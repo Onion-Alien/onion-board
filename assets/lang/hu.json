@@ -1354,7 +1354,6 @@
   "What's new": "Újdonságok",
   "What's playing": "Ami szól",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Ami be van kapcsolva (a hangtorzító, az Élő, egy élő lap), a téma színében látszik. Húzd a saját színed kiválasztásához; témaváltáskor is megmarad.",
-  "What's this tab for?": "Mire jó ez a lap?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Bármi, ami ezt figyeli: <b>{main}</b>, megkapja a hangjaidat (és a beszédhangodat, ha küldöd): OBS, Voicemeeter, keverő vagy capture kártya.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Ami utoljára szólt, gombról, gyorsbillentyűről vagy a véletlen gombról.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Amikor a Discord, a TeamSpeak, a Mumble vagy egy ismert beszédchatű játék figyeli a mikrofonodat (vagy a kábelt), kérdés nélkül annak a módját használja. Ha semmi nem figyel, a mód marad, ahogy van.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "A hangok letöltése…",
   "Downloading the voices: {percent}%": "A hangok letöltése: {percent}%",
   "Others now hear {backup}.": "Mások most ezt hallják: {backup}.",
-  "starting again…": "újraindítás…"
+  "starting again…": "újraindítás…",
+  "How Onion Board works": "Így működik az Onion Board",
+  "How it works": "Így működik",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Az Onion Board a mikrofonodba játssza a hangjaidat, így a Discordon vagy a játékodban ugyanúgy hallják őket, mint téged.{gap}Adj hozzá hangokat a Hangok lapon, aztán kattints duplán az egyikre, vagy nyomd meg a gyorsbillentyűjét. Az alsó sáv mutatja a mikrofonodat, amit mások hallanak, és a fejhallgatódat.{gap}Kattints jobb gombbal egy lapra bal oldalt, és válaszd az Erről a lapról pontot, hogy lásd, mire való.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Tedd a hangjaidat abba a mikrofonba, amit már használsz, így a Discordon és a játékokban semmit sem kell átállítani",
+  "Straight into my mic instead": "Inkább egyenesen a mikrofonomba"
 }

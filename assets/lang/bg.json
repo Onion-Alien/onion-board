@@ -1274,7 +1274,6 @@
   "What's new": "Какво ново",
   "What's playing": "Каквото звучи",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Каквото е включено (гласовият модулатор, На живо, активен раздел), се показва в цвета на темата. Плъзни, за да избереш свой; остава и когато смениш темата.",
-  "What's this tab for?": "За какво е този раздел?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Каквото слуша <b>{main}</b>, получава звуците ти (и гласа ти, ако го пращаш): OBS, Voicemeeter, миксер или карта за запис.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Каквото е звучало последно, от бутон, бърз клавиш или клавиша за случаен звук.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Когато Discord, TeamSpeak, Mumble или игра с познат гласов чат слуша микрофона ти (или кабела), ползвай режима ѝ, без да питаш. Когато нищо не слуша, режимът си остава какъвто е.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Изтегляне на гласовете…",
   "Downloading the voices: {percent}%": "Изтегляне на гласовете: {percent}%",
   "Others now hear {backup}.": "Другите сега чуват {backup}.",
-  "starting again…": "стартиране отново…"
+  "starting again…": "стартиране отново…",
+  "How Onion Board works": "Как работи Onion Board",
+  "How it works": "Как работи",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board пуска звуците ти в микрофона, така че хората в Discord или в играта ти ги чуват така, както чуват теб.{gap}Добави звуци в раздела Звуци, после щракни два пъти върху някой или натисни клавиша му. Лентата долу показва микрофона ти, какво чуват другите и слушалките ти.{gap}Щракни с десния бутон върху раздел вляво и избери За този раздел, за да видиш какво прави.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Пусни звуците си в микрофона, който вече ползваш, така Discord и игрите не се нуждаят от промени",
+  "Straight into my mic instead": "Направо в микрофона ми вместо това"
 }

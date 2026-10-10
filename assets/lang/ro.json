@@ -1371,7 +1371,6 @@
   "What's new": "Ce e nou",
   "What's playing": "Ce se redă",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Ce e pornit (schimbătorul de voce, Live, o filă live) e afișat în culoarea temei. Glisează ca să-ți alegi culoarea; rămâne când schimbi tema.",
-  "What's this tab for?": "La ce folosește fila asta?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Ce ascultă <b>{main}</b> primește sunetele tale (și vocea, dacă o trimiți): OBS, Voicemeeter, un mixer sau o placă de captură.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Ce s-a redat ultima dată, de la un pad, o tastă rapidă sau tasta aleatorie.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Când Discord, TeamSpeak, Mumble sau un joc cu chat vocal cunoscut îți ascultă microfonul (sau cablul), folosește-i modul fără să întrebi. Când nu ascultă nimic, modul rămâne cum e.",
@@ -3073,5 +3072,10 @@
   "Downloading the voices…": "Se descarcă vocile…",
   "Downloading the voices: {percent}%": "Se descarcă vocile: {percent}%",
   "Others now hear {backup}.": "Ceilalți aud acum {backup}.",
-  "starting again…": "se pornește din nou…"
+  "starting again…": "se pornește din nou…",
+  "How Onion Board works": "Cum funcționează Onion Board",
+  "How it works": "Cum funcționează",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board pune sunetele tale în microfon, ca oamenii de pe Discord sau din joc să le audă la fel cum te aud pe tine.{gap}Adaugă sunete în fila Sunete, apoi dă dublu clic pe unul sau apasă tasta lui rapidă. Bara de jos arată microfonul tău, ce aud ceilalți și căștile tale.{gap}Dă clic dreapta pe o filă din stânga și alege Despre fila asta ca să vezi ce face.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Pune sunetele în microfonul pe care îl folosești deja, ca Discord și jocurile să nu aibă nevoie de schimbări",
+  "Straight into my mic instead": "Direct în microfonul meu în schimb"
 }

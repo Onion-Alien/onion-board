@@ -1354,7 +1354,6 @@
   "What's new": "Novedades",
   "What's playing": "Lo que suena",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado (el cambiador de voz, En vivo, una pestaña activa) se muestra en el color del tema. Desliza para elegir el tuyo; se queda cuando cambias de tema.",
-  "What's this tab for?": "¿Para qué es esta pestaña?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Lo que escuche <b>{main}</b> recibe tus sonidos (y tu voz, si la envías): OBS, Voicemeeter, un mezclador o una capturadora.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Lo último que sonó, desde un pad, un atajo o la tecla de sonido al azar.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Cuando Discord, TeamSpeak, Mumble o un juego con un chat de voz conocido está escuchando tu micrófono (o el cable), usar su modo sin preguntar. Si nada está escuchando, el modo se queda como está.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Descargando las voces…",
   "Downloading the voices: {percent}%": "Descargando las voces: {percent}%",
   "Others now hear {backup}.": "Los demás ahora oyen {backup}.",
-  "starting again…": "iniciando de nuevo…"
+  "starting again…": "iniciando de nuevo…",
+  "How Onion Board works": "Cómo funciona Onion Board",
+  "How it works": "Cómo funciona",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board pone tus sonidos en tu micrófono, así la gente en Discord o en tu juego los escucha igual que te escucha a ti.{gap}Agrega sonidos en la pestaña Sonidos y luego haz doble clic en uno o presiona su atajo. La barra de abajo muestra tu micrófono, lo que escuchan los demás y tus audífonos.{gap}Haz clic derecho en una pestaña a la izquierda y elige Sobre esta pestaña para ver qué hace.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Mete tus sonidos en el micrófono que ya usas, así Discord y los juegos no necesitan cambios",
+  "Straight into my mic instead": "Mejor directo a mi micrófono"
 }

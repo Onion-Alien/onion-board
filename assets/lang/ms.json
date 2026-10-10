@@ -1337,7 +1337,6 @@
   "What's new": "Apa yang baharu",
   "What's playing": "Apa yang sedang dimainkan",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Apa yang dihidupkan (pengubah suara, Langsung, tab aktif) ditunjukkan dalam warna tema. Luncurkan untuk memilih warna sendiri; ia kekal apabila anda tukar tema.",
-  "What's this tab for?": "Tab ini untuk apa?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Apa saja yang mendengar <b>{main}</b> mendapat bunyi anda (dan suara anda, jika anda menghantarnya): OBS, Voicemeeter, mikser atau kad tangkap.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Apa saja yang dimainkan terakhir, dari pad, hotkey atau kekunci rawak.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Apabila Discord, TeamSpeak, Mumble atau permainan dengan sembang suara yang dikenali mendengar mikrofon anda (atau kabel), guna modnya tanpa bertanya. Jika tiada yang mendengar, mod kekal seperti sedia ada.",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "Memuat turun suara…",
   "Downloading the voices: {percent}%": "Memuat turun suara: {percent}%",
   "Others now hear {backup}.": "Orang lain kini mendengar {backup}.",
-  "starting again…": "memulakan semula…"
+  "starting again…": "memulakan semula…",
+  "How Onion Board works": "Cara Onion Board berfungsi",
+  "How it works": "Cara ia berfungsi",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board memainkan bunyi anda ke dalam mikrofon, jadi orang di Discord atau dalam permainan anda mendengarnya sama seperti mereka mendengar anda.{gap}Tambah bunyi di tab Bunyi, kemudian klik dua kali pada satu atau tekan kekunci pintasnya. Jalur di bawah menunjukkan mikrofon anda, apa yang orang lain dengar dan fon kepala anda.{gap}Klik kanan tab di sebelah kiri dan pilih Tentang tab ini untuk melihat fungsinya.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Masukkan bunyi anda ke mikrofon yang sudah anda guna, jadi Discord dan permainan tidak perlu diubah",
+  "Straight into my mic instead": "Terus ke mikrofon saya"
 }
