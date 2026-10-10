@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFil
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys, ytdl, ytworker
+from soundboard import theme, winkeys, winpath, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -5223,16 +5223,18 @@ class MainWindow(QMainWindow):
                 import_all(todo)
 
         def import_all(files):
-            for i, f in enumerate(files):
+            for i, shown in enumerate(files):
+                f = shown   # read through any folder link Windows won't follow
                 try:
+                    f = str(winpath.usable(shown))
                     fp = fingerprint(f)
                     if fp and fp in known:
-                        if f in extras:
+                        if shown in extras:
                             self.bridge.imported.emit(None, None, "")   # already moved over
                             continue
                         raise RuntimeError(_("already in your library as “{name}”",
                                              name=known[fp]))
-                    x = extras.get(f)   # from another soundboard: named as it was there
+                    x = extras.get(shown)   # from another soundboard: named as it was there
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
                                              name=x.name if x is not None else "")
                     if x is not None:
@@ -5250,7 +5252,7 @@ class MainWindow(QMainWindow):
                     self.bridge.imported.emit(meta, data, "")   # it's in there as ours
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't import %s: %s", f, e)
-                    self.bridge.imported.emit(None, None, f"{Path(f).name}: {errors.plain(e)}")
+                    self.bridge.imported.emit(None, None, f"{Path(shown).name}: {errors.plain(e)}")
         threading.Thread(target=run, daemon=True, name="import").start()
         self.status.setText(_("Importing {count} file(s)…", count=count))
         busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in

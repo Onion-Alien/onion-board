@@ -28,7 +28,7 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__, mapped
+from soundboard import __version__, mapped, winpath
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -36,16 +36,17 @@ from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
-APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
+# usable_dir: spelled out through any folder link Windows won't follow (soundboard.winpath)
+APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard")
 # from when this app was called Soundboard; see migrate_from_soundboard() below
-OLD_APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
-SOUNDS_DIR = APP_DIR / "sounds"
-CACHE_DIR = APP_DIR / "cache"
+OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Soundboard")
+SOUNDS_DIR = winpath.usable_dir(APP_DIR / "sounds")
+CACHE_DIR = winpath.usable_dir(APP_DIR / "cache")
 CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 # cache files a delete was refused for (still mapped, see _unlink): not new imports, so
 # prune_cache retries them at once instead of after CACHE_GRACE_S
 _refused: set[Path] = set()
-THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
+THUMBS_DIR = winpath.usable_dir(APP_DIR / "thumbs")   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
 # from before them drops them when it saves, and the next newer start takes them back
