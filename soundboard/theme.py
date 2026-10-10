@@ -526,6 +526,7 @@ QPushButton#danger[quiet="true"] { background:transparent; }
 QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
+QPushButton#searchsource { padding:6px 12px; font-size:10pt; }
 QPushButton#backhome { background:$danger_bg; border:1px solid $danger_border; color:$danger_text;
     font-weight:700; font-size:10pt; padding:6px 14px; border-radius:8px; }
 QPushButton#backhome:hover { background:$danger_hover; border-color:$danger_text; }

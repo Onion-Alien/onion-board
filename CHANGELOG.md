@@ -12,6 +12,7 @@
 - The Setup microphone card has a grouped audio flow, clearer setup guidance,
   and a separate optional update notice.
 - **Polished Voice card headers.** Each card has a theme-coloured icon badge, balanced vertical padding and a narrower layout.
+- Web search has a padded header and evenly sized source buttons with site icons.
 - **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
   keyboard navigation, so startup focus no longer looks like a second selected tab.
 - The Voice tab's off state says "Voice effects off — mic unchanged" as plain
