@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The search box on the Sounds tab has a tidier gap between the magnifying glass
+  and placeholder text.
+
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.
