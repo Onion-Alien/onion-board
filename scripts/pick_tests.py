@@ -18,7 +18,7 @@ Prints the test files, one per line: `tests` alone for all of them, nothing for 
 --local also counts uncommitted and new files. Locally, scripts/precommit.ps1 runs
 ruff, the sensitive-data scan and these tests in one go.
 
---matrix prints CI's Windows jobs as JSON instead (BASE "all": the whole suite): the
+--matrix prints CI's test jobs as JSON instead (BASE "all": the whole suite): the
 picked files split into SHARDS jobs of about the same length by test_times.json (each
 file's seconds in a full run), or one job when they're quick, or none. Refresh it now
 and then from a full run's `--durations=0 --durations-min=0` (refresh_times()).
@@ -153,7 +153,7 @@ def pick(changed: list[str]) -> list[str]:
 
 
 TIMES = Path(__file__).with_name("test_times.json")
-SHARDS = 2             # Windows jobs a long run is split into
+SHARDS = 3             # jobs a long run is split into (on Windows and on Linux)
 SPLIT_FROM_S = 240     # seconds of tests (summed over workers) worth a second job:
                        # each job spends ~35 s starting (checkout, venv cache, Python)
 

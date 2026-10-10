@@ -112,7 +112,7 @@ jobs:
           ruff check .
 
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
-  # most of the suite) in two jobs side by side, about half the wait.
+  # most of the suite) in three jobs side by side, about a third of the wait.
   windows:
     needs: pick
     if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
@@ -191,17 +191,18 @@ jobs:
   # The same suite on Linux, for people working on the code away from Windows: the
   # tests marked `windows` are skipped and Windows itself is stood in for
   # (tests/offwindows.py), so this run proves the Linux mode still works.
+  # Split as the Windows jobs are (the whole suite in one job took ~6 min).
   test-linux:
     needs: pick
-    # as `test`: skipped when the change needs no tests, failing when ruff did
-    if: ${{ !cancelled() && (needs.pick.result != 'success' || needs.pick.outputs.tests != '') }}
+    if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
+    name: test-linux (${{ matrix.shard }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - if: needs.pick.result != 'success'
-        run: |
-          echo "ruff or the test pick failed: see the pick job"
-          exit 1
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
         id: py
@@ -226,4 +227,4 @@ jobs:
       - run: .venv/bin/python -m pytest --durations=20 $TESTS
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ needs.pick.outputs.tests }}
+          TESTS: ${{ matrix.tests }}
