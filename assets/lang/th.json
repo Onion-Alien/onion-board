@@ -2950,7 +2950,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "ส่งเสียงเข้าไมค์ที่คุณใช้อยู่แล้ว Discord และเกมจึงไม่ต้องเปลี่ยนอะไรเลย",
   "Straight into my mic instead": "เข้าไมค์โดยตรงแทน",
   "your real voice": "เสียงจริงของคุณ",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "เพิ่มแท็บ <b>แอป</b> (ส่งเพลงหรือเกมเข้าสตรีมของคุณ) และ<b>คู่มือสตรีมเมอร์</b> (ปุ่ม Stream Deck, คำสั่งในแชท)",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "เพิ่มแท็บ <b>ทริกเกอร์</b>: Onion Watch เล่นเสียงเมื่อมีบางอย่างขึ้นบนหน้าจอ (การฆ่า, “YOU DIED”)",
   "Competitive games": "เกมแข่งขัน",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "ทุกแท็บ: รวม <b>วิทยุ</b>, <b>แอป</b> และ <b>ทริกเกอร์</b> ด้วย",
@@ -2960,5 +2959,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "เล่นเสียงใน Discord และเกม ไม่ต้องเรียนรู้อะไรเพิ่ม",
   "Show me everything": "แสดงทั้งหมด",
   "Streaming": "สตรีมมิ่ง",
-  "What will you use Onion Board for?": "คุณจะใช้ Onion Board ทำอะไร?"
+  "What will you use Onion Board for?": "คุณจะใช้ Onion Board ทำอะไร?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "เพิ่มแท็บ <b>แอป</b> (ส่งเพลงหรือเกมเข้าสตรีมของคุณ) ขั้นตอนสุดท้ายมีลิงก์ไปยัง<b>คู่มือสตรีมเมอร์</b> (ปุ่ม Stream Deck, คำสั่งในแชท)"
 }

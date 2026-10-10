@@ -3014,7 +3014,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Tedd a hangjaidat abba a mikrofonba, amit már használsz, így a Discordon és a játékokban semmit sem kell átállítani",
   "Straight into my mic instead": "Inkább egyenesen a mikrofonomba",
   "your real voice": "az igazi hangod",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Hozzáadja az <b>Appok</b> lapot (küldj zenét vagy játékot a streamedbe) és a <b>Streamer-útmutató</b> (Stream Deck gombok, chatparancsok).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Hozzáadja a <b>Triggerek</b> lapot: az Onion Watch lejátszik egy hangot, ha valami megjelenik a képernyőn (egy kill, “YOU DIED”).",
   "Competitive games": "Versengő játékok",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Minden lap: a <b>Rádió</b>, <b>Appok</b> és <b>Triggerek</b> is.",
@@ -3024,5 +3023,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Játssz le hangokat Discordban és játékokban. Semmi mást nem kell megtanulni.",
   "Show me everything": "Mutass mindent",
   "Streaming": "Streamelés",
-  "What will you use Onion Board for?": "Mire fogod használni az Onion Boardot?"
+  "What will you use Onion Board for?": "Mire fogod használni az Onion Boardot?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Hozzáadja az <b>Appok</b> lapot (küldj zenét vagy játékot a streamedbe). Az utolsó lépés a <b>Streamer-útmutató</b> oldalra mutat (Stream Deck gombok, chatparancsok)."
 }

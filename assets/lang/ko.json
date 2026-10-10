@@ -2950,7 +2950,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "이미 쓰는 마이크로 사운드를 보내서 Discord와 게임 설정을 바꿀 필요가 없어요",
   "Straight into my mic instead": "대신 마이크로 바로",
   "your real voice": "당신의 진짜 목소리",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>앱</b> 탭(음악이나 게임 소리를 방송으로 보내기)과 <b>스트리머 가이드</b>(Stream Deck 키, 채팅 명령어)를 추가해요.",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "<b>트리거</b> 탭을 추가해요: 화면에 무언가 나타나면 Onion Watch가 소리를 재생해요(킬, “YOU DIED”).",
   "Competitive games": "경쟁 게임",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "모든 탭: <b>라디오</b>, <b>앱</b>, <b>트리거</b>까지.",
@@ -2960,5 +2959,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Discord와 게임에서 사운드를 재생해요. 더 배울 건 없어요.",
   "Show me everything": "전부 보여줘",
   "Streaming": "방송",
-  "What will you use Onion Board for?": "Onion Board를 어디에 쓰실 건가요?"
+  "What will you use Onion Board for?": "Onion Board를 어디에 쓰실 건가요?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>앱</b> 탭(음악이나 게임 소리를 방송으로 보내기)을 추가해요. 마지막 단계에 <b>스트리머 가이드</b>(Stream Deck 키, 채팅 명령어) 링크가 있어요."
 }

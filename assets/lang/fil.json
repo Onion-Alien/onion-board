@@ -3014,7 +3014,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Ilagay ang sounds mo sa mic na gamit mo na, kaya walang kailangang baguhin sa Discord at mga game",
   "Straight into my mic instead": "Diretso na lang sa mic ko",
   "your real voice": "ang tunay mong boses",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Idinadagdag ang <b>Apps</b> tab (ipadala ang musika o laro sa stream mo) at ang <b>Streamer guide</b> (mga key ng Stream Deck, chat command).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Idinadagdag ang <b>Triggers</b> tab: nagpapatugtog ang Onion Watch ng tunog kapag may lumabas sa screen mo (isang kill, “YOU DIED”).",
   "Competitive games": "Mga competitive na laro",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Lahat ng tab: pati <b>Radio</b>, <b>Apps</b> at <b>Triggers</b>.",
@@ -3024,5 +3023,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Magpatugtog ng tunog sa Discord at mga laro. Wala nang ibang kailangang aralin.",
   "Show me everything": "Ipakita lahat",
   "Streaming": "Streaming",
-  "What will you use Onion Board for?": "Para saan mo gagamitin ang Onion Board?"
+  "What will you use Onion Board for?": "Para saan mo gagamitin ang Onion Board?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Idinadagdag ang <b>Apps</b> tab (ipadala ang musika o laro sa stream mo). May link ang huling hakbang sa <b>Streamer guide</b> (mga key ng Stream Deck, chat command)."
 }

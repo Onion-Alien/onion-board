@@ -3078,7 +3078,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Пускай звуки в мікрофон, яким ти вже користуєшся, і в Discord та іграх нічого міняти не треба",
   "Straight into my mic instead": "Натомість прямо в мікрофон",
   "your real voice": "твій справжній голос",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Додає вкладку <b>Програми</b> (надсилай музику чи гру на стрим) і <b>Керівництво по стримеру</b> (кнопки Stream Deck, команди в чаті).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Додає вкладку <b>Тригери</b>: Onion Watch грає звук, коли щось з'являється на екрані (кіл, “YOU DIED”).",
   "Competitive games": "Змагальні ігри",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Усі вкладки: також <b>Радіо</b>, <b>Програми</b> і <b>Тригери</b>.",
@@ -3088,5 +3087,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Вмикай звуки в Discord та іграх. Більше нічого вчити не треба.",
   "Show me everything": "Покажи все",
   "Streaming": "Стрімінг",
-  "What will you use Onion Board for?": "Для чого ти використовуватимеш Onion Board?"
+  "What will you use Onion Board for?": "Для чого ти використовуватимеш Onion Board?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Додає вкладку <b>Програми</b> (надсилай музику чи гру на стрим). На останньому кроці є посилання: <b>Керівництво по стримеру</b> (кнопки Stream Deck, команди в чаті)."
 }

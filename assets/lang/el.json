@@ -3014,7 +3014,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Βάλε τους ήχους σου στο μικρόφωνο που ήδη χρησιμοποιείς, ώστε το Discord και τα παιχνίδια να μη χρειάζονται αλλαγές",
   "Straight into my mic instead": "Κατευθείαν στο μικρόφωνό μου",
   "your real voice": "την αληθινή σου φωνή",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Προσθέτει την καρτέλα <b>Εφαρμογές</b> (στείλε μουσική ή ένα παιχνίδι στο stream σου) και τον <b>Οδηγός για streamers</b> (πλήκτρα Stream Deck, εντολές στο chat).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Προσθέτει την καρτέλα <b>Εναύσματα</b>: το Onion Watch παίζει έναν ήχο όταν κάτι εμφανιστεί στην οθόνη σου (ένα kill, “YOU DIED”).",
   "Competitive games": "Ανταγωνιστικά παιχνίδια",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Όλες οι καρτέλες: και <b>Ραδιόφωνο</b>, <b>Εφαρμογές</b> και <b>Εναύσματα</b>.",
@@ -3024,5 +3023,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Παίξε ήχους στο Discord και σε παιχνίδια. Τίποτα άλλο να μάθεις.",
   "Show me everything": "Δείξε μου τα πάντα",
   "Streaming": "Streaming",
-  "What will you use Onion Board for?": "Για τι θα χρησιμοποιείς το Onion Board;"
+  "What will you use Onion Board for?": "Για τι θα χρησιμοποιείς το Onion Board;",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Προσθέτει την καρτέλα <b>Εφαρμογές</b> (στείλε μουσική ή ένα παιχνίδι στο stream σου). Το τελευταίο βήμα έχει σύνδεσμο στον <b>Οδηγός για streamers</b> (πλήκτρα Stream Deck, εντολές στο chat)."
 }

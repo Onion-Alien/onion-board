@@ -2950,7 +2950,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "把音效放進你已經在用的麥克風，Discord 和遊戲都不用改設定",
   "Straight into my mic instead": "改為直接送進我的麥克風",
   "your real voice": "你真實的聲音",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "新增<b>應用程式</b>分頁（把音樂或遊戲聲音送進直播）和<b>實況主教學</b>（Stream Deck 按鍵、聊天指令）。",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "新增<b>觸發器</b>分頁：螢幕上出現某樣東西時，Onion Watch 會播放音效（擊殺、“YOU DIED”）。",
   "Competitive games": "競技遊戲",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "所有分頁：<b>電台</b>、<b>應用程式</b>和<b>觸發器</b>也一起。",
@@ -2960,5 +2959,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "在 Discord 和遊戲裡播放音效。不用再學別的。",
   "Show me everything": "全部顯示",
   "Streaming": "直播",
-  "What will you use Onion Board for?": "你打算用 Onion Board 做什麼？"
+  "What will you use Onion Board for?": "你打算用 Onion Board 做什麼？",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "新增<b>應用程式</b>分頁（把音樂或遊戲聲音送進直播）。最後一步附有<b>實況主教學</b>的連結（Stream Deck 按鍵、聊天指令）。"
 }

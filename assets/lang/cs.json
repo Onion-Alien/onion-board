@@ -3078,7 +3078,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Pošli zvuky do mikrofonu, který už používáš, takže Discord ani hry nemusíš nijak měnit",
   "Straight into my mic instead": "Místo toho rovnou do mikrofonu",
   "your real voice": "tvůj skutečný hlas",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Přidá kartu <b>Aplikace</b> (pošli hudbu nebo hru do streamu) a <b>Průvodce pro streamery</b> (tlačítka Stream Decku, příkazy v chatu).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Přidá kartu <b>Spouštěče</b>: Onion Watch zahraje zvuk, když se něco objeví na obrazovce (zabití, “YOU DIED”).",
   "Competitive games": "Soutěžní hry",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Všechny karty: i <b>Rádio</b>, <b>Aplikace</b> a <b>Spouštěče</b>.",
@@ -3088,5 +3087,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Přehrávej zvuky v Discordu a hrách. Nic dalšího se neučíš.",
   "Show me everything": "Ukaž mi všechno",
   "Streaming": "Streamování",
-  "What will you use Onion Board for?": "K čemu budeš Onion Board používat?"
+  "What will you use Onion Board for?": "K čemu budeš Onion Board používat?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Přidá kartu <b>Aplikace</b> (pošli hudbu nebo hru do streamu). Poslední krok odkazuje na <b>Průvodce pro streamery</b> (tlačítka Stream Decku, příkazy v chatu)."
 }

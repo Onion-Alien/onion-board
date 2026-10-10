@@ -3014,7 +3014,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Mete tus sonidos en el micrófono que ya usas, así Discord y los juegos no necesitan cambios",
   "Straight into my mic instead": "Mejor directo a mi micrófono",
   "your real voice": "tu voz real",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Agrega la pestaña <b>Apps</b> (manda música o un juego a tu stream) y la <b>Guía para streamers</b> (teclas del Stream Deck, comandos del chat).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Agrega la pestaña <b>Disparadores</b>: Onion Watch reproduce un sonido cuando algo aparece en tu pantalla (una kill, “YOU DIED”).",
   "Competitive games": "Juegos competitivos",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Todas las pestañas: también <b>Radio</b>, <b>Apps</b> y <b>Disparadores</b>.",
@@ -3024,5 +3023,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Reproduce sonidos en Discord y juegos. Nada más que aprender.",
   "Show me everything": "Muéstrame todo",
   "Streaming": "Streaming",
-  "What will you use Onion Board for?": "¿Para qué vas a usar Onion Board?"
+  "What will you use Onion Board for?": "¿Para qué vas a usar Onion Board?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Agrega la pestaña <b>Apps</b> (manda música o un juego a tu stream). El último paso enlaza la <b>Guía para streamers</b> (teclas del Stream Deck, comandos del chat)."
 }

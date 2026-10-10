@@ -3270,7 +3270,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "ضع أصواتك في الميكروفون الذي تستخدمه أصلًا، فلا يحتاج Discord والألعاب إلى أي تغيير",
   "Straight into my mic instead": "مباشرة إلى الميكروفون بدلًا من ذلك",
   "your real voice": "صوتك الحقيقي",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "يضيف تبويب <b>التطبيقات</b> (أرسل الموسيقى أو لعبة إلى بثّك) و<b>دليل البث</b> (أزرار Stream Deck وأوامر الدردشة).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "يضيف تبويب <b>المحفّزات</b>: يشغّل Onion Watch صوتًا عندما يظهر شيء على شاشتك (قتل، “YOU DIED”).",
   "Competitive games": "ألعاب تنافسية",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "كل التبويبات: <b>الراديو</b> و<b>التطبيقات</b> و<b>المحفّزات</b> أيضًا.",
@@ -3280,5 +3279,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "شغّل الأصوات في Discord والألعاب. لا شيء آخر لتتعلمه.",
   "Show me everything": "أرني كل شيء",
   "Streaming": "البث",
-  "What will you use Onion Board for?": "لماذا ستستخدم Onion Board؟"
+  "What will you use Onion Board for?": "لماذا ستستخدم Onion Board؟",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "يضيف تبويب <b>التطبيقات</b> (أرسل الموسيقى أو لعبة إلى بثّك). الخطوة الأخيرة فيها رابط إلى <b>دليل البث</b> (أزرار Stream Deck وأوامر الدردشة)."
 }

@@ -165,8 +165,8 @@ def uses() -> tuple[tuple[str, str, str, str], ...]:
     return (("normal", "volume", _("Just sounds"),
              _("Play sounds in Discord and games. Nothing else to learn.")),
             ("streamer", "live", _("Streaming"),
-             _("Adds the <b>Apps</b> tab (send music or a game to your stream) and the "
-               "<b>Streamer guide</b> (Stream Deck keys, chat commands).")),
+             _("Adds the <b>Apps</b> tab (send music or a game to your stream). The last step "
+               "links the <b>Streamer guide</b> (Stream Deck keys, chat commands).")),
             ("games", "gamepad", _("Competitive games"),
              _("Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something "
                "shows up on your screen (a kill, \u201cYOU DIED\u201d).")),

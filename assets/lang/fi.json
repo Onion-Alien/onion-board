@@ -3014,7 +3014,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Laita äänesi mikkiin, jota jo käytät, niin Discordiin ja peleihin ei tarvitse muuttaa mitään",
   "Straight into my mic instead": "Suoraan mikkiini sen sijaan",
   "your real voice": "oikean äänesi",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Lisää <b>Sovellukset</b>-välilehden (lähetä musiikkia tai peli streamiisi) ja <b>Streamaajan opas</b> (Stream Deck -näppäimet, chat-komennot).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Lisää <b>Laukaisimet</b>-välilehden: Onion Watch soittaa äänen, kun ruudulle tulee jotain (tappo, “YOU DIED”).",
   "Competitive games": "Kilpapelit",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Kaikki välilehdet: myös <b>Radio</b>, <b>Sovellukset</b> ja <b>Laukaisimet</b>.",
@@ -3024,5 +3023,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Soita ääniä Discordissa ja peleissä. Ei muuta opeteltavaa.",
   "Show me everything": "Näytä kaikki",
   "Streaming": "Striimaus",
-  "What will you use Onion Board for?": "Mihin käytät Onion Boardia?"
+  "What will you use Onion Board for?": "Mihin käytät Onion Boardia?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Lisää <b>Sovellukset</b>-välilehden (lähetä musiikkia tai peli streamiisi). Viimeisessä vaiheessa on linkki: <b>Streamaajan opas</b> (Stream Deck -näppäimet, chat-komennot)."
 }

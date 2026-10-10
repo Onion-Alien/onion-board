@@ -2950,7 +2950,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Masukkan suaramu ke mic yang sudah kamu pakai, jadi Discord dan game tidak perlu diubah",
   "Straight into my mic instead": "Langsung ke mic-ku saja",
   "your real voice": "suara aslimu",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Menambah tab <b>Aplikasi</b> (kirim musik atau game ke stream-mu) dan <b>Panduan streamer</b> (tombol Stream Deck, perintah chat).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Menambah tab <b>Pemicu</b>: Onion Watch memutar suara saat sesuatu muncul di layarmu (kill, “YOU DIED”).",
   "Competitive games": "Game kompetitif",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Semua tab: <b>Radio</b>, <b>Aplikasi</b> dan <b>Pemicu</b> juga.",
@@ -2960,5 +2959,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Putar suara di Discord dan game. Tidak ada lagi yang perlu dipelajari.",
   "Show me everything": "Tampilkan semuanya",
   "Streaming": "Streaming",
-  "What will you use Onion Board for?": "Mau pakai Onion Board untuk apa?"
+  "What will you use Onion Board for?": "Mau pakai Onion Board untuk apa?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Menambah tab <b>Aplikasi</b> (kirim musik atau game ke stream-mu). Langkah terakhir menautkan <b>Panduan streamer</b> (tombol Stream Deck, perintah chat)."
 }

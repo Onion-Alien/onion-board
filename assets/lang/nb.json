@@ -3014,7 +3014,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Send lydene dine inn i mikrofonen du allerede bruker, så Discord og spill ikke trenger endringer",
   "Straight into my mic instead": "Rett inn i mikrofonen min i stedet",
   "your real voice": "din ekte stemme",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Legger til fanen <b>Apper</b> (send musikk eller et spill til strømmen din) og <b>Streamerguide</b> (Stream Deck-knapper, chattekommandoer).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Legger til fanen <b>Triggere</b>: Onion Watch spiller en lyd når noe dukker opp på skjermen (en kill, “YOU DIED”).",
   "Competitive games": "Konkurransespill",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Alle faner: også <b>Radio</b>, <b>Apper</b> og <b>Triggere</b>.",
@@ -3024,5 +3023,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Spill lyder i Discord og spill. Ingenting annet å lære.",
   "Show me everything": "Vis meg alt",
   "Streaming": "Strømming",
-  "What will you use Onion Board for?": "Hva skal du bruke Onion Board til?"
+  "What will you use Onion Board for?": "Hva skal du bruke Onion Board til?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Legger til fanen <b>Apper</b> (send musikk eller et spill til strømmen din). Siste trinn lenker til <b>Streamerguide</b> (Stream Deck-knapper, chattekommandoer)."
 }

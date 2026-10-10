@@ -2950,7 +2950,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Đưa âm thanh vào chính mic bạn đang dùng, nên Discord và game không cần đổi gì",
   "Straight into my mic instead": "Thay vào đó đưa thẳng vào mic",
   "your real voice": "giọng thật của bạn",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Thêm tab <b>Ứng dụng</b> (gửi nhạc hoặc âm thanh game vào stream) và <b>Hướng dẫn truyền phát</b> (phím Stream Deck, lệnh chat).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Thêm tab <b>Kích hoạt</b>: Onion Watch phát âm thanh khi có gì đó hiện trên màn hình (một mạng hạ gục, “YOU DIED”).",
   "Competitive games": "Game đối kháng",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Mọi tab: cả <b>Radio</b>, <b>Ứng dụng</b> và <b>Kích hoạt</b>.",
@@ -2960,5 +2959,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Phát âm thanh trong Discord và game. Không cần học thêm gì.",
   "Show me everything": "Cho tôi xem tất cả",
   "Streaming": "Phát trực tiếp",
-  "What will you use Onion Board for?": "Bạn sẽ dùng Onion Board để làm gì?"
+  "What will you use Onion Board for?": "Bạn sẽ dùng Onion Board để làm gì?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Thêm tab <b>Ứng dụng</b> (gửi nhạc hoặc âm thanh game vào stream). Bước cuối có liên kết tới <b>Hướng dẫn truyền phát</b> (phím Stream Deck, lệnh chat)."
 }

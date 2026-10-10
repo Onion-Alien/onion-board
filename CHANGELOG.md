@@ -3,8 +3,8 @@
 ## Unreleased
 
 - Quick setup: on the very first launch the guide starts by asking what you'll use Onion
-  Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and a
-  *Streamer guide* button on the last step, *Competitive games* adds the Triggers tab
+  Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and links
+  the *Streamer guide* on the last step, *Competitive games* adds the Triggers tab
   (Onion Watch), and *Show me everything* adds every tab. It's asked once only; Settings →
   Tabs changes it later.
 - The note that pops up above the player ("Added … to Sounds", device changes and so

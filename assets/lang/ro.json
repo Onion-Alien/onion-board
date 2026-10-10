@@ -3078,7 +3078,6 @@
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Pune sunetele în microfonul pe care îl folosești deja, ca Discord și jocurile să nu aibă nevoie de schimbări",
   "Straight into my mic instead": "Direct în microfonul meu în schimb",
   "your real voice": "vocea ta adevărată",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Adaugă fila <b>Aplicații</b> (trimite muzică sau un joc pe stream) și <b>Ghid pentru streameri</b> (taste Stream Deck, comenzi în chat).",
   "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Adaugă fila <b>Declanșatoare</b>: Onion Watch redă un sunet când apare ceva pe ecran (un kill, “YOU DIED”).",
   "Competitive games": "Jocuri competitive",
   "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Toate filele: și <b>Radio</b>, <b>Aplicații</b> și <b>Declanșatoare</b>.",
@@ -3088,5 +3087,6 @@
   "Play sounds in Discord and games. Nothing else to learn.": "Redă sunete în Discord și în jocuri. Nimic altceva de învățat.",
   "Show me everything": "Arată-mi tot",
   "Streaming": "Streaming",
-  "What will you use Onion Board for?": "Pentru ce vei folosi Onion Board?"
+  "What will you use Onion Board for?": "Pentru ce vei folosi Onion Board?",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Adaugă fila <b>Aplicații</b> (trimite muzică sau un joc pe stream). Ultimul pas duce la <b>Ghid pentru streameri</b> (taste Stream Deck, comenzi în chat)."
 }
