@@ -617,8 +617,11 @@ def search(query: str, count: int = 20, source: str = "youtube",
             if k not in ("format", "outtmpl")}
     opts.update(extract_flat="in_playlist", noplaylist=False, playlistend=count)
 
+    # YouTube's settings kept between searches: Direct mode only (ytworker.CONFIG_KEEP_S)
+    keep = source != "soundcloud" and net.mode() == net.DIRECT
+
     def look():
-        return _extract(target, opts)
+        return _extract(target, opts, keep)
     site = "https://soundcloud.com" if source == "soundcloud" else "https://www.youtube.com"
     info = look() if direct else _over_tor(look, site)
     out = []
@@ -785,12 +788,13 @@ def _remote(e: ytworker.RemoteError) -> Exception:
     return type(name or "Error", (Exception,), {"__module__": module or "yt_dlp"})(str(e))
 
 
-def _extract(target: str, opts: dict) -> dict:
+def _extract(target: str, opts: dict, keep: bool = False) -> dict:
     """yt-dlp's look-up of `target` (nothing downloaded), in the helper process when
-    the app has one (ytworker: it never holds up the sound), else here."""
+    the app has one (ytworker: it never holds up the sound), else here. `keep`: a
+    YouTube search may reuse YouTube's settings from the last one (ytworker.extract)."""
     if ytworker.enabled:
         try:
-            return ytworker.run("lookup", target, _sendable(opts))
+            return ytworker.run("lookup", target, _sendable(opts), *([True] if keep else []))
         except ytworker.RemoteError as e:
             raise _readable(_remote(e)) from None
         except TimeoutError as e:
@@ -799,8 +803,7 @@ def _extract(target: str, opts: dict) -> dict:
             log.info("%s; looking it up here", e)
     with _ydl() as yt_dlp:
         try:
-            with yt_dlp.YoutubeDL(opts) as ydl:
-                return ydl.extract_info(target, download=False)
+            return ytworker.extract(yt_dlp, target, opts, keep)
         except DownloadError:
             raise
         except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
