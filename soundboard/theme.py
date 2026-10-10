@@ -556,8 +556,8 @@ QPushButton#moretabs:hover { background:$btn_hover; border-color:$border_hi; col
 QPushButton#moretabs:pressed { background:$btn_press; }
 QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
-QFrame#sidebar { background:$panel; border:none; border-right:1px solid $border; }
-QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $border; }   /* mirrored */
+QFrame#sidebar { background:$rail_bg; border:none; border-right:1px solid $rail_border; }
+QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $rail_border; }   /* mirrored */
 QToolButton#railtab { background:transparent; color:$muted; border:1px solid transparent;
     border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
 QToolButton#railtab:hover { background:$btn_hover; color:$text; }
@@ -1224,6 +1224,10 @@ def stylesheet(name: str | None = None) -> str:
     tk = tokens(name)
     tk.setdefault("font", FONT)
     outlined = (name or current_name) in OUTLINED
+    # Navigation belongs to the window background, with a quiet inner edge.
+    # Outlined themes keep their deliberate surface and strong divider.
+    tk["rail_bg"] = tk["panel"] if outlined else _mix(tk["bg"], tk["panel"], 0.18)
+    tk["rail_border"] = tk["border"] if outlined else _mix(tk["bg"], tk["border"], 0.35)
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
     tk["check"] = _check_url(tk["on_accent"])
