@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- *Straight into my mic*: a damaged link file between the board and the mic effect
+  that said the wrong sample rate is made again, instead of your sounds going out at
+  the wrong speed and pitch.
 - Importing a backup whose settings name `read_only` no longer stops the app saving
   for the rest of the session (the imported sounds were gone after a restart), and a
   settings file naming it is no longer set aside as damaged.

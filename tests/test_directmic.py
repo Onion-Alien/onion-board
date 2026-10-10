@@ -142,6 +142,21 @@ def test_make_ring_replaces_an_old_layout(tmp_path):
     assert not dm.make_ring(tmp_path / "no" / "such" / "dir" / "ring2.bin")
 
 
+def test_make_ring_replaces_one_with_the_wrong_rate(tmp_path):
+    """The effect plays the board's audio at the rate the file says: a damaged (or
+    tampered) one with another rate the effect accepts, 44.1 kHz, played every sound
+    at the wrong speed and pitch until it was made again. It's made again now."""
+    p = tmp_path / "ring2.bin"
+    assert dm.make_ring(p)
+    raw = bytearray(p.read_bytes())
+    head = np.frombuffer(raw, dm.HEAD, count=1)
+    head["rate"] = 44100
+    p.write_bytes(bytes(raw))
+    assert not dm.make_ring_ok(p)
+    assert dm.make_ring(p)
+    assert np.frombuffer(p.read_bytes(), dm.HEAD, count=1)["rate"][0] == dm.RATE
+
+
 @pytest.mark.parametrize("values, expected", [
     ({}, ("wrap", 7)),                       # nothing: the endpoint effect (raw gets it)
     ({5: "{S}"}, ("wrap", 7)),               # the driver's SFX stays where it is
