@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- The anonymous usage count (if it's switched on) now also says, as rough buckets
+  only: how many times the app was started since the last count, and whether it runs
+  on Windows 11, Windows 10 or older. It also confirms when a new version actually
+  started after an update. A bug that saves many reports in a row is counted as the
+  first 10 plus one "more left out" count. Problem counts that couldn't be sent wait
+  for the next send instead of being lost. See SECURITY.md.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
