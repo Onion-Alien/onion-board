@@ -84,6 +84,24 @@ half-written ring files at the effect (built with sanitizer traps);
 `fuzzhost --lead` replays a late board block by block (no timing luck) and checks the
 effect's lead grows just enough and comes back; the real-time tests can't pin that down.
 
+**Not on Windows?** The suite also runs on Linux and macOS: `tests/offwindows.py`
+stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
+app imports, and tests marked `@pytest.mark.windows` (or a file's `pytestmark`) are
+skipped. Everything else (mixing, effects, config, the windows on Qt's offscreen
+platform) runs as on Windows; CI runs both. On Debian / Ubuntu:
+
+```sh
+sudo apt-get install libportaudio2 libsndfile1 libegl1 libxkbcommon0 libgl1 libfontconfig1 libdbus-1-3
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt pytest==9.1.1 pytest-xdist==3.8.0 ruff==0.16.9
+QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest
+```
+
+`-m windows` or `-m "not windows"` picks either set on any system. Mark a test
+`windows` only when it fails off Windows because of Windows itself (its registry, a
+DLL, a Windows-only process or file), never to hide a real failure; anything that
+changes Windows (the mic effect, the registry) is still checked only on Windows.
+
 To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
 before committing. The full suite runs on 4 workers (pytest-xdist, about a minute);

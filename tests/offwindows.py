@@ -13,8 +13,15 @@ Tests that need the real thing are marked `@pytest.mark.windows` (or a file's
 from __future__ import annotations
 
 import ctypes
+import subprocess
 import sys
 import types
+
+_POPEN_FLAGS = ("CREATE_NO_WINDOW", "CREATE_NEW_CONSOLE", "CREATE_NEW_PROCESS_GROUP",
+                "DETACHED_PROCESS", "CREATE_BREAKAWAY_FROM_JOB", "CREATE_DEFAULT_ERROR_MODE",
+                "BELOW_NORMAL_PRIORITY_CLASS", "ABOVE_NORMAL_PRIORITY_CLASS",
+                "IDLE_PRIORITY_CLASS", "NORMAL_PRIORITY_CLASS", "HIGH_PRIORITY_CLASS",
+                "REALTIME_PRIORITY_CLASS")
 
 
 class NotWindows(OSError):
@@ -104,6 +111,11 @@ def install() -> None:
     ctypes.set_last_error = lambda _v: 0
     ctypes.FormatError = lambda code=0: f"Windows error {code}"
     ctypes.WinError = lambda code=None, descr=None: NotWindows(code, descr or "not on Windows")
+    # Windows-only Popen flags: 0, because POSIX's Popen refuses any other
+    # creationflags (and a child never opens a console window there anyway).
+    for flag in _POPEN_FLAGS:
+        if not hasattr(subprocess, flag):
+            setattr(subprocess, flag, 0)
 
 
 def quiet_hotkeys() -> None:
