@@ -275,7 +275,9 @@ def test_a_signed_request_never_sends_the_key(qapp, loaded):
     assert call(qapp, srv, "/api/status", {"X-Sig": _sig("guess", "POST /api/status")},
                 "POST")[0] == 401
     srv.succeeded("127.0.0.1")
-    for junk in ("", "x", "1.2.3", "99999999999999.aaaaaaaaaaaaaaaa.x", ". . ."):
+    for junk in ("", "x", "1.2.3", "99999999999999.aaaaaaaaaaaaaaaa.x", ". . .",
+                 "\u00b2.aaaaaaaaaaaaaaaa.x", "1\u0663.aaaaaaaaaaaaaaaa.x"):   # ², Arabic 3:
+        # digits to isdigit(), not to int(): refused, not a dropped connection
         assert not srv.signed(junk, "POST /api/status")
     assert api(qapp, srv, "/api/status", "add-on-key")[0] == 200   # older Pocket pages
 
