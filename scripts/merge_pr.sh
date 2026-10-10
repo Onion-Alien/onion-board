@@ -24,7 +24,9 @@ title=$(gh pr view "$n" --json title -q .title)
 [ "$base" = main ] || { echo "PR #$n goes into $base, not main." >&2; exit 1; }
 
 # required checks: gh exits 0 only when every one has passed
-if ! gh pr checks "$n" --required >/dev/null 2>&1; then
+checks_passed=$(gh pr checks "$n" --required --json bucket \
+    --jq 'length > 0 and all(.[]; .bucket == "pass")' 2>/dev/null || true)
+if [ "$checks_passed" != true ]; then
     gh pr checks "$n" --required >&2 || true
     echo "PR #$n: its required checks haven't all passed yet." >&2
     exit 1

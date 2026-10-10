@@ -1182,7 +1182,6 @@ class MainWindow(QMainWindow):
                                 "OBS…): your mic plus whatever is live"))
         self.out_meter = Meter()
         self.out_meter.setMinimumWidth(60)
-        self.out_meter.setMaximumWidth(280)
         self.out_meter.setToolTip(_("Level of what others receive (Discord, the game, OBS…)"))
         row.addWidget(self.out_meter, 1)
         self.btn_check = QPushButton(_("Hear what they hear"))
@@ -1205,8 +1204,6 @@ class MainWindow(QMainWindow):
         self._mixer_hp = self._decks[2]
         self._mixer_send = (self.out_meter,)
         self._mixer_others = self._decks[1]
-        for row in self._deck_rows:
-            row.addStretch(1)
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
@@ -1489,7 +1486,6 @@ class MainWindow(QMainWindow):
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
         self._name_seek = NameAndSeek(self.np_name, self.seek, 190)
-        self._name_seek.setMaximumWidth(720)
         th.addWidget(self._name_seek, 1)
         th.addWidget(self.np_time)
         # only for a pad made from a video (soundboard.videos): shows it in step
@@ -7872,7 +7868,9 @@ class MainWindow(QMainWindow):
             self.btn_yt.setVisible(not tight and self.ytresults.available()),
             r.touch(self.btn_yt)))
         f.add(64, "w", r.icon_only(self.btn_more))
-        f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
+        f.add(70, "w", lambda tight: (
+            r.hide(self.btn_check, *self._mixer_send, *self._mixer_others)(
+                tight and self.width() < 760)))
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
         self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
@@ -7881,7 +7879,7 @@ class MainWindow(QMainWindow):
         # height: the status line, then the whole mixer strip
         f.add(5, "h", self.rail.compact)   # the rail's buttons closer together, first
         f.add(10, "h", self.status.set_room)
-        f.add(40, "h", r.hide(self.mixer))
+        f.add(40, "h", lambda tight: r.hide(self.mixer)(tight and self.height() < 520))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
         self._stack_cols = (r.stack(self._setup_cols), r.stack(self._setup_top),
                             *self.voice.stack_steps())
@@ -7899,6 +7897,7 @@ class MainWindow(QMainWindow):
             # hidden page's sizes go stale and it stayed the mini player at sizes the
             # whole window fits (nothing is painted before this returns)
             self._set_mini(False)
+            self.rail.compact(self.rail._compact)
             responsive.touch(self._pads_scroll)
             # room for a whole row of pads comes before the mixer, the status line and
             # the rest: without it they kept their room and the pads got a slit
@@ -7916,6 +7915,10 @@ class MainWindow(QMainWindow):
             for apply in self._stack_cols[2:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
+            if need.width() > size.width() or need.height() > size.height():
+                # Growing can restore the mixer after width fitting has finished.
+                # Fit its newly visible controls before deciding to use mini mode.
+                need = self._fit.fit(size)
             mini = need.width() > size.width() or need.height() > size.height()
             if mini and not self.is_mini():
                 log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
