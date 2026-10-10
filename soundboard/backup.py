@@ -601,10 +601,11 @@ def keep_pack(pkg: Package) -> str:
         if src.is_dir():
             for p in sorted(p for p in src.rglob("*") if p.is_file()):
                 h.update(f"{p.relative_to(src).as_posix()}\0{p.stat().st_size}\0".encode())
-        else:
-            with open(src, "rb") as f:
-                while chunk := f.read(1 << 20):
-                    h.update(chunk)
+        else:   # what's in it, not when it was zipped: the same pack re-zipped is one pack
+            with zipfile.ZipFile(src) as z:
+                for i in sorted(z.infolist(), key=lambda i: i.filename):
+                    if not i.is_dir():
+                        h.update(f"{i.filename}\0{i.CRC}\0{i.file_size}\0".encode())
         pid = h.hexdigest()[:12]
         d = packs_dir()
         d.mkdir(parents=True, exist_ok=True)
@@ -624,7 +625,7 @@ def keep_pack(pkg: Package) -> str:
                 raise
         name = src.stem if not src.is_dir() else src.name
         (d / f"{pid}.json").write_text(json.dumps({"name": name[:60]}), "utf-8")
-    except OSError:
+    except _ZIP_ERRORS:   # OSError, or a zip that changed since it was read
         log.warning("couldn't keep a copy of the sound pack %s", src.name, exc_info=True)
         return ""
     pkg.pack_id = pid
