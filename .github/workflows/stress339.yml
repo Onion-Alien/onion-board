@@ -1,0 +1,91 @@
+name: stress339
+
+# Temporary (issue #339): the tab-switch tests over and over on Windows with full page
+# heap, so a use-after-free crashes where it happens. Not for main.
+on:
+  push:
+    branches: [claude/confident-mayer-fbwoo3]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stress:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: tabs-pageheap
+            heap: "1"
+            tests: tests/test_tab_switches.py
+            count: "8"
+          - name: tabs-plain
+            heap: "0"
+            tests: tests/test_tab_switches.py
+            count: "25"
+          - name: shard3-pageheap
+            heap: "1"
+            tests: >-
+              tests/test_appspanel.py tests/test_audit_main.py tests/test_backup.py
+              tests/test_board_window.py tests/test_busy.py tests/test_fit.py
+              tests/test_set_offline.py tests/test_shell_dialogs.py tests/test_status_note.py
+              tests/test_tab_switches.py tests/test_theme_switch_speed.py
+            count: "1"
+    name: ${{ matrix.name }}
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        id: py
+        with:
+          python-version: "3.13"
+      - uses: actions/cache@v6
+        id: venv
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+      - if: steps.venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
+      - run: .venv\Scripts\python -m pip install pytest-repeat
+      - name: Crash dumps and page heap
+        shell: pwsh
+        run: |
+          $key = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\python.exe'
+          New-Item -Path $key -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpFolder -Value "$env:RUNNER_TEMP\crashdumps" -PropertyType ExpandString -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpType -Value 1 -PropertyType DWord -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
+          if ('${{ matrix.heap }}' -eq '1') {
+            $ifeo = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\python.exe'
+            New-Item -Path $ifeo -Force | Out-Null
+            New-ItemProperty -Path $ifeo -Name GlobalFlag -Value 0x02000000 -PropertyType DWord -Force | Out-Null
+            New-ItemProperty -Path $ifeo -Name PageHeapFlags -Value 0x3 -PropertyType DWord -Force | Out-Null
+          }
+          Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe' -ErrorAction SilentlyContinue
+      - shell: bash
+        run: .venv/Scripts/python -m pytest -p no:cacheprovider -n 4 --count "$COUNT" $TESTS
+        env:
+          QT_QPA_PLATFORM: offscreen
+          CI: ""   # the #339 skips off
+          TESTS: ${{ matrix.tests }}
+          COUNT: ${{ matrix.count }}
+      - name: Native stacks of the dumps
+        if: failure()
+        shell: pwsh
+        run: |
+          $cdb = 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe'
+          Get-ChildItem "$env:RUNNER_TEMP\crashdumps" -Filter *.dmp -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "==== $($_.Name)"
+            if (Test-Path $cdb) { & $cdb -z $_.FullName -c ".ecxr; kn 60; !analyze -v; q" | Select-Object -Last 200 }
+          }
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: crashdumps-${{ matrix.name }}
+          path: ${{ runner.temp }}/crashdumps
+          if-no-files-found: ignore
+          retention-days: 7
