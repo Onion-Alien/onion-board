@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Quick setup mic animation and clear navigation.** Putting sounds straight into your
+  mic from the step-by-step setup guide now plays the Bun speaker-building animation
+  directly inside the wizard, and success toasts no longer appear over or block the
+  Back and Next buttons.
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.
