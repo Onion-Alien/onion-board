@@ -33,7 +33,8 @@ module's `install.bat` or `pip install -r requirements.txt`).
 
 - Layout: [CODE.md](CODE.md) → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
 - Real-time audio callbacks never block and never take the engine lock.
-- Anything user-visible goes in `CHANGELOG.md` under *Unreleased*.
+- Anything user-visible goes in a new file `changelog.d/<branch-name>.md` (never in
+  `CHANGELOG.md` itself: one file per PR can't merge-conflict).
 - The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
   add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab,
   Hoot and the download), `ui/triggershost.py` (the host interface the add-on
@@ -312,7 +313,7 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    whole suite, and so does running the workflow by hand on a branch. So run the full
    suite locally before you push. A newer push to the PR cancels its unfinished run.
 3. For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
-   `__version__`, moves *Unreleased* in the CHANGELOG under the version, checks the
+   `__version__`, moves the `changelog.d/` entries into the CHANGELOG under the version, checks the
    translations, refreshes the README's release line; `--dry-run` checks only),
    build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
    with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).

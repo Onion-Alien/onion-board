@@ -69,4 +69,6 @@ privately, see [SECURITY.md](SECURITY.md)) and we'll rewrite the branch.
 - Match the code around you: comment density, naming, how things are split.
 - Line length 100, `ruff` config in `pyproject.toml`.
 - Audio callbacks never block and never take the engine lock (see [docs/CODE.md](docs/CODE.md) → *Audio notes*).
-- Add a CHANGELOG entry under *Unreleased* for anything a user would notice.
+- For anything a user would notice, add a new file `changelog.d/<branch-name>.md` with
+  your `- ` lines (see [changelog.d/README.md](changelog.d/README.md)). Don't edit
+  `CHANGELOG.md`: releases fill it in, and separate files never merge-conflict.

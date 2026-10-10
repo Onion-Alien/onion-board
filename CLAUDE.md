@@ -6,8 +6,10 @@ Humans: [CONTRIBUTING.md](CONTRIBUTING.md) has the same rules.
 **Start with [docs/AGENT-RULES.md](docs/AGENT-RULES.md)**. It lists the regressions
 this repo keeps getting (UI-thread freezes, async results after close, the audio path,
 flaky tests) as rules, says which docs a task needs (read only those), and has the
-one-command check: `scripts\precommit.ps1`. Never read `CHANGELOG.md` whole, only
-append under *Unreleased*. Cut releases with `scripts/release.py X.Y.Z`.
+one-command check: `scripts\precommit.ps1`. Never read or edit `CHANGELOG.md` for a
+change: add a new file `changelog.d/<branch-name>.md` with your `- ` lines instead (no
+merge conflicts between PRs). Cut releases with `scripts/release.py X.Y.Z`, which moves
+them into the changelog.
 
 ## Before you change anything: sync first, check open PRs
 
