@@ -11,7 +11,9 @@ last one (their names only). Soon after a start: how many problems there were si
 last send, as counts, never the report itself: a crash report or a freeze saved
 (`crash/<version>`, `error/<version>`, `freeze/<version>`, with the error's type and
 the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
-soundboard/engine.py:1090`: never its message or anything else from the report), or
+soundboard/engine.py:1090`; a freeze also its caller's line, the library function it
+was stuck in, how long it lasted and whether the window or another thread was busy:
+never its message or anything else from the report), or
 the last run ending without the app closing itself (`unclean-exit/<version>/<why>`:
 a hard crash, ended in Task Manager, a power cut; exitwatch.py works out which, on
 this PC). And `uninstall/<version>` when the uninstaller removes it.
@@ -327,17 +329,82 @@ _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 
 
-def _where(stack: str) -> str:
-    """`soundboard/engine.py:1090`: the deepest of our own lines in a report's stack
-    (the same file and line anyone can look up in the public source), or "".
-    threadnames.py only wraps Thread.start / run, so its lines name their caller."""
-    frames = [(file.replace(chr(92), "/"), line)
+def _ours(stack: str) -> list[str]:
+    """Our own lines in a stack, outermost first, as `soundboard/engine.py:1090` (the
+    same file and line anyone can look up in the public source). threadnames.py only
+    wraps Thread.start / run, so its lines are left out: they name their caller."""
+    frames = [f"{file.replace(chr(92), '/')}:{line}"
               for file, line in _OUR_FRAME.findall(stack)]
-    frames = [f for f in frames if f[0] != "soundboard/threadnames.py"] or frames
-    if not frames:
+    return [f for f in frames if not f.startswith("soundboard/threadnames.py:")] or frames
+
+
+def _where(stack: str) -> str:
+    """The deepest of our own lines in a report's stack, or ""."""
+    frames = _ours(stack)
+    return frames[-1] if frames else ""
+
+
+# the innermost frame of a stuck window, when it's outside our code: only the module's
+# file name (never its folder) and the function, e.g. `threading.wait`
+_INNER = re.compile(r'^\s*File "(?:[^"]*[\\/])?([A-Za-z0-9_]+)\.py", line \d+, in ([A-Za-z_]\w*)$')
+BUSY = 0.3   # a thread using this share of a core or more was working, not waiting
+IN_DIALOG_MARK = "inside a window's own event loop"   # hangwatch.IN_DIALOG_NOTE
+
+
+def _blocked_in(stack: str) -> str:
+    frames = [ln for ln in stack.splitlines() if _ANY_FRAME.match(ln)]
+    if not frames or _OUR_FRAME.match(frames[-1]):
         return ""
-    file, line = frames[-1]
-    return f"{file}:{line}"
+    m = _INNER.match(frames[-1])
+    return f"{m.group(1)}.{m.group(2)}" if m else ""
+
+
+def _lasted(head: str) -> str:
+    m = re.search(r"^Lasted:\s*(.*)$", head, re.M)
+    if not m:
+        return ""                  # a report from an older version: not known
+    s = re.match(r"(\d+) s", m.group(1).strip())
+    if not s:
+        return "never-ended"       # the app was ended while frozen (or never came back)
+    s = int(s.group(1))
+    return ("lasted-under-10s" if s < 10 else "lasted-10-30s" if s < 30
+            else "lasted-30s-2m" if s < 120 else "lasted-2m-plus")
+
+
+def _busy(window: str, others: str) -> str:
+    """Who was using the CPU while the window was stuck (hangwatch.py measures it):
+    `busy-window` (working itself), `busy-thread@<our line>` (another thread was, and
+    the window likely waited on it: the GIL or a lock), `idle` (everyone waited: a
+    lock, the disk, the network, Windows). "" in a report without the numbers."""
+    m = re.search(r"^Window CPU: (\d+)%", window, re.M)
+    if not m:
+        return ""
+    if int(m.group(1)) >= BUSY * 100:
+        return "busy-window"
+    best, where = BUSY * 100, None
+    for block in re.split(r'^(?=Thread ")', others, flags=re.M):
+        m = re.match(r'Thread ".*" \(\d+\), (\d+)% CPU:', block)
+        if m and int(m.group(1)) >= best:
+            best, where = int(m.group(1)), _where(block)
+    if where is None:
+        return "idle"
+    return "busy-thread" + (f"@{where}" if where else "")
+
+
+def _freeze_tag(head: str, window: str, others: str) -> str:
+    """`@<deepest line><<its caller>~<stuck in>/<how long>/<who was busy>`, e.g.
+    `@soundboard/ui/mainwindow.py:5898<soundboard/app.py:100~threading.wait/
+    lasted-10-30s/idle`: each part only when the report has it."""
+    ours = _ours(window)
+    tag = f"@{ours[-1]}" if ours else ""
+    if len(ours) > 1:
+        tag += f"<{ours[-2]}"
+    inner = _blocked_in(window)
+    if inner:
+        tag += f"~{inner}"
+    rest = ["in-dialog"] if IN_DIALOG_MARK in window else []
+    rest += [p for p in (_lasted(head), _busy(window, others)) if p]
+    return tag + "".join(f"/{p}" for p in rest)
 
 
 def _error_type(stack: str) -> str:
@@ -357,7 +424,8 @@ def _error_type(stack: str) -> str:
 def _report_event(path: Path) -> str:
     """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py),
     then where it happened when the stack shows it: `error/1.9.6/KeyError@
-    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/directmic.py:184`."""
+    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/directmic.py:184` (a freeze
+    with more: _freeze_tag)."""
     try:
         with open(path, encoding="utf-8", errors="replace") as f:
             text = f.read(64_000)
@@ -371,11 +439,12 @@ def _report_event(path: Path) -> str:
     # the stack only: never the log lines saved below it
     stack = re.split(r"^Last \d+ log lines\s*$", text, maxsplit=1, flags=re.M)[0]
     stack = stack.split("\n\n", 1)[-1]
-    # a freeze: the window's own stack, never the other threads hangwatch.py adds
-    stack = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)[0]
-    where = _where(stack)
+    # a freeze: the window's own stack; the other threads hangwatch.py adds only say
+    # which one was busy
+    stack, *others = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)
     if "froze for" in head.split("\n", 1)[0]:
-        return f"freeze/{ver}" + (f"@{where}" if where else "")
+        return f"freeze/{ver}" + _freeze_tag(head, stack, "".join(others))
+    where = _where(stack)
     kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
     etype = _error_type(stack)
     tag = "@".join(p for p in (etype, where) if p)
