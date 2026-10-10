@@ -973,10 +973,13 @@ def test_no_language_offer_on_an_english_windows(window, monkeypatch):
     assert not window.lang_bar.isVisibleTo(window)
 
 
-def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window):
+def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypatch):
     """Cable route, no cable, mic closed: the card's two lines say what's still to
     do in the warn colour; the red cross is for things that are wrong."""
+    from soundboard import engine as eng
     from soundboard import theme
+    # the real device list: a PC with a virtual cable installed isn't "no cable"
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w = window
     w.cfg.route = "cable"
     w._update_flow()
