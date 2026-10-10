@@ -2263,3 +2263,26 @@ def test_an_older_mic_part_moves_on_by_itself_once_per_version(window, monkeypat
         monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
         w._auto_mic_update()
     assert tried == [1]
+
+
+def test_picking_the_mic_asks_for_admin_only_when_it_doesnt_work(window, monkeypatch):  # noqa: F811
+    """An older copy of the effect still works: picking the mic route never asks for
+    admin for it (the update stays optional). Right after it was put on, Windows may
+    still be loading it: the route is applied, not attached (and asked) again."""
+    w = window
+    w.cfg.mic_device = "My mic"
+    tried = []
+    monkeypatch.setattr(w, "attach_mic", lambda: tried.append(1))
+    for state in ("outdated", "ready"):
+        w.cfg.route = "cable"
+        monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
+        w.set_route("mic")
+        assert w.cfg.route == "mic" and not tried
+    for state in ("wiped", "missing", "other"):
+        w.cfg.route = "cable"
+        monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
+        w.set_route("mic")
+        assert w.cfg.route == "cable" and tried == [1]
+        tried.clear()
+        w.set_route("mic", attached=True)
+        assert w.cfg.route == "mic" and not tried
