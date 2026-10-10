@@ -132,9 +132,11 @@ def test_a_damaged_line_is_skipped(path):
 
 
 def test_a_big_file_moves_aside_and_both_are_read(path, monkeypatch):
-    monkeypatch.setattr(netlog, "MAX_FILE_BYTES", 300)
     netlog.keep(path)
-    for i in range(10):
+    done("h0.example.com")
+    # the limit from a real line's size (it differs between machines): 3 lines a file
+    monkeypatch.setattr(netlog, "MAX_FILE_BYTES", path.stat().st_size * 2 + 1)
+    for i in range(1, 10):
         done(f"h{i}.example.com")
     assert path.with_name(path.name + ".old").exists()
     restart(path)
