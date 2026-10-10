@@ -7,6 +7,8 @@
   the *Streamer guide* on the last step, *Competitive games* adds the Triggers tab
   (Onion Watch), and *Show me everything* adds every tab. It's asked once only; Settings →
   Tabs changes it later.
+- Add sounds and Record use matching rounded buttons, with a subtle gradient on
+  Add sounds and a quiet raised surface on Record.
 - AI voices puts Start and live status at the top, with a wider voice picker,
   grouped pitch controls and shorter explanatory text in every language.
 - The note that pops up above the player ("Added … to Sounds", device changes and so
