@@ -1,5 +1,4 @@
 """Settings → Audio → Who's listening, and the custom-mode editor."""
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QComboBox, QLabel
 
 from soundboard import destination
@@ -138,33 +137,35 @@ def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: 
     d.close()
 
 
-def test_the_sounds_tab_has_a_mode_dropdown_that_follows_the_picker(window):  # noqa: F811
-    mode = window.mode_combo
-    assert window.sounds_page.isAncestorOf(mode)
-    assert [mode.itemData(i) for i in range(mode.count())] == [
-        "game", "voice", "clean", "advanced"]
-    assert mode.currentData() == "clean" and mode.itemText(3) == "Advanced…"
-    for i in range(mode.count()):                     # each one says what it does
-        assert len(mode.itemData(i, Qt.ToolTipRole)) > 80
-    mode.setCurrentIndex(mode.findData("voice"))      # picked on the Sounds tab
+def test_the_rail_has_a_mode_button_that_follows_the_picker(window):  # noqa: F811
+    mode = window.mode_btn
+    assert window.rail.isAncestorOf(mode) and mode.text() == ""   # an icon beside Live
+    acts = [a for a in mode.menu_.actions() if a.isCheckable()]
+    assert [a.text() for a in acts] == ["Game", "Voice chat", "Clean", "Advanced…"]
+    assert mode.currentData() == "clean" and acts[2].isChecked()
+    assert all(len(a.toolTip()) > 80 for a in acts)   # each one says what it does
+    assert mode.accessibleName() == "Who's listening: Clean"
+    acts[1].trigger()                                 # picked on the rail
     assert window.engine.dest is not None and window.engine.dest.key == "discord"
     assert window.cfg.dest == {"mode": "discord", "simple": "voice", "auto": False}
     assert window._save_timer.isActive()
     assert "Voice chat: shaping for Discord." in mode.toolTip()
+    assert mode.accessibleName() == "Who's listening: Voice chat"
     window.dest_panel.refresh()                       # the Setup tab shows it
     assert window.dest_panel.buttons["voice"].isChecked()
     assert window.dest_panel.advanced.isHidden()      # the full list is Advanced's
     d = SettingsDialog(window, "audio")               # changed in Settings: it follows
     _dest_combo(d.tabs.currentWidget()).setCurrentIndex(
         _dest_combo(d.tabs.currentWidget()).findData("steam"))
-    assert mode.currentData() == "advanced" and mode.itemText(3) == "Advanced: Steam voice"
+    assert mode.currentData() == "advanced"
+    assert mode.accessibleName() == "Who's listening: Advanced: Steam voice"
     d.close()
 
 
-def test_picking_advanced_on_the_sounds_tab_opens_its_settings(window, monkeypatch):  # noqa: F811
+def test_picking_advanced_on_the_rail_opens_its_settings(window, monkeypatch):  # noqa: F811
     opened = []
     monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
-    window.mode_combo.setCurrentIndex(window.mode_combo.findData("advanced"))
+    window.mode_btn.pick("advanced")
     QApplication.processEvents()
     assert opened == ["audio"] and window.cfg.dest["simple"] == "advanced"
     assert window.engine.dest is None                 # kept the mode it had (Off)
@@ -177,7 +178,7 @@ def test_mode_buttons_switch_and_show_what_they_do(window):  # noqa: F811
     panel.buttons["game"].click()
     assert window.cfg.dest["simple"] == "game" and window.engine.dest.key == "game"
     assert "Game: shaping for Vivox" in panel.now.text()
-    assert window.mode_combo.currentData() == "game"
+    assert window.mode_btn.currentData() == "game"
     panel.buttons["advanced"].click()
     assert not panel.advanced.isHidden() and window.engine.dest.key == "game"
     assert panel.combo.currentData() == "game"

@@ -96,6 +96,28 @@ def test_toast_shows_on_the_window_then_hides(qapp):
     process_events(qapp, lambda: not t.isVisibleTo(w))
 
 
+def test_toast_keeps_all_its_lines_when_the_window_shrinks_under_it(qapp):
+    """Shown in a wide window, then the window shrank (into the mini player): the pill
+    kept its one-line height and cut the rest of the text off."""
+    from PySide6.QtWidgets import QWidget
+    w = QWidget()
+    w.resize(1280, 800)
+    w.show()
+    busy.toast(w, "Updating Onion Board's part of your mic so every app hears your "
+               "sounds: click Yes when Windows asks.", ms=5000)
+    t = w.findChild(busy._Toast)
+    one_line = t.height()
+    for size in ((260, 120), (300, 400), (1280, 800)):
+        w.resize(*size)
+        qapp.processEvents()
+        assert t.height() >= t.heightForWidth(t.width()), size
+        assert 0 <= t.y() and t.y() + t.height() <= w.height(), size
+    w.resize(260, 120)
+    qapp.processEvents()
+    assert t.height() > one_line
+    w.close()
+
+
 def test_open_url_says_when_it_could_not(qapp, monkeypatch):
     from PySide6.QtWidgets import QWidget
     w = QWidget()

@@ -136,10 +136,12 @@ def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
 
 def test_tab_explanations_sit_behind_one_info_button(window, monkeypatch):  # noqa: F811
     shown = []
-    monkeypatch.setattr(main.QMessageBox, "information", lambda p, t, x: shown.append(t))
+    monkeypatch.setattr(main.TabHelpPopup, "exec", lambda box: shown.append(box.windowTitle()))
     window.tabs.setCurrentWidget(window.apps)
     assert not window.btn_info.isHidden()
     window.btn_info.click()
     assert shown == ["Send a program's sound"]
     window.tabs.setCurrentWidget(window.sounds_page)
-    assert window.btn_info.isHidden()
+    assert not window.btn_info.isHidden()   # every tab has a line now
+    window.btn_info.click()
+    assert shown[-1] == "Your sounds"

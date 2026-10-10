@@ -1,7 +1,6 @@
 """The Radio tab mustn't hold up the audio threads: Qt keeps Python's lock through
 each call into it, so one long call (drawing the whole map, loading the decoder) is
 a sound skipping on the cable."""
-import os
 import threading
 import time
 from pathlib import Path
@@ -9,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from conftest import real_pc_timing
 from soundboard import radio
 from soundboard.ui import flatmap
 from soundboard.ui.flatmap import LAND_PART, FlatMap
@@ -17,13 +17,6 @@ from soundboard.ui.flatmap import LAND_PART, FlatMap
 def outlines():
     raw = (radio.ASSET_DIR / radio.COUNTRIES).read_bytes()
     return radio.outline_rings(raw), radio.outline_labels(raw)
-
-
-# Hosted CI runners (2 shared cores, other test workers beside it) stall a thread
-# 10-15 ms on their own, as much as the hitch these measure: the timing tests there
-# fail on unchanged code. They run on a real PC, where a hitch is the only stall.
-real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
-                                    reason="wall-clock audio timing: too noisy on CI")
 
 
 def quietest(measure, limit, tries=5):
@@ -288,6 +281,7 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
     m.show()
     qapp.processEvents()
     assert m._loading.isVisible()              # the map is there (it drags) with Bun on it
+    m.set_land([], [])
     m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
     assert not m._loading.isVisible() and m.revealing()
     t = time.monotonic() - m._reveal_t0
@@ -307,27 +301,50 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
     m.close()
 
 
+def test_the_country_names_show_before_the_dots(qapp):
+    """The dots popped in over a map with no names, and the names came only once
+    they were all in. Now the names come first (even when the stations beat the land
+    in), and the dots after."""
+    from soundboard.ui import flatmap
+    rings, labels = outlines()
+    m = FlatMap()
+    m.resize(600, 400)
+    m.show()
+    m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
+    assert m.revealing() and m._reveal_t0 is None   # no dots till the land is in
+    m.set_land(rings, labels)
+    assert m._reveal_t0 > time.monotonic() + flatmap.NAMES_FIRST_S / 2
+    m.grab()
+    assert m._names_pic is not None                 # the names are on the map...
+    t = time.monotonic() - m._reveal_t0
+    assert (flatmap._pop((t - m._delay) / flatmap.POP_S) < 0.05).all()   # ...no dots yet
+    end = time.monotonic() + flatmap.NAMES_FIRST_S + flatmap.REVEAL_S + 2
+    while m.revealing() and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.005)
+    assert not m.revealing() and m._names_pic is None
+    m.close()
+
+
 def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
     """Qt loaded FFmpeg (avcodec and co, tens of MB) as the first station started, on
     the UI thread and holding Python's lock: 10-60 ms, and the sounds playing skipped."""
     import ctypes
     import sys
 
-    import pytest
     if sys.platform != "win32":
         pytest.skip("Windows only")
     loaded = []
     monkeypatch.setattr(ctypes, "WinDLL",
                         lambda path: loaded.append((path, threading.current_thread().name)))
     monkeypatch.setattr(radio, "_preloaded", False)
-    p1, p2 = radio.RadioPlayer(), radio.RadioPlayer()
+    radio.preload_decoder()   # the Radio tab's first show calls it
+    radio.preload_decoder()   # and again: a no-op
     end = time.monotonic() + 5
     while not any("ffmpeg" in f.lower() for f, _ in loaded) and time.monotonic() < end:
         time.sleep(0.01)
     names = [Path(f).name.lower() for f, _ in loaded]
     assert names[0].startswith("avutil") and names[-1].startswith("ffmpeg")
     assert any(n.startswith("avcodec") for n in names)
-    assert len(names) == len(set(names))                       # once, for both players
+    assert len(names) == len(set(names))                       # once, for both calls
     assert all(t == "radio-preload" for _, t in loaded)        # never the UI thread
-    p1.deleteLater()
-    p2.deleteLater()

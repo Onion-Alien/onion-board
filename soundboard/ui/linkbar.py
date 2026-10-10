@@ -1,8 +1,11 @@
-"""The Sounds tab's link bar: paste a web link into "Search sounds" and this row
-appears under it. It looks the link up with yt-dlp (YouTube, SoundCloud, TikTok,
-Twitter/X, Reddit, most video sites, and plain links to audio / video files), then
-offers **Add as sound** (downloaded, imported like a dropped file) or **Play once**
-(downloaded and played through the pads' path, nothing kept in the library).
+"""The Sounds tab's link downloads: a web link pasted into "Search sounds" shows as a
+result card (ytsearch.SearchResults.show_link) whose **Add** and **Play** come here,
+as do a web search's. yt-dlp fetches it (YouTube, SoundCloud, TikTok, Twitter/X,
+Reddit, most video sites, and plain links to audio / video files): **Add** imports it
+like a dropped file, **Play** plays it through the pads' path, nothing kept in the
+library. The bar itself is a line under the search box that only shows when something
+went wrong (and "Try this one without Tor" when Tor was turned away); the card shows
+the rest.
 
 One download serves both: after Play once, Add as sound reuses the file instead of
 fetching it again. The temp folder is deleted when the link changes or the app closes.
@@ -16,12 +19,13 @@ import tempfile
 import threading
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import net, netlog, quality, theme, thumbs, videos, ytdl
-from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
-from soundboard.ui import busy, icons
+from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
+                                site_folder, to_int16)
+from soundboard.ui import busy
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors
 from soundboard.i18n import _
@@ -29,7 +33,6 @@ from soundboard.i18n import _
 log = logging.getLogger(__name__)
 
 PLAY_ID = "__link__"   # the engine voice of Play once
-PROBE_DELAY_MS = 400
 
 
 def _drop_temp(path) -> None:
@@ -48,6 +51,7 @@ class LinkBar(QFrame):
     _msg = Signal(str, str, object)   # worker -> UI: (kind, url, payload)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
     progress = Signal(str, float)     # (url, 0..1 downloaded, or -1 while it's converted)
+    link_changed = Signal(str)        # the search box's link ("" when it has none now)
 
     def __init__(self, engine, cfg, color_for, known_for):
         """`color_for()` gives the next pad colour, `known_for()` {fingerprint: name}
@@ -59,16 +63,14 @@ class LinkBar(QFrame):
         self.title = ""
         self._text = ""               # the search box's text last seen
         self._busy = ""               # "", "add" or "play": one download at a time
+        self._busy_url = ""
         self._got = None              # (url, file, int16 audio, gain) of the last download
         # (url, int16 audio, gain) of the last add: Play after it is instant. Dropped with
         # the link, like _got: a 15-minute song is ~170 MB
         self._kept = None
         self._queued = ""             # "add" / "play" asked for while another download ran
         self._msg.connect(self._on_msg)
-        # a link typed by hand is a new "link" at every keystroke: look up only the
-        # one the typing stops at
-        self._probe_timer = QTimer(self, singleShot=True, interval=PROBE_DELAY_MS)
-        self._probe_timer.timeout.connect(self._probe_now)
+        self._shown = False           # the line says something wrong (_say)
 
         self.setObjectName("card")
         h = QHBoxLayout(self)
@@ -79,16 +81,6 @@ class LinkBar(QFrame):
         self.info.setWordWrap(True)
         errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)
-        self.btn_play = QPushButton(_("Play once"))
-        self.btn_play.setToolTip(_("Download it and play it once, like a pad (others hear it "
-                                   "too) — it isn't added to your Sounds"))
-        icons.set_icon(self.btn_play, "play", size=14)
-        self.btn_play.clicked.connect(self.play_once)
-        self.btn_add = QPushButton(_("Add as sound"))
-        self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds (Enter)"))
-        icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
-        self.btn_add.clicked.connect(self.add)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # makes one download go without Tor (ytdl.TorBlocked)
         self.btn_direct = QPushButton(_("Try this one without Tor"))
@@ -98,15 +90,14 @@ class LinkBar(QFrame):
         self.btn_direct.hide()
         self._blocked = ""            # "add" / "play" that Tor couldn't do for this link
         h.addWidget(self.btn_direct)
-        h.addWidget(self.btn_play)
-        h.addWidget(self.btn_add)
         self.hide()
 
     # ------------------------------------------------------------------ state
     def set_text(self, text: str):
-        """Whatever is in the search box: a link shows the bar, anything else hides it.
-        Only a change counts: the board re-filters with the same text after every add,
-        which mustn't drop a web-search pick that's downloading or waiting its turn."""
+        """Whatever is in the search box: a link becomes the one Play / Add fetch
+        (link_changed tells the window to show its card). Only a change counts: the
+        board re-filters with the same text after every add, which mustn't drop a
+        web-search pick that's downloading or waiting its turn."""
         if text == self._text:
             return
         self._text = text
@@ -120,26 +111,11 @@ class LinkBar(QFrame):
         self._queued = ""
         self._blocked = ""
         self._drop_download()
-        self.setVisible(bool(url))
-        if not url:
-            self._probe_timer.stop()
-            return
-        if not ytdl.site_allowed(url):   # switched off in Settings > Privacy: no look-up
-            self._probe_timer.stop()
+        self._say("")
+        if url and not ytdl.site_allowed(url):   # switched off in Settings > Privacy
             self._say(html.escape(net.off_message(ytdl.site_feature(url))),
                       theme.status("warn"))
-            self._buttons()
-            return
-        self._say(f"Looking up <b>{html.escape(self._host())}</b>…")
-        self._buttons()
-        self._probe_timer.start()
-
-    def _probe_now(self):
-        if self.url:
-            netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name and "
-                                       "length")
-            threading.Thread(target=self._probe, args=(self.url,), daemon=True,
-                             name="link-probe").start()
+        self.link_changed.emit(url)
 
     def open(self, url: str, title: str, secs: float = 0.0):
         """A video picked from the YouTube search: already looked up, so no probe."""
@@ -149,30 +125,25 @@ class LinkBar(QFrame):
             self.url = url
             self._queued = ""
             self._blocked = ""
-            self._probe_timer.stop()
             self._drop_download()
         self.title = title
-        self.show()
         dur = f" · {fmt_time(secs)}" if secs else ""
-        self._say(f"<b>{html.escape(title)}</b>{dur} "
+        self._say(f"<b>{html.escape(title)}</b>{dur} "   # kept for reading, not shown
                   f"<span style='color:{theme.T['muted']}'>· {html.escape(self._host())}</span>")
-        self._buttons()
 
     def _host(self) -> str:
         return self.url.split("/")[2].removeprefix("www.") if self.url else ""
 
     def _say(self, text: str, color: str = ""):
+        """The bar's line. Only a problem shows it (the card shows the rest: busy,
+        playing, added); the text is kept either way."""
         self.info.setText(f"<span style='color:{color}'>{text}</span>" if color else text)
+        self._shown = bool(text) and color in (theme.status("error"), theme.status("warn"))
+        self._buttons()
 
     def _buttons(self):
         self.btn_direct.setVisible(bool(self._blocked) and not self._busy)
-        # already added: no second "Add as sound" next to "✓ Added …"
-        self.btn_add.setVisible(not self.url or self.url != getattr(self, "_added", ""))
-        ok = bool(self.url) and not self._busy and ytdl.site_allowed(self.url)
-        self.btn_add.setEnabled(ok)
-        self.btn_play.setEnabled(ok)
-        self.btn_add.setText(_("Adding…") if self._busy == "add" else _("Add as sound"))
-        self.btn_play.setText(_("Loading…") if self._busy == "play" else _("Play once"))
+        self.setVisible(bool(self.url) and (self._shown or not self.btn_direct.isHidden()))
 
     def _drop_download(self):
         if self._got is not None:
@@ -188,6 +159,9 @@ class LinkBar(QFrame):
     def add(self) -> bool:
         if not self.url:
             return False
+        if self.url == getattr(self, "_added", ""):
+            self.done.emit(self.url, "add", True)
+            return True
         if self._busy:
             return self._queue("add")
         self._start("add")
@@ -209,11 +183,14 @@ class LinkBar(QFrame):
 
     def _queue(self, kind: str) -> bool:
         """Another download is running (one at a time): do this one after it."""
+        if self.url == self._busy_url and kind == self._busy:
+            return True   # already running: don't import the same sound twice
         if self._queued == kind:
-            return False
+            return True
         self._queued = kind
         name = html.escape(self.title or self._host())
-        self._say(f"<b>{name}</b> is next: waiting for the download before it to finish…")
+        self._say(_("<b>{name}</b> is next: waiting for the download before it to finish…",
+                    name=name))
         return True
 
     def _without_tor(self):
@@ -225,6 +202,7 @@ class LinkBar(QFrame):
     def _start(self, kind: str, direct: bool = False):
         self._blocked = ""
         self._busy = kind
+        self._busy_url = self.url
         self._buttons()
         got, self._got = self._got, None   # the worker owns (and deletes) it now
         # Settings > Data & quality: Add as sound keeps the video too (Play never does)
@@ -233,7 +211,7 @@ class LinkBar(QFrame):
             _drop_temp(got[1])
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
-                bool(self.cfg.ytdlp_auto_optin), direct, video)
+                bool(self.cfg.ytdlp_auto_optin), direct, video, self.title)
         what = netlog.quoted(self.title) if self.title else "a link"
         netlog.cause(ytdl.FEATURE, (f"You clicked Play on {what}" if kind == "play" else
                                     f"You added {what} as a sound")
@@ -249,23 +227,18 @@ class LinkBar(QFrame):
         gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
-            self._say("No audio device is open — pick one in Setup.", theme.status("warn"))
+            self._say(_("No audio device is open, pick one in Setup."), theme.status("warn"))
         else:
-            self.played.emit(self.title or "Link", data, gain)
-            name = html.escape(self.title or "it")
-            self._say(f"▶ Playing <b>{name}</b> ({fmt_time(len(data) / SR)}) — "
-                      "<i>Add as sound</i> keeps it.")
+            self.played.emit(self.title or _("Link"), data, gain)
+            name = html.escape(self.title or _("it"))
+            self._say(_("▶ Playing <b>{name}</b> ({time}): <i>Add as sound</i> keeps it.",
+                        name=name, time=fmt_time(len(data) / SR)))
 
     # ------------------------------------------------------------------ workers
-    def _probe(self, url: str):
-        try:
-            self._msg.emit("found", url, ytdl.probe(url))
-        except Exception as e:  # noqa: BLE001 - shown in the bar
-            log.info("link lookup failed for %s: %s", url, e)
-            self._msg.emit("probe-error", url, errors.plain(e))
-
-    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False):
-        """Download (unless `got` already holds it), then import or decode."""
+    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False,
+              shown=""):
+        """Download (unless `got` already holds it), then import or decode. `shown`:
+        the link's title as the bar has it (the file's name when `got` is used)."""
         path = got[1] if got else None
         title = ""
         keep = False
@@ -285,10 +258,16 @@ class LinkBar(QFrame):
                 return
             fp = fingerprint(str(path))
             if fp and fp in known:
-                raise ytdl.DownloadError(f"It's already in your Sounds as “{known[fp]}”.")
-            meta, data = import_file(str(path), color)
-            if (pic := thumbs.find_in(Path(path).parent)) is not None:
-                meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
+                raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
+                                           name=known[fp]))
+            # named after the video, in a folder for the site: YouTube/<title>.flac
+            meta, data = import_file(str(path), color, name=title or shown,
+                                     folder=site_folder(url))
+            try:
+                if (pic := thumbs.find_in(Path(path).parent)) is not None:
+                    meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
+            except OSError as e:
+                log.warning("couldn't keep the thumbnail of %s: %s", url, e)
             self.engine.prepare(meta.id, data)
             saved = ""
             if video:
@@ -296,16 +275,18 @@ class LinkBar(QFrame):
                     kept = ytdl.save_video(path, title or meta.name)
                     if kept:
                         videos.link(meta.id, kept)   # the player's Video button shows it
-                    saved = (f"Video saved in {kept.parent}." if kept else
-                             "No video was saved: this site only gave the sound.")
+                    saved = (_("Video saved in {folder}.", folder=kept.parent) if kept else
+                             _("No video was saved: this site only gave the sound."))
                 except OSError as e:
                     log.warning("couldn't keep the video of %s: %s", url, e)
-                    saved = f"The video couldn't be saved ({errors.plain(e)})."
+                    saved = _("The video couldn't be saved ({error}).",
+                              error=errors.plain(e))
             self._msg.emit("added", url, (meta, data, title, saved))
         except ytdl.TorBlocked as e:   # the bar offers to try it without Tor
             log.warning("link %s turned away over Tor for %s", kind, url)
             self._msg.emit("blocked", url, (kind, html.escape(
-                f"Couldn't {'add' if kind == 'add' else 'play'} it: {e}")))
+                _("Couldn't add it: {error}", error=e) if kind == "add" else
+                _("Couldn't play it: {error}", error=e))))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
             # a bot check or rate limit is about the user's address, not yt-dlp
@@ -314,7 +295,8 @@ class LinkBar(QFrame):
                     _(" A newer yt-dlp may fix this: Settings → Updates → Update now."))
             doing = "add" if kind == "add" else "play"
             # rich text: the plain words, and a "Report it" link when it's one for us
-            self._msg.emit("error", url, errors.html(e, f"Couldn't {doing} it: ",
+            before = _("Couldn't add it: ") if kind == "add" else _("Couldn't play it: ")
+            self._msg.emit("error", url, errors.html(e, before,
                                                      where=f"Couldn't {doing} a link")
                            + html.escape(hint))
         finally:
@@ -323,31 +305,16 @@ class LinkBar(QFrame):
 
     def _on_msg(self, kind: str, url: str, payload):
         current = url == self.url
-        if kind == "found":
-            if current:
-                self.title, secs = payload
-                dur = f" · {fmt_time(secs)}" if secs else ""
-                self._say(f"<b>{html.escape(self.title)}</b>{dur} "
-                          f"<span style='color:{theme.T['muted']}'>"
-                          f"· {html.escape(self._host())}</span>")
-            return
-        if kind == "probe-error":
-            if current and not self._busy:
-                self._say(html.escape(f"Can't use this link: {payload}"), theme.status("error"))
-            return
         if kind == "title":
             if current:
                 self.title = self.title or payload
             return
         if kind == "progress":
-            self.progress.emit(url, payload)
-            if current:
-                t = ("Adding…" if self._busy == "add" else "Loading…")
-                t = t if payload < 0 else f"{t} {payload:.0%}"
-                (self.btn_add if self._busy == "add" else self.btn_play).setText(t)
+            self.progress.emit(url, payload)   # the card's bar and button show it
             return
         # the download finished one way or another
         was, self._busy = self._busy, ""
+        self._busy_url = ""
         if kind == "blocked":
             blocked_kind, payload = payload
             kind = "error"
@@ -360,14 +327,15 @@ class LinkBar(QFrame):
             meta, data, title, saved = payload
             if current:   # one for a link no longer showing would never be played
                 self._kept = (url, data, meta.level_gain)
-            meta.name = (title or (current and self.title) or meta.name)[:40]
+            meta.name = (title or (current and self.title) or meta.name)[:40].strip()
             self.sound_ready.emit(meta, data)
             if current:
-                self._say(f"✓ Added <b>{html.escape(meta.name)}</b> to your Sounds."
+                self._say(_("✓ Added <b>{name}</b> to your Sounds.",
+                            name=html.escape(meta.name))
                           + (f" {html.escape(saved)}" if saved else ""), theme.status("ok"))
             else:   # another link is showing now: still say this one made it
-                busy.toast(self.window(), f"✓ Added <b>{html.escape(meta.name)}</b> to your "
-                                          "Sounds.", "ok")
+                busy.toast(self.window(), _("✓ Added <b>{name}</b> to your Sounds.",
+                                            name=html.escape(meta.name)), "ok")
             self.done.emit(url, "add", True)
         elif kind == "play":
             path, data, gain = payload
@@ -383,6 +351,11 @@ class LinkBar(QFrame):
             else:   # it was for a link no longer showing: don't lose the reason
                 busy.toast(self.window(), payload, "error", 8000)
             self.done.emit(url, was or "add", False)
+            if current and self._queued:
+                # Both clicks were waiting for this same failed download. A second
+                # fetch would leave an error visible even if the retry succeeded.
+                queued, self._queued = self._queued, ""
+                self.done.emit(url, queued, False)
         if self._queued and self.url:
             queued, self._queued = self._queued, ""
             if queued == "add":

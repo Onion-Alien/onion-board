@@ -83,7 +83,7 @@ def test_save_video_copies_under_the_title_without_clobbering(tmp_path):
 def test_settings_page_switches_low_data_mode_and_saves_it(window):  # noqa: F811
     d = SettingsDialog(window, "data")
     page = d.tabs.currentWidget().widget()
-    assert {"LOW DATA MODE", "DOWNLOADS", "RADIO", "SOUNDS FROM THE WEB"} <= {
+    assert {"Low data mode", "Downloads", "Radio", "Sounds from the web"} <= {
         lb.text() for lb in page.findChildren(QLabel)}
     assert not d.data_low.isChecked()
     assert not d._data_widgets["video_height"].isEnabled()   # until videos are kept
@@ -97,4 +97,39 @@ def test_settings_page_switches_low_data_mode_and_saves_it(window):  # noqa: F81
     box.setChecked(True)
     assert window.cfg.data["save_video"] and d._data_widgets["video_height"].isEnabled()
     assert isinstance(d._data_widgets["video_height"], QComboBox)
+    d.close()
+
+
+def test_sounds_are_saved_as_the_picked_format(app_dir, tmp_path):
+    import numpy as np
+    import soundfile as sf
+    x = np.zeros((library.SR // 10, 2), np.float32)
+    assert quality.current.save_format == "mp3"               # the default
+    assert library.save_clip(x, "a", "#1")[0].file.endswith(".mp3")
+    quality.change(save_format="flac")
+    clip = library.save_clip(x, "b", "#1")[0]
+    assert clip.file.endswith(".flac") and sf.info(clip.file).subtype == "PCM_16"
+    src = tmp_path / "video.mp4"                                # needs converting
+    sf.write(tmp_path / "v.wav", x, library.SR)
+    (tmp_path / "v.wav").rename(src)
+    real = library._decode
+    library._decode, was = (lambda p: (real(p)[0], True)), library._decode
+    try:
+        assert library.import_file(str(src), "#1")[0].file.endswith(".flac")
+    finally:
+        library._decode = was
+    assert quality.from_raw({"save_format": "wav"}).save_format == "mp3"
+
+
+def test_a_newer_versions_data_settings_are_kept_on_a_change():
+    quality.load({"download": "small", "from_newer": 3})
+    assert quality.change(patient=True)["from_newer"] == 3
+
+
+def test_settings_page_picks_the_save_format(window):  # noqa: F811
+    d = SettingsDialog(window, "data")
+    fmt = d._data_widgets["save_format"]
+    assert fmt.currentData() == "mp3"
+    fmt.setCurrentIndex(fmt.findData("flac"))
+    assert quality.current.save_format == "flac" and window.cfg.data["save_format"] == "flac"
     d.close()

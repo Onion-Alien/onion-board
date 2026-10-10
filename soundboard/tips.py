@@ -66,8 +66,8 @@ TIPS: tuple[Tip, ...] = (
         "a sound pack: the Backup button."), "settings:general"),
     Tip("themes", _("Onion Board has over 30 themes: Settings → Appearance."),
         "settings:appearance"),
-    Tip("stream", _("Streaming? The stream output gives OBS your sounds on their own "
-        "track: Settings → Audio."), "settings:audio"),
+    Tip("stream", _("Streaming? Setup → Devices → Also send to → Clean, for streaming "
+        "gives OBS your sounds on their own track."), "settings:audio"),
     Tip("hotkeys_off", _("One key can switch every other hotkey off while you type in "
         "chat. Set it in Settings → Hotkeys."), "settings:hotkeys"),
 )

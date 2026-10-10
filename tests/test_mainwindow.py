@@ -47,6 +47,37 @@ def window(qapp, app_dir, monkeypatch):
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
+def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
+    """The splash pumps events while the window is built: the load_triggers timer can
+    run before __init__ ends, and threw AttributeError (_shut_down) when it did."""
+    import sys
+    import time
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    errors = []
+    monkeypatch.setattr(sys, "excepthook", lambda t, v, tb: errors.append(v))
+    calls = []
+    real = main.MainWindow.load_triggers
+    monkeypatch.setattr(main.MainWindow, "load_triggers",
+                        lambda self, now=True: (calls.append(now), real(self, now)))
+
+    def slow_pump():   # a slow start with the splash up
+        time.sleep(main.TRIGGERS_LOAD_MS / 1000 + 0.03)
+        qapp.processEvents()
+    monkeypatch.setattr(main.splash, "pump", slow_pump)
+    Config(sounds=[]).save()
+    w = main.MainWindow()
+    try:
+        assert calls and not errors
+    finally:
+        w._load_thread.join(15)
+        w.close()
+        from PySide6.QtCore import QEvent
+        w.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
 def test_window_builds_with_pads_and_index(window):
     assert set(window.pads) == {"s0", "s1"}
     assert window.meta("s1").name == "Airhorn" and window.meta("zz") is None
@@ -75,12 +106,12 @@ def test_reorder_moves_without_recreating(window):
 
 def test_mic_check_pulse_runs_only_while_on(window):
     window.on_mic_check(True)
-    assert window._pulse.state() == window._pulse.State.Running
+    assert window._pulse.on
     assert window.mic_banner.isVisibleTo(window)
     window.mic_banner.click()             # only a sign: the mixer's button is the switch
     assert window.engine.mic_check
     window.on_mic_check(False)
-    assert window._pulse.state() == window._pulse.State.Stopped
+    assert not window._pulse.on and not window._pulse.running()
     assert window._banner_fx.opacity() == 1.0
 
 
@@ -123,9 +154,11 @@ def test_window_uses_only_the_temp_config(window, app_dir):
 
 def test_overlapping_sounds_each_get_a_stop_chip(window, monkeypatch):
     stopped = []
+    window._update_chips({})
+    assert window.playing_row.isHidden() and not window._chips   # nothing playing
     monkeypatch.setattr(window.engine, "stop", stopped.append)
     window._update_chips({"s0": (0.2, False)})
-    assert window.playing_row.isHidden() and not window._chips   # one sound: no chips
+    assert not window.playing_row.isHidden() and set(window._chips) == {"s0"}  # one: a chip
     window.select("s1")
     window._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
     assert not window.playing_row.isHidden() and set(window._chips) == {"s0", "s1"}
@@ -154,7 +187,9 @@ def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkey
     window.stop_current()
     assert window.current == PLAY_ID   # the player moved to what's still playing
     window._update_chips(live)
-    assert window.playing_row.isHidden()   # one sound, and the player shows it
+    # one sound left, the player shows it: its chip stays (the row going made it
+    # look like ■ had stopped both)
+    assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
     window.select("s1")       # another pad picked while it plays: its chip stays
     window._update_chips(live)
     assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
@@ -398,10 +433,38 @@ def test_speed_popup_shrinks_back_when_redline_locks(window, qapp):
 def test_every_tab_has_its_own_label(window):
     texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
     assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
-    window._tab_icons_only(True)
-    assert window.tabs.tabText(1) == "" and window.tabs.tabToolTip(1).startswith("Radio")
-    window._tab_icons_only(False)
-    assert window.tabs.tabText(2) == "Apps"
+    assert window.tabs.tabToolTip(2) == ""   # the name says it: no hover tip
+
+
+def test_the_tabs_are_a_rail_down_the_left(window, qapp):
+    """Icons only (no hover tips); the button at the bottom opens it out to the names
+    and the onion (saved); a narrow window shuts it again."""
+    window.show()
+    window.resize(1200, 760)
+    window._refit()
+    rail = window.rail
+    assert window.tabs.tabBar().isHidden()   # the rail shows the tabs, not the bar
+    assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
+    b = rail.buttons[1]
+    assert b.text() == "" and b.toolTip() == "" and b.accessibleName() == "Radio"
+    assert not rail.buttons[0].icon().isNull()
+    assert rail.buttons[0].isChecked() == (window.tabs.currentIndex() == 0)
+    assert window.wordmark.isHidden()
+    rail.toggle.click()
+    assert rail.is_open() and window.cfg.sidebar_open
+    assert b.text() == "Radio" and b.toolTip() == ""
+    assert not window.wordmark.isHidden() and not window.tagline.isHidden()
+    rail.buttons[5].click()
+    assert window.tabs.currentIndex() == 5 and rail.buttons[5].isChecked()
+    window.tabs.setTabVisible(2, False)
+    assert rail.buttons[2].isHidden()
+    window.tabs.setTabVisible(2, True)
+    rail.squeeze(True)   # a narrow window
+    assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
+    rail.squeeze(False)
+    assert rail.is_open()
+    rail.toggle.click()
+    assert not window.cfg.sidebar_open
 
 
 def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
@@ -420,6 +483,36 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
     window.tick()
     assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
+    from soundboard.ui.linkbar import PLAY_ID   # a web search's Play lights it too
+    playing.clear()
+    playing[PLAY_ID] = (0.1, False)
+    window.tick()
+    assert is_tab_live(tabs, i)
+
+
+def test_player_bar_follows_to_other_tabs_while_a_sound_plays(window, monkeypatch):
+    """Off the Sounds tab the player is there only while a sound plays (or is paused),
+    so it can be stopped from anywhere."""
+    playing = {}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
+    bar = window.transport
+    assert bar.parent() is not window.sounds_page   # under the tabs, not in the page
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert not bar.isHidden()                        # always on the Sounds tab
+    window.tabs.setCurrentWidget(window.setup_page)
+    assert bar.isHidden()                            # nothing playing: out of the way
+    playing["s0"] = (0.3, False)
+    window._show_transport(window.engine.playing())
+    assert not bar.isHidden()
+    playing["s0"] = (0.3, True)                      # paused: still there to resume
+    window._show_transport(window.engine.playing())
+    assert not bar.isHidden()
+    playing.clear()
+    playing["__test__"] = (0.1, False)               # the mic test's playback isn't a sound
+    window._show_transport(window.engine.playing())
+    assert bar.isHidden()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert not bar.isHidden()
 
 
 def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
@@ -439,12 +532,12 @@ def test_mute_switch_silences_what_others_hear(window, monkeypatch):
     e = window.engine
     assert window.btn_air.isChecked() and e.sending
     window.btn_air.click()
-    assert not e.sending and "Muted" in window.btn_air.text()
+    assert not e.sending and "Muted" in window.btn_air.accessibleName()
     out = np.ones((64, 2), np.float32)
     e._main(out, 64)
     assert not out.any()
     window.set_sending(True)
-    assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.text()
+    assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.accessibleName()
 
 
 def test_closing_the_window_ends_its_computer_voice_thread(window):
@@ -658,7 +751,7 @@ def test_card_titles_and_the_typed_percent_fit_the_themes_font(qapp, theme_name)
         qapp.processEvents()
         assert title.height() == 2 * title.fontMetrics().lineSpacing() + 2
         spin = vol.spin
-        assert spin.width() >= spin.fontMetrics().horizontalAdvance("1000 %") + 10
+        assert spin.width() >= spin.fontMetrics().horizontalAdvance("1000%") + 10
         assert not spin.keyboardTracking()   # typing "150" isn't 1 %, 15 %, 150 %
         host.deleteLater()
     finally:
@@ -842,3 +935,53 @@ def test_clamp_label_wraps_once_per_text_width_and_font(qapp):
     lbl.set_full("Short")
     assert lbl._wrapped() is not wide and [t for t, _ in lbl._wrapped()] == ["Short"]
     lbl.deleteLater()
+
+
+def test_windows_language_is_offered_in_that_language(window, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
+    restarts = []
+    monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
+    window._offer_language()
+    assert window.lang_bar.isVisibleTo(window)
+    assert window.lang_lbl.text() == ("Onion Board gibt es auch auf Deutsch. Du kannst die "
+                                      "Sprache jederzeit unter Einstellungen → Aussehen → "
+                                      "Sprache ändern.")
+    assert window.lang_btn.text() == "Zu Deutsch wechseln"
+    window.lang_btn.click()
+    assert window.cfg.language == "de" and restarts == [1]
+    assert not window.lang_bar.isVisibleTo(window)
+    window._offer_language()                     # picked: never offered again
+    assert not window.lang_bar.isVisibleTo(window)
+
+
+def test_turning_down_the_language_offer_is_remembered(window, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "ja-JP")
+    window._offer_language()
+    assert window.lang_bar.isVisibleTo(window) and window.lang_btn.text() == "日本語に切り替えます"
+    window.lang_hide.click()
+    assert not window.lang_bar.isVisibleTo(window) and window.cfg.language == ""
+    window._offer_language()
+    assert not window.lang_bar.isVisibleTo(window)
+
+
+def test_no_language_offer_on_an_english_windows(window, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "en-GB")
+    window._offer_language()
+    assert not window.lang_bar.isVisibleTo(window)
+
+
+def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window):
+    """Cable route, no cable, mic closed: the card's two lines say what's still to
+    do in the warn colour; the red cross is for things that are wrong."""
+    from soundboard import theme
+    w = window
+    w.cfg.route = "cable"
+    w._update_flow()
+    assert w.setup_state == "missing"
+    text = w.flow_mic.text() + w.flow_out.text()
+    assert "✗" not in text and theme.status("error") not in text
+    assert "after the setup below" in w.flow_mic.text()
+    assert "not installed yet" in w.flow_out.text()

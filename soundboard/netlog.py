@@ -14,8 +14,9 @@ blocked: nothing was looked up or sent for it.
 Kept in memory only, at most MAX_ENTRIES, and gone when the app closes: unless
 "Keep a history" is on (Settings > Connection, or the installer's box: config
 netlog_keep), when each connection is also added to FILE_NAME in the app's folder as
-it ends, and the next start lists them again (see keep()). Never written to the app's
-log. Never recorded: proxy passwords, the relay's per-launch
+it ends, and the next start lists them again (see keep()). The list isn't written to
+the app's log (though the log can name a site something failed on, unless "Keep an
+app log" is off: soundboard.applog). Never recorded: proxy passwords, the relay's per-launch
 secret, request headers and bodies. Query values that look like keys or tokens are
 masked (see redact()).
 
@@ -38,6 +39,8 @@ import time
 import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -342,15 +345,15 @@ def _remove(path: Path) -> None:
 # --------------------------------------------------------------------------- for the view
 
 def feature_label(feature: str) -> str:
-    """What a feature key is for, in words."""
+    """What a feature key is for, in words (in the language picked)."""
     from soundboard import net
     if feature == net.TEST:
-        return "Proxy test button"
-    main, _, sub = feature.partition(".")
+        return _("Proxy test button")
+    main, __, sub = feature.partition(".")
     if main not in net.FEATURES:
-        return "(didn't say)"
-    label = net.FEATURES[main]
-    return f"{label} ({net.SITES[sub]})" if sub in net.SITES else label
+        return _("(didn't say)")
+    label = net.feature_name(main)
+    return f"{label} ({net.site_name(sub)})" if sub in net.SITES else label
 
 
 def redact(target: str) -> str:
@@ -392,8 +395,8 @@ def why(e: Entry) -> str:
 
 
 def outcome(e: Entry) -> str:
-    return {CONNECTING: "Connecting…", CONNECTED: "Open", CLOSED: "Done",
-            BLOCKED: "Blocked", FAILED: "Failed"}[e.state]
+    return {CONNECTING: _("Connecting…"), CONNECTED: _("Open"), CLOSED: _("Done"),
+            BLOCKED: _("Blocked"), FAILED: _("Failed")}[e.state]
 
 
 @dataclass
@@ -521,7 +524,7 @@ def details(e: Entry) -> str:
 def as_text(items: list[Entry] | None = None) -> str:
     """The whole list, for the clipboard."""
     items = entries() if items is None else items
-    kept = "Kept on this PC between starts" if keeping() else "Kept in memory only"
+    kept = "Kept on this PC between starts" if keeping() else "Not saved between starts"
     head = (f"Onion Board network activity: {len(items)} connection(s). {kept}; "
             "review before sharing (it shows the sites you used).")
     return "\n\n".join([head] + [details(e) for e in items])

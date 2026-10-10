@@ -40,11 +40,11 @@ def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(wi
     opened = []
     monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
-    shown.press = "tabs"
+    shown.press = "appearance"
     window.after_update()
     assert len(shown) == 1 and any("Privacy & security" in t for t in shown[0])
     assert any("Update Onion Pocket" in t for t in shown[0])
-    assert opened == ["tabs"]   # the newest note with a Settings page
+    assert opened == ["appearance"]   # the newest note with a Settings page
     assert window.cfg.whats_new_seen == __version__
     window.after_update()   # the next start: nothing new
     assert len(shown) == 1
@@ -96,6 +96,15 @@ def test_it_waits_for_the_tray_and_the_setup_guide(window, shown):
 
 def _write(raw: dict):
     library.CONFIG_PATH.write_text(json.dumps(raw), encoding="utf-8")
+
+
+def test_a_small_discord_link_sits_under_the_notes(window):
+    from soundboard import feedback
+    dlg = whatsnew.WhatsNewDialog(window, whatsnew.NOTES[:1])
+    link = dlg.discord_link
+    assert f'href="{feedback.DISCORD_URL}"' in link.text()
+    assert "Chat about it on Discord" in link.text() and link.openExternalLinks()
+    dlg.close()
 
 
 def test_privacy_survives_an_older_version_saving_over_it(app_dir):

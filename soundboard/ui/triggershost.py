@@ -24,6 +24,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from soundboard import library, theme
+from soundboard.i18n import _
 from soundboard.modules import TRIGGERS_API
 
 log = logging.getLogger(__name__)
@@ -47,6 +48,13 @@ class BoardHost:
         self._adding: list[tuple[str, Callable[[str | None], None]]] = []   # (fingerprint, done)
         self._pressed: dict[str, set[str]] = {}     # tag -> pads its one-shots pressed
 
+    def count(self, key: str):
+        """The add-on's feature `key` was used or is set up (onionwatch/usage.py
+        FEATURES): `used/triggers-<key>` with the next daily usage count, when Count me
+        in is on. Names outside usage.FEATURES are dropped (usage.used)."""
+        from soundboard import usage
+        usage.used(f"triggers-{key}")
+
     def tab_info(self, title: str, text: str):
         """Onion Watch's explanation goes behind the ⓘ by the tabs, not a banner."""
         self.win.tab_info["triggers"] = (title, text)
@@ -68,8 +76,12 @@ class BoardHost:
         """Optional detail for newer trigger cards; keeps the existing host API."""
         meta = self.win.meta(sid)
         if meta is None:
-            return "Sound unavailable"
-        return f"{meta.name}: {meta.volume:.0%} · Hotkey: {meta.hotkey or 'none'}"
+            return _("Sound unavailable")
+        volume = f"{meta.volume:.0%}"
+        if meta.hotkey:
+            return _("{name}: {volume} · Hotkey: {hotkey}", name=meta.name, volume=volume,
+                     hotkey=meta.hotkey)
+        return _("{name}: {volume} · Hotkey: none", name=meta.name, volume=volume)
 
     def sounds(self) -> list[tuple[str, str]]:
         return [(m.id, m.name) for m in self.win.cfg.sounds]

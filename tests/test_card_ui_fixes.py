@@ -22,20 +22,21 @@ def test_deleted_actions_share_one_row(qapp, app_dir):
     dialog.deleteLater()
 
 
-def test_information_is_centered_on_tabs_and_scoped(window, qapp):  # noqa: F811
+def test_information_button_is_on_the_rail_and_scoped(window, qapp):  # noqa: F811
     window.show()
     window.tabs.setCurrentWidget(window.apps)
     qapp.processEvents()
-    bar = window.tabs.tabBar()
     button = window.btn_info
-    assert button.isVisible()
-    assert abs(button.mapTo(window, button.rect().center()).y()
-               - bar.mapTo(window, bar.rect().center()).y()) <= 2
+    assert button.isVisible() and window.rail.isAncestorOf(button)   # under the tabs
     window.tab_info["triggers"] = ("Triggers", "Look for a picture")
     window.tabs.setCurrentWidget(window.triggers)
     qapp.processEvents()
     assert button.isVisible()
-    window.tabs.setCurrentWidget(window.sounds_page)
+    window.tabs.setCurrentWidget(window.sounds_page)   # every tab has a line now
+    qapp.processEvents()
+    assert button.isVisible()
+    del window.tab_info["sounds_page"]
+    window._update_info_btn()
     assert not button.isVisible()
 
 

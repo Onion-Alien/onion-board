@@ -34,18 +34,62 @@ LANG_DIR = (Path(sys._MEIPASS) / "lang" if hasattr(sys, "_MEIPASS")
 ENGLISH = "en"
 PSEUDO = "xx"
 WINDOWS = ""     # Config.language: follow Windows' display language
+# The board doesn't switch to Windows' language by itself yet (that's for 2.0): until a
+# language is picked (Settings → Appearance → Language, saved as config.json's
+# `language`) it stays in English and offers Windows' language in a bar, in that
+# language (MainWindow._offer_language). ONIONBOARD_LANG overrides both.
+FOLLOW_WINDOWS = False
 
-# plural rules: n -> index into a catalog entry's list of forms
+# plural rules: n -> index into a catalog entry's list of forms (FORMS: how many)
+def _one_other(n):
+    return 0 if n == 1 else 1
+
+
+def _slavic(n):            # ru, uk: one (1, 21, 31…), few (2-4, 22-24…), many (the rest)
+    return 0 if n % 10 == 1 and n % 100 != 11 \
+        else 1 if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14 else 2
+
+
 PLURALS = {
-    "en": lambda n: 0 if n == 1 else 1,
-    "de": lambda n: 0 if n == 1 else 1,
-    "es": lambda n: 0 if n == 1 else 1,
+    "en": _one_other, "de": _one_other, "es": _one_other, "it": _one_other,
+    "nl": _one_other, "tr": _one_other, "es-419": _one_other, "pt-PT": _one_other,
+    "el": _one_other, "sv": _one_other, "da": _one_other, "nb": _one_other,
+    "fi": _one_other, "bg": _one_other, "hu": _one_other,
     "pt-BR": lambda n: 0 if n in (0, 1) else 1,
     "fr": lambda n: 0 if n in (0, 1) else 1,
-    # one (1, 21, 31…), few (2-4, 22-24…), many (the rest)
-    "ru": lambda n: 0 if n % 10 == 1 and n % 100 != 11
+    "hi": lambda n: 0 if n in (0, 1) else 1,
+    "ru": _slavic, "uk": _slavic,
+    # one (1), few (2-4, 22-24…, not 12-14), many (the rest)
+    "pl": lambda n: 0 if n == 1
     else 1 if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14 else 2,
+    # one (1), few (2-4), other
+    "cs": lambda n: 0 if n == 1 else 1 if 2 <= n <= 4 else 2,
+    # one (1), few (0, 2-19, 101-119…), other (20-100, 120…)
+    "ro": lambda n: 0 if n == 1 else 1 if n == 0 or 1 <= n % 100 <= 19 else 2,
+    # one (1, 2, 3, and anything not ending in 4, 6 or 9), other
+    "fil": lambda n: 0 if n in (1, 2, 3) or n % 10 not in (4, 6, 9) else 1,
+    # one form for every number
+    "zh-CN": lambda n: 0, "zh-TW": lambda n: 0, "ja": lambda n: 0, "ko": lambda n: 0,
+    "id": lambda n: 0, "vi": lambda n: 0, "th": lambda n: 0, "ms": lambda n: 0,
+    # zero, one, two, few (3-10, 103-110…), many (11-99, 111-199…), other
+    "ar": lambda n: 0 if n == 0 else 1 if n == 1 else 2 if n == 2
+    else 3 if 3 <= n % 100 <= 10 else 4 if 11 <= n % 100 <= 99 else 5,
 }
+FORMS = {"ru": 3, "uk": 3, "pl": 3, "cs": 3, "ro": 3, "ar": 6,
+         **dict.fromkeys(("zh-CN", "zh-TW", "ja", "ko", "id", "vi", "th", "ms"), 1)}
+
+
+def forms(code: str) -> int:
+    """How many plural forms a catalog entry has in language `code`."""
+    return FORMS.get(code, 2)
+
+
+RTL = {"ar"}               # written right to left: the layout is mirrored
+# the font for each script, by language: Windows finds one by itself, but on a Japanese
+# PC it would draw Chinese with Japanese shapes (and the other way round)
+FONTS = {"zh-CN": "Microsoft YaHei UI", "zh-TW": "Microsoft JhengHei UI",
+         "ja": "Yu Gothic UI", "ko": "Malgun Gothic", "th": "Leelawadee UI",
+         "hi": "Nirmala UI"}
 
 _lang = ENGLISH
 _catalog: dict[str, str | list[str]] = {}
@@ -89,20 +133,38 @@ def current() -> str:
     return _lang
 
 
+def _files() -> list[Path]:
+    try:
+        return [f for f in sorted(LANG_DIR.glob("*.json")) if f.stem not in (ENGLISH, PSEUDO)]
+    except OSError:
+        return []
+
+
+def codes() -> list[str]:
+    """The code of every catalog shipped, English first (no catalog is read)."""
+    return [ENGLISH, *(f.stem for f in _files())]
+
+
+_META_NAME = re.compile(r'^\{\s*"_meta"\s*:\s*\{\s*"name"\s*:\s*("(?:[^"\\]|\\.)*")')
+
+
+def _own_name(f: Path) -> str:
+    """Catalog `f`'s `_meta.name`, from its first lines when it's at the top (a whole
+    catalog is ~300 KB: reading all of them took 0.1 s), else from the whole file."""
+    try:
+        with f.open(encoding="utf-8") as fh:
+            m = _META_NAME.match(fh.read(512))
+        if m:
+            return json.loads(m.group(1)) or f.stem
+    except (OSError, ValueError):
+        pass
+    meta = _read(f).get("_meta", {})
+    return meta.get("name", f.stem) if isinstance(meta, dict) else f.stem
+
+
 def available() -> list[tuple[str, str]]:
     """(code, the language's own name) for every catalog shipped, English first."""
-    out = [(ENGLISH, "English")]
-    try:
-        files = sorted(LANG_DIR.glob("*.json"))
-    except OSError:
-        files = []
-    for f in files:
-        code = f.stem
-        if code in (ENGLISH, PSEUDO):
-            continue
-        meta = _read(f).get("_meta", {})
-        out.append((code, meta.get("name", code) if isinstance(meta, dict) else code))
-    return out
+    return [(ENGLISH, "English"), *((f.stem, _own_name(f)) for f in _files())]
 
 
 def windows_language() -> str:
@@ -123,17 +185,68 @@ def windows_language() -> str:
 
 def resolve(setting: str) -> str:
     """The catalog to use for Config.language (`WINDOWS`: Windows' own, if shipped)."""
-    codes = [c for c, _n in available()]
+    codes_ = codes()
     want = setting if setting and setting != WINDOWS else windows_language()
     if want == PSEUDO:
         return PSEUDO
-    if want in codes:
+    if want in codes_:
         return want
+    chinese = _chinese(want)
+    if chinese:
+        return chinese if chinese in codes_ else ENGLISH
+    regional = _regional(want)
+    if regional in codes_:
+        return regional
     base = want.split("-")[0].lower()
-    for c in codes:                       # "de-AT" -> "de", "pt-PT" -> "pt-BR"
+    for c in codes_:                       # "de-AT" -> "de", "pt-PT" -> "pt-BR"
         if c.split("-")[0].lower() == base:
             return c
     return ENGLISH
+
+
+def _chinese(name: str) -> str | None:
+    """Windows names Chinese by region or script: Hong Kong, Macau and Traditional
+    script read zh-TW, the rest zh-CN (a plain "zh" match would send Hong Kong to
+    Simplified). None for other languages."""
+    parts = [p.lower() for p in name.split("-")]
+    if parts[0] != "zh":
+        return None
+    if "hant" in parts or {"hk", "mo", "tw"} & set(parts[1:]):
+        return "zh-TW"
+    return "zh-CN"
+
+
+def _regional(name: str) -> str | None:
+    """The catalog for a region a plain base-language match would get wrong: Spain's
+    Spanish (es) or Latin America's (es-419, every other es-XX); Brazil's Portuguese
+    (pt-BR, also a plain "pt") or Portugal's (pt-PT, the other pt-XX); Norwegian
+    (nb, nn, no) is nb. None: no rule."""
+    parts = [p.lower() for p in name.split("-")]
+    lang, region = parts[0], parts[-1] if len(parts) > 1 else ""
+    if lang == "es" and region:
+        return "es" if region == "es" else "es-419"
+    if lang == "pt":
+        return "pt-BR" if region in ("", "br") else "pt-PT"
+    if lang in ("nb", "nn", "no"):
+        return "nb"
+    return None
+
+
+def is_rtl(code: str | None = None) -> bool:
+    """Language `code` (default: the current one) is written right to left."""
+    return (_lang if code is None else code) in RTL
+
+
+def use_fonts(families) -> None:
+    """After the QApplication is made: the theme fonts `families` (Segoe UI, Consolas…)
+    fall back to the current language's own font for letters they haven't got."""
+    own = FONTS.get(_lang)
+    if not own:
+        return
+    from PySide6.QtGui import QFont
+    for fam in families:
+        if fam and own not in QFont.substitutes(fam):
+            QFont.insertSubstitution(fam, own)
 
 
 def set_language(code: str) -> str:
@@ -152,6 +265,33 @@ def set_language(code: str) -> str:
     return code
 
 
+def in_language(code: str, make):
+    """What `make()` returns with language `code` on for the call (the Language picker
+    and the offer bar speak the language they offer before the app has switched)."""
+    global _lang, _catalog
+    old = _lang, _catalog
+    set_language(code)
+    try:
+        return make()
+    finally:
+        _lang, _catalog = old
+
+
+def offer() -> str | None:
+    """Windows' display language, if a catalog for it is shipped and it isn't the one
+    showing (the board doesn't follow Windows by itself yet: it offers to)."""
+    code = resolve(windows_language())
+    return code if code not in (ENGLISH, PSEUDO, _lang) else None
+
+
+def name_of(code: str) -> str:
+    """Language `code`'s own name ("Deutsch"), or the code."""
+    if code == ENGLISH:
+        return "English"
+    f = LANG_DIR / f"{code}.json"
+    return _own_name(f) if f.is_file() else code
+
+
 def startup(app_dir: Path) -> str:
     """The language for this run, from config.json's `language` (read here, before the
     rest of the settings, so module-level text is made in it), or ONIONBOARD_LANG (for
@@ -162,9 +302,54 @@ def startup(app_dir: Path) -> str:
         raw = _read(app_dir / "config.json") if (app_dir / "config.json").is_file() else {}
         want = raw.get("language", WINDOWS)
         want = want if isinstance(want, str) else WINDOWS
+    if want == WINDOWS and not FOLLOW_WINDOWS:
+        want = ENGLISH
     code = set_language(resolve(want))
     log.info("language: %s (setting %r)", code, want)
     return code
+
+
+def _qt_button(source: str) -> str | None:
+    """Qt's own words on standard buttons (OK, Cancel… in message boxes and dialogs), in
+    the current language; None for words not here."""
+    key = source.replace("&", "")
+    words = {"OK": _("OK"), "Cancel": _("Cancel"), "Close": _("Close"), "Yes": _("Yes"),
+             "No": _("No"), "Save": _("Save"), "Open": _("Open"), "Apply": _("Apply")}
+    return words.get(key)
+
+
+_translator = None
+
+
+def translate_qt_buttons(app) -> bool:
+    """Put Qt's standard buttons (OK, Cancel, Yes…) in the current language too: Qt's
+    own translations aren't shipped. Skipped for English, and when something else
+    already translates them (an Onion Watch tab that got there first, say). True once
+    it's in place."""
+    global _translator
+    if _lang == ENGLISH or _translator is not None:
+        return _translator is not None
+    from PySide6.QtCore import QCoreApplication, QTranslator
+    if QCoreApplication.translate("QPlatformTheme", "Cancel") != "Cancel":
+        return False
+
+    class ButtonWords(QTranslator):
+        def translate(self, context, source, disambiguation=None, n=-1):
+            # None, not "": Qt takes "" as a translation (an empty one) and stops there,
+            # which broke more than buttons: QImage.loadFromData() failed on every PNG
+            # once a language other than English was on
+            if context == "QPlatformTheme" and source:
+                return _qt_button(source)
+            return None
+
+        def isEmpty(self):
+            return False
+
+    _translator = ButtonWords(app)
+    app.installTranslator(_translator)
+    # out again before Python shuts down: Qt mustn't call into it while it does
+    app.aboutToQuit.connect(lambda: app.removeTranslator(_translator))
+    return True
 
 
 def _read(path: Path) -> dict:

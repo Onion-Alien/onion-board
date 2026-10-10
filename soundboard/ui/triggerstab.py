@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButt
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import modules, net, netlog, theme, updates, watchaddon
+from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
@@ -37,13 +38,27 @@ log = logging.getLogger(__name__)
 
 HOOT_PX = 130
 # what Hoot says while he waits to be installed, and when he's clicked
-HOOT_BEGS = ("pleeease?", "install me?", "one click!", "hoo? hoo…?", "I'd watch for you…",
-             "so… bored…")
-HOOT_JOY = ("yay!!", "hoo-ray!", "↓ that button!")
+HOOT_BEGS = (_("pleeease?"), _("install me?"), _("one click!"), _("hoo? hoo…?"),
+             _("I'd watch for you…"), _("so… bored…"))
+HOOT_JOY = (_("yay!!"), _("hoo-ray!"), _("↓ that button!"))
+# the steps of getting it with no number to show, by key (what _step carries): what
+# the button says, and what the update bar says
+STEPS = {"Finding the newest…": (_("Finding the newest…"), _("Finding the newest Onion Watch…")),
+         "Downloading…": (_("Downloading…"), _("Downloading Onion Watch…")),
+         "Installing…": (_("Installing…"), _("Installing Onion Watch…")),
+         "Starting…": (_("Starting…"), _("Starting Onion Watch…"))}
+SHOW_LOAD_MS = 50   # first shown, the add-on loads after the tab's first paint, or this
 
 
-def plural(n: int, word: str) -> str:
-    return f"{n} {word}" + ("" if n == 1 else "s")
+class _WaitPage(QWidget):
+    """The blank page while the add-on isn't loaded yet; tells the tab it was painted."""
+    def __init__(self, painted):
+        super().__init__()
+        self._painted = painted
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        self._painted()
 
 
 class TriggersTab(QWidget):
@@ -56,7 +71,8 @@ class TriggersTab(QWidget):
     def __init__(self, host, dirs=None, defer: bool = False):
         """`host` is the BoardHost; `dirs` where to look for the add-on (tests).
         `defer`: don't load the add-on yet, the window calls load() once it's up
-        (loading it takes up to a second, and the window used to wait for it)."""
+        (loading it takes up to a second, and the window used to wait for it), or
+        only when the tab is first shown, when nothing has to run (needed_now)."""
         super().__init__()
         self.host = host
         self._dirs = dirs
@@ -90,8 +106,9 @@ class TriggersTab(QWidget):
         self.btn_remove = self._remove_button()
         self.foot.addWidget(self.btn_remove)
         self.stack.addWidget(self.board_page)
+        self._load_queued = False           # a load after the first paint is on its way
         if defer:   # blank meanwhile, not Hoot asking to be installed
-            self.wait_page = QWidget()
+            self.wait_page = _WaitPage(self._painted)
             self.stack.addWidget(self.wait_page)
             self.stack.setCurrentWidget(self.wait_page)
         else:
@@ -109,18 +126,18 @@ class TriggersTab(QWidget):
         # card (his speech bubble may overlap him a little on the right)
         side = round(HOOT_PX * 0.6)
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side)
-        self.hoot.setToolTip("Hoot is waiting for Onion Watch")
+        self.hoot.setToolTip(_("Hoot is waiting for Onion Watch"))
         row.addWidget(self.hoot, 0, Qt.AlignCenter)
         text = QVBoxLayout()
         text.setSpacing(8)
         self.title = section_label("")
         self.title.setWordWrap(True)
         text.addWidget(self.title)
-        self.blurb = hint_label(
+        self.blurb = hint_label(_(
             "Onion Watch plays a sound when something shows up in your game: a rare "
             "spawn, a queue popping, “YOU DIED”. It watches the game's own window, even "
             "while other windows cover it, can tell two copies of a game apart, and can "
-            "ring until you stop it. Your sounds play through the board as usual.")
+            "ring until you stop it. Your sounds play through the board as usual."))
         text.addWidget(self.blurb)
         self.kept = hint_label("")        # "Your 3 triggers are kept…"
         text.addWidget(self.kept)
@@ -135,7 +152,7 @@ class TriggersTab(QWidget):
         self.btn_get.clicked.connect(self.get)
         self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.OtherFocusReason))
         buttons.addWidget(self.btn_get)
-        self.btn_cancel = QPushButton("Cancel")
+        self.btn_cancel = QPushButton(_("Cancel"))
         self.btn_cancel.clicked.connect(self.cancel)
         self.btn_cancel.hide()
         buttons.addWidget(self.btn_cancel)
@@ -148,7 +165,7 @@ class TriggersTab(QWidget):
         # bar that just sat full looked like nothing was happening
         self.bar = QProgressBar()
         self.bar.setObjectName("downloadprogress")
-        self.bar.setAccessibleName("Onion Watch download progress")
+        self.bar.setAccessibleName(_("Onion Watch download progress"))
         self.bar.setRange(0, 1000)
         self.bar.setTextVisible(False)
         self.bar.setFixedHeight(6)
@@ -157,10 +174,10 @@ class TriggersTab(QWidget):
         self.working = LoadingBar()
         self.working.hide()
         text.addWidget(self.working)
-        self.privacy = hint_label(
+        self.privacy = hint_label(_(
             "It's downloaded from Onion Watch's page on GitHub only when you click, and "
             "checked before it's installed. It only looks at your screen: it never "
-            "clicks, types or touches your game.")
+            "clicks, types or touches your game."))
         text.addWidget(self.privacy)
         text.addStretch(1)
         row.addLayout(text, 1)
@@ -177,19 +194,19 @@ class TriggersTab(QWidget):
         h.setContentsMargins(0, 8, 0, 0)
         self.update_text = hint_label("")
         h.addWidget(self.update_text, 1)
-        self.btn_update = QPushButton("Update")
+        self.btn_update = QPushButton(_("Update"))
         self.btn_update.setObjectName("primary")
         self.btn_update.clicked.connect(self.get)
         h.addWidget(self.btn_update)
-        self.btn_later = QPushButton("Later")
+        self.btn_later = QPushButton(_("Later"))
         self.btn_later.clicked.connect(lambda: self.update_bar.hide())
         h.addWidget(self.btn_later)
         self.update_bar.hide()
 
     def _remove_button(self) -> QPushButton:
-        b = QPushButton("Remove Onion Watch…")
+        b = QPushButton(_("Remove Onion Watch…"))
         icons.set_icon(b, "trash", "danger_text")
-        b.setToolTip("Uninstall the Onion Watch add-on. Your triggers are kept.")
+        b.setToolTip(_("Uninstall the Onion Watch add-on. Your triggers are kept."))
         b.clicked.connect(self.remove)
         b.hide()
         return b
@@ -217,16 +234,18 @@ class TriggersTab(QWidget):
         """The Hoot page's words: first time, or after it failed to load."""
         n = self._trigger_count()
         broken = self.info is not None and self.panel is None and not self._busy
-        self.title.setText("Onion Watch couldn't start" if broken and error else
-                           "Get Onion Watch for the Triggers tab")
-        self.btn_get.setText("Get Onion Watch again" if broken and error
-                             else "Get Onion Watch")
+        self.title.setText(_("Onion Watch couldn't start") if broken and error else
+                           _("Get Onion Watch for the Triggers tab"))
+        self.btn_get.setText(_("Get Onion Watch again") if broken and error
+                             else _("Get Onion Watch"))
         local = watchaddon.local_zip()
-        self.btn_get.setToolTip(f"Install {local}" if local is not None else
-                                "Download Onion Watch from GitHub and install it")
-        self.kept.setText(f"Your {plural(n, 'trigger')} and {'its' if n == 1 else 'their'} "
-                          "pictures are kept. They'll work again as soon as Onion Watch is "
-                          "installed." if n else "")
+        self.btn_get.setToolTip(_("Install {file}", file=local) if local is not None else
+                                _("Download Onion Watch from GitHub and install it"))
+        self.kept.setText(ngettext(
+            "Your {n} trigger and its pictures are kept. They'll work again as soon as "
+            "Onion Watch is installed.",
+            "Your {n} triggers and their pictures are kept. They'll work again as soon as "
+            "Onion Watch is installed.", n) if n else "")
         self.kept.setVisible(bool(n))
         self.error.setText(error)
         self.error.setVisible(bool(error))
@@ -249,6 +268,49 @@ class TriggersTab(QWidget):
             self.btn_update.setToolTip(why)
 
     # ------------------------------------------------------------------ loading
+    def has_addon(self) -> bool:
+        """Whether Onion Watch is installed, or a local zip is there to install it from
+        (Offline mode hides the tab when it's neither: it's only the Get button)."""
+        if self.info is None:
+            self.info = watchaddon.installed(self._dirs)
+        return self.info is not None or watchaddon.local_zip() is not None
+
+    def needed_now(self) -> bool:
+        """At the window's start (or the tab switched back on in Settings > Tabs):
+        whether to load the add-on straight away. Only when it has to run (watching
+        was on with triggers to watch: it picks up again by itself) or there's none
+        installed (Hoot's page costs nothing, and the board may point at the tab).
+        Otherwise it waits until the tab is first shown: loading it costs ~0.5 s,
+        40+ MB and a dozen threads that a board not watching never needs."""
+        self.info = watchaddon.installed(self._dirs)   # Settings > Add-ons shows it
+        if self.info is None:
+            return True
+        return bool(self.host.screen.get("on")) and self._trigger_count() > 0
+
+    def ensure_loaded(self):
+        """Load the add-on now if it's still waiting to be (something needs it)."""
+        if self.pending:
+            self.load()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self.pending and not self._load_queued:
+            # the tab changes at once (its first paint), then it loads; a timer as
+            # well, in case that paint never comes
+            self._load_queued = True
+            QTimer.singleShot(SHOW_LOAD_MS, self, self._load_on_show)
+
+    def _painted(self):
+        if self._load_queued:
+            QTimer.singleShot(0, self, self._load_on_show)
+
+    def _load_on_show(self):
+        if not self._load_queued:
+            return
+        self._load_queued = False
+        if self.pending and not self._busy and self.isVisible():
+            self.load()
+
     def load(self, error: str = "") -> bool:
         """Put the installed add-on's tab in, if it's there and loads. False (Hoot
         stays, saying why) otherwise."""
@@ -280,7 +342,7 @@ class TriggersTab(QWidget):
             if menu is not None:            # last in its More menu, no row of its own
                 menu.addSeparator()
                 self.act_remove = menu.addAction(icons.icon("trash", "danger_text"),
-                                                 "Remove Onion Watch…", self.remove)
+                                                 _("Remove Onion Watch…"), self.remove)
             else:
                 lay.addLayout(self.foot)
                 self.btn_remove.show()
@@ -301,6 +363,7 @@ class TriggersTab(QWidget):
         on a thread; the tab loads it when it's in."""
         if self._busy:
             return
+        self.ensure_loaded()   # not shown yet: what's installed now is what's updated
         self._busy, self._cancel = True, False
         update = self.panel is not None
         offer = self.offer
@@ -311,14 +374,14 @@ class TriggersTab(QWidget):
         netlog.cause(watchaddon.FEATURE, "You clicked to get Onion Watch (Triggers tab)")
         self._on_step("Finding the newest…" if offer is None else "Downloading…")
         busy.set_busy(self.btn_cancel, False)
-        self.btn_cancel.setText("Cancel")
+        self.btn_cancel.setText(_("Cancel"))
 
         def run():
             try:
                 o = offer or watchaddon.latest(lambda: self._cancel)
                 if o is None:
-                    raise updates.UpdateError(
-                        "there's no Onion Watch release the app can check. Try again later.")
+                    raise updates.UpdateError(_(
+                        "there's no Onion Watch release the app can check. Try again later."))
                 busy.emit(self._step, "Downloading…")
                 path = watchaddon.fetch(o, lambda *a: busy.emit(self._progress, *a),
                                         lambda: self._cancel)
@@ -333,23 +396,25 @@ class TriggersTab(QWidget):
     def cancel(self):
         self._cancel = True
         busy.set_busy(self.btn_cancel, True)   # the download notices between chunks
-        self.btn_cancel.setText("Cancelling…")
+        self.btn_cancel.setText(_("Cancelling…"))
 
     def _busy_label(self, text: str):
         """What the button that started it says while it runs (the bar and Cancel are
         on the get page; an update from the bar only has its own button and text)."""
         (self.btn_update if self.panel is not None else self.btn_get).setText(text)
 
-    def _on_step(self, text: str):
-        """A step with no number to show: the gliding pill, and what it's doing."""
+    def _on_step(self, step: str):
+        """A step with no number to show (a key of STEPS): the gliding pill, and what
+        it's doing."""
         if not self._busy:
             return
         self.bar.hide()
         self.bar.setValue(0)
         self.working.show()
         self.working.start()
-        self._busy_label(text)
-        self.update_text.setText(f"{text[:-1]} Onion Watch…")
+        button, line = STEPS.get(step, (step, step))
+        self._busy_label(button)
+        self.update_text.setText(line)
 
     def _on_progress(self, done: int, total: int):
         if total <= 0 or not self._busy:
@@ -359,8 +424,8 @@ class TriggersTab(QWidget):
         self.bar.show()
         self.bar.setValue(max(self.bar.value(), min(1000, int(done * 1000 / total))))
         pct = self.bar.value() // 10
-        self._busy_label(f"Downloading… {pct}%")
-        self.update_text.setText(f"Downloading Onion Watch… {pct}%")
+        self._busy_label(_("Downloading… {percent}%", percent=pct))
+        self.update_text.setText(_("Downloading Onion Watch… {percent}%", percent=pct))
 
     def _on_finished(self, info, error: str, update: bool):
         if not error and not update:
@@ -378,22 +443,25 @@ class TriggersTab(QWidget):
         self.working.hide()
         self.btn_get.setEnabled(True)
         self.btn_update.setEnabled(True)
-        self.btn_update.setText("Update")
+        self.btn_update.setText(_("Update"))
         self._label_get()                   # the get button's own words (and switch) again
         self.btn_cancel.hide()
         self.bar.hide()
         if update:
             if error:
-                self.update_text.setText(f"Onion Watch wasn't updated: {errors.plain(error)}")
+                self.update_text.setText(_("Onion Watch wasn't updated: {error}",
+                                           error=errors.plain(error)))
             else:
                 self.offer = None
                 self.btn_update.hide()
-                self.btn_later.setText("OK")
-                self.update_text.setText(f"Onion Watch {info.version} is installed. Restart "
-                                         "Onion Board to start using it.")
+                self.btn_later.setText(_("OK"))
+                self.update_text.setText(_("Onion Watch {version} is installed. Restart "
+                                           "Onion Board to start using it.",
+                                           version=info.version))
             return
         if error:
-            self._label_get("Cancelled." if error == "Cancelled" else error)
+            # "Cancelled": updates' UpdateError("cancelled") as watchaddon.friendly words it
+            self._label_get(_("Cancelled.") if self._cancel or error == "Cancelled" else error)
             return
         self.offer = None
         self.load()
@@ -401,21 +469,25 @@ class TriggersTab(QWidget):
     # ------------------------------------------------------------------ removing it
     def confirm_remove(self) -> bool:
         n = self._trigger_count()
-        kept = (f" Your {plural(n, 'trigger')} and {'its' if n == 1 else 'their'} pictures "
-                "are kept for when you get it again." if n else "")
+        text = (ngettext("Remove the Onion Watch add-on from Onion Board? Your {n} trigger "
+                         "and its pictures are kept for when you get it again.\n\nYou can "
+                         "get it again from the Triggers tab any time.",
+                         "Remove the Onion Watch add-on from Onion Board? Your {n} triggers "
+                         "and their pictures are kept for when you get it again.\n\nYou can "
+                         "get it again from the Triggers tab any time.", n) if n else
+                _("Remove the Onion Watch add-on from Onion Board?\n\nYou can get it again "
+                  "from the Triggers tab any time."))
         return QMessageBox.question(
-            self, "Remove Onion Watch?",
-            f"Remove the Onion Watch add-on from Onion Board?{kept}\n\n"
-            "You can get it again from the Triggers tab any time.",
+            self, _("Remove Onion Watch?"), text,
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
 
     def remove(self):
         """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""
         info = self.info
         if self._busy:
-            QMessageBox.information(self, "Remove Onion Watch",
-                                    "Onion Watch is being downloaded right now. Try again "
-                                    "when it's done.")
+            QMessageBox.information(self, _("Remove Onion Watch"),
+                                    _("Onion Watch is being downloaded right now. Try again "
+                                      "when it's done."))
             return
         if info is None or not self.confirm_remove():
             return
@@ -439,27 +511,32 @@ class TriggersTab(QWidget):
             watchaddon.remove(info, self._base())
         except modules.ModuleError as e:
             log.warning("Onion Watch couldn't be removed: %s", e)
-            QMessageBox.warning(self, "Onion Watch wasn't removed",
-                                f"Onion Watch wasn't removed: {errors.plain(e)}")
+            QMessageBox.warning(self, _("Onion Watch wasn't removed"),
+                                _("Onion Watch wasn't removed: {error}", error=errors.plain(e)))
             self.load()                     # it's still there: put its tab back
             return
         log.info("Onion Watch %s was removed", info.version)
         self.info = None
+        self.pending = False                # nothing left to load
         self._label_get()
         self.stack.setCurrentWidget(self.get_page)
         n = self._trigger_count()
-        busy.toast(self, "✓ Onion Watch removed." + (" Your triggers are kept." if n else ""),
-                   "ok")
+        busy.toast(self, _("✓ Onion Watch removed. Your triggers are kept.") if n
+                   else _("✓ Onion Watch removed."), "ok")
 
     def offer_update(self, offer: watchaddon.Offer):
-        """A newer Onion Watch is out (the daily update check): say so on the tab."""
-        if self.panel is None or self._busy:
+        """A newer Onion Watch is out (the daily update check): say so on the tab
+        (not loaded yet, but installed: the bar is there once it is)."""
+        waiting = self.pending and self.info is not None
+        if (self.panel is None and not waiting) or self._busy:
             return
         self.offer = offer
-        self.update_text.setText(f"Onion Watch {offer.version} is out."
-                                 + (f" {offer.notes}" if offer.notes else ""))
+        self.update_text.setText(
+            _("Onion Watch {version} is out. {notes}", version=offer.version, notes=offer.notes)
+            if offer.notes else _("Onion Watch {version} is out.", version=offer.version))
         self.btn_update.show()
-        self.btn_later.setText("Later")
+        self.btn_later.setText(_("Later"))
+
         self.update_bar.show()
 
     # ------------------------------------------------------------------ for the board

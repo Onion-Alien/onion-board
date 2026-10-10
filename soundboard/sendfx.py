@@ -24,6 +24,8 @@ state, and are built for one output rate (the engine keeps one set per output).
 """
 from __future__ import annotations
 
+import math
+
 import numpy as np
 
 from soundboard.dsp import butter, running_min, sosfilt_bank
@@ -59,9 +61,25 @@ class Limiter:
         self.fhist = np.ones(self.hold - 1, F32)        # the box filter's last outputs
         self.rel = RELEASE_DB_S / rate                 # dB per sample
         self.reduction_db = 0.0                        # deepest gain cut in the last block
+        self._resting = 0   # zeros fed through the gain-1 fast path since anything else
+        self._fast = False  # the last block took that path
+
+    def silence(self, n: int) -> np.ndarray | None:
+        """process() of n silent frames, or None when that is n zeros with nothing
+        changed: the gain is at rest and the delay line holds only silence. With
+        nothing playing that's every block, and costs nothing."""
+        if self._resting >= self.la:
+            return None
+        was = self._resting
+        out = self.process(np.zeros((n, 2), F32))
+        if self._fast:   # gain 1 throughout: the delay line now ends in `was + n` zeros
+            self._resting = was + n
+        return out
 
     def process(self, x: np.ndarray) -> np.ndarray:
         n = len(x)
+        self._resting = 0
+        self._fast = False
         if n == 0:
             return x
         la = self.la
@@ -75,6 +93,7 @@ class Limiter:
             self.delay = buf[n:]
             self.need = np.ones(2 * la, F32)
             self.reduction_db = 0.0
+            self._fast = True
             return buf[:n]
         pk = np.max(np.abs(x), axis=1)
         need = np.minimum(F32(1), self.ceiling / np.maximum(pk, F32(1e-9))).astype(F32)
@@ -157,28 +176,37 @@ class SmartMono:
             np.vstack([hi, hi, hi2, hi2]),
         ])
         self._state = None
+        self._ramp = None   # 0..1 over a block, cached per block size
         self.bands = {k: _Band() for k in ("low", "mid", "high")}
 
-    def _split(self, x: np.ndarray) -> dict:
+    def _split(self, x: np.ndarray) -> np.ndarray:
+        """The three bands of x ((n, 2) float64) as (3, 2, n): low, mid, high."""
         y, self._state = sosfilt_bank(self._bank, x.T, self._state)   # (4, 2, n)
-        return {"low": (y[0] + y[1]).T, "mid": y[2].T, "high": y[3].T}
+        bands = np.empty((3,) + y.shape[1:])
+        np.add(y[0], y[1], out=bands[0])
+        bands[1:] = y[2:]
+        return bands
 
     def process(self, x: np.ndarray) -> np.ndarray:
         n = len(x)
         if n == 0:
             return x
         x64 = np.asarray(x, np.float64)
-        k = 1.0 - float(np.exp(-n / (self.rate * self.TAU_S)))
-        mono = np.zeros(n)
-        ramp = np.linspace(0.0, 1.0, n, endpoint=False) + 1.0 / n
-        for name, b in self._split(x64).items():
-            left, right = b[:, 0], b[:, 1]
-            b_ = self.bands[name]
-            b_.ll += (float(left @ left) / n - b_.ll) * k
-            b_.rr += (float(right @ right) / n - b_.rr) * k
-            b_.lr += (float(left @ right) / n - b_.lr) * k
+        k = 1.0 - math.exp(-n / (self.rate * self.TAU_S))
+        bands = self._split(x64)
+        left, right = bands[:, 0], bands[:, 1]          # (3, n) each
+        # the bands' statistics in three calls (one per product) rather than nine, and
+        # the per-band decisions in plain Python floats: this runs on the audio thread
+        ll = np.einsum("bn,bn->b", left, left) / n
+        rr = np.einsum("bn,bn->b", right, right) / n
+        lr = np.einsum("bn,bn->b", left, right) / n
+        s0, s1, g0, g1 = [], [], [], []
+        for i, b_ in enumerate(self.bands.values()):
+            b_.ll += (float(ll[i]) - b_.ll) * k
+            b_.rr += (float(rr[i]) - b_.rr) * k
+            b_.lr += (float(lr[i]) - b_.lr) * k
             tot = b_.ll + b_.rr
-            corr = b_.lr / np.sqrt(b_.ll * b_.rr) if b_.ll * b_.rr > 1e-18 else 1.0
+            corr = b_.lr / math.sqrt(b_.ll * b_.rr) if b_.ll * b_.rr > 1e-18 else 1.0
             sign = b_.sign
             if sign > 0 and corr < self.FLIP_BELOW:
                 sign = -1.0
@@ -186,13 +214,24 @@ class SmartMono:
                 sign = 1.0
             # power of the mono sum vs the channels' average power
             m_pow = (tot + 2 * sign * b_.lr) / 4
-            want = float(np.sqrt((tot / 2) / m_pow)) if m_pow > 1e-18 and tot > 1e-18 else 1.0
+            want = math.sqrt((tot / 2) / m_pow) if m_pow > 1e-18 and tot > 1e-18 else 1.0
             gain = min(max(want, 1.0), self.MAX_GAIN)
-            s0, g0 = b_.sign, b_.gain
-            sg = s0 + (sign - s0) * ramp        # crossfade a polarity change over the block
-            gg = g0 + (gain - g0) * ramp
-            mono += (left + right * sg) * 0.5 * gg
+            s0.append(b_.sign)
+            s1.append(sign - b_.sign)
+            g0.append(b_.gain)
+            g1.append(gain - b_.gain)
             b_.sign, b_.gain = sign, gain
+        if any(s1) or any(g1):
+            # crossfade a polarity change (and the make-up gain) over the block, per band
+            ramp = self._ramp
+            if ramp is None or len(ramp) != n:
+                ramp = self._ramp = np.linspace(0.0, 1.0, n, endpoint=False) + 1.0 / n
+            sg = np.array(s0)[:, None] + np.array(s1)[:, None] * ramp
+            gg = np.array(g0)[:, None] + np.array(g1)[:, None] * ramp
+        else:   # settled (nearly always): one polarity and gain per band
+            sg = np.array(s0)[:, None]
+            gg = np.array(g0)[:, None]
+        mono = ((left + right * sg) * (0.5 * gg)).sum(axis=0)
         out = np.empty((n, 2), F32)
         out[:, 0] = mono
         out[:, 1] = mono

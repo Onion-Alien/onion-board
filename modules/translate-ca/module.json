@@ -1,0 +1,15 @@
+{
+  "id": "translate-ca",
+  "name": "Translate to Catalan",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Catalan. Needs live voice-to-speech. Downloads a 72 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ca",
+  "language_name": "Catalan",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ca-1_9.argosmodel",
+    "sha256": "67a1ef9e3bab7e1b39b7a75d30aa18beb251489a895b12d8be61c14eab6fca18",
+    "bytes": 72211311
+  },
+  "credits": "English to Catalan model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

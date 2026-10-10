@@ -36,3 +36,18 @@ def test_an_animation_stays_paused_in_a_minimised_window(qapp):
     qapp.applicationStateChanged.emit(Qt.ApplicationActive)   # still "visible", minimised
     assert calls == ["start"]
     w.close()
+
+
+def test_an_animation_restarts_when_the_window_is_restored_after_activating(qapp, monkeypatch):
+    # Windows makes the app active before the window leaves its minimised state;
+    # the animation used to stay frozen until something else woke it.
+    monkeypatch.setattr(appstate, "active", lambda: True)
+    w = QWidget()
+    calls = []
+    appstate.pause_in_background(w, lambda: calls.append("start"), lambda: calls.append("stop"))
+    w.showMinimized()
+    qapp.applicationStateChanged.emit(Qt.ApplicationActive)
+    assert calls == []
+    w.showNormal()   # the state change arrives at once, before any new activation
+    assert calls == ["start"]
+    w.close()

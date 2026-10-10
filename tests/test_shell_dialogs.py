@@ -1,7 +1,7 @@
 """The main window's shell: closed dialogs are freed, the live-tab warning survives
 the icons-only tab bar, and status colours are readable on every theme."""
 import pytest
-from PySide6.QtCore import QEvent
+from PySide6.QtCore import QEvent, QPoint, Qt
 
 from soundboard import engine, settings, theme, winkeys
 from soundboard.ui import mainwindow as main
@@ -51,19 +51,120 @@ def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win, monkeypatch):
     kept[0].done(0)
 
 
-def test_live_tab_warning_survives_the_icons_only_tab_bar(qapp, win):
+def test_live_tab_warning_shows_on_the_rail(qapp, win):
     vi = win.tabs.indexOf(win.voice)
+    b = win.rail.buttons[vi]
+    plain = b.icon().cacheKey()
     set_tab_live(win.tabs, vi, True, "● ON: others hear your changed voice", "voice")
-    for compact in (True, False):
-        win._tab_icons_only(compact)
-        tip = win.tabs.tabToolTip(vi)
-        assert tip.startswith("● ON"), tip
-        assert ("Voice:" in tip) == compact
+    for is_open in (False, True):   # no hover tips on the tabs: it's for a screen reader
+        win.rail.set_open(is_open)
+        assert b.toolTip() == "" and b.accessibleDescription().startswith("● ON")
+    assert b.icon().cacheKey() != plain   # the live icon came across
     set_tab_live(win.tabs, vi, False)
-    assert not win.tabs.tabToolTip(vi).startswith("●")   # the right plain tip is back
-    other = win.tabs.indexOf(win.setup_page)
-    win._tab_icons_only(True)
-    assert not win.tabs.tabToolTip(other).startswith("●")
+    assert not b.accessibleDescription().startswith("●")
+    win.rail.set_open(False)
+    setup = win.rail.buttons[win.tabs.indexOf(win.setup_page)]
+    assert not setup.accessibleDescription().startswith("●")
+
+
+def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
+    """Everything that changed a tab on the old top bar shows on the rail: a theme or
+    highlight colour change, a tab switched off / on / swapped, offline mode, Ctrl+Tab."""
+    from PySide6.QtTest import QTest
+    from soundboard import net
+    tabs, rail = win.tabs, win.rail
+    win.show()
+
+    def same(why):
+        for b in rail.buttons:
+            i = b.index
+            assert b.isVisibleTo(rail) == tabs.isTabVisible(i), (why, i)
+            assert b.icon().cacheKey() == tabs.tabBar().tabIcon(i).cacheKey(), (why, i)
+            assert b.isChecked() == (i == tabs.currentIndex()), (why, i)
+            assert b.accessibleName() == tabs.tabText(i).replace("&&", "&"), (why, i)
+
+    vi = tabs.indexOf(win.voice)
+    win.set_tab_on("voice", True)
+    set_tab_live(tabs, vi, True, "● ON", "voice")
+    same("start")
+    try:
+        win.apply_theme("Light")
+        same("theme")
+        win.set_live_color("#3399ff")
+        same("highlight colour")
+        set_tab_live(tabs, vi, False)
+        win.set_tab_on("radio", True)
+        tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+        win.set_tab_on("radio", False)
+        same("current tab switched off")
+        win.set_tab_on("radio", True)
+        win.set_tab_on("voice", False)
+        win.set_tab_on("voice", True)
+        same("tab swapped")
+        monkeypatch.setattr(net, "offline", lambda: True)
+        win._offline_follow()
+        same("offline")
+        monkeypatch.setattr(net, "offline", lambda: False)
+        win._offline_follow()
+        tabs.setCurrentIndex(0)
+        QTest.keyClick(tabs, Qt.Key_Tab, Qt.ControlModifier)
+        assert tabs.currentIndex() != 0
+        same("Ctrl+Tab")
+        shown = [b for b in rail.buttons if b.isVisible()]
+        shown[0].click()
+        QTest.keyClick(shown[0], Qt.Key_Down)   # the arrows, as on the old bar
+        assert tabs.currentIndex() == shown[1].index and win.focusWidget() is shown[1]
+        QTest.keyClick(shown[1], Qt.Key_Up)     # onto Sounds: the focus stays on the rail
+        assert win.focusWidget() is shown[0]
+        QTest.keyClick(shown[0], Qt.Key_Up)     # round to the last one
+        assert tabs.currentIndex() == shown[-1].index
+        same("arrows")
+        asked = []   # right-click: that tab's own menu (Hide this tab), as on the old bar
+
+        class Menu:
+            def exec(self, _pos):
+                pass
+        monkeypatch.setattr(win, "tab_menu", lambda i: asked.append(i) or Menu())
+        for b in shown:
+            b.customContextMenuRequested.emit(QPoint(5, 5))
+        assert asked == [b.index for b in shown]
+    finally:
+        win.set_live_color("")
+        win.apply_theme("Dark")
+
+
+def test_the_rail_mirrors_right_to_left(qapp, win):
+    """Arabic: the rail on the right, its live bar and border on its outer / inner edge,
+    and the narrow window's tight gap beside it."""
+    from PySide6.QtGui import QColor
+    vi = win.tabs.indexOf(win.voice)
+    win.tabs.setTabVisible(vi, True)
+    set_tab_live(win.tabs, vi, True, "● ON", "voice")
+    win.resize(1000, 700)
+    win.show()
+    rail, b = win.rail, win.rail.buttons[vi]
+
+    def bar_at():   # which edge the live bar is painted on
+        img, y = rail.grab().toImage(), b.geometry().center().y()
+        live = QColor(theme.T["live_text"]).name()
+        return [x for x in (0, rail.width() - 1) if QColor(img.pixel(x, y)).name() == live]
+
+    try:
+        assert bar_at() == [0]
+        qapp.setLayoutDirection(Qt.RightToLeft)
+        qapp.processEvents()
+        assert rail.property("rtl") is True
+        assert rail.mapTo(win, QPoint(0, 0)).x() + rail.width() == win.width()
+        assert bar_at() == [rail.width() - 1]
+        win._squeeze_rail(True)
+        m = win._body_lay.contentsMargins()
+        assert (m.left(), m.right()) == (main.BODY_SIDE, main.BODY_SIDE_TIGHT)
+        win._squeeze_rail(False)
+    finally:
+        qapp.setLayoutDirection(Qt.LeftToRight)
+        set_tab_live(win.tabs, vi, False)
+    qapp.processEvents()
+    assert rail.property("rtl") is False
 
 
 def _contrast(a: str, b: str) -> float:

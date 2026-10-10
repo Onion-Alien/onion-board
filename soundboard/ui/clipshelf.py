@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QHBoxLayout, QHeaderView, QLab
 
 from soundboard import errors
 from soundboard.clipshelf import Clip, Shelf
+from soundboard.i18n import _, ngettext
 from soundboard.ui import clipeditor, icons
 from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import UndoBar
@@ -47,19 +48,18 @@ class ClipShelf(QWidget):
         self.title = QLabel()
         self.title.setObjectName("section")
         head.addWidget(self.title)
-        hint = QLabel("Double-click plays · F2 renames · right-click for more")
+        hint = QLabel(_("Double-click plays · F2 renames · right-click for more"))
         hint.setObjectName("hint")
         head.addWidget(hint, 1)
-        self.btn_add = QPushButton("Add to Sounds")
+        self.btn_add = QPushButton(_("Add to Sounds"))
         self.btn_add.setObjectName("small")
         icons.set_icon(self.btn_add, "sounds", size=13)
-        self.btn_add.setToolTip("Make the picked clips sounds on the Sounds tab")
         self.btn_add.clicked.connect(self.add_picked)
         head.addWidget(self.btn_add)
         v.addLayout(head)
         self.list = QTreeWidget()
-        self.list.setAccessibleName("Saved clips")
-        self.list.setHeaderLabels(["Name", "Length", "From"])
+        self.list.setAccessibleName(_("Saved clips"))
+        self.list.setHeaderLabels([_("Name"), _("Length"), _("From")])
         self.list.setRootIsDecorated(False)
         self.list.setUniformRowHeights(True)
         self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -76,7 +76,7 @@ class ClipShelf(QWidget):
         h.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         h.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         v.addWidget(self.list)
-        self.undo_bar = UndoBar("Put the clip back in the list")
+        self.undo_bar = UndoBar(_("Put the clip back in the list"))
         v.addWidget(self.undo_bar)
         for keys, slot in ((Qt.Key_Delete, self.delete_picked),
                            (QKeySequence.Copy, self.copy_picked)):
@@ -95,8 +95,8 @@ class ClipShelf(QWidget):
             it = QTreeWidgetItem([c.name, fmt(c.seconds * SR), c.src])
             it.setData(0, Qt.UserRole, c.id)
             it.setFlags(it.flags() | Qt.ItemIsEditable)
-            it.setToolTip(0, f"{c.name}\nDouble-click plays it, F2 renames it, right-click "
-                             "adds it to your Sounds.")
+            it.setToolTip(0, _("{name}\nDouble-click plays it, F2 renames it, right-click "
+                               "adds it to your Sounds.", name=c.name))
             it.setTextAlignment(1, Qt.AlignRight | Qt.AlignVCenter)
             self.list.addTopLevelItem(it)
             if c.id == pick:
@@ -111,7 +111,7 @@ class ClipShelf(QWidget):
 
     def _sync(self):
         n = len(self.shelf.clips)
-        self.title.setText(f"Saved clips ({n})")
+        self.title.setText(_("Saved clips ({n})", n=n))
         self.btn_add.setEnabled(bool(self._picked()))
 
     def _picked(self) -> list[Clip]:
@@ -142,7 +142,7 @@ class ClipShelf(QWidget):
             return c.audio()
         except Exception as e:  # noqa: BLE001 - the file went missing or is damaged
             log.warning("can't read clip %s: %s", c.file, e)
-            errors.warn(self, "Couldn't open that clip", e)
+            errors.warn(self, _("Couldn't open that clip"), e)
             return None
 
     def _gain(self, data) -> float:
@@ -162,10 +162,12 @@ class ClipShelf(QWidget):
             return
         if self.engine.play(sid, data, self._gain(data), mode="restart",
                             preview=not send) is None:
-            self.title.setText(f"Saved clips ({len(self.shelf.clips)}) · "
-                               + ("nowhere to send it: pick where your sounds go on the "
-                                  "Setup tab" if send else
-                                  "no headphones to play it in: pick them on the Setup tab"))
+            n = len(self.shelf.clips)
+            self.title.setText(
+                _("Saved clips ({n}) · nowhere to send it: pick where your sounds go on the "
+                  "Setup tab", n=n) if send else
+                _("Saved clips ({n}) · no headphones to play it in: pick them on the Setup "
+                  "tab", n=n))
             return
         self._playing = (sid, cid)
 
@@ -200,13 +202,17 @@ class ClipShelf(QWidget):
             self.error = ""
             self.add_to_sounds.emit(data, c.name)
             if self.error:
-                errors.warn(self, "Couldn't add it to your Sounds", self.error)
+                errors.warn(self, _("Couldn't add it to your Sounds"), self.error)
                 return
             added += 1
         if added:
             self.undo_bar.hide()
-            self.title.setText(f"Saved clips ({len(self.shelf.clips)}) · ✓ added "
-                               + (f"{added} to your Sounds" if added > 1 else "to your Sounds"))
+            clips = len(self.shelf.clips)
+            self.title.setText(
+                ngettext("Saved clips ({clips}) · ✓ added {n} to your Sounds",
+                         "Saved clips ({clips}) · ✓ added {n} to your Sounds", added,
+                         clips=clips) if added > 1 else
+                _("Saved clips ({clips}) · ✓ added to your Sounds", clips=clips))
 
     def copy_picked(self):
         picked = self._picked()
@@ -215,8 +221,9 @@ class ClipShelf(QWidget):
         data = self._audio(picked[0])
         if data is not None:
             clipeditor.set_clipboard(data)
-            self.title.setText(f"Saved clips ({len(self.shelf.clips)}) · copied “{picked[0].name}”"
-                               " — Ctrl+V pastes it in an editor or on the Sounds tab")
+            self.title.setText(_("Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in "
+                                 "an editor or on the Sounds tab",
+                                 n=len(self.shelf.clips), name=picked[0].name))
 
     def delete_picked(self):
         gone = []
@@ -233,8 +240,9 @@ class ClipShelf(QWidget):
             for at, c in reversed(gone):
                 self.shelf.restore(at, c)
             self.reload(pick=gone[0][1].id)
-        what = f"“{gone[0][1].name}”" if len(gone) == 1 else f"{len(gone)} clips"
-        self.undo_bar.show_for(f"Deleted {what}", undo)
+        what = (_("Deleted “{name}”", name=gone[0][1].name) if len(gone) == 1
+                else ngettext("Deleted {n} clip", "Deleted {n} clips", len(gone)))
+        self.undo_bar.show_for(what, undo)
         self.reload()
         self.show()
 
@@ -254,16 +262,18 @@ class ClipShelf(QWidget):
                 a.setIcon(icons.icon(icon))
             a.triggered.connect(slot)
             return a
-        act("Stop" if playing and self._playing[0] == PREVIEW else "Play (headphones)",
+        act(_("Stop") if playing and self._playing[0] == PREVIEW else _("Play (headphones)"),
             lambda: self.toggle_play(it), "play")
-        act("Stop sending" if playing and self._playing[0] == SEND
-            else "Send to whoever's listening", lambda: self.toggle_play(it, send=True), "live")
+        act(_("Stop sending") if playing and self._playing[0] == SEND
+            else _("Send to whoever's listening"), lambda: self.toggle_play(it, send=True),
+            "live")
         m.addSeparator()
-        act("Add to Sounds", self.add_picked, "sounds")
-        act("Rename", lambda: self.rename(it), "edit")
-        act("Copy", self.copy_picked, "copy")
+        act(_("Add to Sounds"), self.add_picked, "sounds")
+        act(_("Rename"), lambda: self.rename(it), "edit")
+        act(_("Copy"), self.copy_picked, "copy")
         m.addSeparator()
-        act("Delete", self.delete_picked, "trash")
+        act(_("Delete"), self.delete_picked, "trash")
+
         m.exec(self.list.viewport().mapToGlobal(pos))
 
     def shutdown(self):

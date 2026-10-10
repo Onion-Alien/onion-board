@@ -132,7 +132,8 @@ def test_speak_in_offers_the_languages_and_downloads_only_on_request(panel, monk
     p, _ = panel
     s = p.speech
     codes = [s.cb_lang.itemData(i) for i in range(s.cb_lang.count())]
-    assert codes[0] == "" and set(codes[1:]) == {"zh", "es", "fr", "de", "ru"}
+    assert codes[0] == "" and {"zh", "es", "fr", "de", "ru", "ja", "pt-BR", "zh-TW"} <= set(codes)
+    assert len(codes) == 34
     assert s.tr_box.isHidden()                          # English: nothing to download
     assert not translation.base_dir().exists()          # and nothing was fetched
     got = []
@@ -321,7 +322,8 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
         raise OSError("disk full")
 
     monkeypatch.setattr(mods, "install", boom)
-    monkeypatch.setattr(applog, "report", lambda **k: None)
+    reported = []
+    monkeypatch.setattr(applog, "report", lambda **k: reported.append(k))
     s._install()
     assert not s.b_update.isEnabled() and not s.b_install.isEnabled()
     s._install()                                   # a double-click: still one pip
@@ -329,6 +331,7 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     assert len(started) == 1 and not s.lbl_install.isHidden()
     assert "disk full" in s.lbl_install.text() and "again" in s.lbl_install.text()
     assert s.b_update.text() == "Update speech recognition"
+    assert reported == []   # a full disk is said on the card, not shown as a crash
 
 
 def test_no_update_button_without_the_addon(panel):
@@ -768,9 +771,10 @@ def test_switch_settings_and_cards_round_trip(panel):
     p.fx.pick("Walkie-talkie")
     radio = p.fx.rows["radio"]
     squelch = next(s for s in radio.sliders if s.q.key == "squelch")
-    assert squelch.switch is not None and squelch.slider is None and squelch.value() == 1
-    squelch.switch.setChecked(False)
-    assert p.fx.spec()["effects"]["radio"]["squelch"] == 0
+    # off in the preset: the clicks sounded like a hi-hat
+    assert squelch.switch is not None and squelch.slider is None and squelch.value() == 0
+    squelch.switch.setChecked(True)
+    assert p.fx.spec()["effects"]["radio"]["squelch"] == 1
     radio.reset()
     assert p.fx.spec()["effects"]["radio"]["low"] == voicefx.defaults("radio")["low"]
 
@@ -918,15 +922,21 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
 
 
-def test_cards_fold_away_and_stay_folded(qapp, monkeypatch):
+def test_cards_start_folded_and_unfold(qapp, monkeypatch):
+    """The tab opens with every card folded (it all fits on one screen); what's
+    folded is still saved for older versions."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from soundboard.ui.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", 7, "later"]})   # 7: junk
     try:
-        assert p.ai.isHidden() and not p.fx.isHidden() and not p.speech.isHidden()
+        assert all(not h.is_open() for h in p._heads.values())
+        assert p.ai.isHidden() and p.fx.isHidden() and p.speech.isHidden()
+        assert p.addons.isHidden() and p.speech.custom_box.isHidden()
         saved = []
         p.speech_changed.connect(saved.append)
-        p._heads["fx"].arrow.click()                 # fold the voice changer
+        p._heads["fx"].arrow.click()                 # open the voice changer
+        assert not p.fx.isHidden() and not saved     # it was open last time too
+        p._heads["fx"].arrow.click()                 # fold it again
         assert p.fx.isHidden() and saved[-1]["folded"] == ["ai", "fx", "later"]
         p._heads["ai"].arrow.click()                 # and open the AI voices again
         # "later": a newer version's card, kept for it
@@ -970,7 +980,7 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
 def test_the_card_is_just_the_switch_the_voices_and_one_button(panel):
     p, _ = panel
     fx = p.fx
-    on_card = [w for w in (fx.btn_power, fx.meter, fx.btn_tweak, *fx.tiles.buttons())]
+    on_card = [w for w in (fx.btn_power, fx.btn_tweak, *fx.tiles.buttons())]
     assert all(w.window() is not fx.dlg for w in on_card)
     for w in (fx.hero_box.parentWidget(), fx.btn_random, fx.btn_save, fx.btn_share,
               fx.btn_import, fx.btn_bin, fx.more, *fx.rows.values()):
@@ -1128,3 +1138,147 @@ def test_effect_columns_stack_without_holes(panel, qapp):
         qapp.processEvents()
     assert fx._fx_cols == 1 and fx._groups["Character"].isVisible()
     fx.dlg.close()
+
+
+def _remembered(names_langs, fp):
+    names = [n for n, _ in names_langs]
+    return tts.remember_voices(names, dict(names_langs), fp)
+
+
+def test_a_launch_with_the_same_windows_voices_starts_no_speech_helper(qapp, monkeypatch):
+    """The voice list is remembered with the Windows voices it was listed for: the
+    next launch shows it without starting PowerShell (~2 s, 85 MB) just to list them."""
+    from soundboard.speech import winvoices
+    from soundboard.ui.voicepanel import VoicePanel
+    fp = frozenset({"TTS_MS_EN-US_ZIRA_11.0", "TTS_MS_DE-DE_HEDDA_11.0"})
+    monkeypatch.setattr(winvoices, "fingerprint", lambda: fp)
+    started = []
+
+    class Helper:   # stands in for the PowerShell process
+        stdin = None
+
+        def poll(self):
+            return None
+
+        def kill(self):
+            pass
+
+    def warm_up(self):
+        started.append(1)
+        self._proc = Helper()
+        return self.voices
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", warm_up)
+    known = _remembered([("Microsoft Zira Desktop", "en-US"),
+                         ("Microsoft Hedda Desktop", "de-DE")], fp)
+    p = VoicePanel(FakeEngine(), {}, {"voice": "Microsoft Hedda Desktop",
+                                      tts.VOICE_CACHE: known})
+    sp = p.speech
+    try:
+        assert process_events(qapp, lambda: sp.cb_voice.count() == 3, timeout=5)
+        assert not started and not sp.ctl.tts.running
+        assert sp.cb_voice.currentData() == "Microsoft Hedda Desktop"
+        assert sp.ctl.tts.voice_for("de") == "Microsoft Hedda Desktop"
+        sp.ctl.speaker.voice = "Microsoft Hedda Desktop"
+        sp.ed.textEdited.emit("Hel")                 # typing a line: start it now
+        assert process_events(qapp, lambda: started and not sp._warming, timeout=5)
+        sp.ed.textEdited.emit("Hell")
+        process_events(qapp, lambda: False, timeout=0.2)
+        assert len(started) == 1                     # ...once, not per key
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_other_windows_voices_list_them_again_and_remember_that(qapp, monkeypatch):
+    from soundboard.speech import winvoices
+    from soundboard.ui.voicepanel import VoicePanel
+    fp = frozenset({"TTS_MS_EN-US_ZIRA_11.0", "TTS_MS_FR-FR_JULIE_11.0"})
+    monkeypatch.setattr(winvoices, "fingerprint", lambda: fp)
+
+    def listed(self):   # what the helper's READY line gives
+        self.voices, self.voice_langs = ["Zira", "Julie"], {"Zira": "en-US", "Julie": "fr-FR"}
+        self.listed = (list(self.voices), dict(self.voice_langs))
+        return self.voices
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", listed)
+    old = _remembered([("Zira", "en-US")], {"TTS_MS_EN-US_ZIRA_11.0"})   # before Julie
+    p = VoicePanel(FakeEngine(), {}, {tts.VOICE_CACHE: old})
+    saved = []
+    p.speech_changed.connect(saved.append)
+    try:
+        assert process_events(qapp, lambda: saved, timeout=5)
+        assert tts.remembered_voices(saved[-1][tts.VOICE_CACHE], fp) == (
+            ["Zira", "Julie"], {"Zira": "en-US", "Julie": "fr-FR"})
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_remembered_voices_only_count_for_the_same_voices_and_a_sound_entry():
+    fp = frozenset({"A", "B"})
+    entry = tts.remember_voices(["Zira", "Hedda"], {"Zira": "en-US", "Hedda": "de-DE"}, fp)
+    assert tts.remembered_voices(entry, frozenset({"B", "A"})) == (
+        ["Zira", "Hedda"], {"Zira": "en-US", "Hedda": "de-DE"})
+    assert tts.remembered_voices(entry, frozenset({"A"})) is None      # one removed
+    assert tts.remembered_voices(entry, frozenset()) is None           # can't tell
+    for bad in (None, "x", {"fp": ["A", "B"]}, {"fp": ["A", "B"], "voices": [["Zira"]]},
+                {"fp": ["A", "B"], "voices": [[1, "en"]]}, {"fp": "AB", "voices": []}):
+        assert tts.remembered_voices(bad, fp) is None
+
+
+# ---------------------------------------------------------------- the status bar
+
+def test_status_bar_off_label_cannot_open_a_card(panel):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QLabel
+    p, _ = panel
+    opened = []
+    p.bar.open_card.connect(opened.append)
+    label = p.bar.chips["none"]
+    assert isinstance(label, QLabel)
+    assert label.focusPolicy() == Qt.NoFocus
+    assert label.cursor().shape() == Qt.ArrowCursor
+    QTest.mouseClick(label, Qt.LeftButton)
+    p._open_card("none")
+    assert not opened
+    assert all(not head.is_open() for head in p._heads.values())
+    p.fx.pick("Robot")
+    p.bar.chips["fx"].click()
+    assert opened == ["fx"] and p._heads["fx"].is_open()
+
+
+def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
+    p, eng = panel
+    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
+    p.fx.pick("Robot")
+    assert p.bar.texts() == ["Robot"]          # short; the full words are its tip
+    assert "Voice changer" in p.bar.chips["fx"].toolTip()
+    assert p.bar.chips["fx"].property("state") == "on"
+    p.fx.btn_power.setChecked(False)
+    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
+    # a chip opens its folded card
+    assert not p._heads["speak"].is_open()
+    p.speech.b_live.setChecked(True)
+    assert "Computer voice" in p.bar.texts()
+    p.bar.chips["speak"].click()
+    assert p._heads["speak"].is_open() and p.speech.isVisibleTo(p)
+    p.speech.b_live.setChecked(False)
+    # the mic: its level, or that none is open
+    p.bar.set_level(None)
+    assert not p.bar.lbl_mic.isHidden() and p.bar.lbl_mic.text() == "No mic open"
+    p.bar.set_level(0.5)
+    assert p.bar.lbl_mic.isHidden() and p.bar.meter.level == 0.5
+    assert not hasattr(p.fx, "meter")                     # one meter, in the bar
+
+
+def test_status_bar_shows_the_ai_voice_starting_on_and_failed(panel, monkeypatch):
+    p, _ = panel
+    ai = p.ai
+    monkeypatch.setattr(ai, "is_on", lambda: True)
+    monkeypatch.setattr(ai, "voice_title", lambda: "Squeak")
+    for st, words, state in (("starting", "Squeak…", "on"), ("on", "Squeak", "on"),
+                             ("failed", "AI voice off", "warn")):
+        monkeypatch.setattr(ai, "status", lambda st=st: st)
+        p._update_bar()
+        assert p.bar.texts() == [words]
+        assert p.bar.chips["ai"].property("state") == state

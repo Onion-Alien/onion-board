@@ -1,0 +1,15 @@
+{
+  "id": "translate-vi",
+  "name": "Translate to Vietnamese",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Vietnamese. Needs live voice-to-speech. Downloads a 68 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "vi",
+  "language_name": "Vietnamese",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_vi-1_9.argosmodel",
+    "sha256": "86957101aa4099aa9a1a7492e41987d938d3cf0fdaf4fb684c0797a9d567dd16",
+    "bytes": 67770159
+  },
+  "credits": "English to Vietnamese model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

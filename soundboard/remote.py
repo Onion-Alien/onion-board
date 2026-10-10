@@ -13,7 +13,8 @@ and no CORS headers are sent, so a web page can't read anything back.
 Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
 /api/help returns it, so a script or an AI assistant can look it up):
 
-    /api/status                  version, what's playing, category, live / voice / mic
+    /api/status                  version, what's playing / queued, category, live /
+                                 voice / mic / hear, speed and effects, mode, radio
     /api/sounds                  [{id, name, hotkey, categories, color, playing}]
     /api/categories              ["Memes", ...]
     /api/play?id=… or ?name=…    play a pad (name: exact, any case)
@@ -22,11 +23,18 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/random[?category=…]     a random sound (default: the category showing;
                                  category= with nothing after it: any sound)
     /api/last                    play the last sound again
+    /api/queue?name=… / ?category=…[&shuffle=1] / ?clear=1
+                                 play a sound after the ones playing now, or a whole
+                                 category one after another; alone: what's up next
     /api/category?name=… / ?step=next|prev   show a category (name= blank: All)
     /api/volume?set=0-100 / ?step=up|down    the sounds' volume
     /api/live, /api/voice, /api/mic [?on=1|0|toggle]
                                  the Live / Muted switch, the voice changer, "others
                                  hear my mic" (no on=: toggle)
+    /api/voice?name=Robot        pick a voice (and turn the voice changer on)
+    /api/voices                  the voice changer's voices, and which one is on
+    /api/say?text=… / ?stop=1    speak a typed line in the computer voice
+    /api/hear[?on=1|0|toggle]    "Hear what they hear": your mic as others hear it
     /api/replay                  save the instant replay as a pad
     /api/speed?set=0.25-2 / ?step=up|down [&keep=1|0|toggle]
     /api/pitch?set=-12-12 / ?step=up|down
@@ -80,6 +88,8 @@ import math
 import random
 import re
 import secrets
+import selectors
+import socket
 import threading
 import time
 from dataclasses import dataclass, field
@@ -90,6 +100,7 @@ from urllib.parse import parse_qs, urlsplit
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
 
 from soundboard import errors, netcategory
+from soundboard.i18n import _
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -107,13 +118,22 @@ NONCES_MAX = 20000      # lan: nonces remembered (a phone sends one every 2 s or
 MAX_CONNECTIONS = 32    # connections open at once; more are closed straight away
 PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
 NETWORK_CHECK_S = 30.0  # lan: how often it checks the network is still not Public
-PUBLIC_NETWORK = ("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
-                  "so phones are turned away. At home, set it to Private in Windows "
-                  "Settings → Network & internet, then turn this off and on again")
+WAKE_S = 30.0           # the server thread's longest sleep (halt() wakes it at once)
+
+
+def public_network() -> str:
+    """Why a lan server won't listen, for the app's window (shown as `error`)."""
+    return _("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
+             "so phones are turned away. At home, set it to Private in Windows "
+             "Settings → Network & internet, then turn this off and on again")
+
+
 # every endpoint, in the order they're listed (the 404 answer, /api/help, the
 # setup prompt and Settings all read this)
 ENDPOINTS = {
-    "status": "version, what's playing, the category showing, live / voice / mic / volume",
+    "status": "version, what's playing and what's queued, the category showing, live / "
+              "voice (and which voice) / mic / hear / volume, the live speed and effects, "
+              "the sound mode, the radio",
     "sounds": "every sound: [{id, name, hotkey, categories, color, playing}]",
     "categories": "the category names",
     "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
@@ -122,11 +142,21 @@ ENDPOINTS = {
     "random": "a random sound from ?category=… (default: the one showing; "
               "category= blank: any sound)",
     "last": "play the last sound again",
+    "queue": "?name= / ?id= plays that sound once the ones playing now finish; "
+             "?category=Chill plays every sound in it one after another (&shuffle=1: "
+             "in a random order); ?clear=1 empties the queue; alone: what's up next",
     "category": "show a category: ?name=Memes (name= blank: All) or ?step=next / prev",
     "volume": "the sounds' volume: ?set=0-100 or ?step=up / down (10 % a step)",
     "live": "the Live / Muted switch (Muted: others hear nothing): ?on=1 / 0 / toggle",
-    "voice": "the voice changer on / off: ?on=1 / 0 / toggle",
+    "voice": "the voice changer on / off: ?on=1 / 0 / toggle, or ?name=Robot picks that "
+             "voice and turns the changer on (/api/voices lists them)",
+    "voices": "the voice changer's voices (the built-in ones and your saved ones), and "
+              "which one is on",
+    "say": "speak a typed line for others to hear, in the Voice tab's computer voice "
+           "(through the voice changer if that's on): ?text=hello there; ?stop=1 stops it",
     "mic": "whether others hear your mic: ?on=1 / 0 / toggle",
+    "hear": "Hear what they hear: you hear your mic (and voice changer) the way others "
+            "do, to check it: ?on=1 / 0 / toggle",
     "replay": "save the instant replay (the last seconds you heard) as a new sound",
     "speed": "the live speed of every sound: ?set=0.25-2 or ?step=up / down (the quick "
              "speeds); &keep=1 / 0 / toggle: speed changes leave the pitch alone",
@@ -184,7 +214,62 @@ class _Server(ThreadingHTTPServer):
     def __init__(self, *args, **kwargs):
         self._open: dict[str, int] = {}   # peer -> connections open now
         self._open_lock = threading.Lock()
-        super().__init__(*args, **kwargs)
+        self._halting = False
+        self._halted = threading.Event()
+        self._halted.set()
+        try:   # halt()'s wake-up call: a byte on a socket pair the thread also waits on
+            self._wake_r, self._wake_w = socket.socketpair()
+        except OSError:
+            self._wake_r = self._wake_w = None
+        try:
+            super().__init__(*args, **kwargs)
+        except BaseException:
+            self._close_wake()
+            raise
+
+    def start_thread(self, name: str):
+        """serve() on a thread of its own."""
+        self._halted.clear()
+        threading.Thread(target=self.serve, daemon=True, name=name).start()
+
+    def serve(self):
+        """socketserver's serve_forever, but asleep until a connection comes or halt()
+        wakes it: serve_forever(poll_interval=0.25) woke 4 times a second all day just
+        to see whether it should stop. Without the socket pair it looks every second."""
+        try:
+            with selectors.DefaultSelector() as sel:
+                sel.register(self, selectors.EVENT_READ)
+                if self._wake_r is not None:
+                    sel.register(self._wake_r, selectors.EVENT_READ)
+                timeout = WAKE_S if self._wake_r is not None else 1.0
+                while not self._halting:
+                    ready = sel.select(timeout)
+                    if self._halting:
+                        break
+                    if any(key.fileobj is self for key, _ in ready):
+                        self._handle_request_noblock()
+                    self.service_actions()
+        finally:
+            self._halted.set()
+
+    def halt(self):
+        """Stop serve() and wait for it to end (instead of shutdown())."""
+        self._halting = True
+        if self._wake_w is not None:
+            try:
+                self._wake_w.send(b"x")
+            except OSError:
+                pass
+        self._halted.wait(5.0)
+
+    def server_close(self):
+        super().server_close()
+        self._close_wake()
+
+    def _close_wake(self):
+        for s in (self._wake_r, self._wake_w):
+            if s is not None:
+                s.close()
 
     def process_request(self, request, client_address):
         peer = client_address[0]
@@ -226,6 +311,7 @@ class RemoteControl(QObject):
     after: `closed` says why when that stops it)."""
     request = Signal(object)
     closed = Signal(str)   # lan: stopped by itself, and why
+    _net_answer = Signal(object, bool)   # (the server asked about, is the network Public)
 
     def __init__(self, dispatch, parent=None, *, actions=ACTIONS, page=None,
                  lan: bool = False, name: str = "control API"):
@@ -247,6 +333,8 @@ class RemoteControl(QObject):
         self._network = QTimer(self)
         self._network.setInterval(int(NETWORK_CHECK_S * 1000))
         self._network.timeout.connect(self._check_network)
+        self._net_asking = False
+        self._net_answer.connect(self._network_checked, Qt.QueuedConnection)
 
     @property
     def running(self) -> bool:
@@ -263,7 +351,7 @@ class RemoteControl(QObject):
             self.error = "no token"
             return False
         if self.lan and netcategory.category(host) == netcategory.PUBLIC:
-            self.error = PUBLIC_NETWORK
+            self.error = public_network()
             log.info("%s not started: the network is Public", self.name)
             return False
         try:
@@ -280,27 +368,47 @@ class RemoteControl(QObject):
             return False
         self._server = srv
         self.port = srv.server_address[1]   # (port 0 = any free one, for the tests)
-        threading.Thread(target=srv.serve_forever, kwargs={"poll_interval": 0.25},
-                         daemon=True, name=self.name.replace(" ", "-")).start()
+        srv.start_thread(self.name.replace(" ", "-"))
         log.info("%s listening on %s:%s", self.name, self.host, self.port)
         if self.lan:
             self._network.start()
         return True
 
     def _check_network(self):
+        """lan, every NETWORK_CHECK_S: is the network still not Public? Asked on a
+        thread (Windows takes ~10 ms to say, which was a stall on the UI thread), the
+        answer handled back on the UI thread (_network_checked)."""
+        if not self.running or self._net_asking:
+            return
+        self._net_asking = True
+        server, host = self._server, self.host
+
+        def ask():
+            try:
+                public = netcategory.category(host) == netcategory.PUBLIC
+            finally:
+                self._net_asking = False
+            try:
+                self._net_answer.emit(server, public)
+            except RuntimeError:   # the window (and this) went away meanwhile
+                pass
+        threading.Thread(target=ask, daemon=True, name="remote-network-check").start()
+
+    def _network_checked(self, server, public: bool):
         """lan: the network turned Public (or the PC moved to a Public one keeping its
-        address) while it listens: stop."""
-        if self.running and netcategory.category(self.host) == netcategory.PUBLIC:
+        address) while it listens: stop. (An answer about a server since replaced by a
+        restart is dropped: the restart asked again.)"""
+        if public and self.running and server is self._server:
             self.stop()
-            self.error = PUBLIC_NETWORK
+            self.error = public_network()
             log.info("%s stopped: the network is Public now", self.name)
-            self.closed.emit(PUBLIC_NETWORK)
+            self.closed.emit(self.error)
 
     def stop(self):
         self._network.stop()
         srv, self._server = self._server, None
         if srv is not None:
-            srv.shutdown()
+            srv.halt()
             srv.server_close()
             log.info("%s stopped", self.name)
 
@@ -505,7 +613,10 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      "paused": bool(playing) and all(p for _, p in playing.values()),
                      "live": bool(mw.engine.sending),
                      "voice": mw.voice.fx.btn_power.isChecked(),
+                     "voice_name": getattr(mw.voice.fx, "preset", ""),
                      "mic": bool(cfg.mic_enabled),
+                     "hear": bool(mw.engine.mic_check),
+                     **queue_state(mw),
                      "volume": mw.vol_sound.spin.value(),
                      **live_state(mw), **mode_state(mw, full=False),
                      "radio": radio_state(mw)}
@@ -556,6 +667,10 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     if action == "volume":
         err = set_volume(mw.vol_sound.spin, params)   # -> set_option("sound_vol")
         return err or (200, {"volume": mw.vol_sound.spin.value()})
+    if action == "queue":
+        return dispatch_queue(mw, params)
+    if action in VOICE_ACTIONS:
+        return dispatch_voice(mw, action, params)
     if action in LIVE_ACTIONS:
         return dispatch_live(mw, action, params)
     if action == "mode":
@@ -568,20 +683,18 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
             return 400, BAD_ON
         mw.set_sending(on)
         return 200, {"live": bool(mw.engine.sending)}
-    if action == "voice":
-        if not mw.tab_on("voice"):
-            return 409, VOICE_OFF
-        on = on_value(params, mw.voice.fx.btn_power.isChecked())
-        if on is None:
-            return 400, BAD_ON
-        mw._set_voice(on)
-        return 200, {"voice": mw.voice.fx.btn_power.isChecked()}
     if action == "mic":
         on = on_value(params, bool(cfg.mic_enabled))
         if on is None:
             return 400, BAD_ON
         mw.chk_mic.setChecked(on)   # -> on_mic_toggle
         return 200, {"mic": bool(cfg.mic_enabled)}
+    if action == "hear":
+        on = on_value(params, bool(mw.engine.mic_check))
+        if on is None:
+            return 400, BAD_ON
+        mw.btn_check.setChecked(on)   # -> on_mic_check
+        return 200, {"hear": bool(mw.engine.mic_check)}
     if action == "replay":
         from soundboard.engine import SR
         if len(mw.replay.clip()) < int(0.2 * SR):
@@ -594,15 +707,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 200, {"stopped": "all"}
     m = find_sound(mw, params)
     if m is None:
-        if not params:
-            return 400, {"error": "say which: ?id=… or ?name=…"}
-        body = {"error": "no such sound"}
-        if params.get("name"):   # a typo'd button: say what it probably meant
-            close = difflib.get_close_matches(params["name"].strip(),
-                                              [s.name for s in cfg.sounds], 3, 0.5)
-            if close:
-                body["did_you_mean"] = close
-        return 404, body
+        return no_sound(cfg, params)
     if action == "stop":
         mw.engine.stop(m.id)
         for v in playing:   # and a Watch alarm ringing it (its bar clears by itself)
@@ -613,6 +718,114 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 409, {"error": "that sound hasn't loaded (yet)"}
     mw.play(m.id)
     return 200, {"playing": m.id, "name": m.name}
+
+
+def no_sound(cfg, params: dict) -> tuple[int, dict]:
+    """The answer when ?id= / ?name= names no sound."""
+    if not params:
+        return 400, {"error": "say which: ?id=… or ?name=…"}
+    body = {"error": "no such sound"}
+    if params.get("name"):   # a typo'd button: say what it probably meant
+        close = difflib.get_close_matches(params["name"].strip(),
+                                          [s.name for s in cfg.sounds], 3, 0.5)
+        if close:
+            body["did_you_mean"] = close
+    return 404, body
+
+
+# --------------------------------------------------------------------------- the queue
+
+def queue_state(mw: MainWindow) -> dict:
+    return {"queue": [{"id": s, "name": m.name} for s in mw._queue
+                      if (m := mw.meta(s)) is not None]}
+
+
+def dispatch_queue(mw: MainWindow, params: dict) -> tuple[int, object]:
+    """The play queue (the pad menu's Play next, a category's Play all)."""
+    if (params.get("clear") or "").strip() not in ("", "0"):
+        mw._queue.clear()
+        mw._say_queue()
+        return 200, queue_state(mw)
+    if "category" in params:
+        cat = find_category(mw.cfg, params["category"])
+        if cat is None:
+            return 404, {"error": f"no category called {params['category']!r}",
+                         "categories": list(mw.cfg.categories)}
+        if not any(m.id in mw.audio for m in mw.cfg.sounds if cat in m.tags):
+            return 404, {"error": "no sound to play there"}
+        shuffled = (params.get("shuffle") or "").strip().lower() in ("1", "true", "on", "yes")
+        mw.queue_category(cat, shuffled)
+        return 200, {"category": cat, **queue_state(mw)}
+    if not ("id" in params or "name" in params):
+        return 200, queue_state(mw)
+    m = find_sound(mw, params)
+    if m is None:
+        return no_sound(mw.cfg, params)
+    if m.id not in mw.audio:
+        return 409, {"error": "that sound hasn't loaded (yet)"}
+    mw.queue_sound(m.id)
+    return 200, {"queued": m.id, "name": m.name, **queue_state(mw)}
+
+
+# --------------------------------------------------------------------------- the Voice tab
+
+VOICE_ACTIONS = ("voice", "voices", "say")
+SAY_MAX = 500           # characters in one ?text=
+
+
+def voice_names(mw: MainWindow) -> list[str]:
+    """The voices a request can pick: the built-in ones, then the saved ones ("My own
+    mix" isn't one: picking it opens a window to make it)."""
+    from soundboard import voicefx
+    return list(voicefx.PRESETS) + [n for n in mw.voice.fx.store.voices
+                                    if n not in voicefx.PRESETS]
+
+
+def voice_state(mw: MainWindow) -> dict:
+    fx = mw.voice.fx
+    return {"voice": fx.btn_power.isChecked(), "voice_name": fx.preset}
+
+
+def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
+    from soundboard import voicefx
+    if not mw.tab_on("voice"):
+        return 409, VOICE_OFF
+    fx = mw.voice.fx
+    if action == "voices":
+        saved = fx.store.voices
+        return 200, {**voice_state(mw),
+                     "voices": [{"name": n, "shown": voicefx.shown(n), "saved": n in saved}
+                                for n in voice_names(mw)]}
+    if action == "say":
+        sp = mw.voice.speech
+        if (params.get("stop") or "").strip() not in ("", "0"):
+            sp.ctl.stop_speaking()
+            return 200, {"stopped": True}
+        text = " ".join((params.get("text") or "").split())
+        if not text:
+            return 400, {"error": "say what: ?text=…"}
+        if len(text) > SAY_MAX:
+            return 400, {"error": f"text= is too long: at most {SAY_MAX} characters"}
+        sp.say_line(text)
+        return 200, {"saying": text}
+    if "name" in params:   # voice?name=Robot
+        want = params["name"].strip().casefold()
+        names = voice_names(mw)
+        match = next((n for n in names
+                      if want in (n.casefold(), voicefx.shown(n).casefold())), None)
+        if match is None:
+            body = {"error": f"no voice called {params['name']!r}", "voices": names}
+            close = difflib.get_close_matches(params["name"].strip(), names, 3, 0.5)
+            if close:
+                body["did_you_mean"] = close
+            return 404, body
+        fx.pick(match)
+        return 200, voice_state(mw)
+    on = on_value(params, fx.btn_power.isChecked())
+    if on is None:
+        return 400, BAD_ON
+    mw._set_voice(on)
+    return 200, voice_state(mw)
 
 
 def set_volume(spin, params: dict) -> tuple[int, dict] | None:
@@ -920,12 +1133,13 @@ KEY_PLACEHOLDER = "YOUR-KEY"
 PROMPT_SOUNDS = 120     # a big library: list this many names, the AI can ask for the rest
 
 
-def setup_prompt(cfg, port: int, token: str = "") -> str:
+def setup_prompt(cfg, port: int, token: str = "", voices: list[str] | None = None) -> str:
     """A message to paste into ChatGPT / Claude / any AI assistant so it can walk
     someone through wiring their Stream Deck, Streamer.bot, Touch Portal… to the
-    control API: the address, every endpoint, their own sounds and categories, and
-    how each common tool sends a request. Without `token` the key is a placeholder
-    the person fills in themselves."""
+    control API: what the app can do, the address, every endpoint, their own sounds,
+    categories and voices, and how each common tool sends a request. Without `token`
+    the key is a placeholder the person fills in themselves; `voices` (voice_names)
+    is left out when the Voice tab is switched off."""
     from urllib.parse import quote
 
     key = token or KEY_PLACEHOLDER
@@ -941,31 +1155,58 @@ def setup_prompt(cfg, port: int, token: str = "") -> str:
     cat = cfg.categories[0] if cfg.categories else ""
     rnd = (f"Random sound from a category: {base}/api/random?category={quote(cat)}&token={key}"
            if cat else f"Random sound (any of them): {base}/api/random?category=&token={key}")
+    voice = (voices or ["Robot"])[0]
+    queue = (f"\n- Play the whole \"{cat}\" category in a random order, one after another: "
+             f"{base}/api/queue?category={quote(cat)}&shuffle=1&token={key}" if cat else "")
+    voice_lines = (f"- Voice changer voices: {', '.join(voices)}" if voices else
+                   "- Voice changer: the Voice tab is switched off in Settings → Tabs, so "
+                   "/api/voice, /api/voices and /api/say answer 409 until it's back on")
     endpoints = "\n".join(f"- /api/{a} — {d}" for a, d in ENDPOINTS.items())
     key_note = ("" if token else
                 f"\nMy key isn't in this message: write {KEY_PLACEHOLDER} wherever it goes "
                 "and remind me to replace it with the key from Settings → Remote (click "
                 "Show).\n")
     return f"""\
-I use Onion Board, a free Windows soundboard. Its "Remote control" feature lets other \
-programs on my PC control it over a small local HTTP API. Please help me set up my \
-streaming tools to use it. Ask me first which tools I use (Stream Deck, Streamer.bot, \
-Touch Portal, Bitfocus Companion, SAMMI, Mix It Up, AutoHotkey, a macro pad…) and what \
-I want the buttons / triggers to do, then give me exact click-by-click steps for each \
-one, with the full URLs ready to copy.
+I use Onion Board, a free Windows soundboard and voice changer. Its "Remote control" \
+feature lets other programs on my PC control it over a small local HTTP API. Please help \
+me set up my streaming tools to use it. Ask me first which tools I use (Stream Deck, \
+Streamer.bot, Touch Portal, Bitfocus Companion, SAMMI, Mix It Up, AutoHotkey, a macro \
+pad…) and what I want the buttons / triggers to do, then give me exact click-by-click \
+steps for each one, with the full URLs ready to copy. If I'm not sure what I want, \
+suggest a few ideas from the list below.
+
+WHAT ONION BOARD CAN DO FROM A BUTTON
+- Sounds: play one, a random one (from a category), the last one again, queue one up \
+after the one playing, or play a whole category in a row; stop one or all; pause.
+- Live speed, pitch and effects (bass, echo, reverb, muffle, crunch…) on every sound.
+- A panic button: the Live / Muted switch (Muted: nobody hears my sounds or my mic).
+- The voice changer: on / off, or straight to a named voice (Chipmunk, Robot…).
+- Text to speech: a typed line spoken for others in the computer voice (through the \
+voice changer if it's on).
+- "Hear what they hear": I hear my own mic the way others do, to check my voice.
+- The instant replay: save the last seconds I heard as a new sound.
+- Who's listening: the sound mode (Game, Voice chat, Clean, Advanced) that shapes my \
+sounds for a game or voice chat.
+- The Radio tab: play / stop a station, a random one, star it, its volume, whether \
+others hear it.
+- Reading what's going on (/api/status): what's playing, what's queued, the voice, \
+live / muted, the mode, the radio — handy for a key that lights up.
 
 HOW THE API WORKS
 - Address: {base}  (it only listens on this PC: tools on another computer or phone \
-can't reach it, so they must run on this PC)
+can't reach it, so they must run on this PC. For a phone there's a separate add-on, \
+Onion Pocket, in Settings → Remote: it needs no setup)
 - Every request needs my key, as ?token=KEY in the URL (simplest: works anywhere a URL \
 can be opened), an X-Token: KEY header, or Authorization: Bearer KEY.
 - GET or POST both work; every answer is JSON. The Host header must be 127.0.0.1 or \
 localhost.
-- Sound and category names must match exactly (any case) and be URL-encoded: a space is \
-%20, & is %26. A wrong name answers 404 with "did_you_mean".
-- Errors: 401 = wrong / missing key, 404 = no such sound / category, 409 = not \
-loaded yet, 503 = the app was busy (safe to retry). If nothing answers at all, Onion \
-Board isn't running or "Enable remote control" is off.
+- Sound, category and voice names must match exactly (any case) and be URL-encoded: a \
+space is %20, & is %26. A wrong sound or voice name answers 404 with "did_you_mean".
+- Switches take on=1 (on), on=0 (off) or on=toggle; with no on= they toggle.
+- Errors: 400 = a value it can't use, 401 = wrong / missing key, 404 = no such sound / \
+category / voice / station, 409 = not ready (a sound not loaded yet, or the Voice or \
+Radio tab switched off in Settings), 503 = the app was busy (safe to retry). If nothing \
+answers at all, Onion Board isn't running or "Enable remote control" is off.
 - Test it first by opening {base}/api/status?token={key} in a browser.
 {key_note}
 ENDPOINTS
@@ -973,18 +1214,27 @@ ENDPOINTS
 
 EXAMPLES
 - Play a sound: {base}/api/play?name={quote(example)}&token={key}
-- {rnd}
+- {rnd}{queue}
 - Stop everything: {base}/api/stop?token={key}
 - Panic button (others hear nothing until pressed again): \
 {base}/api/live?on=toggle&token={key}
 - Voice changer on / off: {base}/api/voice?on=toggle&token={key}
+- Straight to one voice: {base}/api/voice?name={quote(voice)}&token={key}
+- Say a line: {base}/api/say?text=thanks%20for%20the%20follow&token={key}
+- Sounds fast and squeaky: {base}/api/speed?set=1.5&token={key}, then back to normal: \
+{base}/api/reset?token={key}
+- Echo on every sound: {base}/api/effects?echo=0.5&token={key}  (/api/effects alone \
+lists the knobs and presets)
+- Sound mode for a game: {base}/api/mode?simple=game&token={key}
+- Radio on / off: {base}/api/radio?on=toggle&token={key}
 
 WHERE EACH TOOL SENDS A REQUEST (as far as I know — correct me if a tool has changed)
 - Elgato Stream Deck app: System → Website action, paste the URL, tick "GET request in \
 background" so no browser opens. (Or a free "API Request" plugin from the Marketplace.)
 - Streamer.bot: an Action with the sub-action Core → Network → Fetch URL; triggers such \
 as Twitch → Channel Reward → Reward Redemption, chat commands, cheers / bits, raids, \
-follows. Fetch URL runs in the background.
+follows. Fetch URL runs in the background. Its variables go in the URL too (URL-encode \
+anything a viewer typed), e.g. a !say command or a "say something" reward.
 - Touch Portal: the "HTTP Get" action (or a web-request plugin).
 - Bitfocus Companion: the "Generic HTTP" connection, a GET action with the full URL \
 (Companion must run on this PC).
@@ -996,9 +1246,12 @@ whr.Open("GET", url), whr.Send() — bound to a key.
 MY SETUP RIGHT NOW
 - Port: {port}
 - Categories: {", ".join(cfg.categories) or "(none yet: every sound is in All)"}
+{voice_lines}
 - Sounds ({len(sounds)}):
 {chr(10).join(names) or "- (none yet)"}
 
 Keep the steps beginner-friendly. Don't suggest exposing the API to the internet, \
-port-forwarding it or running it on another machine: it's meant for this PC only.
+port-forwarding it or running it on another machine: it's meant for this PC only. If I \
+let viewers trigger /api/say with their own text, remind me that whatever they type is \
+spoken on my stream: limit it to a channel-point reward or mods, with a cooldown.
 """

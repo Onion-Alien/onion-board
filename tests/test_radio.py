@@ -81,20 +81,6 @@ def test_station_stats_for_the_hover_card():
     assert p["s"] == "Tokyo" and p["tr"] == -4 and p["t"] == ["jazz", "lofi"] and p["h"]
 
 
-def test_globe_page_escapes_the_card_and_zooms_itself():
-    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    assert "esc(d.n)" in page and "esc(t)" in page and "esc(d.l" in page
-    assert "passive: false" in page and "c.enableZoom = false" in page
-
-
-def test_globe_page_is_light_and_leads_back_to_the_flat_map():
-    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    assert "pauseAnimation" in page and "bridge.setHd(false)" in page and "setActive" in page
-    # nothing that draws on its own: no spin, no stars, no relief, one pixel per pixel
-    assert "autoRotate" not in page and "night-sky" not in page and "topology" not in page
-    assert "setPixelRatio(1)" in page
-
-
 def _outline_file(**changes):
     geo = {"type": "FeatureCollection", "features": [
         {"type": "Feature", "properties": {"NAME": "Square"},
@@ -149,6 +135,30 @@ def test_flat_map_fills_its_area_and_wraps_round_the_world(qapp):
     m.cx = 190.0
     m._clamp()
     assert m.cx == -170.0
+
+
+def test_a_tile_dropped_half_drawn_leaves_its_painter_balanced(qapp):
+    """Switching stations / zooming drops a tile mid-draw (_drop_build closes its steps
+    at a yield): the painter was ended with its save()s still open, and Qt warned
+    "QPainter::end: Painter ended with 2 saved states"."""
+    from PySide6.QtCore import qInstallMessageHandler
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(800, 600)
+    m.set_land([[(x, 0), (x + 5, 0), (x + 5, 5)] for x in range(-170, 170, 10)])
+    warned = []
+    old = qInstallMessageHandler(lambda _kind, _ctx, msg: warned.append(msg))
+    try:
+        total = sum(1 for _ in m._tile_steps(m._level(), 0, 0)[1])
+        assert total >= 2
+        for steps_in in range(1, total + 1):   # dropped at every step it can stop at
+            _pm, steps = m._tile_steps(m._level(), 0, 0)
+            for _ in range(steps_in):
+                next(steps, None)
+            steps.close()
+    finally:
+        qInstallMessageHandler(old)
+    assert not [w for w in warned if "saved states" in w], warned
 
 
 def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
@@ -215,19 +225,14 @@ def test_flat_map_fans_out_stations_on_the_same_spot(qapp):
 
 
 def test_maps_ship_with_the_app_and_fetch_nothing():
-    """No CDN learns who opened the Radio tab: every file the maps use is in ASSET_DIR,
-    exactly the pinned version, and the page may only load from there."""
-    def sri(name):
-        raw = (radio.ASSET_DIR / name).read_bytes()
-        return "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode()
-    assert sri(radio.GLOBE_JS) == radio.GLOBE_SRI
-    assert sri(radio.COUNTRIES) == radio.COUNTRIES_SRI
-    for name in (radio.EARTH_DAY, radio.EARTH_NIGHT, "LICENSE.txt"):
-        assert (radio.ASSET_DIR / name).is_file(), name
-    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    assert "http://" not in page and "https://" not in page
-    assert radio.globe_base_url().isLocalFile()
-    assert radio.globe_base_url().toLocalFile().rstrip("/") == radio.ASSET_DIR.as_posix()
+    """No CDN learns who opened the Radio tab: the outlines the map draws are in
+    ASSET_DIR, exactly the pinned version. The 3D globe's script and Earth pictures
+    went with it (build.ps1 ships the whole folder)."""
+    raw = (radio.ASSET_DIR / radio.COUNTRIES).read_bytes()
+    digest = "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode()
+    assert digest == radio.COUNTRIES_SRI
+    assert sorted(p.name for p in radio.ASSET_DIR.iterdir()) == sorted(
+        [radio.COUNTRIES, "LICENSE.txt"])
 
 
 def test_plays_are_counted_only_when_allowed(tab, monkeypatch):
@@ -252,12 +257,23 @@ def test_flat_map_outlines_come_from_the_app(qapp):
     assert len(rings) > 200 and any(n == "Japan" for n, *_ in labels)
 
 
-def test_globe_page_names_countries_and_islands():
-    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    # the outlines come from the app's own folder, and names are text, never HTML
-    assert f'localJson("{radio.COUNTRIES}")' in page
-    assert "el.textContent = d.n" in page and 'id="names"' in page
-    assert '"Tasmania"' in page and '"United States"' in page
+def test_reading_the_map_outlines_never_holds_up_the_window(qapp, monkeypatch):
+    """A 1.8.0 freeze: the outlines were read on the UI thread (5 s on a busy disk)."""
+    import threading
+    import time
+    gate, real = threading.Event(), radio.outline_rings
+    monkeypatch.setattr(radio, "outline_rings", lambda raw: gate.wait(5) and real(raw))
+    d = RadioDirectory(cache_dir=None)
+    got = []
+    d.outlines_ready.connect(lambda rings, labels: got.append(rings))
+    start = time.monotonic()
+    d.load_outlines()
+    assert time.monotonic() - start < 0.5 and not got
+    gate.set()
+    assert process_events(qapp, lambda: got) and len(got[0]) > 200
+
+
+def test_map_names_islands_the_outlines_leave_out():
     names = [p[0] for p in radio.PLACES]
     assert len(names) == len(set(names))
     for name, lat, lon, width in radio.PLACES:
@@ -329,26 +345,6 @@ def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch)
     assert 0 < shown <= flatmap.TOWNS_IN_VIEW      # never more than a handful at once
 
 
-def test_globe_names_towns_only_near_the_view():
-    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    assert "function setTowns(list)" in page and "pickTowns();" in page
-    assert "pick.push(d) >= TOWNS_IN_VIEW" in page   # a few near the view, never all
-    assert "pxDeg >= TOWN_PX" in page                # and none zoomed out
-    # picked no further out than a name is shown (facing > 0.45 in fitNames)
-    assert "Math.max(0.45, Math.cos(reach * R))" in page and "facing > 0.45" in page
-
-
-def test_globe_names_never_float_without_the_globe():
-    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    # a lost WebGL picture hides the names until it's back and redrawn
-    assert "body.nogl .place{visibility:hidden!important}" in page
-    assert 'document.body.classList.add("nogl")' in page and "webglcontextlost" in page
-    assert 'document.body.classList.remove("nogl"); wake(3000);' in page
-    # a resize or a new screen scale redraws a sleeping globe, even in the background
-    assert "fitNames(); wake();" in page and "dppx" in page
-    assert "appActive ? (ms || 1500) : 250" in page
-
-
 def test_bad_coordinates_and_numbers_are_cleaned():
     s = Station.from_api(api_station(1, geo_lat=0, geo_long=0, bitrate="x", countrycode="J1"))
     assert s.lat is None and s.lon is None and s.bitrate == 0 and s.cc == ""
@@ -376,15 +372,6 @@ def test_saved_stations_round_trip():
 def test_search_matching_covers_name_country_and_tags():
     s = Station.from_api(api_station(1))
     assert s.matches(["japan"]) and s.matches(["jazz", "station"]) and not s.matches(["rock"])
-
-
-def test_globe_page_is_pinned_and_colours_cant_inject():
-    page = radio.globe_html("/*channel*/", "#000000;</style><script>x()</script>", "#123456",
-                            "red", "#eeeeee")
-    # the script is the app's own pinned copy (test_maps_ship_with_the_app_and_fetch_nothing)
-    assert f'<script src="{radio.GLOBE_JS}">' in page
-    assert "Content-Security-Policy" in page and "default-src &#x27;none&#x27;" in page
-    assert "x()" not in page and "#15171f" in page and "#123456" in page
 
 
 # ---------------------------------------------------------------- engine
@@ -649,6 +636,31 @@ def test_first_audio_is_sent_once_however_long_the_window_takes(qapp, server):
         p.stop()
 
 
+def test_shutdown_waits_out_a_buffer_being_handed_over(qapp):
+    """Qt's decoding thread mid-way through a buffer when the player shuts down (its tab
+    going): shutdown waits for it, and a buffer after that isn't taken. Freed while
+    that thread still used it, the player crashed."""
+    p = RadioPlayer()
+    inside, release, took = threading.Event(), threading.Event(), []
+
+    def slow(buf):
+        inside.set()
+        release.wait(5)
+        took.append(buf)
+    p._take_buffer = slow
+    t = threading.Thread(target=p._on_buffer, args=("first",))
+    t.start()
+    assert inside.wait(5)
+    threading.Timer(0.2, release.set).start()
+    t0 = time.monotonic()
+    p.shutdown()
+    assert time.monotonic() - t0 > 0.15 and took == ["first"]
+    p._on_buffer("later")
+    t.join(5)
+    assert took == ["first"]
+    p.shutdown()                                  # twice (the window, then the tab): fine
+
+
 def test_player_reports_a_dead_station(qapp, monkeypatch):
     monkeypatch.setattr(radio, "CONNECT_S", 1.5)   # FFmpeg alone can wait for minutes
     p = RadioPlayer()
@@ -763,62 +775,52 @@ def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.engine.radio_vol == pytest.approx(0.5)
 
 
-def test_globe_pins_only_the_top_stations(tab, monkeypatch):
-    sent = []
-    monkeypatch.setattr(tab, "_js", sent.append)
-    monkeypatch.setattr(radio, "GLOBE_LIGHT", 2)
-    tab.cfg.radio["map"] = "globe"
-    tab._push_globe(force=True)
-    assert sent[-2].startswith("setStations(") and sent[-2].count('"id"') == 2
-    assert sent[-1].startswith("setTowns(")   # the places those stations are in
+@pytest.mark.parametrize("old", [{"map": "globe"}, {"globe_hd": True}, {}])
+def test_the_map_is_the_only_view_and_the_3d_globe_setting_moves_to_it(
+        qapp, app_dir, server, monkeypatch, old):
+    """The HD (3D globe) button is gone. Someone who had the globe on gets the map, and
+    the setting says "flat", which every older version reads as the map too."""
+    from PySide6.QtWidgets import QPushButton
 
-
-def test_flat_map_is_the_default_and_hd_swaps_in_the_globe(qapp, app_dir, server, monkeypatch):
     from soundboard.ui.flatmap import FlatMap
     from soundboard.ui.radiopanel import RadioTab
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
     monkeypatch.setattr(d, "load_outlines", lambda: d.outlines_ready.emit([], []))   # offline
     cfg = Config()
-    cfg.radio = {"globe_hd": True}               # the old switch: the flat map all the same
-    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=True)
-    made = []
-    monkeypatch.setattr(t, "_make_globe", lambda: made.append(1))
+    cfg.radio = dict(old)
+    saved = []
+    t = RadioTab(FakeEngine(), cfg, lambda: saved.append(dict(cfg.radio)), FakeMeter,
+                 directory=d, globe=True)
+    if old.get("map") == "globe":
+        assert cfg.radio["map"] == "flat" and saved   # moved over, and saved at once
+    else:
+        # nothing to move: left alone (other settings may still save)
+        assert cfg.radio.get("map") is None and not any("map" in s for s in saved)
     t.start()
     assert process_events(qapp, lambda: t.flat is not None and t._globe_list)
-    assert isinstance(t.flat, FlatMap) and t.view is None and not made
-    assert len(t.flat._points) == 5               # the flat map takes every station
-    flat = t.flat
-    flat.hd_requested.emit()
-    assert "Loading the 3D globe" in flat._msg   # said first: the web engine is slow to start
-    assert process_events(qapp, lambda: made)
-    assert t.flat is None and cfg.radio["map"] == "globe"
-    assert "globe_hd" not in cfg.radio
-    from PySide6.QtCore import QEvent
-    from shiboken6 import isValid
-    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
-    assert not isValid(flat)                      # deleted, not hidden
-    t._on_globe_hd(False)                         # the globe page's 2D button
-    assert process_events(qapp, lambda: t.flat is not None) and cfg.radio["map"] == "flat"
+    assert isinstance(t.flat, FlatMap) and not hasattr(t, "view")
+    assert len(t.flat._points) == 5               # the map takes every station
+    assert [b.text() for b in t.flat.findChildren(QPushButton)] == ["+", "−"]   # no HD
     t.shutdown()
 
 
-def test_moving_the_window_keeps_the_globe_drawing(qapp, tab, monkeypatch):
-    from PySide6.QtCore import QPoint, Qt
-    from PySide6.QtGui import QMoveEvent, QShowEvent
-    from PySide6.QtWidgets import QApplication, QVBoxLayout
-    sent = []
-    monkeypatch.setattr(tab, "_js", sent.append)
-    win = QWidget()
-    QVBoxLayout(win).addWidget(tab)
-    tab._follow_window()
-    for x in range(5):   # a drag: many moves, a few wakes
-        QApplication.sendEvent(win, QMoveEvent(QPoint(x, 0), QPoint(x - 1, 0)))
-    assert process_events(qapp, lambda: sent) and sent == ["wake()"]
-    tab._on_app_state(Qt.ApplicationInactive)
-    tab.showEvent(QShowEvent())   # back on the tab
-    assert sent[-1] == "wake()"
-    tab.setParent(None)
-    win.deleteLater()
+def test_the_decoder_preloads_when_the_tab_first_opens_not_at_start_up(
+        qapp, app_dir, server, monkeypatch):
+    """Loading Qt's FFmpeg DLLs on a thread stops a hitch as the first station starts,
+    but costs ~22 MB: only once the radio is used."""
+    from soundboard.ui.radiopanel import RadioTab
+    calls = []
+    monkeypatch.setattr(radio, "preload_decoder", lambda: calls.append(1))
+    d = RadioDirectory(app_dir / "radio", bases=(server.base,))
+    cfg = Config()
+    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
+    RadioPlayer().shutdown()
+    assert calls == []                            # built (at every start-up): nothing yet
+    t.start()
+    t.start()                                     # the tab shown again
+    assert calls == [1]
+    assert process_events(qapp, lambda: t._globe_list, timeout=20)
+    t.shutdown()
 
 
 def test_tab_search_shows_local_matches_then_the_directory(qapp, tab, server):
@@ -879,51 +881,6 @@ def test_tab_favorites_are_saved(tab):
     tab.list.setCurrentRow(0)
     tab._toggle_fav()
     assert tab.cfg.radio["favorites"] == []
-
-
-def test_globe_click_reaches_the_tab_without_the_internet(qapp, app_dir, server, monkeypatch):
-    """The globe page loads with the internet blocked (its files ship with the app), and
-    a click reported over the web channel plays that station."""
-    from PySide6.QtWebEngineCore import QWebEngineUrlRequestInterceptor
-
-    from soundboard.ui.radiopanel import RadioTab
-
-    class Offline(QWebEngineUrlRequestInterceptor):
-        def interceptRequest(self, info):
-            if info.requestUrl().scheme() in ("http", "https"):
-                info.block(True)
-
-    eng = FakeEngine()
-    d = RadioDirectory(app_dir / "radio", bases=(server.base,))
-    cfg = Config()
-    cfg.radio = {"map": "globe"}
-    t = RadioTab(eng, cfg, lambda: None, FakeMeter, directory=d, globe=True)
-    played = []
-    monkeypatch.setattr(t, "play", played.append)
-    t._make_globe_orig = t._make_globe
-    blocker = Offline()
-
-    def make():
-        t._make_globe_orig()
-        t.profile.setUrlRequestInterceptor(blocker)
-    t._make_globe = make
-    t.start()
-    assert process_events(qapp, lambda: t._globe_loaded and t._globe_list, timeout=20)
-    page = t.view.page()
-    out = []
-    page.runJavaScript("typeof Globe + ' ' + document.getElementById('msg').textContent",
-                       0, out.append)
-    assert process_events(qapp, lambda: out) and out[0].startswith("function")
-    assert "couldn't load" not in out[0]
-    page.runJavaScript("bridge && bridge.play('uuid-2')")
-    assert process_events(qapp, lambda: played, timeout=5)
-    assert played[0].uuid == "uuid-2"
-    # a link in the page can't take it anywhere
-    page.runJavaScript("location.href = 'https://example.com/'")
-    process_events(qapp, lambda: False, timeout=0.5)
-    assert t.view.url().scheme() != "https"
-    t.shutdown()
-    time.sleep(0)
 
 
 def test_tab_search_failure_says_so_and_can_be_retried(qapp, tab):

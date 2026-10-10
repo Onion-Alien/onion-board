@@ -39,6 +39,7 @@ from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean
                                 clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +72,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "api_token", "remote_addons", "net_mode", "net_proxy",
                   "net_off", "net_offline", "tor_bridges", "data", "stats_id",
                   "stats_sent", "stats_heard", "stats_tabs", "stats_problems_seen",
+                  "stats_started", "stats_steps", "stats_used", "stats_plays", "stats_open_s",
                   "tips_seen", "tip_day"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
@@ -104,6 +106,8 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
                 folder = f"sounds/{len(folders) + 1:03d} {_safe(m.name)}"
                 entry = {k: getattr(m, k) for k in SOUND_FIELDS}
                 entry["audio"] = _safe(_original_name(audio), keep_ext=True)
+                if lib_folder := library._folder_of(audio):   # comes back in it: "YouTube"
+                    entry["folder"] = lib_folder
                 entry["picture"] = ""
                 if audio.suffix.lower() in AUDIO_EXTS:
                     _add_file(z, audio, f"{folder}/{entry['audio']}")
@@ -143,6 +147,14 @@ def settings_of(cfg: Config) -> dict:
     if voices := savedvoices.saved():
         out[SAVED_VOICES] = voices
     return out
+
+
+def _lib_folder(v) -> str:
+    """The library folder a sound in a backup goes in: the one it was in when it was
+    saved ("YouTube"), as one plain folder name; else My sounds."""
+    if not isinstance(v, str) or not v.strip(" ."):
+        return library.MY_SOUNDS
+    return library.file_stem(v)   # no "/", "..", or anything Windows refuses
 
 
 def _original_name(audio: Path) -> str:
@@ -211,8 +223,9 @@ _ZIP_ERRORS = (OSError, zipfile.BadZipFile, zlib.error, RuntimeError,
 
 
 def _unreadable(name: str) -> str:
-    return (f"{name} is damaged or uses a format Onion Board can't read. "
-            "Export it again, or re-zip it with Windows (Send to → Compressed folder).")
+    return _("{name} is damaged or uses a format Onion Board can't read. "
+             "Export it again, or re-zip it with Windows (Send to → Compressed folder).",
+             name=name)
 
 
 class _Source:
@@ -251,14 +264,14 @@ class _Source:
 
     def json(self, name: str) -> dict:
         if self.size(name) > MAX_JSON:
-            raise BackupError(f"{name} is too big to be a settings file.")
+            raise BackupError(_("{name} is too big to be a settings file.", name=name))
         try:
             with self.open(name) as f:
                 data = json.loads(f.read(MAX_JSON + 1).decode("utf-8-sig"))
         except _ZIP_ERRORS as e:   # ValueError covers bad JSON and UnicodeDecodeError
-            raise BackupError(f"{name} in the backup is damaged.") from e
+            raise BackupError(_("{name} in the backup is damaged.", name=name)) from e
         if not isinstance(data, dict):
-            raise BackupError(f"{name} in the backup is damaged.")
+            raise BackupError(_("{name} in the backup is damaged.", name=name))
         return data
 
 
@@ -291,14 +304,15 @@ def _read(src: _Source, path: Path) -> Package:
     if src.has(MANIFEST):
         man = src.json(MANIFEST)
         if man.get("format") != FORMAT:
-            raise BackupError(f"{path.name} isn't an Onion Board backup.")
+            raise BackupError(_("{name} isn't an Onion Board backup.", name=path.name))
         try:
             version = float(man.get("format_version", 0) or 0)
         except (TypeError, ValueError):
             raise BackupError(_unreadable(path.name)) from None
         if version > FORMAT_VERSION:
-            raise BackupError(f"{path.name} was made by a newer Onion Board "
-                              f"({man.get('app_version', '?')}). Update the app to import it.")
+            raise BackupError(_("{name} was made by a newer Onion Board "
+                                "({version}). Update the app to import it.",
+                                name=path.name, version=man.get("app_version", "?")))
         pkg.is_board = True
         pkg.app_version = str(man.get("app_version", ""))
         pkg.created = str(man.get("created", ""))
@@ -331,9 +345,9 @@ def _read(src: _Source, path: Path) -> Package:
         pkg.sounds.append(PackedSound(folder, entry, audio, pic))
     if not pkg.sounds and pkg.settings is None:
         if pkg.is_board:
-            raise BackupError(f"{path.name} has no sounds or settings in it.")
-        raise BackupError(f"{path.name} has no sound files in it, and isn't an Onion Board "
-                          "backup or sound pack.")
+            raise BackupError(_("{name} has no sounds or settings in it.", name=path.name))
+        raise BackupError(_("{name} has no sound files in it, and isn't an Onion Board "
+                            "backup or sound pack.", name=path.name))
     return pkg
 
 
@@ -380,19 +394,20 @@ def extract_loose(path: str | Path, names: list[str], dest_dir: Path
     try:
         total = sum(min(src.size(n), MAX_FILE + 1) for n in names if src.has(n))
         if total > MAX_TOTAL:
-            raise BackupError(f"{path.name} holds {_size(total)} of sounds, more than the "
-                              f"{_size(MAX_TOTAL)} one import can take. Import it in parts.")
+            raise BackupError(_("{name} holds {size} of sounds, more than the "
+                                "{limit} one import can take. Import it in parts.",
+                                name=path.name, size=_size(total), limit=_size(MAX_TOTAL)))
         dest_dir.mkdir(parents=True, exist_ok=True)
         free = shutil.disk_usage(dest_dir).free
         if 2 * total + DISK_SPARE > free:   # unpacked here, then copied into the library
-            raise BackupError(f"There isn't enough free disk space to import {path.name}: "
-                              f"it needs {_size(2 * total + DISK_SPARE)} and {_size(free)} "
-                              "is free.")
+            raise BackupError(_("There isn't enough free disk space to import {name}: "
+                                "it needs {needed} and {free} is free.", name=path.name,
+                                needed=_size(2 * total + DISK_SPARE), free=_size(free)))
         budget = _Budget(total)
         for i, n in enumerate(names):
             shown = PurePosixPath(n).name
             if not src.has(n):
-                out.append((n, None, f"{shown}: not in the zip"))
+                out.append((n, None, _("{name}: not in the zip", name=shown)))
                 continue
             dest = dest_dir / f"{i:04d}" / _safe(shown, keep_ext=True)
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -400,8 +415,11 @@ def extract_loose(path: str | Path, names: list[str], dest_dir: Path
                 _extract(src, n, dest, budget=budget)
             except (BackupError, *_ZIP_ERRORS) as e:
                 log.warning("import: can't unpack %s from %s", n, path.name, exc_info=True)
-                why = str(e) if isinstance(e, BackupError) else "damaged in the zip"
-                out.append((n, None, f"{shown}: {why}"))
+                if isinstance(e, BackupError):
+                    why = _("{name}: {error}", name=shown, error=str(e))
+                else:
+                    why = _("{name}: damaged in the zip", name=shown)
+                out.append((n, None, why))
                 continue
             out.append((n, dest, ""))
     finally:
@@ -440,12 +458,12 @@ def install(pkg: Package, known_fingerprints: set[str], color_for=None) -> Impor
                                     budget)
             except (OSError, BackupError, zipfile.BadZipFile) as e:
                 log.warning("import of %s failed", ps.folder, exc_info=True)
-                out.failed.append(f"{name}: {errors.plain(e)}")
+                out.failed.append(_("{name}: {error}", name=name, error=errors.plain(e)))
                 continue
             except Exception:  # noqa: BLE001 - one odd sound mustn't stop the rest
                 log.warning("import of %s failed", ps.folder, exc_info=True)
-                out.failed.append(f"{name}: it's damaged or in a format Onion Board "
-                                  "can't read")
+                out.failed.append(_("{name}: it's damaged or in a format Onion Board "
+                                    "can't read", name=name))
                 continue
             out.sounds.append(meta)
     finally:
@@ -463,13 +481,15 @@ def _check_room(src: _Source, pkg: Package) -> int:
             if name and src.has(name):
                 total += min(src.size(name), limit + 1)
     if total > MAX_TOTAL:
-        raise BackupError(f"{pkg.path.name} holds {_size(total)} of sounds, more than the "
-                          f"{_size(MAX_TOTAL)} one import can take. Import it in parts.")
+        raise BackupError(_("{name} holds {size} of sounds, more than the "
+                            "{limit} one import can take. Import it in parts.",
+                            name=pkg.path.name, size=_size(total), limit=_size(MAX_TOTAL)))
     library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     free = shutil.disk_usage(library.SOUNDS_DIR).free
     if total + DISK_SPARE > free:
-        raise BackupError(f"There isn't enough free disk space to import {pkg.path.name}: "
-                          f"it needs {_size(total + DISK_SPARE)} and {_size(free)} is free.")
+        raise BackupError(_("There isn't enough free disk space to import {name}: "
+                            "it needs {needed} and {free} is free.", name=pkg.path.name,
+                            needed=_size(total + DISK_SPARE), free=_size(free)))
     return total
 
 
@@ -480,21 +500,20 @@ def _size(n: int) -> str:
 def _install_one(src: _Source, ps: PackedSound, name: str, color: str | None,
                  budget: _Budget | None = None) -> SoundMeta:
     sid = uuid.uuid4().hex[:10]
-    library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
-    audio_name = _safe(PurePosixPath(ps.audio).name, keep_ext=True)
-    dest = library.SOUNDS_DIR / f"{sid}_{audio_name}"
-    _extract(src, ps.audio, dest, budget=budget)
+    ext = PurePosixPath(_safe(PurePosixPath(ps.audio).name, keep_ext=True)).suffix
+    dest = library.new_file(name, ext, _lib_folder(ps.entry.get("folder")))
     try:
+        _extract(src, ps.audio, dest, budget=budget)
         return _fill_meta(src, ps, sid, name, color, dest, budget)
     except BaseException:
-        dest.unlink(missing_ok=True)   # don't leave an orphan audio file behind
+        library.discard(dest)   # don't leave an orphan audio file behind
         raise
 
 
 def _fill_meta(src: _Source, ps: PackedSound, sid: str, name: str, color: str | None,
                dest: Path, budget: _Budget | None = None) -> SoundMeta:
     from soundboard import thumbs
-    meta = SoundMeta(id=sid, name=name, file=str(dest))
+    meta = SoundMeta(id=sid, name=name, file=str(dest), added=time.time())
     defaults = {f.name: getattr(meta, f.name) for f in fields(SoundMeta)}
     for k in SOUND_FIELDS:
         v = ps.entry.get(k)
@@ -536,7 +555,7 @@ def _extract(src: _Source, name: str, dest: Path, limit: int | None = None,
              budget: _Budget | None = None):
     limit = MAX_FILE if limit is None else limit
     if src.size(name) > limit:
-        raise BackupError(f"{PurePosixPath(name).name} is too big")
+        raise BackupError(_("{name} is too big", name=PurePosixPath(name).name))
     tmp = dest.with_name(dest.name + ".part")
     n = 0
     try:
@@ -544,10 +563,10 @@ def _extract(src: _Source, name: str, dest: Path, limit: int | None = None,
             while chunk := fin.read(1 << 20):
                 n += len(chunk)
                 if n > limit:   # the zip's header lied about the size
-                    raise BackupError(f"{PurePosixPath(name).name} is too big")
+                    raise BackupError(_("{name} is too big", name=PurePosixPath(name).name))
                 if budget is not None and n > budget.left:   # so did the whole archive
-                    raise BackupError(f"{PurePosixPath(name).name} doesn't fit: the backup "
-                                      "holds more than it says")
+                    raise BackupError(_("{name} doesn't fit: the backup holds more than it "
+                                        "says", name=PurePosixPath(name).name))
                 fout.write(chunk)
         tmp.replace(dest)
     except BaseException:

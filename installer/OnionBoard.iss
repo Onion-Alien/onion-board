@@ -105,7 +105,7 @@ WelcomeLabel2=This puts Onion Board on your PC. Your sounds go straight into you
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
-FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen), then put your sounds straight into that mic.%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. The only thing counted is the anonymous "still here" if you left Count me in ticked. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen), then put your sounds straight into that mic.%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. If you left Count me in ticked, it sends anonymous usage stats once a day (never your name, IP address or device info). Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
@@ -114,7 +114,7 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "countme"; Description: "Count me in: an anonymous ""still here"" once a day, and crash counts"; GroupDescription: "Privacy (optional)"
+Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -147,7 +147,7 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
   StatusMsg: "Switching on the network activity history..."; \
   Tasks: keepnetlog; Flags: runhidden waituntilterminated
 ; "Count me in" (soundboard/usage.py): unticked, it's switched off before the first
-; start, so nothing is ever sent. Ticked on a page the user saw, it's switched on (an
+; start; the only thing ever sent is one anonymous "opt-out/installer" (no ID). Ticked on a page the user saw, it's switched on (an
 ; old install had it off); a silent update never switches it on.
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
   StatusMsg: "Switching off the usage count..."; \
@@ -199,6 +199,7 @@ Type: filesandordirs; Name: "{app}\modules"
 const
   PrivacyURL = 'https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network';
   UninstallFeedbackURL = 'https://tally.so/r/rjxjyM';   // feedback.py's FORM_URL
+  DiscordURL = 'https://discord.gg/FhKGaWCWHM';          // feedback.py's DISCORD_URL
 
 var
   PrivacyPage: TWizardPage;
@@ -217,6 +218,7 @@ var
   HeardRadios: array of TNewRadioButton;
   HeardKeys: array of String;  // what each one sends (soundboard/usage.py's HEARD)
   HeardOther: TNewEdit;        // Other's own answer
+  DiscordLink: TNewStaticText; // the Finished page's "Join the Onion Board Discord"
 
 // "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
 // already (a reinstall). A plain text search: json.dumps writes it on one line.
@@ -294,6 +296,42 @@ var
   Code: Integer;
 begin
   ShellExecAsOriginalUser('open', PrivacyURL, '', '', SW_SHOWNORMAL, ewNoWait, Code);
+end;
+
+// Only when clicked: the Finished page never opens it by itself
+procedure OpenDiscordLink(Sender: TObject);
+var
+  Code: Integer;
+begin
+  ShellExecAsOriginalUser('open', DiscordURL, '', '', SW_SHOWNORMAL, ewNoWait, Code);
+end;
+
+// The Finished page's link, under whatever is last there (the "Open Onion Board now"
+// box, or the restart choice): placed when the page shows, once those are laid out.
+procedure CreateDiscordLink;
+begin
+  DiscordLink := TNewStaticText.Create(WizardForm.FinishedPage);
+  DiscordLink.Parent := WizardForm.FinishedPage;
+  DiscordLink.Caption := 'Join the Onion Board Discord';
+  DiscordLink.Hint := 'Chat, get help and hear about new versions (opens in your browser)';
+  DiscordLink.ShowHint := True;
+  DiscordLink.Cursor := crHand;
+  DiscordLink.Font.Color := clHotLight;
+  DiscordLink.Font.Style := [fsUnderline];
+  DiscordLink.OnClick := @OpenDiscordLink;
+end;
+
+procedure PlaceDiscordLink;
+var
+  Bottom: Integer;
+begin
+  Bottom := WizardForm.FinishedLabel.Top + WizardForm.FinishedLabel.Height;
+  if WizardForm.RunList.Visible then
+    Bottom := WizardForm.RunList.Top + WizardForm.RunList.Height;
+  if WizardForm.NoRadio.Visible then
+    Bottom := WizardForm.NoRadio.Top + WizardForm.NoRadio.Height;
+  DiscordLink.Left := WizardForm.FinishedLabel.Left;
+  DiscordLink.Top := Bottom + ScaleY(12);
 end;
 
 // "Your privacy": what the app connects to, in plain words, before the boxes (so they
@@ -439,7 +477,7 @@ begin
   Body.Width := HeardPage.SurfaceWidth;
   Body.ShowAccelChar := False;
   Body.Caption := 'It helps us know where people find it. Your pick goes once with the ' +
-    'anonymous Count me in, and nothing else is sent.';
+    'anonymous Count me in.';
   Body.AdjustHeight;
   Top := Body.Top + Body.Height + ScaleY(12);
   AddHeardRadio('youtube', 'YouTube', Top);
@@ -570,7 +608,7 @@ begin
   Body.ShowAccelChar := False;
   Body.Caption :=
     'No account, no ads. On its own, Onion Board only goes online once a day: to ' +
-    'check for updates, and to send an anonymous "still here" if Count me in is ' +
+    'check for updates, and to send anonymous usage stats if Count me in is ' +
     'ticked. Nothing downloads until you click Update, and you can switch both off.' + #13#10#13#10 +
     'Everything else happens only when you use it:' + #13#10 +
     Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +
@@ -610,6 +648,7 @@ begin
   WizardForm.TasksList.ShowHint := True;
   CreateImportPage;
   CreateHeardPage;
+  CreateDiscordLink;
   WizardForm.TasksList.OnClickCheck := @TasksClicked;
 end;
 
@@ -649,6 +688,8 @@ var
 begin
   if (CurPageID <> wpWelcome) and (CurPageID <> wpFinished) then
     LayoutHeader;
+  if CurPageID = wpFinished then
+    PlaceDiscordLink;
   UpdateInstallCaption;
   if (CurPageID <> wpSelectTasks) or WizardSilent then
     exit;
@@ -809,6 +850,15 @@ begin
   Result := CableNeedsRestart;
 end;
 
+// Straight into my mic's effect still on a mic (soundboard/directmic.py's notes)
+function MicEffectLeft: Boolean;
+var
+  Root: Integer;
+begin
+  if IsWin64 then Root := HKLM64 else Root := HKLM;
+  Result := RegKeyExists(Root, 'SOFTWARE\OnionBoard\MicPlugin\Endpoints');
+end;
+
 // Uninstall: offer to remove the cable too. The default answer is Yes only when this
 // installer put it there (other apps, e.g. Voicemeeter, may use one that was already
 // installed). Silent uninstalls leave it alone.
@@ -821,6 +871,14 @@ begin
   // the page (soundboard/feedback.py's form); nothing is sent unless they submit it.
   if (CurUninstallStep = usPostUninstall) and not UninstallSilent then
   begin
+    // "--direct-mic remove" above couldn't take it off the mic (Windows' prompt was
+    // turned down): say so, rather than leave it there without a word
+    if MicEffectLeft then
+      MsgBox('Onion Board''s mic effect is still on your microphone (Windows'' permission ' +
+        'prompt was turned down).' + #13#10#13#10 + 'Your mic works normally: without ' +
+        'Onion Board the effect passes your voice straight through. To remove it, install ' +
+        'Onion Board again and uninstall it, saying Yes to Windows'' prompt.',
+        mbInformation, MB_OK);
     if MsgBox('Onion Board has been removed.' + #13#10#13#10 +
         'Would you tell us why? It opens a short form in your browser (no account, ' +
         'one question). Choose No to skip.', mbConfirmation, MB_YESNO) = IDYES then

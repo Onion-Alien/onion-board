@@ -232,7 +232,7 @@ def test_make_your_own_voice_from_two_others(qapp, app_dir):
         assert v["name"] == "Gravel Nova" and avl.is_mine(v)
         assert v["formant"] == -0.5 and v["pitch_hz"] == 215
         assert dict(v["mix"])[156] == pytest.approx(0.125)
-        assert v["description"] == "Made from Nova with 25 % Brick."
+        assert v["description"] == "Made from Nova with 25% Brick."
         assert v["recipe"] == {"base": "nova", "other": "brick", "amount": 0.25}
         kept = avl.Store().put(v)
         again = AiVoiceEditor(avl.BUILT_IN, kept, FakePreviewer())
@@ -270,3 +270,37 @@ def test_card_shows_who_the_voice_is_and_opens_the_window(qapp, app_dir, monkeyp
             d.deleteLater()
         p.shutdown()
         p.deleteLater()
+
+
+def test_voices_sort_into_who_and_how_high():
+    kinds = {v["id"]: (avl.who(v), avl.pitch_band(v)) for v in avl.BUILT_IN}
+    assert kinds["bear"] == ("men", "low") and kinds["riley"] == ("men", "mid")
+    assert kinds["sage"] == ("women", "mid") and kinds["pixie"] == ("women", "high")
+    assert kinds["river"][0] == kinds["squeak"][0] == kinds["titan"][0] == "other"
+    assert avl.who(mine(tags=["Woman"])) == "women" and avl.who(mine()) == "other"
+    assert avl.pitch_band({"pitch_hz": "junk"}) == "low"
+
+
+def test_all_voices_window_filters_by_who_and_pitch(qapp, app_dir):
+    from soundboard.ui.aivoicebrowser import AiVoiceBrowser
+    store = avl.Store()
+    store.put(mine("Robo", tags=["Man"], pitch_hz=100))
+    d = AiVoiceBrowser(avl.BUILT_IN + store.voices, "nova", store, FakePreviewer(), True,
+                       refresh=lambda: avl.BUILT_IN + store.voices)
+    try:
+        assert len(d.cards) == len(avl.BUILT_IN) + 1
+        assert d.cards[-1].voice["name"] == "Robo"             # your own: last, on its own
+        assert d.who_buttons["men"].text().endswith(" 6")      # Robo counts as a man too
+        d.who_buttons["women"].click()
+        assert [c.voice["id"] for c in d.cards] == ["ivy", "sage", "nova", "pixie"]  # low first
+        d.band_buttons["high"].click()
+        assert [c.voice["id"] for c in d.cards] == ["nova", "pixie"]
+        d.who_buttons["men"].click()
+        assert d.cards == []                                    # no high men: says so
+        d.who_buttons["mine"].click()
+        d.band_buttons["any"].click()
+        assert [c.voice["name"] for c in d.cards] == ["Robo"]
+        d.cards[0].b_delete.click()                             # the last of your own
+        assert d.who_buttons["mine"].isHidden() and len(d.cards) == len(avl.BUILT_IN)
+    finally:
+        d.deleteLater()

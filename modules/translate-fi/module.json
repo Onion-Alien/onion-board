@@ -1,0 +1,15 @@
+{
+  "id": "translate-fi",
+  "name": "Translate to Finnish",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Finnish. Needs live voice-to-speech. Downloads a 69 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "fi",
+  "language_name": "Finnish",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_fi-1_9.argosmodel",
+    "sha256": "172c32485b89233983d1bd4d9e73fc22924ec0cb59bae4c97e299fdd4f083e0e",
+    "bytes": 69132412
+  },
+  "credits": "English to Finnish model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

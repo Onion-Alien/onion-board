@@ -9,6 +9,7 @@ from soundboard.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import setupwizard
+from conftest import devices_done
 from test_setupwizard import devices, resume, wizard  # noqa: F401  (fake devices)
 
 CABLE = "CABLE Input (VB-Audio Virtual Cable)"
@@ -70,7 +71,7 @@ def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, open
     win.set_route("device", "Speakers")
     assert opened["main"][-1] == "Speakers"
     assert win.setup_state == "ok"
-    assert "Speakers" in win.pill.text()
+    assert "Speakers" in win.pill.accessibleName()
     assert "Audio Output Capture" in win.step_lbl.text()
     assert win.btn_install.isHidden() and win.btn_chat.isHidden()   # no cable, no Discord mic
     assert win.cb_route.currentText() == "Speakers"   # picked by name
@@ -96,7 +97,7 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
     assert win.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
     assert "My mic" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
-    assert "Not sending" in win.pill.text()
+    assert "Not sending" in win.pill.accessibleName()
 
 
 def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, opened):
@@ -105,7 +106,7 @@ def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, 
     win.set_route("off")
     assert opened["main"][-1] is None and opened["obs"][-1] == CABLE
     assert win.setup_state == "ok"       # picked on purpose: the Setup tab doesn't nag
-    assert "Not sending" in win.pill.text()
+    assert "Not sending" in win.pill.accessibleName()
     assert win.cb_route.currentData() == "off"
     assert win.cfg.main_device == CABLE  # kept for switching back
     win.set_route("cable")
@@ -114,20 +115,23 @@ def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, 
 
 
 def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
-    win._air_size = 0                    # the full label
+    # one word on the button; the whole sentence is its accessible name and tooltip
+    def said():
+        assert win.btn_air.toolTip().startswith(win.btn_air.accessibleName())
+        return win.btn_air.property("railtext"), win.btn_air.accessibleName()
     win.set_sending(True)
-    assert win.btn_air.text() == "Live — others hear you"
+    assert said() == ("Live", "Live: others hear you")
     win.set_route("device", PHONES)      # the headphones: nothing is sent
-    assert win.btn_air.text() == "Only you hear sounds"
+    assert said() == ("Only you", "Only you hear sounds")
     win.set_route("off")
-    assert win.btn_air.text() == "Only you hear sounds"
+    assert said() == ("Only you", "Only you hear sounds")
     win.set_obs_device("Speakers")       # muting still silences the stream output
-    assert win.btn_air.text() == "Live — stream output only"
+    assert said() == ("Live", "Live: stream output only")
     win.btn_air.setChecked(False)
-    assert win.btn_air.text() == "Muted — others hear nothing"
+    assert said() == ("Muted", "Muted: others hear nothing")
     win.btn_air.setChecked(True)
     win.set_route("cable")
-    assert win.btn_air.text() == "Live — others hear you"
+    assert said() == ("Live", "Live: others hear you")
 
 
 def test_the_route_picker_and_its_settings_mirror(win, opened):
@@ -139,13 +143,16 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     assert not any("cable" in t.lower() and t != CABLE for t in texts)
     cb.setCurrentIndex(cb.findData(main.ROUTE_DEVICE + "Speakers"))
     win.on_device(cb, "route")
+    devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
     d = SettingsDialog(win, "audio")
     route = next(c for c, src in d.dev_combos if src is win.cb_route)
     assert route.currentText() == "Speakers"
     route.activated.emit(route.findData("off"))
+    devices_done(win)
     assert win.cfg.route == "off" and opened["main"][-1] is None
     route.activated.emit(route.findData(main.ROUTE_DEVICE + CABLE))
+    devices_done(win)
     assert win.cfg.route == "cable" and opened["main"][-1] == CABLE   # a cable is a cable
     assert route.currentText() == CABLE
     d.close()
@@ -206,8 +213,8 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     d = SettingsDialog(win, "audio")
     mirror = [v for v in win.also_views if v is not rows]
     assert len(mirror) == 1 and [b.currentData() for b in mirror[0].boxes] == ["Speakers"]
-    win.set_route("off")                 # nobody: nothing goes anywhere
-    assert copies[-1] == [] and rows.boxes == [] and rows.add.isHidden()
+    win.set_route("off")                 # nobody: no copies (+ adds a clean one)
+    assert copies[-1] == [] and rows.boxes == [] and not rows.add.isHidden()
     win.set_route("cable")
     assert copies[-1] == ["Speakers"] and len(rows.boxes) == 1
     win.set_route("device", "Speakers")  # picked as the main one: not twice
@@ -221,6 +228,47 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     d.close()
     win.set_also_send_at(0, PHONES)      # the headphones: you'd hear it twice
     assert copies[-1] == []
+
+
+def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  # noqa: F811
+    """The stream output lives in the Also send to rows: a row set to Clean, for
+    streaming is cfg.obs_device (its volume and voice switch under it), one at a time,
+    and back to Same as the call it's a copy again. Sending to nobody, it's the only
+    kind a row can be. No separate card in Settings any more."""
+    from PySide6.QtWidgets import QLabel
+    opened = []
+    monkeypatch.setattr(engine.Engine, "set_obs_device",
+                        lambda self, name: (opened.append(name),
+                                            self.names.__setitem__("obs", name)))
+    win.set_route("cable")
+    rows = win.also_rows
+    rows.add.click()
+    assert win.cfg.also_send == ["Speakers"] and rows.stream_vol is None
+    kind = rows.kinds[0]
+    kind.setCurrentIndex(kind.findData("stream"))
+    kind.activated.emit(kind.currentIndex())
+    assert win.cfg.obs_device == "Speakers" and win.cfg.also_send == []
+    assert opened[-1] == "Speakers"
+    assert [k.currentData() for k in rows.kinds] == ["stream"]
+    assert rows.stream_vol is not None and rows.stream_voice.isChecked()
+    rows.stream_voice.setChecked(False)
+    assert win.cfg.obs_voice is False
+    assert rows.add.isHidden()           # nothing left to add
+    win.set_send_kind("Speakers", False)  # back to a copy of the call
+    assert win.cfg.obs_device is None and win.cfg.also_send == ["Speakers"]
+    assert opened[-1] is None and rows.stream_vol is None
+    win.set_also_send_at(0, None)
+    win.set_route("off")                 # nobody: only the clean one makes sense
+    assert rows.boxes == [] and not rows.add.isHidden()
+    rows.add.click()
+    assert win.cfg.obs_device and win.cfg.also_send == []
+    assert [rows.kinds[0].itemData(i) for i in range(rows.kinds[0].count())] == ["stream"]
+    assert rows.add.isHidden()           # one clean one at a time
+    rows.widgets[rows.widgets.index(rows.kinds[0].parentWidget()) + 1].click()   # −
+    assert win.cfg.obs_device is None and rows.boxes == []
+    d = SettingsDialog(win, "audio")
+    assert not [w for w in d.findChildren(QLabel) if "Stream output (OBS)" in w.text()]
+    d.close()
 
 
 def test_engine_copies_open_close_retry_and_get_the_send_mix(monkeypatch):
@@ -262,6 +310,57 @@ def test_engine_copies_open_close_retry_and_get_the_send_mix(monkeypatch):
     finally:
         e.shutdown()
     assert e.copies == () and all(t.closed for t in made)
+
+
+def test_a_missing_cable_is_warned_about_once_not_every_retry(monkeypatch, caplog):
+    """A 1.9.7 freeze ended in this warning's write: it was logged every RETRY_S, on
+    the UI thread, for as long as the cable was missing."""
+    import logging
+    fail = {"CABLE"}
+
+    class FakeTap:
+        def __init__(self, name, latency="low"):
+            if name in fail:
+                raise RuntimeError("busy")
+            self.name, self.last_cb = name, engine.time.monotonic()
+
+        def close(self):
+            pass
+    monkeypatch.setattr(engine, "CableTap", FakeTap)
+    e = engine.Engine()
+    try:
+        with caplog.at_level(logging.INFO, logger="soundboard.engine"):
+            for _ in range(5):
+                e.set_tap_device("CABLE")
+                e._open_copy("CABLE")
+            warned = [r for r in caplog.records if r.levelno >= logging.WARNING]
+            assert len(warned) == 1 and "CABLE" in warned[0].getMessage()
+            fail.clear()
+            e.set_tap_device("CABLE")   # back: said once, and a later loss warns again
+            assert any("also sending into CABLE" in r.getMessage() for r in caplog.records)
+            fail.add("CABLE")
+            e.set_tap_device("CABLE")
+            assert len([r for r in caplog.records if r.levelno >= logging.WARNING]) == 2
+    finally:
+        e.shutdown()
+
+
+def test_an_unplugged_output_is_warned_about_once_while_retried(monkeypatch, caplog):
+    import logging
+    e = engine.Engine()
+
+    def gone(*_a, **_k):
+        raise RuntimeError("device not found")
+    monkeypatch.setattr(e, "_open_out", gone)
+    try:
+        with caplog.at_level(logging.INFO, logger="soundboard.engine"):
+            for _ in range(4):
+                e.set_mon_device("Headset")
+            warned = [r for r in caplog.records if r.levelno >= logging.WARNING]
+            assert len(warned) == 1 and "Headset" in warned[0].getMessage()
+            assert e.errors["mon"]   # the window still says it's missing
+    finally:
+        e.shutdown()
 
 
 def test_also_send_is_kept_on_this_pc_and_reset_with_the_devices():

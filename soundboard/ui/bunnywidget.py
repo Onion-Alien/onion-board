@@ -16,10 +16,19 @@ him hop for joy (`joy_lines`) and emits `clicked`.
 he went, and he comes back with a hammer and a plank and hammers away until
 `stop_building(ok)`, which ends in a celebration (ok) or back to how he was.
 
+`pong=True` hides an Easter egg: poke him a few times quickly and he gets cross, and
+poke him `ANNOY_CLICKS` times and he storms off the same way, comes back with a
+baseball bat and challenges you to Pong (ui/bunpong.py) over the page.
+Closing the game calls `calm_down()`, and he's back to how he was.
+
+`naps=True`: in the small hours (NAP_HOURS, by this PC's own clock; nothing is sent
+anywhere) he's asleep in a nightcap, breathing slowly, with Zzz floating up. A click
+wakes him, grumpy, for WOKEN_S seconds; then he nods off again.
+
 The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while
-he's on screen, and slows to a few frames a second while only the gentle bob and ear
-sway move (see `busy`).
+he's on screen, always at the same 30 fps (a slower idle pace made the bob judder
+next to the smooth blinks and ear flicks).
 """
 from __future__ import annotations
 
@@ -31,7 +40,9 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
+from soundboard import theme, usage
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
+from soundboard.i18n import _
 from soundboard.ui import appstate
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
@@ -41,12 +52,33 @@ DUST_INK = QColor("#b3a9c7")
 # build(): when each part of the act ends, in seconds from the start
 DASH_END, CLOUD_END, BACK_END = 0.45, 1.6, 2.1
 SWING = 0.55     # one hammer blow, seconds
-TALK = 0.05        # mic level that counts as talking (same as the wizard's "Hearing you")
+TALK = 0.008       # mic level that counts as talking (-42 dBFS; also the wizard's "Hearing you")
+LOUD = 0.25        # mic level that opens his mouth all the way (-12 dBFS)
+
+
+def loudness(level: float) -> float:
+    """A raw mic peak (0..1) as 0..1 on a dB scale, like the level bar: 0 at TALK,
+    1 at LOUD. Speech peaks sit far below 1 in linear terms, so a linear scale left
+    him still until you yelled."""
+    if level <= TALK:
+        return 0.0
+    return min(1.0, math.log(level / TALK) / math.log(LOUD / TALK))
 FPS = 30
 FAST_MS = 1000 // FPS
-IDLE_MS = 100      # at rest only the slow bob and ear sway move: a few frames a second do
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
+# the Pong Easter egg: this many clicks inside ANNOY_WINDOW seconds and he fetches
+# his bat; from GRUMPY_AT on he's already getting cross
+ANNOY_CLICKS, ANNOY_WINDOW, GRUMPY_AT = 7, 3.0, 4
+TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
+NAP_HOURS = (2, 3, 4)   # local hours (2:00 to 4:59) he's asleep, with naps=True
+WOKEN_S = 30.0     # how long a click keeps him awake
+ZZZ_EVERY = 1.1    # seconds between Zs
+
+
+def local_hour() -> int:
+    """The hour on this PC's clock (read here only, never sent anywhere)."""
+    return time.localtime().tm_hour
 
 
 class _Note:
@@ -74,11 +106,24 @@ class _Puff:
 
 class BunnyWidget(QWidget):
     clicked = Signal()
+    challenge = Signal()   # (pong=True) back with his bat: open the game
 
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
-                 lines=(), hope_lines=(), joy_lines=()):
+                 lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
+                 naps: bool = False):
         super().__init__(parent)
+        self.pong = pong
+        self.naps = naps
+        self._woken_until = 0.0         # a click woke him: awake until then
+        self._hour, self._hour_at = -1, -1e9   # the clock's hour, read once a few seconds
+        self.zzz: list[list[float]] = []      # [x, y, age]: Zs floating up while he sleeps
+        self._zzz_debt = 0.0
+        self._pokes: list[float] = []   # recent click times (the Pong Easter egg)
+        self._angry = 0.0               # how cross he looks right now (smoothed)
+        self._cross_until = 0.0         # ... and stays cross until then
+        self._act_kind = "build"        # which act is running: "build" or "bat"
+        self._dared = False             # the bat act has sent `challenge`
         self.lines, self.hope_lines, self.joy_lines = (tuple(lines), tuple(hope_lines),
                                                        tuple(joy_lines))
         # room either side for the speech bubble (both, so he stays centred)
@@ -120,6 +165,8 @@ class BunnyWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._step)
+        if pong:
+            self.challenge.connect(self._open_game)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     def sizeHint(self) -> QSize:
@@ -134,19 +181,11 @@ class BunnyWidget(QWidget):
     def set_level(self, level: float):
         """The live mic level, 0..1. Call it as often as you like (the wizard: 25/s)."""
         self._level = max(float(level), self._level * 0.8)
-        if self._level > TALK:
-            self._wake()
 
     def burst(self, n: int = 6):
         """Throw a handful of notes out at once."""
-        for _ in range(n):
+        for _i in range(n):
             self._spawn(1.3)
-        self._wake()
-
-    def _wake(self):
-        """Something started moving: back to full speed at once if he's idling."""
-        if self._timer.isActive() and self._timer.interval() != FAST_MS:
-            self._timer.start(FAST_MS)
 
     def hope(self, on: bool):
         """Cheer him up (True) or let him go back to his mood at rest (False)."""
@@ -163,11 +202,85 @@ class BunnyWidget(QWidget):
         self.burst(6)
         self._say(self.joy_lines, 1.6)
 
+    @property
+    def asleep(self) -> bool:
+        """Napping right now: naps on, the small hours, not just woken, not mid-act."""
+        if not self.naps or self.building:
+            return False
+        now = time.monotonic()
+        if now < self._woken_until:
+            return False
+        if now - self._hour_at > 5:
+            self._hour, self._hour_at = local_hour(), now
+        return self._hour in NAP_HOURS
+
+    def wake(self):
+        """A click while he naps: up he gets, grumpy, for WOKEN_S seconds."""
+        now = time.monotonic()
+        usage.used("egg-bun-woken")   # the name only (usage.py)
+        self._woken_until = now + WOKEN_S
+        self._cross_until = now + 1.6
+        self.zzz.clear()
+        self.say = self._rng.choice((_("huh?! wha…"), _("five more minutes…"),
+                                     _("it's the middle of the night!"), _("zzz… hm?!")))
+        self._say_until = now + 2.2
+
     def mousePressEvent(self, ev):
+        if ev.button() == Qt.LeftButton and self.asleep:
+            self.wake()
+            self.clicked.emit()
+            super().mousePressEvent(ev)
+            return
+        if ev.button() == Qt.LeftButton and self.naps:
+            self._woken_until = max(self._woken_until, time.monotonic() + WOKEN_S)
         if ev.button() == Qt.LeftButton and self.joy_lines:
-            self.cheer()
+            if not self.poke():
+                self.cheer()
             self.clicked.emit()
         super().mousePressEvent(ev)
+
+    def poke(self) -> bool:
+        """A click, for the Pong Easter egg: True if it made him cross (rather than
+        happy). The ANNOY_CLICKS-th quick one sends him off for his bat."""
+        if not self.pong:
+            return False
+        if self.building:
+            return True   # mid-act: more clicks do nothing
+        now = time.monotonic()
+        self._pokes = [t for t in self._pokes if now - t < ANNOY_WINDOW] + [now]
+        n = len(self._pokes)
+        if n < GRUMPY_AT:
+            return False
+        self._cross_until = now + ANNOY_WINDOW
+        if n >= ANNOY_CLICKS:
+            self.fetch_bat()
+        else:
+            grumpy = (_("hey!"), _("quit it!"), _("stop poking!"), _("okay, that's it…"))
+            self.say = grumpy[min(n - GRUMPY_AT, len(grumpy) - 1)]
+            self._say_until = now + 1.2
+            self._joy_at = -1.0
+        return True
+
+    def fetch_bat(self):
+        """He storms off and comes back with a baseball bat, then sends `challenge`."""
+        self._pokes.clear()
+        self._act_kind, self._dared = "bat", False
+        self._act_t, self._blows = 0.0, 0
+        self.celebrate = False
+        self.say = ""
+
+    def calm_down(self):
+        """Back to how he was before the game (it closed)."""
+        self._pokes.clear()
+        self._act_t, self._act_kind, self._dared = -1.0, "build", False
+        self._cross_until = 0.0
+        self.prop, self.celebrate = self._home_prop, self._home_celebrate
+        self.say = ""
+
+    def _open_game(self):
+        from soundboard.ui import bunpong   # only ever needed once someone finds it
+        self.say = ""   # (his taunt would poke out from under the game)
+        bunpong.open_for(self)
 
     def _say(self, lines, secs: float):
         if lines:
@@ -182,26 +295,26 @@ class BunnyWidget(QWidget):
         """Start the building act (see the module docstring). Harmless if running."""
         if self.building:
             return
+        self._act_kind = "build"
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
-        self._wake()
 
     def stop_building(self, ok: bool):
         """End the act: celebrate if `ok`, otherwise go back to the usual pose."""
-        self._act_t = -1.0
+        self._act_t, self._act_kind = -1.0, "build"
         self.prop = "star" if ok else self._home_prop
         self.celebrate = ok or self._home_celebrate
         if ok:
             self.burst(8)
-        self._wake()
 
     def act_phase(self) -> str | None:
-        """'dash' (running off), 'cloud' (off screen), 'back', 'hammer', or None."""
+        """'dash' (running off), 'cloud' (off screen), 'back', then 'hammer' (building)
+        or 'bat' (the Pong dare), or None."""
         t = self._act_t
         if t < 0:
             return None
         return ("dash" if t < DASH_END else "cloud" if t < CLOUD_END else
-                "back" if t < BACK_END else "hammer")
+                "back" if t < BACK_END else "hammer" if self._act_kind == "build" else "bat")
 
     def _swing(self) -> float:
         """Hammer position, 0 (raised) .. 1 (on the plank): slow lift, fast strike."""
@@ -220,6 +333,8 @@ class BunnyWidget(QWidget):
 
     def hideEvent(self, ev):
         self._timer.stop()
+        if self._act_kind == "bat" and self.building:   # left the page mid-dare
+            self.calm_down()
         self._level = 0.0
         super().hideEvent(ev)
 
@@ -257,14 +372,21 @@ class BunnyWidget(QWidget):
                 self._puff(r.center().x() + self._rng.uniform(-18, 18),
                            r.center().y() + self._rng.uniform(-10, 18), 40, 9, 0.6)
         elif phase == "back" and before < CLOUD_END:
-            self.prop = "hammer"
+            self.prop = "hammer" if self._act_kind == "build" else "bat"
+        elif phase == "bat":
+            if before < BACK_END:
+                self.say = _("you want some?")
+                self._say_until = time.monotonic() + TAUNT + 0.6
+            elif not self._dared and self._act_t >= BACK_END + TAUNT:
+                self._dared = True
+                self.challenge.emit()
         elif phase == "hammer":
             blows = int((self._act_t - BACK_END) / SWING + 0.3)   # strikes at k = 0.7
             if blows > self._blows:   # just hit the plank: a puff of sawdust, a tink
                 self._blows = blows
                 x = r.left() + r.width() * 1.04    # where the hammer lands
                 y = r.top() + r.height() * 0.9
-                for _ in range(3):
+                for _i in range(3):
                     self._puff(x, y, 26, 4, 0.5)
                 if blows % 2 == 0:
                     n = _Note(x, y - 6, self._rng, 0.6)
@@ -286,18 +408,19 @@ class BunnyWidget(QWidget):
         self.puffs = [f for f in self.puffs if f.age < f.life]
         talking = self._level > TALK
         # mouth follows the voice with a quick attack and a flappy wobble
-        target = min(1.0, self._level * 4) if talking else 0.0
+        loud = loudness(self._level)
+        target = 0.3 + 0.7 * loud if talking else 0.0
         if talking:
             target *= 0.65 + 0.35 * abs(math.sin((now - self._t0) * 17))
         self._mouth += (target - self._mouth) * min(1.0, dt * (22 if target > self._mouth else 12))
-        hop = min(1.0, self._level * 5) * 6 if talking else 0.0
+        hop = (0.3 + 0.7 * loud) * 6 if talking else 0.0
         self._bounce += (hop - self._bounce) * min(1.0, dt * 10)
         # notes: a stream while talking, scaled by how loud
         if talking:
-            self._note_debt += dt * (2 + 10 * min(1.0, self._level * 3))
+            self._note_debt += dt * (2 + 10 * loud)
             while self._note_debt >= 1:
                 self._note_debt -= 1
-                self._spawn(min(1.0, self._level * 3))
+                self._spawn(max(0.3, loud))
         elif self.prop == "headphones":
             self._note_debt += dt * 0.7   # something's always playing in his headphones
             if self._note_debt >= 1:
@@ -318,43 +441,35 @@ class BunnyWidget(QWidget):
             self._flick_at = now
             self._next_flick = now + self._rng.uniform(4, 9)
         cheering = self._joy_at >= 0 and now - self._joy_at < 1.4
-        target = 0.0 if self._hopeful or cheering else self.sad
+        cross = now < self._cross_until or (self._act_kind == "bat" and self.building)
+        self._angry += (float(cross) - self._angry) * min(1.0, dt * (10 if cross else 2))
+        target = 0.0 if self._hopeful or cheering or cross else self.sad
         self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else 1.5))
         if self._sad > 0.3 and now >= self._next_sigh:
             self._sigh_at = now
             self._next_sigh = now + self._rng.uniform(5, 9)
         if self.say and now >= self._say_until:
             self.say = ""
-        if (self.lines and self._sad > 0.3 and not self.say and now >= self._next_beg
+        asleep = self.asleep
+        if asleep:   # Zs drift up and off to the side of his head, growing as they go
+            self._sad = 0.0
+            self._zzz_debt += dt
+            if self._zzz_debt >= ZZZ_EVERY:
+                self._zzz_debt = 0.0
+                r = self._bun_rect()
+                self.zzz.append([r.left() + r.width() * 0.74, r.top() + r.height() * 0.24, 0.0])
+        for z in self.zzz:   # (mostly sideways: there's more room beside him than above)
+            z[2] += dt
+            z[0] += dt * (17 + 7 * math.sin(z[2] * 3))
+            z[1] -= dt * 9
+        self.zzz = [z for z in self.zzz if z[2] < 2.4]
+        if (not asleep and self.lines and self._sad > 0.3 and not self.say
+                and now >= self._next_beg
                 and not (0 <= now - self._sigh_at < 1.6)):
             self._beg_at = now
             self._say(self.lines, BEG)
             self._next_beg = now + BEG + self._rng.uniform(3, 6)
         self.update()
-        want = FAST_MS if self.busy(now) else IDLE_MS
-        if self._timer.interval() != want:
-            self._timer.setInterval(want)
-
-    def busy(self, now: float | None = None) -> bool:
-        """Anything moving faster than the slow bob: talking, notes (not the headphones'
-        trickle), dust, the build act, a hop, a line in his bubble, sparkles, or a
-        blink / ear flick / sigh going on or due before the next idle frame."""
-        now = time.monotonic() if now is None else now
-        if (self._level > TALK or self._mouth > 0.01 or self._bounce > 0.1
-                or any(not n.calm for n in self.notes) or self.puffs or self.building
-                or self.say or self._hopeful or self.celebrate):
-            return True
-        target = 0.0 if self._joy_at >= 0 and now - self._joy_at < 1.4 else self.sad
-        if abs(target - self._sad) > 0.01:   # cheering up or settling back
-            return True
-        soon = now + IDLE_MS / 1000
-        if self._next_blink <= soon or self._next_flick <= soon:
-            return True
-        if self._sad > 0.3 and self._next_sigh <= soon:
-            return True
-        return any(at >= 0 and now - at < span for at, span in (
-            (self._blink_at, 0.16), (self._flick_at, 0.5), (self._sigh_at, 1.6),
-            (self._beg_at, BEG), (self._joy_at, 1.4)))
 
     def pose(self, now: float | None = None) -> dict:
         """Blink / mouth / ears / vertical offset for the current moment."""
@@ -403,8 +518,21 @@ class BunnyWidget(QWidget):
             swing = self._swing()
             dy += 1.5 * swing    # leans into each blow
             ears += 6 * swing
-        return {"blink": blink, "mouth": self._mouth, "ears": ears, "dy": dy,
-                "dx": dx, "swing": swing, "shown": shown, "sad": self._sad}
+        elif phase == "bat":     # taps the bat on his paw, glaring
+            swing = 0.18 * abs(math.sin((self._act_t - BACK_END) * 5))
+            ears -= 8
+        if self._angry > 0.05 and phase in (None, "bat"):   # a cross little shake
+            dx += 1.6 * self._angry * math.sin(t * 40)
+        mouth = self._mouth
+        if self.asleep:   # eyes shut, slow deep breaths, a little snoring "o"
+            blink = 1.0
+            breath = math.sin(t * 1.3)
+            dy = 1.8 * breath
+            ears = 22 + 4 * breath
+            mouth = 0.1 + 0.07 * max(0.0, breath)
+        return {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
+                "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
+                "angry": self._angry}
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -433,11 +561,23 @@ class BunnyWidget(QWidget):
         if pose["shown"]:
             draw_bunny(p, r.translated(pose["dx"], pose["dy"]), self.prop,
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
-                       swing=pose["swing"], sad=pose["sad"])
+                       swing=pose["swing"], sad=pose["sad"], angry=pose["angry"],
+                       nightcap=self.asleep)
         else:
             self._paint_scuffle(p)
         if self.say and pose["shown"]:
             self._bubble(p, self.say, r.translated(pose["dx"], pose["dy"]))
+        if self.zzz:
+            f = QFont(self.font())
+            f.setBold(True)
+            col = QColor(theme.T["text_hi"])
+            for x, y, age in self.zzz:
+                k = age / 2.4
+                f.setPixelSize(max(9, round(self.bun_h * (0.14 + 0.12 * k))))
+                p.setFont(f)
+                col.setAlphaF(min(1.0, age * 3) * (1 - k) ** 1.1 * 0.95)
+                p.setPen(col)
+                p.drawText(QPointF(x, y), "z" if k < 0.35 else "Z")
         for n in self.notes:
             k = n.age / n.life
             alpha = min(1.0, n.age * 6) * (1 - k) ** 1.4

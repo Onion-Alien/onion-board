@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
@@ -21,9 +21,34 @@ from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
 
+class RoundedFrame(QFrame):
+    """Clip a panel and its children to the same corners as the app's cards."""
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), 12, 12)
+        self.setMask(QRegion(path.toFillPolygon().toPolygon()))
+
+
 def section_label(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setObjectName("section")
+    return lbl
+
+
+def steady_number(lbl: QLabel, widest: str) -> QLabel:
+    """A number that changes in place (9% → 100%) keeps its width: same-width digits,
+    room for the widest value, right-aligned, so nothing beside it moves."""
+    lbl.ensurePolished()
+    f = lbl.font()
+    f.setFeature(QFont.Tag("tnum"), 1)
+    lbl.setFont(f)
+    text = lbl.text()
+    lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
+    lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
+    lbl.setText(text)
+    lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
     return lbl
 
 
@@ -229,6 +254,25 @@ class HoverCard(QFrame):
         super().leaveEvent(event)
 
 
+# the widest the Setup and Voice pages' cards get: on a full-screen window they
+# spread to half the screen each, every button and list a bar ~900 px long
+PAGE_MAX_W = 1180
+
+
+def capped(body: QWidget, outer: QWidget | None = None, *,
+           margins: tuple[int, int, int, int] = (0, 0, 0, 0)) -> QWidget:
+    """`body` no wider than PAGE_MAX_W, centred in `outer` (a new QWidget if None)."""
+    outer = outer if outer is not None else QWidget()
+    body.setMaximumWidth(PAGE_MAX_W)
+    h = QHBoxLayout(outer)
+    h.setContentsMargins(*margins)
+    h.setSpacing(0)
+    h.addStretch(1)
+    h.addWidget(body, 1000)   # takes everything up to its cap, the sides the rest
+    h.addStretch(1)
+    return outer
+
+
 def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFrame, QVBoxLayout]:
     """A titled card, the building block of the Voice and Setup pages."""
     f = QFrame()
@@ -313,7 +357,7 @@ class VolumeControl(QWidget):
         self.spin = _Pct()
         self.spin.setObjectName("pct")   # reads as plain text until hovered / typed in
         self.spin.setRange(0, typed_max)
-        self.spin.setSuffix(" %")
+        self.spin.setSuffix("%")
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
         self.spin.setAlignment(Qt.AlignRight)
         self.spin.setToolTip(_("Type an exact volume (0–{typed_max}%)", typed_max=typed_max))
@@ -364,24 +408,29 @@ class EqPanel(QWidget):
         pv = QVBoxLayout(self)
         pv.setContentsMargins(0, 0, 0, 0)
         pv.setSpacing(8)
-        pv.addWidget(section_label("EQUALIZER"))
+        pv.addWidget(section_label(_("Equalizer")))
         row = QHBoxLayout()
         self.chk_on = QCheckBox(_("EQ on"))
         self.chk_on.setChecked(enabled)
         row.addWidget(self.chk_on)
-        self.lbl_for = QLabel("for")
+        self.lbl_for = QLabel(_("for"))
         row.addWidget(self.lbl_for)
         self.cb_target = QComboBox()
-        for label, key in (("My voice", "voice"), ("My sounds", "sounds"), ("Both", "all")):
+        for label, key in ((_("My voice"), "voice"), (_("My sounds"), "sounds"),
+                           (_("Both"), "all")):
             self.cb_target.addItem(label, key)
         icons.set_item_icons(self.cb_target, ["mic", "volume", "wave"])
         self.cb_target.setCurrentIndex(max(0, self.cb_target.findData(target)))
-        row.addWidget(self.cb_target, 1)
+        row.addWidget(self.cb_target)
+        row.addStretch(1)
         pv.addLayout(row)
 
         self.cb_preset = QComboBox()
-        self.cb_preset.addItems(list(EQ_PRESETS))
-        self.cb_preset.addItem(_("Custom"))
+        # the item data is the preset's key, "Custom" for none; the keys are saved in
+        # config, so they keep their old dash and only the shown name drops it
+        for name in EQ_PRESETS:
+            self.cb_preset.addItem(name.replace(" — ", ": "), name)
+        self.cb_preset.addItem(_("Custom"), "Custom")
         pv.addWidget(self.cb_preset)
         no_wheel(self.cb_target, self.cb_preset)
 
@@ -415,10 +464,11 @@ class EqPanel(QWidget):
                                   "down to cut. Double-click the curve to reset.")))
 
         self._set_sliders(gains)
-        self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
+        self._show_preset(preset)
         self.chk_on.toggled.connect(lambda _on: self._emit())
         self.cb_target.currentIndexChanged.connect(lambda _i: self._emit())
-        self.cb_preset.currentTextChanged.connect(self._on_preset)
+        self.cb_preset.currentIndexChanged.connect(
+            lambda _i: self._on_preset(self.cb_preset.currentData()))
         self.curve.reset.connect(self._reset)
         self._refresh(emit=False)
 
@@ -430,7 +480,7 @@ class EqPanel(QWidget):
         """Load gains, turning the EQ on unless they're flat. Emits `changed`."""
         self._set_sliders(gains)
         self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
+        self._show_preset(preset)
         self.cb_preset.blockSignals(False)
         self.chk_on.blockSignals(True)
         self.chk_on.setChecked(any(abs(g) >= 0.05 for g in self.gains()))
@@ -439,9 +489,14 @@ class EqPanel(QWidget):
 
     def state(self) -> tuple[list[float], bool, str, str]:
         return (self.gains(), self.chk_on.isChecked(), self.cb_target.currentData(),
-                self.cb_preset.currentText())
+                self.cb_preset.currentData())
 
     # ---- internals
+    def _show_preset(self, preset: str):
+        """Select `preset` (a key of EQ_PRESETS) in the box, or Custom."""
+        key = preset if preset in EQ_PRESETS else "Custom"
+        self.cb_preset.setCurrentIndex(max(0, self.cb_preset.findData(key)))
+
     def _set_sliders(self, gains):
         # a damaged config can hand us anything: a band that isn't a finite number, or
         # a list of the wrong length, is flat (0 dB) instead of an error
@@ -462,7 +517,7 @@ class EqPanel(QWidget):
     def _on_slider(self, _v):
         self._refresh_labels()
         self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText("Custom")
+        self._show_preset("Custom")
         self.cb_preset.blockSignals(False)
         if not self.chk_on.isChecked():
             self.chk_on.setChecked(True)   # touching the EQ means you want it on (emits)
@@ -472,7 +527,7 @@ class EqPanel(QWidget):
     def _reset(self):
         """Double-click on the curve: flat and off, even if it already says Flat."""
         self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText("Flat (off)")
+        self._show_preset("Flat (off)")
         self.cb_preset.blockSignals(False)
         self._on_preset("Flat (off)")
 
@@ -508,7 +563,7 @@ class UndoBar(QFrame):
     dismissed, or showing something else calls `done` (if given) instead."""
     SECONDS = 10
 
-    def __init__(self, tip: str = "Put it back, exactly as it was"):
+    def __init__(self, tip: str = ""):
         super().__init__()
         from PySide6.QtCore import QTimer
         from PySide6.QtWidgets import QPushButton
@@ -520,7 +575,7 @@ class UndoBar(QFrame):
         h.addWidget(self.label, 1)
         self.btn_undo = QPushButton(_("Undo"))
         self.btn_undo.setObjectName("primary")
-        self.btn_undo.setToolTip(tip)
+        self.btn_undo.setToolTip(tip or _("Put it back, exactly as it was"))
         self.btn_undo.clicked.connect(self.undo)
         h.addWidget(self.btn_undo)
         dismiss = QPushButton()

@@ -474,6 +474,31 @@ def test_a_listing_that_finishes_after_the_panel_is_gone_is_dropped(qapp, monkey
     lister.stop()
 
 
+def test_stop_waits_out_a_listing_being_handed_over(qapp):
+    """The worker mid-way through handing a listing over when the tab goes: stop()
+    waits for it, and nothing is handed over after (the object may be freed next)."""
+    import threading
+    import time
+    lister = appspanel._Lister()
+    inside, release, sent = threading.Event(), threading.Event(), []
+
+    def slow_emit(x):
+        inside.set()
+        release.wait(5)
+        sent.append(x)
+    lister.ready = type("Ready", (), {"emit": staticmethod(slow_emit)})()
+    t = threading.Thread(target=lister._listed, args=([music()], {}))
+    t.start()
+    assert inside.wait(5)
+    threading.Timer(0.2, release.set).start()
+    t0 = time.monotonic()
+    lister.stop()
+    assert time.monotonic() - t0 > 0.15 and len(sent) == 1
+    lister._listed([music()], {})
+    t.join(5)
+    assert len(sent) == 1
+
+
 def test_lister_takes_the_list_from_the_level_watcher_while_it_runs(qapp, monkeypatch):
     def walked(**_):
         raise AssertionError("listed again on a thread of its own")
@@ -503,6 +528,92 @@ def test_a_listing_failure_skips_the_update(qapp, monkeypatch):
     qapp.processEvents()
     assert got == [] and not lister._busy
     lister.stop()
+
+
+def _wait(qapp, until, timeout=3.0):
+    import time
+    end = time.monotonic() + timeout
+    while not until() and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.01)
+    return until()
+
+
+def test_lister_uses_one_worker_thread_for_every_listing(qapp, monkeypatch):
+    """It started a new thread for each listing: 720 an hour in the tray."""
+    import threading
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: [music()])
+    got = []
+    lister = appspanel._Lister()
+    lister.ready.connect(got.append)
+    for n in range(1, 4):
+        lister.refresh()
+        assert _wait(qapp, lambda n=n: len(got) == n and not lister._busy)
+    workers = [t for t in threading.enumerate() if t.name == "applist"]
+    assert lister._thread in workers and lister._thread.is_alive()
+    first = lister._thread
+    lister.refresh()
+    assert _wait(qapp, lambda: len(got) == 4)
+    assert lister._thread is first
+    lister.stop()
+    first.join(2)
+    assert not first.is_alive()                  # stop() ends it
+
+
+def test_hidden_tab_lists_programs_only_when_one_it_watches_starts_or_closes(qapp, monkeypatch):
+    """Hidden, a 5 s check walks only the processes (~4 ms) and lists the programs
+    (~20 ms) when one of the tab's started or closed, one not picked up yet runs, or
+    HIDDEN_FULL_S went by."""
+    import time
+    procs = {1: "explorer.exe", 100: "music.exe"}
+    monkeypatch.setattr(appaudio, "running", lambda: dict(procs))
+    lister = appspanel._Lister()
+    watch = frozenset({"music.exe", "chat.exe"})
+    assert lister._due(watch, frozenset())         # the first look: listed
+    lister._listed_at = time.monotonic()
+    assert not lister._due(watch, frozenset())     # nothing changed: only the walk
+    procs[7] = "game.exe"
+    assert not lister._due(watch, frozenset())     # not one of the tab's programs
+    procs[200] = "chat.exe"
+    assert lister._due(watch, frozenset())         # a watched one started
+    assert not lister._due(watch, frozenset())
+    assert lister._due(watch, frozenset({"chat.exe"}))   # remembered, not picked up yet
+    del procs[100]
+    assert lister._due(watch, frozenset())         # one closed
+    assert not lister._due(watch, frozenset())
+    lister._listed_at = time.monotonic() - appspanel.HIDDEN_FULL_S
+    assert lister._due(watch, frozenset())         # now and then anyway
+    lister.stop()
+
+
+def test_hidden_tab_picks_up_a_remembered_program_on_the_next_check(tab, qapp, monkeypatch):
+    """The feature the hidden re-read is for: a remembered program that starts is
+    sent again within one check, with the cheap process walk in between."""
+    procs = {1: "explorer.exe"}
+    listed = []
+    monkeypatch.setattr(appaudio, "running", lambda: dict(procs))
+    monkeypatch.setattr(appaudio, "list_apps",
+                        lambda strict=False, **_: (listed.append(1),
+                                                   [music()] if 100 in procs else [])[1])
+    tab.peaks.stop()
+    tab._on_apps([music()])
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    tab._on_apps([])                               # it closed: still remembered
+    assert tab.rows["music.exe"].app is None
+    tab.hide()
+
+    def check():
+        n = len(listed)
+        tab._refresh()
+        _wait(qapp, lambda: not tab.lister._busy)
+        qapp.processEvents()
+        return len(listed) - n
+    check()                                        # the first look lists them
+    assert check() == 0                            # nothing new: no listing
+    procs[100] = "music.exe"                       # it starts again
+    assert check() == 1
+    assert tab.rows["music.exe"].sending and tab.rows["music.exe"].app is not None
+    assert check() == 0                            # picked up: back to the walk only
 
 
 def test_record_waits_for_sound_then_adds_a_clip_without_sending(tab, monkeypatch, tmp_path):
@@ -749,3 +860,53 @@ def test_card_buttons_say_which_program_they_are_for(qapp):
     assert row.btn_rec.accessibleName() == f"Record {name}"
     assert row.btn_forget.accessibleName() == f"Forget {name}"
     assert row.btn_clip.accessibleName() == f"Clip editor for {name}"
+
+
+def test_effects_and_card_size_wait_for_a_program(tab, qapp):
+    """Over the empty page the effects button and the card-size slider are hidden:
+    nothing to apply them to."""
+    assert tab.fx_btn.isHidden() and tab.card_size.isHidden() and tab.size_label.isHidden()
+
+
+def test_a_listing_makes_its_cards_one_go_at_a_time(tab, qapp):
+    """Making every card at once on the first look at the tab held up the audio long
+    enough to skip a sound: a listing makes NEW_CARDS, the rest follow just after; a
+    newer listing takes over from one still going."""
+    import time
+    apps = [App(100 + i, f"player{i}.exe") for i in range(4)]
+    tab._on_listed((apps, None))
+    assert len(tab.rows) == appspanel.NEW_CARDS < len(apps)
+    end = time.monotonic() + 2
+    while len(tab.rows) < len(apps) and time.monotonic() < end:
+        qapp.processEvents()
+    assert set(tab.rows) == {f"player{i}.exe" for i in range(4)}
+    more = apps[:1] + [App(200 + i, f"other{i}.exe") for i in range(3)]
+    tab._on_listed((more, None))
+    tab._on_listed((apps[:1], None))   # the others closed before their cards were made
+    end = time.monotonic() + 0.3
+    while time.monotonic() < end:
+        qapp.processEvents()
+    assert set(tab.rows) == {"player0.exe"}
+
+
+def test_program_icons_are_read_off_the_ui_thread(tab, monkeypatch):
+    """The shell's icon lookup held the GIL on the UI thread (10-70 ms a program): the
+    listing's thread reads them now, and a card only shows what was read."""
+    from PySide6.QtGui import QImage
+
+    from soundboard import exeicon
+    read = []
+
+    def load(paths):
+        for p in paths:
+            read.append(p)
+            img = QImage(32, 32, QImage.Format_ARGB32)
+            img.fill(0xFF00FF00)
+            exeicon._cache[p] = img
+    monkeypatch.setattr(exeicon, "load", load)
+    monkeypatch.setattr(exeicon, "_cache", {})
+    tab.lister._listed([music()], None)
+    assert read == [r"C:\Programs\music.exe"]
+    tab._on_apps([music()])
+    pm = tab.rows["music.exe"].icon.pixmap()
+    assert not pm.isNull() and pm.toImage().pixelColor(12, 12).green() == 255

@@ -22,6 +22,8 @@ import re
 from dataclasses import dataclass
 from urllib.parse import quote
 
+from soundboard.i18n import _
+
 log = logging.getLogger(__name__)
 
 OUR_PACKAGES = ("soundboard", "onionwatch", "__main__")
@@ -83,78 +85,100 @@ def _scrub(text: str) -> str:
 
 # -- known messages --------------------------------------------------------------
 
-# (pattern on the cleaned message, plain words). First match wins.
-_DOWNLOADER = [
-    (r"private video|video is private", "That video is private."),
-    (r"confirm your age|age.restricted|inappropriate for some users",
-     "That video is age-restricted, so it can't be downloaded without signing in."),
-    (r"not a bot|confirm you.?re not", "The site wants to check you're not a robot. It "
-     "does that to an internet address it's had a lot of requests from (a VPN or a "
-     "shared network can be one). Waiting a while usually clears it."),
-    (r"members.only|join this channel", "That's a members-only video."),
-    (r"premieres in|live event will begin|this live event", "That video hasn't started yet."),
-    (r"copyright", "That video was taken down over a copyright claim."),
-    (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
-     "That video is blocked in your country."),
-    (r"video unavailable|not available|has been removed|no longer available|"
-     r"account .* terminated|does not exist", "That video isn't available any more."),
-    (r"requested format is not available|no video formats|no formats found",
-     "There's no sound to download at that link."),
-    (r"unsupported url", "That link isn't from a site sounds can be added from."),
-    (r"http error 404|not found", "Nothing was found at that link (404)."),
-    (r"http error 429|too many requests", "The site is turning down too many requests. "
-     "Try again in a few minutes."),
-    (r"http error 403|forbidden", "The site refused the download (403)."),
-    (r"http error 5\d\d", "The site is having trouble right now. Try again later."),
-    (r"timed? ?out", "The connection timed out. Check your internet and try again."),
-    (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
-     r"aborted)|network is unreachable|no route to host|urlopen error",
-     "Couldn't reach the site. Check your internet connection."),
-    (r"sign in|login required|logged.in|cookies", "That needs signing in to the site, "
-     "which Onion Board doesn't do."),
-]
+# (pattern on the cleaned message, plain words). First match wins. Functions, not
+# tables: this module is imported before the language is picked (app.main), so the
+# words are translated when they're used.
+def _downloader() -> list[tuple[str, str]]:
+    return [
+        (r"private video|video is private", _("That video is private.")),
+        (r"confirm your age|age.restricted|inappropriate for some users",
+         _("That video is age-restricted, so it can't be downloaded without signing in.")),
+        (r"not a bot|confirm you.?re not", _(
+            "The site wants to check you're not a robot. It does that to an internet "
+            "address it's had a lot of requests from (a VPN or a shared network can be "
+            "one). Waiting a while usually clears it.")),
+        (r"members.only|join this channel", _("That's a members-only video.")),
+        (r"premieres in|live event will begin|this live event",
+         _("That video hasn't started yet.")),
+        (r"copyright", _("That video was taken down over a copyright claim.")),
+        (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
+         _("That video is blocked in your country.")),
+        (r"video (?:is )?unavailable|not available|has been removed|no longer available|"
+         r"account .* terminated|does not exist", _("That video isn't available any more.")),
+        (r"requested format is not available|no video formats|no formats found",
+         _("There's no sound to download at that link.")),
+        (r"unsupported url", _("That link isn't from a site sounds can be added from.")),
+        (r"http error 404|not found", _("Nothing was found at that link (404).")),
+        (r"http error 429|too many requests",
+         _("The site is turning down too many requests. Try again in a few minutes.")),
+        (r"http error 403|forbidden", _("The site refused the download (403).")),
+        (r"http error 5\d\d", _("The site is having trouble right now. Try again later.")),
+        (r"timed? ?out", _("The connection timed out. Check your internet and try again.")),
+        (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
+         r"aborted)|network is unreachable|no route to host|urlopen error",
+         _("Couldn't reach the site. Check your internet connection.")),
+        (r"sign in|login required|logged.in|cookies",
+         _("That needs signing in to the site, which Onion Board doesn't do.")),
+    ]
 
-_AUDIO_FILE = [
-    (r"format not recognised|unknown format|not a valid|unsupported|file contains data",
-     "It isn't a sound file that can be read, or it's damaged."),
-    (r"system error|no such file", "The file couldn't be opened."),
-]
 
-_AUDIO_DEVICE = [
-    (r"invalid sample rate", "That audio device doesn't support the sample rate needed."),
-    (r"invalid device|device unavailable|-9985|-9996", "That audio device isn't available "
-     "(unplugged, or another app has it to itself)."),
-    (r"unanticipated host error|-9999", "Windows' audio system refused (another app may "
-     "have the device to itself)."),
-    (r"invalid number of channels", "That audio device doesn't support that many channels."),
-]
+def _audio_file() -> list[tuple[str, str]]:
+    return [
+        (r"format not recognised|unknown format|not a valid|unsupported|file contains data",
+         _("It isn't a sound file that can be read, or it's damaged.")),
+        (r"system error|no such file", _("The file couldn't be opened.")),
+    ]
 
-_WINERR = {
-    2: "The file isn't there any more.",
-    3: "The folder isn't there any more.",
-    5: "Windows denied access (the file may be read-only, or an antivirus blocked it).",
-    32: "Another program is using that file. Close it and try again.",
-    33: "Another program is using that file. Close it and try again.",
-    112: "The disk is full.",
-    206: "The file's path is too long.",
-    1223: "It was cancelled.",
-    1392: "The file is damaged and can't be read.",
-    10054: "The connection was dropped.",
-    10060: "The connection timed out. Check your internet and try again.",
-    10061: "The connection was refused.",
-    11001: "Couldn't reach the internet (the address couldn't be looked up).",
-}
 
-_ERRNO = {
-    errno.ENOENT: "The file isn't there any more.",
-    errno.EACCES: _WINERR[5],
-    errno.EPERM: _WINERR[5],
-    errno.ENOSPC: "The disk is full.",
-    errno.ENAMETOOLONG: "The file's path is too long.",
-    errno.EEXIST: "Something with that name is already there.",
-    errno.EISDIR: "That's a folder, not a file.",
-    errno.EROFS: "That drive is read-only.",
-}
+def _audio_device() -> list[tuple[str, str]]:
+    return [
+        (r"invalid sample rate",
+         _("That audio device doesn't support the sample rate needed.")),
+        (r"invalid device|device unavailable|-9985|-9996", _(
+            "That audio device isn't available (unplugged, or another app has it to "
+            "itself).")),
+        (r"unanticipated host error|-9999", _(
+            "Windows' audio system refused (another app may have the device to itself).")),
+        (r"invalid number of channels",
+         _("That audio device doesn't support that many channels.")),
+    ]
+
+
+def _winerr(code: int) -> str:
+    """Plain words for a Windows error number, or ""."""
+    if code in (32, 33):
+        return _("Another program is using that file. Close it and try again.")
+    return {
+        2: _("The file isn't there any more."),
+        3: _("The folder isn't there any more."),
+        5: _("Windows denied access (the file may be read-only, or an antivirus "
+             "blocked it)."),
+        112: _("The disk is full."),
+        206: _("The file's path is too long."),
+        448: _("Windows won't follow a folder link (a junction or a drive mounted as a "
+               "folder) on the way to that file. Copy the file to a normal folder and "
+               "try again."),
+        1223: _("It was cancelled."),
+        1392: _("The file is damaged and can't be read."),
+        10054: _("The connection was dropped."),
+        10060: _("The connection timed out. Check your internet and try again."),
+        10061: _("The connection was refused."),
+        11001: _("Couldn't reach the internet (the address couldn't be looked up)."),
+    }.get(code, "")
+
+
+def _errno(code: int) -> str:
+    """Plain words for an errno, or ""."""
+    if code in (errno.EACCES, errno.EPERM):
+        return _winerr(5)
+    return {
+        errno.ENOENT: _("The file isn't there any more."),
+        errno.ENOSPC: _("The disk is full."),
+        errno.ENAMETOOLONG: _("The file's path is too long."),
+        errno.EEXIST: _("Something with that name is already there."),
+        errno.EISDIR: _("That's a folder, not a file."),
+        errno.EROFS: _("That drive is read-only."),
+    }.get(code, "")
 
 
 def _match(table, text: str) -> str:
@@ -176,16 +200,23 @@ def _os_error(e: OSError) -> str:
     import socket
     import ssl
     if isinstance(e, ssl.SSLError):
-        return "The secure connection failed."
+        return _("The secure connection failed.")
     if isinstance(e, socket.gaierror):
-        return _WINERR[11001]
+        return _winerr(11001)
     if isinstance(e, TimeoutError):
-        return _WINERR[10060]
-    words = _WINERR.get(getattr(e, "winerror", None) or 0) or _ERRNO.get(e.errno or 0, "")
+        return _winerr(10060)
+    if getattr(e, "winerror", None) == 448 and e.filename:
+        from soundboard import winpath
+        if (link := winpath.first_link(e.filename)) is not None:
+            return _("Windows won't follow the folder link “{link}” (it points to "
+                     "“{target}”). Copy the file to a normal folder (like Desktop) and try "
+                     "again, or make that folder a real folder instead of a link.",
+                     link=link[0], target=link[1])
+    words = _winerr(getattr(e, "winerror", None) or 0) or _errno(e.errno or 0)
     if words:
         return words
     if isinstance(e, ConnectionError):
-        return "The connection was refused or dropped."
+        return _("The connection was refused or dropped.")
     if e.errno is None and not getattr(e, "winerror", None):
         return clean(str(e))   # an OSError("…") with our own message
     return clean(e.strerror or str(e))
@@ -221,10 +252,11 @@ def _logged(p: Problem) -> bool:
 
 def _describe(e: BaseException | str | None, downloader: bool) -> Problem:
     if e is None:
-        return Problem("Something went wrong.")
+        return Problem(_("Something went wrong."))
     if isinstance(e, str):
         text = clean(e)
-        return Problem(text or "Something went wrong.", _scrub(e), _upstream_wants_report(e))
+        return Problem(text or _("Something went wrong."), _scrub(e),
+                       _upstream_wants_report(e))
     raw = str(e)
     detail = _scrub(f"{type(e).__module__}.{type(e).__name__}: {raw}")
     known = getattr(e, "problem", None)   # already described where it was raised
@@ -234,48 +266,51 @@ def _describe(e: BaseException | str | None, downloader: bool) -> Problem:
     cleaned = clean(raw)
     if _ours(e) and not downloader:
         # our own messages are written for people; ours to report only if asked
-        return Problem(cleaned or "Something went wrong.", detail,
+        return Problem(cleaned or _("Something went wrong."), detail,
                        bool(getattr(e, "reportable", False)))
     if downloader or mod.startswith("yt_dlp"):
-        words = _match(_DOWNLOADER, cleaned)
+        words = _match(_downloader(), cleaned)
         if words:
             return Problem(words, detail)
-        return Problem(f"The downloader ran into a problem: {_short(cleaned)}" if cleaned
-                       else "The downloader ran into a problem.", detail, True)
+        return Problem(_("The downloader ran into a problem: {error}", error=_short(cleaned))
+                       if cleaned else _("The downloader ran into a problem."), detail, True)
     if mod.startswith("soundfile") or "libsndfile" in raw or raw.startswith("Error opening"):
-        return Problem(_match(_AUDIO_FILE, cleaned)
-                       or "It isn't a sound file that can be read, or it's damaged.", detail)
+        return Problem(_match(_audio_file(), cleaned)
+                       or _("It isn't a sound file that can be read, or it's damaged."),
+                       detail)
     if mod.startswith("sounddevice") or "PaErrorCode" in raw:
-        words = _match(_AUDIO_DEVICE, cleaned)
-        return Problem(words or "The audio device reported a problem.", detail, not words)
+        words = _match(_audio_device(), cleaned)
+        return Problem(words or _("The audio device reported a problem."), detail, not words)
     import json
     import urllib.error
     import zipfile
     if isinstance(e, urllib.error.HTTPError):
-        return Problem(_match(_DOWNLOADER, f"http error {e.code}")
-                       or f"The server answered with an error ({e.code}).", detail)
+        return Problem(_match(_downloader(), f"http error {e.code}")
+                       or _("The server answered with an error ({code}).", code=e.code),
+                       detail)
     if isinstance(e, urllib.error.URLError):
         reason = e.reason
         return (describe(reason) if isinstance(reason, BaseException) else
-                Problem("Couldn't reach the server. Check your internet connection.", detail))
+                Problem(_("Couldn't reach the server. Check your internet connection."),
+                        detail))
     if isinstance(e, OSError):
-        return Problem(_os_error(e) or "Windows reported a problem.", detail)
+        return Problem(_os_error(e) or _("Windows reported a problem."), detail)
     if isinstance(e, zipfile.BadZipFile):
-        return Problem("It isn't a zip file, or it's damaged.", detail)
+        return Problem(_("It isn't a zip file, or it's damaged."), detail)
     if isinstance(e, json.JSONDecodeError):
-        return Problem("The file is damaged (it couldn't be read).", detail)
+        return Problem(_("The file is damaged (it couldn't be read)."), detail)
     if isinstance(e, UnicodeError):
-        return Problem("The file has text in a format that couldn't be read.", detail)
+        return Problem(_("The file has text in a format that couldn't be read."), detail)
     if isinstance(e, MemoryError):
-        return Problem("Ran out of memory. Close some programs and try again.", detail)
+        return Problem(_("Ran out of memory. Close some programs and try again."), detail)
     if isinstance(e, (TypeError, KeyError, AttributeError, IndexError, NameError,
                       AssertionError, ZeroDivisionError)):
-        return Problem("Something went wrong inside Onion Board.", detail, True)
+        return Problem(_("Something went wrong inside Onion Board."), detail, True)
     if mod in ("builtins", "") and isinstance(e, (RuntimeError, ValueError)) and cleaned:
         # raised with a sentence (often by our own code): keep it, minus any noise
         return Problem(cleaned, detail, _upstream_wants_report(raw))
-    return Problem(f"Something unexpected went wrong ({_short(cleaned)})." if cleaned
-                   else f"Something unexpected went wrong ({type(e).__name__}).", detail, True)
+    return Problem(_("Something unexpected went wrong ({error}).",
+                     error=_short(cleaned) if cleaned else type(e).__name__), detail, True)
 
 
 def plain(e: BaseException | str | None) -> str:
@@ -314,7 +349,7 @@ def report_link(p: Problem, where: str = "") -> str:
     showing it needs `linkify(label)`."""
     if not p.reportable:
         return ""
-    return f" <a href=\"{report_url(p, where)}\">Report it</a>"
+    return " " + _("<a href=\"{url}\">Report it</a>", url=report_url(p, where))
 
 
 def html(e: BaseException | str | None, before: str = "", where: str = "") -> str:
@@ -346,10 +381,11 @@ def warn(parent, title: str, e: BaseException | str | None, before: str = "",
         QMessageBox.warning(parent, title, text)
         return
     box = QMessageBox(QMessageBox.Icon.Warning, title,
-                      text + "\n\nThis looks like a problem in Onion Board. Reporting it "
-                      "opens a page on our GitHub with the details filled in; you choose "
-                      "what to send.", QMessageBox.StandardButton.NoButton, parent)
-    report = box.addButton("Report it", QMessageBox.ButtonRole.HelpRole)
+                      text + "\n\n" + _(
+                          "This looks like a problem in Onion Board. Reporting it opens a "
+                          "page on our GitHub with the details filled in; you choose what "
+                          "to send."), QMessageBox.StandardButton.NoButton, parent)
+    report = box.addButton(_("Report it"), QMessageBox.ButtonRole.HelpRole)
     box.addButton(QMessageBox.StandardButton.Close)
     box.exec()
     if box.clickedButton() is report:

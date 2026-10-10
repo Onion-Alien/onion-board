@@ -64,6 +64,8 @@ from pathlib import Path
 
 import numpy as np
 
+from soundboard.i18n import _
+
 log = logging.getLogger(__name__)
 
 FLAG = "--direct-mic"
@@ -85,7 +87,10 @@ LEAD_S = 0.02               # how far behind the board the effect reads (its add
 BLOCK = 480                 # frames rendered per engine call (10 ms)
 ALIVE_MS = 250              # effect heard from this recently: it's running
 MIC_LIVE_MS = 150           # the clean mic arrived this recently: the board runs on it
-POLL_S = 0.002
+POLL_S = 0.002              # how often the feed looks while a block is due (or overdue)
+EARLY_S = 0.002             # the feed itself takes the mic: it looks again this long before
+                            # the next block is due (blocks come a bit early now and then)
+BLOCK_S = BLOCK / RATE
 OTHER_BOARD_MS = 1000       # another board wrote this recently: it's still running
 
 HEAD = np.dtype({
@@ -112,11 +117,17 @@ CAPTURE_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Captur
 FX = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},%d"   # PKEY_FX_* / PKEY_CompositeFX_*
 # On a recording device Windows runs the effects in front of each app's stream: SFX (or
 # LFX on drivers that only know the old kind), after the device's own EFX if it has one.
+# An app asking for a raw stream (Chrome and Edge whenever the mic offers raw, Discord's
+# Studio profile) skips SFX/MFX but not EFX, the endpoint's always-on effect: one copy
+# for every app recording the mic. So the effect goes in EFX.
 LFX, GFX, SFX, MFX, EFX = 1, 2, 5, 6, 7
-SLOTS_FX = {"sfx": SFX, "lfx": LFX}                 # where the effect goes on a mic
+SLOTS_FX = {"sfx": SFX, "lfx": LFX, "efx": EFX}     # where the effect goes on a mic
 MODERN = (SFX, MFX, EFX)
 LEGACY = (LFX, GFX)
 COMPOSITE_SFX = 13                                  # PKEY_CompositeFX_StreamEffectClsid
+COMPOSITE_EFX = 15                                  # PKEY_CompositeFX_EndpointEffectClsid
+ENDPOINT_SLOTS = (EFX, COMPOSITE_EFX)               # raw streams get these too
+OUR_SLOTS = (SFX, LFX, COMPOSITE_SFX, EFX, COMPOSITE_EFX)
 DISABLE_SYSFX = "{1da5d803-d492-4edd-8c23-e0c0ffee7f0e},5"   # "Audio enhancements: off"
 MODES_KEY = "{d3993a3f-99c2-4402-b5ec-a92a0367664b},%d"     # PKEY_*_ProcessingModes_...
 MODE_DEFAULT = "{C18E2F7E-933D-4965-B7D1-1EEF228D2AF3}"     # AUDIO_SIGNALPROCESSINGMODE_DEFAULT
@@ -170,18 +181,27 @@ def new_ring_bytes() -> bytes:
     return head.tobytes() + bytes(FILE_BYTES - HEAD.itemsize)
 
 
+def make_ring_ok(path: Path) -> bool:
+    """The ring file at `path` is there and this version's layout."""
+    try:
+        if not (path.is_file() and path.stat().st_size == FILE_BYTES):
+            return False
+        with open(path, "rb") as f:
+            head = np.frombuffer(f.read(HEAD.itemsize), HEAD)[0]
+    except (OSError, ValueError):
+        return False
+    return bool(head["magic"] == MAGIC and head["version"] == VERSION
+                and head["capacity"] == CAPACITY and head["mic_capacity"] == MIC_CAPACITY)
+
+
 def make_ring(path: Path | None = None) -> bool:
     """Create the ring file if it isn't there (or is another version's). The folder
     lets signed-in users write, so the board can do this without admin. True if it's
     usable now."""
     path = Path(path or ring_path())
     try:
-        if path.is_file() and path.stat().st_size == FILE_BYTES:
-            with open(path, "rb") as f:
-                head = np.frombuffer(f.read(HEAD.itemsize), HEAD)[0]
-            if head["magic"] == MAGIC and head["version"] == VERSION \
-                    and head["capacity"] == CAPACITY and head["mic_capacity"] == MIC_CAPACITY:
-                return True
+        if make_ring_ok(path):
+            return True
         tmp = path.with_suffix(".new")
         tmp.write_bytes(new_ring_bytes())
         os.replace(tmp, path)   # a effect still mapping the old one keeps its own copy
@@ -284,8 +304,8 @@ class RingWriter:
         pid, me = int(self._get("board_pid")), os.getpid()
         if pid and pid != me and self._get("enabled") \
                 and _tick() - int(self._btick[0]) < OTHER_BOARD_MS and _pid_alive(pid):
-            raise RuntimeError("Another Onion Board is already sending into your mic. "
-                               "Close it, and this one takes over.")
+            raise RuntimeError(_("Another Onion Board is already sending into your mic. "
+                                 "Close it, and this one takes over."))
         self._set("board_pid", me)
 
     def set_enabled(self, on: bool):
@@ -375,10 +395,13 @@ class DirectMicStream:
     effect. Each stretch of clean mic the effect publishes is handed to `mic_callback`
     (frames x 2, rate) and the same stretch of the board's output is rendered with
     `callback` (the engine's) and written into the ring, downmixed to mono (voice chat
-    is mono anyway). That's a thread polling every POLL_S, plus `pump()` from the
-    board's own mic callback, which fires right after the effect ran on its block.
-    Without the effect (nobody records the mic) the thread keeps time itself, so
-    sounds still play at the right speed."""
+    is mono anyway). That's a thread, plus `pump()` from the board's own mic callback,
+    which fires right after the effect ran on its block. The thread sleeps until the
+    next block is due (it used to look every POLL_S, 500 times a second): when it
+    takes the mic itself, it looks every POLL_S from just before then; when the mic
+    callback takes it, the thread only steps in if that's late. Without the effect
+    (nobody records the mic) the thread keeps time itself, a whole block at a time,
+    so sounds still play at the right speed."""
 
     samplerate = RATE
 
@@ -412,6 +435,13 @@ class DirectMicStream:
         self._start = time.perf_counter()
         self._made = 0
         self._buf = np.zeros((BLOCK, 2), np.float32)
+        # when the thread looks next (see _wait): the last clean mic taken (perf_counter),
+        # how long a block of it lasts, and whether the thread took it (or the mic
+        # callback did); on its own clock, when the next whole block is due
+        self._fed_at: float | None = None
+        self._fed_period = BLOCK_S
+        self._fed_here = True
+        self._due_at: float | None = None
 
     def start(self):
         self._ring.set_enabled(True)
@@ -507,6 +537,10 @@ class DirectMicStream:
                 return
             x = ring.read_mic(self._mic_pos, gap)
             self._mic_pos = wp
+            # (never counted as more than a block: after a hiccup two can come at once,
+            # and the next one is still only a block away)
+            self._fed_at, self._fed_period = time.perf_counter(), min(gap / rate, BLOCK_S)
+            self._fed_here = threading.current_thread() is self._thread
             if self._mic_callback is not None:
                 self._mic_callback(x, rate)
             self._acc += gap * RATE / rate
@@ -518,23 +552,47 @@ class DirectMicStream:
             return
         if self.mic_live:   # the mic stopped: keep time from here on our own
             self.mic_live = False
+            self._fed_at = None
             ring.clear_sync()
             self._start, self._made = time.perf_counter(), 0
         due = int((time.perf_counter() - self._start) * RATE)
         if due - self._made > RATE // 5:   # stalled (sleep, a hang): don't catch up
             self._made = due - BLOCK
         need = due - self._made
+        if ring.effect_alive(now):
+            # the effect reads the ring on its own clock (no clean mic from it): keep
+            # the ring as full as it can be, in small steps
+            self._due_at = None
+        else:
+            # nobody listens: render whole blocks as they come due, and sleep between
+            need -= need % BLOCK
+            self._due_at = self._start + (self._made + need + BLOCK) / RATE
         if need > 0:
             self._made += need
             self._render(need)
         else:
             ring.heartbeat()
 
+    def _wait(self) -> float:
+        """How long the thread sleeps before it looks again."""
+        now = time.perf_counter()
+        if self.mic_live:
+            if self._fed_at is None:
+                return POLL_S
+            # the thread takes the mic: look from just before the next block is due.
+            # The mic callback does: step in only if it's late with the next one.
+            nxt = self._fed_at + self._fed_period + (-EARLY_S if self._fed_here else POLL_S)
+        elif self._due_at is not None:
+            nxt = self._due_at
+        else:
+            return POLL_S
+        return min(max(nxt - now, POLL_S if self.mic_live else 0.0005), BLOCK_S + POLL_S)
+
     def _run(self):
         try:
             while not self._stop.is_set():
                 self.pump()
-                time.sleep(POLL_S)
+                time.sleep(self._wait())
         except Exception:  # noqa: BLE001 - the engine's watchdog reopens a stalled stream
             log.exception("mic effect feed stopped")
 
@@ -596,10 +654,9 @@ def endpoint_for(name: str | None) -> str | None:
     for e in active:
         if e["name"] == name:
             return e["guid"]
-    for e in active:
-        if e["name"].startswith(name) or name.startswith(e["name"]):
-            return e["guid"]
-    return None
+    near = [e for e in active if e["name"].startswith(name) or name.startswith(e["name"])]
+    # one mic only: two that start the same (a cut-short name) could be the wrong one
+    return near[0]["guid"] if len(near) == 1 else None
 
 
 def _value(key, name):
@@ -628,11 +685,16 @@ def installed_on() -> list[str]:
 
 
 _status_cache: dict = {}
+_status_gen = [0]          # forget_status() bumps it: a refresh started before is dropped
+_status_busy: set = set()  # mic names being re-checked on a thread
+_status_lock = threading.Lock()
 STATUS_S = 2.0
 
 
 def forget_status():
-    _status_cache.clear()
+    with _status_lock:
+        _status_cache.clear()
+        _status_gen[0] += 1
 
 
 def status(mic_name: str | None = None) -> str:
@@ -642,15 +704,44 @@ def status(mic_name: str | None = None) -> str:
       'wiped'     attached, but Windows (a driver or Windows update) took the effect off
       'outdated'  attached, but with another version of the effect than this app's
       'ready'     attached and working
-    'wiped' and 'outdated' need the one-click repair (attaching again). Cached for
-    STATUS_S."""
-    hit = _status_cache.get(mic_name)
-    now = time.monotonic()
-    if hit and now - hit[0] < STATUS_S:
-        return hit[1]
+    'wiped' and 'outdated' need the one-click repair (attaching again).
+
+    The first answer is worked out at once; after that it's re-checked every STATUS_S
+    on a thread, and the last answer comes back meanwhile. The check reads the
+    registry and the ring file, and the window asks every second: on a busy disk the
+    stat alone froze it for 6 s (1.9.7)."""
+    with _status_lock:
+        hit = _status_cache.get(mic_name)
+        now = time.monotonic()
+        if hit and now - hit[0] < STATUS_S:
+            return hit[1]
+        if hit:
+            if mic_name not in _status_busy:
+                _status_busy.add(mic_name)
+                threading.Thread(target=_refresh_status, args=(mic_name, _status_gen[0]),
+                                 daemon=True, name="mic-effect-status").start()
+            return hit[1]
+        gen = _status_gen[0]
     result = _status(mic_name)
-    _status_cache[mic_name] = (now, result)
+    with _status_lock:
+        if gen == _status_gen[0]:
+            _status_cache[mic_name] = (time.monotonic(), result)
     return result
+
+
+def _refresh_status(mic_name: str | None, gen: int):
+    try:
+        result = _status(mic_name)
+    except Exception:  # noqa: BLE001 - keep the last answer; tried again later
+        log.warning("couldn't check the mic effect", exc_info=True)
+        result = None
+    with _status_lock:
+        _status_busy.discard(mic_name)
+        if gen != _status_gen[0]:
+            return
+        hit = _status_cache.get(mic_name)
+        _status_cache[mic_name] = (time.monotonic(),
+                                   result if result is not None else hit[1] if hit else "missing")
 
 
 def needs_repair(state: str) -> bool:
@@ -673,9 +764,25 @@ def _status(mic_name: str | None) -> str:
         return "other"
     if not effect_in_place(guid) or not make_ring():
         return "wiped"
-    if not same_dll(registered_dll(), bundled_dll()):
+    if not same_dll(registered_dll(), bundled_dll()) \
+            or installed_slot(guid) in (SFX, COMPOSITE_SFX):   # raw streams skip it
         return "outdated"
     return "ready"
+
+
+def installed_slot(guid: str) -> int | None:
+    """The effect slot the effect was put in on this mic (None: not on it)."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, rf"{ENDPOINTS_KEY}\{guid}") as k:
+            return int(winreg.QueryValueEx(k, "Slot")[0])
+    except (OSError, ValueError):
+        return None
+
+
+def endpoint_wide() -> bool:
+    """The effect sits in the mic's endpoint effect: every app recording the mic gets it,
+    raw streams too, through one shared copy (so its stream count isn't per app)."""
+    return any(installed_slot(g) in ENDPOINT_SLOTS for g in installed_on())
 
 
 def effect_in_place(guid: str) -> bool:
@@ -684,7 +791,7 @@ def effect_in_place(guid: str) -> bool:
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             rf"{CAPTURE_KEY}\{guid}\FxProperties") as k:
-            return any(_is_ours(_value(k, FX % pid)) for pid in (SFX, LFX, COMPOSITE_SFX))
+            return any(_is_ours(_value(k, FX % pid)) for pid in OUR_SLOTS)
     except OSError:
         return False
 
@@ -839,19 +946,49 @@ class _StateKey(_BackupKey):
         self.created = False
 
 
-def _run(cmd: list[str]) -> int:
-    r = subprocess.run(cmd, capture_output=True, text=True, creationflags=_CREATE_NO_WINDOW)
+def _run(cmd: list[str], timeout: float = 60.0) -> int:
+    """Run a command, hidden. Its exit code; -1 if it hung (it's stopped after `timeout`)."""
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
+                           creationflags=_CREATE_NO_WINDOW)
+    except subprocess.TimeoutExpired:
+        log.warning("%s: no answer in %.0f s, stopped", " ".join(cmd), timeout)
+        return -1
     if r.returncode:
         log.warning("%s -> %s %s", " ".join(cmd), r.returncode, (r.stdout + r.stderr).strip())
     return r.returncode
 
 
-def _audio_comes_back():
+AUDIO_SERVICES = ("AudioEndpointBuilder", "Audiosrv")
+_SERVICE_NAME = re.compile(r"[A-Za-z0-9_.-]{1,80}")
+
+
+def _running_dependents() -> list[str]:
+    """The services running now that depend on Windows' audio ("Windows MIDI Service",
+    "Agent Activation Runtime", some sound-card vendors' own): stopping the audio stops
+    them too, and Windows doesn't start them again with it, so they're started by hand."""
+    script = (f"Get-Service -Name {','.join(AUDIO_SERVICES)} -DependentServices "
+              "-ErrorAction SilentlyContinue | Where-Object Status -eq Running | "
+              "ForEach-Object Name")
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                           capture_output=True, text=True, timeout=30,
+                           creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        log.warning("couldn't list the services that depend on the audio")
+        return []
+    names = [n.strip() for n in r.stdout.splitlines()]
+    return [n for n in dict.fromkeys(names) if _SERVICE_NAME.fullmatch(n)
+            and n.lower() not in {s.lower() for s in AUDIO_SERVICES}]
+
+
+def _audio_comes_back(dependents: list[str] = ()):
     """A small helper that starts Windows' audio again once this process ends, however
     it ends: killed half-way or crashed, the PC must never be left without sound.
     (Starting a service that's already running does nothing.)"""
+    names = [*AUDIO_SERVICES, *(n for n in dependents if _SERVICE_NAME.fullmatch(n))]
     script = (f"Wait-Process -Id {os.getpid()} -ErrorAction SilentlyContinue; "
-              "Start-Service AudioEndpointBuilder; Start-Service Audiosrv")
+              + "; ".join(f"Start-Service '{n}' -ErrorAction SilentlyContinue" for n in names))
     cmd = ["powershell", "-NoProfile", "-NonInteractive", "-Command", script]
     for flags in (_CREATE_NO_WINDOW | 0x01000000, _CREATE_NO_WINDOW):   # out of our job
         try:
@@ -863,12 +1000,16 @@ def _audio_comes_back():
     log.warning("no helper to bring the audio back if this stops half-way")
 
 
-def _audio_service(start: bool):
+def _audio_service(start: bool, dependents: list[str] = ()):
     """Stop / start Windows' audio. The endpoint builder reads the mics' effect settings
-    when it starts, so it goes too (the audio service depends on it)."""
+    when it starts, so it goes too (the audio service depends on it). `dependents`: the
+    services that were running on it (_running_dependents), started again after it."""
     if start:
         _run(["net", "start", "AudioEndpointBuilder"])
         _run(["net", "start", "audiosrv"])
+        for name in dependents:
+            if _SERVICE_NAME.fullmatch(name):
+                _run(["net", "start", name], timeout=30.0)
     else:
         _run(["net", "stop", "audiosrv", "/y"])
         _run(["net", "stop", "AudioEndpointBuilder", "/y"])
@@ -907,22 +1048,23 @@ def _unregister_com():
 
 def pick_slot(values: dict[int, object]) -> tuple[str, int]:
     """Which effect slot the effect takes on a mic whose FxProperties hold `values`
-    ({pid: value}), the way Equalizer APO picks: ('composite', 13) joins the stream
-    effect list Windows chains by itself; ('wrap', LFX) on a driver with only the old
-    kind of effects; otherwise ('wrap', SFX). 'wrap' replaces that slot's effect, and
-    the effect runs the one it replaced first."""
-    if values.get(COMPOSITE_SFX):
-        return "composite", COMPOSITE_SFX
-    if any(values.get(p) for p in LEGACY) and not any(values.get(p) for p in MODERN):
+    ({pid: value}): ('wrap', LFX) on a driver with only the old kind of effects;
+    ('composite', 15) joins an endpoint effect list Windows chains by itself; otherwise
+    ('wrap', EFX), the endpoint effect raw streams get too. 'wrap' replaces that slot's
+    effect, and the effect runs the one it replaced first."""
+    if any(values.get(p) for p in LEGACY) and not any(values.get(p) for p in MODERN) \
+            and not values.get(COMPOSITE_SFX):
         return "wrap", LFX
-    return "wrap", SFX
+    if values.get(COMPOSITE_EFX):
+        return "composite", COMPOSITE_EFX
+    return "wrap", EFX
 
 
 def _original(values: dict[int, object], pid: int) -> str:
     """The effect the effect runs first in slot `pid`: the slot's own, or (a mic whose
-    driver has no stream effect) its old-style LFX, which taking SFX switches off."""
+    driver has no endpoint effect) its old-style LFX, which a modern slot switches off."""
     old = values.get(pid)
-    if not old and pid == SFX and not values.get(EFX):
+    if not old and pid in (SFX, EFX) and not values.get(EFX):
         old = values.get(LFX)
     return old if isinstance(old, str) and not _is_ours(old) else ""
 
@@ -933,25 +1075,27 @@ def _install_endpoint(guid: str, slot: str | None):
     base = rf"{CAPTURE_KEY}\{guid}"
     with _BackupKey(base + r"\FxProperties") as fx, \
             _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
-        values = {p: (fx.get(FX % p) or (None,))[0] for p in (*MODERN, *LEGACY, COMPOSITE_SFX)}
+        values = {p: (fx.get(FX % p) or (None,))[0]
+                  for p in (*MODERN, *LEGACY, COMPOSITE_SFX, COMPOSITE_EFX)}
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
+        modes = SFX if pid in (SFX, COMPOSITE_SFX) else EFX if pid in ENDPOINT_SLOTS else None
         state.set("FxCreated", winreg.REG_DWORD, 1 if fx.created else 0)
         state.set("Slot", winreg.REG_DWORD, pid)
         # every value this touches, as it was, to put back later (written before anything
         # changes, so a step cut off half-way can still be undone)
-        names = (FX % pid, MODES_KEY % SFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
+        names = (FX % pid, MODES_KEY % SFX, MODES_KEY % EFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
         state.set("Before", winreg.REG_MULTI_SZ, [_note(n, fx.get(n)) for n in names])
         if kind == "composite":
-            cur = list(values[COMPOSITE_SFX] or [])
+            cur = list(values[pid] or [])
             fx.set(FX % pid, winreg.REG_MULTI_SZ,
                    [CLSID] + [c for c in cur if c.upper() != CLSID])
             state.set("Original", winreg.REG_SZ, "")
         else:
             state.set("Original", winreg.REG_SZ, _original(values, pid))
             fx.set(FX % pid, winreg.REG_SZ, CLSID)
-        if pid in (SFX, COMPOSITE_SFX):
-            if not fx.get(MODES_KEY % SFX):
-                fx.set(MODES_KEY % SFX, winreg.REG_MULTI_SZ, [MODE_DEFAULT])
+        if modes is not None:
+            if not fx.get(MODES_KEY % modes):
+                fx.set(MODES_KEY % modes, winreg.REG_MULTI_SZ, [MODE_DEFAULT])
             # a modern effect on the mic switches the old-style ones off anyway
             fx.delete(FX % LFX)
             fx.delete(FX % GFX)
@@ -1020,7 +1164,7 @@ def _uninstall_endpoint(guid: str):
     try:
         with _BackupKey(base + r"\FxProperties", create=False) as fx:
             ours = any(_is_ours((fx.get(FX % p) or (None,))[0])
-                       for p in (SFX, LFX, COMPOSITE_SFX))
+                       for p in OUR_SLOTS)
             if ours:
                 for item in before:
                     _put_back(fx, item)
@@ -1042,18 +1186,185 @@ def _delete_if_empty(path: str):
         advapi.RegDeleteKeyW(winreg.HKEY_LOCAL_MACHINE, path)
 
 
-def _make_ring():
-    d = data_dir()
-    d.mkdir(parents=True, exist_ok=True)
-    # The audio engine runs as LOCAL SERVICE with a write-restricted token (so writing
-    # needs WRITE RESTRICTED too); the board runs as the signed-in user. Nothing else:
-    # not store apps (ALL APPLICATION PACKAGES, which a test build once added by hand).
-    _run(["icacls", str(d), "/remove:g", "*S-1-15-2-1", "*S-1-15-2-2", "/T"])
-    _run(["icacls", str(d), "/grant", "*S-1-5-19:(OI)(CI)M", "*S-1-5-33:(OI)(CI)M",
-          "*S-1-5-11:(OI)(CI)M", "/T"])
-    make_ring()
+# Who may do what in the data folders. %ProgramData%\OnionBoard: admins only (its logs
+# are the admin step's). MicPlugin: the audio engine (LOCAL SERVICE with a write-
+# restricted token, so WRITE RESTRICTED too) and signed-in users make and change files
+# in it, but can't delete, rename or swap the folder itself, nor make folders in it.
+# Nothing for store apps. Owner: Administrators.
+_READ = "0x1200a9"          # read & run
+_FOLDER_WRITE = "0x1201bb"  # read, make files, write attributes: no delete, no subfolders
+_MODIFY = "0x1301bf"
+_BASE_SDDL = f"O:BAD:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;{_READ};;;BU)"
+_MIC_SDDL = _BASE_SDDL + "".join(f"(A;;{_FOLDER_WRITE};;;{s})(A;OICIIO;{_MODIFY};;;{s})"
+                                 for s in ("AU", "LS", "WR"))
+_ADMIN_SIDS = ("S-1-5-32-544", "S-1-5-18")   # Administrators, SYSTEM
+_REPARSE = 0x400                             # FILE_ATTRIBUTE_REPARSE_POINT
+
+
+def _is_link(path: Path) -> bool:
+    """A symlink, junction or other reparse point (never followed by the admin step)."""
     try:
-        (d / "ring.bin").unlink()   # the first test build's
+        return bool(getattr(os.lstat(path), "st_file_attributes", 0) & _REPARSE)
+    except OSError:
+        return False
+
+
+def _remove_entry(path: Path):
+    """Remove one folder entry itself, never what a link points at."""
+    if _is_link(path):
+        try:
+            os.rmdir(path)    # a junction / folder link
+        except OSError:
+            os.unlink(path)   # a file link
+    elif path.is_dir():
+        shutil.rmtree(path)   # (doesn't follow links inside)
+    else:
+        path.unlink()
+
+
+def _secure_dir(path: Path, sddl: str) -> str | None:
+    """Make `path` a real folder owned by Administrators with exactly `sddl`'s access, set
+    on an open handle to the folder itself: never through a link, and without touching
+    anything inside (no inheritance walk a planted link could steer). Its owner SID
+    before (None if it was made just now)."""
+    from ctypes import wintypes
+    if _is_link(path) or (path.exists() and not path.is_dir()):
+        log.warning("%s wasn't a plain folder: replaced", path)
+        _remove_entry(path)
+    made = not path.exists()
+    if made:
+        path.mkdir()
+    advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                                   ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD,
+                                   wintypes.HANDLE]
+    kernel.GetFileInformationByHandle.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.LocalFree.argtypes = [ctypes.c_void_p]
+    advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW.argtypes = [
+        wintypes.LPCWSTR, wintypes.DWORD, ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p]
+    advapi.SetKernelObjectSecurity.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.c_void_p]
+    advapi.GetSecurityInfo.argtypes = [wintypes.HANDLE, ctypes.c_int, wintypes.DWORD,
+                                       ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p,
+                                       ctypes.c_void_p, ctypes.c_void_p,
+                                       ctypes.POINTER(ctypes.c_void_p)]
+    advapi.ConvertSidToStringSidW.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)]
+    # READ_CONTROL | WRITE_DAC | WRITE_OWNER; FILE_FLAG_BACKUP_SEMANTICS | OPEN_REPARSE_POINT
+    h = kernel.CreateFileW(str(path), 0x000E0000, 7, None, 3, 0x02200000, None)
+    if h in (None, wintypes.HANDLE(-1).value):
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        info = (ctypes.c_ulong * 13)()   # BY_HANDLE_FILE_INFORMATION
+        if not kernel.GetFileInformationByHandle(wintypes.HANDLE(h), info):
+            raise ctypes.WinError(ctypes.get_last_error())
+        if info[0] & _REPARSE or not info[0] & 0x10:   # swapped for a link since the check
+            raise PermissionError(f"{path} isn't a plain folder")
+        owner = None
+        if not made:
+            sid, sd = ctypes.c_void_p(), ctypes.c_void_p()
+            # SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION
+            if not advapi.GetSecurityInfo(h, 1, 1, ctypes.byref(sid), None, None, None,
+                                          ctypes.byref(sd)):
+                text = ctypes.c_wchar_p()
+                if advapi.ConvertSidToStringSidW(sid, ctypes.byref(text)):
+                    owner = text.value
+                    kernel.LocalFree(text)
+                kernel.LocalFree(sd)
+        sd = ctypes.c_void_p()
+        if not advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                sddl, 1, ctypes.byref(sd), None):
+            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            # (OWNER |) DACL | PROTECTED_DACL: the folder's own security only, no walk
+            what = 0x80000004 | (1 if sddl.startswith("O:") else 0)
+            if not advapi.SetKernelObjectSecurity(h, what, sd):
+                raise ctypes.WinError(ctypes.get_last_error())
+        finally:
+            kernel.LocalFree(sd)
+    finally:
+        kernel.CloseHandle(h)
+    return owner
+
+
+def _owner(path: Path) -> str | None:
+    """The owner SID of one entry itself (links are never asked: they're removed first)."""
+    from ctypes import wintypes
+    advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    advapi.GetNamedSecurityInfoW.argtypes = [wintypes.LPCWSTR, ctypes.c_int, wintypes.DWORD,
+                                             ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p,
+                                             ctypes.c_void_p, ctypes.c_void_p,
+                                             ctypes.POINTER(ctypes.c_void_p)]
+    advapi.ConvertSidToStringSidW.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)]
+    kernel.LocalFree.argtypes = [ctypes.c_void_p]
+    sid, sd = ctypes.c_void_p(), ctypes.c_void_p()
+    if advapi.GetNamedSecurityInfoW(str(path), 1, 1, ctypes.byref(sid), None, None, None,
+                                    ctypes.byref(sd)):
+        return None
+    try:
+        text = ctypes.c_wchar_p()
+        if not advapi.ConvertSidToStringSidW(sid, ctypes.byref(text)):
+            return None
+        value = text.value
+        kernel.LocalFree(text)
+        return value
+    finally:
+        kernel.LocalFree(sd)
+
+
+def _clean_base(base: Path):
+    """Once the base folder is admins-only (nobody else can add to it), drop what someone
+    else could have put there before: links, hard links, anything not admin-owned. The
+    admin step writes its log there, and must never write through a planted link."""
+    for entry in list(base.iterdir()):
+        if entry.name == "MicPlugin":
+            continue
+        try:
+            st = os.lstat(entry)
+            if getattr(st, "st_file_attributes", 0) & _REPARSE or st.st_nlink > 1 \
+                    or _owner(entry) not in _ADMIN_SIDS:
+                log.warning("removed %s from the data folder (not the admin step's)", entry.name)
+                _remove_entry(entry)
+        except OSError:
+            log.warning("couldn't check %s", entry, exc_info=True)
+
+
+def secure_data_dirs():
+    """Admin step, first thing: %ProgramData%\\OnionBoard and its MicPlugin folder made
+    safe before anything is written there (anyone signed in can make folders in
+    %ProgramData%, so either could be someone else's, or a link to a system folder)."""
+    base = data_dir().parent
+    base.parent.mkdir(parents=True, exist_ok=True)
+    owner = _secure_dir(base, _BASE_SDDL)
+    if owner is not None and owner not in _ADMIN_SIDS:
+        log.warning("%s belonged to %s: taken over", base, owner)
+    _clean_base(base)
+    _secure_dir(data_dir(), _MIC_SDDL)
+
+
+def _make_ring():
+    """A fresh ring file for the effect to find when the audio starts, made without
+    ever writing through a link someone else put in the (user-writable) folder: a new
+    file of our own, then swapped in by name."""
+    path = ring_path()
+    if make_ring_ok(path):
+        return
+    tmp = path.parent / f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(new_ring_bytes())
+        os.replace(tmp, path)   # replaces the entry itself, never a link's target
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    try:
+        (path.parent / "ring.bin").unlink()   # the first test build's (unlink: the entry itself)
     except OSError:
         pass
 
@@ -1064,14 +1375,17 @@ def admin_install(guid: str, slot: str | None = None) -> int:
         log.error("no effect DLL at %s", dll)
         return 3
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    _audio_comes_back()
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
     _audio_service(False)
     try:
         # a name of its own per version: a copy Windows still holds can't block it
         digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
         target = install_dir() / f"obmic-{digest}.dll"
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(dll, target)
+        tmp = target.with_suffix(".new")
+        shutil.copyfile(dll, tmp)   # whole, then in place: never a half-copied effect
+        os.replace(tmp, target)
         _register_com(target)
         for old in [*install_dir().glob("obmic*.dll"), *_old_install_dirs()]:
             if old != target:
@@ -1079,15 +1393,24 @@ def admin_install(guid: str, slot: str | None = None) -> int:
         _make_ring()
         for other in installed_on():   # one mic at a time; this one is done afresh
             _uninstall_endpoint(other)
-        _install_endpoint(guid, slot)
+        try:
+            _install_endpoint(guid, slot)
+        except BaseException:
+            # cut off half-way: the mic goes back as it was rather than half set up
+            try:
+                _uninstall_endpoint(guid)
+            except Exception:  # noqa: BLE001 - the notes stay; a later uninstall finishes
+                log.exception("couldn't put %s back after a failed set-up", guid)
+            raise
     finally:
-        _audio_service(True)
+        _audio_service(True, dependents)
     return 0
 
 
 def admin_uninstall() -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    _audio_comes_back()
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
     _audio_service(False)
     try:
         for guid in installed_on():
@@ -1101,7 +1424,7 @@ def admin_uninstall() -> int:
         except OSError:
             pass
     finally:
-        _audio_service(True)
+        _audio_service(True, dependents)
     return 0
 
 
@@ -1128,40 +1451,72 @@ def _is_admin() -> bool:
 
 
 def cli(args: list[str]) -> int:
-    """`--direct-mic install <endpoint guid> [sfx|lfx]` / `--direct-mic uninstall`: the
+    """`--direct-mic install <endpoint guid> [sfx|lfx|efx]` /`--direct-mic uninstall`: the
     admin copy. `--direct-mic remove`: the uninstaller's, not admin: runs the admin
     `uninstall` (Windows asks first) if Onion Board is on a mic at all. 0 when done."""
     if args == ["remove"]:
         if not anything_installed():
             return 0
         if not _is_admin():
-            code = _elevated(["uninstall"], wait_s=120.0)
+            code = _elevated(["uninstall"])
             return 1 if code is None else code
         args = ["uninstall"]
-    logging.basicConfig(filename=str(data_dir().parent / "directmic-admin.log"),
-                        level=logging.INFO, format="%(asctime)s %(message)s") \
-        if data_dir().parent.exists() or _mkdir(data_dir().parent) else None
-    try:
-        if args[:1] == ["install"] and len(args) in (2, 3) and _GUID.fullmatch(args[1]) \
-                and (len(args) == 2 or args[2] in SLOTS_FX):
-            guid = args[1].lower()
-            if guid not in {e["guid"] for e in capture_endpoints()}:
-                return 2
-            return admin_install(guid, args[2] if len(args) == 3 else None)
-        if args == ["uninstall"]:
-            return admin_uninstall()
+    if args[:1] == ["install"] and len(args) in (2, 3) and _GUID.fullmatch(args[1]) \
+            and (len(args) == 2 or args[2] in SLOTS_FX):
+        guid = args[1].lower()
+        if guid not in {e["guid"] for e in capture_endpoints()}:
+            return 2
+        step = lambda: admin_install(guid, args[2] if len(args) == 3 else None)  # noqa: E731
+    elif args == ["uninstall"]:
+        step = admin_uninstall
+    else:
         return 2
-    except Exception:  # noqa: BLE001
-        log.exception("mic effect %s failed", args[:1])
-        return 1
-
-
-def _mkdir(p: Path) -> bool:
+    lock = _admin_lock()
+    if lock is None:
+        return 4   # another copy is at it (a set-up the board stopped waiting for)
     try:
-        p.mkdir(parents=True, exist_ok=True)
-        return True
-    except OSError:
-        return False
+        try:
+            _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+            secure_data_dirs()   # before the log or anything else is written there
+        except Exception:  # noqa: BLE001 - nowhere safe to log to: just say it failed
+            return 5
+        logging.basicConfig(filename=str(data_dir().parent / "directmic-admin.log"),
+                            level=logging.INFO, format="%(asctime)s %(message)s")
+        try:
+            return step()
+        except Exception:  # noqa: BLE001
+            log.exception("mic effect %s failed", args[:1])
+            return 1
+    finally:
+        _release(lock)
+
+
+_LOCK_NAME = "Global\\OnionBoardMicEffect"
+
+
+def _admin_lock():
+    """One admin step at a time, machine-wide: a handle to hold, or None if another copy
+    holds it (two at once would each stop the audio and rewrite the same mic)."""
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateMutexW.restype = ctypes.c_void_p
+    kernel.CreateMutexW.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_wchar_p]
+    kernel.WaitForSingleObject.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+    kernel.CloseHandle.argtypes = [ctypes.c_void_p]
+    h = kernel.CreateMutexW(None, False, _LOCK_NAME)
+    if not h:
+        return None
+    if kernel.WaitForSingleObject(h, 0) not in (0, 0x80):   # got it / its owner died
+        kernel.CloseHandle(h)
+        return None
+    return h
+
+
+def _release(h):
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.ReleaseMutex.argtypes = [ctypes.c_void_p]
+    kernel.CloseHandle.argtypes = [ctypes.c_void_p]
+    kernel.ReleaseMutex(h)
+    kernel.CloseHandle(h)
 
 
 # ---------------------------------------------------------------------- the app's side
@@ -1173,7 +1528,7 @@ def relaunch_params(args: list[str]) -> str:
     return " ".join(parts + [FLAG] + args)
 
 
-def _elevated(args: list[str], wait_s: float = 90.0) -> int | None:
+def _elevated(args: list[str], wait_s: float = 180.0) -> int | None:
     """Run this app's admin copy with `args` (Windows asks first). Its exit code, or
     None if the prompt was turned down or it didn't finish."""
     return run_elevated(sys.executable, relaunch_params(args), wait_s)
@@ -1221,19 +1576,20 @@ def install(mic_name: str | None) -> str | None:
     done, else what went wrong, in plain words."""
     guid = endpoint_for(mic_name)
     if guid is None:
-        return "That mic isn't plugged in (or Windows doesn't list it)."
+        return _("That mic isn't plugged in (or Windows doesn't list it).")
     if not bundled_dll().is_file():
-        return "This copy of Onion Board has no mic effect in it."
+        return _("This copy of Onion Board has no mic effect in it.")
     code = _elevated(["install", guid])
     if code is None:
-        return "Windows' admin prompt was turned down (or didn't finish)."
+        return _("Windows' admin prompt was turned down (or didn't finish).")
     if code:
-        return f"Installing failed (code {code}). The log is in {data_dir().parent}."
+        return _("Installing failed (code {code}). The log is in {folder}.",
+                 code=code, folder=data_dir().parent)
     return None
 
 
 def uninstall() -> str | None:
     code = _elevated(["uninstall"])
     if code is None:
-        return "Windows' admin prompt was turned down (or didn't finish)."
-    return f"Removing failed (code {code})." if code else None
+        return _("Windows' admin prompt was turned down (or didn't finish).")
+    return _("Removing failed (code {code}).", code=code) if code else None

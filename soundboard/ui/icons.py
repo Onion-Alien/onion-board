@@ -10,6 +10,8 @@ from __future__ import annotations
 import math
 import weakref
 
+import shiboken6
+
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import (QColor, QIcon, QIconEngine, QPainter, QPainterPath, QPen, QPixmap,
                            QTransform)
@@ -32,6 +34,17 @@ def _globe(p, fill):
     p.drawEllipse(QRectF(3, 3, 18, 18))
     p.drawEllipse(QRectF(8, 3, 8, 18))
     p.drawLine(QPointF(3, 12), QPointF(21, 12))
+
+
+def _search(p, fill):
+    p.drawEllipse(QRectF(4, 4, 12, 12))
+    p.drawLine(QPointF(14.5, 14.5), QPointF(20, 20))
+
+
+def _offline(p, fill):
+    """Offline mode: the globe, struck through."""
+    _globe(p, fill)
+    p.drawLine(QPointF(3.5, 3.5), QPointF(20.5, 20.5))
 
 
 def _wave(p, fill):
@@ -109,6 +122,13 @@ def _record(p, fill):
 def _plus(p, fill):
     p.drawLine(QPointF(12, 5), QPointF(12, 19))
     p.drawLine(QPointF(5, 12), QPointF(19, 12))
+
+
+def _download(p, fill):
+    """An arrow down into an open tray."""
+    p.drawLine(QPointF(12, 3.5), QPointF(12, 14.5))
+    p.drawPolyline([QPointF(7.5, 10.5), QPointF(12, 15), QPointF(16.5, 10.5)])
+    p.drawPolyline([QPointF(4, 15), QPointF(4, 20), QPointF(20, 20), QPointF(20, 15)])
 
 
 def _gear(p, fill):
@@ -459,6 +479,40 @@ def _like(p, fill):
     p.drawPath(path)
 
 
+def _sort(p, fill):
+    """Lines getting shorter, an arrow pointing down beside them."""
+    for y, w in ((6, 10), (12, 7), (18, 4)):
+        p.drawLine(QPointF(3, y), QPointF(3 + w, y))
+    p.drawLine(QPointF(18, 4), QPointF(18, 20))
+    p.drawPolyline([QPointF(14.5, 16.5), QPointF(18, 20), QPointF(21.5, 16.5)])
+
+
+def _rename(p, fill):
+    """A text box with a typing cursor in it."""
+    p.drawRoundedRect(QRectF(2.5, 7, 19, 10), 2, 2)
+    p.drawLine(QPointF(12, 4), QPointF(12, 20))
+    p.drawLine(QPointF(10, 4), QPointF(14, 4))
+    p.drawLine(QPointF(10, 20), QPointF(14, 20))
+
+
+def _tag(p, fill):
+    """A label tag with its hole."""
+    path = QPainterPath(QPointF(3.5, 5.5))
+    for pt in ((3.5, 11.5), (12.5, 20.5), (20.5, 12.5), (11.5, 3.5), (5.5, 3.5)):
+        path.lineTo(*pt)
+    path.closeSubpath()
+    p.drawPath(path)
+    hole = QPainterPath()
+    hole.addEllipse(QPointF(8, 8), 1.5, 1.5)
+    fill(hole)
+
+
+def _list(p, fill):
+    for y in (6, 12, 18):
+        fill(QPainterPath(), lambda pp, y=y: pp.addEllipse(QPointF(4.5, y), 1.6, 1.6))
+        p.drawLine(QPointF(9, y), QPointF(21, y))
+
+
 def _copy(p, fill):
     p.drawRoundedRect(QRectF(8, 8, 12, 13), 2, 2)
     path = QPainterPath(QPointF(5, 16))
@@ -470,10 +524,12 @@ def _copy(p, fill):
 SHAPES = {
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
-    "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders,
+    "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
+    "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
+    "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
@@ -481,7 +537,8 @@ SHAPES = {
     "shield": _shield, "info": _info,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
-    "apps": _apps, "triggers": _eye, "fold": _chevron("right"), "fold_open": _chevron("down"),
+    "apps": _apps, "triggers": _eye, "eye": _eye,
+    "fold": _chevron("right"), "fold_open": _chevron("down"),
 }
 
 
@@ -602,6 +659,13 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
 
 # --------------------------------------------------------------------------- live retheme
 
+def _gone(ref: weakref.ref) -> bool:
+    """The widget an entry below is for was deleted (its Python side may still be
+    around, pointing at nothing)."""
+    w = ref()
+    return w is None or not shiboken6.isValid(w)
+
+
 _applied: list[tuple[weakref.ref, str, str | None, str | None]] = []
 _tabs: list[tuple[weakref.ref, int, str, str | None, bool]] = []
 
@@ -626,6 +690,9 @@ def set_label_icon(label, name: str, color: str = "muted", size: int = 18):
     dpr = label.devicePixelRatioF() or 1.0
     pm = icon(name, color).pixmap(QSize(size, size), dpr)
     label.setPixmap(pm)
+    # one entry per label, and none for deleted ones: a dialog's labels went on the
+    # list each time it was opened
+    _labels[:] = [e for e in _labels if not _gone(e[0]) and e[0]() is not label]
     _labels.append((weakref.ref(label), name, color, size))
 
 
@@ -706,8 +773,12 @@ def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bo
     # time a sound started or stopped); the bar asks for a layout only if it changed
     # size, and widgets.SteadyTabs lets that through
     tabs.tabBar().setTabIcon(index, _tab_icon(name, tint, badge))
-    _tabs[:] = [e for e in _tabs if not (e[0]() is tabs and e[1] == index)]
+    # ...and none for deleted tab widgets: Settings' tabs added 12 each time it opened
+    _tabs[:] = [e for e in _tabs if not _gone(e[0]) and not (e[0]() is tabs and e[1] == index)]
     _tabs.append((weakref.ref(tabs), index, name, tint, badge))
+    changed = getattr(tabs, "changed", None)   # a tab widget shown elsewhere (ui/sidebar.py)
+    if changed is not None:
+        changed.emit()
 
 
 def tab_icon_name(tabs, index: int) -> str | None:

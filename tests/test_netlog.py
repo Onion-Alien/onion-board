@@ -198,13 +198,13 @@ def test_the_view_shows_simple_and_detailed(qapp):
     e.response(200, "OK")
     netlog.blocked("radio", "radio.example.com", 80, "Radio is switched off.")
     w.refresh()
-    assert "2 connection(s) to 2 server(s), 1 blocked" in w.summary.text()
+    assert "2 connections to 2 servers, 1 blocked" in w.summary.text()
     assert w.servers.rowCount() == 2 and w.servers.item(0, 0).text() == "radio.example.com"
     assert w.servers.item(1, 1).text() == "You clicked Check now"
     w.detailed.setChecked(True)
     assert w.stack.currentIndex() == 1 and w.conns.rowCount() == 2
     assert w.conns.item(1, 2).text() == "You clicked Check now"
-    assert w.conns.item(0, 2).text() == "—"
+    assert w.conns.item(0, 2).text() == ""
     w.conns.selectRow(1)
     text = w.info.toPlainText()
     assert "api.example.com:443" in text and "Route: Tor" in text

@@ -1,6 +1,7 @@
 """Settings > Tabs: switching the Radio, Apps, Triggers and Voice tabs off and on
 (Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
+from PySide6.QtCore import QPoint, Qt
 
 from conftest import process_events
 
@@ -40,7 +41,8 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
         assert isinstance(getattr(w, key), cls) and w.tabs.isTabVisible(i)
         page = w.radio_page if key == "radio" else getattr(w, key)
         assert w.tabs.widget(i) is page
-        assert w.tabs.tabToolTip(i).endswith(main.TABS[i][1])
+        # no description on hover: just the name, and only while the tab is icon-only
+        assert w.tabs.tabToolTip(i) in ("", main.TABS[i][0])
     assert w.cfg.tabs_off == []
     assert w.engine.voice_chain is w.voice.chain
 
@@ -286,7 +288,6 @@ def test_apps_switched_off_right_after_it_is_built(window, qapp):
 
 
 def test_keyboard_never_lands_on_a_hidden_tab(window, qapp):
-    from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     for key in taboff.KEYS:
         window.set_tab_on(key, False)
@@ -325,25 +326,48 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
     from soundboard.ui.voicepanel import SpeechPanel
     from soundboard.voicefx import VoiceChain
     w = window
+    counted = (*REAL.values(), BoardHost, VoiceChain, SpeechPanel, AiVoicePanel,
+               taboff.TabOff, RadioOff)
+    # Only what this test makes is counted. An earlier test's window can still be
+    # around, held by something outside Python's view (a pending timer's lambda keeps
+    # one until it fires), and let go in the middle of this test: its tabs and
+    # listeners going then changed the numbers. So whatever is already here is held
+    # until the end, and left out.
+    gc.collect()
+    already = [o for o in gc.get_objects() if isinstance(o, counted)]
+    already_ids = {id(o) for o in already}
+    old_listeners = list(net._listeners)
+    old_listener_ids = {id(ref) for ref in old_listeners}
     for key in taboff.KEYS:   # once round, so every count below is a settled one
         w.set_tab_on(key, False)
         w.set_tab_on(key, True)
+    w.load_triggers()         # (not watching, it would wait to be shown)
 
     def counts():
-        _flush_deletes(qapp)
-        gc.collect()
-        _flush_deletes(qapp)
-        alive = sum(ref() is not None for ref in net._listeners)
-        objs = gc.get_objects()
+        # a tab that's just gone can take a few collections to really let go
+        # (how many depends on the machine), so look again until the numbers stop
+        last = None
+        for _ in range(10):
+            _flush_deletes(qapp)
+            gc.collect()
+            _flush_deletes(qapp)
+            now = snapshot()
+            if now == last:
+                break
+            last = now
+        return now
+
+    def snapshot():
+        alive = sum(ref() is not None for ref in net._listeners
+                    if id(ref) not in old_listener_ids)
+        objs = [o for o in gc.get_objects() if id(o) not in already_ids]
         return {"net listeners": alive, "fit steps": len(w._fit.steps),
                 "stack": len(w._stack_cols), "tabs": w.tabs.count(),
                 "radio pages": w.radio_page.count(),
                 "watch panels": sum(type(x).__name__ == "Panel"
                                     for x in QApplication.allWidgets()),
                 # nothing still holds an old tab (a hook, a closure, the host)
-                **{cls.__name__: sum(isinstance(o, cls) for o in objs)
-                   for cls in (*REAL.values(), BoardHost, VoiceChain, SpeechPanel,
-                               AiVoicePanel, taboff.TabOff, RadioOff)}}
+                **{cls.__name__: sum(isinstance(o, cls) for o in objs) for cls in counted}}
     before = counts()
     assert before["watch panels"] == 1
     calls = []   # each Onion Watch panel's log (not the panel: that would keep it)
@@ -355,6 +379,9 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
             assert w.engine.voice_chain is (None if key == "voice" else w.voice.chain)
             w.set_tab_on(key, True)
             assert isinstance(getattr(w, key), REAL[key])
+            if key == "triggers":   # not watching: it waits to be shown, or asked for
+                assert w.triggers.pending and w.triggers.panel is None
+                w.load_triggers()
         assert w.engine.voice_chain is w.voice.chain
         assert w.triggers.panel is not None
         assert counts() == before
@@ -397,7 +424,9 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
                 assert isinstance(getattr(w, key), cls)
                 assert w.tabs.isTabVisible(main.TAB_INDEX[key])
             assert w.engine.voice_chain is w.voice.chain
-            assert w.triggers.panel is not None   # Onion Watch loaded on the way back
+            assert w.triggers.pending   # not watching: Onion Watch waits to be shown
+            w.load_triggers()
+            assert w.triggers.panel is not None   # ...and loads on the way back
             for key in REAL:
                 w.set_tab_on(key, False)
             assert w.engine.voice_chain is None
@@ -419,20 +448,82 @@ def test_a_new_user_starts_with_the_basic_tabs():
 
 def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch):
     w = window
+    steps = []
+    monkeypatch.setattr(main.usage, "step", lambda cfg, name, saved=None: steps.append(name))
     assert w.btn_more_tabs.isHidden()                      # every tab on: nothing to add
     w.set_tab_on("radio", False)
     w.set_tab_on("triggers", False)
     assert not w.btn_more_tabs.isHidden()
-    menu = w.btn_more_tabs.menu()
+    menu = w.more_menu
     menu.aboutToShow.emit()
-    texts = [a.text() for a in menu.actions() if not a.isSeparator()]
+    texts = [a.text() for a in menu.actions() if not a.isSeparator() and a.text()]
     assert texts[0].startswith("Radio: ") and texts[1].startswith("Triggers: ")
     assert texts[-1] == "Choose tabs in Settings…" and len(texts) == 3
     opened = []
     monkeypatch.setattr(w, "open_settings", lambda page="privacy": opened.append(page))
     menu.actions()[-1].trigger()
     assert opened == ["tabs"]
-    menu.actions()[1].trigger()                            # Triggers
+    [a for a in menu.actions() if a.text().startswith("Triggers")][0].trigger()
     assert w.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
+    assert steps == ["added-triggers-tab"]   # counted now, not with tomorrow's count
     w.set_tab_on("radio", True)
     assert w.btn_more_tabs.isHidden()
+
+
+def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatch):
+    w = window
+    shown = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": shown.append(text))
+    w.tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+    w.hide_tab("radio")
+    assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
+    assert "More tabs" in shown[0]
+    assert w.rail.isAncestorOf(w.btn_more_tabs)   # under the tabs on the rail
+    assert not w.btn_more_tabs.isHidden()
+    menu = w.more_menu
+    menu.aboutToShow.emit()
+    [a for a in menu.actions() if a.text().startswith("Radio")][0].trigger()
+    assert w.tab_on("radio")
+
+
+def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
+    from soundboard import usage
+    w = window
+    seen = []
+    monkeypatch.setattr(usage, "used", seen.append)
+    w.set_tab_on("radio", False)
+    w.set_tab_on("voice", False)
+    menu = w.more_menu
+    menu.aboutToShow.emit()                  # looked, closed, added nothing
+    menu.aboutToHide.emit()
+    process_events(qapp, lambda: "more-tabs-closed" in seen)
+    assert seen == ["more-tabs-opened", "more-tabs-closed"]
+    seen.clear()
+    menu.aboutToShow.emit()                  # a card picked: the menu hides first
+    menu.aboutToHide.emit()
+    from soundboard.ui.moretabs import TabCard
+    [c for c in menu.findChildren(TabCard)][0].picked.emit()
+    process_events(qapp, lambda: False, timeout=0.2)   # the closed check runs, and passes
+    assert seen == ["more-tabs-opened", "more-tabs-added-radio"] and w.tab_on("radio")
+    w.hide_tab("voice")
+    assert seen[-1] == "tab-hidden-voice"
+    assert all(k in usage.FEATURES for k in seen)
+
+
+def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
+    """+ More tabs' menu opens beside the button on the rail, a few px clear of it, not
+    down over the tabs (and with no menu arrow's room, the + is centred like the rest)."""
+    from soundboard.ui import moretabs
+    w = window
+    w.show()
+    w.set_tab_on("radio", False)
+    btn, menu = w.btn_more_tabs, w.more_menu
+    assert isinstance(menu, moretabs.Menu)
+    assert btn.menu() is None
+    btn.click()
+    process_events(qapp, menu.isVisible)
+    try:
+        at = btn.mapToGlobal(QPoint(0, 0))
+        assert menu.x() == at.x() + btn.width() + moretabs.GAP and menu.y() == at.y()
+    finally:
+        menu.close()

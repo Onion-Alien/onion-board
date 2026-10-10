@@ -41,8 +41,8 @@ class CrashDialog(QDialog):
         self.setMinimumSize(560, 420)
         v = QVBoxLayout(self)
 
-        head = QLabel(_("Sorry — something went wrong.") if not rep.fatal
-                      else _("Sorry — Onion Board couldn't start."))
+        head = QLabel(_("Sorry, something went wrong.") if not rep.fatal
+                      else _("Sorry, Onion Board couldn't start."))
         f = head.font()
         f.setPointSizeF(f.pointSizeF() * 1.3)
         f.setBold(True)
@@ -55,8 +55,8 @@ class CrashDialog(QDialog):
         what.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         v.addWidget(what)
 
-        keep = ("The app will close." if rep.fatal else
-                "The app is still running, but if something looks wrong, restart it.")
+        keep = (_("The app will close.") if rep.fatal else
+                _("The app is still running, but if something looks wrong, restart it."))
         ask = QLabel(
             _("{keep}<br><br><b>Please send this report to the developer</b> so it can be fixed: "
               "press <i>Report on GitHub</i> and paste it in (it's copied for you), or <i>Copy "
@@ -105,7 +105,7 @@ class CrashDialog(QDialog):
 
     def copy(self):
         QGuiApplication.clipboard().setText(self.report_text())
-        self.status.setText(_("Report copied — paste it into your message (Ctrl+V)."))
+        self.status.setText(_("Report copied: paste it into your message (Ctrl+V)."))
 
     def open_issue(self):
         self.copy()
@@ -134,7 +134,10 @@ class CrashDialog(QDialog):
 def free_dialog(dlg: QDialog):
     """Delete a modal dialog once its exec() has returned. Parented to the window and
     never freed, every closed copy stayed alive and made each theme change slower.
-    A crash report opened over it is moved to the dialog's parent first, so it stays."""
+    A crash report opened over it is moved to the dialog's parent first, so it stays.
+    Already gone (its window was freed first, before a deferred call got here): done."""
+    if not shiboken6.isValid(dlg):
+        return
     parent = dlg.parentWidget()
     for c in dlg.findChildren(CrashDialog):
         c.setParent(parent, c.windowFlags())

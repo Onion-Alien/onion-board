@@ -1,10 +1,12 @@
 """Notes down a frozen window: when the UI thread hasn't run its timer for
 HANG_S seconds ("Not Responding"), log what it's doing (its stack) once per
-freeze and save it beside the crash reports (applog.save_freeze), so a freeze
+freeze and save it, with every other thread's stack, beside the crash reports
+(applog.save_freeze, which scrubs personal paths), so a freeze
 nobody can reproduce can still be fixed. Nothing is shown or sent."""
 from __future__ import annotations
 
 import logging
+import re
 import sys
 import threading
 import time
@@ -16,6 +18,12 @@ log = logging.getLogger(__name__)
 
 HANG_S = 5.0
 BEAT_MS = 500
+MAX_FRAMES = 40                 # innermost frames kept per thread
+# A modal dialog's exec() runs its own event loop, which still beats our timer: a
+# freeze with exec() as the last Python frame was in native Qt or another thread.
+IN_EXEC = re.compile(r"\.exec_?\(")
+IN_DIALOG_NOTE = ("(it was inside a window's own event loop; the stall was in Qt "
+                  "or another thread)")
 
 
 class HangWatch(QObject):
@@ -49,10 +57,27 @@ class HangWatch(QObject):
             if reported:
                 continue
             reported = True
-            frame = sys._current_frames().get(self._ui)
-            stack = "".join(traceback.format_stack(frame)) if frame else "(no stack)"
+            frames = sys._current_frames()
+            frame = frames.get(self._ui)
+            ui = traceback.extract_stack(frame, limit=MAX_FRAMES) if frame else None
+            stack = "".join(ui.format()) if ui else "(no stack)"
+            if ui and IN_EXEC.search(ui[-1].line or ""):
+                stack += f"\n{IN_DIALOG_NOTE}\n"
             log.warning("the window hasn't responded for %.0f s; it's doing:\n%s",
                         stuck, stack)
             from soundboard import applog
-            self.saved = applog.save_freeze(stuck, stack)
+            self.saved = applog.save_freeze(stuck, stack + self._others(frames))
             self.reports += 1           # last: a report counts once it's logged and saved
+
+    def _others(self, frames) -> str:
+        """Every other thread's stack: a UI thread stuck in native code is often
+        waiting on one of these (the GIL, a lock)."""
+        names = {t.ident: t.name for t in threading.enumerate()}
+        me = threading.get_ident()
+        parts = ["", "Other threads", "-------------"]
+        for ident, frame in frames.items():
+            if ident in (self._ui, me):
+                continue
+            parts.append(f'Thread "{names.get(ident, "?")}" ({ident}):')
+            parts.append("".join(traceback.format_stack(frame, limit=MAX_FRAMES)))
+        return "\n".join(parts)

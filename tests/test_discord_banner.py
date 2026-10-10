@@ -1,10 +1,15 @@
 """Discord's own settings wiping out sounds (soundboard.discordcfg): the urgent bar in
 the real MainWindow (offscreen) and the Discord guide's advice on the mic vs the cable.
 Discord isn't really read: a fake store sits in the test's own folder."""
+import threading
+import time
+
 import pytest
+from PySide6.QtWidgets import QApplication
 
 from soundboard import discordcfg as dc
 from soundboard.ui import chatguide
+from conftest import process_events
 from test_discordcfg import folder, store
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -18,7 +23,9 @@ def found(**over):
     return [dc.parse({"default": dict({"activeInputProfile": "CUSTOM",
                                        "noiseCancellation": False, "echoCancellation": False,
                                        "automaticGainControl": False,
-                                       "modeOptions": {"vadUseKrisp": False}}, **over)})]
+                                       "modeOptions": {"vadUseKrisp": False,
+                                                       "autoThreshold": False}},
+                                      **over)})]
 
 
 def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):
@@ -79,6 +86,7 @@ def test_guide_on_the_mic_says_custom_not_studio(window, monkeypatch):
     there, and it shows what their Discord is set to."""
     (folder() / "000005.log").write_bytes(store(activeInputProfile="STUDIO"))
     g = chatguide.DiscordGuide(window, window, "Microphone (G733)", kept=True)
+    assert process_events(QApplication.instance(), lambda: not g._reading, 3)
     text = " ".join(lbl.text() for lbl in g.findChildren(chatguide.QLabel))
     assert "choose <b>Custom</b>" in text and "choose <b>Studio</b>" not in text
     assert "Bypass System Audio Input Processing" in text
@@ -92,9 +100,27 @@ def test_guide_on_the_mic_says_custom_not_studio(window, monkeypatch):
 def test_guide_on_the_cable_still_says_studio(window):
     (folder() / "000005.log").write_bytes(store(activeInputProfile="STUDIO"))
     g = chatguide.DiscordGuide(window, window, "CABLE Output")
+    assert process_events(QApplication.instance(), lambda: not g._reading, 3)
     text = " ".join(lbl.text() for lbl in g.findChildren(chatguide.QLabel))
     assert "choose <b>Studio</b>" in text
     assert "right for your sounds" in g.settings.text()
+    g.done(0)
+
+
+def test_guide_reads_discords_files_off_the_ui_thread(window, monkeypatch):
+    """The guide's 2 s watch read Discord's files on the UI thread: a slow or sleeping
+    disk froze the window. It reads on a worker and shows what it found after."""
+    (folder() / "000005.log").write_bytes(store(activeInputProfile="STUDIO"))
+    gate, real = threading.Event(), dc.signature
+    monkeypatch.setattr(dc, "signature", lambda *a: (gate.wait(3), real(*a))[1])
+    t0 = time.monotonic()
+    g = chatguide.DiscordGuide(window, window, "Microphone (G733)", kept=True)
+    g._read_settings()                       # the watch's tick while it's still reading
+    assert time.monotonic() - t0 < 0.5
+    assert g.settings.isHidden() and g._reading
+    gate.set()
+    assert process_events(QApplication.instance(), lambda: not g._reading, 3)
+    assert not g.settings.isHidden() and "skips Onion Board" in g.settings.text()
     g.done(0)
 
 

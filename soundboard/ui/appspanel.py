@@ -25,15 +25,16 @@ import threading
 import time
 import zlib
 
-from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QPainter
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
+from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QFont, QPainter, QPixmap
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel,
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
-from soundboard import appaudio, errors, library, theme, trash
+from soundboard import appaudio, errors, exeicon, library, theme, trash, usage
 from soundboard.clipedit import LiveBuffer
 from soundboard.engine import SR
+from soundboard.i18n import _
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import appstate, icons
@@ -42,26 +43,33 @@ from soundboard.ui.clipeditor import WAVE_H, ClipEditor
 from soundboard.ui.clipshelf import ClipShelf
 from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
+from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
 REFRESH_MS = 1500       # how often the list of programs is re-read while the tab is shown
 REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still gets picked up)
+# while hidden, a 5 s check only walks the process list (~4 ms, not the ~20 ms of a whole
+# listing) and lists the programs when one of the tab's started or closed, one not yet
+# picked up runs, or this long has gone by
+HIDDEN_FULL_S = 30.0
 METER_MS = 60
 MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
 CARD_MAX_W = 900        # the Card size slider's widest: one big card across most windows
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
-CONNECTING = "Connecting…"   # a card's status while its capture is starting
+NEW_CARDS = 1           # program cards made per go (see AppsTab._apply_listing)
+CARDS_GAP_MS = 6        # ...and the break between goes, for the audio thread
+CONNECTING = _("Connecting…")   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
-# choice shows once a stream output is set (Settings → Audio), or while it's set to
-# anything but both
-TO = (("both", "Call + stream", "Others in the call and your stream output both get it"),
-      ("call", "Call only", "Only others in the call get it, not your stream output"),
-      ("stream", "Stream only", "Only your stream output gets it (music for your viewers), "
-                                "not the call"))
-TO_KEYS = tuple(k for k, *_ in TO)
+# choice shows once a stream output is set (Also send to → Clean, for streaming), or
+# while it's set to anything but both
+TO = (("both", _("Call + stream"), _("Others in the call and your stream output both get it")),
+      ("call", _("Call only"), _("Only others in the call get it, not your stream output")),
+      ("stream", _("Stream only"), _("Only your stream output gets it (music for your "
+                                     "viewers), not the call")))
+TO_KEYS = tuple(k for k, *__ in TO)
 
 
 # a version folder in a program's path (Discord's app-1.0.9156, 24.1.3): it changes on
@@ -92,7 +100,8 @@ def saved_volume(v) -> float:
 class _Lister(QObject):
     """Reads the audio sessions off the UI thread (COM, ~50 ms) and hands the result
     to it: `peaks`' next rescan makes the list while that watcher runs (it was finding
-    the same sessions on its own), else a worker thread of its own does."""
+    the same sessions on its own), else one worker thread of the lister's own does
+    (it started a new thread for every listing, 720 an hour in the tray)."""
     ready = Signal(object)
 
     def __init__(self, parent=None, peaks: appaudio.PeakWatcher | None = None):
@@ -100,14 +109,56 @@ class _Lister(QObject):
         self.peaks = peaks
         self._busy = False
         self._stopped = False
+        # held while a result is handed over (worker thread); stop() takes it, so none
+        # is mid-way once the tab is going and could be freed under it (a crash)
+        self._hand_over = threading.Lock()
+        self._job: tuple[frozenset, frozenset] | None = None
+        self._wake = threading.Event()
+        self._thread: threading.Thread | None = None
+        # the worker's own: what refresh(watch=...) saw last time, and when it last listed
+        self._seen: frozenset | None = None
+        self._listed_at = -math.inf
 
-    def refresh(self):
+    def refresh(self, watch: frozenset[str] | None = None,
+                waiting: frozenset[str] = frozenset()):
+        """List the programs. With `watch` (.exe names, lower case: the tab is hidden),
+        only walk the processes first, and list them only if one of those started or
+        closed since the last walk, one in `waiting` (not picked up yet) runs, or
+        HIDDEN_FULL_S has gone by since the last listing."""
         if self._busy or self._stopped:
             return
         self._busy = True
-        if self.peaks is not None and self.peaks.list_for(self._listed):
+        if watch is None and self.peaks is not None and self.peaks.list_for(self._listed):
             return
-        threading.Thread(target=self._work, name="applist", daemon=True).start()
+        self._job = None if watch is None else (watch, waiting)
+        if self._thread is None or not self._thread.is_alive():
+            self._thread = threading.Thread(target=self._run, name="applist", daemon=True)
+            self._thread.start()
+        self._wake.set()
+
+    def _run(self):
+        while True:
+            self._wake.wait()
+            self._wake.clear()
+            if self._stopped:
+                return
+            job = self._job
+            try:
+                due = job is None or self._due(*job)
+            except Exception:  # noqa: BLE001
+                log.debug("walking the processes failed", exc_info=True)
+                due = True
+            if due:
+                self._work()
+            else:
+                self._busy = False
+
+    def _due(self, watch: frozenset[str], waiting: frozenset[str]) -> bool:
+        alive = appaudio.running()
+        seen = frozenset((pid, exe) for pid, exe in alive.items() if exe in watch)
+        changed, self._seen = seen != self._seen, seen
+        return (changed or any(exe in waiting for _pid, exe in seen)
+                or time.monotonic() - self._listed_at >= HIDDEN_FULL_S)
 
     def _work(self):
         alive: dict[int, str] = {}   # every process, from the listing's own process list
@@ -124,12 +175,18 @@ class _Lister(QObject):
         """On the worker's or the level watcher's thread. apps None: the listing failed,
         and this round is skipped (an empty list would stop every capture and drop
         the rows)."""
+        if apps:
+            exeicon.load(app.path for app in apps)   # here, not on the UI thread
+        self._listed_at = time.monotonic()
         self._busy = False
-        if apps is not None and not self._stopped:
-            self.ready.emit((apps, alive))
+        with self._hand_over:
+            if apps is not None and not self._stopped:
+                self.ready.emit((apps, alive))
 
     def stop(self):
-        self._stopped = True
+        with self._hand_over:
+            self._stopped = True
+        self._wake.set()   # the worker sees it and ends
 
 
 class ElidedLabel(QLabel):
@@ -213,65 +270,65 @@ class AppRow(HoverCard):
         top.addLayout(names, 1)
         self.btn_forget = QPushButton("✕")
         self.btn_forget.setObjectName("small")
-        self.btn_forget.setToolTip("Take this program off the list")
+        self.btn_forget.setToolTip(_("Take this program off the list"))
         self.btn_forget.setFixedWidth(26)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
         top.addWidget(self.btn_forget, 0, Qt.AlignTop)
         v.addLayout(top)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(60)
-        self.meter.setToolTip("What the program is playing")
         v.addWidget(self.meter)
         buttons = QHBoxLayout()
         buttons.setSpacing(6)
         self.btn_send = QPushButton()
         self.btn_send.setObjectName("live")
         self.btn_send.setCheckable(True)
-        self.btn_send.setToolTip("Send this program's sound out to others, the way your "
-                                 "sounds go (Setup tab)")
+        self.btn_send.setToolTip(_("Send this program's sound out to others, the way your "
+                                   "sounds go (Setup tab)"))
         icons.set_icon(self.btn_send, "live", checked_color="#ffffff")
         self.btn_send.toggled.connect(lambda on: self.send_toggled.emit(self, on))
-        self.btn_rec = QPushButton("Record")
+        self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
-        self.btn_rec.setToolTip("Record this program: it waits for the program to make a "
-                                "sound, then records until you click again, and the clip is "
-                                "added to your Sounds. Nobody hears it unless Send is on.")
+        self.btn_rec.setToolTip(_("Record this program: it waits for the program to make a "
+                                  "sound, then records until you click again, and the clip is "
+                                  "added to your Sounds. Nobody hears it unless Send is on."))
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(lambda on: self.rec_toggled.emit(self, on))
         for b in (self.btn_send, self.btn_rec):
-            b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            b.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)   # as wide as their words
             buttons.addWidget(b)
         self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
             self.cb_to.addItem(label, key)
             self.cb_to.setItemData(i, tip, Qt.ToolTipRole)
-        self.cb_to.setToolTip("Where this program's sound goes when Send is on")
+        self.cb_to.setToolTip(_("Where this program's sound goes when Send is on"))
         self.cb_to.setCurrentIndex(TO_KEYS.index(to) if to in TO_KEYS else 0)
         self.cb_to.currentIndexChanged.connect(lambda _i: self.to_changed.emit(self, self.to))
         no_wheel(self.cb_to)
         self.cb_to.setVisible(self.to != "both")
         buttons.addWidget(self.cb_to)
+        buttons.addStretch(1)
         v.addLayout(buttons)
         mix = QHBoxLayout()
         mix.setSpacing(8)
-        self.vol = VolumeControl(vol, tip="This program's volume in the mix")
+        self.vol = VolumeControl(vol, tip=_("This program's volume in the mix"))
         self.vol.slider.setMaximumWidth(16777215)   # the card's width, not a row's sliver
         self.vol.changed.connect(lambda v: self.vol_changed.emit(self, v))
         mix.addWidget(self.vol, 1)
-        self.chk_hear = QCheckBox("Hear it myself")
-        self.chk_hear.setToolTip("Also play it into your headphones (off: the program already "
-                                 "plays there on its own)")
+        self.chk_hear = QCheckBox(_("Hear it myself"))
+        self.chk_hear.setToolTip(_("Also play it into your headphones (off: the program "
+                                   "already plays there on its own)"))
         self.chk_hear.setChecked(hear)
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
         mix.addWidget(self.chk_hear)
         v.addLayout(mix)
-        self.btn_clip = QPushButton("Clip editor")
+        self.btn_clip = QPushButton(_("Clip editor"))
         self.btn_clip.setObjectName("fold")
         self.btn_clip.setCheckable(True)
-        self.btn_clip.setToolTip("Keep this program's last minute as a waveform you can cut "
-                                 "bits out of, play, save as sounds or send straight back. "
-                                 "It only listens while it's open.")
+        self.btn_clip.setToolTip(_("Keep this program's last minute as a waveform you can cut "
+                                   "bits out of, play, save as sounds or send straight back. "
+                                   "It only listens while it's open."))
         icons.set_icon(self.btn_clip, "fold", "muted", "text", size=12)
         self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
         v.addWidget(self.btn_clip, 0, Qt.AlignLeft)
@@ -314,10 +371,10 @@ class AppRow(HoverCard):
         self._tight = n
         on = set(self._TIGHTEN[:n])
         self.vol.spin.setVisible("spin" not in on)
-        self.chk_hear.setText("Hear" if "hear" in on else "Hear it myself")
+        self.chk_hear.setText(_("Hear") if "hear" in on else _("Hear it myself"))
         self._label_send()
         if not self.btn_rec.isChecked():   # while recording it shows how long it's been
-            self.btn_rec.setText("" if "rec" in on else "Record")
+            self.btn_rec.setText("" if "rec" in on else _("Record"))
         self.layout().activate()
 
     @property
@@ -336,7 +393,7 @@ class AppRow(HoverCard):
 
     def _label_send(self):
         self.btn_send.setText("" if "send" in self._TIGHTEN[:self._tight]
-                              else "Sending" if self.sending else "Send")
+                              else _("Sending") if self.sending else _("Send"))
 
     def set_app(self, app: appaudio.App | None):
         """The program is running (app) or not (None)."""
@@ -348,14 +405,14 @@ class AppRow(HoverCard):
             where = ", ".join(app.devices[:2])
             sub = app.title or app.exe
             if where:
-                sub += f"  ·  playing on {where}"
+                sub = _("{title}  ·  playing on {devices}", title=sub, devices=where)
             if not self.status_text:   # an error stays up until the next attempt
                 self.sub.setText(sub)
         else:
             self.name.setText((self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?")
                               + self.folder)
             self.set_status("")
-            self.sub.setText("Not running — it'll be picked up when it starts")
+            self.sub.setText(_("Not running: it'll be picked up when it starts"))
         self.btn_send.setEnabled(running)
         self.btn_rec.setEnabled(running)
         self.btn_clip.setEnabled(running or self.btn_clip.isChecked())
@@ -363,10 +420,10 @@ class AppRow(HoverCard):
         self.setEnabled(True)
         self.name.setEnabled(running)
         name = self.name.text()   # a screen reader hears whose card each button is on
-        self.btn_send.setAccessibleName(f"Send {name}")
-        self.btn_rec.setAccessibleName(f"Record {name}")
-        self.btn_forget.setAccessibleName(f"Forget {name}")
-        self.btn_clip.setAccessibleName(f"Clip editor for {name}")
+        self.btn_send.setAccessibleName(_("Send {name}", name=name))
+        self.btn_rec.setAccessibleName(_("Record {name}", name=name))
+        self.btn_forget.setAccessibleName(_("Forget {name}", name=name))
+        self.btn_clip.setAccessibleName(_("Clip editor for {name}", name=name))
 
     def set_status(self, text: str, error: bool = False):
         self.status_text = text
@@ -398,24 +455,24 @@ class AppRow(HoverCard):
         self.btn_rec.setChecked(on)
         self.btn_rec.blockSignals(False)
         if not on:
-            self.btn_rec.setText("" if "rec" in self._TIGHTEN[:self._tight] else "Record")
-
-    _icons = QFileIconProvider()
+            self.btn_rec.setText("" if "rec" in self._TIGHTEN[:self._tight] else _("Record"))
 
     def _set_icon(self, path: str, force: bool = False):
-        # set_app runs on every refresh (each 1.5 s, 5 s while hidden): the shell's
-        # icon lookup is only worth doing when the program changed
+        # set_app runs on every refresh (each 1.5 s, 5 s while hidden): only when the
+        # program changed. The icon itself was read by the listing's thread (exeicon):
+        # asking the shell here held up the audio
         if not force and path == getattr(self, "_icon_path", None):
             return
         self._icon_path = path
-        pm = None
-        if path:
-            try:
-                pm = self._icons.icon(QFileInfo(path)).pixmap(QSize(24, 24))
-            except Exception:  # noqa: BLE001
-                pm = None
-        if pm is None or pm.isNull():
+        img = exeicon.get(path) if path else None
+        if img is None:
             pm = icons.icon("apps", "muted").pixmap(QSize(22, 22))
+        else:
+            dpr = self.icon.devicePixelRatioF()
+            side = round(24 * dpr)
+            pm = QPixmap.fromImage(img.scaled(side, side, Qt.KeepAspectRatio,
+                                              Qt.SmoothTransformation))
+            pm.setDevicePixelRatio(dpr)
         self.icon.setPixmap(pm)
 
 
@@ -439,40 +496,45 @@ class AppsTab(QWidget):
         v.setContentsMargins(0, 8, 0, 0)
         v.setSpacing(8)
         # the explanation is behind the ⓘ at the end of the tab bar (MainWindow)
-        self.info = ("Send a program's sound",
-                     "Pick a program that's playing — a music player, a browser, a game, "
-                        "even a call in another app — and it goes out to whoever's listening, "
-                        "on its own volume, the same way your sounds do (your mic, the "
-                        "cable or the device you picked on the Setup tab, and the stream "
-                        "output). Sending to Nobody: only the stream output gets it. Only "
-                        "that program: nothing else you play is "
-                        "touched, and it keeps playing on your speakers as before. Programs "
-                        "you switch on are remembered and picked up again next time they run.")
+        self.info = (_("Send a program's sound"),
+                     _("Pick a program that's playing (a music player, a browser, a game, "
+                       "even a call in another app) and it goes out to whoever's listening, "
+                       "on its own volume, the same way your sounds do (your mic, the "
+                       "cable or the device you picked on the Setup tab, and the stream "
+                       "output). Sending to Nobody: only the stream output gets it. Only "
+                       "that program: nothing else you play is "
+                       "touched, and it keeps playing on your speakers as before. Programs "
+                       "you switch on are remembered and picked up again next time they run."))
         self.warn = hint_label("")
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
         v.addWidget(self.warn)
-        self.btn_bin = QPushButton("Forgotten programs…")
-        self.btn_bin.setToolTip("Bring back a program you forgot, with its volume and "
-                                "“Hear it myself”")
+        self.btn_bin = QPushButton(_("Forgotten programs…"))
+        self.btn_bin.setToolTip(_("Bring back a program you forgot, with its volume and "
+                                  "“Hear it myself”"))
         icons.set_icon(self.btn_bin, "trash")
         self.btn_bin.clicked.connect(self.show_forgotten)
         toolbar = QHBoxLayout()
         toolbar.addWidget(self.btn_bin)
+        # Live controls: pitch and effects on every program you send (no speed: live)
+        self.fx_btn = SpeedPitchButton("apps")
+        self.fx_btn.changed.connect(lambda _s, p, _k: setattr(self.engine, "apps_pitch", p))
+        self.fx_btn.fx_changed.connect(lambda fx: setattr(self.engine, "apps_fx", fx))
+        toolbar.addWidget(self.fx_btn)
         toolbar.addStretch(1)
-        size_label = QLabel("Card size")
+        size_label = self.size_label = QLabel(_("Card size"))
         size_label.setObjectName("muted")
         toolbar.addWidget(size_label)
         self.card_size = QSlider(Qt.Horizontal)
         self.card_size.setRange(240, CARD_MAX_W)
         self.card_size.setValue(cfg.app_card_width)
         self.card_size.setFixedWidth(100)
-        self.card_size.setAccessibleName("App card size")
-        self.card_size.setToolTip("App card size: smaller fits more programs across")
+        self.card_size.setAccessibleName(_("App card size"))
+        self.card_size.setToolTip(_("App card size: smaller fits more programs across"))
         no_wheel(self.card_size)
         toolbar.addWidget(self.card_size)
         v.addLayout(toolbar)
-        self.undo_bar = UndoBar("Remember the program again, as it was")
+        self.undo_bar = UndoBar(_("Remember the program again, as it was"))
         v.addWidget(self.undo_bar)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
@@ -490,14 +552,16 @@ class AppsTab(QWidget):
         ev.setContentsMargins(0, 12, 0, 0)
         ev.setSpacing(4)
         self.bun = BunnyWidget(height=72, pad=18, sad=0.6,
-                               lines=("play something?", "so quiet…", "music, please?"),
-                               joy_lines=("hehe!", "yay!"))
+                               lines=(_("play something?"), _("so quiet…"),
+                                      _("music, please?")),
+                               joy_lines=(_("hehe!"), _("yay!")), pong=True, naps=True)
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
-        self.empty_text = hint_label("Nothing is playing sound right now. Start some music, "
-                                     "a video or a call and it'll show up here.")
+        self.empty_text = hint_label(_("Nothing is playing sound right now. Start some music, "
+                                       "a video or a call and it'll show up here."))
         self.empty_text.setAlignment(Qt.AlignCenter)
         ev.addWidget(self.empty_text)
         self.list_layout.addWidget(self.empty)
+        self._tools_for_rows()
         self.list_layout.addLayout(self.grid)
         self.list_layout.addStretch(1)
         self.scroll.setWidget(self.list)
@@ -529,9 +593,10 @@ class AppsTab(QWidget):
         # quitting) must not emit from a deleted object; the thread keeps it alive,
         # and the bound slot drops the result once the panel is gone
         self.lister = _Lister(None, self.peaks)
+        self._listing = 0   # listings come in numbered: a newer one replaces a half-done one
         self.lister.ready.connect(self._on_listed)
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.lister.refresh)
+        self.timer.timeout.connect(self._refresh)
         self.meter_timer = QTimer(self)
         self.meter_timer.timeout.connect(self._meters)
         appstate.slow_in_background(self, self.meter_timer, METER_MS)   # behind a game
@@ -573,6 +638,19 @@ class AppsTab(QWidget):
         # the meters run while shown / recording; the list is re-read slowly until then
         self._pace_list()
         self.lister.refresh()
+
+    def _refresh(self):
+        """The list timer: the whole listing while the tab shows (or a capture needs
+        starting again), else the lister's cheap check first."""
+        if self.isVisible() or any(
+                row.capture is not None and (row.capture.ended or row.capture.error)
+                for row in self.rows.values()):
+            self.lister.refresh()
+            return
+        watch = frozenset(row.exe.lower() for row in self.rows.values())
+        waiting = frozenset(row.exe.lower() for key, row in self.rows.items()
+                            if row.app is None and self._spec(key) is not None)
+        self.lister.refresh(watch, waiting)
 
     def _watching(self) -> bool:
         """Something to keep an eye on while the tab is hidden: a remembered program
@@ -626,7 +704,9 @@ class AppsTab(QWidget):
     def live_tip(self) -> str:
         """The "● ON" line for the Apps tab's tooltip while a program is sent."""
         names = [row.name.text() for row in self.rows.values() if row.sending]
-        return "● ON: sending " + (", ".join(names) if names else "a program's sound")
+        if not names:
+            return _("● ON: sending a program's sound")
+        return _("● ON: sending {programs}", programs=", ".join(names))
 
     def _report_active(self):
         """Tell the tab's live dot when the set of programs being sent changes
@@ -655,7 +735,14 @@ class AppsTab(QWidget):
             if self.big is not None:
                 row.hide()   # another card has the big view
             self.empty.setVisible(False)
+            self._tools_for_rows()
         return row
+
+    def _tools_for_rows(self):
+        """The effects button and the card-size slider only mean something with a
+        card to apply them to: hidden over the empty page."""
+        for w in (self.fx_btn, self.size_label, self.card_size):
+            w.setVisible(bool(self.rows))
 
     def _drop_row(self, row: AppRow):
         self._stop_capture(row)
@@ -668,6 +755,7 @@ class AppsTab(QWidget):
         self.grid.removeWidget(row)
         row.deleteLater()
         self.empty.setVisible(not self.rows)
+        self._tools_for_rows()
         self._report_active()
 
     def _hidden(self) -> set[str]:
@@ -731,7 +819,30 @@ class AppsTab(QWidget):
                 row.set_app(row.app)
 
     def _on_listed(self, listed):
-        self._on_apps(*listed)
+        self._listing += 1
+        self._apply_listing(self._listing, *listed)
+
+    def _apply_listing(self, n: int, apps: list, alive: dict[int, str] | None):
+        """A listing, NEW_CARDS at a time: making a card is ~10 ms of Qt calls, and
+        the first look at the tab with eight programs running made them all at once,
+        long enough to skip a sound playing. The rest follow a moment later (unless a
+        newer listing came in meanwhile, which picks them up itself)."""
+        if n != self._listing:
+            return
+        hidden = self._hidden()
+        new = [key for key in dict.fromkeys(self._keys_for(apps))
+               if key not in self.rows and key not in hidden]
+        if len(new) > NEW_CARDS:
+            now = set(new[:NEW_CARDS])
+            # every copy of a kept program's .exe stays in: which copy gets the .exe's
+            # own card is worked out among them
+            keep = {app.exe.lower() for app, key in zip(apps, self._keys_for(apps))
+                    if key in self.rows or key in now}
+            self._on_apps([app for app in apps if app.exe.lower() in keep], alive)
+            QTimer.singleShot(CARDS_GAP_MS, self,
+                              lambda: self._apply_listing(n, apps, alive))
+            return
+        self._on_apps(apps, alive)
 
     def _on_apps(self, apps: list, alive: dict[int, str] | None = None):
         """`apps` the programs with an audio session; `alive` every running process
@@ -797,6 +908,7 @@ class AppsTab(QWidget):
                 row.set_status("")
         self._label_folders()
         self.empty.setVisible(not self.rows)
+        self._tools_for_rows()
         self._report_active()
         if not self.isVisible():
             self._pace_list()   # the last captured program closed: stop re-reading
@@ -838,9 +950,10 @@ class AppsTab(QWidget):
                 if secs >= MAX_SECONDS:
                     self._finish_rec(row)
                 elif rec.triggered:
-                    row.btn_rec.setText(f"Stop  {int(secs // 60)}:{int(secs % 60):02d}")
+                    row.btn_rec.setText(_("Stop  {time}",
+                                          time=f"{int(secs // 60)}:{int(secs % 60):02d}"))
                 else:
-                    row.btn_rec.setText("Waiting for sound…")
+                    row.btn_rec.setText(_("Waiting for sound…"))
             if row.src is not None:
                 row.meter.set_level(row.src.level)
                 row.src.level *= 0.8
@@ -872,7 +985,7 @@ class AppsTab(QWidget):
         cap = appaudio.AppCapture(row.app.pid, lambda x, r=row: self._sink(r, x),
                                   name=row.app.name)
         if not cap.start(wait=False):   # opening it can take seconds: see _poll_capture
-            row.set_status(cap.error or "Couldn't capture it.", error=True)
+            row.set_status(cap.error or _("Couldn't capture it."), error=True)
             log.warning("capturing %s failed: %s", row.exe, cap.error)
             return False
         row.capture = cap
@@ -942,7 +1055,7 @@ class AppsTab(QWidget):
             row.rec = None
             row.set_recording(False)
             return
-        row.btn_rec.setText("Waiting for sound…")
+        row.btn_rec.setText(_("Waiting for sound…"))
         # also enforces the length cap while hidden
         self.meter_timer.start(appstate.interval(METER_MS))
 
@@ -952,7 +1065,7 @@ class AppsTab(QWidget):
             return
         row.set_recording(False)
         if save:
-            row.set_status("Saving the clip…")
+            row.set_status(_("Saving the clip…"))
             row.sub.repaint()
         heard = rec.triggered
         data = rec.stop()
@@ -962,18 +1075,19 @@ class AppsTab(QWidget):
             return
         data = trim_silence(data)
         if len(data) < int(0.2 * SR):
-            self._flash(row, "Too short to keep." if heard
-                        else "Nothing was recorded: it didn't make a sound.")
+            self._flash(row, _("Too short to keep.") if heard
+                        else _("Nothing was recorded: it didn't make a sound."))
             return
         error = self._add_clip(row, data)
         if error:   # the window couldn't save it
-            row.set_status(f"Couldn't save the clip: {error}", error=True)
+            row.set_status(_("Couldn't save the clip: {error}", error=error), error=True)
             return
-        self._flash(row, f"✓ Saved a {len(data) / SR:.1f}s clip to your Sounds.")
+        self._flash(row, _("✓ Saved a {seconds}s clip to your Sounds.",
+                           seconds=f"{len(data) / SR:.1f}"))
 
     def _add_clip(self, row: AppRow, data) -> str:
         """Hand a clip to the window to become a sound; why it couldn't, or ""."""
-        name = (row.app.name if row.app else row.name.text())[:30] or "App"
+        name = (row.app.name if row.app else row.name.text())[:30] or _("App")
         self.clip_error = ""
         self.clip_ready.emit(data, f"{name} {time.strftime('%H.%M.%S')}")
         return self.clip_error
@@ -993,6 +1107,7 @@ class AppsTab(QWidget):
         if row.app is None and not self._has_take(row):
             row.set_clip_open(False)
             return
+        usage.used("clip-editor")   # the name only (usage.py)
         if row.editor is None:
             row.editor = ClipEditor(self.engine, self.cfg, row)
             row.editor.save_clip.connect(lambda data, whole, r=row: self._save_edit(r, data, whole))
@@ -1024,17 +1139,18 @@ class AppsTab(QWidget):
         if whole:   # nothing picked out: the dead air at its ends goes
             data = trim_silence(data)
         if len(data) < int(0.05 * SR):
-            row.editor.flash("Nothing but silence there.")
+            row.editor.flash(_("Nothing but silence there."))
             return
-        src = (row.app.name if row.app else row.name.text())[:30] or "App"
+        src = (row.app.name if row.app else row.name.text())[:30] or _("App")
         try:
             self.shelf.add(data, f"{src} {time.strftime('%H.%M.%S')}", src)
         except Exception as e:  # noqa: BLE001 - the disk is full, the folder is locked
             log.exception("can't keep the clip")
-            row.editor.flash(f"Couldn't save it: {errors.plain(e)}", error=True)
+            row.editor.flash(_("Couldn't save it: {error}", error=errors.plain(e)), error=True)
             return
-        row.editor.flash(f"✓ Kept {len(data) / SR:.2f}s in Saved clips below: double-click "
-                         "plays it, right-click adds it to your Sounds.")
+        row.editor.flash(_("✓ Kept {seconds}s in Saved clips below: double-click plays it, "
+                           "right-click adds it to your Sounds.",
+                           seconds=f"{len(data) / SR:.2f}"))
 
     def _shelf_to_sounds(self, data, name: str):
         self.clip_error = ""
@@ -1134,7 +1250,7 @@ class AppsTab(QWidget):
         self._report_active()
 
     def _stream_output(self) -> bool:
-        """A stream output is set (Settings → Audio → Stream output)."""
+        """A stream output is set (Also send to → Clean, for streaming)."""
         return bool(self.engine.names.get("obs"))
 
     def _on_hear(self, row: AppRow, on: bool):
@@ -1158,7 +1274,8 @@ class AppsTab(QWidget):
             item = trash.put_app(row.exe.lower(), spec, name, hidden=running,
                                  path=key if is_path_key(key) else "")
             self._label_bin()
-            self.undo_bar.show_for(f"Removed “{name}”",
+            self.undo_bar.show_for(_("Removed “{name}”", name=name),
+
                                    lambda: self._undo_forget(item.id))
         self._stop_send(row)
         self._drop_row(row)

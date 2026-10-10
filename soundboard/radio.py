@@ -1,9 +1,9 @@
-"""Radio tab back end: the station directory, the stream player and the globe page.
+"""Radio tab back end: the station directory, the stream player and the map's data.
 
 Stations come from Radio Browser (https://www.radio-browser.info), a free,
 community-run open directory of ~60 000 internet radio stations with an open API
-and no key. Most stations carry a latitude / longitude, which the globe uses.
-The app asks it for: the most-listened stations that have a location (the globe,
+and no key. Most stations carry a latitude / longitude, which the map uses.
+The app asks it for: the most-listened stations that have a location (the map,
 cached for a day in radio_dir()), searches you type, and a "click" when you
 start a station (the directory's own popularity count, which it asks clients to
 send; Settings > Privacy & security turns it off). Nothing else about you is sent. With Radio
@@ -16,17 +16,16 @@ audio to the UI thread as 48 kHz stereo float, which goes into the engine
 (`Engine.feed_radio`) like an app's captured audio (Apps tab), so it can go out
 with your sounds.
 
-The globe is globe.gl (MIT licence, three.js) in a web view. It, the Earth pictures
-and the country outlines ship with the app (ASSET_DIR), so opening either map
-contacts nobody: no CDN learns who opened the Radio tab. The page is ours;
-station names from the directory are escaped before they're shown, the page
-can't navigate anywhere, and it reports clicks back over QWebChannel.
+The map is painted by Qt (ui/flatmap.py). Its country outlines ship with the app
+(ASSET_DIR), so opening it contacts nobody: no CDN learns who opened the Radio tab.
+(Up to 1.9.7 an "HD" button swapped in a 3D globe, globe.gl in a web view. It went:
+the web engine cost ~200 MB of the install, forced GPU drawing on every window and
+kept Chromium in the app once opened.)
 """
 from __future__ import annotations
 
 import base64
 import hashlib
-import html
 import ipaddress
 import json
 import logging
@@ -56,10 +55,9 @@ log = logging.getLogger(__name__)
 API_BASES = ("https://all.api.radio-browser.info", "https://de1.api.radio-browser.info",
              "https://de2.api.radio-browser.info")
 GLOBE_LIMIT = 3000         # stations fetched for the map (the most listened-to)
-GLOBE_LIGHT = 1000         # ...of which the 3D globe pins this many (the flat map: all)
 SEARCH_LIMIT = 150
 SEARCH_MAX_CHARS = 80
-CACHE_S = 24 * 3600        # how long the globe's station list is reused
+CACHE_S = 24 * 3600        # how long the map's station list is reused
 TIMEOUT_MS = 15000
 USER_AGENT = "OnionBoard"   # Radio Browser asks apps to name themselves; no version
 FEATURE = "radio"           # its switch in Settings > Privacy & security (soundboard.net)
@@ -72,15 +70,11 @@ STALL_S = 8.0              # ...and one that goes quiet this long while playing 
 TOR_RETRIES = 6
 TOR_CONNECT_S = 60.0
 
-# The maps' files ship with the app: assets/radio in a source checkout, radio/ in the
+# The map's outlines ship with the app: assets/radio in a source checkout, radio/ in the
 # frozen app (build.ps1 bundles it). Nothing is fetched from a CDN.
 ASSET_DIR = (Path(sys._MEIPASS) / "radio" if hasattr(sys, "_MEIPASS")
              else Path(__file__).resolve().parent.parent / "assets" / "radio")
-GLOBE_JS = "globe.gl.min.js"                   # globe.gl 2.46.2 (MIT), includes three.js
-GLOBE_SRI = "sha384-1uolMBZ25k3zJcNwCLEv49+L+m2dZudqAzsoSAJfQTzDCSBxJzrMuZ2dkp/5JKiT"
-EARTH_DAY = "earth-blue-marble.jpg"            # NASA Blue Marble (public domain)
-EARTH_NIGHT = "earth-night.jpg"                # NASA Black Marble: city lights
-# Natural Earth country outlines (public domain), where the globe's country names go
+# Natural Earth country outlines (public domain): the map's land, where its names go
 COUNTRIES = "ne_110m_admin_0_countries.geojson"
 COUNTRIES_SRI = "sha384-hAVr+/g2HDlVDeHrAVqTIQV3tH1JE5AbtuvCSCcoeG+ZDteCU2XGaE5yLDiLP9m5"
 # The outlines are coarse and leave out small countries and islands. These are named
@@ -108,7 +102,7 @@ PLACES = (
     ("Marshall Islands", 7.1, 171.2, 1.5),
     ("Nauru", -0.53, 166.93, 0.5), ("Kiribati", 1.42, 172.98, 1), ("Tuvalu", -8.52, 179.2, 0.8),
 )
-# how the outlines' short names read on the globe; None leaves one unnamed
+# how the outlines' short names read on the map; None leaves one unnamed
 COUNTRY_NAMES = {
     "United States of America": "United States", "Dem. Rep. Congo": "DR Congo",
     "Central African Rep.": "Central African Republic", "Bosnia and Herz.": "Bosnia",
@@ -121,8 +115,8 @@ COUNTRY_NAMES = {
 
 
 def radio_dir():
-    """Where the station cache and the globe's web cache live (read when used, so
-    tests that move APP_DIR move this too)."""
+    """Where the station cache lives (read when used, so tests that move APP_DIR move
+    this too)."""
     return library.APP_DIR / "radio"
 
 
@@ -327,7 +321,7 @@ def search_text(text: str) -> str:
 
 def _outline_features(raw: bytes) -> list[tuple[dict, list[list[tuple[float, float]]]]]:
     """(properties, outer rings as (lon, lat)) per country, or [] unless `raw` is
-    exactly the pinned outline file (checked like the globe's SRI)."""
+    exactly the pinned outline file (checked by its hash)."""
     if not isinstance(raw, bytes | bytearray):
         return []
     digest = "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode()
@@ -589,7 +583,7 @@ class RadioDirectory(QObject):
         reply.finished.connect(finished)
         return reply
 
-    # -- the globe's stations
+    # -- the map's stations ("globe": the name is from the old 3D globe)
     def load_globe(self, force: bool = False):
         self.globe_stale = ""   # set when a refresh failed and the saved list stands in
         # the saved list is read on a thread as well (a full one takes ~0.3 s)
@@ -661,16 +655,19 @@ class RadioDirectory(QObject):
     # -- the flat map's land
     def load_outlines(self):
         """The country outlines, from the copy that ships with the app. Answers [] when
-        it's missing or altered: the map shows just its dots."""
-        try:
-            raw = (ASSET_DIR / COUNTRIES).read_bytes()
-        except OSError:
-            raw = b""
-        rings = outline_rings(raw)
-        if not rings:
-            log.warning("map outlines unavailable: %s missing or altered", COUNTRIES)
-        labels = outline_labels(raw) if rings else []
-        QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings, labels))
+        it's missing or altered: the map shows just its dots. Read and parsed on a
+        thread: on the UI thread a busy disk froze the window for 5 s (1.8.0)."""
+        def work():
+            try:
+                raw = (ASSET_DIR / COUNTRIES).read_bytes()
+            except OSError:
+                raw = b""
+            rings = outline_rings(raw)
+            if not rings:
+                log.warning("map outlines unavailable: %s missing or altered", COUNTRIES)
+            return rings, (outline_labels(raw) if rings else [])
+        self._off_thread(work, lambda r: self.outlines_ready.emit(*r),
+                         lambda: self.outlines_ready.emit([], []))
 
     # -- search
     def search(self, text: str):
@@ -831,8 +828,11 @@ class RadioPlayer(QObject):
         self._looked_up.connect(self._on_looked_up)
         self._first_audio.connect(self._on_first_audio)
         self._conn = 0               # net.generation() when the stream was opened
+        # held by _on_buffer (decoding thread) while it runs; shutdown() takes it to know
+        # none is running before the player can be freed
+        self._buffer_lock = threading.Lock()
+        self._closed = False
         net.on_change(self._on_connection)
-        preload_decoder()
 
     def _make(self):
         fmt = QAudioFormat()
@@ -953,6 +953,11 @@ class RadioPlayer(QObject):
     def _on_buffer(self, buf):
         """On Qt's decoding thread. The player's own state changes on the UI thread
         (_on_first_audio)."""
+        with self._buffer_lock:
+            if not self._closed:
+                self._take_buffer(buf)
+
+    def _take_buffer(self, buf):
         if self.station is None:
             return
         gen = self._gen
@@ -1043,7 +1048,19 @@ class RadioPlayer(QObject):
             self.now_playing.emit(title)
 
     def shutdown(self):
+        """Stop for good, before the player is freed (its tab going, the app closing):
+        Qt's decoding thread is cut off and any buffer it's still handing over is
+        waited out, so it never calls into a freed player (a crash)."""
+        if self._closed:
+            return
         self.stop()
+        if self._out is not None:
+            try:
+                self._out.audioBufferReceived.disconnect(self._on_buffer)
+            except (RuntimeError, TypeError):   # never connected / already gone
+                pass
+        with self._buffer_lock:
+            self._closed = True
 
 
 def _tor_ready() -> bool:
@@ -1051,10 +1068,10 @@ def _tor_ready() -> bool:
     return tor.manager().state == tor.READY
 
 
-# --------------------------------------------------------------------------- globe page
+# --------------------------------------------------------------------------- the map
 
 def globe_points(stations: list[Station]) -> list[dict]:
-    """What the globe needs per station (short keys: this is sent as one JSON blob).
+    """What the map needs per station (short keys; the name is from the old globe).
     The dicts are each station's own, made once: read them, don't change them."""
     return [s.map_point for s in stations if s.lat is not None and s.lon is not None]
 
@@ -1109,440 +1126,3 @@ def town_labels(points: list[dict], limit: int = TOWNS_MAX) -> list[dict]:
                     "lo": round(mid - 360 if mid > 180 else mid, 4), "k": len(near)})
     out.sort(key=lambda t: (-t["k"], t["n"]))
     return out[:limit]
-
-
-def globe_base_url() -> QUrl:
-    """What globe_html's page is loaded relative to: its script, pictures and outlines."""
-    return QUrl.fromLocalFile(str(ASSET_DIR) + "/")
-
-
-def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str) -> str:
-    """The 3D globe page (the Radio tab's HD view; the flat map is the default). Colours
-    are theme tokens (validated hex), scripts are pinned.
-
-    It only draws while it's being used: no auto-spin, no stars or terrain relief, one
-    pixel per screen pixel. A web view that redraws 60+ times a second makes the whole
-    app stutter. It stops drawing at once while the app is in the background."""
-    def hexcol(c: str, fallback: str) -> str:
-        c = str(c)
-        return c if len(c) == 7 and c[0] == "#" and all(ch in "0123456789abcdefABCDEF"
-                                                         for ch in c[1:]) else fallback
-    bg, accent = hexcol(bg, "#15171f"), hexcol(accent, "#7c5cff")
-    hot, text = hexcol(hot, "#ff4d8d"), hexcol(text, "#e6e8f0")
-    # the page is loaded with ASSET_DIR as its base (globe_base_url): files from there,
-    # nothing from the internet
-    csp = ("default-src 'none'; script-src 'unsafe-inline' file:; "
-           "img-src file: data: blob:; style-src 'unsafe-inline'; "
-           "connect-src file: data: blob:; worker-src blob:")
-    return f"""<!doctype html><html><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="{html.escape(csp)}">
-<style>
-:root{{--accent:{accent};--hot:{hot}}}
-html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
-  font-family:'Segoe UI',sans-serif;user-select:none}}
-#g{{position:absolute;inset:0}}
-#msg{{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  text-align:center;padding:24px;font-size:13px;opacity:.75;pointer-events:none}}
-.card{{background:rgba(12,14,22,.94);color:#e9ecf5;border:1px solid var(--accent);
-  border-radius:10px;padding:10px 12px;font:12px 'Segoe UI',sans-serif;width:260px;
-  box-shadow:0 6px 24px rgba(0,0,0,.5)}}
-.card h3{{margin:0 0 2px;font-size:14px;font-weight:600;line-height:1.25}}
-.card .where{{opacity:.8;margin-bottom:6px}}
-.card .cc{{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;
-  padding:0 4px;margin-right:5px;font-size:10px;font-weight:700}}
-.card .tags{{margin:4px 0 6px}}
-.card .tag{{display:inline-block;background:rgba(255,255,255,.1);border-radius:9px;
-  padding:1px 7px;margin:0 3px 3px 0;font-size:11px}}
-.card table{{border-collapse:collapse;width:100%}}
-.card td{{padding:1px 0;vertical-align:top}}
-.card td:first-child{{opacity:.6;padding-right:8px;white-space:nowrap}}
-.card .up{{color:#13ce66}} .card .down{{color:#ff8fa3}}
-.card .go{{margin-top:7px;color:var(--hot);font-weight:600}}
-#zoom{{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:4px}}
-#zoom button{{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);
-  background:rgba(12,14,22,.75);color:#fff;font:600 17px 'Segoe UI',sans-serif;cursor:pointer}}
-#zoom button:hover{{border-color:var(--accent)}}
-#zoom #flat,#zoom #names{{font-size:10px;opacity:.6}}
-#zoom #names.on{{opacity:1;border-color:var(--accent)}}
-.place{{font:600 11px 'Segoe UI',sans-serif;color:#fff;white-space:nowrap;pointer-events:none;
-  text-shadow:0 0 3px #000,0 0 2px #000,0 1px 2px #000;opacity:.9;letter-spacing:.2px}}
-body.nogl .place{{visibility:hidden!important}}
-.place.big{{font-size:13px}} .place.isle{{font-weight:400;font-style:italic;opacity:.8}}
-.place.town{{font-size:10px;font-weight:600;opacity:.85;padding-bottom:18px}} /* above its dots */
-#hint{{position:absolute;left:10px;bottom:10px;font-size:11px;opacity:.55;pointer-events:none}}
-</style></head><body><div id="g"></div><div id="msg">Loading the globe…</div>
-<div id="zoom"><button id="zin" title="Zoom in (Ctrl +)">+</button>
-<button id="zout" title="Zoom out (Ctrl −)">−</button>
-<button id="look" title="Day / night Earth">☾</button>
-<button id="names" title="Country, island and city names on / off">Aa</button>
-<button id="flat" title="Back to the flat map (lighter on your PC)">2D</button></div>
-<div id="hint">Drag to spin · scroll or Ctrl +/− to zoom · click a dot to play</div>
-<script>{qwebchannel_js}</script>
-<script src="{GLOBE_JS}"></script>
-<script>
-"use strict";
-let ACCENT = "{accent}", HOT = "{hot}";
-const ring = () => t => HOT + Math.round(255 * (1 - t)).toString(16).padStart(2, "0");
-let W = null, bridge = null, stations = [], current = null, maxK = 1;
-let night = false;
-let asleep = false, idleT = 0, appActive = true, fitting = false;
-try {{ night = localStorage.getItem("earth") === "night"; }} catch (e) {{}}
-const msg = t => {{ const m = document.getElementById("msg"); m.textContent = t || "";
-                   m.style.display = t ? "flex" : "none"; }};
-// Draw only while something moves: input, a camera flight, a texture arriving, the
-// window being moved or resized. In the background it still draws a moment, so a resize
-// or a move to another screen (which blanks the picture) is redrawn before it sleeps.
-function wake(ms) {{
-  if (!W) return;
-  if (asleep) {{ W.resumeAnimation(); asleep = false; }}
-  if (!fitting) {{ fitting = true; requestAnimationFrame(fitLoop); }}
-  clearTimeout(idleT);
-  idleT = setTimeout(() => {{ if (W) {{ W.pauseAnimation(); asleep = true; }} }},
-                     appActive ? (ms || 1500) : 250);
-}}
-function fitLoop() {{
-  // the names are re-placed on every frame the globe draws (so, not while it sleeps)
-  if (asleep || !W) {{ fitting = false; return; }}
-  pickTowns();
-  fitNames();
-  requestAnimationFrame(fitLoop);
-}}
-for (const ev of ["pointerdown", "pointermove", "wheel", "keydown"])
-  addEventListener(ev, () => wake(), {{passive: true, capture: true}});
-const esc = s => String(s).replace(/[&<>"']/g,
-  c => ({{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}})[c]);
-const ago = iso => {{
-  const t = Date.parse(iso.length <= 10 ? iso : iso.replace(" ", "T"));
-  if (!t) return "";
-  const d = Math.max(0, (Date.now() - t) / 864e5);
-  return d < 1 ? "today" : d < 2 ? "yesterday" : d < 60 ? Math.round(d) + " days ago" :
-         d < 730 ? Math.round(d / 30.4) + " months ago" : Math.round(d / 365) + " years ago";
-}};
-const fmtN = n => Number(n || 0).toLocaleString();
-function card(d) {{
-  // everything from the directory is escaped: it's community-edited
-  const rows = [];
-  const row = (k, v) => {{ if (v) rows.push("<tr><td>" + k + "</td><td>" + v + "</td></tr>"); }};
-  row("Language", esc(d.l || ""));
-  row("Audio", esc([d.b ? d.b + " kbps" : "", d.co || "", d.h ? "HLS" : ""]
-                   .filter(Boolean).join(" · ")));
-  const tr = d.tr || 0;
-  row("Plays today", fmtN(d.k) + (tr ? ' <span class="' + (tr > 0 ? "up" : "down") + '">' +
-      (tr > 0 ? "▲ " : "▼ ") + fmtN(Math.abs(tr)) + "</span>" : ""));
-  row("Votes", d.v ? "♥ " + fmtN(d.v) : "");
-  row("Working", d.ck ? "checked " + esc(ago(d.ck)) : "");
-  row("Listed info", d.ch ? "updated " + esc(ago(d.ch)) : "");
-  const where = [d.s, d.c].filter(Boolean).map(esc).join(", ");
-  const tags = (d.t || []).map(t => '<span class="tag">' + esc(t) + "</span>").join("");
-  return '<div class="card"><h3>' + esc(d.n) + "</h3>" +
-    '<div class="where">' + (d.cc ? '<span class="cc">' + esc(d.cc) + "</span>" : "") +
-    where + "</div>" + (tags ? '<div class="tags">' + tags + "</div>" : "") +
-    "<table>" + rows.join("") + "</table>" +
-    '<div class="go">' + (d.id === current ? "▶ Playing now" : "▶ Click to play") +
-    "</div></div>";
-}}
-
-// zoom: the wheel (with or without Ctrl), Ctrl +/−/0 and the buttons. Ctrl+wheel and
-// Ctrl +/− would otherwise zoom the whole page instead of the globe.
-function zoom(f, ms) {{
-  if (!W) return;
-  const p = W.pointOfView();
-  W.pointOfView({{altitude: Math.min(5, Math.max(0.12, p.altitude * f))}}, ms);
-  wake(ms + 1500);
-}}
-function fly(lat, lng, altitude, ms) {{
-  if (!W) return;
-  W.pointOfView({{lat, lng, altitude}}, ms);
-  wake(ms + 1500);
-}}
-addEventListener("wheel", e => {{
-  e.preventDefault();
-  zoom(Math.exp(Math.max(-60, Math.min(60, e.deltaY)) * (e.ctrlKey ? 0.006 : 0.003)), 0);
-}}, {{passive: false, capture: true}});
-addEventListener("keydown", e => {{
-  const k = e.key;
-  if (k === "+" || k === "=" || k === "-" || k === "_" || (e.ctrlKey && k === "0")) {{
-    e.preventDefault();
-    if (k === "0") {{ if (W) {{ W.pointOfView({{altitude: 2.4}}, 600); wake(2100); }} }}
-    else zoom(k === "-" || k === "_" ? 1.35 : 1 / 1.35, 250);
-  }}
-}}, true);
-const look = document.getElementById("look");
-const setLook = () => {{
-  look.textContent = night ? "☀" : "☾";
-  if (W) {{ W.globeImageUrl(night ? "{EARTH_NIGHT}" : "{EARTH_DAY}"); wake(4000); }}
-}};
-look.onclick = () => {{
-  night = !night;
-  try {{ localStorage.setItem("earth", night ? "night" : "day"); }} catch (e) {{}}
-  setLook();
-}};
-setLook();
-document.getElementById("flat").onclick = () => {{ if (bridge) bridge.setHd(false); }};
-function setActive(on) {{
-  // the app went to the background (a game, another window): stop drawing
-  appActive = !!on;
-  wake();
-}}
-
-// Country and island names. They're HTML on top of the globe, so they stay the same
-// readable size at any zoom; a name only shows once its country is wider on screen
-// than the name, so zoomed out you see the big countries and zooming in adds the rest.
-// Zoomed in further, the cities and towns the stations are in (setTowns) are named too,
-// the ones with the most stations first. Only those in view are made into names (at
-// most TOWNS_IN_VIEW), so zoomed out they cost nothing.
-let countries = [], towns = [], places = [], showNames = true;
-const TOWN_PX = 14, TOWNS_IN_VIEW = 40;   // px per degree from which towns show; how many
-let townKey = "", townAt = 0, townT = 0;
-try {{ showNames = localStorage.getItem("names") !== "off"; }} catch (e) {{}}
-const namesBtn = document.getElementById("names");
-function labelPoint(ring) {{
-  // the point deepest inside the outline (a centre can fall outside: Vietnam, Croatia)
-  let x0 = 180, x1 = -180, y0 = 90, y1 = -90;
-  for (const [x, y] of ring) {{ x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y);
-                               y1 = Math.max(y1, y); }}
-  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180);   // a degree of longitude is shorter
-  const inside = (x, y) => {{
-    let n = false;
-    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {{
-      const [xi, yi] = ring[i], [xj, yj] = ring[j];
-      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) n = !n;
-    }}
-    return n;
-  }};
-  const depth = (x, y) => {{
-    let best = Infinity;
-    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {{
-      const ax = ring[j][0] * k, ay = ring[j][1], bx = ring[i][0] * k, by = ring[i][1];
-      const dx = bx - ax, dy = by - ay, px = x * k - ax, py = y - ay;
-      const t = Math.max(0, Math.min(1, (px * dx + py * dy) / (dx * dx + dy * dy || 1)));
-      best = Math.min(best, Math.hypot(px - t * dx, py - t * dy));
-    }}
-    return best;
-  }};
-  let bx = (x0 + x1) / 2, by = (y0 + y1) / 2, bd = -1;
-  let sx = (x1 - x0) / 24, sy = (y1 - y0) / 24, cx = bx, cy = by;
-  for (let pass = 0; pass < 2; pass++) {{   // a coarse grid, then a finer one around the best
-    for (let i = -12; i <= 12; i++) for (let j = -12; j <= 12; j++) {{
-      const x = cx + i * sx, y = cy + j * sy;
-      if (!inside(x, y)) continue;
-      const d = depth(x, y);
-      if (d > bd) {{ bd = d; bx = x; by = y; }}
-    }}
-    cx = bx; cy = by; sx /= 10; sy /= 10;
-  }}
-  return {{la: by, lo: bx, w: (x1 - x0) * k}};
-}}
-const area = ring => {{
-  let a = 0;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++)
-    a += (ring[j][0] - ring[i][0]) * (ring[j][1] + ring[i][1]);
-  return Math.abs(a / 2) * Math.cos(ring[0][1] * Math.PI / 180);
-}};
-const RENAME = {json.dumps(COUNTRY_NAMES)};
-function localJson(name) {{
-  // a file next to the page; fetch() can't read file: URLs, XMLHttpRequest can
-  return new Promise((ok, fail) => {{
-    const x = new XMLHttpRequest();
-    x.open("GET", name);
-    x.responseType = "json";
-    x.onload = () => x.response ? ok(x.response) : fail();
-    x.onerror = fail;
-    x.send();
-  }});
-}}
-function loadPlaces() {{
-  const extra = {json.dumps([{"n": n, "la": la, "lo": lo, "w": w, "isle": 1}
-                             for n, la, lo, w in PLACES])};
-  localJson("{COUNTRIES}").then(geo => {{
-    const list = [];
-    for (const f of geo.features) {{
-      const p = f.properties, g = f.geometry;
-      let n = RENAME.hasOwnProperty(p.NAME) ? RENAME[p.NAME] : p.NAME;
-      if (!n || !g) continue;
-      const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
-      const main = polys.map(q => q[0]).reduce((a, b) => area(b) > area(a) ? b : a);
-      list.push(Object.assign({{n}}, labelPoint(main)));
-    }}
-    setPlaces(list.concat(extra));
-  }}).catch(() => setPlaces(extra));   // offline: the islands still get their names
-}}
-function setPlaces(list) {{
-  countries = list.sort((a, b) => b.w - a.w);   // the biggest get first claim on the space
-  showPlaces();
-}}
-function setTowns(list) {{
-  // [{{n, la, lo, k}}], most stations first: after the countries in the claim on space
-  towns = list.map((t, i) => ({{n: t.n, la: t.la, lo: t.lo, k: t.k, town: 1, i}}));
-  townKey = ""; townAt = 0;
-  showPlaces([]);
-  pickTowns();
-}}
-function pickTowns() {{
-  // the towns in view, when zoomed in far enough; at most a few times a second
-  if (!W) return;
-  const now = performance.now();
-  if (now - townAt < 200) {{
-    if (!townT) townT = setTimeout(() => {{ townT = 0; pickTowns(); }}, 220);
-    return;
-  }}
-  townAt = now;
-  const pov = W.pointOfView(), R = Math.PI / 180;
-  const pxDeg = innerHeight / (2 * pov.altitude * Math.tan(25 * R) * 57.3);
-  const pick = [];
-  if (showNames && pxDeg >= TOWN_PX) {{
-    // how far from the middle of the view the screen reaches, in degrees
-    const reach = Math.min(70, Math.hypot(innerWidth, innerHeight) / 2 / pxDeg);
-    // no further out than fitNames shows a name (0.45), or the slots go to hidden ones
-    const lim = Math.max(0.45, Math.cos(reach * R));
-    const s0 = Math.sin(pov.lat * R), c0 = Math.cos(pov.lat * R);
-    for (const d of towns) {{
-      const facing = s0 * Math.sin(d.la * R) +
-                     c0 * Math.cos(d.la * R) * Math.cos((d.lo - pov.lng) * R);
-      if (facing >= lim && pick.push(d) >= TOWNS_IN_VIEW) break;
-    }}
-  }}
-  const key = pick.map(d => d.i).join(",");
-  if (key !== townKey) {{ townKey = key; showPlaces(pick); }}
-}}
-function showPlaces(near) {{
-  places = countries.concat(near || places.filter(d => d.town));
-  if (W) {{ W.htmlElementsData(places); wake(3000); }}
-  setTimeout(fitNames, 50);   // the globe makes the name elements on its next update
-}}
-function placeEl(d) {{
-  const el = document.createElement("div");
-  el.className = "place" + (d.town ? " town" : d.isle ? " isle" : d.w > 25 ? " big" : "");
-  el.style.visibility = "hidden";   // until fitNames decides
-  el.textContent = d.n;
-  d.el = el;
-  return el;
-}}
-function fitNames() {{
-  // Runs on every frame drawn. A name shows when its country is about as wide on screen
-  // as the name (an island: once it's a speck you can see, as the sea around it is free),
-  // it isn't near the globe's edge, and it doesn't cover a bigger one's.
-  if (!W) return;
-  const pov = W.pointOfView(), R = Math.PI / 180;
-  // px per degree in the middle of the view: the camera is alt globe radii up, 50° fov
-  const pxDeg = innerHeight / (2 * pov.altitude * Math.tan(25 * R) * 57.3);
-  const s0 = Math.sin(pov.lat * R), c0 = Math.cos(pov.lat * R), kept = [];
-  for (const d of places) {{
-    if (!d.el) continue;
-    // cosine of the angle from the middle of the view: 1 facing us, 0 at the edge
-    const facing = s0 * Math.sin(d.la * R) +
-                   c0 * Math.cos(d.la * R) * Math.cos((d.lo - pov.lng) * R);
-    let show = showNames && facing > 0.45 && (d.town ? pxDeg >= TOWN_PX :
-               d.w * pxDeg * facing >= (d.isle ? 12 : d.n.length * 5.2));
-    if (show) {{
-      if (!d.pw) {{ d.pw = d.el.offsetWidth; d.ph = d.el.offsetHeight; }}
-      const p = W.getScreenCoords(d.la, d.lo, 0.01);
-      const box = [p.x - d.pw / 2 - 3, p.y - d.ph / 2, p.x + d.pw / 2 + 3, p.y + d.ph / 2];
-      show = !kept.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]);
-      if (show) kept.push(box);
-    }}
-    d.el.style.visibility = show ? "" : "hidden";
-  }}
-}}
-function applyNames() {{
-  namesBtn.classList.toggle("on", showNames);
-  townAt = 0; pickTowns(); fitNames(); wake();
-}}
-namesBtn.onclick = () => {{
-  showNames = !showNames;
-  try {{ localStorage.setItem("names", showNames ? "on" : "off"); }} catch (e) {{}}
-  applyNames();
-}};
-namesBtn.classList.toggle("on", showNames);
-document.getElementById("zin").onclick = () => zoom(1 / 1.35, 250);
-document.getElementById("zout").onclick = () => zoom(1.35, 250);
-try {{ new QWebChannel(qt.webChannelTransport, ch => {{ bridge = ch.objects.radio; }}); }}
-catch (e) {{ /* no app to talk to (a plain browser): the globe still works */ }}
-
-function build() {{
-  if (typeof Globe !== "function") {{
-    msg("The globe couldn't load (its files are missing from the app's radio folder: " +
-        "reinstalling puts them back). Search and the station list still work.");
-    return;
-  }}
-  try {{
-    W = Globe({{animateIn: true}})(document.getElementById("g"))
-      .backgroundColor("{bg}")
-      .globeImageUrl(night ? "{EARTH_NIGHT}" : "{EARTH_DAY}")
-      .onGlobeReady(() => wake(2500))
-      .showAtmosphere(true).atmosphereColor("#7fb8ff").atmosphereAltitude(0.16)
-      .pointResolution(4)
-      .pointLat("la").pointLng("lo")
-      .pointAltitude(d => d.id === current ? 0.08 : 0.004 + 0.03 * Math.sqrt(d.k / maxK))
-      .pointRadius(d => d.id === current ? 0.55 : 0.33)
-      .pointColor(d => d.id === current ? HOT : ACCENT)
-      .pointLabel(card)
-      .onPointClick(d => {{ if (bridge) bridge.play(d.id); }})
-      .ringLat("la").ringLng("lo").ringColor(ring)
-      .ringMaxRadius(3).ringPropagationSpeed(2).ringRepeatPeriod(900)
-      .htmlLat("la").htmlLng("lo").htmlAltitude(0.01).htmlElement(placeEl)
-      .htmlTransitionDuration(0).htmlElementsData(places);
-    const c = W.controls();
-    c.enableZoom = false;   // our own wheel handler zooms (see zoom above)
-    const m = W.globeMaterial();
-    if (m.specular) {{ m.specular.setStyle("#222a38"); m.shininess = 12; }}   // a soft sheen
-    const cv = W.renderer().domElement;
-    // The names are page text, the globe a WebGL picture. Moving the window to another
-    // screen can lose the picture (a lost context, or a resize that clears it while the
-    // globe sleeps) while the text stays, so the names hide until the globe is back.
-    cv.addEventListener("webglcontextlost", () => {{ document.body.classList.add("nogl"); }});
-    cv.addEventListener("webglcontextrestored", () => {{
-      document.body.classList.remove("nogl"); wake(3000);
-    }});
-    const fit = () => {{
-      W.renderer().setPixelRatio(1);
-      W.width(innerWidth).height(innerHeight); fitNames(); wake();   // resizing clears it
-    }};
-    const onDpr = () => {{   // a screen with another scale: no resize event for that alone
-      fit();
-      matchMedia("(resolution: " + devicePixelRatio + "dppx)")
-        .addEventListener("change", onDpr, {{once: true}});
-    }};
-    W.pointOfView({{lat: 25, lng: 10, altitude: 2.4}});
-    addEventListener("resize", fit); fit();
-    matchMedia("(resolution: " + devicePixelRatio + "dppx)")
-      .addEventListener("change", onDpr, {{once: true}});
-    document.addEventListener("visibilitychange", () => {{ if (!document.hidden) wake(); }});
-    msg(stations.length ? "" : "Finding stations…");
-    if (stations.length) W.pointsData(stations);
-    loadPlaces();
-  }} catch (e) {{
-    W = null;
-    msg("The globe can't be shown here (" + e.message + "). Search and the list still work.");
-  }}
-}}
-
-function setStations(list) {{
-  stations = list; maxK = Math.max(1, ...list.map(d => d.k));
-  if (W) {{ W.pointsData(stations); msg(""); wake(); }}
-}}
-function select(p, go) {{
-  // p: the playing station's point (or null); one found by search is added to the globe
-  current = p ? p.id : null;
-  if (p && !stations.some(d => d.id === p.id)) stations = stations.concat([p]);
-  if (!W) return;
-  W.pointsData(stations);
-  const s = stations.find(d => d.id === current);
-  W.ringsData(s ? [s] : []);
-  if (s && go) fly(s.la, s.lo, 1.5, 1200); else wake();
-}}
-function showMessage(t) {{ msg(t); }}
-function setTheme(bg, accent, hot, text) {{
-  // a live theme switch in the app: recolour without reloading the globe
-  ACCENT = accent; HOT = hot;
-  const r = document.documentElement.style;
-  r.setProperty("--accent", accent); r.setProperty("--hot", hot);
-  document.body.style.background = bg; document.body.style.color = text;
-  if (!W) return;
-  W.backgroundColor(bg);   // setting the accessors again makes the globe redraw with them
-  W.pointColor(d => d.id === current ? HOT : ACCENT);
-  W.ringColor(ring);
-  wake();
-}}
-build();
-</script></body></html>"""

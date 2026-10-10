@@ -18,6 +18,7 @@ from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme
+from soundboard.i18n import _
 from soundboard.ui import appstate
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
@@ -36,7 +37,6 @@ SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
 EYES = (36, 64)
 FPS = 30
 FAST_MS = 1000 // FPS
-IDLE_MS = 100     # just swaying and bobbing (no act, blink, glance or mouse): 10 fps do
 
 
 def _e(p, cx, cy, w, h, fill, pen=None, angle=0.0):
@@ -213,9 +213,9 @@ def sparkle(p: QPainter, x: float, y: float, r: float, col: QColor):
 
 
 # ---------------------------------------------------------------------- alive
-WAIT_LINES = ("pleeease?", "just one picture?", "I'll watch anything…", "hoo? hoo…?",
-              "so… bored…", "my turn yet?")
-JOY_LINES = ("yay!! ↓ down there!", "hoo-ray!", "let's watch something!")
+WAIT_LINES = (_("pleeease?"), _("just one picture?"), _("I'll watch anything…"),
+              _("hoo? hoo…?"), _("so… bored…"), _("my turn yet?"))
+JOY_LINES = (_("yay!! ↓ down there!"), _("hoo-ray!"), _("let's watch something!"))
 # the little acts he does while he waits, and how long each lasts (seconds)
 ACTS = {"sigh": 1.8, "plead": 3.0, "tear": 2.6, "peek": 2.2, "doze": 5.0}
 
@@ -257,7 +257,7 @@ class OwlWidget(QWidget):
         # overlaps him a little)
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         self.setCursor(Qt.PointingHandCursor)
-        self.setToolTip("Hoot is waiting for something to watch")
+        self.setToolTip(_("Hoot is waiting for something to watch"))
         self._rng = random.Random()
         self._t0 = self._last = time.monotonic()
         self.t = 0.0
@@ -308,8 +308,6 @@ class OwlWidget(QWidget):
         self._joy_t = 0.0
         self.act = None
         self.say = self._rng.choice(self.joy_lines) if self.joy_lines else ""
-        if self._timer.isActive() and self._timer.interval() != FAST_MS:
-            self._timer.start(FAST_MS)   # the hop starts now, not on the next idle frame
 
     # ------------------------------------------------------------------ time
     def _owl_rect(self) -> QRectF:
@@ -322,24 +320,7 @@ class OwlWidget(QWidget):
         now = time.monotonic()
         self.step(min(0.1, now - self._last))
         self._last = now
-        self.update()
-        want = FAST_MS if self.busy() else IDLE_MS
-        if self._timer.interval() != want:
-            self._timer.setInterval(want)
-
-    def busy(self) -> bool:
-        """Anything moving faster than the slow sway and bob: an act, a hop, a line in
-        his bubble, the mouse near, a blink, his eyes on their way somewhere, or one of
-        those due before the next idle frame."""
-        if self.act or self._joy_t >= 0 or self.say or self._near > 0.02:
-            return True
-        soon = self.t + IDLE_MS / 1000
-        if 0 <= self.t - self._blink_t < 0.18 or self._next_blink <= soon:
-            return True
-        if self._next_act <= soon or self._next_glance <= soon:
-            return True
-        gx, gy = self._glance
-        return abs(self._look[0] - gx) + abs(self._look[1] - gy) > 0.02
+        self.update()   # always 30 fps: a slower idle pace made the sway judder
 
     def _mouse(self) -> tuple[float, float] | None:
         """The cursor relative to his face, in owl heights, if it's in this window."""

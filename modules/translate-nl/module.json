@@ -1,0 +1,15 @@
+{
+  "id": "translate-nl",
+  "name": "Translate to Dutch",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Dutch. Needs live voice-to-speech. Downloads a 72 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "nl",
+  "language_name": "Dutch",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_nl-1_8.argosmodel",
+    "sha256": "91406f040619fb519e16af9c304709e9f3195297e626eec6924d62c7c981a33b",
+    "bytes": 71504559
+  },
+  "credits": "English to Dutch model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

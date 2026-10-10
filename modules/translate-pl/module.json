@@ -1,0 +1,15 @@
+{
+  "id": "translate-pl",
+  "name": "Translate to Polish",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Polish. Needs live voice-to-speech. Downloads a 67 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "pl",
+  "language_name": "Polish",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_pl-1_9.argosmodel",
+    "sha256": "85d865369326b6d8220876fbd7bc552fa5ec8b99e81161fab4a26f78187cedbc",
+    "bytes": 67294886
+  },
+  "credits": "English to Polish model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

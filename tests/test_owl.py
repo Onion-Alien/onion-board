@@ -70,19 +70,11 @@ def test_owl_image_still_plain(qapp):
 
 
 
-def test_he_slows_down_when_only_swaying(qapp):
+def test_swaying_keeps_the_full_frame_rate(qapp):
     w = owl.OwlWidget(80)
     w._next_act = w._next_blink = w._next_glance = 1e9   # nothing due
-    for _ in range(60):
-        w.step(0.1, mouse=None)
-    assert not w.busy()            # 10 frames a second for the sway
-    w.start("doze")
-    assert w.busy()
-    w.act = None
-    assert not w.busy()
-    w.cheer()
-    assert w.busy()
-    w._joy_t = -1.0
-    w.say = ""
-    w.step(0.1, mouse=(0.1, 0.1))  # the mouse comes near
-    assert w.busy()
+    w._timer.start(owl.FAST_MS)
+    for _ in range(5):
+        w._tick()
+    assert w._timer.interval() == owl.FAST_MS
+    w._timer.stop()

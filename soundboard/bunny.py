@@ -21,10 +21,13 @@ PINK = QColor("#ffb3c7")
 CHEEK = QColor(255, 128, 160, 110)
 # his headphones are the current theme's accent (theme.T, read at paint time)
 
-PROPS = (None, "mic", "headphones", "plug", "star", "hammer")
+PROPS = (None, "mic", "headphones", "plug", "star", "hammer", "bat")
 WOOD = QColor("#c98a4b")
 WOOD_DARK = QColor("#9a6532")
 STEEL = QColor("#9aa0b4")
+BAT = QColor("#e3b877")
+GRIP = QColor("#3a3452")
+CROSS = QColor("#ff4d6d")   # the cartoon anger mark
 
 
 def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angle=0.0):
@@ -39,12 +42,15 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
-               swing: float = 0.0, sad: float = 0.0):
+               swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
+               nightcap: bool = False):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
     `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank), and
-    `sad` 0..1 worries his brows, wets his eyes and turns his smile down."""
+    `sad` 0..1 worries his brows, wets his eyes and turns his smile down, and
+    `angry` 0..1 knits them the other way, reddens his cheeks and pops a cross mark
+    on his head (`swing` also swings the "bat"). `nightcap` puts his sleeping cap on."""
     phones = QColor(theme.T["accent"])
     phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
@@ -89,6 +95,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(phones_hi)
         p.drawRoundedRect(QRectF(x + 2.5, 57, 3, 10), 1.5, 1.5)
 
+    if nightcap:
+        _nightcap(p, ink)
+
     # face
     for x in (39, 61):
         if blink > 0.6:       # shut: a happy little arc
@@ -111,8 +120,17 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setPen(QPen(c, 2.2, Qt.SolidLine, Qt.RoundCap))
         for x, sx in ((39, -1), (61, 1)):
             p.drawLine(QPointF(x + sx * 6, 53 + sad), QPointF(x - sx * 3, 52 - 4 * sad))
-    _ellipse(p, 30, 72, 11, 6.5, CHEEK)
-    _ellipse(p, 70, 72, 11, 6.5, CHEEK)
+    if angry > 0.05:          # cross brows, inner ends pulled down
+        c = QColor(INK)
+        c.setAlphaF(min(1.0, angry * 1.4))
+        p.setPen(QPen(c, 2.6, Qt.SolidLine, Qt.RoundCap))
+        for x, sx in ((39, -1), (61, 1)):
+            p.drawLine(QPointF(x + sx * 6, 51 - 2 * angry), QPointF(x - sx * 3, 52 + 3 * angry))
+    cheek = QColor(CHEEK)
+    if angry > 0.05:
+        cheek = QColor(255, 70, 100, min(255, 110 + round(110 * angry)))
+    _ellipse(p, 30, 72, 11 + 2 * angry, 6.5 + angry, cheek)
+    _ellipse(p, 70, 72, 11 + 2 * angry, 6.5 + angry, cheek)
     nose = QPainterPath(QPointF(46.5, 69))
     nose.lineTo(53.5, 69)
     nose.quadTo(50, 74, 50, 74)
@@ -124,7 +142,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         oh = 2.5 + 6.5 * min(1.0, mouth)
         _ellipse(p, 50, 76 + oh / 2, 7 + 2 * mouth, oh, QColor("#5a2238"), QPen(INK, 1.6))
         _ellipse(p, 50, 76 + oh * 0.78, 4.5, oh * 0.4, QColor("#ff8fae"))
-    elif sad > 0.5:           # a little wobbly frown
+    elif sad > 0.5 or angry > 0.4:   # a little wobbly frown
         path = QPainterPath(QPointF(45, 78.5))
         path.quadTo(50, 74.5, 55, 78.5)
         p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap))
@@ -139,6 +157,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.drawPath(path)
 
     _draw_prop(p, prop, ink, swing)
+    if angry > 0.5:           # the cartoon cross-vein mark, up on his forehead
+        p.setPen(QPen(CROSS, 2.4, Qt.SolidLine, Qt.RoundCap))
+        p.setBrush(Qt.NoBrush)
+        cx, cy, k = 72, 40, 0.6 + 0.4 * angry
+        for ax, ay in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+            arc = QPainterPath(QPointF(cx + ax * 1.5 * k, cy + ay * 6 * k))
+            arc.quadTo(cx + ax * 1.5 * k, cy + ay * 1.5 * k, cx + ax * 6 * k, cy + ay * 1.5 * k)
+            p.drawPath(arc)
     p.restore()
 
 
@@ -194,6 +220,60 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0):
         p.drawRoundedRect(QRectF(-10, -38, 20, 10), 2.5, 2.5)
         p.restore()
         _ellipse(p, 80, 92, 12, 10, FUR, ink)
+    elif prop == "bat":         # a baseball bat in his right paw: over his shoulder at
+        # 0, swung down and out to his right at 1 (never across his face)
+        p.save()
+        p.translate(80, 92)
+        p.rotate(15 + 105 * max(0.0, min(1.0, swing)))
+        bat = QPainterPath(QPointF(-2.2, 6))
+        bat.lineTo(-2.2, -14)
+        bat.cubicTo(QPointF(-2.6, -24), QPointF(-6, -30), QPointF(-6, -40))
+        bat.cubicTo(QPointF(-6, -48), QPointF(6, -48), QPointF(6, -40))
+        bat.cubicTo(QPointF(6, -30), QPointF(2.6, -24), QPointF(2.2, -14))
+        bat.lineTo(2.2, 6)
+        bat.closeSubpath()
+        p.setPen(ink)
+        p.setBrush(BAT)
+        p.drawPath(bat)
+        p.setPen(QPen(WOOD, 1.2, Qt.SolidLine, Qt.RoundCap))
+        p.drawLine(QPointF(-1.5, -40), QPointF(-2.5, -30))   # a bit of wood grain
+        p.setPen(ink)
+        p.setBrush(GRIP)
+        p.drawRoundedRect(QRectF(-2.6, -4, 5.2, 9), 1.5, 1.5)
+        _ellipse(p, 0, 7, 7.5, 3.5, GRIP, ink)              # the knob
+        p.restore()
+        _ellipse(p, 80, 92, 12, 10, FUR, ink)
+
+
+def _nightcap(p: QPainter, ink: QPen):
+    """A floppy striped sleeping cap over the headphone band, its tip and bobble
+    flopped down to his left (the viewer's right)."""
+    cap = QColor(theme.T["accent"])
+    stripe = cap.lighter(135)
+    body = QPainterPath(QPointF(24, 49))
+    body.cubicTo(QPointF(24, 30), QPointF(40, 19), QPointF(56, 20))
+    body.cubicTo(QPointF(74, 21), QPointF(88, 31), QPointF(91, 47))
+    body.cubicTo(QPointF(85, 40), QPointF(80, 38), QPointF(76, 47))
+    body.quadTo(QPointF(50, 40), QPointF(24, 49))
+    p.setPen(ink)
+    p.setBrush(cap)
+    p.drawPath(body)
+    p.save()
+    p.setClipPath(body)
+    p.setPen(QPen(stripe, 5))
+    for x in (34, 50, 66, 82):
+        p.drawLine(QPointF(x - 10, 50), QPointF(x + 6, 14))
+    p.restore()
+    p.setPen(ink)
+    p.setBrush(Qt.NoBrush)
+    p.drawPath(body)
+    brim = QPainterPath(QPointF(22, 50))   # the soft white band round the bottom
+    brim.quadTo(QPointF(50, 39), QPointF(78, 48))
+    p.setPen(QPen(INK, 9, Qt.SolidLine, Qt.RoundCap))
+    p.drawPath(brim)
+    p.setPen(QPen(FUR, 6, Qt.SolidLine, Qt.RoundCap))
+    p.drawPath(brim)
+    _ellipse(p, 91, 49, 11, 11, FUR, ink)   # the bobble
 
 
 def _music_note(p: QPainter, x, y, k, col: QColor | None = None):

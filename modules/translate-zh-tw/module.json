@@ -1,0 +1,15 @@
+{
+  "id": "translate-zh-tw",
+  "name": "Translate to Chinese (Traditional)",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Chinese (Traditional). Needs live voice-to-speech. Downloads a 71 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "zh-TW",
+  "language_name": "Chinese (Traditional)",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_zt-1_9.argosmodel",
+    "sha256": "b97b6532196c4421240c0788cb711cc1fe5e5ecbde553c937193d13e5c67826c",
+    "bytes": 70743045
+  },
+  "credits": "English to Chinese (Traditional) model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

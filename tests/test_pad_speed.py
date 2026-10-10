@@ -2,8 +2,11 @@
 regrid, pictures scaled once per size, the footer worked out once, and typing in the
 search box / dragging Pad size not regridding on every step. Work is counted, not
 timed, so a slow test runner can't make these flaky."""
+import threading
+import time
+
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QImage
 from PySide6.QtTest import QTest
 
@@ -33,6 +36,57 @@ def grid_of(n, width=100):
 
 
 # ---------------------------------------------------------------------- the grid
+
+@pytest.mark.parametrize("change", ["grow", "shrink", "filter", "add", "reorder"])
+def test_resizing_cards_repaints_the_entire_drop_hint(qapp, change):
+    """The old dashed box must disappear in the same frame as the cards move."""
+    from PySide6.QtCore import QEvent, QObject
+    from PySide6.QtGui import QRegion
+
+    grid = grid_of(6)
+    grid.show()
+    qapp.processEvents()
+    old = grid.drop_area().toAlignedRect()
+    painted = QRegion()
+
+    class Watch(QObject):
+        def eventFilter(self, obj, event):
+            nonlocal painted
+            if event.type() == QEvent.Paint:
+                painted |= event.region()
+            return False
+
+    watch = Watch()
+    grid.installEventFilter(watch)
+    try:
+        if change == "grow":
+            grid.set_pad_width(105)  # four columns become three; both rows get taller
+        elif change == "shrink":
+            grid.set_pad_width(80)   # all six cards now fit in two shorter rows
+        elif change == "filter":
+            for pad in grid.pads[3:]:
+                pad.setProperty("filtered", True)
+            grid.relayout(force=True)
+        elif change == "add":
+            grid.set_pads(grid.pads + [
+                Pad(SoundMeta(id=f"new{i}", name="New sound", file=""), 100)
+                for i in range(3)])
+        else:
+            grid.set_pads(grid.pads[1:] + grid.pads[:1])
+        new = grid.drop_area().toAlignedRect()
+        qapp.processEvents()
+        background = QRegion(old.united(new))
+        for pad in grid.pads:
+            if not pad.isHidden():
+                background -= QRegion(pad.geometry())
+        assert (background - painted).isEmpty()
+        shown = [p for p in grid.pads if not p.isHidden()]
+        assert all(not new.intersects(p.geometry()) for p in shown)
+        assert all(not a.geometry().intersects(b.geometry())
+                   for i, a in enumerate(shown) for b in shown[i + 1:])
+    finally:
+        grid.close()
+
 
 def test_regrid_adds_pads_with_the_layout_switched_off(qapp):
     """Each pad shown into a live grid laid the whole grid out again: clearing a
@@ -146,13 +200,39 @@ def test_the_grid_is_opaque_in_the_page_colour(qapp):
         theme.apply(qapp, old)
 
 
+def test_window_background_is_solid_and_near_the_page_colour(qapp):
+    """The glow, foot and grain the grid paints behind the pads (the window's own
+    background, so it lines up): fully opaque, so a scroll can still copy the screen,
+    and never far from the theme's page colour."""
+    from PySide6.QtCore import QRect
+    from PySide6.QtGui import QPainter
+    from soundboard import theme
+    old = theme.current_name
+    try:
+        for name in ("Light", "Dark", "Mocha", "High Contrast"):
+            theme.set_current(name)
+            img = QImage(200, 300, QImage.Format_ARGB32)
+            img.fill(Qt.transparent)
+            p = QPainter(img)
+            theme.paint_window_bg(p, QRect(0, 0, 200, 300), QPointF(-50, -100), 1400, 900)
+            p.end()
+            bg = QColor(theme.T["bg"])
+            for x, y in ((0, 0), (199, 150), (100, 299)):
+                c = img.pixelColor(x, y)
+                assert c.alpha() == 255
+                assert max(abs(c.red() - bg.red()), abs(c.green() - bg.green()),
+                           abs(c.blue() - bg.blue())) < 32
+    finally:
+        theme.set_current(old)
+
+
 # ---------------------------------------------------------------------- pictures
 
 def test_fitted_picture_is_made_once_per_size_screen_and_shade(qapp, tmp_path, monkeypatch):
     path = make_image(tmp_path / "a.png")
     loads = []
     real = thumbs.pixmap
-    monkeypatch.setattr(thumbs, "pixmap", lambda p: (loads.append(p), real(p))[1])
+    monkeypatch.setattr(thumbs, "pixmap", lambda p, *a: (loads.append(p), real(p, *a))[1])
     a = thumbs.fitted(path, 146, 89, 1.0, widgets.PIC_SHADE)
     assert a is not None and (a.width(), a.height()) == (146, 89)
     assert thumbs.fitted(path, 146, 89, 1.0, widgets.PIC_SHADE) is a and len(loads) == 1
@@ -169,14 +249,25 @@ def test_fitted_picture_is_made_once_per_size_screen_and_shade(qapp, tmp_path, m
 
 
 def test_fitted_pictures_are_capped_by_size(qapp, tmp_path, monkeypatch):
-    path = make_image(tmp_path / "a.png")
+    paths = [make_image(tmp_path / f"{i}.png") for i in range(6)]
     cap = 3 * 106 * 60 * 4    # three of the biggest below
     monkeypatch.setattr(thumbs, "MAX_FITTED_BYTES", cap)
-    for w in range(100, 106):
+    for w, path in zip(range(100, 106), paths):
         thumbs.fitted(path, w, 60, 1.0)
     assert thumbs._fitted_bytes <= cap
-    assert len([k for k in thumbs._fitted if k[0] == path]) == 3   # the newest kept
-    assert (path, 105, 60, 1.0, (), 0) in thumbs._fitted
+    assert len([k for k in thumbs._fitted if k[0] in paths]) == 3   # the newest kept
+    assert (paths[-1], 105, 60, 1.0, (), 0) in thumbs._fitted
+    for path in paths:
+        thumbs.forget(path)
+
+
+def test_a_new_size_of_a_picture_replaces_the_old_one(qapp, tmp_path):
+    """Pads are all one size: dragging Pad size left a copy at every size it passed."""
+    path = make_image(tmp_path / "a.png")
+    for w in range(100, 106):
+        thumbs.fitted(path, w, 60, 1.0)
+    thumbs.fitted(path, 105, 60, 1.0, ((0, 9),))     # another shade (hover) is its own
+    assert sorted(k[1] for k in thumbs._fitted if k[0] == path) == [105, 105]
     thumbs.forget(path)
 
 
@@ -190,10 +281,10 @@ def test_pad_paints_its_picture_without_scaling_it_again(qapp, tmp_path, monkeyp
     made = []
     real = thumbs.fitted
 
-    def counting(*a):
-        before = len(thumbs._fitted)
-        pm = real(*a)
-        made.append(len(thumbs._fitted) > before)
+    def counting(*a, **k):
+        before = set(thumbs._fitted)
+        pm = real(*a, **k)
+        made.append(set(thumbs._fitted) != before)
         return pm
     monkeypatch.setattr(thumbs, "fitted", counting)
     for _ in range(3):
@@ -214,6 +305,46 @@ def test_pad_paints_its_picture_without_scaling_it_again(qapp, tmp_path, monkeyp
     mid = img.pixelColor(img.width() // 2, img.height() // 3)
     assert mid.red() > mid.blue()
     thumbs.forget(m.image)
+
+
+def test_pad_picture_is_read_off_the_ui_thread(qapp, tmp_path, monkeypatch):
+    """Every restore from the tray (thumbs.trim) re-read a screenful of picture files
+    on the UI thread: on a slow or sleeping disk the window froze. The pad paints its
+    plain card at once and its picture when the worker has read it."""
+    monkeypatch.setattr(thumbs, "LOAD_ASYNC", True, raising=False)
+    m = SoundMeta(id="p", name="Boom", file="f", duration=1.0,
+                  image=make_image(tmp_path / "a.png"))
+    pad = Pad(m, 150)
+    pad.state = "ready"
+    gate, real = threading.Event(), thumbs.QImage
+    monkeypatch.setattr(thumbs, "QImage", lambda *a: (gate.wait(3), real(*a))[1])
+    t0 = time.monotonic()
+    img = pad.grab().toImage()
+    assert time.monotonic() - t0 < 0.5
+    mid = img.pixelColor(img.width() // 2, img.height() // 3)
+    assert not mid.blue() > mid.red() + 40          # the plain card for now
+    assert thumbs.loading(m.image)
+    repaints = []
+    monkeypatch.setattr(pad, "update", lambda *a: repaints.append(a))
+    gate.set()
+    assert process_events(qapp, lambda: repaints, 3)    # repainted once it's in
+    assert not thumbs.loading(m.image)
+    img = pad.grab().toImage()
+    mid = img.pixelColor(img.width() // 2, img.height() // 3)
+    assert mid.blue() > mid.red()                   # the picture shows
+    thumbs.forget(m.image)
+
+
+def test_a_picture_forgotten_while_read_is_not_cached(qapp, tmp_path, monkeypatch):
+    monkeypatch.setattr(thumbs, "LOAD_ASYNC", True, raising=False)
+    path = make_image(tmp_path / "a.png")
+    gate, real = threading.Event(), thumbs.QImage
+    monkeypatch.setattr(thumbs, "QImage", lambda *a: (gate.wait(3), real(*a))[1])
+    assert thumbs.pixmap(path) is None and thumbs.loading(path)
+    thumbs.forget(path)                             # replaced while it was being read
+    gate.set()
+    process_events(qapp, lambda: False, 0.3)
+    assert path not in thumbs._pixmaps
 
 
 def test_pad_footer_is_worked_out_only_when_it_changes(qapp, monkeypatch):

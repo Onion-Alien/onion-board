@@ -36,6 +36,8 @@ def sent(app_dir, monkeypatch):
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
+    monkeypatch.setattr(usage, "_used", set())
+    monkeypatch.setattr(usage, "_open_mark", None)
     net.configure_features()
     yield out
     net.configure_features()
@@ -49,8 +51,13 @@ class _Inline:
         self.target()
 
 
-def _hits(req) -> list[dict]:
-    return json.loads(req.data.decode("utf-8"))["hits"]
+ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/")
+
+
+def _hits(req, about=False) -> list[dict]:
+    """The hits sent; without the daily picture of how it's used unless `about`."""
+    hits = json.loads(req.data.decode("utf-8"))["hits"]
+    return [h for h in hits if about or not h["path"].startswith(ABOUT)]
 
 
 def test_a_new_install_counts_once_a_day(sent):
@@ -63,8 +70,11 @@ def test_a_new_install_counts_once_a_day(sent):
     hits = _hits(req)
     assert [h["path"] for h in hits] == [f"/app/{__version__}", "first-start"]
     assert {h["session"] for h in hits} == {cfg.stats_id} and len(cfg.stats_id) == 32
+    # the same short tag on every count, so one person's days link up (not the ID itself)
+    assert {h["ref"] for h in hits} == {usage.user_tag(cfg.stats_id)}
+    assert usage.user_tag(cfg.stats_id) != cfg.stats_id and len(usage.user_tag("x")) == 14
     # nothing but these fields leaves the PC
-    assert all(set(h) <= {"path", "title", "event", "session"} for h in hits)
+    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
     usage.maybe_send(cfg)   # the same day: nothing
     assert len(sent) == 1
     cfg.stats_sent -= usage.EVERY_S   # a day later: only the daily one
@@ -189,6 +199,31 @@ def test_the_installer_box(cli):
     assert Config.load().stats_heard == "Reddit"
 
 
+def _body(req) -> dict:
+    return json.loads(req.data.decode("utf-8"))
+
+
+def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
+    """Count me in going from on to off says so once, with nothing that ties it to the
+    person (no ID, tag or session), then nothing more."""
+    monkeypatch.setattr(app, "APP_DIR", app_dir)
+    monkeypatch.setattr(applog, "setup", lambda d: d / "log")
+    assert app.set_usage_count(False) == 0          # unticked on a first install
+    ((req, feature),) = sent
+    assert feature == usage.FEATURE and _body(req)["no_sessions"] is True
+    assert _body(req)["hits"] == [{"path": "opt-out/installer", "title": "opt-out/installer",
+                                   "event": True}]
+    assert Config.load().net_off == ["usage_stats"] and not Config.load().stats_id
+    net.configure_features()
+    assert app.set_usage_count(False) == 0          # unticked again on an update: already off
+    assert len(sent) == 1
+    Config(net_offline=True).save()                 # Offline mode: never
+    assert app.set_usage_count(False) == 0 and len(sent) == 1
+    net.configure_features()
+    assert not usage.opt_out("somewhere-else") and len(sent) == 1
+    assert usage.opt_out("settings") and _body(sent[-1][0])["hits"][0]["path"] == "opt-out/settings"
+
+
 def test_update_now_fetches_its_own_copy_of_the_installer():
     from soundboard import updates
 
@@ -250,6 +285,66 @@ def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir)
     assert cfg.stats_problems_seen == 2002 and saved == [1]
     usage.maybe_send(cfg, app_dir=app_dir)   # nothing new: nothing sent
     assert len(sent) == 1
+
+
+def _real_report(where_from: str) -> str:
+    """A report as applog writes it, for an error raised in a soundboard file."""
+    try:
+        exec(compile("def f():\n    raise KeyError('D:/private/secret.wav')\nf()",
+                     where_from, "exec"), {})
+    except KeyError:
+        import sys
+        rep = applog.build_report(sys.exc_info(), where="tick")
+    return rep.text.replace(f"Version:  {applog._state['version']}", "Version:  1.9.8")
+
+
+def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
+    f = tmp_path / "crash-x.txt"
+    src = "D:\\private\\code\\soundboard\\engine.py"
+    f.write_text(_real_report(src) + "\n\nLast 60 log lines\n------\n"
+                 '  File "C:\\soundboard\\ui\\other.py", line 7, in g\nOSError: x\n',
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8/KeyError@soundboard/engine.py:2"
+    # the freeze from a real 1.9.7 report: its deepest line of our own code
+    f.write_text("Onion Board froze for 6 s\nVersion:  1.9.7\nTime:  x\n\n"
+                 "What it was doing\n-----------------\n"
+                 '  File "main.py", line 22, in <module>\n'
+                 '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
+                 '  File "soundboard\\directmic.py", line 184, in make_ring\n'
+                 '  File "pathlib\\_local.py", line 515, in stat\n', encoding="utf-8")
+    assert usage._report_event(f) == "freeze/1.9.7@soundboard/directmic.py:184"
+
+
+def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
+    """hangwatch.py lists every other thread after the window's own stack; the
+    place sent is the window's, and a thread start is blamed on its caller, not on
+    threadnames.py's wrapper around Thread.start."""
+    f = tmp_path / "freeze-x.txt"
+    f.write_text("Onion Board froze for 6 s\nVersion:  1.9.20\nTime:  x\n\n"
+                 "What it was doing\n-----------------\n"
+                 '  File "main.py", line 22, in <module>\n'
+                 '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
+                 '  File "soundboard\\threadnames.py", line 70, in named_start\n'
+                 '  File "threading.py", line 999, in start\n'
+                 "\nOther threads\n-------------\n"
+                 'Thread "audio" (12):\n'
+                 '  File "soundboard\\threadnames.py", line 68, in named_run\n'
+                 '  File "soundboard\\engine.py", line 400, in _loop\n'
+                 'Thread "x" (13):\n'
+                 '  File "soundboard\\threadnames.py", line 70, in named_start\n',
+                 encoding="utf-8")
+    assert usage._report_event(f) == "freeze/1.9.20@soundboard/ui/mainwindow.py:5898"
+
+
+def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
+    f = tmp_path / "crash-x.txt"
+    # an odd install folder named soundboard: deeper than our package, so not sent
+    f.write_text(_real_report("D:\\soundboard\\Python\\Lib\\json\\decoder.py"),
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8/KeyError"
+    f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8"
 
 
 def test_reports_from_before_counting_existed_arent_sent(sent, app_dir):
@@ -318,3 +413,150 @@ def test_uninstall_count_never_fails_the_uninstall(sent, app_dir, monkeypatch):
     cfg.save()
     monkeypatch.setattr(usage, "send", lambda p: 1 / 0)
     assert app.uninstall_count() == 0
+
+
+# ---- how it's used: buckets and fixed names only ----------------------------------
+
+def _sound(i: int, plays: int = 0, hotkey: str = "") -> library.SoundMeta:
+    return library.SoundMeta(id=f"s{i}", name=f"Secret name {i}", file=f"C:/x/{i}.wav",
+                             plays=plays, hotkey=hotkey)
+
+
+def _paths(req) -> list[str]:
+    return [h["path"] for h in _hits(req, about=True)]
+
+
+def test_the_daily_count_says_roughly_how_its_used(sent):
+    cfg = Config(route="mic", language="de", sounds=[_sound(i, plays=2) for i in range(12)])
+    cfg.sounds[0].hotkey = "ctrl+f1"
+    usage.used("voice-changer")
+    usage.used("not-a-feature")   # never sent: only FEATURES
+    usage.maybe_send(cfg)
+    paths = _paths(sent[0][0])
+    # 24 plays already: not a new install, so it's aged from its folder
+    assert [p for p in paths if p.startswith(("route/", "sounds/", "played/", "lang/"))] == [
+        "route/mic", "sounds/11-50", "played/0", "lang/de"]
+    assert {p for p in paths if p.startswith("used/")} == {"used/voice-changer", "used/hotkeys"}
+    assert sum(p.startswith("age/") for p in paths) == 1
+    body = sent[0][0].data.decode("utf-8")
+    assert "Secret name" not in body and "ctrl+f1" not in body and "x/0.wav" not in body
+    # the plays and features since then, a day later
+    cfg.sounds[1].plays += 5
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)
+    paths = _paths(sent[1][0])
+    assert "played/1-10" in paths and "used/voice-changer" not in paths
+    assert "used/hotkeys" in paths   # still set up
+
+
+@pytest.mark.parametrize("n, b", [(0, "0"), (1, "1-10"), (10, "1-10"), (11, "11-50"),
+                                  (50, "11-50"), (51, "51-plus"), (-3, "0")])
+def test_counts_are_rough_buckets(n, b):
+    assert usage.bucket(n) == b
+
+
+@pytest.mark.parametrize("days, b", [(0, "day-1"), (0.9, "day-1"), (1, "days-2-7"),
+                                     (6.9, "days-2-7"), (7, "days-8-30"),
+                                     (30, "days-31-plus"), (400, "days-31-plus")])
+def test_age_is_a_rough_bucket(days, b):
+    assert usage.age_bucket(days) == b
+
+
+def test_an_odd_language_or_route_isnt_sent_as_typed(sent):
+    cfg = Config(route="somewhere-new", language="<script>")
+    usage.maybe_send(cfg)
+    paths = _paths(sent[0][0])
+    assert "lang/auto" in paths and not any(p.startswith("route/") for p in paths)
+
+
+def test_a_new_install_sends_its_first_steps_once_each(sent):
+    cfg = Config()
+    usage.step(cfg, "added-sound")
+    usage.step(cfg, "added-sound")
+    usage.step(cfg, "played-sound")
+    usage.step(cfg, "not-a-step")
+    assert [p for (req, _f) in sent for p in _paths(req)] == [
+        "step/added-sound", "step/played-sound"]
+    usage.maybe_send(cfg)   # its first daily count: a day-old install
+    assert "age/day-1" in _paths(sent[-1][0])
+
+
+def test_adding_a_tab_is_sent_at_once_not_a_day_later(sent):
+    """+ More tabs is used minutes in, after the first daily count went: waiting for
+    the next one lost it for everyone who only tried the app once."""
+    cfg = Config(stats_sent=1.0, stats_started=1.0, stats_steps=["added-sound"])
+    usage.step(cfg, "added-radio-tab")
+    usage.step(cfg, "added-radio-tab")
+    usage.step(cfg, "added-voice-tab")   # every user starts with it: not a step
+    assert [p for (req, _f) in sent for p in _paths(req)] == ["step/added-radio-tab"]
+
+
+def test_a_copy_counted_before_never_sends_first_steps(sent):
+    cfg = Config(stats_sent=1.0)
+    usage.step(cfg, "played-sound")
+    assert sent == [] and set(cfg.stats_steps) == set(usage.STEPS) and cfg.stats_started
+
+
+def test_first_steps_obey_the_switch(sent):
+    net.configure_features(off=[usage.FEATURE])
+    cfg = Config()
+    usage.step(cfg, "played-sound")
+    assert sent == [] and cfg.stats_steps == []
+
+
+def test_the_triggers_tab_counts_its_features(sent):
+    """The Onion Watch add-on passes its feature names through BoardHost.count: sent as
+    used/triggers-<name>, anything else dropped."""
+    from soundboard.ui.triggershost import BoardHost
+    host = BoardHost.__new__(BoardHost)    # count() needs nothing of the window
+    host.count("mode-colour")
+    host.count("pack-import")
+    host.count("D:/pics/secret.png")
+    usage.maybe_send(Config())
+    used = {p for p in _paths(sent[0][0]) if p.startswith("used/")}
+    assert used == {"used/triggers-mode-colour", "used/triggers-pack-import"}
+
+
+def test_features_used_survive_a_quit(app_dir):
+    cfg = Config()
+    usage._used.clear()
+    usage.used("youtube")
+    usage.remember(cfg)
+    cfg.save()
+    assert Config.load().stats_used == ["youtube"]
+
+
+
+# ---- how long it was open ------------------------------------------------------------
+
+def test_open_time_adds_up_ticks_and_skips_sleep(sent):
+    cfg = Config()
+    usage.open_tick(cfg, now=1000)        # the start: nothing yet
+    usage.open_tick(cfg, now=1300)        # 5 min
+    usage.open_tick(cfg, now=1600)        # 5 min
+    usage.open_tick(cfg, now=1600 + 3600)   # an hour's gap: the PC slept, not counted
+    usage.open_tick(cfg, now=5200 + 300)  # 5 min
+    assert cfg.stats_open_s == 900
+
+
+def test_open_time_doesnt_pile_up_while_the_count_is_off(sent):
+    cfg = Config(net_off=["usage_stats"])
+    net.configure_features(cfg.net_off)
+    usage.open_tick(cfg, now=0)
+    usage.open_tick(cfg, now=300)
+    assert cfg.stats_open_s == 0
+
+
+def test_the_daily_count_says_roughly_how_long_it_was_open(sent):
+    cfg = Config(stats_open_s=2 * 3600)
+    usage.maybe_send(cfg)
+    paths = [p for p in _paths(sent[0][0]) if p.startswith("open/")]
+    assert paths == ["open/1-3h"]
+    assert cfg.stats_open_s < 60    # counted: starts again from about nothing
+
+
+@pytest.mark.parametrize("seconds, b", [(0, "under-15m"), (899, "under-15m"),
+                                        (900, "15m-1h"), (3600, "1-3h"),
+                                        (3 * 3600, "3-8h"), (8 * 3600, "8h-plus")])
+def test_open_time_is_a_rough_bucket(seconds, b):
+    assert usage.open_bucket(seconds) == b

@@ -242,3 +242,22 @@ def test_live_tabs_are_tinted_green_by_default_even_after_1_6_6():
     assert Config.from_raw({"live_tab_tint": False}).live_tab_green
     assert Config().live_tab_green
     assert Config.from_raw({"live_tab_green": False}).live_tab_green is False
+
+
+def test_ffmpeg_finding_no_sound_says_so_in_words(tmp_path, monkeypatch):
+    """A link to a page with only a picture on it: ffmpeg's "[out#0/f32le @ 0000…]
+    Output file does not contain any stream" was shown as is."""
+    import subprocess
+    pic = tmp_path / "page.jpg"
+    pic.write_bytes(b"\xff\xd8\xff\xe0 not a sound")
+    monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
+    monkeypatch.setattr(library.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
+        a, 4294967274, b"", b"[out#0/f32le @ 0000020f82c35040] Output file does not contain "
+        b"any stream\r\nError opening output file -.\r\nError opening output files: "
+        b"Invalid argument"))
+    with pytest.raises(RuntimeError) as e:
+        library.decode(str(pic))
+    assert str(e.value) == "this file has no audio in it"
+    assert library._ffmpeg_words("[in#0 @ 01] Invalid data found when processing input") \
+        == "It isn't a sound file that can be read, or it's damaged."
+    assert library._ffmpeg_words("something new") == "something new"

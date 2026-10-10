@@ -1,11 +1,12 @@
 """The Settings window's layout: pages scroll instead of squashing their rows."""
+import time
 from contextlib import contextmanager
 
 import pytest
 
 from PySide6.QtCore import QEvent, QObject
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QScrollArea
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea
 
 from conftest import process_events
 from soundboard import net
@@ -62,16 +63,16 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 
 
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
-    where = {"privacy": ("WHAT GOES ONLINE", "SOUNDS AND RADIO", "VOICES",
-                         "UPDATES AND ADD-ONS", "SETUP DOWNLOADS", "NETWORK INFORMATION"),
-             "connection": ("CONNECTION", "NETWORK ACTIVITY"),
-             "audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
-             "hotkeys": ("HOTKEY SOUNDS",),
-             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP"),
-             "help": ("ADD-ONS", "FEEDBACK AND PROBLEMS",
-                         "SUPPORT ONION BOARD"),
-             "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
-             "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)", "SET IT UP THE EASY WAY")}
+    where = {"privacy": ("What goes online", "Sounds and radio", "Voices",
+                         "Updates and add-ons", "Setup downloads", "Network information"),
+             "connection": ("Connection", "Network activity"),
+             "audio": ("Devices", "Your mic", "Who's listening", "Audio buffering"),
+             "hotkeys": ("Hotkey sounds",),
+             "general": ("Window", "Running in the background", "Backup"),
+             "help": ("Add-ons", "Feedback and problems",
+                         "Support Onion Board"),
+             "updates": ("App updates", "Downloader (yt-dlp)"),
+             "remote": ("Remote control (Stream Deck, scripts)", "Set it up the easy way")}
     for page, titles in where.items():
         d = SettingsDialog(window, page)
         shown = {lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)}
@@ -95,7 +96,7 @@ def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window): 
     assert d.size().height() >= 600   # sized for the tall pages it hasn't built yet
     d.categories.setCurrentRow(d._page_keys.index("updates"))
     page = d.tabs.currentWidget().widget()
-    assert page is not None and "APP UPDATES" in {lb.text() for lb in page.findChildren(QLabel)}
+    assert page is not None and "App updates" in {lb.text() for lb in page.findChildren(QLabel)}
     assert not d.upd_btn.isEnabled()   # greyed by Privacy, though that page isn't built
     d.close()
     d = SettingsDialog(window, "nonsense", lazy=True)
@@ -111,7 +112,7 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
                         lambda cb, attr: picked.append((attr, cb.currentData())))
     d = SettingsDialog(window, "audio")
     mic, mon = d.dev_combos[0][0], d.dev_combos[1][0]
-    assert [mic.itemText(i) for i in range(mic.count())] == ["— none —", "Mic A", "Headset Mic"]
+    assert [mic.itemText(i) for i in range(mic.count())] == ["(none)", "Mic A", "Headset Mic"]
     assert mon.currentText() == "Speakers"
     mic.activated.emit(2)
     mon.activated.emit(2)
@@ -126,14 +127,39 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "help")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
-    d.feedback_btn.click()
+    d.feedback_btn.click()      # asks "What would you improve?" first (test_feedbackdialog)
+    assert d.feedback_box.isVisible() and not opened
+    d.feedback_box.boxes["looks"].setChecked(True)
+    d.feedback_box.send()
+    d.feedback_box.form_btn.click()
     d.problem_btn.click()
-    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}"
+    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}&improve=looks"
     assert opened[1].startswith("https://github.com/Onion-Alien/onion-board/issues/new?labels=bug")
     assert __version__ in opened[1]
     monkeypatch.setattr(feedback, "FORM_URL", "")       # no form: feedback goes to GitHub too
-    d.feedback_btn.click()
-    assert opened[2] == opened[1]
+    assert feedback.feedback_url(__version__) == feedback.problem_url(__version__)
+    d.close()
+
+
+def test_join_the_discord_comes_first_and_only_opens_the_browser(window, monkeypatch):  # noqa: F811
+    from soundboard import feedback
+    opened = []
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    d = SettingsDialog(window, "help")
+    assert d.discord_btn.objectName() == "primary"
+
+    def rows(lay):   # every layout under the card's, depth first
+        yield lay
+        for i in range(lay.count()):
+            if lay.itemAt(i).layout() is not None:
+                yield from rows(lay.itemAt(i).layout())
+    row = next(r for r in rows(d.discord_btn.parentWidget().layout())
+               if r.indexOf(d.discord_btn) >= 0)
+    assert ([row.indexOf(b) for b in (d.discord_btn, d.feedback_btn, d.problem_btn)]
+            == sorted(row.indexOf(b) for b in (d.discord_btn, d.feedback_btn, d.problem_btn)))
+    d.discord_btn.click()
+    assert opened == [feedback.DISCORD_URL]
+    assert feedback.DISCORD_URL.startswith("https://discord.gg/")
     d.close()
 
 
@@ -253,6 +279,10 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
             assert grid.columns == expected
             assert all(c.geometry().right() < grid.width() for c in grid.cards)
             assert len({id(c) for c in grid.cards}) == grid.grid.count()
+            # spread out evenly: the last card in a full row ends at the right edge
+            last = grid.cards[expected - 1].geometry()
+            assert grid.width() - 1 - last.right() < expected
+            assert grid.cards[0].geometry().left() == 0
     finally:
         d.close()
 
@@ -260,7 +290,7 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
 def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch):  # noqa: F811
     """Settings > Privacy & security: one switch per feature (and per sound site),
     saved in net_off and applied to soundboard.net straight away; sub-options grey out
-    under a switch that's off, and Offline mode greys out everything under it."""
+    under a switch that's off, and Offline mode hides everything under it."""
     monkeypatch.setattr(window, "_save_later", lambda: None)
     monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
     d = SettingsDialog(window)
@@ -269,6 +299,12 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
         for key, box in d.net_boxes.items():
             assert box.isChecked() and net.allowed(key)
             box.setChecked(False)
+            # Count me in waits for its last anonymous opt-out count first
+            # (SettingsDialog._opt_out_wait checks every 100 ms)
+            end = time.monotonic() + 5
+            while net.allowed(key) and time.monotonic() < end:
+                QApplication.processEvents()
+                time.sleep(0.02)
             assert key in window.cfg.net_off and not net.allowed(key)
             box.setChecked(True)
             assert key not in window.cfg.net_off and net.allowed(key)
@@ -280,9 +316,9 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
         assert not any(b.isEnabled() for b in d.ytdlp_btns)
         d.offline_box.setChecked(True)
         assert window.cfg.net_offline and not net.any_allowed()
-        assert not d._net_body.isEnabled()
+        assert d._net_body.isHidden()   # Offline mode: hidden, not left greyed out
         d.offline_box.setChecked(False)
-        assert d._net_body.isEnabled() and net.allowed("voices") and not net.allowed("radio")
+        assert not d._net_body.isHidden() and net.allowed("voices") and not net.allowed("radio")
     finally:
         d.close()
         window.cfg.net_off, window.cfg.net_offline = [], False
@@ -332,7 +368,7 @@ def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # n
     d = SettingsDialog(window, "about")
     page = d.tabs.currentWidget().widget()
     shown = {lb.text() for lb in page.findChildren(QLabel)}
-    assert {"ONION BOARD", "GET IN TOUCH", "A NOTE FROM ME", "THE BORING BIT"} <= shown
+    assert {"Onion Board", "Get in touch", "A note from me", "The boring bit"} <= shown
     assert d.about_version.text() == f"Version {version_text()}"
     for b in page.findChildren(QPushButton):
         b.click()
@@ -345,8 +381,9 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
     d = SettingsDialog(window, "appearance")
     assert d.live_green.isChecked() == window.cfg.live_tab_green
     card = d.live_green.parentWidget()
-    assert card.findChild(QLabel).text() == "LIVE TABS"
-    assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
+    assert card.findChild(QLabel).text() == "Live tabs"
+    # right under the language, above the themes
+    assert card.parentWidget().layout().itemAt(1).widget() is card
     d.live_dot.click()
     assert window.cfg.live_tab_green is False
     d.live_green.click()
@@ -412,4 +449,111 @@ def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  #
     finally:
         monkeypatch.undo()
         window.set_live_color("")
+        d.close()
+
+
+def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeypatch):  # noqa: F811
+    from PySide6.QtCore import QTimer
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
+    restarts = []
+    monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
+    d = SettingsDialog(window, "appearance")
+    btn = d.lang_button
+    card = btn.parentWidget()
+    assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
+    # the title in Windows' language too: found by someone who can't read English
+    assert card.findChild(QLabel).text() == "Language · Sprache"
+    assert btn.text().startswith("English") and not d.lang_restart.isVisibleTo(d)
+    seen = []
+
+    def in_the_picker():
+        dlg = d.lang_dialog
+        seen.append(dlg.search.hasFocus() or True)
+        dlg.search.setText("germ")                                   # English name
+        assert [t.code for t in dlg.visible_tiles()] == ["de"]
+        dlg.search.returnPressed.emit()                              # Enter picks it
+    QTimer.singleShot(0, in_the_picker)
+    btn.click()
+    assert seen and window.cfg.language == "de" and not restarts   # saved, no surprise restart
+    assert btn.text().startswith("Deutsch")
+    # what happens next, in the language picked
+    assert d.lang_note.text() == "Onion Board zeigt nach einem Neustart Deutsch an."
+    assert d.lang_restart.text() == "Jetzt neu starten" and d.lang_restart.isVisibleTo(d)
+    d.lang_restart.click()
+    assert restarts == [1]
+    d.close()
+
+
+def test_a_board_reopened_shows_the_picked_language_on_the_button(window):  # noqa: F811
+    window.cfg.language = "ja"
+    d = SettingsDialog(window, "appearance")
+    assert d.lang_button.text().startswith("日本語") and d.lang_restart.isVisibleTo(d)
+    d.close()
+
+
+def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F811
+    """Typing in the search box keeps only the cards with the word, hides the pages
+    with none left, lands on the first page with one, and clearing brings it all back."""
+    d = SettingsDialog(window, "privacy", lazy=True)
+    try:
+        d.search_box.setText("tray")
+        d._apply_search("tray")
+        shown = [d.categories.item(i).text() for i in range(d.categories.count())
+                 if not d.categories.item(i).isHidden()]
+        assert "General" in shown and "Hotkeys" not in shown
+        assert d._page_keys[d.tabs.currentIndex()] == "general"
+        page = d.tabs.currentWidget().widget()
+        cards = page.findChildren(QFrame, "setcard")
+        visible = [c for c in cards if not c.isHidden()]
+        assert visible and len(visible) < len(cards)
+        assert all("tray" in d._words_of(c) for c in visible)
+        d._apply_search("")
+        assert all(not c.isHidden() for c in cards)
+        assert all(not d.categories.item(i).isHidden() for i in range(d.categories.count()))
+        d._apply_search("no such words here")
+        assert all(d.categories.item(i).isHidden() for i in range(d.categories.count()))
+    finally:
+        d.close()
+
+
+def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
+    """Count me in on -> off: the anonymous opt-out goes while the count is still
+    allowed, and the switch takes hold right after; other switches never send it."""
+    from soundboard import usage
+    calls = []
+    monkeypatch.setattr(usage, "opt_out",
+                        lambda where: calls.append((where, net.allowed("usage_stats"))))
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    window.cfg.net_off = []
+    net.configure_features()
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        box.setChecked(False)
+        assert process_events(qapp, lambda: not net.allowed("usage_stats"))
+        assert calls == [("settings", True)] and "usage_stats" in window.cfg.net_off
+        d.net_boxes["radio"].setChecked(False)   # other switches never send it
+        assert calls == [("settings", True)]
+    finally:
+        d.close()
+        net.configure_features()
+
+
+def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
+    """Count me in's hint stays short; its eye opens the table of what's sent, with
+    an example and a reason on every row, and it never touches the switch."""
+    from soundboard.ui import countdialog
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        was = box.isChecked()
+        assert len(d.NET_HINTS["usage_stats"]) < 120
+        d.count_eye.click()
+        dlg = d.count_dialog
+        assert isinstance(dlg, countdialog.CountDialog) and dlg.isVisible()
+        assert all(what and example and why for what, example, why in countdialog.rows())
+        assert box.isChecked() == was
+        dlg.close()
+    finally:
         d.close()

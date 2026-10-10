@@ -19,6 +19,7 @@ import os
 from pathlib import Path
 
 from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.i18n import _
 
 MAX_BYTES = 50 * 1024 * 1024
 _CTRL = {0x11, 0xA2, 0xA3}
@@ -63,15 +64,15 @@ def read(path: str | Path) -> list[Entry]:
     message if it isn't one."""
     path = Path(path)
     if path.stat().st_size > MAX_BYTES:
-        raise ValueError("that file is too big to be a Soundux config")
+        raise ValueError(_("that file is too big to be a Soundux config"))
     try:
         data = json.loads(path.read_bytes().decode("utf-8-sig", errors="replace"))
     except ValueError as e:
-        raise ValueError("that isn't a Soundux config (it couldn't be read)") from e
+        raise ValueError(_("that isn't a Soundux config (it couldn't be read)")) from e
     inner = data.get("data") if isinstance(data, dict) else None
     tabs = inner.get("tabs") if isinstance(inner, dict) else None
     if not isinstance(tabs, list):
-        raise ValueError("that isn't a Soundux config")
+        raise ValueError(_("that isn't a Soundux config"))
     tabs = [t for t in tabs if isinstance(t, dict) and isinstance(t.get("sounds"), list)]
     out = []
     for t in tabs:

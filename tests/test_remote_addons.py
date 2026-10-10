@@ -103,7 +103,7 @@ def test_a_remote_add_on_for_a_newer_app_is_refused(tmp_path):
 def test_it_loads_and_gets_its_card_on_settings(qapp, window, loaded):  # noqa: F811
     d = SettingsDialog(window, "remote")
     texts = [lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)]
-    assert "TEST ADD-ON" in texts and "the test card" in texts
+    assert "Test add-on" in texts and "the test card" in texts
     d.close()
     window._stop_remote_addons()
     assert loaded.stopped == 1
@@ -216,15 +216,22 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
     srv = loaded.server
     monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
     assert not srv.start(0, "add-on-key", "127.0.0.1") and not srv.running
-    assert srv.error == remote.PUBLIC_NETWORK
+    assert srv.error == remote.public_network()
     monkeypatch.setattr(netcategory, "category", lambda ip: None)   # can't tell: on
     assert srv.start(0, "add-on-key", "127.0.0.1")
-    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PRIVATE)
+    asked = []
+    monkeypatch.setattr(netcategory, "category",
+                        lambda ip: asked.append(threading.current_thread())
+                        or netcategory.PRIVATE)
     srv._check_network()
+    assert process_events(qapp, lambda: asked and not srv._net_asking, timeout=3)
+    process_events(qapp, lambda: False, timeout=0.2)
     assert srv.running
+    assert threading.main_thread() not in asked   # asked off the UI thread
     monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
     srv._check_network()
-    assert not srv.running and srv.error == remote.PUBLIC_NETWORK
+    assert process_events(qapp, lambda: not srv.running, timeout=3)
+    assert srv.error == remote.public_network()
     assert "Public" in window.status.text()
     loop = remote.RemoteControl(lambda a, p: (200, {}))   # Stream Deck side: 127.0.0.1
     assert loop.start(0, "k") and loop.running

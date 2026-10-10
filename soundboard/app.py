@@ -8,18 +8,15 @@ import os
 import subprocess
 import sys
 
-# Render the window through the GPU from the start. The Radio tab's globe needs a GPU
-# surface; without this, opening it the first time makes Qt destroy and rebuild the
-# whole native window, which looks like the app closing and reopening.
-# (Must be set before the QApplication exists. QT_WIDGETS_RHI=0 is the escape hatch
-# on a machine whose GPU driver or remote-desktop session can't do it.)
-os.environ.setdefault("QT_WIDGETS_RHI", "1")
+# (Up to 1.9.7 QT_WIDGETS_RHI=1 was set here so the Radio tab's 3D globe could show
+# without rebuilding the window. It gave every window its own Direct3D device, 16
+# driver threads and ~30 MB each, never freed; the globe is gone and windows draw
+# the ordinary way again.)
+from PySide6.QtWidgets import QApplication
 
-from PySide6.QtWidgets import QApplication  # noqa: E402
-
-from soundboard import __version__, applog  # noqa: E402
-from soundboard.library import APP_DIR, migrate_from_soundboard  # noqa: E402
-from soundboard.singleinstance import claim_single_instance, listen_for_second_launch  # noqa: E402
+from soundboard import __version__, applog
+from soundboard.library import APP_DIR, migrate_from_soundboard
+from soundboard.singleinstance import claim_single_instance, listen_for_second_launch
 
 log = logging.getLogger(__name__)
 
@@ -101,6 +98,7 @@ def end_process(code: int):
     watcher, the speech worker, an FFT pool) PySide6's crashed in them, so a clean
     quit ended in an access violation and a Windows "stopped working" report.
     TerminateProcess skips all of that; the settings are already saved."""
+    applog.flush()   # the log is written on a thread: its last lines first
     try:
         sys.stdout and sys.stdout.flush()
         sys.stderr and sys.stderr.flush()
@@ -151,6 +149,15 @@ def clean_temp_leftovers(now: float | None = None) -> int:
     return gone
 
 
+def modules_prune():
+    """Leftover add-on copies (modules.prune_leftovers), off the UI thread."""
+    from soundboard import modules
+    try:
+        modules.prune_leftovers()
+    except Exception:  # noqa: BLE001 - tidying up must never hurt the running app
+        log.debug("couldn't tidy old add-on copies", exc_info=True)
+
+
 def start_ytdlp_check(cfg):
     """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
     import threading
@@ -168,29 +175,19 @@ def selftest() -> int:
     runs it after trimming Qt (scripts/prune_build.py), so a missing DLL fails the
     build instead of a user's first launch. Prints OK and returns 0."""
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
-    os.environ.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--mute-audio --disable-gpu")
     # scipy.fft: the app itself doesn't use scipy, but Onion Watch's matcher does, and
     # build.ps1 ships only that part of it
-    for mod in ("numpy", "scipy.fft", "sounddevice", "soundfile", "soxr", "yt_dlp"):
+    for mod in ("numpy", "scipy.fft", "sounddevice", "soundfile", "soxr", "yt_dlp",
+                # yt-dlp's browser impersonation (TikTok links): its libcurl DLL loads,
+                # and this yt-dlp accepts that curl_cffi version
+                "curl_cffi.curl", "yt_dlp.networking._curlcffi"):
         __import__(mod)
-    from PySide6.QtCore import QEventLoop, QTimer
     from PySide6.QtMultimedia import QMediaPlayer
-    from PySide6.QtWebEngineWidgets import QWebEngineView
-    _app = QApplication(sys.argv)   # kept until the loop below has run
+    _app = QApplication(sys.argv)   # kept until the checks below have run
     from soundboard.ui import mainwindow, setupwizard, crashdialog  # noqa: F401
     from soundboard import engine, radio, theme  # noqa: F401
     theme.app_icon()
     QMediaPlayer()   # loads the FFmpeg multimedia plugin
-    view = QWebEngineView()   # starts Chromium: resources, locale, the helper exe
-    loop = QEventLoop()
-    result = {}
-    view.loadFinished.connect(lambda ok: (result.__setitem__("ok", ok), loop.quit()))
-    QTimer.singleShot(30_000, loop.quit)
-    view.setHtml("<html><body><script>document.title='ready'</script></body></html>")
-    loop.exec()
-    if not result.get("ok"):
-        print("FAIL: the web engine didn't load a page", file=sys.stderr)
-        return 1
     print(f"OK: Onion Board {__version__} self-test passed")
     return 0
 
@@ -265,7 +262,8 @@ def keep_netlog() -> int:
 def set_usage_count(on: bool, heard: str = "") -> int:
     """`OnionBoard.exe --usage-count on|off [--heard-from <answer>]`: the installer's
     "Count me in" box. Off adds the usage count to the switched-off features in
-    config.json before the app's first start, so it never sends one; on takes it out
+    config.json before the app's first start, after one anonymous "opt-out/installer"
+    if it was on until now (usage.opt_out: no ID); on takes it out
     (only a box the user saw: a silent update never passes on). `heard` is the
     installer's "Where did you hear about Onion Board?", kept for the first-start
     event. Other settings are kept; nothing connects. No window. Returns 0 once it's
@@ -277,6 +275,15 @@ def set_usage_count(on: bool, heard: str = "") -> int:
     if cfg.read_only:
         print("FAIL: config.json is locked by another program", file=sys.stderr)
         return 1
+    if not on and "usage_stats" not in cfg.net_off:   # on until now: say so once
+        try:
+            from soundboard import net, usage
+            net.configure_from(cfg)
+            if net.mode() != net.TOR:   # Tor isn't running: don't start it
+                log.info("--usage-count off: opt-out %s",
+                         "sent" if usage.opt_out("installer") else "not sent")
+        except Exception:  # noqa: BLE001 - never in the installer's way
+            log.warning("--usage-count off: opt-out failed", exc_info=True)
     cfg.net_off = [k for k in cfg.net_off if k != "usage_stats"] + ([] if on else ["usage_stats"])
     if heard:
         cfg.stats_heard = heard[:200]
@@ -395,6 +402,8 @@ def main():
         except Exception as e:  # noqa: BLE001 - a FAILED line, not the frozen exe's error box
             print(f"FAILED: {type(e).__name__}: {e}", file=sys.stderr)
             sys.exit(1)
+    from soundboard import threadnames
+    threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
@@ -402,6 +411,8 @@ def main():
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
     tune_runtime_for_audio()
+    from soundboard import ytworker
+    ytworker.enabled = True   # web searches and downloads off the audio's GIL
     from soundboard import i18n
     i18n.startup(APP_DIR)   # before any window or module-level text is made
     import threading
@@ -411,8 +422,21 @@ def main():
     except Exception:  # noqa: BLE001
         log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
     app = QApplication(sys.argv)
+    if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
+        from PySide6.QtCore import Qt as _Qt
+        app.setLayoutDirection(_Qt.RightToLeft)
+    from soundboard import theme as _theme
+    i18n.use_fonts(_theme.font_families())
+    # same-width digits everywhere, so a number that changes doesn't make its text jump
+    from PySide6.QtGui import QFont as _QFont
+    _font = app.font()
+    _font.setFeature(_QFont.Tag("tnum"), 1)
+    app.setFont(_font)
+    i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
+    from soundboard.ui import weblinks
+    weblinks.install()   # links open the browser without the relay's proxy settings
     applog.ui_ready()
     if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
         wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])
@@ -428,19 +452,8 @@ def main():
     from soundboard.ui import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
-    from PySide6.QtCore import Qt
-    from PySide6.QtWidgets import QProxyStyle, QStyle
-
-    class _Style(QProxyStyle):
-        """Fusion, but a click anywhere on a slider's bar moves it there (not a page
-        step towards it), on every slider in the app."""
-
-        def styleHint(self, hint, opt=None, widget=None, ret=None):
-            if hint == QStyle.SH_Slider_AbsoluteSetButtons:
-                return Qt.LeftButton.value
-            return super().styleHint(hint, opt, widget, ret)
-
-    app.setStyle(_Style("Fusion"))
+    from soundboard.wheelguard import AppStyle
+    app.setStyle(AppStyle("Fusion"))   # also: the wheel never changes a dropdown or tab
     from soundboard.ui import a11y
     a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
     from soundboard import theme
@@ -459,7 +472,21 @@ def main():
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
     from soundboard import usage
-    usage.note(usage.mark_running(APP_DIR))   # the last run ended without closing itself?
+    from soundboard import exitwatch
+    last_run = exitwatch.read_last(APP_DIR)   # before this run's black box replaces it
+    unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
+    if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
+        def why(unclean=unclean):
+            try:
+                event, _path = exitwatch.check_last(APP_DIR, *last_run, unclean)
+            except Exception:  # noqa: BLE001 - still count it, without the why
+                log.warning("couldn't tell why the last run ended", exc_info=True)
+                event = unclean
+            usage.note(event)
+        threading.Thread(target=why, daemon=True, name="last-exit").start()
+    import time
+    exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
+        getattr(app, "hangwatch", None), "beat", time.monotonic()))
     if (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
             or app.instance_server.show_requested):    # ...unless launched again since
         w.show()
@@ -473,12 +500,19 @@ def main():
         QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note
                                                else "ok"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
+    # old add-on copies: once the add-ons are loaded (so the ones in use are known)
+    QTimer.singleShot(20_000, lambda: threading.Thread(
+        target=modules_prune, daemon=True, name="addon-leftovers").start())
     QTimer.singleShot(500, w.import_queued)   # the installer's "from Soundpad" box
     QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most every 6 hours, also for an app
     # left running for days
     QTimer.singleShot(45_000, w.check_updates)
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
+    w.tick_usage()   # how long it's open, for the daily count: from now
+    open_timer = QTimer(w)
+    open_timer.timeout.connect(w.tick_usage)
+    open_timer.start(usage.OPEN_TICK_S * 1000)
     recheck = QTimer(w)
     recheck.timeout.connect(w.check_updates)
     recheck.timeout.connect(w.send_usage)

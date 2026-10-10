@@ -7,6 +7,7 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
+from PySide6.QtWidgets import QPushButton
 
 from soundboard import backup
 from soundboard.library import Config, SoundMeta
@@ -253,8 +254,83 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     w._update_chips({"s0": (0.5, False)})
     assert not w.playing_row.isHidden()
     w._unqueue(0)
-    w._update_chips({"s0": (0.5, False)})
+    w._update_chips({})
     assert w._queue == [] and w.playing_row.isHidden()
+
+
+def test_a_double_click_on_a_queue_chips_x_takes_out_only_that_one(window, monkeypatch, calls):
+    w = window
+    w._ui_live = True
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s1")
+    w.queue_sound("s0")
+    w._update_chips({"s0": (0.5, False)})
+    first_x = [b for b in w.playing_row.findChildren(QPushButton) if b.text() == "✕"][0]
+    first_x.click()
+    first_x.click()                   # the same ✕ again before the row is remade
+    assert w._queue == ["s0"]
+
+
+def test_a_double_click_on_stop_doesnt_stop_the_next_queued_sound(window, monkeypatch, calls):
+    w = window
+    stopped = []
+    monkeypatch.setattr(w.engine, "stop", stopped.append)
+    w.select("s0")
+    w.stop_current()
+    w.select("s1")                    # the queue's next sound took the player
+    w.stop_current()                  # the double click's second press
+    assert stopped == ["s0"]
+    w._stopped_at = (0.0, "s0")       # a press well after: stops it
+    w.stop_current()
+    assert stopped == ["s0", "s1"]
+
+
+def two_playing(w):
+    """s0 then s1 really playing (a stand-in headphone output), their chips up."""
+    w._ui_live = True
+    w.engine.mon_stream = object()
+    w.engine.rates["mon"] = 48000
+    for sid in ("s0", "s1"):
+        w.audio[sid] = np.full((48000 * 20, 2), 0.01, np.float32)
+    w.play("s0")
+    w.play("s1")
+    w._update_chips(w.engine.playing())
+    assert list(w._chips) == ["s0", "s1"]
+
+
+def chip_stop(w, sid):
+    w._chips[sid].findChildren(QPushButton)[-1].click()
+    w._update_chips(w.engine.playing())
+
+
+def test_stopping_one_of_two_keeps_the_others_chip(window):
+    """Two playing, ■ on the right one: the row used to hide with one sound left, so
+    the left one's chip went too and it looked like both had stopped."""
+    w = window
+    two_playing(w)
+    chip_stop(w, "s1")
+    assert list(w.engine.playing()) == ["s0"]
+    assert list(w._chips) == ["s0"] and not w.playing_row.isHidden()
+    w._stopped_at = (0.0, "s1")       # well after the first press
+    chip_stop(w, "s0")                # the last one stops: the row goes
+    assert not w.engine.playing() and w.playing_row.isHidden()
+    w.play("s1")                      # one sound on its own: its chip, same as always
+    w._update_chips(w.engine.playing())
+    assert list(w._chips) == ["s1"] and not w.playing_row.isHidden()
+
+
+def test_a_double_click_on_a_now_playing_chips_stop_stops_only_that_one(window):
+    """The row is remade after a ■ and another sound's ■ can slide in under the mouse:
+    the double click's second press used to stop that one too."""
+    w = window
+    two_playing(w)
+    chip_stop(w, "s1")
+    chip_stop(w, "s0")                # the second press, on the ■ now under the mouse
+    assert list(w.engine.playing()) == ["s0"]
+
+
+def test_the_mini_players_stop_all_says_all(window):
+    assert window.mini_stop.text() == "All" and window.mini_st.text() == ""
 
 
 def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, calls):
@@ -324,8 +400,9 @@ def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.pad_menu("s0", None)
-    assert shown == ["Play next", "---", "Edit…", "Effects…", "Set hotkey…",
-                     "Categories", "Add picture…", "---", "Export…", "Remove"]
+    assert shown == ["Play next", "Volume", "---", "Edit…", "Rename…", "Effects…",
+                     "Set hotkey…", "Categories", "Add picture", "---", "Duplicate",
+                     "Export…", "Show the file in its folder", "Remove"]
     assert w.meta("s0").hotkey == "ctrl+alt+7"
     shown = menu_pick(monkeypatch, ["Hotkey: Ctrl+Alt+7", "Remove hotkey"])
     w.pad_menu("s0", None)
@@ -344,3 +421,84 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w.status.setText("")
     w.set_sound_hotkey("s1", "f9")         # a free key: nothing to say
     assert w.status.text() == ""
+
+
+def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch):
+    """Settings → Hotkeys: giving Stop everything a key a pad had takes it off the
+    pad (a combo does one thing) and a warn toast names what lost it."""
+    from soundboard.ui import busy
+    toasts = []
+    monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append((text, kind)))
+    w = window
+    w.meta("s0").hotkey = "f1"
+    w.cfg.category_hotkeys["All"] = "f1"
+    w.set_global_hotkey("stop_hotkey", "f1")
+    assert w.meta("s0").hotkey == ""
+    assert "All" not in w.cfg.category_hotkeys
+    assert w.cfg.stop_hotkey == "f1"
+    text, kind = toasts[-1]
+    assert kind == "warn" and "Boom" in text and "Stop everything" in text and "All" in text
+    toasts.clear()
+    w.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
+    assert not [t for t in toasts if t[1] == "warn"]
+
+
+def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp):
+    """F2 renames the pad the keyboard is on, Alt+Enter opens Edit, Delete removes it
+    (nothing picked), Ctrl+F lands in the search box."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QInputDialog
+    w = window
+    w.show()
+    w.tabs.setCurrentWidget(w.sounds_page)
+    pad = w.pads["s0"]
+    pad.setFocus()
+    qapp.processEvents()   # the tab shown: a shortcut on a hidden widget doesn't fire
+    monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("Big boom", True)))
+    QTest.keyClick(pad, Qt.Key_F2)
+    assert w.meta("s0").name == "Big boom" and pad.meta.name == "Big boom"
+    edited = []
+    monkeypatch.setattr(w, "edit", lambda sid, tab="sound": edited.append(sid))
+    QTest.keyClick(pad, Qt.Key_Return, Qt.AltModifier)
+    assert edited == ["s0"]
+    asked = []
+    monkeypatch.setattr(w, "ask_remove", lambda sids: asked.append(list(sids)) or False)
+    QTest.keyClick(pad, Qt.Key_Delete)
+    assert asked == [["s0"]]
+    QTest.keyClick(pad, Qt.Key_F, Qt.ControlModifier)
+    assert qapp.focusWidget() is w.search
+
+
+def test_duplicate_and_show_file(window, monkeypatch):
+    """Duplicate adds a copy right after the original, with its own file and no
+    hotkey; Show the file opens Explorer on it (and says so if the file is gone)."""
+    import subprocess
+    from pathlib import Path
+    w = window
+    w.meta("s0").hotkey = "f1"
+    new = w.duplicate_sound("s0")
+    assert new is not None and new.id in w.pads
+    assert [m.id for m in w.cfg.sounds][:2] == ["s0", new.id]
+    assert new.name == "Boom (copy)" and new.hotkey == "" and new.file != w.meta("s0").file
+    assert Path(new.file).is_file()
+    runs = []
+    monkeypatch.setattr(subprocess, "Popen", lambda args, **k: runs.append(args))
+    from soundboard.ui import mainwindow as mwmod
+    monkeypatch.setattr(mwmod.sys, "platform", "win32")
+    w.show_sound_file("s0")
+    assert runs and runs[-1][0] == "explorer" and runs[-1][-1] == w.meta("s0").file
+    toasts = []
+    from soundboard.ui import busy
+    monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append(kind))
+    w.meta("s0").file = str(Path(w.meta("s0").file).with_name("gone.wav"))
+    w.show_sound_file("s0")
+    assert toasts[-1] == "warn" and len(runs) == 1
+
+
+def test_transport_time_is_blank_until_a_sound_is_picked(window):
+    w = window
+    assert w.np_time.text() == "" and w.mini_time.text() == ""
+    w.select("s0")
+    w.remove_sound("s0")   # back to "Pick a sound"
+    assert w.np_time.text() == ""

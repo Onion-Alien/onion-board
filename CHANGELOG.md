@@ -4,6 +4,267 @@
 
 - Tab help uses a wider, rounded card with a clear heading, readable text and Bun
   the bunny, or Hoot the owl for Onion Watch. Click outside or press Escape to close.
+- **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
+  keyboard navigation, so startup focus no longer looks like a second selected tab.
+- The Voice tab's off state says "Voice effects off — mic unchanged" as plain
+  status text. It no longer looks clickable or opens the voice changer.
+- **Cards and the file-drop hint stay in sync.** Resizing, moving, adding or filtering sounds clears the old drop-area border and label as soon as the cards move.
+- Floating status notes, including headphones changes and added sounds, disappear
+  after eight seconds. Clicking dismisses them completely, so resizing the window
+  cannot bring them back.
+- Removed redundant hover tooltips from About this tab, More tabs, Settings and
+  the sidebar arrow; their labels and screen-reader help remain available.
+
+- **Readable voice meter.** The Voice tab's status chips no longer squeeze the
+  mic meter into a tiny bar. It fills the available space and takes at least
+  half the bar in roomy windows; status chips wrap below when needed.
+- Live effects open over the app in a draggable window, stay open while using the
+  board, and keep their position when reopened or when Redline is toggled.
+- The speed gauge enters its red zone at 8x, like a car rev counter.
+- Web search results no longer flash tiny windows while their cards are being built.
+- The tray menu now shows a board icon beside **Open Onion Board**.
+- The recording window has clearer source choices, a larger timer and a compact
+  studio panel, with matching styling for trimming and saving a take.
+- Web search and the Radio map have rounded outer corners, matching the other panels.
+- Added missing menu icons, including sorting and Backup, and fixed checked menu icons disappearing against dark backgrounds.
+- Adding and playing the same web result share one download. Repeated clicks no
+  longer queue a duplicate import, and a failed download finishes both actions
+  together. A thumbnail save failure no longer reports a successful audio import
+  as failed.
+- ***Count me in* also counts roughly how long the app was open** since the last daily count (under 15 minutes, up to an hour, 1-3 hours, 3-8 hours or more), so we can tell quick checks from all-evening use. Never the times of day; nothing is sent while it's off.
+- **Clearer privacy text for *Count me in*.** It now says plainly that the random ID sent with the anonymous count links your counts together, so we can see how people use the app over time (which tabs, which versions, whether they come back) and what to improve. The only new thing sent is a short tag made from that same ID, so one person's days link up; switching *Count me in* off sends one last anonymous count (no ID) so we know how many people opted out, then nothing at all.
+- **Shorter, plainer *Count me in* text.** Settings says it in one line (anonymous usage stats once a day; never your name, IP address or device info), and the eye next to it opens a small table of everything it sends, with an example and why, plus links to the full list and GoatCounter's privacy policy. The installer says the same.
+
+## 1.9.27 — 2026-10-09
+
+- **Free sound packs.** *Backup → Free sound packs…* on the Sounds tab adds a
+  whole ready-made board in one click, starting with the 67-sound GM pack for
+  tabletop games. Made your own? *Share a pack* sends it in;
+  once its sounds are checked as CC0 it shows up for everyone. It has its own
+  switch in Settings → Privacy & security.
+- **No more skips while you click around.** A sound playing no longer stutters
+  when a tab opens for the first time (Apps, Radio, Triggers), during a web
+  search, or while a link is looked up.
+- **The player follows you.** Play, pause, stop and seek sit under the tabs, so a
+  sound can be stopped from any tab. Every sound playing gets its own chip, and
+  stopping one of two no longer looks like it stopped both.
+- **Pasted links show a card** with the video to Play or Add; nothing downloads
+  until you pick. Dead, playlist and soundless links say so in plain words.
+- **Offline mode hides what only works online** instead of greying it out, and
+  an *Offline* chip in the header says it's on.
+- **Tabs:** *+ More tabs* sits right after the last tab and shows what each tab
+  does; right-click a tab to hide it.
+- **Voice tab** opens tidy with every card folded; *Custom voices* has its own
+  card. Hothead now works on any mic, Walkie-talkie's clicks are off, and
+  *Female voice* is now *High voice*.
+- **Setup guide:** Bun reacts at normal talking volume (and doesn't cheer when
+  the mic set-up fails), with bigger device tiles and tidier buttons.
+- Bun, the owl and the logo move smoothly at a steady 30 fps.
+- **Fixes:** 43 texts that were English in every language are translated; a
+  sound on the Undo bar no longer gets added back as a dropped-in file; queue
+  double-clicks no longer remove or stop the next sound; toasts keep all their
+  lines in a small window.
+
+## 1.9.26 — 2026-10-08
+
+- **Bun sets up your mic.** While *Straight into my mic* is being set up, Bun
+  rolls in and hammers a speaker together instead of a greyed-out button. If it
+  works, the speaker plays and he cheers; if not, it pops and he shuffles off.
+- **Pasted TikTok links work again.** They all failed with "Unexpected response";
+  TikTok pads now get their picture too.
+- **Smoother voice changer.** A changed voice could turn back into your own
+  mid-call; dragging sliders while talking no longer clicks or drops out.
+- **Fewer pointless error pop-ups.** A window closed a moment too early no longer
+  shows an error report (it's still counted so it gets fixed).
+
+## 1.9.25 — 2026-10-08
+
+- **Fix:** an error report could pop up if the mic set-up finished after the
+  quick-setup guide had already been closed.
+
+## 1.9.24 — 2026-10-08
+
+- **Set up for the app you're using.** When Discord, Zoom, Teams, a browser call,
+  TeamSpeak, Mumble or a game with a known voice chat starts listening, a slim bar
+  asks "Looks like you're using Discord. Set up for it?". *Set up* picks the right
+  sound mode and shows what's left to check; next time that app starts, the mode
+  switches by itself (with Undo). Settings → General lists the apps it remembers.
+- **More for your Stream Deck and chat.** Remote control can now switch the voice
+  changer straight to a voice, say a typed line in the computer voice (a channel
+  point reward that reads out what the viewer wrote), queue a sound or play a whole
+  category in a row, and turn *Hear what they hear* on or off. The Streamer guide's
+  *Copy AI prompt* knows all of it, and lists your voices too.
+- **Fixes:** *Send feedback* and *Report a problem* opened the Documents folder
+  instead of the browser; the Sounds tab now lights up for a song played from the
+  web search, like the Radio tab does.
+
+## 1.9.23 — 2026-10-08
+
+- **Safer mic set-up.** The one-time *Straight into my mic* set-up locks down its own
+  data folder, brings back the Windows audio services it restarts, and puts your mic
+  back as it was if anything goes wrong half-way.
+- **The anonymous usage count says a little more** (only if *Count me in* is on; it
+  still never sends names, sounds or files). Along with the daily count: rough
+  buckets for how long ago it was installed, how many sounds your board has and how
+  many you played, where your sounds go, the app's language, and which features you
+  used. A new install also counts its first steps (added a sound, played one, one
+  reached others) once each. The full list is in SECURITY.md.
+
+## 1.9.22 — 2026-10-08
+
+- **The mic update from 1.9.21 happens by itself.** If you set up *Straight into my
+  mic* before 1.9.21, the first start of this version moves Onion Board's part of
+  your mic for you: click *Yes* when Windows asks (once). No button to find.
+
+## 1.9.21 — 2026-10-08
+
+- **Your sounds reach every app that uses your mic.** Some apps open the mic in a way
+  that went around Onion Board (Discord's *Studio* profile is one), so they heard your
+  voice but not your sounds. Onion Board now sits in the part of the mic those apps
+  can't skip. If you set up *Straight into my mic* before this version, the Setup tab
+  offers the update (Windows asks once, and your sound drops out for a second).
+
+## 1.9.20 — 2026-10-08
+
+- **Sort your pads.** The new button by the search box sorts them *A–Z*, *Newest* or
+  *Most played*, or keeps *My order* (the one you drag). Each sound now keeps a play
+  count, starting from this version.
+- **List view.** The same button shows the pads as one-line rows, several columns of
+  them, with each sound's hotkey: hundreds of sounds on one screen.
+- **Quick volume on a pad.** Hold Ctrl and turn the mouse wheel over a pad, or use
+  the volume slider in its right-click menu, instead of opening *Edit* every time.
+- **Save a typed line as a sound.** *Save as sound* beside *Say* on the Voice tab
+  keeps the line, in the voice you picked, as a pad on the Sounds tab.
+- **A colour per category.** Right-click a category → *Colour*: a dot on its tab and
+  on the in-game overlay shows which one is up.
+- **Small tidy-ups:** the ⓘ beside the tabs is on every tab now (a line on what the
+  tab is for), the Apps tab's *Effects* and *Card size* controls wait until a
+  program shows up, and the transport bar's time is blank until a sound is picked.
+- **The Setup tab says the one-time setup once.** Before it's done, the card no
+  longer shows two red crosses ("Your mic ✗ off", "Virtual mic ✗ not installed
+  yet") over the orange step that explains it; nothing is wrong yet.
+- **Search in Settings.** A box above the categories: type a word and only the
+  cards with it stay, on the pages that have one (Ctrl+F gets you there).
+- **More in a pad's right-click menu:** *Rename…* (just the name), *Duplicate* (a
+  second pad with the same sound and its own file, for its own effects or hotkey) and
+  *Show the file in its folder*.
+- **Pads work from the keyboard.** On a pad, F2 renames it, Alt+Enter opens Edit
+  and Delete removes it (it already removed the picked ones); Ctrl+F anywhere on
+  the Sounds tab jumps to the search box. Arrows, Enter and Space worked already.
+- **Mid-size windows keep the words that matter.** The *Listening* dropdown no longer
+  stands alone as a bare “Clean” (its label goes with it), and *Record* keeps its word
+  instead of becoming a lone red dot, until the window is really small.
+- **Lighter on the CPU while sounds play.** The filters behind every voice chat mode,
+  the EQ, the live effects and the voice changer do their per-block bookkeeping in one
+  step instead of several, and the mono downmix for voice chat does its sums in bulk:
+  playing a few sounds costs about a sixth less of a core, the live effects about a
+  fifth less. Nothing sounds different.
+
+## 1.9.10 — 2026-10-08
+
+- **Links no longer break your browser.** Clicking a link in the app (the Discord
+  invite, release notes, Report a bug…) while your browser was closed started the
+  browser with the app's own network settings, so every site in it asked for a
+  password ("The proxy 127.0.0.1 is requesting a username and password"). Links now
+  open the browser exactly as if you'd opened it yourself. If it happened to you,
+  closing the browser and opening it again fixes it.
+- **A hotkey taken off a sound says so.** Giving an app hotkey (Stop everything, the
+  overlay, push-to-talk…) a key a pad or category already had takes it off that one,
+  as before, but now a message names what lost it, like setting a pad's key already did.
+- **The Voice tab starts with the voice changer.** *Speak another language* moved
+  under the voice changer and AI voices, so the voices are on screen the moment
+  the tab opens.
+
+## 1.9.9 — 2026-10-08
+
+- **Pick your language.** *Settings → Appearance → Language* opens a window of
+  languages, each in its own name, with a search. Every text in the app now comes in
+  all 32 languages (machine-translated where no one has yet, so expect a few odd
+  words). Windows set to one of them gets a one-time offer to switch; the app doesn't
+  switch by itself.
+- **Says when an app skips your sounds.** With *Straight into my mic*, an app that
+  opens the mic in "raw" mode (bypassing Windows' sound effects) gets none of your
+  sounds. The warning bar now names the app, so you know which one to fix.
+- **Stream output is a row under *Also send to*.** Pick *Clean, for streaming* on a
+  row to get the old Stream output (OBS) mix, with its volume and *Include my voice*
+  under it. Your stream setting carries over.
+- **Faster theme switch.** Switching theme in Settings no longer freezes the window
+  for seconds.
+- Setting up *Straight into my mic* no longer flashes an "Audio device problem — mon"
+  error while Windows' audio restarts on purpose.
+- **Triggers tab: Onion Watch 0.9.3.** A trigger's *Test* now shows in *Playing now*
+  with its own stop, and its button says *Stop* while it plays. The Triggers tab is
+  in your language too.
+- Fewer hover tips that only repeated a button's name; dropdowns lose the empty gap
+  before their arrow.
+- Small fixes: the header logo restarts after restoring a minimised window, the Radio
+  map shows country names before the station dots, the clip editor's "Listening…"
+  fits small cards, and the radio's empty-clip messages say "on the radio".
+- Old add-on copies left over from updates are cleaned up at start-up.
+- **No more freezes when a headset drops out.** Unplugging a headset, Bluetooth
+  cutting out or the PC waking from sleep could freeze the window for seconds while
+  the app reopened the device. That now happens in the background, and so do
+  *Re-scan devices* and picking a device by hand: the window stays usable while a
+  slow driver answers.
+- **No more short freezes on a slow or sleeping disk.** Pad pictures, the Discord
+  guide's settings, the *Remove the virtual cable* check and a pad's video are now
+  read in the background, so bringing the window back from the tray or picking a pad
+  no longer waits for the disk. A pad shows its plain card for a moment until its
+  picture is in.
+- **28 more languages to speak in.** The Voice tab's *Speak in* list grows from 5
+  to 33: Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Czech, Slovak,
+  Slovenian, Hungarian, Romanian, Bulgarian, Greek, Danish, Swedish, Norwegian,
+  Finnish, Catalan, Japanese, Korean, Traditional Chinese, Thai, Vietnamese,
+  Indonesian, Malay, Hindi, Arabic, Hebrew and Turkish. Each is a one-time download
+  (66–125 MB) and uses Windows' free voice for it. Language names now show in the
+  app's own language.
+- **Setup and Voice tabs fit a big screen.** Full screen, their cards no longer
+  stretch to half the screen each: the pages stay a readable width in the middle,
+  and buttons, voice lists and sliders keep their own size instead of becoming bars
+  across the whole card.
+- **AI voices: pick by who and how high.** *All voices* sorts them under Men,
+  Women and In between & fun (your own last), lowest first, with chips to show only
+  one kind and only low, middle or high voices.
+- **Live controls on the Radio and Apps tabs.** The Sounds tab's speed / pitch /
+  effects popup now has a twin on the Radio bar and the Apps tab: change the pitch
+  (Redline up to ±36 st) and add bass, treble, muffle, reverb, echo, distortion or a
+  preset to the radio, or to every program you send. No speed there: a live stream
+  can't be played faster than it arrives.
+- **You can switch the app log off.** *Keep an app log* (Settings → Connection,
+  under Network activity) stops `onionboard.log` being written and deletes it. The
+  log can name a site a download or radio station failed on, so Network activity no
+  longer says "nothing here is logged". With the log off, a crash report still gets
+  the run's last lines, from memory.
+- **The Radio tab speaks your language.** Its buttons, genres, filters, messages and
+  the map's tips were still English in every language; now they follow the app's.
+- **Triggers come back on at start-up.** With watching on, Onion Watch could miss
+  starting with the window (an error while the window was still being built) and
+  only picked up once the Triggers tab was opened.
+
+## 1.9.8 — 2026-10-07
+
+- **Onion Board has a Discord.** Chat, get help and hear about new versions: *Join
+  the Discord* in Settings, the tray icon's menu, *What's new* and the installer's
+  last page (it only opens when you click it).
+- **Discord's automatic input sensitivity is caught too.** In a real call it kept
+  cutting songs out in bursts: up to a third of a high-pitched song went missing,
+  none once it was off. The *Fix Discord* bar and the Discord guide now say when
+  *Automatically determine input sensitivity* is on and how to switch it off.
+- **Lighter on memory.** The Radio tab's HD 3D globe is gone: the flat map (the
+  default since October) is now the only map, and if you had the globe picked you
+  get the map. That takes the whole built-in web browser out of the app, so the
+  download and install get much smaller. Windows no longer get a graphics-card
+  device each (about 30 MB and 16 threads per window, never given back), the maths
+  library stops parking ~30 idle threads and up to 1 GB of reserved memory, the
+  radio's decoder loads only once you open the Radio tab, and unused picture-format
+  plug-ins (PDF and co.) no longer load at start-up.
+
+- **Triggers tab: Onion Watch 0.9.2.** Lighter too (closed trigger cards cost almost
+  nothing, and with watching off it doesn't load its maths libraries), and a green
+  *READY* is no longer mistaken for a red one. The board offers the add-on's
+  update by itself.
+
+## 1.9.7 — 2026-10-07
 
 - **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
   on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
@@ -16,6 +277,14 @@
   *Input Profile* **Custom**, *Noise Suppression* **None**, *Echo Cancellation* off
   (Studio stays the clean choice on the virtual cable). The guide shows each of your
   Discord settings with a ✓ or what to switch, and updates as you change them.
+  It also catches Discord's *Advanced Voice Activity*: in a real call it let only
+  about 2 seconds of a 25-second song through (the Mic Test never shows it).
+- **Onion Board starts speaking your language.** When Windows is set to one of 19
+  languages (Deutsch, Español, Français, Italiano, Nederlands, Polski, Português
+  (Brasil), Türkçe, Bahasa Indonesia, Tiếng Việt, Русский, Українська, العربية, हिन्दी,
+  ไทย, 简体中文, 繁體中文, 日本語, 한국어), the main window and the Sounds tab are in
+  it; the rest follows. The same languages and words as Onion Watch's Triggers tab.
+  Arabic is shown right to left. Hong Kong and Macau get Traditional Chinese.
 - **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
   *What's playing* choice: press Record, play a sound, a web search result or the
   radio (or catch a song already playing), then Stop, cut the ends and save it as a
@@ -52,6 +321,8 @@
   to what it showed before. Pick another category by hand and it stays. All the
   programs you've set are listed in *Settings → General*, with a switch for all of it.
 - **The search box keeps its room** on the Sounds tab in mid-size windows.
+- **Buttons in the guides aren't cut off any more** ("Copy the mic na…"): a window
+  with a row of buttons grows wide enough to show them all.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The

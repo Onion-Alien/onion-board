@@ -27,7 +27,6 @@ os.environ["ONIONBOARD_INSTANCE"] = "screenshots"
 os.environ.setdefault("QT_QPA_FONTDIR", str(Path(os.environ.get("WINDIR", r"C:\Windows"))
                                             / "Fonts"))   # offscreen has no fonts otherwise
 os.environ.setdefault("QT_SCALE_FACTOR", "1.5")           # crisper pictures
-os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--mute-audio"
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -105,7 +104,7 @@ def fake_machine(tmp: Path):
     engine.Engine.effect_alive = lambda self: True
     engine.Engine.direct_apps = lambda self: 2
     engine.Engine.set_tap_device = lambda self, n: setattr(self, "tap_name", n)
-    appaudio.list_apps = lambda: [
+    appaudio.list_apps = lambda *a, **k: [
         appaudio.App(pid=1000 + i, exe=exe, title=title, active=on, peak=0.4 if on else 0.0,
                      devices=[OUTS[1]], session_pids={1000 + i})
         for i, (exe, title, on) in enumerate(PROGRAMS)]
@@ -251,12 +250,21 @@ def main():
     w.show()
     w._update_status()
     spin(1.5)
+    # wide enough that nothing folds away (the tagline with the version, the buttons'
+    # words): the top row grows as features are added, and 1180 stopped being enough
+    w._fit.reset()
+    need = w._fit.need().width()
+    if need > w.width():
+        w.resize(need, round(need * 720 / 1180))
+        spin(1.5)
+    print("window", w.width(), "x", w.height(), "- needs", need)
     for page, name in ((w.sounds_page, "sounds"), (w.apps, "apps"), (w.voice, "voice"),
                        (w.setup_page, "setup")):
         w.tabs.setCurrentWidget(page)
         spin()
         save(w, name)
     if watch:
+        w.triggers.ensure_loaded()        # the add-on loads when its tab is first shown
         tr = w.triggers.panel.panel       # the add-on's triggers page
         tr.set_watching(True)             # Watcher.start is a no-op (install_onion_watch)
         tr.poll.stop()                    # show made-up live matches instead

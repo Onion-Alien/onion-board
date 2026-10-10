@@ -1,10 +1,10 @@
 """Write THIRD-PARTY-NOTICES.txt for the packaged app (build.ps1 runs this).
 
-The PyInstaller build bundles Python, Qt (PySide6, LGPL-3.0), Qt WebEngine
-(Chromium), numpy, scipy, libsndfile, libsoxr, PortAudio and more; their licences
-require the notices to travel with the binaries. This walks the runtime
-dependencies installed in the current environment and copies every licence file
-each one ships, then adds the texts PySide6 doesn't include itself.
+The PyInstaller build bundles Python, Qt (PySide6, LGPL-3.0), numpy, scipy,
+libsndfile, libsoxr, PortAudio and more; their licences require the notices to
+travel with the binaries. This walks the runtime dependencies installed in the
+current environment and copies every licence file each one ships, then adds the
+texts PySide6 doesn't include itself.
 
     python scripts/make_notices.py [output path]
 """
@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ROOTS = ["PySide6", "numpy", "scipy", "sounddevice", "soundfile", "soxr",
-         "yt-dlp", "yt-dlp-ejs"]
+         "yt-dlp", "yt-dlp-ejs", "curl_cffi"]
 LICENSE_FILE = re.compile(r"(?i)^(licen[cs]e|copying|notice|authors)|licen[cs]e")
 SKIP_FILE = re.compile(r"(?i)commercial")  # Qt's commercial terms don't apply to us
 RULE = "=" * 78
@@ -40,13 +40,6 @@ https://code.qt.io  and  https://code.qt.io/cgit/pyside/pyside-setup.git
 The LGPL-3.0 and the GPL-3.0 it builds on are reproduced at the end of this file.
 
 {RULE}
-Qt WebEngine (Chromium)
-{RULE}
-The Radio tab's globe uses Qt WebEngine, which contains Chromium and its third-party
-components under BSD-style and other licences. The full list:
-https://doc.qt.io/qt-6/qtwebengine-licensing.html
-
-{RULE}
 FFmpeg (through Qt Multimedia)  --  LGPL-2.1-or-later
 {RULE}
 The Radio tab decodes streams with Qt Multimedia's FFmpeg backend. The FFmpeg
@@ -54,13 +47,18 @@ libraries (avcodec, avformat, avutil, swresample, swscale) ship with PySide6 as
 separate, replaceable DLLs. Source code and licence: https://ffmpeg.org/legal.html
 
 {RULE}
-globe.gl / three.js  --  MIT
+curl-impersonate (through curl_cffi)  --  MIT and curl licence
 {RULE}
-The Radio tab's 3D globe is globe.gl 2.46.2 (https://github.com/vasturiano/globe.gl),
-which includes three.js (https://threejs.org), shipped in the app's radio folder.
-Their MIT licence texts are in radio\\LICENSE.txt. Earth images: NASA Visible
-Earth (public domain), via three-globe. Country outlines: Natural Earth (public
-domain).
+Pasted TikTok links (and some other sites) are fetched with curl_cffi's build of
+curl-impersonate: libcurl with BoringSSL, nghttp2, brotli and zstd, shipped as
+libcurl-impersonate*.dll. Licences: https://github.com/lexiforest/curl-impersonate
+and https://curl.se/docs/copyright.html
+
+{RULE}
+Country outlines
+{RULE}
+The Radio tab's map draws Natural Earth's country outlines (public domain), shipped
+in the app's radio folder.
 
 {RULE}
 PyInstaller bootloader  --  GPL-2.0-or-later with the PyInstaller exception

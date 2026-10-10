@@ -11,8 +11,8 @@ import re
 from collections.abc import Callable
 
 import numpy as np
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import (QButtonGroup, QDialog, QHBoxLayout, QLabel, QLineEdit,
+from PySide6.QtCore import QSize, Qt, QTimer
+from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
                                QMessageBox, QPushButton, QRadioButton, QVBoxLayout, QWidget)
 
 from soundboard import library
@@ -35,10 +35,12 @@ PEAKS = 400
 
 
 def next_name(names) -> str:
-    """"Recording N", one past the highest number already used."""
-    used = [int(m.group(1)) for n in names
-            if (m := re.fullmatch(r"Recording (\d+)", n.strip()))]
-    return f"Recording {max(used, default=0) + 1}"
+    """"Recording N", one past the highest number already used (in English or the
+    language showing: names made before a language change count too)."""
+    mine = re.escape(_("Recording {n}")).replace(re.escape("{n}"), r"(\d+)")
+    used = [int(m.group(1)) for n in names for pat in {r"Recording (\d+)", mine}
+            if (m := re.fullmatch(pat, n.strip()))]
+    return _("Recording {n}", n=max(used, default=0) + 1)
 
 
 def _clock(s: float) -> str:
@@ -60,25 +62,45 @@ class RecordDialog(QDialog):
     """`voice_on()`: the voice changer is changing the mic right now. `names()`: the
     sounds' names (for "Recording N"). `save(data, name)` adds the pad and returns
     whether it could. `open_devices()` shows Setup → Devices. `playing_name()`: the
-    name of what's playing now ("" for nothing), for a recording of it."""
+    name of what's playing now ("" for nothing), for a recording of it, and
+    `playing_picture()` its pad's picture file ("" for none): a recording of a pad
+    gets its picture, passed as save()'s third argument."""
     last_source = "mic"   # what the window offers first: the last one used
 
     def __init__(self, engine, voice_on: Callable[[], bool], names: Callable[[], list],
                  save: Callable[[np.ndarray, str], bool], open_devices: Callable[[], None],
-                 parent=None, playing_name: Callable[[], str] | None = None):
+                 parent=None, playing_name: Callable[[], str] | None = None,
+                 playing_picture: Callable[[], str] | None = None):
         super().__init__(parent)
         fit.watch(self)
         self.engine = engine
         self._voice_on, self._names, self._save, self._open_devices = \
             voice_on, names, save, open_devices
         self._playing_name = playing_name or (lambda: "")
+        self._playing_picture = playing_picture or (lambda: "")
         self._taken_name = ""   # what was playing while it recorded
+        self._taken_pic = ""    # ...and its pad's picture
         self.take: MicTake | None = None
         self.data: np.ndarray | None = None   # the finished take, (n, 2) float32 at SR
         self.saved = 0                        # pads added from this window
         self.setWindowTitle(_("Record a sound"))
+        self.setObjectName("recorddialog")
         lay = QVBoxLayout(self)
-        lay.setSpacing(10)
+        lay.setContentsMargins(24, 22, 24, 20)
+        lay.setSpacing(16)
+        heading = QHBoxLayout()
+        mark = QPushButton()
+        mark.setObjectName("recordmark")
+        mark.setFixedSize(44, 44)
+        mark.setAttribute(Qt.WA_TransparentForMouseEvents)
+        mark.setFocusPolicy(Qt.NoFocus)
+        icons.set_icon(mark, "wave", "accent", size=24)
+        mark.setIconSize(QSize(24, 24))
+        heading.addWidget(mark)
+        title = QLabel(_("Record a sound"))
+        title.setObjectName("recordtitle")
+        heading.addWidget(title, 1)
+        lay.addLayout(heading)
         lay.addWidget(hint_label(_("Record your voice, or a bit of a sound, song or the "
                                    "radio while it plays, and keep it as a sound.")))
 
@@ -115,29 +137,40 @@ class RecordDialog(QDialog):
             group.addButton(b)
             sr.addWidget(b)
             b.toggled.connect(lambda _on: self._show_state())
-        sr.addStretch(1)
+        sr.setSpacing(6)
+        for b in (self.opt_raw, self.opt_fx, self.opt_play):
+            b.setObjectName("recordsource")
+        sr.setStretch(0, 1)
+        sr.setStretch(1, 1)
+        sr.setStretch(2, 1)
         lay.addWidget(self.source)
 
-        self.rec_row = QWidget()
+        self.rec_row = QFrame()
+        self.rec_row.setObjectName("recordstudio")
         row = QHBoxLayout(self.rec_row)
-        row.setContentsMargins(0, 0, 0, 0)
-        row.setSpacing(10)
+        row.setContentsMargins(20, 20, 20, 20)
+        row.setSpacing(24)
         self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
-        self.btn_rec.setMinimumHeight(40)
-        self.btn_rec.setMinimumWidth(120)
+        self.btn_rec.setMinimumHeight(52)
+        self.btn_rec.setMinimumWidth(132)
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=16)
         self.btn_rec.clicked.connect(self._rec_clicked)
         row.addWidget(self.btn_rec)
         col = QVBoxLayout()
-        col.setSpacing(4)
+        col.setSpacing(10)
+        clock_row = QHBoxLayout()
         self.time = QLabel("0:00")
-        self.time.setObjectName("fxname")
-        col.addWidget(self.time)
+        self.time.setObjectName("recordtime")
+        clock_row.addWidget(self.time, 1)
+        self.phase = QLabel()
+        self.phase.setObjectName("recordphase")
+        clock_row.addWidget(self.phase)
+        col.addLayout(clock_row)
         self.meter = Meter()
         self.meter.setMinimumWidth(140)
-        self.meter.setToolTip(_("The level of what's being recorded"))
+        self.meter.setFixedHeight(6)
         col.addWidget(self.meter)
         row.addLayout(col, 1)
         lay.addWidget(self.rec_row)
@@ -147,10 +180,11 @@ class RecordDialog(QDialog):
         lay.addWidget(self.status)
 
         # after Stop: the take, its ends, a listen and a name
-        self.review = QWidget()
+        self.review = QFrame()
+        self.review.setObjectName("recordreview")
         rv = QVBoxLayout(self.review)
-        rv.setContentsMargins(0, 0, 0, 0)
-        rv.setSpacing(8)
+        rv.setContentsMargins(16, 16, 16, 16)
+        rv.setSpacing(12)
         self.trim_home = QVBoxLayout()
         self.trim_home.setContentsMargins(0, 0, 0, 0)
         rv.addLayout(self.trim_home)
@@ -170,14 +204,12 @@ class RecordDialog(QDialog):
 
         bottom = QHBoxLayout()
         self.btn_again = QPushButton(_("Record again"))
-        self.btn_again.setToolTip(_("Throw this one away and record a new one"))
         icons.set_icon(self.btn_again, "record", size=14)
         self.btn_again.clicked.connect(self.record_again)
         bottom.addWidget(self.btn_again)
         bottom.addStretch(1)
         self.btn_save = QPushButton(_("Save"))
         self.btn_save.setObjectName("primary")
-        self.btn_save.setToolTip(_("Add it to your sounds"))
         icons.set_icon(self.btn_save, "plus", "on_accent")
         self.btn_save.clicked.connect(self.save)
         bottom.addWidget(self.btn_save)
@@ -209,11 +241,11 @@ class RecordDialog(QDialog):
             return ("" if e.active_outputs() else
                     _("No audio device is open. Pick one in Setup → Devices."))
         if not e.names.get("mic"):
-            return "No mic is picked. Pick one in Setup → Devices."
+            return _("No mic is picked. Pick one in Setup → Devices.")
         if e.mic_stream is None:
             err = e.errors_snapshot().get("mic")
-            return f"Your mic can't open: {err}" if err else \
-                "Your mic can't open right now. Check it in Setup → Devices."
+            return _("Your mic can't open: {error}", error=err) if err else \
+                _("Your mic can't open right now. Check it in Setup → Devices.")
         return ""
 
     def _show_state(self):
@@ -230,6 +262,10 @@ class RecordDialog(QDialog):
         self.rec_row.setVisible(not have)
         self.btn_rec.setEnabled(recording or not problem)
         self.btn_rec.setChecked(recording)
+        self.phase.setText(_("Recording…") if recording else _("Ready"))
+        self.phase.setProperty("recording", recording)
+        self.phase.style().unpolish(self.phase)
+        self.phase.style().polish(self.phase)
         self.btn_rec.setText(_("Stop") if recording else _("Record"))
         icons.set_icon(self.btn_rec, "stop" if recording else "record", "#ff4d4f", "#ffffff",
                        size=16)
@@ -255,6 +291,7 @@ class RecordDialog(QDialog):
         self.take = MicTake(self.engine, processed=processed, playing=playing)
         self._quiet_s = 0.0
         self._taken_name = self._playing_name() if playing else ""
+        self._taken_pic = self._playing_picture() if playing else ""
         self.status.setText(_("Recording what's playing… play a sound, a search result or "
                               "the radio now, then click Stop.") if playing else
                             _("Recording… click Stop when you're done."))
@@ -305,6 +342,7 @@ class RecordDialog(QDialog):
             return
         if take.playing and not self._taken_name:
             self._taken_name = self._playing_name()   # started after Record was pressed
+            self._taken_pic = self._playing_picture()
         got = take.pump()
         s = take.seconds
         left = MAX_SECONDS - s
@@ -352,7 +390,8 @@ class RecordDialog(QDialog):
             return False
         name = self.name.text().strip() or next_name(self._names())
         self.engine.stop(PREVIEW)
-        if not self._save(data, name):
+        if not (self._save(data, name, self._taken_pic) if self._taken_pic
+                else self._save(data, name)):
             return False
         self.saved += 1
         self.accept_take()

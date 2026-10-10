@@ -28,12 +28,17 @@ def test_a_cycle_is_never_collected_on_another_thread(qapp):
         gc.collect(gen)
     held = dropped_cycle()
 
+    kept = []
+
     def busy():                                # allocates far past every threshold
         junk = []
         for _ in range(200_000):
             junk.append([])
             if len(junk) > 1000:
                 junk.clear()
+        # ...and keeps some: the count is of objects made minus freed, and with all of
+        # them freed again it could end at 0 (nothing due: the test failed, now and then)
+        kept.extend([] for _ in range(5000))
     t = threading.Thread(target=busy)
     t.start()
     t.join(30)

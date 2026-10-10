@@ -220,7 +220,9 @@ def test_watchdog_reopens_a_stalled_stream():
     e._last_cb["main"] = time.monotonic()
     assert e.check_streams() == []               # fresh: nothing to do
     e._last_cb["main"] = time.monotonic() - 10
-    assert e.check_streams() == ["main"]
+    assert e.check_streams() == []               # reopened on the device thread...
+    assert e.devices.wait(5)
+    assert e.check_streams() == ["main"]         # ...and reported on the next check
     assert s.closed and e.stalls == 1
     assert "main" in e.errors                    # "fake main" can't actually be opened
 
@@ -232,6 +234,7 @@ def test_watchdog_retries_a_failed_device_only_every_few_seconds():
     assert e.check_streams() == []
     e._last_try["main"] = time.monotonic() - eng.RETRY_S - 1
     e.check_streams()
+    assert e.devices.wait(5)
     assert "main" in e.errors and e.main_stream is None
     assert time.monotonic() - e._last_try["main"] < 1
 
@@ -924,3 +927,39 @@ def test_quiet_sounds_bus_skips_its_filters_then_wakes_for_a_sound(monkeypatch):
     e.play("a", tone(0.05), 1.0)
     e._main(out, 480)
     assert len(calls) == n + 1 and np.abs(out).max() > 0.01
+
+
+@pytest.mark.parametrize("bus", ["radio", "apps"])
+def test_radio_and_programs_get_their_own_live_pitch_and_effects(bus):
+    """The Radio and Apps tabs' Live controls: pitch and effects on that stream only,
+    the sounds' settings leave it alone."""
+    t = np.arange(480 * 40) / SR
+    hiss = (0.3 * np.sin(2 * np.pi * 8000 * t)).astype(np.float32)
+    x = np.stack([hiss, hiss], axis=1)
+
+    def heard(**settings):
+        e = engine_with("mon")
+        for k, v in settings.items():
+            setattr(e, k, v)
+        if bus == "radio":
+            e.ring_rmon.prefill = 0
+        else:
+            src = e.add_aux("prog")
+            src.monitor = True
+            src.ring_mon.prefill = 0
+        out, got = np.zeros((480, 2), np.float32), []
+        for i in range(0, len(x), 480):
+            if bus == "radio":
+                e.feed_radio(x[i:i + 480])
+            else:
+                e.feed_aux(src, x[i:i + 480])
+            e._mon(out, 480)
+            got.append(out.copy())
+        return float(np.abs(np.concatenate(got)[-480 * 10:]).max())
+
+    dry = heard()
+    assert dry > 0.1
+    assert heard(sound_fx={"muffle": 1.0}) == pytest.approx(dry, rel=0.05)
+    assert heard(**{f"{bus}_fx": {"muffle": 1.0}}) < dry * 0.3
+    pitched = heard(**{f"{bus}_pitch": -12.0})
+    assert np.isfinite(pitched) and pitched > 0.05

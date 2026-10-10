@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to play sounds through your mic (Windows, free) | Onion Board</title>
+<meta name="description" content="How to play sounds and music through your microphone on Windows so others hear them in Discord, games and calls, without a virtual cable. Free, step by step.">
+<meta property="og:title" content="How to play sounds through your mic">
+<meta property="og:description" content="Play sounds and music through your mic on Windows, free, no virtual cable.">
+<meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/setup.png?v=d3069da5">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="../favicon.png" sizes="192x192">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0f1016">
+<link rel="canonical" href="https://onion-alien.github.io/onion-board/play-sounds-through-mic/">
+<link rel="stylesheet" href="../guide.css">
+<script data-goatcounter="https://onionalien.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <nav><a href="../">← Onion Board</a></nav>
+
+  <h1>How to play sounds through your mic on Windows</h1>
+  <p class="lead">Want people in Discord, a game or a call to hear a sound, a song or a clip? It has to go into your microphone. Here's the easy way on Windows, for free, with your own voice still working.</p>
+
+  <a class="dl" href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-through-mic-top">⬇ Download Onion Board (free)</a>
+  <p class="small">Windows 10 and 11 · no account, no ads · full source code on GitHub</p>
+
+  <h2>The short answer</h2>
+  <p>Install a soundboard that mixes sounds into your mic. Onion Board does it with one click and no
+    virtual cable: it adds a small audio effect to your mic in Windows' own audio engine, so every app
+    that listens to your mic hears your voice and your sounds together.</p>
+  <img src="../screenshots/setup.png?v=d3069da5" alt="Onion Board's Setup tab showing sounds going into the mic" loading="lazy" width="1100" height="736">
+
+  <h2>Step by step</h2>
+  <ol>
+    <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-through-mic-steps">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
+    <li>The short guide asks for your mic and headphones. Click <b>Put my sounds straight into my mic</b> and <b>Yes</b> when Windows asks. No virtual cable needed.</li>
+    <li>In Discord (<b>User Settings → Voice &amp; Video</b>), keep your normal mic. Set <b>Input Profile</b> to <b>Custom</b>, <b>Noise Suppression</b> to <b>None</b> and turn <b>Echo Cancellation</b> off, so Discord doesn't filter your sounds out. Onion Board reads these settings and tells you if one is in the way.</li>
+    <li>Drag sound files onto the window, right-click a pad to give it a hotkey, and play.</li>
+  </ol>
+
+  <h2>More than sound files</h2>
+  <ul>
+    <li><b>Music or a video from another program:</b> the Apps tab sends one program's sound (Spotify, a
+      browser tab, a video player) into your mic, without touching anything else.</li>
+    <li><b>Internet radio:</b> the Radio tab plays stations from all over the world; press <b>Send</b>.</li>
+    <li><b>Sounds from search:</b> YouTube, SoundCloud and Myinstants, right inside the app.</li>
+    <li><b>Only the sounds, not your voice:</b> untick <b>Others hear it</b> under <i>My mic</i>.</li>
+  </ul>
+
+  <h2>The old way: a virtual cable</h2>
+  <p>Most guides tell you to install VB-Cable, pick <code>CABLE Output</code> as the mic in every app and
+    route your real mic through it too. It works, but it's fiddly and easy to break. If you need it anyway
+    (for a mixer or OBS, say), Onion Board's <b>Use the virtual cable instead</b> sets it up for you. More
+    on that: <a href="../soundboard-without-virtual-cable/">a soundboard with no virtual cable</a>.</p>
+
+  <h2>If they can't hear it</h2>
+  <ul>
+    <li><b>Discord:</b> Noise Suppression and Echo Cancellation can cut sounds out. Set them as in step 3.</li>
+    <li><b>Zoom:</b> pick <b>Original sound for musicians</b>. See <a href="../zoom-google-meet-soundboard/">Zoom and Google Meet</a>.</li>
+    <li><b>Push-to-talk games:</b> turn on <b>Auto push-to-talk</b> so it holds your key while a sound plays.</li>
+  </ul>
+
+  <div class="note">Windows may warn about the download because the installer isn't code-signed (that costs hundreds a year). Click <b>More info → Run anyway</b>.</div>
+
+  <footer>
+    <a href="../">Onion Board</a> ·
+    <a href="../discord-soundboard/">Discord soundboard setup</a> ·
+    <a href="../free-soundpad-alternative/">Free Soundpad alternative</a> ·
+    <a href="../soundboard-without-virtual-cable/">No virtual cable</a> ·
+    <a href="../voicemod-alternative/">Free Voicemod alternative</a> ·
+    <a href="../resanance-alternative/">Resanance alternative</a> ·
+    <a href="../exp-soundboard-alternative/">EXP Soundboard alternative</a> ·
+    <a href="../discord-text-to-speech-voice-chat/">Text-to-speech in voice chat</a> ·
+    <a href="../zoom-google-meet-soundboard/">Soundboard for Zoom and Meet</a> ·
+    <a href="https://github.com/Onion-Alien/onion-board">Source code</a> ·
+    <a href="https://discord.gg/FhKGaWCWHM">Join the Discord</a> ·
+    <a href="https://tally.so/r/rjxjyM">Send feedback</a><br>
+    The app sends only an anonymous daily count (its version, which tabs you opened, and a random ID so we can see how people use it over time), and you can switch it off. This site counts visits with GoatCounter: no cookies, nothing personal.
+  </footer>
+</div>
+<script src="../zoom.js" defer></script>
+</body>
+</html>

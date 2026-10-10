@@ -1,0 +1,15 @@
+{
+  "id": "translate-he",
+  "name": "Translate to Hebrew",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Hebrew. Needs live voice-to-speech. Downloads a 126 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "he",
+  "language_name": "Hebrew",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_he-1_5.argosmodel",
+    "sha256": "f4b75e20bd51ccef54f2e09d684f40b7f70e3682a6f17ae42dc9d496bbce4d17",
+    "bytes": 125594693
+  },
+  "credits": "English to Hebrew model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

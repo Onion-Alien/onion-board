@@ -1,0 +1,15 @@
+{
+  "id": "translate-it",
+  "name": "Translate to Italian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Italian. Needs live voice-to-speech. Downloads a 88 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "it",
+  "language_name": "Italian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_it-1_0.argosmodel",
+    "sha256": "dde2180001a47904ecbbd688a41e35db8a040e4fd5b52e4f29b4bb499516ab32",
+    "bytes": 87660780
+  },
+  "credits": "English to Italian model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

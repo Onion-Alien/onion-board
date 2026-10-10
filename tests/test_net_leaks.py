@@ -20,7 +20,7 @@ from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard import net, updates
 from soundboard.engine import SR
-from test_radio import FakeEngine, FakeMeter, wav_bytes
+from test_radio import wav_bytes
 
 
 class Sites:
@@ -227,7 +227,7 @@ def test_usage_count_through_the_proxy(sites, socks, guard, counter):
     ((path, body),) = sites.posts
     hits = json.loads(body)["hits"]
     # only what SECURITY.md says: the version, first start, and the random ID
-    assert all(set(h) <= {"path", "title", "event", "session"} for h in hits)
+    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
     assert {h["session"] for h in hits} == {cfg.stats_id}
 
 
@@ -324,7 +324,7 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     from PySide6.QtCore import QBuffer, QByteArray
     from PySide6.QtGui import QImage
 
-    from soundboard import ytdl
+    from soundboard import quality, ytdl
     from soundboard.ui.ytsearch import ResultRow, SearchResults
     shown = []
     monkeypatch.setattr(ResultRow, "set_thumb", lambda row, pm: shown.append(pm.size().toTuple()))
@@ -338,9 +338,16 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     hit = ytdl.Result(id="x", title="T", channel="c", seconds=1, source="soundcloud",
                       art=sites.url("thumbs", "/t.png"))
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": [hit])
+    replies = []   # what each picture's request came back with, for a failure's message
+    real_on_thumb = SearchResults._on_thumb
+    monkeypatch.setattr(SearchResults, "_on_thumb", lambda panel, reply, *a: (
+        replies.append((reply.error(), reply.errorString(), reply.bytesAvailable())),
+        real_on_thumb(panel, reply, *a)))
+    assert quality.current.web_extras and net.allowed("sounds_web")
     panel = SearchResults()
-    panel.search("t")
-    assert process_events(qapp, lambda: shown, timeout=15)
+    assert panel.search("t")
+    assert process_events(qapp, lambda: shown, timeout=15), (
+        replies, sites.hits, socks.hosts_asked(), net.describe())
     assert shown == [(32, 18)]
     assert socks.hosts_asked() == {"thumbs.test"}
 
@@ -421,23 +428,3 @@ def test_a_playing_station_follows_a_change_of_proxy(qapp, sites, socks):
     finally:
         p.stop()
         other.close()
-
-
-def test_the_globe_page_cant_reach_the_network(qapp, app_dir, sites):
-    from soundboard.radio import RadioDirectory
-    from soundboard.ui.radiopanel import RadioTab
-    from soundboard.library import Config
-    from test_radio import api_station
-    sites.routes["/json/stations/search"] = (json.dumps([api_station(1)]).encode(),
-                                             "application/json")
-    d = RadioDirectory(app_dir / "radio", bases=(f"http://127.0.0.1:{sites.port}",))
-    cfg = Config()
-    cfg.radio = {"map": "globe"}
-    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=True)
-    t.start()
-    assert process_events(qapp, lambda: t._globe_loaded, timeout=20)
-    leak = f"http://127.0.0.1:{sites.port}/leak"
-    t.view.page().runJavaScript(f"fetch('{leak}').catch(()=>0); new Image().src='{leak}2'")
-    process_events(qapp, lambda: False, timeout=1.5)
-    assert not any(p.startswith("/leak") for p in sites.paths())
-    t.shutdown()

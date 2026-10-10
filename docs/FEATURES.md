@@ -10,7 +10,11 @@ The full list. The [README](../README.md) has the short version and how to get s
   used by itself. **Pads from videos** have a *Video* button that shows the video in
   step with the sound (only you see it). **Pick several pads** with Ctrl+click,
   Shift+click or Ctrl+A to change their colour, volume, fades or categories, export
-  them or remove them together (one Undo).
+  them or remove them together (one Undo). **From the keyboard:** arrows move
+  between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
+  removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
+  Right-click a pad for *Rename…*, *Duplicate* (a second pad with its own file, for
+  its own effects or hotkey) and *Show the file in its folder*.
 - **Record a sound with your mic, or from what's playing:** the **Record** button next
   to *Add sounds*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
@@ -83,7 +87,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   sounds, and the stream output if you set one). With another device the app never puts
   the cable back, never asks you to install it, and the header pill gets a tick once
   it's sending. With nowhere nothing nags. The choice is per PC and isn't in backups.
-- **Stream output for OBS** (Settings → Audio → *Stream output*): what others hear,
+- **Stream output for OBS** (Setup → Devices → *Also send to* → a device set to *Clean,
+  for streaming*; one at a time, with its volume and *Include my voice* under it): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
   as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
   Output Capture* (or, for a cable, *Audio Input Capture* of its Output end) and your
@@ -122,11 +127,11 @@ The full list. The [README](../README.md) has the short version and how to get s
   [Radio Browser](https://www.radio-browser.info) directory. Click a dot on the
   world map to tune in (hover one for its country, genres, quality and how popular
   it is; drag to move, scroll to zoom: zoomed in, the cities and towns with stations
-  are named), or search by name, genre, country or city. The
-  map's **HD** button swaps it for a 3D globe you can spin (heavier: it runs a web
-  engine); **2D** on the globe goes back. Star stations for
-  *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. It plays in your headphones, goes out through
+  are named), or search by name, genre, country or city. Star stations for
+  *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. One click plays a station; it plays in your headphones, goes out through
   your mic when you press **Send**, and can *Record* or save the *Last 15s* as a pad.
+  The bar's live controls change the pitch (up to ±36 semitones with *Redline*) and
+  add bass, treble, muffle, reverb, echo, distortion or a preset.
 - **Apps tab:** send one program's sound (a music player, a browser, a video, a
   call in another app) to whoever's listening, without touching any other program.
   Each program is a card with its level, a **Send** switch, its own volume, *Hear it
@@ -138,7 +143,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   (double-click plays, F2 renames, right-click adds it to your Sounds, sends, copies
   or deletes it with Undo). Cut, copy, paste, fades, louder / quieter, reverse and
   undo are in its *Edit* menu; Ctrl+C there and Ctrl+V on the Sounds tab makes a new
-  sound; the big-view button gives one program the whole tab. A closed editor
+  sound; the big-view button gives one program the whole tab. The tab's live
+  controls change the pitch and effects of every program you send. A closed editor
   doesn't listen or keep anything. A program you removed comes back, settings and
   all, from *Forgotten programs…*.
 - **Voice tab:** voice changer (21 ready voices, from Female / Male voice and Demon to
@@ -151,17 +157,20 @@ The full list. The [README](../README.md) has the short version and how to get s
   and the dice picks a random one; it shows how much delay the
   voice adds, starts off every time the app opens, and a big ON / OFF button shows
   which it is), **AI voices** (optional: *Get AI voices* downloads about 55 MB, needs
-  Python 3.12+; six characters turn your voice into someone else's, live on your own
-  CPU, about 75 ms behind you; *Remove AI voices* takes it all off again), text-to-speech with Windows' built-in
+  Python 3.12+; 12 characters turn your voice into someone else's, live on your own
+  CPU, about 75 ms behind you. *All voices* shows each as a card with **Hear it**,
+  sorted under Men, Women and In between & fun, with chips for low, middle or high
+  voices; **Make your own voice** blends two and sets how deep and high it is;
+  *Remove AI voices* takes it all off again), text-to-speech with Windows' built-in
   voices or your own (*More options → Custom voices*: a TTS server on your PC such as
   Kokoro or AllTalk — any OpenAI-style `/v1/audio/speech` address — a TTS program, or
   Piper voice packs dropped into the voices folder), and **live voice-to-speech**:
   press *Start talking as the voice* and each sentence you say is spoken by a
   computer voice instead of yours. Speech recognition runs on your PC (the first time, the Voice tab's *Install speech
   recognition* button downloads it, about 300 MB; needs Python 3.12+).
-  *Speak in* makes the voice say it in Chinese, Spanish, French, German or
-  Russian: talk in English and it's translated on your PC. Each language is an
-  add-on you download only if you pick it (65–195 MB), and it needs that
+  *Speak in* makes the voice say it in one of 33 languages (Chinese, Spanish,
+  French, German, Japanese, Portuguese…): talk in English and it's translated on
+  your PC. Each language is an add-on you download only if you pick it (65–196 MB), and it needs that
   language's Windows voice (Settings → Speech → Add voices, free).
 - **Triggers tab:** plays a sound when a picture shows up in your game: a
   game's "YOU DIED", a rare spawn, a queue popping. It's the
@@ -172,7 +181,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   a game are told apart) or a screen, cut the thing to watch for straight out of
   it (or paste a Win+Shift+S cut, or add a file), pick sounds from your board,
   and choose the wait, how soon it may play again and how close a match must be,
-  with the live match % next to it. A trigger plays once each time the picture
+  with the live match % next to it. *Test* plays a trigger's sound now (it shows in
+  *Playing now*, and its button says *Stop* while it plays). A trigger plays once each time the picture
   appears, or rings until you stop it. Its sounds play through the board like a
   pad; a ringing one loops in your headphones. Triggers from before the add-on
   (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
@@ -221,18 +231,34 @@ The full list. The [README](../README.md) has the short version and how to get s
   most once a day, with a *Show me* button that opens the right place. Never while a
   game is up (the overlay open or a fullscreen program in front), each one only once;
   *Show tips* in Settings → General turns them off.
+- **Discord check:** while it runs, Onion Board reads Discord's own voice settings
+  and shows a bar across the window when one would cut your sounds out (Noise
+  Suppression, the Studio profile on your mic, Echo Cancellation, automatic input
+  sensitivity, Advanced Voice Activity); *Fix Discord* opens the steps, each setting
+  with a ✓ or what to switch. With *Straight into my mic*, an app that opens your mic
+  in "raw" mode (and so skips your sounds) is named in a warning bar too.
+- **Your language:** Settings → Appearance → *Language* opens a searchable list of 32
+  languages, each in its own name (Arabic right to left). Windows set to one of them
+  gets a one-time offer to switch.
+- **Tabs:** a new install starts with Sounds, Voice and Setup; the rest wait under
+  **+ More tabs** and are added when clicked. Settings → Tabs switches any of Radio,
+  Apps, Triggers or Voice off so it doesn't load at all.
+- **Community:** *Join the Discord* (Settings, the tray menu, *What's new*) opens the
+  Onion Board Discord for help and news.
 - **Data & quality** (Settings): *Use less data*, download quality, the radio's
   bitrate limit, *Slow or patchy connection* (waits longer before giving up), *Also
   save the video* for links, and *Show pictures and like counts* in search results.
 - **Screen readers:** buttons that only show an icon are read out by name.
-- **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
+- **⚙ Settings** (with a search box above the categories: type a word and only the
+  cards with it stay)**:** 31 themes in four groups — Classic (Dark, Light, true-black
   Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
   your own highlight colour, how live tabs show (a tint or a dot, in the highlight colour), plus hotkeys, overlay, window and audio options. A category sidebar keeps every
   page visible: **Privacy & security** groups online permissions and Offline mode;
   **Connection** holds Direct, proxy and Tor; **Data & quality** holds download
   sizes, radio quality and search extras; **Updates** holds update scheduling
-  and maintenance; **General** holds the window (*Keep window on top*, *Play pads with
+  and maintenance; **Connection** also has *Keep an app log* (off stops
+  `onionboard.log` being written and deletes it); **General** holds the window (*Keep window on top*, *Play pads with
   one click*), tips, startup, backups and *Start over* (*Reset…* just the parts you
   pick, with a restore point first; *Restore points…* undoes it); **Tabs** switches
   off the Radio, Apps, Triggers or Voice tab so it doesn't load at all;
@@ -253,7 +279,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
   It only listens on this PC and needs the key shown there (*Copy an example link* gives a
   ready-made "play a random sound" link). Besides playing and stopping sounds it can
-  mute you (a panic button), switch the voice changer and mic, change the volume and
+  mute you (a panic button), switch the voice changer on or straight to a voice,
+  say a typed line in the computer voice, queue sounds or play a whole category in
+  a row, turn the mic and *Hear what they hear* on or off, change the volume and
   category, save the instant replay, change the live speed, pitch and effects,
   switch who's listening and run the radio; `/api/help` lists it all. New to it? The
   **Streamer guide** there walks through Stream Deck keys, channel points and chat
@@ -274,7 +302,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   **Tor** (*Get Tor* downloads the Tor Project's own, checked first), and never
   quietly goes direct if that fails. **Network activity** (Settings → Connection)
   lists every connection the app makes and why. By itself it only checks for updates
-  and sends an anonymous daily count (version + a random ID); each has its own switch.
+  and sends an anonymous daily count (version, tabs opened, and a random ID that shows how people use the app over time); each has its own switch.
+  Little touches that follow the time of day read your PC's clock and never send it.
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon for *Open Onion Board*, *Stop
   all sounds* or *Quit*). Optionally

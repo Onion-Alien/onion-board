@@ -101,6 +101,11 @@ def register(cls: type[Effect]) -> type[Effect]:
     return cls
 
 
+# built-in voices that were renamed: old saved name -> new name (an older version
+# reading the new name shows Custom with the same effects, so nothing is lost)
+RENAMED = {"Female voice": "High voice"}
+
+
 def _number(v) -> bool:
     return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
 
@@ -116,7 +121,7 @@ def clean_spec(raw) -> dict:
     if isinstance(raw.get("enabled"), bool):
         out["enabled"] = raw["enabled"]
     if isinstance(raw.get("preset"), str):
-        out["preset"] = raw["preset"]
+        out["preset"] = RENAMED.get(raw["preset"], raw["preset"])
     def effects(v):
         return {t: {k: x for k, x in cfg.items()
                     if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}
@@ -277,6 +282,11 @@ class VoiceChain:
     # ------------------------------------------------------------ audio thread
     def process(self, x: np.ndarray, rate: int) -> np.ndarray:
         """(n, 2) float32 mic block -> (n, 2) float32. Called by the mic callback."""
+        if not len(x):
+            # an empty block (a device can hand one over): many effects measure the
+            # block's level or last sample and would fail on it, which bypasses them
+            # for good (a changed voice would turn back into yours mid-call)
+            return np.zeros((0, 2), np.float32)
         if rate != self._rate:          # first block, or the mic changed rate
             self._rate = rate
             self._rebuild(rate)
@@ -327,5 +337,20 @@ class VoiceChain:
 from soundboard.voicefx import builtin  # noqa: E402,F401  (registers the built-ins)
 from soundboard.voicefx.builtin import PRESET_ICONS, PRESETS  # noqa: E402
 
+_shown: tuple[str, dict[str, str]] = ("", {})   # (language, shown_texts()) last built
+
+
+def shown(text: str) -> str:
+    """How an effect's name, description, setting or slider-end word, or a built-in
+    voice's name, reads in the app's language. `text` is the English the code and the
+    saved settings use (it stays the key); an add-on's own text comes back as it is."""
+    global _shown
+    from soundboard import i18n
+    lang = i18n.current()
+    if _shown[0] != lang or not _shown[1]:
+        _shown = (lang, builtin.shown_texts())
+    return _shown[1].get(text, text)
+
+
 __all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "VoiceChain",
-           "PRESETS", "PRESET_ICONS"]
+           "PRESETS", "PRESET_ICONS", "shown"]

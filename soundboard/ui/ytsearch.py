@@ -18,10 +18,10 @@ import random
 import threading
 
 from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
-from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPixmap,
+from PySide6.QtGui import (QColor, QIcon, QPainter, QPainterPath, QPixmap,
                            QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QProgressBar,
+from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QFrame, QHBoxLayout, QLabel,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import net, netlog, quality, theme, ytdl
@@ -32,16 +32,17 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import CardGrid, HoverCard
+from soundboard.ui.panel import CardGrid, HoverCard, RoundedFrame
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
+LINK_CARD_MAX_W = 820        # a pasted link's card: picture beside the words, this wide at most
 TIPS = {"youtube": _("Search YouTube"),
         "ytmusic": _("Search YouTube Music: songs, the official versions"),
         "soundcloud": _("Search SoundCloud"),
@@ -59,15 +60,24 @@ def fmt_count(n: int) -> str:
     return str(n)
 
 
+def _count(kind: str, n: int, shown: str) -> str:
+    """"1.2K views": `n` picks the word's form, `shown` is the number as written."""
+    if kind == "views":
+        return ngettext("{count} view", "{count} views", n, count=shown)
+    if kind == "likes":
+        return ngettext("{count} like", "{count} likes", n, count=shown)
+    return ngettext("{count} comment", "{count} comments", n, count=shown)
+
+
 def stats_text(r: ytdl.Result) -> tuple[str, str]:
     """(the card's line, its tooltip) for a hit's views, likes and comments, as its
     search entry gave them: nothing for what it didn't say. No video page is fetched
     for more (a look-up per hit is scraping, and the kind that gets you bot-checked)."""
     parts, tip = [], []
-    for n, word in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
+    for n, kind in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
         if n is not None:
-            parts.append(f"{fmt_count(n)} {word}")
-            tip.append(f"{n:,} {word}")
+            parts.append(_count(kind, n, fmt_count(n)))
+            tip.append(_count(kind, n, f"{n:,}"))
     return " · ".join(parts), ", ".join(tip)
 
 
@@ -394,62 +404,74 @@ class StatsLabel(ClampLabel):
 
 
 class ResultRow(HoverCard):
-    """One hit as a card: picture, title, channel and length, Play and Add."""
+    """One hit as a card: picture, title, channel and length, Play and Add. `wide`: a
+    pasted link's one card, picture beside the words (stacked when there's no room)."""
     play = Signal(object)
     add = Signal(object)
+    WIDE_MIN_W = 560      # narrower than this, a wide card stacks like the others
+    WIDE_THUMB_W = 340
+    WIDE_STACKED_THUMB_H = 190
 
-    def __init__(self, r: ytdl.Result):
+    def __init__(self, r: ytdl.Result, wide: bool = False):
         super().__init__()
         self.result = r
+        self.wide = wide
+        self._side: bool | None = None   # a wide card: picture beside the words (resizeEvent)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setProperty("own_space", True)   # Space plays / pauses this one (spacekey.py)
         self.setAccessibleName(r.title)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(8, 8, 8, 8)
-        v.setSpacing(6)
         self.thumb = Thumb()
-        v.addWidget(self.thumb)
         self.title = ClampLabel(r.title)
-        v.addWidget(self.title)
+        if wide:   # the style sheet sets the font: a setFont() would be undone
+            self.title.setStyleSheet("font-size:12.5pt; font-weight:700;")
         # channel names come from YouTube: painted as plain text
         self.sub = ClampLabel(" · ".join(x for x in (r.channel, fmt_time(r.seconds)
                                                        if r.seconds else "") if x),
                               lines=1, bold=False)
         self.sub.setObjectName("muted")
-        v.addWidget(self.sub)
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")
-        v.addWidget(self.stats)
-        self.stats.set_stats(r)
-        v.addStretch(1)
-        h = QHBoxLayout()
-        h.setSpacing(6)
         self.btn_play = QPushButton(_("Play"))
+        self.btn_play.setObjectName("cardplay")
         self.btn_play.setToolTip(_("Download its audio and play it once (it isn't kept)"))
-        icons.set_icon(self.btn_play, "play", size=14)
+        icons.set_icon(self.btn_play, "play", "live_text", size=14)
         self.btn_play.clicked.connect(lambda: self.play.emit(self.result))
         self.btn_add = QPushButton(_("Add"))
-        self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds"))
+        self.btn_add.setObjectName("cardadd")
+        self.btn_add.setToolTip(_("Download its audio and add it to your sounds"))
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
         for b in (self.btn_play, self.btn_add):
-            b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            h.addWidget(b)
-        v.addLayout(h)
-        # the download's progress; its space is kept while hidden so the cards don't jump
-        self.bar = QProgressBar()
-        self.bar.setObjectName("downloadprogress")
-        self.bar.setRange(0, 1000)
-        self.bar.setValue(0)
-        self.bar.setAccessibleName(_("Audio download progress"))
-        self.bar.setTextVisible(False)
-        self.bar.setFixedHeight(5)
-        pol = self.bar.sizePolicy()
-        pol.setRetainSizeWhenHidden(True)
-        self.bar.setSizePolicy(pol)
-        self.bar.hide()
-        v.addWidget(self.bar)
+            b.setCursor(Qt.PointingHandCursor)
+            if wide:   # as wide as their words (and the download's), not the whole card
+                b.setMinimumWidth(140)
+                b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+            else:
+                b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.fill = -1.0        # the download's 0..1 (or -1: none), shown in its button
+        self._tip = ""          # its words: the buttons' tooltip while it downloads
+
+        self.text_box = QVBoxLayout()
+        self.text_box.setSpacing(6)
+        for w in (self.title, self.sub, self.stats):
+            self.text_box.addWidget(w)
+        self.text_box.addStretch(1)
+        buttons = QHBoxLayout()
+        buttons.setSpacing(8)
+        buttons.addWidget(self.btn_play)
+        buttons.addWidget(self.btn_add)
+        if wide:
+            buttons.addStretch(1)
+        self.text_box.addLayout(buttons)
+        box = QBoxLayout(QBoxLayout.TopToBottom, self)
+        box.setContentsMargins(10, 10, 10, 10) if wide else box.setContentsMargins(8, 8, 8, 8)
+        box.setSpacing(14 if wide else 8)
+        box.addWidget(self.thumb)
+        box.addLayout(self.text_box, 1)
+        # set_stats shows the label when metadata exists. Adopt it first so each
+        # search result cannot flash a tiny standalone window on the desktop.
+        self.stats.set_stats(r)
+        self._style()
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
         self._locked = False
@@ -457,6 +479,60 @@ class ResultRow(HoverCard):
         self.setProperty("playing", False)
         self.setCursor(Qt.PointingHandCursor)
         self.setToolTip(_("Double-click to play"))
+
+    def _style(self):
+        """The card's two buttons: Play a soft accent tint, Add the filled accent; the
+        one downloading fills with the accent as it goes; Added goes quiet."""
+        T = theme.T
+        base = "border-radius:9px; padding:8px 12px; font-weight:600;"
+        tint, edge = theme.mix(T["card"], T["accent"], 0.2), theme.mix(T["card"], T["accent"], 0.5)
+        tint_hi = theme.mix(T["card"], T["accent"], 0.32)
+        styles = {
+            "play": (f"QPushButton {{ {base} background:{tint}; border:1px solid {edge};"
+                     f" color:{T['live_text']}; }}"
+                     f"QPushButton:hover {{ background:{tint_hi}; }}"),
+            "add": (f"QPushButton {{ {base} background:{T['accent']};"
+                    f" border:1px solid {T['accent']};"
+                    f" color:{T['on_accent']}; }}"
+                    f"QPushButton:hover {{ background:{T['accent_hover']}; }}"),
+        }
+        # waiting for another card's download: greyed, like any busy button
+        waiting = (f"QPushButton[busy=\"true\"] {{ background:{T['btn']}; border:1px solid"
+                   f" {T['border']}; color:{T['muted']}; }}")
+        styles = {k: v + waiting for k, v in styles.items()}
+        added = (f"QPushButton {{ {base} background:transparent; border:1px solid "
+                 f"{T['live_border']}; color:{T['live_text']}; }}")
+        for kind, b in (("play", self.btn_play), ("add", self.btn_add)):
+            css = added if kind == "add" and self._added_shown() else styles[kind]
+            if kind in getattr(self, "_release", {}) and self.fill >= 0:
+                # the download fills it from the left: accent over the card colour
+                f = min(max(self.fill, 0.0), 1.0)
+                on, off = T["accent"], theme.mix(T["card"], T["accent"], 0.12)
+                grad = (f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {on}, stop:{f:.3f} {on},"
+                        f" stop:{min(f + 0.001, 1):.3f} {off}, stop:1 {off})")
+                css = (f"QPushButton {{ {base} background:{grad}; border:1px solid {edge};"
+                       f" color:{T['text_hi']}; }}")
+            if b.styleSheet() != css:
+                b.setStyleSheet(css)
+
+    def _added_shown(self) -> bool:
+        return getattr(self, "_added", False)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        if self.wide:   # beside each other when there's room, stacked when not
+            side = self.width() >= self.WIDE_MIN_W
+            if side != self._side:
+                self._side = side
+                self.layout().setDirection(QBoxLayout.LeftToRight if side
+                                           else QBoxLayout.TopToBottom)
+                if side:
+                    self.thumb.setFixedWidth(self.WIDE_THUMB_W)
+                    self.thumb.setMaximumHeight(16777215)
+                else:   # a narrow window: the buttons stay in sight (the picture is cropped)
+                    self.thumb.setMinimumWidth(0)
+                    self.thumb.setMaximumWidth(16777215)
+                    self.thumb.setMaximumHeight(self.WIDE_STACKED_THUMB_H)
 
     def hasHeightForWidth(self) -> bool:
         return True
@@ -493,61 +569,75 @@ class ResultRow(HoverCard):
         if "play" not in self._release:   # not while its button shows the download
             self.btn_play.setText({"playing": _("Pause"), "paused": _("Resume")}.get(
                 now, _("Play")))
-            icons.set_icon(self.btn_play, "pause" if now == "playing" else "play", size=14)
+            icons.set_icon(self.btn_play, "pause" if now == "playing" else "play",
+                           "live_text", size=14)
         self.btn_play.setToolTip(_("Pause it") if now == "playing" else
                                  _("Carry on playing it") if now == "paused" else
                                  _("Download its audio and play it once (it isn't kept)"))
 
     def set_busy(self, kind: str):
-        """Its audio is being fetched: that button greys out until set_done, and the
-        bar under the buttons fills as it downloads."""
+        """Its audio is being fetched: that button shows how far, filling up as it
+        downloads, and takes no clicks until set_done."""
         if kind in self._release or (kind == "add" and self._added):
             return
         btn = self._btn(kind)
         if self._locked:
             busy.set_busy(btn, False)
         if not self._release:
-            self.bar.setValue(0)
-            self.bar.setToolTip(_("Preparing audio download · 0%"))
-        text = (_("Processing…") if self.bar.toolTip() == _("Processing audio…") else
-                (_("Adding… {pct:.0f}%", pct=self.bar.value() / 10) if kind == "add" else
-                 _("Loading… {pct:.0f}%", pct=self.bar.value() / 10))
-                if self.bar.value() else _("Preparing… 0%"))
+            self.fill = 0.0
+            self._tip = _("Preparing audio download · 0%")
+        text = (_("Processing…") if self._tip == _("Processing audio…") else
+                (_("Adding… {pct:.0f}%", pct=self.fill * 100) if kind == "add" else
+                 _("Loading… {pct:.0f}%", pct=self.fill * 100))
+                if self.fill > 0 else _("Preparing… 0%"))
         self._release[kind] = busy.hold(btn, text)
-        self.bar.show()
+        btn.setToolTip(self._tip)
+        self._style()
 
     def set_progress(self, frac: float):
         """0..1 of its audio downloaded, or below 0 while it's being converted."""
         if not self._release:
             return
         if frac < 0:
-            self.bar.setToolTip(_("Processing audio…"))
+            self._tip = _("Processing audio…")
+            self.fill = 1.0
         else:
-            self.bar.setValue(max(self.bar.value(), min(1000, int(frac * 1000))))
-            self.bar.setToolTip(_("Downloading audio · {value:.0f}%", value=self.bar.value() / 10))
+            self.fill = max(self.fill, min(1.0, frac))
+            self._tip = _("Downloading audio · {value:.0f}%", value=self.fill * 100)
         for kind in self._release:
             word = _("Adding…") if kind == "add" else _("Loading…")
-            self._btn(kind).setText(_("Processing…") if frac < 0 else
-                                    f"{word} {self.bar.value() / 10:.0f}%")
+            btn = self._btn(kind)
+            btn.setText(_("Processing…") if frac < 0 else f"{word} {self.fill * 100:.0f}%")
+            btn.setToolTip(self._tip)
+        self._style()
 
     def set_done(self, kind: str, ok: bool):
         release = self._release.pop(kind, None)
         if not self._release:
-            self.bar.hide()
+            self.fill = -1.0
         if release is None:
+            self._style()
             return
         if kind == "add" and ok:
             release()
             self._added = True
-            self.btn_add.setText(_("✓ Added"))   # added once is enough
+            self.btn_add.setIcon(QIcon())          # not "+ ✓ Added"
+            self.btn_add.setText(_("✓ Added"))     # added once is enough
+            self.btn_add.setToolTip(_("It's in your sounds now"))
             busy.set_busy(self.btn_add, True)
         else:
-            release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
+            release(None if ok else (_("Didn't add") if kind == "add" else _("Didn't play")))
             if self._locked:
                 busy.set_busy(self._btn(kind), True)
             if kind == "play" and self.now:   # it started before the button let go
                 now, self.now = self.now, ""
                 self.set_now(now)
+        if kind == "add" and not ok:
+            self.btn_add.setToolTip(_("Download its audio and add it to your sounds"))
+        elif kind == "play":
+            now, self.now = self.now, None   # its tooltip again, for what it's doing now
+            self.set_now(now)
+        self._style()
 
     def set_locked(self, on: bool):
         """Another card's download is running: this one's buttons wait for it (one at a
@@ -566,7 +656,7 @@ class ResultRow(HoverCard):
         self.thumb.set_pixmap(pm)
 
 
-class SearchResults(QFrame):
+class SearchResults(RoundedFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
     when its "My sounds" back button is (the owner shows its pads again). The site
     buttons in the header pick where the search goes and re-run it there."""
@@ -578,6 +668,7 @@ class SearchResults(QFrame):
     def __init__(self):
         super().__init__()
         self.query = ""
+        self.link = ""          # a pasted link shown as its own card (show_link), not a search
         self.source = "youtube"
         self._gen = 0
         self._rows: list[ResultRow] = []
@@ -587,13 +678,12 @@ class SearchResults(QFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 0, 0)
+        v.setContentsMargins(12, 12, 12, 12)
         v.setSpacing(6)
         head = QHBoxLayout()
         back = self.btn_back = QPushButton(_("Back to my sounds"))
         back.setObjectName("backhome")   # stands out: the way out of the results
         back.setCursor(Qt.PointingHandCursor)
-        back.setToolTip(_("Close the search results and go back to your sounds"))
         icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
@@ -623,7 +713,7 @@ class SearchResults(QFrame):
         self.direct_btn = QPushButton(_("Search this without Tor"))
         self.direct_btn.setToolTip(_("Run just this search straight from the site, not through "
                                      "Tor: the site will see your own address"))
-        self.direct_btn.clicked.connect(lambda: self.search(self.query, direct=True))
+        self.direct_btn.clicked.connect(self._without_tor)
         self.direct_btn.hide()
         row = QHBoxLayout()
         row.addWidget(self.direct_btn)
@@ -635,6 +725,9 @@ class SearchResults(QFrame):
         self.list = FitWidth()   # the cards re-flow to the width they get
         lv = QVBoxLayout(self.list)
         lv.setContentsMargins(0, 0, 6, 0)
+        self.link_row = QHBoxLayout()   # a pasted link's one wide card
+        self.link_row.addStretch(1)
+        lv.addLayout(self.link_row)
         self.rows = CardGrid(min_w=CARD_MIN_W, gap=10)
         lv.addLayout(self.rows)
         lv.addStretch(1)
@@ -690,12 +783,16 @@ class SearchResults(QFrame):
         if not query or not ytdl.site_allowed(self.source):
             return False
         self.query = query
+        self.link = ""
+        self._show_sites(True)
         self._gen += 1
         self._clear()
-        where = "TikTok sounds" if self.source == "tiktok" else self.site
+        where = _("TikTok sounds") if self.source == "tiktok" else self.site
         netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
                      + (" (without Tor)" if direct else ""))
-        text = _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query))
+        text = (_("Searching TikTok sounds for <b>{query}</b>…", query=html.escape(query))
+                if self.source == "tiktok" else
+                _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query)))
         self.title.setText(text)
         self._loading(True, text)
         self.show()
@@ -704,10 +801,45 @@ class SearchResults(QFrame):
                          daemon=True, name="web-search").start()
         return True
 
+    def show_link(self, url: str, direct: bool = False) -> bool:
+        """A pasted link: look it up (nothing downloaded) and show it as one card, to
+        play or add like a search hit. False when its site is switched off."""
+        if not ytdl.site_allowed(url):
+            return False
+        if url == self.link and not direct and not self.isHidden() and (
+                self._rows or self.loading.running()):
+            return True   # already showing (Enter after the paste looked it up)
+        self.query = self.link = url
+        self._show_sites(False)   # the site buttons pick where a search goes: not a link
+        self._gen += 1
+        self._clear()
+        netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name, picture and "
+                                   "length" + (" (without Tor)" if direct else ""))
+        host = html.escape(url.split("/")[2].removeprefix("www.") if "//" in url else url)
+        text = _("Looking up <b>{host}</b>…", host=host)
+        self.title.setText(text)
+        self._loading(True, text)
+        self.show()
+        self.direct_btn.hide()
+        threading.Thread(target=self._work_link, args=(self._gen, url, direct),
+                         daemon=True, name="link-lookup").start()
+        return True
+
+    def _show_sites(self, on: bool):
+        for b in self.site_btns.values():
+            b.setVisible(on)
+
+    def _without_tor(self):
+        if self.link:
+            self.show_link(self.link, direct=True)
+        else:
+            self.search(self.query, direct=True)
+
     def close_results(self):
         self._gen += 1       # a search still running is ignored when it lands
         self._loading(False)
         self._clear()
+        self.link = ""
         self.hide()
         self.closed.emit()
 
@@ -755,7 +887,12 @@ class SearchResults(QFrame):
             r.set_locked(bool(self._fetching) and r.result.url not in self._fetching)
 
     def _clear(self):
+        """Off the screen now, not when Qt gets round to deleting them: a pasted link's
+        one card showed after the last search's cards until then."""
         for r in self._rows:
+            r.hide()
+            self.rows.removeWidget(r)
+            self.link_row.removeWidget(r)
             r.deleteLater()
         self._rows = []
 
@@ -771,6 +908,16 @@ class SearchResults(QFrame):
             # rich text: the plain words, and a "Report it" link when it's one for us
             self._done.emit(gen, [], errors.html(e, where=f"Searching {source}"))
 
+    def _work_link(self, gen: int, url: str, direct: bool):
+        try:
+            self._done.emit(gen, [ytdl.lookup(url, **({"direct": True} if direct else {}))], "")
+        except ytdl.TorBlocked as e:
+            log.info("link look-up turned away over Tor")
+            self._done.emit(gen, "blocked", html.escape(str(e)))
+        except Exception as e:  # noqa: BLE001 - shown in the panel
+            log.info("link look-up failed for %s: %s", url, e)
+            self._done.emit(gen, [], errors.html(e, where="Looking up a link"))
+
     def _on_done(self, gen: int, results, err: str):
         if gen != self._gen:
             return
@@ -778,8 +925,12 @@ class SearchResults(QFrame):
         q = html.escape(self.query)
         if err:
             red = theme.status("error")
-            self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}</span>",
-                                 red=red, site=self.site, err=err))   # rich text from _work
+            if self.link:
+                why = _("Can't use this link: {error}", error=err)   # err: rich text
+                self.title.setText(f"<span style='color:{red}'>{why}</span>")
+            else:
+                self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}"
+                                     "</span>", red=red, site=self.site, err=err))  # from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
@@ -787,10 +938,14 @@ class SearchResults(QFrame):
             return
         self.title.hide()   # the cards say it all; the title is for "no results" / errors
         for r in results:
-            row = ResultRow(r)
+            row = ResultRow(r, wide=bool(self.link))
             row.play.connect(self.play)
             row.add.connect(self.add)
-            self.rows.addWidget(row)
+            if self.link:   # one video: one big card, not a grid of one
+                row.setMaximumWidth(LINK_CARD_MAX_W)
+                self.link_row.insertWidget(0, row, 10)   # all of it, up to the cap
+            else:
+                self.rows.addWidget(row)
             self._rows.append(row)
             if not quality.current.web_extras or not r.thumb:   # Settings > Data & quality
                 continue

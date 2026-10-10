@@ -9,7 +9,7 @@ root in PowerShell unless noted.
 ```powershell
 py -3.13 -m venv .venv                 # Python 3.12+ works
 .venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt
-git config core.hooksPath .githooks    # secrets check on every commit
+git config core.hooksPath .githooks    # secrets check, commit times in UTC (required)
 ```
 
 Build tools, only needed for step 4 (and for the mic effect's own tests):
@@ -71,9 +71,8 @@ platform and a separate single-instance name, and never touches the real
 `%APPDATA%\OnionBoard`. No window appears and no global hotkey is registered.
 `sounddevice.OutputStream` is swapped for a silent stand-in that runs the
 callback at the device's pace but plays nothing, so no test is ever heard on
-the speakers or headphones, and the web engine (the Radio tab's globe) runs with
-`--mute-audio` (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
-opt out of both).
+the speakers or headphones (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
+opt out).
 They're safe to run while someone is using the PC. The mic effect's tests
 (`tests\test_directmic.py`) run the real DLL in `testhost.exe`, never on a real mic or
 the registry; the ones that need the DLL are skipped until
@@ -96,7 +95,33 @@ Keeping it fast: Windows takes ~2 s to refuse a connection to a closed port, eve
 on 127.0.0.1, and `localhost` tries `::1` first. A test that needs "nothing is
 listening" takes its port from `conftest.closed_port()` (refused at once), and a
 test server on 127.0.0.1 only marks its port with `conftest.ipv4_only()`.
-`--durations=20` shows what's slow.
+`--durations=20` shows what's slow (CI lists them on every run).
+
+Hangs and flakes: a test still running after 2 minutes is hung; every thread's stack
+is printed and its worker stopped (`faulthandler_timeout` in `pyproject.toml`), and
+the run goes on. Wall-clock audio timing tests carry `conftest.real_pc_timing`: CI's
+shared runners stall a thread as long as the hitch they measure, so they run on a
+real PC only. Something a test makes that a thread of its own (or Qt's) calls back
+into is stopped after the test (`_STOP_AFTER_TEST` in `conftest.py`), as the app
+stops it when its tab goes. A test that needs `time.sleep`, `threading.Thread` and
+the like faked gives only the module under test a fake one (`conftest.own_module`,
+`own_time`): patched on the real module, every leftover thread in the worker spins
+or never starts. A wait on another thread polls until done (with a generous limit)
+instead of sleeping a fixed time. `PYTEST_XDIST_AUTO_NUM_WORKERS=N` sets the workers
+for the whole suite (8 on CI's 4 cores measured no faster than 4: runners differ by
+up to 2x from run to run, so compare runs started at the same time).
+
+### How heavy is it (the performance suite)
+
+`.venv\Scripts\python -m perf --tier quick` (~1.5 min) runs the real app in a child
+process on a throwaway profile, offscreen with fake audio devices, steps it through
+idle, tray, imports, plays, previews, tabs, dialogs, the voice changer and a leak
+loop, and writes `report.md`: CPU, RAM, threads, handles, disk writes and audio
+callback lateness per step. `--tier full` is longer, `--watch-src <onion-watch
+checkout>` adds the Triggers add-on and standalone Onion Watch, `--compare
+old\report.json` shows before → after, and over `perf\budgets.json` it exits 1. It
+isn't part of pytest. Tiers, scenarios and how to read it:
+[perf/README.md](../perf/README.md).
 
 ### What voice chat does to the sounds (the bench)
 
@@ -121,6 +146,8 @@ with no flags it only reports), `steam_voice_roundtrip.py` (Steam's own voice
 codec, one PC, one account), `discord_roundtrip.py` and `game_roundtrip.py` (a
 friend records the game on their end). The stacks, their sources and what the
 bench found: [GAME-VOICE.md](GAME-VOICE.md).
+
+**After any change to the sending path** (the mic effect, `directmic.py`, routes, send volume or the *Who's listening* modes), run the maintainer's silent voice check (`voicecheck.py`, kept outside the repo because it needs Vivox and Epic developer keys; ~3 min) and paste its table into the PR: it shows what Discord, Vivox and Epic voice do to 3 songs, and whether apps opening the mic each way still get our sounds.
 
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices. Agents: ask the user before running
@@ -158,9 +185,9 @@ if g++ is missing), PyInstaller (bundles `installer\install-vbcable.ps1` and
 `assets\onionboard.ico` as data, both at the root of `_internal\`, and `obmic.dll` in
 `_internal\directmic\`),
 `scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
-charts, Chromium's dev tools, translations — by walking the DLL import tables; the
+charts, the web engine, unused image formats, translations — by walking the DLL import tables; the
 build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (the
-trimmed app loads Qt, WebEngine, Multimedia and the audio stack headless, no window
+trimmed app loads Qt, Multimedia and the audio stack headless, no window
 or device), licence files,
 the add-ons in `modules\` copied into `dist\OnionBoard\modules\` (all but
 `ai-voices`, which has its own release), `scripts\make_bunny.py` (renders the installer artwork
@@ -242,7 +269,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 ## 7. Commit and release
 
 1. Section 3 passes. The pre-commit hook re-runs the secrets scan.
-2. Commit, push, and open a pull request (main takes changes by PR only). CI
+2. Commit, push, and open a pull request (main takes changes by PR only). Merge it
+   with `sh scripts/merge_pr.sh N`, never `gh pr merge` or GitHub's Merge / Update
+   branch buttons: those write the commit in your local time zone, and every commit
+   here must be in UTC (CLAUDE.md, *Commit times*). CI
    (`.github/workflows/checks.yml`) runs on the PR and on main after a merge: the
    secrets scan over the full history, gitleaks, ruff and pytest. A newer push to
    the PR cancels its unfinished run.

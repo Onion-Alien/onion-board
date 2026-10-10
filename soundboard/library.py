@@ -28,28 +28,30 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__, mapped
+from soundboard import __version__, mapped, winpath
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
-APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
+# usable_dir: spelled out through any folder link Windows won't follow (soundboard.winpath)
+APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard")
 # from when this app was called Soundboard; see migrate_from_soundboard() below
-OLD_APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
-SOUNDS_DIR = APP_DIR / "sounds"
-CACHE_DIR = APP_DIR / "cache"
+OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Soundboard")
+SOUNDS_DIR = winpath.usable_dir(APP_DIR / "sounds")
+CACHE_DIR = winpath.usable_dir(APP_DIR / "cache")
 CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 # cache files a delete was refused for (still mapped, see _unlink): not new imports, so
 # prune_cache retries them at once instead of after CACHE_GRACE_S
 _refused: set[Path] = set()
-THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
+THUMBS_DIR = winpath.usable_dir(APP_DIR / "thumbs")   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
 # from before them drops them when it saves, and the next newer start takes them back
 PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep",
-                "tor_bridges")
+                "tor_bridges", "app_log")
 # ...and which What's new was seen, which those versions drop too (it showed again after
 # going back a version and returning). Versions that read privacy.json take only
 # PRIVACY_KEYS from it, so the extra key is safe for them.
@@ -117,6 +119,8 @@ def _stored_path(path: str, folder: Path, absolute: bool) -> str:
     p = Path(path)
     if (p.is_absolute() or not absolute) and p.parent == folder:
         return p.name
+    if absolute and p.is_absolute() and p.is_relative_to(folder):   # a sound in one of
+        return p.relative_to(folder).as_posix()   # its folders: "YouTube/Song.flac"
     return path
 
 
@@ -154,7 +158,10 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
-NEWER_CHOICES = ("route", "net_mode", "tor_bridges")
+NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view")
+# the Sounds tab's orders: as dragged, A-Z, the newest first, the most played first
+PAD_SORTS = ("custom", "name", "newest", "plays")
+PAD_VIEWS = ("grid", "list")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
@@ -191,6 +198,13 @@ def clean_setting(k: str, v):
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
         return v if v in ROUTES else "cable"
+    if k == "pad_sort":
+        return v if v in PAD_SORTS else "custom"
+    if k == "pad_view":
+        return v if v in PAD_VIEWS else "grid"
+    if k == "category_colors":   # {category: "#rrggbb"}; anything else is dropped
+        return {c: col for c, col in v.items() if isinstance(c, str) and isinstance(col, str)
+                and re.fullmatch(r"#[0-9a-fA-F]{6}", col)}
     if k == "tor_bridges":   # an unknown kind: still hide Tor, with the default bridge
         return v if v in TOR_BRIDGES else "snowflake"
     if k == "eq_gains":   # one finite gain per band, within the EQ's sliders
@@ -292,6 +306,8 @@ class SoundMeta:
     only_them: bool = False   # goes out to others but not into your own headphones
     delay: float = 0.0        # seconds between the press and the sound starting
     cooldown: float = 0.0     # seconds after it starts during which presses are ignored
+    plays: int = 0            # times it was played (the Sounds tab's Most played order)
+    added: float = 0.0        # time.time() it joined the board; 0 = before this was kept
 
 
 @dataclass
@@ -329,6 +345,8 @@ class Config:
     overlay_key_checked: bool = False   # "`" looked at against the keyboard layout once
     cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves
     theme: str = "Dark"
+    # the app's language, a catalog code (assets/lang); "" = never picked (i18n.startup)
+    language: str = ""
     live_color: str = ""   # own colour for the "it's on" highlights ("" = the theme's)
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all
@@ -345,7 +363,10 @@ class Config:
     # never picked by anyone) doesn't keep it off; older versions just ignore it
     live_tab_green: bool = True
     pad_width: int = 150
+    pad_sort: str = "custom"   # the Sounds tab's order: PAD_SORTS
+    pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
     app_card_width: int = 300
+    sidebar_open: bool = False   # the tab rail opened out to show the tabs' names
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)
@@ -360,6 +381,9 @@ class Config:
     tips_seen: list = field(default_factory=list)
     tip_day: str = ""
     voice_discord_tip_shown: bool = False   # "Got it" on the voice changer's Studio notice
+    # set up for the app you're using (soundboard.appsetup): ask, apps {exe: simple mode},
+    # never [exe]. Older versions keep it untouched
+    app_setup: dict = field(default_factory=dict)
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
@@ -376,6 +400,7 @@ class Config:
     screen: dict = field(default_factory=dict)
     categories: list[str] = field(default_factory=list)   # pad categories, in tab order
     category: str = ""                # the category the Sounds tab shows; "" = all
+    category_colors: dict = field(default_factory=dict)   # category -> "#rrggbb" on its tab
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
     # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.updates).
@@ -387,6 +412,9 @@ class Config:
     # the newest version whose What's new (ui/whatsnew.py) was shown; a first start has
     # nothing to catch up on, a config without it is from an older version
     whats_new_seen: str = __version__
+    # the version that last moved an older mic part on by itself (ui: _auto_mic_update),
+    # so a "No" at Windows' prompt isn't asked again until the next version
+    mic_update_tried: str = ""
     random_hotkey: str = ""           # plays a random sound from the category showing
     last_hotkey: str = ""             # plays the last sound played again
     next_cat_hotkey: str = ""         # shows the next category (random key + overlay follow)
@@ -428,6 +456,8 @@ class Config:
     net_offline: bool = False
     # Network activity's "Keep a history" (soundboard.netlog.keep): off = memory only
     netlog_keep: bool = False
+    # "Keep an app log" (soundboard.applog.keep): off = onionboard.log isn't written
+    app_log: bool = True
     # "Hide that I'm using Tor": "" (off), "snowflake" or "obfs4" bridges
     tor_bridges: str = ""
     # the anonymous usage count (soundboard.usage; its switch is "usage_stats" in
@@ -442,6 +472,14 @@ class Config:
     # already counted (its file time)
     stats_tabs: list[str] = field(default_factory=list)
     stats_problems_seen: float = 0.0
+    # when this install started (usage.settle), its first steps already counted, the
+    # features used since the last daily count, and the plays counted by then
+    stats_started: float = 0.0
+    stats_steps: list[str] = field(default_factory=list)
+    stats_used: list[str] = field(default_factory=list)
+    stats_plays: int = 0
+    # seconds the app was open since the last daily count (usage.open_tick)
+    stats_open_s: float = 0.0
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
@@ -495,21 +533,20 @@ class Config:
                 except (TypeError, ValueError, KeyError, AttributeError):
                     continue
                 cfg.read_only = True
-                cfg.load_note = (f"Your settings file was locked by another program, so the "
-                                 f"last copy ({name}) was loaded instead. Changes won't be "
-                                 "saved until you restart Onion Board.")
+                cfg.load_note = _("Your settings file was locked by another program, so "
+                                  "the last copy ({name}) was loaded instead. Changes won't "
+                                  "be saved until you restart Onion Board.", name=name)
                 return cfg
             cfg = cls()
             cfg.read_only = True
-            cfg.load_note = ("Your settings file was locked by another program, so Onion "
-                             "Board started with default settings. Changes won't be saved "
-                             "until you restart it.")
+            cfg.load_note = _("Your settings file was locked by another program, so "
+                              "Onion Board started with default settings. Changes won't be "
+                              "saved until you restart it.")
             return cfg
         log.error("config %s is unreadable: %r", CONFIG_PATH, err)
         broken = "" if missing else cls._set_aside()
-        kept = ("" if missing else
-                f" The damaged file was kept as {broken or 'config.json'}.")
-        what = "missing" if missing else "damaged"
+        kept = ("" if missing else " " + _("The damaged file was kept as {file}.",
+                                           file=broken or "config.json"))
         for name, raw in cls._backups():
             try:
                 cfg = cls.from_raw(raw)
@@ -517,13 +554,18 @@ class Config:
                 log.warning("backup %s doesn't load either", name, exc_info=True)
                 continue
             log.warning("recovered settings from backup %s", name)
-            cfg.load_note = (f"Your settings file was {what}, so the last good copy "
-                             f"({name}) was loaded instead.{kept}")
+            cfg.load_note = (_("Your settings file was missing, so the last good copy "
+                               "({name}) was loaded instead.", name=name) if missing else
+                             _("Your settings file was damaged, so the last good copy "
+                               "({name}) was loaded instead.", name=name)) + kept
             return cfg
         cfg = cls()
-        cfg.load_note = (f"Your settings file was {what} and no backup could be read, so "
-                         "Onion Board started with default settings. Your sound files are "
-                         f"still in {SOUNDS_DIR}.{kept}")
+        cfg.load_note = (_("Your settings file was missing and no backup could be read, "
+                           "so Onion Board started with default settings. Your sound files "
+                           "are still in {folder}.", folder=SOUNDS_DIR) if missing else
+                         _("Your settings file was damaged and no backup could be read, "
+                           "so Onion Board started with default settings. Your sound files "
+                           "are still in {folder}.", folder=SOUNDS_DIR)) + kept
         return cfg
 
     @classmethod
@@ -644,7 +686,8 @@ class Config:
                     s[k] = clean_wait(s[k], k)
             if s.get("mode") not in MODES:
                 s["mode"] = "restart"
-            for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0)):
+            for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0),
+                              ("plays", 0, 10**9), ("added", 0.0, 1e11)):
                 if k in s:   # the Edit dialog's slider can't take any number
                     s[k] = min(max(s[k], lo), hi)
             m = SoundMeta(**s)
@@ -720,7 +763,9 @@ class Config:
         so another thread can write it. The number orders snapshots: an older one is
         never written over a newer one."""
         global _snap_seq
-        with _write_lock:
+        # not _write_lock: the writer holds that while it's on the disk, and a slow
+        # disk would freeze the window that's only copying the settings
+        with _seq_lock:
             _snap_seq += 1
             seq = _snap_seq
         return (seq, self.to_raw(),
@@ -728,6 +773,7 @@ class Config:
 
 
 _write_lock = threading.Lock()   # one writer at a time: Saver's thread or a direct save()
+_seq_lock = threading.Lock()     # numbering snapshots (never held across disk I/O)
 _snap_seq = 0       # the last snapshot's number (Config.snapshot)
 _written_seq = 0    # ...and the newest one written
 
@@ -855,6 +901,20 @@ MAX_COOLDOWN_S = 60.0   # a sound's "ignore presses for"
 MODES = ("restart", "overlap", "toggle", "solo", "queue")   # SoundMeta.mode
 
 
+def sorted_sounds(sounds: list[SoundMeta], how: str) -> list[SoundMeta]:
+    """The sounds in the Sounds tab's order `how` (PAD_SORTS). Ties keep the board's
+    own order; sounds from before `added` was kept count as older than any since, and
+    among themselves the later in the board the newer (new sounds are added at the end)."""
+    if how == "name":
+        return sorted(sounds, key=lambda m: m.name.casefold())
+    if how == "plays":
+        return sorted(sounds, key=lambda m: -m.plays)
+    if how == "newest":
+        order = {id(m): i for i, m in enumerate(sounds)}
+        return sorted(sounds, key=lambda m: (-m.added, -order[id(m)]))
+    return list(sounds)
+
+
 def clean_fade(v) -> float:
     """A fade length in seconds, 0..MAX_FADE_S (anything unreadable is no fade)."""
     try:
@@ -971,6 +1031,18 @@ def _ffmpeg() -> str | None:
     return None
 
 
+def _ffmpeg_words(stderr: str) -> str:
+    """ffmpeg's error as words for people ("[out#0/f32le @ 0000…] Output file does not
+    contain any stream" was shown as is); the original goes to the log."""
+    s = stderr.lower()
+    if (not s or "does not contain any stream" in s or "matches no streams" in s
+            or "output file is empty" in s):
+        return _("this file has no audio in it")
+    if "invalid data found" in s or "could not find codec" in s or "unknown format" in s:
+        return _("It isn't a sound file that can be read, or it's damaged.")
+    return stderr
+
+
 def _decode(path: str) -> tuple[np.ndarray, bool]:
     """(audio as (n, 2) float32 at SR, decoded-by-ffmpeg?).
 
@@ -986,17 +1058,20 @@ def _decode(path: str) -> tuple[np.ndarray, bool]:
         log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
         ff = _ffmpeg()
         if not ff:
-            raise RuntimeError("Can't decode this format (install ffmpeg for m4a/aac/video)") from e
+            raise RuntimeError(_("Can't decode this format (install ffmpeg for "
+                                 "m4a/aac/video)")) from e
         try:
             p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),
                                 "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],
                                capture_output=True, timeout=FFMPEG_TIMEOUT,
                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except subprocess.TimeoutExpired:
-            raise RuntimeError(f"ffmpeg took longer than {FFMPEG_TIMEOUT}s") from None
+            raise RuntimeError(_("ffmpeg took longer than {seconds}s",
+                                 seconds=FFMPEG_TIMEOUT)) from None
         if p.returncode != 0 or not p.stdout:
-            msg = p.stderr.decode(errors="ignore").strip() or "ffmpeg failed"
-            raise RuntimeError(msg) from None
+            msg = p.stderr.decode(errors="ignore").strip()
+            log.info("ffmpeg couldn't decode %s: %s", path, msg)
+            raise RuntimeError(_ffmpeg_words(msg)) from None
         data = np.frombuffer(p.stdout, np.float32).reshape(-1, 2).copy()
         sr = SR
         via_ffmpeg = True
@@ -1303,53 +1378,167 @@ def _safe_name(name: str) -> str:
     return "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
 
 
-def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
-    """Decode, bring into the library folder, and return metadata + int16 audio.
+# Where a new sound's file goes, inside SOUNDS_DIR. Plain folders and the sound's own
+# name, so the folder reads like a music library in Explorer (and still does if Onion
+# Board is uninstalled and the sounds are kept). Files from before this were all in
+# SOUNDS_DIR itself as "<id>_<name>": tidy_files() moves them in. English on purpose:
+# a folder on disk mustn't change with the language picked (or the pseudo one).
+RECORDINGS = "Recordings"   # recorded clips, Replay, voice lines saved as sounds
+MY_SOUNDS = "My sounds"     # files added from the PC, other soundboards, old sounds
+DOWNLOADS = "Downloads"     # a link from a site not named in _SITES
+_SITES = {"youtube.com": "YouTube", "youtu.be": "YouTube", "tiktok.com": "TikTok",
+          "soundcloud.com": "SoundCloud", "instagram.com": "Instagram",
+          "twitter.com": "X", "x.com": "X", "reddit.com": "Reddit", "redd.it": "Reddit",
+          "twitch.tv": "Twitch", "facebook.com": "Facebook", "fb.watch": "Facebook",
+          "vimeo.com": "Vimeo", "bandcamp.com": "Bandcamp", "kick.com": "Kick",
+          "dailymotion.com": "Dailymotion", "bilibili.com": "Bilibili",
+          "myinstants.com": "Myinstants", "streamable.com": "Streamable"}
+_RESERVED = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)),
+             *(f"lpt{i}" for i in range(1, 10))}
+_claim_lock = threading.Lock()
 
-    Plain audio files are copied as they are. Anything that needed ffmpeg (video,
-    m4a, aac, wma) is stored as a FLAC of its *audio* instead: a 300 MB video used
-    to be copied whole, and the library stays playable if ffmpeg goes away. So is a
-    file libsndfile reads under a name outside AUDIO_EXTS (.au, .caf, .w64…): only
-    those come back in from a backup (soundboard.backup)."""
+
+def site_folder(url: str) -> str:
+    """The folder a sound downloaded from `url` goes in: the site's name."""
+    from urllib.parse import urlsplit
+    try:
+        host = (urlsplit(url.strip()).hostname or "").lower()
+    except ValueError:
+        host = ""
+    for site, folder in _SITES.items():
+        if host == site or host.endswith("." + site):
+            return folder
+    return DOWNLOADS
+
+
+def file_stem(name: str) -> str:
+    """`name` as a file name Windows takes: no <>:"/|?* (or backslash) or control characters, no
+    trailing dot or space, not a device name (CON, NUL...), not too long."""
+    s = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name)
+    s = " ".join(s.split()).strip(" .")[:80].strip(" .")
+    if s.split(".")[0].lower() in _RESERVED:
+        s = f"_{s}"
+    return s or "Sound"
+
+
+def owns(path: str | Path) -> bool:
+    """A file the library keeps itself: anywhere in SOUNDS_DIR (its own folders too)."""
+    p = Path(path)
+    return p.is_absolute() and p != SOUNDS_DIR and p.is_relative_to(SOUNDS_DIR)
+
+
+def _folder_of(p: Path) -> str:
+    """The library folder a file of ours is in ("YouTube"), "" for SOUNDS_DIR itself
+    or a file from elsewhere."""
+    if not owns(p) or p.parent == SOUNDS_DIR:
+        return ""
+    return p.parent.relative_to(SOUNDS_DIR).as_posix()
+
+
+def new_file(name: str, ext: str, folder: str) -> Path:
+    """A free path for a new sound file named after the sound ("Name (2)" when that's
+    taken), made empty at once so two sounds saved together never get the same one."""
+    where = SOUNDS_DIR / folder
+    where.mkdir(parents=True, exist_ok=True)
+    stem, ext = file_stem(name), ext.lower()
+    with _claim_lock:
+        for n in range(1, 10000):
+            p = where / (f"{stem}{ext}" if n == 1 else f"{stem} ({n}){ext}")
+            try:
+                with open(p, "xb"):
+                    return p
+            except FileExistsError:
+                continue
+    raise OSError(f"no free file name for {stem}{ext} in {where}")
+
+
+def discard(p: Path) -> None:
+    """Undo new_file() after a failed save: the file, and its folder if that's empty now."""
+    p.unlink(missing_ok=True)
+    if p.parent != SOUNDS_DIR:
+        try:
+            p.parent.rmdir()   # only goes when empty
+        except OSError:
+            pass
+
+
+# Audio the library makes itself (a download, a recording) is kept as Settings > Data
+# & quality says (quality.SAVE_FORMATS). MP3 by default: it plays in anything, and is
+# ~a quarter of a FLAC that holds no more than the compressed download did. ~V2 VBR
+# (~190 kbps on music). libsndfile's MP3 starts on time and keeps the length (no
+# encoder gap before a pad's hit). FLAC where it can't write MP3 (an old system
+# libsndfile). Only the saved file: a sound plays from its cache, made at import from
+# the audio as it came.
+_CAN_MP3 = "MP3" in sf.available_formats()
+MP3_QUALITY = 0.2   # libsndfile's compression_level: 0 best .. 1 smallest
+
+
+def stored_ext() -> str:
+    from soundboard import quality
+    return ".mp3" if quality.current.save_format == "mp3" and _CAN_MP3 else ".flac"
+
+
+def write_stored(dest: Path, data: np.ndarray) -> None:
+    """Write library audio ((n, 2) at SR) to `dest`, as its extension says."""
+    if dest.suffix.lower() == ".mp3":
+        sf.write(dest, data, SR, format="MP3", compression_level=MP3_QUALITY)
+    else:
+        sf.write(dest, data, SR, subtype="PCM_16")
+
+
+def import_file(src: str, color: str, name: str = "",
+                folder: str = MY_SOUNDS) -> tuple[SoundMeta, np.ndarray]:
+    """Decode, bring into the library folder, and return metadata + int16 audio.
+    The copy is SOUNDS_DIR/`folder`/`name`.ext (`name`: the sound's name, else the
+    file's own; a download passes its title, its temp file is named by video id).
+
+    Plain audio files are copied as they are. Anything that needed ffmpeg (a
+    download, video, m4a, aac, wma) is stored as an MP3 of its *audio* instead
+    (stored_ext()): a 300 MB video used to be copied whole, and the library stays
+    playable if ffmpeg goes away. So is a file libsndfile reads under a name outside
+    AUDIO_EXTS (.au, .caf, .w64…): only those come back in from a backup
+    (soundboard.backup)."""
     data, via_ffmpeg = _decode(src)
     if not len(data):
-        raise ValueError("this file has no audio in it")
-    SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+        raise ValueError(_("this file has no audio in it"))
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
-    as_flac = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
-    if as_flac:
-        dest = SOUNDS_DIR / f"{sid}_{_safe_name(srcp.stem)}.flac"
-    else:
-        # capped: a long source name plus the id would pass Windows' 255-character limit
-        dest = SOUNDS_DIR / f"{sid}_{srcp.stem[:80].strip() or 'sound'}{srcp.suffix.lower()}"
+    convert = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
+    name = name.strip() or srcp.stem.replace("_", " ").strip()
     # Never fall back to using `src` in place: a download's temp folder is deleted
     # right after this. A failed copy leaves nothing behind and says what to do.
+    dest = None
     try:
-        if as_flac:
-            sf.write(dest, data, SR, subtype="PCM_16")
+        dest = new_file(name, stored_ext() if convert else srcp.suffix, folder)
+        if convert:
+            write_stored(dest, data)
         else:
             shutil.copy2(srcp, dest)
-        meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40] or "Sound",
+        meta = SoundMeta(id=sid, added=time.time(), name=name[:40].strip() or "Sound",
                          file=str(dest), color=color, level_gain=level_gain(data),
                          duration=len(data) / SR, fingerprint=fingerprint(src))
         return meta, store_cached(sid, data)
     except Exception as e:
         log.warning("couldn't copy %s into the library", src, exc_info=True)
-        dest.unlink(missing_ok=True)
+        if dest is not None:
+            discard(dest)
         if isinstance(e, OSError):
-            raise OSError(f"couldn't save it into your Sounds folder ({e.strerror or e}). "
-                          "Check the disk isn't full and try again.") from e
+            raise OSError(_("couldn't save it into your Sounds folder ({error}). Check "
+                            "the disk isn't full and try again.", error=e.strerror or e)) from e
         raise
 
 
 def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.ndarray]:
-    """Store recorded audio ((n, 2) float32 at SR) as a FLAC; return metadata + int16 audio."""
-    SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+    """Store recorded audio ((n, 2) float32 at SR) as stored_ext() says; return
+    metadata + int16 audio."""
     sid = uuid.uuid4().hex[:10]
-    dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}.flac"
-    sf.write(dest, data, SR, subtype="PCM_16")
-    meta = SoundMeta(id=sid, name=name[:40], file=str(dest), color=color,
+    dest = new_file(name, stored_ext(), RECORDINGS)
+    try:
+        write_stored(dest, data)
+    except BaseException:
+        discard(dest)
+        raise
+    meta = SoundMeta(id=sid, name=name[:40], file=str(dest), color=color, added=time.time(),
                      level_gain=level_gain(data), duration=len(data) / SR,
                      fingerprint=fingerprint(str(dest)))
     return meta, store_cached(sid, data)
@@ -1378,10 +1567,13 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
     sid = uuid.uuid4().hex[:10]
     src = Path(meta.file)
     dest = src
-    if src.is_file():
-        SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
-        dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}{src.suffix}"
-        shutil.copy2(src, dest)
+    if src.is_file():   # next to the original (one from outside: in My sounds)
+        dest = new_file(name, src.suffix, _folder_of(src) or MY_SOUNDS)
+        try:
+            shutil.copy2(src, dest)
+        except BaseException:
+            discard(dest)
+            raise
     try:
         if cache_path(meta.id).exists():
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1396,7 +1588,8 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
         except OSError:
             log.debug("couldn't copy the picture of %s", meta.id, exc_info=True)
             image = ""
-    return SoundMeta(id=sid, name=name[:40], file=str(dest), volume=meta.volume,
+    return SoundMeta(id=sid, name=name[:40], file=str(dest), added=time.time(),
+                     volume=meta.volume,
                      mode=meta.mode, loop=meta.loop, color=meta.color,
                      level_gain=meta.level_gain, duration=meta.duration,
                      fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),
@@ -1434,7 +1627,8 @@ USE_RECYCLE_BIN = True
 
 def loose_sounds(cfg: Config) -> list[Path]:
     """Audio files put in the sounds folder by hand (dragged there in Explorer): not
-    one of the library's own files ("<id>_name"), and no sound's file."""
+    one of the library's own files (in its folders, or "<id>_name" from before), and
+    no sound's file."""
     try:
         files = list(SOUNDS_DIR.iterdir())
     except OSError:
@@ -1450,10 +1644,70 @@ def delete_file(meta: SoundMeta):
     that can't be made again), its picture and decoded cache are deleted."""
     p = Path(meta.file)
     try:
-        if p.parent == SOUNDS_DIR and not (USE_RECYCLE_BIN and recycle(p)):
+        if owns(p) and not (USE_RECYCLE_BIN and recycle(p)):
             p.unlink(missing_ok=True)
         if meta.image and Path(meta.image).parent == THUMBS_DIR:
             Path(meta.image).unlink(missing_ok=True)
     except OSError:
         log.warning("couldn't delete %s", p, exc_info=True)
     unlink_cache(meta.id)
+
+
+_VIDEO_ID = re.compile(r"(?=.*[0-9A-Z])[A-Za-z0-9_-]{11}")   # a YouTube video's
+
+
+def _old_folder(rest: str) -> str:
+    """The folder for a file from before library folders, by the "<name>" of its
+    "<id>_<name>": downloads were named by their video id."""
+    if _VIDEO_ID.fullmatch(rest):
+        return "YouTube"
+    if rest.isdigit() and len(rest) >= 8:   # TikTok, X...: a long number
+        return DOWNLOADS
+    return MY_SOUNDS
+
+
+def tidy_files(cfg: Config) -> int:
+    """Move the sound files from before library folders ("<id>_<name>" in SOUNDS_DIR
+    itself) into them, under the sound's own name: "YouTube/Never Gonna Give You
+    Up.flac". At the start, before anything reads them. A file that can't move (open
+    in another program) stays as it is, for the next start. The settings are saved
+    at once: if they can't be, the files go back. Returns how many moved."""
+    if cfg.read_only:
+        return 0
+    moved: dict[Path, Path] = {}
+    changed: list[tuple[SoundMeta, str]] = []
+    for m in cfg.sounds:
+        p = Path(m.file)
+        if p.parent != SOUNDS_DIR or not _OUR_SOUND_FILE.match(p.name):
+            continue
+        if p not in moved:   # two sounds on one file: both follow it
+            if not p.is_file():
+                continue
+            rest = Path(p.name[11:]).stem
+            dest = None
+            try:
+                dest = new_file(m.name or rest, p.suffix, _old_folder(rest))
+                os.replace(p, dest)
+            except OSError:
+                log.warning("couldn't move %s into a library folder", p.name, exc_info=True)
+                if dest is not None:
+                    dest.unlink(missing_ok=True)
+                continue
+            moved[p] = dest
+        changed.append((m, m.file))
+        m.file = str(moved[p])
+    if moved and not cfg.save():
+        log.warning("couldn't save the settings: the sound files go back where they were")
+        for was, now in moved.items():
+            try:
+                os.replace(now, was)
+            except OSError:   # then the sounds keep the new place (saved next time)
+                log.warning("couldn't move %s back", now, exc_info=True)
+                continue
+            for m, old in changed:
+                if Path(old) == was:
+                    m.file = old
+        return 0
+    if moved:
+        log.info("moved %d sound files into library folders", len(moved))
+    return len(moved)

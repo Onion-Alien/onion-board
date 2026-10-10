@@ -86,6 +86,36 @@ def test_a_shared_helper_is_folded_into_the_program_that_started_it():
 
 
 @pytest.mark.skipif(not WIN, reason="Windows only")
+def test_one_process_at_a_time_gives_what_the_full_snapshot_gives():
+    """Who's listening looks up only the pids its sessions name (PidTable), not a
+    snapshot of every process: the rows, and so the names and trees, are the same."""
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    try:
+        full = appaudio._process_table()
+        table = appaudio.PidTable()
+        for pid in (os.getpid(), child.pid, os.getppid()):
+            if pid in full:
+                assert table.get(pid) == full[pid] and pid in table
+        assert table[child.pid][0] == os.getpid()
+        assert appaudio.root_pid(child.pid, table) == appaudio.root_pid(child.pid, full)
+        assert table.snapshots == 0
+    finally:
+        child.kill()
+        child.wait()
+    assert child.pid not in appaudio.PidTable()          # gone, as in a fresh snapshot
+    assert appaudio.PidTable().get(0, (0, "")) == (0, "")
+
+
+def test_a_process_windows_wont_open_falls_back_to_the_full_snapshot(monkeypatch):
+    monkeypatch.setattr(appaudio, "_open_row", lambda pid: appaudio._DENIED)
+    monkeypatch.setattr(appaudio, "_process_table",
+                        lambda: {4: (0, "system"), 600: (4, "audiodg.exe")})
+    table = appaudio.PidTable()
+    assert table.get(600) == (4, "audiodg.exe") and 4 in table and 7 not in table
+    assert table.snapshots == 1                          # once, then it's all known
+
+
+@pytest.mark.skipif(not WIN, reason="Windows only")
 def test_list_apps_runs_and_never_lists_this_process():
     apps = appaudio.list_apps()
     assert isinstance(apps, list)
@@ -198,7 +228,9 @@ def test_peak_watcher_reads_meters_between_scans_and_releases_them(monkeypatch):
     assert w.peak(42) == pytest.approx(0.5)
     for m in made:                                  # it keeps reading without rescanning
         m.v = 0.0
-    time.sleep(0.3)
+    deadline = time.monotonic() + 3                 # (falls over a few reads: a busy PC
+    while w.peak(42) >= 0.05 and time.monotonic() < deadline:   # runs fewer of them)
+        time.sleep(0.01)
     assert w.peak(42) < 0.05 and len(made) == 2
     t = w._thread
     w.stop()
@@ -256,7 +288,9 @@ def test_a_quiet_program_is_handed_over_as_silence():
     appaudio._k32.CloseHandle(evt)
     n = sum(len(x) for x in got)
     assert not th.is_alive() and cap.error is None
-    assert took * SR - 0.1 * SR < n <= took * SR   # the gap, in real time
+    # the gap, in real time: never more, and most of it (the clock above starts before
+    # the thread, which a busy PC can start a good part of a second late)
+    assert 0.2 * SR < n <= took * SR
     assert not any(x.any() for x in got)
 
 

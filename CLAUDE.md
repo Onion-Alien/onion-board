@@ -31,6 +31,47 @@ published. Before writing or committing anything:
 Run `python scripts/check_sensitive.py` before proposing a commit and fix anything it
 reports. Don't add `# sensitive-scan: allow` to silence it without telling the user why.
 
+## Text the app shows: every language, in the same change
+
+Onion Board ships in every language in `assets/lang/` (the same set as Onion Watch). So any change
+that adds or edits text a user can see (labels, buttons, tooltips, dialogs, toasts,
+errors) does all of this **before committing**, not "later":
+
+1. Wrap it: `_("…")` / `ngettext("…", "…", n)` from `soundboard.i18n`. Whole sentences with
+   `{placeholders}`: never an f-string, `+`, or an English word passed into a
+   placeholder ("{what}" = "sounds" can't be translated).
+2. `python scripts/i18n_extract.py --update`: adds the new texts (empty) to every
+   catalog and drops the unused ones.
+3. Translate every text you added or changed into **every** catalog: plain, short,
+   friendly words for gamers, the same words the catalog already uses (and Onion Watch
+   uses, for shared things), every `{placeholder}`, `<b>…</b>`, `&amp;` and line break
+   kept, and the language's number of plural forms (`i18n.FORMS`). Lots of text: one
+   subagent per language.
+4. `ruff`, the i18n tests, and check that `i18n_extract.py` lists none of your texts as
+   missing.
+
+Never wrap log messages, settings keys, file names, the control API's JSON or the changelog. A new language goes into
+both apps at once. Details: [docs/TRANSLATING.md](docs/TRANSLATING.md).
+
+## Any UI work: read docs/DESIGN.md first
+
+**[docs/DESIGN.md](docs/DESIGN.md) is the design system**: tokens, layout, buttons,
+colour, text, behaviour, a "never" list and a checklist. Build every new screen, card,
+dialog and button from it. The rules people trip over most:
+
+- **Narrow by default**: controls as wide as their words, then `addStretch(1)`;
+  dialogs ≤ ~620 px; tiles in fixed-size grids that scroll down.
+- **Buttons on the left, the main one first** (`[Send] [Cancel]`), one filled
+  `#primary` button per card or dialog at most.
+- **Icons and pop-ups over long buttons**: a button is one to three words; anything
+  a picture says is an icon with a tooltip; how-to text goes behind an ⓘ pop-up.
+- **Cards look designed, not like a form**: heading icon, status pill, choice tiles,
+  pictures, an inner area; never a heading over stacked plain rows.
+- Theme tokens only, never a hex colour; ticks and on-states stay the accent colour.
+- Sentence case, no long dashes, `23%`, every string through `_()`.
+- Before sending pictures of a change, look at every state yourself for empty space,
+  cut-off words and invisible controls.
+
 ## Working in the code
 
 **[docs/DEVELOPING.md](docs/DEVELOPING.md) is the full loop**: setup → change →
@@ -55,6 +96,23 @@ or installing anything. The short version:
   mangles UTF-8 (this codebase uses symbols like ⚙ ⏺ 🐰 in strings).
 - Audio callbacks never block or take the engine lock ([docs/CODE.md](docs/CODE.md) → *Audio notes*).
 - Code layout is the table in [docs/CODE.md](docs/CODE.md); keep it current when adding modules.
+- **Commit times: UTC only.** Every commit's author and committer time must be
+  `+0000`: a local time zone in a public repo says where the author lives. The
+  enforcement:
+  - `git config core.hooksPath .githooks` (required) turns on the hooks:
+    `post-commit` and `post-merge` re-stamp new commits in UTC, and `pre-push` refuses
+    anything that isn't.
+  - CI's *Commit times in UTC* step fails a PR (and main) that has any.
+  - **Never merge a PR with `gh pr merge`, GitHub's Merge button or GitHub's
+    *Update branch*.** GitHub writes those commits in your local time zone, and no
+    hook can touch them. Merge with `sh scripts/merge_pr.sh N [--delete-branch]`: it
+    checks CI is green, makes the merge commit here in UTC and pushes it to main.
+  - Bring main into a branch with a local `git merge origin/main` (the hook stamps
+    it).
+  - A branch whose commits aren't UTC: `sh scripts/utc_fix.sh`, then
+    `git push --force-with-lease`.
+  - The same goes for anything else that records where you are: never write your time
+    zone, locale, city or machine names into commits, PR text or files.
 - Never rewrite history already pushed to `main` (no filter-repo, rebase or force-push):
   commits get new IDs, so every fork or branch that merges `main` sees them all as new
   and conflicts. To clean up old commits, add a new commit instead.

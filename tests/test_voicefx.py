@@ -486,3 +486,146 @@ def test_every_preset_runs_and_reports_its_delay():
             assert np.all(np.isfinite(y))
         assert not ch.errors, name
         assert 0 <= ch.latency() < 0.1, name
+
+
+def test_every_built_in_text_can_be_translated():
+    """The built-in effects' names, descriptions, settings and slider ends and the voices'
+    names all have a line in voicefx.builtin.shown_texts(): the Voice tab translates
+    through it, while the English stays what settings and share codes keep."""
+    from soundboard import i18n
+    from soundboard.voicefx import builtin
+    table = builtin.shown_texts()
+    builtins = [c for c in REGISTRY.values() if c.__module__ == builtin.__name__]
+    texts = {t for c in builtins for t in (c.name, c.description)}
+    texts |= {t for c in builtins for q in c.params for t in (q.label, *q.ends) if t}
+    texts |= set(voicefx.PRESETS)
+    assert texts <= set(table), sorted(texts - set(table))
+    assert all(k == v for k, v in table.items())      # English: as written
+    try:
+        i18n.set_language(i18n.PSEUDO)
+        assert i18n.is_pseudo(voicefx.shown("Chipmunk"))
+        assert voicefx.shown("an add-on's own text") == "an add-on's own text"
+    finally:
+        i18n.set_language(i18n.ENGLISH)
+    assert voicefx.shown("Chipmunk") == "Chipmunk"
+
+
+# ------------------------------------------------- found by the voice stress test
+
+def test_an_empty_mic_block_bypasses_nothing():
+    """A device can hand over an empty block. Six effects failed on one, and a failing
+    effect is bypassed for good: a changed voice turned back into yours mid-call."""
+    chain = VoiceChain()
+    chain.configure(spec_for(**voicefx.PRESETS["Demon"], robot={}, chorus={}))
+    x = np.repeat(sine(150, 0.1)[:, None], 2, 1)
+    for block in (x[:480], x[:0], np.zeros((0, 1), np.float32), x[480:960]):
+        assert chain.process(block, RATE).shape == (len(block), 2)
+    assert chain.errors == {}
+
+
+def _corner(y):
+    """The sharpest bend in the waveform after the warm-up: a click is a sharp corner."""
+    return float(np.abs(np.diff(y[RATE // 2:], 2)).max())
+
+
+def _dragged(etype, key, base, change=None):
+    """`key` dragged end to end and back once a second in the slider's own steps, on a
+    steady tone, the way a hand moves it while you talk."""
+    q = next(q for q in REGISTRY[etype].params if q.key == key)
+    e = REGISTRY[etype](RATE, base)
+    x = sine(220, 2.5)
+    out = []
+    for k, i in enumerate(range(0, len(x), 480)):
+        ph = (k % 100) / 100
+        v = q.lo + (2 * ph if ph < 0.5 else 2 - 2 * ph) * (q.hi - q.lo)
+        if q.step:
+            v = q.lo + round((v - q.lo) / q.step) * q.step
+        e.set_values({**base, key: v})
+        out.append(e.run(x[i:i + 480], RATE))
+    held = max(_corner(run_blocks(REGISTRY[etype](RATE, {**base, key: v}), x, 480))
+               for v in (q.lo, base.get(key, q.default), q.hi))
+    return _corner(np.concatenate(out)), held
+
+
+BLEND = {"semitones": -5, "mix": 0.5, "gap": 0, "size": 4, "under": 1}
+
+
+@pytest.mark.parametrize("etype, key, base", [
+    ("cleanup", "hiss", {"gate": 0}), ("pitch", "semitones", {}), ("pitch", "size", {}),
+    ("pitch", "mix", BLEND), ("pitch", "gap", BLEND), ("pitch", "semitones", BLEND),
+    ("compressor", "boost", {}), ("radio", "drive", {"noise": 0}),
+    ("shout", "drive", {"threshold": -40}), ("helmet", "size", {}), ("chorus", "depth", {}),
+    ("echo", "delay", {}), ("echo", "tone", {})])
+def test_dragging_a_slider_while_you_talk_doesnt_click(etype, key, base):
+    """Each of these stepped a gain, jumped a delay or restarted a stage from silence
+    at every block while its slider moved: a crackle for everyone listening."""
+    dragged, held = _dragged(etype, key, base)
+    assert dragged <= max(0.02, 5 * held), (dragged, held)
+
+
+def _syllables(seed, n=24):
+    """Sung-ish syllables: a buzzy vowel at a new pitch each time, gliding up to a
+    semitone, with short pauses between (what autotune keeps snapping on)."""
+    rng = np.random.default_rng(seed)
+    parts, ph = [], 0.0
+    for _ in range(n):
+        m = int(RATE * rng.uniform(0.12, 0.3))
+        f = rng.uniform(100, 220) * 2 ** (rng.uniform(-1, 1) / 12 * np.linspace(0, 1, m))
+        p = ph + 2 * np.pi * np.cumsum(f) / RATE
+        ph = p[-1]
+        parts += [sum(np.sin(k * p) / k for k in range(1, 8)) * 0.15 * np.hanning(m),
+                  np.zeros(int(RATE * rng.uniform(0, 0.08)))]
+    return np.concatenate(parts).astype(np.float32)
+
+
+@pytest.mark.parametrize("seed", [1, 2, 3])
+def test_autotune_never_leaves_a_hole(seed):
+    """Snapping up a note sped the reading past what the stretcher had ready, and the
+    gap was filled with silence; now that block is read a touch slower instead."""
+    x = _syllables(seed)
+    for st in (-9, -5):
+        e = REGISTRY["pitch"](RATE, {"semitones": st, "tune": 1})
+        run_blocks(e, x, 480)
+        assert e.pads == 0, st
+
+
+def test_pitch_dragged_up_while_running_never_waits():
+    e = REGISTRY["pitch"](RATE, {"semitones": -12, "size": 4})   # (size: it never stops)
+    x = sine(220, 2.0)
+    for k, i in enumerate(range(0, len(x), 480)):
+        e.set_values({"semitones": min(-12 + k * 0.5, 12), "size": 4})
+        e.run(x[i:i + 480], RATE)
+    assert e.pads == 0 and e.slows > 0
+
+
+def test_walkie_talkie_clicks_stay_in_the_radio_band():
+    # raw white noise on top of the band-limited voice sounded like a hi-hat
+    x = np.concatenate([np.zeros(SR // 2), _vowel(secs=0.5), np.zeros(SR)]).astype(np.float32)
+    y = _run("radio", {"squelch": 1, "noise": 0, "low": 450, "high": 2700}, x)
+    for seg in (y[SR // 2:SR // 2 + 1500], y[SR + int(SR * 0.3):SR + int(SR * 0.6)]):
+        sp = np.abs(np.fft.rfft(seg)) ** 2
+        f = np.fft.rfftfreq(len(seg), 1 / SR)
+        assert sp[f > 5000].sum() < 0.1 * sp.sum()
+
+
+@pytest.mark.parametrize("mic_db", [-36, -12])
+def test_hothead_blows_out_on_shouting_at_any_mic_level(mic_db):
+    # a fixed level alone never went off on a quiet mic: it learns how loud you talk
+    rng = np.random.default_rng(1)
+    words = np.repeat(rng.uniform(0.5, 1.0, 24), SR // 4) * np.tile(
+        np.r_[np.ones(SR // 5), np.zeros(SR // 20)], 24)[:SR * 6]
+    x = (_vowel(secs=6.0) / 0.55 * words * 10 ** (mic_db / 20)).astype(np.float32)
+    x[SR * 4:SR * 5] *= 10 ** (12 / 20)                # one second of shouting
+    e = voicefx.REGISTRY["shout"](SR, {"threshold": -14, "drive": 16})
+    amt = []
+    for i in range(0, len(x), 480):
+        e.run(x[i:i + 480], SR)
+        amt.append(e.amt)
+    amt = np.array(amt)
+    assert amt[200:400].max() < 0.3                   # talking normally: clean
+    assert amt[420:500].max() > 0.9                    # shouting: blown out
+
+
+def test_renamed_voice_keeps_its_pick():
+    assert voicefx.clean_spec({"preset": "Female voice"})["preset"] == "High voice"
+    assert "High voice" in voicefx.PRESETS

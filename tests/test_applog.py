@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from conftest import own_time
 from soundboard import applog
 
 
@@ -244,7 +245,7 @@ def test_same_bug_again_skips_the_file_and_logs_one_counted_line(fresh, monkeypa
     monkeypatch.setattr(applog, "build_report",
                         lambda *a, **k: built.append(1) or real_build(*a, **k))
     now = [1000.0]
-    monkeypatch.setattr(applog.time, "monotonic", lambda: now[0])
+    own_time(monkeypatch, applog, monotonic=lambda: now[0])
 
     def boom():
         raise KeyError("x")
@@ -280,3 +281,132 @@ def test_open_dialog_lists_at_most_max_extra(fresh):
         # same line, new exception type each time: a new bug each time
         applog.report(_raise(type(f"E{i}", (Exception,), {})(str(i))))
     assert len(first.extra) == applog.MAX_EXTRA
+
+
+@pytest.fixture
+def root_logging(monkeypatch):
+    """setup() replaces the root logger's handlers: put pytest's back afterwards."""
+    import logging
+    root = logging.getLogger()
+    handlers, level = list(root.handlers), root.level
+    monkeypatch.setattr(applog, "_state", dict(applog._state, log_path=None))
+    monkeypatch.setattr(applog.sys, "stderr", None)
+    yield root
+    for h in list(root.handlers):
+        root.removeHandler(h)
+        h.close()
+    for h in handlers:
+        root.addHandler(h)
+    root.setLevel(level)
+
+
+def test_app_log_follows_the_config(tmp_path, root_logging):
+    """Settings' "Keep an app log": on unless config.json says false."""
+    assert applog.wanted(tmp_path)   # no config yet
+    (tmp_path / "config.json").write_text('{"app_log": false}', encoding="utf-8")
+    assert not applog.wanted(tmp_path)
+    path = applog.setup(tmp_path)
+    root_logging.info("a site failed")
+    assert not path.exists() and not applog.keeping()
+    # a crash report still gets this run's last lines, from memory
+    assert "a site failed" in applog._log_tail(path, 10)
+
+
+def test_unticking_the_app_log_deletes_it_and_ticking_starts_it_again(tmp_path,
+                                                                       root_logging):
+    path = applog.setup(tmp_path, keep_log=True)
+    (tmp_path / (applog.LOG_NAME + ".1")).write_text("older\n", encoding="utf-8")
+    root_logging.info("before")
+    assert path.exists() and applog.keeping()
+    applog.keep(False)
+    root_logging.info("while off")
+    assert not path.exists() and not (tmp_path / (applog.LOG_NAME + ".1")).exists()
+    tail = applog._log_tail(path, 10)
+    assert "before" in tail and "while off" in tail
+    applog.keep(True)
+    root_logging.info("back on")
+    applog.flush()
+    text = path.read_text(encoding="utf-8")
+    assert "back on" in text and "while off" not in text
+
+
+def test_a_slow_disk_doesnt_hold_up_a_log_line(tmp_path, root_logging):
+    """A 1.9.7 freeze: a warning on the UI thread waited 5 s for the log file's flush.
+    Lines are written on the log's own thread now."""
+    import time
+    path = applog.setup(tmp_path, keep_log=True)
+    h = next(h for h in root_logging.handlers if isinstance(h, applog._Background))
+    gate, real = threading.Event(), h.file.emit
+
+    def slow(record):   # a disk that's busy (or an antivirus scan of the log)
+        gate.wait(5)
+        real(record)
+    h.file.emit = slow
+    start = time.monotonic()
+    root_logging.warning("can't also send into %s", "a cable")
+    assert time.monotonic() - start < 0.5
+    gate.set()
+    applog.flush()
+    line = path.read_text(encoding="utf-8").strip().splitlines()[-1]
+    assert line.endswith("root: can't also send into a cable") and "WARNING" in line
+
+
+def test_a_traceback_logged_off_the_ui_thread_keeps_its_lines(tmp_path, root_logging):
+    path = applog.setup(tmp_path, keep_log=True)
+    try:
+        raise ValueError("bad thing")
+    except ValueError:
+        root_logging.exception("it failed")
+    applog.flush()
+    text = path.read_text(encoding="utf-8")
+    assert "it failed" in text and "ValueError: bad thing" in text and "Traceback" in text
+
+
+def test_app_commands_under_test_never_log_into_the_real_app_folder():
+    """app.py took its own copy of APP_DIR: a test of --uninstall-count set up the log
+    in the real app folder (%APPDATA%), and every later test's lines went there."""
+    import os
+
+    from soundboard import app, library, updates
+    real = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
+    for d in (app.APP_DIR, updates.APP_DIR, library.APP_DIR):
+        assert not Path(d).is_relative_to(real), d
+
+
+@pytest.mark.parametrize("exc", [
+    OSError(28, "No space left on device"),
+    PermissionError(13, "Permission denied"),
+    MemoryError(),
+    ConnectionResetError(104, "reset"),
+])
+def test_the_pcs_situation_is_said_plainly_not_reported_as_a_crash(fresh, monkeypatch, exc):
+    """A full disk or a file another program holds isn't a bug: no crash dialog, no
+    saved report (it would count as an error/<version> problem), a plain message."""
+    log_path, shown = fresh
+    said = []
+    monkeypatch.setattr(applog, "_show_plain", said.append)
+    assert applog.report(_raise(exc), where="saving a clip") is None
+    assert shown == [] and len(said) == 1
+    assert not (log_path.parent / applog.REPORTS_DIR).exists()
+    applog.report(_raise(exc), where="saving a clip")   # the same again: said once
+    assert len(said) == 1
+
+
+def test_a_missing_file_is_still_a_bug_worth_a_report(fresh):
+    _log_path, shown = fresh
+    assert applog.report(_raise(FileNotFoundError(2, "No such file"))) is not None
+    assert len(shown) == 1
+
+
+def test_a_late_callback_to_a_closed_window_is_saved_but_not_shown(fresh):
+    # a timer / signal reaching a freed widget: still counted, but the user lost nothing
+    _, shown = fresh
+    rep = applog.report(_raise(RuntimeError(
+        "Internal C++ object (QPushButton) already deleted.")))
+    assert rep is not None and rep.path is not None and rep.path.exists()
+    assert shown == []
+    try:   # another line, so not "the same bug again"
+        raise RuntimeError("something else")
+    except RuntimeError as e:
+        assert applog.report(e)
+    assert len(shown) == 1
