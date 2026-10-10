@@ -78,6 +78,8 @@ def test_windows_log_events_for_this_pid_only():
     ({"quitting": True}, [{"kind": "not-responding", "code": "", "module": ""}], 0,
      ("not-responding", "")),
     ({"quitting": True, "stuck_s": 30}, [], 0, ("while-closing", "")),
+    ({"quitting": True, "closed_by_windows": True, "alive": 100}, [], 200,
+     ("windows-closed", "")),
     ({"stuck_s": 12.5, "alive": 100}, [], 200, ("frozen", "")),
     ({"stuck_s": 0, "alive": 100}, [], 200, ("pc-restarted", "")),
     ({"stuck_s": 0, "alive": 300}, [], 200, ("ended", "")),
@@ -107,6 +109,24 @@ def test_check_last_counts_it_and_saves_a_report_not_counted_twice(app_dir, monk
     assert "last words" in text and "this run" not in text   # the last run's log only
     # already counted as unclean-exit/: not again as an error/ report
     assert usage.problems(app_dir, 0) == ([], path.stat().st_mtime)
+
+
+@pytest.mark.parametrize("closed_by_windows, booted", [(True, 0.0), (False, 1e12)])
+def test_ended_by_windows_or_a_restart_is_not_a_problem(app_dir, monkeypatch,
+                                                        closed_by_windows, booted):
+    """A log-off, a PC restart or the update installer ending the app mid-quit came in
+    as unclean-exit/…/while-closing and …/pc-restarted: false alarms."""
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: booted)
+    w = exitwatch.start(app_dir)
+    if closed_by_windows:   # Windows asked, the quit started, then Windows ended it
+        exitwatch.closed_by_windows()
+        exitwatch.quitting()
+    state, native = exitwatch.read_last(app_dir)
+    assert state.get("closed_by_windows", False) is closed_by_windows
+    w._stop.set()   # ...and the process is ended here, before stopped()
+    assert exitwatch.check_last(app_dir, state, native, "unclean-exit/1.9.8") == ("", None)
+    assert not list((app_dir / applog.REPORTS_DIR).glob("crash-*.txt"))
 
 
 def test_the_heartbeat_notes_a_stuck_window(app_dir, monkeypatch):

@@ -6804,6 +6804,7 @@ class MainWindow(QMainWindow):
         quits: hiding to the tray would veto it, and an upgrade run while the app is
         open would fail with "Setup was unable to close all applications"."""
         self._quitting = True
+        exitwatch.closed_by_windows()   # ended before the quit finishes: not a crash
 
     def apply_remote(self) -> str:
         """Start / stop the local control API to match the settings; "" or an error."""
@@ -7328,6 +7329,7 @@ class MainWindow(QMainWindow):
                                 _("The installer couldn't be started ({e}). You can download it "
                                   "from the release page instead.", e=errors.plain(e)))
             return
+        exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
         self.quit_app()
 
     def after_update(self):
