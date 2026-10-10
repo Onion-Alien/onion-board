@@ -64,6 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tests: ${{ steps.pick.outputs.tests }}
+      matrix: ${{ steps.pick.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -77,28 +78,34 @@ jobs:
           BASE: ${{ github.base_ref }}
         run: |
           if [ "$EVENT" = pull_request ]; then
-            tests=$(python scripts/pick_tests.py "origin/$BASE" | tr '\n' ' ')
+            base="origin/$BASE"
           else
-            tests=tests
+            base=all
           fi
+          tests=$(python scripts/pick_tests.py "$base" | tr '\n' ' ')
+          # the Windows jobs: a long run split in two (about the same length each)
+          matrix=$(python scripts/pick_tests.py "$base" --matrix)
           echo "tests=$tests" >> "$GITHUB_OUTPUT"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
           echo "Tests to run: ${tests:-none}"
+          echo "Windows jobs: $matrix"
       - run: |
           python -m pip install -q "$(grep '^ruff==' requirements-dev.txt)"
           ruff check .
 
-  test:
+  # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
+  # most of the suite) in two jobs side by side, about half the wait.
+  windows:
     needs: pick
-    # skipped (which counts as passed) when the change needs no tests; still runs, to
-    # fail, when ruff did, so a required `test` check can't pass over a lint error
-    if: ${{ !cancelled() && (needs.pick.result != 'success' || needs.pick.outputs.tests != '') }}
+    if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
+    name: test (Windows ${{ matrix.shard }})
+    strategy:
+      fail-fast: false   # each job's failures are listed in full
+      matrix:
+        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
     runs-on: windows-latest
     timeout-minutes: 20   # a hung test fails the run instead of holding it for hours
     steps:
-      - if: needs.pick.result != 'success'
-        run: |
-          echo "ruff or the test pick failed: see the pick job"
-          exit 1
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
         id: py
@@ -128,16 +135,37 @@ jobs:
           New-ItemProperty -Path $key -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
       # --durations: the slowest tests are listed at the end of every run, so one that
       # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there.
-      # TESTS: the files the pick job chose (`tests` for all of them).
+      # TESTS: this job's share of the files the pick job chose.
       - shell: bash
         run: .venv/Scripts/python -m pytest --durations=20 $TESTS
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ needs.pick.outputs.tests }}
+          TESTS: ${{ matrix.tests }}
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: crashdumps
+          name: crashdumps-${{ strategy.job-index }}
           path: ${{ runner.temp }}/crashdumps
           if-no-files-found: ignore
           retention-days: 14
+
+  # One check named `test` whatever the split: passed when every Windows job did, or
+  # when the change needs no tests; failed when ruff or the pick did, so it can't pass
+  # over a lint error.
+  test:
+    needs: [pick, windows]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          PICK: ${{ needs.pick.result }}
+          WINDOWS: ${{ needs.windows.result }}
+          MATRIX: ${{ needs.pick.outputs.matrix }}
+        run: |
+          echo "pick: $PICK, Windows jobs: $WINDOWS ($MATRIX)"
+          if [ "$PICK" != success ]; then
+            echo "ruff or the test pick failed: see the pick job"; exit 1
+          fi
+          if [ "$MATRIX" != "[]" ] && [ "$WINDOWS" != success ]; then
+            echo "a Windows test job didn't pass"; exit 1
+          fi
