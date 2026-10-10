@@ -174,6 +174,7 @@ def test_failed_install_offers_to_try_again(wizard, devices):
     assert not wiz.btn_cable.isHidden() and wiz.btn_restart.isHidden()
 
 
+@pytest.mark.windows   # GetTickCount64 (time since the PC started)
 def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_dir):
     import os
     import time

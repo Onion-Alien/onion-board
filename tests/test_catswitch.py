@@ -1,5 +1,6 @@
 """Switch category when a program is in front: the rules' logic with a stubbed
 foreground window, and the board following it."""
+import pytest
 from PySide6.QtCore import Qt
 
 from soundboard import backup
@@ -35,6 +36,7 @@ def switcher(desk):
     return Switcher(foreground=lambda: desk.front, alive=lambda pid: pid in desk.running)
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_switches_when_the_program_comes_to_the_front_and_back_when_it_closes():
     d = Desk()
     s = switcher(d)
@@ -58,6 +60,7 @@ def test_no_switch_for_a_program_without_a_rule_or_a_missing_category():
     assert s.poll({"game.exe": "Gone"}, "Memes", CATS) is None
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_alt_tab_out_changes_nothing_and_coming_back_switches_again():
     d = Desk()
     s = switcher(d)
@@ -83,6 +86,7 @@ def test_a_pick_by_hand_while_the_program_is_in_front_is_respected():
     assert s.poll(RULES, "Memes", CATS) is None
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_matches_the_exe_name_in_any_folder_and_case():
     d = Desk()
     s = switcher(d)
@@ -90,6 +94,7 @@ def test_matches_the_exe_name_in_any_folder_and_case():
     assert s.poll(RULES, "", CATS).category == "Game"
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_back_to_all_works():
     d = Desk()
     s = switcher(d)
@@ -137,6 +142,7 @@ def test_rules_go_into_a_backup_and_back():
 
 # ------------------------------------------------------------------ the board
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_the_board_follows_the_program_and_rename_delete_keep_rules_right(window):  # noqa: F811
     d = Desk()
     w = window
@@ -172,6 +178,7 @@ def test_switch_off_stops_following(window):  # noqa: F811
     assert not w._cat_timer.isActive()
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_program_picker_lists_and_browses(qapp):
     from soundboard.ui.programpick import ProgramPicker
     p = ProgramPicker("Game", {"other.exe": "Memes"},

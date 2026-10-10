@@ -59,6 +59,12 @@ def test_a_done_label_is_never_cut_off(qapp):
     btn = QPushButton("Stop all")
     icons.set_icon(btn, "stop", size=14)
     lay.addWidget(btn)
+    lay.addStretch(1)
+    # a row with room to spare: a shown window never grows to fit a wider label (the
+    # button's minimum width is held, busy._keep_width), so with a font or theme where
+    # "✓ Stopped" is wider than "Stop all" and its icon, a row just wide enough for
+    # the button had no room and got the tick
+    host.resize(300, host.sizeHint().height())
     host.show()
     busy.flash(btn, "✓ Stopped", ms=200)
     assert btn.icon().isNull()

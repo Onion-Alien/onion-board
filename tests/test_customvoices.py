@@ -136,6 +136,7 @@ def test_a_program_voice_writes_its_wav(tmp_path):
         CustomVoice("P", command=[sys.executable, "-c", "raise SystemExit(3)"]).synth("x")
 
 
+@pytest.mark.windows   # Windows sorts file names whatever their case
 def test_voice_set_lists_and_routes_custom_voices(vdir, server, monkeypatch):
     url, seen = server
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])

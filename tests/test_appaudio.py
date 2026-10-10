@@ -17,6 +17,7 @@ WIN = sys.platform == "win32"
 SR = appaudio.SR
 
 
+@pytest.mark.windows   # Windows' struct layouts
 def test_guid_bytes_keep_zero_bytes():
     # IUnknown's last 8 bytes start with C0 00 ...: a c_char array would stop at the 0
     assert bytes(appaudio.IID_IUnknown).hex() == "0000000000000000c000000000000046"
@@ -25,6 +26,7 @@ def test_guid_bytes_keep_zero_bytes():
     assert not (appaudio.IID_IUnknown == appaudio.IID_IAudioClient)
 
 
+@pytest.mark.windows   # Windows' struct layouts
 def test_struct_sizes_match_the_windows_layouts():
     from ctypes import sizeof
     assert sizeof(GUID) == 16
@@ -322,6 +324,7 @@ def test_stop_without_waiting_returns_at_once_and_feeds_nothing_more(monkeypatch
     assert not cap._thread.is_alive() and got == [] and cap.frames == 0
 
 
+@pytest.mark.windows   # Windows processes
 def test_capture_of_a_missing_process_fails_politely():
     got = []
     cap = appaudio.AppCapture(4_000_000_000 - 1, got.append, name="nobody")

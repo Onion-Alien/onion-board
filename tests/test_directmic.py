@@ -100,6 +100,7 @@ def test_ring_rejects_other_versions(ring_file):
         dm.RingWriter(ring_file)
 
 
+@pytest.mark.windows   # looks the other board up with OpenProcess
 def test_a_second_board_backs_off(ring_file, monkeypatch):
     """Two copies of the app (one on a test profile) never both write the mic's ring:
     the second one says so, and takes over once the first one has gone."""
@@ -1538,6 +1539,7 @@ def test_cli_refuses_odd_arguments():
     assert dm.cli(["frobnicate"]) == 2
 
 
+@pytest.mark.windows   # Windows' named mutex
 def test_one_admin_step_at_a_time(monkeypatch):
     monkeypatch.setattr(dm, "_LOCK_NAME", "Local\\OnionBoardMicEffectTest")
     held = dm._admin_lock()
@@ -1616,6 +1618,7 @@ def _dacl(path) -> str:
 _TEST_SDDL = "D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;AU)"   # no owner: not admin
 
 
+@pytest.mark.windows   # Windows' links and access lists
 def test_a_planted_link_is_replaced_not_followed(tmp_path):
     victim = tmp_path / "Windows"
     victim.mkdir()
@@ -1628,6 +1631,7 @@ def test_a_planted_link_is_replaced_not_followed(tmp_path):
     assert (victim / "system.ini").read_text() == "keep" and _dacl(victim) == before
 
 
+@pytest.mark.windows   # Windows' access lists
 def test_the_folder_gets_exactly_its_access_and_nothing_inside_changes(tmp_path):
     d = tmp_path / "MicPlugin"
     (d / "inside").mkdir(parents=True)
@@ -1650,6 +1654,7 @@ def test_the_mic_folder_lets_users_write_files_but_not_swap_it():
     assert dm._BASE_SDDL.startswith("O:BAD:P") and "AU" not in dm._BASE_SDDL
 
 
+@pytest.mark.windows   # Windows' access lists
 def test_the_admin_log_folder_drops_what_others_left(tmp_path, monkeypatch):
     base = tmp_path / "OnionBoard"
     (base / "MicPlugin").mkdir(parents=True)
