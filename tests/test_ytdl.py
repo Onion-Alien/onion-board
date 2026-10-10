@@ -690,6 +690,24 @@ def test_direct_download_refuses_names_that_leave_its_folder(url, monkeypatch):
         ytdl._download_direct(url, None, None)
 
 
+def test_a_direct_download_cut_short_is_refused_and_cleared(monkeypatch, tmp_path):
+    """The connection dropped part way: http's read() just ends (no error), so the
+    bytes got are checked against Content-Length and a short file isn't kept."""
+    class Short(_Resp):
+        headers = {"Content-Length": "1000"}
+    monkeypatch.setattr(ytdl.net, "urlopen", lambda *a, **k: Short(b"ID3" + b"\0" * 97))
+    monkeypatch.setattr(ytdl.tempfile, "tempdir", str(tmp_path))
+    url = "https://www.myinstants.com/media/sounds/vine-boom.mp3"
+    with pytest.raises(ytdl.DownloadError):
+        ytdl._download_direct(url, None, None)
+    assert not list(tmp_path.glob("sb-ytdl-*"))   # its own folder: removed
+    dest = tmp_path / "dest"
+    dest.mkdir()
+    with pytest.raises(ytdl.DownloadError):
+        ytdl._download_direct(url, dest, None)
+    assert not list(dest.iterdir())               # the caller's folder: the file removed
+
+
 def test_direct_leaf_keeps_only_a_plain_file_name():
     assert ytdl._direct_leaf("https://www.myinstants.com/media/sounds/vine-boom.mp3") \
         == "vine-boom.mp3"
