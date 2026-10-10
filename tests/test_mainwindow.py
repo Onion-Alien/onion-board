@@ -1078,15 +1078,15 @@ def test_audit_expanded_sidebar_labels_status(window, qapp):
             assert button.text() and button.accessibleName()
 
 
-def test_audit_setup_routes_and_local_test_precede_advanced_controls(window, qapp):
+def test_audit_setup_routes_precede_advanced_controls(window, qapp):
     window.show()
     window.resize(1180, 720)
     window.tabs.setCurrentWidget(window.setup_page)
     qapp.processEvents()
     view = window.setup_page.viewport()
-    for widget in (window.cb_mic, window.cb_route, window.btn_rec):
+    for widget in (window.cb_mic, window.cb_route):
         assert 0 <= widget.mapTo(view, QPoint()).y() < view.height()
-    assert "local" in window.btn_rec.text()
+    assert not hasattr(window, "btn_rec")   # the local mix test card is gone
     assert window.cb_route.mapTo(view, QPoint()).y() < window.eq.mapTo(view, QPoint()).y()
 
 

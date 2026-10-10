@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Setup no longer has the *Test your local mix* card (Record 6s). To check what others
+  get, use *Hear what they hear* or your chat app's microphone test.
 - Themes use clean, flat cards and a faint accent glow, without window grain,
   dark background fades or panel textures. High Contrast keeps its strong outlines.
 
@@ -11,7 +13,7 @@
   (Onion Watch), and *Show me everything* adds every tab. It's asked once only; Settings →
   Tabs changes it later.
 - Mini player shows connection status and a microphone mute switch. Expanded sidebar
-  actions have labels; Setup puts devices and the local mix test first. Sounds groups
+  actions have labels; Setup puts devices first. Sounds groups
   library tools, Voice opens its presets on first visit, and secondary text reads more
   clearly. The full-width drop target is preserved.
 - Add sounds and Record are flat icon buttons like the rest of the Sounds toolbar

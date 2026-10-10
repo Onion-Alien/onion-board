@@ -206,13 +206,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   up to 1000%; a soft limiter stops hard clipping. "Level volumes" makes every
   sound equally loud.
 - **7-band equalizer** on your voice, your sounds, or both, with presets.
-- **Test mode:**
-  - **Hear what they hear:** your mic plus the sounds exactly as others get them
-    (a red banner shows while it's on).
-  - **Record 6s → play back:** records what goes out (your mic, the cable's output end, or the
-    mix sent to another device), plays it back, and reports whether your voice and
-    sounds are in it and whether the balance is off. Not available when sounds go
-    nowhere.
+- **Test mode:** *Hear what they hear* plays your mic plus the sounds exactly as others
+  get them (a red banner shows while it's on).
 - **Connect your chat** (Setup tab): *Make it sound clean in Discord* (the Discord
   settings that stop it chopping up your sounds, with a check that listens to what
   Discord does to them), *Set up game voice chat*, *Zoom, Teams or a browser call*,

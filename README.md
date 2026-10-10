@@ -134,7 +134,7 @@ Optional: if you never get it, nothing changes.
   mixer) must be picking that device up. With *Nobody*, only you hear sounds, on
   purpose.
 - **They hear sounds but not you:** tick **Others hear it** under *My mic*.
-- **Check it yourself:** *Setup → Record 6s → play back* records what others get (it
+- **Check it yourself:** *Hear what they hear* at the bottom plays what others get (it
   works any way but *Nobody*).
 - **Switch how sounds go out any time:** *Setup → Devices → Send my sounds to*.
 - **More than one place at once** (streamers): *Setup → Devices → Also send to →
