@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The side menu starts open on a new install, so the tabs show their names and not
+  just icons. The button at the bottom still shuts it, and that choice is kept.
+
 - Themes use clean, flat cards and a faint accent glow, without window grain,
   dark background fades or panel textures. High Contrast keeps its strong outlines.
 

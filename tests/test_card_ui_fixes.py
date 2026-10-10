@@ -33,6 +33,7 @@ def test_information_button_is_on_the_rail_and_always_there(window, qapp):  # no
 
 def test_help_cards_open_right_of_the_rail_inside_the_window(window, qapp, monkeypatch):  # noqa: F811
     # it used to line up its right edge with the ⓘ, so it hung off the window's left
+    window.rail.set_open(False)   # the offscreen screen is small: room for it beside
     window.resize(1200, 800)
     window.show()
     qapp.processEvents()

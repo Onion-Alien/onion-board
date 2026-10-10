@@ -444,6 +444,8 @@ def test_the_tabs_are_a_rail_down_the_left(window, qapp):
     window._refit()
     rail = window.rail
     assert window.tabs.tabBar().isHidden()   # the rail shows the tabs, not the bar
+    assert rail.is_open() and window.cfg.sidebar_open   # open by default: names, not just icons
+    rail.toggle.click()
     assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
     b = rail.buttons[1]
     assert b.text() == "" and b.toolTip() == "" and b.accessibleName() == "Radio"
@@ -617,6 +619,7 @@ def test_setup_stacks_long_controls_without_sideways_scrolling(window, qapp):
     """Long translated controls must fit the viewport, then unfold at a wider size."""
     from PySide6.QtWidgets import QBoxLayout
 
+    window.rail.set_open(False)   # the widths below assume the shut rail
     window.cfg.route = "mic"
     window._update_flow()
     window.btn_install.setText("Meine Sounds direkt in mein Mikro legen für Discord und Spiele")
