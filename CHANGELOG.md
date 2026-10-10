@@ -8,6 +8,8 @@
   it says the connection dropped, so you can try again.
 - A slow download from a site that doesn't say how big the file is no longer stops
   after 5 minutes with "The download stopped moving".
+- A backup made after going back to an older version no longer carries the newer
+  version's settings it doesn't know, which could be private to your PC.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
