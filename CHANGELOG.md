@@ -6,6 +6,7 @@
   keyboard navigation, so startup focus no longer looks like a second selected tab.
 - The Voice tab's off state says "Voice effects off — mic unchanged" as plain
   status text. It no longer looks clickable or opens the voice changer.
+- **Cards and the file-drop hint stay in sync.** Resizing, moving, adding or filtering sounds clears the old drop-area border and label as soon as the cards move.
 
 - ***Count me in* also counts roughly how long the app was open** since the last daily count (under 15 minutes, up to an hour, 1-3 hours, 3-8 hours or more), so we can tell quick checks from all-evening use. Never the times of day; nothing is sent while it's off.
 - **Clearer privacy text for *Count me in*.** It now says plainly that the random ID sent with the anonymous count links your counts together, so we can see how people use the app over time (which tabs, which versions, whether they come back) and what to improve. The only new thing sent is a short tag made from that same ID, so one person's days link up; switching *Count me in* off sends one last anonymous count (no ID) so we know how many people opted out, then nothing at all.
