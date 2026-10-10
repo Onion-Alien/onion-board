@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Starting the app (or changing theme) no longer makes every Desktop icon blink and
+  redraw. Recolouring the app's own shortcuts used to tell Windows to rebuild its whole
+  icon cache; now it only refreshes those shortcuts.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
