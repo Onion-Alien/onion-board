@@ -536,10 +536,10 @@ class RadioDirectory(QObject):
                 if not isinstance(e, ValueError):
                     log.warning("radio directory: reading the answer failed", exc_info=True)
                 after = bad
-            try:
-                self._call.emit(after)
-            except RuntimeError:   # the Radio tab was closed meanwhile
-                pass
+            # emitted on the UI thread: the Radio tab switched off during an emit from
+            # here freed this mid-emit (an access violation, issue #339)
+            from soundboard.ui import busy
+            busy.emit(self._call, after)
         _start_for(self, run, "radio-directory")
 
     @property
@@ -884,7 +884,8 @@ class RadioPlayer(QObject):
         except ValueError:   # a name: where it leads is looked up first, off the UI thread
             self._set_state("connecting")
             gen = self._gen
-            _start_for(self, lambda: self._looked_up.emit(gen, _name_is_local(host)),
+            from soundboard.ui import busy   # (emitted on the UI thread, as above)
+            _start_for(self, lambda: busy.emit(self._looked_up, gen, _name_is_local(host)),
                        "radio-lookup")
             return
         self._open()
