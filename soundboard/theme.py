@@ -780,6 +780,24 @@ QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$l
 QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
 QPushButton#live:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
+QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
+QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }
+QDialog#recorddialog QRadioButton#recordsource { background:$panel; border:1px solid $border; border-radius:12px; padding:12px 14px; spacing:8px; font-weight:600; }
+QDialog#recorddialog QRadioButton#recordsource:hover { background:$card_hi; border-color:$border_hi; }
+QDialog#recorddialog QRadioButton#recordsource:checked { background:$card_hi; border-color:$accent; color:$text_hi; }
+QDialog#recorddialog QRadioButton#recordsource:focus { border-color:$text_hi; }
+QDialog#recorddialog QRadioButton#recordsource:disabled { color:$muted; }
+QFrame#recordstudio, QFrame#recordreview { background:$panel; border:1px solid $border; border-radius:16px; }
+QFrame#recordstudio QLabel, QFrame#recordreview QLabel { background:transparent; }
+QDialog#recorddialog QLabel#recordtime { font-size:28pt; font-weight:600; color:$text_hi; }
+QDialog#recorddialog QLabel#recordphase { color:$muted; font-size:9pt; }
+QDialog#recorddialog QLabel#recordphase[recording="true"] { color:$danger_text; }
+QDialog#recorddialog QPushButton#rec { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; border-radius:14px; font-weight:700; }
+QDialog#recorddialog QPushButton#rec:hover { background:$danger_hover; border-color:$danger_text; }
+QDialog#recorddialog QPushButton#rec:checked { background:#d32f2f; border-color:#ff6b6b; color:white; }
+QDialog#recorddialog QPushButton#rec:checked:hover { background:#b92424; }
+QDialog#recorddialog QPushButton#rec:focus { border-color:$text_hi; }
+QDialog#recorddialog QPushButton#rec:disabled { background:$inset; border-color:$border; color:$muted; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
