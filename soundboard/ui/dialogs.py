@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QPushButton, QScrollArea, QSlider, QTabWidget,
@@ -31,6 +31,72 @@ COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue
 SPEED = voicefx.Param("speed", _("Speed"), *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), *soundfx.PITCH_RANGE, 0.0, " st", 1)
 BOOST = voicefx.Param("gain_db", _("Boost"), *soundfx.GAIN_RANGE, 0.0, " dB", 1)
+
+
+class TabHelpPopup(QDialog):
+    """A compact help card with a mascot; Qt dismisses it on an outside click."""
+
+    def __init__(self, title: str, text: str, *, owl: bool = False, parent=None):
+        super().__init__(parent, Qt.Popup | Qt.FramelessWindowHint)
+        from soundboard.bunny import bunny_pixmap
+        from soundboard.ui.owl import owl_image
+
+        self.setWindowTitle(title)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setFixedWidth(min(560, self.screen().availableGeometry().width() - 24))
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        frame = QFrame()
+        frame.setObjectName("tabHelpCard")
+        frame.setStyleSheet(
+            f"QFrame#tabHelpCard {{ background: {theme.T['panel']}; "
+            f"border: 1px solid {theme.T['border']}; border-radius: 16px; }}"
+            "QFrame#tabHelpCard QLabel { background: transparent; border: none; padding: 0; }")
+        outer.addWidget(frame)
+        layout = QVBoxLayout(frame)
+        layout.setContentsMargins(24, 20, 24, 18)
+        layout.setSpacing(16)
+
+        header = QHBoxLayout()
+        self.heading = QLabel(title)
+        self.heading.setTextFormat(Qt.PlainText)
+        self.heading.setWordWrap(True)
+        self.heading.setStyleSheet(
+            f"font-size: 19px; font-weight: 600; color: {theme.T['text_hi']};")
+        header.addWidget(self.heading, 1)
+        close = QPushButton("×")
+        close.setAccessibleName(_("Close"))
+        close.setFixedSize(28, 28)
+        close.setStyleSheet(
+            f"QPushButton {{ border: none; background: transparent; "
+            f"font-size: 21px; color: {theme.T['muted']}; padding: 0; }}"
+            f"QPushButton:hover {{ background: {theme.T['inset']}; "
+            f"color: {theme.T['text_hi']}; border-radius: 7px; }}")
+        close.clicked.connect(self.reject)
+        header.addWidget(close, 0, Qt.AlignTop)
+        layout.addLayout(header)
+
+        content = QHBoxLayout()
+        content.setSpacing(22)
+        self.mascot = QLabel()
+        self.mascot.setFixedSize(88, 104)
+        self.mascot.setAlignment(Qt.AlignCenter)
+        dpr = self.devicePixelRatioF()
+        picture = (QPixmap.fromImage(owl_image(round(92 * dpr), look=0.0))
+                   if owl else bunny_pixmap(92, dpr=dpr))
+        picture.setDevicePixelRatio(dpr)
+        self.mascot.setPixmap(picture)
+        content.addWidget(self.mascot, 0, Qt.AlignVCenter)
+        self.body = QLabel(text)
+        self.body.setTextFormat(Qt.PlainText)
+        self.body.setWordWrap(True)
+        self.body.setStyleSheet(f"font-size: 14px; color: {theme.T['text']};")
+        content.addWidget(self.body, 1, Qt.AlignVCenter)
+        layout.addLayout(content)
+
+        footer = QLabel(_("Click outside to close"))
+        footer.setStyleSheet(f"font-size: 11px; color: {theme.T['muted']};")
+        layout.addWidget(footer, 0, Qt.AlignRight)
 
 
 class EffectsPanel(QWidget):

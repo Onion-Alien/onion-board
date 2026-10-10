@@ -46,7 +46,7 @@ from soundboard.shuffle import ShuffleBag
 from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog
+from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash,
                            taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -3858,7 +3858,17 @@ class MainWindow(QMainWindow):
     def _show_tab_info(self):
         info = self._current_tab_info()
         if info:
-            QMessageBox.information(self, info[0], info[1])
+            box = TabHelpPopup(*info, owl=self.tabs.currentWidget() is self.triggers,
+                               parent=self)
+            box.adjustSize()
+            anchor = self.btn_info.mapToGlobal(self.btn_info.rect().bottomRight())
+            screen = self.btn_info.screen().availableGeometry()
+            box.move(max(screen.left(), min(anchor.x() - box.width(),
+                                           screen.right() - box.width() + 1)),
+                     max(screen.top(), min(anchor.y() + 8,
+                                          screen.bottom() - box.height() + 1)))
+            box.exec()
+            box.deleteLater()
 
     # ------------------------------------------------------------------ language
     def _offer_language(self):
