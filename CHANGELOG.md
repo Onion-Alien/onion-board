@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Quick setup mic animation and clear navigation.** Putting sounds straight into your
+  mic from the step-by-step setup guide now plays the Bun speaker-building animation
+  directly inside the wizard, and success toasts no longer appear over or block the
+  Back and Next buttons.
 - The Radio tab's random button always plays a random popular station, whatever list,
   search or filters are showing. Before, it did nothing on an empty list such as
   Favorites with no favorites yet.
