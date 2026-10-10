@@ -341,6 +341,12 @@ def _trash(p, fill):
     p.drawLine(QPointF(13.5, 10), QPointF(13.5, 17))
 
 
+def _archive(p, fill):
+    p.drawRoundedRect(QRectF(3, 4, 18, 4), 1, 1)
+    p.drawRoundedRect(QRectF(4.5, 8, 15, 12), 1.5, 1.5)
+    p.drawLine(QPointF(9, 12), QPointF(15, 12))
+
+
 def _keyboard(p, fill):
     p.drawRoundedRect(QRectF(2.5, 6, 19, 12), 2.5, 2.5)
     for y in (9.5, 12.5):
@@ -605,7 +611,7 @@ SHAPES = {
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
     "download": _download,
     "expand": _expand,
-    "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
+    "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "shield": _shield, "info": _info,

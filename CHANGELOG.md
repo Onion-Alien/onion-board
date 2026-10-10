@@ -5,6 +5,9 @@
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.
+- The Sounds toolbar sits on one smooth surface with evenly sized controls, bigger
+  icons, a microphone for Record and a box for Backup. Search sits right after Add
+  and Record; the folder, Backup, hotkeys and Recently deleted come after it.
 - Idle Apps cards disappear after ten minutes without sound and return when sound
   resumes. Sending, remembered programs, recordings and clip edits stay available.
 - Tab help uses a wider, rounded card with a clear heading, readable text and Bun

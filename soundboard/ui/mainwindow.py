@@ -1174,17 +1174,22 @@ class MainWindow(QMainWindow):
         left = QVBoxLayout(page)
         left.setContentsMargins(0, 8, 0, 0)
         left.setSpacing(8)
-        tb = QHBoxLayout()
-        tb.setSpacing(8)
+        # one framed surface for the toolbar, every control the same height
+        self.sounds_toolbar = QFrame()
+        self.sounds_toolbar.setObjectName("soundstoolbar")
+        tb = QHBoxLayout(self.sounds_toolbar)
+        tb.setContentsMargins(8, 6, 8, 6)
+        tb.setSpacing(6)
         add = self.btn_add = QPushButton(_("Add sounds"))
         add.setObjectName("primary")
         add.setToolTip(_("Add sound files (or drag them onto the window)"))
         add.clicked.connect(self.add_dialog)
-        icons.set_icon(add, "plus", "on_accent")
+        icons.set_icon(add, "plus", "on_accent", size=18)
         self.btn_record = QPushButton(_("Record"))
-        icons.set_icon(self.btn_record, "record", "#ff4d4f")
+        icons.set_icon(self.btn_record, "mic", size=18)
         self.btn_record.clicked.connect(self.record_dialog)
         self.search = QLineEdit()
+        self.search.setObjectName("soundssearch")
         # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
         # has the rest
         self.search.setPlaceholderText(_("Search sounds or paste a link"))
@@ -1210,12 +1215,12 @@ class MainWindow(QMainWindow):
         self.btn_yt.setAccessibleName(_("Search"))
         self.btn_yt.setToolTip(_("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
                                  "what's typed (or press Enter), play or add the audio"))
-        icons.set_icon(self.btn_yt, "browser")
+        icons.set_icon(self.btn_yt, "browser", size=18)
         self.btn_yt.clicked.connect(self.search_youtube)
         more = self.btn_more = QPushButton(_("Backup"))
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
                           "sound pack"))
-        icons.set_icon(more, "history")
+        icons.set_icon(more, "archive", size=18)
         mm = QMenu(more)
         icons.set_icon(mm.addAction(_("Import a backup or sound pack…"), self.import_dialog),
                        "folder")
@@ -1241,6 +1246,7 @@ class MainWindow(QMainWindow):
             self._act_export_cat.setEnabled(bool(self.cfg.category)),
             pm.menuAction().setVisible(bool(backup.packs()))))
         more.setMenu(mm)
+        more.setProperty("toolbarMenu", True)
         self.btn_bin = QPushButton()
         self.btn_bin.setToolTip(_("Sounds you removed: bring them back, exactly as they were"))
         icons.set_icon(self.btn_bin, "trash")
@@ -1248,25 +1254,27 @@ class MainWindow(QMainWindow):
         self.btn_folder = QPushButton(_("Sounds folder"))
         self.btn_folder.setToolTip(_("Open the folder your sounds are kept in. Sound files you "
                                      "drag into it join the board by themselves."))
-        icons.set_icon(self.btn_folder, "folder")
+        icons.set_icon(self.btn_folder, "folder", size=18)
         self.btn_folder.clicked.connect(self.open_sounds_folder)
-        tb.addWidget(add)
-        tb.addWidget(self.btn_record)
-        tb.addWidget(self.btn_folder)
-        tb.addWidget(more)
-        tb.addWidget(self.btn_bin)
         self._label_bin()
         # the most-used app-wide hotkeys in one click; the full list is in Settings
         self.btn_keys = QPushButton()
         self.btn_keys.setToolTip(_("Quick hotkeys: set the ones people use most, or open every "
                                    "hotkey in Settings"))
-        icons.set_icon(self.btn_keys, "keyboard")
+        icons.set_icon(self.btn_keys, "keyboard", size=18)
         km = QMenu(self.btn_keys)
         km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
         self.btn_keys.setMenu(km)
-        tb.addWidget(self.btn_keys)
+        self.btn_keys.setProperty("toolbarMenu", True)
+        # make things, find things, then the library's tools
+        tb.addWidget(add)
+        tb.addWidget(self.btn_record)
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
+        tb.addWidget(self.btn_folder)
+        tb.addWidget(more)
+        tb.addWidget(self.btn_keys)
+        tb.addWidget(self.btn_bin)
         # the pads' order (as dragged, A-Z, newest, most played) and cards or a list
         self.btn_view = QPushButton()
         self.btn_view.setAccessibleName(_("Order and view"))
@@ -1274,6 +1282,7 @@ class MainWindow(QMainWindow):
         vm.setToolTipsVisible(True)
         vm.aboutToShow.connect(lambda: self._fill_view_menu(vm))
         self.btn_view.setMenu(vm)
+        self.btn_view.setProperty("toolbarMenu", True)
         self._label_view()
         tb.addWidget(self.btn_view)
         # Add sounds is the one filled button; the rest are plain until hovered
@@ -1297,7 +1306,10 @@ class MainWindow(QMainWindow):
         tb.addWidget(size_lbl)
         tb.addWidget(size)
         self._pad_size = (size_lbl, size)
-        left.addLayout(tb)
+        for b in (add, self.btn_record, self.btn_yt, self.btn_folder, more, self.btn_keys,
+                  self.btn_bin, self.btn_view, self.search):
+            b.setFixedHeight(40)
+        left.addWidget(self.sounds_toolbar)
         self.cat_bar = self._build_categories()
         left.addWidget(self.cat_bar)
         self.linkbar = LinkBar(
