@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A settings change made just as the background saver went idle is no longer lost
+  (it could go unsaved until the next change, or be dropped at quit).
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The

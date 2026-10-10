@@ -869,8 +869,11 @@ class Saver:
         while True:
             with self._cond:
                 while self._pending is None:
-                    if not self._cond.wait(30):
-                        self._thread = None   # idle: the next save starts a new one
+                    # timed out with nothing pending: idle, the next save starts a new
+                    # thread (a save() can take the lock as the wait times out: still
+                    # this thread's to write)
+                    if not self._cond.wait(30) and self._pending is None:
+                        self._thread = None
                         return
                 snap, self._pending, self._busy = self._pending, None, True
             try:
