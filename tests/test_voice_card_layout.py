@@ -1,7 +1,7 @@
 """Card actions stay above their choices; square fold arrows have usable content boxes."""
 import pytest
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QStyle, QStyleOptionButton
+from PySide6.QtWidgets import QLabel, QStyle, QStyleOptionButton
 
 from soundboard import theme
 from soundboard import modules
@@ -64,5 +64,52 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         assert panel.lbl_state.text() == "Ready"
     finally:
         panel.shutdown()
+        panel.close()
+        panel.deleteLater()
+
+
+@pytest.mark.parametrize("name", ["Dark", "Light"])
+@pytest.mark.parametrize("width", [340, 580])
+def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp_path,
+                                                        name, width):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    old = theme.current_name
+    theme.apply(qapp, name)
+    panel = VoicePanel(FakeEngine(), {}, {})
+    speech = panel.speech
+    try:
+        speech.setParent(None)
+        speech.title.show()
+        speech.start_box.show()
+        speech.setFixedWidth(width)
+        speech.lbl_state.setText("Starting: the computer voice is getting ready to speak "
+                                 "your words in the selected language.")
+        speech.show()
+        qapp.processEvents()
+        assert speech.start_box.geometry().bottom() < speech.lbl_intro.geometry().top()
+        assert speech.lbl_intro.geometry().bottom() < speech.cb_voice.geometry().top()
+        assert speech.b_live.geometry().left() == 0
+        assert speech.b_live.geometry().right() < speech.lbl_state.geometry().left()
+        assert speech.start_box.rect().contains(speech.lbl_state.geometry())
+        assert speech.start_box.rect().contains(speech.b_live.geometry())
+        assert speech.lbl_state.wordWrap()
+        speech.grab().save(str(tmp_path / f"computer-voice-{name}-{width}.png"))
+    finally:
+        speech.close()
+        speech.setParent(panel)
+        panel.shutdown()
+        panel.deleteLater()
+        theme.apply(qapp, old)
+
+
+def test_voice_changer_action_precedes_description(qapp):
+    from soundboard.ui.voicepanel import VoiceFxPanel
+    panel = VoiceFxPanel({})
+    try:
+        layout = panel.layout()
+        assert layout.itemAt(1).widget() is panel.btn_power
+        assert isinstance(layout.itemAt(2).widget(), QLabel)
+        assert layout.itemAt(2).widget().wordWrap()
+    finally:
         panel.close()
         panel.deleteLater()
