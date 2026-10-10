@@ -1,0 +1,8 @@
+#!/bin/sh
+# A merge commit doesn't run post-commit, so `git merge` / `git pull` left the local
+# time zone in it: re-stamp it in UTC like post-commit does. Only a merge commit made
+# here just now (two parents, on no remote yet); a fast-forward moves HEAD to commits
+# that are already pushed, and those are never rewritten.
+[ "$(git log -1 --format=%P HEAD | wc -w)" -ge 2 ] || exit 0
+[ -z "$(git branch -r --contains HEAD 2>/dev/null)" ] || exit 0
+exec sh "$(git rev-parse --show-toplevel)/.githooks/post-commit"

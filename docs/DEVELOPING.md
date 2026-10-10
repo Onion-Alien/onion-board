@@ -9,7 +9,7 @@ root in PowerShell unless noted.
 ```powershell
 py -3.13 -m venv .venv                 # Python 3.12+ works
 .venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt
-git config core.hooksPath .githooks    # secrets check on every commit
+git config core.hooksPath .githooks    # secrets check, commit times in UTC (required)
 ```
 
 Build tools, only needed for step 4 (and for the mic effect's own tests):
@@ -269,7 +269,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 ## 7. Commit and release
 
 1. Section 3 passes. The pre-commit hook re-runs the secrets scan.
-2. Commit, push, and open a pull request (main takes changes by PR only). CI
+2. Commit, push, and open a pull request (main takes changes by PR only). Merge it
+   with `sh scripts/merge_pr.sh N`, never `gh pr merge` or GitHub's Merge / Update
+   branch buttons: those write the commit in your local time zone, and every commit
+   here must be in UTC (CLAUDE.md, *Commit times*). CI
    (`.github/workflows/checks.yml`) runs on the PR and on main after a merge: the
    secrets scan over the full history, gitleaks, ruff and pytest. A newer push to
    the PR cancels its unfinished run.

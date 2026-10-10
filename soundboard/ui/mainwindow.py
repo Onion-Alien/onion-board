@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFil
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys, ytdl, ytworker
+from soundboard import theme, winkeys, winpath, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -500,9 +500,8 @@ class MainWindow(QMainWindow):
         self.config_saved.connect(self._on_saved)
 
         self.setup_state = ""
-        self._pill_short = False          # the header pill's short text (narrow window)
+        self._pill_long = ""              # the setup pill's whole text (its tip, its name)
         self._pill_good = False           # set up: the pill hides (_show_pill)
-        self._pill_tight = False          # too narrow for the pill at all
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
         self._default_out = appaudio.default_output_name()   # see _follow_default_output
         self._build_ui()
@@ -654,7 +653,7 @@ class MainWindow(QMainWindow):
             self._pending_note = self.cfg.load_note
 
     # ------------------------------------------------------------------ UI build
-    # Layout: header (setup pill, Stop all, Settings) / tabs / mixer strip / status.
+    # Layout: the tab rail (with Live, Stop all and the setup pill) / tabs / mixer strip.
     # Every tab is built the same way: a toolbar row on top, its content, and a
     # bottom bar ending in "Volume [slider %] | Hear it myself" for that source.
     def _build_ui(self):
@@ -676,10 +675,8 @@ class MainWindow(QMainWindow):
         rv.setContentsMargins(BODY_SIDE, 10, BODY_SIDE, 10)
         rv.setSpacing(8)
 
-        # ---- header: setup status, Stop all, Settings (the logo and name are on top of
-        # the tab rail, made here for _paint_logo)
-        head = QHBoxLayout()
-        head.setSpacing(10)
+        # ---- what was the header: the onion and name, the setup pill, Live, Stop all and
+        # Settings, all on the tab rail now (ui/sidebar.py); made here for _paint_logo
         self.logo = LogoWidget()
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
@@ -691,46 +688,44 @@ class MainWindow(QMainWindow):
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.PointingHandCursor)
-        self.pill.setToolTip(_("Where your sounds go, click for setup and testing"))
+        self.pill.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         self.pill.clicked.connect(lambda: self.tabs.setCurrentWidget(self.setup_page))
-        head.addWidget(self.pill)
         # Offline mode: what only works online is out of the way, and this says why
         # (one click to the switch)
-        self.btn_offline = QPushButton(_("Offline"))
+        self.btn_offline = QPushButton()
         self.btn_offline.setObjectName("pill")
         self.btn_offline.setCursor(Qt.PointingHandCursor)
-        self.btn_offline.setToolTip(_("Offline mode is on: nothing goes online, and what needs "
-                                      "the internet is hidden. Click to change it."))
+        sidebar.put(self.btn_offline, _("Offline"),
+                    tip=_("Offline mode is on: nothing goes online, and what needs the "
+                          "internet is hidden. Click to change it."))
         self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
-        icons.set_icon(self.btn_offline, "offline")
+        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON)
         self.btn_offline.setVisible(net.offline())
-        head.addWidget(self.btn_offline)
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
         self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.show_update)
-        icons.set_icon(self.btn_update, "next")
+        icons.set_icon(self.btn_update, "next", size=sidebar.ICON)
         self.btn_update.hide()
-        head.addWidget(self.btn_update)
         # the two switches for everything at once, whatever tab you're on
         self.btn_air = QPushButton()
         self.btn_air.setObjectName("onair")
         self.btn_air.setCheckable(True)
         self.btn_air.setChecked(True)
         self.btn_air.toggled.connect(self.set_sending)
-        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff")
-        head.addWidget(self.btn_air)
-        self._air_size = 0   # 0 full text, 1 one word, 2 icon only (small windows)
+        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON)
         self.set_sending(True)
-        self.stop_btn = QPushButton(_("Stop all"))
+        # Who's listening, beside Live on the rail (the full picker is on the Setup tab)
+        from soundboard.ui.destpanel import ModeButton
+        self.mode_btn = ModeButton(self)
+        self.stop_btn = QPushButton()
         self.stop_btn.setObjectName("danger")
         self.stop_btn.setProperty("quiet", True)   # red text, no box: Live is the loud one
-        self.stop_btn.setToolTip(_("Stops every sound, the radio and every program"))
-        self.stop_btn.clicked.connect(lambda: (self.stop_all(),
-                                               busy.flash(self.stop_btn, _("✓ Stopped"), 1200)))
-        icons.set_icon(self.stop_btn, "stop", "danger_text", size=14)
-        head.addWidget(self.stop_btn)
+        sidebar.put(self.stop_btn, _("Stop all"),
+                    tip=_("Stops every sound, the radio and every program"))
+        self.stop_btn.clicked.connect(self._stop_all_clicked)
+        icons.set_icon(self.stop_btn, "stop", "danger_text", size=sidebar.ICON)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -738,8 +733,6 @@ class MainWindow(QMainWindow):
         self.gear.clicked.connect(lambda: self.open_settings())
         icons.set_icon(self.gear, "settings", size=sidebar.ICON)
         self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
-        head.addStretch(1)
-        rv.addLayout(head)
         self._paint_logo()
 
         # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
@@ -915,11 +908,16 @@ class MainWindow(QMainWindow):
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs, self.btn_info], self.cfg.sidebar_open, [self.gear],
-            self._rail_opened)
+            self._rail_opened,
+            # Live and Stop all first, so they never move; the pills only when needed
+            # (at the rail's foot, as icons)
+            [self.btn_air, self.mode_btn, self.stop_btn, self.pill, self.btn_offline,
+             self.btn_update])
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail
         prev = self.tabs.previousInFocusChain()
-        for w in (*self.rail.buttons, self.btn_more_tabs, self.btn_info, self.gear,
+        for w in (*self.rail.buttons, self.btn_more_tabs, self.btn_info, *self.rail.status,
+                  self.gear,
                   self.rail.toggle, self.tabs):
             QWidget.setTabOrder(prev, w)
             prev = w
@@ -1271,14 +1269,6 @@ class MainWindow(QMainWindow):
         size.valueChanged.connect(lambda _v: self._pad_size_wait.isActive()
                                   or self._pad_size_wait.start())
         no_wheel(size)
-        # Who's listening, one click away (the full picker is on the Setup tab)
-        from soundboard.ui.destpanel import ModeCombo
-        mode_lbl = QLabel(_("Listening:"))
-        mode_lbl.setObjectName("muted")
-        self.mode_combo = ModeCombo(self)
-        tb.addWidget(mode_lbl)
-        tb.addWidget(self.mode_combo)
-        self._mode_pick = (mode_lbl, self.mode_combo)
         size_lbl = QLabel(_("Pad size"))
         size_lbl.setObjectName("muted")
         tb.addWidget(size_lbl)
@@ -2772,40 +2762,46 @@ class MainWindow(QMainWindow):
         self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
-        short = self._pill_short
-        if state == "off":
-            pill = _("Only you") if short else _("Not sending to others (only you hear sounds)")
-        elif state == "ok" and route == "mic":
-            pill = _("Connected") if short else _("In your mic: Discord / games hear your sounds")
-        elif mic_busy:
-            pill = _("Setting up…") if short else _("Setting up your mic…")
-        elif route == "mic" and state != "missing":
-            pill = _("Not working") if short else _("Not reaching your mic, click to fix")
-        elif route == "mic" and directmic.needs_repair(direct):
-            pill = _("Repair needed") if short else _("One click needed: repair your mic")
-        elif route == "mic":
-            pill = (_("One click") if short
-                    else _("One click: put your sounds straight into your mic"))
-        elif state == "ok" and not vm:
-            pill = _("Connected") if short else _("Sending to:  {dev}", dev=dev)
-        elif state == "ok":
-            pill = _("Connected") if short else _("Your mic in Discord / games:  {vm}", vm=vm)
-        elif state == "missing":
-            pill = (_("Setup needed") if short
-                    else _("One-time setup needed, others can't hear you yet"))
-        elif route == "device":
-            pill = (_("Not connected") if short
-                    else _("Not sending: pick a device on the Setup tab"))
-        else:   # (the Setup tab offers straight into the mic first)
-            pill = (_("Not connected") if short
-                    else _("Not connected: click to fix"))
+        pills = []   # (short, whole): the open rail shows the short one
+        for short in (True, False):
+            if state == "off":
+                pill = _("Only you") if short else _("Not sending to others (only you hear sounds)")
+            elif state == "ok" and route == "mic":
+                pill = (_("Connected") if short
+                        else _("In your mic: Discord / games hear your sounds"))
+            elif mic_busy:
+                pill = _("Setting up…") if short else _("Setting up your mic…")
+            elif route == "mic" and state != "missing":
+                pill = _("Not working") if short else _("Not reaching your mic, click to fix")
+            elif route == "mic" and directmic.needs_repair(direct):
+                pill = _("Repair needed") if short else _("One click needed: repair your mic")
+            elif route == "mic":
+                pill = (_("One click") if short
+                        else _("One click: put your sounds straight into your mic"))
+            elif state == "ok" and not vm:
+                pill = _("Connected") if short else _("Sending to:  {dev}", dev=dev)
+            elif state == "ok":
+                pill = _("Connected") if short else _("Your mic in Discord / games:  {vm}", vm=vm)
+            elif state == "missing":
+                pill = (_("Setup needed") if short
+                        else _("One-time setup needed, others can't hear you yet"))
+            elif route == "device":
+                pill = (_("Not connected") if short
+                        else _("Not sending: pick a device on the Setup tab"))
+            else:   # (the Setup tab offers straight into the mic first)
+                pill = (_("Not connected") if short
+                        else _("Not connected: click to fix"))
+            pills.append(pill)
+        pill_short, pill = pills
         good = state in ("ok", "off")
         if good != self._pill_good:
             # all set: Live says it, so the pill only shows when something needs a click
             self._pill_good = good
             self._show_pill()
-        if self.pill.text() != pill:
-            self.pill.setText(pill)
+        if self._pill_long != pill:
+            self._pill_long = pill
+            sidebar.put(self.pill, pill_short, pill,
+                        _("Where your sounds go, click for setup and testing"))
             self.pill.setIcon(icons.icon("headphones", "live_text") if state == "off" else
                               icons.icon("check", "live_text") if good else
                               icons.icon("warn", "warn_text"))
@@ -3630,7 +3626,7 @@ class MainWindow(QMainWindow):
             return False
         self.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
         icons.retheme_live()
-        self.pill.setText("")   # forces _update_flow to repaint its icon
+        self._pill_long = ""   # forces _update_flow to repaint its icon
         self._update_status()
         return True
 
@@ -3956,7 +3952,7 @@ class MainWindow(QMainWindow):
         self.triggers.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
-        self.pill.setText("")   # forces _update_flow to repaint its icon
+        self._pill_long = ""   # forces _update_flow to repaint its icon
         self._update_status()   # the hints and flow, in this theme's status colours
         self._paint_logo()
         self._save_later()
@@ -4147,10 +4143,8 @@ class MainWindow(QMainWindow):
             text = (_("Live: stream output only"), _("Live"), "")
         else:
             text = (_("Only you hear sounds"), _("Only you"), "")
-        # one word ("Live"); the whole sentence leads its tooltip and is what a screen
-        # reader says
-        self.btn_air.setText(text[max(self._air_size, 1)])
-        self.btn_air.setAccessibleName(text[0])
+        # one word ("Live") on the open rail; the whole sentence leads its tooltip and
+        # is what a screen reader says
         if not on:
             tip = _("Click to go live again: others hear you and your sounds")
         elif others:
@@ -4162,21 +4156,19 @@ class MainWindow(QMainWindow):
         else:
             tip = (_("Nothing goes out to others: pick where to send on the Setup tab (Send my "
                      "sounds to)"))
-        if self._pill_good and self.pill.text():   # the hidden pill's "In your mic…"
-            tip = f"{self.pill.text()}\n{tip}"
-        self.btn_air.setToolTip(f"{text[0]}\n{tip}")
+        if self._pill_good and self._pill_long:   # the hidden pill's "In your mic…"
+            tip = f"{self._pill_long}\n{tip}"
+        sidebar.put(self.btn_air, text[1], text[0], tip)
         if hasattr(self, "mini_air"):
             self.mini_air.setChecked(on)
             self.mini_air.setToolTip(self.btn_air.toolTip())
 
-    def _shorten_air(self, size: int) -> Callable[[bool], None]:
-        def apply(compact: bool):
-            size_now = max(self._air_size, size) if compact else min(self._air_size, size - 1)
-            if size_now != self._air_size:
-                self._air_size = size_now
-                self.set_sending(self.btn_air.isChecked())
-                responsive.touch(self.btn_air)
-        return apply
+    def _stop_all_clicked(self):
+        self.stop_all()
+        # only an icon on the rail: a tick for a moment says it worked
+        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON)
+        QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
+                                                       size=sidebar.ICON))
 
     def stop_all(self):
         self._queue.clear()
@@ -5231,16 +5223,18 @@ class MainWindow(QMainWindow):
                 import_all(todo)
 
         def import_all(files):
-            for i, f in enumerate(files):
+            for i, shown in enumerate(files):
+                f = shown   # read through any folder link Windows won't follow
                 try:
+                    f = str(winpath.usable(shown))
                     fp = fingerprint(f)
                     if fp and fp in known:
-                        if f in extras:
+                        if shown in extras:
                             self.bridge.imported.emit(None, None, "")   # already moved over
                             continue
                         raise RuntimeError(_("already in your library as “{name}”",
                                              name=known[fp]))
-                    x = extras.get(f)   # from another soundboard: named as it was there
+                    x = extras.get(shown)   # from another soundboard: named as it was there
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
                                              name=x.name if x is not None else "")
                     if x is not None:
@@ -5258,7 +5252,7 @@ class MainWindow(QMainWindow):
                     self.bridge.imported.emit(meta, data, "")   # it's in there as ours
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't import %s: %s", f, e)
-                    self.bridge.imported.emit(None, None, f"{Path(f).name}: {errors.plain(e)}")
+                    self.bridge.imported.emit(None, None, f"{Path(shown).name}: {errors.plain(e)}")
         threading.Thread(target=run, daemon=True, name="import").start()
         self.status.setText(_("Importing {count} file(s)…", count=count))
         busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in
@@ -6847,8 +6841,7 @@ class MainWindow(QMainWindow):
         self._show_urgent()
 
     def _set_update_pill(self, text: str, tip: str, enabled: bool = True):
-        self.btn_update.setText(text)
-        self.btn_update.setToolTip(tip)
+        sidebar.put(self.btn_update, text, tip=tip)
         self.btn_update.setEnabled(enabled)
         self.btn_update.show()
 
@@ -6933,7 +6926,8 @@ class MainWindow(QMainWindow):
 
     def _on_update_progress(self, pct: int):
         if self._downloading:
-            self.btn_update.setText(_("Downloading update… {pct}%", pct=pct))
+            sidebar.put(self.btn_update, _("Downloading update… {pct}%", pct=pct),
+                        tip=self.btn_update.property("railtip") or "")
 
     def _on_update_ready(self, path, err: str):
         self._downloading = False
@@ -7499,15 +7493,10 @@ class MainWindow(QMainWindow):
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
-        f.add(38, "w", r.hide(*self._mode_pick))
         # the ear button shrinks to its icon first: the level bar is the live part
         f.add(12, "w", r.icon_only(self.btn_check))
         f.add(14, "w", r.hide(self.np_time))
         f.add(45, "w", r.hide(self.speed_btn))
-        f.add(20, "w", self._shorten_pill)
-        f.add(58, "w", r.icon_only(self.stop_btn))
-        f.add(24, "w", self._shorten_air(1))
-        f.add(65, "w", self._shorten_air(2))
         f.add(30, "w", r.hide(self.chk_monitor))
         f.add(28, "w", r.icon_only(self.chk_mic))   # its tooltip still explains it
         f.add(55, "w", r.hide(*self._mixer_hp))
@@ -7524,13 +7513,13 @@ class MainWindow(QMainWindow):
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
-        f.add(80, "w", self._show_pill)
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
         self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
         for steps in self._tab_steps.values():
             f.extend(steps)
         # height: the status line, then the whole mixer strip
+        f.add(5, "h", self.rail.compact)   # the rail's buttons closer together, first
         f.add(10, "h", self.status.set_room)
         f.add(30, "h", r.hide(*self._deck_titles))
         f.add(40, "h", r.hide(self.mixer))
@@ -7538,17 +7527,9 @@ class MainWindow(QMainWindow):
         self._stack_cols = (r.stack(self._setup_cols), *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
 
-    def _show_pill(self, tight: bool | None = None):
-        """The setup pill: only while something needs fixing, and not in a narrow window."""
-        if tight is not None:
-            self._pill_tight = tight
-        self.pill.setVisible(not self._pill_tight and not self._pill_good)
-        responsive.touch(self.pill)
-
-    def _shorten_pill(self, short: bool):
-        if short != self._pill_short:
-            self._pill_short = short
-            self._update_flow()
+    def _show_pill(self):
+        """The setup pill: only while something needs fixing."""
+        self.pill.setVisible(not self._pill_good)
 
     def _refit(self):
         size = self._pages.size()
