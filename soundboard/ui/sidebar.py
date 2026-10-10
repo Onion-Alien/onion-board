@@ -19,7 +19,7 @@ from soundboard.ui import icons
 
 ICON = 20          # a tab's icon on the rail
 SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4...
-OPEN_W = 168       # ...and opened out
+OPEN_W = 180       # ...and opened out (room for "an app by Onion Alien" in any theme font)
 LOGO = 24          # the onion: with its 5 px glow room, a tab button's width (BUTTON_W)
 BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column
 COMPACT_H = 28     # every button's height in a short window (else as tall as a tab's)
