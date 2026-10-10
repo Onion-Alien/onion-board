@@ -2074,7 +2074,6 @@
   "Only others in the call get it, not your stream output": "Dostanou jej pouze ostatní účastníci hovoru, nikoli váš výstup streamu",
   "Only your stream output gets it (music for your viewers), not the call": "Dostane jej pouze výstup vašeho streamu (hudba pro vaše diváky), nikoli hovor",
   "Or type a line and it's spoken in the voice": "Nebo napište řádek a bude mluvený hlasem",
-  "Or type a line and press Enter…": "Nebo napište řádek a stiskněte Enter…",
   "Other pasted links": "Další vložené odkazy",
   "Others hear only the spoken voice, not your real one.": "Ostatní slyší pouze mluvený hlas, ne váš skutečný.",
   "Others in the call and your stream output both get it": "Dostanou to ostatní účastníci hovoru a váš výstup streamu",
@@ -2212,7 +2211,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streamování, nahrávání, Voicemeeter nebo mixážní pult.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Zapněte efekty a přetáhněte jejich posuvníky, abyste si vytvořili svůj vlastní hlas. Změna čehokoli se přepne na „Můj vlastní mix“; líbí se to? Uložte jej jako hlas a získá vlastní tlačítko.",
   "Take this program off the list": "Odstraňte tento program ze seznamu",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Mluvte anglicky a ostatní slyší jiný jazyk. Hlas AI nebo měnič hlasu to říká, když je jeden z nich zapnutý; v opačném případě stiskněte tlačítko Start a ozve se počítačový hlas. Nebo zadejte řádek ve spodní části.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Mluvte a ostatní slyší jinou osobu: vaše slova a tón, jiný hlas, živě. Běží na tomto PC (asi jedno jádro CPU, když mluvíte, nic, když jste v klidu); co říkáš, to nikdy neopustí.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Mluvení uvnitř helmy, masky nebo kovové krabice.",
@@ -3080,5 +3078,7 @@
   "Library": "Knihovna",
   "Quick hotkeys": "Rychlé zkratky",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Poslech: {mode}"
+  "Listening: {mode}": "Poslech: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Mluvte anglicky a ostatní slyší jiný jazyk. Hlas AI nebo měnič hlasu to říká, když je jeden z nich zapnutý; v opačném případě stiskněte tlačítko Start a ozve se počítačový hlas.",
+  "Type a line and press Enter…": "Napište řádek a stiskněte Enter…"
 }

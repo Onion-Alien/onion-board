@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Το λαμβάνουν μόνο άλλοι στην κλήση, όχι η έξοδος ροής σας",
   "Only your stream output gets it (music for your viewers), not the call": "Το λαμβάνει μόνο η έξοδος ροής σας (μουσική για τους θεατές σας), όχι η κλήση",
   "Or type a line and it's spoken in the voice": "Ή πληκτρολογήστε μια γραμμή και εκφωνείται στη φωνή",
-  "Or type a line and press Enter…": "Ή πληκτρολογήστε μια γραμμή και πατήστε Enter…",
   "Other pasted links": "Άλλοι επικολλημένοι σύνδεσμοι",
   "Others hear only the spoken voice, not your real one.": "Άλλοι ακούνε μόνο την προφορική φωνή, όχι την αληθινή σου.",
   "Others in the call and your stream output both get it": "Άλλοι στην κλήση και στην έξοδο ροής σας το λαμβάνουν",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, ηχογράφηση, Voicemeeter ή mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Ενεργοποιήστε τα εφέ και σύρετε τα ρυθμιστικά τους για να δημιουργήσετε τη δική σας φωνή. Η αλλαγή οποιουδήποτε στοιχείου αλλάζει σε \"Το δικό μου μείγμα\". αρέσει; Αποθηκεύστε το ως φωνή και θα αποκτήσει ένα δικό του κουμπί.",
   "Take this program off the list": "Αφαιρέστε αυτό το πρόγραμμα από τη λίστα",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Μιλήστε στα αγγλικά και άλλοι ακούνε άλλη γλώσσα. Η φωνή AI ή η αλλαγή φωνής το λέει όταν ένα από αυτά είναι ενεργοποιημένο. Διαφορετικά, πατήστε Έναρξη και η φωνή του υπολογιστή κάνει. Ή πληκτρολογήστε μια γραμμή στο κάτω μέρος.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Μιλήστε και οι άλλοι ακούν ένα διαφορετικό άτομο: τα λόγια και ο τόνος σας, μια άλλη φωνή, ζωντανά. Λειτουργεί σε αυτόν τον υπολογιστή (περίπου ένας πυρήνας CPU ενώ μιλάτε, τίποτα ενώ είστε ήσυχοι). αυτό που λες δεν το αφήνει ποτέ.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Μιλώντας μέσα σε κράνος, μάσκα ή μεταλλικό κουτί.",
@@ -3016,5 +3014,7 @@
   "Library": "Βιβλιοθήκη",
   "Quick hotkeys": "Γρήγορες συντομεύσεις",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Ακρόαση: {mode}"
+  "Listening: {mode}": "Ακρόαση: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Μιλήστε στα αγγλικά και άλλοι ακούνε άλλη γλώσσα. Η φωνή AI ή η αλλαγή φωνής το λέει όταν ένα από αυτά είναι ενεργοποιημένο. Διαφορετικά, πατήστε Έναρξη και η φωνή του υπολογιστή κάνει.",
+  "Type a line and press Enter…": "Πληκτρολογήστε μια γραμμή και πατήστε Enter…"
 }

@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Ang iba lang sa tawag ang nakakakuha nito, hindi ang iyong stream output",
   "Only your stream output gets it (music for your viewers), not the call": "Tanging ang output ng iyong stream ang nakakakuha nito (musika para sa iyong mga manonood), hindi ang tawag",
   "Or type a line and it's spoken in the voice": "O mag-type ng linya at binibigkas ito sa boses",
-  "Or type a line and press Enter…": "O mag-type ng linya at pindutin ang Enter...",
   "Other pasted links": "Iba pang mga na-paste na link",
   "Others hear only the spoken voice, not your real one.": "Naririnig lamang ng iba ang sinasalitang boses, hindi ang iyong tunay.",
   "Others in the call and your stream output both get it": "Ang iba sa tawag at ang output ng iyong stream ay parehong nakakakuha nito",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, recording, Voicemeter o isang mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "I-on ang mga effect at i-drag ang kanilang mga slider para bumuo ng sarili mong boses. Ang pagpapalit ng anuman ay lilipat sa \"Aking sariling halo\"; gusto nito? I-save ito bilang isang boses at nakakakuha ito ng sarili nitong button.",
   "Take this program off the list": "Alisin ang program na ito sa listahan",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Makipag-usap sa Ingles at marinig ng iba ang ibang wika. Sinasabi ito ng boses ng AI o ng tagapagpalit ng boses kapag naka-on ang isa sa kanila; kung hindi man ay pindutin ang Start at isang boses ng computer ang gagawin. O mag-type ng linya sa ibaba.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Mag-usap, at ibang tao ang maririnig ng iba: ang iyong mga salita at tono, isa pang boses, mabuhay. Ito ay tumatakbo sa PC na ito (tungkol sa isang CPU core habang nagsasalita ka, wala habang tahimik ka); hinding-hindi nawawala ang sinasabi mo.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Nagsasalita sa loob ng helmet, mask o metal box.",
@@ -3016,5 +3014,7 @@
   "Library": "Library",
   "Quick hotkeys": "Mga mabilis na hotkey",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Pakikinig: {mode}"
+  "Listening: {mode}": "Pakikinig: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Makipag-usap sa Ingles at marinig ng iba ang ibang wika. Sinasabi ito ng boses ng AI o ng tagapagpalit ng boses kapag naka-on ang isa sa kanila; kung hindi man ay pindutin ang Start at isang boses ng computer ang gagawin.",
+  "Type a line and press Enter…": "Mag-type ng linya at pindutin ang Enter…"
 }

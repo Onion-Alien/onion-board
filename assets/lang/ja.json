@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "ストリーム出力ではなく、通話中の他の人だけがそれを取得します",
   "Only your stream output gets it (music for your viewers), not the call": "ストリーム出力のみがそれ (視聴者のための音楽) を取得し、通話は取得しません",
   "Or type a line and it's spoken in the voice": "または、行を入力すると音声で読み上げられます",
-  "Or type a line and press Enter…": "または、行を入力して Enter キーを押します…",
   "Other pasted links": "他の貼り付けられたリンク",
   "Others hear only the spoken voice, not your real one.": "他の人にはあなたの本当の声ではなく、話された声だけが聞こえます。",
   "Others in the call and your stream output both get it": "通話中の他のユーザーとストリーム出力の両方がそれを取得します",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "ストリーミング、録音、Voicemeeter、またはミキサー。",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "エフェクトをオンにし、スライダーをドラッグして独自の声を構築します。何かを変更すると、「自分のミックス」に切り替わります。好きですか？音声として保存すると、独自のボタンが追加されます。",
   "Take this program off the list": "このプログラムをリストから外します",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "英語で話せば、他の人には別の言語が聞こえます。 AI 音声またはボイスチェンジャーのいずれかがオンになっている場合は、その声が発せられます。それ以外の場合は、「スタート」を押すとコンピュータの音声が聞こえます。または、下部に行を入力します。",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "話すと、他の人には別の人が聞こえます。あなたの言葉や口調、別の声が生きています。この PC 上で実行されます (話している間は約 1 CPU コアが使用されますが、静かにしている間は何も使用されません)。あなたが言ったことは決して残りません。",
   "Talkbox": "トークボックス",
   "Talking inside a helmet, mask or metal box.": "ヘルメット、マスク、金属製の箱の中で話す。",
@@ -2952,5 +2950,7 @@
   "Library": "ライブラリ",
   "Quick hotkeys": "クイックホットキー",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "リスニング: {mode}"
+  "Listening: {mode}": "リスニング: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "英語で話せば、他の人には別の言語が聞こえます。 AI 音声またはボイスチェンジャーのいずれかがオンになっている場合は、その声が発せられます。それ以外の場合は、「スタート」を押すとコンピュータの音声が聞こえます。",
+  "Type a line and press Enter…": "行を入力して Enter キーを押します…"
 }

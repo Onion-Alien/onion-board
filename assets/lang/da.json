@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Kun andre i opkaldet får det, ikke dit streamoutput",
   "Only your stream output gets it (music for your viewers), not the call": "Kun dit streamoutput får det (musik til dine seere), ikke opkaldet",
   "Or type a line and it's spoken in the voice": "Eller skriv en linje, og den siges i stemmen",
-  "Or type a line and press Enter…": "Eller skriv en linje og tryk på Enter...",
   "Other pasted links": "Andre indsatte links",
   "Others hear only the spoken voice, not your real one.": "Andre hører kun den talte stemme, ikke din rigtige.",
   "Others in the call and your stream output both get it": "Andre i opkaldet og dit streamoutput får det begge",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, optagelse, Voicemeter eller en mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Slå effekter til, og træk deres skydere for at bygge din egen stemme. Ændring af noget skifter til \"Mit eget mix\"; kan lide det? Gem den som en stemme, og den får sin egen knap.",
   "Take this program off the list": "Fjern dette program fra listen",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Tal på engelsk, og andre hører et andet sprog. AI-stemmen eller stemmeskifteren siger det, når en af ​​dem er tændt; ellers tryk på Start og en computerstemme gør det. Eller skriv en linje nederst.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Tal, og andre hører en anden person: dine ord og tone, en anden stemme, live. Den kører på denne pc (ca. én CPU-kerne, mens du taler, intet, mens du er stille); hvad du siger, forlader det aldrig.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Taler inde i en hjelm, maske eller metalboks.",
@@ -3016,5 +3014,7 @@
   "Library": "Bibliotek",
   "Quick hotkeys": "Hurtige genveje",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Lytning: {mode}"
+  "Listening: {mode}": "Lytning: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Tal på engelsk, og andre hører et andet sprog. AI-stemmen eller stemmeskifteren siger det, når en af ​​dem er tændt; ellers tryk på Start og en computerstemme gør det.",
+  "Type a line and press Enter…": "Skriv en linje og tryk på Enter…"
 }

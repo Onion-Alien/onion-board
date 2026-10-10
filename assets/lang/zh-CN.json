@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "只有通话中的其他人才能获取它，而不是您的流输出",
   "Only your stream output gets it (music for your viewers), not the call": "只有您的流输出才能获取它（为观众提供的音乐），而不是呼叫",
   "Or type a line and it's spoken in the voice": "或者输入一行，然后用语音读出",
-  "Or type a line and press Enter…": "或者输入一行并按 Enter...",
   "Other pasted links": "其他粘贴链接",
   "Others hear only the spoken voice, not your real one.": "其他人只能听到口头声音，而不是您的真实声音。",
   "Others in the call and your stream output both get it": "通话中的其他人和您的流输出都可以得到它",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "流媒体、录音、Voicemeeter 或混音器。",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "打开效果并拖动滑块来构建您自己的声音。更改任何内容都会切换到“我自己的混音”；喜欢吗？将其保存为声音，它就会有自己的按钮。",
   "Take this program off the list": "将此程序从列表中删除",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "用英语交谈，其他人听到的是另一种语言。当其中之一打开时，AI语音或变声器会说出来；否则按“开始”，计算机就会发出声音。或者在底部键入一行。",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "说话时，其他人会听到不同的人：你的话语和语气，另一种声音，活生生的。它在这台 PC 上运行（当你说话时大约有一个 CPU 核心，当你安静时什么也没有）；你所说的永远不会离开它。",
   "Talkbox": "谈话盒",
   "Talking inside a helmet, mask or metal box.": "在头盔、面罩或金属盒子内说话。",
@@ -2952,5 +2950,7 @@
   "Library": "声音库",
   "Quick hotkeys": "快捷热键",
   "{route}: {status}": "{route}：{status}",
-  "Listening: {mode}": "聆听：{mode}"
+  "Listening: {mode}": "聆听：{mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英语交谈，其他人听到的是另一种语言。当其中之一打开时，AI语音或变声器会说出来；否则按“开始”，计算机就会发出声音。",
+  "Type a line and press Enter…": "输入一行并按 Enter…"
 }

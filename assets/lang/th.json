@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "มีเพียงคนอื่นๆ ในสายเท่านั้นที่เข้าใจ ไม่ใช่เอาต์พุตสตรีมของคุณ",
   "Only your stream output gets it (music for your viewers), not the call": "มีเพียงเอาต์พุตสตรีมของคุณเท่านั้นที่เข้าใจ (เพลงสำหรับผู้ชมของคุณ) ไม่ใช่การโทร",
   "Or type a line and it's spoken in the voice": "หรือพิมพ์บรรทัดแล้วพูดเป็นเสียง",
-  "Or type a line and press Enter…": "หรือพิมพ์บรรทัดแล้วกด Enter...",
   "Other pasted links": "ลิงค์อื่นๆ ที่วางครับ",
   "Others hear only the spoken voice, not your real one.": "คนอื่นได้ยินเพียงเสียงพูด ไม่ใช่เสียงจริงของคุณ",
   "Others in the call and your stream output both get it": "คนอื่นๆ ในสายและเอาต์พุตสตรีมของคุณต่างก็ได้รับสิ่งนี้",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "การสตรีม การบันทึก โปรแกรมเสียง หรือมิกเซอร์",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "เปิดเอฟเฟกต์แล้วลากแถบเลื่อนเพื่อสร้างเสียงของคุณเอง การเปลี่ยนสิ่งใดๆ จะเป็นสวิตช์ \"มิกซ์ของฉันเอง\"; ชอบไหม? บันทึกเป็นเสียงแล้วจะมีปุ่มเป็นของตัวเอง",
   "Take this program off the list": "นำโปรแกรมนี้ออกจากรายการ",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "พูดเป็นภาษาอังกฤษและคนอื่นได้ยินภาษาอื่น เสียง AI หรือโปรแกรมเปลี่ยนเสียงจะพูดเมื่อเสียงใดเสียงหนึ่งเปิดอยู่ หรือกด Start แล้วเสียงคอมพิวเตอร์ก็ดังขึ้น หรือพิมพ์บรรทัดด้านล่าง",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "พูด และคนอื่นๆ ได้ยินคนอื่น คำพูดและน้ำเสียงของคุณ อีกเสียงหนึ่ง มีชีวิตอยู่ มันทำงานบนพีซีเครื่องนี้ (ประมาณหนึ่งคอร์ CPU ในขณะที่คุณพูด ไม่มีอะไรในขณะที่คุณเงียบ); สิ่งที่คุณพูดไม่เคยทิ้งมันไป",
   "Talkbox": "กล่องสนทนา",
   "Talking inside a helmet, mask or metal box.": "พูดคุยในหมวกกันน็อค หน้ากาก หรือกล่องโลหะ",
@@ -2952,5 +2950,7 @@
   "Library": "คลังเสียง",
   "Quick hotkeys": "ปุ่มลัดด่วน",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "การฟัง: {mode}"
+  "Listening: {mode}": "การฟัง: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "พูดเป็นภาษาอังกฤษและคนอื่นได้ยินภาษาอื่น เสียง AI หรือโปรแกรมเปลี่ยนเสียงจะพูดเมื่อเสียงใดเสียงหนึ่งเปิดอยู่ หรือกด Start แล้วเสียงคอมพิวเตอร์ก็ดังขึ้น",
+  "Type a line and press Enter…": "พิมพ์บรรทัดแล้วกด Enter…"
 }

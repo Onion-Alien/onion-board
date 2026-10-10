@@ -2032,7 +2032,6 @@
   "Only others in the call get it, not your stream output": "Alleen anderen in het gesprek ontvangen het, niet uw streamuitvoer",
   "Only your stream output gets it (music for your viewers), not the call": "Alleen uw streamuitvoer krijgt het (muziek voor uw kijkers), niet de oproep",
   "Or type a line and it's spoken in the voice": "Of typ een regel en deze wordt in de stem uitgesproken",
-  "Or type a line and press Enter…": "Of typ een regel en druk op Enter…",
   "Other pasted links": "Andere geplakte links",
   "Others hear only the spoken voice, not your real one.": "Anderen horen alleen de gesproken stem, niet uw echte stem.",
   "Others in the call and your stream output both get it": "Anderen in het gesprek en uw streamuitvoer krijgen het allebei",
@@ -2167,7 +2166,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, opname, Voicemeeter of een mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Schakel effecten in en sleep de schuifregelaars om je eigen stem samen te stellen. Als u iets wijzigt, schakelt u over naar “Mijn eigen mix”; vind je het leuk? Sla het op als een stem en het krijgt een eigen knop.",
   "Take this program off the list": "Haal dit programma van de lijst",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Praat in het Engels en anderen horen een andere taal. De AI-stem of de stemwisselaar zegt het wanneer een van hen aan staat; druk anders op Start en een computerstem doet dat. Of typ een regel onderaan.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Praat en anderen horen een andere persoon: jouw woorden en toon, een andere stem, live. Het draait op deze pc (ongeveer één CPU-kern terwijl je praat, niets als je stil bent); wat je zegt, verlaat het nooit.",
   "Talkbox": "Praatbox",
   "Talking inside a helmet, mask or metal box.": "Praten in een helm, masker of metalen doos.",
@@ -3016,5 +3014,7 @@
   "Library": "Bibliotheek",
   "Quick hotkeys": "Snelle sneltoetsen",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Luisteren: {mode}"
+  "Listening: {mode}": "Luisteren: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Praat in het Engels en anderen horen een andere taal. De AI-stem of de stemwisselaar zegt het wanneer een van hen aan staat; druk anders op Start en een computerstem doet dat.",
+  "Type a line and press Enter…": "Typ een regel en druk op Enter…"
 }

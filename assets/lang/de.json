@@ -2032,7 +2032,6 @@
   "Only others in the call get it, not your stream output": "Nur andere Teilnehmer des Anrufs erhalten es, nicht Ihre Stream-Ausgabe",
   "Only your stream output gets it (music for your viewers), not the call": "Nur Ihre Stream-Ausgabe erhält sie (Musik für Ihre Zuschauer), nicht der Anruf",
   "Or type a line and it's spoken in the voice": "Oder geben Sie eine Zeile ein und sie wird mit der Stimme gesprochen",
-  "Or type a line and press Enter…": "Oder geben Sie eine Zeile ein und drücken Sie die Eingabetaste ...",
   "Other pasted links": "Andere eingefügte Links",
   "Others hear only the spoken voice, not your real one.": "Andere hören nur die gesprochene Stimme, nicht Ihre echte.",
   "Others in the call and your stream output both get it": "Andere im Anruf und Ihre Stream-Ausgabe verstehen es beide",
@@ -2167,7 +2166,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, Aufnahme, Voicemeeter oder ein Mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Schalten Sie Effekte ein und ziehen Sie deren Schieberegler, um Ihre eigene Stimme zu erstellen. Wenn Sie etwas ändern, wird auf „Mein eigener Mix“ umgeschaltet. Gefällt es dir? Speichern Sie es als Stimme und es erhält eine eigene Schaltfläche.",
   "Take this program off the list": "Streichen Sie dieses Programm von der Liste",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Sprechen Sie auf Englisch und andere hören eine andere Sprache. Die KI-Stimme oder der Sprachwechsler sagen es, wenn einer von ihnen eingeschaltet ist; andernfalls drücken Sie Start und eine Computerstimme ertönt. Oder geben Sie unten eine Zeile ein.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Sprechen Sie, und andere hören eine andere Person: Ihre Worte und Ihren Ton, eine andere Stimme, live. Es läuft auf diesem PC (etwa ein CPU-Kern, während Sie sprechen, nichts, während Sie still sind); Was du sagst, verlässt dich nie.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Sprechen in einem Helm, einer Maske oder einer Metallbox.",
@@ -3016,5 +3014,7 @@
   "Library": "Bibliothek",
   "Quick hotkeys": "Schnelltasten",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Zuhören: {mode}"
+  "Listening: {mode}": "Zuhören: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Sprechen Sie auf Englisch und andere hören eine andere Sprache. Die KI-Stimme oder der Sprachwechsler sagen es, wenn einer von ihnen eingeschaltet ist; andernfalls drücken Sie Start und eine Computerstimme ertönt.",
+  "Type a line and press Enter…": "Geben Sie eine Zeile ein und drücken Sie die Eingabetaste…"
 }

@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "只有通話中的其他人才能獲取它，而不是您的串流輸出",
   "Only your stream output gets it (music for your viewers), not the call": "只有您的串流輸出才能獲取它（為觀眾提供的音樂），而不是呼叫",
   "Or type a line and it's spoken in the voice": "或輸入一行，然後用語音讀出",
-  "Or type a line and press Enter…": "或輸入一行並按 Enter...",
   "Other pasted links": "其他貼上連結",
   "Others hear only the spoken voice, not your real one.": "其他人只能聽到口頭聲音，而不是您的真實聲音。",
   "Others in the call and your stream output both get it": "通話中的其他人和您的串流輸出都可以得到它",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "串流媒體、錄音、Voicemeeter 或混音器。",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "打開效果並拖曳滑桿來建立自己的聲音。更改任何內容都會切換到“我自己的混音”；喜歡嗎？將其保存為聲音，它就會有自己的按鈕。",
   "Take this program off the list": "將此程式從清單中刪除",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "用英語交談，其他人聽到的是另一種語言。當其中一個打開時，AI語音或變聲器會說出來；否則按“開始”，計算機就會發出聲音。或在底部鍵入一行。",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "說話時，其他人會聽到不同的人：你的話語和語氣，另一種聲音，活生生的。它在這台 PC 上運行（當你說話時大約有一個 CPU 核心，當你安靜時什麼都沒有）；你所說的永遠不會離開它。",
   "Talkbox": "談話盒",
   "Talking inside a helmet, mask or metal box.": "在頭盔、面罩或金屬盒內說話。",
@@ -2952,5 +2950,7 @@
   "Library": "聲音庫",
   "Quick hotkeys": "快捷熱鍵",
   "{route}: {status}": "{route}：{status}",
-  "Listening: {mode}": "聆聽：{mode}"
+  "Listening: {mode}": "聆聽：{mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英語交談，其他人聽到的是另一種語言。當其中一個打開時，AI語音或變聲器會說出來；否則按“開始”，計算機就會發出聲音。",
+  "Type a line and press Enter…": "輸入一行並按 Enter…"
 }

@@ -1936,7 +1936,6 @@
   "Only others in the call get it, not your stream output": "Само другите в разговора го получават, но не и вашия поток",
   "Only your stream output gets it (music for your viewers), not the call": "Получава го само вашият поток (музика за вашите зрители), но не и обаждането",
   "Or type a line and it's spoken in the voice": "Или въведете ред и той се произнася с глас",
-  "Or type a line and press Enter…": "Или въведете ред и натиснете Enter...",
   "Other pasted links": "Други поставени връзки",
   "Others hear only the spoken voice, not your real one.": "Други чуват само изговорения глас, а не вашия истински.",
   "Others in the call and your stream output both get it": "И другите в разговора, и в изходния ви поток го получават",
@@ -2069,7 +2068,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Поточно предаване, запис, Voicemeeter или миксер.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Включете ефектите и плъзнете техните плъзгачи, за да създадете свой собствен глас. Промяната на каквото и да било превключва на „Моят собствен микс“; харесва ли го? Запазете го като глас и той ще получи свой собствен бутон.",
   "Take this program off the list": "Махнете тази програма от списъка",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Говорете на английски и другите чуват друг език. AI гласът или гласовият чейнджър го казват, когато един от тях е включен; в противен случай натиснете Старт и компютърен глас го прави. Или напишете ред в долната част.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Говорете и другите ще чуят различен човек: вашите думи и тон, друг глас, на живо. Работи на този компютър (около едно процесорно ядро, докато говорите, нищо, докато мълчите); това, което казваш, никога не го напуска.",
   "Talkbox": "Кутия за разговори",
   "Talking inside a helmet, mask or metal box.": "Говорене в каска, маска или метална кутия.",
@@ -3016,5 +3014,7 @@
   "Library": "Библиотека",
   "Quick hotkeys": "Бързи клавиши",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Слушане: {mode}"
+  "Listening: {mode}": "Слушане: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говорете на английски и другите чуват друг език. AI гласът или гласовият чейнджър го казват, когато един от тях е включен; в противен случай натиснете Старт и компютърен глас го прави.",
+  "Type a line and press Enter…": "Въведете ред и натиснете Enter…"
 }

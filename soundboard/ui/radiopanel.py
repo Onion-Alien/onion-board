@@ -518,10 +518,14 @@ class RadioTab(QWidget):
 
         # ---- globe | station list
         self.split = QSplitter(Qt.Horizontal)
+        # Both ancestors must reveal the window through the map's corner cutouts.
+        self.split.setStyleSheet("QSplitter { background:transparent; }")
         self.split.setChildrenCollapsible(False)
-        # not a RoundedFrame: its mask has no in-between pixels, so it cuts the map's
-        # smooth corners into stairs. The map rounds its own corners.
-        self.globe_box = QFrame()
+        # A plain QWidget inherits the window background. QFrame paints a solid
+        # rectangle behind the map's transparent corner cutouts, leaving square
+        # corners even though the map itself is rounded. No mask here: the map
+        # antialiases its own corners.
+        self.globe_box = QWidget()
         self.globe_box.setMinimumWidth(200)
         self.globe_layout = QVBoxLayout(self.globe_box)
         self.globe_layout.setContentsMargins(0, 0, 0, 0)

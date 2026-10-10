@@ -2212,7 +2212,6 @@
   "Only others in the call get it, not your stream output": "فقط الآخرون في المكالمة يحصلون عليها، وليس مخرجات البث الخاصة بك",
   "Only your stream output gets it (music for your viewers), not the call": "فقط مخرجات البث الخاصة بك هي التي تحصل عليها (الموسيقى للمشاهدين)، وليس المكالمة",
   "Or type a line and it's spoken in the voice": "أو اكتب سطرًا وسيتم نطقه بالصوت",
-  "Or type a line and press Enter…": "أو اكتب سطرًا واضغط على Enter...",
   "Other pasted links": "روابط أخرى تم لصقها",
   "Others hear only the spoken voice, not your real one.": "يسمع الآخرون الصوت المنطوق فقط، وليس صوتك الحقيقي.",
   "Others in the call and your stream output both get it": "يحصل عليه الآخرون في المكالمة ومخرج البث الخاص بك",
@@ -2359,7 +2358,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "البث أو التسجيل أو Voicemeeter أو جهاز مزج الصوت.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "قم بتشغيل التأثيرات واسحب أشرطة التمرير الخاصة بها لإنشاء صوتك الخاص. يؤدي تغيير أي شيء إلى التبديل إلى \"المزيج الخاص بي\"؛ مثل ذلك؟ احفظه كصوت وسيحصل على زر خاص به.",
   "Take this program off the list": "خذ هذا البرنامج من القائمة",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "تحدث باللغة الإنجليزية ويسمع الآخرون لغة أخرى. يقولها صوت الذكاء الاصطناعي أو مغير الصوت عندما يكون أحدهما قيد التشغيل؛ وإلا اضغط على ابدأ وسيفعل صوت الكمبيوتر. أو اكتب سطرًا في الأسفل.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "تحدث، فيسمع الآخرون شخصًا مختلفًا: كلماتك ونبرة صوتك، صوتًا آخر، يعيش. يتم تشغيله على هذا الكمبيوتر الشخصي (حوالي نواة واحدة لوحدة المعالجة المركزية أثناء التحدث، ولا شيء أثناء الهدوء)؛ ما تقوله لا يتركه أبدًا.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "التحدث داخل خوذة أو قناع أو صندوق معدني.",
@@ -3272,5 +3270,7 @@
   "Library": "المكتبة",
   "Quick hotkeys": "اختصارات سريعة",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "الاستماع: {mode}"
+  "Listening: {mode}": "الاستماع: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "تحدث باللغة الإنجليزية ويسمع الآخرون لغة أخرى. يقولها صوت الذكاء الاصطناعي أو مغير الصوت عندما يكون أحدهما قيد التشغيل؛ وإلا اضغط على ابدأ وسيفعل صوت الكمبيوتر.",
+  "Type a line and press Enter…": "اكتب سطرًا واضغط على Enter…"
 }

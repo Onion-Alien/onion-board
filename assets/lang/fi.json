@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Vain muut puhelun osallistujat saavat sen, eivät suoratoistosi",
   "Only your stream output gets it (music for your viewers), not the call": "Vain suoratoistosi saa sen (musiikkia katsojillesi), ei puhelua",
   "Or type a line and it's spoken in the voice": "Tai kirjoita rivi ja se puhutaan äänellä",
-  "Or type a line and press Enter…": "Tai kirjoita rivi ja paina Enter…",
   "Other pasted links": "Muita liitettyjä linkkejä",
   "Others hear only the spoken voice, not your real one.": "Toiset kuulevat vain puhutun äänen, eivät sinun todellista ääntäsi.",
   "Others in the call and your stream output both get it": "Sekä muut puhelun osallistujat että suoratoistosi saavat sen",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Suoratoisto, äänitys, Voicemeeter tai mikseri.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Ota tehosteet käyttöön ja vedä niiden liukusäätimiä luodaksesi oman äänesi. Minkä tahansa muuttaminen vaihtaa \"Omaan sekoitukseeni\"; pidä siitä? Tallenna se äänenä ja se saa oman painikkeensa.",
   "Take this program off the list": "Poista tämä ohjelma luettelosta",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Puhu englanniksi ja muut kuulevat toista kieltä. AI-ääni tai äänenvaihdin sanoo sen, kun jokin niistä on päällä; muussa tapauksessa paina Start ja tietokoneääni tekee sen. Tai kirjoita rivi alareunaan.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Puhu, ja muut kuulevat toisen henkilön: sanasi ja sävysi, toisen äänen livenä. Se toimii tässä PC:ssä (noin yksi CPU-ydin puhuessasi, ei mitään, kun olet hiljaa); mitä sanot ei koskaan jätä sitä.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Puhuminen kypärän, maskin tai metallilaatikon sisällä.",
@@ -3016,5 +3014,7 @@
   "Library": "Kirjasto",
   "Quick hotkeys": "Pikanäppäimet",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Kuuntelu: {mode}"
+  "Listening: {mode}": "Kuuntelu: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu englanniksi ja muut kuulevat toista kieltä. AI-ääni tai äänenvaihdin sanoo sen, kun jokin niistä on päällä; muussa tapauksessa paina Start ja tietokoneääni tekee sen.",
+  "Type a line and press Enter…": "Kirjoita rivi ja paina Enter…"
 }

@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Csak a hívás többi résztvevője kapja meg, a stream kimenet nem",
   "Only your stream output gets it (music for your viewers), not the call": "Csak az adatfolyam kimenete kapja meg (zene a nézőknek), a hívás nem",
   "Or type a line and it's spoken in the voice": "Vagy írjon be egy sort, és az elhangzik a hangon",
-  "Or type a line and press Enter…": "Vagy írjon be egy sort, és nyomja meg az Enter billentyűt…",
   "Other pasted links": "Egyéb beillesztett linkek",
   "Others hear only the spoken voice, not your real one.": "Mások csak a kimondott hangot hallják, az igazit nem.",
   "Others in the call and your stream output both get it": "A hívás többi résztvevője és az adatfolyam kimenete egyaránt megkapja",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, felvétel, Voicemeeter vagy keverő.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Kapcsolja be az effektusokat, és húzza a csúszkákat saját hangjának kialakításához. Ha bármit megváltoztat, akkor a „Saját mix”-re vált; tetszik? Mentse el hangként, és kap egy saját gombot.",
   "Take this program off the list": "Vegye le ezt a programot a listáról",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Beszéljen angolul, és mások más nyelvet hallanak. A mesterséges intelligencia hangja vagy a hangváltó kimondja, ha valamelyik be van kapcsolva; ellenkező esetben nyomja meg a Start gombot, és egy számítógép hangja megteszi. Vagy írjon be egy sort az aljára.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Beszélj, és mások egy másik személyt hallanak: a szavaidat és hangnemedet, egy másik hangot élőben. Ezen a PC-n fut (kb. egy CPU mag, amíg beszél, semmi, amíg csendben van); amit mond, soha nem hagyja el.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Beszélgetés sisakban, maszkban vagy fémdobozban.",
@@ -3016,5 +3014,7 @@
   "Library": "Könyvtár",
   "Quick hotkeys": "Gyorsbillentyűk",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Hallgatás: {mode}"
+  "Listening: {mode}": "Hallgatás: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszéljen angolul, és mások más nyelvet hallanak. A mesterséges intelligencia hangja vagy a hangváltó kimondja, ha valamelyik be van kapcsolva; ellenkező esetben nyomja meg a Start gombot, és egy számítógép hangja megteszi.",
+  "Type a line and press Enter…": "Írjon be egy sort, és nyomja meg az Enter billentyűt…"
 }

@@ -2077,7 +2077,6 @@
   "Only others in the call get it, not your stream output": "Dostają to tylko inni uczestnicy połączenia, a nie wynik strumienia",
   "Only your stream output gets it (music for your viewers), not the call": "Dostaje ją tylko strumień wyjściowy (muzyka dla widzów), a nie połączenie",
   "Or type a line and it's spoken in the voice": "Możesz też wpisać wiersz, a zostanie on wymówiony głosem",
-  "Or type a line and press Enter…": "Możesz też wpisać linię i nacisnąć Enter…",
   "Other pasted links": "Inne wklejone linki",
   "Others hear only the spoken voice, not your real one.": "Inni słyszą tylko głos mówiony, a nie Twój prawdziwy.",
   "Others in the call and your stream output both get it": "Dostają to zarówno inni uczestnicy połączenia, jak i wynik strumienia",
@@ -2215,7 +2214,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Przesyłanie strumieniowe, nagrywanie, miernik głosu lub mikser.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Włącz efekty i przeciągnij ich suwaki, aby stworzyć własny głos. Zmiana czegokolwiek powoduje przejście do opcji „Mój własny miks”; podoba ci się? Zapisz go jako głos, a otrzyma własny przycisk.",
   "Take this program off the list": "Usuń ten program z listy",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Mów po angielsku, a inni usłyszą inny język. Głos AI lub zmieniacz głosu mówi to, gdy jeden z nich jest włączony; w przeciwnym razie naciśnij Start i usłyszysz głos komputerowy. Możesz też wpisać linię na dole.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Mów, a inni usłyszą inną osobę: Twoje słowa i ton, inny głos, żyj. Działa na tym komputerze (około jednego rdzenia procesora, gdy mówisz, nic, gdy milczysz); to, co mówisz, nigdy tego nie opuszcza.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Rozmowa wewnątrz hełmu, maski lub metalowego pudełka.",
@@ -3080,5 +3078,7 @@
   "Library": "Biblioteka",
   "Quick hotkeys": "Szybkie skróty",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Odsłuch: {mode}"
+  "Listening: {mode}": "Odsłuch: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Mów po angielsku, a inni usłyszą inny język. Głos AI lub zmieniacz głosu mówi to, gdy jeden z nich jest włączony; w przeciwnym razie naciśnij Start i usłyszysz głos komputerowy.",
+  "Type a line and press Enter…": "Wpisz linię i naciśnij Enter…"
 }

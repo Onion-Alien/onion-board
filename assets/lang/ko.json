@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "통화에 참여한 다른 사람만 이를 얻을 수 있으며 스트림 출력은 얻을 수 없습니다.",
   "Only your stream output gets it (music for your viewers), not the call": "통화가 아닌 스트림 출력(시청자를 위한 음악)만 얻을 수 있습니다.",
   "Or type a line and it's spoken in the voice": "또는 대사를 입력하면 음성으로 말해줍니다.",
-  "Or type a line and press Enter…": "또는 한 줄을 입력하고 Enter를 누르세요…",
   "Other pasted links": "기타 붙여넣은 링크",
   "Others hear only the spoken voice, not your real one.": "다른 사람들은 실제 음성이 아닌 음성만 듣습니다.",
   "Others in the call and your stream output both get it": "통화 중인 다른 사람과 스트림 출력이 모두 이를 얻습니다.",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "스트리밍, 녹음, Voicemeeter 또는 믹서.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "효과를 켜고 슬라이더를 드래그하여 자신만의 목소리를 만들어 보세요. 무엇이든 변경하면 \"나만의 믹스\"로 전환됩니다. 좋아? 음성으로 저장하면 자체 버튼이 생깁니다.",
   "Take this program off the list": "이 프로그램을 목록에서 제외하세요",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "영어로 이야기하면 다른 사람들은 다른 언어를 듣게 됩니다. AI 음성이나 음성 체인저 중 하나가 켜져 있으면 이를 말합니다. 그렇지 않은 경우 시작을 누르면 컴퓨터 음성이 나옵니다. 또는 하단에 한 줄을 입력하세요.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "말하고 다른 사람들은 다른 사람의 말을 듣습니다. 당신의 말과 어조, 다른 목소리가 실시간으로 전달됩니다. 이 PC에서 실행됩니다(말하는 동안에는 CPU 코어 하나 정도, 조용할 때는 아무것도 실행되지 않음). 당신이 말하는 것은 결코 떠나지 않습니다.",
   "Talkbox": "토크박스",
   "Talking inside a helmet, mask or metal box.": "헬멧, 마스크 또는 금속 상자 안에서 대화합니다.",
@@ -2952,5 +2950,7 @@
   "Library": "라이브러리",
   "Quick hotkeys": "빠른 단축키",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "듣기: {mode}"
+  "Listening: {mode}": "듣기: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "영어로 이야기하면 다른 사람들은 다른 언어를 듣게 됩니다. AI 음성이나 음성 체인저 중 하나가 켜져 있으면 이를 말합니다. 그렇지 않은 경우 시작을 누르면 컴퓨터 음성이 나옵니다.",
+  "Type a line and press Enter…": "한 줄을 입력하고 Enter를 누르세요…"
 }

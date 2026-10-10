@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "Chỉ những người khác trong cuộc gọi mới hiểu được chứ không phải đầu ra luồng của bạn",
   "Only your stream output gets it (music for your viewers), not the call": "Chỉ đầu ra luồng của bạn mới nhận được (âm nhạc cho người xem của bạn), chứ không phải cuộc gọi",
   "Or type a line and it's spoken in the voice": "Hoặc gõ một dòng và nó được nói bằng giọng nói",
-  "Or type a line and press Enter…": "Hoặc gõ một dòng rồi nhấn Enter…",
   "Other pasted links": "Các liên kết đã dán khác",
   "Others hear only the spoken voice, not your real one.": "Những người khác chỉ nghe thấy giọng nói chứ không phải giọng thật của bạn.",
   "Others in the call and your stream output both get it": "Những người khác trong cuộc gọi và đầu ra luồng của bạn đều hiểu được",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Truyền phát, ghi âm, Voicemeeter hoặc máy trộn.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Bật các hiệu ứng và kéo thanh trượt để tạo giọng nói của riêng bạn. Thay đổi bất cứ điều gì sẽ chuyển sang “Bản phối của riêng tôi”; thích nó? Lưu nó dưới dạng giọng nói và nó sẽ có một nút riêng.",
   "Take this program off the list": "Đưa chương trình này ra khỏi danh sách",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Nói chuyện bằng tiếng Anh và những người khác nghe bằng ngôn ngữ khác. Giọng nói AI hoặc bộ thay đổi giọng nói sẽ nói điều đó khi một trong số chúng được bật; nếu không hãy nhấn Bắt đầu và giọng nói của máy tính sẽ thực hiện. Hoặc gõ một dòng ở phía dưới.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Hãy nói và những người khác sẽ nghe thấy một người khác: lời nói và giọng điệu của bạn, một giọng nói khác, sống động. Nó chạy trên PC này (khoảng một lõi CPU khi bạn nói chuyện, không có gì khi bạn im lặng); những gì bạn nói không bao giờ rời bỏ nó.",
   "Talkbox": "Hộp đàm thoại",
   "Talking inside a helmet, mask or metal box.": "Nói chuyện bên trong mũ bảo hiểm, mặt nạ hoặc hộp kim loại.",
@@ -2952,5 +2950,7 @@
   "Library": "Thư viện",
   "Quick hotkeys": "Phím tắt nhanh",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Nghe: {mode}"
+  "Listening: {mode}": "Nghe: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Nói chuyện bằng tiếng Anh và những người khác nghe bằng ngôn ngữ khác. Giọng nói AI hoặc bộ thay đổi giọng nói sẽ nói điều đó khi một trong số chúng được bật; nếu không hãy nhấn Bắt đầu và giọng nói của máy tính sẽ thực hiện.",
+  "Type a line and press Enter…": "Gõ một dòng rồi nhấn Enter…"
 }

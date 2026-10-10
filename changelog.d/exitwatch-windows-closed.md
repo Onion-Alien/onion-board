@@ -1,0 +1,1 @@
+- Restarting Windows, logging off or installing an update while Onion Board is open no longer counts as an unclean exit (it came in as "while-closing" or "pc-restarted") or saves a crash report.
