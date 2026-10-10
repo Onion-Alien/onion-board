@@ -431,7 +431,6 @@ class ResultRow(HoverCard):
         self.sub.setObjectName("muted")
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")
-        self.stats.set_stats(r)
         self.btn_play = QPushButton(_("Play"))
         self.btn_play.setObjectName("cardplay")
         self.btn_play.setToolTip(_("Download its audio and play it once (it isn't kept)"))
@@ -469,6 +468,9 @@ class ResultRow(HoverCard):
         box.setSpacing(14 if wide else 8)
         box.addWidget(self.thumb)
         box.addLayout(self.text_box, 1)
+        # set_stats shows the label when metadata exists. Adopt it first so each
+        # search result cannot flash a tiny standalone window on the desktop.
+        self.stats.set_stats(r)
         self._style()
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
