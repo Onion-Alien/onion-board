@@ -13,7 +13,7 @@ import re
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
@@ -2727,13 +2727,10 @@ class VoicePanel(QWidget):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 8, 0, 0)
         outer.setSpacing(8)
-        # what's on and your mic level, whatever's folded or scrolled away
+        # what's on and your mic level, whatever's folded or scrolled away: just above
+        # the Say bar at the bottom, as wide as it (added below, after the cards)
         self.bar = VoiceStatusBar()
         self.bar.open_card.connect(self._open_card)
-        bar_row = self._bar_row = QHBoxLayout()   # lined up with the cards (_line_up)
-        bar_row.setContentsMargins(4, 0, 8, 0)
-        bar_row.addWidget(self.bar)
-        outer.addLayout(bar_row)
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -2743,7 +2740,6 @@ class VoicePanel(QWidget):
         capped(body, page)  # not a 900 px wide card at full screen
         body.setMaximumWidth(960)   # compact headers; open panels wrap to this width
         self._body = body
-        body.installEventFilter(self)       # the status bar lines up with it (_line_up)
         pv = QVBoxLayout(body)
         pv.setContentsMargins(4, 4, 8, 12)
         pv.setSpacing(16)
@@ -2816,6 +2812,7 @@ class VoicePanel(QWidget):
         self._fold_card("addons", self.addons)
         self._arrange()
 
+        outer.addWidget(self.bar)
         outer.addWidget(self.speech.say_bar)
         self.chain.configure(self.fx.spec())
         self._emit_active()
@@ -2860,25 +2857,9 @@ class VoicePanel(QWidget):
         return [apply]
 
     def eventFilter(self, obj, e):
-        if obj is getattr(self, "_body", None) and e.type() in (QEvent.Resize, QEvent.Move,
-                                                                 QEvent.Show):
-            QTimer.singleShot(0, self, self._line_up)
         if e.type() in (QEvent.Resize, QEvent.Show, QEvent.Hide) and obj in self._cards:
             self._arranger.start(0)   # a card grew, shrank or came and went: re-stack
         return super().eventFilter(obj, e)
-
-    def _line_up(self):
-        """The status bar exactly as wide as the cards, whatever the scroll bar and the
-        width cap do (the cards sit 4 px in from the body's left, 8 from its right)."""
-        b = self._body
-        try:
-            left = b.mapTo(self, QPoint(4, 0)).x()
-            right = max(0, self.width() - (left + b.width() - 12))
-            m = self._bar_row.contentsMargins()
-            if (m.left(), m.right()) != (left, right):
-                self._bar_row.setContentsMargins(left, 0, right, 0)
-        except RuntimeError:     # the tab was closed meanwhile (a queued call)
-            pass
 
     def _arrange(self):
         """The voice changer heads the left column and AI voices the right; every other
