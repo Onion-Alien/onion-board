@@ -2052,7 +2052,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company y otros juegos de Unity con Photon Voice o Dissonance: Opus a 17-30 kbps, 12 kHz como máximo, activación por voz.",
   "Photon or Dissonance": "Fotón o disonancia",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Elija un programa que se esté reproduciendo (un reproductor de música, un navegador, un juego, incluso una llamada en otra aplicación) y se enviará a quien esté escuchando, en su propio volumen, de la misma manera que lo hacen sus sonidos (su micrófono, el cable o el dispositivo que eligió en la pestaña Configuración y la salida de transmisión). Enviar a nadie: solo lo recibe la salida del flujo. Sólo ese programa: no se toca nada más que reproduzcas y sigue reproduciéndose en tus parlantes como antes. Los programas que active se recordarán y se retomarán la próxima vez que se ejecuten.",
-  "Pick a voice, press Start, then just talk.": "Elija una voz, presione Inicio y luego simplemente hable.",
   "Pick the exact voice chat yourself, or make your own.": "Elija usted mismo el chat de voz exacto o cree el suyo propio.",
   "Pitch & voice": "Tono y voz",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Tono, aleatorización, todos los efectos y tus voces guardadas: crea tu propia voz en una ventana al lado de la aplicación",
@@ -2162,7 +2161,6 @@
   "Squash": "Calabaza",
   "Stadium announcer": "locutor del estadio",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Comience con una voz, mezcle un poco de otra y luego establezca qué tan profunda y aguda es. Pulsa Escúchalo para probarlo.",
-  "Start the AI voice": "Iniciar la voz de IA",
   "Start the computer voice": "Iniciar la voz de la computadora",
   "Starting Onion Watch…": "Comenzando Onion Watch...",
   "Starting the translation…": "Comenzando la traducción...",
@@ -2170,7 +2168,6 @@
   "Steam voice": "voz de vapor",
   "Stop  {time}": "Detener {time}",
   "Stop sending": "dejar de enviar",
-  "Stop the AI voice": "Detén la voz de la IA",
   "Stop the computer voice": "Detener la voz de la computadora",
   "Stop the computer voice to change this": "Detenga la voz de la computadora para cambiar esto.",
   "Stop the voice to download this": "Detén la voz para descargar esto.",
@@ -3013,5 +3010,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board pone tus sonidos en tu micrófono, así la gente en Discord o en tu juego los escucha igual que te escucha a ti.{gap}Agrega sonidos en la pestaña Sonidos y luego haz doble clic en uno o presiona su atajo. La barra de abajo muestra tu micrófono, lo que escuchan los demás y tus audífonos.{gap}Haz clic derecho en una pestaña a la izquierda y elige Sobre esta pestaña para ver qué hace.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Mete tus sonidos en el micrófono que ya usas, así Discord y los juegos no necesitan cambios",
   "Straight into my mic instead": "Mejor directo a mi micrófono",
-  "your real voice": "tu voz real"
+  "your real voice": "tu voz real",
+  "Start AI voice": "Iniciar la voz de IA",
+  "Stop AI voice": "Detén la voz de la IA",
+  "Your words and tone, a different voice. Live on this PC.": "Tus palabras y tu tono, otra voz. En vivo en esta PC."
 }

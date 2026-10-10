@@ -2010,7 +2010,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia、Lethal Company 和其他具有 Photon Voice 或 Dissonance: Opus 的 Unity 游戏，速度为 17-30 kbps，最高 12 kHz，语音激活。",
   "Photon or Dissonance": "光子或不和谐",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "选择一个正在播放的程序，音乐播放器、浏览器、游戏，甚至是另一个应用程序中的通话，它就会以自己的音量发送给正在收听的人，就像你的声音一样（你的麦克风、电缆或你在“设置”选项卡上选择的设备，以及流输出）。发送给没有人：只有流输出才能获取它。只有该程序：您播放的任何其他内容都不会受到影响，并且它会像以前一样在扬声器上播放。您打开的程序会被记住，并在下次运行时再次被拾取。",
-  "Pick a voice, press Start, then just talk.": "选择一个声音，按“开始”，然后就可以说话了。",
   "Pick the exact voice chat yourself, or make your own.": "自己选择确切的语音聊天，或者创建自己的语音聊天。",
   "Pitch & voice": "音调和声音",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "音调、随机化、每种效果以及您保存的声音：在应用程序旁边的窗口中构建您自己的声音",
@@ -2117,7 +2116,6 @@
   "Squash": "壁球",
   "Stadium announcer": "体育场播音员",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "从一个声音开始，混合一点另一种声音，然后设置它的深度和高度。按“听”来尝试一下。",
-  "Start the AI voice": "启动AI语音",
   "Start the computer voice": "启动电脑语音",
   "Starting Onion Watch…": "开始洋葱观察...",
   "Starting the translation…": "开始翻译...",
@@ -2125,7 +2123,6 @@
   "Steam voice": "蒸汽语音",
   "Stop  {time}": "停止{time}",
   "Stop sending": "停止发送",
-  "Stop the AI voice": "停止AI语音",
   "Stop the computer voice": "停止电脑声音",
   "Stop the computer voice to change this": "停止电脑声音来改变这个",
   "Stop the voice to download this": "停止声音来下载这个",
@@ -2949,5 +2946,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board 把你的音效放进麦克风，Discord 或游戏里的人听到它们就像听到你说话一样。{gap}在“音效”标签页添加音效，然后双击一个或按它的快捷键。底部的条显示你的麦克风、别人听到的声音和你的耳机。{gap}右键点击左侧的标签页，选择“关于这个标签页”，就能看到它是做什么的。",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "把音效放进你已经在用的麦克风，Discord 和游戏都不用改设置",
   "Straight into my mic instead": "改为直接送进我的麦克风",
-  "your real voice": "你真实的声音"
+  "your real voice": "你真实的声音",
+  "Start AI voice": "启动AI语音",
+  "Stop AI voice": "停止AI语音",
+  "Your words and tone, a different voice. Live on this PC.": "保留你的话语和语气，换一种声音。在这台电脑上实时转换。"
 }

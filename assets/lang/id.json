@@ -2010,7 +2010,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company dan game Unity lainnya dengan Photon Voice atau Dissonance: Opus pada 17-30 kbps, paling banyak 12 kHz, aktivasi suara.",
   "Photon or Dissonance": "Foton atau Disonansi",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Pilih program yang sedang diputar, pemutar musik, browser, game, bahkan panggilan di aplikasi lain, dan program tersebut akan dikirim ke siapa pun yang mendengarkan, dengan volumenya sendiri, sama seperti suara Anda (mikrofon, kabel, atau perangkat yang Anda pilih di tab Pengaturan, dan keluaran streaming). Mengirim ke Siapa Pun: hanya keluaran aliran yang mendapatkannya. Hanya program itu: tidak ada program lain yang Anda mainkan yang disentuh, dan program itu terus diputar di speaker Anda seperti sebelumnya. Program yang Anda aktifkan akan diingat dan diambil lagi saat dijalankan lagi.",
-  "Pick a voice, press Start, then just talk.": "Pilih suara, tekan Mulai, lalu bicara saja.",
   "Pick the exact voice chat yourself, or make your own.": "Pilih sendiri obrolan suara yang tepat, atau buat sendiri.",
   "Pitch & voice": "Nada & suara",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Acak, setiap efek, dan suara Anda yang disimpan: buat suara Anda sendiri di jendela di samping aplikasi",
@@ -2117,7 +2116,6 @@
   "Squash": "Labu",
   "Stadium announcer": "Penyiar stadion",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Mulailah dari sebuah suara, gabungkan sedikit suara lainnya, lalu atur seberapa dalam dan seberapa tinggi suaranya. Tekan Dengarkan untuk mencobanya.",
-  "Start the AI voice": "Mulai suara AI",
   "Start the computer voice": "Mulai suara komputer",
   "Starting Onion Watch…": "Memulai Pengawasan Bawang…",
   "Starting the translation…": "Memulai terjemahan…",
@@ -2125,7 +2123,6 @@
   "Steam voice": "Suara uap",
   "Stop  {time}": "Berhenti {time}",
   "Stop sending": "Berhenti mengirim",
-  "Stop the AI voice": "Hentikan suara AI",
   "Stop the computer voice": "Hentikan suara komputer",
   "Stop the computer voice to change this": "Hentikan suara komputer untuk mengubahnya",
   "Stop the voice to download this": "Hentikan suara untuk mengunduh ini",
@@ -2949,5 +2946,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board memutar suaramu ke mic-mu, jadi orang di Discord atau game-mu mendengarnya sama seperti mereka mendengarmu.{gap}Tambahkan suara di tab Suara, lalu klik dua kali salah satunya atau tekan hotkey-nya. Strip di bawah menunjukkan mic-mu, yang didengar orang lain, dan headphone-mu.{gap}Klik kanan tab di sebelah kiri lalu pilih Tentang tab ini untuk melihat fungsinya.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Masukkan suaramu ke mic yang sudah kamu pakai, jadi Discord dan game tidak perlu diubah",
   "Straight into my mic instead": "Langsung ke mic-ku saja",
-  "your real voice": "suara aslimu"
+  "your real voice": "suara aslimu",
+  "Start AI voice": "Mulai suara AI",
+  "Stop AI voice": "Hentikan suara AI",
+  "Your words and tone, a different voice. Live on this PC.": "Kata dan nada bicaramu, suara yang berbeda. Langsung di PC ini."
 }

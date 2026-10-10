@@ -2052,7 +2052,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company ja muut Unity-pelit, joissa on Photon Voice tai Dissonance: Opus nopeudella 17-30 kbps, enintään 12 kHz, ääniaktivointi.",
   "Photon or Dissonance": "Fotoni tai dissonanssi",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Valitse toistettava ohjelma, musiikkisoitin, selain, peli, jopa puhelu toisessa sovelluksessa, ja se lähetetään jokaiselle, joka kuuntelee, omalla äänenvoimakkuudellaan samalla tavalla kuin äänesi (mikrofoni, kaapeli tai laite, jonka valitsit Asetukset-välilehdellä ja suoratoisto). Lähetys kenellekään: vain stream-tuloste saa sen. Vain tämä ohjelma: mitään muuta toistamaasi ei kosketa, ja se jatkaa toistoa kaiuttimistasi kuten ennenkin. Ohjelmat, jotka kytket päälle, muistetaan ja otetaan uudelleen käyttöön seuraavan kerran.",
-  "Pick a voice, press Start, then just talk.": "Valitse ääni, paina Aloita ja puhu sitten.",
   "Pick the exact voice chat yourself, or make your own.": "Valitse tarkka äänikeskustelu itse tai luo omasi.",
   "Pitch & voice": "Pitch & ääni",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, satunnaisuus, kaikki tehosteet ja tallennetut äänesi: rakenna oma äänesi sovelluksen vieressä olevaan ikkunaan",
@@ -2162,7 +2161,6 @@
   "Squash": "Squash",
   "Stadium announcer": "Stadionin kuuluttaja",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Aloita äänestä, sekoita vähän toista ja aseta sitten, kuinka syvä ja kuinka korkea se on. Kokeile sitä painamalla Kuuntele.",
-  "Start the AI voice": "Käynnistä AI-ääni",
   "Start the computer voice": "Käynnistä tietokoneen ääni",
   "Starting Onion Watch…": "Aloitetaan Sipuli Watch…",
   "Starting the translation…": "Käännös aloitetaan…",
@@ -2170,7 +2168,6 @@
   "Steam voice": "Steam ääni",
   "Stop  {time}": "Pysäytä {time}",
   "Stop sending": "Lopeta lähettäminen",
-  "Stop the AI voice": "Pysäytä tekoälyn ääni",
   "Stop the computer voice": "Lopeta tietokoneen ääni",
   "Stop the computer voice to change this": "Pysäytä tietokoneen ääni muuttaaksesi tätä",
   "Stop the voice to download this": "Pysäytä ääni ladataksesi tämän",
@@ -3013,5 +3010,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board soittaa äänesi mikkiisi, joten Discordissa tai pelissäsi muut kuulevat ne samalla tavalla kuin kuulevat sinut.{gap}Lisää ääniä Äänet-välilehdellä ja tuplaklikkaa sitten yhtä tai paina sen pikanäppäintä. Alareunan palkki näyttää mikkisi, mitä muut kuulevat ja kuulokkeesi.{gap}Napsauta välilehteä vasemmalla hiiren oikealla ja valitse Tietoa tästä välilehdestä nähdäksesi, mitä se tekee.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Laita äänesi mikkiin, jota jo käytät, niin Discordiin ja peleihin ei tarvitse muuttaa mitään",
   "Straight into my mic instead": "Suoraan mikkiini sen sijaan",
-  "your real voice": "oikean äänesi"
+  "your real voice": "oikean äänesi",
+  "Start AI voice": "Käynnistä AI-ääni",
+  "Stop AI voice": "Pysäytä tekoälyn ääni",
+  "Your words and tone, a different voice. Live on this PC.": "Sanasi ja äänensävysi, eri ääni. Suorana tällä tietokoneella."
 }

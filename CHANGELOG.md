@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- AI voices puts Start and live status at the top, with a wider voice picker,
+  grouped pitch controls and shorter explanatory text in every language.
 - YouTube and YouTube Music searches are about a second faster after the first one:
   YouTube's page settings are kept for an hour instead of being fetched before every
   search (Direct connection only; if a search with them fails, it's done again the old

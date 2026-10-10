@@ -2100,7 +2100,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company та інші ігри Unity з Photon Voice або Dissonance: Opus зі швидкістю 17-30 кбіт/с, максимум 12 кГц, голосова активація.",
   "Photon or Dissonance": "Фотон або дисонанс",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Виберіть програму, яка відтворюється: музичний плеєр, браузер, гру, навіть дзвінок в іншій програмі: і вона буде передаватися тому, хто слухає, на власному рівні, так само, як і ваші звуки (ваш мікрофон, кабель або пристрій, який ви вибрали на вкладці «Налаштування», і вихід потоку). Надсилання нікому: отримує лише вихідний потік. Тільки ця програма: нічого іншого, що ви граєте, не торкається, і вона продовжує грати на ваших колонках, як і раніше. Програми, які ви вмикаєте, запам’ятовуються та запускаються знову під час наступного запуску.",
-  "Pick a voice, press Start, then just talk.": "Виберіть голос, натисніть «Пуск» і просто говоріть.",
   "Pick the exact voice chat yourself, or make your own.": "Виберіть правильний голосовий чат самостійно або створіть свій власний.",
   "Pitch & voice": "Висота та голос",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, кожен ефект і ваші збережені голоси: створіть свій власний голос у вікні біля програми",
@@ -2213,7 +2212,6 @@
   "Squash": "Сквош",
   "Stadium announcer": "Диктор стадіону",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Почніть із голосу, додайте трохи іншого, а потім установіть його глибину та високість. Натисніть «Почути», щоб спробувати.",
-  "Start the AI voice": "Запустіть голос ШІ",
   "Start the computer voice": "Запустіть голос комп'ютера",
   "Starting Onion Watch…": "Запуск Onion Watch…",
   "Starting the translation…": "Початок перекладу…",
@@ -2221,7 +2219,6 @@
   "Steam voice": "Паровий голос",
   "Stop  {time}": "Зупинити {time}",
   "Stop sending": "Зупинити надсилання",
-  "Stop the AI voice": "Зупиніть голос ШІ",
   "Stop the computer voice": "Зупиніть комп'ютерний голос",
   "Stop the computer voice to change this": "Зупиніть комп’ютерний голос, щоб змінити це",
   "Stop the voice to download this": "Зупиніть голос, щоб завантажити це",
@@ -3077,5 +3074,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board грає твої звуки в мікрофон, тож люди в Discord чи у твоїй грі чують їх так само, як тебе.{gap}Додай звуки на вкладці Звуки, потім двічі клацни по одному або натисни його гарячу клавішу. Смуга внизу показує твій мікрофон, що чують інші, і твої навушники.{gap}Клацни правою кнопкою по вкладці ліворуч і вибери Про цю вкладку, щоб побачити, що вона робить.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Пускай звуки в мікрофон, яким ти вже користуєшся, і в Discord та іграх нічого міняти не треба",
   "Straight into my mic instead": "Натомість прямо в мікрофон",
-  "your real voice": "твій справжній голос"
+  "your real voice": "твій справжній голос",
+  "Start AI voice": "Запустіть голос ШІ",
+  "Stop AI voice": "Зупиніть голос ШІ",
+  "Your words and tone, a different voice. Live on this PC.": "Твої слова й інтонація, інший голос. Наживо на цьому ПК."
 }

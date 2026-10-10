@@ -2052,7 +2052,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company och andra Unity-spel med Photon Voice eller Dissonance: Opus vid 17-30 kbps, 12 kHz som mest, röstaktivering.",
   "Photon or Dissonance": "Foton eller dissonans",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Välj ett program som spelas, en musikspelare, en webbläsare, ett spel, till och med ett samtal i en annan app, och det går ut till den som lyssnar, på sin egen volym, på samma sätt som dina ljud gör (din mikrofon, kabeln eller enheten du valde på fliken Inställningar och strömutgången). Skickar till ingen: bara strömutgången får det. Bara det programmet: inget annat du spelar berörs, och det fortsätter spela på dina högtalare som tidigare. Program som du slår på kommer ihåg och plockas upp igen nästa gång de körs.",
-  "Pick a voice, press Start, then just talk.": "Välj en röst, tryck på Start och prata sedan.",
   "Pick the exact voice chat yourself, or make your own.": "Välj den exakta röstchatt själv, eller skapa din egen.",
   "Pitch & voice": "Tonhöjd & röst",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, varje effekt och dina sparade röster: bygg din egen röst i ett fönster bredvid appen",
@@ -2162,7 +2161,6 @@
   "Squash": "Squash",
   "Stadium announcer": "Stadion utropare",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Utgå från en röst, blanda in lite av en annan och ställ sedan in hur djup och hög den är. Tryck på Hör för att prova.",
-  "Start the AI voice": "Starta AI-rösten",
   "Start the computer voice": "Starta datorrösten",
   "Starting Onion Watch…": "Startar Onion Watch...",
   "Starting the translation…": "Startar översättningen...",
@@ -2170,7 +2168,6 @@
   "Steam voice": "Ånga röst",
   "Stop  {time}": "Stopp {time}",
   "Stop sending": "Sluta skicka",
-  "Stop the AI voice": "Stoppa AI-rösten",
   "Stop the computer voice": "Stoppa datorrösten",
   "Stop the computer voice to change this": "Stoppa datorrösten för att ändra detta",
   "Stop the voice to download this": "Stoppa rösten för att ladda ner detta",
@@ -3013,5 +3010,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spelar dina ljud i din mikrofon, så folk på Discord eller i ditt spel hör dem på samma sätt som de hör dig.{gap}Lägg till ljud på fliken Ljud, dubbelklicka sedan på ett eller tryck på dess snabbtangent. Remsan längst ner visar din mikrofon, vad andra hör och dina hörlurar.{gap}Högerklicka på en flik till vänster och välj Om den här fliken för att se vad den gör.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Skicka dina ljud in i mikrofonen du redan använder, så behöver Discord och spel inga ändringar",
   "Straight into my mic instead": "Direkt i min mikrofon i stället",
-  "your real voice": "din riktiga röst"
+  "your real voice": "din riktiga röst",
+  "Start AI voice": "Starta AI-rösten",
+  "Stop AI voice": "Stoppa AI-rösten",
+  "Your words and tone, a different voice. Live on this PC.": "Dina ord och ditt tonfall, en annan röst. Live på den här datorn."
 }
