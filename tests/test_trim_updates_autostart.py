@@ -405,7 +405,10 @@ def test_release_notes_become_plain_whole_paragraphs():
 
 
 @pytest.mark.windows   # Windows' PATH (; between folders)
-def test_installer_starts_without_the_frozen_apps_variables():
+def test_installer_starts_without_the_frozen_apps_variables(monkeypatch):
+    # net.own_env adds no_proxy while the app's relay runs: another test in the same
+    # worker may have left one, which isn't what this test is about
+    monkeypatch.setattr(updates.net, "own_env", lambda env: env)
     bundle = r"C:\Apps\OnionBoard\_internal"
     env = updates.installer_env({
         "PATH": bundle + r";C:\Windows;C:\Apps\OnionBoard\_internal\sub",
