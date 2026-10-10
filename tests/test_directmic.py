@@ -161,6 +161,17 @@ def test_make_ring_replaces_one_with_the_wrong_rate(tmp_path):
     assert np.frombuffer(p.read_bytes(), dm.HEAD, count=1)["rate"][0] == dm.RATE
 
 
+def test_make_ring_leaves_another_processes_temp_alone(tmp_path):
+    """The temp has a name of its own now: a stale one from the old fixed name (or
+    another board making the ring at the same moment) is never written through."""
+    p = tmp_path / "ring2.bin"
+    stale = tmp_path / "ring2.new"
+    stale.write_bytes(b"someone else's")
+    assert dm.make_ring(p) and dm.make_ring_ok(p)
+    assert stale.read_bytes() == b"someone else's"
+    assert not list(tmp_path.glob("*.tmp"))
+
+
 @pytest.mark.parametrize("values, expected", [
     ({}, ("wrap", 7)),                       # nothing: the endpoint effect (raw gets it)
     ({5: "{S}"}, ("wrap", 7)),               # the driver's SFX stays where it is
@@ -429,6 +440,20 @@ def test_audio_restart_brings_back_what_depended_on_it(monkeypatch):
     dm._audio_service(True, ["midisrv", "AarSvc_1a2b", "bad name; rm"])
     assert ran == [["net", "start", "AudioEndpointBuilder"], ["net", "start", "audiosrv"],
                    ["net", "start", "midisrv"], ["net", "start", "AarSvc_1a2b"]]
+
+
+def test_a_stop_that_wont_take_is_retried_then_reported(monkeypatch):
+    """The endpoint builder only re-reads a mic's effects when it starts, so a stop
+    that silently failed matters: it's tried once more, and said so if it still won't."""
+    ran, stopped = [], [False]
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
+    monkeypatch.setattr(dm, "_services_stopped", lambda: stopped[0])
+    assert dm._audio_service(False) is False
+    assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder", "AudioEndpointBuilder"]
+    ran.clear()
+    stopped[0] = True
+    assert dm._audio_service(False) is True
+    assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder"]   # no retry needed
 
 
 def test_which_services_depend_on_the_audio(monkeypatch):
@@ -1549,6 +1574,48 @@ def test_uninstaller_takes_it_off_the_mic(monkeypatch):
     assert dm.cli(["remove"]) == 0 and asked == [["uninstall"]]
     monkeypatch.setattr(dm, "_elevated", lambda args, wait_s=90.0: None)   # turned down
     assert dm.cli(["remove"]) == 1
+
+
+def test_uninstall_keeps_going_when_one_mic_wont_go_back(monkeypatch):
+    """One mic that can't be put back (a locked value, say) mustn't strand the others,
+    and mustn't unregister the effect out from under it: everything is left as it is
+    for a later uninstall to finish."""
+    tried, com = [], []
+    other = "{22222222-3333-4444-5555-666666666666}"
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps=(): None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
+    monkeypatch.setattr(dm, "installed_on", lambda: [GUID, other])
+    monkeypatch.setattr(dm, "_unregister_com", lambda: com.append("com"))
+
+    def take(guid):
+        tried.append(guid)
+        if guid != GUID:
+            raise OSError("the mic's registry is locked")
+    monkeypatch.setattr(dm, "_uninstall_endpoint", take)
+    assert dm.admin_uninstall() == 1
+    assert tried == [GUID, other]   # the second mic was still tried
+    assert com == []                # the effect wasn't unregistered while it's on a mic
+
+
+def test_uninstall_removes_the_ring_folder(monkeypatch, tmp_path):
+    """A clean uninstall takes the ring file with it, not just the mic and the keys."""
+    d = tmp_path / "MicPlugin"
+    d.mkdir()
+    (d / "ring2.bin").write_bytes(b"x")
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps=(): None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
+    monkeypatch.setattr(dm, "installed_on", lambda: [])
+    monkeypatch.setattr(dm, "_unregister_com", lambda: None)
+    monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
+    monkeypatch.setattr(dm, "_old_install_dirs", lambda: [])
+    monkeypatch.setattr(dm, "data_dir", lambda: d)
+    monkeypatch.setattr(dm.winreg, "DeleteKey", lambda *a: None)
+    assert dm.admin_uninstall() == 0
+    assert not d.exists()
 
 
 def test_cli_refuses_odd_arguments():
