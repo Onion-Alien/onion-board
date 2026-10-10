@@ -1,0 +1,1 @@
+- Fix the radio map's square corner backing: its container and splitter now reveal the window behind the map's smooth rounded corners.
