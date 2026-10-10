@@ -223,6 +223,20 @@ def _mask(p, fill):
     p.drawArc(QRectF(9, 12, 6, 4), 200 * 16, 140 * 16)
 
 
+def _puzzle(p, fill):
+    """An add-on piece, with a tab above and a socket on the right."""
+    path = QPainterPath(QPointF(4, 8))
+    path.lineTo(9, 8)
+    path.cubicTo(7, 2, 17, 2, 15, 8)
+    path.lineTo(20, 8)
+    path.lineTo(20, 12)
+    path.cubicTo(14, 10, 14, 20, 20, 18)
+    path.lineTo(20, 21)
+    path.lineTo(4, 21)
+    path.closeSubpath()
+    p.drawPath(path)
+
+
 def _cable(p, fill):
     """The virtual cable / plug."""
     p.drawLine(QPointF(9, 3), QPointF(9, 7))
@@ -526,7 +540,7 @@ SHAPES = {
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
-    "sliders": _sliders, "wave": _wave,
+    "sliders": _sliders, "wave": _wave, "puzzle": _puzzle,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
     "download": _download,

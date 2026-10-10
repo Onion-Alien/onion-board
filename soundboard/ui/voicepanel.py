@@ -14,7 +14,7 @@ import threading
 import time
 
 from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QGuiApplication, QPainter
+from PySide6.QtGui import QColor, QGuiApplication, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
@@ -2615,19 +2615,56 @@ class ModulesList(QWidget):
         self.shown.emit()
 
 
+class CardBadge(QWidget):
+    """A small, theme-coloured emblem for a Voice card's header."""
+
+    def __init__(self, name: str):
+        super().__init__()
+        self.name = name
+        self.setFixedSize(36, 36)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+
+    def paintEvent(self, _event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        accent = QColor(theme.T["accent"])
+        wash = QColor(accent)
+        wash.setAlpha(32)
+        soft = QColor(accent)
+        soft.setAlpha(12)
+        edge = QColor(accent)
+        edge.setAlpha(55)
+        bg = QLinearGradient(0, 0, 36, 36)
+        bg.setColorAt(0, wash)
+        bg.setColorAt(1, soft)
+        p.setBrush(bg)
+        p.setPen(edge)
+        p.drawRoundedRect(QRectF(0.5, 0.5, 35, 35), 10, 10)
+        icons.icon(self.name, "accent").paint(p, 7, 7, 22, 22)
+        p.end()
+
+
+CARD_ICONS = {"fx": "voice", "ai": "wave", "speak": "browser",
+              "custom": "speech", "addons": "puzzle"}
+
+
 class CardHead(QWidget):
     """A card's title with an arrow: click anywhere on it to fold the card away. A
     folded card still says when it's on (and when it speaks another language)."""
     toggled = Signal(bool)   # open
 
-    def __init__(self, title: str):
+    def __init__(self, title: str, icon_name: str | None = None):
         super().__init__()
         self.setCursor(Qt.PointingHandCursor)
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
-        h.setSpacing(8)
+        h.setSpacing(12)
+        if icon_name:
+            self.badge = CardBadge(icon_name)
+            h.addWidget(self.badge, 0, Qt.AlignVCenter)
         self.label = section_label(title)
         self.label.setProperty("head", True)   # centred on the arrow, no top padding
+        self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         h.addWidget(self.label)
         h.addStretch(1)
         self.pill = QLabel("")
@@ -2717,6 +2754,7 @@ class VoicePanel(QWidget):
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
         body = QWidget()
         capped(body, page)  # not a 900 px wide card at full screen
+        body.setMaximumWidth(960)   # compact headers; open panels wrap to this width
         self._body = body
         body.installEventFilter(self)       # the status bar lines up with it (_line_up)
         pv = QVBoxLayout(body)
@@ -2947,7 +2985,9 @@ class VoicePanel(QWidget):
     # ---- cards that fold away
     def _fold_card(self, key: str, panel: QWidget) -> QFrame:
         f, v = card(roomy=True)
-        head = CardHead(panel.title.text())
+        # The header has no section label's top padding to compensate for.
+        v.setContentsMargins(18, 12, 18, 12)
+        head = CardHead(panel.title.text(), CARD_ICONS[key])
         panel.title.hide()                      # the head shows it, with the arrow
         head.toggled.connect(lambda open_, k=key, p=panel: self._fold(k, p, not open_))
         v.addWidget(head)
