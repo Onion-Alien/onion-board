@@ -9,6 +9,22 @@ flaky tests) as rules, says which docs a task needs (read only those), and has t
 one-command check: `scripts\precommit.ps1`. Never read `CHANGELOG.md` whole, only
 append under *Unreleased*. Cut releases with `scripts/release.py X.Y.Z`.
 
+## Before you change anything: sync first, check open PRs
+
+Do all three before the first edit, every task. Other agents work on this repo at
+the same time, and work done on a stale copy or twice in parallel gets thrown away.
+
+1. **Start from the latest `main`.** `git fetch origin`, then work on a new branch off
+   `origin/main` (`git switch -c <branch> origin/main`). If the checkout has someone
+   else's uncommitted work or isn't on a clean `main`, don't touch it: use a worktree
+   (`git worktree add <tmp> -b <branch> origin/main`).
+2. **Check you really have it.** `git status -sb` must not say `behind`, and
+   `git log -1 --oneline` must match `git log -1 --oneline origin/main`. Never edit
+   a copy that's behind `main`.
+3. **Know the open PRs.** `gh pr list --state open` (and `gh pr view N --json files`
+   for anything close to your task). If a PR already does your change, or touches the
+   same code, stop and tell the user instead of making a second version.
+
 ## This repo is public
 
 Everything written here — code, comments, docs, tests, commit messages — is
