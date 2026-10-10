@@ -16,6 +16,9 @@
 - **Readable voice meter.** The Voice tab's status chips no longer squeeze the
   mic meter into a tiny bar. It fills the available space and takes at least
   half the bar in roomy windows; status chips wrap below when needed.
+- Live effects open over the app in a draggable window, stay open while using the
+  board, and keep their position when reopened or when Redline is toggled.
+- The speed gauge enters its red zone at 8x, like a car rev counter.
 - ***Count me in* also counts roughly how long the app was open** since the last daily count (under 15 minutes, up to an hour, 1-3 hours, 3-8 hours or more), so we can tell quick checks from all-evening use. Never the times of day; nothing is sent while it's off.
 - **Clearer privacy text for *Count me in*.** It now says plainly that the random ID sent with the anonymous count links your counts together, so we can see how people use the app over time (which tabs, which versions, whether they come back) and what to improve. The only new thing sent is a short tag made from that same ID, so one person's days link up; switching *Count me in* off sends one last anonymous count (no ID) so we know how many people opted out, then nothing at all.
 - **Shorter, plainer *Count me in* text.** Settings says it in one line (anonymous usage stats once a day; never your name, IP address or device info), and the eye next to it opens a small table of everything it sends, with an example and why, plus links to the full list and GoatCounter's privacy policy. The installer says the same.
