@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "Voix IA : {voice} , démarrage.",
   "AI voice: {voice}.": "Voix IA : {voice} .",
   "No mic open": "Pas de micro ouvert",
-  "What others hear from your mic": "Ce que les autres entendent dans votre micro"
+  "What others hear from your mic": "Ce que les autres entendent dans votre micro",
+  "Getting Python ready…": "Préparation de Python…",
+  "Installing the voice engine (a few minutes)…": "Installation du moteur de voix (quelques minutes)…",
+  "Downloading the voices…": "Téléchargement des voix…",
+  "Downloading the voices: {percent}%": "Téléchargement des voix : {percent}%"
 }

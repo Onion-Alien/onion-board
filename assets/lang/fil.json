@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "Boses ng AI: {voice} , simula.",
   "AI voice: {voice}.": "Boses ng AI: {voice} .",
   "No mic open": "Walang bukas na mikropono",
-  "What others hear from your mic": "Kung ano ang naririnig ng iba mula sa iyong mikropono"
+  "What others hear from your mic": "Kung ano ang naririnig ng iba mula sa iyong mikropono",
+  "Getting Python ready…": "Inihahanda ang Python…",
+  "Installing the voice engine (a few minutes)…": "Ini-install ang voice engine (ilang minuto)…",
+  "Downloading the voices…": "Dina-download ang mga boses…",
+  "Downloading the voices: {percent}%": "Dina-download ang mga boses: {percent}%"
 }

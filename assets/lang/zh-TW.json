@@ -2942,5 +2942,9 @@
   "AI voice: {voice}, starting.": "AI語音： {voice} ，開始。",
   "AI voice: {voice}.": "AI語音： {voice} 。",
   "No mic open": "麥克風未開啟",
-  "What others hear from your mic": "其他人透過您的麥克風聽到的內容"
+  "What others hear from your mic": "其他人透過您的麥克風聽到的內容",
+  "Getting Python ready…": "正在準備 Python…",
+  "Installing the voice engine (a few minutes)…": "正在安裝語音引擎（需要幾分鐘）…",
+  "Downloading the voices…": "正在下載聲音…",
+  "Downloading the voices: {percent}%": "正在下載聲音：{percent}%"
 }

@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "AI-röst: {voice} , startar.",
   "AI voice: {voice}.": "AI-röst: {voice} .",
   "No mic open": "Ingen mikrofon öppen",
-  "What others hear from your mic": "Vad andra hör från din mikrofon"
+  "What others hear from your mic": "Vad andra hör från din mikrofon",
+  "Getting Python ready…": "Gör Python redo…",
+  "Installing the voice engine (a few minutes)…": "Installerar röstmotorn (några minuter)…",
+  "Downloading the voices…": "Laddar ner rösterna…",
+  "Downloading the voices: {percent}%": "Laddar ner rösterna: {percent}%"
 }

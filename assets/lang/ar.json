@@ -3262,5 +3262,9 @@
   "AI voice: {voice}, starting.": "صوت الذكاء الاصطناعي: {voice} ، البدء.",
   "AI voice: {voice}.": "صوت الذكاء الاصطناعي: {voice} .",
   "No mic open": "لا يوجد ميكروفون مفتوح",
-  "What others hear from your mic": "ما يسمعه الآخرون من الميكروفون الخاص بك"
+  "What others hear from your mic": "ما يسمعه الآخرون من الميكروفون الخاص بك",
+  "Getting Python ready…": "جارٍ تجهيز Python…",
+  "Installing the voice engine (a few minutes)…": "جارٍ تثبيت محرك الأصوات (بضع دقائق)…",
+  "Downloading the voices…": "جارٍ تنزيل الأصوات…",
+  "Downloading the voices: {percent}%": "جارٍ تنزيل الأصوات: {percent}%"
 }

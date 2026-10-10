@@ -2942,5 +2942,9 @@
   "AI voice: {voice}, starting.": "AI 음성: {voice} , 시작합니다.",
   "AI voice: {voice}.": "AI 음성: {voice} .",
   "No mic open": "마이크가 열려 있지 않음",
-  "What others hear from your mic": "다른 사람이 마이크에서 듣는 내용"
+  "What others hear from your mic": "다른 사람이 마이크에서 듣는 내용",
+  "Getting Python ready…": "Python 준비 중…",
+  "Installing the voice engine (a few minutes)…": "음성 엔진 설치 중(몇 분)…",
+  "Downloading the voices…": "목소리 다운로드 중…",
+  "Downloading the voices: {percent}%": "목소리 다운로드 중: {percent}%"
 }

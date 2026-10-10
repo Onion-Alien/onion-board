@@ -3070,5 +3070,9 @@
   "AI voice: {voice}, starting.": "ШІ голос: {voice} , починається.",
   "AI voice: {voice}.": "ШІ голос: {voice} .",
   "No mic open": "Мікрофон не відкритий",
-  "What others hear from your mic": "Що інші чують із вашого мікрофона"
+  "What others hear from your mic": "Що інші чують із вашого мікрофона",
+  "Getting Python ready…": "Готую Python…",
+  "Installing the voice engine (a few minutes)…": "Встановлюю голосовий рушій (кілька хвилин)…",
+  "Downloading the voices…": "Завантажую голоси…",
+  "Downloading the voices: {percent}%": "Завантажую голоси: {percent}%"
 }

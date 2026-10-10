@@ -450,3 +450,41 @@ def test_voice_settings_are_queued_with_the_audio_not_sent_from_the_ui_thread():
         c.host = None
         h.stop()
         b.close()
+
+
+def test_card_shows_robot_bunny_and_setup_stages_not_pip_output(qapp):
+    from soundboard.ui.aivoicepanel import AiVoicePanel, install_step
+    pip_msg = ("Successfully installed flatbuffers-25.12.19 numpy-2.5.3 "
+               "onnxruntime-1.30.0 packaging-26.3 protobuf-7.36.2")
+    assert install_step(pip_msg) is None            # pip's chatter: the stage stays up
+    assert install_step("> -m venv C:/x/.venv") == "Getting Python ready…"
+    assert "voice engine" in install_step("> -m pip install -r requirements.txt")
+    assert install_step("> C:/x/helper.py --download") == "Downloading the voices…"
+    assert install_step("Downloading the voice model: 42 %") == "Downloading the voices: 42%"
+
+    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
+    try:
+        assert p.bun_robot.robot and not p.bun_robot.isHidden()
+        assert p.loading_bar.isHidden()
+
+        p._on_install_line("> -m pip install -r requirements.txt")
+        p._on_install_line(pip_msg)
+        assert "voice engine" in p.lbl_install.text()
+        assert "flatbuffers" not in p.lbl_install.text()
+
+        p.bun_robot.build()
+        p.loading_bar.start()
+        p._on_install_done(True)                     # done: he celebrates, the bar goes
+        assert not p.bun_robot.building and p.bun_robot.celebrate
+        assert not p.loading_bar.running()
+
+        p.bun_robot.build()                          # failed: the real error shows
+        p._on_install_line("failed (exit code 1)")
+        p._on_install_done(False)
+        assert not p.bun_robot.building and p.bun_robot.sad > 0.5
+        assert "exit code 1" in p.lbl_install.text()
+        p._on_install_done(False, "network unreachable")
+        assert "network unreachable" in p.lbl_install.text()
+    finally:
+        p.shutdown()
+        p.deleteLater()

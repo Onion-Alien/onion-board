@@ -2942,5 +2942,9 @@
   "AI voice: {voice}, starting.": "Giọng nói AI: {voice} , đang bắt đầu.",
   "AI voice: {voice}.": "Giọng nói AI: {voice} .",
   "No mic open": "Không mở mic",
-  "What others hear from your mic": "Những gì người khác nghe được từ micrô của bạn"
+  "What others hear from your mic": "Những gì người khác nghe được từ micrô của bạn",
+  "Getting Python ready…": "Đang chuẩn bị Python…",
+  "Installing the voice engine (a few minutes)…": "Đang cài bộ máy giọng nói (vài phút)…",
+  "Downloading the voices…": "Đang tải giọng nói…",
+  "Downloading the voices: {percent}%": "Đang tải giọng nói: {percent}%"
 }

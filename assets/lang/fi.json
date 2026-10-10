@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "AI-ääni: {voice} , alkaa.",
   "AI voice: {voice}.": "AI-ääni: {voice} .",
   "No mic open": "Ei mikrofonia auki",
-  "What others hear from your mic": "Mitä muut kuulevat mikrofonistasi"
+  "What others hear from your mic": "Mitä muut kuulevat mikrofonistasi",
+  "Getting Python ready…": "Valmistellaan Pythonia…",
+  "Installing the voice engine (a few minutes)…": "Asennetaan äänimoottoria (muutama minuutti)…",
+  "Downloading the voices…": "Ladataan ääniä…",
+  "Downloading the voices: {percent}%": "Ladataan ääniä: {percent}%"
 }

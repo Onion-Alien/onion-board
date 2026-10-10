@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "AI-stem: {voice} , beginnend.",
   "AI voice: {voice}.": "AI-stem: {voice} .",
   "No mic open": "Geen microfoon open",
-  "What others hear from your mic": "Wat anderen via je microfoon horen"
+  "What others hear from your mic": "Wat anderen via je microfoon horen",
+  "Getting Python ready…": "Python klaarzetten…",
+  "Installing the voice engine (a few minutes)…": "Stemengine installeren (een paar minuten)…",
+  "Downloading the voices…": "Stemmen downloaden…",
+  "Downloading the voices: {percent}%": "Stemmen downloaden: {percent}%"
 }

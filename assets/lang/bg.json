@@ -3006,5 +3006,9 @@
   "What others hear from your mic": "Какво чуват другите от вашия микрофон",
   "That's a playlist: open one video and try again.": "Това е плейлист: отворете един видеоклип и опитайте отново.",
   "Can't add a live stream, use Record instead.": "Не можете да добавите поток на живо, вместо това използвайте Запис.",
-  "The downloader (yt-dlp) isn't installed, Settings → Updates → Reset downloader.": "Програмата за изтегляне (yt-dlp) не е инсталирана, Настройки → Актуализации → Нулиране на програмата за изтегляне."
+  "The downloader (yt-dlp) isn't installed, Settings → Updates → Reset downloader.": "Програмата за изтегляне (yt-dlp) не е инсталирана, Настройки → Актуализации → Нулиране на програмата за изтегляне.",
+  "Getting Python ready…": "Подготвяне на Python…",
+  "Installing the voice engine (a few minutes)…": "Инсталиране на гласовия двигател (няколко минути)…",
+  "Downloading the voices…": "Изтегляне на гласовете…",
+  "Downloading the voices: {percent}%": "Изтегляне на гласовете: {percent}%"
 }

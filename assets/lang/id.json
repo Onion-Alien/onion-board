@@ -2942,5 +2942,9 @@
   "AI voice: {voice}, starting.": "Suara AI: {voice} , dimulai.",
   "AI voice: {voice}.": "Suara AI: {voice} .",
   "No mic open": "Tidak ada mikrofon yang terbuka",
-  "What others hear from your mic": "Apa yang didengar orang lain dari mikrofon Anda"
+  "What others hear from your mic": "Apa yang didengar orang lain dari mikrofon Anda",
+  "Getting Python ready…": "Menyiapkan Python…",
+  "Installing the voice engine (a few minutes)…": "Memasang mesin suara (beberapa menit)…",
+  "Downloading the voices…": "Mengunduh suara…",
+  "Downloading the voices: {percent}%": "Mengunduh suara: {percent}%"
 }

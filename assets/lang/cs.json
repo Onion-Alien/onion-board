@@ -3070,5 +3070,9 @@
   "AI voice: {voice}, starting.": "Hlas AI: {voice} , začíná.",
   "AI voice: {voice}.": "Hlas AI: {voice} .",
   "No mic open": "Žádný otevřený mikrofon",
-  "What others hear from your mic": "Co ostatní slyší z vašeho mikrofonu"
+  "What others hear from your mic": "Co ostatní slyší z vašeho mikrofonu",
+  "Getting Python ready…": "Připravuji Python…",
+  "Installing the voice engine (a few minutes)…": "Instaluji hlasový engine (pár minut)…",
+  "Downloading the voices…": "Stahuji hlasy…",
+  "Downloading the voices: {percent}%": "Stahuji hlasy: {percent}%"
 }

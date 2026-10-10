@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "Φωνή AI: {voice} , έναρξη.",
   "AI voice: {voice}.": "Φωνή AI: {voice} .",
   "No mic open": "Κανένα μικρόφωνο ανοιχτό",
-  "What others hear from your mic": "Τι ακούνε οι άλλοι από το μικρόφωνό σας"
+  "What others hear from your mic": "Τι ακούνε οι άλλοι από το μικρόφωνό σας",
+  "Getting Python ready…": "Προετοιμασία της Python…",
+  "Installing the voice engine (a few minutes)…": "Εγκατάσταση της μηχανής φωνών (λίγα λεπτά)…",
+  "Downloading the voices…": "Λήψη των φωνών…",
+  "Downloading the voices: {percent}%": "Λήψη των φωνών: {percent}%"
 }

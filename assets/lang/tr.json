@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "AI sesi: {voice} , başlıyor.",
   "AI voice: {voice}.": "Yapay zeka sesi: {voice} .",
   "No mic open": "Mikrofon açık değil",
-  "What others hear from your mic": "Başkalarının mikrofonunuzdan duydukları"
+  "What others hear from your mic": "Başkalarının mikrofonunuzdan duydukları",
+  "Getting Python ready…": "Python hazırlanıyor…",
+  "Installing the voice engine (a few minutes)…": "Ses motoru kuruluyor (birkaç dakika)…",
+  "Downloading the voices…": "Sesler indiriliyor…",
+  "Downloading the voices: {percent}%": "Sesler indiriliyor: {percent}%"
 }

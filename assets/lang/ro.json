@@ -3070,5 +3070,9 @@
   "AI voice: {voice}, starting.": "Voce AI: {voice} , pornind.",
   "AI voice: {voice}.": "Voce AI: {voice} .",
   "No mic open": "Niciun microfon deschis",
-  "What others hear from your mic": "Ce aud alții de la microfonul tău"
+  "What others hear from your mic": "Ce aud alții de la microfonul tău",
+  "Getting Python ready…": "Se pregătește Python…",
+  "Installing the voice engine (a few minutes)…": "Se instalează motorul de voci (câteva minute)…",
+  "Downloading the voices…": "Se descarcă vocile…",
+  "Downloading the voices: {percent}%": "Se descarcă vocile: {percent}%"
 }

@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "एआई आवाज: {voice} , प्रारंभ।",
   "AI voice: {voice}.": "एआई आवाज: {voice} ।",
   "No mic open": "कोई माइक नहीं खुला",
-  "What others hear from your mic": "दूसरे आपके माइक से क्या सुनते हैं"
+  "What others hear from your mic": "दूसरे आपके माइक से क्या सुनते हैं",
+  "Getting Python ready…": "Python तैयार हो रहा है…",
+  "Installing the voice engine (a few minutes)…": "आवाज़ इंजन इंस्टॉल हो रहा है (कुछ मिनट)…",
+  "Downloading the voices…": "आवाज़ें डाउनलोड हो रही हैं…",
+  "Downloading the voices: {percent}%": "आवाज़ें डाउनलोड हो रही हैं: {percent}%"
 }

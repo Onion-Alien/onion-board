@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Robo-Bun sets up AI voices.** While AI voices download and install, a little
+  robot bunny runs off, comes back with a wrench and builds, with a moving bar and
+  short steps like "Installing the voice engine" instead of pip's output. He cheers
+  when it's done. If it fails, the real error still shows.
 - Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
   short gap clear of their buttons.
 - **Polished playback transport controls.** The sound player's Play/Pause button uses an accent-pill style with clean high-contrast icons that adapt across all themes, and the Stop button uses a sleek secondary surface with a subtle danger outline on hover. Both buttons use smooth filleted vector glyphs with optical centering.

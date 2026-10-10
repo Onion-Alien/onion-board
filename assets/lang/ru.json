@@ -3070,5 +3070,9 @@
   "What others hear from your mic": "Что другие слышат через ваш микрофон",
   "That's a playlist: open one video and try again.": "Это плейлист: откройте одно видео и повторите попытку.",
   "Can't add a live stream, use Record instead.": "Невозможно добавить прямую трансляцию. Вместо этого используйте «Запись».",
-  "The downloader (yt-dlp) isn't installed, Settings → Updates → Reset downloader.": "Загрузчик (yt-dlp) не установлен, Настройки → Обновления → Сбросить загрузчик."
+  "The downloader (yt-dlp) isn't installed, Settings → Updates → Reset downloader.": "Загрузчик (yt-dlp) не установлен, Настройки → Обновления → Сбросить загрузчик.",
+  "Getting Python ready…": "Готовлю Python…",
+  "Installing the voice engine (a few minutes)…": "Устанавливаю голосовой движок (пару минут)…",
+  "Downloading the voices…": "Скачиваю голоса…",
+  "Downloading the voices: {percent}%": "Скачиваю голоса: {percent}%"
 }

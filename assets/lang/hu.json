@@ -3006,5 +3006,9 @@
   "AI voice: {voice}, starting.": "AI hang: {voice} , indul.",
   "AI voice: {voice}.": "AI hang: {voice} .",
   "No mic open": "Nincs nyitva mikrofon",
-  "What others hear from your mic": "Amit mások hallanak a mikrofonodról"
+  "What others hear from your mic": "Amit mások hallanak a mikrofonodról",
+  "Getting Python ready…": "Python előkészítése…",
+  "Installing the voice engine (a few minutes)…": "A hangmotor telepítése (pár perc)…",
+  "Downloading the voices…": "A hangok letöltése…",
+  "Downloading the voices: {percent}%": "A hangok letöltése: {percent}%"
 }

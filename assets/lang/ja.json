@@ -2942,5 +2942,9 @@
   "AI voice: {voice}, starting.": "AI 音声: {voice} 、開始します。",
   "AI voice: {voice}.": "AI 音声: {voice} 。",
   "No mic open": "マイクが開いていません",
-  "What others hear from your mic": "あなたのマイクから他の人に聞こえる音"
+  "What others hear from your mic": "あなたのマイクから他の人に聞こえる音",
+  "Getting Python ready…": "Python を準備中…",
+  "Installing the voice engine (a few minutes)…": "音声エンジンをインストール中（数分）…",
+  "Downloading the voices…": "声をダウンロード中…",
+  "Downloading the voices: {percent}%": "声をダウンロード中: {percent}%"
 }
