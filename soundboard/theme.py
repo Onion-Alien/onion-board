@@ -955,8 +955,7 @@ def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
     panel = tk["panel"]
     return dict(
         tk,
-        bg_glow=_mix(tk["bg"], tk["accent"], 0.05 if light else 0.09),
-        bg_foot=_mix(tk["bg"], black, 0.04 if light else 0.28),
+        **_window_shades(tk, light),
         card_top=_mix(panel, white, 0.5) if light else _mix(panel, tk["text_hi"], 0.04),
         card_base=panel,
         edge=white if light else _mix(panel, tk["text_hi"], 0.11),
@@ -967,6 +966,13 @@ def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
         live_top=_mix(tk["live"], white, 0.16),
         grain=_grain_url(light),
     )
+
+
+def _window_shades(tk: dict[str, str], light: bool) -> dict[str, str]:
+    """The window gradient's glow and foot: all paint_window_bg needs, without the
+    rest of polish_tokens (its grain file is on disk, and that runs on every paint)."""
+    return dict(bg_glow=_mix(tk["bg"], tk["accent"], 0.05 if light else 0.09),
+                bg_foot=_mix(tk["bg"], "#000000", 0.04 if light else 0.28))
 
 
 def polished(name: str | None = None) -> bool:
@@ -986,7 +992,9 @@ def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: fl
         p.fillRect(rect, QColor(T["bg"]))
         return
     light = is_light()
-    pt = polish_tokens(T, light)
+    # never polish_tokens here: it checks the grain file on disk, and this runs on every
+    # paint of the sound board (a slow disk froze the window mid-paint for seconds)
+    pt = dict(T, **_window_shades(T, light))
     g = QRadialGradient(QPointF(0.08, 0), 1.15)
     for at, key in ((0, "bg_glow"), (0.45, "bg"), (1, "bg_foot")):
         g.setColorAt(at, QColor(pt[key]))
@@ -1018,7 +1026,14 @@ def _grain_image(light: bool, size: int = 96) -> QImage:
     return img
 
 
+_grain_urls: dict[bool, str] = {}
+
+
 def _grain_url(light: bool) -> str:
+    """The grain tile as a file for the stylesheet: made once, then remembered (each
+    stylesheet build asked the disk again)."""
+    if url := _grain_urls.get(light):
+        return url
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"
     path = folder / f"grain-{'light' if light else 'dark'}.png"
     try:
@@ -1027,7 +1042,8 @@ def _grain_url(light: bool) -> str:
             _grain_image(light).save(str(path))
     except OSError:
         return ""
-    return path.as_posix()
+    _grain_urls[light] = url = path.as_posix()
+    return url
 
 
 def _check_image(colour: str, size: int) -> QImage:
