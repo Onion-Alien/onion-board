@@ -48,7 +48,10 @@ The full list. The [README](../README.md) has the short version and how to get s
   writes every sound (picture, effects, hotkey, categories) and your settings to
   one `.zip`; import it on a new PC (which audio devices and where sounds go stay
   per PC). A category or a single pad exports as a sound pack to share; importing
-  skips sounds you already have. *Import from another soundboard* brings sounds over
+  skips sounds you already have, and asks before a pack's hotkeys take keys your
+  sounds already use. *Backup → My sound packs* lists the packs you imported: reset
+  one to how it came (its pads' edits undone, removed ones back) or remove it in one
+  go. *Import from another soundboard* brings sounds over
   from Soundpad, Resanance, Soundux or EXP Soundboard. The format is a plain
   zip of JSON and the original audio files — see
   [BACKUP-FORMAT.md](BACKUP-FORMAT.md).
