@@ -2881,7 +2881,11 @@ class VoicePanel(QWidget):
                 col = 0 if heights[0] <= heights[1] else 1
             place[f] = col
             if not f.isHidden():
-                heights[col] += f.sizeHint().height() if f.height() <= 1 else f.height()
+                # Geometry still describes the previous fold until Qt delivers its
+                # layout request. Using it here briefly sends later cards to the
+                # wrong column, then the resize sends them back again.
+                heights[col] += (f.heightForWidth(f.width()) if f.hasHeightForWidth()
+                                 else f.sizeHint().height())
                 heights[col] += gap
         cols = (self._lcol, self._rcol)
         for col in cols:                 # already where they belong, in order: no-op
@@ -2890,11 +2894,13 @@ class VoicePanel(QWidget):
                 break
         else:
             return
-        for f in self._cards:
-            cols[place[f] ^ 1].removeWidget(f)
-            col = cols[place[f]]
-            col.removeWidget(f)
-            col.insertWidget(col.count() - 1, f)   # above the column's stretch
+        for n, col in enumerate(cols):
+            for j, f in enumerate(f for f in self._cards if place[f] == n):
+                if col.itemAt(j).widget() is f:
+                    continue
+                cols[n ^ 1].removeWidget(f)
+                col.removeWidget(f)
+                col.insertWidget(j, f)   # leave cards already in place alone
 
     def _fx_changed(self, spec: dict):
         if self.chain.errors:              # give a bypassed effect another go after an edit
@@ -2975,6 +2981,8 @@ class VoicePanel(QWidget):
     def _fold(self, key: str, panel: QWidget, folded: bool):
         panel.setVisible(not folded)
         self._update_heads()
+        self._arrange()
+        self._body.layout().activate()   # place the new fold before the next paint
         if folded == (key in self._folded):
             return
         (self._folded.add if folded else self._folded.discard)(key)
