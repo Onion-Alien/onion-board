@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- *Straight into my mic*: a damaged link file between the board and the mic effect
+  that said the wrong sample rate is made again, instead of your sounds going out at
+  the wrong speed and pitch.
 - Switching a tab off, or closing a window, while it's still loading something (the
   voice list, a picture, Discord's settings) can no longer crash the app.
 - Starting the app (or changing theme) no longer makes every Desktop icon blink and
