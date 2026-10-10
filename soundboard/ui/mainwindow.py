@@ -50,6 +50,7 @@ from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, re
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card,
                                  hint_label, icon_label, steady_number, vsep)
+from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import set_tab_live
@@ -858,6 +859,9 @@ class MainWindow(QMainWindow):
         self._lang_offered = ""
         rv.addWidget(self.lang_bar)
 
+        self.download_bar = DownloadBar(self)
+        rv.addWidget(self.download_bar)
+
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
         self.tabs = SideTabs()   # its bar hidden: the rail down the left shows the tabs
@@ -991,6 +995,27 @@ class MainWindow(QMainWindow):
         self.status.hide()
         self._pages.addWidget(self._build_mini())
 
+        self.linkbar.download_started.connect(self._on_download_started)
+        self.linkbar.progress.connect(self.download_bar.set_progress)
+        self.linkbar.progress.connect(self.mini_download_bar.set_progress)
+        self.linkbar.done.connect(self.download_bar.set_done)
+        self.linkbar.done.connect(self.mini_download_bar.set_done)
+        self.linkbar.queue_updated.connect(self.download_bar.set_queue)
+        self.linkbar.queue_updated.connect(self.mini_download_bar.set_queue)
+        self.download_bar.cancel_requested.connect(self.linkbar.cancel)
+        self.mini_download_bar.cancel_requested.connect(self.linkbar.cancel)
+        self.ytresults.thumb_ready.connect(self.download_bar.set_thumb)
+        self.ytresults.thumb_ready.connect(self.mini_download_bar.set_thumb)
+
+    def _on_download_started(self, url: str, title: str, kind: str, secs: float = 0.0):
+        pm = None
+        for r in self.ytresults._rows:
+            if r.result.url == url and r.thumb.has_picture():
+                pm = r.thumb._pm
+                break
+        self.download_bar.set_active(url, title, kind, pm)
+        self.mini_download_bar.set_active(url, title, kind, pm)
+
     def _build_mini(self) -> QWidget:
         """The mini player: what's playing, play / stop, where it's at, Live and Stop
         all, and the pads above them if there's room. The pads are the real ones,
@@ -999,6 +1024,9 @@ class MainWindow(QMainWindow):
         v = self._mini_v = QVBoxLayout(page)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
+        self.mini_download_bar = DownloadBar(self)
+        self.mini_download_bar.set_mini(True)
+        v.addWidget(self.mini_download_bar)
         v.addStretch(0)   # keeps the player at the bottom when the pads don't fit
         card = self._mini_card = QFrame()
         card.setObjectName("transport")

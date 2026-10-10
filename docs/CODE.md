@@ -109,6 +109,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/netcategory.py` | whether Windows calls the network an address is on Public / Private / Domain (Network List Manager over COM, no admin), so the phone remote never listens on a café's Wi-Fi |
 | `soundboard/ui/remotehost.py` | Onion Board as the host of a "remote" add-on such as Onion Pocket: its settings (never in a backup), a lan server offering a list of actions, and Settings' look for its card on Settings → Remote |
 | `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
+| `soundboard/ui/downloadbar.py` | persistent top download bar across tabs and in mini player mode: parsing, download progress with live percentage, processing stages, queue badge, and cancel button |
 | `soundboard/ui/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar; the one in the player shows a bouncing equalizer and *Play* becomes *Pause* |
 | `soundboard/ui/spacekey.py` | Space plays / pauses on the Sounds and Radio tabs wherever the focus is (not in text boxes, or on a button reached with Tab) |
 | `soundboard/ui/speedpitch.py` | movable live controls windows: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |

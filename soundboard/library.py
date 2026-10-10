@@ -69,8 +69,8 @@ RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
               ".aiff", ".aif", ".webm", ".mp4", ".mkv", ".mov"}
-MAX_SECONDS = 15 * 60
-FFMPEG_TIMEOUT = 120
+MAX_SECONDS = 120 * 60
+FFMPEG_TIMEOUT = 300
 TARGET_RMS_DB = -17.0  # loudness everything is levelled to when "Level volumes" is on
 I16 = 32767.0
 

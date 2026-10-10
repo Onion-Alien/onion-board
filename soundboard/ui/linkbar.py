@@ -50,8 +50,11 @@ class LinkBar(QFrame):
     played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
     _msg = Signal(str, str, object)   # worker -> UI: (kind, url, payload)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
-    progress = Signal(str, float)     # (url, 0..1 downloaded, or -1 while it's converted)
+    progress = Signal(str, object)    # (url, 0..1 downloaded, or -1/stage while it's converted)
     link_changed = Signal(str)        # the search box's link ("" when it has none now)
+    download_started = Signal(str, str, str, float)  # (url, title, kind, seconds)
+    queue_updated = Signal(list)      # list of queued download dicts
+    download_cancelled = Signal(str)  # (url)
 
     def __init__(self, engine, cfg, color_for, known_for):
         """`color_for()` gives the next pad colour, `known_for()` {fingerprint: name}
@@ -61,9 +64,12 @@ class LinkBar(QFrame):
         self._color_for, self._known_for = color_for, known_for
         self.url = ""
         self.title = ""
+        self._secs = 0.0
         self._text = ""               # the search box's text last seen
         self._busy = ""               # "", "add" or "play": one download at a time
         self._busy_url = ""
+        self._queue_list: list[dict] = []
+        self._cancelled_urls: set[str] = set()
         self._got = None              # (url, file, int16 audio, gain) of the last download
         # (url, int16 audio, gain) of the last add: Play after it is instant. Dropped with
         # the link, like _got: a 15-minute song is ~170 MB
@@ -127,6 +133,7 @@ class LinkBar(QFrame):
             self._blocked = ""
             self._drop_download()
         self.title = title
+        self._secs = secs
         dur = f" · {fmt_time(secs)}" if secs else ""
         self._say(f"<b>{html.escape(title)}</b>{dur} "   # kept for reading, not shown
                   f"<span style='color:{theme.T['muted']}'>· {html.escape(self._host())}</span>")
@@ -164,6 +171,11 @@ class LinkBar(QFrame):
             self.done.emit(self.url, "add", True)
             return True
         if self._busy:
+            if self.url == self._busy_url:
+                if self._busy == "add" or self._queued == "add":
+                    return True
+                self._queued = "add"
+                return True
             return self._queue("add")
         self._start("add")
         return True
@@ -171,8 +183,28 @@ class LinkBar(QFrame):
     def play_once(self) -> bool:
         if not self.url:
             return False
-        if self._busy:
+        # If already downloading this exact sound for play, don't restart
+        if self._busy == "play" and self._busy_url == self.url:
+            return True
+        # If the same URL is already downloading (e.g. for Add), share the download
+        if self._busy and self._busy_url == self.url:
+            if self._queued == "play":
+                return True
+            self._queued = "play"
+            return True
+        # If another URL preview is in flight, preempt it: cancel the old preview so
+        # ghost audio never plays
+        if self._busy == "play" and self._busy_url != self.url:
+            old_url = self._busy_url
+            self._busy = ""
+            self._busy_url = ""
+            self._cancelled_urls.add(old_url)
+            self.download_cancelled.emit(old_url)
+            self.done.emit(old_url, "play", False)
+        elif self._busy == "add":
+            # An "add" to library for another sound is currently writing; queue play behind it
             return self._queue("play")
+
         have = next((g for g in (self._got, self._kept)
                      if g is not None and g[0] == self.url), None)
         if have is not None:
@@ -183,16 +215,55 @@ class LinkBar(QFrame):
         return True
 
     def _queue(self, kind: str) -> bool:
-        """Another download is running (one at a time): do this one after it."""
+        """Another sound's download is running: queue this one after it."""
         if self.url == self._busy_url and kind == self._busy:
             return True   # already running: don't import the same sound twice
-        if self._queued == kind:
-            return True
-        self._queued = kind
+        for item in self._queue_list:
+            if item["url"] == self.url and item["kind"] == kind:
+                return True
+        # Cap queue at 3 items to prevent runaway background queues
+        if len(self._queue_list) >= 3:
+            busy.flash(self.btn_add if kind == "add" else self.btn_play,
+                       _("Queue is full"))
+            return False
+        self._queue_list.append({
+            "url": self.url,
+            "title": self.title,
+            "kind": kind,
+            "seconds": getattr(self, "_secs", 0.0),
+        })
+        self.queue_updated.emit(list(self._queue_list))
+        self.done.emit(self.url, "queued", True)
         name = html.escape(self.title or self._host())
         self._say(_("<b>{name}</b> is next: waiting for the download before it to finish…",
                     name=name))
         return True
+
+    def cancel(self, url: str = ""):
+        target = url or self._busy_url
+        if not target:
+            return
+        if target == self._busy_url:
+            cancelled_url = self._busy_url
+            was_kind = self._busy
+            self._busy = ""
+            self._busy_url = ""
+            self._cancelled_urls.add(cancelled_url)
+            self.download_cancelled.emit(cancelled_url)
+            self.done.emit(cancelled_url, was_kind, False)
+            if self._queue_list:
+                next_item = self._queue_list.pop(0)
+                self.queue_updated.emit(list(self._queue_list))
+                self.open(next_item["url"], next_item["title"], next_item.get("seconds", 0.0))
+                if next_item["kind"] == "add":
+                    self.add()
+                else:
+                    self.play_once()
+        else:
+            self._queue_list = [x for x in self._queue_list if x["url"] != target]
+            self.queue_updated.emit(list(self._queue_list))
+            self.download_cancelled.emit(target)
+            self.done.emit(target, "add", False)
 
     def _without_tor(self):
         """The user's click on "Try this one without Tor": that one download, direct."""
@@ -205,6 +276,7 @@ class LinkBar(QFrame):
         self._busy = kind
         self._busy_url = self.url
         self._buttons()
+        self.download_started.emit(self.url, self.title, kind, getattr(self, "_secs", 0.0))
         got, self._got = self._got, None   # the worker owns (and deletes) it now
         # Settings > Data & quality: Add as sound keeps the video too (Play never does)
         video = kind == "add" and quality.current.save_video
@@ -245,12 +317,13 @@ class LinkBar(QFrame):
         keep = False
         try:
             if path is None:
+                self._msg.emit("progress", url, "parsing")
                 path, title = ytdl.download_audio(
                     url, progress=lambda f: self._msg.emit("progress", url, f),
                     auto_update=auto_update, **({"direct": True} if direct else {}),
                     **({"video": True} if video else {}))
                 self._msg.emit("title", url, title)
-            self._msg.emit("progress", url, -1.0)
+            self._msg.emit("progress", url, "processing")
             if kind == "play":
                 audio = decode(str(path))
                 self._msg.emit("play", url, (path, to_int16(audio), level_gain(audio)))
@@ -305,6 +378,12 @@ class LinkBar(QFrame):
                 _drop_temp(path)
 
     def _on_msg(self, kind: str, url: str, payload):
+        if url in self._cancelled_urls:
+            self._cancelled_urls.discard(url)
+            if kind == "play" and payload:
+                _drop_temp(payload[0])
+            self._process_next_queue()
+            return
         current = url == self.url
         if kind == "title":
             if current:
@@ -358,7 +437,18 @@ class LinkBar(QFrame):
                 # fetch would leave an error visible even if the retry succeeded.
                 queued, self._queued = self._queued, ""
                 self.done.emit(url, queued, False)
-        if self._queued and self.url:
+        self._process_next_queue()
+
+    def _process_next_queue(self):
+        if self._queue_list:
+            next_item = self._queue_list.pop(0)
+            self.queue_updated.emit(list(self._queue_list))
+            self.open(next_item["url"], next_item["title"], next_item.get("seconds", 0.0))
+            if next_item["kind"] == "add":
+                self.add()
+            else:
+                self.play_once()
+        elif self._queued and self.url:
             queued, self._queued = self._queued, ""
             if queued == "add":
                 self.add()
