@@ -13,14 +13,20 @@ the workflow, this script) runs them all. A change no test is about (the README,
 changelog, the website) runs none. main runs the whole suite after every merge, and
 so does a manual run of the workflow.
 
-Usage: python scripts/pick_tests.py [BASE] [--local]   (BASE defaults to origin/main)
+Usage: python scripts/pick_tests.py [BASE] [--local] [--matrix]   (BASE: origin/main)
 Prints the test files, one per line: `tests` alone for all of them, nothing for none.
 --local also counts uncommitted and new files. Locally, scripts/precommit.ps1 runs
 ruff, the sensitive-data scan and these tests in one go.
+
+--matrix prints CI's Windows jobs as JSON instead (BASE "all": the whole suite): the
+picked files split into SHARDS jobs of about the same length by test_times.json (each
+file's seconds in a full run), or one job when they're quick, or none. Refresh it now
+and then from a full run's `--durations=0 --durations-min=0` (refresh_times()).
 """
 from __future__ import annotations
 
 import ast
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -146,11 +152,62 @@ def pick(changed: list[str]) -> list[str]:
     return sorted(tests[t].relative_to(ROOT).as_posix() for t in picked)
 
 
+TIMES = Path(__file__).with_name("test_times.json")
+SHARDS = 2             # Windows jobs a long run is split into
+SPLIT_FROM_S = 240     # seconds of tests (summed over workers) worth a second job:
+                       # each job spends ~35 s starting (checkout, venv cache, Python)
+
+
+def all_tests() -> list[str]:
+    return sorted(p.relative_to(ROOT).as_posix() for p in TESTS.glob("test_*.py"))
+
+
+def shards(files: list[str], n: int = SHARDS) -> list[list[str]]:
+    """`files` in jobs of about the same length (longest first, each into the job with
+    the least so far). One job when they're quick; a file not timed yet counts as an
+    average one."""
+    times = json.loads(TIMES.read_text(encoding="utf-8"))
+    avg = sum(times.values()) / max(len(times), 1)
+    cost = {f: max(times.get(f, avg), 0.5) for f in files}
+    if not files:
+        return []
+    if sum(cost.values()) < SPLIT_FROM_S:
+        return [sorted(files)]
+    jobs: list[tuple[float, list[str]]] = [(0.0, []) for _ in range(n)]
+    for f in sorted(files, key=lambda f: -cost[f]):
+        i = min(range(n), key=lambda i: jobs[i][0])
+        jobs[i] = (jobs[i][0] + cost[f], jobs[i][1] + [f])
+    return [sorted(fs) for _t, fs in jobs if fs]
+
+
+def matrix(picked: list[str]) -> list[dict]:
+    files = all_tests() if picked == ["tests"] else picked
+    jobs = shards(files)
+    return [{"shard": f"{i}/{len(jobs)}", "tests": " ".join(fs)}
+            for i, fs in enumerate(jobs, 1)]
+
+
+def refresh_times(durations_log: str) -> dict[str, float]:
+    """Each test file's seconds (setup + call + teardown) from a pytest
+    `--durations=0 --durations-min=0` output."""
+    import re
+    out: dict[str, float] = {}
+    for line in durations_log.splitlines():
+        m = re.match(r"([\d.]+)s (?:call|setup|teardown)\s+(tests/\S+?\.py)::", line)
+        if m:
+            out[m[2]] = round(out.get(m[2], 0.0) + float(m[1]), 1)
+    return dict(sorted(out.items()))
+
+
 def main(argv: list[str]) -> int:
-    local = "--local" in argv
-    args = [a for a in argv[1:] if a != "--local"]
+    flags = {a for a in argv[1:] if a.startswith("--")}
+    args = [a for a in argv[1:] if not a.startswith("--")]
     base = args[0] if args else "origin/main"
-    for line in pick(changed_files(base, local)):
+    picked = ["tests"] if base == "all" else pick(changed_files(base, "--local" in flags))
+    if "--matrix" in flags:
+        print(json.dumps(matrix(picked)))
+        return 0
+    for line in picked:
         print(line)
     return 0
 
