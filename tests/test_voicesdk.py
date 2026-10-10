@@ -4,6 +4,8 @@ import threading
 import time
 from pathlib import Path
 
+import pytest
+
 from soundboard import voicesdk
 
 
@@ -111,6 +113,7 @@ def test_watcher_scans_each_exe_once():
     assert calls == ["C:/Games/U/u.exe"] and w.suggestion == "unity"
 
 
+@pytest.mark.windows   # Windows paths
 def test_is_system_never_touches_the_disk(monkeypatch):
     """It runs on the UI thread every few seconds: resolving the game's exe on a
     sleeping drive froze the window for 6 s."""

@@ -404,6 +404,7 @@ def test_release_notes_become_plain_whole_paragraphs():
     assert updates.summary(page) == "Drum pads.\n\n- MIDI pads."   # the page's download line
 
 
+@pytest.mark.windows   # Windows' PATH (; between folders)
 def test_installer_starts_without_the_frozen_apps_variables():
     bundle = r"C:\Apps\OnionBoard\_internal"
     env = updates.installer_env({

@@ -38,6 +38,7 @@ def test_icon_file_is_named_by_its_picture(qapp, tmp_path):
     assert sorted(p.name for p in tmp_path.iterdir()) == sorted([a.name, b.name])
 
 
+@pytest.mark.windows   # Windows paths ignore case
 def test_is_ours_matches_only_this_copy(tmp_path):
     exe = str(tmp_path / "OnionBoard" / "OnionBoard.exe")
     assert shellicon.is_ours(exe, "", frozen=True, exe=exe)

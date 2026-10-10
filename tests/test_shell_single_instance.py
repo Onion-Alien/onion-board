@@ -8,6 +8,8 @@ import pytest
 from conftest import own_time
 from soundboard import singleinstance as si
 
+pytestmark = pytest.mark.windows   # Windows' named mutex
+
 
 @pytest.fixture
 def instance(monkeypatch):

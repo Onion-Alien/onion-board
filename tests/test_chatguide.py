@@ -230,6 +230,7 @@ def test_cable_end_ok_only_at_48k(rate):
     assert cableformat.CableEnd("x", "render", "i", 48000, 24, 2).ok
 
 
+@pytest.mark.windows   # Windows' struct layouts (a 4-byte long)
 def test_with_rate_rewrites_rate_and_byte_rate():
     from soundboard.appaudio import WAVEFORMATEX
     wf = WAVEFORMATEX(1, 2, 44100, 44100 * 4, 4, 16, 0)
