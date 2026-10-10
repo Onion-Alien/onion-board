@@ -724,7 +724,7 @@ def apply_settings(cfg: Config, raw: dict) -> list[str]:
     defaults = Config()
     changed = []
     for k, v in raw.items():
-        if k in LOCAL_SETTINGS or k not in Config.__dataclass_fields__:
+        if k in LOCAL_SETTINGS or k not in library.field_names(Config):
             continue
         want = getattr(defaults, k)
         if want is None:

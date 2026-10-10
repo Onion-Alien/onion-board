@@ -229,6 +229,16 @@ def test_apply_settings_checks_types_and_skips_local_ones():
     assert sorted(changed) == ["cue_sounds", "pad_width", "sound_vol"]
 
 
+def test_apply_settings_never_takes_the_windows_own_state():
+    # read_only / load_note are what load() tells the window, not settings: a backup
+    # naming read_only stopped every save for the session (imported pads lost on restart)
+    cfg = Config()
+    changed = backup.apply_settings(cfg, {"read_only": True, "load_note": "hi",
+                                          "mon_vol": 0.5})
+    assert changed == ["mon_vol"]
+    assert cfg.read_only is False and cfg.load_note == ""
+
+
 def _sound_zip(p, entry, sizes=(("s", 1000),)):
     """A zip with a sound folder per (folder, audio bytes); `entry` goes in each."""
     with zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED) as z:

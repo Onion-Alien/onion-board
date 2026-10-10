@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Importing a backup whose settings name `read_only` no longer stops the app saving
+  for the rest of the session (the imported sounds were gone after a restart), and a
+  settings file naming it is no longer set aside as damaged.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
