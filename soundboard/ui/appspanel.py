@@ -25,9 +25,11 @@ import threading
 import time
 import zlib
 
-from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QPainter, QPixmap
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel,
+from PySide6.QtCore import (QEvent, QMimeData, QObject, QRect, QSize, Qt,
+                            QTimer, Signal)
+from PySide6.QtGui import QDrag, QFont, QPainter, QPixmap
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
+                               QHBoxLayout, QLabel,
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
@@ -71,6 +73,85 @@ TO = (("both", _("Call + stream"), _("Others in the call and your stream output 
       ("stream", _("Stream only"), _("Only your stream output gets it (music for your "
                                      "viewers), not the call")))
 TO_KEYS = tuple(k for k, *__ in TO)
+
+# Exact executable names: a web page's title never decides its browser's category.
+APP_CATEGORIES = {
+    "Browsers": ("chrome", "msedge", "firefox", "brave", "opera", "vivaldi", "chromium",
+                 "waterfox", "librewolf", "zen", "arc", "iexplore"),
+    "Music & media": ("spotify", "vlc", "wmplayer", "music.ui", "video.ui", "itunes",
+                      "foobar2000", "winamp", "aimp", "mpv", "mpc-hc", "mpc-hc64",
+                      "mpc-be", "mpc-be64", "plex", "jellyfinmediaplayer", "audacity",
+                      "obs64", "obs32", "potplayermini", "potplayermini64"),
+    "Calls & chat": ("discord", "discordcanary", "discordptb", "slack", "teams",
+                     "ms-teams", "zoom", "skype", "telegram", "signal", "whatsapp",
+                     "element", "mumble", "ts3client_win64", "ts3client_win32"),
+    "Games": ("steam", "steamwebhelper", "epicgameslauncher", "battle.net", "riotclientux",
+              "minecraft", "minecraft.windows", "robloxplayerbeta", "fortniteclient-win64-shipping",
+              "valorant-win64-shipping", "cs2", "dota2", "rocketleague", "overwatch",
+              "league of legends", "r5apex", "gta5", "eldenring", "wow", "terraria"),
+}
+APP_DRAG_MIME = "application/x-onionboard-app-card"
+
+
+def app_category(exe: str) -> str:
+    stem = exe.replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
+    return next((category for category, names in APP_CATEGORIES.items() if stem in names),
+                "Other")
+
+
+class AppCategoryHeading(QLabel):
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setOpacity(0.25)
+        painter.setPen(self.palette().color(self.foregroundRole()))
+        painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
+
+
+class AppGrid(CardGrid):
+    """One responsive card grid per category, with a heading above each populated group."""
+
+    def __init__(self, host, **kwargs):
+        super().__init__(**kwargs)
+        self.headings = {}
+        for category in (*APP_CATEGORIES, "Other"):
+            label = AppCategoryHeading(category, host)
+            label.setContentsMargins(0, 0, 0, 6)
+            font = label.font()
+            font.setWeight(QFont.DemiBold)
+            label.setFont(font)
+            label.hide()
+            self.headings[category] = label
+
+    def _place(self, rect: QRect, move: bool) -> int:
+        shown = [item for item in self._items if not item.isEmpty()]
+        cols = self.columns(rect.width())
+        width = max(1, (rect.width() - self._gap * (cols - 1)) // cols)
+        y = rect.y()
+        for category, heading in self.headings.items():
+            group = [item for item in shown if item.widget().category == category]
+            if move:
+                heading.setVisible(bool(group) and not self.max_cols)
+            if not group:
+                continue
+            if y != rect.y():
+                y += self._gap
+            if not self.max_cols:   # the clip editor's big view needs all the space
+                height = heading.sizeHint().height() + 4
+                if move:
+                    heading.setGeometry(QRect(rect.x(), y, rect.width(), height))
+                y += height + self._gap
+            for i in range(0, len(group), cols):
+                line = group[i:i + cols]
+                heights = [max(item.heightForWidth(width) if item.hasHeightForWidth()
+                               else item.sizeHint().height(), item.minimumSize().height())
+                           for item in line]
+                if move:
+                    for j, item in enumerate(line):
+                        item.setGeometry(QRect(rect.x() + j * (width + self._gap), y,
+                                               width, heights[j]))
+                y += max(heights) + self._gap
+        return max(0, y - self._gap - rect.y())
 
 
 # a version folder in a program's path (Discord's app-1.0.9156, 24.1.3): it changes on
@@ -229,6 +310,7 @@ class AppRow(HoverCard):
     to_changed = Signal(object, str)        # row, one of TO_KEYS
     clip_toggled = Signal(object, bool)     # row, the clip editor opened / closed
     forget = Signal(object)
+    reordered = Signal(object, object, bool)   # source, target, insert before
 
     def __init__(self, exe: str, meter_cls, vol: float = 1.0, hear: bool = False,
                  to: str = "both", key: str = "", path: str = ""):
@@ -236,6 +318,9 @@ class AppRow(HoverCard):
         self.exe = exe
         self.key = key or exe.lower()   # AppsTab.rows' key: the .exe, or a path_key
         self.path = path                # path_key of the program it is ("" not known yet)
+        self.category = app_category(exe)
+        self._drag_press = None
+        self.setAcceptDrops(True)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
         self.last_sound_at = time.monotonic()
@@ -250,7 +335,14 @@ class AppRow(HoverCard):
         v = QVBoxLayout(self)
         v.setContentsMargins(12, 10, 12, 10)
         v.setSpacing(8)
-        top = QHBoxLayout()
+        self.header = QWidget()
+        self.header.setCursor(Qt.OpenHandCursor)
+        self.header.setToolTip("Left-click and drag to reorder within this category. "
+                               "Drop on the left half "
+                               "of another card to place before it, "
+                               "or the right half to place after.")
+        top = QHBoxLayout(self.header)
+        top.setContentsMargins(0, 0, 0, 0)
         top.setSpacing(10)
         self.icon = QLabel()
         self.icon.setFixedSize(28, 28)
@@ -270,13 +362,16 @@ class AppRow(HoverCard):
         names.addWidget(self.name)
         names.addWidget(self.sub)
         top.addLayout(names, 1)
+        for label in (self.header, self.icon, self.name, self.sub):
+            label.setCursor(Qt.OpenHandCursor)
+            label.installEventFilter(self)
         self.btn_forget = QPushButton("✕")
         self.btn_forget.setObjectName("small")
         self.btn_forget.setToolTip(_("Take this program off the list"))
         self.btn_forget.setFixedWidth(26)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
         top.addWidget(self.btn_forget, 0, Qt.AlignTop)
-        v.addLayout(top)
+        v.addWidget(self.header)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(60)
         v.addWidget(self.meter)
@@ -337,6 +432,51 @@ class AppRow(HoverCard):
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
+
+    def eventFilter(self, obj, event):
+        if obj in (self.header, self.icon, self.name, self.sub):
+            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+                self._drag_press = event.globalPosition().toPoint()
+                return True
+            if event.type() == QEvent.MouseButtonRelease:
+                self._drag_press = None
+                return True
+            if (event.type() == QEvent.MouseMove and self._drag_press is not None
+                    and event.buttons() & Qt.LeftButton):
+                distance = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
+                if distance >= QApplication.startDragDistance():
+                    self._drag_press = None
+                    drag = QDrag(self)
+                    mime = QMimeData()
+                    mime.setData(APP_DRAG_MIME, self.key.encode("utf-8"))
+                    drag.setMimeData(mime)
+                    drag.setPixmap(self.grab().scaledToWidth(200, Qt.SmoothTransformation))
+                    drag.exec(Qt.MoveAction)
+                return True
+        return super().eventFilter(obj, event)
+
+    def dragEnterEvent(self, event):
+        source = event.source()
+        if (event.mimeData().hasFormat(APP_DRAG_MIME) and isinstance(source, AppRow)
+                and source is not self and source.parentWidget() is self.parentWidget()
+                and source.category == self.category):
+            event.setDropAction(Qt.MoveAction)
+            event.accept()
+            self._hover(True)
+        else:
+            event.ignore()
+
+    dragMoveEvent = dragEnterEvent
+
+    def dragLeaveEvent(self, event):
+        self._hover(False)
+        event.accept()
+
+    def dropEvent(self, event):
+        self.dragEnterEvent(event)
+        if event.isAccepted():
+            self.reordered.emit(event.source(), self, event.position().x() < self.width() / 2)
+        self._hover(False)
 
     NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
     # narrow card, in this order: the typed volume goes, the buttons keep only their
@@ -547,7 +687,7 @@ class AppsTab(QWidget):
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)
         self.list_layout.setSpacing(6)
-        self.grid = CardGrid(min_w=self.card_size.value(), gap=10, even=False)
+        self.grid = AppGrid(self.list, min_w=self.card_size.value(), gap=10, even=False)
         self.card_size.valueChanged.connect(self._set_card_size)
         # nothing playing: Bun waits, a bit glum, above the how-to
         self.empty = QWidget()
@@ -619,6 +759,32 @@ class AppsTab(QWidget):
         self._save()
 
     # ------------------------------------------------------------------ lifecycle
+    def _layout_apps(self):
+        shown = 0
+        for row in self.rows.values():
+            visible = self.big is None or row is self.big
+            row.setVisible(bool(visible))
+            shown += bool(visible)
+        self.empty.setVisible(not shown)
+        self.grid.invalidate()
+        self.list.updateGeometry()
+
+    def _reorder_apps(self, source: AppRow, target: AppRow, before: bool):
+        if (self.big is not None or source is target or source.category != target.category
+                or self.rows.get(source.key) is not source
+                or self.rows.get(target.key) is not target):
+            return
+        order = [self.grid.itemAt(i).widget() for i in range(self.grid.count())]
+        order.remove(source)
+        order.insert(order.index(target) + (not before), source)
+        # Move layout items, keeping the same cards, captures and clip editors alive.
+        items = {item.widget(): item for item in
+                 [self.grid.takeAt(0) for _ in range(self.grid.count())]}
+        for row in order:
+            self.grid.addItem(items[row])
+        self.grid.invalidate()
+        self.list_layout.activate()
+
     def showEvent(self, ev):
         super().showEvent(ev)
         self.start()
@@ -732,10 +898,9 @@ class AppsTab(QWidget):
             row.to_changed.connect(self._on_to)
             row.clip_toggled.connect(self._on_clip)
             row.forget.connect(self._on_forget)
+            row.reordered.connect(self._reorder_apps)
             self.grid.addWidget(row)
-            if self.big is not None:
-                row.hide()   # another card has the big view
-            self.empty.setVisible(False)
+            self._layout_apps()
             self._tools_for_rows()
         return row
 
@@ -755,7 +920,7 @@ class AppsTab(QWidget):
         self.rows.pop(row.key, None)
         self.grid.removeWidget(row)
         row.deleteLater()
-        self.empty.setVisible(not self.rows)
+        self._layout_apps()
         self._tools_for_rows()
         self._report_active()
 
@@ -928,7 +1093,7 @@ class AppsTab(QWidget):
             elif row.status_text and row.status_error:
                 row.set_status("")
         self._label_folders()
-        self.empty.setVisible(not self.rows)
+        self._layout_apps()
         self._tools_for_rows()
         self._report_active()
         if not self.isVisible():
@@ -965,6 +1130,10 @@ class AppsTab(QWidget):
             self.meter_timer.stop()   # hidden, nothing to cap: showEvent restarts it
             return
         for row in list(self.rows.values()):
+            if row.app is not None:
+                live = self.peaks.peak(row.app.pid)
+                if live is not None and live > 0:
+                    row.last_sound_at = time.monotonic()
             rec = row.rec
             if row.app is not None:
                 live = self.peaks.peak(row.app.pid)
@@ -1189,8 +1358,7 @@ class AppsTab(QWidget):
         if on and row.editor is None:
             return
         self.big = row if on else None
-        for r in self.rows.values():
-            r.setVisible(on is False or r is row)
+        self._layout_apps()
         if row.editor is not None:
             row.editor.set_big(on)
         self.grid.max_cols = 1 if on else 0   # the one card shown, the tab's width

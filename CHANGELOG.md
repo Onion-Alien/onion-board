@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
+  headings. Left-drag a card's header to reorder it within its category for the
+  current session. Unrecognized applications appear in Other.
 - Idle Apps cards disappear after ten minutes without sound and return when sound
   resumes. Sending, remembered programs, recordings and clip edits stay available.
 - **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
