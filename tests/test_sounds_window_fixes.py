@@ -12,7 +12,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
-from soundboard import backup, engine, winkeys
+from soundboard import backup, engine, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui import mainwindow as main
 
@@ -164,6 +164,139 @@ def test_an_imported_hotkey_does_not_take_a_categorys(window, tmp_path, qapp):
     assert window.cfg.sounds[-1].hotkey == ""
     assert window.cfg.category_hotkeys == {"Memes": "f7"}
     assert window._registered[-1]["f7"] == main.RANDOM + "Memes"
+
+
+@pytest.mark.parametrize("take", [False, True])
+def test_a_pack_asks_before_taking_a_sounds_hotkey(window, tmp_path, qapp, monkeypatch,
+                                                   take):
+    window.meta("s0").hotkey = "f8"
+    asked = []
+    monkeypatch.setattr(window, "_take_pack_hotkeys",
+                        lambda clashes, name: asked.append(clashes) or take)
+    wav = _tone(tmp_path / "w.wav").read_bytes()
+    window.import_package(str(_pack(tmp_path / "p.zip", {"name": "x", "hotkey": "f8"}, wav)))
+    process_events(qapp, lambda: len(window.cfg.sounds) == 4, 10)
+    assert [(k, o.name, n.name) for k, o, n in asked[0]] == [("f8", "Boom", "x")]
+    assert window.meta("s0").hotkey == ("" if take else "f8")
+    assert window.cfg.sounds[-1].hotkey == ("f8" if take else "")
+
+
+def test_a_pack_with_no_clashing_hotkeys_asks_nothing(window, tmp_path, qapp, monkeypatch):
+    monkeypatch.setattr(window, "_take_pack_hotkeys", lambda *a: pytest.fail("asked"))
+    wav = _tone(tmp_path / "w.wav").read_bytes()
+    window.import_package(str(_pack(tmp_path / "p.zip", {"name": "x", "hotkey": "f9"}, wav)))
+    process_events(qapp, lambda: len(window.cfg.sounds) == 4, 10)
+    assert window.cfg.sounds[-1].hotkey == "f9"
+
+
+def _three_pack(tmp_path, fingerprints=True):
+    path = tmp_path / "Dungeon pack.zip"
+    with zipfile.ZipFile(path, "w") as z:
+        for i, name in enumerate(("Door", "Dragon", "Coins")):
+            wav = tmp_path / f"{i}.wav"   # a pitch of its own: not a sound already here
+            t = np.arange(int(SR * 0.1)) / SR
+            sf.write(str(wav), np.sin(2 * np.pi * (300 + 100 * i) * t) * 0.3, SR)
+            z.writestr(f"{i} {name}/sound.json", json.dumps(
+                {"audio": "a.wav", "name": name, "hotkey": f"f{i + 1}", "volume": 0.5,
+                 "fingerprint": library.fingerprint(str(wav)) if fingerprints else ""}))
+            z.writestr(f"{i} {name}/a.wav", wav.read_bytes())
+    return path
+
+
+def _import_three(window, tmp_path, qapp):
+    window.import_package(str(_three_pack(tmp_path)))
+    process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
+    return window.cfg.sounds[3:]
+
+
+def test_a_sound_pack_is_kept_and_its_sounds_know_it(window, tmp_path, qapp):
+    door, dragon, coins = _import_three(window, tmp_path, qapp)
+    (pid, name), = backup.packs().items()
+    assert name == "Dungeon pack"
+    assert [(m.pack, m.pack_item) for m in (door, dragon, coins)] == [
+        (pid, "0 Door"), (pid, "1 Dragon"), (pid, "2 Coins")]
+    # imported again: kept once, nothing added
+    window.import_package(str(_three_pack(tmp_path)))
+    process_events(qapp, lambda: "already" in window.status.text(), 10)
+    assert len(backup.packs()) == 1 and len(window.cfg.sounds) == 6
+
+
+def test_an_exported_category_is_a_pack_and_a_full_backup_is_not(window, tmp_path):
+    cat, full = tmp_path / "cat.zip", tmp_path / "full.zip"
+    backup.export(cat, window.cfg.sounds[:2])
+    backup.export(full, window.cfg.sounds, window.cfg)
+    assert backup.read(cat).is_pack and not backup.read(full).is_pack
+
+
+def test_a_hand_made_pack_imported_twice_adds_nothing(window, tmp_path, qapp):
+    window.import_package(str(_three_pack(tmp_path, fingerprints=False)))
+    process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
+    window.import_package(str(_three_pack(tmp_path, fingerprints=False)))
+    process_events(qapp, lambda: "already" in window.status.text(), 10)
+    assert len(window.cfg.sounds) == 6
+
+
+def test_a_sound_pack_resets_to_how_it_came(window, tmp_path, qapp):
+    door, dragon, coins = _import_three(window, tmp_path, qapp)
+    pid = door.pack
+    door.name, door.hotkey, door.volume, door.tags = "My door", "f9", 1.5, ["Mine"]
+    window.remove_sounds([dragon.id])
+    window._finish_removals()
+    assert [m.name for m in window.cfg.sounds[3:]] == ["My door", "Coins"]
+    window.reset_pack(pid, ask=False)
+    process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
+    # put back in its place, with its own settings; my other sounds untouched
+    assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn", "Crash",
+                                                    "Door", "Dragon", "Coins"]
+    door = window.cfg.sounds[3]
+    assert (door.hotkey, door.volume, door.tags) == ("f1", 0.5, [])
+    assert window.cfg.sounds[4].pack == pid and window.cfg.sounds[4].hotkey == "f2"
+
+
+def test_a_reset_asks_before_taking_a_key_given_to_another_sound(window, tmp_path, qapp,
+                                                                 monkeypatch):
+    door, *_rest = _import_three(window, tmp_path, qapp)
+    door.hotkey = ""
+    window.meta("s0").hotkey = "f1"
+    asked = []
+    monkeypatch.setattr(window, "_take_pack_hotkeys",
+                        lambda clashes, name: asked.append(name) or False)
+    window.reset_pack(door.pack, ask=False)
+    assert asked == ["Dungeon pack"]
+    assert window.meta("s0").hotkey == "f1" and door.hotkey == ""
+
+
+def test_a_sound_pack_is_removed_in_one_go_and_undone(window, tmp_path, qapp):
+    door, *_rest = _import_three(window, tmp_path, qapp)
+    pid = door.pack
+    window.remove_pack(pid, ask=False)
+    assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn", "Crash"]
+    window.undo_remove()
+    assert len(window.cfg.sounds) == 6
+    window._finish_removals()
+    assert pid in backup.packs()   # undone: still kept
+    window.remove_pack(pid, ask=False)
+    window._finish_removals()
+    assert backup.packs() == {}
+
+
+def test_sounds_from_an_older_import_join_the_pack(window, tmp_path, qapp):
+    door, *_rest = _import_three(window, tmp_path, qapp)
+    for m in window.cfg.sounds[3:]:   # imported before packs were kept
+        m.pack = m.pack_item = ""
+    backup.forget_pack(door.pack)
+    window.import_package(str(_three_pack(tmp_path)))
+    process_events(qapp, lambda: "already" in window.status.text(), 10)
+    pid, = backup.packs()
+    assert [m.pack for m in window.cfg.sounds[3:]] == [pid] * 3
+
+
+def test_the_same_hotkeys_box_keeps_mine_on_escape(window, qapp):
+    from PySide6.QtCore import QTimer
+    from PySide6.QtWidgets import QApplication
+    m = window.meta("s0")
+    QTimer.singleShot(0, lambda: QApplication.activeModalWidget().reject())
+    assert window._take_pack_hotkeys([("f8", m, m)], "p.zip") is False
 
 
 # ------------------------------------------------------------------ settings

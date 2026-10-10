@@ -213,6 +213,14 @@ class Package:
     app_version: str = ""
     created: str = ""
     is_board: bool = False      # has an onionboard.json (else: a sound or a sound pack)
+    pack_id: str = ""           # set by keep_pack(): its sounds remember where they came from
+    restored: list = field(default_factory=list)   # reset_pack(): sounds already on the board
+
+    @property
+    def is_pack(self) -> bool:
+        """A sound pack (several sounds, no settings: an exported category, or a zip of
+        sound folders): kept, so it can be reset or removed in one go later."""
+        return self.settings is None and len(self.sounds) >= 2
 
 
 # What a damaged / unreadable zip can raise while it's opened or read: a bad
@@ -434,14 +442,17 @@ class Imported:
     sounds: list[SoundMeta] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)   # names already in the library
     failed: list[str] = field(default_factory=list)    # "name: why"
+    # (fingerprint, pack folder) of the skipped ones: the sounds already here join the pack
+    adopt: list[tuple[str, str]] = field(default_factory=list)
 
 
-def install(pkg: Package, known_fingerprints: set[str], color_for=None) -> Imported:
+def install(pkg: Package, known_fingerprints: set[str], color_for=None,
+            on_board: set[tuple[str, str]] = frozenset()) -> Imported:
     """Copy the package's sounds into the library, as new sounds with ids of their own.
     Sounds whose fingerprint is already in the library are skipped (importing the same
     backup twice adds nothing); copies inside the package are all kept, since "Save as
-    new sound" makes pads that share their audio. The audio is decoded later, by the
-    normal loader."""
+    new sound" makes pads that share their audio. So are ones `on_board` has as
+    (pack id, pack folder). The audio is decoded later, by the normal loader."""
     out = Imported()
     known = set(known_fingerprints)
     src = _Source(pkg.path)
@@ -450,12 +461,18 @@ def install(pkg: Package, known_fingerprints: set[str], color_for=None) -> Impor
         for i, ps in enumerate(pkg.sounds):
             name = str(ps.entry.get("name") or Path(ps.audio).stem)[:40]
             fp = ps.entry.get("fingerprint")
+            if (pkg.pack_id, ps.folder) in on_board:
+                out.skipped.append(name)
+                continue
             if isinstance(fp, str) and fp and fp in known:
                 out.skipped.append(name)
+                out.adopt.append((fp, ps.folder))
                 continue
             try:
                 meta = _install_one(src, ps, name, color_for(i) if color_for else None,
                                     budget)
+                if pkg.pack_id:
+                    meta.pack, meta.pack_item = pkg.pack_id, ps.folder
             except (OSError, BackupError, zipfile.BadZipFile) as e:
                 log.warning("import of %s failed", ps.folder, exc_info=True)
                 out.failed.append(_("{name}: {error}", name=name, error=errors.plain(e)))
@@ -512,15 +529,33 @@ def _install_one(src: _Source, ps: PackedSound, name: str, color: str | None,
 
 def _fill_meta(src: _Source, ps: PackedSound, sid: str, name: str, color: str | None,
                dest: Path, budget: _Budget | None = None) -> SoundMeta:
-    from soundboard import thumbs
     meta = SoundMeta(id=sid, name=name, file=str(dest), added=time.time())
-    defaults = {f.name: getattr(meta, f.name) for f in fields(SoundMeta)}
+    _apply_entry(meta, ps.entry, color)
+    if not meta.fingerprint:
+        meta.fingerprint = library.fingerprint(str(dest))
+    _put_picture(src, ps, meta, budget)
+    return meta
+
+
+_MEASURED = ("level_gain", "duration", "fingerprint")
+
+
+def _apply_entry(meta: SoundMeta, entry: dict, color: str | None):
+    """The settings a sound.json gives (checked, like the config's) onto `meta`; ones
+    it leaves out or gets wrong are the defaults."""
+    blank = SoundMeta(id="", name="", file="")
+    defaults = {f.name: getattr(blank, f.name) for f in fields(SoundMeta)}
     for k in SOUND_FIELDS:
-        v = ps.entry.get(k)
-        if k == "name" or v is None:
-            continue
-        if _accept(defaults[k], v):
-            setattr(meta, k, float(v) if isinstance(defaults[k], float) else v)
+        if k == "name":
+            continue   # cut to size by the caller
+        v = entry.get(k)
+        if v is not None and _accept(defaults[k], v):
+            v = float(v) if isinstance(defaults[k], float) else v
+        elif k in _MEASURED:
+            continue   # left as measured from the audio
+        else:
+            v = defaults[k]
+        setattr(meta, k, v.copy() if isinstance(v, (dict, list)) else v)
     meta.tags = clean_tags(meta.tags)
     meta.volume = min(max(meta.volume, 0.0), 2.0)
     meta.level_gain = min(max(meta.level_gain, 0.1), 6.0)
@@ -531,17 +566,122 @@ def _fill_meta(src: _Source, ps: PackedSound, sid: str, name: str, color: str | 
         meta.mode = "restart"
     if not (meta.color.startswith("#") and len(meta.color) in (4, 7)):
         meta.color = color or library.PAD_COLORS[0]
-    if not meta.fingerprint:
-        meta.fingerprint = library.fingerprint(str(dest))
-    if ps.picture:
-        with tempfile.TemporaryDirectory(prefix="onionboard-import-") as td:
-            tmp = Path(td) / ("picture" + Path(ps.picture).suffix.lower())
+
+
+def _put_picture(src: _Source, ps: PackedSound, meta: SoundMeta,
+                 budget: _Budget | None = None):
+    from soundboard import thumbs
+    if not ps.picture:
+        return
+    with tempfile.TemporaryDirectory(prefix="onionboard-import-") as td:
+        tmp = Path(td) / ("picture" + Path(ps.picture).suffix.lower())
+        try:
+            _extract(src, ps.picture, tmp, limit=MAX_PICTURE, budget=budget)
+            meta.image = thumbs.store(tmp, meta.id)   # re-encoded: only a real picture gets in
+        except (BackupError, *_ZIP_ERRORS):
+            log.debug("import: the picture of %s didn't come across", meta.name, exc_info=True)
+
+
+# --------------------------------------------------------------------------- sound packs
+# An imported sound pack is kept (a copy of its zip in APP_DIR/packs, with a .json
+# naming it), and its sounds remember it (SoundMeta.pack / pack_item), so the whole
+# pack can be removed, or put back how it came after its pads were changed or removed.
+
+def packs_dir() -> Path:
+    return library.APP_DIR / "packs"
+
+
+def keep_pack(pkg: Package) -> str:
+    """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
+    twice gets the same id and is kept once). "" if it couldn't be kept."""
+    import hashlib
+    src = Path(pkg.path)
+    h = hashlib.sha1()
+    try:
+        if src.is_dir():
+            for p in sorted(p for p in src.rglob("*") if p.is_file()):
+                h.update(f"{p.relative_to(src).as_posix()}\0{p.stat().st_size}\0".encode())
+        else:
+            with open(src, "rb") as f:
+                while chunk := f.read(1 << 20):
+                    h.update(chunk)
+        pid = h.hexdigest()[:12]
+        d = packs_dir()
+        d.mkdir(parents=True, exist_ok=True)
+        dest = d / f"{pid}.zip"
+        if not dest.is_file():
+            tmp = dest.with_name(dest.name + ".part")
             try:
-                _extract(src, ps.picture, tmp, limit=MAX_PICTURE, budget=budget)
-                meta.image = thumbs.store(tmp, sid)   # re-encoded: only a real picture gets in
-            except (BackupError, *_ZIP_ERRORS):
-                log.debug("import: the picture of %s didn't come across", name, exc_info=True)
-    return meta
+                if src.is_dir():
+                    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+                        for p in sorted(p for p in src.rglob("*") if p.is_file()):
+                            _add_file(z, p, p.relative_to(src).as_posix())
+                else:
+                    shutil.copyfile(src, tmp)
+                tmp.replace(dest)
+            except BaseException:
+                tmp.unlink(missing_ok=True)
+                raise
+        name = src.stem if not src.is_dir() else src.name
+        (d / f"{pid}.json").write_text(json.dumps({"name": name[:60]}), "utf-8")
+    except OSError:
+        log.warning("couldn't keep a copy of the sound pack %s", src.name, exc_info=True)
+        return ""
+    pkg.pack_id = pid
+    return pid
+
+
+def packs() -> dict[str, str]:
+    """The sound packs kept: {id: name}, by name."""
+    out = {}
+    for j in packs_dir().glob("*.json") if packs_dir().is_dir() else []:
+        if not (j.with_suffix(".zip")).is_file():
+            continue
+        try:
+            name = json.loads(j.read_text("utf-8")).get("name")
+        except (OSError, ValueError, AttributeError):
+            name = None
+        out[j.stem] = name if isinstance(name, str) and name else j.stem
+    return dict(sorted(out.items(), key=lambda kv: kv[1].lower()))
+
+
+def read_pack(pid: str) -> Package:
+    """A kept sound pack, read again (BackupError if it's gone or damaged)."""
+    if pid not in packs():
+        raise BackupError(_("That sound pack isn't kept any more. Import it again."))
+    pkg = read(packs_dir() / f"{pid}.zip")
+    pkg.pack_id = pid
+    return pkg
+
+
+def forget_pack(pid: str):
+    """Stop keeping a sound pack (its sounds were removed)."""
+    for ext in (".zip", ".json"):
+        try:
+            (packs_dir() / f"{pid}{ext}").unlink(missing_ok=True)
+        except OSError:
+            log.warning("couldn't remove the kept sound pack %s", pid, exc_info=True)
+
+
+def reset_sounds(pkg: Package, on_board: dict[str, SoundMeta]) -> list[SoundMeta]:
+    """Put the sounds of a kept pack that are still on the board ({pack folder: meta})
+    back how the pack has them: name, hotkey, volume, effects, categories, picture…
+    Their audio file and id stay. Returns the ones changed back."""
+    out = []
+    src = _Source(pkg.path)
+    try:
+        for ps in pkg.sounds:
+            m = on_board.get(ps.folder)
+            if m is None:
+                continue
+            m.name = str(ps.entry.get("name") or Path(ps.audio).stem)[:40]
+            _apply_entry(m, ps.entry, m.color)
+            m.image = ""
+            _put_picture(src, ps, m)
+            out.append(m)
+    finally:
+        src.close()
+    return out
 
 
 class _Budget:

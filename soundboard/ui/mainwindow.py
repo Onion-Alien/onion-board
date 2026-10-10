@@ -425,6 +425,7 @@ class MainWindow(QMainWindow):
         self.bridge.mic_users.connect(self._on_mic_users)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
+        self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
@@ -1221,6 +1222,9 @@ class MainWindow(QMainWindow):
         for src in otherboards.sources():
             icons.set_icon(om.addAction(f"{src.name}…", lambda src=src: self.import_other(src)),
                            "sounds")
+        pm = self._packs_menu = mm.addMenu(_("My sound packs"))
+        icons.set_icon(pm.menuAction(), "sounds")
+        pm.aboutToShow.connect(lambda: self._fill_packs_menu(pm))
         mm.addSeparator()
         icons.set_icon(mm.addAction(_("Export everything (sounds + settings)…"),
                                     self.export_board), "download")
@@ -1230,7 +1234,9 @@ class MainWindow(QMainWindow):
         icons.set_icon(mm.addAction(_("Recently deleted sounds…"), self.show_deleted), "trash")
         icons.set_icon(mm.addAction(_("Open the sounds folder"), self.open_sounds_folder),
                        "folder")   # here too, for when the window's too narrow for its button
-        mm.aboutToShow.connect(lambda: self._act_export_cat.setEnabled(bool(self.cfg.category)))
+        mm.aboutToShow.connect(lambda: (
+            self._act_export_cat.setEnabled(bool(self.cfg.category)),
+            pm.menuAction().setVisible(bool(backup.packs()))))
         more.setMenu(mm)
         self.btn_bin = QPushButton()
         self.btn_bin.setToolTip(_("Sounds you removed: bring them back, exactly as they were"))
@@ -5870,6 +5876,10 @@ class MainWindow(QMainWindow):
             trash.put_sound(m, i)
         if done:
             self._label_bin()
+        for pid in self._packs_removed:   # not undone: the pack is no longer kept
+            if not any(m.pack == pid for m in self.cfg.sounds):
+                backup.forget_pack(pid)
+        self._packs_removed.clear()
 
     def _label_bin(self):
         """The "Recently deleted (n)" button: there while the bin has sounds in it."""
@@ -6338,14 +6348,17 @@ class MainWindow(QMainWindow):
         # only what's on the board: a sound removed a moment ago (still undo-able) must
         # come back from its backup, or deleting all then restoring leaves nothing
         known = {m.fingerprint for m in self.cfg.sounds if m.fingerprint}
+        have = {(m.pack, m.pack_item) for m in self.cfg.sounds if m.pack}
         start = len(self.cfg.sounds)
         self.status.setText(_("Importing {n} sound(s)…", n=len(pkg.sounds)))
         self.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
 
         def run():
             try:
+                if pkg.is_pack:   # kept, so it can be reset or removed in one go later
+                    backup.keep_pack(pkg)
                 res = backup.install(
-                    pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)])
+                    pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
                 self.bridge.unpacked.emit(res, pkg, "")
             except Exception as e:  # noqa: BLE001
                 log.exception("import of %s failed", path)
@@ -6379,40 +6392,197 @@ class MainWindow(QMainWindow):
                                     _("Done. Hotkeys and the theme apply now; everything else "
                                       "the next time Onion Board starts."))
 
+    def _take_pack_hotkeys(self, clashes: list[tuple[str, SoundMeta, SoundMeta]],
+                           name: str) -> bool:
+        """Some sounds in a pack use hotkeys sounds here already have: give those keys
+        to the pack's sounds? No (the default, and Esc) keeps them on yours."""
+        lines = "\n".join(f"{pretty_key(k)}: {old.name} → {new.name}"
+                          for k, old, new in clashes[:10])
+        if len(clashes) > 10:
+            lines += "\n…"
+        box = QMessageBox(QMessageBox.Question, _("Same hotkeys"),
+                          ngettext("A sound in “{name}” uses a hotkey one of your sounds "
+                                   "already has:\n\n{lines}\n\nGive it to the new sound?",
+                                   "{n} sounds in “{name}” use hotkeys your sounds already "
+                                   "have:\n\n{lines}\n\nGive them to the new sounds?",
+                                   len(clashes), name=name, lines=lines),
+                          QMessageBox.NoButton, self)
+        yes = box.addButton(_("Use the new ones"), QMessageBox.YesRole)
+        keep = box.addButton(_("Keep mine"), QMessageBox.NoRole)
+        box.setDefaultButton(keep)
+        box.setEscapeButton(keep)
+        box.exec()
+        clicked = box.clickedButton()
+        free_dialog(box)
+        return clicked is yes
+
     def _on_unpacked(self, res, pkg, err: str):
         self._update_status()
         if res is None:
             QMessageBox.warning(self, _("Import failed"), err)
             return
-        taken = {o.hotkey for o in self.cfg.sounds if o.hotkey}
-        taken |= {getattr(self.cfg, a) for a, *__ in HOTKEY_ACTIONS if getattr(self.cfg, a)}
-        taken |= {k for k in self.cfg.category_hotkeys.values() if k}
-        if self.cfg.ptt_key:   # pressed by us for the game: never a sound's hotkey
-            taken.add(self.cfg.ptt_key)
+        if pkg.pack_id:   # sounds already here from an earlier import join the pack
+            for fp, folder in res.adopt:
+                m = next((o for o in self.cfg.sounds if o.fingerprint == fp and not o.pack),
+                         None)
+                if m:
+                    m.pack, m.pack_item = pkg.pack_id, folder
+        self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.library import merge_tags
-        for m in res.sounds:
-            if m.hotkey in taken:
-                m.hotkey = ""   # the sounds already here keep theirs
-            taken.add(m.hotkey)
+        order = [ps.folder for ps in pkg.sounds]
+        for m in pkg.restored + res.sounds:
             # "memes" goes into the "Memes" already here (and a new one gets a tab)
             m.tags = merge_tags(m.tags, self.cfg.categories)
-            self.cfg.sounds.append(m)
+        for m in res.sounds:
+            self.cfg.sounds.insert(self._pack_spot(m, order), m)
         merge_tags(pkg.categories, self.cfg.categories)   # a full backup's empty ones too
+        for m in pkg.restored:
+            self.engine.set_gain(m.id, self.gain_for(m))
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
         self._load_all()
         self.register_hotkeys()
         n = len(res.sounds)
-        msg = (ngettext("Imported {n} sound ({skipped} already in your library)",
-                        "Imported {n} sounds ({skipped} already in your library)", n,
-                        skipped=len(res.skipped)) if res.skipped else
-               ngettext("Imported {n} sound", "Imported {n} sounds", n))
+        if pkg.restored:   # Backup → My sound packs → Reset to how it came
+            msg = _("“{name}” is back how it came", name=self._pack_name(pkg))
+            if n:
+                msg += ngettext(" ({n} removed sound put back)",
+                                " ({n} removed sounds put back)", n)
+        elif res.skipped:
+            msg = ngettext("Imported {n} sound ({skipped} already in your library)",
+                           "Imported {n} sounds ({skipped} already in your library)", n,
+                           skipped=len(res.skipped))
+        else:
+            msg = ngettext("Imported {n} sound", "Imported {n} sounds", n)
         self.status.setText(msg + ".")
-        self.toast(f"✓ {msg}", "ok" if n else "")
+        self.toast(f"✓ {msg}", "ok" if n or pkg.restored else "")
         if res.failed:
             QMessageBox.warning(self, _("Some sounds weren't imported"),
                                 "\n".join(res.failed[:15]))
+
+    def _settle_hotkeys(self, incoming: list[SoundMeta], name: str):
+        """Hotkeys coming in with a pack that are already in use. Ones a sound here has:
+        ask whether the pack's sounds take them. App-wide keys, category keys and
+        push-to-talk always stay where they are. Whatever's still taken is cleared on
+        the incoming sound (and a key twice in the pack goes to the first)."""
+        taken = {getattr(self.cfg, a) for a, *__ in HOTKEY_ACTIONS if getattr(self.cfg, a)}
+        taken |= {k for k in self.cfg.category_hotkeys.values() if k}
+        if self.cfg.ptt_key:   # pressed by us for the game: never a sound's hotkey
+            taken.add(self.cfg.ptt_key)
+        ids = {m.id for m in incoming}
+        mine = {o.hotkey: o for o in self.cfg.sounds if o.hotkey and o.id not in ids}
+        clashes, seen = [], set(taken)
+        for m in incoming:
+            if m.hotkey and m.hotkey not in seen and m.hotkey in mine:
+                clashes.append((m.hotkey, mine[m.hotkey], m))
+            seen.add(m.hotkey)
+        if clashes and self._take_pack_hotkeys(clashes, name):
+            for _key, old, _new in clashes:
+                old.hotkey = ""   # the pack's sound gets it instead
+        taken |= {o.hotkey for o in self.cfg.sounds if o.hotkey and o.id not in ids}
+        for m in incoming:
+            if m.hotkey in taken:
+                m.hotkey = ""   # the sounds already here keep theirs
+            taken.add(m.hotkey)
+
+    def _pack_name(self, pkg) -> str:
+        return backup.packs().get(pkg.pack_id) or Path(pkg.path).name
+
+    def _pack_spot(self, m: SoundMeta, order: list[str]) -> int:
+        """Where a sound coming back into its pack goes: after the pack's sound before it
+        (or before the one after it) on the board; anything else goes on the end."""
+        if not m.pack or m.pack_item not in order:
+            return len(self.cfg.sounds)
+        at = {o.pack_item: i for i, o in enumerate(self.cfg.sounds) if o.pack == m.pack}
+        k = order.index(m.pack_item)
+        for f in reversed(order[:k]):
+            if f in at:
+                return at[f] + 1
+        for f in order[k + 1:]:
+            if f in at:
+                return at[f]
+        return len(self.cfg.sounds)
+
+    def _fill_packs_menu(self, menu: QMenu):
+        """Backup → My sound packs: each pack imported, to reset or remove in one go."""
+        menu.clear()
+        for pid, name in backup.packs().items():
+            n = sum(m.pack == pid for m in self.cfg.sounds)
+            sub = menu.addMenu(ngettext("{name} ({n} sound)", "{name} ({n} sounds)", n,
+                                        name=name.replace("&", "&&")))   # not a shortcut
+            sub.addAction(_("Reset to how it came"), lambda pid=pid: self.reset_pack(pid))
+            act = sub.addAction(_("Remove from the board"), lambda pid=pid: self.remove_pack(pid))
+            act.setEnabled(bool(n))
+
+    def reset_pack(self, pid: str, ask: bool = True):
+        """Put a sound pack back how it came: its sounds' names, hotkeys, volume,
+        effects, categories and pictures, and its removed sounds come back."""
+        try:
+            pkg = backup.read_pack(pid)
+        except backup.BackupError as e:
+            errors.warn(self, _("Can't reset the sound pack"), e)
+            return
+        name = self._pack_name(pkg)
+        if ask and QMessageBox.question(
+                self, _("Reset sound pack"),
+                _("Put the sounds from “{name}” back how they came?\n\nChanges you made to "
+                  "them (names, hotkeys, volume, effects, pictures…) are undone, and ones you "
+                  "removed come back. Your other sounds aren't touched.", name=name),
+                QMessageBox.Yes | QMessageBox.Cancel) != QMessageBox.Yes:
+            return
+        on_board = {}
+        for m in self.cfg.sounds:
+            if m.pack == pid:
+                on_board.setdefault(m.pack_item, m)
+        fx_before = {m.id: soundfx.key(m.fx) for m in on_board.values()}
+        try:
+            pkg.restored = backup.reset_sounds(pkg, on_board)
+        except (OSError, backup.BackupError) as e:
+            errors.warn(self, _("Can't reset the sound pack"), e)
+            return
+        for m in pkg.restored:
+            if soundfx.key(m.fx) != fx_before[m.id]:
+                self._rerender(m)
+            if p := self.pads.get(m.id):
+                p.update()
+        missing = [ps for ps in pkg.sounds if ps.folder not in on_board]
+        if not missing:
+            self._on_unpacked(backup.Imported(), pkg, "")
+            return
+        full = list(pkg.sounds)
+        pkg.sounds = missing
+        start = len(self.cfg.sounds)
+
+        def run():
+            try:
+                res = backup.install(
+                    pkg, set(), lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)])
+            except Exception as e:  # noqa: BLE001
+                log.exception("reset of the sound pack %s failed", pid)
+                res, err = None, errors.plain(e)
+            else:
+                err = ""
+            pkg.sounds = full   # for _pack_spot's order
+            self.bridge.unpacked.emit(res, pkg, err)
+        threading.Thread(target=run, daemon=True, name="reset-pack").start()
+
+    def remove_pack(self, pid: str, ask: bool = True):
+        """Take every sound of a sound pack off the board (one Undo brings them back);
+        once the Undo bar is gone, the pack is no longer kept."""
+        gone = [m.id for m in self.cfg.sounds if m.pack == pid]
+        if not gone:
+            return
+        name = backup.packs().get(pid, pid)
+        if ask and QMessageBox.question(
+                self, _("Remove sound pack"),
+                ngettext("Remove the {n} sound from “{name}”?",
+                         "Remove the {n} sounds from “{name}”?", len(gone), name=name)
+                + "\n\n" + _("You can undo this, or bring them back from Recently deleted."),
+                QMessageBox.Yes | QMessageBox.Cancel) != QMessageBox.Yes:
+            return
+        self.remove_sounds(gone)
+        self._packs_removed.add(pid)
 
     # ------------------------------------------------------------------ tray
     def _init_tray(self):

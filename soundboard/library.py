@@ -308,6 +308,8 @@ class SoundMeta:
     cooldown: float = 0.0     # seconds after it starts during which presses are ignored
     plays: int = 0            # times it was played (the Sounds tab's Most played order)
     added: float = 0.0        # time.time() it joined the board; 0 = before this was kept
+    pack: str = ""            # the sound pack it came from (backup.packs()), or ""
+    pack_item: str = ""       # its folder in that pack, to reset it to how it came
 
 
 @dataclass
