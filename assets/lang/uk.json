@@ -2928,7 +2928,6 @@
   "Crashes and freezes": "Вилітає і зависає",
   "Find and fix bugs": "Знайти та виправити помилки",
   "Know where people find the app": "Знайте, де люди знаходять додаток",
-  "A random ID": "Випадковий ідентифікатор",
   "What Count me in sends": "Що надсилає «Враховуйте мене»",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Раз на день, анонімно. Ніколи твоє ім'я, IP-адреса чи дані пристрою. Звідки ти дізнався про застосунок і вибір у відгуку, лише якщо ти їх вкажеш. Після вимкнення: один останній підрахунок без ID, потім нічого.",
   "What": "Що",
@@ -2940,6 +2939,5 @@
   "How the app is used": "Як використовується програма",
   "voice changer, Radio tab": "зміна голосу, вкладка Радіо",
   "Your answers, if you give them": "Ваші відповіді, якщо ви їх дасте",
-  "heard of it on YouTube": "чув про це на YouTube",
-  "See if people come back": "Подивіться, чи повернуться люди"
+  "heard of it on YouTube": "чув про це на YouTube"
 }

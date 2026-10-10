@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Összeomlik és lefagy",
   "Find and fix bugs": "Hibák keresése és javítása",
   "Know where people find the app": "Tudja, hol találják az emberek az alkalmazást",
-  "A random ID": "Egy véletlenszerű azonosító",
   "What Count me in sends": "Mit küld a „Benne vagyok”",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Naponta egyszer, névtelenül. Soha a neved, az IP-címed vagy az eszközöd adatai. Hogy honnan hallottál az appról és a visszajelzés választásai csak akkor, ha megadod. Kikapcsolva: egy utolsó számlálás azonosító nélkül, aztán semmi.",
   "What": "Mi",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Hogyan használják az alkalmazást",
   "voice changer, Radio tab": "hangváltó, Rádió fül",
   "Your answers, if you give them": "A válaszaidat, ha megadod",
-  "heard of it on YouTube": "hallott róla a YouTube-on",
-  "See if people come back": "Hátha visszajönnek az emberek"
+  "heard of it on YouTube": "hallott róla a YouTube-on"
 }

@@ -2808,7 +2808,6 @@
   "Crashes and freezes": "クラッシュとフリーズ",
   "Find and fix bugs": "バグを見つけて修正する",
   "Know where people find the app": "人々がどこでアプリを見つけたかを知る",
-  "A random ID": "ランダムなID",
   "What Count me in sends": "「参加する」が送る内容",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "1日1回、匿名で送ります。名前、IPアドレス、端末の情報は一切送りません。アプリを知った場所とフィードバックの選択は、答えた場合だけ送ります。オフにすると、IDなしの最後のカウントを1回送り、その後は何も送りません。",
   "What": "何",
@@ -2820,6 +2819,5 @@
   "How the app is used": "アプリの使用方法",
   "voice changer, Radio tab": "ボイスチェンジャー、ラジオタブ",
   "Your answers, if you give them": "あなたの答えがあれば、",
-  "heard of it on YouTube": "YouTubeで聞いた",
-  "See if people come back": "人々が戻ってくるかどうかを確認する"
+  "heard of it on YouTube": "YouTubeで聞いた"
 }

@@ -504,6 +504,19 @@ def test_first_steps_obey_the_switch(sent):
     assert sent == [] and cfg.stats_steps == []
 
 
+def test_the_triggers_tab_counts_its_features(sent):
+    """The Onion Watch add-on passes its feature names through BoardHost.count: sent as
+    used/triggers-<name>, anything else dropped."""
+    from soundboard.ui.triggershost import BoardHost
+    host = BoardHost.__new__(BoardHost)    # count() needs nothing of the window
+    host.count("mode-colour")
+    host.count("pack-import")
+    host.count("D:/pics/secret.png")
+    usage.maybe_send(Config())
+    used = {p for p in _paths(sent[0][0]) if p.startswith("used/")}
+    assert used == {"used/triggers-mode-colour", "used/triggers-pack-import"}
+
+
 def test_features_used_survive_a_quit(app_dir):
     cfg = Config()
     usage._used.clear()

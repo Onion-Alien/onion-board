@@ -21,7 +21,8 @@ fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`open/1-3h`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
-in FEATURES only). And once each,
+in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
+triggershost.BoardHost.count, as `used/triggers-mode-colour`). And once each,
 the first steps of a new install (`step/added-sound`, `step/played-sound`,
 `step/sent-to-others`), to see where new people get stuck; never for a copy that was
 counted before these existed. Also once each, switching on a tab a new user starts
@@ -82,6 +83,14 @@ TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup")
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
+# the Onion Watch add-on's feature names (onionwatch/usage.py USED + SET_UP)
+TRIGGERS_FEATURES = (
+    "watching", "went-off", "test", "cut-from-window", "picture-file", "paste-picture",
+    "area-trigger", "duplicate", "pick-windows", "pack-export", "pack-import",
+    "history", "restore-deleted",
+    "mode-appear", "mode-vanish", "mode-change", "mode-still", "mode-colour", "ring",
+    "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
+    "categories", "profiles")
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -89,7 +98,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # a tab hidden from its right-click menu
             "more-tabs-opened", "more-tabs-closed",
             *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice")),
-            *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice")))
+            *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice")),
+            # the Triggers tab (the Onion Watch add-on) says which of its features were
+            # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
+            # FEATURES, keep in step
+            *(f"triggers-{k}" for k in TRIGGERS_FEATURES))
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
