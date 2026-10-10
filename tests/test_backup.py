@@ -217,6 +217,18 @@ def test_an_unexpected_error_fails_one_sound_and_leaves_no_file(app_dir, tmp_pat
     assert not list(library.SOUNDS_DIR.glob("*"))
 
 
+def test_a_newer_versions_unknown_settings_stay_out_of_an_export(app_dir):
+    """config.json keeps the settings of a newer version this one doesn't know (for
+    when it's updated again), but a backup, which may be shared, takes only the
+    settings this version knows: one of those could be private to this PC."""
+    library.CONFIG_PATH.write_text(json.dumps(
+        {"sound_vol": 0.5, "future_pc_secret": "abc", "sounds": []}), encoding="utf-8")
+    cfg = Config.load()
+    assert cfg.to_raw()["future_pc_secret"] == "abc"     # kept for the newer version
+    out = backup.settings_of(cfg)
+    assert "future_pc_secret" not in out and out["sound_vol"] == 0.5
+
+
 def test_apply_settings_checks_types_and_skips_local_ones():
     cfg = Config()
     changed = backup.apply_settings(cfg, {"theme": 5, "sound_vol": 2, "mic_enabled": "yes",

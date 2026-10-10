@@ -5,6 +5,20 @@
 - Importing a backup whose settings name `read_only` no longer stops the app saving
   for the rest of the session (the imported sounds were gone after a restart), and a
   settings file naming it is no longer set aside as damaged.
+- A pad's *Picture → From a link* no longer opens a file on this PC or a network share
+  when the web page names one as its preview picture: only web pictures are fetched.
+- A Myinstants sound whose download was cut short is no longer added half-finished:
+  it says the connection dropped, so you can try again.
+- A slow download from a site that doesn't say how big the file is no longer stops
+  after 5 minutes with "The download stopped moving".
+- A backup made after going back to an older version no longer carries the newer
+  version's settings it doesn't know, which could be private to your PC.
+- The remote control API answers a volume of `inf` or a malformed signature with a
+  clear refusal instead of an error or a dropped connection.
+- Updating the downloader (yt-dlp) no longer fails now and then when a search or
+  download starts at the same moment.
+- Switching off *Count me in* in Settings while in Tor mode no longer sends the last
+  anonymous opt-out count, as the privacy page promises.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
@@ -14,6 +28,17 @@
   robot bunny runs off, comes back with a wrench and builds, with a moving bar and
   short steps like "Installing the voice engine" instead of pip's output. He cheers
   when it's done. If it fails, the real error still shows.
+- Setup stacks its columns when translated controls need more room, keeping them
+  visible without sideways scrolling.
+- Radio's station panel clips to its rounded corners, and genre buttons keep their
+  curves at compact heights.
+- Restoring sounds after a reset preserves both the originals and new recordings
+  with the same filename, including their pictures.
+- Importing or resetting a pack keeps matching personal sounds independent of it.
+- Folder packs detect equal-size content changes, so resetting uses the right archive.
+- A removed web download can be added again in the same session.
+- AI failure status describes the selected fallback: built-in voice, real mic or silence.
+
 - Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
   short gap clear of their buttons.
 - **Polished playback transport controls.** The sound player's Play/Pause button uses an accent-pill style with clean high-contrast icons that adapt across all themes, and the Stop button uses a sleek secondary surface with a subtle danger outline on hover. Both buttons use smooth filleted vector glyphs with optical centering.

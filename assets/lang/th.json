@@ -2376,7 +2376,6 @@
   "so quiet…": "เงียบมาก…",
   "so… bored…": "ดังนั้น… เบื่อ…",
   "starting…": "กำลังเริ่ม...",
-  "starting… (a built-in voice covers you until it's ready)": "กำลังเริ่มต้น… (เสียงในตัวครอบคลุมคุณจนกว่าจะพร้อม)",
   "stopped": "หยุดแล้ว",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "หยุดแล้ว: ใช้เวลากว่า {n} นาที ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณแล้วกดอีกครั้ง"
@@ -2828,7 +2827,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "นั่นไม่ใช่เว็บลิงค์ คัดลอกที่อยู่ของรูปภาพ (คลิกขวา → คัดลอกที่อยู่รูปภาพ) แล้ววางที่นี่",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "ไม่มีรูปภาพที่ลิงก์นั้น คลิกขวาที่รูปภาพ → คัดลอกที่อยู่รูปภาพ แล้ววาง",
   "Couldn't get the picture ({error}).": "ไม่สามารถรับรูปภาพ ( {error} )",
-  "starting again… (a built-in voice covers you until it's ready)": "เริ่มต้นใหม่อีกครั้ง… (เสียงในตัวครอบคลุมคุณจนกว่าจะพร้อม)",
   "huh?! wha…": "ฮะ?! อะไรนะ…",
   "five more minutes…": "อีกห้านาที…",
   "it's the middle of the night!": "นี่มันเที่ยงคืนแล้ว!",
@@ -2937,7 +2935,6 @@
   "Voice effects off — mic unchanged": "ปิดเอฟเฟกต์เสียง — ไมค์ไม่เปลี่ยนแปลง",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "เสียงไมค์ของคุณไม่เปลี่ยนแปลง เปิดโปรแกรมเปลี่ยนเสียงหรือเสียง AI ด้านล่างเพื่อเลือกเสียง",
   "AI voice off": "เสียง AI ปิดอยู่",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "เสียง AI หยุดลง: เสียงในตัวครอบคลุมคุณ คลิกเพื่อเปิดเสียง AI",
   "Click to open AI voices.": "คลิกเพื่อเปิดเสียง AI",
   "AI voice: {voice}, starting.": "เสียง AI: {voice} กำลังเริ่มต้น",
   "AI voice: {voice}.": "เสียง AI: {voice}",
@@ -2946,5 +2943,7 @@
   "Getting Python ready…": "กำลังเตรียม Python…",
   "Installing the voice engine (a few minutes)…": "กำลังติดตั้งเอนจินเสียง (ไม่กี่นาที)…",
   "Downloading the voices…": "กำลังดาวน์โหลดเสียง…",
-  "Downloading the voices: {percent}%": "กำลังดาวน์โหลดเสียง: {percent}%"
+  "Downloading the voices: {percent}%": "กำลังดาวน์โหลดเสียง: {percent}%",
+  "Others now hear {backup}.": "ตอนนี้คนอื่นได้ยิน {backup}",
+  "starting again…": "กำลังเริ่มใหม่…"
 }

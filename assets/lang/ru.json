@@ -2378,7 +2378,6 @@
   "so quiet…": "так тихо…",
   "so… bored…": "так… скучно…",
   "starting…": "начиная…",
-  "starting… (a built-in voice covers you until it's ready)": "начинаем… (встроенный голос будет оповещать вас, пока все не будет готово)",
   "stopped": "остановился",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "остановился: это заняло более {n} минуты. Проверьте подключение к Интернету и нажмите еще раз.",
@@ -2848,7 +2847,6 @@
   "Couldn't get the picture ({error}).": "Не удалось получить изображение ( {error} ).",
   "Made from {voice} with {percent}% {other}.": "Сделано из {voice} с помощью {percent} % {other} .",
   "downloading: {percent}% of {size} MB": "загрузка: {percent} % от {size} МБ",
-  "starting again… (a built-in voice covers you until it's ready)": "начну заново… (встроенный голос будет оповещать вас, пока все не будет готово)",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Выберите воспроизводимую программу (музыкальный проигрыватель, браузер, игру или даже звонок в другом приложении), и она будет передаваться тому, кто слушает, на своей громкости, так же, как и ваши звуки (ваш микрофон, кабель или устройство, которое вы выбрали на вкладке «Настройка», и выход потока). Отправка никому: его получает только потоковой вывод. Только эта программа: ничего больше, что вы играете, не затрагивается, и она продолжает воспроизводиться на ваших динамиках, как и раньше. Программы, которые вы включаете, запоминаются и активируются снова при следующем запуске.",
   "Not running: it'll be picked up when it starts": "Не запущен: он будет поднят при запуске.",
   "huh?! wha…": "хм?! что…",
@@ -3062,7 +3060,6 @@
   "Voice effects off — mic unchanged": "Голосовые эффекты отключены, микрофон не изменен.",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Голос вашего микрофона не изменился. Откройте программу смены голоса или голоса AI ниже, чтобы выбрать голос.",
   "AI voice off": "голос ИИ отключен",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Голос ИИ остановился: вас охватывает встроенный голос. Нажмите, чтобы открыть голоса AI.",
   "Click to open AI voices.": "Нажмите, чтобы открыть голоса AI.",
   "AI voice: {voice}, starting.": "Голос ИИ: {voice} , начинаю.",
   "AI voice: {voice}.": "Голос ИИ: {voice} .",
@@ -3074,5 +3071,7 @@
   "Getting Python ready…": "Готовлю Python…",
   "Installing the voice engine (a few minutes)…": "Устанавливаю голосовой движок (пару минут)…",
   "Downloading the voices…": "Скачиваю голоса…",
-  "Downloading the voices: {percent}%": "Скачиваю голоса: {percent}%"
+  "Downloading the voices: {percent}%": "Скачиваю голоса: {percent}%",
+  "Others now hear {backup}.": "Другие теперь слышат {backup}.",
+  "starting again…": "повторный запуск…"
 }

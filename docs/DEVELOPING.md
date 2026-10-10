@@ -66,6 +66,13 @@ module's `install.bat` or `pip install -r requirements.txt`).
 .venv\Scripts\python scripts\check_sensitive.py
 ```
 
+Or all of it in one go, with pytest on only the test files your committed and
+uncommitted changes need (`scripts/pick_tests.py --local`); `-All` runs the whole suite:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1
+```
+
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
 `%APPDATA%\OnionBoard`. No window appears and no global hotkey is registered.
@@ -86,7 +93,8 @@ effect's lead grows just enough and comes back; the real-time tests can't pin th
 
 To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
-before committing. The full suite runs on 4 workers (pytest-xdist, about a minute);
+before committing. `python scripts\pick_tests.py` lists the test files your branch's
+changes need (what a PR runs on CI). The full suite runs on 4 workers (pytest-xdist, about a minute);
 one or two files run in a single process. `-n 2` caps the workers (say, while a
 game is running) and `-n 0` turns them off. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
@@ -277,10 +285,17 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    branch buttons: those write the commit in your local time zone, and every commit
    here must be in UTC (CLAUDE.md, *Commit times*). CI
    (`.github/workflows/checks.yml`) runs on the PR and on main after a merge: the
-   secrets scan over the full history, gitleaks, ruff and pytest. A newer push to
-   the PR cancels its unfinished run.
-3. For a release: bump `__version__`, move *Unreleased* in the CHANGELOG under
-   the version, build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
+   secrets scan over the full history, gitleaks, ruff and pytest. On a PR, pytest
+   runs only the test files the change needs (`scripts/pick_tests.py`: the tests
+   that import a changed module or name a changed file; all of them when
+   `conftest.py`, `pyproject.toml`, the requirements or the workflow change; none for
+   a change no test is about, like the changelog). main, after the merge, runs the
+   whole suite, and so does running the workflow by hand on a branch. So run the full
+   suite locally before you push. A newer push to the PR cancels its unfinished run.
+3. For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
+   `__version__`, moves *Unreleased* in the CHANGELOG under the version, checks the
+   translations, refreshes the README's release line; `--dry-run` checks only),
+   build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
    with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).
    Keep the asset named exactly `OnionBoardSetup.exe` and don't mark the release
    as a pre-release: the README's download button links to

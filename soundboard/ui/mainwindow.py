@@ -6488,12 +6488,6 @@ class MainWindow(QMainWindow):
         if res is None:
             QMessageBox.warning(self, _("Import failed"), err)
             return
-        if pkg.pack_id:   # sounds already here from an earlier import join the pack
-            for fp, folder in res.adopt:
-                m = next((o for o in self.cfg.sounds if o.fingerprint == fp and not o.pack),
-                         None)
-                if m:
-                    m.pack, m.pack_item = pkg.pack_id, folder
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.library import merge_tags
         order = [ps.folder for ps in pkg.sounds]
@@ -7800,7 +7794,16 @@ class MainWindow(QMainWindow):
             # the rest: without it they kept their room and the pads got a slit
             self._pads_scroll.setMinimumHeight(self.grid.row_height())
             narrow = self.width() < 860   # two cards side by side get cramped below this
-            for apply in self._stack_cols:
+            # Translated controls can need more room than the fixed breakpoint.
+            # Measure both Setup columns even while they are stacked, so growing
+            # the window brings them back only when neither will be clipped.
+            cols = self._setup_cols
+            margins = self.setup_page.widget().layout().contentsMargins()
+            room = self.setup_page.viewport().width() - margins.left() - margins.right()
+            room = min(room, cols.parentWidget().maximumWidth())
+            need_cols = sum(cols.itemAt(i).minimumSize().width() for i in range(cols.count()))
+            self._stack_cols[0](narrow or need_cols + cols.spacing() > room)
+            for apply in self._stack_cols[1:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
             mini = need.width() > size.width() or need.height() > size.height()

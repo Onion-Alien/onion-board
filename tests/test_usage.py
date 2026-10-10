@@ -224,6 +224,15 @@ def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
     assert usage.opt_out("settings") and _body(sent[-1][0])["hits"][0]["path"] == "opt-out/settings"
 
 
+def test_no_opt_out_in_tor_mode(sent, monkeypatch):
+    """SECURITY.md: the opt-out is never sent in Tor mode, from Settings either (the
+    installer's path already checked; Settings' switch didn't)."""
+    monkeypatch.setattr(net, "_mode", net.TOR)
+    assert not usage.opt_out("settings") and not sent
+    monkeypatch.setattr(net, "_mode", net.DIRECT)
+    assert usage.opt_out("settings") and len(sent) == 1
+
+
 def test_update_now_fetches_its_own_copy_of_the_installer():
     from soundboard import updates
 
@@ -312,7 +321,8 @@ def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
                  '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
                  '  File "soundboard\\directmic.py", line 184, in make_ring\n'
                  '  File "pathlib\\_local.py", line 515, in stat\n', encoding="utf-8")
-    assert usage._report_event(f) == "freeze/1.9.7@soundboard/directmic.py:184"
+    assert usage._report_event(f) == ("freeze/1.9.7@soundboard/directmic.py:184"
+                                      "<soundboard/ui/mainwindow.py:5898~_local.stat")
 
 
 def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
@@ -333,7 +343,64 @@ def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
                  'Thread "x" (13):\n'
                  '  File "soundboard\\threadnames.py", line 70, in named_start\n',
                  encoding="utf-8")
-    assert usage._report_event(f) == "freeze/1.9.20@soundboard/ui/mainwindow.py:5898"
+    assert usage._report_event(f) == ("freeze/1.9.20@soundboard/ui/mainwindow.py:5898"
+                                      "~threading.start")
+
+
+def _freeze(f, lasted, window_cpu, others, inner='  File "threading.py", line 359, in wait\n'):
+    f.write_text("Onion Board froze for 5 s\nVersion:  1.9.28\nTime:  x\n"
+                 + (f"Lasted:   {lasted}\n" if lasted else "") + "\n"
+                 "What it was doing\n-----------------\n"
+                 '  File "D:\\private\\code\\soundboard\\ui\\mainwindow.py", line 50, in tick\n'
+                 '  File "soundboard\\threadnames.py", line 70, in named_start\n'
+                 '  File "soundboard\\voicesdk.py", line 80, in listen\n' + inner
+                 + (f"\nWindow CPU: {window_cpu}%\n" if window_cpu is not None else "")
+                 + "\nOther threads\n-------------\n" + others, encoding="utf-8")
+
+
+def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tmp_path):
+    """Enough to tell a freeze's cause from the count alone: the caller of the stuck
+    line, the library call it was stuck in, how long it lasted, and whether the
+    window was working itself, waiting on a busy thread, or everyone was waiting."""
+    f = tmp_path / "crash-x.txt"
+    hog = ('Thread "radio" (12), 95% CPU:\n'
+           '  File "soundboard\\threadnames.py", line 68, in named_run\n'
+           '  File "soundboard\\radio.py", line 400, in _decode\n'
+           'Thread "calm" (13), 0% CPU:\n'
+           '  File "soundboard\\engine.py", line 9, in _loop\n')
+    _freeze(f, "42 s", 1, hog)
+    assert usage._report_event(f) == (
+        "freeze/1.9.28@soundboard/voicesdk.py:80<soundboard/ui/mainwindow.py:50"
+        "~threading.wait/lasted-30s-2m/busy-thread@soundboard/radio.py:400")
+    _freeze(f, "7 s", 100, hog)
+    assert usage._report_event(f).endswith("/lasted-under-10s/busy-window")
+    _freeze(f, "still frozen", 0, 'Thread "calm" (13), 2% CPU:\n'
+            '  File "soundboard\\engine.py", line 9, in _loop\n')
+    assert usage._report_event(f).endswith("~threading.wait/never-ended/idle")
+    # stuck in our own line (time.sleep has no frame): no library part
+    _freeze(f, "12 s", 0, "", inner="")
+    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/voicesdk.py:80"
+                                      "<soundboard/ui/mainwindow.py:50/lasted-10-30s/idle")
+    # an older report (no Lasted / CPU lines): only what it has
+    _freeze(f, "", None, hog)
+    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/voicesdk.py:80"
+                                      "<soundboard/ui/mainwindow.py:50~threading.wait")
+    assert "private" not in usage._report_event(f)
+
+
+def test_a_freeze_end_is_noted_without_counting_the_report_again(tmp_path, monkeypatch):
+    import os
+    from soundboard import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    path = applog.save_freeze(5, '  File "soundboard\\engine.py", line 9, in f\n')
+    assert usage._report_event(path).endswith("/never-ended")
+    os.utime(path, (1_000_000, 1_000_000))
+    applog.note_freeze_end(path, 23.4)
+    assert path.stat().st_mtime == 1_000_000
+    assert "Lasted:   23 s" in path.read_text(encoding="utf-8")
+    assert usage._report_event(path).endswith("/lasted-10-30s")
+    applog.note_freeze_end(path, 99)                       # once only
+    assert "Lasted:   23 s" in path.read_text(encoding="utf-8")
 
 
 def test_problem_events_keep_paths_outside_our_package_out(tmp_path):

@@ -2376,7 +2376,6 @@
   "so quiet…": "如此安静……",
   "so… bored…": "所以……无聊……",
   "starting…": "开始…",
-  "starting… (a built-in voice covers you until it's ready)": "正在开始…（内置声音会一直覆盖您，直到准备好为止）",
   "stopped": "停止了",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "已停止：花费了{n}分钟。检查您的互联网连接并再次按下。"
@@ -2828,7 +2827,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "那不是网络链接。复制图片地址（右键单击→复制图片地址）并将其粘贴到此处。",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "那个链接里没有图片。右键单击图片→复制图片地址，然后粘贴。",
   "Couldn't get the picture ({error}).": "无法获取图片 ( {error} )。",
-  "starting again… (a built-in voice covers you until it's ready)": "重新开始......（内置声音会覆盖您，直到准备好）",
   "huh?! wha…": "啊？！世界卫生大会…",
   "five more minutes…": "还有五分钟……",
   "it's the middle of the night!": "现在是半夜！",
@@ -2937,7 +2935,6 @@
   "Voice effects off — mic unchanged": "语音效果关闭 - 麦克风不变",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "您的麦克风声音没有改变。打开下面的语音转换器或AI语音来选择语音。",
   "AI voice off": "AI语音关闭",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI声音停止：内置声音覆盖你。点击打开AI语音。",
   "Click to open AI voices.": "点击打开AI语音。",
   "AI voice: {voice}, starting.": "AI语音： {voice} ，开始。",
   "AI voice: {voice}.": "AI语音： {voice} 。",
@@ -2946,5 +2943,7 @@
   "Getting Python ready…": "正在准备 Python…",
   "Installing the voice engine (a few minutes)…": "正在安装语音引擎（需要几分钟）…",
   "Downloading the voices…": "正在下载声音…",
-  "Downloading the voices: {percent}%": "正在下载声音：{percent}%"
+  "Downloading the voices: {percent}%": "正在下载声音：{percent}%",
+  "Others now hear {backup}.": "其他人现在听到的是{backup}。",
+  "starting again…": "正在重新启动…"
 }

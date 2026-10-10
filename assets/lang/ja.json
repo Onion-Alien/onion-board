@@ -2376,7 +2376,6 @@
   "so quiet…": "とても静かです…",
   "so… bored…": "だから…退屈…",
   "starting…": "起動…",
-  "starting… (a built-in voice covers you until it's ready)": "開始中… (準備が完了するまで内蔵音声がカバーします)",
   "stopped": "止まった",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "停止しました: {n}分以上かかりました。インターネット接続を確認して、もう一度押してください。"
@@ -2828,7 +2827,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "それはウェブリンクではありません。画像のアドレスをコピーし（右クリック→画像アドレスをコピー）、ここに貼り付けます。",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "そのリンク先には画像がありません。画像を右クリック→画像アドレスをコピーして貼り付けます。",
   "Couldn't get the picture ({error}).": "画像を取得できませんでした ( {error} )。",
-  "starting again… (a built-in voice covers you until it's ready)": "もう一度始めます… (準備が整うまで内蔵音声がカバーします)",
   "huh?! wha…": "はぁ？！何…",
   "five more minutes…": "あと5分…",
   "it's the middle of the night!": "真夜中だよ！",
@@ -2937,7 +2935,6 @@
   "Voice effects off — mic unchanged": "音声エフェクトはオフ - マイクは変更されません",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "マイクの声は変わりません。以下のボイスチェンジャーまたは AI 音声を開いて音声を選択します。",
   "AI voice off": "AI音声オフ",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI の音声が停止しました。内蔵の音声があなたをカバーします。クリックすると AI 音声が開きます。",
   "Click to open AI voices.": "クリックすると AI 音声が開きます。",
   "AI voice: {voice}, starting.": "AI 音声: {voice} 、開始します。",
   "AI voice: {voice}.": "AI 音声: {voice} 。",
@@ -2946,5 +2943,7 @@
   "Getting Python ready…": "Python を準備中…",
   "Installing the voice engine (a few minutes)…": "音声エンジンをインストール中（数分）…",
   "Downloading the voices…": "声をダウンロード中…",
-  "Downloading the voices: {percent}%": "声をダウンロード中: {percent}%"
+  "Downloading the voices: {percent}%": "声をダウンロード中: {percent}%",
+  "Others now hear {backup}.": "他の人には今、{backup}が聞こえます。",
+  "starting again…": "再起動中…"
 }

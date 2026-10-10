@@ -2328,7 +2328,6 @@
   "so quiet…": "толкова тихо...",
   "so… bored…": "толкова… скучно…",
   "starting…": "започвайки...",
-  "starting… (a built-in voice covers you until it's ready)": "стартиране... (вграден глас ви покрива, докато не е готово)",
   "stopped": "спря",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "спряно: отне повече от {n} минута. Проверете вашата интернет връзка и го натиснете отново.",
@@ -2789,7 +2788,6 @@
   "Couldn't get the picture ({error}).": "Не можах да получа снимката ( {error} ).",
   "Made from {voice} with {percent}% {other}.": "Направено от {voice} с {percent} % {other} .",
   "downloading: {percent}% of {size} MB": "изтегляне: {percent} % от {size} MB",
-  "starting again… (a built-in voice covers you until it's ready)": "започвам отново… (вграден глас ви покрива, докато не е готово)",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Изберете програма, която се възпроизвежда (музикален плейър, браузър, игра, дори обаждане в друго приложение) и тя се излъчва към всеки, който слуша, със собствена сила на звука, по същия начин, по който правят вашите звуци (вашият микрофон, кабелът или устройството, което сте избрали в раздела „Настройка“, и изходният поток). Изпращане до никого: получава го само изходният поток. Само тази програма: нищо друго, което възпроизвеждате, не се докосва и продължава да се възпроизвежда на вашите високоговорители както преди. Програмите, които включите, се запомнят и се включват отново при следващото им изпълнение.",
   "Not running: it'll be picked up when it starts": "Не работи: ще бъде взето, когато започне",
   "huh?! wha…": "а?! какво...",
@@ -2998,7 +2996,6 @@
   "Voice effects off — mic unchanged": "Гласовите ефекти са изключени — микрофонът не е променен",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Гласът на вашия микрофон е непроменен. Отворете Voice changer или AI voices по-долу, за да изберете глас.",
   "AI voice off": "AI гласът е изключен",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI гласът спря: вграден глас ви покрива. Кликнете, за да отворите AI гласове.",
   "Click to open AI voices.": "Кликнете, за да отворите AI гласове.",
   "AI voice: {voice}, starting.": "AI глас: {voice} , започвам.",
   "AI voice: {voice}.": "AI глас: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Подготвяне на Python…",
   "Installing the voice engine (a few minutes)…": "Инсталиране на гласовия двигател (няколко минути)…",
   "Downloading the voices…": "Изтегляне на гласовете…",
-  "Downloading the voices: {percent}%": "Изтегляне на гласовете: {percent}%"
+  "Downloading the voices: {percent}%": "Изтегляне на гласовете: {percent}%",
+  "Others now hear {backup}.": "Другите сега чуват {backup}.",
+  "starting again…": "стартиране отново…"
 }
