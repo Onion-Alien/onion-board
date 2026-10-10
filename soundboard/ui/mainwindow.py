@@ -1863,7 +1863,6 @@ class MainWindow(QMainWindow):
         from soundboard.ui.destpanel import DestPanel
         self.dest_panel = DestPanel(self)
         dv.addWidget(self.dest_panel)
-        lcol.addStretch(1)
 
         # ---- sound shaping
         eqcard, ev = card(roomy=True)
@@ -1880,7 +1879,8 @@ class MainWindow(QMainWindow):
         hk = QPushButton(_("Hotkeys && auto push-to-talk…"))
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         uv.addWidget(hk, 0, Qt.AlignLeft)
-        rcol.addWidget(utilitycard)
+        lcol.addWidget(utilitycard)
+        lcol.addStretch(1)
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
