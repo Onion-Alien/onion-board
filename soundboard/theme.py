@@ -529,9 +529,14 @@ QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }
 QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
 QFrame#soundstoolbar QPushButton#primary { background:$accent; color:$on_accent;
-    border:1px solid transparent; font-weight:600; padding:0 14px; }
+    border:1px solid transparent; border-radius:12px; font-weight:600; padding:0 14px; }
 QFrame#soundstoolbar QPushButton#primary:hover { background:$accent_hover; }
+QFrame#soundstoolbar QPushButton#primary:pressed { background:$accent; }
 QFrame#soundstoolbar QPushButton#primary:focus { border-color:$text_hi; }
+QFrame#soundstoolbar QPushButton#soundrecord { background:$card_hi; color:$text;
+    border-radius:12px; padding:0 10px; }
+QFrame#soundstoolbar QPushButton#soundrecord:hover { background:$btn_hover; }
+QFrame#soundstoolbar QPushButton#soundrecord:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
 QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
@@ -938,6 +943,11 @@ QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton
 QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
 QFrame#setcard QPushButton#primary:hover {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $accent_top_hi, stop:1 $accent_hover); }
+QFrame#soundstoolbar QPushButton#primary {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:1 $accent); }
+QFrame#soundstoolbar QPushButton#primary:hover {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi, stop:1 $accent_hover); }
+QFrame#soundstoolbar QPushButton#primary:pressed { background:$accent; }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live); }

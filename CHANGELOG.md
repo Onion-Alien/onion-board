@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add sounds and Record use matching rounded buttons, with a subtle gradient on
+  Add sounds and a quiet raised surface on Record.
 - AI voices puts Start and live status at the top, with a wider voice picker,
   grouped pitch controls and shorter explanatory text in every language.
 - The note that pops up above the player ("Added … to Sounds", device changes and so
