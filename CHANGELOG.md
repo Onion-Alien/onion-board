@@ -2,8 +2,12 @@
 
 ## Unreleased
 
+- The side menu's *How it works* button moved from under the tabs down to the bottom,
+  just above Settings, so it isn't mistaken for a tab.
+
 - Setup no longer has the *Test your local mix* card (Record 6s). To check what others
   get, use *Hear what they hear* or your chat app's microphone test.
+
 - The side menu starts open on a new install, so the tabs show their names and not
   just icons. The button at the bottom still shuts it, and that choice is kept.
 

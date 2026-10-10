@@ -192,9 +192,9 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
 
 
 class SideRail(QFrame):
-    """The rail. `extras` (More tabs, ⓘ) sit under the tabs; at the bottom `status`
+    """The rail. `extras` (More tabs) sit under the tabs; at the bottom `status`
     (Live, Stop all, the setup pill…: what used to be the window's header) in a
-    column, with readable labels when open, then `foot` (Settings) and the open /
+    column, with readable labels when open, then `foot` (ⓘ, Settings) and the open /
     shut button. Extras show their "railtext" property as their words while open.
     `on_open(bool)` is called when the user opens or shuts it (to save it)."""
 
@@ -247,7 +247,7 @@ class SideRail(QFrame):
         self.extras = [*extras, *foot]
         for w in self.extras:   # the keyboard's ring, not one left by a click
             w.setFocusPolicy(Qt.TabFocus)
-        self._gaps.append(self._gap(10))   # More tabs and ⓘ aren't tabs
+        self._gaps.append(self._gap(10))   # More tabs isn't a tab
         for w in extras:
             lay.addWidget(w)
         lay.addStretch(1)
