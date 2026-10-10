@@ -57,10 +57,48 @@ jobs:
           tar xzf "$tarball" gitleaks
           ./gitleaks git --redact --verbose --exit-code 1 .
 
+  # ruff, and which test files this change needs (scripts/pick_tests.py): a PR runs
+  # only the tests of what it changed, so a docs-only PR doesn't start Windows at all.
+  # main (after each merge) and a manual run take the whole suite.
+  pick:
+    runs-on: ubuntu-latest
+    outputs:
+      tests: ${{ steps.pick.outputs.tests }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0   # the PR's changes are a diff against main
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            tests=$(python scripts/pick_tests.py "origin/$BASE" | tr '\n' ' ')
+          else
+            tests=tests
+          fi
+          echo "tests=$tests" >> "$GITHUB_OUTPUT"
+          echo "Tests to run: ${tests:-none}"
+      - run: |
+          python -m pip install -q "$(grep '^ruff==' requirements-dev.txt)"
+          ruff check .
+
   test:
+    needs: pick
+    # skipped (which counts as passed) when the change needs no tests; still runs, to
+    # fail, when ruff did, so a required `test` check can't pass over a lint error
+    if: ${{ !cancelled() && (needs.pick.result != 'success' || needs.pick.outputs.tests != '') }}
     runs-on: windows-latest
     timeout-minutes: 20   # a hung test fails the run instead of holding it for hours
     steps:
+      - if: needs.pick.result != 'success'
+        run: |
+          echo "ruff or the test pick failed: see the pick job"
+          exit 1
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
         id: py
@@ -77,7 +115,6 @@ jobs:
         run: |
           python -m venv .venv
           .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
-      - run: .venv\Scripts\ruff check .
       # A test worker that dies outright ("worker 'gw0' crashed", no traceback: a heap
       # corruption fast-fail is past faulthandler) leaves a Windows crash dump here,
       # uploaded below, so the native stack of the crash can be read.
@@ -90,10 +127,13 @@ jobs:
           New-ItemProperty -Path $key -Name DumpType -Value 1 -PropertyType DWord -Force | Out-Null
           New-ItemProperty -Path $key -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
       # --durations: the slowest tests are listed at the end of every run, so one that
-      # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there
-      - run: .venv\Scripts\python -m pytest --durations=20
+      # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there.
+      # TESTS: the files the pick job chose (`tests` for all of them).
+      - shell: bash
+        run: .venv/Scripts/python -m pytest --durations=20 $TESTS
         env:
           QT_QPA_PLATFORM: offscreen
+          TESTS: ${{ needs.pick.outputs.tests }}
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
