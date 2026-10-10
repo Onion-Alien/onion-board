@@ -3016,5 +3016,6 @@
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Lyssning: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Prata på engelska och andra hör ett annat språk. AI-rösten eller röstväxlaren säger det när en av dem är på; annars trycker du på Start och en datorröst gör det.",
-  "Type a line and press Enter…": "Skriv en rad och tryck på Retur…"
+  "Type a line and press Enter…": "Skriv en rad och tryck på Retur…",
+  "Category": "Kategori"
 }

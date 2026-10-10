@@ -2952,5 +2952,6 @@
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "การฟัง: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "พูดเป็นภาษาอังกฤษและคนอื่นได้ยินภาษาอื่น เสียง AI หรือโปรแกรมเปลี่ยนเสียงจะพูดเมื่อเสียงใดเสียงหนึ่งเปิดอยู่ หรือกด Start แล้วเสียงคอมพิวเตอร์ก็ดังขึ้น",
-  "Type a line and press Enter…": "พิมพ์บรรทัดแล้วกด Enter…"
+  "Type a line and press Enter…": "พิมพ์บรรทัดแล้วกด Enter…",
+  "Category": "หมวดหมู่"
 }

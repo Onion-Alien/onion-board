@@ -113,8 +113,6 @@ class AppCategoryHeading(QLabel):
         self._drag_press = None
         self.setAcceptDrops(True)
         self.setCursor(Qt.OpenHandCursor)
-        self.setToolTip(_("Drag to reorder section, or drop app cards here. "
-                          "Right-click to manage."))
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_menu)
 
@@ -179,7 +177,7 @@ class AppCategoryHeading(QLabel):
 
     def _show_menu(self, pos):
         menu = QMenu(self)
-        menu.addAction(_("Rename category…"), lambda: self.rename_requested.emit(self.category))
+        menu.addAction(_("Rename category"), lambda: self.rename_requested.emit(self.category))
         if self.custom:
             menu.addAction(_("Delete category"), lambda: self.delete_requested.emit(self.category))
         menu.exec(self.mapToGlobal(pos))
@@ -503,8 +501,6 @@ class AppRow(HoverCard):
         v.setSpacing(8)
         self.header = QWidget()
         self.header.setCursor(Qt.OpenHandCursor)
-        self.header.setToolTip(_("Left-click and drag to reorder cards or move to another "
-                                 "category. Right-click to manage."))
         top = QHBoxLayout(self.header)
         top.setContentsMargins(0, 0, 0, 0)
         top.setSpacing(10)
@@ -667,7 +663,7 @@ class AppRow(HoverCard):
         while parent and not isinstance(parent, AppsTab):
             parent = parent.parentWidget()
         if parent:
-            cat_menu = menu.addMenu(_("Move to category"))
+            cat_menu = menu.addMenu(_("Categories"))
             for cat in parent.grid.category_order:
                 act = cat_menu.addAction(cat)
                 if cat == self.category:
@@ -675,7 +671,7 @@ class AppRow(HoverCard):
                 else:
                     act.triggered.connect(lambda _c=cat: self.move_to_category.emit(self, _c))
         menu.addSeparator()
-        menu.addAction(_("Forget program"), lambda: self.forget.emit(self))
+        menu.addAction(_("Take this program off the list"), lambda: self.forget.emit(self))
         menu.exec(self.mapToGlobal(pos))
 
     NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
@@ -868,7 +864,7 @@ class AppsTab(QWidget):
         self.btn_add_cat = QPushButton(_("Category"))
         self.btn_add_cat.setObjectName("small")
         self.btn_add_cat.setCursor(Qt.PointingHandCursor)
-        self.btn_add_cat.setToolTip(_("Add a new category for your apps"))
+        self.btn_add_cat.setToolTip(_("New category"))
         icons.set_icon(self.btn_add_cat, "plus", size=12)
         self.btn_add_cat.clicked.connect(self._prompt_new_category)
         toolbar.addWidget(self.btn_add_cat)
@@ -992,8 +988,7 @@ class AppsTab(QWidget):
         heading.delete_requested.connect(self._on_delete_category)
 
     def _prompt_new_category(self):
-        name, ok = QInputDialog.getText(self, _("New category"),
-                                        _("Name (e.g. Work, Streaming, Launchers):"))
+        name, ok = QInputDialog.getText(self, _("New category"), _("Name:"))
         name = (library.clean_tags([name]) or [""])[0] if ok else ""
         if not name or name in self.grid.category_order:
             return
