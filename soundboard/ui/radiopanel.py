@@ -519,7 +519,9 @@ class RadioTab(QWidget):
         # ---- globe | station list
         self.split = QSplitter(Qt.Horizontal)
         self.split.setChildrenCollapsible(False)
-        self.globe_box = RoundedFrame()
+        # not a RoundedFrame: its mask has no in-between pixels, so it cuts the map's
+        # smooth corners into stairs. The map rounds its own corners.
+        self.globe_box = QFrame()
         self.globe_box.setMinimumWidth(200)
         self.globe_layout = QVBoxLayout(self.globe_box)
         self.globe_layout.setContentsMargins(0, 0, 0, 0)
