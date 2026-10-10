@@ -21,6 +21,28 @@ import gc  # noqa: E402
 
 gc.disable()
 
+# A test worker (pytest-xdist) dies with the run that started it. Killing pytest (an
+# editor's or agent's timeout, a closed terminal) used to leave its workers running,
+# each holding ~500 MB, until someone noticed. The run's PID is handed down in the
+# environment; each worker waits on that process and exits the moment it's gone.
+_RUN_PID = "ONIONBOARD_TEST_RUN_PID"
+if "PYTEST_XDIST_WORKER" not in os.environ:
+    os.environ[_RUN_PID] = str(os.getpid())
+elif sys.platform == "win32" and os.environ.get(_RUN_PID, "").isdigit():
+    import ctypes
+    import threading
+
+    def _exit_with_the_run(pid: int):
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.OpenProcess.restype = ctypes.c_void_p
+        handle = k32.OpenProcess(0x00100000, False, pid)   # SYNCHRONIZE
+        if handle:
+            k32.WaitForSingleObject(ctypes.c_void_p(handle), 0xFFFFFFFF)   # INFINITE
+        os._exit(1)
+
+    threading.Thread(target=_exit_with_the_run, args=(int(os.environ[_RUN_PID]),),
+                     name="exit-with-the-run", daemon=True).start()
+
 
 class _SilentOutputStream:
     """Stands in for sounddevice.OutputStream: the callback runs on a thread at the
