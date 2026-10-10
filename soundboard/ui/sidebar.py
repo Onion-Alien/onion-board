@@ -255,11 +255,14 @@ class SideRail(QFrame):
         self.status = list(status)
         self._status_box = QBoxLayout(QBoxLayout.TopToBottom)
         self._status_box.setSpacing(4)
+        self._status_pad_before = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self._status_pad_after = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self._status_box.addSpacerItem(self._status_pad_before)
         for w in self.status:
             w.setFocusPolicy(Qt.TabFocus)
             w.setFixedWidth(BUTTON_W)
             self._status_box.addWidget(w)
-        self._status_box.addStretch(1)   # (open: a row from the start, mirrored or not)
+        self._status_box.addSpacerItem(self._status_pad_after)   # (open: centered horizontally)
         lay.addLayout(self._status_box)
         self._gaps.append(self._gap(6))
         for w in foot:
@@ -459,6 +462,10 @@ class SideRail(QFrame):
             w.style().polish(w)
         self._status_box.setDirection(QBoxLayout.LeftToRight if shown
                                       else QBoxLayout.TopToBottom)
+        pad_h = QSizePolicy.Expanding if shown else QSizePolicy.Minimum
+        self._status_pad_before.changeSize(0, 0, pad_h, QSizePolicy.Minimum)
+        self._status_pad_after.changeSize(0, 0, pad_h, QSizePolicy.Minimum)
+        self._status_box.invalidate()
         for w in self.status:
             w.setProperty("railopen", shown)
             self.show_status(w)

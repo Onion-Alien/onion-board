@@ -14,6 +14,8 @@
   the bunny, or Hoot the owl for Onion Watch. Click outside or press Escape to close.
 - **Reorder sidebar tabs.** Hold the left mouse button on a tab and drag it up or
   down. The new order is remembered next time you open the app.
+- **Centered sidebar status buttons.** When the sidebar is extended, the status icons
+  at the bottom (Live, sound mode, Stop all and status pills) are horizontally centered.
 
 - The Setup microphone card has a grouped audio flow, clearer setup guidance,
   and a separate optional update notice.
