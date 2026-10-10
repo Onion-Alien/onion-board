@@ -146,9 +146,16 @@ jobs:
   # tests marked `windows` are skipped and Windows itself is stood in for
   # (tests/offwindows.py), so this run proves the Linux mode still works.
   test-linux:
+    needs: pick
+    # as `test`: skipped when the change needs no tests, failing when ruff did
+    if: ${{ !cancelled() && (needs.pick.result != 'success' || needs.pick.outputs.tests != '') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - if: needs.pick.result != 'success'
+        run: |
+          echo "ruff or the test pick failed: see the pick job"
+          exit 1
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
         id: py
@@ -169,6 +176,7 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/python -m pip install -r requirements.txt -r requirements-dev.txt
-      - run: .venv/bin/python -m pytest --durations=20
+      - run: .venv/bin/python -m pytest --durations=20 $TESTS
         env:
           QT_QPA_PLATFORM: offscreen
+          TESTS: ${{ needs.pick.outputs.tests }}

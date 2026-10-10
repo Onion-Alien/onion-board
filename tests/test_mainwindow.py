@@ -612,6 +612,7 @@ def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):
     assert not window.is_mini() and window.pads["s0"].width() == 240
 
 
+@pytest.mark.windows   # Segoe UI's text widths: with another font the columns fit side by side
 def test_setup_stacks_long_controls_without_sideways_scrolling(window, qapp):
     """Long translated controls must fit the viewport, then unfold at a wider size."""
     from PySide6.QtWidgets import QBoxLayout
