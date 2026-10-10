@@ -366,6 +366,19 @@ def test_fetch_takes_an_image_link_or_a_pages_preview_picture(qapp, tmp_path, mo
     assert {f for __, f in asked} == {"sounds_web.other"}   # "Other pasted links" switch
 
 
+def test_a_pages_preview_picture_is_only_fetched_from_the_web(qapp, tmp_path, monkeypatch):
+    # og:image comes from the page, not the user: a file:// one would open a file on
+    # this PC, or a share on another (file:////host/share: Windows connects to it)
+    pic = tmp_path / "p.png"
+    pic.write_bytes(png_bytes(tmp_path))
+    for bad in (pic.as_uri(), "file:////attacker.example/share/a.png"):
+        page = f'<html><meta property="og:image" content="{bad}"></html>'.encode()
+        asked = fake_web(monkeypatch, {"https://ex.com/post": (page, "text/html")})
+        with pytest.raises(thumbs.LinkError, match="no picture"):
+            thumbs.fetch("https://ex.com/post")
+        assert [u for u, __ in asked] == ["https://ex.com/post"]
+
+
 def test_fetch_goes_straight_to_a_youtube_videos_thumbnail(qapp, tmp_path, monkeypatch):
     asked = fake_web(monkeypatch, {"https://i.ytimg.com/vi/HEXWRTEbj1I/hqdefault.jpg":
                                    (png_bytes(tmp_path), "image/jpeg")})
