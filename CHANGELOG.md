@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- AI voices puts Start and live status at the top, with a wider voice picker,
+  grouped pitch controls and shorter explanatory text in every language.
 - The note that pops up above the player ("Added … to Sounds", device changes and so
   on) now sits centred over the page instead of jammed in the bottom-left corner on
   top of the sidebar, and is no wider than 560 px.

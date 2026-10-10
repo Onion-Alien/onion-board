@@ -2055,7 +2055,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Photon Voice veya Dissonance ile Phasmophobia, Lethal Company ve diğer Unity oyunları: 17-30 kbps, en fazla 12 kHz'de Opus, sesle aktivasyon.",
   "Photon or Dissonance": "Foton veya Uyumsuzluk",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Çalan bir programı seçin (bir müzik çalar, bir tarayıcı, bir oyun, hatta başka bir uygulamadaki bir çağrı) ve sesleriniz (mikrofonunuz, kablonuz veya Kurulum sekmesinde seçtiğiniz cihaz ve yayın çıkışı) gibi, dinleyen herkese kendi ses seviyesinde iletilir. Kimseye Gönderme: yalnızca akış çıktısı alır. Yalnızca o program: çaldığınız başka hiçbir şeye dokunulmaz ve daha önce olduğu gibi hoparlörlerinizde çalmaya devam eder. Açtığınız programlar bir sonraki çalıştırılışında hatırlanır ve yeniden alınır.",
-  "Pick a voice, press Start, then just talk.": "Bir ses seçin, Başlat'a basın ve konuşun.",
   "Pick the exact voice chat yourself, or make your own.": "Tam sesli sohbeti kendiniz seçin veya kendinizinkini yapın.",
   "Pitch & voice": "Konuşma ve ses",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, her efekt ve kayıtlı sesleriniz: uygulamanın yanındaki bir pencerede kendi sesinizi oluşturun",
@@ -2165,7 +2164,6 @@
   "Squash": "Kabak",
   "Stadium announcer": "Stadyum spikeri",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Bir sesten başlayın, başka bir sesi biraz karıştırın, ardından ne kadar derin ve ne kadar yüksek olduğunu ayarlayın. Denemek için Duy'a basın.",
-  "Start the AI voice": "AI sesini başlat",
   "Start the computer voice": "Bilgisayar sesini başlat",
   "Starting Onion Watch…": "Onion Watch başlatılıyor…",
   "Starting the translation…": "Çeviri başlatılıyor…",
@@ -2173,7 +2171,6 @@
   "Steam voice": "Buhar sesi",
   "Stop  {time}": "{time} durdur",
   "Stop sending": "Göndermeyi durdur",
-  "Stop the AI voice": "AI sesini durdur",
   "Stop the computer voice": "Bilgisayar sesini durdur",
   "Stop the computer voice to change this": "Bunu değiştirmek için bilgisayar sesini durdurun",
   "Stop the voice to download this": "Bunu indirmek için sesi durdurun",
@@ -3013,5 +3010,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board seslerini mikrofonuna çalar, böylece Discord'daki ya da oyunundaki insanlar onları seni duydukları gibi duyar.{gap}Sesler sekmesinden ses ekle, sonra birine çift tıkla ya da kısayol tuşuna bas. Alttaki şerit mikrofonunu, başkalarının ne duyduğunu ve kulaklığını gösterir.{gap}Soldaki bir sekmeye sağ tıkla ve ne işe yaradığını görmek için Bu sekme hakkında'yı seç.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Seslerini zaten kullandığın mikrofona ver, böylece Discord'da ve oyunlarda hiçbir şeyi değiştirmen gerekmez",
   "Straight into my mic instead": "Onun yerine doğrudan mikrofonuma",
-  "your real voice": "gerçek sesini"
+  "your real voice": "gerçek sesini",
+  "Start AI voice": "AI sesini başlat",
+  "Stop AI voice": "AI sesini durdur",
+  "Your words and tone, a different voice. Live on this PC.": "Sözlerin ve tonun, farklı bir ses. Bu bilgisayarda canlı olarak."
 }

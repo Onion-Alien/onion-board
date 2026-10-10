@@ -2052,7 +2052,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company at iba pang laro ng Unity na may Photon Voice o Dissonance: Opus sa 17-30 kbps, 12 kHz sa maximum, voice activation.",
   "Photon or Dissonance": "Photon o Dissonance",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Pumili ng program na nagpe-play, isang music player, isang browser, isang laro, kahit isang tawag sa isa pang app, at napupunta ito sa sinumang nakikinig, sa sarili nitong volume, sa parehong paraan na ginagawa ng iyong mga tunog (iyong mikropono, ang cable o ang device na pinili mo sa tab na Setup, at ang output ng stream). Ipinapadala sa Nobody: tanging ang output ng stream ang nakakakuha nito. Tanging ang program na iyon: wala nang iba pang nilalaro mo ang naantig, at patuloy itong tumutugtog sa iyong mga speaker gaya ng dati. Ang mga program na iyong binubuksan ay naaalala at kukunin muli sa susunod na tumakbo ang mga ito.",
-  "Pick a voice, press Start, then just talk.": "Pumili ng boses, pindutin ang Start, pagkatapos ay magsalita lang.",
   "Pick the exact voice chat yourself, or make your own.": "Piliin ang mismong voice chat, o gumawa ng sarili mo.",
   "Pitch & voice": "Pitch at boses",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, bawat epekto, at ang iyong mga naka-save na boses: bumuo ng sarili mong boses sa isang window sa tabi ng app",
@@ -2162,7 +2161,6 @@
   "Squash": "Kalabasa",
   "Stadium announcer": "Stadium announcer",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Magsimula sa isang boses, paghaluin ng kaunti ang isa pa, pagkatapos ay itakda kung gaano ito kalalim at kung gaano ito kataas. Pindutin ang Pakinggan ito upang subukan ito.",
-  "Start the AI voice": "Simulan ang boses ng AI",
   "Start the computer voice": "Simulan ang boses ng computer",
   "Starting Onion Watch…": "Sinisimulan ang Onion Watch…",
   "Starting the translation…": "Sinisimulan ang pagsasalin...",
@@ -2170,7 +2168,6 @@
   "Steam voice": "Singaw na boses",
   "Stop  {time}": "Huminto {time}",
   "Stop sending": "Itigil ang pagpapadala",
-  "Stop the AI voice": "Itigil ang boses ng AI",
   "Stop the computer voice": "Itigil ang boses ng computer",
   "Stop the computer voice to change this": "Itigil ang boses ng computer para baguhin ito",
   "Stop the voice to download this": "Itigil ang boses para i-download ito",
@@ -3013,5 +3010,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Pinapatugtog ng Onion Board ang sounds mo sa mic mo, kaya naririnig ito ng mga tao sa Discord o sa game mo gaya ng pagkarinig nila sa'yo.{gap}Magdagdag ng sounds sa Sounds tab, tapos i-double-click ang isa o pindutin ang hotkey nito. Ipinapakita ng strip sa ibaba ang mic mo, ang naririnig ng iba at ang headphones mo.{gap}I-right-click ang isang tab sa kaliwa at piliin ang Tungkol sa tab na ito para makita kung ano ang ginagawa nito.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Ilagay ang sounds mo sa mic na gamit mo na, kaya walang kailangang baguhin sa Discord at mga game",
   "Straight into my mic instead": "Diretso na lang sa mic ko",
-  "your real voice": "ang tunay mong boses"
+  "your real voice": "ang tunay mong boses",
+  "Start AI voice": "Simulan ang boses ng AI",
+  "Stop AI voice": "Itigil ang boses ng AI",
+  "Your words and tone, a different voice. Live on this PC.": "Mga salita at tono mo, ibang boses. Live sa PC na ito."
 }

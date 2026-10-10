@@ -2052,7 +2052,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company e outros jogos Unity com Photon Voice ou Dissonance: Opus a 17-30 kbps, 12 kHz no máximo, ativação por voz.",
   "Photon or Dissonance": "Fotão ou Dissonância",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Escolha um programa que esteja a tocar, um leitor de música, um browser, um jogo, até uma chamada noutra aplicação, e será enviado para quem estiver a ouvir, no seu próprio volume, da mesma forma que os seus sons (o seu microfone, o cabo ou o dispositivo que escolheu no separador Configuração e a saída do stream). Enviar para ninguém: apenas a saída do stream recebe. Apenas aquele programa: nada mais do que toca é tocado e continua a tocar nos altifalantes como antes. Os programas que activa são recordados e retomados na próxima vez que forem executados.",
-  "Pick a voice, press Start, then just talk.": "Escolha uma voz, prima Iniciar e fale.",
   "Pick the exact voice chat yourself, or make your own.": "Escolha você mesmo o chat por voz exato ou crie o seu próprio.",
   "Pitch & voice": "Tom e voz",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, todos os efeitos e as suas vozes guardadas: crie a sua própria voz numa janela ao lado da aplicação",
@@ -2162,7 +2161,6 @@
   "Squash": "Abóbora",
   "Stadium announcer": "Locutor do estádio",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Comece com uma voz, misture um pouco de outra e defina o quão profunda e aguda é. Prima Ouvir para experimentar.",
-  "Start the AI voice": "Inicie a voz AI",
   "Start the computer voice": "Inicie a voz artificial",
   "Starting Onion Watch…": "Iniciar o Onion Watch…",
   "Starting the translation…": "Iniciando a tradução…",
@@ -2170,7 +2168,6 @@
   "Steam voice": "Voz a vapor",
   "Stop  {time}": "Parar {time}",
   "Stop sending": "Pare de enviar",
-  "Stop the AI voice": "Pare a voz da IA",
   "Stop the computer voice": "Pare a voz do computador",
   "Stop the computer voice to change this": "Pare a voz artificial para mudar isso",
   "Stop the voice to download this": "Pare a voz para baixar este",
@@ -3013,5 +3010,8 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "O Onion Board toca os teus sons no teu microfone, para que as pessoas no Discord ou no teu jogo os ouçam tal como te ouvem a ti.{gap}Adiciona sons no separador Sons e depois faz duplo clique num ou carrega no atalho dele. A barra em baixo mostra o teu microfone, o que os outros ouvem e os teus auscultadores.{gap}Clica com o botão direito num separador à esquerda e escolhe Acerca deste separador para veres o que faz.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Põe os teus sons no microfone que já usas, para que o Discord e os jogos não precisem de alterações",
   "Straight into my mic instead": "Diretamente no meu microfone",
-  "your real voice": "a tua voz real"
+  "your real voice": "a tua voz real",
+  "Start AI voice": "Inicie a voz AI",
+  "Stop AI voice": "Pare a voz da IA",
+  "Your words and tone, a different voice. Live on this PC.": "As tuas palavras e o teu tom, outra voz. Em direto neste PC."
 }
