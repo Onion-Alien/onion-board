@@ -2140,10 +2140,7 @@ class MainWindow(QMainWindow):
         except Exception:  # noqa: BLE001 - never let the poll's thread die loudly
             log.debug("asking for Windows' default output failed", exc_info=True)
             name = None
-        try:
-            self.default_found.emit(name)
-        except RuntimeError:   # the window is gone (quitting)
-            pass
+        busy.emit(self.default_found, name)
 
     def _on_default_found(self, name):
         self._default_asking = False
@@ -5771,10 +5768,7 @@ class MainWindow(QMainWindow):
             except Exception as e:  # noqa: BLE001 - never leave the status hanging
                 log.exception("picture from a link")
                 img, err = None, errors.plain(e)
-            try:
-                self.picture_fetched.emit(sid, img, err)
-            except RuntimeError:   # the window closed meanwhile
-                pass
+            busy.emit(self.picture_fetched, sid, img, err)
         threading.Thread(target=work, daemon=True, name="picture-link").start()
 
     def _on_picture_fetched(self, sid: str, img, err: str):
@@ -7667,10 +7661,7 @@ class MainWindow(QMainWindow):
             except Exception:  # noqa: BLE001 - never leave _video_asking stuck
                 log.debug("video lookup failed", exc_info=True)
                 found = None
-            try:
-                self.video_found.emit(sid, found)
-            except RuntimeError:   # the window closed meanwhile
-                pass
+            busy.emit(self.video_found, sid, found)
         threading.Thread(target=look, daemon=True, name="video-lookup").start()
 
     def _video_found(self, sid: str, path):

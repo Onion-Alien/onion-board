@@ -16,12 +16,17 @@ was stuck in, how long it lasted and whether the window or another thread was bu
 never its message or anything else from the report), or
 the last run ending without the app closing itself (`unclean-exit/<version>/<why>`:
 a hard crash, ended in Task Manager, a power cut; exitwatch.py works out which, on
-this PC). And `uninstall/<version>` when the uninstaller removes it.
+this PC). Past MAX_PROBLEMS in one send, one `problems-dropped/<bucket>` says roughly
+how many more. On the first start of a new version, `updated/<from>-to-<to>` (so an
+update that never finished shows up as an *Update now* without one). One-off events
+wait in config.json until a send takes them. And `uninstall/<version>` when the
+uninstaller removes it.
 With the daily one, a rough picture of how it's used, each as a bucket or a name from a
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
 one (`sounds/11-50`, `played/1-10`), how long the app was open since then
-(`open/1-3h`), the app's language (`lang/de`), and which features
+(`open/1-3h`), how many times it was started since then (`launches/2-5`), the system
+(`os/win11`, `os/win10`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
 triggershost.BoardHost.count, as `used/triggers-mode-colour`). And once each,
@@ -242,6 +247,38 @@ def open_bucket(seconds: float) -> str:
             else "3-8h" if h < 8 else "8h-plus")
 
 
+def launch_bucket(n: int) -> str:
+    """How many times it was started since the last daily count: 0 (left open since
+    then), 1, 2-5 or 6-plus."""
+    return "0" if n <= 0 else "1" if n == 1 else "2-5" if n <= 5 else "6-plus"
+
+
+def os_tag() -> str:
+    """Which system, nothing finer: win11, win10, win-older, linux or other."""
+    if sys.platform == "win32":
+        try:
+            v = sys.getwindowsversion()
+        except AttributeError:
+            return "other"
+        if v.major >= 10:
+            return "win11" if v.build >= 22000 else "win10"
+        return "win-older"
+    return "linux" if sys.platform.startswith("linux") else "other"
+
+
+def started(cfg) -> None:
+    """At start: count this launch for the next daily count's `launches/`, and when
+    another version ran here last, keep `updated/<from>-to-<to>` for the next send
+    (however it was updated: *Update now*, the installer, a download). Nothing piles
+    up while the count is off; the version is noted either way."""
+    old, cfg.stats_version = cfg.stats_version, __version__
+    if not enabled() or not net.allowed(FEATURE):
+        return
+    cfg.stats_launches = max(0, int(cfg.stats_launches or 0)) + 1
+    if old and old != __version__ and re.fullmatch(VERSION_RE, old):
+        _keep(cfg, [f"updated/{old}-to-{__version__}"])
+
+
 def total_plays(cfg) -> int:
     return sum(max(0, int(getattr(m, "plays", 0) or 0)) for m in cfg.sounds)
 
@@ -283,6 +320,10 @@ def remember(cfg) -> None:
     _used.clear()
     if new:
         cfg.stats_used = [*have, *new]
+    if _pending:   # note()d events: kept in cfg too, so a quit before the send keeps them
+        taken = _pending[:]
+        del _pending[:len(taken)]
+        _keep(cfg, taken)
 
 
 def features_now(cfg) -> list[str]:
@@ -308,6 +349,8 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
     lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
     out.append(f"lang/{lang}")
+    out.append(f"os/{os_tag()}")
+    out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
             | set(features_now(cfg)))
     out += [f"used/{k}" for k in FEATURES if k in have]
@@ -451,11 +494,13 @@ def _report_event(path: Path) -> str:
     return f"{kind}/{ver}" + (f"/{tag}" if tag else "")
 
 
-def problems(app_dir: Path, since: float) -> tuple[list[str], float]:
+def problems(app_dir: Path, since: float,
+             skipped: list[int] | None = None) -> tuple[list[str], float]:
     """Events for the crash / freeze reports saved in app_dir after `since` (a file
-    time), and the newest such time. Only the kind and version are read out."""
+    time), and the newest such time. Only the kind and version are read out. Past
+    MAX_PROBLEMS the rest aren't read: how many is added to `skipped`."""
     from soundboard.applog import REPORTS_DIR
-    out, newest = [], since
+    out, newest, over = [], since, 0
     try:
         files = sorted((f.stat().st_mtime, f.name, f)
                        for f in (app_dir / REPORTS_DIR).glob("crash-*.txt"))
@@ -465,9 +510,14 @@ def problems(app_dir: Path, since: float) -> tuple[list[str], float]:
         if mtime <= since:
             continue
         newest = max(newest, mtime)
+        if len(out) >= MAX_PROBLEMS:
+            over += 1
+            continue
         ev = _report_event(f)
-        if ev and len(out) < MAX_PROBLEMS:
+        if ev:
             out.append(ev)
+    if skipped is not None:
+        skipped.append(over)
     return out, newest
 
 
@@ -499,12 +549,20 @@ def mark_stopped(app_dir: Path) -> None:
 
 
 _pending: list[str] = []   # an unclean exit found at start, for the next send
+MAX_PENDING = 20           # one-off events kept in cfg.stats_pending while unsent
 
 
 def note(event: str) -> None:
-    """Send `event` with the next count."""
+    """Send `event` with the next count (any thread: remember() moves it into cfg)."""
     if event:
         _pending.append(event)
+
+
+def _keep(cfg, events) -> None:
+    """Keep one-off events in cfg.stats_pending until a send takes them."""
+    have = [e for e in (cfg.stats_pending if isinstance(cfg.stats_pending, list) else [])
+            if isinstance(e, str)]
+    cfg.stats_pending = [*have, *(e for e in events if e)][:MAX_PENDING]
 
 
 def uninstall_event() -> str:
@@ -564,12 +622,16 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
     if not event:
-        taken = len(_pending)
-        extra = _pending[:taken]
+        extra = list(cfg.stats_pending)   # remember() just made it a clean list
+        taken = len(extra)
+        skipped = [0]
         if app_dir is not None:
-            found, newest = problems(app_dir, cfg.stats_problems_seen)
+            found, newest = problems(app_dir, cfg.stats_problems_seen, skipped)
             extra += found
+        dropped = skipped[-1] + max(0, len(extra) - MAX_PROBLEMS)
         extra = extra[:MAX_PROBLEMS]
+        if dropped:   # a bug in a loop: one count saying roughly how many more
+            extra.append(f"problems-dropped/{bucket(dropped)}")
     open_tick(cfg)
     payload = hits(cfg, now, event, extra)
     if not payload:
@@ -579,6 +641,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     feats = [h["path"][5:] for h in payload if h["path"].startswith("used/")]
     plays = total_plays(cfg)
     opened = cfg.stats_open_s or 0
+    launches = cfg.stats_launches or 0
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
@@ -592,7 +655,8 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
             cfg.stats_plays = plays
             cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
-        del _pending[:taken]
+            cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
+        cfg.stats_pending = cfg.stats_pending[taken:]   # any kept meanwhile stay
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         if saved is not None:
             saved()

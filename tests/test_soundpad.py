@@ -49,6 +49,7 @@ def _board(tmp_path) -> Path:
     return spl
 
 
+@pytest.mark.windows   # Windows paths
 def test_reads_names_paths_categories_and_hotkeys(tmp_path):
     entries = soundpad.read(_board(tmp_path))
     assert [e.name for e in entries] == ["Bruh", "Vine - Boom", "airhorn", "Gone"]
@@ -89,6 +90,7 @@ def test_finds_soundpads_list_only_when_its_there(tmp_path, monkeypatch):
     assert soundpad.default_list() == spl
 
 
+@pytest.mark.windows   # Windows paths
 def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
@@ -124,6 +126,7 @@ def test_a_dropped_spl_goes_to_the_soundpad_import(main_window, monkeypatch):  #
     assert got == [("soundpad", "C:/x/list.SPL")]
 
 
+@pytest.mark.windows   # Windows paths
 def test_the_installers_box_imports_on_first_start_without_asking(
         main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     """Ticked in the installer, it leaves a note; the first start does the import with

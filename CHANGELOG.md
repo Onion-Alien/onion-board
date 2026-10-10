@@ -5,6 +5,20 @@
 - *Straight into my mic*: a damaged link file between the board and the mic effect
   that said the wrong sample rate is made again, instead of your sounds going out at
   the wrong speed and pitch.
+- Switching a tab off, or closing a window, while it's still loading something (the
+  voice list, a picture, Discord's settings) can no longer crash the app.
+- Starting the app (or changing theme) no longer makes every Desktop icon blink and
+  redraw. Recolouring the app's own shortcuts used to tell Windows to rebuild its whole
+  icon cache; now it only refreshes those shortcuts.
+- When a mic or headphones won't open (for example while Windows' audio restarts),
+  the message now says it's the audio device, not "It isn't a sound file that can be
+  read, or it's damaged."
+- Closing *Show this when a program is in front…* while it's still finding your open
+  programs can no longer crash the app.
+- A settings change made just as the background saver went idle is no longer lost
+  (it could go unsaved until the next change, or be dropped at quit).
+- Closing *Show this when a program is in front…* while it's still finding your open
+  programs can no longer crash the app.
 - Importing a backup whose settings name `read_only` no longer stops the app saving
   for the rest of the session (the imported sounds were gone after a restart), and a
   settings file naming it is no longer set aside as damaged.

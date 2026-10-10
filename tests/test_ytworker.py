@@ -11,6 +11,7 @@ def helper(monkeypatch):
     ytworker.drop_all()
 
 
+@pytest.mark.windows   # the helper process imports the app
 def test_a_helper_answers_and_is_kept_for_the_next_call(helper):
     pid, _version = ytworker.run("ping")
     assert pid and ytworker.run("ping")[0] == pid          # the same warm one

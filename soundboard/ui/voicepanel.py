@@ -1779,11 +1779,7 @@ class SpeechPanel(QWidget):
             known = tts.remembered_voices(self.s.get(tts.VOICE_CACHE), fp)
             voices = (controller.tts.use_listing(*known) if known
                       else controller.tts.warm_up())
-            err = controller.tts.error
-            try:
-                self._voices.emit(voices, err)
-            except RuntimeError:   # the panel was closed while the voices loaded
-                pass
+            busy.emit(self._voices, voices, controller.tts.error)
         threading.Thread(target=warm_up, name="tts-warmup", daemon=True).start()
 
     # ---- text to speech
@@ -1799,10 +1795,7 @@ class SpeechPanel(QWidget):
 
         def work():
             try:
-                voices = t.warm_up()
-                self._voices.emit(voices, t.error)
-            except RuntimeError:   # the panel was closed meanwhile
-                pass
+                busy.emit(self._voices, t.warm_up(), t.error)
             finally:
                 self._warming = False
         threading.Thread(target=work, name="tts-warmup", daemon=True).start()
@@ -1845,10 +1838,7 @@ class SpeechPanel(QWidget):
                 data, err = self.ctl.render_line(text), ""
             except Exception as e:  # noqa: BLE001 - said under the bar
                 data, err = None, errors.plain(e)
-            try:
-                self._line_saved.emit(data, name, err)
-            except RuntimeError:   # the panel was closed meanwhile
-                pass
+            busy.emit(self._line_saved, data, name, err)
         threading.Thread(target=work, name="tts-save", daemon=True).start()
 
     def _line_done(self, data, name: str, err: str):
@@ -2228,10 +2218,7 @@ class SpeechPanel(QWidget):
         def work():
             self._voice_fp = winvoices.fingerprint()
             voices = self.ctl.tts.refresh()
-            try:
-                self._voices.emit(voices, self.ctl.tts.error)
-            except RuntimeError:   # the panel was closed meanwhile
-                pass
+            busy.emit(self._voices, voices, self.ctl.tts.error)
         threading.Thread(target=work, name="tts-refresh", daemon=True).start()
 
     def _download(self):
@@ -3122,10 +3109,7 @@ class VoicePanel(QWidget):
                                            and not m.error), None))
             except Exception:  # noqa: BLE001 - scanned again on the UI thread instead
                 found = voices = None
-            try:
-                self._scanned.emit(found, voices)
-            except RuntimeError:   # the tab was closed meanwhile
-                pass
+            busy.emit(self._scanned, found, voices)
         threading.Thread(target=work, daemon=True, name="addon-scan").start()
 
     def _ai_follow_offline(self):

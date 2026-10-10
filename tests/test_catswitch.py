@@ -1,10 +1,14 @@
 """Switch category when a program is in front: the rules' logic with a stubbed
 foreground window, and the board following it."""
+import pytest
+from PySide6.QtCore import Qt
+
 from soundboard import backup
 from soundboard.catswitch import Switcher
 from soundboard.library import Config, clean_programs
 
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
+from tests.conftest import process_events
 
 GAME = "C:\\Games\\Some Game\\game.exe"
 BROWSER = "C:\\Apps\\browser.exe"
@@ -32,6 +36,7 @@ def switcher(desk):
     return Switcher(foreground=lambda: desk.front, alive=lambda pid: pid in desk.running)
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_switches_when_the_program_comes_to_the_front_and_back_when_it_closes():
     d = Desk()
     s = switcher(d)
@@ -55,6 +60,7 @@ def test_no_switch_for_a_program_without_a_rule_or_a_missing_category():
     assert s.poll({"game.exe": "Gone"}, "Memes", CATS) is None
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_alt_tab_out_changes_nothing_and_coming_back_switches_again():
     d = Desk()
     s = switcher(d)
@@ -80,6 +86,7 @@ def test_a_pick_by_hand_while_the_program_is_in_front_is_respected():
     assert s.poll(RULES, "Memes", CATS) is None
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_matches_the_exe_name_in_any_folder_and_case():
     d = Desk()
     s = switcher(d)
@@ -87,6 +94,7 @@ def test_matches_the_exe_name_in_any_folder_and_case():
     assert s.poll(RULES, "", CATS).category == "Game"
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_back_to_all_works():
     d = Desk()
     s = switcher(d)
@@ -134,6 +142,7 @@ def test_rules_go_into_a_backup_and_back():
 
 # ------------------------------------------------------------------ the board
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_the_board_follows_the_program_and_rename_delete_keep_rules_right(window):  # noqa: F811
     d = Desk()
     w = window
@@ -169,6 +178,7 @@ def test_switch_off_stops_following(window):  # noqa: F811
     assert not w._cat_timer.isActive()
 
 
+@pytest.mark.windows   # Windows paths (C:\...)
 def test_program_picker_lists_and_browses(qapp):
     from soundboard.ui.programpick import ProgramPicker
     p = ProgramPicker("Game", {"other.exe": "Memes"},
@@ -181,3 +191,29 @@ def test_program_picker_lists_and_browses(qapp):
     p._ok()
     assert p.picked == ["new.exe"]
     p.deleteLater()
+
+
+def test_closing_the_program_picker_while_it_lists_is_safe(qapp):
+    """The open programs are listed on a thread. Its answer went to a signal of the
+    dialog itself: closed and freed meanwhile (free_dialog), that emit was a native
+    access violation (CI, a test worker gone). A closed picker now just never hears
+    the answer."""
+    import threading
+    from PySide6.QtCore import QEvent
+    from soundboard.ui.programpick import ProgramPicker
+    go, done = threading.Event(), threading.Event()
+
+    def slow_lister():
+        go.wait(5)
+        done.set()
+        return [("game.exe", GAME, "Some Game")]
+    p = ProgramPicker("Game", {}, lister=slow_lister)
+    p.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)   # freed while still listing
+    go.set()
+    assert done.wait(5)
+    process_events(qapp, lambda: False, timeout=0.3)       # its answer arrives: nothing
+    open_one = ProgramPicker("Game", {}, lister=lambda: [("game.exe", GAME, "")])
+    assert process_events(qapp, lambda: open_one.list.count() == 1
+                          and open_one.list.item(0).data(Qt.UserRole) == "game.exe")
+    open_one.deleteLater()

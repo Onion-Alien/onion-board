@@ -491,6 +491,11 @@ class Config:
     stats_plays: int = 0
     # seconds the app was open since the last daily count (usage.open_tick)
     stats_open_s: float = 0.0
+    # starts since the last daily count, the version that last ran here (for
+    # updated/<from>-to-<to>), and one-off events still waiting to be sent
+    stats_launches: int = 0
+    stats_version: str = ""
+    stats_pending: list[str] = field(default_factory=list)
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
@@ -877,8 +882,11 @@ class Saver:
         while True:
             with self._cond:
                 while self._pending is None:
-                    if not self._cond.wait(30):
-                        self._thread = None   # idle: the next save starts a new one
+                    # timed out with nothing pending: idle, the next save starts a new
+                    # thread (a save() can take the lock as the wait times out: still
+                    # this thread's to write)
+                    if not self._cond.wait(30) and self._pending is None:
+                        self._thread = None
                         return
                 snap, self._pending, self._busy = self._pending, None, True
             try:

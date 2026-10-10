@@ -26,8 +26,25 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
+      # What's new only: a PR, its commits not on main yet; main, what the push added
+      # (each was scanned as its PR already). A manual run scans the whole history.
+      - name: Commits to scan
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          case "$EVENT" in
+            pull_request) echo "range=origin/main..$PR_HEAD" >> "$GITHUB_OUTPUT" ;;
+            push) echo "range=$BEFORE..$AFTER" >> "$GITHUB_OUTPUT" ;;
+            *) echo "range=--all" >> "$GITHUB_OUTPUT" ;;
+          esac
       - name: Personal data and secrets (repo rules)
-        run: python scripts/check_sensitive.py --history
+        env:
+          RANGE: ${{ steps.range.outputs.range }}
+        run: python scripts/check_sensitive.py --history "$RANGE"
       # A commit's time zone says where its author is: new commits must be in UTC
       # (CLAUDE.md, "Commit times"). A PR: its commits not on main yet. main: what
       # the push added (a merge made with GitHub's button or `gh pr merge` fails here).
@@ -46,16 +63,17 @@ jobs:
           fi
       # The CLI rather than gitleaks-action: the action scans `<first commit>^..`,
       # which errors on a repo's first push (the root commit has no parent).
-      - name: gitleaks (full history)
+      - name: gitleaks (the same commits)
         env:
           GITLEAKS_VERSION: "8.30.1"
+          RANGE: ${{ steps.range.outputs.range }}
         run: |
           base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
           tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
           curl -sSfLO "$base/$tarball"
           curl -sSfL "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt" | grep " $tarball\$" | sha256sum -c -
           tar xzf "$tarball" gitleaks
-          ./gitleaks git --redact --verbose --exit-code 1 .
+          ./gitleaks git --redact --verbose --exit-code 1 --log-opts="$RANGE" .
 
   # ruff, and which test files this change needs (scripts/pick_tests.py): a PR runs
   # only the tests of what it changed, so a docs-only PR doesn't start Windows at all.
@@ -64,6 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tests: ${{ steps.pick.outputs.tests }}
+      matrix: ${{ steps.pick.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -77,28 +96,34 @@ jobs:
           BASE: ${{ github.base_ref }}
         run: |
           if [ "$EVENT" = pull_request ]; then
-            tests=$(python scripts/pick_tests.py "origin/$BASE" | tr '\n' ' ')
+            base="origin/$BASE"
           else
-            tests=tests
+            base=all
           fi
+          tests=$(python scripts/pick_tests.py "$base" | tr '\n' ' ')
+          # the Windows jobs: a long run split in two (about the same length each)
+          matrix=$(python scripts/pick_tests.py "$base" --matrix)
           echo "tests=$tests" >> "$GITHUB_OUTPUT"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
           echo "Tests to run: ${tests:-none}"
+          echo "Windows jobs: $matrix"
       - run: |
           python -m pip install -q "$(grep '^ruff==' requirements-dev.txt)"
           ruff check .
 
-  test:
+  # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
+  # most of the suite) in two jobs side by side, about half the wait.
+  windows:
     needs: pick
-    # skipped (which counts as passed) when the change needs no tests; still runs, to
-    # fail, when ruff did, so a required `test` check can't pass over a lint error
-    if: ${{ !cancelled() && (needs.pick.result != 'success' || needs.pick.outputs.tests != '') }}
+    if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
+    name: test (Windows ${{ matrix.shard }})
+    strategy:
+      fail-fast: false   # each job's failures are listed in full
+      matrix:
+        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
     runs-on: windows-latest
     timeout-minutes: 20   # a hung test fails the run instead of holding it for hours
     steps:
-      - if: needs.pick.result != 'success'
-        run: |
-          echo "ruff or the test pick failed: see the pick job"
-          exit 1
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
         id: py
@@ -128,16 +153,77 @@ jobs:
           New-ItemProperty -Path $key -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
       # --durations: the slowest tests are listed at the end of every run, so one that
       # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there.
-      # TESTS: the files the pick job chose (`tests` for all of them).
+      # TESTS: this job's share of the files the pick job chose.
       - shell: bash
         run: .venv/Scripts/python -m pytest --durations=20 $TESTS
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ needs.pick.outputs.tests }}
+          TESTS: ${{ matrix.tests }}
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: crashdumps
+          name: crashdumps-${{ strategy.job-index }}
           path: ${{ runner.temp }}/crashdumps
           if-no-files-found: ignore
           retention-days: 14
+
+  # One check named `test` whatever the split: passed when every Windows job did, or
+  # when the change needs no tests; failed when ruff or the pick did, so it can't pass
+  # over a lint error.
+  test:
+    needs: [pick, windows]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          PICK: ${{ needs.pick.result }}
+          WINDOWS: ${{ needs.windows.result }}
+          MATRIX: ${{ needs.pick.outputs.matrix }}
+        run: |
+          echo "pick: $PICK, Windows jobs: $WINDOWS ($MATRIX)"
+          if [ "$PICK" != success ]; then
+            echo "ruff or the test pick failed: see the pick job"; exit 1
+          fi
+          if [ "$MATRIX" != "[]" ] && [ "$WINDOWS" != success ]; then
+            echo "a Windows test job didn't pass"; exit 1
+          fi
+
+  # The same suite on Linux, for people working on the code away from Windows: the
+  # tests marked `windows` are skipped and Windows itself is stood in for
+  # (tests/offwindows.py), so this run proves the Linux mode still works.
+  test-linux:
+    needs: pick
+    # as `test`: skipped when the change needs no tests, failing when ruff did
+    if: ${{ !cancelled() && (needs.pick.result != 'success' || needs.pick.outputs.tests != '') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - if: needs.pick.result != 'success'
+        run: |
+          echo "ruff or the test pick failed: see the pick job"
+          exit 1
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        id: py
+        with:
+          python-version: "3.13"
+      # PortAudio and libsndfile for sounddevice / soundfile; the rest is what Qt's
+      # offscreen platform loads
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libportaudio2 libsndfile1 \
+            libegl1 libgl1 libxkbcommon0 libfontconfig1 libdbus-1-3 \
+            libpulse0 libx11-xcb1 libxrandr2
+      - uses: actions/cache@v6
+        id: venv
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+      - if: steps.venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt -r requirements-dev.txt
+      - run: .venv/bin/python -m pytest --durations=20 $TESTS
+        env:
+          QT_QPA_PLATFORM: offscreen
+          TESTS: ${{ needs.pick.outputs.tests }}

@@ -475,6 +475,7 @@ def main():
     from soundboard import exitwatch
     last_run = exitwatch.read_last(APP_DIR)   # before this run's black box replaces it
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
+    usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
     if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
         def why(unclean=unclean):
             try:

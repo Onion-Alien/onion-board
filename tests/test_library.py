@@ -55,6 +55,7 @@ def test_trim_all_silence_is_empty():
 
 # ---------------------------------------------------------------- Config
 
+@pytest.mark.windows   # Windows paths (D:\...)
 def test_config_round_trip(app_dir):
     inside = str(library.SOUNDS_DIR / "x.wav")
     c = Config(sound_vol=1.5, stop_hotkey="ctrl+alt+x", latency="high",

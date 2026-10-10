@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import threading
 
-from PySide6.QtCore import QFileInfo, QSize, Qt, Signal
-from PySide6.QtWidgets import (QAbstractItemView, QDialog, QFileDialog, QFileIconProvider,
-                               QHBoxLayout, QListWidget, QListWidgetItem, QPushButton,
-                               QVBoxLayout)
+from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, Signal, Slot
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDialog, QFileDialog,
+                               QFileIconProvider, QHBoxLayout, QListWidget, QListWidgetItem,
+                               QPushButton, QVBoxLayout)
 
 from soundboard import catswitch
 from soundboard.ui import fit, icons
@@ -16,10 +16,27 @@ from soundboard.ui.panel import hint_label
 from soundboard.i18n import _
 
 
+class _Lists(QObject):
+    """Brings a listing from its thread to the picker that asked (by its id). Not a
+    signal of the picker itself: closed and freed while the thread emitted on it, that
+    was a native access violation. This one lives as long as the app, and a freed
+    picker's connection to it is simply gone."""
+    listed = Signal(object, object)   # (picker id, programs): an id is past a C int
+
+
+_lists: _Lists | None = None
+
+
+def _carrier() -> _Lists:
+    global _lists
+    if _lists is None:   # made on the UI thread, by the first picker
+        _lists = _Lists(QApplication.instance())
+    return _lists
+
+
 class ProgramPicker(QDialog):
     """`picked` after OK: the exe names chosen (lower case). `taken`: {exe: category}
     already set, shown on their rows."""
-    _listed = Signal(object)
 
     def __init__(self, category: str, taken: dict[str, str], parent=None, lister=None):
         super().__init__(parent)
@@ -59,16 +76,17 @@ class ProgramPicker(QDialog):
         self._wait = QListWidgetItem(_("Looking for open programs…"))
         self._wait.setFlags(Qt.NoItemFlags)
         self.list.addItem(self._wait)
-        self._listed.connect(self.fill)
-        threading.Thread(target=self._list_bg, daemon=True, name="programs").start()
+        carrier, me, lister = _carrier(), id(self), self._lister
+        carrier.listed.connect(self._on_listed)
+        # the thread never touches the picker: it may be closed and freed meanwhile
+        threading.Thread(target=lambda: carrier.listed.emit(me, lister()), daemon=True,
+                         name="programs").start()
         self._update()
 
-    def _list_bg(self):
-        programs = self._lister()
-        try:
-            self._listed.emit(programs)
-        except RuntimeError:   # closed meanwhile
-            pass
+    @Slot(object, object)
+    def _on_listed(self, who: int, programs):
+        if who == id(self):
+            self.fill(programs)
 
     def fill(self, programs):
         self.list.clear()

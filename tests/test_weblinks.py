@@ -1,4 +1,5 @@
 """A browser the app starts for a link mustn't inherit the relay as its proxy."""
+import pytest
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
 
@@ -13,6 +14,7 @@ def _started(monkeypatch):
     return started
 
 
+@pytest.mark.windows   # Windows' environment ignores case
 def test_links_open_without_the_relay_proxy(qapp, monkeypatch):
     relay = net.relay_url("radio")   # has the per-launch secret
     for k in ("http_proxy", "https_proxy", "all_proxy", "HTTP_PROXY"):

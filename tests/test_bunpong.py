@@ -4,6 +4,7 @@ dialog; points and the end work; Esc or Close ends it and calms him."""
 import random
 import time
 
+import pytest
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QStackedWidget, QVBoxLayout, QWidget
@@ -174,6 +175,7 @@ def test_first_to_win_ends_with_play_again(qapp):
     stack.close()
 
 
+@pytest.mark.windows   # the court's size comes from Segoe UI's text
 def test_long_play_never_sticks_and_paints(qapp):
     stack, game = _game(seed=4)
     c = game.court

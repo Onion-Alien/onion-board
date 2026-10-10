@@ -50,6 +50,7 @@ def test_key_sequence_orders_modifiers_around_the_key():
     assert wk.key_sequence("nope", up=False) is None
 
 
+@pytest.mark.windows   # SendInput
 def test_key_input_record_flags():
     plain = wk.key_input(ord("V"), up=False)
     assert plain.type == wk.INPUT_KEYBOARD and plain.ki.wVk == ord("V")
@@ -60,6 +61,7 @@ def test_key_input_record_flags():
 
 # ---------------------------------------------------------------- live registration
 
+@pytest.mark.windows   # RegisterHotKey
 def test_register_reports_combos_another_thread_owns(qapp):
     from conftest import process_events
     combo = "ctrl+alt+shift+f24"                          # nothing on a PC uses this
@@ -122,6 +124,7 @@ def test_numpad_plus_round_trips():
     assert wk.parse("ctrl+num +") == (wk.MOD_CONTROL, vk)   # saved by 0.x
 
 
+@pytest.mark.windows   # the window in front
 def test_foreground_monitor_info_shape():
     """Device name plus the monitor's native rectangle; the old name-only call still works."""
     name, rect = wk.foreground_monitor_info()

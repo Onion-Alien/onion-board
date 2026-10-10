@@ -3,6 +3,7 @@
     python scripts/check_sensitive.py             # files that would be published
     python scripts/check_sensitive.py --staged    # what is about to be committed
     python scripts/check_sensitive.py --history   # every blob + commit message ever
+    python scripts/check_sensitive.py --history origin/main..HEAD   # just those commits
 
 Built-in rules catch credential formats and machine-identifying data (user
 profile paths, LAN / Tailscale IPs, default Windows host names, e-mail
@@ -123,11 +124,11 @@ def git_in(stdin: bytes, *args: str) -> bytes:
                           check=True).stdout
 
 
-def history_blobs():
-    """(path, sha, bytes) for every file version ever committed, read by one
+def history_blobs(revs: list[str]):
+    """(path, sha, bytes) for every file version the commits `revs` added, read by one
     `git cat-file --batch` instead of two git processes per object (minutes -> s)."""
     paths = {}
-    for line in git("rev-list", "--all", "--objects").decode().splitlines():
+    for line in git("rev-list", "--objects", *revs).decode().splitlines():
         sha, _, path = line.partition(" ")
         if path and path not in SELF:
             paths.setdefault(sha, path)
@@ -146,19 +147,19 @@ def history_blobs():
         pos = end + 1 + size + 1                         # the data's own newline
 
 
-def scan_history(rules) -> list[str]:
+def scan_history(rules, revs: list[str]) -> list[str]:
     hits = []
-    for path, sha, data in history_blobs():
+    for path, sha, data in history_blobs(revs):
         text = decode(data)
         if text is not None:
             hits += scan_text(f"{path}@{sha[:8]}", text, rules)
-    log = git("log", "--all", "--format=%H%x00%an <%ae>%x00%cn <%ce>%x00%B%x01").decode()
+    log = git("log", *revs, "--format=%H%x00%an <%ae>%x00%cn <%ce>%x00%B%x01").decode()
     authors = set()
     for entry in filter(str.strip, log.split("\x01")):
         sha, author, committer, body = entry.strip().split("\0", 3)
         authors |= {author, committer}
         hits += scan_text(f"commit {sha[:8]} message", body, rules)
-    tags = git("for-each-ref", "refs/tags",
+    tags = "" if revs != ["--all"] else git("for-each-ref", "refs/tags",
                "--format=%(refname:short)%00%(taggername) %(taggeremail)%00%(contents)%01").decode()
     for entry in filter(str.strip, tags.split("\x01")):
         name, tagger, body = entry.strip().split("\0", 2)
@@ -176,14 +177,19 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--staged", action="store_true", help="scan the index (pre-commit)")
-    g.add_argument("--history", action="store_true", help="scan every blob and commit message")
+    g.add_argument("--history", nargs="?", const="--all", metavar="RANGE",
+                   help="scan every blob and commit message, or just those of RANGE "
+                        "(e.g. origin/main..HEAD: a PR's own commits, seconds not minutes)")
     args = ap.parse_args()
 
     private = load_private_rules()
     if not private:
         print(f"note: no {PRIVATE_PATTERNS.name} file -- only built-in rules are active\n")
     rules = RULES + private
-    hits = scan_history(rules) if args.history else scan_worktree(rules, args.staged)
+    if args.history:
+        hits = scan_history(rules, args.history.split())
+    else:
+        hits = scan_worktree(rules, args.staged)
     for h in hits:
         print(h)
     print(f"\n{len(hits)} finding(s)." if hits else "No findings.")

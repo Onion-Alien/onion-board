@@ -51,7 +51,8 @@ class _Inline:
         self.target()
 
 
-ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/")
+ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
+         "launches/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -427,7 +428,10 @@ def test_a_bug_in_a_loop_is_at_most_a_few_hits(sent, app_dir):
         _report(app_dir, f"crash-{i:02}.txt", "Onion Board crash report\nVersion:  2.0.0\n",
                 100 + i)
     usage.maybe_send(cfg, app_dir=app_dir)
-    assert len(_hits(sent[0][0])) == usage.MAX_PROBLEMS
+    paths = [h["path"] for h in _hits(sent[0][0])]
+    # the first few, then one count saying roughly how many more (20 here)
+    assert len(paths) == usage.MAX_PROBLEMS + 1
+    assert paths[-1] == "problems-dropped/11-50"
     assert cfg.stats_problems_seen == 129
 
 
@@ -440,7 +444,80 @@ def test_a_run_that_never_closed_itself_is_an_unclean_exit(sent, app_dir):
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
     usage.maybe_send(cfg, app_dir=app_dir)
     assert [h["path"] for h in _hits(sent[0][0])] == [f"unclean-exit/{__version__}"]
-    assert usage._pending == []
+    assert usage._pending == [] and cfg.stats_pending == []
+
+
+def test_a_noted_event_survives_a_failed_send_and_a_quit(sent, app_dir, monkeypatch):
+    usage.note("unclean-exit/2.0.0")
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
+    offline, real = [True], usage.send
+    monkeypatch.setattr(usage, "send", lambda *a, **k: not offline[0] and real(*a, **k))
+    usage.maybe_send(cfg)
+    assert cfg.stats_pending == ["unclean-exit/2.0.0"]
+    cfg.save()                                   # quit, start again
+    cfg = Config.load()
+    offline[0] = False
+    usage.maybe_send(cfg)
+    assert [h["path"] for h in _hits(sent[-1][0])] == ["unclean-exit/2.0.0"]
+    assert cfg.stats_pending == []
+
+
+def test_a_quit_before_any_send_keeps_noted_events(app_dir):
+    usage.note("unclean-exit/2.0.0")
+    cfg = Config()
+    usage.remember(cfg)   # MainWindow._remember_usage, at quit
+    assert cfg.stats_pending == ["unclean-exit/2.0.0"] and usage._pending == []
+    for i in range(50):
+        usage.note(f"unclean-exit/{i}.0")
+    usage.remember(cfg)
+    assert len(cfg.stats_pending) == usage.MAX_PENDING   # never grows without end
+
+
+def test_the_first_start_of_a_new_version_says_it_was_updated(sent):
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
+    usage.started(cfg)                     # never noted a version: not an update
+    assert cfg.stats_version == __version__ and cfg.stats_pending == []
+    usage.started(cfg)                     # the same version again
+    assert cfg.stats_pending == []
+    cfg.stats_version = "1.0.0"
+    usage.started(cfg)
+    usage.maybe_send(cfg)
+    assert [h["path"] for h in _hits(sent[0][0])] == [f"updated/1.0.0-to-{__version__}"]
+    cfg.stats_version = "not a version!"   # never sent as it is
+    usage.started(cfg)
+    assert cfg.stats_pending == []
+
+
+def test_launches_are_counted_only_while_the_count_is_on(sent):
+    cfg = Config()
+    net.configure_features(off=["usage_stats"])
+    usage.started(cfg)
+    assert cfg.stats_launches == 0 and cfg.stats_version == __version__
+    net.configure_features()
+    for _ in range(3):
+        usage.started(cfg)
+    usage.maybe_send(cfg)
+    assert "launches/2-5" in _paths(sent[0][0])
+    assert cfg.stats_launches == 0         # counted: starts again
+    cfg.stats_sent -= usage.EVERY_S        # left open all day: 0
+    usage.maybe_send(cfg)
+    assert "launches/0" in _paths(sent[1][0])
+
+
+@pytest.mark.parametrize("n, b", [(0, "0"), (1, "1"), (2, "2-5"), (5, "2-5"), (6, "6-plus")])
+def test_launches_are_a_rough_bucket(n, b):
+    assert usage.launch_bucket(n) == b
+
+
+@pytest.mark.parametrize("platform, ver, tag", [
+    ("win32", (10, 22631), "win11"), ("win32", (10, 19045), "win10"),
+    ("win32", (6, 9600), "win-older"), ("linux", None, "linux"), ("darwin", None, "other")])
+def test_the_system_is_only_a_rough_name(monkeypatch, platform, ver, tag):
+    monkeypatch.setattr(usage.sys, "platform", platform)
+    if ver:
+        monkeypatch.setattr(usage.sys, "getwindowsversion",
+                            lambda: SimpleNamespace(major=ver[0], build=ver[1]), raising=False)
+    assert usage.os_tag() == tag
 
 
 def test_problems_follow_the_switch(sent, app_dir):

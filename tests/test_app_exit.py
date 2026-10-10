@@ -7,6 +7,8 @@ import sys
 import textwrap
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parent.parent
 
 CHILD = textwrap.dedent("""
@@ -33,6 +35,7 @@ def run(code: int) -> subprocess.CompletedProcess:
                           env=env, capture_output=True, text=True, timeout=60)
 
 
+@pytest.mark.windows   # starts the app in a child process
 def test_ends_with_its_code_beside_live_threads():
     for code in (0, 3):
         r = run(code)

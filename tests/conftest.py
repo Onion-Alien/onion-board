@@ -14,6 +14,12 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+# Off Windows (Linux, macOS) Windows' registry and DLLs are stood in for, so the app
+# imports, and tests marked `windows` are skipped (tests/offwindows.py).
+import offwindows  # noqa: E402
+
+offwindows.install()
+
 # Garbage collection on the main thread only, as in the app (soundboard.uigc): a
 # collection on a test server's or the relay's thread freed a leftover Qt object with
 # a running timer there, and its next tick crashed the worker (access violation).
@@ -101,12 +107,19 @@ _CLOSED_PORTS: set[int] = set()
 _V4_ONLY_PORTS: set[int] = set()
 
 
+_HELD: list = []   # closed_port()'s sockets: bound, never listening, kept to the end
+
+
 def closed_port() -> int:
+    """A port nothing listens on, refused at once. Its socket stays bound (not
+    listening) for the rest of the run: closed, the system handed the same number to a
+    later test's server (Linux reuses them soon), and every connection to that server
+    was "refused" here."""
     import socket
     s = socket.socket()
     s.bind(("127.0.0.1", 0))
+    _HELD.append(s)
     port = s.getsockname()[1]
-    s.close()
     _CLOSED_PORTS.add(port)
     return port
 
@@ -155,6 +168,20 @@ real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_this_pc: the relay refuses radio 127.x "
                             "(net.NEVER_THIS_PC) as in the app")
+    config.addinivalue_line("markers", "windows: needs Windows itself (its registry, "
+                            "DLLs or processes); skipped on Linux and macOS")
+
+
+def pytest_collection_modifyitems(config, items):
+    """Off Windows the `windows` tests are skipped. `-m windows` / `-m "not windows"`
+    picks either set on any system (on Windows, `-m "not windows"` is what runs
+    elsewhere)."""
+    if sys.platform == "win32":
+        return
+    skip = pytest.mark.skip(reason="needs Windows")
+    for item in items:
+        if item.get_closest_marker("windows") is not None:
+            item.add_marker(skip)
 
 
 def pytest_xdist_auto_num_workers(config):
@@ -176,6 +203,10 @@ def qapp():
     app = QApplication.instance() or QApplication([])
     from soundboard.wheelguard import AppStyle
     app.setStyle(AppStyle("Fusion"))   # as the app sets it (app.main)
+    if not app.styleSheet():   # the app's theme and font, as the window applies them:
+        from soundboard import theme   # without it a worker's first tests measured
+        from soundboard.library import Config   # text in Qt's plain font, and the
+        theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
         from soundboard.uigc import UiCollector
         app._collector = UiCollector(parent=app)
