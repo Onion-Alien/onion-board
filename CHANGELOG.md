@@ -4,6 +4,15 @@
 
 - Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
   short gap clear of their buttons.
+- **Quick setup mic animation and clear navigation.** Putting sounds straight into your
+  mic from the step-by-step setup guide now plays the Bun speaker-building animation
+  directly inside the wizard, and success toasts no longer appear over or block the
+  Back and Next buttons.
+- The Radio tab's random button always plays a random popular station, whatever list,
+  search or filters are showing. Before, it did nothing on an empty list such as
+  Favorites with no favorites yet.
+- The Sounds toolbar is a rounded card like the panels around it, with the search box
+  set into it.
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.

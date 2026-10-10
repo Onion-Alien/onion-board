@@ -107,12 +107,13 @@ def test_toast_keeps_all_its_lines_when_the_window_shrinks_under_it(qapp):
                "sounds: click Yes when Windows asks.", ms=5000)
     t = w.findChild(busy._Toast)
     one_line = t.height()
-    for size in ((260, 120), (300, 400), (1280, 800)):
+    # 200 high, not 120: on CI's fonts the wrapped notice is taller than 120 (it fit here)
+    for size in ((260, 200), (300, 400), (1280, 800)):
         w.resize(*size)
         qapp.processEvents()
         assert t.height() >= t.heightForWidth(t.width()), size
         assert 0 <= t.y() and t.y() + t.height() <= w.height(), size
-    w.resize(260, 120)
+    w.resize(260, 200)
     qapp.processEvents()
     assert t.height() > one_line
     w.close()

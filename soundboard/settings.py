@@ -2228,7 +2228,7 @@ class SettingsDialog(QDialog):
     # ------------------------------------------------------------------ privacy & security
     def _privacy(self):
         w, v = self._page()
-        v.addWidget(self._switches_card())
+        self._switches_card(v)
         v.addWidget(self._online_card())
         v.addStretch(1)
         return w
@@ -2343,7 +2343,7 @@ class SettingsDialog(QDialog):
         self.count_eye = eye
         return eye
 
-    def _switches_card(self):
+    def _switches_card(self, v=None):
         """Every feature that goes online, each with its own switch (soundboard.net
         enforces them: off means no connection at all, in any Connection mode), and
         Offline mode over all of them."""
@@ -2361,10 +2361,16 @@ class SettingsDialog(QDialog):
               "(the Radio tab, web search, downloads, updates…). Untick it to pick what may go "
               "online."),
             cfg.net_offline, self._set_offline)
+        note = QLabel(_("Not covered by these: links you open in your own browser (Support, "
+                        "Report a problem, release pages) and the installer's own downloads."))
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        cv.addWidget(note)
+
         body = QWidget()
         bl = QVBoxLayout(body)
-        bl.setContentsMargins(0, 4, 0, 0)
-        bl.setSpacing(8)
+        bl.setContentsMargins(0, 0, 0, 0)
+        bl.setSpacing(12)
         self._net_body = body
         self.net_boxes: dict[str, QCheckBox] = {}
         self._net_subs: dict[str, QWidget] = {}
@@ -2399,12 +2405,11 @@ class SettingsDialog(QDialog):
                     sv.addWidget(sub)
                     self._net_subs[key] = sub
             bl.addWidget(section)
-        cv.addWidget(body)
-        note = QLabel(_("Not covered by these: links you open in your own browser (Support, "
-                        "Report a problem, release pages) and the installer's own downloads."))
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        cv.addWidget(note)
+        if v is not None:
+            v.addWidget(card)
+            v.addWidget(body)
+        else:
+            cv.addWidget(body)
         self._net_sync()
         return card
 
