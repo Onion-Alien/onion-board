@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The left navigation rail blends into the window with a soft theme tint and a
+  subtle divider, keeping the selected tab easy to spot.
 - **Robo-Bun sets up AI voices.** While AI voices download and install, a little
   robot bunny runs off, comes back with a wrench and builds, with a moving bar and
   short steps like "Installing the voice engine" instead of pip's output. He cheers
