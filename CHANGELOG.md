@@ -32,6 +32,8 @@
 - The log no longer warns about "a native error was caught and survived" for Windows
   error code 0x8001010d and its kin: COM raises and handles those itself, so they're
   harmless. They no longer count as a crash at the next start either.
+- The Voice tab's top bar (mic level and what others hear) keeps the same height when
+  a voice turns on or off, so the cards under it no longer jump.
 
 ## 1.9.28 — 2026-10-10
 

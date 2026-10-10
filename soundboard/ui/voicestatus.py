@@ -17,6 +17,7 @@ from soundboard.ui.panel import Flow, icon_label
 from soundboard.ui.widgets import Meter
 
 GAP = 16            # between the mic half and the chips, side by side
+ROW_H = 28          # every chip, label and the mic row: the bar never changes height
 
 
 class Chip(QPushButton):
@@ -30,6 +31,7 @@ class Chip(QPushButton):
         self.setCursor(Qt.PointingHandCursor)
         self.setFocusPolicy(Qt.TabFocus)
         self.setIconSize(QSize(16, 16))
+        self.setFixedHeight(ROW_H)
         self._look = ("", "", None)
 
     def show_as(self, text: str, state: str, icon: str = "", picture=None, tip: str = ""):
@@ -71,6 +73,7 @@ class VoiceStatusBar(QFrame):
 
         mic = self._mic = QWidget()
         mic.setObjectName("voicebarpart")      # no fill of its own: the bar's shows
+        mic.setFixedHeight(ROW_H)
         mh = QHBoxLayout(mic)
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
@@ -90,6 +93,7 @@ class VoiceStatusBar(QFrame):
         # wraps onto more lines rather than holding the window wide (the mini player)
         rh = self._chips_row = Flow(right)
         self.lbl_heard = icon_label("ear", _("What others hear from your mic"))
+        self.lbl_heard.setFixedHeight(ROW_H)
         rh.addWidget(self.lbl_heard)
         box.addWidget(right, 0)
         self.chips: dict[str, Chip | QLabel] = {}
@@ -110,6 +114,8 @@ class VoiceStatusBar(QFrame):
                 if key == "none":
                     chip = QLabel()
                     chip.setObjectName("voicebarlabel")
+                    chip.setFixedHeight(ROW_H)
+                    chip.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
                 else:
                     chip = Chip(key)
                     chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
