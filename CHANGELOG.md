@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- When a mic or headphones won't open (for example while Windows' audio restarts),
+  the message now says it's the audio device, not "It isn't a sound file that can be
+  read, or it's damaged."
 - A pad's *Picture → From a link* no longer opens a file on this PC or a network share
   when the web page names one as its preview picture: only web pictures are fetched.
 - A Myinstants sound whose download was cut short is no longer added half-finished:

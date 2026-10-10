@@ -79,6 +79,18 @@ def test_unreadable_sound_file(tmp_path):
     assert errors.plain(info.value) == "It isn't a sound file that can be read, or it's damaged."
 
 
+def test_a_device_that_wont_open_isnt_called_a_bad_sound_file():
+    """PortAudio's message starts like libsndfile's ("Error opening ..."): a mic or
+    headphones that won't open (Windows' audio restarting, say) is a device problem."""
+    import sounddevice
+    e = sounddevice.PortAudioError(
+        "Error opening OutputStream: Invalid sample rate [PaErrorCode -9997]")
+    assert errors.plain(e) == "That audio device doesn't support the sample rate needed."
+    e = sounddevice.PortAudioError("Error opening InputStream: Unanticipated host error "
+                                   "[PaErrorCode -9999]")
+    assert "sound file" not in errors.plain(e)
+
+
 def test_report_link_only_when_reportable():
     assert errors.report_link(errors.Problem("Private.")) == ""
     assert "Report it" in errors.report_link(errors.Problem("Odd.", "d", True))
