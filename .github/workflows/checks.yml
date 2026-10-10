@@ -28,6 +28,22 @@ jobs:
           python-version: "3.13"
       - name: Personal data and secrets (repo rules)
         run: python scripts/check_sensitive.py --history
+      # A commit's time zone says where its author is: new commits must be in UTC
+      # (CLAUDE.md, "Commit times"). A PR: its commits not on main yet. main: what
+      # the push added (a merge made with GitHub's button or `gh pr merge` fails here).
+      - name: Commit times in UTC
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            sh scripts/check_utc.sh "$PR_HEAD" --not origin/main
+          else
+            sh scripts/check_utc.sh "$BEFORE..$AFTER"
+          fi
       # The CLI rather than gitleaks-action: the action scans `<first commit>^..`,
       # which errors on a repo's first push (the root commit has no parent).
       - name: gitleaks (full history)
