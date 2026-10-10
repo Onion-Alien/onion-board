@@ -1029,6 +1029,7 @@ class PadGrid(QWidget):
                "mp3 · wav · ogg · flac\nm4a · even video files")
     NO_MATCH = _("No sounds match the search\nor this category")
     DROP_HINT = _("Drop sound files here")
+    DROP_HINT_HEIGHT = 110
 
     def __init__(self):
         super().__init__()
@@ -1046,9 +1047,10 @@ class PadGrid(QWidget):
         # no sounds yet: Bun waits (sadly) above the how-to, and cheers up when
         # files are dragged over
         self.empty = QWidget()
+        self.empty.setAttribute(Qt.WA_TranslucentBackground)
         ev = QVBoxLayout(self.empty)
-        ev.setContentsMargins(0, 24, 0, 0)
-        ev.setSpacing(0)
+        ev.setContentsMargins(0, 24, 0, 4)
+        ev.setSpacing(12)
         self.bun = BunnyWidget(
             height=96, pad=16, sad=0.9,
             lines=(_("add a sound?"), _("pleeease?"), _("it's so quiet…"),
@@ -1061,6 +1063,9 @@ class PadGrid(QWidget):
         self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player
         self.empty_text.setWordWrap(True)   # and wraps rather than losing both ends
         self.empty_text.setObjectName("empty")
+        self.empty_text.setAttribute(Qt.WA_TranslucentBackground)
+        self.empty_text.setStyleSheet("padding:8px 12px; background:transparent;")
+        self.empty_text.setFixedHeight(self.DROP_HINT_HEIGHT)
         ev.addWidget(self.empty_text)
         self._cols = 0
         self._n_shown = 0        # pads in the grid now (drop_area)
@@ -1244,12 +1249,17 @@ class PadGrid(QWidget):
             pen = QPen(QColor(theme.T["border"]), 1.4, Qt.DashLine)
             p.setPen(pen)
             p.drawRoundedRect(drop, PAD_RADIUS, PAD_RADIUS)
-            p.setPen(QColor(theme.T["faint"]))
-            p.drawText(drop, Qt.AlignCenter, self.DROP_HINT)
+            if self._n_shown:
+                p.setPen(QColor(theme.T["faint"]))
+                p.drawText(drop, Qt.AlignCenter, self.DROP_HINT)
 
     def drop_area(self) -> QRectF | None:
-        """Where the faint "drop sound files here" box goes: the room under the last
-        row of pads, when there's enough of it (and they're cards, not a list)."""
+        """The same drop box below Bun on an empty board or below the last card row."""
+        if not self.pads and not self.empty.isHidden():
+            m = self.grid.contentsMargins()
+            top = self.empty.y() + self.empty_text.y()
+            return QRectF(m.left() + 2, top, self.width() - m.left() - m.right() - 4,
+                          self.DROP_HINT_HEIGHT)
         if not self._n_shown or self._shape is None or self.rows():
             return None
         cols, w = self._shape
@@ -1262,7 +1272,7 @@ class PadGrid(QWidget):
         # the full width, whatever the pad size: as wide as the pads' columns, it
         # jumped about as Pad size moved
         return QRectF(m.left() + 2, top, self.width() - m.left() - m.right() - 4,
-                      min(room, 110))
+                      min(room, self.DROP_HINT_HEIGHT))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

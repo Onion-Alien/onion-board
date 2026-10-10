@@ -37,6 +37,33 @@ def grid_of(n, width=100):
 
 # ---------------------------------------------------------------------- the grid
 
+@pytest.mark.parametrize("width", [400, 800, 1180])
+def test_empty_board_drop_box_matches_populated_board(qapp, width):
+    grid = grid_of(0)
+    grid.resize(width, 600)
+    grid.show()
+    qapp.processEvents()
+    try:
+        empty = grid.drop_area()
+        bunny = grid.bun.geometry().translated(grid.empty.pos())
+        instructions = grid.empty_text.geometry().translated(grid.empty.pos())
+        assert empty.top() > bunny.bottom()
+        assert empty.top() == instructions.top()
+        assert empty.height() == instructions.height()
+        grid.set_pads([Pad(SoundMeta(id="first", name="First sound", file=""), 100)])
+        qapp.processEvents()
+        assert grid.drop_area().size() == empty.size()
+        grid.pads[0].setProperty("filtered", True)
+        grid.relayout(force=True)
+        assert grid.drop_area() is None
+        assert grid.empty_text.text() == grid.NO_MATCH
+        grid.set_pads([])
+        qapp.processEvents()
+        assert grid.drop_area() == empty
+    finally:
+        grid.close()
+
+
 @pytest.mark.parametrize("change", ["grow", "shrink", "filter", "add", "reorder"])
 def test_resizing_cards_repaints_the_entire_drop_hint(qapp, change):
     """The old dashed box must disappear in the same frame as the cards move."""
