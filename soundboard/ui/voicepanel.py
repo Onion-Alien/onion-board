@@ -534,9 +534,6 @@ class VoiceFxPanel(QWidget):
         v.setSpacing(12)
         self.title = section_label(_("Voice changer"))
         v.addWidget(self.title)
-        v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
-                                 "a game, OBS). Pick a voice to turn it on, then use Hear what "
-                                 "they hear at the bottom to try it.")))
 
         # ---- the switch
         self.btn_power = QPushButton()
@@ -550,6 +547,9 @@ class VoiceFxPanel(QWidget):
         # your mic level is in the tab's status bar (ui/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
         v.addWidget(self.btn_power, 0, Qt.AlignLeft)
+        v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
+                                 "a game, OBS). Pick a voice to turn it on, then use Hear what "
+                                 "they hear at the bottom to try it.")))
 
         # ---- the Discord catch (shown with the changer on, until "Got it")
         # Measured in a real call: with Discord's default Input Profile (Voice
@@ -1465,6 +1465,24 @@ class SpeechPanel(QWidget):
         # ---- live voice to speech
         self.title = section_label(_("Speak another language"))
         v.addWidget(self.title)
+        self.start_box = QWidget()   # Start and its state: shown with live_box
+        action = QHBoxLayout(self.start_box)
+        action.setContentsMargins(0, 0, 0, 0)
+        action.setSpacing(14)
+        self.b_live = QPushButton(_("Start the computer voice"))
+        icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
+        self.b_live.setCheckable(True)
+        self.b_live.setMinimumHeight(40)
+        self.b_live.setObjectName("primary")
+        self.b_live.toggled.connect(self._toggle_live)
+        action.addWidget(self.b_live, 0, Qt.AlignTop)
+        self.lbl_state = QLabel(IDLE_HINT)
+        self.lbl_state.setTextFormat(Qt.PlainText)   # shows the module's error text
+        self.lbl_state.setObjectName("muted")
+        self.lbl_state.setWordWrap(True)
+        self.lbl_state.setMinimumWidth(0)
+        action.addWidget(self.lbl_state, 1)
+        v.addWidget(self.start_box)
         self.lbl_intro = hint_label(_(
             "Talk in English and others hear another language. The AI voice or the voice "
             "changer says it when one of them is on; otherwise press Start and a computer "
@@ -1585,22 +1603,6 @@ class SpeechPanel(QWidget):
         grid.setColumnStretch(3, 2)
         v.addLayout(grid)
 
-        self.start_box = QWidget()   # Start and its state: shown with live_box
-        lv = QVBoxLayout(self.start_box)
-        lv.setContentsMargins(0, 0, 0, 0)
-        lv.setSpacing(12)
-        self.b_live = QPushButton(_("Start the computer voice"))
-        icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
-        self.b_live.setCheckable(True)
-        self.b_live.setMinimumHeight(40)
-        self.b_live.setObjectName("primary")
-        self.b_live.toggled.connect(self._toggle_live)
-        lv.addWidget(self.b_live, 0, Qt.AlignLeft)
-        self.lbl_state = QLabel(IDLE_HINT)
-        self.lbl_state.setTextFormat(Qt.PlainText)   # shows the module's error text
-        self.lbl_state.setObjectName("muted")
-        lv.addWidget(self.lbl_state)
-        v.addWidget(self.start_box)
         # everything the voice was asked to say, live or typed, newest at the bottom
         lrow = QHBoxLayout()
         lrow.addWidget(section_label(_("What the voice said")))
