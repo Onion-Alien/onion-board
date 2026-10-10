@@ -66,6 +66,13 @@ module's `install.bat` or `pip install -r requirements.txt`).
 .venv\Scripts\python scripts\check_sensitive.py
 ```
 
+Or all of it in one go, with pytest on only the test files your committed and
+uncommitted changes need (`scripts/pick_tests.py --local`); `-All` runs the whole suite:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1
+```
+
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
 `%APPDATA%\OnionBoard`. No window appears and no global hotkey is registered.
@@ -285,8 +292,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    a change no test is about, like the changelog). main, after the merge, runs the
    whole suite, and so does running the workflow by hand on a branch. So run the full
    suite locally before you push. A newer push to the PR cancels its unfinished run.
-3. For a release: bump `__version__`, move *Unreleased* in the CHANGELOG under
-   the version, build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
+3. For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
+   `__version__`, moves *Unreleased* in the CHANGELOG under the version, checks the
+   translations, refreshes the README's release line; `--dry-run` checks only),
+   build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
    with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).
    Keep the asset named exactly `OnionBoardSetup.exe` and don't mark the release
    as a pre-release: the README's download button links to

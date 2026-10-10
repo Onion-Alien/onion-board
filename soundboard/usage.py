@@ -520,8 +520,10 @@ def opt_out(where: str) -> bool:
     one last "opt-out/<where>" so we know how many people aren't counted, then nothing
     ever again. No random ID, no tag, no session: it can't be tied to anything they
     sent before. Only while the count is still allowed (call it before switching it
-    off). Waits for the answer: call it off the UI thread."""
-    if where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE):
+    off), and never in Tor mode (SECURITY.md). Waits for the answer: call it off the
+    UI thread."""
+    if (where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE)
+            or net.mode() == net.TOR):
         return False
     name = f"opt-out/{where}"
     netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")

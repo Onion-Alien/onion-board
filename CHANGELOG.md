@@ -5,6 +5,26 @@
 - Starting the app (or changing theme) no longer makes every Desktop icon blink and
   redraw. Recolouring the app's own shortcuts used to tell Windows to rebuild its whole
   icon cache; now it only refreshes those shortcuts.
+- Importing a backup whose settings name `read_only` no longer stops the app saving
+  for the rest of the session (the imported sounds were gone after a restart), and a
+  settings file naming it is no longer set aside as damaged.
+- A pad's *Picture → From a link* no longer opens a file on this PC or a network share
+  when the web page names one as its preview picture: only web pictures are fetched.
+- A Myinstants sound whose download was cut short is no longer added half-finished:
+  it says the connection dropped, so you can try again.
+- A slow download from a site that doesn't say how big the file is no longer stops
+  after 5 minutes with "The download stopped moving".
+- A backup made after going back to an older version no longer carries the newer
+  version's settings it doesn't know, which could be private to your PC.
+- The remote control API answers a volume of `inf` or a malformed signature with a
+  clear refusal instead of an error or a dropped connection.
+- Updating the downloader (yt-dlp) no longer fails now and then when a search or
+  download starts at the same moment.
+- Switching off *Count me in* in Settings while in Tor mode no longer sends the last
+  anonymous opt-out count, as the privacy page promises.
+- A glitch from the mic (a broken sample from its driver) can no longer switch off
+  parts of your voice effect for the rest of the session and let your real voice
+  through.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
@@ -89,6 +109,13 @@
 - ***Count me in* also counts roughly how long the app was open** since the last daily count (under 15 minutes, up to an hour, 1-3 hours, 3-8 hours or more), so we can tell quick checks from all-evening use. Never the times of day; nothing is sent while it's off.
 - **Clearer privacy text for *Count me in*.** It now says plainly that the random ID sent with the anonymous count links your counts together, so we can see how people use the app over time (which tabs, which versions, whether they come back) and what to improve. The only new thing sent is a short tag made from that same ID, so one person's days link up; switching *Count me in* off sends one last anonymous count (no ID) so we know how many people opted out, then nothing at all.
 - **Shorter, plainer *Count me in* text.** Settings says it in one line (anonymous usage stats once a day; never your name, IP address or device info), and the eye next to it opens a small table of everything it sends, with an example and why, plus links to the full list and GoatCounter's privacy policy. The installer says the same.
+- **Far fewer admin prompts for the mic part.** The mic part came out of every build
+  with different bytes even when it hadn't changed, so each new version (and switching
+  between two copies of the app) read it as "outdated" and asked Windows for admin
+  to update it. Builds of the same code are now byte-for-byte the same, so it only
+  asks when the mic part really changed. Picking *My mic* with an older copy that
+  still works no longer asks either (the update stays optional), and right after
+  it's set up the app no longer asks a second time while Windows is still loading it.
 
 ## 1.9.27 — 2026-10-09
 
