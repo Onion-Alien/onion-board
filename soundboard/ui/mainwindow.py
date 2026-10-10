@@ -923,7 +923,10 @@ class MainWindow(QMainWindow):
             # Live and Stop all first, so they never move; the pills only when needed
             # (at the rail's foot, as icons)
             [self.btn_air, self.mode_btn, self.stop_btn, self.pill, self.btn_offline,
-             self.btn_update])
+             self.btn_update], order=[TAB_INDEX[k] for k in self.cfg.sidebar_order
+                                     if k in TAB_INDEX])
+        self.rail.orderChanged.connect(
+            lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail
         prev = self.tabs.previousInFocusChain()

@@ -6,6 +6,9 @@
   resumes. Sending, remembered programs, recordings and clip edits stay available.
 - Tab help uses a wider, rounded card with a clear heading, readable text and Bun
   the bunny, or Hoot the owl for Onion Watch. Click outside or press Escape to close.
+- **Reorder sidebar tabs.** Hold the left mouse button on a tab and drag it up or
+  down. The new order is remembered next time you open the app.
+
 - **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
   keyboard navigation, so startup focus no longer looks like a second selected tab.
 - The Voice tab's off state says "Voice effects off — mic unchanged" as plain
