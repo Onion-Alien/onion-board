@@ -14,8 +14,8 @@
   actions have labels; Setup puts devices and the local mix test first. Sounds groups
   library tools, Voice opens its presets on first visit, and secondary text reads more
   clearly. The full-width drop target is preserved.
-- Add sounds and Record use matching rounded buttons, with a subtle gradient on
-  Add sounds and a quiet raised surface on Record.
+- Add sounds and Record are flat icon buttons like the rest of the Sounds toolbar
+  (Add sounds in the accent colour), with a divider before the search box.
 - AI voices puts Start and live status at the top, with a wider voice picker,
   grouped pitch controls and shorter explanatory text in every language.
 - The note that pops up above the player ("Added … to Sounds", device changes and so
