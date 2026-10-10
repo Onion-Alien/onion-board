@@ -521,7 +521,67 @@ def _copy(p, fill):
     p.drawPath(path)
 
 
+def _youtube(p, fill):
+    body = QPainterPath()
+    body.addRoundedRect(QRectF(2, 5, 20, 14), 4, 4)
+    play = QPainterPath(QPointF(10, 8))
+    play.lineTo(16, 12)
+    play.lineTo(10, 16)
+    play.closeSubpath()
+    fill(body.subtracted(play))
+
+
+def _ytmusic(p, fill):
+    p.drawEllipse(QRectF(2, 2, 20, 20))
+    body = QPainterPath()
+    body.addEllipse(QRectF(6, 6, 12, 12))
+    play = QPainterPath(QPointF(10.5, 8.5))
+    play.lineTo(15.5, 12)
+    play.lineTo(10.5, 15.5)
+    play.closeSubpath()
+    fill(body.subtracted(play))
+
+
+def _soundcloud(p, fill):
+    for x, top in ((2, 12), (5, 10), (8, 7)):
+        p.drawLine(QPointF(x, top), QPointF(x, 18))
+    cloud = QPainterPath(QPointF(11, 18))
+    cloud.lineTo(11, 6)
+    cloud.cubicTo(15, 4, 19, 7, 19, 11)
+    cloud.cubicTo(24, 10, 25, 18, 20, 18)
+    cloud.closeSubpath()
+    fill(cloud)
+
+
+def _tiktok(p, fill):
+    note = QPainterPath(QPointF(13, 2))
+    note.lineTo(17, 2)
+    note.cubicTo(17, 5, 19, 7, 22, 7)
+    note.lineTo(22, 11)
+    note.cubicTo(20, 11, 18, 10, 17, 9)
+    note.lineTo(17, 16)
+    note.cubicTo(17, 24, 4, 24, 4, 16)
+    note.cubicTo(4, 12, 8, 10, 11, 11)
+    note.lineTo(11, 15)
+    note.cubicTo(7, 13, 6, 19, 10, 19)
+    note.cubicTo(12, 19, 13, 18, 13, 16)
+    note.closeSubpath()
+    fill(note)
+
+
+def _myinstants(p, fill):
+    p.drawEllipse(QRectF(2, 12, 20, 8))
+    button = QPainterPath(QPointF(5, 15))
+    button.lineTo(5, 11)
+    button.cubicTo(5, 4, 19, 4, 19, 11)
+    button.lineTo(19, 15)
+    button.cubicTo(16, 18, 8, 18, 5, 15)
+    fill(button)
+
+
 SHAPES = {
+    "youtube": _youtube, "ytmusic": _ytmusic, "soundcloud": _soundcloud,
+    "tiktok": _tiktok, "myinstants": _myinstants,
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,

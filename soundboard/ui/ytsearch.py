@@ -32,7 +32,7 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import CardGrid, HoverCard
+from soundboard.ui.panel import CardGrid, Flow, HoverCard
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
@@ -676,31 +676,33 @@ class SearchResults(QFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 0, 0)
+        v.setContentsMargins(8, 8, 8, 6)
         v.setSpacing(6)
-        head = QHBoxLayout()
+        header = QWidget()
+        header.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        head = Flow(header, gap=8)
         back = self.btn_back = QPushButton(_("Back to my sounds"))
         back.setObjectName("backhome")   # stands out: the way out of the results
         back.setCursor(Qt.PointingHandCursor)
         icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
-        head.addSpacing(8)
         self.site_btns: dict[str, QPushButton] = {}
         group = QButtonGroup(self)
         group.setExclusive(True)
         for key, (name, _prefix) in ytdl.SOURCES.items():
             b = QPushButton(name)
-            b.setObjectName("small")
+            b.setObjectName("searchsource")
+            b.setCursor(Qt.PointingHandCursor)
             b.setCheckable(True)
             b.setChecked(key == self.source)
+            icons.set_icon(b, key, size=16)
             b.setToolTip(TIPS.get(key, f"Search {name}"))
             b.clicked.connect(lambda _c=False, k=key: self.set_source(k))
             group.addButton(b)
             head.addWidget(b)
             self.site_btns[key] = b
-        head.addStretch(1)
-        v.addLayout(head)
+        v.addWidget(header)
         self.title = QLabel()
         self.title.setTextFormat(Qt.RichText)
         self.title.setWordWrap(True)
