@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Συντριβεί και παγώνει",
   "Find and fix bugs": "Βρείτε και διορθώστε σφάλματα",
   "Know where people find the app": "Μάθετε πού βρίσκουν οι χρήστες την εφαρμογή",
-  "A random ID": "Μια τυχαία ταυτότητα",
   "What Count me in sends": "Τι στέλνει το «Μέτρα κι εμένα»",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Μία φορά τη μέρα, ανώνυμα. Ποτέ το όνομά σου, η διεύθυνση IP ή στοιχεία της συσκευής. Πού έμαθες για την εφαρμογή και επιλογές σχολίων μόνο αν τα δώσεις. Αν το κλείσεις: μία τελευταία μέτρηση χωρίς ID, μετά τίποτα.",
   "What": "Τι",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Πώς χρησιμοποιείται η εφαρμογή",
   "voice changer, Radio tab": "αλλαγή φωνής, καρτέλα Ραδιόφωνο",
   "Your answers, if you give them": "Τις απαντήσεις σας, αν τις δώσετε",
-  "heard of it on YouTube": "το άκουσε στο YouTube",
-  "See if people come back": "Δείτε αν ο κόσμος θα επιστρέψει"
+  "heard of it on YouTube": "το άκουσε στο YouTube"
 }

@@ -1,4 +1,5 @@
 """The Settings window's layout: pages scroll instead of squashing their rows."""
+import time
 from contextlib import contextmanager
 
 import pytest
@@ -298,6 +299,12 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
         for key, box in d.net_boxes.items():
             assert box.isChecked() and net.allowed(key)
             box.setChecked(False)
+            # Count me in waits for its last anonymous opt-out count first
+            # (SettingsDialog._opt_out_wait checks every 100 ms)
+            end = time.monotonic() + 5
+            while net.allowed(key) and time.monotonic() < end:
+                QApplication.processEvents()
+                time.sleep(0.02)
             assert key in window.cfg.net_off and not net.allowed(key)
             box.setChecked(True)
             assert key not in window.cfg.net_off and net.allowed(key)

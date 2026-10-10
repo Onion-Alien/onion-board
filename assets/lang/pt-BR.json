@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Falhas e congelamentos",
   "Find and fix bugs": "Encontre e corrija bugs",
   "Know where people find the app": "Saiba onde as pessoas encontram o aplicativo",
-  "A random ID": "Um ID aleatório",
   "What Count me in sends": "O que o \"Contar meu uso\" envia",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Uma vez por dia, anônimo. Nunca seu nome, endereço IP ou dados do dispositivo. Onde você conheceu o app e as escolhas de feedback só se você informar. Ao desligar: uma última contagem sem ID, depois nada.",
   "What": "O que",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Como o aplicativo é usado",
   "voice changer, Radio tab": "trocador de voz, guia Rádio",
   "Your answers, if you give them": "Suas respostas, se você as der",
-  "heard of it on YouTube": "ouvi falar disso no YouTube",
-  "See if people come back": "Veja se as pessoas voltam"
+  "heard of it on YouTube": "ouvi falar disso no YouTube"
 }

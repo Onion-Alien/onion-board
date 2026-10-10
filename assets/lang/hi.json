@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "क्रैश और फ़्रीज़ हो जाता है",
   "Find and fix bugs": "बग ढूंढें और ठीक करें",
   "Know where people find the app": "जानें कि लोगों को ऐप कहां मिलता है",
-  "A random ID": "एक यादृच्छिक आईडी",
   "What Count me in sends": "«मुझे गिनें» क्या भेजता है",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "दिन में एक बार, गुमनाम। आपका नाम, IP पता या डिवाइस की जानकारी कभी नहीं। आपने ऐप के बारे में कहाँ सुना और फ़ीडबैक के विकल्प, सिर्फ़ तब जब आप दें। बंद करने पर: बिना ID के एक आख़िरी गिनती, फिर कुछ नहीं।",
   "What": "क्या",
@@ -2880,6 +2879,5 @@
   "How the app is used": "ऐप का उपयोग कैसे किया जाता है",
   "voice changer, Radio tab": "वॉयस चेंजर, रेडियो टैब",
   "Your answers, if you give them": "आपके उत्तर, यदि आप उन्हें देते हैं",
-  "heard of it on YouTube": "इसके बारे में यूट्यूब पर सुना",
-  "See if people come back": "देखें कि क्या लोग वापस आते हैं"
+  "heard of it on YouTube": "इसके बारे में यूट्यूब पर सुना"
 }

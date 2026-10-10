@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Kaatuu ja jäätyy",
   "Find and fix bugs": "Etsi ja korjaa vikoja",
   "Know where people find the app": "Tiedä, mistä ihmiset löytävät sovelluksen",
-  "A random ID": "Satunnainen tunnus",
   "What Count me in sends": "Mitä ”Olen mukana” lähettää",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Kerran päivässä, nimettömänä. Ei koskaan nimeäsi, IP-osoitettasi tai laitetietojasi. Mistä kuulit sovelluksesta ja palautteen valinnat vain, jos annat ne. Pois päältä: yksi viimeinen laskenta ilman tunnistetta, sitten ei mitään.",
   "What": "Mitä",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Kuinka sovellusta käytetään",
   "voice changer, Radio tab": "äänen vaihtaja, Radio-välilehti",
   "Your answers, if you give them": "Vastauksesi, jos annat ne",
-  "heard of it on YouTube": "kuullut siitä YouTubessa",
-  "See if people come back": "Katso, tulevatko ihmiset takaisin"
+  "heard of it on YouTube": "kuullut siitä YouTubessa"
 }

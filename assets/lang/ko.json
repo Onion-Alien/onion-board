@@ -2808,7 +2808,6 @@
   "Crashes and freezes": "충돌 및 정지",
   "Find and fix bugs": "버그 찾기 및 수정",
   "Know where people find the app": "사람들이 앱을 어디서 찾는지 알아보세요.",
-  "A random ID": "임의의 ID",
   "What Count me in sends": "'나를 세어봐'가 보내는 내용",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "하루에 한 번, 익명으로. 이름, IP 주소, 기기 정보는 절대 보내지 않습니다. 앱을 알게 된 곳과 피드백 선택은 직접 답한 경우에만 보냅니다. 끄면 ID 없이 마지막으로 한 번 세고, 그 뒤로는 아무것도 보내지 않습니다.",
   "What": "무엇",
@@ -2820,6 +2819,5 @@
   "How the app is used": "앱 사용 방법",
   "voice changer, Radio tab": "보이스 체인저, 라디오 탭",
   "Your answers, if you give them": "당신이 대답을 해준다면",
-  "heard of it on YouTube": "유튜브에서 들었어",
-  "See if people come back": "사람들이 돌아오는지 살펴보세요"
+  "heard of it on YouTube": "유튜브에서 들었어"
 }

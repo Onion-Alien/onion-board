@@ -2808,7 +2808,6 @@
   "Crashes and freezes": "Sự cố và đóng băng",
   "Find and fix bugs": "Tìm và sửa lỗi",
   "Know where people find the app": "Biết nơi mọi người tìm thấy ứng dụng",
-  "A random ID": "ID ngẫu nhiên",
   "What Count me in sends": "Những gì \"Tính tôi vào\" gửi đi",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Mỗi ngày một lần, ẩn danh. Không bao giờ có tên, địa chỉ IP hay thông tin thiết bị của bạn. Nơi bạn biết đến ứng dụng và lựa chọn góp ý chỉ khi bạn đưa ra. Khi tắt: một lần đếm cuối không có ID, rồi không gửi gì nữa.",
   "What": "Cái gì",
@@ -2820,6 +2819,5 @@
   "How the app is used": "Ứng dụng được sử dụng như thế nào",
   "voice changer, Radio tab": "thay đổi giọng nói, tab Radio",
   "Your answers, if you give them": "Câu trả lời của bạn, nếu bạn đưa ra chúng",
-  "heard of it on YouTube": "nghe nói về nó trên YouTube",
-  "See if people come back": "Xem mọi người có quay lại không"
+  "heard of it on YouTube": "nghe nói về nó trên YouTube"
 }

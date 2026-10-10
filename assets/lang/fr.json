@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Crashes et gels",
   "Find and fix bugs": "Rechercher et corriger les bugs",
   "Know where people find the app": "Sachez où les gens trouvent l'application",
-  "A random ID": "Un identifiant aléatoire",
   "What Count me in sends": "Ce qu'envoie « Je participe »",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Une fois par jour, anonyme. Jamais ton nom, ton adresse IP ni les infos de ton appareil. Où tu as connu l'appli et tes choix de retour seulement si tu les donnes. Désactivé : un dernier comptage sans identifiant, puis plus rien.",
   "What": "Quoi",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Comment l'application est utilisée",
   "voice changer, Radio tab": "changeur de voix, onglet Radio",
   "Your answers, if you give them": "Vos réponses, si vous les donnez",
-  "heard of it on YouTube": "j'en ai entendu parler sur YouTube",
-  "See if people come back": "Voir si les gens reviennent"
+  "heard of it on YouTube": "j'en ai entendu parler sur YouTube"
 }

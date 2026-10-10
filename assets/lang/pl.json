@@ -2928,7 +2928,6 @@
   "Crashes and freezes": "Awaria i zawieszenie",
   "Find and fix bugs": "Znajdź i napraw błędy",
   "Know where people find the app": "Dowiedz się, gdzie ludzie znajdują aplikację",
-  "A random ID": "Losowy identyfikator",
   "What Count me in sends": "Co wysyła „Wlicz mnie”",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Raz dziennie, anonimowo. Nigdy twoje imię, adres IP ani informacje o urządzeniu. Skąd wiesz o aplikacji i wybory z opinii tylko, jeśli je podasz. Po wyłączeniu: jedno ostatnie zliczenie bez ID, potem nic.",
   "What": "Co",
@@ -2940,6 +2939,5 @@
   "How the app is used": "Sposób korzystania z aplikacji",
   "voice changer, Radio tab": "zmieniacz głosu, zakładka Radio",
   "Your answers, if you give them": "Twoje odpowiedzi, jeśli je dasz",
-  "heard of it on YouTube": "słyszałem o tym na YouTube",
-  "See if people come back": "Zobacz, czy ludzie wrócą"
+  "heard of it on YouTube": "słyszałem o tym na YouTube"
 }

@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Nag-crash at nag-freeze",
   "Find and fix bugs": "Maghanap at ayusin ang mga bug",
   "Know where people find the app": "Alamin kung saan mahahanap ng mga tao ang app",
-  "A random ID": "Isang random na ID",
   "What Count me in sends": "Ano ang ipinapadala ng \"Isali mo ako\"",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Isang beses sa isang araw, anonymous. Hindi kailanman ang pangalan mo, IP address o impormasyon ng device. Kung saan mo narinig ang app at mga pinili sa feedback, kung ibibigay mo lang. Kapag pinatay: isang huling bilang na walang ID, tapos wala na.",
   "What": "Ano",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Paano ginagamit ang app",
   "voice changer, Radio tab": "voice changer, Radio tab",
   "Your answers, if you give them": "Iyong mga sagot, kung ibibigay mo",
-  "heard of it on YouTube": "narinig ito sa YouTube",
-  "See if people come back": "Tingnan kung babalik ang mga tao"
+  "heard of it on YouTube": "narinig ito sa YouTube"
 }
