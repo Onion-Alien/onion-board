@@ -4,6 +4,9 @@
 
 - Setup no longer has the *Test your local mix* card (Record 6s). To check what others
   get, use *Hear what they hear* or your chat app's microphone test.
+- The side menu starts open on a new install, so the tabs show their names and not
+  just icons. The button at the bottom still shuts it, and that choice is kept.
+
 - Themes use clean, flat cards and a faint accent glow, without window grain,
   dark background fades or panel textures. High Contrast keeps its strong outlines.
 
@@ -34,6 +37,9 @@
 - The log no longer warns about "a native error was caught and survived" for Windows
   error code 0x8001010d and its kin: COM raises and handles those itself, so they're
   harmless. They no longer count as a crash at the next start either.
+- The Voice tab's status bar (mic level and what others hear) moved from the top to
+  just above the *type a line* bar at the bottom, and keeps the same height when a
+  voice turns on or off, so nothing jumps.
 
 ## 1.9.28 — 2026-10-10
 

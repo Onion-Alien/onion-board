@@ -525,6 +525,7 @@ def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
     down over the tabs (and with no menu arrow's room, the + is centred like the rest)."""
     from soundboard.ui import moretabs
     w = window
+    w.rail.set_open(False)   # the offscreen screen is small: room for the menu beside
     w.show()
     w.set_tab_on("radio", False)
     btn, menu = w.btn_more_tabs, w.more_menu
