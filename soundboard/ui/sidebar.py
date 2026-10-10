@@ -296,13 +296,12 @@ class SideRail(QFrame):
         return w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
 
     def _label(self, w: QPushButton, name: str, tip: str, shown: bool):
-        """A button under the tabs: its name while open (cut to fit), and on hover its
-        tip, with the name in front when it isn't all there to read."""
+        """A button under the tabs: its name while open and help for screen readers."""
         text = self._fit(w, name) if shown else ""
         w.setText(text)
         w.setAccessibleName(name)
-        w.setToolTip(tip if text == name or tip == name or not tip else
-                     f"{name}\n{tip}" if tip else name)
+        w.setAccessibleDescription(tip)
+        w.setToolTip("")
 
     def show_status(self, w: QPushButton):
         """A status button as `put` left it, for the rail open or shut."""

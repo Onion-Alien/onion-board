@@ -171,7 +171,7 @@ class StatusLine(QLabel):
     player and mixer. Not in any layout, so it never adds a row to the window (a row
     under the mixer pushed the whole board up for one sentence). Hidden while
     there's nothing to say, while the window is too short for it (set_room), and
-    when clicked."""
+    when clicked. Notes expire after eight seconds unless a caller opts out."""
 
     room = True
     GAP = 6
@@ -183,13 +183,22 @@ class StatusLine(QLabel):
         # showed as "&#x27;" when it had no tags in it
         self.setTextFormat(Qt.RichText)
         self.setWordWrap(True)
-        self.setToolTip(_("Click to hide"))
+        self.setCursor(Qt.PointingHandCursor)
+        self._expiry = QTimer(self)
+        self._expiry.setSingleShot(True)
+        self._expiry.timeout.connect(self.clear)
         parent.installEventFilter(self)
 
-    def setText(self, text: str):
+    def setText(self, text: str, *, timeout_ms: int = 8000):
+        self._expiry.stop()
         super().setText(text)
         self.setVisible(self.room and bool(text))
         self.place()
+        if text and timeout_ms:
+            self._expiry.start(timeout_ms)
+
+    def clear(self):
+        self.setText("")
 
     def set_room(self, compact: bool):
         self.room = not compact
@@ -214,7 +223,8 @@ class StatusLine(QLabel):
         return False
 
     def mousePressEvent(self, e):
-        self.hide()
+        self.clear()
+        e.accept()
 
 
 class SnugTabBar(QTabBar):
