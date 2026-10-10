@@ -167,3 +167,30 @@ def test_busy_keeps_the_focus_and_ignores_clicks(qapp):
     QTest.mouseClick(btn, Qt.LeftButton)
     assert clicks == [1] and w.focusWidget() is btn
     w.close()
+
+
+def test_emit_from_a_worker_reaches_the_widget_on_the_ui_thread(qapp):
+    """A worker's result is emitted on the UI thread, never on the worker: a widget
+    freed by the UI thread during a worker's emit was a native crash (Settings > Tabs
+    switching a tab off while its thread finished)."""
+    import threading
+
+    from PySide6.QtCore import QObject, Signal
+
+    class Asker(QObject):
+        done = Signal(object)
+
+    got, gone = [], Asker()
+    asker = Asker()
+    asker.done.connect(lambda v: got.append((v, threading.current_thread().name)))
+    gone.done.connect(lambda v: got.append(("freed one", v)))
+    t = threading.Thread(target=lambda: (busy.emit(asker.done, 1), busy.emit(gone.done, 2)),
+                         name="worker")
+    t.start()
+    t.join(5)
+    gone.deleteLater()   # freed before the UI thread hands its result over
+    from PySide6.QtCore import QEvent
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    process_events(qapp, lambda: got)
+    assert got == [(1, threading.main_thread().name)]
+    assert busy.emit(asker.done, 3) and got[-1][0] == 3   # on the UI thread: at once

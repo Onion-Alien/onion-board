@@ -14,9 +14,10 @@
 from __future__ import annotations
 
 import html
+import threading
 from collections.abc import Callable
 
-from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer, QUrl
+from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import QApplication, QDialog, QLabel, QPushButton, QWidget
 
@@ -263,15 +264,51 @@ def hold_until(btn, text: str, signal, done: Callable[..., str | None] | None = 
     signal.connect(slot)
 
 
-def emit(signal, *args) -> bool:
-    """From a worker thread: hand a result to the widget that started it, unless that
-    widget was deleted meanwhile (its tab switched off in Settings > Tabs, the app
-    closing). Emitting on a deleted one raises, and in a worker that's a crash report."""
+class _Carrier(QObject):
+    """Brings a worker's result over to the UI thread, where it's emitted on the
+    widget that asked. The worker never emits on that widget itself: freed by the UI
+    thread during the emit (its tab switched off, a dialog closed), that was a native
+    access violation or a corrupt heap, not the RuntimeError a widget freed earlier
+    gives. This one lives as long as the app."""
+    call = Signal(object)
+
+    @Slot(object)
+    def _run(self, fn):
+        fn()
+
+
+_carrier: _Carrier | None = None
+_carrier_lock = threading.Lock()
+
+
+def _the_carrier() -> _Carrier:
+    global _carrier
+    with _carrier_lock:
+        if _carrier is None:
+            c = _Carrier()
+            c.moveToThread(QApplication.instance().thread())   # (made on a worker)
+            c.call.connect(c._run)
+            _carrier = c
+        return _carrier
+
+
+def _emit_now(signal, args) -> bool:
     try:
         signal.emit(*args)
         return True
     except RuntimeError:   # "Signal source has been deleted"
         return False
+
+
+def emit(signal, *args) -> bool:
+    """From a worker thread: hand a result to the widget that started it, unless that
+    widget was deleted meanwhile (its tab switched off in Settings > Tabs, the app
+    closing). It's emitted on the UI thread, so the widget can't be freed under it;
+    False when it's gone (known at once on the UI thread, else True)."""
+    if threading.current_thread() is threading.main_thread():
+        return _emit_now(signal, args)
+    _the_carrier().call.emit(lambda: _emit_now(signal, args))
+    return True
 
 
 def open_url(url, btn=None, window: QWidget | None = None, opened: str = "",
