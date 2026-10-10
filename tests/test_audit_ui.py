@@ -223,3 +223,10 @@ def test_flat_preset_and_curve_reset_turn_the_eq_off(qapp):
 
 def test_dim_has_a_style_rule(qapp):
     assert 'QSlider[dim="true"]' in theme.stylesheet()
+
+
+def test_sounds_search_padding_rule(qapp):
+    sheet = theme.stylesheet()
+    assert "QLineEdit#soundssearch" in sheet
+    assert "padding:0 10px 0 4px;" in sheet
+

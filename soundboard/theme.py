@@ -534,7 +534,7 @@ QFrame#soundstoolbar QPushButton#primary:hover { background:$accent_hover; }
 QFrame#soundstoolbar QPushButton#primary:focus { border-color:$text_hi; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
 QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
-    padding:0 10px; }
+    padding:0 10px 0 4px; }
 QLineEdit#soundssearch:hover { border-color:$border_hi; }
 QLineEdit#soundssearch:focus { border-color:$accent; }
 QPushButton#danger { background:$danger_bg; border:1px solid transparent; color:$danger_text; font-weight:600; }
@@ -650,6 +650,14 @@ QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
+QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:17px; padding:0; }
+QPushButton#transport_play:hover { background:$accent_hi; }
+QPushButton#transport_play:pressed { background:$accent; }
+QPushButton#transport_play:disabled { background:$btn; border:1px solid $border; }
+QPushButton#transport_stop { background:$btn; border:1px solid $border; border-radius:10px; padding:0; }
+QPushButton#transport_stop:hover { background:$btn_hover; border-color:$danger_text; }
+QPushButton#transport_stop:pressed { background:$btn_press; }
+QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border; }
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-radius:8px; padding:6px 8px; }

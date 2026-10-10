@@ -4,6 +4,10 @@
 
 - Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
   short gap clear of their buttons.
+- **Polished playback transport controls.** The sound player's Play/Pause button uses an accent-pill style with clean high-contrast icons that adapt across all themes, and the Stop button uses a sleek secondary surface with a subtle danger outline on hover. Both buttons use smooth filleted vector glyphs with optical centering.
+- The search box on the Sounds tab has a tidier gap between the magnifying glass
+  and placeholder text.
+
 - **Quick setup mic animation and clear navigation.** Putting sounds straight into your
   mic from the step-by-step setup guide now plays the Bun speaker-building animation
   directly inside the wizard, and success toasts no longer appear over or block the
@@ -25,6 +29,8 @@
   the bunny, or Hoot the owl for Onion Watch. Click outside or press Escape to close.
 - **Reorder sidebar tabs.** Hold the left mouse button on a tab and drag it up or
   down. The new order is remembered next time you open the app.
+- **Centered sidebar status buttons.** When the sidebar is extended, the status icons
+  at the bottom (Live, sound mode, Stop all and status pills) are horizontally centered.
 
 - The Setup microphone card has a grouped audio flow, clearer setup guidance,
   and a separate optional update notice.
