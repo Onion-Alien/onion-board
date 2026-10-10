@@ -3009,9 +3009,9 @@
   "Downloading the voices: {percent}%": "Λήψη των φωνών: {percent}%",
   "Others now hear {backup}.": "Οι άλλοι τώρα ακούν {backup}.",
   "starting again…": "ξεκινά ξανά…",
-  "How Onion Board works": "Πώς λειτουργεί το Onion Board",
-  "How it works": "Πώς λειτουργεί",
-  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Το Onion Board παίζει τους ήχους σου στο μικρόφωνό σου, οπότε όσοι είναι στο Discord ή στο παιχνίδι σου τους ακούν όπως ακριβώς ακούν εσένα.{gap}Πρόσθεσε ήχους στην καρτέλα Ήχοι και μετά κάνε διπλό κλικ σε έναν ή πάτα τη συντόμευσή του. Η λωρίδα κάτω δείχνει το μικρόφωνό σου, αυτό που ακούνε οι άλλοι και τα ακουστικά σου.{gap}Κάνε δεξί κλικ σε μια καρτέλα αριστερά και διάλεξε «Σχετικά με την καρτέλα» για να δεις τι κάνει.",
+  "How Onion Board works": "Πώς δουλεύει το Onion Board",
+  "How it works": "Πώς δουλεύει",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Το Onion Board παίζει τους ήχους σου μέσα στο μικρόφωνό σου, οπότε όσοι είναι στο Discord ή στο παιχνίδι σου τους ακούνε όπως ακούνε κι εσένα.{gap}Πρόσθεσε ήχους στην καρτέλα Ήχοι, μετά κάνε διπλό κλικ σε έναν ή πάτα το πλήκτρο του. Η λωρίδα κάτω δείχνει το μικρόφωνό σου, τι ακούνε οι άλλοι και τα ακουστικά σου.{gap}Κάνε δεξί κλικ σε μια καρτέλα αριστερά και διάλεξε Σχετικά με την καρτέλα για να δεις τι κάνει.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Βάλε τους ήχους σου στο μικρόφωνο που ήδη χρησιμοποιείς, ώστε το Discord και τα παιχνίδια να μη χρειάζονται αλλαγές",
   "Straight into my mic instead": "Κατευθείαν στο μικρόφωνό μου"
 }

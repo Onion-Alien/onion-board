@@ -2947,7 +2947,7 @@
   "starting again…": "다시 시작 중…",
   "How Onion Board works": "Onion Board 작동 방식",
   "How it works": "작동 방식",
-  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board는 사운드를 마이크로 재생해요. 그래서 Discord나 게임 속 사람들이 당신 목소리를 듣는 것과 똑같이 사운드를 들어요.{gap}사운드 탭에서 사운드를 추가한 다음, 하나를 더블클릭하거나 단축키를 누르세요. 맨 아래 막대에는 마이크, 다른 사람들이 듣는 것, 헤드폰이 표시돼요.{gap}왼쪽의 탭을 우클릭하고 이 탭에 대해를 고르면 그 탭이 무슨 일을 하는지 볼 수 있어요.",
-  "Put your sounds into the mic you already use, so Discord and games need no changes": "이미 쓰는 마이크에 사운드를 넣어요, 그래서 Discord와 게임은 아무것도 바꿀 필요가 없어요",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board는 사운드를 마이크로 재생해서 Discord나 게임 속 사람들이 당신 목소리처럼 똑같이 듣게 해요.{gap}사운드 탭에서 사운드를 추가한 다음, 하나를 더블클릭하거나 단축키를 누르세요. 아래쪽 막대에는 마이크, 다른 사람이 듣는 소리, 헤드폰이 표시돼요.{gap}왼쪽 탭을 오른쪽 클릭하고 이 탭에 대해를 고르면 무슨 탭인지 볼 수 있어요.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "이미 쓰는 마이크로 사운드를 보내서 Discord와 게임 설정을 바꿀 필요가 없어요",
   "Straight into my mic instead": "대신 마이크로 바로"
 }

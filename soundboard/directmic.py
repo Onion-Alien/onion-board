@@ -182,7 +182,8 @@ def new_ring_bytes() -> bytes:
 
 
 def make_ring_ok(path: Path) -> bool:
-    """The ring file at `path` is there and this version's layout."""
+    """The ring file at `path` is there and this version's layout, at the board's rate
+    (the effect plays the board's audio at the rate the file says)."""
     try:
         if not (path.is_file() and path.stat().st_size == FILE_BYTES):
             return False
@@ -190,7 +191,7 @@ def make_ring_ok(path: Path) -> bool:
             head = np.frombuffer(f.read(HEAD.itemsize), HEAD)[0]
     except (OSError, ValueError):
         return False
-    return bool(head["magic"] == MAGIC and head["version"] == VERSION
+    return bool(head["magic"] == MAGIC and head["version"] == VERSION and head["rate"] == RATE
                 and head["capacity"] == CAPACITY and head["mic_capacity"] == MIC_CAPACITY)
 
 

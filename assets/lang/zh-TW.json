@@ -2947,7 +2947,7 @@
   "starting again…": "正在重新啟動…",
   "How Onion Board works": "Onion Board 是怎麼運作的",
   "How it works": "運作方式",
-  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board 會把你的音效播放進你的麥克風，所以 Discord 或遊戲裡的人聽到它們，就跟聽到你說話一樣。{gap}在「音效」分頁加入音效，然後按兩下其中一個，或按它的快速鍵。底部的長條會顯示你的麥克風、別人聽到的和你的耳機。{gap}在左側的分頁上按右鍵，選擇「關於這個分頁」，就能看到它的用途。",
-  "Put your sounds into the mic you already use, so Discord and games need no changes": "把你的音效送進你原本使用的麥克風，Discord 和遊戲都不用改設定",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board 把你的音效放進麥克風，Discord 或遊戲裡的人聽到它們就像聽到你說話一樣。{gap}在「音效」分頁加入音效，然後雙擊一個或按它的快速鍵。底部的條顯示你的麥克風、別人聽到的聲音和你的耳機。{gap}在左側的分頁上按右鍵，選擇「關於這個分頁」，就能看到它是做什麼的。",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "把音效放進你已經在用的麥克風，Discord 和遊戲都不用改設定",
   "Straight into my mic instead": "改為直接送進我的麥克風"
 }
