@@ -3,10 +3,11 @@
     .venv\\Scripts\\python scripts\\release.py 1.9.28          # bump, date the changelog
     .venv\\Scripts\\python scripts\\release.py 1.9.28 --dry-run
 
-It:
+Changes not released yet are one file each in changelog.d/ (so two pull requests
+never edit the same lines of CHANGELOG.md and conflict). It:
 1. checks the new version is newer than soundboard/__init__.py's;
-2. checks CHANGELOG.md's "## Unreleased" has entries, renames it to
-   "## <version> <long dash> <today, UTC>" and opens a fresh empty "## Unreleased" above it;
+2. checks changelog.d/ has entries, writes them into CHANGELOG.md under
+   "## <version> <long dash> <today, UTC>" (newest first) and deletes the files;
 3. sets __version__ in soundboard/__init__.py;
 4. runs `scripts/i18n_extract.py --check` (missing translations fail it) and
    `scripts/docs.py --no-shots` (the README and website release line).
@@ -28,6 +29,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 INIT = ROOT / "soundboard" / "__init__.py"
 CHANGELOG = ROOT / "CHANGELOG.md"
+FRAGMENTS = ROOT / "changelog.d"
+FRAGMENT_README = "README.md"   # keeps the folder in git; not an entry
 DASH = "\u2014"   # the changelog's headings are "## 1.9.27 <long dash> 2026-10-09"
 VERSION_RE = re.compile(r'__version__ = "([^"]+)"')
 
@@ -46,17 +49,42 @@ def bump_init(text: str, new: str) -> str:
     return VERSION_RE.sub(f'__version__ = "{new}"', text, count=1)
 
 
-def date_changelog(text: str, new: str, today: str) -> str:
-    """Rename "## Unreleased" to the release, with a fresh empty one above it."""
-    m = re.search(r"^## Unreleased[ \t]*\n(.*?)(?=^## |\Z)", text, flags=re.M | re.S)
-    if not m:
-        raise SystemExit("CHANGELOG.md has no '## Unreleased' section")
-    if not m.group(1).strip():
-        raise SystemExit("CHANGELOG.md's Unreleased section is empty: nothing to release")
+def fragment_files(folder: Path | None = None) -> list[Path]:
+    """changelog.d/*.md, newest first: by the time git added each one (not committed
+    yet counts as newest), then by name."""
+    folder = folder or FRAGMENTS
+    files = [p for p in folder.glob("*.md") if p.name != FRAGMENT_README]
+
+    def added(p: Path) -> int:
+        try:
+            out = subprocess.run(
+                ["git", "log", "--diff-filter=A", "--format=%ct", "-1", "--", p.name],
+                cwd=folder, capture_output=True, text=True, timeout=20).stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            out = ""
+        return int(out) if out.isdigit() else 1 << 62
+
+    return sorted(sorted(files, key=lambda p: p.name), key=added, reverse=True)
+
+
+def read_fragment(p: Path) -> str:
+    return p.read_text(encoding="utf-8").strip()
+
+
+def date_changelog(text: str, new: str, today: str, entries: list[str]) -> str:
+    """Put the entries under a new "## <version>" heading above the newest release."""
+    entries = [e for e in entries if e]
+    if not entries:
+        raise SystemExit("changelog.d/ has no entries: nothing to release")
+    if re.search(r"^## Unreleased\b", text, flags=re.M):
+        raise SystemExit("CHANGELOG.md has an '## Unreleased' section: move its lines "
+                         "into a file in changelog.d/")
     if re.search(rf"^## {re.escape(new)}\b", text, flags=re.M):
         raise SystemExit(f"CHANGELOG.md already has a {new} section")
-    head = f"## Unreleased\n\n## {new} {DASH} {today}\n"
-    return text[:m.start()] + head + text[m.start() + len("## Unreleased\n"):]
+    section = f"## {new} {DASH} {today}\n\n" + "\n".join(entries) + "\n\n"
+    m = re.search(r"^## ", text, flags=re.M)
+    at = m.start() if m else len(text)
+    return text[:at] + section + text[at:]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -70,13 +98,18 @@ def main(argv: list[str] | None = None) -> int:
     if parse(args.version) <= parse(old):
         raise SystemExit(f"{args.version} isn't newer than the current {old}")
     today = datetime.datetime.now(datetime.UTC).date().isoformat()   # UTC, like commits
-    new_log = date_changelog(log, args.version, today)
+    frags = fragment_files()
+    new_log = date_changelog(log, args.version, today, [read_fragment(p) for p in frags])
     if args.dry_run:
-        print(f"ok: {old} -> {args.version} ({today}); nothing written")
+        print(f"ok: {old} -> {args.version} ({today}), {len(frags)} entries; "
+              "nothing written")
         return 0
     CHANGELOG.write_text(new_log, encoding="utf-8")
     INIT.write_text(bump_init(init, args.version), encoding="utf-8")
-    print(f"{old} -> {args.version}: CHANGELOG.md, soundboard/__init__.py")
+    for p in frags:
+        p.unlink()
+    print(f"{old} -> {args.version}: CHANGELOG.md ({len(frags)} entries from "
+          "changelog.d/), soundboard/__init__.py")
     for cmd in (["scripts/i18n_extract.py", "--check"], ["scripts/docs.py", "--no-shots"]):
         if subprocess.run([sys.executable, *cmd], cwd=ROOT).returncode:
             raise SystemExit(f"{' '.join(cmd)} failed: fix it, then run it again")

@@ -26,8 +26,10 @@ Every task, before changing anything (details in `CLAUDE.md`):
 | Text a user sees | `CLAUDE.md` *Text the app shows*, [TRANSLATING.md](TRANSLATING.md) | |
 | Build, installer, release | [DEVELOPING.md](DEVELOPING.md) sections 4 to 7 | DESIGN |
 
-- **`CHANGELOG.md` is append-only for agents:** never read it whole (1700+ lines). Add
-  your line under `## Unreleased` (read its first ~30 lines for the style).
+- **Never edit `CHANGELOG.md` for a change**, and never read it whole (2000+ lines).
+  Your entry goes in its own new file, `changelog.d/<branch-name>.md` (one or more
+  `- ` lines; [changelog.d/README.md](../changelog.d/README.md)), so stacked PRs never
+  conflict on it. `scripts/release.py` moves them into `CHANGELOG.md`.
 - The big files (`ui/mainwindow.py`, `ui/voicepanel.py`, `engine.py`, `ui/setupwizard.py`,
   `tests/test_mainwindow.py`): grep for the name you need, then read only that range.
 - `git log --oneline -S <name>` finds when and why something changed faster than reading.
@@ -93,7 +95,8 @@ Every task, before changing anything (details in `CLAUDE.md`):
   only show in the built app: build with `-NoInstaller` and start it once. `8f6f343`
 
 ### Releases (about 45 hand-made commits)
-- Bump with `scripts/release.py X.Y.Z`, never by hand. It dates the changelog, sets
+- Bump with `scripts/release.py X.Y.Z`, never by hand. It moves `changelog.d/` into the
+  changelog under the dated version, sets
   `__version__` and refreshes the release line. `tests/test_release.py` fails when
   `__init__.py` and the changelog disagree.
 
