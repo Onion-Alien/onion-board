@@ -2074,7 +2074,6 @@
   "Only others in the call get it, not your stream output": "Doar ceilalți din apel o primesc, nu ieșirea dvs. de flux",
   "Only your stream output gets it (music for your viewers), not the call": "Doar fluxul dvs. îl primește (muzică pentru spectatori), nu apelul",
   "Or type a line and it's spoken in the voice": "Sau tastați o linie și este rostită în voce",
-  "Or type a line and press Enter…": "Sau tastați o linie și apăsați Enter...",
   "Other pasted links": "Alte link-uri lipite",
   "Others hear only the spoken voice, not your real one.": "Alții aud doar vocea rostită, nu pe cea reală.",
   "Others in the call and your stream output both get it": "Ceilalți din apel și ieșirea fluxului dvs. îl primesc",
@@ -2212,7 +2211,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, înregistrare, Voicemeeter sau un mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Activați efectele și trageți glisoarele lor pentru a vă crea propria voce. Schimbarea a ceva trece la „Propriul meu mix”; iti place? Salvează-l ca voce și primește un buton propriu.",
   "Take this program off the list": "Scoateți acest program de pe listă",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Vorbește în engleză și alții aud altă limbă. Vocea AI sau schimbătorul de voce o spune atunci când unul dintre ele este pornit; în caz contrar, apăsați Start și o voce de computer face. Sau tastați o linie în partea de jos.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Vorbește și alții aud o altă persoană: cuvintele și tonul tău, o altă voce, în direct. Funcționează pe acest computer (aproximativ un nucleu CPU în timp ce vorbești, nimic când ești liniștit); ceea ce spui nu o părăsește niciodată.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Vorbește în interiorul unei căști, mască sau cutie de metal.",
@@ -3083,5 +3081,7 @@
   "Library": "Bibliotecă",
   "Quick hotkeys": "Taste rapide",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Ascultare: {mode}"
+  "Listening: {mode}": "Ascultare: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Vorbește în engleză și alții aud altă limbă. Vocea AI sau schimbătorul de voce o spune atunci când unul dintre ele este pornit; în caz contrar, apăsați Start și o voce de computer face.",
+  "Type a line and press Enter…": "Tastați o linie și apăsați Enter…"
 }

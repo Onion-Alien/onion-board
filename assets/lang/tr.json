@@ -2032,7 +2032,6 @@
   "Only others in the call get it, not your stream output": "Akış çıktınız değil, yalnızca görüşmedeki diğer kişiler bunu alır",
   "Only your stream output gets it (music for your viewers), not the call": "Aramayı değil, yalnızca akış çıktınız onu alır (izleyicileriniz için müzik)",
   "Or type a line and it's spoken in the voice": "Veya bir satır yazın ve sesli olarak söylensin",
-  "Or type a line and press Enter…": "Veya bir satır yazıp Enter tuşuna basın…",
   "Other pasted links": "Yapıştırılan diğer bağlantılar",
   "Others hear only the spoken voice, not your real one.": "Diğerleri sizin gerçek sesinizi değil, yalnızca konuşulan sesinizi duyar.",
   "Others in the call and your stream output both get it": "Görüşmedeki diğer kişiler ve yayın çıktınız bunu anlıyor",
@@ -2167,7 +2166,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Akış, kayıt, Voicemeeter veya mikser.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Kendi sesinizi oluşturmak için efektleri açın ve kaydırıcılarını sürükleyin. Herhangi bir şeyi değiştirdiğinizde \"Kendi karışımım\" ayarına geçiş yapılır; beğendin mi? Bunu bir ses olarak kaydettiğinizde kendine ait bir düğme olur.",
   "Take this program off the list": "Bu programı listeden çıkarın",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "İngilizce konuşun ve diğerleri başka bir dil duysun. Yapay zeka sesi veya ses değiştirici, içlerinden biri açıkken bunu söylüyor; aksi takdirde Başlat'a bastığınızda bir bilgisayar sesi duyulur. Veya altına bir satır yazın.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Konuşun ve diğerleri farklı bir kişiyi duysun: sözleriniz ve ses tonunuz, başka bir ses, canlı. Bu bilgisayarda çalışıyor (konuştuğunuz sırada yaklaşık bir CPU çekirdeği, sessiz olduğunuzda hiçbir şey yok); söyledikleriniz asla peşini bırakmıyor.",
   "Talkbox": "Konuşma kutusu",
   "Talking inside a helmet, mask or metal box.": "Kask, maske veya metal kutunun içinde konuşmak.",
@@ -3019,5 +3017,7 @@
   "Library": "Kütüphane",
   "Quick hotkeys": "Hızlı kısayollar",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Dinleme: {mode}"
+  "Listening: {mode}": "Dinleme: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "İngilizce konuşun ve diğerleri başka bir dil duysun. Yapay zeka sesi veya ses değiştirici, içlerinden biri açıkken bunu söylüyor; aksi takdirde Başlat'a bastığınızda bir bilgisayar sesi duyulur.",
+  "Type a line and press Enter…": "Bir satır yazıp Enter tuşuna basın…"
 }

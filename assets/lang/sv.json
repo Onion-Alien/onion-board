@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Endast andra i samtalet får det, inte din strömutgång",
   "Only your stream output gets it (music for your viewers), not the call": "Det är bara din streaming som får det (musik för dina tittare), inte samtalet",
   "Or type a line and it's spoken in the voice": "Eller skriv en rad och den läses upp med rösten",
-  "Or type a line and press Enter…": "Eller skriv en rad och tryck på Retur...",
   "Other pasted links": "Andra inklistrade länkar",
   "Others hear only the spoken voice, not your real one.": "Andra hör bara den talade rösten, inte din riktiga.",
   "Others in the call and your stream output both get it": "Andra i samtalet och din strömutgång får det båda",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, inspelning, Voicemeter eller en mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Slå på effekter och dra deras reglage för att bygga din egen röst. Ändra något växlar till \"Min egen blandning\"; gillar det? Spara den som en röst och den får en egen knapp.",
   "Take this program off the list": "Ta bort det här programmet från listan",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Prata på engelska och andra hör ett annat språk. AI-rösten eller röstväxlaren säger det när en av dem är på; annars trycker du på Start och en datorröst gör det. Eller skriv en rad längst ner.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Prata och andra hör en annan person: dina ord och tonfall, en annan röst, live. Den körs på den här datorn (ungefär en CPU-kärna medan du pratar, ingenting när du är tyst); det du säger lämnar det aldrig.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Pratar inuti en hjälm, mask eller metalllåda.",
@@ -3019,5 +3017,7 @@
   "Library": "Bibliotek",
   "Quick hotkeys": "Snabbtangenter",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Lyssning: {mode}"
+  "Listening: {mode}": "Lyssning: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Prata på engelska och andra hör ett annat språk. AI-rösten eller röstväxlaren säger det när en av dem är på; annars trycker du på Start och en datorröst gör det.",
+  "Type a line and press Enter…": "Skriv en rad och tryck på Retur…"
 }

@@ -1,0 +1,1 @@
+- Voice tab: the "Type a line" bar moved to the top of the tab, so the bottom only has your mic level and the mixer.

@@ -1468,7 +1468,7 @@ class SpeechPanel(QWidget):
         self.lbl_intro = hint_label(_(
             "Talk in English and others hear another language. The AI voice or the voice "
             "changer says it when one of them is on; otherwise press Start and a computer "
-            "voice does. Or type a line at the bottom."))
+            "voice does."))
         v.addWidget(self.lbl_intro)
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
         # English in, the chosen language out.
@@ -1726,12 +1726,12 @@ class SpeechPanel(QWidget):
         theme.set_tone(self.tts_err, "error")
         self.tts_err.hide()
         v.addWidget(self.tts_err)
-        # ---- the tab's bottom bar (placed by VoicePanel, like every tab's bar):
-        # typing a line is the extra, then the voice's volume
+        # ---- the Say bar (placed by VoicePanel at the top of the tab, out of the
+        # crowded bottom): typing a line, then the voice's volume
         self.say_bar, row = bar()
         row.addWidget(icon_label("speech", _("Or type a line and it's spoken in the voice")))
         self.ed = QLineEdit()
-        self.ed.setPlaceholderText(_("Or type a line and press Enter…"))
+        self.ed.setPlaceholderText(_("Type a line and press Enter…"))
         self.ed.returnPressed.connect(self._say)
         self.ed.textEdited.connect(self._warm_for_a_line)
         row.addWidget(self.ed, 1)
@@ -2727,8 +2727,8 @@ class VoicePanel(QWidget):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 8, 0, 0)
         outer.setSpacing(8)
-        # what's on and your mic level, whatever's folded or scrolled away: just above
-        # the Say bar at the bottom, as wide as it (added below, after the cards)
+        # what's on and your mic level, whatever's folded or scrolled away: at the
+        # bottom, just above the mixer (added below, after the cards; the Say bar on top)
         self.bar = VoiceStatusBar()
         self.bar.open_card.connect(self._open_card)
         scroll = self._scroll = QScrollArea()
@@ -2812,8 +2812,8 @@ class VoicePanel(QWidget):
         self._fold_card("addons", self.addons)
         self._arrange()
 
+        outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
         outer.addWidget(self.bar)
-        outer.addWidget(self.speech.say_bar)
         self.chain.configure(self.fx.spec())
         self._emit_active()
 

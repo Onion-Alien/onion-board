@@ -2032,7 +2032,6 @@
   "Only others in the call get it, not your stream output": "केवल कॉल में मौजूद अन्य लोगों को ही यह मिलता है, आपका स्ट्रीम आउटपुट नहीं",
   "Only your stream output gets it (music for your viewers), not the call": "केवल आपका स्ट्रीम आउटपुट इसे प्राप्त करता है (आपके दर्शकों के लिए संगीत), कॉल नहीं",
   "Or type a line and it's spoken in the voice": "या एक पंक्ति टाइप करें और वह स्वर में बोली जाती है",
-  "Or type a line and press Enter…": "या एक पंक्ति टाइप करें और Enter दबाएँ…",
   "Other pasted links": "अन्य चिपकाए गए लिंक",
   "Others hear only the spoken voice, not your real one.": "दूसरे लोग केवल मौखिक आवाज़ सुनते हैं, आपकी वास्तविक आवाज़ नहीं।",
   "Others in the call and your stream output both get it": "कॉल में मौजूद अन्य लोग और आपका स्ट्रीम आउटपुट दोनों इसे प्राप्त करते हैं",
@@ -2167,7 +2166,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "स्ट्रीमिंग, रिकॉर्डिंग, वॉयसमीटर या मिक्सर।",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "अपनी आवाज़ बनाने के लिए प्रभाव चालू करें और उनके स्लाइडर्स को खींचें। कुछ भी बदलने से \"मेरा अपना मिश्रण\" पर स्विच हो जाता है; तरह ही? इसे एक आवाज के रूप में सहेजें और इसे अपना एक बटन मिल जाएगा।",
   "Take this program off the list": "इस प्रोग्राम को सूची से हटा दें",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "अंग्रेजी में बात करें और अन्य लोग दूसरी भाषा सुनें। एआई आवाज या आवाज परिवर्तक इसे तब कहता है जब उनमें से एक चालू होता है; अन्यथा स्टार्ट दबाएँ और कंप्यूटर की आवाज़ आ जाएगी। या नीचे एक लाइन टाइप करें.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "बात करें, और अन्य लोग एक अलग व्यक्ति को सुनें: आपके शब्द और स्वर, एक और आवाज, लाइव। यह इस पीसी पर चलता है (जब आप बात करते हैं तो लगभग एक सीपीयू कोर, जब आप शांत होते हैं तो कुछ भी नहीं); आप जो कहते हैं वह कभी नहीं छूटता।",
   "Talkbox": "टॉकबॉक्स",
   "Talking inside a helmet, mask or metal box.": "हेलमेट, मास्क या धातु के बक्से के अंदर बात करना।",
@@ -3019,5 +3017,7 @@
   "Library": "लाइब्रेरी",
   "Quick hotkeys": "त्वरित हॉटकी",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "सुनना: {mode}"
+  "Listening: {mode}": "सुनना: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "अंग्रेजी में बात करें और अन्य लोग दूसरी भाषा सुनें। एआई आवाज या आवाज परिवर्तक इसे तब कहता है जब उनमें से एक चालू होता है; अन्यथा स्टार्ट दबाएँ और कंप्यूटर की आवाज़ आ जाएगी।",
+  "Type a line and press Enter…": "एक पंक्ति टाइप करें और Enter दबाएँ…"
 }
