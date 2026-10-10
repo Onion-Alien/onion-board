@@ -1139,6 +1139,7 @@ class MainWindow(QMainWindow):
         h.setSpacing(14)
         self.mixer = f
         self._deck_titles: list[QWidget] = []
+        self._deck_rows: list[QHBoxLayout] = []
         self._decks: list[QWidget] = []   # each group, with the line before it
 
         def group(icon: str, title: str, tip: str) -> tuple[QLabel, QHBoxLayout]:
@@ -1150,6 +1151,7 @@ class MainWindow(QMainWindow):
             row = QHBoxLayout(deck)
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(8)
+            self._deck_rows.append(row)
             row.addWidget(icon_label(icon, tip))
             lbl = QLabel(title)
             lbl.setObjectName("decktitle")
@@ -1173,6 +1175,7 @@ class MainWindow(QMainWindow):
                                            "activity when you talk"))
         self.mic_meter = self.vol_mic.meter
         row.addWidget(self.vol_mic)
+        self.vol_mic.setMaximumWidth(240)
 
         send_lbl, row = group("live", _("What others hear"),
                               _("Everything going out to others right now (Discord, a game, "
@@ -1190,6 +1193,7 @@ class MainWindow(QMainWindow):
         self.btn_check.toggled.connect(self.on_mic_check)
         icons.set_icon(self.btn_check, "ear", checked_color="#ffffff")
         row.addWidget(self.btn_check)
+        self.btn_check.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         h.setStretchFactor(self._decks[1][-1], 1)   # the "what others hear" group takes the room
 
         self.hp_lbl, row = group("headphones", _("My headphones"),
@@ -1197,9 +1201,12 @@ class MainWindow(QMainWindow):
         self.vol_mon = VolumeControl(c.mon_vol, tip=_("Only what YOU hear, doesn't change "
                                                       "anything for others"))
         row.addWidget(self.vol_mon)
+        self.vol_mon.setMaximumWidth(220)
         self._mixer_hp = self._decks[2]
         self._mixer_send = (self.out_meter,)
         self._mixer_others = self._decks[1]
+        for row in self._deck_rows:
+            row.addStretch(1)
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
@@ -7895,8 +7902,14 @@ class MainWindow(QMainWindow):
             # room for a whole row of pads comes before the mixer, the status line and
             # the rest: without it they kept their room and the pads got a slit
             self._pads_scroll.setMinimumHeight(self.grid.row_height())
-            self._mixer_layout.setDirection(QBoxLayout.TopToBottom if self.width() < 1050
+            stacked = self.width() < 1050
+            self._mixer_layout.setDirection(QBoxLayout.TopToBottom if stacked
                                             else QBoxLayout.LeftToRight)
+            self._mixer_layout.setSpacing(4 if stacked else 14)
+            for row in self._deck_rows:
+                row.setAlignment(Qt.AlignLeft if stacked else Qt.Alignment())
+            for group in self._decks[1:]:
+                group[0].setMaximumHeight(0 if stacked else 16777215)
             narrow = self.width() < 860   # two cards side by side get cramped below this
             # Translated controls can need more room than the fixed breakpoint.
             # Measure both Setup columns even while they are stacked, so growing

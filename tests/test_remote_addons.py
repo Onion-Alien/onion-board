@@ -185,13 +185,20 @@ def test_a_flood_of_connections_cant_pile_up_threads(qapp, loaded, monkeypatch):
     monkeypatch.setattr(remote, "PEER_CONNECTIONS", 3)
     srv = loaded.server
     assert srv.start(0, "add-on-key", "127.0.0.1")
-    before = threading.active_count()
+    server = srv._server
+
+    def handlers():
+        # Only this server's request threads: counting every thread in the process
+        # picked up other tests' workers starting or ending meanwhile (flaky).
+        return sum(getattr(t, "_target", None) == server.process_request_thread
+                   for t in threading.enumerate())
+
     held = [socket.create_connection((srv.host, srv.port), timeout=5) for _ in range(20)]
     for s in held:
         s.sendall(b"GET / HTTP/1.1\r\n")   # half a request: its thread waits for more
-    assert process_events(qapp, lambda: threading.active_count() - before >= 3, timeout=2)
+    assert process_events(qapp, lambda: handlers() >= 3, timeout=2)
     process_events(qapp, lambda: False, timeout=0.3)
-    assert threading.active_count() - before <= 3
+    assert handlers() <= 3
     closed = waiting = 0
     for s in held:
         s.settimeout(0.2)
