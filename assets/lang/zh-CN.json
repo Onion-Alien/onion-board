@@ -2949,5 +2949,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board 把你的音效放进麦克风，Discord 或游戏里的人听到它们就像听到你说话一样。{gap}在“音效”标签页添加音效，然后双击一个或按它的快捷键。底部的条显示你的麦克风、别人听到的声音和你的耳机。{gap}右键点击左侧的标签页，选择“关于这个标签页”，就能看到它是做什么的。",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "把音效放进你已经在用的麦克风，Discord 和游戏都不用改设置",
   "Straight into my mic instead": "改为直接送进我的麦克风",
-  "your real voice": "你真实的声音"
+  "your real voice": "你真实的声音",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "添加<b>应用</b>标签页（把音乐或游戏声音送进直播）和<b>主播指南</b>（Stream Deck 按键、聊天指令）。",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "添加<b>触发器</b>标签页：屏幕上出现某样东西时，Onion Watch 会播放声音（击杀、“YOU DIED”）。",
+  "Competitive games": "竞技游戏",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "所有标签页：<b>电台</b>、<b>应用</b>和<b>触发器</b>也一起。",
+  "Just sounds": "只要音效",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "选最接近的一项。它只决定你一开始有哪些标签页：随时可以在<b>设置</b> → <b>标签页</b>中更改。",
+  "Play sounds from your Stream Deck, channel points and chat commands": "用 Stream Deck、频道积分和聊天指令播放音效",
+  "Play sounds in Discord and games. Nothing else to learn.": "在 Discord 和游戏里播放音效。不用再学别的。",
+  "Show me everything": "全部显示",
+  "Streaming": "直播",
+  "What will you use Onion Board for?": "你打算用 Onion Board 做什么？"
 }

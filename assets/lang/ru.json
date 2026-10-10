@@ -3077,5 +3077,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board играет твои звуки в микрофон, так что люди в Discord или в игре слышат их так же, как тебя.{gap}Добавь звуки на вкладке Звуки, потом дважды щёлкни по одному или нажми его горячую клавишу. Полоса внизу показывает твой микрофон, что слышат другие и твои наушники.{gap}Щёлкни правой кнопкой по вкладке слева и выбери Об этой вкладке, чтобы узнать, что она делает.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Отправляй звуки в микрофон, которым ты уже пользуешься, и в Discord и играх ничего менять не нужно",
   "Straight into my mic instead": "Лучше прямо в мой микрофон",
-  "your real voice": "твой настоящий голос"
+  "your real voice": "твой настоящий голос",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Добавляет вкладку <b>Программы</b> (отправляй музыку или игру на стрим) и <b>Гайд для стримеров</b> (кнопки Stream Deck, команды в чате).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Добавляет вкладку <b>Триггеры</b>: Onion Watch играет звук, когда что-то появляется на экране (килл, “YOU DIED”).",
+  "Competitive games": "Соревновательные игры",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Все вкладки: и <b>Радио</b>, и <b>Программы</b>, и <b>Триггеры</b>.",
+  "Just sounds": "Только звуки",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Выбери самое близкое. Это решает только, с какими вкладками начать: поменять можно в любой момент в <b>Настройки</b> → <b>Вкладки</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Включай звуки со Stream Deck, баллами канала и командами в чате",
+  "Play sounds in Discord and games. Nothing else to learn.": "Включай звуки в Discord и играх. Больше ничего учить не надо.",
+  "Show me everything": "Покажи всё",
+  "Streaming": "Стриминг",
+  "What will you use Onion Board for?": "Для чего ты будешь использовать Onion Board?"
 }

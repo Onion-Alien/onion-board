@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board आपके साउंड आपके माइक में चलाता है, ताकि Discord या आपके गेम में लोग उन्हें वैसे ही सुनें जैसे आपको सुनते हैं।{gap}साउंड टैब पर साउंड जोड़ें, फिर किसी पर डबल-क्लिक करें या उसकी हॉटकी दबाएँ। नीचे की पट्टी आपका माइक, दूसरे क्या सुनते हैं और आपके हेडफ़ोन दिखाती है।{gap}बाईं ओर किसी टैब पर राइट-क्लिक करें और इस टैब के बारे में चुनें, ताकि देख सकें कि वह क्या करता है।",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "अपने साउंड उसी माइक में डालें जो आप पहले से इस्तेमाल करते हैं, ताकि Discord और गेम में कुछ बदलना न पड़े",
   "Straight into my mic instead": "इसके बजाय सीधे मेरे माइक में",
-  "your real voice": "आपकी असली आवाज़"
+  "your real voice": "आपकी असली आवाज़",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>ऐप्स</b> टैब जोड़ता है (अपनी स्ट्रीम में म्यूज़िक या गेम भेजें) और <b>स्ट्रीमर गाइड</b> (Stream Deck की कीज़, चैट कमांड)।",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "<b>ट्रिगर</b> टैब जोड़ता है: स्क्रीन पर कुछ दिखते ही Onion Watch एक साउंड बजाता है (एक किल, “YOU DIED”)।",
+  "Competitive games": "कॉम्पिटिटिव गेम्स",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "सारे टैब: <b>रेडियो</b>, <b>ऐप्स</b> और <b>ट्रिगर</b> भी।",
+  "Just sounds": "सिर्फ़ साउंड्स",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "सबसे करीबी चुनें। इससे बस यह तय होता है कि आप किन टैब से शुरू करते हैं: इसे कभी भी <b>सेटिंग्स</b> → <b>टैब</b> में बदलें।",
+  "Play sounds from your Stream Deck, channel points and chat commands": "अपने Stream Deck, चैनल पॉइंट्स और चैट कमांड से साउंड बजाएं",
+  "Play sounds in Discord and games. Nothing else to learn.": "Discord और गेम्स में साउंड बजाएं। और कुछ सीखने की ज़रूरत नहीं।",
+  "Show me everything": "मुझे सब दिखाओ",
+  "Streaming": "स्ट्रीमिंग",
+  "What will you use Onion Board for?": "आप Onion Board किस लिए इस्तेमाल करेंगे?"
 }

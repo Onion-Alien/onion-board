@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Pinapatugtog ng Onion Board ang sounds mo sa mic mo, kaya naririnig ito ng mga tao sa Discord o sa game mo gaya ng pagkarinig nila sa'yo.{gap}Magdagdag ng sounds sa Sounds tab, tapos i-double-click ang isa o pindutin ang hotkey nito. Ipinapakita ng strip sa ibaba ang mic mo, ang naririnig ng iba at ang headphones mo.{gap}I-right-click ang isang tab sa kaliwa at piliin ang Tungkol sa tab na ito para makita kung ano ang ginagawa nito.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Ilagay ang sounds mo sa mic na gamit mo na, kaya walang kailangang baguhin sa Discord at mga game",
   "Straight into my mic instead": "Diretso na lang sa mic ko",
-  "your real voice": "ang tunay mong boses"
+  "your real voice": "ang tunay mong boses",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Idinadagdag ang <b>Apps</b> tab (ipadala ang musika o laro sa stream mo) at ang <b>Streamer guide</b> (mga key ng Stream Deck, chat command).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Idinadagdag ang <b>Triggers</b> tab: nagpapatugtog ang Onion Watch ng tunog kapag may lumabas sa screen mo (isang kill, “YOU DIED”).",
+  "Competitive games": "Mga competitive na laro",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Lahat ng tab: pati <b>Radio</b>, <b>Apps</b> at <b>Triggers</b>.",
+  "Just sounds": "Mga tunog lang",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Piliin ang pinakamalapit. Ang mga tab lang na sisimulan mo ang pinipili nito: palitan ito kahit kailan sa <b>Settings</b> → <b>Mga tab</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Magpatugtog ng tunog mula sa Stream Deck, channel points at chat command",
+  "Play sounds in Discord and games. Nothing else to learn.": "Magpatugtog ng tunog sa Discord at mga laro. Wala nang ibang kailangang aralin.",
+  "Show me everything": "Ipakita lahat",
+  "Streaming": "Streaming",
+  "What will you use Onion Board for?": "Para saan mo gagamitin ang Onion Board?"
 }

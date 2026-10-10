@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board joue tes sons dans ton micro, pour que les gens sur Discord ou dans ton jeu les entendent comme ils t'entendent.{gap}Ajoute des sons dans l'onglet Sons, puis double-clique sur l'un d'eux ou appuie sur son raccourci. La barre du bas montre ton micro, ce que les autres entendent et ton casque.{gap}Fais un clic droit sur un onglet à gauche et choisis À propos de cet onglet pour voir à quoi il sert.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Mets tes sons dans le micro que tu utilises déjà, pour que Discord et les jeux n'aient rien à changer",
   "Straight into my mic instead": "Directement dans mon micro à la place",
-  "your real voice": "ta vraie voix"
+  "your real voice": "ta vraie voix",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Ajoute l'onglet <b>Applis</b> (envoie de la musique ou un jeu sur ton stream) et le <b>Guide streamer</b> (touches Stream Deck, commandes du chat).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Ajoute l'onglet <b>Déclencheurs</b> : Onion Watch joue un son quand quelque chose apparaît à l'écran (un kill, “YOU DIED”).",
+  "Competitive games": "Jeux compétitifs",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Tous les onglets : <b>Radio</b>, <b>Applis</b> et <b>Déclencheurs</b> aussi.",
+  "Just sounds": "Juste des sons",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Choisis le plus proche. Ça décide seulement des onglets de départ : change-le quand tu veux dans <b>Paramètres</b> → <b>Onglets</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Joue des sons depuis ton Stream Deck, les points de chaîne et les commandes du chat",
+  "Play sounds in Discord and games. Nothing else to learn.": "Joue des sons dans Discord et les jeux. Rien d'autre à apprendre.",
+  "Show me everything": "Montre-moi tout",
+  "Streaming": "Streaming",
+  "What will you use Onion Board for?": "Tu vas utiliser Onion Board pour quoi ?"
 }

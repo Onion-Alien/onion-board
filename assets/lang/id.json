@@ -1299,7 +1299,7 @@
   "Stops every sound": "Menghentikan setiap suara",
   "Stops every sound, the radio and every program.": "Menghentikan setiap suara, radio, dan setiap program.",
   "Straight into <b>your mic</b>: one click, and Discord and games hear your sounds through the mic they already use. Nothing to install from the internet, nothing to pick in Discord. (Or use a free <b>virtual cable</b> instead.)": "Langsung ke <b>mikrofon Anda</b> : satu klik, dan Discord serta game akan mendengar suara Anda melalui mikrofon yang sudah mereka gunakan. Tidak ada yang bisa diinstal dari internet, tidak ada yang bisa dipilih di Discord. (Atau gunakan <b>kabel virtual</b> gratis sebagai gantinya.)",
-  "Streamer guide": "Panduan pita",
+  "Streamer guide": "Panduan streamer",
   "Streamer guide: play sounds from your Stream Deck and chat": "Panduan streamer: memutar suara dari Stream Deck dan mengobrol",
   "Streamer guide…": "Panduan pita…",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streaming, atau menggunakan lebih dari satu aplikasi? Setiap perangkat di sini mendapat salinan dari apa yang didengar orang lain juga: Voicemeeter, perangkat yang ditangkap OBS, kabel kedua, speaker...",
@@ -2949,5 +2949,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board memutar suaramu ke mic-mu, jadi orang di Discord atau game-mu mendengarnya sama seperti mereka mendengarmu.{gap}Tambahkan suara di tab Suara, lalu klik dua kali salah satunya atau tekan hotkey-nya. Strip di bawah menunjukkan mic-mu, yang didengar orang lain, dan headphone-mu.{gap}Klik kanan tab di sebelah kiri lalu pilih Tentang tab ini untuk melihat fungsinya.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Masukkan suaramu ke mic yang sudah kamu pakai, jadi Discord dan game tidak perlu diubah",
   "Straight into my mic instead": "Langsung ke mic-ku saja",
-  "your real voice": "suara aslimu"
+  "your real voice": "suara aslimu",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Menambah tab <b>Aplikasi</b> (kirim musik atau game ke stream-mu) dan <b>Panduan streamer</b> (tombol Stream Deck, perintah chat).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Menambah tab <b>Pemicu</b>: Onion Watch memutar suara saat sesuatu muncul di layarmu (kill, “YOU DIED”).",
+  "Competitive games": "Game kompetitif",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Semua tab: <b>Radio</b>, <b>Aplikasi</b> dan <b>Pemicu</b> juga.",
+  "Just sounds": "Suara saja",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Pilih yang paling cocok. Ini hanya menentukan tab awalmu: ubah kapan saja di <b>Pengaturan</b> → <b>Tab</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Putar suara dari Stream Deck, poin channel, dan perintah chat",
+  "Play sounds in Discord and games. Nothing else to learn.": "Putar suara di Discord dan game. Tidak ada lagi yang perlu dipelajari.",
+  "Show me everything": "Tampilkan semuanya",
+  "Streaming": "Streaming",
+  "What will you use Onion Board for?": "Mau pakai Onion Board untuk apa?"
 }

@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board riproduce i tuoi suoni nel microfono, così la gente su Discord o nel tuo gioco li sente come sente te.{gap}Aggiungi suoni nella scheda Suoni, poi fai doppio clic su uno o premi la sua scorciatoia. La barra in basso mostra il tuo microfono, cosa sentono gli altri e le tue cuffie.{gap}Fai clic destro su una scheda a sinistra e scegli Info su questa scheda per vedere a cosa serve.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Metti i tuoi suoni nel microfono che usi già, così Discord e i giochi non devono cambiare niente",
   "Straight into my mic instead": "Invece direttamente nel mio microfono",
-  "your real voice": "la tua vera voce"
+  "your real voice": "la tua vera voce",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Aggiunge la scheda <b>App</b> (manda musica o un gioco nella tua live) e la <b>Guida agli streamer</b> (tasti dello Stream Deck, comandi in chat).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Aggiunge la scheda <b>Trigger</b>: Onion Watch riproduce un suono quando qualcosa appare sullo schermo (un'uccisione, “YOU DIED”).",
+  "Competitive games": "Giochi competitivi",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Tutte le schede: anche <b>Radio</b>, <b>App</b> e <b>Trigger</b>.",
+  "Just sounds": "Solo suoni",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Scegli la più vicina. Decide solo con quali schede inizi: cambiala quando vuoi in <b>Impostazioni</b> → <b>Schede</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Riproduci suoni dallo Stream Deck, punti canale e comandi in chat",
+  "Play sounds in Discord and games. Nothing else to learn.": "Riproduci suoni su Discord e nei giochi. Nient'altro da imparare.",
+  "Show me everything": "Mostrami tutto",
+  "Streaming": "Streaming",
+  "What will you use Onion Board for?": "Per cosa userai Onion Board?"
 }

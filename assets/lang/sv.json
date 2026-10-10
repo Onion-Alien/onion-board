@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spelar dina ljud i din mikrofon, så folk på Discord eller i ditt spel hör dem på samma sätt som de hör dig.{gap}Lägg till ljud på fliken Ljud, dubbelklicka sedan på ett eller tryck på dess snabbtangent. Remsan längst ner visar din mikrofon, vad andra hör och dina hörlurar.{gap}Högerklicka på en flik till vänster och välj Om den här fliken för att se vad den gör.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Skicka dina ljud in i mikrofonen du redan använder, så behöver Discord och spel inga ändringar",
   "Straight into my mic instead": "Direkt i min mikrofon i stället",
-  "your real voice": "din riktiga röst"
+  "your real voice": "din riktiga röst",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Lägger till fliken <b>Appar</b> (skicka musik eller ett spel till din stream) och <b>Streamerguide</b> (Stream Deck-knappar, chattkommandon).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Lägger till fliken <b>Triggers</b>: Onion Watch spelar ett ljud när något dyker upp på skärmen (en kill, “YOU DIED”).",
+  "Competitive games": "Tävlingsspel",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Alla flikar: även <b>Radio</b>, <b>Appar</b> och <b>Triggers</b>.",
+  "Just sounds": "Bara ljud",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Välj det som passar bäst. Det avgör bara vilka flikar du börjar med: ändra när du vill under <b>Inställningar</b> → <b>Flikar</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Spela ljud från ditt Stream Deck, kanalpoäng och chattkommandon",
+  "Play sounds in Discord and games. Nothing else to learn.": "Spela ljud i Discord och spel. Inget mer att lära sig.",
+  "Show me everything": "Visa allt",
+  "Streaming": "Streaming",
+  "What will you use Onion Board for?": "Vad ska du använda Onion Board till?"
 }

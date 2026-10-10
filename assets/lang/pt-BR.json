@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "O Onion Board toca seus sons no seu microfone, então o pessoal no Discord ou no seu jogo ouve eles do mesmo jeito que ouve você.{gap}Adicione sons na aba Sons, depois dê dois cliques em um ou aperte o atalho dele. A barra embaixo mostra seu microfone, o que os outros ouvem e seus fones.{gap}Clique com o botão direito numa aba à esquerda e escolha Sobre esta aba para ver o que ela faz.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Coloque seus sons no microfone que você já usa, assim o Discord e os jogos não precisam de mudanças",
   "Straight into my mic instead": "Direto no meu microfone",
-  "your real voice": "sua voz real"
+  "your real voice": "sua voz real",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Adiciona a aba <b>Apps</b> (mande música ou um jogo para a sua live) e o <b>Guia para streamers</b> (teclas do Stream Deck, comandos do chat).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Adiciona a aba <b>Gatilhos</b>: o Onion Watch toca um som quando algo aparece na sua tela (um abate, “YOU DIED”).",
+  "Competitive games": "Jogos competitivos",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Todas as abas: <b>Rádio</b>, <b>Apps</b> e <b>Gatilhos</b> também.",
+  "Just sounds": "Só sons",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Escolha a mais próxima. Só decide com quais abas você começa: mude quando quiser em <b>Configurações</b> → <b>Abas</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Toque sons pelo Stream Deck, pontos do canal e comandos do chat",
+  "Play sounds in Discord and games. Nothing else to learn.": "Toque sons no Discord e nos jogos. Nada mais para aprender.",
+  "Show me everything": "Mostre tudo",
+  "Streaming": "Streaming",
+  "What will you use Onion Board for?": "Para que você vai usar o Onion Board?"
 }

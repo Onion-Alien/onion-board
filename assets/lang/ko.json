@@ -2949,5 +2949,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board는 사운드를 마이크로 재생해서 Discord나 게임 속 사람들이 당신 목소리처럼 똑같이 듣게 해요.{gap}사운드 탭에서 사운드를 추가한 다음, 하나를 더블클릭하거나 단축키를 누르세요. 아래쪽 막대에는 마이크, 다른 사람이 듣는 소리, 헤드폰이 표시돼요.{gap}왼쪽 탭을 오른쪽 클릭하고 이 탭에 대해를 고르면 무슨 탭인지 볼 수 있어요.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "이미 쓰는 마이크로 사운드를 보내서 Discord와 게임 설정을 바꿀 필요가 없어요",
   "Straight into my mic instead": "대신 마이크로 바로",
-  "your real voice": "당신의 진짜 목소리"
+  "your real voice": "당신의 진짜 목소리",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>앱</b> 탭(음악이나 게임 소리를 방송으로 보내기)과 <b>스트리머 가이드</b>(Stream Deck 키, 채팅 명령어)를 추가해요.",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "<b>트리거</b> 탭을 추가해요: 화면에 무언가 나타나면 Onion Watch가 소리를 재생해요(킬, “YOU DIED”).",
+  "Competitive games": "경쟁 게임",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "모든 탭: <b>라디오</b>, <b>앱</b>, <b>트리거</b>까지.",
+  "Just sounds": "사운드만",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "가장 가까운 걸 고르세요. 처음에 보일 탭만 정해요: 언제든 <b>설정</b> → <b>탭</b>에서 바꿀 수 있어요.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Stream Deck, 채널 포인트, 채팅 명령어로 사운드 재생",
+  "Play sounds in Discord and games. Nothing else to learn.": "Discord와 게임에서 사운드를 재생해요. 더 배울 건 없어요.",
+  "Show me everything": "전부 보여줘",
+  "Streaming": "방송",
+  "What will you use Onion Board for?": "Onion Board를 어디에 쓰실 건가요?"
 }

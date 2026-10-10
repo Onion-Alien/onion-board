@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board mete tus sonidos en tu micro, así la gente en Discord o en tu juego los oye igual que te oye a ti.{gap}Añade sonidos en la pestaña Sonidos y luego haz doble clic en uno o pulsa su atajo. La barra de abajo muestra tu micro, lo que oyen los demás y tus cascos.{gap}Haz clic derecho en una pestaña de la izquierda y elige Sobre esta pestaña para ver qué hace.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Mete tus sonidos en el micro que ya usas, así Discord y los juegos no necesitan cambios",
   "Straight into my mic instead": "Directamente en mi micro",
-  "your real voice": "tu voz real"
+  "your real voice": "tu voz real",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Añade la pestaña <b>Apps</b> (envía música o un juego a tu directo) y la <b>Guía para streamers</b> (teclas del Stream Deck, comandos del chat).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Añade la pestaña <b>Disparadores</b>: Onion Watch reproduce un sonido cuando algo aparece en tu pantalla (una kill, “YOU DIED”).",
+  "Competitive games": "Juegos competitivos",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Todas las pestañas: también <b>Radio</b>, <b>Apps</b> y <b>Disparadores</b>.",
+  "Just sounds": "Solo sonidos",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Elige la más parecida. Solo decide con qué pestañas empiezas: cámbialo cuando quieras en <b>Ajustes</b> → <b>Pestañas</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Reproduce sonidos desde tu Stream Deck, puntos del canal y comandos del chat",
+  "Play sounds in Discord and games. Nothing else to learn.": "Reproduce sonidos en Discord y juegos. Nada más que aprender.",
+  "Show me everything": "Enséñamelo todo",
+  "Streaming": "Directos",
+  "What will you use Onion Board for?": "¿Para qué vas a usar Onion Board?"
 }

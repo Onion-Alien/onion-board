@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board soittaa äänesi mikkiisi, joten Discordissa tai pelissäsi muut kuulevat ne samalla tavalla kuin kuulevat sinut.{gap}Lisää ääniä Äänet-välilehdellä ja tuplaklikkaa sitten yhtä tai paina sen pikanäppäintä. Alareunan palkki näyttää mikkisi, mitä muut kuulevat ja kuulokkeesi.{gap}Napsauta välilehteä vasemmalla hiiren oikealla ja valitse Tietoa tästä välilehdestä nähdäksesi, mitä se tekee.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Laita äänesi mikkiin, jota jo käytät, niin Discordiin ja peleihin ei tarvitse muuttaa mitään",
   "Straight into my mic instead": "Suoraan mikkiini sen sijaan",
-  "your real voice": "oikean äänesi"
+  "your real voice": "oikean äänesi",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Lisää <b>Sovellukset</b>-välilehden (lähetä musiikkia tai peli streamiisi) ja <b>Streamaajan opas</b> (Stream Deck -näppäimet, chat-komennot).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Lisää <b>Laukaisimet</b>-välilehden: Onion Watch soittaa äänen, kun ruudulle tulee jotain (tappo, “YOU DIED”).",
+  "Competitive games": "Kilpapelit",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Kaikki välilehdet: myös <b>Radio</b>, <b>Sovellukset</b> ja <b>Laukaisimet</b>.",
+  "Just sounds": "Pelkät äänet",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Valitse lähin. Se päättää vain, millä välilehdillä aloitat: vaihda milloin vain kohdassa <b>Asetukset</b> → <b>Välilehdet</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Soita ääniä Stream Deckistä, kanavapisteillä ja chat-komennoilla",
+  "Play sounds in Discord and games. Nothing else to learn.": "Soita ääniä Discordissa ja peleissä. Ei muuta opeteltavaa.",
+  "Show me everything": "Näytä kaikki",
+  "Streaming": "Striimaus",
+  "What will you use Onion Board for?": "Mihin käytät Onion Boardia?"
 }

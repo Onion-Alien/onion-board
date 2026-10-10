@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board speelt je geluiden in je mic af, zodat mensen in Discord of je game ze net zo horen als jou.{gap}Voeg geluiden toe op het tabblad Geluiden, dubbelklik er dan op een of druk op de sneltoets. De balk onderaan toont je mic, wat anderen horen en je koptelefoon.{gap}Klik met rechts op een tabblad links en kies Over dit tabblad om te zien wat het doet.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Zet je geluiden in de mic die je al gebruikt, zodat Discord en games niets hoeven te veranderen",
   "Straight into my mic instead": "In plaats daarvan rechtstreeks in mijn mic",
-  "your real voice": "je echte stem"
+  "your real voice": "je echte stem",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Voegt het tabblad <b>Apps</b> toe (stuur muziek of een game naar je stream) en de <b>Streamer-gids</b> (Stream Deck-knoppen, chatcommando's).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Voegt het tabblad <b>Triggers</b> toe: Onion Watch speelt een geluid als er iets op je scherm verschijnt (een kill, “YOU DIED”).",
+  "Competitive games": "Competitieve games",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Alle tabbladen: ook <b>Radio</b>, <b>Apps</b> en <b>Triggers</b>.",
+  "Just sounds": "Alleen geluiden",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Kies wat het best past. Het bepaalt alleen met welke tabbladen je begint: verander het altijd via <b>Instellingen</b> → <b>Tabbladen</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Speel geluiden af via je Stream Deck, kanaalpunten en chatcommando's",
+  "Play sounds in Discord and games. Nothing else to learn.": "Speel geluiden af in Discord en games. Verder niets te leren.",
+  "Show me everything": "Laat me alles zien",
+  "Streaming": "Streamen",
+  "What will you use Onion Board for?": "Waarvoor ga je Onion Board gebruiken?"
 }

@@ -1416,7 +1416,7 @@
   "Stops every sound": "يوقف كل صوت",
   "Stops every sound, the radio and every program.": "يوقف كل صوت والراديو وكل برنامج.",
   "Straight into <b>your mic</b>: one click, and Discord and games hear your sounds through the mic they already use. Nothing to install from the internet, nothing to pick in Discord. (Or use a free <b>virtual cable</b> instead.)": "مباشرة إلى <b>الميكروفون الخاص بك</b> : بنقرة واحدة، وسيسمع Discord والألعاب أصواتك من خلال الميكروفون الذي يستخدمونه بالفعل. لا شيء يمكن تثبيته من الإنترنت، ولا شيء يمكن اختياره في Discord. (أو استخدم <b>كبلًا افتراضيًا</b> مجانيًا بدلاً من ذلك.)",
-  "Streamer guide": "دليل غاسل",
+  "Streamer guide": "دليل البث",
   "Streamer guide: play sounds from your Stream Deck and chat": "دليل Streamer - قم بتشغيل الأصوات من Stream Deck الخاص بك وقم بالدردشة",
   "Streamer guide…": "دليل الناقل…",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "البث أم استخدام أكثر من تطبيق؟ يحصل كل جهاز هنا على نسخة مما يسمعه الآخرون أيضًا: جهاز قياس الصوت، وجهاز يلتقطه OBS، وكابل ثانٍ، ومكبرات صوت...",
@@ -3269,5 +3269,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "يشغّل Onion Board أصواتك في الميكروفون، فيسمعها الناس في Discord أو في لعبتك كما يسمعونك.{gap}أضف أصواتًا في تبويب الأصوات، ثم انقر على أحدها مرتين أو اضغط مفتاحه المختصر. يعرض الشريط في الأسفل ميكروفونك وما يسمعه الآخرون وسماعاتك.{gap}انقر بزر الفأرة الأيمن على تبويب في اليسار واختر «عن هذا التبويب» لترى ما يفعله.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "ضع أصواتك في الميكروفون الذي تستخدمه أصلًا، فلا يحتاج Discord والألعاب إلى أي تغيير",
   "Straight into my mic instead": "مباشرة إلى الميكروفون بدلًا من ذلك",
-  "your real voice": "صوتك الحقيقي"
+  "your real voice": "صوتك الحقيقي",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "يضيف تبويب <b>التطبيقات</b> (أرسل الموسيقى أو لعبة إلى بثّك) و<b>دليل البث</b> (أزرار Stream Deck وأوامر الدردشة).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "يضيف تبويب <b>المحفّزات</b>: يشغّل Onion Watch صوتًا عندما يظهر شيء على شاشتك (قتل، “YOU DIED”).",
+  "Competitive games": "ألعاب تنافسية",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "كل التبويبات: <b>الراديو</b> و<b>التطبيقات</b> و<b>المحفّزات</b> أيضًا.",
+  "Just sounds": "أصوات فقط",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "اختر الأقرب. هذا يحدد فقط التبويبات التي تبدأ بها: غيّره في أي وقت من <b>الإعدادات</b> ← <b>علامات التبويب</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "شغّل الأصوات من Stream Deck ونقاط القناة وأوامر الدردشة",
+  "Play sounds in Discord and games. Nothing else to learn.": "شغّل الأصوات في Discord والألعاب. لا شيء آخر لتتعلمه.",
+  "Show me everything": "أرني كل شيء",
+  "Streaming": "البث",
+  "What will you use Onion Board for?": "لماذا ستستخدم Onion Board؟"
 }

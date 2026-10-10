@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Quick setup: on the very first launch the guide starts by asking what you'll use Onion
+  Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and a
+  *Streamer guide* button on the last step, *Competitive games* adds the Triggers tab
+  (Onion Watch), and *Show me everything* adds every tab. It's asked once only; Settings →
+  Tabs changes it later.
+
 ## 1.9.28 — 2026-10-10
 
 - AI voices: when the AI voice stops, the message says "Others now hear your real

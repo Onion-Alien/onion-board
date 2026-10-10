@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board seslerini mikrofonuna çalar, böylece Discord'daki ya da oyunundaki insanlar onları seni duydukları gibi duyar.{gap}Sesler sekmesinden ses ekle, sonra birine çift tıkla ya da kısayol tuşuna bas. Alttaki şerit mikrofonunu, başkalarının ne duyduğunu ve kulaklığını gösterir.{gap}Soldaki bir sekmeye sağ tıkla ve ne işe yaradığını görmek için Bu sekme hakkında'yı seç.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Seslerini zaten kullandığın mikrofona ver, böylece Discord'da ve oyunlarda hiçbir şeyi değiştirmen gerekmez",
   "Straight into my mic instead": "Onun yerine doğrudan mikrofonuma",
-  "your real voice": "gerçek sesini"
+  "your real voice": "gerçek sesini",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>Uygulamalar</b> sekmesini (yayınına müzik ya da oyun sesi gönder) ve <b>Yayıncı kılavuzu</b>'nu (Stream Deck tuşları, sohbet komutları) ekler.",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "<b>Tetikleyiciler</b> sekmesini ekler: ekranında bir şey belirince Onion Watch bir ses çalar (bir kill, “YOU DIED”).",
+  "Competitive games": "Rekabetçi oyunlar",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Tüm sekmeler: <b>Radyo</b>, <b>Uygulamalar</b> ve <b>Tetikleyiciler</b> de.",
+  "Just sounds": "Sadece sesler",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "En yakın olanı seç. Yalnızca hangi sekmelerle başlayacağını belirler: istediğin zaman <b>Ayarlar</b> → <b>Sekmeler</b> bölümünden değiştir.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Stream Deck, kanal puanları ve sohbet komutlarıyla ses çal",
+  "Play sounds in Discord and games. Nothing else to learn.": "Discord'da ve oyunlarda ses çal. Öğrenecek başka bir şey yok.",
+  "Show me everything": "Her şeyi göster",
+  "Streaming": "Yayın",
+  "What will you use Onion Board for?": "Onion Board'u ne için kullanacaksın?"
 }

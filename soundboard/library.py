@@ -387,6 +387,10 @@ class Config:
     ytdlp_auto_optin: bool = False
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
     setup_done: bool = False          # the quick-setup guide has been completed
+    # what the quick-setup guide's first page was told the app is for (USES in
+    # ui/setupwizard.py). "" = not asked yet: only a brand-new install starts so
+    # (first_start), so the question comes once, on the first launch
+    use_mode: str = "normal"
     # "Did you know?" tips (soundboard.tips): on / off, the ones shown, the day of the last
     tips_on: bool = True
     tips_seen: list = field(default_factory=list)
@@ -593,6 +597,7 @@ class Config:
         cfg.route = "mic"
         cfg.mic_first = True
         cfg.tabs_off = list(BASIC_TABS_OFF)   # a plain soundboard first; + More tabs adds them
+        cfg.use_mode = ""   # the guide asks what it's for (and adds the tabs that fit)
         return cfg
 
     def _restore_privacy(self):

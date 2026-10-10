@@ -2949,5 +2949,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board memainkan bunyi anda ke dalam mikrofon, jadi orang di Discord atau dalam permainan anda mendengarnya sama seperti mereka mendengar anda.{gap}Tambah bunyi di tab Bunyi, kemudian klik dua kali pada satu atau tekan kekunci pintasnya. Jalur di bawah menunjukkan mikrofon anda, apa yang orang lain dengar dan fon kepala anda.{gap}Klik kanan tab di sebelah kiri dan pilih Tentang tab ini untuk melihat fungsinya.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Masukkan bunyi anda ke mikrofon yang sudah anda guna, jadi Discord dan permainan tidak perlu diubah",
   "Straight into my mic instead": "Terus ke mikrofon saya",
-  "your real voice": "suara sebenar anda"
+  "your real voice": "suara sebenar anda",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Menambah tab <b>Aplikasi</b> (hantar muzik atau permainan ke strim anda) dan <b>Panduan penstrim</b> (kekunci Stream Deck, arahan sembang).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Menambah tab <b>Pencetus</b>: Onion Watch memainkan bunyi apabila sesuatu muncul di skrin anda (kill, “YOU DIED”).",
+  "Competitive games": "Permainan kompetitif",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Semua tab: <b>Radio</b>, <b>Aplikasi</b> dan <b>Pencetus</b> juga.",
+  "Just sounds": "Bunyi sahaja",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Pilih yang paling hampir. Ia hanya menentukan tab permulaan anda: tukar bila-bila masa di <b>Tetapan</b> → <b>Tab</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Mainkan bunyi daripada Stream Deck, mata saluran dan arahan sembang",
+  "Play sounds in Discord and games. Nothing else to learn.": "Mainkan bunyi dalam Discord dan permainan. Tiada lagi yang perlu dipelajari.",
+  "Show me everything": "Tunjukkan semua",
+  "Streaming": "Penstriman",
+  "What will you use Onion Board for?": "Untuk apa anda akan guna Onion Board?"
 }

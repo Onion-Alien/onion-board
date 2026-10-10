@@ -2949,5 +2949,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board phát âm thanh của bạn vào mic, nên mọi người trên Discord hay trong game nghe thấy chúng giống như nghe bạn nói.{gap}Thêm âm thanh ở thẻ Âm thanh, rồi nhấp đúp vào một cái hoặc bấm phím tắt của nó. Thanh ở dưới cùng cho thấy mic của bạn, những gì người khác nghe và tai nghe của bạn.{gap}Nhấp chuột phải vào một thẻ bên trái và chọn Về thẻ này để xem nó làm gì.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Đưa âm thanh vào chính mic bạn đang dùng, nên Discord và game không cần đổi gì",
   "Straight into my mic instead": "Thay vào đó đưa thẳng vào mic",
-  "your real voice": "giọng thật của bạn"
+  "your real voice": "giọng thật của bạn",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Thêm tab <b>Ứng dụng</b> (gửi nhạc hoặc âm thanh game vào stream) và <b>Hướng dẫn truyền phát</b> (phím Stream Deck, lệnh chat).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Thêm tab <b>Kích hoạt</b>: Onion Watch phát âm thanh khi có gì đó hiện trên màn hình (một mạng hạ gục, “YOU DIED”).",
+  "Competitive games": "Game đối kháng",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Mọi tab: cả <b>Radio</b>, <b>Ứng dụng</b> và <b>Kích hoạt</b>.",
+  "Just sounds": "Chỉ âm thanh",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Chọn cái gần nhất. Nó chỉ quyết định bạn bắt đầu với tab nào: đổi bất cứ lúc nào trong <b>Cài đặt</b> → <b>Tab</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Phát âm thanh từ Stream Deck, điểm kênh và lệnh chat",
+  "Play sounds in Discord and games. Nothing else to learn.": "Phát âm thanh trong Discord và game. Không cần học thêm gì.",
+  "Show me everything": "Cho tôi xem tất cả",
+  "Streaming": "Phát trực tiếp",
+  "What will you use Onion Board for?": "Bạn sẽ dùng Onion Board để làm gì?"
 }

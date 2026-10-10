@@ -3013,5 +3013,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spiller lydene dine inn i mikrofonen din, så folk på Discord eller i spillet ditt hører dem på samme måte som de hører deg.{gap}Legg til lyder på fanen Lyder, og dobbeltklikk så på en eller trykk hurtigtasten dens. Stripen nederst viser mikrofonen din, hva andre hører og hodetelefonene dine.{gap}Høyreklikk på en fane til venstre og velg Om denne fanen for å se hva den gjør.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Send lydene dine inn i mikrofonen du allerede bruker, så Discord og spill ikke trenger endringer",
   "Straight into my mic instead": "Rett inn i mikrofonen min i stedet",
-  "your real voice": "din ekte stemme"
+  "your real voice": "din ekte stemme",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Legger til fanen <b>Apper</b> (send musikk eller et spill til strømmen din) og <b>Streamerguide</b> (Stream Deck-knapper, chattekommandoer).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Legger til fanen <b>Triggere</b>: Onion Watch spiller en lyd når noe dukker opp på skjermen (en kill, “YOU DIED”).",
+  "Competitive games": "Konkurransespill",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Alle faner: også <b>Radio</b>, <b>Apper</b> og <b>Triggere</b>.",
+  "Just sounds": "Bare lyder",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Velg det som passer best. Det bestemmer bare hvilke faner du starter med: endre det når som helst i <b>Innstillinger</b> → <b>Faner</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Spill lyder fra Stream Deck, kanalpoeng og chattekommandoer",
+  "Play sounds in Discord and games. Nothing else to learn.": "Spill lyder i Discord og spill. Ingenting annet å lære.",
+  "Show me everything": "Vis meg alt",
+  "Streaming": "Strømming",
+  "What will you use Onion Board for?": "Hva skal du bruke Onion Board til?"
 }

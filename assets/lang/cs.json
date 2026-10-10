@@ -3077,5 +3077,16 @@
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board pouští tvoje zvuky do mikrofonu, takže je lidi na Discordu nebo ve hře slyší stejně jako tebe.{gap}Přidej zvuky na kartě Zvuky, pak na jeden dvakrát klikni nebo stiskni jeho zkratku. Pruh dole ukazuje tvůj mikrofon, co slyší ostatní, a tvoje sluchátka.{gap}Klikni pravým tlačítkem na kartu vlevo a vyber O této kartě, ať vidíš, k čemu je.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Pošli zvuky do mikrofonu, který už používáš, takže Discord ani hry nemusíš nijak měnit",
   "Straight into my mic instead": "Místo toho rovnou do mikrofonu",
-  "your real voice": "tvůj skutečný hlas"
+  "your real voice": "tvůj skutečný hlas",
+  "Adds the <b>Apps</b> tab (send music or a game to your stream) and the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Přidá kartu <b>Aplikace</b> (pošli hudbu nebo hru do streamu) a <b>Průvodce pro streamery</b> (tlačítka Stream Decku, příkazy v chatu).",
+  "Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something shows up on your screen (a kill, “YOU DIED”).": "Přidá kartu <b>Spouštěče</b>: Onion Watch zahraje zvuk, když se něco objeví na obrazovce (zabití, “YOU DIED”).",
+  "Competitive games": "Soutěžní hry",
+  "Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.": "Všechny karty: i <b>Rádio</b>, <b>Aplikace</b> a <b>Spouštěče</b>.",
+  "Just sounds": "Jen zvuky",
+  "Pick the closest one. It only decides which tabs you start with: change it any time in <b>Settings</b> → <b>Tabs</b>.": "Vyber, co sedí nejvíc. Rozhoduje jen o tom, s jakými kartami začneš: změnit to můžeš kdykoli v <b>Nastavení</b> → <b>Karty</b>.",
+  "Play sounds from your Stream Deck, channel points and chat commands": "Přehrávej zvuky ze Stream Decku, bodů kanálu a příkazů v chatu",
+  "Play sounds in Discord and games. Nothing else to learn.": "Přehrávej zvuky v Discordu a hrách. Nic dalšího se neučíš.",
+  "Show me everything": "Ukaž mi všechno",
+  "Streaming": "Streamování",
+  "What will you use Onion Board for?": "K čemu budeš Onion Board používat?"
 }
