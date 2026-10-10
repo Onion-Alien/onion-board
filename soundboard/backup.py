@@ -73,7 +73,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "net_off", "net_offline", "tor_bridges", "data", "stats_id",
                   "stats_sent", "stats_heard", "stats_tabs", "stats_problems_seen",
                   "stats_started", "stats_steps", "stats_used", "stats_plays", "stats_open_s",
-                  "tips_seen", "tip_day"}
+                  "stats_launches", "stats_version", "stats_pending", "tips_seen", "tip_day"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
                 "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold",
