@@ -15,8 +15,8 @@ from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QSignalBlocker, QSize, Qt,
-                            QTimer, QUrl, Signal)
+from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
+                            Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
@@ -891,15 +891,16 @@ class MainWindow(QMainWindow):
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
             self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
-        # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
+        # one ⓘ under the tabs: how the whole app works (a tab's own explanation is in
+        # its right-click menu)
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
-        self.btn_info.setProperty("railtext", _("About this tab"))
-        self.btn_info.setAccessibleName(_("About this tab"))
+        self.btn_info.setProperty("railtext", _("How it works"))
+        self.btn_info.setAccessibleName(_("How Onion Board works"))
         icons.set_icon(self.btn_info, "info", size=sidebar.ICON)
         self.btn_info.setCursor(Qt.PointingHandCursor)
-        self.btn_info.setToolTip(_("What's this tab for?"))
-        self.btn_info.clicked.connect(self._show_tab_info)
+        self.btn_info.setToolTip(_("How Onion Board works"))
+        self.btn_info.clicked.connect(self._show_app_info)
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
@@ -935,12 +936,13 @@ class MainWindow(QMainWindow):
                   self.rail.toggle, self.tabs):
             QWidget.setTabOrder(prev, w)
             prev = w
-        # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
+        # right-click a tab: what it's for, or hide it (+ More tabs or Settings > Tabs
+        # bring it back)
         for b in self.rail.buttons:
             b.customContextMenuRequested.connect(
                 lambda pos, b=b: self.tab_menu(b.index).exec(b.mapToGlobal(pos)))
-        # every tab has a line for the ⓘ (the Apps tab brings its own): one tab with
-        # the button and the rest without looked like a slip
+        # every tab has a line for its right-click "About this tab" (the Apps tab brings
+        # its own)
         self.tab_info.setdefault("sounds_page", (
             _("Your sounds"),
             _("Your pads. Add sounds with the button, by dropping files or folders here, "
@@ -968,10 +970,6 @@ class MainWindow(QMainWindow):
             _("Where your sounds go (straight into your mic, the virtual cable, another "
               "device or nobody), your devices, who's listening, the equalizer, and a "
               "test that records what goes out and plays it back.")))
-        self._update_info_btn = lambda *__: self.btn_info.setVisible(
-            self._current_tab_info() is not None)
-        self.tabs.currentChanged.connect(self._update_info_btn)
-        self._update_info_btn()
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
@@ -3422,7 +3420,6 @@ class MainWindow(QMainWindow):
             # the Onion Watch add-on, or Hoot and its download button until it's
             # installed; loaded by load_triggers
             v = TriggersTab(BoardHost(self), defer=True)
-            v.loaded.connect(lambda: self._update_info_btn())   # Onion Watch can arrive late
         v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
         return v
 
@@ -3481,6 +3478,10 @@ class MainWindow(QMainWindow):
         key = TAB_KEYS[i]
         menu = QMenu(self)
         menu.setAttribute(Qt.WA_DeleteOnClose)
+        if self._tab_info_at(i) is not None:
+            menu.addAction(icons.icon("info"), _("About this tab"),
+                           lambda: self._show_tab_info(i))
+            menu.addSeparator()
         if key in taboff.KEYS:
             act = menu.addAction(icons.icon("offline"), _("Hide this tab"))
             act.triggered.connect(lambda: self.hide_tab(key))
@@ -3527,7 +3528,6 @@ class MainWindow(QMainWindow):
         else:
             self._swap_tab(key)
         self.tabs.setTabVisible(i, self.tab_shown(key))
-        self._update_info_btn()
         self._update_more_tabs()
         log.info("tab %s switched %s", key, "on" if on else "off")
         if on:   # once per install, sent now (usage.py: a daily count could be a day off)
@@ -3588,7 +3588,6 @@ class MainWindow(QMainWindow):
             if not shown and self.tabs.currentIndex() == i:
                 self.tabs.setCurrentIndex(0)
             self.tabs.setTabVisible(i, shown)
-        self._update_info_btn()
         self._update_more_tabs()
 
     def _search_follow_switch(self):
@@ -3889,25 +3888,43 @@ class MainWindow(QMainWindow):
             self.register_hotkeys()   # the capture paused them
         free_dialog(d)
 
-    def _current_tab_info(self) -> tuple[str, str] | None:
-        page = self.tabs.currentWidget()
+    def _tab_info_at(self, i: int) -> tuple[str, str] | None:
+        page = self.tabs.widget(i)
         return next((v for k, v in self.tab_info.items() if getattr(self, k, None) is page),
                     None)
 
-    def _show_tab_info(self):
-        info = self._current_tab_info()
+    def _show_tab_info(self, i: int):
+        """A tab's right-click "About this tab": its explanation, next to the tab."""
+        info = self._tab_info_at(i)
         if info:
-            box = TabHelpPopup(*info, owl=self.tabs.currentWidget() is self.triggers,
-                               parent=self)
-            box.adjustSize()
-            anchor = self.btn_info.mapToGlobal(self.btn_info.rect().bottomRight())
-            screen = self.btn_info.screen().availableGeometry()
-            box.move(max(screen.left(), min(anchor.x() - box.width(),
-                                           screen.right() - box.width() + 1)),
-                     max(screen.top(), min(anchor.y() + 8,
-                                          screen.bottom() - box.height() + 1)))
-            box.exec()
-            box.deleteLater()
+            button = next((b for b in self.rail.buttons if b.index == i), self.tabs)
+            self._show_help(TabHelpPopup(*info, owl=self.tabs.widget(i) is self.triggers,
+                                         parent=self), button)
+
+    def _show_app_info(self):
+        """The rail's ⓘ: how the whole app works, in a few lines."""
+        self._show_help(TabHelpPopup(_("How Onion Board works"), _(
+            "Onion Board plays your sounds into your mic, so people in Discord or your "
+            "game hear them the same way they hear you.{gap}"
+            "Add sounds on the Sounds tab, then double-click one or press its hotkey. The "
+            "strip at the bottom shows your mic, what others hear and your headphones.{gap}"
+            "Right-click a tab on the left and pick About this tab to see what it does.",
+            gap="\n\n"),
+            parent=self), self.btn_info)
+
+    def _show_help(self, box: QDialog, beside: QWidget):
+        """Open a help card to the right of `beside` (a rail button), inside the
+        window: never off its left edge."""
+        box.layout().activate()   # wrapped text: as tall as the words need
+        box.resize(box.width(), box.heightForWidth(box.width()) if box.hasHeightForWidth()
+                   else box.sizeHint().height())
+        top_left = beside.mapToGlobal(QPoint(beside.width() + 8, 0))
+        area = self.geometry() & beside.screen().availableGeometry()
+        x = max(area.left(), min(top_left.x(), area.right() - box.width() + 1))
+        y = max(area.top(), min(top_left.y(), area.bottom() - box.height() + 1))
+        box.move(x, y)
+        box.exec()
+        box.deleteLater()
 
     # ------------------------------------------------------------------ language
     def _offer_language(self):
