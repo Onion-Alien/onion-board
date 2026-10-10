@@ -19,8 +19,8 @@ import sys
 import threading
 import time
 import uuid
-from dataclasses import asdict, dataclass, field
-from functools import lru_cache
+from dataclasses import asdict, dataclass, field, fields
+from functools import cache, lru_cache
 from pathlib import Path
 from typing import ClassVar
 
@@ -97,11 +97,19 @@ def fits_type(default, v) -> bool:
     return isinstance(v, type(default))
 
 
+@cache
+def field_names(cls) -> frozenset[str]:
+    """A dataclass's settings: its fields, not its ClassVars (which __dataclass_fields__
+    lists too, e.g. Config.read_only)."""
+    return frozenset(f.name for f in fields(cls))
+
+
 def _typed(raw: dict, defaults, what: str) -> dict:
     """Keep only raw's known fields whose type fits (floats given as ints become floats)."""
     out = {}
+    known = field_names(type(defaults))
     for k, v in raw.items():
-        if k not in type(defaults).__dataclass_fields__:
+        if k not in known:
             continue
         want = getattr(defaults, k)
         if not fits_type(want, v):

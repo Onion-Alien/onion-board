@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Importing a backup whose settings name `read_only` no longer stops the app saving
+  for the rest of the session (the imported sounds were gone after a restart), and a
+  settings file naming it is no longer set aside as damaged.
 - A pad's *Picture → From a link* no longer opens a file on this PC or a network share
   when the web page names one as its preview picture: only web pictures are fetched.
 - A Myinstants sound whose download was cut short is no longer added half-finished:
