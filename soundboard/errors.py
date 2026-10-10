@@ -274,13 +274,15 @@ def _describe(e: BaseException | str | None, downloader: bool) -> Problem:
             return Problem(words, detail)
         return Problem(_("The downloader ran into a problem: {error}", error=_short(cleaned))
                        if cleaned else _("The downloader ran into a problem."), detail, True)
+    # a device first: PortAudio's "Error opening OutputStream: ..." starts like
+    # libsndfile's "Error opening 'x.mp3': ...", and isn't about a sound file
+    if mod.startswith("sounddevice") or "PaErrorCode" in raw:
+        words = _match(_audio_device(), cleaned)
+        return Problem(words or _("The audio device reported a problem."), detail, not words)
     if mod.startswith("soundfile") or "libsndfile" in raw or raw.startswith("Error opening"):
         return Problem(_match(_audio_file(), cleaned)
                        or _("It isn't a sound file that can be read, or it's damaged."),
                        detail)
-    if mod.startswith("sounddevice") or "PaErrorCode" in raw:
-        words = _match(_audio_device(), cleaned)
-        return Problem(words or _("The audio device reported a problem."), detail, not words)
     import json
     import urllib.error
     import zipfile

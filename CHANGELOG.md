@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- When a mic or headphones won't open (for example while Windows' audio restarts),
+  the message now says it's the audio device, not "It isn't a sound file that can be
+  read, or it's damaged."
 - Importing a backup whose settings name `read_only` no longer stops the app saving
   for the rest of the session (the imported sounds were gone after a restart), and a
   settings file naming it is no longer set aside as damaged.
