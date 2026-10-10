@@ -2290,7 +2290,8 @@ class MainWindow(QMainWindow):
             self._prepare_all()
         self._device_job(plan, opened)
 
-    def set_route(self, route: str, device: str | None = None, by_hand: bool = False):
+    def set_route(self, route: str, device: str | None = None, by_hand: bool = False,
+                  attached: bool = False):
         """Setup -> Devices -> Send my sounds to: your mic, the virtual cable, another
         device (Voicemeeter, a mixer, a device OBS captures) or nobody (only you, and the
         stream output). `device`: send into that one too (the picker and the setup guide
@@ -2301,7 +2302,10 @@ class MainWindow(QMainWindow):
         if route not in library.ROUTES or (route == c.route and device is None):
             self._show_route()
             return
-        if route == "mic" and directmic.status(c.mic_device) != "ready":
+        # an older copy of the effect ('outdated') still works: picking the mic never
+        # asks for admin for it (the update stays optional). `attached`: it was just
+        # put on, and Windows may still be loading it; asking again would loop prompts.
+        if route == "mic" and not attached and not directmic.works(directmic.status(c.mic_device)):
             self._show_route()   # not attached yet: the picker stays put until it is
             self.attach_mic()
             return
@@ -2914,7 +2918,7 @@ class MainWindow(QMainWindow):
             self._settle_until = time.monotonic() + self.SETTLE_S
             QTimer.singleShot(int(self.SETTLE_S * 1000) + 200, self._update_status)
             self.cfg.route = "cable"   # so set_route() applies "mic" in full
-            self.set_route("mic")
+            self.set_route("mic", attached=True)
             from soundboard.ui.setupwizard import SetupWizard
             modal = QApplication.activeModalWidget()
             if not isinstance(modal, SetupWizard):

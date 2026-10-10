@@ -1350,7 +1350,9 @@ def apply(app, name: str, live: str | None = None) -> str:
     if live is not None:
         set_live(live)
     name = set_current(name)
-    _restyle(app, stylesheet(name))
+    css = stylesheet(name)
+    if app.styleSheet() != css:   # the same sheet again (a new window): nothing changes
+        _restyle(app, css)
     widgets = app.allWidgets()
     _recolour_inline(widgets, old)
     sheet = live_sheet()

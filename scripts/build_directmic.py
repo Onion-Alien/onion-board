@@ -19,7 +19,11 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "native" / "directmic"
 OUT = ROOT / "build" / "directmic"
 FLAGS = ["-O2", "-Wall", "-Wextra", "-static", "-static-libgcc", "-static-libstdc++",
-         "-fno-exceptions", "-s"]
+         "-fno-exceptions", "-s",
+         # the same source gives the same bytes: the app tells an older mic part by
+         # its bytes (directmic.same_dll), and a link-time stamp or a path-based image
+         # base made every build look like an update (an admin prompt each version)
+         "-Wl,--no-insert-timestamp", "-Wl,--disable-auto-image-base"]
 # the fuzz build: the same code, any undefined behaviour a fault (no runtime needed)
 FUZZ_FLAGS = [f for f in FLAGS if f != "-s"] + [
     "-g", "-DOBMIC_FUZZ", "-fsanitize=undefined,float-cast-overflow,float-divide-by-zero",
