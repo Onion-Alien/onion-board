@@ -2755,6 +2755,7 @@ class VoicePanel(QWidget):
         # the two columns; the other cards stack under whichever column is shorter
         # (_arrange), so an open card never leaves a hole beside a short one.
         pv.addStretch(1)                 # spare height goes under the cards, not between
+        self._has_saved_folds = isinstance(speech, dict) and "folded" in speech
         folded = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = {k for k in folded if isinstance(k, str)} \
             if isinstance(folded, list) else set()
@@ -2983,9 +2984,10 @@ class VoicePanel(QWidget):
         self._cards.append(f)
         f.installEventFilter(self)              # its size decides its column (_arrange)
         self._lcol.insertWidget(self._lcol.count() - 1, f)
-        head.set_open(False)                    # the tab opens with every card folded
-        panel.setVisible(False)                 # (what's folded is still saved, for
-        return f                                # older versions)
+        open_ = key not in self._folded if self._has_saved_folds else key == "fx"
+        head.set_open(open_)
+        panel.setVisible(open_)
+        return f
 
     def _fold(self, key: str, panel: QWidget, folded: bool):
         panel.setVisible(not folded)

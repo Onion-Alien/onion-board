@@ -619,7 +619,9 @@ def test_setup_stacks_long_controls_without_sideways_scrolling(window, qapp):
 
     window.cfg.route = "mic"
     window._update_flow()
-    window.btn_install.setText("Meine Sounds direkt in mein Mikro legen")
+    window.btn_install.setText("Meine Sounds direkt in mein Mikro legen für Discord und Spiele")
+    window.btn_install.setMinimumWidth(650)  # a long translated action
+    window.btn_install.show()
     # The offscreen test font needs wider cards than the shipped Segoe UI font.
     window._setup_cols.parentWidget().setMaximumWidth(1500)
     window.tabs.setCurrentWidget(window.setup_page)
@@ -1031,3 +1033,69 @@ def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
             menu.close()
             qapp.processEvents()
 
+
+
+@pytest.mark.parametrize("size", [(800, 600), (1180, 720)])
+def test_audit_normal_navigation_returns_from_mini(window, qapp, size):
+    window.show()
+    window.resize(360, 320)
+    qapp.processEvents()
+    assert window.is_mini()
+    window.resize(*size)
+    for _ in range(3):
+        qapp.processEvents()
+    for i in range(window.tabs.count()):
+        window.tabs.setCurrentIndex(i)
+        window._refit()
+        assert not window.is_mini()
+        assert window.rail.isVisibleTo(window)
+
+
+def test_audit_mini_mic_controls_share_the_mixer_state(window, qapp):
+    window.show()
+    window.resize(360, 320)
+    qapp.processEvents()
+    assert window.mini_connection.isVisibleTo(window)
+    assert window.mini_connection.text()
+    assert window.mini_connection.accessibleName() == window._pill_long
+    window.mini_mic.setChecked(False)
+    assert not window.cfg.mic_enabled and not window.chk_mic.isChecked()
+    assert window.mini_mic.text() == "Mic muted"
+    window.chk_mic.setChecked(True)
+    assert window.cfg.mic_enabled and window.mini_mic.isChecked()
+    window.mini_connection.click()
+    qapp.processEvents()
+    assert not window.is_mini() and window.tabs.currentWidget() is window.setup_page
+
+
+def test_audit_expanded_sidebar_labels_status(window, qapp):
+    window.show()
+    window.resize(1180, 720)
+    window.rail.set_open(True)
+    qapp.processEvents()
+    for button in (window.btn_air, window.mode_btn, window.stop_btn, window.pill):
+        if not button.isHidden():
+            assert button.text() and button.accessibleName()
+
+
+def test_audit_setup_routes_and_local_test_precede_advanced_controls(window, qapp):
+    window.show()
+    window.resize(1180, 720)
+    window.tabs.setCurrentWidget(window.setup_page)
+    qapp.processEvents()
+    view = window.setup_page.viewport()
+    for widget in (window.cb_mic, window.cb_route, window.btn_rec):
+        assert 0 <= widget.mapTo(view, QPoint()).y() < view.height()
+    assert "local" in window.btn_rec.text()
+    assert window.cb_route.mapTo(view, QPoint()).y() < window.eq.mapTo(view, QPoint()).y()
+
+
+def test_drop_target_keeps_the_full_board_width(window, qapp):
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    window.resize(1180, 720)
+    qapp.processEvents()
+    rect = window.grid.drop_area()
+    margins = window.grid.grid.contentsMargins()
+    assert rect is not None and rect.height() >= 90
+    assert rect.width() == window.grid.width() - margins.left() - margins.right() - 4

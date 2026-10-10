@@ -65,23 +65,16 @@ def test_sidebar_status_buttons_centered_when_extended(qapp):
         assert rail._status_pad_after.geometry().height() == 0
         assert b1.geometry().x() == b2.geometry().x() == b3.geometry().x()
 
-        # Extended: centered horizontally
+        # Expanded: each action gets its own readable row.
         rail.set_open(True)
         qapp.processEvents()
         vis = [b for b in rail.status if b.isVisible()]
-        # inside the rail's 1px edge border (contentsRect), or that pixel counts as a gap
-        box = rail.contentsRect()
-        left_gap = vis[0].geometry().left() - box.left()
-        right_gap = box.right() - vis[-1].geometry().right()
-        assert abs(left_gap - right_gap) <= 1
-
-        # Mirrored (RTL)
+        assert vis[0].geometry().bottom() < vis[1].geometry().top()
+        assert all(b.width() > 100 for b in vis)
+        assert vis[0].geometry().x() == vis[1].geometry().x()
         rail.setLayoutDirection(Qt.RightToLeft)
         qapp.processEvents()
-        box = rail.contentsRect()
-        left_gap_rtl = vis[-1].geometry().left() - box.left()
-        right_gap_rtl = box.right() - vis[0].geometry().right()
-        assert abs(left_gap_rtl - right_gap_rtl) <= 1
+        assert vis[0].geometry().x() == vis[1].geometry().x()
     finally:
         host.close()
 

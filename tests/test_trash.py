@@ -143,7 +143,7 @@ def test_a_removed_destination_mode_can_be_undone(window):  # noqa: F811
     dlg.accept()
 
 
-def test_removing_from_the_menu_asks_first_and_the_bin_button_shows(window, monkeypatch):  # noqa: F811
+def test_removing_from_the_menu_asks_first_and_deleted_sounds_stay_in_library(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QMessageBox
     assert window.btn_bin.isHidden()
     monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Cancel)
@@ -151,7 +151,11 @@ def test_removing_from_the_menu_asks_first_and_the_bin_button_shows(window, monk
     monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
     assert window.ask_remove(["s0"]) and window.meta("s0") is None
     window._finish_removals()
-    assert not window.btn_bin.isHidden() and window.btn_bin.text() == "Recently deleted (1)"
+    assert window.btn_bin.isHidden()
+    assert len(trash.items()) == 1
+    deleted = next(a for a in window.btn_more.menu().actions()
+                   if a.text() == "Recently deleted sounds…")
+    assert deleted.isEnabled() and deleted.isVisible()
 
 
 def test_a_locked_bin_list_is_never_saved_over(app_dir, monkeypatch):

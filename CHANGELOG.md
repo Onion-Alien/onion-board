@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Mini player shows connection status and a microphone mute switch. Expanded sidebar
+  actions have labels; Setup puts devices and the local mix test first. Sounds groups
+  library tools, Voice opens its presets on first visit, and secondary text reads more
+  clearly. The full-width drop target is preserved.
+
 - YouTube and YouTube Music searches are about a second faster after the first one:
   YouTube's page settings are kept for an hour instead of being fetched before every
   search (Direct connection only; if a search with them fails, it's done again the old

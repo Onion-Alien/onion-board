@@ -395,6 +395,13 @@ def _add_hover_token(t: dict[str, str]) -> None:
 
 
 for _t in THEMES.values():
+    # Secondary text must read on the brightest surface used behind it.
+    for key in ("muted", "faint"):
+        _t[key] = next(c for c in (_mix(_t[key], _t["text_hi"], i / 20)
+                                  for i in range(21))
+                       if min(_contrast(c, _t[bg]) for bg in
+                              ("bg", "panel", "card", "card_hi", "btn")) >= 4.5
+                       or c == _t["text_hi"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
 
@@ -602,7 +609,7 @@ QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
 QPushButton#onair:checked { background:$live; border:1px solid transparent; color:$on_live; }
 QPushButton#onair:checked:hover { background:$live_hi; }
 QWidget#decktop { background:transparent; }
-QLabel#decktitle { color:$muted; font-size:9pt; font-weight:600; }
+QLabel#decktitle { color:$text; font-size:9pt; font-weight:600; }
 QLabel#statusnote { background:$card_hi; color:$text; border-radius:8px; padding:6px 10px; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
 QAbstractSpinBox { background:$bg; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
@@ -651,6 +658,7 @@ QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
 QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:17px; padding:0; }
+QPushButton#transport_play[mini="true"] { border-radius:14px; }
 QPushButton#transport_play:hover { background:$accent_hi; }
 QPushButton#transport_play:pressed { background:$accent; }
 QPushButton#transport_play:disabled { background:$btn; border:1px solid $border; }
@@ -658,7 +666,7 @@ QPushButton#transport_stop { background:$btn; border:1px solid $border; border-r
 QPushButton#transport_stop:hover { background:$btn_hover; border-color:$danger_text; }
 QPushButton#transport_stop:pressed { background:$btn_press; }
 QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border; }
-QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
+QSlider#seek::groove:horizontal { margin:0 8px; height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
@@ -691,6 +699,9 @@ QPushButton::menu-indicator:open { image:url("$up"); }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$muted; border-radius:2px; }
 QSlider#seek::sub-page:horizontal { background:$accent; }
+QSlider#seek::sub-page:horizontal:disabled { background:$groove; }
+QSlider#seek::handle:horizontal { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:-4px 0; border-radius:7px; }
+QSlider#seek::handle:horizontal:disabled { background:$off; }
 QSlider::handle:horizontal { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
 /* room for the whole handle: Qt sizes a slider to its groove, which cut the circle's top
    and bottom off flat */
@@ -1016,7 +1027,7 @@ def _grain_image(light: bool, size: int = 96) -> QImage:
     rng = random.Random(7)
     img = QImage(size, size, QImage.Format_ARGB32)
     img.fill(Qt.transparent)
-    peak = 7 if light else 10
+    peak = 3
     for y in range(size):
         for x in range(size):
             a = rng.randint(0, peak)
@@ -1035,7 +1046,7 @@ def _grain_url(light: bool) -> str:
     if url := _grain_urls.get(light):
         return url
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"
-    path = folder / f"grain-{'light' if light else 'dark'}.png"
+    path = folder / f"grain-soft-{'light' if light else 'dark'}.png"
     try:
         folder.mkdir(exist_ok=True)
         if not path.exists():

@@ -19,7 +19,8 @@ from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignal
                             Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
+                               QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
@@ -1023,6 +1024,7 @@ class MainWindow(QMainWindow):
         top.setSpacing(6)
         self.mini_pp = QPushButton()
         self.mini_pp.setObjectName("transport_play")
+        self.mini_pp.setProperty("mini", True)
         self.mini_pp.setToolTip(_("Play / pause"))
         self.mini_pp.clicked.connect(self.toggle_play_pause)
         self.mini_st = QPushButton()
@@ -1064,6 +1066,7 @@ class MainWindow(QMainWindow):
         self.mini_seek = SeekSlider(Qt.Horizontal)
         self.mini_seek.setRange(0, 1000)
         self.mini_seek.setObjectName("seek")
+        self.mini_seek.setFixedHeight(24)
         self.mini_seek.sliderPressed.connect(lambda: setattr(self, "_seeking", True))
         self.mini_seek.sliderReleased.connect(lambda: self.do_seek(self.mini_seek))
         self.mini_seek.valueChanged.connect(self._seek_preview)
@@ -1074,9 +1077,39 @@ class MainWindow(QMainWindow):
         steady_number(self.mini_time, "00:00 / 00:00")
         bottom.addWidget(self.mini_time)
         cv.addLayout(bottom)
+        connection = QHBoxLayout()
+        self.mini_connection = QPushButton()
+        self.mini_connection.setObjectName("pill")
+        self.mini_connection.setMinimumWidth(0)
+        self.mini_connection.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        self.mini_connection.clicked.connect(self._mini_setup)
+        connection.addWidget(self.mini_connection, 1)
+        self.mini_mic = QPushButton()
+        self.mini_mic.setCheckable(True)
+        self.mini_mic.setFixedHeight(28)
+        self.mini_mic.setToolTip(_("Mute or unmute your microphone for others"))
+        self.mini_mic.toggled.connect(self.on_mic_toggle)
+        connection.addWidget(self.mini_mic)
+        cv.addLayout(connection)
         v.addWidget(card)
+        self._sync_mini_mic()
         icons.set_icon(self.mini_pp, "play", "on_accent", size=16)
         return page
+
+    def _mini_setup(self):
+        self.resize(max(800, self.width()), max(600, self.height()))
+        self.tabs.setCurrentWidget(self.setup_page)
+        self._refit()
+
+    def _sync_mini_mic(self):
+        if not hasattr(self, "mini_mic"):
+            return
+        on = self.cfg.mic_enabled
+        with QSignalBlocker(self.mini_mic), QSignalBlocker(self.chk_mic):
+            self.mini_mic.setChecked(on)
+            self.chk_mic.setChecked(on)
+        self.mini_mic.setText(_("Mic on") if on else _("Mic muted"))
+        self.mini_mic.setAccessibleName(self.mini_mic.text())
 
     def _set_np_name(self, text: str):
         self.np_name.setText(self.np_name.fontMetrics().elidedText(text, Qt.ElideRight, 186))
@@ -1096,7 +1129,7 @@ class MainWindow(QMainWindow):
         # labelled inline (a title row over each box made the strip twice as tall)
         f = QFrame()
         f.setObjectName("deck")
-        h = QHBoxLayout(f)
+        h = self._mixer_layout = QHBoxLayout(f)
         h.setContentsMargins(12, 6, 12, 6)
         h.setSpacing(14)
         self.mixer = f
@@ -1141,6 +1174,7 @@ class MainWindow(QMainWindow):
                                 "OBS…): your mic plus whatever is live"))
         self.out_meter = Meter()
         self.out_meter.setMinimumWidth(60)
+        self.out_meter.setMaximumWidth(280)
         self.out_meter.setToolTip(_("Level of what others receive (Discord, the game, OBS…)"))
         row.addWidget(self.out_meter, 1)
         self.btn_check = QPushButton(_("Hear what they hear"))
@@ -1215,7 +1249,7 @@ class MainWindow(QMainWindow):
                                  "what's typed (or press Enter), play or add the audio"))
         icons.set_icon(self.btn_yt, "browser", size=18)
         self.btn_yt.clicked.connect(self.search_youtube)
-        more = self.btn_more = QPushButton(_("Backup"))
+        more = self.btn_more = QPushButton(_("Library"))
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
                           "sound pack"))
         icons.set_icon(more, "archive", size=18)
@@ -1264,15 +1298,20 @@ class MainWindow(QMainWindow):
         km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
         self.btn_keys.setMenu(km)
         self.btn_keys.setProperty("toolbarMenu", True)
+        km.setTitle(_("Quick hotkeys"))
+        mm.addSeparator()
+        mm.addMenu(km)
+        for utility in (self.btn_folder, self.btn_keys, self.btn_bin):
+            utility.setParent(page)
+            utility.hide()
         # make things, find things, then the library's tools
         tb.addWidget(add)
         tb.addWidget(self.btn_record)
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
-        tb.addWidget(self.btn_folder)
+        tb.addWidget(vsep())
         tb.addWidget(more)
-        tb.addWidget(self.btn_keys)
-        tb.addWidget(self.btn_bin)
+        tb.addWidget(vsep())
         # the pads' order (as dragged, A-Z, newest, most played) and cards or a list
         self.btn_view = QPushButton()
         self.btn_view.setAccessibleName(_("Order and view"))
@@ -1437,6 +1476,7 @@ class MainWindow(QMainWindow):
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
         self._name_seek = NameAndSeek(self.np_name, self.seek, 190)
+        self._name_seek.setMaximumWidth(720)
         th.addWidget(self._name_seek, 1)
         th.addWidget(self.np_time)
         # only for a pad made from a video (soundboard.videos): shows it in step
@@ -1459,7 +1499,8 @@ class MainWindow(QMainWindow):
         th.addWidget(self.speed_btn)
         sep = vsep()
         th.addWidget(sep)
-        vol_icon = icon_label("volume", _("Volume of all your sounds"))
+        vol_icon = QLabel(_("Sounds"))
+        vol_icon.setObjectName("decktitle")
         th.addWidget(vol_icon)
         self.vol_sound = VolumeControl(c.sound_vol, tip=_("How loud your sounds are, type up to "
                                                           "1000% in the box"))
@@ -1604,7 +1645,14 @@ class MainWindow(QMainWindow):
         page.setFrameShape(QFrame.NoFrame)
         body = QWidget()
         inner = capped(body, margins=(4, 12, 8, 12))   # not a 900 px wide card at full screen
-        cols = self._setup_cols = QHBoxLayout(body)
+        sections = QVBoxLayout(body)
+        sections.setContentsMargins(0, 0, 0, 0)
+        sections.setSpacing(16)
+        routing = self._setup_top = QHBoxLayout()
+        routing.setSpacing(16)
+        sections.addLayout(routing)
+        cols = self._setup_cols = QHBoxLayout()
+        sections.addLayout(cols)
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
@@ -1742,8 +1790,7 @@ class MainWindow(QMainWindow):
         guide.clicked.connect(self.run_setup)
         chat.addWidget(guide)
         hv.addLayout(chat)
-        lcol.addWidget(howcard)
-        lcol.addWidget(helpcard)
+
 
         # ---- devices
         devcard, av = card(_("Devices"), _("Already set up for you, only change these if "
@@ -1775,6 +1822,10 @@ class MainWindow(QMainWindow):
             cb.setMinimumContentsLength(16)
         grid.setColumnStretch(3, 1)   # the room past the boxes, not the boxes' column
         av.addLayout(grid)
+        self.setup_connection = QLabel()
+        self.setup_connection.setObjectName("hint")
+        self.setup_connection.setWordWrap(True)
+        av.addWidget(self.setup_connection)
         self.cb_main.setParent(devcard)   # never a window of its own
         self.cb_main.hide()
         # more places at once (streamers): a row per extra device, + and − (alsosend)
@@ -1799,7 +1850,9 @@ class MainWindow(QMainWindow):
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: self.rescan_with_feedback(ref))
         av.addWidget(ref, 0, Qt.AlignLeft)
-        lcol.addWidget(devcard)
+        routing.addWidget(devcard, 1)
+        lcol.addWidget(howcard)
+        lcol.addWidget(helpcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
@@ -1812,11 +1865,13 @@ class MainWindow(QMainWindow):
         lcol.addStretch(1)
 
         # ---- test
-        testcard, tv = card(_("Test it"), _("Talk while a sound plays. Records what goes out "
-                                            "to others (what Discord, the game or OBS "
-                                            "receives), plays it back, and tells you if your "
-                                            "voice + sounds are in it."), roomy=True)
-        self.btn_rec = QPushButton(_("Record 6s → play back"))
+        testcard, tv = card(_("Test your local mix"),
+                            _("Talk while a sound plays. Record the outgoing mix here and "
+                              "play it back in your headphones to check voice and sounds. "
+                              "Then use your chat app's microphone test to confirm it "
+                              "receives the audio."), roomy=True)
+        tv.setAlignment(Qt.AlignTop)
+        self.btn_rec = QPushButton(_("Record local mix for 6s"))
         self.btn_rec.setObjectName("primary")
         icons.set_icon(self.btn_rec, "record", "on_accent")
         self.btn_rec.clicked.connect(self.start_test)
@@ -1829,15 +1884,15 @@ class MainWindow(QMainWindow):
         self.test_result.setObjectName("resultbox")
         self.test_result.hide()
         tv.addWidget(self.test_result)
-        rcol.addWidget(testcard)
+        routing.addWidget(testcard, 1)
 
         # ---- sound shaping
         eqcard, ev = card(roomy=True)
         self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains)
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
-        rcol.addWidget(eqcard)
         rcol.addWidget(destcard)
+        rcol.addWidget(eqcard)
         utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
@@ -2528,6 +2583,7 @@ class MainWindow(QMainWindow):
         way (the meter, the tests and live voice-to-speech still hear it); this only
         decides whether it's mixed into what others get."""
         self.set_option("mic_enabled", b)
+        self._sync_mini_mic()
         self._update_status()
 
     def _update_status(self):
@@ -2848,6 +2904,21 @@ class MainWindow(QMainWindow):
                         else _("Not connected: click to fix"))
             pills.append(pill)
         pill_short, pill = pills
+        self.setup_connection.setText(pill)
+        self.setup_connection.setProperty("tone", "ok" if state in ("ok", "off") else "warn")
+        self.setup_connection.style().unpolish(self.setup_connection)
+        self.setup_connection.style().polish(self.setup_connection)
+        if hasattr(self, "mini_connection"):
+            route_name = (_("My mic") if route == "mic" else
+                          _("Only you") if state == "off" else _("Output"))
+            self.mini_connection.setText(_("{route}: {status}",
+                                          route=route_name, status=pill_short))
+            self.mini_connection.setToolTip(pill)
+            self.mini_connection.setAccessibleName(pill)
+            self.mini_connection.setProperty("state", "ok" if state in ("ok", "off")
+                                              else "warn")
+            self.mini_connection.style().unpolish(self.mini_connection)
+            self.mini_connection.style().polish(self.mini_connection)
         good = state in ("ok", "off")
         if good != self._pill_good:
             # all set: Live says it, so the pill only shows when something needs a click
@@ -3566,7 +3637,7 @@ class MainWindow(QMainWindow):
                 self._tab_steps[key] = new.fit_steps()
                 self._fit.extend(self._tab_steps[key])
             if key == "voice":
-                self._stack_cols = (self._stack_cols[0], *new.stack_steps())
+                self._stack_cols = (*self._stack_cols[:2], *new.stack_steps())
             self._refit()
 
     def _follow_switches(self):
@@ -5946,13 +6017,13 @@ class MainWindow(QMainWindow):
         self._packs_removed.clear()
 
     def _label_bin(self):
-        """The "Recently deleted (n)" button: there while the bin has sounds in it."""
+        """Keep the compatibility button's count; Library holds the visible action."""
         n = len(trash.items(trash.SOUND))
         self.btn_bin.setText(_("Recently deleted ({n})", n=n))
-        self.btn_bin.setVisible(n > 0)
+        self.btn_bin.hide()   # Recently deleted is in the Library menu
 
     def show_deleted(self):
-        """Backup → Recently deleted sounds…"""
+        """Library → Recently deleted sounds…"""
         from soundboard.ui.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self)
@@ -7528,7 +7599,7 @@ class MainWindow(QMainWindow):
                 e.cancel_test_record()
                 self._stop_capture()
                 self.btn_rec.setEnabled(True)
-                self.btn_rec.setText(_("Record 6s → play back"))
+                self.btn_rec.setText(_("Record local mix for 6s"))
                 self.test_result.setText(_("<span style='color:{status}'>The test stopped: the "
                                            "send device's output went away. Check Devices and "
                                            "try again.</span>", status=theme.status('error')))
@@ -7543,7 +7614,7 @@ class MainWindow(QMainWindow):
         elif self._rec_playing and "__test__" not in playing:
             self._rec_playing = False
             self.btn_rec.setEnabled(True)
-            self.btn_rec.setText(_("Record 6s → play back"))
+            self.btn_rec.setText(_("Record local mix for 6s"))
 
         # auto push-to-talk: hold the game's PTT key only while a sound (or live
         # radio / a program) goes out. _ptt_held remembers exactly which key we pressed, so it's
@@ -7744,20 +7815,20 @@ class MainWindow(QMainWindow):
         f.add(14, "w", r.hide(self.np_time))
         f.add(45, "w", r.hide(self.speed_btn))
         f.add(30, "w", r.hide(self.chk_monitor))
-        f.add(28, "w", r.icon_only(self.chk_mic))   # its tooltip still explains it
         f.add(55, "w", r.hide(*self._mixer_hp))
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.icon_only(self.btn_add))
         # a bare red dot read as a warning light, so Record keeps its word until the
         # folder, Backup and the Listening dropdown have gone
-        f.add(39, "w", r.icon_only(self.btn_record))
+        f.add(65, "w", r.icon_only(self.btn_record))
         # the search box keeps room to type in until the buttons beside it have shrunk
         f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
                                       r.touch(self.search)))
-        f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
-        f.add(15, "w", r.icon_only(self.btn_folder))
-        f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
+        f.add(63, "w", lambda tight: (
+            self.btn_yt.setVisible(not tight and self.ytresults.available()),
+            r.touch(self.btn_yt)))
+        f.add(64, "w", r.icon_only(self.btn_more))
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
@@ -7767,10 +7838,10 @@ class MainWindow(QMainWindow):
         # height: the status line, then the whole mixer strip
         f.add(5, "h", self.rail.compact)   # the rail's buttons closer together, first
         f.add(10, "h", self.status.set_room)
-        f.add(30, "h", r.hide(*self._deck_titles))
         f.add(40, "h", r.hide(self.mixer))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
-        self._stack_cols = (r.stack(self._setup_cols), *self.voice.stack_steps())
+        self._stack_cols = (r.stack(self._setup_cols), r.stack(self._setup_top),
+                            *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
 
     def _show_pill(self):
@@ -7785,20 +7856,23 @@ class MainWindow(QMainWindow):
             # hidden page's sizes go stale and it stayed the mini player at sizes the
             # whole window fits (nothing is painted before this returns)
             self._set_mini(False)
+            responsive.touch(self._pads_scroll)
             # room for a whole row of pads comes before the mixer, the status line and
             # the rest: without it they kept their room and the pads got a slit
             self._pads_scroll.setMinimumHeight(self.grid.row_height())
+            self._mixer_layout.setDirection(QBoxLayout.TopToBottom if self.width() < 1050
+                                            else QBoxLayout.LeftToRight)
             narrow = self.width() < 860   # two cards side by side get cramped below this
             # Translated controls can need more room than the fixed breakpoint.
             # Measure both Setup columns even while they are stacked, so growing
             # the window brings them back only when neither will be clipped.
-            cols = self._setup_cols
             margins = self.setup_page.widget().layout().contentsMargins()
             room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            room = min(room, cols.parentWidget().maximumWidth())
-            need_cols = sum(cols.itemAt(i).minimumSize().width() for i in range(cols.count()))
-            self._stack_cols[0](narrow or need_cols + cols.spacing() > room)
-            for apply in self._stack_cols[1:]:
+            for i, cols in enumerate((self._setup_cols, self._setup_top)):
+                available = min(room, cols.parentWidget().maximumWidth())
+                needed = sum(cols.itemAt(j).minimumSize().width() for j in range(cols.count()))
+                self._stack_cols[i](narrow or needed + cols.spacing() > available)
+            for apply in self._stack_cols[2:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
             mini = need.width() > size.width() or need.height() > size.height()
