@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Radio: the map's corners are smoothly rounded like the stations card, not cut into
+  little steps.
+
 - Themes use clean, flat cards and a faint accent glow, without window grain,
   dark background fades or panel textures. High Contrast keeps its strong outlines.
 

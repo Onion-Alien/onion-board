@@ -23,8 +23,8 @@ import time
 
 import numpy as np
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, Signal
-from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QPainter, QPainterPath, QPen,
-                           QPixmap, QTransform)
+from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath,
+                           QPen, QPixmap, QTransform)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QToolTip,
                                QVBoxLayout, QWidget)
 
@@ -161,6 +161,7 @@ class FlatMap(QWidget):
         self._lon = np.zeros(0)
         self._lat = np.zeros(0)
         self._r = np.zeros(0)           # dot radius before zoom
+        self._buf: QImage | None = None  # the map drawn before its corners are rounded
         self._fan = np.zeros((0, 2))    # where a stacked dot goes round its spot (SPREAD_PX)
         self._current: str | None = None
         self._hover = -1
@@ -889,16 +890,36 @@ class FlatMap(QWidget):
         p.drawPixmap(0, 0, self._names_pic[1])
 
     def paintEvent(self, _e):
+        # Rounded like the stations card beside it. A clip path or a widget mask is
+        # all-or-nothing per pixel, so its corners come out as stairs: draw the map
+        # into a picture, cut the corners out of that with a smooth (antialiased)
+        # rounded shape, then put the picture on screen.
         self._clamp()
         dpr = self.devicePixelRatioF()
+        size = self.size() * dpr
+        buf = self._buf
+        if buf is None or buf.size() != size or buf.devicePixelRatio() != dpr:
+            buf = self._buf = QImage(size, QImage.Format_ARGB32_Premultiplied)
+            buf.setDevicePixelRatio(dpr)
+        buf.fill(Qt.transparent)
+        q = QPainter(buf)
+        self._paint(q, dpr)
+        corners = QPainterPath()   # odd-even fill: the box minus the rounded card
+        corners.addRect(QRectF(self.rect()))
+        corners.addRoundedRect(QRectF(self.rect()), CORNER_PX, CORNER_PX)
+        q.setRenderHint(QPainter.Antialiasing)
+        q.setClipping(False)
+        q.resetTransform()
+        q.setCompositionMode(QPainter.CompositionMode_DestinationOut)
+        q.fillPath(corners, QColor(0, 0, 0))
+        q.end()
         p = QPainter(self)
+        p.drawImage(0, 0, buf)
+        p.end()
+
+    def _paint(self, p: QPainter, dpr: float):
         t = theme.T
-        card = QPainterPath()   # rounded like the stations card beside it
-        card.addRoundedRect(QRectF(self.rect()), CORNER_PX, CORNER_PX)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.fillPath(card, QColor(t["bg"]))
-        p.setRenderHint(QPainter.Antialiasing, False)
-        p.setClipPath(card)
+        p.fillRect(self.rect(), QColor(t["bg"]))
         cur = self._level()
         slots = self._slots(cur)
         shown = [(self._tile_rect(cur, k, i, j).topLeft(), self._tiles.get((cur, i, j)))
@@ -948,7 +969,6 @@ class FlatMap(QWidget):
             p.drawRoundedRect(box, 8, 8)
             p.setPen(QColor(t["text"]))
             p.drawText(area, flags, self._msg)
-        p.end()
 
     # ------------------------------------------------------------------ input
     def _hit(self, pos: QPointF) -> int:
