@@ -505,8 +505,31 @@ def save_freeze(seconds: float, stack: str) -> Path | None:
     text = "\n".join([f"Onion Board froze for {seconds:.0f} s",
                       f"Version:  {__version__}",
                       f"Time:     {time.strftime('%Y-%m-%d %H:%M:%S')}",
+                      f"Lasted:   {FREEZE_NOT_ENDED}",
                       "", "What it was doing", "-----------------", stack])
     return _save(Report(title="froze", text=scrub(text), fatal=False))
+
+
+FREEZE_NOT_ENDED = "still frozen"   # until note_freeze_end; left if the app never came back
+
+
+def note_freeze_end(path: Path | None, seconds: float):
+    """Write how long a saved freeze lasted in all on its `Lasted:` line, once the
+    window answers again. The file keeps its old time, so a report already counted
+    (usage.py reads the ones newer than the last send) isn't counted again. Left
+    saying FREEZE_NOT_ENDED: the app was ended while frozen (or never came back)."""
+    if path is None:
+        return
+    try:
+        st = path.stat()
+        text = path.read_text(encoding="utf-8")
+        new = text.replace(f"Lasted:   {FREEZE_NOT_ENDED}", f"Lasted:   {seconds:.0f} s", 1)
+        if new == text:
+            return
+        path.write_text(new, encoding="utf-8")
+        os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
+    except OSError:
+        log.debug("couldn't note how long the freeze lasted", exc_info=True)
 
 
 def _offer(rep: Report, sig: tuple):

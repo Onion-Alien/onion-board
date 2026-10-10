@@ -141,9 +141,12 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
 
 def settings_of(cfg: Config) -> dict:
     """The app's settings as they're exported: everything except LOCAL_SETTINGS, plus
-    the voice changer's saved voices (kept in a file of their own, savedvoices.py)."""
+    the voice changer's saved voices (kept in a file of their own, savedvoices.py).
+    Only settings this version knows: a newer version's that config.json keeps
+    (Config._raw_extra) could be private to this PC, and a backup may be shared."""
     raw = cfg.to_raw()
-    out = {k: v for k, v in raw.items() if k not in LOCAL_SETTINGS}
+    known = {f.name for f in fields(Config)}
+    out = {k: v for k, v in raw.items() if k in known and k not in LOCAL_SETTINGS}
     if voices := savedvoices.saved():
         out[SAVED_VOICES] = voices
     return out
