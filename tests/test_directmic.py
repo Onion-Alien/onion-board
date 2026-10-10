@@ -108,7 +108,8 @@ def test_a_second_board_backs_off(ring_file, monkeypatch):
     first.start()
     try:
         time.sleep(0.05)
-        other = os.getpid() + 1
+        real_getpid = dm.os.getpid
+        other = real_getpid() + 1
         monkeypatch.setattr(dm.os, "getpid", lambda: other)   # another process
         with pytest.raises(RuntimeError, match="Another Onion Board"):
             dm.DirectMicStream(lambda out, *a: out.fill(0.1), ring_file)
@@ -116,7 +117,9 @@ def test_a_second_board_backs_off(ring_file, monkeypatch):
         assert w._get("enabled") == 1   # the first one's ring was left alone
         w.close(owner=False)
     finally:
-        monkeypatch.undo()
+        # just this patch: monkeypatch's undo also drops every fixture's (the real
+        # %APPDATA% guard's too)
+        monkeypatch.setattr(dm.os, "getpid", real_getpid)
         first.close()
     monkeypatch.setattr(dm.os, "getpid", lambda: other)
     second = dm.DirectMicStream(lambda out, *a: out.fill(0.1), ring_file)   # first gone

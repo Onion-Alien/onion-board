@@ -422,6 +422,7 @@ def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  #
     from soundboard import theme
     d = SettingsDialog(window, "appearance")
     # a colour change restyles only what's drawn in it: the whole app took seconds
+    real_stylesheet = theme.stylesheet
     monkeypatch.setattr(theme, "stylesheet", lambda *a: pytest.fail("whole-app restyle"))
     try:
         assert d.hue_now.text() == f"Now: {theme.current_name}'s own colour."
@@ -447,7 +448,9 @@ def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  #
         assert window.cfg.live_color == "" and theme.T["live"] == theme.T["accent"]
         assert theme.T["accent"] in window.btn_air.styleSheet()
     finally:
-        monkeypatch.undo()
+        # just this patch: monkeypatch's undo also dropped the fixtures' temp app folder,
+        # so the reset below saved the test board into the real %APPDATA%\OnionBoard
+        theme.stylesheet = real_stylesheet
         window.set_live_color("")
         d.close()
 
