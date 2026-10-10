@@ -63,6 +63,12 @@ if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ 
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 
+# One C++ runtime: PyInstaller can bundle an older msvcp140.dll from this PC next to
+# the newer one PySide6 ships, and if Windows loads the older one Qt can't start ("DLL
+# load failed while importing QtWidgets: The specified procedure could not be found").
+& $py scripts\vc_runtime.py dist\OnionBoard
+if ($LASTEXITCODE -ne 0) { throw "vc_runtime.py failed" }
+
 # PyInstaller ships all of Qt (QML, 3D, Charts, dev tools, 186 translations...).
 # Drop what the app never loads, then prove the trimmed app still starts.
 & $py scripts\prune_build.py dist\OnionBoard
