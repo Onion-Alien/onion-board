@@ -508,7 +508,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Xem video của âm thanh này khi nó phát. Âm thanh vẫn gửi đi bình thường; video chỉ dành cho bạn.",
   "What's new": "Có gì mới",
   "What's playing": "Đang phát gì",
-  "What's this tab for?": "Thẻ này để làm gì?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Cái gì nghe <b>{main}</b> sẽ nhận âm thanh của bạn (và giọng bạn, nếu bạn gửi): OBS, Voicemeeter, bàn mixer hoặc card capture.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Khi một trong các chương trình này lên phía trước, bảng tự hiện “{category}”. Khi nó đóng, bảng quay về cái đã hiện trước đó.",
   "Where I dragged it": "Chỗ tôi đã kéo tới",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "Đang tải giọng nói…",
   "Downloading the voices: {percent}%": "Đang tải giọng nói: {percent}%",
   "Others now hear {backup}.": "Người khác hiện nghe thấy {backup}.",
-  "starting again…": "đang khởi động lại…"
+  "starting again…": "đang khởi động lại…",
+  "How Onion Board works": "Onion Board hoạt động thế nào",
+  "How it works": "Cách hoạt động",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board phát âm thanh của bạn vào mic, nên mọi người trên Discord hay trong game nghe thấy chúng giống như nghe bạn nói.{gap}Thêm âm thanh ở thẻ Âm thanh, rồi nhấp đúp vào một cái hoặc bấm phím tắt của nó. Thanh ở dưới cùng cho thấy mic của bạn, những gì người khác nghe và tai nghe của bạn.{gap}Nhấp chuột phải vào một thẻ bên trái và chọn Về thẻ này để xem nó làm gì.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Đưa âm thanh vào chính mic bạn đang dùng, nên Discord và game không cần đổi gì",
+  "Straight into my mic instead": "Thay vào đó đưa thẳng vào mic"
 }

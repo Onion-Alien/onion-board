@@ -514,7 +514,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "चलते समय इस साउंड का वीडियो देखें। साउंड हमेशा की तरह बाहर जाता है; वीडियो सिर्फ़ आपके लिए है।",
   "What's new": "नया क्या है",
   "What's playing": "जो चल रहा है",
-  "What's this tab for?": "यह टैब किस लिए है?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "जो भी <b>{main}</b> को सुनता है उसे आपके साउंड मिलते हैं (और आपकी आवाज़, अगर आप उसे भेजते हैं): OBS, Voicemeeter, मिक्सर या कैप्चर कार्ड।",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "जब इनमें से कोई प्रोग्राम सामने आता है, तो बोर्ड अपने आप “{category}” दिखाता है। उसके बंद होने पर बोर्ड वापस वही दिखाता है जो पहले दिखा रहा था।",
   "Where I dragged it": "जहाँ मैंने खींचा",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "आवाज़ें डाउनलोड हो रही हैं…",
   "Downloading the voices: {percent}%": "आवाज़ें डाउनलोड हो रही हैं: {percent}%",
   "Others now hear {backup}.": "दूसरों को अब {backup} सुनाई दे रहा है।",
-  "starting again…": "फिर से शुरू हो रहा है…"
+  "starting again…": "फिर से शुरू हो रहा है…",
+  "How Onion Board works": "Onion Board कैसे काम करता है",
+  "How it works": "यह कैसे काम करता है",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board आपके साउंड आपके माइक में चलाता है, ताकि Discord या आपके गेम में लोग उन्हें वैसे ही सुनें जैसे आपको सुनते हैं।{gap}साउंड टैब पर साउंड जोड़ें, फिर किसी पर डबल-क्लिक करें या उसकी हॉटकी दबाएँ। नीचे की पट्टी आपका माइक, दूसरे क्या सुनते हैं और आपके हेडफ़ोन दिखाती है।{gap}बाईं ओर किसी टैब पर राइट-क्लिक करें और इस टैब के बारे में चुनें, ताकि देख सकें कि वह क्या करता है।",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "अपने साउंड उसी माइक में डालें जो आप पहले से इस्तेमाल करते हैं, ताकि Discord और गेम में कुछ बदलना न पड़े",
+  "Straight into my mic instead": "इसके बजाय सीधे मेरे माइक में"
 }

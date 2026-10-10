@@ -508,7 +508,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "播放时观看这个音效的视频。声音照常发送；视频只有你能看到。",
   "What's new": "新功能",
   "What's playing": "正在播放的内容",
-  "What's this tab for?": "这个标签页是做什么的？",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "任何收听 <b>{main}</b> 的程序都会收到你的音效（如果你发送声音，也包括你的声音）：OBS、Voicemeeter、调音台或采集卡。",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "当这些程序之一切到前台时，音效板会自动显示“{category}”。程序关闭后，音效板会回到之前显示的内容。",
   "Where I dragged it": "我拖到的位置",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "正在下载声音…",
   "Downloading the voices: {percent}%": "正在下载声音：{percent}%",
   "Others now hear {backup}.": "其他人现在听到的是{backup}。",
-  "starting again…": "正在重新启动…"
+  "starting again…": "正在重新启动…",
+  "How Onion Board works": "Onion Board 是怎么工作的",
+  "How it works": "工作原理",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board 把你的音效放进麦克风，Discord 或游戏里的人听到它们就像听到你说话一样。{gap}在“音效”标签页添加音效，然后双击一个或按它的快捷键。底部的条显示你的麦克风、别人听到的声音和你的耳机。{gap}右键点击左侧的标签页，选择“关于这个标签页”，就能看到它是做什么的。",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "把音效放进你已经在用的麦克风，Discord 和游戏都不用改设置",
+  "Straight into my mic instead": "改为直接送进我的麦克风"
 }

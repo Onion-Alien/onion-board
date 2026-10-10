@@ -514,7 +514,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Schau dir das Video dieses Sounds an, während er spielt. Der Sound geht ganz normal raus; das Video ist nur für dich.",
   "What's new": "Was ist neu",
   "What's playing": "Was gerade spielt",
-  "What's this tab for?": "Wofür ist dieser Tab?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Alles, was auf <b>{main}</b> hört, bekommt deine Sounds (und deine Stimme, wenn du sie sendest): OBS, Voicemeeter, ein Mischpult oder eine Capture-Karte.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Wenn eins dieser Programme nach vorne kommt, zeigt das Board von selbst „{category}“. Wenn es geschlossen wird, geht das Board zurück zu dem, was es vorher gezeigt hat.",
   "Where I dragged it": "Wo ich es hingezogen habe",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Stimmen werden heruntergeladen…",
   "Downloading the voices: {percent}%": "Stimmen werden heruntergeladen: {percent}%",
   "Others now hear {backup}.": "Andere hören jetzt {backup}.",
-  "starting again…": "startet erneut…"
+  "starting again…": "startet erneut…",
+  "How Onion Board works": "So funktioniert Onion Board",
+  "How it works": "So funktioniert's",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spielt deine Sounds in dein Mikro, damit Leute in Discord oder deinem Spiel sie genauso hören wie dich.{gap}Füg auf dem Tab Sounds Sounds hinzu, dann doppelklick einen oder drück seinen Hotkey. Die Leiste unten zeigt dein Mikro, was andere hören, und deine Kopfhörer.{gap}Rechtsklick auf einen Tab links und wähl Über diesen Tab, um zu sehen, was er macht.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Schick deine Sounds in das Mikro, das du schon benutzt, damit Discord und Spiele nichts umstellen müssen",
+  "Straight into my mic instead": "Stattdessen direkt in mein Mikro"
 }

@@ -1354,7 +1354,6 @@
   "What's new": "Nyheder",
   "What's playing": "Det, der spiller",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Det, der er slået til (stemmeskifteren, Live, en live-fane), vises i temaets farve. Træk for at vælge din egen; den bliver, når du skifter tema.",
-  "What's this tab for?": "Hvad bruges denne fane til?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Det, der lytter til <b>{main}</b>, får dine lyde (og din stemme, hvis du sender den): OBS, Voicemeeter, en mixer eller et capture card.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Det, der spillede sidst, fra en pad, en genvejstast eller tasten til tilfældig lyd.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Når Discord, TeamSpeak, Mumble eller et spil med en kendt stemmechat lytter til din mikrofon (eller kablet), så brug dens tilstand uden at spørge. Når intet lytter, forbliver tilstanden, som den er.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Henter stemmerne…",
   "Downloading the voices: {percent}%": "Henter stemmerne: {percent}%",
   "Others now hear {backup}.": "Andre hører nu {backup}.",
-  "starting again…": "starter igen…"
+  "starting again…": "starter igen…",
+  "How Onion Board works": "Sådan virker Onion Board",
+  "How it works": "Sådan virker det",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board afspiller dine lyde i din mikrofon, så folk på Discord eller i dit spil hører dem på samme måde, som de hører dig.{gap}Tilføj lyde på fanen Lyde, og dobbeltklik så på en eller tryk på dens genvejstast. Bjælken nederst viser din mikrofon, hvad andre hører, og dine høretelefoner.{gap}Højreklik på en fane til venstre, og vælg Om denne fane for at se, hvad den gør.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Send dine lyde ind i den mikrofon, du allerede bruger, så Discord og spil ikke skal ændres",
+  "Straight into my mic instead": "Direkte ind i min mikrofon i stedet"
 }

@@ -1354,7 +1354,6 @@
   "What's new": "Ano'ng bago",
   "What's playing": "Ang nagpe-play",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Ipinapakita sa kulay ng theme ang naka-on (voice changer, Live, live tab). I-slide para pumili ng sarili mong kulay; mananatili ito kahit palitan mo ang theme.",
-  "What's this tab for?": "Para saan ang tab na ito?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Kung ano man ang nakikinig sa <b>{main}</b> ay makakakuha ng mga sound mo (at ng boses mo, kung ipinapadala mo): OBS, Voicemeeter, mixer o capture card.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Kung ano ang huling nag-play, mula sa pad, hotkey o random key.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Kapag nakikinig sa mic mo (o sa cable) ang Discord, TeamSpeak, Mumble o game na may kilalang voice chat, gamitin ang mode nito nang hindi nagtatanong. Kapag walang nakikinig, hindi binabago ang mode.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Dina-download ang mga boses…",
   "Downloading the voices: {percent}%": "Dina-download ang mga boses: {percent}%",
   "Others now hear {backup}.": "Naririnig na ngayon ng iba ang {backup}.",
-  "starting again…": "nagsisimula muli…"
+  "starting again…": "nagsisimula muli…",
+  "How Onion Board works": "Paano gumagana ang Onion Board",
+  "How it works": "Paano ito gumagana",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Pinapatugtog ng Onion Board ang sounds mo sa mic mo, kaya naririnig ito ng mga tao sa Discord o sa game mo gaya ng pagkarinig nila sa'yo.{gap}Magdagdag ng sounds sa Sounds tab, tapos i-double-click ang isa o pindutin ang hotkey nito. Ipinapakita ng strip sa ibaba ang mic mo, ang naririnig ng iba at ang headphones mo.{gap}I-right-click ang isang tab sa kaliwa at piliin ang Tungkol sa tab na ito para makita kung ano ang ginagawa nito.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Ilagay ang sounds mo sa mic na gamit mo na, kaya walang kailangang baguhin sa Discord at mga game",
+  "Straight into my mic instead": "Diretso na lang sa mic ko"
 }

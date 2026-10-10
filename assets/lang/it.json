@@ -514,7 +514,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Guarda il video di questo suono mentre suona. Il suono esce normalmente; il video è solo per te.",
   "What's new": "Novità",
   "What's playing": "Ciò che suona",
-  "What's this tab for?": "A cosa serve questa scheda?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Chi ascolta <b>{main}</b> riceve i tuoi suoni (e la tua voce, se la invii): OBS, Voicemeeter, un mixer o una scheda di acquisizione.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Quando uno di questi programmi passa in primo piano, la board mostra “{category}” da sola. Quando si chiude, la board torna a ciò che mostrava prima.",
   "Where I dragged it": "Dove l'ho trascinato",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Download delle voci…",
   "Downloading the voices: {percent}%": "Download delle voci: {percent}%",
   "Others now hear {backup}.": "Gli altri ora sentono {backup}.",
-  "starting again…": "riavvio…"
+  "starting again…": "riavvio…",
+  "How Onion Board works": "Come funziona Onion Board",
+  "How it works": "Come funziona",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board riproduce i tuoi suoni nel microfono, così la gente su Discord o nel tuo gioco li sente come sente te.{gap}Aggiungi suoni nella scheda Suoni, poi fai doppio clic su uno o premi la sua scorciatoia. La barra in basso mostra il tuo microfono, cosa sentono gli altri e le tue cuffie.{gap}Fai clic destro su una scheda a sinistra e scegli Info su questa scheda per vedere a cosa serve.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Metti i tuoi suoni nel microfono che usi già, così Discord e i giochi non devono cambiare niente",
+  "Straight into my mic instead": "Invece direttamente nel mio microfono"
 }

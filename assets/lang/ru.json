@@ -479,7 +479,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Смотри видео этого звука, пока он играет. Звук уходит как обычно; видео только для тебя.",
   "What's new": "Что нового",
   "What's playing": "Что играет",
-  "What's this tab for?": "Для чего эта вкладка?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Всё, что слушает <b>{main}</b>, получает твои звуки (и голос, если ты его отправляешь): OBS, Voicemeeter, микшер или карта захвата.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Когда одна из этих программ выходит на передний план, доска сама показывает «{category}». Когда она закрывается, доска возвращается к тому, что было до этого.",
   "Where I dragged it": "Где я его оставил",
@@ -3073,5 +3072,10 @@
   "Downloading the voices…": "Скачиваю голоса…",
   "Downloading the voices: {percent}%": "Скачиваю голоса: {percent}%",
   "Others now hear {backup}.": "Другие теперь слышат {backup}.",
-  "starting again…": "повторный запуск…"
+  "starting again…": "повторный запуск…",
+  "How Onion Board works": "Как работает Onion Board",
+  "How it works": "Как это работает",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board играет твои звуки в микрофон, так что люди в Discord или в игре слышат их так же, как тебя.{gap}Добавь звуки на вкладке Звуки, потом дважды щёлкни по одному или нажми его горячую клавишу. Полоса внизу показывает твой микрофон, что слышат другие и твои наушники.{gap}Щёлкни правой кнопкой по вкладке слева и выбери Об этой вкладке, чтобы узнать, что она делает.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Отправляй звуки в микрофон, которым ты уже пользуешься, и в Discord и играх ничего менять не нужно",
+  "Straight into my mic instead": "Лучше прямо в мой микрофон"
 }

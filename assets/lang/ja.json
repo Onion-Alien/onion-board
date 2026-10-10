@@ -508,7 +508,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "再生中にこのサウンドの動画を見られます。サウンドは通常どおり送信され、動画はあなただけに表示されます。",
   "What's new": "新機能",
   "What's playing": "再生中の音",
-  "What's this tab for?": "このタブの使い方は？",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "<b>{main}</b> を聞いているもの（OBS、Voicemeeter、ミキサー、キャプチャーカード）にサウンド（と送信していればあなたの声）が届きます。",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "これらのプログラムが前面に来ると、ボードは自動で「{category}」を表示します。閉じると、前に表示していたものに戻ります。",
   "Where I dragged it": "ドラッグした場所",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "声をダウンロード中…",
   "Downloading the voices: {percent}%": "声をダウンロード中: {percent}%",
   "Others now hear {backup}.": "他の人には今、{backup}が聞こえます。",
-  "starting again…": "再起動中…"
+  "starting again…": "再起動中…",
+  "How Onion Board works": "Onion Board のしくみ",
+  "How it works": "しくみ",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board はサウンドをマイクに流すので、Discord やゲームの相手にはあなたの声と同じように聞こえます。{gap}サウンドタブでサウンドを追加し、ダブルクリックするかホットキーを押します。下のバーにはマイク、相手に聞こえる音、ヘッドホンが表示されます。{gap}左のタブを右クリックして「このタブについて」を選ぶと、そのタブの役割がわかります。",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "いつものマイクにサウンドを流すので、Discord やゲームの設定は変えなくて大丈夫です",
+  "Straight into my mic instead": "代わりにマイクに直接入れる"
 }
