@@ -442,8 +442,6 @@ class Imported:
     sounds: list[SoundMeta] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)   # names already in the library
     failed: list[str] = field(default_factory=list)    # "name: why"
-    # (fingerprint, pack folder) of the skipped ones: the sounds already here join the pack
-    adopt: list[tuple[str, str]] = field(default_factory=list)
 
 
 def install(pkg: Package, known_fingerprints: set[str], color_for=None,
@@ -466,7 +464,6 @@ def install(pkg: Package, known_fingerprints: set[str], color_for=None,
                 continue
             if isinstance(fp, str) and fp and fp in known:
                 out.skipped.append(name)
-                out.adopt.append((fp, ps.folder))
                 continue
             try:
                 meta = _install_one(src, ps, name, color_for(i) if color_for else None,
@@ -595,12 +592,21 @@ def keep_pack(pkg: Package) -> str:
     """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
     twice gets the same id and is kept once). "" if it couldn't be kept."""
     import hashlib
+    import zlib
     src = Path(pkg.path)
     h = hashlib.sha1()
     try:
         if src.is_dir():
-            for p in sorted(p for p in src.rglob("*") if p.is_file()):
-                h.update(f"{p.relative_to(src).as_posix()}\0{p.stat().st_size}\0".encode())
+            for p in sorted((p for p in src.rglob("*") if p.is_file()),
+                            key=lambda p: p.relative_to(src).as_posix()):
+                crc, size = 0, 0
+                with p.open("rb") as stream:
+                    while chunk := stream.read(1024 * 1024):
+                        crc = zlib.crc32(chunk, crc)
+                        size += len(chunk)
+                # Same identity as a ZIP containing these paths and contents;
+                # existing ZIP pack memberships remain valid.
+                h.update(f"{p.relative_to(src).as_posix()}\0{crc}\0{size}\0".encode())
         else:   # what's in it, not when it was zipped: the same pack re-zipped is one pack
             with zipfile.ZipFile(src) as z:
                 for i in sorted(z.infolist(), key=lambda i: i.filename):

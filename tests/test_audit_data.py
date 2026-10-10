@@ -64,7 +64,11 @@ def test_a_restore_keeps_files_whose_name_is_taken(app_dir):
     [point] = reset.points()
     (library.SOUNDS_DIR / "a1.wav").write_bytes(b"other")   # something took its name
     reset.restore(point.id)
-    assert (point.path / "sounds" / "a1.wav").read_bytes() == b"RIFFa1"
+    restored, = Config.load().sounds
+    assert Path(restored.file).read_bytes() == b"RIFFa1"
+    assert Path(restored.file) != library.SOUNDS_DIR / "a1.wav"
+    assert (library.SOUNDS_DIR / "a1.wav").read_bytes() == b"other"
+    assert not point.path.exists()
 
 
 def test_a_restore_that_cant_save_puts_the_files_back(app_dir, monkeypatch):

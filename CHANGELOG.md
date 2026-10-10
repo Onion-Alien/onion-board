@@ -11,6 +11,17 @@
   robot bunny runs off, comes back with a wrench and builds, with a moving bar and
   short steps like "Installing the voice engine" instead of pip's output. He cheers
   when it's done. If it fails, the real error still shows.
+- Setup stacks its columns when translated controls need more room, keeping them
+  visible without sideways scrolling.
+- Radio's station panel clips to its rounded corners, and genre buttons keep their
+  curves at compact heights.
+- Restoring sounds after a reset preserves both the originals and new recordings
+  with the same filename, including their pictures.
+- Importing or resetting a pack keeps matching personal sounds independent of it.
+- Folder packs detect equal-size content changes, so resetting uses the right archive.
+- A removed web download can be added again in the same session.
+- AI failure status describes the selected fallback: built-in voice, real mic or silence.
+
 - Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
   short gap clear of their buttons.
 - **Polished playback transport controls.** The sound player's Play/Pause button uses an accent-pill style with clean high-contrast icons that adapt across all themes, and the Stop button uses a sleek secondary surface with a subtle danger outline on hover. Both buttons use smooth filleted vector glyphs with optical centering.

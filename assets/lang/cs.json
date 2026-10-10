@@ -2476,7 +2476,6 @@
   "so quiet…": "tak tichý…",
   "so… bored…": "takže… nuda…",
   "starting…": "začíná…",
-  "starting… (a built-in voice covers you until it's ready)": "začíná... (vestavěný hlas vás pokryje, dokud nebude připraven)",
   "stopped": "zastavil",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "zastaveno: trvalo to přes {n} minutu. Zkontrolujte připojení k internetu a stiskněte jej znovu.",
@@ -2948,7 +2947,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "To není webový odkaz. Zkopírujte adresu obrázku (klikněte na něj pravým tlačítkem → Kopírovat adresu obrázku) a vložte ji sem.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Na tom odkazu není žádný obrázek. Klikněte pravým tlačítkem na obrázek → Kopírovat adresu obrázku a vložte ji.",
   "Couldn't get the picture ({error}).": "Obrázek se nepodařilo získat ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "začíná znovu... (zabudovaný hlas vás pokryje, dokud nebude připraven)",
   "huh?! wha…": "co?! co…",
   "five more minutes…": "ještě pět minut…",
   "it's the middle of the night!": "je uprostřed noci!",
@@ -3065,7 +3063,6 @@
   "Voice effects off — mic unchanged": "Hlasové efekty vypnuty – mikrofon se nezměnil",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Hlas vašeho mikrofonu se nezměnil. Otevřete aplikaci Voice Changer nebo AI voices níže a vyberte hlas.",
   "AI voice off": "Hlas AI vypnutý",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Hlas umělé inteligence se zastavil: zakrývá vás vestavěný hlas. Kliknutím otevřete hlasy AI.",
   "Click to open AI voices.": "Kliknutím otevřete hlasy AI.",
   "AI voice: {voice}, starting.": "Hlas AI: {voice} , začíná.",
   "AI voice: {voice}.": "Hlas AI: {voice} .",
@@ -3074,5 +3071,7 @@
   "Getting Python ready…": "Připravuji Python…",
   "Installing the voice engine (a few minutes)…": "Instaluji hlasový engine (pár minut)…",
   "Downloading the voices…": "Stahuji hlasy…",
-  "Downloading the voices: {percent}%": "Stahuji hlasy: {percent}%"
+  "Downloading the voices: {percent}%": "Stahuji hlasy: {percent}%",
+  "Others now hear {backup}.": "Ostatní nyní slyší {backup}.",
+  "starting again…": "znovu se spouští…"
 }

@@ -410,6 +410,10 @@ class AiVoicePanel(QWidget):
     def _backup_picked(self, *_):
         self.s["backup"] = self.cb_backup.currentData() or "voice"
         self.ctl.set_backup(self.s["backup"])
+        if self.status() == "failed":
+            self.lbl_state.setText(self.failure_text(getattr(self, "_failure_error", "")))
+        elif self.status() == "starting":
+            self.lbl_state.setText(self._starting_text())
         self._emit()
 
     # ------------------------------------------------------------ start / stop
@@ -429,7 +433,7 @@ class AiVoicePanel(QWidget):
             if not self._start_helper():
                 return
             self._voice_name = self._voice().get("name", "")
-            self._set_ui(True, _("starting… (a built-in voice covers you until it's ready)"))
+            self._set_ui(True, self._starting_text())
         elif not on and self.ctl.running:
             self.ctl.stop()
             self._set_ui(False, IDLE)
@@ -452,6 +456,19 @@ class AiVoicePanel(QWidget):
     def voice_title(self) -> str:
         """The running voice's name (the status bar's chip)."""
         return self._voice_name or self._voice().get("name", "") or self.cb_voice.currentText()
+
+    def backup_heard(self) -> str:
+        return BACKUP_HEARD.get(self.cb_backup.currentData() or "voice", BACKUP_HEARD["voice"])
+
+    def _starting_text(self, retry: bool = False) -> str:
+        return (_("starting again…") if retry else _("starting…")) + " " + _(
+            "Others now hear {backup}.", backup=self.backup_heard())
+
+    def failure_text(self, error: str = "") -> str:
+        return (_("⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, "
+                  "then Start to try again.", error=error, backup=self.backup_heard()) if error else
+                _("⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start "
+                  "to try again.", backup=self.backup_heard()))
 
     def _set_ui(self, on: bool, state: str):
         self._status = "starting" if on else "off"
@@ -487,7 +504,8 @@ class AiVoicePanel(QWidget):
                   cpu=cpu, ms=ms))
         elif t == "error":
             self._status = "failed"
-            self.lbl_state.setText(f"⚠ {text}")
+            self._failure_error = text
+            self.lbl_state.setText(self.failure_text(text))
         elif (t == "stopped" and self.ctl.running and not self._connected
               and not self._retried and self.module is not None):
             # the helper never called back (once it sat silent for 30 s, then started
@@ -495,17 +513,12 @@ class AiVoicePanel(QWidget):
             self._retried = True
             log.warning("AI voice helper didn't connect (%s); trying once more", text)
             if self._start_helper():
-                self.lbl_state.setText(_("starting again… (a built-in voice covers you "
-                                         "until it's ready)"))
+                self._status = "starting"
+                self.lbl_state.setText(self._starting_text(retry=True))
         elif t == "stopped" and self.ctl.running:
             self._status = "failed"
-            backup = BACKUP_HEARD.get(self.cb_backup.currentData() or "voice",
-                                      BACKUP_HEARD["voice"])
-            self.lbl_state.setText(
-                _("⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, "
-                  "then Start to try again.", error=text, backup=backup) if text else
-                _("⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start "
-                  "to try again.", backup=backup))
+            self._failure_error = text
+            self.lbl_state.setText(self.failure_text(text))
 
     # ------------------------------------------------------------ get / remove
     def _get(self):
