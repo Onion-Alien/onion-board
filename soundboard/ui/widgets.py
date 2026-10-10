@@ -1135,6 +1135,10 @@ class PadGrid(QWidget):
         finally:
             self.grid.setEnabled(True)
             self.grid.activate()
+            # Moving children only repaints the strips they expose. The drop hint
+            # also moves (or disappears), including background below every pad:
+            # repaint it with the completed layout so its old border/text is erased.
+            self.update()
 
     def _place(self, cols: int, w: int):
         h = self.pad_h(w)
