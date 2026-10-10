@@ -224,6 +224,15 @@ def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
     assert usage.opt_out("settings") and _body(sent[-1][0])["hits"][0]["path"] == "opt-out/settings"
 
 
+def test_no_opt_out_in_tor_mode(sent, monkeypatch):
+    """SECURITY.md: the opt-out is never sent in Tor mode, from Settings either (the
+    installer's path already checked; Settings' switch didn't)."""
+    monkeypatch.setattr(net, "_mode", net.TOR)
+    assert not usage.opt_out("settings") and not sent
+    monkeypatch.setattr(net, "_mode", net.DIRECT)
+    assert usage.opt_out("settings") and len(sent) == 1
+
+
 def test_update_now_fetches_its_own_copy_of_the_installer():
     from soundboard import updates
 
