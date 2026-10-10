@@ -2661,7 +2661,6 @@
   "Only stations streaming at least this bitrate": "Yalnızca en az bu bit hızında yayın yapan istasyonlar",
   "Others hear the radio. Click so only you do.": "Diğerleri radyoyu duyuyor. Yalnızca sizin yapmanız için tıklayın.",
   "Play a random station": "Rastgele bir istasyonu çal",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Gösterilen listeden rastgele bir istasyonu çalın (daraltmak için önce bir tür veya ülke seçin)",
   "Playing now": "Şu anda oynatılıyor",
   "Playing {name}": "{name} oynatılıyor",
   "Playing {name}: {title}": "{name} oynatılıyor: {title}",

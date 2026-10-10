@@ -2607,7 +2607,6 @@
   "Only stations streaming at least this bitrate": "仅电台至少传输此比特率",
   "Others hear the radio. Click so only you do.": "其他人听到广播。单击，只有您这样做。",
   "Play a random station": "播放随机电台",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "从显示的列表中随机播放一个电台（首先选择一个流派或国家以缩小范围）",
   "Playing now": "正在播放",
   "Playing {name}": "正在播放{name}",
   "Playing {name}: {title}": "播放{name} ： {title}",

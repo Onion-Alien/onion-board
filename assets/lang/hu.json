@@ -2661,7 +2661,6 @@
   "Only stations streaming at least this bitrate": "Csak azok az állomások, amelyek legalább ekkora bitsebességet sugároznak",
   "Others hear the radio. Click so only you do.": "Mások hallják a rádiót. Kattints, így csak te teheted.",
   "Play a random station": "Játssz egy véletlenszerű állomást",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Játssz le egy véletlenszerű állomást a megjelenő listából (a szűkítéshez először válassz egy műfajt vagy országot)",
   "Playing now": "Játszik most",
   "Playing {name}": "{name} lejátszása",
   "Playing {name}: {title}": "{name} lejátszása: {title}",

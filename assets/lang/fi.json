@@ -2661,7 +2661,6 @@
   "Only stations streaming at least this bitrate": "Vain asemat, jotka suoratoistavat vähintään tätä bittinopeutta",
   "Others hear the radio. Click so only you do.": "Muut kuulevat radiota. Napsauta niin vain sinä.",
   "Play a random station": "Toista satunnainen asema",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Toista satunnainen asema luettelosta, joka näkyy (valitse ensin genre tai maa rajataksesi sitä)",
   "Playing now": "Pelaa nyt",
   "Playing {name}": "Toistetaan {name}",
   "Playing {name}: {title}": "Toistetaan {name} : {title}",

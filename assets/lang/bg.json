@@ -2558,7 +2558,6 @@
   "Only stations streaming at least this bitrate": "Само станции, предаващи поне този битрейт",
   "Others hear the radio. Click so only you do.": "Други чуват радиото. Кликнете, така че само вие да го направите.",
   "Play a random station": "Пуснете произволна станция",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Пуснете произволна станция от показващия се списък (първо изберете жанр или държава, за да го стесните)",
   "Playing now": "Играе се сега",
   "Playing {name}": "Играя на {name}",
   "Playing {name}: {title}": "Пускане на {name} : {title}",

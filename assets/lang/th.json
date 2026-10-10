@@ -2607,7 +2607,6 @@
   "Only stations streaming at least this bitrate": "เฉพาะสถานีที่สตรีมอย่างน้อยบิตเรตนี้",
   "Others hear the radio. Click so only you do.": "คนอื่นได้ยินวิทยุ คลิกเพื่อให้คุณเท่านั้น",
   "Play a random station": "เล่นสถานีสุ่ม",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "เล่นสถานีสุ่มจากรายการที่แสดง (เลือกประเภทหรือประเทศก่อนเพื่อจำกัดให้แคบลง)",
   "Playing now": "กำลังเล่นอยู่ครับ",
   "Playing {name}": "กำลังเล่น {name}",
   "Playing {name}: {title}": "กำลังเล่น {name} : {title}",

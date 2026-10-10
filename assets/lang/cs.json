@@ -2715,7 +2715,6 @@
   "Only stations streaming at least this bitrate": "Pouze stanice streamující alespoň tento datový tok",
   "Others hear the radio. Click so only you do.": "Ostatní slyší rádio. Klikněte tak pouze vy.",
   "Play a random station": "Přehrajte náhodnou stanici",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Přehrajte náhodnou stanici ze zobrazeného seznamu (nejprve vyberte žánr nebo zemi, abyste ji zúžili)",
   "Playing now": "Nyní se hraje",
   "Playing {name}": "Hra {name}",
   "Playing {name}: {title}": "Přehrává se {name} : {title}",

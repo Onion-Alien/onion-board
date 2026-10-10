@@ -2661,7 +2661,6 @@
   "Only stations streaming at least this bitrate": "Tanging ang mga istasyon na nag-i-stream ng hindi bababa sa bitrate na ito",
   "Others hear the radio. Click so only you do.": "Naririnig ng iba ang radyo. I-click para ikaw lang ang gagawa.",
   "Play a random station": "Maglaro ng random na istasyon",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "I-play ang isang random na istasyon mula sa listahan na ipinapakita (pumili ng isang genre o bansa muna upang paliitin ito)",
   "Playing now": "Naglalaro ngayon",
   "Playing {name}": "Naglalaro ng {name}",
   "Playing {name}: {title}": "Naglalaro ng {name} : {title}",
