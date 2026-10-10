@@ -33,6 +33,7 @@ from soundboard import library, net, otherboards
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
+from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.widgets import Meter
 from soundboard import errors
 from soundboard.i18n import _
@@ -305,7 +306,9 @@ class SetupWizard(QDialog):
         self.timer.start(TICK_MS)
         if self._proc is not None:   # still installing from a guide closed mid-way
             self.bun_cable.build()
-        self.go(2 if resumed or self._proc is not None else 0)
+        if win._attaching:
+            self.setup_show.start()
+        self.go(2 if resumed or self._proc is not None or win._attaching else 0)
 
     # ------------------------------------------------------------------ pages
     def _choice_list(self, names: list[str], current: str | None,
@@ -445,6 +448,9 @@ class SetupWizard(QDialog):
         self.btn_attach.setStyleSheet("padding:12px 22px; font-size:12pt;")
         self.btn_attach.clicked.connect(self.attach_mic)
         v.addWidget(self.btn_attach, 0, Qt.AlignLeft)
+        self.setup_show = SetupShow(height=96)
+        self.setup_show.done.connect(lambda: self.recheck_cable(rescan=False))
+        v.addWidget(self.setup_show)
         # a bound method, not a lambda: Qt drops the link when the guide is freed, so a
         # set-up finishing after it closed can't poke its deleted buttons
         self.win.mic_attached.connect(self._mic_attached)
@@ -528,6 +534,8 @@ class SetupWizard(QDialog):
     def _pick_route(self, choice: str):
         """Step 3: the cable ("cable"), nowhere (NOWHERE) or another device (its name).
         Applied at once, and kept even if the guide is closed (like a picked mic)."""
+        if self.setup_show.on:
+            self.setup_show._stop()
         if choice == "cable":
             self.win.set_route("cable")
             self._show_other(False)
@@ -616,6 +624,8 @@ class SetupWizard(QDialog):
     # ------------------------------------------------------------------ navigation
     def go(self, i: int):
         i = max(0, min(self.PAGES - 1, i))
+        if i != 2 and self.setup_show.on:
+            self.setup_show._stop()
         self.stack.setCurrentIndex(i)
         self.progress.setText(_("Step {step} of {pages}", step=i + 1, pages=self.PAGES))
         self.btn_back.setVisible(i > 0)
@@ -631,7 +641,8 @@ class SetupWizard(QDialog):
     def _update_next(self):
         i = self.stack.currentIndex()
         # while the cable installs, stay on its page: leaving it (or finishing) would
-        # lose track of the installer
+        # lose track of the installer (a mic set-up is the main window's: it reports
+        # back through mic_attached wherever the guide is)
         # (greyed out with set_busy, not setEnabled: that would throw the keyboard focus
         # to another control; the click handlers check too, for Enter on the dialog)
         installing = self._proc is not None
@@ -680,6 +691,8 @@ class SetupWizard(QDialog):
 
     def done(self, r):
         self.timer.stop()
+        if self.setup_show.on:
+            self.setup_show._stop()
         if r != QDialog.Accepted:
             for k, v in self._saved_devices.items():   # keep what they had, unless
                 if k not in self._user_picked:         # they picked another one here
@@ -734,6 +747,8 @@ class SetupWizard(QDialog):
         return self.cable_ok()
 
     def _mic_attached(self, mic: str, err: str):
+        if self.setup_show.on:
+            self.setup_show.finish(not bool(err))
         self.recheck_cable(rescan=False)
 
     def recheck_cable(self, rescan: bool = True):
@@ -752,14 +767,28 @@ class SetupWizard(QDialog):
                                     "in Discord and games") if route == "mic" else "")
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
         attaching = self.win._attaching
-        self.btn_attach.setVisible(not busy and not (route == "mic" and self.route_ok()))
+        self.btn_attach.setVisible(not busy and not (route == "mic" and self.route_ok())
+                                   and not self.setup_show.on)
         self.btn_attach.setEnabled(not attaching)
         state = directmic.status(self.win.cfg.mic_device)
         self.btn_attach.setText(_("Setting up… click Yes when Windows asks") if attaching
                                 else _("Repair (one click)") if directmic.needs_repair(state)
                                 else _("Put my sounds straight into my mic"))
+        if self.setup_show.on and not attaching:
+            self.setup_show.finish(self.route_ok())
         if route == "mic" and not busy and not self._cable_tries and not self._needs_restart:
             self.other_box.hide()
+            if self.setup_show.on:
+                self.cable_status.setText(
+                    _("<b style='color:{colour}'>✓ On your mic.</b> Discord and games hear "
+                      "your sounds through it, press Next.", colour=_ok()) if self.route_ok()
+                    else _("Setting up… click Yes when Windows asks") if attaching
+                    else _("Setting up…"))
+                self.btn_cable.hide()
+                self.btn_recheck.hide()
+                self.btn_other.hide()
+                self._update_next()
+                return
             if self.route_ok():
                 self.cable_status.setText(_("<b style='color:{colour}'>✓ On your mic.</b> "
                                             "Discord and games hear your sounds through it, "
@@ -876,10 +905,13 @@ class SetupWizard(QDialog):
         self._update_next()
 
     def attach_mic(self):
+        self.setup_show.start()
         self.win.attach_mic()
         self.recheck_cable(rescan=False)
 
     def install_cable(self):
+        if self.setup_show.on:
+            self.setup_show._stop()
         if self.win.cfg.route == "mic" and self.cable_ok():   # "...instead", and it's there
             self._pick_route("cable")
             return

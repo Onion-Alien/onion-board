@@ -547,8 +547,7 @@ class RadioTab(QWidget):
         self.btn_random.setObjectName("iconbutton")
         self.btn_random.setAccessibleName(_("Play a random station"))
         icons.set_icon(self.btn_random, "shuffle")
-        self.btn_random.setToolTip(_("Play a random station from the list showing (pick a "
-                                     "genre or country first to narrow it)"))
+        self.btn_random.setToolTip(_("Play a random station"))
         self.btn_random.clicked.connect(self.play_random)
         bh.addWidget(self.btn_random)
         self.btn_fav = QPushButton()
@@ -1238,13 +1237,14 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     # ------------------------------------------------------------------ playing
     def play_random(self):
-        """A random station from the ones listed (the filters apply), never the one
-        already playing."""
+        """Any of the popular stations, whatever list, search or filters are showing,
+        never the one already playing."""
         now = self.player.station
-        pool = [s for s in self.visible_stations()[:LIST_MAX]
-                if now is None or s.uuid != now.uuid]
+        pool = [s for s in self._globe_list if now is None or s.uuid != now.uuid]
         if pool:
             self.play(random.choice(pool))
+        elif not self._globe_list:
+            self._refresh_info(self._no_stations_text())   # the directory isn't in yet
 
     def play(self, s: Station):
         self._title = ""
