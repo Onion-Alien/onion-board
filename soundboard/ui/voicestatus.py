@@ -3,7 +3,7 @@ and everything that's changing what others hear from it (the voice changer, the 
 voice, the computer voice, the language you speak in), whichever cards are folded.
 
 Each thing that's on is a chip; clicking it opens its card. With nothing on, one
-quiet chip says others hear your real voice."""
+plain label explains that the mic voice is unchanged."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, Signal
@@ -21,7 +21,7 @@ GAP = 16            # between the mic half and the chips, side by side
 
 class Chip(QPushButton):
     """One thing that's on: a rounded label with a picture, the accent colour while
-    it's on, the warning colour when it went wrong, muted for "your real voice"."""
+    it's on, the warning colour when it went wrong."""
 
     def __init__(self, key: str):
         super().__init__()
@@ -94,7 +94,7 @@ class VoiceStatusBar(QFrame):
         self.lbl_heard = icon_label("ear", _("What others hear from your mic"))
         rh.addWidget(self.lbl_heard)
         box.addWidget(right, 0)
-        self.chips: dict[str, Chip] = {}
+        self.chips: dict[str, Chip | QLabel] = {}
         self._no_mic = None
 
     # ---- what's on
@@ -109,11 +109,20 @@ class VoiceStatusBar(QFrame):
         for key, text, state, icon, picture, tip in items:
             chip = self.chips.get(key)
             if chip is None:
-                chip = self.chips[key] = Chip(key)
-                chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
-            chip.show_as(text, state, icon, picture, tip)
+                if key == "none":
+                    chip = QLabel()
+                    chip.setObjectName("voicebarlabel")
+                else:
+                    chip = Chip(key)
+                    chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
+                self.chips[key] = chip
+            if isinstance(chip, Chip):
+                chip.show_as(text, state, icon, picture, tip)
+            else:
+                chip.setText(text)
+                chip.setToolTip(tip)
         order = [self.chips[k] for k in keys]
-        if [w for w in self._row_widgets() if isinstance(w, Chip)] != order:
+        if [w for w in self._row_widgets() if w in self.chips.values()] != order:
             for w in order:                       # after "Others hear", in order
                 row.removeWidget(w)
             for w in order:
@@ -124,7 +133,7 @@ class VoiceStatusBar(QFrame):
 
     def texts(self) -> list[str]:
         """The chips' words, in order (tests, the tab's accessible summary)."""
-        return [w.text() for w in self._row_widgets() if isinstance(w, Chip)]
+        return [w.text() for w in self._row_widgets() if w in self.chips.values()]
 
     def _row_widgets(self) -> list:
         row = self._chips_row
