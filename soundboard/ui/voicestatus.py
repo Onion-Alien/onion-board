@@ -82,9 +82,7 @@ class VoiceStatusBar(QFrame):
         mh.addWidget(self.lbl_mic)
         self.meter = Meter()
         self.meter.setMinimumWidth(80)
-        self.meter.setMaximumWidth(420)    # a level, not a stripe across a wide window
         mh.addWidget(self.meter, 1)
-        mh.addStretch(0)
         box.addWidget(mic, 1)
 
         right = self._right = QWidget()
@@ -148,6 +146,7 @@ class VoiceStatusBar(QFrame):
             self._no_mic = no_mic
             self.lbl_mic.setVisible(no_mic)
             icons.set_label_icon(self.mic_icon, "mic", "warn_text" if no_mic else "muted")
+            self._fit()
 
     # ---- one row, or two when it's narrow
     def resizeEvent(self, e):
@@ -158,10 +157,16 @@ class VoiceStatusBar(QFrame):
         m = self._box.contentsMargins()
         room = self.width() - m.left() - m.right()
         line = sum(w.sizeHint().width() + 6 for w in self._row_widgets())   # one line
-        need = 160 + GAP + line
+        # Keep at least half the bar for the meter. If the status chips would
+        # squeeze it below that, put them underneath instead.
+        mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
+        need = max(160, (self.width() + 1) // 2 + mic_labels) + GAP + line
         d = QBoxLayout.LeftToRight if room >= need else QBoxLayout.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.LeftToRight else 0)
+        # Flow's hint remembers its last width. Without a cap it takes the spare
+        # room on the next layout pass and squeezes the mic meter to its minimum.
+        self._right.setMaximumWidth(line if d == QBoxLayout.LeftToRight else 16777215)
         if self._box.direction() != d:
             self._box.setDirection(d)
             self._box.setSpacing(GAP if d == QBoxLayout.LeftToRight else 8)
