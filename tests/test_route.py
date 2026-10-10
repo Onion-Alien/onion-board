@@ -244,7 +244,9 @@ def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  #
     minus = win.also_rows.widgets[-1]
     assert minus.text() == "−" and minus.isVisible()
     assert minus.width() <= minus.sizeHint().width() + 4
-    assert minus.width() < win.also_rows.boxes[0].width() // 3
+    card = win.cb_main.parentWidget()
+    assert card.rect().contains(minus.mapTo(card, minus.rect().bottomRight()))
+    assert win.setup_page.horizontalScrollBar().maximum() == 0
 
 
 def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  # noqa: F811
