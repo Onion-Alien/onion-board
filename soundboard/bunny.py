@@ -42,14 +42,15 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
-               swing: float = 0.0, sad: float = 0.0, angry: float = 0.0):
+               swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
+               nightcap: bool = False):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
     `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank), and
     `sad` 0..1 worries his brows, wets his eyes and turns his smile down, and
     `angry` 0..1 knits them the other way, reddens his cheeks and pops a cross mark
-    on his head (`swing` also swings the "bat")."""
+    on his head (`swing` also swings the "bat"). `nightcap` puts his sleeping cap on."""
     phones = QColor(theme.T["accent"])
     phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
@@ -93,6 +94,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setPen(Qt.NoPen)
         p.setBrush(phones_hi)
         p.drawRoundedRect(QRectF(x + 2.5, 57, 3, 10), 1.5, 1.5)
+
+    if nightcap:
+        _nightcap(p, ink)
 
     # face
     for x in (39, 61):
@@ -239,6 +243,37 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0):
         _ellipse(p, 0, 7, 7.5, 3.5, GRIP, ink)              # the knob
         p.restore()
         _ellipse(p, 80, 92, 12, 10, FUR, ink)
+
+
+def _nightcap(p: QPainter, ink: QPen):
+    """A floppy striped sleeping cap over the headphone band, its tip and bobble
+    flopped down to his left (the viewer's right)."""
+    cap = QColor(theme.T["accent"])
+    stripe = cap.lighter(135)
+    body = QPainterPath(QPointF(24, 49))
+    body.cubicTo(QPointF(24, 30), QPointF(40, 19), QPointF(56, 20))
+    body.cubicTo(QPointF(74, 21), QPointF(88, 31), QPointF(91, 47))
+    body.cubicTo(QPointF(85, 40), QPointF(80, 38), QPointF(76, 47))
+    body.quadTo(QPointF(50, 40), QPointF(24, 49))
+    p.setPen(ink)
+    p.setBrush(cap)
+    p.drawPath(body)
+    p.save()
+    p.setClipPath(body)
+    p.setPen(QPen(stripe, 5))
+    for x in (34, 50, 66, 82):
+        p.drawLine(QPointF(x - 10, 50), QPointF(x + 6, 14))
+    p.restore()
+    p.setPen(ink)
+    p.setBrush(Qt.NoBrush)
+    p.drawPath(body)
+    brim = QPainterPath(QPointF(22, 50))   # the soft white band round the bottom
+    brim.quadTo(QPointF(50, 39), QPointF(78, 48))
+    p.setPen(QPen(INK, 9, Qt.SolidLine, Qt.RoundCap))
+    p.drawPath(brim)
+    p.setPen(QPen(FUR, 6, Qt.SolidLine, Qt.RoundCap))
+    p.drawPath(brim)
+    _ellipse(p, 91, 49, 11, 11, FUR, ink)   # the bobble
 
 
 def _music_note(p: QPainter, x, y, k, col: QColor | None = None):

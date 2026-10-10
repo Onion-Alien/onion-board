@@ -8,7 +8,7 @@ from __future__ import annotations
 import html
 
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QSizePolicy, QSpacerItem, QTabWidget, QToolButton,
                                QVBoxLayout, QWidget)
@@ -80,6 +80,7 @@ class RailTab(QToolButton):
     def __init__(self, rail: SideRail, index: int):
         super().__init__()
         self.rail, self.index = rail, index
+        self._kbd_focus = False
         self.setObjectName("railtab")
         self.setCheckable(True)   # (the rail checks the current one: see SideRail.sync)
         self.setCursor(Qt.PointingHandCursor)
@@ -93,6 +94,31 @@ class RailTab(QToolButton):
         if self.isChecked():   # the current tab: a soft accent fill under the icon
             self._fill(r, theme.T["accent"], TINT_ALPHA)
         super().paintEvent(e)
+        if self.hasFocus() and self._kbd_focus:
+            p = QPainter(self)
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setPen(QPen(QColor(theme.T["accent"]), 1))
+            p.setBrush(Qt.NoBrush)
+            p.drawRoundedRect(r, 8, 8)
+
+    def focusInEvent(self, e):
+        # Qt also focuses the first tab on startup: that isn't keyboard navigation.
+        self._kbd_focus = e.reason() in (Qt.TabFocusReason, Qt.BacktabFocusReason,
+                                        Qt.ShortcutFocusReason)
+        super().focusInEvent(e)
+        self.update()
+
+    def focusOutEvent(self, e):
+        self._kbd_focus = False
+        super().focusOutEvent(e)
+        self.update()
+
+    def mousePressEvent(self, e):
+        # TabFocus keeps the old tab focused after clicking another one.
+        for b in self.rail.buttons:
+            b._kbd_focus = False
+            b.update()
+        super().mousePressEvent(e)
 
     def keyPressEvent(self, e):
         """Up / down: the tab before / after it, as the arrows did on the old top bar
@@ -270,13 +296,12 @@ class SideRail(QFrame):
         return w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
 
     def _label(self, w: QPushButton, name: str, tip: str, shown: bool):
-        """A button under the tabs: its name while open (cut to fit), and on hover its
-        tip, with the name in front when it isn't all there to read."""
+        """A button under the tabs: its name while open and help for screen readers."""
         text = self._fit(w, name) if shown else ""
         w.setText(text)
         w.setAccessibleName(name)
-        w.setToolTip(tip if text == name or tip == name or not tip else
-                     f"{name}\n{tip}" if tip else name)
+        w.setAccessibleDescription(tip)
+        w.setToolTip("")
 
     def show_status(self, w: QPushButton):
         """A status button as `put` left it, for the rail open or shut."""

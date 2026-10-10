@@ -102,7 +102,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
             # FEATURES, keep in step
-            *(f"triggers-{k}" for k in TRIGGERS_FEATURES))
+            *(f"triggers-{k}" for k in TRIGGERS_FEATURES),
+            # the Easter eggs, to see if anyone finds them: Pong with Bun opened, left
+            # before the end, won or lost; the header onion made to cry; sleepy Bun woken
+            "egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
+            "egg-onion-cried", "egg-bun-woken")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")

@@ -1227,15 +1227,35 @@ def test_remembered_voices_only_count_for_the_same_voices_and_a_sound_entry():
 
 # ---------------------------------------------------------------- the status bar
 
+def test_status_bar_off_label_cannot_open_a_card(panel):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QLabel
+    p, _ = panel
+    opened = []
+    p.bar.open_card.connect(opened.append)
+    label = p.bar.chips["none"]
+    assert isinstance(label, QLabel)
+    assert label.focusPolicy() == Qt.NoFocus
+    assert label.cursor().shape() == Qt.ArrowCursor
+    QTest.mouseClick(label, Qt.LeftButton)
+    p._open_card("none")
+    assert not opened
+    assert all(not head.is_open() for head in p._heads.values())
+    p.fx.pick("Robot")
+    p.bar.chips["fx"].click()
+    assert opened == ["fx"] and p._heads["fx"].is_open()
+
+
 def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
     p, eng = panel
-    assert p.bar.texts() == ["Your real voice"]
+    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
     p.fx.pick("Robot")
     assert p.bar.texts() == ["Robot"]          # short; the full words are its tip
     assert "Voice changer" in p.bar.chips["fx"].toolTip()
     assert p.bar.chips["fx"].property("state") == "on"
     p.fx.btn_power.setChecked(False)
-    assert p.bar.texts() == ["Your real voice"]
+    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
     # a chip opens its folded card
     assert not p._heads["speak"].is_open()
     p.speech.b_live.setChecked(True)

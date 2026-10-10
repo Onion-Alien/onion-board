@@ -19,7 +19,7 @@ from PySide6.QtGui import (QBrush, QColor, QFont, QImage, QLinearGradient, QPain
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import theme
+from soundboard import theme, usage
 from soundboard.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
 from soundboard.ui import appstate, fit
@@ -315,6 +315,7 @@ class Court(QWidget):
         self.goal_flash = ["bun" if who == "you" else "you", 0.0]
         self.shake = 0.28
         if self.score[who] >= WIN_AT:
+            usage.used("egg-pong-won" if who == "you" else "egg-pong-lost")
             if who == "you":
                 self._confetti()
             self._go("over")
@@ -597,6 +598,7 @@ def open_for(bun) -> BunPong:
     for old in win.findChildren(BunPong):
         old.finish()
     dlg = BunPong(win, bun)
+    usage.used("egg-pong-opened")   # the names only (usage.py)
     dlg.open()
     dlg.court.setFocus(Qt.OtherFocusReason)
     return dlg
@@ -709,6 +711,8 @@ class BunPong(QDialog):
             return
         self._done = True
         self._timer.stop()
+        if self.court.state in ("play", "point"):   # left mid-game
+            usage.used("egg-pong-quit")
         if self.bun is not None:
             try:
                 self.bun.calm_down()

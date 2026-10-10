@@ -11,8 +11,8 @@ import re
 from collections.abc import Callable
 
 import numpy as np
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import (QButtonGroup, QDialog, QHBoxLayout, QLabel, QLineEdit,
+from PySide6.QtCore import QSize, Qt, QTimer
+from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
                                QMessageBox, QPushButton, QRadioButton, QVBoxLayout, QWidget)
 
 from soundboard import library
@@ -84,8 +84,23 @@ class RecordDialog(QDialog):
         self.data: np.ndarray | None = None   # the finished take, (n, 2) float32 at SR
         self.saved = 0                        # pads added from this window
         self.setWindowTitle(_("Record a sound"))
+        self.setObjectName("recorddialog")
         lay = QVBoxLayout(self)
-        lay.setSpacing(10)
+        lay.setContentsMargins(24, 22, 24, 20)
+        lay.setSpacing(16)
+        heading = QHBoxLayout()
+        mark = QPushButton()
+        mark.setObjectName("recordmark")
+        mark.setFixedSize(44, 44)
+        mark.setAttribute(Qt.WA_TransparentForMouseEvents)
+        mark.setFocusPolicy(Qt.NoFocus)
+        icons.set_icon(mark, "wave", "accent", size=24)
+        mark.setIconSize(QSize(24, 24))
+        heading.addWidget(mark)
+        title = QLabel(_("Record a sound"))
+        title.setObjectName("recordtitle")
+        heading.addWidget(title, 1)
+        lay.addLayout(heading)
         lay.addWidget(hint_label(_("Record your voice, or a bit of a sound, song or the "
                                    "radio while it plays, and keep it as a sound.")))
 
@@ -122,28 +137,40 @@ class RecordDialog(QDialog):
             group.addButton(b)
             sr.addWidget(b)
             b.toggled.connect(lambda _on: self._show_state())
-        sr.addStretch(1)
+        sr.setSpacing(6)
+        for b in (self.opt_raw, self.opt_fx, self.opt_play):
+            b.setObjectName("recordsource")
+        sr.setStretch(0, 1)
+        sr.setStretch(1, 1)
+        sr.setStretch(2, 1)
         lay.addWidget(self.source)
 
-        self.rec_row = QWidget()
+        self.rec_row = QFrame()
+        self.rec_row.setObjectName("recordstudio")
         row = QHBoxLayout(self.rec_row)
-        row.setContentsMargins(0, 0, 0, 0)
-        row.setSpacing(10)
+        row.setContentsMargins(20, 20, 20, 20)
+        row.setSpacing(24)
         self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
-        self.btn_rec.setMinimumHeight(40)
-        self.btn_rec.setMinimumWidth(120)
+        self.btn_rec.setMinimumHeight(52)
+        self.btn_rec.setMinimumWidth(132)
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=16)
         self.btn_rec.clicked.connect(self._rec_clicked)
         row.addWidget(self.btn_rec)
         col = QVBoxLayout()
-        col.setSpacing(4)
+        col.setSpacing(10)
+        clock_row = QHBoxLayout()
         self.time = QLabel("0:00")
-        self.time.setObjectName("fxname")
-        col.addWidget(self.time)
+        self.time.setObjectName("recordtime")
+        clock_row.addWidget(self.time, 1)
+        self.phase = QLabel()
+        self.phase.setObjectName("recordphase")
+        clock_row.addWidget(self.phase)
+        col.addLayout(clock_row)
         self.meter = Meter()
         self.meter.setMinimumWidth(140)
+        self.meter.setFixedHeight(6)
         col.addWidget(self.meter)
         row.addLayout(col, 1)
         lay.addWidget(self.rec_row)
@@ -153,10 +180,11 @@ class RecordDialog(QDialog):
         lay.addWidget(self.status)
 
         # after Stop: the take, its ends, a listen and a name
-        self.review = QWidget()
+        self.review = QFrame()
+        self.review.setObjectName("recordreview")
         rv = QVBoxLayout(self.review)
-        rv.setContentsMargins(0, 0, 0, 0)
-        rv.setSpacing(8)
+        rv.setContentsMargins(16, 16, 16, 16)
+        rv.setSpacing(12)
         self.trim_home = QVBoxLayout()
         self.trim_home.setContentsMargins(0, 0, 0, 0)
         rv.addLayout(self.trim_home)
@@ -234,6 +262,10 @@ class RecordDialog(QDialog):
         self.rec_row.setVisible(not have)
         self.btn_rec.setEnabled(recording or not problem)
         self.btn_rec.setChecked(recording)
+        self.phase.setText(_("Recording…") if recording else _("Ready"))
+        self.phase.setProperty("recording", recording)
+        self.phase.style().unpolish(self.phase)
+        self.phase.style().polish(self.phase)
         self.btn_rec.setText(_("Stop") if recording else _("Record"))
         icons.set_icon(self.btn_rec, "stop" if recording else "record", "#ff4d4f", "#ffffff",
                        size=16)

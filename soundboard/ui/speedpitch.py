@@ -1,21 +1,21 @@
 """Live speed / pitch / effects: a small button on a transport bar ("1x") that opens
-a popup with the sliders. It changes what's playing right now and isn't saved; to
-keep a version of a sound, use its Edit → Effects tab instead.
+a movable window with the sliders. It changes what's playing right now and isn't
+saved; to keep a version of a sound, use its Edit → Effects tab instead.
 
 Two columns: speed & pitch on the left, the live effects (soundboard.livefx: bass,
 treble, muffle, reverb, echo, distortion, and presets that set several) on the right.
 
 The sane range (0.25–2x, ±12 st) is always there. The greyed-out **Redline**
 section under it unlocks the silly range (up to 10x, ±36 st) and shows a rev
-meter that goes into the red past 2x."""
+meter whose red zone starts at 8x."""
 from __future__ import annotations
 
 import math
 
 from PySide6.QtCore import QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
-from PySide6.QtWidgets import (QCheckBox, QFrame, QGridLayout, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import livefx, theme, voicefx
 from soundboard.ui import icons
@@ -26,7 +26,7 @@ from soundboard.i18n import _
 SPEED = voicefx.Param("speed", _("Speed"), 0.25, 2.0, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), -12, 12, 0, " st", 1)
 QUICK = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
-REDLINE_AT = 2.0                        # the meter's red zone starts here
+REDLINE_AT = 8.0                        # the meter's red zone starts here
 REDLINE_SPEED = (0.1, 10.0)             # sounds
 REDLINE_PITCH = voicefx.Param("pitch", _("Pitch"), -36, 36, 0, " st", 1)
 REDLINE_QUICK = (3.0, 4.0, 6.0, 8.0, 10.0)
@@ -79,24 +79,25 @@ class RevMeter(QWidget):
             a = math.radians(self._angle(v))
             return QPointF(c.x() + rad * math.cos(a), c.y() - rad * math.sin(a))
 
-        warn_to = min(self.top, max(REDLINE_AT + 1, self.top * 0.4))
+        warn_at = min(self.top, max(0.0, REDLINE_AT - 2))
+        red_at = min(self.top, REDLINE_AT)
         arc(0, self.top, t["faint"], 3)                  # the whole dial, dim
-        arc(0, REDLINE_AT, t["accent"], 7)
-        arc(REDLINE_AT, warn_to, t["warn_text"], 7)
-        if warn_to < self.top:
-            arc(warn_to, self.top, RED, 7)
+        arc(0, warn_at, t["accent"], 7)
+        arc(warn_at, red_at, t["warn_text"], 7)
+        if red_at < self.top:
+            arc(red_at, self.top, RED, 7)
 
         f = QFont(self.font())
         f.setPointSizeF(7)
         p.setFont(f)
         for i in range(int(self.top) + 1):              # a tick + number per 1x
-            hot = i > REDLINE_AT
+            hot = i >= REDLINE_AT
             p.setPen(QPen(QColor(RED if hot else t["muted"]), 1.5))
             p.drawLine(point(i, r - 6), point(i, r - 13))
             q = point(i, r - 22)
             p.drawText(QRectF(q.x() - 10, q.y() - 7, 20, 14), Qt.AlignCenter, str(i))
 
-        hot = self.speed > REDLINE_AT + 1e-6
+        hot = self.speed >= REDLINE_AT - 1e-6
         needle = QColor(RED if hot else t["text_hi"])
         p.setPen(QPen(needle, 2.5, Qt.SolidLine, Qt.RoundCap))
         p.drawLine(c, point(self.speed, r - 4))
@@ -140,7 +141,12 @@ class SpeedPitchButton(QPushButton):
         self._speed_hi = redline_speed(*redline)
         redline = redline[1]
 
-        self.pop = QFrame(self, Qt.Popup)
+        # A regular modeless window: its title bar can be dragged, and clicking
+        # the board does not dismiss the controls while configuring live audio.
+        self.pop = QDialog(self)
+        self.pop.setWindowTitle(_("Live controls"))
+        self.pop.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self._placed = False
         self.pop.setObjectName("transport")
         v = QVBoxLayout(self.pop)
         v.setContentsMargins(16, 12, 16, 14)
@@ -328,7 +334,7 @@ class SpeedPitchButton(QPushButton):
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
         self.red_box.setVisible(on and self.has_speed)   # the rev meter: speed only
         if self.pop.isVisible():
-            self._open()                  # resize / re-place it for the new height
+            self._open()                  # resize, retaining the user's position
         self._edited()
 
     def values(self) -> tuple[float, float, bool]:
@@ -375,18 +381,23 @@ class SpeedPitchButton(QPushButton):
         self.red_box.parentWidget().layout().activate()
         self.pop.layout().activate()
         self.pop.adjustSize()
-        pos = self.mapToGlobal(QPoint(0, 0))
-        # kept on the screen the button is on (a second monitor can sit left of or
-        # above the primary one, at negative coordinates)
-        area = self.screen().availableGeometry()
-        y = pos.y() - self.pop.height() - 4     # above the bar, unless there's no room
-        if y < area.top():
-            y = pos.y() + self.height() + 4
-        y = max(area.top(), min(y, area.bottom() - self.pop.height()))
-        x = pos.x() + self.width() - self.pop.width()
-        x = max(area.left(), min(x, area.right() - self.pop.width()))
-        self.pop.move(x, y)
+        if not self._placed:
+            # Open over the owner, rather than aligning a wide panel to a small
+            # Effects button near the left edge of the app.
+            owner = self.window().frameGeometry()
+            self.pop.move(owner.center() - self.pop.rect().center())
         self.pop.show()
+        # show() supplies the native title-bar size. Include that frame when
+        # keeping controls reachable, including monitors at negative coordinates.
+        frame = self.pop.frameGeometry()
+        screen = QApplication.screenAt(frame.center()) or self.screen()
+        area = screen.availableGeometry()
+        x = max(area.left(), min(frame.x(), area.right() - frame.width() + 1))
+        y = max(area.top(), min(frame.y(), area.bottom() - frame.height() + 1))
+        self.pop.move(QPoint(x, y))
+        self._placed = True
+        self.pop.raise_()
+        self.pop.activateWindow()
 
     def _label(self):
         s, p, _k = self.values()
@@ -403,7 +414,7 @@ class SpeedPitchButton(QPushButton):
                 parts.append("FX")
             txt = " · ".join(parts) or _("Effects")
         self.setText(txt)
-        hot = s > REDLINE_AT + 1e-6 or abs(p) > PITCH.hi
+        hot = s >= REDLINE_AT - 1e-6 or abs(p) > PITCH.hi
         # scoped to this button: unscoped, it would cascade into the popup (a child).
         # Only when the look changes: each set re-polishes the popup's ~90 widgets too
         # (6-9 ms a slider step)
