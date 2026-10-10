@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updating the downloader (yt-dlp) no longer fails now and then when a search or
+  download starts at the same moment.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
