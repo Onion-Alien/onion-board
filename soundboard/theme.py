@@ -560,6 +560,7 @@ QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
+QDialog#transport { background:$panel; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
@@ -624,6 +625,7 @@ QFrame#urgentbar QPushButton#urgenthide { background:transparent; color:$warn_te
     border-radius:14px; padding:0; font-size:12pt; }
 QFrame#urgentbar QPushButton#urgenthide:hover { background:$danger_bg; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
+QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
@@ -1198,7 +1200,7 @@ def stylesheet(name: str | None = None) -> str:
     else:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
     if tk.get("texture") and (url := _texture_url(tk["texture"], tk["panel"])):
-        css += ("QFrame#card, QFrame#transport, QFrame#deck, QFrame#setcard "
+        css += ("QFrame#card, QFrame#transport, QDialog#transport, QFrame#deck, QFrame#setcard "
                 f'{{ background-image:url("{url}"); }}\n')
     return css
 
