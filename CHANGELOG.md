@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Robo-Bun sets up AI voices.** While AI voices download and install, a little
+  robot bunny runs off, comes back with a wrench and builds, with a moving bar and
+  short steps like "Installing the voice engine" instead of pip's output. He cheers
+  when it's done. If it fails, the real error still shows.
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.

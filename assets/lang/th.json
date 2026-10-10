@@ -2821,5 +2821,9 @@
   "How the app is used": "วิธีการใช้งานแอป",
   "voice changer, Radio tab": "โปรแกรมเปลี่ยนเสียง, แท็บวิทยุ",
   "Your answers, if you give them": "คำตอบของคุณถ้าคุณให้พวกเขา",
-  "heard of it on YouTube": "ได้ยินเรื่องนี้ใน YouTube"
+  "heard of it on YouTube": "ได้ยินเรื่องนี้ใน YouTube",
+  "Getting Python ready…": "กำลังเตรียม Python…",
+  "Installing the voice engine (a few minutes)…": "กำลังติดตั้งเอนจินเสียง (ไม่กี่นาที)…",
+  "Downloading the voices…": "กำลังดาวน์โหลดเสียง…",
+  "Downloading the voices: {percent}%": "กำลังดาวน์โหลดเสียง: {percent}%"
 }

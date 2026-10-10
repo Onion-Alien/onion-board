@@ -2943,5 +2943,9 @@
   "How the app is used": "Как используется приложение",
   "voice changer, Radio tab": "смена голоса, вкладка Радио",
   "Your answers, if you give them": "Ваши ответы, если вы их дадите",
-  "heard of it on YouTube": "слышал об этом на YouTube"
+  "heard of it on YouTube": "слышал об этом на YouTube",
+  "Getting Python ready…": "Готовлю Python…",
+  "Installing the voice engine (a few minutes)…": "Устанавливаю голосовой движок (пару минут)…",
+  "Downloading the voices…": "Скачиваю голоса…",
+  "Downloading the voices: {percent}%": "Скачиваю голоса: {percent}%"
 }

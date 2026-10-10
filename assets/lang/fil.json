@@ -2881,5 +2881,9 @@
   "How the app is used": "Paano ginagamit ang app",
   "voice changer, Radio tab": "voice changer, Radio tab",
   "Your answers, if you give them": "Iyong mga sagot, kung ibibigay mo",
-  "heard of it on YouTube": "narinig ito sa YouTube"
+  "heard of it on YouTube": "narinig ito sa YouTube",
+  "Getting Python ready…": "Inihahanda ang Python…",
+  "Installing the voice engine (a few minutes)…": "Ini-install ang voice engine (ilang minuto)…",
+  "Downloading the voices…": "Dina-download ang mga boses…",
+  "Downloading the voices: {percent}%": "Dina-download ang mga boses: {percent}%"
 }

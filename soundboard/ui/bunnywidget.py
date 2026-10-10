@@ -111,8 +111,9 @@ class BunnyWidget(QWidget):
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
                  lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
-                 naps: bool = False):
+                 naps: bool = False, robot: bool = False):
         super().__init__(parent)
+        self.robot = robot              # Robo-Bun: metal, LEDs, a wrench instead of a hammer
         self.pong = pong
         self.naps = naps
         self._woken_until = 0.0         # a click woke him: awake until then
@@ -135,6 +136,7 @@ class BunnyWidget(QWidget):
         if joy_lines:
             self.setCursor(Qt.PointingHandCursor)
         self.sad = sad             # his mood at rest
+        self._home_sad = sad       # ... which a failed build only dents until the next try
         self._sad = sad            # ... and right now (smoothed)
         self._hopeful = False
         self._sigh_at = -1.0
@@ -298,12 +300,15 @@ class BunnyWidget(QWidget):
         self._act_kind = "build"
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
+        self.sad = self._home_sad
 
     def stop_building(self, ok: bool):
-        """End the act: celebrate if `ok`, otherwise go back to the usual pose."""
+        """End the act: celebrate if `ok`, otherwise go back to the usual pose, looking
+        sad until the next try."""
         self._act_t, self._act_kind = -1.0, "build"
         self.prop = "star" if ok else self._home_prop
         self.celebrate = ok or self._home_celebrate
+        self.sad = self._home_sad if ok else max(self._home_sad, 0.8)
         if ok:
             self.burst(8)
 
@@ -372,7 +377,10 @@ class BunnyWidget(QWidget):
                 self._puff(r.center().x() + self._rng.uniform(-18, 18),
                            r.center().y() + self._rng.uniform(-10, 18), 40, 9, 0.6)
         elif phase == "back" and before < CLOUD_END:
-            self.prop = "hammer" if self._act_kind == "build" else "bat"
+            if self._act_kind != "build":
+                self.prop = "bat"
+            else:
+                self.prop = "wrench" if self.robot else "hammer"
         elif phase == "bat":
             if before < BACK_END:
                 self.say = _("you want some?")
@@ -562,7 +570,7 @@ class BunnyWidget(QWidget):
             draw_bunny(p, r.translated(pose["dx"], pose["dy"]), self.prop,
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
                        swing=pose["swing"], sad=pose["sad"], angry=pose["angry"],
-                       nightcap=self.asleep)
+                       nightcap=self.asleep, robot=self.robot)
         else:
             self._paint_scuffle(p)
         if self.say and pose["shown"]:

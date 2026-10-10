@@ -2941,5 +2941,9 @@
   "How the app is used": "Jak se aplikace používá",
   "voice changer, Radio tab": "měnič hlasu, karta Rádio",
   "Your answers, if you give them": "Vaše odpovědi, pokud je dáte",
-  "heard of it on YouTube": "slyšeli o tom na YouTube"
+  "heard of it on YouTube": "slyšeli o tom na YouTube",
+  "Getting Python ready…": "Připravuji Python…",
+  "Installing the voice engine (a few minutes)…": "Instaluji hlasový engine (pár minut)…",
+  "Downloading the voices…": "Stahuji hlasy…",
+  "Downloading the voices: {percent}%": "Stahuji hlasy: {percent}%"
 }

@@ -133,3 +133,26 @@ def test_headphones_trickle_calm_notes(qapp):
         if b.notes:
             break
     assert b.notes and all(n.calm for n in b.notes)
+
+
+def test_robot_bunny_widget_build_and_props(qapp):
+    from soundboard.bunny import bunny_image
+    img = bunny_image(100, "wrench", robot=True)
+    assert not img.isNull()
+    b = BunnyWidget(robot=True)
+    assert b.robot
+    b.resize(b.sizeHint())
+    b.build()
+    assert b.building
+    phases = []
+    for _ in range(140):
+        _run(qapp, b, 1)
+        if b.act_phase() not in phases:
+            phases.append(b.act_phase())
+    assert "dash" in phases and "cloud" in phases and "back" in phases and "hammer" in phases
+    assert b.prop == "wrench"
+    b.stop_building(True)
+    assert not b.building and b.celebrate and b.prop == "star"
+    b.build()
+    b.stop_building(False)
+    assert not b.building and not b.celebrate and b.sad > 0.5

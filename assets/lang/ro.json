@@ -2941,5 +2941,9 @@
   "How the app is used": "Cum se folosește aplicația",
   "voice changer, Radio tab": "schimbător de voce, fila Radio",
   "Your answers, if you give them": "Răspunsurile tale, dacă le dai",
-  "heard of it on YouTube": "am auzit de asta pe YouTube"
+  "heard of it on YouTube": "am auzit de asta pe YouTube",
+  "Getting Python ready…": "Se pregătește Python…",
+  "Installing the voice engine (a few minutes)…": "Se instalează motorul de voci (câteva minute)…",
+  "Downloading the voices…": "Se descarcă vocile…",
+  "Downloading the voices: {percent}%": "Se descarcă vocile: {percent}%"
 }

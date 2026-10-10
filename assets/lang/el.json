@@ -2881,5 +2881,9 @@
   "How the app is used": "Πώς χρησιμοποιείται η εφαρμογή",
   "voice changer, Radio tab": "αλλαγή φωνής, καρτέλα Ραδιόφωνο",
   "Your answers, if you give them": "Τις απαντήσεις σας, αν τις δώσετε",
-  "heard of it on YouTube": "το άκουσε στο YouTube"
+  "heard of it on YouTube": "το άκουσε στο YouTube",
+  "Getting Python ready…": "Προετοιμασία της Python…",
+  "Installing the voice engine (a few minutes)…": "Εγκατάσταση της μηχανής φωνών (λίγα λεπτά)…",
+  "Downloading the voices…": "Λήψη των φωνών…",
+  "Downloading the voices: {percent}%": "Λήψη των φωνών: {percent}%"
 }

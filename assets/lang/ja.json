@@ -2821,5 +2821,9 @@
   "How the app is used": "アプリの使用方法",
   "voice changer, Radio tab": "ボイスチェンジャー、ラジオタブ",
   "Your answers, if you give them": "あなたの答えがあれば、",
-  "heard of it on YouTube": "YouTubeで聞いた"
+  "heard of it on YouTube": "YouTubeで聞いた",
+  "Getting Python ready…": "Python を準備中…",
+  "Installing the voice engine (a few minutes)…": "音声エンジンをインストール中（数分）…",
+  "Downloading the voices…": "声をダウンロード中…",
+  "Downloading the voices: {percent}%": "声をダウンロード中: {percent}%"
 }

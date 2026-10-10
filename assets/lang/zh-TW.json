@@ -2821,5 +2821,9 @@
   "How the app is used": "如何使用該應用程式",
   "voice changer, Radio tab": "變聲器，收音機選項卡",
   "Your answers, if you give them": "你的答案，如果你給的話",
-  "heard of it on YouTube": "在 YouTube 上聽過"
+  "heard of it on YouTube": "在 YouTube 上聽過",
+  "Getting Python ready…": "正在準備 Python…",
+  "Installing the voice engine (a few minutes)…": "正在安裝語音引擎（需要幾分鐘）…",
+  "Downloading the voices…": "正在下載聲音…",
+  "Downloading the voices: {percent}%": "正在下載聲音：{percent}%"
 }

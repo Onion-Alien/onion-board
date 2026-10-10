@@ -2881,5 +2881,9 @@
   "How the app is used": "Hogyan használják az alkalmazást",
   "voice changer, Radio tab": "hangváltó, Rádió fül",
   "Your answers, if you give them": "A válaszaidat, ha megadod",
-  "heard of it on YouTube": "hallott róla a YouTube-on"
+  "heard of it on YouTube": "hallott róla a YouTube-on",
+  "Getting Python ready…": "Python előkészítése…",
+  "Installing the voice engine (a few minutes)…": "A hangmotor telepítése (pár perc)…",
+  "Downloading the voices…": "A hangok letöltése…",
+  "Downloading the voices: {percent}%": "A hangok letöltése: {percent}%"
 }

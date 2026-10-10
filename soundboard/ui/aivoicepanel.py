@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import threading
 
 from PySide6.QtCore import Qt, Signal
@@ -21,7 +22,9 @@ from soundboard.i18n import _
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, icons
+from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.panel import hint_label, section_label
+from soundboard.ui.widgets import LoadingBar
 from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
@@ -59,12 +62,32 @@ def model_downloaded(module: mods.ModuleInfo | None) -> bool:
         for f in ("stream.onnx", "speaker.onnx", "voices.npz"))
 
 
+def install_step(line: str) -> str | None:
+    """What the card says for one line of the add-on's install output: each install
+    step's command ("> -m pip install …") becomes a short stage, the voice download's
+    percentage updates it, and pip's own chatter is None (the stage stays up)."""
+    s = line.strip()
+    if s.startswith("> "):
+        if " venv " in s + " ":
+            return _("Getting Python ready…")
+        if " pip " in s:
+            return _("Installing the voice engine (a few minutes)…")
+        if "--download" in s:
+            return _("Downloading the voices…")
+        return _("Setting up…")
+    m = re.search(r"voice model: (\d+) ?%", s)
+    if m:
+        return _("Downloading the voices: {percent}%", percent=int(m.group(1)))
+    return None
+
+
 class AiVoicePanel(QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
     _event = Signal(dict)
-    _install_line = Signal(str)
+    _install_line = Signal(str)     # a raw line of the install's output
+    _install_note = Signal(str)     # our own words for the card, shown as they are
     _install_done = Signal(bool, str)
 
     def __init__(self, controller: aivoice.AiVoiceController, settings: dict,
@@ -77,7 +100,9 @@ class AiVoicePanel(QWidget):
         controller.on_event = self._event.emit
         controller.set_backup(self.s["backup"])
         self._event.connect(self._on_event)
-        self._install_line.connect(lambda t: self.lbl_install.setText(t[-160:]))
+        self._install_line.connect(self._on_install_line)
+        self._install_note.connect(lambda t: self.lbl_install.setText(t))
+        self._last_line = ""            # the install's last output: the error if it fails
         self._install_done.connect(self._on_install_done)
         self._installing = False
         self._voice_name = ""
@@ -160,8 +185,17 @@ class AiVoicePanel(QWidget):
         mv = QVBoxLayout(self.missing)
         mv.setContentsMargins(0, 0, 0, 0)
         mv.setSpacing(12)
+
+        setup_row = QHBoxLayout()
+        setup_row.setSpacing(16)
+        self.bun_robot = BunnyWidget(height=88, pad=14, robot=True)
+        setup_row.addWidget(self.bun_robot, 0, Qt.AlignVCenter)
+
+        info = QVBoxLayout()
+        info.setSpacing(8)
         self.lbl_missing = hint_label("")
-        mv.addWidget(self.lbl_missing)
+        info.addWidget(self.lbl_missing)
+
         mrow = QHBoxLayout()
         mrow.setSpacing(8)
         self.b_install = QPushButton(_("Install AI voices"))
@@ -176,11 +210,19 @@ class AiVoicePanel(QWidget):
         self.b_get.clicked.connect(self._get)
         mrow.addWidget(self.b_get)
         mrow.addStretch(1)
-        mv.addLayout(mrow)
-        v.addWidget(self.missing)
+        info.addLayout(mrow)
+
         self.lbl_install = hint_label("")
         self.lbl_install.hide()
-        v.addWidget(self.lbl_install)
+        info.addWidget(self.lbl_install)
+
+        self.loading_bar = LoadingBar()
+        self.loading_bar.hide()
+        info.addWidget(self.loading_bar)
+
+        setup_row.addLayout(info, 1)
+        mv.addLayout(setup_row)
+        v.addWidget(self.missing)
 
         self.btn_opts = QPushButton(_("More options"))
         self.btn_opts.setObjectName("fold")
@@ -262,13 +304,18 @@ class AiVoicePanel(QWidget):
     def _refresh(self):
         m = self.module
         ok = m is not None and m.installed and model_downloaded(m) and bool(self.voices)
-        self.ready_box.setVisible(ok)
-        self.missing.setVisible(not ok)
-        self.b_install.setVisible(m is not None and not ok)
-        self.b_get.setVisible(m is None)
+        if self._installing:
+            self.ready_box.setVisible(False)
+            self.missing.setVisible(True)
+        else:
+            self.ready_box.setVisible(ok)
+            self.missing.setVisible(not ok)
+        busy_now = self._installing   # Robo-Bun, the step and the bar stand in for them
+        self.b_install.setVisible(m is not None and not ok and not busy_now)
+        self.b_get.setVisible(m is None and not busy_now)
         self.b_update.setVisible(m is not None)
         self.b_remove.setVisible(m is not None and aiaddon.removable(m))
-        self.btn_opts.setVisible(m is not None)
+        self.btn_opts.setVisible(m is not None and not self._installing)
         if net.offline():   # Offline mode: nothing here can be fetched (the card goes
             for b in (self.b_get, self.b_install, self.b_update):   # when not ready)
                 b.hide()
@@ -467,12 +514,17 @@ class AiVoicePanel(QWidget):
         self._installing = True
         self.b_get.setEnabled(False)
         self.b_get.setText(_("Getting AI voices…"))
+        self._last_line = ""
+        self._refresh()
+        self.bun_robot.build()
         self.lbl_install.show()
         self.lbl_install.setText(_("asking GitHub for the add-on…"))
+        self.loading_bar.show()
+        self.loading_bar.start()
 
         def progress(done: int, total: int):
             if total:
-                busy.emit(self._install_line, _("downloading: {percent}% of {size} MB",
+                busy.emit(self._install_note, _("downloading: {percent}% of {size} MB",
                                                 percent=done * 100 // total,
                                                 size=f"{total / 1e6:.0f}"))
 
@@ -482,7 +534,7 @@ class AiVoicePanel(QWidget):
                 if offer is None:
                     raise mods.ModuleError(_("there's no AI voices add-on to download yet"))
                 info = aiaddon.install(aiaddon.fetch(offer, progress))
-                busy.emit(self._install_line,
+                busy.emit(self._install_note,
                           _("setting up its Python environment (a few minutes)…"))
                 ok = mods.install(info, lambda line: busy.emit(self._install_line, line))
                 busy.emit(self._install_done, ok, "")
@@ -513,11 +565,16 @@ class AiVoicePanel(QWidget):
         if m is None or self._installing:
             return
         self._installing = True
+        self._refresh()
         for b in (self.b_install, self.b_update, self.b_start):
             b.setEnabled(False)
         self.b_install.setText(_("Installing… (a few minutes)"))
+        self._last_line = ""
+        self.bun_robot.build()
         self.lbl_install.show()
         self.lbl_install.setText(_("starting…"))
+        self.loading_bar.show()
+        self.loading_bar.start()
 
         def work():
             try:
@@ -530,22 +587,36 @@ class AiVoicePanel(QWidget):
 
         threading.Thread(target=work, name="ai-voices-install", daemon=True).start()
 
+    def _on_install_line(self, t: str):
+        """Robo-Bun does the work on screen: the card shows the stage, not pip's output,
+        and keeps the last line in case it's the error."""
+        self._last_line = t
+        step = install_step(t)
+        if step:
+            self.lbl_install.setText(step)
+
     def _on_install_done(self, ok: bool, err: str = ""):
         self._installing = False
         for b in (self.b_install, self.b_update, self.b_start, self.b_get):
             b.setEnabled(True)
         self.b_install.setText(_("Install AI voices"))
         self.b_get.setText(_("Get AI voices"))
+        self.loading_bar.stop()
+        self.loading_bar.hide()
+        self.bun_robot.stop_building(ok)
         if ok:
             self.lbl_install.hide()
             self.modules_changed.emit()     # a fresh download is a new module folder
             self._refresh()
             busy.toast(self, _("AI voices are installed. Pick a voice and press Start."), "ok")
         else:
+            self._refresh()                 # the buttons come back to try again
+            self.lbl_install.show()
             self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
                                        "if it keeps failing, run install.bat in the add-on's "
                                        "folder to see why.",
-                                       error=err or self.lbl_install.text()))
+                                       error=err or self._last_line[-160:] or
+                                       self.lbl_install.text()))
 
     def shutdown(self):
         self.ctl.shutdown()

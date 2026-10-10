@@ -2881,5 +2881,9 @@
   "How the app is used": "Wie die App genutzt wird",
   "voice changer, Radio tab": "Sprachwechsler, Registerkarte „Radio“",
   "Your answers, if you give them": "Ihre Antworten, wenn Sie sie geben",
-  "heard of it on YouTube": "Habe davon auf YouTube gehört"
+  "heard of it on YouTube": "Habe davon auf YouTube gehört",
+  "Getting Python ready…": "Python wird vorbereitet…",
+  "Installing the voice engine (a few minutes)…": "Stimmen-Engine wird installiert (ein paar Minuten)…",
+  "Downloading the voices…": "Stimmen werden heruntergeladen…",
+  "Downloading the voices: {percent}%": "Stimmen werden heruntergeladen: {percent}%"
 }

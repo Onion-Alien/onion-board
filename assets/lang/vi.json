@@ -2821,5 +2821,9 @@
   "How the app is used": "Ứng dụng được sử dụng như thế nào",
   "voice changer, Radio tab": "thay đổi giọng nói, tab Radio",
   "Your answers, if you give them": "Câu trả lời của bạn, nếu bạn đưa ra chúng",
-  "heard of it on YouTube": "nghe nói về nó trên YouTube"
+  "heard of it on YouTube": "nghe nói về nó trên YouTube",
+  "Getting Python ready…": "Đang chuẩn bị Python…",
+  "Installing the voice engine (a few minutes)…": "Đang cài bộ máy giọng nói (vài phút)…",
+  "Downloading the voices…": "Đang tải giọng nói…",
+  "Downloading the voices: {percent}%": "Đang tải giọng nói: {percent}%"
 }

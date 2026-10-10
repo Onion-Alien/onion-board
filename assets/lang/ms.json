@@ -2821,5 +2821,9 @@
   "How the app is used": "Cara apl digunakan",
   "voice changer, Radio tab": "penukar suara, tab Radio",
   "Your answers, if you give them": "Jawapan anda, jika anda memberikannya",
-  "heard of it on YouTube": "mendengarnya di YouTube"
+  "heard of it on YouTube": "mendengarnya di YouTube",
+  "Getting Python ready…": "Menyediakan Python…",
+  "Installing the voice engine (a few minutes)…": "Memasang enjin suara (beberapa minit)…",
+  "Downloading the voices…": "Memuat turun suara…",
+  "Downloading the voices: {percent}%": "Memuat turun suara: {percent}%"
 }

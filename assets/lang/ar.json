@@ -3121,5 +3121,9 @@
   "How the app is used": "كيف يتم استخدام التطبيق",
   "voice changer, Radio tab": "مغير الصوت، علامة تبويب الراديو",
   "Your answers, if you give them": "إجاباتك، إذا أعطيتهم",
-  "heard of it on YouTube": "سمعت عنه على موقع يوتيوب"
+  "heard of it on YouTube": "سمعت عنه على موقع يوتيوب",
+  "Getting Python ready…": "جارٍ تجهيز Python…",
+  "Installing the voice engine (a few minutes)…": "جارٍ تثبيت محرك الأصوات (بضع دقائق)…",
+  "Downloading the voices…": "جارٍ تنزيل الأصوات…",
+  "Downloading the voices: {percent}%": "جارٍ تنزيل الأصوات: {percent}%"
 }

@@ -2881,5 +2881,9 @@
   "How the app is used": "ऐप का उपयोग कैसे किया जाता है",
   "voice changer, Radio tab": "वॉयस चेंजर, रेडियो टैब",
   "Your answers, if you give them": "आपके उत्तर, यदि आप उन्हें देते हैं",
-  "heard of it on YouTube": "इसके बारे में यूट्यूब पर सुना"
+  "heard of it on YouTube": "इसके बारे में यूट्यूब पर सुना",
+  "Getting Python ready…": "Python तैयार हो रहा है…",
+  "Installing the voice engine (a few minutes)…": "आवाज़ इंजन इंस्टॉल हो रहा है (कुछ मिनट)…",
+  "Downloading the voices…": "आवाज़ें डाउनलोड हो रही हैं…",
+  "Downloading the voices: {percent}%": "आवाज़ें डाउनलोड हो रही हैं: {percent}%"
 }

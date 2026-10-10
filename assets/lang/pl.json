@@ -2941,5 +2941,9 @@
   "How the app is used": "Sposób korzystania z aplikacji",
   "voice changer, Radio tab": "zmieniacz głosu, zakładka Radio",
   "Your answers, if you give them": "Twoje odpowiedzi, jeśli je dasz",
-  "heard of it on YouTube": "słyszałem o tym na YouTube"
+  "heard of it on YouTube": "słyszałem o tym na YouTube",
+  "Getting Python ready…": "Przygotowuję Pythona…",
+  "Installing the voice engine (a few minutes)…": "Instaluję silnik głosów (kilka minut)…",
+  "Downloading the voices…": "Ściągam głosy…",
+  "Downloading the voices: {percent}%": "Ściągam głosy: {percent}%"
 }

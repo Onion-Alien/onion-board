@@ -2821,5 +2821,9 @@
   "How the app is used": "앱 사용 방법",
   "voice changer, Radio tab": "보이스 체인저, 라디오 탭",
   "Your answers, if you give them": "당신이 대답을 해준다면",
-  "heard of it on YouTube": "유튜브에서 들었어"
+  "heard of it on YouTube": "유튜브에서 들었어",
+  "Getting Python ready…": "Python 준비 중…",
+  "Installing the voice engine (a few minutes)…": "음성 엔진 설치 중(몇 분)…",
+  "Downloading the voices…": "목소리 다운로드 중…",
+  "Downloading the voices: {percent}%": "목소리 다운로드 중: {percent}%"
 }
