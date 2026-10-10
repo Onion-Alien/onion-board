@@ -139,6 +139,7 @@ def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: 
 
 def test_the_rail_has_a_mode_button_that_follows_the_picker(window):  # noqa: F811
     mode = window.mode_btn
+    window.rail.set_open(False)   # shut: icons only
     assert window.rail.isAncestorOf(mode) and mode.text() == ""   # an icon beside Live
     acts = [a for a in mode.menu_.actions() if a.isCheckable()]
     assert [a.text() for a in acts] == ["Game", "Voice chat", "Clean", "Advanced…"]

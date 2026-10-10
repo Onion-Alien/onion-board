@@ -14,7 +14,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
-import sounddevice as sd
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
                             Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
@@ -44,8 +43,6 @@ from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, So
                                 prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
-from soundboard.testcheck import analyze as analyze_output
-from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash,
@@ -480,7 +477,6 @@ class MainWindow(QMainWindow):
         # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
         # given to it once it's in if nothing here has that key
         self._import_keys: dict[str, str] = {}
-        self._rec_playing = False
         self.current: str | None = None   # sound shown in the transport bar
         self._link_meta: SoundMeta | None = None   # the link bar's Play once
         self._link_url = ""                        # ...and the page it came from
@@ -497,11 +493,6 @@ class MainWindow(QMainWindow):
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
         self._talk_shown: bool | None = None
         self.virtual_mic: str | None = None
-        self._cap: list[np.ndarray] = []  # Record-6s test: capture of the cable's far end
-        self._cap_stream = None
-        self._cap_rate: int | None = None
-        self._cap_name: str | None = None
-        self._rec_started = 0.0
         self._load_thread: threading.Thread | None = None
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
         self._save_timer = QTimer(self)
@@ -895,8 +886,8 @@ class MainWindow(QMainWindow):
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
             self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
-        # one ⓘ under the tabs: how the whole app works (a tab's own explanation is in
-        # its right-click menu)
+        # one ⓘ at the rail's foot, over Settings: how the whole app works (a tab's own
+        # explanation is in its right-click menu). Not under the tabs: it isn't one
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
         self.btn_info.setProperty("railtext", _("How it works"))
@@ -923,7 +914,7 @@ class MainWindow(QMainWindow):
         self._update_more_tabs()
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
-            [self.btn_more_tabs, self.btn_info], self.cfg.sidebar_open, [self.gear],
+            [self.btn_more_tabs], self.cfg.sidebar_open, [self.btn_info, self.gear],
             self._rail_opened,
             # Live and Stop all first, so they never move; the pills only when needed
             # (at the rail's foot, as icons)
@@ -935,7 +926,7 @@ class MainWindow(QMainWindow):
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail
         prev = self.tabs.previousInFocusChain()
-        for w in (*self.rail.buttons, self.btn_more_tabs, self.btn_info, *self.rail.status,
+        for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status, self.btn_info,
                   self.gear,
                   self.rail.toggle, self.tabs):
             QWidget.setTabOrder(prev, w)
@@ -1873,28 +1864,6 @@ class MainWindow(QMainWindow):
         self.dest_panel = DestPanel(self)
         dv.addWidget(self.dest_panel)
         lcol.addStretch(1)
-
-        # ---- test
-        testcard, tv = card(_("Test your local mix"),
-                            _("Talk while a sound plays. Record the outgoing mix here and "
-                              "play it back in your headphones to check voice and sounds. "
-                              "Then use your chat app's microphone test to confirm it "
-                              "receives the audio."), roomy=True)
-        tv.setAlignment(Qt.AlignTop)
-        self.btn_rec = QPushButton(_("Record local mix for 6s"))
-        self.btn_rec.setObjectName("primary")
-        icons.set_icon(self.btn_rec, "record", "on_accent")
-        self.btn_rec.clicked.connect(self.start_test)
-        tv.addWidget(self.btn_rec, 0, Qt.AlignLeft)
-        tv.addWidget(hint_label(_("To hear it live instead, use Hear what they hear at the "
-                                  "bottom.")))
-        self.test_result = QLabel()
-        self.test_result.setWordWrap(True)
-        self.test_result.setTextFormat(Qt.RichText)
-        self.test_result.setObjectName("resultbox")
-        self.test_result.hide()
-        tv.addWidget(self.test_result)
-        routing.addWidget(testcard, 1)
 
         # ---- sound shaping
         eqcard, ev = card(roomy=True)
@@ -7451,86 +7420,12 @@ class MainWindow(QMainWindow):
                                   "sent, so nobody (including you) hears it.</span>",
                                   status=theme.status('warn')))
 
-    def start_test(self):
-        if self.engine.main_stream is None:
-            route = self.cfg.route
-            QMessageBox.information(
-                self, _("Test"),
-                _("Sending to others is off, so there's nothing to record. Change it under Setup "
-                  "→ Devices → Send my sounds to.") if route == "off" else
-                _("Pick the device to send to first (Setup tab → Devices → Send my sounds to).")
-                if route == "device" else
-                _("Put your sounds in your mic first (Setup tab → Put my sounds straight into my "
-                  "mic), or use the virtual cable.") if route == "mic" else
-                _("Set up the virtual cable first (Setup tab → Step-by-step guide), or pick "
-                  "another device under Send my sounds to."))
-            return
-        # Capture the far end of the virtual cable too, so the test hears exactly
-        # what Discord / the game hears (not just our internal mix).
-        self._stop_capture()
-        self._cap, self._cap_rate = [], None
-        # straight into my mic: the mic itself, which carries exactly what others get
-        vm = (self.cfg.mic_device if self.cfg.route == "mic"
-              else eng.virtual_mic_for(self.cfg.main_device))
-        self._cap_name = vm
-        if vm:
-            idx = eng.find_device("input", vm)
-            if idx is not None:
-                try:
-                    self._cap_rate = int(sd.query_devices(idx)["default_samplerate"])
-                    self._cap_stream = sd.InputStream(
-                        device=idx, samplerate=self._cap_rate, channels=2, dtype="float32",
-                        callback=lambda i, f, t, s: self._cap.append(i.copy()))
-                    self._cap_stream.start()
-                except Exception:  # noqa: BLE001 - fall back to the internal mix
-                    log.warning("can't capture %s for the test; using the internal mix",
-                                vm, exc_info=True)
-                    self._cap_stream = None
-        self.engine.start_test_record(6.0)
-        self.btn_rec.setEnabled(False)
-        self.test_result.hide()
-        self._rec_started = time.monotonic()
-
-    def _stop_capture(self) -> bool:
-        """Close the test's cable-capture stream if one is open. True if there was one."""
-        s, self._cap_stream = self._cap_stream, None
-        if s is None:
-            return False
-        try:
-            s.stop()
-            s.close()
-        except Exception:  # noqa: BLE001
-            log.debug("closing the test capture stream raised", exc_info=True)
-        return True
-
-    def _finish_test(self, internal, rate):
-        e = self.engine
-        cable = False
-        data = internal
-        if self._stop_capture() and self._cap:
-            data, rate, cable = np.concatenate(self._cap), self._cap_rate, True
-        mic = e.take_mic_recording()
-        if not self.cfg.mic_enabled:   # sounds only: don't go looking for the voice
-            mic = None
-        try:
-            r = analyze_output(data, rate, mic[0] if mic else None, mic[1] if mic else SR,
-                               self.cfg.sound_vol)
-            self.test_result.setText(summary_html(r, self._cap_name if cable else None,
-                                                  mic_sent=self.cfg.mic_enabled))
-        except Exception as ex:  # noqa: BLE001
-            log.exception("test analysis failed")
-            self.test_result.setText(
-                _("<span style='color:{status}'>Test analysis failed: {ex}</span>",
-                  status=theme.status('error'), ex=errors.plain(ex)))
-        self.test_result.show()
-        return data, rate
-
     # ------------------------------------------------------------------ tick
     # The window's visibility sets the UI timer's pace: 30/s for the meters and
     # visualisers while it's on screen, TICK_BG_MS while it's on screen behind another
     # program (a game: the meters still move, a third as often), TICK_IDLE_MS while it's
     # hidden in the tray or minimised (nothing to paint, but push-to-talk, the stream
-    # watchdog and the test recording must go on). Qt tells us through these three
+    # watchdog must go on). Qt tells us through these three
     # events and applicationStateChanged.
     def showEvent(self, ev):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
@@ -7574,11 +7469,10 @@ class MainWindow(QMainWindow):
 
     def _busy(self, playing) -> bool:
         """Something on screen moves with the tick: a sound playing (not paused), the
-        radio, the test recording, a meter or the mic level still showing."""
+        radio, a meter or the mic level still showing."""
         e = self.engine
         return (any(not paused for _p, paused in playing.values())
-                or self.radio.is_active() or e.recording or e.rec_done is not None
-                or self._rec_playing or bool(self._queue) or bool(e.aux)
+                or self.radio.is_active() or bool(self._queue) or bool(e.aux)
                 or max(e.level_play, e.level_main,
                        e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
 
@@ -7630,31 +7524,6 @@ class MainWindow(QMainWindow):
         e.level_play *= 0.9
         e.level_main *= 0.9
         e.level_mic *= 0.9
-
-        # test recording
-        if e.recording:
-            left = 6.0 - (now - self._rec_started)
-            self.btn_rec.setText(_("Recording… talk / play sounds  ({max:.0f}s)", max=max(left, 0)))
-            if left < -4:   # the output stopped (device unplugged): give up
-                e.cancel_test_record()
-                self._stop_capture()
-                self.btn_rec.setEnabled(True)
-                self.btn_rec.setText(_("Record local mix for 6s"))
-                self.test_result.setText(_("<span style='color:{status}'>The test stopped: the "
-                                           "send device's output went away. Check Devices and "
-                                           "try again.</span>", status=theme.status('error')))
-                self.test_result.show()
-        elif e.rec_done is not None:
-            data, rate = e.rec_done
-            e.rec_done = None
-            data, rate = self._finish_test(data, rate)
-            e.play("__test__", data, 1.0, preview=True, src_rate=rate)
-            self._rec_playing = True
-            self.btn_rec.setText(_("Playing back what they heard…"))
-        elif self._rec_playing and "__test__" not in playing:
-            self._rec_playing = False
-            self.btn_rec.setEnabled(True)
-            self.btn_rec.setText(_("Record local mix for 6s"))
 
         # auto push-to-talk: hold the game's PTT key only while a sound (or live
         # radio / a program) goes out. _ptt_held remembers exactly which key we pressed, so it's
@@ -8038,7 +7907,7 @@ class MainWindow(QMainWindow):
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
         for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
                      self._release_ptt,
-                     self._stop_capture, self._remember_usage, self.cfg.save, self.overlay.shutdown,
+                     self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,

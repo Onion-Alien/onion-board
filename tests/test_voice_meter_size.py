@@ -34,6 +34,28 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
         bar.deleteLater()
 
 
+def test_bar_keeps_its_height_when_chips_come_and_go(qapp):
+    bar = VoiceStatusBar()
+    bar.set_level(0.1)
+    bar.resize(1200, 60)
+    bar.show()
+    try:
+        heights = []
+        for items in ([("none", "Voice effects off", "off", "mic", None, "")],
+                      [("fx", "Male voice", "on", "voice", None, "")],
+                      [("fx", "Robot", "on", "voice", None, ""),
+                       ("ai", "AI voice off", "warn", "warn", None, "")],
+                      [("none", "Voice effects off", "off", "mic", None, "")]):
+            bar.set_items(items)
+            for _ in range(4):
+                qapp.processEvents()
+            heights.append(bar.sizeHint().height())
+        assert len(set(heights)) == 1, heights
+    finally:
+        bar.close()
+        bar.deleteLater()
+
+
 def test_many_chips_wrap_and_meter_recovers(qapp):
     bar = VoiceStatusBar()
     bar.set_level(0.1)
