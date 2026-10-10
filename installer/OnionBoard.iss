@@ -150,11 +150,11 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
 ; start; the only thing ever sent is one anonymous "opt-out/installer" (no ID). Ticked on a page the user saw, it's switched on (an
 ; old install had it off); a silent update never switches it on.
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
-  StatusMsg: "Switching off the usage count..."; \
+  StatusMsg: "Nearly done..."; \
   Tasks: not countme; Flags: runhidden waituntilterminated
 ; It also passes on the last page's "Where did you hear about Onion Board?".
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg}"; \
-  StatusMsg: "Switching on the usage count..."; \
+  StatusMsg: "Nearly done..."; \
   Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
