@@ -9,6 +9,9 @@
   YouTube's page settings are kept for an hour instead of being fetched before every
   search (Direct connection only; if a search with them fails, it's done again the old
   way, with fresh ones).
+- The log no longer warns about "a native error was caught and survived" for Windows
+  error code 0x8001010d and its kin: COM raises and handles those itself, so they're
+  harmless. They no longer count as a crash at the next start either.
 
 ## 1.9.28 — 2026-10-10
 
