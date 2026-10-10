@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Tab help uses a wider, rounded card with a clear heading, readable text and Bun
+  the bunny, or Hoot the owl for Onion Watch. Click outside or press Escape to close.
+
 - **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
   on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
   song through for about a second, then wipes it out, and its **Studio** profile,
