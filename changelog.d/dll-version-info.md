@@ -1,0 +1,1 @@
+- **The mic effect now names itself.** `obmic.dll` (the Windows audio effect behind *Straight into my mic*) carries a version resource, so Windows' file Properties and security tools see "Onion Board" rather than a nameless, unsigned DLL. The build stays byte-identical for the same version.
