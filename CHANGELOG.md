@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Switching a tab off, or closing a window, while it's still loading something (the
+  voice list, a picture, Discord's settings) can no longer crash the app.
 - Starting the app (or changing theme) no longer makes every Desktop icon blink and
   redraw. Recolouring the app's own shortcuts used to tell Windows to rebuild its whole
   icon cache; now it only refreshes those shortcuts.

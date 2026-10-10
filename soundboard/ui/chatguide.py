@@ -255,10 +255,7 @@ class ChatCheck(QObject):
         self._emit(self._found, app, chatcheck.test_signal() if app is not None else None, run)
 
     def _emit(self, signal, *args):
-        try:
-            signal.emit(*args)
-        except RuntimeError:   # the dialog closed meanwhile
-            pass
+        busy.emit(signal, *args)   # (on the UI thread: the dialog may close meanwhile)
 
     def _on_found(self, app, sig, run: int):
         if run != self._run or not self.running:
@@ -464,10 +461,7 @@ class DiscordGuide(QDialog):
         except Exception:  # noqa: BLE001 - never leave _reading stuck
             log.debug("reading Discord's settings failed", exc_info=True)
             sig, found = last, None
-        try:
-            self._settings_read.emit(sig, found)
-        except RuntimeError:   # the guide closed meanwhile
-            pass
+        busy.emit(self._settings_read, sig, found)
 
     def _settings_in(self, sig, found):
         self._reading = False
