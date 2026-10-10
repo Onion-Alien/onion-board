@@ -118,6 +118,15 @@ def test_missing_cable_offers_install_and_guide_returns(wizard, devices):
     assert not library.Config.load().setup_done   # shown again next launch
 
 
+def test_closing_the_guide_stops_it_opening_every_launch(wizard, devices):
+    # closed with the X (or Esc), setup_done stayed False, so it popped up every start
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    wiz.reject()
+    assert library.Config.load().setup_done
+
+
 def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
     w, wiz = wizard
     wiz.go(3)
