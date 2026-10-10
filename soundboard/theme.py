@@ -499,6 +499,10 @@ QLabel[tone="error"], QLabel#hint[tone="error"] { color:$error_text; }
 QLabel#eqlabel { color:$muted; font-size:8pt; }
 QLabel#empty { color:$muted; font-size:15px; padding:8px 40px 40px 40px; }
 QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
+QFrame#card QFrame#micflow { background:$bg; border:1px solid $border; border-radius:10px; }
+QFrame#card QFrame#micoutput { background:$panel; border:1px solid $border; border-radius:8px; }
+QFrame#card QLabel#micguide { padding:2px 0; }
+QFrame#card QLabel#micupdatenote { background:$bg; color:$muted; border-radius:8px; padding:12px; font-size:9pt; }
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }

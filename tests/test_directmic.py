@@ -1799,9 +1799,14 @@ def test_an_older_working_mic_part_offers_the_update_as_optional(window, monkeyp
         w._update_status()
         assert w.setup_state == "ok"
         step = w.step_lbl.text()
-        assert "Nothing to set" in step and "Optional" in step
+        assert "Nothing to set" in step
+        assert not w.mic_update_note.isHidden()
+        assert "Optional" in w.mic_update_note.text()
         assert w.btn_install.text().startswith("Optional")
         assert w.btn_install.objectName() != "primary"
+        _routes(w, monkeypatch, "ready", cables=())
+        w._update_flow()
+        assert w.mic_update_note.isHidden()
     finally:
         w.engine.main_stream = None
 
