@@ -2609,7 +2609,6 @@
   "Only stations streaming at least this bitrate": "이 비트레이트 이상을 스트리밍하는 스테이션만",
   "Others hear the radio. Click so only you do.": "다른 사람들은 라디오를 듣습니다. 클릭하면 나만 가능합니다.",
   "Play a random station": "임의의 채널 재생",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "표시되는 목록에서 임의의 방송국을 재생합니다(범위를 좁히려면 먼저 장르나 국가를 선택하세요).",
   "Playing now": "지금 재생 중",
   "Playing {name}": "{name} 플레이 중",
   "Playing {name}: {title}": "{name} 재생 중: {title}",

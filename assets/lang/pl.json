@@ -2717,7 +2717,6 @@
   "Only stations streaming at least this bitrate": "Tylko stacje transmitujące transmisję strumieniową o co najmniej tej przepływności",
   "Others hear the radio. Click so only you do.": "Inni słyszą radio. Kliknij, aby tylko Ty to zrobił.",
   "Play a random station": "Odtwórz losową stację",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Odtwórz losową stację z wyświetlonej listy (najpierw wybierz gatunek lub kraj, aby zawęzić listę)",
   "Playing now": "Gram teraz",
   "Playing {name}": "Gram w {name}",
   "Playing {name}: {title}": "Gram w {name} : {title}",

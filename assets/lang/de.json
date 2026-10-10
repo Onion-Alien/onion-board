@@ -2663,7 +2663,6 @@
   "Only stations streaming at least this bitrate": "Nur Sender, die mindestens diese Bitrate streamen",
   "Others hear the radio. Click so only you do.": "Andere hören das Radio. Klicken Sie, damit nur Sie es tun.",
   "Play a random station": "Spielen Sie einen zufälligen Sender ab",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Spielen Sie einen zufälligen Sender aus der angezeigten Liste ab (wählen Sie zuerst ein Genre oder Land aus, um es einzugrenzen).",
   "Playing now": "Spielt jetzt",
   "Playing {name}": "{name} wird gespielt",
   "Playing {name}: {title}": "{name} wird abgespielt: {title}",
