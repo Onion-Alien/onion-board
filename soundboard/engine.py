@@ -2682,8 +2682,15 @@ class Engine:
         two = x.shape[1] >= 2
         x = np.repeat(x, 2, axis=1) if x.shape[1] == 1 else x[:, :2]
         x = np.ascontiguousarray(x, dtype=np.float32)
-        if two:   # a copy (it may still be a view of PortAudio's buffer): written to
-            x = self._mic_channels(x.copy() if np.shares_memory(x, indata) else x)
+        if two and np.shares_memory(x, indata):   # a copy: it's written to below
+            x = x.copy()   # (it may still be a view of PortAudio's buffer)
+        # a NaN / Inf from the mic (a driver's effect, or the clean mic in the ring
+        # file, which anyone signed in can write) broke voice effects for the session
+        # (bypassed: the real voice went out), and stuck in what's sent and in the
+        # dead-channel check's averages
+        x = finite(x)
+        if two:
+            x = self._mic_channels(x)
         self.level_mic = max(peak(x), self.level_mic * 0.85)
         rec = self._mic_rec
         raw = x[:, 0].copy() if rec is not None and self._rec_buf is not None else None
