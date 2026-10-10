@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Closing *Show this when a program is in front…* while it's still finding your open
+  programs can no longer crash the app.
 - Importing a backup whose settings name `read_only` no longer stops the app saving
   for the rest of the session (the imported sounds were gone after a restart), and a
   settings file naming it is no longer set aside as damaged.
