@@ -22,22 +22,32 @@ def test_deleted_actions_share_one_row(qapp, app_dir):
     dialog.deleteLater()
 
 
-def test_information_button_is_on_the_rail_and_scoped(window, qapp):  # noqa: F811
+def test_information_button_is_on_the_rail_and_always_there(window, qapp):  # noqa: F811
     window.show()
-    window.tabs.setCurrentWidget(window.apps)
-    qapp.processEvents()
     button = window.btn_info
-    assert button.isVisible() and window.rail.isAncestorOf(button)   # under the tabs
-    window.tab_info["triggers"] = ("Triggers", "Look for a picture")
-    window.tabs.setCurrentWidget(window.triggers)
+    for page in (window.apps, window.triggers, window.sounds_page):
+        window.tabs.setCurrentWidget(page)
+        qapp.processEvents()
+        assert button.isVisible() and window.rail.isAncestorOf(button)   # under the tabs
+
+
+def test_help_cards_open_right_of_the_rail_inside_the_window(window, qapp, monkeypatch):  # noqa: F811
+    # it used to line up its right edge with the ⓘ, so it hung off the window's left
+    window.resize(1200, 800)
+    window.show()
     qapp.processEvents()
-    assert button.isVisible()
-    window.tabs.setCurrentWidget(window.sounds_page)   # every tab has a line now
-    qapp.processEvents()
-    assert button.isVisible()
-    del window.tab_info["sounds_page"]
-    window._update_info_btn()
-    assert not button.isVisible()
+    placed = []
+
+    def inspect(box):
+        placed.append((box.windowTitle(), box.geometry()))
+        return 0
+
+    monkeypatch.setattr(TabHelpPopup, "exec", inspect)
+    window.btn_info.click()
+    title, rect = placed[-1]
+    assert title == "How Onion Board works"
+    rail_right = window.rail.mapToGlobal(window.rail.rect().topRight()).x()
+    assert rect.left() > rail_right and window.geometry().contains(rect.topLeft())
 
 
 @pytest.mark.parametrize("page", ["radio_page", "triggers"])
@@ -65,7 +75,7 @@ def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page)
         return 0
 
     monkeypatch.setattr(TabHelpPopup, "exec", inspect)
-    window._show_tab_info()
+    window._show_tab_info(window.tabs.indexOf(target))
     assert checked == [True]
 
 

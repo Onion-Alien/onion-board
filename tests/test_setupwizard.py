@@ -87,6 +87,26 @@ def test_cable_present_routes_output_and_finishes(wizard, devices):
     assert library.Config.load().setup_done
 
 
+def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
+    # "Installed and connected" with the big set-up button under it read as "set it up
+    # again"; and a mic set-up that failed still ended Bun's show as a win (the cable
+    # worked)
+    from soundboard import directmic
+    w, wiz = wizard
+    wiz.show()
+    wiz.go(2)
+    assert w.cfg.route == "cable" and "Installed and" in wiz.cable_status.text()
+    assert wiz.btn_attach.isHidden() and not wiz.btn_mic_instead.isHidden()
+    monkeypatch.setattr(w, "attach_mic", lambda: None)
+    wiz.btn_mic_instead.click()
+    assert wiz.setup_show.on and wiz.btn_mic_instead.isHidden()
+    results = []
+    monkeypatch.setattr(wiz.setup_show, "finish", results.append)
+    monkeypatch.setattr(directmic, "status", lambda name=None: "absent")
+    w.mic_attached.emit("Headset Mic (USB)", "Windows said no")
+    assert results and not any(results)
+
+
 def test_missing_cable_offers_install_and_guide_returns(wizard, devices):
     devices["cable"] = False
     w, wiz = wizard
@@ -516,3 +536,59 @@ def test_a_mic_set_up_finishing_after_the_guide_closed_is_ignored(qapp, app_dir,
     w.close()
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, monkeypatch):
+    from soundboard import directmic
+    w, wiz = mic_wizard
+    wiz.show()
+    wiz.go(2)
+    assert not wiz.btn_attach.isHidden()
+    assert wiz.setup_show.isHidden()
+
+    monkeypatch.setattr(directmic, "install", lambda name: "")
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+
+    wiz.btn_attach.click()
+    assert wiz.setup_show.on
+    assert not wiz.setup_show.isHidden()
+    assert wiz.btn_attach.isHidden()
+    assert wiz.btn_cable.isHidden()
+    assert wiz.btn_other.isHidden()
+
+    w._attaching = False
+    w.mic_attached.emit("Headset Mic (USB)", "")
+
+    assert wiz.setup_show.on
+    assert "On your mic" in wiz.cable_status.text()
+    assert not busy.is_busy(wiz.btn_next)
+    assert wiz.btn_next.text().startswith("Next")
+
+    from soundboard.ui.busy import _Toast
+    toast = wiz.findChild(_Toast)
+    assert toast is None or toast.isHidden()
+
+    wiz.setup_show._stop()
+    assert not wiz.btn_cable.isHidden()
+    assert not wiz.btn_other.isHidden()
+    assert wiz.btn_attach.isHidden()
+
+
+def test_toast_places_above_dialog_bottom_buttons(qapp):
+    from PySide6.QtWidgets import QDialog, QPushButton
+    from soundboard.ui.busy import _Toast
+
+    dlg = QDialog()
+    dlg.resize(600, 500)
+    dlg.show()
+    btn = QPushButton("Next", dlg)
+    btn.resize(100, 40)
+    btn.move(450, 440)
+    btn.show()
+
+    t = _Toast(dlg)
+    t.show_text("Notice message", "", 5000)
+
+    assert t.y() + t.height() <= btn.y()
+    dlg.close()
+

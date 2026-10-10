@@ -3,6 +3,7 @@ switch, start with Windows vs Task Manager, the status line's text, hotkeys and
 categories, the effects preview, the crash dialog's state, loose empty files, the
 link bar's queue and the Discord check's clean-up. Offscreen, fake devices."""
 import numpy as np
+import pytest
 import shiboken6
 from PySide6.QtCore import QEvent, QSize, Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
@@ -142,6 +143,22 @@ def test_closing_the_edit_dialog_mid_render_clears_the_status(window, monkeypatc
     window.edit("s0")
     assert window.status.text() != "Rendering the preview…"
     assert window._preview_done is None
+
+
+@pytest.mark.parametrize("ok", [0, 1])
+def test_closing_the_edit_dialog_stops_the_preview(window, monkeypatch, ok):
+    window.audio["s0"] = np.zeros((48000, 2), np.float32)
+
+    class Previewed(main.EditDialog):
+        def exec(self):
+            assert window.preview("s0") == "playing"   # same effects: the plain preview
+            return ok
+    monkeypatch.setattr(main, "EditDialog", Previewed)
+    stopped = []
+    real = window.engine.stop
+    monkeypatch.setattr(window.engine, "stop", lambda sid: (stopped.append(sid), real(sid)))
+    window.edit("s0")
+    assert "s0:preview" in stopped and "s0~fx:preview" in stopped
 
 
 # --------------------------------------------------------------------------- crash dialog

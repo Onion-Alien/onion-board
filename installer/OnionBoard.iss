@@ -150,11 +150,11 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
 ; start; the only thing ever sent is one anonymous "opt-out/installer" (no ID). Ticked on a page the user saw, it's switched on (an
 ; old install had it off); a silent update never switches it on.
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
-  StatusMsg: "Switching off the usage count..."; \
+  StatusMsg: "Nearly done..."; \
   Tasks: not countme; Flags: runhidden waituntilterminated
 ; It also passes on the last page's "Where did you hear about Onion Board?".
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg}"; \
-  StatusMsg: "Switching on the usage count..."; \
+  StatusMsg: "Nearly done..."; \
   Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
@@ -210,6 +210,7 @@ var
   CableUnticked: Boolean;      // the cable box was unticked on the first visit
   Bunny: TBitmapImage;
   TorCaption: String;          // the Tor box's own caption (Offline mode replaces it)
+  CableKnown, CableThere: Boolean;   // CableInstalled's answer, asked once
   ImportPage: TWizardPage;     // "Bring your sounds over": only when one is found
   ImportBoxes: array of TNewCheckBox;
   ImportKeys: array of String; // soundboard/otherboards.py's key for each box
@@ -236,6 +237,39 @@ begin
   StringChangeEx(S, #13, '', True);
   StringChangeEx(S, #10, '', True);
   Result := Pos('"net_offline":true', S) > 0;
+end;
+
+// A working VB-Cable already on this PC: an active playback device whose driver is
+// "VB-Audio Virtual Cable" (Windows' own list of sound devices, read-only)
+function CableInstalled: Boolean;
+var
+  Root, I: Integer;
+  Base: String;
+  Keys: TArrayOfString;
+  State: Cardinal;
+  Driver: String;
+begin
+  if CableKnown then
+  begin
+    Result := CableThere;
+    exit;
+  end;
+  CableKnown := True;
+  CableThere := False;
+  if IsWin64 then Root := HKLM64 else Root := HKLM;
+  Base := 'SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render';
+  if RegGetSubkeyNames(Root, Base, Keys) then
+    for I := 0 to GetArrayLength(Keys) - 1 do
+      if RegQueryDWordValue(Root, Base + '\' + Keys[I], 'DeviceState', State) and
+         (State = 1) and
+         RegQueryStringValue(Root, Base + '\' + Keys[I] + '\Properties',
+           '{b3f8fa53-0004-438e-9003-51a46e139bfc},6', Driver) and
+         (Pos('VB-Audio Virtual Cable', Driver) > 0) then
+      begin
+        CableThere := True;
+        break;
+      end;
+  Result := CableThere;
 end;
 
 // The Offline mode box (silent installs: /OFFLINE=1, or the app already offline)
@@ -704,6 +738,18 @@ begin
   else if OfflineApplied and not OfflineChosen then
     WizardSelectTasks('ffmpeg');
   OfflineApplied := OfflineChosen;
+  // Already installed: say so, greyed out and unticked, rather than offer it again
+  if CableInstalled then
+  begin
+    WizardSelectTasks('!vbcable');
+    for I := 0 to WizardForm.TasksList.Items.Count - 1 do
+      if Pos('(VB-Cable)', WizardForm.TasksList.ItemCaption[I]) > 0 then
+      begin
+        WizardForm.TasksList.ItemCaption[I] :=
+          'The free virtual cable (VB-Cable): already installed on this PC';
+        WizardForm.TasksList.ItemEnabled[I] := False;
+      end;
+  end;
   for I := 0 to WizardForm.TasksList.Items.Count - 1 do
     if (Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0) then
     begin

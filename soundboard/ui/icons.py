@@ -84,23 +84,27 @@ def _volume(p, fill):
 
 
 def _play(p, fill):
-    path = QPainterPath(QPointF(7, 4.5))
-    path.lineTo(19.5, 12)
-    path.lineTo(7, 19.5)
+    path = QPainterPath()
+    path.moveTo(8.2, 5.8)
+    path.quadTo(7.2, 5.1, 7.2, 6.4)
+    path.lineTo(7.2, 17.6)
+    path.quadTo(7.2, 18.9, 8.2, 18.2)
+    path.lineTo(18.2, 12.6)
+    path.quadTo(19.2, 12.0, 18.2, 11.4)
     path.closeSubpath()
     fill(path)
 
 
 def _pause(p, fill):
-    for x in (6.5, 13.5):
+    for x in (6.8, 13.8):
         path = QPainterPath()
-        path.addRoundedRect(QRectF(x, 5, 4, 14), 1, 1)
+        path.addRoundedRect(QRectF(x, 5.5, 3.4, 13), 1.7, 1.7)
         fill(path)
 
 
 def _stop(p, fill):
     path = QPainterPath()
-    path.addRoundedRect(QRectF(6, 6, 12, 12), 2, 2)
+    path.addRoundedRect(QRectF(6, 6, 12, 12), 2.8, 2.8)
     fill(path)
 
 

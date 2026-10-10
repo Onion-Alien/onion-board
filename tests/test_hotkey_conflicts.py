@@ -134,14 +134,15 @@ def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
     assert pages == ["hotkeys"]
 
 
-def test_tab_explanations_sit_behind_one_info_button(window, monkeypatch):  # noqa: F811
+def test_tab_explanations_are_in_each_tabs_right_click_menu(window, monkeypatch):  # noqa: F811
     shown = []
     monkeypatch.setattr(main.TabHelpPopup, "exec", lambda box: shown.append(box.windowTitle()))
-    window.tabs.setCurrentWidget(window.apps)
-    assert not window.btn_info.isHidden()
-    window.btn_info.click()
-    assert shown == ["Send a program's sound"]
-    window.tabs.setCurrentWidget(window.sounds_page)
-    assert not window.btn_info.isHidden()   # every tab has a line now
-    window.btn_info.click()
-    assert shown[-1] == "Your sounds"
+    for page, title in ((window.apps, "Send a program's sound"),
+                        (window.sounds_page, "Your sounds")):
+        menu = window.tab_menu(window.tabs.indexOf(page))
+        about = menu.actions()[0]
+        assert about.text() == "About this tab"
+        about.trigger()
+        assert shown[-1] == title
+    window.btn_info.click()   # the rail's ⓘ: the whole app, whichever tab is open
+    assert shown[-1] == "How Onion Board works"

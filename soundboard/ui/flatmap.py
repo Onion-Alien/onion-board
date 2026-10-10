@@ -56,6 +56,7 @@ SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot
 NAMES_FIRST_S = 0.35                # the country names alone, before the dots...
 REVEAL_S = 1.4                      # ...then the first stations pop in over this long...
 POP_S = 0.3                         # ...each growing in over this (a little overshoot)
+CORNER_PX = 12                      # the map's rounded corners (like QFrame#stations)
 LOADING_TEXT = _("Tuning in to radio stations around the world…")
 
 
@@ -147,8 +148,7 @@ class FlatMap(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMouseTracking(True)
-        self.setMinimumSize(120, 80)
-        self.setAttribute(Qt.WA_OpaquePaintEvent)
+        self.setMinimumSize(120, 80)   # not opaque: the rounded corners show what's behind
         self._land: list[QPainterPath] = []   # in (lon, -lat) degrees, in parts (set_land)
         self._land_box: list[QRectF] = []     # each part's bounds: a tile skips the rest
         self._labels: list[tuple[str, float, float, float]] = []   # name, lon, lat, width°
@@ -893,7 +893,12 @@ class FlatMap(QWidget):
         dpr = self.devicePixelRatioF()
         p = QPainter(self)
         t = theme.T
-        p.fillRect(self.rect(), QColor(t["bg"]))
+        card = QPainterPath()   # rounded like the stations card beside it
+        card.addRoundedRect(QRectF(self.rect()), CORNER_PX, CORNER_PX)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.fillPath(card, QColor(t["bg"]))
+        p.setRenderHint(QPainter.Antialiasing, False)
+        p.setClipPath(card)
         cur = self._level()
         slots = self._slots(cur)
         shown = [(self._tile_rect(cur, k, i, j).topLeft(), self._tiles.get((cur, i, j)))

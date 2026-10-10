@@ -15,8 +15,8 @@ from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QSignalBlocker, QSize, Qt,
-                            QTimer, QUrl, Signal)
+from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
+                            Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
@@ -69,8 +69,8 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
-                                   expand_dropped, fmt_pos, loudness, pad_height,
+from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
+                                   SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
                                    spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -891,15 +891,16 @@ class MainWindow(QMainWindow):
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
             self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
-        # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
+        # one ⓘ under the tabs: how the whole app works (a tab's own explanation is in
+        # its right-click menu)
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
-        self.btn_info.setProperty("railtext", _("About this tab"))
-        self.btn_info.setAccessibleName(_("About this tab"))
+        self.btn_info.setProperty("railtext", _("How it works"))
+        self.btn_info.setAccessibleName(_("How Onion Board works"))
         icons.set_icon(self.btn_info, "info", size=sidebar.ICON)
         self.btn_info.setCursor(Qt.PointingHandCursor)
-        self.btn_info.setToolTip(_("What's this tab for?"))
-        self.btn_info.clicked.connect(self._show_tab_info)
+        self.btn_info.setToolTip(_("How Onion Board works"))
+        self.btn_info.clicked.connect(self._show_app_info)
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
@@ -935,12 +936,13 @@ class MainWindow(QMainWindow):
                   self.rail.toggle, self.tabs):
             QWidget.setTabOrder(prev, w)
             prev = w
-        # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
+        # right-click a tab: what it's for, or hide it (+ More tabs or Settings > Tabs
+        # bring it back)
         for b in self.rail.buttons:
             b.customContextMenuRequested.connect(
                 lambda pos, b=b: self.tab_menu(b.index).exec(b.mapToGlobal(pos)))
-        # every tab has a line for the ⓘ (the Apps tab brings its own): one tab with
-        # the button and the rest without looked like a slip
+        # every tab has a line for its right-click "About this tab" (the Apps tab brings
+        # its own)
         self.tab_info.setdefault("sounds_page", (
             _("Your sounds"),
             _("Your pads. Add sounds with the button, by dropping files or folders here, "
@@ -968,10 +970,6 @@ class MainWindow(QMainWindow):
             _("Where your sounds go (straight into your mic, the virtual cable, another "
               "device or nobody), your devices, who's listening, the equalizer, and a "
               "test that records what goes out and plays it back.")))
-        self._update_info_btn = lambda *__: self.btn_info.setVisible(
-            self._current_tab_info() is not None)
-        self.tabs.currentChanged.connect(self._update_info_btn)
-        self._update_info_btn()
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
@@ -1024,11 +1022,11 @@ class MainWindow(QMainWindow):
         top = QHBoxLayout()
         top.setSpacing(6)
         self.mini_pp = QPushButton()
-        self.mini_pp.setObjectName("round")
+        self.mini_pp.setObjectName("transport_play")
         self.mini_pp.setToolTip(_("Play / pause"))
         self.mini_pp.clicked.connect(self.toggle_play_pause)
         self.mini_st = QPushButton()
-        self.mini_st.setObjectName("round")
+        self.mini_st.setObjectName("transport_stop")
         self.mini_st.setToolTip(_("Stop"))
         self.mini_st.clicked.connect(self.stop_current)
         icons.set_icon(self.mini_st, "stop", size=16)
@@ -1077,7 +1075,7 @@ class MainWindow(QMainWindow):
         bottom.addWidget(self.mini_time)
         cv.addLayout(bottom)
         v.addWidget(card)
-        icons.set_icon(self.mini_pp, "play", size=16)
+        icons.set_icon(self.mini_pp, "play", "on_accent", size=16)
         return page
 
     def _set_np_name(self, text: str):
@@ -1221,7 +1219,7 @@ class MainWindow(QMainWindow):
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
                           "sound pack"))
         icons.set_icon(more, "archive", size=18)
-        mm = QMenu(more)
+        mm = DropdownMenu(more)
         icons.set_icon(mm.addAction(_("Import a backup or sound pack…"), self.import_dialog),
                        "folder")
         icons.set_icon(mm.addAction(_("Free sound packs…"), self.show_packs), "download")
@@ -1262,7 +1260,7 @@ class MainWindow(QMainWindow):
         self.btn_keys.setToolTip(_("Quick hotkeys: set the ones people use most, or open every "
                                    "hotkey in Settings"))
         icons.set_icon(self.btn_keys, "keyboard", size=18)
-        km = QMenu(self.btn_keys)
+        km = DropdownMenu(self.btn_keys)
         km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
         self.btn_keys.setMenu(km)
         self.btn_keys.setProperty("toolbarMenu", True)
@@ -1278,7 +1276,7 @@ class MainWindow(QMainWindow):
         # the pads' order (as dragged, A-Z, newest, most played) and cards or a list
         self.btn_view = QPushButton()
         self.btn_view.setAccessibleName(_("Order and view"))
-        vm = QMenu(self.btn_view)
+        vm = DropdownMenu(self.btn_view)
         vm.setToolTipsVisible(True)
         vm.aboutToShow.connect(lambda: self._fill_view_menu(vm))
         self.btn_view.setMenu(vm)
@@ -1403,12 +1401,12 @@ class MainWindow(QMainWindow):
 
         f, th = bar()
         self.btn_pp = QPushButton()
-        self.btn_pp.setObjectName("round")
+        self.btn_pp.setObjectName("transport_play")
         self.btn_pp.setToolTip(_("Play / pause"))
         self.btn_pp.clicked.connect(self.toggle_play_pause)
         self._pp_icon = None
         self.btn_st = QPushButton()
-        self.btn_st.setObjectName("round")
+        self.btn_st.setObjectName("transport_stop")
         self.btn_st.setToolTip(_("Stop"))
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
@@ -1595,8 +1593,7 @@ class MainWindow(QMainWindow):
             self._pp_icon = name
             for b in (self.btn_pp, getattr(self, "mini_pp", None)):
                 if b is not None:
-                    b.setIcon(icons.icon(name))
-                    b.setIconSize(QSize(16, 16))
+                    icons.set_icon(b, name, "on_accent", size=16)
 
     def _build_setup_page(self) -> QWidget:
         """One-time setup and the rarely-touched stuff: where the audio goes,
@@ -2918,7 +2915,10 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(int(self.SETTLE_S * 1000) + 200, self._update_status)
             self.cfg.route = "cable"   # so set_route() applies "mic" in full
             self.set_route("mic")
-            self.toast(_("Done: Discord and games hear your sounds through your mic now."))
+            from soundboard.ui.setupwizard import SetupWizard
+            modal = QApplication.activeModalWidget()
+            if not isinstance(modal, SetupWizard):
+                self.toast(_("Done: Discord and games hear your sounds through your mic now."))
             if is_hands_free(mic):
                 self.toast(_("That's a Bluetooth headset's call mic: some of them skip Windows' "
                              "sound effects. If nobody hears your sounds, use the headset's USB "
@@ -3420,7 +3420,6 @@ class MainWindow(QMainWindow):
             # the Onion Watch add-on, or Hoot and its download button until it's
             # installed; loaded by load_triggers
             v = TriggersTab(BoardHost(self), defer=True)
-            v.loaded.connect(lambda: self._update_info_btn())   # Onion Watch can arrive late
         v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
         return v
 
@@ -3479,6 +3478,10 @@ class MainWindow(QMainWindow):
         key = TAB_KEYS[i]
         menu = QMenu(self)
         menu.setAttribute(Qt.WA_DeleteOnClose)
+        if self._tab_info_at(i) is not None:
+            menu.addAction(icons.icon("info"), _("About this tab"),
+                           lambda: self._show_tab_info(i))
+            menu.addSeparator()
         if key in taboff.KEYS:
             act = menu.addAction(icons.icon("offline"), _("Hide this tab"))
             act.triggered.connect(lambda: self.hide_tab(key))
@@ -3525,7 +3528,6 @@ class MainWindow(QMainWindow):
         else:
             self._swap_tab(key)
         self.tabs.setTabVisible(i, self.tab_shown(key))
-        self._update_info_btn()
         self._update_more_tabs()
         log.info("tab %s switched %s", key, "on" if on else "off")
         if on:   # once per install, sent now (usage.py: a daily count could be a day off)
@@ -3586,7 +3588,6 @@ class MainWindow(QMainWindow):
             if not shown and self.tabs.currentIndex() == i:
                 self.tabs.setCurrentIndex(0)
             self.tabs.setTabVisible(i, shown)
-        self._update_info_btn()
         self._update_more_tabs()
 
     def _search_follow_switch(self):
@@ -3887,25 +3888,43 @@ class MainWindow(QMainWindow):
             self.register_hotkeys()   # the capture paused them
         free_dialog(d)
 
-    def _current_tab_info(self) -> tuple[str, str] | None:
-        page = self.tabs.currentWidget()
+    def _tab_info_at(self, i: int) -> tuple[str, str] | None:
+        page = self.tabs.widget(i)
         return next((v for k, v in self.tab_info.items() if getattr(self, k, None) is page),
                     None)
 
-    def _show_tab_info(self):
-        info = self._current_tab_info()
+    def _show_tab_info(self, i: int):
+        """A tab's right-click "About this tab": its explanation, next to the tab."""
+        info = self._tab_info_at(i)
         if info:
-            box = TabHelpPopup(*info, owl=self.tabs.currentWidget() is self.triggers,
-                               parent=self)
-            box.adjustSize()
-            anchor = self.btn_info.mapToGlobal(self.btn_info.rect().bottomRight())
-            screen = self.btn_info.screen().availableGeometry()
-            box.move(max(screen.left(), min(anchor.x() - box.width(),
-                                           screen.right() - box.width() + 1)),
-                     max(screen.top(), min(anchor.y() + 8,
-                                          screen.bottom() - box.height() + 1)))
-            box.exec()
-            box.deleteLater()
+            button = next((b for b in self.rail.buttons if b.index == i), self.tabs)
+            self._show_help(TabHelpPopup(*info, owl=self.tabs.widget(i) is self.triggers,
+                                         parent=self), button)
+
+    def _show_app_info(self):
+        """The rail's ⓘ: how the whole app works, in a few lines."""
+        self._show_help(TabHelpPopup(_("How Onion Board works"), _(
+            "Onion Board plays your sounds into your mic, so people in Discord or your "
+            "game hear them the same way they hear you.{gap}"
+            "Add sounds on the Sounds tab, then double-click one or press its hotkey. The "
+            "strip at the bottom shows your mic, what others hear and your headphones.{gap}"
+            "Right-click a tab on the left and pick About this tab to see what it does.",
+            gap="\n\n"),
+            parent=self), self.btn_info)
+
+    def _show_help(self, box: QDialog, beside: QWidget):
+        """Open a help card to the right of `beside` (a rail button), inside the
+        window: never off its left edge."""
+        box.layout().activate()   # wrapped text: as tall as the words need
+        box.resize(box.width(), box.heightForWidth(box.width()) if box.hasHeightForWidth()
+                   else box.sizeHint().height())
+        top_left = beside.mapToGlobal(QPoint(beside.width() + 8, 0))
+        area = self.geometry() & beside.screen().availableGeometry()
+        x = max(area.left(), min(top_left.x(), area.right() - box.width() + 1))
+        y = max(area.top(), min(top_left.y(), area.bottom() - box.height() + 1))
+        box.move(x, y)
+        box.exec()
+        box.deleteLater()
 
     # ------------------------------------------------------------------ language
     def _offer_language(self):
@@ -6064,6 +6083,7 @@ class MainWindow(QMainWindow):
         d.hotkeys_changed.connect(self.register_hotkeys)
         ok = d.exec()
         self.drop_preview()                        # a preview still rendering
+        self.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         self.engine.stop(f"{sid}~fx:preview")
         try:
             if ok and d.as_copy:

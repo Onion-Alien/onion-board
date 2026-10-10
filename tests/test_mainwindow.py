@@ -973,10 +973,13 @@ def test_no_language_offer_on_an_english_windows(window, monkeypatch):
     assert not window.lang_bar.isVisibleTo(window)
 
 
-def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window):
+def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypatch):
     """Cable route, no cable, mic closed: the card's two lines say what's still to
     do in the warn colour; the red cross is for things that are wrong."""
+    from soundboard import engine as eng
     from soundboard import theme
+    # the real device list: a PC with a virtual cable installed isn't "no cable"
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w = window
     w.cfg.route = "cable"
     w._update_flow()
@@ -985,3 +988,22 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window):
     assert "✗" not in text and theme.status("error") not in text
     assert "after the setup below" in w.flow_mic.text()
     assert "not installed yet" in w.flow_out.text()
+
+
+def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
+    """Dropdown menus on the sound page toolbar open with a short pixel gap from their button."""
+    from soundboard.ui.widgets import DropdownMenu
+    w = window
+    w.show()
+    for btn in (w.btn_more, w.btn_keys, w.btn_view):
+        menu = btn.menu()
+        assert isinstance(menu, DropdownMenu)
+        btn.showMenu()
+        qapp.processEvents()
+        try:
+            bottom = btn.mapToGlobal(btn.rect().bottomLeft()).y()
+            assert menu.y() - bottom >= DropdownMenu.GAP
+        finally:
+            menu.close()
+            qapp.processEvents()
+

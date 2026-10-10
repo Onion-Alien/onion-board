@@ -1182,13 +1182,20 @@ def test_last_15s_holds_only_the_station_that_played(qapp, tab, server):
     tab.stop()
 
 
-def test_the_dice_plays_another_listed_station(tab, monkeypatch):
+def test_the_dice_plays_any_popular_station_whatever_the_filters(tab, monkeypatch):
+    """The dice ignores the list showing and every filter: a genre that hides most
+    stations, an empty Favorites list, it still picks from all popular stations."""
     played = []
     monkeypatch.setattr(tab, "play", played.append)
-    listed = {s.uuid for s in tab.visible_stations()}
-    for _ in range(5):
+    popular = {s.uuid for s in tab._globe_list}
+    tab.set_genre("Rock")
+    tab.favorites = []
+    tab.btn_favs.click()
+    assert not tab.visible_stations()
+    for _ in range(40):
         tab.btn_random.click()
-    assert played and all(s.uuid in listed for s in played)
+    assert played and all(s.uuid in popular for s in played)
+    assert {s.uuid for s in played} - {s.uuid for s in tab._filtered(tab._globe_list)}
 
 
 def test_loads_gently_reads_what_json_loads_reads():
