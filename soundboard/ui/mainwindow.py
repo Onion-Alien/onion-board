@@ -895,8 +895,8 @@ class MainWindow(QMainWindow):
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
             self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
-        # one ⓘ under the tabs: how the whole app works (a tab's own explanation is in
-        # its right-click menu)
+        # one ⓘ at the rail's foot, over Settings: how the whole app works (a tab's own
+        # explanation is in its right-click menu). Not under the tabs: it isn't one
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
         self.btn_info.setProperty("railtext", _("How it works"))
@@ -923,7 +923,7 @@ class MainWindow(QMainWindow):
         self._update_more_tabs()
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
-            [self.btn_more_tabs, self.btn_info], self.cfg.sidebar_open, [self.gear],
+            [self.btn_more_tabs], self.cfg.sidebar_open, [self.btn_info, self.gear],
             self._rail_opened,
             # Live and Stop all first, so they never move; the pills only when needed
             # (at the rail's foot, as icons)
@@ -935,7 +935,7 @@ class MainWindow(QMainWindow):
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail
         prev = self.tabs.previousInFocusChain()
-        for w in (*self.rail.buttons, self.btn_more_tabs, self.btn_info, *self.rail.status,
+        for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status, self.btn_info,
                   self.gear,
                   self.rail.toggle, self.tabs):
             QWidget.setTabOrder(prev, w)
