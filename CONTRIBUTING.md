@@ -12,7 +12,7 @@ and how the UI should look in [docs/DESIGN.md](docs/DESIGN.md); this file is the
 python scripts\check_sensitive.py
 ```
 
-All four must pass. CI runs the same checks.
+All four must pass. CI runs the same checks (on a PR, only the tests of what it changed).
 
 Turn on the hooks once per clone: the secrets check runs before every commit, and
 commit times are recorded in UTC:
