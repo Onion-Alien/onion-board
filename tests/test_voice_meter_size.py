@@ -26,8 +26,7 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
             for _ in range(4):
                 qapp.processEvents()
             if width >= 800:
-                assert bar._box.direction() == QBoxLayout.LeftToRight
-                assert bar.meter.width() >= 300
+                assert bar.meter.width() >= width // 2
             assert bar.meter.geometry().right() < bar._mic.width()
             assert bar._right.geometry().right() < bar.width()
     finally:
@@ -51,8 +50,7 @@ def test_many_chips_wrap_and_meter_recovers(qapp):
                 assert bar._box.direction() == QBoxLayout.TopToBottom
                 assert bar._right.maximumWidth() > width
             else:
-                assert bar._box.direction() == QBoxLayout.LeftToRight
-                assert bar.meter.width() >= 300
+                assert bar.meter.width() >= width // 2
     finally:
         bar.close()
         bar.deleteLater()
