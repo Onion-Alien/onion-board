@@ -35,6 +35,18 @@ Every task, before changing anything (details in `CLAUDE.md`):
 ## The rules
 
 ### UI thread (about 80 fixes: the biggest group)
+#### Layout acceptance
+- Review the complete final screen, using the final branch with current main included,
+  before presenting a UI change or merging it. Check Dark and Light, empty and populated
+  boards, 800x600, 1180x720, and the mini/full transition. Inspect controls together,
+  including their spacing and unused areas, rather than approving individual widgets.
+- Keep the large drop target across the board's full width. Keep the audio footer compact
+  and its controls using the available width. A hidden playback label must leave no
+  reserved gap before the seek slider. Sidebar buttons need at least 34 px height and
+  4 px spacing at normal window sizes. Preserve normal navigation at 800x600.
+- Add regression checks for a reported layout defect, and run them before committing.
+  Do not treat a partial spacing adjustment as completion of the screen's review.
+
 - Disk, network, device, process and capture calls never run on the Qt UI thread.
   Run them on a worker, and the UI thread only applies the result.
   `9fa49b9` `154b0f5` `307ff86`

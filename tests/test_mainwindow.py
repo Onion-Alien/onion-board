@@ -1099,3 +1099,26 @@ def test_drop_target_keeps_the_full_board_width(window, qapp):
     margins = window.grid.grid.contentsMargins()
     assert rect is not None and rect.height() >= 90
     assert rect.width() == window.grid.width() - margins.left() - margins.right() - 4
+
+
+def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
+    window.apply_theme("Dark")
+    window.tabs.setCurrentIndex(0)
+    window.show()
+    for size in ((360, 320), (440, 380), (600, 450), (800, 600)):
+        window.resize(*size)
+        for _ in range(5):
+            qapp.processEvents()
+    assert not window.is_mini()
+    assert window.mixer.height() < 100
+    assert window.btn_check.isVisibleTo(window)
+    right = window.btn_check.mapTo(window.mixer, window.btn_check.rect().topRight()).x()
+    assert window.mixer.width() - right <= 20
+    window.np_name.hide()
+    qapp.processEvents()
+    seek_left = window.seek.mapTo(window.btn_st.parentWidget(), QPoint()).x()
+    assert seek_left - window.btn_st.geometry().right() <= 24
+    buttons = window.rail.buttons
+    assert all(b.height() >= 34 for b in buttons)
+    assert all(b.y() - a.geometry().bottom() >= 4
+               for a, b in zip(buttons, buttons[1:]))

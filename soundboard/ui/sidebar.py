@@ -22,7 +22,7 @@ SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4
 OPEN_W = 190       # room for the brand and expanded listening status
 LOGO = 24          # the onion: with its 5 px glow room, a tab button's width (BUTTON_W)
 BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column
-COMPACT_H = 28     # every button's height in a short window (else as tall as a tab's)
+COMPACT_H = 28     # only genuinely short windows use smaller targets
 SIDE_SHUT = 4      # the rail's own side margins, shut (a 34 px button)...
 SIDE_OPEN = 10     # ...and open
 LIVE_BAR_W = 3     # a live tab's bar on the rail's outer edge (Settings > Live tabs: tint)
@@ -433,8 +433,10 @@ class SideRail(QFrame):
     def compact(self, tight: bool):
         """A short window packs the buttons closer (a responsive step), before the
         window gives up and turns into the mini player."""
-        if tight != self._compact:
+        short = tight and self.window().height() < 520
+        if tight != self._compact or short != getattr(self, "_short", None):
             self._compact = tight
+            self._short = short
             self._apply()
 
     def _apply(self):
@@ -489,8 +491,9 @@ class SideRail(QFrame):
         for w in everything:
             w.setMinimumHeight(0)
             w.setMaximumHeight(16777215)
-        h = COMPACT_H if self._compact else max(w.sizeHint().height() for w in everything)
-        self._lay.setSpacing(1 if self._compact else 4)
+        short = self._compact and self.window().height() < 520
+        h = COMPACT_H if short else max(34, *(w.sizeHint().height() for w in everything))
+        self._lay.setSpacing(1 if short else 4)
         if self.property("compact") != self._compact:   # less padding: the icons stay whole
             self.setProperty("compact", self._compact)
             for w in everything:

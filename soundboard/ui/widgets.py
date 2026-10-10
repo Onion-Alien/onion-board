@@ -172,6 +172,7 @@ class NameAndSeek(QWidget):
         self.name, self.seek, self.max_name = name, seek, max_name
         name.setParent(self)
         seek.setParent(self)
+        name.installEventFilter(self)
 
     def sizeHint(self):
         return QSize(self.max_name + 120, max(self.name.height(), self.seek.sizeHint().height()))
@@ -182,12 +183,18 @@ class NameAndSeek(QWidget):
     def relayout(self):
         h = self.height()
         fm = self.name.fontMetrics()
-        w = min(self.max_name, fm.horizontalAdvance(self.name.text()) + 4,
-                max(0, self.width() - 60 - self.GAP))
+        w = 0 if self.name.isHidden() else min(
+            self.max_name, fm.horizontalAdvance(self.name.text()) + 4,
+            max(0, self.width() - 60 - self.GAP))
         self.name.setGeometry(0, 0, w, h)
         sh = self.seek.sizeHint().height()
-        x = w + self.GAP
+        x = w + self.GAP if not self.name.isHidden() else 0
         self.seek.setGeometry(x, (h - sh) // 2, max(0, self.width() - x), sh)
+
+    def eventFilter(self, obj, event):
+        if obj is self.name and event.type() in (QEvent.Show, QEvent.Hide):
+            self.relayout()
+        return super().eventFilter(obj, event)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
