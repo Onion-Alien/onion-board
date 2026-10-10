@@ -2399,7 +2399,6 @@
   "mono output devices aren't supported": "Mono-Ausgabegeräte werden nicht unterstützt",
   "monster": "Monster",
   "music, please?": "Musik, bitte?",
-  "my real voice": "meine wahre Stimme",
   "my turn yet?": "Bin ich schon dran?",
   "new voice only": "Nur neue Stimme",
   "no reason given": "kein Grund angegeben",
@@ -3013,5 +3012,6 @@
   "How it works": "So funktioniert's",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spielt deine Sounds in dein Mikro, damit Leute in Discord oder deinem Spiel sie genauso hören wie dich.{gap}Füg auf dem Tab Sounds Sounds hinzu, dann doppelklick einen oder drück seinen Hotkey. Die Leiste unten zeigt dein Mikro, was andere hören, und deine Kopfhörer.{gap}Rechtsklick auf einen Tab links und wähl Über diesen Tab, um zu sehen, was er macht.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Schick deine Sounds in das Mikro, das du schon benutzt, damit Discord und Spiele nichts umstellen müssen",
-  "Straight into my mic instead": "Stattdessen direkt in mein Mikro"
+  "Straight into my mic instead": "Stattdessen direkt in mein Mikro",
+  "your real voice": "deine echte Stimme"
 }

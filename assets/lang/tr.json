@@ -2399,7 +2399,6 @@
   "mono output devices aren't supported": "mono çıkış cihazları desteklenmiyor",
   "monster": "canavar",
   "music, please?": "müzik lütfen?",
-  "my real voice": "benim gerçek sesim",
   "my turn yet?": "sıram geldi mi?",
   "new voice only": "yalnızca yeni ses",
   "no reason given": "sebep belirtilmedi",
@@ -3013,5 +3012,6 @@
   "How it works": "Nasıl çalışır",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board seslerini mikrofonuna çalar, böylece Discord'daki ya da oyunundaki insanlar onları seni duydukları gibi duyar.{gap}Sesler sekmesinden ses ekle, sonra birine çift tıkla ya da kısayol tuşuna bas. Alttaki şerit mikrofonunu, başkalarının ne duyduğunu ve kulaklığını gösterir.{gap}Soldaki bir sekmeye sağ tıkla ve ne işe yaradığını görmek için Bu sekme hakkında'yı seç.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Seslerini zaten kullandığın mikrofona ver, böylece Discord'da ve oyunlarda hiçbir şeyi değiştirmen gerekmez",
-  "Straight into my mic instead": "Onun yerine doğrudan mikrofonuma"
+  "Straight into my mic instead": "Onun yerine doğrudan mikrofonuma",
+  "your real voice": "gerçek sesini"
 }

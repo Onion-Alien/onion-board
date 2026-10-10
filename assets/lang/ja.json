@@ -2349,7 +2349,6 @@
   "mono output devices aren't supported": "モノラル出力デバイスはサポートされていません",
   "monster": "モンスター",
   "music, please?": "音楽をお願いします?",
-  "my real voice": "私の本当の声",
   "my turn yet?": "私の番はまだ？",
   "new voice only": "新しい音声のみ",
   "no reason given": "理由は示されていない",
@@ -2949,5 +2948,6 @@
   "How it works": "しくみ",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board はサウンドをマイクに流すので、Discord やゲームの相手にはあなたの声と同じように聞こえます。{gap}サウンドタブでサウンドを追加し、ダブルクリックするかホットキーを押します。下のバーにはマイク、相手に聞こえる音、ヘッドホンが表示されます。{gap}左のタブを右クリックして「このタブについて」を選ぶと、そのタブの役割がわかります。",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "いつものマイクにサウンドを流すので、Discord やゲームの設定は変えなくて大丈夫です",
-  "Straight into my mic instead": "代わりにマイクに直接入れる"
+  "Straight into my mic instead": "代わりにマイクに直接入れる",
+  "your real voice": "あなたの本当の声"
 }

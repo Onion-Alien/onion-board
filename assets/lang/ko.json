@@ -2349,7 +2349,6 @@
   "mono output devices aren't supported": "모노 출력 장치는 지원되지 않습니다",
   "monster": "괴물",
   "music, please?": "음악 좀 주세요?",
-  "my real voice": "내 진짜 목소리",
   "my turn yet?": "아직 내 차례야?",
   "new voice only": "새로운 목소리만",
   "no reason given": "이유가 주어지지 않음",
@@ -2949,5 +2948,6 @@
   "How it works": "작동 방식",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board는 사운드를 마이크로 재생해서 Discord나 게임 속 사람들이 당신 목소리처럼 똑같이 듣게 해요.{gap}사운드 탭에서 사운드를 추가한 다음, 하나를 더블클릭하거나 단축키를 누르세요. 아래쪽 막대에는 마이크, 다른 사람이 듣는 소리, 헤드폰이 표시돼요.{gap}왼쪽 탭을 오른쪽 클릭하고 이 탭에 대해를 고르면 무슨 탭인지 볼 수 있어요.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "이미 쓰는 마이크로 사운드를 보내서 Discord와 게임 설정을 바꿀 필요가 없어요",
-  "Straight into my mic instead": "대신 마이크로 바로"
+  "Straight into my mic instead": "대신 마이크로 바로",
+  "your real voice": "당신의 진짜 목소리"
 }

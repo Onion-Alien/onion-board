@@ -34,7 +34,7 @@ BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
                  (_("My real voice"), "mic"), (_("Silence"), "mute")]
 # what others hear once the AI voice has stopped, by backup key ("Others now hear …")
 BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
-                "mic": _("my real voice"), "mute": _("silence")}
+                "mic": _("your real voice"), "mute": _("silence")}
 
 
 def read_voices(module: mods.ModuleInfo | None,
@@ -465,6 +465,7 @@ class AiVoicePanel(QWidget):
             "Others now hear {backup}.", backup=self.backup_heard())
 
     def failure_text(self, error: str = "") -> str:
+        error = error.strip().rstrip(".。")   # the sentence adds its own full stop
         return (_("⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, "
                   "then Start to try again.", error=error, backup=self.backup_heard()) if error else
                 _("⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start "

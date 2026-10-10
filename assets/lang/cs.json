@@ -2449,7 +2449,6 @@
   "mono output devices aren't supported": "mono výstupní zařízení nejsou podporována",
   "monster": "netvor",
   "music, please?": "hudba, prosím?",
-  "my real voice": "můj skutečný hlas",
   "my turn yet?": "jsem ještě na řadě?",
   "new voice only": "pouze nový hlas",
   "no reason given": "bez uvedení důvodu",
@@ -3077,5 +3076,6 @@
   "How it works": "Jak to funguje",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board pouští tvoje zvuky do mikrofonu, takže je lidi na Discordu nebo ve hře slyší stejně jako tebe.{gap}Přidej zvuky na kartě Zvuky, pak na jeden dvakrát klikni nebo stiskni jeho zkratku. Pruh dole ukazuje tvůj mikrofon, co slyší ostatní, a tvoje sluchátka.{gap}Klikni pravým tlačítkem na kartu vlevo a vyber O této kartě, ať vidíš, k čemu je.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Pošli zvuky do mikrofonu, který už používáš, takže Discord ani hry nemusíš nijak měnit",
-  "Straight into my mic instead": "Místo toho rovnou do mikrofonu"
+  "Straight into my mic instead": "Místo toho rovnou do mikrofonu",
+  "your real voice": "tvůj skutečný hlas"
 }

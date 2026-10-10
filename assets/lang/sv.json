@@ -2399,7 +2399,6 @@
   "mono output devices aren't supported": "monoutgångsenheter stöds inte",
   "monster": "monster",
   "music, please?": "musik, snälla?",
-  "my real voice": "min riktiga röst",
   "my turn yet?": "min tur ännu?",
   "new voice only": "bara ny röst",
   "no reason given": "ingen anledning ges",
@@ -3013,5 +3012,6 @@
   "How it works": "Så funkar det",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spelar dina ljud i din mikrofon, så folk på Discord eller i ditt spel hör dem på samma sätt som de hör dig.{gap}Lägg till ljud på fliken Ljud, dubbelklicka sedan på ett eller tryck på dess snabbtangent. Remsan längst ner visar din mikrofon, vad andra hör och dina hörlurar.{gap}Högerklicka på en flik till vänster och välj Om den här fliken för att se vad den gör.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Skicka dina ljud in i mikrofonen du redan använder, så behöver Discord och spel inga ändringar",
-  "Straight into my mic instead": "Direkt i min mikrofon i stället"
+  "Straight into my mic instead": "Direkt i min mikrofon i stället",
+  "your real voice": "din riktiga röst"
 }

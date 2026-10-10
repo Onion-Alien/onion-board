@@ -2399,7 +2399,6 @@
   "mono output devices aren't supported": "monolähtölaitteita ei tueta",
   "monster": "hirviö",
   "music, please?": "musiikkia, kiitos?",
-  "my real voice": "minun oikea ääneni",
   "my turn yet?": "minun vuoroni vielä?",
   "new voice only": "vain uusi ääni",
   "no reason given": "syytä ei annettu",
@@ -3013,5 +3012,6 @@
   "How it works": "Näin se toimii",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board soittaa äänesi mikkiisi, joten Discordissa tai pelissäsi muut kuulevat ne samalla tavalla kuin kuulevat sinut.{gap}Lisää ääniä Äänet-välilehdellä ja tuplaklikkaa sitten yhtä tai paina sen pikanäppäintä. Alareunan palkki näyttää mikkisi, mitä muut kuulevat ja kuulokkeesi.{gap}Napsauta välilehteä vasemmalla hiiren oikealla ja valitse Tietoa tästä välilehdestä nähdäksesi, mitä se tekee.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Laita äänesi mikkiin, jota jo käytät, niin Discordiin ja peleihin ei tarvitse muuttaa mitään",
-  "Straight into my mic instead": "Suoraan mikkiini sen sijaan"
+  "Straight into my mic instead": "Suoraan mikkiini sen sijaan",
+  "your real voice": "oikean äänesi"
 }
