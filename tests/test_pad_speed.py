@@ -201,15 +201,13 @@ def test_the_grid_is_opaque_in_the_page_colour(qapp):
 
 
 def test_window_background_is_solid_and_near_the_page_colour(qapp):
-    """The glow, foot and grain the grid paints behind the pads (the window's own
-    background, so it lines up): fully opaque, so a scroll can still copy the screen,
-    and never far from the theme's page colour."""
+    """Every theme keeps an opaque, subtle background for smooth scrolling."""
     from PySide6.QtCore import QRect
     from PySide6.QtGui import QPainter
     from soundboard import theme
     old = theme.current_name
     try:
-        for name in ("Light", "Dark", "Mocha", "High Contrast"):
+        for name in theme.THEMES:
             theme.set_current(name)
             img = QImage(200, 300, QImage.Format_ARGB32)
             img.fill(Qt.transparent)
@@ -221,21 +219,20 @@ def test_window_background_is_solid_and_near_the_page_colour(qapp):
                 c = img.pixelColor(x, y)
                 assert c.alpha() == 255
                 assert max(abs(c.red() - bg.red()), abs(c.green() - bg.green()),
-                           abs(c.blue() - bg.blue())) < 32
+                           abs(c.blue() - bg.blue())) < 12
     finally:
         theme.set_current(old)
 
 
 def test_window_background_never_touches_the_disk(qapp, monkeypatch):
     """The grid paints the window's background on every paint: it used to build all of
-    polish_tokens, whose grain file is checked on disk, and a slow disk froze the
-    window mid-paint for seconds. The stylesheet's grain file is only checked once."""
+    polish_tokens, whose grain file was checked on disk, and a slow disk froze the
+    window mid-paint for seconds."""
     from types import SimpleNamespace
 
     from PySide6.QtCore import QRect
     from PySide6.QtGui import QPainter
     from soundboard import theme
-    theme._grain_url(True), theme._grain_url(False)   # the stylesheet made them already
 
     def no_disk(*_a, **_k):
         raise AssertionError("painting asked the disk")
@@ -250,7 +247,6 @@ def test_window_background_never_touches_the_disk(qapp, monkeypatch):
                 theme.paint_window_bg(p, QRect(0, 0, 50, 50), QPointF(0, 0), 400, 300)
             finally:
                 p.end()
-            assert theme._grain_url(name == "Light")   # and the stylesheet's is remembered
     finally:
         theme.set_current(old)
 

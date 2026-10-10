@@ -246,14 +246,13 @@ def test_every_theme_is_in_one_settings_group():
     assert not theme.is_light("Dark") and not theme.is_light("Midnight")
 
 
-@pytest.mark.parametrize("name", [n for n, t in theme.THEMES.items() if t.get("texture")
-                                  or t.get("font")])
-def test_textured_and_font_themes_build_their_stylesheet(qapp, name):
+@pytest.mark.parametrize("name", theme.THEMES)
+def test_every_theme_builds_a_clean_stylesheet(qapp, name):
     css = theme.stylesheet(name)
     font = theme.THEMES[name].get("font", theme.FONT)
     assert f"font-family:'{font}'" in css
-    if theme.THEMES[name].get("texture"):
-        assert "background-image:url(" in css
+    assert "background-image:url(" not in css
+    assert "$" not in css
 
 
 def test_setup_tab_uses_the_themes_status_colours(qapp, win):

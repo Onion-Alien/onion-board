@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Themes use clean, flat cards and a faint accent glow, without window grain,
+  dark background fades or panel textures. High Contrast keeps its strong outlines.
+
 - Quick setup: on the very first launch the guide starts by asking what you'll use Onion
   Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and links
   the *Streamer guide* on the last step, *Competitive games* adds the Triggers tab

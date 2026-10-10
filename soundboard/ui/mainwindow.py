@@ -679,7 +679,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self._pages)
         root = self._full = QWidget()
         root.setObjectName("root")   # the theme's window gradient
-        root.setProperty("grain", True)
         self._pages.addWidget(root)
         self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
         self._full_row.setContentsMargins(0, 0, 0, 0)

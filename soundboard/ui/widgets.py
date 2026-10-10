@@ -1220,7 +1220,7 @@ class PadGrid(QWidget):
         # the same colour the page behind it shows; read on each paint, so a theme
         # change (theme.apply repaints every widget) follows
         p = QPainter(self)
-        # the window's glow and grain, fixed to the pads (so a scroll can still copy
+        # the window's faint glow, fixed to the pads (so a scroll can still copy
         # what's on screen): it lines up with the window at the top of the board
         win, view = self.window(), self.parentWidget()
         root = win.centralWidget() if hasattr(win, "centralWidget") else None
