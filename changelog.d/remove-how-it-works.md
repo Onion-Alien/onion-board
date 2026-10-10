@@ -1,0 +1,1 @@
+- Removed the sidebar's How it works button and its app explanation popup.
