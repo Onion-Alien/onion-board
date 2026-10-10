@@ -434,3 +434,16 @@ def test_settings_key_show_says_hide_and_turning_off_hides_it(qapp, window):
         d.close()
         w.cfg.api_enabled = False
         w.apply_remote()
+
+
+def test_a_volume_that_isnt_a_finite_number_is_refused(qapp):
+    """?set=inf made round() raise OverflowError: a 500 instead of a 400."""
+    from PySide6.QtWidgets import QSpinBox
+    spin = QSpinBox()
+    spin.setRange(0, 100)
+    spin.setValue(40)
+    for bad in ("inf", "-inf", "1e999", "nan", "loud"):
+        status, _body = remote.set_volume(spin, {"set": bad})
+        assert status == 400
+    assert spin.value() == 40
+    assert remote.set_volume(spin, {"set": "70"}) is None and spin.value() == 70

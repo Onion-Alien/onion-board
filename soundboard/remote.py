@@ -444,7 +444,8 @@ class RemoteControl(QObject):
             return False
         ts, _, rest = sig.strip().partition(".")
         nonce, _, mac = rest.partition(".")
-        if not (ts.isdigit() and len(ts) <= 12 and _NONCE.fullmatch(nonce)):
+        # isascii: "²" and other digits pass isdigit() but int() refuses them
+        if not (ts.isascii() and ts.isdigit() and len(ts) <= 12 and _NONCE.fullmatch(nonce)):
             return False
         if abs(time.time() - int(ts)) > SIG_WINDOW_S:
             return False
@@ -835,7 +836,7 @@ def set_volume(spin, params: dict) -> tuple[int, dict] | None:
     if "set" in params:
         try:
             new = round(float(params["set"]))
-        except ValueError:
+        except (ValueError, OverflowError):   # "loud", nan / inf, 1e999
             return 400, {"error": "set= takes a number, 0-100"}
     elif step in ("up", "down", "+", "-"):
         new = (round(spin.value() / 10) + (1 if step in ("up", "+") else -1)) * 10

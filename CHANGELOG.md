@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The remote control API answers a volume of `inf` or a malformed signature with a
+  clear refusal instead of an error or a dropped connection.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
