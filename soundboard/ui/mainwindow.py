@@ -886,16 +886,6 @@ class MainWindow(QMainWindow):
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
             self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
-        # one ⓘ at the rail's foot, over Settings: how the whole app works (a tab's own
-        # explanation is in its right-click menu). Not under the tabs: it isn't one
-        self.btn_info = QPushButton()
-        self.btn_info.setObjectName("tabinfo")
-        self.btn_info.setProperty("railtext", _("How it works"))
-        self.btn_info.setAccessibleName(_("How Onion Board works"))
-        icons.set_icon(self.btn_info, "info", size=sidebar.ICON)
-        self.btn_info.setCursor(Qt.PointingHandCursor)
-        self.btn_info.setToolTip(_("How Onion Board works"))
-        self.btn_info.clicked.connect(self._show_app_info)
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
@@ -914,7 +904,7 @@ class MainWindow(QMainWindow):
         self._update_more_tabs()
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
-            [self.btn_more_tabs], self.cfg.sidebar_open, [self.btn_info, self.gear],
+            [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear],
             self._rail_opened,
             # Live and Stop all first, so they never move; the pills only when needed
             # (at the rail's foot, as icons)
@@ -926,7 +916,7 @@ class MainWindow(QMainWindow):
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail
         prev = self.tabs.previousInFocusChain()
-        for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status, self.btn_info,
+        for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status,
                   self.gear,
                   self.rail.toggle, self.tabs):
             QWidget.setTabOrder(prev, w)
@@ -1649,11 +1639,9 @@ class MainWindow(QMainWindow):
         sections = QVBoxLayout(body)
         sections.setContentsMargins(0, 0, 0, 0)
         sections.setSpacing(16)
-        routing = self._setup_top = QHBoxLayout()
-        routing.setSpacing(16)
-        sections.addLayout(routing)
         cols = self._setup_cols = QHBoxLayout()
         sections.addLayout(cols)
+        sections.addStretch(1)
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
@@ -1851,9 +1839,8 @@ class MainWindow(QMainWindow):
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: self.rescan_with_feedback(ref))
         av.addWidget(ref, 0, Qt.AlignLeft)
-        routing.addWidget(devcard, 1)
-        lcol.addWidget(howcard)
-        lcol.addWidget(helpcard)
+        lcol.addWidget(devcard)
+        rcol.addWidget(howcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
@@ -1870,7 +1857,8 @@ class MainWindow(QMainWindow):
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
         rcol.addWidget(destcard)
-        rcol.addWidget(eqcard)
+        rcol.addWidget(helpcard)
+        lcol.addWidget(eqcard)
         utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
@@ -3644,7 +3632,7 @@ class MainWindow(QMainWindow):
                 self._tab_steps[key] = new.fit_steps()
                 self._fit.extend(self._tab_steps[key])
             if key == "voice":
-                self._stack_cols = (*self._stack_cols[:2], *new.stack_steps())
+                self._stack_cols = (*self._stack_cols[:1], *new.stack_steps())
             self._refit()
 
     def _follow_switches(self):
@@ -3979,17 +3967,6 @@ class MainWindow(QMainWindow):
             button = next((b for b in self.rail.buttons if b.index == i), self.tabs)
             self._show_help(TabHelpPopup(*info, owl=self.tabs.widget(i) is self.triggers,
                                          parent=self), button)
-
-    def _show_app_info(self):
-        """The rail's ⓘ: how the whole app works, in a few lines."""
-        self._show_help(TabHelpPopup(_("How Onion Board works"), _(
-            "Onion Board plays your sounds into your mic, so people in Discord or your "
-            "game hear them the same way they hear you.{gap}"
-            "Add sounds on the Sounds tab, then double-click one or press its hotkey. The "
-            "strip at the bottom shows your mic, what others hear and your headphones.{gap}"
-            "Right-click a tab on the left and pick About this tab to see what it does.",
-            gap="\n\n"),
-            parent=self), self.btn_info)
 
     def _show_help(self, box: QDialog, beside: QWidget):
         """Open a help card to the right of `beside` (a rail button), inside the
@@ -7754,7 +7731,7 @@ class MainWindow(QMainWindow):
         f.add(40, "h", lambda tight: r.hide(self.mixer)(
             tight and (self.height() < 520 or self.width() < 760)))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
-        self._stack_cols = (r.stack(self._setup_cols), r.stack(self._setup_top),
+        self._stack_cols = (r.stack(self._setup_cols),
                             *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
 
@@ -7785,11 +7762,11 @@ class MainWindow(QMainWindow):
             # the window brings them back only when neither will be clipped.
             margins = self.setup_page.widget().layout().contentsMargins()
             room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            for i, cols in enumerate((self._setup_cols, self._setup_top)):
+            for i, cols in enumerate((self._setup_cols,)):
                 available = min(room, cols.parentWidget().maximumWidth())
                 needed = sum(cols.itemAt(j).minimumSize().width() for j in range(cols.count()))
                 self._stack_cols[i](narrow or needed + cols.spacing() > available)
-            for apply in self._stack_cols[2:]:
+            for apply in self._stack_cols[1:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
             if need.width() > size.width() or need.height() > size.height():

@@ -144,5 +144,3 @@ def test_tab_explanations_are_in_each_tabs_right_click_menu(window, monkeypatch)
         assert about.text() == "About this tab"
         about.trigger()
         assert shown[-1] == title
-    window.btn_info.click()   # the rail's ⓘ: the whole app, whichever tab is open
-    assert shown[-1] == "How Onion Board works"

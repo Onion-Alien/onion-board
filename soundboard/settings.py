@@ -2073,6 +2073,7 @@ class SettingsDialog(QDialog):
         for key, (label, _fmt) in quality.DOWNLOADS.items():
             dl.addItem(label, key)
         dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
+        dl.setMinimumWidth(dl.sizeHint().width())
         grid.addWidget(dl, 0, 1)
         no_wheel(dl)
         grid.addWidget(QLabel(_("Save sounds as")), 1, 0)
@@ -2081,9 +2082,10 @@ class SettingsDialog(QDialog):
             fmt.addItem(label, key)
         fmt.setToolTip(save_hint)
         fmt.currentIndexChanged.connect(lambda _i: self._data_set(save_format=fmt.currentData()))
+        fmt.setMinimumWidth(fmt.sizeHint().width())
         grid.addWidget(fmt, 1, 1)
         no_wheel(fmt)
-        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(2, 1)
         cv.addLayout(grid)
         hint = QLabel(save_hint)
         hint.setObjectName("hint")
@@ -2108,6 +2110,7 @@ class SettingsDialog(QDialog):
         for h in quality.VIDEO_HEIGHTS:
             vh.addItem(_("Up to {height}p", height=h), h)
         vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
+        vh.setMinimumWidth(vh.sizeHint().width())
         grid.addWidget(vh, 0, 1)
         no_wheel(vh)
         self._data_widgets["video_height"] = vh
@@ -2117,7 +2120,7 @@ class SettingsDialog(QDialog):
         self.data_folder.setTextInteractionFlags(Qt.TextSelectableByMouse)
         # a path has no spaces to wrap at: it gets cut short instead of widening the page
         self.data_folder.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-        grid.addWidget(self.data_folder, 1, 1)
+        grid.addWidget(self.data_folder, 1, 1, 1, 2)
         row = _button_row()
         change = QPushButton(_("Change…"))
 
@@ -2136,8 +2139,8 @@ class SettingsDialog(QDialog):
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
         show.clicked.connect(open_folder)
         row.addWidget(show)
-        grid.addLayout(row, 2, 1)
-        grid.setColumnStretch(1, 1)
+        grid.addLayout(row, 2, 1, 1, 2)
+        grid.setColumnStretch(2, 1)
         cv.addLayout(grid)
         self._data_video_rows = (vh, change, show, self.data_folder)
         v.addWidget(card)
@@ -2154,9 +2157,10 @@ class SettingsDialog(QDialog):
         for kbps, label in quality.RADIO_KBPS.items():
             kb.addItem(label, kbps)
         kb.currentIndexChanged.connect(lambda _i: self._data_radio(kb.currentData()))
+        kb.setMinimumWidth(kb.sizeHint().width())
         grid.addWidget(kb, 0, 1)
         no_wheel(kb)
-        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(2, 1)
         cv.addLayout(grid)
         self._data_widgets["radio_kbps"] = kb
         self._data_widgets["patient"] = self._option(

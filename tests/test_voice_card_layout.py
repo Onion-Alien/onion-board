@@ -1,7 +1,7 @@
 """Card actions stay above their choices; square fold arrows have usable content boxes."""
 import pytest
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QStyle, QStyleOptionButton
+from PySide6.QtWidgets import QLabel, QStyle, QStyleOptionButton
 
 from soundboard import theme
 from soundboard import modules
@@ -11,6 +11,45 @@ from soundboard.ui.aivoicepanel import AiVoicePanel
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.voicefx import VoiceChain
 from tests.test_voicepanel import FakeEngine
+
+
+@pytest.mark.parametrize("stacked", [False, True])
+def test_card_columns_use_new_fold_size_before_resize(qapp, monkeypatch, stacked):
+    """A fold must place later cards using the new size, even before Qt resizes."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    panel = VoicePanel(FakeEngine(), {}, {"folded": []})
+    try:
+        panel.resize(600 if stacked else 1000, 800)
+        panel.stack_steps()[0](stacked)
+        panel.show()
+        for _ in range(8):
+            qapp.processEvents()
+
+        def check():
+            heights = [0, 0]
+            for i, card in enumerate(panel._cards):
+                column = 0 if stacked else (i if i < 2 else int(heights[1] < heights[0]))
+                layout = (panel._lcol, panel._rcol)[column]
+                assert layout.indexOf(card) >= 0
+                height = (card.heightForWidth(card.width()) if card.hasHeightForWidth()
+                          else card.sizeHint().height())
+                heights[column] += height + layout.spacing()
+            for layout in (panel._lcol, panel._rcol):
+                cards = [layout.itemAt(i).widget() for i in range(layout.count() - 1)]
+                for first, second in zip(cards, cards[1:]):
+                    assert second.y() >= first.geometry().bottom() + layout.spacing()
+
+        for _ in range(12):
+            panel._heads["speak"].arrow.click()
+            # Check before the pending resize as well as after each event pass.
+            check()
+            for _ in range(3):
+                qapp.processEvents()
+                check()
+    finally:
+        panel.shutdown()
+        panel.close()
+        panel.deleteLater()
 
 
 @pytest.mark.parametrize("name", ["Dark", "Light", "High Contrast", "Retro 98"])
@@ -64,5 +103,52 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         assert panel.lbl_state.text() == "Ready"
     finally:
         panel.shutdown()
+        panel.close()
+        panel.deleteLater()
+
+
+@pytest.mark.parametrize("name", ["Dark", "Light"])
+@pytest.mark.parametrize("width", [340, 580])
+def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp_path,
+                                                        name, width):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    old = theme.current_name
+    theme.apply(qapp, name)
+    panel = VoicePanel(FakeEngine(), {}, {})
+    speech = panel.speech
+    try:
+        speech.setParent(None)
+        speech.title.show()
+        speech.start_box.show()
+        speech.setFixedWidth(width)
+        speech.lbl_state.setText("Starting: the computer voice is getting ready to speak "
+                                 "your words in the selected language.")
+        speech.show()
+        qapp.processEvents()
+        assert speech.start_box.geometry().bottom() < speech.lbl_intro.geometry().top()
+        assert speech.lbl_intro.geometry().bottom() < speech.cb_voice.geometry().top()
+        assert speech.b_live.geometry().left() == 0
+        assert speech.b_live.geometry().right() < speech.lbl_state.geometry().left()
+        assert speech.start_box.rect().contains(speech.lbl_state.geometry())
+        assert speech.start_box.rect().contains(speech.b_live.geometry())
+        assert speech.lbl_state.wordWrap()
+        speech.grab().save(str(tmp_path / f"computer-voice-{name}-{width}.png"))
+    finally:
+        speech.close()
+        speech.setParent(panel)
+        panel.shutdown()
+        panel.deleteLater()
+        theme.apply(qapp, old)
+
+
+def test_voice_changer_action_precedes_description(qapp):
+    from soundboard.ui.voicepanel import VoiceFxPanel
+    panel = VoiceFxPanel({})
+    try:
+        layout = panel.layout()
+        assert layout.itemAt(1).widget() is panel.btn_power
+        assert isinstance(layout.itemAt(2).widget(), QLabel)
+        assert layout.itemAt(2).widget().wordWrap()
+    finally:
         panel.close()
         panel.deleteLater()
