@@ -3014,13 +3014,14 @@ class VoicePanel(QWidget):
                           _("What you say is said in {language}. Click to open it.",
                             language=lang)))
         if not items:
-            items.append(("none", _("Your real voice"), "off", "mic", None,
-                          _("Nothing changes your voice. Click to pick a voice.")))
+            items.append(("none", _("Voice effects off — mic unchanged"), "off", "mic", None,
+                          _("Your mic voice is unchanged. Open Voice changer or AI voices "
+                            "below to choose a voice.")))
         self.bar.set_items(items)
 
     def _open_card(self, key: str):
         """A status bar chip: unfold its card and scroll to it."""
-        key = {"none": "fx", "lang": "speak"}.get(key, key)
+        key = {"lang": "speak"}.get(key, key)
         head = self._heads.get(key)
         if head is None:
             return

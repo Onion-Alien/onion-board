@@ -544,7 +544,6 @@ QToolButton#railtab { background:transparent; color:$muted; border:1px solid tra
     border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
 QToolButton#railtab:hover { background:$btn_hover; color:$text; }
 QToolButton#railtab:checked { background:transparent; color:$text_hi; }   /* + the rail's fill */
-QToolButton#railtab:focus { border-color:$accent; }
 QFrame#sidebar QPushButton#moretabs, QFrame#sidebar QPushButton#tabinfo,
 QFrame#sidebar QPushButton#settings, QFrame#sidebar QPushButton#modebtn,
 QFrame#sidebar QPushButton#railtoggle { padding:7px 6px; text-align:left; color:$muted;
@@ -564,6 +563,7 @@ QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
+QDialog#transport { background:$panel; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
@@ -628,6 +628,7 @@ QFrame#urgentbar QPushButton#urgenthide { background:transparent; color:$warn_te
     border-radius:14px; padding:0; font-size:12pt; }
 QFrame#urgentbar QPushButton#urgenthide:hover { background:$danger_bg; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
+QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
@@ -783,6 +784,24 @@ QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$l
 QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
 QPushButton#live:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
+QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
+QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }
+QDialog#recorddialog QRadioButton#recordsource { background:$panel; border:1px solid $border; border-radius:12px; padding:12px 14px; spacing:8px; font-weight:600; }
+QDialog#recorddialog QRadioButton#recordsource:hover { background:$card_hi; border-color:$border_hi; }
+QDialog#recorddialog QRadioButton#recordsource:checked { background:$card_hi; border-color:$accent; color:$text_hi; }
+QDialog#recorddialog QRadioButton#recordsource:focus { border-color:$text_hi; }
+QDialog#recorddialog QRadioButton#recordsource:disabled { color:$muted; }
+QFrame#recordstudio, QFrame#recordreview { background:$panel; border:1px solid $border; border-radius:16px; }
+QFrame#recordstudio QLabel, QFrame#recordreview QLabel { background:transparent; }
+QDialog#recorddialog QLabel#recordtime { font-size:28pt; font-weight:600; color:$text_hi; }
+QDialog#recorddialog QLabel#recordphase { color:$muted; font-size:9pt; }
+QDialog#recorddialog QLabel#recordphase[recording="true"] { color:$danger_text; }
+QDialog#recorddialog QPushButton#rec { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; border-radius:14px; font-weight:700; }
+QDialog#recorddialog QPushButton#rec:hover { background:$danger_hover; border-color:$danger_text; }
+QDialog#recorddialog QPushButton#rec:checked { background:#d32f2f; border-color:#ff6b6b; color:white; }
+QDialog#recorddialog QPushButton#rec:checked:hover { background:#b92424; }
+QDialog#recorddialog QPushButton#rec:focus { border-color:$text_hi; }
+QDialog#recorddialog QPushButton#rec:disabled { background:$inset; border-color:$border; color:$muted; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
@@ -1202,7 +1221,7 @@ def stylesheet(name: str | None = None) -> str:
     else:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
     if tk.get("texture") and (url := _texture_url(tk["texture"], tk["panel"])):
-        css += ("QFrame#card, QFrame#transport, QFrame#deck, QFrame#setcard "
+        css += ("QFrame#card, QFrame#transport, QDialog#transport, QFrame#deck, QFrame#setcard "
                 f'{{ background-image:url("{url}"); }}\n')
     return css
 
