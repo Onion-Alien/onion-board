@@ -16,6 +16,10 @@
   YouTube's page settings are kept for an hour instead of being fetched before every
   search (Direct connection only; if a search with them fails, it's done again the old
   way, with fresh ones).
+- *Straight into my mic*: when Windows starts running the mic effect after Onion Board
+  opened (it loads it late sometimes), your sounds switch to it within a second instead
+  of staying on the virtual cable until the app was restarted. If Windows takes the
+  effect off, they go back to the cable the same way.
 - The log no longer warns about "a native error was caught and survived" for Windows
   error code 0x8001010d and its kin: COM raises and handles those itself, so they're
   harmless. They no longer count as a crash at the next start either.
