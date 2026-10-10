@@ -30,7 +30,7 @@ from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import Flow as _Flow
-from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
+from soundboard.ui.panel import RoundedFrame, VolumeControl, bar, icon_label, vsep
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.widgets import paint_now_playing
 
@@ -519,7 +519,7 @@ class RadioTab(QWidget):
         # ---- globe | station list
         self.split = QSplitter(Qt.Horizontal)
         self.split.setChildrenCollapsible(False)
-        self.globe_box = QWidget()
+        self.globe_box = RoundedFrame()
         self.globe_box.setMinimumWidth(200)
         self.globe_layout = QVBoxLayout(self.globe_box)
         self.globe_layout.setContentsMargins(0, 0, 0, 0)
