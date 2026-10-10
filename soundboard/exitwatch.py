@@ -19,6 +19,10 @@ The kinds, most certain first: `native-crash`, `windows-error`, `not-responding`
 at the last heartbeat: probably ended in Task Manager), `pc-restarted` (the PC
 started again since the last heartbeat: a power cut, a forced restart, a blue
 screen), `ended` (none of those: ended in Task Manager, or killed without a trace).
+
+Two of them aren't the app's problem and are neither counted nor reported (NOT_PROBLEMS):
+`windows-closed` (Windows logging off / restarting, or an installer, asked the app to
+close and then ended it before its quit finished) and `pc-restarted`.
 """
 from __future__ import annotations
 
@@ -47,8 +51,9 @@ EVENTS_MAX_AGE_MS = 14 * 24 * 3600 * 1000
 WEVTUTIL_TIMEOUT_S = 10
 LOG_LINES = 40          # of the last run's log, in the report
 
-_KINDS = ("native-crash", "windows-error", "not-responding", "while-closing", "frozen",
-          "pc-restarted", "ended")
+_KINDS = ("native-crash", "windows-error", "not-responding", "windows-closed",
+          "while-closing", "frozen", "pc-restarted", "ended")
+NOT_PROBLEMS = {"windows-closed", "pc-restarted"}
 # Windows exception codes worth a name; anything else is sent as its hex code
 _CODES = {0xC0000005: "access-violation", 0xC0000409: "fast-fail",
           0xC00000FD: "stack-overflow", 0xC0000374: "heap-corruption",
@@ -139,6 +144,13 @@ class ExitWatch:
         self.state["alive"] = time.time()
         self._write()
 
+    def closed_by_windows(self):
+        """Windows (log-off, restart) or an installer asked the app to close: it may
+        end the app before the quit finishes, and that's not a crash."""
+        self.state["closed_by_windows"] = True
+        self.state["alive"] = time.time()
+        self._write()
+
     def stopped(self):
         """The quit finished: nothing to explain next time."""
         self._stop.set()
@@ -171,6 +183,11 @@ def start(app_dir: Path, ui_stuck=lambda: 0.0) -> ExitWatch:
 def quitting():
     for w in _current:
         w.quitting()
+
+
+def closed_by_windows():
+    for w in _current:
+        w.closed_by_windows()
 
 
 def stopped():
@@ -307,6 +324,8 @@ def diagnose(state: dict, native: str, events: list[dict], booted: float) -> tup
             return "windows-error", "@".join(p for p in (ev["code"], ev["module"]) if p)
     if any(ev["kind"] == "not-responding" for ev in events):
         return "not-responding", ""
+    if state.get("closed_by_windows"):
+        return "windows-closed", ""
     if state.get("quitting"):
         return "while-closing", ""
     if float(state.get("stuck_s") or 0) >= FROZEN_S:
@@ -376,10 +395,14 @@ def report_text(state: dict, native: str, events: list[dict], kind: str, tag: st
 def check_last(app_dir: Path, state: dict, native: str, unclean_event: str):
     """After an unclean exit (usage.mark_running's `unclean_event`): work out why, add
     it to the usage event, and save a report beside the crash reports. Runs off the UI
-    thread (wevtutil takes a moment). Returns (event, report path)."""
+    thread (wevtutil takes a moment). Returns (event, report path); ("", None) when it
+    wasn't the app's problem (NOT_PROBLEMS)."""
     from soundboard import applog
     events = windows_events(int(state.get("pid") or 0))
     kind, tag = diagnose(state, native, events, boot_time())
+    if kind in NOT_PROBLEMS:   # Windows or the power ended it: nothing to count or report
+        log.info("the last run was ended from outside: %s", kind)
+        return "", None
     log.warning("the last run ended without closing itself: %s%s", kind,
                 f" ({tag})" if tag else "")
     rep = applog.Report(title="ended without closing",

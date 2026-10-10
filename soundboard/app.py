@@ -483,7 +483,8 @@ def main():
             except Exception:  # noqa: BLE001 - still count it, without the why
                 log.warning("couldn't tell why the last run ended", exc_info=True)
                 event = unclean
-            usage.note(event)
+            if event:   # "": Windows or a power cut ended it, not the app's problem
+                usage.note(event)
         threading.Thread(target=why, daemon=True, name="last-exit").start()
     import time
     exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
