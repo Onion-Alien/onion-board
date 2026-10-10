@@ -62,3 +62,16 @@ def test_dry_run_changes_nothing(tmp_path, monkeypatch):
     assert fake_version(old) == OLD
     assert vr.main([str(tmp_path / "OnionBoard")]) == 0
     assert fake_version(old) == NEW
+
+
+def test_bundled_icu_is_deleted(tmp_path, monkeypatch):
+    internal = tmp_path / "OnionBoard" / "_internal"
+    icu = [make(internal / "icuuc.dll", NEW), make(internal / "icudt78.dll", NEW)]
+    qt = make(internal / "PySide6" / "Qt6Core.dll", NEW)
+    assert vr.foreign_icu(tmp_path / "OnionBoard") == sorted(icu)
+    monkeypatch.setattr(vr, "shiboken_dir", lambda: None)
+    monkeypatch.setattr(vr.plan, "__defaults__", (None, fake_version))
+    assert vr.main([str(tmp_path / "OnionBoard"), "--dry-run"]) == 0
+    assert all(p.exists() for p in icu)
+    assert vr.main([str(tmp_path / "OnionBoard")]) == 0
+    assert not any(p.exists() for p in icu) and qt.exists()

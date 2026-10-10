@@ -93,6 +93,16 @@ Every task, before changing anything (details in `CLAUDE.md`):
 ### Frozen build
 - Changes to `build.ps1`, `scripts/prune_build.py`, PyInstaller hooks or bundled data
   only show in the built app: build with `-NoInstaller` and start it once. `8f6f343`
+- **"DLL load failed while importing QtWidgets: The specified procedure could not be
+  found"** means a foreign DLL got into `_internal\`: another program's ICU
+  (`icuuc.dll`, `icudt78.dll`) or an older `msvcp140.dll`, picked up from a folder on
+  the build PC's PATH (AI tool runtimes carry their own). `build.ps1` runs PyInstaller
+  with only Windows' folders on PATH, and `scripts/vc_runtime.py` deletes bundled ICU
+  and evens out the C++ runtime. Don't hand-delete files from `dist\` or `App\`: fix
+  it in those two, then `build.ps1 -Clean` (the cached analysis keeps old paths). Find
+  where a DLL came from in `build\OnionBoard\Analysis-00.toc`. On an installed copy
+  it can also be an old installer run over a new install: reinstall with the current
+  `OnionBoardSetup.exe` (it clears `_internal` first), never an older setup file.
 
 ### Releases (about 45 hand-made commits)
 - Bump with `scripts/release.py X.Y.Z`, never by hand. It moves `changelog.d/` into the

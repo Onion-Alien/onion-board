@@ -214,7 +214,9 @@ if g++ is missing), PyInstaller (bundles `installer\install-vbcable.ps1` and
 `_internal\directmic\`),
 `scripts\vc_runtime.py` (overwrites any older copy of the C++ runtime, `msvcp140.dll`
 and the rest, with the newest, PySide6's own: an older one from the build PC stops the
-app at start with "The specified procedure could not be found"),
+app at start with "The specified procedure could not be found"; it also deletes any
+ICU DLL another program on PATH slipped in, as Qt uses Windows' own; PyInstaller
+itself runs with only Windows' folders on PATH),
 `scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
 charts, the web engine, unused image formats, translations — by walking the DLL import tables; the
 build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (the
