@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The Sounds toolbar sits on one smooth surface with evenly sized controls, bigger
+  icons, a microphone for Record and a box for Backup. Search sits right after Add
+  and Record; the folder, Backup, hotkeys and Recently deleted come after it.
 - Idle Apps cards disappear after ten minutes without sound and return when sound
   resumes. Sending, remembered programs, recordings and clip edits stay available.
 - **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
