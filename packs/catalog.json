@@ -4,7 +4,7 @@
     {
       "id": "gm-starter",
       "name": "GM starter pack",
-      "emoji": "🐉",
+      "emoji": "🎲",
       "description": "For tabletop games (D&D and friends): tavern, travel, weather, dungeon, combat, magic, boss and ending sounds. Music loops, and Ctrl+Alt+1/2/3 switch tavern, battle and boss music.",
       "url": "https://github.com/Onion-Alien/onion-board/releases/download/gm-pack-1/onion-board-gm-starter-pack.zip",
       "sha256": "bfb53856bb8f225f336e5391b9ceb0773da2bca61923de0102abf888d499f09d",

@@ -72,7 +72,7 @@ BUILT_IN = [{
     "sounds": 67,
     "license": "CC0 + CC BY (credits inside)",
     "author": "Onion Board",
-    "emoji": "🐉",
+    "emoji": "🎲",
     "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss",
                    "Endings"],
 }, {
