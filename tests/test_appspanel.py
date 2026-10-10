@@ -448,7 +448,9 @@ def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp, mo
     tab._on_apps([music()])                        # unused: still watching for idle timeout
     assert tab.timer.isActive()
     row = tab.rows["music.exe"]
-    monkeypatch.setattr(appspanel.time, "monotonic", lambda: row.last_sound_at + 600)
+    # a second past the deadline: (t + 600) - t comes out 599.99… for some clock values
+    later = row.last_sound_at + appspanel.IDLE_SECONDS + 1
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: later)
     tab._on_apps([], {100: "music.exe"})
     assert not tab.rows
     assert not tab.timer.isActive()
