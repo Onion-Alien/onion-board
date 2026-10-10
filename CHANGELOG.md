@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A slow download from a site that doesn't say how big the file is no longer stops
+  after 5 minutes with "The download stopped moving".
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The

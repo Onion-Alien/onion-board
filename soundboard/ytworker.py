@@ -18,6 +18,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 from multiprocessing.connection import Client, Listener
 from pathlib import Path
 
@@ -103,6 +104,8 @@ class _Helper:
                 if kind == "progress":
                     if progress:
                         progress(value)
+                    continue
+                if kind == "alive":   # downloading, size unknown: not stuck
                     continue
                 return kind, value
         except (EOFError, OSError, BrokenPipeError) as e:
@@ -198,8 +201,9 @@ def _lookup(conn, yt_dlp, target: str, opts: dict):
 
 
 def _download(conn, yt_dlp, url: str, opts: dict, max_seconds: float):
-    """ytdl._run's yt-dlp part: (info, the file yt-dlp names)."""
-    import time
+    """ytdl._run's yt-dlp part: (info, the file yt-dlp names). Says how far it got
+    (or, when the site gives no size, that it's still going: at least once a second):
+    the app takes a download that says nothing for DOWNLOAD_QUIET_S as stuck."""
     last = [0.0]
 
     def hook(d):
@@ -207,8 +211,13 @@ def _download(conn, yt_dlp, url: str, opts: dict, max_seconds: float):
             return
         total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
         now = time.monotonic()
-        f = min(d.get("downloaded_bytes", 0) / total, 1.0) if total else 0.0
-        if total and (now - last[0] >= 0.1 or f >= 1.0):
+        if not total:
+            if now - last[0] >= 1.0:
+                last[0] = now
+                conn.send(("alive", None))
+            return
+        f = min(d.get("downloaded_bytes", 0) / total, 1.0)
+        if now - last[0] >= 0.1 or f >= 1.0:
             last[0] = now
             conn.send(("progress", f))
     opts = dict(opts, progress_hooks=[hook])
