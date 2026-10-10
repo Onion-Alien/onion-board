@@ -2982,6 +2982,34 @@ class MainWindow(QMainWindow):
              time.monotonic() < self._settle_until and e.effect_alive())   # "starting…" ends
         return h
 
+    _following_effect = False
+
+    def _follow_mic_effect(self):
+        """Sending into the mic, and the mic effect started (or stopped) working since
+        what others hear was opened: switch to it (or back to the cable) now. Before,
+        sounds stayed on the cable until the app restarted, e.g. when Windows loaded the
+        effect a while after the app started. Checked about once a second; the streams
+        open on the device thread."""
+        if self._attaching or self._following_effect:
+            return
+        if self.engine.names["main"] == self._main_name():
+            return
+        self._following_effect = True
+        log.info("the mic effect %s: what others hear follows",
+                 "works now" if self._main_name() == directmic.DEVICE else "stopped working")
+
+        def opened(ends):
+            self._following_effect = False
+            if ends is not None:
+                self._set_cable_bad(ends)
+            self._update_status()
+            self._prepare_all()
+
+        def plan():   # worked out when its turn comes
+            send = self._send_plan()
+            return lambda: self._open_send(send)
+        self._device_job(plan, opened)
+
     DIRECT_GRACE_S = 4.0   # the board's own mic open this long, and still no sign of it
     SETTLE_S = 20.0        # after setting it up: how long Windows gets to load it
 
@@ -7498,6 +7526,8 @@ class MainWindow(QMainWindow):
         now = time.monotonic()
         self._tick_n += 1
         if self._tick_n % max(1, 1000 // self.timer.interval()) == 0:   # about once a second
+            if self.cfg.route == "mic":
+                self._follow_mic_effect()
             if e.check_streams() or sum(e.xruns.values()) != self._xruns_shown:
                 self._update_status()
             elif self.cfg.route == "mic" and self._direct_health() != self._direct_shown:

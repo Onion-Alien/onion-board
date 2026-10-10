@@ -1760,6 +1760,35 @@ def test_nobody_goes_silent_before_the_mic_is_set_up(window, monkeypatch, state)
     assert w._main_name() is None   # no cable either: nothing to send into
 
 
+def test_sounds_follow_the_mic_effect_once_it_works(window, monkeypatch):  # noqa: F811
+    """The effect started working after the app opened what others hear on the cable
+    (Windows loaded it late): the next check switches to it, no restart needed. And
+    back to the cable if Windows takes it off."""
+    w = window
+    _routes(w, monkeypatch, "missing")
+    opened = []
+    monkeypatch.setattr(w.engine, "set_main_device",
+                        lambda name: (opened.append(name), w.engine.names.update(main=name)))
+    monkeypatch.setattr(w, "_device_job", lambda plan, then=None: then(plan()()))
+    monkeypatch.setattr(w, "_cable_ends", lambda *_a: None)
+    w.engine.names["main"] = CABLE_IN
+    w._follow_mic_effect()
+    assert opened == []   # nothing changed: nothing reopened
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    w._follow_mic_effect()
+    assert opened == [dm.DEVICE]
+    w._follow_mic_effect()
+    assert opened == [dm.DEVICE]   # only once
+    monkeypatch.setattr(dm, "status", lambda name=None: "wiped")
+    w._follow_mic_effect()
+    assert opened == [dm.DEVICE, CABLE_IN]
+    w._attaching = True   # being set up: set_route applies it when it's on
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    w._follow_mic_effect()
+    assert opened == [dm.DEVICE, CABLE_IN]
+    w._attaching = False
+
+
 @pytest.mark.parametrize("state", ["ready", "missing", "wiped"])
 def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatch, state):  # noqa: F811
     """Straight into the mic is the way: working or not set up yet, the Setup tab
