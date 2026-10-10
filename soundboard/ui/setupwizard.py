@@ -294,8 +294,6 @@ class SetupWizard(QDialog):
         nav.addStretch(1)
         self.btn_next = QPushButton(_("Next  →"))
         self.btn_next.setObjectName("primary")
-        self.btn_next.setMinimumWidth(160)
-        self.btn_next.setStyleSheet("padding:10px 18px; font-size:11pt;")
         self.btn_next.clicked.connect(self.next_clicked)
         self.btn_next.setDefault(True)   # Enter moves on (not "Play a test sound")
         nav.addWidget(self.btn_next)
@@ -445,7 +443,6 @@ class SetupWizard(QDialog):
         self.btn_attach = QPushButton(_("Put my sounds straight into my mic"))
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
-        self.btn_attach.setStyleSheet("padding:12px 22px; font-size:12pt;")
         self.btn_attach.clicked.connect(self.attach_mic)
         v.addWidget(self.btn_attach, 0, Qt.AlignLeft)
         self.setup_show = SetupShow(height=96)
@@ -481,7 +478,6 @@ class SetupWizard(QDialog):
         buttons.addWidget(self.btn_recheck)
         self.btn_restart = QPushButton(_("⟲  Restart my PC now"))
         self.btn_restart.setObjectName("primary")
-        self.btn_restart.setStyleSheet("padding:12px; font-size:12pt;")
         self.btn_restart.clicked.connect(self.restart_pc)
         self.btn_restart.hide()
         v.addWidget(self.btn_restart, 0, Qt.AlignLeft)
@@ -705,6 +701,9 @@ class SetupWizard(QDialog):
             for k, v in self._saved_devices.items():   # keep what they had, unless
                 if k not in self._user_picked:         # they picked another one here
                     setattr(self.win.cfg, k, v)
+            # closed on purpose: don't open it again every launch (the Setup tab's
+            # Step-by-step guide still opens it)
+            self.win.cfg.setup_done = True
             self.win.cfg.save()
             self.win._init_devices()
         super().done(r)

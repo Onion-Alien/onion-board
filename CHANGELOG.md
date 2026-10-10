@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The quick setup guide no longer opens on every start after you close it with the X;
+  it's still in the Setup tab (*Step-by-step guide*). Its buttons are all the normal
+  size now (the big mic button and the wide Next button were oversized).
 - *Straight into my mic*: a damaged link file between the board and the mic effect
   that said the wrong sample rate is made again, instead of your sounds going out at
   the wrong speed and pitch.
