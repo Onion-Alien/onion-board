@@ -73,10 +73,12 @@ def served(monkeypatch, app_dir):
     net.configure_features()
 
 
-def test_the_built_in_list_has_the_gm_pack_from_our_own_release():
-    gm, = packs.built_in()
-    assert gm.id == "gm-starter" and gm.sounds == 67
-    assert gm.url.startswith(updates.DOWNLOADS) and len(gm.sha256) == 64
+def test_the_built_in_list_has_our_packs_from_our_own_releases():
+    built = packs.built_in()
+    assert [(p.id, p.sounds) for p in built] == [("gm-starter", 67), ("esports", 51),
+                                                 ("podcast", 51)]
+    for p in built:
+        assert p.url.startswith(updates.DOWNLOADS) and len(p.sha256) == 64
 
 
 def test_the_repo_catalog_matches_what_the_app_ships():
@@ -84,7 +86,7 @@ def test_the_repo_catalog_matches_what_the_app_ships():
     raw = json.loads((Path(__file__).parents[1] / "packs" / "catalog.json")
                      .read_text(encoding="utf-8"))
     assert [p.id for p in packs.parse(raw)] == [p.id for p in packs.built_in()]
-    assert packs.parse(raw)[0] == packs.built_in()[0]
+    assert packs.parse(raw) == packs.built_in()
 
 
 def test_parse_keeps_only_packs_from_our_releases_with_a_checksum():
@@ -155,7 +157,7 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        assert [c.pack.id for c in dlg.cards] == ["gm-starter"]
+        assert [c.pack.id for c in dlg.cards] == ["gm-starter", "esports", "podcast"]
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
         assert served.calls == []
     finally:
