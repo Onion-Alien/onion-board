@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Polished playback transport controls.** The sound player's Play/Pause button uses an accent-pill style with clean high-contrast icons that adapt across all themes, and the Stop button uses a sleek secondary surface with a subtle danger outline on hover. Both buttons use smooth filleted vector glyphs with optical centering.
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.
