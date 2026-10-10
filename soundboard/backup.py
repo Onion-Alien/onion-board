@@ -73,7 +73,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "net_off", "net_offline", "tor_bridges", "data", "stats_id",
                   "stats_sent", "stats_heard", "stats_tabs", "stats_problems_seen",
                   "stats_started", "stats_steps", "stats_used", "stats_plays", "stats_open_s",
-                  "tips_seen", "tip_day"}
+                  "stats_launches", "stats_version", "stats_pending", "tips_seen", "tip_day"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
                 "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold",
@@ -141,9 +141,12 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
 
 def settings_of(cfg: Config) -> dict:
     """The app's settings as they're exported: everything except LOCAL_SETTINGS, plus
-    the voice changer's saved voices (kept in a file of their own, savedvoices.py)."""
+    the voice changer's saved voices (kept in a file of their own, savedvoices.py).
+    Only settings this version knows: a newer version's that config.json keeps
+    (Config._raw_extra) could be private to this PC, and a backup may be shared."""
     raw = cfg.to_raw()
-    out = {k: v for k, v in raw.items() if k not in LOCAL_SETTINGS}
+    known = {f.name for f in fields(Config)}
+    out = {k: v for k, v in raw.items() if k in known and k not in LOCAL_SETTINGS}
     if voices := savedvoices.saved():
         out[SAVED_VOICES] = voices
     return out
@@ -730,7 +733,7 @@ def apply_settings(cfg: Config, raw: dict) -> list[str]:
     defaults = Config()
     changed = []
     for k, v in raw.items():
-        if k in LOCAL_SETTINGS or k not in Config.__dataclass_fields__:
+        if k in LOCAL_SETTINGS or k not in library.field_names(Config):
             continue
         want = getattr(defaults, k)
         if want is None:

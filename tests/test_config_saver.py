@@ -96,3 +96,29 @@ def test_a_read_only_config_isnt_written(app_dir):
     results = []
     library.Saver(cfg, done=results.append).save()
     assert results == [False] and not library.CONFIG_PATH.exists()
+
+
+def test_a_save_as_the_idle_wait_ends_is_still_written(app_dir):
+    """The saver thread's 30 s idle wait timed out, and a save() took the lock before
+    the wait got it back: the thread saw a timeout, left with that save pending, and
+    it was never written (flush() then gave up on it at quit)."""
+    cfg = Config()
+    s = library.Saver(cfg)
+    raced = []
+
+    class Racy(threading.Condition):
+        def wait(self, timeout=None):
+            if timeout == 30 and not raced:   # the idle wait: time it out, with a save
+                raced.append(1)               # slipping in just as it does
+                cfg.theme = "Paper"
+                s._pending = cfg.snapshot()
+                return False
+            return super().wait(timeout)
+    s._cond = Racy()
+    cfg.theme = "Light"
+    s.save()
+    end = time.monotonic() + 10
+    while not raced and time.monotonic() < end:   # the first write done, then idle
+        time.sleep(0.01)
+    assert raced and s.flush(5)
+    assert _on_disk()["theme"] == "Paper"

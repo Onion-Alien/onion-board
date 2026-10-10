@@ -1,12 +1,14 @@
 """Switch category when a program is in front: the rules' logic with a stubbed
 foreground window, and the board following it."""
 import pytest
+from PySide6.QtCore import Qt
 
 from soundboard import backup
 from soundboard.catswitch import Switcher
 from soundboard.library import Config, clean_programs
 
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
+from tests.conftest import process_events
 
 GAME = "C:\\Games\\Some Game\\game.exe"
 BROWSER = "C:\\Apps\\browser.exe"
@@ -189,3 +191,29 @@ def test_program_picker_lists_and_browses(qapp):
     p._ok()
     assert p.picked == ["new.exe"]
     p.deleteLater()
+
+
+def test_closing_the_program_picker_while_it_lists_is_safe(qapp):
+    """The open programs are listed on a thread. Its answer went to a signal of the
+    dialog itself: closed and freed meanwhile (free_dialog), that emit was a native
+    access violation (CI, a test worker gone). A closed picker now just never hears
+    the answer."""
+    import threading
+    from PySide6.QtCore import QEvent
+    from soundboard.ui.programpick import ProgramPicker
+    go, done = threading.Event(), threading.Event()
+
+    def slow_lister():
+        go.wait(5)
+        done.set()
+        return [("game.exe", GAME, "Some Game")]
+    p = ProgramPicker("Game", {}, lister=slow_lister)
+    p.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)   # freed while still listing
+    go.set()
+    assert done.wait(5)
+    process_events(qapp, lambda: False, timeout=0.3)       # its answer arrives: nothing
+    open_one = ProgramPicker("Game", {}, lister=lambda: [("game.exe", GAME, "")])
+    assert process_events(qapp, lambda: open_one.list.count() == 1
+                          and open_one.list.item(0).data(Qt.UserRole) == "game.exe")
+    open_one.deleteLater()

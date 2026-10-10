@@ -19,8 +19,8 @@ import sys
 import threading
 import time
 import uuid
-from dataclasses import asdict, dataclass, field
-from functools import lru_cache
+from dataclasses import asdict, dataclass, field, fields
+from functools import cache, lru_cache
 from pathlib import Path
 from typing import ClassVar
 
@@ -97,11 +97,19 @@ def fits_type(default, v) -> bool:
     return isinstance(v, type(default))
 
 
+@cache
+def field_names(cls) -> frozenset[str]:
+    """A dataclass's settings: its fields, not its ClassVars (which __dataclass_fields__
+    lists too, e.g. Config.read_only)."""
+    return frozenset(f.name for f in fields(cls))
+
+
 def _typed(raw: dict, defaults, what: str) -> dict:
     """Keep only raw's known fields whose type fits (floats given as ints become floats)."""
     out = {}
+    known = field_names(type(defaults))
     for k, v in raw.items():
-        if k not in type(defaults).__dataclass_fields__:
+        if k not in known:
             continue
         want = getattr(defaults, k)
         if not fits_type(want, v):
@@ -483,6 +491,11 @@ class Config:
     stats_plays: int = 0
     # seconds the app was open since the last daily count (usage.open_tick)
     stats_open_s: float = 0.0
+    # starts since the last daily count, the version that last ran here (for
+    # updated/<from>-to-<to>), and one-off events still waiting to be sent
+    stats_launches: int = 0
+    stats_version: str = ""
+    stats_pending: list[str] = field(default_factory=list)
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
@@ -869,8 +882,11 @@ class Saver:
         while True:
             with self._cond:
                 while self._pending is None:
-                    if not self._cond.wait(30):
-                        self._thread = None   # idle: the next save starts a new one
+                    # timed out with nothing pending: idle, the next save starts a new
+                    # thread (a save() can take the lock as the wait times out: still
+                    # this thread's to write)
+                    if not self._cond.wait(30) and self._pending is None:
+                        self._thread = None
                         return
                 snap, self._pending, self._busy = self._pending, None, True
             try:

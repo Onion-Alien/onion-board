@@ -27,6 +27,28 @@ import gc  # noqa: E402
 
 gc.disable()
 
+# A test worker (pytest-xdist) dies with the run that started it. Killing pytest (an
+# editor's or agent's timeout, a closed terminal) used to leave its workers running,
+# each holding ~500 MB, until someone noticed. The run's PID is handed down in the
+# environment; each worker waits on that process and exits the moment it's gone.
+_RUN_PID = "ONIONBOARD_TEST_RUN_PID"
+if "PYTEST_XDIST_WORKER" not in os.environ:
+    os.environ[_RUN_PID] = str(os.getpid())
+elif sys.platform == "win32" and os.environ.get(_RUN_PID, "").isdigit():
+    import ctypes
+    import threading
+
+    def _exit_with_the_run(pid: int):
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.OpenProcess.restype = ctypes.c_void_p
+        handle = k32.OpenProcess(0x00100000, False, pid)   # SYNCHRONIZE
+        if handle:
+            k32.WaitForSingleObject(ctypes.c_void_p(handle), 0xFFFFFFFF)   # INFINITE
+        os._exit(1)
+
+    threading.Thread(target=_exit_with_the_run, args=(int(os.environ[_RUN_PID]),),
+                     name="exit-with-the-run", daemon=True).start()
+
 
 class _SilentOutputStream:
     """Stands in for sounddevice.OutputStream: the callback runs on a thread at the
@@ -248,6 +270,16 @@ def _never_touch_real_appdata(monkeypatch, tmp_path):
         m = sys.modules.get(mod)
         if m is not None and Path(m.APP_DIR).is_relative_to(real):
             monkeypatch.setattr(m, "APP_DIR", tmp_path / "guard" / "app_dir")
+    # ...and a test that first imports soundboard.app in its own body gets the real
+    # folder (the loop above ran before): applog.setup itself never takes it in a test
+    from soundboard import applog
+    real_setup = applog.setup
+
+    def setup(app_dir, *a, **k):
+        if Path(app_dir).is_relative_to(real):
+            app_dir = tmp_path / "guard" / "app_dir"
+        return real_setup(Path(app_dir), *a, **k)
+    monkeypatch.setattr(applog, "setup", setup)
 
 
 @pytest.fixture(autouse=True)
@@ -307,6 +339,16 @@ def _not_a_dev_pc(monkeypatch):
     """The developer's PCs set ONIONBOARD_NO_STATS (no usage count from them): the
     tests run as on anyone's PC, so the usage count tests see it sent."""
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
+
+
+@pytest.fixture(autouse=True)
+def _never_count_for_real(monkeypatch):
+    """No test ever reaches the real GoatCounter: the usage count (and the problem
+    events riding on it) would land in the project's real stats. Tests that send one
+    point usage.ENDPOINT at their own stand-in server; anything else that slips
+    through (a test faking sys.frozen that builds a window) hits a closed local port."""
+    from soundboard import usage
+    monkeypatch.setattr(usage, "ENDPOINT", f"http://127.0.0.1:{closed_port()}/api/v0/count")
 
 
 @pytest.fixture(autouse=True)

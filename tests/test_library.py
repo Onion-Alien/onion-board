@@ -262,3 +262,9 @@ def test_ffmpeg_finding_no_sound_says_so_in_words(tmp_path, monkeypatch):
     assert library._ffmpeg_words("[in#0 @ 01] Invalid data found when processing input") \
         == "It isn't a sound file that can be read, or it's damaged."
     assert library._ffmpeg_words("something new") == "something new"
+
+
+def test_settings_named_like_the_windows_own_state_are_ignored():
+    # in config.json they made Config(**known) fail, and a good config was set aside
+    c = Config.from_raw({"read_only": True, "load_note": "hi", "mon_vol": 0.5})
+    assert c.mon_vol == 0.5 and c.read_only is False and c.load_note == ""

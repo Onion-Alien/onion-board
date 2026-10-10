@@ -11,15 +11,22 @@ last one (their names only). Soon after a start: how many problems there were si
 last send, as counts, never the report itself: a crash report or a freeze saved
 (`crash/<version>`, `error/<version>`, `freeze/<version>`, with the error's type and
 the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
-soundboard/engine.py:1090`: never its message or anything else from the report), or
+soundboard/engine.py:1090`; a freeze also its caller's line, the library function it
+was stuck in, how long it lasted and whether the window or another thread was busy:
+never its message or anything else from the report), or
 the last run ending without the app closing itself (`unclean-exit/<version>/<why>`:
 a hard crash, ended in Task Manager, a power cut; exitwatch.py works out which, on
-this PC). And `uninstall/<version>` when the uninstaller removes it.
+this PC). Past MAX_PROBLEMS in one send, one `problems-dropped/<bucket>` says roughly
+how many more. On the first start of a new version, `updated/<from>-to-<to>` (so an
+update that never finished shows up as an *Update now* without one). One-off events
+wait in config.json until a send takes them. And `uninstall/<version>` when the
+uninstaller removes it.
 With the daily one, a rough picture of how it's used, each as a bucket or a name from a
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
 one (`sounds/11-50`, `played/1-10`), how long the app was open since then
-(`open/1-3h`), the app's language (`lang/de`), and which features
+(`open/1-3h`), how many times it was started since then (`launches/2-5`), the system
+(`os/win11`, `os/win10`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
 triggershost.BoardHost.count, as `used/triggers-mode-colour`). And once each,
@@ -240,6 +247,38 @@ def open_bucket(seconds: float) -> str:
             else "3-8h" if h < 8 else "8h-plus")
 
 
+def launch_bucket(n: int) -> str:
+    """How many times it was started since the last daily count: 0 (left open since
+    then), 1, 2-5 or 6-plus."""
+    return "0" if n <= 0 else "1" if n == 1 else "2-5" if n <= 5 else "6-plus"
+
+
+def os_tag() -> str:
+    """Which system, nothing finer: win11, win10, win-older, linux or other."""
+    if sys.platform == "win32":
+        try:
+            v = sys.getwindowsversion()
+        except AttributeError:
+            return "other"
+        if v.major >= 10:
+            return "win11" if v.build >= 22000 else "win10"
+        return "win-older"
+    return "linux" if sys.platform.startswith("linux") else "other"
+
+
+def started(cfg) -> None:
+    """At start: count this launch for the next daily count's `launches/`, and when
+    another version ran here last, keep `updated/<from>-to-<to>` for the next send
+    (however it was updated: *Update now*, the installer, a download). Nothing piles
+    up while the count is off; the version is noted either way."""
+    old, cfg.stats_version = cfg.stats_version, __version__
+    if not enabled() or not net.allowed(FEATURE):
+        return
+    cfg.stats_launches = max(0, int(cfg.stats_launches or 0)) + 1
+    if old and old != __version__ and re.fullmatch(VERSION_RE, old):
+        _keep(cfg, [f"updated/{old}-to-{__version__}"])
+
+
 def total_plays(cfg) -> int:
     return sum(max(0, int(getattr(m, "plays", 0) or 0)) for m in cfg.sounds)
 
@@ -281,6 +320,10 @@ def remember(cfg) -> None:
     _used.clear()
     if new:
         cfg.stats_used = [*have, *new]
+    if _pending:   # note()d events: kept in cfg too, so a quit before the send keeps them
+        taken = _pending[:]
+        del _pending[:len(taken)]
+        _keep(cfg, taken)
 
 
 def features_now(cfg) -> list[str]:
@@ -306,6 +349,8 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
     lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
     out.append(f"lang/{lang}")
+    out.append(f"os/{os_tag()}")
+    out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
             | set(features_now(cfg)))
     out += [f"used/{k}" for k in FEATURES if k in have]
@@ -327,17 +372,82 @@ _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 
 
-def _where(stack: str) -> str:
-    """`soundboard/engine.py:1090`: the deepest of our own lines in a report's stack
-    (the same file and line anyone can look up in the public source), or "".
-    threadnames.py only wraps Thread.start / run, so its lines name their caller."""
-    frames = [(file.replace(chr(92), "/"), line)
+def _ours(stack: str) -> list[str]:
+    """Our own lines in a stack, outermost first, as `soundboard/engine.py:1090` (the
+    same file and line anyone can look up in the public source). threadnames.py only
+    wraps Thread.start / run, so its lines are left out: they name their caller."""
+    frames = [f"{file.replace(chr(92), '/')}:{line}"
               for file, line in _OUR_FRAME.findall(stack)]
-    frames = [f for f in frames if f[0] != "soundboard/threadnames.py"] or frames
-    if not frames:
+    return [f for f in frames if not f.startswith("soundboard/threadnames.py:")] or frames
+
+
+def _where(stack: str) -> str:
+    """The deepest of our own lines in a report's stack, or ""."""
+    frames = _ours(stack)
+    return frames[-1] if frames else ""
+
+
+# the innermost frame of a stuck window, when it's outside our code: only the module's
+# file name (never its folder) and the function, e.g. `threading.wait`
+_INNER = re.compile(r'^\s*File "(?:[^"]*[\\/])?([A-Za-z0-9_]+)\.py", line \d+, in ([A-Za-z_]\w*)$')
+BUSY = 0.3   # a thread using this share of a core or more was working, not waiting
+IN_DIALOG_MARK = "inside a window's own event loop"   # hangwatch.IN_DIALOG_NOTE
+
+
+def _blocked_in(stack: str) -> str:
+    frames = [ln for ln in stack.splitlines() if _ANY_FRAME.match(ln)]
+    if not frames or _OUR_FRAME.match(frames[-1]):
         return ""
-    file, line = frames[-1]
-    return f"{file}:{line}"
+    m = _INNER.match(frames[-1])
+    return f"{m.group(1)}.{m.group(2)}" if m else ""
+
+
+def _lasted(head: str) -> str:
+    m = re.search(r"^Lasted:\s*(.*)$", head, re.M)
+    if not m:
+        return ""                  # a report from an older version: not known
+    s = re.match(r"(\d+) s", m.group(1).strip())
+    if not s:
+        return "never-ended"       # the app was ended while frozen (or never came back)
+    s = int(s.group(1))
+    return ("lasted-under-10s" if s < 10 else "lasted-10-30s" if s < 30
+            else "lasted-30s-2m" if s < 120 else "lasted-2m-plus")
+
+
+def _busy(window: str, others: str) -> str:
+    """Who was using the CPU while the window was stuck (hangwatch.py measures it):
+    `busy-window` (working itself), `busy-thread@<our line>` (another thread was, and
+    the window likely waited on it: the GIL or a lock), `idle` (everyone waited: a
+    lock, the disk, the network, Windows). "" in a report without the numbers."""
+    m = re.search(r"^Window CPU: (\d+)%", window, re.M)
+    if not m:
+        return ""
+    if int(m.group(1)) >= BUSY * 100:
+        return "busy-window"
+    best, where = BUSY * 100, None
+    for block in re.split(r'^(?=Thread ")', others, flags=re.M):
+        m = re.match(r'Thread ".*" \(\d+\), (\d+)% CPU:', block)
+        if m and int(m.group(1)) >= best:
+            best, where = int(m.group(1)), _where(block)
+    if where is None:
+        return "idle"
+    return "busy-thread" + (f"@{where}" if where else "")
+
+
+def _freeze_tag(head: str, window: str, others: str) -> str:
+    """`@<deepest line><<its caller>~<stuck in>/<how long>/<who was busy>`, e.g.
+    `@soundboard/ui/mainwindow.py:5898<soundboard/app.py:100~threading.wait/
+    lasted-10-30s/idle`: each part only when the report has it."""
+    ours = _ours(window)
+    tag = f"@{ours[-1]}" if ours else ""
+    if len(ours) > 1:
+        tag += f"<{ours[-2]}"
+    inner = _blocked_in(window)
+    if inner:
+        tag += f"~{inner}"
+    rest = ["in-dialog"] if IN_DIALOG_MARK in window else []
+    rest += [p for p in (_lasted(head), _busy(window, others)) if p]
+    return tag + "".join(f"/{p}" for p in rest)
 
 
 def _error_type(stack: str) -> str:
@@ -357,7 +467,8 @@ def _error_type(stack: str) -> str:
 def _report_event(path: Path) -> str:
     """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py),
     then where it happened when the stack shows it: `error/1.9.6/KeyError@
-    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/directmic.py:184`."""
+    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/directmic.py:184` (a freeze
+    with more: _freeze_tag)."""
     try:
         with open(path, encoding="utf-8", errors="replace") as f:
             text = f.read(64_000)
@@ -371,22 +482,25 @@ def _report_event(path: Path) -> str:
     # the stack only: never the log lines saved below it
     stack = re.split(r"^Last \d+ log lines\s*$", text, maxsplit=1, flags=re.M)[0]
     stack = stack.split("\n\n", 1)[-1]
-    # a freeze: the window's own stack, never the other threads hangwatch.py adds
-    stack = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)[0]
-    where = _where(stack)
+    # a freeze: the window's own stack; the other threads hangwatch.py adds only say
+    # which one was busy
+    stack, *others = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)
     if "froze for" in head.split("\n", 1)[0]:
-        return f"freeze/{ver}" + (f"@{where}" if where else "")
+        return f"freeze/{ver}" + _freeze_tag(head, stack, "".join(others))
+    where = _where(stack)
     kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
     etype = _error_type(stack)
     tag = "@".join(p for p in (etype, where) if p)
     return f"{kind}/{ver}" + (f"/{tag}" if tag else "")
 
 
-def problems(app_dir: Path, since: float) -> tuple[list[str], float]:
+def problems(app_dir: Path, since: float,
+             skipped: list[int] | None = None) -> tuple[list[str], float]:
     """Events for the crash / freeze reports saved in app_dir after `since` (a file
-    time), and the newest such time. Only the kind and version are read out."""
+    time), and the newest such time. Only the kind and version are read out. Past
+    MAX_PROBLEMS the rest aren't read: how many is added to `skipped`."""
     from soundboard.applog import REPORTS_DIR
-    out, newest = [], since
+    out, newest, over = [], since, 0
     try:
         files = sorted((f.stat().st_mtime, f.name, f)
                        for f in (app_dir / REPORTS_DIR).glob("crash-*.txt"))
@@ -396,9 +510,14 @@ def problems(app_dir: Path, since: float) -> tuple[list[str], float]:
         if mtime <= since:
             continue
         newest = max(newest, mtime)
+        if len(out) >= MAX_PROBLEMS:
+            over += 1
+            continue
         ev = _report_event(f)
-        if ev and len(out) < MAX_PROBLEMS:
+        if ev:
             out.append(ev)
+    if skipped is not None:
+        skipped.append(over)
     return out, newest
 
 
@@ -430,12 +549,20 @@ def mark_stopped(app_dir: Path) -> None:
 
 
 _pending: list[str] = []   # an unclean exit found at start, for the next send
+MAX_PENDING = 20           # one-off events kept in cfg.stats_pending while unsent
 
 
 def note(event: str) -> None:
-    """Send `event` with the next count."""
+    """Send `event` with the next count (any thread: remember() moves it into cfg)."""
     if event:
         _pending.append(event)
+
+
+def _keep(cfg, events) -> None:
+    """Keep one-off events in cfg.stats_pending until a send takes them."""
+    have = [e for e in (cfg.stats_pending if isinstance(cfg.stats_pending, list) else [])
+            if isinstance(e, str)]
+    cfg.stats_pending = [*have, *(e for e in events if e)][:MAX_PENDING]
 
 
 def uninstall_event() -> str:
@@ -451,8 +578,10 @@ def opt_out(where: str) -> bool:
     one last "opt-out/<where>" so we know how many people aren't counted, then nothing
     ever again. No random ID, no tag, no session: it can't be tied to anything they
     sent before. Only while the count is still allowed (call it before switching it
-    off). Waits for the answer: call it off the UI thread."""
-    if where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE):
+    off), and never in Tor mode (SECURITY.md). Waits for the answer: call it off the
+    UI thread."""
+    if (where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE)
+            or net.mode() == net.TOR):
         return False
     name = f"opt-out/{where}"
     netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
@@ -493,12 +622,16 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
     if not event:
-        taken = len(_pending)
-        extra = _pending[:taken]
+        extra = list(cfg.stats_pending)   # remember() just made it a clean list
+        taken = len(extra)
+        skipped = [0]
         if app_dir is not None:
-            found, newest = problems(app_dir, cfg.stats_problems_seen)
+            found, newest = problems(app_dir, cfg.stats_problems_seen, skipped)
             extra += found
+        dropped = skipped[-1] + max(0, len(extra) - MAX_PROBLEMS)
         extra = extra[:MAX_PROBLEMS]
+        if dropped:   # a bug in a loop: one count saying roughly how many more
+            extra.append(f"problems-dropped/{bucket(dropped)}")
     open_tick(cfg)
     payload = hits(cfg, now, event, extra)
     if not payload:
@@ -508,6 +641,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     feats = [h["path"][5:] for h in payload if h["path"].startswith("used/")]
     plays = total_plays(cfg)
     opened = cfg.stats_open_s or 0
+    launches = cfg.stats_launches or 0
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
@@ -521,7 +655,8 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
             cfg.stats_plays = plays
             cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
-        del _pending[:taken]
+            cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
+        cfg.stats_pending = cfg.stats_pending[taken:]   # any kept meanwhile stay
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         if saved is not None:
             saved()
