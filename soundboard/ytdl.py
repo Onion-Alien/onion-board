@@ -722,6 +722,12 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
         raise DownloadError(_("That isn't a Myinstants sound link."))
+    def drop():   # nothing half-downloaded is left behind
+        if dest:
+            path.unlink(missing_ok=True)
+        else:
+            shutil.rmtree(tmp, ignore_errors=True)
+
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
         with (net.urlopen(req, timeout=30, feature=f"{FEATURE}.myinstants",
@@ -735,17 +741,17 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
                 f.write(chunk)
                 if progress and total:
                     progress(min(got / total, 1.0))
+            if total and got != total:   # a dropped connection just ends read()
+                raise DownloadError(_("Download failed ({error})",
+                                      error=_("The connection was dropped.")))
     except DownloadError:
-        if not dest:
-            shutil.rmtree(tmp, ignore_errors=True)
+        drop()
         raise
     except net.FeatureOff as e:
-        if not dest:
-            shutil.rmtree(tmp, ignore_errors=True)
+        drop()
         raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - network: show why
-        if not dest:
-            shutil.rmtree(tmp, ignore_errors=True)
+        drop()
         raise DownloadError(_("Download failed ({error})", error=errors.plain(e))) from e
     return path, _direct_title(url)
 
