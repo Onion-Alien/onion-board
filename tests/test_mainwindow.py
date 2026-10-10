@@ -985,3 +985,22 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window):
     assert "✗" not in text and theme.status("error") not in text
     assert "after the setup below" in w.flow_mic.text()
     assert "not installed yet" in w.flow_out.text()
+
+
+def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):
+    """Dropdown menus on the sound page toolbar open with a short pixel gap from their button."""
+    from soundboard.ui.widgets import DropdownMenu
+    w = window
+    w.show()
+    for btn in (w.btn_more, w.btn_keys, w.btn_view):
+        menu = btn.menu()
+        assert isinstance(menu, DropdownMenu)
+        btn.showMenu()
+        qapp.processEvents()
+        try:
+            bottom = btn.mapToGlobal(btn.rect().bottomLeft()).y()
+            assert menu.y() - bottom >= DropdownMenu.GAP
+        finally:
+            menu.close()
+            qapp.processEvents()
+

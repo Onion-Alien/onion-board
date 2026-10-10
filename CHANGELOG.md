@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
+  short gap clear of their buttons.
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.

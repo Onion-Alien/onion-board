@@ -11,7 +11,7 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea,
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMenu, QScrollArea,
                                QSlider, QStackedWidget, QStyle, QTabWidget, QVBoxLayout,
                                QWidget)
 
@@ -25,6 +25,23 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 
 PAD_MIME = "application/x-soundboard-pad"
+
+
+class DropdownMenu(QMenu):
+    """A dropdown menu opened with a short gap from its button, not stuck to it."""
+    GAP = 8
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        btn = self.parentWidget()
+        if isinstance(btn, QAbstractButton):
+            below = self.y() >= btn.mapToGlobal(btn.rect().center()).y()
+            gap = self.GAP if below else -self.GAP
+            room = btn.screen().availableGeometry() if btn.screen() else None
+            new_y = self.y() + gap
+            if room:
+                new_y = max(room.top(), min(new_y, room.bottom() + 1 - self.height()))
+            self.move(self.x(), new_y)
 
 
 class Meter(QWidget):
