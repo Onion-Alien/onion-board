@@ -159,7 +159,8 @@ class LinkBar(QFrame):
     def add(self) -> bool:
         if not self.url:
             return False
-        if self.url == getattr(self, "_added", ""):
+        if (self.url == getattr(self, "_added", "")
+                and any(m.id == getattr(self, "_added_id", None) for m in self.cfg.sounds)):
             self.done.emit(self.url, "add", True)
             return True
         if self._busy:
@@ -322,6 +323,7 @@ class LinkBar(QFrame):
                 self._blocked = blocked_kind
         if kind == "added":
             self._added = url
+            self._added_id = payload[0].id
         self._buttons()
         if kind == "added":
             meta, data, title, saved = payload

@@ -2476,7 +2476,6 @@
   "so quiet…": "так тихо...",
   "so… bored…": "так...нудно...",
   "starting…": "починаючи...",
-  "starting… (a built-in voice covers you until it's ready)": "починається… (вбудований голос охоплює вас, поки не буде готово)",
   "stopped": "зупинився",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "зупинено: це зайняло більше {n} хвилини. Перевірте підключення до Інтернету та натисніть її ще раз.",
@@ -2948,7 +2947,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Це не веб-посилання. Скопіюйте адресу зображення (клацніть правою кнопкою миші → Копіювати адресу зображення) і вставте її сюди.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "За цим посиланням немає зображення. Клацніть зображення правою кнопкою миші → Копіювати адресу зображення та вставте його.",
   "Couldn't get the picture ({error}).": "Не вдалося отримати зображення ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "починаємо знову… (вбудований голос охоплює вас, поки не буде готово)",
   "huh?! wha…": "га?! що...",
   "five more minutes…": "ще п'ять хвилин...",
   "it's the middle of the night!": "зараз середина ночі!",
@@ -3065,7 +3063,6 @@
   "Voice effects off — mic unchanged": "Голосові ефекти вимкнено — мікрофон без змін",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Ваш голос мікрофона не змінився. Щоб вибрати голос, відкрийте програму зміни голосу або голоси AI нижче.",
   "AI voice off": "AI голос вимкнено",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Голос AI зупинився: вбудований голос закриває вас. Натисніть, щоб відкрити голоси ШІ.",
   "Click to open AI voices.": "Натисніть, щоб відкрити голоси ШІ.",
   "AI voice: {voice}, starting.": "ШІ голос: {voice} , починається.",
   "AI voice: {voice}.": "ШІ голос: {voice} .",
@@ -3074,5 +3071,7 @@
   "Getting Python ready…": "Готую Python…",
   "Installing the voice engine (a few minutes)…": "Встановлюю голосовий рушій (кілька хвилин)…",
   "Downloading the voices…": "Завантажую голоси…",
-  "Downloading the voices: {percent}%": "Завантажую голоси: {percent}%"
+  "Downloading the voices: {percent}%": "Завантажую голоси: {percent}%",
+  "Others now hear {backup}.": "Інші тепер чують {backup}.",
+  "starting again…": "повторний запуск…"
 }

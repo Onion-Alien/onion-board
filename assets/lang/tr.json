@@ -2426,7 +2426,6 @@
   "so quiet…": "çok sessiz…",
   "so… bored…": "yani… sıkıldım…",
   "starting…": "başlangıç…",
-  "starting… (a built-in voice covers you until it's ready)": "başlıyor… (yerleşik bir ses, hazır olana kadar sizi dinler)",
   "stopped": "durduruldu",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "durdu: {n} dakikadan fazla sürdü. İnternet bağlantınızı kontrol edin ve tekrar basın.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Bu bir web bağlantısı değil. Resmin adresini kopyalayın (sağ tıklayın → Resim adresini kopyala) ve buraya yapıştırın.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "O linkte resim yok. Resme sağ tıklayın → Resim adresini kopyalayın ve yapıştırın.",
   "Couldn't get the picture ({error}).": "Resim alınamadı ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "yeniden başlıyoruz… (yerleşik bir ses, hazır olana kadar sizi dinler)",
   "huh?! wha…": "Ha?! ne…",
   "five more minutes…": "beş dakika daha…",
   "it's the middle of the night!": "gece yarısı!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Ses efektleri kapalı — mikrofon değişmedi",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Mikrofon sesiniz değişmedi. Bir ses seçmek için aşağıda Ses değiştiriciyi veya AI seslerini açın.",
   "AI voice off": "AI sesi kapalı",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI sesi durdu: yerleşik bir ses sizi kapsar. AI seslerini açmak için tıklayın.",
   "Click to open AI voices.": "AI seslerini açmak için tıklayın.",
   "AI voice: {voice}, starting.": "AI sesi: {voice} , başlıyor.",
   "AI voice: {voice}.": "Yapay zeka sesi: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Python hazırlanıyor…",
   "Installing the voice engine (a few minutes)…": "Ses motoru kuruluyor (birkaç dakika)…",
   "Downloading the voices…": "Sesler indiriliyor…",
-  "Downloading the voices: {percent}%": "Sesler indiriliyor: {percent}%"
+  "Downloading the voices: {percent}%": "Sesler indiriliyor: {percent}%",
+  "Others now hear {backup}.": "Diğerleri artık {backup} duyuyor.",
+  "starting again…": "yeniden başlatılıyor…"
 }

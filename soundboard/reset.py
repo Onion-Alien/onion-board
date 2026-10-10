@@ -222,6 +222,7 @@ def restore(point_id: str) -> str:
     old = Config.from_raw(json.loads((point.path / "config.json").read_text(encoding="utf-8")))
     _new_point("Before restoring", [], now, keep=point.id)   # so this can be undone too
     moved: list[tuple[Path, Path]] = []   # (where it was in the point, where it is now)
+    restored_paths: dict[str, dict[Path, Path]] = {"file": {}, "image": {}}
     whole = True   # everything came out of the point: it can go
     try:
         for sub, home in (("sounds", library.SOUNDS_DIR), ("thumbs", library.THUMBS_DIR)):
@@ -230,13 +231,35 @@ def restore(point_id: str) -> str:
                 home.mkdir(parents=True, exist_ok=True)
                 for f in sorted(x for x in src.rglob("*") if x.is_file()):
                     to = home / f.relative_to(src)   # back into its library folder
-                    if to.exists():   # left in the point, not lost with it
-                        log.warning("%s is in the library already; kept in the point", f.name)
-                        whole = False
-                        continue
                     to.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.move(str(f), to)
+                    original = to
+                    # Claim a destination before moving: a new recording may have
+                    # reused the old readable filename since the reset.
+                    for n in range(1, 10000):
+                        to = (original if n == 1 else original.with_name(
+                            f"{original.stem} ({n}){original.suffix}"))
+                        try:
+                            with to.open("xb"):
+                                pass
+                            break
+                        except FileExistsError:
+                            continue
+                    else:
+                        raise OSError(f"no free restore filename for {original}")
+                    try:
+                        shutil.move(str(f), to)
+                    except BaseException:
+                        to.unlink(missing_ok=True)
+                        raise
                     moved.append((f, to))
+                    attr = "file" if sub == "sounds" else "image"
+                    restored_paths[attr][original] = to
+        # Rewrite once from each pad's original path. A claimed name can itself
+        # be another old file's name, so rewriting during moves would cascade.
+        for m in old.sounds:
+            for attr, paths in restored_paths.items():
+                if getattr(m, attr) and (to := paths.get(Path(getattr(m, attr)))):
+                    setattr(m, attr, str(to))
         # the pad list as it was, minus sounds whose audio has gone since (deleted after
         # the point was saved: they're in Recently deleted), plus sounds added since
         ids = {m.id for m in old.sounds}

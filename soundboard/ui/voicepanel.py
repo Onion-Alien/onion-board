@@ -3032,8 +3032,7 @@ class VoicePanel(QWidget):
             st, title = self.ai.status(), self.ai.voice_title()
             if st == "failed":
                 items.append(("ai", _("AI voice off"), "warn", "warn", None,
-                              _("The AI voice stopped: a built-in voice covers you. Click "
-                                "to open AI voices.")))
+                              self.ai.failure_text() + " " + _("Click to open AI voices.")))
             else:
                 items.append(("ai", title + ("…" if st == "starting" else ""), "on", "wave",
                               None, (_("AI voice: {voice}, starting.", voice=title)

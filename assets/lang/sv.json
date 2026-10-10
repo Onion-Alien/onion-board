@@ -2426,7 +2426,6 @@
   "so quiet…": "så tyst...",
   "so… bored…": "så … uttråkad…",
   "starting…": "startande…",
-  "starting… (a built-in voice covers you until it's ready)": "börjar... (en inbyggd röst täcker dig tills den är klar)",
   "stopped": "stannade",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "stoppad: det tog över {n} minut. Kontrollera din internetanslutning och tryck på den igen.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Det är inte en webblänk. Kopiera bildens adress (högerklicka på den → Kopiera bildadress) och klistra in den här.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Det finns ingen bild på den länken. Högerklicka på bilden → Kopiera bildadress och klistra in den.",
   "Couldn't get the picture ({error}).": "Det gick inte att hämta bilden ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "börjar igen... (en inbyggd röst täcker dig tills den är klar)",
   "huh?! wha…": "va?! va…",
   "five more minutes…": "fem minuter till...",
   "it's the middle of the night!": "det är mitt i natten!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Rösteffekter av — mikrofonen oförändrad",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Din mikrofonröst är oförändrad. Öppna Voice changer eller AI-röster nedan för att välja en röst.",
   "AI voice off": "AI-röst avstängd",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI-rösten stannade: en inbyggd röst täcker dig. Klicka för att öppna AI-röster.",
   "Click to open AI voices.": "Klicka för att öppna AI-röster.",
   "AI voice: {voice}, starting.": "AI-röst: {voice} , startar.",
   "AI voice: {voice}.": "AI-röst: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Gör Python redo…",
   "Installing the voice engine (a few minutes)…": "Installerar röstmotorn (några minuter)…",
   "Downloading the voices…": "Laddar ner rösterna…",
-  "Downloading the voices: {percent}%": "Laddar ner rösterna: {percent}%"
+  "Downloading the voices: {percent}%": "Laddar ner rösterna: {percent}%",
+  "Others now hear {backup}.": "Andra hör nu {backup}.",
+  "starting again…": "startar igen…"
 }

@@ -2376,7 +2376,6 @@
   "so quiet…": "如此安靜…",
   "so… bored…": "所以……無聊……",
   "starting…": "開始…",
-  "starting… (a built-in voice covers you until it's ready)": "正在開始…（內建聲音會一直覆蓋您，直到準備好為止）",
   "stopped": "停止了",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "已停止：花費了{n}分鐘。檢查您的網路連線並再次按下。"
@@ -2828,7 +2827,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "那不是網頁連結。複製圖片地址（右鍵單擊→複製圖片地址）並將其貼上到此處。",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "那個連結裡沒有圖片。右鍵點擊圖片→複製圖片地址，然後貼上。",
   "Couldn't get the picture ({error}).": "無法取得圖片 ( {error} )。",
-  "starting again… (a built-in voice covers you until it's ready)": "重新開始......（內建聲音會覆蓋您，直到準備好）",
   "huh?! wha…": "啊？ ！世界衛生大會…",
   "five more minutes…": "還有五分鐘…",
   "it's the middle of the night!": "現在是半夜！",
@@ -2937,7 +2935,6 @@
   "Voice effects off — mic unchanged": "語音效果關閉 - 麥克風不變",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "您的麥克風聲音沒有改變。開啟下面的語音轉換器或AI語音來選擇語音。",
   "AI voice off": "AI語音關閉",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI聲音停止：內建聲音覆蓋你。點擊開啟AI語音。",
   "Click to open AI voices.": "點擊開啟AI語音。",
   "AI voice: {voice}, starting.": "AI語音： {voice} ，開始。",
   "AI voice: {voice}.": "AI語音： {voice} 。",
@@ -2946,5 +2943,7 @@
   "Getting Python ready…": "正在準備 Python…",
   "Installing the voice engine (a few minutes)…": "正在安裝語音引擎（需要幾分鐘）…",
   "Downloading the voices…": "正在下載聲音…",
-  "Downloading the voices: {percent}%": "正在下載聲音：{percent}%"
+  "Downloading the voices: {percent}%": "正在下載聲音：{percent}%",
+  "Others now hear {backup}.": "其他人現在聽到的是{backup}。",
+  "starting again…": "正在重新啟動…"
 }

@@ -86,6 +86,7 @@ def test_add_and_play_share_one_download(qapp, monkeypatch, tmp_path, first):
 
     monkeypatch.setattr(linkbar.threading, "Thread", Worker)
     bar.sound_ready.connect(lambda *args: added.append(args))
+    bar.sound_ready.connect(lambda meta, _data: bar.cfg.sounds.append(meta))
     bar.done.connect(lambda *args: done.append(args))
     assert (bar.add() if first == "add" else bar.play_once())
     # Repeated activation mustn't queue a duplicate of the running action.

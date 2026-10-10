@@ -2426,7 +2426,6 @@
   "so quiet…": "olyan csendes…",
   "so… bored…": "hát… unatkozik…",
   "starting…": "indul…",
-  "starting… (a built-in voice covers you until it's ready)": "indul… (egy beépített hang takar, amíg készen nem áll)",
   "stopped": "megállt",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "megállt: több mint {n} percig tartott. Ellenőrizze az internetkapcsolatot, és nyomja meg újra.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Ez nem internetes hivatkozás. Másolja ki a kép címét (jobb gombbal kattintson rá → Kép címének másolása), és illessze be ide.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "A linken nincs kép. Kattintson a jobb gombbal a képre → Kép címének másolása, és illessze be.",
   "Couldn't get the picture ({error}).": "Nem sikerült beolvasni a képet ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "újrakezdve… (egy beépített hang takar, amíg készen nem áll)",
   "huh?! wha…": "mi?! izé…",
   "five more minutes…": "még öt perc…",
   "it's the middle of the night!": "az éjszaka közepe van!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Hangeffektusok kikapcsolva – a mikrofon változatlan",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "A mikrofon hangja változatlan. Hang kiválasztásához nyissa meg lent a Hangváltót vagy az AI hangokat.",
   "AI voice off": "AI hang kikapcsolva",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "A mesterséges intelligencia hangja megállt: egy beépített hang takarja el Önt. Kattintson az AI hangok megnyitásához.",
   "Click to open AI voices.": "Kattintson az AI hangok megnyitásához.",
   "AI voice: {voice}, starting.": "AI hang: {voice} , indul.",
   "AI voice: {voice}.": "AI hang: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Python előkészítése…",
   "Installing the voice engine (a few minutes)…": "A hangmotor telepítése (pár perc)…",
   "Downloading the voices…": "A hangok letöltése…",
-  "Downloading the voices: {percent}%": "A hangok letöltése: {percent}%"
+  "Downloading the voices: {percent}%": "A hangok letöltése: {percent}%",
+  "Others now hear {backup}.": "Mások most ezt hallják: {backup}.",
+  "starting again…": "újraindítás…"
 }

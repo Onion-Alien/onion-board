@@ -2426,7 +2426,6 @@
   "so quiet…": "zo stil…",
   "so… bored…": "dus... verveeld...",
   "starting…": "beginnend…",
-  "starting… (a built-in voice covers you until it's ready)": "beginnend... (een ingebouwde stem bedekt je totdat hij klaar is)",
   "stopped": "gestopt",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "gestopt: het duurde meer dan {n} minuut. Controleer uw internetverbinding en druk er nogmaals op.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Dat is geen weblink. Kopieer het adres van de afbeelding (klik er met de rechtermuisknop op → Afbeeldingsadres kopiëren) en plak het hier.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Er staat geen foto bij die link. Klik met de rechtermuisknop op de afbeelding → Kopieer het afbeeldingsadres en plak dat.",
   "Couldn't get the picture ({error}).": "Kan de afbeelding niet verkrijgen ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "opnieuw beginnen... (een ingebouwde stem bedekt je totdat hij klaar is)",
   "huh?! wha…": "hè?! wat...",
   "five more minutes…": "nog vijf minuten...",
   "it's the middle of the night!": "het is midden in de nacht!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Stemeffecten uit – microfoon ongewijzigd",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Je microfoonstem is onveranderd. Open Stemwisselaar of AI-stemmen hieronder om een ​​stem te kiezen.",
   "AI voice off": "AI-stem uit",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "De AI-stem stopte: een ingebouwde stem bedekt je. Klik om AI-stemmen te openen.",
   "Click to open AI voices.": "Klik om AI-stemmen te openen.",
   "AI voice: {voice}, starting.": "AI-stem: {voice} , beginnend.",
   "AI voice: {voice}.": "AI-stem: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Python klaarzetten…",
   "Installing the voice engine (a few minutes)…": "Stemengine installeren (een paar minuten)…",
   "Downloading the voices…": "Stemmen downloaden…",
-  "Downloading the voices: {percent}%": "Stemmen downloaden: {percent}%"
+  "Downloading the voices: {percent}%": "Stemmen downloaden: {percent}%",
+  "Others now hear {backup}.": "Anderen horen nu {backup}.",
+  "starting again…": "opnieuw starten…"
 }
