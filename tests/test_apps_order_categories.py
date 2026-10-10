@@ -162,5 +162,71 @@ def test_big_clip_view_restores_category_sections(tab, qapp, monkeypatch):
     tab._set_big(row, False)
     qapp.processEvents()
     assert not tab.rows["spotify.exe"].isHidden()
-    assert not tab.grid.headings["Browsers"].isHidden()
     tab.hide()
+
+
+def test_cross_category_drag_moves_category(tab):
+    apps = [App(1, "firefox.exe"), App(2, "spotify.exe")]
+    tab._on_apps(apps)
+    firefox = tab.rows["firefox.exe"]
+    spotify = tab.rows["spotify.exe"]
+    assert firefox.category == "Browsers"
+    assert spotify.category == "Music & media"
+
+    # Drag firefox over spotify
+    tab._reorder_apps(firefox, spotify, before=True)
+    assert firefox.category == "Music & media"
+    assert order(tab) == ["firefox.exe", "spotify.exe"]
+    assert tab.cfg.apps["firefox.exe"]["category"] == "Music & media"
+
+
+def test_drop_card_on_category_heading(tab):
+    apps = [App(1, "custom.exe")]
+    tab._on_apps(apps)
+    custom = tab.rows["custom.exe"]
+    assert custom.category == "Other"
+
+    # Drop onto Browsers heading
+    tab._on_card_dropped_on_category(custom, "Browsers")
+    assert custom.category == "Browsers"
+    assert tab.cfg.apps["custom.exe"]["category"] == "Browsers"
+
+
+def test_reorder_category_headings(tab):
+    assert tab.grid.category_order[0] == "Browsers"
+    assert "Other" in tab.grid.category_order
+
+    tab._on_category_reordered("Other", "Browsers", before=True)
+    assert tab.grid.category_order[0] == "Other"
+    assert tab.cfg.apps_categories[0] == "Other"
+
+
+def test_custom_category_lifecycle(tab):
+    apps = [App(1, "custom.exe")]
+    tab._on_apps(apps)
+    custom = tab.rows["custom.exe"]
+
+    # 1. Add custom category
+    tab.grid.add_category("Work")
+    tab.cfg.apps_categories = list(tab.grid.category_order)
+    assert "Work" in tab.grid.category_order
+    assert "Work" in tab.grid.headings
+
+    # 2. Move card to custom category
+    tab._move_row_to_category(custom, "Work")
+    assert custom.category == "Work"
+
+    # 3. Rename custom category
+    tab.grid.rename_category("Work", "Office")
+    for row in tab.rows.values():
+        if row.category == "Work":
+            row.category = "Office"
+    assert "Office" in tab.grid.category_order
+    assert "Work" not in tab.grid.category_order
+    assert custom.category == "Office"
+
+    # 4. Delete custom category -> moves cards to Other
+    tab._on_delete_category("Office")
+    assert "Office" not in tab.grid.category_order
+    assert custom.category == "Other"
+

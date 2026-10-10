@@ -410,6 +410,7 @@ class Config:
     # keep it untouched and only ever see the first program of each name in `apps`
     apps_paths: dict = field(default_factory=dict)
     apps_hidden: list[str] = field(default_factory=list)   # Apps tab: programs taken off with ✕
+    apps_categories: list[str] = field(default_factory=list)  # Apps tab: category order
     # Triggers tab: on, interval_ms, monitor (the screen for triggers that don't pick
     # their own), triggers (the Onion Watch add-on's Trigger.to_raw)
     screen: dict = field(default_factory=dict)

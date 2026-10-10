@@ -29,8 +29,8 @@ from PySide6.QtCore import (QEvent, QMimeData, QObject, QRect, QSize, Qt,
                             QTimer, Signal)
 from PySide6.QtGui import QDrag, QFont, QPainter, QPixmap
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
-                               QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
+                               QHBoxLayout, QInputDialog, QLabel,
+                               QLayout, QMenu, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
 from soundboard import appaudio, errors, exeicon, library, theme, trash, usage
@@ -91,6 +91,7 @@ APP_CATEGORIES = {
               "league of legends", "r5apex", "gta5", "eldenring", "wow", "terraria"),
 }
 APP_DRAG_MIME = "application/x-onionboard-app-card"
+CATEGORY_DRAG_MIME = "application/x-onionboard-app-category"
 
 
 def app_category(exe: str) -> str:
@@ -100,6 +101,89 @@ def app_category(exe: str) -> str:
 
 
 class AppCategoryHeading(QLabel):
+    reordered = Signal(str, str, bool)    # (source_cat, target_cat, before)
+    card_dropped = Signal(object, str)    # (AppRow, target_cat)
+    rename_requested = Signal(str)        # (category)
+    delete_requested = Signal(str)        # (category)
+
+    def __init__(self, category: str, host: QWidget, custom: bool = False):
+        super().__init__(category, host)
+        self.category = category
+        self.custom = custom
+        self._drag_press = None
+        self.setAcceptDrops(True)
+        self.setCursor(Qt.OpenHandCursor)
+        self.setToolTip(_("Drag to reorder section, or drop app cards here. "
+                          "Right-click to manage."))
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._show_menu)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._drag_press = event.globalPosition().toPoint()
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self._drag_press = None
+        super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._drag_press is not None and event.buttons() & Qt.LeftButton:
+            dist = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
+            if dist >= QApplication.startDragDistance():
+                self._drag_press = None
+                drag = QDrag(self)
+                mime = QMimeData()
+                mime.setData(CATEGORY_DRAG_MIME, self.category.encode("utf-8"))
+                drag.setMimeData(mime)
+                pixmap = self.grab()
+                drag.setPixmap(pixmap)
+                drag.exec(Qt.MoveAction)
+                return
+        super().mouseMoveEvent(event)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasFormat(CATEGORY_DRAG_MIME):
+            src_cat = bytes(event.mimeData().data(CATEGORY_DRAG_MIME)).decode("utf-8")
+            if src_cat != self.category:
+                event.setDropAction(Qt.MoveAction)
+                event.accept()
+                return
+        elif event.mimeData().hasFormat(APP_DRAG_MIME):
+            source = event.source()
+            if isinstance(source, AppRow) and source.category != self.category:
+                event.setDropAction(Qt.MoveAction)
+                event.accept()
+                return
+        event.ignore()
+
+    dragMoveEvent = dragEnterEvent
+
+    def dropEvent(self, event):
+        if event.mimeData().hasFormat(CATEGORY_DRAG_MIME):
+            src_cat = bytes(event.mimeData().data(CATEGORY_DRAG_MIME)).decode("utf-8")
+            if src_cat != self.category:
+                before = event.position().y() < self.height() / 2
+                self.reordered.emit(src_cat, self.category, before)
+                event.setDropAction(Qt.MoveAction)
+                event.accept()
+                return
+        elif event.mimeData().hasFormat(APP_DRAG_MIME):
+            source = event.source()
+            if isinstance(source, AppRow):
+                self.card_dropped.emit(source, self.category)
+                event.setDropAction(Qt.MoveAction)
+                event.accept()
+                return
+        event.ignore()
+
+    def _show_menu(self, pos):
+        menu = QMenu(self)
+        menu.addAction(_("Rename category…"), lambda: self.rename_requested.emit(self.category))
+        if self.custom:
+            menu.addAction(_("Delete category"), lambda: self.delete_requested.emit(self.category))
+        menu.exec(self.mapToGlobal(pos))
+
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
@@ -111,28 +195,106 @@ class AppCategoryHeading(QLabel):
 class AppGrid(CardGrid):
     """One responsive card grid per category, with a heading above each populated group."""
 
-    def __init__(self, host, **kwargs):
+    def __init__(self, host, categories: list[str] | None = None, **kwargs):
         super().__init__(**kwargs)
-        self.headings = {}
-        for category in (*APP_CATEGORIES, "Other"):
-            label = AppCategoryHeading(category, host)
-            label.setContentsMargins(0, 0, 0, 6)
-            font = label.font()
-            font.setWeight(QFont.DemiBold)
-            label.setFont(font)
-            label.hide()
-            self.headings[category] = label
+        self.host = host
+        default_cats = (*APP_CATEGORIES, "Other")
+        if categories:
+            self.category_order = [c for c in categories if c]
+            for cat in default_cats:
+                if cat not in self.category_order:
+                    self.category_order.append(cat)
+        else:
+            self.category_order = list(default_cats)
+
+        self.custom_categories = set(self.category_order) - set(default_cats)
+        self.headings: dict[str, AppCategoryHeading] = {}
+        for category in self.category_order:
+            self._create_heading(category)
+
+    def _create_heading(self, category: str) -> AppCategoryHeading:
+        is_custom = category in self.custom_categories
+        label = AppCategoryHeading(category, self.host, custom=is_custom)
+        label.setContentsMargins(0, 0, 0, 6)
+        font = label.font()
+        font.setWeight(QFont.DemiBold)
+        label.setFont(font)
+        label.hide()
+        self.headings[category] = label
+        return label
+
+    def add_category(self, category: str) -> AppCategoryHeading | None:
+        if category in self.category_order:
+            return None
+        self.custom_categories.add(category)
+        if "Other" in self.category_order:
+            idx = self.category_order.index("Other")
+            self.category_order.insert(idx, category)
+        else:
+            self.category_order.append(category)
+        label = self._create_heading(category)
+        self._sync_headings_order()
+        self.invalidate()
+        return label
+
+    def remove_category(self, category: str):
+        if category not in self.category_order:
+            return
+        self.custom_categories.discard(category)
+        self.category_order.remove(category)
+        heading = self.headings.pop(category, None)
+        if heading:
+            heading.hide()
+            heading.deleteLater()
+        self.invalidate()
+
+    def rename_category(self, old: str, new: str):
+        if old not in self.category_order or not new or new in self.category_order:
+            return
+        idx = self.category_order.index(old)
+        self.category_order[idx] = new
+        if old in self.custom_categories:
+            self.custom_categories.remove(old)
+            self.custom_categories.add(new)
+        heading = self.headings.pop(old, None)
+        if heading:
+            heading.category = new
+            heading.setText(new)
+            self.headings[new] = heading
+        self._sync_headings_order()
+        self.invalidate()
+
+    def reorder_categories(self, source: str, target: str, before: bool):
+        if (source == target or source not in self.category_order
+                or target not in self.category_order):
+            return
+        self.category_order.remove(source)
+        idx = self.category_order.index(target) + (not before)
+        self.category_order.insert(idx, source)
+        self._sync_headings_order()
+        self.invalidate()
+
+    def _sync_headings_order(self):
+        new_headings = {}
+        for cat in self.category_order:
+            if cat in self.headings:
+                new_headings[cat] = self.headings[cat]
+        self.headings = new_headings
 
     def _place(self, rect: QRect, move: bool) -> int:
         shown = [item for item in self._items if not item.isEmpty()]
         cols = self.columns(rect.width())
         width = max(1, (rect.width() - self._gap * (cols - 1)) // cols)
         y = rect.y()
-        for category, heading in self.headings.items():
+        for category in self.category_order:
+            heading = self.headings.get(category)
+            if heading is None:
+                continue
             group = [item for item in shown if item.widget().category == category]
+            is_visible = bool(group) or (category in self.custom_categories)
             if move:
-                heading.setVisible(bool(group) and not self.max_cols)
-            if not group:
+                heading.setVisible(bool(is_visible) and not self.max_cols)
+            if not is_visible:
                 continue
             if y != rect.y():
                 y += self._gap
@@ -311,16 +473,20 @@ class AppRow(HoverCard):
     clip_toggled = Signal(object, bool)     # row, the clip editor opened / closed
     forget = Signal(object)
     reordered = Signal(object, object, bool)   # source, target, insert before
+    move_to_category = Signal(object, str)
 
     def __init__(self, exe: str, meter_cls, vol: float = 1.0, hear: bool = False,
-                 to: str = "both", key: str = "", path: str = ""):
+                 to: str = "both", key: str = "", path: str = "", category: str = ""):
         super().__init__()
         self.exe = exe
         self.key = key or exe.lower()   # AppsTab.rows' key: the .exe, or a path_key
         self.path = path                # path_key of the program it is ("" not known yet)
-        self.category = app_category(exe)
+        self.category = category or app_category(exe)
         self._drag_press = None
         self.setAcceptDrops(True)
+        self.setCursor(Qt.OpenHandCursor)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._show_card_menu)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
         self.last_sound_at = time.monotonic()
@@ -337,10 +503,8 @@ class AppRow(HoverCard):
         v.setSpacing(8)
         self.header = QWidget()
         self.header.setCursor(Qt.OpenHandCursor)
-        self.header.setToolTip("Left-click and drag to reorder within this category. "
-                               "Drop on the left half "
-                               "of another card to place before it, "
-                               "or the right half to place after.")
+        self.header.setToolTip(_("Left-click and drag to reorder cards or move to another "
+                                 "category. Right-click to manage."))
         top = QHBoxLayout(self.header)
         top.setContentsMargins(0, 0, 0, 0)
         top.setSpacing(10)
@@ -433,6 +597,23 @@ class AppRow(HoverCard):
         self._label_send()
         self.set_app(None)
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._drag_press = event.globalPosition().toPoint()
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self._drag_press = None
+        super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._drag_press is not None and event.buttons() & Qt.LeftButton:
+            distance = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
+            if distance >= QApplication.startDragDistance():
+                self._start_drag()
+                return
+        super().mouseMoveEvent(event)
+
     def eventFilter(self, obj, event):
         if obj in (self.header, self.icon, self.name, self.sub):
             if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
@@ -445,21 +626,23 @@ class AppRow(HoverCard):
                     and event.buttons() & Qt.LeftButton):
                 distance = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
                 if distance >= QApplication.startDragDistance():
-                    self._drag_press = None
-                    drag = QDrag(self)
-                    mime = QMimeData()
-                    mime.setData(APP_DRAG_MIME, self.key.encode("utf-8"))
-                    drag.setMimeData(mime)
-                    drag.setPixmap(self.grab().scaledToWidth(200, Qt.SmoothTransformation))
-                    drag.exec(Qt.MoveAction)
+                    self._start_drag()
                 return True
         return super().eventFilter(obj, event)
+
+    def _start_drag(self):
+        self._drag_press = None
+        drag = QDrag(self)
+        mime = QMimeData()
+        mime.setData(APP_DRAG_MIME, self.key.encode("utf-8"))
+        drag.setMimeData(mime)
+        drag.setPixmap(self.grab().scaledToWidth(min(self.width(), 240), Qt.SmoothTransformation))
+        drag.exec(Qt.MoveAction)
 
     def dragEnterEvent(self, event):
         source = event.source()
         if (event.mimeData().hasFormat(APP_DRAG_MIME) and isinstance(source, AppRow)
-                and source is not self and source.parentWidget() is self.parentWidget()
-                and source.category == self.category):
+                and source is not self and source.parentWidget() is self.parentWidget()):
             event.setDropAction(Qt.MoveAction)
             event.accept()
             self._hover(True)
@@ -477,6 +660,23 @@ class AppRow(HoverCard):
         if event.isAccepted():
             self.reordered.emit(event.source(), self, event.position().x() < self.width() / 2)
         self._hover(False)
+
+    def _show_card_menu(self, pos):
+        menu = QMenu(self)
+        parent = self.parentWidget()
+        while parent and not isinstance(parent, AppsTab):
+            parent = parent.parentWidget()
+        if parent:
+            cat_menu = menu.addMenu(_("Move to category"))
+            for cat in parent.grid.category_order:
+                act = cat_menu.addAction(cat)
+                if cat == self.category:
+                    act.setEnabled(False)
+                else:
+                    act.triggered.connect(lambda _c=cat: self.move_to_category.emit(self, _c))
+        menu.addSeparator()
+        menu.addAction(_("Forget program"), lambda: self.forget.emit(self))
+        menu.exec(self.mapToGlobal(pos))
 
     NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
     # narrow card, in this order: the typed volume goes, the buttons keep only their
@@ -659,6 +859,11 @@ class AppsTab(QWidget):
         self.btn_bin.clicked.connect(self.show_forgotten)
         toolbar = QHBoxLayout()
         toolbar.addWidget(self.btn_bin)
+        self.btn_add_cat = QPushButton(_("Category"))
+        self.btn_add_cat.setToolTip(_("Add a new category for your apps"))
+        icons.set_icon(self.btn_add_cat, "plus", size=13)
+        self.btn_add_cat.clicked.connect(self._prompt_new_category)
+        toolbar.addWidget(self.btn_add_cat)
         # Live controls: pitch and effects on every program you send (no speed: live)
         self.fx_btn = SpeedPitchButton("apps")
         self.fx_btn.changed.connect(lambda _s, p, _k: setattr(self.engine, "apps_pitch", p))
@@ -687,7 +892,9 @@ class AppsTab(QWidget):
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)
         self.list_layout.setSpacing(6)
-        self.grid = AppGrid(self.list, min_w=self.card_size.value(), gap=10, even=False)
+        self.grid = AppGrid(self.list, categories=getattr(cfg, "apps_categories", None),
+                            min_w=self.card_size.value(), gap=10, even=False)
+        self._wire_headings()
         self.card_size.valueChanged.connect(self._set_card_size)
         # nothing playing: Bun waits, a bit glum, above the how-to
         self.empty = QWidget()
@@ -723,12 +930,14 @@ class AppsTab(QWidget):
         for exe, spec in list(cfg.apps.items())[:MAX_REMEMBERED]:   # remembered programs
             if isinstance(spec, dict):
                 self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")),
-                          str(spec.get("to", "both")), path=str(spec.get("path") or ""))
+                          str(spec.get("to", "both")), path=str(spec.get("path") or ""),
+                          category=str(spec.get("category") or ""))
         for key, spec in list(cfg.apps_paths.items())[:MAX_REMEMBERED]:
             if isinstance(spec, dict) and is_path_key(key):
                 self._row(str(spec.get("exe") or key.rsplit("\\", 1)[-1]),
                           saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")),
-                          str(spec.get("to", "both")), key=key, path=key)
+                          str(spec.get("to", "both")), key=key, path=key,
+                          category=str(spec.get("category") or ""))
         self._label_folders()
 
         self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
@@ -769,11 +978,99 @@ class AppsTab(QWidget):
         self.grid.invalidate()
         self.list.updateGeometry()
 
+    def _wire_headings(self):
+        for heading in self.grid.headings.values():
+            self._wire_heading(heading)
+
+    def _wire_heading(self, heading: AppCategoryHeading):
+        heading.reordered.connect(self._on_category_reordered)
+        heading.card_dropped.connect(self._on_card_dropped_on_category)
+        heading.rename_requested.connect(self._on_rename_category)
+        heading.delete_requested.connect(self._on_delete_category)
+
+    def _prompt_new_category(self):
+        name, ok = QInputDialog.getText(self, _("New category"),
+                                        _("Name (e.g. Work, Streaming, Launchers):"))
+        name = (library.clean_tags([name]) or [""])[0] if ok else ""
+        if not name or name in self.grid.category_order:
+            return
+        label = self.grid.add_category(name)
+        if label:
+            self._wire_heading(label)
+        self.cfg.apps_categories = list(self.grid.category_order)
+        self._save()
+        self._layout_apps()
+
+    def _on_category_reordered(self, source_cat: str, target_cat: str, before: bool):
+        self.grid.reorder_categories(source_cat, target_cat, before)
+        self.cfg.apps_categories = list(self.grid.category_order)
+        self._save()
+        self._layout_apps()
+
+    def _on_card_dropped_on_category(self, source: AppRow, category: str):
+        self._move_row_to_category(source, category)
+
+    def _on_rename_category(self, old_cat: str):
+        new_name, ok = QInputDialog.getText(self, _("Rename category"),
+                                            _("New name:"), text=old_cat)
+        new_name = (library.clean_tags([new_name]) or [""])[0] if ok else ""
+        if not new_name or new_name == old_cat or new_name in self.grid.category_order:
+            return
+        self.grid.rename_category(old_cat, new_name)
+        for row in self.rows.values():
+            if row.category == old_cat:
+                row.category = new_name
+                self._save_row_category(row)
+        self.cfg.apps_categories = list(self.grid.category_order)
+        self._save()
+        self._layout_apps()
+
+    def _on_delete_category(self, category: str):
+        for row in self.rows.values():
+            if row.category == category:
+                row.category = "Other"
+                self._save_row_category(row)
+        self.grid.remove_category(category)
+        self.cfg.apps_categories = list(self.grid.category_order)
+        self._save()
+        self._layout_apps()
+
+    def _move_row_to_category(self, source: AppRow, target_cat: str):
+        if self.big is not None or source.category == target_cat:
+            return
+        source.category = target_cat
+        self._save_row_category(source)
+        order = [self.grid.itemAt(i).widget() for i in range(self.grid.count())]
+        order.remove(source)
+        first_target = next((r for r in order if r.category == target_cat), None)
+        if first_target is not None:
+            order.insert(order.index(first_target), source)
+        else:
+            order.append(source)
+        items = {item.widget(): item for item in
+                 [self.grid.takeAt(0) for _ in range(self.grid.count())]}
+        for row in order:
+            self.grid.addItem(items[row])
+        self.grid.invalidate()
+        self.list_layout.activate()
+
+    def _save_row_category(self, row: AppRow):
+        spec = self._spec(row.key)
+        if spec is None:
+            self.cfg.apps[row.key] = {"vol": row.vol.value(), "monitor": row.chk_hear.isChecked(),
+                                      "to": row.to, "category": row.category}
+        else:
+            spec["category"] = row.category
+        self._save()
+
     def _reorder_apps(self, source: AppRow, target: AppRow, before: bool):
-        if (self.big is not None or source is target or source.category != target.category
+        if (self.big is not None or source is target
                 or self.rows.get(source.key) is not source
                 or self.rows.get(target.key) is not target):
             return
+        if source.category != target.category:
+            source.category = target.category
+            self._save_row_category(source)
         order = [self.grid.itemAt(i).widget() for i in range(self.grid.count())]
         order.remove(source)
         order.insert(order.index(target) + (not before), source)
@@ -885,11 +1182,15 @@ class AppsTab(QWidget):
 
     # ------------------------------------------------------------------ rows
     def _row(self, exe: str, vol: float = 1.0, hear: bool = False, to: str = "both",
-             key: str = "", path: str = "") -> AppRow:
+             key: str = "", path: str = "", category: str = "") -> AppRow:
         key = key or exe.lower()
         row = self.rows.get(key)
         if row is None:
-            row = self.rows[key] = AppRow(exe, self._meter_cls, vol, hear, to, key, path)
+            spec = self._spec(key)
+            cat = (category or (spec.get("category") if isinstance(spec, dict) else "")
+                   or app_category(exe))
+            row = self.rows[key] = AppRow(exe, self._meter_cls, vol, hear, to, key, path,
+                                          category=cat)
             row.show_to(self._stream_output())
             row.send_toggled.connect(self._on_send)
             row.rec_toggled.connect(self._on_rec)
@@ -899,6 +1200,7 @@ class AppsTab(QWidget):
             row.clip_toggled.connect(self._on_clip)
             row.forget.connect(self._on_forget)
             row.reordered.connect(self._reorder_apps)
+            row.move_to_category.connect(self._move_row_to_category)
             self.grid.addWidget(row)
             self._layout_apps()
             self._tools_for_rows()
@@ -907,7 +1209,7 @@ class AppsTab(QWidget):
     def _tools_for_rows(self):
         """The effects button and the card-size slider only mean something with a
         card to apply them to: hidden over the empty page."""
-        for w in (self.fx_btn, self.size_label, self.card_size):
+        for w in (self.fx_btn, self.btn_add_cat, self.size_label, self.card_size):
             w.setVisible(bool(self.rows))
 
     def _drop_row(self, row: AppRow):
