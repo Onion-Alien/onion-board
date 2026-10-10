@@ -3016,5 +3016,6 @@
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Hallgatás: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszéljen angolul, és mások más nyelvet hallanak. A mesterséges intelligencia hangja vagy a hangváltó kimondja, ha valamelyik be van kapcsolva; ellenkező esetben nyomja meg a Start gombot, és egy számítógép hangja megteszi.",
-  "Type a line and press Enter…": "Írjon be egy sort, és nyomja meg az Enter billentyűt…"
+  "Type a line and press Enter…": "Írjon be egy sort, és nyomja meg az Enter billentyűt…",
+  "Category": "Kategória"
 }

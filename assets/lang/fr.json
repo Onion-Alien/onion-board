@@ -3016,5 +3016,6 @@
   "{route}: {status}": "{route} : {status}",
   "Listening: {mode}": "Écoute : {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Parlez en anglais et les autres entendent une autre langue. La voix de l'IA ou le changeur de voix le dit lorsque l'un d'eux est activé ; sinon, appuyez sur Démarrer et une voix de synthèse le fait.",
-  "Type a line and press Enter…": "Tapez une ligne et appuyez sur Entrée…"
+  "Type a line and press Enter…": "Tapez une ligne et appuyez sur Entrée…",
+  "Category": "Catégorie"
 }

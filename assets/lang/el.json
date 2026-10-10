@@ -3016,5 +3016,6 @@
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Ακρόαση: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Μιλήστε στα αγγλικά και άλλοι ακούνε άλλη γλώσσα. Η φωνή AI ή η αλλαγή φωνής το λέει όταν ένα από αυτά είναι ενεργοποιημένο. Διαφορετικά, πατήστε Έναρξη και η φωνή του υπολογιστή κάνει.",
-  "Type a line and press Enter…": "Πληκτρολογήστε μια γραμμή και πατήστε Enter…"
+  "Type a line and press Enter…": "Πληκτρολογήστε μια γραμμή και πατήστε Enter…",
+  "Category": "Κατηγορία"
 }
