@@ -230,6 +230,23 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     assert copies[-1] == []
 
 
+def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  # noqa: F811
+    """The − sits in the grid's stretch column: on the full-width Devices card it was a
+    bar across the card's whole right half."""
+    monkeypatch.setattr(engine.Engine, "set_copy_devices",
+                        lambda self, names: setattr(self, "copy_names", tuple(names)))
+    win.set_route("cable")
+    win.show()
+    win.resize(1900, 1000)
+    win.tabs.setCurrentWidget(win.setup_page)
+    win.also_rows.add.click()
+    qapp.processEvents()
+    minus = win.also_rows.widgets[-1]
+    assert minus.text() == "−" and minus.isVisible()
+    assert minus.width() <= minus.sizeHint().width() + 4
+    assert minus.width() < win.also_rows.boxes[0].width() // 3
+
+
 def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  # noqa: F811
     """The stream output lives in the Also send to rows: a row set to Clean, for
     streaming is cfg.obs_device (its volume and voice switch under it), one at a time,

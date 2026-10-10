@@ -103,7 +103,8 @@ class AlsoSendRows:
         self.grid.addWidget(field, r, first + 1)
         row.append(field)
         if minus is not None:
-            self.grid.addWidget(minus, r, first + 2)
+            # its own size at the left: this column takes the card's spare width
+            self.grid.addWidget(minus, r, first + 2, Qt.AlignLeft | Qt.AlignVCenter)
             row.append(minus)
         self.widgets += row
 
