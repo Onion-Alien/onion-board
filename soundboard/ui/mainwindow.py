@@ -1024,11 +1024,11 @@ class MainWindow(QMainWindow):
         top = QHBoxLayout()
         top.setSpacing(6)
         self.mini_pp = QPushButton()
-        self.mini_pp.setObjectName("round")
+        self.mini_pp.setObjectName("transport_play")
         self.mini_pp.setToolTip(_("Play / pause"))
         self.mini_pp.clicked.connect(self.toggle_play_pause)
         self.mini_st = QPushButton()
-        self.mini_st.setObjectName("round")
+        self.mini_st.setObjectName("transport_stop")
         self.mini_st.setToolTip(_("Stop"))
         self.mini_st.clicked.connect(self.stop_current)
         icons.set_icon(self.mini_st, "stop", size=16)
@@ -1077,7 +1077,7 @@ class MainWindow(QMainWindow):
         bottom.addWidget(self.mini_time)
         cv.addLayout(bottom)
         v.addWidget(card)
-        icons.set_icon(self.mini_pp, "play", size=16)
+        icons.set_icon(self.mini_pp, "play", "on_accent", size=16)
         return page
 
     def _set_np_name(self, text: str):
@@ -1403,12 +1403,12 @@ class MainWindow(QMainWindow):
 
         f, th = bar()
         self.btn_pp = QPushButton()
-        self.btn_pp.setObjectName("round")
+        self.btn_pp.setObjectName("transport_play")
         self.btn_pp.setToolTip(_("Play / pause"))
         self.btn_pp.clicked.connect(self.toggle_play_pause)
         self._pp_icon = None
         self.btn_st = QPushButton()
-        self.btn_st.setObjectName("round")
+        self.btn_st.setObjectName("transport_stop")
         self.btn_st.setToolTip(_("Stop"))
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
@@ -1595,8 +1595,7 @@ class MainWindow(QMainWindow):
             self._pp_icon = name
             for b in (self.btn_pp, getattr(self, "mini_pp", None)):
                 if b is not None:
-                    b.setIcon(icons.icon(name))
-                    b.setIconSize(QSize(16, 16))
+                    icons.set_icon(b, name, "on_accent", size=16)
 
     def _build_setup_page(self) -> QWidget:
         """One-time setup and the rarely-touched stuff: where the audio goes,
