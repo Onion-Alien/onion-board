@@ -1225,10 +1225,11 @@ class MainWindow(QMainWindow):
         tb.setContentsMargins(8, 6, 8, 6)
         tb.setSpacing(6)
         add = self.btn_add = QPushButton(_("Add sounds"))
-        add.setObjectName("primary")
+        # flat like the rest of the toolbar; the accent colour marks it as the main one
+        add.setObjectName("soundadd")
         add.setToolTip(_("Add sound files (or drag them onto the window)"))
         add.clicked.connect(self.add_dialog)
-        icons.set_icon(add, "plus", "on_accent", size=18)
+        icons.set_icon(add, "plus", "accent", size=18)
         self.btn_record = QPushButton(_("Record"))
         self.btn_record.setObjectName("soundrecord")
         icons.set_icon(self.btn_record, "mic", size=18)
@@ -1320,6 +1321,7 @@ class MainWindow(QMainWindow):
         # make things, find things, then the library's tools
         tb.addWidget(add)
         tb.addWidget(self.btn_record)
+        tb.addWidget(vsep())
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
         tb.addWidget(vsep())
