@@ -13,9 +13,10 @@ the workflow, this script) runs them all. A change no test is about (the README,
 changelog, the website) runs none. main runs the whole suite after every merge, and
 so does a manual run of the workflow.
 
-Usage: python scripts/pick_tests.py [BASE]   (BASE defaults to origin/main)
+Usage: python scripts/pick_tests.py [BASE] [--local]   (BASE defaults to origin/main)
 Prints the test files, one per line: `tests` alone for all of them, nothing for none.
-Locally: python -m pytest $(python scripts/pick_tests.py)
+--local also counts uncommitted and new files. Locally, scripts/precommit.ps1 runs
+ruff, the sensitive-data scan and these tests in one go.
 """
 from __future__ import annotations
 
@@ -83,10 +84,21 @@ def code_files() -> dict[str, Path]:
     return files
 
 
-def changed_files(base: str) -> list[str]:
-    out = subprocess.run(["git", "diff", "--name-only", "--no-renames", f"{base}...HEAD"],
-                         cwd=ROOT, capture_output=True, text=True, check=True).stdout
+def _git(*args: str) -> list[str]:
+    out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True,
+                         check=True).stdout
     return [line for line in out.splitlines() if line]
+
+
+def changed_files(base: str, local: bool = False) -> list[str]:
+    """What the branch changed since it left `base`. `local` adds what isn't committed
+    yet (edited, staged and new files), for running the right tests before a commit."""
+    if not local:
+        return _git("diff", "--name-only", "--no-renames", f"{base}...HEAD")
+    since = _git("merge-base", base, "HEAD")[0]
+    files = _git("diff", "--name-only", "--no-renames", since)   # to the working tree
+    files += _git("ls-files", "--others", "--exclude-standard")
+    return sorted(set(files))
 
 
 def pick(changed: list[str]) -> list[str]:
@@ -135,8 +147,10 @@ def pick(changed: list[str]) -> list[str]:
 
 
 def main(argv: list[str]) -> int:
-    base = argv[1] if len(argv) > 1 else "origin/main"
-    for line in pick(changed_files(base)):
+    local = "--local" in argv
+    args = [a for a in argv[1:] if a != "--local"]
+    base = args[0] if args else "origin/main"
+    for line in pick(changed_files(base, local)):
         print(line)
     return 0
 
