@@ -270,6 +270,7 @@ class SetupWizard(QDialog):
         self._saved_devices = {"mic_device": win.cfg.mic_device,
                                "mon_device": win.cfg.mon_device}
         self._user_picked: set[str] = set()   # the ones they actually clicked
+        self._chose_cable = False   # "Virtual cable instead" clicked here
 
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -541,6 +542,7 @@ class SetupWizard(QDialog):
         if self.setup_show.on:
             self.setup_show._stop()
         if choice == "cable":
+            self._chose_cable = True   # picked here: recheck_cable leaves it on the cable
             self.win.set_route("cable")
             self._show_other(False)
         elif choice == NOWHERE:
@@ -768,6 +770,13 @@ class SetupWizard(QDialog):
         if not busy and self.bun_cable.building:
             self.bun_cable.stop_building(self.cable_ok())
         route = self.win.cfg.route
+        # on the cable, but the mic effect is already on the mic and working: use the mic
+        # (the page leads with it) instead of offering to set it up all over again
+        if (route == "cable" and not busy and not self._chose_cable
+                and not self.win._attaching and not self.setup_show.on
+                and directmic.works(directmic.status(self.win.cfg.mic_device))):
+            self.win.set_route("mic")
+            route = self.win.cfg.route
         # (straight into the mic has its own "...instead" button, below)
         self.btn_use_cable.setVisible(not busy and route not in ("cable", "mic"))
         self.btn_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the mic "
@@ -919,6 +928,12 @@ class SetupWizard(QDialog):
         self._update_next()
 
     def attach_mic(self):
+        self._chose_cable = False
+        if self.win.cfg.route != "mic" and directmic.works(
+                directmic.status(self.win.cfg.mic_device)):
+            self.win.set_route("mic")   # already on the mic: no admin prompt, no reinstall
+            self.recheck_cable(rescan=False)
+            return
         self.setup_show.start()
         self.win.attach_mic()
         self.recheck_cable(rescan=False)
