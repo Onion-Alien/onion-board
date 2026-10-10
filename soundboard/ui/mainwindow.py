@@ -69,8 +69,8 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
-                                   expand_dropped, fmt_pos, loudness, pad_height,
+from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
+                                   SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
                                    spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -1221,7 +1221,7 @@ class MainWindow(QMainWindow):
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
                           "sound pack"))
         icons.set_icon(more, "archive", size=18)
-        mm = QMenu(more)
+        mm = DropdownMenu(more)
         icons.set_icon(mm.addAction(_("Import a backup or sound pack…"), self.import_dialog),
                        "folder")
         icons.set_icon(mm.addAction(_("Free sound packs…"), self.show_packs), "download")
@@ -1262,7 +1262,7 @@ class MainWindow(QMainWindow):
         self.btn_keys.setToolTip(_("Quick hotkeys: set the ones people use most, or open every "
                                    "hotkey in Settings"))
         icons.set_icon(self.btn_keys, "keyboard", size=18)
-        km = QMenu(self.btn_keys)
+        km = DropdownMenu(self.btn_keys)
         km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
         self.btn_keys.setMenu(km)
         self.btn_keys.setProperty("toolbarMenu", True)
@@ -1278,7 +1278,7 @@ class MainWindow(QMainWindow):
         # the pads' order (as dragged, A-Z, newest, most played) and cards or a list
         self.btn_view = QPushButton()
         self.btn_view.setAccessibleName(_("Order and view"))
-        vm = QMenu(self.btn_view)
+        vm = DropdownMenu(self.btn_view)
         vm.setToolTipsVisible(True)
         vm.aboutToShow.connect(lambda: self._fill_view_menu(vm))
         self.btn_view.setMenu(vm)

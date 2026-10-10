@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dropdown menus on the Sounds tab (Backup, Shortcuts, Order and view) open with a
+  short gap clear of their buttons.
 - **Polished playback transport controls.** The sound player's Play/Pause button uses an accent-pill style with clean high-contrast icons that adapt across all themes, and the Stop button uses a sleek secondary surface with a subtle danger outline on hover. Both buttons use smooth filleted vector glyphs with optical centering.
 - The search box on the Sounds tab has a tidier gap between the magnifying glass
   and placeholder text.
