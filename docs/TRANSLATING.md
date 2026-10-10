@@ -55,9 +55,9 @@ ngettext("{n} sound", "{n} sounds", n)
 `python scripts/i18n_extract.py` lists, per language, what's missing and what's no
 longer used; `--update` adds the missing texts (empty) to every catalog and drops the
 unused ones; `--check` exits 1 if anything is off. The tests check that every
-translation keeps the placeholders and has the right plural forms; a text not
-translated yet shows the English, so wrapping new text doesn't wait on the
-translations (run `--update` and translate the new texts afterwards).
+translation keeps the placeholders and has the right plural forms. CI's pick job runs
+`--check` too, so a change that adds or edits text translates it into every catalog
+in the same change (`--update`, then fill in the new texts).
 
 A new language: copy a catalog to `<code>.json` (a Windows language code), set
 `_meta.name` to the language's own name, translate, and add its plural rule to
