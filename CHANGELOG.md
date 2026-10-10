@@ -4,6 +4,26 @@
 
 - A settings change made just as the background saver went idle is no longer lost
   (it could go unsaved until the next change, or be dropped at quit).
+- Importing a backup whose settings name `read_only` no longer stops the app saving
+  for the rest of the session (the imported sounds were gone after a restart), and a
+  settings file naming it is no longer set aside as damaged.
+- A pad's *Picture → From a link* no longer opens a file on this PC or a network share
+  when the web page names one as its preview picture: only web pictures are fetched.
+- A Myinstants sound whose download was cut short is no longer added half-finished:
+  it says the connection dropped, so you can try again.
+- A slow download from a site that doesn't say how big the file is no longer stops
+  after 5 minutes with "The download stopped moving".
+- A backup made after going back to an older version no longer carries the newer
+  version's settings it doesn't know, which could be private to your PC.
+- The remote control API answers a volume of `inf` or a malformed signature with a
+  clear refusal instead of an error or a dropped connection.
+- Updating the downloader (yt-dlp) no longer fails now and then when a search or
+  download starts at the same moment.
+- Switching off *Count me in* in Settings while in Tor mode no longer sends the last
+  anonymous opt-out count, as the privacy page promises.
+- A glitch from the mic (a broken sample from its driver) can no longer switch off
+  parts of your voice effect for the rest of the session and let your real voice
+  through.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The

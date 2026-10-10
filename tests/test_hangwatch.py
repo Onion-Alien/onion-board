@@ -1,9 +1,12 @@
 """A frozen UI thread gets its stack logged, once per freeze."""
 import logging
+import re
+import sys
 import threading
 import time
 from pathlib import Path
 
+import pytest
 from PySide6.QtCore import QCoreApplication, QEvent
 
 from soundboard.hangwatch import HangWatch
@@ -50,10 +53,39 @@ def test_a_frozen_window_logs_what_it_was_doing_once(qapp, caplog, tmp_path, mon
         assert hw.saved.parent == tmp_path / applog.REPORTS_DIR
         assert "froze for" in hw.saved.read_text(encoding="utf-8")
         assert "frozen_in_a_long_wait" in hw.saved.read_text(encoding="utf-8")
+        assert "Lasted:   still frozen" in hw.saved.read_text(encoding="utf-8")
         beat_for(qapp, HANG_S)                     # beating again: no new report
         assert hw.reports == 1
+        # ...and the report says how long it lasted in all
+        assert re.search(r"^Lasted:   \d+ s$", hw.saved.read_text(encoding="utf-8"), re.M)
     finally:
         hw.stop()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="thread CPU times are read on Windows")
+def test_a_freeze_report_says_how_busy_each_thread_was(qapp, tmp_path, monkeypatch):
+    """A window asleep (waiting) uses no CPU; a thread spinning uses a whole core."""
+    from soundboard import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    go = threading.Event()
+
+    def spinning_worker():
+        while not go.is_set():
+            sum(range(1000))
+    worker = threading.Thread(target=spinning_worker, name="spinner", daemon=True)
+    worker.start()
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        frozen_in_a_long_wait(hw, HANG_S * 2)
+        text = hw.saved.read_text(encoding="utf-8")
+        assert int(re.search(r"^Window CPU: (\d+)%", text, re.M).group(1)) < 30
+        assert int(re.search(r'^Thread "spinner" \(\d+\), (\d+)% CPU:', text,
+                             re.M).group(1)) >= 30
+    finally:
+        hw.stop()
+        go.set()
+        worker.join()
 
 
 def waiting_in_a_worker(go):

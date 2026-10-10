@@ -3,6 +3,12 @@
 Guidance for AI coding agents (Claude Code, Codex, Copilot, etc.) working in this repo.
 Humans: [CONTRIBUTING.md](CONTRIBUTING.md) has the same rules.
 
+**Start with [docs/AGENT-RULES.md](docs/AGENT-RULES.md)**. It lists the regressions
+this repo keeps getting (UI-thread freezes, async results after close, the audio path,
+flaky tests) as rules, says which docs a task needs (read only those), and has the
+one-command check: `scripts\precommit.ps1`. Never read `CHANGELOG.md` whole, only
+append under *Unreleased*. Cut releases with `scripts/release.py X.Y.Z`.
+
 ## This repo is public
 
 Everything written here — code, comments, docs, tests, commit messages — is
