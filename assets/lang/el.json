@@ -2426,7 +2426,6 @@
   "so quiet…": "τόσο ήσυχο…",
   "so… bored…": "τόσο… βαριέμαι…",
   "starting…": "εκκίνηση…",
-  "starting… (a built-in voice covers you until it's ready)": "ξεκινώντας… (μια ενσωματωμένη φωνή σας καλύπτει μέχρι να είναι έτοιμη)",
   "stopped": "σταμάτησε",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "σταμάτησε: χρειάστηκε πάνω από {n} λεπτό. Ελέγξτε τη σύνδεσή σας στο Διαδίκτυο και πατήστε το ξανά.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Αυτός δεν είναι σύνδεσμος Ιστού. Αντιγράψτε τη διεύθυνση της εικόνας (κάντε δεξί κλικ → Αντιγραφή διεύθυνσης εικόνας) και επικολλήστε την εδώ.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Δεν υπάρχει εικόνα σε αυτόν τον σύνδεσμο. Κάντε δεξί κλικ στην εικόνα → Αντιγραφή διεύθυνσης εικόνας και επικολλήστε την.",
   "Couldn't get the picture ({error}).": "Δεν ήταν δυνατή η λήψη της εικόνας ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "ξεκινώντας πάλι… (μια ενσωματωμένη φωνή σε καλύπτει μέχρι να είναι έτοιμη)",
   "huh?! wha…": "ε;! τι…",
   "five more minutes…": "πέντε λεπτά ακόμα…",
   "it's the middle of the night!": "είναι μεσάνυχτα!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Φωνητικά εφέ απενεργοποιημένα — το μικρόφωνο αμετάβλητο",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Η φωνή του μικροφώνου σας δεν έχει αλλάξει. Ανοίξτε το Voice changer ή τις φωνές AI παρακάτω για να επιλέξετε φωνή.",
   "AI voice off": "Η φωνή AI σβήνει",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Η φωνή AI σταμάτησε: μια ενσωματωμένη φωνή σας καλύπτει. Κάντε κλικ για να ανοίξετε τις φωνές AI.",
   "Click to open AI voices.": "Κάντε κλικ για να ανοίξετε τις φωνές AI.",
   "AI voice: {voice}, starting.": "Φωνή AI: {voice} , έναρξη.",
   "AI voice: {voice}.": "Φωνή AI: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Προετοιμασία της Python…",
   "Installing the voice engine (a few minutes)…": "Εγκατάσταση της μηχανής φωνών (λίγα λεπτά)…",
   "Downloading the voices…": "Λήψη των φωνών…",
-  "Downloading the voices: {percent}%": "Λήψη των φωνών: {percent}%"
+  "Downloading the voices: {percent}%": "Λήψη των φωνών: {percent}%",
+  "Others now hear {backup}.": "Οι άλλοι τώρα ακούν {backup}.",
+  "starting again…": "ξεκινά ξανά…"
 }

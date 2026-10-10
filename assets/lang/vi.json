@@ -2376,7 +2376,6 @@
   "so quiet…": "thật yên tĩnh…",
   "so… bored…": "thế nên… chán…",
   "starting…": "bắt đầu…",
-  "starting… (a built-in voice covers you until it's ready)": "bắt đầu… (một giọng nói tích hợp bao quanh bạn cho đến khi nó sẵn sàng)",
   "stopped": "dừng lại",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "đã dừng: mất hơn {n} phút. Kiểm tra kết nối internet của bạn và nhấn lại."
@@ -2828,7 +2827,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Đó không phải là một liên kết web. Sao chép địa chỉ của ảnh (nhấp chuột phải vào ảnh → Sao chép địa chỉ ảnh) và dán vào đây.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Không có hình ảnh ở liên kết đó. Nhấp chuột phải vào ảnh → Sao chép địa chỉ ảnh và dán địa chỉ đó.",
   "Couldn't get the picture ({error}).": "Không thể lấy được hình ảnh ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "bắt đầu lại… (một giọng nói tích hợp bao quanh bạn cho đến khi nó sẵn sàng)",
   "huh?! wha…": "hả?! gì…",
   "five more minutes…": "năm phút nữa…",
   "it's the middle of the night!": "bây giờ là nửa đêm!",
@@ -2937,7 +2935,6 @@
   "Voice effects off — mic unchanged": "Tắt hiệu ứng giọng nói - mic không thay đổi",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Giọng mic của bạn không thay đổi. Mở Voice Changer hoặc AI Voices bên dưới để chọn giọng nói.",
   "AI voice off": "Tắt giọng nói AI",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Giọng nói AI dừng lại: một giọng nói tích hợp bao phủ bạn. Nhấp để mở giọng nói AI.",
   "Click to open AI voices.": "Nhấp để mở giọng nói AI.",
   "AI voice: {voice}, starting.": "Giọng nói AI: {voice} , đang bắt đầu.",
   "AI voice: {voice}.": "Giọng nói AI: {voice} .",
@@ -2946,5 +2943,7 @@
   "Getting Python ready…": "Đang chuẩn bị Python…",
   "Installing the voice engine (a few minutes)…": "Đang cài bộ máy giọng nói (vài phút)…",
   "Downloading the voices…": "Đang tải giọng nói…",
-  "Downloading the voices: {percent}%": "Đang tải giọng nói: {percent}%"
+  "Downloading the voices: {percent}%": "Đang tải giọng nói: {percent}%",
+  "Others now hear {backup}.": "Người khác hiện nghe thấy {backup}.",
+  "starting again…": "đang khởi động lại…"
 }

@@ -2426,7 +2426,6 @@
   "so quiet…": "si calme…",
   "so… bored…": "donc… je m'ennuie…",
   "starting…": "départ…",
-  "starting… (a built-in voice covers you until it's ready)": "en commençant… (une voix intégrée vous couvre jusqu'à ce qu'il soit prêt)",
   "stopped": "arrêté",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "arrêté : cela a pris plus de {n} minute. Vérifiez votre connexion Internet et appuyez à nouveau dessus.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Ce n'est pas un lien Web. Copiez l'adresse de l'image (cliquez dessus avec le bouton droit → Copier l'adresse de l'image) et collez-la ici.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Il n'y a pas de photo sur ce lien. Cliquez avec le bouton droit sur l'image → Copier l'adresse de l'image et collez-la.",
   "Couldn't get the picture ({error}).": "Impossible d'obtenir l'image ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "recommencer… (une voix intégrée vous couvre jusqu'à ce qu'il soit prêt)",
   "huh?! wha…": "hein?! quoi…",
   "five more minutes…": "encore cinq minutes…",
   "it's the middle of the night!": "c'est le milieu de la nuit !",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Effets vocaux désactivés – micro inchangé",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "La voix de votre micro est inchangée. Ouvrez le changeur de voix ou les voix AI ci-dessous pour choisir une voix.",
   "AI voice off": "Voix off de l'IA",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "La voix de l'IA s'est arrêtée : une voix intégrée vous couvre. Cliquez pour ouvrir les voix de l'IA.",
   "Click to open AI voices.": "Cliquez pour ouvrir les voix de l'IA.",
   "AI voice: {voice}, starting.": "Voix IA : {voice} , démarrage.",
   "AI voice: {voice}.": "Voix IA : {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Préparation de Python…",
   "Installing the voice engine (a few minutes)…": "Installation du moteur de voix (quelques minutes)…",
   "Downloading the voices…": "Téléchargement des voix…",
-  "Downloading the voices: {percent}%": "Téléchargement des voix : {percent}%"
+  "Downloading the voices: {percent}%": "Téléchargement des voix : {percent}%",
+  "Others now hear {backup}.": "Les autres entendent maintenant {backup}.",
+  "starting again…": "redémarrage…"
 }

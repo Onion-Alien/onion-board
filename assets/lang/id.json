@@ -2376,7 +2376,6 @@
   "so quiet…": "sangat tenang…",
   "so… bored…": "jadi… bosan…",
   "starting…": "mulai…",
-  "starting… (a built-in voice covers you until it's ready)": "mulai… (suara bawaan menutupi Anda hingga siap)",
   "stopped": "berhenti",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "berhenti: memerlukan waktu lebih dari {n} menit. Periksa koneksi internet Anda dan tekan lagi."
@@ -2828,7 +2827,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Itu bukan tautan web. Salin alamat gambar (klik kanan → Salin alamat gambar) dan tempel di sini.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Tidak ada gambar di tautan itu. Klik kanan gambar → Salin alamat gambar, dan tempelkan itu.",
   "Couldn't get the picture ({error}).": "Tidak dapat mengambil gambarnya ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "memulai lagi… (suara bawaan menutupi Anda hingga siap)",
   "huh?! wha…": "Hah?! apa…",
   "five more minutes…": "lima menit lagi…",
   "it's the middle of the night!": "ini tengah malam!",
@@ -2937,7 +2935,6 @@
   "Voice effects off — mic unchanged": "Efek suara mati — mikrofon tidak berubah",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Suara mikrofon Anda tidak berubah. Buka Pengubah suara atau suara AI di bawah untuk memilih suara.",
   "AI voice off": "Suara AI mati",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Suara AI berhenti: suara bawaan menutupi Anda. Klik untuk membuka suara AI.",
   "Click to open AI voices.": "Klik untuk membuka suara AI.",
   "AI voice: {voice}, starting.": "Suara AI: {voice} , dimulai.",
   "AI voice: {voice}.": "Suara AI: {voice} .",
@@ -2946,5 +2943,7 @@
   "Getting Python ready…": "Menyiapkan Python…",
   "Installing the voice engine (a few minutes)…": "Memasang mesin suara (beberapa menit)…",
   "Downloading the voices…": "Mengunduh suara…",
-  "Downloading the voices: {percent}%": "Mengunduh suara: {percent}%"
+  "Downloading the voices: {percent}%": "Mengunduh suara: {percent}%",
+  "Others now hear {backup}.": "Orang lain sekarang mendengar {backup}.",
+  "starting again…": "memulai lagi…"
 }
