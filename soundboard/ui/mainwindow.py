@@ -1867,7 +1867,7 @@ class MainWindow(QMainWindow):
         hk = QPushButton(_("Hotkeys && auto push-to-talk…"))
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         uv.addWidget(hk, 0, Qt.AlignLeft)
-        rcol.addWidget(utilitycard)
+        lcol.addWidget(utilitycard)
         lcol.addStretch(1)
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
