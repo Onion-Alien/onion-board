@@ -859,8 +859,14 @@ class MainWindow(QMainWindow):
         self._lang_offered = ""
         rv.addWidget(self.lang_bar)
 
+        # the bar and the tabs share a box with no gap of its own: every tab page already
+        # starts 8 px down, so the bar's gap to the first row matches the rows below it
+        tabs_box = QWidget()
+        tv = QVBoxLayout(tabs_box)
+        tv.setContentsMargins(0, 0, 0, 0)
+        tv.setSpacing(0)
         self.download_bar = DownloadBar(self)
-        rv.addWidget(self.download_bar)
+        tv.addWidget(self.download_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -868,7 +874,8 @@ class MainWindow(QMainWindow):
         self.tabs.setDocumentMode(True)
         self.tabs.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         SteadyTabs(self.tabs)   # a change inside a page doesn't repaint the whole board
-        rv.addWidget(self.tabs, 1)
+        tv.addWidget(self.tabs, 1)
+        rv.addWidget(tabs_box, 1)
         self.sounds_page = self._build_sounds_page()
         self.tabs.addTab(self.sounds_page, "")
         # the Radio tab, or the panel saying it's switched off (Settings > Privacy)
