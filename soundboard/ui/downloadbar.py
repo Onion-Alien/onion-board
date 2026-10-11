@@ -99,6 +99,7 @@ class DownloadBar(QFrame):
     """The persistent top bar displaying ongoing downloads and preparation."""
     cancel_requested = Signal(str)  # (url to cancel, or "" for active)
     play_requested = Signal()
+    shown_changed = Signal(bool)   # the bar appeared / went away
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -220,6 +221,14 @@ class DownloadBar(QFrame):
         self.bar.update()
         if self.url:
             self._update_thumb()   # the plain icon is drawn in the theme's colour
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        self.shown_changed.emit(True)
+
+    def hideEvent(self, ev):
+        super().hideEvent(ev)
+        self.shown_changed.emit(False)
 
     def set_mini(self, mini: bool):
         self._mini = mini

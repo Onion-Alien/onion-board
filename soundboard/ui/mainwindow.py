@@ -865,8 +865,10 @@ class MainWindow(QMainWindow):
         tv = QVBoxLayout(tabs_box)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(0)
+        self._tabs_lay = tv
         self.download_bar = DownloadBar(self)
         tv.addWidget(self.download_bar)
+        self.download_bar.shown_changed.connect(self._dl_bar_gap)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -1221,11 +1223,18 @@ class MainWindow(QMainWindow):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
 
+    def _dl_bar_gap(self, shown: bool):
+        """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
+        and none from the Sounds page, whose first row then sits 8 px down like the rest."""
+        self._tabs_lay.setSpacing(8 if shown else 0)
+        self._sounds_lay.setContentsMargins(0, 0 if shown else 8, 0, 0)
+
     def _build_sounds_page(self) -> QWidget:
         c = self.cfg
         page = QWidget()
         left = QVBoxLayout(page)
         left.setContentsMargins(0, 8, 0, 0)
+        self._sounds_lay = left
         left.setSpacing(8)
         # one framed surface for the toolbar, every control the same height
         self.sounds_toolbar = QFrame()
