@@ -1856,7 +1856,6 @@
   "Get AI voices": "Holen Sie sich KI-Stimmen",
   "Get Onion Watch": "Holen Sie sich Onion Watch",
   "Get Onion Watch again": "Holen Sie sich erneut Onion Watch",
-  "Get Onion Watch for the Triggers tab": "Holen Sie sich Onion Watch für die Registerkarte „Trigger“.",
   "Get and update add-ons": "Holen Sie sich Add-ons und aktualisieren Sie sie",
   "Getting AI voices…": "KI-Stimmen bekommen…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Das Abrufen und Aktualisieren von Add-ons ist unter „Einstellungen“ > „Datenschutz und Sicherheit“ deaktiviert.",
@@ -1992,7 +1991,6 @@
   "Onion Watch download progress": "Beobachten Sie den Download-Fortschritt von Onion",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch wird gerade heruntergeladen. Versuchen Sie es erneut, wenn es fertig ist.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch kann noch nicht heruntergeladen werden (GitHub gibt an, dass es nicht gefunden werden kann). Versuchen Sie es später noch einmal.",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "Onion Watch spielt einen Ton ab, wenn etwas in Ihrem Spiel auftaucht: ein seltener Spawn, eine Warteschlange, „Du bist gestorben“. Es überwacht das eigene Fenster des Spiels, auch wenn es von anderen Fenstern verdeckt wird, kann zwei Kopien eines Spiels unterscheiden und kann klingeln, bis Sie es stoppen. Ihre Sounds werden wie gewohnt über das Board abgespielt.",
   "Onion Watch wasn't removed": "Onion Watch wurde nicht entfernt",
   "Onion Watch wasn't removed: {error}": "Onion Watch wurde nicht entfernt: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch wurde nicht aktualisiert: {error}",
@@ -3050,5 +3048,11 @@
   "Click to send your sounds again: right now others hear only your mic": "Klicken, um deine Sounds wieder zu senden: gerade hören andere nur dein Mikro",
   "Only your mic": "Nur dein Mikro",
   "Others hear": "Andere hören",
-  "Others hear only your mic": "Andere hören nur dein Mikro"
+  "Others hear only your mic": "Andere hören nur dein Mikro",
+  "Can ring until you stop it": "Kann klingeln, bis du es stoppst",
+  "Free, from GitHub, and only downloaded when you click.": "Kostenlos, von GitHub, und erst beim Klick heruntergeladen.",
+  "Only looks: never clicks or types in your game": "Schaut nur zu: klickt oder tippt nie in deinem Spiel",
+  "Plays one of your sounds when something happens in your game.": "Spielt einen deiner Sounds, wenn in deinem Spiel etwas passiert.",
+  "Rare spawns, queue pops, “YOU DIED”": "Seltene Spawns, Warteschlange fertig, „YOU DIED“",
+  "Watches the game's window, even behind others": "Beobachtet das Spielfenster, auch hinter anderen"
 }

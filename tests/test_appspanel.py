@@ -1028,3 +1028,24 @@ def test_card_menu_ticks_its_category_and_shows_ampersands(tab, monkeypatch):
     assert moved == ["Games"]
     remove = seen[0].actions()[-1]
     assert remove.toolTip() == "Take this program off the list" and not remove.icon().isNull()
+
+
+def test_card_menu_has_a_keyboard_way(tab, monkeypatch):
+    """Menu key or Shift+F10 on anything in a card opens its menu (it was right-click
+    only), under the focused control or mid-card."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QKeySequence, QShortcut
+    from PySide6.QtWidgets import QMenu
+    from soundboard.ui import appspanel
+    seen = []
+
+    class Shown(QMenu):
+        def exec(self, *a):
+            seen.append(a)
+    monkeypatch.setattr(appspanel, "QMenu", Shown)
+    row = tab._row("spotify.exe")
+    keys = {sc.key().toString(): sc for sc in row.findChildren(QShortcut)}
+    assert QKeySequence(Qt.Key_Menu).toString() in keys and "Shift+F10" in keys
+    assert all(sc.context() == Qt.WidgetWithChildrenShortcut for sc in keys.values())
+    keys["Shift+F10"].activated.emit()
+    assert len(seen) == 1

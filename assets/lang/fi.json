@@ -1852,7 +1852,6 @@
   "Get AI voices": "Hanki AI-ääniä",
   "Get Onion Watch": "Hanki sipulikello",
   "Get Onion Watch again": "Hanki Onion Watch uudelleen",
-  "Get Onion Watch for the Triggers tab": "Hanki sipulikello Triggers-välilehdelle",
   "Get and update add-ons": "Hanki ja päivitä lisäosat",
   "Getting AI voices…": "Haetaan tekoälyääniä…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Lisäosien hakeminen ja päivittäminen on kytketty pois päältä kohdassa Asetukset > Tietosuoja ja suojaus.",
@@ -1989,7 +1988,6 @@
   "Onion Watch download progress": "Sipuli Katso latauksen edistymistä",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watchia ladataan juuri nyt. Yritä uudelleen, kun se on valmis.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch ei ole vielä ladattavissa (GitHub sanoo, ettei se löydä sitä). Yritä myöhemmin uudelleen.",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "Sipulikello toistaa äänen, kun pelissäsi ilmestyy jotain: harvinainen sytytys, jono poksahtaa, \"YOU DIED\". Se tarkkailee pelin omaa ikkunaa, vaikka muut ikkunat peittävät sen, erottaa pelin kaksi kopiota toisistaan ​​ja voi soittaa, kunnes lopetat sen. Äänesi soivat laudan läpi tavalliseen tapaan.",
   "Onion Watch wasn't removed": "Onion Watchia ei poistettu",
   "Onion Watch wasn't removed: {error}": "Sipulikelloa ei poistettu: {error}",
   "Onion Watch wasn't updated: {error}": "Sipulikelloa ei päivitetty: {error}",
@@ -3050,5 +3048,11 @@
   "Click to send your sounds again: right now others hear only your mic": "Napsauta lähettääksesi äänesi taas: nyt muut kuulevat vain mikkisi",
   "Only your mic": "Vain mikkisi",
   "Others hear": "Muut kuulevat",
-  "Others hear only your mic": "Muut kuulevat vain mikkisi"
+  "Others hear only your mic": "Muut kuulevat vain mikkisi",
+  "Can ring until you stop it": "Voi soida, kunnes pysäytät sen",
+  "Free, from GitHub, and only downloaded when you click.": "Ilmainen, GitHubista, ja ladataan vasta kun napsautat.",
+  "Only looks: never clicks or types in your game": "Vain katsoo: ei koskaan napsauta tai kirjoita peliisi",
+  "Plays one of your sounds when something happens in your game.": "Soittaa yhden äänistäsi, kun pelissä tapahtuu jotain.",
+  "Rare spawns, queue pops, “YOU DIED”": "Harvinaiset spawnit, jono valmis, “YOU DIED”",
+  "Watches the game's window, even behind others": "Tarkkailee pelin ikkunaa, myös muiden takana"
 }

@@ -2032,7 +2032,6 @@
   "Get AI voices": "احصل على أصوات الذكاء الاصطناعي",
   "Get Onion Watch": "احصل على ساعة البصل",
   "Get Onion Watch again": "احصل على Onion Watch مرة أخرى",
-  "Get Onion Watch for the Triggers tab": "احصل على Onion Watch لعلامة التبويب Triggers",
   "Get and update add-ons": "الحصول على الوظائف الإضافية وتحديثها",
   "Getting AI voices…": "الحصول على أصوات الذكاء الاصطناعي...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "يتم إيقاف الحصول على الوظائف الإضافية وتحديثها في الإعدادات > الخصوصية والأمان.",
@@ -2172,7 +2171,6 @@
   "Onion Watch download progress": "Onion شاهد تقدم التنزيل",
   "Onion Watch is being downloaded right now. Try again when it's done.": "يتم الآن تنزيل Onion Watch. حاول مرة أخرى عند الانتهاء.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch غير متاح للتنزيل بعد (يقول GitHub أنه لا يمكنه العثور عليه). حاول مرة أخرى لاحقًا.",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "تصدر Onion Watch صوتًا عندما يظهر شيء ما في لعبتك: ظهور نادر، أو ظهور قائمة انتظار، \"لقد مت\". فهو يراقب نافذة اللعبة الخاصة، حتى عندما تغطيها النوافذ الأخرى، ويمكنه التمييز بين نسختين من اللعبة، ويمكنه الرنين حتى توقفها. أصواتك تلعب من خلال اللوحة كالمعتاد.",
   "Onion Watch wasn't removed": "لم تتم إزالة Onion Watch",
   "Onion Watch wasn't removed: {error}": "لم تتم إزالة Onion Watch: {error}",
   "Onion Watch wasn't updated: {error}": "لم يتم تحديث Onion Watch: {error}",
@@ -3310,5 +3308,11 @@
   "Click to send your sounds again: right now others hear only your mic": "انقر لإرسال أصواتك مجددًا: الآخرون يسمعون ميكروفونك فقط الآن",
   "Only your mic": "ميكروفونك فقط",
   "Others hear": "الآخرون يسمعون",
-  "Others hear only your mic": "الآخرون يسمعون ميكروفونك فقط"
+  "Others hear only your mic": "الآخرون يسمعون ميكروفونك فقط",
+  "Can ring until you stop it": "يمكنه الرنين حتى تُوقفه",
+  "Free, from GitHub, and only downloaded when you click.": "مجاني، من GitHub، ولا يُنزَّل إلا عند النقر.",
+  "Only looks: never clicks or types in your game": "يراقب فقط: لا ينقر ولا يكتب في لعبتك أبدًا",
+  "Plays one of your sounds when something happens in your game.": "يشغّل أحد أصواتك عندما يحدث شيء في لعبتك.",
+  "Rare spawns, queue pops, “YOU DIED”": "ظهور نادر، بدء المباراة، “YOU DIED”",
+  "Watches the game's window, even behind others": "يراقب نافذة اللعبة، حتى خلف النوافذ الأخرى"
 }

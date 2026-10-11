@@ -2,8 +2,8 @@
 itself is the Onion Watch add-on (soundboard.watchaddon); this is Onion Board's
 side of it:
 
-  * Until the add-on is installed, entering the tab opens a dismissible install
-    dialog with Hoot and a *Get Onion Watch* button. One click
+  * Until the add-on is installed, the tab is Hoot's card: what Onion Watch does
+    and a *Get Onion Watch* button (no window popping up on entering). One click
     downloads it (nothing is fetched before that), installs it into
     %APPDATA%\\OnionBoard\\modules and loads it into this tab, no restart needed.
     Triggers made before the add-on existed are kept in Config.screen meanwhile,
@@ -24,14 +24,14 @@ import logging
 import threading
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import (QDialog, QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
+from PySide6.QtWidgets import (QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
 from soundboard.i18n import _, ngettext
-from soundboard.ui import busy, icons
+from soundboard.ui import art, busy, icons
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import Flow, card, hint_label, section_label
+from soundboard.ui.panel import Flow, HoverCard, hint_label
 from soundboard.ui.widgets import LoadingBar
 from soundboard import errors
 
@@ -83,7 +83,6 @@ class TriggersTab(QWidget):
         self.offer: watchaddon.Offer | None = None   # a newer version to update to
         self._busy = False
         self._closed = False
-        self._leaving = False   # the tab hid or closed: the window's going isn't a "no"
         self._cancel = False
         self._compact: dict[str, bool] = {}          # fit steps applied (see fit_steps)
         self._progress.connect(self._on_progress)
@@ -122,33 +121,56 @@ class TriggersTab(QWidget):
         page = QWidget()
         pv = QVBoxLayout(page)
         pv.setContentsMargins(0, 8, 0, 0)
-        self.install_popup = QDialog(self)
-        self.install_popup.setWindowTitle(_("Get Onion Watch for the Triggers tab"))
-        self.install_popup.setWindowModality(Qt.WindowModal)
-        self.install_popup.setMaximumWidth(620)
-        self.install_popup.resize(620, 1)
-        self.install_popup.rejected.connect(self._dismiss_install)
-        popup_layout = QVBoxLayout(self.install_popup)
-        popup_layout.setContentsMargins(12, 12, 12, 12)
-        box, bv = card()
+        # Onion Watch's own card on the tab (it was a window popping up on entering
+        # the tab, then a lone button: DESIGN section 0 keeps windows for questions
+        # that need an answer). Short, like an ad: its logo and name, one line, what
+        # it does as a few points, the button, Hoot beside it all.
+        box = HoverCard()   # lights up under the mouse, as the Apps cards do
+        bv = QVBoxLayout(box)
+        bv.setContentsMargins(18, 16, 18, 16)
+        box.setMaximumWidth(620)
         row = QHBoxLayout()
         row.setSpacing(18)
-        # Enough room for Hoot's speech bubble without squeezing the dialog's text.
-        side = 16
-        self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side)
-        self.hoot.setToolTip(_("Hoot is waiting for Onion Watch"))
-        row.addWidget(self.hoot, 0, Qt.AlignCenter)
         text = QVBoxLayout()
-        text.setSpacing(8)
-        self.title = section_label("")
+        text.setSpacing(10)
+        head = QHBoxLayout()
+        head.setSpacing(12)
+        logo = QLabel()
+        pm = art.pixmap("onion-watch", 52)
+        if pm is not None:
+            logo.setPixmap(pm)
+            logo.setFixedSize(52, 52)
+        else:
+            logo.hide()
+        head.addWidget(logo, 0, Qt.AlignTop)
+        names = QVBoxLayout()
+        names.setSpacing(2)
+        self.title = QLabel("Onion Watch")
+        self.title.setObjectName("helptitle")
         self.title.setWordWrap(True)
-        text.addWidget(self.title)
-        self.blurb = hint_label(_(
-            "Onion Watch plays a sound when something shows up in your game: a rare "
-            "spawn, a queue popping, “YOU DIED”. It watches the game's own window, even "
-            "while other windows cover it, can tell two copies of a game apart, and can "
-            "ring until you stop it. Your sounds play through the board as usual."))
-        text.addWidget(self.blurb)
+        names.addWidget(self.title)
+        self.blurb = hint_label(_("Plays one of your sounds when something happens in "
+                                  "your game."))
+        names.addWidget(self.blurb)
+        head.addLayout(names, 1)
+        text.addLayout(head)
+        points = QVBoxLayout()
+        points.setSpacing(6)
+        for pic, words in (
+                ("gamepad", _("Rare spawns, queue pops, “YOU DIED”")),
+                ("eye", _("Watches the game's window, even behind others")),
+                ("volume", _("Can ring until you stop it")),
+                ("shield", _("Only looks: never clicks or types in your game"))):
+            line = QHBoxLayout()
+            line.setSpacing(8)
+            dot = QLabel()
+            icons.set_label_icon(dot, pic, "accent_hi", size=16)
+            line.addWidget(dot, 0, Qt.AlignTop)
+            lbl = QLabel(words)
+            lbl.setWordWrap(True)
+            line.addWidget(lbl, 1)
+            points.addLayout(line)
+        text.addLayout(points)
         self.kept = hint_label("")        # "Your 3 triggers are kept…"
         text.addWidget(self.kept)
         self.error = hint_label("")
@@ -160,7 +182,6 @@ class TriggersTab(QWidget):
         self.btn_get.setObjectName("primary")
         icons.set_icon(self.btn_get, "triggers", "on_accent")
         self.btn_get.clicked.connect(lambda: (usage.used("watch-prompt-get"), self.get()))
-        self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.OtherFocusReason))
         buttons.addWidget(self.btn_get)
         self.btn_cancel = QPushButton(_("Cancel"))
         self.btn_cancel.clicked.connect(self.cancel)
@@ -168,9 +189,6 @@ class TriggersTab(QWidget):
         buttons.addWidget(self.btn_cancel)
         self.btn_remove_broken = self._remove_button()
         buttons.addWidget(self.btn_remove_broken)
-        self.btn_close_install = QPushButton(_("Close"))
-        self.btn_close_install.clicked.connect(self.install_popup.reject)
-        buttons.addWidget(self.btn_close_install)
         text.addLayout(buttons)
         # the download's real progress, and a pill gliding along while there's no
         # number to show (asking GitHub for the newest, installing, starting it): one
@@ -186,22 +204,30 @@ class TriggersTab(QWidget):
         self.working = LoadingBar()
         self.working.hide()
         text.addWidget(self.working)
-        self.privacy = hint_label(_(
+        self.privacy = hint_label(_("Free, from GitHub, and only downloaded when you click."))
+        self.privacy.setToolTip(_(
             "It's downloaded from Onion Watch's page on GitHub only when you click, and "
             "checked before it's installed. It only looks at your screen: it never "
             "clicks, types or touches your game."))
         text.addWidget(self.privacy)
         text.setAlignment(Qt.AlignTop)
         row.addLayout(text, 1)
+        # Enough room for Hoot's speech bubble without squeezing the card's text.
+        side = 16
+        self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side)
+        self.hoot.setToolTip(_("Hoot is waiting for Onion Watch"))
+        self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.OtherFocusReason))
+        row.addWidget(self.hoot, 0, Qt.AlignCenter)
         bv.addLayout(row)
-        popup_layout.addWidget(box)
-        from soundboard.ui import fit
-        fit.watch(self.install_popup)
-        self.get_again = QPushButton(_("Get Onion Watch"))
-        icons.set_icon(self.get_again, "triggers")
-        self.get_again.clicked.connect(self._show_install_popup)
-        pv.addWidget(self.get_again, 0, Qt.AlignLeft)
+        # in the middle of the tab, a landing page rather than a box in its corner (a
+        # row with stretches, not an alignment: that kept its wrapped text's height)
+        mid = QHBoxLayout()
+        mid.addStretch(1)
+        mid.addWidget(box, 100)
+        mid.addStretch(1)
         pv.addStretch(1)
+        pv.addLayout(mid)
+        pv.addStretch(2)
         self.get_page = page
         self.stack.addWidget(page)
         self._label_get()
@@ -253,11 +279,9 @@ class TriggersTab(QWidget):
         n = self._trigger_count()
         broken = self.info is not None and self.panel is None and not self._busy
         self.title.setText(_("Onion Watch couldn't start") if broken and error else
-                           _("Get Onion Watch for the Triggers tab"))
+                           "Onion Watch")
         self.btn_get.setText(_("Get Onion Watch again") if broken and error
                              else _("Get Onion Watch"))
-        self.get_again.setText(self.btn_get.text())
-        self.install_popup.setWindowTitle(self.title.text())
         local = watchaddon.local_zip()
         self.btn_get.setToolTip(_("Install {file}", file=local) if local is not None else
                                 _("Download Onion Watch from GitHub and install it"))
@@ -320,27 +344,13 @@ class TriggersTab(QWidget):
             self._load_queued = True
             QTimer.singleShot(SHOW_LOAD_MS, self, self._load_on_show)
         elif not self.pending:
-            QTimer.singleShot(0, self, self._show_install_popup)
+            QTimer.singleShot(0, self, self._get_page_shown)
 
-    def hideEvent(self, event):
-        super().hideEvent(event)
-        self._leaving = True
-        self.install_popup.reject()
-        self._leaving = False
-
-    def _show_install_popup(self):
-        if (self._closed or self.pending or self.panel is not None or not self.isVisible()
-                or self.install_popup.isVisible()):
-            return
-        self.install_popup.open()
-        usage.used("watch-prompt-shown")   # the names only (usage.py)
-        self.btn_get.setFocus(Qt.OtherFocusReason)
-
-    def _dismiss_install(self):
-        if not (self._leaving or self._closed):
-            usage.used("watch-prompt-closed")
-        if self._busy and self.panel is None:
-            self.cancel()
+    def _get_page_shown(self):
+        """Hoot's page came into view: counted (the names only, usage.py)."""
+        if (not self._closed and not self.pending and self.panel is None
+                and self.isVisible() and self.stack.currentWidget() is self.get_page):
+            usage.used("watch-prompt-shown")
 
     def _painted(self):
         if self._load_queued:
@@ -363,7 +373,7 @@ class TriggersTab(QWidget):
         if self.info is None:
             self._label_get(error)
             self.stack.setCurrentWidget(self.get_page)
-            QTimer.singleShot(0, self, self._show_install_popup)
+            QTimer.singleShot(0, self, self._get_page_shown)
             return False
         try:
             entry = modules.load_package(self.info)
@@ -372,7 +382,7 @@ class TriggersTab(QWidget):
             log.warning("Onion Watch couldn't be loaded: %s", e, exc_info=True)
             self._label_get(watchaddon.friendly(e))
             self.stack.setCurrentWidget(self.get_page)
-            QTimer.singleShot(0, self, self._show_install_popup)
+            QTimer.singleShot(0, self, self._get_page_shown)
             return False
         self.panel = panel
         lay = self.board_page.layout()
@@ -395,7 +405,6 @@ class TriggersTab(QWidget):
         for key, compact in self._compact.items():
             self._apply_fit(key, compact)
         self.stack.setCurrentWidget(self.board_page)
-        self.install_popup.accept()
         log.info("Onion Watch %s is the Triggers tab", self.info.version)
         self.loaded.emit()
         if self.is_active():
@@ -622,7 +631,6 @@ class TriggersTab(QWidget):
 
     def shutdown(self):
         self._closed = True
-        self.install_popup.reject()
         self._cancel = True
         if self.panel is not None:
             try:
