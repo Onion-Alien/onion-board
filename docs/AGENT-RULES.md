@@ -36,6 +36,13 @@ Every task, before changing anything (details in `CLAUDE.md`):
 
 ## The rules
 
+### Every fix has a test
+- A bug fix comes with a test that fails without the fix and passes with it, so the
+  same mistake can't come back unseen. The PR's `Regression test:` line names it, or
+  says `none: <why>` (e.g. only a real device or the frozen build shows it).
+  `precommit.ps1` warns when a `fix/*` branch or a "fix" commit changes `soundboard/`
+  but nothing in `tests/`.
+
 ### UI thread (about 80 fixes: the biggest group)
 #### Layout acceptance
 - Review the complete final screen, using the final branch with current main included,
@@ -143,7 +150,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1 -Tests
 ```
 
 It runs ruff, the sensitive-data scan, the translation check and CODE.md's module list
-(about 15 s). The tests are left to CI: push, open the PR and keep working while it runs
+(about 10 s). The tests are left to CI: push, open the PR and keep working while it runs
 the test files your changes need, on 4 jobs side by side. `-Tests` runs those files here
 (a change to `theme.py`, `mainwindow.py` or `library.py` picks most of the suite: about
 4 minutes); `-All` the whole suite.
