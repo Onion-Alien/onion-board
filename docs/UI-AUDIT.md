@@ -255,10 +255,14 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   bar seeks finer, and capping them only traded a long control for an empty gap
   (PR #410, capping all four, was closed for that). Don't re-cap them.
 
-- [ ] **U13: Program names from the file name.** Apps cards title a program from
+- [x] **U13: Program names from the file name.** Apps cards title a program from
   its .exe: *Vlc*, *Obs64* (the window says VLC and OBS). Use the program's own
   name (its file description, as Windows' volume mixer does) and keep the .exe
   stem only as a fallback. Target: `appaudio.App.name`, `ui/appspanel.py`.
+
+  Done (PR #424): `appaudio.file_description` reads the .exe's FileDescription on
+  the lister's worker, cached per path; `App.name` uses it (*VLC media player*,
+  *OBS Studio*), and a card keeps it once the program closes.
 - [ ] **U14: Apps category names aren't translated.** The built-in categories
   (Browsers, Music & media, Calls & chat, Games, Other) show in English in every
   language; translate the shown name, keep the saved key. Target: `ui/appspanel.py`.

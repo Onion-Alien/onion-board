@@ -498,6 +498,7 @@ class AppRow(HoverCard):
             sc.activated.connect(self._menu_from_keyboard)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
+        self.known_name = ""            # the program's own name, once it has been seen
         self.last_sound_at = time.monotonic()
         self.capture: appaudio.AppCapture | None = None
         self.remember_pending = False   # Send clicked: remembered once the capture is up
@@ -761,6 +762,7 @@ class AppRow(HoverCard):
         self.app = app
         running = app is not None
         if running:
+            self.known_name = app.name   # kept for when it closes
             self.name.setText(app.name + self.folder)
             self._set_icon(app.path)
             where = ", ".join(app.devices[:2])
@@ -770,7 +772,8 @@ class AppRow(HoverCard):
             if not self.status_text:   # an error stays up until the next attempt
                 self.sub.setText(sub)
         else:
-            self.name.setText((self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?")
+            self.name.setText((self.known_name
+                               or (self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?"))
                               + self.folder)
             self.set_status("")
             self.sub.setText(_("Not running: it'll be picked up when it starts"))
