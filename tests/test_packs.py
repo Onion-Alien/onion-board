@@ -4,6 +4,7 @@ is a stand-in."""
 import hashlib
 import io
 import json
+import threading
 import urllib.request
 import zipfile
 
@@ -162,6 +163,30 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
         assert served.calls == []
     finally:
         dlg.done(0)
+
+
+def test_closing_the_dialog_before_the_list_arrives_is_quiet(qapp, monkeypatch):
+    """Closed while a slow connection is still reading the list: the late result is
+    dropped, nothing escapes the worker as a crash report."""
+    from soundboard.ui.crashdialog import free_dialog
+    escaped = []
+    monkeypatch.setattr(threading, "excepthook", lambda a: escaped.append(a.exc_value))
+    monkeypatch.setattr(net, "allowed", lambda feature: True)
+    gate = threading.Event()
+
+    def slow_catalog():
+        gate.wait(5)
+        return packs.built_in()
+    monkeypatch.setattr(packs, "catalog", slow_catalog)
+    dlg = packsdialog.PacksDialog(lambda p: None, None)
+    t = next(t for t in threading.enumerate() if t.name == "pack-list")
+    free_dialog(dlg)
+    qapp.processEvents()
+    gate.set()
+    t.join(5)
+    qapp.processEvents()
+    assert not t.is_alive()
+    assert escaped == []
 
 
 @pytest.fixture
