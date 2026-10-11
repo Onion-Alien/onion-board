@@ -51,7 +51,7 @@ from soundboard.ui import routewarn
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
-                           sourcedialog, splash, taboff)
+                           sourcedialog, splash, taboff, themecover)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar, capped,
                                  card, hint_label, icon_label, steady_number, vsep)
@@ -4586,6 +4586,12 @@ class MainWindow(QMainWindow):
         box.open()
 
     def apply_theme(self, name: str):
+        # a still of the window with Bun over it while every widget restyles: no frame
+        # of a half-styled window, and it fades to the new theme (ui/themecover.py)
+        with themecover.covered(self):
+            self._apply_theme(name)
+
+    def _apply_theme(self, name: str):
         self.cfg.theme = theme.apply(QApplication.instance(), name)
         icons.retheme()
         self.radio.retheme()
@@ -4598,6 +4604,7 @@ class MainWindow(QMainWindow):
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
         self._update_status()   # the hints and flow, in this theme's status colours
+        self.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
         self._paint_logo()
         self._save_later()
 

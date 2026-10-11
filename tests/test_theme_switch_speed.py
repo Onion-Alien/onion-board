@@ -4,7 +4,7 @@ with every Settings page built."""
 import os
 import time
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -79,3 +79,45 @@ def test_app_wide_filters_sit_out_the_restyle(settings, main_window):  # noqa: F
     main_window.update()
     QApplication.processEvents()
     assert seen   # installed again
+
+
+def test_the_drag_veil_sits_out_the_restyle_too(settings, main_window):  # noqa: F811
+    """The drop veil watched every event app-wide outside app_filter(): 49,000 Python
+    calls in each switch on a full board, each one waiting on the audio threads."""
+    assert main_window.drop_veil in theme._app_filters
+
+
+def test_a_switch_shows_a_still_with_bun_then_fades_to_the_new_theme(settings, main_window):  # noqa: F811
+    """Never a half-styled frame: the window is covered by a picture of itself while
+    every widget restyles, then that fades. A quick second click never stacks two."""
+    from soundboard.ui.themecover import ThemeCover
+    seen = []
+    real = main_window._apply_theme
+
+    def during(name):
+        seen.extend(c for c in main_window.findChildren(ThemeCover) if c.isVisible())
+        real(name)
+    main_window._apply_theme = during
+    try:
+        main_window.apply_theme(_other(theme.current_name))
+        main_window.apply_theme(_other(theme.current_name))
+    finally:
+        del main_window._apply_theme
+    assert len(seen) == 2 and seen[1].geometry() == main_window.rect()
+    QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    covers = main_window.findChildren(ThemeCover)
+    assert len(covers) == 1   # the first went as the second came
+    end = time.monotonic() + 3
+    while main_window.findChildren(ThemeCover) and time.monotonic() < end:
+        QApplication.processEvents()
+        QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    assert not main_window.findChildren(ThemeCover)
+
+
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_a_hovered_menu_row_shows_in_every_theme(name):
+    """The hovered row of a menu or dropdown was 1.07-1.5:1 against the menu (no
+    visible change in Flashbang, Blood Moon, Lava): now it stands out, words readable."""
+    t = theme.THEMES[name]
+    assert theme._contrast(t["item_hover"], t["card"]) >= 1.6
+    assert theme._contrast(t["item_hover"], t["text_hi"]) >= 4.5

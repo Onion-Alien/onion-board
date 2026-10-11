@@ -45,7 +45,7 @@ class DropVeil(QWidget):
         self.hide()
         app = QApplication.instance()
         assert app is not None
-        app.installEventFilter(self)
+        theme.app_filter(app, self)   # (sits out theme switches: 49,000 events each)
 
     def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
         t = ev.type()
