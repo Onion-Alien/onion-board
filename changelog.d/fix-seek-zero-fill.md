@@ -1,0 +1,1 @@
+- The seek bar no longer looks a few seconds in when a sound starts at 0:00.

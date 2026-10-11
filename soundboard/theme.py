@@ -698,7 +698,9 @@ QPushButton#transport_stop { background:$btn; border:1px solid $border; border-r
 QPushButton#transport_stop:hover { background:$btn_hover; border-color:$danger_text; }
 QPushButton#transport_stop:pressed { background:$btn_press; }
 QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border; }
-QSlider#seek::groove:horizontal { margin:0 8px; height:6px; border-radius:3px; }
+/* no side margin on the groove: the fill starts at the widget's edge, so a margin left a
+   purple stub sticking out past the handle at 0:00 (it looked a few seconds in) */
+QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
@@ -733,6 +735,7 @@ QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; 
 QSlider::sub-page:horizontal { background:$muted; border-radius:2px; }
 QSlider#seek::sub-page:horizontal { background:$accent; }
 QSlider#seek::sub-page:horizontal:disabled { background:$groove; }
+QSlider#seek[atstart="true"]::sub-page:horizontal { background:$groove; }
 QSlider#seek::handle:horizontal { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:-4px 0; border-radius:7px; }
 QSlider#seek::handle:horizontal:disabled { background:$off; }
 QSlider::handle:horizontal { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
