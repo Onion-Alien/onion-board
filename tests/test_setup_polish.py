@@ -50,15 +50,14 @@ def test_cable_not_installed_says_it_once(window, monkeypatch):  # noqa: F811
 
 
 def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch):  # noqa: F811
-    """Straight into the mic works: "Nothing to set." and one short line; the
+    """Straight into the mic works: one status line and no step; the
     noise-suppression how-to is behind the card's ⓘ, not a paragraph."""
     w = window
     _mic_works(w, monkeypatch)
     w._show_route()
     w._update_status()
-    step = w.step_lbl.text()
-    assert "Nothing to set" in step
-    assert "noise suppression" not in step.lower()
+    assert w.mic_line.text() == "Your sounds go into your mic"
+    assert w.step_lbl.isHidden() and w.mic_reason.isHidden()
     b = w.btn_mictips
     assert not b.isHidden()
     assert b.toolTip() and b.accessibleName()

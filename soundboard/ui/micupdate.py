@@ -14,7 +14,7 @@ from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath
 from PySide6.QtWidgets import (QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
                                QPushButton, QStyle, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard import michelper, theme
 from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -81,13 +81,16 @@ class MicUpdateOffer(QFrame):
         body = QVBoxLayout()
         body.setContentsMargins(18, 12, 18, 18)
         body.setSpacing(8)
+        ask = michelper.will_ask()   # the mic helper with this part: no prompt
         self.body = QLabel(_("Windows asks for permission. Audio pauses briefly during "
-                             "the update."))
+                             "the update.") if ask else
+                           _("Audio pauses briefly during the update."))
         self.body.setWordWrap(True)
         body.addWidget(self.body)
         self.note = QLabel(prompt_note(frozen))
         self.note.setObjectName("hint")
         self.note.setWordWrap(True)
+        self.note.setVisible(ask)
         body.addWidget(self.note)
         body.addSpacing(4)
         # the footer: where to find it later, then the actions (main one first)
@@ -99,7 +102,8 @@ class MicUpdateOffer(QFrame):
         row.addWidget(self.later_note, 1)
         self.btn_install = QPushButton(_("Install update"))
         self.btn_install.setObjectName("primary")
-        _shield(self.btn_install)
+        if ask:
+            _shield(self.btn_install)
         self.btn_install.clicked.connect(self._install)
         row.addWidget(self.btn_install)
         self.btn_later = QPushButton(_("Not now"))

@@ -23,7 +23,7 @@ def wait(qapp, condition):
 @pytest.mark.parametrize('action', ['repair', 'reinstall', 'remove'])
 def test_confirmation_cancel_changes_nothing(window, monkeypatch, action):  # noqa: F811
     asked = []
-    monkeypatch.setattr(dm, '_elevated', lambda *a: asked.append(a))
+    monkeypatch.setattr(dm, '_elevated', lambda *a, **k: asked.append(a))
     d = SettingsDialog(window, 'audio')
     card = d.findChild(RecoveryCard)
     card.confirm(action, card.shown()[0])
@@ -97,8 +97,9 @@ def test_clean_install_preflights_replacement_and_preserves_failed_removal(monke
     dll = tmp_path / 'missing.dll'
     calls = []
     monkeypatch.setattr(dm, 'bundled_dll', lambda: dll)
-    monkeypatch.setattr(dm, 'admin_uninstall', lambda: calls.append('remove') or 1)
-    monkeypatch.setattr(dm, 'admin_install', lambda guid, **k: calls.append('install') or 0)
+    monkeypatch.setattr(dm, '_audio_off', lambda work: work())
+    monkeypatch.setattr(dm, '_take_off', lambda only: calls.append('remove') or 1)
+    monkeypatch.setattr(dm, '_put_on', lambda guid, slot, dll: calls.append('install') or 0)
     monkeypatch.setattr(dm, 'registered_dll', lambda: None)
     assert dm.admin_reinstall('guid') == 3
     assert not calls
@@ -108,7 +109,7 @@ def test_clean_install_preflights_replacement_and_preserves_failed_removal(monke
     dll.write_bytes(b'dll')
     assert dm.admin_reinstall('guid') == 1
     assert calls == ['remove']  # failed removal keeps recovery notes; never install over it
-    monkeypatch.setattr(dm, 'admin_uninstall', lambda: calls.append('remove') or 0)
+    monkeypatch.setattr(dm, '_take_off', lambda only: calls.append('remove') or 0)
     assert dm.admin_reinstall('guid') == 0
     assert calls[-2:] == ['remove', 'install']
 
@@ -127,9 +128,9 @@ def test_clean_reinstall_never_leaves_the_mic_without_a_part(monkeypatch, tmp_pa
     data.mkdir(parents=True)
     tried = []
 
-    def install(guid, slot=None, source=None):
-        tried.append('old' if source else 'new')
-        if source:
+    def install(guid, slot, source):
+        tried.append('new' if source == new else 'old')
+        if source != new:
             assert source.read_bytes() == b'old'   # a copy kept before the uninstall
             return 0
         if tried.count('new') <= fails:
@@ -141,11 +142,14 @@ def test_clean_reinstall_never_leaves_the_mic_without_a_part(monkeypatch, tmp_pa
     monkeypatch.setattr(dm, 'registered_dll', lambda: old)
     monkeypatch.setattr(dm, 'installed_on', lambda: ['guid'])
     monkeypatch.setattr(dm, 'data_dir', lambda: data)
-    monkeypatch.setattr(dm, 'admin_uninstall', lambda: old.unlink() or 0)   # old part gone
-    monkeypatch.setattr(dm, 'admin_install', install)
+    monkeypatch.setattr(dm, '_take_off', lambda only: old.unlink() or 0)   # old part gone
+    monkeypatch.setattr(dm, '_put_on', install)
     monkeypatch.setattr(dm.time, 'sleep', lambda s: None)
+    stops = []
+    monkeypatch.setattr(dm, '_audio_off', lambda work: stops.append(1) or work())
     assert dm.admin_reinstall('guid') == result
     assert tried == sources
+    assert stops == [1]   # one restart of Windows' audio for the whole job, retries too
     assert not list(data.parent.glob('obmic-previous*'))   # the copy doesn't stay
 
 
@@ -172,7 +176,7 @@ def test_clean_reinstall_uses_one_admin_prompt(monkeypatch, tmp_path):
     calls = []
     monkeypatch.setattr(dm, 'bundled_dll', lambda: dll)
     monkeypatch.setattr(dm, 'endpoint_for', lambda mic: 'guid')
-    monkeypatch.setattr(dm, '_elevated', lambda args: calls.append(args) or 0)
+    monkeypatch.setattr(dm, '_elevated', lambda args, **k: calls.append(args) or 0)
     assert dm.install('Test mic', clean=True) is None
     assert calls == [['reinstall', 'guid']]
 
@@ -408,7 +412,7 @@ def test_uninstall_one_mic_keeps_the_rest(monkeypatch):
 
 def test_uninstall_one_mic_from_the_command_line(monkeypatch):
     asked = []
-    monkeypatch.setattr(dm, '_elevated', lambda args: asked.append(args) or 0)
+    monkeypatch.setattr(dm, '_elevated', lambda args, **k: asked.append(args) or 0)
     assert dm.uninstall('{0.0.1.00000000}.{bbbbbbbb-0000-0000-0000-000000000002}') is None
     assert asked == [['uninstall', GUID_B]]
     assert dm.uninstall() is None and asked[-1] == ['uninstall']
@@ -509,7 +513,7 @@ def test_admin_cleanup_of_a_mic_with_notes_is_a_normal_remove(monkeypatch):
 
 def test_cleanup_from_the_command_line(monkeypatch):
     asked = []
-    monkeypatch.setattr(dm, '_elevated', lambda args: asked.append(args) or 0)
+    monkeypatch.setattr(dm, '_elevated', lambda args, **k: asked.append(args) or 0)
     assert dm.cleanup(GUID_B) is None and asked == [['cleanup', GUID_B]]
 
 

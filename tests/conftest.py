@@ -351,6 +351,8 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     def no_task(*_a, **_k):
         raise AssertionError("a test tried to use Windows' Task Scheduler")
     monkeypatch.setattr(michelper, "helper_dir", lambda: tmp_path / "guard" / "Helper")
+    # "will Windows ask": known, no helper (like CI), so no check runs on a thread
+    monkeypatch.setattr(michelper, "_known", {True: False, False: False})
     monkeypatch.setattr(michelper, "queue_dir", lambda: tmp_path / "guard" / "MicHelper")
     monkeypatch.setattr(michelper, "_schtasks", no_task)
     directmic.forget_status()
