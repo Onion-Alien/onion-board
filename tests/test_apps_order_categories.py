@@ -201,6 +201,25 @@ def test_reorder_category_headings(tab):
     assert tab.cfg.apps_categories[0] == "Other"
 
 
+def test_a_program_saved_in_a_category_that_is_gone_still_gets_a_place(qapp, monkeypatch):
+    """A remembered program whose category isn't in the list any more (a restored
+    backup, a category deleted while it wasn't listed) goes to its usual one: the
+    layout only places the categories it knows, so the card would vanish."""
+    from soundboard.library import Config
+    from tests.test_appspanel import AppsTab, Engine, FakeCapture, Meter
+    monkeypatch.setattr(appspanel.appaudio, "AppCapture", FakeCapture)
+    monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda strict=False, **_: [])
+    cfg = Config()
+    cfg.apps = {"spotify.exe": {"vol": 1.0, "category": "Gone"}}
+    cfg.apps_categories = ["Browsers", "Other"]
+    t = AppsTab(Engine(), cfg, lambda: None, Meter)
+    try:
+        row = t.rows["spotify.exe"]
+        assert row.category == "Music & media" and row.category in t.grid.category_order
+    finally:
+        t.shutdown()
+
+
 def test_custom_category_lifecycle(tab):
     apps = [App(1, "custom.exe")]
     tab._on_apps(apps)
