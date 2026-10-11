@@ -230,7 +230,7 @@ def _oval(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angl
     p.save()
     p.translate(cx, cy)
     p.rotate(angle)
-    p.setPen(pen or Qt.NoPen)
+    p.setPen(pen or Qt.PenStyle.NoPen)
     p.setBrush(fill)
     p.drawEllipse(QRectF(-w / 2, -h / 2, w, h))
     p.restore()
@@ -239,7 +239,7 @@ def _oval(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angl
 class ScribeBunny(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setFixedSize(SLOT_W, SLOT_H)
         self.state = "parsing"       # parsing | downloading | processing | done | failed
         self.prog = 0.0              # 0..1 downloaded
@@ -323,9 +323,9 @@ class ScribeBunny(QWidget):
             dpr = self._scale
             pm = QPixmap(round(SLOT_W * dpr), round(SLOT_H * dpr))
             pm.setDevicePixelRatio(dpr)
-            pm.fill(Qt.transparent)
+            pm.fill(Qt.GlobalColor.transparent)
             q = QPainter(pm)
-            q.setRenderHint(QPainter.Antialiasing)
+            q.setRenderHint(QPainter.RenderHint.Antialiasing)
             draw(q)
             q.end()
             self._layers[key] = pm
@@ -348,7 +348,7 @@ class ScribeBunny(QWidget):
         p = QPainter(self)
         # the kept pictures are made at the screen's real pixel size (or a zoomed render's)
         self._scale = round(max(p.device().devicePixelRatioF(), p.deviceTransform().m11()), 2)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setClipRect(self.rect())
         done = self.state == "done"
         hop = dx = ears = 0.0
@@ -383,8 +383,8 @@ class ScribeBunny(QWidget):
 
     def _scroll(self, p: QPainter, t: float, age: float):
         ink = QPen(INK, 1.4)
-        ink.setJoinStyle(Qt.RoundJoin)
-        ink.setCapStyle(Qt.RoundCap)
+        ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        ink.setCapStyle(Qt.PenCapStyle.RoundCap)
         done = self.state == "done"
         # an open scroll: a sheet between two wooden rollers, one at the top and one at
         # the bottom. When he's done the rollers wind in to meet in the middle, side by
@@ -468,7 +468,7 @@ class ScribeBunny(QWidget):
         p.setPen(ink)
         p.setBrush(PARCHMENT_DARK)
         p.drawRoundedRect(QRectF(xl, cy - r, xr - xl, 2 * r), r, r)
-        p.setPen(QPen(QColor("#f8ecc8"), 0.9, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor("#f8ecc8"), 0.9, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(QPointF(xl + 3, cy - r * 0.35), QPointF(xr - 3, cy - r * 0.35))   # a glint
         for x in (xl - 1.6, xr + 1.6):
             _oval(p, x, cy, 4.2, 2 * r + 2.0, WOOD, QPen(INK, 1.2))
@@ -507,8 +507,9 @@ class ScribeBunny(QWidget):
                      QPointF(x + 0.4, g + 0.6))
         path.cubicTo(QPointF(x + 1.3, g + 0.1), QPointF(x + 0.6, g - 1.1),
                      QPointF(x - 0.1, g - 0.4))
-        p.setPen(QPen(INK, 0.4, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(INK, 0.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                      Qt.PenJoinStyle.RoundJoin))
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
     def _note(self, p: QPainter, n: Note, k: float):
@@ -519,9 +520,10 @@ class ScribeBunny(QWidget):
         p.translate(n.x, cy)
         p.scale(k, k)
         p.translate(-n.x, -cy)
-        ink = QPen(INK, 0.35, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        ink = QPen(INK, 0.35, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                   Qt.PenJoinStyle.RoundJoin)
         p.setPen(ink)
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         if n.rest:
             self._rest(p, n, mid)
             p.restore()
@@ -581,7 +583,7 @@ class ScribeBunny(QWidget):
     def _beams(self, p: QPainter, written: list[Note]):
         """Join each run of beamed notes at their stems' ends: one beam for eighths, a
         second for sixteenths."""
-        p.setPen(QPen(INK, 0.55, Qt.SolidLine, Qt.FlatCap))
+        p.setPen(QPen(INK, 0.55, Qt.PenStyle.SolidLine, Qt.PenCapStyle.FlatCap))
         for a, b in zip(written, written[1:]):
             if not (a.beamed and b.beamed and a.stem_end == b.stem_end and a.up == b.up
                     and a.row == b.row and int(a.start + 1e-6) == int(b.start + 1e-6)):
@@ -595,8 +597,8 @@ class ScribeBunny(QWidget):
 
     def _slurs(self, p: QPainter, written: list[Note]):
         """A curved line over (or under) each phrase marked as a slur, once it's done."""
-        p.setPen(QPen(INK, 0.3, Qt.SolidLine, Qt.RoundCap))
-        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(INK, 0.3, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
         start = None
         for n in written:
             if n.slur_start:
@@ -623,13 +625,14 @@ class ScribeBunny(QWidget):
         p.translate(x, y)
         p.rotate(28)   # leaning right, out of his face
         p.scale(0.56, 0.56)
-        p.setPen(QPen(INK, 1.6, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(INK, 1.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(QPointF(0, 0), QPointF(13, -22))
         feather = QPainterPath(QPointF(5, -9))
         feather.cubicTo(QPointF(8, -26), QPointF(24, -34), QPointF(25, -34))
         feather.cubicTo(QPointF(24, -22), QPointF(16, -10), QPointF(8, -8))
         feather.closeSubpath()
-        p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setPen(QPen(INK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                      Qt.PenJoinStyle.RoundJoin))
         p.setBrush(QColor(theme.T["accent"]).lighter(125))
         p.drawPath(feather)
         _oval(p, 4.5, -7, 12, 10, FUR, QPen(INK, 1.8))   # the paw

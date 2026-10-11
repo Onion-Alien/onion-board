@@ -51,7 +51,7 @@ class ProgramPicker(QDialog):
               "itself. When it closes, the board goes back to what it showed before.",
               category=category)))
         self.list = QListWidget()
-        self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.list.setIconSize(QSize(20, 20))
         self.list.setMinimumSize(380, 260)
         self.list.itemSelectionChanged.connect(self._update)
@@ -74,7 +74,7 @@ class ProgramPicker(QDialog):
         lay.addLayout(row)
         self._icons = QFileIconProvider()
         self._wait = QListWidgetItem(_("Looking for open programs…"))
-        self._wait.setFlags(Qt.NoItemFlags)
+        self._wait.setFlags(Qt.ItemFlag.NoItemFlags)
         self.list.addItem(self._wait)
         carrier, me, lister = _carrier(), id(self), self._lister
         carrier.listed.connect(self._on_listed)
@@ -94,7 +94,7 @@ class ProgramPicker(QDialog):
             self._add(exe, path, title)
         if not self.list.count():
             li = QListWidgetItem(_("No open programs found. Use Browse for a program."))
-            li.setFlags(Qt.NoItemFlags)
+            li.setFlags(Qt.ItemFlag.NoItemFlags)
             self.list.addItem(li)
         self._update()
 
@@ -106,7 +106,7 @@ class ProgramPicker(QDialog):
         elif cat:
             text = _("{program}    (now shows “{category}”)", program=text, category=cat)
         li = QListWidgetItem(text)
-        li.setData(Qt.UserRole, exe)
+        li.setData(Qt.ItemDataRole.UserRole, exe)
         li.setToolTip(path or exe)
         if path:
             try:
@@ -126,16 +126,16 @@ class ProgramPicker(QDialog):
         if not exe:
             return
         for i in range(self.list.count()):
-            if self.list.item(i).data(Qt.UserRole) == exe:
+            if self.list.item(i).data(Qt.ItemDataRole.UserRole) == exe:
                 self.list.setCurrentRow(i)
                 return
-        if self.list.count() == 1 and not self.list.item(0).data(Qt.UserRole):
+        if self.list.count() == 1 and not self.list.item(0).data(Qt.ItemDataRole.UserRole):
             self.list.clear()   # the "Looking…" / "none found" line
         self.list.setCurrentItem(self._add(exe, path))
 
     def _chosen(self) -> list[str]:
-        return [li.data(Qt.UserRole) for li in self.list.selectedItems()
-                if li.data(Qt.UserRole)]
+        return [li.data(Qt.ItemDataRole.UserRole) for li in self.list.selectedItems()
+                if li.data(Qt.ItemDataRole.UserRole)]
 
     def _update(self):
         self.btn_ok.setEnabled(bool(self._chosen()))

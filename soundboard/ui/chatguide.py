@@ -46,7 +46,7 @@ def _warn() -> str:
 def _label(text: str, css: str = "font-size:11pt;") -> QLabel:
     lbl = QLabel(text)
     lbl.setWordWrap(True)
-    lbl.setTextFormat(Qt.RichText)
+    lbl.setTextFormat(Qt.TextFormat.RichText)
     lbl.setStyleSheet(css)
     return lbl
 

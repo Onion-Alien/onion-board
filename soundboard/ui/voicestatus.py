@@ -28,8 +28,8 @@ class Chip(QPushButton):
         super().__init__()
         self.key = key
         self.setObjectName("vchip")
-        self.setCursor(Qt.PointingHandCursor)
-        self.setFocusPolicy(Qt.TabFocus)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.setIconSize(QSize(16, 16))
         self.setFixedHeight(ROW_H)
         self._look = ("", "", None)
@@ -66,8 +66,8 @@ class VoiceStatusBar(QFrame):
         self.setObjectName("voicebar")
         # never what holds the window wide (below ~520 px it became the mini player):
         # narrow, it goes to two rows and the chips wrap (_fit)
-        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-        box = self._box = QBoxLayout(QBoxLayout.LeftToRight, self)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        box = self._box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self)
         box.setContentsMargins(14, 10, 14, 10)
         box.setSpacing(GAP)
 
@@ -115,7 +115,7 @@ class VoiceStatusBar(QFrame):
                     chip = QLabel()
                     chip.setObjectName("voicebarlabel")
                     chip.setFixedHeight(ROW_H)
-                    chip.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+                    chip.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
                 else:
                     chip = Chip(key)
                     chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
@@ -167,12 +167,12 @@ class VoiceStatusBar(QFrame):
         # squeeze it below that, put them underneath instead.
         mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
         need = max(160, (self.width() + 1) // 2 + mic_labels) + GAP + line
-        d = QBoxLayout.LeftToRight if room >= need else QBoxLayout.TopToBottom
+        d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
-        self._right.setMinimumWidth(line if d == QBoxLayout.LeftToRight else 0)
+        self._right.setMinimumWidth(line if d == QBoxLayout.Direction.LeftToRight else 0)
         # Flow's hint remembers its last width. Without a cap it takes the spare
         # room on the next layout pass and squeezes the mic meter to its minimum.
-        self._right.setMaximumWidth(line if d == QBoxLayout.LeftToRight else 16777215)
+        self._right.setMaximumWidth(line if d == QBoxLayout.Direction.LeftToRight else 16777215)
         if self._box.direction() != d:
             self._box.setDirection(d)
-            self._box.setSpacing(GAP if d == QBoxLayout.LeftToRight else 8)
+            self._box.setSpacing(GAP if d == QBoxLayout.Direction.LeftToRight else 8)

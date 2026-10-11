@@ -277,7 +277,8 @@ class WhatsNewDialog(QDialog):
             f'{_("Chat about it on Discord")}</a>')
         chat.setObjectName("hint")
         chat.setToolTip(_("The Onion Board Discord server, in your browser"))
-        chat.setTextInteractionFlags(Qt.LinksAccessibleByMouse | Qt.LinksAccessibleByKeyboard)
+        chat.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse
+                                     | Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
         chat.setOpenExternalLinks(True)
         lay.addWidget(chat)
         buttons = QHBoxLayout()
@@ -313,7 +314,7 @@ class WhatsNewDialog(QDialog):
         h = QHBoxLayout(row)
         h.setContentsMargins(12, 9, 12, 10)
         h.setSpacing(10)
-        h.addWidget(icon_label(icon), 0, Qt.AlignTop)
+        h.addWidget(icon_label(icon), 0, Qt.AlignmentFlag.AlignTop)
         v = QVBoxLayout()
         v.setSpacing(2)
         t = QLabel(title)

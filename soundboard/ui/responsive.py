@@ -77,7 +77,8 @@ def icon_only(button: QPushButton) -> Callable[[bool], None]:
 def stack(layout: QBoxLayout) -> Callable[[bool], None]:
     """Side-by-side columns become one column."""
     def apply(compact: bool):
-        layout.setDirection(QBoxLayout.TopToBottom if compact else QBoxLayout.LeftToRight)
+        layout.setDirection(QBoxLayout.Direction.TopToBottom if compact
+                            else QBoxLayout.Direction.LeftToRight)
     return apply
 
 

@@ -83,9 +83,9 @@ class Meter(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = self.rect()
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T["groove"]))
         rad = min(4.0, r.height() / 2)
         p.drawRoundedRect(r, rad, rad)
@@ -117,9 +117,9 @@ class EqCurve(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T["bg"]))
         p.drawRoundedRect(r, 8, 8)
         mid = r.center().y()
@@ -135,18 +135,18 @@ class EqCurve(QWidget):
             path.moveTo(x, y) if i == 0 else path.lineTo(x, y)
         col = QColor(theme.T["accent"] if self.on else theme.T["off"])
         p.setPen(QPen(col, 2.2))
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
         if not self.on:   # on a little plate, so the flat line doesn't strike it through
             fm = p.fontMetrics()
             off = _("EQ off")
             plate = QRectF(0, 0, fm.horizontalAdvance(off) + 14, fm.height() + 4)
             plate.moveCenter(r.center())
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(theme.T["bg"]))
             p.drawRoundedRect(plate, plate.height() / 2, plate.height() / 2)
             p.setPen(QColor(theme.T["muted"]))
-            p.drawText(plate, Qt.AlignCenter, off)
+            p.drawText(plate, Qt.AlignmentFlag.AlignCenter, off)
 
 
 class SeekSlider(QSlider):
@@ -157,7 +157,7 @@ class SeekSlider(QSlider):
         self.setAccessibleName(_("Playback position"))   # a screen reader said nothing on it
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             self.setValue(QStyle.sliderValueFromPosition(
                 self.minimum(), self.maximum(), int(e.position().x()), self.width()))
         super().mousePressEvent(e)
@@ -196,7 +196,7 @@ class NameAndSeek(QWidget):
         self.seek.setGeometry(x, (h - sh) // 2, max(0, self.width() - x), sh)
 
     def eventFilter(self, obj, event):
-        if obj is self.name and event.type() in (QEvent.Show, QEvent.Hide):
+        if obj is self.name and event.type() in (QEvent.Type.Show, QEvent.Type.Hide):
             self.relayout()
         return super().eventFilter(obj, event)
 
@@ -206,7 +206,7 @@ class NameAndSeek(QWidget):
 
     def changeEvent(self, e):
         super().changeEvent(e)
-        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+        if e.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
             self.relayout()
 
 
@@ -254,10 +254,10 @@ class LoadingBar(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect())
         rad = r.height() / 2
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T.get("groove", "#343849")))
         p.drawRoundedRect(r, rad, rad)
         # the pill eases from one end to the other and back, stretching mid-glide
@@ -282,8 +282,8 @@ def paint_now_playing(p: QPainter, rect: QRectF, color: QColor, paused: bool = F
     gap = rect.width() / (n * 3 - 1)   # a bar is two gaps wide
     bw = gap * 2
     p.save()
-    p.setRenderHint(QPainter.Antialiasing)
-    p.setPen(Qt.NoPen)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(color)
     for i in range(n):
         f = 0.3 if paused else 0.25 + 0.75 * abs(math.sin(t * (2.3 + i * 0.9) + i * 1.7))
@@ -322,21 +322,21 @@ class SteadyTabs(QObject):
         super().__init__(tabs)
         self._tabs = tabs
         self._stack = tabs.findChild(QStackedWidget, "qt_tabwidget_stackedwidget",
-                                     Qt.FindDirectChildrenOnly)
+                                     Qt.FindChildOption.FindDirectChildrenOnly)
         self._last = None
         tabs.installEventFilter(self)
 
     def _state(self):
         t, bar = self._tabs, self._tabs.tabBar()
         corners = tuple(w.sizeHint() if w is not None and w.isVisible() else None
-                        for w in (t.cornerWidget(Qt.TopLeftCorner),
-                                  t.cornerWidget(Qt.TopRightCorner)))
+                        for w in (t.cornerWidget(Qt.Corner.TopLeftCorner),
+                                  t.cornerWidget(Qt.Corner.TopRightCorner)))
         return (t.size(), t.isVisible(), t.count(), t.currentIndex(), bar.sizeHint(),
                 bar.minimumSizeHint(), corners,
                 self._stack.minimumSizeHint() if self._stack is not None else None)
 
     def eventFilter(self, obj, ev):
-        if obj is self._tabs and ev.type() == QEvent.LayoutRequest:
+        if obj is self._tabs and ev.type() == QEvent.Type.LayoutRequest:
             state = self._state()
             if state == self._last:
                 return True
@@ -469,7 +469,7 @@ class Pad(QAbstractButton):
         self._hover_k = 0.0      # 0..1, eased in and out (the card lights up smoothly)
         self._hover_anim = QVariantAnimation(self)
         self._hover_anim.setDuration(HOVER_MS)
-        self._hover_anim.setEasingCurve(QEasingCurve.OutCubic)   # quick up, soft landing
+        self._hover_anim.setEasingCurve(QEasingCurve.Type.OutCubic)   # quick up, soft landing
         self._hover_anim.valueChanged.connect(self._on_hover_k)
         self._down = False       # pressed: the card sinks a little
         self._play_t = None      # when it started playing (the flash on start)
@@ -482,9 +482,9 @@ class Pad(QAbstractButton):
         self._foot = (None, None)     # (what the footer shows, its font, text and badge)
         self._wheel = 0               # Ctrl+wheel turned less than a notch (touchpads)
         self.setFixedSize(width, pad_height(width))
-        self.setCursor(Qt.PointingHandCursor)
-        self.setAttribute(Qt.WA_Hover)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.clicked.connect(lambda: self.activated.emit(self.meta.id))   # keyboard / a11y
         self.describe()
 
@@ -528,8 +528,10 @@ class Pad(QAbstractButton):
             self.setAccessibleDescription(desc)
 
     def focusInEvent(self, e):
-        self._kbd_focus = e.reason() in (Qt.TabFocusReason, Qt.BacktabFocusReason,
-                                         Qt.ShortcutFocusReason, Qt.OtherFocusReason)
+        self._kbd_focus = e.reason() in (Qt.FocusReason.TabFocusReason,
+                                         Qt.FocusReason.BacktabFocusReason,
+                                         Qt.FocusReason.ShortcutFocusReason,
+                                         Qt.FocusReason.OtherFocusReason)
         super().focusInEvent(e)
 
     def focusOutEvent(self, e):
@@ -538,28 +540,30 @@ class Pad(QAbstractButton):
 
     def keyPressEvent(self, e):
         k, mods = e.key(), e.modifiers()
-        arrows = {Qt.Key_Left: (-1, 0), Qt.Key_Right: (1, 0), Qt.Key_Up: (0, -1),
-                  Qt.Key_Down: (0, 1)}
-        if k == Qt.Key_Space and mods & Qt.ControlModifier:
+        arrows = {Qt.Key.Key_Left: (-1, 0), Qt.Key.Key_Right: (1, 0), Qt.Key.Key_Up: (0, -1),
+                  Qt.Key.Key_Down: (0, 1)}
+        if k == Qt.Key.Key_Space and mods & Qt.KeyboardModifier.ControlModifier:
             self.pick.emit(self.meta.id, False)
-        elif k == Qt.Key_Space and not mods:
+        elif k == Qt.Key.Key_Space and not mods:
             if not e.isAutoRepeat():
                 self.space.emit(self.meta.id)
-        elif k in (Qt.Key_Return, Qt.Key_Enter) and mods & Qt.AltModifier:
+        elif k in (Qt.Key.Key_Return, Qt.Key.Key_Enter) and mods & Qt.KeyboardModifier.AltModifier:
             self.edit.emit(self.meta.id)
-        elif k in (Qt.Key_Return, Qt.Key_Enter):
+        elif k in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.activated.emit(self.meta.id)
-        elif k == Qt.Key_F2 and not mods:
+        elif k == Qt.Key.Key_F2 and not mods:
             self.rename.emit(self.meta.id)
-        elif k == Qt.Key_Menu or (k == Qt.Key_F10 and mods & Qt.ShiftModifier):
+        elif k == Qt.Key.Key_Menu or (k == Qt.Key.Key_F10
+                                      and mods & Qt.KeyboardModifier.ShiftModifier):
             self.menu.emit(self.meta.id, self.mapToGlobal(self.rect().center()))
-        elif k in arrows and not mods & (Qt.ControlModifier | Qt.AltModifier):
+        elif k in arrows and not mods & (Qt.KeyboardModifier.ControlModifier
+                                         | Qt.KeyboardModifier.AltModifier):
             self.step.emit(self, *arrows[k])
         else:
             super().keyPressEvent(e)
 
     def changeEvent(self, e):
-        if e.type() == QEvent.FontChange:
+        if e.type() == QEvent.Type.FontChange:
             self._font_key = self.font().key()
         super().changeEvent(e)
 
@@ -570,7 +574,8 @@ class Pad(QAbstractButton):
         key = (self.meta.name, room.width(), room.height(), self._font_key)
         if self._name_fit is None or self._name_fit[0] != key:
             name = self.meta.name
-            wrap = Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap
+            wrap = (Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+                    | Qt.TextFlag.TextWordWrap)
             box = room.toRect()
             f = QFont(self.font())
             f.setBold(True)
@@ -583,8 +588,8 @@ class Pad(QAbstractButton):
                     self._name_fit = (key, (f, wrap, name))
                     break
             else:
-                one = Qt.AlignLeft | Qt.AlignVCenter
-                self._name_fit = (key, (f, one, fm.elidedText(name, Qt.ElideRight,
+                one = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+                self._name_fit = (key, (f, one, fm.elidedText(name, Qt.TextElideMode.ElideRight,
                                                               box.width())))
         return self._name_fit[1]
 
@@ -662,11 +667,11 @@ class Pad(QAbstractButton):
         self._fade_hover(False)
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             self._press = e.position().toPoint()
             self._down = True
             self.update()
-        elif e.button() == Qt.RightButton:
+        elif e.button() == Qt.MouseButton.RightButton:
             self.menu.emit(self.meta.id, e.globalPosition().toPoint())
 
     def mouseMoveEvent(self, e):
@@ -685,21 +690,22 @@ class Pad(QAbstractButton):
             shot = self.grab()
             dpr = shot.devicePixelRatio()
             half = shot.scaled(round(self.width() / 2 * dpr), round(self.height() / 2 * dpr),
-                               Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                               Qt.AspectRatioMode.KeepAspectRatio,
+                               Qt.TransformationMode.SmoothTransformation)
             half.setDevicePixelRatio(dpr)
             drag.setPixmap(half)
-            drag.exec(Qt.MoveAction)
+            drag.exec(Qt.DropAction.MoveAction)
 
     def mouseReleaseEvent(self, e):
         if self._down:
             self._down = False
             self.update()
-        if e.button() == Qt.LeftButton and self._press is not None:
+        if e.button() == Qt.MouseButton.LeftButton and self._press is not None:
             self._press = None
             mods = e.modifiers()
-            if mods & Qt.ShiftModifier:
+            if mods & Qt.KeyboardModifier.ShiftModifier:
                 self.pick.emit(self.meta.id, True)
-            elif mods & Qt.ControlModifier:
+            elif mods & Qt.KeyboardModifier.ControlModifier:
                 self.pick.emit(self.meta.id, False)
             elif Pad.single_click:
                 self.activated.emit(self.meta.id)
@@ -708,7 +714,7 @@ class Pad(QAbstractButton):
 
     def wheelEvent(self, e):
         """Ctrl+wheel: the sound's volume. A plain wheel still scrolls the pads."""
-        if not e.modifiers() & Qt.ControlModifier:
+        if not e.modifiers() & Qt.KeyboardModifier.ControlModifier:
             e.ignore()
             return
         self._wheel += e.angleDelta().y()
@@ -722,8 +728,8 @@ class Pad(QAbstractButton):
         if Pad.single_click:   # a quick second click is just another click
             self.mousePressEvent(e)
             return
-        if e.button() == Qt.LeftButton and not e.modifiers() & (Qt.ShiftModifier |
-                                                                  Qt.ControlModifier):
+        if e.button() == Qt.MouseButton.LeftButton and not e.modifiers() & (
+                Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.ControlModifier):
             self._press = None
             self.activated.emit(self.meta.id)
 
@@ -733,7 +739,7 @@ class Pad(QAbstractButton):
             self._paint_slim()
             return
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
         accent = self._accent_colour()
         C = pad_colours()
@@ -741,7 +747,7 @@ class Pad(QAbstractButton):
         if self._down:
             r.adjust(1.5, 1.5, -1.5, -1.5)
         elif k > 0.0:   # the mouse over it: it lifts off a soft shadow
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             for grow, alpha in ((0.0, 60), (1.0, 30), (2.0, 14)):   # a blur, cheaply
                 p.setBrush(QColor(0, 0, 0, int(alpha * k)))
                 p.drawRoundedRect(r.adjusted(-grow, HOVER_LIFT - grow + 0.5,
@@ -794,7 +800,7 @@ class Pad(QAbstractButton):
             # progress: a thin accent line along the bottom edge
             p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * self.progress, 3), accent)
             p.restore()
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         if playing:
             glow = QColor(accent)   # breathes while it plays
             glow.setAlpha(60 if self.paused else int(105 + 35 * math.sin(now * 5)))
@@ -802,29 +808,29 @@ class Pad(QAbstractButton):
             p.drawPath(path)
             pen = QPen(accent, 2.2)
             if self.paused:
-                pen.setStyle(Qt.DashLine)
+                pen.setStyle(Qt.PenStyle.DashLine)
             p.setPen(pen)
         elif self.picked:
             p.setPen(QPen(C["accent"], 2.4))
         elif self.selected:
             p.setPen(QPen(C["border_hi"], 1.6))
         else:   # at rest: no outline, the card's own shade is enough
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
         p.drawPath(path)
         if self.picked:   # a tick in the corner, so it reads as picked while playing too
             c = QRectF(r.right() - 24, r.top() + 6, 18, 18)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(C["accent"])
             p.drawEllipse(c)
             tick = QPen(C["on_accent"], 2.2)   # white vanished on yellow accents
-            tick.setCapStyle(Qt.RoundCap)
+            tick.setCapStyle(Qt.PenCapStyle.RoundCap)
             p.setPen(tick)
             p.drawPolyline([QPointF(c.left() + 5, c.center().y()),
                             QPointF(c.left() + 8, c.bottom() - 5),
                             QPointF(c.right() - 4, c.top() + 5)])
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(C["text_hi"], 1.4, Qt.DashLine))
+            p.setPen(QPen(C["text_hi"], 1.4, Qt.PenStyle.DashLine))
             p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
         on_pic = pic is not None
         # name
@@ -845,22 +851,23 @@ class Pad(QAbstractButton):
         p.setFont(f)
         if self.state in ("loading", "rendering"):
             p.setPen(muted)
-            p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
+            p.drawText(foot, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
                        _("applying effects…") if self.state == "rendering" else _("loading…"))
         elif self.state == "error":
             p.setPen(_ERROR_ON_PIC if on_pic else C["error_text"])   # readable on light
-            p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, _("can't load file"))
+            p.drawText(foot, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                       _("can't load file"))
         else:
             p.setPen(muted)
-            p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
+            p.drawText(foot, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, right)
             if badge is not None:
                 hk, w = badge
                 box = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)
-                p.setPen(Qt.NoPen)
+                p.setPen(Qt.PenStyle.NoPen)
                 p.setBrush(C["badge"])
                 p.drawRoundedRect(box, 5, 5)
                 p.setPen(C["badge_text"])
-                p.drawText(box, Qt.AlignCenter, hk)
+                p.drawText(box, Qt.AlignmentFlag.AlignCenter, hk)
 
     def _picture(self, r: QRectF):
         """The pad's picture fitted to `r` in real pixels with its shade drawn on, or
@@ -879,7 +886,7 @@ class Pad(QAbstractButton):
     def _paint_slim(self):
         """A one-line row: accent dot, name, duration; progress along the bottom."""
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
         T = theme.T
         accent = QColor(self.meta.color)
@@ -904,19 +911,19 @@ class Pad(QAbstractButton):
         if playing:
             pen = QPen(accent, 1.8)
             if self.paused:
-                pen.setStyle(Qt.DashLine)
+                pen.setStyle(Qt.PenStyle.DashLine)
         elif self.picked:
             pen = QPen(QColor(T["accent"]), 2)
         elif self.selected:
             pen = QPen(QColor(T["border_hi"]), 1.4)
         else:
-            pen = Qt.NoPen
+            pen = Qt.PenStyle.NoPen
         p.setPen(pen)
         p.drawPath(path)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(QColor(T["text_hi"]), 1.2, Qt.DashLine))
+            p.setPen(QPen(QColor(T["text_hi"]), 1.2, Qt.PenStyle.DashLine))
             p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         dot = QRectF(r.left() + 9, r.center().y() - 4, 8, 8)
         if self.meter:   # the row's level meter: a halo round the dot, as loud as it is
             halo = QColor(accent)
@@ -943,25 +950,26 @@ class Pad(QAbstractButton):
             rc = T["muted"]
         rw = fm.horizontalAdvance(right) + 4
         p.setPen(QColor(rc))
-        p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignRight | Qt.AlignVCenter, right)
+        p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignmentFlag.AlignRight
+                   | Qt.AlignmentFlag.AlignVCenter, right)
         hk = self.meta.hotkey and (midi.short(self.meta.hotkey) if midi.is_midi(self.meta.hotkey)
                                    else pretty_key(self.meta.hotkey))
         if hk and r.width() >= 200:   # the key as a badge left of the length, room allowing
             bw = fm.horizontalAdvance(hk) + 10
             if bw <= r.width() * 0.4:
                 box = QRectF(r.right() - 9 - rw - 4 - bw, r.center().y() - 9, bw, 18)
-                p.setPen(Qt.NoPen)
+                p.setPen(Qt.PenStyle.NoPen)
                 p.setBrush(pad_colours()["badge"])
                 p.drawRoundedRect(box, 5, 5)
                 p.setPen(pad_colours()["badge_text"])
-                p.drawText(box, Qt.AlignCenter, hk)
+                p.drawText(box, Qt.AlignmentFlag.AlignCenter, hk)
                 rw += bw + 8
         f.setBold(True)
         p.setFont(f)
         text_r = r.adjusted(24, 0, -14 - rw, 0)
         p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
-        p.drawText(text_r, Qt.AlignLeft | Qt.AlignVCenter,
-                   p.fontMetrics().elidedText(self.meta.name, Qt.ElideRight,
+        p.drawText(text_r, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                   p.fontMetrics().elidedText(self.meta.name, Qt.TextElideMode.ElideRight,
                                               int(text_r.width())))
 
     def _paint_meter(self, p: QPainter, r: QRectF, accent: QColor):
@@ -971,7 +979,7 @@ class Pad(QAbstractButton):
             return
         # from under the top corner to just above the footer (the hotkey badge)
         track = QRectF(r.left() + 4, r.top() + PAD_RADIUS, 3, r.height() - PAD_RADIUS - 28)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         dim = QColor(accent)
         dim.setAlpha(40)
         p.setBrush(dim)
@@ -1008,7 +1016,7 @@ class Pad(QAbstractButton):
         grad = QLinearGradient(0, area.top(), 0, area.bottom())
         grad.setColorAt(0.0, top)
         grad.setColorAt(1.0, bottom)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(grad)
         rad = min(bw / 2, 2.5)
         for i, lv in enumerate(bands):
@@ -1043,13 +1051,13 @@ class PadGrid(QWidget):
         self.grid = QGridLayout(self)
         self.grid.setSpacing(10)
         self.grid.setContentsMargins(4, 4, 4, 4)
-        self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.grid.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.setAcceptDrops(True)
-        self.setAttribute(Qt.WA_OpaquePaintEvent)   # see event()
+        self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)   # see event()
         # no sounds yet: Bun waits (sadly) above the how-to, and cheers up when
         # files are dragged over
         self.empty = QWidget()
-        self.empty.setAttribute(Qt.WA_TranslucentBackground)
+        self.empty.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         ev = QVBoxLayout(self.empty)
         ev.setContentsMargins(0, 24, 0, 4)
         ev.setSpacing(12)
@@ -1060,12 +1068,13 @@ class PadGrid(QWidget):
             hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),
             joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")), pong=True, naps=True)
         self.bun.setToolTip(_("Bun is waiting for some sounds"))
-        ev.addWidget(self.bun, 0, Qt.AlignHCenter)
+        ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
-        self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player
+        # short lines: fits the mini player
+        self.empty_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.empty_text.setWordWrap(True)   # and wraps rather than losing both ends
         self.empty_text.setObjectName("empty")
-        self.empty_text.setAttribute(Qt.WA_TranslucentBackground)
+        self.empty_text.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.empty_text.setStyleSheet("padding:8px 12px; background:transparent;")
         self.empty_text.setFixedHeight(self.DROP_HINT_HEIGHT)
         ev.addWidget(self.empty_text)
@@ -1199,11 +1208,11 @@ class PadGrid(QWidget):
             self.empty_text.setText(self.NO_MATCH if self.pads else self.HOW_TO)
             # across the whole width, however wide that is now (a fixed width here kept
             # the grid as wide as the window once was: a shrunk window showed nothing)
-            grid.setAlignment(Qt.AlignTop)
+            grid.setAlignment(Qt.AlignmentFlag.AlignTop)
             grid.addWidget(self.empty, 0, 0)
             self.empty.show()
             return
-        grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        grid.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.empty.hide()
         self.empty_text.setText(self.HOW_TO)
         for p, at in want.items():
@@ -1221,13 +1230,13 @@ class PadGrid(QWidget):
 
     def event(self, e):
         done = super().event(e)
-        if e.type() in (QEvent.Polish, QEvent.StyleChange, QEvent.ParentChange):
+        if e.type() in (QEvent.Type.Polish, QEvent.Type.StyleChange, QEvent.Type.ParentChange):
             # opaque: it paints the page colour behind itself (paintEvent), so a scroll
             # copies what's on screen and only the strip that came into view is drawn.
             # See-through, every pad in view was painted again on each wheel step. Qt
             # clears the flag when the scroll area adopts it and on each restyle (a
             # theme change), so it's set again after those
-            self.setAttribute(Qt.WA_OpaquePaintEvent)
+            self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
         return done
 
     def paintEvent(self, e):
@@ -1247,13 +1256,13 @@ class PadGrid(QWidget):
         drop = self.drop_area()
         if drop is not None and drop.intersects(QRectF(e.rect())):
             # the empty room under the pads says what it's for, faintly
-            p.setRenderHint(QPainter.Antialiasing)
-            pen = QPen(QColor(theme.T["border"]), 1.4, Qt.DashLine)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            pen = QPen(QColor(theme.T["border"]), 1.4, Qt.PenStyle.DashLine)
             p.setPen(pen)
             p.drawRoundedRect(drop, PAD_RADIUS, PAD_RADIUS)
             if self._n_shown:
                 p.setPen(QColor(theme.T["faint"]))
-                p.drawText(drop, Qt.AlignCenter, self.DROP_HINT)
+                p.drawText(drop, Qt.AlignmentFlag.AlignCenter, self.DROP_HINT)
 
     def drop_area(self) -> QRectF | None:
         """The same drop box below Bun on an empty board or below the last card row."""
@@ -1291,7 +1300,7 @@ class PadGrid(QWidget):
             return
         i = shown.index(pad) + dx + dy * max(1, self._cols)
         if 0 <= i < len(shown):
-            shown[i].setFocus(Qt.TabFocusReason)
+            shown[i].setFocus(Qt.FocusReason.TabFocusReason)
             area = self.parentWidget() and self.parentWidget().parentWidget()
             if isinstance(area, QScrollArea):
                 area.ensureWidgetVisible(shown[i])
