@@ -1018,6 +1018,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.dir.search("")    # drops any search still on its way
             self._results, self._search_failed = None, False
             self._show_list()
+            self._flash_until = 0.0    # no "Searching…" left over from the cleared words
+            self._refresh_info()
             return
         self._results, self._search_failed = None, False
         # soon: matches among the stations already known (not on every keystroke)
@@ -1046,6 +1048,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._remember(stations)
         self._results = [self._stations[s.uuid] for s in stations]
         self._show_list()
+        self._flash_until = 0.0        # the results are in: "Searching…" is over
         self._refresh_info()
 
     def _local_matches(self) -> list[Station]:
