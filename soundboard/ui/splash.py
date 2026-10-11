@@ -1,14 +1,11 @@
-"""The start-up splash: Bun sitting in the middle of the screen nodding along to his
-headphones, from the moment the QApplication exists until the main window is up. No
-card, spinner or caption: a soft glow in the theme's background colour behind him,
-his headphones and notes in its accent (the theme is read straight from config.json;
-the rest of the settings load later).
+"""A small start-up panel: a steady Bun, the app name and three gently pulsing dots.
+The theme is read straight from config.json; the rest of the settings load later.
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
 seconds importing and building the window, all on the UI thread. On Windows the
 splash therefore isn't a Qt window: a thread of its own draws each frame into a
 QImage at the monitor's real resolution (QPainter on a QImage is fine off the UI
-thread) and hands it to a native layered window, so Bun hops smoothly at 60 fps
+thread) and hands it to a native layered window, so the dots keep moving
 however busy the UI thread is. Elsewhere (the offscreen platform the tests use)
 it's a Qt widget that `pump()` repaints: `show()` hooks the import system so every
 module loaded meanwhile pumps it, and MainWindow calls `pump()` between its slower
@@ -27,23 +24,20 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QCursor, QGuiApplication, QImage, QPainter,
-                           QRadialGradient)
+from PySide6.QtGui import QColor, QCursor, QFont, QGuiApplication, QImage, QPainter
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme
-from soundboard.bunny import draw_bunny, music_note
+from soundboard.bunny import draw_bunny
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
-CARD_W, CARD_H = 320, 320   # logical px; the native window is this times the screen's scale
-BUN_W, BUN_H = 150, 180
-GLOW_R = 150     # the soft backdrop's radius
-BEAT = 0.9       # seconds per nod
-NOTES = 3        # notes in the air at once
-NOTE_S = 2.4     # seconds for a note to float up and fade
+CARD_W, CARD_H = 240, 248   # logical px, including 8 px around the rounded panel
+BUN_W, BUN_H = 80, 96
+PULSE_S = 1.8
 FRAME = 1 / 30   # seconds between repaints while pumping (the Qt fallback)
-NATIVE_FPS = 60
+NATIVE_FPS = 30
 # while it's up, Python hands the GIL over every 0.5 ms instead of every 5: each frame
 # takes the GIL dozens of times, and a busy UI thread would otherwise hold it 5 ms each
 SWITCH_S = 0.0005
@@ -52,69 +46,71 @@ CONFIG = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard" / "config.j
 
 _splash: Splash | NativeSplash | None = None
 _last = 0.0
-_sprites: dict[tuple, QImage] = {}   # Bun drawn once per (ears, blink, scale)
+_surfaces: dict[tuple, QImage] = {}   # only the dots need drawing on each frame
+_animate = True
 
 
-def _sprite(ears: float, blink: float, scale: float) -> QImage:
-    """Bun in this pose, drawn once at `scale` (device px per logical px) with room to
-    spare for the stretch, so a frame is one image draw instead of hundreds of
-    painter calls (the native splash shares the GIL with a busy UI thread)."""
-    key = (round(ears), blink, scale)
-    img = _sprites.get(key)
+def _surface(w: float, h: float, scale: float) -> QImage:
+    """Cache the stationary panel at the monitor's resolution, including its text."""
+    status = _("Starting…")
+    family = theme.T.get("font", theme.FONT)
+    key = (w, h, scale, tuple(theme.T.items()), family, status)
+    img = _surfaces.get(key)
     if img is None:
-        over = scale * 1.25
-        img = QImage(round(BUN_W * over), round(BUN_H * over), QImage.Format_ARGB32_Premultiplied)
+        img = QImage(round(w * scale), round(h * scale), QImage.Format_ARGB32_Premultiplied)
         img.fill(Qt.transparent)
         p = QPainter(img)
-        draw_bunny(p, QRectF(0, 0, img.width(), img.height()), blink=blink, ears=key[0])
-        p.end()
-        _sprites[key] = img
+        try:
+            p.scale(scale, scale)
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(theme.T["panel"]))
+            p.drawRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
+            draw_bunny(p, QRectF((w - BUN_W) / 2, 30, BUN_W, BUN_H))
+            font = QFont(family)
+            font.setPixelSize(18)
+            font.setWeight(QFont.DemiBold)
+            p.setFont(font)
+            p.setPen(QColor(theme.T["text_hi"]))
+            p.drawText(QRectF(20, 142, w - 40, 26), Qt.AlignCenter, "Onion Board")
+            font.setPixelSize(12)
+            font.setWeight(QFont.Normal)
+            p.setFont(font)
+            p.setPen(QColor(theme.T["muted"]))
+            p.drawText(QRectF(20, 171, w - 40, 22), Qt.AlignCenter, status)
+        finally:
+            p.end()
+        _surfaces[key] = img
     return img
 
 
 def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
-    """One frame of Bun sitting in the middle, nodding along to his headphones, `t`
-    seconds in, on a `w` x `h` (logical px) canvas that `p` maps onto `scale` device
-    px per logical px. He stays put and keeps his shape (no squash, no flipping): just
-    a nod, ears bouncing on the beat, a blink now and then and notes drifting up."""
-    beat = 2 * math.pi * t / BEAT
-    nod = math.sin(beat)
-    lift = 2.5 * (1 - math.cos(2 * beat)) / 2   # a little bounce on every beat
-    foot_x, foot_y = w / 2, h / 2 + BUN_H / 2 - 6
+    """A stationary panel; only the three dots change opacity, never size or position."""
     p.setRenderHint(QPainter.Antialiasing)
     p.setRenderHint(QPainter.SmoothPixmapTransform)
+    p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale))
     p.setPen(Qt.NoPen)
-    # a soft glow in the theme's background colour behind him, fading out to nothing,
-    # so he reads the same on any wallpaper without a hard-edged card
-    bg = QColor(theme.T["bg"])
-    glow = QRadialGradient(QPointF(w / 2, h / 2 + 8), GLOW_R)
-    for at, alpha in ((0.0, 235), (0.7, 220), (0.88, 110), (1.0, 0)):
-        c = QColor(bg)
-        c.setAlpha(alpha)
-        glow.setColorAt(at, c)
-    p.setBrush(glow)
-    p.drawEllipse(QPointF(w / 2, h / 2 + 8), GLOW_R, GLOW_R)
-    # his shadow on the floor
-    p.setBrush(QColor(0, 0, 0, 60))
-    p.drawEllipse(QRectF(foot_x - BUN_W * 0.3, foot_y - 6, BUN_W * 0.6, 12))
-    # notes floating up from his headphones
     accent = QColor(theme.T["accent"])
-    for i in range(NOTES):
-        u = ((t / NOTE_S) + i / NOTES) % 1.0       # 0..1 through this note's rise
-        side = -1 if i % 2 == 0 else 1
-        x = foot_x + side * (BUN_W * 0.42 + 14 * u) + 5 * math.sin(u * 7 + i)
-        y = foot_y - BUN_H * 0.55 - 70 * u
+    for i in range(3):
+        pulse = (1 - math.cos(2 * math.pi * (t - i * 0.2) / PULSE_S)) / 2
         c = QColor(accent)
-        c.setAlphaF(min(1.0, u * 5, (1 - u) * 2.2))
-        music_note(p, x - 5, y - 8, 1.35, c)
-    # Bun, nodding about his feet
-    p.save()
-    p.translate(foot_x, foot_y - lift)
-    p.rotate(3 * nod)
-    blink = 1.0 if (t % 3.1) > 2.95 else 0.0
-    p.drawImage(QRectF(-BUN_W / 2, -BUN_H, BUN_W, BUN_H),
-                _sprite(5 + 4 * math.sin(2 * beat), blink, scale))
-    p.restore()
+        c.setAlphaF(0.3 + 0.7 * pulse if _animate else 1.0)
+        p.setBrush(c)
+        p.drawEllipse(QPointF(w / 2 + (i - 1) * 11, h - 35), 2.5, 2.5)
+
+
+def _animations_enabled() -> bool:
+    """Read Windows' Animation effects preference without changing any settings."""
+    if sys.platform == "win32":
+        import ctypes
+        from ctypes import wintypes
+        try:
+            enabled = wintypes.BOOL(1)
+            if ctypes.windll.user32.SystemParametersInfoW(0x1042, 0, ctypes.byref(enabled), 0):
+                return bool(enabled.value)
+        except (AttributeError, OSError):
+            pass
+    return True
 
 
 class Splash(QWidget):
@@ -270,7 +266,8 @@ class NativeSplash:
                 while user.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):   # PM_REMOVE
                     user.TranslateMessage(ctypes.byref(msg))
                     user.DispatchMessageW(ctypes.byref(msg))
-                self._stop.wait(max(0.0, 1 / NATIVE_FPS - (time.monotonic() - start)))
+                interval = 1 / NATIVE_FPS if _animate else 0.25
+                self._stop.wait(max(0.0, interval - (time.monotonic() - start)))
         finally:
             user.DestroyWindow(hwnd)
             gdi.SelectObject(dc, old)
@@ -290,7 +287,8 @@ class _PumpOnImport:
 
 def show() -> Splash | NativeSplash:
     """Put the splash up, centred on the screen the mouse is on."""
-    global _splash
+    global _splash, _animate
+    _animate = _animations_enabled()
     try:
         theme.set_current(json.loads(CONFIG.read_text(encoding="utf-8-sig")).get("theme", ""))
     except Exception:  # noqa: BLE001 - first launch, or unreadable: the default theme
@@ -336,4 +334,4 @@ def close():
         _splash.close()
         _splash.deleteLater()
         _splash = None
-    _sprites.clear()
+    _surfaces.clear()

@@ -35,7 +35,8 @@ def test_splash_follows_the_saved_theme(qapp, tmp_path, monkeypatch):
         s = splash.show()
         assert theme.current_name == "Toxic"
         img = s.grab().toImage()
-        assert img.pixelColor(0, 0).alpha() == 0   # no card behind Bun any more
+        assert img.pixelColor(0, 0).alpha() == 0   # transparent outside the rounded panel
+        assert img.pixelColor(20, 20).name() == theme.T["panel"]
     finally:
         splash.close()
         theme.set_current(theme.DEFAULT)
@@ -51,8 +52,54 @@ def test_frames_draw_at_any_scale(qapp):
         img.fill(Qt.transparent)
         p = QPainter(img)
         p.scale(k, k)
-        splash.paint_frame(p, 0.3, splash.CARD_W, splash.CARD_H)
+        splash.paint_frame(p, 0.3, splash.CARD_W, splash.CARD_H, k)
         p.end()
         assert img.pixelColor(0, 0).alpha() == 0
         assert any(img.pixelColor(x, img.height() // 2).alpha() == 255
-                   for x in range(img.width()))   # Bun is in there, solid
+                   for x in range(img.width()))   # the panel is solid
+
+
+def _frame(t):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QImage, QPainter
+    img = QImage(splash.CARD_W, splash.CARD_H, QImage.Format_ARGB32_Premultiplied)
+    img.fill(Qt.transparent)
+    p = QPainter(img)
+    splash.paint_frame(p, t, splash.CARD_W, splash.CARD_H)
+    p.end()
+    return img
+
+
+def test_only_loading_dots_animate(qapp, monkeypatch):
+    """The mascot and text stay still; motion is confined to the small indicator."""
+    monkeypatch.setattr(splash, "_animate", True)
+    first, later = _frame(0), _frame(0.9)
+    assert splash.CARD_W <= 240 and splash.CARD_H <= 248
+    assert first.copy(0, 0, first.width(), 200) == later.copy(0, 0, later.width(), 200)
+    changed = [(x, y) for y in range(200, first.height()) for x in range(first.width())
+               if first.pixel(x, y) != later.pixel(x, y)]
+    assert changed
+    assert all(100 <= x <= 140 and 210 <= y <= 216 for x, y in changed)
+
+
+def test_reduced_motion_keeps_every_frame_static(qapp, monkeypatch):
+    monkeypatch.setattr(splash, "_animate", False)
+    assert _frame(0) == _frame(0.9) == _frame(2.5)
+
+
+def test_windows_animation_preference(monkeypatch):
+    import ctypes
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(splash.sys, "platform", "win32")
+
+    def preference(action, param, result, flags):
+        assert action == 0x1042
+        result._obj.value = 0
+        return 1
+
+    user = SimpleNamespace(SystemParametersInfoW=preference)
+    monkeypatch.setattr(ctypes, "windll", SimpleNamespace(user32=user), raising=False)
+    assert not splash._animations_enabled()
+    user.SystemParametersInfoW = lambda *args: 0   # unavailable: retain the default
+    assert splash._animations_enabled()
