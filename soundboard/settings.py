@@ -685,7 +685,9 @@ class SettingsDialog(QDialog):
     @staticmethod
     def _fill(sa: QScrollArea, page: QWidget):
         for label in page.findChildren(QLabel):
-            label.setWordWrap(True)
+            # (a short field label beside its control keeps one line: wrapping, the
+            # row squeezed it onto two with room to spare)
+            label.setWordWrap(not label.property("keepline"))
         for combo in page.findChildren(QComboBox):
             combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
             combo.setMinimumContentsLength(6)
@@ -1126,8 +1128,9 @@ class SettingsDialog(QDialog):
         test.clicked.connect(lambda: self.mw.overlay.open_by_click())
         row = QHBoxLayout()   # beside how the key works: two lines, not three
         row.setSpacing(8)
-        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode), 1)
-        row.addWidget(test)
+        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
+        row.addWidget(test)   # as wide as its words (it ran to the card's edge)
+        row.addStretch(1)
         cv.addLayout(row)
         v.addWidget(card)
 
@@ -1142,7 +1145,8 @@ class SettingsDialog(QDialog):
         row = QHBoxLayout()
         row.setSpacing(12)
         row.addWidget(QLabel(_("Auto-hide after")))
-        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide), 1)
+        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide))
+        row.addStretch(1)   # the choice right after its label, not at the card's far edge
         cv.addLayout(row)
         self.ov_toggle_only = (after, row.itemAt(1).widget())
         v.addWidget(card)
@@ -1401,15 +1405,12 @@ class SettingsDialog(QDialog):
         top.setChecked(self.mw.cfg.always_on_top)
         top.toggled.connect(self.mw.on_top_toggle)
         cv.addWidget(top)
-        one = QCheckBox(_("Play pads with one click"))
+        # its explanation under the box's text like every other option's (it sat at
+        # the card's edge)
+        one = self._option(cv, _("Play pads with one click"),
+                           _("Otherwise, double-click to play. Ctrl+click selects without "
+                             "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
         one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        one.setChecked(self.mw.cfg.single_click)
-        one.toggled.connect(self.mw.set_single_click)
-        cv.addWidget(one)
-        hint = QLabel(_("Otherwise, double-click to play. Ctrl+click selects without playing."))
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        cv.addWidget(hint)
         if hasattr(self.mw, "set_tips_on"):
             self.box_tips = self._option(
                 cv, _("Show tips"),
