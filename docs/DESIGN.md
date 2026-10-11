@@ -1,7 +1,8 @@
 ---
 # Onion Board design system: the machine-readable part.
-# Colour values live in soundboard/theme.py (THEMES): 30+ themes share these token
-# NAMES, so code always uses a token, never a hex value. The prose below says how.
+# Colour values live in soundboard/theme.py (THEMES): 31 themes (not 2 or 3: every
+# one is shipped and picked by real people) share these token NAMES, so code always
+# uses a token, never a hex value. The prose below says how; section 6 says how to check.
 name: Onion Board
 version: 3
 platform: PySide6 (Qt Widgets), styled by one app style sheet (theme.stylesheet)
@@ -29,7 +30,7 @@ colour_roles:          # token names in theme.THEMES; values change per theme
   item_hover: item_hover # a hovered menu / dropdown row (worked out per theme: always shows)
   text: text, text_hi (titles), muted (secondary), faint (disabled-looking)
   heading: section
-  accent: accent / accent_hi / on_accent   # main action, on-state, Live, playing
+  accent: accent / accent_hi / on_accent / accent_text   # main action, on-state, Live, playing; accent_text: as text or an icon on a surface
   accent2: accent2      # the logo's second colour, gradients only
   status: ok_text, warn_text / warn_bg, error_text, danger_* (destructive buttons)
 radius:
@@ -462,8 +463,21 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 
 ## 6. Colour
 
+- **There are 31 themes, not three.** Every colour you add has to work in all of
+  `theme.THEMES` (dark, light, true black, High Contrast's outlines, pale accents like
+  Flashbang's yellow, loud ones like Deep Fried, other fonts like Retro 98 and Comic
+  Sans). Dark and Light are the reference look; the others must look as finished.
 - Only theme tokens (`theme.T["accent"]`, `$accent` in the style sheet). Never a hex
-  value in widget code: it breaks 30+ themes, High Contrast and light themes.
+  value in widget code: it breaks the other 29 themes, High Contrast and light themes.
+  A new token is derived for every theme in `theme.py` (like `live_text`,
+  `accent_text`, `item_hover`), never filled in by hand for two of them.
+- The accent drawn **as text or an icon** straight on the window or a card uses
+  `accent_text` (`$accent_text`; `icons.icon(..., "accent")` does it for you): the plain
+  accent is for fills, and some themes' accent can't be read on their own background
+  (Flashbang's yellow on white was 1.4:1). Text on an accent fill is `on_accent`.
+- A rule for a widget that sits inside a card must be as specific as the card's generic
+  rules (`QFrame#setcard QPushButton:checked` filled the picked theme card with the
+  accent): give it a `QFrame#setcard ...` / `QFrame#card ...` twin.
 - **Accent means "do this" or "this is on"**: the main button, ticked boxes, toggles,
   the picked option, Live, the playing tile, the selected tab. Ticks and switches stay
   the accent colour when on, never grey.
@@ -475,8 +489,41 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 - Controls above and below a card grid start where the cards' panels do (the search
   results' Back and Show more).
 - Status text uses `theme.set_tone(label, "ok" | "warn" | "error")`, not a colour.
-- Check contrast in Dark, Light, High Contrast and Retro 98 at least: 4.5:1 for text,
-  3:1 for a control's edge.
+- Contrast in **every** theme: 4.5:1 for text, 3:1 for icons, bold labels and a
+  control's edge. `tests/test_every_theme.py` and `tests/test_ui_audit.py` check the
+  tokens in all 31; add a case there for a new colour role.
+- A live theme switch must leave nothing in the old theme's colours: anything that
+  bakes a colour in (an icon, a pixmap, a widget's own style sheet) is redrawn by
+  `icons.retheme()` / `MainWindow._apply_theme` or reads `theme.T` when it paints.
+
+### The states a feature is built for
+
+Not "dark, light, maybe hover". Every new screen, card or control is built and checked
+for all of these at once:
+
+| Axis | States |
+| --- | --- |
+| Theme | all 31 in `theme.THEMES`, picked at launch **and** switched to live from another theme |
+| Control | rest, hover, pressed, keyboard focus, checked / picked, disabled, busy |
+| Content | empty, one item, full (scrolling), long translated words (German) |
+| Window | 1180x720, 800x600, the mini player, right-to-left |
+| Route | the On Air card connected and not (*Setup needed*), with a toast up |
+
+The theme traits that broke things before (pick one theme of each kind when checking by eye;
+the tests check the tokens in all 31):
+
+| Trait | Themes | What breaks |
+| --- | --- | --- |
+| Pale accent on a light background | Flashbang, Barbie | the accent as text or an icon can't be read: use `accent_text` |
+| Accent close to grey or to the text colour | Carbon, Arctic, Hacker, Amber Terminal | anything filled with the accent under `text`-coloured words (grey on grey) |
+| Light backgrounds | Light, Paper, Mint, Cherry Blossom, Vaporwave, Flashbang, Barbie, Comic Sans, Retro 98 | bright dark-theme status colours, white text, shadows that assume dark |
+| Outlined, black on black | High Contrast | flat fills vanish: it keeps borders at rest (`OUTLINED`) |
+| Textures | Carbon, Synthwave, Brainrot, Amber Terminal, Hacker, Swamp, Deep Fried | flat colours painted over panels show as patches |
+| Other fonts | Amber Terminal, Hacker (Consolas), Retro 98 (Tahoma), Comic Sans | wider words: fixed widths cut text off |
+| Loud colours | Deep Fried, Brainrot, Synthwave | `text` is yellow / lime, so a hard-coded white or grey stands out |
+
+Never draw a fixed colour except a sound's own colour, the user's own highlight colour
+(`live_override`) and the status colours: those three stay as they are in every theme.
 
 ## 7. Text
 
@@ -541,10 +588,11 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 4. Cards: at least three of section 5's pieces, nothing that looks like a plain form?
 5. Text: sentence case, no long dashes, `_()`, `23%`, short plain words?
 6. Pictures of **every** state, rendered offscreen (`window` test fixture,
-   `widget.grab().save(...)`, `QT_QPA_FONTDIR=C:/Windows/Fonts`), in at least Dark and
-   one light theme, and one long-word language (German) if text changed. Look at
-   them before anyone else does: empty space, cut-off words, things the same colour
-   as what's behind them.
+   `widget.grab().save(...)`, `QT_QPA_FONTDIR=C:/Windows/Fonts`), in Dark and Light
+   and, for any colour change, **every theme in `theme.THEMES` (31)**: a fresh launch
+   in each and a live switch from Dark, plus one long-word language (German) if text
+   changed. Look at them before anyone else does: empty space, cut-off words, things
+   the same colour as what's behind them, the old theme's colours left after a switch.
 7. Icons and words aligned (section 4, *Icon and text alignment*): one icon column,
    one text keyline for every line, icons on the first line's cap height? Check a
    zoomed grab with guide lines.

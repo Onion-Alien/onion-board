@@ -407,6 +407,18 @@ def _add_item_hover_token(t: dict[str, str]) -> None:
                             and _contrast(c, t["text_hi"]) >= 4.5), _mix(card, t["text"], 0.25))
 
 
+def _add_accent_text_token(t: dict[str, str]) -> None:
+    """accent_text: the accent where it's drawn straight on the window or a card (an
+    icon, the bold *Add sounds*), not as a fill. Flashbang's yellow was 1.4:1 on white:
+    the accent moved towards the text colour until it reads (3:1, the bar for icons and
+    bold words). Most themes' accent already does, and keeps its exact colour."""
+    if "accent_text" in t:
+        return
+    t["accent_text"] = next(c for c in (_mix(t["accent"], t["text_hi"], i / 20) for i in range(21))
+                            if min(_contrast(c, t[b]) for b in ("bg", "panel", "card")) >= 3.0
+                            or c == t["text_hi"])
+
+
 SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
 
 for _t in THEMES.values():
@@ -420,6 +432,7 @@ for _t in THEMES.values():
     _add_live_tokens(_t)
     _add_hover_token(_t)
     _add_item_hover_token(_t)
+    _add_accent_text_token(_t)
 
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
@@ -559,7 +572,7 @@ QFrame#soundstoolbar QPushButton { background:transparent; border:1px solid tran
 QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }
 QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
-QFrame#soundstoolbar QPushButton#soundadd { color:$accent; font-weight:600; }
+QFrame#soundstoolbar QPushButton#soundadd { color:$accent_text; font-weight:600; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
 QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
@@ -930,9 +943,14 @@ QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress {
     background:$groove; border:none; border-radius:2px; }
 QProgressBar#downloadprogress::chunk { background:$accent; border-radius:2px; }
 QPushButton#hkbtn { min-width:150px; font-weight:600; }
-QPushButton#themecard { background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
-QPushButton#themecard:hover { border-color:$border_hi; }
-QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
+/* also inside a card: there `QFrame#setcard QPushButton:checked` (an accent fill) would
+   win, and the card paints its name in $text: grey on grey in Carbon */
+QPushButton#themecard, QFrame#setcard QPushButton#themecard, QFrame#card QPushButton#themecard {
+    background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
+QPushButton#themecard:hover, QFrame#setcard QPushButton#themecard:hover,
+QFrame#card QPushButton#themecard:hover { background:$panel; border-color:$border_hi; }
+QPushButton#themecard:checked, QFrame#setcard QPushButton#themecard:checked,
+QFrame#card QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
 QFrame#card QFrame#chip { background:$btn; border:1px solid transparent; border-radius:11px; }
 QFrame#card QFrame#chip:hover { background:$btn_hover; }
 QFrame#card QFrame#chip[sel="true"] { border-color:$accent; }
@@ -1342,7 +1360,7 @@ def stylesheet(name: str | None = None) -> str:
 # Text colours code writes straight into a label's rich text or a widget's own stylesheet
 # (status(), T["faint"]...): a live theme switch swaps the old theme's for the new one's.
 _INLINE_KEYS = ("ok_text", "warn_text", "error_text", "danger_text", "text", "text_hi",
-                "muted", "faint", "section", "accent", "accent_hi", "live_text")
+                "muted", "faint", "section", "accent", "accent_hi", "live_text", "accent_text")
 _TEXT_COLOUR = re.compile(r"(?<![-\w])(color:\s*)(#[0-9a-fA-F]{6})(?![0-9a-fA-F])")
 
 

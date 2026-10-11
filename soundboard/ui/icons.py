@@ -848,7 +848,9 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
     literal colours ("#ff4d4f"). `selected` colours the current tab / a highlighted
     list item (accent, not Qt's washed-out tint)."""
     def resolve(c: str) -> str:
-        return theme.T.get(c, c)
+        # an icon is drawn on the window or a card, never on an accent fill (that's
+        # on_accent): the accent's readable shade there (Flashbang's yellow on white)
+        return theme.T.get("accent_text" if c == "accent" else c, c)
     normal = resolve(color or "text")
     on = resolve(checked_color or "on_accent")
     sel = resolve(selected)
