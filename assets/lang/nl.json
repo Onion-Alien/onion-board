@@ -2972,12 +2972,10 @@
     "+{count} in de wachtrij",
     "+{count} in de wachtrij"
   ],
-  "Add as sound": "Toevoegen als geluid",
   "Cancel download": "Download annuleren",
   "Couldn't download": "Downloaden mislukt",
   "Parsing video…": "Video wordt gelezen…",
   "Parsing…": "Wordt gelezen…",
-  "Play once": "Eén keer afspelen",
   "Queue is full": "Wachtrij is vol",
   "Queued": "In de wachtrij",
   "Queued: waiting for current download to finish…": "In de wachtrij: wacht tot de huidige download klaar is…",
@@ -3164,5 +3162,11 @@
   "Use my mic": "Mijn mic gebruiken",
   "Use the virtual cable": "De virtuele kabel gebruiken",
   "Plays from: {path}": "Speelt af vanaf: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Elk geluid verschijnt zodra het erin staat. Sluiten stopt het niet."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Elk geluid verschijnt zodra het erin staat. Sluiten stopt het niet.",
+  "Adding to sounds": "Toevoegen aan geluiden",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Wordt een nieuw geluid op je board zodra het klaar is. Je hoeft niets te drukken.",
+  "Playing once": "Eén keer afspelen",
+  "Plays once when it's ready. It isn't added to your sounds.": "Speelt één keer af zodra het klaar is. Wordt niet aan je geluiden toegevoegd.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Wordt een nieuw geluid op je board na de vorige. Je hoeft niets te drukken.",
+  "Waiting to add": "Wacht op toevoegen"
 }

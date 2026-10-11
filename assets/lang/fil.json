@@ -2972,12 +2972,10 @@
     "+{count} nakapila",
     "+{count} nakapila"
   ],
-  "Add as sound": "Idagdag bilang sound",
   "Cancel download": "Kanselahin ang download",
   "Couldn't download": "Hindi ma-download",
   "Parsing video…": "Binabasa ang video…",
   "Parsing…": "Binabasa…",
-  "Play once": "I-play nang isang beses",
   "Queue is full": "Puno na ang pila",
   "Queued": "Nakapila",
   "Queued: waiting for current download to finish…": "Nakapila: hinihintay matapos ang kasalukuyang download…",
@@ -3164,5 +3162,11 @@
   "Use my mic": "Gamitin ang mic ko",
   "Use the virtual cable": "Gamitin ang virtual cable",
   "Plays from: {path}": "Pinapatugtog mula sa: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Lumalabas ang bawat tunog pagkapasok nito. Hindi ito titigil kapag isinara mo ito."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Lumalabas ang bawat tunog pagkapasok nito. Hindi ito titigil kapag isinara mo ito.",
+  "Adding to sounds": "Idinadagdag sa sounds",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Magiging bagong sound sa board mo kapag handa na. Wala kang kailangang pindutin.",
+  "Playing once": "Ipe-play nang isang beses",
+  "Plays once when it's ready. It isn't added to your sounds.": "Ipe-play nang isang beses kapag handa na. Hindi ito idadagdag sa sounds mo.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Magiging bagong sound sa board mo pagkatapos ng mga nauna. Wala kang kailangang pindutin.",
+  "Waiting to add": "Naghihintay na maidagdag"
 }

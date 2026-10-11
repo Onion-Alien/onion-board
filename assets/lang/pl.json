@@ -3036,12 +3036,10 @@
     "+{count} w kolejce",
     "+{count} w kolejce"
   ],
-  "Add as sound": "Dodaj jako dźwięk",
   "Cancel download": "Anuluj pobieranie",
   "Couldn't download": "Nie udało się pobrać",
   "Parsing video…": "Odczytywanie wideo…",
   "Parsing…": "Odczytywanie…",
-  "Play once": "Odtwórz raz",
   "Queue is full": "Kolejka jest pełna",
   "Queued": "W kolejce",
   "Queued: waiting for current download to finish…": "W kolejce: czeka na koniec bieżącego pobierania…",
@@ -3237,5 +3235,11 @@
   "Use my mic": "Użyj mojego mikrofonu",
   "Use the virtual cable": "Użyj wirtualnego kabla",
   "Plays from: {path}": "Odtwarzany z: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Każdy dźwięk pojawia się, gdy tylko zostanie dodany. Zamknięcie tego go nie zatrzyma."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Każdy dźwięk pojawia się, gdy tylko zostanie dodany. Zamknięcie tego go nie zatrzyma.",
+  "Adding to sounds": "Dodawanie do dźwięków",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Gdy będzie gotowy, stanie się nowym dźwiękiem na twojej tablicy. Nic nie musisz klikać.",
+  "Playing once": "Odtwarzanie raz",
+  "Plays once when it's ready. It isn't added to your sounds.": "Gdy będzie gotowy, odtworzy się raz. Nie zostanie dodany do twoich dźwięków.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Po poprzednich stanie się nowym dźwiękiem na twojej tablicy. Nic nie musisz klikać.",
+  "Waiting to add": "Czeka na dodanie"
 }

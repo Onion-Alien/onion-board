@@ -2972,12 +2972,10 @@
     "+{count} sorban",
     "+{count} sorban"
   ],
-  "Add as sound": "Hozzáadás hangként",
   "Cancel download": "Letöltés megszakítása",
   "Couldn't download": "Nem sikerült letölteni",
   "Parsing video…": "Videó beolvasása…",
   "Parsing…": "Beolvasás…",
-  "Play once": "Lejátszás egyszer",
   "Queue is full": "A sor megtelt",
   "Queued": "Sorban",
   "Queued: waiting for current download to finish…": "Sorban: vár, amíg a mostani letöltés befejeződik…",
@@ -3164,5 +3162,11 @@
   "Use my mic": "Saját mikrofon használata",
   "Use the virtual cable": "Virtuális kábel használata",
   "Plays from: {path}": "Innen szól: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Minden hang megjelenik, amint bekerült. A bezárás nem állítja le."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Minden hang megjelenik, amint bekerült. A bezárás nem állítja le.",
+  "Adding to sounds": "Hozzáadás a hangokhoz",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Ha kész, új hang lesz a boardodon. Semmit sem kell megnyomnod.",
+  "Playing once": "Egyszeri lejátszás",
+  "Plays once when it's ready. It isn't added to your sounds.": "Ha kész, egyszer lejátssza. Nem kerül a hangjaid közé.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Az előtte lévők után új hang lesz a boardodon. Semmit sem kell megnyomnod.",
+  "Waiting to add": "Hozzáadásra vár"
 }

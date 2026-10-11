@@ -4,7 +4,7 @@ web links and search cards clicked by the user.
 
 Shows:
 - Preview thumbnail or download icon
-- Action badge ("Play once" / "Add as sound")
+- What it's doing, as a status tag, not a button ("Adding to sounds", "Waiting to add")
 - Sound title (elided)
 - Status text ("Parsing video…", "Downloading · 42%", "Processing audio…", "✓ Added")
 - A smooth progress bar (determinate fill or indeterminate gliding shimmer)
@@ -129,6 +129,47 @@ class ElideLabel(QLabel):
                                   self.palette(), self.isEnabled(), text,
                                   QPalette.ColorRole.WindowText)
         p.end()
+
+
+class KindTag(QWidget):
+    """What a pick will do, as a status (an icon and a few words in the accent colour,
+    no box): a filled "Add as sound" pill looked like a button to press."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("kindtag")
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(4)
+        self.icon = QLabel()
+        self.icon.setFixedSize(12, 12)
+        self.text = QLabel()
+        self.text.setObjectName("kindtag")
+        lay.addWidget(self.icon)
+        lay.addWidget(self.text)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.kind, self.queued = "", False
+
+    def set_kind(self, kind: str, queued: bool = False):
+        self.kind, self.queued = kind, queued
+        if queued:   # only Add as sound waits in the queue (Play once never does)
+            text = _("Waiting to add")
+            tip = _("Becomes a new sound on your board after the ones before it. "
+                    "Nothing to press.")
+        elif kind == "play":
+            text = _("Playing once")
+            tip = _("Plays once when it's ready. It isn't added to your sounds.")
+        else:
+            text = _("Adding to sounds")
+            tip = _("Becomes a new sound on your board when it's ready. Nothing to press.")
+        self.text.setText(text)
+        self.setToolTip(tip)
+        self.retheme()
+
+    def retheme(self):
+        self.icon.setPixmap(icons.pixmap("play" if self.kind == "play" and not self.queued
+                                         else "plus", 12,
+                                         theme.T["live_text"]))
 
 
 class Outcome(QWidget):
@@ -476,9 +517,7 @@ class DownloadBar(QFrame):
             row1.addLayout(v, stretch)
             return v
 
-        self.pill = QLabel()
-        self.pill.setObjectName("actionpill")
-        self.pill.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.pill = KindTag()
         hang(self.pill)
 
         self.lbl_title = ElideLabel()
@@ -610,8 +649,6 @@ class DownloadBar(QFrame):
         T = theme.T
         card_bg = theme.mix(T["card"], T["accent"], 0.12)
         border = theme.mix(T["card"], T["accent"], 0.35)
-        pill_bg = theme.mix(T["card"], T["accent"], 0.28)
-        pill_color = T["live_text"]
         row_bg = theme.mix(card_bg, T["text"], 0.05)
         bad = theme.status("error")
         bad_edge = theme.mix(row_bg, bad, 0.45)
@@ -622,8 +659,7 @@ class DownloadBar(QFrame):
             f"QWidget#downloadhead, QWidget#queuepanel, QWidget#queueholder, "
             f"QScrollArea#queuescroll {{ background:transparent; border:none; }}"
             f"QWidget#queuepanel {{ border-top:1px solid {border}; }}"
-            f"QLabel#actionpill {{ background:{pill_bg}; color:{pill_color}; "
-            f"border-radius:6px; padding:2px 8px; font-size:8pt; font-weight:700; }}"
+            f"QLabel#kindtag {{ color:{T['live_text']}; font-size:8.5pt; font-weight:700; }}"
             f"QLabel#downloadtitle {{ color:{T['text_hi']}; }}"
             f"QLabel#downloadmeta {{ color:{T['muted']}; font-size:9pt; }}"
             f"QLabel#downloadstatus {{ color:{T['muted']}; font-size:8.5pt; font-weight:600; }}"
@@ -659,6 +695,7 @@ class DownloadBar(QFrame):
         for b, name in ((self.btn_min, "fold_up"), (self.btn_expand, "fold_open")):
             b.setIcon(QIcon(icons.pixmap(name, 16, T["muted"])))
         self.s_icon.setPixmap(self._icon("download"))
+        self.pill.retheme()
         self._line_up()
         self._update_queue_badge()
         if self.url:
@@ -831,8 +868,7 @@ class DownloadBar(QFrame):
         self._meta = "· " + meta if meta else ""
         self.lbl_meta.setText(self._meta)
         self._show_meta()
-        pill_text = _("Play once") if kind == "play" else _("Add as sound")
-        self.pill.setText(pill_text)
+        self.pill.set_kind(kind)
         self._update_thumb()
 
     @_after_hold
@@ -994,9 +1030,8 @@ class DownloadBar(QFrame):
                 again.clicked.connect(lambda _c=False, u=q["url"]: self._retry(u))
                 rl.addWidget(again)
             else:
-                kind = QLabel(_("Play once") if q.get("kind") == "play" else _("Add as sound"))
-                kind.setObjectName("actionpill")
-                kind.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+                kind = KindTag()
+                kind.set_kind("add", queued=True)
                 rl.addWidget(kind)
             x = QPushButton()
             x.setObjectName("urgenthide")
