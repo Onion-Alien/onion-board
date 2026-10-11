@@ -22,6 +22,7 @@ import os
 import sys
 import threading
 import time
+import typing
 from collections.abc import Callable
 from ctypes import (POINTER, Structure, Union, addressof, byref, c_float, c_int, c_int64,
                     c_long, c_ubyte, c_uint, c_ulong, c_ushort, c_void_p, c_wchar_p, cast, sizeof)
@@ -136,7 +137,7 @@ class GUID(Structure):
     def __eq__(self, other):
         return isinstance(other, GUID) and bytes(self) == bytes(other)
 
-    __hash__ = None
+    __hash__ = None   # pyright: ignore[reportAssignmentType]  # unhashable: __eq__ compares bytes
 
 
 IID_IUnknown = GUID.of("00000000-0000-0000-C000-000000000046")
@@ -214,7 +215,9 @@ class Com:
         proto = _protos.get(key)
         if proto is None:
             proto = _protos[key] = WINFUNCTYPE(restype, c_void_p, *argtypes)
-        vtbl = cast(self.ptr, POINTER(c_void_p))[0]
+        ptr = self.ptr
+        assert ptr, "the interface was released"
+        vtbl = cast(ptr, POINTER(c_void_p))[0]
         return proto(cast(vtbl, POINTER(c_void_p))[slot])
 
     def call(self, slot: int, argtypes: tuple, *args, what: str = "") -> int:
@@ -486,11 +489,12 @@ class PidTable:
             return self._full.get(pid)
         if pid in self._rows:
             return self._rows[pid]
-        row = _open_row(pid)
-        if row is _DENIED:
+        found = _open_row(pid)
+        if found is _DENIED:
             self._full = _process_table()
             self.snapshots += 1
             return self._full.get(pid)
+        row = typing.cast("tuple[int, str] | None", found)
         self._rows[pid] = row
         return row
 
@@ -710,7 +714,8 @@ def recording_apps(device: str, mine: bool = False) -> list[App]:
 
 def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
                only: str | None = None, alive: dict[int, str] | None = None,
-               titles: bool | None = None, table: PidTable | None = None,
+               titles: bool | None = None,
+               table: PidTable | dict[int, tuple[int, str]] | None = None,
                mine: bool = False) -> list[App]:
     """With `meters`, also keeps each session's IAudioMeterInformation there
     (root pid -> [Com]) for the caller to read and release; window titles are then
@@ -723,6 +728,7 @@ def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
         table = _process_table()
         forget_dead_pids(table)
     if alive is not None:
+        assert isinstance(table, dict), "alive needs the full snapshot"
         alive.update((pid, exe) for pid, (_, exe) in table.items())
     apps: dict[int, App] = {}
     with _enumerator() as en:
@@ -930,7 +936,9 @@ def _release_meters(meters: dict):
 
 # --------------------------------------------------------------------------- capture
 
-_QI_T = _REF_T = _DONE_T = None
+_QI_T: typing.Any = None
+_REF_T: typing.Any = None
+_DONE_T: typing.Any = None
 if _win:
     _QI_T = WINFUNCTYPE(c_long, c_void_p, POINTER(GUID), POINTER(c_void_p))
     _REF_T = WINFUNCTYPE(c_ulong, c_void_p)
@@ -1181,6 +1189,7 @@ class AppCapture:
                 client = None
                 if e.hr != AUDCLNT_E_UNSUPPORTED_FORMAT & 0xFFFFFFFF or kind == "i16":
                     raise
+        assert client is not None and fmt is not None   # the last try raises instead
         is_float = fmt.wFormatTag == WAVE_FORMAT_IEEE_FLOAT
         evt = _k32.CreateEventW(None, False, False, None)
         cap = None

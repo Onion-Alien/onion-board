@@ -36,6 +36,7 @@ import time
 import weakref
 from collections import OrderedDict
 from dataclasses import dataclass, field
+from typing import Any
 
 import numpy as np
 import sounddevice as sd
@@ -710,6 +711,7 @@ class StreamResampler:
     def __call__(self, x: np.ndarray) -> np.ndarray:
         if self.same:
             return x
+        assert self.rs is not None   # made unless the rates match
         y = self.rs.resample_chunk(x)
         self.fed += len(x)
         self.made += len(y)
@@ -1003,7 +1005,7 @@ class Engine:
         self._forgets: dict[str, int] = {}
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
-        keys = ("main", "mon", "mic", "obs")
+        keys: list[str] = ["main", "mon", "mic", "obs"]
         self.names = dict.fromkeys(keys)          # device names for reopening
         self._last_cb = dict.fromkeys(keys, 0.0)  # monotonic time of last callback
         self._last_try = dict.fromkeys(keys, 0.0)   # last (re)open attempt
@@ -1026,7 +1028,7 @@ class Engine:
         self.eq_gains: list[float] | None = None   # None = EQ off
         self.eq_target = "voice"                   # 'voice' | 'sounds' | 'all'
         self.dest = None                           # destination.Dest shaping the sounds bus
-        self._dests: dict[str, object] = {}        # out -> destination.Processor
+        self._dests: dict[str, destination.Processor] = {}
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.mon_voice_only = False   # ...but only your (changed) voice: the Voice tab's
@@ -1037,7 +1039,7 @@ class Engine:
         self.mic_gate = False     # mute your mic while a sound plays (only the sounds go out)
         self._gate: dict[str, float] = {}   # output -> the mic's current gate gain
         self.limiter_on = True    # hold the send device's peaks at sendfx.CEILING_DB
-        self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
+        self._send: dict[tuple[str, str], Any] = {}   # (out, kind) -> its sendfx stage
         self._quiet: dict[str, int] = {}   # out -> frames of silence on its sounds bus
         self._idle_n: dict[str, int] = {}  # out -> frames its sounds bus skipped (_bus_idle)
         self._glides: dict = {}   # (out, what) -> the volume its last block ended at (_vol)
@@ -1122,7 +1124,7 @@ class Engine:
 
         self._rec_buf: list[np.ndarray] | None = None
         self._rec_frames_left = 0
-        self._rec_done: tuple[list, int] | np.ndarray | None = None   # see rec_done
+        self._rec_done: tuple[list | np.ndarray, int] | None = None   # see rec_done
         self._mic_pow = [0.0, 0.0]   # each mic channel's recent power (_mic_channels)
         self._mic_dead: int | None = None   # the mic channel found dead, if one is
         self._mon_fed = False        # the mic wrote to ring_mon last block (mic check)
@@ -1964,8 +1966,9 @@ class Engine:
             return None
         blocks, rate = done
         if isinstance(blocks, list):
-            done = self._rec_done = (np.concatenate(blocks), rate)
-        return done
+            blocks = np.concatenate(blocks)
+            self._rec_done = (blocks, rate)
+        return blocks, rate
 
     @rec_done.setter
     def rec_done(self, value):
@@ -2256,12 +2259,12 @@ class Engine:
             f = self._eqs[key] = EQ(self.rates[out], fade_in=f is None)
         return f.process(x, g)
 
-    def _stage(self, out: str, kind: type):
+    def _stage[T](self, out: str, kind: type[T]) -> T:
         """This output's Limiter / SmartMono / Ducker, made for its current rate."""
         key = (out, kind.__name__)
         f = self._send.get(key)
         if f is None or f.rate != self.rates[out]:
-            f = self._send[key] = kind(self.rates[out])
+            f = self._send[key] = kind(self.rates[out])   # pyright: ignore[reportCallIssue]  # a stage takes its rate
         return f
 
     def _lowcut(self) -> int:
@@ -2356,7 +2359,7 @@ class Engine:
             mix += self._vol("main", "radio", r, self.radio_vol if self.radio_live else 0.0)
             if took is not None:   # the radio as you hear it, sent out or not
                 took += r * np.float32(self.radio_vol)
-        if took is not None:
+        if took is not None and take is not None:
             take.append(took)
         lowcut = self._lowcut()
         apps = None
@@ -2476,7 +2479,7 @@ class Engine:
             mix += self._vol("mon", "radio", r, self.radio_vol if on else 0.0)
             if took is not None:
                 took += r * np.float32(self.radio_vol)
-        if took is not None:
+        if took is not None and take is not None:
             take.append(took)
         lowcut = self._lowcut()   # the headphones get the mode's shaping too (_dest)
         apps = None
@@ -2539,7 +2542,8 @@ class Engine:
             mic, out = self.mic_stream, self.main_stream
             if mic is None or out is None:
                 return None
-            return float(mic.latency) + float(out.latency) + 0.015
+            # one-way streams: a float each (a tuple is for duplex ones)
+            return float(mic.latency) + float(out.latency) + 0.015   # pyright: ignore[reportArgumentType]
         except Exception:  # noqa: BLE001 - a stream closing meanwhile
             return None
 
@@ -2594,10 +2598,10 @@ class Engine:
         # a mode that already made the bus mono (every built-in one) needs no second pass
         if self.send_mono and not quiet and not (self.dest is not None and self.dest.mono):
             mix = self._stage(out, SmartMono).process(mix)
-        if mic_on and add_mic:
+        if mic_on and add_mic and m is not None:   # (mic_on: m is not None)
             m = self._gated(out, m)
             mix += self._eq(out, "voice", self._vol(out, "mic", m, self.mic_vol))
-        elif mic_on:
+        elif mic_on and m is not None:
             self._gated(out, m)   # (keeps the gate's level current for _direct_mic_gain)
         return mix
 
@@ -2746,7 +2750,7 @@ class Engine:
         chain = self.voice_chain
         if chain is not None:   # after the meter: that judges the real mic
             x = chain.process(x, self.rates["mic"])
-        if raw is not None:     # a test: the real mic (did you talk?) and what's sent
+        if raw is not None and rec is not None:   # a test: the real mic and what's sent
             rec.append(np.stack([raw, x[:, 0]], 1))
         if take is not None and self._take_fx:
             take.append(x.copy())

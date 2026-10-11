@@ -16,6 +16,7 @@ service uses; where a number is an estimate the profile says so.
 from __future__ import annotations
 
 import subprocess
+import typing
 from dataclasses import dataclass
 
 import numpy as np
@@ -223,7 +224,8 @@ def highpass(x: np.ndarray, hz: float, order: int = 13, tail_hz: float = 0) -> n
     sos = butter(order, hz, "highpass", fs=SR)
     if tail_hz:
         sos = np.vstack([sos, butter(2, tail_hz, "highpass", fs=SR)])
-    return sosfilt(sos, np.asarray(x, F32), axis=0).astype(F32)
+    y = sosfilt(sos, np.asarray(x, F32), axis=0)
+    return typing.cast(np.ndarray, y).astype(F32)   # no zi: an array, not a tuple
 
 
 def roundtrip(x: np.ndarray, profile: Profile, ffmpeg: str | None = None) -> np.ndarray:

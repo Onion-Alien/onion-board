@@ -229,7 +229,7 @@ def take(item_id: str) -> Item | None:
                     d["image"] = str(_move(img, library.THUMBS_DIR)) if img.exists() else ""
             except OSError:
                 log.warning("couldn't bring %s back", item.name, exc_info=True)
-                if moved is not None:   # the audio came back but the picture didn't
+                if moved is not None and f is not None:   # the audio came back, the picture didn't
                     try:
                         shutil.move(str(moved), f)
                     except OSError:   # then the entry follows the audio where it is now
@@ -300,10 +300,10 @@ def meta_of(item: Item) -> SoundMeta | None:
     m.tags = library.clean_tags(m.tags)
     m.source = sourceinfo.clean(m.source)
     extra = {k: v for k, v in item.data.items() if k not in fields_}
-    if extra:
-        m._raw_extra = extra
+    if extra:   # not dataclass fields on purpose (library._raw_extra)
+        m._raw_extra = extra   # pyright: ignore[reportAttributeAccessIssue]
     if m.mode not in library.MODES:   # a newer version's mode: played as restart
-        m._raw_kept = {"mode": ("restart", m.mode)}
+        m._raw_kept = {"mode": ("restart", m.mode)}   # pyright: ignore[reportAttributeAccessIssue]
         m.mode = "restart"
     return m
 

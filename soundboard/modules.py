@@ -61,7 +61,7 @@ import threading
 import time
 import uuid
 import zipfile
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
@@ -118,7 +118,7 @@ class ModuleInfo:
     error: str = ""
     loaded: bool = False
 
-    def resolved_command(self, extra: list[str] = ()) -> list[str]:
+    def resolved_command(self, extra: Sequence[str] = ()) -> list[str]:
         """argv for a service module, with {python} and {dir} filled in."""
         return [self._fill(a) for a in self.command] + list(extra)
 
@@ -257,6 +257,7 @@ def load_effects(infos: list[ModuleInfo]) -> None:
         try:
             spec = importlib.util.spec_from_file_location(
                 f"soundboard_module_{info.id.replace('-', '_')}", info.path / info.entry)
+            assert spec is not None and spec.loader is not None   # a .py path
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
             api = ModuleAPI(info)
@@ -357,6 +358,7 @@ def load_package(info: ModuleInfo):
     else:
         spec = importlib.util.spec_from_file_location(
             info.package, pkg_dir / "__init__.py", submodule_search_locations=[str(pkg_dir)])
+        assert spec is not None and spec.loader is not None   # a .py path
         pkg = importlib.util.module_from_spec(spec)
         sys.modules[info.package] = pkg
         try:
@@ -444,6 +446,8 @@ def install_zip(path: Path, module_id: str, kind: str,
     finally:
         shutil.rmtree(staging, ignore_errors=True)
     info = _read(dest)
+    if info is None:   # read fine in staging a moment ago
+        raise ModuleError(_("it has no module.json"))
     log.info("installed module %s %s into %s", module_id, info.version, dest)
     precompile([info])   # (on the download's thread) it's loaded straight after
     return info
@@ -628,6 +632,7 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
         timer.daemon = True
         timer.start()
         try:
+            assert p.stdout is not None   # stdout=PIPE
             for line in p.stdout:
                 if line.strip():
                     on_line(line.rstrip())
