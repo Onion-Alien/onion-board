@@ -586,7 +586,7 @@ QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#small, QPushButton#danger[small="true"] { padding:2px 8px; font-size:8pt; }
 QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
-    font-weight:600; font-size:10pt; padding:6px 12px; border-radius:8px; }
+    font-weight:600; font-size:10pt; padding:6px 14px 6px 10px; border-radius:8px; }
 QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }

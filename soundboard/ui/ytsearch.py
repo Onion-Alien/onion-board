@@ -763,13 +763,15 @@ class SearchResults(RoundedFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(12, 0, 12, 12)
+        v.setContentsMargins(12, 12, 12, 12)   # Back sits as far in from the top as the side
         v.setSpacing(6)
         header = QWidget()
         header.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
-        back = self.btn_back = QPushButton(_("Back to my sounds"))
+        back = self.btn_back = QPushButton(_("Back"))
+        back.setToolTip(_("Back to my sounds"))
+        back.setAccessibleName(_("Back to my sounds"))
         back.setObjectName("backhome")   # the way out of the results: a plain button
         back.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(back, "back", "text_hi", size=18)
