@@ -3101,5 +3101,29 @@
   "Adding {n} sound": [
     "Menambah {n} bunyi"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Kabel maya telah dibuang. Mulakan semula PC anda sebelum memasangnya semula."
+  "The virtual cable was removed. Restart your PC before you install it again.": "Kabel maya telah dibuang. Mulakan semula PC anda sebelum memasangnya semula.",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Ia akan dibuang daripada {mic}: kesan mikrofon berfungsi pada satu mikrofon pada satu masa.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Kesan mikrofon dipasang semula pada {mic}. Cuba dalam sembang suara anda.",
+  "Mic effect removed from {mic}": "Kesan mikrofon dibuang daripada {mic}",
+  "Onion Board will send your sounds into {mic} from now on.": "Mulai sekarang Onion Board akan menghantar bunyi anda ke {mic}.",
+  "Plug this mic in to repair it.": "Sambungkan mikrofon ini untuk membaikinya.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Pasang semula kesan mikrofon Onion Board pada {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Pulihkan {mic} dan buang kesan mikrofon Onion Board daripadanya. Bunyi tidak lagi dihantar terus kepadanya.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Pulihkan {mic}, buang kesan mikrofon lama, kemudian pasang salinan baharu padanya.",
+  "{mic} (unplugged)": "{mic} (tidak disambung)",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Bunyi anda pergi ke {mic}. Untuk guna mikrofon ini, pilih juga di bawah Peranti.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Bersihkan sisa",
+  "Cleaning up failed (code {code}).": "Pembersihan gagal (kod {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Jika ada yang ditemui, Windows akan meminta kebenaran dan audio berhenti seketika.",
+  "Install mic effect": "Pasang kesan",
+  "Leftovers removed from {mic}.": "Sisa dibuang daripada {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Cari apa sahaja yang ditinggalkan Onion Board pada {mic} dan buangnya. Hanya bahagian Onion Board dibuang: tetapan lain mikrofon kekal.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Kesan mikrofon dipasang pada {mic}. Cuba dalam sembang suara anda.",
+  "Mic effect installed. Test it in your voice chat.": "Kesan mikrofon dipasang. Cuba dalam sembang suara anda.",
+  "Not installed": "Belum dipasang",
+  "Nothing of Onion Board's was left on {mic}.": "Tiada sisa Onion Board pada {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Letakkan kesan mikrofon Onion Board pada mikrofon pilihan anda supaya bunyi anda terus masuk ke dalamnya.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Letakkan kesan mikrofon Onion Board pada {mic} supaya bunyi anda terus masuk ke dalamnya.",
+  "Some leftovers couldn't be removed from {mic}.": "Sesetengah sisa tidak dapat dibuang daripada {mic}."
 }

@@ -3101,5 +3101,29 @@
   "Adding {n} sound": [
     "{n} 件のサウンドを追加中"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "仮想ケーブルを削除しました。もう一度インストールする前にPCを再起動してください。"
+  "The virtual cable was removed. Restart your PC before you install it again.": "仮想ケーブルを削除しました。もう一度インストールする前にPCを再起動してください。",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}からは外れます。マイクエフェクトは一度に1つのマイクでしか動作しません。",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "マイクエフェクトを{mic}に再インストールしました。ボイスチャットで試してください。",
+  "Mic effect removed from {mic}": "{mic}からマイクエフェクトを削除しました",
+  "Onion Board will send your sounds into {mic} from now on.": "これからOnion Boardはサウンドを{mic}に送ります。",
+  "Plug this mic in to repair it.": "修復するには、このマイクを接続してください。",
+  "Reinstall Onion Board's mic effect on {mic}.": "Onion Boardのマイクエフェクトを{mic}に再インストールします。",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "{mic}の設定を元に戻し、Onion Boardのマイクエフェクトを削除します。サウンドはこのマイクに直接送られなくなります。",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic}の設定を元に戻し、古いマイクエフェクトを削除してから、新しいコピーをインストールします。",
+  "{mic} (unplugged)": "{mic}(未接続)",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "サウンドは{mic}に送られています。代わりにこのマイクを使うには、デバイスでも選んでください。",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "残りを掃除",
+  "Cleaning up failed (code {code}).": "掃除に失敗しました(コード {code})。",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "何か見つかった場合、Windowsが許可を求め、音声が少しの間止まります。",
+  "Install mic effect": "エフェクトをインストール",
+  "Leftovers removed from {mic}.": "{mic}から残りを取り除きました。",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Onion Boardが{mic}に残したものを探して取り除きます。消えるのはOnion Boardの部分だけで、マイクのほかの設定はそのままです。",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "マイクエフェクトを{mic}にインストールしました。ボイスチャットで試してください。",
+  "Mic effect installed. Test it in your voice chat.": "マイクエフェクトをインストールしました。ボイスチャットで試してください。",
+  "Not installed": "未インストール",
+  "Nothing of Onion Board's was left on {mic}.": "{mic}にOnion Boardのものは残っていませんでした。",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Onion Boardのマイクエフェクトを選択中のマイクに入れて、サウンドを直接送れるようにします。",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Onion Boardのマイクエフェクトを{mic}に入れて、サウンドを直接送れるようにします。",
+  "Some leftovers couldn't be removed from {mic}.": "{mic}から一部の残りを取り除けませんでした。"
 }

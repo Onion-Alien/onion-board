@@ -3101,5 +3101,29 @@
   "Adding {n} sound": [
     "正在新增 {n} 個聲音"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "虛擬線材已移除。重新安裝前請先重新啟動電腦。"
+  "The virtual cable was removed. Restart your PC before you install it again.": "虛擬線材已移除。重新安裝前請先重新啟動電腦。",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "它會從 {mic} 上移除:麥克風效果一次只能用於一支麥克風。",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "已在 {mic} 上重新安裝麥克風效果。請在語音聊天中測試。",
+  "Mic effect removed from {mic}": "已從 {mic} 移除麥克風效果",
+  "Onion Board will send your sounds into {mic} from now on.": "從現在起,Onion Board 會把你的聲音傳送到 {mic}。",
+  "Plug this mic in to repair it.": "請連接這支麥克風後再修復。",
+  "Reinstall Onion Board's mic effect on {mic}.": "在 {mic} 上重新安裝 Onion Board 的麥克風效果。",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "還原 {mic} 並移除其上的 Onion Board 麥克風效果。聲音將不再直接傳送到它。",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "還原 {mic},移除舊的麥克風效果,然後在其上安裝新副本。",
+  "{mic} (unplugged)": "{mic}(未連接)",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "你的聲音會傳送到 {mic}。要改用這支麥克風,請也在「裝置」中選擇它。",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "清理殘留",
+  "Cleaning up failed (code {code}).": "清理失敗(代碼 {code})。",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "如果找到殘留,Windows 會要求權限,音訊會短暫停止。",
+  "Install mic effect": "安裝麥克風效果",
+  "Leftovers removed from {mic}.": "已從 {mic} 清理殘留。",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "尋找 Onion Board 在 {mic} 上留下的東西並移除。只移除 Onion Board 自己的部分:麥克風的其他設定保留。",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "已在 {mic} 上安裝麥克風效果。請在語音聊天中測試。",
+  "Mic effect installed. Test it in your voice chat.": "已安裝麥克風效果。請在語音聊天中測試。",
+  "Not installed": "未安裝",
+  "Nothing of Onion Board's was left on {mic}.": "{mic} 上沒有留下 Onion Board 的任何東西。",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "把 Onion Board 的麥克風效果裝到所選麥克風上,讓你的聲音直接進入它。",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "把 Onion Board 的麥克風效果裝到 {mic} 上,讓你的聲音直接進入它。",
+  "Some leftovers couldn't be removed from {mic}.": "部分殘留無法從 {mic} 移除。"
 }

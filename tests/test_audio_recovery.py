@@ -4,7 +4,7 @@ import time
 
 import pytest
 from PySide6.QtCore import QEvent
-from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QComboBox, QLabel, QPushButton
 
 from soundboard import directmic as dm
 from soundboard.settings import SettingsDialog
@@ -26,8 +26,8 @@ def test_confirmation_cancel_changes_nothing(window, monkeypatch, action):  # no
     monkeypatch.setattr(dm, '_elevated', lambda *a: asked.append(a))
     d = SettingsDialog(window, 'audio')
     card = d.findChild(RecoveryCard)
-    card.confirm(action)
-    card.confirm(action)  # repeated clicks keep the same confirmation
+    card.confirm(action, card.shown()[0])
+    card.confirm(action, card.shown()[0])  # repeated clicks keep the same confirmation
     assert card.dialog.isVisible()
     next(b for b in card.dialog.findChildren(QPushButton) if b.text() == 'Cancel').click()
     assert not asked and not card.recovery.running
@@ -140,14 +140,16 @@ def test_clean_reinstall_uses_one_admin_prompt(monkeypatch, tmp_path):
     assert calls == [['reinstall', 'guid']]
 
 
-@pytest.mark.parametrize('state,pill,fix', [
-    ('ready', 'Ready', None),
-    ('outdated', 'Update available', 'Update mic effect'),
-    ('wiped', 'Off', 'Repair mic effect'),  # Windows took it off: the fix must be on show
-    ('other', 'Off', 'Repair mic effect'),
-    ('missing', 'Off', None),
+@pytest.mark.parametrize('state,pill,buttons', [
+    ('ready', 'Ready', ['Clean reinstall', 'Remove mic effect']),
+    ('outdated', 'Update available', ['Update mic effect', 'Clean reinstall', 'Remove mic effect']),
+    # Windows took it off: the fix must be on show
+    ('wiped', 'Off', ['Repair mic effect', 'Clean reinstall', 'Remove mic effect']),
+    # not on this mic: nothing to repair or remove, it's installed
+    ('other', 'Not installed', ['Install mic effect']),
+    ('missing', 'Not installed', ['Install mic effect']),
 ])
-def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, pill, fix):  # noqa: F811
+def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, pill, buttons):  # noqa: F811
     monkeypatch.setattr(dm, 'status', lambda mic=None: state)
     window.resize(1180, 720)
     window.show()
@@ -156,19 +158,15 @@ def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, 
     card._checked(state)
     for _i in range(5):
         qapp.processEvents()
-    assert card.pill.isVisibleTo(card) and card.pill.text() == pill
-    # the heading has no top padding, so its words share a centre line with the pill
-    assert card.heading.property('head')
-    title, badge = card.heading.geometry(), card.pill.geometry()
-    assert abs(title.center().y() - badge.center().y()) <= 1
-    assert card.fix.isVisibleTo(card) == (fix is not None)
-    if fix:
-        assert card.fix.text() == fix and card.fix.graphicsEffect() is None
-    # the rare actions live behind the ⋯ menu, never as a row of small buttons
-    assert card.more.toolTip() and card.more.accessibleName()
-    assert [a.text() for a in card.menu.actions() if not a.isSeparator()] == [
-        'Repair mic effect', 'Clean reinstall', 'Remove mic effect']
-    assert card.menu_actions['remove'].isEnabled() == (state != 'missing')
+    row = card.rows[None]   # Windows listed no mics: the app's mic on its own
+    assert row.pill.isVisibleTo(row) and row.pill.text() == pill
+    # every action is a button on the mic's own row: no ⋯ menu, no dropdown
+    assert [b.text() for b in row.buttons.values()] == buttons
+    assert all(b.isVisibleTo(card) for b in row.buttons.values())
+    assert not card.findChildren(QComboBox)
+    assert not [b for b in card.findChildren(QPushButton) if b.objectName() == 'iconbutton']
+    filled = [b for b in row.buttons.values() if b.objectName() == 'primary']
+    assert len(filled) <= 1 and all(b.graphicsEffect() is None for b in filled)
     assert not [b for b in card.findChildren(QPushButton) if b.objectName() == 'small']
     d.close()
 
@@ -179,7 +177,7 @@ def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # n
     d.show()
     card = d.findChild(RecoveryCard)
     card._checked('outdated')
-    card.fix.click()
+    card.rows[None].buttons['update'].click()
     dialog = card.dialog
     assert dialog.windowTitle() == 'Update mic effect' and dialog.isModal()
     go, cancel = [b for b in dialog.findChildren(QPushButton)]
@@ -188,7 +186,7 @@ def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # n
     assert go.minimumWidth() == 0 and go.maximumWidth() > 10000
     dialog.reject()
     card._checked('ready')
-    assert not card.fix.isVisibleTo(card)
+    assert 'update' not in card.rows[None].buttons
     d.close()
 
 
@@ -203,7 +201,7 @@ def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch
     window.show()
     d = window.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
-    card.confirm('repair')
+    card.confirm('repair', card.shown()[0])
     next(b for b in card.dialog.findChildren(QPushButton)
          if b.text() == 'Repair mic effect').click()
     assert card.show_.on and card.show_.isVisibleTo(card)
@@ -212,4 +210,291 @@ def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch
     gate.set()
     wait(qapp, lambda: not card.recovery.running)
     assert card.show_._result is (error is None)   # its ending plays once far enough
+    assert not card.pill.isVisibleTo(card)
+    d.close()
+
+
+# ---------------------------------------------------------------- more than one mic
+
+GUID_A = '{0.0.1.00000000}.{aaaaaaaa-0000-0000-0000-000000000001}'
+GUID_B = '{0.0.1.00000000}.{bbbbbbbb-0000-0000-0000-000000000002}'
+GUID_C = '{0.0.1.00000000}.{cccccccc-0000-0000-0000-000000000003}'
+
+
+def two_mics(a='ready', b='other', c=None):
+    """Two plugged-in mics with the same name (a headset and its twin), and maybe an
+    unplugged third."""
+    out = [{'guid': GUID_A, 'name': 'Headset Mic (USB)', 'active': True, 'state': a,
+            'pa': 'Headset Mic (USB)'},
+           {'guid': GUID_B, 'name': 'Headset Mic (USB)', 'active': True, 'state': b,
+            'pa': 'Headset Mic (USB) #2'}]
+    if c:
+        out.append({'guid': GUID_C, 'name': 'Old Mic', 'active': False, 'state': c,
+                    'pa': None})
+    return out
+
+
+def card_with(window, qapp, monkeypatch, found):  # noqa: F811
+    window.cfg.mic_device = 'Headset Mic (USB)'
+    monkeypatch.setattr(dm, 'mics', lambda names=(): [dict(m) for m in found])
+    monkeypatch.setattr(dm, 'status', lambda mic=None: found[0]['state'])
+    window.show()
+    d = window.open_settings('audio')   # a page in the window: a hidden card doesn't check
+    card = d.findChild(RecoveryCard)
+    card.check()
+    wait(qapp, lambda: len(card.rows) == len(found) and not card._checking)
+    return d, card
+
+
+def texts(row):
+    return [b.text() for b in row.buttons.values()]
+
+
+def test_every_mic_is_a_row_with_its_name_and_state(window, qapp, monkeypatch):  # noqa: F811
+    d, card = card_with(window, qapp, monkeypatch, two_mics())
+    a, b = card.rows[GUID_A], card.rows[GUID_B]
+    # twins are numbered (in front); the mic the app sends into says so
+    assert (a.name.text(), b.name.text()) == ('#1 Headset Mic (USB)', '#2 Headset Mic (USB)')
+    assert a.in_use.isVisibleTo(a) and not b.in_use.isVisibleTo(b)
+    assert a.pill.text() == 'Ready' and texts(a) == ['Clean reinstall', 'Remove mic effect']
+    assert not card.findChildren(QComboBox)
+    d.close()
+
+
+def test_each_mic_keeps_its_own_state(window, qapp, monkeypatch):  # noqa: F811
+    d, card = card_with(window, qapp, monkeypatch, two_mics('ready', 'other'))
+    b = card.rows[GUID_B]
+    assert b.pill.text() == 'Not installed'
+    # nothing to repair, reinstall or remove there: install it, or clean up leftovers
+    assert texts(b) == ['Install mic effect', 'Clean up leftovers']
+    assert card.rows[GUID_A].pill.text() == 'Ready'
+    # a re-check that changed nothing keeps the rows (and keyboard focus in them)
+    card.check()
+    wait(qapp, lambda: not card._checking)
+    assert card.rows[GUID_B] is b
+    d.close()
+
+
+def test_install_acts_only_on_that_mic(window, qapp, monkeypatch):  # noqa: F811
+    calls, switched = [], []
+    d, card = card_with(window, qapp, monkeypatch, two_mics('ready', 'other'))
+    monkeypatch.setattr(dm, 'install_on', lambda guid, clean=False: calls.append(guid))
+    monkeypatch.setattr(dm, 'install', lambda *a, **k: pytest.fail('went by name'))
+    monkeypatch.setattr(dm, 'status_on', lambda guid: 'ready')
+    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'on_device', lambda cb, attr: switched.append(attr))
+    window.cb_mic.addItem('Headset Mic (USB) #2', 'Headset Mic (USB) #2')
+    card.rows[GUID_B].buttons['install'].click()
+    assert card.dialog.windowTitle() == 'Install mic effect'
+    words = ' '.join(lbl.text() for lbl in card.dialog.findChildren(QLabel))
+    # the dialog names the mic, says the effect moves, and that sounds go there now
+    assert "mic effect on #2 Headset Mic (USB)" in words
+    assert 'comes off #1 Headset Mic (USB)' in words
+    assert 'send your sounds into #2 Headset Mic (USB)' in words
+    next(b for b in card.dialog.findChildren(QPushButton)
+         if b.text() == 'Install mic effect').click()
+    wait(qapp, lambda: not card.recovery.running)
+    assert calls == [GUID_B]
+    assert switched == ['mic_device']   # the app now sends into the mic it went on
+    assert window.cb_mic.currentData() == 'Headset Mic (USB) #2'
+    assert card.note.text() == ('Mic effect installed on #2 Headset Mic (USB). '
+                                'Test it in your voice chat.')
+    d.close()
+
+
+def test_remove_leaves_the_other_mic_alone(window, qapp, monkeypatch):  # noqa: F811
+    calls = []
+    d, card = card_with(window, qapp, monkeypatch, two_mics('ready', 'ready'))
+    monkeypatch.setattr(dm, 'uninstall', lambda guid=None: calls.append(guid))
+    monkeypatch.setattr(dm, 'status_on', lambda guid: 'other')
+    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    card.rows[GUID_B].buttons['remove'].click()
+    next(b for b in card.dialog.findChildren(QPushButton)
+         if b.text() == 'Remove mic effect').click()
+    wait(qapp, lambda: not card.recovery.running)
+    assert calls == [GUID_B]
+    assert card.note.text() == 'Mic effect removed from #2 Headset Mic (USB)'
+    d.close()
+
+
+def test_unplugged_mic_is_listed_but_never_repaired(window, qapp, monkeypatch):  # noqa: F811
+    d, card = card_with(window, qapp, monkeypatch, two_mics('other', 'other', 'wiped'))
+    monkeypatch.setattr(dm, 'install_on', lambda *a, **k: pytest.fail('repaired unplugged'))
+    monkeypatch.setattr(window, 'toast', lambda *a: None)
+    c = card.rows[GUID_C]
+    assert c.name.text() == 'Old Mic (unplugged)'
+    assert texts(c) == ['Remove mic effect']   # the effect can still come off it
+    assert c.hint.isVisibleTo(c) and c.hint.text() == 'Plug this mic in to repair it.'
+    assert not card.recovery.start('repair', c.mic)
+    assert not card.recovery.running and not window._attaching
+    d.close()
+
+
+def test_mic_list_by_endpoint(monkeypatch):
+    monkeypatch.setattr(dm, 'capture_endpoints', lambda: [
+        {'guid': GUID_A, 'name': 'Mic (USB)', 'active': True},
+        {'guid': GUID_B, 'name': 'Mic (USB)', 'active': True},
+        {'guid': GUID_C, 'name': 'Gone (USB)', 'active': False},
+        {'guid': '{x}', 'name': 'Old headset', 'active': False}])
+    monkeypatch.setattr(dm, 'installed_on', lambda: [GUID_B, GUID_C])
+    monkeypatch.setattr(dm, 'effect_in_place', lambda guid: True)
+    monkeypatch.setattr(dm, 'make_ring', lambda: True)
+    monkeypatch.setattr(dm, 'same_dll', lambda *a: True)
+    monkeypatch.setattr(dm, 'registered_dll', lambda: None)
+    monkeypatch.setattr(dm, 'installed_slot', lambda guid: None)
+    found = dm.mics(['Mic (USB)'])
+    # unplugged without the effect: left out; unplugged with it: kept, last
+    assert [(m['guid'], m['state']) for m in found] == [
+        (GUID_A, 'other'), (GUID_B, 'ready'), (GUID_C, 'ready')]
+    assert not found[2]['active']
+    # a name two mics share can't be told apart: neither is matched to it
+    assert [m['pa'] for m in found] == [None, None, None]
+    assert dm.status_on(GUID_B) == 'ready' and dm.status_on(GUID_A) == 'other'
+
+
+def test_uninstall_one_mic_keeps_the_rest(monkeypatch):
+    on = [GUID_A, GUID_B]
+    gone, steps = [], []
+    monkeypatch.setattr(dm, '_enable_privileges', lambda *a: None)
+    monkeypatch.setattr(dm, '_running_dependents', lambda: [])
+    monkeypatch.setattr(dm, '_audio_comes_back', lambda deps: None)
+    monkeypatch.setattr(dm, '_audio_service', lambda start, deps=(): True)
+    monkeypatch.setattr(dm, 'installed_on', lambda: list(on))
+    monkeypatch.setattr(dm, '_uninstall_endpoint', lambda g: (gone.append(g), on.remove(g)))
+    monkeypatch.setattr(dm, '_unregister_com', lambda: steps.append('unregister'))
+    monkeypatch.setattr(dm, '_remove', lambda path: steps.append('files'))
+    assert dm.admin_uninstall(GUID_B) == 0
+    assert gone == [GUID_B] and on == [GUID_A] and not steps   # still used by mic A
+    assert dm.admin_uninstall(GUID_A) == 0
+    assert gone == [GUID_B, GUID_A] and 'unregister' in steps   # the last one: all gone
+
+
+def test_uninstall_one_mic_from_the_command_line(monkeypatch):
+    asked = []
+    monkeypatch.setattr(dm, '_elevated', lambda args: asked.append(args) or 0)
+    assert dm.uninstall('{0.0.1.00000000}.{bbbbbbbb-0000-0000-0000-000000000002}') is None
+    assert asked == [['uninstall', GUID_B]]
+    assert dm.uninstall() is None and asked[-1] == ['uninstall']
+
+
+def test_twin_the_app_cant_switch_to_says_where_sounds_go(window, qapp, monkeypatch):  # noqa: F811
+    found = two_mics('ready', 'other')
+    found[1]['pa'] = None   # its name is shared: the app can't pick it by itself
+    d, card = card_with(window, qapp, monkeypatch, found)
+    card.rows[GUID_B].buttons['install'].click()
+    words = ' '.join(lbl.text() for lbl in card.dialog.findChildren(QLabel))
+    assert 'Your sounds go into Headset Mic (USB). To use this mic instead' in words
+    assert 'from now on' not in words
+    card.dialog.reject()
+    d.close()
+
+
+# ---------------------------------------------------------------- leftovers on a mic
+
+OTHER = '{11111111-2222-3333-4444-555555555555}'   # a driver's own effect
+
+
+def test_without_ours_takes_only_our_effect_out():
+    assert dm.without_ours([OTHER, dm.CLSID.lower()]) == (True, [OTHER])
+    assert dm.without_ours([dm.CLSID]) == (True, None)
+    assert dm.without_ours(dm.CLSID) == (True, None)
+    assert dm.without_ours(OTHER) == (False, OTHER)
+    assert dm.without_ours([OTHER]) == (False, [OTHER])
+
+
+def test_strip_endpoint_leaves_everything_else(monkeypatch):
+    changed = {}
+
+    class Key:
+        def __init__(self, path, create=True):
+            assert path.endswith(GUID_B + r'\FxProperties') and not create
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            pass
+
+        def set(self, name, kind, value):
+            changed[name] = value
+
+        def delete(self, name):
+            changed[name] = 'deleted'
+    monkeypatch.setattr(dm, '_BackupKey', Key)
+    monkeypatch.setattr(dm, '_fx_values', lambda guid: {
+        dm.FX % 5: dm.CLSID, dm.FX % 6: [OTHER, dm.CLSID], dm.FX % 7: OTHER})
+    dm._strip_endpoint(GUID_B)
+    assert changed == {dm.FX % 5: 'deleted', dm.FX % 6: [OTHER]}   # FX 7 untouched
+
+
+def test_leftovers_reads_without_admin(monkeypatch):
+    on, fx, rest = [], {}, [False]
+    monkeypatch.setattr(dm, 'installed_on', lambda: list(on))
+    monkeypatch.setattr(dm, '_fx_values', lambda guid: fx)
+    monkeypatch.setattr(dm, 'anything_installed', lambda: rest[0])
+    assert not dm.leftovers(GUID_B)
+    fx[dm.FX % 5] = [OTHER, dm.CLSID]
+    assert dm.leftovers(GUID_B)   # our effect in a slot without notes
+    fx.clear()
+    rest[0] = True
+    assert dm.leftovers(GUID_B)   # on no mic, but still registered
+    on.append(GUID_A)
+    assert not dm.leftovers(GUID_B)   # mic A uses it: that's not a leftover
+
+
+@pytest.mark.parametrize('on,traces,rest', [
+    ([], True, True), ([GUID_A], True, True), ([], False, True), ([GUID_A], False, False)])
+def test_admin_cleanup(monkeypatch, on, traces, rest):
+    steps = []
+    monkeypatch.setattr(dm, '_enable_privileges', lambda *a: None)
+    monkeypatch.setattr(dm, '_running_dependents', lambda: [])
+    monkeypatch.setattr(dm, '_audio_comes_back', lambda deps: None)
+    monkeypatch.setattr(dm, '_audio_service', lambda start, deps=(): steps.append(start) or True)
+    monkeypatch.setattr(dm, 'installed_on', lambda: list(on))
+    monkeypatch.setattr(dm, '_fx_values', lambda guid: {dm.FX % 5: dm.CLSID} if traces else {})
+    monkeypatch.setattr(dm, '_strip_endpoint', lambda guid: steps.append(('strip', guid)))
+    monkeypatch.setattr(dm, 'anything_installed', lambda: rest)
+    monkeypatch.setattr(dm, 'admin_uninstall', lambda only=None: steps.append(('all', only)) or 0)
+    assert dm.admin_cleanup(GUID_B) == 0
+    # the mic is only rewritten with Windows' audio stopped, and only if ours is on it
+    assert steps[:3] == ([False, ('strip', GUID_B), True] if traces else steps[:3])
+    if not traces:
+        assert False not in steps
+    # the effect itself only goes when no mic uses it
+    assert (('all', None) in steps) == (not on and rest)
+
+
+def test_admin_cleanup_of_a_mic_with_notes_is_a_normal_remove(monkeypatch):
+    monkeypatch.setattr(dm, 'installed_on', lambda: [GUID_B])
+    monkeypatch.setattr(dm, 'admin_uninstall', lambda only=None: 7 if only == GUID_B else 0)
+    assert dm.admin_cleanup(GUID_B) == 7
+
+
+def test_cleanup_from_the_command_line(monkeypatch):
+    asked = []
+    monkeypatch.setattr(dm, '_elevated', lambda args: asked.append(args) or 0)
+    assert dm.cleanup(GUID_B) is None and asked == [['cleanup', GUID_B]]
+
+
+@pytest.mark.parametrize('found', [False, True])
+def test_cleanup_asks_for_admin_only_when_something_is_there(window, qapp, monkeypatch, found):  # noqa: F811
+    asked, switched = [], []
+    d, card = card_with(window, qapp, monkeypatch, two_mics('ready', 'other'))
+    left = [found]
+    monkeypatch.setattr(dm, 'leftovers', lambda guid: left[0])
+    monkeypatch.setattr(dm, 'cleanup',
+                        lambda guid: asked.append(guid) or left.__setitem__(0, False))
+    monkeypatch.setattr(dm, 'status_on', lambda guid: 'other')
+    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'on_device', lambda cb, attr: switched.append(attr))
+    card.rows[GUID_B].buttons['cleanup'].click()
+    words = ' '.join(lbl.text() for lbl in card.dialog.findChildren(QLabel))
+    assert "Only Onion Board's own parts go" in words and 'comes off' not in words
+    next(b for b in card.dialog.findChildren(QPushButton)
+         if b.text() == 'Clean up leftovers').click()
+    wait(qapp, lambda: not card.recovery.running)
+    assert asked == ([GUID_B] if found else [])
+    assert not switched   # cleaning up never moves your sounds to another mic
+    assert card.note.text() == ('Leftovers removed from #2 Headset Mic (USB).' if found else
+                                "Nothing of Onion Board's was left on #2 Headset Mic (USB).")
     d.close()

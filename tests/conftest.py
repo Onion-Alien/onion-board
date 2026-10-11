@@ -324,7 +324,7 @@ def _keep_the_test_logging():
 @pytest.fixture(autouse=True)
 def _never_touch_the_real_mic(monkeypatch, tmp_path):
     """Straight into my mic (soundboard.directmic): no test writes the real shared file
-    the mic effect reads, runs the admin step, or sees this PC's own install."""
+    the mic effect reads, runs the admin step, or sees this PC's own install or mics."""
     from soundboard import directmic
 
     def no_admin(*_a, **_k):
@@ -333,6 +333,7 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     monkeypatch.setattr(directmic, "ring_path", lambda: tmp_path / "guard" / "ring2.bin")
     monkeypatch.setattr(directmic, "_elevated", no_admin)
     monkeypatch.setattr(directmic, "installed_on", lambda: [])
+    monkeypatch.setattr(directmic, "capture_endpoints", lambda: [])   # nor this PC's mics
     directmic.forget_status()
 
 

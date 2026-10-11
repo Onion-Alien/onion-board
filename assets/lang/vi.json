@@ -3101,5 +3101,29 @@
   "Adding {n} sound": [
     "Đang thêm {n} âm thanh"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Đã gỡ cáp ảo. Hãy khởi động lại PC trước khi cài lại."
+  "The virtual cable was removed. Restart your PC before you install it again.": "Đã gỡ cáp ảo. Hãy khởi động lại PC trước khi cài lại.",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Nó sẽ được gỡ khỏi {mic}: mỗi lúc hiệu ứng mic chỉ chạy trên một mic.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Đã cài lại hiệu ứng mic trên {mic}. Hãy thử trong cuộc trò chuyện thoại.",
+  "Mic effect removed from {mic}": "Đã gỡ hiệu ứng mic khỏi {mic}",
+  "Onion Board will send your sounds into {mic} from now on.": "Từ giờ Onion Board sẽ gửi âm thanh của bạn vào {mic}.",
+  "Plug this mic in to repair it.": "Cắm mic này vào để sửa.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Cài lại hiệu ứng mic của Onion Board trên {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Khôi phục {mic} và gỡ hiệu ứng mic của Onion Board khỏi nó. Âm thanh sẽ không còn được gửi trực tiếp vào đó.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Khôi phục {mic}, gỡ hiệu ứng mic cũ, rồi cài một bản mới lên đó.",
+  "{mic} (unplugged)": "{mic} (chưa cắm)",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Âm thanh của bạn đang vào {mic}. Để dùng mic này thay thế, hãy chọn nó trong Thiết bị nữa.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Dọn phần còn sót",
+  "Cleaning up failed (code {code}).": "Dọn dẹp thất bại (mã {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Nếu tìm thấy gì, Windows sẽ xin quyền và âm thanh sẽ dừng một lát.",
+  "Install mic effect": "Cài hiệu ứng",
+  "Leftovers removed from {mic}.": "Đã dọn phần còn sót khỏi {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Tìm mọi thứ Onion Board để lại trên {mic} và gỡ đi. Chỉ phần của Onion Board bị gỡ: các cài đặt khác của mic vẫn giữ.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Đã cài hiệu ứng mic trên {mic}. Hãy thử trong cuộc trò chuyện thoại.",
+  "Mic effect installed. Test it in your voice chat.": "Đã cài hiệu ứng mic. Hãy thử trong cuộc trò chuyện thoại.",
+  "Not installed": "Chưa cài",
+  "Nothing of Onion Board's was left on {mic}.": "Không còn gì của Onion Board trên {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên micro đã chọn để âm thanh của bạn đi thẳng vào đó.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên {mic} để âm thanh của bạn đi thẳng vào đó.",
+  "Some leftovers couldn't be removed from {mic}.": "Không gỡ được một số phần còn sót khỏi {mic}."
 }
