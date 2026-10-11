@@ -142,7 +142,9 @@ These are the current reference points. Copy their structure before inventing a 
 - **Narrow by default.** Every control is as wide as its content: buttons as wide as
   their words, dropdowns as wide as their longest choice (capped at 360 px), then
   `addStretch(1)`. Only a control that holds long free text (search, a path, a slider,
-  a text line) may stretch.
+  a text line) may stretch. On a full-screen window only the search box is capped
+  (`SEARCH_MAX_W`, 480 px); the seek bar, the meter and the drop box keep following the
+  window on purpose (a longer seek bar seeks finer). Don't cap them.
 - **Dialogs**: capped at about 620 px wide, as tall as their content. Use
   `fit.watch(self)` so they grow to fit translated text. A multi-step dialog changes
   pages in a `QStackedWidget` and shrinks to the current page (see feedbackdialog).
@@ -384,20 +386,10 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Left tab rail | `soundboard/ui/sidebar.py` |
 | Wheel guard, dropdown widths | `soundboard/wheelguard.py` |
 
-## 13. Known gaps (old screens that break these rules)
+## 13. Known gaps
 
-The prioritized, evidence-based fix list is [UI-AUDIT.md](UI-AUDIT.md). The notes
-below predate that spot audit: recheck them, rather than assuming they still apply.
-
-Fix these when a task touches them; don't sweep them all in one go.
-
-- Some Setup texts still have long dashes (open work: text style pass).
-- Voice tab cards stretch across the full width with empty space below.
-- Many word buttons that should be icons, and long ones ("Make it sound clean in
-  Discord", "Record 6s, play back") that should be shorter (open work: the compact pass).
-- Plain cards: Setup's *Your mic* (paragraphs of how-to text that belong behind an ⓘ),
-  *Connect your chat* (a grid of long word buttons that could be app tiles), Settings
-  pages (rows of text and buttons with no icons or pills).
+Open UI work, old screens that still break these rules included, is tracked only in
+[UI-AUDIT.md](UI-AUDIT.md). Fix a gap when a task touches it; don't sweep them all in one go.
 
 ## 14. UI workflow for agents and reviewers
 
