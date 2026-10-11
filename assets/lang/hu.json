@@ -239,7 +239,6 @@
   "Click again to turn it off": "Kattints újra a kikapcsoláshoz",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Kattints a <b>Voice Input Device</b> mezőre, és válaszd ezt: <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Kattints, hogy újra élő legyél: mások hallanak téged és a hangjaidat",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Kattints a némításhoz: semmi nem megy ki másoknak (Discord, a játék, OBS…). Te továbbra is mindent hallasz",
   "Click to set": "Kattints a beállításhoz",
   "Clip {time}": "Klip {time}",
   "Close": "Bezárás",
@@ -3047,8 +3046,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Megjegyzi minden letöltés linkjét, csatornáját, feltöltési dátumát, hosszát és megtekintéseit (magából a letöltésből, semmi pluszt nem kér le), a hang melletti szövegfájlban is. Kattints jobb gombbal a hangra a link megnyitásához vagy másolásához. Kikapcsolva: az új letöltések semmit sem tartanak meg ebből, és a menü elrejti; ami már el van mentve, marad.",
   "Remember where it came from": "Jegyezze meg, honnan jött",
   "Set up output": "Kimenet beállítása",
-  "Sound output": "Hangkimenet",
   "Interface size": "Felület mérete",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Mindent nagyobbá vagy kisebbé tesz az Onion Boardban: szöveget, gombokat és padeket.",
-  "Onion Board changes size after a restart.": "Az Onion Board újraindítás után vált méretet."
+  "Onion Board changes size after a restart.": "Az Onion Board újraindítás után vált méretet.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Kattints, hogy elnémítsd a hangjaidat mások számára (Discord, a játék, OBS…). A mikrofonod továbbra is megy, hacsak nincs bekapcsolva a hangváltó. Te továbbra is mindent hallasz",
+  "Click to send your sounds again: right now others hear only your mic": "Kattints, hogy újra küldd a hangjaidat: most mások csak a mikrofonodat hallják",
+  "Only your mic": "Csak a mikrofonod",
+  "Others hear": "Mások hallják",
+  "Others hear only your mic": "Mások csak a mikrofonodat hallják"
 }

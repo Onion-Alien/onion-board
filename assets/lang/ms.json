@@ -237,7 +237,6 @@
   "Click again to turn it off": "Klik lagi untuk mematikannya",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Klik kotak <b>Voice Input Device</b> dan pilih <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Klik untuk langsung semula: orang lain dengar anda dan bunyi anda",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klik untuk senyapkan: tiada apa langsung dihantar kepada orang lain (Discord, permainan, OBS…). Anda masih dengar semuanya",
   "Click to set": "Klik untuk tetapkan",
   "Clip {time}": "Klip {time}",
   "Close": "Tutup",
@@ -2982,8 +2981,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Menyimpan pautan, saluran, tarikh muat naik, panjang dan tontonan setiap muat turun (daripada muat turun itu sendiri, tiada apa-apa tambahan diambil), juga dalam fail teks di sebelah bunyi. Klik kanan bunyi untuk membuka atau menyalin pautan. Dimatikan: muat turun baharu tidak menyimpan apa-apa dan menu menyembunyikannya; yang sudah disimpan kekal.",
   "Remember where it came from": "Ingat dari mana asalnya",
   "Set up output": "Sediakan output",
-  "Sound output": "Output bunyi",
   "Interface size": "Saiz antara muka",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Menjadikan semua dalam Onion Board lebih besar atau lebih kecil: teks, butang dan pad.",
-  "Onion Board changes size after a restart.": "Saiz Onion Board berubah selepas dimulakan semula."
+  "Onion Board changes size after a restart.": "Saiz Onion Board berubah selepas dimulakan semula.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik untuk senyapkan bunyi anda bagi orang lain (Discord, permainan, OBS…). Mikrofon anda masih dihantar kecuali penukar suara dihidupkan. Anda masih dengar semuanya",
+  "Click to send your sounds again: right now others hear only your mic": "Klik untuk hantar bunyi anda semula: sekarang orang lain hanya dengar mikrofon anda",
+  "Only your mic": "Hanya mikrofon anda",
+  "Others hear": "Orang lain dengar",
+  "Others hear only your mic": "Orang lain hanya dengar mikrofon anda"
 }

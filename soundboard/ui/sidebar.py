@@ -213,14 +213,19 @@ class OutputBlock(QFrame):
     Built on keylines (docs/DESIGN.md *Icon and text alignment*): its icons sit in
     the same column as the tab icons above and the buttons below, every line of
     words starts at the same x after them, and each icon is centred on the cap
-    height of its label's first line."""
+    height of its label's first line. The status line is the setup action too:
+    "Not connected ›" is one click to Setup, "Connected" is only words."""
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
+    TOP = 12              # card padding over the title row (the 12 of settings cards)
     PAD = 8               # the card's other padding
     GLYPH = 16            # the icon column
-    GAP = 6               # icon to words (8 wraps "Sound output" on the 190 px rail)
+    GAP = 6               # icon to words (8 wraps longer titles on the 190 px rail)
     TEXT_X = LEAD + GLYPH + GAP   # the keyline: where every line of words starts
-    ACTION_PAD = 8        # the setup action's hover fill past its words
+    ROW_PAD = 4           # the status line's hover fill past its icon
+    ROW_GAP = 6           # title row to the status line's fill
+    ROW_H = 28            # the status line's height, fill and all
+    CHEVRON = 12          # the status line's chevron: lighter than the icons
 
     def __init__(self, power: QPushButton, connection: QPushButton):
         super().__init__()
@@ -229,20 +234,19 @@ class OutputBlock(QFrame):
         self.setObjectName("railoutput")
         self.power, self.connection = power, connection
         box = self.box = QVBoxLayout(self)
-        box.setContentsMargins(self.LEAD, self.PAD, self.PAD, self.PAD)
         box.setSpacing(0)
         top = self.top = QHBoxLayout()
         top.setSpacing(0)   # icon GAP words, then a tighter 4 before the switch
         mark = self.mark = self._glyph()
         icons.set_label_icon(mark, "live", "accent", size=self.GLYPH)
-        self.title = QLabel(_("Sound output"))
+        self.title = QLabel(_("Others hear"))
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
         self.title.setAlignment(Qt.AlignLeading | Qt.AlignTop)
         self.title.setMinimumWidth(0)
         self.switch = Switch()
         self.switch.setProperty("glyphoffset", 1)
-        self.switch.setAccessibleName(_("Sound output"))
+        self.switch.setAccessibleName(_("Others hear"))
         self.title.setBuddy(self.switch)
         self.switch.setChecked(power.isChecked())
         self.switch.toggled.connect(power.setChecked)
@@ -254,66 +258,61 @@ class OutputBlock(QFrame):
         top.addSpacing(4)
         top.addWidget(self.switch, 0, Qt.AlignTop)
         box.addLayout(top)
-        self._status_gap = QSpacerItem(0, 4, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self._status_gap = QSpacerItem(0, self.ROW_GAP, QSizePolicy.Minimum, QSizePolicy.Fixed)
         box.addSpacerItem(self._status_gap)
-        status = QHBoxLayout()
-        status.setSpacing(self.GAP)
-        self.status_icon = self._glyph()
-        self.status_text = QLabel()
-        self.status_text.setWordWrap(True)
-        self.status_text.setAlignment(Qt.AlignLeading | Qt.AlignTop)
-        self.status_text.setMinimumWidth(0)
-        status.addWidget(self.status_icon, 0, Qt.AlignTop)
-        status.addWidget(self.status_text, 1, Qt.AlignTop)
-        box.addLayout(status)
-        # the action is a second line of the status row: its words start on the
-        # keyline too, and its hover fill reaches GAP past them on each side
+        # the status line is the button: its fill starts ROW_PAD before the icon (the
+        # card's padding is that much less there, the title row that much in), so the
+        # icon and words stay on their keylines
         self.setup = QPushButton()
         self.setup.setObjectName("railoutputsetup")
         self.setup.setProperty("quiet", True)
-        self.setup.setCursor(Qt.PointingHandCursor)
-        self.setup.setMinimumHeight(34)
-        # grows with a wrapped (translated) label instead of clipping it
+        self.setup.setMinimumHeight(self.ROW_H)
+        # grows with a wrapped (translated) status instead of clipping it
         self.setup.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
-        self.setup.setAccessibleName(_("Set up output"))
-        action = self.action = QHBoxLayout(self.setup)
-        action.setContentsMargins(self.ACTION_PAD, 4, self.ACTION_PAD, 4)
-        action.setSpacing(0)   # the chevron glyph has ~5 px of air in its 16 px box
-        label = self.setup_label = _HugLabel(_("Set up output"))
-        label.setWordWrap(True)
-        label.setAlignment(Qt.AlignLeading | Qt.AlignTop)
-        label.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.arrow = self._glyph()
-        self.arrow.setAttribute(Qt.WA_TransparentForMouseEvents)
-        action.addWidget(label, 0, Qt.AlignTop)
-        action.addWidget(self.arrow, 0, Qt.AlignTop)
-        action.addStretch(1)   # the chevron stays beside its words
-        self.setup.clicked.connect(connection.click)
-        row = self.setup_row = QHBoxLayout()
+        row = self.row = QHBoxLayout(self.setup)
         row.setSpacing(0)
-        self._setup_indent = QSpacerItem(self.GLYPH + self.GAP - self.ACTION_PAD, 0,
-                                         QSizePolicy.Fixed, QSizePolicy.Minimum)
-        row.addSpacerItem(self._setup_indent)
-        row.addWidget(self.setup, 1)
-        box.addLayout(row)
+        self.status_icon = self._glyph()
+        self.status_text = _HugLabel("")
+        self.status_text.setWordWrap(True)
+        self.status_text.setAlignment(Qt.AlignLeading | Qt.AlignTop)
+        self.arrow = self._glyph(self.CHEVRON)
+        for w in (self.status_icon, self.status_text, self.arrow):
+            w.setAttribute(Qt.WA_TransparentForMouseEvents)
+        row.addWidget(self.status_icon, 0, Qt.AlignTop)
+        row.addSpacing(self.GAP)
+        row.addWidget(self.status_text, 0, Qt.AlignTop)
+        row.addSpacing(self.GAP - 2)   # (the chevron's glyph has ~2 px of air)
+        row.addWidget(self.arrow, 0, Qt.AlignTop)
+        row.addStretch(1)   # the chevron stays beside its words
+        self.setup.clicked.connect(self._setup_clicked)
+        box.addWidget(self.setup)
         self.refresh()
 
-    def _glyph(self) -> QLabel:
+    def _glyph(self, size: int = 0) -> QLabel:
         g = QLabel()
-        g.setFixedWidth(self.GLYPH)
+        g.setFixedWidth(size or self.GLYPH)
         g.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
         return g
 
-    def _pin(self, glyph: QLabel, label: QLabel, lead: int = 0):
-        """Centre `glyph` on the cap height of `label`'s first line (not on the
-        label's box: a wrapped label's box centre falls between its lines). `lead`:
-        how far the label's first line is pushed down."""
+    def _good(self) -> bool:
+        return self.connection.property("state") == "ok"
+
+    def _setup_clicked(self):
+        if not self._good():   # "Connected" is only words
+            self.connection.click()
+
+    def _pin(self, glyph: QLabel, label: QLabel, lead: int = 0, mid: str = "cap"):
+        """Centre `glyph` on `label`'s first line (not on the label's box: a wrapped
+        label's box centre falls between its lines): on its cap height, or (`mid`
+        "x") its x-height, for the chevron after lowercase words. `lead`: how far
+        the label's first line is pushed down."""
         label.ensurePolished()
         fm = label.fontMetrics()
-        centre = lead + fm.ascent() - fm.capHeight() / 2
-        top = max(0, int(centre - self.GLYPH / 2))   # (a half pixel up: the overshoot)
+        centre = lead + fm.ascent() - (fm.xHeight() if mid == "x" else fm.capHeight()) / 2
+        size = glyph.width()
+        top = max(0, int(centre - size / 2))   # (a half pixel up: the overshoot)
         glyph.setContentsMargins(0, top, 0, 0)
-        glyph.setFixedHeight(max(fm.height(), top + self.GLYPH))
+        glyph.setFixedHeight(max(fm.height(), top + size))
 
     def _pin_all(self):
         # the title's first line is centred on the switch, and the mark on that line
@@ -321,13 +320,13 @@ class OutputBlock(QFrame):
         lead = max(0, -(-(self.switch.height() - self.title.fontMetrics().height()) // 2))
         self.title.setContentsMargins(0, lead, 0, 0)
         self._pin(self.mark, self.title, lead)
-        self._pin(self.status_icon, self.status_text)
-        # one line of the action: centred in its 34 px; wrapped, the chevron stays
+        # one line of status: centred in its ROW_H; wrapped, the icon and chevron stay
         # on the first line
-        self.setup_label.ensurePolished()
-        pad = max(4, (34 - self.setup_label.fontMetrics().height()) // 2)
-        self.action.setContentsMargins(self.ACTION_PAD, pad, self.ACTION_PAD, pad)
-        self._pin(self.arrow, self.setup_label)
+        self.status_text.ensurePolished()
+        pad = max(4, (self.ROW_H - self.status_text.fontMetrics().height()) // 2)
+        self.row.setContentsMargins(self.ROW_PAD, pad, self.PAD, pad)
+        self._pin(self.status_icon, self.status_text)
+        self._pin(self.arrow, self.status_text, mid="x")
 
     def changeEvent(self, e):
         super().changeEvent(e)
@@ -336,15 +335,14 @@ class OutputBlock(QFrame):
 
     def set_expanded(self, expanded: bool):
         self.setProperty("expanded", expanded)
-        self.box.setContentsMargins(*(self.LEAD, self.PAD, self.PAD, self.PAD) if expanded
-                                    else (0, 4, 0, 4))
+        self.box.setContentsMargins(*(self.LEAD - self.ROW_PAD, self.TOP, self.PAD, self.PAD)
+                                    if expanded else (0, 4, 0, 4))
+        self.top.setContentsMargins(self.ROW_PAD if expanded else 0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.LeftToRight if expanded else QBoxLayout.TopToBottom)
         self.title.setVisible(expanded)
-        self.status_icon.setVisible(expanded)
-        self.status_text.setVisible(expanded)
         self.setup.setVisible(expanded)
         self.switch.setFixedSize(38 if expanded else 34, 22)
-        self._status_gap.changeSize(0, 4 if expanded else 0,
+        self._status_gap.changeSize(0, self.ROW_GAP if expanded else 0,
                                     QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.box.invalidate()
         self.top.setAlignment(self.mark, Qt.AlignTop if expanded else Qt.AlignHCenter)
@@ -362,13 +360,22 @@ class OutputBlock(QFrame):
         self.switch.setAccessibleDescription(self.power.property("railfull") or "")
         self.status_text.setText(self.connection.property("railtext") or "")
         self.status_text.setToolTip(self.connection.property("railfull") or "")
-        good = self.connection.property("state") == "ok"
-        self.setup.setVisible(bool(self.property("expanded")) and not good)
+        good = self._good()
+        # "Not connected ›" takes you to Setup; "Connected" is words only: no hover, no
+        # hand, out of the Tab order (never disabled: that would throw the focus)
+        self.setup.setProperty("action", not good)
+        self.setup.setCursor(Qt.ArrowCursor if good else Qt.PointingHandCursor)
+        self.setup.setFocusPolicy(Qt.NoFocus if good else Qt.TabFocus)
+        self.setup.setToolTip("" if good else self.connection.toolTip())
+        self.setup.setAccessibleName(self.status_text.text() if good else _("Set up output"))
+        self.setup.setAccessibleDescription(self.connection.property("railfull") or "")
+        self.arrow.setVisible(not good)
+        self.setup.style().unpolish(self.setup)
+        self.setup.style().polish(self.setup)
         theme.set_tone(self.status_text, "ok" if good else "warn")
         self.status_icon.setPixmap(self.connection.icon().pixmap(self.GLYPH, self.GLYPH))
-        self.setup.setToolTip(self.connection.toolTip())
         icons.set_label_icon(self.arrow, "fold_back" if self.isRightToLeft() else "fold",
-                             "accent", size=self.GLYPH)
+                             "warn_text", size=self.CHEVRON)
         self._pin_all()
 
 
@@ -560,6 +567,10 @@ class SideRail(QFrame):
         if power is not None and connection is not None:
             self.output = OutputBlock(power, connection)
             self._status_box.insertWidget(2 if self.alerts else 1, self.output)
+            # 8 to Stop all under the open card, not the box's 4 (a spacer gets no
+            # spacing of its own); refresh_output sizes it
+            self._output_gap = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Fixed)
+            self._status_box.insertItem(3 if self.alerts else 2, self._output_gap)
         self._status_box.addSpacerItem(self._status_pad_after)   # (open: centered horizontally)
         lay.addLayout(self._status_box)
         self._gaps.append(self._gap(6))
@@ -783,12 +794,12 @@ class SideRail(QFrame):
 
     def _full_fit(self) -> int:
         """The narrowest open rail where the full layout fits, every word on its line:
-        the name, "Sound output" beside its switch, Settings beside the arrow (a longer
+        the name, "Others hear" beside its switch, Settings beside the arrow (a longer
         translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
         need = [side + BUTTON_W + 6 + self._brand_width()]
         if self.output:
-            title = self.output.title.fontMetrics().horizontalAdvance(_("Sound output"))
+            title = self.output.title.fontMetrics().horizontalAdvance(_("Others hear"))
             need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
         for w in self.foot:
             name = ICON_PAD + (w.property("railtext") or "")
@@ -987,6 +998,9 @@ class SideRail(QFrame):
         if self.output:
             shown = self.is_open() and not self._mid()   # mid: the small one, in the column
             self.output.set_expanded(shown)
+            self._output_gap.changeSize(0, 4 if shown else 0, QSizePolicy.Minimum,
+                                        QSizePolicy.Fixed)
+            self._status_box.invalidate()
             self.output.power.hide()
             self.output.connection.setVisible(
                 not shown and not bool(self.output.connection.property("outputgood")))

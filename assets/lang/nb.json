@@ -239,7 +239,6 @@
   "Click again to turn it off": "Klikk igjen for å slå den av",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Klikk på feltet <b>Inndataenhet for tale</b> og velg <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Klikk for å være live igjen: andre hører deg og lydene dine",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klikk for å dempe: ingenting går ut til andre (Discord, spillet, OBS…). Du hører fortsatt alt",
   "Click to set": "Klikk for å velge",
   "Clip {time}": "Klipp {time}",
   "Close": "Lukk",
@@ -3047,8 +3046,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Tar vare på lenke, kanal, opplastingsdato, lengde og visninger for hver nedlasting (fra selve nedlastingen, ingenting ekstra hentes), også i en tekstfil ved siden av lyden. Høyreklikk lyden for å åpne eller kopiere lenken. Av: nye nedlastinger tar vare på ingenting av dette og menyen skjuler det; det som allerede er lagret, blir.",
   "Remember where it came from": "Husk hvor den kom fra",
   "Set up output": "Sett opp utgang",
-  "Sound output": "Lydutgang",
   "Interface size": "Grensesnittstørrelse",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Gjør alt i Onion Board større eller mindre: tekst, knapper og pads.",
-  "Onion Board changes size after a restart.": "Onion Board endrer størrelse etter en omstart."
+  "Onion Board changes size after a restart.": "Onion Board endrer størrelse etter en omstart.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klikk for å dempe lydene dine for andre (Discord, spillet, OBS…). Mikrofonen din sendes fortsatt, med mindre stemmeskifteren er på. Du hører fortsatt alt",
+  "Click to send your sounds again: right now others hear only your mic": "Klikk for å sende lydene dine igjen: nå hører andre bare mikrofonen din",
+  "Only your mic": "Bare mikrofonen din",
+  "Others hear": "Andre hører",
+  "Others hear only your mic": "Andre hører bare mikrofonen din"
 }

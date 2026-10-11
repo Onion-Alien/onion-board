@@ -82,7 +82,6 @@
   "Clear the selection (Esc)": "ล้างที่เลือก (Esc)",
   "Click again to turn it off": "คลิกอีกครั้งเพื่อปิด",
   "Click to go live again: others hear you and your sounds": "คลิกเพื่อกลับมาออนแอร์: คนอื่นได้ยินคุณและเสียงของคุณ",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "คลิกเพื่อปิดเสียง: ไม่มีอะไรส่งออกไปหาคนอื่นเลย (Discord, เกม, OBS…) คุณยังได้ยินทุกอย่าง",
   "Close": "ปิด",
   "Close Onion Board and open it again to finish.": "ปิด Onion Board แล้วเปิดใหม่เพื่อให้เสร็จ",
   "Colour": "สี",
@@ -2982,8 +2981,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "เก็บลิงก์ ช่อง วันที่อัปโหลด ความยาว และยอดดูของแต่ละการดาวน์โหลด (จากการดาวน์โหลดเอง ไม่ได้ดึงอะไรเพิ่ม) ในไฟล์ข้อความข้างเสียงด้วย คลิกขวาที่เสียงเพื่อเปิดหรือคัดลอกลิงก์ ปิด: การดาวน์โหลดใหม่จะไม่เก็บอะไรเลยและเมนูจะซ่อนไว้ ส่วนที่บันทึกไว้แล้วยังอยู่",
   "Remember where it came from": "จำว่ามาจากไหน",
   "Set up output": "ตั้งค่าเอาต์พุต",
-  "Sound output": "เอาต์พุตเสียง",
   "Interface size": "ขนาดหน้าจอ",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "ทำให้ทุกอย่างใน Onion Board ใหญ่ขึ้นหรือเล็กลง: ข้อความ ปุ่ม และแพด",
-  "Onion Board changes size after a restart.": "Onion Board จะเปลี่ยนขนาดหลังรีสตาร์ท"
+  "Onion Board changes size after a restart.": "Onion Board จะเปลี่ยนขนาดหลังรีสตาร์ท",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "คลิกเพื่อปิดเสียงของคุณสำหรับคนอื่น (Discord, เกม, OBS…) ไมค์ของคุณยังส่งออกไป เว้นแต่จะเปิดโปรแกรมเปลี่ยนเสียงอยู่ คุณยังได้ยินทุกอย่าง",
+  "Click to send your sounds again: right now others hear only your mic": "คลิกเพื่อส่งเสียงของคุณอีกครั้ง: ตอนนี้คนอื่นได้ยินแค่ไมค์ของคุณ",
+  "Only your mic": "แค่ไมค์ของคุณ",
+  "Others hear": "คนอื่นได้ยิน",
+  "Others hear only your mic": "คนอื่นได้ยินแค่ไมค์ของคุณ"
 }

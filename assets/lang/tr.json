@@ -83,7 +83,6 @@
   "Clear the selection (Esc)": "Seçimi temizle (Esc)",
   "Click again to turn it off": "Kapatmak için tekrar tıkla",
   "Click to go live again: others hear you and your sounds": "Tekrar canlıya geçmek için tıkla: diğerleri seni ve seslerini duyar",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Susturmak için tıkla: diğerlerine (Discord, oyun, OBS…) hiçbir şey gitmez. Sen yine her şeyi duyarsın",
   "Close": "Kapat",
   "Close Onion Board and open it again to finish.": "Bitirmek için Onion Board'u kapatıp tekrar aç.",
   "Colour": "Renk",
@@ -3047,8 +3046,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Her indirmenin bağlantısını, kanalını, yükleme tarihini, süresini ve görüntülenmesini saklar (indirmenin kendisinden, fazladan bir şey çekilmez), sesin yanındaki bir metin dosyasında da. Bağlantıyı açmak veya kopyalamak için sese sağ tıkla. Kapalı: yeni indirmeler bunların hiçbirini saklamaz ve menü gizler; zaten kaydedilmiş olan kalır.",
   "Remember where it came from": "Nereden geldiğini hatırla",
   "Set up output": "Çıkışı ayarla",
-  "Sound output": "Ses çıkışı",
   "Interface size": "Arayüz boyutu",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board'daki her şeyi büyütür ya da küçültür: yazılar, düğmeler ve pad'ler.",
-  "Onion Board changes size after a restart.": "Onion Board yeniden başlatınca boyut değiştirir."
+  "Onion Board changes size after a restart.": "Onion Board yeniden başlatınca boyut değiştirir.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Seslerini diğerleri için kapatmak için tıkla (Discord, oyun, OBS…). Ses değiştirici açık değilse mikrofonun gitmeye devam eder. Sen her şeyi duymaya devam edersin",
+  "Click to send your sounds again: right now others hear only your mic": "Seslerini yeniden göndermek için tıkla: şu an diğerleri yalnızca mikrofonunu duyuyor",
+  "Only your mic": "Yalnızca mikrofonun",
+  "Others hear": "Diğerleri duyar",
+  "Others hear only your mic": "Diğerleri yalnızca mikrofonunu duyuyor"
 }

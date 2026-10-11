@@ -82,7 +82,6 @@
   "Clear the selection (Esc)": "Bỏ chọn (Esc)",
   "Click again to turn it off": "Bấm lần nữa để tắt",
   "Click to go live again: others hear you and your sounds": "Bấm để trực tiếp lại: người khác nghe bạn và âm thanh của bạn",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Bấm để tắt tiếng: không gì gửi tới người khác (Discord, game, OBS…). Bạn vẫn nghe mọi thứ",
   "Close": "Đóng",
   "Close Onion Board and open it again to finish.": "Đóng Onion Board rồi mở lại để hoàn tất.",
   "Colour": "Màu",
@@ -2982,8 +2981,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Lưu liên kết, kênh, ngày tải lên, độ dài và lượt xem của mỗi lần tải (lấy từ chính lần tải đó, không lấy thêm gì), cả trong tệp văn bản cạnh âm thanh. Chuột phải vào âm thanh để mở hoặc sao chép liên kết. Tắt: các lần tải mới không lưu gì và menu sẽ ẩn đi; những gì đã lưu vẫn giữ nguyên.",
   "Remember where it came from": "Ghi nhớ nguồn gốc",
   "Set up output": "Thiết lập đầu ra",
-  "Sound output": "Đầu ra âm thanh",
   "Interface size": "Cỡ giao diện",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Làm mọi thứ trong Onion Board to hơn hoặc nhỏ hơn: chữ, nút và pad.",
-  "Onion Board changes size after a restart.": "Onion Board đổi cỡ sau khi khởi động lại."
+  "Onion Board changes size after a restart.": "Onion Board đổi cỡ sau khi khởi động lại.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Nhấn để tắt âm thanh của bạn với người khác (Discord, trò chơi, OBS…). Mic của bạn vẫn được gửi đi trừ khi bật đổi giọng nói. Bạn vẫn nghe mọi thứ",
+  "Click to send your sounds again: right now others hear only your mic": "Nhấn để gửi lại âm thanh của bạn: giờ người khác chỉ nghe mic của bạn",
+  "Only your mic": "Chỉ mic của bạn",
+  "Others hear": "Người khác nghe",
+  "Others hear only your mic": "Người khác chỉ nghe mic của bạn"
 }

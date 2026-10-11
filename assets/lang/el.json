@@ -239,7 +239,6 @@
   "Click again to turn it off": "Κάνε κλικ ξανά για να το κλείσεις",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Κάνε κλικ στο πεδίο <b>Voice Input Device</b> και διάλεξε <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Κάνε κλικ για να βγεις ξανά ζωντανά: οι άλλοι ακούν εσένα και τους ήχους σου",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Κάνε κλικ για σίγαση: τίποτα απολύτως δεν βγαίνει στους άλλους (Discord, παιχνίδι, OBS…). Εσύ ακούς ακόμα τα πάντα",
   "Click to set": "Κάνε κλικ για ρύθμιση",
   "Clip {time}": "Κλιπ {time}",
   "Close": "Κλείσιμο",
@@ -3047,8 +3046,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Κρατά τον σύνδεσμο, το κανάλι, την ημερομηνία ανάρτησης, τη διάρκεια και τις προβολές κάθε λήψης (από την ίδια τη λήψη, τίποτα επιπλέον δεν κατεβαίνει), και σε αρχείο κειμένου δίπλα στον ήχο. Δεξί κλικ στον ήχο για άνοιγμα ή αντιγραφή του συνδέσμου. Κλειστό: οι νέες λήψεις δεν κρατούν τίποτα από αυτά και το μενού τα κρύβει· ό,τι έχει ήδη αποθηκευτεί μένει.",
   "Remember where it came from": "Θυμήσου από πού ήρθε",
   "Set up output": "Ρύθμιση εξόδου",
-  "Sound output": "Έξοδος ήχου",
   "Interface size": "Μέγεθος περιβάλλοντος",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Κάνει τα πάντα στο Onion Board μεγαλύτερα ή μικρότερα: κείμενο, κουμπιά και pads.",
-  "Onion Board changes size after a restart.": "Το Onion Board αλλάζει μέγεθος μετά από επανεκκίνηση."
+  "Onion Board changes size after a restart.": "Το Onion Board αλλάζει μέγεθος μετά από επανεκκίνηση.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Πάτα για σίγαση των ήχων σου για τους άλλους (Discord, το παιχνίδι, OBS…). Το μικρόφωνό σου συνεχίζει να στέλνεται, εκτός αν είναι ενεργή η αλλαγή φωνής. Εσύ ακούς τα πάντα",
+  "Click to send your sounds again: right now others hear only your mic": "Πάτα για να στέλνεις ξανά τους ήχους σου: τώρα οι άλλοι ακούν μόνο το μικρόφωνό σου",
+  "Only your mic": "Μόνο το μικρόφωνό σου",
+  "Others hear": "Οι άλλοι ακούν",
+  "Others hear only your mic": "Οι άλλοι ακούν μόνο το μικρόφωνό σου"
 }

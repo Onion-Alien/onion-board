@@ -239,7 +239,6 @@
   "Click again to turn it off": "Clica outra vez para desligar",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Clica na caixa <b>Voice Input Device</b> e escolhe <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Clica para voltar ao direto: os outros ouvem-te a ti e aos teus sons",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Clica para silenciar: não sai nada para os outros (Discord, o jogo, OBS…). Tu continuas a ouvir tudo",
   "Click to set": "Clica para definir",
   "Clip {time}": "Clip {time}",
   "Close": "Fechar",
@@ -3047,8 +3046,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Guarda a ligação, o canal, a data de carregamento, a duração e as visualizações de cada transferência (da própria transferência, nada extra é obtido), também num ficheiro de texto ao lado do som. Clica com o botão direito no som para abrir ou copiar a ligação. Desligado: as novas transferências não guardam nada disto e o menu esconde-o; o que já foi guardado fica.",
   "Remember where it came from": "Lembrar de onde veio",
   "Set up output": "Configurar saída",
-  "Sound output": "Saída de áudio",
   "Interface size": "Tamanho da interface",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Torna tudo no Onion Board maior ou mais pequeno: texto, botões e pads.",
-  "Onion Board changes size after a restart.": "O Onion Board muda de tamanho depois de reiniciar."
+  "Onion Board changes size after a restart.": "O Onion Board muda de tamanho depois de reiniciar.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Clica para silenciar os teus sons para os outros (Discord, o jogo, OBS…). O teu microfone continua a ser enviado, a não ser que o mudador de voz esteja ligado. Tu continuas a ouvir tudo",
+  "Click to send your sounds again: right now others hear only your mic": "Clica para voltar a enviar os teus sons: agora os outros ouvem só o teu microfone",
+  "Only your mic": "Só o teu microfone",
+  "Others hear": "Os outros ouvem",
+  "Others hear only your mic": "Os outros ouvem só o teu microfone"
 }

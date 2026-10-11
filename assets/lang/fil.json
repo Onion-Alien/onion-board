@@ -239,7 +239,6 @@
   "Click again to turn it off": "I-click ulit para i-off ito",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "I-click ang <b>Voice Input Device</b> box at piliin ang <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "I-click para mag-live ulit: maririnig ka at ang mga sound mo ng iba",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "I-click para i-mute: walang anumang lalabas sa iba (Discord, game, OBS…). Naririnig mo pa rin lahat",
   "Click to set": "I-click para i-set",
   "Clip {time}": "Clip {time}",
   "Close": "Isara",
@@ -3047,8 +3046,12 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Itinatabi ang link, channel, petsa ng upload, haba at views ng bawat download (mula mismo sa download, walang dagdag na kinukuha), pati sa text file sa tabi ng sound. I-right-click ang sound para buksan o kopyahin ang link. Naka-off: walang itatabi ang mga bagong download at itatago ito ng menu; mananatili ang naitabi na.",
   "Remember where it came from": "Tandaan kung saan galing",
   "Set up output": "I-set up ang output",
-  "Sound output": "Output ng tunog",
   "Interface size": "Laki ng interface",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Pinalalaki o pinaliliit ang lahat sa Onion Board: text, mga button at mga pad.",
-  "Onion Board changes size after a restart.": "Magbabago ang laki ng Onion Board pagkatapos mag-restart."
+  "Onion Board changes size after a restart.": "Magbabago ang laki ng Onion Board pagkatapos mag-restart.",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "I-click para i-mute ang mga sound mo para sa iba (Discord, ang laro, OBS…). Naipapadala pa rin ang mic mo maliban kung naka-on ang voice changer. Naririnig mo pa rin ang lahat",
+  "Click to send your sounds again: right now others hear only your mic": "I-click para ipadala ulit ang mga sound mo: mic mo lang ang naririnig ng iba ngayon",
+  "Only your mic": "Mic mo lang",
+  "Others hear": "Naririnig ng iba",
+  "Others hear only your mic": "Mic mo lang ang naririnig ng iba"
 }
