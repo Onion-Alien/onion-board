@@ -3167,5 +3167,22 @@
     "{n} звука уже есть в твоей библиотеке",
     "{n} звуков уже есть в твоей библиотеке"
   ],
-  "Open Triggers": "Открыть триггеры"
+  "Open Triggers": "Открыть триггеры",
+  "Audio recovery": "Восстановление звука",
+  "Clean reinstall": "Чистая переустановка",
+  "Fix problems sending sounds into your mic after an update.": "Исправь проблемы с передачей звуков в микрофон после обновления.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Эффект микрофона переустановлен. Проверь его в голосовом чате.",
+  "Mic effect removed": "Эффект микрофона удалён",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Переустанови эффект микрофона Onion Board на выбранном микрофоне.",
+  "Remove mic effect": "Удалить эффект микрофона",
+  "Repair failed": "Восстановление не удалось",
+  "Repair mic effect": "Восстановить эффект микрофона",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Восстанови микрофоны и удали эффект микрофона Onion Board. Звуки больше не будут передаваться прямо в микрофон.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Восстанови микрофоны, удали старый эффект микрофона и установи свежую копию на выбранный микрофон.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Не удалось проверить эффект микрофона. Перезагрузи ПК и попробуй снова восстановить эффект микрофона.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows запросит разрешение. Звук ненадолго прервётся, в том числе в звонках и играх.",
+  "Your sounds and settings are kept.": "Твои звуки и настройки сохранятся.",
+  "{error}": "{error}",
+  "Update mic effect": "Обновить эффект микрофона",
+  "Update to new version": "Обновить до новой версии"
 }
