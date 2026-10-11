@@ -992,6 +992,7 @@ class AppsTab(QWidget):
         name = (library.clean_tags([name]) or [""])[0] if ok else ""
         if not name or name in self.grid.category_order:
             return
+        usage.used("apps-category-added")
         label = self.grid.add_category(name)
         if label:
             self._wire_heading(label)
@@ -1000,6 +1001,7 @@ class AppsTab(QWidget):
         self._layout_apps()
 
     def _on_category_reordered(self, source_cat: str, target_cat: str, before: bool):
+        usage.used("apps-reorder")
         self.grid.reorder_categories(source_cat, target_cat, before)
         self.cfg.apps_categories = list(self.grid.category_order)
         self._save()
@@ -1014,6 +1016,7 @@ class AppsTab(QWidget):
         new_name = (library.clean_tags([new_name]) or [""])[0] if ok else ""
         if not new_name or new_name == old_cat or new_name in self.grid.category_order:
             return
+        usage.used("apps-category-renamed")
         self.grid.rename_category(old_cat, new_name)
         for row in self.rows.values():
             if row.category == old_cat:
@@ -1024,6 +1027,7 @@ class AppsTab(QWidget):
         self._layout_apps()
 
     def _on_delete_category(self, category: str):
+        usage.used("apps-category-deleted")
         for row in self.rows.values():
             if row.category == category:
                 row.category = "Other"
@@ -1036,6 +1040,7 @@ class AppsTab(QWidget):
     def _move_row_to_category(self, source: AppRow, target_cat: str):
         if self.big is not None or source.category == target_cat:
             return
+        usage.used("apps-reorder")
         source.category = target_cat
         self._save_row_category(source)
         order = [self.grid.itemAt(i).widget() for i in range(self.grid.count())]
@@ -1066,6 +1071,7 @@ class AppsTab(QWidget):
                 or self.rows.get(source.key) is not source
                 or self.rows.get(target.key) is not target):
             return
+        usage.used("apps-reorder")
         if source.category != target.category:
             source.category = target.category
             self._save_row_category(source)

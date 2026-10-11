@@ -24,7 +24,7 @@ from PySide6.QtGui import (QColor, QFontMetricsF, QIcon, QLinearGradient, QPaint
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard import theme, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
 from soundboard.ui.scribebun import ScribeBunny
@@ -501,7 +501,8 @@ class DownloadBar(QFrame):
         self.btn_min.setToolTip(_("Hide"))
         self.btn_min.setCursor(Qt.PointingHandCursor)
         self.btn_min.setFixedSize(22, 22)
-        self.btn_min.clicked.connect(lambda: self.set_collapsed(True))
+        self.btn_min.clicked.connect(
+            lambda: (usage.used("dl-bar-small"), self.set_collapsed(True)))
         self.btn_close = QPushButton("✕", self)
         self.btn_close.setObjectName("urgenthide")
         self.btn_close.setToolTip(_("Dismiss"))
@@ -993,7 +994,7 @@ class DownloadBar(QFrame):
             x.setCursor(Qt.PointingHandCursor)
             x.setFixedSize(24, 24)
             x.clicked.connect(lambda _c=False, u=q["url"], b=bad: self._forget(u) if b
-                              else self.cancel_requested.emit(u))
+                              else (usage.used("dl-cancel"), self.cancel_requested.emit(u)))
             rl.addWidget(x)
             self.rows.addWidget(row)
         self.rows.addStretch(1)
@@ -1009,6 +1010,7 @@ class DownloadBar(QFrame):
         if item is None:
             return
         self._forget(url)
+        usage.used("dl-retry")
         self.retry_requested.emit(dict(item))
 
     def _forget(self, url: str):
@@ -1101,6 +1103,7 @@ class DownloadBar(QFrame):
         self._clear_and_hide()
 
     def _on_cancel(self):
+        usage.used("dl-cancel")
         url = self._cancelling = self.url
         self.cancel_requested.emit(url)
         self._cancelling = ""
@@ -1108,6 +1111,7 @@ class DownloadBar(QFrame):
             self._ended_quietly()
 
     def _on_stop_all(self):
+        usage.used("dl-cancel")
         self._cancelling = self.url
         self.stop_all_requested.emit()
         self._cancelling = ""
