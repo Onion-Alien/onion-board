@@ -744,7 +744,9 @@ def test_record_waits_for_sound_then_adds_a_clip_without_sending(tab, monkeypatc
     data, name = clips[0]
     assert name.startswith("Music ")
     assert 0.9 * appspanel.SR < len(data) < 1.4 * appspanel.SR   # the silence isn't in it
-    assert cap.stopped and row.capture is None and "Saved" in row.sub.text()
+    from soundboard.ui import toast
+    assert cap.stopped and row.capture is None
+    assert any("Saved" in t.words() and t.kind == "ok" for t in toast.shown(tab))
     assert not list(tmp_path.iterdir())          # the spool file is gone
 
 
@@ -757,7 +759,9 @@ def test_record_that_never_hears_anything_saves_nothing(tab, monkeypatch, tmp_pa
     row.btn_rec.setChecked(True)
     row.capture.sink(np.zeros((4800, 2), np.float32))
     row.btn_rec.setChecked(False)
-    assert clips == [] and "didn't make a sound" in row.sub.text()
+    from soundboard.ui import toast
+    assert clips == []
+    assert any("didn't make a sound" in t.words() for t in toast.shown(tab))
 
 
 def test_record_and_send_share_one_capture(tab, monkeypatch, tmp_path):

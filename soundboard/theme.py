@@ -852,6 +852,9 @@ QPushButton#vchip[state="warn"] { color:$warn_text; border-color:$warn_text; bac
 QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
+QLabel#pill[tone="ok"] { color:$live_text; border-color:$live_border; }
+QLabel#pill[tone="warn"] { color:$warn_text; border-color:$warn_text; }
+QLabel#pill[tone="error"] { color:$error_text; border-color:$error_text; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
@@ -885,7 +888,6 @@ QFrame#setcard QPushButton:hover { background:$btn_hover; }
 QFrame#setcard QPushButton[quiet="true"] { background:transparent; }
 QFrame#setcard QPushButton[quiet="true"]:hover { background:$btn_hover; }
 QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
-QFrame#setcard QPushButton#primary[recoveryUpdate="true"] { border:1px solid $warn_text; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }

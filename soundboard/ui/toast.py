@@ -16,6 +16,11 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
   ``on_close`` runs when the card goes without its button clicked: timed out, closed,
   pushed out by newer cards or replaced (an Undo card's "too late now").
 - **Timing**: hovering pauses the countdown. Errors stay until closed.
+- **Too small to read**: the host's ``toast_mode()`` says "icons" (the mini player
+  with pads) or "hidden" (its smallest); cards that don't all fit above the floor are
+  icons too. Icons sit in the window's top corner: hovering shows the words, clicking
+  makes the window big enough to read them (the host's ``toast_expand``) and closes
+  nothing. Hidden or not, they time out as cards do; errors wait for the window to grow.
 
 Child widgets of the window, never their own windows, so they never take focus from a
 game. Animations are skipped when Windows' "Animation effects" setting is off.
@@ -46,6 +51,8 @@ ACTION_INLINE = 110       # a button wider than this goes under the text
 WIDTH = 380               # at most; narrower windows get their width less 32
 MARGIN = 16               # from the window's side
 ANIM_MS = 180
+DOT = 28                  # a card shrunk to its icon: the window's too small to read cards
+DOT_MARGIN = 8            # the icons' gap from the window's top corner
 LINE = 26                 # the row's height: icon, first text line, buttons
 ANIMATE: bool | None = None   # None: follow Windows' setting (off when offscreen)
 
@@ -271,12 +278,17 @@ class _Toast(QWidget):
         self._timer = QTimer(self, singleShot=True, timeout=self.dismiss)
         self._left = 0          # ms left when the countdown was paused by hovering
         self._leaving = False
+        self._squeezed = False   # hidden while the window shows icons (_Stack.place)
         self._anims: list[QAbstractAnimation] = []
         self.hide()
 
     # -- what it says
     def text(self) -> str:
         return self._text
+
+    def words(self) -> str:
+        """What it says, as plain words (no markup, entities read)."""
+        return _strip_tags(self._text)
 
     def set_content(self, text: str, kind: str, ms: int, action, progress, on_close=None):
         self._closed()   # what it said before is gone now
@@ -427,6 +439,9 @@ class _Stack(QObject):
         self.setObjectName("toaststack")
         self.host = host
         self.toasts: list[_Toast] = []   # oldest first
+        self.compact = False             # too small to read: icons (_Dot) instead
+        self.dots: list[_Dot] = []
+        self.mode = "cards"              # or "icons" / "hidden" (host.toast_mode)
         host.installEventFilter(self)
 
     def eventFilter(self, obj, ev):
@@ -478,13 +493,30 @@ class _Stack(QObject):
         bottom = self._floor()
         rtl = host.isRightToLeft()
         x = MARGIN - _Toast.PAD if rtl else host.width() - w - MARGIN + _Toast.PAD
-        for t in reversed(self.toasts):   # newest at the bottom, older ones above it
+        heights = {}
+        for t in self.toasts:
             t.setFixedWidth(w)
             t.ensurePolished()
             t.card.ensurePolished()
             lay = t.layout()
             h = lay.totalHeightForWidth(w) if lay.hasHeightForWidth() else t.sizeHint().height()
-            h = max(h, t.minimumSizeHint().height())
+            heights[t] = max(h, t.minimumSizeHint().height())
+        # the host's say (the mini player: icons on top, or none at its smallest), else
+        # cards; cards that can't all be read above the floor shrink to icons too
+        mode = getattr(host, "toast_mode", None)
+        mode = mode() if callable(mode) else "cards"
+        if mode == "cards" and sum(heights.values()) > bottom - 4:
+            mode = "icons"
+        self.mode = mode
+        self.compact = mode != "cards"
+        self._place_dots(rtl)
+        if self.compact:   # they keep counting down (errors wait for the window to grow)
+            for t in self.toasts:
+                t._squeezed = True
+                t.hide()
+            return
+        for t in reversed(self.toasts):   # newest at the bottom, older ones above it
+            h = heights[t]
             t.setFixedHeight(h)
             top = bottom - h
             pos = QPoint(max(0, x), max(0, top))
@@ -492,9 +524,68 @@ class _Stack(QObject):
                 t.glide_to(pos)
             else:
                 t.move(pos)
+            if t._squeezed and not t._leaving:
+                t._squeezed = False
+                t.show()   # the window grew: the card is back
             bottom = top
         for t in self.toasts:
             t.raise_()
+
+    def _place_dots(self, rtl: bool):
+        """One round icon per card in the window's top corner (newest in the corner),
+        while the mode is "icons"."""
+        want = len(self.toasts) if self.mode == "icons" else 0
+        while len(self.dots) < want:
+            self.dots.append(_Dot(self))
+        for d in self.dots[want:]:
+            d.hide()
+        gap = 6
+        for i, t in enumerate(list(reversed(self.toasts))[:want]):
+            d = self.dots[i]
+            d.show_for(t)
+            step = DOT_MARGIN + i * (DOT + gap)
+            d.move(step if rtl else self.host.width() - step - DOT, DOT_MARGIN)
+            d.show()
+            d.raise_()
+
+    def expand(self):
+        grow = getattr(self.host, "toast_expand", None)
+        if callable(grow):
+            grow()
+
+
+class _Dot(QPushButton):
+    """A card shrunk to its icon (the window's too small to read cards): hovering shows
+    its words, clicking makes the window bigger. Clicking never closes it."""
+
+    def __init__(self, stack: _Stack):
+        super().__init__(stack.host)
+        self.setObjectName("toastdot")
+        self.setFixedSize(DOT, DOT)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setFocusPolicy(Qt.NoFocus)
+        self._tone = "accent"
+        self.clicked.connect(stack.expand)
+
+    def show_for(self, t: _Toast):
+        name, self._tone = KINDS.get(t.kind, KINDS[""])
+        icons.set_icon(self, name or "info", self._tone, size=16)
+        words = _strip_tags(t.text())
+        self.setToolTip(words)
+        self.setAccessibleName(words)
+        self.update()
+
+    def paintEvent(self, ev):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        tone = QColor(theme.T.get(self._tone, theme.T.get("accent", "#7c5cff")))
+        p.setPen(QPen(tone, 2))
+        bg = QColor(theme.T.get("card_hi" if self.underMouse() else "card", "#232633"))
+        p.setBrush(bg)
+        p.drawEllipse(QRectF(1, 1, DOT - 2, DOT - 2))
+        pm = self.icon().pixmap(16, 16)
+        p.drawPixmap((DOT - 16) // 2, (DOT - 16) // 2, pm)
+        p.end()
 
 
 def _in_toast(w: QWidget) -> bool:
@@ -563,11 +654,12 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
     if new:
         stack.add(t)
         stack.place(animate=False)
-        t.show()
-        t.raise_()
-        t.fade_in()
-        t.glide_to(t.pos(), from_below=True)
-        stack.place()   # the older cards make room
+        if not stack.compact:
+            t.show()
+            t.raise_()
+            t.fade_in()
+            t.glide_to(t.pos(), from_below=True)
+            stack.place()   # the older cards make room
     else:
         stack.place()
     _announce(t, text)
@@ -581,6 +673,14 @@ def close(window: QWidget | None, key: str):
         t = s.find("", "", key) if s is not None else None
         if t is not None:
             t.dismiss()
+
+
+def relayout(window: QWidget):
+    """The window changed how it shows cards (in or out of the mini player): place them
+    again, as cards or icons."""
+    s = window.window().findChild(_Stack, "toaststack", Qt.FindDirectChildrenOnly)
+    if s is not None and s.toasts:
+        s.place(animate=False)
 
 
 def shown(window: QWidget) -> list[_Toast]:

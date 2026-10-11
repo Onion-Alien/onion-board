@@ -275,7 +275,10 @@ def test_save_as_sound_says_why_it_failed(speech, qapp, monkeypatch):
     p.clip_ready.connect(lambda data, name: got.append(name))
     p.speech.ed.setText("hi")
     p.speech.b_keep.click()
-    assert process_events(qapp, lambda: not p.speech.tts_err.isHidden()
-                          or "speech engine stopped" in p.speech.tts_err.text())
-    assert "speech engine stopped" in p.speech.tts_err.text()
+    from soundboard.ui import toast
+
+    def said():
+        return [t for t in toast.shown(p.speech) if "speech engine stopped" in t.text()]
+    assert process_events(qapp, said)
+    assert said()[0].kind == "error"
     assert not got

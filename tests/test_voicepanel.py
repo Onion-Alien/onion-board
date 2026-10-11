@@ -328,8 +328,9 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     assert not s.b_update.isEnabled() and not s.b_install.isEnabled()
     s._install()                                   # a double-click: still one pip
     assert process_events(qapp, lambda: s.b_update.isEnabled())
-    assert len(started) == 1 and not s.lbl_install.isHidden()
-    assert "disk full" in s.lbl_install.text() and "again" in s.lbl_install.text()
+    from soundboard.ui import toast
+    [t] = [t for t in toast.shown(s) if "disk full" in t.words()]
+    assert len(started) == 1 and t.kind == "error" and "again" in t.words()
     assert s.b_update.text() == "Update speech recognition"
     assert reported == []   # a full disk is said on the card, not shown as a crash
 

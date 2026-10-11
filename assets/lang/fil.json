@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Hindi ma-scan ulit",
   "Couldn't reach GitHub ({error}).": "Hindi maabot ang GitHub ({error}).",
   "Couldn't read the {name} board": "Hindi mabasa ang {name} board",
-  "Couldn't render it": "Hindi ma-render",
   "Couldn't render the preview with these effects (see the log).": "Hindi ma-render ang preview gamit ang mga effect na ito (tingnan ang log).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Hindi ma-reset: naka-lock ang settings file. Walang binago.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Hindi ma-restore: naka-lock ang settings file. Walang binago.",
@@ -2055,15 +2054,7 @@
   "Save as a voice": "I-save bilang isang boses",
   "Save clip": "I-save ang clip",
   "Saved clips": "Naka-save na mga clip",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Mga naka-save na clip ({clips}) · ✓ idinagdag sa iyong Mga Tunog",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Mga naka-save na clip ({clips}) · ✓ idinagdag {n} sa iyong Mga Tunog",
-    "Mga naka-save na clip ({clips}) · ✓ idinagdag {n} sa iyong Mga Tunog"
-  ],
   "Saved clips ({n})": "Mga naka-save na clip ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Mga naka-save na clip ({n}) · kinopya ang “{name}”: Ctrl+V i-paste ito sa isang editor o sa tab na Mga Tunog",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Mga naka-save na clip ({n}) · walang headphones para i-play ito: piliin ang mga ito sa tab na Setup",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Mga naka-save na clip ({n}) · wala kahit saan upang ipadala ito: piliin kung saan pupunta ang iyong mga tunog sa tab na Setup",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Ang mga naka-save na boses na iyong tinanggal, itinago sa loob ng {n} araw upang maibalik mo ang mga ito",
     "Ang mga naka-save na boses na iyong tinanggal, itinago sa loob ng {n} na) araw upang maibalik mo ang mga ito"
@@ -3112,7 +3103,12 @@
   "Your sounds and settings are kept.": "Mananatili ang mga tunog at setting mo.",
   "{error}": "{error}",
   "Update mic effect": "I-update ang mic effect",
-  "Update to new version": "I-update sa bagong bersyon",
+  "Added the voice “{name}”": "Naidagdag ang boses na “{name}”",
+  "Added {n} clip to your Sounds": [
+    "Naidagdag ang {n} clip sa iyong Sounds",
+    "Naidagdag ang {n} na clip sa iyong Sounds"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Nakopya ang “{name}”: idinidikit ito ng Ctrl+V sa isang editor o sa tab na Sounds",
   "Keep": "Itago",
   "Keep your imported sounds?": "Itatago ba ang mga na-import na tunog?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

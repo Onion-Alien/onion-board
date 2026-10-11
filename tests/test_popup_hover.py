@@ -4,8 +4,12 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QDialog, QMenu, QPushButton, QVBoxLayout
 
+from conftest import real_pc_mouse
 from soundboard.ui.panel import HoverCard
 from test_mainwindow import window  # noqa: F401
+
+
+pytestmark = real_pc_mouse
 
 
 @pytest.mark.parametrize("popup_type", [QMenu, QDialog])
@@ -21,6 +25,10 @@ def test_popup_clears_hover_and_allows_reentry(qapp, popup_type):
     else:
         popup.setWindowFlags(Qt.Popup)
     try:
+        # into the card first, as at the end: a window an earlier test showed may still
+        # be Qt's last one under the mouse
+        QTest.qWaitForWindowExposed(card)
+        QTest.mouseMove(card, QPoint(1, 1))
         QTest.mouseMove(button, button.rect().center())
         qapp.processEvents()
         assert button.underMouse() and card.property("hovered")

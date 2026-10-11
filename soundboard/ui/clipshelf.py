@@ -5,6 +5,7 @@ right-click adds it to your Sounds, sends it, copies it or deletes it (the Undo
 bar brings it back)."""
 from __future__ import annotations
 
+import html
 import logging
 
 import numpy as np
@@ -16,7 +17,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QHBoxLayout, QHeaderView, QLab
 from soundboard import errors
 from soundboard.clipshelf import Clip, Shelf
 from soundboard.i18n import _, ngettext
-from soundboard.ui import clipeditor, icons
+from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import UndoBar
 from soundboard.engine import SR
@@ -162,12 +163,9 @@ class ClipShelf(QWidget):
             return
         if self.engine.play(sid, data, self._gain(data), mode="restart",
                             preview=not send) is None:
-            n = len(self.shelf.clips)
-            self.title.setText(
-                _("Saved clips ({n}) · nowhere to send it: pick where your sounds go on the "
-                  "Setup tab", n=n) if send else
-                _("Saved clips ({n}) · no headphones to play it in: pick them on the Setup "
-                  "tab", n=n))
+            busy.toast(self, html.escape(
+                _("Nowhere to send it: pick where your sounds go on the Setup tab.") if send
+                else _("No headphones to play it in: pick them on the Setup tab.")), "error")
             return
         self._playing = (sid, cid)
 
@@ -207,12 +205,8 @@ class ClipShelf(QWidget):
             added += 1
         if added:
             self.undo_bar.finish()
-            clips = len(self.shelf.clips)
-            self.title.setText(
-                ngettext("Saved clips ({clips}) · ✓ added {n} to your Sounds",
-                         "Saved clips ({clips}) · ✓ added {n} to your Sounds", added,
-                         clips=clips) if added > 1 else
-                _("Saved clips ({clips}) · ✓ added to your Sounds", clips=clips))
+            busy.toast(self, ngettext("Added {n} clip to your Sounds",
+                                      "Added {n} clips to your Sounds", added), "ok")
 
     def copy_picked(self):
         picked = self._picked()
@@ -221,9 +215,8 @@ class ClipShelf(QWidget):
         data = self._audio(picked[0])
         if data is not None:
             clipeditor.set_clipboard(data)
-            self.title.setText(_("Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in "
-                                 "an editor or on the Sounds tab",
-                                 n=len(self.shelf.clips), name=picked[0].name))
+            busy.toast(self, _("Copied “{name}”: Ctrl+V pastes it in an editor or on the "
+                               "Sounds tab", name=html.escape(picked[0].name)), "ok")
 
     def delete_picked(self):
         gone = []
