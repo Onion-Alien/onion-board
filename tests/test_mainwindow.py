@@ -1147,7 +1147,9 @@ def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     assert not window.is_mini()
     assert window.mixer.height() < 100
     assert window.btn_check.isVisibleTo(window)
-    right = window.btn_check.mapTo(window.mixer, window.btn_check.rect().topRight()).x()
+    last = window._deck_tabs[2]   # the headphones' icon, after what others hear
+    assert last.isVisibleTo(window)
+    right = last.mapTo(window.mixer, last.rect().topRight()).x()
     assert window.mixer.width() - right <= 20
     window.np_name.hide()
     qapp.processEvents()
@@ -1157,6 +1159,41 @@ def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     assert all(b.height() >= 34 for b in buttons)
     assert all(b.y() - a.geometry().bottom() >= 4
                for a, b in zip(buttons, buttons[1:]))
+
+
+def test_narrow_levels_strip_shows_one_group_and_icons_for_the_others(window, qapp):
+    """Too narrow for all three groups, none is dropped: what others hear shows whole
+    and your mic and headphones are icons beside it; clicking one brings its group up."""
+    window.tabs.setCurrentWidget(window.setup_page)
+    window.show()
+    window.resize(1700, 800)
+    qapp.processEvents()
+    assert not window._mixer_one   # room for all three
+    assert not any(t.isVisibleTo(window) for t in window._deck_tabs)
+    decks = [g[-1] for g in window._decks]
+    for width in (900, 640):   # (narrower is the mini player with the tests' wider font)
+        window.resize(width, 800)
+        qapp.processEvents()
+        assert not window.is_mini() and window.mixer.isVisibleTo(window)
+        assert window._mixer_one
+        assert [d.isVisibleTo(window) for d in decks] == [False, True, False]
+        assert [t.isVisibleTo(window) for t in window._deck_tabs] == [True, False, True]
+        right = window.mixer.mapFromGlobal(window._deck_tabs[2].mapToGlobal(
+            window._deck_tabs[2].rect().topRight())).x()
+        assert right <= window.mixer.width()
+        for i in (0, 2, 1):
+            window._deck_tabs[i].click()
+            qapp.processEvents()
+            assert [d.isVisibleTo(window) for d in decks] == [j == i for j in range(3)]
+            for c in decks[i].findChildren(QWidget):
+                if c.isVisibleTo(window):   # inside the strip, nothing cut off
+                    br = c.mapTo(window.mixer, c.rect().bottomRight())
+                    assert window.mixer.rect().contains(br)
+    window.resize(1700, 800)
+    qapp.processEvents()
+    assert not window._mixer_one
+    assert all(d.isVisibleTo(window) for d in decks)
+    assert window.chk_mic.text() and window.vol_mon.spin.isVisibleTo(window)
 
 
 @pytest.mark.parametrize("page", [0, -1])   # Sounds, and the last tab (Setup)
