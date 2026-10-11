@@ -21,9 +21,12 @@ WORK = ROOT / "build" / "michelper-work"
 # everything else the app ships: the helper imports none of it
 EXCLUDE = ("numpy", "PySide6", "shiboken6", "scipy", "sounddevice", "soundfile", "soxr",
            "yt_dlp", "curl_cffi", "tkinter")
-# SHA-256 of the windowed bootloader (runw.exe) in PyInstaller's PyPI wheels. That file
-# is in thousands of programs, some of them malware, so virus scanners flagged a helper
-# built with it: scripts/build_bootloader.ps1 compiles one here instead.
+# SHA-256 of a bootloader (runw.exe) in PyInstaller's PyPI wheels, used only to tell a
+# stock wheel from one whose bootloaders were compiled here: the wheel ships run.exe and
+# runw.exe together and build_bootloader.ps1 rebuilds them together, so runw.exe is a
+# sentinel for both. The stock ones are in thousands of programs, some of them malware,
+# so virus scanners flagged a helper built with run.exe; build_bootloader.ps1 compiles
+# a clean one here instead.
 STOCK_RUNW = {
     "6.22.3": "2291f269c3a3804fde1079462239e09a8b32fffbeeaa8f628a531faf5be77d41",
 }
@@ -62,28 +65,57 @@ def build(clean: bool = False) -> int:
         print(f"no {DLL}: run scripts/build_directmic.py first", file=sys.stderr)
         return 1
     if stock := stock_bootloader():
-        print(f"PyInstaller {stock} has its stock bootloader, which virus scanners flag:"
-              " run scripts/build_bootloader.ps1 first", file=sys.stderr)
-        return 1
+        # Not fatal: a dev build (or one on a machine without MinGW-w64's gcc) should
+        # still produce a working helper. build.ps1 compiles a local bootloader before
+        # we get here, so release builds are clean; only direct/no-compiler builds fall
+        # back to the stock one, with this warning.
+        print(f"warning: PyInstaller {stock} has its stock bootloader, which some virus"
+              " scanners flag as a false positive. Run scripts/build_bootloader.ps1 for a"
+              " clean build (needs MinGW-w64's gcc).", file=sys.stderr)
     sys.path.insert(0, str(ROOT))
     from soundboard import michelper
-    cmd = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--onedir", "--windowed",
-           "--name", "obmichelper", "--distpath", str(OUT), "--workpath", str(WORK),
-           "--specpath", str(WORK), "--version-file", str(version_file()),
-           "--add-binary", f"{DLL}{os.pathsep}directmic", "--paths", str(ROOT)]
-    if clean:
-        cmd.append("--clean")
+    # --console, not --windowed: a windowed build still drew a couple of antivirus false
+    # positives on VirusTotal where a console one is clean. No window is shown either way
+    # -- the helper only ever runs as a hidden SYSTEM scheduled task (see michelper.py),
+    # which has no interactive desktop.
+    spec_cmd = [sys.executable, "-m", "PyInstaller.utils.cliutils.makespec", "--onedir",
+                "--console", "--name", "obmichelper", "--specpath", str(WORK),
+                "--version-file", str(version_file()),
+                "--icon", str(ROOT / "assets" / "onionboard.ico"),
+                "--add-binary", f"{DLL}{os.pathsep}directmic", "--paths", str(ROOT)]
     for mod in EXCLUDE:
-        cmd += ["--exclude-module", mod]
+        spec_cmd += ["--exclude-module", mod]
     # PyInstaller finds DLLs on PATH too: only Windows' own (as build.ps1 does)
     env = {**os.environ, "PATH": os.pathsep.join(
         str(Path(os.environ.get("SystemRoot", r"C:\Windows")) / p)
         for p in ("System32", "", r"System32\Wbem"))}
-    r = subprocess.run([*cmd, str(ROOT / "soundboard" / "michelper.py")], cwd=ROOT, env=env)
+    r = subprocess.run([*spec_cmd, str(ROOT / "soundboard" / "michelper.py")], cwd=ROOT,
+                       env=env, stdout=subprocess.DEVNULL)
+    if r.returncode:
+        return r.returncode
+    # The Python part (PKG) as obmichelper.pkg beside the .exe, not appended to it: an
+    # .exe with a PyInstaller archive on its end is what virus scanners flag (Bkav,
+    # Panda: even Onion Watch's .exe), the bootloader alone isn't
+    spec = WORK / "obmichelper.spec"
+    text = spec.read_text(encoding="utf-8")
+    end = "\n)\ncoll = COLLECT("
+    if text.count(end) != 1:
+        print(f"unexpected {spec}: no EXE(...) before COLLECT", file=sys.stderr)
+        return 1
+    spec.write_text(text.replace(end, "\n    append_pkg=False," + end), encoding="utf-8")
+    cmd = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--distpath", str(OUT),
+           "--workpath", str(WORK)]
+    if clean:
+        cmd.append("--clean")
+    r = subprocess.run([*cmd, str(spec)], cwd=ROOT, env=env)
     if r.returncode:
         return r.returncode
     folder = OUT / "obmichelper"
-    r = subprocess.run([str(folder / michelper.EXE_NAME), "--selftest"], timeout=60)
+    # It's a console build (a windowed one draws antivirus false positives), so run the
+    # self-test with no console window; at runtime it only ever runs as a hidden SYSTEM
+    # scheduled task, which has no desktop to show one on.
+    r = subprocess.run([str(folder / michelper.EXE_NAME), "--selftest"], timeout=60,
+                       creationflags=0x08000000)  # CREATE_NO_WINDOW
     if r.returncode:
         print(f"the built mic helper failed its self-test ({r.returncode})", file=sys.stderr)
         return 1
