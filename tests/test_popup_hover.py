@@ -21,6 +21,10 @@ def test_popup_clears_hover_and_allows_reentry(qapp, popup_type):
     else:
         popup.setWindowFlags(Qt.Popup)
     try:
+        # into the card first, as at the end: a window an earlier test showed may still
+        # be Qt's last one under the mouse
+        QTest.qWaitForWindowExposed(card)
+        QTest.mouseMove(card, QPoint(1, 1))
         QTest.mouseMove(button, button.rect().center())
         qapp.processEvents()
         assert button.underMouse() and card.property("hovered")
