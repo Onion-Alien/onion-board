@@ -1,7 +1,7 @@
 from test_mainwindow import window  # noqa: F401
 
-from soundboard.library import Config
-from PySide6.QtCore import QSize
+from soundboard.library import Config, SoundMeta
+from PySide6.QtCore import QRectF, QSize
 import pytest
 
 
@@ -24,6 +24,32 @@ def test_background_stretches_whole_thumbnail_with_padding(window, size):  # noq
     for pad in w.grid.pads:
         assert pad.x() >= target.left()
         assert pad.x() + pad.width() <= target.right()
+
+
+def test_background_board_scrolls_without_partial_rows(window, qapp, monkeypatch):  # noqa: F811
+    w = window
+    for n in range(2, 24):
+        w.cfg.sounds.append(SoundMeta(id=f"s{n}", name="Sound", file=w.meta("s0").file))
+    w._rebuild_pads()
+    w.meta("s0").image = "first.jpg"
+    playing = {"s0": (0.2, True)}
+    monkeypatch.setattr(w.engine, "playing", lambda: playing)
+    w.cfg.playing_background = True
+    w.tabs.setCurrentWidget(w.sounds_page)
+    w.resize(1180, 720)
+    w.show()
+    w._update_playing_background(playing)
+    qapp.processEvents()
+    bar = w._pad_scroll.verticalScrollBar()
+    for value in (0, 31, 120, bar.maximum()):
+        bar.setValue(value)
+        qapp.processEvents()
+        view = w.grid.parentWidget()
+        visible = QRectF(0, -w.grid.y(), view.width(), view.height())
+        for pad in w.grid.pads:
+            rect = QRectF(pad.geometry())
+            if visible.intersects(rect):
+                assert visible.contains(rect), (value, rect, visible)
 
 
 def test_background_tracks_first_active_sound(window):  # noqa: F811

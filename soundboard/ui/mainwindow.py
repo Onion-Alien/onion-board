@@ -1611,8 +1611,7 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
-        scroll.verticalScrollBar().valueChanged.connect(
-            lambda __: self.grid.update() if self.grid.background_image else None)
+        scroll.verticalScrollBar().valueChanged.connect(self._scroll_background_board)
         self._pad_scroll = scroll
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         # the pads fit the width
@@ -8256,15 +8255,41 @@ class MainWindow(QMainWindow):
         if self.transport.isHidden() == want:
             self.transport.setVisible(want)
 
+    def _scroll_background_board(self, value):
+        if not self.grid.background_image:
+            return
+        step = getattr(self, "_background_row_step", 0)
+        bar = self._pad_scroll.verticalScrollBar()
+        if step:
+            snapped = min(round(value / step), bar.maximum() // step) * step
+            if snapped != value:
+                bar.setValue(snapped)
+        self.grid.update()
+
     def _update_playing_background(self, playing):
         on = self.cfg.playing_background
-        if getattr(self, "_background_gap", None) != on:
-            self._background_gap = on
+        bottom, step = 0, 0
+        if on and self.grid.pads and self.grid._shape is not None:
+            margins = self.grid.grid.contentsMargins()
+            height = self.grid.pad_h(self.grid._shape[1])
+            spacing = self.grid.grid.spacing()
+            step = height + spacing
+            room = self._pad_scroll.height() - margins.top() - margins.bottom()
+            if room >= height:
+                bottom = (room + spacing) % step
+        self._background_row_step = step
+        gap = (on, bottom)
+        if getattr(self, "_background_gap", None) != gap:
+            self._background_gap = gap
+            bar = self._pad_scroll.verticalScrollBar()
+            if not hasattr(self, "_background_scroll_step"):
+                self._background_scroll_step = bar.singleStep()
             # The gap belongs outside the viewport, so the backdrop contains
             # every card rather than cutting inside their edges.
             rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
             self._pad_scroll.setViewportMargins(12 if on and rtl else 0, 0,
-                                               12 if on and not rtl else 0, 0)
+                                               12 if on and not rtl else 0, bottom)
+            bar.setSingleStep(step or self._background_scroll_step)
         image = ""
         if on:
             # The first active sound owns the backdrop, including while paused.
