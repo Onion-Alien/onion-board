@@ -40,7 +40,6 @@ CLIP_S = 15
 LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 TYPE_DELAY_MS = 80         # ...and before the list shows the matches already known
-ERROR_LINE_S = 30           # a station's error stays up this long (or till the next state)
 FAV_MAX = 200
 RECENT_MAX = 30
 ROW_H = 54
@@ -982,14 +981,12 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._reloading = False
             busy.set_busy(self.btn_refresh, False)
             stale = getattr(self.dir, "globe_stale", "")
-            self._refresh_info(
-                f"<span style='color:{theme.status('warn')}'>"
-                + _("Couldn't reach the station directory, showing the saved list.")
-                + "</span>" if stale else
-                f"<span style='color:{theme.status('ok')}'>✓ "
-                + ngettext("Station list updated: {n} station.",
-                           "Station list updated: {n} stations.", len(stations))
-                + "</span>")
+            if stale:
+                self._say(_("Couldn't reach the station directory, showing the saved list."),
+                          "warn")
+            else:
+                self._say(ngettext("Station list updated: {n} station.",
+                                   "Station list updated: {n} stations.", len(stations)), "ok")
         else:
             self._refresh_info()
 
@@ -1007,10 +1004,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         elif self._query:
             self._results, self._search_failed = [], True
             self._show_list()
-            self._refresh_info(
-                f"<span style='color:{theme.status('error')}'>"
-                + _("Search failed ({error}). Check your connection and press Enter to try "
-                    "again.", error=html.escape(msg)) + "</span>")
+            self._say(_("Search failed ({error}). Check your connection and press Enter to "
+                        "try again.", error=msg), "error")
 
     def _on_text(self, text: str):
         self._query = " ".join(text.split())
@@ -1332,10 +1327,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_error(self, msg: str):
         self._restate_rows()
-        red = theme.status("error")
-        self._refresh_info(f"<span style='color:{red}'>"
-                           + _("That station isn't working ({error}). Try another one.",
-                               error=html.escape(msg)) + "</span>", ERROR_LINE_S)
+        self._say(_("That station isn't working ({error}). Try another one.", error=msg),
+                  "error")
         self._select_on_globe(fly=False)
 
     def _on_now_playing(self, title: str):
@@ -1371,6 +1364,13 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self._globe_error:
             return _("Can't reach the station directory, press ↻ to try again.")
         return _("Finding stations…") if self._started else ""
+
+    def _say(self, text: str, kind: str):
+        """A result or a problem as a corner card; the info line goes back to what's
+        playing (only "Refreshing…" / "Searching…" stay on it)."""
+        busy.toast(self, html.escape(text), kind)
+        self._flash_until = 0.0
+        self._refresh_info()
 
     def _refresh_info(self, msg: str = "", secs: float = 4):
         if msg:
@@ -1499,21 +1499,17 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
         if len(data) < int(0.2 * SR):
-            self._refresh_info(f"<span style='color:{theme.status('warn')}'>{empty_msg}</span>")
+            self._say(empty_msg, "warn")
             return False
         st = self.player.station or self._fed_by or self.selected()
         name = (st.name[:30] if st else _("Radio")) + " " + time.strftime("%H.%M.%S")
         self.clip_error = ""
         self.clip_ready.emit(data, name)   # the window saves it (and sets clip_error if not)
         if self.clip_error:
-            self._refresh_info(f"<span style='color:{theme.status('error')}'>"
-                               + _("Couldn't save the clip: {error}",
-                                   error=html.escape(self.clip_error)) + "</span>")
+            self._say(_("Couldn't save the clip: {error}", error=self.clip_error), "error")
             return False
-        green = theme.status("ok")
-        self._refresh_info(f"<span style='color:{green}'>✓ "
-                           + _("Saved a {secs}s clip to your Sounds.",
-                               secs=f"{len(data) / SR:.1f}") + "</span>")
+        self._say(_("Saved a {secs}s clip to your Sounds.", secs=f"{len(data) / SR:.1f}"),
+                  "ok")
         return True
 
     def _tick(self):

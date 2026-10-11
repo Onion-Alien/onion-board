@@ -82,6 +82,12 @@ def opened(tab, qapp):
     return row
 
 
+
+def said(w, words: str) -> bool:
+    """A corner card on ``w``'s window says ``words``."""
+    from soundboard.ui import toast
+    return any(words in t.text() for t in toast.shown(w))
+
 def test_folded_away_nothing_is_built_or_listening(tab, qapp):
     run(tab, music())
     qapp.processEvents()
@@ -145,7 +151,7 @@ def test_drag_selects_and_save_adds_just_that_bit(tab, qapp):
     assert not tab.clips   # not straight into Sounds: into Saved clips, under the cards
     (c,) = tab.shelf.shelf.clips
     assert len(c.audio()) == t.b - t.a and c.name.startswith(c.src) and c.src
-    assert "Saved clips" in ed.info.text() and tab.shelf.isVisible()
+    assert said(ed, "Saved clips") and tab.shelf.isVisible()
 
 
 def test_saving_the_whole_take_trims_dead_air(tab, qapp):
@@ -336,7 +342,7 @@ def test_saved_clips_play_rename_add_and_delete_with_undo(tab, qapp):
     (data, name), = tab.clips
     assert name == "airhorn bit" and len(data) == SR
     sh.delete_picked()
-    assert not sh.shelf.clips and sh.undo_bar.isVisible()
+    assert not sh.shelf.clips and sh.undo_bar.active()
     sh.undo_bar.undo()
     assert [c.name for c in sh.shelf.clips] == ["airhorn bit"]
 
@@ -364,7 +370,7 @@ def test_copy_marks_the_clipboard_so_the_sounds_tab_can_paste_it(tab, qapp):
     row.editor.copy()
     got = clipeditor.pasted_clip()
     assert got is not None and len(got) == SR
-    assert "Sounds tab" in row.editor.info.text() and row.editor.info.wordWrap()
+    assert said(row.editor, "Sounds tab")
     QApplication.clipboard().setText("something else copied since")
     assert clipeditor.pasted_clip() is None          # the newer copy wins
 
@@ -405,9 +411,9 @@ def test_click_copy_paste_with_real_keys_does_something(tab, qapp):
     assert not t.has_selection and t.a > 0           # just a cursor
     n = len(t)
     QTest.keyClick(w, Qt.Key_C, Qt.ControlModifier)  # nothing picked: copies it all
-    assert "Copied all of it" in ed.info.text()
+    assert said(ed, "Copied all of it")
     QTest.keyClick(w, Qt.Key_V, Qt.ControlModifier)
-    assert len(ed.take) == 2 * n and "Pasted 0:04.00" in ed.info.text()
+    assert len(ed.take) == 2 * n and said(ed, "Pasted 0:04.00")
     QTest.keyClick(w, Qt.Key_Z, Qt.ControlModifier)
     assert len(ed.take) == n
 
@@ -424,7 +430,7 @@ def test_paste_over_what_was_just_copied_duplicates_it(tab, qapp):
     QTest.keyClick(w, Qt.Key_V, Qt.ControlModifier)
     t = ed.take
     assert len(t) == 5 * SR and (t.a, t.b) == (2 * SR, 3 * SR)   # a second copy, after it
-    assert "Pasted 0:01.00 at 0:02.00" in ed.info.text()
+    assert said(ed, "Pasted 0:01.00 at 0:02.00")
 
 
 def test_a_paused_program_doesnt_fill_the_editor_with_silence(tab, qapp):

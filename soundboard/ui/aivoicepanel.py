@@ -7,6 +7,7 @@ settings under "ai".
 """
 from __future__ import annotations
 
+import html
 import json
 import logging
 import re
@@ -623,12 +624,12 @@ class AiVoicePanel(QWidget):
             busy.toast(self, _("AI voices are installed. Pick a voice and press Start."), "ok")
         else:
             self._refresh()                 # the buttons come back to try again
-            self.lbl_install.show()
-            self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
-                                       "if it keeps failing, run install.bat in the add-on's "
-                                       "folder to see why.",
-                                       error=err or self._last_line[-160:] or
-                                       self.lbl_install.text()))
+            last = self.lbl_install.text()
+            self.lbl_install.hide()
+            busy.toast(self, html.escape(_(
+                "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, "
+                "run install.bat in the add-on's folder to see why.",
+                error=err or self._last_line[-160:] or last).removeprefix("⚠ ")), "error")
 
     def shutdown(self):
         self.ctl.shutdown()

@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys, winpath, ytdl, ytworker
+from soundboard import bunny, theme, winkeys, winpath, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -107,6 +107,8 @@ TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+UNDO_KEY = "undo-sounds"   # its card (toast key)
+TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
@@ -424,9 +426,6 @@ class MainWindow(QMainWindow):
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
         self._voice_was: bool | None = None   # voice changer state before a held key
         Pad.single_click = self.cfg.single_click
-        self._undo_timer = QTimer(self)
-        self._undo_timer.setSingleShot(True)
-        self._undo_timer.timeout.connect(self._finish_removals)
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
@@ -436,6 +435,16 @@ class MainWindow(QMainWindow):
         self._downloading = False
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
+        # set up for the app you're using (appsetup): the bar's app and what it shows.
+        # Before the Discord check below: on a slow start its answer (_on_discord) comes
+        # in while the splash pumps events, before the end of __init__
+        self._setup_tracker = appsetup.Tracker()
+        self._setup_app: appsetup.Seen | None = None
+        self._setup_state = ""        # "offer", "done" or "" (hidden)
+        self._setup_skipped: set[str] = set()   # answered Not now, this run
+        self._setup_undo: dict | None = None    # the dest settings before a switch
+        self._setup_hide = QTimer(self, singleShot=True)
+        self._setup_hide.timeout.connect(self._hide_setup)
         # Discord's own voice settings (discordcfg), read while it runs: the ones that
         # wipe out sounds get the urgent bar
         self.discord_found: list = []
@@ -459,6 +468,8 @@ class MainWindow(QMainWindow):
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self._pending_imports = 0
         self._imported_ok = 0
+        # boards the installer's ticked box brought over: asked once they're in
+        self._ask_keep: list[str] = []
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
@@ -540,14 +551,6 @@ class MainWindow(QMainWindow):
         # who's still set to the cable while sounds go straight into the mic (_cable_tip)
         self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
-        # set up for the app you're using (appsetup): the bar's app and what it shows
-        self._setup_tracker = appsetup.Tracker()
-        self._setup_app: appsetup.Seen | None = None
-        self._setup_state = ""        # "offer", "done", "switched" or "" (hidden)
-        self._setup_skipped: set[str] = set()   # answered Not now, this run
-        self._setup_undo: dict | None = None    # the dest settings before a switch
-        self._setup_hide = QTimer(self, singleShot=True)
-        self._setup_hide.timeout.connect(self._hide_setup)
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self._voice_tick)
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
@@ -644,7 +647,7 @@ class MainWindow(QMainWindow):
         """Started hidden in the tray (--tray at sign-in)? Then the box waits for the
         window to be opened, instead of popping up over whatever the user is doing."""
         if self.isVisible():
-            QMessageBox.warning(self, _("Settings were restored"), self.cfg.load_note)
+            self.tell(_("Settings were restored"), self.cfg.load_note, "warn", 20000)
         else:
             self._pending_note = self.cfg.load_note
 
@@ -700,14 +703,14 @@ class MainWindow(QMainWindow):
                     tip=_("Offline mode is on: nothing goes online, and what needs the "
                           "internet is hidden. Click to change it."))
         self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
-        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON)
+        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON, gap=False)
         self.btn_offline.setVisible(net.offline())
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
         self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.show_update)
-        icons.set_icon(self.btn_update, "next", size=sidebar.ICON)
+        icons.set_icon(self.btn_update, "next", size=sidebar.ICON, gap=False)
         self.btn_update.hide()
         # the two switches for everything at once, whatever tab you're on
         self.btn_air = QPushButton()
@@ -715,7 +718,7 @@ class MainWindow(QMainWindow):
         self.btn_air.setCheckable(True)
         self.btn_air.setChecked(True)
         self.btn_air.toggled.connect(self.set_sending)
-        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON)
+        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON, gap=False)
         self.set_sending(True)
         # Keep the mode controller for shared commands; its full picker lives on Setup.
         from soundboard.ui.destpanel import ModeButton
@@ -728,7 +731,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
-        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON, gap=False)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -736,7 +739,7 @@ class MainWindow(QMainWindow):
         self.gear.clicked.connect(lambda: self.open_settings())
         # (showing its page: the accent, as a selected tab's icon; on_accent was white
         # on the soft fill, all but gone in Light)
-        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON)
+        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON, gap=False)
         self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
         # the onion beside it: the Discord, feedback, a bug report, the code (each only
         # opens a page in the browser, feedback.py)
@@ -745,7 +748,7 @@ class MainWindow(QMainWindow):
         self.btn_about.setProperty("quiet", True)
         self.btn_about.setToolTip(_("Help and community"))
         self.btn_about.setProperty("railtext", _("Help and community"))
-        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON)
+        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON, gap=False)
         self.about_menu = DropdownMenu(self.btn_about)
         self.about_menu.aboutToShow.connect(self._fill_about_menu)
         self.btn_about.clicked.connect(self._show_about_menu)
@@ -930,7 +933,7 @@ class MainWindow(QMainWindow):
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
-        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON)
+        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON, gap=False)
         self.btn_more_tabs.setProperty("railtext", _("More tabs"))
         self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
         self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
@@ -1378,7 +1381,7 @@ class MainWindow(QMainWindow):
         add.setObjectName("soundadd")
         add.setToolTip(_("Add sound files (or drag them onto the window)"))
         add.clicked.connect(self.add_dialog)
-        icons.set_icon(add, "plus", "accent", size=18)
+        icons.set_icon(add, "music", "accent", size=18)
         self.btn_record = QPushButton(_("Record"))
         self.btn_record.setObjectName("soundrecord")
         icons.set_icon(self.btn_record, "mic", size=18)
@@ -1587,29 +1590,6 @@ class MainWindow(QMainWindow):
         self.playing_row.hide()
         left.addWidget(self.playing_row)
 
-        # ---- "Removed X · Undo": a removed sound can be brought back for a while
-        self.undo_bar = QFrame()
-        self.undo_bar.setObjectName("chip")
-        uh = QHBoxLayout(self.undo_bar)
-        uh.setContentsMargins(10, 4, 4, 4)
-        self.undo_lbl = QLabel()
-        self.undo_lbl.setTextFormat(Qt.PlainText)   # sound names are user / web text
-        uh.addWidget(self.undo_lbl, 1)
-        undo = QPushButton(_("Undo"))
-        undo.setObjectName("primary")
-        undo.setToolTip(_("Put the sound back, exactly as it was. Later: Backup → Recently "
-                          "deleted sounds"))
-        undo.clicked.connect(self.undo_remove)
-        uh.addWidget(undo)
-        dismiss = QPushButton()
-        dismiss.setObjectName("chipstop")
-        dismiss.setToolTip(_("Dismiss"))
-        dismiss.setFixedSize(24, 24)
-        icons.set_icon(dismiss, "stop", size=10)
-        dismiss.clicked.connect(self._finish_removals)
-        uh.addWidget(dismiss)
-        self.undo_bar.hide()
-        left.addWidget(self.undo_bar)
 
         f, th = bar()
         self.btn_pp = QPushButton()
@@ -3170,7 +3150,7 @@ class MainWindow(QMainWindow):
             # the route stays on the mic: until it's set up, the cable carries the
             # sounds meanwhile (_main_name), and the one-click stays on offer
             err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
-            QMessageBox.warning(self, _("Couldn't put Onion Board on your mic"), err)
+            self.tell(_("Couldn't put Onion Board on your mic"), err, "error")
         else:
             log.info("on the mic now: %s", mic)
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
@@ -3344,8 +3324,8 @@ class MainWindow(QMainWindow):
             return
         script = RESOURCE_DIR / "install-vbcable.ps1"
         if not script.exists():
-            QMessageBox.warning(self, _("Installer missing"),
-                                _("Can't find {name}.", name=script.name))
+            self.tell(_("Installer missing"), _("Can't find {name}.", name=script.name),
+                      "error")
             return
         try:
             subprocess.Popen(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
@@ -3353,11 +3333,11 @@ class MainWindow(QMainWindow):
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
         except OSError as e:
             log.warning("couldn't start the cable installer", exc_info=True)
-            QMessageBox.warning(
-                self, _("Couldn't start the installer"),
+            self.tell(
+                _("Couldn't start the installer"),
                 _("Windows wouldn't run PowerShell ({e}).\n\nYou can install VB-Cable by hand: "
                   "download it from vb-audio.com, unzip it, right-click VBCABLE_Setup_x64.exe → "
-                  "Run as administrator → Install Driver.", e=errors.plain(e)))
+                  "Run as administrator → Install Driver.", e=errors.plain(e)), "error")
             return
         QMessageBox.information(
             self, _("Installing the virtual cable"),
@@ -3381,9 +3361,9 @@ class MainWindow(QMainWindow):
             subprocess.Popen(["control", "mmsys.cpl,,1"], creationflags=0x08000000)
         except OSError:
             log.warning("couldn't open the Sound control panel", exc_info=True)
-            QMessageBox.warning(self, _("Couldn't open the Sound settings"),
-                                _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
-                                  "Enter, then go to the Recording tab."))
+            self.tell(_("Couldn't open the Sound settings"),
+                      _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
+                        "Enter, then go to the Recording tab."), "warn", 15000)
             return
         QMessageBox.information(
             self, _("Game with no mic setting"),
@@ -3504,13 +3484,32 @@ class MainWindow(QMainWindow):
             self._setup_undo = copy.deepcopy(d)
             set_simple(self, app.simple)
             log.info("app setup: %s -> %s mode (remembered)", app.exe, app.simple)
-        self._show_setup("switched" if what == "switch" else "offer", app)
+            self._hide_setup()   # (what it said was about before the switch)
+            self.toast(_("{mode} mode for <b>{name}</b>.", mode=profiles.BY_KEY[app.simple].name,
+                         name=html.escape(app.name)), "ok", SETUP_SWITCHED_MS,
+                       key="app-switch", action=(_("Undo"), self._undo_app_switch),
+                       on_close=self._forget_app_switch)
+            return
+        self._show_setup("offer", app)
+
+    def _undo_app_switch(self):
+        """Undo on "Game mode for X": the mode goes back to how it was."""
+        if self._setup_undo is not None:
+            from soundboard.ui.destpanel import _refresh_views
+            self.cfg.dest = self._setup_undo
+            self._setup_undo = None
+            self.mode_why = ""
+            destination.apply(self.cfg, self.engine)
+            self._save_later()
+            _refresh_views(self)
+
+    def _forget_app_switch(self):
+        self._setup_undo = None
 
     def _show_setup(self, state: str, app: appsetup.Seen):
         self._setup_app, self._setup_state = app, state
         self._setup_hide.stop()
         name = html.escape(app.name)
-        mode = profiles.BY_KEY[app.simple].name
         self.setup_x.setToolTip(_("Hide"))
         self.setup_x.setAccessibleName(_("Hide"))
         self.setup_no.setVisible(state == "offer")
@@ -3520,10 +3519,6 @@ class MainWindow(QMainWindow):
             self.setup_yes.setText(_("Set up"))
             self.setup_x.setToolTip(_("Don't ask about {name} again", name=app.name))
             self.setup_x.setAccessibleName(self.setup_x.toolTip())
-        elif state == "switched":
-            self.setup_lbl.setText(_("{mode} mode for <b>{name}</b>.", mode=mode, name=name))
-            self.setup_yes.setText(_("Undo"))
-            self._setup_hide.start(SETUP_SWITCHED_MS)
         else:
             lines, button = self._setup_checks(app)
             self.setup_lbl.setText("<br>".join(lines))
@@ -3568,16 +3563,6 @@ class MainWindow(QMainWindow):
             log.info("app setup: %s -> %s mode (set up)", app.exe, app.simple)
             self._show_setup("done", app)
             self.app_setup_changed.emit()
-        elif state == "switched":
-            if self._setup_undo is not None:
-                from soundboard.ui.destpanel import _refresh_views
-                self.cfg.dest = self._setup_undo
-                self._setup_undo = None
-                self.mode_why = ""
-                destination.apply(self.cfg, self.engine)
-                self._save_later()
-                _refresh_views(self)
-            self._hide_setup()
         elif app.guide:
             self.show_chat_guide(app.guide)
             if self._setup_state == "done":
@@ -3649,6 +3634,11 @@ class MainWindow(QMainWindow):
         m = _TONE_SPAN.fullmatch(text)
         return self.toast(m.group(1) if m else text, kind, ms, **kw)
 
+    def tell(self, title: str, text: str, kind: str, ms: int = 8000, **kw):
+        """What a message box would have said (a title and plain words, maybe on
+        several lines) as one toast: the title bold on its own line."""
+        return self.toast(toastmod.titled(title, text), kind, ms, **kw)
+
     def unsay(self, key: str):
         """Take the toast with this key down (what it said is over)."""
         toastmod.close(self, key)
@@ -3658,6 +3648,33 @@ class MainWindow(QMainWindow):
         when the player's hidden."""
         bar = next((w for w in (self.transport, self.mixer) if w.isVisible()), None)
         return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
+
+    def toast_mode(self) -> str:
+        """How the corner cards show (ui/toast.py): as cards in the window; as icons on
+        top of the mini player's pads; not at all in the mini player with no pads (a
+        remote: errors wait for the window to grow)."""
+        if not self.is_mini():
+            return "cards"
+        return "icons" if self._pads_scroll.isVisible() else "hidden"
+
+    def toast_expand(self):
+        """A card shrunk to its icon was clicked: make the window big enough to read
+        the cards (and leave the mini player), kept on its screen."""
+        if self.isMinimized():
+            self.showNormal()
+        if self.isMaximized() or self.isFullScreen():
+            return
+        room = self.screen().availableGeometry()
+        want = QSize(min(max(self.width(), TOAST_EXPAND.width()), room.width()),
+                     min(max(self.height(), TOAST_EXPAND.height()), room.height()))
+        if want == self.size():
+            return
+        frame = self.frameGeometry()
+        extra = frame.size() - self.size()   # the title bar and borders
+        x = min(max(frame.x(), room.left()), room.right() + 1 - want.width() - extra.width())
+        y = min(max(frame.y(), room.top()), room.bottom() + 1 - want.height() - extra.height())
+        self.resize(want)
+        self.move(max(room.left(), x), max(room.top(), y))
 
     def _make_radio(self):
         """The Radio tab, or with Radio switched off in Settings > Privacy & security a
@@ -4673,7 +4690,7 @@ class MainWindow(QMainWindow):
     def _stop_all_clicked(self):
         self.stop_all()
         # only an icon on the rail: a tick for a moment says it worked
-        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
         QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
                                                        size=sidebar.ICON))
 
@@ -5393,8 +5410,7 @@ class MainWindow(QMainWindow):
         if not new or new == old or old not in self.cfg.categories:
             return
         if new.lower() in {c.lower() for c in self.cfg.categories if c != old}:
-            QMessageBox.information(self, _("Rename category"), _("There's already a “{new}”.",
-                                                               new=new))
+            self.toast(_("There's already a “{new}”.", new=html.escape(new)), "warn")
             return
         self.cfg.categories[self.cfg.categories.index(old)] = new
         if old in self.cfg.category_hotkeys:
@@ -5822,6 +5838,9 @@ class MainWindow(QMainWindow):
         self._import_total = 0
         busy.set_busy(self.btn_add, False)
         self.triggers.import_done()   # a trigger's sound that failed to import
+        boards, self._ask_keep = self._ask_keep, []
+        if boards and ids and not self._keep_imported(boards, ids):
+            return
         if not n and not skipped:
             self.toast(_("Nothing new to add"), key="import")
             return
@@ -5835,6 +5854,32 @@ class MainWindow(QMainWindow):
         if short:
             self.toast(_("A sound you added is very short, so it may be barely "
                          "heard."), "warn")
+
+    def _keep_imported(self, boards: list[str], ids: list[str]) -> bool:
+        """The installer's box brought another soundboard's sounds over without asking:
+        ask now whether to keep them, so nobody has to delete a big board pad by pad.
+        False: they're removed (Undo and Recently deleted still have them)."""
+        text = (ngettext("We brought over <b>{n}</b> sound from {name}. Keep it?",
+                         "We brought over <b>{n}</b> sounds from {name}. Keep them?",
+                         len(ids), name=boards[0]) if len(boards) == 1 else
+                ngettext("We brought over <b>{n}</b> sound from your other soundboards. "
+                         "Keep it?",
+                         "We brought over <b>{n}</b> sounds from your other soundboards. "
+                         "Keep them?", len(ids)))
+        box = QMessageBox(QMessageBox.Question, _("Keep your imported sounds?"), text,
+                          QMessageBox.NoButton, self)
+        # Bun, smug: got your board and its settings in one go
+        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF(), smug=True))
+        keep = box.addButton(_("Keep"), QMessageBox.YesRole)
+        remove = box.addButton(_("Remove"), QMessageBox.NoRole)
+        box.setDefaultButton(keep)
+        box.setEscapeButton(keep)   # closing it never deletes anything
+        box.exec()
+        kept = box.clickedButton() is not remove   # closed some other way: kept
+        free_dialog(box)
+        if not kept:
+            self.remove_sounds(ids)
+        return kept
 
     def _show_skipped(self, skipped):
         dlg = importreport.SkippedDialog(skipped, self)
@@ -6195,9 +6240,9 @@ class MainWindow(QMainWindow):
         if not m:
             return
         if not thumbs.set_image(m, path):
-            QMessageBox.warning(self, _("Couldn't use that picture"),
-                                _("{name} isn't a picture this app can read.",
-                                  name=Path(path).name))
+            self.tell(_("Couldn't use that picture"),
+                      _("{name} isn't a picture this app can read.", name=Path(path).name),
+                      "warn")
             return
         self._save_now()
         self.pads[sid].update()
@@ -6296,22 +6341,27 @@ class MainWindow(QMainWindow):
         self._rebuild_pads()
         self._fill_categories()
         self.register_hotkeys()
+        # "Removed X · Undo" for a while; after that they're in Recently deleted
         if len(gone) == 1:
-            name = self.undo_lbl.fontMetrics().elidedText(gone[0].name, Qt.ElideRight, 260)
-            self.undo_lbl.setText(_("Removed “{name}”", name=name))
+            name = self.fontMetrics().elidedText(gone[0].name, Qt.ElideRight, 260)
+            text = _("Removed “{name}”", name=name)
         else:
-            self.undo_lbl.setText(_("Removed {n} sounds", n=len(gone)))
-        self.undo_bar.show()
-        self._undo_timer.start(UNDO_S * 1000)
+            text = _("Removed {n} sounds", n=len(gone))
+        t = self.toast(html.escape(text), "", UNDO_S * 1000, key=UNDO_KEY,
+                       action=(_("Undo"), self.undo_remove), on_close=self._finish_removals)
+        if t is not None:
+            t.card.action.setToolTip(_("Put the sound back, exactly as it was. Later: Backup "
+                                       "→ Recently deleted sounds"))
 
     def undo_remove(self):
         """Put the last removed sound(s) back where they were, with everything they had."""
-        self._undo_timer.stop()
-        self.undo_bar.hide()
         if not self._removed:
             return
         done, self._removed = self._removed, []
         self._put_back(done)
+        # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
+        # on_close finds their pack still in use)
+        toastmod.close(self, UNDO_KEY)
 
     def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
         """Put removed sounds back on the board: (meta, the index it had, its audio or
@@ -6349,11 +6399,10 @@ class MainWindow(QMainWindow):
     def _finish_removals(self):
         """The undo window is over: the removed sounds go to Recently deleted
         (soundboard.trash), where they can still be brought back for a while."""
-        self._undo_timer.stop()
-        self.undo_bar.hide()
         # let go of their audio first: Windows won't delete a mapped cache file
         # (soundboard.mapped) while an array still points into it
         done, self._removed = [(m, i) for m, i, _d in self._removed], []
+        toastmod.close(self, UNDO_KEY)   # (its on_close comes back here: nothing left)
         for m, i in done:
             trash.put_sound(m, i)
         if done:
@@ -6676,7 +6725,7 @@ class MainWindow(QMainWindow):
     def export_sounds(self, sounds: list[SoundMeta], name: str):
         """A sound pack: just these sounds (no settings), e.g. to share with friends."""
         if not sounds:
-            QMessageBox.information(self, _("Export"), _("There are no sounds in it to export."))
+            self.toast(_("There are no sounds in it to export."), "warn")
             return
         f = self._save_name(_("Export sounds"), backup._safe(name) + ".zip")
         if f:
@@ -6707,9 +6756,9 @@ class MainWindow(QMainWindow):
     def _on_exported(self, path: str, n: int, err: str):
         self._exporting = False
         if err:
-            QMessageBox.warning(self, _("Export failed"),
-                                _("Couldn't write {name}:\n{err}",
-                                  name=Path(path).name, err=errors.plain(err)))
+            self.tell(_("Export failed"),   # in place of the "Exporting…" card
+                      _("Couldn't write {name}:\n{err}",
+                        name=Path(path).name, err=errors.plain(err)), "error")
             return
         msg = (ngettext("Exported {n} sound to {name}.",
                         "Exported {n} sounds to {name}.",
@@ -6744,6 +6793,7 @@ class MainWindow(QMainWindow):
         note.unlink(missing_ok=True)
         for key in dict.fromkeys(keys):
             if (src := otherboards.by_key(key)) is not None:
+                self._ask_keep.append(src.name)
                 self.import_other(src, ask=False)
 
     def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
@@ -6782,10 +6832,7 @@ class MainWindow(QMainWindow):
             msg = (_("No sounds to bring over: the sound files {name} points at have been moved "
                      "or deleted.", name=src.name) if entries else
                    _("There are no sounds on your {name} board.", name=src.name))
-            if ask:
-                QMessageBox.information(self, title, msg)
-            else:
-                self.toast(msg, "warn")
+            self.toast(html.escape(msg), "warn")
             return
         if ask:
             keys = sum(1 for e in ok if e.hotkey)
@@ -6833,9 +6880,9 @@ class MainWindow(QMainWindow):
         except Exception as e:  # noqa: BLE001 - a damaged or odd file, never a crash
             QApplication.restoreOverrideCursor()
             log.warning("couldn't read %s", path, exc_info=True)
-            QMessageBox.warning(self, _("Can't import"),
-                                _("{name} is damaged or in a format Onion Board can't read ({e}).",
-                                  name=Path(path).name, e=errors.plain(e)))
+            self.tell(_("Can't import"),
+                      _("{name} is damaged or in a format Onion Board can't read ({e}).",
+                        name=Path(path).name, e=errors.plain(e)), "error")
             return
         QApplication.restoreOverrideCursor()
         use_settings = False
@@ -6904,9 +6951,9 @@ class MainWindow(QMainWindow):
         self._save_now()
         self.register_hotkeys()
         if changed:
-            QMessageBox.information(self, _("Settings imported"),
-                                    _("Done. Hotkeys and the theme apply now; everything else "
-                                      "the next time Onion Board starts."))
+            self.tell(_("Settings imported"),
+                      _("Done. Hotkeys and the theme apply now; everything else "
+                        "the next time Onion Board starts."), "ok")
 
     def _take_pack_hotkeys(self, clashes: list[tuple[str, SoundMeta, SoundMeta]],
                            name: str) -> bool:
@@ -6926,6 +6973,7 @@ class MainWindow(QMainWindow):
         yes = box.addButton(_("Use the new ones"), QMessageBox.YesRole)
         keep = box.addButton(_("Keep mine"), QMessageBox.NoRole)
         box.setDefaultButton(keep)
+        box.setEscapeButton(keep)   # closing it never deletes anything
         box.setEscapeButton(keep)
         box.exec()
         clicked = box.clickedButton()
@@ -6935,7 +6983,7 @@ class MainWindow(QMainWindow):
     def _on_unpacked(self, res, pkg, err: str):
         self._update_status()
         if res is None:
-            QMessageBox.warning(self, _("Import failed"), err)
+            self.tell(_("Import failed"), err, "error")
             return
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.library import merge_tags
@@ -6967,8 +7015,9 @@ class MainWindow(QMainWindow):
             msg = ngettext("Imported {n} sound", "Imported {n} sounds", n)
         self.toast(msg, "ok" if n or pkg.restored else "")
         if res.failed:
-            QMessageBox.warning(self, _("Some sounds weren't imported"),
-                                "\n".join(res.failed[:15]))
+            skipped = [importreport.Skipped(line, "", "unreadable") for line in res.failed]
+            self.toast(html.escape(_("Some sounds weren't imported")), "warn", 10000,
+                       action=(_("See why"), lambda: self._show_skipped(skipped)))
 
     def _settle_hotkeys(self, incoming: list[SoundMeta], name: str):
         """Hotkeys coming in with a pack that are already in use. Ones a sound here has:
@@ -7642,17 +7691,12 @@ class MainWindow(QMainWindow):
             self._set_update_pill(_("Update: {version}", version=rel.version),
                                   _("Onion Board {version} is out, click for details",
                                     version=rel.version))
-            box = QMessageBox(QMessageBox.Warning, _("Couldn't update"),
-                              _("Onion Board {version} couldn't be downloaded: {rstrip}.",
-                                version=rel.version, rstrip=errors.plain(err).rstrip('.')),
-                              QMessageBox.NoButton, self)
-            page = box.addButton(_("Open the download page"), QMessageBox.AcceptRole)
-            box.addButton(_("Close"), QMessageBox.RejectRole)
-            box.exec()
-            clicked = box.clickedButton()
-            free_dialog(box)
-            if clicked is page:
-                QDesktopServices.openUrl(QUrl(rel.url))
+            url = rel.url
+            self.tell(_("Couldn't update"),
+                      _("Onion Board {version} couldn't be downloaded: {rstrip}.",
+                        version=rel.version, rstrip=errors.plain(err).rstrip('.')), "error",
+                      action=(_("Open the download page"),
+                              lambda: QDesktopServices.openUrl(QUrl(url))))
             return
         self._update_file = path
         self._show_urgent()
@@ -7700,9 +7744,11 @@ class MainWindow(QMainWindow):
             log.warning("couldn't start the update installer: %s", e)
             self.cfg.update_pending = ""
             self._save_later()
-            QMessageBox.warning(self, _("Couldn't update"),
-                                _("The installer couldn't be started ({e}). You can download it "
-                                  "from the release page instead.", e=errors.plain(e)))
+            self.tell(_("Couldn't update"),
+                      _("The installer couldn't be started ({e}). You can download it "
+                        "from the release page instead.", e=errors.plain(e)), "error",
+                      action=(_("Open the download page"),
+                              lambda: QDesktopServices.openUrl(QUrl(updates.RELEASES))))
             return
         exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
         self.quit_app()
@@ -7771,17 +7817,10 @@ class MainWindow(QMainWindow):
             return
         if not updated:
             return
-        box = QMessageBox(QMessageBox.Information, _("Updated"),
-                          _("Onion Board is up to date: version {version}.", version=__version__),
-                          QMessageBox.NoButton, self)
-        new = box.addButton(_("What's new"), QMessageBox.HelpRole)
-        box.addButton(QMessageBox.Ok)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        if clicked is new:
-            QDesktopServices.openUrl(QUrl(
-                f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"))
+        url = f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"
+        self.toast(_("Onion Board is up to date: version {version}.", version=__version__),
+                   "ok", 10000,
+                   action=(_("What's new"), lambda: QDesktopServices.openUrl(QUrl(url))))
 
     def _update_failed(self, pending: str):
         from soundboard import __version__
@@ -7836,8 +7875,8 @@ class MainWindow(QMainWindow):
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
-            QTimer.singleShot(400, lambda: QMessageBox.warning(
-                self, _("Settings were restored"), note))
+            QTimer.singleShot(400, lambda: self.tell(
+                _("Settings were restored"), note, "warn", 20000))
         later, self._whats_new_later = getattr(self, "_whats_new_later", None), None
         if later is not None:   # held back while the window was in the tray
             QTimer.singleShot(700, lambda: self.whats_new(later))
@@ -8241,6 +8280,7 @@ class MainWindow(QMainWindow):
             show = room >= SLIM_PAD_H + m.top() + m.bottom()
             if self._pads_scroll.isHidden() == show:
                 self._pads_scroll.setVisible(show)
+                toastmod.relayout(self)   # icons on the pads, or none without them
 
     def _mini_pad_room(self, size: QSize) -> int:
         """The height above the mini player's card."""
@@ -8279,6 +8319,7 @@ class MainWindow(QMainWindow):
             self.apply_filter(self.search.text())
         finally:
             self.setUpdatesEnabled(True)
+        toastmod.relayout(self)   # cards in the window, icons in the mini player
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)

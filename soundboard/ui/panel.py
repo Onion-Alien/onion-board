@@ -4,6 +4,8 @@ their widgets and emit plain values; the main window maps those onto the config
 and the engine."""
 from __future__ import annotations
 
+import html
+
 import math
 
 from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
@@ -643,57 +645,47 @@ class EqPanel(QWidget):
         self._refresh(emit=True)
 
 
-class UndoBar(QFrame):
-    """"Deleted X · Undo" for a few seconds after something is thrown away.
-    show_for(text, undo, done): Undo calls `undo`; the bar timing out, being
-    dismissed, or showing something else calls `done` (if given) instead."""
+class UndoBar(QWidget):
+    """"Deleted X · Undo" for a few seconds after something is thrown away, as a corner
+    card (ui/toast.py) with an Undo button; this widget itself is never seen.
+    show_for(text, undo, done): Undo calls `undo`; the card timing out, being closed,
+    or showing something else calls `done` (if given) instead."""
     SECONDS = 10
 
     def __init__(self, tip: str = ""):
         super().__init__()
-        from PySide6.QtCore import QTimer
-        from PySide6.QtWidgets import QPushButton
-        self.setObjectName("chip")
-        h = QHBoxLayout(self)
-        h.setContentsMargins(10, 4, 4, 4)
-        self.label = QLabel()
-        self.label.setTextFormat(Qt.PlainText)   # names are user / web text
-        h.addWidget(self.label, 1)
-        self.btn_undo = QPushButton(_("Undo"))
-        self.btn_undo.setObjectName("primary")
-        self.btn_undo.setToolTip(tip or _("Put it back, exactly as it was"))
-        self.btn_undo.clicked.connect(self.undo)
-        h.addWidget(self.btn_undo)
-        dismiss = QPushButton()
-        dismiss.setObjectName("chipstop")
-        dismiss.setToolTip(_("Dismiss"))
-        dismiss.setFixedSize(24, 24)
-        icons.set_icon(dismiss, "stop", size=10)
-        dismiss.clicked.connect(self.finish)
-        h.addWidget(dismiss)
-        self._timer = QTimer(self)
-        self._timer.setSingleShot(True)
-        self._timer.timeout.connect(self.finish)
+        self.tip = tip or _("Put it back, exactly as it was")
+        self.text = ""
         self._undo = self._done = None
+        self._key = f"undo-{id(self)}"
         self.hide()
 
+    def active(self) -> bool:
+        """Is its card up (Undo still possible)?"""
+        return self._undo is not None or self._done is not None
+
     def show_for(self, text: str, undo, done=None):
+        from soundboard.ui import busy
         self.finish()
-        self.label.setText(self.label.fontMetrics().elidedText(text, Qt.ElideRight, 320))
+        self.text = text
         self._undo, self._done = undo, done
-        self.show()
-        self._timer.start(self.SECONDS * 1000)
+        t = busy.toast(self, html.escape(text), "", self.SECONDS * 1000, key=self._key,
+                       action=(_("Undo"), self.undo), on_close=self.finish)
+        if t is not None:
+            t.card.action.setToolTip(self.tip)
+
+    def _take_down(self):
+        from soundboard.ui import toast
+        toast.close(self, self._key)
 
     def undo(self):
         cb, self._undo, self._done = self._undo, None, None
-        self._timer.stop()
-        self.hide()
+        self._take_down()
         if cb is not None:
             cb()
 
     def finish(self):
         cb, self._undo, self._done = self._done, None, None
-        self._timer.stop()
-        self.hide()
+        self._take_down()
         if cb is not None:
             cb()

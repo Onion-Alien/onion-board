@@ -12,6 +12,7 @@ to whoever's listening. A copied bit also marks the system clipboard (MIME), so
 Ctrl+V on the Sounds tab adds it as a sound."""
 from __future__ import annotations
 
+import html
 import itertools
 
 import numpy as np
@@ -25,7 +26,7 @@ from soundboard.clipedit import BIN, LiveBuffer, Take, bin_peaks
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import level_gain
-from soundboard.ui import appstate, icons
+from soundboard.ui import appstate, busy, icons
 
 PAD = 4                 # the waveform's inner margin, px
 EDGE_PX = 6             # how close to a selection edge a press grabs it
@@ -571,13 +572,13 @@ class ClipEditor(QWidget):
         set_clipboard(take.selected())
         self._copied_from = (id(take.data), take.a, take.b) if take.has_selection else None
         if take.has_selection:
-            self.flash(_("Copied {length}. Ctrl+V pastes it at the cursor, in another "
+            self.say(_("Copied {length}. Ctrl+V pastes it at the cursor, in another "
                          "program's editor, or on the Sounds tab as a new sound.",
-                         length=fmt(len(clipboard))))
+                         length=fmt(len(clipboard))), "ok")
         else:
-            self.flash(_("Copied all of it ({length}). Ctrl+V pastes it at the cursor, in "
+            self.say(_("Copied all of it ({length}). Ctrl+V pastes it at the cursor, in "
                          "another program's editor, or on the Sounds tab as a new sound.",
-                         length=fmt(len(clipboard))))
+                         length=fmt(len(clipboard))), "ok")
         return True
 
     def cut(self) -> bool:
@@ -600,11 +601,11 @@ class ClipEditor(QWidget):
             #                               nothing, so it goes in after it (a copy of it)
         at = take.a
         if not self._edit(lambda t: t.paste(piece)):
-            self.flash(_("Couldn't paste: the clip can't get any longer."), error=True)
+            self.say(_("Couldn't paste: the clip can't get any longer."), "warn")
             return False
         self._copied_from = None
-        self.flash(_("Pasted {length} at {position}: it's {total} long now. Ctrl+Z undoes it.",
-                     length=fmt(len(piece)), position=fmt(at), total=fmt(len(self.take))))
+        self.say(_("Pasted {length} at {position}: it's {total} long now. Ctrl+Z undoes it.",
+                   length=fmt(len(piece)), position=fmt(at), total=fmt(len(self.take))), "ok")
         return True
 
     def undo(self):
@@ -643,7 +644,7 @@ class ClipEditor(QWidget):
             return
         if self.engine.play(self._preview_sid, data, self._gain(data), mode="restart",
                             preview=True) is None:
-            self.flash(_("No headphones to play it in: pick them on the Setup tab."), error=True)
+            self.say(_("No headphones to play it in: pick them on the Setup tab."), "error")
             return
         self._play = (self._preview_sid, start, start + len(data))
         self._sync()
@@ -657,8 +658,8 @@ class ClipEditor(QWidget):
         if not len(data):
             return
         if self.engine.play(self._send_sid, data, self._gain(data), mode="restart") is None:
-            self.flash(_("Nowhere to send it: pick where your sounds go on the Setup tab."),
-                       error=True)
+            self.say(_("Nowhere to send it: pick where your sounds go on the Setup tab."),
+                     "error")
             return
         self._play = (self._send_sid, start, start + len(data))
         self.flash(_("Sending {length}…", length=fmt(len(data))))
@@ -703,6 +704,10 @@ class ClipEditor(QWidget):
         theme.set_tone(self.info, "error" if error else "")
         self.info.setText(text)
         self._msg_timer.start(ms)
+
+    def say(self, text: str, kind: str):
+        """A result or a problem, as a corner card; hints stay on the line (flash)."""
+        busy.toast(self, html.escape(text), kind)
 
     def _clear_msg(self):
         self._msg = ""
@@ -753,6 +758,7 @@ class ClipEditor(QWidget):
         narrow = self.width() < NARROW_PX
         for b in (self.btn_live, self.btn_play, self.btn_save, self.btn_send, self.btn_edit):
             b.setText("" if narrow else b.property("full_text"))
+            icons.text_gap(b)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

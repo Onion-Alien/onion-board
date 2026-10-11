@@ -93,8 +93,8 @@ def test_a_forgotten_program_can_be_undone_or_brought_back(apps_tab):  # noqa: F
     tab._on_apps([])                                           # it closed
     tab._on_forget(tab.rows["music.exe"])
     assert "music.exe" not in tab.cfg.apps and "music.exe" not in tab.rows
-    assert not tab.undo_bar.isHidden() and not tab.btn_bin.isHidden()
-    tab.undo_bar.btn_undo.click()
+    assert tab.undo_bar.active() and not tab.btn_bin.isHidden()
+    tab.undo_bar.undo()
     assert tab.cfg.apps["music.exe"] == {"vol": 2.5, "monitor": True}
     row = tab.rows["music.exe"]
     assert row.vol.value() == pytest.approx(2.5) and row.chk_hear.isChecked()
@@ -112,10 +112,10 @@ def test_x_on_a_running_program_takes_it_off_the_list_until_brought_back(apps_ta
     tab._on_apps([music(pid=100)])
     tab.rows["music.exe"].btn_forget.click()
     assert "music.exe" not in tab.rows and tab.cfg.apps_hidden == ["music.exe"]
-    assert tab.undo_bar.label.text() == "Removed “Music”"
+    assert tab.undo_bar.text == "Removed “Music”"
     tab._on_apps([music(pid=100)])                 # still running: stays off the list
     assert "music.exe" not in tab.rows
-    tab.undo_bar.btn_undo.click()
+    tab.undo_bar.undo()
     assert tab.cfg.apps_hidden == [] and "music.exe" not in tab.cfg.apps
     tab._on_apps([music(pid=100)])                 # the next listing brings it back
     assert "music.exe" in tab.rows
@@ -138,7 +138,7 @@ def test_a_removed_destination_mode_can_be_undone(window):  # noqa: F811
     dlg.list.setCurrentRow(0)
     dlg.remove()
     assert window.cfg.dest["custom"] == [] and window.cfg.dest["mode"] == "off"
-    dlg.undo_bar.btn_undo.click()
+    dlg.undo_bar.undo()
     assert window.cfg.dest["custom"] == [raw] and window.cfg.dest["mode"] == raw["key"]
     dlg.accept()
 

@@ -51,7 +51,7 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
-               nightcap: bool = False, robot: bool = False):
+               nightcap: bool = False, robot: bool = False, smug: bool = False):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -59,7 +59,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `sad` 0..1 worries his brows, wets his eyes and turns his smile down, and
     `angry` 0..1 knits them the other way, reddens his cheeks and pops a cross mark
     on his head (`swing` also swings the "bat"). `nightcap` puts his sleeping cap on.
-    `robot` draws him as Robo-Bun, metal with glowing LED ears, eyes and chest."""
+    `robot` draws him as Robo-Bun, metal with glowing LED ears, eyes and chest.
+    `smug`: half-shut eyes, one brow up and a lopsided smirk (he got away with it)."""
     phones = QColor(theme.T["accent"])
     phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
@@ -158,6 +159,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         _ellipse(p, x, 62, 9 + 1.5 * sad, (11.5 + 1.5 * sad) * (1 - blink), INK)
         _ellipse(p, x + 1.6, 59, 3.4 + sad, 3.8 + sad, QColor("white"))
         _ellipse(p, x - 1.6, 65.5, 1.6, 1.6, QColor("white"))
+        if smug:              # heavy lids: fur over the top half, a flat lid line
+            p.setPen(Qt.NoPen)
+            p.setBrush(fur)
+            p.drawRect(QRectF(x - 6, 54, 12, 7.5))
+            p.setPen(QPen(INK, 2.4, Qt.SolidLine, Qt.RoundCap))
+            p.drawLine(QPointF(x - 5.2, 61.5), QPointF(x + 5.2, 61.5))
         if sad > 0.05:        # welling up
             c = QColor("#8fd3ff")
             c.setAlphaF(0.8 * sad)
@@ -176,6 +183,13 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.setPen(QPen(c, 2.2, Qt.SolidLine, Qt.RoundCap))
             for x, sx in ((39, -1), (61, 1)):
                 p.drawLine(QPointF(x + sx * 6, 53 + sad), QPointF(x - sx * 3, 52 - 4 * sad))
+        if smug:                  # one brow flat, the other cocked up
+            p.setPen(QPen(INK, 2.2, Qt.SolidLine, Qt.RoundCap))
+            p.drawLine(QPointF(34, 55), QPointF(44, 55.5))
+            arch = QPainterPath(QPointF(56, 52))
+            arch.quadTo(61, 46.5, 67, 50)
+            p.setBrush(Qt.NoBrush)
+            p.drawPath(arch)
         if angry > 0.05:          # cross brows, inner ends pulled down
             c = QColor(INK)
             c.setAlphaF(min(1.0, angry * 1.4))
@@ -205,6 +219,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         else:
             _ellipse(p, 50, 76 + oh / 2, 7 + 2 * mouth, oh, QColor("#5a2238"), QPen(INK, 1.6))
             _ellipse(p, 50, 76 + oh * 0.78, 4.5, oh * 0.4, QColor("#ff8fae"))
+    elif smug and not robot:  # a lopsided smirk, up on one side
+        path = QPainterPath(QPointF(44, 76))
+        path.quadTo(51, 79, 57, 73.5)
+        p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap))
+        p.setBrush(Qt.NoBrush)
+        p.drawPath(path)
     elif sad > 0.5 or angry > 0.4:   # a little wobbly frown
         path = QPainterPath(QPointF(45, 78.5))
         path.quadTo(50, 74.5, 55, 78.5)
@@ -386,18 +406,18 @@ sparkle = _sparkle
 
 
 def bunny_image(height: int, prop: str | None = None, dpr: float = 1.0,
-                robot: bool = False) -> QImage:
+                robot: bool = False, smug: bool = False) -> QImage:
     h = max(1, round(height * dpr))
     w = max(1, round(h * W / H))
     img = QImage(w, h, QImage.Format_ARGB32_Premultiplied)
     img.fill(Qt.transparent)
     p = QPainter(img)
-    draw_bunny(p, QRectF(0, 0, w, h), prop, robot=robot)
+    draw_bunny(p, QRectF(0, 0, w, h), prop, robot=robot, smug=smug)
     p.end()
     img.setDevicePixelRatio(dpr)
     return img
 
 
 def bunny_pixmap(height: int, prop: str | None = None, dpr: float = 1.0,
-                 robot: bool = False) -> QPixmap:
-    return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot))
+                 robot: bool = False, smug: bool = False) -> QPixmap:
+    return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot, smug=smug))

@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHB
                                QVBoxLayout)
 
 from soundboard import trash
-from soundboard.ui import fit, icons
+from soundboard.ui import busy, fit, icons, toast
 from soundboard.ui.panel import hint_label
 from soundboard.i18n import _, ngettext
 
@@ -107,9 +107,9 @@ class DeletedDialog(QDialog):
                 failed.append(it.name if it else _("One of them"))
         self.fill()
         if failed:
-            QMessageBox.warning(self, _("Couldn't bring it back"),
-                                _("{names}\n\ncouldn't be brought back: its files are gone "
-                                  "from the bin.", names="\n".join(failed)))
+            busy.toast(self, toast.titled(_("Couldn't bring it back"), _(
+                "{names}\n\ncouldn't be brought back: its files are gone from the bin.",
+                names="\n".join(failed))), "warn", 10000)
 
     def delete_for_good(self):
         ids = self._picked()

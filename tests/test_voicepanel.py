@@ -328,8 +328,9 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     assert not s.b_update.isEnabled() and not s.b_install.isEnabled()
     s._install()                                   # a double-click: still one pip
     assert process_events(qapp, lambda: s.b_update.isEnabled())
-    assert len(started) == 1 and not s.lbl_install.isHidden()
-    assert "disk full" in s.lbl_install.text() and "again" in s.lbl_install.text()
+    from soundboard.ui import toast
+    [t] = [t for t in toast.shown(s) if "disk full" in t.words()]
+    assert len(started) == 1 and t.kind == "error" and "again" in t.words()
     assert s.b_update.text() == "Update speech recognition"
     assert reported == []   # a full disk is said on the card, not shown as a crash
 
@@ -672,7 +673,7 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     assert p.fx.preset == "Two"
     sound = p.fx.spec()["effects"]
     p.fx.delete_voice("One")
-    assert "One" not in p.fx._tile and p.fx.undo_bar.isVisibleTo(p.fx)
+    assert "One" not in p.fx._tile and p.fx.undo_bar.active()
     p.fx.undo_bar.undo()
     assert list(p.fx.store.voices) == ["One", "Two"]
     p.fx.delete_voice("Two")                       # the one that's on: you still sound
@@ -1042,9 +1043,11 @@ def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
 
 def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
+
+    from soundboard.ui import busy
     p, _ = panel
     said = []
-    monkeypatch.setattr(QMessageBox, "warning", lambda *a: said.append(a[2]))
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
     assert p.fx.import_code("OB1-not-a-real-code") == ""
     assert said and not p.fx.store.voices
     # a built-in voice's name gets "(shared)"; saying No adds nothing
@@ -1062,9 +1065,11 @@ def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
     p.fx.save_voice()
     p.fx.save_voice()
     p.fx.copy_code("Mine")
-    assert p.fx.undo_bar.isVisibleTo(p.fx) and p.fx.undo_bar.btn_undo.isHidden()
-    p.fx.delete_voice("Mine")                        # a real Undo shows its button again
-    assert not p.fx.undo_bar.btn_undo.isHidden()
+    from soundboard.ui import toast
+    [t] = [t for t in toast.shown(p.fx) if "share code" in t.text()]
+    assert t.kind == "ok" and t.card.action.isHidden() and not p.fx.undo_bar.active()
+    p.fx.delete_voice("Mine")                        # a real Undo has its button
+    assert p.fx.undo_bar.active()
 
 
 def test_make_it_yours_buttons_are_at_the_top(panel):
