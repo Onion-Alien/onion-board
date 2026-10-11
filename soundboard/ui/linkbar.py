@@ -215,16 +215,25 @@ class LinkBar(QFrame):
         return True
 
     def _queue(self, kind: str) -> bool:
-        """Another sound's download is running: queue this one after it."""
+        """Another sound's download is running: an Add waits at the back of the queue,
+        a Play goes next."""
         if self.url == self._busy_url and kind == self._busy:
             return True   # already running: don't import the same sound twice
         if any(q["url"] == self.url and q["kind"] == kind for q in self._queue_list):
             return True
-        if len(self._queue_list) >= MAX_QUEUED:
+        pick = {"url": self.url, "title": self.title, "kind": kind, "seconds": self._secs}
+        if kind == "play":
+            # Play once means now: it goes next (the running download keeps going), and
+            # it replaces a Play already waiting, like it replaces one still loading
+            for q in [q for q in self._queue_list if q["kind"] == "play"]:
+                self._queue_list.remove(q)
+                self.done.emit(q["url"], "play", False)
+            self._queue_list.insert(0, pick)
+        elif len(self._queue_list) >= MAX_QUEUED:
             busy.toast(self.window(), _("Queue is full"), "warn")
             return False
-        self._queue_list.append({"url": self.url, "title": self.title, "kind": kind,
-                                 "seconds": self._secs})
+        else:
+            self._queue_list.append(pick)
         self.queue_updated.emit(list(self._queue_list))
         self.queued.emit(self.url, kind)
         name = html.escape(self.title or self._host())

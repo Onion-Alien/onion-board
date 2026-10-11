@@ -12,3 +12,5 @@
 - A download that worked shows a tick for a second before the next one takes its
   place; one that failed flashes red and waits in the queue list with Retry.
 - Click a waiting song in the queue list to download it next.
+- Play once while other songs download goes next in the queue (it doesn't wait behind
+  the Adds), and a newer Play replaces one still waiting.
