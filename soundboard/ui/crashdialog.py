@@ -82,6 +82,7 @@ class CrashDialog(QDialog):
         self.copy_btn = QPushButton(_("Copy report"))
         self.copy_btn.clicked.connect(self.copy)
         self.github_btn = QPushButton(_("Report on GitHub"))
+        self.github_btn.setObjectName("primary")
         self.github_btn.setDefault(True)
         self.github_btn.setToolTip(_("Copies the report and opens a new issue in your browser"))
         self.github_btn.clicked.connect(self.open_issue)
