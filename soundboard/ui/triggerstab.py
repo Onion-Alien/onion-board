@@ -24,7 +24,7 @@ import html
 import logging
 import threading
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
                                QPushButton, QStackedWidget, QVBoxLayout, QWidget)
 
@@ -406,7 +406,11 @@ class TriggersTab(QWidget):
             panel.active_changed.connect(self.active_changed)
         for key, compact in self._compact.items():
             self._apply_fit(key, compact)
+        bar = self._bar()
+        if bar is not None:
+            bar.installEventFilter(self)    # its width changing: _fit_bar
         self.stack.setCurrentWidget(self.board_page)
+        self._fit_bar()
         log.info("Onion Watch %s is the Triggers tab", self.info.version)
         self.loaded.emit()
         if self.is_active():
@@ -646,18 +650,64 @@ class TriggersTab(QWidget):
     # ------------------------------------------------------------------ small windows
     FIT = {"hint": "hide", "interval_label": "hide", "cut": "icon", "add": "icon",
            "paste": "icon", "watch": "icon"}
+    BAR = ("cut", "paste", "add", "watch", "interval_label")   # icon only in this order
 
     def fit_steps(self):
-        """What the main window may squeeze here when it gets small (ui/responsive.py).
-        They apply to the add-on's tab whenever it's in, also when it arrives later."""
-        def step(key):
-            def apply(compact: bool):
-                self._compact[key] = compact
-                self._apply_fit(key, compact)
-            return apply
-        return [(20, "h", step("hint")),
-                (25, "w", step("cut")), (26, "w", step("paste")), (27, "w", step("add")),
-                (28, "w", step("watch")), (29, "w", step("interval_label"))]
+        """What the main window may squeeze here when it gets small (ui/responsive.py):
+        the hint at the top. It applies to the add-on's tab whenever it's in, also when
+        it arrives later. The bottom bar's buttons go by the bar's own room (_fit_bar):
+        as the window's steps they also lost their words when another tab was what
+        didn't fit, and kept them off until the window grew."""
+        def hint(compact: bool):
+            self._compact["hint"] = compact
+            self._apply_fit("hint", compact)
+        return [(20, "h", hint)]
+
+    def _bar(self) -> QWidget | None:
+        """The add-on's bottom bar: what its buttons sit in."""
+        parts = self.panel.fit_parts() if self.panel is not None else {}
+        button = next((parts[k] for k in self.BAR if k in parts), None)
+        return button.parentWidget() if button is not None else None
+
+    def _fit_bar(self):
+        """The bar's buttons keep their words while they fit on one line in the bar,
+        and go icon only, first to last in BAR, while they don't."""
+        bar = self._bar()
+        if bar is None or self.panel is None or bar.layout() is None or bar.width() <= 0:
+            return
+        lay = bar.layout()
+        assert lay is not None
+        keys = [k for k in self.BAR if k in self.panel.fit_parts()]
+
+        def over() -> bool:
+            lay.invalidate()
+            if lay.hasHeightForWidth():   # a wrapping row: wraps at this width
+                return lay.heightForWidth(bar.width()) > lay.heightForWidth(1 << 20)
+            return lay.sizeHint().width() > bar.width()
+
+        if not any(self._compact.get(k) for k in keys) and not over():
+            return   # (the usual case: nothing to measure again)
+        bar.setUpdatesEnabled(False)
+        try:
+            for k in keys:
+                self._set_bar(k, False)
+            for k in keys:
+                if not over():
+                    break
+                self._set_bar(k, True)
+        finally:
+            bar.setUpdatesEnabled(True)
+
+    def _set_bar(self, key: str, compact: bool):
+        if self._compact.get(key, False) != compact:
+            self._compact[key] = compact
+            self._apply_fit(key, compact)
+
+    def eventFilter(self, obj, event):
+        if (event.type() == QEvent.Type.Resize and obj is self._bar()
+                and event.size().width() != event.oldSize().width()):
+            self._fit_bar()
+        return False
 
     def _apply_fit(self, key: str, compact: bool):
         from soundboard.ui import responsive as r
