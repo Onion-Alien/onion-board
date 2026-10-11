@@ -41,7 +41,11 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 1
+HELPER_VERSION = 2
+# The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
+# helpers out there have a bug that matters: the app then asks Windows once more, and
+# that prompt puts this version's helper in place.
+MIN_HELPER_VERSION = 2
 TASK = r"\Onion Board\Mic helper"
 EXE_NAME = "obmichelper.exe"
 STAMP = "stamp.txt"
@@ -122,13 +126,26 @@ def installed() -> bool:
     return helper_exe().is_file() and _schtasks("/query", "/tn", TASK) == 0
 
 
-def ready() -> bool:
-    """A helper this app can use for setting up: it carries the same effect DLL as this
-    app (an older one would put an older effect on the mic). An older helper with the
-    same DLL is fine: the next admin step that asks anyway updates it. Runs a process:
-    not on the UI thread."""
-    want = _dll_of(_read_stamp(bundled_helper()))
-    return want is not None and _dll_of(_read_stamp(helper_dir())) == want and installed()
+def _version_of(stamp: str | None) -> int:
+    try:
+        return int((stamp or "").split()[0])
+    except (IndexError, ValueError):
+        return 0
+
+
+def ready(same_dll: bool = True) -> bool:
+    """A helper this app can use: at least MIN_HELPER_VERSION and, for setting up
+    (`same_dll`), carrying the same effect DLL as this app (an older one would put an
+    older effect on the mic). An older helper otherwise is fine: the next admin step
+    that asks anyway updates it. Runs a process: not on the UI thread."""
+    have = _read_stamp(helper_dir())
+    if _version_of(have) < MIN_HELPER_VERSION:
+        return False
+    if same_dll:
+        want = _dll_of(_read_stamp(bundled_helper()))
+        if want is None or _dll_of(have) != want:
+            return False
+    return installed()
 
 
 def ask(args: list[str], wait_s: float = 300.0) -> int | None:

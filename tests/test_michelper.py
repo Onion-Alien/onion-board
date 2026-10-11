@@ -20,7 +20,7 @@ REAL_ELEVATED = dm._elevated   # (the conftest guard replaces it in every test)
 ROOT = Path(__file__).resolve().parent.parent
 
 # HELPER_VERSION and the admin code it stands for: change one, change the other
-ADMIN_DIGEST = {1: "954b432154c606bb4f825d983e85cefa6463062f255f69f0ecb863a4dc9558b2"}
+ADMIN_DIGEST = {2: "625c2df1e7bf179a2b455c7b1c8fd6161602e41741aaf4f35ef211cdb48baffb"}
 
 
 def _queue():
@@ -122,14 +122,19 @@ def test_ready_needs_the_same_effect_dll(monkeypatch, tmp_path):
     monkeypatch.setattr(mh, "bundled_helper", lambda: bundled)
     monkeypatch.setattr(mh, "installed", lambda: True)
     mh.helper_dir().mkdir(parents=True)
-    (bundled / mh.STAMP).write_text("2 aaaa")
-    assert not mh.ready()   # no helper stamp
-    (mh.helper_dir() / mh.STAMP).write_text("1 aaaa")
+    monkeypatch.setattr(mh, "HELPER_VERSION", 5)
+    monkeypatch.setattr(mh, "MIN_HELPER_VERSION", 3)
+    (bundled / mh.STAMP).write_text("5 aaaa")
+    assert not mh.ready() and not mh.ready(same_dll=False)   # no helper stamp
+    (mh.helper_dir() / mh.STAMP).write_text("4 aaaa")
     assert mh.ready()       # older helper, same DLL
-    (mh.helper_dir() / mh.STAMP).write_text("2 bbbb")
+    (mh.helper_dir() / mh.STAMP).write_text("5 bbbb")
     assert not mh.ready()   # another DLL: Windows asks, and the helper is updated
-    monkeypatch.setattr(mh, "installed", lambda: False)
+    assert mh.ready(same_dll=False)   # it can still take the effect off
     (mh.helper_dir() / mh.STAMP).write_text("2 aaaa")
+    assert not mh.ready() and not mh.ready(same_dll=False)   # older than the minimum
+    monkeypatch.setattr(mh, "installed", lambda: False)
+    (mh.helper_dir() / mh.STAMP).write_text("5 aaaa")
     assert not mh.ready()   # its task is gone
 
 
@@ -139,24 +144,21 @@ def test_make_stamp(tmp_path):
     assert mh.make_stamp(dll) == f"{mh.HELPER_VERSION} {hashlib.sha256(b'effect').hexdigest()}"
 
 
-@pytest.mark.parametrize("args, uses", [
-    (["install", GUID], "ready"), (["reinstall", GUID], "ready"),
-    (["uninstall"], "installed"), (["cleanup", GUID], "installed"),
-    (["remove-all"], "installed")])
-def test_admin_steps_go_through_the_helper_when_it_can(monkeypatch, args, uses):
+@pytest.mark.parametrize("args, same_dll", [
+    (["install", GUID], True), (["reinstall", GUID], True),
+    (["uninstall"], False), (["cleanup", GUID], False), (["remove-all"], False)])
+def test_admin_steps_go_through_the_helper_when_it_can(monkeypatch, args, same_dll):
     asked, prompted = [], []
-    monkeypatch.setattr(mh, "ready", lambda: uses == "ready")
-    monkeypatch.setattr(mh, "installed", lambda: uses == "installed")
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True: asked.append(same_dll) or True)
     monkeypatch.setattr(mh, "ask", lambda a, wait_s=300.0: asked.append(a) or 0)
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: prompted.append(a) or 0)
     assert REAL_ELEVATED(args) == 0
-    assert asked == [args] and not prompted
+    assert asked == [same_dll, args] and not prompted
 
 
 def test_without_a_helper_windows_asks(monkeypatch):
     prompted = []
-    monkeypatch.setattr(mh, "ready", lambda: False)
-    monkeypatch.setattr(mh, "installed", lambda: True)   # an older DLL's helper
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True: not same_dll)   # older DLL's
     monkeypatch.setattr(mh, "ask", lambda *a, **k: pytest.fail("asked an unusable helper"))
     monkeypatch.setattr(dm, "run_elevated",
                         lambda exe, params, wait_s: prompted.append(params) or 0)
@@ -166,7 +168,7 @@ def test_without_a_helper_windows_asks(monkeypatch):
 
 def test_a_helper_that_doesnt_answer_falls_back_to_windows(monkeypatch):
     prompted = []
-    monkeypatch.setattr(mh, "installed", lambda: True)
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True: True)
     monkeypatch.setattr(mh, "ask", lambda *a, **k: None)
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: prompted.append(a) or 0)
     assert REAL_ELEVATED(["uninstall"]) == 0 and prompted
@@ -175,7 +177,7 @@ def test_a_helper_that_doesnt_answer_falls_back_to_windows(monkeypatch):
 def test_a_slot_choice_always_asks_windows(monkeypatch):
     """`install <guid> <slot>` (the recovery card's expert choice) isn't a helper step."""
     prompted = []
-    monkeypatch.setattr(mh, "ready", lambda: pytest.fail("looked for the helper"))
+    monkeypatch.setattr(mh, "ready", lambda **k: pytest.fail("looked for the helper"))
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: prompted.append(a) or 0)
     assert REAL_ELEVATED(["install", GUID, "efx"]) == 0 and prompted
 
@@ -289,3 +291,17 @@ def test_helper_version_follows_the_admin_code():
     assert ADMIN_DIGEST.get(mh.HELPER_VERSION) == admin_source_digest(), (
         f"the mic helper's admin code changed: bump michelper.HELPER_VERSION and set "
         f"ADMIN_DIGEST[{mh.HELPER_VERSION}] = {admin_source_digest()!r}")
+
+
+def test_a_reinstall_makes_the_ring_folder_again(monkeypatch):
+    """A reinstall's uninstall removes the data folder when no board holds the ring
+    open: putting the effect back makes it again (found on a real PC, through the
+    helper: the set-up failed half-way and left the mic without the effect)."""
+    made = []
+
+    def secure():
+        made.append(True)
+        dm.ring_path().parent.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(dm, "secure_data_dirs", secure)
+    dm._make_ring()
+    assert made and dm.make_ring_ok(dm.ring_path())

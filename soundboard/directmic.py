@@ -1532,6 +1532,10 @@ def _make_ring():
     path = ring_path()
     if make_ring_ok(path):
         return
+    if not path.parent.is_dir():
+        # a reinstall's uninstall removed the folder (nothing held the ring open, as a
+        # running board does): made again, as safe as the admin step makes it at first
+        secure_data_dirs()
     tmp = path.parent / f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
     try:
@@ -1701,6 +1705,8 @@ def _remove(path: Path):
     else:
         try:
             path.unlink()
+        except FileNotFoundError:
+            pass
         except OSError:
             log.info("can't remove %s yet", path)
 
@@ -1833,8 +1839,7 @@ def _via_helper(args: list[str], wait_s: float) -> int | None:
     try:
         if not michelper.allowed(args):
             return None
-        usable = michelper.ready() if args[0] in ("install", "reinstall") \
-            else michelper.installed()
+        usable = michelper.ready(same_dll=args[0] in ("install", "reinstall"))
         return michelper.ask(args, wait_s) if usable else None
     except Exception:  # noqa: BLE001 - Windows' prompt still works
         log.warning("the mic helper failed", exc_info=True)
