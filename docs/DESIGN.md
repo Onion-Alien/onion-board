@@ -180,6 +180,12 @@ These are the current reference points. Copy their structure before inventing a 
 
 ## 4. Icons and pop-ups instead of long buttons
 
+- **Centre icons beside text.** Align the icon's vertical centre with the centre of
+  its label, never with the label's baseline or bottom edge. Use `Qt.AlignVCenter`
+  for the icon and text in their shared row, including wrapped and translated labels.
+  Keep a small, consistent gap; an action chevron sits beside its words rather than
+  at the far edge of an otherwise empty row.
+
 The screen shows **what you can do**; the explaining happens on demand. Wherever it
 works, a short control plus a pop-up beats a long button or a paragraph on the page.
 

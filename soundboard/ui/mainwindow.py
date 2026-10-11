@@ -761,9 +761,11 @@ class MainWindow(QMainWindow):
         self.btn_air.toggled.connect(self.set_sending)
         icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON)
         self.set_sending(True)
-        # Who's listening, beside Live on the rail (the full picker is on the Setup tab)
+        # Keep the mode controller for shared commands; its full picker lives on Setup.
         from soundboard.ui.destpanel import ModeButton
         self.mode_btn = ModeButton(self)
+        self.mode_btn.setParent(self)
+        self.mode_btn.hide()
         self.stop_btn = QPushButton()
         self.stop_btn.setObjectName("danger")
         self.stop_btn.setProperty("quiet", True)   # red text, no box: Live is the loud one
@@ -964,7 +966,7 @@ class MainWindow(QMainWindow):
             self._rail_opened,
             # Live and Stop all never move; the pills (what needs attention) sit above
             # them and only show when needed (at the rail's foot, as icons)
-            [self.btn_air, self.mode_btn, self.stop_btn],
+            [self.btn_air, self.stop_btn],
             order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
             alerts=[self.pill, self.btn_offline, self.btn_update])
         # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
@@ -980,7 +982,12 @@ class MainWindow(QMainWindow):
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
         # page's box holds the download bar too, so the bar's buttons come just before it
         prev = self._tabs_box.previousInFocusChain()
-        for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status,
+        status_focus = []
+        for button in self.rail.status:
+            if button is self.btn_air and self.rail.output:
+                status_focus.extend((self.rail.output.switch, self.rail.output.setup))
+            status_focus.append(button)
+        for w in (*self.rail.buttons, self.btn_more_tabs, *status_focus,
                   self.gear,
                   self.rail.toggle, self._tabs_box):
             QWidget.setTabOrder(prev, w)
@@ -7952,6 +7959,9 @@ class MainWindow(QMainWindow):
     def _show_pill(self):
         """The setup pill: only while something needs fixing."""
         self.pill.setVisible(not self._pill_good)
+        self.pill.setProperty("outputgood", self._pill_good)
+        if hasattr(self, "rail"):
+            self.rail.refresh_output()
 
     def _refit(self):
         size = self._pages.size()

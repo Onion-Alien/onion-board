@@ -581,6 +581,14 @@ QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-ali
 QFrame#sidebar QLabel#wordmark { font-size:12pt; }
 QFrame#sidebar QFrame#raildiv { background:$border_hi; border:none; }
 QFrame#sidebar QWidget#railslot { background:transparent; }
+QFrame#railoutput { background:$panel; border:none; border-radius:12px; }
+QFrame#railoutput[expanded="false"] { background:transparent; }
+QFrame#railoutput QLabel#railoutputtitle { font-weight:700; color:$text_hi; }
+QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
+    border:1px solid transparent; border-radius:6px; padding:0; }
+QFrame#railoutput QPushButton#railoutputsetup QLabel { color:$accent; }
+QFrame#railoutput QPushButton#railoutputsetup:hover { background:$btn_hover; }
+QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }

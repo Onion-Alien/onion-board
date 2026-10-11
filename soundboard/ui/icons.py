@@ -476,6 +476,10 @@ def _chevron(direction):
             path.moveTo(6, 15)
             path.lineTo(12, 9)
             path.lineTo(18, 15)
+        elif direction == "left":
+            path.moveTo(15, 6)
+            path.lineTo(9, 12)
+            path.lineTo(15, 18)
         else:
             path.moveTo(9, 6)
             path.lineTo(15, 12)
@@ -637,7 +641,8 @@ SHAPES = {
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
-    "fold": _chevron("right"), "fold_open": _chevron("down"), "fold_up": _chevron("up"),
+    "fold": _chevron("right"), "fold_back": _chevron("left"),
+    "fold_open": _chevron("down"), "fold_up": _chevron("up"),
 }
 
 

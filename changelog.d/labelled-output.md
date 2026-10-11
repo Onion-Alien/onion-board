@@ -1,0 +1,2 @@
+- Group the expanded sidebar's output switch and connection status, with visible labels and a broadcast icon.
+- Keep Stop all visible and leave the listening mode picker on Setup instead of duplicating it on the sidebar.

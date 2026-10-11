@@ -204,6 +204,113 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
         rail.show_status(w)
 
 
+class OutputBlock(QFrame):
+    """Named output switch and connection help for the expanded rail."""
+
+    def __init__(self, power: QPushButton, connection: QPushButton):
+        super().__init__()
+        from soundboard.ui.voicepanel import Switch
+
+        self.setObjectName("railoutput")
+        self.power, self.connection = power, connection
+        box = self.box = QVBoxLayout(self)
+        box.setContentsMargins(8, 8, 8, 8)
+        box.setSpacing(0)
+        top = self.top = QHBoxLayout()
+        top.setSpacing(4)
+        mark = self.mark = QLabel()
+        mark.setFixedSize(16, 20)
+        mark.setContentsMargins(0, 4, 0, 0)   # optical centre of Segoe's visible glyphs
+        mark.setAlignment(Qt.AlignCenter)
+        icons.set_label_icon(mark, "live", "accent", size=16)
+        self.title = QLabel(_("Sound output"))
+        self.title.setObjectName("railoutputtitle")
+        self.title.setWordWrap(True)
+        self.title.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
+        self.title.setMinimumWidth(0)
+        self.switch = Switch()
+        self.switch.setProperty("glyphoffset", 2)
+        self.switch.setAccessibleName(_("Sound output"))
+        self.title.setBuddy(self.switch)
+        self.switch.setChecked(power.isChecked())
+        self.switch.toggled.connect(power.setChecked)
+        power.toggled.connect(self.switch.setChecked)
+        top.addWidget(mark, 0, Qt.AlignVCenter)
+        top.addWidget(self.title, 1)
+        top.addWidget(self.switch)
+        box.addLayout(top)
+        self._status_gap = QSpacerItem(0, 4, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        box.addSpacerItem(self._status_gap)
+        status = QHBoxLayout()
+        status.setSpacing(6)
+        self.status_icon = QLabel()
+        self.status_icon.setFixedSize(16, 20)
+        self.status_icon.setContentsMargins(0, 4, 0, 0)
+        self.status_icon.setAlignment(Qt.AlignCenter)
+        self.status_text = QLabel()
+        self.status_text.setWordWrap(True)
+        self.status_text.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
+        self.status_text.setMinimumWidth(0)
+        status.addWidget(self.status_icon, 0, Qt.AlignVCenter)
+        status.addWidget(self.status_text, 1)
+        box.addLayout(status)
+        self.setup = QPushButton()
+        self.setup.setObjectName("railoutputsetup")
+        self.setup.setProperty("quiet", True)
+        self.setup.setCursor(Qt.PointingHandCursor)
+        self.setup.setMinimumHeight(34)
+        self.setup.setAccessibleName(_("Set up output"))
+        action = QHBoxLayout(self.setup)
+        action.setContentsMargins(0, 4, 0, 4)
+        action.setSpacing(4)
+        label = QLabel(_("Set up output"))
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
+        label.setMinimumWidth(0)
+        label.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.arrow = QLabel()
+        self.arrow.setFixedSize(16, 24)
+        self.arrow.setContentsMargins(0, 8, 0, 0)
+        self.arrow.setAttribute(Qt.WA_TransparentForMouseEvents)
+        action.addWidget(label, 0, Qt.AlignVCenter)
+        action.addWidget(self.arrow, 0, Qt.AlignVCenter)
+        action.addStretch(1)
+        self.setup.clicked.connect(connection.click)
+        box.addWidget(self.setup)
+        self.refresh()
+
+    def set_expanded(self, expanded: bool):
+        self.setProperty("expanded", expanded)
+        self.box.setContentsMargins(*(8, 8, 8, 8) if expanded else (0, 4, 0, 4))
+        self.top.setDirection(QBoxLayout.LeftToRight if expanded else QBoxLayout.TopToBottom)
+        self.title.setVisible(expanded)
+        self.status_icon.setVisible(expanded)
+        self.status_text.setVisible(expanded)
+        self.setup.setVisible(expanded)
+        self.switch.setFixedSize(38 if expanded else 34, 22)
+        self._status_gap.changeSize(0, 4 if expanded else 0,
+                                    QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.box.invalidate()
+        self.top.setAlignment(self.mark, Qt.AlignVCenter if expanded else Qt.AlignHCenter)
+        self.top.setAlignment(self.switch, Qt.AlignVCenter if expanded else Qt.AlignHCenter)
+        self.setFixedWidth(OPEN_W - 2 * SIDE_OPEN - 1 if expanded else BUTTON_W)
+        self.style().unpolish(self)
+        self.style().polish(self)
+
+    def refresh(self):
+        self.switch.setToolTip(self.power.toolTip())
+        self.switch.setAccessibleDescription(self.power.property("railfull") or "")
+        self.status_text.setText(self.connection.property("railtext") or "")
+        self.status_text.setToolTip(self.connection.property("railfull") or "")
+        good = self.connection.property("state") == "ok"
+        self.setup.setVisible(bool(self.property("expanded")) and not good)
+        theme.set_tone(self.status_text, "ok" if good else "warn")
+        self.status_icon.setPixmap(self.connection.icon().pixmap(16, 16))
+        self.setup.setToolTip(self.connection.toolTip())
+        icons.set_label_icon(self.arrow, "fold_back" if self.isRightToLeft() else "fold",
+                             "accent", size=16)
+
+
 class ClickLabel(QLabel):
     """A label that says when it's clicked (the version in the header)."""
 
@@ -300,6 +407,7 @@ class SideRail(QFrame):
         # order they're drawn (the keyboard follows it): what needs attention first
         self.alerts = list(alerts)
         self.status = [*self.alerts, *status]
+        self.output = None
         self._status_box = QBoxLayout(QBoxLayout.TopToBottom)
         self._status_box.setSpacing(4)
         self._status_pad_before = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -328,6 +436,11 @@ class SideRail(QFrame):
         else:
             alert_wrap.deleteLater()
             self._open_only.remove(alert_wrap)
+        power = next((w for w in self.status if w.objectName() == "onair"), None)
+        connection = next((w for w in self.status if w.objectName() == "pill"), None)
+        if power is not None and connection is not None:
+            self.output = OutputBlock(power, connection)
+            self._status_box.insertWidget(2 if self.alerts else 1, self.output)
         self._status_box.addSpacerItem(self._status_pad_after)   # (open: centered horizontally)
         lay.addLayout(self._status_box)
         self._gaps.append(self._gap(6))
@@ -516,6 +629,8 @@ class SideRail(QFrame):
             w.setToolTip(f"{html.escape(full)}<br>{tip}")
         else:
             w.setToolTip("\n".join(filter(None, (full, tip if tip != full else ""))))
+        if self.output and w in (self.output.power, self.output.connection):
+            self.output.refresh()
 
     # ---- open / shut
     def is_open(self) -> bool:
@@ -616,4 +731,15 @@ class SideRail(QFrame):
                 w.style().polish(w)
         for w in everything:
             w.setFixedHeight(h)
+        self.refresh_output()
         self.updateGeometry()
+
+    def refresh_output(self):
+        if self.output:
+            shown = self.is_open()
+            self.output.set_expanded(shown)
+            self.output.power.hide()
+            self.output.connection.setVisible(
+                not shown and not bool(self.output.connection.property("outputgood")))
+            self.output.refresh()
+            self._sync_divider()

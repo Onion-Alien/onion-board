@@ -3045,5 +3045,7 @@
   "Delete info": "Διαγραφή πληροφοριών",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Διαγραφή της προέλευσης του «{name}»;\n\nΟ σύνδεσμος, το κανάλι, οι άλλες λεπτομέρειες και το αρχείο κειμένου τους διαγράφονται. Ο ήχος μένει.",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Κρατά τον σύνδεσμο, το κανάλι, την ημερομηνία ανάρτησης, τη διάρκεια και τις προβολές κάθε λήψης (από την ίδια τη λήψη, τίποτα επιπλέον δεν κατεβαίνει), και σε αρχείο κειμένου δίπλα στον ήχο. Δεξί κλικ στον ήχο για άνοιγμα ή αντιγραφή του συνδέσμου. Κλειστό: οι νέες λήψεις δεν κρατούν τίποτα από αυτά και το μενού τα κρύβει· ό,τι έχει ήδη αποθηκευτεί μένει.",
-  "Remember where it came from": "Θυμήσου από πού ήρθε"
+  "Remember where it came from": "Θυμήσου από πού ήρθε",
+  "Set up output": "Ρύθμιση εξόδου",
+  "Sound output": "Έξοδος ήχου"
 }
