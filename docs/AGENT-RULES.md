@@ -79,6 +79,9 @@ Every task, before changing anything (details in `CLAUDE.md`):
 ### Tests (about 24)
 - Garbage collection runs only on the UI thread (`soundboard/uigc.py`). Python's GC on an
   audio or worker thread frees Qt objects there and crashes natively. `15d7fb5`
+- So is what a finished thread held (its target, args, closures): `uigc` hands it to
+  the UI thread, or a tab switched off mid-job was freed on the worker. A test that
+  checks something a thread held is freed calls `uigc.let_go()` first.
 - A test needing a port that refuses uses `closed_port()` / `ipv4_only()` from
   `tests/conftest.py`, never a hard-coded port.
 - A timing test takes the best of several tries and skips on CI. A busy runner
