@@ -3085,9 +3085,11 @@ class MainWindow(QMainWindow):
             mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
                     colour=warn)
         # the app's own painted tick and cross, not the font's ✓ / ✗ (a brushy x)
+        dpr = self.flow_out.devicePixelRatioF() or 1.0
+
         def marks(text: str) -> str:
-            return (text.replace("✗", icons.inline("cross", bad))
-                    .replace("✓", icons.inline("check", ok)))
+            return (text.replace("✗", icons.inline("cross", bad, dpr=dpr))
+                    .replace("✓", icons.inline("check", ok, dpr=dpr)))
         self.flow_mic.setText(marks(mic))
         self.flow_out.setText(marks(out))
         self.step_lbl.setText(step)

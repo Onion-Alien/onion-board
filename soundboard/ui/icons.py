@@ -329,8 +329,8 @@ def _check(p, fill):
 def _cross(p, fill):
     """A status cross: the check's circle with an x in it (something isn't working)."""
     p.drawEllipse(QRectF(3, 3, 18, 18))
-    p.drawLine(QPointF(9, 9), QPointF(15, 15))
-    p.drawLine(QPointF(15, 9), QPointF(9, 15))
+    p.drawLine(QPointF(8.5, 8.5), QPointF(15.5, 15.5))
+    p.drawLine(QPointF(15.5, 8.5), QPointF(8.5, 15.5))
 
 
 def _info(p, fill):
@@ -940,19 +940,22 @@ _labels: list[tuple[weakref.ref, str, str, int]] = []
 _inline: dict[tuple, str] = {}
 
 
-def inline(name: str, color: str, size: int = 16) -> str:
+def inline(name: str, color: str, size: int = 16, dpr: float = 1.0) -> str:
     """An icon inside rich text (a status tick or cross in a sentence), as an <img>.
-    Drawn at 3x so it stays sharp on a scaled screen; `color` is a real colour
-    (theme.status(...)), so a redraw after a theme change picks up the new one."""
-    key = (name, color, size)
+    Drawn at exactly the screen pixels it fills (`size` x the label's
+    devicePixelRatioF): rich text scales an image without smoothing, so one drawn
+    bigger and shrunk came out jagged. `color` is a real colour (theme.status(...)),
+    so a redraw after a theme change picks up the new one."""
+    px = max(1, round(size * dpr))
+    key = (name, color, px)
     if key not in _inline:
         data = QByteArray()
         buf = QBuffer(data)
         buf.open(QBuffer.OpenModeFlag.WriteOnly)
-        pixmap(name, size * 3, color).save(buf, "PNG")
+        pixmap(name, px, color).save(buf, "PNG")
         src = bytes(data.toBase64().data()).decode()
-        _inline[key] = (f"<img src='data:image/png;base64,{src}' width='{size}' "
-                        f"height='{size}' style='vertical-align: middle'>")
+        _inline[key] = (f"<img src='data:image/png;base64,{src}' width='{px / dpr:g}' "
+                        f"height='{px / dpr:g}' style='vertical-align: middle'>")
     return _inline[key]
 
 
