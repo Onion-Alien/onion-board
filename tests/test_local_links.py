@@ -32,7 +32,7 @@ def test_link_and_copy_share_cache_effects_and_live_playback(app_dir, monkeypatc
     assert mapped.is_mapped(a) == use_map
     assert mapped.is_mapped(b) == use_map
     # Simulate restart: the only permitted reads are from the common decoded cache.
-    monkeypatch.setattr(library, "decode", lambda *args: pytest.fail("source decoded again"))
+    monkeypatch.setattr(library, "_read", lambda *args: pytest.fail("source decoded again"))
     for meta in (linked, copied):
         meta.fx = {"speed": 1.25, "eq": [6.0] + [0.0] * (len(eq.BANDS) - 1)}
     a, b = library.load_sound(linked), library.load_sound(copied)
