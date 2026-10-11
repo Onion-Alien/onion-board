@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Οι ήχοι σου πάνε στο {name}.</b> Ό,τι ακούει εκεί τους παίρνει. Στο OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. Στο Voicemeeter ή σε μίκτη, στείλε αυτή την είσοδο όπου πρέπει να πάει. Δεν πηγαίνει σε φωνητικό chat; Ξετσέκαρε το <b>Αποστολή σε mono</b> στο Ποιος ακούει για να μείνει stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Ρυθμίσεις → Ήχος → Μικρόφωνο: {mic}. Ξετσέκαρε το <b>Automatically adjust microphone volume</b>, βάλε το <b>Background noise suppression</b> σε <b>Low</b>, ή διάλεξε <b>Original sound for musicians</b> (μετά άνοιξέ το μέσα στη σύσκεψη, πάνω αριστερά).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "Το <b>{name}</b> είναι επόμενο: περιμένει να τελειώσει η λήψη πριν από αυτό…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Προαιρετικό:</b> το κομμάτι του μικροφώνου δουλεύει, και βγήκε νεότερη έκδοση. Δεν χρειάζεται, ενημέρωσε παρακάτω όποτε σε βολεύει (τα Windows ρωτούν μία φορά και ο ήχος σου κόβεται για ένα δευτερόλεπτο).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Η μία άκρη του καλωδίου είναι στα {rates}, οπότε μετατρέπει τον ήχο σου στη διαδρομή. Διόρθωσέ το για τον πιο καθαρό ήχο.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Δεν ανοίγει: {devices} (στο Στείλε και σε). Είναι συνδεδεμένο; Ξαναδοκιμάζεται μόνο του.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Σημαντική διόρθωση:</b> {fix}</p>",
@@ -776,7 +775,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Ανοίγει αναφορά bug στο GitHub στον browser σου, με συμπληρωμένες τις εκδόσεις",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Την ανοίγει τώρα, όπως η συντόμευση: διάλεξε ήχο με τα πλήκτρα του ή με κλικ. Το Esc, αυτό το κουμπί ή η συντόμευση την κλείνει",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Ανοίγει την πλήρη λίστα (SECURITY.md) στο GitHub, στον browser σου",
-  "Optional: update the mic part": "Προαιρετικό: ενημέρωσε το κομμάτι του μικροφώνου",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Ή απλώς σύρ' την: πιάσε οποιοδήποτε άδειο σημείο της επικάλυψης (τον τίτλο, τις άκρες) και άφησέ τη οπουδήποτε, σε οποιαδήποτε οθόνη. Από εκεί και πέρα ανοίγει εκεί. Το Εμφάνιση προεπισκόπησης δείχνει μόνο πώς φαίνεται: άνοιξε την επικάλυψη με τη συντόμευσή της για να τη δοκιμάσεις ή να τη μετακινήσεις.",
   "Orange": "Πορτοκαλί",
   "Other games": "Άλλα παιχνίδια",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Επόμενο: τα Windows θα ζητήσουν άδεια για το OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Τίποτα για ενημέρωση τώρα: οι ρυθμίσεις του μικροφώνου άλλαξαν.",
   "The Windows prompt names Python because you're running from source.": "Το παράθυρο των Windows αναφέρει Python επειδή τρέχεις από τον πηγαίο κώδικα.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Η ενημέρωση ακυρώθηκε. Το μικρόφωνο συνεχίζει να δουλεύει: ενημέρωσε όποτε θες από τη Διαμόρφωση.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Τα Windows θα ζητήσουν άδεια. Ο ήχος σταματά για λίγο κατά την ενημέρωση.",
   "You can update later in Setup.": "Μπορείς να ενημερώσεις αργότερα από τη Διαμόρφωση.",
   "Your mic is already up to date.": "Το μικρόφωνό σου είναι ήδη ενημερωμένο.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Πάτησε ↻ για να δοκιμάσεις ξανά.",
   "That station isn't on the air right now. Try another one.": "Αυτός ο σταθμός δεν εκπέμπει αυτή τη στιγμή. Δοκίμασε άλλον.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Το ραδιόφωνο δεν λειτουργεί αυτή τη στιγμή. Δεν φταις εσύ: ο διακομιστής με τη λίστα σταθμών δεν δουλεύει. Δοκίμασε ξανά σε λίγο.",
-  "This station points into your home network, so it isn't played.": "Αυτός ο σταθμός δείχνει στο οικιακό σου δίκτυο, οπότε δεν παίζει."
+  "This station points into your home network, so it isn't played.": "Αυτός ο σταθμός δείχνει στο οικιακό σου δίκτυο, οπότε δεν παίζει.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Ενημέρωσε το κομμάτι του μικροφώνου</b><br>Είναι από παλαιότερη έκδοση του Onion Board, οπότε κάποια παιχνίδια, κλήσεις και browsers μπορεί να μην ακούν τους ήχους σου. Τα Windows ρωτούν μία φορά και ο ήχος κόβεται για ένα δευτερόλεπτο.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, με παλιά έκδοση του κομματιού μικροφώνου του Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Η ενημέρωση ακυρώθηκε. Το κομμάτι του μικροφώνου είναι ακόμα το παλιό: ενημέρωσέ το από την καρτέλα Διαμόρφωση."
 }

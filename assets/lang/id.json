@@ -278,7 +278,6 @@
   "Open the sounds folder": "Buka folder suara",
   "Opened the folder with the log in it.": "Folder berisi log sudah dibuka.",
   "Opened your sounds folder": "Folder suaramu sudah dibuka",
-  "Optional: update the mic part": "Opsional: perbarui bagian mic",
   "Others hear it": "Orang lain dengar",
   "Overlap: every press plays a new copy": "Tumpuk: tiap tekan memutar salinan baru",
   "Pad size": "Ukuran pad",
@@ -638,7 +637,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Suara Anda masuk ke {name} .</b> Apa pun yang didengarkan di sana, dapatkan mereka. Di OBS: Sumber → + → <b>Pengambilan Output Audio</b> → <b>{name}</b> . Di Voicemeeter atau mixer, kirimkan masukan itu ke mana pun ia harus pergi. Tidak melanjutkan obrolan suara? Hapus centang <b>Kirim dalam mono</b> di bawah Siapa yang mendengarkan agar tetap stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b> : Pengaturan → Audio → Mikrofon: {mic} . Hapus centang <b>Sesuaikan volume mikrofon secara otomatis</b> , atur <b>Penekan kebisingan latar belakang</b> ke <b>Rendah</b> , atau pilih <b>Suara asli untuk musisi</b> (lalu aktifkan dalam rapat, kiri atas).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> berikutnya: menunggu unduhan sebelum selesai…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Opsional:</b> bagian mikrofon Anda berfungsi, dan versi yang lebih baru telah hadir. Ini tidak diperlukan, perbarui di bawah kapan pun Anda mau (Windows bertanya sekali, dan suara Anda berhenti sebentar).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Salah satu ujung kabel berada pada {rates} , sehingga akan mengubah suara Anda saat melewatinya. Perbaiki untuk suara terbersih.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Perbaikan penting:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>Salinan ini dijalankan dari sumber: perbarui dengan <code>git pull</code> .</p>",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Berikutnya: Windows akan meminta izin untuk OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Tidak ada yang perlu diperbarui: pengaturan mic-mu berubah.",
   "The Windows prompt names Python because you're running from source.": "Jendela Windows menyebut Python karena kamu menjalankan dari kode sumber.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Pembaruan dibatalkan. Mic-mu tetap berfungsi: perbarui kapan saja di Penyiapan.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows akan meminta izin. Audio berhenti sebentar selama pembaruan.",
   "You can update later in Setup.": "Kamu bisa memperbarui nanti di Penyiapan.",
   "Your mic is already up to date.": "Mic-mu sudah versi terbaru.",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "Tekan ↻ untuk mencoba lagi.",
   "That station isn't on the air right now. Try another one.": "Stasiun itu sedang tidak mengudara. Coba yang lain.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio sedang mati sekarang. Bukan salahmu: server daftar stasiunnya tidak jalan. Coba lagi sebentar lagi.",
-  "This station points into your home network, so it isn't played.": "Stasiun ini mengarah ke jaringan rumahmu, jadi tidak diputar."
+  "This station points into your home network, so it isn't played.": "Stasiun ini mengarah ke jaringan rumahmu, jadi tidak diputar.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Perbarui bagian mic-mu</b><br>Ini dari versi Onion Board yang lebih lama, jadi beberapa game, panggilan, dan browser mungkin tidak mendengar suaramu. Windows bertanya sekali, dan suara terputus sedetik.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, dengan bagian mic Onion Board versi lama",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Pembaruan dibatalkan. Bagian mic-mu masih yang lama: perbarui dari tab Penyiapan."
 }

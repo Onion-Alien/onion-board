@@ -308,7 +308,6 @@
   "Open the sounds folder": "افتح مجلد الأصوات",
   "Opened the folder with the log in it.": "فُتح المجلد الذي فيه السجل.",
   "Opened your sounds folder": "فُتح مجلد أصواتك",
-  "Optional: update the mic part": "اختياري: حدّث جزء الميكروفون",
   "Others hear it": "الآخرون يسمعونه",
   "Overlap: every press plays a new copy": "تداخل: كل ضغطة تشغّل نسخة جديدة",
   "Pad size": "حجم الزر",
@@ -718,7 +717,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>أصواتك تذهب إلى {name} .</b> كل ما يستمع هناك يحصل عليهم. في OBS: المصادر → + → <b>التقاط إخراج الصوت</b> → <b>{name}</b> . في Voicemeeter أو جهاز مزج الصوت، أرسل هذا الإدخال إلى أي مكان يجب أن يذهب إليه. لا تذهب إلى الدردشة الصوتية؟ قم بإلغاء تحديد <b>إرسال أحادي</b> ضمن من يستمع ليظل صوت ستيريو.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>التكبير/التصغير</b> : الإعدادات → الصوت → الميكروفون: {mic} . قم بإلغاء <b>تحديد ضبط مستوى صوت الميكروفون تلقائيًا</b> ، أو قم بتعيين <b>منع ضوضاء الخلفية</b> على <b>منخفض</b> ، أو اختر <b>الصوت الأصلي للموسيقيين</b> (ثم قم بتشغيله في الاجتماع، أعلى اليسار).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> هو التالي: في انتظار التنزيل قبل أن ينتهي...",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>اختياري:</b> جزء الميكروفون الخاص بك يعمل، ويوجد إصدار أحدث هنا. ليس هناك حاجة لذلك - قم بالتحديث أدناه عندما يناسبك (يسألك Windows مرة واحدة، وينقطع الصوت لثانية واحدة).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>أحد طرفي الكابل موجود على {rates} ، لذا فهو يحول الصوت أثناء مروره. إصلاحه للحصول على أنقى صوت.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>إصلاح مهم:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>يتم تشغيل هذه النسخة من المصدر: قم بتحديثها باستخدام <code>git pull</code> .</p>",
@@ -3379,7 +3377,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "التالي: سيطلب Windows الإذن لـ OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "لا شيء لتحديثه الآن: تغيّرت إعدادات الميكروفون.",
   "The Windows prompt names Python because you're running from source.": "نافذة Windows تذكر Python لأنك تشغّل البرنامج من المصدر.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "أُلغي التحديث. الميكروفون يبقى يعمل: حدّثه متى شئت من التهيئة.",
   "Windows asks for permission. Audio pauses briefly during the update.": "سيطلب Windows الإذن. يتوقف الصوت لحظة أثناء التحديث.",
   "You can update later in Setup.": "يمكنك التحديث لاحقًا من التهيئة.",
   "Your mic is already up to date.": "الميكروفون محدَّث بالفعل.",
@@ -3549,5 +3546,8 @@
   "Press ↻ to try again.": "اضغط ↻ للمحاولة مرة أخرى.",
   "That station isn't on the air right now. Try another one.": "هذه المحطة لا تبث الآن. جرّب محطة أخرى.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "الراديو متوقف الآن. المشكلة ليست عندك: خادم قائمة المحطات لا يعمل. حاول مرة أخرى بعد قليل.",
-  "This station points into your home network, so it isn't played.": "هذه المحطة تشير إلى شبكتك المنزلية، لذلك لا يتم تشغيلها."
+  "This station points into your home network, so it isn't played.": "هذه المحطة تشير إلى شبكتك المنزلية، لذلك لا يتم تشغيلها.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>حدّث جزء الميكروفون</b><br>إنه من إصدار أقدم من Onion Board، لذلك قد لا تسمع بعض الألعاب والمكالمات والمتصفحات أصواتك. يطلب Windows الإذن مرة واحدة، وينقطع الصوت لثانية.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>، مع إصدار قديم من جزء الميكروفون في Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "أُلغي التحديث. جزء الميكروفون ما زال القديم: حدّثه من تبويب التهيئة."
 }

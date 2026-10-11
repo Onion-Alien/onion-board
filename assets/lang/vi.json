@@ -278,7 +278,6 @@
   "Open the sounds folder": "Mở thư mục âm thanh",
   "Opened the folder with the log in it.": "Đã mở thư mục chứa nhật ký.",
   "Opened your sounds folder": "Đã mở thư mục âm thanh của bạn",
-  "Optional: update the mic part": "Tùy chọn: cập nhật phần mic",
   "Others hear it": "Người khác nghe",
   "Overlap: every press plays a new copy": "Chồng lên: mỗi lần bấm phát một bản mới",
   "Pad size": "Cỡ nút",
@@ -638,7 +637,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Âm thanh của bạn chuyển đến {name} .</b> Bất cứ điều gì lắng nghe có được chúng. Trong OBS: Nguồn → + → <b>Ghi đầu ra âm thanh</b> → <b>{name}</b> . Trong Voicemeeter hoặc máy trộn, hãy gửi đầu vào đó đến bất cứ nơi nào cần đến. Bạn không tiếp tục trò chuyện bằng giọng nói? Bỏ chọn <b>Gửi ở chế độ mono</b> bên dưới Ai đang nghe để giữ âm thanh nổi.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Thu phóng</b> : Cài đặt → Âm thanh → Micrô: {mic} . Bỏ chọn <b>Tự động điều chỉnh âm lượng micrô</b> , đặt <b>Khử tiếng ồn nền</b> thành <b>Thấp</b> hoặc chọn <b>Âm thanh gốc cho nhạc sĩ</b> (sau đó bật tính năng này trong cuộc họp, trên cùng bên trái).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "Tiếp theo là <b>{name}</b> : chờ quá trình tải xuống trước khi hoàn tất…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Tùy chọn:</b> phần micrô của bạn hoạt động và có phiên bản mới hơn ở đây. Không cần thiết, hãy cập nhật bên dưới bất cứ khi nào bạn thấy phù hợp (Windows hỏi một lần và âm thanh của bạn sẽ tắt trong một giây).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Một đầu của cáp đang ở trạng thái {rates} , do đó, nó sẽ chuyển đổi âm thanh của bạn trong quá trình truyền qua. Sửa nó để có âm thanh sạch nhất.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Sửa chữa quan trọng:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>Bản sao này chạy từ nguồn: cập nhật nó bằng <code>git pull</code> .</p>",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Tiếp theo: Windows sẽ xin quyền cho OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Hiện không có gì để cập nhật: cài đặt mic của bạn đã thay đổi.",
   "The Windows prompt names Python because you're running from source.": "Hộp thoại Windows ghi Python vì bạn đang chạy từ mã nguồn.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Đã hủy cập nhật. Mic vẫn hoạt động: cập nhật bất cứ lúc nào trong Thiết lập.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows sẽ xin quyền. Âm thanh tạm dừng một chút khi cập nhật.",
   "You can update later in Setup.": "Bạn có thể cập nhật sau trong Thiết lập.",
   "Your mic is already up to date.": "Mic của bạn đã là bản mới nhất.",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "Nhấn ↻ để thử lại.",
   "That station isn't on the air right now. Try another one.": "Đài đó hiện không phát sóng. Hãy thử đài khác.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio đang bị sập. Không phải lỗi của bạn: máy chủ danh sách đài không hoạt động. Hãy thử lại sau một lát.",
-  "This station points into your home network, so it isn't played.": "Đài này trỏ vào mạng gia đình của bạn, nên không được phát."
+  "This station points into your home network, so it isn't played.": "Đài này trỏ vào mạng gia đình của bạn, nên không được phát.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Cập nhật phần mic của bạn</b><br>Phần này từ phiên bản Onion Board cũ hơn, nên một số game, cuộc gọi và trình duyệt có thể không nghe thấy âm thanh của bạn. Windows hỏi một lần, và âm thanh mất trong một giây.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, với phần mic của Onion Board phiên bản cũ",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Đã hủy cập nhật. Phần mic vẫn là bản cũ: hãy cập nhật trong tab Thiết lập."
 }

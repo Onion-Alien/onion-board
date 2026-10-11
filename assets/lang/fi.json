@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Äänesi menevät laitteeseen {name}.</b> Mikä tahansa siellä kuunteleva saa ne. OBS:ssä: Lähteet → + → <b>Audio Output Capture</b> → <b>{name}</b>. Voicemeeterissä tai mikserissä lähetä se tulo eteenpäin minne sen pitää mennä. Eivätkö ne mene puhechattiin? Poista ruksi kohdasta <b>Lähetä monona</b> kohdassa Kuka kuulee, niin ne pysyvät stereona.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Asetukset → Ääni → Mikrofoni: {mic}. Poista ruksi kohdasta <b>Säädä mikrofonin äänenvoimakkuutta automaattisesti</b>, aseta <b>Taustamelun vaimennus</b> tilaan <b>Matala</b>, tai valitse <b>Alkuperäinen ääni muusikoille</b> (ja laita se päälle kokouksessa, ylhäällä vasemmalla).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> on seuraavana: odottaa edellisen latauksen valmistumista…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Valinnainen:</b> mikkiosasi toimii, ja uudempi versio on saatavilla. Se ei ole pakollinen, päivitä alta, kun sinulle sopii (Windows kysyy kerran, ja äänesi katkeaa sekunniksi).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Kaapelin toinen pää on taajuudella {rates}, joten se muuntaa äänesi matkalla. Korjaa se puhtaimman äänen saamiseksi.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Laitetta {devices} ei saada auki (kohdassa Lähetä myös). Onko se kytketty? Sitä yritetään itsestään uudelleen.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Tärkeä korjaus:</b> {fix}</p>",
@@ -776,7 +775,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Avaa bugiraportin GitHubiin selaimessasi, versiot valmiiksi täytettyinä",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Avaa sen nyt, samoin kuin pikanäppäin: valitse ääni sen näppäimillä tai klikkaamalla. Esc, tämä painike tai pikanäppäin sulkee sen",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Avaa koko listan (SECURITY.md) GitHubissa, selaimessasi",
-  "Optional: update the mic part": "Valinnainen: päivitä mikkiosa",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Tai vedä se vain: tartu mihin tahansa overlayn tyhjään kohtaan (sen otsikkoon, reunoihin) ja pudota se minne tahansa, mille tahansa näytölle. Se aukeaa siitä lähtien siellä. Näytä esikatselu vain näyttää, miltä se näyttää: avaa overlay sen pikanäppäimellä kokeillaksesi tai siirtääksesi sitä.",
   "Orange": "Oranssi",
   "Other games": "Muut pelit",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Seuraavaksi: Windows kysyy lupaa OnionBoard.exelle.",
   "Nothing to update now: your mic settings changed.": "Ei päivitettävää nyt: mikin asetukset muuttuivat.",
   "The Windows prompt names Python because you're running from source.": "Windowsin kehote mainitsee Pythonin, koska ajat lähdekoodista.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Päivitys peruttu. Mikki toimii edelleen: päivitä milloin vain Käyttöönotossa.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows kysyy lupaa. Ääni katkeaa hetkeksi päivityksen aikana.",
   "You can update later in Setup.": "Voit päivittää myöhemmin Käyttöönotossa.",
   "Your mic is already up to date.": "Mikkisi on jo ajan tasalla.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Paina ↻ yrittääksesi uudelleen.",
   "That station isn't on the air right now. Try another one.": "Tämä asema ei ole nyt lähetyksessä. Kokeile toista.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio ei toimi juuri nyt. Vika ei ole sinussa: asemalistan palvelin ei toimi. Yritä hetken päästä uudelleen.",
-  "This station points into your home network, so it isn't played.": "Tämä asema osoittaa kotiverkkoosi, joten sitä ei soiteta."
+  "This station points into your home network, so it isn't played.": "Tämä asema osoittaa kotiverkkoosi, joten sitä ei soiteta.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Päivitä mikkiosa</b><br>Se on Onion Boardin vanhemmasta versiosta, joten jotkin pelit, puhelut ja selaimet eivät ehkä kuule ääniäsi. Windows kysyy kerran, ja ääni katkeaa sekunniksi.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, jossa on Onion Boardin mikkiosan vanha versio",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Päivitys peruttu. Mikkiosa on yhä vanha: päivitä se Käyttöönotto-välilehdeltä."
 }

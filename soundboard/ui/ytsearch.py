@@ -755,6 +755,7 @@ class SearchResults(RoundedFrame):
         self.link = ""          # a pasted link shown as its own card (show_link), not a search
         self.source = "youtube"
         self._gen = 0
+        self._running: tuple[str, str] | None = None   # (query, site) still being searched
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
@@ -763,13 +764,15 @@ class SearchResults(RoundedFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(12, 0, 12, 12)
+        v.setContentsMargins(12, 12, 12, 12)   # Back sits as far in from the top as the side
         v.setSpacing(6)
         header = QWidget()
         header.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
-        back = self.btn_back = QPushButton(_("Back to my sounds"))
+        back = self.btn_back = QPushButton(_("Back"))
+        back.setToolTip(_("Back to my sounds"))
+        back.setAccessibleName(_("Back to my sounds"))
         back.setObjectName("backhome")   # the way out of the results: a plain button
         back.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(back, "back", "text_hi", size=18)
@@ -786,22 +789,32 @@ class SearchResults(RoundedFrame):
             group.addAction(a)
             self.site_actions[key] = a
         v.addWidget(header)
+        # "No results", "Can't use this link…", "Couldn't search…": in the middle of the
+        # results area, where "Searching…" was, not in a corner under Back
+        self.message = QWidget()
+        mv = QVBoxLayout(self.message)
+        mv.setContentsMargins(24, 0, 24, 0)
+        mv.setSpacing(10)
+        mv.addStretch(2)
         self.title = QLabel()
         self.title.setTextFormat(Qt.TextFormat.RichText)
         self.title.setWordWrap(True)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         errors.linkify(self.title)   # an error's "Report it" link
-        v.addWidget(self.title)
+        mv.addWidget(self.title)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # runs the search without Tor (ytdl.TorBlocked)
         self.direct_btn = QPushButton(_("Search this without Tor"))
         self.direct_btn.setToolTip(_("Run just this search straight from the site, not through "
                                      "Tor: the site will see your own address"))
+        self.direct_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.direct_btn, "tor", size=16)
         self.direct_btn.clicked.connect(self._without_tor)
         self.direct_btn.hide()
-        row = QHBoxLayout()
-        row.addWidget(self.direct_btn)
-        row.addStretch(1)
-        v.addLayout(row)
+        mv.addWidget(self.direct_btn, 0, Qt.AlignmentFlag.AlignHCenter)
+        mv.addStretch(3)
+        self.message.hide()
+        v.addWidget(self.message, 1)
         self.loading = SearchingView()      # takes the list's place while searching
         self.spinner = self.loading         # start / stop / running()
         v.addWidget(self.loading, 1)
@@ -883,6 +896,9 @@ class SearchResults(RoundedFrame):
         query = " ".join(query.split())
         if not query or not ytdl.site_allowed(self.source):
             return False
+        if not direct and self._running == (query, self.source) and not self.isHidden():
+            return True   # Enter spammed: the same search is still on its way
+        self._running = (query, self.source)
         self.query = query
         self.link = ""
         self._gen += 1
@@ -911,6 +927,7 @@ class SearchResults(RoundedFrame):
                 self._rows or self.loading.running()):
             return True   # already showing (Enter after the paste looked it up)
         self.query = self.link = url
+        self._running = None
         self._gen += 1
         self._clear()
         netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name, picture and "
@@ -933,6 +950,7 @@ class SearchResults(RoundedFrame):
 
     def close_results(self):
         self._gen += 1       # a search still running is ignored when it lands
+        self._running = None
         self._loading(False)
         self._clear()
         self.link = ""
@@ -941,12 +959,18 @@ class SearchResults(RoundedFrame):
 
     def _loading(self, on: bool, text: str = ""):
         """The loading view in place of the title and list (on), or those back."""
-        for w in (self.title, self.scroll_area):
-            w.setVisible(not on)
+        self.message.hide()   # _say() brings it back for a message
+        self.scroll_area.setVisible(not on)
         if on:
             self.loading.start(text)
         else:
             self.loading.stop()
+
+    def _say(self, text: str):
+        """A message in the middle of the results area, instead of cards."""
+        self.title.setText(text)
+        self.scroll_area.hide()
+        self.message.show()
 
     def mark(self, url: str, kind: str, ok: bool | None = None):
         """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
@@ -1064,6 +1088,7 @@ class SearchResults(RoundedFrame):
             self._add_rows(new, gen)
             self.more_btn.setVisible(bool(new) and self._asked < MAX_RESULTS)
             return
+        self._running = None
         self._loading(False)
         self.more_btn.hide()
         q = html.escape(self.query)
@@ -1071,17 +1096,17 @@ class SearchResults(RoundedFrame):
             red = theme.status("error")
             if self.link:
                 why = _("Can't use this link: {error}", error=err)   # err: rich text
-                self.title.setText(f"<span style='color:{red}'>{why}</span>")
+                self._say(f"<span style='color:{red}'>{why}</span>")
                 busy.toast(self.window(), why, "error", 8000)   # not only in the panel
             else:
-                self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}"
-                                     "</span>", red=red, site=self.site, err=err))  # from _work
+                self._say(_("<span style='color:{red}'>Couldn't search {site}: {err}"
+                            "</span>", red=red, site=self.site, err=err))  # from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
-            self.title.setText(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
+            self._say(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
             return
-        self.title.hide()   # the cards say it all; the title is for "no results" / errors
+        # the cards say it all; the message is for "no results" / errors
         self._add_rows(results, gen)
         # a full first page: there may be more of them
         self.more_btn.setVisible(not self.link and len(results) >= PAGE // 2)

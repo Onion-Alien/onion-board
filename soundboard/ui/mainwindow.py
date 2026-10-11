@@ -663,6 +663,7 @@ class MainWindow(QMainWindow):
 
     _mic_offer = None       # the open MicUpdateOffer
     _mic_updating = False   # attach_mic was started from it (its own result messages)
+    _mic_offered = False    # shown this start (it comes back next start until updated)
 
     def _mic_update_due(self) -> bool:
         cfg = self.cfg
@@ -674,10 +675,9 @@ class MainWindow(QMainWindow):
         Studio, Chrome, Edge) is offered an update a second after the window opens, not
         left to a button nobody looks for. Windows' admin prompt only comes after
         *Install update*: never by itself, and never from the tray (showEvent asks again
-        once the window is open). Offered once per version; Setup keeps the button."""
-        from soundboard import __version__
-        cfg = self.cfg
-        if self._shut_down or self._mic_offer is not None or cfg.mic_update_tried == __version__:
+        once the window is open). Offered again each start until it's updated: an old
+        part may not reach every app. Setup keeps the button meanwhile."""
+        if self._shut_down or self._mic_offer is not None or self._mic_offered:
             return
         if not self.isVisible():
             return
@@ -686,8 +686,7 @@ class MainWindow(QMainWindow):
             return
         if not self._mic_update_due():
             return
-        cfg.mic_update_tried = __version__
-        cfg.save()
+        self._mic_offered = True
         log.info("offering the newer mic part")
         from soundboard.ui.micupdate import MicUpdateOffer
         offer = self._mic_offer = MicUpdateOffer(self)
@@ -712,7 +711,7 @@ class MainWindow(QMainWindow):
         self._mic_updating = True
         self.toast(_("Updating Onion Board's part of your mic so every app hears your "
                      "sounds: click Yes when Windows asks."))
-        self.attach_mic()
+        self.attach_mic(clean=True)
 
     def _show_load_note(self):
         """Started hidden in the tray (--tray at sign-in)? Then the box waits for the
@@ -2023,13 +2022,27 @@ class MainWindow(QMainWindow):
         self.step_lbl.setTextFormat(Qt.TextFormat.RichText)
         self.step_lbl.setObjectName("micguide")
         cv.addWidget(self.step_lbl)
-        self.mic_update_note = QLabel()
-        self.mic_update_note.setTextFormat(Qt.TextFormat.RichText)
-        self.mic_update_note.setWordWrap(True)
-        self.mic_update_note.setObjectName("micupdatenote")
+        # an old mic part: one amber banner with its one button, in the step's place
+        self.mic_update_note = QFrame()
+        self.mic_update_note.setObjectName("micupdatebar")
+        nh = QHBoxLayout(self.mic_update_note)
+        nh.setContentsMargins(14, 10, 10, 10)
+        nh.setSpacing(12)
+        self.mic_update_icon = icon_label("warn", color="warn_text")
+        nh.addWidget(self.mic_update_icon, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.mic_update_text = QLabel()
+        self.mic_update_text.setTextFormat(Qt.TextFormat.RichText)
+        self.mic_update_text.setWordWrap(True)
+        nh.addWidget(self.mic_update_text, 1)
+        self.btn_micupdate = QPushButton(_("Update now"))
+        self.btn_micupdate.setObjectName("primary")
+        from soundboard.ui.micupdate import _shield
+        _shield(self.btn_micupdate)
+        self.btn_micupdate.clicked.connect(self._accept_mic_update)
+        nh.addWidget(self.btn_micupdate, 0, Qt.AlignmentFlag.AlignVCenter)
         self.mic_update_note.hide()
         cv.addWidget(self.mic_update_note)
-        self.setup_show = SetupShow(height=96)   # Bun builds your mic (instead of the button)
+        self.setup_show = SetupShow(height=96, left=True)   # Bun builds it, by the buttons
         self.setup_show.done.connect(self._update_flow)   # (the button's back, if needed)
         cv.addWidget(self.setup_show)
         self.btn_install = QPushButton(_("Install the free virtual cable"))
@@ -3099,6 +3112,10 @@ class MainWindow(QMainWindow):
                       if apps else ""))
             step = _("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
                      "your sounds are in it.").replace("</b>", "</b><br>", 1)
+            if direct == "outdated":   # works, but an old part: the banner below says so
+                out = _("<b style='color:{colour}'>{name}</b>, with an old version of "
+                        "Onion Board's mic part", colour=warn, name=name)
+                step = ""
         elif route == "mic":
             state = "unrouted"
             out = _("Into your mic  <b style='color:{colour}'>✗ can't reach it</b>",
@@ -3196,12 +3213,13 @@ class MainWindow(QMainWindow):
         self.step_lbl.setText(step)
         self.btn_mictips.setVisible(route == "mic")
         update = route == "mic" and state == "ok" and direct == "outdated"
-        self.mic_update_note.setVisible(update)
+        self.step_lbl.setVisible(bool(step))   # (the update banner says it instead)
         if update:
-            note = _("<br><br><b>Optional:</b> your mic part works, and a newer "
-                     "version is here. It's not needed: update below whenever suits "
-                     "you (Windows asks once, and your sound drops out for a second).")
-            self.mic_update_note.setText(note.removeprefix("<br><br>"))
+            self.mic_update_text.setText(_(
+                "<b style='color:{colour}'>Update your mic part</b><br>It's from an older "
+                "version of Onion Board, so some games, calls and browsers may not hear "
+                "your sounds. Windows asks once, and your sound drops out for a second.",
+                colour=warn))
         # setting up, or Windows still loading it: the button stays "Setting up…" and
         # takes no clicks (attach_mic holds it) until it works or the wait is over
         mic_busy = route == "mic" and (self._attaching or (settling and state != "ok"))
@@ -3222,13 +3240,14 @@ class MainWindow(QMainWindow):
                            if said == "updated" else
                            _("Done: Discord and games hear your sounds through your mic now."),
                            "ok")
-        self.btn_install.setVisible((state == "missing" or update
+        # an old part: the banner and its button, until Bun's show is over
+        self.mic_update_note.setVisible(update and not self.setup_show.on)
+        self.btn_install.setVisible((state == "missing"
                                      or (route == "mic" and state != "ok"))
                                     and not self.setup_show.on)   # Bun's show instead
         if not busy.is_busy(self.btn_install):
             self.btn_install.setText(
                 _("Install the free virtual cable") if route != "mic" else
-                _("Optional: update the mic part") if update else
                 _("Put my sounds straight into my mic") if direct in ("missing", "other") else
                 _("Repair (one click)"))
             icons.set_icon(self.btn_install, "mic" if route == "mic" else "cable",
@@ -3331,9 +3350,11 @@ class MainWindow(QMainWindow):
             self.pill.style().polish(self.pill)
             self.set_sending(self.btn_air.isChecked())   # its tooltip carries the pill's text
 
-    def attach_mic(self):
+    def attach_mic(self, clean: bool = False):
         """Put the mic effect on the mic in use (Windows asks for admin once), then send
-        what others hear into it. The admin step waits, so it runs on a thread."""
+        what others hear into it. The admin step waits, so it runs on a thread.
+        `clean` (the update offer): the old part comes off completely first, then the
+        new one goes on, under the same one prompt."""
         if self._attaching:
             return
         mic = self.cfg.mic_device
@@ -3346,11 +3367,11 @@ class MainWindow(QMainWindow):
         self.setup_show.start()
         self._update_flow()
         log.info("attaching the mic effect to %s", mic)
-        threading.Thread(target=self._attach_mic_work, args=(mic,),
+        threading.Thread(target=self._attach_mic_work, args=(mic, clean),
                          daemon=True, name="mic-attach").start()
 
-    def _attach_mic_work(self, mic: str):
-        err = directmic.install(mic) or ""
+    def _attach_mic_work(self, mic: str, clean: bool = False):
+        err = directmic.install(mic, clean=clean) or ""
         # the admin prompt can outlast the window (closed and freed meanwhile): then
         # there's nobody to tell, and emitting on the freed window raises TypeError
         if qt_valid(self):
@@ -3374,8 +3395,8 @@ class MainWindow(QMainWindow):
             self.setup_show.finish(False)
             if updating and err == directmic.declined():
                 # No to the optional update: the old part keeps working, no box needed
-                self.toast(_("Update cancelled. Your mic keeps working: update any time "
-                             "in Setup."), "warn")
+                self.toast(_("Update cancelled. Your mic part is still the old one: "
+                             "update it from the Setup tab."), "warn")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -5658,7 +5679,9 @@ class MainWindow(QMainWindow):
 
         def run():
             try:
-                out = soundfx.render(load_original(m), fx)
+                # into the cache file for these effects: a long sound is never all in
+                # memory, and saving them afterwards finds it rendered
+                out = library.render_cached(m.id, load_original(m), fx)
             except Exception:  # noqa: BLE001
                 log.exception("effects preview failed")
                 out = None

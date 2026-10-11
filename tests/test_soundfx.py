@@ -164,8 +164,9 @@ def test_load_sound_renders_effects_once_and_caches_them(sound, monkeypatch):
     plain = library.load_sound(sound)
     sound.fx = {"speed": 2.0}
     calls = []
-    real = soundfx.render
-    monkeypatch.setattr(soundfx, "render", lambda d, fx: calls.append(1) or real(d, fx))
+    real = soundfx.render_into
+    monkeypatch.setattr(soundfx, "render_into",
+                        lambda d, fx, *a: calls.append(1) or real(d, fx, *a))
     a = library.load_sound(sound)
     b = library.load_sound(sound)
     assert calls == [1]                                          # rendered once, then cached

@@ -137,7 +137,8 @@ def test_the_web_result_in_the_player_says_so(window, player):
 
 def test_back_to_my_sounds_stands_out(window):
     b = window.ytresults.btn_back
-    assert b.text() == "Back to my sounds" and b.objectName() == "backhome"
+    assert b.text() == "Back" and b.objectName() == "backhome"
+    assert b.toolTip() == "Back to my sounds"
 
 
 def test_space_on_the_radio_tab_plays_and_stops_the_radio(window, monkeypatch):

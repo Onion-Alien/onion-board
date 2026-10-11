@@ -544,7 +544,8 @@ QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; mar
 QFrame#card QFrame#micflow { background:$bg; border:1px solid $border; border-radius:10px; }
 QFrame#card QFrame#micoutput { background:$panel; border:1px solid $border; border-radius:8px; }
 QFrame#card QLabel#micguide { padding:2px 0; }
-QFrame#card QLabel#micupdatenote { background:$bg; color:$muted; border-radius:8px; padding:12px; font-size:9pt; }
+QFrame#card QFrame#micupdatebar { background:$warn_bg; border:1px solid $warn_text; border-radius:10px; }
+QFrame#card QFrame#micupdatebar QLabel { background:transparent; }
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
 QFrame#card QFrame#alttile { background:$bg; border-radius:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:700; color:$text_hi; background:transparent; }
@@ -585,7 +586,7 @@ QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#small, QPushButton#danger[small="true"] { padding:2px 8px; font-size:8pt; }
 QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
-    font-weight:600; font-size:10pt; padding:6px 12px; border-radius:8px; }
+    font-weight:600; font-size:10pt; padding:6px 14px 6px 10px; border-radius:8px; }
 QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }

@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Dina ljud går till {name}.</b> Det som lyssnar där får dem. I OBS: Källor → + → <b>Audio Output Capture</b> → <b>{name}</b>. I Voicemeeter eller en mixer, skicka den ingången vidare dit den ska. Går det inte vidare till en röstchatt? Kryssa ur <b>Skicka i mono</b> under Vem lyssnar för att behålla stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Inställningar → Ljud → Mikrofon: {mic}. Kryssa ur <b>Justera mikrofonvolymen automatiskt</b>, ställ in <b>Undertryck bakgrundsljud</b> på <b>Låg</b>, eller välj <b>Originalljud för musiker</b> (och slå sedan på det i mötet, uppe till vänster).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> är näst på tur: väntar på att nedladdningen före den ska bli klar…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Valfritt:</b> din mikrofondel funkar, och en nyare version finns. Den behövs inte, uppdatera nedan när det passar dig (Windows frågar en gång, och ditt ljud försvinner en sekund).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Ena änden av kabeln är på {rates}, så den konverterar ditt ljud på vägen. Fixa det för renast ljud.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan inte öppna {devices} (under Skicka även till). Inkopplad? Den provas igen av sig själv.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Viktig fix:</b> {fix}</p>",
@@ -776,7 +775,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Öppnar en buggrapport på GitHub i din webbläsare, med versionerna ifyllda",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Öppnar den nu, samma som snabbtangenten: välj ett ljud med dess tangenter eller ett klick. Esc, den här knappen eller snabbtangenten stänger den",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Öppnar hela listan (SECURITY.md) på GitHub, i din webbläsare",
-  "Optional: update the mic part": "Valfritt: uppdatera mikrofondelen",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Eller dra den bara: ta tag i valfri tom del av overlayen (dess titel, dess kanter) och släpp den var som helst, på valfri skärm. Den öppnas där från och med då. Visa förhandsvisning visar bara hur den ser ut: öppna overlayen med dess snabbtangent för att testa den eller flytta den.",
   "Orange": "Orange",
   "Other games": "Andra spel",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Nästa: Windows ber om tillåtelse för OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Inget att uppdatera nu: dina mikrofoninställningar har ändrats.",
   "The Windows prompt names Python because you're running from source.": "Windows-rutan nämner Python eftersom du kör från källkoden.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Uppdateringen avbröts. Mikrofonen fungerar fortfarande: uppdatera när du vill under Konfiguration.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows ber om tillåtelse. Ljudet pausar kort under uppdateringen.",
   "You can update later in Setup.": "Du kan uppdatera senare under Konfiguration.",
   "Your mic is already up to date.": "Din mikrofon är redan uppdaterad.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Tryck på ↻ för att försöka igen.",
   "That station isn't on the air right now. Try another one.": "Den stationen sänder inte just nu. Prova en annan.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radion ligger nere just nu. Det är inte du: servern med stationslistan fungerar inte. Försök igen om en liten stund.",
-  "This station points into your home network, so it isn't played.": "Den här stationen pekar in i ditt hemnätverk, så den spelas inte."
+  "This station points into your home network, so it isn't played.": "Den här stationen pekar in i ditt hemnätverk, så den spelas inte.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Uppdatera mikrofondelen</b><br>Den kommer från en äldre version av Onion Board, så vissa spel, samtal och webbläsare kanske inte hör dina ljud. Windows frågar en gång, och ljudet försvinner en sekund.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, med en gammal version av Onion Boards mikrofondel",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Uppdateringen avbröts. Mikrofondelen är fortfarande den gamla: uppdatera den under fliken Konfiguration."
 }

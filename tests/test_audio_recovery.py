@@ -34,7 +34,7 @@ def test_confirmation_cancel_changes_nothing(window, monkeypatch, action):  # no
     d.close()
 
 
-@pytest.mark.parametrize('action,clean', [('repair', False), ('reinstall', True)])
+@pytest.mark.parametrize('action,clean', [('repair', False), ('reinstall', True), ('update', True)])
 def test_recovery_finishes_after_settings_is_deleted(window, qapp, monkeypatch, action, clean):  # noqa: F811
     gate, entered = threading.Event(), threading.Event()
     calls, refreshed = [], []
@@ -98,7 +98,8 @@ def test_clean_install_preflights_replacement_and_preserves_failed_removal(monke
     calls = []
     monkeypatch.setattr(dm, 'bundled_dll', lambda: dll)
     monkeypatch.setattr(dm, 'admin_uninstall', lambda: calls.append('remove') or 1)
-    monkeypatch.setattr(dm, 'admin_install', lambda guid: calls.append('install') or 0)
+    monkeypatch.setattr(dm, 'admin_install', lambda guid, **k: calls.append('install') or 0)
+    monkeypatch.setattr(dm, 'registered_dll', lambda: None)
     assert dm.admin_reinstall('guid') == 3
     assert not calls
     dll.write_bytes(b'')
@@ -110,6 +111,42 @@ def test_clean_install_preflights_replacement_and_preserves_failed_removal(monke
     monkeypatch.setattr(dm, 'admin_uninstall', lambda: calls.append('remove') or 0)
     assert dm.admin_reinstall('guid') == 0
     assert calls[-2:] == ['remove', 'install']
+
+
+@pytest.mark.parametrize('fails,result,sources', [
+    (0, 0, ['new']),                      # goes on first time
+    (1, 0, ['new', 'new']),               # a second try works
+    (2, 6, ['new', 'new', 'old']),        # won't go on: the old part goes back
+])
+def test_clean_reinstall_never_leaves_the_mic_without_a_part(monkeypatch, tmp_path, fails,
+                                                             result, sources):
+    new, old = tmp_path / 'obmic.dll', tmp_path / 'obmic-old.dll'
+    new.write_bytes(b'new')
+    old.write_bytes(b'old')
+    data = tmp_path / 'OnionBoard' / 'MicPlugin'
+    data.mkdir(parents=True)
+    tried = []
+
+    def install(guid, slot=None, source=None):
+        tried.append('old' if source else 'new')
+        if source:
+            assert source.read_bytes() == b'old'   # a copy kept before the uninstall
+            return 0
+        if tried.count('new') <= fails:
+            if fails == 2 and tried.count('new') == 1:
+                raise OSError('registry')   # an exception counts as a failure too
+            return 6
+        return 0
+    monkeypatch.setattr(dm, 'bundled_dll', lambda: new)
+    monkeypatch.setattr(dm, 'registered_dll', lambda: old)
+    monkeypatch.setattr(dm, 'installed_on', lambda: ['guid'])
+    monkeypatch.setattr(dm, 'data_dir', lambda: data)
+    monkeypatch.setattr(dm, 'admin_uninstall', lambda: old.unlink() or 0)   # old part gone
+    monkeypatch.setattr(dm, 'admin_install', install)
+    monkeypatch.setattr(dm.time, 'sleep', lambda s: None)
+    assert dm.admin_reinstall('guid') == result
+    assert tried == sources
+    assert not list(data.parent.glob('obmic-previous*'))   # the copy doesn't stay
 
 
 @pytest.mark.parametrize('action', ['install', 'uninstall'])

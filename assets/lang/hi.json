@@ -284,7 +284,6 @@
   "Open the sounds folder": "साउंड फ़ोल्डर खोलें",
   "Opened the folder with the log in it.": "लॉग वाला फ़ोल्डर खोल दिया।",
   "Opened your sounds folder": "आपका साउंड फ़ोल्डर खोल दिया",
-  "Optional: update the mic part": "वैकल्पिक: माइक वाला हिस्सा अपडेट करें",
   "Others hear it": "दूसरे सुनते हैं",
   "Overlap: every press plays a new copy": "ओवरलैप: हर बार दबाने पर नई कॉपी चलती है",
   "Pad size": "पैड साइज़",
@@ -654,7 +653,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>आपके साउंड {name} पर जाते हैं।</b> वहाँ जो भी सुनता है, उसे वे मिलते हैं। OBS में: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>। Voicemeeter या मिक्सर में, उस इनपुट को जहाँ जाना है वहाँ आगे भेजें। वॉइस चैट में नहीं जा रहा? स्टीरियो रखने के लिए कौन सुन रहा है में <b>मोनो में भेजें</b> से टिक हटाएँ।",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Settings → Audio → Microphone: {mic}। <b>Automatically adjust microphone volume</b> से टिक हटाएँ, <b>Background noise suppression</b> को <b>Low</b> पर करें, या <b>Original sound for musicians</b> चुनें (फिर मीटिंग में ऊपर बाएँ से उसे चालू करें)।",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> अगला है: पिछले डाउनलोड के पूरा होने का इंतज़ार…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>वैकल्पिक:</b> आपके माइक वाला हिस्सा काम करता है, और एक नया वर्शन आ गया है। यह ज़रूरी नहीं, जब ठीक लगे नीचे से अपडेट करें (Windows एक बार पूछता है, और आपका साउंड एक सेकंड के लिए बंद हो जाता है)।",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>केबल का एक सिरा {rates} पर है, इसलिए यह रास्ते में आपके साउंड को बदलता है। सबसे साफ़ साउंड के लिए इसे ठीक करें।</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>ज़रूरी फ़िक्स:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>यह कॉपी सोर्स से चलती है: इसे <code>git pull</code> से अपडेट करें।</p>",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "अगला: Windows OnionBoard.exe के लिए अनुमति मांगेगा।",
   "Nothing to update now: your mic settings changed.": "अभी अपडेट करने को कुछ नहीं: आपके माइक की सेटिंग बदल गई।",
   "The Windows prompt names Python because you're running from source.": "Windows के प्रॉम्प्ट में Python लिखा है क्योंकि आप सोर्स से चला रहे हैं।",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "अपडेट रद्द हुआ। आपका माइक चलता रहेगा: कभी भी सेटअप में अपडेट करें।",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows अनुमति मांगेगा। अपडेट के दौरान आवाज़ थोड़ी देर रुकेगी।",
   "You can update later in Setup.": "आप बाद में सेटअप में अपडेट कर सकते हैं।",
   "Your mic is already up to date.": "आपका माइक पहले से अपडेट है।",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "फिर से कोशिश करने के लिए ↻ दबाएँ।",
   "That station isn't on the air right now. Try another one.": "वह स्टेशन अभी प्रसारण नहीं कर रहा। कोई दूसरा आज़माएँ।",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "रेडियो अभी बंद है। गलती आपकी नहीं है: स्टेशन सूची का सर्वर काम नहीं कर रहा। थोड़ी देर बाद फिर कोशिश करें।",
-  "This station points into your home network, so it isn't played.": "यह स्टेशन आपके घरेलू नेटवर्क की ओर इशारा करता है, इसलिए इसे नहीं चलाया जाता।"
+  "This station points into your home network, so it isn't played.": "यह स्टेशन आपके घरेलू नेटवर्क की ओर इशारा करता है, इसलिए इसे नहीं चलाया जाता।",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>माइक वाला हिस्सा अपडेट करें</b><br>यह Onion Board के पुराने वर्ज़न का है, इसलिए कुछ गेम, कॉल और ब्राउज़र आपकी आवाज़ें शायद न सुनें। Windows एक बार पूछेगा, और आवाज़ एक सेकंड के लिए रुकेगी।",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, Onion Board के माइक वाले हिस्से के पुराने वर्ज़न के साथ",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "अपडेट रद्द हुआ। माइक वाला हिस्सा अभी भी पुराना है: इसे सेटअप टैब से अपडेट करें।"
 }

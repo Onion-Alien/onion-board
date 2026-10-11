@@ -554,6 +554,26 @@ def running_min(x: np.ndarray, size: int) -> np.ndarray:
     return np.minimum(suf[:k], pre[size - 1: size - 1 + k])
 
 
+class SosRun:
+    """A fixed biquad cascade over one long (n, channels) signal fed in pieces (an
+    effect baked into a sound, soundfx.render). Its state stays float64 from piece to
+    piece, as inside one sosfilt call: sosfilt hands the state back in the signal's
+    dtype, which suits audio blocks, but rounding it to float32 every piece of a long
+    render moved the result by a few int16 steps after a big boost."""
+
+    def __init__(self, sos):
+        self.sos = np.atleast_2d(np.asarray(sos))
+        self._s = None
+
+    def run(self, x: np.ndarray) -> np.ndarray:
+        dt = _work_dtype(x, self.sos)
+        p = _plan("sos", (self.sos,), dt)
+        if self._s is None:
+            self._s = np.zeros((1, x.shape[1], p.S))
+        y, self._s = p.run(np.ascontiguousarray(x.T, dtype=dt), self._s)
+        return y[0].T
+
+
 class SmoothSos:
     """A biquad cascade with memory, for one stream of blocks.
 

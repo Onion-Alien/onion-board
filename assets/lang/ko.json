@@ -278,7 +278,6 @@
   "Open the sounds folder": "사운드 폴더 열기",
   "Opened the folder with the log in it.": "로그가 있는 폴더를 열었어요.",
   "Opened your sounds folder": "사운드 폴더를 열었어요",
-  "Optional: update the mic part": "선택: 마이크 부분 업데이트",
   "Others hear it": "다른 사람이 들어요",
   "Overlap: every press plays a new copy": "겹치기: 누를 때마다 새로 재생",
   "Pad size": "패드 크기",
@@ -638,7 +637,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>귀하의 소리는 {name} 에게 전달됩니다.</b> 거기에서 듣는 것은 무엇이든 그것을 얻습니다. OBS: 소스 → + → <b>오디오 출력 캡처</b> → <b>{name}</b> . Voicemeeter 또는 믹서에서 해당 입력을 어디로든 보내세요. 음성 채팅을 진행하지 않나요? 스테레오로 유지하려면 듣고 있는 사람 아래에서 <b>모노로 보내기를</b> 선택 취소하세요.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>줌</b> : 설정 → 오디오 → 마이크: {mic} . <b>마이크 볼륨 자동 조정을</b> 선택 해제하거나, <b>배경 소음 억제를</b> <b>낮음</b> 으로 설정하거나, <b>음악가를 위한 원본 사운드를</b> 선택합니다(그런 다음 회의에서 왼쪽 상단에서 켜세요).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "다음은 <b>{name}</b> 입니다. 다운로드가 끝나기 전에 다운로드를 기다리고 있습니다…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>선택 사항:</b> 마이크 부품이 작동하며 최신 버전이 여기에 있습니다. 필요하지 않습니다. 필요할 때마다 아래를 업데이트하세요(Windows에서 한 번 묻고 잠시 동안 소리가 끊김).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>케이블의 한쪽 끝은 {rates} 이므로 통과하는 동안 사운드를 변환합니다. 가장 깨끗한 소리를 위해 수정하세요.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>중요한 수정:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>이 복사본은 소스에서 실행됩니다. <code>git pull</code> 로 업데이트하세요.</p>",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "다음: Windows가 OnionBoard.exe에 대한 권한을 묻습니다.",
   "Nothing to update now: your mic settings changed.": "지금은 업데이트할 것이 없습니다: 마이크 설정이 바뀌었습니다.",
   "The Windows prompt names Python because you're running from source.": "소스에서 실행 중이라 Windows 창에 Python이 표시됩니다.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "업데이트를 취소했습니다. 마이크는 계속 작동합니다: 언제든 셋업에서 업데이트하세요.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows가 권한을 묻습니다. 업데이트 중 소리가 잠깐 끊깁니다.",
   "You can update later in Setup.": "나중에 셋업에서 업데이트할 수 있습니다.",
   "Your mic is already up to date.": "마이크가 이미 최신입니다.",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "다시 시도하려면 ↻를 누르세요.",
   "That station isn't on the air right now. Try another one.": "그 방송국은 지금 방송 중이 아닙니다. 다른 방송국을 시도해 보세요.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "지금 라디오가 안 됩니다. 사용자 문제가 아니에요: 방송국 목록 서버가 작동하지 않습니다. 잠시 후 다시 시도하세요.",
-  "This station points into your home network, so it isn't played.": "이 방송국은 홈 네트워크를 가리키므로 재생하지 않습니다."
+  "This station points into your home network, so it isn't played.": "이 방송국은 홈 네트워크를 가리키므로 재생하지 않습니다.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>마이크 부분을 업데이트하세요</b><br>이전 버전의 Onion Board에서 설치된 것이라 일부 게임, 통화, 브라우저에서 사운드가 들리지 않을 수 있습니다. Windows가 한 번 묻고, 소리가 1초 동안 끊깁니다.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, Onion Board 마이크 부분이 이전 버전입니다",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "업데이트를 취소했습니다. 마이크 부분은 아직 이전 버전입니다: 셋업 탭에서 업데이트하세요."
 }

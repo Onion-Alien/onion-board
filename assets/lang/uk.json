@@ -290,7 +290,6 @@
   "Open the sounds folder": "Відкрити папку звуків",
   "Opened the folder with the log in it.": "Відкрито папку з журналом.",
   "Opened your sounds folder": "Відкрито папку звуків",
-  "Optional: update the mic part": "Необов'язково: оновити частину з мікрофоном",
   "Others hear it": "Інші чують",
   "Overlap: every press plays a new copy": "Накладання: кожне натискання грає нову копію",
   "Pad size": "Розмір кнопок",
@@ -670,7 +669,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Ваші звуки надходять до {name} .</b> Усе, що там слухає, те й отримує. У OBS: Джерела → + → <b>Захоплення аудіовиходу</b> → <b>{name}</b> . У Voicemeeter або мікшері надішліть цей вхідний сигнал куди завгодно. Не йдете до голосового чату? Зніміть прапорець <b>«Надіслати в моно»</b> в розділі «Хто слухає», щоб зберегти стерео.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Масштаб</b> : Налаштування → Аудіо → Мікрофон: {mic} . Зніміть прапорець <b>«Автоматично регулювати гучність мікрофона»</b> , встановіть <b>«Приглушення фонового шуму»</b> на <b>«Низький»</b> або виберіть <b>«Оригінальний звук для музикантів»</b> (потім увімкніть його під час зустрічі вгорі ліворуч).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> наступний: очікує завантаження, перш ніж воно закінчиться…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Необов’язково:</b> ваш мікрофон працює, і доступна новіша версія. Це не потрібно: оновлюйте нижче, коли вам зручно (Windows запитує один раз, а ваш звук пропадає на секунду).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Один кінець кабелю знаходиться на {rates} , тому він перетворює ваш звук під час проходження. Виправте це для найчистішого звуку.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Важливе виправлення:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>Ця копія запускається з джерела: оновіть її за допомогою <code>git pull</code> .</p>",
@@ -3163,7 +3161,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Далі Windows попросить дозвіл для OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Немає чого оновлювати: налаштування мікрофона змінилися.",
   "The Windows prompt names Python because you're running from source.": "Вікно Windows називає Python, бо ти запускаєш із вихідного коду.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Оновлення скасовано. Мікрофон і далі працює: онови будь-коли в розділі Підключення.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows попросить дозвіл. Звук ненадовго зникне під час оновлення.",
   "You can update later in Setup.": "Оновити можна пізніше в розділі Підключення.",
   "Your mic is already up to date.": "Твій мікрофон уже оновлено.",
@@ -3330,5 +3327,8 @@
   "Press ↻ to try again.": "Натисни ↻, щоб спробувати ще раз.",
   "That station isn't on the air right now. Try another one.": "Ця станція зараз не в ефірі. Спробуй іншу.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Радіо зараз не працює. Справа не в тобі: сервер зі списком станцій не працює. Спробуй ще раз трохи згодом.",
-  "This station points into your home network, so it isn't played.": "Ця станція вказує на твою домашню мережу, тому вона не грає."
+  "This station points into your home network, so it isn't played.": "Ця станція вказує на твою домашню мережу, тому вона не грає.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Онови частину з мікрофоном</b><br>Вона зі старішої версії Onion Board, тож деякі ігри, дзвінки та браузери можуть не чути твоїх звуків. Windows запитає один раз, і звук зникне на секунду.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, зі старою версією частини Onion Board для мікрофона",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Оновлення скасовано. Частина з мікрофоном досі стара: онови її на вкладці Підключення."
 }
