@@ -154,6 +154,9 @@ These are the current reference points. Copy their structure before inventing a 
   smallest window size.
 - Right-to-left languages mirror automatically; don't hard-code left/right positions
   in painting code without checking `layoutDirection()`.
+- The sidebar's inner edge can be dragged between its collapsed and expanded widths.
+  Release snaps to the nearer existing state; it never grows wider than the expanded
+  rail. Keep the named expand/collapse button as the keyboard alternative.
 
 ## 3. Buttons
 
@@ -183,6 +186,8 @@ These are the current reference points. Copy their structure before inventing a 
 - **Centre icons beside text.** Align the icon's vertical centre with the centre of
   its label, never with the label's baseline or bottom edge. Use `Qt.AlignVCenter`
   for the icon and text in their shared row, including wrapped and translated labels.
+  Check the visible glyphs in a rendered view: a chevron or switch may need a small
+  optical adjustment because widget bounds and the visible shapes differ.
   Keep a small, consistent gap; an action chevron sits beside its words rather than
   at the far edge of an otherwise empty row.
 

@@ -76,6 +76,25 @@ def test_connected_output_hides_setup_and_shrinks_then_restores(window, qapp, mo
 
 
 @pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
+def test_bottom_controls_follow_tab_column_during_drag(window, qapp, direction):  # noqa: F811
+    window.setLayoutDirection(direction)
+    window.resize(1180, 720)
+    window.show()
+    window.rail.set_open(False)
+    for width in (70, 115, 160, 90, 43):
+        window.rail.drag_width(width)
+        qapp.processEvents()
+        rail = window.rail
+        tab = rail.buttons[0]
+        center = tab.mapTo(rail, QPoint()).x() + tab.width() / 2
+        for widget in (rail.output.mark, rail.output.switch, window.stop_btn, rail.toggle):
+            actual = widget.mapTo(rail, QPoint()).x() + widget.width() / 2
+            assert abs(actual - center) <= 1
+        assert window.stop_btn.width() == tab.width()
+    window.rail.finish_resize()
+
+
+@pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
 def test_output_block_stays_inside_rail_at_normal_and_narrow_sizes(window, qapp, direction):  # noqa: F811
     window.setLayoutDirection(direction)
     window.show()

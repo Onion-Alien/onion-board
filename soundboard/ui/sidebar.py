@@ -229,7 +229,7 @@ class OutputBlock(QFrame):
         self.title.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
         self.title.setMinimumWidth(0)
         self.switch = Switch()
-        self.switch.setProperty("glyphoffset", 2)
+        self.switch.setProperty("glyphoffset", 1)
         self.switch.setAccessibleName(_("Sound output"))
         self.title.setBuddy(self.switch)
         self.switch.setChecked(power.isChecked())
@@ -270,7 +270,8 @@ class OutputBlock(QFrame):
         label.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.arrow = QLabel()
         self.arrow.setFixedSize(16, 24)
-        self.arrow.setContentsMargins(0, 8, 0, 0)
+        self.arrow.setContentsMargins(0, 2, 0, 0)
+        self.arrow.setAlignment(Qt.AlignCenter)
         self.arrow.setAttribute(Qt.WA_TransparentForMouseEvents)
         action.addWidget(label, 0, Qt.AlignVCenter)
         action.addWidget(self.arrow, 0, Qt.AlignVCenter)
@@ -341,6 +342,43 @@ class _Arrow(QPushButton):
             p.end()
 
 
+class ResizeHandle(QWidget):
+    """Drag the inner edge between the rail's existing widths."""
+
+    def __init__(self, rail):
+        super().__init__(rail)
+        self.rail = rail
+        self.setObjectName("railslot")
+        self.setCursor(Qt.SizeHorCursor)
+        self._start = None
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton and not self.rail._squeezed:
+            self._start = (event.globalPosition().x(), self.rail.width())
+            event.accept()
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._start is not None:
+            x, width = self._start
+            delta = event.globalPosition().x() - x
+            if self.rail.isRightToLeft():
+                delta = -delta
+            self.rail.drag_width(round(width + delta))
+            event.accept()
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton and self._start is not None:
+            self._start = None
+            self.rail.finish_resize()
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
+
+
 class SideRail(QFrame):
     """The rail. `extras` (More tabs) sit under the tabs; at the bottom `alerts` (the
     setup pill, Offline, Update: shown only when needed), then `status` (Live, who's
@@ -363,6 +401,8 @@ class SideRail(QFrame):
         self._compact = False    # a short window: the buttons closer together
         self._on_open = on_open
         self._drop_y = None
+        self._drag_width = None
+        self.resize_handle = ResizeHandle(self)
         lay = self._lay = QVBoxLayout(self)
         lay.setSpacing(4)
         # the onion in the icons' column, open or shut, and when open the name and
@@ -634,7 +674,46 @@ class SideRail(QFrame):
 
     # ---- open / shut
     def is_open(self) -> bool:
-        return self._open and not self._squeezed
+        opened = self._drag_width == OPEN_W if self._drag_width is not None else self._open
+        return opened and not self._squeezed
+
+    def drag_width(self, width: int):
+        before = self.is_open()
+        self._drag_width = max(SHUT_W, min(OPEN_W, width))
+        if self.is_open() != before:
+            self._apply()
+        else:
+            self.setFixedWidth(self._drag_width)
+            self._size_lower_controls()
+
+    def _size_lower_controls(self):
+        """Icon-only controls follow the same widening column as the tabs."""
+        width = OPEN_W - 2 * SIDE_OPEN - 1 if self.is_open() else self.width() - 2 * SIDE_SHUT - 1
+        for widget in self.status:
+            widget.setFixedWidth(width)
+        if self.output:
+            self.output.setFixedWidth(width)
+        self.toggle.setFixedWidth(BUTTON_W if self.is_open() else width)
+
+    def finish_resize(self):
+        if self._drag_width is None:
+            return
+        opened = self._drag_width >= (SHUT_W + OPEN_W) / 2
+        self._drag_width = None
+        if opened != self._open:
+            self.set_open(opened)
+        else:
+            self._apply()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._place_resize_handle()
+
+    def _place_resize_handle(self):
+        if hasattr(self, "resize_handle"):
+            edge = 0 if self.isRightToLeft() else self.width() - 6
+            self.resize_handle.setGeometry(edge, 0, 6, self.height())
+            self.resize_handle.raise_()
 
     def set_open(self, on: bool):
         if on == self._open:
@@ -670,7 +749,8 @@ class SideRail(QFrame):
             self.setProperty("rtl", self.isRightToLeft())
             self.style().unpolish(self)
             self.style().polish(self)
-        self.setFixedWidth(OPEN_W if shown else SHUT_W)
+        self.setFixedWidth(self._drag_width if self._drag_width is not None
+                           else OPEN_W if shown else SHUT_W)
         side = SIDE_OPEN if shown else SIDE_SHUT
         edge = 4 if self._compact else 10
         self._lay.setContentsMargins(side, edge, side, edge)
@@ -713,6 +793,9 @@ class SideRail(QFrame):
         # languages); its name is what it does now, on hover and for a screen reader
         self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"), "",
                     False)
+        self.toggle.setProperty("railopen", shown)
+        self.toggle.style().unpolish(self.toggle)
+        self.toggle.style().polish(self.toggle)
         self._sync_divider()   # (the arrow's tip: _label cleared it)
         self.sync()
         # one height for everything on the rail: the buttons under the tabs came out
@@ -732,6 +815,7 @@ class SideRail(QFrame):
         for w in everything:
             w.setFixedHeight(h)
         self.refresh_output()
+        self._place_resize_handle()
         self.updateGeometry()
 
     def refresh_output(self):
@@ -743,3 +827,4 @@ class SideRail(QFrame):
                 not shown and not bool(self.output.connection.property("outputgood")))
             self.output.refresh()
             self._sync_divider()
+        self._size_lower_controls()

@@ -578,6 +578,14 @@ QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
 QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
+QFrame#sidebar QPushButton#moretabs[railopen="false"],
+QFrame#sidebar QPushButton#tabinfo[railopen="false"],
+QFrame#sidebar QPushButton#settings[railopen="false"],
+QFrame#sidebar QPushButton#modebtn[railopen="false"],
+QFrame#sidebar QPushButton#railtoggle[railopen="false"],
+QFrame#sidebar QPushButton#pill[railopen="false"],
+QFrame#sidebar QPushButton#onair[railopen="false"],
+QFrame#sidebar QPushButton#danger[railopen="false"] { text-align:center; }
 QFrame#sidebar QLabel#wordmark { font-size:12pt; }
 QFrame#sidebar QFrame#raildiv { background:$border_hi; border:none; }
 QFrame#sidebar QWidget#railslot { background:transparent; }
