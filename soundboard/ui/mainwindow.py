@@ -364,6 +364,7 @@ class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
     cable_removed = Signal(str)         # remove_cable finished: error ("" = done)
+    remote_changed = Signal()           # a remote control server started or stopped
     cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
     video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
     config_saved = Signal(bool)         # the background save finished: ok
@@ -747,17 +748,6 @@ class MainWindow(QMainWindow):
         self.pill.setCursor(Qt.CursorShape.PointingHandCursor)
         self.pill.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         self.pill.clicked.connect(lambda: self.tabs.setCurrentWidget(self.setup_page))
-        # Offline mode: what only works online is out of the way, and this says why
-        # (one click to the switch)
-        self.btn_offline = QPushButton()
-        self.btn_offline.setObjectName("pill")
-        self.btn_offline.setCursor(Qt.CursorShape.PointingHandCursor)
-        sidebar.put(self.btn_offline, _("Offline"),
-                    tip=_("Offline mode is on: nothing goes online, and what needs the "
-                          "internet is hidden. Click to change it."))
-        self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
-        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON, gap=False)
-        self.btn_offline.setVisible(net.offline())
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
@@ -1009,7 +999,14 @@ class MainWindow(QMainWindow):
             # them and only show when needed (at the rail's foot, as icons)
             [self.btn_air, self.stop_btn],
             order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
-            alerts=[self.pill, self.btn_offline, self.btn_update])
+            alerts=[self.pill, self.btn_update])
+        # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
+        # (_net_follow), each one click to its Settings page
+        if self.rail.output is not None:
+            self.rail.output.lineClicked.connect(self.open_settings)
+        self.remote_changed.connect(self._net_follow, Qt.ConnectionType.QueuedConnection)
+        remote.on_change(self._remote_watch)
+        self._net_follow()
         # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
         # through them (the tab widget does that only while it has the focus)
         for n in range(1, 10):
@@ -4094,9 +4091,9 @@ class MainWindow(QMainWindow):
             self._refit()
 
     def _offline_follow(self):
-        """Offline mode: the Offline pill in the header, and the tabs that only work
-        online (needs_online) out of the tab bar and + More tabs; back when it's off."""
-        self.btn_offline.setVisible(net.offline())
+        """Offline mode: Offline in the On Air card, and the tabs that only work online
+        (needs_online) out of the tab bar and + More tabs; back when it's off."""
+        self._net_follow()
         for key in ("radio", "triggers"):
             i = TAB_INDEX[key]
             shown = self.tab_shown(key)
@@ -4147,8 +4144,72 @@ class MainWindow(QMainWindow):
         if playing:
             self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
 
+    def card_lines(self) -> list[sidebar.Line]:
+        """What the On Air card says under its status (OutputBlock.set_lines): how the
+        app goes online, and a remote control listening."""
+        return [line for line in (self._network_line(), self._remote_line()) if line]
+
+    def _network_line(self) -> sidebar.Line | None:
+        """Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
+        if net.offline():
+            return sidebar.Line("offline", _("Offline"), "",
+                                _("Offline mode is on: nothing goes online, and what needs "
+                                  "the internet is hidden. Click to change it."), "privacy")
+        mode = net.mode()
+        click = _("Click to change it.")
+        if mode == net.TOR:
+            t = tor.manager()
+            tip = "\n".join((t.status_text(), click))
+            if t.state == tor.READY:
+                return sidebar.Line("tor", _("Through Tor"), "ok", tip, "privacy")
+            if t.state == tor.STARTING:
+                return sidebar.Line("tor", _("Tor {percent}%", percent=t.progress), "", tip,
+                                    "privacy")
+            if t.state == tor.FAILED:
+                return sidebar.Line("tor", _("Tor failed"), "warn", tip, "privacy")
+            return sidebar.Line("tor", _("Tor"), "", tip, "privacy")
+        if mode == net.PROXY:
+            p = net.proxy()
+            if p is None:
+                return sidebar.Line("shield", _("Proxy not working"), "warn",
+                                    "\n".join((net.describe(), click)), "privacy")
+            return sidebar.Line("shield", _("Through proxy"), "ok",
+                                "\n".join((_("Everything goes through your proxy "
+                                             "({address}).", address=p.where), click)),
+                                "privacy")
+        return None
+
+    def _remote_line(self) -> sidebar.Line | None:
+        """A phone remote (a remote add-on such as Onion Pocket) listening on the home
+        network, or else the control API listening on this PC; None when neither."""
+        servers = remote.listening()
+        click = _("Click to change it.")
+        phone = [s for s in servers if s.lan]
+        if phone:
+            return sidebar.Line("phone", _("Phone remote on"), "ok",
+                                "\n".join((_("Phones on your home network can control the "
+                                             "board ({address}).",
+                                             address=f"{phone[0].host}:{phone[0].port}"),
+                                            click)), "remote")
+        if servers:
+            return sidebar.Line("phone", _("Remote control on"), "",
+                                "\n".join((_("Stream Deck buttons and scripts on this PC "
+                                             "can control the board (port {port}).",
+                                             port=servers[0].port), click)), "remote")
+        return None
+
+    def _remote_watch(self):
+        self.remote_changed.emit()   # (maybe from the thread that stopped it)
+
+    def _net_follow(self):
+        output = getattr(getattr(self, "rail", None), "output", None)
+        if output is not None:
+            output.set_lines(self.card_lines())
+            self.rail.refresh_output()   # (the card's widest line can change its scale)
+
     def _on_tor(self):
         """Something is waiting for Tor: say so (once), and when it's ready or failed."""
+        self._net_follow()
         t = tor.manager()
         if t.state == tor.STARTING and t.waiting:
             say = ("starting", _("Connecting to Tor… what you asked for goes once it's "

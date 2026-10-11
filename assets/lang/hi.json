@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "अगर साउंड कटे-कटे आएँ, तो वॉइस ऐप का noise suppression बंद करें (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> बंद। Studio नहीं: वह Onion Board को छोड़ देता है)।",
   "Sounds chopped up?": "साउंड कटे-कटे आ रहे हैं?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "आप जो कहते हैं उसे इस भाषा में अनुवाद करता है। बंद: हर आवाज़ अंग्रेज़ी बोलती है, और भाषा चुनी हुई रहती है।",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "अंग्रेज़ी में बोलें और दूसरे कोई और भाषा सुनते हैं। नीचे का स्विच चालू करें: AI आवाज़ या वॉइस चेंजर में से जो चालू हो, वह इसे बोलता है; नहीं तो Start दबाएँ और कंप्यूटर की आवाज़ बोलती है।"
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "अंग्रेज़ी में बोलें और दूसरे कोई और भाषा सुनते हैं। नीचे का स्विच चालू करें: AI आवाज़ या वॉइस चेंजर में से जो चालू हो, वह इसे बोलता है; नहीं तो Start दबाएँ और कंप्यूटर की आवाज़ बोलती है।",
+  "Click to change it.": "बदलने के लिए क्लिक करें।",
+  "Everything goes through your proxy ({address}).": "सब कुछ आपके प्रॉक्सी से होकर जाता है ({address})।",
+  "Phone remote on": "फ़ोन रिमोट चालू",
+  "Phones on your home network can control the board ({address}).": "आपके होम नेटवर्क के फ़ोन बोर्ड को कंट्रोल कर सकते हैं ({address})।",
+  "Proxy not working": "प्रॉक्सी काम नहीं कर रहा",
+  "Remote control on": "रिमोट कंट्रोल चालू",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "इस PC पर Stream Deck बटन और स्क्रिप्ट बोर्ड को कंट्रोल कर सकते हैं (पोर्ट {port})।",
+  "Through Tor": "Tor से होकर",
+  "Through proxy": "प्रॉक्सी से होकर",
+  "Tor": "Tor",
+  "Tor failed": "Tor विफल रहा",
+  "Tor {percent}%": "Tor {percent}%"
 }

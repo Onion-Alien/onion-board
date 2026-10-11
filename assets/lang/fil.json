@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Kung napuputol-putol ang mga sound, i-off ang noise suppression ng voice app (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Hindi Studio: nilalaktawan nito ang Onion Board).",
   "Sounds chopped up?": "Napuputol-putol ang mga sound?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Isinasalin ang sinasabi mo sa wikang ito. Naka-off: Ingles ang sinasalita ng bawat boses, at nananatiling napili ang wika.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Magsalita sa Ingles at ibang wika ang maririnig ng iba. I-on ang switch sa ibaba: sasabihin ito ng AI voice o ng voice changer kapag naka-on ang isa sa kanila; kung hindi, pindutin ang Start at isang computer voice ang magsasabi."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Magsalita sa Ingles at ibang wika ang maririnig ng iba. I-on ang switch sa ibaba: sasabihin ito ng AI voice o ng voice changer kapag naka-on ang isa sa kanila; kung hindi, pindutin ang Start at isang computer voice ang magsasabi.",
+  "Click to change it.": "I-click para palitan.",
+  "Everything goes through your proxy ({address}).": "Lahat ay dumadaan sa proxy mo ({address}).",
+  "Phone remote on": "Naka-on ang phone remote",
+  "Phones on your home network can control the board ({address}).": "Makokontrol ng mga phone sa home network mo ang board ({address}).",
+  "Proxy not working": "Hindi gumagana ang proxy",
+  "Remote control on": "Naka-on ang remote control",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Makokontrol ng mga Stream Deck button at script sa PC na ito ang board (port {port}).",
+  "Through Tor": "Sa Tor",
+  "Through proxy": "Sa proxy",
+  "Tor": "Tor",
+  "Tor failed": "Pumalya ang Tor",
+  "Tor {percent}%": "Tor {percent}%"
 }

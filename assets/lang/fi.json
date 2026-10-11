@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jos äänet pätkivät, laita puhesovelluksen kohinanvaimennus pois (Discord: <b>Syöttöprofiili → Mukautettu</b>, <b>Kohinanvaimennus → Ei mitään</b>, <b>Kaiunpoisto</b> pois. Ei Studio: se ohittaa Onion Boardin).",
   "Sounds chopped up?": "Pätkivätkö äänet?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Kääntää puheesi tälle kielelle. Pois: jokainen ääni puhuu englantia, ja kieli pysyy valittuna.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu englantia, ja muut kuulevat toista kieltä. Laita alla oleva kytkin päälle: AI-ääni tai äänenmuunnin sanoo sen, kun jompikumpi on päällä; muuten paina Käynnistä, niin tietokoneääni sanoo sen."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu englantia, ja muut kuulevat toista kieltä. Laita alla oleva kytkin päälle: AI-ääni tai äänenmuunnin sanoo sen, kun jompikumpi on päällä; muuten paina Käynnistä, niin tietokoneääni sanoo sen.",
+  "Click to change it.": "Muuta klikkaamalla.",
+  "Everything goes through your proxy ({address}).": "Kaikki kulkee välityspalvelimesi kautta ({address}).",
+  "Phone remote on": "Puhelinkaukosäädin päällä",
+  "Phones on your home network can control the board ({address}).": "Kotiverkkosi puhelimet voivat ohjata boardia ({address}).",
+  "Proxy not working": "Välityspalvelin ei toimi",
+  "Remote control on": "Kauko-ohjaus päällä",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Stream Deckin näppäimet ja tämän PC:n skriptit voivat ohjata boardia (portti {port}).",
+  "Through Tor": "Torin kautta",
+  "Through proxy": "Välityspalvelimen kautta",
+  "Tor": "Tor",
+  "Tor failed": "Tor epäonnistui",
+  "Tor {percent}%": "Tor {percent} %"
 }

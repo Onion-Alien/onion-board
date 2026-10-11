@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ако звуците накъсват, изключи потискането на шума в гласовото приложение (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> изключено. Не Studio: то прескача Onion Board).",
   "Sounds chopped up?": "Звуците накъсват?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Превежда казаното от теб на този език. Изключено: всеки глас говори на английски, а езикът остава избран.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говори на английски, а другите чуват друг език. Включи превключвателя отдолу: AI гласът или гласовият чейнджър го казва, когато единият е включен; иначе натисни Старт и го казва компютърен глас."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говори на английски, а другите чуват друг език. Включи превключвателя отдолу: AI гласът или гласовият чейнджър го казва, когато единият е включен; иначе натисни Старт и го казва компютърен глас.",
+  "Click to change it.": "Щракни, за да го смениш.",
+  "Everything goes through your proxy ({address}).": "Всичко минава през твоето прокси ({address}).",
+  "Phone remote on": "Телефонно дистанционно: вкл.",
+  "Phones on your home network can control the board ({address}).": "Телефоните в домашната ти мрежа могат да управляват борда ({address}).",
+  "Proxy not working": "Проксито не работи",
+  "Remote control on": "Дистанционно управление: вкл.",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Бутоните на Stream Deck и скриптовете на този компютър могат да управляват борда (порт {port}).",
+  "Through Tor": "През Tor",
+  "Through proxy": "През прокси",
+  "Tor": "Tor",
+  "Tor failed": "Tor не успя",
+  "Tor {percent}%": "Tor {percent}%"
 }

@@ -3128,5 +3128,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "소리가 잘리는 경우 음성 앱의 소음 억제 기능을 끄세요(Discord: <b>입력 프로필 → 사용자 정의</b> , <b>소음 억제 → 없음</b> , <b>에코 제거</b> 끄기. Studio 아님: Onion Board 건너뛰기).",
   "Sounds chopped up?": "소리가 잘리나요?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "말한 내용을 이 언어로 번역합니다. 끄면: 모든 음성이 영어로 말하고, 언어는 선택된 채로 남습니다.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "영어로 말하면 다른 사람에게는 다른 언어로 들립니다. 아래 스위치를 켜세요: AI 음성이나 음성 변조기 중 켜져 있는 것이 말합니다. 둘 다 꺼져 있으면 시작을 누르면 컴퓨터 음성이 말합니다."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "영어로 말하면 다른 사람에게는 다른 언어로 들립니다. 아래 스위치를 켜세요: AI 음성이나 음성 변조기 중 켜져 있는 것이 말합니다. 둘 다 꺼져 있으면 시작을 누르면 컴퓨터 음성이 말합니다.",
+  "Click to change it.": "클릭해서 바꾸세요.",
+  "Everything goes through your proxy ({address}).": "모든 연결이 프록시를 거칩니다({address}).",
+  "Phone remote on": "휴대폰 리모컨 켜짐",
+  "Phones on your home network can control the board ({address}).": "집 네트워크의 휴대폰으로 보드를 조작할 수 있어요({address}).",
+  "Proxy not working": "프록시가 작동하지 않음",
+  "Remote control on": "원격 제어 켜짐",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "이 PC의 Stream Deck 버튼과 스크립트로 보드를 조작할 수 있어요(포트 {port}).",
+  "Through Tor": "Tor 경유",
+  "Through proxy": "프록시 경유",
+  "Tor": "Tor",
+  "Tor failed": "Tor 실패",
+  "Tor {percent}%": "Tor {percent}%"
 }

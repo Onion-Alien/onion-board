@@ -3274,5 +3274,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Якщо звуки порізані, вимкніть придушення шуму в голосовій програмі (Discord: <b>Профіль введення → Спеціальний</b> , <b>Придушення шуму → Немає</b> , <b>Ехоподавлення</b> вимкнено. Не Studio: пропускає Onion Board).",
   "Sounds chopped up?": "Звуки обриваються?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Перекладає сказане вами цією мовою. Вимкнено: усі голоси говорять англійською, а мова лишається вибраною.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говоріть англійською, а інші чують іншу мову. Увімкніть перемикач нижче: скаже ШІ-голос або змінювач голосу, коли один із них увімкнено; інакше натисніть «Пуск», і скаже комп’ютерний голос."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говоріть англійською, а інші чують іншу мову. Увімкніть перемикач нижче: скаже ШІ-голос або змінювач голосу, коли один із них увімкнено; інакше натисніть «Пуск», і скаже комп’ютерний голос.",
+  "Click to change it.": "Натисни, щоб змінити.",
+  "Everything goes through your proxy ({address}).": "Усе йде через твій проксі ({address}).",
+  "Phone remote on": "Пульт із телефона увімкнено",
+  "Phones on your home network can control the board ({address}).": "Телефони у твоїй домашній мережі можуть керувати бордом ({address}).",
+  "Proxy not working": "Проксі не працює",
+  "Remote control on": "Віддалене керування увімкнено",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Кнопки Stream Deck і скрипти на цьому ПК можуть керувати бордом (порт {port}).",
+  "Through Tor": "Через Tor",
+  "Through proxy": "Через проксі",
+  "Tor": "Tor",
+  "Tor failed": "Tor не вдався",
+  "Tor {percent}%": "Tor {percent}%"
 }

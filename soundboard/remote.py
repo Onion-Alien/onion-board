@@ -92,6 +92,7 @@ import selectors
 import socket
 import threading
 import time
+import weakref
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import TYPE_CHECKING
@@ -304,6 +305,36 @@ class _Server(ThreadingHTTPServer):
                 self._open.pop(peer, None)
 
 
+_running: weakref.WeakSet = weakref.WeakSet()   # the servers listening now
+_watchers: list = []   # weak callbacks, called whenever one starts or stops
+
+
+def on_change(fn) -> None:
+    """Call `fn` whenever a server starts or stops (held weakly, like net.on_change).
+    It may be called from the thread that stopped one: hand over to the UI thread."""
+    ref = weakref.WeakMethod(fn) if hasattr(fn, "__self__") else (lambda f=fn: f)
+    _watchers.append(ref)
+
+
+def listening() -> list[RemoteControl]:
+    """The servers listening now (the control API, a remote add-on's)."""
+    return [s for s in list(_running) if s.running]
+
+
+def _changed() -> None:
+    for ref in list(_watchers):
+        fn = ref()
+        if fn is None:
+            if ref in _watchers:
+                _watchers.remove(ref)
+            continue
+        try:
+            fn()
+        except RuntimeError:   # its window is gone
+            if ref in _watchers:
+                _watchers.remove(ref)
+
+
 class RemoteControl(QObject):
     """Starts / stops the server. `dispatch(action, params) -> (status, body)` runs on
     the UI thread for every authorised request whose action is in `actions`. `page`,
@@ -374,6 +405,8 @@ class RemoteControl(QObject):
         log.info("%s listening on %s:%s", self.name, self.host, self.port)
         if self.lan:
             self._network.start()
+        _running.add(self)
+        _changed()
         return True
 
     def _check_network(self):
@@ -413,6 +446,8 @@ class RemoteControl(QObject):
             srv.halt()
             srv.server_close()
             log.info("%s stopped", self.name)
+            _running.discard(self)
+            _changed()
 
     def _on_request(self, job: Job):
         with job.lock:

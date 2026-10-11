@@ -3128,5 +3128,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Nếu âm thanh bị ngắt quãng, hãy tắt tính năng khử tiếng ồn của ứng dụng giọng nói (Discord: <b>Cấu hình đầu vào → Tùy chỉnh</b> , <b>Giảm tiếng ồn → Không có</b> , <b>Tắt tiếng vang</b> . Không phải Studio: nó bỏ qua Onion Board).",
   "Sounds chopped up?": "Âm thanh bị ngắt quãng?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Dịch những gì bạn nói sang ngôn ngữ này. Tắt: mọi giọng đều nói tiếng Anh, và ngôn ngữ vẫn được chọn.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Nói tiếng Anh và người khác nghe một ngôn ngữ khác. Bật công tắc bên dưới: giọng AI hoặc bộ đổi giọng sẽ nói khi một trong hai đang bật; nếu không, nhấn Bắt đầu và giọng máy tính sẽ nói."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Nói tiếng Anh và người khác nghe một ngôn ngữ khác. Bật công tắc bên dưới: giọng AI hoặc bộ đổi giọng sẽ nói khi một trong hai đang bật; nếu không, nhấn Bắt đầu và giọng máy tính sẽ nói.",
+  "Click to change it.": "Nhấn để đổi.",
+  "Everything goes through your proxy ({address}).": "Mọi thứ đều đi qua proxy của bạn ({address}).",
+  "Phone remote on": "Điều khiển bằng điện thoại đang bật",
+  "Phones on your home network can control the board ({address}).": "Điện thoại trong mạng nhà bạn có thể điều khiển board ({address}).",
+  "Proxy not working": "Proxy không hoạt động",
+  "Remote control on": "Điều khiển từ xa đang bật",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Nút Stream Deck và script trên PC này có thể điều khiển board (cổng {port}).",
+  "Through Tor": "Qua Tor",
+  "Through proxy": "Qua proxy",
+  "Tor": "Tor",
+  "Tor failed": "Tor thất bại",
+  "Tor {percent}%": "Tor {percent}%"
 }

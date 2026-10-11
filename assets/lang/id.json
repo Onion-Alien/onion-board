@@ -3128,5 +3128,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jika suara terpotong-potong, matikan peredam bising pada aplikasi suara (Discord: <b>Profil Input → Kustom</b> , <b>Peredam Kebisingan → Tidak Ada</b> , <b>Pembatalan Gema</b> nonaktif. Bukan Studio: ia melewati Onion Board).",
   "Sounds chopped up?": "Suara terpotong-potong?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Menerjemahkan ucapanmu ke bahasa ini. Mati: setiap suara berbicara bahasa Inggris, dan bahasanya tetap terpilih.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Bicara dalam bahasa Inggris dan orang lain mendengar bahasa lain. Nyalakan sakelar di bawah: suara AI atau pengubah suara mengucapkannya saat salah satunya aktif; kalau tidak, tekan Mulai dan suara komputer yang mengucapkannya."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Bicara dalam bahasa Inggris dan orang lain mendengar bahasa lain. Nyalakan sakelar di bawah: suara AI atau pengubah suara mengucapkannya saat salah satunya aktif; kalau tidak, tekan Mulai dan suara komputer yang mengucapkannya.",
+  "Click to change it.": "Klik untuk mengubahnya.",
+  "Everything goes through your proxy ({address}).": "Semuanya lewat proxy kamu ({address}).",
+  "Phone remote on": "Remote HP aktif",
+  "Phones on your home network can control the board ({address}).": "HP di jaringan rumahmu bisa mengontrol board ({address}).",
+  "Proxy not working": "Proxy tidak berfungsi",
+  "Remote control on": "Kontrol jarak jauh aktif",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Tombol Stream Deck dan skrip di PC ini bisa mengontrol board (port {port}).",
+  "Through Tor": "Lewat Tor",
+  "Through proxy": "Lewat proxy",
+  "Tor": "Tor",
+  "Tor failed": "Tor gagal",
+  "Tor {percent}%": "Tor {percent}%"
 }
