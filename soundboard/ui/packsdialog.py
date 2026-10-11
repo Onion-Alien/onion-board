@@ -146,10 +146,10 @@ class PacksDialog(QDialog):
 
     def _read_list(self):
         try:
-            self._listed.emit(packs.catalog(), "")
+            busy.emit(self._listed, packs.catalog(), "")
         except Exception as e:  # noqa: BLE001 - offline, switched off, a bad list…
             log.info("couldn't read the pack list: %s", e)
-            self._listed.emit(None, errors.plain(e))
+            busy.emit(self._listed, None, errors.plain(e))
 
     def _show(self, found, err: str):
         if self._closed:
@@ -182,14 +182,14 @@ class PacksDialog(QDialog):
         def run():
             try:
                 path = packs.download(
-                    p, lambda done, total: self._progress.emit(card, done, total),
+                    p, lambda done, total: busy.emit(self._progress, card, done, total),
                     lambda: self._closed)
-                self._fetched.emit(card, path, "")
+                busy.emit(self._fetched, card, path, "")
             except updates.UpdateError as e:
-                self._fetched.emit(card, None, str(e))
+                busy.emit(self._fetched, card, None, str(e))
             except Exception as e:  # noqa: BLE001 - never a crash
                 log.exception("pack %s download failed", p.id)
-                self._fetched.emit(card, None, errors.plain(e))
+                busy.emit(self._fetched, card, None, errors.plain(e))
         threading.Thread(target=run, daemon=True, name="pack-download").start()
 
     def _on_progress(self, card: PackCard, done: int, total: int):
