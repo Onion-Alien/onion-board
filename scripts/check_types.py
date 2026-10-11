@@ -7,6 +7,7 @@ by file, rule and message (not line), so an edit that moves code doesn't trip it
     python scripts/check_types.py                # files changed since origin/main
     python scripts/check_types.py --base X       # ... since branch X
     python scripts/check_types.py FILE ...       # just these files
+    python scripts/check_types.py --all          # whole repo (what CI runs)
     python scripts/check_types.py --update       # whole repo: rewrite the baseline
 
 Fixed an old error? Run --update so the baseline shrinks and it can't come back.
@@ -55,6 +56,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="*")
     ap.add_argument("--base", default="origin/main")
+    ap.add_argument("--all", action="store_true")
     ap.add_argument("--update", action="store_true")
     a = ap.parse_args()
 
@@ -68,14 +70,14 @@ def main():
         print(f"baseline: {sum(counts.values())} errors in {len({k[0] for k in counts})} files")
         return 0
 
-    files = a.files or changed(a.base)
-    if not files:
+    files = [] if a.all else a.files or changed(a.base)
+    if not files and not a.all:
         print("no changed Python files to type check")
         return 0
     with open(BASELINE, encoding="utf-8") as fh:
         known = {(r["file"], r["rule"], r["message"]): r["count"] for r in json.load(fh)}
     seen, new = collections.Counter(), []
-    for d in pyright(files):
+    for d in pyright(files):   # no files: the whole repo
         k = key(d)
         seen[k] += 1
         if seen[k] > known.get(k, 0):
@@ -87,7 +89,7 @@ def main():
         print(f"{len(new)} new type error(s). Fix them, or add `# pyright: ignore[rule]` "
               "with a reason if pyright is wrong.")
         return 1
-    print(f"no new type errors in {len(files)} file(s)")
+    print("no new type errors in " + ("the repo" if a.all else f"{len(files)} file(s)"))
     return 0
 
 
