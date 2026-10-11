@@ -5954,7 +5954,7 @@ class MainWindow(QMainWindow):
         text = (ngettext("Adding {count} sound…", "Adding {count} sounds…", total, count=total)
                 if not done else _("Adding {done} of {total}…", done=done, total=total))
         if total <= 1:
-            self.toast(text, "busy", key="import")
+            self.toast(text, "busy", 0, key="import")   # up until it's in, however slow
             return
         if self._import_card_shut:
             return

@@ -397,3 +397,23 @@ def test_stop_on_a_big_import_keeps_whats_in_and_skips_the_rest(main_window, qap
     assert done.card.action.text() == "Undo" and not w._import_stop.is_set()
     done.card.action.click()
     assert len(w.cfg.sounds) == before
+
+
+def test_one_slow_file_keeps_its_busy_card_until_its_in(main_window, qapp, tmp_path,  # noqa: F811
+                                                       monkeypatch):
+    """A long file can take longer to read than a notice stays up: its card waits."""
+    import threading
+    from soundboard.ui import mainwindow
+    w = main_window
+    p = tmp_path / "Hour.wav"
+    sf.write(p, np.zeros((SR // 10, 2)), SR)
+    go, real = threading.Event(), mainwindow.import_file
+    monkeypatch.setattr(mainwindow, "import_file", lambda f, *a, **k: (go.wait(10),
+                                                                      real(f, *a, **k))[1])
+    w.import_files([str(p)])
+    card = next(x for x in toast.shown(w) if x.key == "import")
+    assert card.kind == "busy" and card.card.progress is None
+    # a busy card's own long wait (minutes), not a notice's few seconds
+    assert card._timer.remainingTime() > 60_000
+    go.set()
+    assert process_events(qapp, lambda: not w._pending_imports)
