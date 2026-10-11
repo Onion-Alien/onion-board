@@ -12,6 +12,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+from typing import Literal, overload
 
 import numpy as np
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
@@ -3082,6 +3083,10 @@ class MainWindow(QMainWindow):
         self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
+        # a device is picked to send to (not the headphones): failing is "Not working",
+        # never "Not configured"
+        picked = (self.cfg.main_device if route in ("cable", "device")
+                  and self.cfg.main_device != self.cfg.mon_device else None)
         pills = []   # (short, whole): the open rail shows the short one
         for short in (True, False):
             if state == "off":
@@ -3105,12 +3110,15 @@ class MainWindow(QMainWindow):
             elif state == "missing":
                 pill = (_("Setup needed") if short
                         else _("One-time setup needed, others can't hear you yet"))
+            elif picked:   # set up, but it won't open (or the cable's mic end is gone)
+                pill = (_("Not working") if short
+                        else _("Can't send to {device}, click to fix", device=picked))
             elif route == "device":
-                pill = (_("Not connected") if short
+                pill = (_("Not configured") if short
                         else _("Not sending: pick a device on the Setup tab"))
             else:   # (the Setup tab offers straight into the mic first)
-                pill = (_("Not connected") if short
-                        else _("Not connected: click to fix"))
+                pill = (_("Not configured") if short
+                        else _("Not configured: click to fix"))
             pills.append(pill)
         pill_short, pill = pills
         self.setup_connection.setText(pill)
@@ -3764,6 +3772,16 @@ class MainWindow(QMainWindow):
     def tab_shown(self, key: str) -> bool:
         """Whether a tab is in the tab bar: switched on, and of use (needs_online)."""
         return self.tab_on(key) and not self.needs_online(key)
+
+    @overload
+    def _make_tab(self, key: Literal["voice"]) -> VoicePanel | taboff.VoiceOff: ...
+    @overload
+    def _make_tab(self, key: Literal["apps"]) -> AppsTab | taboff.TabOff: ...
+    @overload
+    def _make_tab(self, key: Literal["triggers"]) -> TriggersTab | taboff.TabOff: ...
+    @overload
+    def _make_tab(self, key: str) -> (VoicePanel | AppsTab | TriggersTab
+                                      | taboff.TabOff): ...
 
     def _make_tab(self, key: str):
         """The Apps, Triggers or Voice tab, wired to the window; or, switched off in

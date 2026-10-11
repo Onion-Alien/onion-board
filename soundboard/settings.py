@@ -7,6 +7,7 @@ import logging
 import re
 import threading
 import time
+from collections.abc import Callable
 
 from PySide6.QtCore import QObject, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import (QColor, QFont, QKeySequence, QPainter, QPainterPath,
@@ -204,12 +205,14 @@ class HotkeyDialog(QDialog):
             self.accept()
 
     def _stop_pads(self):
+        midi = self._midi
+        assert midi is not None   # only connected with one
         try:
-            self._midi.pressed.disconnect(self._on_pad)
-            self._midi.busy_changed.disconnect(self._show_pads)
+            midi.pressed.disconnect(self._on_pad)
+            midi.busy_changed.disconnect(self._show_pads)
         except (RuntimeError, TypeError):
             pass
-        self._midi.capture(False)
+        midi.capture(False)
 
     def keyPressEvent(self, e):
         vk = e.nativeVirtualKey()
@@ -446,7 +449,7 @@ class SettingsDialog(QDialog):
         self.categories.setAccessibleName(_("Settings categories"))
         self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.categories.setFixedWidth(196)
-        self._unbuilt: dict[int, object] = {}   # tab index -> its page's builder
+        self._unbuilt: dict[int, Callable[[], QWidget]] = {}   # tab index -> its page's builder
         for i, (key, title, icon, build) in enumerate(pages):
             sa = self._scroll()
             if lazy and key != page:
@@ -467,7 +470,7 @@ class SettingsDialog(QDialog):
         # widget hands its focus to it), so Tab from the list went nowhere
         self.tabs.tabBar().setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.tabs.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.tabs.setFocusProxy(None)
+        self.tabs.setFocusProxy(None)   # pyright: ignore[reportArgumentType]  # None clears it
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
@@ -609,7 +612,7 @@ class SettingsDialog(QDialog):
                 self._searching = False
         first = named = None
         for i in range(self.tabs.count()):
-            page = self.tabs.widget(i).widget()
+            page = self._tab_page(i)
             title = self.categories.item(i).data(Qt.ItemDataRole.UserRole + 1).lower()
             if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
                 self.categories.item(i).setHidden(True)
@@ -677,7 +680,19 @@ class SettingsDialog(QDialog):
         """A lazy page, the first time it's shown."""
         build = self._unbuilt.pop(i, None)
         if build is not None:
-            self._fill(self.tabs.widget(i), build())
+            self._fill(self._tab_area(i), build())
+
+    def _tab_area(self, i: int) -> QScrollArea:
+        """Page i's scroll area (each tab is one)."""
+        sa = self.tabs.widget(i)
+        assert isinstance(sa, QScrollArea)
+        return sa
+
+    def _tab_page(self, i: int) -> QWidget:
+        """Page i's contents (a lazy one not built yet: its placeholder)."""
+        page = self._tab_area(i).widget()
+        assert page is not None
+        return page
 
     @staticmethod
     def _card(title: str, hint: str = ""):
@@ -1104,7 +1119,9 @@ class SettingsDialog(QDialog):
         row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide))
         row.addStretch(1)   # the choice right after its label, not at the card's far edge
         cv.addLayout(row)
-        self.ov_toggle_only = (after, row.itemAt(1).widget())
+        item = row.itemAt(1)
+        assert item is not None
+        self.ov_toggle_only = (after, item.widget())
         v.addWidget(card)
 
         card, cv = self._card(_("Where and how it looks"),
@@ -1410,7 +1427,8 @@ class SettingsDialog(QDialog):
     def _fill_app_setup(self):
         lay = self.app_setup_list
         while lay.count():
-            w = lay.takeAt(0).widget()
+            item = lay.takeAt(0)
+            w = item.widget() if item is not None else None
             if w is not None:
                 w.deleteLater()
         s = appsetup.settings(self.mw.cfg)
@@ -1486,7 +1504,8 @@ class SettingsDialog(QDialog):
     def _fill_programs(self):
         lay = self.programs_list
         while lay.count():
-            w = lay.takeAt(0).widget()
+            item = lay.takeAt(0)
+            w = item.widget() if item is not None else None
             if w is not None:
                 w.deleteLater()
         rules = self.mw.cfg.category_programs
@@ -1859,7 +1878,8 @@ class SettingsDialog(QDialog):
             info = t.info
             have = info is not None and watchaddon.removable(info, t._base())
             status.setText(note or (_("Version {version} is installed.", version=info.version)
-                                    if have else _("Onion Watch isn't installed.")))
+                                    if have and info is not None
+                                    else _("Onion Watch isn't installed.")))
             b["get"].setVisible(not have)
             for k in ("check", "reinstall", "remove"):
                 b[k].setVisible(have)
@@ -1898,30 +1918,36 @@ class SettingsDialog(QDialog):
             if state.get("offer") is not None:      # "Update to X"
                 run_get(state["offer"], b["check"], _("Updating…"))
                 return
-            if tab() is None:
+            t = tab()
+            if t is None:
                 return
-            info = tab().info
+            info = t.info
 
             def found(offer):
                 state["offer"] = offer
-                if tab() is not None:
-                    tab().offer_update(offer)
+                t = tab()
+                if t is not None:
+                    t.offer_update(offer)
                 refresh()
             self._addon_check(b["check"], watchaddon.FEATURE, watchaddon.latest,
                               info.version if info else "0", found)
 
         def remove():
-            if tab() is not None:
-                tab().remove()              # asks first
+            t = tab()
+            if t is not None:
+                t.remove()              # asks first
             refresh()
 
         b["get"].clicked.connect(lambda: run_get(None, b["get"], _("Getting it…")))
         b["check"].clicked.connect(check)
         b["reinstall"].clicked.connect(lambda: run_get(None, b["reinstall"],
                                                        _("Reinstalling…")))
-        b["report"].clicked.connect(lambda: self._addon_report(
-            b["report"], f"Onion Watch {tab().info.version}"
-            if tab() is not None and tab().info else "Onion Watch"))
+        def report():
+            t = tab()
+            info = t.info if t is not None else None
+            self._addon_report(b["report"],
+                               f"Onion Watch {info.version}" if info else "Onion Watch")
+        b["report"].clicked.connect(report)
         b["remove"].clicked.connect(remove)
         self._watch_refresh = refresh   # the Tabs page switched Triggers off or on
         refresh()   # in the card first: shown without a parent, it's a window of its own
@@ -1955,7 +1981,8 @@ class SettingsDialog(QDialog):
                                  "{error}. Reinstall it, or report the problem.",
                                  version=info.version, error=info.error)
             status.setText(note or (_("Version {version} is installed. Its settings are on "
-                                      "the Remote page.", version=info.version) if have else
+                                      "the Remote page.", version=info.version)
+                                    if have and info is not None else
                                     _("Onion Pocket isn't installed.")))
             b["get"].setVisible(not have and pocketaddon.offered())
             for k in ("check", "reinstall", "remove"):
@@ -2020,6 +2047,7 @@ class SettingsDialog(QDialog):
                 self._pocket_changed()
                 return
             release(_("✓ Done"))
+            assert new is not None   # (addon is None without it)
             if getattr(self, "_pocket_slot", None) is not None:
                 fresh = self._addon_card(new, addon)
                 if fresh is not None:
@@ -2556,6 +2584,7 @@ class SettingsDialog(QDialog):
             self.count_dialog = countdialog.show(self)
         eye.clicked.connect(show)
         self.count_eye = eye
+        self.count_dialog = None   # the dialog show() opens
         return eye
 
     def _switches_card(self, v=None):
@@ -3433,6 +3462,7 @@ class SettingsDialog(QDialog):
                 if new is not None:
                     btn.hide()
                 return
+            assert new is not None   # (addon is None without it)
             box = card.parentWidget().layout() if card.parentWidget() else None
             fresh = self._addon_card(new, addon)
             if fresh is not None and box is not None:

@@ -232,7 +232,7 @@ class OutputBlock(QFrame):
     the same column as the tab icons above and the buttons below, every line of
     words starts at the same x after them, and each icon is centred on the cap
     height of its label's first line. The status line is the setup action too:
-    "Not connected ›" is one click to Setup, "Connected" is only words."""
+    "Not configured ›" is one click to Setup, "Connected" is only words."""
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
     TOP = 12              # card padding over the title row (the 12 of settings cards)
@@ -240,6 +240,11 @@ class OutputBlock(QFrame):
     GLYPH = 16            # the icon column
     GAP = 6               # icon to words (8 wraps longer titles on the 190 px rail)
     TEXT_X = LEAD + GLYPH + GAP   # the keyline: where every line of words starts
+    SWITCH_GAP = 8        # words to the switch
+    SWITCH = (38, 22)     # the switch's size
+    ICON_X = LEAD + GLYPH // 2   # the icon column's centre: the tab icons'
+    MIN_SCALE = 0.85      # the card scales down to fit, never smaller than this (smaller
+                          # looked out of place); past that, the small card instead
     ROW_PAD = 4           # the status line's hover fill past its icon
     ROW_GAP = 6           # title row to the status line's fill
     ROW_H = 28            # the status line's height, fill and all
@@ -254,28 +259,32 @@ class OutputBlock(QFrame):
         box = self.box = QVBoxLayout(self)
         box.setSpacing(0)
         top = self.top = QHBoxLayout()
-        top.setSpacing(0)   # icon GAP words, then a tighter 4 before the switch
+        top.setSpacing(0)   # icon GAP words, 8 to the switch right after them
         mark = self.mark = self._glyph()
-        icons.set_label_icon(mark, "live", "accent", size=self.GLYPH)
-        self.title = QLabel(_("Others hear"))
+        self._scale = 1.0
+        self.title = _HugLabel("", widest=self.names())
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
         self.title.setAlignment(Qt.AlignmentFlag.AlignLeading | Qt.AlignmentFlag.AlignTop)
         self.title.setMinimumWidth(0)
         self.switch = Switch()
         self.switch.setProperty("glyphoffset", 1)
-        self.switch.setAccessibleName(_("Others hear"))
         self.title.setBuddy(self.switch)
         self.switch.setChecked(power.isChecked())
         self.switch.toggled.connect(power.setChecked)
         power.toggled.connect(self.switch.setChecked)
+        power.toggled.connect(self._name)
+        self._name(power.isChecked())
         top.addWidget(mark, 0, Qt.AlignmentFlag.AlignTop)
         self._title_gap = QSpacerItem(self.GAP, 0, QSizePolicy.Policy.Fixed,
                                       QSizePolicy.Policy.Minimum)
         top.addSpacerItem(self._title_gap)
-        top.addWidget(self.title, 1, Qt.AlignmentFlag.AlignTop)
-        top.addSpacing(4)
+        top.addWidget(self.title, 0, Qt.AlignmentFlag.AlignTop)
+        self._switch_gap = QSpacerItem(self.SWITCH_GAP, 0, QSizePolicy.Policy.Fixed,
+                                       QSizePolicy.Policy.Minimum)
+        top.addSpacerItem(self._switch_gap)
         top.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
+        top.addStretch(1)   # the switch stays beside its words
         box.addLayout(top)
         self._status_gap = QSpacerItem(0, self.ROW_GAP, QSizePolicy.Policy.Minimum,
                                        QSizePolicy.Policy.Fixed)
@@ -299,9 +308,14 @@ class OutputBlock(QFrame):
         for w in (self.status_icon, self.status_text, self.arrow):
             w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         row.addWidget(self.status_icon, 0, Qt.AlignmentFlag.AlignTop)
-        row.addSpacing(self.GAP)
+        self._icon_gap = QSpacerItem(self.GAP, 0, QSizePolicy.Policy.Fixed,
+                                     QSizePolicy.Policy.Minimum)
+        row.addSpacerItem(self._icon_gap)
         row.addWidget(self.status_text, 0, Qt.AlignmentFlag.AlignTop)
-        row.addSpacing(self.GAP - 2)   # (the chevron's glyph has ~2 px of air)
+        # (the chevron's glyph has ~2 px of air)
+        self._arrow_gap = QSpacerItem(self.GAP - 2, 0, QSizePolicy.Policy.Fixed,
+                                      QSizePolicy.Policy.Minimum)
+        row.addSpacerItem(self._arrow_gap)
         row.addWidget(self.arrow, 0, Qt.AlignmentFlag.AlignTop)
         row.addStretch(1)   # the chevron stays beside its words
         self.setup.clicked.connect(self._setup_clicked)
@@ -343,8 +357,9 @@ class OutputBlock(QFrame):
         # one line of status: centred in its ROW_H; wrapped, the icon and chevron stay
         # on the first line
         self.status_text.ensurePolished()
-        pad = max(4, (self.ROW_H - self.status_text.fontMetrics().height()) // 2)
-        self.row.setContentsMargins(self.ROW_PAD, pad, self.PAD, pad)
+        row_h = self._px(self.ROW_H)
+        pad = max(self._px(4), (row_h - self.status_text.fontMetrics().height()) // 2)
+        self.row.setContentsMargins(self._px(self.ROW_PAD), pad, self._px(self.PAD), pad)
         self._pin(self.status_icon, self.status_text)
         self._pin(self.arrow, self.status_text, mid="x")
 
@@ -353,18 +368,86 @@ class OutputBlock(QFrame):
         if e.type() in (QEvent.Type.StyleChange, QEvent.Type.FontChange):
             self._pin_all()
 
+    def _px(self, n: float) -> int:
+        """A length at the card's scale."""
+        return max(1, round(n * self._scale))
+
+    def _base_pt(self) -> float:
+        """The app's text size (the card's words at full size)."""
+        self.ensurePolished()
+        return self.font().pointSizeF() if self.font().pointSizeF() > 0 else 10.0
+
+    def _metrics(self, scale: float, bold: bool = False) -> QFontMetrics:
+        font = QFont(self.font())
+        font.setPointSizeF(self._base_pt() * scale)
+        font.setBold(bold)
+        return QFontMetrics(font)
+
+    def text_x(self) -> int:
+        """The keyline at the card's scale: where every line of words starts."""
+        glyph = self._px(self.GLYPH)
+        return round(self.ICON_X - glyph / 2) + glyph + self._px(self.GAP)
+
+    def need(self, scale: float) -> int:
+        """The card's width at `scale` with every line on one line: "Off Air" beside
+        its switch, and the status line, chevron and all."""
+        def px(n: float) -> int:
+            return max(1, round(n * scale))
+        text_x = round(self.ICON_X - px(self.GLYPH) / 2) + px(self.GLYPH) + px(self.GAP)
+        bold = self._metrics(scale, bold=True)
+        title = max(bold.horizontalAdvance(t) for t in self.names())
+        status = self._metrics(scale).horizontalAdvance(self.status_text.text())
+        return max(text_x + title + 1 + px(self.SWITCH_GAP) + px(self.SWITCH[0]) + px(self.PAD),
+                   text_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON) + 2 * px(self.PAD))
+
+    def scale_for(self, width: int) -> float:
+        """The biggest scale (up to 1) the card fits `width` at, or 0: not even at
+        MIN_SCALE (the rail shows the small card then)."""
+        scale = 1.0
+        while scale >= self.MIN_SCALE - 1e-9:
+            if self.need(scale) <= width:
+                return scale
+            scale = round(scale - 0.01, 2)
+        return 0.0
+
+    def set_scale(self, scale: float):
+        """The same card with every part (words, icons, switch, gaps) `scale` times
+        its size: dragged narrower than it fits, it shrinks instead of wrapping."""
+        if scale == self._scale:
+            return
+        self._scale = scale
+        size = "" if scale == 1 else f"font-size:{self._base_pt() * scale:.2f}pt;"
+        for label in (self.title, self.status_text):
+            label.setStyleSheet(size)
+        self.set_expanded(bool(self.property("expanded")))
+        self.refresh()
+
     def set_expanded(self, expanded: bool):
         self.setProperty("expanded", expanded)
-        self.box.setContentsMargins(*(self.LEAD - self.ROW_PAD, self.TOP, self.PAD, self.PAD)
+        px = self._px
+        glyph = px(self.GLYPH) if expanded else self.GLYPH
+        icon_x = round(self.ICON_X - glyph / 2)   # the icon column's centre stays put
+        row_pad = px(self.ROW_PAD)
+        self.box.setContentsMargins(*(icon_x - row_pad, px(self.TOP), px(self.PAD), px(self.PAD))
                                     if expanded else (0, 4, 0, 4))
-        self.top.setContentsMargins(self.ROW_PAD if expanded else 0, 0, 0, 0)
+        self.top.setContentsMargins(row_pad if expanded else 0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.Direction.LeftToRight if expanded
                               else QBoxLayout.Direction.TopToBottom)
         self.title.setVisible(expanded)
         self.setup.setVisible(expanded)
-        self.switch.setFixedSize(38 if expanded else 34, 22)
-        self._status_gap.changeSize(0, self.ROW_GAP if expanded else 0,
+        for g in (self.mark, self.status_icon):
+            g.setFixedWidth(glyph)
+        self.arrow.setFixedWidth(px(self.CHEVRON))
+        icons.set_label_icon(self.mark, "live", "accent", size=glyph)
+        self.switch.setFixedSize(*((px(self.SWITCH[0]), px(self.SWITCH[1])) if expanded
+                                   else (34, 22)))
+        for gap, n in ((self._title_gap, self.GAP), (self._switch_gap, self.SWITCH_GAP),
+                       (self._icon_gap, self.GAP), (self._arrow_gap, self.GAP - 2)):
+            gap.changeSize(px(n), 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.setup.setMinimumHeight(px(self.ROW_H))
+        self._status_gap.changeSize(0, px(self.ROW_GAP) if expanded else 0,
                                     QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.row.invalidate()
         self.box.invalidate()
         self.top.setAlignment(self.mark, Qt.AlignmentFlag.AlignTop if expanded
                               else Qt.AlignmentFlag.AlignHCenter)
@@ -378,13 +461,23 @@ class OutputBlock(QFrame):
             self.mark.setContentsMargins(0, 0, 0, 0)
             self.mark.setFixedHeight(self.GLYPH)
 
+    @staticmethod
+    def names() -> tuple[str, str]:
+        return _("On Air"), _("Off Air")
+
+    def _name(self, on: bool):
+        """"On Air" while others hear you, "Off Air" while they don't."""
+        text = self.names()[0 if on else 1]
+        self.title.setText(text)
+        self.switch.setAccessibleName(text)
+
     def refresh(self):
         self.switch.setToolTip(self.power.toolTip())
         self.switch.setAccessibleDescription(self.power.property("railfull") or "")
         self.status_text.setText(self.connection.property("railtext") or "")
         self.status_text.setToolTip(self.connection.property("railfull") or "")
         good = self._good()
-        # "Not connected ›" takes you to Setup; "Connected" is words only: no hover, no
+        # "Not configured ›" takes you to Setup; "Connected" is words only: no hover, no
         # hand, out of the Tab order (never disabled: that would throw the focus)
         self.setup.setProperty("action", not good)
         self.setup.setCursor(Qt.CursorShape.ArrowCursor if good
@@ -397,18 +490,25 @@ class OutputBlock(QFrame):
         self.setup.style().unpolish(self.setup)
         self.setup.style().polish(self.setup)
         theme.set_tone(self.status_text, "ok" if good else "warn")
-        self.status_icon.setPixmap(self.connection.icon().pixmap(self.GLYPH, self.GLYPH))
+        glyph = self._px(self.GLYPH)
+        self.status_icon.setPixmap(self.connection.icon().pixmap(glyph, glyph))
         icons.set_label_icon(self.arrow, "fold_back" if self.isRightToLeft() else "fold",
-                             "warn_text", size=self.CHEVRON)
+                             "warn_text", size=self._px(self.CHEVRON))
         self._pin_all()
 
 
 class _HugLabel(QLabel):
     """A wrapping label that asks only for its words' width, so whatever follows it
-    (a chevron) sits right after the words; short of room, it wraps."""
+    (a chevron) sits right after the words; short of room, it wraps. `widest`: texts
+    it swaps between, sized for the widest so what follows never jumps."""
+
+    def __init__(self, text: str, widest: tuple[str, ...] = ()):
+        super().__init__(text)
+        self._widest = widest
 
     def sizeHint(self):
-        width = self.fontMetrics().horizontalAdvance(self.text()) + 1
+        fm = self.fontMetrics()
+        width = max(fm.horizontalAdvance(t) for t in (self.text(), *self._widest)) + 1
         return QSize(width, self.heightForWidth(width))
 
     def minimumSizeHint(self):
@@ -835,7 +935,7 @@ class SideRail(QFrame):
         else:
             w.setToolTip("\n".join(filter(None, (full, tip if tip != full else ""))))
         if self.output and w in (self.output.power, self.output.connection):
-            self.output.refresh()
+            self.refresh_output()   # (new status words can change the card's scale)
 
     # ---- open / shut
     def is_open(self) -> bool:
@@ -863,14 +963,16 @@ class SideRail(QFrame):
         return self._target_width() - 2 * SIDE_OPEN - 1 - BUTTON_W - 6 >= self._brand_width()
 
     def _full_fit(self) -> int:
-        """The narrowest open rail where the full layout fits, every word on its line:
-        the name, "Others hear" beside its switch, Settings beside the arrow (a longer
-        translation needs more room)."""
+        """The narrowest open rail where the full layout fits (from 80% open): the
+        name on one line, the output card with every line on one line, as small as it
+        scales (a longer translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
-        need = [side + BUTTON_W + 6 + self._brand_width()]
+        need = [FULL_W, SHUT_W + round(0.8 * (OPEN_W - SHUT_W)),   # (from 80% open)
+                side + BUTTON_W + 6 + self._brand_width()]   # the name on one line
         if self.output:
-            title = self.output.title.fontMetrics().horizontalAdvance(_("Others hear"))
-            need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
+            # the card with every line on one line, scaled down as far as it goes
+            # (never wrapped: the small card until then)
+            need.append(side + self.output.need(self.output.MIN_SCALE))
         return max(FULL_W, min(OPEN_W, max(need)))
 
     def _small(self, w: QWidget) -> bool:
@@ -1097,6 +1199,10 @@ class SideRail(QFrame):
     def refresh_output(self):
         if self.output:
             shown = self.is_open() and not self._mid()   # mid: the small one, in the column
+            self.output.refresh()   # (its status words first: the scale fits them)
+            # narrower than it fits at full size: the same card, smaller
+            self.output.set_scale((self.output.scale_for(self._inner_width()) or 1.0)
+                                  if shown else 1.0)
             self.output.set_expanded(shown)
             self._output_gap.changeSize(0, 4 if shown else 0, QSizePolicy.Policy.Minimum,
                                         QSizePolicy.Policy.Fixed)

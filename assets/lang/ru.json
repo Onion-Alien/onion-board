@@ -221,7 +221,6 @@
   "No {site} results for <b>{q}</b>.": "На {site} ничего не найдено по запросу <b>{q}</b>.",
   "Nobody: only I hear them": "Никуда: слышу только я",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Обычно твои звуки идут в микрофон, так что их слышат все, кто слышит твой микрофон. Выбирай что-то другое, только чтобы отправлять их в другое место: Voicemeeter, микшер, устройство, которое захватывает OBS, или виртуальный кабель.",
-  "Not connected": "Не подключено",
   "Not sending to others (only you hear sounds)": "Не отправляется другим (звуки слышишь только ты)",
   "Not working": "Не работает",
   "Nothing goes out to others, only to the stream output. Click to mute that too (you still hear everything)": "К другим ничего не уходит, только на выход для стрима. Нажми, чтобы заглушить и его (ты по-прежнему слышишь всё)",
@@ -2936,7 +2935,6 @@
   "<b style='color:{colour}'>{device}</b>, your new mic <b style='color:{colour}'>✓ working</b>": "<b style='color:{colour}'>{device}</b> , ваш новый микрофон <b style='color:{colour}'>✓ работает</b>",
   "One-time setup needed, others can't hear you yet": "Требуется единоразовая настройка, другие пока вас не слышат",
   "Not sending: pick a device on the Setup tab": "Не отправлять: выберите устройство на вкладке «Настройка».",
-  "Not connected: click to fix": "Не подключено: нажмите, чтобы исправить",
   "<b style='color:{colour}'>One-time setup:</b> install the free virtual cable. It's what lets Discord and games hear your sounds. Without it, only you can hear them. Easier: set <b>Send my sounds to</b> to <b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick that device there.": "<b style='color:{colour}'>Единоразовая настройка:</b> установите бесплатный виртуальный кабель. Это то, что позволяет Discord и играм слышать ваши звуки. Без этого их сможете услышать только вы. Проще: установите <b>«Отправить мои звуки» на</b> <b>«Мой микрофон»</b> (устанавливать нечего). Voicemeeter, микшер или OBS? Выберите это устройство там.",
   "Record the radio. Click again to stop and the clip is added to your Sounds.": "Запишите радио. Нажмите еще раз, чтобы остановить, и клип будет добавлен в ваши звуки.",
   "Can't reach the station directory, press ↻ to try again.": "Не удалось попасть в каталог станций. Нажмите ↻, чтобы повторить попытку.",
@@ -3085,7 +3083,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Нажми, чтобы заглушить свои звуки для других (Discord, игра, OBS…). Микрофон по-прежнему идёт, если не включена смена голоса. Ты по-прежнему слышишь всё",
   "Click to send your sounds again: right now others hear only your mic": "Нажми, чтобы снова отправлять звуки: сейчас другие слышат только твой микрофон",
   "Only your mic": "Только твой микрофон",
-  "Others hear": "Другие слышат",
   "Others hear only your mic": "Другие слышат только твой микрофон",
   "Can ring until you stop it": "Может звенеть, пока вы не остановите",
   "Free, from GitHub, and only downloaded when you click.": "Бесплатно, с GitHub, и скачивается только по щелчку.",
@@ -3223,5 +3220,10 @@
   "Your mic needs a quick repair": "Микрофону нужен быстрый ремонт",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Выключи или включи микрофон для других. Твои звуки они всё равно слышат.",
   "That page has no sound Onion Board can add.": "На этой странице нет звука, который Onion Board может добавить.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Удалённые звуки вернёт «Отменить», а позже — Копия → Недавно удалённые звуки."
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Удалённые звуки вернёт «Отменить», а позже — Копия → Недавно удалённые звуки.",
+  "Off Air": "Не в эфире",
+  "On Air": "В эфире",
+  "Not configured": "Не настроено",
+  "Not configured: click to fix": "Не настроено: нажми, чтобы исправить",
+  "Can't send to {device}, click to fix": "Не получается отправить на {device}, нажми, чтобы исправить"
 }

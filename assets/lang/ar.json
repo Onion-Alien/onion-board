@@ -260,8 +260,6 @@
   "No {site} results for <b>{q}</b>.": "لا نتائج في {site} لـ <b>{q}</b>.",
   "Nobody: only I hear them": "لا أحد: أنا فقط أسمعها",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "عادةً تدخل أصواتك في الميكروفون، فيسمعها كل من يسمع ميكروفونك. لا تختر شيئًا آخر إلا إن أردت إرسالها إلى مكان آخر: Voicemeeter، أو جهاز مزج، أو جهاز يلتقطه OBS، أو كابل افتراضي.",
-  "Not connected": "غير متصل",
-  "Not connected: click to fix": "غير متصل: انقر للإصلاح",
   "Not reaching your mic, click to fix": "لا يصل إلى الميكروفون, انقر للإصلاح",
   "Not sending to others (only you hear sounds)": "لا إرسال إلى الآخرين (أنت فقط تسمع الأصوات)",
   "Not sending: pick a device on the Setup tab": "لا إرسال: اختر جهازًا في تبويب التهيئة",
@@ -3277,7 +3275,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "انقر لكتم أصواتك عن الآخرين (Discord، اللعبة، OBS…). يبقى ميكروفونك مُرسلًا ما لم يكن مغير الصوت مفعّلًا. أنت تسمع كل شيء",
   "Click to send your sounds again: right now others hear only your mic": "انقر لإرسال أصواتك مجددًا: الآخرون يسمعون ميكروفونك فقط الآن",
   "Only your mic": "ميكروفونك فقط",
-  "Others hear": "الآخرون يسمعون",
   "Others hear only your mic": "الآخرون يسمعون ميكروفونك فقط",
   "Can ring until you stop it": "يمكنه الرنين حتى تُوقفه",
   "Free, from GitHub, and only downloaded when you click.": "مجاني، من GitHub، ولا يُنزَّل إلا عند النقر.",
@@ -3442,5 +3439,10 @@
   "Your mic needs a quick repair": "ميكروفونك يحتاج إلى إصلاح سريع",
   "Mute or unmute your mic for others. Your sounds still play for them.": "اكتم أو شغّل ميكروفونك للآخرين. أصواتك تبقى مسموعة لهم.",
   "That page has no sound Onion Board can add.": "لا يوجد في هذه الصفحة صوت يمكن لـ Onion Board إضافته.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "الأصوات المُزالة تعود عبر تراجع، أو لاحقًا من نسخ احتياطي ← الأصوات المحذوفة مؤخرًا."
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "الأصوات المُزالة تعود عبر تراجع، أو لاحقًا من نسخ احتياطي ← الأصوات المحذوفة مؤخرًا.",
+  "Off Air": "خارج الهواء",
+  "On Air": "على الهواء",
+  "Not configured": "غير مُعد",
+  "Not configured: click to fix": "غير مُعد: انقر للإصلاح",
+  "Can't send to {device}, click to fix": "لا يمكن الإرسال إلى {device}، انقر للإصلاح"
 }

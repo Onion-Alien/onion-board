@@ -122,6 +122,7 @@ class _Background(logging.handlers.QueueHandler):
         """Wait (a little) until every line so far is in the file: a crash report
         reads the log's tail, and a test reads the file."""
         q, end = self.queue, time.monotonic() + self.FLUSH_S
+        assert isinstance(q, queue.Queue)   # made in __init__
         with q.all_tasks_done:
             while q.unfinished_tasks and time.monotonic() < end:
                 q.all_tasks_done.wait(0.05)
@@ -163,6 +164,7 @@ def keep(on: bool) -> None:
                if isinstance(h, (_Memory, _Background)))
     new = _handler(Path(path), on)
     if not on:
+        assert isinstance(new, _Memory)
         new.lines.extend(_log_tail(path, LOG_TAIL_LINES).splitlines())
     root.addHandler(new)
     root.removeHandler(old)
@@ -236,7 +238,9 @@ def ui_ready():
     # focusWindowChanged, not applicationStateChanged: that one fires before
     # activeWindow() is set, so the report would be held back again, forever.
     from PySide6.QtWidgets import QApplication
-    QApplication.instance().focusWindowChanged.connect(_show_pending)
+    app = QApplication.instance()
+    assert isinstance(app, QApplication)
+    app.focusWindowChanged.connect(_show_pending)
 
 
 def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None:
@@ -593,7 +597,8 @@ def _app_in_front() -> bool:
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance()
-    return (app is not None and app.applicationState() == Qt.ApplicationState.ApplicationActive
+    return (isinstance(app, QApplication)
+            and app.applicationState() == Qt.ApplicationState.ApplicationActive
             and app.activeWindow() is not None)
 
 
