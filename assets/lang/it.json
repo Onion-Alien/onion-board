@@ -3116,5 +3116,15 @@
   "Your sounds and settings are kept.": "I tuoi suoni e le impostazioni vengono conservati.",
   "{error}": "{error}",
   "Update mic effect": "Aggiorna effetto microfono",
-  "Update to new version": "Aggiorna alla nuova versione"
+  "Update to new version": "Aggiorna alla nuova versione",
+  "Keep": "Tieni",
+  "Keep your imported sounds?": "Tenere i suoni importati?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Abbiamo portato <b>{n}</b> suono dalle tue altre soundboard. Lo tieni?",
+    "Abbiamo portato <b>{n}</b> suoni dalle tue altre soundboard. Li tieni?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Abbiamo portato <b>{n}</b> suono da {name}. Lo tieni?",
+    "Abbiamo portato <b>{n}</b> suoni da {name}. Li tieni?"
+  ]
 }

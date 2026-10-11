@@ -3116,5 +3116,15 @@
   "Your sounds and settings are kept.": "Οι ήχοι και οι ρυθμίσεις σου διατηρούνται.",
   "{error}": "{error}",
   "Update mic effect": "Ενημέρωση εφέ μικροφώνου",
-  "Update to new version": "Ενημέρωση στη νέα έκδοση"
+  "Update to new version": "Ενημέρωση στη νέα έκδοση",
+  "Keep": "Διατήρηση",
+  "Keep your imported sounds?": "Να κρατηθούν οι εισαγόμενοι ήχοι;",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Φέραμε <b>{n}</b> ήχο από τα άλλα σου soundboard. Να τον κρατήσεις;",
+    "Φέραμε <b>{n}</b> ήχους από τα άλλα σου soundboard. Να τους κρατήσεις;"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Φέραμε <b>{n}</b> ήχο από το {name}. Να τον κρατήσεις;",
+    "Φέραμε <b>{n}</b> ήχους από το {name}. Να τους κρατήσεις;"
+  ]
 }

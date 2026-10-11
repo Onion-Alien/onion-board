@@ -3045,5 +3045,13 @@
   "Your sounds and settings are kept.": "소리와 설정은 유지됩니다.",
   "{error}": "{error}",
   "Update mic effect": "마이크 효과 업데이트",
-  "Update to new version": "새 버전으로 업데이트"
+  "Update to new version": "새 버전으로 업데이트",
+  "Keep": "유지",
+  "Keep your imported sounds?": "가져온 사운드를 유지할까요?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "다른 사운드보드에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ]
 }

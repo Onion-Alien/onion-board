@@ -3045,5 +3045,13 @@
   "Your sounds and settings are kept.": "เสียงและการตั้งค่าจะยังอยู่ครบ",
   "{error}": "{error}",
   "Update mic effect": "อัปเดตเอฟเฟกต์ไมค์",
-  "Update to new version": "อัปเดตเป็นเวอร์ชันใหม่"
+  "Update to new version": "อัปเดตเป็นเวอร์ชันใหม่",
+  "Keep": "เก็บไว้",
+  "Keep your imported sounds?": "เก็บเสียงที่นำเข้าไว้ไหม?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "เราย้ายเสียง <b>{n}</b> เสียงมาจากซาวด์บอร์ดอื่นของคุณแล้ว เก็บไว้ไหม?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "เราย้ายเสียง <b>{n}</b> เสียงมาจาก {name} แล้ว เก็บไว้ไหม?"
+  ]
 }

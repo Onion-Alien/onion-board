@@ -3045,5 +3045,13 @@
   "Your sounds and settings are kept.": "サウンドと設定は保持されます。",
   "{error}": "{error}",
   "Update mic effect": "マイクエフェクトを更新",
-  "Update to new version": "新しいバージョンに更新"
+  "Update to new version": "新しいバージョンに更新",
+  "Keep": "残す",
+  "Keep your imported sounds?": "取り込んだサウンドを残しますか？",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "ほかのサウンドボードから <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name} から <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
+  ]
 }

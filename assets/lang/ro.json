@@ -3187,5 +3187,17 @@
   "Your sounds and settings are kept.": "Sunetele și setările tale sunt păstrate.",
   "{error}": "{error}",
   "Update mic effect": "Actualizează efectul",
-  "Update to new version": "Actualizează la versiunea nouă"
+  "Update to new version": "Actualizează la versiunea nouă",
+  "Keep": "Păstrează",
+  "Keep your imported sounds?": "Păstrezi sunetele importate?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Sunete aduse din celelalte soundboarduri ale tale: <b>{n}</b>. Le păstrezi?",
+    "Sunete aduse din celelalte soundboarduri ale tale: <b>{n}</b>. Le păstrezi?",
+    "Sunete aduse din celelalte soundboarduri ale tale: <b>{n}</b>. Le păstrezi?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?",
+    "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?",
+    "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?"
+  ]
 }

@@ -3187,5 +3187,17 @@
   "Your sounds and settings are kept.": "Tvoje zvuky a nastavení zůstanou zachované.",
   "{error}": "{error}",
   "Update mic effect": "Aktualizovat efekt mikrofonu",
-  "Update to new version": "Aktualizovat na novou verzi"
+  "Update to new version": "Aktualizovat na novou verzi",
+  "Keep": "Ponechat",
+  "Keep your imported sounds?": "Ponechat importované zvuky?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?"
+  ]
 }

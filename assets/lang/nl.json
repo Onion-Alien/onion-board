@@ -3116,5 +3116,15 @@
   "Your sounds and settings are kept.": "Je geluiden en instellingen blijven bewaard.",
   "{error}": "{error}",
   "Update mic effect": "Microfooneffect bijwerken",
-  "Update to new version": "Bijwerken naar nieuwe versie"
+  "Update to new version": "Bijwerken naar nieuwe versie",
+  "Keep": "Houden",
+  "Keep your imported sounds?": "Geïmporteerde geluiden houden?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "We hebben <b>{n}</b> geluid uit je andere soundboards overgezet. Houden?",
+    "We hebben <b>{n}</b> geluiden uit je andere soundboards overgezet. Houden?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "We hebben <b>{n}</b> geluid uit {name} overgezet. Houden?",
+    "We hebben <b>{n}</b> geluiden uit {name} overgezet. Houden?"
+  ]
 }

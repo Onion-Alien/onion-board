@@ -3116,5 +3116,15 @@
   "Your sounds and settings are kept.": "Dina ljud och inställningar behålls.",
   "{error}": "{error}",
   "Update mic effect": "Uppdatera mikrofoneffekt",
-  "Update to new version": "Uppdatera till ny version"
+  "Update to new version": "Uppdatera till ny version",
+  "Keep": "Behåll",
+  "Keep your imported sounds?": "Behålla de importerade ljuden?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Vi hämtade <b>{n}</b> ljud från dina andra soundboards. Vill du behålla det?",
+    "Vi hämtade <b>{n}</b> ljud från dina andra soundboards. Vill du behålla dem?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla det?",
+    "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla dem?"
+  ]
 }

@@ -3045,5 +3045,13 @@
   "Your sounds and settings are kept.": "Bunyi dan tetapan anda dikekalkan.",
   "{error}": "{error}",
   "Update mic effect": "Kemas kini kesan mikrofon",
-  "Update to new version": "Kemas kini ke versi baharu"
+  "Update to new version": "Kemas kini ke versi baharu",
+  "Keep": "Simpan",
+  "Keep your imported sounds?": "Simpan bunyi yang diimport?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Kami bawa <b>{n}</b> bunyi dari soundboard anda yang lain. Simpan?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Kami bawa <b>{n}</b> bunyi dari {name}. Simpan?"
+  ]
 }

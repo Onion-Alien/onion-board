@@ -3116,5 +3116,15 @@
   "Your sounds and settings are kept.": "आपकी आवाज़ें और सेटिंग सुरक्षित रहेंगी।",
   "{error}": "{error}",
   "Update mic effect": "माइक इफ़ेक्ट अपडेट करें",
-  "Update to new version": "नए संस्करण में अपडेट करें"
+  "Update to new version": "नए संस्करण में अपडेट करें",
+  "Keep": "रखें",
+  "Keep your imported sounds?": "आयात की गई आवाज़ें रखें?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "हमने आपके दूसरे साउंडबोर्ड से <b>{n}</b> आवाज़ लाई है। इसे रखें?",
+    "हमने आपके दूसरे साउंडबोर्ड से <b>{n}</b> आवाज़ें लाई हैं। इन्हें रखें?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "हमने {name} से <b>{n}</b> आवाज़ लाई है। इसे रखें?",
+    "हमने {name} से <b>{n}</b> आवाज़ें लाई हैं। इन्हें रखें?"
+  ]
 }

@@ -3116,5 +3116,15 @@
   "Your sounds and settings are kept.": "Äänesi ja asetuksesi säilyvät.",
   "{error}": "{error}",
   "Update mic effect": "Päivitä mikrofonitehoste",
-  "Update to new version": "Päivitä uuteen versioon"
+  "Update to new version": "Päivitä uuteen versioon",
+  "Keep": "Säilytä",
+  "Keep your imported sounds?": "Säilytetäänkö tuodut äänet?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Toimme <b>{n}</b> äänen muista soundboardeistasi. Säilytetäänkö se?",
+    "Toimme <b>{n}</b> ääntä muista soundboardeistasi. Säilytetäänkö ne?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Toimme <b>{n}</b> äänen sovelluksesta {name}. Säilytetäänkö se?",
+    "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
+  ]
 }
