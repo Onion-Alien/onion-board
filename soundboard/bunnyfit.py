@@ -55,7 +55,9 @@ HATS = {"beanie", "pom_beanie", "wizard", "sailor", "beret", "crown", "onion", "
         "bandana", "eyeshade", "bucket", "party", "propeller", "blossom", "leaves",
         "headband", "bow"}
 
-GOLD, GOLD_DARK = QColor("#ffcf40"), QColor("#d99a1e")
+NECK = {"bowtie", "scarf", "lei", "strings"}   # face-layer pieces that sit round his neck
+
+GOLD, GOLD_DARK =QColor("#ffcf40"), QColor("#d99a1e")
 WHITE = QColor("#ffffff")
 DARK = QColor("#1c1a26")
 
@@ -581,14 +583,16 @@ PIECES = {
 
 
 def draw(p: QPainter, pieces: tuple[str, ...], layer: str, ink: QPen,
-         hats: bool = True, shut: bool = False) -> None:
+         hats: bool = True, shut: bool = False, neck: bool | None = None) -> None:
     """Paint the `layer` part of `pieces` (bunny.py calls this between its own layers).
     `hats=False` leaves out anything on his head (his nightcap is on); `shut`: his eyes
-    are closed, so no laser eyes."""
+    are closed, so no laser eyes. `neck` True / False paints only the pieces round his
+    neck / only the rest (ui/owl.py places the two apart on Hoot)."""
     for name in pieces:
         where, fn = PIECES.get(name, ("", None))
         if (where == layer and fn and (hats or name not in HATS)
-                and not (shut and name == "laser")):
+                and not (shut and name == "laser")
+                and (neck is None or neck == (name in NECK))):
             p.save()
             fn(p, ink)
             p.restore()

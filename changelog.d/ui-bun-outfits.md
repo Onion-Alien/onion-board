@@ -1,1 +1,1 @@
-- Bun the bunny dresses up for each theme: a crown in Royal, a cape and fangs in Vampire, laser eyes in Deep Fried, an onion hat in Onion, and more.
+﻿- Bun the bunny and Hoot the owl dress up for each theme: a crown in Royal, a cape and fangs in Vampire, laser eyes in Deep Fried, an onion hat in Onion, and more.

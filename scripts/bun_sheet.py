@@ -2,6 +2,8 @@
 
     .venv\\Scripts\\python scripts\\bun_sheet.py outfits   # every theme's outfit
     .venv\\Scripts\\python scripts\\bun_sheet.py poses     # outfits x every pose
+    .venv\\Scripts\\python scripts\\bun_sheet.py owls      # Hoot (Triggers tab) per theme
+    .venv\\Scripts\\python scripts\\bun_sheet.py owl       # Hoot posed, a few outfits
     .venv\\Scripts\\python scripts\\bun_sheet.py live      # the real animated widgets,
                                                          # frozen at moments of each act
 
@@ -77,7 +79,29 @@ def grid(rows: list[tuple[str, list[tuple[str, QPixmap | None]]]], cw: int, ch: 
     return img
 
 
-def outfits(_themes) -> QImage:
+OWL_POSES = [
+    ("idle", {}), ("look", {"look": 1.0, "look_y": 0.6}), ("blink", {"blink": 1.0}),
+    ("sad", {"sad": 1.0, "tufts": 20}), ("plead", {"plead": 1.0, "clasp": 1.0}),
+    ("tear", {"tear": 0.4, "sad": 0.6}), ("joy", {"flap": 1.0, "tufts": -12}),
+]
+
+
+def owl(themes) -> QImage:
+    """Hoot (the Triggers tab's owl) in every theme's outfit, then a few posed."""
+    from soundboard.ui.owl import draw_owl
+
+    def draw(p, rect, j):
+        draw_owl(p, rect, **OWL_POSES[j][1])
+    rows = [(n, [(label, None) for label, _ in OWL_POSES]) for n in themes]
+    return grid(rows, 120, 150, draw)
+
+
+def owls(_themes) -> QImage:
+    from soundboard.ui.owl import draw_owl
+    return outfits(_themes, lambda p, rect: draw_owl(p, rect))
+
+
+def outfits(_themes, draw=None) -> QImage:
     cols = 6
     names = list(theme.THEMES)
     rows = [names[i:i + cols] for i in range(0, len(names), cols)]
@@ -91,7 +115,8 @@ def outfits(_themes) -> QImage:
         use_theme(name)
         x, y = (i % cols) * cw, (i // cols) * ch
         p.fillRect(x + 1, y + 1, cw - 2, ch - 2, QColor(theme.T["bg"]))
-        bunny.draw_bunny(p, QRectF(x + 20, y + 14, cw - 40, ch - 54), None)
+        rect = QRectF(x + 20, y + 14, cw - 40, ch - 54)
+        (draw or (lambda q, r: bunny.draw_bunny(q, r, None)))(p, rect)
         p.setPen(QColor(theme.T["text_hi"]))
         p.drawText(QRectF(x, y + ch - 36, cw, 24), Qt.AlignmentFlag.AlignCenter, name)
     p.end()
@@ -180,7 +205,7 @@ def live(themes) -> QImage:
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("sheet", choices=("outfits", "poses", "live"))
+    ap.add_argument("sheet", choices=("outfits", "poses", "live", "owls", "owl"))
     ap.add_argument("--themes", default=",".join(MIX))
     ap.add_argument("--out", default=os.path.join(tempfile.gettempdir(), "bun-sheets"))
     a = ap.parse_args()
@@ -188,7 +213,8 @@ def main():
     themes = [t.strip() for t in a.themes.split(",") if t.strip() in theme.THEMES]
     os.makedirs(a.out, exist_ok=True)
     path = os.path.join(a.out, f"{a.sheet}.png")
-    {"outfits": outfits, "poses": poses, "live": live}[a.sheet](themes).save(path)
+    sheets = {"outfits": outfits, "poses": poses, "live": live, "owls": owls, "owl": owl}
+    sheets[a.sheet](themes).save(path)
     print(path)
 
 

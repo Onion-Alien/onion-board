@@ -41,6 +41,26 @@ def test_nightcap_replaces_his_hat(qapp):
     assert _draw(nightcap=True, outfit=("shades",)) != capped   # glasses stay on
 
 
+def test_hoot_wears_the_theme_outfit_but_not_in_artwork(qapp, monkeypatch):
+    from soundboard.ui import owl
+
+    def hoot(**kw):
+        img = QImage(100, 120, QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(Qt.GlobalColor.transparent)
+        p = QPainter(img)
+        owl.draw_owl(p, QRectF(0, 0, 100, 120), **kw)
+        p.end()
+        return img
+
+    monkeypatch.setattr(theme, "current_name", "Royal")
+    assert hoot() == hoot(outfit=("crown",)) != hoot(outfit=())
+    for piece in bunnyfit.PIECES:          # every piece lands somewhere on him
+        assert hoot(outfit=(piece,)) != hoot(outfit=()), piece
+    plain = owl.owl_image(120)             # the artwork: his own teal, no outfit
+    monkeypatch.setattr(theme, "current_name", "Dark")
+    assert owl.owl_image(120) == plain
+
+
 def test_laser_eyes_stop_when_his_eyes_shut(qapp):
     assert _draw(blink=1.0, outfit=("laser",)) == _draw(blink=1.0, outfit=())
     assert _draw(outfit=("laser",)) != _draw(outfit=())

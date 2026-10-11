@@ -64,6 +64,16 @@ To add an outfit: draw the piece as a function in `bunnyfit.py` on the 100 x 120
 it sits on his head), list it under the theme in `OUTFITS`, then check the sheets.
 `tests/test_bunnyfit.py` checks every listed piece exists and draws.
 
+### Hoot wears them too
+
+Hoot the owl (`soundboard/ui/owl.py`, the Triggers tab before Onion Watch is installed)
+wears the same theme outfit. He has no pieces of his own: `owl._fit` moves Bun's pieces
+onto his shape (head 12 higher, eyes 28 apart and scaled 1.3, neck pieces just under his
+beak) and `draw_owl` calls it at the same four layers. `owl_image` (dialog artwork, his own
+teal) stays plain. A new piece drawn for Bun shows up on Hoot too: check it with
+`bun_sheet.py owls` and `bun_sheet.py owl`. Onion Watch's own copy of the owl
+(`onionwatch/owl.py` in that project) has no outfits.
+
 **Anything that caches a picture of Bun must key it on `theme.current_name`** (his
 outfit), not only the accent colour: see `ScribeBunny._layer`.
 
@@ -73,6 +83,8 @@ outfit), not only the accent colour: see `ScribeBunny._layer`.
 .venv\Scripts\python scripts\bun_sheet.py outfits   # every theme's outfit
 .venv\Scripts\python scripts\bun_sheet.py poses     # outfits x every pose
 .venv\Scripts\python scripts\bun_sheet.py live      # the real widgets, frame by frame
+.venv\Scripts\python scripts\bun_sheet.py owls      # Hoot in every theme's outfit
+.venv\Scripts\python scripts\bun_sheet.py owl       # Hoot's poses in a few outfits
 ```
 
 `live` swaps `time.monotonic` for a fake clock and steps each widget's own timer
