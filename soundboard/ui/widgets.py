@@ -160,10 +160,15 @@ class SeekSlider(QSlider):
         # at 0:00 Qt still paints a sliver of fill beside the handle (it looked a few
         # seconds in): the theme hides the fill while "atstart" is set
         self.setProperty("atstart", True)
-        self.valueChanged.connect(self._mark_start)
 
-    def _mark_start(self, v):
-        at = v <= self.minimum()
+    def sliderChange(self, change):
+        super().sliderChange(change)
+        if change not in (QSlider.SliderChange.SliderValueChange,
+                          QSlider.SliderChange.SliderRangeChange):
+            return
+        # Playback blocks signals to avoid seeking on each tick. This virtual
+        # callback still runs, so the fill follows both playback and user input.
+        at = self.value() <= self.minimum()
         if self.property("atstart") != at:   # restyle only when it flips, not every tick
             self.setProperty("atstart", at)
             self.style().unpolish(self)

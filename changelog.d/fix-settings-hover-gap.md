@@ -1,0 +1,1 @@
+- Leave room between the Settings back arrow's hover highlight and its heading.

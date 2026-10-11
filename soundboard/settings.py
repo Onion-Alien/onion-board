@@ -513,14 +513,14 @@ class SettingsDialog(QDialog):
         self.page_title = QLabel(_("Settings"))
         self.page_title.setObjectName("section")
         self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
-        # the arrow over the categories' icons, the name over their names (an
-        # item: 4 px padding, a 20 px icon, then its text 36 px in)
+        # Keep the arrow over the category icons, with room between its hover
+        # background and the heading.
         back.setFixedWidth(36)
         # its icon on the icons' centre line and level with the heading's letters
         # (2 px lower than centred); the same 14 px of padding: the controls' height
         back.setStyleSheet("padding:9px 0px 5px 3px")
         top = QHBoxLayout()
-        top.setSpacing(0)
+        top.setSpacing(8)
         top.addWidget(back)
         top.addWidget(self.page_title, 1)
         side.addLayout(top)
