@@ -986,8 +986,54 @@ begin
       mbInformation, MB_OK, IDOK);
 end;
 
+// An update clears {app}\_internal first ([InstallDelete]). If a program (antivirus, a
+// leftover Onion Board or python process) holds a file in there open, that delete stops
+// halfway and leaves a broken install ("Failed to load Python DLL"). So before anything
+// is deleted, check the folder can be renamed: Windows refuses that while a file inside
+// is open. Not in PrepareToInstall: that runs before CloseApplications has closed a
+// running Onion Board, which would wrongly fail a normal update.
+procedure CheckInternalNotInUse;
+var
+  Dir, Probe: String;
+  Attempt: Integer;
+  Moved: Boolean;
+begin
+  Dir := ExpandConstant('{app}\_internal');
+  Probe := ExpandConstant('{app}\_internal.chk');
+  if not DirExists(Dir) then
+    exit;
+  Moved := False;
+  // a scanner often lets go within a second or two, so try for ~10 s
+  for Attempt := 1 to 20 do
+  begin
+    if RenameFile(Dir, Probe) then
+    begin
+      Moved := True;
+      break;
+    end;
+    Sleep(500);
+  end;
+  if not Moved then
+  begin
+    Log('A file in ' + Dir + ' is in use; stopping before anything is deleted');
+    RaiseException('Onion Board can''t be updated right now: a file in its folder is in ' +
+      'use by another program (antivirus, or Onion Board still running). Nothing was ' +
+      'changed and your current Onion Board still works. Close it (and pause your ' +
+      'antivirus for a moment), then run this installer again.');
+  end;
+  if not RenameFile(Probe, Dir) then
+  begin
+    // never leave the folder under the wrong name
+    Sleep(1000);
+    if not RenameFile(Probe, Dir) then
+      Log('Could not rename ' + Probe + ' back to ' + Dir);
+  end;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssInstall then
+    CheckInternalNotInUse;
   if CurStep = ssPostInstall then
     QueueImports;
   if (CurStep = ssPostInstall) and MayDownload('vbcable') then
