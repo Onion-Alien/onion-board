@@ -225,6 +225,26 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
         rail.show_status(w)
 
 
+class _Dot(QWidget):
+    """A small warning dot, over the corner of an icon (it never takes clicks)."""
+
+    SIZE = 8
+
+    def __init__(self, parent: QWidget):
+        super().__init__(parent)
+        self.setFixedSize(self.SIZE, self.SIZE)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.hide()
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(theme.T["warn_text"]))
+        p.drawEllipse(QRectF(self.rect()))
+        p.end()
+
+
 class OutputBlock(QFrame):
     """Named output switch and connection help for the expanded rail.
 
@@ -262,6 +282,10 @@ class OutputBlock(QFrame):
         top.setSpacing(0)   # icon GAP words, 8 to the switch right after them
         mark = self.mark = self._glyph()
         self._scale = 1.0
+        # the small card (the warning line hidden): a dot on the On Air icon says
+        # sending isn't set up, and the icon is the way to Setup
+        self.dot = _Dot(self)
+        mark.installEventFilter(self)
         self.title = _HugLabel("", widest=self.names())
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
@@ -461,6 +485,27 @@ class OutputBlock(QFrame):
             self.mark.setContentsMargins(0, 0, 0, 0)
             self.mark.setFixedHeight(self.GLYPH)
 
+    def _place_dot(self):
+        """On the icon's top corner (the far one from the words' side)."""
+        if not self.dot.isVisible():
+            return
+        g = self.mark.geometry()
+        top = g.top() + self.mark.contentsMargins().top()
+        size = self.GLYPH
+        x = g.center().x() + (-size // 2 - 3 if self.isRightToLeft() else size // 2 - 5)
+        self.dot.move(round(x), top - 4)
+        self.dot.raise_()
+
+    def eventFilter(self, obj: QObject, e: QEvent) -> bool:
+        if obj is self.mark:
+            if e.type() in (QEvent.Type.Move, QEvent.Type.Resize):
+                self._place_dot()
+            elif (e.type() == QEvent.Type.MouseButtonRelease and self.dot.isVisible()
+                  and e.button() == Qt.MouseButton.LeftButton):
+                self.connection.click()   # (Setup)
+                return True
+        return False
+
     @staticmethod
     def names() -> tuple[str, str]:
         return _("On Air"), _("Off Air")
@@ -487,6 +532,12 @@ class OutputBlock(QFrame):
         self.setup.setAccessibleName(self.status_text.text() if good else _("Set up output"))
         self.setup.setAccessibleDescription(self.connection.property("railfull") or "")
         self.arrow.setVisible(not good)
+        small = not self.property("expanded")
+        self.dot.setVisible(small and not good)
+        self.mark.setCursor(Qt.CursorShape.PointingHandCursor if small and not good
+                            else Qt.CursorShape.ArrowCursor)
+        self.mark.setToolTip(self.connection.toolTip() if small and not good else "")
+        self._place_dot()
         self.setup.style().unpolish(self.setup)
         self.setup.style().polish(self.setup)
         theme.set_tone(self.status_text, "ok" if good else "warn")
@@ -794,6 +845,9 @@ class SideRail(QFrame):
         waiting = [w for w in self.alerts if not w.isHidden()]
         self.div_alerts.setVisible(bool(waiting))
         # shut, the alerts are out of sight: a dot on the arrow, their names on hover
+        # (not the setup one: its dot is on the On Air icon, which leads to Setup)
+        if self.output:
+            waiting = [w for w in waiting if w is not self.output.connection]
         dot = bool(waiting) and (not self.is_open() or self._mid())
         if self.toggle.property("dot") != dot:
             self.toggle.setProperty("dot", dot)
@@ -963,12 +1017,12 @@ class SideRail(QFrame):
         return self._target_width() - 2 * SIDE_OPEN - 1 - BUTTON_W - 6 >= self._brand_width()
 
     def _full_fit(self) -> int:
-        """The narrowest open rail where the full layout fits: the output card with
-        every line on one line, as small as it scales (a longer translation needs
-        more room)."""
+        """The narrowest open rail where the full layout fits (from 80% open): the
+        name on one line, the output card with every line on one line, as small as it
+        scales (a longer translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
-        # (the name doesn't count: short of room it takes two lines, mid or full)
-        need = [FULL_W, SHUT_W + round(0.8 * (OPEN_W - SHUT_W))]   # (from 80% open)
+        need = [FULL_W, SHUT_W + round(0.8 * (OPEN_W - SHUT_W)),   # (from 80% open)
+                side + BUTTON_W + 6 + self._brand_width()]   # the name on one line
         if self.output:
             # the card with every line on one line, scaled down as far as it goes
             # (never wrapped: the small card until then)
@@ -1124,7 +1178,7 @@ class SideRail(QFrame):
         self._lay.invalidate()
         mid = self._mid()
         self.brand.setVisible(shown)
-        fits = self._brand_fits()
+        fits = not mid or self._brand_fits()   # (full: as it always was)
         self.byline.setVisible(shown and fits)
         if self.property("twolinebrand") != (not fits):   # two lines: a size smaller
             self.setProperty("twolinebrand", not fits)
