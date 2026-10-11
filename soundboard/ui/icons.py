@@ -295,6 +295,14 @@ def _info(p, fill):
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
 
 
+def _more(p, fill):
+    """More actions (a card's rare ones): three dots in a row."""
+    dots = QPainterPath()
+    for x in (5, 12, 19):
+        dots.addEllipse(QPointF(x, 12), 1.9, 1.9)
+    fill(dots)
+
+
 def _alert(p, fill):
     """An error: a circle with an exclamation mark."""
     p.drawEllipse(QRectF(3, 3, 18, 18))
@@ -684,7 +692,7 @@ SHAPES = {
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
-    "shield": _shield, "info": _info, "alert": _alert, "onion": _onion,
+    "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
