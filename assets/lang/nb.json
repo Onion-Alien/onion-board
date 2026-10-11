@@ -2124,7 +2124,6 @@
   "That isn't a Myinstants sound link.": "Det er ikke en Myinstants-lydlenke.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Det er ikke en proxy-adresse: den skal se ut som socks5h://127.0.0.1:9050 eller http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Det er ikke en stemmekode (de starter med \"OB1-\").",
-  "That link isn't from a site sounds can be added from.": "Den lenken er ikke fra et nettsted lyder kan legges til fra.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Den mikrofonen er ikke koblet til (eller Windows viser den ikke).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Det må logges på nettstedet, noe Onion Board ikke gjør.",
   "That program isn't running any more.": "Det programmet kjører ikke lenger.",
@@ -2943,7 +2942,6 @@
   "Mic on": "Mikrofon på",
   "Output": "Utgang",
   "Mic muted": "Mikrofon dempet",
-  "Mute or unmute your microphone for others": "Demp eller slå på mikrofonen din for andre",
   "Library": "Bibliotek",
   "Quick hotkeys": "Hurtigtaster",
   "{route}: {status}": "{route}: {status}",
@@ -3149,5 +3147,8 @@
   "Virtual cable": "Virtuell kabel",
   "Working": "Virker",
   "Working: your sounds go into your mic": "Virker: lydene dine går inn i mikrofonen",
-  "Your mic needs a quick repair": "Mikrofonen din trenger en rask reparasjon"
+  "Your mic needs a quick repair": "Mikrofonen din trenger en rask reparasjon",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Demp eller slå på mikrofonen din for andre. Lydene dine spilles fortsatt for dem.",
+  "That page has no sound Onion Board can add.": "Den siden har ingen lyd Onion Board kan legge til.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Fjernede lyder kommer tilbake med Angre, eller senere fra Sikkerhetskopi → Nylig slettede lyder."
 }

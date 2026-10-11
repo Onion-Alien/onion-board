@@ -2171,7 +2171,6 @@
   "That isn't a Myinstants sound link.": "To není zvukový odkaz Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "To není proxy adresa: měla by vypadat jako socks5h://127.0.0.1:9050 nebo http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "To není hlasový kód (začínají „OB1-“).",
-  "That link isn't from a site sounds can be added from.": "Tento odkaz není z webu, ze kterého lze zvuky přidat.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Tento mikrofon není zapojen (nebo jej systém Windows neuvádí).",
   "That needs signing in to the site, which Onion Board doesn't do.": "To vyžaduje přihlášení k webu, což Onion Board nedělá.",
   "That program isn't running any more.": "Ten program už neběží.",
@@ -3006,7 +3005,6 @@
   "Mic on": "Mikrofon zapnut",
   "Output": "Výstup",
   "Mic muted": "Mikrofon ztlumen",
-  "Mute or unmute your microphone for others": "Ztlum nebo zapni mikrofon pro ostatní",
   "Library": "Knihovna",
   "Quick hotkeys": "Rychlé zkratky",
   "{route}: {status}": "{route}: {status}",
@@ -3222,5 +3220,8 @@
   "Virtual cable": "Virtuální kabel",
   "Working": "Funguje",
   "Working: your sounds go into your mic": "Funguje: tvoje zvuky jdou do mikrofonu",
-  "Your mic needs a quick repair": "Tvůj mikrofon potřebuje rychlou opravu"
+  "Your mic needs a quick repair": "Tvůj mikrofon potřebuje rychlou opravu",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Ztlum nebo zapni mikrofon pro ostatní. Tvoje zvuky jim hrají dál.",
+  "That page has no sound Onion Board can add.": "Na té stránce není žádný zvuk, který by Onion Board mohl přidat.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Odebrané zvuky vrátíš přes Zpět, nebo později přes Záloha → Nedávno smazané zvuky."
 }

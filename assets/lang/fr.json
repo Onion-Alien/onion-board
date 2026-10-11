@@ -2127,7 +2127,6 @@
   "That isn't a Myinstants sound link.": "Ce n'est pas un lien sonore Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Ce n'est pas une adresse proxy : elle devrait ressembler à chaussettes5h://127.0.0.1:9050 ou http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Ce n'est pas un code vocal (ils commencent par « OB1- »).",
-  "That link isn't from a site sounds can be added from.": "Ce lien ne provient pas d'un site à partir duquel les sons peuvent être ajoutés.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ce micro n'est pas branché (ou Windows ne le répertorie pas).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Cela nécessite de se connecter au site, ce que Onion Board ne fait pas.",
   "That program isn't running any more.": "Ce programme ne fonctionne plus.",
@@ -2943,7 +2942,6 @@
   "Mic on": "Micro actif",
   "Output": "Sortie",
   "Mic muted": "Micro coupé",
-  "Mute or unmute your microphone for others": "Coupe ou active ton micro pour les autres",
   "Library": "Bibliothèque",
   "Quick hotkeys": "Raccourcis rapides",
   "{route}: {status}": "{route} : {status}",
@@ -3149,5 +3147,8 @@
   "Virtual cable": "Câble virtuel",
   "Working": "Fonctionne",
   "Working: your sounds go into your mic": "Ça marche : tes sons vont dans ton micro",
-  "Your mic needs a quick repair": "Ton micro a besoin d'une petite réparation"
+  "Your mic needs a quick repair": "Ton micro a besoin d'une petite réparation",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Coupe ou active ton micro pour les autres. Tes sons continuent de leur parvenir.",
+  "That page has no sound Onion Board can add.": "Cette page n'a aucun son qu'Onion Board peut ajouter.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Les sons retirés reviennent avec Annuler, ou plus tard depuis Sauvegarde → Sons supprimés récemment."
 }

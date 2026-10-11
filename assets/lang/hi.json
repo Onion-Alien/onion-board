@@ -2127,7 +2127,6 @@
   "That isn't a Myinstants sound link.": "वह Myinstants ध्वनि लिंक नहीं है।",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "यह कोई प्रॉक्सी पता नहीं है: इसे socks5h://127.0.0.1:9050 या http://host:8080 जैसा दिखना चाहिए",
   "That isn't a voice code (they start with “OB1-”).": "वह ध्वनि कोड नहीं है (वे \"OB1-\" से शुरू होते हैं)।",
-  "That link isn't from a site sounds can be added from.": "वह लिंक किसी साइट से नहीं है, जिससे ध्वनियां जोड़ी जा सकती हैं।",
   "That mic isn't plugged in (or Windows doesn't list it).": "वह माइक प्लग इन नहीं है (या विंडोज़ उसे सूचीबद्ध नहीं करता है)।",
   "That needs signing in to the site, which Onion Board doesn't do.": "इसके लिए साइट पर साइन इन करना आवश्यक है, जो कि ओनियन बोर्ड नहीं करता है।",
   "That program isn't running any more.": "वह प्रोग्राम अब नहीं चल रहा है.",
@@ -2943,7 +2942,6 @@
   "Mic on": "माइक चालू है",
   "Output": "आउटपुट",
   "Mic muted": "माइक म्यूट है",
-  "Mute or unmute your microphone for others": "दूसरों के लिए अपना माइक्रोफ़ोन म्यूट या अनम्यूट करें",
   "Library": "लाइब्रेरी",
   "Quick hotkeys": "त्वरित हॉटकी",
   "{route}: {status}": "{route}: {status}",
@@ -3149,5 +3147,8 @@
   "Virtual cable": "वर्चुअल केबल",
   "Working": "काम कर रहा है",
   "Working: your sounds go into your mic": "काम कर रहा है: आपकी आवाज़ें आपके माइक में जाती हैं",
-  "Your mic needs a quick repair": "आपके माइक को जल्दी ठीक करना है"
+  "Your mic needs a quick repair": "आपके माइक को जल्दी ठीक करना है",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "दूसरों के लिए अपना माइक म्यूट या अनम्यूट करें। आपके साउंड उन्हें सुनाई देते रहेंगे।",
+  "That page has no sound Onion Board can add.": "उस पेज पर कोई साउंड नहीं है जिसे Onion Board जोड़ सके।",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "हटाए गए साउंड अनडू से, या बाद में बैकअप → हाल में डिलीट किए गए साउंड से वापस आ जाते हैं।"
 }
