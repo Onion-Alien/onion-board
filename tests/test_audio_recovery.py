@@ -140,30 +140,49 @@ def test_clean_reinstall_uses_one_admin_prompt(monkeypatch, tmp_path):
     assert calls == [['reinstall', 'guid']]
 
 
-def test_update_action_and_compact_secondary_buttons(window, qapp, monkeypatch):  # noqa: F811
-    monkeypatch.setattr(dm, 'status', lambda mic=None: 'outdated')
+@pytest.mark.parametrize('state,pill,fix', [
+    ('ready', 'Ready', None),
+    ('outdated', 'Update available', 'Update mic effect'),
+    ('wiped', 'Off', 'Repair mic effect'),  # Windows took it off: the fix must be on show
+    ('other', 'Off', 'Repair mic effect'),
+    ('missing', 'Off', None),
+])
+def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, pill, fix):  # noqa: F811
+    monkeypatch.setattr(dm, 'status', lambda mic=None: state)
     window.resize(1180, 720)
     window.show()
     d = window.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
-    card._checked('outdated')
+    card._checked(state)
     for _i in range(5):
         qapp.processEvents()
-    assert card.repair.text() == 'Update to new version'
-    assert all(b.isVisibleTo(card) for b in card.actions.values())
-    assert card.repair.height() > card.actions['reinstall'].height()
-    assert card.repair.height() > card.actions['remove'].height()
-    assert card.repair.property('recoveryUpdate')
-    assert card.repair.graphicsEffect() is not None
-    centers = [b.geometry().center().y() for b in card.actions.values()]
-    assert max(centers) - min(centers) <= 1
-    card.repair.click()
-    assert card.dialog.windowTitle() == 'Update mic effect'
-    buttons = card.dialog.findChildren(QPushButton)
-    assert len({(b.width(), b.height()) for b in buttons}) == 1
-    card.dialog.reject()
+    assert card.pill.isVisibleTo(card) and card.pill.text() == pill
+    assert card.fix.isVisibleTo(card) == (fix is not None)
+    if fix:
+        assert card.fix.text() == fix and card.fix.graphicsEffect() is None
+    # the rare actions live behind the ⋯ menu, never as a row of small buttons
+    assert card.more.toolTip() and card.more.accessibleName()
+    assert [a.text() for a in card.menu.actions() if not a.isSeparator()] == [
+        'Repair mic effect', 'Clean reinstall', 'Remove mic effect']
+    assert card.menu_actions['remove'].isEnabled() == (state != 'missing')
+    assert not [b for b in card.findChildren(QPushButton) if b.objectName() == 'small']
+    d.close()
+
+
+def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(dm, 'status', lambda mic=None: 'outdated')
+    d = SettingsDialog(window, 'audio')
+    d.show()
+    card = d.findChild(RecoveryCard)
+    card._checked('outdated')
+    card.fix.click()
+    dialog = card.dialog
+    assert dialog.windowTitle() == 'Update mic effect' and dialog.isModal()
+    go, cancel = [b for b in dialog.findChildren(QPushButton)]
+    assert go.text() == 'Update mic effect' and go.isDefault() and cancel.text() == 'Cancel'
+    # buttons as wide as their words (German is 30% longer): no fixed sizes
+    assert go.minimumWidth() == 0 and go.maximumWidth() > 10000
+    dialog.reject()
     card._checked('ready')
-    assert not card.repair.isVisibleTo(card)
-    assert card.actions['reinstall'].isVisibleTo(card)
-    assert card.actions['remove'].isVisibleTo(card)
+    assert not card.fix.isVisibleTo(card)
     d.close()
