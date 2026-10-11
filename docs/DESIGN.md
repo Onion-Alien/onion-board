@@ -5,15 +5,22 @@
 name: Onion Board
 version: 3
 platform: PySide6 (Qt Widgets), styled by one app style sheet (theme.stylesheet)
-font:
+font:                 # THE type scale: these 7 sizes only (see "Standard kit")
   family: "Segoe UI (a theme may swap it with its `font` token)"
-  base: 10pt          # everything, unless a role below says otherwise
-  hint: 8.5pt         # QLabel#hint: explanations under a heading
-  small: 8pt          # QPushButton#small, badges
-  section: 10pt bold  # QLabel#section: card and group headings
-  title: 1.3x base, bold   # a dialog's one big question ("What would you improve?")
-  wordmark: 13pt bold
+  caption: 8pt          # QPushButton#small, badges, counts on chips
+  hint: 8.5pt           # QLabel#hint: explanations, secondary lines
+  body: 10pt            # everything, unless a role here says otherwise
+  section: 10pt 600     # QLabel#section: card and group headings
+  large: 11pt 600-700   # tile / pack / tab-card names; body text of full-page guides
+  title: 13pt 700       # a dialog's one question, #helptitle, the wordmark
+  display: 17pt 800     # a full-page guide's step title (setupwizard TITLE_CSS)
+  number: 28pt 600      # one big live number (the recording timer)
   digits: same-width (tabular); live numbers via panel.steady_number()
+button:               # THE button kinds and sizes (see "Standard kit")
+  kinds: default, primary, quiet, danger, danger+quiet, small, iconbutton
+  text_button: padding 7px 12px, 10pt, about 32px tall, as wide as its words
+  small_button: "#small: padding 2px 8px, 8pt, about 22px tall; dense rows only"
+  icon_button: 28px square, 18px glyph (24px + 16px glyph in dense rows, 36px in bars)
 colour_roles:          # token names in theme.THEMES; values change per theme
   background: bg
   surface: panel        # cards (QFrame#card, #setcard), bars
@@ -39,7 +46,7 @@ spacing:               # multiples of 4 (Fluent's 4px ramp)
 size:
   dialog_max_width: 620px
   dropdown_max_width: 360px
-  icon_button: 28-32px square
+  icon_button: 28px square (24 dense rows, 36 = CONTROL_H in bars); nothing else
   control_height: 36px  # panel.CONTROL_H: toolbar buttons, search box, play/stop
   bar_height: 48px      # panel.BAR_H: the Sounds toolbar and every bottom bar
   interface_size: 80-150%  # Settings > Appearance; Qt scales it all, so sizes stay in px
@@ -57,6 +64,173 @@ in passing unless the task is about them.
 The style is **quiet and compact**: flat surfaces in the theme's colours, no resting
 outlines, controls only as big as their words, one accent-coloured thing that says
 "do this" or "this is on". The app should look designed, not generated.
+
+## Standard kit: text sizes, buttons, pop-ups (read this first)
+
+These are the only sizes and parts new UI may use. Pick from these lists; never
+invent an in-between size ("10.5pt looks nicer here") or a one-off look for one
+screen. If something truly can't be built from the kit, add the new part to
+`theme.py` **and to this section** in the same PR, so the next screen reuses it.
+
+Older code still has off-scale sizes (7pt, 9pt, 9.5pt, 10.5pt, 12pt, 15pt, 19pt and
+22-36 px icon buttons in between). They are debt tracked as U16 in
+[UI-AUDIT.md](UI-AUDIT.md): never copy a size from old code, copy it from here.
+
+### Text sizes
+
+| Role | Size | How to get it | Use for |
+| --- | --- | --- | --- |
+| Caption | 8pt | `QPushButton#small`, a badge | small buttons, counts, badges |
+| Hint | 8.5pt, `muted` | `panel.hint_label(text)` (`QLabel#hint`) | the line under a heading, secondary lines, empty-state help |
+| Body | 10pt | nothing: the default | everything else |
+| Section | 10pt, weight 600 | `panel.section_label(text)` (`QLabel#section`) | card and group headings |
+| Large | 11pt, weight 600-700 | the tile's object name (`#tabcardtitle`) | a tile's or pack's name; body text of a full-page guide |
+| Title | 13pt, weight 700 | `QLabel#helptitle` | a dialog's one question; at most one per dialog page |
+| Display | 17pt, weight 800 | `setupwizard.TITLE_CSS` | the step title of a full-page guide (setup, reset, chat guide) only |
+| Number | 28pt, weight 600 | the recording timer's style | one big live number per screen, with `steady_number()` |
+
+- Hierarchy comes from **weight and colour first, size second**: a heading is body
+  size in weight 600, a secondary line is `muted`. Most screens need only hint, body
+  and section.
+- Set sizes in `theme.py`'s style sheet by object name. **No `font-size` in widget
+  code** and no `setPointSizeF(…)` with a literal. If a role has no generic object
+  name yet, add one to the style sheet (e.g. `QLabel#title`) and use it.
+- Sizes are in pt so the *Interface size* setting (80-150%) and Windows scaling
+  stretch everything evenly. Never px for text.
+- Emoji used as pictures are pictures, not text: size them like icons.
+
+### Buttons
+
+Every button is one of these kinds. Don't add a new `QPushButton#name` to change a
+button's look; an object name on a button is for finding it in tests and for the
+kinds below.
+
+| Kind | Code | When |
+| --- | --- | --- |
+| Primary | `b.setObjectName("primary")` | the one thing most people should press: **at most one per card, dialog page or bar** |
+| Default | plain `QPushButton(_("…"))` | other actions with words |
+| Quiet | `b.setProperty("quiet", True)` | secondary actions that shouldn't draw the eye; no fill until hover |
+| Danger | `b.setObjectName("danger")` | removes or resets something; add `quiet` when it sits in a list row |
+| Small | `b.setObjectName("small")` | an action inside a dense row (a list item, a chip); never a card's main action |
+| Icon | `b.setObjectName("iconbutton")`, `quiet`, `icons.set_icon(b, "name")`, `setToolTip` + `setAccessibleName` | any action a picture says (section 4) |
+| Toggle | `b.setCheckable(True)` (fills with the accent when on) | a feature's on/off (`#power`); a mode in an exclusive `QButtonGroup` |
+
+Sizes (the theme gives them; don't override):
+
+| Button | Size | Notes |
+| --- | --- | --- |
+| Text button (primary, default, danger) | about 32 px tall (padding 7/12 px), as wide as its words | never `setFixedWidth` / `setMinimumWidth` on a text button: German is 30% longer |
+| Small | about 22 px tall (padding 2/8 px, 8pt) | |
+| Icon button, normal | `setFixedSize(28, 28)`, 18 px glyph (`set_icon`'s default) | cards, dialogs, menus' anchors |
+| Icon button, dense | `setFixedSize(24, 24)`, `set_icon(b, name, size=16)` | list rows, chips; 24 px is the WCAG minimum, never smaller |
+| Bar control | height `panel.CONTROL_H` (36) inside a `panel.BAR_H` (48) bar | the Sounds toolbar, player and bottom bars only |
+
+Labels: one to three words, sentence case, a verb for actions ("Save", "Add sounds",
+"Delete"), never "OK" or "Yes"/"No". A button that starts slow work stays enabled and
+shows it with `busy.set_busy` / `busy.run_busy` (focus would jump otherwise).
+
+Rows of buttons: `Flow(gap=8)` (`settings._button_row()`) or an `QHBoxLayout` with
+spacing 8, buttons at their own width, then `addStretch(1)`.
+
+### Pop-ups, messages and modals: one way for each job
+
+| Job | Use | Never |
+| --- | --- | --- |
+| Tell the user something worked or failed | `busy.toast(window, _("…"), "ok" / "warn" / "error")` | `QMessageBox.information` / `.warning` for news |
+| An error the user fixes right there | a `QLabel#hint` under the control with `theme.set_tone(lbl, "error")` | a pop-up that hides the control |
+| Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
+| Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
+| Explain how something works | an ⓘ icon button opening an anchored help pop-up; Esc / click outside closes | a paragraph on the card, a modal |
+| A few rare actions on a card or item | a ⋯ icon button with `widgets.DropdownMenu`; right-click gives the same `QMenu` | a row of extra buttons |
+| Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |
+| A long editor or tuning panel | a retained **modeless** `QDialog`: create once, `show()` + `raise_()`, changes apply live, `[Done]` closes | a modal that blocks sounds and hotkeys |
+
+**Modal or not:** modeless (`show()`) is the default, so sounds keep playing and
+hotkeys keep working. Modal (`open()` + the `finished` signal) only when the app can't
+go on without the answer. New code doesn't use `exec()` (it runs a nested event loop:
+callbacks fire after the dialog's owner is gone). Old `exec()` calls are left until
+someone reviews their lifecycle.
+
+### Dialog anatomy (every dialog looks like this)
+
+```
+┌───────────────────────────────── ≤ 620 px ─┐
+│  Title: the one question (13pt, bold)       │  18 px margins all round
+│  Hint: one or two plain lines (8.5pt, muted)│  12 px between blocks
+│                                             │
+│  [content: choices, fields, a list]         │
+│                                             │
+│                       [Main action] [Cancel]│  stretch, then main first
+└─────────────────────────────────────────────┘
+```
+
+- Window title = the same words as the title, sentence case.
+- Width: as narrow as its content, `setMaximumWidth(620)`; height fits the content
+  (`fit.watch(self)` grows it for long translations). Never as wide as the main window.
+- Footer: `addStretch(1)`, then the main action (`#primary`, `setDefault(True)`), then
+  Cancel / Done / Close. Mirrors itself in right-to-left languages. Don't use
+  `QDialogButtonBox` in new code: it reorders buttons per platform.
+- Esc = Cancel (or Done for live settings). Closing returns focus to whatever opened it.
+- Two steps = two pages in one `QStackedWidget`, not a second dialog (feedbackdialog).
+
+```python
+from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+
+from soundboard.i18n import _
+from soundboard.ui import fit, panel
+
+
+class RenameDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(_("Rename the sound"))
+        self.setMaximumWidth(620)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        title = QLabel(_("Rename the sound"))
+        title.setObjectName("helptitle")            # the Title role
+        v.addWidget(title)
+        v.addWidget(panel.hint_label(_("This is the name on its tile.")))
+        # ... content ...
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        row.addStretch(1)
+        save = QPushButton(_("Save"))
+        save.setObjectName("primary")
+        save.setDefault(True)
+        save.clicked.connect(self.accept)
+        cancel = QPushButton(_("Cancel"))
+        cancel.clicked.connect(self.reject)
+        row.addWidget(save)
+        row.addWidget(cancel)
+        v.addLayout(row)
+        fit.watch(self)
+
+# modal only if the app needs the answer; otherwise dlg.show()
+dlg = RenameDialog(window)
+dlg.finished.connect(lambda code: ...)   # check the owner still exists first
+dlg.open()
+```
+
+### Card recipe
+
+```python
+card, v = SettingsDialog._card(_("Recording"), _("What the Record button captures."))
+# = QFrame#setcard, margins 14/12/14/14, spacing 8, QLabel#section + QLabel#hint
+# then: an icon before the heading, a status pill, tiles or a meter (section 5),
+# controls at their own width, a Flow(gap=8) row of buttons, addStretch(1).
+```
+
+Outside Settings, copy the same numbers onto a `QFrame#card`. Cards never set their
+own background, border or font sizes: the theme paints them.
+
+### Spacing, corners, colours
+
+Spacing comes from this list only: 4, 8 (in rows and cards), 12 (between blocks),
+14 (card padding), 16, 18 (dialog margins), 24. Corners: 8 px buttons and boxes, 6 px small items, 12 px cards, 15 px pills.
+Colours: only theme tokens (section 6). All of these are in the token block at the
+top of this file.
 
 ## 0. Foundation and decisions before drawing
 
@@ -221,7 +395,7 @@ works, a short control plus a pop-up beats a long button or a paragraph on the p
   rest moves to its tooltip, or the button opens a small pop-up that explains and asks.
 - **Icon first.** Any action a picture says (folder, refresh, clear, stop, play, copy,
   show/hide, record, effects, sort, add, settings, info, more) is an icon-only button,
-  quiet, 28-32 px square (never smaller than 24 px, WCAG 2.2 *Target size*). Its words
+  quiet, 28 px square (24 px in dense rows, never smaller: WCAG 2.2 *Target size*). Its words
   are the tooltip and the accessible name, so every language keeps working.
 - **Explanations behind an ⓘ.** More than one line of "how this works" text on a card
   goes into a pop-up opened from an ⓘ icon beside the heading (or the card's hint, cut
@@ -317,7 +491,12 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 
 ## 9. Never
 
-- A hex colour, a pixel font size or an outline (`border:` at rest) in widget code.
+- A hex colour, a `font-size` / `setPointSizeF(<number>)` or an outline (`border:` at
+  rest) in widget code. A text size or button size that isn't in the *Standard kit*.
+- A new `QPushButton#name` look for one screen, a fixed width on a text button, or an
+  icon button that isn't 24, 28 or 36 px.
+- `QMessageBox.information` / `.warning` for news (toast it), Yes/No buttons, or
+  `exec()` / `QDialogButtonBox` in new dialogs.
 - A control stretched to fill a row, or a dialog as wide as its parent.
 - A left-aligned dialog footer, or more than one filled button in one place.
 - ALL CAPS headings, Title Case Buttons, long dashes.
@@ -333,7 +512,9 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 
 ## 10. Checklist for every UI change
 
-1. Built from the pieces above (cards, hint, primary, quiet, icon buttons, tokens)?
+1. Built only from the *Standard kit*: text sizes from its table (no inline
+   `font-size`), button kinds and sizes from its tables, the right pop-up for the job,
+   dialogs in its anatomy? Pieces above (cards, hint, primary, quiet, icon buttons, tokens)?
 2. As narrow as its content; no stretched control; dialog ≤ 620 px?
 3. Dialog actions bottom-right, main first within the group, one filled button at most? Every button
    three words or fewer, icons wherever a picture says it, long text in a pop-up?

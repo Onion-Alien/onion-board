@@ -49,7 +49,7 @@ class Skipped:
     group: str     # a GROUPS key
 
     def line(self) -> str:
-        return f"{self.file}: {self.reason}"
+        return f"{self.file}: {self.reason}" if self.reason else self.file
 
 
 def classify(file: str, e: BaseException) -> Skipped:

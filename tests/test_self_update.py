@@ -5,6 +5,7 @@ import pytest
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
+from soundboard.ui import toast
 from soundboard import __version__, updates
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -92,7 +93,8 @@ def test_a_failed_download_puts_the_pill_back(window, boxes, qapp, monkeypatch):
     boxes.answers = {"Update available": "Update now"}
     window._on_update(_rel(), "", True)
     assert process_events(qapp, lambda: not window._downloading)
-    assert boxes.shown[-1][0] == "Couldn't update"
+    t = toast.shown(window)[-1]
+    assert "Couldn't update" in t.text() and t.card.action.text() == "Open the download page"
     assert window.btn_update.accessibleName() == "Update: 99.0.0" and window.btn_update.isEnabled()
     assert window._update_file is None
 
@@ -110,7 +112,9 @@ def test_next_start_says_whether_the_update_worked(window, boxes):
     window.show()
     window.cfg.update_pending = __version__
     window.after_update()
-    assert boxes.shown[-1][0] == "Updated" and window.cfg.update_pending == ""
+    t = toast.shown(window)[-1]
+    assert "up to date" in t.text() and t.card.action.text() == "What's new"
+    assert window.cfg.update_pending == ""
     window.cfg.update_pending = "99.0.0"
     window.after_update()
     assert boxes.shown[-1][0] == "The update didn't finish" and window.cfg.update_pending == ""

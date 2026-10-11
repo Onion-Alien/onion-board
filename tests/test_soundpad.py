@@ -108,9 +108,11 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     assert new["Bruh"].hotkey == "ctrl+1" and new["Vine - Boom"].hotkey == ""
     assert new["Vine - Boom"].tags == ["Memes", "Loud"]
     assert {"Memes", "Loud"} <= set(w.cfg.categories)
-    assert all(Path(m.file).parent == library.SOUNDS_DIR / "My sounds"
-               and Path(m.file).stem == m.name and Path(m.file).is_file()
-               for m in new.values())   # copies of their own, named as in Soundpad
+    assert {n: Path(m.file) for n, m in new.items()} == {   # linked to Soundpad's files
+        "Bruh": tmp_path / "My sounds" / "bruh.wav",
+        "Vine - Boom": tmp_path / "My sounds" / "sub" / "vine boom.wav",
+        "airhorn": tmp_path / "elsewhere" / "airhorn.wav"}
+    assert not any(library.SOUNDS_DIR in Path(m.file).parents for m in new.values())
     assert (tmp_path / "My sounds" / "bruh.wav").is_file()   # Soundpad's own stay put
     assert not w._import_errors
 

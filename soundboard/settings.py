@@ -2214,6 +2214,16 @@ class SettingsDialog(QDialog):
         w, v = self._page()
         self._data_widgets = {}
 
+        card, cv = self._card(_("Local sounds"))
+        self.copy_local_sounds = self._option(
+            cv, _("Copy into library"),
+            _("Off: link to the original file. Turn on to keep sounds if the original is "
+              "moved, deleted or on a disconnected drive. Uses extra disk space. "
+              "Applies to new local imports only."),
+            self.mw.cfg.copy_local_sounds,
+            lambda b: self.mw.set_option("copy_local_sounds", b))
+        v.addWidget(card)
+
         card, cv = self._card(_("Low data mode"),
                               _("For a phone hotspot, capped plan or slow internet: smaller "
                                 "downloads, lower-bitrate radio, more patience with stations "
@@ -3389,9 +3399,8 @@ class SettingsDialog(QDialog):
             self.mw.remove_remote_addon(info)
         except modules.ModuleError as e:
             log.warning("Onion Pocket couldn't be removed: %s", e)
-            QMessageBox.warning(self, _("Onion Pocket wasn't removed"),
-                                _("Onion Pocket wasn't removed: {error}",
-                                  error=errors.plain(e)))
+            busy.toast(self, html.escape(_("Onion Pocket wasn't removed: {error}",
+                                           error=errors.plain(e))), "error")
             return
         self.mw.pocket_offer = None
         if getattr(self, "_pocket_slot", None) is not None:

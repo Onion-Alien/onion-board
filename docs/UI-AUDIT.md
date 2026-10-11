@@ -12,27 +12,39 @@ PR and what was checked (themes, sizes, test file) only after reviewing the affe
 
 ## Open
 
+- [ ] **U16: Move old screens onto the standard sizes.** DESIGN.md's *Standard kit*
+  fixes 7 text sizes, 3 icon-button sizes and one pop-up per job. Old code (11 October,
+  `origin/main` `67ea807`) still has: inline `font-size` / `setPointSizeF` in about 60
+  places, with off-scale 7, 7.5, 9, 9.5, 10.5, 12, 14, 15 and 19pt (`theme.py` `#fxend`,
+  `#recordtitle`, `#round`; `ui/speedpitch.py`, `ui/chatguide.py`, `ui/resetguide.py`,
+  `ui/whatsnew.py`, `ui/setupwizard.py`, `ui/overlay.py`); icon buttons at 22, 30, 32
+  and 36 px outside bars; about 28 `QMessageBox.information` / `.warning` calls that
+  should be toasts or inline tone labels, Yes/No `QMessageBox.question`s, 30
+  `QDialogButtonBox` footers and 35 `exec()` calls. Do it one screen per PR (pictures
+  before and after), moving inline sizes into `theme.py` object names. Don't sweep
+  everything in one go; `exec()` changes need a lifecycle check each.
+
 Ideas from test runs on 11 October, not yet verified on main. Check each first; some may
 be the owner's call rather than a fix.
 
-- [ ] **U16: A link lookup looks like a hang.** Paste a link in the Sounds search and press
+- [ ] **U17: A link lookup looks like a hang.** Paste a link in the Sounds search and press
   Enter: the card says "Looking up <host>…" with no progress and no Cancel. Idea: a small
   spinner or "still looking…" after about 3 s, and Cancel on the card.
   Target: `ui/ytsearch.py` (`show_link`).
-- [ ] **U17: Importing a long file gives no feedback.** A one-hour MP3 imports fine but
+- [ ] **U18: Importing a long file gives no feedback.** A one-hour MP3 imports fine but
   nothing says it's working until it appears. Idea: a busy toast while an import takes over
   about 1 s. Target: `import_files` in `ui/mainwindow.py`.
-- [ ] **U18: Two mic-mute switches on Setup.** *Send my mic to others* and *Mute mic during
+- [ ] **U19: Two mic-mute switches on Setup.** *Send my mic to others* and *Mute mic during
   sounds* both gate the mic, worded differently. Check what each does: if different, the
   words must say so; if the same, merge them. Also: Audio buffering's two choices only show
   which is active in the combo text (low priority). Target: `settings.py` ~1272/1286.
-- [ ] **U19: A program that went quiet looks the same as one playing.** Apps tab: a captured
+- [ ] **U20: A program that went quiet looks the same as one playing.** Apps tab: a captured
   program at volume 0 keeps "playing" and Send on; only the meter drops. Idea: a "silent"
   hint after a few seconds without sound. Target: `ui/appspanel.py`.
-- [ ] **U20: Turning Send off forgets the program's volume.** By design today
+- [ ] **U21: Turning Send off forgets the program's volume.** By design today
   (`test_appspanel`: "stopped and forgotten"). Could remember the volume without
   auto-sending. Ask the owner before changing it.
-- [ ] **U21: Long word buttons and plain cards** (carried from DESIGN's old known-gaps list,
+- [ ] **U22: Long word buttons and plain cards** (carried from DESIGN's old known-gaps list,
   recheck first): buttons like "Make it sound clean in Discord" / "Record 6s, play back"
   that should be shorter or icons; Setup's *Your mic* (how-to paragraphs that belong
   behind an ⓘ) and *Connect your chat* (a grid of long word buttons that could be tiles).
