@@ -786,22 +786,32 @@ class SearchResults(RoundedFrame):
             group.addAction(a)
             self.site_actions[key] = a
         v.addWidget(header)
+        # "No results", "Can't use this link…", "Couldn't search…": in the middle of the
+        # results area, where "Searching…" was, not in a corner under Back
+        self.message = QWidget()
+        mv = QVBoxLayout(self.message)
+        mv.setContentsMargins(24, 0, 24, 0)
+        mv.setSpacing(10)
+        mv.addStretch(2)
         self.title = QLabel()
         self.title.setTextFormat(Qt.TextFormat.RichText)
         self.title.setWordWrap(True)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         errors.linkify(self.title)   # an error's "Report it" link
-        v.addWidget(self.title)
+        mv.addWidget(self.title)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # runs the search without Tor (ytdl.TorBlocked)
         self.direct_btn = QPushButton(_("Search this without Tor"))
         self.direct_btn.setToolTip(_("Run just this search straight from the site, not through "
                                      "Tor: the site will see your own address"))
+        self.direct_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.direct_btn, "tor", size=16)
         self.direct_btn.clicked.connect(self._without_tor)
         self.direct_btn.hide()
-        row = QHBoxLayout()
-        row.addWidget(self.direct_btn)
-        row.addStretch(1)
-        v.addLayout(row)
+        mv.addWidget(self.direct_btn, 0, Qt.AlignmentFlag.AlignHCenter)
+        mv.addStretch(3)
+        self.message.hide()
+        v.addWidget(self.message, 1)
         self.loading = SearchingView()      # takes the list's place while searching
         self.spinner = self.loading         # start / stop / running()
         v.addWidget(self.loading, 1)
@@ -941,12 +951,18 @@ class SearchResults(RoundedFrame):
 
     def _loading(self, on: bool, text: str = ""):
         """The loading view in place of the title and list (on), or those back."""
-        for w in (self.title, self.scroll_area):
-            w.setVisible(not on)
+        self.message.hide()   # _say() brings it back for a message
+        self.scroll_area.setVisible(not on)
         if on:
             self.loading.start(text)
         else:
             self.loading.stop()
+
+    def _say(self, text: str):
+        """A message in the middle of the results area, instead of cards."""
+        self.title.setText(text)
+        self.scroll_area.hide()
+        self.message.show()
 
     def mark(self, url: str, kind: str, ok: bool | None = None):
         """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
@@ -1071,17 +1087,17 @@ class SearchResults(RoundedFrame):
             red = theme.status("error")
             if self.link:
                 why = _("Can't use this link: {error}", error=err)   # err: rich text
-                self.title.setText(f"<span style='color:{red}'>{why}</span>")
+                self._say(f"<span style='color:{red}'>{why}</span>")
                 busy.toast(self.window(), why, "error", 8000)   # not only in the panel
             else:
-                self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}"
-                                     "</span>", red=red, site=self.site, err=err))  # from _work
+                self._say(_("<span style='color:{red}'>Couldn't search {site}: {err}"
+                            "</span>", red=red, site=self.site, err=err))  # from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
-            self.title.setText(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
+            self._say(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
             return
-        self.title.hide()   # the cards say it all; the title is for "no results" / errors
+        # the cards say it all; the message is for "no results" / errors
         self._add_rows(results, gen)
         # a full first page: there may be more of them
         self.more_btn.setVisible(not self.link and len(results) >= PAGE // 2)
