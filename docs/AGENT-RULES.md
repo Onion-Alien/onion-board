@@ -70,6 +70,10 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   small), full once everything fits (`_full_fit`). Attention dots sit on their icon.
 - Add regression checks for a reported layout defect, and run them before committing.
   Do not treat a partial spacing adjustment as completion of the screen's review.
+- Moving a widget between layouts (re-stacking columns, reflowing a grid): take it out
+  with `widgets.take_out()`, never a bare `takeAt()`. An item that's taken but never freed
+  keeps the widget's size changes, so the re-added card keeps a stale height and gets
+  squeezed until the width changes.
 
 - Disk, network, device, process and capture calls never run on the Qt UI thread.
   Run them on a worker, and the UI thread only applies the result.
