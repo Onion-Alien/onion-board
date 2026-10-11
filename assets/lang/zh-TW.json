@@ -3127,5 +3127,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "送進你的麥克風  <b style='color:{colour}'>✗ 沒有運作</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>不用設定。</b>Discord 和遊戲繼續用你平常的麥克風，你的音效已經在裡面了。",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "如果音效斷斷續續，就關掉語音程式的噪音抑制（Discord：<b>輸入設定檔 → 自訂</b>、<b>噪音抑制 → 無</b>、關掉<b>回音消除</b>。不要選錄音室：它會跳過 Onion Board）。",
-  "Sounds chopped up?": "音效斷斷續續？"
+  "Sounds chopped up?": "音效斷斷續續？",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "沒有儲存影片：儲存影片需要 FFmpeg（設定 > 資料 & 品質）。"
 }

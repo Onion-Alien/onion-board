@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "आपके माइक तक <b style='color:{colour}'>✗ नहीं चल रहा</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>कुछ सेट नहीं करना।</b> Discord और गेम आपका सामान्य माइक ही रखते हैं, और आपके साउंड उसमें हैं।",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "अगर साउंड कटे-कटे आएँ, तो वॉइस ऐप का noise suppression बंद करें (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> बंद। Studio नहीं: वह Onion Board को छोड़ देता है)।",
-  "Sounds chopped up?": "साउंड कटे-कटे आ रहे हैं?"
+  "Sounds chopped up?": "साउंड कटे-कटे आ रहे हैं?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "कोई वीडियो सहेजा नहीं गया: वीडियो सहेजने के लिए FFmpeg चाहिए (सेटिंग्स > आधार सामग्री की गुणवत्ता)।"
 }

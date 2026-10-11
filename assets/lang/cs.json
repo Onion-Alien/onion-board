@@ -3273,5 +3273,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ neběží</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Není co nastavovat.</b> Discord a hry si nechají tvůj normální mikrofon a tvoje zvuky jsou v něm.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Pokud se zvuky sekají, vypni potlačení šumu v hlasové aplikaci (Discord: <b>Vstupní profil → Vlastní</b>, <b>Potlačení šumu → Žádné</b>, <b>Potlačení ozvěny</b> vypnout. Ne Studio: to Onion Board přeskakuje).",
-  "Sounds chopped up?": "Zvuky se sekají?"
+  "Sounds chopped up?": "Zvuky se sekají?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Video se neuložilo: ukládání videí potřebuje FFmpeg (Nastavení > Data & kvalita)."
 }

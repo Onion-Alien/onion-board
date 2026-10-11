@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Mikrofonunuza <b style='color:{colour}'>✗ çalışmıyor</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Ayarlanacak bir şey yok.</b> Discord ve oyunlar normal mikrofonunuzu korur ve sesleriniz de onun içindedir.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Sesler kesilirse, ses uygulamasının gürültü bastırma özelliğini kapatın (Discord: <b>Giriş Profili → Özel</b> , <b>Gürültü Bastırma → Yok</b> , <b>Yankı Önleme</b> kapalı. Studio değil: Onion Board'u atlar).",
-  "Sounds chopped up?": "Sesler kesiliyor mu?"
+  "Sounds chopped up?": "Sesler kesiliyor mu?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Hiçbir video kaydedilmedi: video kaydetmek için FFmpeg gerekir (Ayarlar > Veri ve kalite)."
 }

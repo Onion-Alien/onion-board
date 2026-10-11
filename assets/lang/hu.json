@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "A mikrofonodba  <b style='color:{colour}'>✗ nem fut</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nincs mit beállítani.</b> A Discord és a játékok a szokásos mikrofonodat használják, és a hangjaid benne vannak.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ha a hangok szaggatnak, kapcsold ki a beszélgetőapp zajszűrését (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> ki. Ne Studio: az kihagyja az Onion Boardot).",
-  "Sounds chopped up?": "Szaggatnak a hangok?"
+  "Sounds chopped up?": "Szaggatnak a hangok?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nem lett videó mentve: a videók mentéséhez FFmpeg kell (Beállítások > Adat & minőség)."
 }

@@ -3127,5 +3127,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "마이크에 <b style='color:{colour}'>✗ 실행 안 됨</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>설정할 것이 없습니다.</b> Discord와 게임은 일반적인 마이크를 유지하며 사운드도 그 안에 있습니다.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "소리가 잘리는 경우 음성 앱의 소음 억제 기능을 끄세요(Discord: <b>입력 프로필 → 사용자 정의</b> , <b>소음 억제 → 없음</b> , <b>에코 제거</b> 끄기. Studio 아님: Onion Board 건너뛰기).",
-  "Sounds chopped up?": "소리가 잘리나요?"
+  "Sounds chopped up?": "소리가 잘리나요?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "동영상이 저장되지 않았습니다. 동영상을 저장하려면 FFmpeg가 필요합니다(설정 > 데이터 및 품질)."
 }

@@ -3492,5 +3492,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "داخل الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يعمل</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>لا شيء لتعيينه.</b> يحتفظ Discord والألعاب بالميكروفون العادي الخاص بك، وأصواتك فيه.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "إذا تم تقطيع الأصوات، فأوقف تشغيل ميزة منع الضوضاء في تطبيق الصوت (Discord: <b>ملف تعريف الإدخال → مخصص</b> ، <b>منع الضوضاء → لا شيء</b> ، <b>إيقاف تشغيل إلغاء الصدى</b> . ليس استوديو: فهو يتخطى Onion Board).",
-  "Sounds chopped up?": "الأصوات متقطعة؟"
+  "Sounds chopped up?": "الأصوات متقطعة؟",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "لم يتم حفظ أي فيديو: حفظ الفيديوهات يحتاج إلى FFmpeg (الإعدادات > البيانات والجودة)."
 }

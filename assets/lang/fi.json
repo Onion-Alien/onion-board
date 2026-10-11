@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Mikkiisi  <b style='color:{colour}'>✗ ei käynnissä</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Ei mitään säädettävää.</b> Discord ja pelit pitävät tavallisen mikkisi, ja äänesi ovat siinä.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jos äänet pätkivät, laita puhesovelluksen kohinanvaimennus pois (Discord: <b>Syöttöprofiili → Mukautettu</b>, <b>Kohinanvaimennus → Ei mitään</b>, <b>Kaiunpoisto</b> pois. Ei Studio: se ohittaa Onion Boardin).",
-  "Sounds chopped up?": "Pätkivätkö äänet?"
+  "Sounds chopped up?": "Pätkivätkö äänet?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Videota ei tallennettu: videoiden tallennus tarvitsee FFmpegin (Asetukset > Data & laatu)."
 }

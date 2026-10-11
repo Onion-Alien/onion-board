@@ -3127,5 +3127,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "マイクに<b style='color:{colour}'>✗ 動いていない</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>設定は不要です。</b> Discord やゲームは普段のマイクのままで、サウンドはそこに入っています。",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "サウンドが途切れる場合は、ボイスアプリのノイズ抑制をオフにしてください（Discord: <b>入力プロファイル → カスタム</b>、<b>ノイズ抑制 → なし</b>、<b>エコー除去</b>オフ。スタジオは不可: Onion Board を通りません）。",
-  "Sounds chopped up?": "サウンドが途切れる？"
+  "Sounds chopped up?": "サウンドが途切れる？",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "ビデオは保存されませんでした。ビデオの保存には FFmpeg が必要です（設定 > データと品質）。"
 }

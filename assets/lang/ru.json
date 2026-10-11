@@ -3273,5 +3273,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "В микрофон  <b style='color:{colour}'>✗ не работает</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Настраивать нечего.</b> Discord и игры остаются на твоём обычном микрофоне, а твои звуки уже в нём.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Если звуки обрываются, выключи шумоподавление в голосовом приложении (Discord: <b>Профиль ввода → Пользовательский</b>, <b>Шумоподавление → Нет</b>, <b>Эхоподавление</b> выкл. Не Студия: она пропускает Onion Board).",
-  "Sounds chopped up?": "Звуки обрываются?"
+  "Sounds chopped up?": "Звуки обрываются?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Видео не сохранено: для сохранения видео нужен FFmpeg (Настройки > Данные & качество)."
 }

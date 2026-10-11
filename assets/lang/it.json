@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Nel tuo microfono <b style='color:{colour}'>✗ non attivo</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Niente da impostare.</b> Discord e i giochi mantengono il tuo microfono normale e i tuoi suoni sono al suo interno.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Se i suoni vengono interrotti, disattiva la soppressione del rumore dell'app vocale (Discord: <b>Profilo di input → Personalizzato</b> , <b>Soppressione del rumore → Nessuno</b> , <b>Cancellazione eco</b> disattivata. Non Studio: salta Onion Board).",
-  "Sounds chopped up?": "Suoni interrotti?"
+  "Sounds chopped up?": "Suoni interrotti?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nessun video è stato salvato: per salvare i video serve FFmpeg (Impostazioni > Dati e qualità)."
 }

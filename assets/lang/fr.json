@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Dans ton micro  <b style='color:{colour}'>✗ ne tourne pas</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Rien à régler.</b> Discord et les jeux gardent ton micro normal, et tes sons sont dedans.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Si les sons sont hachés, coupe la suppression de bruit de l'appli vocale (Discord : <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> désactivé. Pas Studio : il ignore Onion Board).",
-  "Sounds chopped up?": "Sons hachés ?"
+  "Sounds chopped up?": "Sons hachés ?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Aucune vidéo enregistrée : enregistrer des vidéos demande FFmpeg (Paramètres > Données & qualité)."
 }

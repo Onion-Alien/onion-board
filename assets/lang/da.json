@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ind i din mikrofon  <b style='color:{colour}'>✗ kører ikke</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Intet at indstille.</b> Discord og spil beholder din normale mikrofon, og dine lyde er i den.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Hvis lydene bliver hakket i stykker, så slå stemmeappens støjreduktion fra (Discord: <b>Inputprofil → Brugerdefineret</b>, <b>Støjreduktion → Ingen</b>, <b>Ekkoannullering</b> fra. Ikke Studio: den springer Onion Board over).",
-  "Sounds chopped up?": "Bliver lydene hakket i stykker?"
+  "Sounds chopped up?": "Bliver lydene hakket i stykker?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Ingen video blev gemt: for at gemme videoer skal du have FFmpeg (Indstillinger > Data & kvalitet)."
 }

@@ -3273,5 +3273,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "În microfonul tău  <b style='color:{colour}'>✗ nu rulează</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nimic de setat.</b> Discord și jocurile păstrează microfonul tău normal, iar sunetele tale sunt în el.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Dacă sunetele se taie, oprește suprimarea zgomotului din aplicația de voce (Discord: <b>Profil de intrare → Personalizat</b>, <b>Suprimarea zgomotului → Niciuna</b>, <b>Anularea ecoului</b> oprită. Nu Studio: sare peste Onion Board).",
-  "Sounds chopped up?": "Sunetele se taie?"
+  "Sounds chopped up?": "Sunetele se taie?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nu s-a salvat niciun videoclip: pentru salvarea videoclipurilor e nevoie de FFmpeg (Setări > Date & calitate)."
 }

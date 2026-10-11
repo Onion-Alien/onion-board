@@ -3200,5 +3200,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "In dein Mikro  <b style='color:{colour}'>✗ läuft nicht</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nichts einzustellen.</b> Discord und Spiele behalten dein normales Mikro, und deine Sounds sind darin.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Wenn Sounds zerhackt werden, schalte die Rauschunterdrückung der Sprach-App aus (Discord: <b>Eingabeprofil → Benutzerdefiniert</b>, <b>Rauschunterdrückung → Keine</b>, <b>Echounterdrückung</b> aus. Nicht Studio: Das überspringt Onion Board).",
-  "Sounds chopped up?": "Sounds zerhackt?"
+  "Sounds chopped up?": "Sounds zerhackt?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Kein Video gespeichert: Zum Speichern von Videos braucht es FFmpeg (Einstellungen > Daten & Qualität)."
 }

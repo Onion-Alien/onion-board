@@ -3127,5 +3127,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "เข้าไมค์ของคุณ <b style='color:{colour}'>✗ ไม่ทำงาน</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>ไม่มีอะไรจะตั้งค่า</b> Discord และเกมจะรักษาไมโครโฟนตามปกติของคุณ และเสียงของคุณก็จะอยู่ในนั้น",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "หากเสียงขาดหาย ให้ปิดการลดเสียงรบกวนของแอปเสียง (Discord: <b>Input Profile → Custom</b> , <b>Noise Suppression → None</b> , <b>Echo Cancellation</b> ปิดอยู่ ไม่ใช่ Studio: จะข้าม Onion Board)",
-  "Sounds chopped up?": "เสียงขาดหาย?"
+  "Sounds chopped up?": "เสียงขาดหาย?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "ไม่มีการบันทึกวิดีโอ: การบันทึกวิดีโอต้องใช้ FFmpeg (การตั้งค่า > ข้อมูล & คุณภาพ)"
 }

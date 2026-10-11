@@ -3127,5 +3127,6 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ke mikrofon anda  <b style='color:{colour}'>✗ tidak berjalan</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Tiada apa perlu ditetapkan.</b> Discord dan permainan mengekalkan mikrofon biasa anda, dan bunyi anda ada di dalamnya.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jika bunyi terpotong-potong, matikan penindasan hingar aplikasi suara (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> mati. Bukan Studio: ia melangkau Onion Board).",
-  "Sounds chopped up?": "Bunyi terpotong-potong?"
+  "Sounds chopped up?": "Bunyi terpotong-potong?",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Tiada video disimpan: menyimpan video perlukan FFmpeg (Tetapan > Data & kualiti)."
 }
