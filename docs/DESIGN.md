@@ -376,7 +376,10 @@ Fix these when a task touches them; don't sweep them all in one go.
    wheelguard and established card/choice widgets. If two screens need the same
    behaviour, extract a small shared helper instead of pasting another layout.
 4. **Review every affected state.** Render offscreen with the test fixtures and
-   `QT_QPA_FONTDIR` set to the system fonts. Inspect the complete page and each
+   `QT_QPA_FONTDIR` set to the system fonts. For MainWindow screenshots, switch
+   themes with `window.apply_theme(name)`: it refreshes registered icons as well
+   as the stylesheet; calling `theme.apply()` alone leaves stale icon colours.
+   Inspect the complete page and each
    menu, expanded card and dialog affected, including empty/populated and disabled/
    busy states where relevant. Use Dark/Light, narrow/normal sizes, and German when
    labels change; follow `AGENT-RULES.md` for full layout acceptance. Check focus,

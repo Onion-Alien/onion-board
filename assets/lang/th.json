@@ -850,7 +850,6 @@
   "Downloads": "ดาวน์โหลด",
   "Downloads the newest {name} again and puts it in place of this one. Your own things are kept.": "ดาวน์โหลด {name} ใหม่ล่าสุดอีกครั้งและวางไว้แทนที่อันนี้ สิ่งของของท่านก็เก็บไว้",
   "Drag along the rainbow to pick the highlight colour": "ลากไปตามสายรุ้งเพื่อเลือกสีไฮไลต์",
-  "Drop sound files here\nor click  ＋ Add sounds\n\nmp3 · wav · ogg · flac\nm4a · even video files": "วางไฟล์เสียงที่นี่หรือคลิก ＋ เพิ่มเสียง mp3 · wav · ogg · flac m4a · แม้แต่ไฟล์วิดีโอ",
   "EQ off": "ปิด EQ",
   "Empties the bin. It's kept in the restore point.": "ล้างถังขยะ มันถูกเก็บไว้ในจุดคืนค่า",
   "Enable remote control": "เปิดใช้งานการควบคุมระยะไกล",

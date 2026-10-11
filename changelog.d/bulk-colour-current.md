@@ -1,0 +1,2 @@
+- The bulk colour menu marks the selected sounds' shared colour. Mixed colours leave every option unmarked until a colour is chosen.
+- The empty and populated soundboards use the same "Drop sound files here" hint.
