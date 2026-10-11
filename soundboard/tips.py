@@ -26,8 +26,8 @@ class Tip:
 
 
 TIPS: tuple[Tip, ...] = (
-    Tip("effects", _("Right-click any pad → Effects… for bass boost, nightcore, slowed + "
-        "reverb, trim and more. The original file is never changed."), "tab:sounds"),
+    Tip("effects", _("Right-click any pad → Edit… → Effects for bass boost, nightcore, "
+        "slowed + reverb, trim and more. The original file is never changed."), "tab:sounds"),
     Tip("record", _("Record a sound with your mic: the Record button next to Add sounds."),
         "record"),
     Tip("search", _("Type in the search box and press Enter to find sounds on YouTube, "

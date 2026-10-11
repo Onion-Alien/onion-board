@@ -14,7 +14,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
   removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
   Right-click a pad for *Rename…*, *Duplicate* (a second pad with its own file, for
-  its own effects or hotkey) and *Show the file in its folder*.
+  its own effects or hotkey) and *Open file location*. A pad's picture is set in
+  **Edit…** (from a file or a link), or by dropping or pasting a picture on it.
 - **Record a sound with your mic, or from what's playing:** the **Record** button next
   to *Add sounds*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
@@ -62,8 +63,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   headphones), a **wait** before it plays, a **cooldown** against spamming, **fade in /
   fade out**, and **Hold to play** (plays only while you hold its key or pad down, like
   an air horn).
-- **Effects on any sound** (right-click a pad → **Effects…**, or the *Effects* tab
-  of **Edit…**): speed and pitch (separately, or together like a record player
+- **Effects on any sound** (right-click a pad → **Edit…** → *Effects*): speed and pitch (separately, or together like a record player
   with *Tape mode*), **trim** (drag the start and end on the sound's waveform, or
   type exact times — keep one line out of a 4-minute video), a 7-band EQ, a boost
   up to +36 dB that clips on purpose,
