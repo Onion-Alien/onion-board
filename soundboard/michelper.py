@@ -17,7 +17,9 @@ The app asks by writing a request file (one line: a `--direct-mic` admin command
 every request it finds and writes each one's exit code into ...\\results (admins only,
 so a planted link can't steer what SYSTEM writes). While it works on one it keeps a
 heartbeat (`<id>.ack`) there, so the app can tell a helper at work from one that died
-half-way. Requests are untrusted: only the commands in `allowed()` run, with a mic
+half-way (by whether it changes, never by its age on the wall clock: a clock
+correction or a sleep mid-step would make a working helper look dead). Requests are
+untrusted: only the commands in `allowed()` run, with a mic
 GUID as their only argument. The helper
 installs only the DLL it carries, so an update to the effect or the helper (another
 STAMP) still goes through Windows' prompt once, which updates the helper too. Without
@@ -44,7 +46,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 7
+HELPER_VERSION = 8
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -236,14 +238,14 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
         _forget(req)
         return None
     ack = results_dir() / f"{rid}.ack"
-    start = time.monotonic()
+    clock, beats = _Clock(), _Beats()
     while True:
-        waited = time.monotonic() - start
+        waited = clock.now()
         code = _result(res)
         if code is not None:
             _forget(res)   # (admins only: stays; the helper clears old ones)
             return code
-        beat = _age(ack)
+        beat = beats.quiet(ack, waited)
         if beat is not None:
             # at work: wait however long it takes (Windows' prompt now would find it
             # holding the lock and fail), unless its heartbeat stopped
@@ -255,8 +257,10 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
         elif req.exists():
             # not picked up yet: give up after START_S, unless the helper is at work on
             # another request (another account's, or one left behind): it takes ours
-            # next, so wait, within the task's own time limit
-            if waited > HARD_S or (waited > START_S and not _busy(ack)):
+            # next, so wait, within the task's own time limit (others are watched from
+            # the start: one only counts once it is seen to change)
+            busy = beats.busy(ack, waited)
+            if waited > HARD_S or (waited > START_S and not busy):
                 log.info("the mic helper didn't pick the request up")
                 _forget(req)
                 return None
@@ -266,13 +270,67 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
         time.sleep(0.1)
 
 
-def _busy(ours: Path) -> bool:
-    """The helper is at work on some other request (a fresh heartbeat of another)."""
+GAP_S = 5.0   # ask() didn't look for this long (it looks 10 times a second): the PC slept
+
+
+class _Clock:
+    """Seconds ask() has waited, on time.monotonic() (never the wall clock: a clock
+    correction never moves it), not counting time the PC slept: the helper slept too,
+    so a wait that went past a limit meanwhile hasn't really."""
+
+    def __init__(self):
+        self.last, self.waited = time.monotonic(), 0.0
+
+    def now(self) -> float:
+        t = time.monotonic()
+        step, self.last = t - self.last, t
+        if 0.0 <= step <= GAP_S:
+            self.waited += step
+        return self.waited
+
+
+class _Beats:
+    """When each heartbeat (.ack) last changed, by ask()'s clock: what it says (a new
+    helper writes a count into it) or its time (one of version 5 to 7 only touches
+    it). A change is what counts, never how old a file looks by the wall clock: a clock
+    put forward made a working helper look dead, one put back made a dead one look
+    alive for that long."""
+
+    def __init__(self):
+        self.seen: dict[Path, tuple[tuple, float]] = {}
+
+    def quiet(self, path: Path, now: float, new: bool = True) -> float | None:
+        """Seconds since `path` last changed, or None if it isn't there. One seen for
+        the first time counts as just changed if `new` (ours: made for this request),
+        else only once it changes (another's may be a dead helper's)."""
+        mark = _mark(path)
+        if mark is None:
+            self.seen.pop(path, None)
+            return None
+        last = self.seen.get(path)
+        if last is None:
+            self.seen[path] = last = (mark, now if new else float("-inf"))
+        elif last[0] != mark:
+            self.seen[path] = last = (mark, now)
+        return now - last[1]
+
+    def busy(self, ours: Path, now: float) -> bool:
+        """The helper is at work on some other request (another's heartbeat beats)."""
+        try:
+            others = [p for p in results_dir().glob("*.ack") if p != ours]
+        except OSError:
+            return False
+        return any((self.quiet(p, now, new=False) or 0.0) <= STALE_S for p in others)
+
+
+def _mark(path: Path) -> tuple | None:
+    """What a heartbeat says and when it was written, or None if it isn't there."""
     try:
-        return any(p != ours and (_age(p) or 0.0) <= STALE_S
-                   for p in results_dir().glob("*.ack"))
+        with open(path, "rb") as f:
+            text = f.read(64)
+        return text, os.stat(path).st_mtime_ns
     except OSError:
-        return False
+        return None
 
 
 def _age(path: Path) -> float | None:
@@ -390,26 +448,39 @@ def _answer(rid: str, code: int):
 
 
 class _Heartbeat:
-    """`<id>.ack` in results, touched every BEAT_S while the helper works on that
-    request: the app keeps waiting while it is fresh, and knows the helper died
-    (killed, crashed) when it goes stale. Gone once the answer is there."""
+    """`<id>.ack` in results, rewritten every BEAT_S while the helper works on that
+    request: the app keeps waiting while it changes, and knows the helper died
+    (killed, crashed) when it stops. Gone once the answer is there. Each beat writes a
+    new count (what the app watches since version 8) in place, which also moves the
+    file's time (what an app of version 7 or older watches)."""
 
     def __init__(self, rid: str):
         self.path = results_dir() / f"{rid}.ack"
         self.stop = threading.Event()
+        self.count = 0
         tmp = self.path.with_suffix(".atmp")
-        tmp.write_bytes(b"")
+        tmp.write_bytes(self._text())
         os.replace(tmp, self.path)
         self.thread = threading.Thread(target=self._beat, name="mic-helper-beat",
                                        daemon=True)
         self.thread.start()
 
+    def _text(self) -> bytes:
+        return f"{self.count} {time.time():.3f}".encode("ascii")
+
     def _beat(self):
         while not self.stop.wait(BEAT_S):
-            try:
-                os.utime(self.path)
+            self.count += 1
+            try:   # (in place: the app may be reading it, which a replace would refuse)
+                with open(self.path, "r+b") as f:
+                    text = self._text()
+                    f.write(text)
+                    f.truncate(len(text))
             except OSError:
-                pass
+                try:
+                    os.utime(self.path)
+                except OSError:
+                    pass
 
     def end(self):
         self.stop.set()

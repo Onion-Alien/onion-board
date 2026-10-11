@@ -31,7 +31,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                 4: "b49bed37327a635032e846b3f51e1b47fc5ebcaef7ee4078d03c95528a142370",
                 5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467",
                 6: "9b83750c3d3586a89804c5ec5c97618fc1ce30b511723e4e3cf3525513c9a534",
-                7: "562d4f9cdb4cd0a53071284bf83aef9bbf8b2563c5ba7a3368dc190942d22c66"}
+                7: "562d4f9cdb4cd0a53071284bf83aef9bbf8b2563c5ba7a3368dc190942d22c66",
+                8: "2e6e7bce58fff25b999c3779c61576bc676a39765c974e83b62ad437f5a15a2d"}
 
 
 def _queue():
@@ -713,3 +714,116 @@ def test_a_reinstall_makes_the_ring_folder_again(monkeypatch):
     monkeypatch.setattr(dm, "secure_data_dirs", secure)
     dm._make_ring()
     assert made and dm.make_ring_ok(dm.ring_path())
+
+
+# ---------------------------------------------------------------- sleep, clock jumps
+
+def _jump_monotonic(monkeypatch, by: float, after: int = 5):
+    """time.monotonic() jumps `by` seconds once, after `after` calls: the PC slept."""
+    real, calls = time.monotonic, [0]
+
+    def mono():
+        calls[0] += 1
+        return real() + (by if calls[0] > after else 0.0)
+    monkeypatch.setattr(mh.time, "monotonic", mono)
+
+
+def _shift_clock(monkeypatch, by: float):
+    real = time.time
+    monkeypatch.setattr(mh.time, "time", lambda: real() + by)
+
+
+def _beating_helper(monkeypatch, seconds: float = 0.8, code: int = 3):
+    monkeypatch.setattr(mh, "BEAT_S", 0.05)
+    monkeypatch.setattr(mh, "STALE_S", 0.3)
+    _fake_task(monkeypatch, lambda rid: mh.serve(run=lambda a: time.sleep(seconds) or code))
+
+
+def test_a_clock_correction_mid_step_doesnt_look_like_a_dead_helper(monkeypatch):
+    """The clock jumps an hour ahead while the helper works: its heartbeat looks an
+    hour old by the wall clock, but it is still beating, so the app keeps waiting
+    (asking Windows now would find the helper holding the lock: code 4)."""
+    _queue()
+    _beating_helper(monkeypatch)
+    _shift_clock(monkeypatch, 3600)
+    assert mh.ask(["uninstall"], wait_s=60) == 3
+
+
+def test_a_sleep_mid_step_doesnt_look_like_a_dead_helper(monkeypatch):
+    """The laptop sleeps half-way (the app's clock jumps past the task's time limit and
+    the wall clock with it): the time asleep doesn't count, the helper goes on."""
+    _queue()
+    _beating_helper(monkeypatch)
+    _jump_monotonic(monkeypatch, mh.HARD_S + 100)
+    _shift_clock(monkeypatch, mh.HARD_S + 100)
+    assert mh.ask(["uninstall"], wait_s=60) == 3
+
+
+def test_a_dead_helper_is_noticed_after_the_clock_went_back(monkeypatch):
+    """A helper died half-way and the clock was set back: its .ack looks brand new by
+    the wall clock for an hour. It never changes, so the app still gives up at STALE_S."""
+    _queue()
+    monkeypatch.setattr(mh, "STALE_S", 0.3)
+    _shift_clock(monkeypatch, -3600)
+
+    def work(rid):
+        mh._take(mh.requests_dir() / f"{rid}.req")
+        (mh.results_dir() / f"{rid}.ack").write_bytes(b"")
+    _fake_task(monkeypatch, work)
+    start = time.monotonic()
+    assert mh.ask(["uninstall"], wait_s=60) is None
+    assert time.monotonic() - start < 5
+
+
+def test_a_dead_heartbeat_of_another_request_that_looks_new_doesnt_hold_ours(monkeypatch):
+    """Another request's .ack left by a dead helper, dated now (or later, after a clock
+    correction): it never changes, so ours still gives up at START_S."""
+    _queue()
+    monkeypatch.setattr(mh, "_schtasks", lambda *a, **k: 0)
+    monkeypatch.setattr(mh, "START_S", 0.2)
+    dead = mh.results_dir() / f"{'8' * 32}.ack"
+    dead.write_bytes(b"")
+    later = time.time() + 3600
+    os.utime(dead, (later, later))
+    start = time.monotonic()
+    assert mh.ask(["uninstall"], wait_s=5) is None
+    assert time.monotonic() - start < 3
+
+
+def test_the_heartbeat_says_something_new_each_beat(monkeypatch):
+    """A new helper writes a count into its .ack (what a new app watches) and the write
+    moves its time too (what an app of version 7 or older watches)."""
+    _queue()
+    monkeypatch.setattr(mh, "BEAT_S", 0.05)
+    ack = mh.results_dir() / f"{'9' * 32}.ack"
+    seen = []
+
+    def slow(args):
+        for _ in range(4):
+            seen.append((ack.read_bytes(), ack.stat().st_mtime_ns))
+            time.sleep(0.15)
+        return 0
+    _request("9" * 32, b"uninstall")
+    mh.serve(run=slow)
+    texts, times = [s[0] for s in seen], [s[1] for s in seen]
+    assert all(texts) and len(set(texts)) == len(texts)
+    assert times == sorted(times) and len(set(times)) > 1
+
+
+def test_a_new_app_still_watches_an_older_helper_that_only_touches(monkeypatch):
+    """A helper of version 5 to 7 only touches an empty .ack: the app sees the time
+    move and keeps waiting past STALE_S until it answers."""
+    _queue()
+    monkeypatch.setattr(mh, "STALE_S", 0.3)
+
+    def work(rid):
+        args = mh._take(mh.requests_dir() / f"{rid}.req")
+        ack = mh.results_dir() / f"{rid}.ack"
+        ack.write_bytes(b"")
+        for _ in range(16):
+            time.sleep(0.05)
+            os.utime(ack)
+        mh._answer(rid, 0 if args else 2)
+        ack.unlink()
+    _fake_task(monkeypatch, work)
+    assert mh.ask(["uninstall"], wait_s=60) == 0
