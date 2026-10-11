@@ -700,14 +700,14 @@ class MainWindow(QMainWindow):
                     tip=_("Offline mode is on: nothing goes online, and what needs the "
                           "internet is hidden. Click to change it."))
         self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
-        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON)
+        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON, gap=False)
         self.btn_offline.setVisible(net.offline())
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
         self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.show_update)
-        icons.set_icon(self.btn_update, "next", size=sidebar.ICON)
+        icons.set_icon(self.btn_update, "next", size=sidebar.ICON, gap=False)
         self.btn_update.hide()
         # the two switches for everything at once, whatever tab you're on
         self.btn_air = QPushButton()
@@ -715,7 +715,7 @@ class MainWindow(QMainWindow):
         self.btn_air.setCheckable(True)
         self.btn_air.setChecked(True)
         self.btn_air.toggled.connect(self.set_sending)
-        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON)
+        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON, gap=False)
         self.set_sending(True)
         # Keep the mode controller for shared commands; its full picker lives on Setup.
         from soundboard.ui.destpanel import ModeButton
@@ -728,7 +728,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
-        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON, gap=False)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -736,7 +736,7 @@ class MainWindow(QMainWindow):
         self.gear.clicked.connect(lambda: self.open_settings())
         # (showing its page: the accent, as a selected tab's icon; on_accent was white
         # on the soft fill, all but gone in Light)
-        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON)
+        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON, gap=False)
         self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
         # the onion beside it: the Discord, feedback, a bug report, the code (each only
         # opens a page in the browser, feedback.py)
@@ -745,7 +745,7 @@ class MainWindow(QMainWindow):
         self.btn_about.setProperty("quiet", True)
         self.btn_about.setToolTip(_("Help and community"))
         self.btn_about.setProperty("railtext", _("Help and community"))
-        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON)
+        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON, gap=False)
         self.about_menu = DropdownMenu(self.btn_about)
         self.about_menu.aboutToShow.connect(self._fill_about_menu)
         self.btn_about.clicked.connect(self._show_about_menu)
@@ -930,7 +930,7 @@ class MainWindow(QMainWindow):
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
-        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON)
+        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON, gap=False)
         self.btn_more_tabs.setProperty("railtext", _("More tabs"))
         self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
         self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
@@ -1378,7 +1378,7 @@ class MainWindow(QMainWindow):
         add.setObjectName("soundadd")
         add.setToolTip(_("Add sound files (or drag them onto the window)"))
         add.clicked.connect(self.add_dialog)
-        icons.set_icon(add, "plus", "accent", size=18)
+        icons.set_icon(add, "music", "accent", size=18)
         self.btn_record = QPushButton(_("Record"))
         self.btn_record.setObjectName("soundrecord")
         icons.set_icon(self.btn_record, "mic", size=18)
@@ -4660,7 +4660,7 @@ class MainWindow(QMainWindow):
     def _stop_all_clicked(self):
         self.stop_all()
         # only an icon on the rail: a tick for a moment says it worked
-        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
         QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
                                                        size=sidebar.ICON))
 

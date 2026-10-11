@@ -3,4 +3,5 @@ pytest==9.1.1
 pytest-xdist==3.8.0
 pytest-rerunfailures==16.7
 ruff==0.16.10
+pyright==1.1.414
 pyinstaller==6.22.3

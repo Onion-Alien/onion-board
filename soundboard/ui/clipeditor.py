@@ -758,6 +758,7 @@ class ClipEditor(QWidget):
         narrow = self.width() < NARROW_PX
         for b in (self.btn_live, self.btn_play, self.btn_save, self.btn_send, self.btn_edit):
             b.setText("" if narrow else b.property("full_text"))
+            icons.text_gap(b)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
