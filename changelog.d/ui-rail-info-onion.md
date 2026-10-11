@@ -1,0 +1,1 @@
+- Sidebar: an onion button between Settings and the arrow opens Join the Discord, Send feedback, Report a problem, the GitHub page and What's new. It sits exactly halfway at every sidebar width, and the small › on the sidebar card has a sharp tip again.

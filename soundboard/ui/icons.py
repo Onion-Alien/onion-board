@@ -283,6 +283,22 @@ def _info(p, fill):
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
 
 
+def _onion(p, fill):
+    """Help and community (the rail's foot): a bulb, a layer and a curled leaf."""
+    bulb = QPainterPath(QPointF(12, 6.5))
+    bulb.cubicTo(QPointF(14, 9), QPointF(20.5, 10), QPointF(20.5, 14.8))
+    bulb.cubicTo(QPointF(20.5, 19), QPointF(16.5, 21), QPointF(12, 21))
+    bulb.cubicTo(QPointF(7.5, 21), QPointF(3.5, 19), QPointF(3.5, 14.8))
+    bulb.cubicTo(QPointF(3.5, 10), QPointF(10, 9), QPointF(12, 6.5))
+    p.drawPath(bulb)
+    layer = QPainterPath(QPointF(12, 9))
+    layer.cubicTo(QPointF(15, 12.5), QPointF(15, 17.5), QPointF(12.5, 21))
+    p.drawPath(layer)
+    leaf = QPainterPath(QPointF(12, 6.5))
+    leaf.cubicTo(QPointF(12, 4.5), QPointF(13, 3), QPointF(15.5, 2.5))
+    p.drawPath(leaf)
+
+
 def _shield(p, fill):
     """Privacy & security: a shield with a tick."""
     path = QPainterPath(QPointF(12, 3))
@@ -472,25 +488,29 @@ def _eye(p, fill):
 
 def _chevron(direction):
     """A fold-out's state: > closed, v open (^ to fold it back up)."""
+    pts = {"down": ((6, 9), (12, 15), (18, 9)), "up": ((6, 15), (12, 9), (18, 15)),
+           "left": ((15, 6), (9, 12), (15, 18))}.get(direction, ((9, 6), (15, 12), (9, 18)))
+
     def draw(p, fill):
-        path = QPainterPath()
-        if direction == "down":
-            path.moveTo(6, 9)
-            path.lineTo(12, 15)
-            path.lineTo(18, 9)
-        elif direction == "up":
-            path.moveTo(6, 15)
-            path.lineTo(12, 9)
-            path.lineTo(18, 15)
-        elif direction == "left":
-            path.moveTo(15, 6)
-            path.lineTo(9, 12)
-            path.lineTo(15, 18)
+        # each corner on the pixel grid at the size it's drawn: at 12 px the tip fell
+        # between two pixel rows and came out a dim smudge, not a point
+        scale = p.transform().m11() or 1
+        odd = round(p.pen().widthF() * scale) % 2 == 1   # a 1 px line: drawn hard
+
+        def snap(v):
+            d = v * scale
+            return (math.floor(d) if odd else math.floor(d + 0.5)) / scale
+
+        path = QPainterPath(QPointF(snap(pts[0][0]), snap(pts[0][1])))
+        for x, y in pts[1:]:
+            path.lineTo(snap(x), snap(y))
+        if odd:   # a 1 px line at 45 degrees: solid steps, not two half-lit pixels each
+            p.save()
+            p.setRenderHint(QPainter.Antialiasing, False)
+            p.drawPath(path)
+            p.restore()
         else:
-            path.moveTo(9, 6)
-            path.lineTo(15, 12)
-            path.lineTo(9, 18)
-        p.drawPath(path)
+            p.drawPath(path)
     return draw
 
 
@@ -643,7 +663,7 @@ SHAPES = {
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
-    "shield": _shield, "info": _info,
+    "shield": _shield, "info": _info, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
