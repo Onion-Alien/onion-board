@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "超過 0 dB 聲音會變大，直到破音。",
   "Add": "新增",
   "Add a tab: radio, sending a program's sound, screen triggers": "新增分頁：電台、傳送程式的聲音、螢幕觸發器",
-  "Add sound files (or drag them onto the window)": "新增音效檔（或直接拖到視窗上）",
   "Add sounds": "新增音效",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "已將「{name}」（{duration:.1f} 秒）加入音效，在那裡按右鍵可以重新命名或設定快速鍵。",
   "Adding {count} sound…": [
@@ -325,7 +324,6 @@
   "Recently deleted ({n})": "最近刪除（{n}）",
   "Record": "錄音",
   "Record a sound": "錄製音效",
-  "Record a sound with your mic: the Record button next to Add sounds.": "用你的麥克風錄音效：「新增音效」旁邊的「錄音」按鈕。",
   "Record again": "重新錄音",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "錄下你的聲音，或在音效、歌曲或電台播放時錄下一段，存成音效。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "正在錄製播放中的聲音… 現在播放音效、搜尋結果或電台，然後按「停止」。",
@@ -3141,5 +3139,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor 失敗",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "整個資料夾",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "新增音效：檔案、資料夾、錄音、連結或免費音效包（也可以把檔案拖到視窗上）",
+  "From a link": "從連結",
+  "Paste a link into the search box": "把連結貼到搜尋框",
+  "Record a sound with your mic: Add, then Record.": "用麥克風錄製音效：新增 → 錄音。",
+  "Sound files": "音效檔案",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "沒有儲存影片：儲存影片需要 FFmpeg（設定 > 資料 & 品質）。"
 }

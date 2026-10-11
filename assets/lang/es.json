@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Por encima de 0 dB el sonido sube hasta que satura.",
   "Add": "Añadir",
   "Add a tab: radio, sending a program's sound, screen triggers": "Añadir una pestaña: radio, enviar el sonido de un programa, disparadores de pantalla",
-  "Add sound files (or drag them onto the window)": "Añadir archivos de sonido (o arrástralos a la ventana)",
   "Add sounds": "Añadir sonidos",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "“{name}” ({duration:.1f}s) añadido a Sonidos: haz clic derecho en él para cambiarle el nombre o ponerle un atajo.",
   "Adding {count} sound…": [
@@ -331,7 +330,6 @@
   "Recently deleted ({n})": "Eliminados recientemente ({n})",
   "Record": "Grabar",
   "Record a sound": "Grabar un sonido",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Graba un sonido con tu micro: el botón Grabar junto a Añadir sonidos.",
   "Record again": "Grabar otra vez",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Graba tu voz, o un trozo de un sonido, una canción o la radio mientras suena, y guárdalo como sonido.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Grabando lo que suena… reproduce ahora un sonido, un resultado de búsqueda o la radio, y luego haz clic en Parar.",
@@ -3214,5 +3212,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor ha fallado",
   "Tor {percent}%": "Tor {percent} %",
+  "A whole folder": "Una carpeta entera",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Añade sonidos: archivos, una carpeta, una grabación, un enlace o un pack gratis (o arrastra archivos a la ventana)",
+  "From a link": "Desde un enlace",
+  "Paste a link into the search box": "Pega un enlace en el cuadro de búsqueda",
+  "Record a sound with your mic: Add, then Record.": "Graba un sonido con tu micro: Añadir y luego Grabar.",
+  "Sound files": "Archivos de sonido",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "No se guardó ningún vídeo: para guardar vídeos hace falta FFmpeg (Ajustes > Datos & calidad)."
 }

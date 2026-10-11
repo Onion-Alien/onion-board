@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Boven 0 dB wordt het geluid harder tot het gaat clippen.",
   "Add": "Toevoegen",
   "Add a tab: radio, sending a program's sound, screen triggers": "Een tabblad toevoegen: radio, het geluid van een programma sturen, schermtriggers",
-  "Add sound files (or drag them onto the window)": "Geluidsbestanden toevoegen (of sleep ze op het venster)",
   "Add sounds": "Geluiden toevoegen",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "“{name}” ({duration:.1f}s) toegevoegd aan Geluiden, rechtsklik het daar om te hernoemen of een sneltoets in te stellen.",
   "Adding {count} sound…": [
@@ -331,7 +330,6 @@
   "Recently deleted ({n})": "Onlangs verwijderd ({n})",
   "Record": "Opnemen",
   "Record a sound": "Een geluid opnemen",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Neem een geluid op met je mic: de knop Opnemen naast Geluiden toevoegen.",
   "Record again": "Opnieuw opnemen",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Neem je stem op, of een stukje van een geluid, nummer of de radio terwijl het speelt, en bewaar het als geluid.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Neemt op wat er speelt… speel nu een geluid, een zoekresultaat of de radio af en klik dan op Stop.",
@@ -3214,5 +3212,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor mislukt",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Een hele map",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Geluiden toevoegen: bestanden, een map, een opname, een link of een gratis pakket (of sleep bestanden naar het venster)",
+  "From a link": "Via een link",
+  "Paste a link into the search box": "Plak een link in het zoekvak",
+  "Record a sound with your mic: Add, then Record.": "Neem een geluid op met je microfoon: Toevoegen, dan Opnemen.",
+  "Sound files": "Geluidsbestanden",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Er is geen video opgeslagen: video's opslaan heeft FFmpeg nodig (Instellingen > Gegevens & kwaliteit)."
 }

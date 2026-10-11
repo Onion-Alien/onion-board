@@ -133,7 +133,6 @@
   "Add a tab: radio, sending a program's sound, screen triggers": "Tambah tab: radio, menghantar bunyi program, pencetus skrin",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Tambah sebagai bunyi menyimpan salinan video juga (pad masih bunyinya sahaja). Video guna jauh lebih banyak data: kira-kira 5 hingga 25 MB seminit.",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg installed only lower-quality videos can be saved (usually 360p).": "Tambah sebagai bunyi menyimpan salinan video juga (pad masih bunyinya sahaja). Video guna jauh lebih banyak data: kira-kira 5 hingga 25 MB seminit. Tanpa ffmpeg dipasang, hanya video kualiti rendah boleh disimpan (biasanya 360p).",
-  "Add sound files (or drag them onto the window)": "Tambah fail bunyi (atau seret ke tetingkap)",
   "Add sounds": "Tambah bunyi",
   "Add-on downloads": "Muat turun add-on",
   "Add-on downloads are off (Privacy)": "Muat turun add-on dimatikan (Privasi)",
@@ -884,7 +883,6 @@
   "Recently deleted voices": "Suara baru dipadam",
   "Record": "Rakam",
   "Record a sound": "Rakam bunyi",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Rakam bunyi dengan mikrofon anda: butang Rakam di sebelah Tambah bunyi.",
   "Record again": "Rakam semula",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Rakam suara anda, atau sedikit bunyi, lagu atau radio semasa ia dimainkan, dan simpan sebagai bunyi.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Merakam apa yang sedang dimainkan… mainkan bunyi, hasil carian atau radio sekarang, kemudian klik Henti.",
@@ -3141,5 +3139,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor gagal",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Satu folder penuh",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Tambah bunyi: fail, folder, rakaman, pautan atau pek percuma (atau seret fail ke tetingkap)",
+  "From a link": "Daripada pautan",
+  "Paste a link into the search box": "Tampal pautan dalam kotak carian",
+  "Record a sound with your mic: Add, then Record.": "Rakam bunyi dengan mikrofon anda: Tambah, kemudian Rakam.",
+  "Sound files": "Fail bunyi",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Tiada video disimpan: menyimpan video perlukan FFmpeg (Tetapan > Data & kualiti)."
 }

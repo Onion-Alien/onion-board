@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Powyżej 0 dB dźwięk robi się głośniejszy, aż zacznie przesterowywać.",
   "Add": "Dodaj",
   "Add a tab: radio, sending a program's sound, screen triggers": "Dodaj kartę: radio, wysyłanie dźwięku programu, wyzwalacze ekranowe",
-  "Add sound files (or drag them onto the window)": "Dodaj pliki dźwiękowe (albo przeciągnij je na okno)",
   "Add sounds": "Dodaj dźwięki",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Dodano „{name}” ({duration:.1f} s) do Dźwięków, kliknij go tam prawym, by zmienić nazwę lub ustawić skrót.",
   "Adding {count} sound…": [
@@ -337,7 +336,6 @@
   "Recently deleted ({n})": "Ostatnio usunięte ({n})",
   "Record": "Nagraj",
   "Record a sound": "Nagraj dźwięk",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Nagraj dźwięk mikrofonem: przycisk Nagraj obok Dodaj dźwięki.",
   "Record again": "Nagraj ponownie",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nagraj swój głos albo kawałek dźwięku, piosenki czy radia, gdy gra, i zachowaj go jako dźwięk.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nagrywanie tego, co gra… zagraj teraz dźwięk, wynik wyszukiwania albo radio, potem kliknij Stop.",
@@ -3287,5 +3285,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor nie zadziałał",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Cały folder",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Dodaj dźwięki: pliki, folder, nagranie, link lub darmową paczkę (albo przeciągnij pliki na okno)",
+  "From a link": "Z linku",
+  "Paste a link into the search box": "Wklej link w polu wyszukiwania",
+  "Record a sound with your mic: Add, then Record.": "Nagraj dźwięk mikrofonem: Dodaj, potem Nagraj.",
+  "Sound files": "Pliki dźwiękowe",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nie zapisano żadnego filmu: do zapisywania filmów potrzebny jest FFmpeg (Ustawienia > Dane i jakość)."
 }

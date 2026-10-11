@@ -110,7 +110,6 @@
   "Add a tab: radio, sending a program's sound, screen triggers": "Добави раздел: радио, пращане на звука на програма, тригери от екрана",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Добави като звук пази и копие на видеото (бутонът пак е само звукът му). Видеата заемат много повече място: около 5 до 25 MB на минута.",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg installed only lower-quality videos can be saved (usually 360p).": "Добави като звук пази и копие на видеото (бутонът пак е само звукът му). Видеата заемат много повече място: около 5 до 25 MB на минута. Без инсталиран ffmpeg могат да се запазват само видеа с по-ниско качество (обикновено 360p).",
-  "Add sound files (or drag them onto the window)": "Добави звукови файлове (или ги провлачи в прозореца)",
   "Add sounds": "Добави звуци",
   "Add-on downloads": "Изтегляне на добавки",
   "Add-on downloads are off (Privacy)": "Изтеглянето на добавки е изключено (Поверителност)",
@@ -834,7 +833,6 @@
   "Recently deleted voices": "Наскоро изтрити гласове",
   "Record": "Запис",
   "Record a sound": "Запиши звук",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Запиши звук с микрофона си: бутонът Запис до Добави звуци.",
   "Record again": "Запиши пак",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши гласа си или парче от звук, песен или радиото, докато звучи, и го запази като звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записвам каквото звучи… пусни звук, резултат от търсене или радиото сега, после кликни Спри.",
@@ -3214,5 +3212,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor не успя",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Цяла папка",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Добави звуци: файлове, папка, запис, линк или безплатен пакет (или плъзни файлове в прозореца)",
+  "From a link": "От линк",
+  "Paste a link into the search box": "Постави линк в полето за търсене",
+  "Record a sound with your mic: Add, then Record.": "Запиши звук с микрофона: Добави, после Запис.",
+  "Sound files": "Звукови файлове",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Не е запазено видео: за запазване на видео трябва FFmpeg (Настройки > Данни & качество)."
 }

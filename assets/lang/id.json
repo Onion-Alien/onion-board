@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Di atas 0 dB suaranya makin keras sampai pecah.",
   "Add": "Tambah",
   "Add a tab: radio, sending a program's sound, screen triggers": "Tambah tab: radio, kirim suara program, pemicu layar",
-  "Add sound files (or drag them onto the window)": "Tambah file suara (atau seret ke jendela)",
   "Add sounds": "Tambah suara",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "“{name}” ({duration:.1f} dtk) ditambahkan ke Suara, klik kanan di sana untuk mengganti nama atau mengatur hotkey.",
   "Adding {count} sound…": [
@@ -325,7 +324,6 @@
   "Recently deleted ({n})": "Baru dihapus ({n})",
   "Record": "Rekam",
   "Record a sound": "Rekam suara",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Rekam suara dengan mic-mu: tombol Rekam di sebelah Tambah suara.",
   "Record again": "Rekam lagi",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Rekam suaramu, atau sepotong suara, lagu, atau radio selagi diputar, lalu simpan sebagai suara.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Merekam yang sedang diputar… putar suara, hasil pencarian, atau radio sekarang, lalu klik Stop.",
@@ -3141,5 +3139,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor gagal",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Satu folder penuh",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Tambah suara: file, folder, rekaman, tautan, atau paket gratis (atau seret file ke jendela)",
+  "From a link": "Dari tautan",
+  "Paste a link into the search box": "Tempel tautan di kotak pencarian",
+  "Record a sound with your mic: Add, then Record.": "Rekam suara dengan mikmu: Tambah, lalu Rekam.",
+  "Sound files": "File suara",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Tidak ada video yang disimpan: menyimpan video butuh FFmpeg (Pengaturan > Data & kualitas)."
 }

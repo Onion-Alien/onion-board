@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Понад 0 дБ звук стає гучнішим, доки не почне спотворюватися.",
   "Add": "Додати",
   "Add a tab: radio, sending a program's sound, screen triggers": "Додати вкладку: радіо, звук програми, тригери на екрані",
-  "Add sound files (or drag them onto the window)": "Додати звукові файли (або перетягни їх у вікно)",
   "Add sounds": "Додати звуки",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Додано «{name}» ({duration:.1f} с) у «Звуки»: правий клік там, щоб перейменувати або задати гарячу клавішу.",
   "Adding {count} sound…": [
@@ -337,7 +336,6 @@
   "Recently deleted ({n})": "Нещодавно видалені ({n})",
   "Record": "Запис",
   "Record a sound": "Записати звук",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Записуй звук мікрофоном: кнопка «Запис» поруч із «Додати звуки».",
   "Record again": "Записати ще раз",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши свій голос або шматок звуку, пісні чи радіо, поки воно грає, і збережи як звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записую те, що грає… увімкни звук, результат пошуку чи радіо, потім натисни «Стоп».",
@@ -3287,5 +3285,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor не вдався",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Цілу папку",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Додати звуки: файли, папку, запис, посилання або безкоштовний пак (або перетягни файли у вікно)",
+  "From a link": "За посиланням",
+  "Paste a link into the search box": "Встав посилання в поле пошуку",
+  "Record a sound with your mic: Add, then Record.": "Запиши звук з мікрофона: Додати, потім Запис.",
+  "Sound files": "Звукові файли",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Жодного відео не було збережено: для збереження відео потрібен FFmpeg (Налаштування > Дані та якість)."
 }

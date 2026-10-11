@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "เกิน 0 dB เสียงจะดังขึ้นจนแตก",
   "Add": "เพิ่ม",
   "Add a tab: radio, sending a program's sound, screen triggers": "เพิ่มแท็บ: วิทยุ, ส่งเสียงของโปรแกรม, ทริกเกอร์หน้าจอ",
-  "Add sound files (or drag them onto the window)": "เพิ่มไฟล์เสียง (หรือลากมาวางบนหน้าต่าง)",
   "Add sounds": "เพิ่มเสียง",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "เพิ่ม “{name}” ({duration:.1f} วิ) ลงใน เสียง แล้ว, คลิกขวาที่นั่นเพื่อเปลี่ยนชื่อหรือตั้งปุ่มลัด",
   "Adding {count} sound…": [
@@ -325,7 +324,6 @@
   "Recently deleted ({n})": "ลบล่าสุด ({n})",
   "Record": "อัด",
   "Record a sound": "อัดเสียง",
-  "Record a sound with your mic: the Record button next to Add sounds.": "อัดเสียงด้วยไมค์: ปุ่ม อัด ข้างปุ่ม เพิ่มเสียง",
   "Record again": "อัดอีกครั้ง",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "อัดเสียงพูดของคุณ หรือบางส่วนของเสียง เพลง หรือวิทยุระหว่างที่เล่น แล้วเก็บเป็นเสียง",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "กำลังอัดสิ่งที่เล่นอยู่… เล่นเสียง ผลการค้นหา หรือวิทยุตอนนี้ แล้วคลิก หยุด",
@@ -3141,5 +3139,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor ล้มเหลว",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "ทั้งโฟลเดอร์",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "เพิ่มเสียง: ไฟล์ โฟลเดอร์ เสียงที่อัด ลิงก์ หรือแพ็กฟรี (หรือลากไฟล์มาวางที่หน้าต่าง)",
+  "From a link": "จากลิงก์",
+  "Paste a link into the search box": "วางลิงก์ในช่องค้นหา",
+  "Record a sound with your mic: Add, then Record.": "อัดเสียงด้วยไมค์ของคุณ: เพิ่ม แล้วกด อัด",
+  "Sound files": "ไฟล์เสียง",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "ไม่มีการบันทึกวิดีโอ: การบันทึกวิดีโอต้องใช้ FFmpeg (การตั้งค่า > ข้อมูล & คุณภาพ)"
 }

@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Trên 0 dB âm thanh to dần đến khi bị vỡ tiếng.",
   "Add": "Thêm",
   "Add a tab: radio, sending a program's sound, screen triggers": "Thêm thẻ: radio, gửi âm thanh của chương trình, kích hoạt màn hình",
-  "Add sound files (or drag them onto the window)": "Thêm file âm thanh (hoặc kéo thả vào cửa sổ)",
   "Add sounds": "Thêm âm thanh",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Đã thêm “{name}” ({duration:.1f}s) vào Âm thanh, chuột phải vào nó ở đó để đổi tên hoặc đặt phím tắt.",
   "Adding {count} sound…": [
@@ -325,7 +324,6 @@
   "Recently deleted ({n})": "Đã xóa gần đây ({n})",
   "Record": "Ghi",
   "Record a sound": "Ghi âm thanh",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Ghi âm thanh bằng mic: nút Ghi cạnh Thêm âm thanh.",
   "Record again": "Ghi lại",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Ghi giọng bạn, hoặc một đoạn âm thanh, bài hát hay radio khi nó đang phát, rồi giữ thành âm thanh.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Đang ghi những gì đang phát… phát một âm thanh, kết quả tìm kiếm hoặc radio ngay, rồi bấm Dừng.",
@@ -3141,5 +3139,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor thất bại",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Cả một thư mục",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Thêm âm thanh: tệp, thư mục, bản ghi, liên kết hoặc gói miễn phí (hoặc kéo tệp vào cửa sổ)",
+  "From a link": "Từ một liên kết",
+  "Paste a link into the search box": "Dán liên kết vào ô tìm kiếm",
+  "Record a sound with your mic: Add, then Record.": "Ghi âm bằng mic của bạn: Thêm, rồi Ghi.",
+  "Sound files": "Tệp âm thanh",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Không có video nào được lưu: lưu video cần FFmpeg (Cài đặt > Chất lượng & dữ liệu)."
 }

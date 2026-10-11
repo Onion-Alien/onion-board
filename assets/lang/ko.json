@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "0 dB를 넘으면 클리핑될 때까지 소리가 커져요.",
   "Add": "추가",
   "Add a tab: radio, sending a program's sound, screen triggers": "탭 추가: 라디오, 프로그램 소리 보내기, 화면 트리거",
-  "Add sound files (or drag them onto the window)": "사운드 파일 추가(또는 창에 끌어다 놓기)",
   "Add sounds": "사운드 추가",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "“{name}”({duration:.1f}초)을(를) 사운드에 추가했어요, 거기서 우클릭해 이름을 바꾸거나 단축키를 지정하세요.",
   "Adding {count} sound…": [
@@ -325,7 +324,6 @@
   "Recently deleted ({n})": "최근 삭제됨({n})",
   "Record": "녹음",
   "Record a sound": "사운드 녹음",
-  "Record a sound with your mic: the Record button next to Add sounds.": "마이크로 사운드 녹음: 사운드 추가 옆의 녹음 버튼.",
   "Record again": "다시 녹음",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "목소리를 녹음하거나, 재생 중인 사운드·노래·라디오의 일부를 녹음해 사운드로 남겨요.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "재생 중인 소리 녹음 중… 지금 사운드나 검색 결과, 라디오를 재생한 다음 정지를 클릭하세요.",
@@ -3141,5 +3139,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor 실패",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "폴더 통째로",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "사운드 추가: 파일, 폴더, 녹음, 링크 또는 무료 팩 (파일을 창에 끌어다 놓아도 돼요)",
+  "From a link": "링크에서",
+  "Paste a link into the search box": "검색창에 링크를 붙여넣으세요",
+  "Record a sound with your mic: Add, then Record.": "마이크로 사운드 녹음: 추가 → 녹음.",
+  "Sound files": "사운드 파일",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "동영상이 저장되지 않았습니다. 동영상을 저장하려면 FFmpeg가 필요합니다(설정 > 데이터 및 품질)."
 }

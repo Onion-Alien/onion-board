@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QFocusEvent, QKeyEvent
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QPushButton
 
 from soundboard import ytdl
 from soundboard.engine import SR
@@ -54,6 +54,13 @@ def space(w):
     QApplication.sendEvent(w, QKeyEvent(QEvent.KeyPress, Qt.Key_Space, Qt.NoModifier, " "))
 
 
+def toolbar_button(window):
+    """A plain button on the Sounds toolbar (the real ones there open menus)."""
+    btn = QPushButton("x", window.sounds_toolbar)
+    btn.show()
+    return btn
+
+
 def focused(monkeypatch, w):
     monkeypatch.setattr(QApplication, "focusWidget", staticmethod(lambda: w))
 
@@ -61,7 +68,7 @@ def focused(monkeypatch, w):
 def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monkeypatch):
     window.play("s0")
     assert player.paused("s0") is False
-    btn = window.btn_record
+    btn = toolbar_button(window)
     clicks = []
     btn.clicked.connect(lambda: clicks.append(1))
     focused(monkeypatch, btn)
@@ -75,7 +82,7 @@ def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monk
 def test_space_still_presses_a_button_reached_with_tab_and_types_in_text(
         window, player, monkeypatch):
     window.play("s0")
-    btn = window.btn_record
+    btn = toolbar_button(window)
     focused(monkeypatch, btn)
     focus(btn, Qt.TabFocusReason)
     space(btn)

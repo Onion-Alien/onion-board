@@ -135,7 +135,6 @@
   "Add a tab: radio, sending a program's sound, screen triggers": "Přidat kartu: rádio, posílání zvuku programu, spouštěče z obrazovky",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Přidat jako zvuk si nechá i kopii videa (pad je pořád jen jeho zvuk). Videa spotřebují mnohem víc dat: asi 5 až 25 MB za minutu.",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg installed only lower-quality videos can be saved (usually 360p).": "Přidat jako zvuk si nechá i kopii videa (pad je pořád jen jeho zvuk). Videa spotřebují mnohem víc dat: asi 5 až 25 MB za minutu. Bez nainstalovaného ffmpeg jde uložit jen video v nižší kvalitě (obvykle 360p).",
-  "Add sound files (or drag them onto the window)": "Přidat zvukové soubory (nebo je přetáhni do okna)",
   "Add sounds": "Přidat zvuky",
   "Add-on downloads": "Stahování doplňků",
   "Add-on downloads are off (Privacy)": "Stahování doplňků je vypnuté (Soukromí)",
@@ -912,7 +911,6 @@
   "Recently deleted voices": "Nedávno smazané hlasy",
   "Record": "Nahrát",
   "Record a sound": "Nahrát zvuk",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Nahraj zvuk mikrofonem: tlačítko Nahrát vedle Přidat zvuky.",
   "Record again": "Nahrát znovu",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Nahraj svůj hlas, nebo kousek zvuku, písničky či rádia, zatímco hraje, a nech si ho jako zvuk.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Nahrávám, co hraje… pusť teď zvuk, výsledek hledání nebo rádio a pak klikni na Zastavit.",
@@ -3287,5 +3285,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor selhal",
   "Tor {percent}%": "Tor {percent} %",
+  "A whole folder": "Celou složku",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Přidej zvuky: soubory, složku, nahrávku, odkaz nebo balíček zdarma (nebo přetáhni soubory do okna)",
+  "From a link": "Z odkazu",
+  "Paste a link into the search box": "Vlož odkaz do vyhledávacího pole",
+  "Record a sound with your mic: Add, then Record.": "Nahraj zvuk mikrofonem: Přidat, pak Nahrát.",
+  "Sound files": "Zvukové soubory",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Video se neuložilo: ukládání videí potřebuje FFmpeg (Nastavení > Data & kvalita)."
 }

@@ -135,7 +135,6 @@
   "Add a tab: radio, sending a program's sound, screen triggers": "Adaugă o filă: radio, trimiterea sunetului unui program, declanșatoare de ecran",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Adaugă ca sunet păstrează și o copie a videoclipului (pad-ul rămâne doar sunetul lui). Videoclipurile ocupă mult mai mult: cam 5–25 MB pe minut.",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg installed only lower-quality videos can be saved (usually 360p).": "Adaugă ca sunet păstrează și o copie a videoclipului (pad-ul rămâne doar sunetul lui). Videoclipurile ocupă mult mai mult: cam 5–25 MB pe minut. Fără ffmpeg instalat se pot salva doar videoclipuri de calitate mai mică (de obicei 360p).",
-  "Add sound files (or drag them onto the window)": "Adaugă fișiere de sunet (sau trage-le pe fereastră)",
   "Add sounds": "Adaugă sunete",
   "Add-on downloads": "Descărcări de suplimente",
   "Add-on downloads are off (Privacy)": "Descărcările de suplimente sunt oprite (Confidențialitate)",
@@ -912,7 +911,6 @@
   "Recently deleted voices": "Voci șterse recent",
   "Record": "Înregistrează",
   "Record a sound": "Înregistrează un sunet",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Înregistrează un sunet cu microfonul: butonul Înregistrează de lângă Adaugă sunete.",
   "Record again": "Înregistrează din nou",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Înregistrează-ți vocea, sau o bucată dintr-un sunet, o melodie sau radioul cât se redă, și păstreaz-o ca sunet.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Se înregistrează ce se redă… redă acum un sunet, un rezultat al căutării sau radioul, apoi dă clic pe Stop.",
@@ -3287,5 +3285,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor a eșuat",
   "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Un folder întreg",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Adaugă sunete: fișiere, un folder, o înregistrare, un link sau un pachet gratuit (sau trage fișierele pe fereastră)",
+  "From a link": "Dintr-un link",
+  "Paste a link into the search box": "Lipește un link în caseta de căutare",
+  "Record a sound with your mic: Add, then Record.": "Înregistrează un sunet cu microfonul: Adaugă, apoi Înregistrează.",
+  "Sound files": "Fișiere audio",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nu s-a salvat niciun videoclip: pentru salvarea videoclipurilor e nevoie de FFmpeg (Setări > Date & calitate)."
 }

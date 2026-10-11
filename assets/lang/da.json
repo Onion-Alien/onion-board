@@ -134,7 +134,6 @@
   "Add a tab: radio, sending a program's sound, screen triggers": "Tilføj en fane: radio, send et programs lyd, skærm-triggere",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Tilføj som lyd gemmer også en kopi af videoen (pad'en er stadig kun dens lyd). Videoer bruger meget mere data: ca. 5 til 25 MB i minuttet.",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg installed only lower-quality videos can be saved (usually 360p).": "Tilføj som lyd gemmer også en kopi af videoen (pad'en er stadig kun dens lyd). Videoer bruger meget mere data: ca. 5 til 25 MB i minuttet. Uden ffmpeg installeret kan kun videoer i lavere kvalitet gemmes (som regel 360p).",
-  "Add sound files (or drag them onto the window)": "Tilføj lydfiler (eller træk dem over på vinduet)",
   "Add sounds": "Tilføj lyde",
   "Add-on downloads": "Add-on-downloads",
   "Add-on downloads are off (Privacy)": "Add-on-downloads er slået fra (Privatliv)",
@@ -898,7 +897,6 @@
   "Recently deleted voices": "Nyligt slettede stemmer",
   "Record": "Optag",
   "Record a sound": "Optag en lyd",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Optag en lyd med din mikrofon: knappen Optag ved siden af Tilføj lyde.",
   "Record again": "Optag igen",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Optag din stemme, eller et stykke af en lyd, en sang eller radioen, mens den spiller, og gem det som en lyd.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Optager det, der spiller… afspil en lyd, et søgeresultat eller radioen nu, og klik så på Stop.",
@@ -3214,5 +3212,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor fejlede",
   "Tor {percent}%": "Tor {percent} %",
+  "A whole folder": "En hel mappe",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Tilføj lyde: filer, en mappe, en optagelse, et link eller en gratis pakke (eller træk filer ind i vinduet)",
+  "From a link": "Fra et link",
+  "Paste a link into the search box": "Indsæt et link i søgefeltet",
+  "Record a sound with your mic: Add, then Record.": "Optag en lyd med din mikrofon: Tilføj, derefter Optag.",
+  "Sound files": "Lydfiler",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Ingen video blev gemt: for at gemme videoer skal du have FFmpeg (Indstillinger > Data & kvalitet)."
 }

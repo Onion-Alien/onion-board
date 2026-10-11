@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Au-dessus de 0 dB, le son devient plus fort jusqu'à saturer.",
   "Add": "Ajouter",
   "Add a tab: radio, sending a program's sound, screen triggers": "Ajouter un onglet : radio, envoi du son d'un programme, déclencheurs d'écran",
-  "Add sound files (or drag them onto the window)": "Ajouter des fichiers son (ou les glisser sur la fenêtre)",
   "Add sounds": "Ajouter des sons",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "« {name} » ({duration:.1f}s) ajouté aux Sons, clic droit dessus pour le renommer ou lui donner un raccourci.",
   "Adding {count} sound…": [
@@ -331,7 +330,6 @@
   "Recently deleted ({n})": "Supprimés récemment ({n})",
   "Record": "Enregistrer",
   "Record a sound": "Enregistrer un son",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Enregistre un son avec ton micro : le bouton Enregistrer à côté de Ajouter des sons.",
   "Record again": "Réenregistrer",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Enregistre ta voix, ou un bout de son, de chanson ou de radio pendant qu'il joue, et garde-le comme son.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Enregistrement de ce qui joue… joue un son, un résultat de recherche ou la radio maintenant, puis clique sur Arrêter.",
@@ -3214,5 +3212,11 @@
   "Tor": "Tor",
   "Tor failed": "Échec de Tor",
   "Tor {percent}%": "Tor {percent} %",
+  "A whole folder": "Un dossier entier",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Ajoute des sons : fichiers, un dossier, un enregistrement, un lien ou un pack gratuit (ou glisse des fichiers sur la fenêtre)",
+  "From a link": "Depuis un lien",
+  "Paste a link into the search box": "Colle un lien dans la barre de recherche",
+  "Record a sound with your mic: Add, then Record.": "Enregistre un son avec ton micro : Ajouter, puis Enregistrer.",
+  "Sound files": "Fichiers audio",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Aucune vidéo enregistrée : enregistrer des vidéos demande FFmpeg (Paramètres > Données & qualité)."
 }

@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "0 dB'nin üstünde ses bozulana kadar yükselir.",
   "Add": "Ekle",
   "Add a tab: radio, sending a program's sound, screen triggers": "Sekme ekle: radyo, bir programın sesini gönderme, ekran tetikleyicileri",
-  "Add sound files (or drag them onto the window)": "Ses dosyası ekle (ya da pencereye sürükle)",
   "Add sounds": "Ses ekle",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "“{name}” ({duration:.1f} sn) Sesler'e eklendi, yeniden adlandırmak ya da kısayol tuşu atamak için orada sağ tıkla.",
   "Adding {count} sound…": [
@@ -331,7 +330,6 @@
   "Recently deleted ({n})": "Son silinenler ({n})",
   "Record": "Kaydet",
   "Record a sound": "Ses kaydet",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Mikrofonunla ses kaydet: Ses ekle'nin yanındaki Kaydet düğmesi.",
   "Record again": "Tekrar kaydet",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Sesini ya da çalarken bir sesin, şarkının veya radyonun bir parçasını kaydet ve ses olarak sakla.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Çalan kaydediliyor… şimdi bir ses, bir arama sonucu ya da radyoyu çal, sonra Durdur'a tıkla.",
@@ -3214,5 +3212,11 @@
   "Tor": "Tor",
   "Tor failed": "Tor başarısız",
   "Tor {percent}%": "Tor %{percent}",
+  "A whole folder": "Bütün bir klasör",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Ses ekle: dosyalar, klasör, kayıt, bağlantı veya ücretsiz paket (ya da dosyaları pencereye sürükle)",
+  "From a link": "Bir bağlantıdan",
+  "Paste a link into the search box": "Arama kutusuna bir bağlantı yapıştır",
+  "Record a sound with your mic: Add, then Record.": "Mikrofonunla ses kaydet: Ekle, sonra Kaydet.",
+  "Sound files": "Ses dosyaları",
   "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Hiçbir video kaydedilmedi: video kaydetmek için FFmpeg gerekir (Ayarlar > Veri ve kalite)."
 }
