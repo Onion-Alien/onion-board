@@ -2954,5 +2954,7 @@
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "영어로 이야기하면 다른 사람들은 다른 언어를 듣게 됩니다. AI 음성이나 음성 체인저 중 하나가 켜져 있으면 이를 말합니다. 그렇지 않은 경우 시작을 누르면 컴퓨터 음성이 나옵니다.",
   "Type a line and press Enter…": "한 줄을 입력하고 Enter를 누르세요…",
   "Category": "카테고리",
-  "Show more": "더 보기"
+  "Show more": "더 보기",
+  "Country": "국가",
+  "Sort by": "정렬 기준"
 }

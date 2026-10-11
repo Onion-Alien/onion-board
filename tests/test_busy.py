@@ -200,3 +200,29 @@ def test_emit_from_a_worker_reaches_the_widget_on_the_ui_thread(qapp):
     process_events(qapp, lambda: got)
     assert got == [(1, threading.main_thread().name)]
     assert busy.emit(asker.done, 3) and got[-1][0] == 3   # on the UI thread: at once
+
+
+def test_a_worker_result_after_the_app_tore_down_is_dropped_quietly(qapp, monkeypatch):
+    """Closing while a radio station was still connecting: the lookup thread's result
+    went to a carrier Qt had already deleted, and the thread died printing
+    "RuntimeError: Signal source has been deleted"."""
+    import threading
+
+    class Gone:
+        @property
+        def call(self):
+            raise RuntimeError("Signal source has been deleted")
+
+    monkeypatch.setattr(busy, "_carrier", Gone())
+    btn = QPushButton()
+    out, errors = [], []
+    t = threading.Thread(target=lambda: out.append(busy.emit(btn.clicked)))
+    old_hook = threading.excepthook
+    threading.excepthook = lambda a: errors.append(a.exc_value)
+    try:
+        t.start()
+        t.join(5)
+    finally:
+        threading.excepthook = old_hook
+    assert out == [False] and errors == []
+    assert busy._carrier is None                  # made fresh next time
