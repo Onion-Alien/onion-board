@@ -157,6 +157,10 @@ def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, 
     for _i in range(5):
         qapp.processEvents()
     assert card.pill.isVisibleTo(card) and card.pill.text() == pill
+    # the heading has no top padding, so its words share a centre line with the pill
+    assert card.heading.property('head')
+    title, badge = card.heading.geometry(), card.pill.geometry()
+    assert abs(title.center().y() - badge.center().y()) <= 1
     assert card.fix.isVisibleTo(card) == (fix is not None)
     if fix:
         assert card.fix.text() == fix and card.fix.graphicsEffect() is None

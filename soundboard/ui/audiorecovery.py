@@ -134,6 +134,7 @@ class RecoveryCard(QFrame):
         title = QLabel(_("Audio recovery"))
         title.setObjectName("section")
         title.setProperty("keepline", True)
+        title.setProperty("head", True)   # no top padding: it shares a line with the pill
         self.heading = title
         head.addWidget(title, 0, Qt.AlignVCenter)
         self.pill = QLabel()
