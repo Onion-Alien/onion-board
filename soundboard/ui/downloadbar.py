@@ -20,7 +20,7 @@ import urllib.parse
 from collections.abc import Callable
 
 from PySide6.QtCore import QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal
-from PySide6.QtGui import (QColor, QFontMetricsF, QIcon, QLinearGradient, QPainter,
+from PySide6.QtGui import (QColor, QFontMetricsF, QLinearGradient, QPainter,
                            QPainterPath, QPalette, QPen, QPixmap)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
@@ -167,9 +167,8 @@ class KindTag(QWidget):
         self.retheme()
 
     def retheme(self):
-        self.icon.setPixmap(icons.pixmap("play" if self.kind == "play" and not self.queued
-                                         else "plus", 12,
-                                         theme.T["live_text"]))
+        icons.set_label_icon(self.icon, "play" if self.kind == "play" and not self.queued
+                             else "plus", "live_text", size=12)
 
 
 class Outcome(QWidget):
@@ -693,7 +692,7 @@ class DownloadBar(QFrame):
         )
         self.bar.update()
         for b, name in ((self.btn_min, "fold_up"), (self.btn_expand, "fold_open")):
-            b.setIcon(QIcon(icons.pixmap(name, 16, T["muted"])))
+            icons.set_icon(b, name, "muted", size=16)
         self.s_icon.setPixmap(self._icon("download"))
         self.pill.retheme()
         self._line_up()
@@ -965,8 +964,9 @@ class DownloadBar(QFrame):
         else:
             self.queue_badge.setText(" · ".join(x for x in (self._queued_text(),
                                                             self._failed_text_for(failed)) if x))
-        self.queue_badge.setIcon(QIcon(icons.pixmap(
-            "fold_open" if self.queue_badge.isChecked() else "fold", 14, theme.T["muted"])))
+        icons.set_icon(self.queue_badge,
+                       "fold_open" if self.queue_badge.isChecked() else "fold",
+                       "muted", size=14, gap=False)
         names = [pretty_title(item.get("title", "")) or _("Sound") for item in self._queue]
         self.queue_badge.setToolTip("\n".join(([_("Up next")] + [f"• {n_}" for n_ in names])
                                               if names else [self._failed_text_for(failed)]))
@@ -981,8 +981,8 @@ class DownloadBar(QFrame):
         if on and has:
             self._fill_rows()
         self.panel.setVisible(on and has)
-        self.queue_badge.setIcon(QIcon(icons.pixmap(
-            "fold_open" if on else "fold", 14, theme.T["muted"])))
+        icons.set_icon(self.queue_badge, "fold_open" if on else "fold",
+                       "muted", size=14, gap=False)
 
     def _fill_rows(self):
         """The queue list, rebuilt: the picks waiting, then the ones that failed (each
