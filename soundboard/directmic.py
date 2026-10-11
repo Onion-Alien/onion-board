@@ -960,7 +960,7 @@ class _StateKey(_BackupKey):
 def _run(cmd: list[str], timeout: float = 60.0) -> int:
     """Run a command, hidden. Its exit code; -1 if it hung (it's stopped after `timeout`)."""
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
+        r = subprocess.run(cmd, capture_output=True, text=True, errors="replace", timeout=timeout,
                            creationflags=_CREATE_NO_WINDOW)
     except subprocess.TimeoutExpired:
         log.warning("%s: no answer in %.0f s, stopped", " ".join(cmd), timeout)
@@ -983,7 +983,7 @@ def _running_dependents() -> list[str]:
               "ForEach-Object Name")
     try:
         r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
-                           capture_output=True, text=True, timeout=30,
+                           capture_output=True, text=True, errors="replace", timeout=30,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
         log.warning("couldn't list the services that depend on the audio")
@@ -1019,7 +1019,7 @@ def _services_stopped() -> bool:
               " | Where-Object Status -ne 'Stopped' | Measure-Object).Count")
     try:
         r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
-                           capture_output=True, text=True, timeout=15,
+                           capture_output=True, text=True, errors="replace", timeout=15,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
         return False

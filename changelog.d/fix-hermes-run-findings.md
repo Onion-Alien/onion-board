@@ -1,0 +1,1 @@
+- Radio: the info line no longer keeps saying "Searching…" for a few seconds after the results are in or the search box is cleared.
