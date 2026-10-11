@@ -50,7 +50,7 @@ def open_clean(url: str) -> bool:
 class _Handler(QObject):
     @Slot(QUrl)
     def open(self, url: QUrl) -> None:
-        open_clean(bytes(url.toEncoded()).decode("ascii"))
+        open_clean(bytes(url.toEncoded().data()).decode("ascii"))
 
 
 _handler: _Handler | None = None
@@ -61,4 +61,4 @@ def install() -> None:
     if _handler is None:
         _handler = _Handler()
     for scheme in SCHEMES:
-        QDesktopServices.setUrlHandler(scheme, _handler, "open")
+        QDesktopServices.setUrlHandler(scheme, _handler, "open")   # pyright: ignore[reportArgumentType]  # PySide takes a str

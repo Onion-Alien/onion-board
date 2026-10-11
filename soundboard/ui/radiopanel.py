@@ -62,7 +62,7 @@ GENRES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Reggae", ("reggae", "dancehall", "ska", "dub")),
     ("News & Talk", ("news", "talk", "sport", "information", "public radio", "politics")),
 )
-_GENRE_WORDS = dict(GENRES)
+_GENRE_WORDS: dict[str, tuple[str, ...]] = dict(GENRES)
 GENRE_LABELS = {"Pop": _("Pop"), "Rock": _("Rock"), "Dance": _("Dance"),
                 "Hip-hop": _("Hip-hop"), "Jazz & Soul": _("Jazz & Soul"),
                 "Classical": _("Classical"), "Chill": _("Chill"), "Oldies": _("Oldies"),
@@ -608,7 +608,9 @@ class RadioTab(QWidget):
         vol = cfg.radio.get("vol", 1.0)
         self.vol = VolumeControl(float(vol) if isinstance(vol, (int, float)) else 1.0,
                                  tip=tip, meter=True)
-        self.meter = self.vol.meter
+        meter = self.vol.meter
+        assert meter is not None   # meter=True
+        self.meter = meter
         self.vol.changed.connect(self._on_vol)
         bh.addWidget(self.vol)
         self._clip_group = (self.btn_rec, self.btn_last)

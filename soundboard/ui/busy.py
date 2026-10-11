@@ -18,7 +18,7 @@ import threading
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QObject, Qt, QTimer, QUrl, Signal, Slot
-from PySide6.QtGui import QDesktopServices, QIcon
+from PySide6.QtGui import QDesktopServices, QIcon, QKeyEvent
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import errors
@@ -111,7 +111,8 @@ class _ClickBlocker(QObject):
         if t in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease,
                  QEvent.Type.MouseButtonDblClick):
             return True
-        return t in (QEvent.Type.KeyPress, QEvent.Type.KeyRelease) and ev.key() in (
+        return isinstance(ev, QKeyEvent) and t in (QEvent.Type.KeyPress,
+                                                   QEvent.Type.KeyRelease) and ev.key() in (
             Qt.Key.Key_Space, Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Select)
 
 
@@ -231,7 +232,9 @@ def _the_carrier() -> _Carrier:
     with _carrier_lock:
         if _carrier is None:
             c = _Carrier()
-            c.moveToThread(QApplication.instance().thread())   # (made on a worker)
+            app = QApplication.instance()
+            assert app is not None   # made before any worker
+            c.moveToThread(app.thread())   # (made on a worker)
             c.call.connect(c._run)
             _carrier = c
         return _carrier

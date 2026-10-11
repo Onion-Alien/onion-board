@@ -1276,7 +1276,7 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             new = votes.setdefault(old[k].lower(), {})
             new[T[k]] = new.get(T[k], 0) + 1
     # max() keeps the first of equal counts, and dicts keep _INLINE_KEYS order
-    swap = {a: max(c, key=c.get) for a, c in votes.items()}
+    swap = {a: max(c, key=lambda b, c=c: c[b]) for a, c in votes.items()}
     swap = {a: b for a, b in swap.items() if a != b.lower()}
     if not swap:
         return

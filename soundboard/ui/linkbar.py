@@ -17,6 +17,7 @@ import logging
 import shutil
 import tempfile
 import threading
+from typing import Any
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
@@ -358,10 +359,14 @@ class LinkBar(QFrame):
         try:
             if path is None:
                 emit("progress", url, "parsing")
+                more: dict[str, Any] = {}   # only what's asked (fakes in tests take less)
+                if direct:
+                    more["direct"] = True
+                if video:
+                    more["video"] = True
                 path, title = ytdl.download_audio(
                     url, progress=lambda f: emit("progress", url, f),
-                    auto_update=auto_update, **({"direct": True} if direct else {}),
-                    **({"video": True} if video else {}))
+                    auto_update=auto_update, **more)
                 emit("title", url, title)
             if stop is not None and stop.is_set():
                 emit("cancelled", url, None)   # while it downloaded: no import, no decode

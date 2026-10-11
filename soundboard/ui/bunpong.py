@@ -10,6 +10,7 @@ Nothing is kept: Esc or Close ends the game and Bun calms down again.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 import random
 import time
 
@@ -118,7 +119,7 @@ class Court(QWidget):
         self.setMouseTracking(True)
         self.setMinimumSize(320, 220)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.on_over = None   # called when someone reaches WIN_AT
+        self.on_over: Callable[[], None] | None = None   # called when someone reaches WIN_AT
         self.end_bun_left = 0.0   # where Bun stands at the end (the dialog centres him)
         self.reset()
 

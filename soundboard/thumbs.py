@@ -71,7 +71,8 @@ def store(src: str | Path | QImage, sid: str) -> str:
     try:
         library.THUMBS_DIR.mkdir(parents=True, exist_ok=True)
         dest = library.THUMBS_DIR / f"{sid}_{uuid.uuid4().hex[:6]}.jpg"
-        if not img.convertToFormat(QImage.Format.Format_RGB888).save(str(dest), "JPG", 88):
+        # (a str format: the stubs' bytes one fails at run time)
+        if not img.convertToFormat(QImage.Format.Format_RGB888).save(str(dest), "JPG", 88):   # pyright: ignore[reportCallIssue, reportArgumentType]
             return ""
         return str(dest)
     except OSError:

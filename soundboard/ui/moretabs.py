@@ -34,7 +34,9 @@ class Menu(QMenu):
     as its menu, Qt kept room for a drop-down arrow and the + sat off centre."""
 
     def pop(self):
-        self.popup(self.parentWidget().mapToGlobal(QPoint(0, 0)))   # (placed on show)
+        btn = self.parentWidget()
+        assert btn is not None   # made on its button
+        self.popup(btn.mapToGlobal(QPoint(0, 0)))   # (placed on show)
 
     def showEvent(self, ev):
         super().showEvent(ev)
