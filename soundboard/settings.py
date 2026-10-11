@@ -486,10 +486,11 @@ class SettingsDialog(QDialog):
         # a search box over the categories: 13 pages are a lot to look through for one
         # switch. Typing hides every card without the word and every page without a card.
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText(_("Search settings"))
+        # (a page: "Settings" is the heading right over it)
+        self.search_box.setPlaceholderText(_("Search") if embedded else _("Search settings"))
         self.search_box.setClearButtonEnabled(True)
         self.search_box.setAccessibleName(_("Search settings"))
-        self.search_box.setFixedWidth(196)   # (embedded: less the back arrow, _fit_width)
+        self.search_box.setFixedWidth(196)
         self._search_wait = QTimer(self, singleShot=True, interval=150)
         self._search_wait.timeout.connect(lambda: self._apply_search(self.search_box.text()))
         self.search_box.textChanged.connect(lambda _t: self._search_wait.start())
@@ -501,7 +502,8 @@ class SettingsDialog(QDialog):
         self.back_btn = None
         if embedded:
             # a page, not a window: back to the tab you were on (as Escape or a rail
-            # tab does), at the top left beside the search; narrow, over the icons
+            # tab does), on its own row over the search with the page's name, so the
+            # search box still lines up with the categories; narrow, over the icons
             back = self.back_btn = QPushButton()
             back.setProperty("quiet", True)
             icons.set_icon(back, "back")
@@ -509,14 +511,21 @@ class SettingsDialog(QDialog):
             back.setAccessibleName(_("Back"))
             back.setAutoDefault(False)
             back.clicked.connect(self.accept)
-            top = self._side_top = QHBoxLayout()
-            top.setSpacing(8)
+            self.page_title = QLabel(_("Settings"))
+            self.page_title.setObjectName("section")
+            self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
+            # the arrow over the categories' icons, the name over their names (an
+            # item: 4 px padding, a 20 px icon, then its text 36 px in)
+            back.setFixedWidth(36)
+            # its icon on the icons' centre line and level with the heading's letters
+            # (2 px lower than centred); the same 14 px of padding: the controls' height
+            back.setStyleSheet("padding:9px 0px 5px 3px")
+            top = QHBoxLayout()
+            top.setSpacing(0)
             top.addWidget(back)
-            top.addWidget(self.search_box, 1)
+            top.addWidget(self.page_title, 1)
             side.addLayout(top)
-            self.search_box.setFixedWidth(196 - back.sizeHint().width() - 8)
-        else:
-            side.addWidget(self.search_box)
+        side.addWidget(self.search_box)
         side.addWidget(self.categories, 1)
         right = self._right = QVBoxLayout()   # (narrow: the search box on top)
         right.setSpacing(8)
@@ -557,16 +566,16 @@ class SettingsDialog(QDialog):
             return
         self._narrow = narrow
         box = self.search_box
-        home = self._side_top if self.back_btn is not None else self._side
-        (home if narrow else self._right).removeWidget(box)
+        (self._side if narrow else self._right).removeWidget(box)
         if narrow:
             self._right.insertWidget(0, box)
             box.setMinimumWidth(0)
             box.setMaximumWidth(16777215)
         else:
-            home.addWidget(box, 1) if home is not self._side else home.insertWidget(0, box)
-            box.setFixedWidth(196 - (self.back_btn.sizeHint().width() + 8
-                                     if self.back_btn is not None else 0))
+            self._side.insertWidget(1 if self.back_btn is not None else 0, box)
+            box.setFixedWidth(196)
+        if self.back_btn is not None:
+            self.page_title.setVisible(not narrow)
         self._content.setSpacing(8 if narrow else 16)
         for i in range(self.categories.count()):
             item = self.categories.item(i)
@@ -912,14 +921,13 @@ class SettingsDialog(QDialog):
         row.addWidget(swatch)
         row.addWidget(hue, 1)
         cv.addLayout(row)
-        btns = QHBoxLayout()
+        btns = _button_row()   # (one under the other in a narrow window: no clipping)
         more = QPushButton(_("More colours"))
         more.setToolTip(_("Pick any colour, including how strong and how bright it is"))
         reset = QPushButton(_("Theme's colour"))
         reset.setToolTip(_("Go back to each theme's own highlight colour"))
         btns.addWidget(more)
         btns.addWidget(reset)
-        btns.addStretch(1)
         cv.addLayout(btns)
         now = QLabel()
         now.setObjectName("hint")

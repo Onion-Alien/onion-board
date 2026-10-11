@@ -937,10 +937,10 @@ class MainWindow(QMainWindow):
         av = QVBoxLayout(area)
         av.setContentsMargins(0, 0, 0, 0)
         av.setSpacing(rv.spacing())
-        for bar in (self.mic_banner, self.urgent_bar, self.tip_bar, self.setup_bar,
-                    self.lang_bar):
-            rv.removeWidget(bar)
-            av.addWidget(bar)
+        for strip in (self.mic_banner, self.urgent_bar, self.tip_bar, self.setup_bar,
+                      self.lang_bar):
+            rv.removeWidget(strip)
+            av.addWidget(strip)
         av.addWidget(tabs_box, 1)
         self._content = QStackedWidget()
         self._content.addWidget(area)
@@ -4345,7 +4345,8 @@ class MainWindow(QMainWindow):
         while it's up. [Done], Escape or any tab on the rail goes back to the tab you
         were on. Asked for again while up: the same page, on `page` if one is named."""
         dlg = self._settings_dlg
-        if dlg is not None and qt_valid(dlg):
+        fresh = dlg is None or not qt_valid(dlg)
+        if not fresh:
             if page:
                 dlg.show_page(page)
         else:
@@ -4363,8 +4364,10 @@ class MainWindow(QMainWindow):
             self._opening_settings = False
         self.rail.select_foot(self.gear)
         self._show_transport()
-        if not dlg.isAncestorOf(QApplication.focusWidget()):
-            dlg.categories.setFocus(Qt.OtherFocusReason)   # (Escape is for it now)
+        # (Escape is for it now; fresh, not the back arrow: the mini player's swap
+        # handed the focus on to it, ringed)
+        if fresh or not dlg.isAncestorOf(QApplication.focusWidget()):
+            dlg.categories.setFocus(Qt.OtherFocusReason)
         return dlg
 
     def _board_counts(self, on: bool):
@@ -4380,10 +4383,11 @@ class MainWindow(QMainWindow):
         """Settings asked for from the mini player: the window grows to the smallest
         size that shows them (SETTINGS_ROOM, or what the window needs), on the screen."""
         screen = self.screen().availableGeometry() if self.screen() else None
-        for _ in range(4):
+        for _try in range(4):
             size = self._pages.size()
             need = self._fit.fit(size).expandedTo(SETTINGS_ROOM)
-            if not self.is_mini() and size.width() >= need.width()                     and size.height() >= need.height():
+            if (not self.is_mini() and size.width() >= need.width()
+                    and size.height() >= need.height()):
                 break
             grow = need.expandedTo(size) - size
             w, h = self.width() + grow.width(), self.height() + grow.height()

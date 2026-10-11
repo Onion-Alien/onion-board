@@ -64,8 +64,9 @@ the affected states; include its PR and validation evidence here.
   Done (PR #413): Settings is a page in the main window, not a window: it takes the
   place of the tabs and the bars over them (`_content`, a stack), while the tab rail
   and the player + mixer strip stay, so sounds can still be played and stopped. The
-  rail's cog shows selected while it's up; `[Done]`, Escape or any rail tab (also
-  Ctrl+1...) goes back to the tab you were on. It keeps its own category list and
+  rail's cog (icon only, a square) shows selected while it's up; a back arrow over the
+  categories (no `[Done]` row), Escape or any rail tab (also Ctrl+1...) goes back to
+  the tab you were on. It keeps its own category list and
   search, applies live (no Save/Cancel), and every `open_settings("page")` link lands
   on that page (`SettingsDialog.show_page`, clearing a search first). Under 640 px the
   categories become an icon column (names as tips) and the search box goes over the

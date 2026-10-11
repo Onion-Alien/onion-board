@@ -600,7 +600,11 @@ class SideRail(QFrame):
                            for _ in range(2)]
         self._foot_box.addSpacerItem(self._foot_pads[0])
         for w in foot:
-            self._foot_box.addWidget(w, 1)
+            self._foot_box.addWidget(w, 0)
+        # Settings is its icon only (selected: the current tab's fill round it); open,
+        # the arrow stays at the far side
+        self._foot_gap = QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self._foot_box.addSpacerItem(self._foot_gap)
         self._foot_box.addWidget(self.toggle, 0)   # (mirrored: the right)
         self._foot_box.addSpacerItem(self._foot_pads[1])
         lay.addLayout(self._foot_box)
@@ -635,7 +639,10 @@ class SideRail(QFrame):
             p.setRenderHint(QPainter.Antialiasing)
             p.setPen(Qt.NoPen)
             p.setBrush(c)
-            p.drawRoundedRect(QRectF(obj.rect()).adjusted(0.5, 0.5, -0.5, -0.5), 8, 8)
+            # a square round the icon (the button is the controls' height, taller)
+            side = min(obj.width(), obj.height())
+            r = QRectF((obj.width() - side) / 2, (obj.height() - side) / 2, side, side)
+            p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), 8, 8)
             p.end()
         return False
 
@@ -830,10 +837,6 @@ class SideRail(QFrame):
         if self.output:
             title = self.output.title.fontMetrics().horizontalAdvance(_("Sound output"))
             need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
-        for w in self.foot:
-            name = ICON_PAD + (w.property("railtext") or "")
-            need.append(side + ICON + 24 + w.fontMetrics().horizontalAdvance(name)
-                        + 4 + BUTTON_W)
         return max(FULL_W, min(OPEN_W, max(need)))
 
     def _small(self, w: QWidget) -> bool:
@@ -890,8 +893,9 @@ class SideRail(QFrame):
             pad.changeSize(room, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
         self._foot_box.invalidate()
         for widget in self.foot:
-            widget.setMinimumWidth(BUTTON_W if mid else 0)
-            widget.setMaximumWidth(BUTTON_W if mid else 16777215)
+            widget.setFixedSize(BUTTON_W, BUTTON_W)   # a square: its fill, its hover
+        self._foot_gap.changeSize(0, 0, QSizePolicy.Fixed if mid else QSizePolicy.Expanding,
+                                  QSizePolicy.Fixed)
         self.toggle.setFixedWidth(BUTTON_W)
         self._place_column()
 
@@ -970,9 +974,13 @@ class SideRail(QFrame):
         for w in self.extras:
             if w.property("railtip") is None:   # its own tip, kept under the name
                 w.setProperty("railtip", w.toolTip())
-            w.setProperty("railopen", shown)
-            self._label(w, w.property("railtext") or "", w.property("railtip"),
-                        shown and not (mid and w in self.foot))
+            name = w.property("railtext") or ""
+            if w in self.foot:   # its icon only, open or shut (its name: screen readers)
+                w.setProperty("railopen", False)
+                self._label(w, name, w.property("railtip"), False)
+            else:
+                w.setProperty("railopen", shown)
+                self._label(w, name, w.property("railtip"), shown)
             w.style().unpolish(w)
             w.style().polish(w)
         self._status_box.setDirection(QBoxLayout.TopToBottom)
