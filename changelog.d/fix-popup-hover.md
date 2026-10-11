@@ -1,0 +1,1 @@
+- Fixed icons and cards staying highlighted after opening a popup and moving the mouse away.
