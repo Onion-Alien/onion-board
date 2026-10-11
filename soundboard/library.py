@@ -1496,15 +1496,7 @@ def load_sound(meta: SoundMeta) -> np.ndarray:
     return data
 
 
-_NPY_HEAD = 128   # a rendered cache file's header: written last, once the length is known
 REVERSE_CHUNK = 1 << 20   # frames swapped at a time when a render is reversed on disk
-
-
-def _npy_header(frames: int) -> bytes:
-    """The .npy header of (frames, 2) int16, padded to _NPY_HEAD bytes (np.load's format)."""
-    h = f"{{'descr': '<i2', 'fortran_order': False, 'shape': ({frames}, 2), }}"
-    h = h.ljust(_NPY_HEAD - 11) + "\n"
-    return b"\x93NUMPY\x01\x00" + struct.pack("<H", len(h)) + h.encode("latin1")
 
 
 def _reverse_frames(path: Path, frames: int) -> None:
@@ -1548,15 +1540,11 @@ def render_cached(sid: str, data: np.ndarray, fx: dict | None) -> np.ndarray:
 
             def put(x):
                 nonlocal n
-                y = x * I16                       # to_int16's rounding (x is in [-1, 1])
-                np.rint(y, out=y)
-                np.clip(y, -I16 - 1, I16, out=y)
-                f.write(y.astype("<i2").tobytes())
+                f.write(_i16(x).tobytes())        # x is in [-1, 1]: no limiter
                 n += len(x)
 
             soundfx.render_into(data, fx, start, put)
-            f.seek(0)
-            f.write(_npy_header(n))
+            _npy_header(f, n)
         if soundfx.clean(fx)["reverse"]:
             _reverse_frames(tmp, n)
         tmp.replace(dest)
