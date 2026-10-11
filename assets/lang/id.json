@@ -2879,7 +2879,6 @@
   "Quick hotkeys": "Hotkey cepat",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Mendengarkan: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Berbicara dalam bahasa Inggris dan orang lain mendengar bahasa lain. Suara AI atau pengubah suara mengucapkannya saat salah satunya aktif; jika tidak, tekan Mulai dan suara komputer akan berbunyi.",
   "Type a line and press Enter": "Ketik satu baris dan tekan Enter",
   "Category": "Kategori",
   "Show more": "Tampilkan lagi",
@@ -3127,5 +3126,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ke mikrofonmu <b style='color:{colour}'>✗ tidak berjalan</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Tidak ada yang perlu diatur.</b> Discord dan game mempertahankan mikrofon normal Anda, dan suara Anda tetap ada di dalamnya.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jika suara terpotong-potong, matikan peredam bising pada aplikasi suara (Discord: <b>Profil Input → Kustom</b> , <b>Peredam Kebisingan → Tidak Ada</b> , <b>Pembatalan Gema</b> nonaktif. Bukan Studio: ia melewati Onion Board).",
-  "Sounds chopped up?": "Suara terpotong-potong?"
+  "Sounds chopped up?": "Suara terpotong-potong?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Menerjemahkan ucapanmu ke bahasa ini. Mati: setiap suara berbicara bahasa Inggris, dan bahasanya tetap terpilih.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Bicara dalam bahasa Inggris dan orang lain mendengar bahasa lain. Nyalakan sakelar di bawah: suara AI atau pengubah suara mengucapkannya saat salah satunya aktif; kalau tidak, tekan Mulai dan suara komputer yang mengucapkannya."
 }

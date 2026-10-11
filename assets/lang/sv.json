@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Snabbtangenter",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Lyssning: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Prata på engelska och andra hör ett annat språk. AI-rösten eller röstväxlaren säger det när en av dem är på; annars trycker du på Start och en datorröst gör det.",
   "Type a line and press Enter": "Skriv en rad och tryck på Retur",
   "Category": "Kategori",
   "Show more": "Visa fler",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "I din mikrofon  <b style='color:{colour}'>✗ kör inte</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Inget att ställa in.</b> Discord och spel behåller din vanliga mikrofon, och dina ljud finns i den.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Om ljuden hackas sönder, stäng av röstappens brusreducering (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> av. Inte Studio: den hoppar över Onion Board).",
-  "Sounds chopped up?": "Hackar ljuden?"
+  "Sounds chopped up?": "Hackar ljuden?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Översätter det du säger till det här språket. Av: alla röster talar engelska, och språket förblir valt.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Prata engelska så hör andra ett annat språk. Slå på reglaget nedan: AI-rösten eller röstförvrängaren säger det när en av dem är på; annars trycker du på Start så säger en datorröst det."
 }

@@ -473,9 +473,12 @@ def as_link(text: str) -> str:
 
 
 def clean_title(title: str) -> str:
-    """A pad name from a video title: no "(Official Video)" / "[HD]" noise."""
+    """A pad name from a video title: no "(Official Video)" / "[HD]" noise, no HTML
+    entities (TikTok's come as "&amp;"), no " - Sound Button" (a Myinstants page's)."""
+    title = html.unescape(title)
     t = re.sub(r"\s*[(\[][^)\]]*\b(official|video|audio|lyrics?|hd|4k|visuali[sz]er)\b[^)\]]*[)\]]",
                "", title, flags=re.I)
+    t = re.sub(r"\s+[-|]\s+sound button\s*$", "", t, flags=re.I)
     return re.sub(r"\s+", " ", t).strip() or title.strip()
 
 
@@ -843,7 +846,13 @@ def _readable(e: Exception) -> FetchError:
     command-line tips or "report this on yt-dlp's GitHub"; one we can't explain is
     marked for reporting to us. The original text stays in `.raw`."""
     p = errors.describe(e, downloader=True)
-    out = FetchError(p.text)
+    text = p.text
+    # through a proxy / Tor, "check your internet" was wrong when it's the proxy that
+    # didn't answer: say what net.py saw ("Couldn't reach the proxy at ...")
+    if text == _("Couldn't reach the site. Check your internet connection.") \
+            and net.mode() != net.DIRECT:
+        text = net.last_failure(time.monotonic() - 60) or text
+    out = FetchError(text)
     out.problem, out.raw = p, str(e)
     return out
 

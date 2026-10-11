@@ -973,6 +973,70 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
     assert asked[-1] == "" and sp.ctl.dub is None and not p.ai_controller.dub_on
 
 
+def _chinese_downloaded(sp):
+    from types import SimpleNamespace
+    from soundboard.speech import translation
+    sp.module = SimpleNamespace(installed=True, id="live")
+    zh = next(m for m in sp.langs if m.language == "zh")
+    d = translation.model_dir(zh)
+    (d / "model").mkdir(parents=True)
+    (d / "model" / "model.bin").write_bytes(b"x")
+    (d / "sentencepiece.model").write_bytes(b"x")
+    assert zh.installed
+
+
+def test_speak_in_has_its_own_switch_a_voice_never_turns_it_back_on(panel, monkeypatch):
+    """Chinese on, then off, then a voice changer voice: it must stay English."""
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    asked = []
+    monkeypatch.setattr(sp, "translate_for", asked.append)
+    assert not sp.sw_lang.isChecked()                 # off by default
+    saved = []
+    sp.changed.connect(saved.append)
+    sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
+    assert sp.sw_lang.isChecked() and sp.translating() is not None   # picked = on
+    assert saved[-1]["translate_on"] and saved[-1]["translate"] == "zh"
+    sp.sw_lang.setChecked(False)                      # off: the language stays picked
+    assert sp.cb_lang.currentData() == "zh" and sp.translating() is None
+    assert not saved[-1]["translate_on"] and sp.lbl_bg.isHidden()
+    p.fx.pick("Robot")                                # a voice from another card
+    assert asked[-1] == "" and not sp.ctl.fx_always
+    assert "Chinese" not in p._heads["fx"].pill.text()
+    assert "lang" not in p.bar.chips                  # the status bar says English too
+    sp.sw_lang.setChecked(True)                       # only its own switch turns it on
+    assert asked[-1] == "fx" and sp.ctl.fx_always
+    assert "lang" in p.bar.chips
+
+
+def test_speak_in_switch_starts_off_for_a_saved_language(qapp, monkeypatch):
+    """Settings from before the switch (a language, no translate_on) start off."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
+                   {"voice": "Microsoft Zira Desktop", "translate": "zh"})
+    try:
+        sp = p.speech
+        assert sp.cb_lang.currentData() == "zh" and not sp.sw_lang.isChecked()
+        _chinese_downloaded(sp)
+        assert sp.translating() is None
+        args = sp._live_args()                        # the computer voice speaks English
+        assert "--translate" not in args
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_speak_in_switch_with_english_asks_for_a_language(panel, monkeypatch):
+    p, _ = panel
+    sp = p.speech
+    shown = []
+    monkeypatch.setattr(sp.cb_lang, "showPopup", lambda: shown.append(1))
+    sp.sw_lang.setChecked(True)
+    assert shown and not sp.sw_lang.isChecked()
+
+
 # ---------------------------------------------------------------- Make it yours window
 
 def test_the_card_is_just_the_switch_the_voices_and_one_button(panel):
