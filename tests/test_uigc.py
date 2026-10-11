@@ -66,3 +66,41 @@ def test_the_collector_checks_on_a_timer(qapp):
     finally:
         c._timer.stop()                        # (not stop(): gc stays off for the suite)
         c.deleteLater()
+
+
+def test_what_a_thread_held_is_let_go_of_on_the_ui_thread(qapp):
+    """A tab switched off while its thread works: the thread's target held the last
+    reference, and the tab (with the Qt objects only it held) was freed there."""
+    freed_on = []
+
+    class Tab:
+        def __init__(self):
+            self.timer = QTimer()   # held by Python only, as a tab's parts can be
+
+        def work(self, _arg):
+            pass
+
+        def __del__(self):
+            freed_on.append(threading.current_thread())
+
+    uigc.let_go()
+    t = threading.Thread(target=Tab().work, args=(Tab(),))
+    t.start()
+    t.join(10)
+    assert freed_on == []                      # handed over, not freed on the thread
+    assert uigc.let_go() == 1
+    assert freed_on == [threading.main_thread()] * 2
+
+
+def test_a_thread_run_on_the_ui_thread_lets_go_at_once(qapp):
+    freed = []
+
+    class Job:
+        def work(self):
+            pass
+
+        def __del__(self):
+            freed.append(1)
+
+    threading.Thread(target=Job().work).run()
+    assert freed == [1]
