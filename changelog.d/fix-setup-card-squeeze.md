@@ -1,0 +1,1 @@
+- Setup's cards no longer get squeezed (buttons drawn over their text) after your mic's status changes; the same fix covers the Voice tab's effect columns and other layouts that rearrange themselves.

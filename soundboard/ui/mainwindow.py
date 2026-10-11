@@ -76,7 +76,7 @@ from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
                                    SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
-                                   spectrum, SLIM_PAD_H)
+                                   spectrum, take_out, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -2132,7 +2132,7 @@ class MainWindow(QMainWindow):
         for col, cards in zip(self._setup_lr,
                               (self._setup_narrow, ()) if compact else self._setup_wide):
             while col.count():
-                col.takeAt(0)   # the cards stay on the page, only their places change
+                take_out(col)   # the cards stay on the page, only their places change
             for w in cards:
                 col.addWidget(w)
             col.addStretch(1)

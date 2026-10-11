@@ -30,6 +30,7 @@ from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
+from soundboard.ui.widgets import take_out
 from soundboard.ui.panel import (Flow, UndoBar, bar, capped, card, fold_button, hint_label,
                                  icon_button, icon_label, reset_button, section_label,
                                  steady_number)
@@ -1277,7 +1278,7 @@ class VoiceFxPanel(QWidget):
             lbl.hide()
         for col in self._fx_columns:
             while col.count() > 1:           # all but the stretch
-                col.takeAt(0)
+                take_out(col)
         for col, widgets in zip(self._fx_columns, plan):
             for w in widgets:
                 col.insertWidget(col.count() - 1, w)   # above the column's stretch
