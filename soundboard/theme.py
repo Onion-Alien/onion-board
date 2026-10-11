@@ -637,6 +637,11 @@ QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }
 QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
+QPushButton#railupdate { background:transparent; border:none; padding:0; }   /* painted: sidebar.UpdateCard */
+QPushButton#railupdatecopy { background:transparent; border:1px solid transparent;
+    border-radius:6px; padding:2px 6px; color:$accent; font-size:8.5pt; font-weight:600; }
+QPushButton#railupdatecopy:hover { background:$panel; }
+QPushButton#railupdatecopy:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
@@ -939,9 +944,9 @@ QTableCornerButton::section { background:$btn; border:none; }
 QFrame#setcard QPlainTextEdit { background:$card; color:$text;
     border:1px solid transparent; border-radius:6px; padding:8px;
     selection-background-color:$btn_press; selection-color:$text_hi; }
-QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress {
+QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress, QProgressBar#updatebar {
     background:$groove; border:none; border-radius:2px; }
-QProgressBar#downloadprogress::chunk { background:$accent; border-radius:2px; }
+QProgressBar#downloadprogress::chunk, QProgressBar#updatebar::chunk { background:$accent; border-radius:2px; }
 QPushButton#hkbtn { min-width:150px; font-weight:600; }
 /* also inside a card: there `QFrame#setcard QPushButton:checked` (an accent fill) would
    win, and the card paints its name in $text: grey on grey in Carbon */
