@@ -3,7 +3,7 @@
 Every plain "open this folder" action is a quiet icon-only button whose folder icon
 is backed by a tooltip and a matching screen-reader name (DESIGN section 4), instead
 of a word button here and an icon button there."""
-from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QLabel, QPushButton
 
 from soundboard.ui import panel
 from soundboard.settings import SettingsDialog
@@ -49,3 +49,55 @@ def test_crash_report_folder_is_an_icon_button(qapp):
     dlg = crashdialog.CrashDialog(applog.Report(title="ValueError: x", text="BODY"), None)
     _assert_icon_only_folder(dlg.folder_btn)
     dlg.close()
+
+
+def _assert_reset(btn: QPushButton):
+    """The reset family: the same small quiet "Reset" with the reset arrow everywhere
+    (it was "Reset" as a link, "Reset" as a button and "Reset all")."""
+    assert btn.text() == "Reset"
+    assert btn.objectName() == "reset"
+    assert not btn.icon().isNull()
+    assert btn.toolTip()                              # says what goes back
+
+
+def test_resets_are_one_family(window):  # noqa: F811
+    from soundboard.ui.voicepanel import EffectRow
+    _assert_reset(panel.reset_button("Back to how it was"))
+    pop = window.speed_btn.pop
+    resets = [b for b in pop.findChildren(QPushButton) if b.text() == "Reset"]
+    assert len(resets) == 1
+    _assert_reset(resets[0])
+    rows = window.voice.fx.findChildren(EffectRow) or window.voice.findChildren(EffectRow)
+    assert rows
+    _assert_reset(rows[0].btn_reset)
+    from soundboard.ui.dialogs import EditDialog
+    d = EditDialog(window.meta("s1"), window.hotkeys, window.preview, window, tab="effects")
+    resets = [b for b in d.findChildren(QPushButton) if b.text() == "Reset"]
+    assert resets
+    _assert_reset(resets[0])
+    assert any(b.text() == "Save a copy" for b in d.findChildren(QPushButton))
+    d.reject()
+
+
+def test_sound_modes_help_is_an_info_icon(window, qapp):  # noqa: F811
+    from PySide6.QtTest import QTest
+    window.show()
+    window.tabs.setCurrentWidget(window.setup_page)
+    QTest.qWait(100)
+    b = window.dest_panel.help_btn
+    assert b.text() == "" and b.objectName() == "infobutton" and not b.icon().isNull()
+    assert b.toolTip() == b.accessibleName() == "What do these do?"
+    assert b.width() >= 24 and b.height() >= 24        # not a smaller click target
+    # beside the card's heading, on its line (DESIGN section 4)
+    heading = next(lbl for lbl in b.parentWidget().findChildren(QLabel)
+                   if lbl.objectName() == "section")
+    assert heading.text() == "Who's listening"
+    fm = heading.fontMetrics()           # centred on the heading's cap height
+    cap_centre = heading.geometry().top() + 8 + fm.ascent() - fm.capHeight() / 2
+    assert abs(b.geometry().center().y() - cap_centre) <= 1.5
+
+
+def test_sound_modes_have_their_pictures(window):  # noqa: F811
+    """Game, Voice chat, Clean and Advanced show the sidebar mode button's pictures."""
+    for b in window.dest_panel.buttons.values():
+        assert not b.icon().isNull() and b.text()
