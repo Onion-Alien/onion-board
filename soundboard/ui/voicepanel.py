@@ -3033,7 +3033,7 @@ class VoicePanel(QWidget):
                           _("What you say is said in {language}. Click to open it.",
                             language=lang)))
         if not items:
-            items.append(("none", _("Voice effects off — mic unchanged"), "off", "mic", None,
+            items.append(("none", _("Voice effects off: mic unchanged"), "off", "mic", None,
                           _("Your mic voice is unchanged. Open Voice changer or AI voices "
                             "below to choose a voice.")))
         self.bar.set_items(items)

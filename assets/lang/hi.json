@@ -2976,7 +2976,7 @@
   "Voice changer: {voice}. Click to open it.": "आवाज परिवर्तक: {voice} । इसे खोलने के लिए क्लिक करें.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "कंप्यूटर की आवाज़ ( {voice} ) आपके लिए बोलती है। इसे खोलने के लिए क्लिक करें.",
   "What you say is said in {language}. Click to open it.": "आप जो कहते हैं वह {language} में कहा जाता है। इसे खोलने के लिए क्लिक करें.",
-  "Voice effects off — mic unchanged": "ध्वनि प्रभाव बंद - माइक अपरिवर्तित",
+  "Voice effects off: mic unchanged": "ध्वनि प्रभाव बंद: माइक अपरिवर्तित",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "आपके माइक की आवाज़ अपरिवर्तित है. आवाज चुनने के लिए नीचे वॉयस चेंजर या एआई वॉयस खोलें।",
   "AI voice off": "एआई आवाज बंद",
   "Click to open AI voices.": "एआई वॉयस खोलने के लिए क्लिक करें।",

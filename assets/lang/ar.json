@@ -3232,7 +3232,7 @@
   "Voice changer: {voice}. Click to open it.": "مغير الصوت : {voice} . انقر لفتحه.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "صوت الكمبيوتر ( {voice} ) يتحدث عنك. انقر لفتحه.",
   "What you say is said in {language}. Click to open it.": "ما تقوله يقال باللغة {language} . انقر لفتحه.",
-  "Voice effects off — mic unchanged": "تم إيقاف تشغيل المؤثرات الصوتية - لم يتغير الميكروفون",
+  "Voice effects off: mic unchanged": "تم إيقاف تشغيل المؤثرات الصوتية: لم يتغير الميكروفون",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "صوت الميكروفون الخاص بك لم يتغير. افتح مغير الصوت أو أصوات الذكاء الاصطناعي أدناه لاختيار صوت.",
   "AI voice off": "إيقاف صوت الذكاء الاصطناعي",
   "Click to open AI voices.": "انقر لفتح أصوات الذكاء الاصطناعي.",

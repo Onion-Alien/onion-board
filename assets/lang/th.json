@@ -2912,7 +2912,7 @@
   "Voice changer: {voice}. Click to open it.": "โปรแกรมเปลี่ยนเสียง: {voice} . คลิกเพื่อเปิด",
   "The computer voice ({voice}) speaks for you. Click to open it.": "เสียงคอมพิวเตอร์ ( {voice} ) พูดแทนคุณ คลิกเพื่อเปิด",
   "What you say is said in {language}. Click to open it.": "สิ่งที่คุณพูดเป็นภาษา {language} คลิกเพื่อเปิด",
-  "Voice effects off — mic unchanged": "ปิดเอฟเฟกต์เสียง — ไมค์ไม่เปลี่ยนแปลง",
+  "Voice effects off: mic unchanged": "ปิดเอฟเฟกต์เสียง: ไมค์ไม่เปลี่ยนแปลง",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "เสียงไมค์ของคุณไม่เปลี่ยนแปลง เปิดโปรแกรมเปลี่ยนเสียงหรือเสียง AI ด้านล่างเพื่อเลือกเสียง",
   "AI voice off": "เสียง AI ปิดอยู่",
   "Click to open AI voices.": "คลิกเพื่อเปิดเสียง AI",

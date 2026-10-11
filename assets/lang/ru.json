@@ -3037,7 +3037,7 @@
   "Voice changer: {voice}. Click to open it.": "Сменщик голоса: {voice} . Нажмите, чтобы открыть его.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Компьютерный голос ( {voice} ) говорит за вас. Нажмите, чтобы открыть его.",
   "What you say is said in {language}. Click to open it.": "То, что вы говорите, сказано на {language} . Нажмите, чтобы открыть его.",
-  "Voice effects off — mic unchanged": "Голосовые эффекты отключены, микрофон не изменен.",
+  "Voice effects off: mic unchanged": "Голосовые эффекты отключены, микрофон не изменен.",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Голос вашего микрофона не изменился. Откройте программу смены голоса или голоса AI ниже, чтобы выбрать голос.",
   "AI voice off": "голос ИИ отключен",
   "Click to open AI voices.": "Нажмите, чтобы открыть голоса AI.",
