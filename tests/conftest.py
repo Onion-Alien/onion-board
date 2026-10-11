@@ -23,9 +23,13 @@ offwindows.install()
 # Garbage collection on the main thread only, as in the app (soundboard.uigc): a
 # collection on a test server's or the relay's thread freed a leftover Qt object with
 # a running timer there, and its next tick crashed the worker (access violation).
+# The same for what a finished thread lets go of (its target, often a tab's method).
 import gc  # noqa: E402
 
+from soundboard import uigc  # noqa: E402
+
 gc.disable()
+uigc.hand_threads_to_ui()
 
 # A test worker (pytest-xdist) dies with the run that started it. Killing pytest (an
 # editor's or agent's timeout, a closed terminal) used to leave its workers running,
@@ -218,8 +222,8 @@ def _collect_on_the_main_thread():
     """What a test left in reference cycles is collected here, on the main thread
     (automatic collection is off: see the top of this file)."""
     yield
-    from soundboard.uigc import collect_due
-    collect_due()
+    uigc.let_go()
+    uigc.collect_due()
 
 
 def process_events(app, until, timeout=8.0, step=0.02):

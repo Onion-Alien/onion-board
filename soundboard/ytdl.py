@@ -595,10 +595,11 @@ class Result:
 
 
 def search(query: str, count: int = 20, source: str = "youtube",
-           direct: bool = False) -> list[Result]:
-    """Search one of SOURCES (one results page, nothing downloaded). Live streams
-    and junk entries are left out. Raises DownloadError like probe (TorBlocked when
-    the site turned Tor away; `direct` is the user's "without Tor" click)."""
+           direct: bool = False, start: int = 1) -> list[Result]:
+    """Search one of SOURCES (one results page, nothing downloaded): hits `start` to
+    `count` (1-based), so Show more asks for the next ones. Live streams and junk
+    entries are left out. Raises DownloadError like probe (TorBlocked when the site
+    turned Tor away; `direct` is the user's "without Tor" click)."""
     query = " ".join(query.split())
     if not query:
         return []
@@ -606,8 +607,8 @@ def search(query: str, count: int = 20, source: str = "youtube",
     feature = _gate(source)
     if kind == "myinstants":
         if direct:
-            return _myinstants(query, count, direct=True)
-        return _over_tor(lambda: _myinstants(query, count), MYINSTANTS)
+            return _myinstants(query, count, direct=True)[start - 1:]
+        return _over_tor(lambda: _myinstants(query, count), MYINSTANTS)[start - 1:]
     if kind == "ytmusic":
         target = ("https://music.youtube.com/search?q="
                   f"{urllib.parse.quote_plus(query)}#songs")
@@ -615,7 +616,8 @@ def search(query: str, count: int = 20, source: str = "youtube",
         target = f"{kind}{count}:{query}{TIKTOK_SUFFIX if source == 'tiktok' else ''}"
     opts = {k: v for k, v in _opts(feature=feature, direct=direct).items()
             if k not in ("format", "outtmpl")}
-    opts.update(extract_flat="in_playlist", noplaylist=False, playlistend=count)
+    opts.update(extract_flat="in_playlist", noplaylist=False, playliststart=start,
+                playlistend=count)
 
     # YouTube's settings kept between searches: Direct mode only (ytworker.CONFIG_KEEP_S)
     keep = source != "soundcloud" and net.mode() == net.DIRECT

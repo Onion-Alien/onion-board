@@ -1248,13 +1248,13 @@ def test_status_bar_off_label_cannot_open_a_card(panel):
 
 def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
     p, eng = panel
-    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
+    assert p.bar.texts() == ["Voice effects off: mic unchanged"]
     p.fx.pick("Robot")
     assert p.bar.texts() == ["Robot"]          # short; the full words are its tip
     assert "Voice changer" in p.bar.chips["fx"].toolTip()
     assert p.bar.chips["fx"].property("state") == "on"
     p.fx.btn_power.setChecked(False)
-    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
+    assert p.bar.texts() == ["Voice effects off: mic unchanged"]
     # a chip opens its folded card
     assert not p._heads["speak"].is_open()
     p.speech.b_live.setChecked(True)

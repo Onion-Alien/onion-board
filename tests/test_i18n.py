@@ -346,6 +346,13 @@ def test_every_shipped_catalog_keeps_the_placeholders():
                 assert len(value) == i18n.forms(code), (code, key)
 
 
+def test_no_text_the_app_shows_has_a_long_dash():
+    """CLAUDE.md "Text the app shows": no long dashes (a colon or a comma instead). A
+    range like "A–Z" keeps its short one."""
+    texts, _plural, _problems = extract_script().scan()
+    assert [t for t in texts if "—" in t] == []
+
+
 def test_qt_standard_buttons_follow_the_language(qapp, langs):
     from PySide6.QtWidgets import QDialogButtonBox
     i18n.set_language(i18n.PSEUDO)

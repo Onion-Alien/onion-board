@@ -22,6 +22,12 @@ pr_state=$1 base=$2 branch=$3 head_oid=$4 owner=$5 del=$6
 title=$(gh pr view "$n" --json title -q .title)
 [ "$pr_state" = OPEN ] || { echo "PR #$n is $pr_state." >&2; exit 1; }
 [ "$base" = main ] || { echo "PR #$n goes into $base, not main." >&2; exit 1; }
+# no agent session links in a public PR's text (CLAUDE.md, "This repo is public")
+if gh pr view "$n" --json title,body -q '.title + "\n" + .body' |
+        grep -qiE 'claude\.ai/code/session_|Claude-Session:'; then
+    echo "PR #$n's title or description links an agent session: edit it out first." >&2
+    exit 1
+fi
 
 # required checks: gh exits 0 only when every one has passed
 checks_passed=$(gh pr checks "$n" --required --json bucket \

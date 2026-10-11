@@ -69,14 +69,26 @@ Every task, before changing anything (details in `CLAUDE.md`):
 - Anything the native mic effect reads (the ring file) is fuzzed:
   `scripts/fuzz_directmic.py`, and `scripts/build_directmic.py --testhost` before the
   `test_directmic.py` tests, which CI skips.
+- The mic effect's admin install / uninstall (`soundboard/directmic.py`: copying the DLL,
+  registering it, putting it on a mic, taking it off) is fuzzed at every registry write:
+  **run `python scripts/sim_directmic.py` after changing it, or the ring layout**, before
+  opening the PR. It drives the real code against the fake registry and checks a mic
+  always ends up exactly as it started, even when the step is cut off half-way (a crash,
+  a reboot). CI runs the normal-path tests; this reaches the interrupted paths by hand.
 
 ### Tests (about 24)
 - Garbage collection runs only on the UI thread (`soundboard/uigc.py`). Python's GC on an
   audio or worker thread frees Qt objects there and crashes natively. `15d7fb5`
+- So is what a finished thread held (its target, args, closures): `uigc` hands it to
+  the UI thread, or a tab switched off mid-job was freed on the worker. A test that
+  checks something a thread held is freed calls `uigc.let_go()` first.
 - A test needing a port that refuses uses `closed_port()` / `ipv4_only()` from
   `tests/conftest.py`, never a hard-coded port.
 - A timing test takes the best of several tries and skips on CI. A busy runner
   makes single measurements flaky. `63fe4e5`
+- CI gives a failed or crashed test two more tries (`--reruns 2`), so a flake doesn't
+  block a merge. A test that needed one is listed on the run's summary page as a
+  warning: it's still a bug to fix, not a pass to lean on.
 - Tests never touch the real `%APPDATA%\OnionBoard`, real devices or real hotkeys;
   `conftest.py` fakes them. Keep it that way in new fixtures.
 
