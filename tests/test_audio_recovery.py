@@ -186,3 +186,26 @@ def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # n
     card._checked('ready')
     assert not card.fix.isVisibleTo(card)
     d.close()
+
+
+@pytest.mark.parametrize('error', [None, 'Permission refused'])
+def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch, error):  # noqa: F811
+    gate = threading.Event()
+    window.cfg.mic_device = 'Test mic'
+    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'toast', lambda *a: None)
+    monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
+    monkeypatch.setattr(dm, 'install', lambda *a, **kw: gate.wait(5) and error)
+    d = SettingsDialog(window, 'audio')
+    d.show()
+    card = d.findChild(RecoveryCard)
+    card.confirm('repair')
+    next(b for b in card.dialog.findChildren(QPushButton)
+         if b.text() == 'Repair mic effect').click()
+    assert card.show_.on and card.show_.isVisibleTo(card)
+    # Working… is a neutral pill with an outline, not loose text beside the heading
+    assert card.pill.text() == 'Working…' and card.pill.property('tone') == 'muted'
+    gate.set()
+    wait(qapp, lambda: not card.recovery.running)
+    assert card.show_._result is (error is None)   # its ending plays once far enough
+    d.close()
