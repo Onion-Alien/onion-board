@@ -3016,5 +3016,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "Hindi mai-install ng winget ang FFmpeg (sabi nito: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "Walang winget sa PC na ito, kaya hindi mai-install ng app ang FFmpeg. Kunin ito mula sa ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "Tumagal nang mahigit {seconds} segundo ang winget.",
-  "✓ Got FFmpeg": "✓ Nakuha ang FFmpeg"
+  "✓ Got FFmpeg": "✓ Nakuha ang FFmpeg",
+  "No settings match “{text}”": "Walang tugmang setting sa “{text}”"
 }

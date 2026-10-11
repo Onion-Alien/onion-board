@@ -2952,5 +2952,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget không cài được FFmpeg (nó báo: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget không có trên PC này, nên ứng dụng không thể cài FFmpeg. Tải từ ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget mất hơn {seconds} giây.",
-  "✓ Got FFmpeg": "✓ Đã có FFmpeg"
+  "✓ Got FFmpeg": "✓ Đã có FFmpeg",
+  "No settings match “{text}”": "Không có cài đặt nào khớp với “{text}”"
 }

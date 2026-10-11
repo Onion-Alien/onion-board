@@ -3272,5 +3272,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "لم يتمكن winget من تثبيت FFmpeg (قال: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget غير موجود على هذا الكمبيوتر، لذا لا يمكن للتطبيق تثبيت FFmpeg. احصل عليه من ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "استغرق winget أكثر من {seconds} ثانية.",
-  "✓ Got FFmpeg": "✓ تم الحصول على FFmpeg"
+  "✓ Got FFmpeg": "✓ تم الحصول على FFmpeg",
+  "No settings match “{text}”": "لا توجد إعدادات تطابق \"{text}\""
 }

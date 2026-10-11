@@ -3016,5 +3016,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget kunne ikke installere FFmpeg (det sagde: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget er ikke på denne pc, så appen kan ikke installere FFmpeg. Hent det fra ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget tog mere end {seconds} sekunder.",
-  "✓ Got FFmpeg": "✓ FFmpeg hentet"
+  "✓ Got FFmpeg": "✓ FFmpeg hentet",
+  "No settings match “{text}”": "Ingen indstillinger matcher \"{text}\""
 }

@@ -2952,5 +2952,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget ติดตั้ง FFmpeg ไม่ได้ (มันแจ้งว่า: {error})",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget ไม่มีในเครื่องนี้ แอปจึงติดตั้ง FFmpeg ไม่ได้ รับได้จาก ffmpeg.org",
   "winget took longer than {seconds} seconds.": "winget ใช้เวลานานกว่า {seconds} วินาที",
-  "✓ Got FFmpeg": "✓ ได้ FFmpeg แล้ว"
+  "✓ Got FFmpeg": "✓ ได้ FFmpeg แล้ว",
+  "No settings match “{text}”": "ไม่มีการตั้งค่าที่ตรงกับ “{text}”"
 }

@@ -3016,5 +3016,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "Το winget δεν μπόρεσε να εγκαταστήσει το FFmpeg (είπε: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "Το winget δεν υπάρχει σε αυτόν τον υπολογιστή, οπότε η εφαρμογή δεν μπορεί να εγκαταστήσει το FFmpeg. Πάρτε το από το ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "Το winget πήρε περισσότερο από {seconds} δευτερόλεπτα.",
-  "✓ Got FFmpeg": "✓ Το FFmpeg αποκτήθηκε"
+  "✓ Got FFmpeg": "✓ Το FFmpeg αποκτήθηκε",
+  "No settings match “{text}”": "Καμία ρύθμιση δεν ταιριάζει με το \"{text}\""
 }
