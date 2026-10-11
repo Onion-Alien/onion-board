@@ -21,26 +21,32 @@ WORK = ROOT / "build" / "michelper-work"
 # everything else the app ships: the helper imports none of it
 EXCLUDE = ("numpy", "PySide6", "shiboken6", "scipy", "sounddevice", "soundfile", "soxr",
            "yt_dlp", "curl_cffi", "tkinter")
-# SHA-256 of a bootloader (runw.exe) in PyInstaller's PyPI wheels, used only to tell a
-# stock wheel from one whose bootloaders were compiled here: the wheel ships run.exe and
-# runw.exe together and build_bootloader.ps1 rebuilds them together, so runw.exe is a
-# sentinel for both. The stock ones are in thousands of programs, some of them malware,
-# so virus scanners flagged a helper built with run.exe; build_bootloader.ps1 compiles
-# a clean one here instead.
-STOCK_RUNW = {
-    "6.22.3": "2291f269c3a3804fde1079462239e09a8b32fffbeeaa8f628a531faf5be77d41",
-}
+# build_bootloader.ps1 leaves this beside the bootloaders it compiled, with their SHA-256s.
+# The stock ones from PyPI are in thousands of programs, some of them malware, so virus
+# scanners flagged a helper built with one. A file that doesn't match (a stock wheel
+# reinstalled over it, a PyInstaller upgrade) counts as stock: that works for any
+# PyInstaller version, where a list of stock hashes would go stale at the next upgrade.
+MARKER = "compiled-here.txt"
+BOOTLOADERS = ("run.exe", "runw.exe")
 
 
-def stock_bootloader() -> str:
-    """PyInstaller's version when its bootloader is the stock one from PyPI, else ''."""
+def bootloader_hashes(folder: Path) -> str:
     import hashlib
+    return "".join(f"{hashlib.sha256((folder / n).read_bytes()).hexdigest()}  {n}\n"
+                   for n in BOOTLOADERS)
 
+
+def stock_bootloader(folder: Path | None = None) -> str:
+    """PyInstaller's version when its bootloader wasn't compiled here
+    (scripts/build_bootloader.ps1), else ''."""
     import PyInstaller
-    runw = (Path(PyInstaller.__file__).parent / "bootloader" / "Windows-64bit-intel"
-            / "runw.exe")
-    digest = hashlib.sha256(runw.read_bytes()).hexdigest()
-    return PyInstaller.__version__ if digest == STOCK_RUNW.get(PyInstaller.__version__) else ""
+    folder = folder or Path(PyInstaller.__file__).parent / "bootloader" / "Windows-64bit-intel"
+    try:
+        if (folder / MARKER).read_text(encoding="utf-8") == bootloader_hashes(folder):
+            return ""
+    except OSError:
+        pass
+    return PyInstaller.__version__
 
 
 def version_file() -> Path:
