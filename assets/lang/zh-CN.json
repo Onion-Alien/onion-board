@@ -3089,5 +3089,6 @@
   "Straight into the mic you already use. Nothing to install.": "直接送进你正在用的麦克风。无需安装。",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "音效现在发往 <b>{device}</b>，这是普通的扬声器或耳机，只有你自己听得到。选一种能传到语音聊天的方式：",
   "Use my mic": "用我的麦克风",
-  "Use the virtual cable": "用虚拟音频线"
+  "Use the virtual cable": "用虚拟音频线",
+  "Plays from: {path}": "播放自：{path}"
 }

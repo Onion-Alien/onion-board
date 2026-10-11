@@ -3162,5 +3162,6 @@
   "Straight into the mic you already use. Nothing to install.": "Rechtstreeks in de mic die je al gebruikt. Niets te installeren.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Ze gaan nu naar <b>{device}</b>, gewone speakers of een headset, dus alleen jij hoort ze. Kies een manier die de voicechat bereikt:",
   "Use my mic": "Mijn mic gebruiken",
-  "Use the virtual cable": "De virtuele kabel gebruiken"
+  "Use the virtual cable": "De virtuele kabel gebruiken",
+  "Plays from: {path}": "Speelt af vanaf: {path}"
 }

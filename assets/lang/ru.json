@@ -3235,5 +3235,6 @@
   "Straight into the mic you already use. Nothing to install.": "Прямо в микрофон, которым вы уже пользуетесь. Ничего не нужно устанавливать.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Сейчас они идут на <b>{device}</b>, обычные колонки или гарнитуру, поэтому их слышите только вы. Выберите способ, который дойдёт до голосового чата:",
   "Use my mic": "Мой микрофон",
-  "Use the virtual cable": "Виртуальный кабель"
+  "Use the virtual cable": "Виртуальный кабель",
+  "Plays from: {path}": "Играет из: {path}"
 }

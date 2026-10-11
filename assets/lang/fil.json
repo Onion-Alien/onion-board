@@ -3162,5 +3162,6 @@
   "Straight into the mic you already use. Nothing to install.": "Diretso sa mic na gamit mo na. Walang kailangang i-install.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Napupunta na sila sa <b>{device}</b>, isang normal na speaker o headset, kaya ikaw lang ang nakakarinig. Pumili ng paraang aabot sa voice chat:",
   "Use my mic": "Gamitin ang mic ko",
-  "Use the virtual cable": "Gamitin ang virtual cable"
+  "Use the virtual cable": "Gamitin ang virtual cable",
+  "Plays from: {path}": "Pinapatugtog mula sa: {path}"
 }

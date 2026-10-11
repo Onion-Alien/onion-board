@@ -3162,5 +3162,6 @@
   "Straight into the mic you already use. Nothing to install.": "Suoraan mikkiin, jota jo käytät. Ei mitään asennettavaa.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Ne menevät nyt laitteeseen <b>{device}</b>, tavallisiin kaiuttimiin tai kuulokkeisiin, joten vain sinä kuulet ne. Valitse tapa, joka ulottuu äänichattiin:",
   "Use my mic": "Käytä omaa mikkiä",
-  "Use the virtual cable": "Käytä virtuaalikaapelia"
+  "Use the virtual cable": "Käytä virtuaalikaapelia",
+  "Plays from: {path}": "Soitetaan tiedostosta: {path}"
 }

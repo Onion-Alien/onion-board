@@ -3089,5 +3089,6 @@
   "Straight into the mic you already use. Nothing to install.": "ส่งเข้าไมค์ที่คุณใช้อยู่แล้วโดยตรง ไม่ต้องติดตั้งอะไร",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "ตอนนี้เสียงไปที่ <b>{device}</b> ซึ่งเป็นลำโพงหรือหูฟังธรรมดา จึงมีแค่คุณที่ได้ยิน เลือกวิธีที่ไปถึงแชทเสียง:",
   "Use my mic": "ใช้ไมค์ของฉัน",
-  "Use the virtual cable": "ใช้สายเสมือน"
+  "Use the virtual cable": "ใช้สายเสมือน",
+  "Plays from: {path}": "เล่นจาก: {path}"
 }

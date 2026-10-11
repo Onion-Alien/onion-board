@@ -3089,5 +3089,6 @@
   "Straight into the mic you already use. Nothing to install.": "Terus ke mikrofon yang anda sudah guna. Tiada apa untuk dipasang.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Bunyi kini pergi ke <b>{device}</b>, pembesar suara atau set kepala biasa, jadi hanya anda yang dengar. Pilih cara yang sampai ke sembang suara:",
   "Use my mic": "Guna mikrofon saya",
-  "Use the virtual cable": "Guna kabel maya"
+  "Use the virtual cable": "Guna kabel maya",
+  "Plays from: {path}": "Dimainkan dari: {path}"
 }

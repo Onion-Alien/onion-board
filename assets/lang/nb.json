@@ -3162,5 +3162,6 @@
   "Straight into the mic you already use. Nothing to install.": "Rett inn i mikrofonen du allerede bruker. Ingenting å installere.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "De går nå til <b>{device}</b>, vanlige høyttalere eller hodesett, så bare du hører dem. Velg en måte som når fram til talechatten:",
   "Use my mic": "Bruk mikrofonen min",
-  "Use the virtual cable": "Bruk den virtuelle kabelen"
+  "Use the virtual cable": "Bruk den virtuelle kabelen",
+  "Plays from: {path}": "Spilles fra: {path}"
 }

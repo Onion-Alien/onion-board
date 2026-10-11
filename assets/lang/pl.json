@@ -3235,5 +3235,6 @@
   "Straight into the mic you already use. Nothing to install.": "Prosto do mikrofonu, którego już używasz. Nic do instalowania.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Teraz idą do <b>{device}</b>, zwykłych głośników lub słuchawek, więc słyszysz je tylko ty. Wybierz sposób, który dotrze na czat głosowy:",
   "Use my mic": "Użyj mojego mikrofonu",
-  "Use the virtual cable": "Użyj wirtualnego kabla"
+  "Use the virtual cable": "Użyj wirtualnego kabla",
+  "Plays from: {path}": "Odtwarzany z: {path}"
 }

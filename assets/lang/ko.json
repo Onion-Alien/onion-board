@@ -3089,5 +3089,6 @@
   "Straight into the mic you already use. Nothing to install.": "이미 쓰는 마이크로 바로 보냅니다. 설치할 것이 없습니다.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "지금 사운드가 <b>{device}</b>(일반 스피커나 헤드셋)로 가서 나만 들을 수 있습니다. 음성 채팅에 닿는 방법을 고르세요:",
   "Use my mic": "내 마이크 사용",
-  "Use the virtual cable": "가상 케이블 사용"
+  "Use the virtual cable": "가상 케이블 사용",
+  "Plays from: {path}": "재생 위치: {path}"
 }

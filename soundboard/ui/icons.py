@@ -310,6 +310,16 @@ def _cable(p, fill):
     p.drawPath(path)
 
 
+def _link(p, fill):
+    """A sound played from its own file elsewhere on the disk: two chain links."""
+    p.save()
+    p.translate(12, 12)
+    p.rotate(-45)
+    p.drawRoundedRect(QRectF(-10, -3.5, 11.5, 7), 3.5, 3.5)
+    p.drawRoundedRect(QRectF(-1.5, -3.5, 11.5, 7), 3.5, 3.5)
+    p.restore()
+
+
 def _check(p, fill):
     p.drawEllipse(QRectF(3, 3, 18, 18))
     p.drawLine(QPointF(8, 12.5), QPointF(11, 15.5))
@@ -725,6 +735,7 @@ SHAPES = {
     "panel_close_rtl": _panel("right", "right"), "panel_open_rtl": _panel("right", "left"),
     "nav_back": _nav_arrow("back"), "nav_next": _nav_arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
+    "link": _link,
     "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,

@@ -3162,5 +3162,6 @@
   "Straight into the mic you already use. Nothing to install.": "Zaten kullandığın mikrofona doğrudan. Kurulacak bir şey yok.",
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Sesler artık <b>{device}</b> cihazına gidiyor; bu normal bir hoparlör ya da kulaklık, yani onları sadece sen duyuyorsun. Sesli sohbete ulaşan bir yol seç:",
   "Use my mic": "Mikrofonumu kullan",
-  "Use the virtual cable": "Sanal kabloyu kullan"
+  "Use the virtual cable": "Sanal kabloyu kullan",
+  "Plays from: {path}": "Şuradan çalınır: {path}"
 }
