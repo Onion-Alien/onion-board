@@ -153,7 +153,9 @@ Your sounds and settings live in `%APPDATA%\OnionBoard\` and survive reinstalls.
   it. Every release is scanned on VirusTotal (the link is at the top).
 - **What needs admin:** only the one-click *straight into my mic* step. It adds a
   small audio effect to your mic inside Windows' audio engine, backs up that mic's
-  settings first, and puts them back when you switch it off or uninstall. The details
+  settings first, and puts them back when you switch it off or uninstall. Windows asks
+  once: a small helper then does repairs and changes of mic without asking again (it
+  only runs when the app needs it). The details
   are in [SECURITY.md](SECURITY.md#what-straight-into-my-mic-changes-on-your-pc).
 - **What goes online:** only what you ask for (searches, downloads, the radio), an
   update check, and an anonymous daily count you can switch off. Every request is

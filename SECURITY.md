@@ -40,7 +40,10 @@ In scope, for example:
   the file is in scope; the effect takes the sizes once and checks every sample. So is
   the admin step (`--direct-mic install / uninstall`) installing any DLL but the app's
   own copy, touching any device but a mic Windows lists, or leaving a mic's effect
-  settings changed after an uninstall. Others on
+  settings changed after an uninstall. So is the mic helper (`obmichelper.exe`, run as
+  SYSTEM) doing anything for anyone but the account that set it up, running any
+  request outside its fixed list, installing any DLL but its own, or writing through
+  a link someone planted. Others on
   the PC hearing or changing what goes into your mic through that file is a known part
   of the design (anyone signed in can already record and play audio).
 - Anything that sends the user's data off the machine without them asking.
@@ -291,6 +294,22 @@ goes online.
   One admin step runs at a time, every command it runs has a time limit, and a set-up
   that fails half-way puts the mic back as it was. It logs to
   `%ProgramData%\OnionBoard\directmic-admin.log`.
+- **The mic helper** (so Windows asks once, not on every repair or change of mic): the
+  first set-up also copies `obmichelper.exe` (only the admin step above, with its own
+  copy of the effect DLL) to `%ProgramFiles%\Onion Board Mic Helper\` (admins only) and
+  registers a scheduled task, `\Onion Board\Mic helper`, that runs it as SYSTEM. It has
+  no trigger and isn't a service: it runs only when Onion Board starts it, for the few
+  seconds a job takes. The task's permissions let only the Windows account that set it
+  up (and admins) start it. The app asks for a job with a one-line file in
+  `%ProgramData%\OnionBoard\MicHelper\requests\` (that account may add files there,
+  nothing else) and reads the answer from `...\results\` (admins only, so nothing can
+  steer what SYSTEM writes). A request is only ever matched against a fixed list
+  (`install`, `reinstall`, `cleanup` or `uninstall` with a mic id, `uninstall`,
+  `remove-all`), never used as a path or shown, and anything else is refused. The
+  helper installs only the DLL inside its own Program Files folder, so it can't be
+  used to put any other code into Windows' audio: a new version of the effect still
+  needs Windows' prompt, which also updates the helper. It logs to
+  `%ProgramData%\OnionBoard\michelper.log`.
 - **The data folders**: anyone signed in can make folders in `%ProgramData%`, so before
   writing anything there the admin step makes `%ProgramData%\OnionBoard` a real folder
   owned by Administrators that only admins can change (a link someone put there is
@@ -306,10 +325,12 @@ goes online.
   the effect trusts nothing in it: a damaged, cut-short or tampered file (even one
   that makes reading it fault) gets the plain mic passed through, never a crash of
   Windows' audio engine. `scripts/fuzz_directmic.py` tests this.
-- **Taking it off**: uninstalling Onion Board runs `--direct-mic remove`, which asks
-  for admin only if the effect is on a mic, then does what `--direct-mic uninstall`
-  (as admin) does: put every mic's values back from the notes, unregister the effect and
-  delete `Onion Board Mic` and the notes. If Windows already took the effect off (a
+- **Taking it off**: uninstalling Onion Board runs `--direct-mic remove`, which (through
+  the mic helper, or else after Windows' prompt, and only if the effect or the helper
+  is there at all) does what `--direct-mic uninstall` (as admin) does: put every mic's
+  values back from the notes, unregister the effect and delete `Onion Board Mic` and the
+  notes. Then the helper's task is deleted and its files and `MicHelper` folder
+  removed (files in use at that moment, at the next restart). If Windows already took the effect off (a
   driver update, *Reset sound settings*), what's there now stays. The shared file and
   the admin log stay in `%ProgramData%\OnionBoard\`.
 - **The virtual cable**, the fallback, is VB-Audio's own signed driver: installed by

@@ -45,6 +45,11 @@ registers it, puts it on the mic (keeping any effect the mic's driver had, which
 effect then runs first) and restarts Windows' audio service. `uninstall()` puts every
 mic back as it was. The DLL that's installed is always this app's own copy, never a path
 from the command line, so the admin step can't be pointed at another DLL.
+
+After that first prompt the admin steps go through the mic helper (soundboard/
+michelper.py: a SYSTEM scheduled task running a frozen copy of this module's admin
+part with its own DLL), with no prompt; `_elevated` tries it first and falls back to
+Windows' prompt.
 """
 from __future__ import annotations
 
@@ -55,15 +60,23 @@ import mmap
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import threading
 import time
 import winreg
 from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING
 from pathlib import Path
 
-import numpy as np
+if TYPE_CHECKING:
+    import numpy as np
+else:
+    try:
+        import numpy as np
+    except ImportError:   # the mic helper (soundboard/michelper.py) ships without numpy:
+        np = None         # it only runs the admin part, which never needs it
 
 from soundboard.i18n import _
 
@@ -94,22 +107,23 @@ EARLY_S = 0.002             # the feed itself takes the mic: it looks again this
 BLOCK_S = BLOCK / RATE
 OTHER_BOARD_MS = 1000       # another board wrote this recently: it's still running
 
-HEAD = np.dtype({
-    "names": ["magic", "version", "rate", "capacity", "write_pos", "board_tick", "enabled",
-              "mode", "gain", "mic_gain", "mic_capacity", "publisher", "mic_write_pos",
-              "mic_rate", "lead", "mic_tick", "effect_version", "board_pid", "sync_seq",
-              "sync_wp", "sync_mic"],
-    "formats": ["<u4", "<u4", "<u4", "<u4", "<u8", "<u8", "<u4", "<u4", "<f4", "<f4", "<u4",
-                "<i4", "<u8", "<u4", "<u4", "<u8", "<u4", "<u4", "<u4", "<u8", "<u8"],
-    "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40, 44, 48, 52, 56, 64, 68, 72, 80, 84, 88, 96,
-                104],
-    "itemsize": SLOT_OFFSET})
-SLOT = np.dtype({
-    "names": ["owner", "rate", "channels", "flags", "tick", "read_pos", "lead", "underruns",
-              "blocks"],
-    "formats": ["<i4", "<u4", "<u4", "<u4", "<u8", "<u8", "<u4", "<u4", "<u8"],
-    "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40],
-    "itemsize": 64})
+if np is not None:
+    HEAD = np.dtype({
+        "names": ["magic", "version", "rate", "capacity", "write_pos", "board_tick", "enabled",
+                  "mode", "gain", "mic_gain", "mic_capacity", "publisher", "mic_write_pos",
+                  "mic_rate", "lead", "mic_tick", "effect_version", "board_pid", "sync_seq",
+                  "sync_wp", "sync_mic"],
+        "formats": ["<u4", "<u4", "<u4", "<u4", "<u8", "<u8", "<u4", "<u4", "<f4", "<f4", "<u4",
+                    "<i4", "<u8", "<u4", "<u4", "<u8", "<u4", "<u4", "<u4", "<u8", "<u8"],
+        "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40, 44, 48, 52, 56, 64, 68, 72, 80, 84, 88, 96,
+                    104],
+        "itemsize": SLOT_OFFSET})
+    SLOT = np.dtype({
+        "names": ["owner", "rate", "channels", "flags", "tick", "read_pos", "lead", "underruns",
+                  "blocks"],
+        "formats": ["<i4", "<u4", "<u4", "<u4", "<u8", "<u8", "<u4", "<u4", "<u8"],
+        "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40],
+        "itemsize": 64})
 SLOT_REPLACING, SLOT_PUBLISHING = 1, 2
 
 STATE_KEY = r"SOFTWARE\OnionBoard\MicPlugin"
@@ -172,14 +186,12 @@ def _tick() -> int:
 
 
 def new_ring_bytes() -> bytes:
-    """A fresh ring file: header filled in, board off, no samples."""
-    head = np.zeros(1, HEAD)
-    h = head[0]
-    h["magic"], h["version"], h["rate"], h["capacity"] = MAGIC, VERSION, RATE, CAPACITY
-    h["gain"] = h["mic_gain"] = 1.0
-    h["mic_capacity"] = MIC_CAPACITY
-    h["mode"] = MODE_REPLACE
-    return head.tobytes() + bytes(FILE_BYTES - HEAD.itemsize)
+    """A fresh ring file: header filled in, board off, no samples. (struct, not HEAD:
+    the admin step makes it in the mic helper too, which has no numpy.)"""
+    out = bytearray(FILE_BYTES)
+    struct.pack_into("<4I", out, 0, MAGIC, VERSION, RATE, CAPACITY)   # magic .. capacity
+    struct.pack_into("<I2fI", out, 36, MODE_REPLACE, 1.0, 1.0, MIC_CAPACITY)   # mode .. mic cap
+    return bytes(out)
 
 
 def make_ring_ok(path: Path) -> bool:
@@ -189,11 +201,13 @@ def make_ring_ok(path: Path) -> bool:
         if not (path.is_file() and path.stat().st_size == FILE_BYTES):
             return False
         with open(path, "rb") as f:
-            head = np.frombuffer(f.read(HEAD.itemsize), HEAD)[0]
-    except (OSError, ValueError):
+            raw = f.read(52)
+        magic, version, rate, capacity = struct.unpack_from("<4I", raw, 0)
+        mic_capacity, = struct.unpack_from("<I", raw, 48)
+    except (OSError, ValueError, struct.error):
         return False
-    return bool(head["magic"] == MAGIC and head["version"] == VERSION and head["rate"] == RATE
-                and head["capacity"] == CAPACITY and head["mic_capacity"] == MIC_CAPACITY)
+    return (magic, version, rate, capacity, mic_capacity) \
+        == (MAGIC, VERSION, RATE, CAPACITY, MIC_CAPACITY)
 
 
 def make_ring(path: Path | None = None) -> bool:
@@ -1523,6 +1537,10 @@ def _make_ring():
     path = ring_path()
     if make_ring_ok(path):
         return
+    if not path.parent.is_dir():
+        # a reinstall's uninstall removed the folder (nothing held the ring open, as a
+        # running board does): made again, as safe as the admin step makes it at first
+        secure_data_dirs()
     tmp = path.parent / f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
     try:
@@ -1568,6 +1586,12 @@ def admin_install(guid: str, slot: str | None = None, source: Path | None = None
         _make_ring()
         for other in installed_on():   # one mic at a time; this one is done afresh
             _uninstall_endpoint(other)
+        for e in capture_endpoints():
+            # an older version's set-up cut off (or its notes lost) left the effect in
+            # this mic's slots with nothing to put back: just take it out
+            if e["guid"] != guid and any(without_ours(v)[0]
+                                         for v in _fx_values(e["guid"]).values()):
+                _strip_endpoint(e["guid"])
         try:
             _install_endpoint(guid, slot)
         except BaseException:
@@ -1670,6 +1694,15 @@ def admin_uninstall(only: str | None = None) -> int:
     return 0
 
 
+def admin_remove_all() -> int:
+    """The app is being uninstalled: the effect off every mic, then the mic helper."""
+    from soundboard import michelper
+    code = admin_uninstall()
+    if code == 0 and not michelper.is_helper():
+        michelper.remove_helper()   # (the helper removes itself after answering)
+    return code
+
+
 def _strip_endpoint(guid: str):
     """Take this effect out of every effect slot on one mic that has no notes. What it
     replaced isn't known, so the slot is left without it: everything else stays."""
@@ -1752,14 +1785,16 @@ def _is_admin() -> bool:
 def cli(args: list[str]) -> int:
     """`--direct-mic install <endpoint guid> [sfx|lfx|efx]` /`--direct-mic uninstall`: the
     admin copy. `--direct-mic remove`: the uninstaller's, not admin: runs the admin
-    `uninstall` (Windows asks first) if Onion Board is on a mic at all. 0 when done."""
+    `remove-all` (the mic helper, or Windows asks first) if Onion Board is on a mic or
+    its helper is there at all. 0 when done."""
+    from soundboard import michelper
     if args == ["remove"]:
-        if not anything_installed():
+        if not anything_installed() and not michelper.installed():
             return 0
         if not _is_admin():
-            code = _elevated(["uninstall"])
+            code = _elevated(["remove-all"])
             return 1 if code is None else code
-        args = ["uninstall"]
+        args = ["remove-all"]
     if args[:1] == ["reinstall"] and len(args) == 2 and _GUID.fullmatch(args[1]):
         guid = args[1].lower()
         if guid not in {e["guid"] for e in capture_endpoints()}:
@@ -1773,6 +1808,8 @@ def cli(args: list[str]) -> int:
         step = lambda: admin_install(guid, args[2] if len(args) == 3 else None)  # noqa: E731
     elif args == ["uninstall"]:
         step = admin_uninstall
+    elif args == ["remove-all"]:
+        step = admin_remove_all
     elif args[:1] == ["cleanup"] and len(args) == 2 and _GUID.fullmatch(args[1]):
         guid = args[1].lower()
         step = lambda: admin_cleanup(guid)  # noqa: E731
@@ -1793,10 +1830,15 @@ def cli(args: list[str]) -> int:
         logging.basicConfig(filename=str(data_dir().parent / "directmic-admin.log"),
                             level=logging.INFO, format="%(asctime)s %(message)s")
         try:
-            return step()
+            code = step()
         except Exception:  # noqa: BLE001
             log.exception("mic effect %s failed", args[:1])
             return 1
+        if code == 0 and args[0] in ("install", "reinstall", "cleanup") \
+                and not michelper.is_helper():
+            # the one prompt also sets up (or updates) the helper: no prompt next time
+            michelper.install_helper()
+        return code
     finally:
         _release(lock)
 
@@ -1839,10 +1881,28 @@ def relaunch_params(args: list[str]) -> str:
 
 
 def _elevated(args: list[str], wait_s: float = 300.0) -> int | None:
-    """Run this app's admin copy with `args` (Windows asks first). Its exit code, or
-    None if the prompt was turned down or it didn't finish. The audio stop/start and
-    the dependent services can take a while on a slow PC, so allow generously."""
+    """Run the admin command `args`: through the mic helper when it's set up (no
+    prompt), else this app's admin copy (Windows asks first). Its exit code, or None if
+    the prompt was turned down or it didn't finish. The audio stop/start and the
+    dependent services can take a while on a slow PC, so allow generously."""
+    code = _via_helper(args, wait_s)
+    if code is not None:
+        return code
     return run_elevated(sys.executable, relaunch_params(args), wait_s)
+
+
+def _via_helper(args: list[str], wait_s: float) -> int | None:
+    """`args` run by the mic helper, or None to ask Windows instead. Setting up needs a
+    helper with this app's effect DLL; taking it off works with any helper."""
+    from soundboard import michelper
+    try:
+        if not michelper.allowed(args):
+            return None
+        usable = michelper.ready(same_dll=args[0] in ("install", "reinstall"))
+        return michelper.ask(args, wait_s) if usable else None
+    except Exception:  # noqa: BLE001 - Windows' prompt still works
+        log.warning("the mic helper failed", exc_info=True)
+        return None
 
 
 def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:

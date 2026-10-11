@@ -80,7 +80,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   prompt, then Discord and games hear your sounds through the mic they already use,
   with nothing to pick there; voice changer, mic volume, gate, ducking and mute all
   still work, and the Setup tab offers a one-click repair if a Windows update takes it
-  off), **the virtual cable** (the backup: *Use the virtual cable instead* on the
+  off; after the first permission prompt, repairs and changes of mic don't ask again), **the virtual cable** (the backup: *Use the virtual cable instead* on the
   Setup tab, or the installer's box, unticked; Discord or the game uses its *CABLE
   Output* as a mic. Once your sounds are in your mic, the Setup tab offers to remove
   the cable), **another device** (any output
