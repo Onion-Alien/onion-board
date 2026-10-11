@@ -3091,5 +3091,7 @@
   "Use my mic": "ใช้ไมค์ของฉัน",
   "Use the virtual cable": "ใช้สายเสมือน",
   "Plays from: {path}": "เล่นจาก: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "แต่ละเสียงจะขึ้นทันทีที่เพิ่มเสร็จ ปิดอันนี้ก็ไม่หยุด"
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "แต่ละเสียงจะขึ้นทันทีที่เพิ่มเสร็จ ปิดอันนี้ก็ไม่หยุด",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows สงวน {keys} ไว้ใช้เอง จึงตั้งเป็นปุ่มลัดไม่ได้ เลือกปุ่มอื่น</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows สงวน <b>{key}</b> ไว้ใช้เอง จึงตั้งเป็นปุ่มลัดไม่ได้ เลือกปุ่มอื่น</span>"
 }

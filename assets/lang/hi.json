@@ -3164,5 +3164,7 @@
   "Use my mic": "मेरा माइक इस्तेमाल करें",
   "Use the virtual cable": "वर्चुअल केबल इस्तेमाल करें",
   "Plays from: {path}": "यहाँ से चलता है: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "हर साउंड जुड़ते ही दिखने लगती है। इसे बंद करने से यह रुकता नहीं।"
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "हर साउंड जुड़ते ही दिखने लगती है। इसे बंद करने से यह रुकता नहीं।",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows {keys} को अपने लिए रखता है, इसलिए यह हॉटकी नहीं बन सकती। कोई और की चुनें।</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> को अपने लिए रखता है, इसलिए यह हॉटकी नहीं बन सकती। कोई और की चुनें।</span>"
 }

@@ -3237,5 +3237,7 @@
   "Use my mic": "Folosește microfonul meu",
   "Use the virtual cable": "Folosește cablul virtual",
   "Plays from: {path}": "Se redă din: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Fiecare sunet apare imediat ce e adăugat. Închiderea nu îl oprește."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Fiecare sunet apare imediat ce e adăugat. Închiderea nu îl oprește.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows păstrează {keys} pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows păstrează <b>{key}</b> pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>"
 }

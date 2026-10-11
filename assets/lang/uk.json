@@ -3237,5 +3237,7 @@
   "Use my mic": "Мій мікрофон",
   "Use the virtual cable": "Віртуальний кабель",
   "Plays from: {path}": "Грає з: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Кожен звук з'являється, щойно доданий. Якщо закрити, це не зупиниться."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Кожен звук з'являється, щойно доданий. Якщо закрити, це не зупиниться.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows залишає {keys} собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows залишає <b>{key}</b> собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>"
 }

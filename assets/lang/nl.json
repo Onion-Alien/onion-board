@@ -3164,5 +3164,7 @@
   "Use my mic": "Mijn mic gebruiken",
   "Use the virtual cable": "De virtuele kabel gebruiken",
   "Plays from: {path}": "Speelt af vanaf: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Elk geluid verschijnt zodra het erin staat. Sluiten stopt het niet."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Elk geluid verschijnt zodra het erin staat. Sluiten stopt het niet.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows houdt {keys} voor zichzelf, dus het kan geen sneltoets zijn. Kies een andere toets.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows houdt <b>{key}</b> voor zichzelf, dus het kan geen sneltoets zijn. Kies een andere toets.</span>"
 }

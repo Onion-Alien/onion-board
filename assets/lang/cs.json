@@ -3237,5 +3237,7 @@
   "Use my mic": "Použít můj mikrofon",
   "Use the virtual cable": "Použít virtuální kabel",
   "Plays from: {path}": "Přehrává se z: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Každý zvuk se objeví hned, jak je přidaný. Zavřením se to nezastaví."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Každý zvuk se objeví hned, jak je přidaný. Zavřením se to nezastaví.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows si {keys} nechává pro sebe, takže nemůže být zkratkou. Vyber jinou klávesu.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows si <b>{key}</b> nechává pro sebe, takže nemůže být zkratkou. Vyber jinou klávesu.</span>"
 }

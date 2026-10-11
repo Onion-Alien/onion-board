@@ -3091,5 +3091,7 @@
   "Use my mic": "Dùng mic của tôi",
   "Use the virtual cable": "Dùng cáp ảo",
   "Plays from: {path}": "Phát từ: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Mỗi âm thanh hiện ra ngay khi được thêm. Đóng cái này không làm nó dừng."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Mỗi âm thanh hiện ra ngay khi được thêm. Đóng cái này không làm nó dừng.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows giữ {keys} cho riêng nó, nên không thể làm phím tắt. Hãy chọn phím khác.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows giữ <b>{key}</b> cho riêng nó, nên không thể làm phím tắt. Hãy chọn phím khác.</span>"
 }

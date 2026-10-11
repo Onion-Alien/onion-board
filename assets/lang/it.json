@@ -3164,5 +3164,7 @@
   "Use my mic": "Usa il mio microfono",
   "Use the virtual cable": "Usa il cavo virtuale",
   "Plays from: {path}": "Riprodotto da: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Ogni suono compare appena è dentro. Chiudere questo non lo ferma."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Ogni suono compare appena è dentro. Chiudere questo non lo ferma.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows tiene {keys} per sé, quindi non può essere una scorciatoia. Scegli un altro tasto.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows tiene <b>{key}</b> per sé, quindi non può essere una scorciatoia. Scegli un altro tasto.</span>"
 }

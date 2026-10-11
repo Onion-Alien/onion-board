@@ -830,6 +830,20 @@ def _write_privacy(text: str):
         log.warning("couldn't save %s", path, exc_info=True)
 
 
+def _replace(tmp: Path, path: Path, tries: int = 6):
+    """tmp.replace(path), tried again for a moment while something (an antivirus scan,
+    the search indexer, a backup tool) has `path` open: one such lock made a whole
+    save fail and showed "Couldn't save your settings" though the next save was fine."""
+    for i in range(tries):
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError:
+            if i == tries - 1:
+                raise
+            time.sleep(0.05 * (i + 1))
+
+
 def _write(snap: tuple[int, dict, str]) -> bool:
     """Write a Config.snapshot() to config.json (+ privacy.json), unless a newer one
     is already there."""
@@ -863,7 +877,7 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                     _rotated[CONFIG_PATH] = time.monotonic()
                 except OSError:   # a backup locked for a moment mustn't block the save
                     log.warning("couldn't rotate the config backups", exc_info=True)
-            tmp.replace(CONFIG_PATH)
+            _replace(tmp, CONFIG_PATH)
             _written_seq = seq
             return True
         except OSError:

@@ -3456,5 +3456,7 @@
   "Use my mic": "استخدم ميكروفوني",
   "Use the virtual cable": "استخدم الكابل الافتراضي",
   "Plays from: {path}": "يُشغَّل من: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "يظهر كل صوت فور إضافته. إغلاق هذا لا يوقفه."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "يظهر كل صوت فور إضافته. إغلاق هذا لا يوقفه.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>يحتفظ Windows بـ {keys} لنفسه، فلا يمكن أن يكون اختصارًا. اختر مفتاحًا آخر.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>يحتفظ Windows بـ <b>{key}</b> لنفسه، فلا يمكن أن يكون اختصارًا. اختر مفتاحًا آخر.</span>"
 }

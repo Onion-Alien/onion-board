@@ -3164,5 +3164,7 @@
   "Use my mic": "Mikrofonumu kullan",
   "Use the virtual cable": "Sanal kabloyu kullan",
   "Plays from: {path}": "Şuradan çalınır: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Her ses eklenir eklenmez görünür. Bunu kapatmak durdurmaz."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Her ses eklenir eklenmez görünür. Bunu kapatmak durdurmaz.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows {keys} tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>"
 }

@@ -3164,5 +3164,7 @@
   "Use my mic": "Saját mikrofon használata",
   "Use the virtual cable": "Virtuális kábel használata",
   "Plays from: {path}": "Innen szól: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Minden hang megjelenik, amint bekerült. A bezárás nem állítja le."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Minden hang megjelenik, amint bekerült. A bezárás nem állítja le.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>A Windows magának tartja a(z) {keys} billentyűt, így nem lehet gyorsbillentyű. Válassz másik billentyűt.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>A Windows magának tartja a(z) <b>{key}</b> billentyűt, így nem lehet gyorsbillentyű. Válassz másik billentyűt.</span>"
 }

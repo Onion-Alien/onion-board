@@ -3091,5 +3091,7 @@
   "Use my mic": "내 마이크 사용",
   "Use the virtual cable": "가상 케이블 사용",
   "Plays from: {path}": "재생 위치: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "각 사운드는 추가되는 즉시 나타나요. 닫아도 멈추지 않아요."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "각 사운드는 추가되는 즉시 나타나요. 닫아도 멈추지 않아요.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} 키는 Windows가 직접 쓰기 때문에 단축키로 쓸 수 없어요. 다른 키를 고르세요.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 키는 Windows가 직접 쓰기 때문에 단축키로 쓸 수 없어요. 다른 키를 고르세요.</span>"
 }

@@ -3091,5 +3091,7 @@
   "Use my mic": "Pakai mic-ku",
   "Use the virtual cable": "Pakai kabel virtual",
   "Plays from: {path}": "Diputar dari: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap suara muncul begitu masuk. Menutup ini tidak menghentikannya."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap suara muncul begitu masuk. Menutup ini tidak menghentikannya.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows menyimpan {keys} untuk dirinya sendiri, jadi tidak bisa jadi hotkey. Pilih tombol lain.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows menyimpan <b>{key}</b> untuk dirinya sendiri, jadi tidak bisa jadi hotkey. Pilih tombol lain.</span>"
 }

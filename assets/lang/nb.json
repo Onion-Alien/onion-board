@@ -3164,5 +3164,7 @@
   "Use my mic": "Bruk mikrofonen min",
   "Use the virtual cable": "Bruk den virtuelle kabelen",
   "Plays from: {path}": "Spilles fra: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Hver lyd dukker opp så snart den er inne. Å lukke dette stopper det ikke."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Hver lyd dukker opp så snart den er inne. Å lukke dette stopper det ikke.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows holder av {keys} for seg selv, så den kan ikke være en hurtigtast. Velg en annen tast.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows holder av <b>{key}</b> for seg selv, så den kan ikke være en hurtigtast. Velg en annen tast.</span>"
 }

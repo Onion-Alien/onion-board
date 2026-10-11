@@ -3164,5 +3164,7 @@
   "Use my mic": "Käytä omaa mikkiä",
   "Use the virtual cable": "Käytä virtuaalikaapelia",
   "Plays from: {path}": "Soitetaan tiedostosta: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Jokainen ääni näkyy heti, kun se on lisätty. Sulkeminen ei pysäytä sitä."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Jokainen ääni näkyy heti, kun se on lisätty. Sulkeminen ei pysäytä sitä.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows pitää {keys}-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows pitää <b>{key}</b>-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>"
 }

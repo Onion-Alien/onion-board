@@ -3164,5 +3164,7 @@
   "Use my mic": "Χρήση του μικροφώνου μου",
   "Use the virtual cable": "Χρήση του εικονικού καλωδίου",
   "Plays from: {path}": "Παίζει από: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Κάθε ήχος εμφανίζεται μόλις μπει. Το κλείσιμο δεν το σταματά."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Κάθε ήχος εμφανίζεται μόλις μπει. Το κλείσιμο δεν το σταματά.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Τα Windows κρατούν το {keys} για τον εαυτό τους, οπότε δεν μπορεί να γίνει πλήκτρο συντόμευσης. Διάλεξε άλλο πλήκτρο.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Τα Windows κρατούν το <b>{key}</b> για τον εαυτό τους, οπότε δεν μπορεί να γίνει πλήκτρο συντόμευσης. Διάλεξε άλλο πλήκτρο.</span>"
 }

@@ -3091,5 +3091,7 @@
   "Use my mic": "自分のマイクを使う",
   "Use the virtual cable": "仮想ケーブルを使う",
   "Plays from: {path}": "再生元: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "サウンドは追加されるとすぐに表示されます。閉じても止まりません。"
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "サウンドは追加されるとすぐに表示されます。閉じても止まりません。",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} は Windows 専用のため、ホットキーにできません。別のキーを選んでください。</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> は Windows 専用のため、ホットキーにできません。別のキーを選んでください。</span>"
 }

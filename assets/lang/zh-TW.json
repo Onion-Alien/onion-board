@@ -3091,5 +3091,7 @@
   "Use my mic": "用我的麥克風",
   "Use the virtual cable": "用虛擬音源線",
   "Plays from: {path}": "播放自：{path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "每個聲音一加入就會出現。關閉這裡不會停止。"
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "每個聲音一加入就會出現。關閉這裡不會停止。",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} 是 Windows 自己保留的鍵，不能當作快速鍵。請換一個鍵。</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的鍵，不能當作快速鍵。請換一個鍵。</span>"
 }

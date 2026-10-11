@@ -3164,5 +3164,7 @@
   "Use my mic": "Gamitin ang mic ko",
   "Use the virtual cable": "Gamitin ang virtual cable",
   "Plays from: {path}": "Pinapatugtog mula sa: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Lumalabas ang bawat tunog pagkapasok nito. Hindi ito titigil kapag isinara mo ito."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Lumalabas ang bawat tunog pagkapasok nito. Hindi ito titigil kapag isinara mo ito.",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Nakareserba ang {keys} para sa Windows, kaya hindi ito puwedeng hotkey. Pumili ng ibang key.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Nakareserba ang <b>{key}</b> para sa Windows, kaya hindi ito puwedeng hotkey. Pumili ng ibang key.</span>"
 }
