@@ -241,8 +241,8 @@ def set_offline() -> int:
 
 
 def keep_netlog() -> int:
-    """`OnionBoard.exe --keep-netlog`: the installer's "Keep a history of network
-    activity" box (or /KEEPNETLOG=1). Switches on netlog_keep in config.json before
+    """`OnionBoard.exe --keep-netlog`: the installer's /KEEPNETLOG=1 (its box
+    moved to the app's Settings). Switches on netlog_keep in config.json before
     the app's first start, so its first connections are kept too. Other settings are
     kept; nothing connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
     migrate_from_soundboard()

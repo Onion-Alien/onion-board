@@ -2988,6 +2988,8 @@
   "Other": "その他",
   "Help and community": "ヘルプとコミュニティ",
   "Onion Board on GitHub": "GitHub の Onion Board",
+  "A sound you added is very short, so it may be barely heard.": "追加したサウンドはとても短いため、ほとんど聞こえないかもしれません。",
+  "Both files are in {folder}.": "どちらのファイルも {folder} にあります。",
   "A download is still running. If you close now, it's lost. Close anyway?": "ダウンロードがまだ実行中です。今閉じると失われます。それでも閉じますか?",
   "Download running": "ダウンロード中",
   "Your sounds are back on your mic.": "サウンドがマイクに戻りました。",

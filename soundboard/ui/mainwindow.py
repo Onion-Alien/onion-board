@@ -105,6 +105,7 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 
+SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
@@ -426,6 +427,7 @@ class MainWindow(QMainWindow):
         self._undo_timer = QTimer(self)
         self._undo_timer.setSingleShot(True)
         self._undo_timer.timeout.connect(self._finish_removals)
+        self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
@@ -3043,7 +3045,7 @@ class MainWindow(QMainWindow):
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
-        self.btn_usecable.setVisible(route == "mic" and state != "ok" and not mic_busy)
+        self.btn_usecable.setVisible(route == "mic" and not mic_busy)   # also when it works
         spare = route == "mic" and state == "ok" and self._spare_cable()
         self.btn_rmcable.setVisible(spare)
         self.rmcable_note.setVisible(spare)
@@ -5798,6 +5800,8 @@ class MainWindow(QMainWindow):
             self._index()
             self.audio[meta.id] = data
             self._imported_ok += 1
+            if meta.duration < SHORT_SOUND_S:
+                self._imported_short = True
             self._import_ids.append(meta.id)
             usage.used("add-files")
             usage.step(self.cfg, "added-sound")
@@ -5812,6 +5816,7 @@ class MainWindow(QMainWindow):
         self._fill_categories()   # categories and hotkeys from an Import from Soundpad
         self.register_hotkeys()
         n, self._imported_ok = self._imported_ok, 0
+        short, self._imported_short = self._imported_short, False
         ids, self._import_ids = self._import_ids, []
         skipped, self._import_errors = self._import_errors, []
         self._import_total = 0
@@ -5827,6 +5832,9 @@ class MainWindow(QMainWindow):
             action = (_("Undo"), lambda: self.remove_sounds(ids))
         self.toast(text, kind, 8000 if skipped else 6000, key="import", action=action)
         self._flash_new(ids)
+        if short:
+            self.toast(_("A sound you added is very short, so it may be barely "
+                         "heard."), "warn")
 
     def _show_skipped(self, skipped):
         dlg = importreport.SkippedDialog(skipped, self)

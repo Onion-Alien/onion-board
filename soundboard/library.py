@@ -576,7 +576,8 @@ class Config:
         log.error("config %s is unreadable: %r", CONFIG_PATH, err)
         broken = "" if missing else cls._set_aside()
         kept = ("" if missing else " " + _("The damaged file was kept as {file}.",
-                                           file=broken or "config.json"))
+                                           file=broken or "config.json")
+                + " " + _("Both files are in {folder}.", folder=CONFIG_PATH.parent))
         for name, raw in cls._backups():
             try:
                 cfg = cls.from_raw(raw)

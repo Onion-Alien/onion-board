@@ -1,0 +1,1 @@
+- A smaller, calmer startup splash with a steady Bun, the app name and three gentle loading dots. It follows your theme and Windows' Animation effects setting.

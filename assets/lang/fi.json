@@ -3053,6 +3053,8 @@
   "Other": "Muut",
   "Help and community": "Apua ja yhteisö",
   "Onion Board on GitHub": "Onion Board GitHubissa",
+  "A sound you added is very short, so it may be barely heard.": "Lisäämäsi ääni on hyvin lyhyt, joten se saattaa kuulua tuskin lainkaan.",
+  "Both files are in {folder}.": "Molemmat tiedostot ovat kansiossa {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Lataus on vielä kesken. Jos suljet nyt, se menetetään. Suljetaanko silti?",
   "Download running": "Lataus käynnissä",
   "Your sounds are back on your mic.": "Äänesi ovat taas mikrofonissasi.",

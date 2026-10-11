@@ -2988,6 +2988,8 @@
   "Other": "기타",
   "Help and community": "도움말 및 커뮤니티",
   "Onion Board on GitHub": "GitHub의 Onion Board",
+  "A sound you added is very short, so it may be barely heard.": "추가한 사운드가 매우 짧아서 거의 들리지 않을 수 있습니다.",
+  "Both files are in {folder}.": "두 파일 모두 {folder}에 있습니다.",
   "A download is still running. If you close now, it's lost. Close anyway?": "다운로드가 아직 진행 중입니다. 지금 닫으면 사라집니다. 그래도 닫을까요?",
   "Download running": "다운로드 진행 중",
   "Your sounds are back on your mic.": "사운드가 다시 마이크에 연결되었습니다.",

@@ -3053,6 +3053,8 @@
   "Other": "Други",
   "Help and community": "Помощ и общност",
   "Onion Board on GitHub": "Onion Board в GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Добавеният звук е много кратък и може почти да не се чуе.",
+  "Both files are in {folder}.": "И двата файла са в {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Все още тече изтегляне. Ако затворите сега, то ще се загуби. Да се затвори ли въпреки това?",
   "Download running": "Тече изтегляне",
   "Your sounds are back on your mic.": "Звуците ви отново са на микрофона.",

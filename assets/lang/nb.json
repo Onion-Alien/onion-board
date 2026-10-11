@@ -3053,6 +3053,8 @@
   "Other": "Annet",
   "Help and community": "Hjelp og fellesskap",
   "Onion Board on GitHub": "Onion Board på GitHub",
+  "A sound you added is very short, so it may be barely heard.": "En lyd du la til er veldig kort, så den høres kanskje knapt.",
+  "Both files are in {folder}.": "Begge filene ligger i {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "En nedlasting pågår fortsatt. Hvis du lukker nå, går den tapt. Lukke likevel?",
   "Download running": "Nedlasting pågår",
   "Your sounds are back on your mic.": "Lydene dine er tilbake på mikrofonen din.",
