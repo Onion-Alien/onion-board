@@ -571,6 +571,7 @@ class RadioDirectory(QObject):
         self.bases = list(bases)
         self._search_gen = 0
         self._pending: dict[int, list] = {}
+        self._searching = ""   # the text of the newest search
         self._call.connect(self._run_call)
 
     def _run_call(self, f):
@@ -766,6 +767,9 @@ class RadioDirectory(QObject):
         """Stations whose name, tags or place (city / region) contain `text`, most
         listened first. A newer search makes an older one's results be dropped."""
         text = search_text(text)
+        if text and text == self._searching and self._search_gen in self._pending:
+            return   # Enter spammed: the same search is still on its way
+        self._searching = text
         self._search_gen += 1
         gen = self._search_gen
         if not text:
