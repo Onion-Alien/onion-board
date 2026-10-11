@@ -3025,5 +3025,8 @@
   "{n} sound is already in your library": [
     "{n} bunyi sudah ada dalam pustaka anda"
   ],
-  "Open Triggers": "Buka Pencetus"
+  "Open Triggers": "Buka Pencetus",
+  "Copy into library": "Salin ke pustaka",
+  "Local sounds": "Bunyi setempat",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Dimatikan: pautkan ke fail asal. Hidupkan untuk mengekalkan bunyi jika fail asal dipindahkan, dipadam atau berada pada pemacu yang terputus. Menggunakan ruang cakera tambahan. Hanya untuk import setempat baharu."
 }

@@ -34,7 +34,7 @@ from pathlib import Path, PurePosixPath
 
 import soundfile as sf
 
-from soundboard import __version__, library, savedvoices, voicefx
+from soundboard import __version__, library, savedvoices, videos, voicefx
 from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean_setting,
                                 clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
@@ -110,7 +110,7 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
                 if lib_folder := library._folder_of(audio):   # comes back in it: "YouTube"
                     entry["folder"] = lib_folder
                 entry["picture"] = ""
-                if audio.suffix.lower() in AUDIO_EXTS:
+                if audio.suffix.lower() in AUDIO_EXTS and not videos.is_video(str(audio)):
                     _add_file(z, audio, f"{folder}/{entry['audio']}")
                 else:   # only AUDIO_EXTS are read back in: a .caf, .au… goes as a FLAC
                     entry["audio"] = Path(entry["audio"]).stem + ".flac"

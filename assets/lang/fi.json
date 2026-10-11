@@ -3096,5 +3096,8 @@
     "{n} ääntä on jo kirjastossasi",
     "{n} ääntä on jo kirjastossasi"
   ],
-  "Open Triggers": "Avaa Laukaisimet"
+  "Open Triggers": "Avaa Laukaisimet",
+  "Copy into library": "Kopioi kirjastoon",
+  "Local sounds": "Paikalliset äänet",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Pois: linkitä alkuperäiseen tiedostoon. Ota käyttöön, jotta äänet säilyvät, jos alkuperäinen siirretään, poistetaan tai on irrotetulla asemalla. Vie lisää levytilaa. Koskee vain uusia paikallisia tuonteja."
 }

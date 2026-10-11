@@ -3025,5 +3025,8 @@
   "{n} sound is already in your library": [
     "{n} เสียงมีอยู่ในคลังของคุณแล้ว"
   ],
-  "Open Triggers": "เปิดทริกเกอร์"
+  "Open Triggers": "เปิดทริกเกอร์",
+  "Copy into library": "คัดลอกไปยังคลัง",
+  "Local sounds": "เสียงในเครื่อง",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "ปิด: ลิงก์ไปยังไฟล์ต้นฉบับ เปิดเพื่อเก็บเสียงไว้แม้ต้นฉบับถูกย้าย ลบ หรืออยู่บนไดรฟ์ที่ไม่ได้เชื่อมต่อ ใช้พื้นที่ดิสก์เพิ่ม มีผลกับการนำเข้าไฟล์ในเครื่องใหม่เท่านั้น"
 }

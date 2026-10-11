@@ -3025,5 +3025,8 @@
   "{n} sound is already in your library": [
     "사운드 {n}개가 이미 라이브러리에 있어요"
   ],
-  "Open Triggers": "트리거 열기"
+  "Open Triggers": "트리거 열기",
+  "Copy into library": "라이브러리에 복사",
+  "Local sounds": "로컬 사운드",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "끄기: 원본 파일에 연결합니다. 원본이 이동 또는 삭제되거나 드라이브 연결이 끊겨도 사운드를 유지하려면 켜세요. 추가 디스크 공간을 사용합니다. 새 로컬 가져오기에만 적용됩니다."
 }

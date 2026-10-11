@@ -3096,5 +3096,8 @@
     "{n} ses zaten kitaplığınızda",
     "{n} ses zaten kitaplığınızda"
   ],
-  "Open Triggers": "Tetikleyicileri aç"
+  "Open Triggers": "Tetikleyicileri aç",
+  "Copy into library": "Kitaplığa kopyala",
+  "Local sounds": "Yerel sesler",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Kapalı: özgün dosyaya bağlanır. Özgün dosya taşınırsa, silinirse veya bağlantısı kesilmiş bir sürücüdeyse sesleri korumak için açın. Ek disk alanı kullanır. Yalnızca yeni yerel içe aktarmalara uygulanır."
 }

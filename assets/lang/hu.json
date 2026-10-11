@@ -3096,5 +3096,8 @@
     "{n} hang már a könyvtáradban van",
     "{n} hang már a könyvtáradban van"
   ],
-  "Open Triggers": "Triggerek megnyitása"
+  "Open Triggers": "Triggerek megnyitása",
+  "Copy into library": "Másolás a könyvtárba",
+  "Local sounds": "Helyi hangok",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Kikapcsolva: hivatkozás az eredeti fájlra. Kapcsold be, hogy a hangok megmaradjanak, ha az eredetit áthelyezed, törlöd vagy leválasztott meghajtón van. Több tárhelyet használ. Csak az új helyi importokra vonatkozik."
 }

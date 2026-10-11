@@ -3096,5 +3096,8 @@
     "{n} sound ang nasa library mo na",
     "{n} sound ang nasa library mo na"
   ],
-  "Open Triggers": "Buksan ang Triggers"
+  "Open Triggers": "Buksan ang Triggers",
+  "Copy into library": "Kopyahin sa library",
+  "Local sounds": "Mga lokal na tunog",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Naka-off: i-link sa orihinal na file. I-on para manatili ang mga tunog kung inilipat o binura ang orihinal, o nasa drive na hindi nakakonekta. Gumagamit ng dagdag na espasyo. Para lang sa mga bagong lokal na import."
 }

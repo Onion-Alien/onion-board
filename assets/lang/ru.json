@@ -3167,5 +3167,8 @@
     "{n} звука уже есть в твоей библиотеке",
     "{n} звуков уже есть в твоей библиотеке"
   ],
-  "Open Triggers": "Открыть триггеры"
+  "Open Triggers": "Открыть триггеры",
+  "Copy into library": "Копировать в библиотеку",
+  "Local sounds": "Локальные звуки",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Выключено: ссылка на исходный файл. Включите, чтобы сохранить звуки, если оригинал перемещён, удалён или находится на отключённом диске. Занимает дополнительное место. Только для новых локальных импортов."
 }

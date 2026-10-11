@@ -3025,5 +3025,8 @@
   "{n} sound is already in your library": [
     "{n} suara sudah ada di perpustakaan Anda"
   ],
-  "Open Triggers": "Buka Pemicu"
+  "Open Triggers": "Buka Pemicu",
+  "Copy into library": "Salin ke pustaka",
+  "Local sounds": "Suara lokal",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Nonaktif: tautkan ke file asli. Aktifkan agar suara tetap tersedia jika file asli dipindahkan, dihapus, atau berada di drive yang terputus. Memakai ruang disk tambahan. Hanya berlaku untuk impor lokal baru."
 }
