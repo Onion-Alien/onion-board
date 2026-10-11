@@ -82,7 +82,6 @@
   "Clear the selection (Esc)": "選択を解除（Esc）",
   "Click again to turn it off": "もう一度クリックでオフ",
   "Click to go live again: others hear you and your sounds": "クリックでライブに戻る: 相手にあなたとサウンドが聞こえます",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "クリックでミュート: 相手（Discord、ゲーム、OBS…）には何も届きません。あなたにはすべて聞こえます",
   "Close": "閉じる",
   "Close Onion Board and open it again to finish.": "完了するには Onion Board を閉じて開き直してください。",
   "Colour": "色",
@@ -2978,9 +2977,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "ダウンロードごとのリンク、チャンネル、投稿日、長さ、再生回数を保存します（ダウンロード自体から取得し、追加では何も取りに行きません）。サウンドの横のテキストファイルにも保存します。サウンドを右クリックするとリンクを開いたりコピーしたりできます。オフ：新しいダウンロードは何も保存せず、メニューにも表示されません。保存済みのものは残ります。",
   "Remember where it came from": "入手元を記録する",
   "Set up output": "出力を設定",
-  "Sound output": "音声出力",
   "Interface size": "画面の大きさ",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board のすべてを大きく、または小さくします: 文字、ボタン、パッド。",
   "Onion Board changes size after a restart.": "Onion Board は再起動後に大きさが変わります。",
-  "Save a copy": "コピーを保存"
+  "Save a copy": "コピーを保存",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "クリックして相手へのサウンドをミュート（Discord、ゲーム、OBS…）。ボイスチェンジャーがオンでなければ、マイクはそのまま送られます。自分には全部聞こえます",
+  "Click to send your sounds again: right now others hear only your mic": "クリックしてサウンドの送信を再開：今は相手には自分のマイクだけ聞こえます",
+  "Only your mic": "マイクだけ",
+  "Others hear": "相手に聞こえる",
+  "Others hear only your mic": "相手には自分のマイクだけ聞こえます"
 }

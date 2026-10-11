@@ -84,7 +84,6 @@
   "Clear the selection (Esc)": "Odznacz wszystko (Esc)",
   "Click again to turn it off": "Kliknij ponownie, by wyłączyć",
   "Click to go live again: others hear you and your sounds": "Kliknij, by znów nadawać: inni słyszą ciebie i twoje dźwięki",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Kliknij, by wyciszyć: nic nie trafia do innych (Discord, gra, OBS…). Ty nadal słyszysz wszystko",
   "Close": "Zamknij",
   "Close Onion Board and open it again to finish.": "Zamknij Onion Board i otwórz go ponownie, by dokończyć.",
   "Colour": "Kolor",
@@ -3108,9 +3107,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Zapamiętuje link, kanał, datę przesłania, długość i wyświetlenia każdego pobrania (z samego pobrania, nic dodatkowego nie jest pobierane), także w pliku tekstowym obok dźwięku. Kliknij dźwięk prawym, by otworzyć lub skopiować link. Wyłączone: nowe pobrania nic z tego nie zapisują, a menu to ukrywa; to, co już zapisane, zostaje.",
   "Remember where it came from": "Zapamiętuj, skąd pochodzi",
   "Set up output": "Skonfiguruj wyjście",
-  "Sound output": "Wyjście dźwięku",
   "Interface size": "Rozmiar interfejsu",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Powiększa lub pomniejsza wszystko w Onion Board: tekst, przyciski i pady.",
   "Onion Board changes size after a restart.": "Onion Board zmieni rozmiar po ponownym uruchomieniu.",
-  "Save a copy": "Zapisz kopię"
+  "Save a copy": "Zapisz kopię",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Kliknij, aby wyciszyć swoje dźwięki dla innych (Discord, gra, OBS…). Twój mikrofon dalej leci, chyba że zmieniacz głosu jest włączony. Ty dalej słyszysz wszystko",
+  "Click to send your sounds again: right now others hear only your mic": "Kliknij, aby znów wysyłać swoje dźwięki: teraz inni słyszą tylko twój mikrofon",
+  "Only your mic": "Tylko twój mikrofon",
+  "Others hear": "Inni słyszą",
+  "Others hear only your mic": "Inni słyszą tylko twój mikrofon"
 }

@@ -241,7 +241,6 @@
   "Click again to turn it off": "Clic din nou ca să-l oprești",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Dă clic pe căsuța <b>Dispozitiv de intrare voce</b> și alege <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Clic ca să revii live: ceilalți te aud pe tine și sunetele tale",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Clic pentru mut: nimic nu mai iese spre ceilalți (Discord, jocul, OBS…). Tu auzi în continuare tot",
   "Click to set": "Clic ca să setezi",
   "Clip {time}": "Clip {time}",
   "Close": "Închide",
@@ -3108,9 +3107,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Păstrează linkul, canalul, data încărcării, durata și vizualizările fiecărei descărcări (din descărcarea însăși, nu se cere nimic în plus), și într-un fișier text lângă sunet. Clic dreapta pe sunet ca să deschizi sau să copiezi linkul. Oprit: descărcările noi nu păstrează nimic din toate astea și meniul le ascunde; ce e deja salvat rămâne.",
   "Remember where it came from": "Ține minte de unde vine",
   "Set up output": "Configurează ieșirea",
-  "Sound output": "Ieșire audio",
   "Interface size": "Dimensiunea interfeței",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Face totul în Onion Board mai mare sau mai mic: text, butoane și paduri.",
   "Onion Board changes size after a restart.": "Onion Board își schimbă dimensiunea după o repornire.",
-  "Save a copy": "Salvează o copie"
+  "Save a copy": "Salvează o copie",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Apasă ca să oprești sunetele tale pentru ceilalți (Discord, jocul, OBS…). Microfonul tău merge în continuare, dacă nu e pornit schimbătorul de voce. Tu auzi în continuare tot",
+  "Click to send your sounds again: right now others hear only your mic": "Apasă ca să trimiți din nou sunetele tale: acum ceilalți aud doar microfonul tău",
+  "Only your mic": "Doar microfonul tău",
+  "Others hear": "Ceilalți aud",
+  "Others hear only your mic": "Ceilalți aud doar microfonul tău"
 }

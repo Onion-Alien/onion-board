@@ -82,7 +82,6 @@
   "Clear the selection (Esc)": "선택 해제(Esc)",
   "Click again to turn it off": "다시 클릭하면 꺼져요",
   "Click to go live again: others hear you and your sounds": "클릭해서 다시 라이브: 다른 사람이 내 목소리와 사운드를 들어요",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "클릭해서 음소거: 다른 사람(Discord, 게임, OBS…)에게 아무것도 안 나가요. 나는 계속 다 들려요",
   "Close": "닫기",
   "Close Onion Board and open it again to finish.": "Onion Board를 닫았다가 다시 열면 완료돼요.",
   "Colour": "색상",
@@ -2978,9 +2977,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "다운로드마다 링크, 채널, 업로드 날짜, 길이, 조회수를 저장해요(다운로드 자체에서 가져오며 따로 더 가져오지 않아요). 사운드 옆 텍스트 파일에도 저장해요. 사운드를 오른쪽 클릭해 링크를 열거나 복사하세요. 끄면: 새 다운로드는 아무것도 저장하지 않고 메뉴에서도 숨겨요. 이미 저장된 건 그대로예요.",
   "Remember where it came from": "출처 기억하기",
   "Set up output": "출력 설정",
-  "Sound output": "사운드 출력",
   "Interface size": "인터페이스 크기",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board의 모든 것을 크게 또는 작게 만듭니다: 글자, 버튼, 패드.",
   "Onion Board changes size after a restart.": "Onion Board는 다시 시작한 뒤 크기가 바뀝니다.",
-  "Save a copy": "사본 저장"
+  "Save a copy": "사본 저장",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "클릭하면 다른 사람에게 가는 사운드를 음소거해요 (Discord, 게임, OBS…). 보이스 체인저가 켜져 있지 않으면 마이크는 계속 나가요. 나는 계속 다 들려요",
+  "Click to send your sounds again: right now others hear only your mic": "클릭하면 사운드를 다시 보내요: 지금 다른 사람은 내 마이크만 들어요",
+  "Only your mic": "내 마이크만",
+  "Others hear": "다른 사람이 듣기",
+  "Others hear only your mic": "다른 사람은 내 마이크만 들어요"
 }

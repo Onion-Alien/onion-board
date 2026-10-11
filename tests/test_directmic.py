@@ -1494,7 +1494,11 @@ def test_engine_add_mode_leaves_the_voice_to_the_effect(ring_file, monkeypatch):
             s.pump()
         assert np.abs(w.data[:w.write_pos]).max() < 1e-6   # no voice in the ring
         assert abs(w.h[0]["mic_gain"] - 0.7) < 1e-6        # the effect keeps it, at 70%
-        e.sending = False
+        e.sending = False   # "Others hear" off: your plain voice still goes (mic_only)...
+        _publish(w, np.full((480, 2), 0.2, np.float32))
+        s.pump()
+        assert abs(w.h[0]["mic_gain"] - 0.7) < 1e-6
+        e.mic_enabled = False   # ...unless it isn't sent
         _publish(w, np.full((480, 2), 0.2, np.float32))
         s.pump()
         assert w.h[0]["mic_gain"] == 0.0

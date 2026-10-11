@@ -239,7 +239,6 @@
   "Click again to turn it off": "Klicka igen för att stänga av",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Klicka på rutan <b>Voice Input Device</b> och välj <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Klicka för att gå live igen: andra hör dig och dina ljud",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klicka för att tysta: inget alls går ut till andra (Discord, spelet, OBS…). Du hör fortfarande allt",
   "Click to set": "Klicka för att ställa in",
   "Clip {time}": "Klipp {time}",
   "Close": "Stäng",
@@ -3043,9 +3042,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Sparar länk, kanal, uppladdningsdatum, längd och visningar för varje nedladdning (från själva nedladdningen, inget extra hämtas), även i en textfil bredvid ljudet. Högerklicka på ljudet för att öppna eller kopiera länken. Av: nya nedladdningar sparar inget av det och menyn döljer det; det som redan är sparat blir kvar.",
   "Remember where it came from": "Kom ihåg var det kom ifrån",
   "Set up output": "Ställ in utgång",
-  "Sound output": "Ljudutgång",
   "Interface size": "Gränssnittets storlek",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Gör allt i Onion Board större eller mindre: text, knappar och pads.",
   "Onion Board changes size after a restart.": "Onion Board byter storlek efter en omstart.",
-  "Save a copy": "Spara en kopia"
+  "Save a copy": "Spara en kopia",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klicka för att tysta dina ljud för andra (Discord, spelet, OBS…). Din mikrofon skickas fortfarande, om inte röstväxlaren är på. Du hör fortfarande allt",
+  "Click to send your sounds again: right now others hear only your mic": "Klicka för att skicka dina ljud igen: just nu hör andra bara din mikrofon",
+  "Only your mic": "Bara din mikrofon",
+  "Others hear": "Andra hör",
+  "Others hear only your mic": "Andra hör bara din mikrofon"
 }

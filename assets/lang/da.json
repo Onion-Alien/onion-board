@@ -239,7 +239,6 @@
   "Click again to turn it off": "Klik igen for at slå den fra",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Klik på feltet <b>Stemmeinputenhed</b>, og vælg <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Klik for at gå live igen: andre hører dig og dine lyde",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klik for at slå lyden fra: slet intet går ud til andre (Discord, spillet, OBS…). Du hører stadig alt",
   "Click to set": "Klik for at indstille",
   "Clip {time}": "Klip {time}",
   "Close": "Luk",
@@ -3043,9 +3042,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Gemmer hver downloads link, kanal, uploaddato, længde og visninger (fra selve downloaden, intet ekstra hentes), også i en tekstfil ved siden af lyden. Højreklik på lyden for at åbne eller kopiere linket. Fra: nye downloads gemmer intet af det, og menuen skjuler det; det, der allerede er gemt, bliver.",
   "Remember where it came from": "Husk hvor den kom fra",
   "Set up output": "Opsæt output",
-  "Sound output": "Lydoutput",
   "Interface size": "Grænsefladestørrelse",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Gør alt i Onion Board større eller mindre: tekst, knapper og pads.",
   "Onion Board changes size after a restart.": "Onion Board skifter størrelse efter en genstart.",
-  "Save a copy": "Gem en kopi"
+  "Save a copy": "Gem en kopi",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik for at slå dine lyde fra for andre (Discord, spillet, OBS…). Din mikrofon sendes stadig, medmindre stemmeskifteren er slået til. Du hører stadig alt",
+  "Click to send your sounds again: right now others hear only your mic": "Klik for at sende dine lyde igen: lige nu hører andre kun din mikrofon",
+  "Only your mic": "Kun din mikrofon",
+  "Others hear": "Andre hører",
+  "Others hear only your mic": "Andre hører kun din mikrofon"
 }
