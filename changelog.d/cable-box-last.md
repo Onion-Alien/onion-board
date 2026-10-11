@@ -1,0 +1,1 @@
+- The installer's virtual cable box moved to the bottom of the list under "Advanced", with plainer wording (most people don't need it).

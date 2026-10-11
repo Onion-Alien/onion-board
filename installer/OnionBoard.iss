@@ -109,13 +109,13 @@ FinishedLabel=Onion Board is installed. It will open now and ask you a few easy 
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you'd rather send sounds through a cable than your mic"; GroupDescription: "Other ways to send your sounds (optional)"; Flags: unchecked
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you know you need one"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked
 
 [InstallDelete]
 ; The Python runtime and libraries from the last version: cleared first so files a
