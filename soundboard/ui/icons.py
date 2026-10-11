@@ -465,13 +465,17 @@ def _eye(p, fill):
 
 
 def _chevron(direction):
-    """A fold-out's state: > closed, v open."""
+    """A fold-out's state: > closed, v open (^ to fold it back up)."""
     def draw(p, fill):
         path = QPainterPath()
         if direction == "down":
             path.moveTo(6, 9)
             path.lineTo(12, 15)
             path.lineTo(18, 9)
+        elif direction == "up":
+            path.moveTo(6, 15)
+            path.lineTo(12, 9)
+            path.lineTo(18, 15)
         else:
             path.moveTo(9, 6)
             path.lineTo(15, 12)
@@ -633,7 +637,7 @@ SHAPES = {
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
-    "fold": _chevron("right"), "fold_open": _chevron("down"),
+    "fold": _chevron("right"), "fold_open": _chevron("down"), "fold_up": _chevron("up"),
 }
 
 

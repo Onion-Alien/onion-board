@@ -41,7 +41,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library, net, quality, ytworker
+from soundboard import library, net, quality, sourceinfo, ytworker
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
@@ -776,7 +776,9 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     except Exception as e:  # noqa: BLE001 - network: show why
         drop()
         raise DownloadError(_("Download failed ({error})", error=errors.plain(e))) from e
-    return path, _direct_title(url)
+    title = _direct_title(url)
+    sourceinfo.save_for(tmp, {"title": title}, url)   # the pad menu's Open on Myinstants
+    return path, title
 
 
 def _sendable(opts: dict) -> dict:
@@ -966,4 +968,5 @@ def _found(url: str, dest: Path, path: Path, info: dict) -> tuple[Path, str]:
             raise DownloadError(_("Nothing was downloaded (the file may be over {mb} MB).",
                                   mb=MAX_BYTES // 2**20))
         path = found[0]
+    sourceinfo.save_for(path.parent, info, url)   # the pad menu's Open on YouTube
     return path, clean_title(info.get("title") or path.stem)

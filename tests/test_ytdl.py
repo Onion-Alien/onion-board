@@ -643,6 +643,8 @@ def test_search_myinstants_reads_the_buttons_and_downloads_the_mp3(monkeypatch, 
     path, title = ytdl.download_audio(r[0].url, dest=tmp_path)   # no yt-dlp involved
     assert path == tmp_path / "vine-boom.mp3" and path.read_bytes() == b"ID3mp3"
     assert title == "Vine boom"
+    from soundboard import sourceinfo   # the pad menu's Open on Myinstants
+    assert sourceinfo.read_from(tmp_path)["link"] == r[0].url
 
 
 def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
@@ -826,8 +828,9 @@ def test_result_counts_are_only_what_the_search_gave():
     assert not hasattr(ytdl, "stats")
 
 
-def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypatch):
+def test_a_download_shows_its_progress_and_leaves_the_other_cards_free(qapp, monkeypatch):
     from soundboard.ui import busy
+    from soundboard.i18n import _
     from soundboard.ui.ytsearch import SearchResults
     hits = [ytdl.Result(f"vid{i}xxxxxx", f"Song {i}", "c", 60, "myinstants",
                         f"https://example.com/{i}.mp3") for i in range(3)]
@@ -837,9 +840,12 @@ def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypat
     a, b, c = panel._rows
     panel.mark(hits[0].url, "add")                   # Add on the first card
     assert a.fill == 0.0
-    assert "0%" in a.btn_add.text()
+    assert a.btn_add.text() == _("Parsing…")      # no "0%" until bytes arrive
     assert busy.is_busy(a.btn_add) and not busy.is_busy(a.btn_play)   # Play after it: fine
-    assert all(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
+    # the others stay clickable: a Play replaces a loading Play, an Add waits its turn
+    assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
+    panel.queued(hits[1].url, "add")
+    assert b.btn_add.text() == _("Queued") and busy.is_busy(b.btn_add)
     panel.progress(hits[0].url, 0.42)
     assert a.fill == 0.42 and "42%" in a.btn_add.text()
     panel.mark(hits[0].url, "play")                  # ...and Play on it too
@@ -849,9 +855,9 @@ def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypat
     assert "Processing" in a.btn_play.text()
     panel.mark(hits[0].url, "add", True)
     assert a.btn_add.text() == "✓ Added" and a.fill >= 0   # still playing
-    assert busy.is_busy(b.btn_play)
     panel.mark(hits[0].url, "play", True)
     assert a.fill < 0 and busy.is_busy(a.btn_add)       # added stays added
+    panel.mark(hits[1].url, "add", False)            # its wait was cancelled
     assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
 
 

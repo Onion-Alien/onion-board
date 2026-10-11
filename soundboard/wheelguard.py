@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QObject, Qt, QTimer
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QComboBox, QProxyStyle,
+                               QApplication, QComboBox, QMenu, QProxyStyle,
                                QScrollBar, QSizePolicy, QStyle)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
@@ -31,14 +31,28 @@ class AppStyle(QProxyStyle):
     - a dropdown is as wide as its longest choice, capped at COMBO_CAP, and never
       stretches to fill its card (Settings' device boxes were 720 px for a 30-letter
       name). One that set its own size policy, width cap or sizing rule keeps it.
+    - a submenu opens just past its menu's edge, not over it (Fusion put it 7 px
+      inside the menu's border and padding, theme.py's QMenu). SUBMENU_GAP does it
+      where Qt uses it; _SubmenuEdge where it doesn't (a submenu flipped to the other
+      side near the screen's edge, right-to-left languages).
     """
 
     COMBO_CAP = 360
+    # how far right of its item a submenu opens: 7 sits it flush against the menu's
+    # border (measured with theme.py's QMenu padding 5 + border 1), +2 leaves a gap
+    SUBMENU_GAP = 7 + 2
 
     def polish(self, arg):
         super().polish(arg)
         if isinstance(arg, QComboBox):
             snug_combo(arg, self.COMBO_CAP)
+        elif isinstance(arg, QMenu):
+            arg.installEventFilter(_submenu_edge())   # once: Qt doesn't add it twice
+
+    def pixelMetric(self, metric, opt=None, widget=None):
+        if metric == QStyle.PM_SubMenuOverlap:
+            return self.SUBMENU_GAP
+        return super().pixelMetric(metric, opt, widget)
 
     def styleHint(self, hint, opt=None, widget=None, ret=None):
         if hint in (QStyle.SH_ComboBox_AllowWheelScrolling,
@@ -47,6 +61,33 @@ class AppStyle(QProxyStyle):
         if hint == QStyle.SH_Slider_AbsoluteSetButtons:
             return Qt.LeftButton.value
         return super().styleHint(hint, opt, widget, ret)
+
+
+class _SubmenuEdge(QObject):
+    """On a submenu about to show (before it's on screen, so it never jumps): if it
+    covers its menu, move it just outside, on the side it opened towards."""
+    GAP = 2
+
+    def eventFilter(self, obj, ev):
+        if ev.type() == QEvent.Show and isinstance(obj, QMenu):
+            parent = obj.parentWidget()
+            if isinstance(parent, QMenu) and parent.isVisible():
+                pg, g = parent.geometry(), obj.geometry()
+                if g.left() <= pg.right() and g.right() >= pg.left():   # they overlap
+                    x = (pg.right() + 1 + self.GAP if g.center().x() >= pg.center().x()
+                         else pg.left() - self.GAP - g.width())
+                    obj.move(x, g.top())
+        return False
+
+
+_edge: _SubmenuEdge | None = None
+
+
+def _submenu_edge() -> _SubmenuEdge:
+    global _edge
+    if _edge is None:
+        _edge = _SubmenuEdge()
+    return _edge
 
 
 def snug_combo(cb: QComboBox, cap: int = AppStyle.COMBO_CAP):
