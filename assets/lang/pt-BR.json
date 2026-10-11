@@ -3062,12 +3062,9 @@
   "Other": "Outros",
   "Help and community": "Ajuda e comunidade",
   "Onion Board on GitHub": "Onion Board no GitHub",
-<<<<<<< HEAD
   "A sound you added is very short, so it may be barely heard.": "Um som que você adicionou é muito curto, então pode mal ser ouvido.",
-  "Both files are in {folder}.": "Os dois arquivos estão em {folder}."
-=======
+  "Both files are in {folder}.": "Os dois arquivos estão em {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Um download ainda está em andamento. Se você fechar agora, ele será perdido. Fechar mesmo assim?",
   "Download running": "Download em andamento",
   "Your sounds are back on your mic.": "Seus sons voltaram para o seu microfone."
->>>>>>> origin/main
 }

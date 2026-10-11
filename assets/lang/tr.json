@@ -3062,12 +3062,9 @@
   "Other": "Diğer",
   "Help and community": "Yardım ve topluluk",
   "Onion Board on GitHub": "GitHub'da Onion Board",
-<<<<<<< HEAD
   "A sound you added is very short, so it may be barely heard.": "Eklediğin bir ses çok kısa, bu yüzden neredeyse duyulmayabilir.",
-  "Both files are in {folder}.": "İki dosya da {folder} içinde."
-=======
+  "Both files are in {folder}.": "İki dosya da {folder} içinde.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Bir indirme hâlâ sürüyor. Şimdi kapatırsan kaybolur. Yine de kapatılsın mı?",
   "Download running": "İndirme sürüyor",
   "Your sounds are back on your mic.": "Seslerin yine mikrofonunda."
->>>>>>> origin/main
 }
