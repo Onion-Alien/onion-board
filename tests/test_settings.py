@@ -602,6 +602,27 @@ def test_tab_moves_from_the_category_list_into_the_page_and_on_to_done(window, q
         qapp.setLayoutDirection(Qt.LeftToRight)
 
 
+def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qapp):  # noqa: F811
+    d = SettingsDialog(window, "privacy", lazy=True)
+    d.show()
+    try:
+        for i in range(d.categories.count()):   # a page's own name opens that page
+            name = d.categories.item(i).text()
+            d.tabs.setCurrentIndex((i + 5) % d.tabs.count())
+            d._apply_search(name)
+            assert d.tabs.currentIndex() == i, name
+        d._apply_search("hotkey")   # General mentions hotkeys too, but comes first
+        assert d.categories.item(d.tabs.currentIndex()).text() == "Hotkeys"
+        d._apply_search("zzqq nothing")
+        assert d.no_match.isVisibleTo(d) and not d.tabs.isVisibleTo(d)
+        assert "zzqq nothing" in d.no_match.text()
+        d._apply_search("")
+        assert d.tabs.isVisibleTo(d) and not d.no_match.isVisibleTo(d)
+        assert not any(d.categories.item(r).isHidden() for r in range(d.categories.count()))
+    finally:
+        d.close()
+
+
 def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qapp):  # noqa: F811
     """The first card on every page lines up with the top of the search box, and Done
     has the same gap above it as below and beside it."""

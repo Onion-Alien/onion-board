@@ -3036,5 +3036,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget FFmpeg'i yükleyemedi (şöyle dedi: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "Bu PC'de winget yok, bu yüzden uygulama FFmpeg'i yükleyemez. ffmpeg.org'dan edinin.",
   "winget took longer than {seconds} seconds.": "winget {seconds} saniyeden uzun sürdü.",
-  "✓ Got FFmpeg": "✓ FFmpeg alındı"
+  "✓ Got FFmpeg": "✓ FFmpeg alındı",
+  "No settings match “{text}”": "“{text}” ile eşleşen ayar yok"
 }

@@ -2972,5 +2972,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget で FFmpeg をインストールできませんでした（次のように表示: {error}）。",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "この PC に winget がないため、アプリから FFmpeg をインストールできません。ffmpeg.org から入手してください。",
   "winget took longer than {seconds} seconds.": "winget が {seconds} 秒以上かかりました。",
-  "✓ Got FFmpeg": "✓ FFmpeg を入手しました"
+  "✓ Got FFmpeg": "✓ FFmpeg を入手しました",
+  "No settings match “{text}”": "「{text}」に一致する設定はありません"
 }

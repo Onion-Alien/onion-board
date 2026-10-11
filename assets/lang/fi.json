@@ -3036,5 +3036,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget ei voinut asentaa FFmpegiä (se sanoi: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "wingetiä ei ole tällä tietokoneella, joten sovellus ei voi asentaa FFmpegiä. Hae se osoitteesta ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget kesti yli {seconds} sekuntia.",
-  "✓ Got FFmpeg": "✓ FFmpeg haettu"
+  "✓ Got FFmpeg": "✓ FFmpeg haettu",
+  "No settings match “{text}”": "Mikään asetus ei vastaa \"{text}\""
 }

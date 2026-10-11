@@ -2972,5 +2972,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget 無法安裝 FFmpeg（它說：{error}）。",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "這台電腦上沒有 winget，因此應用程式無法安裝 FFmpeg。請從 ffmpeg.org 取得。",
   "winget took longer than {seconds} seconds.": "winget 花了超過 {seconds} 秒。",
-  "✓ Got FFmpeg": "✓ 已取得 FFmpeg"
+  "✓ Got FFmpeg": "✓ 已取得 FFmpeg",
+  "No settings match “{text}”": "沒有設定符合“{text}”"
 }

@@ -3100,5 +3100,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget не зміг встановити FFmpeg (він сказав: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget немає на цьому ПК, тож програма не може встановити FFmpeg. Візьміть його з ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget працював довше ніж {seconds} секунд.",
-  "✓ Got FFmpeg": "✓ FFmpeg отримано"
+  "✓ Got FFmpeg": "✓ FFmpeg отримано",
+  "No settings match “{text}”": "Жодне налаштування не відповідає “{text}”"
 }

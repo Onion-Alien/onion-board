@@ -2972,5 +2972,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget이 FFmpeg를 설치하지 못했습니다(메시지: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "이 PC에 winget이 없어 앱에서 FFmpeg를 설치할 수 없습니다. ffmpeg.org에서 받으세요.",
   "winget took longer than {seconds} seconds.": "winget이 {seconds}초보다 오래 걸렸습니다.",
-  "✓ Got FFmpeg": "✓ FFmpeg 받음"
+  "✓ Got FFmpeg": "✓ FFmpeg 받음",
+  "No settings match “{text}”": "“{text}”와 일치하는 설정이 없습니다."
 }

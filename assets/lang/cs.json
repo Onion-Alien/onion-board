@@ -3100,5 +3100,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget nedokázal nainstalovat FFmpeg (oznámil: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget na tomto PC není, takže aplikace nemůže FFmpeg nainstalovat. Vezměte ho z ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget trval déle než {seconds} sekund.",
-  "✓ Got FFmpeg": "✓ FFmpeg získán"
+  "✓ Got FFmpeg": "✓ FFmpeg získán",
+  "No settings match “{text}”": "Žádné nastavení neodpovídá „{text}“"
 }

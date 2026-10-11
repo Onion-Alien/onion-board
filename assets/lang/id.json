@@ -2972,5 +2972,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget tidak bisa memasang FFmpeg (katanya: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget tidak ada di PC ini, jadi aplikasi tidak bisa memasang FFmpeg. Dapatkan dari ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget memakan waktu lebih dari {seconds} detik.",
-  "✓ Got FFmpeg": "✓ FFmpeg didapat"
+  "✓ Got FFmpeg": "✓ FFmpeg didapat",
+  "No settings match “{text}”": "Tidak ada pengaturan yang cocok dengan “{text}”"
 }

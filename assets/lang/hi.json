@@ -3036,5 +3036,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "winget FFmpeg इंस्टॉल नहीं कर सका (उसने कहा: {error})।",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "इस PC पर winget नहीं है, इसलिए ऐप FFmpeg इंस्टॉल नहीं कर सकता। इसे ffmpeg.org से लें।",
   "winget took longer than {seconds} seconds.": "winget को {seconds} सेकंड से ज़्यादा समय लगा।",
-  "✓ Got FFmpeg": "✓ FFmpeg मिल गया"
+  "✓ Got FFmpeg": "✓ FFmpeg मिल गया",
+  "No settings match “{text}”": "कोई भी सेटिंग \"{text}\" से मेल नहीं खाती"
 }

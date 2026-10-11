@@ -494,6 +494,13 @@ class SettingsDialog(QDialog):
         content.setSpacing(16)
         content.addLayout(side)
         content.addWidget(self.tabs, 1)
+        # a search that finds nothing says so, in place of the pages
+        self.no_match = QLabel()
+        self.no_match.setObjectName("hint")
+        self.no_match.setAlignment(Qt.AlignCenter)
+        self.no_match.setWordWrap(True)
+        self.no_match.hide()
+        content.addWidget(self.no_match, 1)
         lay.addLayout(content, 1)
         close = QPushButton(_("Done"))
         close.setObjectName("primary")
@@ -530,7 +537,7 @@ class SettingsDialog(QDialog):
                     self._build_page(i)
             finally:
                 self._searching = False
-        first = None
+        first = named = None
         for i in range(self.tabs.count()):
             page = self.tabs.widget(i).widget()
             title = self.categories.item(i).text().lower()
@@ -552,8 +559,17 @@ class SettingsDialog(QDialog):
             self.categories.item(i).setHidden(bool(words) and not hits)
             if hits and first is None:
                 first = i
+            # "hotkey" goes to the Hotkeys page, not the first page that mentions one
+            if hits and named is None and words and all(w in title for w in words):
+                named = i
+        nothing = bool(words) and first is None
+        self.no_match.setText(_("No settings match “{text}”", text=text.strip()))
+        self.no_match.setVisible(nothing)
+        self.tabs.setVisible(not nothing)
         on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
-        if words and first is not None and on_hidden:
+        if named is not None:
+            self.tabs.setCurrentIndex(named)
+        elif words and first is not None and on_hidden:
             self.tabs.setCurrentIndex(first)
 
     def _category_icons(self):

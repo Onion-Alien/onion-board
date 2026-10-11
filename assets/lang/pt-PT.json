@@ -3036,5 +3036,6 @@
   "winget couldn't install FFmpeg (it said: {error}).": "O winget não conseguiu instalar o FFmpeg (disse: {error}).",
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "O winget não está neste PC, por isso a aplicação não pode instalar o FFmpeg. Obtenha-o em ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "O winget demorou mais de {seconds} segundos.",
-  "✓ Got FFmpeg": "✓ FFmpeg obtido"
+  "✓ Got FFmpeg": "✓ FFmpeg obtido",
+  "No settings match “{text}”": "Nenhuma definição corresponde a “{text}”"
 }
