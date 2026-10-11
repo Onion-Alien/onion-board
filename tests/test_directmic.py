@@ -1117,6 +1117,35 @@ def test_replace_mode_falls_back_to_the_mic_when_the_board_stops(ring_file):
     assert rms.min() > 0.1, np.round(rms[rms.argmin() - 4:rms.argmin() + 4], 3)   # no gap
 
 
+@needs_host
+@pytest.mark.parametrize("gap", [0.0, 0.005])
+@realtime
+def test_a_quick_reopen_keeps_the_board_on_the_mic(ring_file, gap):
+    """The stream closed and opened again at once (a buffering change reopens every
+    stream): the effect read on meanwhile, and the board, paced by the mic, never got
+    a lead ahead of it again. Its sounds stayed off the mic until the app restarted."""
+    board = Echo(gain=0.0, tone=0.4)   # the board sends only a tone
+    held = []
+
+    def during(s):
+        time.sleep(0.7)
+        s.close()
+        time.sleep(gap)
+        s2 = dm.DirectMicStream(board, ring_file, mic_callback=board.mic, mode=dm.MODE_REPLACE)
+        s2.start()
+        held.append(s2)
+
+    try:
+        (x,), _, _ = _run_host(ring_file, 48000, 1, 2.5, mic=0.3, mic_hz=-1, callback=board,
+                               mic_callback=board.mic, mode=dm.MODE_REPLACE, during=during)
+    finally:
+        for s in held:
+            s.close()
+    y = x[int(1.5 * 48000):int(2.4 * 48000), 0]
+    t = np.arange(len(y)) / 48000
+    assert 2 * abs(np.mean(y * np.exp(-2j * np.pi * 440 * t))) > 0.3   # the tone, not the mic
+
+
 def ramp(seconds):
     """A board whose send mix is a ramp from 0.1 to 0.45 over `seconds`: every ring
     frame has its own value, so a replayed stretch shows."""
