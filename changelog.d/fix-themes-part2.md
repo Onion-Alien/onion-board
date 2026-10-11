@@ -1,0 +1,2 @@
+- Every one of the 31 themes checked on every screen: the picked theme card in Settings no longer fills with the accent colour (its name was grey on grey in Carbon), and the accent-coloured *Add sounds* and icons stay readable in light themes with a pale accent (Flashbang).
+- Theme switches make about a third fewer slow style calls.
