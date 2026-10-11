@@ -478,6 +478,9 @@ class OutputBlock(QFrame):
         for gap, n in ((self._title_gap, self.GAP), (self._switch_gap, self.SWITCH_GAP),
                        (self._icon_gap, self.GAP), (self._arrow_gap, self.GAP - 2)):
             gap.changeSize(px(n), 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        if not expanded:
+            # Match the visible switch-to-stop gap below the small output block.
+            self._switch_gap.changeSize(0, 10, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setup.setMinimumHeight(px(self.ROW_H))
         self._status_gap.changeSize(0, px(self.ROW_GAP) if expanded else 0,
                                     QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
