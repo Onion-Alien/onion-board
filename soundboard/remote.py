@@ -27,7 +27,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
                                  play a sound after the ones playing now, or a whole
                                  category one after another; alone: what's up next
     /api/category?name=… / ?step=next|prev   show a category (name= blank: All)
-    /api/volume?set=0-100 / ?step=up|down    the sounds' volume
+    /api/volume?set=0-1000 / ?step=up|down   the sounds' volume (100: normal)
     /api/live, /api/voice, /api/mic [?on=1|0|toggle]
                                  the Live / Muted switch, the voice changer, "others
                                  hear my mic" (no on=: toggle)
@@ -146,7 +146,8 @@ ENDPOINTS = {
              "?category=Chill plays every sound in it one after another (&shuffle=1: "
              "in a random order); ?clear=1 empties the queue; alone: what's up next",
     "category": "show a category: ?name=Memes (name= blank: All) or ?step=next / prev",
-    "volume": "the sounds' volume: ?set=0-100 or ?step=up / down (10 % a step)",
+    "volume": "the sounds' volume in %: ?set=0-1000 (100: normal) or ?step=up / down "
+          "(10 % a step)",
     "live": "the Live / Muted switch (Muted: others hear nothing): ?on=1 / 0 / toggle",
     "voice": "the voice changer on / off: ?on=1 / 0 / toggle, or ?name=Robot picks that "
              "voice and turns the changer on (/api/voices lists them)",
@@ -178,7 +179,8 @@ ENDPOINTS = {
                   "&on=1 / 0 / toggle",
     "radio_live": "whether others hear the radio: ?on=1 / 0 / toggle",
     "radio_hear": "whether you hear the radio yourself: ?on=1 / 0 / toggle",
-    "radio_volume": "the radio's volume: ?set=0-100 or ?step=up / down (10 % a step)",
+    "radio_volume": "the radio's volume in %: ?set=0-1000 (100: normal) or ?step=up / down "
+                "(10 % a step)",
     "help": "this list",
 }
 ACTIONS = tuple(ENDPOINTS)
@@ -830,18 +832,18 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
 
 
 def set_volume(spin, params: dict) -> tuple[int, dict] | None:
-    """?set=0-100 / ?step=up|down (10 % a step) on a volume box: an error answer, or
+    """?set=0-<the box's maximum> / ?step=up|down (10 % a step) on a volume box: an error answer, or
     None once it's set."""
     step = (params.get("step") or "").strip().lower()
     if "set" in params:
         try:
             new = round(float(params["set"]))
         except (ValueError, OverflowError):   # "loud", nan / inf, 1e999
-            return 400, {"error": "set= takes a number, 0-100"}
+            return 400, {"error": f"set= takes a number, 0-{spin.maximum()}"}
     elif step in ("up", "down", "+", "-"):
         new = (round(spin.value() / 10) + (1 if step in ("up", "+") else -1)) * 10
     else:
-        return 400, {"error": "say how: ?set=0-100 or ?step=up / down"}
+        return 400, {"error": f"say how: ?set=0-{spin.maximum()} or ?step=up / down"}
     spin.setValue(min(max(new, 0), spin.maximum()))
     return None
 

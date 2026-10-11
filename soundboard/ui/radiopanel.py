@@ -673,6 +673,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._mode = QButtonGroup(self)
         for b in (self.btn_popular, self.btn_favs, self.btn_recent):
             b.setObjectName("seg")
+            b.setAccessibleName(b.text())    # kept when the fitter drops the words
             b.setCheckable(True)
             b.setCursor(Qt.PointingHandCursor)
             self._mode.addButton(b)
@@ -710,14 +711,19 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cmb_country.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.cmb_country.setMinimumContentsLength(8)
         self.cmb_country.addItem(_("All countries"), "")
+        self.cmb_country.setAccessibleName(_("Country"))
+        self.cmb_country.setToolTip(_("Country"))
         self.cmb_country.activated.connect(
             lambda _i: self.set_country(self.cmb_country.currentData() or ""))
         self.cmb_quality = QComboBox()
         self.cmb_quality.setToolTip(_("Only stations streaming at least this bitrate"))
+        self.cmb_quality.setAccessibleName(_("Quality"))
         for label, kbps in QUALITIES:
             self.cmb_quality.addItem(label, kbps)
         self.cmb_quality.activated.connect(lambda _i: self._on_filter())
         self.cmb_sort = QComboBox()
+        self.cmb_sort.setAccessibleName(_("Sort by"))
+        self.cmb_sort.setToolTip(_("Sort by"))
         for label, _key in SORTS:
             self.cmb_sort.addItem(label)
         self.cmb_sort.activated.connect(lambda _i: self._show_list())
@@ -742,6 +748,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         v.addWidget(rule)
 
         self.list = QListWidget()
+        self.list.setAccessibleName(_("Stations"))
         self.list.setMinimumSize(160, 48)
         self.list.setUniformItemSizes(True)
         self.list.setWordWrap(False)
@@ -1342,7 +1349,10 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _update_buttons(self):
         on = self.player.station is not None
         self._update_now()
-        self.btn_play.setText("" if self._play_short else _("Stop") if on else _("Play"))
+        word = _("Stop") if on else _("Play")
+        self.btn_play.setText("" if self._play_short else word)
+        self.btn_play.setAccessibleName(word)     # still named when it's only an icon
+        self.btn_play.setToolTip(word if self._play_short else "")
         icons.set_icon(self.btn_play, "stop" if on else "play")
         self.btn_play.setEnabled(on or self.selected() is not None
                                  or bool(self.cfg.radio.get("last")))
@@ -1434,6 +1444,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         from soundboard.ui import responsive as r
         def star_only(compact):
             self.btn_favs.setText("" if compact else _("Favorites"))
+            self.btn_favs.setToolTip(_("Favorites") if compact else "")
             r.touch(self.btn_favs)
 
         def play_icon(compact):

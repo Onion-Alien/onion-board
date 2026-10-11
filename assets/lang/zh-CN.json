@@ -2954,5 +2954,7 @@
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英语交谈，其他人听到的是另一种语言。当其中之一打开时，AI语音或变声器会说出来；否则按“开始”，计算机就会发出声音。",
   "Type a line and press Enter…": "输入一行并按 Enter…",
   "Category": "分类",
-  "Show more": "显示更多"
+  "Show more": "显示更多",
+  "Country": "国家/地区",
+  "Sort by": "排序方式"
 }

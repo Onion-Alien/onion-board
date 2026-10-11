@@ -231,6 +231,12 @@ def test_window_streamer_endpoints(qapp, window):
     assert d("volume", step="down")[1] == {"volume": 40}
     assert d("volume", set="loud")[0] == 400 and d("volume")[0] == 400
     assert d("volume", set="-5")[1] == {"volume": 0}
+    top = w.vol_sound.spin.maximum()     # the help and errors give the real range
+    assert d("volume", set="99999")[1] == {"volume": top}
+    assert f"0-{top}" in remote.ENDPOINTS["volume"] and f"0-{top}" in remote.__doc__
+    assert f"0-{top}" in remote.ENDPOINTS["radio_volume"]   # same kind of box
+    assert f"0-{top}" in d("volume")[1]["error"]
+    d("volume", set="0")
 
     w.new_category(name="Memes")
     assert d("category", name="memes") == (200, {"category": "Memes"})

@@ -775,6 +775,25 @@ def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.engine.radio_vol == pytest.approx(0.5)
 
 
+def test_every_radio_control_has_a_name_a_screen_reader_can_say(tab):
+    """Play/Stop, the country and sort boxes, the station list and the Popular /
+    Favorites / Recent buttons were silent, worst when a small window shows them as
+    bare icons."""
+    def names():
+        return {w: w.accessibleName() for w in (
+            tab.btn_play, tab.cmb_country, tab.cmb_quality, tab.cmb_sort, tab.list,
+            tab.btn_popular, tab.btn_favs, tab.btn_recent)}
+    assert all(names().values()), names()
+    steps = tab.fit_steps()
+    for _cost, _dim, step in steps:               # squeezed: words dropped, icons only
+        if callable(step):
+            step(True)
+    assert tab.btn_play.text() == "" and tab.btn_favs.text() == ""
+    assert all(names().values()), names()
+    assert tab.btn_play.accessibleName() == "Play" and tab.btn_play.toolTip() == "Play"
+    assert tab.btn_favs.accessibleName() == "Favorites"
+
+
 @pytest.mark.parametrize("old", [{"map": "globe"}, {"globe_hd": True}, {}])
 def test_the_map_is_the_only_view_and_the_3d_globe_setting_moves_to_it(
         qapp, app_dir, server, monkeypatch, old):
