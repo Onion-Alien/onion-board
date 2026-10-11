@@ -56,7 +56,7 @@ from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui import sidebar
-from soundboard.ui.sidebar import SideTabs
+from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.spacekey import SpaceKey
@@ -236,6 +236,25 @@ class SnugTabBar(QTabBar):
     def minimumSizeHint(self) -> QSize:
         m = super().minimumSizeHint()
         return QSize(min(m.width(), self.sizeHint().width()), m.height())
+
+
+class WidthScroll(QScrollArea):
+    """While it's the page showing, it needs its content's width, so a narrow window
+    shuts the rail before the page gets a sideways scroll bar (that only worked while
+    the levels strip happened to shut the rail first). Only when shutting it would be
+    enough (`room()`: the page's width with the rail shut): wider content scrolls
+    sideways rather than turn the window into the mini player."""
+
+    def __init__(self, room):
+        super().__init__()
+        self._room = room
+
+    def minimumSizeHint(self) -> QSize:
+        m = super().minimumSizeHint()
+        if self.widget() is None or not self.isVisible():   # a page not showing
+            return m
+        need = self.widget().minimumSizeHint().width() + self.verticalScrollBar().sizeHint().width()
+        return QSize(max(m.width(), need), m.height()) if need <= self._room() else m
 
 
 class BannerButton(QPushButton):
@@ -991,6 +1010,8 @@ class MainWindow(QMainWindow):
         rv.addWidget(self.transport)
         self.tabs.currentChanged.connect(lambda _i: self._show_transport())
         self._show_transport()
+        self._fit_tab = self.tabs.currentWidget()
+        self.tabs.currentChanged.connect(self._fit_setup_tab)
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
@@ -1134,11 +1155,27 @@ class MainWindow(QMainWindow):
         self._deck_titles: list[QWidget] = []
         self._deck_rows: list[QHBoxLayout] = []
         self._decks: list[QWidget] = []   # each group, with the line before it
+        # too narrow for all three: one group shown whole (what others hear, unless
+        # you pick another) and the other two as icon buttons that bring theirs up
+        self._deck_tabs: list[QPushButton] = []
+        self._mixer_one = self._mixer_tight = False
+        self._mixer_focus = 1
 
         def group(icon: str, title: str, tip: str) -> tuple[QLabel, QHBoxLayout]:
             sep = vsep() if self._decks else None
             if sep is not None:
                 h.addWidget(sep)
+            tab = QPushButton()
+            tab.setObjectName("iconbutton")
+            tab.setProperty("quiet", True)
+            tab.setToolTip(title)
+            tab.setAccessibleName(title)
+            icons.set_icon(tab, icon, "muted")
+            tab.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            tab.clicked.connect(lambda _c=False, i=len(self._decks): self._focus_deck(i))
+            tab.hide()
+            h.addWidget(tab)
+            self._deck_tabs.append(tab)
             deck = QWidget()
             deck.setObjectName("decktop")
             row = QHBoxLayout(deck)
@@ -1167,8 +1204,10 @@ class MainWindow(QMainWindow):
                                      tip=_("How loud your voice is for others. The dot shows "
                                            "activity when you talk"))
         self.mic_meter = self.vol_mic.meter
-        row.addWidget(self.vol_mic)
-        self.vol_mic.setMaximumWidth(240)
+        # shown alone (_mixer_one_at_a_time) its slider takes the room, up to its own
+        # most (150 px), with what's left after it
+        row.addWidget(self.vol_mic, 1)
+        row.addStretch(0)
 
         send_lbl, row = group("live", _("What others hear"),
                               _("Everything going out to others right now (Discord, a game, "
@@ -1192,15 +1231,62 @@ class MainWindow(QMainWindow):
                                  _("Only what YOU hear. Doesn't change anything for others."))
         self.vol_mon = VolumeControl(c.mon_vol, tip=_("Only what YOU hear, doesn't change "
                                                       "anything for others"))
-        row.addWidget(self.vol_mon)
-        self.vol_mon.setMaximumWidth(220)
-        self._mixer_hp = self._decks[2]
-        self._mixer_send = (self.out_meter,)
-        self._mixer_others = self._decks[1]
+        row.addWidget(self.vol_mon, 1)
+        row.addStretch(0)
+        for vol in (self.vol_mic, self.vol_mon):   # no gap between the slider and its %
+            vol.setMaximumWidth(vol.layout().maximumSize().width())
+        self._mic_text = self.chk_mic.text()
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
+
+    def _fit_mixer(self, tight: bool):
+        """The levels strip's responsive step. Only when the strip itself is too wide
+        (not for whatever else is): one group whole, the other two as icons; still too
+        wide, that group's words go too."""
+        stages = (lambda: self._mixer_one_at_a_time(True),
+                  lambda: self.chk_mic.setText(""),   # its tooltip says what it is
+                  lambda: (self.vol_mic.spin.hide(), self.vol_mon.spin.hide()))
+        self._mixer_one_at_a_time(False)
+        self.chk_mic.setText(self._mic_text)
+        self.vol_mic.spin.show()
+        self.vol_mon.spin.show()
+        self._touch_mixer()
+        self._mixer_tight = tight
+        if not tight:
+            return
+        side = self._body_lay.contentsMargins()
+        room = self._pages.width() - self.rail.minimumWidth() - side.left() - side.right()
+        for stage in stages:
+            if self.mixer.minimumSizeHint().width() <= room:
+                break
+            stage()
+            self._touch_mixer()
+
+    def _touch_mixer(self):
+        responsive.touch(*self._deck_tabs, self.chk_mic, self.vol_mic.spin,
+                         self.vol_mon.spin, self.out_meter)
+
+    def _mixer_one_at_a_time(self, on: bool):
+        """Too narrow for the three groups: show one whole, the others as icons."""
+        self._mixer_one = on
+        for i, (deck, tab, title) in enumerate(zip(
+                (g[-1] for g in self._decks), self._deck_tabs, self._deck_titles)):
+            whole = not on or i == self._mixer_focus
+            deck.setVisible(whole)
+            tab.setVisible(not whole)
+            title.setVisible(not on)   # the icon beside it (and its tooltip) says which
+            # the shown group takes the room (what others hear, with all three)
+            self._mixer_layout.setStretchFactor(deck, int(i == (self._mixer_focus if on else 1)))
+
+    def _focus_deck(self, i: int):
+        """An icon in the narrow levels strip clicked: its group is the one shown."""
+        self._mixer_focus = i
+        if self._deck_tabs[i].hasFocus():   # it just hid: keep the keyboard in the strip
+            self._deck_tabs[i - 1 if i else 1].setFocus()
+        self._fit.reset()   # the groups aren't the same width: fit again
+        self._refit()
 
     def _build_sounds_page(self) -> QWidget:
         c = self.cfg
@@ -1650,7 +1736,7 @@ class MainWindow(QMainWindow):
         """One-time setup and the rarely-touched stuff: where the audio goes,
         devices, the recorded test, EQ, levelling."""
         c = self.cfg
-        page = QScrollArea()
+        page = WidthScroll(lambda: self._pages.width() - SHUT_W - 2 * BODY_SIDE)
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
         body = QWidget()
@@ -3551,6 +3637,16 @@ class MainWindow(QMainWindow):
         if self.isRightToLeft():   # mirrored (Arabic): the rail is on the right
             side = side[::-1]
         self._body_lay.setContentsMargins(side[0], 10, side[1], 10)
+        if getattr(self, "_mixer_tight", False):   # its room changed: measure it again
+            self._fit_mixer(True)
+
+    def _fit_setup_tab(self, _i: int):
+        """Into or out of Setup: its width counts only while it shows (WidthScroll),
+        so what gives way is worked out again."""
+        was, self._fit_tab = self._fit_tab, self.tabs.currentWidget()
+        if hasattr(self, "_fit") and self.setup_page in (was, self._fit_tab):
+            self._fit.reset()
+            self._refit()
 
     def _rail_opened(self, on: bool):
         """The rail opened out or shut: save it, and fit the window to its new width
@@ -7762,7 +7858,9 @@ class MainWindow(QMainWindow):
         f.add(14, "w", r.hide(self.np_time))
         f.add(45, "w", r.hide(self.speed_btn))
         f.add(30, "w", r.hide(self.chk_monitor))
-        f.add(55, "w", r.hide(*self._mixer_hp))
+        # the levels strip never drops a group: one is shown whole and the other two
+        # become icons that bring theirs up (_fit_mixer)
+        f.add(52, "w", self._fit_mixer)
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.icon_only(self.btn_add))
@@ -7778,9 +7876,6 @@ class MainWindow(QMainWindow):
             self.btn_yt.setVisible(not tight and self.ytresults.available()),
             r.touch(self.btn_yt)))
         f.add(64, "w", r.icon_only(self.btn_more))
-        f.add(70, "w", lambda tight: (
-            r.hide(self.btn_check, *self._mixer_send, *self._mixer_others)(
-                tight and self.width() < 760)))
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
         self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
