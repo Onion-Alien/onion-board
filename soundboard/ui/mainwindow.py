@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QTabBar, QToolTip, QVBoxLayout,
+                               QSystemTrayIcon, QTabBar, QToolTip, QVBoxLayout, QWidgetItem,
                                QWidget, QWidgetAction)
 from shiboken6 import isValid as qt_valid
 
@@ -1859,7 +1859,7 @@ class MainWindow(QMainWindow):
         sections.addStretch(1)
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
-        lcol, rcol = QVBoxLayout(), QVBoxLayout()
+        lcol, rcol = self._setup_lr = QVBoxLayout(), QVBoxLayout()
         for col in (lcol, rcol):
             col.setSpacing(16)
             cols.addLayout(col, 1)
@@ -2054,8 +2054,6 @@ class MainWindow(QMainWindow):
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: self.rescan_with_feedback(ref))
         av.addWidget(ref, 0, Qt.AlignLeft)
-        lcol.addWidget(devcard)
-        rcol.addWidget(howcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
@@ -2071,9 +2069,6 @@ class MainWindow(QMainWindow):
         self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains)
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
-        rcol.addWidget(destcard)
-        rcol.addWidget(helpcard)
-        lcol.addWidget(eqcard)
         utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
@@ -2082,14 +2077,39 @@ class MainWindow(QMainWindow):
         hk = QPushButton(_("Hotkeys && auto push-to-talk"))
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         uv.addWidget(hk, 0, Qt.AlignLeft)
-        lcol.addWidget(utilitycard)
-        lcol.addStretch(1)
-        rcol.addStretch(1)
+        # side by side: devices + sound shaping on the left, getting it heard on the
+        # right. One column (narrow): everything a new user needs to get set up comes
+        # before the EQ, or they scrolled past it to find the setup button
+        self._setup_wide = ((devcard, eqcard, utilitycard), (howcard, destcard, helpcard))
+        self._setup_narrow = (devcard, howcard, helpcard, destcard, eqcard, utilitycard)
+        self._setup_stacked = None
+        self._stack_setup(False)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
         from soundboard.ui.destpanel import apply_send
         apply_send(self.cfg, self.engine)          # ...and mono / ducking
         return page
+
+    def _stack_setup(self, compact: bool):
+        """Setup's cards in two columns, or in one column in setup order."""
+        if compact == self._setup_stacked:
+            return
+        self._setup_stacked = compact
+        self._setup_cols.setDirection(QBoxLayout.TopToBottom if compact
+                                      else QBoxLayout.LeftToRight)
+        for col, cards in zip(self._setup_lr,
+                              (self._setup_narrow, ()) if compact else self._setup_wide):
+            while col.count():
+                col.takeAt(0)   # the cards stay on the page, only their places change
+            for w in cards:
+                col.addWidget(w)
+            col.addStretch(1)
+
+    def _setup_need(self) -> int:
+        """The width Setup's two columns need side by side, measured the same way
+        whether they're stacked or not (stacked, the right column is empty)."""
+        return sum(max(QWidgetItem(w).minimumSize().width() for w in cards)
+                   for cards in self._setup_wide) + self._setup_cols.spacing()
 
     def on_eq(self, gains, enabled, target, preset):
         c = self.cfg
@@ -7954,7 +7974,7 @@ class MainWindow(QMainWindow):
         f.add(40, "h", lambda tight: r.hide(self.mixer)(
             tight and (self.height() < 520 or self.width() < 760)))
         f.add(50, "h", self._cat_bar_step)   # the overlay's category key still works
-        self._stack_cols = (r.stack(self._setup_cols),
+        self._stack_cols = (self._stack_setup,
                             *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
 
@@ -8000,10 +8020,8 @@ class MainWindow(QMainWindow):
             # the window brings them back only when neither will be clipped.
             margins = self.setup_page.widget().layout().contentsMargins()
             room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            for i, cols in enumerate((self._setup_cols,)):
-                available = min(room, cols.parentWidget().maximumWidth())
-                needed = sum(cols.itemAt(j).minimumSize().width() for j in range(cols.count()))
-                self._stack_cols[i](narrow or needed + cols.spacing() > available)
+            available = min(room, self._setup_cols.parentWidget().maximumWidth())
+            self._stack_cols[0](narrow or self._setup_need() > available)
             for apply in self._stack_cols[1:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit

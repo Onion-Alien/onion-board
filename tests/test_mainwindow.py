@@ -1125,6 +1125,31 @@ def test_devices_card_aligns_with_setup_columns_and_stacks_when_narrow(window, q
             assert card.width() <= window.setup_page.viewport().width()
 
 
+def test_narrow_setup_puts_getting_set_up_before_the_eq(window, qapp):
+    """One column: devices, then the virtual mic and Connect your chat, and only then the
+    sound shaping. Stacked as two columns' worth, the EQ came before the setup button."""
+    from PySide6.QtWidgets import QBoxLayout
+    body = window._setup_cols.parentWidget()
+    body.setMaximumWidth(1500)   # the offscreen fallback font needs wider columns
+    window.tabs.setCurrentWidget(window.setup_page)
+    window.show()
+    cards = (window.cb_main.parentWidget(), window.how_title.parentWidget(),
+             window.btn_chat.parentWidget(), window.dest_panel.parentWidget(),
+             window.eq.parentWidget(), window.chk_level.parentWidget())
+    for width, height in ((800, 600), (1920, 1080), (800, 600)):
+        window.resize(width, height)
+        for _ in range(5):
+            qapp.processEvents()
+            window._refit()
+        tops = [c.mapTo(body, QPoint()).y() for c in cards]
+        if width == 800:
+            assert window._setup_cols.direction() == QBoxLayout.TopToBottom
+            assert tops == sorted(tops) and len(set(tops)) == len(tops)
+        else:
+            assert window._setup_cols.direction() == QBoxLayout.LeftToRight
+            assert tops[0] == tops[1]   # devices and the virtual mic side by side
+
+
 def test_drop_target_keeps_the_full_board_width(window, qapp):
     window.show()
     window.tabs.setCurrentIndex(0)
