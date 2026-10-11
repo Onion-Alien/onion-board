@@ -1167,6 +1167,17 @@ class PadGrid(QWidget):
             self.background_image, self.background_opacity = image, opacity
             self.update()
 
+    def background_rect(self, size: QSize) -> QRectF:
+        view = self.parentWidget()
+        area = QRectF(0, -self.y(), self.width(),
+                      view.height() if view else self.height()).adjusted(12, 12, -12, -12)
+        if size.isEmpty() or area.width() <= 0 or area.height() <= 0:
+            return QRectF()
+        scale = min(area.width() / size.width(), area.height() / size.height())
+        target = QRectF(0, 0, size.width() * scale, size.height() * scale)
+        target.moveCenter(area.center())
+        return target
+
     def minimumSizeHint(self):
         # never wider than the scroll area around it: the pads fit themselves to its
         # width (relayout), so a narrower window can't leave them stuck wider than it
@@ -1343,16 +1354,17 @@ class PadGrid(QWidget):
         if self.background_image and self.background_opacity:
             pm = thumbs.pixmap(self.background_image, waiter=self)
             if pm is not None and not pm.isNull():
-                # Fill the visible board, centred and cropped, behind the pads.
-                # Its viewport position stays fixed when the cards scroll.
-                area = QRectF(0, -self.y(), self.width(), view.height() if view else self.height())
-                scale = max(area.width() / pm.width(), area.height() / pm.height())
-                source = QRectF(0, 0, area.width() / scale, area.height() / scale)
-                source.moveCenter(QRectF(pm.rect()).center())
+                # Fit the whole thumbnail inside the visible board, with breathing
+                # room beside the scrollbar. Keep it fixed while the cards scroll.
+                target = self.background_rect(pm.size())
+                clip = QPainterPath()
+                clip.addRoundedRect(target, PAD_RADIUS, PAD_RADIUS)
                 p.save()
+                p.setRenderHint(QPainter.RenderHint.Antialiasing)
+                p.setClipPath(clip)
                 p.setOpacity(self.background_opacity / 100)
                 p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-                p.drawPixmap(area, pm, source)
+                p.drawPixmap(target, pm, QRectF(pm.rect()))
                 p.restore()
         drop = self.drop_area()
         if drop is not None and drop.intersects(QRectF(e.rect())):

@@ -729,7 +729,6 @@ class SettingsDialog(QDialog):
         w, v = self._page()
         self.theme_cards = []
         v.addWidget(self._language_card())
-        v.addWidget(self._playing_background_card())
         # above the themes (it sat under every theme card, out of sight)
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
@@ -752,6 +751,7 @@ class SettingsDialog(QDialog):
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
+        v.addWidget(self._playing_background_card())
         v.addWidget(self._ui_scale_card())
         v.addWidget(self._highlight_card())
         hints = {"Classic": _("Changes the whole app instantly."),
@@ -814,8 +814,10 @@ class SettingsDialog(QDialog):
         return card
 
     def _playing_background_card(self) -> QFrame:
-        card, cv = self._card(_("Playing sound background"))
-        enabled = QCheckBox(_("Show the playing sound's thumbnail behind the cards"))
+        card, cv = self._card(_("Playing sound background"),
+                              _("Show the playing sound's thumbnail behind the cards"))
+        enabled = QCheckBox(_("On"))
+        enabled.setAccessibleName(_("Playing sound background"))
         enabled.setChecked(self.mw.cfg.playing_background)
         enabled.toggled.connect(lambda on: self.mw.set_option("playing_background", on))
         cv.addWidget(enabled)
