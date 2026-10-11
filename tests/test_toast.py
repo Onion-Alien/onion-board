@@ -363,3 +363,37 @@ def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, 
     done = next(x for x in toast.shown(w) if x.key == "import")
     assert done.kind == "ok" and done.card.action.text() == "Undo"
     assert done.card.icon.width() == 18 and not w._import_card_shut   # next import: card again
+
+
+def test_stop_on_a_big_import_keeps_whats_in_and_skips_the_rest(main_window, qapp, tmp_path,  # noqa: F811
+                                                                 monkeypatch):
+    import threading
+    from soundboard.ui import mainwindow
+    w = main_window
+    t = np.arange(SR // 10) / SR
+    files = []
+    for i in range(6):
+        p = tmp_path / f"Oops {i}.wav"
+        sf.write(p, np.stack([np.sin(2 * np.pi * (300 + 70 * i) * t)] * 2, 1) * 0.3, SR)
+        files.append(str(p))
+    go, real, calls = threading.Event(), mainwindow.import_file, []
+
+    def slow(f, *a, **k):   # two go in, the third waits
+        calls.append(f)
+        if len(calls) == 3:
+            go.wait(10)
+        return real(f, *a, **k)
+    monkeypatch.setattr(mainwindow, "import_file", slow)
+    before = len(w.cfg.sounds)
+    w.import_files(files)
+    assert process_events(qapp, lambda: w._pending_imports == 4 and len(calls) == 3)
+    card = next(x for x in toast.shown(w) if x.key == "import")
+    assert card.card.action.text() == "Stop"
+    card.card.action.click()
+    go.set()
+    assert process_events(qapp, lambda: not w._pending_imports)
+    assert len(calls) == 3 and len(w.cfg.sounds) == before + 3   # the one being read finished
+    done = next(x for x in toast.shown(w) if x.key == "import")
+    assert done.card.action.text() == "Undo" and not w._import_stop.is_set()
+    done.card.action.click()
+    assert len(w.cfg.sounds) == before

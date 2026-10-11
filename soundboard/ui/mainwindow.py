@@ -475,6 +475,7 @@ class MainWindow(QMainWindow):
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
         self._import_card_shut = False   # its card closed with ✕: the import goes on
+        self._import_stop = threading.Event()   # its Stop: the files not started are skipped
         # the pads come in a few at a time while a big import runs, each playable at once
         self._import_pads = QTimer(self, singleShot=True, interval=300,
                                    timeout=self._rebuild_pads)   # pyright: ignore[reportCallIssue]
@@ -5808,11 +5809,16 @@ class MainWindow(QMainWindow):
         known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
         copy_local = self.cfg.copy_local_sounds
         local_files = set(files)   # ZIP extraction adds temporary files later
+        stop = self._import_stop
 
         def run():
             with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
                 todo = list(files)
                 for k, (z, names) in enumerate(zips.items()):
+                    if stop.is_set():   # Stop: not unpacked, only counted down
+                        for __ in names:
+                            self.bridge.imported.emit(None, None, None)
+                        continue
                     try:
                         res = backup.extract_loose(z, names, Path(tmp) / str(k))
                     except Exception as e:  # noqa: BLE001 - too big, no room, damaged
@@ -5833,6 +5839,9 @@ class MainWindow(QMainWindow):
 
         def import_all(files):
             for i, shown in enumerate(files):
+                if stop.is_set():   # Stop: the rest only count down, the ones in stay
+                    self.bridge.imported.emit(None, None, None)
+                    continue
                 f = shown   # read through any folder link Windows won't follow
                 try:
                     f = str(winpath.usable(shown))
@@ -5884,6 +5893,7 @@ class MainWindow(QMainWindow):
         text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
                                                  "Closing this doesn't stop it."))
         t = self.toast(text, "busy", 0, key="import", progress=(done, total),
+                       action=(_("Stop"), self._stop_import),
                        picture=bunny.bunny_pixmap(44, dpr=self.devicePixelRatioF()))
         if t is not None and not t.property("import_card"):
             t.setProperty("import_card", True)
@@ -5891,6 +5901,13 @@ class MainWindow(QMainWindow):
 
     def _shut_import_card(self):
         if self._pending_imports > 0:
+            self._import_card_shut = True
+
+    def _stop_import(self):
+        """The card's Stop: the file being read finishes, the rest are skipped; the
+        sounds already in stay (the finished card's Undo takes them off too)."""
+        if self._pending_imports > 0:
+            self._import_stop.set()
             self._import_card_shut = True
 
     def on_imported(self, meta, data, err):
@@ -5922,6 +5939,7 @@ class MainWindow(QMainWindow):
         self._import_pads.stop()
         self._pending_imports = 0
         self._import_card_shut = False
+        self._import_stop.clear()
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()   # categories and hotkeys from an Import from Soundpad
