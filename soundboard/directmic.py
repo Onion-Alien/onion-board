@@ -866,6 +866,46 @@ def effect_in_place(guid: str) -> bool:
         return False
 
 
+def without_ours(value):
+    """An effect slot's value with this effect taken out: (changed, new value or None
+    to delete it). Only our own CLSID goes; every other effect in a list stays."""
+    if isinstance(value, list):
+        rest = [x for x in value if not (isinstance(x, str) and x.upper() == CLSID)]
+        return len(rest) != len(value), (rest or None)
+    return (True, None) if _is_ours(value) else (False, value)
+
+
+def _fx_values(guid: str) -> dict:
+    """Every effect-slot value on a mic ({name: value}); {} if it has none."""
+    out = {}
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                            rf"{CAPTURE_KEY}\{guid}\FxProperties") as k:
+            i = 0
+            while True:
+                try:
+                    name, value, _kind = winreg.EnumValue(k, i)
+                except OSError:
+                    break
+                i += 1
+                if name.lower().startswith(FX.split(",")[0].lower() + ","):
+                    out[name] = value
+    except OSError:
+        pass
+    return out
+
+
+def leftovers(guid: str) -> bool:
+    """Something of Onion Board's is still on this mic although the notes say it isn't
+    (a set-up cut off, notes lost): our CLSID in one of its effect slots, or, with the
+    effect on no mic at all, its registration or files. Reads only: no admin."""
+    if guid.lower() in installed_on():
+        return True   # on it properly: Remove takes it off
+    if any(without_ours(v)[0] for v in _fx_values(guid).values()):
+        return True
+    return not installed_on() and anything_installed()
+
+
 def _is_ours(value) -> bool:
     """An effect slot's value (one CLSID, or a list of them) holds this effect."""
     vals = value if isinstance(value, list) else [value]
@@ -1585,6 +1625,45 @@ def admin_uninstall(only: str | None = None) -> int:
     return 0
 
 
+def _strip_endpoint(guid: str):
+    """Take this effect out of every effect slot on one mic that has no notes. What it
+    replaced isn't known, so the slot is left without it: everything else stays."""
+    try:
+        with _BackupKey(rf"{CAPTURE_KEY}\{guid}\FxProperties", create=False) as fx:
+            for name, value in _fx_values(guid).items():
+                changed, rest = without_ours(value)
+                if not changed:
+                    continue
+                if rest is None:
+                    fx.delete(name)
+                else:
+                    fx.set(name, winreg.REG_MULTI_SZ, rest)
+                log.info("%s: took a leftover effect out of %s", guid, name)
+    except FileNotFoundError:
+        pass   # the mic is gone
+
+
+def admin_cleanup(guid: str) -> int:
+    """Clean up after the effect on a mic it isn't (by our notes) on: our CLSID out of
+    its effect slots, then, if no mic uses the effect, its registration and files. A
+    mic it is on properly is uninstalled the normal way (its notes put it back)."""
+    if guid in installed_on():
+        return admin_uninstall(guid)
+    _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+    if any(without_ours(v)[0] for v in _fx_values(guid).values()):
+        dependents = _running_dependents()
+        _audio_comes_back(dependents)
+        try:
+            if not _audio_service(False):
+                return 6   # never rewrite a live mic
+            _strip_endpoint(guid)
+        finally:
+            _audio_service(True, dependents)
+    if not installed_on() and anything_installed():
+        return admin_uninstall()   # on no mic: the rest of it goes too
+    return 0
+
+
 def _remove(path: Path):
     if path.is_dir():
         shutil.rmtree(path, ignore_errors=True)
@@ -1631,6 +1710,9 @@ def cli(args: list[str]) -> int:
         step = lambda: admin_install(guid, args[2] if len(args) == 3 else None)  # noqa: E731
     elif args == ["uninstall"]:
         step = admin_uninstall
+    elif args[:1] == ["cleanup"] and len(args) == 2 and _GUID.fullmatch(args[1]):
+        guid = args[1].lower()
+        step = lambda: admin_cleanup(guid)  # noqa: E731
     elif args[:1] == ["uninstall"] and len(args) == 2 and _GUID.fullmatch(args[1]):
         guid = args[1].lower()   # an unplugged mic too: its settings are still there
         step = lambda: admin_uninstall(guid)  # noqa: E731
@@ -1761,6 +1843,14 @@ def install_on(guid: str | None, *, clean: bool = False) -> str | None:
         return _("Installing failed (code {code}). The log is in {folder}.",
                  code=code, folder=data_dir().parent)
     return None
+
+
+def cleanup(guid: str) -> str | None:
+    """admin_cleanup() on the mic with endpoint GUID `guid` (Windows asks first)."""
+    code = _elevated(["cleanup", guid])
+    if code is None:
+        return declined()
+    return _("Cleaning up failed (code {code}).", code=code) if code else None
 
 
 def uninstall(guid: str | None = None) -> str | None:

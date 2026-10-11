@@ -3258,6 +3258,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Przywróć {mic}, usuń stary efekt mikrofonu, a potem zainstaluj na nim nową kopię.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Efekt mikrofonu jest na {mic}. Działa naraz tylko na jednym mikrofonie.",
   "{mic} (unplugged)": "{mic} (odłączony)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Twoje dźwięki trafiają do {mic}. Aby użyć tego mikrofonu, wybierz go też w Urządzeniach."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Twoje dźwięki trafiają do {mic}. Aby użyć tego mikrofonu, wybierz go też w Urządzeniach.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Usuń pozostałości",
+  "Cleaning up failed (code {code}).": "Czyszczenie nie powiodło się (kod {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Jeśli coś się znajdzie, Windows poprosi o zgodę, a dźwięk na chwilę ucichnie.",
+  "Install mic effect": "Zainstaluj efekt",
+  "Leftovers removed from {mic}.": "Usunięto pozostałości z {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Znajdź wszystko, co Onion Board zostawił na {mic}, i to usuń. Znikną tylko części Onion Board: pozostałe ustawienia mikrofonu zostaną.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Efekt mikrofonu zainstalowany na {mic}. Sprawdź go na czacie głosowym.",
+  "Mic effect installed. Test it in your voice chat.": "Efekt mikrofonu zainstalowany. Sprawdź go na czacie głosowym.",
+  "Not installed": "Nie zainstalowano",
+  "Nothing of Onion Board's was left on {mic}.": "Na {mic} nie zostało nic z Onion Board.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Załóż efekt mikrofonu Onion Board na wybrany mikrofon, żeby twoje dźwięki trafiały do niego bezpośrednio.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Załóż efekt mikrofonu Onion Board na {mic}, żeby twoje dźwięki trafiały do niego bezpośrednio.",
+  "Some leftovers couldn't be removed from {mic}.": "Nie udało się usunąć części pozostałości z {mic}."
 }

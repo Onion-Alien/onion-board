@@ -3258,6 +3258,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Віднови {mic}, видали старий ефект мікрофона, а потім встанови на нього нову копію.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Ефект мікрофона стоїть на {mic}. Він працює лише на одному мікрофоні водночас.",
   "{mic} (unplugged)": "{mic} (від'єднано)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Звуки йдуть у {mic}. Щоб використовувати цей мікрофон, обери його і в Пристроях."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Звуки йдуть у {mic}. Щоб використовувати цей мікрофон, обери його і в Пристроях.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Прибрати залишки",
+  "Cleaning up failed (code {code}).": "Не вдалося прибрати (код {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Якщо щось знайдеться, Windows попросить дозвіл, і звук ненадовго зупиниться.",
+  "Install mic effect": "Встановити ефект",
+  "Leftovers removed from {mic}.": "Залишки прибрано з {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Знайди все, що Onion Board залишив на {mic}, і прибери. Зникнуть лише частини Onion Board: інші налаштування мікрофона залишаться.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Ефект мікрофона встановлено на {mic}. Перевір його в голосовому чаті.",
+  "Mic effect installed. Test it in your voice chat.": "Ефект мікрофона встановлено. Перевір його в голосовому чаті.",
+  "Not installed": "Не встановлено",
+  "Nothing of Onion Board's was left on {mic}.": "На {mic} нічого від Onion Board не залишилося.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Постав ефект мікрофона Onion Board на вибраний мікрофон, щоб звуки йшли прямо в нього.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Постав ефект мікрофона Onion Board на {mic}, щоб звуки йшли прямо в нього.",
+  "Some leftovers couldn't be removed from {mic}.": "Деякі залишки не вдалося прибрати з {mic}."
 }

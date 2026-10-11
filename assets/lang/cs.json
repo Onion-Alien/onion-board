@@ -3258,6 +3258,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Obnov {mic}, odstraň starý efekt mikrofonu a pak na něj nainstaluj novou kopii.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Efekt mikrofonu je na {mic}. Funguje vždy jen na jednom mikrofonu.",
   "{mic} (unplugged)": "{mic} (odpojený)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Tvoje zvuky jdou do {mic}. Chceš-li místo něj tento mikrofon, vyber ho i v Zařízeních."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Tvoje zvuky jdou do {mic}. Chceš-li místo něj tento mikrofon, vyber ho i v Zařízeních.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Uklidit zbytky",
+  "Cleaning up failed (code {code}).": "Úklid selhal (kód {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Pokud se něco najde, Windows požádá o povolení a zvuk se na chvíli zastaví.",
+  "Install mic effect": "Nainstalovat efekt",
+  "Leftovers removed from {mic}.": "Zbytky odstraněny z {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Najdi vše, co Onion Board zanechal na {mic}, a odstraň to. Odejdou jen části Onion Board: ostatní nastavení mikrofonu zůstanou.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Efekt mikrofonu nainstalován na {mic}. Vyzkoušej ho v hlasovém chatu.",
+  "Mic effect installed. Test it in your voice chat.": "Efekt mikrofonu nainstalován. Vyzkoušej ho v hlasovém chatu.",
+  "Not installed": "Nenainstalováno",
+  "Nothing of Onion Board's was left on {mic}.": "Na {mic} nezůstalo nic z Onion Board.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Dej efekt mikrofonu Onion Board na vybraný mikrofon, aby do něj šly tvoje zvuky přímo.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Dej efekt mikrofonu Onion Board na {mic}, aby do něj šly tvoje zvuky přímo.",
+  "Some leftovers couldn't be removed from {mic}.": "Některé zbytky se z {mic} nepodařilo odstranit."
 }

@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Επαναφέρε το {mic}, αφαίρεσε το παλιό εφέ μικροφώνου και μετά εγκατάστησε ένα νέο αντίγραφο σε αυτό.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Το εφέ μικροφώνου είναι στο {mic}. Λειτουργεί σε ένα μικρόφωνο κάθε φορά.",
   "{mic} (unplugged)": "{mic} (αποσυνδεδεμένο)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Οι ήχοι σου πηγαίνουν στο {mic}. Για να χρησιμοποιήσεις αυτό το μικρόφωνο, διάλεξέ το και στις Συσκευές."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Οι ήχοι σου πηγαίνουν στο {mic}. Για να χρησιμοποιήσεις αυτό το μικρόφωνο, διάλεξέ το και στις Συσκευές.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Καθαρισμός υπολειμμάτων",
+  "Cleaning up failed (code {code}).": "Ο καθαρισμός απέτυχε (κωδικός {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Αν βρεθεί κάτι, τα Windows θα ζητήσουν άδεια και ο ήχος θα σταματήσει για λίγο.",
+  "Install mic effect": "Εγκατάσταση εφέ",
+  "Leftovers removed from {mic}.": "Τα υπολείμματα αφαιρέθηκαν από το {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Ψάξε ό,τι άφησε το Onion Board στο {mic} και αφαίρεσέ το. Φεύγουν μόνο τα κομμάτια του Onion Board: οι άλλες ρυθμίσεις του μικροφώνου μένουν.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Το εφέ μικροφώνου εγκαταστάθηκε στο {mic}. Δοκίμασέ το στη φωνητική συνομιλία.",
+  "Mic effect installed. Test it in your voice chat.": "Το εφέ μικροφώνου εγκαταστάθηκε. Δοκίμασέ το στη φωνητική συνομιλία.",
+  "Not installed": "Δεν έχει εγκατασταθεί",
+  "Nothing of Onion Board's was left on {mic}.": "Δεν έμεινε τίποτα από το Onion Board στο {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Βάλε το εφέ μικροφώνου του Onion Board στο επιλεγμένο μικρόφωνο, ώστε οι ήχοι σου να πηγαίνουν απευθείας σε αυτό.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Βάλε το εφέ μικροφώνου του Onion Board στο {mic}, ώστε οι ήχοι σου να πηγαίνουν απευθείας σε αυτό.",
+  "Some leftovers couldn't be removed from {mic}.": "Κάποια υπολείμματα δεν αφαιρέθηκαν από το {mic}."
 }

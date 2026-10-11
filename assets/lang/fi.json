@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Palauta {mic} ennalleen, poista vanha mikrofonitehoste ja asenna siihen sitten uusi kopio.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofonitehoste on laitteessa {mic}. Se toimii yhdessä mikrofonissa kerrallaan.",
   "{mic} (unplugged)": "{mic} (irrotettu)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Äänesi menevät laitteeseen {mic}. Jos haluat käyttää tätä mikrofonia, valitse se myös kohdassa Laitteet."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Äänesi menevät laitteeseen {mic}. Jos haluat käyttää tätä mikrofonia, valitse se myös kohdassa Laitteet.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Siivoa jäänteet",
+  "Cleaning up failed (code {code}).": "Siivous epäonnistui (koodi {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Jos jotain löytyy, Windows pyytää lupaa ja ääni katkeaa hetkeksi.",
+  "Install mic effect": "Asenna tehoste",
+  "Leftovers removed from {mic}.": "Jäänteet poistettu laitteesta {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Etsi kaikki, mitä Onion Board jätti laitteeseen {mic}, ja poista se. Vain Onion Boardin omat osat poistuvat: mikrofonin muut asetukset pysyvät.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Mikrofonitehoste asennettu laitteeseen {mic}. Testaa sitä äänichatissa.",
+  "Mic effect installed. Test it in your voice chat.": "Mikrofonitehoste asennettu. Testaa sitä äänichatissa.",
+  "Not installed": "Ei asennettu",
+  "Nothing of Onion Board's was left on {mic}.": "Laitteeseen {mic} ei jäänyt mitään Onion Boardista.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Laita Onion Boardin mikrofonitehoste valitsemaasi mikrofoniin, niin äänesi menevät suoraan siihen.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Laita Onion Boardin mikrofonitehoste laitteeseen {mic}, niin äänesi menevät suoraan siihen.",
+  "Some leftovers couldn't be removed from {mic}.": "Kaikkia jäänteitä ei voitu poistaa laitteesta {mic}."
 }

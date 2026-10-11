@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Ibalik sa dati ang {mic}, alisin ang lumang mic effect, tapos mag-install ng bagong kopya rito.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Nasa {mic} ang mic effect. Gumagana ito sa isang mic lang bawat oras.",
   "{mic} (unplugged)": "{mic} (hindi nakasaksak)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Napupunta ang mga tunog mo sa {mic}. Para gamitin ang mic na ito, piliin din ito sa Devices."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Napupunta ang mga tunog mo sa {mic}. Para gamitin ang mic na ito, piliin din ito sa Devices.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Linisin ang natira",
+  "Cleaning up failed (code {code}).": "Nabigo ang paglilinis (code {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Kung may makita, hihingi ng pahintulot ang Windows at saglit na titigil ang audio.",
+  "Install mic effect": "I-install ang effect",
+  "Leftovers removed from {mic}.": "Naalis ang mga natira sa {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Hanapin ang anumang iniwan ng Onion Board sa {mic} at alisin ito. Mga bahagi lang ng Onion Board ang aalisin: maiiwan ang ibang setting ng mic.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Na-install ang mic effect sa {mic}. Subukan ito sa voice chat mo.",
+  "Mic effect installed. Test it in your voice chat.": "Na-install ang mic effect. Subukan ito sa voice chat mo.",
+  "Not installed": "Hindi naka-install",
+  "Nothing of Onion Board's was left on {mic}.": "Walang natirang bahagi ng Onion Board sa {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Ilagay ang mic effect ng Onion Board sa napili mong mikropono para diretso rito ang mga tunog mo.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Ilagay ang mic effect ng Onion Board sa {mic} para diretso rito ang mga tunog mo.",
+  "Some leftovers couldn't be removed from {mic}.": "May mga natirang hindi maalis sa {mic}."
 }

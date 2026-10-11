@@ -3112,6 +3112,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic} 설정을 복원하고 이전 마이크 효과를 제거한 다음 새로 설치합니다.",
   "The mic effect is on {mic}. It works on one mic at a time.": "마이크 효과는 {mic}에 있어요. 한 번에 마이크 하나에서만 작동해요.",
   "{mic} (unplugged)": "{mic} (연결 안 됨)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "소리는 {mic}(으)로 가고 있어요. 이 마이크를 쓰려면 장치에서도 선택하세요."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "소리는 {mic}(으)로 가고 있어요. 이 마이크를 쓰려면 장치에서도 선택하세요.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "남은 것 정리",
+  "Cleaning up failed (code {code}).": "정리 실패 (코드 {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "무언가 발견되면 Windows가 권한을 묻고 오디오가 잠깐 멈춰요.",
+  "Install mic effect": "효과 설치",
+  "Leftovers removed from {mic}.": "{mic}에서 남은 것을 지웠어요.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Onion Board가 {mic}에 남긴 것을 찾아 지웁니다. Onion Board의 부분만 지워지고 마이크의 다른 설정은 그대로예요.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "{mic}에 마이크 효과를 설치했어요. 음성 채팅에서 테스트해 보세요.",
+  "Mic effect installed. Test it in your voice chat.": "마이크 효과를 설치했어요. 음성 채팅에서 테스트해 보세요.",
+  "Not installed": "설치 안 됨",
+  "Nothing of Onion Board's was left on {mic}.": "{mic}에 Onion Board의 흔적이 없었어요.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "선택한 마이크에 Onion Board 마이크 효과를 넣어 소리가 바로 들어가게 합니다.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "{mic}에 Onion Board 마이크 효과를 넣어 소리가 바로 들어가게 합니다.",
+  "Some leftovers couldn't be removed from {mic}.": "{mic}에서 일부를 지우지 못했어요."
 }

@@ -3112,6 +3112,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "คืนค่า {mic} ลบเอฟเฟกต์ไมค์เก่า แล้วติดตั้งชุดใหม่ลงไป",
   "The mic effect is on {mic}. It works on one mic at a time.": "เอฟเฟกต์ไมค์อยู่บน {mic} ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น",
   "{mic} (unplugged)": "{mic} (ไม่ได้เสียบ)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "เสียงของคุณส่งเข้า {mic} หากต้องการใช้ไมค์นี้แทน ให้เลือกในอุปกรณ์ด้วย"
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "เสียงของคุณส่งเข้า {mic} หากต้องการใช้ไมค์นี้แทน ให้เลือกในอุปกรณ์ด้วย",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "ล้างของที่ค้าง",
+  "Cleaning up failed (code {code}).": "ล้างไม่สำเร็จ (รหัส {code})",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "ถ้าพบอะไร Windows จะขออนุญาตและเสียงจะหยุดชั่วครู่",
+  "Install mic effect": "ติดตั้งเอฟเฟกต์",
+  "Leftovers removed from {mic}.": "ลบของที่ค้างออกจาก {mic} แล้ว",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "ค้นหาสิ่งที่ Onion Board ทิ้งไว้บน {mic} แล้วเอาออก ลบเฉพาะส่วนของ Onion Board การตั้งค่าอื่นของไมค์ยังอยู่",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "ติดตั้งเอฟเฟกต์ไมค์บน {mic} แล้ว ลองทดสอบในแชทเสียง",
+  "Mic effect installed. Test it in your voice chat.": "ติดตั้งเอฟเฟกต์ไมค์แล้ว ลองทดสอบในแชทเสียง",
+  "Not installed": "ยังไม่ได้ติดตั้ง",
+  "Nothing of Onion Board's was left on {mic}.": "ไม่มีอะไรของ Onion Board เหลือบน {mic}",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "ใส่เอฟเฟกต์ไมค์ของ Onion Board บนไมโครโฟนที่เลือก เพื่อให้เสียงของคุณเข้าไปโดยตรง",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "ใส่เอฟเฟกต์ไมค์ของ Onion Board บน {mic} เพื่อให้เสียงของคุณเข้าไปโดยตรง",
+  "Some leftovers couldn't be removed from {mic}.": "ลบของที่ค้างบางส่วนออกจาก {mic} ไม่ได้"
 }

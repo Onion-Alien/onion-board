@@ -3112,6 +3112,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Khôi phục {mic}, gỡ hiệu ứng mic cũ, rồi cài một bản mới lên đó.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Hiệu ứng mic đang ở {mic}. Mỗi lúc nó chỉ chạy trên một mic.",
   "{mic} (unplugged)": "{mic} (chưa cắm)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Âm thanh của bạn đang vào {mic}. Để dùng mic này thay thế, hãy chọn nó trong Thiết bị nữa."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Âm thanh của bạn đang vào {mic}. Để dùng mic này thay thế, hãy chọn nó trong Thiết bị nữa.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Dọn phần còn sót",
+  "Cleaning up failed (code {code}).": "Dọn dẹp thất bại (mã {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Nếu tìm thấy gì, Windows sẽ xin quyền và âm thanh sẽ dừng một lát.",
+  "Install mic effect": "Cài hiệu ứng",
+  "Leftovers removed from {mic}.": "Đã dọn phần còn sót khỏi {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Tìm mọi thứ Onion Board để lại trên {mic} và gỡ đi. Chỉ phần của Onion Board bị gỡ: các cài đặt khác của mic vẫn giữ.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Đã cài hiệu ứng mic trên {mic}. Hãy thử trong cuộc trò chuyện thoại.",
+  "Mic effect installed. Test it in your voice chat.": "Đã cài hiệu ứng mic. Hãy thử trong cuộc trò chuyện thoại.",
+  "Not installed": "Chưa cài",
+  "Nothing of Onion Board's was left on {mic}.": "Không còn gì của Onion Board trên {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên micro đã chọn để âm thanh của bạn đi thẳng vào đó.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên {mic} để âm thanh của bạn đi thẳng vào đó.",
+  "Some leftovers couldn't be removed from {mic}.": "Không gỡ được một số phần còn sót khỏi {mic}."
 }

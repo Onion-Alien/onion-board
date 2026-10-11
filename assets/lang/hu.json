@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Állítsd vissza ezt: {mic}, távolítsd el a régi mikrofoneffektet, majd telepíts rá egy friss példányt.",
   "The mic effect is on {mic}. It works on one mic at a time.": "A mikrofoneffekt ezen van: {mic}. Egyszerre csak egy mikrofonon működik.",
   "{mic} (unplugged)": "{mic} (nincs csatlakoztatva)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "A hangjaid ide mennek: {mic}. Ha inkább ezt a mikrofont használnád, válaszd ki az Eszközöknél is."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "A hangjaid ide mennek: {mic}. Ha inkább ezt a mikrofont használnád, válaszd ki az Eszközöknél is.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Maradványok törlése",
+  "Cleaning up failed (code {code}).": "A takarítás nem sikerült (kód: {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Ha talál valamit, a Windows engedélyt kér, és a hang rövid időre leáll.",
+  "Install mic effect": "Effekt telepítése",
+  "Leftovers removed from {mic}.": "Maradványok törölve innen: {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Keresd meg, amit az Onion Board itt hagyott: {mic}, és töröld. Csak az Onion Board részei tűnnek el: a mikrofon többi beállítása marad.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Mikrofoneffekt telepítve erre: {mic}. Próbáld ki a hangcsevegésben.",
+  "Mic effect installed. Test it in your voice chat.": "Mikrofoneffekt telepítve. Próbáld ki a hangcsevegésben.",
+  "Not installed": "Nincs telepítve",
+  "Nothing of Onion Board's was left on {mic}.": "Nem maradt semmi az Onion Boardból itt: {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Tedd az Onion Board mikrofoneffektjét a kiválasztott mikrofonra, hogy a hangjaid közvetlenül belekerüljenek.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Tedd az Onion Board mikrofoneffektjét erre: {mic}, hogy a hangjaid közvetlenül belekerüljenek.",
+  "Some leftovers couldn't be removed from {mic}.": "Néhány maradványt nem sikerült törölni innen: {mic}."
 }

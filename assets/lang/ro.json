@@ -3258,6 +3258,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Restabilește {mic}, elimină vechiul efect de microfon, apoi instalează pe el o copie nouă.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Efectul de microfon este pe {mic}. Merge pe un singur microfon odată.",
   "{mic} (unplugged)": "{mic} (deconectat)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Sunetele tale merg în {mic}. Ca să folosești acest microfon, alege-l și la Dispozitive."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Sunetele tale merg în {mic}. Ca să folosești acest microfon, alege-l și la Dispozitive.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Curăță resturile",
+  "Cleaning up failed (code {code}).": "Curățarea a eșuat (cod {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Dacă se găsește ceva, Windows va cere permisiunea și sunetul se va opri scurt.",
+  "Install mic effect": "Instalează efectul",
+  "Leftovers removed from {mic}.": "Resturile au fost eliminate de pe {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Caută tot ce a lăsat Onion Board pe {mic} și elimină. Pleacă doar părțile Onion Board: celelalte setări ale microfonului rămân.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Efectul de microfon a fost instalat pe {mic}. Testează-l în chatul vocal.",
+  "Mic effect installed. Test it in your voice chat.": "Efectul de microfon a fost instalat. Testează-l în chatul vocal.",
+  "Not installed": "Neinstalat",
+  "Nothing of Onion Board's was left on {mic}.": "Nu mai era nimic de la Onion Board pe {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Pune efectul de microfon Onion Board pe microfonul ales, ca sunetele tale să meargă direct în el.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Pune efectul de microfon Onion Board pe {mic}, ca sunetele tale să meargă direct în el.",
+  "Some leftovers couldn't be removed from {mic}.": "Unele resturi nu au putut fi eliminate de pe {mic}."
 }

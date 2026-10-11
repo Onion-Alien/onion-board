@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic} cihazını eski haline getir, eski mikrofon efektini kaldır, sonra üzerine yeni bir kopya kur.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofon efekti {mic} üzerinde. Aynı anda yalnızca bir mikrofonda çalışır.",
   "{mic} (unplugged)": "{mic} (takılı değil)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Seslerin {mic} cihazına gidiyor. Bunun yerine bu mikrofonu kullanmak için Cihazlar'da da seç."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Seslerin {mic} cihazına gidiyor. Bunun yerine bu mikrofonu kullanmak için Cihazlar'da da seç.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Kalıntıları temizle",
+  "Cleaning up failed (code {code}).": "Temizlik başarısız (kod {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Bir şey bulunursa Windows izin ister ve ses kısa bir süre durur.",
+  "Install mic effect": "Efekti kur",
+  "Leftovers removed from {mic}.": "Kalıntılar {mic} üzerinden kaldırıldı.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Onion Board'un {mic} üzerinde bıraktığı her şeyi bul ve kaldır. Yalnızca Onion Board'un parçaları gider: mikrofonun diğer ayarları kalır.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Mikrofon efekti {mic} üzerine kuruldu. Sesli sohbetinde dene.",
+  "Mic effect installed. Test it in your voice chat.": "Mikrofon efekti kuruldu. Sesli sohbetinde dene.",
+  "Not installed": "Kurulu değil",
+  "Nothing of Onion Board's was left on {mic}.": "{mic} üzerinde Onion Board'dan bir şey kalmamış.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Seslerin doğrudan gitmesi için Onion Board mikrofon efektini seçili mikrofona koy.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Seslerin doğrudan gitmesi için Onion Board mikrofon efektini {mic} üzerine koy.",
+  "Some leftovers couldn't be removed from {mic}.": "Bazı kalıntılar {mic} üzerinden kaldırılamadı."
 }

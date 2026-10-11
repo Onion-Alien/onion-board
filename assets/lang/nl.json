@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Herstel {mic}, verwijder het oude microfooneffect en installeer er daarna een nieuwe kopie op.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Het microfooneffect zit op {mic}. Het werkt op één microfoon tegelijk.",
   "{mic} (unplugged)": "{mic} (niet aangesloten)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Je geluiden gaan naar {mic}. Wil je deze microfoon gebruiken, kies hem dan ook bij Apparaten."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Je geluiden gaan naar {mic}. Wil je deze microfoon gebruiken, kies hem dan ook bij Apparaten.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Restjes opruimen",
+  "Cleaning up failed (code {code}).": "Opruimen mislukt (code {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Als er iets wordt gevonden, vraagt Windows om toestemming en stopt het geluid even.",
+  "Install mic effect": "Effect installeren",
+  "Leftovers removed from {mic}.": "Restjes verwijderd van {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Zoek alles wat Onion Board op {mic} heeft achtergelaten en haal het weg. Alleen de onderdelen van Onion Board gaan weg: de andere instellingen van de microfoon blijven.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Microfooneffect geïnstalleerd op {mic}. Test het in je voicechat.",
+  "Mic effect installed. Test it in your voice chat.": "Microfooneffect geïnstalleerd. Test het in je voicechat.",
+  "Not installed": "Niet geïnstalleerd",
+  "Nothing of Onion Board's was left on {mic}.": "Er was niets van Onion Board meer op {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Zet het microfooneffect van Onion Board op je gekozen microfoon, zodat je geluiden er rechtstreeks in gaan.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Zet het microfooneffect van Onion Board op {mic}, zodat je geluiden er rechtstreeks in gaan.",
+  "Some leftovers couldn't be removed from {mic}.": "Sommige restjes konden niet van {mic} worden verwijderd."
 }

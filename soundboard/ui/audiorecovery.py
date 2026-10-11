@@ -29,25 +29,28 @@ from soundboard.ui.widgets import DropdownMenu
 from soundboard.wheelguard import no_wheel, snug_combo
 
 log = logging.getLogger(__name__)
+INSTALLS = ("install", "repair", "update", "reinstall")   # these leave the effect on
 
 
 def look(state):
     """What the card shows for a directmic.status(): (pill text, pill tone ("muted" =
     neutral, still outlined so it reads as a pill), the one fix
     offered as the main button, or None)."""
-    off = (_("Off"), "warn", "repair")
+    # not on this mic at all: nothing to repair, it's installed (and then it's on this one)
+    absent = (_("Not installed"), "muted", "install")
     return {
         "ready": (_("Ready"), "ok", None),
         "outdated": (_("Update available"), "warn", "update"),
-        "wiped": off,      # Windows took it off the mic
-        "other": off,      # it's on another mic, not the one picked
-        "missing": (_("Off"), "muted", None),
+        "wiped": (_("Off"), "warn", "repair"),   # Windows took it off the mic
+        "other": absent,     # it's on another mic, not this one
+        "missing": absent,   # on no mic
     }.get(state, ("", "", None))
 
 
 def action_text(action):
-    return {"repair": _("Repair mic effect"), "update": _("Update mic effect"),
-            "reinstall": _("Clean reinstall"),
+    return {"install": _("Install mic effect"),
+            "repair": _("Repair mic effect"), "update": _("Update mic effect"),
+            "reinstall": _("Clean reinstall"), "cleanup": _("Clean up leftovers"),
             "remove": _("Remove mic effect")}[action]
 
 
@@ -57,6 +60,8 @@ def explanation(action, mic=None):
         action = "repair"
     if mic is None:
         return {
+            "install": _("Put Onion Board's mic effect on your selected microphone, so "
+                         "your sounds can go straight into it."),
             "repair": _("Reinstall Onion Board's mic effect on your selected microphone."),
             "reinstall": _("Restore your microphones, remove the old mic effect, then "
                            "install a fresh copy on your selected microphone."),
@@ -64,21 +69,28 @@ def explanation(action, mic=None):
                         "Sounds will stop going straight into your mic."),
         }[action]
     return {
+        "install": _("Put Onion Board's mic effect on {mic}, so your sounds can go "
+                     "straight into it.", mic=mic),
         "repair": _("Reinstall Onion Board's mic effect on {mic}.", mic=mic),
         "reinstall": _("Restore {mic}, remove the old mic effect, then install a fresh "
                        "copy on it.", mic=mic),
         "remove": _("Restore {mic} and remove Onion Board's mic effect from it. Sounds "
                     "will stop going straight into it.", mic=mic),
+        "cleanup": _("Look for anything Onion Board left on {mic} and take it out. Only "
+                     "Onion Board's own parts go: the mic's other settings stay.", mic=mic),
     }[action]
 
 
 def labels(mics):
-    """The list's words for each mic: its name, numbered when two share one, marked
+    """The list's words for each mic: its name, every one numbered when two share it
+    (in front, so a narrow list that cuts the end off still tells them apart), marked
     when unplugged."""
+    names = [m["name"] for m in mics]
     seen, out = {}, []
     for m in mics:
         n = seen[m["name"]] = seen.get(m["name"], 0) + 1
-        name = m["name"] if n == 1 else _("{mic} ({number})", mic=m["name"], number=n)
+        name = m["name"] if names.count(m["name"]) == 1 else \
+            _("#{number} {mic}", mic=m["name"], number=n)
         out.append(name if m["active"] else _("{mic} (unplugged)", mic=name))
     return out
 
@@ -106,7 +118,7 @@ class Recovery(QObject):
         if action != "remove" and target is None and not mic:
             self.mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn")
             return False
-        if action != "remove" and target is not None and not target["active"]:
+        if action in INSTALLS and target is not None and not target["active"]:
             self.mw.toast(_("Plug this mic in to repair it."), "warn")
             return False
         self.running = True
@@ -120,7 +132,15 @@ class Recovery(QObject):
         err, state = "", ""
         guid = target["guid"] if target else None
         try:
-            if action == "remove":
+            if action == "cleanup" and target is not None and guid:   # on a picked mic
+                if not directmic.leftovers(guid):
+                    action = "cleanup-none"   # nothing there: no admin prompt at all
+                else:
+                    err = directmic.cleanup(guid)
+                    if not err and directmic.leftovers(guid):
+                        err = _("Some leftovers couldn't be removed from {mic}.",
+                                mic=target["name"])
+            elif action == "remove":
                 err = directmic.uninstall(guid) if guid else directmic.uninstall()
             elif guid:
                 err = directmic.install_on(guid, clean=action == "reinstall")
@@ -132,7 +152,7 @@ class Recovery(QObject):
             if not err and action == "remove" and (
                     has_effect(state) if guid else directmic.anything_installed()):
                 err = _("Repair failed")
-            elif not err and action != "remove" and state != "ready":
+            elif not err and action in INSTALLS and state != "ready":
                 err = _("The mic effect could not be verified. Restart your PC, then try "
                         "Repair mic effect again.")
         except Exception as exc:  # noqa: BLE001 - report unexpected device failures
@@ -146,7 +166,7 @@ class Recovery(QObject):
         target, self.target = getattr(self, "target", None), None
         pa = target and target.get("pa")
         cb = getattr(self.mw, "cb_mic", None)
-        if not err and action != "remove" and pa and pa != self.mw.cfg.mic_device \
+        if not err and action in INSTALLS and pa and pa != self.mw.cfg.mic_device \
                 and cb is not None and cb.findData(pa) >= 0:
             # the effect is on that mic now: the app sends into it (as picking it would)
             cb.setCurrentIndex(cb.findData(pa))
@@ -205,8 +225,9 @@ class RecoveryCard(QFrame):
         self.more.setAccessibleName(_("More options"))
         self.menu = DropdownMenu(self.more)
         self.menu_actions = {}
+        # cleanup: on a mic without the effect, anything a cut-off set-up left behind
         for action, icon in (("repair", "reload"), ("reinstall", "reload"),
-                             ("remove", "trash")):
+                             ("cleanup", "reload"), ("remove", "trash")):
             if action == "remove":
                 self.menu.addSeparator()
             act = self.menu.addAction(icons.icon(icon), action_text(action))
@@ -336,10 +357,13 @@ class RecoveryCard(QFrame):
         if fix:
             self.fix.setText(action_text(fix))
             self.fix.setProperty("action", fix)
+        # repair, reinstall and remove need the effect on this mic: greyed out without
+        # it (the main button offers Install instead)
+        installed = has_effect(state)
+        self.menu_actions["cleanup"].setEnabled(t is not None and state in ("other", "missing"))
         for a in ("repair", "reinstall"):
-            self.menu_actions[a].setEnabled(not unplugged)
-        self.menu_actions["remove"].setEnabled(
-            state != "missing" if t is None else has_effect(state))
+            self.menu_actions[a].setEnabled(installed and not unplugged)
+        self.menu_actions["remove"].setEnabled(installed)
         on = [i for i, m in enumerate(self.mics) if has_effect(m["state"]) and m is not t]
         if unplugged:
             self.where.setText(_("Plug this mic in to repair it."))
@@ -369,7 +393,7 @@ class RecoveryCard(QFrame):
         title.setObjectName("helptitle")
         v.addWidget(title)
         lines = [explanation(action, name)]
-        if t is not None and action != "remove":
+        if t is not None and action in INSTALLS:
             moved = [labels(self.mics)[i] for i, m in enumerate(self.mics)
                      if has_effect(m["state"]) and m is not t]
             if moved:
@@ -382,8 +406,11 @@ class RecoveryCard(QFrame):
                 # its name is shared or unknown: the app can't switch to it by itself
                 lines.append(_("Your sounds go into {mic}. To use this mic instead, pick "
                                "it under Devices too.", mic=self.mw.cfg.mic_device))
-        lines.append(_("Windows will ask for permission. Audio will briefly stop, "
-                       "including calls and games."))
+        lines.append(
+            _("If anything is found, Windows will ask for permission and audio will "
+              "briefly stop.") if action == "cleanup" else
+            _("Windows will ask for permission. Audio will briefly stop, "
+              "including calls and games."))
         for text in lines:
             label = QLabel(text)
             label.setWordWrap(True)
@@ -437,11 +464,19 @@ class RecoveryCard(QFrame):
         self._checked(state)
         if err:
             text = err
+        elif action == "cleanup":
+            text = _("Leftovers removed from {mic}.", mic=name)
+        elif action == "cleanup-none":
+            text = _("Nothing of Onion Board's was left on {mic}.", mic=name)
         elif name is None:
             text = (_("Mic effect removed") if action == "remove" else
+                    _("Mic effect installed. Test it in your voice chat.")
+                    if action == "install" else
                     _("Mic effect reinstalled. Test it in your voice chat."))
         else:
             text = (_("Mic effect removed from {mic}", mic=name) if action == "remove" else
+                    _("Mic effect installed on {mic}. Test it in your voice chat.",
+                      mic=name) if action == "install" else
                     _("Mic effect reinstalled on {mic}. Test it in your voice chat.",
                       mic=name))
         self.note.setText(text)

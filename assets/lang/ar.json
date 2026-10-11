@@ -3477,6 +3477,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "استعد إعدادات {mic}، وأزل مؤثر الميكروفون القديم، ثم ثبّت نسخة جديدة عليه.",
   "The mic effect is on {mic}. It works on one mic at a time.": "مؤثر الميكروفون موجود على {mic}. يعمل على ميكروفون واحد في كل مرة.",
   "{mic} (unplugged)": "{mic} (غير موصول)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "تذهب أصواتك إلى {mic}. لاستخدام هذا الميكروفون بدلًا منه، اختره في الأجهزة أيضًا."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "تذهب أصواتك إلى {mic}. لاستخدام هذا الميكروفون بدلًا منه، اختره في الأجهزة أيضًا.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "نظّف البقايا",
+  "Cleaning up failed (code {code}).": "فشل التنظيف (الرمز {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "إذا وُجد شيء، سيطلب Windows الإذن وسيتوقف الصوت لفترة قصيرة.",
+  "Install mic effect": "ثبّت مؤثر الميكروفون",
+  "Leftovers removed from {mic}.": "أُزيلت البقايا من {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "ابحث عن أي شيء تركه Onion Board على {mic} وأزله. تُزال أجزاء Onion Board فقط: تبقى إعدادات الميكروفون الأخرى.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "ثُبّت مؤثر الميكروفون على {mic}. جرّبه في الدردشة الصوتية.",
+  "Mic effect installed. Test it in your voice chat.": "ثُبّت مؤثر الميكروفون. جرّبه في الدردشة الصوتية.",
+  "Not installed": "غير مثبّت",
+  "Nothing of Onion Board's was left on {mic}.": "لم يبقَ شيء من Onion Board على {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "ضع مؤثر الميكروفون من Onion Board على الميكروفون المحدد لتذهب أصواتك إليه مباشرة.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "ضع مؤثر الميكروفون من Onion Board على {mic} لتذهب أصواتك إليه مباشرة.",
+  "Some leftovers couldn't be removed from {mic}.": "تعذّرت إزالة بعض البقايا من {mic}."
 }

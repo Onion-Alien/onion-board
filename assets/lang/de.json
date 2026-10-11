@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Stelle {mic} wieder her, entferne den alten Mikrofoneffekt und installiere dann eine frische Kopie darauf.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Der Mikrofoneffekt ist auf {mic}. Er läuft immer nur auf einem Mikrofon.",
   "{mic} (unplugged)": "{mic} (nicht angeschlossen)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Deine Sounds gehen an {mic}. Um stattdessen dieses Mikrofon zu nutzen, wähl es auch unter Geräte."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Deine Sounds gehen an {mic}. Um stattdessen dieses Mikrofon zu nutzen, wähl es auch unter Geräte.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Reste entfernen",
+  "Cleaning up failed (code {code}).": "Aufräumen fehlgeschlagen (Code {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Wenn etwas gefunden wird, fragt Windows nach der Erlaubnis und der Ton stoppt kurz.",
+  "Install mic effect": "Effekt installieren",
+  "Leftovers removed from {mic}.": "Reste entfernt von {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Such alles, was Onion Board auf {mic} hinterlassen hat, und entferne es. Nur die Teile von Onion Board gehen: Die anderen Einstellungen des Mikrofons bleiben.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Mikrofoneffekt installiert auf {mic}. Teste ihn im Sprachchat.",
+  "Mic effect installed. Test it in your voice chat.": "Mikrofoneffekt installiert. Teste ihn im Sprachchat.",
+  "Not installed": "Nicht installiert",
+  "Nothing of Onion Board's was left on {mic}.": "Von Onion Board war nichts mehr auf {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Installiere den Mikrofoneffekt von Onion Board auf deinem gewählten Mikrofon, damit deine Sounds direkt hineingehen.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Installiere den Mikrofoneffekt von Onion Board auf {mic}, damit deine Sounds direkt hineingehen.",
+  "Some leftovers couldn't be removed from {mic}.": "Einige Reste konnten nicht von {mic} entfernt werden."
 }

@@ -3185,6 +3185,19 @@
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Gendan {mic}, fjern den gamle mikrofoneffekt, og installer så en ny kopi på den.",
   "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofoneffekten er på {mic}. Den virker på én mikrofon ad gangen.",
   "{mic} (unplugged)": "{mic} (ikke tilsluttet)",
-  "{mic} ({number})": "{mic} ({number})",
-  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Dine lyde går til {mic}. Vælg også denne mikrofon under Enheder for at bruge den i stedet."
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Dine lyde går til {mic}. Vælg også denne mikrofon under Enheder for at bruge den i stedet.",
+  "#{number} {mic}": "#{number} {mic}",
+  "Clean up leftovers": "Ryd op i rester",
+  "Cleaning up failed (code {code}).": "Oprydningen mislykkedes (kode {code}).",
+  "If anything is found, Windows will ask for permission and audio will briefly stop.": "Hvis der findes noget, beder Windows om tilladelse, og lyden stopper kortvarigt.",
+  "Install mic effect": "Installer mikrofoneffekt",
+  "Leftovers removed from {mic}.": "Rester fjernet fra {mic}.",
+  "Look for anything Onion Board left on {mic} and take it out. Only Onion Board's own parts go: the mic's other settings stay.": "Find alt, hvad Onion Board har efterladt på {mic}, og fjern det. Kun Onion Boards egne dele fjernes: mikrofonens øvrige indstillinger bliver.",
+  "Mic effect installed on {mic}. Test it in your voice chat.": "Mikrofoneffekten er installeret på {mic}. Test den i din stemmechat.",
+  "Mic effect installed. Test it in your voice chat.": "Mikrofoneffekten er installeret. Test den i din stemmechat.",
+  "Not installed": "Ikke installeret",
+  "Nothing of Onion Board's was left on {mic}.": "Der var intet tilbage fra Onion Board på {mic}.",
+  "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Sæt Onion Boards mikrofoneffekt på din valgte mikrofon, så dine lyde kan gå direkte ind i den.",
+  "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Sæt Onion Boards mikrofoneffekt på {mic}, så dine lyde kan gå direkte ind i den.",
+  "Some leftovers couldn't be removed from {mic}.": "Nogle rester kunne ikke fjernes fra {mic}."
 }
