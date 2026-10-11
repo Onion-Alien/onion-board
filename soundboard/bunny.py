@@ -250,7 +250,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
-    bunnyfit.draw(p, fit, "face", ink)
+    bunnyfit.draw(p, fit, "face", ink, shut=blink > 0.6)
     _draw_prop(p, prop, ink, swing, fur=fur)
     if angry > 0.5:           # the cartoon cross-vein mark, up on his forehead
         p.setPen(QPen(CROSS, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))

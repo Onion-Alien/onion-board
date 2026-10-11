@@ -581,12 +581,14 @@ PIECES = {
 
 
 def draw(p: QPainter, pieces: tuple[str, ...], layer: str, ink: QPen,
-         hats: bool = True) -> None:
+         hats: bool = True, shut: bool = False) -> None:
     """Paint the `layer` part of `pieces` (bunny.py calls this between its own layers).
-    `hats=False` leaves out anything on his head (his nightcap is on)."""
+    `hats=False` leaves out anything on his head (his nightcap is on); `shut`: his eyes
+    are closed, so no laser eyes."""
     for name in pieces:
         where, fn = PIECES.get(name, ("", None))
-        if where == layer and fn and (hats or name not in HATS):
+        if (where == layer and fn and (hats or name not in HATS)
+                and not (shut and name == "laser")):
             p.save()
             fn(p, ink)
             p.restore()

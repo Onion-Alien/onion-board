@@ -39,3 +39,8 @@ def test_nightcap_replaces_his_hat(qapp):
     capped = _draw(nightcap=True, outfit=())
     assert _draw(nightcap=True, outfit=("crown",)) == capped
     assert _draw(nightcap=True, outfit=("shades",)) != capped   # glasses stay on
+
+
+def test_laser_eyes_stop_when_his_eyes_shut(qapp):
+    assert _draw(blink=1.0, outfit=("laser",)) == _draw(blink=1.0, outfit=())
+    assert _draw(outfit=("laser",)) != _draw(outfit=())
