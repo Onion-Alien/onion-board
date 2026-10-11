@@ -38,6 +38,8 @@ Step "sensitive data" { & $py scripts\check_sensitive.py }
 # as CI's pick job: every text in every catalog, and every module in docs/CODE.md
 Step "translations" { & $py scripts\i18n_extract.py --check }
 Step "CODE.md modules" { & $py scripts\check_code_doc.py }
+# pyright on the changed files; only errors not in scripts/pyright_baseline.json fail
+Step "types (new errors only)" { & $py scripts\check_types.py --base $Base }
 
 if ($All) { $picked = @("tests") }
 else {

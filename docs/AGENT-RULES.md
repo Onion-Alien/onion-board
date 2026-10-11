@@ -143,7 +143,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1 -Tests
 ```
 
 It runs ruff, the sensitive-data scan, the translation check and CODE.md's module list
-(about 15 s). The tests are left to CI: push, open the PR and keep working while it runs
+(about 15 s), plus pyright on the Python files you changed: only type errors that
+aren't in scripts/pyright_baseline.json fail (scripts/check_types.py). Fixed an old
+one? python scripts/check_types.py --update shrinks the baseline. Pyright wrong? Add
+# pyright: ignore[rule] with a reason. The tests are left to CI: push, open the PR and keep working while it runs
 the test files your changes need, on 4 jobs side by side. `-Tests` runs those files here
 (a change to `theme.py`, `mainwindow.py` or `library.py` picks most of the suite: about
 4 minutes); `-All` the whole suite.
