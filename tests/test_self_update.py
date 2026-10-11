@@ -124,10 +124,10 @@ def test_progress_fills_the_card_the_banner_and_settings(window, boxes, qapp):
     window._on_update_progress(76 * mb, 180 * mb)
     card = window.btn_update
     assert card.state == "downloading" and card.pct == 42
-    assert card.title == "Downloading… 42%" and card.hint == "76 of 180 MB"
+    assert card.title == "Downloading 42%" and card.hint == "76 of 180 MB"
     assert window.urgent_prog.isVisibleTo(window.urgent_bar) and window.urgent_prog.value() == 42
     assert "76 of 180 MB" in window.urgent_sub.text() and window.urgent_btn.text() == "Cancel"
-    assert window.update_status() == "Downloading… 42% · 76 of 180 MB"
+    assert window.update_status() == "Downloading 42% · 76 of 180 MB"
     window._on_update_progress(180 * mb, 180 * mb)
     assert card.pct == 100 and window.urgent_prog.value() == 100
     window._downloading = False

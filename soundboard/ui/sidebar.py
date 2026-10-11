@@ -9,6 +9,7 @@ icon (live badge, voice picture, warning tint), name, tip and whether it's shown
 from __future__ import annotations
 
 import html
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -838,7 +839,13 @@ class UpdateCard(QPushButton):
         tm, hm = QFontMetrics(title_f), QFontMetrics(hint_f)
         x = OutputBlock.TEXT_X
         chev = OutputBlock.CHEVRON + 4 if self.state == "available" else 0
-        lines = _wrap(self.title, tm, max(10, width - x - OutputBlock.PAD - chev))
+        room = max(10, width - x - OutputBlock.PAD - chev)
+        lines = _wrap(self.title, tm, room)
+        if self.state == "downloading" and len(lines) == 1:
+            # wrapped as "100%" would be, so the card doesn't grow at the end
+            widest = re.sub(r"\d+", "100", self.title)
+            if len(_wrap(widest, tm, room)) > 1:
+                lines = _wrap(self.title, tm, tm.horizontalAdvance(self.title) - 1)
         y = self.TOP
         rows = {"x": x, "title": (y, lines), "tm": tm, "hm": hm,
                 "title_f": title_f, "hint_f": hint_f}

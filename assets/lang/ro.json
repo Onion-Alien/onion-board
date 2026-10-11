@@ -3288,7 +3288,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "Se descarcă Onion Board {version}: {done} MB până acum.",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "Se descarcă Onion Board {version}: {done} din {total} MB ({pct}%).",
   "Downloading the update": "Se descarcă actualizarea",
-  "Downloading… {pct}%": "Se descarcă… {pct}%",
   "Error details copied: paste them into a message to the developer.": "Detaliile erorii au fost copiate: lipește-le într-un mesaj către dezvoltator.",
   "Keep going": "Continuă",
   "Try again": "Încearcă din nou",

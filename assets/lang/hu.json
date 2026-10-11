@@ -3215,7 +3215,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "Az Onion Board {version} letöltése folyik: eddig {done} MB.",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "Az Onion Board {version} letöltése folyik: {done} / {total} MB ({pct}%).",
   "Downloading the update": "A frissítés letöltése",
-  "Downloading… {pct}%": "Letöltés… {pct}%",
   "Error details copied: paste them into a message to the developer.": "A hiba részletei kimásolva: illeszd be őket egy üzenetbe a fejlesztőnek.",
   "Keep going": "Folytatás",
   "Try again": "Újra",

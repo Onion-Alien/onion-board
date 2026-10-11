@@ -3215,7 +3215,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "Baixando o Onion Board {version}: {done} MB até agora.",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "Baixando o Onion Board {version}: {done} de {total} MB ({pct}%).",
   "Downloading the update": "Baixando a atualização",
-  "Downloading… {pct}%": "Baixando… {pct}%",
   "Error details copied: paste them into a message to the developer.": "Detalhes do erro copiados: cole numa mensagem para o desenvolvedor.",
   "Keep going": "Continuar",
   "Try again": "Tentar de novo",

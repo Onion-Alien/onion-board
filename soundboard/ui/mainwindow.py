@@ -8057,7 +8057,7 @@ class MainWindow(QMainWindow):
             mb = 1024 * 1024
             hint = (_("{done} of {total} MB", done=done // mb, total=max(1, round(total / mb)))
                     if total else _("{done} MB", done=done // mb))
-            return ("downloading", _("Downloading… {pct}%", pct=self._update_pct()), hint,
+            return ("downloading", _("Downloading {pct}%", pct=self._update_pct()), hint,
                     _("Downloading Onion Board {version}: click to see how far it is, "
                       "or to cancel.", version=rel.version))
         if self._update_err:

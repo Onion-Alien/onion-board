@@ -3288,7 +3288,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "Завантажується Onion Board {version}: поки {done} МБ.",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "Завантажується Onion Board {version}: {done} з {total} МБ ({pct}%).",
   "Downloading the update": "Завантаження оновлення",
-  "Downloading… {pct}%": "Завантаження… {pct}%",
   "Error details copied: paste them into a message to the developer.": "Подробиці помилки скопійовано: встав їх у повідомлення розробнику.",
   "Keep going": "Продовжити",
   "Try again": "Спробувати ще",

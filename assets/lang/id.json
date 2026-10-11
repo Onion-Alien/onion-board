@@ -3142,7 +3142,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "Mengunduh Onion Board {version}: {done} MB sejauh ini.",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "Mengunduh Onion Board {version}: {done} dari {total} MB ({pct}%).",
   "Downloading the update": "Mengunduh pembaruan",
-  "Downloading… {pct}%": "Mengunduh… {pct}%",
   "Error details copied: paste them into a message to the developer.": "Detail error disalin: tempel ke pesan untuk developer.",
   "Keep going": "Lanjutkan",
   "Try again": "Coba lagi",

@@ -3215,7 +3215,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "Λήψη του Onion Board {version}: {done} MB μέχρι τώρα.",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "Λήψη του Onion Board {version}: {done} από {total} MB ({pct}%).",
   "Downloading the update": "Λήψη της ενημέρωσης",
-  "Downloading… {pct}%": "Λήψη… {pct}%",
   "Error details copied: paste them into a message to the developer.": "Οι λεπτομέρειες του σφάλματος αντιγράφηκαν: επικόλλησέ τες σε μήνυμα προς τον δημιουργό.",
   "Keep going": "Συνέχεια",
   "Try again": "Δοκίμασε ξανά",

@@ -3142,7 +3142,6 @@
   "Downloading Onion Board {version}: {done} MB so far.": "กำลังดาวน์โหลด Onion Board {version}: ได้ {done} MB แล้ว",
   "Downloading Onion Board {version}: {done} of {total} MB ({pct}%).": "กำลังดาวน์โหลด Onion Board {version}: {done} จาก {total} MB ({pct}%)",
   "Downloading the update": "กำลังดาวน์โหลดอัปเดต",
-  "Downloading… {pct}%": "กำลังดาวน์โหลด… {pct}%",
   "Error details copied: paste them into a message to the developer.": "คัดลอกรายละเอียดข้อผิดพลาดแล้ว: วางลงในข้อความถึงผู้พัฒนาได้เลย",
   "Keep going": "ทำต่อ",
   "Try again": "ลองอีกครั้ง",
