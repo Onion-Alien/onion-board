@@ -8257,8 +8257,16 @@ class MainWindow(QMainWindow):
             self.transport.setVisible(want)
 
     def _update_playing_background(self, playing):
+        on = self.cfg.playing_background
+        if getattr(self, "_background_gap", None) != on:
+            self._background_gap = on
+            # The gap belongs outside the viewport, so the backdrop contains
+            # every card rather than cutting inside their edges.
+            rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
+            self._pad_scroll.setViewportMargins(12 if on and rtl else 0, 0,
+                                               12 if on and not rtl else 0, 0)
         image = ""
-        if self.cfg.playing_background:
+        if on:
             # The first active sound owns the backdrop, including while paused.
             # Waiting sounds and a merely selected pad never claim it.
             sid = next((sid for sid in playing if sid in self._meta), None)

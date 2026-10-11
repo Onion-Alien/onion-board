@@ -9,15 +9,21 @@ import pytest
 def test_background_stretches_whole_thumbnail_with_padding(window, size):  # noqa: F811
     w = window
     w.tabs.setCurrentWidget(w.sounds_page)
+    w.cfg.playing_background = True
+    w._update_playing_background({})
     w.resize(1180, 720)
     w.show()
     w.grid.relayout(force=True)
     view = w.grid.parentWidget()
     target = w.grid.background_rect(size)
-    assert target.left() == pytest.approx(12)
-    assert target.right() == pytest.approx(view.width() - 12)
-    assert target.top() + w.grid.y() == pytest.approx(12)
-    assert target.bottom() + w.grid.y() == pytest.approx(view.height() - 12)
+    assert target.left() == pytest.approx(0)
+    assert target.right() == pytest.approx(view.width())
+    assert target.top() + w.grid.y() == pytest.approx(0)
+    assert target.bottom() + w.grid.y() == pytest.approx(view.height())
+    assert w._pad_scroll.viewportMargins().right() == 12
+    for pad in w.grid.pads:
+        assert pad.x() >= target.left()
+        assert pad.x() + pad.width() <= target.right()
 
 
 def test_background_tracks_first_active_sound(window):  # noqa: F811

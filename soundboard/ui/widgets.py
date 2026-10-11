@@ -1175,7 +1175,7 @@ class PadGrid(QWidget):
     def background_rect(self, size: QSize) -> QRectF:
         view = self.parentWidget()
         area = QRectF(0, -self.y(), self.width(),
-                      view.height() if view else self.height()).adjusted(12, 12, -12, -12)
+                      view.height() if view else self.height())
         if size.isEmpty() or area.width() <= 0 or area.height() <= 0:
             return QRectF()
         return area
