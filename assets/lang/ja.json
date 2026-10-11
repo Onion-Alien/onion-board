@@ -2908,12 +2908,10 @@
   "+{count} queued": [
     "+{count} 件待機中"
   ],
-  "Add as sound": "サウンドとして追加",
   "Cancel download": "ダウンロードをキャンセル",
   "Couldn't download": "ダウンロードできませんでした",
   "Parsing video…": "動画を解析中…",
   "Parsing…": "解析中…",
-  "Play once": "1回再生",
   "Queue is full": "待機キューがいっぱいです",
   "Queued": "待機中",
   "Queued: waiting for current download to finish…": "待機中: 現在のダウンロード完了を待っています…",
@@ -3091,5 +3089,11 @@
   "Use my mic": "自分のマイクを使う",
   "Use the virtual cable": "仮想ケーブルを使う",
   "Plays from: {path}": "再生元: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "サウンドは追加されるとすぐに表示されます。閉じても止まりません。"
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "サウンドは追加されるとすぐに表示されます。閉じても止まりません。",
+  "Adding to sounds": "サウンドに追加中",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "準備ができたらボードの新しいサウンドになります。押すものはありません。",
+  "Playing once": "1回だけ再生",
+  "Plays once when it's ready. It isn't added to your sounds.": "準備ができたら1回だけ再生します。サウンドには追加されません。",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "前のものの後でボードの新しいサウンドになります。押すものはありません。",
+  "Waiting to add": "追加待ち"
 }

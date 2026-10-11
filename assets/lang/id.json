@@ -2908,12 +2908,10 @@
   "+{count} queued": [
     "+{count} dalam antrean"
   ],
-  "Add as sound": "Tambah sebagai suara",
   "Cancel download": "Batalkan unduhan",
   "Couldn't download": "Gagal mengunduh",
   "Parsing video…": "Membaca video…",
   "Parsing…": "Membaca…",
-  "Play once": "Putar sekali",
   "Queue is full": "Antrean penuh",
   "Queued": "Dalam antrean",
   "Queued: waiting for current download to finish…": "Dalam antrean: menunggu unduhan saat ini selesai…",
@@ -3091,5 +3089,11 @@
   "Use my mic": "Pakai mic-ku",
   "Use the virtual cable": "Pakai kabel virtual",
   "Plays from: {path}": "Diputar dari: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap suara muncul begitu masuk. Menutup ini tidak menghentikannya."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap suara muncul begitu masuk. Menutup ini tidak menghentikannya.",
+  "Adding to sounds": "Menambahkan ke suara",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Jadi suara baru di board-mu saat sudah siap. Tidak perlu menekan apa pun.",
+  "Playing once": "Diputar sekali",
+  "Plays once when it's ready. It isn't added to your sounds.": "Diputar sekali saat sudah siap. Tidak ditambahkan ke suaramu.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Jadi suara baru di board-mu setelah yang sebelumnya. Tidak perlu menekan apa pun.",
+  "Waiting to add": "Menunggu ditambahkan"
 }

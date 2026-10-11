@@ -2972,12 +2972,10 @@
     "+{count} i kø",
     "+{count} i kø"
   ],
-  "Add as sound": "Legg til som lyd",
   "Cancel download": "Avbryt nedlasting",
   "Couldn't download": "Kunne ikke laste ned",
   "Parsing video…": "Leser videoen…",
   "Parsing…": "Leser…",
-  "Play once": "Spill av én gang",
   "Queue is full": "Køen er full",
   "Queued": "I kø",
   "Queued: waiting for current download to finish…": "I kø: venter på at nedlastingen blir ferdig…",
@@ -3164,5 +3162,11 @@
   "Use my mic": "Bruk mikrofonen min",
   "Use the virtual cable": "Bruk den virtuelle kabelen",
   "Plays from: {path}": "Spilles fra: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Hver lyd dukker opp så snart den er inne. Å lukke dette stopper det ikke."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Hver lyd dukker opp så snart den er inne. Å lukke dette stopper det ikke.",
+  "Adding to sounds": "Legges til i lyder",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Blir en ny lyd på boardet ditt når den er klar. Du trenger ikke trykke på noe.",
+  "Playing once": "Spilles én gang",
+  "Plays once when it's ready. It isn't added to your sounds.": "Spilles én gang når den er klar. Den legges ikke til i lydene dine.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Blir en ny lyd på boardet ditt etter de foran. Du trenger ikke trykke på noe.",
+  "Waiting to add": "Venter på å bli lagt til"
 }

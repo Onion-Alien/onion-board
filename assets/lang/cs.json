@@ -3036,12 +3036,10 @@
     "+{count} ve frontě",
     "+{count} ve frontě"
   ],
-  "Add as sound": "Přidat jako zvuk",
   "Cancel download": "Zrušit stahování",
   "Couldn't download": "Nepodařilo se stáhnout",
   "Parsing video…": "Načítá se video…",
   "Parsing…": "Načítá se…",
-  "Play once": "Přehrát jednou",
   "Queue is full": "Fronta je plná",
   "Queued": "Ve frontě",
   "Queued: waiting for current download to finish…": "Ve frontě: čeká na dokončení stahování…",
@@ -3237,5 +3235,11 @@
   "Use my mic": "Použít můj mikrofon",
   "Use the virtual cable": "Použít virtuální kabel",
   "Plays from: {path}": "Přehrává se z: {path}",
-  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Každý zvuk se objeví hned, jak je přidaný. Zavřením se to nezastaví."
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Každý zvuk se objeví hned, jak je přidaný. Zavřením se to nezastaví.",
+  "Adding to sounds": "Přidává se do zvuků",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Až bude hotový, stane se z něj nový zvuk na tvém boardu. Nic nemusíš mačkat.",
+  "Playing once": "Přehraje se jednou",
+  "Plays once when it's ready. It isn't added to your sounds.": "Až bude hotový, přehraje se jednou. Do tvých zvuků se nepřidá.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Stane se z něj nový zvuk na tvém boardu po těch před ním. Nic nemusíš mačkat.",
+  "Waiting to add": "Čeká na přidání"
 }
