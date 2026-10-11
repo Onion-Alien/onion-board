@@ -883,7 +883,8 @@ class SideRail(QFrame):
 
     def _full_fit(self) -> int:
         """The narrowest open rail where the full layout fits, every word on its line:
-        the name, "On Air" / "Off Air" beside its switch, Settings beside the arrow (a longer translation needs more room)."""
+        the name, "On Air" / "Off Air" beside its switch, Settings beside the arrow (a
+        longer translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
         need = [side + BUTTON_W + 6 + self._brand_width()]
         if self.output:
