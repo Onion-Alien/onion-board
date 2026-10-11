@@ -53,13 +53,25 @@ the affected states; include its PR and validation evidence here.
   entry labels explain the task, reopening raises the existing editor, and collapsed
   cards keep the common controls visible.
 
-- [ ] **U4: Consistent live/draft and modal contracts.** MainWindow opens Settings
+- [x] **U4: Consistent live/draft and modal contracts.** MainWindow opens Settings
   and Edit sound with `exec()`; Voice tuning explicitly stays modeless. Settings
   apply immediately; Edit commits on Save. Targets: `ui/mainwindow.py`,
   `settings.py`, `ui/dialogs.py`, `ui/voicepanel.py`. Acceptance: preferences/live
   tuning permit continued app use; transactional Save/Cancel remains intact; modal
   tasks have an explicit reason. Before converting, check lifetime, repeated opening,
   deletion of the edited item, async results, preview rollback and shortcut behaviour.
+
+  Done (PR #PRNUM): Settings and Edit sound open with `show()`, beside the board, so
+  sounds, hotkeys and the tabs keep working. Settings is one live window (`[Done]`):
+  opening it again raises it on the page asked for (`SettingsDialog.show_page`, which
+  clears a search first). Edit sound stays a draft with `[Save] [Cancel]`, one window
+  per sound (editing it again raises it); Save applies to the sound as it is in the
+  list then, and removing the sound closes its window unsaved (Undo brings it back as
+  it was). Previews stop on close either way. Checked offscreen in Dark and Light at
+  440 to 1920 wide, with GIFs of reopening, the draft and removing while editing
+  (`tests/test_audit_main.py`, `test_shell_dialogs.py`). Kept modal on purpose: the
+  yes/no questions, catching a hotkey and the setup guide (each needs an answer
+  before the app can go on).
 
 ## Polish next
 
