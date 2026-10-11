@@ -58,7 +58,7 @@ class ProgramPicker(QDialog):
         self.list.itemDoubleClicked.connect(lambda _i: self._ok())
         lay.addWidget(self.list, 1)
         row = QHBoxLayout()
-        browse = QPushButton(_("Browse for a program…"))
+        browse = QPushButton(_("Browse for a program"))
         icons.set_icon(browse, "folder")
         browse.clicked.connect(self.browse)
         row.addWidget(browse)

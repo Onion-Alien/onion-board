@@ -471,7 +471,7 @@ def test_remove_asks_first_then_uninstalls_it_and_keeps_the_triggers(qapp, tmp_p
     assert process_events(qapp, lambda: tab.panel is not None)
     menu = tab.panel.btn_more.menu()
     assert menu.actions()[-1] is tab.act_remove and tab.btn_remove.isHidden()
-    assert tab.act_remove.text() == "Remove Onion Watch…"
+    assert tab.act_remove.text() == "Remove Onion Watch"
     lay = tab.board_page.layout()
     assert lay.itemAt(lay.count() - 1).widget() is tab.panel     # no row of its own
     panel = tab.panel

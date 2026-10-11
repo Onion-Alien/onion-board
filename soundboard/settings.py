@@ -761,7 +761,7 @@ class SettingsDialog(QDialog):
         row.addWidget(hue, 1)
         cv.addLayout(row)
         btns = QHBoxLayout()
-        more = QPushButton(_("More colours…"))
+        more = QPushButton(_("More colours"))
         more.setToolTip(_("Pick any colour, including how strong and how bright it is"))
         reset = QPushButton(_("Theme's colour"))
         reset.setToolTip(_("Go back to each theme's own highlight colour"))
@@ -918,7 +918,7 @@ class SettingsDialog(QDialog):
         b.setObjectName("hkbtn")
         b.clicked.connect(lambda __=False, a=attr: self._capture(a))
         # each row's buttons say which hotkey they're for (a screen reader read every
-        # row as "Click to set…" and "Clear")
+        # row as "Click to set" and "Clear")
         b.setAccessibleName(_("{label} hotkey", label=label))
         row.addWidget(b)
         x = QPushButton("✕")
@@ -935,7 +935,7 @@ class SettingsDialog(QDialog):
             combo = getattr(self.mw.cfg, attr)
             for b in buttons:
                 b.setText(pretty_key(combo)
-                          or (_("Off") if attr == "ptt_key" else _("Click to set…")))
+                          or (_("Off") if attr == "ptt_key" else _("Click to set")))
 
     def _capture(self, attr):
         # auto push-to-talk presses the key itself: that can't be a MIDI pad
@@ -1155,7 +1155,7 @@ class SettingsDialog(QDialog):
               "Piper voice packs dropped into the voices folder. They join the Voice list on the "
               "Voice tab."))
         row = _button_row()   # one line, wrapping only when the window is narrow
-        add = QPushButton(_("Add a voice server…"))
+        add = QPushButton(_("Add a voice server"))
         icons.set_icon(add, "plus")
         add.clicked.connect(lambda: mw.tab_on("voice") and mw.voice.speech._add_voice_server())
         row.addWidget(add)
@@ -1449,10 +1449,10 @@ class SettingsDialog(QDialog):
                                 "devices. A restore point is saved first, so it can always be "
                                 "undone."))
         row = QHBoxLayout()
-        rst = QPushButton(_("Reset…"))
+        rst = QPushButton(_("Reset"))
         icons.set_icon(rst, "reload")
         rst.clicked.connect(lambda: self._open_reset(points=False))
-        pts = QPushButton(_("Restore points…"))
+        pts = QPushButton(_("Restore points"))
         pts.clicked.connect(lambda: self._open_reset(points=True))
         row.addWidget(rst)
         row.addWidget(pts)
@@ -1628,7 +1628,7 @@ class SettingsDialog(QDialog):
                                 ("check", _("Check for updates"), "reload"),
                                 ("reinstall", _("Reinstall"), ""),
                                 ("report", _("Report a problem"), ""),
-                                ("remove", _("Remove…"), "trash")):
+                                ("remove", _("Remove"), "trash")):
             b = QPushButton(text)
             if icon:
                 icons.set_icon(b, icon, "danger_text" if key == "remove" else None)
@@ -2017,7 +2017,7 @@ class SettingsDialog(QDialog):
                                 "import it on another PC. Importing a friend's sound pack adds "
                                 "its sounds; ones you already have are skipped."))
         row = QHBoxLayout()
-        exp = QPushButton(_("Export everything…"))
+        exp = QPushButton(_("Export everything"))
         icons.set_icon(exp, "folder")
         def export():
             mw = self.mw
@@ -2027,7 +2027,7 @@ class SettingsDialog(QDialog):
                                 lambda _p, _n, err: _("Didn't export") if err
                                 else _("✓ Exported"))
         exp.clicked.connect(export)
-        imp = QPushButton(_("Import…"))
+        imp = QPushButton(_("Import"))
         imp.clicked.connect(self.mw.import_dialog)
         row.addWidget(exp)
         row.addWidget(imp)
@@ -2122,7 +2122,7 @@ class SettingsDialog(QDialog):
         self.data_folder.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         grid.addWidget(self.data_folder, 1, 1, 1, 2)
         row = _button_row()
-        change = QPushButton(_("Change…"))
+        change = QPushButton(_("Change"))
 
         def pick():
             folder = QFileDialog.getExistingDirectory(self, _("Save videos in"),
@@ -3165,7 +3165,7 @@ class SettingsDialog(QDialog):
         lay = card.layout()
         if lay is None or not pocketaddon.removable(info):
             return
-        btn = QPushButton(_("Remove Onion Pocket…"))
+        btn = QPushButton(_("Remove Onion Pocket"))
         btn.setToolTip(_("Takes the add-on out of Onion Board: phones can't play your pads any "
                          "more. Paired phones are kept for when you get it again."))
         icons.set_icon(btn, "trash", "danger_text")
@@ -3387,7 +3387,7 @@ class SettingsDialog(QDialog):
                                 "so the AI can set up whatever tools you use with you."))
         # side by side, wrapping (not widening the window) when Settings is narrow
         btns = _button_row()
-        guide = QPushButton(_("Streamer guide…"))
+        guide = QPushButton(_("Streamer guide"))
         guide.setObjectName("primary")
         btns.addWidget(guide)
         ai = QPushButton(_("Copy AI prompt"))

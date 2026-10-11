@@ -1,7 +1,7 @@
 """Dropdowns and buttons are as wide as their words, never stretched across a card.
 
 Settings' device boxes were 600-720 px for a 30-letter name and Edit sound's hotkey
-button ran 369 px for "Click to set…". The app style sizes every dropdown to its
+button ran 369 px for "Click to set". The app style sizes every dropdown to its
 longest choice (capped) unless the code chose otherwise (wheelguard.AppStyle)."""
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QApplication, QComboBox, QHBoxLayout, QVBoxLayout, QWidget

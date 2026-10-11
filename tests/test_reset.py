@@ -125,7 +125,7 @@ def test_guide_picks_parts_and_restarts(window, monkeypatch, qapp):  # noqa: F81
     from soundboard.settings import SettingsDialog
     from soundboard.ui.resetguide import ResetGuide, RestorePoints
     d = SettingsDialog(window, "general")
-    assert any(b.text() == "Reset…" for b in d.findChildren(QPushButton))
+    assert any(b.text() == "Reset" for b in d.findChildren(QPushButton))
     restarts = []
     monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
     g = ResetGuide(window)

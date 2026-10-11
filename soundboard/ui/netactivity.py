@@ -234,7 +234,7 @@ class NetActivity(QWidget):
         # in a small Settings window (Copy and Clear far right beside the summary looked
         # out of line with Totals and Open log)
         row = Flow(gap=8)
-        self.totals = QPushButton(_("Totals…"))
+        self.totals = QPushButton(_("Totals"))
         self.totals.setToolTip(_("How much data went to each site, added up over the whole "
                                  "history"))
         self.open_log = QPushButton(_("Open log"))
