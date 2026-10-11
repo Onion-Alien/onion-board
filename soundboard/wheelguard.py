@@ -51,20 +51,20 @@ class AppStyle(QProxyStyle):
             snug_combo(arg, self.COMBO_CAP)
         elif isinstance(arg, QMenu):
             arg.installEventFilter(_submenu_edge())   # once: Qt doesn't add it twice
-        elif isinstance(arg, QWidget) and arg.windowType() == Qt.Popup:
+        elif isinstance(arg, QWidget) and arg.windowType() == Qt.WindowType.Popup:
             arg.installEventFilter(_submenu_edge())
 
     def pixelMetric(self, metric, opt=None, widget=None):
-        if metric == QStyle.PM_SubMenuOverlap:
+        if metric == QStyle.PixelMetric.PM_SubMenuOverlap:
             return self.SUBMENU_GAP
         return super().pixelMetric(metric, opt, widget)
 
     def styleHint(self, hint, opt=None, widget=None, ret=None):
-        if hint in (QStyle.SH_ComboBox_AllowWheelScrolling,
-                    QStyle.SH_TabBar_AllowWheelScrolling):
+        if hint in (QStyle.StyleHint.SH_ComboBox_AllowWheelScrolling,
+                    QStyle.StyleHint.SH_TabBar_AllowWheelScrolling):
             return 0
-        if hint == QStyle.SH_Slider_AbsoluteSetButtons:
-            return Qt.LeftButton.value
+        if hint == QStyle.StyleHint.SH_Slider_AbsoluteSetButtons:
+            return Qt.MouseButton.LeftButton.value
         return super().styleHint(hint, opt, widget, ret)
 
 
@@ -73,24 +73,24 @@ class _SubmenuEdge(QObject):
     GAP = 2
 
     def eventFilter(self, obj, ev):
-        if ev.type() == QEvent.Show and obj.windowType() == Qt.Popup:
+        if ev.type() == QEvent.Type.Show and obj.windowType() == Qt.WindowType.Popup:
             # A popup grabs the mouse before the opener receives Leave. Moving away
             # while it is open can then leave both QSS and custom hover fills stuck.
             # Send the normal leave events, including to hovered cards and parents.
             for window in QApplication.topLevelWidgets():
-                if window is obj or window.windowType() == Qt.Popup:
+                if window is obj or window.windowType() == Qt.WindowType.Popup:
                     continue
                 for widget in [window, *window.findChildren(QWidget)]:
                     if widget.window() is window and widget.underMouse():
-                        widget.setAttribute(Qt.WA_UnderMouse, False)
-                        QApplication.sendEvent(widget, QEvent(QEvent.Leave))
-                        if widget.testAttribute(Qt.WA_Hover):
+                        widget.setAttribute(Qt.WidgetAttribute.WA_UnderMouse, False)
+                        QApplication.sendEvent(widget, QEvent(QEvent.Type.Leave))
+                        if widget.testAttribute(Qt.WidgetAttribute.WA_Hover):
                             QApplication.sendEvent(widget, QHoverEvent(
-                                QEvent.HoverLeave, QPointF(-1, -1),
+                                QEvent.Type.HoverLeave, QPointF(-1, -1),
                                 QPointF(widget.mapToGlobal(widget.rect().center())),
                                 QPointF(-1, -1)))
                         widget.update()
-        if ev.type() == QEvent.Show and isinstance(obj, QMenu):
+        if ev.type() == QEvent.Type.Show and isinstance(obj, QMenu):
             parent = obj.parentWidget()
             if isinstance(parent, QMenu) and parent.isVisible():
                 pg, g = parent.geometry(), obj.geometry()
@@ -120,15 +120,15 @@ def snug_combo(cb: QComboBox, cap: int = AppStyle.COMBO_CAP):
     non-default size policy is left alone. Redone whenever its choices change."""
     managed = cb.property("snug")
     if managed is None:
-        if (cb.sizePolicy().horizontalPolicy() != QSizePolicy.Preferred
+        if (cb.sizePolicy().horizontalPolicy() != QSizePolicy.Policy.Preferred
                 or cb.maximumWidth() < QWIDGETSIZE_MAX):
             cb.setProperty("snug", False)
             return
         cb.setProperty("snug", True)
-        short = cb.sizeAdjustPolicy() != QComboBox.AdjustToContentsOnFirstShow
+        short = cb.sizeAdjustPolicy() != QComboBox.SizeAdjustPolicy.AdjustToContentsOnFirstShow
         if short and not cb.minimumWidth():
             cb.setMinimumWidth(cb.minimumSizeHint().width())   # keep the short floor
-        cb.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         m = cb.model()
         refit = lambda *_a: _refit(cb, cap)  # noqa: E731
         for sig in (m.rowsInserted, m.rowsRemoved, m.modelReset, m.dataChanged):
@@ -149,7 +149,7 @@ def _refit(cb: QComboBox, cap: int):
 
 class _Guard(QObject):
     def eventFilter(self, obj, ev):
-        if ev.type() == QEvent.Wheel and isinstance(
+        if ev.type() == QEvent.Type.Wheel and isinstance(
                 obj, (QComboBox, QAbstractSpinBox, QAbstractSlider)) \
                 and not isinstance(obj, QScrollBar):
             w = obj.parentWidget()
