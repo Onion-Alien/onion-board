@@ -161,7 +161,8 @@ TILE_W, TILE_H = 138, 112     # a device tile; TILE_COLS of them fill the page's
 TILE_COLS, TILE_GAP = 4, 12
 CONTENT_W = TILE_COLS * TILE_W + (TILE_COLS - 1) * TILE_GAP   # a page's width: one row
 MARGIN = 24                   # the dialog's sides: the step bar, pages and Back / Next
-USE_TILE_H = 64               # "What's it for?": wider, shorter tiles, two across
+USE_TILE_H = 72               # "What's it for?": the same tiles, one row, no second line
+HEADER_GAP = 20               # every step: between the title + words and what's below
 # Bun beside each step's title: about as tall as the title and its words, so the
 # header ends where its text does (his default padding left an empty band under it)
 BUN_H, BUN_PAD = 100, 10
@@ -644,23 +645,22 @@ class SetupWizard(QDialog):
                                      "→ <b>Tabs</b>.")),
                             BunnyWidget("star", height=BUN_H, pad=BUN_PAD)))
         box = QWidget()
-        grid = QGridLayout(box)   # two across, icon beside the name
+        grid = QGridLayout(box)   # one row, like the device tiles
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(TILE_GAP)
         self.use_group = QButtonGroup(box)
         self.use_buttons: dict[str, QRadioButton] = {}
         self._use_words: dict[str, str] = {}
-        wide = (CONTENT_W - TILE_GAP) // 2
         for i, (key, icon, title, words) in enumerate(uses()):
-            rb = ChoiceTile(title, icon, wide, USE_TILE_H, stacked=False)
+            rb = ChoiceTile(title, icon, TILE_W, USE_TILE_H)
             rb.setProperty("use", key)
             rb.setChecked(key == self._use)
             self.use_group.addButton(rb)
-            grid.addWidget(rb, i // 2, i % 2)
+            grid.addWidget(rb, 0, i)
             self.use_buttons[key] = rb
             self._use_words[key] = words
-        grid.setColumnStretch(2, 1)
-        v.addSpacing(4)
+        grid.setColumnStretch(len(uses()), 1)
+        v.addSpacing(HEADER_GAP)
         v.addWidget(box)
         v.addSpacing(12)
         card, cl = _card(14, 8, roomy=False)
@@ -705,7 +705,7 @@ class SetupWizard(QDialog):
             self._pick_mic(cur)
         lst, self.mic_group = self._choice_list(
             mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
-        v.addSpacing(4)
+        v.addSpacing(HEADER_GAP)
         v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
         v.addSpacing(12)
         self.mic_heard = _label("")
@@ -734,11 +734,13 @@ class SetupWizard(QDialog):
             self._pick_headphones(cur)
         lst, __ = self._choice_list(outs, cur,
                                    lambda n: self._pick_headphones(n, by_user=True))
-        v.addSpacing(6)
+        v.addSpacing(HEADER_GAP)
         v.addWidget(lst)
-        v.addSpacing(10)
-        # a round speaker button in a card, with what to do next to it
-        card, cl = _card(14, roomy=False)
+        v.addSpacing(12)
+        # a round speaker button in a card, with what to do next to it: as wide as
+        # its words (not the page), with room above and below
+        card, cl = _card(16, roomy=False)
+        cl.setContentsMargins(16, 16, 24, 16)
         row = QHBoxLayout()
         row.setSpacing(16)
         play = self.btn_test = _RoundButton(56)
@@ -755,11 +757,16 @@ class SetupWizard(QDialog):
         hint = _label(_("Only you hear it. Didn't hear it? Pick another one and try again."),
                       "font-size:10pt;")
         hint.setObjectName("muted")
+        for lbl in (self.test_hint, hint):   # one line each: the card is as wide as them
+            lbl.setWordWrap(False)
         words.addWidget(hint)
         words.addStretch(1)
         row.addLayout(words, 1)
         cl.addLayout(row)
-        v.addWidget(card)
+        card_row = QHBoxLayout()
+        card_row.addWidget(card)
+        card_row.addStretch(1)
+        v.addLayout(card_row)
         v.addStretch(1)
         return p
 
@@ -788,7 +795,7 @@ class SetupWizard(QDialog):
         # the answer to "is it working?" right under the intro, in a card of its own
         self.status_card = StatusCard(self.cable_status)
         self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignLeft)
-        v.insertSpacing(1, 4)
+        v.insertSpacing(1, HEADER_GAP)
         v.insertWidget(2, self.status_card)
         self.cable_bar = QProgressBar()
         self.cable_bar.setRange(0, 0)   # busy: we can't know how long Windows takes
@@ -951,12 +958,15 @@ class SetupWizard(QDialog):
     def _page_discord(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
+        v.setSpacing(8)
         self.discord_text = _label("")
         head = _header(_("Last step: tell Discord or your game"), self.discord_text,
                        BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD))
         self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
         v.addLayout(head)
-        row = QHBoxLayout()
+        self.helper_row = QWidget()   # (takes no room when both buttons are hidden)
+        row = QHBoxLayout(self.helper_row)
+        row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(10)
         self.btn_copy = QPushButton(_("Copy the name"))
         icons.set_icon(self.btn_copy, "copy")
@@ -967,9 +977,8 @@ class SetupWizard(QDialog):
         nomic.clicked.connect(self.win.open_windows_mic)
         row.addWidget(nomic)
         row.addStretch(1)
-        v.addSpacing(12)
-        v.addLayout(row)
-        v.addSpacing(12)
+        v.addSpacing(HEADER_GAP - 8)
+        v.addWidget(self.helper_row)
         # straight into the mic, Discord needs nothing to work: its one tip is a small
         # pill (shut until clicked) that opens a card under it, not a paragraph
         self.discord_fold = FoldPill(_("Discord: one setting worth changing"), "speech")
@@ -1545,6 +1554,7 @@ class SetupWizard(QDialog):
         streamer = self.win.cfg.use_mode == "streamer"
         self.btn_streamer.setVisible(streamer)
         self.help_card.setVisible(games or streamer)
+        self.helper_row.setVisible(not (self.btn_copy.isHidden() and self.btn_nomic.isHidden()))
 
     def _fill_discord_text(self):
         cfg = self.win.cfg

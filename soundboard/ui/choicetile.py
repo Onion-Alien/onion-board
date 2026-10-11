@@ -128,16 +128,18 @@ class ChoiceTile(QRadioButton):
             size = 24
             pm = icons.icon(self.icon_name, colour).pixmap(QSize(size, size),
                                                             self.devicePixelRatioF())
-            p.drawPixmap(round((self.width() - size) / 2), 12, pm)
-            top = 12 + size + 6
-            bottom = self.height() - FOOT_PAD - foot
             small = QFont(self.font())
             small.setPointSizeF(HINT_PT)
             sub_h = QFontMetrics(small).height() if self.sub else 0
-            words = QRectF(10, top, self.width() - 20, bottom - top - sub_h)
             fm = QFontMetrics(p.font())
-            room = max(1, int(words.height() // fm.lineSpacing()))
-            lines = wrap(text, fm, int(words.width()), room)
+            bottom = self.height() - FOOT_PAD - foot
+            room = max(1, int((bottom - 12 - size - 6 - sub_h) // fm.lineSpacing()))
+            lines = wrap(text, fm, self.width() - 20, room)
+            # icon, words and kind centred as one block: no band under a short name
+            block = size + 6 + len(lines) * fm.lineSpacing() + sub_h
+            y0 = max(10.0, (bottom - block) / 2 + 2)
+            p.drawPixmap(round((self.width() - size) / 2), round(y0), pm)
+            words = QRectF(10, y0 + size + 6, self.width() - 20, len(lines) * fm.lineSpacing())
             y = words.top()
             for line in lines:
                 p.drawText(QRectF(words.left(), y, words.width(), fm.lineSpacing()),
