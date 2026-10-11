@@ -143,7 +143,7 @@ the affected states; include its PR and validation evidence here.
   spacing. Keep technical settings as readable forms where appropriate; do not add
   decorative tiles or redundant pills merely to satisfy a visual quota.
 
-  Done (PR #PRNUM): rendered all 13 pages (Settings is a page in the window since U4).
+  Done (PR #423): rendered all 13 pages (Settings is a page in the window since U4).
   The cards already have a heading, a hint and compact labelled rows; kept as forms.
   Fixed where one card broke the pattern: General's *Play pads with one click* had its
   explanation at the card's edge (now `_option`, under the box's text like the rest);
