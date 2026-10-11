@@ -1,0 +1,1 @@
+- Remote control: `/api/queue` answers `"playing"` instead of `"queued"` when nothing was playing and the sound started at once.

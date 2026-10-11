@@ -5770,13 +5770,15 @@ class MainWindow(QMainWindow):
         return any(sid in self._meta and not paused
                    for sid, (_p, paused) in self.engine.playing().items())
 
-    def queue_sound(self, sid: str):
-        """Play `sid` once the board's sounds playing now have finished (now, if none are)."""
+    def queue_sound(self, sid: str) -> bool:
+        """Play `sid` once the board's sounds playing now have finished (now, if none are:
+        True then)."""
         if not self._pads_playing() and not self._queue:
             self.play(sid, now=True)
-            return
+            return True
         self._queue.append(sid)
         self._say_queue()
+        return False
 
     def queue_category(self, name: str, shuffled: bool):
         """Play every sound in category `name`, one after another."""

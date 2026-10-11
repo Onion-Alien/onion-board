@@ -409,6 +409,12 @@ def test_voices_say_queue_and_hear(qapp, window):
     assert [q["name"] for q in d("status")[1]["queue"]] == ["Airhorn", "Boom"]
     assert d("queue", name="nope")[0] == 404 and d("queue", category="Nope")[0] == 404
     assert d("queue", clear="1") == (200, {"queue": []})
+    played.clear()                                     # nothing playing: it plays at once
+    st, body = d("queue", name="boom")
+    assert st == 200 and body["playing"] == "s0" and "queued" not in body and body["queue"] == []
+    st, body = d("queue", name="airhorn")              # now something is: it waits
+    assert st == 200 and body["queued"] == "s1" and "playing" not in body
+    d("queue", clear="1")
 
     assert d("hear", on="1") == (200, {"hear": True}) and w.engine.mic_check
     assert w.btn_check.isChecked() and d("status")[1]["hear"] is True
