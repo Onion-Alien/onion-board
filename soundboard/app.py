@@ -405,7 +405,7 @@ def ui_scale_startup(app_dir: Path) -> int:
 def main():
     for stream in (sys.stdout, sys.stderr):   # a path with emoji or Cyrillic in it, sent
         if stream is not None and hasattr(stream, "reconfigure"):   # to a file or pipe,
-            stream.reconfigure(errors="replace")   # mustn't stop the command line
+            stream.reconfigure(errors="replace")   # pyright: ignore[reportAttributeAccessIssue]  # hasattr
     if "--selftest" in sys.argv:
         sys.exit(selftest())
     if "--get-tor" in sys.argv:
@@ -473,7 +473,8 @@ def main():
     # listen at once, not after the ~1 s of imports below: a second launch meanwhile
     # would otherwise find nobody answering (the window is looked up when asked)
     holder = {}
-    app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
+    server = listen_for_second_launch(app, lambda: holder.get("w"))
+    app.instance_server = server   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     from soundboard.autostart import TRAY_ARG
     from soundboard.ui import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
@@ -516,7 +517,7 @@ def main():
     exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
         getattr(app, "hangwatch", None), "beat", time.monotonic()))
     if (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
-            or app.instance_server.show_requested):    # ...unless launched again since
+            or server.show_requested):    # ...unless launched again since
         w.show()
     splash.close()
     from PySide6.QtCore import QTimer
@@ -545,9 +546,11 @@ def main():
     recheck.timeout.connect(w.send_usage)
     recheck.start(6 * 3600 * 1000)
     from soundboard.hangwatch import HangWatch
-    app.hangwatch = HangWatch(parent=app)   # a frozen window gets its stack logged
+    # a frozen window gets its stack logged
+    app.hangwatch = HangWatch(parent=app)   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     from soundboard.uigc import UiCollector
-    app.collector = UiCollector(parent=app)  # garbage collection on this thread only
+    # garbage collection on this thread only
+    app.collector = UiCollector(parent=app)   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     code = app.exec()
     # w.shutdown already ran (aboutToQuit). Python's own teardown after this -- Qt,
     # the web view, COM, audio objects -- can hang with the window gone, leaving an
