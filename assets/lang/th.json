@@ -2989,5 +2989,10 @@
   "Only looks: never clicks or types in your game": "แค่ดู: ไม่คลิกหรือพิมพ์ในเกมของคุณ",
   "Plays one of your sounds when something happens in your game.": "เล่นเสียงของคุณเมื่อมีบางอย่างเกิดขึ้นในเกม",
   "Rare spawns, queue pops, “YOU DIED”": "ของหายากเกิด, คิวเด้ง, “YOU DIED”",
-  "Watches the game's window, even behind others": "เฝ้าดูหน้าต่างเกม แม้อยู่หลังหน้าต่างอื่น"
+  "Watches the game's window, even behind others": "เฝ้าดูหน้าต่างเกม แม้อยู่หลังหน้าต่างอื่น",
+  "Browsers": "เบราว์เซอร์",
+  "Calls & chat": "โทรและแชท",
+  "Games": "เกม",
+  "Music & media": "เพลงและสื่อ",
+  "Other": "อื่นๆ"
 }

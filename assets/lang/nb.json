@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "Ser bare: klikker eller skriver aldri i spillet ditt",
   "Plays one of your sounds when something happens in your game.": "Spiller en av lydene dine når noe skjer i spillet.",
   "Rare spawns, queue pops, “YOU DIED”": "Sjeldne spawns, kø som spretter, “YOU DIED”",
-  "Watches the game's window, even behind others": "Følger med på spillvinduet, også bak andre"
+  "Watches the game's window, even behind others": "Følger med på spillvinduet, også bak andre",
+  "Browsers": "Nettlesere",
+  "Calls & chat": "Samtaler og chat",
+  "Games": "Spill",
+  "Music & media": "Musikk og medier",
+  "Other": "Annet"
 }
