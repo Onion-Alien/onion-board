@@ -659,8 +659,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "Noise Suppression ialah <b>Standard</b>: ia menelan bunyi yang sekata: tetapkan <b>Noise Suppression</b> kepada <b>None</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Biasanya orang lain mendengar suara dan bunyi anda bersama. Nyahtanda ini untuk bunyi sahaja: mereka dengar bunyi tetapi bukan mikrofon anda. (Sama dengan kotak “Orang lain dengar” di bawah Mikrofon saya.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Biasanya bunyi anda masuk ke mikrofon anda, jadi semua yang mendengar mikrofon anda mendengarnya. Pilih yang lain hanya untuk menghantarnya ke tempat lain: Voicemeeter, mikser, peranti yang dirakam OBS, atau kabel maya.",
-  "Not connected": "Tidak bersambung",
-  "Not connected: click to fix": "Tidak bersambung: klik untuk baiki",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Tidak termasuk di sini: pautan yang anda buka dalam pelayar anda sendiri (Sokong, Laporkan masalah, halaman keluaran) dan muat turun pemasang itu sendiri.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Tiada dalam senarai? Tutup Steam sepenuhnya (klik kanan ikonnya di sebelah jam → Exit) dan bukanya semula.",
   "Not loaded yet: try again in a moment": "Belum dimuatkan: cuba lagi sebentar",
@@ -2957,7 +2955,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik untuk senyapkan bunyi anda bagi orang lain (Discord, permainan, OBS…). Mikrofon anda masih dihantar kecuali penukar suara dihidupkan. Anda masih dengar semuanya",
   "Click to send your sounds again: right now others hear only your mic": "Klik untuk hantar bunyi anda semula: sekarang orang lain hanya dengar mikrofon anda",
   "Only your mic": "Hanya mikrofon anda",
-  "Others hear": "Orang lain dengar",
   "Others hear only your mic": "Orang lain hanya dengar mikrofon anda",
   "Can ring until you stop it": "Boleh berdering sehingga anda hentikan",
   "Free, from GitHub, and only downloaded when you click.": "Percuma, dari GitHub, dan hanya dimuat turun apabila anda klik.",
@@ -3077,5 +3074,10 @@
   "Your mic needs a quick repair": "Mikrofon anda perlu dibaiki sekejap",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Bisukan atau hidupkan mikrofon anda untuk orang lain. Bunyi anda masih dimainkan untuk mereka.",
   "That page has no sound Onion Board can add.": "Halaman itu tiada bunyi yang boleh ditambah oleh Onion Board.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Bunyi yang dibuang kembali dengan Buat asal, atau kemudian dari Sandaran → Bunyi baru dipadam."
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Bunyi yang dibuang kembali dengan Buat asal, atau kemudian dari Sandaran → Bunyi baru dipadam.",
+  "Off Air": "Tidak ke udara",
+  "On Air": "Ke udara",
+  "Not configured": "Belum disediakan",
+  "Not configured: click to fix": "Belum disediakan: klik untuk betulkan",
+  "Can't send to {device}, click to fix": "Tidak boleh hantar ke {device}, klik untuk betulkan"
 }

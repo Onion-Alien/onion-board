@@ -9,7 +9,7 @@ from __future__ import annotations
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 
-from soundboard import theme
+from soundboard import bunnyfit, theme
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
@@ -51,7 +51,8 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
-               nightcap: bool = False, robot: bool = False, smug: bool = False):
+               nightcap: bool = False, robot: bool = False, smug: bool = False,
+               outfit: tuple[str, ...] | None = None):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -60,7 +61,10 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `angry` 0..1 knits them the other way, reddens his cheeks and pops a cross mark
     on his head (`swing` also swings the "bat"). `nightcap` puts his sleeping cap on.
     `robot` draws him as Robo-Bun, metal with glowing LED ears, eyes and chest.
-    `smug`: half-shut eyes, one brow up and a lopsided smirk (he got away with it)."""
+    `smug`: half-shut eyes, one brow up and a lopsided smirk (he got away with it).
+    `outfit`: bunnyfit pieces to dress him in (None: the current theme's, (): none).
+    Robo-Bun wears no outfit."""
+    fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
     phones = QColor(theme.T["accent"])
     phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
@@ -112,7 +116,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         _ellipse(p, 50, 97, 10, 10, ROBOT_CYAN, None)
         _ellipse(p, 50, 97, 4, 4, ROBOT_CYAN_HI, None)
 
+    bunnyfit.draw(p, fit, "back", ink)
     _ellipse(p, 50, 64, 68, 56, fur, ink)
+    bunnyfit.draw(p, fit, "under", ink, hats=not nightcap)
 
     # headphones: band over the head, cups on the sides
     band = QPainterPath(QPointF(17, 64))
@@ -133,6 +139,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
 
     if nightcap:
         _nightcap(p, ink)
+    bunnyfit.draw(p, fit, "over", ink, hats=not nightcap)
 
     # face
     for x in (39, 61):
@@ -243,6 +250,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
+    bunnyfit.draw(p, fit, "face", ink, shut=blink > 0.6)
     _draw_prop(p, prop, ink, swing, fur=fur)
     if angry > 0.5:           # the cartoon cross-vein mark, up on his forehead
         p.setPen(QPen(CROSS, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))

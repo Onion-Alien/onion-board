@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "<b>{q}</b>에 대한 {site} 결과가 없어요.",
   "Nobody: only I hear them": "아무도 없음: 나만 들음",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "보통 사운드는 마이크로 들어가서, 내 마이크를 듣는 모두가 들어요. 다른 곳으로 보내고 싶을 때만 다른 걸 고르세요: Voicemeeter, 믹서, OBS가 캡처하는 장치, 가상 케이블.",
-  "Not connected": "연결 안 됨",
-  "Not connected: click to fix": "연결 안 됨: 클릭해서 고치기",
   "Not reaching your mic, click to fix": "마이크에 안 들어가요, 클릭해서 고치기",
   "Not sending to others (only you hear sounds)": "다른 사람에게 안 보냄(사운드는 나만 들음)",
   "Not sending: pick a device on the Setup tab": "안 보내는 중: 셋업 탭에서 장치를 고르세요",
@@ -2957,7 +2955,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "클릭하면 다른 사람에게 가는 사운드를 음소거해요 (Discord, 게임, OBS…). 보이스 체인저가 켜져 있지 않으면 마이크는 계속 나가요. 나는 계속 다 들려요",
   "Click to send your sounds again: right now others hear only your mic": "클릭하면 사운드를 다시 보내요: 지금 다른 사람은 내 마이크만 들어요",
   "Only your mic": "내 마이크만",
-  "Others hear": "다른 사람이 듣기",
   "Others hear only your mic": "다른 사람은 내 마이크만 들어요",
   "Can ring until you stop it": "멈출 때까지 울리게 할 수 있어요",
   "Free, from GitHub, and only downloaded when you click.": "무료, GitHub에서, 클릭할 때만 다운로드돼요.",
@@ -3077,5 +3074,10 @@
   "Your mic needs a quick repair": "마이크를 빠르게 복구해야 합니다",
   "Mute or unmute your mic for others. Your sounds still play for them.": "다른 사람에게 들리는 마이크를 음소거하거나 해제합니다. 사운드는 계속 들립니다.",
   "That page has no sound Onion Board can add.": "그 페이지에는 Onion Board가 추가할 수 있는 사운드가 없습니다.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "삭제한 사운드는 실행 취소로, 또는 나중에 백업 → 최근 삭제된 사운드에서 되돌릴 수 있습니다."
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "삭제한 사운드는 실행 취소로, 또는 나중에 백업 → 최근 삭제된 사운드에서 되돌릴 수 있습니다.",
+  "Off Air": "방송 꺼짐",
+  "On Air": "방송 중",
+  "Not configured": "설정 안 됨",
+  "Not configured: click to fix": "설정 안 됨: 클릭해서 고치기",
+  "Can't send to {device}, click to fix": "{device}(으)로 보낼 수 없어요. 클릭해서 고치기"
 }

@@ -4,6 +4,7 @@ with Bring back and Delete for good."""
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import Protocol
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHBoxLayout,
@@ -38,12 +39,21 @@ def _texts(what: str, keep_days: int) -> tuple[str, str, str]:
             _("Nothing here. Deleted sounds show up here."))
 
 
+class Source(Protocol):
+    """What DeletedDialog lists: the trash module, or a store of voices with its own bin."""
+    @property
+    def KEEP_DAYS(self) -> int: ...   # noqa: N802 - trash's name
+    def items(self, kind: str | None = None) -> list[trash.Item]: ...
+    def take(self, item_id: str) -> trash.Item | None: ...
+    def forget(self, item_id: str) -> None: ...
+
+
 class DeletedDialog(QDialog):
     """`restore(item)` puts a taken-out entry back and returns whether it could.
     `source` has trash's items(kind) / take(id) / forget(id) and KEEP_DAYS."""
 
     def __init__(self, kind: str, what: str, restore: Callable[[trash.Item], bool],
-                 parent=None, source=trash):
+                 parent=None, source: Source = trash):
         super().__init__(parent)
         fit.watch(self)
         self.kind, self.what, self.restore, self.source = kind, what, restore, source

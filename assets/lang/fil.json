@@ -671,8 +671,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "<b>Standard</b> ang Noise Suppression: kinakain nito ang tuloy-tuloy na tunog: gawing <b>None</b> ang <b>Noise Suppression</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Karaniwan, sabay na naririnig ng iba ang boses mo at ang mga sound mo. I-untick ito para sound lang: maririnig nila ang mga sound pero hindi ang mic mo. (Kapareho ng “Naririnig ng iba” na box sa ilalim ng Mic ko.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Karaniwan, pumupunta sa mic mo ang mga sound mo, kaya naririnig sila ng lahat ng nakakarinig sa mic mo. Pumili lang ng iba kung gusto mong ipadala sila sa ibang lugar: Voicemeeter, mixer, device na kinukuha ng OBS, o virtual cable.",
-  "Not connected": "Hindi nakakonekta",
-  "Not connected: click to fix": "Hindi nakakonekta: i-click para ayusin",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Hindi sakop nito: mga link na binubuksan mo sa sarili mong browser (Support, Report a problem, release pages) at mga sariling download ng installer.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Wala sa listahan? Isara nang tuluyan ang Steam (i-right-click ang icon nito malapit sa orasan → Exit) at buksan ulit.",
   "Not loaded yet: try again in a moment": "Hindi pa na-load: subukan ulit maya-maya",
@@ -3021,7 +3019,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "I-click para i-mute ang mga sound mo para sa iba (Discord, ang laro, OBS…). Naipapadala pa rin ang mic mo maliban kung naka-on ang voice changer. Naririnig mo pa rin ang lahat",
   "Click to send your sounds again: right now others hear only your mic": "I-click para ipadala ulit ang mga sound mo: mic mo lang ang naririnig ng iba ngayon",
   "Only your mic": "Mic mo lang",
-  "Others hear": "Naririnig ng iba",
   "Others hear only your mic": "Mic mo lang ang naririnig ng iba",
   "Can ring until you stop it": "Puwedeng tumunog hanggang ihinto mo",
   "Free, from GitHub, and only downloaded when you click.": "Libre, mula sa GitHub, at dina-download lang kapag nag-click ka.",
@@ -3150,5 +3147,10 @@
   "Your mic needs a quick repair": "Kailangan ng mabilis na ayos ng mic mo",
   "Mute or unmute your mic for others. Your sounds still play for them.": "I-mute o i-unmute ang mikropono mo para sa iba. Naririnig pa rin nila ang mga sound mo.",
   "That page has no sound Onion Board can add.": "Walang sound sa page na iyon na maidadagdag ng Onion Board.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Bumabalik ang mga inalis na sound sa I-undo, o mamaya mula sa Backup → Kamakailang binurang mga sound."
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Bumabalik ang mga inalis na sound sa I-undo, o mamaya mula sa Backup → Kamakailang binurang mga sound.",
+  "Off Air": "Off air",
+  "On Air": "On air",
+  "Not configured": "Hindi naka-set up",
+  "Not configured: click to fix": "Hindi naka-set up: i-click para ayusin",
+  "Can't send to {device}, click to fix": "Hindi makapagpadala sa {device}, i-click para ayusin"
 }

@@ -661,6 +661,25 @@ def test_shutdown_waits_out_a_buffer_being_handed_over(qapp):
     p.shutdown()                                  # twice (the window, then the tab): fine
 
 
+def test_reopening_a_playing_stream_never_hangs_the_window(qapp, server):
+    """A station that drops is reopened while Qt's decoding thread is still handing over
+    buffers. The reopen stopped the old stream without unhooking them first: Qt's stop()
+    waited for that thread, which waited for Python's lock, and the window froze."""
+    p = RadioPlayer()
+    p.play(Station(uuid="u", name="Tone FM", url=server.base + "/stream.wav"))
+    try:
+        assert process_events(qapp, lambda: p.status == "playing", timeout=15)
+        for _ in range(25):                        # froze within about 6 on the old code
+            p._open()
+            t0 = time.monotonic()
+            while time.monotonic() - t0 < 0.15:    # buffers flowing again
+                qapp.processEvents()
+                time.sleep(0.005)
+        assert process_events(qapp, lambda: p.status == "playing", timeout=15)
+    finally:
+        p.stop()
+
+
 def test_player_reports_a_dead_station(qapp, monkeypatch):
     monkeypatch.setattr(radio, "CONNECT_S", 1.5)   # FFmpeg alone can wait for minutes
     p = RadioPlayer()

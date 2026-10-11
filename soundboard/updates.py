@@ -314,7 +314,7 @@ def _length(header) -> int:
 
 
 def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size: int,
-          what: str, size: int = 0, progress: Callable[[int, int], None] | None = None,
+          what: str, size: int = 0, progress: Callable[[int, int], object] | None = None,
           cancelled: Callable[[], bool] | None = None, feature: str = FEATURE) -> Path:
     """Download a release file to `dest` (via dest + ".part", so a failed download
     never leaves a half file under its name) and prove it's the one GitHub lists

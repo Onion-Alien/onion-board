@@ -1,0 +1,1 @@
+- When the sidebar is narrow, a dot on the On Air icon (not on the open/close arrow) says sending isn't set up; clicking the icon opens Setup. The arrow keeps its dot for the other alerts (offline, update).

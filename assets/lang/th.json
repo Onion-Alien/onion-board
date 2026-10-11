@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "ไม่มีผลลัพธ์จาก {site} สำหรับ <b>{q}</b>",
   "Nobody: only I hear them": "ไม่มีใคร: ฉันได้ยินคนเดียว",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "ปกติเสียงของคุณจะเข้าไปในไมค์ ทุกคนที่ได้ยินไมค์คุณก็ได้ยินด้วย เลือกอย่างอื่นเฉพาะเมื่ออยากส่งไปที่อื่นแทน: Voicemeeter, มิกเซอร์, อุปกรณ์ที่ OBS จับเสียง หรือสายเสมือน",
-  "Not connected": "ไม่ได้เชื่อมต่อ",
-  "Not connected: click to fix": "ไม่ได้เชื่อมต่อ: คลิกเพื่อแก้",
   "Not reaching your mic, click to fix": "ไม่ถึงไมค์ของคุณ, คลิกเพื่อแก้",
   "Not sending to others (only you hear sounds)": "ไม่ได้ส่งหาคนอื่น (มีแค่คุณที่ได้ยินเสียง)",
   "Not sending: pick a device on the Setup tab": "ไม่ได้ส่ง: เลือกอุปกรณ์ในแท็บ เซ็ตอัป",
@@ -2957,7 +2955,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "คลิกเพื่อปิดเสียงของคุณสำหรับคนอื่น (Discord, เกม, OBS…) ไมค์ของคุณยังส่งออกไป เว้นแต่จะเปิดโปรแกรมเปลี่ยนเสียงอยู่ คุณยังได้ยินทุกอย่าง",
   "Click to send your sounds again: right now others hear only your mic": "คลิกเพื่อส่งเสียงของคุณอีกครั้ง: ตอนนี้คนอื่นได้ยินแค่ไมค์ของคุณ",
   "Only your mic": "แค่ไมค์ของคุณ",
-  "Others hear": "คนอื่นได้ยิน",
   "Others hear only your mic": "คนอื่นได้ยินแค่ไมค์ของคุณ",
   "Can ring until you stop it": "ดังได้จนกว่าคุณจะหยุด",
   "Free, from GitHub, and only downloaded when you click.": "ฟรี จาก GitHub และดาวน์โหลดเมื่อคุณคลิกเท่านั้น",
@@ -3077,5 +3074,10 @@
   "Your mic needs a quick repair": "ไมค์ของคุณต้องซ่อมเล็กน้อย",
   "Mute or unmute your mic for others. Your sounds still play for them.": "ปิดหรือเปิดเสียงไมโครโฟนของคุณสำหรับผู้อื่น เสียงของคุณยังเล่นให้พวกเขาได้ยิน",
   "That page has no sound Onion Board can add.": "หน้านั้นไม่มีเสียงที่ Onion Board เพิ่มได้",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "เสียงที่ลบจะกลับมาได้ด้วย เลิกทำ หรือภายหลังจาก สำรอง → เสียงที่ลบล่าสุด"
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "เสียงที่ลบจะกลับมาได้ด้วย เลิกทำ หรือภายหลังจาก สำรอง → เสียงที่ลบล่าสุด",
+  "Off Air": "ไม่ออกอากาศ",
+  "On Air": "ออกอากาศ",
+  "Not configured": "ยังไม่ได้ตั้งค่า",
+  "Not configured: click to fix": "ยังไม่ได้ตั้งค่า: คลิกเพื่อแก้",
+  "Can't send to {device}, click to fix": "ส่งไปที่ {device} ไม่ได้ คลิกเพื่อแก้"
 }

@@ -72,7 +72,7 @@ TOR_CONNECT_S = 60.0
 
 # The map's outlines ship with the app: assets/radio in a source checkout, radio/ in the
 # frozen app (build.ps1 bundles it). Nothing is fetched from a CDN.
-ASSET_DIR = (Path(sys._MEIPASS) / "radio" if hasattr(sys, "_MEIPASS")
+ASSET_DIR = (Path(sys._MEIPASS) / "radio" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
              else Path(__file__).resolve().parent.parent / "assets" / "radio")
 # Natural Earth country outlines (public domain): the map's land, where its names go
 COUNTRIES = "ne_110m_admin_0_countries.geojson"
@@ -120,7 +120,7 @@ def radio_dir():
     return library.APP_DIR / "radio"
 
 
-def _http(url: str) -> str:
+def _http(url: object) -> str:
     """A station's web address, or "" if it isn't http(s) or points into this PC / the
     home network (the directory is community-edited: a listing must not be able to make
     the app send requests to the user's router or local services)."""
@@ -170,7 +170,7 @@ def _name_is_local(host: str) -> bool:
         return False
     for info in infos:
         try:
-            if _local_ip(ipaddress.ip_address(info[4][0].split("%")[0])):
+            if _local_ip(ipaddress.ip_address(str(info[4][0]).split("%")[0])):
                 return True
         except ValueError:
             continue
@@ -300,11 +300,13 @@ class Station:
     @cached_property
     def map_point(self) -> dict:
         """globe_points()'s dict for it (it must have lat and lon). Shared: don't change it."""
+        lat, lon = self.lat, self.lon
+        assert lat is not None and lon is not None
         return {"id": self.uuid, "n": self.name, "c": self.country, "cc": self.cc,
                 "s": self.state, "l": self.language, "t": self.tags[:6], "co": self.codec,
                 "b": self.bitrate, "v": self.votes, "tr": self.trend, "h": self.hls,
-                "ck": self.checked, "ch": self.changed, "la": round(self.lat, 4),
-                "lo": round(self.lon, 4), "k": self.clicks}
+                "ck": self.checked, "ch": self.changed, "la": round(lat, 4),
+                "lo": round(lon, 4), "k": self.clicks}
 
 
 def fold(text: str) -> str:
@@ -386,19 +388,24 @@ _DECODER = json.JSONDecoder()
 _SPACE = re.compile(r"[ \t\n\r]*")
 
 
+def _skip(s: str, i: int) -> int:
+    """The index after the whitespace at s[i] (i when there's none)."""
+    return _SPACE.match(s, i).end()   # pyright: ignore[reportOptionalMemberAccess]  # * always matches
+
+
 def _array(s: str, i: int) -> tuple[list, int]:
     """The JSON array at s[i] (its "["), decoded one element at a time; returns it and
     the index just after its "]"."""
     out = []
-    i = _SPACE.match(s, i + 1).end()
+    i = _skip(s, i + 1)
     if s.startswith("]", i):
         return out, i + 1
     while True:
         v, i = _DECODER.raw_decode(s, i)
         out.append(v)
-        i = _SPACE.match(s, i).end()
+        i = _skip(s, i)
         if s.startswith(",", i):
-            i = _SPACE.match(s, i + 1).end()
+            i = _skip(s, i + 1)
         elif s.startswith("]", i):
             return out, i + 1
         else:
@@ -412,28 +419,28 @@ def loads_gently(raw: bytes | str):
     radio and your mic all stuttered. Here a top-level array (or the arrays in a
     top-level object) is decoded one element at a time."""
     s = raw.decode("utf-8") if isinstance(raw, (bytes, bytearray)) else raw
-    i = _SPACE.match(s).end()
+    i = _skip(s, 0)
     if s.startswith("[", i):
         value, i = _array(s, i)
     elif s.startswith("{", i):
         value = {}
-        i = _SPACE.match(s, i + 1).end()
+        i = _skip(s, i + 1)
         if s.startswith("}", i):
             i += 1
         else:
             while True:
                 key, i = _DECODER.raw_decode(s, i)
-                i = _SPACE.match(s, i).end()
+                i = _skip(s, i)
                 if not isinstance(key, str) or not s.startswith(":", i):
                     raise ValueError(f"expected a key at {i}")
-                i = _SPACE.match(s, i + 1).end()
+                i = _skip(s, i + 1)
                 if s.startswith("[", i):
                     value[key], i = _array(s, i)
                 else:
                     value[key], i = _DECODER.raw_decode(s, i)
-                i = _SPACE.match(s, i).end()
+                i = _skip(s, i)
                 if s.startswith(",", i):
-                    i = _SPACE.match(s, i + 1).end()
+                    i = _skip(s, i + 1)
                 elif s.startswith("}", i):
                     i += 1
                     break
@@ -441,7 +448,7 @@ def loads_gently(raw: bytes | str):
                     raise ValueError(f"expected ',' or '}}' at {i}")
     else:
         value, i = _DECODER.raw_decode(s, i)
-    if _SPACE.match(s, i).end() != len(s):
+    if _skip(s, i) != len(s):
         raise ValueError("extra data after the JSON")
     return value
 
@@ -584,7 +591,7 @@ class RadioDirectory(QObject):
             if reply.error() != QNetworkReply.NetworkError.NoError:
                 retry(net.explain(reply.errorString(), started))
                 return
-            raw = bytes(reply.readAll())
+            raw = reply.readAll().data()
             # a maintenance page or a captive portal, say, raises in parse
             self._off_thread(lambda: parse(raw), done, lambda: retry(
                 "the directory sent something that isn't station data"))
@@ -650,6 +657,8 @@ class RadioDirectory(QObject):
         try:
             p = self.cache_path
             raw = loads_gently(p.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                return None
             stations = [s for s in map(Station.from_saved, raw.get("stations", [])) if s]
             return (float(raw.get("time", 0)), stations) if stations else None
         except (OSError, ValueError, AttributeError, TypeError):
@@ -827,6 +836,7 @@ class RadioPlayer(QObject):
         self.station: Station | None = None
         self._player: QMediaPlayer | None = None
         self._out: QAudioBufferOutput | None = None
+        self._halting = False
         self._retries = 0
         self._got_audio = False
         self._reconnecting = False   # a stream that played dropped: reopen until it's back
@@ -923,10 +933,11 @@ class RadioPlayer(QObject):
         self._opened = time.monotonic()
         self._watch.start()
         self._set_state("connecting")
-        self._player.stop()
-        self._player.setSource(QUrl())   # the same URL again is ignored: really reopen it
-        self._player.setSource(QUrl(self.station.url))
-        self._player.play()
+        player, station = self._player, self.station
+        assert player is not None and station is not None   # play() made and set them
+        self._halt_player()   # also empties the source: the same URL again would be ignored
+        player.setSource(QUrl(station.url))
+        player.play()
 
     def _on_connection(self):
         """The Connection setting changed: a playing station reconnects the new way at
@@ -957,17 +968,28 @@ class RadioPlayer(QObject):
         self._gen += 1
         self._watch.stop()
         if self._player is not None:
-            # Qt's stop() waits for its decoding thread while this thread holds Python's
-            # lock; a buffer that thread is handing to _on_buffer needs that lock too: a
-            # deadlock. So _on_buffer is unhooked first and a buffer already on its way
-            # gets a moment (the GIL let go) to finish; station None makes it return.
+            self._halt_player()
+        self._set_state("stopped")
+
+    def _halt_player(self):
+        """Qt's stop() waits for its decoding thread while this thread holds Python's
+        lock; a buffer that thread is handing to _on_buffer needs that lock too: a
+        deadlock (stopping, and reopening a station that dropped). So _on_buffer is
+        unhooked first and a buffer already on its way gets a moment (the GIL let go)
+        to finish; _halting makes it return."""
+        player = self._player
+        if player is None:
+            return
+        self._halting = True
+        try:
             self._unhook_buffers()
             time.sleep(0.005)
-            self._player.stop()
-            self._player.setSource(QUrl())
+            player.stop()
+            player.setSource(QUrl())
+        finally:
+            self._halting = False
             if not self._closed:
                 self._hook_buffers()
-        self._set_state("stopped")
 
     def _hook_buffers(self):
         if self._out is not None:
@@ -994,7 +1016,7 @@ class RadioPlayer(QObject):
                 self._take_buffer(buf)
 
     def _take_buffer(self, buf):
-        if self.station is None:
+        if self.station is None or self._halting:
             return
         gen = self._gen
         x = buffer_to_array(buf)

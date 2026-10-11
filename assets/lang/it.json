@@ -236,8 +236,6 @@
   "No {site} results for <b>{q}</b>.": "Nessun risultato su {site} per <b>{q}</b>.",
   "Nobody: only I hear them": "Nessuno: li sento solo io",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Di solito i tuoi suoni entrano nel microfono, così chi sente il tuo microfono sente anche loro. Scegli altro solo per mandarli altrove: Voicemeeter, un mixer, un dispositivo catturato da OBS o un cavo virtuale.",
-  "Not connected": "Non connesso",
-  "Not connected: click to fix": "Non connesso: clicca per sistemare",
   "Not reaching your mic, click to fix": "Non arriva al microfono: clicca per sistemare",
   "Not sending to others (only you hear sounds)": "Non invia agli altri (i suoni li senti solo tu)",
   "Not sending: pick a device on the Setup tab": "Non invia: scegli un dispositivo nella scheda Configura",
@@ -3021,7 +3019,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Clicca per silenziare i tuoi suoni per gli altri (Discord, il gioco, OBS…). Il tuo microfono continua a passare, a meno che il cambia voce sia attivo. Tu continui a sentire tutto",
   "Click to send your sounds again: right now others hear only your mic": "Clicca per inviare di nuovo i tuoi suoni: ora gli altri sentono solo il tuo microfono",
   "Only your mic": "Solo il tuo microfono",
-  "Others hear": "Gli altri sentono",
   "Others hear only your mic": "Gli altri sentono solo il tuo microfono",
   "Can ring until you stop it": "Può suonare finché non lo fermi",
   "Free, from GitHub, and only downloaded when you click.": "Gratis, da GitHub, e scaricato solo quando fai clic.",
@@ -3150,5 +3147,10 @@
   "Your mic needs a quick repair": "Il tuo microfono ha bisogno di una riparazione veloce",
   "Mute or unmute your mic for others. Your sounds still play for them.": "Disattiva o attiva il tuo microfono per gli altri. I tuoi suoni continuano a sentirli.",
   "That page has no sound Onion Board can add.": "In quella pagina non c'è nessun suono che Onion Board possa aggiungere.",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "I suoni rimossi tornano con Annulla, o più tardi da Backup → Suoni eliminati di recente."
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "I suoni rimossi tornano con Annulla, o più tardi da Backup → Suoni eliminati di recente.",
+  "Off Air": "Fuori onda",
+  "On Air": "In onda",
+  "Not configured": "Non configurato",
+  "Not configured: click to fix": "Non configurato: clicca per sistemare",
+  "Can't send to {device}, click to fix": "Impossibile inviare a {device}, clicca per sistemare"
 }

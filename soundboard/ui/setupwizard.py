@@ -307,7 +307,7 @@ def _label(text: str, css: str = BODY_CSS) -> QLabel:
     return lbl
 
 
-def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
+def _header(title: str | QLabel, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     """A page's title and intro, with Bun (holding something that fits the page)
     beside both, top-aligned with the title. He's no taller than the words, so the
     header ends where they do (BUN_H)."""
@@ -315,7 +315,7 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     row.setSpacing(16)
     col = QVBoxLayout()
     col.setSpacing(10)
-    col.addWidget(_label(title, TITLE_CSS))
+    col.addWidget(_label(title, TITLE_CSS) if isinstance(title, str) else title)
     col.addWidget(body)
     col.addStretch(1)
     row.addLayout(col, 1)
@@ -930,7 +930,8 @@ class SetupWizard(QDialog):
         """The list of other places to send to: every output but your headphones (you'd
         hear everything twice), and nowhere. Filled when shown, after step 2's pick."""
         while self.other_lay.count():
-            w = self.other_lay.takeAt(0).widget()
+            item = self.other_lay.takeAt(0)
+            w = item.widget() if item else None
             if w is not None:
                 w.deleteLater()
         self.other_box.setVisible(on)
@@ -975,9 +976,9 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         v.setSpacing(8)
         self.discord_text = _label("")
-        head = _header(_("Last step: tell Discord or your game"), self.discord_text,
+        self.discord_title = _label(_("Last step: tell Discord or your game"), TITLE_CSS)
+        head = _header(self.discord_title, self.discord_text,
                        BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD))
-        self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
         v.addLayout(head)
         self.helper_row = QWidget()   # (takes no room when both buttons are hidden)
         row = QHBoxLayout(self.helper_row)
