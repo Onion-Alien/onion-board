@@ -3177,6 +3177,7 @@
   "Added the voice “{name}”": "Голос «{name}» додано",
   "Added {n} clip to your Sounds": [
     "{n} кліп додано до ваших звуків",
+    "Кліпів додано до ваших звуків: {n}",
     "Кліпів додано до ваших звуків: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» скопійовано: Ctrl+V вставляє його в редактор або на вкладку «Звуки»",

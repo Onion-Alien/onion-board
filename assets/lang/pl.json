@@ -3177,6 +3177,7 @@
   "Added the voice “{name}”": "Dodano głos „{name}”",
   "Added {n} clip to your Sounds": [
     "Dodano {n} klip do twoich dźwięków",
+    "Klipy dodane do twoich dźwięków: {n}",
     "Klipy dodane do twoich dźwięków: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Skopiowano „{name}”: Ctrl+V wkleja go w edytorze lub na karcie Dźwięki",

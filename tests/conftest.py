@@ -167,6 +167,10 @@ _refuse_closed_ports_at_once()
 # the only stall.
 real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
                                     reason="wall-clock audio timing: too noisy on CI")
+# Hover state (underMouse) follows the real cursor: QTest.mouseMove moves it on a PC,
+# but a hosted runner's desktop has no cursor to move, so hover never starts there.
+real_pc_mouse = pytest.mark.skipif(bool(os.environ.get("CI")),
+                                   reason="needs a real cursor: hosted runners have none")
 
 
 def pytest_configure(config):
@@ -614,6 +618,27 @@ def _stop_what_tests_left_running(monkeypatch):
                 getattr(obj, stop)()
             except RuntimeError:   # its C++ side is already gone (its tab was freed)
                 pass
+
+
+@pytest.fixture(autouse=True)
+def _let_go_of_the_mouse():
+    """Release any mouse button a test left held. QTest keeps the buttons it pressed
+    for the whole process (Qt 6's mouseDClick ends on a press), and with one held
+    every later test's mouseMove is a drag: no widget gets entered or hovered."""
+    yield
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication, QWidget
+    app = QApplication.instance()
+    if app is None or app.mouseButtons() == Qt.NoButton:
+        return
+    from PySide6.QtTest import QTest
+    spot = QWidget()
+    spot.show()
+    for button in (Qt.LeftButton, Qt.RightButton, Qt.MiddleButton):
+        if app.mouseButtons() & button:
+            QTest.mouseRelease(spot, button)
+    spot.close()
+    spot.deleteLater()
 
 
 @pytest.fixture(autouse=True)

@@ -3036,7 +3036,6 @@
   "Update to new version": "更新至新版本",
   "Added the voice “{name}”": "已新增聲音「{name}」",
   "Added {n} clip to your Sounds": [
-    "已將 {n} 個片段新增到你的音效",
     "已將 {n} 個片段新增到你的音效"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "已複製「{name}」：按 Ctrl+V 可貼到編輯器或「音效」分頁",

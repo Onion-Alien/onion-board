@@ -3177,6 +3177,7 @@
   "Added the voice “{name}”": "Přidán hlas „{name}“",
   "Added {n} clip to your Sounds": [
     "Přidán {n} klip do vašich zvuků",
+    "Klipy přidané do vašich zvuků: {n}",
     "Klipy přidané do vašich zvuků: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ zkopírováno: Ctrl+V jej vloží do editoru nebo na kartu Zvuky",

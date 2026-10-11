@@ -1746,7 +1746,9 @@ class SpeechPanel(QWidget):
         b_keep = self.b_keep = QPushButton(_("Save as sound"))
         b_keep.setToolTip(_("Keep the line typed here as a pad on the Sounds tab, in this "
                             "voice (with the voice changer, if it's on for the computer voice)"))
-        icons.set_icon(b_keep, "plus", size=12)
+        # its small icon keeps Qt's own gap: the wider one pushed the Voice tab past the
+        # mini player's width
+        icons.set_icon(b_keep, "plus", size=12, gap=False)
         b_keep.clicked.connect(self._save_line)
         self._line_saved.connect(self._line_done)
         row.addWidget(b_say)

@@ -3036,7 +3036,6 @@
   "Update to new version": "新しいバージョンに更新",
   "Added the voice “{name}”": "ボイス「{name}」を追加しました",
   "Added {n} clip to your Sounds": [
-    "{n} 個のクリップをサウンドに追加しました",
     "{n} 個のクリップをサウンドに追加しました"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "「{name}」をコピーしました: Ctrl+V でエディターかサウンドタブに貼り付けられます",
