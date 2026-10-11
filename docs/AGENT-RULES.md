@@ -83,6 +83,9 @@ Every task, before changing anything (details in `CLAUDE.md`):
   `tests/conftest.py`, never a hard-coded port.
 - A timing test takes the best of several tries and skips on CI. A busy runner
   makes single measurements flaky. `63fe4e5`
+- CI gives a failed or crashed test two more tries (`--reruns 2`), so a flake doesn't
+  block a merge. A test that needed one is listed on the run's summary page as a
+  warning: it's still a bug to fix, not a pass to lean on.
 - Tests never touch the real `%APPDATA%\OnionBoard`, real devices or real hotkeys;
   `conftest.py` fakes them. Keep it that way in new fixtures.
 

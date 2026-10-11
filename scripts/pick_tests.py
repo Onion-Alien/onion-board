@@ -153,7 +153,7 @@ def pick(changed: list[str]) -> list[str]:
 
 
 TIMES = Path(__file__).with_name("test_times.json")
-SHARDS = 3             # jobs a long run is split into (on Windows and on Linux)
+SHARDS = 4             # jobs a long run is split into (on Windows and on Linux)
 SPLIT_FROM_S = 240     # seconds of tests (summed over workers) worth a second job:
                        # each job spends ~35 s starting (checkout, venv cache, Python)
 
