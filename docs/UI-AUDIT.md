@@ -63,6 +63,16 @@ the affected states; include its PR and validation evidence here.
   consistent treatment for each action family, main actions still understandable,
   tooltips/accessibility names on icons and no smaller click targets.
 
+  Folder family done (PR #400): `panel.icon_button` (tooltip and accessible name
+  from one string) and every plain "open this folder" action is now a quiet
+  icon-only folder button: Settings > Data & quality (videos), the Voice tab's
+  speech and add-ons folders, and the crash report. The crash report's button is
+  named "Open folder"; its tooltip adds what the folder holds. Kept labelled on
+  purpose: *Sounds folder* in the toolbar and *Browse for a program*, where a new
+  person needs the words. Checked offscreen in Dark (`tests/test_icon_actions.py`).
+  Still open: the reset, help (*What do these do?*) and configuration families,
+  and *Save as new sound*.
+
 - [ ] **U6: Settings card hierarchy.** Sampled General/Audio/Connection cards are
   predominantly stacked forms; Appearance and Recording have stronger grouping
   and choice hierarchy. Target: `settings.py`. Acceptance: clear headings, compact
@@ -87,6 +97,12 @@ the affected states; include its PR and validation evidence here.
   edges. Existing `DropdownMenu` and `QMenu` usage is a starting point, not evidence
   that these behaviours fail. Include light theme and small windows.
 
+  Started (PR #399): the Sounds bulk Colour menu checks the shared colour (none
+  for a mixed selection) and the empty and filled boards share one "Drop sound
+  files here" hint. Checked offscreen in Dark, Light, High Contrast and Retro 98 at
+  narrow and normal sizes. Still open: the rest of the Sounds menus, and the Apps,
+  Radio and Voice menus.
+
 ## Ready-to-paste LLM handoff
 
 ```text
@@ -99,7 +115,8 @@ for controls/surfaces and section 14 for the UI workflow.
 Use docs/UI-AUDIT.md as the backlog. U1 requires bottom-right dialog actions:
 stretch before the action group, main action first within that group, then
 alternatives/Cancel/Done. Ordinary fields and card/toolbar actions stay beside
-their content. U1 is done (PR #398); work through U2-U4 in separate changes. Report intentional
+their content. U1 is done (PR #398); U5's folder family (PR #400) and part of
+U9 (PR #399) are done. Work through U2-U4 in separate changes. Report intentional
 differences instead of forcing every choice into one widget type. Preserve live
 settings versus draft Save/Cancel, preview, keyboard access and window lifetimes.
 Reuse small shared helpers, translate changed UI text in every language, inspect
