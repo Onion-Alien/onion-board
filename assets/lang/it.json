@@ -803,7 +803,6 @@
   "Couldn't play it: {error}": "Impossibile riprodurlo: {error}",
   "Couldn't re-scan": "Impossibile ripetere la scansione",
   "Couldn't reach GitHub ({error}).": "Impossibile raggiungere GitHub ({error}).",
-  "Couldn't render it": "Impossibile renderizzarlo",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Impossibile ripristinare: il file delle impostazioni era bloccato. Niente è stato cambiato.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Impossibile ripristinare: il file delle impostazioni era bloccato. Niente è stato cambiato.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Impossibile salvare le impostazioni di ripristino. Il punto di ripristino è in Impostazioni > Generali.",
@@ -2058,15 +2057,7 @@
   "Save as a voice": "Salva come voce",
   "Save clip": "Salva clip",
   "Saved clips": "Clip salvate",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Clip salvate ({clips}) · ✓ aggiunte ai tuoi suoni",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Clip salvate ({clips}) · ✓ aggiunti {n} ai tuoi suoni",
-    "Clip salvate ({clips}) · ✓ aggiunti {n} ai tuoi suoni"
-  ],
   "Saved clips ({n})": "Clip salvate ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Clip salvate ({n}) · “{name}” copiate: Ctrl+V lo incolla in un editor o nella scheda Suoni",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Clip salvate ({n}) · nessuna cuffia per riprodurle: selezionale nella scheda Configurazione",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Clip salvate ({n}) · nessun posto dove inviarlo: scegli dove vanno i tuoi suoni nella scheda Configurazione",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Voci salvate che hai eliminato, conservate per {n} giorni in modo da poterle ripristinare",
     "Voci salvate che hai eliminato, conservate per {n} giorni in modo da poterle ripristinare"
@@ -3113,6 +3104,12 @@
   "{error}": "{error}",
   "Update mic effect": "Aggiorna effetto microfono",
   "Update to new version": "Aggiorna alla nuova versione",
+  "Added the voice “{name}”": "Voce “{name}” aggiunta",
+  "Added {n} clip to your Sounds": [
+    "{n} clip aggiunta ai tuoi suoni",
+    "{n} clip aggiunte ai tuoi suoni"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” copiato: Ctrl+V lo incolla in un editor o nella scheda Suoni",
   "Keep": "Tieni",
   "Keep your imported sounds?": "Tenere i suoni importati?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

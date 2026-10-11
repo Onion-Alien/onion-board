@@ -871,7 +871,6 @@
   "Couldn't play it: {error}": "تعذر تشغيلها: {error}",
   "Couldn't re-scan": "تعذرت إعادة الفحص",
   "Couldn't reach GitHub ({error}).": "تعذر الوصول إلى GitHub ({error}).",
-  "Couldn't render it": "لا يمكن تقديمه",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "تعذرت إعادة التعيين: تم قفل ملف الإعدادات. لم يتغير شيء.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "تعذرت الاستعادة: تم قفل ملف الإعدادات. لم يتغير شيء.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "لا يمكن حفظ إعدادات إعادة التعيين. نقطة الاستعادة الخاصة بك موجودة في الإعدادات> عام.",
@@ -2242,19 +2241,7 @@
   "Save as a voice": "حفظ كصوت",
   "Save clip": "حفظ المقطع",
   "Saved clips": "المقاطع المحفوظة",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "المقاطع المحفوظة ({clips}) · ✓ تمت إضافتها إلى الأصوات الخاصة بك",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "المقاطع المحفوظة ({clips}) · ✓ تمت إضافة {n} إلى الأصوات الخاصة بك",
-    "المقاطع المحفوظة ({clips}) · ✓ تمت إضافة {n} إلى الأصوات الخاصة بك",
-    "المقاطع المحفوظة ({clips}) · ✓ تمت إضافة {n} إلى الأصوات الخاصة بك",
-    "المقاطع المحفوظة ({clips}) · ✓ تمت إضافة {n} إلى الأصوات الخاصة بك",
-    "المقاطع المحفوظة ({clips}) · ✓ تمت إضافة {n} إلى الأصوات الخاصة بك",
-    "المقاطع المحفوظة ({clips}) · ✓ تمت إضافة {n} إلى الأصوات الخاصة بك"
-  ],
   "Saved clips ({n})": "المقاطع المحفوظة ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "المقاطع المحفوظة ({n}) · تم نسخ \"{name}\" - يلصقها Ctrl+V في المحرر أو في علامة التبويب \"الأصوات\"",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "المقاطع المحفوظة ({n}) · لا توجد سماعات رأس لتشغيلها: اخترها من علامة التبويب \"إعداد\".",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "المقاطع المحفوظة ({n}) · ليس هناك مكان لإرسالها: اختر المكان الذي تنتقل إليه أصواتك من خلال علامة التبويب \"إعداد\".",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "الأصوات المحفوظة التي قمت بحذفها، تم الاحتفاظ بها لمدة {n} يوم حتى تتمكن من استعادتها",
     "الأصوات المحفوظة التي قمت بحذفها، تم الاحتفاظ بها لمدة {n} من الأيام حتى تتمكن من استعادتها",
@@ -3397,6 +3384,16 @@
   "{error}": "{error}",
   "Update mic effect": "تحديث مؤثر الميكروفون",
   "Update to new version": "التحديث إلى الإصدار الجديد",
+  "Added the voice “{name}”": "تمت إضافة الصوت “{name}”",
+  "Added {n} clip to your Sounds": [
+    "تمت إضافة {n} مقطع إلى أصواتك",
+    "عدد المقاطع المضافة إلى أصواتك: {n}",
+    "عدد المقاطع المضافة إلى أصواتك: {n}",
+    "عدد المقاطع المضافة إلى أصواتك: {n}",
+    "عدد المقاطع المضافة إلى أصواتك: {n}",
+    "عدد المقاطع المضافة إلى أصواتك: {n}"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "تم نسخ “{name}”: يلصقه Ctrl+V في محرر أو في تبويب الأصوات",
   "Keep": "الاحتفاظ",
   "Keep your imported sounds?": "هل تريد الاحتفاظ بالأصوات المستوردة؟",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

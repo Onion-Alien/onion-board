@@ -786,7 +786,6 @@
   "Couldn't play it: {error}": "Không thể phát nội dung đó: {error}",
   "Couldn't re-scan": "Không thể quét lại",
   "Couldn't reach GitHub ({error}).": "Không thể truy cập GitHub ({error}).",
-  "Couldn't render it": "Không thể hiển thị nó",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Không thể đặt lại: tệp cài đặt đã bị khóa. Không có gì được thay đổi.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Không thể khôi phục: tệp cài đặt đã bị khóa. Không có gì được thay đổi.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Không thể lưu cài đặt đặt lại. Điểm khôi phục của bạn nằm trong Cài đặt > Chung.",
@@ -2012,14 +2011,7 @@
   "Save as a voice": "Lưu dưới dạng giọng nói",
   "Save clip": "Lưu đoạn phim",
   "Saved clips": "Clip đã lưu",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Các clip đã lưu ({clips}) · ✓ được thêm vào Âm thanh của bạn",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Các clip đã lưu ({clips}) · ✓ đã thêm {n} vào Âm thanh của bạn"
-  ],
   "Saved clips ({n})": "Các clip đã lưu ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Các clip đã lưu ({n}) · đã sao chép “{name}”: Ctrl+V dán nó vào trình chỉnh sửa hoặc trên tab Âm thanh",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Các clip đã lưu ({n}) · không có tai nghe để phát: chọn chúng trên tab Cài đặt",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Các clip đã lưu ({n}) · không nơi nào để gửi nó: chọn nơi âm thanh của bạn xuất hiện trên tab Thiết lập",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Những giọng nói đã lưu mà bạn đã xóa, được lưu giữ trong {n} ngày để bạn có thể khôi phục chúng"
   ],
@@ -3042,6 +3034,11 @@
   "{error}": "{error}",
   "Update mic effect": "Cập nhật hiệu ứng mic",
   "Update to new version": "Cập nhật lên bản mới",
+  "Added the voice “{name}”": "Đã thêm giọng “{name}”",
+  "Added {n} clip to your Sounds": [
+    "Đã thêm {n} đoạn vào Âm thanh của bạn"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Đã sao chép “{name}”: Ctrl+V dán vào trình chỉnh sửa hoặc thẻ Âm thanh",
   "Keep": "Giữ lại",
   "Keep your imported sounds?": "Giữ lại âm thanh đã nhập?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

@@ -17,6 +17,7 @@ next time they run.
 from __future__ import annotations
 
 import dataclasses
+import html
 import logging
 import math
 import os
@@ -40,7 +41,7 @@ from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
-from soundboard.ui import appstate, icons
+from soundboard.ui import appstate, busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import WAVE_H, ClipEditor
 from soundboard.ui.clipshelf import ClipShelf
@@ -1664,16 +1665,19 @@ class AppsTab(QWidget):
         if not save:
             return
         data = trim_silence(data)
+        row.set_status("")   # "Saving the clip…" is over: the result is a corner card
         if len(data) < int(0.2 * SR):
-            self._flash(row, _("Too short to keep.") if heard
-                        else _("Nothing was recorded: it didn't make a sound."))
+            busy.toast(self, html.escape(_("Too short to keep.") if heard else
+                                         _("Nothing was recorded: it didn't make a sound.")),
+                       "warn")
             return
         error = self._add_clip(row, data)
         if error:   # the window couldn't save it
-            row.set_status(_("Couldn't save the clip: {error}", error=error), error=True)
+            busy.toast(self, html.escape(_("Couldn't save the clip: {error}", error=error)),
+                       "error")
             return
-        self._flash(row, _("✓ Saved a {seconds}s clip to your Sounds.",
-                           seconds=f"{len(data) / SR:.1f}"))
+        busy.toast(self, _("✓ Saved a {seconds}s clip to your Sounds.",
+                           seconds=f"{len(data) / SR:.1f}"), "ok")
 
     def _add_clip(self, row: AppRow, data) -> str:
         """Hand a clip to the window to become a sound; why it couldn't, or ""."""
@@ -1729,18 +1733,19 @@ class AppsTab(QWidget):
         if whole:   # nothing picked out: the dead air at its ends goes
             data = trim_silence(data)
         if len(data) < int(0.05 * SR):
-            row.editor.flash(_("Nothing but silence there."))
+            busy.toast(self, html.escape(_("Nothing but silence there.")), "warn")
             return
         src = (row.app.name if row.app else row.name.text())[:30] or _("App")
         try:
             self.shelf.add(data, f"{src} {time.strftime('%H.%M.%S')}", src)
         except Exception as e:  # noqa: BLE001 - the disk is full, the folder is locked
             log.exception("can't keep the clip")
-            row.editor.flash(_("Couldn't save it: {error}", error=errors.plain(e)), error=True)
+            busy.toast(self, html.escape(_("Couldn't save it: {error}", error=errors.plain(e))),
+                       "error")
             return
-        row.editor.flash(_("✓ Kept {seconds}s in Saved clips below: double-click plays it, "
+        busy.toast(self, _("✓ Kept {seconds}s in Saved clips below: double-click plays it, "
                            "right-click adds it to your Sounds.",
-                           seconds=f"{len(data) / SR:.2f}"))
+                           seconds=f"{len(data) / SR:.2f}"), "ok")
 
     def _shelf_to_sounds(self, data, name: str):
         self.clip_error = ""
@@ -1778,14 +1783,6 @@ class AppsTab(QWidget):
         super().resizeEvent(e)
         if self.big is not None:
             QTimer.singleShot(0, self._fit_big)
-
-    def _flash(self, row: AppRow, text: str):
-        row.set_status(text)
-
-        def clear():
-            if row.status_text == text and not row.status_error:
-                row.set_status("")
-        QTimer.singleShot(5000, row, clear)
 
     # ------------------------------------------------------------------ controls
     def _remember(self, row: AppRow):

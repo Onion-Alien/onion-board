@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Fikk ikke søkt på nytt",
   "Couldn't reach GitHub ({error}).": "Fikk ikke kontakt med GitHub ({error}).",
   "Couldn't read the {name} board": "Fikk ikke lest {name}-brettet",
-  "Couldn't render it": "Fikk ikke lagd den",
   "Couldn't render the preview with these effects (see the log).": "Fikk ikke lagd forhåndsvisningen med disse effektene (se loggen).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Fikk ikke tilbakestilt: innstillingsfilen var låst. Ingenting ble endret.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Fikk ikke gjenopprettet: innstillingsfilen var låst. Ingenting ble endret.",
@@ -2055,15 +2054,7 @@
   "Save as a voice": "Lagre som en stemme",
   "Save clip": "Lagre klippet",
   "Saved clips": "Lagrede klipp",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Lagrede klipp ({clips}) · ✓ lagt til lydene dine",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Lagrede klipp ({clips}) · ✓ la til {n} til lydene dine",
-    "Lagrede klipp ({clips}) · ✓ la til {n} til lydene dine"
-  ],
   "Saved clips ({n})": "Lagrede klipp ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Lagrede klipp ({n}) · kopierte \"{name}\": Ctrl+V limer det inn i et redigeringsprogram eller på Lyder-fanen",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Lagrede klipp ({n}) · ingen hodetelefoner å spille det av i: velg dem på fanen Oppsett",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Lagrede klipp ({n}) · ingen steder å sende det: velg hvor lydene dine skal gå på fanen Oppsett",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Lagrede stemmer du har slettet, beholdt i {n} dag slik at du kan ta dem tilbake",
     "Lagrede stemmer du slettet, beholdt i {n} dager slik at du kan ta dem tilbake"
@@ -3113,6 +3104,12 @@
   "{error}": "{error}",
   "Update mic effect": "Oppdater mikrofoneffekt",
   "Update to new version": "Oppdater til ny versjon",
+  "Added the voice “{name}”": "Stemmen «{name}» er lagt til",
+  "Added {n} clip to your Sounds": [
+    "{n} klipp lagt til i lydene dine",
+    "{n} klipp lagt til i lydene dine"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» kopiert: Ctrl+V limer det inn i et redigeringsprogram eller på Lyder-fanen",
   "Keep": "Behold",
   "Keep your imported sounds?": "Beholde de importerte lydene?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

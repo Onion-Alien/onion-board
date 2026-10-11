@@ -278,6 +278,10 @@ class _Toast(QWidget):
     def text(self) -> str:
         return self._text
 
+    def words(self) -> str:
+        """What it says, as plain words (no markup, entities read)."""
+        return _strip_tags(self._text)
+
     def set_content(self, text: str, kind: str, ms: int, action, progress, on_close=None):
         self._closed()   # what it said before is gone now
         self._on_close = on_close

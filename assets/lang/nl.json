@@ -803,7 +803,6 @@
   "Couldn't play it: {error}": "Kan het niet afspelen: {error}",
   "Couldn't re-scan": "Kan niet opnieuw scannen",
   "Couldn't reach GitHub ({error}).": "Kan GitHub niet bereiken ({error}).",
-  "Couldn't render it": "Kan het niet weergeven",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Kan niet resetten: het instellingenbestand is vergrendeld. Er werd niets veranderd.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Kan niet herstellen: het instellingenbestand is vergrendeld. Er werd niets veranderd.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Kan de reset-instellingen niet opslaan. Uw herstelpunt bevindt zich in Instellingen > Algemeen.",
@@ -2058,15 +2057,7 @@
   "Save as a voice": "Opslaan als stem",
   "Save clip": "Clip opslaan",
   "Saved clips": "Opgeslagen clips",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Opgeslagen clips ({clips}) · ✓ toegevoegd aan je geluiden",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Opgeslagen clips ({clips}) · ✓ heeft {n} toegevoegd aan je geluiden",
-    "Opgeslagen clips ({clips}) · ✓ heeft {n} toegevoegd aan je geluiden"
-  ],
   "Saved clips ({n})": "Opgeslagen clips ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Opgeslagen clips ({n}) · gekopieerd “{name}”: Ctrl+V plakt het in een editor of op het tabblad Geluiden",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Opgeslagen clips ({n}) · geen koptelefoon om deze af te spelen: kies ze op het tabblad Configuratie",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Opgeslagen clips ({n}) · Nergens naartoe te sturen: kies waar je geluiden naartoe gaan op het tabblad Instellingen",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Opgeslagen stemmen die je hebt verwijderd, worden {n} dag bewaard zodat je ze terug kunt halen",
     "Opgeslagen stemmen die je hebt verwijderd, worden {n} dagen bewaard, zodat je ze terug kunt halen"
@@ -3113,6 +3104,12 @@
   "{error}": "{error}",
   "Update mic effect": "Microfooneffect bijwerken",
   "Update to new version": "Bijwerken naar nieuwe versie",
+  "Added the voice “{name}”": "Stem ‘{name}’ toegevoegd",
+  "Added {n} clip to your Sounds": [
+    "{n} clip toegevoegd aan je geluiden",
+    "{n} clips toegevoegd aan je geluiden"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "‘{name}’ gekopieerd: Ctrl+V plakt het in een editor of op het tabblad Geluiden",
   "Keep": "Houden",
   "Keep your imported sounds?": "Geïmporteerde geluiden houden?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

@@ -482,9 +482,10 @@ def test_card_shows_robot_bunny_and_setup_stages_not_pip_output(qapp):
         p._on_install_line("failed (exit code 1)")
         p._on_install_done(False)
         assert not p.bun_robot.building and p.bun_robot.sad > 0.5
-        assert "exit code 1" in p.lbl_install.text()
+        from soundboard.ui import toast
+        assert "exit code 1" in toast.shown(p)[-1].text() and p.lbl_install.isHidden()
         p._on_install_done(False, "network unreachable")
-        assert "network unreachable" in p.lbl_install.text()
+        assert "network unreachable" in toast.shown(p)[-1].text()
     finally:
         p.shutdown()
         p.deleteLater()

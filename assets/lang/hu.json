@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Nem sikerült újra keresni",
   "Couldn't reach GitHub ({error}).": "Nem érhető el a GitHub ({error}).",
   "Couldn't read the {name} board": "Nem sikerült beolvasni ezt a boardot: {name}",
-  "Couldn't render it": "Nem sikerült elkészíteni",
   "Couldn't render the preview with these effects (see the log).": "Nem sikerült elkészíteni az előnézetet ezekkel az effektekkel (lásd a naplót).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Nem sikerült alaphelyzetbe állítani: a beállításfájl zárolva volt. Semmi nem változott.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Nem sikerült helyreállítani: a beállításfájl zárolva volt. Semmi nem változott.",
@@ -2055,15 +2054,7 @@
   "Save as a voice": "Mentés hangként",
   "Save clip": "Klip mentése",
   "Saved clips": "Mentett klipek",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Mentett klipek ({clips}) · ✓ hozzáadva a Hangokhoz",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Mentett klipek ({clips}) · ✓ {n} hozzáadva a Hangokhoz",
-    "Mentett klipek ({clips}) · ✓ {n} hozzáadva a Hangokhoz"
-  ],
   "Saved clips ({n})": "Mentett klipek ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Mentett klipek ({n}) · \"{name}\" másolva: Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Mentett klipek ({n}) · nincs fejhallgató a lejátszáshoz: válassza ki őket a Beállítás lapon",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Mentett klipek ({n}) · nincs hova küldeni: válassza ki a hangok helyét a Beállítás lapon",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "A törölt hangok mentve, {n} napig megőrizve, hogy visszahozhassa őket",
     "A törölt hangok mentve, {n} napig megőrizve, hogy visszahozhassa őket"
@@ -3113,6 +3104,12 @@
   "{error}": "{error}",
   "Update mic effect": "Mikrofoneffekt frissítése",
   "Update to new version": "Frissítés az új verzióra",
+  "Added the voice “{name}”": "„{name}” hang hozzáadva",
+  "Added {n} clip to your Sounds": [
+    "{n} klip hozzáadva a hangjaidhoz",
+    "{n} klip hozzáadva a hangjaidhoz"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” másolva: a Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra",
   "Keep": "Megtartás",
   "Keep your imported sounds?": "Megtartod az importált hangokat?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

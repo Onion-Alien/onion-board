@@ -269,7 +269,6 @@
   "Couldn't re-scan": "Не успях да сканирам пак",
   "Couldn't reach GitHub ({error}).": "Не успях да се свържа с GitHub ({error}).",
   "Couldn't read the {name} board": "Не успях да прочета борда на {name}",
-  "Couldn't render it": "Не успях да го обработя",
   "Couldn't render the preview with these effects (see the log).": "Не успях да направя прегледа с тези ефекти (виж дневника).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Не успях да нулирам: файлът с настройките беше заключен. Нищо не е променено.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Не успях да възстановя: файлът с настройките беше заключен. Нищо не е променено.",
@@ -1962,14 +1961,7 @@
   "Save as a voice": "Запазване като глас",
   "Save clip": "Запазване на клипа",
   "Saved clips": "Запазени клипове",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Запазени клипове ({clips}) · ✓ добавени към вашите звуци",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Запазени клипове ({clips}) · ✓ добави {n} към вашите звуци",
-    "Запазени клипове ({clips}) · ✓ добави {n} към вашите звуци"
-  ],
   "Saved clips ({n})": "Запазени клипове ({n})",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Запазени клипове ({n}) · няма слушалки за възпроизвеждане: изберете ги в раздела Настройка",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Запазени клипове ({n}) · няма къде да го изпратите: изберете къде отиват вашите звуци в раздела Настройка",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Запазени гласове, които сте изтрили, пазени за {n} ден, за да можете да ги върнете",
     "Запазени гласове, които сте изтрили, съхранявани за {n} дни, за да можете да ги върнете"
@@ -2759,7 +2751,6 @@
   "Game voice chat: make your sounds come through clean": "Гласов чат в играта: накарайте звуците си да се чуват чисто",
   "Zoom, Teams and browser calls: make your sounds come through clean": "Zoom, Teams и повиквания на браузъра: накарайте звуците си да се чуват чисто",
   "Couldn't open Discord: is it installed? Open it yourself: ⚙ User Settings → Voice & Video. The link was": "Не можах да отворя Discord: инсталиран ли е? Отворете го сами: ⚙ Потребителски настройки → Глас и видео. Връзката беше",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Запазени клипове ( {n} ) · копирани „ {name} “: Ctrl+V го поставя в редактор или в раздела Звуци",
   "Report copied: paste it into your message (Ctrl+V).": "Докладът е копиран: поставете го в съобщението си (Ctrl+V).",
   "Sorry, something went wrong.": "Съжаляваме, нещо се обърка.",
   "Sorry, Onion Board couldn't start.": "За съжаление Onion Board не можа да стартира.",
@@ -3113,6 +3104,12 @@
   "{error}": "{error}",
   "Update mic effect": "Обнови ефекта",
   "Update to new version": "Обнови до новата версия",
+  "Added the voice “{name}”": "Добавен е гласът „{name}“",
+  "Added {n} clip to your Sounds": [
+    "Добавен е {n} клип към звуците ви",
+    "Добавени са {n} клипа към звуците ви"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ е копиран: Ctrl+V го поставя в редактор или в раздела „Звуци“",
   "Keep": "Запази",
   "Keep your imported sounds?": "Да запазя ли внесените звуци?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
