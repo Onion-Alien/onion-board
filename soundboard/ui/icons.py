@@ -108,6 +108,16 @@ def _stop(p, fill):
     fill(path)
 
 
+def _stop_all(p, fill):
+    """Two stop squares, one behind the other: everything stops, not just this sound."""
+    back = QPainterPath()
+    back.addRoundedRect(QRectF(10, 4, 10, 10), 2.4, 2.4)
+    p.drawPath(back)
+    front = QPainterPath()
+    front.addRoundedRect(QRectF(4, 10, 10, 10), 2.4, 2.4)
+    fill(front)
+
+
 def _expand(p, fill):
     """Four corners pointing out: make it big."""
     for x, y, dx, dy in ((4, 4, 1, 1), (20, 4, -1, 1), (4, 20, 1, -1), (20, 20, -1, -1)):
@@ -612,7 +622,8 @@ SHAPES = {
     "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave, "puzzle": _puzzle,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
-    "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
+    "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
+    "plus": _plus,
     "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,

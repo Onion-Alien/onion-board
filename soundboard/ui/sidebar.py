@@ -1,13 +1,16 @@
 """The main window's tabs as a thin rail down the left: one icon per tab, and a
 button at the bottom that opens it out to show their names, with the onion and
-"by Onion Alien" on top. The QTabWidget stays (its pages, live marks and settings
+the app's name and version on top. The foot is three zones with a thin line between:
+what needs attention (not connected, offline, an update: only when there is one),
+what's on air (Live, who's listening, Stop all), then Settings with the open / shut
+arrow beside it. The QTabWidget stays (its pages, live marks and settings
 all work as before); only its bar is hidden, and the rail mirrors it: each tab's
 icon (live badge, voice picture, warning tint), name, tip and whether it's shown."""
 from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QSizePolicy, QSpacerItem, QTabWidget, QToolButton,
@@ -26,6 +29,9 @@ COMPACT_H = 28     # only genuinely short windows use smaller targets
 SIDE_SHUT = 4      # the rail's own side margins, shut (a 34 px button)...
 SIDE_OPEN = 10     # ...and open
 LIVE_BAR_W = 3     # a live tab's bar on the rail's outer edge (Settings > Live tabs: tint)
+ICON_PAD = " "   # Qt puts only ~4 px between a button's icon and its words, and with a
+                      # style sheet on, no style or QSS rule can change that: an en space
+                      # (~6 px) in front of the words does
 TEXT_W = OPEN_W - 2 * SIDE_OPEN - ICON - 24   # a name's room on the open rail (icon,
                                               # padding, border, the gap after the icon)
 TINT_ALPHA = 0.16  # the current tab's soft accent fill (an outlined box looked heavy)
@@ -187,22 +193,56 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
     w.setProperty("railfull", full or text)
     w.setProperty("railtip", tip)
     rail = w.parentWidget()
-    if isinstance(rail, SideRail):
+    while rail is not None and not isinstance(rail, SideRail):   # (in a see-through box)
+        rail = rail.parentWidget()
+    if rail is not None:
         rail.show_status(w)
 
 
+class ClickLabel(QLabel):
+    """A label that says when it's clicked (the version in the header)."""
+
+    clicked = Signal()
+
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.setCursor(Qt.PointingHandCursor)
+
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton and self.rect().contains(e.position().toPoint()):
+            self.clicked.emit()
+        super().mouseReleaseEvent(e)
+
+
+class _Arrow(QPushButton):
+    """The open / shut arrow; with property "dot" a small warning dot on its corner
+    (an alert is waiting on the shut rail)."""
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        if self.property("dot"):
+            p = QPainter(self)
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(theme.T["warn_text"]))
+            p.drawEllipse(QRectF(self.width() - 12, 4, 8, 8))
+            p.end()
+
+
 class SideRail(QFrame):
-    """The rail. `extras` (More tabs) sit under the tabs; at the bottom `status`
-    (Live, Stop all, the setup pill…: what used to be the window's header) in a
-    column, with readable labels when open, then `foot` (ⓘ, Settings) and the open /
-    shut button. Extras show their "railtext" property as their words while open.
+    """The rail. `extras` (More tabs) sit under the tabs; at the bottom `alerts` (the
+    setup pill, Offline, Update: shown only when needed), then `status` (Live, who's
+    listening, Stop all: what used to be the window's header) in a column, with
+    readable labels when open, then `foot` (Settings) with the open / shut button
+    beside it (under it, shut). Extras show their "railtext" property as their words while open.
     `on_open(bool)` is called when the user opens or shuts it (to save it)."""
 
     orderChanged = Signal(list)
 
     def __init__(self, tabs: SideTabs, logo: QWidget, brand: QLabel, byline: QLabel,
                  extras: list[QPushButton], is_open: bool, foot: list[QPushButton] = (),
-                 on_open=None, status: list[QPushButton] = (), order=()):
+                 on_open=None, status: list[QPushButton] = (), order=(),
+                 alerts: list[QPushButton] = ()):
         super().__init__()
         self.setObjectName("sidebar")
         self.tabs = tabs
@@ -251,32 +291,93 @@ class SideRail(QFrame):
         for w in extras:
             lay.addWidget(w)
         lay.addStretch(1)
-        # what was the window's header, there whatever tab you're on: icons only
-        self.status = list(status)
+        # what was the window's header, there whatever tab you're on: icons only. In the
+        # order they're drawn (the keyboard follows it): what needs attention first
+        self.alerts = list(alerts)
+        self.status = [*self.alerts, *status]
         self._status_box = QBoxLayout(QBoxLayout.TopToBottom)
         self._status_box.setSpacing(4)
         self._status_pad_before = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self._status_pad_after = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self._status_box.addSpacerItem(self._status_pad_before)
+        self.div_alerts = self._divider()   # under the alerts, only while there are any
+        # the alerts, and who's listening, only on the open rail: shut, it keeps just
+        # the few that matter (a dot on the arrow says an alert is waiting)
+        self._open_only: list[QWidget] = []
+        alert_wrap = self._wrap()
         for w in self.status:
             w.setFocusPolicy(Qt.TabFocus)
             w.setFixedWidth(BUTTON_W)
-            self._status_box.addWidget(w)
+            if w in self.alerts:
+                alert_wrap.layout().addWidget(w)
+                w.installEventFilter(self)   # shown / hidden: the line and dot follow
+            elif w.objectName() == "modebtn":
+                wrap = self._wrap()
+                wrap.layout().addWidget(w)
+                self._status_box.addWidget(wrap)
+            else:
+                self._status_box.addWidget(w)
+        if self.alerts:
+            alert_wrap.layout().addWidget(self.div_alerts)
+            self._status_box.insertWidget(1, alert_wrap)
+        else:
+            alert_wrap.deleteLater()
+            self._open_only.remove(alert_wrap)
         self._status_box.addSpacerItem(self._status_pad_after)   # (open: centered horizontally)
         lay.addLayout(self._status_box)
         self._gaps.append(self._gap(6))
-        for w in foot:
-            lay.addWidget(w)
-        self.toggle = QPushButton()
+        lay.addWidget(self._divider())
+        # Settings and the open / shut arrow share a row when open, stack when shut
+        self.toggle = _Arrow()
         self.toggle.setObjectName("railtoggle")
         self.toggle.setCursor(Qt.PointingHandCursor)
         self.toggle.setFocusPolicy(Qt.TabFocus)
         self.toggle.clicked.connect(lambda: self.set_open(not self._open))
         self.toggle.setFixedWidth(SHUT_W - 2 * SIDE_SHUT - 1)   # a tab button's, open too
-        lay.addWidget(self.toggle, 0, Qt.AlignLeft)   # (mirrored: the right)
+        self._foot_box = QBoxLayout(QBoxLayout.TopToBottom)
+        self._foot_box.setSpacing(4)
+        for w in foot:
+            self._foot_box.addWidget(w, 1)
+        self._foot_box.addWidget(self.toggle, 0)   # (mirrored: the right)
+        lay.addLayout(self._foot_box)
         tabs.changed.connect(self.sync)
         tabs.currentChanged.connect(self.sync)
         self._apply()
+
+    def _wrap(self) -> QWidget:
+        """A see-through box for buttons that only the open rail shows."""
+        box = QWidget()
+        box.setObjectName("railslot")
+        lay = QVBoxLayout(box)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(4)
+        self._open_only.append(box)
+        return box
+
+    def _divider(self) -> QFrame:
+        line = QFrame()
+        line.setObjectName("raildiv")   # a 1 px line in the rail's border colour (theme.py)
+        line.setFixedHeight(1)
+        return line
+
+    def eventFilter(self, obj: QObject, e: QEvent) -> bool:
+        if e.type() in (QEvent.Show, QEvent.Hide) and obj in self.alerts:
+            QTimer.singleShot(0, self, self._sync_divider)   # (not after the rail's gone)
+        return False
+
+    def _sync_divider(self):
+        """The line under the alerts is there only while one of them is."""
+        if not self.alerts:
+            return
+        waiting = [w for w in self.alerts if not w.isHidden()]
+        self.div_alerts.setVisible(bool(waiting))
+        # shut, the alerts are out of sight: a dot on the arrow, their names on hover
+        dot = bool(waiting) and not self.is_open()
+        if self.toggle.property("dot") != dot:
+            self.toggle.setProperty("dot", dot)
+            self.toggle.update()
+        names = [w.property("railfull") or "" for w in waiting]
+        self.toggle.setToolTip("\n".join(names) if dot else "")
 
     def set_order(self, order):
         """Move the rail buttons, retaining the pages' fixed indexes everywhere else."""
@@ -361,6 +462,9 @@ class SideRail(QFrame):
         bar = self.tabs.tabBar()
         cur = self.tabs.currentIndex()
         shown = self.is_open()
+        shown_idx = {b: n for n, b in enumerate(
+            (b for b in self.buttons if b.index < self.tabs.count()
+             and self.tabs.isTabVisible(b.index)), 1)}
         for b in self.buttons:
             i = b.index
             if i >= self.tabs.count():
@@ -372,9 +476,10 @@ class SideRail(QFrame):
             b.setIcon(bar.tabIcon(i))
             b.setText(self._fit(b, name) if shown else "")
             b.setAccessibleName(name)
-            # no hover tip (the user's call): the icon says it, and the names are a
-            # click away on the open rail; a live tab's "● ON" line is for a screen reader
-            b.setToolTip("")
+            # open: the name is on the button, no tip. Shut, it's all there is: the name
+            # and the key that jumps to it. (A live tab's "● ON" line is for a screen reader.)
+            n = shown_idx.get(b)
+            b.setToolTip("" if shown or n is None or n > 9 else f"{name}  (Ctrl+{n})")
             b.setAccessibleDescription(tip)
             b.setChecked(i == cur)
             b.update()
@@ -384,7 +489,7 @@ class SideRail(QFrame):
     def _fit(w: QWidget, text: str) -> str:
         """`text` cut with "…" to what fits beside the icon on the open rail (a long
         translation pushed past the rail's edge)."""
-        return w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
+        return ICON_PAD + w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
 
     def _label(self, w: QPushButton, name: str, tip: str, shown: bool):
         """A button under the tabs: its name while open and help for screen readers."""
@@ -476,6 +581,10 @@ class SideRail(QFrame):
             self.show_status(w)
             w.style().unpolish(w)
             w.style().polish(w)
+        self._foot_box.setDirection(QBoxLayout.LeftToRight if shown else QBoxLayout.TopToBottom)
+        for box in self._open_only:
+            box.setVisible(shown)
+        self._sync_divider()
         self.toggle.setVisible(not self._squeezed)
         # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
         icons.set_icon(self.toggle, "back" if shown != self.isRightToLeft() else "forward",
@@ -484,6 +593,7 @@ class SideRail(QFrame):
         # languages); its name is what it does now, on hover and for a screen reader
         self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"), "",
                     False)
+        self._sync_divider()   # (the arrow's tip: _label cleared it)
         self.sync()
         # one height for everything on the rail: the buttons under the tabs came out
         # 3 px shorter, so their focus ring and hover box didn't match the tabs'

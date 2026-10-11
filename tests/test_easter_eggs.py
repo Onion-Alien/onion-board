@@ -1,4 +1,4 @@
-"""Small Easter eggs: the header onion cries when clicked too much, and Bun naps in the
+"""Small Easter eggs: the header onion wobbles when clicked, and Bun naps in the
 small hours (by this PC's clock) until a click wakes him."""
 
 import time
@@ -9,7 +9,6 @@ from PySide6.QtWidgets import QHBoxLayout, QWidget
 
 from soundboard import usage
 from soundboard.ui import bunnywidget as bw
-from soundboard.ui import logowidget as lw
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.logowidget import LogoWidget
 
@@ -22,65 +21,15 @@ def _logo():
     return win, logo
 
 
-def _run(logo, secs, dt=1 / 30):
-    for _ in range(round(secs / dt)):
-        logo.advance(dt)
-
-
-def test_a_few_clicks_only_wobble(qapp):
+def test_a_click_wobbles_and_it_settles(qapp):
     win, logo = _logo()
-    for _ in range(lw.WELL_UP_AT - 1):
-        QTest.mouseClick(logo, Qt.LeftButton)
-    assert logo.squish > 0 and logo.welling == 0 and not logo.crying
-    win.close()
-
-
-def test_enough_quick_clicks_make_it_cry_tears_that_land(qapp, monkeypatch):
-    monkeypatch.setattr(usage, "_used", set())
-    win, logo = _logo()
-    for i in range(lw.CRY_CLICKS - 1):
-        QTest.mouseClick(logo, Qt.LeftButton)
-        if i + 1 >= lw.WELL_UP_AT:
-            assert logo.welling > 0   # eyes welling up on the way
-    assert not logo.crying
-    assert "egg-onion-cried" not in usage._used
-    QTest.mouseClick(logo, Qt.LeftButton)
-    assert logo.crying
-    assert usage._used == {"egg-onion-cried"}   # counted (by name only)
-    _run(logo, 1.0)
-    assert logo.tears and logo._layer is not None and logo._layer.isVisible()
-    assert any(t[5] >= 0 for t in logo.tears)    # some have splashed down
-    assert logo.puddle > 0
-    assert not logo.grab().isNull() and not logo._layer.grab().isNull()
-    win.close()
-
-
-def test_clicks_while_crying_peel_it_and_it_dries_up_after(qapp, monkeypatch):
-    win, logo = _logo()
-    for _ in range(lw.CRY_CLICKS):
-        logo.poke()
-    logo.poke()
-    logo.poke()
-    assert len(logo.peels) == 2
-    clock = [time.monotonic()]
-    monkeypatch.setattr(lw.time, "monotonic", lambda: clock[0])
-    for _ in range(int((lw.CRY_S + 6) * 30)):
-        clock[0] += 1 / 30
-        logo.advance(1 / 30)
-    assert not logo.crying and not logo.tears and not logo.peels and logo.puddle == 0
-    assert logo._layer is None
-    win.close()
-
-
-def test_slow_clicks_never_add_up(qapp, monkeypatch):
-    win, logo = _logo()
-    clock = [1000.0]
-    monkeypatch.setattr(lw.time, "monotonic", lambda: clock[0])
     for _ in range(30):
-        logo.poke()
-        clock[0] += lw.CRY_WINDOW
-        logo.advance(0.03)
-    assert not logo.crying
+        QTest.mouseClick(logo, Qt.LeftButton)
+    assert logo.squish > 0
+    for _ in range(30):
+        logo.advance(1 / 30)
+    assert logo.squish == 0
+    assert not logo.grab().isNull()
     win.close()
 
 
@@ -125,5 +74,5 @@ def test_a_click_wakes_him_grumpy_then_he_dozes_off(qapp, monkeypatch):
 
 def test_the_eggs_are_counted_by_name_only():
     for key in ("egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
-                "egg-onion-cried", "egg-bun-woken"):
+                "egg-bun-woken"):
         assert key in usage.FEATURES
