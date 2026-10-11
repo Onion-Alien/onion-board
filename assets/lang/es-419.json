@@ -134,7 +134,6 @@
   "Add a tab: radio, sending a program's sound, screen triggers": "Agregar una pestaña: radio, enviar el sonido de un programa, disparadores de pantalla",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Agregar como sonido también guarda una copia del video (el pad sigue siendo solo su sonido). Los videos usan muchos más datos: unos 5 a 25 MB por minuto.",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg installed only lower-quality videos can be saved (usually 360p).": "Agregar como sonido también guarda una copia del video (el pad sigue siendo solo su sonido). Los videos usan muchos más datos: unos 5 a 25 MB por minuto. Sin ffmpeg instalado solo se pueden guardar videos de menor calidad (normalmente 360p).",
-  "Add sound files (or drag them onto the window)": "Agregar archivos de sonido (o arrástralos a la ventana)",
   "Add sounds": "Agregar sonidos",
   "Add-on downloads": "Descargas de complementos",
   "Add-on downloads are off (Privacy)": "Las descargas de complementos están desactivadas (Privacidad)",
@@ -898,7 +897,6 @@
   "Recently deleted voices": "Voces eliminadas recientemente",
   "Record": "Grabar",
   "Record a sound": "Grabar un sonido",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Graba un sonido con tu micrófono: el botón Grabar junto a Agregar sonidos.",
   "Record again": "Grabar otra vez",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Graba tu voz, o un pedazo de un sonido, una canción o la radio mientras suena, y guárdalo como sonido.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Grabando lo que suena… reproduce ahora un sonido, un resultado de búsqueda o la radio, y luego haz clic en Detener.",
@@ -3213,5 +3211,11 @@
   "Through proxy": "Por proxy",
   "Tor": "Tor",
   "Tor failed": "Tor falló",
-  "Tor {percent}%": "Tor {percent} %"
+  "Tor {percent}%": "Tor {percent} %",
+  "A whole folder": "Una carpeta completa",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Agrega sonidos: archivos, una carpeta, una grabación, un enlace o un paquete gratis (o arrastra archivos a la ventana)",
+  "From a link": "Desde un enlace",
+  "Paste a link into the search box": "Pega un enlace en el cuadro de búsqueda",
+  "Record a sound with your mic: Add, then Record.": "Graba un sonido con tu micro: Agregar y luego Grabar.",
+  "Sound files": "Archivos de sonido"
 }

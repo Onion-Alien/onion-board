@@ -1342,3 +1342,22 @@ def test_the_tab_key_goes_from_the_side_rail_into_the_page(window, qapp, page):
 
 def test_the_seek_sliders_have_a_name_a_screen_reader_can_say(window):
     assert window.seek.accessibleName() and window.mini_seek.accessibleName()
+
+
+def test_add_is_a_menu_of_every_way_in(window, monkeypatch):
+    """Add opens a menu (a stray click adds nothing); From a link takes a copied link."""
+    from soundboard.i18n import _
+    menu = window.btn_add.menu()
+    assert menu is not None
+    assert [a.text() for a in menu.actions()] == [
+        _("Sound files"), _("A whole folder"), _("Record"), _("From a link"),
+        _("Free sound packs")]
+    shown = []
+    monkeypatch.setattr(window, "_show_link", lambda: shown.append(window.search.text()))
+    QApplication.clipboard().setText("https://www.youtube.com/watch?v=abc")
+    window.add_from_link()
+    assert window.search.text() == "https://www.youtube.com/watch?v=abc" and shown
+    window.search.clear()
+    QApplication.clipboard().setText("not a link")
+    window.add_from_link()
+    assert window.search.text() == ""

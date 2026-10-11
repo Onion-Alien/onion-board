@@ -1449,16 +1449,21 @@ class MainWindow(QMainWindow):
         tb = QHBoxLayout(self.sounds_toolbar)
         tb.setContentsMargins(8, 6, 8, 6)
         tb.setSpacing(6)
-        add = self.btn_add = QPushButton(_("Add sounds"))
+        # every way in under one button: a stray click opens a menu, not a file picker
+        add = self.btn_add = QPushButton(_("Add"))
         # flat like the rest of the toolbar; the accent colour marks it as the main one
         add.setObjectName("soundadd")
-        add.setToolTip(_("Add sound files (or drag them onto the window)"))
-        add.clicked.connect(self.add_dialog)
+        add.setToolTip(_("Add sounds: files, a folder, a recording, a link or a free pack "
+                         "(or drag files onto the window)"))
         icons.set_icon(add, "music", "accent", size=18)
-        self.btn_record = QPushButton(_("Record"))
-        self.btn_record.setObjectName("soundrecord")
-        icons.set_icon(self.btn_record, "mic", size=18)
-        self.btn_record.clicked.connect(self.record_dialog)
+        am = self._add_menu = DropdownMenu(add)
+        icons.set_icon(am.addAction(_("Sound files"), self.add_dialog), "music")
+        icons.set_icon(am.addAction(_("A whole folder"), self.add_folder_dialog), "folder")
+        icons.set_icon(am.addAction(_("Record"), self.record_dialog), "mic")
+        icons.set_icon(am.addAction(_("From a link"), self.add_from_link), "link")
+        icons.set_icon(am.addAction(_("Free sound packs"), self.show_packs), "download")
+        add.setMenu(am)
+        add.setProperty("toolbarMenu", True)
         self.search = QLineEdit()
         self.search.setObjectName("soundssearch")
         # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
@@ -1551,7 +1556,6 @@ class MainWindow(QMainWindow):
             utility.hide()
         # make things, find things, then the library's tools
         tb.addWidget(add)
-        tb.addWidget(self.btn_record)
         tb.addWidget(vsep())
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
@@ -1570,7 +1574,7 @@ class MainWindow(QMainWindow):
         self._label_view()
         tb.addWidget(self.btn_view)
         # Creation actions have their own surfaces; library tools stay quiet.
-        for b in (self.btn_record, self.btn_folder, more, self.btn_bin, self.btn_keys,
+        for b in (self.btn_folder, more, self.btn_bin, self.btn_keys,
                   self.btn_yt, self.btn_view):
             b.setProperty("quiet", True)
         size = QSlider(Qt.Orientation.Horizontal)
@@ -1590,7 +1594,7 @@ class MainWindow(QMainWindow):
         tb.addWidget(size_lbl)
         tb.addWidget(size)
         self._pad_size = (size_lbl, size)
-        for b in (add, self.btn_record, self.btn_yt, self.btn_folder, more, self.btn_keys,
+        for b in (add, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
             b.setFixedHeight(CONTROL_H)
         left.addWidget(self.sounds_toolbar)
@@ -6022,6 +6026,24 @@ class MainWindow(QMainWindow):
         if files:
             self.import_files(files)
 
+    def add_folder_dialog(self):
+        """Add every sound in a folder (and its subfolders), as a drop of it would."""
+        folder = QFileDialog.getExistingDirectory(self, _("Add sounds"), str(Path.home()))
+        if folder:
+            self.import_files(expand_dropped([folder]))
+
+    def add_from_link(self):
+        """A link already copied goes straight into the search box (its card shows);
+        otherwise the box is focused for one to be pasted."""
+        copied = QApplication.clipboard().text().strip()
+        if ytdl.as_link(copied):
+            self.search.setText(copied)
+            self._show_link()
+        else:
+            self.toast(_("Paste a link into the search box"))
+        self.search.setFocus()
+        self.search.selectAll()
+
     def import_files(self, files, extras: dict[str, otherboards.Entry] | None = None):
         """Add sound files (and zips / backups). `extras`: file -> its name, hotkey and
         categories from another soundboard; those already here are skipped quietly."""
@@ -8595,9 +8617,6 @@ class MainWindow(QMainWindow):
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.icon_only(self.btn_add))
-        # a bare red dot read as a warning light, so Record keeps its word until the
-        # folder, Backup and the Listening dropdown have gone
-        f.add(65, "w", r.icon_only(self.btn_record))
         # the search box keeps room to type in until the buttons beside it have shrunk
         f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
                                       r.touch(self.search)))
