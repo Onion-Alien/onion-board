@@ -3081,5 +3081,6 @@
   "Listening: {mode}": "Прослуховування: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Розмовляйте англійською, і інші почують іншу мову. Голос штучного інтелекту або програма зміни голосу вимовляє це, коли один із них увімкнено; інакше натисніть «Пуск», і комп’ютерний голос зробить це.",
   "Type a line and press Enter…": "Введіть рядок і натисніть Enter…",
-  "Category": "Категорія"
+  "Category": "Категорія",
+  "Show more": "Показати ще"
 }

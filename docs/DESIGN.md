@@ -176,6 +176,11 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
   the accent colour when on, never grey.
 - Hover and selection highlights in menus and lists stay neutral (`card_hi`,
   `btn_hover`), not accent.
+- A menu's picked item (the search site, the sort order) shows in the accent colour,
+  its text and icon (`checked_color="accent"`); a dropdown opens with `DropdownMenu`'s
+  8 px gap under its button.
+- Controls above and below a card grid start where the cards' panels do (the search
+  results' Back and Show more).
 - Status text uses `theme.set_tone(label, "ok" | "warn" | "error")`, not a colour.
 - Check contrast in Dark, Light, High Contrast and Retro 98 at least: 4.5:1 for text,
   3:1 for a control's edge.

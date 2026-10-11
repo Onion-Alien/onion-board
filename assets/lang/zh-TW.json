@@ -2953,5 +2953,6 @@
   "Listening: {mode}": "聆聽：{mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英語交談，其他人聽到的是另一種語言。當其中一個打開時，AI語音或變聲器會說出來；否則按“開始”，計算機就會發出聲音。",
   "Type a line and press Enter…": "輸入一行並按 Enter…",
-  "Category": "分類"
+  "Category": "分類",
+  "Show more": "顯示更多"
 }

@@ -3017,5 +3017,6 @@
   "Listening: {mode}": "Kuuntelu: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu englanniksi ja muut kuulevat toista kieltä. AI-ääni tai äänenvaihdin sanoo sen, kun jokin niistä on päällä; muussa tapauksessa paina Start ja tietokoneääni tekee sen.",
   "Type a line and press Enter…": "Kirjoita rivi ja paina Enter…",
-  "Category": "Kategoria"
+  "Category": "Kategoria",
+  "Show more": "Näytä lisää"
 }
