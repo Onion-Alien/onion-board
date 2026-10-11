@@ -16,6 +16,7 @@ from __future__ import annotations
 import html
 import threading
 from collections.abc import Callable
+from typing import Any
 
 from PySide6.QtCore import QEvent, QObject, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices, QIcon
@@ -167,7 +168,7 @@ def hold(btn, text: str) -> Callable[..., None]:
 
 
 def run_busy(btn, text: str, fn: Callable[[], object],
-             done: Callable[[object], str | None] | str | None = None,
+             done: Callable[[Any], str | None] | str | None = None,
              ms: int = FLASH_MS):
     """Run ``fn`` (on the GUI thread) with the button showing ``text`` meanwhile, then
     flash ``done`` — a string, or a function of ``fn``'s result returning one."""

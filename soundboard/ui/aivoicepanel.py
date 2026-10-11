@@ -91,7 +91,7 @@ class AiVoicePanel(QWidget):
     _install_note = Signal(str)     # our own words for the card, shown as they are
     _install_done = Signal(bool, str)
 
-    def __init__(self, controller: aivoice.AiVoiceController, settings: dict,
+    def __init__(self, controller: aivoice.AiVoiceController, settings: dict | None,
                  module_list: list[mods.ModuleInfo], engine=None):
         super().__init__()
         self.ctl = controller
