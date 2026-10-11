@@ -78,7 +78,7 @@ the affected states; include its PR and validation evidence here.
   purpose: *Sounds folder* in the toolbar and *Browse for a program*, where a new
   person needs the words. Checked offscreen in Dark (`tests/test_icon_actions.py`).
 
-  Rest done (PR #PRNUM): **reset family** (`panel.reset_button`): one slim muted
+  Rest done (PR #415): **reset family** (`panel.reset_button`): one slim muted
   *Reset* link with the reset arrow beside an effect, the live controls (was *Reset
   all*, a filled button) and a sound's effects (was a small button); the tooltip says
   what goes back, heading rows keep their height. **Help**: the sound modes' *What do
