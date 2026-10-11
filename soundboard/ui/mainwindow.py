@@ -3553,10 +3553,10 @@ class MainWindow(QMainWindow):
             return
         self._attaching = True
         self._autofixing = auto
+        self._declined = False   # (whatever happens now is what the card says)
         if auto:
             self.toast(_("Fixing your mic… (your sound drops for a second)"))
         else:
-            self._declined = False
             self._autofix_err = ""
             # Bun's show explains the first set-up's wait and Yes; a repair or an
             # update says it in the card instead
