@@ -528,8 +528,8 @@ def _announce(t: _Toast, text: str):
 def titled(title: str, text: str) -> str:
     """A message box's title and plain words (lines kept) as a toast's rich text."""
     import html
-    body = html.escape(text).replace("\n", "<br>")
-    return f"<b>{html.escape(title)}</b><br>{body}" if title else body
+    body = html.escape(text, quote=False).replace("\n", "<br>")
+    return f"<b>{html.escape(title, quote=False)}</b><br>{body}" if title else body
 
 
 def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, *,
