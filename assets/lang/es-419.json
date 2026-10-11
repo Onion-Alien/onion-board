@@ -754,7 +754,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} está lista. ¿Reiniciar ahora para instalarla?",
   "Onion Board: quick setup": "Onion Board: configuración rápida",
   "Onion Pocket isn't installed.": "Onion Pocket no está instalado.",
-  "Onion Pocket wasn't removed": "Onion Pocket no se quitó",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket no se quitó: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: tus pads en tu celular",
   "Onion Watch isn't installed.": "Onion Watch no está instalado.",
@@ -1256,7 +1255,6 @@
   "Update settings": "Configuración de actualizaciones",
   "Update to {version}": "Actualizar a {version}",
   "Update: {version}": "Actualización: {version}",
-  "Updated": "Actualizado",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Actualizado a Onion Board {version}. Nada cambia hasta que tú quieras: todo funciona como antes.",
   "Updates": "Actualizaciones",
   "Updates and add-ons": "Actualizaciones y complementos",
@@ -1983,7 +1981,6 @@
   "Onion Watch download progress": "Progreso de la descarga de Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch se está descargando ahora mismo. Inténtalo de nuevo cuando haya terminado.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch aún no está disponible para descargar (GitHub dice que no puede encontrarlo). Vuelve a intentarlo más tarde.",
-  "Onion Watch wasn't removed": "Onion Watch no fue eliminado",
   "Onion Watch wasn't removed: {error}": "Onion Watch no fue eliminado: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch no se actualizó: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} está instalada. Reinicie Onion Board para comenzar a usarlo.",
@@ -2197,7 +2194,6 @@
   "There's no sound to download at that link.": "No hay sonido para descargar en ese enlace.",
   "This add-on has no install steps.": "Este complemento no tiene pasos de instalación.",
   "This copy of Onion Board has no mic effect in it.": "Esta copia de Onion Board no tiene efecto de micrófono.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Esto parece un problema en Onion Board. Informarlo abre una página en nuestro GitHub con los detalles completos; tú eliges qué enviar.",
   "This program's volume in the mix": "El volumen de este programa en la mezcla.",
   "Tone": "Tono",
   "Too short to keep.": "Demasiado corto para conservarlo.",
@@ -3116,5 +3112,15 @@
   "Your sounds and settings are kept.": "Tus sonidos y ajustes se conservan.",
   "{error}": "{error}",
   "Update mic effect": "Actualizar efecto de micrófono",
-  "Update to new version": "Actualizar a la nueva versión"
+  "Update to new version": "Actualizar a la nueva versión",
+  "Keep": "Conservar",
+  "Keep your imported sounds?": "¿Conservar los sonidos importados?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Trajimos <b>{n}</b> sonido de tus otras soundboards. ¿Lo conservas?",
+    "Trajimos <b>{n}</b> sonidos de tus otras soundboards. ¿Los conservas?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Trajimos <b>{n}</b> sonido de {name}. ¿Lo conservas?",
+    "Trajimos <b>{n}</b> sonidos de {name}. ¿Los conservas?"
+  ]
 }

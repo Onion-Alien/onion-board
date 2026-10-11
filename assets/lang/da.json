@@ -754,7 +754,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} er klar. Genstart nu for at installere den?",
   "Onion Board: quick setup": "Onion Board: hurtig opsætning",
   "Onion Pocket isn't installed.": "Onion Pocket er ikke installeret.",
-  "Onion Pocket wasn't removed": "Onion Pocket blev ikke fjernet",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket blev ikke fjernet: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: dine pads på din telefon",
   "Onion Watch isn't installed.": "Onion Watch er ikke installeret.",
@@ -1256,7 +1255,6 @@
   "Update settings": "Opdateringsindstillinger",
   "Update to {version}": "Opdatér til {version}",
   "Update: {version}": "Opdatering: {version}",
-  "Updated": "Opdateret",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Opdateret til Onion Board {version}. Intet ændrer sig, før du vil have det: alt virker som før.",
   "Updates": "Opdateringer",
   "Updates and add-ons": "Opdateringer og add-ons",
@@ -1983,7 +1981,6 @@
   "Onion Watch download progress": "Onion Watch download fremskridt",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch bliver downloadet lige nu. Prøv igen, når det er færdigt.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch er ikke tilgængelig til download endnu (GitHub siger, at den ikke kan finde den). Prøv igen senere.",
-  "Onion Watch wasn't removed": "Onion Watch blev ikke fjernet",
   "Onion Watch wasn't removed: {error}": "Onion Watch blev ikke fjernet: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch blev ikke opdateret: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} er installeret. Genstart Onion Board for at begynde at bruge det.",
@@ -2197,7 +2194,6 @@
   "There's no sound to download at that link.": "Der er ingen lyd at downloade på det link.",
   "This add-on has no install steps.": "Denne tilføjelse har ingen installationstrin.",
   "This copy of Onion Board has no mic effect in it.": "Denne kopi af Onion Board har ingen mikrofoneffekt.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Dette ligner et problem i Onion Board. Rapportering af det åbner en side på vores GitHub med detaljerne udfyldt; du vælger, hvad du vil sende.",
   "This program's volume in the mix": "Dette programs volumen i blandingen",
   "Tone": "Tone",
   "Too short to keep.": "For kort til at beholde.",
@@ -3116,5 +3112,15 @@
   "Your sounds and settings are kept.": "Dine lyde og indstillinger bevares.",
   "{error}": "{error}",
   "Update mic effect": "Opdater mikrofoneffekt",
-  "Update to new version": "Opdater til ny version"
+  "Update to new version": "Opdater til ny version",
+  "Keep": "Behold",
+  "Keep your imported sounds?": "Behold dine importerede lyde?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Vi hentede <b>{n}</b> lyd fra dine andre soundboards. Vil du beholde den?",
+    "Vi hentede <b>{n}</b> lyde fra dine andre soundboards. Vil du beholde dem?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Vi hentede <b>{n}</b> lyd fra {name}. Vil du beholde den?",
+    "Vi hentede <b>{n}</b> lyde fra {name}. Vil du beholde dem?"
+  ]
 }

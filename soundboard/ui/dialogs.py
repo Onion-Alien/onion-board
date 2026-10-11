@@ -11,8 +11,8 @@ from PySide6.QtGui import QFont, QImage, QPixmap
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox, QDialog,
                                QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMessageBox,
-                               QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
+                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QPushButton,
+                               QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
 from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, usage, voicefx
@@ -20,7 +20,7 @@ from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
-from soundboard.ui import busy, fit, icons, sourcedialog
+from soundboard.ui import busy, fit, icons, sourcedialog, toast
 from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
                                  section_label, steady_number)
 from soundboard.ui.trim import TrimPanel
@@ -632,9 +632,8 @@ class EditDialog(QDialog):
             return
         img = QImage(f)
         if img.isNull():
-            QMessageBox.warning(self, _("Couldn't use that picture"),
-                                _("{name} isn't a picture this app can read.",
-                                  name=Path(f).name))
+            busy.toast(self, toast.titled(_("Couldn't use that picture"), _(
+                "{name} isn't a picture this app can read.", name=Path(f).name)), "warn")
             return
         self._set_picture(img)
 
@@ -669,8 +668,8 @@ class EditDialog(QDialog):
             return
         if img is None or img.isNull():
             self.pic_note.setText("")
-            QMessageBox.warning(self, _("Couldn't use that picture"),
-                                err or _("There's no picture at that link."))
+            busy.toast(self, toast.titled(_("Couldn't use that picture"),
+                                          err or _("There's no picture at that link.")), "warn")
             return
         self._set_picture(img)
 

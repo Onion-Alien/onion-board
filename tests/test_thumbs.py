@@ -4,7 +4,6 @@ import json
 import numpy as np
 import pytest
 from PySide6.QtGui import QColor, QImage
-from PySide6.QtWidgets import QMessageBox
 
 from soundboard import library, thumbs
 from soundboard import net as thumbs_net
@@ -420,13 +419,13 @@ def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch
     d.apply()
     assert thumbs.Path(m.image).parent == library.THUMBS_DIR
 
-    warned = []
-    monkeypatch.setattr(QMessageBox, "warning", lambda *a: warned.append(a[2]))
+    from soundboard.ui import toast
     d2 = EditDialog(window.meta("s1"), window.hotkeys, lambda *a: None, window)
     monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("https://ex.com/b", True))
     d2.btn_pic_link.click()
-    assert process_events(qapp, lambda: warned)
-    assert warned == ["There's no picture at that link."] and d2.picture is None
+    assert process_events(qapp, lambda: toast.shown(d2))
+    assert "There's no picture at that link." in toast.shown(d2)[-1].text()
+    assert d2.picture is None
     d2.apply()
     assert not window.meta("s1").image
     d.deleteLater()

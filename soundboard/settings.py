@@ -3399,9 +3399,8 @@ class SettingsDialog(QDialog):
             self.mw.remove_remote_addon(info)
         except modules.ModuleError as e:
             log.warning("Onion Pocket couldn't be removed: %s", e)
-            QMessageBox.warning(self, _("Onion Pocket wasn't removed"),
-                                _("Onion Pocket wasn't removed: {error}",
-                                  error=errors.plain(e)))
+            busy.toast(self, html.escape(_("Onion Pocket wasn't removed: {error}",
+                                           error=errors.plain(e))), "error")
             return
         self.mw.pocket_offer = None
         if getattr(self, "_pocket_slot", None) is not None:
