@@ -161,14 +161,8 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg
   Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
-Filename: "{code:WingetPath}"; \
-  Parameters: "install --id Gyan.FFmpeg.Essentials --exact --silent --disable-interactivity --accept-package-agreements --accept-source-agreements"; \
-  StatusMsg: "Adding M4A and video support (FFmpeg)... this can take a minute."; \
-  Tasks: ffmpeg; Check: MayDownload('ffmpeg'); Flags: runhidden waituntilterminated
-Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --quiet"; \
-  WorkingDir: "{app}\modules\live-voice"; \
-  StatusMsg: "Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)..."; \
-  Tasks: livevoice; Check: HasPython and MayDownload('livevoice'); Flags: runhidden waituntilterminated
+; FFmpeg, live voice and Tor download from CurStepChanged in [Code] (RunExtra), so the
+; window keeps working and Cancel can stop them.
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
 ; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
 ; closing itself: open it again once the new version is in place.
@@ -1070,6 +1064,115 @@ begin
   RegDeleteKeyIfEmpty(HKCU, 'Software\OnionBoard');
 end;
 
+// The extras that download after the files (Tor, FFmpeg, live voice): each runs without
+// the installer waiting on it, through a small PowerShell wrapper that notes its PID and
+// exit code, while a progress page keeps the window working and Cancel is clickable.
+// Cancel stops the one running (its whole process tree) and skips the rest: Onion Board
+// itself is installed by then, so the Finished page still comes.
+var
+  ExtrasPage: TOutputProgressWizardPage;
+  ExtrasCancelled: Boolean;
+  ExtrasSkipped: String;
+
+procedure ExtrasCancelClick(Sender: TObject);
+begin
+  if MsgBox('Stop downloading the extras? Onion Board is already installed, and you can ' +
+            'add them later in the app.', mbConfirmation, MB_YESNO) = IDYES then
+    ExtrasCancelled := True;
+end;
+
+function PsQuote(S: String): String;
+begin
+  Result := S;
+  StringChangeEx(Result, '''', '''''', True);
+  Result := '''' + Result + '''';
+end;
+
+// Runs `Exe Params` hidden; True with its exit code, False if cancelled or not started.
+// `Later` says where to get it afterwards, for the "skipped" note.
+function RunExtra(Name, Status, Exe, Params, Dir, Later: String; var Code: Integer): Boolean;
+var
+  Wrapper, PidFile, ExitFile: String;
+  Pid: AnsiString;
+  S: AnsiString;
+  I, Dummy: Integer;
+  OldClick: TNotifyEvent;
+begin
+  Result := False;
+  Code := -1;
+  if ExtrasCancelled then
+  begin
+    ExtrasSkipped := ExtrasSkipped + #13#10 + '- ' + Name + ': ' + Later;
+    exit;
+  end;
+  Wrapper := ExpandConstant('{tmp}\extra-' + IntToStr(Random(1000000)) + '.ps1');
+  PidFile := Wrapper + '.pid';
+  ExitFile := Wrapper + '.exit';
+  SaveStringToFile(Wrapper,
+    '$PID | Set-Content -LiteralPath ' + PsQuote(PidFile) + #13#10 +
+    '$p = Start-Process -FilePath ' + PsQuote(Exe) + ' -ArgumentList ' + PsQuote(Params) +
+    ' -WorkingDirectory ' + PsQuote(Dir) + ' -WindowStyle Hidden -PassThru' + #13#10 +
+    '$p.WaitForExit()' + #13#10 +
+    'Set-Content -LiteralPath ' + PsQuote(ExitFile) + ' -Value $p.ExitCode' + #13#10, False);
+  if not Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + Wrapper + '"',
+              '', SW_HIDE, ewNoWait, Dummy) then
+    exit;
+  if ExtrasPage = nil then
+    ExtrasPage := CreateOutputProgressPage('Adding the extras',
+      'Onion Board is installed. Click Cancel to skip the rest.');
+  ExtrasPage.SetText(Status, '');
+  ExtrasPage.Show;
+  OldClick := WizardForm.CancelButton.OnClick;
+  WizardForm.CancelButton.OnClick := @ExtrasCancelClick;
+  try
+    I := 0;
+    while not FileExists(ExitFile) and not ExtrasCancelled do
+    begin
+      WizardForm.CancelButton.Enabled := True;
+      ExtrasPage.SetProgress(I mod 50, 50);   // keeps the window drawing and clickable
+      Sleep(200);
+      I := I + 1;
+    end;
+  finally
+    WizardForm.CancelButton.OnClick := OldClick;
+    WizardForm.CancelButton.Enabled := False;
+  end;
+  if ExtrasCancelled and not FileExists(ExitFile) then
+  begin
+    if LoadStringFromFile(PidFile, Pid) then
+      Exec(ExpandConstant('{sys}	askkill.exe'), '/F /T /PID ' + Trim(String(Pid)), '',
+           SW_HIDE, ewWaitUntilTerminated, Dummy);
+    ExtrasSkipped := ExtrasSkipped + #13#10 + '- ' + Name + ': ' + Later;
+    exit;
+  end;
+  if LoadStringFromFile(ExitFile, S) then
+    Code := StrToIntDef(Trim(String(S)), -1);
+  Result := True;
+end;
+
+// The FFmpeg box: winget's own package (Gyan.FFmpeg.Essentials).
+procedure GetFfmpeg;
+var
+  Code: Integer;
+begin
+  RunExtra('M4A and video support (FFmpeg)',
+    'Adding M4A and video support (FFmpeg)... this can take a minute.',
+    WingetPath(''), 'install --id Gyan.FFmpeg.Essentials --exact --silent ' +
+    '--disable-interactivity --accept-package-agreements --accept-source-agreements',
+    ExpandConstant('{tmp}'), 'Onion Board offers it when a file needs it', Code);
+end;
+
+// The live voice box: the add-on's own install.bat (needs Python).
+procedure GetLiveVoice;
+var
+  Code: Integer;
+begin
+  RunExtra('Live voice-to-speech',
+    'Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)...',
+    ExpandConstant('{cmd}'), '/c "' + ExpandConstant('{app}\modules\live-voice\install.bat') +
+    '" --quiet', ExpandConstant('{app}\modules\live-voice'), 'Voice tab > Install', Code);
+end;
+
 // The "tor" box: the app downloads Tor itself (OnionBoard.exe --get-tor, the same
 // routine as Settings' Get Tor button: checked against its pinned SHA-256, through the
 // saved proxy if there is one). Nothing to do when this Tor is already there.
@@ -1077,11 +1180,11 @@ procedure GetTor;
 var
   Code: Integer;
 begin
-  WizardForm.StatusLabel.Caption :=
-    'Downloading Tor from the Tor Project (about 22 MB)... this can take a minute.';
-  if not Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--get-tor', '', SW_HIDE,
-              ewWaitUntilTerminated, Code) then
-    Code := -1;
+  if not RunExtra('Private connection (Tor)',
+           'Downloading Tor from the Tor Project (about 22 MB)... this can take a minute.',
+           ExpandConstant('{app}\{#AppExeName}.exe'), '--get-tor', ExpandConstant('{app}'),
+           'Settings > Connection > Get Tor', Code) then
+    exit;
   if Code <> 0 then
     SuppressibleMsgBox('Tor couldn''t be downloaded, so the private connection isn''t ' +
       'ready yet. Onion Board works fine without it.' + #13#10#13#10 +
@@ -1146,8 +1249,17 @@ begin
     QueueImports;
   if CurStep = ssPostInstall then
     FinishCable;
+  if (CurStep = ssPostInstall) and MayDownload('ffmpeg') then
+    GetFfmpeg;
+  if (CurStep = ssPostInstall) and MayDownload('livevoice') and HasPython then
+    GetLiveVoice;
   if (CurStep = ssPostInstall) and MayDownload('tor') then
     GetTor;
+  if (CurStep = ssPostInstall) and (ExtrasPage <> nil) then
+    ExtrasPage.Hide;
+  if (CurStep = ssPostInstall) and (ExtrasSkipped <> '') then
+    SuppressibleMsgBox('Stopped. Onion Board is installed; these weren''t added:' +
+      ExtrasSkipped, mbInformation, MB_OK, IDOK);
   if (CurStep = ssPostInstall) and MayDownload('livevoice') and not HasPython then
     SuppressibleMsgBox('Live voice-to-speech needs Python, which isn''t on this PC yet.' + #13#10#13#10 +
       'Get it free from python.org (tick "Add python.exe to PATH" while installing it). ' +
