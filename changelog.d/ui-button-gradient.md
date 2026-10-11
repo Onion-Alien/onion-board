@@ -1,0 +1,1 @@
+- Main buttons look richer: a soft gradient from your theme's colour into its second colour, a light top edge, and a deeper look while pressed. Text stays as readable as before in every theme.

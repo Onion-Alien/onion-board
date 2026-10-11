@@ -356,7 +356,10 @@ These are the current reference points. Copy their structure before inventing a 
   Keep contextual actions beside their content; do not right-align every UI element.
 - **At most one filled button** (`setObjectName("primary")`) per card or dialog: the
   thing most people should press. Everything else is a plain button or a quiet one
-  (`setProperty("quiet", True)`: no background until hover).
+  (`setProperty("quiet", True)`: no background until hover). The filled button is the
+  one surface that isn't flat: the theme paints it a gradient from `accent` into
+  `accent2` with a light top rim (`POLISH_STYLE`, `_accent_shades`), so don't give it
+  its own `background`.
 - Destructive actions use `#danger`, and anything that removes something a person
   made goes through Undo or the Recently deleted bin (`trash.py`, `ui/deleted.py`,
   `panel.UndoBar`), not a one-click loss. Keep "are you sure?" for deleting for good.
