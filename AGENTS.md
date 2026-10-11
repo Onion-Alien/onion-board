@@ -19,8 +19,8 @@ The rules agents break most, in short:
 - Never edit `CHANGELOG.md` for a change: add `changelog.d/<branch-name>.md`.
 - Text the app shows goes through `_()` and into every language in `assets/lang/`.
 - UI work follows [docs/DESIGN.md](docs/DESIGN.md), including its control/surface
-  decisions and UI workflow. [docs/UI-AUDIT.md](docs/UI-AUDIT.md) tracks existing
-  inconsistencies and has a handoff prompt; recheck an item before fixing it.
+  decisions and UI workflow. [docs/UI-AUDIT.md](docs/UI-AUDIT.md) is the only UI
+  to-do list ("the UI audit doc"); recheck an item against origin/main before fixing it.
 - Dialog footer actions sit bottom-right (stretch before the action group), with
   the main action first within the group. This does not right-align ordinary fields
   or contextual card/toolbar actions.
