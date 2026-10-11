@@ -1178,10 +1178,7 @@ class PadGrid(QWidget):
                       view.height() if view else self.height()).adjusted(12, 12, -12, -12)
         if size.isEmpty() or area.width() <= 0 or area.height() <= 0:
             return QRectF()
-        scale = min(area.width() / size.width(), area.height() / size.height())
-        target = QRectF(0, 0, size.width() * scale, size.height() * scale)
-        target.moveCenter(area.center())
-        return target
+        return area
 
     def minimumSizeHint(self):
         # never wider than the scroll area around it: the pads fit themselves to its
@@ -1359,7 +1356,7 @@ class PadGrid(QWidget):
         if self.background_image and self.background_opacity:
             pm = thumbs.pixmap(self.background_image, waiter=self)
             if pm is not None and not pm.isNull():
-                # Fit the whole thumbnail inside the visible board, with breathing
+                # Stretch the whole thumbnail across the visible board, with breathing
                 # room beside the scrollbar. Keep it fixed while the cards scroll.
                 target = self.background_rect(pm.size())
                 clip = QPainterPath()

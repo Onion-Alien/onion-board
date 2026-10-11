@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.parametrize("size", [QSize(100, 100), QSize(480, 270), QSize(100, 300)])
-def test_background_fits_whole_thumbnail_with_padding(window, size):  # noqa: F811
+def test_background_stretches_whole_thumbnail_with_padding(window, size):  # noqa: F811
     w = window
     w.tabs.setCurrentWidget(w.sounds_page)
     w.resize(1180, 720)
@@ -14,11 +14,10 @@ def test_background_fits_whole_thumbnail_with_padding(window, size):  # noqa: F8
     w.grid.relayout(force=True)
     view = w.grid.parentWidget()
     target = w.grid.background_rect(size)
-    assert target.width() / target.height() == pytest.approx(size.width() / size.height())
-    assert target.left() >= 12 - 1e-6
-    assert target.right() <= view.width() - 12 + 1e-6
-    assert target.top() + w.grid.y() >= 12 - 1e-6
-    assert target.bottom() + w.grid.y() <= view.height() - 12 + 1e-6
+    assert target.left() == pytest.approx(12)
+    assert target.right() == pytest.approx(view.width() - 12)
+    assert target.top() + w.grid.y() == pytest.approx(12)
+    assert target.bottom() + w.grid.y() == pytest.approx(view.height() - 12)
 
 
 def test_background_tracks_first_active_sound(window):  # noqa: F811
