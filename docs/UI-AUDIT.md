@@ -137,7 +137,7 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   (DESIGN: narrow by default) and recheck with a populated board.
 
   Decided with the owner (11 October): **only the search box is capped**
-  (`SEARCH_MAX_W` 480, PR #PRNUM; 456 px at 1180x720, so normal windows are unchanged).
+  (`SEARCH_MAX_W` 480, PR #411; 456 px at 1180x720, so normal windows are unchanged).
   A few words go in it, so past that it was only a longer empty bar. The seek bar,
   the meter and the drop box **keep following the window on purpose**: a longer seek
   bar seeks finer, and capping them only traded a long control for an empty gap
