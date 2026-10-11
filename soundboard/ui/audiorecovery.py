@@ -15,7 +15,8 @@ import logging
 import threading
 
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtWidgets import QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
+                               QVBoxLayout)
 from shiboken6 import isValid as qt_valid
 
 from soundboard import directmic, errors, theme
@@ -178,34 +179,38 @@ class MicRow(QFrame):
     action that mic can take, as buttons (nothing hidden in a menu)."""
 
     def __init__(self, card, mic, label, in_use):
-        super().__init__()
+        super().__init__(card)   # inside the card from the start: never a window
         self.mic = mic
         self.setObjectName("tabcard")   # a box inside the card
         v = QVBoxLayout(self)
         v.setContentsMargins(12, 10, 12, 10)
         v.setSpacing(8)
+        # each layout joins the row before anything goes in it: a widget added to a
+        # layout that has no widget yet is a window of its own for a moment, and a new
+        # window takes the keyboard focus away from Settings
         top = QHBoxLayout()
         top.setSpacing(8)
-        self.name = QLabel(label)
+        v.addLayout(top)
+        self.name = QLabel(label, self)
         self.name.setToolTip(mic["name"])
         self.name.setWordWrap(True)
         top.addWidget(self.name, 1)
         pill, tone, _fix = look(mic["state"])
-        self.pill = QLabel(pill)
+        self.pill = QLabel(pill, self)
         self.pill.setObjectName("pill")
         self.pill.setVisible(bool(pill))
         theme.set_tone(self.pill, tone)
         top.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.in_use = QLabel(_("In use"))
+        self.in_use = QLabel(_("In use"), self)
         self.in_use.setObjectName("pill")
         theme.set_tone(self.in_use, "muted")
         self.in_use.setVisible(in_use)
         top.addWidget(self.in_use, 0, Qt.AlignmentFlag.AlignVCenter)
-        v.addLayout(top)
         self.buttons = {}
         row = Flow(gap=8)
+        v.addLayout(row)
         for action in actions_for(mic):
-            b = QPushButton(action_text(action))
+            b = QPushButton(action_text(action), self)
             if action in ("repair", "update"):
                 b.setObjectName("primary")   # the fix this mic needs
             elif action == "remove":
@@ -214,8 +219,7 @@ class MicRow(QFrame):
             b.clicked.connect(lambda _c=False, a=action: card.confirm(a, self.mic))
             row.addWidget(b)
             self.buttons[action] = b
-        v.addLayout(row)
-        self.hint = QLabel(_("Plug this mic in to repair it."))
+        self.hint = QLabel(_("Plug this mic in to repair it."), self)
         self.hint.setObjectName("hint")
         self.hint.setWordWrap(True)
         self.hint.setVisible(not mic["active"])
@@ -326,8 +330,9 @@ class RecoveryCard(QFrame):
             except Exception:  # noqa: BLE001 - keep settings usable if Windows refuses
                 log.exception("couldn't check mic effect")
                 state = "unknown"
-            busy.emit(self.listed, found, mic or "")
+            # the app's mic first, then the list: one rebuild of the rows, not two
             busy.emit(self.checked, state, mic or "")
+            busy.emit(self.listed, found, mic or "")
         threading.Thread(target=work, daemon=True, name="recovery-status").start()
 
     def shown(self):
@@ -360,7 +365,13 @@ class RecoveryCard(QFrame):
         if sig == self._shown:
             return   # the same: keep the rows (and the keyboard focus in them)
         self._shown = sig
+        # a button with the keyboard focus goes with its row: the same one on the new
+        # row takes it, or focus would be lost (Tab goes nowhere)
+        focus = QApplication.focusWidget()
+        keep = next(((g, a) for g, r in self.rows.items() for a, b in r.buttons.items()
+                     if b is focus), None)
         for r in self.rows.values():
+            r.hide()
             self.list.removeWidget(r)
             r.deleteLater()
         self.rows = {}
@@ -368,6 +379,11 @@ class RecoveryCard(QFrame):
             r = MicRow(self, m, text, bool(m["pa"]) and m["pa"] == self.mw.cfg.mic_device)
             self.list.addWidget(r)
             self.rows[m["guid"]] = r
+        if keep is not None:
+            row = self.rows.get(keep[0])
+            b = row.buttons.get(keep[1]) if row else None
+            b = b or next((b for r in self.rows.values() for b in r.buttons.values()), None)
+            (b or self).setFocus(Qt.FocusReason.OtherFocusReason)
         self._sync_busy()
 
     def name_of(self, mic):
