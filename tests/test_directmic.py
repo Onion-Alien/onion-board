@@ -535,6 +535,32 @@ def test_stream_keeps_time_without_the_effect(ring_file):
     assert set(calls) == {dm.BLOCK}   # whole blocks, as a sound card's would come
 
 
+def test_publisher_change_restores_the_lead_without_a_stale_heartbeat(ring_file):
+    stream = dm.DirectMicStream(lambda out, *args: out.fill(0.4), ring_file)
+    stream.active = True
+    ring = stream._ring
+    try:
+        ring._set("publisher", 1)
+        _publish(ring, np.zeros((480, 2), np.float32))
+        stream.pump()
+        slot = ring.slots[0]
+        slot["owner"], slot["tick"] = 2, dm._tick()
+        slot["read_pos"], slot["lead"] = ring.write_pos + 480, 960
+        target = int(slot["read_pos"]) + int(slot["lead"]) + 2 * dm.BLOCK
+        # The new effect takes over inside MIC_LIVE_MS; the board never went idle.
+        ring._set("publisher", 2)
+        _publish(ring, np.zeros((480, 2), np.float32))
+        stream.pump()
+        assert stream.mic_live and stream._publisher == 2
+        assert ring.write_pos == target
+        assert np.all(ring.data[:target] == 0)
+        _publish(ring, np.zeros((480, 2), np.float32))
+        stream.pump()
+        assert np.allclose(ring.data[target:target + 480], 0.4)
+    finally:
+        stream.close()
+
+
 def test_stream_sleeps_between_blocks_when_nobody_listens(ring_file):
     """Nobody records the mic: the thread wakes about once a block (10 ms), not every
     2 ms (that was 500 wakeups a second, a third of the board's CPU while idle)."""
@@ -1117,6 +1143,48 @@ def test_replace_mode_falls_back_to_the_mic_when_the_board_stops(ring_file):
     assert np.abs(end - noise(len(end), int(1.4 * 48000))).max() < 1e-6   # the mic again
     rms = _block_rms(y[int(0.3 * 48000):], 48000)
     assert rms.min() > 0.1, np.round(rms[rms.argmin() - 4:rms.argmin() + 4], 3)   # no gap
+
+
+@needs_host
+@pytest.mark.parametrize("instances", [1, 2])
+@realtime
+def test_audio_engine_restart_keeps_the_board_on_the_mic(ring_file, instances, monkeypatch):
+    """Windows' audio engine exits and reloads the effect while the board keeps sending."""
+    from soundboard.engine import Engine
+    from test_engine import tone
+    monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
+    engine = Engine()
+    engine.set_main_device(dm.DEVICE)
+    engine.play("tone", tone(10), 1.0)
+    env = dict(os.environ, ProgramData=str(ring_file.parent.parent.parent))
+    processes = []
+    try:
+        for index in range(2):
+            out = ring_file.parent / f"restart-{index}.f32"
+            p = subprocess.Popen([str(HOST), str(DLL), str(out), "48000", "1", "2",
+                                  "0.3", str(instances), "300"], env=env, stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT, text=True)
+            processes.append(p)
+            if index == 0:
+                time.sleep(0.7)
+                p.kill()
+                p.communicate(timeout=5)
+            else:
+                log, _ = p.communicate(timeout=10)
+                assert p.returncode == 0, log
+                for app in range(instances):
+                    path = out if app == 0 else Path(f"{out}.{app}")
+                    samples = np.fromfile(path, np.float32)[48000:]
+                    assert len(samples) == 48000
+                    t = np.arange(len(samples)) / dm.RATE
+                    level = 2 * abs(np.mean(samples * np.exp(-2j * np.pi * 440 * t)))
+                    assert level > 0.1
+    finally:
+        for p in processes:
+            if p.poll() is None:
+                p.kill()
+                p.communicate(timeout=5)
+        engine.shutdown()
 
 
 @needs_host

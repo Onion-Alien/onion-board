@@ -443,6 +443,7 @@ class DirectMicStream:
         self.mic_live = False       # the board is running on the effect's clean mic
         self.mic_rate = 0
         self._mic_pos = 0
+        self._publisher = 0
         self._acc = 0.0
         self._start = time.perf_counter()
         self._made = 0
@@ -537,7 +538,8 @@ class DirectMicStream:
         """(Re)starting on the clean mic: the effect went on reading meanwhile. Paced by
         the mic from here on, the board never got back a lead ahead of where it reads,
         and the effect waits for just that: after a quick reopen (a buffering change)
-        the board's sounds stayed off the mic. Silence up to a lead past it fixes that."""
+        or a change of publisher, the board's sounds stayed off the mic. Silence up to
+        a lead past it fixes that."""
         ring = self._ring
         slots = ring.live_slots()
         if not len(slots):
@@ -552,8 +554,13 @@ class DirectMicStream:
         now = _tick()
         if ring.mic_live(now):
             wp, rate = ring.mic_write_pos, ring.mic_rate
+            publisher = int(ring._get("publisher"))
             gap = wp - self._mic_pos
-            if not self.mic_live or rate != self.mic_rate or gap < 0 or gap > MIC_CAPACITY // 2:
+            # A new effect can take over before the old mic's heartbeat expires.
+            # Its recorders read on during that gap, so restore our lead here too.
+            if (not self.mic_live or publisher != self._publisher or rate != self.mic_rate
+                    or gap < 0 or gap > MIC_CAPACITY // 2):
+                self._publisher = publisher
                 self._mic_pos, self.mic_rate, self._acc = wp, rate, 0.0   # (re)start here
                 self.mic_live = True
                 self._catch_up()
