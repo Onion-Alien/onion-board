@@ -87,6 +87,11 @@ suggesting or starting it, and tick it there with its PR when done.
 colour, text, behaviour, a "never" list and a checklist. Build every new screen, card,
 dialog and button from it. The rules people trip over most:
 
+- **Start with its *Standard kit* section**: the only text sizes (8 / 8.5 / 10 /
+  11 / 13 / 17 / 28 pt, each with a job), the only button kinds and sizes (icon
+  buttons 24, 28 or 36 px), which pop-up to use for which job (toast, Undo, ⓘ, ⋯
+  menu, small dialog, modeless editor) and a copy-paste dialog. Never copy a size
+  from old code: old screens are full of off-scale ones.
 - **Narrow by default**: controls as wide as their words, then `addStretch(1)`;
   dialogs ≤ ~620 px; tiles in fixed-size grids that scroll down.
 - **Dialog actions at the bottom-right, the main one first within the group**
