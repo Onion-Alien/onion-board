@@ -8,6 +8,7 @@ from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QFont, QImage, QPixmap
+from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox, QDialog,
                                QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMessageBox,
@@ -20,7 +21,8 @@ from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COL
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import busy, fit, icons, sourcedialog
-from soundboard.ui.panel import EqPanel, hint_label, section_label, steady_number
+from soundboard.ui.panel import (EqPanel, hint_label, icon_button, section_label,
+                                 steady_number)
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
@@ -42,24 +44,23 @@ BOOST = voicefx.Param("gain_db", _("Boost"), *soundfx.GAIN_RANGE, 0.0, " dB", 1)
 
 
 class TabHelpPopup(QDialog):
-    """A compact help card with a mascot; Qt dismisses it on an outside click."""
+    """A compact help card with a mascot: Escape, the close button or a click outside
+    closes it, and the focus goes back to what opened it. Its look comes from the
+    shared style sheet (`#helpcard`, `#helptitle`, `#helpbody`), so it follows the theme."""
 
     def __init__(self, title: str, text: str, *, owl: bool = False, parent=None):
         super().__init__(parent, Qt.Popup | Qt.FramelessWindowHint)
         from soundboard.bunny import bunny_pixmap
         from soundboard.ui.owl import owl_image
 
+        self._opener = QApplication.focusWidget()
         self.setWindowTitle(title)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setFixedWidth(min(560, self.screen().availableGeometry().width() - 24))
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         frame = QFrame()
-        frame.setObjectName("tabHelpCard")
-        frame.setStyleSheet(
-            f"QFrame#tabHelpCard {{ background: {theme.T['panel']}; "
-            f"border: 1px solid {theme.T['border']}; border-radius: 16px; }}"
-            "QFrame#tabHelpCard QLabel { background: transparent; border: none; padding: 0; }")
+        frame.setObjectName("helpcard")
         outer.addWidget(frame)
         layout = QVBoxLayout(frame)
         layout.setContentsMargins(24, 20, 24, 18)
@@ -67,21 +68,13 @@ class TabHelpPopup(QDialog):
 
         header = QHBoxLayout()
         self.heading = QLabel(title)
+        self.heading.setObjectName("helptitle")
         self.heading.setTextFormat(Qt.PlainText)
         self.heading.setWordWrap(True)
-        self.heading.setStyleSheet(
-            f"font-size: 19px; font-weight: 600; color: {theme.T['text_hi']};")
         header.addWidget(self.heading, 1)
-        close = QPushButton("×")
-        close.setAccessibleName(_("Close"))
-        close.setFixedSize(28, 28)
-        close.setStyleSheet(
-            f"QPushButton {{ border: none; background: transparent; "
-            f"font-size: 21px; color: {theme.T['muted']}; padding: 0; }}"
-            f"QPushButton:hover {{ background: {theme.T['inset']}; "
-            f"color: {theme.T['text_hi']}; border-radius: 7px; }}")
-        close.clicked.connect(self.reject)
-        header.addWidget(close, 0, Qt.AlignTop)
+        self.close_btn = icon_button("close", _("Close"), size=16)
+        self.close_btn.clicked.connect(self.reject)
+        header.addWidget(self.close_btn, 0, Qt.AlignTop)
         layout.addLayout(header)
 
         content = QHBoxLayout()
@@ -96,15 +89,17 @@ class TabHelpPopup(QDialog):
         self.mascot.setPixmap(picture)
         content.addWidget(self.mascot, 0, Qt.AlignVCenter)
         self.body = QLabel(text)
+        self.body.setObjectName("helpbody")
         self.body.setTextFormat(Qt.PlainText)
         self.body.setWordWrap(True)
-        self.body.setStyleSheet(f"font-size: 14px; color: {theme.T['text']};")
         content.addWidget(self.body, 1, Qt.AlignVCenter)
         layout.addLayout(content)
 
-        footer = QLabel(_("Click outside to close"))
-        footer.setStyleSheet(f"font-size: 11px; color: {theme.T['muted']};")
-        layout.addWidget(footer, 0, Qt.AlignRight)
+    def done(self, r):
+        super().done(r)
+        # the focus back on what opened it (a rail tab), not lost to the window
+        if self._opener is not None and qt_valid(self._opener) and self._opener.isVisible():
+            self._opener.setFocus(Qt.PopupFocusReason)
 
 
 class EffectsPanel(QWidget):

@@ -138,6 +138,12 @@ def _plus(p, fill):
     p.drawLine(QPointF(5, 12), QPointF(19, 12))
 
 
+def _close(p, fill):
+    """An x: closes a pop-up (the help card)."""
+    p.drawLine(QPointF(6.5, 6.5), QPointF(17.5, 17.5))
+    p.drawLine(QPointF(17.5, 6.5), QPointF(6.5, 17.5))
+
+
 def _download(p, fill):
     """An arrow down into an open tray."""
     p.drawLine(QPointF(12, 3.5), QPointF(12, 14.5))
@@ -631,7 +637,7 @@ SHAPES = {
     "sliders": _sliders, "wave": _wave, "puzzle": _puzzle,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
-    "plus": _plus,
+    "plus": _plus, "close": _close,
     "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,

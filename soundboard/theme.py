@@ -501,6 +501,12 @@ QLabel#section { color:$heading; font-size:10pt; font-weight:600; padding-top:8p
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
+/* the tab help card (dialogs.TabHelpPopup): a raised surface with an edge (it floats
+   over the board), the title role (1.3x base, bold) and body text */
+QFrame#helpcard { background:$panel; border:1px solid $border; border-radius:16px; }
+QFrame#helpcard QLabel { background:transparent; border:none; padding:0; }
+QLabel#helptitle { font-size:13pt; font-weight:700; color:$text_hi; }
+QLabel#helpbody { font-size:10.5pt; color:$text; }
 QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
 QLabel[tone="warn"], QLabel#hint[tone="warn"] { color:$warn_text; }
