@@ -1,0 +1,1 @@
+- The Voice tab says "Voice effects off: mic unchanged" with a colon, not a long dash, in every language.

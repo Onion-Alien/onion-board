@@ -47,6 +47,11 @@ class SideTabs(QTabWidget):
         super().__init__()
         self.tabBar().hide()
         self.tabBar().installEventFilter(self)
+        # the hidden bar was the Tab key's stop after the rail: it can't take focus, so
+        # Tab stuck on the rail's last button and never reached the page
+        self.setFocusProxy(None)
+        self.setFocusPolicy(Qt.NoFocus)
+        self.tabBar().setFocusPolicy(Qt.NoFocus)
 
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
         if obj is self.tabBar() and e.type() == QEvent.Show:
