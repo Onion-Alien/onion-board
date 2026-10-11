@@ -7,6 +7,7 @@ decoding and resampling it again.
 """
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import logging
@@ -14,6 +15,7 @@ import math
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import threading
@@ -1259,8 +1261,87 @@ def load_sound(meta: SoundMeta) -> np.ndarray:
         return load_original(meta)
     data = load_cached(meta.id, key)
     if data is None:
-        data = store_cached(meta.id, soundfx.render(load_original(meta), meta.fx), key)
+        data = render_cached(meta.id, load_original(meta), meta.fx)
     return data
+
+
+_NPY_HEAD = 128   # a rendered cache file's header: written last, once the length is known
+REVERSE_CHUNK = 1 << 20   # frames swapped at a time when a render is reversed on disk
+
+
+def _npy_header(frames: int) -> bytes:
+    """The .npy header of (frames, 2) int16, padded to _NPY_HEAD bytes (np.load's format)."""
+    h = f"{{'descr': '<i2', 'fortran_order': False, 'shape': ({frames}, 2), }}"
+    h = h.ljust(_NPY_HEAD - 11) + "\n"
+    return b"\x93NUMPY\x01\x00" + struct.pack("<H", len(h)) + h.encode("latin1")
+
+
+def _reverse_frames(path: Path, frames: int) -> None:
+    """Reverse the frames of a (frames, 2) int16 .npy in place, a piece at a time."""
+    if frames < 2:
+        return
+    mm = np.load(path, mmap_mode="r+")
+    lo, hi = 0, frames
+    while hi - lo > 1:
+        k = min(REVERSE_CHUNK, (hi - lo) // 2)
+        a = mm[lo:lo + k][::-1].copy()
+        mm[lo:lo + k] = mm[hi - k:hi][::-1]
+        mm[hi - k:hi] = a
+        lo, hi = lo + k, hi - k
+    mm.flush()
+    del mm   # unmapped now: Windows can't rename a file that's still mapped
+
+
+def render_cached(sid: str, data: np.ndarray, fx: dict | None) -> np.ndarray:
+    """Render a sound's effects (soundfx.render_into) straight into its cache file for
+    these effects and return it as int16 (a long one mapped, soundboard.mapped). Only
+    a few seconds of it are in memory at a time, however long it is. If the file
+    can't be written it's rendered in memory instead, like store_cached does."""
+    from soundboard import soundfx
+    key = soundfx.key(fx)
+    if not key:
+        return to_int16(data)   # nothing to render (never trimmed either)
+    dest = cache_path(sid, key)
+    tmp = dest.with_name(f"{dest.stem}.{uuid.uuid4().hex[:8]}.tmp.npy")
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(tmp, "wb") as f:
+            n = 0
+
+            def start():
+                nonlocal n
+                f.seek(0)
+                f.truncate()
+                f.write(bytes(_NPY_HEAD))
+                n = 0
+
+            def put(x):
+                nonlocal n
+                y = x * I16                       # to_int16's rounding (x is in [-1, 1])
+                np.rint(y, out=y)
+                np.clip(y, -I16 - 1, I16, out=y)
+                f.write(y.astype("<i2").tobytes())
+                n += len(x)
+
+            soundfx.render_into(data, fx, start, put)
+            f.seek(0)
+            f.write(_npy_header(n))
+        if soundfx.clean(fx)["reverse"]:
+            _reverse_frames(tmp, n)
+        tmp.replace(dest)
+        _refused.discard(dest)
+    except OSError:   # e.g. dest is mapped by audio still in use: prune_cache tidies up
+        log.warning("couldn't write the effects cache for %s; rendering in memory", sid,
+                    exc_info=True)
+        with contextlib.suppress(OSError):
+            tmp.unlink(missing_ok=True)
+        return to_int16(soundfx.render(data, fx))
+    except BaseException:
+        with contextlib.suppress(OSError):
+            tmp.unlink(missing_ok=True)
+        raise
+    out = load_cached(sid, key)
+    return out if out is not None else to_int16(soundfx.render(data, fx))
 
 
 def cache_keep(sounds: list[SoundMeta]) -> set[str]:
