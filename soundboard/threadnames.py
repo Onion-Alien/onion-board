@@ -40,7 +40,7 @@ def _calls():
 def name_native(native_id: int | None, name: str) -> bool:
     """Name the OS thread `native_id` (threading.Thread.native_id). True if it worked."""
     api = _calls()
-    if not api or not native_id or not name:
+    if not isinstance(api, tuple) or not native_id or not name:   # None / False: not there
         return False
     open_thread, describe, close = api
     try:

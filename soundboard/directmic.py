@@ -60,6 +60,7 @@ import sys
 import threading
 import time
 import winreg
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -244,7 +245,7 @@ class RingWriter:
         self.mic = np.ndarray((MIC_CAPACITY, 2), np.float32, buffer=self._mm,
                               offset=HEADER + CAPACITY * 4)
         # one view per field: building them on every access costs more than the access
-        f = {name: self.h[name] for name in HEAD.names}
+        f = {name: self.h[name] for name in HEAD.names or ()}
         self._wp, self._btick, self._mwp, self._mtick = (
             f["write_pos"], f["board_tick"], f["mic_write_pos"], f["mic_tick"])
         self._f_fields = f
@@ -928,7 +929,8 @@ class _BackupKey:
                  winreg.KEY_ALL_ACCESS, None, ctypes.byref(h), ctypes.byref(disp))
         if err:
             raise ctypes.WinError(err)
-        self.h = h.value
+        assert h.value is not None   # it opened
+        self.h: int | winreg.HKEYType = h.value
         self.created = disp.value == 1   # REG_CREATED_NEW_KEY
 
     def get(self, name):
@@ -1008,7 +1010,7 @@ def _running_dependents() -> list[str]:
             and n.lower() not in {s.lower() for s in AUDIO_SERVICES}]
 
 
-def _audio_comes_back(dependents: list[str] = ()):
+def _audio_comes_back(dependents: Sequence[str] = ()):
     """A small helper that starts Windows' audio again once this process ends, however
     it ends: killed half-way or crashed, the PC must never be left without sound.
     (Starting a service that's already running does nothing.)"""
@@ -1041,7 +1043,7 @@ def _services_stopped() -> bool:
     return r.stdout.strip() == "0"
 
 
-def _audio_service(start: bool, dependents: list[str] = ()) -> bool:
+def _audio_service(start: bool, dependents: Sequence[str] = ()) -> bool:
     """Stop / start Windows' audio. The endpoint builder reads the mics' effect settings
     when it starts, so it goes too (the audio service depends on it). `dependents`: the
     services that were running on it (_running_dependents), started again after it.
@@ -1096,7 +1098,7 @@ def _unregister_com():
             pass
 
 
-def pick_slot(values: dict[int, object]) -> tuple[str, int]:
+def pick_slot(values: Mapping[int, object]) -> tuple[str, int]:
     """Which effect slot the effect takes on a mic whose FxProperties hold `values`
     ({pid: value}): ('wrap', LFX) on a driver with only the old kind of effects;
     ('composite', 15) joins an endpoint effect list Windows chains by itself; otherwise
@@ -1110,7 +1112,7 @@ def pick_slot(values: dict[int, object]) -> tuple[str, int]:
     return "wrap", EFX
 
 
-def _original(values: dict[int, object], pid: int) -> str:
+def _original(values: Mapping[int, object], pid: int) -> str:
     """The effect the effect runs first in slot `pid`: the slot's own, or (a mic whose
     driver has no endpoint effect) its old-style LFX, which a modern slot switches off."""
     old = values.get(pid)
@@ -1225,10 +1227,11 @@ def _uninstall_endpoint(guid: str):
         created = (state.get("FxCreated") or (0,))[0]
         slot = (state.get("Slot") or (None,))[0]
         if not before and slot is not None:   # an early test build's notes
-            before = [f"{FX % slot}=sz:{state.get('Original')[0]}"
-                      if (state.get("Original") or ("",))[0] else f"{FX % slot}="]
-            if (state.get("ModesCreated") or (0,))[0]:
-                before.append(f"{MODES_KEY % state.get('ModesCreated')[0]}=")
+            original = (state.get("Original") or ("",))[0]
+            before = [f"{FX % slot}=sz:{original}" if original else f"{FX % slot}="]
+            modes_created = (state.get("ModesCreated") or (0,))[0]
+            if modes_created:
+                before.append(f"{MODES_KEY % modes_created}=")
             if (state.get("AssocCreated") or (0,))[0]:
                 before.append(f"{FX % 0}=")
     try:
@@ -1682,6 +1685,11 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
         kernel32.CloseHandle(info.hProcess)
 
 
+def declined() -> str:
+    """What install/uninstall return when Windows' admin prompt was turned down."""
+    return _("Windows' admin prompt was turned down (or didn't finish).")
+
+
 def install(mic_name: str | None, *, clean: bool = False) -> str | None:
     """Put the effect on the mic called `mic_name` (Windows asks for admin). None when
     done, else what went wrong, in plain words."""
@@ -1692,7 +1700,7 @@ def install(mic_name: str | None, *, clean: bool = False) -> str | None:
         return _("This copy of Onion Board has no mic effect in it.")
     code = _elevated(["reinstall" if clean else "install", guid])
     if code is None:
-        return _("Windows' admin prompt was turned down (or didn't finish).")
+        return declined()
     if code:
         return _("Installing failed (code {code}). The log is in {folder}.",
                  code=code, folder=data_dir().parent)
@@ -1702,5 +1710,5 @@ def install(mic_name: str | None, *, clean: bool = False) -> str | None:
 def uninstall() -> str | None:
     code = _elevated(["uninstall"])
     if code is None:
-        return _("Windows' admin prompt was turned down (or didn't finish).")
+        return declined()
     return _("Removing failed (code {code}).", code=code) if code else None

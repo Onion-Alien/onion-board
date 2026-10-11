@@ -287,8 +287,10 @@ class SapiTTS:
                 self._start()
                 req = " ".join([_b64(voice) if voice else "-", str(int(max(-10, min(10, rate)))),
                                 _b64(path), _b64(text)])
-                self._proc.stdin.write(req + "\n")
-                self._proc.stdin.flush()
+                p = self._proc
+                assert p is not None and p.stdin is not None   # _start: stdin=PIPE
+                p.stdin.write(req + "\n")
+                p.stdin.flush()
                 ans = self._readline(LINE_TIMEOUT_S)
                 self._used = self._clock()
             if ans != "OK":
@@ -322,6 +324,7 @@ class SapiTTS:
         p, self._proc = self._proc, None
         if p is not None:
             try:
+                assert p.stdin is not None
                 p.stdin.close()
                 p.wait(timeout=2)
             except Exception:  # noqa: BLE001

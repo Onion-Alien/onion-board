@@ -64,7 +64,7 @@ CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on a save that changes some
 ROTATE_EVERY_S = 3600   # ...at most once an hour (the first change of a session always)
 # where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
 # app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
-RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")
+RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
                 else Path(__file__).resolve().parent.parent / "installer")
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
@@ -564,14 +564,14 @@ class Config:
                     cfg = cls.from_raw(raw)
                 except (TypeError, ValueError, KeyError, AttributeError):
                     continue
-                cfg.read_only = True
-                cfg.load_note = _("Your settings file was locked by another program, so "
+                cfg.read_only = True   # pyright: ignore[reportAttributeAccessIssue]  # ClassVar: per instance here
+                cfg.load_note = _("Your settings file was locked by another program, so "   # pyright: ignore[reportAttributeAccessIssue]
                                   "the last copy ({name}) was loaded instead. Changes won't "
                                   "be saved until you restart Onion Board.", name=name)
                 return cfg
             cfg = cls()
-            cfg.read_only = True
-            cfg.load_note = _("Your settings file was locked by another program, so "
+            cfg.read_only = True   # pyright: ignore[reportAttributeAccessIssue]
+            cfg.load_note = _("Your settings file was locked by another program, so "   # pyright: ignore[reportAttributeAccessIssue]
                               "Onion Board started with default settings. Changes won't be "
                               "saved until you restart it.")
             return cfg
@@ -589,13 +589,13 @@ class Config:
             log.warning("recovered settings from backup %s", name)
             if missing or broken:   # put it back as config.json now, not at the next
                 cfg.save()          # change (a damaged file left in place stays kept)
-            cfg.load_note = (_("Your settings file was missing, so the last good copy "
+            cfg.load_note = (_("Your settings file was missing, so the last good copy "   # pyright: ignore[reportAttributeAccessIssue]
                                "({name}) was loaded instead.", name=name) if missing else
                              _("Your settings file was damaged, so the last good copy "
                                "({name}) was loaded instead.", name=name)) + kept
             return cfg
         cfg = cls()
-        cfg.load_note = (_("Your settings file was missing and no backup could be read, "
+        cfg.load_note = (_("Your settings file was missing and no backup could be read, "   # pyright: ignore[reportAttributeAccessIssue]
                            "so Onion Board started with default settings. Your sound files "
                            "are still in {folder}.", folder=SOUNDS_DIR) if missing else
                          _("Your settings file was damaged and no backup could be read, "
@@ -728,10 +728,10 @@ class Config:
                 if k in s:   # the Edit dialog's slider can't take any number
                     s[k] = min(max(s[k], lo), hi)
             m = SoundMeta(**s)
-            if extra:
-                m._raw_extra = extra
+            if extra:   # not dataclass fields on purpose (see _raw_extra above)
+                m._raw_extra = extra   # pyright: ignore[reportAttributeAccessIssue]
             if kept:
-                m._raw_kept = kept
+                m._raw_kept = kept   # pyright: ignore[reportAttributeAccessIssue]
             sounds.append(m)
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
@@ -762,10 +762,10 @@ class Config:
                 kept[k] = (known[k], v)
         known["version"] = CONFIG_VERSION
         cfg = cls(**known, sounds=sounds)
-        if extra:
-            cfg._raw_extra = extra
+        if extra:   # not dataclass fields on purpose (see _raw_extra above)
+            cfg._raw_extra = extra   # pyright: ignore[reportAttributeAccessIssue]
         if kept:
-            cfg._raw_kept = kept
+            cfg._raw_kept = kept   # pyright: ignore[reportAttributeAccessIssue]
         cfg.categories = clean_tags(cfg.categories)
         for m in sounds:   # a category a sound is in always has a tab
             m.tags = merge_tags(m.tags, cfg.categories)

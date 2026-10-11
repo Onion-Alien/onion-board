@@ -24,7 +24,7 @@ from __future__ import annotations
 import logging
 import math
 from collections import deque
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
 import numpy as np
 
@@ -141,6 +141,7 @@ class VoiceSource:
             self._rs = resample.make(VOICE_RATE, rate)    # steady, not in soxr's lumps
             self._rs_rate = rate
         if rate != VOICE_RATE:
+            assert self._rs is not None   # made for this rate above
             y = self._rs.resample_chunk(y)
         if len(y):
             self._ring.append(y)
@@ -339,7 +340,7 @@ class AiVoiceController:
         return self.host is not None
 
     def start(self, module: ModuleInfo, voice: str, auto_pitch: bool = True,
-              pitch: float = 0.0, args: list[str] = ()):
+              pitch: float = 0.0, args: Sequence[str] = ()):
         self.stop()
         argv = ["--voice", voice, "--pitch", f"{float(pitch):g}"]
         if not auto_pitch:

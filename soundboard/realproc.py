@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import ctypes
 import importlib.util
+import typing
 from pathlib import Path
 
 import numpy as np
@@ -66,7 +67,7 @@ def _to_i16(y: np.ndarray) -> np.ndarray:
 
 def webrtc(y: np.ndarray, hpf: bool = False, ns: bool = False, agc: bool = False) -> np.ndarray:
     """Run mono float y at 48 kHz through one WebRTC audio processor, 10 ms at a time."""
-    from livekit import rtc
+    from livekit import rtc   # pyright: ignore[reportMissingImports]  # optional
     apm = rtc.AudioProcessingModule(high_pass_filter=hpf, noise_suppression=ns,
                                     auto_gain_control=agc)
     pcm = _to_i16(np.concatenate([y, np.zeros((-len(y)) % FRAME)]))
@@ -145,7 +146,7 @@ def process(x: np.ndarray, stages=STAGES) -> np.ndarray:
         if "webrtc_hpf" in rest:            # the high-pass comes before the denoiser
             y = webrtc(y, hpf=True)
             rest.discard("webrtc_hpf")
-        y = rnnoise(y)
+        y = typing.cast(np.ndarray, rnnoise(y))   # no with_prob: just the audio
     if rest:
         y = webrtc(y, hpf="webrtc_hpf" in rest, ns="webrtc_ns" in rest,
                    agc="webrtc_agc" in rest)

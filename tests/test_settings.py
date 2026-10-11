@@ -84,6 +84,23 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     d.close()
 
 
+def _open_in_window(win, qapp, page, width=1020, height=720):
+    """Settings as the cog opens it: a page in the shown window, `width` x `height`."""
+    win.show()
+    d = win.open_settings(page)
+    size_settings(win, qapp, d, width, height)
+    return d
+
+
+def size_settings(win, qapp, d, width, height):
+    """The window sized so the Settings page in it is `width` x `height`."""
+    for _ in range(3):
+        qapp.processEvents()
+        win.resize(win.width() + width - d.width(),
+                   win.height() + height - d.height())
+    qapp.processEvents()
+
+
 def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window):  # noqa: F811
     """Building all twelve pages under the app's style sheet took a second or two on
     every click of the cog: the window builds the others when they're first picked."""
@@ -94,7 +111,6 @@ def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window): 
     assert shown == []
     built = [i for i in range(d.tabs.count()) if d.tabs.widget(i).widget() is not None]
     assert built == [d._page_keys.index("audio")]
-    assert d.size().height() >= 600   # sized for the tall pages it hasn't built yet
     d.categories.setCurrentRow(d._page_keys.index("updates"))
     page = d.tabs.currentWidget().widget()
     assert page is not None and "App updates" in {lb.text() for lb in page.findChildren(QLabel)}
@@ -269,12 +285,11 @@ def test_all_settings_pages_fit_their_window(window, qapp):  # noqa: F811
 def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: F811
     from soundboard.settings import ThemeGrid
 
-    d = SettingsDialog(window, "appearance")
-    d.show()
+    d = _open_in_window(window, qapp, "appearance")
     try:
         grid = d.findChildren(ThemeGrid)[0]
         for width, expected in ((1020, 4), (720, 2), (1200, 5), (720, 2)):
-            d.resize(width, 760)
+            size_settings(window, qapp, d, width, 760)
             for _ in range(5):
                 qapp.processEvents()
             assert grid.columns == expected
@@ -564,17 +579,14 @@ def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
 
 
 @pytest.mark.parametrize("rtl", [False, True])
-def test_tab_moves_from_the_category_list_into_the_page_and_on_to_done(window, qapp, rtl):  # noqa: F811
+def test_tab_moves_from_the_category_list_into_the_page_and_out_again(window, qapp, rtl):  # noqa: F811
     """Keyboard and screen-reader users: Tab from the category list goes into the open
-    page, on through it to Done, and Shift+Tab comes back, on every page."""
+    page, on through it and out of it, and Shift+Tab comes back, on every page."""
     if rtl:
         qapp.setLayoutDirection(Qt.RightToLeft)
     try:
-        d = SettingsDialog(window, "privacy")
-        d.show()
-        d.activateWindow()
-        done = next(b for b in d.findChildren(QPushButton) if b.objectName() == "primary"
-                    and b.parent() is d)
+        d = _open_in_window(window, qapp, "privacy")
+        window.activateWindow()
         for row in range(d.categories.count()):
             if d.categories.isRowHidden(row):
                 continue
@@ -589,11 +601,12 @@ def test_tab_moves_from_the_category_list_into_the_page_and_on_to_done(window, q
             QTest.keyClick(first, Qt.Key_Backtab)
             assert QApplication.focusWidget() is d.categories
             QTest.keyClick(d.categories, Qt.Key_Tab)
-            for _ in range(400):
-                if QApplication.focusWidget() is done:
+            for _ in range(400):   # no trap: Tab goes on through the page and out of it
+                if not page.isAncestorOf(QApplication.focusWidget()):
                     break
                 QTest.keyClick(QApplication.focusWidget(), Qt.Key_Tab)
-            assert QApplication.focusWidget() is done, d.categories.item(row).text()
+            assert not page.isAncestorOf(QApplication.focusWidget()), (
+                d.categories.item(row).text())
         d.categories.setFocus()
         QTest.keyClick(d.categories, Qt.Key_Backtab)
         assert QApplication.focusWidget() is d.search_box
@@ -623,13 +636,9 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
         d.close()
 
 
-def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qapp):  # noqa: F811
-    """The first card on every page lines up with the top of the search box, and Done
-    has the same gap above it as below and beside it."""
-    d = SettingsDialog(window, "privacy")
-    d.resize(1020, 680)
-    d.show()
-    qapp.processEvents()
+def test_pages_start_level_with_the_back_row(window, qapp):  # noqa: F811
+    """The first card on every page lines up with the top of the back arrow's row."""
+    d = _open_in_window(window, qapp, "privacy", 1020, 680)
 
     def top(w):
         return w.mapTo(d, QPoint(0, 0)).y()
@@ -639,13 +648,7 @@ def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qa
         page = d.tabs.currentWidget().widget()
         first = min((c for c in page.children() if isinstance(c, QWidget) and c.isVisible()),
                     key=lambda c: c.y())
-        assert top(first) == top(d.search_box), d.categories.item(row).text()
-    done = next(b for b in d.findChildren(QPushButton) if b.objectName() == "primary"
-                and b.parent() is d)
-    above = top(done) - (top(d.tabs) + d.tabs.height())
-    below = d.height() - (top(done) + done.height())
-    right = d.width() - (done.mapTo(d, QPoint(0, 0)).x() + done.width())
-    assert above == below == right, (above, below, right)
+        assert top(first) == top(d.back_btn), d.categories.item(row).text()
     d.close()
 
 
@@ -671,10 +674,10 @@ def test_settings_cards_line_up(window, qapp):  # noqa: F811
     hint = next(lb for lb in d.findChildren(QLabel)
                 if lb.text().startswith("Otherwise, double-click to play"))
     assert hint.contentsMargins().left() == 26
-    d.show_page("overlay")
-    d.resize(1000, 700)
-    d.show()
-    qapp.processEvents()
+    d.close()
+    d = _open_in_window(window, qapp, "overlay", 1000, 700)
+    for _ in range(5):   # the rows settle their widths
+        qapp.processEvents()
     test = next(b for b in d.findChildren(QPushButton) if b.text() == "Open overlay")
     assert test.width() <= test.sizeHint().width() + 2
     auto = d.ov_toggle_only[1]

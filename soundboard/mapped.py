@@ -72,10 +72,11 @@ def adopt(data: np.ndarray, path: Path) -> np.ndarray:
 
 def is_mapped(a: np.ndarray) -> bool:
     """Does `a` (or what it's a view of) live in a mapped file?"""
-    while a is not None:
-        if isinstance(a, (np.memmap, mmap.mmap)):
+    b: object = a
+    while b is not None:
+        if isinstance(b, (np.memmap, mmap.mmap)):
             return True
-        a = getattr(a, "base", None)
+        b = getattr(b, "base", None)
     return False
 
 
