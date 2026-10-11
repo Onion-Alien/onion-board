@@ -113,6 +113,7 @@ class RecoveryCard(QFrame):
         head.addWidget(icon, 0, Qt.AlignVCenter)
         title = QLabel(_("Audio recovery"))
         title.setObjectName("section")
+        title.setProperty("keepline", True)
         self.heading = title
         head.addWidget(title, 0, Qt.AlignVCenter)
         head.addStretch(1)
