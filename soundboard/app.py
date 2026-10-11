@@ -525,8 +525,7 @@ def main():
     elif not w.cfg.setup_done:   # first launch: the setup wizard
         QTimer.singleShot(400, w.run_setup)
     if reset_note:
-        QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note
-                                               else "ok"))
+        QTimer.singleShot(900, lambda: w.toast(reset_note, "ok" if reset.last_ok else "warn"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
     # old add-on copies: once the add-ons are loaded (so the ones in use are known)
     QTimer.singleShot(20_000, lambda: threading.Thread(

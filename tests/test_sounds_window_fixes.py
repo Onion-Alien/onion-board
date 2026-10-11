@@ -11,7 +11,7 @@ import soundfile as sf
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QMessageBox
 
-from conftest import process_events
+from conftest import process_events, said
 from soundboard import backup, engine, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui import mainwindow as main
@@ -137,7 +137,7 @@ def test_a_backup_restores_sounds_removed_a_moment_ago(window, tmp_path, qapp, m
     window.selection.delete()
     assert window.cfg.sounds == []
     window.import_package(str(out))   # still inside the Undo window
-    process_events(qapp, lambda: window.status.text().startswith("Imported"), 10)
+    process_events(qapp, lambda: said(window).startswith("Imported"), 10)
     window._finish_removals()
     assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn", "Crash"]
 
@@ -214,7 +214,7 @@ def test_a_sound_pack_is_kept_and_its_sounds_know_it(window, tmp_path, qapp):
         (pid, "0 Door"), (pid, "1 Dragon"), (pid, "2 Coins")]
     # imported again: kept once, nothing added
     window.import_package(str(_three_pack(tmp_path)))
-    process_events(qapp, lambda: "already" in window.status.text(), 10)
+    process_events(qapp, lambda: "already" in said(window), 10)
     assert len(backup.packs()) == 1 and len(window.cfg.sounds) == 6
 
 
@@ -229,7 +229,7 @@ def test_a_hand_made_pack_imported_twice_adds_nothing(window, tmp_path, qapp):
     window.import_package(str(_three_pack(tmp_path, fingerprints=False)))
     process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
     window.import_package(str(_three_pack(tmp_path, fingerprints=False)))
-    process_events(qapp, lambda: "already" in window.status.text(), 10)
+    process_events(qapp, lambda: "already" in said(window), 10)
     assert len(window.cfg.sounds) == 6
 
 
@@ -283,7 +283,7 @@ def test_import_without_provenance_stays_independent(window, tmp_path, qapp):
         m.pack = m.pack_item = ""
     backup.forget_pack(door.pack)
     window.import_package(str(_three_pack(tmp_path)))
-    process_events(qapp, lambda: "already" in window.status.text(), 10)
+    process_events(qapp, lambda: "already" in said(window), 10)
     pid, = backup.packs()
     assert [m.pack for m in window.cfg.sounds[3:]] == [""] * 3
     window.remove_pack(pid, ask=False)

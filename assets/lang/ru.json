@@ -13,7 +13,6 @@
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} (в «Также отправлять в»). Подключено? Попытка повторится сама.</span>",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не удалось поискать на {site}: {err}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не удаётся сыграть «{name}»{why}. Если файл перемещён или удалён, убери кнопку и добавь звук заново.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Не удалось подготовить прослушивание (см. журнал).</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Мгновенный повтор не может слушать: {error}</span>",
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нечего сохранять: {why}.</span>",
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Пульт выключен: {err}.</span>",
@@ -167,8 +166,6 @@
     "Импортировано {n} звука",
     "Импортировано {n} звуков"
   ],
-  "Importing {count} file(s)…": "Импортирую файлы: {count}…",
-  "Importing {n} sound(s)…": "Импортирую звуки: {n}…",
   "Importing {n} sound…": [
     "Импортирую {n} звук…",
     "Импортирую {n} звука…",
@@ -2935,7 +2932,6 @@
   "Reset to how it came": "Сброс до того, как это было",
   "Remove from the board": "Убрать с доски",
   "Onion Board {version} is out, click for details": "Onion Board {version} вышла, нажмите, чтобы узнать подробности",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Не удалось сохранить настройки, см. журнал в %APPDATA%\\OnionBoard.</span>",
   "Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.": "Не удалось сохранить настройки, см. журнал в %APPDATA%\\OnionBoard.",
   "Live: others hear you": "В прямом эфире: вас слышат другие",
   "There's no picture at that link.": "По этой ссылке нет изображения.",
@@ -3168,5 +3164,6 @@
     "{n} звук уже есть в твоей библиотеке",
     "{n} звука уже есть в твоей библиотеке",
     "{n} звуков уже есть в твоей библиотеке"
-  ]
+  ],
+  "Open Triggers": "Открыть триггеры"
 }

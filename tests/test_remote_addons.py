@@ -12,7 +12,7 @@ import threading
 import pytest
 from PySide6.QtWidgets import QLabel
 
-from conftest import process_events
+from conftest import process_events, said
 from soundboard import backup, modules, remote
 from soundboard.settings import SettingsDialog
 from soundboard.ui.remotehost import RemoteHost
@@ -239,7 +239,7 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
     srv._check_network()
     assert process_events(qapp, lambda: not srv.running, timeout=3)
     assert srv.error == remote.public_network()
-    assert "Public" in window.status.text()
+    assert "Public" in said(window)
     loop = remote.RemoteControl(lambda a, p: (200, {}))   # Stream Deck side: 127.0.0.1
     assert loop.start(0, "k") and loop.running
     loop.stop()

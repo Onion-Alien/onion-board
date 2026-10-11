@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema sa audio device: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Hindi ma-play ang “{name}”{why}. Kung nailipat o nabura ang file, alisin ang pad at idagdag ulit ang sound.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Hindi ma-scan ulit ang mga device, i-restart ang app para makuha ang mga bago.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Hindi ma-render ang preview (tingnan ang log).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Hindi ma-save ang settings mo, tingnan ang log sa %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Naka-off ang mga hotkey: ino-on ulit sila ng {key}.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Hindi makapakinig ang Instant replay: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Walang bukas na audio device, pumili sa Setup.</span>",
@@ -533,8 +531,6 @@
     "Na-import ang {n} sound ({skipped} ang nasa library mo na)",
     "Na-import ang {n} sound ({skipped} ang nasa library mo na)"
   ],
-  "Importing {count} file(s)…": "Ini-import ang {count} file…",
-  "Importing {n} sound(s)…": "Ini-import ang {n} sound…",
   "Importing {n} sound…": [
     "Ini-import ang {n} sound…",
     "Ini-import ang {n} sound…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} sound ang nasa library mo na",
     "{n} sound ang nasa library mo na"
-  ]
+  ],
+  "Open Triggers": "Buksan ang Triggers"
 }

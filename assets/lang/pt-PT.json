@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema no dispositivo de áudio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Não é possível tocar “{name}”{why}. Se o ficheiro foi movido ou eliminado, remove o botão e adiciona o som outra vez.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Não foi possível voltar a procurar dispositivos, reinicia a app para apanhar os novos.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Não foi possível gerar a pré-visualização (vê o registo).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Não foi possível guardar as tuas definições, vê o registo em %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Os atalhos estão desligados: {key} volta a ligá-los.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>A repetição instantânea não consegue ouvir: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Nenhum dispositivo de áudio aberto, escolhe um em Configurar.</span>",
@@ -533,8 +531,6 @@
     "{n} som importado ({skipped} já na tua biblioteca)",
     "{n} sons importados ({skipped} já na tua biblioteca)"
   ],
-  "Importing {count} file(s)…": "A importar {count} ficheiro(s)…",
-  "Importing {n} sound(s)…": "A importar {n} som(ns)…",
   "Importing {n} sound…": [
     "A importar {n} som…",
     "A importar {n} sons…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} sons já estão na tua biblioteca",
     "{n} sons já estão na tua biblioteca"
-  ]
+  ],
+  "Open Triggers": "Abrir Gatilhos"
 }

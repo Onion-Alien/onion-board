@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problem med lydenhet: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Kan ikke spille «{name}»{why}. Hvis filen er flyttet eller slettet, fjern paden og legg til lyden på nytt.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Fikk ikke søkt etter enheter på nytt, start appen på nytt for å finne nye.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Fikk ikke lagd forhåndsvisningen (se loggen).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Fikk ikke lagret innstillingene dine, se loggen i %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Hurtigtastene er av: {key} slår dem på igjen.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Øyeblikksreprise får ikke lyttet: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Ingen lydenhet er åpen, velg en i Oppsett.</span>",
@@ -533,8 +531,6 @@
     "Importerte {n} lyd ({skipped} allerede i biblioteket ditt)",
     "Importerte {n} lyder ({skipped} allerede i biblioteket ditt)"
   ],
-  "Importing {count} file(s)…": "Importerer {count} fil(er)…",
-  "Importing {n} sound(s)…": "Importerer {n} lyd(er)…",
   "Importing {n} sound…": [
     "Importerer {n} lyd…",
     "Importerer {n} lyder…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} lyder er allerede i biblioteket ditt",
     "{n} lyder er allerede i biblioteket ditt"
-  ]
+  ],
+  "Open Triggers": "Åpne Triggere"
 }

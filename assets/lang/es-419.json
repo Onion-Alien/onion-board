@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema con el dispositivo de audio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>No se puede reproducir “{name}”{why}. Si el archivo se movió o se eliminó, quita el pad y vuelve a agregar el sonido.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>No se pudieron volver a buscar dispositivos: reinicia la app para que detecte los nuevos.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>No se pudo preparar la vista previa (revisa el registro).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>No se pudo guardar tu configuración: revisa el registro en %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Los atajos están desactivados: {key} los vuelve a activar.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>La repetición instantánea no puede escuchar: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>No hay ningún dispositivo de audio abierto: elige uno en Configurar.</span>",
@@ -533,8 +531,6 @@
     "{n} sonido importado ({skipped} ya en tu biblioteca)",
     "{n} sonidos importados ({skipped} ya en tu biblioteca)"
   ],
-  "Importing {count} file(s)…": "Importando {count} archivo(s)…",
-  "Importing {n} sound(s)…": "Importando {n} sonido(s)…",
   "Importing {n} sound…": [
     "Importando {n} sonido…",
     "Importando {n} sonidos…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} sonidos ya están en tu biblioteca",
     "{n} sonidos ya están en tu biblioteca"
-  ]
+  ],
+  "Open Triggers": "Abrir Disparadores"
 }

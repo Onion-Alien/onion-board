@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>مشكلة في جهاز الصوت: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>تعذّر تشغيل “{name}”{why}. إذا نُقل الملف أو حُذف، فأزل الزر وأضف الصوت من جديد.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>تعذّرت إعادة البحث عن الأجهزة, أعد تشغيل التطبيق لاكتشاف الأجهزة الجديدة.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>تعذّر إنشاء المعاينة (راجع السجل).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>تعذّر حفظ إعداداتك, راجع السجل في %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>الاختصارات متوقفة: {key} يعيد تشغيلها.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>الإعادة الفورية لا تستطيع الاستماع: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>لا يوجد جهاز صوت مفتوح, اختر واحدًا في التهيئة.</span>",
@@ -200,8 +198,6 @@
     "استُورد {n} صوتًا",
     "استُورد {n} صوت"
   ],
-  "Importing {count} file(s)…": "جارٍ استيراد {count} ملف/ملفات…",
-  "Importing {n} sound(s)…": "جارٍ استيراد {n} صوت/أصوات…",
   "Importing {n} sound…": [
     "جارٍ استيراد {n} صوت…",
     "جارٍ استيراد {n} صوت…",
@@ -3381,5 +3377,6 @@
     "{n} أصوات موجودة بالفعل في مكتبتك",
     "{n} صوتًا موجودة بالفعل في مكتبتك",
     "{n} صوت موجودة بالفعل في مكتبتك"
-  ]
+  ],
+  "Open Triggers": "افتح المحفّزات"
 }

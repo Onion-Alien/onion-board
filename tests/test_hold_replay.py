@@ -6,7 +6,7 @@ import time
 import numpy as np
 import pytest
 
-from conftest import process_events
+from conftest import process_events, said
 from soundboard import replay as rp
 from soundboard.engine import SR
 from soundboard.library import SoundMeta
@@ -107,7 +107,7 @@ def test_instant_replay_with_nothing_heard_adds_nothing(window, qapp, monkeypatc
     FakeCapture.made[-1].sink(np.zeros((SR, 2), np.float32))   # silence
     n = len(w.cfg.sounds)
     w.on_hotkey("__replay__")
-    assert len(w.cfg.sounds) == n and "Nothing to save" in w.status.text()
+    assert len(w.cfg.sounds) == n and "Nothing to save" in said(w)
 
 
 def test_replay_keeps_only_the_last_seconds(qapp):

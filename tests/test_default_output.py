@@ -8,7 +8,7 @@ import pytest
 
 from soundboard import appaudio
 from soundboard import engine as eng
-from conftest import devices_done
+from conftest import devices_done, said
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 OUTS = ["Headphones  (Gaming Headset)", "Speakers (Realtek Audio)",
@@ -39,7 +39,7 @@ def test_the_headphones_follow_windows_default_output(window, monkeypatch):
     window._follow_default_output()
     assert window.cfg.mon_device == OUTS[1] and window.opened[-1] == OUTS[1]
     assert window.cb_mon.currentData() == OUTS[1]
-    assert "Speakers" in window.status.text()
+    assert "Speakers" in said(window)
 
 
 def test_a_device_picked_by_hand_stays(window, monkeypatch):
@@ -115,7 +115,7 @@ def test_picking_a_bluetooth_hands_free_mic_warns_about_call_quality(window, mon
     cb.setCurrentIndex(cb.count() - 1)
     window.on_device(cb, "mic_device")
     devices_done(window)
-    assert "phone-call mic" in window.status.text()
+    assert "phone-call mic" in said(window)
 
 
 def test_a_pick_waits_its_turn_while_a_driver_is_stuck(window, monkeypatch, qapp):

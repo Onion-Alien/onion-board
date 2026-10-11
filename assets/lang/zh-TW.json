@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>音訊裝置有問題：{problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>無法播放「{name}」{why}。如果檔案被移動或刪除了，請移除這個按鈕再重新加入音效。</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>無法重新掃描裝置，重新啟動程式即可偵測新裝置。</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>無法產生預覽（請看記錄）。</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>無法儲存你的設定，請看 %APPDATA%\\OnionBoard 裡的記錄。</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>快速鍵已關閉：按 {key} 可重新開啟。</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>即時重播無法收音：{error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>沒有開啟任何音訊裝置，請在「設置」裡選一個。</span>",
@@ -175,8 +173,6 @@
   "Imported {n} sound": [
     "已匯入 {n} 個音效"
   ],
-  "Importing {count} file(s)…": "正在匯入 {count} 個檔案…",
-  "Importing {n} sound(s)…": "正在匯入 {n} 個音效…",
   "Importing {n} sound…": [
     "正在匯入 {n} 個音效…"
   ],
@@ -3026,5 +3022,6 @@
   "That sound is already in your library": "這個聲音已經在你的音效庫裡",
   "{n} sound is already in your library": [
     "{n} 個聲音已經在你的音效庫裡"
-  ]
+  ],
+  "Open Triggers": "開啟觸發器"
 }

@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from conftest import own_module, real_pc_timing
+from conftest import own_module, real_pc_timing, said
 from soundboard import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
@@ -2176,14 +2176,14 @@ def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, 
     w.attach_mic()
     w.engine.errors["mon"] = "Device unavailable"
     w._update_status()
-    assert "problem" not in w.status.text()
+    assert "problem" not in said(w)
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     w._mic_attached("My mic", "")
-    assert "problem" not in w.status.text()
+    assert "problem" not in said(w)
     w._settle_until = 0.0
     w._update_status()
-    assert "headphones: Device unavailable" in w.status.text()
-    assert "mon:" not in w.status.text()
+    assert "headphones: Device unavailable" in said(w)
+    assert "mon:" not in said(w)
 
 
 def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noqa: F811

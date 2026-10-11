@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Äänilaiteongelma: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Ei voi soittaa: “{name}”{why}. Jos tiedosto siirrettiin tai poistettiin, poista nappi ja lisää ääni uudelleen.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Laitteita ei voitu etsiä uudelleen, käynnistä sovellus uudelleen löytääksesi uudet.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Esikatselua ei voitu tehdä (katso loki).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Asetuksiasi ei voitu tallentaa, katso loki kansiosta %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Pikanäppäimet ovat pois: {key} laittaa ne takaisin päälle.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Pikauusinta ei voi kuunnella: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Mikään äänilaite ei ole auki, valitse sellainen Käyttöönotossa.</span>",
@@ -533,8 +531,6 @@
     "Tuotiin {n} ääni ({skipped} jo kirjastossasi)",
     "Tuotiin {n} ääntä ({skipped} jo kirjastossasi)"
   ],
-  "Importing {count} file(s)…": "Tuodaan tiedostoja: {count}…",
-  "Importing {n} sound(s)…": "Tuodaan ääniä: {n}…",
   "Importing {n} sound…": [
     "Tuodaan {n} ääni…",
     "Tuodaan {n} ääntä…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} ääntä on jo kirjastossasi",
     "{n} ääntä on jo kirjastossasi"
-  ]
+  ],
+  "Open Triggers": "Avaa Laukaisimet"
 }

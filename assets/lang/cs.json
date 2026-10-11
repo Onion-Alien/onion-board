@@ -95,8 +95,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problém se zvukovým zařízením: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>„{name}“ nejde přehrát{why}. Pokud byl soubor přesunut nebo smazán, odeber pad a přidej zvuk znovu.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Zařízení se nepovedlo znovu vyhledat, restartuj aplikaci, aby načetla nová.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Náhled se nepovedlo vytvořit (viz záznam).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Nastavení se nepovedlo uložit, viz záznam v %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Zkratky jsou vypnuté: {key} je zase zapne.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Okamžitý záznam nemůže poslouchat: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Není otevřené žádné zvukové zařízení, vyber ho v Zapojení.</span>",
@@ -544,8 +542,6 @@
     "Importovány {n} zvuky ({skipped} už v knihovně je)",
     "Importováno {n} zvuků ({skipped} už v knihovně je)"
   ],
-  "Importing {count} file(s)…": "Importuji soubory ({count})…",
-  "Importing {n} sound(s)…": "Importuji zvuky ({n})…",
   "Importing {n} sound…": [
     "Importuji {n} zvuk…",
     "Importuji {n} zvuky…",
@@ -3168,5 +3164,6 @@
     "{n} zvuk už je v knihovně",
     "{n} zvuky už jsou v knihovně",
     "{n} zvuků už je v knihovně"
-  ]
+  ],
+  "Open Triggers": "Otevřít Spouštěče"
 }

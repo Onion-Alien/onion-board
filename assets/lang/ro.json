@@ -95,8 +95,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problemă cu dispozitivul audio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Nu se poate reda „{name}”{why}. Dacă fișierul a fost mutat sau șters, scoate pad-ul și adaugă sunetul din nou.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Nu s-au putut rescana dispozitivele, repornește aplicația ca să le vezi pe cele noi.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Nu s-a putut genera previzualizarea (vezi Jurnalul).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Nu s-au putut salva setările, vezi jurnalul din %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Tastele rapide sunt oprite: {key} le repornește.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Reluarea instantă nu poate asculta: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Niciun dispozitiv audio nu e deschis, alege unul în Configurare.</span>",
@@ -544,8 +542,6 @@
     "Am importat {n} sunete ({skipped} erau deja în biblioteca ta)",
     "Am importat {n} de sunete ({skipped} erau deja în biblioteca ta)"
   ],
-  "Importing {count} file(s)…": "Se importă fișiere: {count}…",
-  "Importing {n} sound(s)…": "Se importă sunete: {n}…",
   "Importing {n} sound…": [
     "Se importă {n} sunet…",
     "Se importă {n} sunete…",
@@ -3168,5 +3164,6 @@
     "{n} sunet e deja în biblioteca ta",
     "{n} sunete sunt deja în biblioteca ta",
     "{n} de sunete sunt deja în biblioteca ta"
-  ]
+  ],
+  "Open Triggers": "Deschide Declanșatoare"
 }
