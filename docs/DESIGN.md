@@ -3,7 +3,7 @@
 # Colour values live in soundboard/theme.py (THEMES): 30+ themes share these token
 # NAMES, so code always uses a token, never a hex value. The prose below says how.
 name: Onion Board
-version: 1
+version: 2
 platform: PySide6 (Qt Widgets), styled by one app style sheet (theme.stylesheet)
 font:
   family: "Segoe UI (a theme may swap it with its `font` token)"
@@ -54,6 +54,68 @@ in passing unless the task is about them.
 The style is **quiet and compact**: flat surfaces in the theme's colours, no resting
 outlines, controls only as big as their words, one accent-coloured thing that says
 "do this" or "this is on". The app should look designed, not generated.
+
+## 0. Foundation and decisions before drawing
+
+Use **Microsoft Fluent 2 interaction guidance, implemented with our existing
+PySide6 widgets**. `theme.py`, painted icons and shared UI helpers are the component
+implementation. This file is the app's single design contract. The web examples
+linked below explain behaviour; they are not dependencies to embed. Our compact
+geometry, themes, left-first actions and existing wording take precedence where
+Fluent examples differ. New UI must follow these decisions; older UI is migrated
+through [UI-AUDIT.md](UI-AUDIT.md) in small changes.
+
+### Choose the control by the user's task
+
+| Task | Default control and rule |
+| --- | --- |
+| Turn one setting on/off | Labelled `QCheckBox`. Reuse an existing `#power` checkable button for a feature's main on/off action. Do not introduce a third switch style. |
+| Pick one of 2-5 choices that need comparison | A labelled exclusive group. Use radio tiles for choices with icons or explanations; compact `QRadioButton`s suit short technical options. |
+| Pick a frequent short mode in a toolbar | Exclusive checkable buttons in `QButtonGroup`; match the existing mode controls. Give the group a label and keyboard selection. |
+| Pick from a long or changing list | `QComboBox`, with a persistent label, meaningful selected value and width cap. Devices, languages and voices belong here. Use a dropdown for a small group only when space demands it. |
+| Pick several independent options | Labelled checkboxes. Never radio buttons or an exclusive button group. |
+| Execute an action | `QPushButton`; one primary action, secondary actions quiet. A dropdown changes a value; a menu offers actions. |
+| Set a bounded number | Slider with a steady visible value; use a spin box where precise entry matters. |
+
+Different controls are intentional only when their tasks differ. Keep comparable
+choices in the same feature family consistent. An exclusive group must stay
+exclusive when restyled; verify arrows, Tab, Space and visible selected state.
+Custom button tiles need the keyboard behaviour of the radio choice they replace.
+
+### Choose the surface and save behaviour
+
+| Task | Default surface and contract |
+| --- | --- |
+| A few extra settings for the current card | A labelled inline disclosure, immediately after that card's main controls. Keep its common controls visible. |
+| A long editor or tuning while using the app | A retained modeless `QDialog`: reuse/raise it, apply live settings immediately, close without undoing them. |
+| Short secondary actions | A more-menu beside the card heading or item. Use `DropdownMenu` for button-anchored menus and `QMenu` for context menus. Both expose the same shared actions where applicable. |
+| Brief explanation | Anchored help popup; Escape/outside click closes it and focus returns to its opener. |
+| Edit an item as a transaction | Draft changes with `[Save] [Cancel]`; Cancel/Escape discards the draft. Preview must not persist edits. Modeless is preferred if the owning item can safely remain editable. |
+| A required decision or irreversible operation | A modal dialog with a specific action and Cancel. Explain the consequence; prefer Undo/recently deleted for reversible removal. |
+| General app preferences | Modeless settings, applied immediately, `[Done]` to close. No Save, Apply or Cancel implying rollback. |
+
+Use modal UI only when continuing would invalidate the task or require an answer.
+On Qt, prefer `open()` with `finished` for necessary modal tasks and `show()` for
+modeless windows; keep a reference and guard callbacks after close. Existing
+`exec()` flows need a lifecycle review before conversion. Escape follows the same
+contract as Cancel/Done. Closing a popup restores focus to its opener; a modeless
+window must not steal focus back while the user is working elsewhere.
+
+### Action rows and labels
+
+Place dialog actions at the bottom, logical start, main action first, then secondary
+actions, then stretch. Preview/reset tools stay beside what they affect. Do not let
+`QDialogButtonBox`'s platform ordering silently override this app's action order.
+Use Save for a draft commit, Cancel for discarding a draft, Done for closing live
+settings and Close for information. A destructive action uses its verb and `#danger`.
+Menus use short verbs, separators between groups and checkmarks for current values.
+Do not hide an action solely behind right-click; provide a keyboard or visible entry.
+
+Primary references: Fluent 2 [radio groups](https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage/),
+[dropdowns](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage),
+[buttons](https://fluent2.microsoft.design/components/web/react/core/button/usage/),
+[dialogs](https://fluent2.microsoft.design/components/web/react/core/dialog/usage),
+and Qt's [QDialog lifecycle](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QDialog.html).
 
 ## 1. The best screens to copy
 
@@ -151,10 +213,10 @@ three of these, and none of them is plain grey boxes of text:
   `QLabel#section` heading, optional ⓘ or ⋯ icon at the end of the same line.
 - **Status as a pill**, not a sentence: a small rounded label in the tone colour
   ("On", "Ready", "Not set up") beside the heading, via `theme.set_tone`.
-- **Choices as tiles**, not radio lists: icon + name (+ one muted line) in a rounded
+- **Choices as tiles** when they need comparison or explanation: icon + name (+ one muted line) in a rounded
   tile, the picked one filled with the accent tint. Copy `#voicetile`, `#themecard`, the
   setup guide's device rows and More tabs' `#tabcard` (picture, bold title, one-line
-  blurb).
+  blurb). Compact technical choices follow section 0; do not turn every field into a tile.
 - **Pictures**: a card about a thing shows it (an app icon, a device icon, the mascot,
   art from `assets/art/`), at a fixed size on the left.
 - **Rhythm**: 14 px padding, 8 px between rows, 12-16 px between groups; one idea per
@@ -284,6 +346,9 @@ The rules above are Onion Board's take on what the big design systems agree on n
 
 ## 13. Known gaps (old screens that break these rules)
 
+The prioritized, evidence-based fix list is [UI-AUDIT.md](UI-AUDIT.md). The notes
+below predate that spot audit: recheck them, rather than assuming they still apply.
+
 Fix these when a task touches them; don't sweep them all in one go.
 
 - Settings' *Done* and the setup guide's *Next* sit bottom-right.
@@ -294,6 +359,38 @@ Fix these when a task touches them; don't sweep them all in one go.
 - Plain cards: Setup's *Your mic* (paragraphs of how-to text that belong behind an ⓘ),
   *Connect your chat* (a grid of long word buttons that could be app tiles), Settings
   pages (rows of text and buttons with no icons or pills).
+
+## 14. UI workflow for agents and reviewers
+
+1. **Read and inspect.** Follow `AGENT-RULES.md` for latest main, open PRs and an
+   isolated checkout. Read this file and the relevant audit item. Inspect the
+   existing widget and reuse its helpers before inventing another pattern.
+2. **State the contract.** In the task notes or PR, write: user task; control chosen
+   from section 0; inline/menu/popup/dialog; live or draft changes; action order;
+   close/Escape behaviour. Explain any exception briefly. This needs no extra
+   user approval for ordinary implementation choices.
+3. **Build with existing pieces.** Use `theme.py`, `icons`, `Flow`, `fit`, `busy`,
+   wheelguard and established card/choice widgets. If two screens need the same
+   behaviour, extract a small shared helper instead of pasting another layout.
+4. **Review every affected state.** Render offscreen with the test fixtures and
+   `QT_QPA_FONTDIR` set to the system fonts. Inspect the complete page and each
+   menu, expanded card and dialog affected, including empty/populated and disabled/
+   busy states where relevant. Use Dark/Light, narrow/normal sizes, and German when
+   labels change; follow `AGENT-RULES.md` for full layout acceptance. Check focus,
+   keyboard choice, Escape, save/cancel semantics and long labels. Inspect High
+   Contrast/Retro 98 when colours or custom painting change.
+5. **Validate and deliver.** Translate user-visible changes in every catalog, run
+   `scripts\precommit.ps1` on the changed scope, and show the reviewed pictures.
+   Add behavioural regression checks for reported defects, not tests that merely
+   repeat styling code. Follow the normal PR/CI/local UTC merge loop.
+6. **Keep the contract current.** Mark only verified audit items complete with the
+   PR and validation. Update this file when adding an approved reusable pattern;
+   do not leave contradictory instructions in another document.
+
+PR evidence can be one short paragraph: `Control/surface: ...; changes: live/draft;
+actions: ...; close: ...; verified states: ...`. Documentation-only changes do not
+need new UI screenshots or runtime tests. This workflow is a review requirement;
+existing CI checks do not automatically judge visual or interaction consistency.
 
 ## Where this comes from
 
