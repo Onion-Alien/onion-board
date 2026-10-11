@@ -9,7 +9,7 @@ import math
 from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
+                               QLayout, QPushButton, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -298,6 +298,21 @@ def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     lbl.setToolTip(tip)
     lbl.setObjectName("iconlabel")
     return lbl
+
+
+def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18) -> QPushButton:
+    """An icon-only button (section 4: a picture says it, quiet, 28-32 px).
+
+    `tip` is the button's whole meaning: it is the tooltip and the screen-reader name
+    (`setAccessibleName`), so nothing depends on the drawing alone. Its words stay in
+    every catalog: pass an already-translated string to `tip`."""
+    b = QPushButton()
+    b.setObjectName("iconbutton")
+    b.setProperty("quiet", quiet)
+    icons.set_icon(b, name, size=size)
+    b.setToolTip(tip)
+    b.setAccessibleName(tip)
+    return b
 
 
 class _LevelDot(Meter):
