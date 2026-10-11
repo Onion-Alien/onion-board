@@ -505,10 +505,8 @@ class SettingsDialog(QDialog):
         close = QPushButton(_("Done"))
         close.setObjectName("primary")
         close.clicked.connect(self.accept)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        row.addWidget(close)
-        lay.addLayout(row)
+        from soundboard.ui.panel import action_row   # panel imports settings (widgets → pretty_key)
+        lay.addLayout(action_row(close))
         self._initial_size()
 
     # ------------------------------------------------------------------ search

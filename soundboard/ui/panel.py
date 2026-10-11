@@ -77,6 +77,18 @@ def bar(margins=(10, 8, 12, 8)) -> tuple[QFrame, QHBoxLayout]:
     return f, h
 
 
+def action_row(*buttons: QWidget, spacing: int = 8) -> QHBoxLayout:
+    """A dialog's action row, the main action first: `[Save] [Cancel]` then empty
+    space, never right-aligned (section 0: action rows and labels). The caller makes
+    the one filled `#primary` action first; everything else is a plain or quiet button."""
+    row = QHBoxLayout()
+    row.setSpacing(spacing)
+    for b in buttons:
+        row.addWidget(b)
+    row.addStretch(1)
+    return row
+
+
 class Flow(QLayout):
     """Lays its widgets out left to right, wrapping onto new lines (the Radio tab's
     genre chips, the Triggers tab's settings)."""

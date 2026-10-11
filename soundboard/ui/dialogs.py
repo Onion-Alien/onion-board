@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QFont, QPixmap
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog,
                                QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QPushButton, QScrollArea, QSlider, QTabWidget,
                                QVBoxLayout, QWidget)
@@ -15,7 +15,7 @@ from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COL
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import EqPanel, hint_label, section_label, steady_number
+from soundboard.ui.panel import EqPanel, action_row, hint_label, section_label, steady_number
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
@@ -427,8 +427,8 @@ class EditDialog(QDialog):
         self.effects.changed.connect(self._fx_note)
         self._fx_note()
 
-        # one row at the bottom: a headphones icon to preview on the left, the
-        # dialog's own buttons on the right
+        # one row at the bottom: a headphones icon to preview beside its content,
+        # then the dialog's actions, the main one first (Save)
         prev = self.btn_preview = QPushButton()
         prev.setObjectName("iconbutton")
         prev.setProperty("quiet", True)
@@ -451,19 +451,23 @@ class EditDialog(QDialog):
                           else _("▶  Playing"), 1500)
         prev.clicked.connect(play_preview)
 
-        bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        bb.button(QDialogButtonBox.Save).setObjectName("primary")   # the one filled button
-        bb.button(QDialogButtonBox.Cancel).setProperty("quiet", True)
-        copy = bb.addButton(_("Save as new sound"), QDialogButtonBox.AcceptRole)
+        save = QPushButton(_("Save"))
+        save.setObjectName("primary")   # the one filled button
+        save.setDefault(True)           # Enter in a field saves
+        save.clicked.connect(self.accept)
+        copy = QPushButton(_("Save as new sound"))
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
-        copy.clicked.connect(lambda: setattr(self, "as_copy", True))
-        bb.accepted.connect(self.accept)
-        bb.rejected.connect(self.reject)
-        brow = QHBoxLayout()
-        brow.addWidget(prev)
-        brow.addStretch(1)
-        brow.addWidget(bb)
-        lay.addLayout(brow)
+
+        def accept_copy():
+            self.as_copy = True
+            self.accept()
+        copy.clicked.connect(accept_copy)
+        cancel = QPushButton(_("Cancel"))
+        cancel.setProperty("quiet", True)
+        cancel.clicked.connect(self.reject)
+        for b in (prev, copy, cancel):
+            b.setAutoDefault(False)
+        lay.addLayout(action_row(prev, save, copy, cancel))
         self.setMinimumWidth(500)
         self.resize(540, 640)
 

@@ -7,12 +7,12 @@ import threading
 
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, Signal, Slot
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDialog, QFileDialog,
-                               QFileIconProvider, QHBoxLayout, QListWidget, QListWidgetItem,
+                               QFileIconProvider, QListWidget, QListWidgetItem,
                                QPushButton, QVBoxLayout)
 
 from soundboard import catswitch
 from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label
+from soundboard.ui.panel import action_row, hint_label
 from soundboard.i18n import _
 
 
@@ -57,21 +57,16 @@ class ProgramPicker(QDialog):
         self.list.itemSelectionChanged.connect(self._update)
         self.list.itemDoubleClicked.connect(lambda _i: self._ok())
         lay.addWidget(self.list, 1)
-        row = QHBoxLayout()
-        browse = QPushButton(_("Browse for a program"))
+        browse = QPushButton(_("Browse for a program…"))
         icons.set_icon(browse, "folder")
         browse.clicked.connect(self.browse)
-        row.addWidget(browse)
-        row.addStretch(1)
         self.btn_ok = QPushButton(_("Add"))
         self.btn_ok.setObjectName("primary")
         icons.set_icon(self.btn_ok, "plus", "on_accent")
         self.btn_ok.clicked.connect(self._ok)
-        row.addWidget(self.btn_ok)
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(self.reject)
-        row.addWidget(cancel)
-        lay.addLayout(row)
+        lay.addLayout(action_row(self.btn_ok, browse, cancel))
         self._icons = QFileIconProvider()
         self._wait = QListWidgetItem(_("Looking for open programs…"))
         self._wait.setFlags(Qt.NoItemFlags)

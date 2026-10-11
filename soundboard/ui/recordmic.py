@@ -20,7 +20,7 @@ from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS
 from soundboard.recorder import MicTake
 from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label
+from soundboard.ui.panel import action_row, hint_label
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.widgets import Meter
 from soundboard.i18n import _
@@ -202,24 +202,19 @@ class RecordDialog(QDialog):
         rv.addLayout(nr)
         lay.addWidget(self.review)
 
-        bottom = QHBoxLayout()
         self.btn_again = QPushButton(_("Record again"))
         icons.set_icon(self.btn_again, "record", size=14)
         self.btn_again.clicked.connect(self.record_again)
-        bottom.addWidget(self.btn_again)
-        bottom.addStretch(1)
         self.btn_save = QPushButton(_("Save"))
         self.btn_save.setObjectName("primary")
         icons.set_icon(self.btn_save, "plus", "on_accent")
         self.btn_save.clicked.connect(self.save)
-        bottom.addWidget(self.btn_save)
         close = QPushButton(_("Close"))
         close.clicked.connect(self.reject)
-        bottom.addWidget(close)
         for b in (self.btn_devices, self.btn_rec, self.btn_preview, self.btn_again, close):
             b.setAutoDefault(False)
         self.btn_save.setDefault(True)   # Enter in the name box saves
-        lay.addLayout(bottom)
+        lay.addLayout(action_row(self.btn_save, self.btn_again, close))
 
         self._timer = QTimer(self, interval=PUMP_MS)
         self._timer.timeout.connect(self._tick)

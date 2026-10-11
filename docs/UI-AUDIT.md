@@ -13,7 +13,7 @@ the affected states; include its PR and validation evidence here.
 
 ## Fix first
 
-- [ ] **U1: Consistent dialog actions.** Feedback uses left-first Send/Cancel;
+- [x] **U1: Consistent dialog actions.** Feedback uses left-first Send/Cancel;
   Settings Done and Edit sound actions are right-aligned in previews. Recording's
   saved-state row and Program picker also put actions after a stretch in code.
   Targets: `settings.py`, `ui/dialogs.py`, `ui/recordmic.py`, `ui/programpick.py`.
@@ -21,6 +21,16 @@ the affected states; include its PR and validation evidence here.
   action at logical start, then alternatives/Cancel/Done, one filled action;
   preview/reset stays with its content. Verify recording before/after capture,
   Edit Save/Save as new sound/Cancel, Enter/Escape, and narrow translated layouts.
+
+  Done (PR #TODO): added `panel.action_row` (buttons left to right, stretch last) and
+  used it in all four. Control/surface: dialog action rows. Changes: draft/live, each
+  dialog's own contract kept (Settings Done closes live settings; Edit Save commits a
+  draft; Record Save adds a pad; picker Add returns the choice). Actions: one filled
+  `#primary` main action first, then secondary/alternative, then Cancel/Done/Close,
+  stretch last. Preview stays beside its content (Edit headphones, Record Preview row).
+  Close/Enter/Escape kept: Escape rejects, Enter triggers the default Save/Add/Done.
+  Verified offscreen Dark/Light, narrow/normal and German: actions left-aligned, no
+  button clipped (`tests/test_dialog_actions.py`).
 
 - [ ] **U2: A clear rule for choice controls.** Recording source uses radio tiles;
   Appearance's live indicator and Connection use plain radios; output modes use
