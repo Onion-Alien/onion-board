@@ -2743,7 +2743,7 @@ class VoicePanel(QWidget):
         body.setMaximumWidth(960)   # compact headers; open panels wrap to this width
         self._body = body
         pv = QVBoxLayout(body)
-        pv.setContentsMargins(4, 4, 8, 12)
+        pv.setContentsMargins(0, 4, 8, 12)   # left edge in line with the download bar
         pv.setSpacing(16)
         cols = self._cols = QHBoxLayout()
         cols.setContentsMargins(0, 0, 0, 0)

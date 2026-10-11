@@ -19,10 +19,10 @@ import time
 import urllib.parse
 
 from PySide6.QtCore import QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPath, QPalette,
-                           QPixmap)
+from PySide6.QtGui import (QColor, QFontMetricsF, QIcon, QLinearGradient, QPainter,
+                           QPainterPath, QPalette, QPixmap)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
-                               QSizePolicy, QVBoxLayout, QWidget)
+                               QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.i18n import _, ngettext
@@ -264,56 +264,72 @@ class DownloadBar(QFrame):
 
         # Center column: pill, title and uploader on line 1, status and progress on line 2
         col = self._col = QVBoxLayout()
-        col.setSpacing(6)
+        col.setSpacing(2)   # line 2 is as tall as its buttons: they make the gap
         col.setContentsMargins(0, 0, 0, 0)
 
-        row1 = QHBoxLayout()
+        row1 = self._row1 = QHBoxLayout()
         row1.setSpacing(8)
         row1.setContentsMargins(0, 0, 0, 0)
+        # every piece of line 1 hangs from the top by its own amount (_line_up), so the
+        # words share one baseline and the pill and logo sit centred on the title
+        self._drops: dict[QWidget, QSpacerItem] = {}
+
+        def hang(w: QWidget, stretch: int = 0) -> QVBoxLayout:
+            v = QVBoxLayout()
+            v.setContentsMargins(0, 0, 0, 0)
+            v.setSpacing(0)
+            drop = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Fixed)
+            v.addItem(drop)
+            v.addWidget(w)
+            self._drops[w] = drop
+            row1.addLayout(v, stretch)
+            return v
 
         self.pill = QLabel()
         self.pill.setObjectName("actionpill")
         self.pill.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        row1.addWidget(self.pill)
+        hang(self.pill)
 
         self.lbl_title = ElideLabel()
         self.lbl_title.setObjectName("downloadtitle")
         f = self.lbl_title.font()
         f.setBold(True)
         self.lbl_title.setFont(f)
-        row1.addWidget(self.lbl_title, 0)
+        hang(self.lbl_title)
 
         self.src_icon = QLabel()   # where it's from: the site's logo, then its name
         self.src_icon.setFixedSize(14, 14)
         self.src_icon.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        row1.addWidget(self.src_icon)
+        hang(self.src_icon)
         self.lbl_src = QLabel()
         self.lbl_src.setObjectName("downloadmeta")
-        row1.addWidget(self.lbl_src)
+        hang(self.lbl_src)
 
         self.lbl_meta = ElideLabel()
         self.lbl_meta.setObjectName("downloadmeta")
         self.lbl_meta.hide()
-        row1.addWidget(self.lbl_meta, 1)
+        hang(self.lbl_meta, 1)
         row1.addStretch(1)   # a short title doesn't stretch the line
         col.addLayout(row1)
 
-        row2 = QHBoxLayout()
+        row2 = self._row2 = QHBoxLayout()
         row2.setSpacing(10)
         row2.setContentsMargins(0, 0, 0, 0)
 
         self.lbl_status = QLabel()
         self.lbl_status.setObjectName("downloadstatus")
         self.lbl_status.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        row2.addWidget(self.lbl_status)
+        row2.addWidget(self.lbl_status, 0, Qt.AlignVCenter)
 
         self.bar = SmoothProgressBar()
-        row2.addWidget(self.bar, 1)
+        row2.addWidget(self.bar, 1, Qt.AlignVCenter)
 
         col.addLayout(row2)
         h.addLayout(col, 1)
+        h.setAlignment(col, Qt.AlignVCenter)   # the two lines together, in the middle
 
-        # On the right: the queue's button, Stop all, Cancel (or ✕ once it's over)
+        # after the progress, on its line: the queue's button, Stop all, Cancel (or ✕ once
+        # it's over)
         self.queue_badge = QPushButton()
         self.queue_badge.setObjectName("queuebadge")
         self.queue_badge.setCheckable(True)
@@ -321,21 +337,21 @@ class DownloadBar(QFrame):
         self.queue_badge.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.queue_badge.toggled.connect(self._toggle_panel)
         self.queue_badge.hide()
-        h.addWidget(self.queue_badge, 0, Qt.AlignVCenter)
+        row2.addWidget(self.queue_badge, 0, Qt.AlignVCenter)
 
         self.btn_stop_all = QPushButton(_("Stop all"))
         self.btn_stop_all.setObjectName("cancelbutton")
         self.btn_stop_all.setCursor(Qt.PointingHandCursor)
         self.btn_stop_all.clicked.connect(self._on_stop_all)
         self.btn_stop_all.hide()
-        h.addWidget(self.btn_stop_all, 0, Qt.AlignVCenter)
+        row2.addWidget(self.btn_stop_all, 0, Qt.AlignVCenter)
 
         self.btn_cancel = QPushButton(_("Cancel"))
         self.btn_cancel.setObjectName("cancelbutton")
         self.btn_cancel.setCursor(Qt.PointingHandCursor)
         self.btn_cancel.setToolTip(_("Cancel download"))
         self.btn_cancel.clicked.connect(self._on_cancel)
-        h.addWidget(self.btn_cancel, 0, Qt.AlignVCenter)
+        row2.addWidget(self.btn_cancel, 0, Qt.AlignVCenter)
 
         self.btn_close = QPushButton("✕")
         self.btn_close.setObjectName("urgenthide")
@@ -343,7 +359,7 @@ class DownloadBar(QFrame):
         self.btn_close.setFixedSize(26, 26)
         self.btn_close.clicked.connect(self.hide)
         self.btn_close.hide()
-        h.addWidget(self.btn_close, 0, Qt.AlignVCenter)
+        row2.addWidget(self.btn_close, 0, Qt.AlignVCenter)
 
         # The queue: one row per pick waiting, each with its own ✕
         self.panel = QWidget()
@@ -414,12 +430,34 @@ class DownloadBar(QFrame):
             f"QLabel#queueindex {{ color:{T['muted']}; font-size:8.5pt; font-weight:700; }}"
         )
         self.bar.update()
+        self._line_up()
         self._update_queue_badge()
         if self.url:
             self._update_thumb()   # the plain icon is drawn in the theme's colour
             self.src_icon.setPixmap(self._icon(self._source[0]))
         if self.panel.isVisible():
             self._fill_rows()
+
+    def _line_up(self):
+        """Line 1 on one line: the title, the site's name and the uploader on the same
+        baseline, the pill and the site's logo centred on the middle of the title's
+        capitals. Worked out from the fonts the style sheet gave."""
+        texts = (self.lbl_title, self.lbl_src, self.lbl_meta)
+        for w in texts + (self.pill,):
+            w.ensurePolished()
+        cap_mid = QFontMetricsF(self.lbl_title.font()).capHeight() / 2
+        # how far below its own top each piece's line (baseline, or middle) falls
+        line_at = {}
+        for w in texts:
+            fm = QFontMetricsF(w.font())
+            w.setFixedHeight(math.ceil(fm.height()))
+            line_at[w] = (w.height() - fm.height()) / 2 + fm.ascent()
+        line_at[self.pill] = self.pill.sizeHint().height() / 2 + cap_mid
+        line_at[self.src_icon] = self.src_icon.height() / 2 + cap_mid
+        base = max(line_at.values())
+        for w, drop in self._drops.items():
+            drop.changeSize(0, round(base - line_at[w]), QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self._row1.invalidate()
 
     def showEvent(self, ev):
         super().showEvent(ev)
@@ -434,7 +472,11 @@ class DownloadBar(QFrame):
         self._show_meta()
 
     def set_mini(self, mini: bool):
+        """The mini player's narrow bar: no picture, the site as just its logo, and its
+        Stop all in the queue list (no room for it beside Cancel)."""
         self._mini = mini
+        self.lbl_src.setVisible(not mini)
+        self.retheme()   # also lines line 1 up again
         self._apply_art()
         self._head_lay.setContentsMargins(*((8, 6, 8, 6) if mini else (12, 10, 12, 10)))
         self._head_lay.setSpacing(8 if mini else 12)
@@ -458,6 +500,7 @@ class DownloadBar(QFrame):
         self._source = source_of(url)
         self.lbl_src.setText(self._source[1])
         self.src_icon.setPixmap(self._icon(self._source[0]))
+        self.src_icon.setToolTip(self._source[1])
 
         self.lbl_title.setText(self.title)
         self.lbl_title.setToolTip(self.title)

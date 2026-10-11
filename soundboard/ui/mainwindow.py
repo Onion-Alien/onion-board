@@ -1681,7 +1681,8 @@ class MainWindow(QMainWindow):
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
         body = QWidget()
-        inner = capped(body, margins=(4, 12, 8, 12))   # not a 900 px wide card at full screen
+        inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
+        # cards' left edge lines up with the download bar and the other tabs
         sections = QVBoxLayout(body)
         sections.setContentsMargins(0, 0, 0, 0)
         sections.setSpacing(16)

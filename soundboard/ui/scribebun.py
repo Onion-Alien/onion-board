@@ -22,7 +22,7 @@ import time
 from dataclasses import dataclass
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme
@@ -247,6 +247,10 @@ class ScribeBunny(QWidget):
         self._shown_prog = 0.0       # eased, so notes appear steadily
         self._last = time.monotonic()
         self._notes, self._bars = [], []   # reset() picks the piece
+        # the parts that don't move from frame to frame (Bun in a pose, the scroll with
+        # what's written so far) are drawn once and reused, so a frame is a few copies
+        self._layers: dict[tuple, QPixmap] = {}
+        self._scale = 1.0
         self._timer = QTimer(self)
         self._timer.setInterval(1000 // FPS)
         self._timer.timeout.connect(self._tick)
@@ -306,7 +310,26 @@ class ScribeBunny(QWidget):
         self._shown_prog += (self.prog - self._shown_prog) * min(1.0, dt * 6)
         if self.gone():
             self._timer.stop()
-        self.update()
+        if not self.window().isMinimized():   # nothing to see: skip the frame
+            self.update()
+
+    def _layer(self, key: tuple, draw) -> QPixmap:
+        """A transparent picture of the whole slot drawn by `draw(painter)`, kept by `key`."""
+        key = key + (theme.T["accent"], self._scale)
+        pm = self._layers.get(key)
+        if pm is None:
+            if len(self._layers) > 48:   # poses and pages of an old download
+                self._layers.clear()
+            dpr = self._scale
+            pm = QPixmap(round(SLOT_W * dpr), round(SLOT_H * dpr))
+            pm.setDevicePixelRatio(dpr)
+            pm.fill(Qt.transparent)
+            q = QPainter(pm)
+            q.setRenderHint(QPainter.Antialiasing)
+            draw(q)
+            q.end()
+            self._layers[key] = pm
+        return pm
 
     def _notes_written(self) -> float:
         """How many notes are on the scroll: in step with the download, so the scroll
@@ -323,6 +346,8 @@ class ScribeBunny(QWidget):
         t = time.monotonic()
         age = self._age()
         p = QPainter(self)
+        # the kept pictures are made at the screen's real pixel size (or a zoomed render's)
+        self._scale = round(max(p.device().devicePixelRatioF(), p.deviceTransform().m11()), 2)
         p.setRenderHint(QPainter.Antialiasing)
         p.setClipRect(self.rect())
         done = self.state == "done"
@@ -342,8 +367,10 @@ class ScribeBunny(QWidget):
         if done and age >= HOP_S:
             self._dust(p, (age - HOP_S) / SCOOT_S)
         bx = (SLOT_W - W * BUN_SCALE) / 2
-        draw_bunny(p, QRectF(bx, 0, W * BUN_SCALE, H * BUN_SCALE), None, blink=blink,
-                   ears=ears, sad=sad)
+        ears = round(ears)
+        p.drawPixmap(0, 0, self._layer(("bun", blink, ears, sad), lambda q: draw_bunny(
+            q, QRectF(bx, 0, W * BUN_SCALE, H * BUN_SCALE), None, blink=blink, ears=ears,
+            sad=sad)))
         self._scroll(p, t, age)
         p.end()
 
@@ -368,17 +395,30 @@ class ScribeBunny(QWidget):
         yt = TOP_Y + (mid - r - TOP_Y) * roll
         yb = BOT_Y + (mid + r - BOT_Y) * roll
         xl, xr = X0 + 7.0 * roll, X1 - 7.0 * roll
-        if roll < 1.0:   # the sheet between the rollers
-            p.setPen(ink)
-            p.setBrush(PARCHMENT)
-            p.drawRect(QRectF(xl + 2, yt, xr - xl - 4, yb - yt))
-        if roll < 1.0:
-            p.save()   # the writing rolls up with the sheet
-            p.setClipRect(QRectF(xl + 2, yt, xr - xl - 4, yb - yt))
-            self._staves_and_notes(p, xl, xr)
-            p.restore()
-        self._roller(p, xl, xr, yb, r, ink)
-        self._roller(p, xl, xr, yt, r, ink)
+        def sheet(q: QPainter, partial: bool):
+            if roll < 1.0:   # the sheet between the rollers, and the writing on it
+                q.setPen(ink)
+                q.setBrush(PARCHMENT)
+                q.drawRect(QRectF(xl + 2, yt, xr - xl - 4, yb - yt))
+                q.save()   # the writing rolls up with the sheet
+                q.setClipRect(QRectF(xl + 2, yt, xr - xl - 4, yb - yt))
+                self._staves_and_notes(q, xl, xr, partial)
+                q.restore()
+            self._roller(q, xl, xr, yb, r, ink)
+            self._roller(q, xl, xr, yt, r, ink)
+
+        if roll == 0.0:   # open and still: the written part is kept, the next note live
+            whole = int(self._notes_written())
+            p.drawPixmap(0, 0, self._layer(("sheet", id(self._notes), whole),
+                                           lambda q: sheet(q, False)))
+            n = self._notes_written()
+            if whole < len(self._notes) and n > whole and self.state == "downloading":
+                p.save()
+                p.setClipRect(QRectF(xl + 2, yt + r, xr - xl - 4, yb - yt - 2 * r))
+                self._note(p, self._notes[whole], n - whole)
+                p.restore()
+        else:
+            sheet(p, True)
         if roll > 0.6:   # tied up, with a bow
             ribbon = QColor(theme.T["accent"])
             ribbon.setAlphaF(min(1.0, (roll - 0.6) / 0.4))
@@ -434,7 +474,7 @@ class ScribeBunny(QWidget):
             _oval(p, x, cy, 4.2, 2 * r + 2.0, WOOD, QPen(INK, 1.2))
             _oval(p, x - 0.3, cy - r * 0.35, 1.3, r * 0.7, QColor("#e8b87c"))
 
-    def _staves_and_notes(self, p: QPainter, xl: float, xr: float):
+    def _staves_and_notes(self, p: QPainter, xl: float, xr: float, partial: bool = True):
         p.setPen(QPen(STAFF, 0.3))
         for bottom in ROW_BOTTOMS:
             for k in range(5):
@@ -446,7 +486,7 @@ class ScribeBunny(QWidget):
         notes = self._notes
         for i in range(whole):
             self._note(p, notes[i], 1.0)
-        if whole < len(notes) and n > whole and self.state == "downloading":
+        if partial and whole < len(notes) and n > whole and self.state == "downloading":
             self._note(p, notes[whole], n - whole)
         self._beams(p, notes[:whole])
         self._slurs(p, notes[:whole])
