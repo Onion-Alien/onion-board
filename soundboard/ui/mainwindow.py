@@ -50,6 +50,7 @@ from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, re
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card,
                                  hint_label, icon_label, steady_number, vsep)
+from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import set_tab_live
@@ -259,6 +260,21 @@ class BannerButton(QPushButton):
             text = fm.elidedText(self._short, Qt.ElideRight, max(0, room))
         if text != self.text():
             self.setText(text)
+
+
+class _Moved(QObject):
+    """Calls `fn` (once, after the layout settles) when the watched widget moves or
+    changes size."""
+
+    def __init__(self, widget: QWidget, fn):
+        super().__init__(widget)
+        self._fn = fn
+        widget.installEventFilter(self)
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.Resize, QEvent.Move, QEvent.Show):
+            QTimer.singleShot(0, self, self._fn)
+        return False
 
 
 class Pulse(QObject):
@@ -864,13 +880,30 @@ class MainWindow(QMainWindow):
         self._lang_offered = ""
         rv.addWidget(self.lang_bar)
 
+        # the bar and the tabs share a box with no gap of its own: every tab page already
+        # starts 8 px down, so the bar's gap to the first row matches the rows below it
+        tabs_box = self._tabs_box = QWidget()
+        tv = QVBoxLayout(tabs_box)
+        tv.setContentsMargins(0, 0, 0, 0)
+        tv.setSpacing(0)
+        self._tabs_lay = tv
+        # in a box of its own, so its edges can follow the page's cards (_fit_dl_bar)
+        dl_box = QWidget()
+        self._dl_lay = QHBoxLayout(dl_box)
+        self._dl_lay.setContentsMargins(0, 0, 0, 0)
+        self.download_bar = DownloadBar(self)
+        self._dl_lay.addWidget(self.download_bar)
+        tv.addWidget(dl_box)
+        self.download_bar.shown_changed.connect(self._dl_bar_gap)
+
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
         self.tabs = SideTabs()   # its bar hidden: the rail down the left shows the tabs
         self.tabs.setDocumentMode(True)
         self.tabs.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         SteadyTabs(self.tabs)   # a change inside a page doesn't repaint the whole board
-        rv.addWidget(self.tabs, 1)
+        tv.addWidget(self.tabs, 1)
+        rv.addWidget(tabs_box, 1)
         self.sounds_page = self._build_sounds_page()
         self.tabs.addTab(self.sounds_page, "")
         # the Radio tab, or the panel saying it's switched off (Settings > Privacy)
@@ -927,11 +960,12 @@ class MainWindow(QMainWindow):
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         self._full_row.insertWidget(0, self.rail)
-        # Tab goes header, rail, page (as it did with the top tabs), not page, rail
-        prev = self.tabs.previousInFocusChain()
+        # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
+        # page's box holds the download bar too, so the bar's buttons come just before it
+        prev = self._tabs_box.previousInFocusChain()
         for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status,
                   self.gear,
-                  self.rail.toggle, self.tabs):
+                  self.rail.toggle, self._tabs_box):
             QWidget.setTabOrder(prev, w)
             prev = w
         # right-click a tab: what it's for, or hide it (+ More tabs or Settings > Tabs
@@ -971,6 +1005,7 @@ class MainWindow(QMainWindow):
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
+        self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
         self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
         self._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
@@ -1004,6 +1039,35 @@ class MainWindow(QMainWindow):
         self.status.hide()
         self._pages.addWidget(self._build_mini())
 
+        self.linkbar.download_started.connect(self._on_download_started)
+        self.linkbar.progress.connect(self.download_bar.set_progress)
+        self.linkbar.progress.connect(self.mini_download_bar.set_progress)
+        self.linkbar.done.connect(self.download_bar.set_done)
+        self.linkbar.failed.connect(self.download_bar.set_failed)
+        self.linkbar.failed.connect(self.mini_download_bar.set_failed)
+        self.linkbar.done.connect(self.mini_download_bar.set_done)
+        self.download_bar.retry_requested.connect(self._retry_download)
+        self.mini_download_bar.retry_requested.connect(self._retry_download)
+        self.download_bar.front_requested.connect(self.linkbar.move_to_front)
+        self.mini_download_bar.front_requested.connect(self.linkbar.move_to_front)
+        self.linkbar.queue_updated.connect(self.download_bar.set_queue)
+        self.linkbar.queue_updated.connect(self.mini_download_bar.set_queue)
+        self.download_bar.cancel_requested.connect(self.linkbar.cancel)
+        self.mini_download_bar.cancel_requested.connect(self.linkbar.cancel)
+        self.download_bar.stop_all_requested.connect(self.linkbar.cancel_all)
+        self.mini_download_bar.stop_all_requested.connect(self.linkbar.cancel_all)
+        for b in (self.download_bar, self.mini_download_bar):
+            b.thumb_lookup = self.ytresults.thumb_for
+        self.linkbar.queued.connect(self.ytresults.queued)
+        self.ytresults.thumb_ready.connect(self.download_bar.set_thumb)
+        self.ytresults.thumb_ready.connect(self.mini_download_bar.set_thumb)
+
+    def _on_download_started(self, url: str, title: str, kind: str, secs: float = 0.0):
+        pm = self.ytresults.thumb_for(url)
+        channel, card_secs = self.ytresults.meta_for(url)
+        self.download_bar.set_active(url, title, kind, pm, channel, secs or card_secs)
+        self.mini_download_bar.set_active(url, title, kind, pm, channel, secs or card_secs)
+
     def _build_mini(self) -> QWidget:
         """The mini player: what's playing, play / stop, where it's at, Live and Stop
         all, and the pads above them if there's room. The pads are the real ones,
@@ -1012,6 +1076,9 @@ class MainWindow(QMainWindow):
         v = self._mini_v = QVBoxLayout(page)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
+        self.mini_download_bar = DownloadBar(self)
+        self.mini_download_bar.set_mini(True)
+        v.addWidget(self.mini_download_bar)
         v.addStretch(0)   # keeps the player at the bottom when the pads don't fit
         card = self._mini_card = QFrame()
         card.setObjectName("transport")
@@ -1202,11 +1269,31 @@ class MainWindow(QMainWindow):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
 
+    def _fit_dl_bar(self):
+        """A page whose cards stop short of the edges (Setup: room for its scroll bar,
+        and centred past the width cap on a wide window) names that column `dl_column`:
+        the download bar then takes the cards' own left and right edges."""
+        col = getattr(self.tabs.currentWidget(), "dl_column", None)
+        left = right = 0
+        if col is not None and col.isVisible():
+            x = col.mapTo(self._tabs_box, QPoint(0, 0)).x()
+            left, right = max(0, x), max(0, self._tabs_box.width() - x - col.width())
+        m = self._dl_lay.contentsMargins()
+        if (m.left(), m.right()) != (left, right):
+            self._dl_lay.setContentsMargins(left, 0, right, 0)
+
+    def _dl_bar_gap(self, shown: bool):
+        """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
+        and none from the Sounds page, whose first row then sits 8 px down like the rest."""
+        self._tabs_lay.setSpacing(8 if shown else 0)
+        self._sounds_lay.setContentsMargins(0, 0 if shown else 8, 0, 0)
+
     def _build_sounds_page(self) -> QWidget:
         c = self.cfg
         page = QWidget()
         left = QVBoxLayout(page)
         left.setContentsMargins(0, 8, 0, 0)
+        self._sounds_lay = left
         left.setSpacing(8)
         # one framed surface for the toolbar, every control the same height
         self.sounds_toolbar = QFrame()
@@ -1654,7 +1741,10 @@ class MainWindow(QMainWindow):
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
         body = QWidget()
-        inner = capped(body, margins=(4, 12, 8, 12))   # not a 900 px wide card at full screen
+        page.dl_column = body   # the download bar lines up with these cards
+        _Moved(body, self._fit_dl_bar)
+        inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
+        # cards' left edge lines up with the download bar and the other tabs
         sections = QVBoxLayout(body)
         sections.setContentsMargins(0, 0, 0, 0)
         sections.setSpacing(16)
@@ -4111,6 +4201,8 @@ class MainWindow(QMainWindow):
         self.radio.retheme()
         self.apps.retheme()
         self.triggers.retheme()
+        self.download_bar.retheme()
+        self.mini_download_bar.retheme()
         self.ytresults.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
@@ -4457,6 +4549,15 @@ class MainWindow(QMainWindow):
         self._cat_row.hide()
         self._results_open = True
         self._sync_cat_bar()
+
+    def _retry_download(self, item: dict):
+        """The download bar's Retry on a pick that failed: picked again, as if its
+        search card was clicked (it starts, or waits its turn)."""
+        kind = item["kind"]
+        self.linkbar.open(item["url"], item["title"], item["seconds"])
+        self.ytresults.mark(item["url"], kind)
+        if not (self.linkbar.play_once() if kind == "play" else self.linkbar.add()):
+            self.ytresults.mark(item["url"], kind, False)
 
     def _from_youtube(self, r, play: bool):
         if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:

@@ -213,6 +213,8 @@ class Thumb(QWidget):
         self._pm: QPixmap | None = None
         self._scaled: QPixmap | None = None   # _pm at this size: not scaled per paint
         self.now = ""   # "playing" / "paused" while it's the one in the player
+        self.progress_stage = ""
+        self.progress_frac = 0.0
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         policy = self.sizePolicy()
         policy.setHeightForWidth(True)
@@ -265,7 +267,51 @@ class Thumb(QWidget):
             p.drawPixmap(QPointF((w - size.width()) / 2, (h - size.height()) / 2), pm)
         if self.now:
             self._paint_now(p, w, h)
+        elif self.progress_stage:
+            self._paint_progress(p, w, h)
         p.end()
+
+    def _paint_progress(self, p: QPainter, w: int, h: int):
+        """Overlay while downloading / parsing / processing / queued."""
+        p.fillRect(QRectF(0, 0, w, h), QColor(0, 0, 0, 110))
+        stage = self.progress_stage
+        if stage == "parsing":
+            word = _("Parsing…")
+        elif stage == "processing":
+            word = _("Processing…")
+        elif stage == "queued":
+            word = _("Queued")
+        else:
+            word = f"{self.progress_frac * 100:.0f}%"
+
+        f = p.font()
+        f.setBold(True)
+        f.setPointSizeF(9)
+        p.setFont(f)
+        pill_w = p.fontMetrics().horizontalAdvance(word) + 20
+        pill = QRectF((w - pill_w) / 2, (h - 22) / 2, pill_w, 22)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(theme.T["accent"]))
+        p.drawRoundedRect(pill, 11, 11)
+        p.setPen(QColor(theme.T["on_accent"]))
+        p.drawText(pill, Qt.AlignCenter, word)
+
+        if stage not in ("downloading", "processing"):
+            return   # nothing measured yet: no line that would look stuck
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(0, 0, 0, 120))
+        p.drawRect(QRectF(0, h - 4, w, 4))
+        fill_w = w if stage == "processing" else w * self.progress_frac
+        p.setBrush(QColor(theme.T["accent"]))
+        p.drawRect(QRectF(0, h - 4, max(4.0, fill_w), 4))
+
+    def set_progress(self, stage: str, frac: float):
+        changed = (stage != self.progress_stage
+                   or abs(frac - self.progress_frac) > 0.01)
+        self.progress_stage = stage
+        self.progress_frac = frac
+        if changed:
+            self.update()
 
     def _paint_now(self, p: QPainter, w: int, h: int):
         """The one in the player: the picture dims and a big equalizer (bouncing, or
@@ -476,7 +522,6 @@ class ResultRow(HoverCard):
         self._style()
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
-        self._locked = False
         self.now = ""           # "playing" / "paused": it's the one in the player
         self.setProperty("playing", False)
         self.setCursor(Qt.PointingHandCursor)
@@ -506,14 +551,19 @@ class ResultRow(HoverCard):
                  f"{T['live_border']}; color:{T['live_text']}; }}")
         for kind, b in (("play", self.btn_play), ("add", self.btn_add)):
             css = added if kind == "add" and self._added_shown() else styles[kind]
-            if kind in getattr(self, "_release", {}) and self.fill >= 0:
-                # the download fills it from the left: accent over the card colour
-                f = min(max(self.fill, 0.0), 1.0)
-                on, off = T["accent"], theme.mix(T["card"], T["accent"], 0.12)
-                grad = (f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {on}, stop:{f:.3f} {on},"
-                        f" stop:{min(f + 0.001, 1):.3f} {off}, stop:1 {off})")
-                css = (f"QPushButton {{ {base} background:{grad}; border:1px solid {edge};"
-                       f" color:{T['text_hi']}; }}")
+            if kind in getattr(self, "_release", {}):
+                if self.fill >= 0:
+                    # the download fills it from the left: accent over the card colour
+                    f = min(max(self.fill, 0.0), 1.0)
+                    on, off = T["accent"], theme.mix(T["card"], T["accent"], 0.12)
+                    grad = (f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {on}, "
+                            f"stop:{f:.3f} {on}, stop:{min(f + 0.001, 1):.3f} {off}, stop:1 {off})")
+                    css = (f"QPushButton {{ {base} background:{grad}; border:1px solid {edge};"
+                           f" color:{T['text_hi']}; }}")
+                else:
+                    tint_bg = theme.mix(T["card"], T["accent"], 0.28)
+                    css = (f"QPushButton {{ {base} background:{tint_bg}; border:1px solid {edge};"
+                           f" color:{T['live_text']}; }}")
             if b.styleSheet() != css:
                 b.setStyleSheet(css)
 
@@ -583,37 +633,73 @@ class ResultRow(HoverCard):
         if kind in self._release or (kind == "add" and self._added):
             return
         btn = self._btn(kind)
-        if self._locked:
-            busy.set_busy(btn, False)
         if not self._release:
+            self.stage = "parsing"
             self.fill = 0.0
-            self._tip = _("Preparing audio download · 0%")
-        text = (_("Processing…") if self._tip == _("Processing audio…") else
+            self._tip = _("Parsing video…")
+            self.thumb.set_progress("parsing", 0.0)
+        text = (_("Processing…") if self.stage == "processing" else
                 (_("Adding… {pct:.0f}%", pct=self.fill * 100) if kind == "add" else
                  _("Loading… {pct:.0f}%", pct=self.fill * 100))
-                if self.fill > 0 else _("Preparing… 0%"))
+                if self.fill > 0 else _("Parsing…"))
         self._release[kind] = busy.hold(btn, text)
         btn.setToolTip(self._tip)
         self._style()
 
-    def set_progress(self, frac: float):
-        """0..1 of its audio downloaded, or below 0 while it's being converted."""
+    def set_queued(self, kind: str):
+        """This card waits for another download to finish first."""
+        if kind == "add" and self._added:
+            return
+        btn = self._btn(kind)
+        self.stage = "queued"
+        self.fill = -0.5
+        self._tip = _("Queued: waiting for current download to finish…")
+        if kind in self._release:   # already held busy by the click (mark): relabel it
+            btn.setText(_("Queued"))
+        else:
+            self._release[kind] = busy.hold(btn, _("Queued"))
+        btn.setToolTip(self._tip)
+        self.thumb.set_progress("queued", 0.0)
+        self._style()
+
+    def set_progress(self, frac):
+        """0..1 of its audio downloaded, 'parsing', or below 0 / 'processing' while converted."""
         if not self._release:
             return
-        if frac < 0:
+        if frac == "parsing":
+            self.stage = "parsing"
+            self.fill = -0.5
+            self._tip = _("Parsing video…")
+            self.thumb.set_progress("parsing", 0.0)
+            for kind in self._release:
+                btn = self._btn(kind)
+                btn.setText(_("Parsing…"))
+                btn.setToolTip(self._tip)
+        elif frac == "processing" or (isinstance(frac, (int, float)) and frac < 0):
+            self.stage = "processing"
             self._tip = _("Processing audio…")
             self.fill = 1.0
-        else:
-            self.fill = max(self.fill, min(1.0, frac))
-            self._tip = _("Downloading audio · {value:.0f}%", value=self.fill * 100)
-        for kind in self._release:
-            word = _("Adding…") if kind == "add" else _("Loading…")
-            btn = self._btn(kind)
-            btn.setText(_("Processing…") if frac < 0 else f"{word} {self.fill * 100:.0f}%")
-            btn.setToolTip(self._tip)
+            self.thumb.set_progress("processing", 1.0)
+            for kind in self._release:
+                btn = self._btn(kind)
+                btn.setText(_("Processing…"))
+                btn.setToolTip(self._tip)
+        elif isinstance(frac, (int, float)):
+            self.stage = "downloading"
+            self.fill = max(0.0, min(1.0, float(frac)))
+            pct = self.fill * 100
+            self._tip = _("Downloading audio · {value:.0f}%", value=pct)
+            self.thumb.set_progress("downloading", self.fill)
+            for kind in self._release:
+                word = _("Adding…") if kind == "add" else _("Loading…")
+                btn = self._btn(kind)
+                btn.setText(f"{word} {pct:.0f}%")
+                btn.setToolTip(self._tip)
         self._style()
 
     def set_done(self, kind: str, ok: bool):
+        self.stage = ""
+        self.thumb.set_progress("", 0.0)
         release = self._release.pop(kind, None)
         if not self._release:
             self.fill = -1.0
@@ -629,8 +715,6 @@ class ResultRow(HoverCard):
             busy.set_busy(self.btn_add, True)
         else:
             release(None if ok else (_("Didn't add") if kind == "add" else _("Didn't play")))
-            if self._locked:
-                busy.set_busy(self._btn(kind), True)
             if kind == "play" and self.now:   # it started before the button let go
                 now, self.now = self.now, ""
                 self.set_now(now)
@@ -640,19 +724,6 @@ class ResultRow(HoverCard):
             now, self.now = self.now, None   # its tooltip again, for what it's doing now
             self.set_now(now)
         self._style()
-
-    def set_locked(self, on: bool):
-        """Another card's download is running: this one's buttons wait for it (one at a
-        time, so a click never cancels the one before it)."""
-        if on == self._locked:
-            return
-        self._locked = on
-        for kind in ("play", "add"):
-            if kind in self._release or (kind == "add" and self._added):
-                continue
-            busy.set_busy(self._btn(kind), on)
-        self.setToolTip(_("Wait for the other download to finish") if on
-                        else _("Double-click to play"))
 
     def set_thumb(self, pm: QPixmap):
         self.thumb.set_pixmap(pm)
@@ -666,6 +737,7 @@ class SearchResults(RoundedFrame):
     play = Signal(object)
     add = Signal(object)
     closed = Signal()
+    thumb_ready = Signal(str, object)
     source_changed = Signal(str)
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
 
@@ -869,9 +941,7 @@ class SearchResults(RoundedFrame):
             self.loading.stop()
 
     def mark(self, url: str, kind: str, ok: bool | None = None):
-        """A row's Play / Add: busy (ok None) while its audio is fetched, then done.
-        Meanwhile the other rows' buttons wait: the link bar does one link at a time,
-        and a second pick used to replace the first, which then never played."""
+        """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
         if ok is None:
             self._fetching.setdefault(url, set()).add(kind)
         elif url in self._fetching:
@@ -884,7 +954,6 @@ class SearchResults(RoundedFrame):
                     r.set_busy(kind)
                 else:
                     r.set_done(kind, ok)
-        self._lock_rows()
 
     def show_now(self, url: str, now: str):
         """The player has `url` loaded ("playing" / "paused"), or nothing from here
@@ -892,15 +961,27 @@ class SearchResults(RoundedFrame):
         for r in self._rows:
             r.set_now(now if url and r.result.url == url else "")
 
-    def progress(self, url: str, frac: float):
-        """The link bar's download of `url`: 0..1, or below 0 while it's converted."""
+    def queued(self, url: str, kind: str):
+        """The link bar runs one download at a time: this pick waits its turn."""
+        for r in self._rows:
+            if r.result.url == url:
+                r.set_queued(kind)
+
+    def thumb_for(self, url: str) -> QPixmap | None:
+        """The picture of `url`'s card, if it has one yet (for the download bar)."""
+        return next((r.thumb._pm for r in self._rows
+                     if r.result.url == url and r.thumb.has_picture()), None)
+
+    def meta_for(self, url: str) -> tuple[str, float]:
+        """The uploader and length of `url`'s card, if it has one (for the download bar)."""
+        r = next((r.result for r in self._rows if r.result.url == url), None)
+        return (r.channel, r.seconds) if r else ("", 0.0)
+
+    def progress(self, url: str, frac):
+        """The link bar's download of `url`: 0..1, 'parsing', or below 0 / 'processing'."""
         for r in self._rows:
             if r.result.url == url:
                 r.set_progress(frac)
-
-    def _lock_rows(self):
-        for r in self._rows:
-            r.set_locked(bool(self._fetching) and r.result.url not in self._fetching)
 
     def _clear(self):
         """Off the screen now, not when Qt gets round to deleting them: a pasted link's
@@ -1010,7 +1091,6 @@ class SearchResults(RoundedFrame):
             reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
-        self._lock_rows()
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         data = reply.readAll()
@@ -1018,3 +1098,4 @@ class SearchResults(RoundedFrame):
         pm = QPixmap()
         if gen == self._gen and row in self._rows and pm.loadFromData(data):
             row.set_thumb(pm)
+            self.thumb_ready.emit(row.result.url, pm)

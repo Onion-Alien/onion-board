@@ -321,8 +321,6 @@
   "Playing": "Spielt",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Spielt nur, solange sein Hotkey oder MIDI-Pad gedrückt ist, wie eine Drucklufthupe. Ein Klick aufs Pad spielt es trotzdem ganz ab.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Spielt dein Mikro zusammen mit den Sounds in deine Kopfhörer, genau das, was andere hören. Solange es an ist, zeigt sich ein rotes Banner.",
-  "Preparing audio download · 0%": "Audio-Download wird vorbereitet · 0%",
-  "Preparing… 0%": "Wird vorbereitet… 0%",
   "Preset": "Vorlage",
   "Preview": "Vorschau",
   "Preview (only you hear it)": "Vorschau (nur du hörst sie)",
@@ -493,7 +491,6 @@
   "Voice": "Stimme",
   "Volume": "Lautstärke",
   "Volume for {count} (%):": "Lautstärke für {count} (%):",
-  "Wait for the other download to finish": "Warte, bis der andere Download fertig ist",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Führt dich durch Mikro, Kopfhörer, wohin deine Sounds gehen (dein Mikro, das Kabel, ein anderes Gerät oder nirgendwohin) und Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Schau dir das Video dieses Sounds an, während er spielt. Der Sound geht ganz normal raus; das Video ist nur für dich.",
   "What's new": "Was ist neu",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget ist nicht auf diesem PC, daher kann die App FFmpeg nicht installieren. Holen Sie es stattdessen von ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget hat länger als {seconds} Sekunden gebraucht.",
   "✓ Got FFmpeg": "✓ FFmpeg geholt",
-  "No settings match “{text}”": "Keine Einstellung passt zu „{text}“"
+  "No settings match “{text}”": "Keine Einstellung passt zu „{text}“",
+  "+{count} queued": [
+    "+{count} wartet",
+    "+{count} warten"
+  ],
+  "Add as sound": "Als Sound hinzufügen",
+  "Cancel download": "Download abbrechen",
+  "Couldn't download": "Konnte nicht heruntergeladen werden",
+  "Parsing video…": "Video wird analysiert…",
+  "Parsing…": "Wird analysiert…",
+  "Play once": "Einmal abspielen",
+  "Queue is full": "Warteschlange ist voll",
+  "Queued": "In Warteschlange",
+  "Queued: waiting for current download to finish…": "In Warteschlange: Warten auf Abschluss des aktuellen Downloads…",
+  "▶ Playing": "▶ Wird abgespielt",
+  "✓ Added to your sounds": "✓ Zu deinen Sounds hinzugefügt",
+  "Retry": "Erneut versuchen",
+  "Download this one next": "Das als Nächstes herunterladen"
 }

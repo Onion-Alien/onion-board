@@ -321,8 +321,6 @@
   "Playing": "Speelt",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Speelt alleen zolang de sneltoets of MIDI-pad ingedrukt is, zoals een luchthoorn. Klikken op de pad speelt hem nog steeds helemaal af.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Speelt je mic af in je koptelefoon bovenop de geluiden, precies wat anderen horen. Zolang het aan staat, zie je een rode balk.",
-  "Preparing audio download · 0%": "Audiodownload voorbereiden · 0%",
-  "Preparing… 0%": "Voorbereiden… 0%",
   "Preset": "Voorinstelling",
   "Preview": "Voorbeeld",
   "Preview (only you hear it)": "Voorbeeld (alleen jij hoort het)",
@@ -493,7 +491,6 @@
   "Voice": "Stem",
   "Volume": "Volume",
   "Volume for {count} (%):": "Volume voor {count} (%):",
-  "Wait for the other download to finish": "Wacht tot de andere download klaar is",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Loopt met je door mic, koptelefoon, waar je geluiden heen gaan (je mic, de kabel, een ander apparaat of nergens) en Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Bekijk de video van dit geluid terwijl het speelt. Het geluid gaat gewoon naar buiten; de video is alleen voor jou.",
   "What's new": "Wat is er nieuw",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget staat niet op deze pc, dus de app kan FFmpeg niet installeren. Haal het van ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget deed er langer dan {seconds} seconden over.",
   "✓ Got FFmpeg": "✓ FFmpeg opgehaald",
-  "No settings match “{text}”": "Er komt geen instelling overeen met “{text}”"
+  "No settings match “{text}”": "Er komt geen instelling overeen met “{text}”",
+  "+{count} queued": [
+    "+{count} in de wachtrij",
+    "+{count} in de wachtrij"
+  ],
+  "Add as sound": "Toevoegen als geluid",
+  "Cancel download": "Download annuleren",
+  "Couldn't download": "Downloaden mislukt",
+  "Parsing video…": "Video wordt gelezen…",
+  "Parsing…": "Wordt gelezen…",
+  "Play once": "Eén keer afspelen",
+  "Queue is full": "Wachtrij is vol",
+  "Queued": "In de wachtrij",
+  "Queued: waiting for current download to finish…": "In de wachtrij: wacht tot de huidige download klaar is…",
+  "▶ Playing": "▶ Speelt",
+  "✓ Added to your sounds": "✓ Toegevoegd aan je geluiden",
+  "Retry": "Opnieuw",
+  "Download this one next": "Deze als volgende downloaden"
 }

@@ -321,8 +321,6 @@
   "Playing": "चल रहा है",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "सिर्फ़ तभी चलता है जब उसकी हॉटकी या MIDI पैड दबा रहे, एयर हॉर्न की तरह। पैड पर क्लिक करने से यह फिर भी पूरा चलता है।",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "साउंड के साथ आपका माइक भी हेडफ़ोन में चलाता है, ठीक वही जो दूसरे सुनते हैं। चालू रहने पर एक लाल पट्टी दिखती है।",
-  "Preparing audio download · 0%": "ऑडियो डाउनलोड की तैयारी · 0%",
-  "Preparing… 0%": "तैयारी… 0%",
   "Preset": "प्रीसेट",
   "Preview": "प्रीव्यू",
   "Preview (only you hear it)": "प्रीव्यू (सिर्फ़ आप सुनते हैं)",
@@ -493,7 +491,6 @@
   "Voice": "वॉइस",
   "Volume": "वॉल्यूम",
   "Volume for {count} (%):": "{count} के लिए वॉल्यूम (%):",
-  "Wait for the other download to finish": "दूसरे डाउनलोड के पूरा होने का इंतज़ार करें",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "माइक, हेडफ़ोन, आपके साउंड कहाँ जाएँ (आपका माइक, केबल, कोई और डिवाइस या कहीं नहीं) और Discord, सब क़दम-दर-क़दम",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "चलते समय इस साउंड का वीडियो देखें। साउंड हमेशा की तरह बाहर जाता है; वीडियो सिर्फ़ आपके लिए है।",
   "What's new": "नया क्या है",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "इस PC पर winget नहीं है, इसलिए ऐप FFmpeg इंस्टॉल नहीं कर सकता। इसे ffmpeg.org से लें।",
   "winget took longer than {seconds} seconds.": "winget को {seconds} सेकंड से ज़्यादा समय लगा।",
   "✓ Got FFmpeg": "✓ FFmpeg मिल गया",
-  "No settings match “{text}”": "कोई भी सेटिंग \"{text}\" से मेल नहीं खाती"
+  "No settings match “{text}”": "कोई भी सेटिंग \"{text}\" से मेल नहीं खाती",
+  "+{count} queued": [
+    "+{count} कतार में",
+    "+{count} कतार में"
+  ],
+  "Add as sound": "साउंड के रूप में जोड़ें",
+  "Cancel download": "डाउनलोड रद्द करें",
+  "Couldn't download": "डाउनलोड नहीं हो सका",
+  "Parsing video…": "वीडियो पढ़ा जा रहा है…",
+  "Parsing…": "पढ़ा जा रहा है…",
+  "Play once": "एक बार चलाएँ",
+  "Queue is full": "कतार भरी है",
+  "Queued": "कतार में",
+  "Queued: waiting for current download to finish…": "कतार में: अभी का डाउनलोड पूरा होने का इंतज़ार…",
+  "▶ Playing": "▶ चल रहा है",
+  "✓ Added to your sounds": "✓ आपके साउंड में जोड़ा गया",
+  "Retry": "फिर कोशिश करें",
+  "Download this one next": "इसे अगला डाउनलोड करें"
 }

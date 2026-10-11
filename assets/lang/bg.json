@@ -801,8 +801,6 @@
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Звучи само докато бързият му клавиш или MIDI пэдът е задържан, като въздушна сирена. Кликът върху бутона пак го пуска докрай.",
   "Port": "Порт",
   "Position": "Позиция",
-  "Preparing audio download · 0%": "Подготовка на изтеглянето на аудио · 0%",
-  "Preparing… 0%": "Подготовка… 0%",
   "Preset": "Готова настройка",
   "Press a new key or combo for it": "Натисни нов клавиш или комбинация за него",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Натисни бързия клавиш в игра и звуците ти се появяват отгоре. Играта запазва клавиатурата и мишката ти, а клавишите на овърлея се връщат към играта в мига, в който се затвори.",
@@ -1232,7 +1230,6 @@
   "Volume": "Сила на звука",
   "Volume for {count} (%):": "Сила на звука за {count} (%):",
   "Wait first": "Първо изчакай",
-  "Wait for the other download to finish": "Изчакай другото изтегляне да свърши",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Чакам да те чуя… ако лентата не мърда, избери друг микрофон.",
   "Waits for the sounds playing to finish": "Чака звуците, които звучат, да свършат",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Чака толкова след натискането, преди да звучи, например за финала на шега. Спри всичко го отменя.",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget не е на този компютър, затова приложението не може да инсталира FFmpeg. Вземете го от ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget отне повече от {seconds} секунди.",
   "✓ Got FFmpeg": "✓ FFmpeg е взет",
-  "No settings match “{text}”": "Няма настройки, които да съответстват на „{text}“"
+  "No settings match “{text}”": "Няма настройки, които да съответстват на „{text}“",
+  "+{count} queued": [
+    "+{count} на опашка",
+    "+{count} на опашка"
+  ],
+  "Add as sound": "Добави като звук",
+  "Cancel download": "Отказ от изтеглянето",
+  "Couldn't download": "Не можа да се изтегли",
+  "Parsing video…": "Видеото се чете…",
+  "Parsing…": "Чете се…",
+  "Play once": "Пусни веднъж",
+  "Queue is full": "Опашката е пълна",
+  "Queued": "На опашка",
+  "Queued: waiting for current download to finish…": "На опашка: чака текущото изтегляне да свърши…",
+  "▶ Playing": "▶ Свири",
+  "✓ Added to your sounds": "✓ Добавено към звуците ти",
+  "Retry": "Опитай пак",
+  "Download this one next": "Изтегли това следващо"
 }

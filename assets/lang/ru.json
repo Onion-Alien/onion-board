@@ -296,8 +296,6 @@
   "Play your pads from your phone with Onion Pocket: Settings → Remote.": "Играй звуки с телефона через Onion Pocket: Настройки → Пульт.",
   "Playing": "Играет",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Играет, только пока зажата его горячая клавиша или MIDI-пэд, как гудок. Клик по кнопке всё равно играет его до конца.",
-  "Preparing audio download · 0%": "Готовлю загрузку звука · 0%",
-  "Preparing… 0%": "Готовлю… 0%",
   "Preset": "Пресет",
   "Preview": "Прослушать",
   "Preview (only you hear it)": "Прослушать (слышишь только ты)",
@@ -458,7 +456,6 @@
   "Voice": "Голос",
   "Volume": "Громкость",
   "Volume for {count} (%):": "Громкость для: {count} (%):",
-  "Wait for the other download to finish": "Подожди, пока закончится другая загрузка",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Проведёт по микрофону, наушникам, тому, куда идут твои звуки (микрофон, кабель, другое устройство или никуда), и Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Смотри видео этого звука, пока он играет. Звук уходит как обычно; видео только для тебя.",
   "What's new": "Что нового",
@@ -3081,5 +3078,23 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget нет на этом ПК, поэтому приложение не может установить FFmpeg. Скачайте его с ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget работал дольше {seconds} секунд.",
   "✓ Got FFmpeg": "✓ FFmpeg установлен",
-  "No settings match “{text}”": "Ни одна настройка не соответствует «{text}»"
+  "No settings match “{text}”": "Ни одна настройка не соответствует «{text}»",
+  "+{count} queued": [
+    "+{count} в очереди",
+    "+{count} в очереди",
+    "+{count} в очереди"
+  ],
+  "Add as sound": "Добавить как звук",
+  "Cancel download": "Отменить скачивание",
+  "Couldn't download": "Не удалось скачать",
+  "Parsing video…": "Анализ видео…",
+  "Parsing…": "Анализ…",
+  "Play once": "Воспроизвести один раз",
+  "Queue is full": "Очередь заполнена",
+  "Queued": "В очереди",
+  "Queued: waiting for current download to finish…": "В очереди: ожидание завершения текущей загрузки…",
+  "▶ Playing": "▶ Воспроизведение",
+  "✓ Added to your sounds": "✓ Добавлено в звуки",
+  "Retry": "Повторить",
+  "Download this one next": "Скачать это следующим"
 }

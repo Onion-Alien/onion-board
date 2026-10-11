@@ -321,8 +321,6 @@
   "Playing": "Tocando",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Toca só enquanto o atalho ou pad MIDI dele está pressionado, como uma buzina. Clicar no botão ainda toca até o fim.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Toca seu microfone nos seus fones de ouvido junto com os sons, exatamente o que os outros ouvem. Uma faixa vermelha aparece enquanto está ligado.",
-  "Preparing audio download · 0%": "Preparando o download do áudio · 0%",
-  "Preparing… 0%": "Preparando… 0%",
   "Preset": "Predefinição",
   "Preview": "Prévia",
   "Preview (only you hear it)": "Prévia (só você ouve)",
@@ -493,7 +491,6 @@
   "Voice": "Voz",
   "Volume": "Volume",
   "Volume for {count} (%):": "Volume de {count} (%):",
-  "Wait for the other download to finish": "Espere o outro download terminar",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Guia você por microfone, fones de ouvido, para onde seus sons vão (seu microfone, o cabo, outro dispositivo ou lugar nenhum) e Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Assista ao vídeo deste som enquanto ele toca. O som sai normalmente; o vídeo é só para você.",
   "What's new": "Novidades",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "O winget não está neste PC, então o aplicativo não pode instalar o FFmpeg. Pegue em ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "O winget levou mais de {seconds} segundos.",
   "✓ Got FFmpeg": "✓ FFmpeg obtido",
-  "No settings match “{text}”": "Nenhuma configuração corresponde a “{text}”"
+  "No settings match “{text}”": "Nenhuma configuração corresponde a “{text}”",
+  "+{count} queued": [
+    "+{count} na fila",
+    "+{count} na fila"
+  ],
+  "Add as sound": "Adicionar como som",
+  "Cancel download": "Cancelar download",
+  "Couldn't download": "Não foi possível baixar",
+  "Parsing video…": "Analisando vídeo…",
+  "Parsing…": "Analisando…",
+  "Play once": "Reproduzir uma vez",
+  "Queue is full": "A fila está cheia",
+  "Queued": "Na fila",
+  "Queued: waiting for current download to finish…": "Na fila: aguardando o download atual terminar…",
+  "▶ Playing": "▶ Reproduzindo",
+  "✓ Added to your sounds": "✓ Adicionado aos seus sons",
+  "Retry": "Tentar de novo",
+  "Download this one next": "Baixar este em seguida"
 }

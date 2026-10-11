@@ -879,8 +879,6 @@
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Pouští tvůj mikrofon do sluchátek přes zvuky, přesně to, co slyší ostatní. Dokud je zapnuté, svítí červený banner.",
   "Port": "Port",
   "Position": "Pozice",
-  "Preparing audio download · 0%": "Připravuji stahování zvuku · 0%",
-  "Preparing… 0%": "Připravuji… 0%",
   "Preset": "Předvolba",
   "Press a new key or combo for it": "Stiskni pro něj novou klávesu nebo kombinaci",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Stiskni zkratku ve hře a tvoje zvuky se objeví nad ní. Hra si nechá klávesnici i myš a klávesy překryvu se vrátí hře hned, jak se zavře.",
@@ -1329,7 +1327,6 @@
   "Volume": "Hlasitost",
   "Volume for {count} (%):": "Hlasitost pro {count} (%):",
   "Wait first": "Nejdřív počkat",
-  "Wait for the other download to finish": "Počkej, až doběhne druhé stahování",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Čekám, až tě uslyším… pokud se lišta nehýbe, vyber jiný mikrofon.",
   "Waits for the sounds playing to finish": "Počká, až dohrají hrající zvuky",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Po stisku počká takhle dlouho, než začne hrát, třeba kvůli pointě. Zastavit všechno ho zruší.",
@@ -3081,5 +3078,23 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget na tomto PC není, takže aplikace nemůže FFmpeg nainstalovat. Vezměte ho z ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget trval déle než {seconds} sekund.",
   "✓ Got FFmpeg": "✓ FFmpeg získán",
-  "No settings match “{text}”": "Žádné nastavení neodpovídá „{text}“"
+  "No settings match “{text}”": "Žádné nastavení neodpovídá „{text}“",
+  "+{count} queued": [
+    "+{count} ve frontě",
+    "+{count} ve frontě",
+    "+{count} ve frontě"
+  ],
+  "Add as sound": "Přidat jako zvuk",
+  "Cancel download": "Zrušit stahování",
+  "Couldn't download": "Nepodařilo se stáhnout",
+  "Parsing video…": "Načítá se video…",
+  "Parsing…": "Načítá se…",
+  "Play once": "Přehrát jednou",
+  "Queue is full": "Fronta je plná",
+  "Queued": "Ve frontě",
+  "Queued: waiting for current download to finish…": "Ve frontě: čeká na dokončení stahování…",
+  "▶ Playing": "▶ Hraje",
+  "✓ Added to your sounds": "✓ Přidáno do tvých zvuků",
+  "Retry": "Zkusit znovu",
+  "Download this one next": "Stáhnout tohle jako další"
 }

@@ -315,8 +315,6 @@
   "Playing": "재생 중",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "단축키나 MIDI 패드를 누르고 있는 동안만 재생돼요(에어혼처럼). 패드를 클릭하면 끝까지 재생돼요.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "사운드 위에 내 마이크를 헤드폰으로 들려줘요, 다른 사람이 듣는 그대로예요. 켜져 있는 동안 빨간 배너가 표시돼요.",
-  "Preparing audio download · 0%": "오디오 다운로드 준비 중 · 0%",
-  "Preparing… 0%": "준비 중… 0%",
   "Preset": "프리셋",
   "Preview": "미리 듣기",
   "Preview (only you hear it)": "미리 듣기(나만 들음)",
@@ -487,7 +485,6 @@
   "Voice": "음성",
   "Volume": "볼륨",
   "Volume for {count} (%):": "{count}의 볼륨(%):",
-  "Wait for the other download to finish": "다른 다운로드가 끝날 때까지 기다리세요",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "마이크, 헤드폰, 사운드가 갈 곳(내 마이크, 케이블, 다른 장치, 없음), Discord까지 차근차근 안내해요",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "재생하는 동안 이 사운드의 동영상을 봐요. 사운드는 평소처럼 나가고, 동영상은 나만 봐요.",
   "What's new": "새로운 기능",
@@ -2953,5 +2950,21 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "이 PC에 winget이 없어 앱에서 FFmpeg를 설치할 수 없습니다. ffmpeg.org에서 받으세요.",
   "winget took longer than {seconds} seconds.": "winget이 {seconds}초보다 오래 걸렸습니다.",
   "✓ Got FFmpeg": "✓ FFmpeg 받음",
-  "No settings match “{text}”": "“{text}”와 일치하는 설정이 없습니다."
+  "No settings match “{text}”": "“{text}”와 일치하는 설정이 없습니다.",
+  "+{count} queued": [
+    "+{count}개 대기 중"
+  ],
+  "Add as sound": "사운드로 추가",
+  "Cancel download": "다운로드 취소",
+  "Couldn't download": "다운로드하지 못했어요",
+  "Parsing video…": "동영상 읽는 중…",
+  "Parsing…": "읽는 중…",
+  "Play once": "한 번 재생",
+  "Queue is full": "대기열이 가득 찼어요",
+  "Queued": "대기 중",
+  "Queued: waiting for current download to finish…": "대기 중: 지금 다운로드가 끝나길 기다리는 중…",
+  "▶ Playing": "▶ 재생 중",
+  "✓ Added to your sounds": "✓ 내 사운드에 추가됨",
+  "Retry": "다시 시도",
+  "Download this one next": "이걸 다음에 다운로드"
 }

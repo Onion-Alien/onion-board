@@ -866,8 +866,6 @@
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Reproduce tu micrófono en tus audífonos por encima de los sonidos: justo lo que oyen los demás. Mientras está activado se ve un aviso rojo.",
   "Port": "Puerto",
   "Position": "Posición",
-  "Preparing audio download · 0%": "Preparando la descarga de audio · 0%",
-  "Preparing… 0%": "Preparando… 0%",
   "Preset": "Preajuste",
   "Press a new key or combo for it": "Presiona una tecla o combinación nueva para él",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Presiona el atajo en un juego y tus sonidos aparecen encima. El juego conserva tu teclado y tu mouse, y las teclas de la superposición vuelven al juego en cuanto se cierra.",
@@ -1312,7 +1310,6 @@
   "Volume": "Volumen",
   "Volume for {count} (%):": "Volumen para {count} (%):",
   "Wait first": "Esperar antes",
-  "Wait for the other download to finish": "Espera a que termine la otra descarga",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Esperando oírte… si la barra no se mueve, elige otro micrófono.",
   "Waits for the sounds playing to finish": "Espera a que terminen los sonidos que están sonando",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Espera este tiempo después de presionarlo antes de sonar, por ejemplo para el remate de un chiste. Detener todo lo cancela.",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget no está en este PC, así que la aplicación no puede instalar FFmpeg. Obténlo en ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget tardó más de {seconds} segundos.",
   "✓ Got FFmpeg": "✓ FFmpeg obtenido",
-  "No settings match “{text}”": "Ninguna configuración coincide con \"{text}\""
+  "No settings match “{text}”": "Ninguna configuración coincide con \"{text}\"",
+  "+{count} queued": [
+    "+{count} en cola",
+    "+{count} en cola"
+  ],
+  "Add as sound": "Agregar como sonido",
+  "Cancel download": "Cancelar descarga",
+  "Couldn't download": "No se pudo descargar",
+  "Parsing video…": "Analizando video…",
+  "Parsing…": "Analizando…",
+  "Play once": "Reproducir una vez",
+  "Queue is full": "La fila está llena",
+  "Queued": "En cola",
+  "Queued: waiting for current download to finish…": "En cola: esperando a que termine la descarga actual…",
+  "▶ Playing": "▶ Reproduciendo",
+  "✓ Added to your sounds": "✓ Agregado a tus sonidos",
+  "Retry": "Reintentar",
+  "Download this one next": "Descargar este a continuación"
 }

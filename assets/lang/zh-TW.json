@@ -315,8 +315,6 @@
   "Playing": "播放中",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "只有按住快速鍵或 MIDI 打擊墊時才播放，就像汽笛喇叭。點擊按鈕仍會完整播放。",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "把你的麥克風疊加在音效上，播到你的耳機裡，完全就是別人聽到的。開啟時會顯示紅色橫幅。",
-  "Preparing audio download · 0%": "準備下載音訊 · 0%",
-  "Preparing… 0%": "準備中… 0%",
   "Preset": "預設集",
   "Preview": "試聽",
   "Preview (only you hear it)": "試聽（只有你聽得到）",
@@ -487,7 +485,6 @@
   "Voice": "語音",
   "Volume": "音量",
   "Volume for {count} (%):": "{count} 的音量（%）：",
-  "Wait for the other download to finish": "請等其他下載完成",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "帶你設定麥克風、耳機、音效要送到哪裡（你的麥克風、音源線、其他裝置或不傳送）以及 Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "播放時觀看這個音效的影片。音效仍會照常送出；影片只有你看得到。",
   "What's new": "新功能",
@@ -2953,5 +2950,21 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "這台電腦上沒有 winget，因此應用程式無法安裝 FFmpeg。請從 ffmpeg.org 取得。",
   "winget took longer than {seconds} seconds.": "winget 花了超過 {seconds} 秒。",
   "✓ Got FFmpeg": "✓ 已取得 FFmpeg",
-  "No settings match “{text}”": "沒有設定符合“{text}”"
+  "No settings match “{text}”": "沒有設定符合“{text}”",
+  "+{count} queued": [
+    "+{count} 個排隊中"
+  ],
+  "Add as sound": "新增為聲音",
+  "Cancel download": "取消下載",
+  "Couldn't download": "無法下載",
+  "Parsing video…": "正在解析影片…",
+  "Parsing…": "正在解析…",
+  "Play once": "播放一次",
+  "Queue is full": "隊列已滿",
+  "Queued": "排隊中",
+  "Queued: waiting for current download to finish…": "排隊中: 正在等待當前下載完成…",
+  "▶ Playing": "▶ 正在播放",
+  "✓ Added to your sounds": "✓ 已新增到您的聲音",
+  "Retry": "重試",
+  "Download this one next": "下一個下載這個"
 }

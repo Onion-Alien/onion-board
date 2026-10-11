@@ -866,8 +866,6 @@
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Παίζει το μικρόφωνό σου στα ακουστικά σου πάνω από τους ήχους, ακριβώς ό,τι ακούν οι άλλοι. Όσο είναι ανοιχτό φαίνεται μια κόκκινη μπάρα.",
   "Port": "Θύρα",
   "Position": "Θέση",
-  "Preparing audio download · 0%": "Προετοιμασία λήψης ήχου · 0%",
-  "Preparing… 0%": "Προετοιμασία… 0%",
   "Preset": "Προεπιλογή",
   "Press a new key or combo for it": "Πάτα νέο πλήκτρο ή συνδυασμό γι' αυτό",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Πάτα τη συντόμευση μέσα στο παιχνίδι και οι ήχοι σου εμφανίζονται από πάνω. Το παιχνίδι κρατάει το πληκτρολόγιο και το ποντίκι σου, και τα πλήκτρα της επικάλυψης γυρνούν στο παιχνίδι μόλις κλείσει.",
@@ -1312,7 +1310,6 @@
   "Volume": "Ένταση",
   "Volume for {count} (%):": "Ένταση για {count} (%):",
   "Wait first": "Αναμονή πριν",
-  "Wait for the other download to finish": "Περίμενε να τελειώσει η άλλη λήψη",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Περιμένω να σε ακούσω… αν η μπάρα δεν κουνιέται, διάλεξε άλλο μικρόφωνο.",
   "Waits for the sounds playing to finish": "Περιμένει να τελειώσουν οι ήχοι που παίζουν",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Περιμένει τόσο μετά το πάτημα πριν παίξει, π.χ. για την ατάκα. Το Σταμάτα τα πάντα το ακυρώνει.",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "Το winget δεν υπάρχει σε αυτόν τον υπολογιστή, οπότε η εφαρμογή δεν μπορεί να εγκαταστήσει το FFmpeg. Πάρτε το από το ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "Το winget πήρε περισσότερο από {seconds} δευτερόλεπτα.",
   "✓ Got FFmpeg": "✓ Το FFmpeg αποκτήθηκε",
-  "No settings match “{text}”": "Καμία ρύθμιση δεν ταιριάζει με το \"{text}\""
+  "No settings match “{text}”": "Καμία ρύθμιση δεν ταιριάζει με το \"{text}\"",
+  "+{count} queued": [
+    "+{count} σε αναμονή",
+    "+{count} σε αναμονή"
+  ],
+  "Add as sound": "Προσθήκη ως ήχος",
+  "Cancel download": "Ακύρωση λήψης",
+  "Couldn't download": "Η λήψη απέτυχε",
+  "Parsing video…": "Ανάγνωση βίντεο…",
+  "Parsing…": "Ανάγνωση…",
+  "Play once": "Αναπαραγωγή μία φορά",
+  "Queue is full": "Η ουρά είναι γεμάτη",
+  "Queued": "Σε αναμονή",
+  "Queued: waiting for current download to finish…": "Σε αναμονή: περιμένει να τελειώσει η τρέχουσα λήψη…",
+  "▶ Playing": "▶ Παίζει",
+  "✓ Added to your sounds": "✓ Προστέθηκε στους ήχους σου",
+  "Retry": "Δοκίμασε ξανά",
+  "Download this one next": "Κατέβασε αυτό επόμενο"
 }

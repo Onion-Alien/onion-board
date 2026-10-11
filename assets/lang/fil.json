@@ -866,8 +866,6 @@
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Pine-play ang mic mo sa headphones mo kasabay ng mga sound, eksaktong naririnig ng iba. May pulang banner habang naka-on ito.",
   "Port": "Port",
   "Position": "Posisyon",
-  "Preparing audio download · 0%": "Inihahanda ang audio download · 0%",
-  "Preparing… 0%": "Inihahanda… 0%",
   "Preset": "Preset",
   "Press a new key or combo for it": "Pindutin ang bagong key o combo para dito",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Pindutin ang hotkey sa game at lalabas ang mga sound mo sa ibabaw nito. Nasa game pa rin ang keyboard at mouse mo, at babalik sa game ang mga key ng overlay pagkasara nito.",
@@ -1312,7 +1310,6 @@
   "Volume": "Volume",
   "Volume for {count} (%):": "Volume para sa {count} (%):",
   "Wait first": "Maghintay muna",
-  "Wait for the other download to finish": "Hintaying matapos ang ibang download",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Hinihintay kang marinig… kung hindi gumagalaw ang bar, pumili ng ibang mic.",
   "Waits for the sounds playing to finish": "Hinihintay matapos ang mga sound na nagpe-play",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Naghihintay nang ganitong tagal pagkapindot bago mag-play, halimbawa para sa punchline. Kinakansela ito ng Itigil lahat.",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "Walang winget sa PC na ito, kaya hindi mai-install ng app ang FFmpeg. Kunin ito mula sa ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "Tumagal nang mahigit {seconds} segundo ang winget.",
   "✓ Got FFmpeg": "✓ Nakuha ang FFmpeg",
-  "No settings match “{text}”": "Walang tugmang setting sa “{text}”"
+  "No settings match “{text}”": "Walang tugmang setting sa “{text}”",
+  "+{count} queued": [
+    "+{count} nakapila",
+    "+{count} nakapila"
+  ],
+  "Add as sound": "Idagdag bilang sound",
+  "Cancel download": "Kanselahin ang download",
+  "Couldn't download": "Hindi ma-download",
+  "Parsing video…": "Binabasa ang video…",
+  "Parsing…": "Binabasa…",
+  "Play once": "I-play nang isang beses",
+  "Queue is full": "Puno na ang pila",
+  "Queued": "Nakapila",
+  "Queued: waiting for current download to finish…": "Nakapila: hinihintay matapos ang kasalukuyang download…",
+  "▶ Playing": "▶ Tumutugtog",
+  "✓ Added to your sounds": "✓ Naidagdag sa mga sound mo",
+  "Retry": "Subukan ulit",
+  "Download this one next": "I-download ito sunod"
 }

@@ -315,8 +315,6 @@
   "Playing": "กำลังเล่น",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "เล่นเฉพาะตอนกดปุ่มลัดหรือแพด MIDI ค้างไว้ เหมือนแตรลม คลิกที่แพดยังเล่นจนจบ",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "เล่นไมค์ของคุณเข้าหูฟังพร้อมกับเสียง, ตรงกับที่คนอื่นได้ยิน แถบสีแดงจะแสดงระหว่างที่เปิด",
-  "Preparing audio download · 0%": "กำลังเตรียมดาวน์โหลดเสียง · 0%",
-  "Preparing… 0%": "กำลังเตรียม… 0%",
   "Preset": "พรีเซ็ต",
   "Preview": "ฟังตัวอย่าง",
   "Preview (only you hear it)": "ฟังตัวอย่าง (คุณได้ยินคนเดียว)",
@@ -487,7 +485,6 @@
   "Voice": "เสียงพูด",
   "Volume": "ระดับเสียง",
   "Volume for {count} (%):": "ระดับเสียงของ {count} (%):",
-  "Wait for the other download to finish": "รอให้ดาวน์โหลดอีกอันเสร็จก่อน",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "พาคุณตั้งค่าไมค์ หูฟัง ที่ที่เสียงของคุณไป (ไมค์, สาย, อุปกรณ์อื่น หรือไม่ไปไหน) และ Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "ดูวิดีโอของเสียงนี้ระหว่างที่เล่น เสียงยังส่งออกไปตามปกติ วิดีโอมีไว้ให้คุณดูคนเดียว",
   "What's new": "มีอะไรใหม่",
@@ -2953,5 +2950,21 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget ไม่มีในเครื่องนี้ แอปจึงติดตั้ง FFmpeg ไม่ได้ รับได้จาก ffmpeg.org",
   "winget took longer than {seconds} seconds.": "winget ใช้เวลานานกว่า {seconds} วินาที",
   "✓ Got FFmpeg": "✓ ได้ FFmpeg แล้ว",
-  "No settings match “{text}”": "ไม่มีการตั้งค่าที่ตรงกับ “{text}”"
+  "No settings match “{text}”": "ไม่มีการตั้งค่าที่ตรงกับ “{text}”",
+  "+{count} queued": [
+    "+{count} อยู่ในคิว"
+  ],
+  "Add as sound": "เพิ่มเป็นเสียง",
+  "Cancel download": "ยกเลิกการดาวน์โหลด",
+  "Couldn't download": "ดาวน์โหลดไม่สำเร็จ",
+  "Parsing video…": "กำลังอ่านวิดีโอ…",
+  "Parsing…": "กำลังอ่าน…",
+  "Play once": "เล่นครั้งเดียว",
+  "Queue is full": "คิวเต็มแล้ว",
+  "Queued": "อยู่ในคิว",
+  "Queued: waiting for current download to finish…": "อยู่ในคิว: รอให้การดาวน์โหลดปัจจุบันเสร็จ…",
+  "▶ Playing": "▶ กำลังเล่น",
+  "✓ Added to your sounds": "✓ เพิ่มลงในเสียงของคุณแล้ว",
+  "Retry": "ลองอีกครั้ง",
+  "Download this one next": "ดาวน์โหลดอันนี้ต่อไป"
 }

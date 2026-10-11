@@ -315,8 +315,6 @@
   "Playing": "Diputar",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Hanya diputar selama hotkey atau pad MIDI-nya ditahan, seperti klakson. Klik pad tetap memutarnya sampai habis.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Memutar mic-mu ke headphone bersama suara-suaranya, persis yang didengar orang lain. Banner merah muncul selama ini aktif.",
-  "Preparing audio download · 0%": "Menyiapkan unduhan audio · 0%",
-  "Preparing… 0%": "Menyiapkan… 0%",
   "Preset": "Preset",
   "Preview": "Pratinjau",
   "Preview (only you hear it)": "Pratinjau (hanya kamu yang dengar)",
@@ -487,7 +485,6 @@
   "Voice": "Vokal",
   "Volume": "Volume",
   "Volume for {count} (%):": "Volume untuk {count} (%):",
-  "Wait for the other download to finish": "Tunggu unduhan lainnya selesai",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Memandumu mengatur mic, headphone, ke mana suaramu dikirim (mic-mu, kabel, perangkat lain, atau tidak ke mana-mana), dan Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Tonton video suara ini selagi diputar. Suaranya tetap terkirim seperti biasa; videonya hanya untukmu.",
   "What's new": "Yang baru",
@@ -2953,5 +2950,21 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget tidak ada di PC ini, jadi aplikasi tidak bisa memasang FFmpeg. Dapatkan dari ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget memakan waktu lebih dari {seconds} detik.",
   "✓ Got FFmpeg": "✓ FFmpeg didapat",
-  "No settings match “{text}”": "Tidak ada pengaturan yang cocok dengan “{text}”"
+  "No settings match “{text}”": "Tidak ada pengaturan yang cocok dengan “{text}”",
+  "+{count} queued": [
+    "+{count} dalam antrean"
+  ],
+  "Add as sound": "Tambah sebagai suara",
+  "Cancel download": "Batalkan unduhan",
+  "Couldn't download": "Gagal mengunduh",
+  "Parsing video…": "Membaca video…",
+  "Parsing…": "Membaca…",
+  "Play once": "Putar sekali",
+  "Queue is full": "Antrean penuh",
+  "Queued": "Dalam antrean",
+  "Queued: waiting for current download to finish…": "Dalam antrean: menunggu unduhan saat ini selesai…",
+  "▶ Playing": "▶ Diputar",
+  "✓ Added to your sounds": "✓ Ditambahkan ke suaramu",
+  "Retry": "Coba lagi",
+  "Download this one next": "Unduh ini berikutnya"
 }

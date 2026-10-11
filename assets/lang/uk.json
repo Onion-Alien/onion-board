@@ -327,8 +327,6 @@
   "Playing": "Грає",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Грає лише поки утримуєш гарячу клавішу або MIDI-пед, як гудок. Клік по кнопці все одно програє його до кінця.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Грає твій мікрофон у навушники поверх звуків: саме те, що чують інші. Поки це ввімкнено, видно червону смугу.",
-  "Preparing audio download · 0%": "Підготовка завантаження аудіо · 0%",
-  "Preparing… 0%": "Підготовка… 0%",
   "Preset": "Пресет",
   "Preview": "Прослухати",
   "Preview (only you hear it)": "Прослухати (чуєш лише ти)",
@@ -499,7 +497,6 @@
   "Voice": "Голос",
   "Volume": "Гучність",
   "Volume for {count} (%):": "Гучність ({count}), %:",
-  "Wait for the other download to finish": "Зачекай, поки завершиться інше завантаження",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Проведе тебе через мікрофон, навушники, куди йдуть звуки (мікрофон, кабель, інший пристрій чи нікуди) і Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Дивись відео цього звуку, поки він грає. Звук іде як звичайно; відео лише для тебе.",
   "What's new": "Що нового",
@@ -3081,5 +3078,23 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget немає на цьому ПК, тож програма не може встановити FFmpeg. Візьміть його з ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget працював довше ніж {seconds} секунд.",
   "✓ Got FFmpeg": "✓ FFmpeg отримано",
-  "No settings match “{text}”": "Жодне налаштування не відповідає “{text}”"
+  "No settings match “{text}”": "Жодне налаштування не відповідає “{text}”",
+  "+{count} queued": [
+    "+{count} у черзі",
+    "+{count} у черзі",
+    "+{count} у черзі"
+  ],
+  "Add as sound": "Додати як звук",
+  "Cancel download": "Скасувати завантаження",
+  "Couldn't download": "Не вдалося завантажити",
+  "Parsing video…": "Читаємо відео…",
+  "Parsing…": "Читаємо…",
+  "Play once": "Відтворити раз",
+  "Queue is full": "Черга заповнена",
+  "Queued": "У черзі",
+  "Queued: waiting for current download to finish…": "У черзі: чекає, поки завершиться поточне завантаження…",
+  "▶ Playing": "▶ Грає",
+  "✓ Added to your sounds": "✓ Додано до твоїх звуків",
+  "Retry": "Повторити",
+  "Download this one next": "Завантажити це наступним"
 }

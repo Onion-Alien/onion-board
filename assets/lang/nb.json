@@ -866,8 +866,6 @@
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Spiller mikrofonen din i hodetelefonene oppå lydene, akkurat det andre hører. Et rødt banner vises mens det er på.",
   "Port": "Port",
   "Position": "Plassering",
-  "Preparing audio download · 0%": "Forbereder nedlasting av lyd · 0%",
-  "Preparing… 0%": "Forbereder… 0%",
   "Preset": "Forhåndsvalg",
   "Press a new key or combo for it": "Trykk en ny tast eller kombinasjon for den",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Trykk hurtigtasten i et spill, så dukker lydene dine opp oppå det. Spillet beholder tastaturet og musen, og tastene i overlayet går tilbake til spillet i det det lukkes.",
@@ -1312,7 +1310,6 @@
   "Volume": "Volum",
   "Volume for {count} (%):": "Volum for {count} (%):",
   "Wait first": "Vent først",
-  "Wait for the other download to finish": "Vent til den andre nedlastingen er ferdig",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Venter på å høre deg… hvis stolpen ikke beveger seg, velg en annen mikrofon.",
   "Waits for the sounds playing to finish": "Venter til lydene som spilles, er ferdige",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Venter så lenge etter trykket før den spilles, for eksempel for en punchline. Stopp alt avbryter den.",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget finnes ikke på denne PC-en, så appen kan ikke installere FFmpeg. Hent det fra ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget tok mer enn {seconds} sekunder.",
   "✓ Got FFmpeg": "✓ FFmpeg hentet",
-  "No settings match “{text}”": "Ingen innstillinger samsvarer med «{text}»"
+  "No settings match “{text}”": "Ingen innstillinger samsvarer med «{text}»",
+  "+{count} queued": [
+    "+{count} i kø",
+    "+{count} i kø"
+  ],
+  "Add as sound": "Legg til som lyd",
+  "Cancel download": "Avbryt nedlasting",
+  "Couldn't download": "Kunne ikke laste ned",
+  "Parsing video…": "Leser videoen…",
+  "Parsing…": "Leser…",
+  "Play once": "Spill av én gang",
+  "Queue is full": "Køen er full",
+  "Queued": "I kø",
+  "Queued: waiting for current download to finish…": "I kø: venter på at nedlastingen blir ferdig…",
+  "▶ Playing": "▶ Spiller",
+  "✓ Added to your sounds": "✓ Lagt til i lydene dine",
+  "Retry": "Prøv igjen",
+  "Download this one next": "Last ned denne som neste"
 }

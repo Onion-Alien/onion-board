@@ -315,8 +315,6 @@
   "Playing": "Đang phát",
   "Plays only while its hotkey or MIDI pad is held down, like an air horn. Clicking the pad still plays it through.": "Chỉ phát khi đang giữ phím tắt hoặc nút MIDI, như còi hơi. Bấm vào nút vẫn phát hết.",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "Phát mic của bạn vào tai nghe cùng với âm thanh, đúng những gì người khác nghe. Một dải đỏ hiện khi nó đang bật.",
-  "Preparing audio download · 0%": "Đang chuẩn bị tải âm thanh · 0%",
-  "Preparing… 0%": "Đang chuẩn bị… 0%",
   "Preset": "Mẫu",
   "Preview": "Nghe thử",
   "Preview (only you hear it)": "Nghe thử (chỉ bạn nghe)",
@@ -487,7 +485,6 @@
   "Voice": "Giọng nói",
   "Volume": "Âm lượng",
   "Volume for {count} (%):": "Âm lượng cho {count} (%):",
-  "Wait for the other download to finish": "Đợi lượt tải kia xong",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Hướng dẫn bạn qua mic, tai nghe, nơi âm thanh đến (mic, cáp, thiết bị khác hoặc không đâu cả) và Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Xem video của âm thanh này khi nó phát. Âm thanh vẫn gửi đi bình thường; video chỉ dành cho bạn.",
   "What's new": "Có gì mới",
@@ -2953,5 +2950,21 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "winget không có trên PC này, nên ứng dụng không thể cài FFmpeg. Tải từ ffmpeg.org.",
   "winget took longer than {seconds} seconds.": "winget mất hơn {seconds} giây.",
   "✓ Got FFmpeg": "✓ Đã có FFmpeg",
-  "No settings match “{text}”": "Không có cài đặt nào khớp với “{text}”"
+  "No settings match “{text}”": "Không có cài đặt nào khớp với “{text}”",
+  "+{count} queued": [
+    "+{count} đang chờ"
+  ],
+  "Add as sound": "Thêm làm âm thanh",
+  "Cancel download": "Hủy tải xuống",
+  "Couldn't download": "Không tải được",
+  "Parsing video…": "Đang đọc video…",
+  "Parsing…": "Đang đọc…",
+  "Play once": "Phát một lần",
+  "Queue is full": "Hàng chờ đã đầy",
+  "Queued": "Đang chờ",
+  "Queued: waiting for current download to finish…": "Đang chờ: đợi lượt tải hiện tại xong…",
+  "▶ Playing": "▶ Đang phát",
+  "✓ Added to your sounds": "✓ Đã thêm vào âm thanh của bạn",
+  "Retry": "Thử lại",
+  "Download this one next": "Tải cái này tiếp theo"
 }

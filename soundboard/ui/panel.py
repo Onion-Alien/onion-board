@@ -267,9 +267,11 @@ def capped(body: QWidget, outer: QWidget | None = None, *,
     h = QHBoxLayout(outer)
     h.setContentsMargins(*margins)
     h.setSpacing(0)
-    h.addStretch(1)
-    h.addWidget(body, 1000)   # takes everything up to its cap, the sides the rest
-    h.addStretch(1)
+    # the body takes all the width up to its cap (so its left edge lines up with the
+    # download bar and the other tabs), the two sides only what's left past the cap
+    h.addStretch(0)
+    h.addWidget(body, 1)
+    h.addStretch(0)
     return outer
 
 

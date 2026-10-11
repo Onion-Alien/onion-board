@@ -866,8 +866,6 @@
   "Plays your mic into your headphones on top of the sounds, exactly what others hear. A red banner shows while it's on.": "A mikrofonodat a hangok tetejére játssza a fejhallgatódba, pontosan azt, amit mások hallanak. Amíg be van kapcsolva, piros sáv látszik.",
   "Port": "Port",
   "Position": "Pozíció",
-  "Preparing audio download · 0%": "Hangletöltés előkészítése · 0%",
-  "Preparing… 0%": "Előkészítés… 0%",
   "Preset": "Előbeállítás",
   "Press a new key or combo for it": "Nyomj meg egy új gombot vagy kombinációt hozzá",
   "Press the hotkey in a game and your sounds appear on top of it. The game keeps your keyboard and mouse, and the overlay's keys go back to the game the moment it closes.": "Nyomd meg a gyorsbillentyűt egy játékban, és a hangjaid megjelennek fölötte. A játéknál marad a billentyűzet és az egér, és az overlay gombjai a bezárás pillanatában visszakerülnek a játékhoz.",
@@ -1312,7 +1310,6 @@
   "Volume": "Hangerő",
   "Volume for {count} (%):": "Hangerő ennyihez: {count} (%):",
   "Wait first": "Előtte várás",
-  "Wait for the other download to finish": "Várd meg, amíg a másik letöltés befejeződik",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Várom, hogy halljalak… ha a sáv nem mozdul, válassz másik mikrofont.",
   "Waits for the sounds playing to finish": "Megvárja, amíg a szóló hangok véget érnek",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Ennyit vár a nyomás után lejátszás előtt, mondjuk egy poénhoz. A Minden leállítása megszakítja.",
@@ -3017,5 +3014,22 @@
   "winget isn't on this PC, so the app can't install FFmpeg. Get it from ffmpeg.org instead.": "Ezen a PC-n nincs winget, így az alkalmazás nem tudja telepíteni az FFmpeg-et. Szerezze be az ffmpeg.org oldalról.",
   "winget took longer than {seconds} seconds.": "A winget {seconds} másodpercnél tovább tartott.",
   "✓ Got FFmpeg": "✓ FFmpeg megvan",
-  "No settings match “{text}”": "Egyetlen beállítás sem felel meg a következőnek: „{text}”"
+  "No settings match “{text}”": "Egyetlen beállítás sem felel meg a következőnek: „{text}”",
+  "+{count} queued": [
+    "+{count} sorban",
+    "+{count} sorban"
+  ],
+  "Add as sound": "Hozzáadás hangként",
+  "Cancel download": "Letöltés megszakítása",
+  "Couldn't download": "Nem sikerült letölteni",
+  "Parsing video…": "Videó beolvasása…",
+  "Parsing…": "Beolvasás…",
+  "Play once": "Lejátszás egyszer",
+  "Queue is full": "A sor megtelt",
+  "Queued": "Sorban",
+  "Queued: waiting for current download to finish…": "Sorban: vár, amíg a mostani letöltés befejeződik…",
+  "▶ Playing": "▶ Szól",
+  "✓ Added to your sounds": "✓ Hozzáadva a hangjaidhoz",
+  "Retry": "Újra",
+  "Download this one next": "Ezt töltsd le következőnek"
 }
