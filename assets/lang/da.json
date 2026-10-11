@@ -3096,5 +3096,16 @@
     "{n} lyde er allerede i dit bibliotek",
     "{n} lyde er allerede i dit bibliotek"
   ],
-  "Open Triggers": "Åbn Triggere"
+  "Open Triggers": "Åbn Triggere",
+  "Compatibility fixes for games, calls and browsers.": "Kompatibilitetsrettelser til spil, opkald og browsere.",
+  "Install update": "Installer opdatering",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon opdateret: spil, opkald og browsere hører dine lyde.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Næste: Windows beder om tilladelse til OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Intet at opdatere nu: dine mikrofonindstillinger er ændret.",
+  "The Windows prompt names Python because you're running from source.": "Windows-prompten nævner Python, fordi du kører fra kildekoden.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Opdatering annulleret. Din mikrofon virker stadig: opdater når som helst under Opsætning.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows beder om tilladelse. Lyden stopper kort under opdateringen.",
+  "You can update later in Setup.": "Du kan opdatere senere under Opsætning.",
+  "Your mic is already up to date.": "Din mikrofon er allerede opdateret.",
+  "Your mic, upgraded": "Din mikrofon, opgraderet"
 }

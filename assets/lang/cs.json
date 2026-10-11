@@ -3167,5 +3167,16 @@
     "{n} zvuky už jsou v knihovně",
     "{n} zvuků už je v knihovně"
   ],
-  "Open Triggers": "Otevřít Spouštěče"
+  "Open Triggers": "Otevřít Spouštěče",
+  "Compatibility fixes for games, calls and browsers.": "Opravy kompatibility pro hry, hovory a prohlížeče.",
+  "Install update": "Nainstalovat aktualizaci",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon aktualizován: hry, hovory i prohlížeče slyší tvoje zvuky.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Dál: Windows požádá o povolení pro OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Teď není co aktualizovat: nastavení mikrofonu se změnilo.",
+  "The Windows prompt names Python because you're running from source.": "Okno Windows uvádí Python, protože aplikaci spouštíš ze zdrojového kódu.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Aktualizace zrušena. Mikrofon dál funguje: aktualizovat můžeš kdykoli v Zapojení.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows požádá o povolení. Zvuk se během aktualizace na chvíli přeruší.",
+  "You can update later in Setup.": "Aktualizovat můžeš později v Zapojení.",
+  "Your mic is already up to date.": "Tvůj mikrofon už je aktuální.",
+  "Your mic, upgraded": "Tvůj mikrofon, vylepšený"
 }

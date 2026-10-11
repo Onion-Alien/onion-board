@@ -3096,5 +3096,16 @@
     "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं",
     "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं"
   ],
-  "Open Triggers": "ट्रिगर खोलें"
+  "Open Triggers": "ट्रिगर खोलें",
+  "Compatibility fixes for games, calls and browsers.": "गेम, कॉल और ब्राउज़र के लिए कम्पैटिबिलिटी सुधार।",
+  "Install update": "अपडेट इंस्टॉल करें",
+  "Mic updated: games, calls and browsers hear your sounds.": "माइक अपडेट हो गया: गेम, कॉल और ब्राउज़र आपकी आवाज़ें सुनते हैं।",
+  "Next: Windows will ask permission for OnionBoard.exe.": "अगला: Windows OnionBoard.exe के लिए अनुमति मांगेगा।",
+  "Nothing to update now: your mic settings changed.": "अभी अपडेट करने को कुछ नहीं: आपके माइक की सेटिंग बदल गई।",
+  "The Windows prompt names Python because you're running from source.": "Windows के प्रॉम्प्ट में Python लिखा है क्योंकि आप सोर्स से चला रहे हैं।",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "अपडेट रद्द हुआ। आपका माइक चलता रहेगा: कभी भी सेटअप में अपडेट करें।",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows अनुमति मांगेगा। अपडेट के दौरान आवाज़ थोड़ी देर रुकेगी।",
+  "You can update later in Setup.": "आप बाद में सेटअप में अपडेट कर सकते हैं।",
+  "Your mic is already up to date.": "आपका माइक पहले से अपडेट है।",
+  "Your mic, upgraded": "आपका माइक, अपग्रेड"
 }

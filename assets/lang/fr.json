@@ -3096,5 +3096,16 @@
     "{n} sons sont déjà dans ta bibliothèque",
     "{n} sons sont déjà dans ta bibliothèque"
   ],
-  "Open Triggers": "Ouvrir les déclencheurs"
+  "Open Triggers": "Ouvrir les déclencheurs",
+  "Compatibility fixes for games, calls and browsers.": "Correctifs de compatibilité pour les jeux, les appels et les navigateurs.",
+  "Install update": "Installer la mise à jour",
+  "Mic updated: games, calls and browsers hear your sounds.": "Micro mis à jour : jeux, appels et navigateurs entendent tes sons.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Ensuite : Windows va demander l'autorisation pour OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Rien à mettre à jour : les réglages de ton micro ont changé.",
+  "The Windows prompt names Python because you're running from source.": "La fenêtre de Windows indique Python parce que tu lances l'app depuis le code source.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Mise à jour annulée. Ton micro marche toujours : mets à jour quand tu veux dans Config.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows demande l'autorisation. Le son se coupe un instant pendant la mise à jour.",
+  "You can update later in Setup.": "Tu peux mettre à jour plus tard dans Config.",
+  "Your mic is already up to date.": "Ton micro est déjà à jour.",
+  "Your mic, upgraded": "Ton micro, amélioré"
 }

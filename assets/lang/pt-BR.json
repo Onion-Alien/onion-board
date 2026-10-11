@@ -3096,5 +3096,16 @@
     "{n} sons já estão na sua biblioteca",
     "{n} sons já estão na sua biblioteca"
   ],
-  "Open Triggers": "Abrir Gatilhos"
+  "Open Triggers": "Abrir Gatilhos",
+  "Compatibility fixes for games, calls and browsers.": "Correções de compatibilidade para jogos, chamadas e navegadores.",
+  "Install update": "Instalar atualização",
+  "Mic updated: games, calls and browsers hear your sounds.": "Microfone atualizado: jogos, chamadas e navegadores ouvem seus sons.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Em seguida: o Windows vai pedir permissão para o OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Nada para atualizar agora: as configurações do seu microfone mudaram.",
+  "The Windows prompt names Python because you're running from source.": "O aviso do Windows mostra Python porque você está rodando pelo código-fonte.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Atualização cancelada. Seu microfone continua funcionando: atualize quando quiser em Configurar.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "O Windows vai pedir permissão. O áudio pausa rapidinho durante a atualização.",
+  "You can update later in Setup.": "Você pode atualizar depois em Configurar.",
+  "Your mic is already up to date.": "Seu microfone já está atualizado.",
+  "Your mic, upgraded": "Seu microfone, melhorado"
 }

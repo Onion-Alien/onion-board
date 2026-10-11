@@ -3167,5 +3167,16 @@
     "{n} dźwięki są już w Twojej bibliotece",
     "{n} dźwięków jest już w Twojej bibliotece"
   ],
-  "Open Triggers": "Otwórz Wyzwalacze"
+  "Open Triggers": "Otwórz Wyzwalacze",
+  "Compatibility fixes for games, calls and browsers.": "Poprawki zgodności z grami, rozmowami i przeglądarkami.",
+  "Install update": "Zainstaluj aktualizację",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon zaktualizowany: gry, rozmowy i przeglądarki słyszą twoje dźwięki.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Dalej: Windows poprosi o zgodę dla OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Nie ma teraz czego aktualizować: ustawienia mikrofonu się zmieniły.",
+  "The Windows prompt names Python because you're running from source.": "Okno Windows wymienia Pythona, bo uruchamiasz aplikację z kodu źródłowego.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Aktualizacja anulowana. Mikrofon dalej działa: zaktualizuj kiedy chcesz w Konfiguracji.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows poprosi o zgodę. Dźwięk na chwilę zniknie podczas aktualizacji.",
+  "You can update later in Setup.": "Możesz zaktualizować później w Konfiguracji.",
+  "Your mic is already up to date.": "Twój mikrofon jest już aktualny.",
+  "Your mic, upgraded": "Twój mikrofon, ulepszony"
 }

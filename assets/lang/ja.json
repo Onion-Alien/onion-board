@@ -3025,5 +3025,16 @@
   "{n} sound is already in your library": [
     "{n} 件のサウンドはすでにライブラリにあります"
   ],
-  "Open Triggers": "トリガーを開く"
+  "Open Triggers": "トリガーを開く",
+  "Compatibility fixes for games, calls and browsers.": "ゲーム、通話、ブラウザーとの互換性を修正します。",
+  "Install update": "アップデートをインストール",
+  "Mic updated: games, calls and browsers hear your sounds.": "マイクを更新しました: ゲーム、通話、ブラウザーでサウンドが聞こえます。",
+  "Next: Windows will ask permission for OnionBoard.exe.": "次に、Windows が OnionBoard.exe の許可を求めます。",
+  "Nothing to update now: your mic settings changed.": "今は更新するものがありません: マイクの設定が変わりました。",
+  "The Windows prompt names Python because you're running from source.": "ソースから実行しているため、Windows の確認画面には Python と表示されます。",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "アップデートを取り消しました。マイクはそのまま使えます: いつでもセットアップから更新できます。",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows が許可を求めます。更新中は音が少し途切れます。",
+  "You can update later in Setup.": "あとでセットアップから更新できます。",
+  "Your mic is already up to date.": "マイクはすでに最新です。",
+  "Your mic, upgraded": "マイクをアップグレード"
 }

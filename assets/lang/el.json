@@ -3096,5 +3096,16 @@
     "{n} ήχοι είναι ήδη στη βιβλιοθήκη σου",
     "{n} ήχοι είναι ήδη στη βιβλιοθήκη σου"
   ],
-  "Open Triggers": "Άνοιγμα Εναυσμάτων"
+  "Open Triggers": "Άνοιγμα Εναυσμάτων",
+  "Compatibility fixes for games, calls and browsers.": "Διορθώσεις συμβατότητας για παιχνίδια, κλήσεις και browsers.",
+  "Install update": "Εγκατάσταση ενημέρωσης",
+  "Mic updated: games, calls and browsers hear your sounds.": "Το μικρόφωνο ενημερώθηκε: παιχνίδια, κλήσεις και browsers ακούν τους ήχους σου.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Επόμενο: τα Windows θα ζητήσουν άδεια για το OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Τίποτα για ενημέρωση τώρα: οι ρυθμίσεις του μικροφώνου άλλαξαν.",
+  "The Windows prompt names Python because you're running from source.": "Το παράθυρο των Windows αναφέρει Python επειδή τρέχεις από τον πηγαίο κώδικα.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Η ενημέρωση ακυρώθηκε. Το μικρόφωνο συνεχίζει να δουλεύει: ενημέρωσε όποτε θες από τη Διαμόρφωση.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Τα Windows θα ζητήσουν άδεια. Ο ήχος σταματά για λίγο κατά την ενημέρωση.",
+  "You can update later in Setup.": "Μπορείς να ενημερώσεις αργότερα από τη Διαμόρφωση.",
+  "Your mic is already up to date.": "Το μικρόφωνό σου είναι ήδη ενημερωμένο.",
+  "Your mic, upgraded": "Το μικρόφωνό σου, αναβαθμισμένο"
 }

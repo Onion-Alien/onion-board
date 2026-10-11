@@ -3025,5 +3025,16 @@
   "{n} sound is already in your library": [
     "{n} âm thanh đã có trong thư viện của bạn"
   ],
-  "Open Triggers": "Mở Kích hoạt"
+  "Open Triggers": "Mở Kích hoạt",
+  "Compatibility fixes for games, calls and browsers.": "Sửa lỗi tương thích cho game, cuộc gọi và trình duyệt.",
+  "Install update": "Cài bản cập nhật",
+  "Mic updated: games, calls and browsers hear your sounds.": "Đã cập nhật mic: game, cuộc gọi và trình duyệt nghe được âm thanh của bạn.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Tiếp theo: Windows sẽ xin quyền cho OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Hiện không có gì để cập nhật: cài đặt mic của bạn đã thay đổi.",
+  "The Windows prompt names Python because you're running from source.": "Hộp thoại Windows ghi Python vì bạn đang chạy từ mã nguồn.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Đã hủy cập nhật. Mic vẫn hoạt động: cập nhật bất cứ lúc nào trong Thiết lập.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows sẽ xin quyền. Âm thanh tạm dừng một chút khi cập nhật.",
+  "You can update later in Setup.": "Bạn có thể cập nhật sau trong Thiết lập.",
+  "Your mic is already up to date.": "Mic của bạn đã là bản mới nhất.",
+  "Your mic, upgraded": "Mic của bạn, đã nâng cấp"
 }
