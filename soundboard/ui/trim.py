@@ -29,7 +29,7 @@ class Waveform(QWidget):
         self.start, self.end = 0.0, self.length
         self._drag: str | None = None
         self.setMinimumHeight(70)
-        self.setCursor(Qt.SizeHorCursor)
+        self.setCursor(Qt.CursorShape.SizeHorCursor)
         self.setToolTip(_("Drag the handles to cut off the start and end. Only the part between "
                           "them plays."))
 
@@ -73,7 +73,7 @@ class Waveform(QWidget):
     def paintEvent(self, e):
         T = theme.T
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         p.setPen(QPen(QColor(T["border"]), 1))
         p.setBrush(QColor(T["bg"]))
@@ -84,7 +84,7 @@ class Waveform(QWidget):
         if n:
             w = (self.width() - 8) / n
             on, off = QColor(T["accent"]), QColor(T["faint"])
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             for i, v in enumerate(self.peaks):
                 x = 4 + i * w
                 p.setBrush(on if x0 <= x + w / 2 <= x1 else off)
@@ -92,16 +92,17 @@ class Waveform(QWidget):
                 p.drawRect(QRectF(x, mid - bh, max(w - 0.5, 0.6), bh * 2))
         else:
             p.setPen(QColor(T["muted"]))
-            p.drawText(r, Qt.AlignCenter, _("Waveform shows once the sound has loaded"))
+            p.drawText(r, Qt.AlignmentFlag.AlignCenter,
+                       _("Waveform shows once the sound has loaded"))
         shade = QColor(0, 0, 0, 90)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(shade)
         p.drawRect(QRectF(r.left(), r.top(), x0 - r.left(), r.height()))
         p.drawRect(QRectF(x1, r.top(), r.right() - x1, r.height()))
         for x in (x0, x1):
             p.setPen(QPen(QColor(T["text_hi"]), 2))
             p.drawLine(int(x), int(r.top() + 2), int(x), int(r.bottom() - 2))
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(T["text_hi"]))
             p.drawRoundedRect(QRectF(x - 4, mid - 9, 8, 18), 3, 3)
         p.end()

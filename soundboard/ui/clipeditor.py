@@ -95,8 +95,8 @@ class ClipWave(QWidget):
         super().__init__(editor)
         self.ed = editor
         self.setMinimumHeight(WAVE_H)
-        self.setFocusPolicy(Qt.StrongFocus)
-        self.setCursor(Qt.IBeamCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setCursor(Qt.CursorShape.IBeamCursor)
         self.setAccessibleName(_("Clip waveform"))
         # no tooltip: it covered the waveform being dragged on (the keys are in the
         # Edit menu and the line under it)
@@ -124,9 +124,9 @@ class ClipWave(QWidget):
 
     # ---------------------------------------------------------- mouse
     def mousePressEvent(self, e):
-        if e.button() != Qt.LeftButton:
+        if e.button() != Qt.MouseButton.LeftButton:
             return super().mousePressEvent(e)
-        self.setFocus(Qt.MouseFocusReason)
+        self.setFocus(Qt.FocusReason.MouseFocusReason)
         take = self.ed.freeze(keep_view=True)
         if take is None:
             return
@@ -141,7 +141,7 @@ class ClipWave(QWidget):
         elif take.has_selection and abs(x - self.x_of(take.b)) <= EDGE_PX:
             self._anchor = take.a       # drag the end edge
             self._edge = True
-        elif e.modifiers() & Qt.ShiftModifier:
+        elif e.modifiers() & Qt.KeyboardModifier.ShiftModifier:
             self._anchor = take.a if abs(f - take.a) > abs(f - take.b) else take.b
             take.select(self._anchor, f)
         else:
@@ -155,7 +155,7 @@ class ClipWave(QWidget):
             x = e.position().x()
             near = (take is not None and take.has_selection
                     and min(abs(x - self.x_of(take.a)), abs(x - self.x_of(take.b))) <= EDGE_PX)
-            self.setCursor(Qt.SizeHorCursor if near else Qt.IBeamCursor)
+            self.setCursor(Qt.CursorShape.SizeHorCursor if near else Qt.CursorShape.IBeamCursor)
             return
         x = e.position().x()
         if not self._edge and not self._moved and abs(x - self._press_x) < DRAG_PX:
@@ -178,10 +178,11 @@ class ClipWave(QWidget):
     def wheelEvent(self, e):
         mods = e.modifiers()
         dy = e.angleDelta().y() or e.angleDelta().x()
-        if self.ed.take is None or not dy or not mods & (Qt.ControlModifier | Qt.ShiftModifier):
+        if self.ed.take is None or not dy or not mods & (Qt.KeyboardModifier.ControlModifier
+                                                         | Qt.KeyboardModifier.ShiftModifier):
             e.ignore()   # plain scrolling scrolls the list of programs, as everywhere
             return
-        if mods & Qt.ControlModifier:
+        if mods & Qt.KeyboardModifier.ControlModifier:
             self.ed.zoom(0.8 if dy > 0 else 1.25, self.frame_at(e.position().x()))
         else:
             v0, v1 = self.ed.view
@@ -191,32 +192,34 @@ class ClipWave(QWidget):
     # ---------------------------------------------------------- keys
     def keyPressEvent(self, e):
         ed, take, k = self.ed, self.ed.take, e.key()
-        shift = bool(e.modifiers() & Qt.ShiftModifier)
-        if k == Qt.Key_Space:
+        shift = bool(e.modifiers() & Qt.KeyboardModifier.ShiftModifier)
+        if k == Qt.Key.Key_Space:
             ed.toggle_play()
-        elif k in (Qt.Key_Return, Qt.Key_Enter):
+        elif k in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             ed.save()
-        elif k == Qt.Key_Escape and take is not None and take.has_selection:
+        elif k == Qt.Key.Key_Escape and take is not None and take.has_selection:
             take.select(take.a, take.a)
             ed.changed_selection()
-        elif k in (Qt.Key_Left, Qt.Key_Right, Qt.Key_Home, Qt.Key_End) and take is not None:
+        elif (k in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Home, Qt.Key.Key_End)
+              and take is not None):
             v0, v1 = ed.view
-            step = max(int((v1 - v0) / 100), 1) * (10 if e.modifiers() & Qt.ControlModifier else 1)
+            fast = e.modifiers() & Qt.KeyboardModifier.ControlModifier
+            step = max(int((v1 - v0) / 100), 1) * (10 if fast else 1)
             pos = take.b if shift and take.b != take.a else take.a
-            pos = {Qt.Key_Left: pos - step, Qt.Key_Right: pos + step,
-                   Qt.Key_Home: 0, Qt.Key_End: len(take)}[k]
+            pos = {Qt.Key.Key_Left: pos - step, Qt.Key.Key_Right: pos + step,
+                   Qt.Key.Key_Home: 0, Qt.Key.Key_End: len(take)}[k]
             if shift:   # grow / shrink the selection's end
                 take.select(take.a, pos)
             else:
                 take.select(pos, pos)
             ed.changed_selection()
-        elif k in (Qt.Key_Plus, Qt.Key_Equal):
+        elif k in (Qt.Key.Key_Plus, Qt.Key.Key_Equal):
             ed.zoom(0.8)
-        elif k == Qt.Key_Minus:
+        elif k == Qt.Key.Key_Minus:
             ed.zoom(1.25)
-        elif k == Qt.Key_0:
+        elif k == Qt.Key.Key_0:
             ed.fit()
-        elif k == Qt.Key_L:
+        elif k == Qt.Key.Key_L:
             ed.go_live()
         else:
             super().keyPressEvent(e)
@@ -227,11 +230,11 @@ class ClipWave(QWidget):
         ed = self.ed
         p = QPainter(self)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(QPen(QColor(T["accent"] if self.hasFocus() else T["border"]), 1))
         p.setBrush(QColor(T["bg"]))
         p.drawRoundedRect(r, 6, 6)
-        p.setRenderHint(QPainter.Antialiasing, False)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, False)
         peaks = ed.peaks()
         n = int(self._span())
         mid, half = r.center().y(), r.height() / 2 - 6
@@ -264,10 +267,10 @@ class ClipWave(QWidget):
                 text = _("Empty")
             elif p.fontMetrics().horizontalAdvance(text) > r.width() - 2 * PAD - 8:
                 text = _("Listening…")   # a small card: the long line ran off both sides
-            p.drawText(r, Qt.AlignCenter, text)
+            p.drawText(r, Qt.AlignmentFlag.AlignCenter, text)
         if take is not None and not take.has_selection:   # the cursor: where a paste goes
             x = self.x_of(take.a)
-            p.setPen(QPen(QColor(T["text_hi"]), 1, Qt.DashLine))
+            p.setPen(QPen(QColor(T["text_hi"]), 1, Qt.PenStyle.DashLine))
             p.drawLine(QLineF(x, r.top() + 3, x, r.bottom() - 3))
         play = ed.playhead()
         if play is not None:
@@ -280,13 +283,14 @@ class ClipWave(QWidget):
         p.setFont(f)
         tr = r.adjusted(6, 2, -6, -2)
         if ed.take is None:
-            p.drawText(tr, Qt.AlignLeft | Qt.AlignTop,
+            p.drawText(tr, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop,
                        _("−{seconds}s", seconds=f"{ed.window_s():.0f}"))
-            p.drawText(tr, Qt.AlignRight | Qt.AlignTop, _("now ●"))
+            p.drawText(tr, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop, _("now ●"))
         else:
             v0, v1 = ed.view
-            p.drawText(tr, Qt.AlignLeft | Qt.AlignTop, fmt(max(v0, 0)))
-            p.drawText(tr, Qt.AlignRight | Qt.AlignTop, fmt(min(v1, len(ed.take))))
+            p.drawText(tr, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop, fmt(max(v0, 0)))
+            p.drawText(tr, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop,
+                       fmt(min(v1, len(ed.take))))
         p.end()
 
     def focusInEvent(self, e):
@@ -339,7 +343,7 @@ class ClipEditor(QWidget):
             b.setProperty("full_text", text)
             icons.set_icon(b, icon, size=13)
             b.clicked.connect(slot)
-            b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+            b.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
             bar.addWidget(b)
             return b
 
@@ -373,9 +377,9 @@ class ClipEditor(QWidget):
         v.addLayout(bar)
         self.info = QLabel()
         self.info.setObjectName("hint")
-        self.info.setTextFormat(Qt.PlainText)
+        self.info.setTextFormat(Qt.TextFormat.PlainText)
         self.info.setWordWrap(True)   # a long message wraps, never cut off
-        self.info.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        self.info.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         v.addWidget(self.info)
 
         self.timer = QTimer(self)
@@ -392,7 +396,8 @@ class ClipEditor(QWidget):
             a = QAction(text, self)
             if keys:
                 a.setShortcut(QKeySequence(keys))
-                a.setShortcutContext(Qt.WidgetWithChildrenShortcut)   # only while it has focus
+                # only while it has focus
+                a.setShortcutContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
                 self.addAction(a)
             if icon:
                 a.setIcon(icons.icon(icon))
@@ -401,13 +406,13 @@ class ClipEditor(QWidget):
             self.actions_by_name[name] = a
             return a
 
-        act("cut", _("Cut"), self.cut, QKeySequence.Cut)
-        act("copy", _("Copy"), self.copy, QKeySequence.Copy, "copy")
-        act("paste", _("Paste"), self.paste, QKeySequence.Paste)
-        act("delete", _("Delete"), lambda: self._edit(Take.delete), QKeySequence.Delete,
+        act("cut", _("Cut"), self.cut, QKeySequence.StandardKey.Cut)
+        act("copy", _("Copy"), self.copy, QKeySequence.StandardKey.Copy, "copy")
+        act("paste", _("Paste"), self.paste, QKeySequence.StandardKey.Paste)
+        act("delete", _("Delete"), lambda: self._edit(Take.delete), QKeySequence.StandardKey.Delete,
             "trash")
         act("crop", _("Keep only the selection"), lambda: self._edit(Take.crop), "Ctrl+K")
-        act("all", _("Select all"), self.select_all, QKeySequence.SelectAll)
+        act("all", _("Select all"), self.select_all, QKeySequence.StandardKey.SelectAll)
         m.addSeparator()
         act("fade_in", _("Fade in"), lambda: self._edit(Take.fade_in))
         act("fade_out", _("Fade out"), lambda: self._edit(Take.fade_out))
@@ -419,8 +424,8 @@ class ClipEditor(QWidget):
         act("reverse", _("Reverse"), lambda: self._edit(Take.reverse))
         act("silence", _("Silence"), lambda: self._edit(Take.silence))
         m.addSeparator()
-        act("undo", _("Undo"), self.undo, QKeySequence.Undo)
-        act("redo", _("Redo"), self.redo, QKeySequence.Redo)
+        act("undo", _("Undo"), self.undo, QKeySequence.StandardKey.Undo)
+        act("redo", _("Redo"), self.redo, QKeySequence.StandardKey.Redo)
         act("fit", _("Zoom to fit"), self.fit, "Ctrl+0")
         m.aboutToShow.connect(self._enable_actions)
         return m

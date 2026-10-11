@@ -53,7 +53,7 @@ class DeletedDialog(QDialog):
         self.hint = hint_label(hint)
         lay.addWidget(self.hint)
         self.list = QListWidget()
-        self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.list.setMinimumSize(360, 240)
         self.list.itemSelectionChanged.connect(self._update)
         self.list.itemDoubleClicked.connect(lambda _i: self.bring_back())
@@ -70,7 +70,7 @@ class DeletedDialog(QDialog):
         row.addWidget(self.btn_forget)
         row.addStretch(1)
         lay.addLayout(row)
-        box = QDialogButtonBox(QDialogButtonBox.Close)
+        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         box.rejected.connect(self.reject)
         row.addWidget(box)
         self.fill()
@@ -80,19 +80,19 @@ class DeletedDialog(QDialog):
         for it in self.source.items(self.kind):
             li = QListWidgetItem(_("{name}    ·    deleted {ago}",
                                    name=it.name, ago=trash.ago(it.when)))
-            li.setData(Qt.UserRole, it.id)
+            li.setData(Qt.ItemDataRole.UserRole, it.id)
             self.list.addItem(li)
         if self.list.count():
             self.list.setCurrentRow(0)
         else:
             li = QListWidgetItem(self.empty_text)
-            li.setFlags(Qt.NoItemFlags)
+            li.setFlags(Qt.ItemFlag.NoItemFlags)
             self.list.addItem(li)
         self._update()
 
     def _picked(self) -> list[str]:
-        return [li.data(Qt.UserRole) for li in self.list.selectedItems()
-                if li.data(Qt.UserRole)]
+        return [li.data(Qt.ItemDataRole.UserRole) for li in self.list.selectedItems()
+                if li.data(Qt.ItemDataRole.UserRole)]
 
     def _update(self):
         on = bool(self._picked())
@@ -120,7 +120,7 @@ class DeletedDialog(QDialog):
                 self, _("Delete for good"),
                 ngettext("Delete {n} item for good? This can't be undone.",
                          "Delete {n} items for good? This can't be undone.", n)
-            ) != QMessageBox.Yes:
+            ) != QMessageBox.StandardButton.Yes:
             return
         for iid in ids:
             self.source.forget(iid)

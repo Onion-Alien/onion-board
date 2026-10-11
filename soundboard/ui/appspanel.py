@@ -123,20 +123,20 @@ class AppCategoryHeading(QLabel):
         self.custom = custom
         self._drag_press = None
         self.setAcceptDrops(True)
-        self.setCursor(Qt.OpenHandCursor)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_menu)
         # the keyboard's way to the same menu, as on the cards (DESIGN section 0):
         # Tab reaches the heading (a click doesn't: it's the drag handle), then the
         # Menu key or Shift+F10 opens it under the name
-        self.setFocusPolicy(Qt.TabFocus)
-        for keys in (QKeySequence(Qt.Key_Menu), QKeySequence("Shift+F10")):
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        for keys in (QKeySequence(Qt.Key.Key_Menu), QKeySequence("Shift+F10")):
             sc = QShortcut(keys, self)
-            sc.setContext(Qt.WidgetShortcut)
+            sc.setContext(Qt.ShortcutContext.WidgetShortcut)
             sc.activated.connect(lambda: self._show_menu(self.rect().bottomLeft()))
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._drag_press = event.globalPosition().toPoint()
         super().mousePressEvent(event)
 
@@ -145,7 +145,7 @@ class AppCategoryHeading(QLabel):
         super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self._drag_press is not None and event.buttons() & Qt.LeftButton:
+        if self._drag_press is not None and event.buttons() & Qt.MouseButton.LeftButton:
             dist = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
             if dist >= QApplication.startDragDistance():
                 self._drag_press = None
@@ -155,7 +155,7 @@ class AppCategoryHeading(QLabel):
                 drag.setMimeData(mime)
                 pixmap = self.grab()
                 drag.setPixmap(pixmap)
-                drag.exec(Qt.MoveAction)
+                drag.exec(Qt.DropAction.MoveAction)
                 return
         super().mouseMoveEvent(event)
 
@@ -163,13 +163,13 @@ class AppCategoryHeading(QLabel):
         if event.mimeData().hasFormat(CATEGORY_DRAG_MIME):
             src_cat = bytes(event.mimeData().data(CATEGORY_DRAG_MIME)).decode("utf-8")
             if src_cat != self.category:
-                event.setDropAction(Qt.MoveAction)
+                event.setDropAction(Qt.DropAction.MoveAction)
                 event.accept()
                 return
         elif event.mimeData().hasFormat(APP_DRAG_MIME):
             source = event.source()
             if isinstance(source, AppRow) and source.category != self.category:
-                event.setDropAction(Qt.MoveAction)
+                event.setDropAction(Qt.DropAction.MoveAction)
                 event.accept()
                 return
         event.ignore()
@@ -182,14 +182,14 @@ class AppCategoryHeading(QLabel):
             if src_cat != self.category:
                 before = event.position().y() < self.height() / 2
                 self.reordered.emit(src_cat, self.category, before)
-                event.setDropAction(Qt.MoveAction)
+                event.setDropAction(Qt.DropAction.MoveAction)
                 event.accept()
                 return
         elif event.mimeData().hasFormat(APP_DRAG_MIME):
             source = event.source()
             if isinstance(source, AppRow):
                 self.card_dropped.emit(source, self.category)
-                event.setDropAction(Qt.MoveAction)
+                event.setDropAction(Qt.DropAction.MoveAction)
                 event.accept()
                 return
         event.ignore()
@@ -250,7 +250,7 @@ class AppGrid(CardGrid):
         label = AppCategoryHeading(category, self.host, custom=is_custom)
         label.setContentsMargins(0, 0, 0, 6)
         font = label.font()
-        font.setWeight(QFont.DemiBold)
+        font.setWeight(QFont.Weight.DemiBold)
         label.setFont(font)
         label.hide()
         self.headings[category] = label
@@ -368,7 +368,7 @@ class AppGrid(CardGrid):
             if inner is None:   # a card's own order, read while it's still in one piece
                 inner, n = [], w.nextInFocusChain()
                 while n is not w and w.isAncestorOf(n):
-                    if n.focusPolicy() & Qt.TabFocus:
+                    if n.focusPolicy() & Qt.FocusPolicy.TabFocus:
                         inner.append(n)
                     n = n.nextInFocusChain()
                 w._tab_chain = inner
@@ -506,7 +506,7 @@ class ElidedLabel(QLabel):
     def paintEvent(self, e):
         text = self.text()
         r = self.contentsRect()
-        shown = self.fontMetrics().elidedText(text, Qt.ElideRight, r.width())
+        shown = self.fontMetrics().elidedText(text, Qt.TextElideMode.ElideRight, r.width())
         if shown != text and self.hide_overflow:
             shown = ""
         tip = text if shown != text else ""
@@ -514,7 +514,7 @@ class ElidedLabel(QLabel):
             self.setToolTip(tip)
         p = QPainter(self)
         p.setPen(self.palette().color(self.foregroundRole()))
-        p.drawText(r, int(self.alignment() | Qt.AlignVCenter), shown)
+        p.drawText(r, int(self.alignment() | Qt.AlignmentFlag.AlignVCenter), shown)
 
 
 def _route(src, to: str):
@@ -545,14 +545,14 @@ class AppRow(HoverCard):
         self.category = category or app_category(exe)
         self._drag_press = None
         self.setAcceptDrops(True)
-        self.setCursor(Qt.OpenHandCursor)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_card_menu)
         # the keyboard's way to the same menu (DESIGN section 0: never right-click
         # only): the Menu key or Shift+F10 on anything in the card
-        for keys in (QKeySequence(Qt.Key_Menu), QKeySequence("Shift+F10")):
+        for keys in (QKeySequence(Qt.Key.Key_Menu), QKeySequence("Shift+F10")):
             sc = QShortcut(keys, self)
-            sc.setContext(Qt.WidgetWithChildrenShortcut)
+            sc.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
             sc.activated.connect(self._menu_from_keyboard)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
@@ -570,37 +570,37 @@ class AppRow(HoverCard):
         v.setContentsMargins(12, 10, 12, 10)
         v.setSpacing(8)
         self.header = QWidget()
-        self.header.setCursor(Qt.OpenHandCursor)
+        self.header.setCursor(Qt.CursorShape.OpenHandCursor)
         top = QHBoxLayout(self.header)
         top.setContentsMargins(0, 0, 0, 0)
         top.setSpacing(10)
         self.icon = QLabel()
         self.icon.setFixedSize(28, 28)
-        self.icon.setAlignment(Qt.AlignCenter)
+        self.icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         top.addWidget(self.icon)
         names = QVBoxLayout()
         names.setSpacing(1)
         self.name = ElidedLabel(exe)
         bold = self.name.font()   # not a style sheet: each one re-styles the widget
-        bold.setWeight(QFont.DemiBold)
+        bold.setWeight(QFont.Weight.DemiBold)
         self.name.setFont(bold)
         self.sub = ElidedLabel()
         self.sub.setObjectName("hint")
         for lbl in (self.name, self.sub):   # long titles give way instead of widening the card
-            lbl.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-            lbl.setTextFormat(Qt.PlainText)   # window titles are set by web pages
+            lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+            lbl.setTextFormat(Qt.TextFormat.PlainText)   # window titles are set by web pages
         names.addWidget(self.name)
         names.addWidget(self.sub)
         top.addLayout(names, 1)
         for label in (self.header, self.icon, self.name, self.sub):
-            label.setCursor(Qt.OpenHandCursor)
+            label.setCursor(Qt.CursorShape.OpenHandCursor)
             label.installEventFilter(self)
         self.btn_forget = QPushButton("✕")
         self.btn_forget.setObjectName("small")
         self.btn_forget.setToolTip(_("Take this program off the list"))
         self.btn_forget.setFixedWidth(26)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
-        top.addWidget(self.btn_forget, 0, Qt.AlignTop)
+        top.addWidget(self.btn_forget, 0, Qt.AlignmentFlag.AlignTop)
         v.addWidget(self.header)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(60)
@@ -623,12 +623,13 @@ class AppRow(HoverCard):
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(lambda on: self.rec_toggled.emit(self, on))
         for b in (self.btn_send, self.btn_rec):
-            b.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)   # as wide as their words
+            # as wide as their words
+            b.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
             buttons.addWidget(b)
         self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
             self.cb_to.addItem(label, key)
-            self.cb_to.setItemData(i, tip, Qt.ToolTipRole)
+            self.cb_to.setItemData(i, tip, Qt.ItemDataRole.ToolTipRole)
         self.cb_to.setToolTip(_("Where this program's sound goes when Send is on"))
         self.cb_to.setCurrentIndex(TO_KEYS.index(to) if to in TO_KEYS else 0)
         self.cb_to.currentIndexChanged.connect(lambda _i: self.to_changed.emit(self, self.to))
@@ -655,13 +656,13 @@ class AppRow(HoverCard):
                                    "bits out of, play, save as sounds or send straight back. "
                                    "It only listens while it's open."))
         self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
-        v.addWidget(self.btn_clip, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_clip, 0, Qt.AlignmentFlag.AlignLeft)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._drag_press = event.globalPosition().toPoint()
         super().mousePressEvent(event)
 
@@ -670,7 +671,7 @@ class AppRow(HoverCard):
         super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self._drag_press is not None and event.buttons() & Qt.LeftButton:
+        if self._drag_press is not None and event.buttons() & Qt.MouseButton.LeftButton:
             distance = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
             if distance >= QApplication.startDragDistance():
                 self._start_drag()
@@ -679,14 +680,15 @@ class AppRow(HoverCard):
 
     def eventFilter(self, obj, event):
         if obj in (self.header, self.icon, self.name, self.sub):
-            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+            if (event.type() == QEvent.Type.MouseButtonPress
+                    and event.button() == Qt.MouseButton.LeftButton):
                 self._drag_press = event.globalPosition().toPoint()
                 return True
-            if event.type() == QEvent.MouseButtonRelease:
+            if event.type() == QEvent.Type.MouseButtonRelease:
                 self._drag_press = None
                 return True
-            if (event.type() == QEvent.MouseMove and self._drag_press is not None
-                    and event.buttons() & Qt.LeftButton):
+            if (event.type() == QEvent.Type.MouseMove and self._drag_press is not None
+                    and event.buttons() & Qt.MouseButton.LeftButton):
                 distance = (event.globalPosition().toPoint() - self._drag_press).manhattanLength()
                 if distance >= QApplication.startDragDistance():
                     self._start_drag()
@@ -699,14 +701,15 @@ class AppRow(HoverCard):
         mime = QMimeData()
         mime.setData(APP_DRAG_MIME, self.key.encode("utf-8"))
         drag.setMimeData(mime)
-        drag.setPixmap(self.grab().scaledToWidth(min(self.width(), 240), Qt.SmoothTransformation))
-        drag.exec(Qt.MoveAction)
+        drag.setPixmap(self.grab().scaledToWidth(min(self.width(), 240),
+                                                 Qt.TransformationMode.SmoothTransformation))
+        drag.exec(Qt.DropAction.MoveAction)
 
     def dragEnterEvent(self, event):
         source = event.source()
         if (event.mimeData().hasFormat(APP_DRAG_MIME) and isinstance(source, AppRow)
                 and source is not self and source.parentWidget() is self.parentWidget()):
-            event.setDropAction(Qt.MoveAction)
+            event.setDropAction(Qt.DropAction.MoveAction)
             event.accept()
             self._hover(True)
         else:
@@ -892,8 +895,8 @@ class AppRow(HoverCard):
         else:
             dpr = self.icon.devicePixelRatioF()
             side = round(24 * dpr)
-            pm = QPixmap.fromImage(img.scaled(side, side, Qt.KeepAspectRatio,
-                                              Qt.SmoothTransformation))
+            pm = QPixmap.fromImage(img.scaled(side, side, Qt.AspectRatioMode.KeepAspectRatio,
+                                              Qt.TransformationMode.SmoothTransformation))
             pm.setDevicePixelRatio(dpr)
         self.icon.setPixmap(pm)
 
@@ -947,7 +950,7 @@ class AppsTab(QWidget):
         toolbar.addWidget(self.fx_btn)
         self.btn_add_cat = QPushButton(_("Category"))
         self.btn_add_cat.setObjectName("small")
-        self.btn_add_cat.setCursor(Qt.PointingHandCursor)
+        self.btn_add_cat.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_add_cat.setToolTip(_("New category"))
         icons.set_icon(self.btn_add_cat, "plus", size=12)
         self.btn_add_cat.clicked.connect(self._prompt_new_category)
@@ -956,7 +959,7 @@ class AppsTab(QWidget):
         size_label = self.size_label = QLabel(_("Card size"))
         size_label.setObjectName("muted")
         toolbar.addWidget(size_label)
-        self.card_size = QSlider(Qt.Horizontal)
+        self.card_size = QSlider(Qt.Orientation.Horizontal)
         self.card_size.setRange(240, CARD_MAX_W)
         self.card_size.setValue(cfg.app_card_width)
         self.card_size.setFixedWidth(100)
@@ -969,8 +972,8 @@ class AppsTab(QWidget):
         v.addWidget(self.undo_bar)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.NoFrame)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list = FitWidth()   # the cards re-flow to the width they get (AppRow._fit_width)
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)
@@ -988,10 +991,10 @@ class AppsTab(QWidget):
                                lines=(_("play something?"), _("so quiet…"),
                                       _("music, please?")),
                                joy_lines=(_("hehe!"), _("yay!")), pong=True, naps=True)
-        ev.addWidget(self.bun, 0, Qt.AlignHCenter)
+        ev.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignHCenter)
         self.empty_text = hint_label(_("Nothing is playing sound right now. Start some music, "
                                        "a video or a call and it'll show up here."))
-        self.empty_text.setAlignment(Qt.AlignCenter)
+        self.empty_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         ev.addWidget(self.empty_text)
         self.list_layout.addWidget(self.empty)
         self._tools_for_rows()

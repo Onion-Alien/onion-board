@@ -143,7 +143,7 @@ class TriggersTab(QWidget):
             logo.setFixedSize(52, 52)
         else:
             logo.hide()
-        head.addWidget(logo, 0, Qt.AlignTop)
+        head.addWidget(logo, 0, Qt.AlignmentFlag.AlignTop)
         names = QVBoxLayout()
         names.setSpacing(2)
         self.title = QLabel("Onion Watch")
@@ -166,7 +166,7 @@ class TriggersTab(QWidget):
             line.setSpacing(8)
             dot = QLabel()
             icons.set_label_icon(dot, pic, "accent_hi", size=16)
-            line.addWidget(dot, 0, Qt.AlignTop)
+            line.addWidget(dot, 0, Qt.AlignmentFlag.AlignTop)
             lbl = QLabel(words)
             lbl.setWordWrap(True)
             line.addWidget(lbl, 1)
@@ -211,14 +211,14 @@ class TriggersTab(QWidget):
             "checked before it's installed. It only looks at your screen: it never "
             "clicks, types or touches your game."))
         text.addWidget(self.privacy)
-        text.setAlignment(Qt.AlignTop)
+        text.setAlignment(Qt.AlignmentFlag.AlignTop)
         row.addLayout(text, 1)
         # Enough room for Hoot's speech bubble without squeezing the card's text.
         side = 16
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side)
         self.hoot.setToolTip(_("Hoot is waiting for Onion Watch"))
-        self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.OtherFocusReason))
-        row.addWidget(self.hoot, 0, Qt.AlignCenter)
+        self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason))
+        row.addWidget(self.hoot, 0, Qt.AlignmentFlag.AlignCenter)
         bv.addLayout(row)
         # in the middle of the tab, a landing page rather than a box in its corner (a
         # row with stretches, not an alignment: that kept its wrapped text's height)
@@ -534,7 +534,9 @@ class TriggersTab(QWidget):
                   "from the Triggers tab any time."))
         return QMessageBox.question(
             self, _("Remove Onion Watch?"), text,
-            QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        ) == QMessageBox.StandardButton.Yes
 
     def remove(self):
         """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""

@@ -58,8 +58,8 @@ class SetupShow(BunnyWidget):
 
     def __init__(self, height: int = 58, parent=None):
         super().__init__(None, height=height, pad=10, parent=parent)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self._t = -1.0           # seconds into the show, -1 when not on
         self._result = None      # what finish() said, until it's shown
         self._end_at = -1.0      # show time the ending began
@@ -293,11 +293,11 @@ class SetupShow(BunnyWidget):
         if not self.on:
             return
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
         r = self._bun_rect()
         phase = self.phase()
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, 45))
         sw = r.width() * 0.62
         p.drawEllipse(QRectF(r.center().x() + pose["dx"] - sw / 2, r.bottom() - 4, sw, 8))
@@ -356,10 +356,10 @@ class SetupShow(BunnyWidget):
         if phase == "scoot":   # he takes it with him
             box.translate(self._scoot_dx(), 0)
         ink = QPen(INK, 1.6)
-        ink.setJoinStyle(Qt.RoundJoin)
+        ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         # the handle, then the box, then the lid hinged at the back
         p.setPen(QPen(INK, 2.2))
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         hw = box.width() * 0.34
         if lid < 0.5:
             p.drawArc(QRectF(box.center().x() - hw / 2, box.top() - box.height() * 0.32,
@@ -402,7 +402,7 @@ class SetupShow(BunnyWidget):
             p.setOpacity(max(0.0, 1 - (e - YAY_SCOOT - SCOOT_S) / 0.5))
         accent = QColor(theme.T["accent"])
         ink = QPen(INK, 1.8)
-        ink.setJoinStyle(Qt.RoundJoin)
+        ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
 
         def pop(i: int) -> float:   # each part springs on a little bigger, then settles
             k = (self._t - self._part_at[i]) / 0.25
@@ -429,7 +429,7 @@ class SetupShow(BunnyWidget):
             p.drawEllipse(QPointF(cx, cy), rr, rr)
             p.setBrush(accent)
             p.drawEllipse(QPointF(cx, cy), rr * 0.55, rr * 0.55)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(INK)
             p.drawEllipse(QPointF(cx, cy), rr * 0.18, rr * 0.18)
         if self._parts >= 4:
@@ -439,7 +439,7 @@ class SetupShow(BunnyWidget):
             p.setPen(ink)
             p.setBrush(STEEL)
             p.drawEllipse(QPointF(cx, cy), rr, rr)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(accent.lighter(130))
             p.drawEllipse(QPointF(cx, cy), rr * 0.45, rr * 0.45)
         if self._parts < PARTS and self._end_at < 0:   # nails waiting, a work in progress
@@ -476,7 +476,7 @@ class SetupShow(BunnyWidget):
         if not self._bits:
             super()._paint_puffs(p)
             return
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(SMOKE)
         for f in self.puffs:
             k = f.age / f.life

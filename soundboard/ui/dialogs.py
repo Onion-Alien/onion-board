@@ -49,13 +49,13 @@ class TabHelpPopup(QDialog):
     shared style sheet (`#helpcard`, `#helptitle`, `#helpbody`), so it follows the theme."""
 
     def __init__(self, title: str, text: str, *, owl: bool = False, parent=None):
-        super().__init__(parent, Qt.Popup | Qt.FramelessWindowHint)
+        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         from soundboard.bunny import bunny_pixmap
         from soundboard.ui.owl import owl_image
 
         self._opener = QApplication.focusWidget()
         self.setWindowTitle(title)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setFixedWidth(min(560, self.screen().availableGeometry().width() - 24))
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -69,37 +69,37 @@ class TabHelpPopup(QDialog):
         header = QHBoxLayout()
         self.heading = QLabel(title)
         self.heading.setObjectName("helptitle")
-        self.heading.setTextFormat(Qt.PlainText)
+        self.heading.setTextFormat(Qt.TextFormat.PlainText)
         self.heading.setWordWrap(True)
         header.addWidget(self.heading, 1)
         self.close_btn = icon_button("close", _("Close"), size=16)
         self.close_btn.clicked.connect(self.reject)
-        header.addWidget(self.close_btn, 0, Qt.AlignTop)
+        header.addWidget(self.close_btn, 0, Qt.AlignmentFlag.AlignTop)
         layout.addLayout(header)
 
         content = QHBoxLayout()
         content.setSpacing(22)
         self.mascot = QLabel()
         self.mascot.setFixedSize(88, 104)
-        self.mascot.setAlignment(Qt.AlignCenter)
+        self.mascot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         dpr = self.devicePixelRatioF()
         picture = (QPixmap.fromImage(owl_image(round(92 * dpr), look=0.0))
                    if owl else bunny_pixmap(92, dpr=dpr))
         picture.setDevicePixelRatio(dpr)
         self.mascot.setPixmap(picture)
-        content.addWidget(self.mascot, 0, Qt.AlignVCenter)
+        content.addWidget(self.mascot, 0, Qt.AlignmentFlag.AlignVCenter)
         self.body = QLabel(text)
         self.body.setObjectName("helpbody")
-        self.body.setTextFormat(Qt.PlainText)
+        self.body.setTextFormat(Qt.TextFormat.PlainText)
         self.body.setWordWrap(True)
-        content.addWidget(self.body, 1, Qt.AlignVCenter)
+        content.addWidget(self.body, 1, Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(content)
 
     def done(self, r):
         super().done(r)
         # the focus back on what opened it (a rail tab), not lost to the window
         if self._opener is not None and qt_valid(self._opener) and self._opener.isVisible():
-            self._opener.setFocus(Qt.PopupFocusReason)
+            self._opener.setFocus(Qt.FocusReason.PopupFocusReason)
 
 
 class EffectsPanel(QWidget):
@@ -297,7 +297,7 @@ class EditDialog(QDialog):
             r = g.rowCount()
             lbl = QLabel(text)
             lbl.setObjectName("muted")
-            g.addWidget(lbl, r, 0, Qt.AlignLeft | Qt.AlignVCenter)
+            g.addWidget(lbl, r, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             if isinstance(field, QWidget):
                 g.addWidget(field, r, 1)
                 lbl.setBuddy(field)
@@ -308,7 +308,7 @@ class EditDialog(QDialog):
         self.name = QLineEdit(meta.name)
         f = self.name.font()
         f.setPointSizeF(f.pointSizeF() + 1.5)
-        f.setWeight(QFont.DemiBold)
+        f.setWeight(QFont.Weight.DemiBold)
         self.name.setFont(f)
         row(g, _("Name"), self.name)
 
@@ -337,7 +337,7 @@ class EditDialog(QDialog):
         prow.setSpacing(8)
         self.pic_view = QLabel()
         self.pic_view.setFixedSize(PIC_W, PIC_H)
-        self.pic_view.setAlignment(Qt.AlignCenter)
+        self.pic_view.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.pic_view.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 6px;")
         prow.addWidget(self.pic_view)
 
@@ -400,7 +400,7 @@ class EditDialog(QDialog):
         g = card(_("Playback"))
         vrow = QHBoxLayout()
         vrow.setSpacing(10)
-        self.vol = QSlider(Qt.Horizontal)
+        self.vol = QSlider(Qt.Orientation.Horizontal)
         self.vol.setRange(0, 200)
         self.vol.setValue(round(meta.volume * 100))   # int() made 0.29 read as 28 %
         self.vol.setAccessibleName(_("Volume"))
@@ -489,7 +489,7 @@ class EditDialog(QDialog):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.effects)
-        scroll.setFrameShape(QScrollArea.NoFrame)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self.tabs.addTab(scroll, _("Effects"))
         self.tabs.currentChanged.connect(
             lambda i: i == 1 and usage.used("pad-effects"))   # the name only (usage.py)
@@ -528,10 +528,12 @@ class EditDialog(QDialog):
                           else _("▶  Playing"), 1500)
         prev.clicked.connect(play_preview)
 
-        bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        bb.button(QDialogButtonBox.Save).setObjectName("primary")   # the one filled button
-        bb.button(QDialogButtonBox.Cancel).setProperty("quiet", True)
-        copy = bb.addButton(_("Save a copy"), QDialogButtonBox.AcceptRole)
+        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Save
+                              | QDialogButtonBox.StandardButton.Cancel)
+        # the one filled button
+        bb.button(QDialogButtonBox.StandardButton.Save).setObjectName("primary")
+        bb.button(QDialogButtonBox.StandardButton.Cancel).setProperty("quiet", True)
+        copy = bb.addButton(_("Save a copy"), QDialogButtonBox.ButtonRole.AcceptRole)
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
         copy.clicked.connect(lambda: setattr(self, "as_copy", True))
         bb.accepted.connect(self.accept)
@@ -559,7 +561,7 @@ class EditDialog(QDialog):
         head.addWidget(name)
         head.addStretch(1)
         head.addWidget(lbl)
-        sl = QSlider(Qt.Horizontal)
+        sl = QSlider(Qt.Orientation.Horizontal)
         sl.setRange(0, int(top * 10))
         sl.setValue(int(round(min(max(value, 0.0), top) * 10)))
         sl.setToolTip(tip)
@@ -612,8 +614,8 @@ class EditDialog(QDialog):
         else:
             pm = QPixmap()
         if not pm.isNull():
-            self.pic_view.setPixmap(pm.scaled(PIC_W, PIC_H, Qt.KeepAspectRatio,
-                                              Qt.SmoothTransformation))
+            self.pic_view.setPixmap(pm.scaled(PIC_W, PIC_H, Qt.AspectRatioMode.KeepAspectRatio,
+                                              Qt.TransformationMode.SmoothTransformation))
         self.pic_view.setVisible(not pm.isNull())   # no picture: just the buttons
         self.btn_pic_clear.setVisible(not pm.isNull())
 

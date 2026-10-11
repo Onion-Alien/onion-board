@@ -95,7 +95,7 @@ class _Loading(QFrame):
         from soundboard.ui.bunnywidget import BunnyWidget
         super().__init__(parent)
         self.setObjectName("maploader")
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         box = QHBoxLayout(self)
         box.setContentsMargins(6, 4, 18, 4)
         box.setSpacing(4)
@@ -194,7 +194,7 @@ class FlatMap(QWidget):
         self._build: tuple | None = None  # (tile, picture, its steps): being drawn
         self._slice = QTimer(self)        # draws the next slice of it
         self._slice.setSingleShot(True)
-        self._slice.setTimerType(Qt.PreciseTimer)
+        self._slice.setTimerType(Qt.TimerType.PreciseTimer)
         self._slice.setInterval(SLICE_GAP_MS)
         self._slice.timeout.connect(self._draw_slice)
         self._forget = QTimer(self)       # hidden a while: let the drawn tiles go
@@ -212,9 +212,9 @@ class FlatMap(QWidget):
             b.setObjectName("mapbtn")
             b.setToolTip(tip)
             b.setFixedSize(30, 30)
-            b.setCursor(Qt.PointingHandCursor)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.clicked.connect(slot)
-            box.addWidget(b, 0, Qt.AlignRight)
+            box.addWidget(b, 0, Qt.AlignmentFlag.AlignRight)
             self._buttons.append(b)
         self._loading = _Loading(self)   # until the stations come (set_points)
         self.set_theme()
@@ -233,7 +233,7 @@ class FlatMap(QWidget):
         for ring in rings:
             if path is None or n + len(ring) > LAND_PART:
                 path, n = QPainterPath(), 0
-                path.setFillRule(Qt.WindingFill)
+                path.setFillRule(Qt.FillRule.WindingFill)
                 self._land.append(path)
             path.moveTo(ring[0][0], -ring[0][1])
             for x, y in ring[1:]:
@@ -473,7 +473,7 @@ class FlatMap(QWidget):
                       & (ys > rect.top() - 8) & (ys < rect.bottom() + 8))
                 accent = QColor(t["accent"])
                 accent.setAlphaF(0.85)
-                p.setPen(Qt.NoPen)
+                p.setPen(Qt.PenStyle.NoPen)
                 p.setBrush(accent)
                 grow = self._grow()
                 for k, i in enumerate(np.flatnonzero(on), 1):
@@ -485,7 +485,7 @@ class FlatMap(QWidget):
             font, colour = self._label_style()
             fm = QFontMetricsF(font)
             halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
-            halo.setJoinStyle(Qt.RoundJoin)
+            halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
             corner = tr.map(QPointF(-180, -LAT_TOP))
             for box, name in self._place_labels(s):
                 box = box.translated(corner)
@@ -502,7 +502,7 @@ class FlatMap(QWidget):
     def _label_style(self) -> tuple[QFont, QColor]:
         font = QFont(self.font())
         font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85))
-        font.setWeight(QFont.DemiBold)
+        font.setWeight(QFont.Weight.DemiBold)
         return font, QColor(theme.T["text_hi"])
 
     def _label_boxes(self, tr: QTransform, s: float, rect: QRectF, fm: QFontMetricsF):
@@ -557,18 +557,18 @@ class FlatMap(QWidget):
             t = theme.T
             font = QFont(self.font())
             font.setPointSizeF(max(7.0, font.pointSizeF() * 0.8))
-            font.setWeight(QFont.Normal)
+            font.setWeight(QFont.Weight.Normal)
             fm = QFontMetricsF(font)
             w, h = fm.horizontalAdvance(name) + 6, fm.height() + 2
             pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
             pm.setDevicePixelRatio(dpr)
-            pm.fill(Qt.transparent)
+            pm.fill(Qt.GlobalColor.transparent)
             q = QPainter(pm)
-            q.setRenderHint(QPainter.Antialiasing)
+            q.setRenderHint(QPainter.RenderHint.Antialiasing)
             path = QPainterPath()
             path.addText(3, 1 + fm.ascent(), font, name)
             halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
-            halo.setJoinStyle(Qt.RoundJoin)
+            halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
             q.strokePath(path, halo)
             q.fillPath(path, _mix(t["bg"], t["text"], 0.68))
             q.end()
@@ -676,7 +676,7 @@ class FlatMap(QWidget):
         def steps():
             p = QPainter(pm)
             try:
-                p.setRenderHint(QPainter.Antialiasing)
+                p.setRenderHint(QPainter.RenderHint.Antialiasing)
                 tr = QTransform()
                 tr.translate(180 * s - i * TILE / dpr, LAT_TOP * s - j * TILE / dpr)
                 tr.scale(s, s)
@@ -712,7 +712,7 @@ class FlatMap(QWidget):
         x1 = max(x + pm.width() for x, _y, pm in parts)
         y1 = max(y + pm.height() for _x, y, pm in parts)
         pic = QPixmap(x1 - x0, y1 - y0)
-        pic.fill(Qt.transparent)
+        pic.fill(Qt.GlobalColor.transparent)
         q = QPainter(pic)
         for x, y, pm in parts:   # device pixel for device pixel
             q.drawPixmap(QRectF(x - x0, y - y0, pm.width(), pm.height()), pm,
@@ -740,7 +740,7 @@ class FlatMap(QWidget):
         """What shows while the view's tiles are drawn: the land of the whole world
         (small, so a little soft), and over it the last whole view, each one picture."""
         p.save()
-        p.setRenderHint(QPainter.SmoothPixmapTransform)
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         base = self._base_level()
         got = self._picture(base, tuple((0, i, j) for i, j in self._all_tiles(base)))
         if got is not None:
@@ -846,7 +846,7 @@ class FlatMap(QWidget):
                             & (ys > -8) & (ys < self.height() + 8))
         accent = QColor(theme.T["accent"])
         accent.setAlphaF(0.85)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(accent)
         r = self._r * self._grow() * size
         for i in on.tolist():
@@ -865,14 +865,14 @@ class FlatMap(QWidget):
             pic = QPixmap(max(1, round(self.width() * dpr)),
                           max(1, round(self.height() * dpr)))
             pic.setDevicePixelRatio(dpr)
-            pic.fill(Qt.transparent)
+            pic.fill(Qt.GlobalColor.transparent)
             q = QPainter(pic)
-            q.setRenderHint(QPainter.Antialiasing)
+            q.setRenderHint(QPainter.RenderHint.Antialiasing)
             t = theme.T
             font, colour = self._label_style()
             fm = QFontMetricsF(font)
             halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
-            halo.setJoinStyle(Qt.RoundJoin)
+            halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
             rect = QRectF(self.rect())
             placed = self._place_labels(s)
             for k in self._copies():
@@ -899,18 +899,18 @@ class FlatMap(QWidget):
         size = self.size() * dpr
         buf = self._buf
         if buf is None or buf.size() != size or buf.devicePixelRatio() != dpr:
-            buf = self._buf = QImage(size, QImage.Format_ARGB32_Premultiplied)
+            buf = self._buf = QImage(size, QImage.Format.Format_ARGB32_Premultiplied)
             buf.setDevicePixelRatio(dpr)
-        buf.fill(Qt.transparent)
+        buf.fill(Qt.GlobalColor.transparent)
         q = QPainter(buf)
         self._paint(q, dpr)
         corners = QPainterPath()   # odd-even fill: the box minus the rounded card
         corners.addRect(QRectF(self.rect()))
         corners.addRoundedRect(QRectF(self.rect()), CORNER_PX, CORNER_PX)
-        q.setRenderHint(QPainter.Antialiasing)
+        q.setRenderHint(QPainter.RenderHint.Antialiasing)
         q.setClipping(False)
         q.resetTransform()
-        q.setCompositionMode(QPainter.CompositionMode_DestinationOut)
+        q.setCompositionMode(QPainter.CompositionMode.CompositionMode_DestinationOut)
         q.fillPath(corners, QColor(0, 0, 0))
         q.end()
         p = QPainter(self)
@@ -938,7 +938,7 @@ class FlatMap(QWidget):
                     if pm is not None:
                         p.drawPixmap(at, pm)
         self._plan(cur, slots, complete and not revealing)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         if revealing:
             self._paint_reveal(p)
             self._paint_names(p)   # on top, as the tiles have them
@@ -949,20 +949,20 @@ class FlatMap(QWidget):
             if 0 <= hover < len(self._points):
                 r = self._r[hover] * self._grow() + 2
                 p.setPen(QPen(QColor(t["text_hi"]), 1.5))
-                p.setBrush(Qt.NoBrush)
+                p.setBrush(Qt.BrushStyle.NoBrush)
                 p.drawEllipse(QPointF(xs[hover], ys[hover]), r, r)
             if cur_i >= 0:
                 hot = QColor(t["accent2"])
                 c = QPointF(xs[cur_i], ys[cur_i])
                 p.setPen(QPen(hot, 2))
-                p.setBrush(Qt.NoBrush)
+                p.setBrush(Qt.BrushStyle.NoBrush)
                 p.drawEllipse(c, 9, 9)
                 p.setPen(QPen(QColor(t["bg"]), 1.5))
                 p.setBrush(hot)
                 p.drawEllipse(c, 5, 5)
         if self._msg:   # on a card of its own, not over the country names
             area = QRectF(self.rect().adjusted(24, 24, -24, -24))
-            flags = Qt.AlignCenter | Qt.TextWordWrap
+            flags = Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap
             box = p.boundingRect(area, flags, self._msg).adjusted(-14, -8, 14, 8)
             p.setPen(QPen(QColor(t["border"]), 1))
             p.setBrush(QColor(t["card"]))
@@ -999,13 +999,13 @@ class FlatMap(QWidget):
         e.accept()
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             self._drag = e.position()
             self._dragged = False
 
     def mouseMoveEvent(self, e):
         pos = e.position()
-        if self._drag is not None and e.buttons() & Qt.LeftButton:
+        if self._drag is not None and e.buttons() & Qt.MouseButton.LeftButton:
             d = pos - self._drag
             if self._dragged or abs(d.x()) + abs(d.y()) > 3:
                 self._dragged = True
@@ -1013,14 +1013,15 @@ class FlatMap(QWidget):
                 self.cx -= d.x() / s
                 self.cy += d.y() / s
                 self._drag = pos
-                self.setCursor(Qt.ClosedHandCursor)
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 QToolTip.hideText()
                 self.update()
             return
         i = self._hit(pos)
         if i != self._hover:
             self._hover = i
-            self.setCursor(Qt.PointingHandCursor if i >= 0 else Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.PointingHandCursor if i >= 0
+                           else Qt.CursorShape.ArrowCursor)
             if i >= 0:
                 QToolTip.showText(e.globalPosition().toPoint(), self._tip(self._points[i]), self)
             else:
@@ -1028,7 +1029,7 @@ class FlatMap(QWidget):
             self.update()
 
     def mouseReleaseEvent(self, e):
-        if e.button() != Qt.LeftButton:
+        if e.button() != Qt.MouseButton.LeftButton:
             return
         dragged, self._drag = self._dragged, None
         self.unsetCursor()

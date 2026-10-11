@@ -21,7 +21,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QWidget
 from shiboken6 import isValid as qt_valid
 
 WIDEN_STEP = 80
-WATCHED = (QEvent.Show, QEvent.LayoutRequest, QEvent.Resize)
+WATCHED = (QEvent.Type.Show, QEvent.Type.LayoutRequest, QEvent.Type.Resize)
 
 
 def needed_height(w: QWidget, width: int) -> int:

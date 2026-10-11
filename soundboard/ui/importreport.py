@@ -93,7 +93,7 @@ class SkippedDialog(QDialog):
     def __init__(self, skipped: list[Skipped], parent: QWidget | None = None):
         super().__init__(parent)
         self.setWindowTitle(_("Files not added"))
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setMaximumWidth(620)
         self.skipped = skipped
         root = QVBoxLayout(self)
@@ -122,7 +122,7 @@ class SkippedDialog(QDialog):
             shown += len(items)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(body)
         scroll.setMinimumWidth(420)
         # as tall as the list, up to 380 (then it scrolls)
@@ -169,14 +169,14 @@ class SkippedDialog(QDialog):
             row = QVBoxLayout()
             row.setSpacing(0)
             name_lbl = QLabel(s.file)
-            name_lbl.setTextFormat(Qt.PlainText)   # file names are the user's text
+            name_lbl.setTextFormat(Qt.TextFormat.PlainText)   # file names are the user's text
             name_lbl.setWordWrap(True)
-            name_lbl.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            name_lbl.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             why = QLabel(s.reason)
             why.setObjectName("hint")
-            why.setTextFormat(Qt.PlainText)
+            why.setTextFormat(Qt.TextFormat.PlainText)
             why.setWordWrap(True)
-            why.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            why.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             row.addWidget(name_lbl)
             row.addWidget(why)
             v.addLayout(row)

@@ -57,27 +57,27 @@ def _surface(w: float, h: float, scale: float) -> QImage:
     key = (w, h, scale, tuple(theme.T.items()), family, status)
     img = _surfaces.get(key)
     if img is None:
-        img = QImage(round(w * scale), round(h * scale), QImage.Format_ARGB32_Premultiplied)
-        img.fill(Qt.transparent)
+        img = QImage(round(w * scale), round(h * scale), QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(Qt.GlobalColor.transparent)
         p = QPainter(img)
         try:
             p.scale(scale, scale)
-            p.setRenderHint(QPainter.Antialiasing)
-            p.setPen(Qt.NoPen)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(theme.T["panel"]))
             p.drawRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
             draw_bunny(p, QRectF((w - BUN_W) / 2, 30, BUN_W, BUN_H))
             font = QFont(family)
             font.setPixelSize(18)
-            font.setWeight(QFont.DemiBold)
+            font.setWeight(QFont.Weight.DemiBold)
             p.setFont(font)
             p.setPen(QColor(theme.T["text_hi"]))
-            p.drawText(QRectF(20, 142, w - 40, 26), Qt.AlignCenter, "Onion Board")
+            p.drawText(QRectF(20, 142, w - 40, 26), Qt.AlignmentFlag.AlignCenter, "Onion Board")
             font.setPixelSize(12)
-            font.setWeight(QFont.Normal)
+            font.setWeight(QFont.Weight.Normal)
             p.setFont(font)
             p.setPen(QColor(theme.T["muted"]))
-            p.drawText(QRectF(20, 171, w - 40, 22), Qt.AlignCenter, status)
+            p.drawText(QRectF(20, 171, w - 40, 22), Qt.AlignmentFlag.AlignCenter, status)
         finally:
             p.end()
         _surfaces[key] = img
@@ -86,10 +86,10 @@ def _surface(w: float, h: float, scale: float) -> QImage:
 
 def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
     """A stationary panel; only the three dots change opacity, never size or position."""
-    p.setRenderHint(QPainter.Antialiasing)
-    p.setRenderHint(QPainter.SmoothPixmapTransform)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale))
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     accent = QColor(theme.T["accent"])
     for i in range(3):
         pulse = (1 - math.cos(2 * math.pi * (t - i * 0.2) / PULSE_S)) / 2
@@ -117,9 +117,10 @@ class Splash(QWidget):
     """The Qt splash, for platforms without the native one (the tests' offscreen)."""
 
     def __init__(self):
-        super().__init__(None, Qt.SplashScreen | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setAttribute(Qt.WA_ShowWithoutActivating)   # don't take focus from a game
+        super().__init__(None, Qt.WindowType.SplashScreen | Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        # don't take focus from a game
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle("Onion Board")
         self.setFixedSize(CARD_W, CARD_H)
         self._t0 = time.monotonic()
@@ -240,7 +241,8 @@ class NativeSplash:
         bits = H()
         dib = gdi.CreateDIBSection(dc, ctypes.byref(bih), 0, ctypes.byref(bits), None, 0)
         old = gdi.SelectObject(dc, dib)
-        img = QImage(w, h, QImage.Format_ARGB32_Premultiplied)   # premultiplied BGRA, as GDI wants
+        # premultiplied BGRA, as GDI wants
+        img = QImage(w, h, QImage.Format.Format_ARGB32_Premultiplied)
         nbytes = w * h * 4
         size, src, dst = wt.SIZE(w, h), wt.POINT(0, 0), wt.POINT(x, y)
         blend = BLENDFUNCTION(0, 0, 255, 1)   # AC_SRC_OVER, per-pixel alpha
@@ -249,7 +251,7 @@ class NativeSplash:
         try:
             while not self._stop.is_set():
                 start = time.monotonic()
-                img.fill(Qt.transparent)
+                img.fill(Qt.GlobalColor.transparent)
                 p = QPainter(img)
                 try:
                     p.scale(k, k)   # drawn at the monitor's real resolution, never stretched
@@ -305,7 +307,7 @@ def show() -> Splash | NativeSplash:
         _splash.move(geo.center().x() - CARD_W // 2, geo.center().y() - CARD_H // 2)
     _splash.show()
     _splash.repaint()
-    QApplication.processEvents(QEventLoop.ExcludeUserInputEvents)
+    QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
     sys.meta_path.insert(0, _PumpOnImport)
     return _splash
 
@@ -320,7 +322,7 @@ def pump():
         return
     _last = now
     _splash.update()
-    QApplication.processEvents(QEventLoop.ExcludeUserInputEvents)
+    QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
 
 def close():
