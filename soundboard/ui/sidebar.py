@@ -917,7 +917,7 @@ class SideRail(QFrame):
         self._lay.invalidate()
         mid = self._mid()
         self.brand.setVisible(shown)
-        fits = self._brand_fits()
+        fits = not mid or self._brand_fits()   # (full: as it always was)
         self.byline.setVisible(shown and fits)
         if self.property("twolinebrand") != (not fits):   # two lines: a size smaller
             self.setProperty("twolinebrand", not fits)
