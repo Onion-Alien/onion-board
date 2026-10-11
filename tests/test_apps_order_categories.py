@@ -304,6 +304,7 @@ def _focus_chain(start, n=60):
         out.append(w)
     return out
 
+
 def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, monkeypatch):
     from soundboard import i18n
     from soundboard.engine import Engine
