@@ -3153,5 +3153,15 @@
   "Not configured": "Δεν έχει ρυθμιστεί",
   "Not configured: click to fix": "Δεν έχει ρυθμιστεί: κάνε κλικ για διόρθωση",
   "Can't send to {device}, click to fix": "Δεν γίνεται αποστολή στο {device}, κάνε κλικ για διόρθωση",
+  "A second mic to pick in Discord or the game.": "Ένα δεύτερο μικρόφωνο που διαλέγεις στο Discord ή στο παιχνίδι.",
+  "Discord and games won't hear your sounds": "Το Discord και τα παιχνίδια δεν θα ακούν τους ήχους σου",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Δωρεάν. Ανοίγει το Διαμόρφωση και το εγκαθιστά, μετά το διαλέγεις ως μικρόφωνο στο Discord ή στο παιχνίδι.",
+  "Install a virtual cable": "Εγκατάσταση εικονικού καλωδίου",
+  "Keep it": "Διατήρηση",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Είναι για OBS, Voicemeeter ή μίκτη; Κράτησέ το.",
+  "Straight into the mic you already use. Nothing to install.": "Κατευθείαν στο μικρόφωνο που ήδη χρησιμοποιείς. Τίποτα για εγκατάσταση.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Πηγαίνουν τώρα στο <b>{device}</b>, κανονικά ηχεία ή ακουστικά, οπότε τους ακούς μόνο εσύ. Διάλεξε έναν τρόπο που φτάνει στη φωνητική συνομιλία:",
+  "Use my mic": "Χρήση του μικροφώνου μου",
+  "Use the virtual cable": "Χρήση του εικονικού καλωδίου",
   "Plays from: {path}": "Παίζει από: {path}"
 }

@@ -3153,5 +3153,15 @@
   "Not configured": "Sin configurar",
   "Not configured: click to fix": "Sin configurar: haz clic para arreglarlo",
   "Can't send to {device}, click to fix": "No se puede enviar a {device}, haz clic para arreglarlo",
+  "A second mic to pick in Discord or the game.": "Un segundo micro que eliges en Discord o en el juego.",
+  "Discord and games won't hear your sounds": "Discord y los juegos no oirán tus sonidos",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Gratis. Abre Configuración y lo instala; luego lo eliges como micro en Discord o en el juego.",
+  "Install a virtual cable": "Instalar un cable virtual",
+  "Keep it": "Dejarlo así",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "¿Es para OBS, Voicemeeter o una mesa de mezclas? Déjalo así.",
+  "Straight into the mic you already use. Nothing to install.": "Directo al micro que ya usas. Nada que instalar.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Ahora van a <b>{device}</b>, unos altavoces o auriculares normales, así que solo los oyes tú. Elige una forma que llegue al chat de voz:",
+  "Use my mic": "Usar mi micro",
+  "Use the virtual cable": "Usar el cable virtual",
   "Plays from: {path}": "Se reproduce desde: {path}"
 }

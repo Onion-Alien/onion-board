@@ -3080,5 +3080,15 @@
   "Not configured": "未設定",
   "Not configured: click to fix": "未設定：クリックして修正",
   "Can't send to {device}, click to fix": "{device} に送れません。クリックして修正",
+  "A second mic to pick in Discord or the game.": "Discord やゲームで選ぶ 2 つ目のマイクです。",
+  "Discord and games won't hear your sounds": "Discord やゲームにはサウンドが聞こえません",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "無料。セットアップ を開いてインストールします。その後 Discord やゲームでマイクとして選びます。",
+  "Install a virtual cable": "仮想ケーブルをインストール",
+  "Keep it": "そのままにする",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "OBS、Voicemeeter、ミキサー用ですか？ そのままにしてください。",
+  "Straight into the mic you already use. Nothing to install.": "今使っているマイクに直接流します。インストール不要です。",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "サウンドは今 <b>{device}</b>（普通のスピーカーかヘッドセット）に流れているので、聞こえるのは自分だけです。ボイスチャットに届く方法を選んでください:",
+  "Use my mic": "自分のマイクを使う",
+  "Use the virtual cable": "仮想ケーブルを使う",
   "Plays from: {path}": "再生元: {path}"
 }

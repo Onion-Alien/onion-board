@@ -3153,5 +3153,15 @@
   "Not configured": "Ikke satt opp",
   "Not configured: click to fix": "Ikke satt opp: klikk for å fikse",
   "Can't send to {device}, click to fix": "Kan ikke sende til {device}, klikk for å fikse",
+  "A second mic to pick in Discord or the game.": "En ekstra mikrofon du velger i Discord eller spillet.",
+  "Discord and games won't hear your sounds": "Discord og spill hører ikke lydene dine",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Gratis. Åpner Oppsett og installerer den, så velger du den som mikrofon i Discord eller spillet.",
+  "Install a virtual cable": "Installer en virtuell kabel",
+  "Keep it": "Behold det",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Er det for OBS, Voicemeeter eller en mikser? Behold det.",
+  "Straight into the mic you already use. Nothing to install.": "Rett inn i mikrofonen du allerede bruker. Ingenting å installere.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "De går nå til <b>{device}</b>, vanlige høyttalere eller hodesett, så bare du hører dem. Velg en måte som når fram til talechatten:",
+  "Use my mic": "Bruk mikrofonen min",
+  "Use the virtual cable": "Bruk den virtuelle kabelen",
   "Plays from: {path}": "Spilles fra: {path}"
 }

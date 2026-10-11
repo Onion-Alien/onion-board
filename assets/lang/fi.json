@@ -3153,5 +3153,15 @@
   "Not configured": "Ei määritetty",
   "Not configured: click to fix": "Ei määritetty: korjaa klikkaamalla",
   "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla",
+  "A second mic to pick in Discord or the game.": "Toinen mikki, jonka valitset Discordissa tai pelissä.",
+  "Discord and games won't hear your sounds": "Discord ja pelit eivät kuule ääniäsi",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Ilmainen. Avaa Käyttöönotto-välilehden ja asentaa sen, sitten valitset sen mikiksi Discordissa tai pelissä.",
+  "Install a virtual cable": "Asenna virtuaalikaapeli",
+  "Keep it": "Pidä se",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Onko se OBS:lle, Voicemeeterille tai mikserille? Pidä se.",
+  "Straight into the mic you already use. Nothing to install.": "Suoraan mikkiin, jota jo käytät. Ei mitään asennettavaa.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Ne menevät nyt laitteeseen <b>{device}</b>, tavallisiin kaiuttimiin tai kuulokkeisiin, joten vain sinä kuulet ne. Valitse tapa, joka ulottuu äänichattiin:",
+  "Use my mic": "Käytä omaa mikkiä",
+  "Use the virtual cable": "Käytä virtuaalikaapelia",
   "Plays from: {path}": "Soitetaan tiedostosta: {path}"
 }

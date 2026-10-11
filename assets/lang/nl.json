@@ -3153,5 +3153,15 @@
   "Not configured": "Niet ingesteld",
   "Not configured: click to fix": "Niet ingesteld: klik om te herstellen",
   "Can't send to {device}, click to fix": "Kan niet naar {device} sturen, klik om te herstellen",
+  "A second mic to pick in Discord or the game.": "Een tweede mic die je in Discord of de game kiest.",
+  "Discord and games won't hear your sounds": "Discord en games horen je geluiden niet",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Gratis. Opent Setup en installeert hem, daarna kies je hem als mic in Discord of de game.",
+  "Install a virtual cable": "Een virtuele kabel installeren",
+  "Keep it": "Zo laten",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Bedoeld voor OBS, Voicemeeter of een mengpaneel? Laat het zo.",
+  "Straight into the mic you already use. Nothing to install.": "Rechtstreeks in de mic die je al gebruikt. Niets te installeren.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Ze gaan nu naar <b>{device}</b>, gewone speakers of een headset, dus alleen jij hoort ze. Kies een manier die de voicechat bereikt:",
+  "Use my mic": "Mijn mic gebruiken",
+  "Use the virtual cable": "De virtuele kabel gebruiken",
   "Plays from: {path}": "Speelt af vanaf: {path}"
 }

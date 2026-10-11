@@ -3226,5 +3226,15 @@
   "Not configured": "Nenastaveno",
   "Not configured: click to fix": "Nenastaveno: klikni pro opravu",
   "Can't send to {device}, click to fix": "Nejde posílat do {device}, klikni pro opravu",
+  "A second mic to pick in Discord or the game.": "Druhý mikrofon, který vybereš v Discordu nebo ve hře.",
+  "Discord and games won't hear your sounds": "Discord a hry tvoje zvuky neuslyší",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Zdarma. Otevře Zapojení a nainstaluje ho, pak ho vybereš jako mikrofon v Discordu nebo ve hře.",
+  "Install a virtual cable": "Nainstalovat virtuální kabel",
+  "Keep it": "Ponechat",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Je to pro OBS, Voicemeeter nebo mixpult? Ponech to.",
+  "Straight into the mic you already use. Nothing to install.": "Přímo do mikrofonu, který už používáš. Nic se neinstaluje.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Teď jdou do <b>{device}</b>, běžných reproduktorů nebo sluchátek, takže je slyšíš jen ty. Vyber způsob, který se dostane do hlasového chatu:",
+  "Use my mic": "Použít můj mikrofon",
+  "Use the virtual cable": "Použít virtuální kabel",
   "Plays from: {path}": "Přehrává se z: {path}"
 }
