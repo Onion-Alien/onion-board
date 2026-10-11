@@ -9,6 +9,7 @@ icon (live badge, voice picture, warning tint), name, tip and whether it's shown
 from __future__ import annotations
 
 import html
+from collections.abc import Sequence
 
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
@@ -55,13 +56,14 @@ class SideTabs(QTabWidget):
         self.tabBar().installEventFilter(self)
         # the hidden bar was the Tab key's stop after the rail: it can't take focus, so
         # Tab stuck on the rail's last button and never reached the page
-        self.setFocusProxy(None)
+        self.setFocusProxy(None)   # pyright: ignore[reportArgumentType]  # None clears it
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.tabBar().setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
-        if obj is self.tabBar() and e.type() == QEvent.Type.Show:
-            obj.hide()   # QTabWidget shows it again when it lays itself out
+        bar = self.tabBar()
+        if obj is bar and e.type() == QEvent.Type.Show:
+            bar.hide()   # QTabWidget shows it again when it lays itself out
         return False
 
     def setCurrentIndex(self, i):
@@ -498,9 +500,9 @@ class SideRail(QFrame):
     orderChanged = Signal(list)
 
     def __init__(self, tabs: SideTabs, logo: QWidget, brand: QLabel, byline: QLabel,
-                 extras: list[QPushButton], is_open: bool, foot: list[QPushButton] = (),
-                 on_open=None, status: list[QPushButton] = (), order=(),
-                 alerts: list[QPushButton] = ()):
+                 extras: list[QPushButton], is_open: bool, foot: Sequence[QPushButton] = (),
+                 on_open=None, status: Sequence[QPushButton] = (), order=(),
+                 alerts: Sequence[QPushButton] = ()):
         super().__init__()
         self.setObjectName("sidebar")
         self.tabs = tabs
@@ -516,8 +518,9 @@ class SideRail(QFrame):
         # the onion in the icons' column, open or shut, and when open the name and
         # "by Onion Alien" beside it (centred over the open rail, it sat off the column)
         self.logo = logo
-        if hasattr(logo, "set_mark"):
-            logo.set_mark(LOGO)
+        set_mark = getattr(logo, "set_mark", None)
+        if set_mark is not None:
+            set_mark(LOGO)
         head = QHBoxLayout()
         head.setSpacing(6)
         slot = QWidget()
@@ -575,21 +578,21 @@ class SideRail(QFrame):
         # the alerts, and who's listening, only on the open rail: shut, it keeps just
         # the few that matter (a dot on the arrow says an alert is waiting)
         self._open_only: list[QWidget] = []
-        alert_wrap = self._wrap()
+        alert_wrap, alert_lay = self._wrap_lay()
         for w in self.status:
             w.setFocusPolicy(Qt.FocusPolicy.TabFocus)
             w.setFixedWidth(BUTTON_W)
             if w in self.alerts:
-                alert_wrap.layout().addWidget(w)
+                alert_lay.addWidget(w)
                 w.installEventFilter(self)   # shown / hidden: the line and dot follow
             elif w.objectName() == "modebtn":
-                wrap = self._wrap()
-                wrap.layout().addWidget(w)
+                wrap, lay = self._wrap_lay()
+                lay.addWidget(w)
                 self._status_box.addWidget(wrap)
             else:
                 self._status_box.addWidget(w)
         if self.alerts:
-            alert_wrap.layout().addWidget(self.div_alerts)
+            alert_lay.addWidget(self.div_alerts)
             self._status_box.insertWidget(1, alert_wrap)
         else:
             alert_wrap.deleteLater()
@@ -639,13 +642,17 @@ class SideRail(QFrame):
 
     def _wrap(self) -> QWidget:
         """A see-through box for buttons that only the open rail shows."""
+        return self._wrap_lay()[0]
+
+    def _wrap_lay(self) -> tuple[QWidget, QVBoxLayout]:
+        """_wrap's box, and its layout to put the buttons in."""
         box = QWidget()
         box.setObjectName("railslot")
         lay = QVBoxLayout(box)
         lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(4)
         self._open_only.append(box)
-        return box
+        return box, lay
 
     def _divider(self) -> QFrame:
         line = QFrame()
@@ -656,7 +663,8 @@ class SideRail(QFrame):
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
         if e.type() in (QEvent.Type.Show, QEvent.Type.Hide) and obj in self.alerts:
             QTimer.singleShot(0, self, self._sync_divider)   # (not after the rail's gone)
-        elif e.type() == QEvent.Type.Paint and obj in self.foot:
+        elif (e.type() == QEvent.Type.Paint and isinstance(obj, QPushButton)
+              and obj in self.foot):
             # a square round the icon (the button is as tall as the others, so it sits
             # level with them): selected, the current tab's soft fill (RailTab); else
             # the hover fill; the keyboard's ring (theme.py leaves these to here)

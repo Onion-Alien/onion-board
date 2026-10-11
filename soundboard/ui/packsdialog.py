@@ -60,7 +60,7 @@ class PackCard(QFrame):
         top.addLayout(names, 1)
         self.btn = QPushButton()
         self.btn.setObjectName("primary")
-        self.btn.clicked.connect(lambda: self.window().add(self))
+        self.btn.clicked.connect(self._add)
         top.addWidget(self.btn, 0, Qt.AlignmentFlag.AlignTop)
         v.addLayout(top)
         if pack.description:
@@ -81,6 +81,11 @@ class PackCard(QFrame):
             _("Downloads the pack ({size}) and puts its sounds on your board, each "
               "category as its own tab", size=size_text(self.pack.size) or "?"))
         icons.set_icon(self.btn, "check" if added else "download", "on_accent")
+
+    def _add(self, _checked: bool = False):
+        dialog = self.window()
+        assert isinstance(dialog, PacksDialog)   # the cards are in one
+        dialog.add(self)
 
 
 class PacksDialog(QDialog):
@@ -104,16 +109,16 @@ class PacksDialog(QDialog):
         self.note = hint_label("")
         self.note.hide()
         lay.addWidget(self.note)
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         self.body = QWidget()
         self.list = QVBoxLayout(self.body)
         self.list.setContentsMargins(0, 0, 0, 0)
         self.list.setSpacing(8)
-        self.scroll.setWidget(self.body)
-        self.scroll.setMinimumSize(440, 260)
-        lay.addWidget(self.scroll, 1)
+        self.scroll_area.setWidget(self.body)
+        self.scroll_area.setMinimumSize(440, 260)
+        lay.addWidget(self.scroll_area, 1)
         share = QFrame()
         share.setObjectName("card")
         sv = QHBoxLayout(share)
@@ -162,7 +167,8 @@ class PacksDialog(QDialog):
         if found is None or self._busy:   # don't pull a card out from under a download
             return
         while self.list.count():
-            w = self.list.takeAt(0).widget()
+            item = self.list.takeAt(0)
+            w = item.widget() if item else None
             if w is not None:
                 w.deleteLater()
         self.cards = [PackCard(p) for p in found]

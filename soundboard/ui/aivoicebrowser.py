@@ -42,8 +42,10 @@ class Previewer:
         if self.busy or not self.available():
             return
         data = aipreview.cached(voice)
+        play = self.play
+        assert play is not None   # available() checked
         if data is not None:
-            self.play(data)
+            play(data)
             return
         self.busy = True
         btn.setText(MAKING)
@@ -64,7 +66,7 @@ class Previewer:
             btn.setText(HEAR)
         except RuntimeError:          # its card was rebuilt meanwhile
             pass
-        if data is not None:
+        if data is not None and self.play is not None:   # (hear() checked it)
             self.play(data)
         elif err:
             on_error(_("⚠ Couldn't play a sample: {error}", error=err))
@@ -170,11 +172,11 @@ class AiVoiceBrowser(QDialog):
         self.status.setWordWrap(True)
         self.status.hide()
         lay.addWidget(self.status)
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
-        self.scroll.setMinimumSize(680, 420)
-        lay.addWidget(self.scroll, 1)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll_area.setMinimumSize(680, 420)
+        lay.addWidget(self.scroll_area, 1)
         self.undo_bar = UndoBar(_("Bring the voice back"))
         lay.addWidget(self.undo_bar)
         row = QHBoxLayout()
@@ -280,7 +282,7 @@ class AiVoiceBrowser(QDialog):
                 c.b_use.clicked.connect(lambda __=False, vid=vo["id"]: self.use(vid))
                 c.b_hear.clicked.connect(lambda __=False, c=c: self.previewer.hear(
                     c.b_hear, c.voice, self._sampled, self._say))
-                if c.b_edit is not None:
+                if c.b_edit is not None and c.b_delete is not None:   # (made together)
                     c.b_edit.clicked.connect(lambda __=False, vid=vo["id"]: self.edit(vid))
                     c.b_delete.clicked.connect(lambda __=False, vid=vo["id"]: self.delete(vid))
                 grid.addWidget(c, r + i // 2, i % 2)
@@ -292,7 +294,7 @@ class AiVoiceBrowser(QDialog):
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
         grid.setRowStretch(r, 1)
-        self.scroll.setWidget(body)
+        self.scroll_area.setWidget(body)
         n = len(self.store.deleted)
         self.b_bin.setText(_("Recently deleted ({n})", n=n))
         self.b_bin.setVisible(n > 0)

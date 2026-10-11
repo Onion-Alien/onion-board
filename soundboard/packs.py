@@ -155,7 +155,7 @@ def catalog() -> list[Pack]:
     return packs
 
 
-def download(pack: Pack, progress: Callable[[int, int], None] | None = None,
+def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
              cancelled: Callable[[], bool] | None = None) -> Path:
     """Fetch `pack` into the app folder's "packs", checked against its SHA-256; its
     path. Raises updates.UpdateError with a message for the user. Call off the UI
