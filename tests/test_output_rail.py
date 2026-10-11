@@ -8,7 +8,10 @@ from soundboard.ui.sidebar import RailTab
 from test_mainwindow import window  # noqa: F401
 
 
-def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window, qapp):  # noqa: F811
+def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window, qapp,  # noqa: F811
+                                                                         monkeypatch):
+    # a send device, so muting means something even on a PC (CI) with no cable
+    monkeypatch.setattr(window, "_main_name", lambda: "CABLE Input")
     window.resize(1180, 720)
     window.show()
     window.rail.set_open(True)
