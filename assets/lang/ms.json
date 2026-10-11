@@ -3090,5 +3090,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Bunyi kini pergi ke <b>{device}</b>, pembesar suara atau set kepala biasa, jadi hanya anda yang dengar. Pilih cara yang sampai ke sembang suara:",
   "Use my mic": "Guna mikrofon saya",
   "Use the virtual cable": "Guna kabel maya",
+  "Plays from: {path}": "Dimainkan dari: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap bunyi muncul sebaik sahaja masuk. Menutup ini tidak menghentikannya."
 }

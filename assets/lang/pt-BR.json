@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Agora eles vão para <b>{device}</b>, um alto-falante ou headset comum, então só você ouve. Escolha um jeito que chegue ao chat de voz:",
   "Use my mic": "Usar meu microfone",
   "Use the virtual cable": "Usar o cabo virtual",
+  "Plays from: {path}": "Toca a partir de: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Cada som aparece assim que entra. Fechar isto não para."
 }

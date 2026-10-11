@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Napupunta na sila sa <b>{device}</b>, isang normal na speaker o headset, kaya ikaw lang ang nakakarinig. Pumili ng paraang aabot sa voice chat:",
   "Use my mic": "Gamitin ang mic ko",
   "Use the virtual cable": "Gamitin ang virtual cable",
+  "Plays from: {path}": "Pinapatugtog mula sa: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Lumalabas ang bawat tunog pagkapasok nito. Hindi ito titigil kapag isinara mo ito."
 }

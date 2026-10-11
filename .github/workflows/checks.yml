@@ -7,6 +7,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      linux:
+        description: Also run the Linux tests (off by default)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -249,11 +254,12 @@ jobs:
   # tests marked `windows` are skipped and Windows itself is stood in for
   # (tests/offwindows.py), so this run proves the Linux mode still works.
   # Split as the Windows jobs are (the whole suite in one job took ~6 min).
-  # Only on main (after each merge) and by hand: on every PR it doubled the runners a
-  # PR took, and with a few PRs at once they queued for minutes. It never gated a merge.
+  # Off unless asked for: the code is worked on from Windows, so it only runs by hand
+  # (Actions > checks > Run workflow, tick "Also run the Linux tests", or
+  # `gh workflow run checks.yml -f linux=true`). It never gated a merge.
   test-linux:
     needs: pick
-    if: ${{ github.event_name != 'pull_request' && needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
+    if: ${{ inputs.linux && needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
     name: test-linux   # GitHub adds the shard: "test-linux (1/4)"
     strategy:
       fail-fast: false

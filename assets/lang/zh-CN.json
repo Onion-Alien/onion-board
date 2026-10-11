@@ -3090,5 +3090,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "音效现在发往 <b>{device}</b>，这是普通的扬声器或耳机，只有你自己听得到。选一种能传到语音聊天的方式：",
   "Use my mic": "用我的麦克风",
   "Use the virtual cable": "用虚拟音频线",
+  "Plays from: {path}": "播放自：{path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "每个声音一加入就会出现。关闭这里不会停止。"
 }

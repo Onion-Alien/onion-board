@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Πηγαίνουν τώρα στο <b>{device}</b>, κανονικά ηχεία ή ακουστικά, οπότε τους ακούς μόνο εσύ. Διάλεξε έναν τρόπο που φτάνει στη φωνητική συνομιλία:",
   "Use my mic": "Χρήση του μικροφώνου μου",
   "Use the virtual cable": "Χρήση του εικονικού καλωδίου",
+  "Plays from: {path}": "Παίζει από: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Κάθε ήχος εμφανίζεται μόλις μπει. Το κλείσιμο δεν το σταματά."
 }

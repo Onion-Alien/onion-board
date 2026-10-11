@@ -3236,5 +3236,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Acum merg la <b>{device}</b>, niște boxe sau căști obișnuite, deci doar tu le auzi. Alege o cale care ajunge în chatul vocal:",
   "Use my mic": "Folosește microfonul meu",
   "Use the virtual cable": "Folosește cablul virtual",
+  "Plays from: {path}": "Se redă din: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Fiecare sunet apare imediat ce e adăugat. Închiderea nu îl oprește."
 }

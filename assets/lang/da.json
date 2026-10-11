@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "De går nu til <b>{device}</b>, en almindelig højttaler eller headset, så kun du hører dem. Vælg en måde, der når voice chat:",
   "Use my mic": "Brug min mikrofon",
   "Use the virtual cable": "Brug det virtuelle kabel",
+  "Plays from: {path}": "Afspilles fra: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Hver lyd dukker op, så snart den er inde. At lukke dette stopper det ikke."
 }
