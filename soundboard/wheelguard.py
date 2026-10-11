@@ -11,10 +11,10 @@ measurable idle cost.
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
-from PySide6.QtGui import QHoverEvent
+from PySide6.QtGui import QHoverEvent, QMouseEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
                                QApplication, QCheckBox, QComboBox, QMenu, QProxyStyle,
-                               QScrollBar, QSizePolicy, QStyle, QWidget)
+                               QScrollBar, QSizePolicy, QSlider, QTabBar, QWidget)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
 
@@ -23,7 +23,7 @@ _guard: _Guard | None = None
 
 class AppStyle(QProxyStyle):
     """Fusion, with two app-wide changes that reach every window, the add-ons'
-    included (Onion Watch's Triggers / Log strip), at no per-event cost:
+    included (Onion Watch's Triggers / Log strip):
 
     - the wheel never changes a dropdown or flips a tab strip. Rolling past the
       Radio filters changed them; rolling over Triggers / Log switched pages. An
@@ -37,6 +37,8 @@ class AppStyle(QProxyStyle):
       when it shows. Not a pixelMetric override: every Python override here is called
       by Qt from C++ tens of thousands of times per theme switch, and each call waits
       for Python's lock while an audio thread holds it (freezes of 11 s and 36 s).
+      The wheel and slider changes are for the same reason _AppFilter on those
+      widgets, not a styleHint override (~28k calls per switch).
     - popups clear hover on the controls behind their mouse grab, so moving away
       while a menu is open never leaves its opener highlighted.
     - tick boxes take keyboard focus from Tab, so mouse clicks do not leave a
@@ -47,8 +49,10 @@ class AppStyle(QProxyStyle):
 
     def polish(self, arg):
         super().polish(arg)
-        if isinstance(arg, QComboBox):
-            snug_combo(arg, self.COMBO_CAP)
+        if isinstance(arg, (QComboBox, QTabBar, QSlider)):
+            arg.installEventFilter(_app_filter())   # once: Qt doesn't add it twice
+            if isinstance(arg, QComboBox):
+                snug_combo(arg, self.COMBO_CAP)
         elif isinstance(arg, QCheckBox) and arg.focusPolicy() == Qt.FocusPolicy.StrongFocus:
             arg.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         elif isinstance(arg, QMenu):
@@ -56,13 +60,38 @@ class AppStyle(QProxyStyle):
         elif isinstance(arg, QWidget) and arg.windowType() == Qt.WindowType.Popup:
             arg.installEventFilter(_submenu_edge())
 
-    def styleHint(self, hint, opt=None, widget=None, ret=None):
-        if hint in (QStyle.StyleHint.SH_ComboBox_AllowWheelScrolling,
-                    QStyle.StyleHint.SH_TabBar_AllowWheelScrolling):
-            return 0
-        if hint == QStyle.StyleHint.SH_Slider_AbsoluteSetButtons:
-            return Qt.MouseButton.LeftButton.value
-        return super().styleHint(hint, opt, widget, ret)
+
+
+class _AppFilter(QObject):
+    """AppStyle's wheel and slider changes, on each dropdown, tab strip and slider."""
+    WHEEL, PRESS = QEvent.Type.Wheel, QEvent.Type.MouseButtonPress
+
+    def eventFilter(self, obj, ev):
+        t = ev.type()
+        if t == self.WHEEL and isinstance(obj, (QComboBox, QTabBar)):
+            ev.ignore()   # passed on to the parent, so the page scrolls instead
+            return True
+        if t == self.PRESS and isinstance(obj, QSlider) \
+                and ev.button() == Qt.MouseButton.LeftButton:
+            # Qt's own jump-to-the-click is the middle button: hand it that press
+            mid = QMouseEvent(QEvent.Type.MouseButtonPress, ev.position(),
+                              ev.scenePosition(), ev.globalPosition(),
+                              Qt.MouseButton.MiddleButton, Qt.MouseButton.MiddleButton,
+                              ev.modifiers())
+            QApplication.sendEvent(obj, mid)
+            ev.setAccepted(mid.isAccepted())
+            return True
+        return False
+
+
+_filter: _AppFilter | None = None
+
+
+def _app_filter() -> _AppFilter:
+    global _filter
+    if _filter is None:
+        _filter = _AppFilter()
+    return _filter
 
 
 class _SubmenuEdge(QObject):
