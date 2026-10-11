@@ -593,13 +593,6 @@ begin
 #endif
 end;
 
-#ifdef PREVIEW
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin
-  Result := CurPageID <> HeardPage.ID;   // a look at the pages, never an install
-end;
-#endif
-
 // Next or Install on the pages before installing (there's no Ready page): Install on
 // whichever is last, which can change as Count me in is ticked.
 procedure UpdateInstallCaption;
@@ -871,32 +864,94 @@ begin
     Result := '';
 end;
 
-// Run install-vbcable.ps1 (extracted to {tmp}) with `Args`; its exit code, or -1 if it
-// couldn't start.
-function CableScript(Args: String): Integer;
+// The cable step, in three parts so the installer never sits frozen on it:
+//  1. leaving the boxes page with the cable ticked: download and check VB-Audio's setup
+//     in the background (install-vbcable.ps1 -Prefetch), while the user reads on;
+//  2. Install clicked: start the script without waiting, so Windows' permission box
+//     comes up at once while the files copy (and Cancel still works);
+//  3. after the files: wait for its exit code (a small page, only if they haven't
+//     answered Windows yet), then the restart / uninstaller bookkeeping.
+var
+  CablePrefetched, CableStarted, CableDone, CableHad: Boolean;
+
+function CableScriptPath: String;
 begin
-  if not FileExists(ExpandConstant('{tmp}\install-vbcable.ps1')) then
+  Result := ExpandConstant('{tmp}\install-vbcable.ps1');
+  if not FileExists(Result) then
     ExtractTemporaryFile('install-vbcable.ps1');
-  if not Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' +
-              ExpandConstant('{tmp}\install-vbcable.ps1') + '" ' + Args,
-              '', SW_HIDE, ewWaitUntilTerminated, Result) then
-    Result := -1;
 end;
 
-procedure InstallCable;
+function CableExitFile: String;
+begin
+  Result := ExpandConstant('{tmp}\cable-exit.txt');
+end;
+
+// the script's exit code (0 working, 3010 restart needed, 1 failed), or -2 while it runs
+function CableExitCode: Integer;
+var
+  S: AnsiString;
+begin
+  Result := -2;
+  if LoadStringFromFile(CableExitFile, S) then
+    Result := StrToIntDef(Trim(String(S)), -1);
+end;
+
+procedure PrefetchCable;
 var
   Code: Integer;
-  HadCable: Boolean;
 begin
-  // ask Windows whether the driver is there (2 = not installed): VB-Audio's own
-  // uninstaller leaves its setup program in Program Files, so that proves nothing
-  HadCable := CableScript('-Check') <> 2;
-  WizardForm.StatusLabel.Caption :=
-    'Installing the virtual cable. Windows will show a permission box: please click Yes.';
-  Code := CableScript('-Silent');
+  if CablePrefetched or not MayDownload('vbcable') or CableInstalled then
+    exit;
+  CablePrefetched := True;
+  Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + CableScriptPath +
+       '" -Prefetch "' + ExpandConstant('{tmp}\cable') + '"', '', SW_HIDE, ewNoWait, Code);
+end;
+
+procedure StartCable;
+var
+  Args: String;
+  Code: Integer;
+begin
+  CableHad := CableInstalled;
+  Args := '-Silent';
+  if CablePrefetched then   // silent installs never saw the boxes page: no prefetch
+    Args := Args + ' -From ''' + ExpandConstant('{tmp}\cable') + '''';
+  DeleteFile(CableExitFile);
+  CableStarted := Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -Command "& ''' +
+    CableScriptPath + ''' ' + Args + '; Set-Content -LiteralPath ''' + CableExitFile +
+    ''' -Value $LASTEXITCODE"', '', SW_HIDE, ewNoWait, Code);
+end;
+
+procedure FinishCable;
+var
+  Code, I: Integer;
+  Page: TOutputProgressWizardPage;
+begin
+  if not CableStarted then
+    exit;
+  if CableExitCode = -2 then
+  begin
+    Page := CreateOutputProgressPage('Adding the virtual cable',
+      'If Windows is asking for permission, click Yes.');
+    Page.Show;
+    try
+      // SetProgress keeps the window drawing while it waits; at most 15 minutes
+      for I := 0 to 3600 do
+      begin
+        if CableExitCode <> -2 then
+          break;
+        Page.SetProgress(I mod 40, 40);
+        Sleep(250);
+      end;
+    finally
+      Page.Hide;
+    end;
+  end;
+  Code := CableExitCode;
+  CableDone := True;
   CableNeedsRestart := (Code = 3010);
   // remembered for the uninstaller: a cable we put there is offered for removal first
-  if (not HadCable) and ((Code = 0) or (Code = 3010)) then
+  if (not CableHad) and ((Code = 0) or (Code = 3010)) then
     RegWriteStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', '1');
   // after that restart, open the app once by itself on the setup guide's cable step
   // (the same per-user RunOnce entry the guide sets; Windows deletes it as it runs)
@@ -905,6 +960,40 @@ begin
       'OnionBoardResumeSetup',
       '"' + ExpandConstant('{app}\{#AppExeName}.exe') + '" --resume-setup');
 end;
+
+// Cancelled after the cable went in: Inno takes Onion Board's files back out, but the
+// cable stays, so say where to remove it.
+procedure DeinitializeSetup;
+var
+  Code: Integer;
+begin
+  if not CableStarted or CableDone or WizardSilent then
+    exit;
+  Code := CableExitCode;
+  if (Code = 0) or (Code = 3010) then
+    MsgBox('Onion Board wasn''t installed, but the virtual cable (VB-Cable) was already ' +
+      'added to your PC.' + #13#10#13#10 + 'To remove it: Windows Settings > Apps > ' +
+      'Installed apps > "VBCABLE, The Virtual Audio Cable" > Uninstall.', mbInformation, MB_OK)
+  else if Code = -2 then
+    MsgBox('Onion Board wasn''t installed. The virtual cable (VB-Cable) may still be ' +
+      'added if you click Yes on Windows'' box.' + #13#10#13#10 + 'To remove it later: ' +
+      'Windows Settings > Apps > Installed apps > "VBCABLE, The Virtual Audio Cable" > ' +
+      'Uninstall.', mbInformation, MB_OK);
+end;
+
+#ifdef PREVIEW
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := CurPageID <> HeardPage.ID;   // a look at the pages, never an install
+end;
+#else
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := True;
+  if CurPageID = wpSelectTasks then
+    PrefetchCable;
+end;
+#endif
 
 function NeedRestart(): Boolean;
 begin
@@ -1052,9 +1141,11 @@ begin
   // first, right after Install is clicked: Windows' permission box comes up while the
   // user is still looking, not minutes later at the end
   if (CurStep = ssInstall) and MayDownload('vbcable') then
-    InstallCable;
+    StartCable;
   if CurStep = ssPostInstall then
     QueueImports;
+  if CurStep = ssPostInstall then
+    FinishCable;
   if (CurStep = ssPostInstall) and MayDownload('tor') then
     GetTor;
   if (CurStep = ssPostInstall) and MayDownload('livevoice') and not HasPython then

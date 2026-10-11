@@ -24,7 +24,12 @@
 #   2 = (-Check only) no cable installed
 #   -StatusFile: each step writes "<step>|<text>" there (steps: download, install,
 #   wake, check) so the app can show progress.
-param([switch]$Silent, [switch]$Check, [string]$StatusFile, [switch]$Elevated)
+#   -Prefetch <dir>: only download and check the setup program into <dir> (no admin), then
+#   leave "ready" (its path) or "failed" there. The installer starts this while the user
+#   is still picking boxes, so Windows' permission box comes up the moment they click
+#   Install. -From <dir>: use what -Prefetch left there (waits for it), else download.
+param([switch]$Silent, [switch]$Check, [string]$StatusFile, [switch]$Elevated,
+      [string]$Prefetch, [string]$From)
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"   # makes Invoke-WebRequest much faster
@@ -205,8 +210,63 @@ function Wake-Cable {
     return Wait-Cable 30
 }
 
+$page = "https://vb-audio.com/Cable/"
+
+# The newest Windows driver pack from the official page, unpacked into $work: the setup
+# program's path, once its signature checks out. Throws "<kind>|<message>" otherwise.
+function Get-CableSetup($work) {
+    $zipUrl = $null
+    try {
+        $html = (Invoke-WebRequest -Uri $page -UseBasicParsing).Content
+        $packs = [regex]::Matches($html, 'https://download\.vb-audio\.com/Download_CABLE/VBCABLE_Driver_Pack(\d+)\.zip') |
+            Sort-Object { [int]$_.Groups[1].Value } -Descending
+        if ($packs.Count -gt 0) { $zipUrl = $packs[0].Value }
+    } catch {
+        Write-Host "Couldn't read $page ($($_.Exception.Message))" -ForegroundColor Yellow
+    }
+    if (-not $zipUrl) { $zipUrl = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip" }
+    $zip = Join-Path $work "vbcable.zip"
+    Write-Host "Downloading $zipUrl"
+    try {
+        Invoke-WebRequest -Uri $zipUrl -OutFile $zip -UseBasicParsing
+    } catch {
+        throw "download|Download failed: $($_.Exception.Message)"
+    }
+    Expand-Archive -Path $zip -DestinationPath $work -Force
+    $exeName = if ([Environment]::Is64BitOperatingSystem) { "VBCABLE_Setup_x64.exe" } else { "VBCABLE_Setup.exe" }
+    $exe = Get-ChildItem -Path $work -Recurse -Filter $exeName | Select-Object -First 1
+    if (-not $exe) { throw "pack|Setup program $exeName not found in the pack." }
+    Test-CableSignature $exe.FullName
+    return $exe.FullName
+}
+
+# Only run it if it's genuinely signed by VB-Audio.
+function Test-CableSignature($path) {
+    $sig = Get-AuthenticodeSignature -FilePath $path
+    $signer = if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { "" }
+    # the certificate's own name (an EV code-signing cert: VB-Audio's legal entity), not
+    # just "contains Burel" anywhere in the subject
+    $cn = if ($sig.SignerCertificate) { $sig.SignerCertificate.GetNameInfo("SimpleName", $false) } else { "" }
+    if ($sig.Status -ne "Valid" -or $cn -notmatch "^(BUREL VINCENT|VB-Audio)\b") {
+        throw "signature|Signature check FAILED ($($sig.Status); signer: $signer). Not running it."
+    }
+    Write-Host "Signature OK: $signer" -ForegroundColor Green
+}
+
 if ($Check) {
     switch (Get-CableState) { "ok" { exit 0 } "restart" { exit 3010 } default { exit 2 } }
+}
+
+if ($Prefetch) {
+    New-Item -ItemType Directory -Force -Path $Prefetch | Out-Null
+    try {
+        $path = Get-CableSetup $Prefetch
+        Set-Content -Path (Join-Path $Prefetch "ready") -Value $path -Encoding utf8
+        exit 0
+    } catch {
+        Set-Content -Path (Join-Path $Prefetch "failed") -Value "$($_.Exception.Message)" -Encoding utf8
+        exit 1
+    }
 }
 
 Write-Host "=== Virtual cable setup ===" -ForegroundColor Cyan
@@ -249,86 +309,69 @@ if ($state -eq "restart") {
     Exit-NeedsRestart
 }
 
-# Find the newest Windows driver pack linked from the official page.
-Say "download" "Downloading the virtual cable..."
-$page = "https://vb-audio.com/Cable/"
-$zipUrl = $null
-try {
-    $html = (Invoke-WebRequest -Uri $page -UseBasicParsing).Content
-    $packs = [regex]::Matches($html, 'https://download\.vb-audio\.com/Download_CABLE/VBCABLE_Driver_Pack(\d+)\.zip') |
-        Sort-Object { [int]$_.Groups[1].Value } -Descending
-    if ($packs.Count -gt 0) { $zipUrl = $packs[0].Value }
-} catch {
-    Write-Host "Couldn't read $page ($($_.Exception.Message))" -ForegroundColor Yellow
-}
-if (-not $zipUrl) { $zipUrl = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip" }
-
-# Elevated: a fresh folder only admins can write to, since the user's own %TEMP% would
-# let any program swap the setup exe (or plant a DLL) before it runs. Unelevated
-# (silent): a fresh random folder in %TEMP%; Windows checks the exe's signature again
-# when it asks for admin, and the box shows who signed it.
-if ($admin) {
-    $work = Join-Path $env:SystemRoot ("Temp\vbcable-" + [guid]::NewGuid())
-    New-Item -ItemType Directory -Force -Path $work | Out-Null
-    $acl = New-Object Security.AccessControl.DirectorySecurity
-    $acl.SetAccessRuleProtection($true, $false)
-    foreach ($sid in "S-1-5-32-544", "S-1-5-18") {   # Administrators, SYSTEM
-        $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
-            (New-Object Security.Principal.SecurityIdentifier $sid), "FullControl",
-            "ContainerInherit,ObjectInherit", "None", "Allow")))
+$exePath = $null
+if ($From) {
+    # the installer's -Prefetch, started a while ago: wait for it rather than download twice
+    for ($i = 0; $i -lt 240 -and -not (Test-Path (Join-Path $From "ready")) -and
+                  -not (Test-Path (Join-Path $From "failed")); $i++) { Start-Sleep -Milliseconds 500 }
+    $ready = Join-Path $From "ready"
+    if (Test-Path $ready) {
+        $exePath = (Get-Content $ready -Raw).Trim()
+        try { Test-CableSignature $exePath } catch { $exePath = $null }   # again: it sat in %TEMP%
     }
-    Set-Acl -Path $work -AclObject $acl
-} else {
-    $work = Join-Path $env:TEMP ("vbcable-" + [guid]::NewGuid())
-    New-Item -ItemType Directory -Force -Path $work | Out-Null
-}
-$zip = Join-Path $work "vbcable.zip"
-
-Write-Host "Downloading $zipUrl"
-try {
-    Invoke-WebRequest -Uri $zipUrl -OutFile $zip -UseBasicParsing
-} catch {
-    Write-Host "Download failed: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "Opening the download page instead - install it from there." -ForegroundColor Yellow
-    Start-Process $page
-    Pause-Exit 1
-}
-Expand-Archive -Path $zip -DestinationPath $work -Force
-
-$exeName = if ([Environment]::Is64BitOperatingSystem) { "VBCABLE_Setup_x64.exe" } else { "VBCABLE_Setup.exe" }
-$exe = Get-ChildItem -Path $work -Recurse -Filter $exeName | Select-Object -First 1
-if (-not $exe) {
-    Write-Host "Setup program $exeName not found in the pack." -ForegroundColor Red
-    Pause-Exit 1
 }
 
-# Only run it if it's genuinely signed by VB-Audio.
-$sig = Get-AuthenticodeSignature -FilePath $exe.FullName
-$signer = if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { "" }
-# the certificate's own name (an EV code-signing cert: VB-Audio's legal entity), not
-# just "contains Burel" anywhere in the subject
-$cn = if ($sig.SignerCertificate) { $sig.SignerCertificate.GetNameInfo("SimpleName", $false) } else { "" }
-if ($sig.Status -ne "Valid" -or $cn -notmatch "^(BUREL VINCENT|VB-Audio)\b") {
-    Write-Host "Signature check FAILED ($($sig.Status); signer: $signer). Not running it." -ForegroundColor Red
-    Pause-Exit 1
+$work = $null
+if (-not $exePath) {
+    Say "download" "Downloading the virtual cable..."
+    # Elevated: a fresh folder only admins can write to, since the user's own %TEMP% would
+    # let any program swap the setup exe (or plant a DLL) before it runs. Unelevated
+    # (silent): a fresh random folder in %TEMP%; Windows checks the exe's signature again
+    # when it asks for admin, and the box shows who signed it.
+    if ($admin) {
+        $work = Join-Path $env:SystemRoot ("Temp\vbcable-" + [guid]::NewGuid())
+        New-Item -ItemType Directory -Force -Path $work | Out-Null
+        $acl = New-Object Security.AccessControl.DirectorySecurity
+        $acl.SetAccessRuleProtection($true, $false)
+        foreach ($sid in "S-1-5-32-544", "S-1-5-18") {   # Administrators, SYSTEM
+            $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
+                (New-Object Security.Principal.SecurityIdentifier $sid), "FullControl",
+                "ContainerInherit,ObjectInherit", "None", "Allow")))
+        }
+        Set-Acl -Path $work -AclObject $acl
+    } else {
+        $work = Join-Path $env:TEMP ("vbcable-" + [guid]::NewGuid())
+        New-Item -ItemType Directory -Force -Path $work | Out-Null
+    }
+    try {
+        $exePath = Get-CableSetup $work
+    } catch {
+        $kind, $text = "$($_.Exception.Message)" -split "\|", 2
+        if (-not $text) { $text = $kind }
+        Write-Host $text -ForegroundColor Red
+        if ($kind -eq "download") {
+            Write-Host "Opening the download page instead - install it from there." -ForegroundColor Yellow
+            Start-Process $page
+        }
+        Pause-Exit 1
+    }
 }
-Write-Host "Signature OK: $signer" -ForegroundColor Green
 
 Write-Host ""
 Say "install" "Installing the virtual cable..."
 if (-not $Silent) { Write-Host "Click 'Install Driver' in the VB-Cable window." -ForegroundColor Cyan }
 try {
     if ($Silent) {
-        Start-Process -FilePath $exe.FullName -ArgumentList "-i", "-h" -Verb RunAs -Wait
+        Start-Process -FilePath $exePath -ArgumentList "-i", "-h" -Verb RunAs -Wait
     } else {
-        Start-Process -FilePath $exe.FullName -Verb RunAs -Wait
+        Start-Process -FilePath $exePath -Verb RunAs -Wait
     }
 } catch {
     Write-Host "Install was cancelled." -ForegroundColor Yellow
     Pause-Exit 1
 }
 
-Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue
+if ($work) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
 
 Say "check" "Checking the cable..."
 $state = Wait-Cable 20

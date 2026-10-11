@@ -1,2 +1,3 @@
-- Installing the virtual cable no longer shows a PowerShell or console window: Windows asks once for VB-Audio's own signed setup ("VB-Audio Virtual Cable Installer"), and the setup text says to click Yes on it.
-- The virtual cable is now set up first, right after you click Install, so Windows' permission box shows while you're still watching instead of at the very end.
+﻿- Installing the virtual cable no longer shows a PowerShell or console window: Windows asks once for VB-Audio's own signed setup ("VB-Audio Virtual Cable Installer").
+- The installer downloads the cable while you're still picking boxes and asks Windows' permission the moment you click Install, instead of at the very end after a pause. The window keeps working meanwhile, and Cancel still works.
+- Cancel the install after the cable went in, and the installer now says the cable is still on your PC and where to remove it.
