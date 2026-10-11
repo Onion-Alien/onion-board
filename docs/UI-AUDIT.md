@@ -153,7 +153,7 @@ the affected states; include its PR and validation evidence here.
   initial spot audit did not cover them. Treat new observations as findings only
   after inspection. Triggers' add-on UI is maintained separately.
 
-  Done (PR #PRNUM): rendered Apps with six programs in three categories (cards, the
+  Done (PR #422): rendered Apps with six programs in three categories (cards, the
   card menu and its Categories submenu, a category heading's menu) and the Triggers
   tab without the add-on, Dark and Light at 800x600 and 1180x720. Fine as they are:
   the card menu (Categories ticked, red Remove), the heading menu. Fixed: **Triggers
