@@ -46,8 +46,9 @@ Every task, before changing anything (details in `CLAUDE.md`):
   and its controls using the available width. A hidden playback label must leave no
   reserved gap before the seek slider. Sidebar buttons need at least 34 px height and
   4 px spacing at normal window sizes. Preserve normal navigation at 800x600.
-- During sidebar dragging, keep top and bottom icons in the same column. Attach
-  attention dots to their icon, not the edge of a button that can stretch.
+- Sidebar edge drag has three states, no steps between: shut below halfway (one icon
+  column, centred), mid from halfway (names; what doesn't fit is hidden or kept
+  small), full once everything fits (`_full_fit`). Attention dots sit on their icon.
 - Add regression checks for a reported layout defect, and run them before committing.
   Do not treat a partial spacing adjustment as completion of the screen's review.
 

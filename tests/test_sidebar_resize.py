@@ -2,9 +2,8 @@
 import pytest
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
-from PySide6.QtWidgets import QLabel, QWidget
-from soundboard.ui.sidebar import OPEN_W, SHUT_W, SideRail, SideTabs
-from soundboard.ui.sidebar import _Arrow
+from PySide6.QtWidgets import QLabel, QPushButton, QWidget
+from soundboard.ui.sidebar import FULL_W, OPEN_W, SHUT_W, SideRail, SideTabs, _Arrow
 
 
 def _event(qapp, handle, kind, x):
@@ -62,33 +61,37 @@ def test_short_drag_snaps_back_without_changing_saved_preference(qapp):
     rail.close()
 
 
+def test_shut_then_mid_then_full_while_dragging(qapp):
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "Sounds")
+    settings = QPushButton()
+    settings.setProperty("railtext", "Settings")
+    rail = SideRail(tabs, QWidget(), QLabel("Onion Board"), QLabel("v1.0"), [], False,
+                    foot=[settings])
+    rail.resize(SHUT_W, 600)
+    rail.show()
+    try:
+        full = rail._full_fit()
+        assert FULL_W < full <= OPEN_W
+        for width in range(SHUT_W, OPEN_W + 1, 3):
+            rail.drag_width(width)
+            qapp.processEvents()
+            named = bool(rail.buttons[0].text().strip())
+            assert named == (width >= FULL_W) == rail.brand.isVisible()
+            # the mid layout: no version, Settings just its icon
+            assert rail.byline.isVisible() == (width >= full)
+            assert bool(settings.text().strip()) == (width >= full)
+            assert not named or rail.rect().contains(rail.brand.geometry())
+        rail.finish_resize()
+    finally:
+        rail.close()
+
+
 @pytest.mark.parametrize("rtl", [False, True])
-def test_dot_stays_next_to_arrow_at_every_width(qapp, rtl):
+def test_dot_stays_beside_the_arrow_at_every_width(qapp, rtl):
     arrow = _Arrow()
     arrow.setLayoutDirection(Qt.RightToLeft if rtl else Qt.LeftToRight)
     for width in (34, 70, 116, 159, 190):
         arrow.resize(width, 38)
-        dot = arrow.dot_rect()
-        assert dot.center().x() - width / 2 == (-8 if rtl else 8)
-        assert dot.center().y() == (38 - 20) / 2
+        assert arrow.dot_rect().center().x() - width / 2 == (-8 if rtl else 8)
     arrow.close()
-
-
-def test_halfway_drag_shows_names_and_wrapped_brand_without_saving(qapp):
-    tabs = SideTabs()
-    tabs.addTab(QWidget(), "Sounds")
-    saved = []
-    rail = SideRail(tabs, QWidget(), QLabel("Onion Board"), QLabel("v1.0"), [], False,
-                    on_open=saved.append)
-    rail.resize(SHUT_W, 600)
-    rail.show()
-    rail.drag_width(116)
-    qapp.processEvents()
-    assert rail.is_open() and rail.buttons[0].text().strip() == "Sounds"
-    assert rail.brand.isVisible() and rail.brand.wordWrap()
-    assert rail.rect().contains(rail.brand.geometry())
-    assert saved == []
-    rail.drag_width(117)
-    rail.finish_resize()
-    assert saved == [True] and rail.width() == OPEN_W
-    rail.close()

@@ -1,2 +1,2 @@
-- Keep sidebar icons aligned while dragging, show tab names halfway open, and fit the app name in the narrow header.
-- Keep the sidebar's attention dot beside the expand arrow as its width changes.
+- Dragging the sidebar open is smoother: icons stay in one centred column until halfway, then tab names show with a compact header, and the full sidebar appears once everything fits.
+- The sidebar's attention dot stays beside the expand arrow.
