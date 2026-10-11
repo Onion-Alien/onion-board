@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Scorciatoie rapide",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Ascolto: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Parli in inglese e gli altri ascoltano un'altra lingua. La voce AI o il cambia voce lo dicono quando uno di essi è attivo; altrimenti premi Start e verrà eseguita una voce computerizzata.",
   "Type a line and press Enter": "Digita una riga e premi Invio",
   "Category": "Categoria",
   "Show more": "Mostra altri",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Nel tuo microfono <b style='color:{colour}'>✗ non attivo</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Niente da impostare.</b> Discord e i giochi mantengono il tuo microfono normale e i tuoi suoni sono al suo interno.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Se i suoni vengono interrotti, disattiva la soppressione del rumore dell'app vocale (Discord: <b>Profilo di input → Personalizzato</b> , <b>Soppressione del rumore → Nessuno</b> , <b>Cancellazione eco</b> disattivata. Non Studio: salta Onion Board).",
-  "Sounds chopped up?": "Suoni interrotti?"
+  "Sounds chopped up?": "Suoni interrotti?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Traduce quello che dici in questa lingua. Spento: ogni voce parla inglese e la lingua resta scelta.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Parla in inglese e gli altri sentono un'altra lingua. Attiva l'interruttore qui sotto: lo dice la voce IA o il modificatore di voce quando uno dei due è attivo; altrimenti premi Avvia e lo dice una voce sintetica."
 }

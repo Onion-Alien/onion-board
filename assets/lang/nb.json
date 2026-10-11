@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Hurtigtaster",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Lytting: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Snakk på engelsk og andre hører et annet språk. AI-stemmen eller stemmeveksleren sier det når en av dem er på; ellers trykker du på Start og en datamaskinstemme gjør det.",
   "Type a line and press Enter": "Skriv inn en linje og trykk Enter",
   "Category": "Kategori",
   "Show more": "Vis flere",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Inn i mikrofonen  <b style='color:{colour}'>✗ kjører ikke</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Ingenting å stille inn.</b> Discord og spill beholder den vanlige mikrofonen din, og lydene dine er i den.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Hvis lydene blir hakkete, slå av støydempingen i taleappen (Discord: <b>Inndataprofil → Egendefinert</b>, <b>Støydemping → Ingen</b>, <b>Ekkokansellering</b> av. Ikke Studio: den hopper over Onion Board).",
-  "Sounds chopped up?": "Hakkete lyder?"
+  "Sounds chopped up?": "Hakkete lyder?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Oversetter det du sier til dette språket. Av: alle stemmer snakker engelsk, og språket forblir valgt.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Snakk engelsk, så hører andre et annet språk. Slå på bryteren nedenfor: AI-stemmen eller stemmeendreren sier det når en av dem er på; ellers trykker du Start, så sier en datastemme det."
 }

@@ -2879,7 +2879,6 @@
   "Quick hotkeys": "Kekunci pintas pantas",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Mendengar: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Bercakap dalam bahasa Inggeris dan orang lain mendengar bahasa lain. Suara AI atau penukar suara mengatakannya apabila salah satu daripadanya dihidupkan; jika tidak tekan Mula dan suara komputer akan melakukannya.",
   "Type a line and press Enter": "Taip baris dan tekan Enter",
   "Category": "Kategori",
   "Show more": "Tunjuk lagi",
@@ -3127,5 +3126,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ke mikrofon anda  <b style='color:{colour}'>✗ tidak berjalan</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Tiada apa perlu ditetapkan.</b> Discord dan permainan mengekalkan mikrofon biasa anda, dan bunyi anda ada di dalamnya.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jika bunyi terpotong-potong, matikan penindasan hingar aplikasi suara (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> mati. Bukan Studio: ia melangkau Onion Board).",
-  "Sounds chopped up?": "Bunyi terpotong-potong?"
+  "Sounds chopped up?": "Bunyi terpotong-potong?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Menterjemah apa yang anda katakan ke bahasa ini. Mati: setiap suara bercakap bahasa Inggeris, dan bahasa itu kekal dipilih.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Bercakap dalam bahasa Inggeris dan orang lain mendengar bahasa lain. Hidupkan suis di bawah: suara AI atau penukar suara menyebutnya apabila salah satunya hidup; jika tidak, tekan Mula dan suara komputer menyebutnya."
 }

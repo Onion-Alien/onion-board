@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Pikanäppäimet",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Kuuntelu: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu englanniksi ja muut kuulevat toista kieltä. AI-ääni tai äänenvaihdin sanoo sen, kun jokin niistä on päällä; muussa tapauksessa paina Start ja tietokoneääni tekee sen.",
   "Type a line and press Enter": "Kirjoita rivi ja paina Enter",
   "Category": "Kategoria",
   "Show more": "Näytä lisää",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Mikkiisi  <b style='color:{colour}'>✗ ei käynnissä</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Ei mitään säädettävää.</b> Discord ja pelit pitävät tavallisen mikkisi, ja äänesi ovat siinä.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jos äänet pätkivät, laita puhesovelluksen kohinanvaimennus pois (Discord: <b>Syöttöprofiili → Mukautettu</b>, <b>Kohinanvaimennus → Ei mitään</b>, <b>Kaiunpoisto</b> pois. Ei Studio: se ohittaa Onion Boardin).",
-  "Sounds chopped up?": "Pätkivätkö äänet?"
+  "Sounds chopped up?": "Pätkivätkö äänet?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Kääntää puheesi tälle kielelle. Pois: jokainen ääni puhuu englantia, ja kieli pysyy valittuna.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Puhu englantia, ja muut kuulevat toista kieltä. Laita alla oleva kytkin päälle: AI-ääni tai äänenmuunnin sanoo sen, kun jompikumpi on päällä; muuten paina Käynnistä, niin tietokoneääni sanoo sen."
 }

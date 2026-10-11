@@ -2879,7 +2879,6 @@
   "Quick hotkeys": "快捷熱鍵",
   "{route}: {status}": "{route}：{status}",
   "Listening: {mode}": "聆聽：{mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英語交談，其他人聽到的是另一種語言。當其中一個打開時，AI語音或變聲器會說出來；否則按“開始”，計算機就會發出聲音。",
   "Type a line and press Enter": "輸入一行並按 Enter",
   "Category": "分類",
   "Show more": "顯示更多",
@@ -3127,5 +3126,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "送進你的麥克風  <b style='color:{colour}'>✗ 沒有運作</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>不用設定。</b>Discord 和遊戲繼續用你平常的麥克風，你的音效已經在裡面了。",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "如果音效斷斷續續，就關掉語音程式的噪音抑制（Discord：<b>輸入設定檔 → 自訂</b>、<b>噪音抑制 → 無</b>、關掉<b>回音消除</b>。不要選錄音室：它會跳過 Onion Board）。",
-  "Sounds chopped up?": "音效斷斷續續？"
+  "Sounds chopped up?": "音效斷斷續續？",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "把你說的話翻譯成這種語言。關閉：所有聲音都說英語，語言仍保持選取。",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英語說，別人聽到的是另一種語言。打開下面的開關：AI 聲音或變聲器開著時由它來說；否則按「開始」，由電腦聲音來說。"
 }

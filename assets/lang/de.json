@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Schnelltasten",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Zuhören: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Sprechen Sie auf Englisch und andere hören eine andere Sprache. Die KI-Stimme oder der Sprachwechsler sagen es, wenn einer von ihnen eingeschaltet ist; andernfalls drücken Sie Start und eine Computerstimme ertönt.",
   "Type a line and press Enter": "Geben Sie eine Zeile ein und drücken Sie die Eingabetaste",
   "Category": "Kategorie",
   "Show more": "Mehr anzeigen",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "In dein Mikro  <b style='color:{colour}'>✗ läuft nicht</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nichts einzustellen.</b> Discord und Spiele behalten dein normales Mikro, und deine Sounds sind darin.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Wenn Sounds zerhackt werden, schalte die Rauschunterdrückung der Sprach-App aus (Discord: <b>Eingabeprofil → Benutzerdefiniert</b>, <b>Rauschunterdrückung → Keine</b>, <b>Echounterdrückung</b> aus. Nicht Studio: Das überspringt Onion Board).",
-  "Sounds chopped up?": "Sounds zerhackt?"
+  "Sounds chopped up?": "Sounds zerhackt?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Übersetzt, was du sagst, in diese Sprache. Aus: Jede Stimme spricht Englisch, und die Sprache bleibt gewählt.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Sprich Englisch, und andere hören eine andere Sprache. Schalte den Schalter unten ein: Die KI-Stimme oder der Stimmverzerrer sagt es, wenn eins davon an ist; sonst drück Start, dann sagt es eine Computerstimme."
 }

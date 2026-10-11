@@ -2879,7 +2879,6 @@
   "Quick hotkeys": "ปุ่มลัดด่วน",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "การฟัง: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "พูดเป็นภาษาอังกฤษและคนอื่นได้ยินภาษาอื่น เสียง AI หรือโปรแกรมเปลี่ยนเสียงจะพูดเมื่อเสียงใดเสียงหนึ่งเปิดอยู่ หรือกด Start แล้วเสียงคอมพิวเตอร์ก็ดังขึ้น",
   "Type a line and press Enter": "พิมพ์บรรทัดแล้วกด Enter",
   "Category": "หมวดหมู่",
   "Show more": "แสดงเพิ่มเติม",
@@ -3127,5 +3126,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "เข้าไมค์ของคุณ <b style='color:{colour}'>✗ ไม่ทำงาน</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>ไม่มีอะไรจะตั้งค่า</b> Discord และเกมจะรักษาไมโครโฟนตามปกติของคุณ และเสียงของคุณก็จะอยู่ในนั้น",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "หากเสียงขาดหาย ให้ปิดการลดเสียงรบกวนของแอปเสียง (Discord: <b>Input Profile → Custom</b> , <b>Noise Suppression → None</b> , <b>Echo Cancellation</b> ปิดอยู่ ไม่ใช่ Studio: จะข้าม Onion Board)",
-  "Sounds chopped up?": "เสียงขาดหาย?"
+  "Sounds chopped up?": "เสียงขาดหาย?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "แปลสิ่งที่คุณพูดเป็นภาษานี้ ปิด: ทุกเสียงพูดภาษาอังกฤษ และภาษาที่เลือกไว้ยังคงอยู่",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "พูดภาษาอังกฤษแล้วคนอื่นได้ยินอีกภาษา เปิดสวิตช์ด้านล่าง: เสียง AI หรือตัวเปลี่ยนเสียงจะพูดเมื่อเปิดอยู่อย่างใดอย่างหนึ่ง ไม่เช่นนั้นกด Start แล้วเสียงคอมพิวเตอร์จะพูด"
 }
