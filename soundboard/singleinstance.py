@@ -64,11 +64,14 @@ def claim_single_instance() -> bool:
     return False
 
 
-def listen_for_second_launch(app, get_window) -> QLocalServer:
+class InstanceServer(QLocalServer):
+    show_requested = False   # launched again before the window existed
+
+
+def listen_for_second_launch(app, get_window) -> InstanceServer:
     """Bring the window to the front when someone launches Onion Board again."""
     QLocalServer.removeServer(INSTANCE_NAME)
-    server = QLocalServer(app)
-    server.show_requested = False
+    server = InstanceServer(app)
 
     def on_connect():
         conn = server.nextPendingConnection()

@@ -249,7 +249,7 @@ class _Server(ThreadingHTTPServer):
                     if self._halting:
                         break
                     if any(key.fileobj is self for key, _ in ready):
-                        self._handle_request_noblock()
+                        self._handle_request_noblock()   # pyright: ignore[reportAttributeAccessIssue]  # socketserver's
                     self.service_actions()
         finally:
             self._halted.set()
@@ -528,6 +528,7 @@ def _handler_for(ctl: RemoteControl):
             self.wfile.write(data)
 
         def _page(self):
+            assert ctl.page is not None   # _go checked
             body, headers = ctl.page
             self.send_response(200)
             for k, v in headers.items():
@@ -550,7 +551,7 @@ def _handler_for(ctl: RemoteControl):
                 return self._answer(429, {"error": "too many wrong keys: wait a minute"})
             if not ctl.authorised(self.headers, query, f"{self.command} {self.path}"):
                 ctl.failed(peer)
-                body = {"error": "missing or wrong token"}
+                body: dict[str, object] = {"error": "missing or wrong token"}
                 if ctl.lan:   # so a phone whose clock is off can sign again
                     body["now"] = int(time.time())
                 return self._answer(401, body)
@@ -642,15 +643,17 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         sid = mw.play_random(cat)
         if sid is None:
             return 404, {"error": "no sound to play there"}
-        return 200, {"playing": sid, "name": mw.meta(sid).name}
+        m = mw.meta(sid)
+        return 200, {"playing": sid, "name": m.name if m is not None else ""}
     if action == "last":
         sid = getattr(mw, "_last_sid", None)
-        if sid is None or mw.meta(sid) is None:
+        m = mw.meta(sid) if sid is not None else None
+        if sid is None or m is None:
             return 404, {"error": "nothing has played yet"}
         if sid not in mw.audio:
             return 409, {"error": "that sound hasn't loaded (yet)"}
         mw.play(sid)
-        return 200, {"playing": sid, "name": mw.meta(sid).name}
+        return 200, {"playing": sid, "name": m.name}
     if action == "category":
         step = (params.get("step") or "").strip().lower()
         if step:
@@ -780,12 +783,20 @@ def voice_names(mw: MainWindow) -> list[str]:
     """The voices a request can pick: the built-in ones, then the saved ones ("My own
     mix" isn't one: picking it opens a window to make it)."""
     from soundboard import voicefx
-    return list(voicefx.PRESETS) + [n for n in mw.voice.fx.store.voices
+    return list(voicefx.PRESETS) + [n for n in _voice_tab(mw).fx.store.voices
                                     if n not in voicefx.PRESETS]
 
 
+def _voice_tab(mw: MainWindow):
+    """The Voice tab, for a caller that checked mw.tab_on("voice")."""
+    from soundboard.ui.taboff import VoiceOff
+    voice = mw.voice
+    assert not isinstance(voice, VoiceOff)   # switched on: the real tab
+    return voice
+
+
 def voice_state(mw: MainWindow) -> dict:
-    fx = mw.voice.fx
+    fx = _voice_tab(mw).fx
     return {"voice": fx.btn_power.isChecked(), "voice_name": fx.preset}
 
 
@@ -793,14 +804,14 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
     from soundboard import voicefx
     if not mw.tab_on("voice"):
         return 409, VOICE_OFF
-    fx = mw.voice.fx
+    fx = _voice_tab(mw).fx
     if action == "voices":
         saved = fx.store.voices
         return 200, {**voice_state(mw),
                      "voices": [{"name": n, "shown": voicefx.shown(n), "saved": n in saved}
                                 for n in voice_names(mw)]}
     if action == "say":
-        sp = mw.voice.speech
+        sp = _voice_tab(mw).speech
         if (params.get("stop") or "").strip() not in ("", "0"):
             sp.ctl.stop_speaking()
             return 200, {"stopped": True}
@@ -950,7 +961,7 @@ def mode_state(mw: MainWindow, full: bool = True) -> dict:
     d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
     now = destination.resolve(d)
     p = profiles.current(d)
-    out = {"mode": now.key, "mode_label": now.label, "simple": p.key,
+    out: dict[str, object] = {"mode": now.key, "mode_label": now.label, "simple": p.key,
            "simple_label": p.label,
            "explain": profiles.explain(d, getattr(mw, "mode_why", ""))}
     if full:

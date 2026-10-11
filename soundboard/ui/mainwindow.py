@@ -12,6 +12,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+from typing import Literal, overload
 
 import numpy as np
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
@@ -3723,6 +3724,16 @@ class MainWindow(QMainWindow):
     def tab_shown(self, key: str) -> bool:
         """Whether a tab is in the tab bar: switched on, and of use (needs_online)."""
         return self.tab_on(key) and not self.needs_online(key)
+
+    @overload
+    def _make_tab(self, key: Literal["voice"]) -> VoicePanel | taboff.VoiceOff: ...
+    @overload
+    def _make_tab(self, key: Literal["apps"]) -> AppsTab | taboff.TabOff: ...
+    @overload
+    def _make_tab(self, key: Literal["triggers"]) -> TriggersTab | taboff.TabOff: ...
+    @overload
+    def _make_tab(self, key: str) -> (VoicePanel | AppsTab | TriggersTab
+                                      | taboff.TabOff): ...
 
     def _make_tab(self, key: str):
         """The Apps, Triggers or Voice tab, wired to the window; or, switched off in

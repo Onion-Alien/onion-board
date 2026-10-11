@@ -55,6 +55,7 @@ import urllib.request
 import weakref
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from soundboard import errors, netlog, without_app_blas
 from soundboard.i18n import _
@@ -755,11 +756,15 @@ class _Response(http.client.HTTPResponse):
     def __init__(self, sock, *a, entry: netlog.Entry | None = None,
                  stale: Callable[[], str] | None = None, **kw):
         super().__init__(sock, *a, **kw)
-        if entry is not None:
-            self.fp = _Counted(self.fp, entry, stale)
+        if entry is not None:   # (a file-like wrapper, as http.client reads it)
+            self.fp = _Counted(self.fp, entry, stale)   # pyright: ignore[reportAttributeAccessIssue]
 
 
-class _Logged:
+# _Logged is mixed into HTTP(S)Connection: type checked as one
+_LoggedBase = http.client.HTTPConnection if TYPE_CHECKING else object
+
+
+class _Logged(_LoggedBase):
     """An http.client connection that adds its requests, answers and bytes to its
     activity entry (netlog)."""
     entry: netlog.Entry | None = None
@@ -804,8 +809,10 @@ class _Logged:
 
     def getresponse(self):
         entry = self.entry
-        self.response_class = (lambda sock, *a, **kw: _Response(sock, *a, entry=entry,
-                                                                 stale=self._stale, **kw))
+        def make(sock, *a, **kw):
+            return _Response(sock, *a, entry=entry, stale=self._stale, **kw)
+        # a factory, not the class: http.client only calls it
+        self.response_class = make   # pyright: ignore[reportAttributeAccessIssue]
         r = super().getresponse()
         self.answered = True
         if entry is not None:
@@ -842,13 +849,16 @@ class _HTTPSConnection(_Logged, http.client.HTTPSConnection):
         self.sock = sock
         self._opened(entry)
         try:
-            self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+            ctx = self._context   # pyright: ignore[reportAttributeAccessIssue]  # http.client's
+            self.sock = ctx.wrap_socket(sock, server_hostname=self.host)
         except BaseException as e:
             sock.close()
+            assert self.entry is not None   # _opened set it
             self.entry.failed(f"secure connection failed ({errors.plain(e)})")
             raise
         if not is_loopback(self.host):
             _track_live(self.sock, self.feature)   # the TLS socket now (sock is detached)
+        assert self.entry is not None   # _opened set it
         self.entry.set_tls(_tls_text(self.sock))
 
 
@@ -886,7 +896,8 @@ class _HTTPSHandler(urllib.request.HTTPSHandler):
         self.feature, self.direct = feature, direct
 
     def https_open(self, req):
-        return self.do_open(_HTTPSConnection, req, context=self._context,
+        return self.do_open(_HTTPSConnection, req,
+                            context=self._context,   # pyright: ignore[reportAttributeAccessIssue]
                             feature=self.feature, direct=self.direct)
 
 
@@ -937,6 +948,7 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
                 port = 0
             netlog.blocked(feature, u.hostname or "", port, str(e))
             raise
+    assert feature is not None   # check() raised for None
     try:
         return _opener(feature, direct).open(req, timeout=timeout)
     except urllib.error.URLError as e:
@@ -1063,7 +1075,7 @@ class _Relay:
             headers = [ln for ln in lines[1:] if ln]
             feature = self._authorised(headers)
             direct = feature is not None and feature.startswith(DIRECT_LOGIN)
-            if direct:
+            if direct and feature is not None:
                 feature = feature[len(DIRECT_LOGIN):]
             if feature is None:
                 c.sendall(b"HTTP/1.1 407 Proxy Authentication Required\r\n"
