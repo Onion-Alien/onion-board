@@ -848,10 +848,14 @@ def test_tab_search_shows_local_matches_then_the_directory(qapp, tab, server):
     assert tab.list.count() == 5
     tab.search.setText("rock")
     tab._search_now()
+    assert "Searching" in tab.info.text()
     assert process_events(qapp, lambda: tab._results is not None)
     assert [s.name for s in tab.visible_stations()] == ["Rock Radio"]
-    tab.search.setText("")
-    assert tab.list.count() == 5
+    assert "Searching" not in tab.info.text()       # the answer ends it, no 4 s wait
+    tab.search.setText("pop")
+    tab._search_now()
+    tab.search.setText("")                          # cleared mid-search: at once too
+    assert tab.list.count() == 5 and "Searching" not in tab.info.text()
 
 
 def test_tab_plays_into_the_engine_and_clips_to_sounds(qapp, tab, server):
