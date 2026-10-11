@@ -2,6 +2,7 @@
 switch category, louder / quieter, mic and voice changer keys, all hotkeys off, a set
 of hotkeys per category, a sound's queue / wait / cooldown / "only others hear it",
 playing a whole category and one-click pads."""
+from conftest import said, unsay
 import pytest
 
 import numpy as np
@@ -9,6 +10,7 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QPushButton
 
+from soundboard.ui import toast
 from soundboard import backup
 from soundboard.library import Config, SoundMeta
 from soundboard.ui.widgets import Pad
@@ -338,16 +340,16 @@ def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, call
     playing(monkeypatch, w, ["s0"])
     w.queue_sound("s1")
     w.queue_sound("s0")
-    assert w.status.text().startswith("Up next: “Airhorn” (+1 more)")
+    assert said(w).startswith("Up next: “Airhorn” (+1 more)")
     w._unqueue(0)                     # the ✕ on Airhorn's chip
-    assert w.status.text().startswith("Up next: “Boom”")
+    assert said(w).startswith("Up next: “Boom”")
     playing(monkeypatch, w, [])
     w.tick()                          # the last one starts: nothing is up next
-    assert w._queue == [] and not w.status.text().startswith("Up next")
+    assert w._queue == [] and not said(w).startswith("Up next")
     playing(monkeypatch, w, ["s0"])
     w.queue_sound("s1")
     w.stop_all()
-    assert not w.status.text().startswith("Up next")
+    assert not said(w).startswith("Up next")
 
 
 def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window, monkeypatch,
@@ -451,12 +453,13 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w.cfg.stop_hotkey = "ctrl+alt+s"
     w.meta("s1").hotkey = "f2"
     w.set_sound_hotkey("s0", "f2")
-    assert w.meta("s1").hotkey == "" and "it was the key for “Airhorn”" in w.status.text()
+    assert w.meta("s1").hotkey == "" and "it was the key for “Airhorn”" in said(w)
     w.set_sound_hotkey("s0", "ctrl+alt+s")
-    assert w.cfg.stop_hotkey == "" and "Stop everything" in w.status.text()
-    w.status.setText("")
-    w.set_sound_hotkey("s1", "f9")         # a free key: nothing to say
-    assert w.status.text() == ""
+    assert w.cfg.stop_hotkey == "" and "Stop everything" in said(w)
+    unsay(w)
+    w.set_sound_hotkey("s1", "f9")         # a free key: just the green card, no warning
+    [t] = toast.shown(w)
+    assert t.kind == "ok" and "f9 plays" in t.text()
 
 
 def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch):

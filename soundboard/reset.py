@@ -114,10 +114,15 @@ def _write_pending(d: dict) -> None:
     _pending_path().write_text(json.dumps(d), encoding="utf-8")
 
 
+last_ok = False   # run_pending's note says it worked (the toast is green), not a failure
+
+
 def run_pending() -> str:
     """At start-up, before the window reads the settings: do a reset or restore that
     was asked for. Returns what to tell the user ("" for nothing). Never raises: a
     failure is logged and the app starts as it was."""
+    global last_ok
+    last_ok = False
     p = _pending_path()
     try:
         raw = json.loads(p.read_text(encoding="utf-8"))
@@ -186,6 +191,8 @@ def reset(parts: list[str]) -> str:
         return _("Couldn't save the reset settings. Your restore point is in "
                  "Settings > General.")
     log.info("reset %s (restore point %s)", parts, point.id)
+    global last_ok
+    last_ok = True
     return _("Reset: {parts}. Changed your mind? Settings > General > Restore points.",
              parts=", ".join(part_name(p) for p in parts))
 
@@ -296,6 +303,8 @@ def restore(point_id: str) -> str:
     else:   # kept (and listed): what's left in it isn't lost
         log.warning("restored %s, but kept it: some of it is still only in there", point.id)
     log.info("restored %s", point.id)
+    global last_ok
+    last_ok = True
     return _("Restored: {parts} from {ago}.", parts=point.describe(),
              ago=trash.ago(point.when)) + bin_note
 

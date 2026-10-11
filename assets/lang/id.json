@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Masalah perangkat audio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Tidak bisa memutar “{name}”{why}. Kalau file-nya dipindah atau dihapus, hapus pad-nya lalu tambahkan suaranya lagi.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Gagal memindai ulang perangkat, restart aplikasi untuk mendeteksi yang baru.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Gagal memproses pratinjau (lihat log).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Gagal menyimpan pengaturanmu, lihat log di %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Hotkey mati: {key} menyalakannya lagi.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Instant replay tidak bisa mendengarkan: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Tidak ada perangkat audio yang terbuka, pilih satu di Penyiapan.</span>",
@@ -175,8 +173,6 @@
   "Imported {n} sound": [
     "{n} suara diimpor"
   ],
-  "Importing {count} file(s)…": "Mengimpor {count} file…",
-  "Importing {n} sound(s)…": "Mengimpor {n} suara…",
   "Importing {n} sound…": [
     "Mengimpor {n} suara…"
   ],
@@ -399,7 +395,6 @@
   "Show “{category}” when a program is in front": "Tampilkan “{category}” saat sebuah program di depan",
   "Skip this version": "Lewati versi ini",
   "Solo: stops every other sound first": "Solo: hentikan semua suara lain dulu",
-  "Some files weren't added": "Beberapa file tidak ditambahkan",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Beberapa game cuma pakai mic utama Windows. Jendela pengaturan suara baru saja terbuka:\n\n1.  Klik kanan  {vm}  →  Set as Default Device\n2.  Klik kanan lagi  →  Set as Default Communication Device\n     (voice chat di banyak game meminta yang itu ke Windows)\n3.  Restart game-nya.\n\nPerhatian: voice typing juga akan mendengar suara-suaramu.\nUntuk membatalkan, lakukan hal yang sama pada mic normalmu.",
   "Some sounds weren't imported": "Beberapa suara tidak terimpor",
   "Sorry, Onion Board couldn't start.": "Maaf, Onion Board gagal dimulai.",
@@ -3001,5 +2996,34 @@
   "Both files are in {folder}.": "Kedua berkas ada di {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Masih ada unduhan yang berjalan. Jika kamu menutup sekarang, unduhan itu hilang. Tutup saja?",
   "Download running": "Unduhan berjalan",
-  "Your sounds are back on your mic.": "Suaramu kembali ada di mikrofonmu."
+  "Your sounds are back on your mic.": "Suaramu kembali ada di mikrofonmu.",
+  "Added {n} sound": [
+    "{n} suara ditambahkan"
+  ],
+  "Adding {done} of {total}…": "Menambahkan {done} dari {total}…",
+  "Already in your library": "Sudah ada di perpustakaan Anda",
+  "Couldn't add {n} file": [
+    "Tidak bisa menambahkan {n} file"
+  ],
+  "Couldn't be opened": "Tidak bisa dibuka",
+  "Drop files": "Letakkan file",
+  "Drop to add sounds": "Letakkan untuk menambahkan suara",
+  "Drop to add {n} file": [
+    "Letakkan untuk menambahkan {n} file"
+  ],
+  "Files not added": "File yang tidak ditambahkan",
+  "Not a sound we can play": "Bukan suara yang bisa kami putar",
+  "See why": "Lihat alasannya",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} file tidak ditambahkan"
+  ],
+  "{n} skipped": [
+    "{n} dilewati"
+  ],
+  "That sound is already in your library": "Suara itu sudah ada di perpustakaan Anda",
+  "{n} sound is already in your library": [
+    "{n} suara sudah ada di perpustakaan Anda"
+  ],
+  "Open Triggers": "Buka Pemicu"
 }

@@ -8,8 +8,8 @@
   returns a ``release(text=None)`` to call when it's over.
 - ``flash(btn, "✓ Copied")`` just swaps the label for a moment.
 - ``toast(window, "✓ Added 3 sounds")`` for a result that isn't about one button: a
-  pill along the bottom of the window (or of the dialog in front) for a few seconds.
-  A child widget, so it never takes focus from a game.
+  card in the bottom corner of the window (or of the dialog in front) for a few
+  seconds (``ui/toast.py``). A child widget, so it never takes focus from a game.
 """
 from __future__ import annotations
 
@@ -17,13 +17,13 @@ import html
 import threading
 from collections.abc import Callable
 
-from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer, QUrl, Signal, Slot
+from PySide6.QtCore import QEvent, QObject, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices, QIcon
-from PySide6.QtWidgets import QApplication, QDialog, QLabel, QPushButton, QWidget
+from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import theme
 from soundboard import errors
 from soundboard.i18n import _
+from soundboard.ui import toast as toastmod
 
 FLASH_MS = 2200
 _IDLE = "_busy_idle_text"
@@ -187,71 +187,16 @@ def run_busy(btn, text: str, fn: Callable[[], object],
     QTimer.singleShot(0, go)
 
 
-TOAST_MS = 4000
+TOAST_MS = toastmod.TOAST_MS
+_Toast = toastmod._Toast
 
 
-class _Toast(QLabel):
-    """The pill ``toast`` shows: follows its window's size, hides itself."""
-
-    def __init__(self, host: QWidget):
-        super().__init__(host)
-        self.setObjectName("toast")
-        self.setWordWrap(True)
-        self.setTextFormat(Qt.RichText)
-        self.setAlignment(Qt.AlignCenter)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.setAccessibleName(_("Notice"))
-        self._timer = QTimer(self, singleShot=True, timeout=self.hide)
-        host.installEventFilter(self)
-        self.hide()
-
-    def show_text(self, text: str, kind: str, ms: int):
-        self.setText(text)
-        theme.set_tone(self, kind)
-        self._place()
-        self.show()
-        self.raise_()
-        self._timer.start(ms)
-
-    def _place(self):
-        host = self.parentWidget()
-        w = min(560, max(200, host.width() - 32))
-        self.setFixedWidth(w)
-        self.ensurePolished()   # its padding (the style sheet) counts before it's shown
-        # the height for this width: adjustSize() kept the old one when the window
-        # shrank under a toast (into the mini player), cutting its last lines off
-        self.resize(w, self.heightForWidth(w))
-        bottom_pad = 18
-        if isinstance(host, QDialog):
-            buttons = [b for b in host.findChildren(QPushButton)
-                       if b.isVisible() and b is not self and b.parent() is not self]
-            if buttons:
-                bottom_btns = [
-                    b for b in buttons
-                    if b.mapTo(host, QPointF(0, 0)).y() + b.height() >= host.height() - 70]
-                if bottom_btns:
-                    top_y = min(b.mapTo(host, QPointF(0, 0)).y() for b in bottom_btns)
-                    bottom_pad = max(18, int(host.height() - top_y + 8))
-        self.move((host.width() - w) // 2, max(0, int(host.height() - self.height() - bottom_pad)))
-
-    def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
-        if ev.type() == QEvent.Resize and self.isVisible():
-            self._place()
-        return False
-
-
-def toast(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS):
-    """Show ``text`` (rich text; kind "ok" / "warn" / "error" / "") at the bottom of
-    the dialog in front if there is one (Settings is modal over the window), else of
-    ``window``."""
-    host = QApplication.activeModalWidget() or window
-    if host is None:
-        return
-    host = host.window()
-    t = host.findChild(_Toast, options=Qt.FindDirectChildrenOnly)
-    if t is None:
-        t = _Toast(host)
-    t.show_text(text, kind, ms)
+def toast(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, **kw):
+    """Show ``text`` (rich text; kind "ok" / "warn" / "error" / "busy" / "") in the
+    bottom corner of the dialog in front if there is one (Settings is modal over the
+    window), else of ``window``. ``action=(label, fn)``, ``key`` and ``progress`` as in
+    ``toast.show``."""
+    return toastmod.show(window, text, kind, ms, **kw)
 
 
 def hold_until(btn, text: str, signal, done: Callable[..., str | None] | None = None):

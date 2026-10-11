@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Äänilaiteongelma: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Ei voi soittaa: “{name}”{why}. Jos tiedosto siirrettiin tai poistettiin, poista nappi ja lisää ääni uudelleen.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Laitteita ei voitu etsiä uudelleen, käynnistä sovellus uudelleen löytääksesi uudet.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Esikatselua ei voitu tehdä (katso loki).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Asetuksiasi ei voitu tallentaa, katso loki kansiosta %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Pikanäppäimet ovat pois: {key} laittaa ne takaisin päälle.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Pikauusinta ei voi kuunnella: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Mikään äänilaite ei ole auki, valitse sellainen Käyttöönotossa.</span>",
@@ -533,8 +531,6 @@
     "Tuotiin {n} ääni ({skipped} jo kirjastossasi)",
     "Tuotiin {n} ääntä ({skipped} jo kirjastossasi)"
   ],
-  "Importing {count} file(s)…": "Tuodaan tiedostoja: {count}…",
-  "Importing {n} sound(s)…": "Tuodaan ääniä: {n}…",
   "Importing {n} sound…": [
     "Tuodaan {n} ääni…",
     "Tuodaan {n} ääntä…"
@@ -1071,7 +1067,6 @@
   "Slow or patchy connection": "Hidas tai pätkivä yhteys",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Soolo: pysäyttää ensin kaikki muut äänet",
-  "Some files weren't added": "Joitain tiedostoja ei lisätty",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Jotkin pelit käyttävät vain Windowsin päämikkiä. Ääni-ikkuna aukesi juuri:\n\n1.  Klikkaa oikealla  {vm}  →  Määritä oletuslaitteeksi\n2.  Klikkaa sitä uudelleen oikealla  →  Määritä oletustietoliikennelaitteeksi\n     (monien pelien puhechatti pyytää Windowsilta juuri sitä)\n3.  Käynnistä peli uudelleen.\n\nHuomio: puheella kirjoitus kuulee sitten myös äänesi.\nKumotaksesi tee sama tavalliselle mikillesi.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Osaa Äskettäin poistetuista ei voitu palauttaa: se säilyy tässä palautuspisteessä.",
   "Some sounds weren't imported": "Joitain ääniä ei tuotu",
@@ -3066,5 +3061,40 @@
   "Both files are in {folder}.": "Molemmat tiedostot ovat kansiossa {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Lataus on vielä kesken. Jos suljet nyt, se menetetään. Suljetaanko silti?",
   "Download running": "Lataus käynnissä",
-  "Your sounds are back on your mic.": "Äänesi ovat taas mikrofonissasi."
+  "Your sounds are back on your mic.": "Äänesi ovat taas mikrofonissasi.",
+  "Added {n} sound": [
+    "{n} ääni lisätty",
+    "{n} ääntä lisätty"
+  ],
+  "Adding {done} of {total}…": "Lisätään {done}/{total}…",
+  "Already in your library": "Jo kirjastossasi",
+  "Couldn't add {n} file": [
+    "{n} tiedostoa ei voitu lisätä",
+    "{n} tiedostoa ei voitu lisätä"
+  ],
+  "Couldn't be opened": "Ei voitu avata",
+  "Drop files": "Pudota tiedostot",
+  "Drop to add sounds": "Pudota lisätäksesi ääniä",
+  "Drop to add {n} file": [
+    "Pudota lisätäksesi {n} tiedoston",
+    "Pudota lisätäksesi {n} tiedostoa"
+  ],
+  "Files not added": "Tiedostoja ei lisätty",
+  "Not a sound we can play": "Ei ääni, jota voimme toistaa",
+  "See why": "Katso miksi",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} tiedostoa ei lisätty",
+    "{n} tiedostoa ei lisätty"
+  ],
+  "{n} skipped": [
+    "{n} ohitettu",
+    "{n} ohitettu"
+  ],
+  "That sound is already in your library": "Tämä ääni on jo kirjastossasi",
+  "{n} sound is already in your library": [
+    "{n} ääntä on jo kirjastossasi",
+    "{n} ääntä on jo kirjastossasi"
+  ],
+  "Open Triggers": "Avaa Laukaisimet"
 }

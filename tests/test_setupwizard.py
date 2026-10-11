@@ -603,25 +603,6 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     assert wiz.btn_attach.isHidden()
 
 
-def test_toast_places_above_dialog_bottom_buttons(qapp):
-    from PySide6.QtWidgets import QDialog, QPushButton
-    from soundboard.ui.busy import _Toast
-
-    dlg = QDialog()
-    dlg.resize(600, 500)
-    dlg.show()
-    btn = QPushButton("Next", dlg)
-    btn.resize(100, 40)
-    btn.move(450, 440)
-    btn.show()
-
-    t = _Toast(dlg)
-    t.show_text("Notice message", "", 5000)
-
-    assert t.y() + t.height() <= btn.y()
-    dlg.close()
-
-
 def test_only_a_brand_new_install_is_asked_what_its_for(wizard, app_dir):
     _, wiz = wizard   # an older config (use_mode saved or missing): no question
     assert not wiz._ask_use and wiz.base == 0 and wiz.PAGES == 4

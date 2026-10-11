@@ -13,7 +13,6 @@
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не удаётся открыть {devices} (в «Также отправлять в»). Подключено? Попытка повторится сама.</span>",
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не удалось поискать на {site}: {err}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не удаётся сыграть «{name}»{why}. Если файл перемещён или удалён, убери кнопку и добавь звук заново.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Не удалось подготовить прослушивание (см. журнал).</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Мгновенный повтор не может слушать: {error}</span>",
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нечего сохранять: {why}.</span>",
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Пульт выключен: {err}.</span>",
@@ -167,8 +166,6 @@
     "Импортировано {n} звука",
     "Импортировано {n} звуков"
   ],
-  "Importing {count} file(s)…": "Импортирую файлы: {count}…",
-  "Importing {n} sound(s)…": "Импортирую звуки: {n}…",
   "Importing {n} sound…": [
     "Импортирую {n} звук…",
     "Импортирую {n} звука…",
@@ -374,7 +371,6 @@
   "Show this when a program is in front": "Показывать, когда программа на переднем плане",
   "Show “{category}” when a program is in front": "Показывать «{category}», когда программа на переднем плане",
   "Skip this version": "Пропустить эту версию",
-  "Some files weren't added": "Некоторые файлы не добавлены",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Некоторые игры просто берут основной микрофон Windows. Только что открылось окно «Звук»:\n\n1.  ПКМ по  {vm}  →  Использовать по умолчанию\n2.  Снова ПКМ по нему  →  Использовать устройство связи по умолчанию\n     (голосовой чат многих игр просит у Windows именно его)\n3.  Перезапусти игру.\n\nВнимание: голосовой ввод тоже будет слышать твои звуки.\nЧтобы вернуть, сделай то же самое со своим обычным микрофоном.",
   "Some sounds weren't imported": "Некоторые звуки не импортированы",
   "Sound": "Звук",
@@ -2936,7 +2932,6 @@
   "Reset to how it came": "Сброс до того, как это было",
   "Remove from the board": "Убрать с доски",
   "Onion Board {version} is out, click for details": "Onion Board {version} вышла, нажмите, чтобы узнать подробности",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Не удалось сохранить настройки, см. журнал в %APPDATA%\\OnionBoard.</span>",
   "Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.": "Не удалось сохранить настройки, см. журнал в %APPDATA%\\OnionBoard.",
   "Live: others hear you": "В прямом эфире: вас слышат другие",
   "There's no picture at that link.": "По этой ссылке нет изображения.",
@@ -3131,5 +3126,46 @@
   "Both files are in {folder}.": "Оба файла лежат в {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Загрузка ещё идёт. Если закрыть сейчас, она будет потеряна. Всё равно закрыть?",
   "Download running": "Идёт загрузка",
-  "Your sounds are back on your mic.": "Твои звуки снова на микрофоне."
+  "Your sounds are back on your mic.": "Твои звуки снова на микрофоне.",
+  "Added {n} sound": [
+    "Добавлен {n} звук",
+    "Добавлено {n} звука",
+    "Добавлено {n} звуков"
+  ],
+  "Adding {done} of {total}…": "Добавляю {done} из {total}…",
+  "Already in your library": "Уже есть в твоей библиотеке",
+  "Couldn't add {n} file": [
+    "Не удалось добавить {n} файл",
+    "Не удалось добавить {n} файла",
+    "Не удалось добавить {n} файлов"
+  ],
+  "Couldn't be opened": "Не удалось открыть",
+  "Drop files": "Перетащи файлы",
+  "Drop to add sounds": "Отпусти, чтобы добавить звуки",
+  "Drop to add {n} file": [
+    "Отпусти, чтобы добавить {n} файл",
+    "Отпусти, чтобы добавить {n} файла",
+    "Отпусти, чтобы добавить {n} файлов"
+  ],
+  "Files not added": "Не добавленные файлы",
+  "Not a sound we can play": "Это не звук, который мы можем проиграть",
+  "See why": "Почему?",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} файл не добавлен",
+    "{n} файла не добавлены",
+    "{n} файлов не добавлено"
+  ],
+  "{n} skipped": [
+    "{n} пропущен",
+    "{n} пропущено",
+    "{n} пропущено"
+  ],
+  "That sound is already in your library": "Этот звук уже есть в твоей библиотеке",
+  "{n} sound is already in your library": [
+    "{n} звук уже есть в твоей библиотеке",
+    "{n} звука уже есть в твоей библиотеке",
+    "{n} звуков уже есть в твоей библиотеке"
+  ],
+  "Open Triggers": "Открыть триггеры"
 }

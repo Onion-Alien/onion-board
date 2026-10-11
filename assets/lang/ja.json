@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>オーディオデバイスの問題：{problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>「{name}」を再生できません{why}。ファイルを移動・削除した場合は、パッドを削除してサウンドを追加し直してください。</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>デバイスを再スキャンできませんでした、新しいデバイスを読み込むにはアプリを再起動してください。</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>プレビューを作成できませんでした（ログを確認してください）。</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>設定を保存できませんでした、%APPDATA%\\OnionBoard のログを確認してください。</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>ホットキーはオフです：{key} でオンに戻せます。</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>インスタントリプレイが音を拾えません: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>オーディオデバイスが開いていません、セットアップで選んでください。</span>",
@@ -175,8 +173,6 @@
   "Imported {n} sound": [
     "{n} 個のサウンドをインポートしました"
   ],
-  "Importing {count} file(s)…": "{count} 個のファイルをインポート中…",
-  "Importing {n} sound(s)…": "{n} 個のサウンドをインポート中…",
   "Importing {n} sound…": [
     "{n} 個のサウンドをインポート中…"
   ],
@@ -399,7 +395,6 @@
   "Show “{category}” when a program is in front": "プログラムが前面のときに「{category}」を表示",
   "Skip this version": "このバージョンをスキップ",
   "Solo: stops every other sound first": "ソロ：ほかのサウンドをすべて止めてから再生",
-  "Some files weren't added": "一部のファイルが追加されませんでした",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "ゲームによっては Windows の既定のマイクしか使いません。サウンドのウィンドウが開きました:\n\n1.  {vm} を右クリック  →  既定のデバイスとして設定\n2.  もう一度右クリック  →  既定の通信デバイスとして設定\n     （多くのゲームのボイスチャットはこちらを使います）\n3.  ゲームを再起動します。\n\n注意: 音声入力にもサウンドが聞こえるようになります。\n元に戻すには、普段のマイクで同じ操作をしてください。",
   "Some sounds weren't imported": "一部のサウンドがインポートされませんでした",
   "Sorry, Onion Board couldn't start.": "申し訳ありません、Onion Board を起動できませんでした。",
@@ -3001,5 +2996,34 @@
   "Both files are in {folder}.": "どちらのファイルも {folder} にあります。",
   "A download is still running. If you close now, it's lost. Close anyway?": "ダウンロードがまだ実行中です。今閉じると失われます。それでも閉じますか?",
   "Download running": "ダウンロード中",
-  "Your sounds are back on your mic.": "サウンドがマイクに戻りました。"
+  "Your sounds are back on your mic.": "サウンドがマイクに戻りました。",
+  "Added {n} sound": [
+    "{n} 件のサウンドを追加しました"
+  ],
+  "Adding {done} of {total}…": "{total} 件中 {done} 件を追加中…",
+  "Already in your library": "すでにライブラリにあります",
+  "Couldn't add {n} file": [
+    "{n} 件のファイルを追加できませんでした"
+  ],
+  "Couldn't be opened": "開けませんでした",
+  "Drop files": "ファイルをドロップ",
+  "Drop to add sounds": "ドロップしてサウンドを追加",
+  "Drop to add {n} file": [
+    "ドロップして {n} 件のファイルを追加"
+  ],
+  "Files not added": "追加されなかったファイル",
+  "Not a sound we can play": "再生できるサウンドではありません",
+  "See why": "理由を見る",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} 件のファイルは追加されませんでした"
+  ],
+  "{n} skipped": [
+    "{n} 件スキップ"
+  ],
+  "That sound is already in your library": "このサウンドはすでにライブラリにあります",
+  "{n} sound is already in your library": [
+    "{n} 件のサウンドはすでにライブラリにあります"
+  ],
+  "Open Triggers": "トリガーを開く"
 }

@@ -101,7 +101,7 @@ CloseApplications=yes
 
 [Messages]
 WelcomeLabel1=Let's set up Onion Board
-WelcomeLabel2=This puts Onion Board on your PC. Your sounds go straight into your own mic, so Discord and your games hear them without changing anything there. No virtual cable or extra driver to install.%n%nNext you'll see what it connects to online, then you can tick any extras you want. When Windows asks for permission, click Yes.%n%nDid Windows or your browser warn you before this opened ("Windows protected your PC", "not commonly downloaded")? That's normal for a free app that isn't code-signed, and you got past it fine. Next time: More info, then Run anyway.
+WelcomeLabel2=Onion Board plays your sounds straight into your mic, so Discord and your games hear them. Nothing to set up in those apps.%n%nClick Next to start.
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
@@ -109,13 +109,12 @@ FinishedLabel=Onion Board is installed. It will open now and ask you a few easy 
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
-Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
-Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"; GroupDescription: "Privacy (optional)"
-Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you know you need one"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked
+Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; Check: CanOfferFfmpeg
+Name: "livevoice"; Description: "Live voice-to-speech (needs Python, about 300 MB)"; Flags: unchecked
+Name: "tor"; Description: "Hide my internet address (Tor), about 22 MB"; Flags: unchecked
+Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"
+Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you know you need one"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked; Check: not CableInstalled
 
 [InstallDelete]
 ; The Python runtime and libraries from the last version: cleared first so files a
@@ -141,11 +140,11 @@ Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserM
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--set-offline"; \
   StatusMsg: "Switching on Offline mode..."; \
   Check: OfflineChosen; AfterInstall: CheckOffline; Flags: runhidden waituntilterminated
-; "Keep a history" before the first start too, so its first connections are kept.
-; Unticking the box never switches it off: that's in the app (it deletes the file).
+; "Keep a history" (/KEEPNETLOG=1; the box is in the app's Settings) before the first
+; start too, so its first connections are kept.
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
   StatusMsg: "Switching on the network activity history..."; \
-  Tasks: keepnetlog; Flags: runhidden waituntilterminated
+  Check: KeepNetlogParam; Flags: runhidden waituntilterminated
 ; "Count me in" (soundboard/usage.py): unticked, it's switched off before the first
 ; start; the only thing ever sent is one anonymous "opt-out/installer" (no ID). Ticked on a page the user saw, it's switched on (an
 ; old install had it off); a silent update never switches it on.
@@ -445,8 +444,7 @@ begin
   Body.Width := ImportPage.SurfaceWidth;
   Body.ShowAccelChar := False;
   Body.Caption := 'Onion Board can copy your sounds in from it the first time it opens, ' +
-    'so your board is ready straight away. Your other app keeps its own copies, and ' +
-    'nothing in it is changed.';
+    'so your board is ready straight away. Your other app isn''t touched.';
   Body.AdjustHeight;
   ImportTop := Body.Top + Body.Height + ScaleY(12);
   if Preview or HasSoundpad then
@@ -499,7 +497,7 @@ end;
 // drops a typed answer that doesn't look like a name). "Rather not say" is picked.
 procedure CreateHeardPage;
 var
-  Body, Note: TNewStaticText;
+  Body: TNewStaticText;
   Top: Integer;
 begin
   HeardPage := CreateCustomPage(ImportPage.ID, 'One last thing',
@@ -510,40 +508,33 @@ begin
   Body.WordWrap := True;
   Body.Width := HeardPage.SurfaceWidth;
   Body.ShowAccelChar := False;
-  Body.Caption := 'It helps us know where people find it. Your pick goes once with the ' +
-    'anonymous Count me in.';
+  Body.Caption := 'Helps us know where to post. Sent once, anonymously.';
   Body.AdjustHeight;
   Top := Body.Top + Body.Height + ScaleY(12);
   AddHeardRadio('youtube', 'YouTube', Top);
   AddHeardRadio('reddit', 'Reddit', Top);
-  AddHeardRadio('github', 'GitHub', Top);
   AddHeardRadio('google', 'Google', Top);
   AddHeardRadio('friend', 'A friend', Top);
   AddHeardRadio('other', 'Other:', Top);
   HeardOther := TNewEdit.Create(HeardPage);
   HeardOther.Parent := HeardPage.Surface;
   HeardOther.Left := ScaleX(70);
-  HeardOther.Top := HeardRadios[5].Top - ScaleY(3);
+  HeardOther.Top := HeardRadios[4].Top - ScaleY(3);
   HeardOther.Width := ScaleX(200);
   HeardOther.MaxLength := 40;
   HeardOther.OnChange := @HeardOtherTyped;
-  HeardRadios[5].Width := HeardOther.Left - ScaleX(4);
+  HeardRadios[4].Width := HeardOther.Left - ScaleX(4);
   AddHeardRadio('', 'Rather not say', Top);
-  HeardRadios[6].Checked := True;
-  Note := TNewStaticText.Create(HeardPage);
-  Note.Parent := HeardPage.Surface;
-  Note.AutoSize := False;
-  Note.WordWrap := True;
-  Note.Width := HeardPage.SurfaceWidth;
-  Note.Top := Top + ScaleY(6);
-  Note.ShowAccelChar := False;
-  Note.Caption := 'For Other, just a name like Discord or TikTok. Anything else ' +
-    '(an email address, a link, a number) is left out.';
-  Note.AdjustHeight;
+  HeardRadios[5].Checked := True;
 end;
 
 // A first install: no settings from an earlier one. An update already sent its
 // first-start, so it isn't asked.
+function KeepNetlogParam: Boolean;
+begin
+  Result := ExpandConstant('{param:KEEPNETLOG|0}') = '1';
+end;
+
 function IsNewInstall: Boolean;
 begin
   Result := not FileExists(ExpandConstant('{userappdata}\OnionBoard\config.json'));
@@ -631,9 +622,7 @@ function SetWindowLongW(hWnd: HWND; nIndex: Integer; dwNewLong: Longint): Longin
 procedure InitializeWizard;
 var
   Body, Link, Note: TNewStaticText;
-  Bullet: String;
 begin
-  Bullet := '  ' + #$2022 + '  ';
   // The box list stops 11 px short of its page: down to the page's bottom, eleven rows
   // (with FFmpeg offered and Count me in) fit without a scrollbar.
   WizardForm.TasksList.Height := WizardForm.TasksList.Parent.ClientHeight -
@@ -650,14 +639,9 @@ begin
   Body.Width := PrivacyPage.SurfaceWidth;
   Body.ShowAccelChar := False;
   Body.Caption :=
-    'No account, no ads. On its own, Onion Board only goes online once a day: to ' +
-    'check for updates, and to send anonymous usage stats if Count me in is ' +
-    'ticked. Nothing downloads until you click Update, and you can switch both off.' + #13#10#13#10 +
-    'Everything else happens only when you use it:' + #13#10 +
-    Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +
-    Bullet + 'Radio: Radio Browser (a free list of stations) and the stations you play.' + #13#10 +
-    Bullet + 'Voices and add-ons: they download when you press their buttons.' + #13#10#13#10 +
-    'Those sites can see your internet address. The Tor box on the next page hides it.';
+    'No account, no ads. Once a day Onion Board checks for updates and, if Count me ' +
+    'in is ticked, sends anonymous usage stats. Searching sounds, radio and voices go ' +
+    'online only when you use them.';
   Body.AdjustHeight;
   Link := TNewStaticText.Create(PrivacyPage);
   Link.Parent := PrivacyPage.Surface;
@@ -747,18 +731,6 @@ begin
   else if OfflineApplied and not OfflineChosen then
     WizardSelectTasks('ffmpeg');
   OfflineApplied := OfflineChosen;
-  // Already installed: say so, greyed out and unticked, rather than offer it again
-  if CableInstalled then
-  begin
-    WizardSelectTasks('!vbcable');
-    for I := 0 to WizardForm.TasksList.Items.Count - 1 do
-      if Pos('(VB-Cable)', WizardForm.TasksList.ItemCaption[I]) > 0 then
-      begin
-        WizardForm.TasksList.ItemCaption[I] :=
-          'The free virtual cable (VB-Cable): already installed on this PC';
-        WizardForm.TasksList.ItemEnabled[I] := False;
-      end;
-  end;
   for I := 0 to WizardForm.TasksList.Items.Count - 1 do
     if (Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0) then
     begin
@@ -766,8 +738,8 @@ begin
         TorCaption := WizardForm.TasksList.ItemCaption[I];
       WizardForm.TasksList.ItemEnabled[I] := not OfflineChosen;
       if OfflineChosen then
-        WizardForm.TasksList.ItemCaption[I] := 'Private connection (Tor): off, because ' +
-          'Offline mode is ticked'
+        WizardForm.TasksList.ItemCaption[I] := 'Hide my internet address (Tor): off, ' +
+          'because Offline mode is ticked'
       else
         WizardForm.TasksList.ItemCaption[I] := TorCaption;
     end;

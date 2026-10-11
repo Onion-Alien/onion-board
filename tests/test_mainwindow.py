@@ -2,6 +2,7 @@
 audio device is opened, no global hotkey is registered) and exercises the UI
 plumbing: pad syncing, the metadata index, the mic-check pulse, the wheel guard."""
 import numpy as np
+from conftest import said, unsay
 import pytest
 import soundfile as sf
 from PySide6.QtCore import QPoint, QPointF, Qt
@@ -230,7 +231,7 @@ def test_seek_bar_starts_right_after_a_short_name(window, qapp):
 
 def test_no_pad_hint_line_under_the_player(window):
     window.tabs.setCurrentWidget(window.sounds_page)
-    assert "click to play" not in window.status.text()
+    assert "click to play" not in said(window)
 
 
 def test_sounds_only_toggle_leaves_the_mic_open(window, monkeypatch):
@@ -832,27 +833,18 @@ def test_the_window_shows_which_version_is_running(window, monkeypatch):
     assert mainwindow.version_text() == __version__     # the installed app: just the number
 
 
-def test_empty_status_line_takes_no_room(window):
-    """No message, no row: the mixer sits at the bottom with only the margin under it."""
+def test_an_empty_board_has_no_status_row(window):
+    """No message, no row: the mixer sits at the bottom with only the margin under it,
+    and a notice is a toast over the page, never a row of its own."""
     window.resize(1200, 800)
     window.show()
     QApplication.processEvents()
-    st = window.status
-    window.status.setText("")
-    QApplication.processEvents()
-    assert not st.isVisible()
     gap = window._full.height() - window.mixer.geometry().bottom()
     assert gap <= 12
-    st.setText("1 audio drop-out since start")
-    assert st.isVisible()
-    st.set_room(True)            # window too short: stays hidden, even for a new message
-    st.setText("Category: All")
-    assert not st.isVisible()
-    st.set_room(False)
-    assert st.isVisible()
-    st.setText("")
-    st.set_room(False)           # room again, but nothing to say
-    assert not st.isVisible()
+    window.toast("1 audio drop-out since start", "warn")
+    QApplication.processEvents()
+    assert window._full.height() - window.mixer.geometry().bottom() == gap
+    unsay(window)
 
 
 def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
@@ -860,14 +852,14 @@ def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
     window.select("s1")
     QApplication.clipboard().setText("just words")
     window.paste_picture()
-    assert not window.meta("s1").image and "copy a picture first" in window.status.text()
+    assert not window.meta("s1").image and "copy a picture first" in said(window)
     img = QImage(200, 120, QImage.Format_RGB32)
     img.fill(QColor("#ff00ff"))
     QApplication.clipboard().setImage(img)
     window.paste_picture()
     pic = window.meta("s1").image
     assert pic and library.Path(pic).is_file() and not window.meta("s0").image
-    assert "Airhorn" in window.status.text()
+    assert "Airhorn" in said(window)
     window.selection.on_pick("s0", False)   # picked pads win over the selected one
     window.selection.on_pick("s1", False)
     window.paste_picture()

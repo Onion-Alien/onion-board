@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problem med lydenhet: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Kan ikke spille «{name}»{why}. Hvis filen er flyttet eller slettet, fjern paden og legg til lyden på nytt.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Fikk ikke søkt etter enheter på nytt, start appen på nytt for å finne nye.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Fikk ikke lagd forhåndsvisningen (se loggen).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Fikk ikke lagret innstillingene dine, se loggen i %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Hurtigtastene er av: {key} slår dem på igjen.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Øyeblikksreprise får ikke lyttet: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Ingen lydenhet er åpen, velg en i Oppsett.</span>",
@@ -533,8 +531,6 @@
     "Importerte {n} lyd ({skipped} allerede i biblioteket ditt)",
     "Importerte {n} lyder ({skipped} allerede i biblioteket ditt)"
   ],
-  "Importing {count} file(s)…": "Importerer {count} fil(er)…",
-  "Importing {n} sound(s)…": "Importerer {n} lyd(er)…",
   "Importing {n} sound…": [
     "Importerer {n} lyd…",
     "Importerer {n} lyder…"
@@ -1071,7 +1067,6 @@
   "Slow or patchy connection": "Treg eller ustabil tilkobling",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: stopper alle andre lyder først",
-  "Some files weren't added": "Noen filer ble ikke lagt til",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Noen spill bruker bare hovedmikrofonen i Windows. Et lydvindu åpnet seg nå:\n\n1.  Høyreklikk  {vm}  →  Angi som standardenhet\n2.  Høyreklikk den igjen  →  Angi som standard kommunikasjonsenhet\n     (talechat i mange spill spør Windows om den)\n3.  Start spillet på nytt.\n\nObs: taleskriving vil da også høre lydene dine.\nFor å angre, gjør det samme på den vanlige mikrofonen din.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Noe av Nylig slettet kunne ikke hentes tilbake: det beholdes i dette gjenopprettingspunktet.",
   "Some sounds weren't imported": "Noen lyder ble ikke importert",
@@ -3066,5 +3061,40 @@
   "Both files are in {folder}.": "Begge filene ligger i {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "En nedlasting pågår fortsatt. Hvis du lukker nå, går den tapt. Lukke likevel?",
   "Download running": "Nedlasting pågår",
-  "Your sounds are back on your mic.": "Lydene dine er tilbake på mikrofonen din."
+  "Your sounds are back on your mic.": "Lydene dine er tilbake på mikrofonen din.",
+  "Added {n} sound": [
+    "{n} lyd lagt til",
+    "{n} lyder lagt til"
+  ],
+  "Adding {done} of {total}…": "Legger til {done} av {total}…",
+  "Already in your library": "Allerede i biblioteket ditt",
+  "Couldn't add {n} file": [
+    "Kunne ikke legge til {n} fil",
+    "Kunne ikke legge til {n} filer"
+  ],
+  "Couldn't be opened": "Kunne ikke åpnes",
+  "Drop files": "Slipp filer",
+  "Drop to add sounds": "Slipp for å legge til lyder",
+  "Drop to add {n} file": [
+    "Slipp for å legge til {n} fil",
+    "Slipp for å legge til {n} filer"
+  ],
+  "Files not added": "Filer ikke lagt til",
+  "Not a sound we can play": "Ikke en lyd vi kan spille av",
+  "See why": "Se hvorfor",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fil ble ikke lagt til",
+    "{n} filer ble ikke lagt til"
+  ],
+  "{n} skipped": [
+    "{n} hoppet over",
+    "{n} hoppet over"
+  ],
+  "That sound is already in your library": "Den lyden er allerede i biblioteket ditt",
+  "{n} sound is already in your library": [
+    "{n} lyder er allerede i biblioteket ditt",
+    "{n} lyder er allerede i biblioteket ditt"
+  ],
+  "Open Triggers": "Åpne Triggere"
 }

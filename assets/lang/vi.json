@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Lỗi thiết bị âm thanh: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Không phát được “{name}”{why}. Nếu file đã bị chuyển hoặc xóa, hãy gỡ nút và thêm lại âm thanh.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Không quét lại được thiết bị, khởi động lại ứng dụng để nhận thiết bị mới.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Không tạo được bản nghe thử (xem nhật ký).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Không lưu được cài đặt, xem nhật ký trong %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Phím tắt đang tắt: {key} bật lại.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Phát lại tức thì không nghe được: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Chưa mở thiết bị âm thanh nào, chọn một cái trong Thiết lập.</span>",
@@ -175,8 +173,6 @@
   "Imported {n} sound": [
     "Đã nhập {n} âm thanh"
   ],
-  "Importing {count} file(s)…": "Đang nhập {count} file…",
-  "Importing {n} sound(s)…": "Đang nhập {n} âm thanh…",
   "Importing {n} sound…": [
     "Đang nhập {n} âm thanh…"
   ],
@@ -399,7 +395,6 @@
   "Show “{category}” when a program is in front": "Hiện “{category}” khi một chương trình ở phía trước",
   "Skip this version": "Bỏ qua phiên bản này",
   "Solo: stops every other sound first": "Solo: dừng mọi âm thanh khác trước",
-  "Some files weren't added": "Một số file không được thêm",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Một số game chỉ dùng mic chính của Windows. Một cửa sổ Sound vừa mở:\n\n1.  Chuột phải  {vm}  →  Set as Default Device\n2.  Chuột phải lần nữa  →  Set as Default Communication Device\n     (voice chat trong nhiều game hỏi Windows cái này)\n3.  Khởi động lại game.\n\nLưu ý: khi đó nhập liệu bằng giọng nói cũng sẽ nghe âm thanh của bạn.\nĐể hoàn tác, làm y như vậy trên mic bình thường của bạn.",
   "Some sounds weren't imported": "Một số âm thanh không được nhập",
   "Sorry, Onion Board couldn't start.": "Xin lỗi, Onion Board không khởi động được.",
@@ -3001,5 +2996,34 @@
   "Both files are in {folder}.": "Cả hai tệp đều nằm trong {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Vẫn còn một lượt tải xuống đang chạy. Nếu đóng bây giờ, nó sẽ mất. Vẫn đóng?",
   "Download running": "Đang tải xuống",
-  "Your sounds are back on your mic.": "Âm thanh của bạn đã quay lại micro."
+  "Your sounds are back on your mic.": "Âm thanh của bạn đã quay lại micro.",
+  "Added {n} sound": [
+    "Đã thêm {n} âm thanh"
+  ],
+  "Adding {done} of {total}…": "Đang thêm {done}/{total}…",
+  "Already in your library": "Đã có trong thư viện của bạn",
+  "Couldn't add {n} file": [
+    "Không thêm được {n} file"
+  ],
+  "Couldn't be opened": "Không mở được",
+  "Drop files": "Thả file",
+  "Drop to add sounds": "Thả để thêm âm thanh",
+  "Drop to add {n} file": [
+    "Thả để thêm {n} file"
+  ],
+  "Files not added": "File chưa được thêm",
+  "Not a sound we can play": "Không phải âm thanh chúng tôi phát được",
+  "See why": "Xem lý do",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} file chưa được thêm"
+  ],
+  "{n} skipped": [
+    "Bỏ qua {n}"
+  ],
+  "That sound is already in your library": "Âm thanh này đã có trong thư viện của bạn",
+  "{n} sound is already in your library": [
+    "{n} âm thanh đã có trong thư viện của bạn"
+  ],
+  "Open Triggers": "Mở Kích hoạt"
 }

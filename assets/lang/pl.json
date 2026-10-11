@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problem z urządzeniem audio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Nie można odtworzyć „{name}”{why}. Jeśli plik przeniesiono lub usunięto, usuń pad i dodaj dźwięk ponownie.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Nie udało się ponownie wykryć urządzeń, uruchom aplikację jeszcze raz, by zobaczyć nowe.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Nie udało się przygotować odsłuchu (zobacz dziennik).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Nie udało się zapisać ustawień, zobacz dziennik w %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Skróty są wyłączone: {key} włącza je z powrotem.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Natychmiastowa powtórka nie może słuchać: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Żadne urządzenie audio nie jest otwarte, wybierz je w Konfiguracji.</span>",
@@ -185,8 +183,6 @@
     "Zaimportowano {n} dźwięki",
     "Zaimportowano {n} dźwięków"
   ],
-  "Importing {count} file(s)…": "Importowanie plików ({count})…",
-  "Importing {n} sound(s)…": "Importowanie dźwięków ({n})…",
   "Importing {n} sound…": [
     "Importowanie {n} dźwięku…",
     "Importowanie {n} dźwięków…",
@@ -411,7 +407,6 @@
   "Show “{category}” when a program is in front": "Pokaż „{category}”, gdy program jest na wierzchu",
   "Skip this version": "Pomiń tę wersję",
   "Solo: stops every other sound first": "Solo: najpierw zatrzymuje wszystkie inne dźwięki",
-  "Some files weren't added": "Niektórych plików nie dodano",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Niektóre gry używają po prostu głównego mikrofonu Windows. Właśnie otworzyło się okno dźwięku:\n\n1.  Prawy klik  {vm}  →  Ustaw jako urządzenie domyślne\n2.  Prawy klik ponownie  →  Ustaw jako domyślne urządzenie komunikacyjne\n     (czat głosowy w wielu grach pyta Windows właśnie o nie)\n3.  Uruchom grę ponownie.\n\nUwaga: pisanie głosowe też będzie wtedy słyszeć twoje dźwięki.\nBy cofnąć, zrób to samo na swoim zwykłym mikrofonie.",
   "Some sounds weren't imported": "Niektórych dźwięków nie zaimportowano",
   "Sorry, Onion Board couldn't start.": "Przepraszamy, Onion Board nie mógł się uruchomić.",
@@ -3131,5 +3126,46 @@
   "Both files are in {folder}.": "Oba pliki są w folderze {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Pobieranie nadal trwa. Jeśli zamkniesz teraz, zostanie utracone. Zamknąć mimo to?",
   "Download running": "Trwa pobieranie",
-  "Your sounds are back on your mic.": "Twoje dźwięki są znowu na mikrofonie."
+  "Your sounds are back on your mic.": "Twoje dźwięki są znowu na mikrofonie.",
+  "Added {n} sound": [
+    "Dodano {n} dźwięk",
+    "Dodano {n} dźwięki",
+    "Dodano {n} dźwięków"
+  ],
+  "Adding {done} of {total}…": "Dodawanie {done} z {total}…",
+  "Already in your library": "Już w Twojej bibliotece",
+  "Couldn't add {n} file": [
+    "Nie udało się dodać {n} pliku",
+    "Nie udało się dodać {n} plików",
+    "Nie udało się dodać {n} plików"
+  ],
+  "Couldn't be opened": "Nie udało się otworzyć",
+  "Drop files": "Upuść pliki",
+  "Drop to add sounds": "Upuść, aby dodać dźwięki",
+  "Drop to add {n} file": [
+    "Upuść, aby dodać {n} plik",
+    "Upuść, aby dodać {n} pliki",
+    "Upuść, aby dodać {n} plików"
+  ],
+  "Files not added": "Niedodane pliki",
+  "Not a sound we can play": "To nie jest dźwięk, który możemy odtworzyć",
+  "See why": "Zobacz dlaczego",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} plik nie został dodany",
+    "{n} pliki nie zostały dodane",
+    "{n} plików nie zostało dodanych"
+  ],
+  "{n} skipped": [
+    "{n} pominięty",
+    "{n} pominięte",
+    "{n} pominiętych"
+  ],
+  "That sound is already in your library": "Ten dźwięk jest już w Twojej bibliotece",
+  "{n} sound is already in your library": [
+    "{n} dźwięk jest już w Twojej bibliotece",
+    "{n} dźwięki są już w Twojej bibliotece",
+    "{n} dźwięków jest już w Twojej bibliotece"
+  ],
+  "Open Triggers": "Otwórz Wyzwalacze"
 }

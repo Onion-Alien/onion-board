@@ -29,7 +29,7 @@ from __future__ import annotations
 import html
 import logging
 
-from soundboard import remote, theme
+from soundboard import remote
 from soundboard.modules import REMOTE_API
 
 log = logging.getLogger(__name__)
@@ -82,8 +82,7 @@ class RemoteHost:
         return remote.new_token()
 
     def warn(self, text: str):
-        self.win.status.setText(f"<span style='color:{theme.status('warn')}'>"
-                                f"{html.escape(text)}</span>")
+        self.win.toast(html.escape(text), "warn")
 
     @staticmethod
     def allow_firewall(name: str, port: int) -> bool:

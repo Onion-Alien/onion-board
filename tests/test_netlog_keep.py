@@ -266,4 +266,4 @@ def test_the_installer_wires_it_up():
     iss = Path(__file__).parent.parent / "installer" / "OnionBoard.iss"
     iss = iss.read_text(encoding="utf-8")
     assert "--keep-netlog" in iss
-    assert 'Name: "keepnetlog"' in iss and "Tasks: keepnetlog" in iss
+    assert "{param:KEEPNETLOG|0}" in iss and "Check: KeepNetlogParam" in iss

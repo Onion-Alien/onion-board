@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>مشكلة في جهاز الصوت: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>تعذّر تشغيل “{name}”{why}. إذا نُقل الملف أو حُذف، فأزل الزر وأضف الصوت من جديد.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>تعذّرت إعادة البحث عن الأجهزة, أعد تشغيل التطبيق لاكتشاف الأجهزة الجديدة.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>تعذّر إنشاء المعاينة (راجع السجل).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>تعذّر حفظ إعداداتك, راجع السجل في %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>الاختصارات متوقفة: {key} يعيد تشغيلها.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>الإعادة الفورية لا تستطيع الاستماع: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>لا يوجد جهاز صوت مفتوح, اختر واحدًا في التهيئة.</span>",
@@ -200,8 +198,6 @@
     "استُورد {n} صوتًا",
     "استُورد {n} صوت"
   ],
-  "Importing {count} file(s)…": "جارٍ استيراد {count} ملف/ملفات…",
-  "Importing {n} sound(s)…": "جارٍ استيراد {n} صوت/أصوات…",
   "Importing {n} sound…": [
     "جارٍ استيراد {n} صوت…",
     "جارٍ استيراد {n} صوت…",
@@ -429,7 +425,6 @@
   "Show “{category}” when a program is in front": "أظهر “{category}” عندما يكون برنامج في المقدمة",
   "Skip this version": "تخطَّ هذا الإصدار",
   "Solo: stops every other sound first": "منفرد: يوقف كل صوت آخر أولًا",
-  "Some files weren't added": "بعض الملفات لم تُضَف",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "بعض الألعاب تستخدم ميكروفون Windows الرئيسي فقط. فُتحت للتو نافذة الصوت:\n\n1.  انقر بالزر الأيمن على  {vm}  →  Set as Default Device\n2.  انقر عليه بالزر الأيمن مجددًا  →  Set as Default Communication Device\n     (الدردشة الصوتية في كثير من الألعاب تطلب هذا من Windows)\n3.  أعد تشغيل اللعبة.\n\nتنبيه: الكتابة بالصوت ستسمع أصواتك أيضًا.\nللتراجع، افعل الشيء نفسه على ميكروفونك العادي.",
   "Some sounds weren't imported": "بعض الأصوات لم تُستورد",
   "Sorry, Onion Board couldn't start.": "عذرًا, تعذّر تشغيل Onion Board.",
@@ -3326,5 +3321,64 @@
   "Both files are in {folder}.": "كلا الملفين في {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "لا يزال هناك تنزيل قيد التشغيل. إذا أغلقت الآن فسيضيع. هل تريد الإغلاق على أي حال؟",
   "Download running": "التنزيل قيد التشغيل",
-  "Your sounds are back on your mic.": "عادت أصواتك إلى الميكروفون."
+  "Your sounds are back on your mic.": "عادت أصواتك إلى الميكروفون.",
+  "Added {n} sound": [
+    "تمت إضافة {n} صوت",
+    "تمت إضافة {n} صوت",
+    "تمت إضافة {n} صوت",
+    "تمت إضافة {n} أصوات",
+    "تمت إضافة {n} صوتًا",
+    "تمت إضافة {n} صوت"
+  ],
+  "Adding {done} of {total}…": "جارٍ إضافة {done} من {total}…",
+  "Already in your library": "موجود بالفعل في مكتبتك",
+  "Couldn't add {n} file": [
+    "تعذّرت إضافة {n} ملف",
+    "تعذّرت إضافة {n} ملف",
+    "تعذّرت إضافة {n} ملف",
+    "تعذّرت إضافة {n} ملفات",
+    "تعذّرت إضافة {n} ملفًا",
+    "تعذّرت إضافة {n} ملف"
+  ],
+  "Couldn't be opened": "تعذّر فتحه",
+  "Drop files": "أفلت الملفات",
+  "Drop to add sounds": "أفلت لإضافة أصوات",
+  "Drop to add {n} file": [
+    "أفلت لإضافة {n} ملف",
+    "أفلت لإضافة {n} ملف",
+    "أفلت لإضافة {n} ملف",
+    "أفلت لإضافة {n} ملفات",
+    "أفلت لإضافة {n} ملفًا",
+    "أفلت لإضافة {n} ملف"
+  ],
+  "Files not added": "ملفات لم تُضف",
+  "Not a sound we can play": "ليس صوتًا يمكننا تشغيله",
+  "See why": "اعرف السبب",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "لم يُضف {n} ملف",
+    "لم يُضف {n} ملف",
+    "لم يُضف {n} ملف",
+    "لم تُضف {n} ملفات",
+    "لم يُضف {n} ملفًا",
+    "لم يُضف {n} ملف"
+  ],
+  "{n} skipped": [
+    "تخطّي {n}",
+    "تخطّي {n}",
+    "تخطّي {n}",
+    "تخطّي {n}",
+    "تخطّي {n}",
+    "تخطّي {n}"
+  ],
+  "That sound is already in your library": "هذا الصوت موجود بالفعل في مكتبتك",
+  "{n} sound is already in your library": [
+    "{n} صوت موجود بالفعل في مكتبتك",
+    "{n} صوت موجود بالفعل في مكتبتك",
+    "{n} صوت موجود بالفعل في مكتبتك",
+    "{n} أصوات موجودة بالفعل في مكتبتك",
+    "{n} صوتًا موجودة بالفعل في مكتبتك",
+    "{n} صوت موجودة بالفعل في مكتبتك"
+  ],
+  "Open Triggers": "افتح المحفّزات"
 }
