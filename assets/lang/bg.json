@@ -3118,5 +3118,16 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Пренесохме <b>{n}</b> звук от {name}. Да го запазя ли?",
     "Пренесохме <b>{n}</b> звука от {name}. Да ги запазя ли?"
-  ]
+  ],
+  "Compatibility fixes for games, calls and browsers.": "Поправки за съвместимост с игри, разговори и браузъри.",
+  "Install update": "Инсталирай обновлението",
+  "Mic updated: games, calls and browsers hear your sounds.": "Микрофонът е обновен: игри, разговори и браузъри чуват звуците ти.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Следва: Windows ще поиска разрешение за OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Няма какво да се обновява: настройките на микрофона се смениха.",
+  "The Windows prompt names Python because you're running from source.": "Прозорецът на Windows споменава Python, защото пускаш от изходния код.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Обновлението е отказано. Микрофонът продължава да работи: обнови по всяко време от Свързване.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows ще поиска разрешение. Звукът спира за момент по време на обновлението.",
+  "You can update later in Setup.": "Можеш да обновиш по-късно от Свързване.",
+  "Your mic is already up to date.": "Микрофонът ти вече е обновен.",
+  "Your mic, upgraded": "Микрофонът ти, обновен"
 }
