@@ -3061,5 +3061,7 @@
   "Music & media": "Musiikki ja media",
   "Other": "Muut",
   "Help and community": "Apua ja yhteisö",
-  "Onion Board on GitHub": "Onion Board GitHubissa"
+  "Onion Board on GitHub": "Onion Board GitHubissa",
+  "A sound you added is very short, so it may be barely heard.": "Lisäämäsi ääni on hyvin lyhyt, joten se saattaa kuulua tuskin lainkaan.",
+  "Both files are in {folder}.": "Molemmat tiedostot ovat kansiossa {folder}."
 }

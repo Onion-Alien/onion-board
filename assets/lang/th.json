@@ -2996,5 +2996,7 @@
   "Music & media": "เพลงและสื่อ",
   "Other": "อื่นๆ",
   "Help and community": "ความช่วยเหลือและชุมชน",
-  "Onion Board on GitHub": "Onion Board บน GitHub"
+  "Onion Board on GitHub": "Onion Board บน GitHub",
+  "A sound you added is very short, so it may be barely heard.": "เสียงที่คุณเพิ่มสั้นมาก อาจแทบไม่ได้ยิน",
+  "Both files are in {folder}.": "ไฟล์ทั้งสองอยู่ใน {folder}"
 }

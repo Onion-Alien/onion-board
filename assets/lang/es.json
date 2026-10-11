@@ -3061,5 +3061,7 @@
   "Music & media": "Música y multimedia",
   "Other": "Otros",
   "Help and community": "Ayuda y comunidad",
-  "Onion Board on GitHub": "Onion Board en GitHub"
+  "Onion Board on GitHub": "Onion Board en GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Un sonido que añadiste es muy corto, así que casi no se oirá.",
+  "Both files are in {folder}.": "Los dos archivos están en {folder}."
 }

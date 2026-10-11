@@ -2996,5 +2996,7 @@
   "Music & media": "音楽とメディア",
   "Other": "その他",
   "Help and community": "ヘルプとコミュニティ",
-  "Onion Board on GitHub": "GitHub の Onion Board"
+  "Onion Board on GitHub": "GitHub の Onion Board",
+  "A sound you added is very short, so it may be barely heard.": "追加したサウンドはとても短いため、ほとんど聞こえないかもしれません。",
+  "Both files are in {folder}.": "どちらのファイルも {folder} にあります。"
 }

@@ -3061,5 +3061,7 @@
   "Music & media": "Музика и медия",
   "Other": "Други",
   "Help and community": "Помощ и общност",
-  "Onion Board on GitHub": "Onion Board в GitHub"
+  "Onion Board on GitHub": "Onion Board в GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Добавеният звук е много кратък и може почти да не се чуе.",
+  "Both files are in {folder}.": "И двата файла са в {folder}."
 }

@@ -3321,5 +3321,7 @@
   "Music & media": "الموسيقى والوسائط",
   "Other": "أخرى",
   "Help and community": "المساعدة والمجتمع",
-  "Onion Board on GitHub": "Onion Board على GitHub"
+  "Onion Board on GitHub": "Onion Board على GitHub",
+  "A sound you added is very short, so it may be barely heard.": "الصوت الذي أضفته قصير جدًا، وقد لا يُسمع إلا بالكاد.",
+  "Both files are in {folder}.": "كلا الملفين في {folder}."
 }
