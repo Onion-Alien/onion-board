@@ -242,3 +242,24 @@ def test_on_close_runs_unless_the_button_was_clicked(qapp):
     busy.toast(w, "Removed “Airhorn”", "", 50, on_close=lambda: closed.append(3))
     assert process_events(qapp, lambda: 3 in closed)   # timed out
     w.close()
+
+
+def test_short_sound_warning_keeps_import_actions_and_resets(main_window, qapp, tmp_path):  # noqa: F811
+    w = main_window
+    short = tmp_path / "short.wav"
+    long = tmp_path / "long.wav"
+    sf.write(short, np.zeros((SR // 10, 2)), SR)
+    sf.write(long, np.zeros((SR, 2)), SR)
+    w.import_files([str(short)])
+    assert process_events(qapp, lambda: not w._pending_imports)
+    cards = toast.shown(w)
+    result = next(t for t in cards if t.key == "import")
+    assert result.kind == "ok" and result.card.action.text() == "Undo"
+    warning = next(t for t in cards if "very short" in t.text())
+    assert warning.kind == "warn"
+    assert not w._imported_short
+    warning.card.btn_close.click()
+    w.import_files([str(long)])
+    assert process_events(qapp, lambda: not w._pending_imports)
+    assert not any("very short" in t.text() for t in toast.shown(w))
+    assert next(t for t in toast.shown(w) if t.key == "import").card.action.text() == "Undo"

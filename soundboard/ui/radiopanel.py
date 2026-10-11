@@ -40,6 +40,7 @@ CLIP_S = 15
 LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 TYPE_DELAY_MS = 80         # ...and before the list shows the matches already known
+ERROR_LINE_S = 30           # a station's error stays up this long (or till the next state)
 FAV_MAX = 200
 RECENT_MAX = 30
 ROW_H = 54
@@ -1334,7 +1335,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         red = theme.status("error")
         self._refresh_info(f"<span style='color:{red}'>"
                            + _("That station isn't working ({error}). Try another one.",
-                               error=html.escape(msg)) + "</span>")
+                               error=html.escape(msg)) + "</span>", ERROR_LINE_S)
         self._select_on_globe(fly=False)
 
     def _on_now_playing(self, title: str):
@@ -1371,9 +1372,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return _("Can't reach the station directory, press ↻ to try again.")
         return _("Finding stations…") if self._started else ""
 
-    def _refresh_info(self, msg: str = ""):
+    def _refresh_info(self, msg: str = "", secs: float = 4):
         if msg:
-            self._flash_until = time.monotonic() + 4
+            self._flash_until = time.monotonic() + secs
             self.info.setText(msg)
             return
         if time.monotonic() < self._flash_until:
