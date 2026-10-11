@@ -48,6 +48,30 @@ def test_settings_and_the_arrow_share_a_row_open_and_stack_shut(qapp):
     rail.close()
 
 
+def test_settings_is_its_icon_only_and_selected_round_it(qapp):
+    """Open or shut, Settings is just the cog (its name for screen readers); showing its page,
+    it gets the current tab's fill and the tabs lose theirs. The arrow stays at the
+    far side of the open rail."""
+    from soundboard.ui.sidebar import BUTTON_W
+    rail, _alert, _live, gear = _rail(qapp, True)
+    gear.setProperty("railtext", "Settings")
+    rail.set_open(False)
+    QApplication.processEvents()
+    for is_open in (True, False):
+        rail.set_open(is_open)
+        QApplication.processEvents()
+        assert gear.text() == ""
+        assert gear.accessibleName() == "Settings" and gear.width() == BUTTON_W
+    rail.set_open(True)
+    QApplication.processEvents()
+    assert rail.toggle.geometry().right() > gear.geometry().right() + BUTTON_W
+    rail.select_foot(gear)
+    assert gear.isChecked() and not rail.buttons[0].isChecked()
+    rail.select_foot(None)
+    assert not gear.isChecked() and rail.buttons[0].isChecked()
+    rail.close()
+
+
 def test_a_rail_without_alerts_has_no_stray_window(qapp):
     tabs = SideTabs()
     tabs.addTab(QWidget(), "One")

@@ -501,6 +501,12 @@ QLabel#section { color:$heading; font-size:10pt; font-weight:600; padding-top:8p
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
+/* the tab help card (dialogs.TabHelpPopup): a raised surface with an edge (it floats
+   over the board), the title role (1.3x base, bold) and body text */
+QFrame#helpcard { background:$panel; border:1px solid $border; border-radius:16px; }
+QFrame#helpcard QLabel { background:transparent; border:none; padding:0; }
+QLabel#helptitle { font-size:13pt; font-weight:700; color:$text_hi; }
+QLabel#helpbody { font-size:10.5pt; color:$text; }
 QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
 QLabel[tone="warn"], QLabel#hint[tone="warn"] { color:$warn_text; }
@@ -577,6 +583,7 @@ QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text
 QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
 QFrame#sidebar QPushButton#settings:focus, QFrame#sidebar QPushButton#modebtn:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
+QFrame#sidebar QPushButton#settings:checked { background:transparent; color:$text_hi; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
 QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
@@ -605,6 +612,7 @@ QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
+QDialog#settingspage { background:transparent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }

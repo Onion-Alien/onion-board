@@ -62,19 +62,39 @@ the affected states; include its PR and validation evidence here.
   bottom at 1180x720); it now sits beside the on/off switch and wraps under it when
   narrow. Speak another language's *More options* was below the *What the voice said*
   box; it now follows the voice and speed. The Say bar lost its own volume (the owner's
-  call): a typed line plays like a sound, so the bottom bar's volumes set it. Left on purpose: Who's listening is
-  both a rail menu (a quick switch) and Settings > Audio's card (the full choice);
+  call): a typed line plays like a sound, so the bottom bar's volumes set it. Left on
+  purpose: Who's listening is both a rail menu (a quick switch) and Settings > Audio's card (the full choice);
   *What do these do?* there and the AI voice browser still open modal (help and a
   pick-a-voice list; converting them needs the lifecycle review U4 did). Checked
   offscreen in Dark and Light at 440, 800x600 and 1180x720 (`tests/test_voicepanel.py`).
 
-- [ ] **U4: Consistent live/draft and modal contracts.** MainWindow opens Settings
+- [x] **U4: Consistent live/draft and modal contracts.** MainWindow opens Settings
   and Edit sound with `exec()`; Voice tuning explicitly stays modeless. Settings
   apply immediately; Edit commits on Save. Targets: `ui/mainwindow.py`,
   `settings.py`, `ui/dialogs.py`, `ui/voicepanel.py`. Acceptance: preferences/live
   tuning permit continued app use; transactional Save/Cancel remains intact; modal
   tasks have an explicit reason. Before converting, check lifetime, repeated opening,
   deletion of the edited item, async results, preview rollback and shortcut behaviour.
+
+  Done (PR #413): Settings is a page in the main window, not a window: it takes the
+  place of the tabs and the bars over them (`_content`, a stack), while the tab rail
+  and the player + mixer strip stay, so sounds can still be played and stopped. The
+  rail's cog (icon only, a square) shows selected while it's up; a back arrow over the
+  categories (no `[Done]` row), Escape or any rail tab (also Ctrl+1...) goes back to
+  the tab you were on. It keeps its own category list and
+  search, applies live (no Save/Cancel), and every `open_settings("page")` link lands
+  on that page (`SettingsDialog.show_page`, clearing a search first). Under 640 px the
+  categories become an icon column (names as tips) and the search box goes over the
+  page, so it fits 440 to 1920 wide. Made too small for it, Settings closes and the
+  mini player shows; asked for from the mini player, the window grows to fit it
+  (`SETTINGS_ROOM`). Edit sound opens with `show()` beside the board: a draft with
+  `[Save] [Cancel]`, one window per sound (editing it again raises it); Save applies
+  to the sound as it is in the list then, and removing the sound closes its window
+  unsaved (Undo brings it back as it was). Previews stop on close either way. Checked
+  offscreen in Dark and Light at 440 to 1920 wide, with GIFs
+  (`tests/test_shell_dialogs.py`, `test_audit_main.py`). Kept modal on purpose: the
+  yes/no questions, catching a hotkey and the setup guide (each needs an answer
+  before the app can go on).
 
 ## Polish next
 
@@ -112,10 +132,19 @@ the affected states; include its PR and validation evidence here.
   spacing. Keep technical settings as readable forms where appropriate; do not add
   decorative tiles or redundant pills merely to satisfy a visual quota.
 
-- [ ] **U7: Shared help-popup treatment.** `TabHelpPopup` in `ui/dialogs.py` defines
+- [x] **U7: Shared help-popup treatment.** `TabHelpPopup` in `ui/dialogs.py` defines
   local pixel typography, padding, border and close styling. Acceptance: reuse shared
   typography/surface/action roles; coherent help placement, Escape/outside dismissal,
   focus return and accessible close action. Verify Dark, Light and High Contrast.
+
+  Done (PR #416): `TabHelpPopup` sets no style of its own: `#helpcard` (panel
+  surface, an edge because it floats over the board, 16 px corners), `#helptitle` (the
+  title role, 13pt bold `text_hi`) and `#helpbody`, all in
+  `theme.py`, so it follows every theme. Close is the painted `close` icon
+  (`icons.py`) as a quiet `icon_button` named *Close* (it was a typed ×). Escape, the
+  close button or a click outside close it (the "Click outside to close" line
+  went: people do it anyway), and the focus goes back to its opener.
+  Checked offscreen in Dark, Light and High Contrast (`tests/test_card_ui_fixes.py`).
 
 ## Coverage still needed
 
