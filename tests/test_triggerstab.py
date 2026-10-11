@@ -126,46 +126,47 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
     assert TriggersTab(FakeHost(), [tmp_path / "m"]).kept.isHidden()
 
 
-def test_install_prompt_opens_on_entry_and_can_be_reopened(qapp, tmp_path):
+def test_the_tab_itself_offers_it_no_window_pops_up(qapp, tmp_path, monkeypatch):
+    """Not installed: the tab is Hoot's card (what it does, Get Onion Watch), not a
+    window popping up on entering it and a lone button once that was closed."""
+    from PySide6.QtWidgets import QDialog
+    from soundboard.ui import triggerstab
+    seen = []
+    monkeypatch.setattr(triggerstab.usage, "used", seen.append)
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
     try:
-        assert not tab.install_popup.isVisible()
         tab.resize(1700, 800)
         tab.show()
-        assert process_events(qapp, tab.install_popup.isVisible)
-        assert tab.install_popup.width() <= 620
-        assert tab.btn_get.isVisible() and tab.btn_close_install.isVisible()
-        assert tab.blurb.wordWrap() and tab.privacy.wordWrap()
-        tab.btn_close_install.click()
-        assert not tab.install_popup.isVisible() and tab.get_again.isVisible()
-        qapp.processEvents()
-        assert not tab.install_popup.isVisible()
-        tab.get_again.click()
-        assert tab.install_popup.isVisible()
-        tab.hide()
-        assert not tab.install_popup.isVisible()
-        tab.show()
-        assert process_events(qapp, tab.install_popup.isVisible)
+        assert process_events(qapp, lambda: "watch-prompt-shown" in seen)
+        assert not [d for d in tab.findChildren(QDialog) if d.isVisible()]
+        assert tab.stack.currentWidget() is tab.get_page
+        assert tab.hoot.isVisible() and tab.btn_get.isVisible()
+        assert tab.btn_get.objectName() == "primary"
+        assert tab.blurb.wordWrap() and tab.privacy.wordWrap() and tab.privacy.toolTip()
+        assert tab.title.text() == "Onion Watch"
+        card = tab.hoot.parentWidget()
+        assert card.maximumWidth() <= 620
+        # the wrapped words get their height: nothing under the button overlaps it
+        assert tab.btn_get.parentWidget() is card is tab.blurb.parentWidget()
+        assert tab.blurb.geometry().bottom() < tab.btn_get.y()
     finally:
         tab.shutdown()
         tab.close()
         tab.deleteLater()
 
 
-def test_deferred_install_prompt_waits_until_the_tab_is_visible(qapp, tmp_path):
+def test_deferred_tab_shows_hoot_once_visible_and_cancel_keeps_the_page(qapp, tmp_path):
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
     try:
         tab.load()
-        qapp.processEvents()
-        assert not tab.install_popup.isVisible()
         tab.show()
-        assert process_events(qapp, tab.install_popup.isVisible)
+        assert process_events(qapp, lambda: tab.btn_get.isVisible())
         tab._busy = True
-        tab.btn_close_install.click()
-        assert tab._cancel and not tab.install_popup.isVisible()
+        tab.btn_cancel.show()
+        tab.btn_cancel.click()
+        assert tab._cancel
         tab._finish(None, "Cancelled", False)
-        tab.get_again.click()
-        assert tab.install_popup.isVisible() and tab.error.isVisible()
+        assert tab.stack.currentWidget() is tab.get_page and tab.error.isVisible()
     finally:
         tab.shutdown()
         tab.close()
@@ -378,13 +379,12 @@ def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, mo
     live = []
     tab.active_changed.connect(live.append)
     tab.show()
-    assert process_events(qapp, tab.install_popup.isVisible)
+    assert process_events(qapp, tab.btn_get.isVisible)
     tab.btn_get.click()
     assert process_events(qapp, lambda: tab.panel is not None)
     assert tab.stack.currentWidget() is tab.board_page and not tab.needs_nudge()
     assert (tmp_path / "modules" / "onion-watch" / "module.json").is_file()
     assert tab.panel.host is host
-    assert not tab.install_popup.isVisible()
     assert tab.panel.watch.text() == ""   # ...so its Watch button came in icon only
     tab.panel.set_active(True)
     assert live == [True] and tab.is_active()
@@ -424,7 +424,7 @@ def test_an_installed_add_on_loads_on_start(qapp, tmp_path, addon_zip):
     assert tab.panel is not None and tab.stack.currentWidget() is tab.board_page
     tab.show()
     qapp.processEvents()
-    assert not tab.install_popup.isVisible()
+    assert not tab.hoot.isVisible()
     tab.shutdown()
     tab.close()
 
@@ -516,7 +516,7 @@ def test_a_broken_one_can_be_removed_from_hoots_page(qapp, tmp_path, addon_zip, 
     monkeypatch.setattr(tab, "confirm_remove", lambda: True)
     tab.btn_remove_broken.click()
     assert watchaddon.installed([tmp_path / "modules"]) is None
-    assert tab.title.text() == "Get Onion Watch for the Triggers tab"
+    assert tab.title.text() == "Onion Watch"
     assert tab.error.isHidden() and tab.btn_remove_broken.isHidden()
 
 

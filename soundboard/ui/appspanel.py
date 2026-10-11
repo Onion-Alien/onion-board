@@ -27,7 +27,8 @@ import zlib
 
 from PySide6.QtCore import (QEvent, QMimeData, QObject, QRect, QSize, Qt,
                             QTimer, Signal)
-from PySide6.QtGui import QActionGroup, QDrag, QFont, QPainter, QPixmap
+from PySide6.QtGui import (QActionGroup, QColor, QDrag, QFont, QKeySequence, QPainter, QPixmap,
+                           QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
                                QHBoxLayout, QInputDialog, QLabel,
                                QLayout, QMenu, QPushButton, QScrollArea, QSizePolicy, QSlider,
@@ -95,6 +96,15 @@ APP_DRAG_MIME = "application/x-onionboard-app-card"
 CATEGORY_DRAG_MIME = "application/x-onionboard-app-category"
 
 
+def category_label(category: str) -> str:
+    """A category's shown name: the built-in ones in the app's language, the user's own
+    as typed. The config keeps the English name (usage.APPS_BUILT_IN), so a board
+    switched to another language, or opened by an older version, still finds them."""
+    return {"Browsers": _("Browsers"), "Music & media": _("Music & media"),
+            "Calls & chat": _("Calls & chat"), "Games": _("Games"),
+            "Other": _("Other")}.get(category, category)
+
+
 def app_category(exe: str) -> str:
     stem = exe.replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
     return next((category for category, names in APP_CATEGORIES.items() if stem in names),
@@ -108,7 +118,7 @@ class AppCategoryHeading(QLabel):
     delete_requested = Signal(str)        # (category)
 
     def __init__(self, category: str, host: QWidget, custom: bool = False):
-        super().__init__(category, host)
+        super().__init__(category_label(category), host)
         self.category = category
         self.custom = custom
         self._drag_press = None
@@ -116,6 +126,14 @@ class AppCategoryHeading(QLabel):
         self.setCursor(Qt.OpenHandCursor)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_menu)
+        # the keyboard's way to the same menu, as on the cards (DESIGN section 0):
+        # Tab reaches the heading (a click doesn't: it's the drag handle), then the
+        # Menu key or Shift+F10 opens it under the name
+        self.setFocusPolicy(Qt.TabFocus)
+        for keys in (QKeySequence(Qt.Key_Menu), QKeySequence("Shift+F10")):
+            sc = QShortcut(keys, self)
+            sc.setContext(Qt.WidgetShortcut)
+            sc.activated.connect(lambda: self._show_menu(self.rect().bottomLeft()))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -189,9 +207,21 @@ class AppCategoryHeading(QLabel):
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
+        if self.hasFocus():   # the focus ring: the rule under it in the accent, solid
+            painter.fillRect(0, self.height() - 2, self.width(), 2,
+                             QColor(theme.T.get("accent", "#7c5cff")))
+            return
         painter.setOpacity(0.25)
         painter.setPen(self.palette().color(self.foregroundRole()))
         painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
+
+    def focusInEvent(self, event):
+        super().focusInEvent(event)
+        self.update()
+
+    def focusOutEvent(self, event):
+        super().focusOutEvent(event)
+        self.update()
 
 
 class AppGrid(CardGrid):
@@ -211,6 +241,7 @@ class AppGrid(CardGrid):
 
         self.custom_categories = set(self.category_order) - set(default_cats)
         self.headings: dict[str, AppCategoryHeading] = {}
+        self._tab_key: list[int] = []   # the shown order the Tab chain was last set to
         for category in self.category_order:
             self._create_heading(category)
 
@@ -261,7 +292,7 @@ class AppGrid(CardGrid):
         heading = self.headings.pop(old, None)
         if heading:
             heading.category = new
-            heading.setText(new)
+            heading.setText(category_label(new))
             self.headings[new] = heading
         self._sync_headings_order()
         self.invalidate()
@@ -288,6 +319,7 @@ class AppGrid(CardGrid):
         cols = self.columns(rect.width())
         width = max(1, (rect.width() - self._gap * (cols - 1)) // cols)
         y = rect.y()
+        seq: list[QWidget] = []   # headings and cards as shown, for the Tab order
         for category in self.category_order:
             heading = self.headings.get(category)
             if heading is None:
@@ -298,6 +330,7 @@ class AppGrid(CardGrid):
                 heading.setVisible(bool(is_visible) and not self.max_cols)
             if not is_visible:
                 continue
+            seq += [heading, *(item.widget() for item in group)]
             if y != rect.y():
                 y += self._gap
             if not self.max_cols:   # the clip editor's big view needs all the space
@@ -315,7 +348,33 @@ class AppGrid(CardGrid):
                         item.setGeometry(QRect(rect.x() + j * (width + self._gap), y,
                                                width, heights[j]))
                 y += max(heights) + self._gap
+        if move and not self.max_cols:
+            self._sync_tab_order(seq)
         return max(0, y - self._gap - rect.y())
+
+    def _sync_tab_order(self, seq: list[QWidget]):
+        """Tab goes a heading, its cards, the next heading... as shown. The headings are
+        made before any card, so by default Tab visited them all first."""
+        key = [id(w) for w in seq]
+        if key == self._tab_key:
+            return
+        self._tab_key = key
+        chain = []
+        for w in seq:
+            if isinstance(w, AppCategoryHeading):
+                chain.append(w)
+                continue
+            inner = getattr(w, "_tab_chain", None)
+            if inner is None:   # a card's own order, read while it's still in one piece
+                inner, n = [], w.nextInFocusChain()
+                while n is not w and w.isAncestorOf(n):
+                    if n.focusPolicy() & Qt.TabFocus:
+                        inner.append(n)
+                    n = n.nextInFocusChain()
+                w._tab_chain = inner
+            chain += inner
+        for a, b in zip(chain, chain[1:]):
+            QWidget.setTabOrder(a, b)
 
 
 # a version folder in a program's path (Discord's app-1.0.9156, 24.1.3): it changes on
@@ -489,8 +548,15 @@ class AppRow(HoverCard):
         self.setCursor(Qt.OpenHandCursor)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_card_menu)
+        # the keyboard's way to the same menu (DESIGN section 0: never right-click
+        # only): the Menu key or Shift+F10 on anything in the card
+        for keys in (QKeySequence(Qt.Key_Menu), QKeySequence("Shift+F10")):
+            sc = QShortcut(keys, self)
+            sc.setContext(Qt.WidgetWithChildrenShortcut)
+            sc.activated.connect(self._menu_from_keyboard)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
+        self.known_name = ""            # the program's own name, once it has been seen
         self.last_sound_at = time.monotonic()
         self.capture: appaudio.AppCapture | None = None
         self.remember_pending = False   # Send clicked: remembered once the capture is up
@@ -658,6 +724,13 @@ class AppRow(HoverCard):
             self.reordered.emit(event.source(), self, event.position().x() < self.width() / 2)
         self._hover(False)
 
+    def _menu_from_keyboard(self):
+        """Under the focused control (Send, the volume…), or mid-card."""
+        f = QApplication.focusWidget()
+        at = (f.mapTo(self, f.rect().bottomLeft()) if f is not None and self.isAncestorOf(f)
+              else self.rect().center())
+        self._show_card_menu(at)
+
     def _show_card_menu(self, pos):
         menu = QMenu(self)
         parent = self.parentWidget()
@@ -669,7 +742,7 @@ class AppRow(HoverCard):
             group = QActionGroup(cat_menu)
             for cat in parent.grid.category_order:
                 act = cat_menu.addAction(icons.icon("tag", checked_color="accent"),
-                                         cat.replace("&", "&&"))   # "Music & media"
+                                         category_label(cat).replace("&", "&&"))
                 act.setCheckable(True)
                 act.setChecked(cat == self.category)
                 group.addAction(act)
@@ -747,6 +820,7 @@ class AppRow(HoverCard):
         self.app = app
         running = app is not None
         if running:
+            self.known_name = app.name   # kept for when it closes
             self.name.setText(app.name + self.folder)
             self._set_icon(app.path)
             where = ", ".join(app.devices[:2])
@@ -756,7 +830,8 @@ class AppRow(HoverCard):
             if not self.status_text:   # an error stays up until the next attempt
                 self.sub.setText(sub)
         else:
-            self.name.setText((self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?")
+            self.name.setText((self.known_name
+                               or (self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?"))
                               + self.folder)
             self.set_status("")
             self.sub.setText(_("Not running: it'll be picked up when it starts"))
@@ -999,7 +1074,7 @@ class AppsTab(QWidget):
     def _prompt_new_category(self):
         name, ok = QInputDialog.getText(self, _("New category"), _("Name:"))
         name = (library.clean_tags([name]) or [""])[0] if ok else ""
-        if not name or name in self.grid.category_order:
+        if not name or self._category_taken(name):
             return
         usage.used("apps-category-added")
         label = self.grid.add_category(name)
@@ -1019,12 +1094,16 @@ class AppsTab(QWidget):
     def _on_card_dropped_on_category(self, source: AppRow, category: str):
         self._move_row_to_category(source, category)
 
+    def _category_taken(self, name: str) -> bool:
+        """A category already has this name, saved or shown ('Spiele' is Games)."""
+        return any(name in (c, category_label(c)) for c in self.grid.category_order)
+
     def _on_rename_category(self, old_cat: str):
         new_name, ok = QInputDialog.getText(self, _("Rename category"),
-                                            _("New name:"), text=old_cat)
+                                            _("New name:"), text=category_label(old_cat))
         new_name = (library.clean_tags([new_name]) or [""])[0] if ok else ""
-        if not new_name or new_name == old_cat or new_name in self.grid.category_order:
-            return
+        if not new_name or self._category_taken(new_name):
+            return   # unchanged too: OK on the shown name renames nothing
         usage.used("apps-category-renamed")
         self.grid.rename_category(old_cat, new_name)
         for row in self.rows.values():

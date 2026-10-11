@@ -342,6 +342,57 @@ def process_path(pid: int, exe: str = "") -> str:
     return path
 
 
+_descriptions: dict[str, str] = {}   # .exe path -> its file description; see file_description
+_version = None   # version.dll, its own copy (argtypes set here don't leak elsewhere)
+
+
+def file_description(path: str) -> str:
+    """The program's own name for itself: its .exe's FileDescription version info, what
+    Windows' volume mixer shows ('VLC media player' for vlc.exe, 'OBS Studio' for
+    obs64.exe); '' if it has none. Reads the file, so never on the UI thread; cached
+    per path (a program's name doesn't change while it runs)."""
+    global _version
+    if not _win or not path:
+        return ""
+    with _names_lock:
+        if path in _descriptions:
+            return _descriptions[path]
+    desc = ""
+    try:
+        if _version is None:
+            v = ctypes.WinDLL("version")
+            v.GetFileVersionInfoSizeW.restype = c_ulong
+            v.GetFileVersionInfoSizeW.argtypes = (c_wchar_p, c_void_p)
+            v.GetFileVersionInfoW.restype = c_int
+            v.GetFileVersionInfoW.argtypes = (c_wchar_p, c_ulong, c_ulong, c_void_p)
+            v.VerQueryValueW.restype = c_int
+            v.VerQueryValueW.argtypes = (c_void_p, c_wchar_p, c_void_p, c_void_p)
+            _version = v
+        size = _version.GetFileVersionInfoSizeW(path, None)
+        buf = ctypes.create_string_buffer(size) if size else None
+        if buf is not None and _version.GetFileVersionInfoW(path, 0, size, buf):
+            ptr, n = c_void_p(), c_uint()
+            langs = []   # the file's own language + code page pairs first, then the usual
+            if (_version.VerQueryValueW(buf, "\\VarFileInfo\\Translation", byref(ptr),
+                                        byref(n)) and ptr.value and n.value >= 4):
+                w = (c_ushort * (n.value // 2)).from_address(ptr.value)
+                langs = [f"{w[i]:04x}{w[i + 1]:04x}" for i in range(0, len(w) - 1, 2)]
+            for lang in (*langs, "040904b0", "040904e4", "04090000"):
+                if (_version.VerQueryValueW(buf, f"\\StringFileInfo\\{lang}\\FileDescription",
+                                            byref(ptr), byref(n)) and ptr.value and n.value):
+                    desc = ctypes.wstring_at(ptr.value, n.value).split("\0", 1)[0].strip()
+                    if desc:
+                        break
+    except (OSError, ValueError):
+        log.debug("version info of %s unavailable", path, exc_info=True)
+    if desc.lower().endswith(".exe"):   # Notepad and Snipping Tool say 'Notepad.exe'
+        desc = desc[:-4].rstrip()
+    desc = desc[:60]
+    with _names_lock:
+        _descriptions[path] = desc
+    return desc
+
+
 def forget_dead_pids(table: dict[int, tuple[int, str]]):
     """Drops cached paths of pids missing from a fresh process list: Windows reuses
     pids, and a stale entry would put a remembered program's name (and its auto-send)
@@ -559,10 +610,14 @@ class App:
     peak: float = 0.0        # 0..1, from Windows' own session meter
     devices: list[str] = field(default_factory=list)   # where it's playing
     session_pids: set = field(default_factory=set)
+    description: str = ""    # the .exe's own name for itself (file_description)
 
     @property
     def name(self) -> str:
-        """Short display name: 'Spotify' from spotify.exe."""
+        """Display name: the program's own ('VLC media player', as Windows' volume
+        mixer shows it), else from its .exe: 'Spotify' from spotify.exe."""
+        if self.description:
+            return self.description
         stem = os.path.splitext(self.exe)[0]
         return stem[:1].upper() + stem[1:] if stem else f"pid {self.pid}"
 
@@ -740,7 +795,7 @@ def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App],
         path = (process_path(root, table.get(root, (0, ""))[1])   # a helper's host, not it
                 or (process_path(pid.value, exe) if exe not in HELPER_EXES else ""))
         exe = os.path.basename(path) or table.get(root, (0, ""))[1] or f"pid {root}"
-        app = apps[root] = App(root, exe, path)
+        app = apps[root] = App(root, exe, path, description=file_description(path))
     app.session_pids.add(pid.value)
     app.active = app.active or state.value == 1
     app.peak = max(app.peak, float(peak.value))

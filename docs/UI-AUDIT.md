@@ -136,12 +136,22 @@ the affected states; include its PR and validation evidence here.
   options is U3. Checked offscreen in Dark and Light at 800x600 and 1180x720
   (`tests/test_icon_actions.py`).
 
-- [ ] **U6: Settings card hierarchy.** Sampled General/Audio/Connection cards are
+- [x] **U6: Settings card hierarchy.** Sampled General/Audio/Connection cards are
   predominantly stacked forms; Appearance and Recording have stronger grouping
   and choice hierarchy. Target: `settings.py`. Acceptance: clear headings, compact
   labelled fields, hints/help on demand, status when meaningful and consistent
   spacing. Keep technical settings as readable forms where appropriate; do not add
   decorative tiles or redundant pills merely to satisfy a visual quota.
+
+  Done (PR #423): rendered all 13 pages (Settings is a page in the window since U4).
+  The cards already have a heading, a hint and compact labelled rows; kept as forms.
+  Fixed where one card broke the pattern: General's *Play pads with one click* had its
+  explanation at the card's edge (now `_option`, under the box's text like the rest);
+  Overlay's *Open overlay* ran to the card's edge and *Auto-hide after*'s choice sat at
+  the far right (both now as wide as their words, right after what they belong to);
+  Audio's *While I talk, lower my sounds:* wrapped onto two lines with room to spare
+  (Settings wraps every label; a `keepline` property opts a short field label out).
+  Checked offscreen in Dark and Light at 1180x720 (`tests/test_settings.py`).
 
 - [x] **U7: Shared help-popup treatment.** `TabHelpPopup` in `ui/dialogs.py` defines
   local pixel typography, padding, border and close styling. Acceptance: reuse shared
@@ -159,10 +169,24 @@ the affected states; include its PR and validation evidence here.
 
 ## Coverage still needed
 
-- [ ] **U8: Populated Apps and installed Triggers.** Check their item menus,
+- [x] **U8: Populated Apps and installed Triggers.** Check their item menus,
   submenus, configuration and confirmation states with safe test fixtures; the
   initial spot audit did not cover them. Treat new observations as findings only
   after inspection. Triggers' add-on UI is maintained separately.
+
+  Done (PR #422): rendered Apps with six programs in three categories (cards, the
+  card menu and its Categories submenu, a category heading's menu) and the Triggers
+  tab without the add-on, Dark and Light at 800x600 and 1180x720. Fine as they are:
+  the card menu (Categories ticked, red Remove), the heading menu. Fixed: **Triggers
+  without the add-on** was a window popping up on entering the tab and, once closed,
+  an empty page with one button. Now the tab itself is Onion Watch's card, short like an
+  ad (the owner's call): its logo (`assets/art/onion-watch.png`, from the add-on's own
+  painted logo) and name, one line, four points with painted icons, *Get Onion Watch*
+  as the one filled button, Hoot beside them, one line of fine print (the full privacy
+  words are its tooltip); centred on the tab, a `HoverCard`. No window. **Apps cards** open their
+  menu with the Menu key or Shift+F10 from anything in the card (it was right-click
+  only). New findings: U13, U14, U15 below (`tests/test_triggerstab.py`,
+  `tests/test_appspanel.py`).
 - [x] **U9: Menu interaction and accessibility pass.** Check Sounds/Apps/Radio/Voice
   menus for action grouping, current-value checkmarks, destructive treatment,
   visible alternatives to right-click, keyboard navigation, focus return and screen
@@ -230,6 +254,28 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   the meter and the drop box **keep following the window on purpose**: a longer seek
   bar seeks finer, and capping them only traded a long control for an empty gap
   (PR #410, capping all four, was closed for that). Don't re-cap them.
+
+- [x] **U13: Program names from the file name.** Apps cards title a program from
+  its .exe: *Vlc*, *Obs64* (the window says VLC and OBS). Use the program's own
+  name (its file description, as Windows' volume mixer does) and keep the .exe
+  stem only as a fallback. Target: `appaudio.App.name`, `ui/appspanel.py`.
+
+  Done (PR #424): `appaudio.file_description` reads the .exe's FileDescription on
+  the lister's worker, cached per path; `App.name` uses it (*VLC media player*,
+  *OBS Studio*), and a card keeps it once the program closes.
+- [x] **U14: Apps category names aren't translated.** The built-in categories
+  (Browsers, Music & media, Calls & chat, Games, Other) show in English in every
+  language; translate the shown name, keep the saved key. Target: `ui/appspanel.py`.
+
+  Done (PR #425): `appspanel.category_label` gives the shown name (headings, the
+  card's Categories menu, the rename prompt) in all 32 languages; the config keeps
+  the English key.
+- [x] **U15: Apps category headings have no keyboard way to their menu** (Rename,
+  Delete). They take no focus; give them one with a visible focus ring, or put the
+  menu on a small button beside the heading. Target: `ui/appspanel.py`.
+
+  Done (PR #426): Tab reaches a heading (its rule turns the accent colour), the Menu
+  key or Shift+F10 opens its menu, and Tab goes heading, its cards, next heading.
 
 ### Features for later (not UI fixes; after 2.0)
 

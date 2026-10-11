@@ -249,3 +249,102 @@ def test_custom_category_lifecycle(tab):
     assert "Office" not in tab.grid.category_order
     assert custom.category == "Other"
 
+
+
+def test_category_headings_have_a_keyboard_way_to_their_menu(tab, qapp, monkeypatch):
+    """Tab reaches a heading (in the order shown: heading, its cards, the next one), it
+    shows it has the focus, and the Menu key or Shift+F10 opens Rename / Delete."""
+    from PySide6.QtGui import QKeySequence, QShortcut
+    apps = [App(1, "firefox.exe"), App(2, "spotify.exe"), App(3, "vlc.exe")]
+    monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda **_: apps)
+    tab.grid.add_category("Work")
+    tab._wire_headings()
+    tab.resize(1000, 900)
+    tab.show()
+    tab._on_apps(apps)
+    qapp.processEvents()
+    browsers, music = tab.grid.headings["Browsers"], tab.grid.headings["Music & media"]
+    assert browsers.focusPolicy() == Qt.TabFocus   # a click is the drag, not focus
+    firefox, spotify = tab.rows["firefox.exe"], tab.rows["spotify.exe"]
+    stops = [w for w in _focus_chain(browsers) if w.focusPolicy() & Qt.TabFocus]
+    assert firefox.isAncestorOf(stops[0])                 # its card, not the next heading
+    after_firefox = [w for w in stops if not firefox.isAncestorOf(w)]
+    assert after_firefox[0] is music and spotify.isAncestorOf(after_firefox[1])
+    tab.grid.reorder_categories("Music & media", "Browsers", True)   # follows a reorder
+    tab._layout_apps()
+    qapp.processEvents()
+    first = [w for w in _focus_chain(music) if w.focusPolicy() & Qt.TabFocus][:1]
+    assert spotify.isAncestorOf(first[0])
+
+    plain = browsers.grab().toImage()
+    browsers.setFocus(Qt.TabFocusReason)
+    qapp.processEvents()
+    assert browsers.hasFocus() and browsers.grab().toImage() != plain   # its focus ring
+
+    seen = []
+
+    class Shown(appspanel.QMenu):
+        def exec(self, *a):
+            seen.append([x.text() for x in self.actions() if x.text()])
+    monkeypatch.setattr(appspanel, "QMenu", Shown)
+    for heading, want in ((browsers, ["Rename category"]),
+                          (tab.grid.headings["Work"], ["Rename category", "Delete category"])):
+        keys = {sc.key().toString(): sc for sc in heading.findChildren(QShortcut)}
+        assert QKeySequence(Qt.Key_Menu).toString() in keys and "Shift+F10" in keys
+        assert all(sc.context() == Qt.WidgetShortcut for sc in keys.values())
+        for sc in keys.values():
+            sc.activated.emit()
+        assert seen[-2:] == [want, want]
+
+
+def _focus_chain(start, n=60):
+    w, out = start, []
+    for _ in range(n):
+        w = w.nextInFocusChain()
+        out.append(w)
+    return out
+
+
+def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, monkeypatch):
+    from soundboard import i18n
+    from soundboard.engine import Engine
+    from soundboard.library import Config
+    from soundboard.ui.widgets import Meter
+    monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda strict=False, **_: [])
+    i18n.set_language("de")
+    try:
+        cfg = Config()
+        t = appspanel.AppsTab(Engine(), cfg, lambda: None, Meter)
+        t._on_apps([App(1, "cs2.exe"), App(2, "spotify.exe")])
+        assert t.grid.headings["Games"].text() == "Spiele"
+        assert t.grid.headings["Music & media"].text() == "Musik & Medien"
+        assert t.rows["cs2.exe"].category == "Games"          # the saved key stays English
+        shown = []
+
+        class Shown(appspanel.QMenu):
+            def exec(self, *a):
+                for act in self.actions():
+                    if act.menu() is not None:
+                        shown.extend(x.text() for x in act.menu().actions())
+        monkeypatch.setattr(appspanel, "QMenu", Shown)
+        t.rows["cs2.exe"]._show_card_menu(t.rows["cs2.exe"].rect().center())
+        assert "Spiele" in shown and "Musik && Medien" in shown and "Games" not in shown
+        asked = []
+
+        def answer(text):
+            def get_text(*a, **k):
+                asked.append(k.get("text"))
+                return text, True
+            return get_text
+        monkeypatch.setattr(appspanel.QInputDialog, "getText", answer("Spiele"))
+        t._on_rename_category("Games")                       # OK on the shown name: no change
+        assert asked == ["Spiele"] and "Games" in t.grid.category_order
+        t._prompt_new_category()                             # nor a second "Spiele"
+        assert "Spiele" not in t.grid.category_order
+        monkeypatch.setattr(appspanel.QInputDialog, "getText", answer("Shooter"))
+        t._on_rename_category("Games")
+        assert "Shooter" in t.grid.category_order and t.rows["cs2.exe"].category == "Shooter"
+        assert t.grid.headings["Shooter"].text() == "Shooter"
+        t.shutdown()
+    finally:
+        i18n.set_language("en")
