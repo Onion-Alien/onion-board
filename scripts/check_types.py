@@ -16,7 +16,6 @@ import argparse
 import collections
 import json
 import os
-import re
 import subprocess
 import sys
 
@@ -35,13 +34,7 @@ def pyright(files):
         diags = json.loads(out.stdout)["generalDiagnostics"]
     except (ValueError, KeyError):
         sys.exit(f"pyright failed:\n{out.stdout}\n{out.stderr}")
-    # Old-style Qt enum names (Qt.AlignLeft, QPainter.Antialiasing) work at run time but
-    # aren't in Qt's type stubs: ~1800 false alarms that new Qt code would keep adding.
-    return [d for d in diags if d["severity"] == "error"
-            and not QT_ENUM.search(d["message"])]
-
-
-QT_ENUM = re.compile(r'Cannot access attribute "[A-Za-z_]\w*" for class "type\[Q')
+    return [d for d in diags if d["severity"] == "error"]
 
 
 def key(d):

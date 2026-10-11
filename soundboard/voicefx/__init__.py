@@ -83,7 +83,7 @@ class Effect:
 REGISTRY: dict[str, type[Effect]] = {}
 
 
-def register(cls: type[Effect]) -> type[Effect]:
+def register[E: Effect](cls: type[E]) -> type[E]:
     """Make an effect type available (usable as a class decorator)."""
     if not cls.type or not cls.name:
         raise ValueError(f"{cls.__name__} needs a `type` and a `name`")

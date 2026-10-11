@@ -32,10 +32,11 @@ _timer: threading.Timer | None = None
 
 def _file_of(a: np.ndarray) -> str | None:
     """The file a mapped array lives in, or None."""
-    while a is not None:
-        if isinstance(a, np.memmap):
-            return a.filename
-        a = getattr(a, "base", None)
+    b: object = a
+    while b is not None:
+        if isinstance(b, np.memmap):
+            return b.filename
+        b = getattr(b, "base", None)
     return None
 
 
@@ -82,7 +83,9 @@ def lookup(data: np.ndarray, rate: int) -> dict | None:
 def remember(data: np.ndarray, rate: int, shares: dict) -> None:
     """Save a mapped sound's shares (written a moment later, with the rest of a load)."""
     path = _file_of(data)
-    key = path and _key(path)
+    if not path:
+        return
+    key = _key(path)
     if not key:
         return
     global _timer

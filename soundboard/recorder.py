@@ -72,6 +72,7 @@ class Recorder:
                     self._mem = [self._read_spool()]
                     self._mem.append(x.copy())
             else:
+                assert self._mem is not None   # no spool: in memory
                 self._mem.append(x.copy())
             self.rec_frames += n
 
@@ -133,6 +134,7 @@ class Recorder:
 
     def _close_spool(self):
         try:
+            assert self._spool is not None
             self._spool.close()
         except Exception:  # noqa: BLE001
             log.debug("closing the spool raised", exc_info=True)
@@ -278,6 +280,7 @@ class MicTake:
             except Exception:  # noqa: BLE001 - disk full etc.: the rest in memory
                 log.warning("mic take spool failed; continuing in memory", exc_info=True)
                 self._mem = [self._read_back()]
+        assert self._mem is not None   # no spool: in memory
         self._mem.append(x)
 
     def _read_back(self) -> np.ndarray:
@@ -285,6 +288,7 @@ class MicTake:
         spool, self._spool = self._spool, None
         data = np.zeros((0, 2), np.float32)
         try:
+            assert spool is not None
             spool.close()
             data, _ = sf.read(str(self.spool_path), dtype="float32", always_2d=True)
         except Exception:  # noqa: BLE001

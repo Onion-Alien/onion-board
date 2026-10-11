@@ -612,7 +612,7 @@ class SmoothSos:
             # the new design picks up the old one's memory (it describes the same
             # recent signal), which keeps its start-up transient small
             self.zi = None if sos is None else (
-                zi.copy() if same_shape else self._zeros(sos, x, axis))
+                zi.copy() if same_shape and zi is not None else self._zeros(sos, x, axis))
             if not self.fresh:
                 self._old, self._old_zi, self._pos = old, zi, 0
         self.fresh = False

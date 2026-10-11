@@ -155,7 +155,7 @@ def read_code(text) -> tuple[str, dict, list[str]]:
             continue
         if not isinstance(cfg, dict):
             raise CodeError(_("That code is damaged: an effect's settings are missing."))
-        d = {"on": True}
+        d: dict[str, bool | float] = {"on": True}
         for q in cls.params:
             v = cfg.get(q.key)
             if isinstance(v, (int, float)) and not isinstance(v, bool):

@@ -19,6 +19,7 @@ room, they don't take anything out of it.
 """
 from __future__ import annotations
 
+import typing
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -151,7 +152,7 @@ def _resonant_lowpass(x: np.ndarray, hz: float, q: float) -> np.ndarray:
     c = np.cos(w)
     b = np.array([(1 - c) / 2, 1 - c, (1 - c) / 2])
     a = np.array([1 + alpha, -2 * c, 1 - alpha])
-    return lfilter(b / a[0], a / a[0], x)
+    return typing.cast(np.ndarray, lfilter(b / a[0], a / a[0], x))   # no zi: an array
 
 
 def apply(x: np.ndarray, model: str, distance: float = 0.0, variant: str = "") -> np.ndarray:
@@ -170,11 +171,11 @@ def apply(x: np.ndarray, model: str, distance: float = 0.0, variant: str = "") -
     if v.band:
         lo, hi = v.band
         hi = min(hi, SR / 2 - 100)
-        y = sosfilt(butter(4, (lo, hi), "bandpass", fs=SR), y)
+        y = typing.cast(np.ndarray, sosfilt(butter(4, (lo, hi), "bandpass", fs=SR), y))
     hz = cutoff_hz(model, distance, variant)
     if hz and hz < SR / 2 - 100:
         y = (_resonant_lowpass(y, hz, v.lowpass_q) if v.lowpass_q > 0.71
-             else sosfilt(butter(2, hz, "lowpass", fs=SR), y))
+             else typing.cast(np.ndarray, sosfilt(butter(2, hz, "lowpass", fs=SR), y)))
     y = y * gain(model, distance, variant)
     return np.repeat(y[:, None], 2, axis=1).astype(F32)
 

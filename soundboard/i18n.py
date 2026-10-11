@@ -29,7 +29,8 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-LANG_DIR = (Path(sys._MEIPASS) / "lang" if hasattr(sys, "_MEIPASS")
+# _MEIPASS: set by PyInstaller in the frozen app
+LANG_DIR = (Path(sys._MEIPASS) / "lang" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
             else Path(__file__).resolve().parent.parent / "assets" / "lang")
 ENGLISH = "en"
 PSEUDO = "xx"
