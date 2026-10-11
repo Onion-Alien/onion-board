@@ -55,6 +55,9 @@ log = logging.getLogger(__name__)
 API_BASES = ("https://all.api.radio-browser.info", "https://de1.api.radio-browser.info",
              "https://de2.api.radio-browser.info")
 GLOBE_LIMIT = 3000         # stations fetched for the map (the most listened-to)
+# With no saved list the most listened-to few come first: the directory takes 5-15 s
+# to send all 3000 (~3.8 MB, never compressed), and ~1-2 s for these
+GLOBE_FIRST = 300
 SEARCH_LIMIT = 150
 SEARCH_MAX_CHARS = 80
 CACHE_S = 24 * 3600        # how long the map's station list is reused
@@ -626,8 +629,11 @@ class RadioDirectory(QObject):
                      "Radio tab: fetching the station list (saved for a day)")
         # Settings > Data & quality: low data mode asks for a third of the list
         limit = quality.GLOBE_LOW if quality.current.low_data else GLOBE_LIMIT
-        path = ("/json/stations/search?has_geo_info=true&hidebroken=true"
-                f"&order=clickcount&reverse=true&limit={limit}{_kbps_query()}")
+        got: dict = {"full": False, "first": []}   # first: the first few's ids, once shown
+
+        def path(n):
+            return ("/json/stations/search?has_geo_info=true&hidebroken=true"
+                    f"&order=clickcount&reverse=true&limit={n}{_kbps_query()}")
 
         def fresh(raw):   # on a thread
             stations = [s for s in _stations(raw) if s.lat is not None]
@@ -639,19 +645,34 @@ class RadioDirectory(QObject):
             if not stations:
                 fail("the directory sent no stations")
                 return
+            got["full"] = True
             self.globe_stale = ""
+            if got["first"] and [s.uuid for s in stations] == got["first"]:
+                return   # the first few were all there is: nothing new to show
             self.globe_ready.emit(stations)
 
         def fail(msg):
             log.warning("radio directory unavailable: %s", msg)
-            if quiet:   # the old list is up already
+            if quiet or got["first"]:   # the old list (or the first few) is up already
                 self.globe_stale = msg or "no answer"
             elif cached is not None:   # an old list beats none
                 self.globe_stale = msg or "no answer"
                 self.globe_ready.emit(fits(cached[1]))
             else:
                 self.failed.emit("globe", msg)
-        self._get(path, done, fail, parse=fresh)
+        self._get(path(limit), done, fail, parse=fresh)
+        if force or cached is not None or limit <= GLOBE_FIRST:
+            return   # (Refresh: the list showing stays till the full one is in)
+
+        # nothing to show meanwhile (a first start, a reset): the first few, asked for
+        # alongside, fill the list and the map in a second or two instead of Bun
+        # waiting on the whole list. Never saved: the full list replaces them.
+        def first(stations):
+            if stations and not got["full"]:
+                got["first"] = [s.uuid for s in stations]
+                self.globe_ready.emit(stations)
+        self._get(path(GLOBE_FIRST), first, lambda _msg: None,
+                  parse=lambda raw: [s for s in _stations(raw) if s.lat is not None])
 
     def _read_cache(self) -> tuple[float, list[Station]] | None:
         try:
