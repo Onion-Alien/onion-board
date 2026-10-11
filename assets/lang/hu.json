@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Gyorsbillentyűk",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Hallgatás: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszéljen angolul, és mások más nyelvet hallanak. A mesterséges intelligencia hangja vagy a hangváltó kimondja, ha valamelyik be van kapcsolva; ellenkező esetben nyomja meg a Start gombot, és egy számítógép hangja megteszi.",
   "Type a line and press Enter": "Írjon be egy sort, és nyomja meg az Enter billentyűt",
   "Category": "Kategória",
   "Show more": "Több mutatása",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "A mikrofonodba  <b style='color:{colour}'>✗ nem fut</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nincs mit beállítani.</b> A Discord és a játékok a szokásos mikrofonodat használják, és a hangjaid benne vannak.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ha a hangok szaggatnak, kapcsold ki a beszélgetőapp zajszűrését (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> ki. Ne Studio: az kihagyja az Onion Boardot).",
-  "Sounds chopped up?": "Szaggatnak a hangok?"
+  "Sounds chopped up?": "Szaggatnak a hangok?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Lefordítja, amit mondasz, erre a nyelvre. Ki: minden hang angolul beszél, és a nyelv kiválasztva marad.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszélj angolul, és mások más nyelvet hallanak. Kapcsold be a lenti kapcsolót: az AI hang vagy a hangváltó mondja ki, ha valamelyik be van kapcsolva; különben nyomd meg a Start gombot, és egy gépi hang mondja ki."
 }

@@ -2879,7 +2879,6 @@
   "Quick hotkeys": "クイックホットキー",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "リスニング: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "英語で話せば、他の人には別の言語が聞こえます。 AI 音声またはボイスチェンジャーのいずれかがオンになっている場合は、その声が発せられます。それ以外の場合は、「スタート」を押すとコンピュータの音声が聞こえます。",
   "Type a line and press Enter": "行を入力して Enter キーを押します",
   "Category": "カテゴリ",
   "Show more": "もっと見る",
@@ -3127,5 +3126,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "マイクに<b style='color:{colour}'>✗ 動いていない</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>設定は不要です。</b> Discord やゲームは普段のマイクのままで、サウンドはそこに入っています。",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "サウンドが途切れる場合は、ボイスアプリのノイズ抑制をオフにしてください（Discord: <b>入力プロファイル → カスタム</b>、<b>ノイズ抑制 → なし</b>、<b>エコー除去</b>オフ。スタジオは不可: Onion Board を通りません）。",
-  "Sounds chopped up?": "サウンドが途切れる？"
+  "Sounds chopped up?": "サウンドが途切れる？",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "話した内容をこの言語に翻訳します。オフ：どの声も英語で話し、言語は選んだままになります。",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "英語で話すと、ほかの人には別の言語で聞こえます。下のスイッチをオンにしてください：AI ボイスかボイスチェンジャーがオンならそれが話します。どちらもオフなら「スタート」を押すとコンピューターの声が話します。"
 }

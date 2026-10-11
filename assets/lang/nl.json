@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Snelle sneltoetsen",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Luisteren: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Praat in het Engels en anderen horen een andere taal. De AI-stem of de stemwisselaar zegt het wanneer een van hen aan staat; druk anders op Start en een computerstem doet dat.",
   "Type a line and press Enter": "Typ een regel en druk op Enter",
   "Category": "Categorie",
   "Show more": "Meer tonen",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "In je microfoon <b style='color:{colour}'>✗ niet actief</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Niets in te stellen.</b> Discord en games behouden je normale microfoon en je geluiden zitten erin.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Als geluiden haperen, schakel dan de ruisonderdrukking van de spraakapp uit (Discord: <b>Invoerprofiel → Aangepast</b> , <b>Ruisonderdrukking → Geen</b> , <b>Echo-onderdrukking</b> uit. Niet Studio: Onion Board wordt overgeslagen).",
-  "Sounds chopped up?": "Haperen je geluiden?"
+  "Sounds chopped up?": "Haperen je geluiden?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Vertaalt wat je zegt naar deze taal. Uit: elke stem spreekt Engels, en de taal blijft gekozen.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Praat Engels en anderen horen een andere taal. Zet de schakelaar hieronder aan: de AI-stem of de stemvervormer zegt het als een van beide aan staat; druk anders op Start en een computerstem zegt het."
 }

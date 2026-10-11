@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Mga mabilis na hotkey",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Pakikinig: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Makipag-usap sa Ingles at marinig ng iba ang ibang wika. Sinasabi ito ng boses ng AI o ng tagapagpalit ng boses kapag naka-on ang isa sa kanila; kung hindi man ay pindutin ang Start at isang boses ng computer ang gagawin.",
   "Type a line and press Enter": "Mag-type ng linya at pindutin ang Enter",
   "Category": "Kategorya",
   "Show more": "Ipakita pa",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Sa mic mo  <b style='color:{colour}'>✗ hindi tumatakbo</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Walang kailangang i-set.</b> Normal mong mic pa rin ang gamit ng Discord at games, at nandoon ang mga sound mo.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Kung napuputol-putol ang mga sound, i-off ang noise suppression ng voice app (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Hindi Studio: nilalaktawan nito ang Onion Board).",
-  "Sounds chopped up?": "Napuputol-putol ang mga sound?"
+  "Sounds chopped up?": "Napuputol-putol ang mga sound?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Isinasalin ang sinasabi mo sa wikang ito. Naka-off: Ingles ang sinasalita ng bawat boses, at nananatiling napili ang wika.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Magsalita sa Ingles at ibang wika ang maririnig ng iba. I-on ang switch sa ibaba: sasabihin ito ng AI voice o ng voice changer kapag naka-on ang isa sa kanila; kung hindi, pindutin ang Start at isang computer voice ang magsasabi."
 }

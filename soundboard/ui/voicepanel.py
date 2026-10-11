@@ -56,7 +56,8 @@ def default_fx_spec() -> dict:
 
 def default_speech_settings() -> dict:
     return {"voice": "", "rate": 0, "gain": 1.0, "model": "base.en", "language": "en",
-            "mute_real_voice": True, "voice_fx": True, "translate": ""}
+            "mute_real_voice": True, "voice_fx": True, "translate": "",
+            "translate_on": False}
 
 
 def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
@@ -1501,9 +1502,9 @@ class SpeechPanel(QWidget):
         action.addWidget(self.lbl_state, 1)
         v.addWidget(self.start_box)
         self.lbl_intro = hint_label(_(
-            "Talk in English and others hear another language. The AI voice or the voice "
-            "changer says it when one of them is on; otherwise press Start and a computer "
-            "voice does."))
+            "Talk in English and others hear another language. Turn on the switch below: the AI "
+            "voice or the voice changer says it when one of them is on; otherwise press "
+            "Start and a computer voice does."))
         v.addWidget(self.lbl_intro)
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
         # English in, the chosen language out.
@@ -1516,6 +1517,12 @@ class SpeechPanel(QWidget):
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(8)
         trow = QHBoxLayout()
+        # its own on/off: turning on a voice elsewhere never starts translating
+        self.sw_lang = Switch(_("Translate what you say into this language. Off: every "
+                                "voice speaks English, and the language stays picked."))
+        self.sw_lang.setAccessibleName(_("Speak in"))
+        self.sw_lang.setChecked(bool(self.s["translate_on"]))
+        trow.addWidget(self.sw_lang)
         self.lbl_lang = QLabel(_("Speak in"))
         trow.addWidget(self.lbl_lang)
         self.cb_lang = QComboBox()
@@ -1771,6 +1778,7 @@ class SpeechPanel(QWidget):
         self.ed_lang.editingFinished.connect(self._settings_edited)
         self._fill_langs()
         self.cb_lang.currentIndexChanged.connect(self._lang_picked)
+        self.sw_lang.toggled.connect(self._lang_switched)
         self._refresh_module()
 
         app = QGuiApplication.instance()
@@ -1998,7 +2006,8 @@ class SpeechPanel(QWidget):
                       language=self.ed_lang.text().strip() or "en",
                       mute_real_voice=self.chk_mute.isChecked(),
                       voice_fx=self.chk_fx.isChecked(),
-                      translate=self.cb_lang.currentData() or "")
+                      translate=self.cb_lang.currentData() or "",
+                      translate_on=self.sw_lang.isChecked())
         self.ctl.speaker.rate = self.s["rate"]
         self.ctl.set_mute_real_voice(self.s["mute_real_voice"])
         if self.ctl.live and not self.bg_for:
@@ -2042,13 +2051,30 @@ class SpeechPanel(QWidget):
         self._refresh_translation()
 
     def _lang_picked(self, *_):
+        # picking a language means speaking it; English (as you say it) is off
+        self.sw_lang.blockSignals(True)
+        self.sw_lang.setChecked(bool(self.cb_lang.currentData()))
+        self.sw_lang.blockSignals(False)
+        self._lang_switched()
+
+    def _lang_switched(self, *_):
+        if self.sw_lang.isChecked() and not self.cb_lang.currentData():
+            self.sw_lang.blockSignals(True)
+            self.sw_lang.setChecked(False)    # no language yet: pick one first
+            self.sw_lang.blockSignals(False)
+            self.cb_lang.showPopup()
+            return
         self._settings_edited()
         self._refresh_translation()
         self.lang_changed.emit()
 
+    def _lang_on(self) -> mods.ModuleInfo | None:
+        """The language picked under Speak in while its switch is on."""
+        return self._lang() if self.sw_lang.isChecked() else None
+
     def translating(self) -> mods.ModuleInfo | None:
-        """The language picked under Speak in, when it's downloaded and ready."""
-        m = self._lang()
+        """The language picked under Speak in, switched on, downloaded and ready."""
+        m = self._lang_on()
         ok = self.module is not None and self.module.installed
         return m if ok and m is not None and m.installed else None
 
@@ -2058,14 +2084,15 @@ class SpeechPanel(QWidget):
     def _refresh_translation(self):
         """The box under "Speak in": download it, get its Windows voice, or all set."""
         m = self._lang()
-        if m is not None:
-            name = langnames.of(m)
+        on = self._lang_on()
+        if on is not None:
+            name = langnames.of(on)
             self.lbl_delay.setText(_(
                 "⏱ Others hear you in {language} a few seconds late: each sentence is "
                 "written down, translated, then spoken once you've finished it. It works "
                 "with the AI voice, the voice changer and the computer voice; your real voice "
                 "is muted meanwhile.", language=name))
-        self.lbl_delay.setVisible(m is not None)
+        self.lbl_delay.setVisible(on is not None)
         busy = self._dl_busy is not None
         self.tr_box.setVisible(m is not None or busy)
         for b in (self.b_dl, self.b_dl_cancel, self.b_voice_install, self.b_voices,
@@ -2384,7 +2411,7 @@ class SpeechPanel(QWidget):
         lang = str(self.s["language"]).strip().lower()
         lang = lang if re.fullmatch(r"auto|[a-z]{2,3}", lang) else "en"
         args = ["--model", model, "--language", lang]
-        m = self._lang()
+        m = self._lang_on()
         self.ctl.live_voice = None
         if m is not None and m.installed:
             args += ["--translate", str(translation.model_dir(m))]
@@ -2395,7 +2422,7 @@ class SpeechPanel(QWidget):
         if on and self.bg_for:           # Start takes over from translating for a voice
             self._stop_bg()
         if on and not self.ctl.live:
-            m = self._lang()
+            m = self._lang_on()
             if m is not None and not m.installed:
                 self._set_live_ui(False, _("Download {language} first (above).",
                                            language=langnames.of(m)))
@@ -2466,7 +2493,7 @@ class SpeechPanel(QWidget):
         self.b_live.blockSignals(False)
         self.b_live.setText(_("Stop the computer voice") if on else _("Start the computer voice"))
         self.live_changed.emit(on)
-        for w in (self.cb_model, self.ed_lang, self.cb_lang):
+        for w in (self.cb_model, self.ed_lang, self.cb_lang, self.sw_lang):
             _enable(w, not on, _("Stop the computer voice to change this"))
         _enable(self.b_update, not on and not self._installing,
                 _("Stop the computer voice to change this") if on
@@ -2972,6 +2999,8 @@ class VoicePanel(QWidget):
             sp._bg_note(_("Turn on the AI voice or the voice changer below, or press Start "
                           "for the computer voice, to speak {language}.",
                           language=langnames.of(m)))
+        elif m is None and not sp.bg_for and not sp._bg_warning:
+            sp._bg_note("")               # switched off: no "turn on a voice" hint
 
     # ---- cards that fold away
     def _fold_card(self, key: str, panel: QWidget, title: QLabel) -> QFrame:

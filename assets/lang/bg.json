@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Бързи клавиши",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Слушане: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говорете на английски и другите чуват друг език. AI гласът или гласовият чейнджър го казват, когато един от тях е включен; в противен случай натиснете Старт и компютърен глас го прави.",
   "Type a line and press Enter": "Въведете ред и натиснете Enter",
   "Category": "Категория",
   "Show more": "Покажи още",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Към микрофона ти  <b style='color:{colour}'>✗ не работи</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Нищо за настройване.</b> Discord и игрите си ползват нормалния ти микрофон и звуците ти са в него.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ако звуците накъсват, изключи потискането на шума в гласовото приложение (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> изключено. Не Studio: то прескача Onion Board).",
-  "Sounds chopped up?": "Звуците накъсват?"
+  "Sounds chopped up?": "Звуците накъсват?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Превежда казаното от теб на този език. Изключено: всеки глас говори на английски, а езикът остава избран.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говори на английски, а другите чуват друг език. Включи превключвателя отдолу: AI гласът или гласовият чейнджър го казва, когато единият е включен; иначе натисни Старт и го казва компютърен глас."
 }

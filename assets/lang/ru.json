@@ -3005,7 +3005,6 @@
   "Quick hotkeys": "Быстрые клавиши",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Прослушивание: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говорите на английском, и другие слышат другой язык. Голос AI или устройство смены голоса произносит это, когда один из них включен; в противном случае нажмите «Пуск», и это сделает компьютерный голос.",
   "Type a line and press Enter": "Введите строку и нажмите Enter",
   "Category": "Категория",
   "Show more": "Показать ещё",
@@ -3273,5 +3272,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "В микрофон  <b style='color:{colour}'>✗ не работает</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Настраивать нечего.</b> Discord и игры остаются на твоём обычном микрофоне, а твои звуки уже в нём.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Если звуки обрываются, выключи шумоподавление в голосовом приложении (Discord: <b>Профиль ввода → Пользовательский</b>, <b>Шумоподавление → Нет</b>, <b>Эхоподавление</b> выкл. Не Студия: она пропускает Onion Board).",
-  "Sounds chopped up?": "Звуки обрываются?"
+  "Sounds chopped up?": "Звуки обрываются?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Переводит сказанное вами на этот язык. Выкл.: все голоса говорят по-английски, а язык остаётся выбранным.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говорите по-английски, а другие слышат другой язык. Включите переключатель ниже: скажет ИИ-голос или изменитель голоса, когда один из них включён; иначе нажмите «Пуск», и скажет компьютерный голос."
 }

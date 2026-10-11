@@ -2942,7 +2942,6 @@
   "Quick hotkeys": "Atalhos rápidos",
   "{route}: {status}": "{route}: {status}",
   "Listening: {mode}": "Escuta: {mode}",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Fale em inglês e os outros ouvirão outro idioma. A voz AI ou o trocador de voz diz isso quando um deles está ligado; caso contrário, prima Iniciar e uma voz artificial irá fazê-lo.",
   "Type a line and press Enter": "Escreva uma linha e prima Enter",
   "Category": "Categoria",
   "Show more": "Mostrar mais",
@@ -3200,5 +3199,7 @@
   "Into your mic  <b style='color:{colour}'>✗ not running</b>": "No teu microfone  <b style='color:{colour}'>✗ não está a funcionar</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nada para configurar.</b> O Discord e os jogos mantêm o teu microfone normal, e os teus sons estão nele.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Se os sons ficarem aos bocados, desliga a supressão de ruído da app de voz (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> desligado. Não Studio: ele salta o Onion Board).",
-  "Sounds chopped up?": "Sons aos bocados?"
+  "Sounds chopped up?": "Sons aos bocados?",
+  "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Traduz o que dizes para este idioma. Desligado: todas as vozes falam inglês, e o idioma continua escolhido.",
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Fala em inglês e os outros ouvem outro idioma. Liga o interruptor abaixo: a voz de IA ou o modificador de voz diz quando um deles está ligado; caso contrário, prime Iniciar e uma voz de computador diz."
 }
