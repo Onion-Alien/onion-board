@@ -56,6 +56,35 @@ def _ink_box(img, rect):
     return QRect(QPoint(min(xs), min(ys)), QPoint(max(xs), max(ys)))
 
 
+@pytest.mark.parametrize("theme_name", ["Dark", "Light"])
+@pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
+def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_name,  # noqa: F811
+                                                         direction):
+    from soundboard import theme
+
+    theme.apply(qapp, theme_name)
+    window.setLayoutDirection(direction)
+    window.resize(1180, 720)
+    window.show()
+    rail = window.rail
+    for _ in range(2):
+        rail.set_open(False)
+        qapp.processEvents()
+        img = rail.grab().toImage()
+        mark, switch, stop = [_ink_box(img, QRect(w.mapTo(rail, QPoint()), w.size()))
+                              for w in (rail.output.mark, rail.output.switch, window.stop_btn)]
+        above = switch.top() - mark.bottom() - 1
+        below = stop.top() - switch.bottom() - 1
+        assert abs(above - below) <= 1
+        assert above >= 16
+        rail.set_open(True)
+        qapp.processEvents()
+        assert rail.output._switch_gap.sizeHint().width() == rail.output.SWITCH_GAP
+        assert rail.output._switch_gap.sizeHint().height() == 0
+        if direction == Qt.LeftToRight:
+            _assert_keylines(rail.output)
+
+
 def _assert_keylines(output, setup=True):
     """Every icon is centred on its label's first-line cap height and every line of
     words starts on one keyline (docs/DESIGN.md *Icon and text alignment*)."""
