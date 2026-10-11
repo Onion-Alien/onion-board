@@ -85,6 +85,8 @@ jobs:
     outputs:
       tests: ${{ steps.pick.outputs.tests }}
       matrix: ${{ steps.pick.outputs.matrix }}
+      shards: ${{ steps.pick.outputs.shards }}
+      shard_tests: ${{ steps.pick.outputs.shard_tests }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -107,6 +109,11 @@ jobs:
           matrix=$(python scripts/pick_tests.py "$base" --matrix)
           echo "tests=$tests" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          # the test jobs' matrix is just the shard names ("1/4"), each job's files
+          # looked up by name: a job skipped before it starts never gets its matrix, and
+          # a name built from matrix.shard showed up on it as raw expression text
+          echo "shards=$(jq -c '[.[].shard]' <<< "$matrix")" >> "$GITHUB_OUTPUT"
+          echo "shard_tests=$(jq -c 'map({(.shard): .tests}) | add // {}' <<< "$matrix")" >> "$GITHUB_OUTPUT"
           echo "Tests to run: ${tests:-none}"
           echo "Windows jobs: $matrix"
       - run: |
@@ -123,11 +130,11 @@ jobs:
   windows:
     needs: pick
     if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: ${{ matrix.shard && format('test (Windows {0})', matrix.shard) || 'test (Windows)' }}
+    name: test-windows   # GitHub adds the shard: "test-windows (1/4)"
     strategy:
       fail-fast: false   # each job's failures are listed in full
       matrix:
-        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
+        shard: ${{ fromJSON(needs.pick.outputs.shards) }}
     runs-on: windows-latest
     timeout-minutes: 20   # a hung test fails the run instead of holding it for hours
     steps:
@@ -170,7 +177,7 @@ jobs:
           .venv/Scripts/python -m pytest --durations=20 --reruns 2 -rfER $TESTS | tee pytest.log
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ matrix.tests }}
+          TESTS: ${{ fromJSON(needs.pick.outputs.shard_tests)[matrix.shard] }}
       - name: Flaky tests (passed on a rerun)
         if: always()
         shell: bash
@@ -219,12 +226,11 @@ jobs:
   test-linux:
     needs: pick
     if: ${{ github.event_name != 'pull_request' && needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    # a skipped job never gets its matrix, so a bare matrix.shard shows up as raw text
-    name: ${{ matrix.shard && format('test-linux ({0})', matrix.shard) || 'test-linux (main only)' }}
+    name: test-linux   # GitHub adds the shard: "test-linux (1/4)"
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
+        shard: ${{ fromJSON(needs.pick.outputs.shards) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -254,7 +260,7 @@ jobs:
           .venv/bin/python -m pytest --durations=20 --reruns 2 -rfER $TESTS | tee pytest.log
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ matrix.tests }}
+          TESTS: ${{ fromJSON(needs.pick.outputs.shard_tests)[matrix.shard] }}
       - name: Flaky tests (passed on a rerun)
         if: always()
         shell: bash
