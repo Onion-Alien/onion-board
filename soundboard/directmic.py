@@ -532,6 +532,20 @@ class DirectMicStream:
             self._ring.write(out.mean(axis=1, dtype=np.float32))
             n -= k
 
+    def _catch_up(self):
+        """(Re)starting on the clean mic: the effect went on reading meanwhile. Paced by
+        the mic from here on, the board never got back a lead ahead of where it reads,
+        and the effect waits for just that: after a quick reopen (a buffering change)
+        the board's sounds stayed off the mic. Silence up to a lead past it fixes that."""
+        ring = self._ring
+        slots = ring.live_slots()
+        if not len(slots):
+            return
+        short = (int(slots["read_pos"].max()) + int(slots["lead"].max()) + 2 * BLOCK
+                 - ring.write_pos)
+        if 0 < short <= CAPACITY // 4:
+            ring.write(np.zeros(short, np.float32))
+
     def _pump(self):
         ring = self._ring
         now = _tick()
@@ -541,6 +555,7 @@ class DirectMicStream:
             if not self.mic_live or rate != self.mic_rate or gap < 0 or gap > MIC_CAPACITY // 2:
                 self._mic_pos, self.mic_rate, self._acc = wp, rate, 0.0   # (re)start here
                 self.mic_live = True
+                self._catch_up()
                 ring.heartbeat()
                 return
             if gap == 0:
