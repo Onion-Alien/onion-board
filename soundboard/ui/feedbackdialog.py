@@ -122,10 +122,10 @@ class FeedbackDialog(QDialog):
         self.send_btn.setObjectName("primary")
         self.send_btn.setDefault(True)
         self.send_btn.clicked.connect(self.send)
-        # on the left, the main one first: where the eye starts reading
+        # bottom-right, the main one first
+        row.addStretch(1)
         row.addWidget(self.send_btn)
         row.addWidget(cancel)
-        row.addStretch(1)
         v.addSpacing(6)
         v.addLayout(row)
         # what Send does with the picks (usage.improve): said where people decide
@@ -212,9 +212,9 @@ class FeedbackDialog(QDialog):
         self.form_btn = QPushButton(_("Open the feedback form"))
         self.form_btn.setObjectName("primary")
         self.form_btn.clicked.connect(self.open_form)
+        row.addStretch(1)
         row.addWidget(self.form_btn)
         row.addWidget(done)
-        row.addStretch(1)
         v.addSpacing(6)
         v.addLayout(row)
         return w

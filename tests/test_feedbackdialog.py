@@ -21,8 +21,10 @@ def test_improve_sends_only_known_names_and_the_tidied_other(monkeypatch):
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage.net, "allowed", lambda f: True)
     monkeypatch.setattr(usage, "send", lambda payload: sent.append(payload) or True)
-    monkeypatch.setattr(usage.threading, "Thread",
-                        lambda target, args, **kw: SimpleNamespace(start=lambda: target(*args)))
+    # only usage's own threads run inline (patching threading.Thread itself breaks
+    # any other thread that starts meanwhile)
+    monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=lambda target, args, **kw:
+                        SimpleNamespace(start=lambda: target(*args))))
     cfg = SimpleNamespace(stats_id="abc")
     assert usage.improve(cfg, ["looks", "nonsense", "other"], "Dark mode me@example.com")
     assert [h["path"] for h in sent[0]] == ["improve/looks", "improve/other/dark-mode"]
@@ -40,8 +42,10 @@ def test_follow_ups_go_under_their_pick_and_only_known_names(monkeypatch):
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage.net, "allowed", lambda f: True)
     monkeypatch.setattr(usage, "send", lambda payload: sent.append(payload) or True)
-    monkeypatch.setattr(usage.threading, "Thread",
-                        lambda target, args, **kw: SimpleNamespace(start=lambda: target(*args)))
+    # only usage's own threads run inline (patching threading.Thread itself breaks
+    # any other thread that starts meanwhile)
+    monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=lambda target, args, **kw:
+                        SimpleNamespace(start=lambda: target(*args))))
     picks = ["bugs", "bugs/crashes", "sounds/made-up", "looks/crowded", "sounds", "sounds/music"]
     usage.improve(SimpleNamespace(stats_id="abc"), picks, bugs="Crashes when I alt-tab")
     assert [h["path"] for h in sent[0]] == [

@@ -116,17 +116,21 @@ class SourceDialog(QDialog):
         self.btn_copy.clicked.connect(self._copy)
         close = QPushButton(_("Close"))
         close.clicked.connect(self.accept)
+        # the dialog's actions bottom-right, the main one first
+        row.addStretch(1)
         for b in (self.btn_open, self.btn_copy, close):
             row.addWidget(b)
+        # the bin acts on the details above: on the left, beside them, last in Tab
+        # order; focus starts on Open (set below), never on deleting
         self.btn_forget = QPushButton()
         self.btn_forget.setObjectName("iconbutton")
         icons.set_icon(self.btn_forget, "trash", "danger_text")
         self.btn_forget.setToolTip(_("Delete info"))
         self.btn_forget.setAccessibleName(_("Delete info"))
         self.btn_forget.clicked.connect(self._forget)
-        row.addWidget(self.btn_forget)
-        row.addStretch(1)
+        row.insertWidget(0, self.btn_forget)
         v.addLayout(row)
+        self.btn_open.setFocus()
         self.setMaximumWidth(620)
 
     def _forget(self):

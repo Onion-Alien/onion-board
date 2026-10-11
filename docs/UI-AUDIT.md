@@ -13,14 +13,22 @@ the affected states; include its PR and validation evidence here.
 
 ## Fix first
 
-- [ ] **U1: Consistent dialog actions.** Feedback uses left-first Send/Cancel;
-  Settings Done and Edit sound actions are right-aligned in previews. Recording's
-  saved-state row and Program picker also put actions after a stretch in code.
-  Targets: `settings.py`, `ui/dialogs.py`, `ui/recordmic.py`, `ui/programpick.py`.
-  Reuse/extract a small action-row helper in the shared UI layer. Acceptance: main
-  action at logical start, then alternatives/Cancel/Done, one filled action;
-  preview/reset stays with its content. Verify recording before/after capture,
-  Edit Save/Save as new sound/Cancel, Enter/Escape, and narrow translated layouts.
+- [x] **U1: Consistent bottom-right dialog actions.** The original audit treated
+  right-aligned actions as a defect under the old design rule. That finding is
+  superseded: bottom-right is the intended pattern, and Settings, Edit sound,
+  Recording and the Program picker already followed it (PR #396, which moved them
+  left, was closed unmerged). Acceptance: stretch before the bottom-right action
+  group, main action first within the group, then alternatives/Cancel/Done, one
+  filled action; preview/reset stays with its content.
+
+  Done (PR #398): the remaining left-aligned footers moved bottom-right: Send
+  feedback (both pages), Count me in (Done) and the sound source box (Open, Copy
+  link, Close; its Delete info bin stays on the left beside the details and stays
+  last in focus order). Order, defaults, Escape and focus unchanged; checked
+  offscreen in Dark and Light, English and German (`tests/test_dialog_actions.py`).
+  Left as is on purpose: Recently deleted's Bring back / Delete for good act on the
+  list above them (its Close is already bottom-right); setup and reset guides keep
+  Back on the left and Next/Go on the right.
 
 - [ ] **U2: A clear rule for choice controls.** Recording source uses radio tiles;
   Appearance's live indicator and Connection use plain radios; output modes use
@@ -88,14 +96,17 @@ origin/main in an isolated branch/worktree; check open PRs for overlapping work.
 Read docs/DESIGN.md: Fluent 2 supplies interaction guidance; our Qt components,
 themes and local action-order rules supply the implementation. Follow section 0
 for controls/surfaces and section 14 for the UI workflow.
-Use docs/UI-AUDIT.md as the backlog. Reverify and implement U1 first as a focused
-PR, then work through U2-U4 in separate reviewed changes. Report intentional
+Use docs/UI-AUDIT.md as the backlog. U1 requires bottom-right dialog actions:
+stretch before the action group, main action first within that group, then
+alternatives/Cancel/Done. Ordinary fields and card/toolbar actions stay beside
+their content. U1 is done (PR #398); work through U2-U4 in separate changes. Report intentional
 differences instead of forcing every choice into one widget type. Preserve live
 settings versus draft Save/Cancel, preview, keyboard access and window lifetimes.
 Reuse small shared helpers, translate changed UI text in every language, inspect
 offscreen screenshots of the full affected page and secondary states, run scoped
 precommit checks, and show the pictures. Never launch the live app without asking.
-Follow repository CI and local UTC merge rules. Update the backlog with each
+Leave PRs open for review; do not merge unless explicitly asked. Any authorized
+merge must follow the repository's local UTC merge rules. Update the backlog with each
 completed PR and validation; leave unverified items open. This document records
 existing observations; no UI fixes have been implemented by the documentation PR.
 ```
