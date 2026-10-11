@@ -22,7 +22,7 @@ the affected states; include its PR and validation evidence here.
   preview/reset stays with its content. Verify recording before/after capture,
   Edit Save/Save as new sound/Cancel, Enter/Escape, and narrow translated layouts.
 
-  Done (PR #TODO): added `panel.action_row` (buttons left to right, stretch last) and
+  Done (PR #396): added `panel.action_row` (buttons left to right, stretch last) and
   used it in all four. Control/surface: dialog action rows. Changes: draft/live, each
   dialog's own contract kept (Settings Done closes live settings; Edit Save commits a
   draft; Record Save adds a pad; picker Add returns the choice). Actions: one filled
