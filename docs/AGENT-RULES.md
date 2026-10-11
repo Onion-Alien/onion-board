@@ -69,6 +69,12 @@ Every task, before changing anything (details in `CLAUDE.md`):
 - Anything the native mic effect reads (the ring file) is fuzzed:
   `scripts/fuzz_directmic.py`, and `scripts/build_directmic.py --testhost` before the
   `test_directmic.py` tests, which CI skips.
+- The mic effect's admin install / uninstall (`soundboard/directmic.py`: copying the DLL,
+  registering it, putting it on a mic, taking it off) is fuzzed at every registry write:
+  **run `python scripts/sim_directmic.py` after changing it, or the ring layout**, before
+  opening the PR. It drives the real code against the fake registry and checks a mic
+  always ends up exactly as it started, even when the step is cut off half-way (a crash,
+  a reboot). CI runs the normal-path tests; this reaches the interrupted paths by hand.
 
 ### Tests (about 24)
 - Garbage collection runs only on the UI thread (`soundboard/uigc.py`). Python's GC on an
