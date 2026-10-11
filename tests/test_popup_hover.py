@@ -4,8 +4,12 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QDialog, QMenu, QPushButton, QVBoxLayout
 
+from conftest import real_pc_mouse
 from soundboard.ui.panel import HoverCard
 from test_mainwindow import window  # noqa: F401
+
+
+pytestmark = real_pc_mouse
 
 
 @pytest.mark.parametrize("popup_type", [QMenu, QDialog])

@@ -167,6 +167,10 @@ _refuse_closed_ports_at_once()
 # the only stall.
 real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
                                     reason="wall-clock audio timing: too noisy on CI")
+# Hover state (underMouse) follows the real cursor: QTest.mouseMove moves it on a PC,
+# but a hosted runner's desktop has no cursor to move, so hover never starts there.
+real_pc_mouse = pytest.mark.skipif(bool(os.environ.get("CI")),
+                                   reason="needs a real cursor: hosted runners have none")
 
 
 def pytest_configure(config):
