@@ -3040,6 +3040,17 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "已从 {name} 导入 <b>{n}</b> 个音效。要保留吗？"
   ],
+  "Compatibility fixes for games, calls and browsers.": "修复与游戏、通话和浏览器的兼容性问题。",
+  "Install update": "安装更新",
+  "Mic updated: games, calls and browsers hear your sounds.": "麦克风已更新：游戏、通话和浏览器都能听到你的声音。",
+  "Next: Windows will ask permission for OnionBoard.exe.": "接下来：Windows 会请求 OnionBoard.exe 的权限。",
+  "Nothing to update now: your mic settings changed.": "现在没有可更新的：你的麦克风设置已更改。",
+  "The Windows prompt names Python because you're running from source.": "因为你从源代码运行，Windows 提示里显示的是 Python。",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "已取消更新。麦克风照常可用：随时可以在向导里更新。",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows 会请求权限。更新期间声音会短暂中断。",
+  "You can update later in Setup.": "你可以稍后在向导里更新。",
+  "Your mic is already up to date.": "你的麦克风已是最新版本。",
+  "Your mic, upgraded": "麦克风，升级了",
   "Another device": "其他设备",
   "Click Yes when Windows asks.": "Windows 询问时点击“是”。",
   "Discord: one setting worth changing": "Discord：一个值得改的设置",

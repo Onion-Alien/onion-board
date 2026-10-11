@@ -3040,6 +3040,17 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Kami bawa <b>{n}</b> bunyi dari {name}. Simpan?"
   ],
+  "Compatibility fixes for games, calls and browsers.": "Pembaikan keserasian untuk permainan, panggilan dan pelayar.",
+  "Install update": "Pasang kemas kini",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon dikemas kini: permainan, panggilan dan pelayar mendengar bunyi anda.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Seterusnya: Windows akan meminta kebenaran untuk OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Tiada apa untuk dikemas kini: tetapan mikrofon anda telah berubah.",
+  "The Windows prompt names Python because you're running from source.": "Gesaan Windows menyebut Python kerana anda menjalankannya dari kod sumber.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Kemas kini dibatalkan. Mikrofon anda masih berfungsi: kemas kini bila-bila masa dalam Persediaan.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows akan meminta kebenaran. Audio berhenti sekejap semasa kemas kini.",
+  "You can update later in Setup.": "Anda boleh kemas kini kemudian dalam Persediaan.",
+  "Your mic is already up to date.": "Mikrofon anda sudah terkini.",
+  "Your mic, upgraded": "Mikrofon anda, dinaik taraf",
   "Another device": "Peranti lain",
   "Click Yes when Windows asks.": "Klik Ya apabila Windows bertanya.",
   "Discord: one setting worth changing": "Discord: satu tetapan yang patut diubah",

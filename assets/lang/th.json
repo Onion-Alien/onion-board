@@ -3040,6 +3040,17 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "เราย้ายเสียง <b>{n}</b> เสียงมาจาก {name} แล้ว เก็บไว้ไหม?"
   ],
+  "Compatibility fixes for games, calls and browsers.": "แก้ปัญหาความเข้ากันได้กับเกม การโทร และเบราว์เซอร์",
+  "Install update": "ติดตั้งอัปเดต",
+  "Mic updated: games, calls and browsers hear your sounds.": "อัปเดตไมค์แล้ว: เกม การโทร และเบราว์เซอร์ได้ยินเสียงของคุณ",
+  "Next: Windows will ask permission for OnionBoard.exe.": "ต่อไป: Windows จะขออนุญาตสำหรับ OnionBoard.exe",
+  "Nothing to update now: your mic settings changed.": "ตอนนี้ไม่มีอะไรต้องอัปเดต: การตั้งค่าไมค์ของคุณเปลี่ยนไป",
+  "The Windows prompt names Python because you're running from source.": "หน้าต่างของ Windows แสดงชื่อ Python เพราะคุณรันจากซอร์สโค้ด",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "ยกเลิกการอัปเดตแล้ว ไมค์ยังใช้ได้ตามปกติ: อัปเดตได้ทุกเมื่อในเซ็ตอัป",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows จะขออนุญาต เสียงจะหยุดสักครู่ระหว่างอัปเดต",
+  "You can update later in Setup.": "คุณอัปเดตทีหลังได้ในเซ็ตอัป",
+  "Your mic is already up to date.": "ไมค์ของคุณเป็นเวอร์ชันล่าสุดแล้ว",
+  "Your mic, upgraded": "ไมค์ของคุณ อัปเกรดแล้ว",
   "Another device": "อุปกรณ์อื่น",
   "Click Yes when Windows asks.": "คลิกใช่เมื่อ Windows ถาม",
   "Discord: one setting worth changing": "Discord: การตั้งค่าหนึ่งอย่างที่ควรเปลี่ยน",

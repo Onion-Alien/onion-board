@@ -1682,6 +1682,11 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
         kernel32.CloseHandle(info.hProcess)
 
 
+def declined() -> str:
+    """What install/uninstall return when Windows' admin prompt was turned down."""
+    return _("Windows' admin prompt was turned down (or didn't finish).")
+
+
 def install(mic_name: str | None, *, clean: bool = False) -> str | None:
     """Put the effect on the mic called `mic_name` (Windows asks for admin). None when
     done, else what went wrong, in plain words."""
@@ -1692,7 +1697,7 @@ def install(mic_name: str | None, *, clean: bool = False) -> str | None:
         return _("This copy of Onion Board has no mic effect in it.")
     code = _elevated(["reinstall" if clean else "install", guid])
     if code is None:
-        return _("Windows' admin prompt was turned down (or didn't finish).")
+        return declined()
     if code:
         return _("Installing failed (code {code}). The log is in {folder}.",
                  code=code, folder=data_dir().parent)
@@ -1702,5 +1707,5 @@ def install(mic_name: str | None, *, clean: bool = False) -> str | None:
 def uninstall() -> str | None:
     code = _elevated(["uninstall"])
     if code is None:
-        return _("Windows' admin prompt was turned down (or didn't finish).")
+        return declined()
     return _("Removing failed (code {code}).", code=code) if code else None
