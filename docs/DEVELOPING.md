@@ -107,7 +107,7 @@ platform) runs as on Windows; CI runs both. On Debian / Ubuntu:
 sudo apt-get install libportaudio2 libsndfile1 libegl1 libxkbcommon0 libgl1 libfontconfig1 libdbus-1-3 \
   libpulse0 libx11-xcb1 libxrandr2
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt pytest==9.1.1 pytest-xdist==3.8.0 ruff==0.16.9
+.venv/bin/pip install -r requirements.txt pytest==9.1.1 pytest-xdist==3.8.0 pytest-rerunfailures==16.7 ruff==0.16.10
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest
 ```
 
