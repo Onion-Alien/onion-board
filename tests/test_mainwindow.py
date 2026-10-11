@@ -1179,6 +1179,21 @@ def test_full_screen_caps_only_the_search_box(window, qapp):
         window.grid.width() - margins.left() - margins.right() - 4)
 
 
+def test_volume_percent_sits_beside_its_slider_on_the_row_line(window, qapp):
+    """The bottom row's 100% / 70% were right-aligned in a box as wide as "1000%":
+    25-30 px from their slider, and 1 px under the labels beside them."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.resize(1180, 720)
+    QTest.qWait(150)
+    for vol in (window.vol_mic, window.vol_mon):
+        spin = vol.spin
+        assert spin.alignment() & Qt.AlignLeft and spin.alignment() & Qt.AlignVCenter
+        text_x = spin.mapTo(vol, spin.lineEdit().geometry().topLeft()).x()
+        assert text_x - vol.slider.geometry().right() <= 12
+        assert spin.lineEdit().textMargins().bottom() == 2
+
+
 def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     window.apply_theme("Dark")
     window.tabs.setCurrentIndex(0)

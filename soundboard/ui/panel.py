@@ -376,7 +376,13 @@ class VolumeControl(QWidget):
         self.spin.setRange(0, typed_max)
         self.spin.setSuffix("%")
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
-        self.spin.setAlignment(Qt.AlignRight)
+        # beside its slider, on the row's centre line: right-aligned in a box as wide as
+        # "1000%", "70%" sat 30-40 px away from its slider
+        self.spin.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # its text box rounds the centring down: the digits sat 1-1.5 px under the
+        # slider and the labels beside it (measured ink); 2 px less at the bottom
+        # moves the centre up by one
+        self.spin.lineEdit().setTextMargins(0, 0, 0, 2)
         self.spin.setToolTip(_("Type an exact volume (0–{typed_max}%)", typed_max=typed_max))
         if tip:
             self.slider.setToolTip(tip)
