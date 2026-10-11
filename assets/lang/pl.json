@@ -3241,5 +3241,7 @@
   "Playing once": "Odtwarzanie raz",
   "Plays once when it's ready. It isn't added to your sounds.": "Gdy będzie gotowy, odtworzy się raz. Nie zostanie dodany do twoich dźwięków.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Po poprzednich stanie się nowym dźwiękiem na twojej tablicy. Nic nie musisz klikać.",
-  "Waiting to add": "Czeka na dodanie"
+  "Waiting to add": "Czeka na dodanie",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows zostawia {keys} dla siebie, więc nie może to być skrót. Wybierz inny klawisz.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows zostawia <b>{key}</b> dla siebie, więc nie może to być skrót. Wybierz inny klawisz.</span>"
 }

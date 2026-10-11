@@ -226,6 +226,12 @@ class HotkeyDialog(QDialog):
                 | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
                 | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
                 | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
+        if not mods and vk == 0x7B:   # winkeys.reserved: Windows never lets it go
+            self.hint.setText(_("<span style='color:{warn}'>Windows keeps <b>{key}</b> for "
+                                "itself, so it can't be a hotkey. Pick another key.</span>",
+                                warn=theme.status("warn"),
+                                key=pretty_key(winkeys.combo_name(0, vk))))
+            return
         if not mods and is_typing_key(vk) and self._warned_vk != vk:
             # a global hotkey takes the key away from every other program: warn once
             self._warned_vk = vk
@@ -507,14 +513,14 @@ class SettingsDialog(QDialog):
         self.page_title = QLabel(_("Settings"))
         self.page_title.setObjectName("section")
         self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
-        # the arrow over the categories' icons, the name over their names (an
-        # item: 4 px padding, a 20 px icon, then its text 36 px in)
+        # Keep the arrow over the category icons, with room between its hover
+        # background and the heading.
         back.setFixedWidth(36)
         # its icon on the icons' centre line and level with the heading's letters
         # (2 px lower than centred); the same 14 px of padding: the controls' height
         back.setStyleSheet("padding:9px 0px 5px 3px")
         top = QHBoxLayout()
-        top.setSpacing(0)
+        top.setSpacing(8)
         top.addWidget(back)
         top.addWidget(self.page_title, 1)
         side.addLayout(top)

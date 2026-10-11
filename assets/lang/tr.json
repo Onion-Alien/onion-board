@@ -3168,5 +3168,7 @@
   "Playing once": "Bir kez çalınıyor",
   "Plays once when it's ready. It isn't added to your sounds.": "Hazır olunca bir kez çalar. Seslerine eklenmez.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Öncekilerden sonra board'unda yeni bir ses olur. Hiçbir şeye basmana gerek yok.",
-  "Waiting to add": "Eklenmeyi bekliyor"
+  "Waiting to add": "Eklenmeyi bekliyor",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows {keys} tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>"
 }

@@ -3168,5 +3168,7 @@
   "Playing once": "Ipe-play nang isang beses",
   "Plays once when it's ready. It isn't added to your sounds.": "Ipe-play nang isang beses kapag handa na. Hindi ito idadagdag sa sounds mo.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Magiging bagong sound sa board mo pagkatapos ng mga nauna. Wala kang kailangang pindutin.",
-  "Waiting to add": "Naghihintay na maidagdag"
+  "Waiting to add": "Naghihintay na maidagdag",
+  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Nakareserba ang {keys} para sa Windows, kaya hindi ito puwedeng hotkey. Pumili ng ibang key.</span>",
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Nakareserba ang <b>{key}</b> para sa Windows, kaya hindi ito puwedeng hotkey. Pumili ng ibang key.</span>"
 }

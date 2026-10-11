@@ -61,6 +61,12 @@ NAME[0x6B] = "add"   # "num +" would clash with the "+" between keys in a combo
 MODIFIER_VKS = {0x10, 0x11, 0x12, 0x5B, 0x5C, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5}
 
 
+def reserved(combo: str) -> bool:
+    """F12 on its own: Windows keeps it for debuggers, so RegisterHotKey always says
+    another program has it, even with nothing else running."""
+    return parse(combo) == (0, 0x7B)
+
+
 def parse(combo: str) -> tuple[int, int] | None:
     """'ctrl+alt+s' -> (modifier flags, vk). None if it can't be parsed."""
     mods, vk = 0, None

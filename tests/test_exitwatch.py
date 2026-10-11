@@ -36,6 +36,21 @@ def test_a_clean_quit_leaves_nothing_to_explain(app_dir):
     assert not (app_dir / exitwatch.NATIVE).exists()
 
 
+def test_faulthandler_is_armed_early_and_exitwatch_takes_over(app_dir):
+    """app.py reads the last run's native-crash.txt, then arm_faulthandler before the
+    window is built (a native crash while Qt/modules load is caught); ExitWatch's own
+    handle replaces the early one at start()."""
+    (app_dir / exitwatch.NATIVE).write_text("old run's stacks", encoding="utf-8")
+    _, native = exitwatch.read_last(app_dir)
+    assert native == "old run's stacks"        # app.py reads it first...
+    exitwatch.arm_early(app_dir)               # ...then arms faulthandler (a fresh file)
+    assert exitwatch._early_native is not None
+    assert (app_dir / exitwatch.NATIVE).read_text(encoding="utf-8") == ""
+    w = exitwatch.start(app_dir)               # ExitWatch's own handle takes over
+    assert exitwatch._early_native is None and w._native is not None
+    exitwatch.stopped()
+
+
 def test_a_native_crash_names_the_error_and_our_deepest_line():
     assert exitwatch.native_summary(_native()) == ("access-violation",
                                                    "soundboard/engine.py:1090")

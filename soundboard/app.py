@@ -427,11 +427,13 @@ def main():
         except Exception as e:  # noqa: BLE001 - a FAILED line, not the frozen exe's error box
             print(f"FAILED: {type(e).__name__}: {e}", file=sys.stderr)
             sys.exit(1)
-    from soundboard import threadnames
+    from soundboard import bootmark, exitwatch, threadnames
     threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
+    last_run = exitwatch.read_last(APP_DIR)   # the last run's black box, before arming wipes it
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
+    exitwatch.arm_early(APP_DIR)   # faulthandler on before the window is built (native crashes)
     from soundboard.library import MIGRATION_ERRORS
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
@@ -468,6 +470,7 @@ def main():
         wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])
     if not claim_single_instance():
         log.info("another Onion Board is running; asked it to come to the front")
+        bootmark.clear(APP_DIR)   # a normal end, not a start that failed
         sys.exit(0)
     register_restart()   # only the copy that runs: a second launch just exits
     # listen at once, not after the ~1 s of imports below: a second launch meanwhile
@@ -493,16 +496,17 @@ def main():
         w = holder["w"] = MainWindow()
     except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
         splash.close()
-        applog.report(where="starting up", fatal=True)
+        applog.report(where="starting up", fatal=True)   # saved and counted as error/
+        bootmark.clear(APP_DIR)   # that report is the trace: not a silent start failure
         sys.exit(1)
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
     from soundboard import usage
-    from soundboard import exitwatch
-    last_run = exitwatch.read_last(APP_DIR)   # before this run's black box replaces it
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
     usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
+    failed_ver, failed_pid = bootmark.previous()   # a start that never got this far
+    bootmark.clear(APP_DIR)   # running.txt (just written) is the marker from here on
     if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
         def why(unclean=unclean):
             try:
@@ -513,6 +517,15 @@ def main():
             if event:   # "": Windows or a power cut ended it, not the app's problem
                 usage.note(event)
         threading.Thread(target=why, daemon=True, name="last-exit").start()
+    elif failed_ver:   # died while loading, before running.txt or the window existed
+        native = last_run[1]
+        def why_failed(ver=failed_ver, pid=failed_pid, native=native):
+            try:
+                usage.note(usage.startup_failed(APP_DIR, ver, pid, native))
+            except Exception:  # noqa: BLE001 - still count it, without the why
+                log.warning("couldn't tell why the last start failed", exc_info=True)
+                usage.note(f"startup-failed/{ver}")
+        threading.Thread(target=why_failed, daemon=True, name="last-start").start()
     import time
     exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
         getattr(app, "hangwatch", None), "beat", time.monotonic()))

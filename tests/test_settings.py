@@ -636,6 +636,22 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
         d.close()
 
 
+@pytest.mark.parametrize("width", [800, 1180])
+@pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
+def test_back_hover_has_room_before_settings_title(window, qapp, width, direction):  # noqa: F811
+    d = _open_in_window(window, qapp, "privacy", width, 720)
+    d.setLayoutDirection(direction)
+    qapp.processEvents()
+    QTest.mouseMove(d.back_btn, d.back_btn.rect().center())
+    qapp.processEvents()
+    arrow, title = d.back_btn.geometry(), d.page_title.geometry()
+    gap = (title.left() - arrow.right() - 1 if direction == Qt.LeftToRight
+           else arrow.left() - title.right() - 1)
+    assert gap >= 8
+    d.back_btn.click()
+    assert not d.isVisible()
+
+
 def test_pages_start_level_with_the_back_row(window, qapp):  # noqa: F811
     """The first card on every page lines up with the top of the back arrow's row."""
     d = _open_in_window(window, qapp, "privacy", 1020, 680)

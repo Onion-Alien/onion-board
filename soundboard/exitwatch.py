@@ -74,6 +74,32 @@ _DLL = re.compile(r"^[A-Za-z0-9_.\-]{1,40}\.(?:dll|exe|pyd)$", re.I)
 
 # -- while running ----------------------------------------------------------------
 
+_early_native = None   # the file faulthandler writes to before ExitWatch takes over
+
+
+def arm_early(app_dir: Path) -> None:
+    """Arm faulthandler before the window is built (app.py, right after applog.setup),
+    so a native crash while Qt and the sound library load -- before ExitWatch exists --
+    is written to native-crash.txt for the next start to read. `read_last` must run
+    first: this opens the file afresh. ExitWatch re-arms with its own handle at start()."""
+    global _early_native
+    try:
+        _early_native = open(Path(app_dir) / NATIVE, "w", encoding="utf-8")
+        faulthandler.enable(_early_native, all_threads=True)
+    except (OSError, RuntimeError, ValueError):
+        log.debug("faulthandler not on (early)", exc_info=True)
+
+
+def _disarm_early() -> None:
+    global _early_native
+    if _early_native is not None:
+        try:
+            _early_native.close()
+        except OSError:
+            pass
+        _early_native = None
+
+
 class ExitWatch:
     """The black box for this run. `ui_stuck()` says how many seconds the window has
     been stuck (hangwatch), read on the heartbeat thread."""
@@ -97,6 +123,7 @@ class ExitWatch:
             faulthandler.enable(self._native, all_threads=True)
         except (OSError, RuntimeError, ValueError):
             log.debug("faulthandler not on", exc_info=True)
+        _disarm_early()   # arm_early's handle is replaced by the one above
         if old is not None:
             try:
                 old.close()
@@ -194,6 +221,7 @@ def stopped():
     for w in _current:
         w.stopped()
     _current.clear()
+    _disarm_early()   # arm_early ran but ExitWatch never started (an early exit)
 
 
 # -- at the next start --------------------------------------------------------------

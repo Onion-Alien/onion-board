@@ -1,0 +1,1 @@
+- Smooth the playback button's circular edge and keep Live tab badges, download controls and source icons crisp on scaled screens.

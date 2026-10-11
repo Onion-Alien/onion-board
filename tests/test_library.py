@@ -268,3 +268,22 @@ def test_settings_named_like_the_windows_own_state_are_ignored():
     # in config.json they made Config(**known) fail, and a good config was set aside
     c = Config.from_raw({"read_only": True, "load_note": "hi", "mon_vol": 0.5})
     assert c.mon_vol == 0.5 and c.read_only is False and c.load_note == ""
+
+
+def test_a_config_locked_for_a_moment_still_saves(app_dir, monkeypatch):
+    """An antivirus scan holding config.json open made one save fail outright."""
+    real, locked = Path.replace, [2]
+
+    def replace(self, target):
+        if Path(target) == library.CONFIG_PATH and locked[0]:
+            locked[0] -= 1
+            raise PermissionError(32, "being used by another process")
+        return real(self, target)
+
+    monkeypatch.setattr(Path, "replace", replace)
+    c = Config(sound_vol=0.42)
+    assert c.save()
+    assert json.loads(library.CONFIG_PATH.read_text())["sound_vol"] == 0.42
+    locked[0] = 99                                        # never lets go: still a failure
+    c.sound_vol = 0.5
+    assert not c.save()

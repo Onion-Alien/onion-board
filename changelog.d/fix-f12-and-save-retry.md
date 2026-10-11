@@ -1,0 +1,2 @@
+- Plain F12 as a hotkey: the app now says Windows keeps that key for itself (it blamed another program before), and the hotkey picker won't take it.
+- A settings save that hit a file another program had open for a moment (an antivirus scan) is tried again instead of showing "Couldn't save your settings".
