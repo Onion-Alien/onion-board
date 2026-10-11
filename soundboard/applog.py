@@ -271,6 +271,10 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
         log.critical("Unhandled exception%s", f" in {where}" if where else "", exc_info=exc_info)
         rep = build_report(exc_info, where, fatal)
         rep.path = _save(rep)
+        if rep.path is not None:
+            # that saved report is the trace of a start that died while loading: the
+            # next start won't also count a startup-failed for the same crash
+            _clear_bootmark(Path(_state["log_path"]).parent)
         if fatal or not _late_callback(v):
             _offer(rep, sig)
         return rep
@@ -287,6 +291,19 @@ def _late_callback(v) -> bool:
     C++ object (...) already deleted"). Still a bug, so it's saved and counted like any
     other, but the window is gone and the user lost nothing: no dialog for it."""
     return isinstance(v, RuntimeError) and "already deleted" in str(v)
+
+
+def _clear_bootmark(app_dir) -> None:
+    """A saved crash report is the trace of a start that died while loading (an
+    unhandled exception after the hooks went in, before `running.txt` was written):
+    take the start-up breadcrumb (bootmark.py) away with it, or the next start would
+    count that one crash twice -- `error/` and `startup-failed/`. Mid-run the
+    breadcrumb is already gone: a no-op. Never raises."""
+    try:
+        from soundboard import bootmark
+        bootmark.clear(app_dir)
+    except Exception:  # noqa: BLE001 - never let this break the reporter
+        log.debug("couldn't clear the start-up breadcrumb", exc_info=True)
 
 
 # Windows errors that are the PC's state, not a bug: in use (32, 33), access denied (5),

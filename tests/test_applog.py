@@ -57,6 +57,18 @@ def test_report_saves_scrubbed_file_and_offers_it(fresh):
     assert shown == [rep]
 
 
+def test_a_saved_report_takes_the_start_up_breadcrumb_with_it(fresh):
+    """A start that dies after applog's hooks are in leaves a saved crash report
+    behind (counted as error/): the start-up breadcrumb (bootmark.py) must go with
+    it, or the next start would count the same crash again as startup-failed."""
+    log_path, _ = fresh
+    from soundboard import bootmark
+    bootmark.mark("1.9.28", log_path.parent)   # the start is under way
+    rep = applog.report(_raise(ValueError("boom")), where="starting up")
+    assert rep.path is not None
+    assert not (log_path.parent / bootmark.NAME).exists()
+
+
 def test_same_bug_is_offered_once(fresh):
     _, shown = fresh
 
