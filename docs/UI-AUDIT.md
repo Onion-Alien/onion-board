@@ -109,7 +109,7 @@ the affected states; include its PR and validation evidence here.
   files here" hint. Checked offscreen in Dark, Light, High Contrast and Retro 98 at
   narrow and normal sizes.
 
-  Done (PR #PRNUM): one colour list for both Sounds Colour menus
+  Done (PR #414): one colour list for both Sounds Colour menus
   (`padbatch.fill_colour_menu`): named colours (the bulk one showed `#1fb6ff`), the
   current one ticked on its own dot (the category one had a typed "✓" and bold). The
   Apps card's Categories tick the program's category (it was greyed out) and keep
