@@ -94,7 +94,8 @@ fake registry, killing it at every write (when to run it: AGENT-RULES *Audio pat
 stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
 app imports, and tests marked `@pytest.mark.windows` (or a file's `pytestmark`) are
 skipped. Everything else (mixing, effects, config, the windows on Qt's offscreen
-platform) runs as on Windows; CI runs both. On Debian / Ubuntu:
+platform) runs as on Windows. CI runs the Linux tests only when asked:
+`gh workflow run checks.yml -f linux=true`. On Debian / Ubuntu:
 
 ```sh
 sudo apt-get install libportaudio2 libsndfile1 libegl1 libxkbcommon0 libgl1 libfontconfig1 libdbus-1-3 \
