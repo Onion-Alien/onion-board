@@ -494,7 +494,8 @@ class Pad(QAbstractButton):
         self._font_key = self.font().key()
         self._accent: tuple[str | None, QColor] = (None, QColor())   # (meta.color, its QColor)
         # (what the footer shows, its font, text and badge)
-        self._foot: tuple[tuple | None, tuple[QFont, str, tuple[str, int] | None] | None] =             (None, None)
+        self._foot: tuple[tuple | None, tuple[QFont, str, tuple[str, int] | None] | None] = \
+            (None, None)
         self._linked = (None, "")     # (meta.file, its path when outside the library)
         self._link_rect: QRectF | None = None   # where the linked-file mark was painted
         self._wheel = 0               # Ctrl+wheel turned less than a notch (touchpads)
