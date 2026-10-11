@@ -1029,10 +1029,8 @@ class PadGrid(QWidget):
     reorder = Signal(str, int)   # sound id, new index
     files_dropped = Signal(list)
     image_dropped = Signal(str, str)   # sound id, picture file dropped on its pad
-    HOW_TO = _("Drop sound files here\nor click  ＋ Add sounds\n\n"
-               "mp3 · wav · ogg · flac\nm4a · even video files")
+    HOW_TO = DROP_HINT = _("Drop sound files here")
     NO_MATCH = _("No sounds match the search\nor this category")
-    DROP_HINT = _("Drop sound files here")
     DROP_HINT_HEIGHT = 110
 
     def __init__(self):

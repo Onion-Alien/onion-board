@@ -850,7 +850,6 @@
   "Downloads": "ダウンロード",
   "Downloads the newest {name} again and puts it in place of this one. Your own things are kept.": "最新の {name} をもう一度ダウンロードして、これと入れ替えます。自分で作ったものは残ります。",
   "Drag along the rainbow to pick the highlight colour": "虹の上をドラッグしてハイライト色を選ぶ",
-  "Drop sound files here\nor click  ＋ Add sounds\n\nmp3 · wav · ogg · flac\nm4a · even video files": "ここにサウンドファイルをドロップ\nまたは ＋ サウンドを追加 をクリック\n\nmp3 · wav · ogg · flac\nm4a · 動画ファイルも OK",
   "EQ off": "EQ オフ",
   "Empties the bin. It's kept in the restore point.": "ごみ箱を空にします。中身は復元ポイントに残ります。",
   "Enable remote control": "リモート操作を有効にする",

@@ -850,7 +850,6 @@
   "Downloads": "下载",
   "Downloads the newest {name} again and puts it in place of this one. Your own things are kept.": "重新下载最新的 {name} 并替换当前这个。你自己的东西会保留。",
   "Drag along the rainbow to pick the highlight colour": "沿着彩虹拖动来选择高亮颜色",
-  "Drop sound files here\nor click  ＋ Add sounds\n\nmp3 · wav · ogg · flac\nm4a · even video files": "把音效文件拖到这里\n或点击  ＋ 添加音效\n\nmp3 · wav · ogg · flac\nm4a · 甚至视频文件",
   "EQ off": "均衡器关闭",
   "Empties the bin. It's kept in the restore point.": "清空“最近删除”。其中的内容会保留在还原点里。",
   "Enable remote control": "启用远程控制",
