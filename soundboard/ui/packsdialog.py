@@ -2,6 +2,7 @@
 add in one click (soundboard.packs), and where to share one of your own."""
 from __future__ import annotations
 
+import html
 import logging
 import threading
 from collections.abc import Callable
@@ -155,8 +156,9 @@ class PacksDialog(QDialog):
         if self._closed:
             return
         if err:
-            self._say(_("Couldn't get the newest list of packs ({error}), so these are "
-                        "the ones this version knows.", error=err))
+            busy.toast(self, html.escape(_(
+                "Couldn't get the newest list of packs ({error}), so these are the ones "
+                "this version knows.", error=err)), "warn")
         if found is None or self._busy:   # don't pull a card out from under a download
             return
         while self.list.count():
@@ -206,7 +208,8 @@ class PacksDialog(QDialog):
         busy.set_busy(card.btn, False)
         card.show_idle()
         if path is None:
-            self._say(_("Couldn't download {name}: {error}", name=card.pack.name, error=err))
+            busy.toast(self, html.escape(_("Couldn't download {name}: {error}",
+                                           name=card.pack.name, error=err)), "error")
             return
         self._say("")
         self._add(Path(path))

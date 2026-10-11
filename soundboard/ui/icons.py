@@ -52,6 +52,18 @@ def _wave(p, fill):
         p.drawLine(QPointF(x, 12 - h / 2), QPointF(x, 12 + h / 2))
 
 
+def _music(p, fill):
+    """A pair of beamed notes, matching the toolbar's round line icons."""
+    path = QPainterPath(QPointF(9, 17))
+    path.lineTo(9, 6)
+    path.lineTo(20, 3)
+    path.lineTo(20, 14)
+    p.drawPath(path)
+    p.drawLine(QPointF(9, 10), QPointF(20, 7))
+    for x, y in ((6, 18), (17, 15)):
+        fill(QPainterPath(), lambda pp, x=x, y=y: pp.addEllipse(QPointF(x, y), 3, 2.5))
+
+
 def _sliders(p, fill):
     for y, k in ((6, 15), (12, 8), (18, 13)):
         p.drawLine(QPointF(3, y), QPointF(21, y))
@@ -281,6 +293,14 @@ def _info(p, fill):
     dot.addEllipse(QPointF(12, 7.5), 1.1, 1.1)
     fill(dot)
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
+
+
+def _more(p, fill):
+    """More actions (a card's rare ones): three dots in a row."""
+    dots = QPainterPath()
+    for x in (5, 12, 19):
+        dots.addEllipse(QPointF(x, 12), 1.9, 1.9)
+    fill(dots)
 
 
 def _alert(p, fill):
@@ -663,7 +683,7 @@ SHAPES = {
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
-    "sliders": _sliders, "wave": _wave, "puzzle": _puzzle,
+    "sliders": _sliders, "wave": _wave, "music": _music, "puzzle": _puzzle,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
     "plus": _plus, "close": _close,
@@ -672,7 +692,7 @@ SHAPES = {
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
-    "shield": _shield, "info": _info, "alert": _alert, "onion": _onion,
+    "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
@@ -712,11 +732,13 @@ class SharpEngine(QIconEngine):
     Pixmaps made ahead of time at a few sizes (16, 20, 24...) get shrunk to the
     18 / 14 / 12 px the app asks for, and to 22 / 18 / 15 px on a 125 % screen,
     which blurs thin lines. This draws each size the first time it's needed, once.
-    `draw(px, mode, state)` returns a `px`-pixel square QPixmap."""
+    `draw(px, mode, state)` returns a `px`-pixel square QPixmap. `pad`: empty pixels
+    after it, so a button's words sit TEXT_GAP from its icon (Qt's own gap is 4 px)."""
 
-    def __init__(self, draw):
+    def __init__(self, draw, pad: int = 0):
         super().__init__()
         self._draw = draw
+        self._pad = pad
         self._made: dict[tuple, QPixmap] = {}
 
     def _get(self, px: int, mode, state) -> QPixmap:
@@ -727,8 +749,15 @@ class SharpEngine(QIconEngine):
         return pm
 
     def scaledPixmap(self, size, mode, state, scale):
-        side = max(1, min(size.width(), size.height()))
+        side = max(1, min(size.width() - self._pad, size.height()))
         pm = QPixmap(self._get(max(1, round(side * scale)), mode, state))
+        if self._pad:
+            wide = QPixmap(round((side + self._pad) * scale), pm.height())
+            wide.fill(Qt.GlobalColor.transparent)
+            p = QPainter(wide)
+            p.drawPixmap(0, 0, pm)
+            p.end()
+            pm = wide
         pm.setDevicePixelRatio(scale)
         return pm
 
@@ -740,8 +769,8 @@ class SharpEngine(QIconEngine):
         painter.drawPixmap(rect, self.scaledPixmap(rect.size(), mode, state, scale))
 
     def actualSize(self, size, mode, state):
-        side = min(size.width(), size.height())
-        return QSize(side, side)
+        side = min(size.width() - self._pad, size.height())
+        return QSize(side + self._pad, side)
 
     def availableSizes(self, mode=QIcon.Mode.Normal, state=QIcon.State.Off):
         return [QSize(s, s) for s in SIZES]
@@ -750,7 +779,7 @@ class SharpEngine(QIconEngine):
         # a copy (QIcon detaching, e.g. on addPixmap, which this engine ignores): Qt
         # deletes it, but PySide drops the Python side as soon as this returns, so
         # keep it here (rare: the app never adds pixmaps to these icons)
-        c = SharpEngine(self._draw)
+        c = SharpEngine(self._draw, self._pad)
         _clones.append(c)
         return c
 
@@ -770,7 +799,7 @@ _cache: dict[tuple, QIcon] = {}
 
 
 def icon(name: str, color: str | None = None, checked_color: str | None = None,
-         selected: str = "accent") -> QIcon:
+         selected: str = "accent", pad: int = 0) -> QIcon:
     """`color`/`checked_color` are theme token names (e.g. "text", "on_accent") or
     literal colours ("#ff4d4f"). `selected` colours the current tab / a highlighted
     list item (accent, not Qt's washed-out tint)."""
@@ -780,7 +809,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
     on = resolve(checked_color or "on_accent")
     sel = resolve(selected)
     muted = resolve("muted")
-    key = (name, normal, on, sel)
+    key = (name, normal, on, sel, pad)
     if key not in _cache:
         def draw(px, mode, state):
             if mode == QIcon.Mode.Disabled:
@@ -792,7 +821,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
             else:
                 col = normal
             return pixmap(name, px, col)
-        _cache[key] = sharp_icon(draw)
+        _cache[key] = QIcon(SharpEngine(draw, pad))
     return _cache[key]
 
 
@@ -805,20 +834,38 @@ def _gone(ref: weakref.ref) -> bool:
     return w is None or not shiboken6.isValid(w)
 
 
-_applied: list[tuple[weakref.ref, str, str | None, str | None]] = []
+_applied: list[tuple[weakref.ref, str, str | None, str | None, int]] = []
+
+# icon to words on a button, the same everywhere (DESIGN.md: 6-8 px); Qt puts 4 px
+TEXT_GAP = 8
 _tabs: list[tuple[weakref.ref, int, str, str | None, bool]] = []
 
 
 def set_icon(widget, name: str, color: str | None = None, checked_color: str | None = None,
-             size: int = 18):
+             size: int = 18, gap: bool = True):
     """Give a button or menu action (anything with setIcon) an icon that follows theme
-    changes."""
-    widget.setIcon(icon(name, color, checked_color))
+    changes. A button with words gets TEXT_GAP between the icon and them; `gap=False`
+    for one lined up on its own icon column (the sidebar's)."""
+    if not gap:
+        widget.setProperty("noTextGap", True)
+    has_text = (hasattr(widget, "setIconSize") and not widget.property("noTextGap")
+                and bool(getattr(widget, "text", str)()))
+    pad = TEXT_GAP - 4 if has_text else 0
+    widget.setIcon(icon(name, color, checked_color, pad=pad))
     if hasattr(widget, "setIconSize"):   # a QAction takes its menu's size
-        widget.setIconSize(QSize(size, size))
+        widget.setIconSize(QSize(size + pad, size))
     # one entry per widget: buttons re-iconed on every click must not grow the list
     _applied[:] = [e for e in _applied if e[0]() is not None and e[0]() is not widget]
-    _applied.append((weakref.ref(widget), name, color, checked_color))
+    _applied.append((weakref.ref(widget), name, color, checked_color, pad))
+
+
+def text_gap(button):
+    """Re-fit the icon's gap after a button's words were dropped or put back (a
+    narrow window's icon-only step): no words, no empty space after the icon."""
+    for ref, name, color, checked, __ in _applied:
+        if ref() is button:
+            set_icon(button, name, color, checked, button.iconSize().height())
+            return
 
 
 _labels: list[tuple[weakref.ref, str, str, int]] = []
@@ -933,11 +980,11 @@ def tab_icon_name(tabs, index: int) -> str | None:
 def retheme_live():
     """Re-draw only the icons in the live colour (a live tab's, the mic pill's) after
     the user picks a new one: retheme() re-draws every icon in the app."""
-    for ref, name, color, checked in _applied:
+    for ref, name, color, checked, pad in _applied:
         w = ref()
         if w is not None and "live_text" in (color, checked):
             try:
-                w.setIcon(icon(name, color, checked))
+                w.setIcon(icon(name, color, checked, pad=pad))
             except RuntimeError:   # the C++ widget is gone
                 pass
     for ref, index, name, tint, badge in _tabs:
@@ -953,12 +1000,12 @@ def retheme():
     _cache.clear()
     _tab_cache.clear()
     alive = []
-    for ref, name, color, checked in _applied:
+    for ref, name, color, checked, pad in _applied:
         w = ref()
         try:
             if w is not None:
-                w.setIcon(icon(name, color, checked))
-                alive.append((ref, name, color, checked))
+                w.setIcon(icon(name, color, checked, pad=pad))
+                alive.append((ref, name, color, checked, pad))
         except RuntimeError:   # the C++ widget is gone
             pass
     _applied[:] = alive

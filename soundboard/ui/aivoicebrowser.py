@@ -7,6 +7,7 @@ edit, delete (Undo, then Recently deleted), or make another.
 """
 from __future__ import annotations
 
+import html
 import threading
 from collections.abc import Callable
 
@@ -316,10 +317,10 @@ class AiVoiceBrowser(QDialog):
     # ------------------------------------------------------------ your own voices
     def edit(self, vid: str | None):
         if vid is None and self.store.full():
-            self._say(ngettext("⚠ You have {n} voice of your own already: delete it to "
-                               "make another.",
-                               "⚠ You have {n} voices of your own already: delete one to "
-                               "make another.", avl.MAX_VOICES))
+            busy.toast(self, html.escape(ngettext(
+                "⚠ You have {n} voice of your own already: delete it to make another.",
+                "⚠ You have {n} voices of your own already: delete one to make another.",
+                avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
             return
         built = [v for v in self.voices if not avl.is_mine(v)]
         d = AiVoiceEditor(built, self.store.get(vid) if vid else None, self.previewer, self)

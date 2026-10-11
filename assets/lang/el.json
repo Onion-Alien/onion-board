@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Δεν έγινε νέα σάρωση",
   "Couldn't reach GitHub ({error}).": "Δεν βρέθηκε το GitHub ({error}).",
   "Couldn't read the {name} board": "Δεν διαβάστηκε ο πίνακας {name}",
-  "Couldn't render it": "Δεν δημιουργήθηκε",
   "Couldn't render the preview with these effects (see the log).": "Δεν δημιουργήθηκε η προεπισκόπηση με αυτά τα εφέ (δες την καταγραφή).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Δεν έγινε επαναφορά: το αρχείο ρυθμίσεων ήταν κλειδωμένο. Δεν άλλαξε τίποτα.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Δεν έγινε ανάκτηση: το αρχείο ρυθμίσεων ήταν κλειδωμένο. Δεν άλλαξε τίποτα.",
@@ -2055,15 +2054,7 @@
   "Save as a voice": "Αποθήκευση ως φωνή",
   "Save clip": "Αποθήκευση κλιπ",
   "Saved clips": "Αποθηκευμένα κλιπ",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Αποθηκευμένα κλιπ ({clips}) · ✓ προστέθηκαν στους ήχους σας",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Αποθηκευμένα κλιπ ({clips}) · ✓ προστέθηκαν {n} στους ήχους σας",
-    "Αποθηκευμένα κλιπ ({clips}) · ✓ προστέθηκαν {n} στους ήχους σας"
-  ],
   "Saved clips ({n})": "Αποθηκευμένα κλιπ ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Αποθηκευμένα κλιπ ({n}) · αντιγράφηκε \"{name}\": Το Ctrl+V το επικολλά σε ένα πρόγραμμα επεξεργασίας ή στην καρτέλα Ήχοι",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Αποθηκευμένα κλιπ ({n}) · δεν υπάρχουν ακουστικά για αναπαραγωγή: επιλέξτε τα από την καρτέλα Ρύθμιση",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Αποθηκευμένα κλιπ ({n}) · πουθενά να τα στείλετε: επιλέξτε πού πηγαίνουν οι ήχοι σας στην καρτέλα Ρύθμιση",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Αποθηκευμένες φωνές που διαγράψατε, κρατήθηκαν για {n} ημέρα, ώστε να μπορείτε να τις επαναφέρετε",
     "Οι αποθηκευμένες φωνές που διαγράψατε, τις κρατήσατε για {n} ημέρες, ώστε να μπορείτε να τις επαναφέρετε"
@@ -3112,7 +3103,12 @@
   "Your sounds and settings are kept.": "Οι ήχοι και οι ρυθμίσεις σου διατηρούνται.",
   "{error}": "{error}",
   "Update mic effect": "Ενημέρωση εφέ μικροφώνου",
-  "Update to new version": "Ενημέρωση στη νέα έκδοση",
+  "Added the voice “{name}”": "Προστέθηκε η φωνή «{name}»",
+  "Added {n} clip to your Sounds": [
+    "Προστέθηκε {n} κλιπ στους ήχους σου",
+    "Προστέθηκαν {n} κλιπ στους ήχους σου"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Αντιγράφηκε το «{name}»: το Ctrl+V το επικολλά σε έναν επεξεργαστή ή στην καρτέλα Ήχοι",
   "Keep": "Διατήρηση",
   "Keep your imported sounds?": "Να κρατηθούν οι εισαγόμενοι ήχοι;",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

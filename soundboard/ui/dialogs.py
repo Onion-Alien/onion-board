@@ -519,7 +519,11 @@ class EditDialog(QDialog):
 
             def done(ok, ms=1500):
                 busy.set_busy(prev, False)
-                self._say(_("▶  Playing") if ok else _("Couldn't render it"), ms)
+                if ok:
+                    self._say(_("▶  Playing"), ms)
+                else:   # the window's corner card says why: the summary comes back
+                    self._saying = False
+                    self._fx_note()
             got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
                              self.fades(), done)
             if got != "rendering":

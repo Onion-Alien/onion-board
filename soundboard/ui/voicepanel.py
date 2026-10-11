@@ -1067,6 +1067,9 @@ class VoiceFxPanel(QWidget):
         self.pick(name)
         if self.dlg.isVisible():
             busy.flash(self.btn_import, _("✓ Added"))
+        else:   # nothing else would say it worked
+            busy.toast(self._parent(), _("Added the voice “{name}”", name=html.escape(name)),
+                       "ok")
         return name
 
     @staticmethod
@@ -1727,10 +1730,6 @@ class SpeechPanel(QWidget):
         self.lbl_custom.hide()
         ov.addWidget(self.lbl_custom)
         self.btn_opts.toggled.connect(self.opts.setVisible)
-        self.tts_err = hint_label("")
-        theme.set_tone(self.tts_err, "error")
-        self.tts_err.hide()
-        v.addWidget(self.tts_err)
         # ---- the Say bar (placed by VoicePanel at the top of the tab, out of the
         # crowded bottom): typing a line, then the voice's volume
         self.say_bar, row = bar()
@@ -1748,7 +1747,9 @@ class SpeechPanel(QWidget):
         b_keep = self.b_keep = QPushButton(_("Save as sound"))
         b_keep.setToolTip(_("Keep the line typed here as a pad on the Sounds tab, in this "
                             "voice (with the voice changer, if it's on for the computer voice)"))
-        icons.set_icon(b_keep, "plus", size=12)
+        # its small icon keeps Qt's own gap: the wider one pushed the Voice tab past the
+        # mini player's width
+        icons.set_icon(b_keep, "plus", size=12, gap=False)
         b_keep.clicked.connect(self._save_line)
         self._line_saved.connect(self._line_done)
         row.addWidget(b_say)
@@ -1975,8 +1976,7 @@ class SpeechPanel(QWidget):
             self._recheck_voices_asked()
 
     def _tts_error(self, msg: str):
-        self.tts_err.setText(f"⚠ {msg}")
-        self.tts_err.show()
+        busy.toast(self, html.escape(msg), "error")
 
     def _voice_picked(self, *_):
         self._voice_standin = False   # the user chose this one
@@ -2267,11 +2267,13 @@ class SpeechPanel(QWidget):
         _enable(self.b_live, not self._installing, _("Waiting for the install to finish"))
         self.b_dl_cancel.setEnabled(True)
         self._fill_langs()
-        if err and m is not None:
-            self.lbl_tr.setText(_("Download cancelled.") if err == "cancelled"
-                                else _("\u26a0 {language}: {error}. Check your internet "
-                                       "connection and press Download again.",
-                                       language=langnames.of(m), error=errors.plain(err)))
+        if err == "cancelled" and m is not None:
+            busy.toast(self, html.escape(_("Download cancelled.")))
+        elif err and m is not None:
+            busy.toast(self, html.escape(_(
+                "⚠ {language}: {error}. Check your internet connection and press "
+                "Download again.", language=langnames.of(m), error=errors.plain(err))
+                .removeprefix("⚠ ")), "error")
         self.downloaded.emit()
 
     def _remove_download(self):
@@ -2361,10 +2363,12 @@ class SpeechPanel(QWidget):
             self._refresh_module()
             self.lbl_state.setText(_("Installed. Press Start and talk."))
         else:
-            self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
-                                       "if it keeps failing, run install.bat in the add-on's "
-                                       "folder to see why.",
-                                       error=err or self.lbl_install.text()))
+            last = self.lbl_install.text()
+            self.lbl_install.hide()
+            busy.toast(self, html.escape(_(
+                "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, "
+                "run install.bat in the add-on's folder to see why.",
+                error=err or last).removeprefix("⚠ ")), "error")
 
     def _live_args(self) -> list[str]:
         """The live-voice helper's arguments; sets the voice translated lines use."""

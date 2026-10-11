@@ -178,7 +178,7 @@ class ModeButton(QPushButton):
         self.menu_.addSeparator()
         self.menu_.addAction(icons.icon("info"), _("What do these do?"),
                              lambda: ModesHelp(self.mw).exec())
-        icons.set_icon(self, MODE_ICONS[p.key], size=sidebar.ICON)
+        icons.set_icon(self, MODE_ICONS[p.key], size=sidebar.ICON, gap=False)
         name = (_("Advanced: {label}", label=destination.resolve(d).name)
                 if p is profiles.ADVANCED else p.name)
         who = _("Who's listening")

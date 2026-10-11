@@ -786,7 +786,6 @@
   "Couldn't play it: {error}": "无法播放：{error}",
   "Couldn't re-scan": "无法重新扫描",
   "Couldn't reach GitHub ({error}).": "无法连接 GitHub（{error}）。",
-  "Couldn't render it": "无法生成",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "无法重置：设置文件被锁定了。什么都没改。",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "无法还原：设置文件被锁定了。什么都没改。",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "无法保存重置后的设置。你的还原点在 设置 > 常规 里。",
@@ -2012,14 +2011,7 @@
   "Save as a voice": "另存为声音",
   "Save clip": "保存剪辑",
   "Saved clips": "已保存的剪辑",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "保存的剪辑 ({clips}) · ✓ 添加到您的声音",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "已保存的剪辑 ({clips}) · ✓ 将{n}添加到您的声音中"
-  ],
   "Saved clips ({n})": "已保存的剪辑 ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "已保存的剪辑 ({n}) · 复制的“{name}”：Ctrl+V 将其粘贴到编辑器中或“声音”选项卡上",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "已保存的剪辑 ({n}) · 没有耳机可以播放：在“设置”选项卡上选择它们",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "已保存的剪辑 ({n}) · 无处发送：在“设置”选项卡上选择声音的发送位置",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "您删除的已保存语音将保留{n}天，以便您可以将其恢复"
   ],
@@ -3041,7 +3033,11 @@
   "Your sounds and settings are kept.": "你的声音和设置会保留。",
   "{error}": "{error}",
   "Update mic effect": "更新麦克风效果",
-  "Update to new version": "更新到新版本",
+  "Added the voice “{name}”": "已添加声音“{name}”",
+  "Added {n} clip to your Sounds": [
+    "已将 {n} 个片段添加到你的声音"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "已复制“{name}”：按 Ctrl+V 可粘贴到编辑器或“声音”标签页",
   "Keep": "保留",
   "Keep your imported sounds?": "保留导入的音效吗？",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [

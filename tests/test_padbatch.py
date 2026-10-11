@@ -220,4 +220,5 @@ def test_click_selects_double_click_plays(window):
     QTest.mouseClick(pad, Qt.LeftButton, pos=QPoint(10, 10))
     assert played == [] and w.current == "s0"
     QTest.mouseDClick(pad, Qt.LeftButton, pos=QPoint(10, 10))
+    QTest.mouseRelease(pad, Qt.LeftButton, pos=QPoint(10, 10))   # mouseDClick ends held
     assert played == ["s0"]

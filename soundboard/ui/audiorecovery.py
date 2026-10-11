@@ -1,21 +1,37 @@
-"""Discoverable recovery for Onion Board's Windows microphone effect."""
+"""Discoverable recovery for Onion Board's Windows microphone effect.
+
+The card in Settings > Audio shows where the mic effect stands as a pill. The one fix
+it needs (update, or repair when Windows took it off the mic) is the card's main
+button; the rare actions (repair, clean reinstall, remove) sit behind its ⋯ menu."""
 from __future__ import annotations
 
 import logging
 import threading
 
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout, QGraphicsDropShadowEffect)
+from PySide6.QtWidgets import QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 from shiboken6 import isValid as qt_valid
 
 from soundboard import directmic, errors, theme
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
+from soundboard.ui.widgets import DropdownMenu
 
 log = logging.getLogger(__name__)
+
+
+def look(state):
+    """What the card shows for a directmic.status(): (pill text, pill tone, the one fix
+    offered as the main button, or None)."""
+    off = (_("Off"), "warn", "repair")
+    return {
+        "ready": (_("Ready"), "ok", None),
+        "outdated": (_("Update available"), "warn", "update"),
+        "wiped": off,      # Windows took it off the mic
+        "other": off,      # it's on another mic, not the one picked
+        "missing": (_("Off"), "", None),
+    }.get(state, ("", "", None))
 
 
 def action_text(action):
@@ -116,30 +132,41 @@ class RecoveryCard(QFrame):
         title.setProperty("keepline", True)
         self.heading = title
         head.addWidget(title, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.pill = QLabel()
+        self.pill.setObjectName("pill")
+        self.pill.hide()
+        head.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
         head.addStretch(1)
+        self.more = QPushButton()
+        self.more.setObjectName("iconbutton")
+        self.more.setProperty("quiet", True)
+        self.more.setFixedSize(28, 28)
+        icons.set_icon(self.more, "more")
+        self.more.setToolTip(_("More options"))
+        self.more.setAccessibleName(_("More options"))
+        self.menu = DropdownMenu(self.more)
+        self.menu_actions = {}
+        for action, icon in (("repair", "reload"), ("reinstall", "reload"),
+                             ("remove", "trash")):
+            if action == "remove":
+                self.menu.addSeparator()
+            act = self.menu.addAction(icons.icon(icon), action_text(action))
+            act.triggered.connect(lambda checked=False, a=action: self.confirm(a))
+            self.menu_actions[action] = act
+        self.more.clicked.connect(
+            lambda: self.menu.popup(self.more.mapToGlobal(self.more.rect().bottomLeft())))
+        head.addWidget(self.more, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(head)
         hint = QLabel(_("Fix problems sending sounds into your mic after an update."))
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         v.addWidget(hint)
         row = Flow(gap=8)
-        self.repair = QPushButton(_("Update to new version"))
-        self.repair.setObjectName("primary")
-        self.repair.hide()
-        self.repair.clicked.connect(lambda: self.confirm("update"))
-        row.addWidget(self.repair)
-        self.actions = {"repair": self.repair}
-        for action in ("reinstall", "remove"):
-            button = QPushButton(action_text(action))
-            icons.set_icon(button, "reload" if action == "reinstall" else "trash")
-            if action == "remove":
-                button.setObjectName("danger")
-                button.setProperty("small", True)
-            else:
-                button.setObjectName("small")
-            button.clicked.connect(lambda checked=False, a=action: self.confirm(a))
-            self.actions[action] = button
-            row.addWidget(button)
+        self.fix = QPushButton()
+        self.fix.setObjectName("primary")
+        self.fix.hide()
+        self.fix.clicked.connect(lambda: self.confirm(self.fix.property("action")))
+        row.addWidget(self.fix)
         v.addLayout(row)
         self.note = QLabel()
         self.note.setWordWrap(True)
@@ -148,8 +175,8 @@ class RecoveryCard(QFrame):
         v.addWidget(self.note)
         self.checked.connect(self._checked)
         self.recovery.finished.connect(self._done)
-        self._sync_busy()
         self._checking = False
+        self._sync_busy()
         self.timer = QTimer(self)
         self.timer.setInterval(5000)
         self.timer.timeout.connect(self.check)
@@ -176,19 +203,17 @@ class RecoveryCard(QFrame):
         if mic is not None and mic != (self.mw.cfg.mic_device or ""):
             return
         self._state = state
-        self.repair.setText(_("Update to new version"))
-        self.repair.setVisible(state == "outdated")
-        self.repair.setProperty("recoveryUpdate", state == "outdated")
-        self.repair.style().unpolish(self.repair)
-        self.repair.style().polish(self.repair)
-        if state == "outdated":
-            glow = QGraphicsDropShadowEffect(self.repair)
-            glow.setColor(QColor(theme.T["warn_text"]))
-            glow.setBlurRadius(12)
-            glow.setOffset(0, 0)
-            self.repair.setGraphicsEffect(glow)
-        else:
-            self.repair.setGraphicsEffect(None)
+        if self.recovery.running:
+            return   # the pill says Working… until the fix is done
+        pill, tone, fix = look(state)
+        self.pill.setText(pill)
+        self.pill.setVisible(bool(pill))
+        theme.set_tone(self.pill, tone)
+        self.fix.setVisible(fix is not None)
+        if fix:
+            self.fix.setText(action_text(fix))
+            self.fix.setProperty("action", fix)
+        self.menu_actions["remove"].setEnabled(state != "missing")
 
     def confirm(self, action):
         if self.recovery.running or self.mw._attaching:
@@ -200,55 +225,57 @@ class RecoveryCard(QFrame):
         self.dialog = d
         d.setWindowTitle(action_text(action))
         d.setMaximumWidth(620)
-        d.resize(500, 200)
         v = QVBoxLayout(d)
         v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
         title = QLabel(action_text(action))
-        title.setObjectName("section")
+        title.setObjectName("helptitle")
         v.addWidget(title)
         for text in (explanation(action),
                      _("Windows will ask for permission. Audio will briefly stop, "
-                       "including calls and games."),
-                     _("Your sounds and settings are kept.")):
+                       "including calls and games.")):
             label = QLabel(text)
             label.setWordWrap(True)
             v.addWidget(label)
+        kept = QLabel(_("Your sounds and settings are kept."))
+        kept.setObjectName("hint")
+        kept.setWordWrap(True)
+        v.addWidget(kept)
         row = QHBoxLayout()
+        row.setSpacing(8)
+        row.addStretch(1)
         go = QPushButton(action_text(action))
         go.setObjectName("danger" if action == "remove" else "primary")
+        go.setDefault(True)
         go.clicked.connect(lambda: self._start(action, d))
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(d.reject)
-        row.addStretch(1)
         row.addWidget(go)
         row.addWidget(cancel)
         v.addLayout(row)
-        width = max(go.sizeHint().width(), cancel.sizeHint().width())
-        height = max(go.sizeHint().height(), cancel.sizeHint().height())
-        go.setFixedSize(width, height)
-        cancel.setFixedSize(width, height)
         fit.watch(d)
         d.finished.connect(d.deleteLater)
-        d.show()
+        d.open()
 
     def _start(self, action, dialog):
         if self.recovery.start(action):
             dialog.accept()
-            self.note.setText(_("Working…"))
-            self.note.show()
+            self.note.hide()
             self._sync_busy()
 
     def _sync_busy(self):
-        for button in self.actions.values():
-            busy.set_busy(button, self.recovery.running)
-        if self.recovery.running:
-            self.note.setText(_("Working…"))
-            self.note.show()
+        running = self.recovery.running
+        busy.set_busy(self.fix, running)
+        busy.set_busy(self.more, running)
+        if running:
+            self.pill.setText(_("Working…"))
+            self.pill.show()
+            theme.set_tone(self.pill, "")
 
     def _done(self, action, err, state):
         self._sync_busy()
         self._checked(state)
-        self.note.show()
         self.note.setText(err or (_("Mic effect removed") if action == "remove" else
                                   _("Mic effect reinstalled. Test it in your voice chat.")))
         theme.set_tone(self.note, "warn" if err else "ok")
+        self.note.show()

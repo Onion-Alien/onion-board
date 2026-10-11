@@ -6,6 +6,7 @@ them through whatever tools they use.
 """
 from __future__ import annotations
 
+import html
 from urllib.parse import quote
 
 from PySide6.QtCore import Qt
@@ -195,5 +196,5 @@ class StreamerGuide(QDialog):
     def _copy(self, btn, action: str, query: str):
         QApplication.clipboard().setText(link(self.mw.cfg, action, query))
         busy.flash(btn, _("✓  Copied"))
-        self.state.setText(_("Copied. It holds your key: paste it only into your own tools, "
-                             "never into chat."))
+        busy.toast(self, html.escape(_("Copied. It holds your key: paste it only into your "
+                                       "own tools, never into chat.")), "ok")

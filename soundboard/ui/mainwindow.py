@@ -108,6 +108,7 @@ TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
 UNDO_KEY = "undo-sounds"   # its card (toast key)
+TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
@@ -434,6 +435,16 @@ class MainWindow(QMainWindow):
         self._downloading = False
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
+        # set up for the app you're using (appsetup): the bar's app and what it shows.
+        # Before the Discord check below: on a slow start its answer (_on_discord) comes
+        # in while the splash pumps events, before the end of __init__
+        self._setup_tracker = appsetup.Tracker()
+        self._setup_app: appsetup.Seen | None = None
+        self._setup_state = ""        # "offer", "done" or "" (hidden)
+        self._setup_skipped: set[str] = set()   # answered Not now, this run
+        self._setup_undo: dict | None = None    # the dest settings before a switch
+        self._setup_hide = QTimer(self, singleShot=True)
+        self._setup_hide.timeout.connect(self._hide_setup)
         # Discord's own voice settings (discordcfg), read while it runs: the ones that
         # wipe out sounds get the urgent bar
         self.discord_found: list = []
@@ -540,14 +551,6 @@ class MainWindow(QMainWindow):
         # who's still set to the cable while sounds go straight into the mic (_cable_tip)
         self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
-        # set up for the app you're using (appsetup): the bar's app and what it shows
-        self._setup_tracker = appsetup.Tracker()
-        self._setup_app: appsetup.Seen | None = None
-        self._setup_state = ""        # "offer", "done" or "" (hidden)
-        self._setup_skipped: set[str] = set()   # answered Not now, this run
-        self._setup_undo: dict | None = None    # the dest settings before a switch
-        self._setup_hide = QTimer(self, singleShot=True)
-        self._setup_hide.timeout.connect(self._hide_setup)
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self._voice_tick)
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
@@ -700,14 +703,14 @@ class MainWindow(QMainWindow):
                     tip=_("Offline mode is on: nothing goes online, and what needs the "
                           "internet is hidden. Click to change it."))
         self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
-        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON)
+        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON, gap=False)
         self.btn_offline.setVisible(net.offline())
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
         self.btn_update.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_update.clicked.connect(self.show_update)
-        icons.set_icon(self.btn_update, "next", size=sidebar.ICON)
+        icons.set_icon(self.btn_update, "next", size=sidebar.ICON, gap=False)
         self.btn_update.hide()
         # the two switches for everything at once, whatever tab you're on
         self.btn_air = QPushButton()
@@ -715,7 +718,7 @@ class MainWindow(QMainWindow):
         self.btn_air.setCheckable(True)
         self.btn_air.setChecked(True)
         self.btn_air.toggled.connect(self.set_sending)
-        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON)
+        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON, gap=False)
         self.set_sending(True)
         # Keep the mode controller for shared commands; its full picker lives on Setup.
         from soundboard.ui.destpanel import ModeButton
@@ -728,7 +731,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
-        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON, gap=False)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -736,7 +739,7 @@ class MainWindow(QMainWindow):
         self.gear.clicked.connect(lambda: self.open_settings())
         # (showing its page: the accent, as a selected tab's icon; on_accent was white
         # on the soft fill, all but gone in Light)
-        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON)
+        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON, gap=False)
         self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
         # the onion beside it: the Discord, feedback, a bug report, the code (each only
         # opens a page in the browser, feedback.py)
@@ -745,7 +748,7 @@ class MainWindow(QMainWindow):
         self.btn_about.setProperty("quiet", True)
         self.btn_about.setToolTip(_("Help and community"))
         self.btn_about.setProperty("railtext", _("Help and community"))
-        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON)
+        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON, gap=False)
         self.about_menu = DropdownMenu(self.btn_about)
         self.about_menu.aboutToShow.connect(self._fill_about_menu)
         self.btn_about.clicked.connect(self._show_about_menu)
@@ -930,7 +933,7 @@ class MainWindow(QMainWindow):
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
-        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON)
+        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON, gap=False)
         self.btn_more_tabs.setProperty("railtext", _("More tabs"))
         self.btn_more_tabs.setCursor(Qt.CursorShape.PointingHandCursor)
         # a click left an accent ring on it
@@ -1380,7 +1383,7 @@ class MainWindow(QMainWindow):
         add.setObjectName("soundadd")
         add.setToolTip(_("Add sound files (or drag them onto the window)"))
         add.clicked.connect(self.add_dialog)
-        icons.set_icon(add, "plus", "accent", size=18)
+        icons.set_icon(add, "music", "accent", size=18)
         self.btn_record = QPushButton(_("Record"))
         self.btn_record.setObjectName("soundrecord")
         icons.set_icon(self.btn_record, "mic", size=18)
@@ -3651,6 +3654,33 @@ class MainWindow(QMainWindow):
         bar = next((w for w in (self.transport, self.mixer) if w.isVisible()), None)
         return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
 
+    def toast_mode(self) -> str:
+        """How the corner cards show (ui/toast.py): as cards in the window; as icons on
+        top of the mini player's pads; not at all in the mini player with no pads (a
+        remote: errors wait for the window to grow)."""
+        if not self.is_mini():
+            return "cards"
+        return "icons" if self._pads_scroll.isVisible() else "hidden"
+
+    def toast_expand(self):
+        """A card shrunk to its icon was clicked: make the window big enough to read
+        the cards (and leave the mini player), kept on its screen."""
+        if self.isMinimized():
+            self.showNormal()
+        if self.isMaximized() or self.isFullScreen():
+            return
+        room = self.screen().availableGeometry()
+        want = QSize(min(max(self.width(), TOAST_EXPAND.width()), room.width()),
+                     min(max(self.height(), TOAST_EXPAND.height()), room.height()))
+        if want == self.size():
+            return
+        frame = self.frameGeometry()
+        extra = frame.size() - self.size()   # the title bar and borders
+        x = min(max(frame.x(), room.left()), room.right() + 1 - want.width() - extra.width())
+        y = min(max(frame.y(), room.top()), room.bottom() + 1 - want.height() - extra.height())
+        self.resize(want)
+        self.move(max(room.left(), x), max(room.top(), y))
+
     def _make_radio(self):
         """The Radio tab, or with Radio switched off in Settings > Privacy & security a
         panel saying so: then no directory, player or web view is made at all. (The
@@ -4666,7 +4696,7 @@ class MainWindow(QMainWindow):
     def _stop_all_clicked(self):
         self.stop_all()
         # only an icon on the rail: a tick for a moment says it worked
-        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
         QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
                                                        size=sidebar.ICON))
 
@@ -8264,6 +8294,7 @@ class MainWindow(QMainWindow):
             show = room >= SLIM_PAD_H + m.top() + m.bottom()
             if self._pads_scroll.isHidden() == show:
                 self._pads_scroll.setVisible(show)
+                toastmod.relayout(self)   # icons on the pads, or none without them
 
     def _mini_pad_room(self, size: QSize) -> int:
         """The height above the mini player's card."""
@@ -8302,6 +8333,7 @@ class MainWindow(QMainWindow):
             self.apply_filter(self.search.text())
         finally:
             self.setUpdatesEnabled(True)
+        toastmod.relayout(self)   # cards in the window, icons in the mini player
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)

@@ -803,7 +803,6 @@
   "Couldn't play it: {error}": "इसे नहीं चलाया जा सका: {error}",
   "Couldn't re-scan": "पुनः स्कैन नहीं किया जा सका",
   "Couldn't reach GitHub ({error}).": "GitHub ({error}) तक नहीं पहुंच सका।",
-  "Couldn't render it": "इसे प्रस्तुत नहीं किया जा सका",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "रीसेट नहीं किया जा सका: सेटिंग्स फ़ाइल लॉक हो गई थी। कुछ भी नहीं बदला गया.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "पुनर्स्थापित नहीं किया जा सका: सेटिंग्स फ़ाइल लॉक हो गई थी। कुछ भी नहीं बदला गया.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "रीसेट सेटिंग्स सहेजी नहीं जा सकीं. आपका पुनर्स्थापना बिंदु सेटिंग > सामान्य में है।",
@@ -2058,15 +2057,7 @@
   "Save as a voice": "एक आवाज के रूप में सहेजें",
   "Save clip": "क्लिप सहेजें",
   "Saved clips": "सहेजे गए क्लिप",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "सहेजे गए क्लिप ({clips}) · ✓ आपकी ध्वनि में जोड़े गए",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "सहेजे गए क्लिप ({clips}) · ✓ आपकी ध्वनि में {n} जोड़ा गया",
-    "सहेजे गए क्लिप ({clips}) · ✓ आपकी ध्वनि में {n} जोड़ा गया"
-  ],
   "Saved clips ({n})": "सहेजे गए क्लिप ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "सहेजे गए क्लिप ({n}) · कॉपी किए गए \"{name}\" - Ctrl+V इसे संपादक में या ध्वनि टैब पर चिपकाता है",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "सहेजे गए क्लिप ({n}) · इसे चलाने के लिए कोई हेडफ़ोन नहीं है: उन्हें सेटअप टैब पर चुनें",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "सहेजे गए क्लिप ({n}) · इसे भेजने के लिए कहीं नहीं: सेटअप टैब पर चुनें कि आपकी ध्वनियाँ कहाँ जाएँ",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "आपके द्वारा हटाई गई सहेजी गई आवाज़ें {n} दिन के लिए रखी जाएंगी ताकि आप उन्हें वापस ला सकें",
     "आपके द्वारा हटाई गई सहेजी गई आवाज़ें {n} दिनों तक रखी गईं ताकि आप उन्हें वापस ला सकें"
@@ -3112,7 +3103,12 @@
   "Your sounds and settings are kept.": "आपकी आवाज़ें और सेटिंग सुरक्षित रहेंगी।",
   "{error}": "{error}",
   "Update mic effect": "माइक इफ़ेक्ट अपडेट करें",
-  "Update to new version": "नए संस्करण में अपडेट करें",
+  "Added the voice “{name}”": "आवाज़ “{name}” जोड़ी गई",
+  "Added {n} clip to your Sounds": [
+    "{n} क्लिप आपकी साउंड्स में जोड़ी गई",
+    "{n} क्लिप आपकी साउंड्स में जोड़ी गईं"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” कॉपी किया गया: Ctrl+V इसे किसी एडिटर में या Sounds टैब पर पेस्ट करता है",
   "Keep": "रखें",
   "Keep your imported sounds?": "आयात की गई आवाज़ें रखें?",
   "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
