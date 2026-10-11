@@ -854,6 +854,7 @@ QPushButton#vchip[state="warn"] { color:$warn_text; border-color:$warn_text; bac
 QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
+QLabel#pill[tone="muted"] { border-color:$muted; }
 QLabel#pill[tone="ok"] { color:$live_text; border-color:$live_border; }
 QLabel#pill[tone="warn"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[tone="error"] { color:$error_text; border-color:$error_text; }
