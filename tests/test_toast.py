@@ -215,7 +215,8 @@ def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # no
     t = next(x for x in toast.shown(w) if x.key == "import")
     assert t.kind == "ok" and t.card.action.text() == "Undo"
     t.card.action.click()
-    assert len(w.cfg.sounds) == before and not w.undo_bar.isHidden()   # undo-able too
+    assert len(w.cfg.sounds) == before   # undo-able too
+    assert any(x.key == "undo-sounds" for x in toast.shown(w))
 
 
 def test_the_veil_says_what_a_drop_does():

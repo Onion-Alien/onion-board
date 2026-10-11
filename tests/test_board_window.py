@@ -110,21 +110,26 @@ def _loaded(window, qapp):
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
 
 
+def _undo_card(w):
+    from soundboard.ui import toast
+    return [t for t in toast.shown(w) if t.key == "undo-sounds"]
+
+
 def test_remove_can_be_undone_then_goes_for_good(window, qapp):
     _loaded(window, qapp)
     m1 = window.meta("s1")
     data = window.audio["s1"]
     window.remove_sound("s1")
-    assert window.meta("s1") is None and (not window.undo_bar.isHidden())
+    assert window.meta("s1") is None and _undo_card(window)
     assert Path(m1.file).exists()                  # nothing deleted yet
     window.undo_remove()
     assert [m.id for m in window.cfg.sounds] == ["s0", "s1"]
-    assert window.audio["s1"] is data and not (not window.undo_bar.isHidden())
+    assert window.audio["s1"] is data and not _undo_card(window)
     window.remove_sound("s0")
     window.remove_sound("s1")                      # the first removal is final now
     assert len(window._removed) == 1 and window.cfg.sounds == []
     window._finish_removals()
-    assert window._removed == [] and not (not window.undo_bar.isHidden())
+    assert window._removed == [] and not _undo_card(window)
 
 
 def test_remove_is_finished_on_close(window):

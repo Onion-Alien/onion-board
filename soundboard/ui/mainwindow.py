@@ -107,6 +107,7 @@ TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+UNDO_KEY = "undo-sounds"   # its card (toast key)
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
@@ -424,9 +425,6 @@ class MainWindow(QMainWindow):
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
         self._voice_was: bool | None = None   # voice changer state before a held key
         Pad.single_click = self.cfg.single_click
-        self._undo_timer = QTimer(self)
-        self._undo_timer.setSingleShot(True)
-        self._undo_timer.timeout.connect(self._finish_removals)
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
@@ -545,7 +543,7 @@ class MainWindow(QMainWindow):
         # set up for the app you're using (appsetup): the bar's app and what it shows
         self._setup_tracker = appsetup.Tracker()
         self._setup_app: appsetup.Seen | None = None
-        self._setup_state = ""        # "offer", "done", "switched" or "" (hidden)
+        self._setup_state = ""        # "offer", "done" or "" (hidden)
         self._setup_skipped: set[str] = set()   # answered Not now, this run
         self._setup_undo: dict | None = None    # the dest settings before a switch
         self._setup_hide = QTimer(self, singleShot=True)
@@ -1589,29 +1587,6 @@ class MainWindow(QMainWindow):
         self.playing_row.hide()
         left.addWidget(self.playing_row)
 
-        # ---- "Removed X · Undo": a removed sound can be brought back for a while
-        self.undo_bar = QFrame()
-        self.undo_bar.setObjectName("chip")
-        uh = QHBoxLayout(self.undo_bar)
-        uh.setContentsMargins(10, 4, 4, 4)
-        self.undo_lbl = QLabel()
-        self.undo_lbl.setTextFormat(Qt.PlainText)   # sound names are user / web text
-        uh.addWidget(self.undo_lbl, 1)
-        undo = QPushButton(_("Undo"))
-        undo.setObjectName("primary")
-        undo.setToolTip(_("Put the sound back, exactly as it was. Later: Backup → Recently "
-                          "deleted sounds"))
-        undo.clicked.connect(self.undo_remove)
-        uh.addWidget(undo)
-        dismiss = QPushButton()
-        dismiss.setObjectName("chipstop")
-        dismiss.setToolTip(_("Dismiss"))
-        dismiss.setFixedSize(24, 24)
-        icons.set_icon(dismiss, "stop", size=10)
-        dismiss.clicked.connect(self._finish_removals)
-        uh.addWidget(dismiss)
-        self.undo_bar.hide()
-        left.addWidget(self.undo_bar)
 
         f, th = bar()
         self.btn_pp = QPushButton()
@@ -3506,13 +3481,32 @@ class MainWindow(QMainWindow):
             self._setup_undo = copy.deepcopy(d)
             set_simple(self, app.simple)
             log.info("app setup: %s -> %s mode (remembered)", app.exe, app.simple)
-        self._show_setup("switched" if what == "switch" else "offer", app)
+            self._hide_setup()   # (what it said was about before the switch)
+            self.toast(_("{mode} mode for <b>{name}</b>.", mode=profiles.BY_KEY[app.simple].name,
+                         name=html.escape(app.name)), "ok", SETUP_SWITCHED_MS,
+                       key="app-switch", action=(_("Undo"), self._undo_app_switch),
+                       on_close=self._forget_app_switch)
+            return
+        self._show_setup("offer", app)
+
+    def _undo_app_switch(self):
+        """Undo on "Game mode for X": the mode goes back to how it was."""
+        if self._setup_undo is not None:
+            from soundboard.ui.destpanel import _refresh_views
+            self.cfg.dest = self._setup_undo
+            self._setup_undo = None
+            self.mode_why = ""
+            destination.apply(self.cfg, self.engine)
+            self._save_later()
+            _refresh_views(self)
+
+    def _forget_app_switch(self):
+        self._setup_undo = None
 
     def _show_setup(self, state: str, app: appsetup.Seen):
         self._setup_app, self._setup_state = app, state
         self._setup_hide.stop()
         name = html.escape(app.name)
-        mode = profiles.BY_KEY[app.simple].name
         self.setup_x.setToolTip(_("Hide"))
         self.setup_x.setAccessibleName(_("Hide"))
         self.setup_no.setVisible(state == "offer")
@@ -3522,10 +3516,6 @@ class MainWindow(QMainWindow):
             self.setup_yes.setText(_("Set up"))
             self.setup_x.setToolTip(_("Don't ask about {name} again", name=app.name))
             self.setup_x.setAccessibleName(self.setup_x.toolTip())
-        elif state == "switched":
-            self.setup_lbl.setText(_("{mode} mode for <b>{name}</b>.", mode=mode, name=name))
-            self.setup_yes.setText(_("Undo"))
-            self._setup_hide.start(SETUP_SWITCHED_MS)
         else:
             lines, button = self._setup_checks(app)
             self.setup_lbl.setText("<br>".join(lines))
@@ -3570,16 +3560,6 @@ class MainWindow(QMainWindow):
             log.info("app setup: %s -> %s mode (set up)", app.exe, app.simple)
             self._show_setup("done", app)
             self.app_setup_changed.emit()
-        elif state == "switched":
-            if self._setup_undo is not None:
-                from soundboard.ui.destpanel import _refresh_views
-                self.cfg.dest = self._setup_undo
-                self._setup_undo = None
-                self.mode_why = ""
-                destination.apply(self.cfg, self.engine)
-                self._save_later()
-                _refresh_views(self)
-            self._hide_setup()
         elif app.guide:
             self.show_chat_guide(app.guide)
             if self._setup_state == "done":
@@ -6331,22 +6311,27 @@ class MainWindow(QMainWindow):
         self._rebuild_pads()
         self._fill_categories()
         self.register_hotkeys()
+        # "Removed X · Undo" for a while; after that they're in Recently deleted
         if len(gone) == 1:
-            name = self.undo_lbl.fontMetrics().elidedText(gone[0].name, Qt.ElideRight, 260)
-            self.undo_lbl.setText(_("Removed “{name}”", name=name))
+            name = self.fontMetrics().elidedText(gone[0].name, Qt.ElideRight, 260)
+            text = _("Removed “{name}”", name=name)
         else:
-            self.undo_lbl.setText(_("Removed {n} sounds", n=len(gone)))
-        self.undo_bar.show()
-        self._undo_timer.start(UNDO_S * 1000)
+            text = _("Removed {n} sounds", n=len(gone))
+        t = self.toast(html.escape(text), "", UNDO_S * 1000, key=UNDO_KEY,
+                       action=(_("Undo"), self.undo_remove), on_close=self._finish_removals)
+        if t is not None:
+            t.card.action.setToolTip(_("Put the sound back, exactly as it was. Later: Backup "
+                                       "→ Recently deleted sounds"))
 
     def undo_remove(self):
         """Put the last removed sound(s) back where they were, with everything they had."""
-        self._undo_timer.stop()
-        self.undo_bar.hide()
         if not self._removed:
             return
         done, self._removed = self._removed, []
         self._put_back(done)
+        # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
+        # on_close finds their pack still in use)
+        toastmod.close(self, UNDO_KEY)
 
     def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
         """Put removed sounds back on the board: (meta, the index it had, its audio or
@@ -6384,11 +6369,10 @@ class MainWindow(QMainWindow):
     def _finish_removals(self):
         """The undo window is over: the removed sounds go to Recently deleted
         (soundboard.trash), where they can still be brought back for a while."""
-        self._undo_timer.stop()
-        self.undo_bar.hide()
         # let go of their audio first: Windows won't delete a mapped cache file
         # (soundboard.mapped) while an array still points into it
         done, self._removed = [(m, i) for m, i, _d in self._removed], []
+        toastmod.close(self, UNDO_KEY)   # (its on_close comes back here: nothing left)
         for m, i in done:
             trash.put_sound(m, i)
         if done:

@@ -163,7 +163,8 @@ def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
     w.selection.picked = {"s1", "x1"}
     w.selection.delete()
     assert [m.id for m in w.cfg.sounds] == ["s0", "x0"]
-    assert "2 sounds" in w.undo_lbl.text() and not w.selection.picked
+    from soundboard.ui import toast
+    assert any("2 sounds" in t.text() for t in toast.shown(w)) and not w.selection.picked
     w.undo_remove()
     assert [m.id for m in w.cfg.sounds] == before
     assert set(w.pads) == set(before)
