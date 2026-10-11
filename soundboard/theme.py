@@ -519,6 +519,7 @@ QFrame#card QFrame#micoutput { background:$panel; border:1px solid $border; bord
 QFrame#card QLabel#micguide { padding:2px 0; }
 QFrame#card QLabel#micupdatenote { background:$bg; color:$muted; border-radius:8px; padding:12px; font-size:9pt; }
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
+QFrame#card QFrame#alttile { background:$bg; border-radius:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }
 QPushButton { background:$btn; border:1px solid transparent; border-radius:8px; padding:7px 12px; }
@@ -533,6 +534,7 @@ QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent
 QPushButton:disabled { color:$muted; }
 QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
+QPushButton[guide="true"] { font-size:11pt; padding:9px 20px; border-radius:10px; }
 QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;

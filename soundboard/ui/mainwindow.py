@@ -4100,9 +4100,13 @@ class MainWindow(QMainWindow):
 
     def register_hotkeys(self):
         mapping = {}
+        if self._hotkeys_off and not self.cfg.hotkeys_off_hotkey:
+            # the key that turns them back on was cleared or given to something else:
+            # nothing could turn them on again until a restart, so they're on now
+            self._hotkeys_off = False
+            self.toast(_("Hotkeys are on again."), "ok", key="hotkeys")
         if self._hotkeys_off:   # only the key that turns them back on
-            if self.cfg.hotkeys_off_hotkey:
-                mapping[self.cfg.hotkeys_off_hotkey] = "__hotkeys__"
+            mapping[self.cfg.hotkeys_off_hotkey] = "__hotkeys__"
             self.hotkeys.register(mapping)
             self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
             return
@@ -4616,6 +4620,8 @@ class MainWindow(QMainWindow):
     def toggle_hotkeys(self):
         """All hotkeys off (they type normally again), or back on. Not saved: the app
         always opens with them on."""
+        if not self._hotkeys_off and not self.cfg.hotkeys_off_hotkey:
+            return   # no key to turn them back on with
         self._hotkeys_off = not self._hotkeys_off
         if self._hotkeys_off and self._voice_was is not None:   # a held voice key
             self._set_voice(self._voice_was)
