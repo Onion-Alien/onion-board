@@ -322,7 +322,7 @@ These are the current reference points. Copy their structure before inventing a 
 
 | Screen | What it gets right |
 | --- | --- |
-| Sounds tab board (`ui/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one filled main button (*Add sounds*), the rest quiet. |
+| Sounds tab board (`ui/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
 | Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
 | Setup tab cards | `setcard`: heading, one-line hint, controls, buttons at their own width in a wrapping row. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |

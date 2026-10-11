@@ -23,7 +23,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import net, netlog, quality, sourceinfo, theme, thumbs, usage, videos, ytdl
+from soundboard import library, net, netlog, quality, sourceinfo, theme, thumbs, usage, videos, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
                                 site_folder, to_int16)
 from soundboard.ui import busy
@@ -403,7 +403,10 @@ class LinkBar(QFrame):
                     if kept:
                         videos.link(meta.id, kept)   # the player's Video button shows it
                     saved = (_("Video saved in {folder}.", folder=kept.parent) if kept else
-                             _("No video was saved: this site only gave the sound."))
+                             _("No video was saved: this site only gave the sound.")
+                             if library._ffmpeg() else
+                             _("No video was saved: saving videos needs FFmpeg "
+                               "(Settings > Data & quality)."))
                 except OSError as e:
                     log.warning("couldn't keep the video of %s: %s", url, e)
                     saved = _("The video couldn't be saved ({error}).",
