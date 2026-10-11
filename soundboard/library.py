@@ -497,6 +497,8 @@ class Config:
     stats_plays: int = 0
     # seconds the app was open since the last daily count (usage.open_tick)
     stats_open_s: float = 0.0
+    # sounds fetched from a link or web search since the last daily count (usage.downloaded)
+    stats_downloads: int = 0
     # starts since the last daily count, the version that last ran here (for
     # updated/<from>-to-<to>), and one-off events still waiting to be sent
     stats_launches: int = 0

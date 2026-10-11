@@ -25,7 +25,8 @@ With the daily one, a rough picture of how it's used, each as a bucket or a name
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
 one (`sounds/11-50`, `played/1-10`), how long the app was open since then
-(`open/1-3h`), how many times it was started since then (`launches/2-5`), the system
+(`open/1-3h`), how many sounds were fetched from a link or a web search since then
+(`downloads/2-5`), how many times it was started since then (`launches/2-5`), the system
 (`os/win11`, `os/win10`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
@@ -62,6 +63,7 @@ import re
 import sys
 import threading
 import time
+import urllib.parse
 import urllib.request
 import uuid
 from pathlib import Path
@@ -98,6 +100,14 @@ TRIGGERS_FEATURES = (
     "mode-appear", "mode-vanish", "mode-change", "mode-still", "mode-colour", "ring",
     "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
     "categories", "profiles")
+# the sites a downloaded sound is counted under (download_site); anything else is "other"
+DL_SITES = ("youtube", "tiktok", "soundcloud", "instagram", "x", "reddit", "twitch",
+            "myinstants", "other")
+_DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
+             ("tiktok", ("tiktok.com",)), ("soundcloud", ("soundcloud.com", "snd.sc")),
+             ("instagram", ("instagram.com",)), ("x", ("x.com", "twitter.com")),
+             ("reddit", ("reddit.com", "redd.it")), ("twitch", ("twitch.tv",)),
+             ("myinstants", ("myinstants.com",)))
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -113,7 +123,14 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the Easter eggs, to see if anyone finds them: Pong with Bun opened, left
             # before the end, won or lost; sleepy Bun woken
             "egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
-            "egg-bun-woken")
+            "egg-bun-woken",
+            # sounds fetched from a link or a web search (ui/linkbar.py): the site
+            # (DL_SITES), a pasted link or a search pick, Add as sound or Play once, one
+            # waiting in the queue, a pick already in the library, and the sites that
+            # failed. Never the link, title or search words
+            *(f"dl-{k}" for k in DL_SITES),
+            "dl-link", "dl-search", "dl-add", "dl-play", "dl-queue", "dl-already-have",
+            *(f"dl-failed-{k}" for k in DL_SITES))
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -247,6 +264,36 @@ def open_bucket(seconds: float) -> str:
             else "3-8h" if h < 8 else "8h-plus")
 
 
+def download_site(url: str) -> str:
+    """The site a link is on, as one of DL_SITES: the name only, never the link."""
+    host = (urllib.parse.urlsplit(url).hostname or "").lower()
+    for name, domains in _DL_HOSTS:
+        if any(host == d or host.endswith("." + d) for d in domains):
+            return name
+    return "other"
+
+
+def download_bucket(n: int) -> str:
+    """How many sounds were fetched since the last daily count: 0, 1, 2-5, 6-20 or
+    21-plus."""
+    return ("0" if n <= 0 else "1" if n == 1 else "2-5" if n <= 5 else "6-20" if n <= 20
+            else "21-plus")
+
+
+def downloaded(cfg, url: str, via: str, kind: str, ok: bool) -> None:
+    """A link or web-search pick finished (ui/linkbar.py): `via` "link" or "search",
+    `kind` "add" or "play". Counted as used() names, and one more for the next daily
+    `downloads/` when it worked (only while the count is on, like open_tick)."""
+    site = download_site(url)
+    if not ok:
+        used(f"dl-failed-{site}")
+        return
+    for k in (site, via, kind):
+        used(f"dl-{k}")
+    if enabled() and net.allowed(FEATURE):
+        cfg.stats_downloads = max(0, int(cfg.stats_downloads or 0)) + 1
+
+
 def launch_bucket(n: int) -> str:
     """How many times it was started since the last daily count: 0 (left open since
     then), 1, 2-5 or 6-plus."""
@@ -347,6 +394,7 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"sounds/{bucket(len(cfg.sounds))}")
     out.append(f"played/{bucket(total_plays(cfg) - cfg.stats_plays)}")
     out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
+    out.append(f"downloads/{download_bucket(cfg.stats_downloads or 0)}")
     lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
     out.append(f"lang/{lang}")
     out.append(f"os/{os_tag()}")
@@ -642,6 +690,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     plays = total_plays(cfg)
     opened = cfg.stats_open_s or 0
     launches = cfg.stats_launches or 0
+    downloads = cfg.stats_downloads or 0
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
@@ -656,6 +705,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             cfg.stats_plays = plays
             cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
             cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
+            cfg.stats_downloads = max(0, (cfg.stats_downloads or 0) - downloads)
         cfg.stats_pending = cfg.stats_pending[taken:]   # any kept meanwhile stay
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         if saved is not None:
