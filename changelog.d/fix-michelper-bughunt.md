@@ -1,0 +1,2 @@
+- Mic helper: a request left while the helper is busy with another (a second account's) waits its turn instead of giving up after 20 s and sending Windows' prompt into the lock (code 4).
+- Mic card: an admin step that didn't finish (the prompt left open, admin rights denied) is an error with what to do, not "You clicked No".

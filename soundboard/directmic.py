@@ -1810,7 +1810,7 @@ def cli(args: list[str]) -> int:
             return 0
         if not _is_admin():
             code = _elevated(["remove-all"])
-            return 1 if code is None else code
+            return 1 if code is None or code < 0 else code
         args = ["remove-all"]
     if args[:1] == ["reinstall"] and len(args) == 2 and _GUID.fullmatch(args[1]):
         guid = args[1].lower()
@@ -1958,9 +1958,14 @@ def _via_helper(args: list[str], wait_s: float) -> int | None:
         return None
 
 
+UNFINISHED = -1   # run_elevated: it ran (or couldn't start), but no answer came
+
+
 def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
-    """Run `exe` as admin, hidden (Windows asks first). Its exit code, or None if the
-    prompt was turned down or it didn't finish in `wait_s`."""
+    """Run `exe` as admin, hidden (Windows asks first). Its exit code; None if the
+    prompt was turned down (ERROR_CANCELLED: a No, or a PC that denies admin rights to
+    this account); UNFINISHED if it couldn't start otherwise or didn't finish in
+    `wait_s` (the prompt may still be open: nobody clicked No)."""
     from ctypes import wintypes
 
     class SHELLEXECUTEINFOW(ctypes.Structure):
@@ -1982,12 +1987,13 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
     kernel32.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
     kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
     if not shell32.ShellExecuteExW(ctypes.byref(info)) or not info.hProcess:
-        log.info("%s %s not run (error %s)", Path(exe).name, params[-40:],
-                 ctypes.get_last_error())
-        return None
+        error = ctypes.get_last_error()
+        log.info("%s %s not run (error %s)", Path(exe).name, params[-40:], error)
+        return None if error == 1223 else UNFINISHED   # ERROR_CANCELLED: turned down
     try:
         if kernel32.WaitForSingleObject(info.hProcess, int(wait_s * 1000)) != 0:
-            return None
+            log.info("%s %s didn't finish in %.0f s", Path(exe).name, params[-40:], wait_s)
+            return UNFINISHED
         code = wintypes.DWORD()
         kernel32.GetExitCodeProcess(info.hProcess, ctypes.byref(code))
         return code.value
@@ -1998,6 +2004,13 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
 def declined() -> str:
     """What install/uninstall return when Windows' admin prompt was turned down."""
     return _("Windows' admin prompt was turned down (or didn't finish).")
+
+
+def unfinished() -> str:
+    """What install/uninstall return when the admin step didn't finish (or couldn't
+    start): not a No, so the card never says one was clicked."""
+    return _("Windows' admin step didn't finish. If its prompt is still open, answer it; "
+             "then try again.")
 
 
 def no_helper() -> str:
@@ -2023,6 +2036,8 @@ def install_on(guid: str | None, *, clean: bool = False,
     code = _elevated(["reinstall" if clean else "install", guid], ask_windows=ask_windows)
     if code is None:
         return declined() if ask_windows else no_helper()
+    if code == UNFINISHED:
+        return unfinished()
     if code:
         return _("Installing failed (code {code}). The log is in {folder}.",
                  code=code, folder=data_dir().parent)
@@ -2034,6 +2049,8 @@ def cleanup(guid: str) -> str | None:
     code = _elevated(["cleanup", guid])
     if code is None:
         return declined()
+    if code == UNFINISHED:
+        return unfinished()
     return _("Cleaning up failed (code {code}).", code=code) if code else None
 
 
@@ -2042,4 +2059,6 @@ def uninstall(guid: str | None = None) -> str | None:
     code = _elevated(["uninstall", guid] if guid else ["uninstall"])
     if code is None:
         return declined()
+    if code == UNFINISHED:
+        return unfinished()
     return _("Removing failed (code {code}).", code=code) if code else None

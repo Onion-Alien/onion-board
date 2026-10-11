@@ -3286,5 +3286,6 @@
   "Your PC's sound drops out for a second while Windows reloads it.": "Mawawala ang sound ng PC mo nang isang segundo habang nire-reload ito ng Windows.",
   "Your sounds go into your mic": "Pumapasok ang mga sound mo sa mic mo",
   "{mic} · not sent, sounds only": "{mic} · hindi ipinapadala, sounds lang",
-  "{mic} · off": "{mic} · naka-off"
+  "{mic} · off": "{mic} · naka-off",
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Hindi natapos ang admin step ng Windows. Kung bukas pa ang prompt nito, sagutin ito; pagkatapos subukan ulit."
 }
