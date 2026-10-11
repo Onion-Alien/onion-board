@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 2
+HELPER_VERSION = 3
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -433,25 +433,14 @@ def install_helper() -> bool:
     return True
 
 
-def _delete_at_reboot(path: Path):
-    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    k32.MoveFileExW.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_ulong]
-    entries = sorted(path.rglob("*"), key=lambda p: len(p.parts), reverse=True)
-    for p in [*entries, path]:   # files and the deepest folders first
-        k32.MoveFileExW(str(p), None, 0x4)   # MOVEFILE_DELAY_UNTIL_REBOOT
-
-
 def remove_helper():
     """Take the helper away (the app is being uninstalled): its task and files now;
     files in use (the helper removing itself runs from them) at the next restart."""
+    from soundboard import directmic
     _schtasks("/delete", "/tn", TASK, "/f")
     for d in (helper_dir(), queue_dir()):
-        shutil.rmtree(d, ignore_errors=True)   # all of it, unless it's running
         if d.exists():
-            try:
-                _delete_at_reboot(d)
-            except OSError:
-                log.warning("mic helper: can't remove %s", d, exc_info=True)
+            directmic._remove(d)
     log.info("mic helper removed")
 
 

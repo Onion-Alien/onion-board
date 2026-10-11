@@ -20,7 +20,7 @@ REAL_ELEVATED = dm._elevated   # (the conftest guard replaces it in every test)
 ROOT = Path(__file__).resolve().parent.parent
 
 # HELPER_VERSION and the admin code it stands for: change one, change the other
-ADMIN_DIGEST = {2: "625c2df1e7bf179a2b455c7b1c8fd6161602e41741aaf4f35ef211cdb48baffb"}
+ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4c620"}
 
 
 def _queue():
