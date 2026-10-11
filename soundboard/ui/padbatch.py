@@ -10,7 +10,7 @@ import html
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt
-from PySide6.QtGui import QColor, QIcon, QKeySequence, QPainter, QPixmap, QShortcut
+from PySide6.QtGui import QActionGroup, QColor, QIcon, QKeySequence, QPainter, QPixmap, QShortcut
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QWidget)
 
@@ -174,8 +174,19 @@ class PadSelection(QObject):
         self._popup(button, self._fill_cats)
 
     def _fill_colors(self, menu: QMenu):
+        colors = {m.color for m in self.sounds()}
+        current = next(iter(colors)) if len(colors) == 1 else None
+        group = QActionGroup(menu)
+        group.setExclusive(True)
         for c in PAD_COLORS:
-            menu.addAction(swatch(c), c, lambda c=c: self.set_color(c))
+            color_icon = swatch(c)
+            # QMenu uses the icon slot for checked actions too: supply an On icon.
+            color_icon.addPixmap(icons.icon("check", "text").pixmap(14, 14),
+                                 QIcon.Normal, QIcon.On)
+            action = menu.addAction(color_icon, c, lambda c=c: self.set_color(c))
+            action.setCheckable(True)
+            action.setChecked(c == current)
+            group.addAction(action)
 
     def _fill_cats(self, menu: QMenu):
         sounds = self.sounds()

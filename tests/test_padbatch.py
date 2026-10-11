@@ -4,9 +4,9 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QAccessible, QKeyEvent, QMouseEvent
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMenu
 
-from soundboard.library import SoundMeta
+from soundboard.library import PAD_COLORS, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -32,6 +32,23 @@ def click(pad, mods=Qt.NoModifier):
 
 def key(pad, k, mods=Qt.NoModifier):
     QApplication.sendEvent(pad, QKeyEvent(QEvent.KeyPress, k, mods))
+
+
+@pytest.mark.parametrize("colors", [(PAD_COLORS[0], PAD_COLORS[0]),
+                                   (PAD_COLORS[0], PAD_COLORS[1])])
+def test_bulk_colour_menu_marks_shared_value_and_applies_choice(window, colors):
+    window.selection.picked = {"s0", "s1"}
+    for sid, color in zip(("s0", "s1"), colors):
+        window.meta(sid).color = color
+    menu = QMenu(window)
+    window.selection._fill_colors(menu)
+    actions = menu.actions()
+    assert all(action.isCheckable() for action in actions)
+    expected = [colors[0]] if colors[0] == colors[1] else []
+    assert [action.text() for action in actions if action.isChecked()] == expected
+    actions[1].trigger()
+    assert all(window.meta(sid).color == PAD_COLORS[1] for sid in ("s0", "s1"))
+    assert [action.text() for action in actions if action.isChecked()] == [PAD_COLORS[1]]
 
 
 def test_ctrl_click_toggles_and_shift_click_picks_a_range(window):

@@ -1,0 +1,1 @@
+- The bulk colour menu marks the selected sounds' shared colour. Mixed colours leave every option unmarked until a colour is chosen.
