@@ -381,6 +381,9 @@ def _selftest_addon_in(path, tmp) -> int:
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):   # a path with emoji or Cyrillic in it, sent
+        if stream is not None and hasattr(stream, "reconfigure"):   # to a file or pipe,
+            stream.reconfigure(errors="replace")   # mustn't stop the command line
     if "--selftest" in sys.argv:
         sys.exit(selftest())
     if "--get-tor" in sys.argv:
