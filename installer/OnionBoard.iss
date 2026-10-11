@@ -130,6 +130,9 @@ Type: filesandordirs; Name: "{app}\_internal"
 #ifndef PREVIEW
 Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 #endif
+; The cable step runs first, before the files above are copied (see CurStepChanged), so it
+; needs its own copy of the script to extract into {tmp}.
+Source: "install-vbcable.ps1"; Flags: dontcopy
 
 [Icons]
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserModelID: "OnionBoard.App"; Tasks: desktopicon
@@ -868,11 +871,14 @@ begin
     Result := '';
 end;
 
-// Run install-vbcable.ps1 with `Args`; its exit code, or -1 if it couldn't start.
+// Run install-vbcable.ps1 (extracted to {tmp}) with `Args`; its exit code, or -1 if it
+// couldn't start.
 function CableScript(Args: String): Integer;
 begin
+  if not FileExists(ExpandConstant('{tmp}\install-vbcable.ps1')) then
+    ExtractTemporaryFile('install-vbcable.ps1');
   if not Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' +
-              ExpandConstant('{app}\_internal\install-vbcable.ps1') + '" ' + Args,
+              ExpandConstant('{tmp}\install-vbcable.ps1') + '" ' + Args,
               '', SW_HIDE, ewWaitUntilTerminated, Result) then
     Result := -1;
 end;
@@ -1043,10 +1049,12 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
     CheckInternalNotInUse;
+  // first, right after Install is clicked: Windows' permission box comes up while the
+  // user is still looking, not minutes later at the end
+  if (CurStep = ssInstall) and MayDownload('vbcable') then
+    InstallCable;
   if CurStep = ssPostInstall then
     QueueImports;
-  if (CurStep = ssPostInstall) and MayDownload('vbcable') then
-    InstallCable;
   if (CurStep = ssPostInstall) and MayDownload('tor') then
     GetTor;
   if (CurStep = ssPostInstall) and MayDownload('livevoice') and not HasPython then
