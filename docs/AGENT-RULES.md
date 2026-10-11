@@ -17,6 +17,7 @@ Before the first edit, every task: latest `origin/main` and the open PRs
 | Audio path, mic effect, engine | this file, [CODE.md](CODE.md) *Audio notes* and *Sending sounds* | DESIGN |
 | New module or file | [CODE.md](CODE.md) *Code layout* (add it there) | |
 | Text a user sees | `CLAUDE.md` *Text the app shows*, [TRANSLATING.md](TRANSLATING.md) | |
+| Bun the mascot: drawing, outfits, animations | [MASCOT.md](MASCOT.md) | |
 | Build, installer, release | [DEVELOPING.md](DEVELOPING.md) sections 4 to 7 | DESIGN |
 
 - Never read `CHANGELOG.md` whole (2000+ lines), and never edit it for a change:

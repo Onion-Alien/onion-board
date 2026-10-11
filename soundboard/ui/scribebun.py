@@ -315,7 +315,7 @@ class ScribeBunny(QWidget):
 
     def _layer(self, key: tuple, draw) -> QPixmap:
         """A transparent picture of the whole slot drawn by `draw(painter)`, kept by `key`."""
-        key = key + (theme.T["accent"], self._scale)
+        key = key + (theme.T["accent"], theme.current_name, self._scale)   # name: Bun's outfit
         pm = self._layers.get(key)
         if pm is None:
             if len(self._layers) > 48:   # poses and pages of an old download

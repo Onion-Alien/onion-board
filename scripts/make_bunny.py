@@ -33,7 +33,7 @@ def side_panel(w: int, h: int) -> QImage:
     p.setPen(QColor(255, 255, 255, 60))
     p.setBrush(QColor(255, 255, 255, 45))
     p.drawEllipse(QRectF(w * 0.08, h * 0.30, w * 0.84, w * 0.84))
-    draw_bunny(p, QRectF(w * 0.1, h * 0.26, w * 0.8, h * 0.44), "headphones")
+    draw_bunny(p, QRectF(w * 0.1, h * 0.26, w * 0.8, h * 0.44), "headphones", outfit=())
     f = p.font()
     f.setPixelSize(max(12, w // 7))
     f.setBold(True)
@@ -54,7 +54,7 @@ def small_corner(s: int) -> QImage:
     img = QImage(s, s, QImage.Format_RGB32)
     img.fill(QColor("white"))
     p = QPainter(img)
-    draw_bunny(p, QRectF(0, 0, s, s), None)
+    draw_bunny(p, QRectF(0, 0, s, s), None, outfit=())   # installer art: plain Bun
     p.end()
     return img
 
@@ -73,7 +73,7 @@ def main():
         sheet.fill(QColor("#1e1b2e"))
         p = QPainter(sheet)
         for i, prop in enumerate(PROPS):
-            draw_bunny(p, QRectF(200 * i + 10, 10, 180, 220), prop)
+            draw_bunny(p, QRectF(200 * i + 10, 10, 180, 220), prop, outfit=())
         p.end()
         sheet.save(str(OUT / "bunny-preview.png"))
         side_panel(328, 628).save(str(OUT / "side-preview.png"))
