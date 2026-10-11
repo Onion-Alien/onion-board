@@ -5,15 +5,8 @@ mistakes made again. Each rule below is one of those mistakes, with commits that
 fixed it (`git show <hash>` to see the fix). Check your change against the rules for the area
 you touched before committing. When you fix a new kind of regression, add a line here.
 
-## Before the first edit: latest main, open PRs
-
-Every task, before changing anything (details in `CLAUDE.md`):
-
-1. `git fetch origin` and work on a new branch (or worktree) off `origin/main`.
-   Never edit someone else's dirty checkout.
-2. Confirm it: `git status -sb` doesn't say `behind`; your `HEAD` is `origin/main`'s.
-3. `gh pr list --state open`: if a PR already does this or touches the same code,
-   stop and tell the user. No duplicate work.
+Before the first edit, every task: latest `origin/main` and the open PRs
+([CLAUDE.md *Before you change anything*](../CLAUDE.md#before-you-change-anything-sync-first-check-open-prs)).
 
 ## What to read for a task (don't read the rest)
 
@@ -26,13 +19,28 @@ Every task, before changing anything (details in `CLAUDE.md`):
 | Text a user sees | `CLAUDE.md` *Text the app shows*, [TRANSLATING.md](TRANSLATING.md) | |
 | Build, installer, release | [DEVELOPING.md](DEVELOPING.md) sections 4 to 7 | DESIGN |
 
-- **Never edit `CHANGELOG.md` for a change**, and never read it whole (2000+ lines).
-  Your entry goes in its own new file, `changelog.d/<branch-name>.md` (one or more
-  `- ` lines; [changelog.d/README.md](../changelog.d/README.md)), so stacked PRs never
-  conflict on it. `scripts/release.py` moves them into `CHANGELOG.md`.
+- Never read `CHANGELOG.md` whole (2000+ lines), and never edit it for a change:
+  [changelog.d/README.md](../changelog.d/README.md).
 - The big files (`ui/mainwindow.py`, `ui/voicepanel.py`, `engine.py`, `ui/setupwizard.py`,
   `tests/test_mainwindow.py`): grep for the name you need, then read only that range.
 - `git log --oneline -S <name>` finds when and why something changed faster than reading.
+
+## Where each rule lives (one home each; elsewhere only a link)
+
+| Rule | Home |
+|---|---|
+| Sync to `origin/main`, check open PRs, worktree for a dirty checkout | [CLAUDE.md](../CLAUDE.md) *Before you change anything* |
+| Commit times in UTC, merging only with `scripts/merge_pr.sh`, no history rewrites | [CLAUDE.md](../CLAUDE.md) *Commit times and merging* |
+| Public repo: secrets, personal data, assets, network table, loopback | [CONTRIBUTING.md](../CONTRIBUTING.md) *Rules that aren't negotiable* (agent extras: CLAUDE.md) |
+| Text in every language | [CLAUDE.md](../CLAUDE.md) *Text the app shows*; details [TRANSLATING.md](TRANSLATING.md) |
+| UI look, sizes, text style, dialog actions, UI workflow | [DESIGN.md](DESIGN.md) |
+| UI to-do list | [UI-AUDIT.md](UI-AUDIT.md) |
+| Changelog entries | [changelog.d/README.md](../changelog.d/README.md) |
+| Ask before launching the app or the mic effect's admin steps | [CLAUDE.md](../CLAUDE.md) *Working in the code* |
+| Regression rules (UI thread, async, audio path, tests, frozen build) | this file, *The rules* |
+| The quick check before a commit, and what's left to CI | this file, *Before every commit* |
+| Setup, test, build, install and release commands; what needs a rebuild | [DEVELOPING.md](DEVELOPING.md) |
+| Code layout, audio internals | [CODE.md](CODE.md) |
 
 ## The rules
 
@@ -130,9 +138,8 @@ Every task, before changing anything (details in `CLAUDE.md`):
   `OnionBoardSetup.exe` (it clears `_internal` first), never an older setup file.
 
 ### Releases (about 45 hand-made commits)
-- Bump with `scripts/release.py X.Y.Z`, never by hand. It moves `changelog.d/` into the
-  changelog under the dated version, sets
-  `__version__` and refreshes the release line. `tests/test_release.py` fails when
+- Bump with `scripts/release.py X.Y.Z`, never by hand (the steps:
+  [DEVELOPING.md](DEVELOPING.md) section 7). `tests/test_release.py` fails when
   `__init__.py` and the changelog disagree.
 
 ## Before every commit
@@ -143,7 +150,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1 -Tests
 ```
 
 It runs ruff, the sensitive-data scan, the translation check and CODE.md's module list
-(about 15 s). The tests are left to CI: push, open the PR and keep working while it runs
+(about 10 s). The tests are left to CI: push, open the PR and keep working while it runs
 the test files your changes need, on 4 jobs side by side. `-Tests` runs those files here
 (a change to `theme.py`, `mainwindow.py` or `library.py` picks most of the suite: about
-4 minutes); `-All` the whole suite.
+4 minutes); use it only when you need a result before pushing. **Don't run `-All`
+locally**: CI runs the whole suite on main after every merge (and on a branch when the
+workflow is run by hand).

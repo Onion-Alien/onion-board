@@ -1,27 +1,15 @@
 # AGENTS.md
 
-For AI coding agents that read `AGENTS.md` (Codex and others). The full guidance is
-[CLAUDE.md](CLAUDE.md): read it first, it applies to every agent, not only Claude.
-Then [docs/AGENT-RULES.md](docs/AGENT-RULES.md) for which other docs your task needs.
+For AI coding agents that read `AGENTS.md` (Codex and others). The guidance is
+[CLAUDE.md](CLAUDE.md): read it first, it applies to every agent, not only Claude. Then
+[docs/AGENT-RULES.md](docs/AGENT-RULES.md) for which other docs your task needs.
 
-The rules agents break most, in short:
+The ones agents break most, each kept in one place:
 
-- **Merge locally, never on GitHub.** Merge a green PR with
-  `sh scripts/merge_pr.sh N --delete-branch`. Never `gh pr merge`, the API's merge
-  call, GitHub's Merge button or *Update branch*: GitHub writes those commits in the
-  local time zone, and every commit here must be in UTC (`+0000`). Bring `main` into a
-  branch with a local `git merge origin/main`.
-- `git config core.hooksPath .githooks` in every new checkout or worktree (the UTC hooks).
-- Start from the latest `origin/main` on a new branch or worktree; never edit someone
-  else's dirty checkout. Check `gh pr list --state open` for the same work first.
-- No personal or machine data, secrets or session links in files, commits or PR text:
-  this repo is public.
-- Never edit `CHANGELOG.md` for a change: add `changelog.d/<branch-name>.md`.
-- Text the app shows goes through `_()` and into every language in `assets/lang/`.
-- UI work follows [docs/DESIGN.md](docs/DESIGN.md), including its control/surface
-  decisions and UI workflow. [docs/UI-AUDIT.md](docs/UI-AUDIT.md) is the only UI
-  to-do list ("the UI audit doc"); recheck an item against origin/main before fixing it.
-- Dialog footer actions sit bottom-right (stretch before the action group), with
-  the main action first within the group. This does not right-align ordinary fields
-  or contextual card/toolbar actions.
-- Check with `scripts\precommit.ps1` before committing.
+- Start from the latest `origin/main`, check open PRs: [CLAUDE.md *Before you change anything*](CLAUDE.md#before-you-change-anything-sync-first-check-open-prs).
+- Merge only with `sh scripts/merge_pr.sh N`, never on GitHub; commits in UTC: [CLAUDE.md *Commit times and merging*](CLAUDE.md#commit-times-and-merging).
+- Public repo, no personal data: [CLAUDE.md *This repo is public*](CLAUDE.md#this-repo-is-public).
+- Text in every language: [CLAUDE.md *Text the app shows*](CLAUDE.md#text-the-app-shows-every-language-in-the-same-change).
+- UI: [docs/DESIGN.md](docs/DESIGN.md); the only UI to-do list is [docs/UI-AUDIT.md](docs/UI-AUDIT.md).
+- Changelog: [changelog.d/README.md](changelog.d/README.md), never `CHANGELOG.md`.
+- Before committing: [AGENT-RULES *Before every commit*](docs/AGENT-RULES.md#before-every-commit).
