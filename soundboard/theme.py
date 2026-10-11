@@ -587,6 +587,7 @@ QFrame#sidebar QPushButton#pill[railopen="false"],
 QFrame#sidebar QPushButton#onair[railopen="false"],
 QFrame#sidebar QPushButton#danger[railopen="false"] { text-align:center; }
 QFrame#sidebar QLabel#wordmark { font-size:12pt; }
+QFrame#sidebar[twolinebrand="true"] QLabel#wordmark { font-size:10pt; }
 QFrame#sidebar QFrame#raildiv { background:$border_hi; border:none; }
 QFrame#sidebar QWidget#railslot { background:transparent; }
 QFrame#railoutput { background:$panel; border:none; border-radius:12px; }

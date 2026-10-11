@@ -774,9 +774,11 @@ class SideRail(QFrame):
         if self.output:
             self.output.setFixedWidth(BUTTON_W if mid else width)
             self._status_box.setAlignment(self.output, middle)
-        for pad in self._foot_pads:
-            pad.changeSize(0, 0, QSizePolicy.Expanding if mid else QSizePolicy.Fixed,
-                           QSizePolicy.Minimum)
+        # (split by hand, rounded as the centred toggle above: Qt's stretch gave the
+        # odd pixel to the other side, so the pair wobbled 1 px against it while dragged)
+        spare = max(0, width - 2 * BUTTON_W - self._foot_box.spacing()) if mid else 0
+        for pad, room in zip(self._foot_pads, (spare // 2, spare - spare // 2)):
+            pad.changeSize(room, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
         self._foot_box.invalidate()
         for widget in self.foot:
             widget.setMinimumWidth(BUTTON_W if mid else 0)
@@ -846,7 +848,12 @@ class SideRail(QFrame):
         self._lay.invalidate()
         mid = self._mid()
         self.brand.setVisible(shown)
-        self.byline.setVisible(shown and self._brand_fits())
+        fits = self._brand_fits()
+        self.byline.setVisible(shown and fits)
+        if self.property("twolinebrand") != (not fits):   # two lines: a size smaller
+            self.setProperty("twolinebrand", not fits)
+            self.brand.style().unpolish(self.brand)
+            self.brand.style().polish(self.brand)
         style = Qt.ToolButtonTextBesideIcon if shown else Qt.ToolButtonIconOnly
         for b in self.buttons:
             b.setToolButtonStyle(style)
