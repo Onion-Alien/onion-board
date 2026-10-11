@@ -131,12 +131,12 @@ def test_sounds_are_saved_as_the_picked_format(app_dir, tmp_path):
     src = tmp_path / "video.mp4"                                # needs converting
     sf.write(tmp_path / "v.wav", x, library.SR)
     (tmp_path / "v.wav").rename(src)
-    real = library._decode
-    library._decode, was = (lambda p: (real(p)[0], True)), library._decode
+    real = library._read
+    library._read, was = (lambda p, *a: (real(p)[0], True)), library._read
     try:
         assert library.import_file(str(src), "#1")[0].file.endswith(".flac")
     finally:
-        library._decode = was
+        library._read = was
     assert quality.from_raw({"save_format": "wav"}).save_format == "mp3"
 
 

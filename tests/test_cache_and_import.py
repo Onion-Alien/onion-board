@@ -1,6 +1,7 @@
 """Phase 2: bounded decoding, the int16 cache, imports, clips and dedupe."""
 import os
 import time
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -68,8 +69,8 @@ def test_load_sound_decodes_once_then_uses_the_cache(app_dir, monkeypatch):
     p = wav(app_dir / "s.wav")
     m = SoundMeta(id="s1", name="s", file=str(p))
     calls = []
-    real = library.decode
-    monkeypatch.setattr(library, "decode", lambda path: calls.append(path) or real(path))
+    real = library._read
+    monkeypatch.setattr(library, "_read", lambda path, *a: calls.append(path) or real(path, *a))
     a = load_sound(m)
     b = load_sound(m)
     assert calls == [str(p)]
@@ -100,8 +101,8 @@ def test_import_copies_plain_audio_and_caches_it(app_dir):
 
 def test_import_of_ffmpeg_decoded_file_stores_mp3_not_the_source(app_dir, monkeypatch):
     src = wav(app_dir / "video.wav").rename(app_dir / "video.mp4")   # pretend it's a video
-    real = library._decode
-    monkeypatch.setattr(library, "_decode", lambda p: (real(p)[0], True))
+    real = library._read
+    monkeypatch.setattr(library, "_read", lambda p, *a: (real(p)[0], True))
     meta, _ = import_file(str(src), "#123456")
     assert meta.file.endswith(".mp3") and sf.info(meta.file).format == "MP3"
     assert not any(p.suffix == ".mp4" for p in library.SOUNDS_DIR.rglob("*"))
@@ -149,3 +150,99 @@ def test_import_of_a_name_made_only_of_underscores_keeps_the_pad(app_dir):
     assert meta.name == "Sound"
     cfg = library.Config(sounds=[meta])
     assert [m.id for m in library.Config.from_raw(cfg.to_raw()).sounds] == [meta.id]
+
+
+# ---------------------------------------------------------------- long sounds: streamed
+
+def _music(path, seconds, rate, channels=2, loud=1.0, subtype="FLOAT"):
+    """Tones + noise with silence in the middle; `loud` > 1 goes over full scale."""
+    rng = np.random.default_rng(5)
+    t = np.arange(int(seconds * rate)) / rate
+    x = loud * (0.6 * np.sin(2 * np.pi * 220 * t) + 0.3 * np.sin(2 * np.pi * 331 * t)
+                + 0.1 * rng.standard_normal(len(t)))
+    x[len(t) // 3: len(t) // 2] = 0.0
+    sf.write(path, np.stack([x * (1 - 0.3 * c) for c in range(channels)], 1), rate, subtype=subtype)
+    return path
+
+
+@pytest.mark.parametrize("rate,channels,loud", [(SR, 2, 0.5), (44100, 2, 1.4), (22050, 1, 0.8),
+                                                (96000, 2, 1.2)])
+def test_a_streamed_import_makes_what_a_whole_one_does(app_dir, monkeypatch, rate, channels, loud):
+    """Over STREAM_S a sound is decoded a second at a time straight into its cache: the
+    same int16 audio, length and level as decoding it whole (to the sample when no
+    resampling is involved; resampled, within a sample step at the very edges)."""
+    src = _music(app_dir / "song.wav", 3.3, rate, channels, loud)
+    whole, a = import_file(str(src), "#000000")
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    calls = []
+    real = library._stream
+    monkeypatch.setattr(library, "_stream", lambda *a, **k: calls.append(1) or real(*a, **k))
+    streamed, b = import_file(str(src), "#000000")
+    assert calls, "it wasn't streamed"
+    assert b.dtype == np.int16 and b.shape == a.shape
+    assert streamed.duration == whole.duration
+    assert streamed.level_gain == pytest.approx(whole.level_gain, rel=1e-6)
+    diff = np.abs(np.asarray(b, np.int32) - np.asarray(a, np.int32))
+    assert diff.max() <= (0 if rate == SR else 1)
+    assert np.array_equal(np.load(cache_path(streamed.id)), np.asarray(b))
+    assert not list(library.CACHE_DIR.glob("*.tmp.npy"))   # nothing left half-written
+
+
+def test_a_streamed_import_over_full_scale_is_limited_not_clipped(app_dir, monkeypatch):
+    src = _music(app_dir / "loud.wav", 3.0, SR, loud=1.6)
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    _, data = import_file(str(src), "#000000")
+    whole = to_int16(library.decode(str(src)))
+    assert np.array_equal(np.asarray(data), whole)
+    flat = np.sum(np.abs(np.asarray(data, np.int32)) >= 32767)
+    assert flat < 10   # a clipped one would have thousands of flat tops
+
+
+def test_a_streamed_import_of_a_converted_file_saves_the_same_copy(app_dir, monkeypatch):
+    """A format the library converts (here one libsndfile reads under a name outside
+    AUDIO_EXTS) is saved while it's decoded: the stored file holds the same audio."""
+    src = _music(app_dir / "odd.w64", 2.5, 44100, subtype="PCM_16")
+    whole, _ = import_file(str(src), "#000000")
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    streamed, _ = import_file(str(src), "#000000")
+    assert Path(streamed.file).suffix == Path(whole.file).suffix == library.stored_ext()
+    x, _sr = sf.read(whole.file, dtype="float32")
+    y, _sr = sf.read(streamed.file, dtype="float32")
+    assert x.shape == y.shape and np.max(np.abs(x - y)) < 2 / 32767
+
+
+def test_a_streamed_import_that_fails_leaves_nothing_behind(app_dir, monkeypatch):
+    src = _music(app_dir / "odd.w64", 3.0, SR, subtype="PCM_16")
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    real = library._sf_pieces
+
+    def broken(f, left):
+        for i, x in enumerate(real(f, left)):
+            if i == 2:
+                raise OSError(28, "No space left on device")
+            yield x
+
+    monkeypatch.setattr(library, "_sf_pieces", broken)
+    with pytest.raises(OSError, match="Sounds folder"):
+        import_file(str(src), "#000000")
+    assert not [p for p in library.SOUNDS_DIR.rglob("*") if p.is_file()]
+    assert not list(library.CACHE_DIR.glob("*"))
+
+
+def test_load_original_streams_a_long_sound_back_into_the_cache(app_dir, monkeypatch):
+    src = _music(app_dir / "long.wav", 3.0, 44100)
+    meta, a = import_file(str(src), "#000000")
+    library.unlink_cache(meta.id)
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    b = library.load_original(meta)
+    assert np.abs(np.asarray(b, np.int32) - np.asarray(a, np.int32)).max() <= 1
+    assert cache_path(meta.id).exists()
+
+
+def test_decode_int16_streams_a_long_link_into_its_own_cache_file(app_dir, monkeypatch):
+    src = _music(app_dir / "link.wav", 3.0, SR, loud=1.3)
+    whole = (to_int16(library.decode(str(src))), library.level_gain(library.decode(str(src))))
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    data, gain = library.decode_int16(str(src))
+    assert np.array_equal(np.asarray(data), whole[0]) and gain == pytest.approx(whole[1], rel=1e-6)
+    assert [p.name.startswith("play-") for p in library.CACHE_DIR.glob("*.npy")] == [True]
