@@ -686,11 +686,17 @@ class MainWindow(QMainWindow):
         self.logo = LogoWidget()
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
-        self.tagline = QLabel(_("an app by Onion Alien · v{version_text}",
-                                version_text=version_text()))
+        from soundboard import __version__
+        # on the rail: the name over a quiet "v1.9.28" (the title bar says "from source");
+        # who made it is a tip on all three
+        self.tagline = sidebar.ClickLabel(f"v{__version__}")
         self.tagline.setObjectName("tagline")
-        # on the rail, the name and the version each on a line of their own
-        self.tagline.setText(self.tagline.text().replace(" · ", "\n", 1))
+        about = _("an app by Onion Alien · v{version_text}", version_text=version_text())
+        for w in (self.logo, self.wordmark):
+            w.setToolTip(about)
+        whats_new = _("What's new")   # the version is a button to it
+        self.tagline.setToolTip(f"{about}\n{whats_new}")
+        self.tagline.clicked.connect(self.show_whats_new)
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.PointingHandCursor)
@@ -731,7 +737,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
-        icons.set_icon(self.stop_btn, "stop", "danger_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -906,11 +912,18 @@ class MainWindow(QMainWindow):
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear],
             self._rail_opened,
-            # Live and Stop all first, so they never move; the pills only when needed
-            # (at the rail's foot, as icons)
-            [self.btn_air, self.mode_btn, self.stop_btn, self.pill, self.btn_offline,
-             self.btn_update], order=[TAB_INDEX[k] for k in self.cfg.sidebar_order
-                                     if k in TAB_INDEX])
+            # Live and Stop all never move; the pills (what needs attention) sit above
+            # them and only show when needed (at the rail's foot, as icons)
+            [self.btn_air, self.mode_btn, self.stop_btn],
+            order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
+            alerts=[self.pill, self.btn_offline, self.btn_update])
+        # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
+        # through them (the tab widget does that only while it has the focus)
+        for n in range(1, 10):
+            QShortcut(QKeySequence(f"Ctrl+{n}"), self,
+                      activated=lambda n=n: self._go_tab(n - 1, absolute=True))
+        QShortcut(QKeySequence("Ctrl+Tab"), self, activated=lambda: self._go_tab(1))
+        QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self._go_tab(-1))
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         self._full_row.insertWidget(0, self.rail)
@@ -1233,13 +1246,17 @@ class MainWindow(QMainWindow):
         self.search.returnPressed.connect(self.on_search_enter)
         icons.set_icon(self.search.addAction(QIcon(), QLineEdit.LeadingPosition), "search",
                        "muted")
-        # the web search: Enter does it too, so a small globe, not a second "Search" box
+        # the web search: Enter does it; this button shows the site it goes to and picks
+        # another from its menu
         self.btn_yt = QPushButton()
         self.btn_yt.setAccessibleName(_("Search"))
         self.btn_yt.setToolTip(_("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
                                  "what's typed (or press Enter), play or add the audio"))
-        icons.set_icon(self.btn_yt, "browser", size=18)
-        self.btn_yt.clicked.connect(self.search_youtube)
+        icons.set_icon(self.btn_yt, "youtube", size=18)
+        # which site Enter searches: the button shows it, its menu picks another
+        self._site_menu = DropdownMenu(self.btn_yt)
+        self.btn_yt.setMenu(self._site_menu)
+        self.btn_yt.setProperty("toolbarMenu", True)
         more = self.btn_more = QPushButton(_("Library"))
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
                           "sound pack"))
@@ -1377,6 +1394,8 @@ class MainWindow(QMainWindow):
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self._cat_row.show)   # ...and the categories' row
         self.ytresults.closed.connect(self._results_closed)
+        self.ytresults.fill_site_menu(self._site_menu)
+        self.ytresults.source_changed.connect(self._on_site_picked)
         self._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
@@ -4092,6 +4111,7 @@ class MainWindow(QMainWindow):
         self.radio.retheme()
         self.apps.retheme()
         self.triggers.retheme()
+        self.ytresults.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
@@ -4381,6 +4401,13 @@ class MainWindow(QMainWindow):
         if self.current == LINK_ID:
             self.current = None   # a new link: refresh the name
         self.select(LINK_ID)
+
+    def _on_site_picked(self, key: str):
+        """A site picked in the search button's menu: it shows that site, and the
+        search box's words are searched there now (open results re-run themselves)."""
+        icons.set_icon(self.btn_yt, key, size=18)
+        if self.ytresults.isHidden() and self.search.text().strip():
+            self.search_youtube()
 
     def search_youtube(self):
         """Enter / the Search button: search the site the results header has
@@ -5100,7 +5127,7 @@ class MainWindow(QMainWindow):
             a_cols[a] = col
         if now:
             cm.addSeparator()
-            a_cols[cm.addAction(icons.icon("palette", checked_color="text"), _("No colour"))] = ""
+            a_cols[cm.addAction(icons.icon("palette", checked_color="accent"), _("No colour"))] = ""
         menu.addSeparator()
         a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front…"))
         a_unprog = {menu.addAction(icons.icon("offline"),
@@ -5602,7 +5629,7 @@ class MainWindow(QMainWindow):
                       "plays": "star"}
         for key, name in self._sort_names().items():
             a = menu.addAction(name, lambda k=key: self.set_pad_sort(k))
-            icons.set_icon(a, sort_icons[key], checked_color="text")
+            icons.set_icon(a, sort_icons[key], checked_color="accent")
             a.setCheckable(True)
             a.setChecked(self.cfg.pad_sort == key)
             a.setToolTip(tips[key])
@@ -5613,7 +5640,7 @@ class MainWindow(QMainWindow):
                 ("grid", _("Pads"), "sounds", _("Cards, with pictures")),
                 ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
             a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
-            icons.set_icon(a, icon, checked_color="text")
+            icons.set_icon(a, icon, checked_color="accent")
             a.setCheckable(True)
             a.setChecked(self.cfg.pad_view == key)
             a.setToolTip(tip)
@@ -5717,7 +5744,7 @@ class MainWindow(QMainWindow):
         cats = menu.addMenu(icons.icon("tag"), _("Categories"))
         cat_acts = {}
         for c in self.cfg.categories:
-            a = cats.addAction(icons.icon("tag", checked_color="text"), c.replace("&", "&&"))
+            a = cats.addAction(icons.icon("tag", checked_color="accent"), c.replace("&", "&&"))
             a.setCheckable(True)
             a.setChecked(c in m.tags)
             cat_acts[a] = c
@@ -7329,6 +7356,30 @@ class MainWindow(QMainWindow):
             log.info("updated to %s", __version__)
         self.whats_new(updated=bool(pending))
 
+    def _go_tab(self, n: int, absolute: bool = False):
+        """The n-th tab on the rail (`absolute`), or the one n steps from this one."""
+        shown = [b for b in self.rail.buttons if b.isVisible()]
+        if not shown:
+            return
+        if absolute:
+            if n < len(shown):
+                shown[n].click()
+            return
+        cur = next((k for k, b in enumerate(shown) if b.isChecked()), 0)
+        shown[(cur + n) % len(shown)].click()
+
+    def show_whats_new(self):
+        """The header's version, clicked: the newest release's notes, any time."""
+        from soundboard.ui import whatsnew
+        if not whatsnew.NOTES:
+            return
+        dlg = whatsnew.WhatsNewDialog(self, [whatsnew.NOTES[0]])
+        dlg.exec()
+        page = dlg.page
+        free_dialog(dlg)
+        if page:
+            self.open_settings(page)
+
     def whats_new(self, updated: bool = False):
         """What's new in this version (ui/whatsnew.py), if they haven't seen it: once,
         with a button to the settings it's about. Waits while the window is in the tray
@@ -7721,6 +7772,8 @@ class MainWindow(QMainWindow):
         # the search box keeps room to type in until the buttons beside it have shrunk
         f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
                                       r.touch(self.search)))
+        # very narrow: the search button (and its site menu) goes; Enter still searches
+        # the site picked last
         f.add(63, "w", lambda tight: (
             self.btn_yt.setVisible(not tight and self.ytresults.available()),
             r.touch(self.btn_yt)))

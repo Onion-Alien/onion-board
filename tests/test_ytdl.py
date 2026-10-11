@@ -571,7 +571,7 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     window.ytresults._rows[0].btn_add.click()                # Add: reuses the download
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
     assert len(calls) == 1
-    window.ytresults.site_btns["soundcloud"].click()       # another site: searches again
+    window.ytresults.site_actions["soundcloud"].trigger()  # another site: searches again
     assert process_events(qapp, lambda: searched[-1:] == ["soundcloud"], 5)
     assert searched == ["youtube", "youtube", "soundcloud"]
     assert "No SoundCloud results" not in window.ytresults.title.text()
@@ -651,7 +651,7 @@ def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
         gate.wait(5), [])[1])
     panel = SearchResults()
-    assert set(panel.site_btns) == set(ytdl.SOURCES) >= {"tiktok", "myinstants", "ytmusic"}
+    assert set(panel.site_actions) == set(ytdl.SOURCES) >= {"tiktok", "myinstants", "ytmusic"}
     panel.set_source("tiktok")
     panel.search("bruh")
     assert panel.spinner.running() and "TikTok sounds" in panel.title.text()
@@ -889,3 +889,60 @@ def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_pa
     shown = window.ytresults.list.findChildren(ResultRow)
     assert [w.result.title for w in shown if not w.isHidden()] == ["A Tone"]
     assert shown and all(w.wide for w in shown if not w.isHidden())   # its own big card
+
+
+def test_show_more_adds_the_next_page_under_the_cards_up_to_the_cap(qapp, monkeypatch):
+    from soundboard.ui import ytsearch
+    from soundboard.ui.ytsearch import PAGE, SearchResults
+
+    asked = []
+
+    def fake(q, count=PAGE, source="youtube", start=1, **kw):
+        asked.append((start, count))
+        return [ytdl.Result(f"v{i:06d}xxxxx", f"Song {i}", "c", 60)
+                for i in range(start - 1, min(count, 45))]   # the site has 45 hits
+
+    class Now:   # the worker, run on the spot
+        def __init__(self, target, args=(), kwargs=None, **kw):
+            self.run = lambda: target(*args, **(kwargs or {}))
+
+        def start(self):
+            self.run()
+
+    monkeypatch.setattr(ytdl, "search", fake)
+    panel = SearchResults()   # before Now: its network relay's thread must really run
+    monkeypatch.setattr(ytsearch.threading, "Thread", Now)
+    panel.search("song")
+    assert process_events(qapp, lambda: len(panel._rows) == PAGE, 5)
+    assert not panel.more_btn.isHidden()
+    panel.more_btn.click()
+    assert process_events(qapp, lambda: len(panel._rows) == 2 * PAGE, 5)
+    assert asked[-1] == (PAGE + 1, 2 * PAGE)   # only the new page is asked for
+    panel.more_btn.click()                      # 5 left: shown, and still offered
+    assert process_events(qapp, lambda: len(panel._rows) == 45, 5)
+    panel.more_btn.click()                      # nothing new: the button goes
+    assert process_events(qapp, lambda: panel.more_btn.isHidden(), 5)
+    assert len({r.result.url for r in panel._rows}) == 45
+    monkeypatch.setattr(ytsearch, "MAX_RESULTS", PAGE)
+    panel.search("again")                       # at the cap: no Show more
+    assert process_events(qapp, lambda: len(panel._rows) == PAGE, 5)
+    panel.more_btn.click()
+    assert process_events(qapp, lambda: panel.more_btn.isHidden(), 5)
+
+
+def test_open_results_follow_a_theme_switch(qapp):
+    from soundboard import theme
+    from soundboard.ui.ytsearch import SearchResults
+    panel = SearchResults()
+    panel.query = "x"
+    panel._on_done(0, [ytdl.Result("vid0xxxxxxx", "Song", "c", 60)], "")
+    row = panel._rows[0]
+    try:
+        theme.apply(qapp, "Dark")
+        panel.retheme()
+        dark = row.btn_play.styleSheet()
+        theme.apply(qapp, "Light")
+        panel.retheme()
+        assert row.btn_play.styleSheet() != dark   # no Dark-only colours left on Light
+    finally:
+        theme.apply(qapp, "Dark")

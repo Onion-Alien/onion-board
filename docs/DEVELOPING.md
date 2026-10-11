@@ -91,6 +91,11 @@ half-written ring files at the effect (built with sanitizer traps);
 `scripts\fuzz_directmic.py [seconds] [workers]` runs it for longer than the tests do.
 `fuzzhost --lead` replays a late board block by block (no timing luck) and checks the
 effect's lead grows just enough and comes back; the real-time tests can't pin that down.
+After changing the mic effect's admin install / uninstall (copying the DLL, registering
+it, putting it on a mic or taking it off) or the ring layout, run
+`scripts\sim_directmic.py`: it drives that code against a fake registry, killing it at
+every write, and checks a mic always ends up exactly as it started even when the step is
+cut off half-way.
 
 **Not on Windows?** The suite also runs on Linux and macOS: `tests/offwindows.py`
 stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
@@ -102,7 +107,7 @@ platform) runs as on Windows; CI runs both. On Debian / Ubuntu:
 sudo apt-get install libportaudio2 libsndfile1 libegl1 libxkbcommon0 libgl1 libfontconfig1 libdbus-1-3 \
   libpulse0 libx11-xcb1 libxrandr2
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt pytest==9.1.1 pytest-xdist==3.8.0 ruff==0.16.9
+.venv/bin/pip install -r requirements.txt pytest==9.1.1 pytest-xdist==3.8.0 pytest-rerunfailures==16.7 ruff==0.16.10
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest
 ```
 

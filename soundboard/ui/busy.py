@@ -307,8 +307,18 @@ def emit(signal, *args) -> bool:
     False when it's gone (known at once on the UI thread, else True)."""
     if threading.current_thread() is threading.main_thread():
         return _emit_now(signal, args)
-    _the_carrier().call.emit(lambda: _emit_now(signal, args))
+    try:
+        _the_carrier().call.emit(lambda: _emit_now(signal, args))
+    except (RuntimeError, AttributeError):   # app closing: the carrier (or the app) is gone
+        _forget_carrier()
+        return False
     return True
+
+
+def _forget_carrier():
+    global _carrier
+    with _carrier_lock:
+        _carrier = None
 
 
 def open_url(url, btn=None, window: QWidget | None = None, opened: str = "",

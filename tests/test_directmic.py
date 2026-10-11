@@ -175,7 +175,7 @@ def test_make_ring_leaves_another_processes_temp_alone(tmp_path):
 @pytest.mark.parametrize("values, expected", [
     ({}, ("wrap", 7)),                       # nothing: the endpoint effect (raw gets it)
     ({5: "{S}"}, ("wrap", 7)),               # the driver's SFX stays where it is
-    ({7: "{E}", 1: "{E}"}, ("wrap", 7)),     # modern driver (a G733): wrap its EFX
+    ({7: "{E}", 1: "{E}"}, ("wrap", 7)),     # modern driver (a gaming headset): wrap its EFX
     ({1: "{L}"}, ("wrap", 1)),               # only old-style effects: LFX
     ({1: "{L}", 2: "{G}"}, ("wrap", 1)),
     ({13: ["{X}"], 5: "{S}"}, ("wrap", 7)),  # a stream effect list: left alone
@@ -291,7 +291,7 @@ SZ, MULTI, DWORD, BINARY, EXPAND, QWORD = 1, 7, 4, 3, 2, 11
 MICS = {
     "no effects at all": None,
     "a stream effect": {dm.FX % 5: ("{S}", SZ), dm.MODES_KEY % 5: ([dm.MODE_DEFAULT], MULTI)},
-    "a G733 (EFX + old LFX)": {dm.FX % 7: ("{E}", SZ), dm.FX % 1: ("{E}", SZ),
+    "a gaming headset (EFX + old LFX)": {dm.FX % 7: ("{E}", SZ), dm.FX % 1: ("{E}", SZ),
                                dm.MODES_KEY % 7: ([dm.MODE_DEFAULT], MULTI)},
     "old-style effects only": {dm.FX % 1: ("{L}", SZ), dm.FX % 2: ("{G}", SZ)},
     "a stream effect list": {dm.FX % 13: (["{X}", "{Y}"], MULTI), dm.FX % 5: ("{S}", SZ)},
@@ -373,7 +373,7 @@ def test_an_uninstall_cut_off_anywhere_finishes_on_the_next_run(fake_reg, mic):
 def test_repair_after_windows_reset_keeps_the_new_driver_effects(fake_reg):
     """A driver update / "Reset sound settings" rewrote the mic's effects: repairing and
     later taking it off leave the driver's new ones, not the stale ones from before."""
-    _mic(fake_reg, MICS["a G733 (EFX + old LFX)"])
+    _mic(fake_reg, MICS["a gaming headset (EFX + old LFX)"])
     dm._install_endpoint(GUID, None)
     fake_reg.keys[FXKEY.lower()] = {dm.FX % 7: ("{NEW}", SZ)}   # Windows reset it
     for guid in fake_reg.installed_on():   # what admin_install does: repair
@@ -446,7 +446,7 @@ def test_a_failed_set_up_puts_the_mic_back(fake_reg, monkeypatch, tmp_path):
     monkeypatch.setattr(dm, "_running_dependents", lambda: [])
     monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
     monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
-    _mic(fake_reg, MICS["a G733 (EFX + old LFX)"])
+    _mic(fake_reg, MICS["a gaming headset (EFX + old LFX)"])
     before = fake_reg.mics()
     real = dm._install_endpoint
 
@@ -1558,8 +1558,8 @@ def test_status_offers_the_move_out_of_the_stream_effect(monkeypatch, slot, expe
     assert dm.endpoint_wide() == (slot in (7, 15))
 
 
-def test_a_g733_gets_it_in_the_endpoint_effect(fake_reg):
-    _mic(fake_reg, MICS["a G733 (EFX + old LFX)"])
+def test_a_gaming_headset_gets_it_in_the_endpoint_effect(fake_reg):
+    _mic(fake_reg, MICS["a gaming headset (EFX + old LFX)"])
     dm._install_endpoint(GUID, None)
     fx = fake_reg.keys[FXKEY.lower()]
     state = fake_reg.keys[dm.ENDPOINTS_KEY.lower() + "\\" + GUID.lower()]
@@ -1685,11 +1685,11 @@ def test_a_data_folder_that_cant_be_made_safe_stops_the_admin_step(monkeypatch):
 def test_a_cut_short_name_two_mics_share_picks_neither(monkeypatch):
     mics = [{"guid": "{a}", "name": "Microphone (USB Audio Device)", "active": True},
             {"guid": "{b}", "name": "Microphone (USB Audio Device 2)", "active": True},
-            {"guid": "{c}", "name": "Headset Microphone (G733)", "active": True}]
+            {"guid": "{c}", "name": "Headset Microphone (USB headset)", "active": True}]
     monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
     assert dm.endpoint_for("Microphone (USB Audio Device)") == "{a}"   # exact wins
     assert dm.endpoint_for("Microphone (USB Audio") is None             # which one?
-    assert dm.endpoint_for("Headset Microphone (G7") == "{c}"
+    assert dm.endpoint_for("Headset Microphone (USB") == "{c}"
 
 
 # ---------------------------------------------------------------------- the data folder
