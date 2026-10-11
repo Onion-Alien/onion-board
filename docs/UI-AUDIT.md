@@ -270,9 +270,12 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   Done (PR #425): `appspanel.category_label` gives the shown name (headings, the
   card's Categories menu, the rename prompt) in all 32 languages; the config keeps
   the English key.
-- [ ] **U15: Apps category headings have no keyboard way to their menu** (Rename,
+- [x] **U15: Apps category headings have no keyboard way to their menu** (Rename,
   Delete). They take no focus; give them one with a visible focus ring, or put the
   menu on a small button beside the heading. Target: `ui/appspanel.py`.
+
+  Done (PR #426): Tab reaches a heading (its rule turns the accent colour), the Menu
+  key or Shift+F10 opens its menu, and Tab goes heading, its cards, next heading.
 
 ### Features for later (not UI fixes; after 2.0)
 

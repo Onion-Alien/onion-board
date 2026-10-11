@@ -27,7 +27,7 @@ import zlib
 
 from PySide6.QtCore import (QEvent, QMimeData, QObject, QRect, QSize, Qt,
                             QTimer, Signal)
-from PySide6.QtGui import (QActionGroup, QDrag, QFont, QKeySequence, QPainter, QPixmap,
+from PySide6.QtGui import (QActionGroup, QColor, QDrag, QFont, QKeySequence, QPainter, QPixmap,
                            QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
                                QHBoxLayout, QInputDialog, QLabel,
@@ -126,6 +126,14 @@ class AppCategoryHeading(QLabel):
         self.setCursor(Qt.OpenHandCursor)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_menu)
+        # the keyboard's way to the same menu, as on the cards (DESIGN section 0):
+        # Tab reaches the heading (a click doesn't: it's the drag handle), then the
+        # Menu key or Shift+F10 opens it under the name
+        self.setFocusPolicy(Qt.TabFocus)
+        for keys in (QKeySequence(Qt.Key_Menu), QKeySequence("Shift+F10")):
+            sc = QShortcut(keys, self)
+            sc.setContext(Qt.WidgetShortcut)
+            sc.activated.connect(lambda: self._show_menu(self.rect().bottomLeft()))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -199,9 +207,21 @@ class AppCategoryHeading(QLabel):
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
+        if self.hasFocus():   # the focus ring: the rule under it in the accent, solid
+            painter.fillRect(0, self.height() - 2, self.width(), 2,
+                             QColor(theme.T.get("accent", "#7c5cff")))
+            return
         painter.setOpacity(0.25)
         painter.setPen(self.palette().color(self.foregroundRole()))
         painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
+
+    def focusInEvent(self, event):
+        super().focusInEvent(event)
+        self.update()
+
+    def focusOutEvent(self, event):
+        super().focusOutEvent(event)
+        self.update()
 
 
 class AppGrid(CardGrid):
@@ -221,6 +241,7 @@ class AppGrid(CardGrid):
 
         self.custom_categories = set(self.category_order) - set(default_cats)
         self.headings: dict[str, AppCategoryHeading] = {}
+        self._tab_key: list[int] = []   # the shown order the Tab chain was last set to
         for category in self.category_order:
             self._create_heading(category)
 
@@ -298,6 +319,7 @@ class AppGrid(CardGrid):
         cols = self.columns(rect.width())
         width = max(1, (rect.width() - self._gap * (cols - 1)) // cols)
         y = rect.y()
+        seq: list[QWidget] = []   # headings and cards as shown, for the Tab order
         for category in self.category_order:
             heading = self.headings.get(category)
             if heading is None:
@@ -308,6 +330,7 @@ class AppGrid(CardGrid):
                 heading.setVisible(bool(is_visible) and not self.max_cols)
             if not is_visible:
                 continue
+            seq += [heading, *(item.widget() for item in group)]
             if y != rect.y():
                 y += self._gap
             if not self.max_cols:   # the clip editor's big view needs all the space
@@ -325,7 +348,33 @@ class AppGrid(CardGrid):
                         item.setGeometry(QRect(rect.x() + j * (width + self._gap), y,
                                                width, heights[j]))
                 y += max(heights) + self._gap
+        if move and not self.max_cols:
+            self._sync_tab_order(seq)
         return max(0, y - self._gap - rect.y())
+
+    def _sync_tab_order(self, seq: list[QWidget]):
+        """Tab goes a heading, its cards, the next heading... as shown. The headings are
+        made before any card, so by default Tab visited them all first."""
+        key = [id(w) for w in seq]
+        if key == self._tab_key:
+            return
+        self._tab_key = key
+        chain = []
+        for w in seq:
+            if isinstance(w, AppCategoryHeading):
+                chain.append(w)
+                continue
+            inner = getattr(w, "_tab_chain", None)
+            if inner is None:   # a card's own order, read while it's still in one piece
+                inner, n = [], w.nextInFocusChain()
+                while n is not w and w.isAncestorOf(n):
+                    if n.focusPolicy() & Qt.TabFocus:
+                        inner.append(n)
+                    n = n.nextInFocusChain()
+                w._tab_chain = inner
+            chain += inner
+        for a, b in zip(chain, chain[1:]):
+            QWidget.setTabOrder(a, b)
 
 
 # a version folder in a program's path (Discord's app-1.0.9156, 24.1.3): it changes on
