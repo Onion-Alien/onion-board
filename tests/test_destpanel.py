@@ -343,3 +343,26 @@ def test_switch_by_itself_follows_whoever_listens(window, monkeypatch):  # noqa:
     window._poll_voice()
     assert window.engine.dest.key == "discord"     # off: back to only suggesting
     assert not panel.suggest.isHidden()
+
+
+def test_mode_buttons_pick_with_arrow_keys(window, qapp):  # noqa: F811
+    """U2: the mode buttons are an exclusive group, so arrows move the pick like radio
+    buttons and apply it (DESIGN section 0: keyboard selection for button groups)."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    panel = DestPanel(window)
+    panel.show()
+    keys = list(panel.buttons)
+    first = panel.buttons[keys[0]]
+    first.click()
+    first.setFocus()
+    qapp.processEvents()
+    QTest.keyClick(first, Qt.Key_Right)
+    assert panel.buttons[keys[1]].isChecked() and not first.isChecked()
+    assert profiles_key(window) == keys[1]
+    panel.close()
+
+
+def profiles_key(mw) -> str:
+    from soundboard import profiles
+    return profiles.current(mw.cfg.dest).key
