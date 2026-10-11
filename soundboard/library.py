@@ -7,22 +7,27 @@ decoding and resampling it again.
 """
 from __future__ import annotations
 
+import contextlib
 import hashlib
+import itertools
 import json
 import logging
 import math
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import uuid
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field, fields
 from functools import cache, lru_cache
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, NamedTuple
 
 import numpy as np
 import soundfile as sf
@@ -1104,52 +1109,269 @@ def _ffmpeg_words(stderr: str) -> str:
     return stderr
 
 
-def _decode(path: str) -> tuple[np.ndarray, bool]:
-    """(audio as (n, 2) float32 at SR, decoded-by-ffmpeg?).
+# A file is read a second at a time, whatever its length. A sound up to STREAM_S comes
+# back whole (float32 in RAM, as it always did); a longer one never is: it's resampled,
+# measured and written into its cache (and its converted copy) piece by piece, then
+# played from the cache file (mapped). A two-hour import used to hold its float32 audio
+# (2.8 GB) and a few copies of it at once; now it holds about a second of it.
+STREAM_S = 60
+LEVEL_WIN = 2400   # level_gain's blocks (50 ms); a second (SR) is a whole number of them
+
+
+class _SourceError(Exception):
+    """libsndfile couldn't open or read the file: ffmpeg gets a go (m4a/aac/video etc.)."""
+
+
+def _stereo(x: np.ndarray) -> np.ndarray:
+    if x.shape[1] == 1:
+        return np.repeat(x, 2, axis=1)
+    return x[:, :2] if x.shape[1] > 2 else x
+
+
+def _sf_pieces(f, left: int):
+    while left > 0:
+        try:
+            x = f.read(frames=min(f.samplerate, left), dtype="float32", always_2d=True)
+        except Exception as e:  # noqa: BLE001 - libsndfile opened it but can't decode it
+            raise _SourceError(e) from e
+        if not len(x):
+            return
+        left -= len(x)
+        yield x
+
+
+@contextlib.contextmanager
+def _sf_source(path: str):
+    """(rate, pieces) of the file's first MAX_SECONDS, by libsndfile."""
+    try:
+        f = sf.SoundFile(path)
+    except Exception as e:  # noqa: BLE001
+        raise _SourceError(e) from e
+    with f:
+        yield f.samplerate, _sf_pieces(f, int(MAX_SECONDS * f.samplerate))
+
+
+class _Stopwatch:
+    """Kills ffmpeg once it has been waited on for FFMPEG_TIMEOUT in all: only the time
+    spent waiting for its audio counts, not the import's own work on each piece."""
+
+    def __init__(self, p: subprocess.Popen, out):
+        self.p, self.out, self.spent, self.since, self.fired = p, out, 0.0, None, False
+        self.done = threading.Event()
+        threading.Thread(target=self._run, daemon=True, name="ffmpeg-timeout").start()
+
+    def _run(self):
+        while not self.done.wait(0.25):
+            since = self.since
+            if since is not None and self.spent + time.monotonic() - since > FFMPEG_TIMEOUT:
+                self.fired = True
+                self.p.kill()
+                return
+
+    def read(self, n: int) -> bytes:
+        self.since = time.monotonic()
+        try:
+            return self.out.read(n)
+        finally:
+            self.spent += time.monotonic() - self.since
+            self.since = None
+
+
+def _ffmpeg_pieces(path: str, p: subprocess.Popen, err, watch: _Stopwatch):
+    got = 0
+    while True:
+        b = watch.read(SR * 8)   # a second of f32le stereo
+        if not b:
+            break
+        n = len(b) // 8 * 8
+        got += n
+        if n:
+            yield np.frombuffer(b, np.float32, count=n // 4).reshape(-1, 2)
+    code = p.wait()
+    if watch.fired:
+        raise RuntimeError(_("ffmpeg took longer than {seconds}s", seconds=FFMPEG_TIMEOUT))
+    if code != 0 or not got:
+        err.seek(0)
+        msg = err.read().decode(errors="ignore").strip()
+        log.info("ffmpeg couldn't decode %s: %s", path, msg)
+        raise RuntimeError(_ffmpeg_words(msg))
+
+
+@contextlib.contextmanager
+def _ffmpeg_source(path: str, cause: BaseException | None = None):
+    """(SR, pieces) of the file's first MAX_SECONDS, by ffmpeg (streamed, never all of
+    its output at once). The process is gone when this ends, however it ends."""
+    ff = _ffmpeg()
+    if not ff:
+        from soundboard import usage   # the name only, never the file
+        usage.used("needs-ffmpeg")
+        raise RuntimeError(_("This file needs FFmpeg to play. Get it in "
+                             "Settings > Data & quality.")) from cause
+    with tempfile.TemporaryFile() as err:
+        try:
+            p = subprocess.Popen([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),
+                                  "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=err,
+                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        except OSError as e:   # a broken ffmpeg: about the file's format, not the disk
+            raise RuntimeError(str(e)) from e
+        out = p.stdout
+        assert out is not None   # stdout=PIPE
+        watch = _Stopwatch(p, out)
+        try:
+            yield SR, _ffmpeg_pieces(path, p, err, watch)
+        finally:
+            watch.done.set()
+            if p.poll() is None:
+                p.kill()
+            out.close()
+            p.wait()
+
+
+class _Long(NamedTuple):
+    """A sound over STREAM_S, imported straight into its cache (_read)."""
+    audio: np.ndarray    # (n, 2) int16, mapped from the cache file
+    gain: float          # level_gain() of it
+    frames: int
+    via_ffmpeg: bool
+
+
+def _read(path: str, sid: str | None = None,
+          store: Callable[[bool], Path | None] | None = None) -> tuple[np.ndarray, bool] | _Long:
+    """(audio as (n, 2) float32 at SR, decoded-by-ffmpeg?), or with `sid`, for a sound
+    over STREAM_S: a _Long, its audio already in sid's cache and, when store(via_ffmpeg)
+    names a file, saved there as it was decoded (write_stored's format).
 
     Only the first MAX_SECONDS are ever read: libsndfile is asked for that many
-    frames and ffmpeg is given -t, so a two-hour file costs the same as a
-    fifteen-minute one."""
-    via_ffmpeg = False
+    frames and ffmpeg is given -t."""
     try:
-        with sf.SoundFile(path) as f:
-            sr = f.samplerate
-            data = f.read(frames=int(MAX_SECONDS * sr), dtype="float32", always_2d=True)
-    except Exception as e:  # noqa: BLE001 - fall back to ffmpeg for m4a/aac/video etc.
-        log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
-        ff = _ffmpeg()
-        if not ff:
-            from soundboard import usage   # the name only, never the file
-            usage.used("needs-ffmpeg")
-            raise RuntimeError(_("This file needs FFmpeg to play. Get it in "
-                                 "Settings > Data & quality.")) from e
-        try:
-            p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),
-                                "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],
-                               capture_output=True, timeout=FFMPEG_TIMEOUT,
-                               creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        except subprocess.TimeoutExpired:
-            raise RuntimeError(_("ffmpeg took longer than {seconds}s",
-                                 seconds=FFMPEG_TIMEOUT)) from None
-        if p.returncode != 0 or not p.stdout:
-            msg = p.stderr.decode(errors="ignore").strip()
-            log.info("ffmpeg couldn't decode %s: %s", path, msg)
-            raise RuntimeError(_ffmpeg_words(msg)) from None
-        data = np.frombuffer(p.stdout, np.float32).reshape(-1, 2).copy()
-        sr = SR
-        via_ffmpeg = True
-    if data.shape[1] == 1:
-        data = np.repeat(data, 2, axis=1)
-    elif data.shape[1] > 2:
-        data = data[:, :2]
-    if sr != SR:
-        data = soxr.resample(data, sr, SR, quality="VHQ").astype(np.float32)
+        return _read_from(path, sid, store, None)
+    except _SourceError as e:
+        log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e.__cause__)
+        return _read_from(path, sid, store, e.__cause__)
+
+
+def _read_from(path, sid, store, ffmpeg_cause):
+    via_ffmpeg = ffmpeg_cause is not None
+    src = _ffmpeg_source(path, ffmpeg_cause) if via_ffmpeg else _sf_source(path)
+    with src as (rate, pieces):
+        head, n = [], 0
+        for x in pieces:
+            head.append(_stereo(x))
+            n += len(x)
+            if sid is not None and n > STREAM_S * rate:
+                rest = (_stereo(x) for x in pieces)
+                return _stream(itertools.chain(head, rest), rate, sid,
+                               store(via_ffmpeg) if store else None, via_ffmpeg)
+        data = np.concatenate(head) if head else np.zeros((0, 2), np.float32)
+    del head
+    if rate != SR:
+        data = soxr.resample(data, rate, SR, quality="VHQ").astype(np.float32, copy=False)
     return np.ascontiguousarray(data, dtype=np.float32), via_ffmpeg
+
+
+def _decode(path: str) -> tuple[np.ndarray, bool]:
+    """(audio as (n, 2) float32 at SR, decoded-by-ffmpeg?), whole."""
+    got = _read(path)
+    assert not isinstance(got, _Long)   # only with a sid
+    return got
 
 
 def decode(path: str) -> np.ndarray:
     """Decode any audio file to (n, 2) float32 at SR with high-quality resampling."""
     return _decode(path)[0]
+
+
+_NPY_HEAD = 128   # a streamed cache file's header, written last when the length is known
+
+
+def _npy_header(f, frames: int) -> None:
+    """The .npy header of (frames, 2) int16, padded to _NPY_HEAD bytes (np.load reads it)."""
+    h = f"{{'descr': '<i2', 'fortran_order': False, 'shape': ({frames}, 2), }}"
+    h = h.ljust(_NPY_HEAD - 11) + "\n"
+    f.seek(0)
+    f.write(b"\x93NUMPY\x01\x00" + struct.pack("<H", len(h)) + h.encode("latin1"))
+
+
+def _i16(x: np.ndarray) -> np.ndarray:
+    """to_int16's rounding of float audio already under full scale (or limited)."""
+    y = x * I16
+    np.rint(y, out=y)
+    np.clip(y, -I16 - 1, I16, out=y)
+    return y.astype("<i2")
+
+
+def _stream(pieces, rate: int, sid: str, store: Path | None, via_ffmpeg: bool) -> _Long:
+    """The streamed half of _read: resample, then a second at a time measure the level
+    and write the stored copy and the int16 cache. Exactly what decode → write_stored →
+    level_gain → store_cached make of the whole thing: to_int16 turns a sound that
+    goes over full scale down with the limiter (_under_full_scale, run a second at a
+    time from the start), else only rounds it. Which one is known only at the end, so
+    both are written and the right one kept."""
+    from soundboard.sendfx import Limiter
+    rs = soxr.ResampleStream(rate, SR, 2, dtype="float32", quality="VHQ") if rate != SR else None
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    dest = cache_path(sid)
+    tmp = {False: dest.with_suffix(".tmp.npy"), True: dest.with_name(f"{sid}.lim.tmp.npy")}
+    lim = Limiter(SR, ceiling_db=-0.05)
+    st = {"n": 0, "lim_n": 0, "skip": lim.la, "peak": 0.0}
+    rms: list[np.ndarray] = []
+    try:
+        with contextlib.ExitStack() as stack:
+            files = {k: stack.enter_context(open(p, "wb")) for k, p in tmp.items()}
+            for f in files.values():
+                f.write(bytes(_NPY_HEAD))
+            out = stack.enter_context(_stored_writer(store)) if store is not None else None
+
+            def limited(y):
+                d = min(st["skip"], len(y))   # the limiter's first `la` frames are its delay
+                y, st["skip"] = y[d:], st["skip"] - d
+                y = y[:st["n"] - st["lim_n"]]
+                if len(y):
+                    files[True].write(_i16(y).tobytes())
+                    st["lim_n"] += len(y)
+
+            def second(x):
+                st["peak"] = max(st["peak"], float(np.max(np.abs(x))))
+                rms.append(_block_rms(x))
+                if out is not None:
+                    out.write(x)
+                files[False].write(_i16(x).tobytes())
+                st["n"] += len(x)
+                limited(lim.process(x))
+
+            buf = np.zeros((0, 2), np.float32)
+
+            def feed(y):
+                nonlocal buf
+                buf = np.concatenate([buf, y]) if len(buf) else y
+                while len(buf) >= SR:
+                    second(np.ascontiguousarray(buf[:SR], np.float32))
+                    buf = buf[SR:]
+
+            for x in pieces:
+                feed(rs.resample_chunk(x) if rs is not None else x)
+            if rs is not None:
+                feed(rs.resample_chunk(np.zeros((0, 2), np.float32), last=True))
+            if len(buf):
+                second(np.ascontiguousarray(buf, np.float32))
+            limited(lim.process(np.zeros((lim.la, 2), np.float32)))   # push the delay out
+            for f in files.values():
+                _npy_header(f, st["n"])
+        keep = tmp[st["peak"] > 1.0]
+        try:
+            keep.replace(dest)
+            _refused.discard(dest)   # a new file there: in use again, not a leftover
+        except OSError:   # dest mapped by audio still in use: play the new file where it is
+            log.warning("couldn't put the cache of %s in place", sid, exc_info=True)
+            dest = keep
+        audio = mapped.load(dest)
+    finally:
+        for p in tmp.values():
+            if p != dest:
+                p.unlink(missing_ok=True)
+    gain = _gain(float(st["peak"]), np.concatenate(rms) if rms else np.zeros(0, np.float32))
+    return _Long(audio, gain, st["n"], via_ffmpeg)
 
 
 def to_int16(data: np.ndarray) -> np.ndarray:
@@ -1245,8 +1467,19 @@ def load_original(meta: SoundMeta) -> np.ndarray:
     """int16 audio of the sound as imported (no effects): cache, else decode."""
     data = load_cached(meta.id)
     if data is None:
-        data = store_cached(meta.id, decode(meta.file))
+        got = _read(meta.file, meta.id)   # a long one goes straight into the cache
+        data = got.audio if isinstance(got, _Long) else store_cached(meta.id, got[0])
     return data
+
+
+def decode_int16(path: str) -> tuple[np.ndarray, float]:
+    """(int16 audio, level_gain) of a file that isn't a sound of the library (a link
+    played before it's added). A long one is streamed into a cache file of its own
+    (mapped; prune_cache takes it once nothing plays it), like an import."""
+    got = _read(path, f"play-{uuid.uuid4().hex[:10]}")
+    if isinstance(got, _Long):
+        return got.audio, got.gain
+    return to_int16(got[0]), level_gain(got[0])
 
 
 def load_sound(meta: SoundMeta) -> np.ndarray:
@@ -1413,28 +1646,36 @@ def fingerprint(path: str) -> str:
         return ""
 
 
+def _block_rms(data: np.ndarray) -> np.ndarray:
+    """RMS of the mono mix in each whole LEVEL_WIN block (a part-block at the end is left
+    out). Block by block, so any run of whole seconds can be done on its own."""
+    mono = data.mean(axis=1)
+    n = len(mono) // LEVEL_WIN
+    return np.sqrt((mono[: n * LEVEL_WIN].reshape(n, LEVEL_WIN) ** 2).mean(axis=1))
+
+
+def _gain(pk: float, rms: np.ndarray, r: float = 0.0) -> float:
+    """level_gain from the loudest sample and the block RMS (`r` when there's no block)."""
+    if len(rms):
+        # RMS over the loud part only, so silence padding doesn't skew it
+        rms = rms[rms > rms.max() * 0.1] if rms.max() > 0 else rms
+        r = float(np.sqrt((rms ** 2).mean())) if len(rms) else 0.0
+    if r <= 1e-6:
+        return 1.0
+    g = 10 ** ((TARGET_RMS_DB - 20 * np.log10(r)) / 20)
+    if pk > 0:
+        g = min(g, 0.95 / pk * 1.4)  # allow a little limiter work, not a lot
+    return float(np.clip(g, 0.1, 6.0))
+
+
 def level_gain(data: np.ndarray) -> float:
     """Gain that brings the sound to TARGET_RMS_DB without letting peaks exceed ~-0.5 dBFS."""
     if not len(data):
         return 1.0
-    mono = data.mean(axis=1)
-    # RMS over the loud part only, so silence padding doesn't skew it
-    win = 2400
-    n = len(mono) // win
-    if n >= 1:
-        blocks = mono[: n * win].reshape(n, win)
-        rms = np.sqrt((blocks ** 2).mean(axis=1))
-        rms = rms[rms > rms.max() * 0.1] if rms.max() > 0 else rms
-        r = float(np.sqrt((rms ** 2).mean())) if len(rms) else 0.0
-    else:
-        r = float(np.sqrt((mono ** 2).mean()))
-    if r <= 1e-6:
-        return 1.0
-    g = 10 ** ((TARGET_RMS_DB - 20 * np.log10(r)) / 20)
     pk = float(np.max(np.abs(data)))
-    if pk > 0:
-        g = min(g, 0.95 / pk * 1.4)  # allow a little limiter work, not a lot
-    return float(np.clip(g, 0.1, 6.0))
+    if len(data) >= LEVEL_WIN:
+        return _gain(pk, _block_rms(data))
+    return _gain(pk, np.zeros(0), float(np.sqrt((data.mean(axis=1) ** 2).mean())))
 
 
 def _safe_name(name: str) -> str:
@@ -1541,12 +1782,17 @@ def stored_ext() -> str:
     return ".mp3" if quality.current.save_format == "mp3" and _CAN_MP3 else ".flac"
 
 
+def _stored_writer(dest: Path) -> sf.SoundFile:
+    """An open writer for library audio ((n, 2) at SR), in the format `dest`'s extension says."""
+    if dest.suffix.lower() == ".mp3":
+        return sf.SoundFile(dest, "w", SR, 2, format="MP3", compression_level=MP3_QUALITY)
+    return sf.SoundFile(dest, "w", SR, 2, subtype="PCM_16")
+
+
 def write_stored(dest: Path, data: np.ndarray) -> None:
     """Write library audio ((n, 2) at SR) to `dest`, as its extension says."""
-    if dest.suffix.lower() == ".mp3":
-        sf.write(dest, data, SR, format="MP3", compression_level=MP3_QUALITY)
-    else:
-        sf.write(dest, data, SR, subtype="PCM_16")
+    with _stored_writer(dest) as f:
+        f.write(data)
 
 
 def import_file(src: str, color: str, name: str = "",
@@ -1563,13 +1809,46 @@ def import_file(src: str, color: str, name: str = "",
     playable if ffmpeg goes away. So is a file libsndfile reads under a name outside
     AUDIO_EXTS (.au, .caf, .w64…): only those come back in from a backup
     (soundboard.backup)."""
-    data, via_ffmpeg = _decode(src)
-    if not len(data):
-        raise ValueError(_("this file has no audio in it"))
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
-    convert = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
     name = name.strip() or srcp.stem.replace("_", " ").strip()
+    # Never fall back to using `src` in place: a download's temp folder is deleted
+    # right after this. A failed copy leaves nothing behind and says what to do.
+    dest = None
+
+    def store(via_ffmpeg: bool) -> Path | None:
+        """A long sound to convert is saved while it's decoded (_read): here."""
+        nonlocal dest
+        if copy and (via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS):
+            dest = dest or new_file(name, stored_ext(), folder)
+            return dest
+        return None
+
+    try:
+        got = _read(src, sid, store)
+        if isinstance(got, _Long):
+            if copy and dest is None:          # plain audio: copied as it is
+                dest = new_file(name, srcp.suffix, folder)
+                shutil.copy2(srcp, dest)
+            meta = SoundMeta(id=sid, added=time.time(), name=name[:40].strip() or "Sound",
+                             file=str(dest) if copy else str(srcp.absolute()), color=color,
+                             level_gain=got.gain, duration=got.frames / SR,
+                             fingerprint=fingerprint(src))
+            return meta, got.audio
+    except Exception as e:
+        if dest is None and not isinstance(e, OSError):
+            raise                              # it couldn't be read: said as it is
+        log.warning("couldn't copy %s into the library", src, exc_info=True)
+        if dest is not None:
+            discard(dest)
+        if isinstance(e, OSError):
+            raise OSError(_("couldn't save it into your Sounds folder ({error}). Check "
+                            "the disk isn't full and try again.", error=e.strerror or e)) from e
+        raise
+    data, via_ffmpeg = got
+    if not len(data):
+        raise ValueError(_("this file has no audio in it"))
+    convert = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
     if not copy:
         # The same decoded cache feeds playback and effects in either storage mode.
         # Only persistent local files may use this path; temporary imports must copy.
@@ -1577,9 +1856,6 @@ def import_file(src: str, color: str, name: str = "",
                          file=str(srcp.absolute()), color=color, level_gain=level_gain(data),
                          duration=len(data) / SR, fingerprint=fingerprint(src))
         return meta, store_cached(sid, data)
-    # Never fall back to using `src` in place: a download's temp folder is deleted
-    # right after this. A failed copy leaves nothing behind and says what to do.
-    dest = None
     try:
         dest = new_file(name, stored_ext() if convert else srcp.suffix, folder)
         if convert:

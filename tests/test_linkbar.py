@@ -69,9 +69,7 @@ def test_add_and_play_share_one_download(qapp, monkeypatch, tmp_path, first):
     downloads, added, done, workers = [], [], [], []
     monkeypatch.setattr(linkbar.ytdl, "download_audio",
                         lambda url, **kw: (downloads.append(url) or path, "Clip"))
-    monkeypatch.setattr(linkbar, "decode", lambda path: data)
-    monkeypatch.setattr(linkbar, "to_int16", lambda audio: audio)
-    monkeypatch.setattr(linkbar, "level_gain", lambda audio: 0.5)
+    monkeypatch.setattr(linkbar, "decode_int16", lambda path: (data, 0.5))
     monkeypatch.setattr(linkbar, "fingerprint", lambda path: "fp")
     monkeypatch.setattr(linkbar, "import_file", lambda path, color, **kw: (meta, data))
     monkeypatch.setattr(linkbar.thumbs, "find_in", lambda folder: None)

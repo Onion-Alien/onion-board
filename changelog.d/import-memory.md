@@ -1,0 +1,2 @@
+- Adding a long sound no longer takes gigabytes of memory: it's read and saved a second at a time. A 1-hour MP3 used about 4.5 GB while it was added, now about 30 MB, and a sound up to the 2-hour limit costs the same.
+- Playing a long link before adding it no longer loads the whole thing into memory.
