@@ -62,3 +62,41 @@ def test_wheel_never_changes_a_dropdown_or_tab_anywhere(window):  # noqa: F811
                 QPointF(5, 5), QPointF(w.mapToGlobal(QPoint(5, 5))), QPoint(), QPoint(0, dy),
                 Qt.NoButton, Qt.NoModifier, Qt.NoScrollPhase, False))
         assert w.currentIndex() == 0, f"{type(w).__name__} {w.objectName()} moved"
+
+
+def test_style_has_no_python_style_hint():
+    """Qt asks the style for hints tens of thousands of times per theme switch; a
+    Python styleHint makes each one wait for Python's lock (theme switch freezes of
+    11 s and 36 s while audio ran). The wheel / slider changes are event filters."""
+    from soundboard.wheelguard import AppStyle
+    assert "styleHint" not in AppStyle.__dict__
+    assert "pixelMetric" not in AppStyle.__dict__
+
+
+def test_click_on_a_slider_jumps_there_and_drags(qapp):
+    """A left click anywhere on a slider's bar moves it there (not a page step), and
+    the same press keeps dragging it, for plain and seek sliders alike."""
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QSlider
+
+    from soundboard.ui.widgets import SeekSlider
+    for cls in (QSlider, SeekSlider):
+        s = cls(Qt.Orientation.Horizontal)
+        s.setRange(0, 100)
+        s.setPageStep(10)
+        s.resize(300, 24)
+        s.show()
+        QApplication.processEvents()
+        y = s.height() // 2
+        QTest.mousePress(s, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier,
+                         QPoint(270, y))
+        assert s.value() > 80, f"{cls.__name__} page-stepped to {s.value()}"
+        assert s.isSliderDown()
+        QTest.mouseMove(s, QPoint(60, y))
+        assert s.value() < 30, f"{cls.__name__} didn't drag ({s.value()})"
+        QTest.mouseRelease(s, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier,
+                           QPoint(60, y))
+        assert not s.isSliderDown()
+        s.close()
+        s.deleteLater()
