@@ -794,6 +794,15 @@ QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* Spacious controls only in Voice and Setup cards. */
 QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
+/* the reset family (panel.reset_button): a slim muted link with the reset arrow, the
+   same beside an effect, the live controls and a sound's effects */
+QPushButton#reset, QFrame#card QPushButton#reset, QFrame#card[roomy="true"] QPushButton#reset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
+QPushButton#reset:hover, QFrame#card QPushButton#reset:hover, QFrame#card[roomy="true"] QPushButton#reset:hover { color:$text; background:transparent; }
+QPushButton#infobutton, QFrame#card QPushButton#infobutton, QFrame#card[roomy="true"] QPushButton#infobutton { background:transparent; padding:0; min-width:24px; max-width:24px; min-height:24px; max-height:24px; border-radius:6px; }
+QPushButton#infobutton:hover, QFrame#card QPushButton#infobutton:hover, QFrame#card[roomy="true"] QPushButton#infobutton:hover { background:$btn_hover; }
+/* a quiet icon button stays quiet inside a card too (the ⓘ after the sound modes) */
+QFrame#card QPushButton#iconbutton[quiet="true"], QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"] { background:transparent; padding:7px 10px; min-height:0; }
+QFrame#card QPushButton#iconbutton[quiet="true"]:hover, QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"]:hover { background:$btn_hover; }
 QFrame#card[roomy="true"] QPushButton#primary { padding:10px 16px; }
 QFrame#card[roomy="true"] QPushButton#voicetile { padding:7px 12px; text-align:left; }
 QFrame#card[roomy="true"] QPushButton#fold { padding:8px 10px; text-align:left; }
@@ -819,8 +828,6 @@ QLabel#fxparam { color:$text; font-size:9pt; }
 QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
 QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
-QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
-QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
 QFrame#voicebar { background:$panel; border-radius:12px; }
 QWidget#voicebarpart, QFrame#voicebar QLabel { background:transparent; }
 QLabel#voicebarlabel { color:$muted; font-size:9pt; font-weight:600; }

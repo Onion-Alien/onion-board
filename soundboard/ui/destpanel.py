@@ -14,8 +14,8 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDia
 
 from soundboard import destination, profiles, voicesdk
 from soundboard.destination import CEILINGS, LOWCUTS, Dest
-from soundboard.ui import fit
-from soundboard.ui.panel import Flow, UndoBar, hint_label
+from soundboard.ui import fit, icons
+from soundboard.ui.panel import Flow, UndoBar, hint_label, info_button
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
@@ -225,20 +225,24 @@ class DestPanel(QWidget):
         for p in profiles.PROFILES:
             b = QPushButton(p.name)
             b.setCheckable(True)
+            # each mode's picture (the sidebar's mode button uses the same); white on
+            # the picked one, like its words
+            icons.set_icon(b, MODE_ICONS[p.key], "text", "on_accent", size=16)
             b.setToolTip(mode_tip(p))
             b.setAccessibleName(_("{label} mode", label=p.name))
             b.setAccessibleDescription(p.blurb)
             self.group.addButton(b)
             self.buttons[p.key] = b
             row.addWidget(b)
+        # the explanation behind an ⓘ beside the card's heading (it was a four-word
+        # button on its own line under the modes): the card puts `help_btn` there
+        self.help_btn = info_button(_("What do these do?"))
+        self.help_btn.setAccessibleDescription(
+            _("Every mode in plain words, and what it's doing right now"))
+        self.help_btn.clicked.connect(self.show_help)
         v.addLayout(row)
         self.now = hint_label("")
         v.addWidget(self.now)
-        help_btn = QPushButton(_("What do these do?"))
-        help_btn.setObjectName("small")
-        help_btn.setToolTip(_("Every mode in plain words, and what it's doing right now"))
-        help_btn.clicked.connect(self.show_help)
-        v.addWidget(help_btn, 0, Qt.AlignLeft)
         # a hint that something else is in use: Discord listening while in Game, say,
         # or (Advanced) the game in front ships a voice engine we know
         self.suggest = QWidget()

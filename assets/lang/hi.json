@@ -366,7 +366,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "रिपोर्ट कॉपी हो गई। इसे आपके ब्राउज़र में अभी खुले issue में पेस्ट करें (Ctrl+V)।",
   "Report on GitHub": "GitHub पर रिपोर्ट करें",
   "Reset": "रीसेट",
-  "Reset all": "सब रीसेट करें",
   "Restart now": "अभी रीस्टार्ट करें",
   "Restart: press again restarts it": "रीस्टार्ट: दोबारा दबाने पर फिर से शुरू",
   "Resume": "फिर चलाएँ",
@@ -374,7 +373,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "किसी पैड पर राइट-क्लिक → अगला चलाएँ, ताकि वह चल रहे साउंड के बाद कतार में लगे।",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "सिर्फ़ यह एक सर्च सीधे साइट से चलाएँ, Tor से नहीं: साइट को आपका असली पता दिखेगा",
   "Save": "सेव करें",
-  "Save as new sound": "नए साउंड के रूप में सेव करें",
   "Search": "सर्च",
   "Search Myinstants: short meme sound buttons": "Myinstants पर सर्च करें: छोटे मीम साउंड बटन",
   "Search SoundCloud": "SoundCloud पर सर्च करें",
@@ -3050,5 +3048,6 @@
   "Sound output": "ध्वनि आउटपुट",
   "Interface size": "इंटरफ़ेस का आकार",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board में सब कुछ बड़ा या छोटा करता है: टेक्स्ट, बटन और पैड।",
-  "Onion Board changes size after a restart.": "Onion Board रीस्टार्ट के बाद आकार बदलता है।"
+  "Onion Board changes size after a restart.": "Onion Board रीस्टार्ट के बाद आकार बदलता है।",
+  "Save a copy": "कॉपी सेव करें"
 }

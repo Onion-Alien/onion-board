@@ -372,7 +372,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Skopiowano raport. Wklej go do zgłoszenia, które właśnie otworzyło się w przeglądarce (Ctrl+V).",
   "Report on GitHub": "Zgłoś na GitHubie",
   "Reset": "Resetuj",
-  "Reset all": "Resetuj wszystko",
   "Restart now": "Uruchom ponownie",
   "Restart: press again restarts it": "Restart: ponowne naciśnięcie zaczyna od nowa",
   "Resume": "Wznów",
@@ -380,7 +379,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "Kliknij pad prawym → Zagraj następny, by dodać go do kolejki po grającym dźwięku.",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "Uruchom tylko to wyszukiwanie prosto ze strony, nie przez Tor: strona zobaczy twój własny adres",
   "Save": "Zapisz",
-  "Save as new sound": "Zapisz jako nowy dźwięk",
   "Search": "Szukaj",
   "Search Myinstants: short meme sound buttons": "Szukaj w Myinstants: krótkie memiczne przyciski dźwiękowe",
   "Search SoundCloud": "Szukaj w SoundCloud",
@@ -3115,5 +3113,6 @@
   "Sound output": "Wyjście dźwięku",
   "Interface size": "Rozmiar interfejsu",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Powiększa lub pomniejsza wszystko w Onion Board: tekst, przyciski i pady.",
-  "Onion Board changes size after a restart.": "Onion Board zmieni rozmiar po ponownym uruchomieniu."
+  "Onion Board changes size after a restart.": "Onion Board zmieni rozmiar po ponownym uruchomieniu.",
+  "Save a copy": "Zapisz kopię"
 }

@@ -360,7 +360,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Đã sao chép báo cáo. Dán vào issue vừa mở trong trình duyệt (Ctrl+V).",
   "Report on GitHub": "Báo cáo trên GitHub",
   "Reset": "Đặt lại",
-  "Reset all": "Đặt lại tất cả",
   "Restart now": "Khởi động lại ngay",
   "Restart: press again restarts it": "Phát lại: bấm lần nữa để phát lại từ đầu",
   "Resume": "Tiếp tục",
@@ -368,7 +367,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "Chuột phải một nút → Phát tiếp theo để xếp nó sau âm thanh đang phát.",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "Chỉ chạy tìm kiếm này trực tiếp từ trang, không qua Tor: trang sẽ thấy địa chỉ thật của bạn",
   "Save": "Lưu",
-  "Save as new sound": "Lưu thành âm thanh mới",
   "Search": "Tìm",
   "Search Myinstants: short meme sound buttons": "Tìm Myinstants: nút âm thanh meme ngắn",
   "Search SoundCloud": "Tìm SoundCloud",
@@ -2985,5 +2983,6 @@
   "Sound output": "Đầu ra âm thanh",
   "Interface size": "Cỡ giao diện",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Làm mọi thứ trong Onion Board to hơn hoặc nhỏ hơn: chữ, nút và pad.",
-  "Onion Board changes size after a restart.": "Onion Board đổi cỡ sau khi khởi động lại."
+  "Onion Board changes size after a restart.": "Onion Board đổi cỡ sau khi khởi động lại.",
+  "Save a copy": "Lưu bản sao"
 }

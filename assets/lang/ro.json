@@ -980,7 +980,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Raport copiat. Lipește-l în issue-ul care tocmai s-a deschis în browser (Ctrl+V).",
   "Report on GitHub": "Raportează pe GitHub",
   "Reset": "Resetează",
-  "Reset all": "Resetează tot",
   "Reset and restart": "Resetează și repornește",
   "Reset downloader": "Resetează programul de descărcare",
   "Reset: {parts}. Changed your mind? Settings > General > Restore points.": "Resetat: {parts}. Te-ai răzgândit? Setări > General > Puncte de restaurare.",
@@ -1003,7 +1002,6 @@
   "Running in the background": "Rulează în fundal",
   "Safer: bigger buffers": "Mai sigur: buffere mai mari",
   "Save": "Salvează",
-  "Save as new sound": "Salvează ca sunet nou",
   "Save it as a file to share with friends": "Salvează-l ca fișier ca să-l partajezi cu prietenii",
   "Save videos in": "Salvează videoclipurile în",
   "Save what you just heard": "Salvează ce tocmai ai auzit",
@@ -3115,5 +3113,6 @@
   "Sound output": "Ieșire audio",
   "Interface size": "Dimensiunea interfeței",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Face totul în Onion Board mai mare sau mai mic: text, butoane și paduri.",
-  "Onion Board changes size after a restart.": "Onion Board își schimbă dimensiunea după o repornire."
+  "Onion Board changes size after a restart.": "Onion Board își schimbă dimensiunea după o repornire.",
+  "Save a copy": "Salvează o copie"
 }
