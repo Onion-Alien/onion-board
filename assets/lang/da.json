@@ -3042,5 +3042,9 @@
   "Timing": "Timing",
   "Playback": "Afspilning",
   "From a file (you can also drop a picture on the pad)": "Fra en fil (du kan også slippe et billede på knappen)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Højreklik på en pad → Redigér → Effekter for bas-boost, nightcore, slowed + reverb, beskæring og mere. Den originale fil bliver aldrig ændret."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Højreklik på en pad → Redigér → Effekter for bas-boost, nightcore, slowed + reverb, beskæring og mere. Den originale fil bliver aldrig ændret.",
+  "Delete info": "Slet info",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Slet hvor “{name}” kom fra?\n\nLink, kanal og andre detaljer og deres tekstfil slettes. Lyden bliver.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Gemmer hver downloads link, kanal, uploaddato, længde og visninger (fra selve downloaden, intet ekstra hentes), også i en tekstfil ved siden af lyden. Højreklik på lyden for at åbne eller kopiere linket. Fra: nye downloads gemmer intet af det, og menuen skjuler det; det, der allerede er gemt, bliver.",
+  "Remember where it came from": "Husk hvor den kom fra"
 }

@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QPushButton, QVBoxLayout)
+                               QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard import sourceinfo, theme
 from soundboard.i18n import _
@@ -28,9 +28,12 @@ def copy_link(src: dict, window=None) -> None:
 
 
 class SourceDialog(QDialog):
+    forgotten = Signal()   # Delete info: the owner saves the settings
+
     def __init__(self, meta, parent=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
+        self.meta = meta
         self.src = sourceinfo.clean(meta.source)
         site = sourceinfo.site_name(self.src)
         self.setWindowTitle(site)
@@ -112,9 +115,31 @@ class SourceDialog(QDialog):
         close.clicked.connect(self.accept)
         for b in (self.btn_open, self.btn_copy, close):
             row.addWidget(b)
+        self.btn_forget = QPushButton()
+        self.btn_forget.setObjectName("iconbutton")
+        icons.set_icon(self.btn_forget, "trash", "danger_text")
+        self.btn_forget.setToolTip(_("Delete info"))
+        self.btn_forget.setAccessibleName(_("Delete info"))
+        self.btn_forget.clicked.connect(self._forget)
+        row.addWidget(self.btn_forget)
         row.addStretch(1)
         v.addLayout(row)
         self.setMaximumWidth(620)
+
+    def _forget(self):
+        """Ask, then drop the link and details and the text file (the sound stays)."""
+        box = QMessageBox(QMessageBox.Question, _("Delete info"),
+                          _("Delete where “{name}” came from?\n\nIts link, channel and other "
+                            "details and their text file are deleted. The sound stays.",
+                            name=self.meta.name),
+                          QMessageBox.Yes | QMessageBox.Cancel, self)
+        box.button(QMessageBox.Yes).setText(_("Delete"))
+        box.setDefaultButton(QMessageBox.Cancel)
+        if box.exec() != QMessageBox.Yes:
+            return
+        sourceinfo.forget(self.meta)
+        self.forgotten.emit()
+        self.accept()
 
     def _copy(self):
         QApplication.clipboard().setText(self.src.get("link", ""))

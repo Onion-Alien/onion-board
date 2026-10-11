@@ -2977,5 +2977,9 @@
   "Timing": "Waktu",
   "Playback": "Pemutaran",
   "From a file (you can also drop a picture on the pad)": "Dari file (kamu juga bisa menjatuhkan gambar ke pad)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Klik kanan pad mana saja → Sunting → Efek untuk bass boost, nightcore, slowed + reverb, potong, dan lainnya. File aslinya tidak pernah diubah."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Klik kanan pad mana saja → Sunting → Efek untuk bass boost, nightcore, slowed + reverb, potong, dan lainnya. File aslinya tidak pernah diubah.",
+  "Delete info": "Hapus info",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Hapus asal “{name}”?\n\nLink, channel, dan detail lainnya serta file teksnya dihapus. Suaranya tetap ada.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Menyimpan link, channel, tanggal unggah, durasi, dan penayangan setiap unduhan (dari unduhan itu sendiri, tidak ada yang diambil tambahan), juga di file teks di samping suara. Klik kanan suara untuk membuka atau menyalin link. Mati: unduhan baru tidak menyimpan apa pun dan menu menyembunyikannya; yang sudah tersimpan tetap ada.",
+  "Remember where it came from": "Ingat asalnya"
 }

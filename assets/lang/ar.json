@@ -3302,5 +3302,9 @@
   "Timing": "التوقيت",
   "Playback": "التشغيل",
   "From a file (you can also drop a picture on the pad)": "من ملف (يمكنك أيضًا إفلات صورة على اللوحة)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "انقر بالزر الأيمن على أي زر → تعديل → المؤثرات لتعزيز الجهير، وnightcore، وslowed + reverb، والقصّ والمزيد. الملف الأصلي لا يتغير أبدًا."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "انقر بالزر الأيمن على أي زر → تعديل → المؤثرات لتعزيز الجهير، وnightcore، وslowed + reverb، والقصّ والمزيد. الملف الأصلي لا يتغير أبدًا.",
+  "Delete info": "حذف المعلومات",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "حذف مصدر “{name}”؟\n\nسيُحذف رابطه وقناته وتفاصيله الأخرى وملفها النصي. يبقى الصوت.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "يحتفظ برابط كل تنزيل وقناته وتاريخ رفعه ومدته ومشاهداته (من التنزيل نفسه، دون جلب أي شيء إضافي)، وفي ملف نصي بجانب الصوت أيضًا. انقر بالزر الأيمن على الصوت لفتح الرابط أو نسخه. عند الإيقاف: لا تحتفظ التنزيلات الجديدة بأي منها وتخفيها القائمة، ويبقى ما حُفظ من قبل.",
+  "Remember where it came from": "تذكّر من أين جاء"
 }

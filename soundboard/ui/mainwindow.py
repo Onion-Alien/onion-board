@@ -5854,7 +5854,7 @@ class MainWindow(QMainWindow):
                                                  "its own effects or hotkey"))
         a_export = add(("download",), _("Export"), _("Save it as a file to share with friends"))
         a_src_open = a_src_copy = a_src_info = None
-        if src := sourceinfo.clean(m.source):   # downloaded from YouTube, TikTok…
+        if src := sourceinfo.shown(m):   # downloaded from YouTube, TikTok…
             site = sourceinfo.site_name(src)
             sm = menu.addMenu(icons.icon(sourceinfo.icon(src)), site)
             sm.setToolTipsVisible(True)
@@ -5881,7 +5881,9 @@ class MainWindow(QMainWindow):
         elif act is not None and act == a_src_copy:
             sourcedialog.copy_link(src, self)
         elif act is not None and act == a_src_info:
-            sourcedialog.SourceDialog(m, self).show()
+            d = sourcedialog.SourceDialog(m, self)
+            d.forgotten.connect(self._save_now)
+            d.show()
         elif act == a_stop:
             self._stop_sound(sid)
         elif act == a_next:
@@ -6208,6 +6210,7 @@ class MainWindow(QMainWindow):
         m = self.meta(sid)
         d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
         d.hotkeys_changed.connect(self.register_hotkeys)
+        d.source_forgotten.connect(self._save_now)
         ok = d.exec()
         self.drop_preview()                        # a preview still rendering
         self.engine.stop(f"{sid}:preview")         # and the one playing, either kind

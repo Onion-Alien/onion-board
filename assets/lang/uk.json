@@ -3107,5 +3107,9 @@
   "Timing": "Час",
   "Playback": "Відтворення",
   "From a file (you can also drop a picture on the pad)": "З файлу (можна й просто перетягнути картинку на кнопку)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Правий клік на будь-якій кнопці → Редагувати → Ефекти для підсилення басу, nightcore, slowed + reverb, обрізки та іншого. Оригінальний файл ніколи не змінюється."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Правий клік на будь-якій кнопці → Редагувати → Ефекти для підсилення басу, nightcore, slowed + reverb, обрізки та іншого. Оригінальний файл ніколи не змінюється.",
+  "Delete info": "Видалити відомості",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Видалити, звідки взято «{name}»?\n\nПосилання, канал та інші відомості, а також їхній текстовий файл буде видалено. Звук залишиться.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Запам'ятовує посилання, канал, дату завантаження, тривалість і перегляди кожного завантаження (із самого завантаження, нічого зайвого не запитується), ще й у текстовому файлі поруч зі звуком. Клацни звук правою кнопкою, щоб відкрити чи скопіювати посилання. Вимкнено: нові завантаження нічого з цього не зберігають, а меню це ховає; уже збережене залишається.",
+  "Remember where it came from": "Пам'ятати, звідки взято"
 }

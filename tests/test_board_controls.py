@@ -425,7 +425,7 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     monkeypatch.setattr(busy, "open_url", lambda url, **kw: opened.append(url) or True)
     shown = menu_pick(monkeypatch, ["YouTube", "Open on YouTube"])
     w.pad_menu("s0", None)
-    assert shown.index("YouTube") == shown.index("Export…") + 1 and opened == [LINK]
+    assert shown.index("YouTube") == shown.index("Export") + 1 and opened == [LINK]
     menu_pick(monkeypatch, ["YouTube", "Copy link"])
     w.pad_menu("s0", None)
     from PySide6.QtWidgets import QApplication
@@ -433,6 +433,12 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     dialogs = []
     monkeypatch.setattr(sourcedialog.SourceDialog, "show",
                         lambda self: dialogs.append(self))
+    from soundboard import quality
+    monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
+    shown = menu_pick(monkeypatch, ["Duplicate"])
+    w.pad_menu("s0", None)
+    assert "YouTube" not in shown and w.meta("s0").source   # hidden, still kept
+    monkeypatch.setattr(quality, "current", quality.Prefs())
     menu_pick(monkeypatch, ["YouTube", "Details"])
     w.pad_menu("s0", None)
     [d] = dialogs

@@ -2977,5 +2977,9 @@
   "Timing": "時間",
   "Playback": "播放",
   "From a file (you can also drop a picture on the pad)": "從檔案（也可以把圖片拖到按鈕上）",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "在任一按鈕上按右鍵 → 編輯 → 效果 可以低音增強、nightcore、降速 + 殘響、修剪等等。原始檔案永遠不會被修改。"
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "在任一按鈕上按右鍵 → 編輯 → 效果 可以低音增強、nightcore、降速 + 殘響、修剪等等。原始檔案永遠不會被修改。",
+  "Delete info": "刪除資訊",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "要刪除「{name}」的來源嗎？\n\n它的連結、頻道和其他詳細資料以及對應的文字檔都會被刪除。音效會保留。",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "儲存每次下載的連結、頻道、上傳日期、長度和觀看次數（來自下載本身，不會額外取得任何內容），也會存到音效旁的文字檔。在音效上按右鍵即可開啟或複製連結。關閉後：新的下載不再儲存這些內容，選單也會隱藏；已儲存的內容會保留。",
+  "Remember where it came from": "記住來源"
 }

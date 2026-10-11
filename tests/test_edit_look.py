@@ -90,3 +90,21 @@ def test_a_downloaded_sound_says_where_it_came_from(window, monkeypatch):  # noq
     d.btn_source.click()
     assert len(shown) == 1 and shown[0].btn_open.toolTip() == SRC["link"]
     d.deleteLater()
+
+
+def test_delete_info_from_edit_hides_the_line_and_saves(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QMessageBox
+    from soundboard.ui import sourcedialog
+    window.meta("s0").source = dict(SRC)
+    d = _dialog(window)
+    opened = []
+    monkeypatch.setattr(sourcedialog.SourceDialog, "show", lambda self: opened.append(self))
+    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
+    saved = []
+    d.source_forgotten.connect(lambda: saved.append(1))
+    d.show()
+    d.btn_source.click()
+    opened[0].btn_forget.click()
+    assert window.meta("s0").source == {} and saved and not d.source_row.isVisible()
+    d.close()
+    d.deleteLater()

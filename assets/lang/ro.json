@@ -3107,5 +3107,9 @@
   "Timing": "Timp",
   "Playback": "Redare",
   "From a file (you can also drop a picture on the pad)": "Dintr-un fișier (poți și să tragi o imagine pe buton)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Clic dreapta pe orice pad → Editează → Efecte pentru bass boost, nightcore, slowed + reverb, tăiere și altele. Fișierul original nu e schimbat niciodată."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Clic dreapta pe orice pad → Editează → Efecte pentru bass boost, nightcore, slowed + reverb, tăiere și altele. Fișierul original nu e schimbat niciodată.",
+  "Delete info": "Șterge informațiile",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Ștergi de unde vine „{name}”?\n\nLinkul, canalul și celelalte detalii, plus fișierul lor text, se șterg. Sunetul rămâne.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Păstrează linkul, canalul, data încărcării, durata și vizualizările fiecărei descărcări (din descărcarea însăși, nu se cere nimic în plus), și într-un fișier text lângă sunet. Clic dreapta pe sunet ca să deschizi sau să copiezi linkul. Oprit: descărcările noi nu păstrează nimic din toate astea și meniul le ascunde; ce e deja salvat rămâne.",
+  "Remember where it came from": "Ține minte de unde vine"
 }

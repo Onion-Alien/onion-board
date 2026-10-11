@@ -3107,5 +3107,9 @@
   "Timing": "Время",
   "Playback": "Воспроизведение",
   "From a file (you can also drop a picture on the pad)": "Из файла (можно и просто перетащить картинку на кнопку)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "ПКМ по любой кнопке → Редактировать → Эффекты — усиление баса, nightcore, slowed + reverb, обрезка и не только. Исходный файл никогда не меняется."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "ПКМ по любой кнопке → Редактировать → Эффекты — усиление баса, nightcore, slowed + reverb, обрезка и не только. Исходный файл никогда не меняется.",
+  "Delete info": "Удалить сведения",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Удалить, откуда взят «{name}»?\n\nСсылка, канал и другие сведения, а также их текстовый файл будут удалены. Звук останется.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Запоминает ссылку, канал, дату загрузки, длительность и просмотры каждой загрузки (из самой загрузки, ничего лишнего не запрашивается), ещё и в текстовом файле рядом со звуком. Щёлкни звук правой кнопкой, чтобы открыть или скопировать ссылку. Выключено: новые загрузки ничего из этого не сохраняют, а меню это скрывает; уже сохранённое остаётся.",
+  "Remember where it came from": "Запоминать, откуда взят"
 }

@@ -3042,5 +3042,9 @@
   "Timing": "टाइमिंग",
   "Playback": "प्लेबैक",
   "From a file (you can also drop a picture on the pad)": "फ़ाइल से (आप पैड पर तस्वीर छोड़ भी सकते हैं)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "किसी भी पैड पर राइट-क्लिक → संपादित करें → इफ़ेक्ट: बेस बूस्ट, नाइटकोर, स्लोड + रिवर्ब, ट्रिम और भी बहुत कुछ। मूल फ़ाइल कभी नहीं बदलती।"
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "किसी भी पैड पर राइट-क्लिक → संपादित करें → इफ़ेक्ट: बेस बूस्ट, नाइटकोर, स्लोड + रिवर्ब, ट्रिम और भी बहुत कुछ। मूल फ़ाइल कभी नहीं बदलती।",
+  "Delete info": "जानकारी मिटाएँ",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "“{name}” कहाँ से आया, यह मिटाएँ?\n\nइसका लिंक, चैनल और बाकी विवरण और उनकी टेक्स्ट फ़ाइल मिट जाएगी। साउंड बना रहेगा।",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "हर डाउनलोड का लिंक, चैनल, अपलोड की तारीख, लंबाई और व्यूज़ रखता है (डाउनलोड से ही, अलग से कुछ नहीं लाया जाता), साउंड के बगल में एक टेक्स्ट फ़ाइल में भी। लिंक खोलने या कॉपी करने के लिए साउंड पर राइट-क्लिक करें। बंद: नए डाउनलोड इसमें से कुछ नहीं रखते और मेन्यू इसे छिपा देता है; जो पहले से सहेजा है वह बना रहता है।",
+  "Remember where it came from": "याद रखें कहाँ से आया"
 }

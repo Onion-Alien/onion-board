@@ -375,8 +375,9 @@ class LinkBar(QFrame):
             except OSError as e:
                 log.warning("couldn't keep the thumbnail of %s: %s", url, e)
             # the video's link, channel and views: the pad menu's Open on YouTube
-            meta.source = sourceinfo.read_from(Path(path).parent)
-            sourceinfo.write(meta.file, meta.source)
+            if quality.current.keep_source:
+                meta.source = sourceinfo.read_from(Path(path).parent)
+                sourceinfo.write(meta.file, meta.source)
             self.engine.prepare(meta.id, data)
             saved = ""
             if video:

@@ -3042,5 +3042,9 @@
   "Timing": "Tempi",
   "Playback": "Riproduzione",
   "From a file (you can also drop a picture on the pad)": "Da un file (puoi anche trascinare un'immagine sul pad)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Clic destro su un pad → Modifica → Effetti per bass boost, nightcore, slowed + reverb, taglio e altro. Il file originale non viene mai modificato."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Clic destro su un pad → Modifica → Effetti per bass boost, nightcore, slowed + reverb, taglio e altro. Il file originale non viene mai modificato.",
+  "Delete info": "Elimina info",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Eliminare la provenienza di “{name}”?\n\nIl link, il canale, gli altri dettagli e il loro file di testo vengono eliminati. Il suono resta.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Tiene link, canale, data di caricamento, durata e visualizzazioni di ogni download (dal download stesso, non viene recuperato altro), anche in un file di testo accanto al suono. Clic destro sul suono per aprire o copiare il link. Disattivato: i nuovi download non tengono nulla di tutto questo e il menu lo nasconde; ciò che è già salvato resta.",
+  "Remember where it came from": "Ricorda da dove viene"
 }

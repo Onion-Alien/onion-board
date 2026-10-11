@@ -3042,5 +3042,9 @@
   "Timing": "Timing",
   "Playback": "Afspelen",
   "From a file (you can also drop a picture on the pad)": "Uit een bestand (je kunt ook een afbeelding op de pad slepen)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Rechtsklik een pad → Bewerken → Effecten voor bass boost, nightcore, slowed + reverb, inkorten en meer. Het originele bestand verandert nooit."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Rechtsklik een pad → Bewerken → Effecten voor bass boost, nightcore, slowed + reverb, inkorten en meer. Het originele bestand verandert nooit.",
+  "Delete info": "Info verwijderen",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Verwijderen waar ‘{name}’ vandaan komt?\n\nDe link, het kanaal en andere details en hun tekstbestand worden verwijderd. Het geluid blijft.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Bewaart van elke download de link, het kanaal, de uploaddatum, de lengte en de weergaven (uit de download zelf, er wordt niets extra opgehaald), ook in een tekstbestand naast het geluid. Klik met rechts op het geluid om de link te openen of te kopiëren. Uit: nieuwe downloads bewaren hier niets van en het menu verbergt het; wat al bewaard is, blijft.",
+  "Remember where it came from": "Onthouden waar het vandaan komt"
 }

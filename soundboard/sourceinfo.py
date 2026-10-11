@@ -107,6 +107,20 @@ def clean(v) -> dict:
     return {k: x for k, x in out.items() if x not in ("", None)}
 
 
+def shown(meta) -> dict:
+    """What the pad menu and Edit show for a sound: its cleaned source, or {} while
+    Settings > Data & quality > Remember where it came from is off (kept, not shown)."""
+    from soundboard import quality
+    return clean(meta.source) if quality.current.keep_source else {}
+
+
+def forget(meta) -> None:
+    """The Details box's Delete info: the sound keeps its audio, loses where it came
+    from, and its text file goes."""
+    remove(meta.file)
+    meta.source = {}
+
+
 def site_name(src: dict) -> str:
     """"YouTube", "TikTok", "Instagram"… or the host of any other site."""
     found = site_of(src.get("link", ""))

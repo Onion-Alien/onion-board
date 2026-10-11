@@ -2977,5 +2977,9 @@
   "Timing": "Thời gian",
   "Playback": "Phát",
   "From a file (you can also drop a picture on the pad)": "Từ tệp (bạn cũng có thể thả ảnh lên nút)",
-  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Chuột phải bất kỳ nút nào → Biên tập → Hiệu ứng để tăng bass, nightcore, slowed + reverb, cắt và hơn nữa. File gốc không bao giờ bị đổi."
+  "Right-click any pad → Edit → Effects for bass boost, nightcore, slowed + reverb, trim and more. The original file is never changed.": "Chuột phải bất kỳ nút nào → Biên tập → Hiệu ứng để tăng bass, nightcore, slowed + reverb, cắt và hơn nữa. File gốc không bao giờ bị đổi.",
+  "Delete info": "Xóa thông tin",
+  "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Xóa nguồn của “{name}”?\n\nLiên kết, kênh, các chi tiết khác và tệp văn bản của chúng sẽ bị xóa. Âm thanh vẫn còn.",
+  "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Lưu liên kết, kênh, ngày tải lên, độ dài và lượt xem của mỗi lần tải (lấy từ chính lần tải đó, không lấy thêm gì), cả trong tệp văn bản cạnh âm thanh. Chuột phải vào âm thanh để mở hoặc sao chép liên kết. Tắt: các lần tải mới không lưu gì và menu sẽ ẩn đi; những gì đã lưu vẫn giữ nguyên.",
+  "Remember where it came from": "Ghi nhớ nguồn gốc"
 }
