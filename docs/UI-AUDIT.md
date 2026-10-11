@@ -277,6 +277,18 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   Done (PR #426): Tab reaches a heading (its rule turns the accent colour), the Menu
   key or Shift+F10 opens its menu, and Tab goes heading, its cards, next heading.
 
+- [ ] **U16: Move old screens onto the standard sizes.** DESIGN.md's *Standard kit*
+  fixes 7 text sizes, 3 icon-button sizes and one pop-up per job. Old code (11 October,
+  `origin/main` `67ea807`) still has: inline `font-size` / `setPointSizeF` in about 60
+  places, with off-scale 7, 7.5, 9, 9.5, 10.5, 12, 14, 15 and 19pt (`theme.py` `#fxend`,
+  `#recordtitle`, `#round`; `ui/speedpitch.py`, `ui/chatguide.py`, `ui/resetguide.py`,
+  `ui/whatsnew.py`, `ui/setupwizard.py`, `ui/overlay.py`); icon buttons at 22, 30, 32
+  and 36 px outside bars; about 28 `QMessageBox.information` / `.warning` calls that
+  should be toasts or inline tone labels, Yes/No `QMessageBox.question`s, 30
+  `QDialogButtonBox` footers and 35 `exec()` calls. Do it one screen per PR (pictures
+  before and after), moving inline sizes into `theme.py` object names. Don't sweep
+  everything in one go; `exec()` changes need a lifecycle check each.
+
 ### Features for later (not UI fixes; after 2.0)
 
 - Lower other programs (Spotify, the game) while a sound plays; `appaudio` already
