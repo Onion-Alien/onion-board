@@ -44,7 +44,7 @@ from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, So
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
+from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
                            sourcedialog, splash, taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -61,7 +61,7 @@ from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.spacekey import SpaceKey
-from soundboard.ui.padbatch import PadSelection
+from soundboard.ui.padbatch import PadSelection, fill_colour_menu
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab, ElidedLabel
 from soundboard.ui.triggershost import BoardHost
@@ -5340,24 +5340,12 @@ class MainWindow(QMainWindow):
                                _("Clear the random-sound hotkey")) if hk else None
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
         a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
-        a_shuf = menu.addAction(icons.icon("next"), _("Play them all, shuffled"))
+        a_shuf = menu.addAction(icons.icon("shuffle"), _("Play them all, shuffled"))
         a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
-        now = self.cfg.category_colors.get(name, "")
-        a_cols = {}
-        for col in PAD_COLORS:
-            picked = col.lower() == now.lower()
-            # the dot sits where a tick would: the one it has now is bold, with a ✓
-            a = cm.addAction(self._dot_icon(col), COLOUR_NAMES.get(col, col)
-                             + ("  ✓" if picked else ""))
-            if picked:
-                bold = a.font()
-                bold.setBold(True)
-                a.setFont(bold)
-            a_cols[a] = col
-        if now:
-            cm.addSeparator()
-            a_cols[cm.addAction(icons.icon("palette", checked_color="accent"), _("No colour"))] = ""
+        # the same colour list as the bulk Colour menu: names, the current one ticked
+        fill_colour_menu(cm, self.cfg.category_colors.get(name, ""),
+                         lambda col: self.set_category_color(name, col), none=True)
         menu.addSeparator()
         a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front"))
         a_unprog = {menu.addAction(icons.icon("offline"),
@@ -5382,8 +5370,6 @@ class MainWindow(QMainWindow):
             self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
-        elif act in a_cols:
-            self.set_category_color(name, a_cols[act])
         elif act == a_del:
             self.delete_category(name)
         elif act == a_prog:

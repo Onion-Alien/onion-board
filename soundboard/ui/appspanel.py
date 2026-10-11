@@ -27,7 +27,7 @@ import zlib
 
 from PySide6.QtCore import (QEvent, QMimeData, QObject, QRect, QSize, Qt,
                             QTimer, Signal)
-from PySide6.QtGui import QDrag, QFont, QPainter, QPixmap
+from PySide6.QtGui import QActionGroup, QDrag, QFont, QPainter, QPixmap
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
                                QHBoxLayout, QInputDialog, QLabel,
                                QLayout, QMenu, QPushButton, QScrollArea, QSizePolicy, QSlider,
@@ -177,9 +177,12 @@ class AppCategoryHeading(QLabel):
 
     def _show_menu(self, pos):
         menu = QMenu(self)
-        menu.addAction(_("Rename category"), lambda: self.rename_requested.emit(self.category))
+        menu.addAction(icons.icon("edit"), _("Rename category"),
+                       lambda: self.rename_requested.emit(self.category))
         if self.custom:
-            menu.addAction(_("Delete category"), lambda: self.delete_requested.emit(self.category))
+            menu.addSeparator()
+            menu.addAction(icons.icon("trash", "danger_text"), _("Delete category"),
+                           lambda: self.delete_requested.emit(self.category))
         menu.exec(self.mapToGlobal(pos))
 
     def paintEvent(self, event):
@@ -663,15 +666,23 @@ class AppRow(HoverCard):
         while parent and not isinstance(parent, AppsTab):
             parent = parent.parentWidget()
         if parent:
-            cat_menu = menu.addMenu(_("Categories"))
+            # one category per program: the one it's in is ticked (it was greyed out)
+            cat_menu = menu.addMenu(icons.icon("tag"), _("Categories"))
+            group = QActionGroup(cat_menu)
             for cat in parent.grid.category_order:
-                act = cat_menu.addAction(cat)
-                if cat == self.category:
-                    act.setEnabled(False)
-                else:
-                    act.triggered.connect(lambda _c=cat: self.move_to_category.emit(self, _c))
-        menu.addSeparator()
-        menu.addAction(_("Take this program off the list"), lambda: self.forget.emit(self))
+                act = cat_menu.addAction(icons.icon("tag", checked_color="accent"),
+                                         cat.replace("&", "&&"))   # "Music & media"
+                act.setCheckable(True)
+                act.setChecked(cat == self.category)
+                group.addAction(act)
+                if cat != self.category:
+                    act.triggered.connect(lambda _x=False, _c=cat:
+                                          self.move_to_category.emit(self, _c))
+            menu.addSeparator()
+        menu.setToolTipsVisible(True)
+        gone = menu.addAction(icons.icon("trash", "danger_text"), _("Remove"),
+                              lambda: self.forget.emit(self))
+        gone.setToolTip(_("Take this program off the list"))
         menu.exec(self.mapToGlobal(pos))
 
     NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
