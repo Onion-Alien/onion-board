@@ -27,7 +27,7 @@ from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-                               QPushButton, QRadioButton, QScrollArea, QSizePolicy,
+                               QPushButton, QScrollArea, QSizePolicy,
                                QVBoxLayout, QWidget)
 
 from soundboard import directmic
@@ -189,8 +189,8 @@ class StepBar(QWidget):
 
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
         t = theme.T
         for i in range(self.steps):
             p.setBrush(QColor(t["accent"] if i <= self.current else t["card_hi"]))
@@ -319,7 +319,7 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     col.addWidget(body)
     col.addStretch(1)
     row.addLayout(col, 1)
-    row.addWidget(bun, 0, Qt.AlignTop)
+    row.addWidget(bun, 0, Qt.AlignmentFlag.AlignTop)
     return row
 
 
@@ -411,7 +411,7 @@ class StatusCard(QFrame):
         self._badge = QWidget()   # painted by the card (paintEvent)
         self._badge.setFixedSize(self.BADGE, self.BADGE)
         self._badge.setStyleSheet("background:transparent;")
-        h.addWidget(self._badge, 0, Qt.AlignTop)
+        h.addWidget(self._badge, 0, Qt.AlignmentFlag.AlignTop)
         col = QVBoxLayout()
         col.setSpacing(4)
         self.title = QLabel()
@@ -424,7 +424,7 @@ class StatusCard(QFrame):
         col.addLayout(self.action_box)
         h.addLayout(col, 1)
         self.pill = QLabel()
-        h.addWidget(self.pill, 0, Qt.AlignTop)
+        h.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignTop)
 
     def _colour(self) -> QColor:
         t = theme.T
@@ -446,8 +446,8 @@ class StatusCard(QFrame):
     def paintEvent(self, ev):
         t = theme.T
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
         r = QRectF(self.rect())
         p.setBrush(QColor(t["panel"]))
         p.drawRoundedRect(r, 12, 12)
@@ -460,7 +460,7 @@ class StatusCard(QFrame):
         p.setBrush(c)
         p.drawEllipse(b)
         pen = QPen(QColor(t["on_accent"] if self.tone == "busy" else t["bg"]), 2.6,
-                   Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+                   Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         p.setPen(pen)
         cx, cy = b.center().x(), b.center().y()
         if self.tone == "ok":
@@ -503,7 +503,7 @@ class CableConfirm(QDialog):
         self.btn_tell = QPushButton(_("Tell us why"))
         self.btn_tell.setProperty("quiet", True)
         icons.set_icon(self.btn_tell, "speech")
-        why.addWidget(self.btn_tell, 0, Qt.AlignVCenter)
+        why.addWidget(self.btn_tell, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(why)
         row = QHBoxLayout()
         row.setSpacing(8)
@@ -561,7 +561,7 @@ class SetupWizard(QDialog):
         top = QHBoxLayout()   # the step bar, then "Step 2 of 5"
         top.setSpacing(12)
         self.step_bar = StepBar(self.PAGES)
-        top.addWidget(self.step_bar, 0, Qt.AlignVCenter)
+        top.addWidget(self.step_bar, 0, Qt.AlignmentFlag.AlignVCenter)
         self.progress = QLabel()
         self.progress.setObjectName("hint")
         top.addWidget(self.progress)
@@ -592,7 +592,8 @@ class SetupWizard(QDialog):
         self.btn_next = QPushButton(_nav_words(_("Next  →")))
         self.btn_next.setObjectName("primary")
         # the arrow after the words, on the reading side's end
-        self.btn_next.setLayoutDirection(Qt.LeftToRight if rtl else Qt.RightToLeft)
+        self.btn_next.setLayoutDirection(Qt.LayoutDirection.LeftToRight if rtl
+                                         else Qt.LayoutDirection.RightToLeft)
         self.btn_next.clicked.connect(self.next_clicked)
         self.btn_next.setDefault(True)   # Enter moves on (not "Play a test sound")
         nav.addWidget(self.btn_next)
@@ -665,7 +666,7 @@ class SetupWizard(QDialog):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(TILE_GAP)
         self.use_group = QButtonGroup(box)
-        self.use_buttons: dict[str, QRadioButton] = {}
+        self.use_buttons: dict[str, ChoiceTile] = {}
         self._use_words: dict[str, str] = {}
         for i, (key, icon, title, words) in enumerate(uses()):
             rb = ChoiceTile(title, icon, TILE_W, TILE_MIN_H)
@@ -731,7 +732,7 @@ class SetupWizard(QDialog):
         self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
                                    "go out, not your mic)"))
         self.chk_send.setChecked(self.win.cfg.mic_enabled)
-        v.addWidget(self.chk_send, 0, Qt.AlignLeft)
+        v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         self._mic_peak_seen = False
         return p
@@ -807,7 +808,7 @@ class SetupWizard(QDialog):
         self.cable_status.setStyleSheet("font-size:10pt;")
         # the answer to "is it working?" right under the intro, in a card of its own
         self.status_card = StatusCard(self.cable_status)
-        self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignLeft)
+        self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
         v.insertSpacing(1, HEADER_GAP - SECTION_GAP)
         v.insertWidget(2, self.status_card)
         self.cable_bar = QProgressBar()
@@ -864,7 +865,7 @@ class SetupWizard(QDialog):
         icons.set_icon(self.btn_use_cable, "cable")
         self.btn_use_cable.clicked.connect(lambda: self._pick_route("cable"))
         self.btn_use_cable.hide()
-        v.addWidget(self.btn_use_cable, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_use_cable, 0, Qt.AlignmentFlag.AlignLeft)
         v.addWidget(self._alt_card())
         v.addStretch(1)
         return p
@@ -899,7 +900,7 @@ class SetupWizard(QDialog):
             v.addLayout(top)
             v.addWidget(panel.hint_label(words))
             v.addStretch(1)
-            v.addWidget(button, 0, Qt.AlignLeft)
+            v.addWidget(button, 0, Qt.AlignmentFlag.AlignLeft)
             tiles.addWidget(box, 1)
             return box
 
@@ -1011,7 +1012,7 @@ class SetupWizard(QDialog):
         self.btn_discord.setToolTip(_("The Discord settings that stop it chopping up your "
                                       "sounds, and a check that listens to what Discord does"))
         self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
-        body.addWidget(self.btn_discord, 0, Qt.AlignLeft)
+        body.addWidget(self.btn_discord, 0, Qt.AlignmentFlag.AlignLeft)
         v.addSpacing(8)
         v.addWidget(self.discord_body)
         # games and calls: their guides, in a card of their own
@@ -1090,7 +1091,7 @@ class SetupWizard(QDialog):
     def event(self, ev):
         # any change to what's shown (a state, a card opening): fit to it again, once
         # things have settled (fit.watch grows the window; this also shrinks it)
-        if ev.type() == QEvent.LayoutRequest and not self._settle_due:
+        if ev.type() == QEvent.Type.LayoutRequest and not self._settle_due:
             self._settle_due = True
             QTimer.singleShot(SETTLE_MS, self, self._settle_size)
         return super().event(ev)

@@ -38,7 +38,7 @@ def wrap(text: str, fm: QFontMetrics, width: int, max_lines: int) -> list[str]:
         if len(lines) == max_lines - 1 and words:   # the last line: the rest, cut short
             line = " ".join([line, *words])
             words = []
-        lines.append(fm.elidedText(line, Qt.ElideRight, width))
+        lines.append(fm.elidedText(line, Qt.TextElideMode.ElideRight, width))
     return lines
 
 
@@ -56,13 +56,13 @@ class ChoiceTile(QRadioButton):
         self.meter = False   # keeps room for the level bar even before it shows
         self._drawn_level = -1
         self.setFixedSize(width, height)
-        self.setCursor(Qt.PointingHandCursor)
-        self.setAttribute(Qt.WA_Hover)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover)
         self.setAccessibleName(text)
         self._keyboard = False   # focus came from the keyboard: show the focus ring
 
     def focusInEvent(self, ev):
-        if ev.reason() in (Qt.TabFocusReason, Qt.BacktabFocusReason):
+        if ev.reason() in (Qt.FocusReason.TabFocusReason, Qt.FocusReason.BacktabFocusReason):
             self._keyboard = True
         super().focusInEvent(ev)
 
@@ -125,10 +125,10 @@ class ChoiceTile(QRadioButton):
     def paintEvent(self, ev):
         t = theme.T
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         on, hover = self.isChecked(), self.underMouse()
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(t["card_hi"] if hover and not on else t["panel"]))
         p.drawRoundedRect(r, RADIUS, RADIUS)
         if on:   # the accent tint and ring
@@ -136,16 +136,16 @@ class ChoiceTile(QRadioButton):
             tint.setAlpha(40)
             p.setBrush(tint)
             p.drawRoundedRect(r, RADIUS, RADIUS)
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QPen(QColor(t["accent"]), 2))
             p.drawRoundedRect(r.adjusted(1, 1, -1, -1), RADIUS - 1, RADIUS - 1)
         elif self._ring():   # the keyboard's ring
-            p.setBrush(Qt.NoBrush)
-            p.setPen(QPen(QColor(t["text"]), 1.5, Qt.DotLine))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QPen(QColor(t["text"]), 1.5, Qt.PenStyle.DotLine))
             p.drawRoundedRect(r.adjusted(1, 1, -1, -1), RADIUS - 1, RADIUS - 1)
         if on and self._ring():
-            p.setBrush(Qt.NoBrush)
-            p.setPen(QPen(QColor(t["text_hi"]), 1, Qt.DotLine))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QPen(QColor(t["text_hi"]), 1, Qt.PenStyle.DotLine))
             p.drawRoundedRect(r.adjusted(4, 4, -4, -4), RADIUS - 4, RADIUS - 4)
 
         text = self.title or self.text().replace("&&", "&")
@@ -173,14 +173,14 @@ class ChoiceTile(QRadioButton):
             y = words.top()
             for line in lines:
                 p.drawText(QRectF(words.left(), y, words.width(), fm.lineSpacing()),
-                           Qt.AlignHCenter | Qt.AlignTop, line)
+                           Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, line)
                 y += fm.lineSpacing()
             if self.sub:
                 p.setFont(small)
                 p.setPen(QColor(t["muted"]))
                 line = QRectF(words.left(), y, words.width(), sub_h)
-                p.drawText(line, Qt.AlignHCenter | Qt.AlignTop,
-                           QFontMetrics(small).elidedText(self.sub, Qt.ElideRight,
+                p.drawText(line, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop,
+                           QFontMetrics(small).elidedText(self.sub, Qt.TextElideMode.ElideRight,
                                                           int(line.width())))
         else:
             size = 22
@@ -191,26 +191,28 @@ class ChoiceTile(QRadioButton):
             p.drawPixmap(round(x), round((self.height() - size) / 2), pm)
             left = PAD if rtl else PAD + size + 12
             words = QRectF(left, 0, self.width() - PAD - size - 12 - PAD - 22, self.height())
-            align = (Qt.AlignRight if rtl else Qt.AlignLeft) | Qt.AlignVCenter | Qt.TextWordWrap
+            align = ((Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft)
+                     | Qt.AlignmentFlag.AlignVCenter | Qt.TextFlag.TextWordWrap)
             p.drawText(words, align, text)
 
         if on:   # the tick badge in the top corner (the reading side's end)
             d = 18
             x = PAD - 6 if self.isRightToLeft() else self.width() - PAD + 6 - d
             badge = QRectF(x, PAD - 6, d, d)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(t["accent"]))
             p.drawEllipse(badge)
             tick = QPainterPath(QPointF(badge.left() + 5, badge.center().y()))
             tick.lineTo(badge.left() + 8, badge.center().y() + 3)
             tick.lineTo(badge.right() - 4.5, badge.center().y() - 3.5)
-            p.setBrush(Qt.NoBrush)
-            p.setPen(QPen(QColor(t["on_accent"]), 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QPen(QColor(t["on_accent"]), 2, Qt.PenStyle.SolidLine,
+                          Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
             p.drawPath(tick)
 
         if self.level is not None:   # the live level along the foot
             track = QRectF(PAD, self.height() - FOOT_PAD - 4, self.width() - 2 * PAD, 4)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(t["card_hi"]))
             p.drawRoundedRect(track, 2, 2)
             frac = self._level_frac()
@@ -232,12 +234,12 @@ class FoldPill(QAbstractButton):
         self.setText(text)
         self.icon_name = icon
         self.setCheckable(True)
-        self.setCursor(Qt.PointingHandCursor)
-        self.setAttribute(Qt.WA_Hover)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setAccessibleName(text)
         self.toggled.connect(lambda __: self.update())
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
     def _font(self) -> QFont:
         f = QFont(self.font())
@@ -254,10 +256,10 @@ class FoldPill(QAbstractButton):
     def paintEvent(self, ev):
         t = theme.T
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         on = self.isChecked()
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(t["btn_hover"] if self.underMouse() else t["btn"]))
         p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
         if on:
@@ -266,7 +268,7 @@ class FoldPill(QAbstractButton):
             p.setBrush(tint)
             p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
         if self.hasFocus():
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QPen(QColor(t["accent"]), 1.5))
             p.drawRoundedRect(r.adjusted(1, 1, -1, -1), r.height() / 2 - 1, r.height() / 2 - 1)
         rtl = self.isRightToLeft()
@@ -285,7 +287,8 @@ class FoldPill(QAbstractButton):
         for i, (part, w) in enumerate(parts):
             if part == "text":
                 p.setPen(QColor(t["text_hi"]))
-                p.drawText(QRectF(x, 0, w + 2, self.height()), Qt.AlignVCenter, self.text())
+                p.drawText(QRectF(x, 0, w + 2, self.height()), Qt.AlignmentFlag.AlignVCenter,
+                           self.text())
             else:
                 p.drawPixmap(round(x), round((self.height() - w) / 2), part)
             x += w + (gaps[i] if i < len(gaps) else 0)
