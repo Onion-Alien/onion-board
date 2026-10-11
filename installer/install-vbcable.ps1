@@ -228,13 +228,23 @@ if (-not (Test-Admin) -and -not $Elevated) {
     if ($Silent) { $argv += "-Silent" }
     if ($StatusFile) { $argv += @("-StatusFile", "`"$StatusFile`"") }
     try {
-        $p = Start-Process powershell.exe -ArgumentList $argv -Verb RunAs -PassThru -Wait `
-            -WindowStyle $(if ($Silent) { "Hidden" } else { "Normal" })
+        # Silent (the installer): conhost --headless gives the admin copy no window at all.
+        # Plain -WindowStyle Hidden still flashes a console on Windows 11, which looks scary.
+        if ($Silent) {
+            $p = Start-Process conhost.exe -ArgumentList (@("--headless", "powershell.exe") + $argv) `
+                -Verb RunAs -PassThru -Wait -WindowStyle Hidden
+        } else {
+            $p = Start-Process powershell.exe -ArgumentList $argv -Verb RunAs -PassThru -Wait
+        }
     } catch {
         Say "cancelled" "Install was cancelled."
         Pause-Exit 1
     }
     Restore-AudioDefaults
+    if ($Silent) {
+        # conhost --headless doesn't pass the exit code back: read it from the result
+        switch (Get-CableState) { "ok" { exit 0 } "restart" { exit 3010 } default { exit 1 } }
+    }
     exit $p.ExitCode   # the elevated copy has already said everything (and paused)
 }
 

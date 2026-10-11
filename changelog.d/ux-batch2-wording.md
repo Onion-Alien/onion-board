@@ -2,3 +2,4 @@
 - A station's error line on the Radio tab stays up for 30 seconds instead of 4.
 - The message after a damaged settings file says which folder holds both files.
 - Adding a very short sound (under 0.3 s) shows a note that it may be barely heard.
+- The "Settings were restored" box has an Open folder button.

@@ -3062,6 +3062,12 @@
   "Other": "Egyéb",
   "Help and community": "Súgó és közösség",
   "Onion Board on GitHub": "Az Onion Board a GitHubon",
+<<<<<<< HEAD
   "A sound you added is very short, so it may be barely heard.": "Egy hozzáadott hang nagyon rövid, ezért alig hallható.",
   "Both files are in {folder}.": "Mindkét fájl itt van: {folder}."
+=======
+  "A download is still running. If you close now, it's lost. Close anyway?": "Még fut egy letöltés. Ha most bezárod, elveszik. Mégis bezárod?",
+  "Download running": "Letöltés folyamatban",
+  "Your sounds are back on your mic.": "A hangjaid ismét a mikrofonodon vannak."
+>>>>>>> origin/main
 }

@@ -3127,6 +3127,12 @@
   "Other": "Inne",
   "Help and community": "Pomoc i społeczność",
   "Onion Board on GitHub": "Onion Board na GitHubie",
+<<<<<<< HEAD
   "A sound you added is very short, so it may be barely heard.": "Dodany dźwięk jest bardzo krótki, więc może być ledwo słyszalny.",
   "Both files are in {folder}.": "Oba pliki są w folderze {folder}."
+=======
+  "A download is still running. If you close now, it's lost. Close anyway?": "Pobieranie nadal trwa. Jeśli zamkniesz teraz, zostanie utracone. Zamknąć mimo to?",
+  "Download running": "Trwa pobieranie",
+  "Your sounds are back on your mic.": "Twoje dźwięki są znowu na mikrofonie."
+>>>>>>> origin/main
 }

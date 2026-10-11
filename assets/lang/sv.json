@@ -3062,6 +3062,12 @@
   "Other": "Övrigt",
   "Help and community": "Hjälp och gemenskap",
   "Onion Board on GitHub": "Onion Board på GitHub",
+<<<<<<< HEAD
   "A sound you added is very short, so it may be barely heard.": "Ett ljud du lade till är mycket kort, så det hörs kanske knappt.",
   "Both files are in {folder}.": "Båda filerna finns i {folder}."
+=======
+  "A download is still running. If you close now, it's lost. Close anyway?": "En nedladdning pågår fortfarande. Om du stänger nu går den förlorad. Stänga ändå?",
+  "Download running": "Nedladdning pågår",
+  "Your sounds are back on your mic.": "Dina ljud är tillbaka på din mikrofon."
+>>>>>>> origin/main
 }

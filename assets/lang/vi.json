@@ -2997,6 +2997,12 @@
   "Other": "Khác",
   "Help and community": "Trợ giúp và cộng đồng",
   "Onion Board on GitHub": "Onion Board trên GitHub",
+<<<<<<< HEAD
   "A sound you added is very short, so it may be barely heard.": "Một âm thanh bạn thêm rất ngắn nên có thể gần như không nghe thấy.",
   "Both files are in {folder}.": "Cả hai tệp đều nằm trong {folder}."
+=======
+  "A download is still running. If you close now, it's lost. Close anyway?": "Vẫn còn một lượt tải xuống đang chạy. Nếu đóng bây giờ, nó sẽ mất. Vẫn đóng?",
+  "Download running": "Đang tải xuống",
+  "Your sounds are back on your mic.": "Âm thanh của bạn đã quay lại micro."
+>>>>>>> origin/main
 }
