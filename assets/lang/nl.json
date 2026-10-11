@@ -3096,5 +3096,22 @@
     "{n} geluiden staan al in je bibliotheek",
     "{n} geluiden staan al in je bibliotheek"
   ],
-  "Open Triggers": "Triggers openen"
+  "Open Triggers": "Triggers openen",
+  "Audio recovery": "Audioherstel",
+  "Clean reinstall": "Schone herinstallatie",
+  "Fix problems sending sounds into your mic after an update.": "Los problemen op met het sturen van geluiden naar je microfoon na een update.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Microfooneffect opnieuw geïnstalleerd. Test het in je voicechat.",
+  "Mic effect removed": "Microfooneffect verwijderd",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Installeer het microfooneffect van Onion Board opnieuw op je geselecteerde microfoon.",
+  "Remove mic effect": "Microfooneffect verwijderen",
+  "Repair failed": "Herstel mislukt",
+  "Repair mic effect": "Microfooneffect herstellen",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Herstel je microfoons en verwijder het microfooneffect van Onion Board. Geluiden worden dan niet meer rechtstreeks naar je microfoon gestuurd.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Herstel je microfoons, verwijder het oude microfooneffect en installeer vervolgens een nieuwe kopie op je geselecteerde microfoon.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Het microfooneffect kon niet worden gecontroleerd. Start je pc opnieuw op en probeer het microfooneffect daarna opnieuw te herstellen.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows vraagt om toestemming. Het geluid stopt even, ook in gesprekken en games.",
+  "Your sounds and settings are kept.": "Je geluiden en instellingen blijven bewaard.",
+  "{error}": "{error}",
+  "Update mic effect": "Microfooneffect bijwerken",
+  "Update to new version": "Bijwerken naar nieuwe versie"
 }

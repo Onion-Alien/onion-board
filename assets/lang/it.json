@@ -3096,5 +3096,22 @@
     "{n} suoni sono già nella tua raccolta",
     "{n} suoni sono già nella tua raccolta"
   ],
-  "Open Triggers": "Apri Trigger"
+  "Open Triggers": "Apri Trigger",
+  "Audio recovery": "Ripristino audio",
+  "Clean reinstall": "Reinstallazione pulita",
+  "Fix problems sending sounds into your mic after an update.": "Risolvi i problemi di invio dei suoni al microfono dopo un aggiornamento.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Effetto microfono reinstallato. Provalo nella chat vocale.",
+  "Mic effect removed": "Effetto microfono rimosso",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Reinstalla l’effetto microfono di Onion Board sul microfono selezionato.",
+  "Remove mic effect": "Rimuovi effetto microfono",
+  "Repair failed": "Riparazione fallita",
+  "Repair mic effect": "Ripara effetto microfono",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Ripristina i tuoi microfoni e rimuovi l’effetto microfono di Onion Board. I suoni non verranno più inviati direttamente al microfono.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Ripristina i tuoi microfoni, rimuovi il vecchio effetto microfono e installa una nuova copia sul microfono selezionato.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Impossibile verificare l’effetto microfono. Riavvia il PC, poi prova di nuovo a riparare l’effetto microfono.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows chiederà il permesso. L’audio si interromperà brevemente, anche nelle chiamate e nei giochi.",
+  "Your sounds and settings are kept.": "I tuoi suoni e le impostazioni vengono conservati.",
+  "{error}": "{error}",
+  "Update mic effect": "Aggiorna effetto microfono",
+  "Update to new version": "Aggiorna alla nuova versione"
 }

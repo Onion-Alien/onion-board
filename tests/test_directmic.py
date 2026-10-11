@@ -418,7 +418,8 @@ def test_admin_step_brings_the_audio_back_whatever_happens(fake_reg, monkeypatch
     monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
     monkeypatch.setattr(dm, "_running_dependents", lambda: ["midisrv"])
     monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: calls.append(("helper", deps)))
-    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append((start, deps)))
+    monkeypatch.setattr(dm, "_audio_service",
+                        lambda start, deps=(): calls.append((start, deps)) or True)
     monkeypatch.setattr(dm, "_register_com", lambda path: calls.append("com"))
     monkeypatch.setattr(dm, "_make_ring", lambda: None)
     _mic(fake_reg, MICS["a stream effect"])
@@ -445,7 +446,7 @@ def test_a_failed_set_up_puts_the_mic_back(fake_reg, monkeypatch, tmp_path):
         monkeypatch.setattr(dm, name, lambda *a: None)
     monkeypatch.setattr(dm, "_running_dependents", lambda: [])
     monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
-    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): True)
     _mic(fake_reg, MICS["a gaming headset (EFX + old LFX)"])
     before = fake_reg.mics()
     real = dm._install_endpoint
@@ -1653,7 +1654,7 @@ def test_uninstall_keeps_going_when_one_mic_wont_go_back(monkeypatch):
     monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
     monkeypatch.setattr(dm, "_running_dependents", lambda: [])
     monkeypatch.setattr(dm, "_audio_comes_back", lambda deps=(): None)
-    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): True)
     monkeypatch.setattr(dm, "installed_on", lambda: [GUID, other])
     monkeypatch.setattr(dm, "_unregister_com", lambda: com.append("com"))
 
@@ -1675,7 +1676,7 @@ def test_uninstall_removes_the_ring_folder(monkeypatch, tmp_path):
     monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
     monkeypatch.setattr(dm, "_running_dependents", lambda: [])
     monkeypatch.setattr(dm, "_audio_comes_back", lambda deps=(): None)
-    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): True)
     monkeypatch.setattr(dm, "installed_on", lambda: [])
     monkeypatch.setattr(dm, "_unregister_com", lambda: None)
     monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")

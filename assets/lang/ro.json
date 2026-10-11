@@ -3167,5 +3167,22 @@
     "{n} sunete sunt deja în biblioteca ta",
     "{n} de sunete sunt deja în biblioteca ta"
   ],
-  "Open Triggers": "Deschide Declanșatoare"
+  "Open Triggers": "Deschide Declanșatoare",
+  "Audio recovery": "Recuperare audio",
+  "Clean reinstall": "Reinstalare curată",
+  "Fix problems sending sounds into your mic after an update.": "Rezolvă problemele de trimitere a sunetelor în microfon după o actualizare.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Efectul de microfon a fost reinstalat. Testează-l în chatul vocal.",
+  "Mic effect removed": "Efect de microfon eliminat",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Reinstalează efectul de microfon Onion Board pe microfonul selectat.",
+  "Remove mic effect": "Elimină efectul",
+  "Repair failed": "Reparare eșuată",
+  "Repair mic effect": "Repară efectul",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Restabilește microfoanele și elimină efectul de microfon Onion Board. Sunetele nu vor mai fi trimise direct în microfon.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Restabilește microfoanele, elimină vechiul efect de microfon, apoi instalează o copie nouă pe microfonul selectat.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Efectul de microfon nu a putut fi verificat. Repornește PC-ul, apoi încearcă din nou să repari efectul.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows va cere permisiune. Sunetul se va opri pentru scurt timp, inclusiv în apeluri și jocuri.",
+  "Your sounds and settings are kept.": "Sunetele și setările tale sunt păstrate.",
+  "{error}": "{error}",
+  "Update mic effect": "Actualizează efectul",
+  "Update to new version": "Actualizează la versiunea nouă"
 }

@@ -1,0 +1,1 @@
+- Added Audio recovery in Settings: repair the mic effect, clean reinstall it, or restore normal microphone operation by removing it. Recovery runs in the background, verifies the resulting setup, and refuses to change mic settings if Windows audio cannot be stopped.

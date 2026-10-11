@@ -3096,5 +3096,22 @@
     "{n} sons já estão na sua biblioteca",
     "{n} sons já estão na sua biblioteca"
   ],
-  "Open Triggers": "Abrir Gatilhos"
+  "Open Triggers": "Abrir Gatilhos",
+  "Audio recovery": "Recuperação de áudio",
+  "Clean reinstall": "Reinstalação limpa",
+  "Fix problems sending sounds into your mic after an update.": "Resolva problemas ao enviar sons para seu microfone após uma atualização.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Efeito do microfone reinstalado. Teste no seu chat de voz.",
+  "Mic effect removed": "Efeito do microfone removido",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Reinstale o efeito de microfone do Onion Board no microfone selecionado.",
+  "Remove mic effect": "Remover efeito do microfone",
+  "Repair failed": "Falha no reparo",
+  "Repair mic effect": "Reparar efeito do microfone",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Restaure seus microfones e remova o efeito de microfone do Onion Board. Os sons deixarão de ir diretamente para seu microfone.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Restaure seus microfones, remova o efeito de microfone antigo e instale uma nova cópia no microfone selecionado.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Não foi possível verificar o efeito do microfone. Reinicie seu PC e tente reparar o efeito do microfone novamente.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "O Windows pedirá permissão. O áudio será interrompido por um instante, inclusive em chamadas e jogos.",
+  "Your sounds and settings are kept.": "Seus sons e configurações são mantidos.",
+  "{error}": "{error}",
+  "Update mic effect": "Atualizar efeito do microfone",
+  "Update to new version": "Atualizar para nova versão"
 }

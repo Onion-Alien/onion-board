@@ -3025,5 +3025,22 @@
   "{n} sound is already in your library": [
     "{n} เสียงมีอยู่ในคลังของคุณแล้ว"
   ],
-  "Open Triggers": "เปิดทริกเกอร์"
+  "Open Triggers": "เปิดทริกเกอร์",
+  "Audio recovery": "กู้คืนเสียง",
+  "Clean reinstall": "ติดตั้งใหม่ทั้งหมด",
+  "Fix problems sending sounds into your mic after an update.": "แก้ปัญหาการส่งเสียงเข้าไมค์หลังอัปเดต",
+  "Mic effect reinstalled. Test it in your voice chat.": "ติดตั้งเอฟเฟกต์ไมค์ใหม่แล้ว ลองทดสอบในแชทเสียง",
+  "Mic effect removed": "ลบเอฟเฟกต์ไมค์แล้ว",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "ติดตั้งเอฟเฟกต์ไมค์ของ Onion Board ใหม่บนไมโครโฟนที่เลือก",
+  "Remove mic effect": "ลบเอฟเฟกต์ไมค์",
+  "Repair failed": "ซ่อมแซมไม่สำเร็จ",
+  "Repair mic effect": "ซ่อมแซมเอฟเฟกต์ไมค์",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "คืนค่าไมโครโฟนและลบเอฟเฟกต์ไมค์ของ Onion Board เสียงจะไม่ถูกส่งเข้าไมค์โดยตรงอีกต่อไป",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "คืนค่าไมโครโฟน ลบเอฟเฟกต์ไมค์เก่า แล้วติดตั้งใหม่บนไมโครโฟนที่เลือก",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "ตรวจสอบเอฟเฟกต์ไมค์ไม่ได้ รีสตาร์ท PC แล้วลองซ่อมแซมเอฟเฟกต์ไมค์อีกครั้ง",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows จะขออนุญาต เสียงจะหยุดชั่วครู่ รวมถึงสายที่คุยและเกม",
+  "Your sounds and settings are kept.": "เสียงและการตั้งค่าจะยังอยู่ครบ",
+  "{error}": "{error}",
+  "Update mic effect": "อัปเดตเอฟเฟกต์ไมค์",
+  "Update to new version": "อัปเดตเป็นเวอร์ชันใหม่"
 }
