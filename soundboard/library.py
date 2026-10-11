@@ -1083,8 +1083,8 @@ def _decode(path: str) -> tuple[np.ndarray, bool]:
         log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
         ff = _ffmpeg()
         if not ff:
-            raise RuntimeError(_("Can't decode this format (install ffmpeg for "
-                                 "m4a/aac/video)")) from e
+            raise RuntimeError(_("This file needs FFmpeg to play. Get it in "
+                                 "Settings > Data & quality.")) from e
         try:
             p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),
                                 "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],

@@ -92,6 +92,7 @@ FEATURES = {
     "voice_servers": "Custom voice servers",
     "setup_downloads": "Install the virtual cable from the app",
     "tor_download": "Download Tor from the app",
+    "ffmpeg_download": "Install FFmpeg from the app",
     "usage_stats": "Anonymous usage count",
 }
 # "sounds_web.<site>": the sites sounds come from, each with its own switch under it
@@ -116,6 +117,7 @@ def feature_name(key: str) -> str:
         "voice_servers": _("Custom voice servers"),
         "setup_downloads": _("Install the virtual cable from the app"),
         "tor_download": _("Download Tor from the app"),
+        "ffmpeg_download": _("Install FFmpeg from the app"),
         "usage_stats": _("Anonymous usage count"),
     }.get(key, FEATURES.get(key, key))
 
@@ -148,6 +150,8 @@ def _off_sentence(main: str) -> str:
                              "from vb-audio.com."),
         "tor_download": _("Downloading Tor from the app is switched off in "
                           "Settings > Privacy & security."),
+        "ffmpeg_download": _("Installing FFmpeg from the app is switched off in "
+                             "Settings > Privacy & security."),
         "usage_stats": _("The anonymous usage count is switched off in "
                          "Settings > Privacy & security."),
     }[main]

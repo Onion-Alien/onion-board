@@ -2143,6 +2143,23 @@ class SettingsDialog(QDialog):
         grid.setColumnStretch(2, 1)
         cv.addLayout(grid)
         self._data_video_rows = (vh, change, show, self.data_folder)
+
+        # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
+        # who skipped it had no way to add it later, so the app can get it itself now.
+        ff_box = QWidget()
+        ff_row = QHBoxLayout(ff_box)
+        ff_row.setContentsMargins(0, 0, 0, 0)
+        ff_row.setSpacing(8)
+        self.ff_note = QLabel()
+        self.ff_note.setObjectName("hint")
+        self.ff_note.setWordWrap(True)
+        ff_row.addWidget(self.ff_note, 1)
+        self.btn_ffmpeg = QPushButton(_("Get FFmpeg"))
+        icons.set_icon(self.btn_ffmpeg, "download")
+        self.ff_box = ff_box
+        ff_row.addWidget(self.btn_ffmpeg)
+        cv.addWidget(ff_box)
+        self.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
         v.addWidget(card)
 
         card, cv = self._card(_("Radio"),
@@ -2220,8 +2237,58 @@ class SettingsDialog(QDialog):
                 wdg.setEnabled(q.save_video)
             self.data_folder.setText(str(q.videos()))
             self.data_folder.setToolTip(str(q.videos()))
+            self._ffmpeg_sync()
         finally:
             self._data_syncing = False
+
+    def _ffmpeg_sync(self, msg: str = ""):
+        """The Get FFmpeg row: shown while FFmpeg is missing (or a download is going),
+        with the button greyed out when the app may not go online for it."""
+        from soundboard import ffmpegget, net
+        button = getattr(self, "btn_ffmpeg", None)
+        if button is None:
+            return
+        show = ffmpegget.can_offer() or busy.is_busy(button) or bool(msg)
+        self.ff_box.setVisible(show)
+        if not show:
+            return
+        allowed = net.allowed(ffmpegget.FEATURE)
+        button.setEnabled(allowed)
+        button.setToolTip(net.off_message(ffmpegget.FEATURE) if not allowed else
+                          _("Install FFmpeg (about 100 MB) through winget, Microsoft's "
+                            "package manager, to play and add M4A, AAC and video files"))
+        self.ff_note.setText(msg or _("M4A, AAC and video files need FFmpeg. It's a free "
+                                      "download of about 100 MB."))
+
+    def _get_ffmpeg(self):
+        """Get FFmpeg in the background (winget, which can take a minute), then say so."""
+        from soundboard import ffmpegget
+        release = busy.hold(self.btn_ffmpeg, _("Getting FFmpeg…"))
+        relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
+
+        def finish(err):
+            relay.deleteLater()
+            release(_("✗ Failed") if err else _("✓ Got FFmpeg"))
+            if qt_valid(getattr(self, "btn_ffmpeg", None)):
+                self._ffmpeg_sync(err or _("FFmpeg is ready: M4A, AAC and video files "
+                                           "play now."))
+                self._data_sync()
+
+        def work():
+            from soundboard import netlog
+            netlog.cause(ffmpegget.FEATURE, "You clicked Get FFmpeg (Settings > "
+                                            "Data & quality)")
+            try:
+                ffmpegget.get()
+                relay.done.emit("")
+            except ffmpegget.GetError as e:
+                relay.done.emit(errors.plain(e))
+            except Exception as e:  # noqa: BLE001 - shown, never a stuck button
+                logging.getLogger(__name__).exception("Get FFmpeg failed")
+                relay.done.emit(_("Couldn't get FFmpeg ({error}).", error=errors.plain(e)))
+
+        relay.done.connect(finish)
+        threading.Thread(target=work, daemon=True, name="ffmpeg-get").start()
 
     # ------------------------------------------------------------------ privacy & security
     def _privacy(self):
@@ -2321,6 +2388,10 @@ class SettingsDialog(QDialog):
         "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
+        "ffmpeg_download": _("Get FFmpeg (Data & quality) installs FFmpeg with winget, "
+                             "Microsoft's package manager, so M4A, AAC and video files "
+                             "play and can be added. Off: install FFmpeg yourself from "
+                             "ffmpeg.org."),
         "usage_stats": _("Anonymous usage stats once a day, to see what to improve. "
                          "Never your name, IP address or device info."),
     }
@@ -2376,7 +2447,7 @@ class SettingsDialog(QDialog):
             (_("Sounds and radio"), ("sounds_web", "sound_packs", "radio")),
             (_("Voices"), ("voices", "voice_servers")),
             (_("Updates and add-ons"), ("app_update", "ytdlp_update", "addons")),
-            (_("Setup downloads"), ("setup_downloads", "tor_download")),
+            (_("Setup downloads"), ("setup_downloads", "tor_download", "ffmpeg_download")),
             (_("Usage count"), ("usage_stats",)),
         )
         labels = {"sounds_web": _("Online sounds"), "sound_packs": _("Free sound packs"),
@@ -2386,6 +2457,7 @@ class SettingsDialog(QDialog):
                   "voice_servers": _("Online voice servers"),
                   "setup_downloads": _("Virtual cable download"),
                   "tor_download": _("Tor download"),
+                  "ffmpeg_download": _("FFmpeg download"),
                   "usage_stats": _("Count me in")}
         for title, keys in groups:
             section, sv = self._card(title)
