@@ -28,27 +28,48 @@ def win(qapp, app_dir, monkeypatch):
 def test_closed_settings_and_setup_dialogs_are_freed(qapp, win, monkeypatch):
     """Parented to the window and never freed, every closed copy stayed alive and
     each theme change restyled all of them."""
-    monkeypatch.setattr(settings.SettingsDialog, "exec", lambda self: 0)
     monkeypatch.setattr(setupwizard.SetupWizard, "exec", lambda self: 0)
     for _ in range(3):
-        win.open_settings()
+        win.open_settings().done(0)   # Settings sit beside the window: Done closes them
+        qapp.processEvents()          # (freed just after its finished signal)
         win.run_setup()
     assert win.findChildren(settings.SettingsDialog) == []
     assert win.findChildren(setupwizard.SetupWizard) == []
 
 
-def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win, monkeypatch):
+def test_settings_open_beside_the_window_and_once(qapp, win):
+    """Settings apply as they change, so they don't hold up the board (U4): one
+    window, raised and switched to the page asked for when it's opened again."""
+    d = win.open_settings("audio")
+    assert d.isVisible() and not d.isModal()
+    assert win.isEnabled() and qapp.activeModalWidget() is None
+    assert win.open_settings("hotkeys") is d
+    assert d._page_keys[d.tabs.currentIndex()] == "hotkeys"
+    assert win.open_settings() is d                          # the cog: stays on its page
+    assert d._page_keys[d.tabs.currentIndex()] == "hotkeys"
+    d.search_box.setText("zzzz-nothing")
+    d._apply_search("zzzz-nothing")
+    win.open_settings("audio")                               # a page asked for: search cleared
+    assert d.search_box.text() == "" and d._page_keys[d.tabs.currentIndex()] == "audio"
+    d.reject()                                               # Escape / the X
+    qapp.processEvents()
+    assert win._settings_dlg is None
+    assert win.findChildren(settings.SettingsDialog) == []
+    again = win.open_settings()                              # a new one after closing
+    assert again.isVisible()
+    again.done(0)
+    qapp.processEvents()
+
+
+def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win):
     from soundboard import applog
     from soundboard.ui.crashdialog import CrashDialog
-    kept = []
-
-    def exec_(dlg):
-        kept.append(CrashDialog(applog.Report(title="E: x", text="t"), None, dlg))
-        return 0
-    monkeypatch.setattr(settings.SettingsDialog, "exec", exec_)
-    win.open_settings()
-    assert kept[0].parentWidget() is win
-    kept[0].done(0)
+    dlg = win.open_settings()
+    kept = CrashDialog(applog.Report(title="E: x", text="t"), None, dlg)
+    dlg.done(0)
+    qapp.processEvents()
+    assert kept.parentWidget() is win
+    kept.done(0)
 
 
 def test_live_tab_warning_shows_on_the_rail(qapp, win):

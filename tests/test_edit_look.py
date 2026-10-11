@@ -68,12 +68,10 @@ def test_save_as_new_sound_puts_the_picture_on_the_copy(window, tmp_path,  # noq
     w = window
     before = len(w.cfg.sounds)
 
-    def run(self):
-        self.btn_pic_file.click()
-        self.as_copy = True
-        return QDialog.Accepted
-    monkeypatch.setattr(EditDialog, "exec", run)
-    w.edit("s0")
+    d = w.edit("s0")
+    d.btn_pic_file.click()
+    d.as_copy = True
+    d.done(QDialog.Accepted)
     assert len(w.cfg.sounds) == before + 1
     copy = w.cfg.sounds[w.cfg.sounds.index(w.meta("s0")) + 1]
     assert copy.image and not w.meta("s0").image

@@ -466,12 +466,8 @@ class SettingsDialog(QDialog):
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
-        keys = self._page_keys = [p[0] for p in pages]
-        if page in self._offline_pages():   # hidden in Offline mode: its switch instead
-            page = "privacy"
-        self.categories.setCurrentRow(keys.index(page) if page in keys else 0)
-        self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
-        self._build_page(self.tabs.currentIndex())   # an unknown page: the first one
+        self._page_keys = [p[0] for p in pages]
+        self.show_page(page)
         self._offline_sync()
         # a search box over the categories: 13 pages are a lot to look through for one
         # switch. Typing hides every card without the word and every page without a card.
@@ -510,6 +506,22 @@ class SettingsDialog(QDialog):
         row.addWidget(close)
         lay.addLayout(row)
         self._initial_size()
+
+    def show_page(self, page: str):
+        """Go to `page` (also when the window is open already and asked for another).
+        Hidden in Offline mode: the Privacy page with its switch instead; an unknown
+        page: the first one. A search in the box is cleared first, or it hid the page."""
+        box = getattr(self, "search_box", None)
+        if box is not None and box.text():
+            box.clear()
+            self._apply_search("")
+        keys = self._page_keys
+        if page in self._offline_pages():
+            page = "privacy"
+        i = keys.index(page) if page in keys else 0
+        self.categories.setCurrentRow(i)
+        self.tabs.setCurrentIndex(i)
+        self._build_page(self.tabs.currentIndex())
 
     # ------------------------------------------------------------------ search
     @staticmethod

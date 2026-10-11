@@ -461,6 +461,10 @@ class MainWindow(QMainWindow):
         self.bridge.mic_users.connect(self._on_mic_users)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
+        # windows beside the board, not over it (U4): the one Settings, and an Edit
+        # sound for each sound being edited
+        self._settings_dlg: SettingsDialog | None = None
+        self._editors: dict[str, EditDialog] = {}
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -4311,10 +4315,28 @@ class MainWindow(QMainWindow):
             self.tip_bar.hide()
         self._save_later()
 
-    def open_settings(self, page: str = "privacy"):
-        dlg = SettingsDialog(self, page, lazy=True)
-        dlg.exec()
-        free_dialog(dlg)
+    def open_settings(self, page: str | None = None):
+        """Settings in their own window, beside the board (not over it): they apply as
+        they change, so sounds, hotkeys and the tabs keep working while it's open. One
+        window: opening it again raises it, on `page` if one is asked for."""
+        dlg = self._settings_dlg
+        if dlg is not None and qt_valid(dlg):
+            if page:
+                dlg.show_page(page)
+            dlg.showNormal() if dlg.isMinimized() else dlg.show()
+            dlg.raise_()
+            dlg.activateWindow()
+            return dlg
+        dlg = self._settings_dlg = SettingsDialog(self, page or "privacy", lazy=True)
+        dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+        dlg.show()
+        return dlg
+
+    def _settings_closed(self, dlg):
+        if self._settings_dlg is dlg:
+            self._settings_dlg = None
+        # freed once its finished signal is over (deleting it inside that crashed)
+        QTimer.singleShot(0, lambda: free_dialog(dlg))
         self.register_hotkeys()   # in case a capture was cancelled
 
     def apply_theme(self, name: str):
@@ -6117,6 +6139,7 @@ class MainWindow(QMainWindow):
         gone = [m for m in (self.meta(s) for s in sids) if m]
         if not gone:
             return
+        self._close_editors([m.id for m in gone])
         self._finish_removals()   # only the latest removal can be undone
         for m in gone:
             self.engine.stop(m.id)
@@ -6331,20 +6354,44 @@ class MainWindow(QMainWindow):
         self.register_hotkeys()
 
     def edit(self, sid, tab: str = "sound"):
+        """Edit sound beside the board, not over it: sounds, hotkeys and the other
+        pads keep working. It's still a draft: nothing changes until Save, and Cancel
+        (or Escape, or closing it) drops it. One window per sound: editing the same
+        sound again raises the open one."""
+        d = self._editors.get(sid)
+        if d is not None and qt_valid(d):
+            if tab == "effects":
+                d.tabs.setCurrentIndex(1)
+            d.showNormal() if d.isMinimized() else d.show()
+            d.raise_()
+            d.activateWindow()
+            return d
         m = self.meta(sid)
-        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
+        if m is None:
+            return None
+        d = self._editors[sid] = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
         d.hotkeys_changed.connect(self.register_hotkeys)
         d.source_forgotten.connect(self._save_now)
-        ok = d.exec()
+        d.finished.connect(lambda ok, sid=sid, d=d: self._edit_done(sid, d, ok))
+        d.show()
+        return d
+
+    def _edit_done(self, sid: str, d: EditDialog, ok: int):
+        """An Edit sound window closed: Save puts its draft on the sound (or a copy)."""
+        if self._editors.get(sid) is d:
+            del self._editors[sid]
         self.drop_preview()                        # a preview still rendering
         self.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         self.engine.stop(f"{sid}~fx:preview")
+        # the sound as it is now: gone (removed while the window was open: nothing to
+        # save it onto), or the same sound in a new object (Undo put it back)
+        m = self.meta(sid)
         try:
-            if ok and d.as_copy:
+            if ok and m is not None and d.as_copy:
                 self._save_copy(m, d)
-            elif ok:
+            elif ok and m is not None:
                 old_key = soundfx.key(m.fx)
-                d.apply()
+                d.apply(m)
                 self._clear_dupe_hotkey(m)
                 self.engine.set_gain(sid, self.gain_for(m))
                 if soundfx.key(m.fx) != old_key:
@@ -6353,8 +6400,17 @@ class MainWindow(QMainWindow):
                 self.pads[sid].update()
                 self.apply_filter(self.search.text())
         finally:
-            free_dialog(d)
+            # freed once its finished signal is over (deleting it inside that crashed)
+            QTimer.singleShot(0, lambda: free_dialog(d))
         self.register_hotkeys()
+
+    def _close_editors(self, sids):
+        """The sounds are going: their open Edit sound windows close, unsaved (the
+        Undo bar brings the sound back as it was)."""
+        for sid in sids:
+            d = self._editors.get(sid)
+            if d is not None and qt_valid(d):
+                d.reject()
 
     def duplicate_sound(self, sid: str) -> SoundMeta | None:
         """The pad menu's Duplicate: a copy right after the original, with its own
