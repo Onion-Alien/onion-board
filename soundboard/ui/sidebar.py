@@ -1,7 +1,7 @@
 """The main window's tabs as a thin rail down the left: one icon per tab, and a
 button at the bottom that opens it out to show their names, with the onion and
 the app's name and version on top. The foot is three zones with a thin line between:
-what needs attention (not connected, offline, an update: only when there is one),
+what needs attention (not connected, an update: only when there is one),
 what's on air (Live, who's listening, Stop all), then Settings with the open / shut
 arrow beside it. The QTabWidget stays (its pages, live marks and settings
 all work as before); only its bar is hidden, and the rail mirrors it: each tab's
@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import html
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QMouseEvent, QPainter, QPen
@@ -261,7 +262,13 @@ class OutputBlock(QFrame):
     the same column as the tab icons above and the buttons below, every line of
     words starts at the same x after them, and each icon is centred on the cap
     height of its label's first line. The status line is the setup action too:
-    "Not configured ›" is one click to Setup, "Connected" is only words."""
+    "Not configured ›" is one click to Setup, "Connected" is only words. Under it,
+    a line for each thing worth knowing about the network (set_lines): the app
+    going online through a proxy or Tor or not at all, a phone remote listening.
+    Each is one click to its Settings page; the small card keeps their icons under
+    the switch."""
+
+    lineClicked = Signal(str)   # a line's Settings page
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
     TOP = 12              # card padding over the title row (the 12 of settings cards)
@@ -354,6 +361,9 @@ class OutputBlock(QFrame):
         row.addStretch(1)   # the chevron stays beside its words
         self.setup.clicked.connect(self._setup_clicked)
         box.addWidget(self.setup)
+        # the network lines (set_lines), made as they're needed
+        self._lines: list[Line] = []
+        self.net: list[_NetLine] = []
         self.refresh()
 
     def _glyph(self, size: int = 0) -> QLabel:
@@ -396,6 +406,14 @@ class OutputBlock(QFrame):
         self.row.setContentsMargins(self._px(self.ROW_PAD), pad, self._px(self.PAD), pad)
         self._pin(self.status_icon, self.status_text)
         self._pin(self.arrow, self.status_text, mid="x")
+        for n in self.net:
+            if self.property("expanded"):
+                n.row.setContentsMargins(self._px(self.ROW_PAD), pad, self._px(self.PAD), pad)
+                self._pin(n.glyph, n.label)
+            else:   # the icon alone, centred under the switch
+                n.row.setContentsMargins(0, 8, 0, 0)
+                n.glyph.setContentsMargins(0, 0, 0, 0)
+                n.glyph.setFixedHeight(self.GLYPH)
 
     def changeEvent(self, e):
         super().changeEvent(e)
@@ -431,8 +449,11 @@ class OutputBlock(QFrame):
         bold = self._metrics(scale, bold=True)
         title = max(bold.horizontalAdvance(t) for t in self.names())
         status = self._metrics(scale).horizontalAdvance(self.status_text.text())
+        network = max((self._metrics(scale).horizontalAdvance(line.words)
+                       for line in self._lines), default=0)
         return max(text_x + title + 1 + px(self.SWITCH_GAP) + px(self.SWITCH[0]) + px(self.PAD),
-                   text_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON) + 2 * px(self.PAD))
+                   text_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON) + 2 * px(self.PAD),
+                   text_x + network + 1 + 2 * px(self.PAD))
 
     def scale_for(self, width: int) -> float:
         """The biggest scale (up to 1) the card fits `width` at, or 0: not even at
@@ -451,7 +472,7 @@ class OutputBlock(QFrame):
             return
         self._scale = scale
         size = "" if scale == 1 else f"font-size:{self._base_pt() * scale:.2f}pt;"
-        for label in (self.title, self.status_text):
+        for label in (self.title, self.status_text, *(n.label for n in self.net)):
             label.setStyleSheet(size)
         self.set_expanded(bool(self.property("expanded")))
         self.refresh()
@@ -471,6 +492,8 @@ class OutputBlock(QFrame):
         self.setup.setVisible(expanded)
         for g in (self.mark, self.status_icon):
             g.setFixedWidth(glyph)
+        for n in self.net:
+            n.lay_out(expanded, glyph, px)
         self.arrow.setFixedWidth(px(self.CHEVRON))
         icons.set_label_icon(self.mark, "live", "accent", size=glyph)
         self.switch.setFixedSize(*((px(self.SWITCH[0]), px(self.SWITCH[1])) if expanded
@@ -519,6 +542,23 @@ class OutputBlock(QFrame):
                 return True
         return False
 
+    def set_lines(self, lines: list[Line]):
+        """The network lines under the status, in order (none: a direct connection
+        and nothing listening)."""
+        lines = list(lines)
+        if lines == self._lines:
+            return
+        self._lines = lines
+        expanded = bool(self.property("expanded"))
+        while len(self.net) < len(lines):
+            n = _NetLine(self)
+            n.clicked.connect(lambda _c=False, n=n: self.lineClicked.emit(n.page))
+            self.box.addWidget(n)
+            self.net.append(n)
+            n.lay_out(expanded, self._px(self.GLYPH) if expanded else self.GLYPH, self._px)
+            n.label.setStyleSheet(self.title.styleSheet())   # (the card's scale)
+        self.refresh()
+
     @staticmethod
     def names() -> tuple[str, str]:
         return _("On Air"), _("Off Air")
@@ -560,7 +600,72 @@ class OutputBlock(QFrame):
         self.status_icon.setPixmap(self.connection.icon().pixmap(glyph, glyph))
         icons.set_label_icon(self.arrow, "fold_back" if self.isRightToLeft() else "fold",
                              "warn_text", size=self._px(self.CHEVRON))
+        for i, n in enumerate(self.net):
+            n.setVisible(i < len(self._lines))
+            if i < len(self._lines):
+                n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
         self._pin_all()
+
+
+@dataclass(frozen=True)
+class Line:
+    """A line in the On Air card under its status (OutputBlock.set_lines)."""
+    icon: str
+    words: str
+    tone: str = ""   # "ok", "warn" or "" (plain)
+    full: str = ""   # the tip: what it says in full
+    page: str = ""   # the Settings page a click opens
+
+
+class _NetLine(QPushButton):
+    """One Line: its glyph and words on the status line's keylines, the whole line
+    the button (shut: the icon alone, centred under the switch)."""
+
+    def __init__(self, card: OutputBlock):
+        super().__init__()
+        self.page = ""
+        self.setObjectName("railoutputsetup")
+        self.setProperty("quiet", True)
+        self.setProperty("action", True)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+        self.row = QHBoxLayout(self)
+        self.row.setSpacing(0)
+        self.glyph = card._glyph()
+        self.label = _HugLabel("")
+        self.label.setWordWrap(True)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeading | Qt.AlignmentFlag.AlignTop)
+        for w in (self.glyph, self.label):
+            w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.row.addWidget(self.glyph, 0, Qt.AlignmentFlag.AlignTop)
+        self.gap = QSpacerItem(OutputBlock.GAP, 0, QSizePolicy.Policy.Fixed,
+                               QSizePolicy.Policy.Minimum)
+        self.row.addSpacerItem(self.gap)
+        self.row.addWidget(self.label, 0, Qt.AlignmentFlag.AlignTop)
+        self.row.addStretch(1)
+        self.hide()
+
+    def lay_out(self, expanded: bool, glyph: int, px):
+        # shut: the icon's box is the card's width, so it sits centred under the switch
+        self.glyph.setFixedWidth(glyph if expanded else BUTTON_W)
+        self.label.setVisible(expanded)
+        self.setMinimumHeight(px(OutputBlock.ROW_H) if expanded else OutputBlock.GLYPH + 12)
+        self.gap.changeSize(px(OutputBlock.GAP) if expanded else 0, 0,
+                            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.row.invalidate()
+
+    def show_line(self, line: Line, size: int):
+        self.page = line.page
+        self.label.setText(line.words)
+        theme.set_tone(self.label, line.tone)
+        self.setToolTip(line.full)
+        self.setAccessibleName(line.words)
+        self.setAccessibleDescription(line.full)
+        icons.set_label_icon(self.glyph, line.icon, {"ok": "ok_text", "warn": "warn_text"}
+                             .get(line.tone, "muted"), size=size)
+        self.style().unpolish(self)
+        self.style().polish(self)
 
 
 class _HugLabel(QLabel):

@@ -48,7 +48,7 @@ def clean_settings(raw) -> dict:
     for k in ("voice", "model", "language", "translate"):
         if k in out and not isinstance(out[k], str):
             del out[k]
-    for k in ("mute_real_voice", "voice_fx"):
+    for k in ("mute_real_voice", "voice_fx", "translate_on"):
         if k in out and not isinstance(out[k], bool):
             del out[k]
     for k, lo, hi in (("rate", -10, 10), ("gain", 0.0, MAX_GAIN)):

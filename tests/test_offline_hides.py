@@ -20,10 +20,11 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         window.set_tab_on(key, True)
     bar = window.tabs
     try:
-        assert window.btn_offline.isHidden() and bar.isTabVisible(TAB_INDEX["radio"])
+        assert window.card_lines() == [] and bar.isTabVisible(TAB_INDEX["radio"])
         window.tabs.setCurrentIndex(TAB_INDEX["radio"])
         offline(window, True)
-        assert not window.btn_offline.isHidden()
+        assert [line.words for line in window.card_lines()] == ["Offline"]   # in the card
+        assert window.rail.output._lines == window.card_lines()
         assert not bar.isTabVisible(TAB_INDEX["radio"])
         assert bar.currentIndex() == 0   # was on Radio: back to the Sounds tab
         # no Onion Watch in the test profile: the Triggers tab is only its Get button
@@ -35,7 +36,7 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         window.set_tab_on("apps", False)
         assert window._more_tab_keys() == ["apps"]
         offline(window, False)
-        assert window.btn_offline.isHidden()
+        assert window.card_lines() == [] and window.rail.output._lines == []
         assert bar.isTabVisible(TAB_INDEX["radio"]) and bar.isTabVisible(TAB_INDEX["triggers"])
         assert not window.btn_yt.isHidden()
         assert "paste a link" in window.search.placeholderText()
@@ -137,3 +138,56 @@ def test_addons_without_one_installed_goes_offline(window):  # noqa: F811
     finally:
         d.close()
         offline(window, False)
+
+
+def test_on_air_card_says_proxy_and_tor(window, monkeypatch):  # noqa: F811
+    from soundboard import tor
+
+    def line():
+        lines = window.rail.output._lines
+        assert len(lines) == 1
+        return lines[0].icon, lines[0].words, lines[0].tone
+
+    try:
+        net.configure(net.PROXY, "socks5h://127.0.0.1:9050")
+        QApplication.processEvents()
+        assert line() == ("shield", "Through proxy", "ok")
+        net.configure(net.PROXY, "not a proxy::")
+        assert line()[2] == "warn"
+        net.configure(net.TOR)
+        t = tor.manager()
+        for state, words, tone in ((tor.STARTING, "Tor 40%", ""),
+                                   (tor.READY, "Through Tor", "ok"),
+                                   (tor.FAILED, "Tor failed", "warn")):
+            monkeypatch.setattr(t, "state", state)
+            monkeypatch.setattr(t, "progress", 40)
+            window._on_tor()
+            assert line() == ("tor", words, tone)
+        clicked = []
+        monkeypatch.setattr(window, "open_settings", clicked.append)
+        window.rail.output.net[0].click()
+        assert clicked == ["privacy"]
+    finally:
+        net.configure(net.DIRECT)
+        QApplication.processEvents()
+    assert window.rail.output._lines == []
+
+
+def test_on_air_card_says_a_remote_listens(window, monkeypatch):  # noqa: F811
+    from soundboard import remote
+
+    ctl = remote.RemoteControl(lambda a, p: (200, {}), window)
+    try:
+        assert ctl.start(0, "k" * 32)
+        for _ in range(3):
+            QApplication.processEvents()   # (queued: it may come from another thread)
+        assert [line.words for line in window.rail.output._lines] == ["Remote control on"]
+        ctl.lan = True   # a phone remote's server says so instead
+        window._net_follow()
+        assert [(line.words, line.page) for line in window.rail.output._lines] == [
+            ("Phone remote on", "remote")]
+    finally:
+        ctl.stop()
+    for _ in range(3):
+        QApplication.processEvents()
+    assert window.rail.output._lines == []
