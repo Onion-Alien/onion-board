@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "Sampai {value} menit.",
   "Update available": "Ada pembaruan",
   "Update now": "Perbarui sekarang",
-  "Updated": "Diperbarui",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Diperbarui ke Onion Board {version}. Tidak ada yang berubah sampai kamu mau: semuanya berjalan seperti sebelumnya.",
   "Use the virtual cable instead": "Pakai kabel virtual saja",
   "Video": "Video",
@@ -1046,7 +1045,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} sudah keluar, klik untuk detailnya",
   "Onion Board: quick setup": "Onion Board: pengaturan cepat",
   "Onion Pocket isn't installed.": "Onion Pocket belum terpasang.",
-  "Onion Pocket wasn't removed": "Kantong Bawang tidak dihapus",
   "Onion Pocket wasn't removed: {error}": "Kantong Bawang tidak dihapus: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: bantalan di ponsel Anda",
   "Onion Watch isn't installed.": "Onion Watch belum diinstal.",
@@ -1941,7 +1939,6 @@
   "Onion Watch download progress": "Kemajuan pengunduhan Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch sedang diunduh sekarang. Coba lagi jika sudah selesai.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch belum tersedia untuk diunduh (GitHub mengatakan tidak dapat menemukannya). Coba lagi nanti.",
-  "Onion Watch wasn't removed": "Onion Watch tidak dihapus",
   "Onion Watch wasn't removed: {error}": "Onion Watch tidak dihapus: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch tidak diperbarui: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} telah diinstal. Mulai ulang Onion Board untuk mulai menggunakannya.",
@@ -2149,7 +2146,6 @@
   "There's no sound to download at that link.": "Tidak ada suara untuk diunduh di tautan itu.",
   "This add-on has no install steps.": "Add-on ini tidak memiliki langkah instalasi.",
   "This copy of Onion Board has no mic effect in it.": "Salinan Onion Board ini tidak memiliki efek mikrofon di dalamnya.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Ini sepertinya masalah di Onion Board. Melaporkannya akan membuka halaman di GitHub kami dengan rincian yang terisi; Anda memilih apa yang akan dikirim.",
   "This program's volume in the mix": "Volume program ini tercampur",
   "Tone": "Nada",
   "Too short to keep.": "Terlalu pendek untuk disimpan.",
@@ -3026,6 +3022,9 @@
     "{n} suara sudah ada di perpustakaan Anda"
   ],
   "Open Triggers": "Buka Pemicu",
+  "Copy into library": "Salin ke pustaka",
+  "Local sounds": "Suara lokal",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Nonaktif: tautkan ke file asli. Aktifkan agar suara tetap tersedia jika file asli dipindahkan, dihapus, atau berada di drive yang terputus. Memakai ruang disk tambahan. Hanya berlaku untuk impor lokal baru.",
   "Audio recovery": "Pemulihan audio",
   "Clean reinstall": "Instal ulang bersih",
   "Fix problems sending sounds into your mic after an update.": "Atasi masalah pengiriman suara ke mikrofon setelah pembaruan.",
@@ -3042,5 +3041,13 @@
   "Your sounds and settings are kept.": "Suara dan pengaturanmu tetap tersimpan.",
   "{error}": "{error}",
   "Update mic effect": "Perbarui efek mikrofon",
-  "Update to new version": "Perbarui ke versi baru"
+  "Update to new version": "Perbarui ke versi baru",
+  "Keep": "Simpan",
+  "Keep your imported sounds?": "Simpan suara yang diimpor?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Kami memindahkan <b>{n}</b> suara dari soundboard lainmu. Simpan?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Kami memindahkan <b>{n}</b> suara dari {name}. Simpan?"
+  ]
 }

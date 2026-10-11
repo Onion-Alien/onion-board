@@ -41,6 +41,8 @@ from soundboard.ui import icons
 TOAST_MS = 4000
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
 MAX_SHOWN = 3
+UNDER = 28                # where the text starts: past the icon (18) and a gap (10)
+ACTION_INLINE = 110       # a button wider than this goes under the text
 WIDTH = 380               # at most; narrower windows get their width less 32
 MARGIN = 16               # from the window's side
 ANIM_MS = 180
@@ -127,9 +129,18 @@ class _Card(QFrame):
 
         # every part of the row is LINE tall and centred in it, the text's first line
         # too (set_line), so icon, words, ×N, the button, copy and ✕ share one middle
-        row = QHBoxLayout(self)
-        row.setContentsMargins(18, 10, 6, 10)   # 18: room for the stripe
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(18, 10, 6, 10)   # 18: room for the stripe
+        outer.setSpacing(2)
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(10)
+        outer.addLayout(row)
+        self._row = row
+        # a long button goes on a line of its own under the text (set_action_place),
+        # so it doesn't squeeze the words into a thin column
+        self._under = QHBoxLayout()
+        outer.addLayout(self._under)
         self.icon = QLabel()
         self.icon.setFixedSize(18, LINE)
         self.icon.setAlignment(Qt.AlignCenter)
@@ -169,6 +180,26 @@ class _Card(QFrame):
         b.setCursor(Qt.PointingHandCursor)
         icons.set_icon(b, name, "muted", size=size)
         return b
+
+    def set_action_place(self):
+        """A short button (Undo, See why) sits on the text's line; a long one goes on a
+        line of its own under the text."""
+        self.action.ensurePolished()
+        wide = self.action.sizeHint().width() > ACTION_INLINE
+        self._row.removeWidget(self.action)
+        while self._under.count():   # the button and its stretch, if it was under
+            self._under.takeAt(0)
+        if wide:
+            # the button's words start where the text does: past the icon, less the
+            # button's own padding
+            inset = (self.action.sizeHint().width()
+                     - self.action.fontMetrics().horizontalAdvance(self.action.text())) // 2
+            self._under.setContentsMargins(max(0, UNDER - inset), 0, 0, 0)
+            self._under.addWidget(self.action)
+            self._under.addStretch(1)
+        else:
+            self._row.insertWidget(self._row.indexOf(self.btn_copy), self.action, 0,
+                                   Qt.AlignTop)
 
     def set_line(self):
         """Pad the text so its first line sits in the middle of the LINE-tall row."""
@@ -266,6 +297,7 @@ class _Toast(QWidget):
         if action:
             label, self._callback = action
             self.card.action.setText(label)
+            self.card.set_action_place()
             self.card.action.show()
         else:
             self._callback = None
@@ -491,6 +523,13 @@ def _announce(t: _Toast, text: str):
             QAccessible.updateAccessibility(QAccessibleAnnouncementEvent(t, _strip_tags(text)))
     except (ImportError, AttributeError, TypeError):
         pass
+
+
+def titled(title: str, text: str) -> str:
+    """A message box's title and plain words (lines kept) as a toast's rich text."""
+    import html
+    body = html.escape(text, quote=False).replace("\n", "<br>")
+    return f"<b>{html.escape(title, quote=False)}</b><br>{body}" if title else body
 
 
 def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, *,

@@ -5,6 +5,7 @@ import pytest
 from soundboard import appsetup, profiles
 from soundboard.library import Config
 from soundboard.settings import SettingsDialog
+from soundboard.ui import toast
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 DISCORD = appsetup.Seen("discord.exe", "Discord", profiles.VOICE.key)
@@ -112,9 +113,11 @@ def test_offer_set_up_then_switch_by_itself_next_time(window):
     window._app_setup([], now=100.0)                      # Discord closed a while
     at(window, 200.0)                                     # and came back
     assert window.cfg.dest["simple"] == "voice"
-    assert window._setup_state == "switched" and window.setup_yes.text() == "Undo"
-    window.setup_yes.click()                              # Undo
-    assert window.cfg.dest["simple"] == "clean" and window.setup_bar.isHidden()
+    [t] = [t for t in toast.shown(window) if "Discord" in t.text()]
+    assert t.card.action.text() == "Undo" and window.setup_bar.isHidden()
+    t.card.action.click()                                 # Undo
+    assert window.cfg.dest["simple"] == "clean"
+    assert not [t for t in toast.shown(window) if "Discord" in t.text()]
 
 
 def test_not_now_and_never(window):

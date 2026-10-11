@@ -20,6 +20,7 @@ again* when it's broken) uninstalls it after asking, and Hoot is back; the trigg
 """
 from __future__ import annotations
 
+import html
 import logging
 import threading
 
@@ -539,9 +540,8 @@ class TriggersTab(QWidget):
         """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""
         info = self.info
         if self._busy:
-            QMessageBox.information(self, _("Remove Onion Watch"),
-                                    _("Onion Watch is being downloaded right now. Try again "
-                                      "when it's done."))
+            busy.toast(self, _("Onion Watch is being downloaded right now. Try again "
+                               "when it's done."), "warn")
             return
         if info is None or not self.confirm_remove():
             return
@@ -565,8 +565,8 @@ class TriggersTab(QWidget):
             watchaddon.remove(info, self._base())
         except modules.ModuleError as e:
             log.warning("Onion Watch couldn't be removed: %s", e)
-            QMessageBox.warning(self, _("Onion Watch wasn't removed"),
-                                _("Onion Watch wasn't removed: {error}", error=errors.plain(e)))
+            busy.toast(self, html.escape(_("Onion Watch wasn't removed: {error}",
+                                           error=errors.plain(e))), "error")
             self.load()                     # it's still there: put its tab back
             return
         log.info("Onion Watch %s was removed", info.version)

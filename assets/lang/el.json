@@ -754,7 +754,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Το Onion Board {version} είναι έτοιμο. Επανεκκίνηση τώρα για εγκατάσταση;",
   "Onion Board: quick setup": "Onion Board: γρήγορη ρύθμιση",
   "Onion Pocket isn't installed.": "Το Onion Pocket δεν είναι εγκατεστημένο.",
-  "Onion Pocket wasn't removed": "Το Onion Pocket δεν αφαιρέθηκε",
   "Onion Pocket wasn't removed: {error}": "Το Onion Pocket δεν αφαιρέθηκε: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: τα κουμπιά σου στο κινητό σου",
   "Onion Watch isn't installed.": "Το Onion Watch δεν είναι εγκατεστημένο.",
@@ -1256,7 +1255,6 @@
   "Update settings": "Ρυθμίσεις ενημερώσεων",
   "Update to {version}": "Ενημέρωση σε {version}",
   "Update: {version}": "Ενημέρωση: {version}",
-  "Updated": "Ενημερώθηκε",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Ενημερώθηκε σε Onion Board {version}. Δεν αλλάζει τίποτα μέχρι να το θελήσεις: όλα δουλεύουν όπως πριν.",
   "Updates": "Ενημερώσεις",
   "Updates and add-ons": "Ενημερώσεις και πρόσθετα",
@@ -1983,7 +1981,6 @@
   "Onion Watch download progress": "Πρόοδος λήψης Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Το Onion Watch γίνεται λήψη αυτή τη στιγμή. Δοκιμάστε ξανά όταν τελειώσει.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Το Onion Watch δεν είναι ακόμη διαθέσιμο για λήψη (το GitHub λέει ότι δεν μπορεί να το βρει). Δοκιμάστε ξανά αργότερα.",
-  "Onion Watch wasn't removed": "Το Onion Watch δεν αφαιρέθηκε",
   "Onion Watch wasn't removed: {error}": "Το Onion Watch δεν καταργήθηκε: {error}",
   "Onion Watch wasn't updated: {error}": "Το Onion Watch δεν ενημερώθηκε: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Το Onion Watch {version} έχει εγκατασταθεί. Επανεκκινήστε το Onion Board για να αρχίσετε να το χρησιμοποιείτε.",
@@ -2197,7 +2194,6 @@
   "There's no sound to download at that link.": "Δεν υπάρχει ήχος για λήψη σε αυτόν τον σύνδεσμο.",
   "This add-on has no install steps.": "Αυτό το πρόσθετο δεν έχει βήματα εγκατάστασης.",
   "This copy of Onion Board has no mic effect in it.": "Αυτό το αντίγραφο του Onion Board δεν έχει αποτέλεσμα μικροφώνου σε αυτό.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Αυτό μοιάζει με πρόβλημα στο Onion Board. Η αναφορά του ανοίγει μια σελίδα στο GitHub μας με συμπληρωμένα τα στοιχεία. εσείς επιλέγετε τι θα στείλετε.",
   "This program's volume in the mix": "Ο όγκος αυτού του προγράμματος στη μίξη",
   "Tone": "Τόνος",
   "Too short to keep.": "Πολύ σύντομο για να το κρατήσω.",
@@ -3097,6 +3093,9 @@
     "{n} ήχοι είναι ήδη στη βιβλιοθήκη σου"
   ],
   "Open Triggers": "Άνοιγμα Εναυσμάτων",
+  "Copy into library": "Αντιγραφή στη βιβλιοθήκη",
+  "Local sounds": "Τοπικοί ήχοι",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Ανενεργό: σύνδεση με το αρχικό αρχείο. Ενεργοποιήστε για να διατηρούνται οι ήχοι αν το αρχικό μετακινηθεί, διαγραφεί ή βρίσκεται σε αποσυνδεδεμένο δίσκο. Χρησιμοποιεί επιπλέον χώρο. Ισχύει μόνο για νέες τοπικές εισαγωγές.",
   "Audio recovery": "Ανάκτηση ήχου",
   "Clean reinstall": "Καθαρή εγκατάσταση",
   "Fix problems sending sounds into your mic after an update.": "Διόρθωσε προβλήματα αποστολής ήχων στο μικρόφωνο μετά από ενημέρωση.",
@@ -3113,5 +3112,15 @@
   "Your sounds and settings are kept.": "Οι ήχοι και οι ρυθμίσεις σου διατηρούνται.",
   "{error}": "{error}",
   "Update mic effect": "Ενημέρωση εφέ μικροφώνου",
-  "Update to new version": "Ενημέρωση στη νέα έκδοση"
+  "Update to new version": "Ενημέρωση στη νέα έκδοση",
+  "Keep": "Διατήρηση",
+  "Keep your imported sounds?": "Να κρατηθούν οι εισαγόμενοι ήχοι;",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Φέραμε <b>{n}</b> ήχο από τα άλλα σου soundboard. Να τον κρατήσεις;",
+    "Φέραμε <b>{n}</b> ήχους από τα άλλα σου soundboard. Να τους κρατήσεις;"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Φέραμε <b>{n}</b> ήχο από το {name}. Να τον κρατήσεις;",
+    "Φέραμε <b>{n}</b> ήχους από το {name}. Να τους κρατήσεις;"
+  ]
 }

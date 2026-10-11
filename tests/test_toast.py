@@ -215,7 +215,8 @@ def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # no
     t = next(x for x in toast.shown(w) if x.key == "import")
     assert t.kind == "ok" and t.card.action.text() == "Undo"
     t.card.action.click()
-    assert len(w.cfg.sounds) == before and not w.undo_bar.isHidden()   # undo-able too
+    assert len(w.cfg.sounds) == before   # undo-able too
+    assert any(x.key == "undo-sounds" for x in toast.shown(w))
 
 
 def test_the_veil_says_what_a_drop_does():
@@ -263,3 +264,36 @@ def test_short_sound_warning_keeps_import_actions_and_resets(main_window, qapp, 
     assert process_events(qapp, lambda: not w._pending_imports)
     assert not any("very short" in t.text() for t in toast.shown(w))
     assert next(t for t in toast.shown(w) if t.key == "import").card.action.text() == "Undo"
+
+
+def test_a_long_button_goes_under_the_text(qapp):
+    w = _host(qapp)
+    t = busy.toast(w, "Couldn't update", "error", action=("Open the download page", lambda: None))
+    short = busy.toast(w, "Removed it", "ok", action=("Undo", lambda: None))
+    assert t.card._under.indexOf(t.card.action) >= 0
+    assert short.card._row.indexOf(short.card.action) >= 0
+    w.close()
+
+
+def test_a_cards_parts_line_up(qapp):
+    """The long button's words start where the message does; the icon, copy and ✕
+    sit in the middle of the first line."""
+    from PySide6.QtCore import QPoint
+    w = _host(qapp)
+    t = busy.toast(w, "<b>Couldn't update</b><br>It couldn't be downloaded.", "error",
+                   action=("Open the download page", lambda: None))
+    qapp.processEvents()
+    c = t.card
+
+    def left_of_words(widget, words):
+        inset = (widget.width() - widget.fontMetrics().horizontalAdvance(words)) // 2 \
+            if widget is c.action else widget.contentsMargins().left()
+        return widget.mapTo(c, QPoint(0, 0)).x() + inset
+
+    assert abs(left_of_words(c.action, c.action.text()) - left_of_words(c.label, "")) <= 1
+    first = c.label.mapTo(c, QPoint(0, 0)).y() + c.label.contentsMargins().top() \
+        + c.label.fontMetrics().height() / 2
+    for part in (c.icon, c.btn_copy, c.btn_close):
+        middle = part.mapTo(c, QPoint(0, 0)).y() + part.height() / 2
+        assert abs(middle - first) <= 2, part
+    w.close()

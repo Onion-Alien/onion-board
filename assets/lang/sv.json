@@ -754,7 +754,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} är klart. Starta om nu för att installera det?",
   "Onion Board: quick setup": "Onion Board: snabbinställning",
   "Onion Pocket isn't installed.": "Onion Pocket är inte installerat.",
-  "Onion Pocket wasn't removed": "Onion Pocket togs inte bort",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket togs inte bort: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: dina rutor på din telefon",
   "Onion Watch isn't installed.": "Onion Watch är inte installerat.",
@@ -1256,7 +1255,6 @@
   "Update settings": "Uppdateringsinställningar",
   "Update to {version}": "Uppdatera till {version}",
   "Update: {version}": "Uppdatering: {version}",
-  "Updated": "Uppdaterad",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Uppdaterad till Onion Board {version}. Inget ändras förrän du vill: allt funkar som förut.",
   "Updates": "Uppdateringar",
   "Updates and add-ons": "Uppdateringar och tillägg",
@@ -1983,7 +1981,6 @@
   "Onion Watch download progress": "Onion Watch nedladdningsförlopp",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch laddas ner just nu. Försök igen när det är klart.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch är inte tillgänglig för nedladdning ännu (GitHub säger att den inte kan hitta den). Försök igen senare.",
-  "Onion Watch wasn't removed": "Onion Watch togs inte bort",
   "Onion Watch wasn't removed: {error}": "Onion Watch togs inte bort: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch uppdaterades inte: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} är installerad. Starta om Onion Board för att börja använda den.",
@@ -2197,7 +2194,6 @@
   "There's no sound to download at that link.": "Det finns inget ljud att ladda ner på den länken.",
   "This add-on has no install steps.": "Det här tillägget har inga installationssteg.",
   "This copy of Onion Board has no mic effect in it.": "Denna kopia av Onion Board har ingen mikrofoneffekt.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Det här ser ut som ett problem i Onion Board. Att rapportera det öppnar en sida på vår GitHub med detaljerna ifyllda; du väljer vad du vill skicka.",
   "This program's volume in the mix": "Detta programs volym i mixen",
   "Tone": "Tona",
   "Too short to keep.": "För kort för att hålla.",
@@ -3097,6 +3093,9 @@
     "{n} ljud finns redan i ditt bibliotek"
   ],
   "Open Triggers": "Öppna Triggers",
+  "Copy into library": "Kopiera till biblioteket",
+  "Local sounds": "Lokala ljud",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Av: länka till originalfilen. Slå på för att behålla ljuden om originalet flyttas, raderas eller finns på en frånkopplad enhet. Använder extra diskutrymme. Gäller bara nya lokala importer.",
   "Audio recovery": "Ljudåterställning",
   "Clean reinstall": "Ren ominstallation",
   "Fix problems sending sounds into your mic after an update.": "Åtgärda problem med att skicka ljud till din mikrofon efter en uppdatering.",
@@ -3113,5 +3112,15 @@
   "Your sounds and settings are kept.": "Dina ljud och inställningar behålls.",
   "{error}": "{error}",
   "Update mic effect": "Uppdatera mikrofoneffekt",
-  "Update to new version": "Uppdatera till ny version"
+  "Update to new version": "Uppdatera till ny version",
+  "Keep": "Behåll",
+  "Keep your imported sounds?": "Behålla de importerade ljuden?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Vi hämtade <b>{n}</b> ljud från dina andra soundboards. Vill du behålla det?",
+    "Vi hämtade <b>{n}</b> ljud från dina andra soundboards. Vill du behålla dem?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla det?",
+    "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla dem?"
+  ]
 }

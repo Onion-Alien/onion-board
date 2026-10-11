@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "최대 {value}분.",
   "Update available": "업데이트 있음",
   "Update now": "지금 업데이트",
-  "Updated": "업데이트됨",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version}(으)로 업데이트했어요. 원할 때까지 아무것도 바뀌지 않아요: 모든 게 전처럼 작동해요.",
   "Use the virtual cable instead": "대신 가상 케이블 쓰기",
   "Video": "동영상",
@@ -1048,7 +1047,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} 이 출시되었습니다. 자세한 내용을 보려면 클릭하세요.",
   "Onion Board: quick setup": "양파 보드 - 빠른 설정",
   "Onion Pocket isn't installed.": "양파 포켓이 설치되지 않았습니다.",
-  "Onion Pocket wasn't removed": "양파 주머니가 제거되지 않았습니다",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket이 제거되지 않았습니다: {error}",
   "Onion Pocket: your pads on your phone": "양파 포켓: 휴대폰의 패드",
   "Onion Watch isn't installed.": "양파 감시가 설치되지 않았습니다.",
@@ -1941,7 +1939,6 @@
   "Onion Watch download progress": "양파시계 다운로드 진행",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch가 지금 다운로드 중입니다. 완료되면 다시 시도하세요.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch는 아직 다운로드할 수 없습니다(GitHub에서는 찾을 수 없다고 합니다). 나중에 다시 시도하세요.",
-  "Onion Watch wasn't removed": "Onion Watch가 제거되지 않았습니다.",
   "Onion Watch wasn't removed: {error}": "Onion Watch가 제거되지 않았습니다: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch가 업데이트되지 않았습니다: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} 이 설치되었습니다. 사용을 시작하려면 Onion Board를 다시 시작하세요.",
@@ -2149,7 +2146,6 @@
   "There's no sound to download at that link.": "해당 링크에서는 다운로드할 수 있는 사운드가 없습니다.",
   "This add-on has no install steps.": "이 추가 기능에는 설치 단계가 없습니다.",
   "This copy of Onion Board has no mic effect in it.": "이 Onion Board 사본에는 마이크 효과가 없습니다.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "이는 Onion Board의 문제인 것 같습니다. 이를 보고하면 세부 정보가 채워진 GitHub 페이지가 열립니다. 무엇을 보낼지 선택하세요.",
   "This program's volume in the mix": "이 프로그램의 믹스 볼륨",
   "Tone": "음정",
   "Too short to keep.": "너무 짧아서 보관할 수 없습니다.",
@@ -3026,6 +3022,9 @@
     "사운드 {n}개가 이미 라이브러리에 있어요"
   ],
   "Open Triggers": "트리거 열기",
+  "Copy into library": "라이브러리에 복사",
+  "Local sounds": "로컬 사운드",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "끄기: 원본 파일에 연결합니다. 원본이 이동 또는 삭제되거나 드라이브 연결이 끊겨도 사운드를 유지하려면 켜세요. 추가 디스크 공간을 사용합니다. 새 로컬 가져오기에만 적용됩니다.",
   "Audio recovery": "오디오 복구",
   "Clean reinstall": "완전히 재설치",
   "Fix problems sending sounds into your mic after an update.": "업데이트 후 마이크로 소리가 전송되지 않는 문제를 해결하세요.",
@@ -3042,5 +3041,13 @@
   "Your sounds and settings are kept.": "소리와 설정은 유지됩니다.",
   "{error}": "{error}",
   "Update mic effect": "마이크 효과 업데이트",
-  "Update to new version": "새 버전으로 업데이트"
+  "Update to new version": "새 버전으로 업데이트",
+  "Keep": "유지",
+  "Keep your imported sounds?": "가져온 사운드를 유지할까요?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "다른 사운드보드에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ]
 }

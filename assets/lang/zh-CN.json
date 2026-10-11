@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "最长 {value} 分钟。",
   "Update available": "有可用更新",
   "Update now": "立即更新",
-  "Updated": "已更新",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "已更新到 Onion Board {version}。在你需要之前什么都不会变：一切照旧。",
   "Use the virtual cable instead": "改用虚拟音频线",
   "Video": "视频",
@@ -1046,7 +1045,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} 已发布，点击查看详情",
   "Onion Board: quick setup": "Onion Board：快速设置",
   "Onion Pocket isn't installed.": "Onion Pocket 没有安装。",
-  "Onion Pocket wasn't removed": "Onion Pocket 没有被移除",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket 没有被移除：{error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket：手机上的按钮",
   "Onion Watch isn't installed.": "Onion Watch 没有安装。",
@@ -1941,7 +1939,6 @@
   "Onion Watch download progress": "Onion Watch下载进度",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch 正在下载。完成后重试。",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch 尚无法下载（GitHub 表示找不到）。稍后再试。",
-  "Onion Watch wasn't removed": "洋葱手表没有被删除",
   "Onion Watch wasn't removed: {error}": "Onion Watch 未删除： {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch 未更新： {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version}已安装。重新启动 Onion Board 即可开始使用。",
@@ -2149,7 +2146,6 @@
   "There's no sound to download at that link.": "该链接没有可供下载的声音。",
   "This add-on has no install steps.": "该附加组件没有安装步骤。",
   "This copy of Onion Board has no mic effect in it.": "此洋葱板副本中没有麦克风效果。",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "这看起来像是 Onion Board 中的一个问题。报告该问题会在我们的 GitHub 上打开一个页面，其中填写了详细信息；您选择要发送的内容。",
   "This program's volume in the mix": "该节目的混音音量",
   "Tone": "语气",
   "Too short to keep.": "太短了，无法保留。",
@@ -3026,6 +3022,9 @@
     "{n} 个声音已在你的音效库里"
   ],
   "Open Triggers": "打开触发器",
+  "Copy into library": "复制到音效库",
+  "Local sounds": "本地音效",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "关闭：链接到原始文件。开启后，即使原文件被移动、删除或所在驱动器断开连接，也能保留音效。会占用额外磁盘空间。仅适用于新导入的本地文件。",
   "Audio recovery": "音频恢复",
   "Clean reinstall": "全新安装",
   "Fix problems sending sounds into your mic after an update.": "修复更新后无法将声音发送到麦克风的问题。",
@@ -3042,5 +3041,13 @@
   "Your sounds and settings are kept.": "你的声音和设置会保留。",
   "{error}": "{error}",
   "Update mic effect": "更新麦克风效果",
-  "Update to new version": "更新到新版本"
+  "Update to new version": "更新到新版本",
+  "Keep": "保留",
+  "Keep your imported sounds?": "保留导入的音效吗？",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "已从你的其他音效板导入 <b>{n}</b> 个音效。要保留吗？"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "已从 {name} 导入 <b>{n}</b> 个音效。要保留吗？"
+  ]
 }

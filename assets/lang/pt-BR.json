@@ -474,7 +474,6 @@
   "Up to {value} minutes.": "Até {value} minutos.",
   "Update available": "Atualização disponível",
   "Update now": "Atualizar agora",
-  "Updated": "Atualizado",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Atualizado para o Onion Board {version}. Nada muda até você querer: tudo funciona como antes.",
   "Use the virtual cable instead": "Usar o cabo virtual",
   "Video": "Vídeo",
@@ -1067,7 +1066,6 @@
   "Onion Board {version} is out, click for details": "Saiu o Onion Board {version}, clique para ver os detalhes",
   "Onion Board: quick setup": "Onion Board: configuração rápida",
   "Onion Pocket isn't installed.": "O Onion Pocket não está instalado.",
-  "Onion Pocket wasn't removed": "O Onion Pocket não foi removido",
   "Onion Pocket wasn't removed: {error}": "O Onion Pocket não foi removido: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: seus botões no celular",
   "Onion Watch isn't installed.": "O Onion Watch não está instalado.",
@@ -1986,7 +1984,6 @@
   "Onion Watch download progress": "Progresso do download do Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch está sendo baixado agora. Tente novamente quando terminar.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch ainda não está disponível para download (o GitHub diz que não consegue encontrá-lo). Tente novamente mais tarde.",
-  "Onion Watch wasn't removed": "Onion Watch não foi removido",
   "Onion Watch wasn't removed: {error}": "Onion Watch não foi removido: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch não foi atualizado: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} está instalado. Reinicie o Onion Board para começar a usá-lo.",
@@ -2197,7 +2194,6 @@
   "There's no sound to download at that link.": "Não há som para baixar nesse link.",
   "This add-on has no install steps.": "Este complemento não possui etapas de instalação.",
   "This copy of Onion Board has no mic effect in it.": "Esta cópia do Onion Board não tem efeito de microfone.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Isso parece um problema no Onion Board. Reportar abre uma página em nosso GitHub com os dados preenchidos; você escolhe o que enviar.",
   "This program's volume in the mix": "O volume deste programa na mixagem",
   "Tone": "Tom",
   "Too short to keep.": "Muito curto para manter.",
@@ -3097,6 +3093,9 @@
     "{n} sons já estão na sua biblioteca"
   ],
   "Open Triggers": "Abrir Gatilhos",
+  "Copy into library": "Copiar para a biblioteca",
+  "Local sounds": "Sons locais",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Desativado: vincula ao arquivo original. Ative para manter os sons se o original for movido, excluído ou estiver em uma unidade desconectada. Usa espaço extra em disco. Aplica-se apenas a novas importações locais.",
   "Audio recovery": "Recuperação de áudio",
   "Clean reinstall": "Reinstalação limpa",
   "Fix problems sending sounds into your mic after an update.": "Resolva problemas ao enviar sons para seu microfone após uma atualização.",
@@ -3113,5 +3112,15 @@
   "Your sounds and settings are kept.": "Seus sons e configurações são mantidos.",
   "{error}": "{error}",
   "Update mic effect": "Atualizar efeito do microfone",
-  "Update to new version": "Atualizar para nova versão"
+  "Update to new version": "Atualizar para nova versão",
+  "Keep": "Manter",
+  "Keep your imported sounds?": "Manter os sons importados?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Trouxemos <b>{n}</b> som das suas outras soundboards. Manter?",
+    "Trouxemos <b>{n}</b> sons das suas outras soundboards. Manter?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Trouxemos <b>{n}</b> som do {name}. Manter?",
+    "Trouxemos <b>{n}</b> sons do {name}. Manter?"
+  ]
 }

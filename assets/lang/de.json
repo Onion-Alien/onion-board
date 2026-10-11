@@ -474,7 +474,6 @@
   "Up to {value} minutes.": "Bis zu {value} Minuten.",
   "Update available": "Update verfügbar",
   "Update now": "Jetzt aktualisieren",
-  "Updated": "Aktualisiert",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Auf Onion Board {version} aktualisiert. Nichts ändert sich, bis du es willst: Alles funktioniert wie vorher.",
   "Use the virtual cable instead": "Stattdessen das virtuelle Kabel nutzen",
   "Video": "Video",
@@ -1067,7 +1066,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} ist da, klick für Details",
   "Onion Board: quick setup": "Onion Board: Schnelleinrichtung",
   "Onion Pocket isn't installed.": "Onion Pocket ist nicht installiert.",
-  "Onion Pocket wasn't removed": "Onion Pocket wurde nicht entfernt",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket wurde nicht entfernt: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: deine Pads auf deinem Handy",
   "Onion Watch isn't installed.": "Onion Watch ist nicht installiert.",
@@ -1986,7 +1984,6 @@
   "Onion Watch download progress": "Beobachten Sie den Download-Fortschritt von Onion",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch wird gerade heruntergeladen. Versuchen Sie es erneut, wenn es fertig ist.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch kann noch nicht heruntergeladen werden (GitHub gibt an, dass es nicht gefunden werden kann). Versuchen Sie es später noch einmal.",
-  "Onion Watch wasn't removed": "Onion Watch wurde nicht entfernt",
   "Onion Watch wasn't removed: {error}": "Onion Watch wurde nicht entfernt: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch wurde nicht aktualisiert: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} ist installiert. Starten Sie Onion Board neu, um es zu verwenden.",
@@ -2197,7 +2194,6 @@
   "There's no sound to download at that link.": "Unter diesem Link ist kein Ton zum Herunterladen zu hören.",
   "This add-on has no install steps.": "Für dieses Add-on sind keine Installationsschritte erforderlich.",
   "This copy of Onion Board has no mic effect in it.": "Diese Kopie von Onion Board hat keinen Mikrofoneffekt.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Dies scheint ein Problem in Onion Board zu sein. Wenn Sie es melden, wird auf unserem GitHub eine Seite mit den ausgefüllten Details geöffnet. Sie entscheiden, was Sie senden möchten.",
   "This program's volume in the mix": "Die Lautstärke dieses Programms im Mix",
   "Tone": "Ton",
   "Too short to keep.": "Zu kurz zum Aufbewahren.",
@@ -3097,6 +3093,9 @@
     "{n} Sounds sind schon in deiner Bibliothek"
   ],
   "Open Triggers": "Trigger öffnen",
+  "Copy into library": "In Bibliothek kopieren",
+  "Local sounds": "Lokale Sounds",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Aus: Originaldatei verknüpfen. Einschalten, um Sounds zu behalten, wenn das Original verschoben, gelöscht oder auf einem getrennten Laufwerk ist. Braucht zusätzlichen Speicherplatz. Gilt nur für neue lokale Importe.",
   "Audio recovery": "Audio-Wiederherstellung",
   "Clean reinstall": "Sauber neu installieren",
   "Fix problems sending sounds into your mic after an update.": "Behebe Probleme beim Senden von Sounds an dein Mikrofon nach einem Update.",
@@ -3113,5 +3112,15 @@
   "Your sounds and settings are kept.": "Deine Sounds und Einstellungen bleiben erhalten.",
   "{error}": "{error}",
   "Update mic effect": "Mikrofoneffekt aktualisieren",
-  "Update to new version": "Auf neue Version aktualisieren"
+  "Update to new version": "Auf neue Version aktualisieren",
+  "Keep": "Behalten",
+  "Keep your imported sounds?": "Importierte Sounds behalten?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Wir haben <b>{n}</b> Sound aus deinen anderen Soundboards übernommen. Behalten?",
+    "Wir haben <b>{n}</b> Sounds aus deinen anderen Soundboards übernommen. Behalten?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Wir haben <b>{n}</b> Sound aus {name} übernommen. Behalten?",
+    "Wir haben <b>{n}</b> Sounds aus {name} übernommen. Behalten?"
+  ]
 }

@@ -480,7 +480,6 @@
   "Up to {value} minutes.": "До {value} хв.",
   "Update available": "Доступне оновлення",
   "Update now": "Оновити зараз",
-  "Updated": "Оновлено",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Оновлено до Onion Board {version}. Нічого не зміниться, доки ти сам не захочеш: усе працює як раніше.",
   "Use the virtual cable instead": "Натомість використати віртуальний кабель",
   "Video": "Відео",
@@ -1090,7 +1089,6 @@
   "Onion Board {version} is out, click for details": "Вийшла {version} Onion Board: натисніть, щоб дізнатися більше",
   "Onion Board: quick setup": "Onion Board: швидке налаштування",
   "Onion Pocket isn't installed.": "Onion Pocket не встановлено.",
-  "Onion Pocket wasn't removed": "Onion Pocket не було видалено",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket не видалено: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: ваші планшети на телефоні",
   "Onion Watch isn't installed.": "Onion Watch не встановлено.",
@@ -2031,7 +2029,6 @@
   "Onion Watch download progress": "Onion Спостерігайте за прогресом завантаження",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Зараз завантажується Onion Watch. Спробуйте ще раз, коли це буде зроблено.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch поки що недоступний для завантаження (GitHub каже, що не може його знайти). Повторіть спробу пізніше.",
-  "Onion Watch wasn't removed": "Onion Watch не видалено",
   "Onion Watch wasn't removed: {error}": "Onion Watch не видалено: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch не оновлено: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} встановлено. Перезапустіть Onion Board, щоб почати використовувати його.",
@@ -2245,7 +2242,6 @@
   "There's no sound to download at that link.": "За цим посиланням немає звуку для завантаження.",
   "This add-on has no install steps.": "Це доповнення не має етапів встановлення.",
   "This copy of Onion Board has no mic effect in it.": "Ця копія Onion Board не має ефекту мікрофона.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Це виглядає як проблема в Onion Board. Повідомлення про це відкриває сторінку на нашому GitHub із заповненими деталями; ви обираєте, що відправити.",
   "This program's volume in the mix": "Гучність цієї програми в міксі",
   "Tone": "Тон",
   "Too short to keep.": "Занадто короткий, щоб зберегти.",
@@ -3168,6 +3164,9 @@
     "{n} звуків уже у вашій бібліотеці"
   ],
   "Open Triggers": "Відкрити тригери",
+  "Copy into library": "Копіювати до бібліотеки",
+  "Local sounds": "Локальні звуки",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Вимкнено: посилання на вихідний файл. Увімкніть, щоб зберегти звуки, якщо оригінал переміщено, видалено або він на від’єднаному диску. Використовує додаткове місце. Лише для нових локальних імпортів.",
   "Audio recovery": "Відновлення звуку",
   "Clean reinstall": "Чисте перевстановлення",
   "Fix problems sending sounds into your mic after an update.": "Виправ проблеми з передаванням звуків у мікрофон після оновлення.",
@@ -3184,5 +3183,17 @@
   "Your sounds and settings are kept.": "Твої звуки й налаштування збережуться.",
   "{error}": "{error}",
   "Update mic effect": "Оновити ефект мікрофона",
-  "Update to new version": "Оновити до нової версії"
+  "Update to new version": "Оновити до нової версії",
+  "Keep": "Залишити",
+  "Keep your imported sounds?": "Залишити імпортовані звуки?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?"
+  ]
 }

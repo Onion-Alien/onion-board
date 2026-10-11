@@ -982,7 +982,7 @@ class VoiceFxPanel(QWidget):
         tile of its own (picked straight away)."""
         suggestion = self._based_on or self.store.free_name(_("My voice"))
         if self.store.full() and self.store.find(suggestion) is None:
-            QMessageBox.information(self._parent(), _("Save as a voice"), self._full_text())
+            busy.toast(self._parent(), html.escape(self._full_text()), "warn", 8000)
             return
         name = self._ask_name(_("Save as a voice"), suggestion)
         if not name:
@@ -1030,9 +1030,8 @@ class VoiceFxPanel(QWidget):
         return code
 
     def _note(self, text: str):
-        """A short line where Undo shows, with nothing to undo."""
-        self.undo_bar.show_for(text, None)
-        self.undo_bar.btn_undo.hide()
+        """A short result, as a corner card."""
+        busy.toast(self._parent(), html.escape(text), "ok")
 
     def import_code(self, text: str | None = None) -> str:
         """Add a voice from a share code (asked for if not given) as a new saved voice,
@@ -1047,10 +1046,10 @@ class VoiceFxPanel(QWidget):
         try:
             name, effects, notes = savedvoices.read_code(text)
         except savedvoices.CodeError as e:
-            QMessageBox.warning(self._parent(), title, str(e))
+            busy.toast(self._parent(), html.escape(str(e)), "warn")
             return ""
         if self.store.full():
-            QMessageBox.information(self._parent(), title, self._full_text())
+            busy.toast(self._parent(), html.escape(self._full_text()), "warn", 8000)
             return ""
         if name.casefold() in self._builtin_names():
             name = f"{name[:savedvoices.MAX_NAME - 9]} (shared)"
@@ -1107,7 +1106,6 @@ class VoiceFxPanel(QWidget):
             self._based_on = ""
         self._fill_saved()
         self._emit()
-        self.undo_bar.btn_undo.show()   # (a note hides it)
         self.undo_bar.show_for(_("Deleted the voice “{name}”", name=name),
                                lambda: self._undelete(item.id, was_on))
 
