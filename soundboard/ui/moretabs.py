@@ -124,4 +124,4 @@ def fill(menu: QMenu, tabs: list[tuple[str, str, str]], add, settings):
         card.picked.connect(lambda a=act: (a.trigger(), menu.close()))
         menu.addAction(act)
     menu.addSeparator()
-    menu.addAction(icons.icon("settings"), _("Choose tabs in Settings…"), settings)
+    menu.addAction(icons.icon("settings"), _("Choose tabs in Settings"), settings)

@@ -395,18 +395,18 @@ def menu_pick(monkeypatch, path):
 
 def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     w = window
-    shown = menu_pick(monkeypatch, ["Set hotkey…"])
+    shown = menu_pick(monkeypatch, ["Set hotkey"])
     from soundboard.ui import mainwindow
     monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.pad_menu("s0", None)
-    assert shown == ["Play next", "Volume", "---", "Edit…", "Rename…", "Effects…",
-                     "Set hotkey…", "Categories", "Add picture", "---", "Duplicate",
-                     "Export…", "Show the file in its folder", "Remove"]
+    assert shown == ["Play next", "Volume", "---", "Edit", "Rename", "Effects",
+                     "Set hotkey", "Categories", "Add picture", "---", "Duplicate",
+                     "Export", "Show the file in its folder", "Remove"]
     assert w.meta("s0").hotkey == "ctrl+alt+7"
     shown = menu_pick(monkeypatch, ["Hotkey: Ctrl+Alt+7", "Remove hotkey"])
     w.pad_menu("s0", None)
-    assert "Hotkey: Ctrl+Alt+7" in shown and "Set hotkey…" not in shown
+    assert "Hotkey: Ctrl+Alt+7" in shown and "Set hotkey" not in shown
     assert w.meta("s0").hotkey == ""
 
 

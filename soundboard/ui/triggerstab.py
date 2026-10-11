@@ -101,7 +101,7 @@ class TriggersTab(QWidget):
         self._build_update_bar()
         net.on_change(self._follow_switch)
         bv.addWidget(self.update_bar)
-        self.act_remove = None              # "Remove Onion Watch…" in the add-on's More menu
+        self.act_remove = None              # "Remove Onion Watch" in the add-on's More menu
         self.foot = QHBoxLayout()           # ...or, if it has none, under its tab
         self.foot.setContentsMargins(0, 6, 0, 0)
         self.foot.addStretch(1)
@@ -221,7 +221,7 @@ class TriggersTab(QWidget):
         self.update_bar.hide()
 
     def _remove_button(self) -> QPushButton:
-        b = QPushButton(_("Remove Onion Watch…"))
+        b = QPushButton(_("Remove Onion Watch"))
         icons.set_icon(b, "trash", "danger_text")
         b.setToolTip(_("Uninstall the Onion Watch add-on. Your triggers are kept."))
         b.clicked.connect(self.remove)
@@ -380,7 +380,7 @@ class TriggersTab(QWidget):
             if menu is not None:            # last in its More menu, no row of its own
                 menu.addSeparator()
                 self.act_remove = menu.addAction(icons.icon("trash", "danger_text"),
-                                                 _("Remove Onion Watch…"), self.remove)
+                                                 _("Remove Onion Watch"), self.remove)
             else:
                 lay.addLayout(self.foot)
                 self.btn_remove.show()

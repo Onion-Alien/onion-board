@@ -429,7 +429,7 @@ class DiscordGuide(QDialog):
             failed=_("Couldn't open Discord: is it installed? Open it yourself: ⚙ User "
                      "Settings → Voice & Video. The link was")))
         row.addWidget(opn)
-        ptt = QPushButton(_("Auto push-to-talk…"))
+        ptt = QPushButton(_("Auto push-to-talk"))
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)
@@ -551,7 +551,7 @@ class GameGuide(QDialog):
                                       busy.flash(copy, _("✓  Copied"))))
         copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
-        ptt = QPushButton(_("Auto push-to-talk…"))
+        ptt = QPushButton(_("Auto push-to-talk"))
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)

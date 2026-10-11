@@ -848,7 +848,7 @@ class AppsTab(QWidget):
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
         v.addWidget(self.warn)
-        self.btn_bin = QPushButton(_("Forgotten programs…"))
+        self.btn_bin = QPushButton(_("Forgotten programs"))
         self.btn_bin.setToolTip(_("Bring back a program you forgot, with its volume and "
                                   "“Hear it myself”"))
         icons.set_icon(self.btn_bin, "trash")

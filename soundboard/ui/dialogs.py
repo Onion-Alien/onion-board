@@ -541,7 +541,7 @@ class EditDialog(QDialog):
 
     def _set_hk(self, combo):
         self.hotkey = combo
-        self.hk_btn.setText(pretty_key(combo) or _("Click to set…"))
+        self.hk_btn.setText(pretty_key(combo) or _("Click to set"))
 
     def _capture(self):
         d = HotkeyDialog(self.hotkeys, self)
