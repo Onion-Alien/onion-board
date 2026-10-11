@@ -140,13 +140,14 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         _assert_keylines(output, setup=False)
         window.rail.set_open(False)
         assert window.pill.isHidden() and not window.rail.toggle.property("dot")
-        assert not output.dot.isVisible()
+        assert output.dot.isVisible() and output.dot.ok   # green: working
         window.engine.main_stream = None
         window._update_flow()
         qapp.processEvents()
         # shut: the dot is on the On Air icon (the arrow has none), and the icon is
         # the way to Setup
-        assert output.dot.isVisible() and not window.rail.toggle.property("dot")
+        assert output.dot.isVisible() and not output.dot.ok
+        assert not window.rail.toggle.property("dot")
         mark = output.mark.geometry()
         assert output.dot.geometry().intersects(mark.adjusted(-4, -4, 4, 4))
         window.tabs.setCurrentWidget(window.sounds_page)
