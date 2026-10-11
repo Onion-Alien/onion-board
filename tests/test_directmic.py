@@ -2098,8 +2098,8 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
     assert w.cfg.route == "mic" and w._main_name() == (cables[0] if cables else None)
     assert not [t for t in toast.shown(w) if t.kind == "error"]
-    assert "You clicked <b>No</b>" in w.step_lbl.text()
-    assert "cable" not in w.step_lbl.text().lower()   # the mic is the way
+    assert "You clicked <b>No</b>" in w.mic_reason.text()
+    assert "cable" not in w.mic_reason.text().lower()   # the mic is the way
     assert w.btn_install.text() == "Put my sounds straight into my mic"
     assert "mic" in w.pill.accessibleName().lower()
 
@@ -2307,29 +2307,19 @@ def _flow_settled(w):
     w._update_flow()
 
 
-def _menu(w) -> dict:
-    """The mic card's ⋯ menu: {words: enabled}."""
-    w._mic_menu()
-    menu = w._mic_menu_open
-    items = {a.text(): a.isEnabled() for a in menu.actions() if a.text()}
-    menu.close()
-    return items
-
-
 def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa: F811
     """Straight into the mic works: the cable is only the fallback, so its removal is
-    offered in the card's ⋯ menu (and no "also on the virtual cable" on the mic's line,
-    no button or note on the card itself)."""
+    offered beside the card's other ways (and no "also on the virtual cable" on the
+    mic's status)."""
     w = window
     _working_on_the_mic(w, monkeypatch)
     _flow_settled(w)
     assert "virtual cable" not in w.mic_line.text()
-    assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
-    assert _menu(w).get("Remove the virtual cable") is True
+    assert not w.btn_rmcable.isHidden() and w.btn_rmcable.toolTip()
     for cables, vbcable in (((), True), ((CABLE_IN,), False)):   # none, or not VB-Cable's
         _working_on_the_mic(w, monkeypatch, cables, vbcable)
         _flow_settled(w)
-        assert "Remove the virtual cable" not in _menu(w)
+        assert w.btn_rmcable.isHidden()
 
 
 def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeypatch):  # noqa: F811
@@ -2349,11 +2339,10 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     for _ in range(5):
         w._update_flow()
     assert time.monotonic() - t0 < 0.5
-    assert "Remove the virtual cable" not in _menu(w)   # not known yet: not offered
+    assert w.btn_rmcable.isHidden()          # not known yet: not offered
     gate.set()
     app = QApplication.instance()
-    assert process_events(app, lambda: not w._vb_setup_asking, 3)
-    assert "Remove the virtual cable" in _menu(w)        # offered once it's known
+    assert process_events(app, lambda: not w.btn_rmcable.isHidden(), 3)   # shown when known
     for _ in range(5):
         w._update_flow()
     assert len(asked) == 1                   # asked once, not on every redraw
@@ -2398,7 +2387,7 @@ def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(cableremove, "remove", lambda: None)
     w.remove_cable()
     w._update_flow()
-    assert _menu(w)["Use the virtual cable instead"] is False
+    assert w.btn_usecable.isHidden()
     w.use_cable_instead()   # (still there for a moment, or clicked by keyboard)
     assert w.cfg.route == "mic" and "Restart" in said[-1][0] and said[-1][1] == "warn"
 
@@ -2685,7 +2674,9 @@ def test_windows_taking_it_off_is_fixed_by_itself(window, monkeypatch):  # noqa:
     assert threads.setups() == [("My mic", False, True)]   # auto
     assert said[-1][0].startswith("Fixing your mic")
     assert "Fixing your mic" in w.mic_line.text()
-    assert w.btn_install.isHidden() and w.step_lbl.isHidden() and not w.setup_show.on
+    assert w.btn_install.isHidden() and not w.setup_show.on
+    assert "going back on" in w.mic_reason.text() and "Yes" not in w.mic_reason.text()
+    assert w.mic_pill.text() == "Fixing…"
     w._update_flow()
     _qt_run()
     assert len(threads.setups()) == 1   # redraws while it runs: still the one fix
@@ -2729,7 +2720,7 @@ def test_without_the_helper_the_card_asks_for_the_click(window, monkeypatch, rea
         assert w.btn_install.isHidden()
         return
     assert "Windows took Onion Board off your mic" in w.mic_line.text()
-    assert "<b>Yes</b> when Windows asks" in w.step_lbl.text()
+    assert "<b>Yes</b> when Windows asks" in w.mic_reason.text()
     assert w.btn_install.text() == "Repair (one click)" and not w.btn_install.isHidden()
 
 
@@ -2751,7 +2742,7 @@ def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F
     assert len(threads.setups()) == 1
     assert said[-1][1] == "warn" and "by itself" in said[-1][0]
     assert w.btn_install.text() == "Try again" and not w.btn_install.isHidden()
-    assert "code 6" in w.step_lbl.text()
+    assert "code 6" in w.mic_reason.text()
     # clicked: tried again (Windows may ask now)
     w.btn_install.click()
     assert threads.setups()[-1] == ("My mic", False, False)
@@ -2773,10 +2764,10 @@ def test_the_yes_is_only_mentioned_when_windows_will_ask(window, monkeypatch):  
     for ready in (False, True):
         _helper(monkeypatch, ready)
         w._update_flow()
-        assert ("Windows asks once" in w.step_lbl.text()) is not ready
+        assert ("Windows asks once" in w.mic_reason.text()) is not ready
         w._attaching = True
         w._update_flow()
-        assert ("Yes" in w.step_lbl.text()) is not ready
+        assert ("Yes" in w.mic_reason.text()) is not ready
         w._attaching = False
     _routes(w, monkeypatch, "outdated")
     monkeypatch.setattr(w.engine, "main_stream", object())
@@ -2804,17 +2795,39 @@ def test_bun_builds_only_the_first_set_up(window, monkeypatch):  # noqa: F811
 
 
 def test_the_working_card_is_one_line(window, monkeypatch):  # noqa: F811
-    """Working: the status line (and the mic's name), nothing else; the cable and the
-    guide are in the ⋯ menu, the same menu every time."""
+    """Working: the status box (the mic's name and its live level), the pill, and the
+    other ways as plain buttons; no step and no main button."""
     w = window
     _working_on_the_mic(w, monkeypatch, cables=())
     monkeypatch.setattr(w.engine, "mic_stream", object())
     w.cfg.mic_device = "My mic"
-    w._update_flow(talking=True)
-    assert "Your sounds go into your mic" in w.mic_line.text()
-    assert "My mic" in w.mic_line.text() and "hearing you" in w.mic_line.text()
-    for b in (w.btn_install, w.btn_usecable, w.btn_guide, w.btn_rmcable, w.step_lbl,
-              w.mic_flow, w.mic_update_note):
+    w._update_flow()
+    assert w.mic_line.text() == "Your sounds go into your mic"
+    assert w.mic_sub.text() == "My mic" and not w.card_meter.isHidden()
+    assert w.mic_pill.text() == "Connected" and w.mic_pill.property("tone") == "ok"
+    for b in (w.btn_install, w.step_lbl, w.mic_flow, w.mic_update_note):
         assert b.isHidden()
-    assert list(_menu(w)) == ["Use the virtual cable instead", "Step-by-step guide"]
-    assert w.btn_micmore.toolTip() and w.btn_micmore.accessibleName()
+    assert not w.btn_usecable.isHidden() and w.btn_usecable.property("quiet")
+    assert w.btn_guide.isHidden() and not w.helpcard.isHidden()   # (it has the guide)
+
+
+def test_every_time_windows_takes_it_off_it_is_fixed_again(window, monkeypatch):  # noqa: F811
+    """Fixed, worked for a while, then another Windows update took it off: fixed by
+    itself again (only a fix that doesn't hold stops it)."""
+    w = window
+    _routes(w, monkeypatch, "wiped")
+    w.cfg.mic_device = "My mic"
+    _helper(monkeypatch, True)
+    threads = _no_threads(monkeypatch)
+    w._update_flow()
+    _qt_run()
+    _routes(w, monkeypatch, "ready")
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    w._mic_attached("My mic", "")
+    w._settle_until = 0.0
+    w._update_flow()   # works
+    _routes(w, monkeypatch, "wiped")
+    w._update_flow()
+    _qt_run()
+    assert len(threads.setups()) == 2 and "Fixing your mic" in w.mic_line.text()

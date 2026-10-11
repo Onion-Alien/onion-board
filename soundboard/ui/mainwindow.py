@@ -55,7 +55,7 @@ from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, re
                            sourcedialog, splash, taboff, themecover)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar, capped,
-                                 card, hint_label, icon_button, icon_label, info_button,
+                                 card, hint_label, icon_label, info_button,
                                  steady_number, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
@@ -1988,25 +1988,25 @@ class MainWindow(QMainWindow):
         self.btn_mictips = info_button(_("Sounds chopped up?"))
         self.btn_mictips.clicked.connect(self._show_mic_tips)
         self.btn_mictips.hide()
-        howcard, cv = card(_("Your virtual mic"), roomy=True, beside=self.btn_mictips)
-        item = cv.itemAt(0)
-        head = item.layout() if item else None   # card() puts its title row first
-        first = head.itemAt(0) if head else None
-        how_title = first.widget() if first else None
-        assert isinstance(how_title, QLabel)
-        self.how_title = how_title   # renamed when not using the cable
-        # the rare ways (the cable instead, the guide, removing a spare cable) behind a ⋯
-        # at the end of the heading (DESIGN section 4), not as buttons everyone reads past
-        self.btn_micmore = icon_button("more", _("More options"), size=16)
-        self.btn_micmore.setFixedSize(24, 24)
-        self.btn_micmore.clicked.connect(self._mic_menu)
-        pin = head.itemAt(1).layout() if head and head.count() > 1 else None
-        top = pin.contentsMargins().top() if pin else 0
-        more_pin = QVBoxLayout()
-        more_pin.setContentsMargins(0, top, 0, 0)
-        more_pin.addWidget(self.btn_micmore)
-        more_pin.addStretch(1)
-        head.addLayout(more_pin)
+        # the heading on one centre line: a mic, the title, its ⓘ, then the status pill
+        # at the end (DESIGN section 5)
+        howcard, cv = card(roomy=True)
+        head = QHBoxLayout()
+        head.setContentsMargins(0, 8, 0, 0)   # (card() leaves room for a title's padding)
+        head.setSpacing(8)
+        center = Qt.AlignmentFlag.AlignVCenter
+        head.addWidget(icon_label("mic", color="text"), 0, center)
+        self.how_title = QLabel(_("Your virtual mic"))   # renamed for the other routes
+        self.how_title.setObjectName("section")
+        self.how_title.setProperty("head", True)   # (no padding above: centred with the rest)
+        head.addWidget(self.how_title, 0, center)
+        head.addWidget(self.btn_mictips, 0, center)
+        head.addStretch(1)
+        self.mic_pill = QLabel()
+        self.mic_pill.setObjectName("pill")
+        self.mic_pill.hide()
+        head.addWidget(self.mic_pill, 0, center)
+        cv.addLayout(head)
         flow = self.mic_flow = QFrame()
         flow.setObjectName("micflow")
         fv = QVBoxLayout(flow)
@@ -2038,14 +2038,50 @@ class MainWindow(QMainWindow):
             else:
                 fv.addLayout(row)
         cv.addWidget(flow)
-        # straight into the mic: one quiet line instead of the picture above (it works
-        # by itself, the helper repairs it); the step below only when it needs a click
+        # straight into the mic: one status box instead of the picture above (it works
+        # by itself, and the mic helper puts it back when Windows takes it off): a big
+        # icon, what's happening, the mic's name and its live level. The step below
+        # only when it needs a click.
+        box = self.mic_status = QFrame()
+        box.setObjectName("micstatus")
+        bh = QHBoxLayout(box)
+        bh.setContentsMargins(12, 10, 12, 10)
+        bh.setSpacing(10)
+        self.mic_state_icon = QLabel()
+        self.mic_state_icon.setFixedSize(20, 20)
+        bh.addWidget(self.mic_state_icon, 0, Qt.AlignmentFlag.AlignTop)
+        lines = QVBoxLayout()
+        lines.setSpacing(8)
+        bh.addLayout(lines, 1)
+        # line 1: what's happening, the mic, its live level
+        top = QHBoxLayout()
+        top.setSpacing(10)
         self.mic_line = QLabel()
         self.mic_line.setObjectName("micline")
-        self.mic_line.setTextFormat(Qt.TextFormat.RichText)
-        self.mic_line.setWordWrap(True)
-        self.mic_line.hide()
-        cv.addWidget(self.mic_line)
+        top.addWidget(self.mic_line, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.mic_sub = ElidedLabel()
+        self.mic_sub.setObjectName("hint")
+        self.mic_sub.setMinimumWidth(40)
+        top.addWidget(self.mic_sub, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.card_meter = Meter()
+        self.card_meter.setFixedWidth(90)
+        self.card_meter.setToolTip(_("Your mic"))
+        top.addWidget(self.card_meter, 0, Qt.AlignmentFlag.AlignVCenter)   # by its name
+        top.addStretch(1)
+        lines.addLayout(top)
+        # line 2, when there's something to say or do: why, then the buttons
+        self.mic_reason = QLabel()
+        self.mic_reason.setWordWrap(True)
+        self.mic_reason.setTextFormat(Qt.TextFormat.RichText)
+        self.mic_reason.hide()
+        lines.addWidget(self.mic_reason)
+        self.mic_ways = Flow(gap=8)
+        lines.addLayout(self.mic_ways)
+        box.hide()
+        self._mic_icon = None
+        self._ways_in = None   # which row the set-up buttons are in (_place_ways)
+        cv.addWidget(box)
+        cv.addWidget(box)
         self.helper_checked.connect(self._helper_known)
         self.step_lbl = QLabel()
         self.step_lbl.setWordWrap(True)
@@ -2103,12 +2139,16 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.btn_install, "cable", "on_accent")
         ways.addWidget(self.btn_install)
         ways.addWidget(self.btn_usecable)   # (after the mic's own button: the second way)
+        for b in (self.btn_usecable,):
+            b.setProperty("quiet", True)   # the rarer ways: plain words, no fill
         # Connect your chat is hidden until there's a chat to connect: its guide is here
         # meanwhile (that card held nothing else, while nothing was set up or on Nobody)
         self.btn_guide = self._guide_button()
         self.btn_guide.hide()
+        self.btn_guide.setProperty("quiet", True)
         ways.addWidget(self.btn_guide)
         cv.addLayout(ways)
+        self._ways = ways
         # straight into the mic works: the cable is only a fallback, so offer to remove it
         self.btn_rmcable = QPushButton(_("Remove the virtual cable"))
         self.btn_rmcable.setToolTip(_("Uninstalls VB-Cable. Your sounds go straight into your "
@@ -2130,7 +2170,8 @@ class MainWindow(QMainWindow):
         self.rmcable_note.setTextFormat(Qt.TextFormat.RichText)
         self.rmcable_note.hide()
         cv.addWidget(self.rmcable_note)
-        cv.addWidget(self.btn_rmcable, 0, Qt.AlignmentFlag.AlignLeft)
+        self.btn_rmcable.setProperty("quiet", True)
+        ways.addWidget(self.btn_rmcable)   # beside the other ways, when there's one
         self.btn_rescan = QPushButton(_("I've installed it: check again"))
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
@@ -3246,11 +3287,15 @@ class MainWindow(QMainWindow):
         self.flow_out.setText(marks(out))
         mic_route = route == "mic"
         button = None   # straight into the mic: the one button, when it needs a click
+        self._place_ways(mic_route)
         if mic_route:
-            line, step, button = self._mic_view(direct, state, settling, talking, step)
-            self.mic_line.setText(marks(line))
+            reason, button = self._show_mic_status(direct, state, settling, step)
+            self.mic_reason.setText(reason)
+            self.mic_reason.setVisible(bool(reason))
+            step = ""   # (said in the box)
         self.mic_flow.setVisible(not mic_route)
-        self.mic_line.setVisible(mic_route)
+        self.mic_status.setVisible(mic_route)
+        self.mic_pill.setVisible(mic_route)
         self.step_lbl.setText(step)
         self.btn_mictips.setVisible(route == "mic")
         update = route == "mic" and state == "ok" and direct == "outdated"
@@ -3306,13 +3351,12 @@ class MainWindow(QMainWindow):
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
-        # the cable instead and removing a spare one are in the ⋯ menu (_mic_menu);
-        # whether VB-Cable's setup is there to remove it with is looked up on a thread now
-        if route == "mic" and state == "ok":
-            self._spare_cable()
-        self.btn_usecable.hide()
-        self.btn_rmcable.hide()
-        self.rmcable_note.hide()
+        # the other ways sit beside the main button as plain words, every time
+        self.btn_usecable.setVisible(route == "mic" and not mic_busy   # also when it works
+                                     and not self._cable_gone)   # (back after a restart)
+        spare = route == "mic" and state == "ok" and self._spare_cable()
+        self.btn_rmcable.setVisible(spare)
+        self.rmcable_note.hide()   # (its tooltip says it)
         if route == "mic":
             self._direct_shown = self._direct_health()
         self._cable_follow_switch()
@@ -3329,7 +3373,7 @@ class MainWindow(QMainWindow):
         # one rule: Connect your chat shows when there's a chat to connect; until then
         # its one button (the guide) sits in the mic card
         self.helpcard.setVisible(mic_side)
-        self.btn_guide.hide()   # in the ⋯ menu (and in Connect your chat)
+        self.btn_guide.setVisible(not mic_side)   # (Connect your chat has it then)
         self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
@@ -3374,6 +3418,7 @@ class MainWindow(QMainWindow):
             pills.append(pill)
         pill_short, pill = pills
         self.setup_connection.setText(pill)
+        self.setup_connection.setVisible(route != "mic")   # (the mic card's pill says it)
         self.setup_connection.setProperty("tone", "ok" if state in ("ok", "off") else "warn")
         self.setup_connection.style().unpolish(self.setup_connection)
         self.setup_connection.style().polish(self.setup_connection)
@@ -3405,82 +3450,107 @@ class MainWindow(QMainWindow):
             self.pill.style().polish(self.pill)
             self.set_sending(self.btn_air.isChecked())   # its tooltip carries the pill's text
 
-    def _mic_view(self, direct: str, state: str, settling: bool, talking: bool,
-                  step: str) -> tuple[str, str, str | None]:
-        """Straight into the mic, on the Setup tab: (the one status line, the reason the
-        user is needed or "", the one button's words or None). One rule: the card
-        asks for a click only when the app can't go on without one (the first set-up,
-        a No, no usable mic helper, a repair that failed); otherwise it's one line,
-        and Windows taking it off the mic is fixed by itself. `step`: what the old card
-        said for this state (setting up, starting, not running)."""
-        ok, bad, warn = theme.status("ok"), theme.status("error"), theme.status("warn")
-        muted = theme.T["muted"]
+    def _place_ways(self, mic: bool):
+        """The set-up buttons sit in the status box on the mic route (one place for
+        the state and what to do about it), in their row under the picture otherwise."""
+        if self._ways_in == mic:
+            return
+        self._ways_in = mic
+        src, dst = (self._ways, self.mic_ways) if mic else (self.mic_ways, self._ways)
+        for b in (self.btn_install, self.btn_usecable, self.btn_guide, self.btn_rmcable):
+            src.removeWidget(b)
+            dst.addWidget(b)
+        self.mic_ways.invalidate()
+        self._ways.invalidate()
+
+    def _show_mic_status(self, direct: str, state: str, settling: bool,
+                         step: str) -> tuple[str, str | None]:
+        """Straight into the mic, on the Setup tab: fills the status box and the pill,
+        and gives (the reason the user is needed or "", the one button's words or
+        None). One rule: the card asks for a click only when the app can't go on
+        without one (the first set-up, a No, no usable mic helper, a repair that
+        failed); otherwise it's the status box, and Windows taking it off the mic is
+        fixed by itself. `step`: what the old card said for this state."""
         e = self.engine
         ask = michelper.will_ask()
         if michelper.known() is None:
             self._check_helper()   # once, at start: the texts follow its answer
-
-        def status(text, colour, mark=""):
-            return f"<b style='color:{colour}'>{mark}{html.escape(text)}</b>"
+        name = self.cfg.mic_device or _("your mic")
+        needed_no = _("You clicked <b>No</b>, so nothing changed. Try again and click "
+                      "<b>Yes</b> when Windows asks.")
 
         def needed(reason):   # a No beats every other reason: it's what just happened
-            return (_("You clicked <b>No</b>, so nothing changed. Try again and click "
-                      "<b>Yes</b> when Windows asks.") if self._declined else reason)
+            return needed_no if self._declined else reason
 
-        if self._attaching and self._autofixing:
-            return status(_("Fixing your mic…"), warn), "", None
-        if self._attaching:
-            return status(_("Setting up…"), warn), step, None
-        if state == "missing" and settling:
-            return status(_("Starting…"), warn), step, None
         if directmic.works(direct):
             self._autofix_tried = False   # working: the next time it's off is fixed again
-        if directmic.needs_repair(direct):
+        # (tone, icon, headline, pill, reason, button)
+        if self._attaching and self._autofixing:
+            look = ("warn", "reload", _("Fixing your mic…"), _("Fixing…"),
+                    _("Windows took Onion Board off your mic. It's going back on: your "
+                      "sound drops out for a second."), None)
+        elif self._attaching:
+            look = ("warn", "reload", _("Setting up…"), _("Setting up…"), step, None)
+        elif state == "missing" and settling:
+            look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
+        elif directmic.needs_repair(direct):
             known = michelper.known()
             if known and self._autofix_tried and not self._autofix_err:
                 # fixed, and Windows took it off again: no loop of audio restarts
                 self._autofix_err = _("Windows took it off again")
             if known and not self._autofix_err:
                 QTimer.singleShot(0, self, lambda: self._auto_fix(direct))
-                return status(_("Fixing your mic…"), warn), "", None
-            if known is None:
-                return status(_("Checking your mic…"), muted), "", None
-            line = status(_("Windows took Onion Board off your mic"), bad, "✗ ")
-            if self._autofix_err:
-                return line, needed(_(
-                    "Onion Board couldn't fix it by itself ({error}). Click <b>Try "
-                    "again</b>: if Windows asks for permission, click <b>Yes</b>.",
-                    error=html.escape(self._autofix_err.rstrip(".")))), _("Try again")
-            return line, needed(_(
-                "A driver or Windows update does that. Click <b>Repair</b>, then <b>Yes</b> "
-                "when Windows asks.")), _("Repair (one click)")
-        if not directmic.works(direct):
-            line = (status(_("Not in your mic yet"), warn) if direct == "missing" else
-                    status(_("On another mic"), warn))
-            return line, needed(
-                _("One click puts your sounds straight into your mic, so Discord and games "
-                  "hear them. Windows asks once: click <b>Yes</b>.") if ask else
-                _("One click puts your sounds straight into your mic, so Discord and games "
-                  "hear them.")), _("Put my sounds straight into my mic")
-        if state == "ok":
-            name = html.escape(self.cfg.mic_device or _("your mic"))
-            if not self.cfg.mic_enabled:
-                about = _("mic not sent, sounds only")
-            elif e.mic_stream is None:
-                about = _("mic off")
-            elif talking:
-                about = _("hearing you")
+                look = ("warn", "reload", _("Fixing your mic…"), _("Fixing…"),
+                        _("Windows took Onion Board off your mic. It's going back on: "
+                          "your sound drops out for a second."), None)
+            elif known is None:
+                look = ("", "reload", _("Checking your mic…"), _("Setting up…"), "", None)
+            elif self._autofix_err:
+                look = ("error", "warn", _("Windows took Onion Board off your mic"),
+                        _("Repair needed"), needed(_(
+                            "Onion Board couldn't fix it by itself: {error}. Click <b>Try "
+                            "again</b>, and if Windows asks for permission, click <b>Yes</b>.",
+                            error=html.escape(self._autofix_err.rstrip(".")))),
+                        _("Try again"))
             else:
-                about = ""
-            extra = name + (" · " + html.escape(about) if about else "")
-            live = ("  " + _("<b style='color:{colour}'>(live)</b>", colour=ok)
-                    if e.direct_apps() else "")
-            return (status(_("Your sounds go into your mic"), ok, "✓ ") + live
-                    + f"<br><span style='color:{muted}'>{extra}</span>"), "", None
-        # set up, but Windows isn't running it or it won't open: the step says why
-        line = (status(_("Not running"), bad, "✗ ") if state == "unrouted"
-                and e.main_stream is not None else status(_("Can't reach it"), bad, "✗ "))
-        return line, needed(step), _("Repair (one click)")
+                look = ("error", "warn", _("Windows took Onion Board off your mic"),
+                        _("Repair needed"), needed(_(
+                            "A driver or Windows update does that. Click <b>Repair</b>, then "
+                            "<b>Yes</b> when Windows asks.")), _("Repair (one click)"))
+        elif not directmic.works(direct):
+            look = ("warn", "mic",
+                    _("Not in your mic yet") if direct == "missing" else _("On another mic"),
+                    _("Not set up"), needed(
+                        _("One click puts your sounds straight into your mic, so Discord and "
+                          "games hear them. Windows asks once: click <b>Yes</b>.") if ask else
+                        _("One click puts your sounds straight into your mic, so Discord and "
+                          "games hear them.")), _("Put my sounds straight into my mic"))
+        elif state == "ok":
+            look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)
+        else:   # set up, but Windows isn't running it or it won't open: the step says why
+            look = ("error", "warn",
+                    _("Not running") if state == "unrouted" and e.main_stream is not None
+                    else _("Can't reach it"), _("Not working"), needed(step),
+                    _("Repair (one click)"))
+        tone, icon, headline, pill, reason, button = look
+        if state == "ok" and not self.cfg.mic_enabled:
+            sub = _("{mic} · not sent, sounds only", mic=name)
+        elif state == "ok" and e.mic_stream is None:
+            sub = _("{mic} · off", mic=name)
+        else:
+            sub = name
+        self.mic_sub.setToolTip(sub)
+        self.mic_line.setText(headline)
+        theme.set_tone(self.mic_line, tone)
+        self.mic_sub.setText(sub)
+        self.card_meter.setVisible(state == "ok" and e.mic_stream is not None)
+        colour = {"ok": "ok_text", "warn": "warn_text", "error": "error_text"}.get(tone, "muted")
+        if (icon, colour) != self._mic_icon:
+            self._mic_icon = (icon, colour)
+            icons.set_label_icon(self.mic_state_icon, icon, colour, size=20)
+        self.mic_pill.setText(pill)
+        theme.set_tone(self.mic_pill, tone)
+        return reason or "", button
 
     def _auto_fix(self, direct: str):
         """Windows took the effect off the mic (a driver or Windows update): put it back
@@ -3514,28 +3584,6 @@ class MainWindow(QMainWindow):
     def _helper_known(self):
         self._helper_checking = False
         self._update_flow()
-
-    def _mic_menu(self):
-        """The mic card's ⋯: the rarer ways, the same menu every time (only what can't
-        be done right now is greyed)."""
-        menu = QMenu(self)
-        mic = self.cfg.route == "mic"
-        if mic:
-            act = menu.addAction(_("Use the virtual cable instead"), self.use_cable_instead)
-            icons.set_icon(act, "cable")
-            act.setEnabled(not self._attaching and not self._cable_gone)
-            if self._spare_cable():
-                act = menu.addAction(_("Remove the virtual cable"), self.remove_cable)
-                act.setToolTip(_("Uninstalls VB-Cable. Your sounds go straight into your "
-                                 "mic, so Onion Board doesn't need it"))
-                act.setEnabled(not busy.is_busy(self.btn_rmcable))
-        act = menu.addAction(_("Step-by-step guide"),
-                             lambda: (usage.used("setup-guide-opened"), self.run_setup()))
-        icons.set_icon(act, "check")
-        menu.setToolTipsVisible(True)
-        b = self.btn_micmore
-        menu.popup(b.mapToGlobal(QPoint(0, b.height())))
-        self._mic_menu_open = menu   # (tests look at it)
 
     def attach_mic(self, clean: bool = False, auto: bool = False):
         """Put the mic effect on the mic in use (Windows asks for admin once; with the
@@ -9056,6 +9104,8 @@ class MainWindow(QMainWindow):
         self.out_meter.set_level(e.level_main)
         self.logo.set_level(e.level_play)   # anything playing, not your voice
         self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
+        if self.card_meter.isVisible():
+            self.card_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         talking = e.mic_stream is not None and e.level_mic > 0.05
         if talking:
             self._talk_until = now + 0.8
