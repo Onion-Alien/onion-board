@@ -787,8 +787,21 @@ class MainWindow(QMainWindow):
         self.gear.setProperty("quiet", True)
         self.gear.setToolTip(_("Themes, hotkeys and more"))
         self.gear.clicked.connect(lambda: self.open_settings())
-        icons.set_icon(self.gear, "settings", size=sidebar.ICON)
+        # (showing its page: the accent, as a selected tab's icon; on_accent was white
+        # on the soft fill, all but gone in Light)
+        icons.set_icon(self.gear, "settings", checked_color="accent", size=sidebar.ICON)
         self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
+        # the onion beside it: the Discord, feedback, a bug report, the code (each only
+        # opens a page in the browser, feedback.py)
+        self.btn_about = QPushButton(_("Help and community"))
+        self.btn_about.setObjectName("settings")   # Settings' look: a quiet square
+        self.btn_about.setProperty("quiet", True)
+        self.btn_about.setToolTip(_("Help and community"))
+        self.btn_about.setProperty("railtext", _("Help and community"))
+        icons.set_icon(self.btn_about, "onion", size=sidebar.ICON)
+        self.about_menu = DropdownMenu(self.btn_about)
+        self.about_menu.aboutToShow.connect(self._fill_about_menu)
+        self.btn_about.clicked.connect(self._show_about_menu)
         self._paint_logo()
 
         # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
@@ -984,7 +997,7 @@ class MainWindow(QMainWindow):
         self._update_more_tabs()
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
-            [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear],
+            [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear, self.btn_about],
             self._rail_opened,
             # Live and Stop all never move; the pills (what needs attention) sit above
             # them and only show when needed (at the rail's foot, as icons)
@@ -1013,7 +1026,7 @@ class MainWindow(QMainWindow):
                 status_focus.extend((self.rail.output.switch, self.rail.output.setup))
             status_focus.append(button)
         for w in (*self.rail.buttons, self.btn_more_tabs, *status_focus,
-                  self.gear,
+                  self.gear, self.btn_about,
                   self.rail.toggle, self._tabs_box):
             QWidget.setTabOrder(prev, w)
             prev = w
@@ -4437,6 +4450,27 @@ class MainWindow(QMainWindow):
         self._update_status()   # the hints and flow, in this theme's status colours
         self._paint_logo()
         self._save_later()
+
+    def _show_about_menu(self):
+        # (a foot button is checkable for Settings' "showing" fill: this one never is)
+        self.btn_about.setChecked(False)
+        self.about_menu.popup(self.btn_about.mapToGlobal(self.btn_about.rect().topRight()))
+
+    def _fill_about_menu(self):
+        """The onion at the rail's foot: where to talk to us, and where the app lives."""
+        from soundboard import __version__, feedback
+        m = self.about_menu
+        m.clear()
+        icons.set_icon(m.addAction(_("Join the Discord"), lambda: self._open_page(
+            feedback.DISCORD_URL)), "speech")
+        icons.set_icon(m.addAction(_("Send feedback"), self.ask_feedback), "edit")
+        icons.set_icon(m.addAction(_("Report a problem"), lambda: self._open_page(
+            feedback.problem_url(__version__))), "warn")
+        m.addSeparator()
+        icons.set_icon(m.addAction(_("Onion Board on GitHub"), lambda: self._open_page(
+            f"https://github.com/{updates.REPO}")), "folder")
+        news = _("What's new")
+        icons.set_icon(m.addAction(f"{news} (v{__version__})", self.show_whats_new), "info")
 
     def _paint_logo(self):
         self.logo.update()   # it reads the theme colours itself

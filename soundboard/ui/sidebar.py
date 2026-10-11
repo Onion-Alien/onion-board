@@ -611,12 +611,14 @@ class SideRail(QFrame):
         self._foot_pads = [QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
                            for _ in range(2)]
         self._foot_box.addSpacerItem(self._foot_pads[0])
+        # Settings is its icon only (selected: the current tab's fill round it); open,
+        # the arrow stays at the far side and a button between them sits in the middle
+        self._foot_gaps = []
         for w in foot:
             self._foot_box.addWidget(w, 0)
-        # Settings is its icon only (selected: the current tab's fill round it); open,
-        # the arrow stays at the far side
-        self._foot_gap = QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self._foot_box.addSpacerItem(self._foot_gap)
+            gap = QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
+            self._foot_box.addSpacerItem(gap)
+            self._foot_gaps.append(gap)
         self._foot_box.addWidget(self.toggle, 0)   # (mirrored: the right)
         self._foot_box.addSpacerItem(self._foot_pads[1])
         lay.addLayout(self._foot_box)
@@ -908,14 +910,38 @@ class SideRail(QFrame):
             self._status_box.setAlignment(self.output, middle)
         # (split by hand, rounded as the centred toggle above: Qt's stretch gave the
         # odd pixel to the other side, so the pair wobbled 1 px against it while dragged)
-        spare = max(0, width - 2 * BUTTON_W - self._foot_box.spacing()) if mid else 0
-        for pad, room in zip(self._foot_pads, (spare // 2, spare - spare // 2)):
+        row = len(self.foot) + 1   # the foot buttons and the arrow
+        # open, they're one row; dragged too narrow for that row, a column as when shut
+        # (side by side, they ran into each other)
+        side = self.is_open() and width >= row * BUTTON_W + (row - 1) * 4
+        self._foot_box.setDirection(QBoxLayout.LeftToRight if side else QBoxLayout.TopToBottom)
+        wide = side and not mid
+        self._foot_box.setSpacing(0 if wide else 4)   # (wide: the gaps are the spacing)
+        spare = max(0, width - row * BUTTON_W - (row - 1) * 4) if mid and side else 0
+        pads = (spare // 2, spare - spare // 2)
+        # open: Settings at the near side, the arrow at the far one and what's between
+        # them exactly in the middle, so the gaps are split by hand too (Qt's stretch
+        # gave the odd pixel to one gap); the odd pixel goes past the arrow instead,
+        # so the middle one is on the cards' centre line
+        gap_w = 0
+        if wide:
+            free = max(0, width - row * BUTTON_W)
+            gap_w = free // max(1, len(self._foot_gaps))
+            pads = (0, free - gap_w * len(self._foot_gaps))
+        for pad, room in zip(self._foot_pads, pads):
             pad.changeSize(room, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
-        self._foot_box.invalidate()
+        if wide:   # (and any pixel the layout has over the cards' width)
+            self._foot_pads[1].changeSize(pads[1], 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
         for widget in self.foot:
             widget.setFixedWidth(BUTTON_W)   # (its fill, hover and ring: a square, painted)
-        self._foot_gap.changeSize(0, 0, QSizePolicy.Fixed if mid else QSizePolicy.Expanding,
-                                  QSizePolicy.Fixed)
+        # stacked on the open rail: centred, as everything else is there (shut, the
+        # column's margins centre it)
+        across = Qt.AlignHCenter if self.is_open() and not side else Qt.AlignmentFlag(0)
+        for widget in (*self.foot, self.toggle):
+            self._foot_box.setAlignment(widget, across)
+        for gap in self._foot_gaps:
+            gap.changeSize(gap_w, 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self._foot_box.invalidate()
         self.toggle.setFixedWidth(BUTTON_W)
         self._place_column()
 
