@@ -135,3 +135,109 @@ def test_thumbnail_failure_does_not_fail_successful_import(qapp, monkeypatch, tm
     bar._work("add", URL, (URL, tmp_path / "clip.wav", data, 1.0), "#fff", {}, False)
     assert len(added) == 1
     assert done == [(URL, "add", True)]
+
+
+OTHER = "https://www.youtube.com/watch?v=other"
+
+
+def _fake_start(bar, monkeypatch):
+    """_start without a worker thread: the test sends the worker's messages itself."""
+    from soundboard.ui import linkbar
+
+    class Worker:
+        def __init__(self, *a, **kw):
+            pass
+
+        def start(self):
+            pass
+
+    monkeypatch.setattr(linkbar.threading, "Thread", Worker)
+
+
+def test_a_cancelled_play_never_plays_when_its_download_lands(qapp, monkeypatch, tmp_path):
+    bar, eng = _bar()
+    _fake_start(bar, monkeypatch)
+    done = []
+    bar.done.connect(lambda *args: done.append(args))
+    assert bar.play_once()
+    old = bar._job
+    bar.cancel()
+    assert done == [(URL, "play", False)] and not bar._busy
+    # the worker keeps going: many progress ticks, then the audio. None of it counts.
+    data = np.zeros((480, 2), np.int16)
+    for f in (0.2, 0.6, "processing"):
+        bar._on_msg("progress", URL, f, old)
+    bar._on_msg("play", URL, (tmp_path / "a.wav", data, 1.0), old)
+    assert eng.played == [] and old not in bar._dropped
+
+
+def test_a_new_play_replaces_the_one_still_loading(qapp, monkeypatch, tmp_path):
+    bar, eng = _bar()
+    _fake_start(bar, monkeypatch)
+    done = []
+    bar.done.connect(lambda *args: done.append(args))
+    bar.play_once()
+    first = bar._job
+    bar.open(OTHER, "Other")
+    bar.play_once()
+    assert done == [(URL, "play", False)] and bar._busy_url == OTHER
+    data = np.zeros((480, 2), np.int16)
+    bar._on_msg("play", URL, (tmp_path / "a.wav", data, 1.0), first)   # late: dropped
+    assert eng.played == [] and bar._busy == "play"
+    bar._on_msg("play", OTHER, (tmp_path / "b.wav", data, 1.0), bar._job)
+    assert len(eng.played) == 1
+
+
+def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
+    from soundboard.ui import linkbar
+
+    bar, _eng = _bar()
+    _fake_start(bar, monkeypatch)
+    toasts, queued, done = [], [], []
+    monkeypatch.setattr(linkbar.busy, "toast", lambda *args, **kw: toasts.append(args))
+    bar.queued.connect(lambda *args: queued.append(args))
+    bar.done.connect(lambda *args: done.append(args))
+    bar.add()
+    for i in range(linkbar.MAX_QUEUED):
+        bar.open(f"{OTHER}{i}", f"Other {i}")
+        assert bar.add()
+    assert len(queued) == linkbar.MAX_QUEUED and queued[0] == (f"{OTHER}0", "add")
+    bar.open(OTHER, "One too many")
+    assert not bar.add() and toasts   # no crash, a message instead
+    bar.cancel(f"{OTHER}1")           # a waiting pick: its row is told it's off
+    assert done == [(f"{OTHER}1", "add", False)]
+    assert [q["url"] for q in bar._queue_list] == [f"{OTHER}0", f"{OTHER}2"]
+
+
+def test_play_now_goes_next_and_replaces_a_waiting_play(qapp, monkeypatch):
+    from soundboard.ui import linkbar
+
+    bar, _eng = _bar()
+    _fake_start(bar, monkeypatch)
+    monkeypatch.setattr(linkbar.busy, "toast", lambda *args, **kw: None)
+    done, lists = [], []
+    bar.done.connect(lambda *args: done.append(args))
+    bar.queue_updated.connect(lambda q: lists.append([(x["url"], x["kind"]) for x in q]))
+    bar.add()                                   # downloading one song...
+    for i in range(2):                          # ...two more waiting to be added
+        bar.open(f"{OTHER}a{i}", "Add")
+        bar.add()
+    bar.open(f"{OTHER}p1", "Play")
+    assert bar.play_once()
+    # Play now: next up, the running Add untouched
+    assert lists[-1] == [(f"{OTHER}p1", "play"), (f"{OTHER}a0", "add"),
+                         (f"{OTHER}a1", "add")]
+    assert bar._busy == "add" and bar._busy_url == URL
+    # a newer Play now replaces the one waiting (its card is told it's off)
+    bar.open(f"{OTHER}p2", "Play")
+    bar.play_once()
+    assert lists[-1][0] == (f"{OTHER}p2", "play") and len(lists[-1]) == 3
+    assert (f"{OTHER}p1", "play", False) in done
+    # a full queue of Adds still takes a Play
+    bar.open(f"{OTHER}a2", "Add")
+    bar.add()
+    bar.open(f"{OTHER}p3", "Play")
+    assert bar.play_once() and lists[-1][0] == (f"{OTHER}p3", "play")
+    # the Add finishes: the Play starts before the other Adds
+    bar._on_msg("error", URL, "nope", bar._job)
+    assert bar._busy == "play" and bar._busy_url == f"{OTHER}p3"

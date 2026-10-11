@@ -404,17 +404,32 @@ def test_fetch_says_why_it_couldnt(qapp, monkeypatch):
 
 
 def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch):  # noqa: F811
+    """Edit… → Picture → the link button: fetched off the UI thread, shown, and put on
+    the pad only on Save; a link with no picture says so and changes nothing."""
+    from PySide6.QtWidgets import QInputDialog
+    from soundboard.ui.dialogs import EditDialog
     img = QImage(str(make_image(tmp_path / "a.png")))
     monkeypatch.setattr(thumbs, "fetch", lambda url: img if url == "https://ex.com/a" else
                         (_ for _ in ()).throw(thumbs.LinkError("There's no picture at that link.")))
-    window.picture_from_link("s0", " https://ex.com/a ")
     m = window.meta("s0")
-    assert process_events(qapp, lambda: bool(m.image))
+    d = EditDialog(m, window.hotkeys, lambda *a: None, window)
+    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: (" https://ex.com/a ", True))
+    d.btn_pic_link.click()
+    assert process_events(qapp, lambda: d.picture is not None)
+    assert not m.image                       # not until Save
+    d.apply()
     assert thumbs.Path(m.image).parent == library.THUMBS_DIR
-    assert window._saver.flush(10) and Config.load().sounds[0].image == m.image
 
     warned = []
     monkeypatch.setattr(QMessageBox, "warning", lambda *a: warned.append(a[2]))
-    window.picture_from_link("s1", "https://ex.com/b")
+    d2 = EditDialog(window.meta("s1"), window.hotkeys, lambda *a: None, window)
+    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("https://ex.com/b", True))
+    d2.btn_pic_link.click()
     assert process_events(qapp, lambda: warned)
-    assert warned == ["There's no picture at that link."] and not window.meta("s1").image
+    assert warned == ["There's no picture at that link."] and d2.picture is None
+    d2.apply()
+    assert not window.meta("s1").image
+    d.deleteLater()
+    d2.deleteLater()
+
+

@@ -21,7 +21,7 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from soundboard import library
+from soundboard import library, sourceinfo
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
 
@@ -146,6 +146,7 @@ def put_sound(meta: SoundMeta, index: int) -> None:
         if library.owns(p) and p.exists():   # kept in the bin in its library folder
             sub = p.parent.relative_to(library.SOUNDS_DIR)   # ("YouTube/Song.flac")
             d["file"] = _move(p, folder() / sub).relative_to(folder()).as_posix()
+            sourceinfo.remove(p)   # only a copy of meta.source: written again on take()
     except OSError:
         log.warning("couldn't move %s to the bin; removing it instead", meta.file,
                     exc_info=True)
@@ -222,6 +223,7 @@ def take(item_id: str) -> Item | None:
                         return None   # back into its library folder
                     moved = _move(f, library.SOUNDS_DIR / f.parent.relative_to(folder()))
                     d["file"] = str(moved)
+                    sourceinfo.write(moved, sourceinfo.clean(d.get("source")))
                 img = _in_bin(d.get("image", ""))
                 if img is not None and img.parent == folder():
                     d["image"] = str(_move(img, library.THUMBS_DIR)) if img.exists() else ""
@@ -296,6 +298,7 @@ def meta_of(item: Item) -> SoundMeta | None:
     except TypeError:
         return None
     m.tags = library.clean_tags(m.tags)
+    m.source = sourceinfo.clean(m.source)
     extra = {k: v for k, v in item.data.items() if k not in fields_}
     if extra:
         m._raw_extra = extra

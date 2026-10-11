@@ -2166,6 +2166,13 @@ class SettingsDialog(QDialog):
         grid.setColumnStretch(2, 1)
         cv.addLayout(grid)
         self._data_video_rows = (vh, change, show, self.data_folder)
+        self._data_widgets["keep_source"] = self._option(
+            cv, _("Remember where it came from"),
+            _("Keeps each download's link, channel, upload date, length and views (from the "
+              "download itself, nothing extra is fetched), in a text file next to the sound "
+              "too. Right-click the sound to open or copy the link. Off: new downloads keep "
+              "none of it and the menu hides it; what's already saved stays."),
+            q.keep_source, lambda b: self._data_set(keep_source=b))
 
         # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
         # who skipped it had no way to add it later, so the app can get it itself now.
