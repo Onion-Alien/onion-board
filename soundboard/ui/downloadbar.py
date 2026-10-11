@@ -655,13 +655,14 @@ class DownloadBar(QFrame):
         self.setStyleSheet(
             f"QFrame#downloadbar {{ background:{card_bg}; border:1px solid {border}; "
             f"border-radius:12px; }}"
+            + self._gradient_css(row_bg) +
             f"QWidget#downloadhead, QWidget#queuepanel, QWidget#queueholder, "
             f"QScrollArea#queuescroll {{ background:transparent; border:none; }}"
             f"QWidget#queuepanel {{ border-top:1px solid {border}; }}"
             f"QLabel#kindtag {{ color:{T['live_text']}; font-size:8.5pt; font-weight:700; }}"
             f"QLabel#downloadtitle {{ color:{T['text_hi']}; }}"
             f"QLabel#downloadmeta {{ color:{T['muted']}; font-size:9pt; }}"
-            f"QLabel#downloadstatus {{ color:{T['muted']}; font-size:8.5pt; font-weight:600; }}"
+            f"QLabel#downloadstatus {{ color:{T['text']}; font-size:8.5pt; font-weight:600; }}"
             f"QLabel#summaryname {{ color:{T['text_hi']}; font-size:8.5pt; font-weight:700; }}"
             f"QLabel#summaryfailed {{ color:{theme.status('error')}; font-size:8.5pt; "
             f"font-weight:700; }}"
@@ -689,6 +690,7 @@ class DownloadBar(QFrame):
             f"QFrame#queuerow:hover {{ background:{theme.mix(row_bg, T['text'], 0.06)}; "
             f"border-color:{T['border_hi']}; }}"
             f"QLabel#queueindex {{ color:{T['muted']}; font-size:8.5pt; font-weight:700; }}"
+            + self._row_gradient_css(row_bg)
         )
         self.bar.update()
         for b, name in ((self.btn_min, "fold_up"), (self.btn_expand, "fold_open")):
@@ -702,6 +704,61 @@ class DownloadBar(QFrame):
             self.src_icon.setPixmap(self._icon(self._source[0]))
         if self.panel.isVisible():
             self._fill_rows()
+
+    def _gradient_css(self, row_bg: str) -> str:
+        """The banner as one of the theme's designed surfaces: the accent lit at the top
+        left fading into the theme's second colour, a light rim on top. How it ended
+        tints the lit corner: green when added, red when it failed (state below). The
+        outlined theme (High Contrast) stays flat."""
+        if not theme.polished():
+            return ""
+        T, mix = theme.T, theme.mix
+        base = T["card"]
+        a, a2 = T["accent"], T.get("accent2") or T["accent"]
+        ok, bad = theme.status("ok"), theme.status("error")
+        mid = mix(base, a, 0.12)
+        end = mix(base, a2, 0.14)
+        rim = mix(mix(base, a, 0.45), "#ffffff", 0.18)
+
+        def grad(top, middle, last):
+            return (f"qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {top}, "
+                    f"stop:0.45 {middle}, stop:1 {last})")
+        # failed: red the whole way across with a solid red edge, so it reads as an error
+        # even in red themes (Blood Moon), where the busy banner is red-tinted already
+        return (f"QFrame#downloadbar {{ background:{grad(mix(base, a, 0.26), mid, end)}; "
+                f"border-color:{mix(base, a, 0.38)}; border-top-color:{rim}; }}"
+                f"QFrame#downloadbar[ended=\"ok\"] {{ "
+                f"background:{grad(mix(base, ok, 0.22), mid, end)}; "
+                f"border-color:{mix(base, ok, 0.45)}; }}"
+                f"QFrame#downloadbar[ended=\"failed\"] {{ background:"
+                f"{grad(mix(base, bad, 0.26), mix(base, bad, 0.14), mix(base, bad, 0.08))}; "
+                f"border-color:{bad}; }}")
+
+    def _row_gradient_css(self, row_bg: str) -> str:
+        """Queue rows lit from the left in the accent (a failed one in red)."""
+        if not theme.polished():
+            return ""
+        T, mix = theme.T, theme.mix
+        bad = theme.status("error")
+        hover = mix(row_bg, T["text"], 0.06)
+
+        def lit(left, rest):
+            return (f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {left}, "
+                    f"stop:0.5 {rest}, stop:1 {rest})")
+        return (f"QFrame#queuerow {{ background:{lit(mix(row_bg, T['accent'], 0.16), row_bg)}; "
+                f"border-color:{mix(row_bg, T['text'], 0.07)}; }}"
+                f"QFrame#queuerow:hover {{ background:"
+                f"{lit(mix(hover, T['accent'], 0.24), hover)}; border-color:{T['border_hi']}; }}"
+                f"QFrame#queuerow[failed=\"true\"] {{ background:"
+                f"{lit(mix(row_bg, bad, 0.2), row_bg)}; border-color:{mix(row_bg, bad, 0.45)}; }}")
+
+    def _set_ended(self, how: str):
+        """"ok", "failed" or "" (running): the banner's gradient follows it."""
+        if self.property("ended") == how:
+            return
+        self.setProperty("ended", how)
+        self.style().unpolish(self)
+        self.style().polish(self)
 
     def _line_up(self):
         """Line 1 on one line: the title, the site's name and the uploader on the same
@@ -854,6 +911,7 @@ class DownloadBar(QFrame):
         self.title = pretty_title(title) or _("Sound")
         self.kind = kind
         self.stage = "parsing"
+        self._set_ended("")
         self.progress_frac = 0.0
         self._pm = thumb_pm
         self._source = source_of(url)
@@ -1089,6 +1147,7 @@ class DownloadBar(QFrame):
                 self._ended_quietly()
             return
         self.stage = "done"
+        self._set_ended("ok" if ok else "failed")
         self.scribe.finish(ok)
         self.btn_cancel.hide()
         self._corner()
@@ -1123,6 +1182,7 @@ class DownloadBar(QFrame):
 
     def _show_failed_state(self):
         self.stage = "done"
+        self._set_ended("failed")
         self.lbl_status.setText(_("Couldn't download"))
         self.bar.set_progress(0.0)
         self.btn_cancel.hide()
@@ -1179,6 +1239,7 @@ class DownloadBar(QFrame):
         self.url = ""
         self.title = ""
         self.stage = ""
+        self._set_ended("")
         self._queue = []
         self._failed = []
         self._failing = ""
