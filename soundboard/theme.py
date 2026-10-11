@@ -655,7 +655,7 @@ QFrame#vsep { background:$border; border:none; }
 QFrame#toast { background:$panel; border:1px solid $border_hi; border-radius:12px; }
 QFrame#toast QLabel { background:transparent; }
 QFrame#toast QPushButton#toastaction { background:transparent; border:none; color:$accent_hi;
-    font-weight:600; padding:4px 8px; border-radius:6px; }
+    font-weight:600; padding:2px 8px 6px; border-radius:6px; }
 QFrame#toast QPushButton#toastaction:hover { background:$btn_hover; }
 QFrame#toast QPushButton#toastclose { background:transparent; border:none; border-radius:12px;
     padding:0; }

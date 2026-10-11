@@ -1,6 +1,7 @@
 """Toasts (ui/toast.py), the import's summary and See why (ui/importreport.py), and the
 drop veil (ui/dropveil.py)."""
 import numpy as np
+import pytest
 import soundfile as sf
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QWidget
@@ -313,6 +314,43 @@ def test_a_cards_parts_line_up(qapp):
         middle = part.mapTo(c, QPoint(0, 0)).y() + part.height() / 2
         assert abs(middle - first) <= 2, part
     w.close()
+
+
+@pytest.mark.windows
+def test_see_why_text_is_level_with_the_warning_icon(qapp):
+    """Check the painted baseline with the Windows font the app ships with."""
+    import os
+    from pathlib import Path
+    from PySide6.QtGui import QColor, QFont, QFontDatabase
+    from soundboard import theme
+
+    QFontDatabase.addApplicationFont(str(Path(os.environ["WINDIR"]) / "Fonts" / "segoeui.ttf"))
+
+    def ink_middle(widget, colour):
+        image = widget.grab().toImage()
+        target = QColor(colour)
+        rows = [y for y in range(image.height()) for x in range(image.width())
+                if max(abs(image.pixelColor(x, y).red() - target.red()),
+                       abs(image.pixelColor(x, y).green() - target.green()),
+                       abs(image.pixelColor(x, y).blue() - target.blue())) < 20]
+        assert rows
+        return widget.y() + (min(rows) + max(rows)) / 2
+
+    old = theme.current_name
+    w = _host(qapp)
+    try:
+        for name in ("Dark", "Light"):
+            theme.apply(qapp, name)
+            t = busy.toast(w, "5 sounds are already in your library · 1 skipped", "warn",
+                           key="import", action=("See why", lambda: None))
+            t.card.action.setFont(QFont("Segoe UI", 10))
+            qapp.processEvents()
+            assert t.card.action.height() == toast.LINE
+            assert abs(ink_middle(t.card.action, theme.T["accent_hi"])
+                       - ink_middle(t.card.icon, theme.T["warn_text"])) <= 1
+    finally:
+        w.close()
+        theme.apply(qapp, old)
 
 
 def test_the_mini_player_shows_icons_on_top_or_none(main_window, qapp):  # noqa: F811
