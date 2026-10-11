@@ -128,9 +128,12 @@ Every task, before changing anything (details in `CLAUDE.md`):
 ## Before every commit
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1        # what you changed
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1 -All   # once before a PR
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1          # quick checks
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1 -Tests   # + the picked tests
 ```
 
-It runs ruff, the sensitive-data scan and the translation check, then pytest on just
-the test files your committed and uncommitted changes need.
+It runs ruff, the sensitive-data scan, the translation check and CODE.md's module list
+(about 15 s). The tests are left to CI: push, open the PR and keep working while it runs
+the test files your changes need, on 4 jobs side by side. `-Tests` runs those files here
+(a change to `theme.py`, `mainwindow.py` or `library.py` picks most of the suite: about
+4 minutes); `-All` the whole suite.

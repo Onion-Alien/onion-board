@@ -67,8 +67,9 @@ module's `install.bat` or `pip install -r requirements.txt`).
 .venv\Scripts\python scripts\check_sensitive.py
 ```
 
-Or all of it in one go, with pytest on only the test files your committed and
-uncommitted changes need (`scripts/pick_tests.py --local`); `-All` runs the whole suite:
+Or the quick checks (ruff, the sensitive scan, translations, CODE.md) in one go. The
+tests are left to CI; `-Tests` also runs the test files your committed and uncommitted
+changes need (`scripts/pick_tests.py --local`), `-All` the whole suite:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1

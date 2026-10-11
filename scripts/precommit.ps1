@@ -1,13 +1,16 @@
-# Every check a commit needs, in one go, on only what you changed:
-#   ruff, the sensitive-data scan, the i18n catalogs, and the tests that cover your
-#   committed + uncommitted changes since origin/main (scripts/pick_tests.py --local).
+# The quick checks a commit needs, in one go (about 15 s): ruff, the sensitive-data
+# scan, the i18n catalogs and CODE.md's module list. The tests are left to CI: a PR
+# runs the ones its changes need (scripts/pick_tests.py) on 4 jobs side by side, faster
+# than this PC, and you keep working meanwhile. A change to a busy module (theme.py,
+# mainwindow.py, library.py) picks most of the suite: about 4 minutes here.
 #
 #   powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1
-#   ... -All      run the whole test suite instead (about 3 minutes)
+#   ... -Tests    also run the tests your committed + uncommitted changes need
+#   ... -All      also run the whole test suite (about 4 minutes)
 #   ... -Base X   compare with branch X instead of origin/main
 #
 # Stops at the first failure. Run from anywhere; it works in the repo root.
-param([switch]$All, [string]$Base = "origin/main")
+param([switch]$Tests, [switch]$All, [string]$Base = "origin/main")
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -36,13 +39,18 @@ Step "sensitive data" { & $py scripts\check_sensitive.py }
 Step "translations" { & $py scripts\i18n_extract.py --check }
 Step "CODE.md modules" { & $py scripts\check_code_doc.py }
 
-if ($All) { $tests = @("tests") }
+if ($All) { $picked = @("tests") }
 else {
-    $tests = @(& $py scripts\pick_tests.py $Base --local)
+    $picked = @(& $py scripts\pick_tests.py $Base --local)
     if ($LASTEXITCODE -ne 0) { Write-Host "FAILED: pick_tests" -ForegroundColor Red; exit 1 }
 }
-if ($tests.Count -eq 0) {
+if (-not ($Tests -or $All)) {
+    $n = if ($picked -contains "tests") { "all" } else { $picked.Count }
+    Write-Host "Checks passed in $(Took $total). Tests left to CI ($n test files; -Tests runs them here)." -ForegroundColor Green
+    exit 0
+}
+if ($picked.Count -eq 0) {
     Write-Host "== no tests cover these changes (total $(Took $total))"; exit 0
 }
-Step "pytest ($($tests -join ' '))" { & $py -m pytest -q @tests }
+Step "pytest ($($picked -join ' '))" { & $py -m pytest -q @picked }
 Write-Host "All checks passed in $(Took $total)." -ForegroundColor Green

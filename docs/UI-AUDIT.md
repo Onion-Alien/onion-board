@@ -37,13 +37,24 @@ the affected states; include its PR and validation evidence here.
   list above them (its Close is already bottom-right); setup and reset guides keep
   Back on the left and Next/Go on the right.
 
-- [ ] **U2: A clear rule for choice controls.** Recording source uses radio tiles;
+- [x] **U2: A clear rule for choice controls.** Recording source uses radio tiles;
   Appearance's live indicator and Connection use plain radios; output modes use
   exclusive buttons; Edit playback uses a combo. These are not all defects: compare
   task and available space against DESIGN section 0 before changing them.
   Targets: `ui/recordmic.py`, `settings.py`, `ui/destpanel.py`, `ui/dialogs.py`.
   Acceptance: comparable choices use the same pattern; labels, exclusivity,
   keyboard selection and saved values work; dynamic device lists remain dropdowns.
+
+  Done (PR #420): each one checked against section 0's table; they follow it, so they
+  stay. Recording source (two choices with icons) = radio tiles; Live tabs, Connection
+  and Network activity (short technical options) = plain radios; Who's listening (a
+  frequent mode) = exclusive buttons, and arrows move the pick and apply it like radio
+  buttons (new test). Fixed: Live tabs' two radios were stacked while Connection's and
+  Network activity's sit in a row: now one wrapping row too. Left on purpose: Edit
+  sound's *On press* stays a dropdown (five choices with long labels;
+  as radios they'd add four rows to a tall window, and it's set once per sound).
+  Checked offscreen in Dark and Light at 800x600 and 1180x720 (`tests/test_settings.py`,
+  `tests/test_destpanel.py`).
 
 - [x] **U3: Predictable configuration entry points.** Voice's Make it yours opens a
   retained modeless editor, AI voice More options expands inline, and mode options
