@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys, winpath, ytdl, ytworker
+from soundboard import bunny, theme, winkeys, winpath, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -5854,6 +5854,8 @@ class MainWindow(QMainWindow):
                          "Keep them?", len(ids)))
         box = QMessageBox(QMessageBox.Question, _("Keep your imported sounds?"), text,
                           QMessageBox.NoButton, self)
+        # Bun, smug: got your board and its settings in one go
+        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF(), smug=True))
         keep = box.addButton(_("Keep"), QMessageBox.YesRole)
         remove = box.addButton(_("Remove"), QMessageBox.NoRole)
         box.setDefaultButton(keep)
