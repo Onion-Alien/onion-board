@@ -45,7 +45,7 @@ the affected states; include its PR and validation evidence here.
   Acceptance: comparable choices use the same pattern; labels, exclusivity,
   keyboard selection and saved values work; dynamic device lists remain dropdowns.
 
-  Done (PR #PRNUM): each one checked against section 0's table; they follow it, so they
+  Done (PR #420): each one checked against section 0's table; they follow it, so they
   stay. Recording source (two choices with icons) = radio tiles; Live tabs, Connection
   and Network activity (short technical options) = plain radios; Who's listening (a
   frequent mode) = exclusive buttons, and arrows move the pick and apply it like radio
