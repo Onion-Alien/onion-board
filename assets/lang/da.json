@@ -3093,6 +3093,9 @@
     "{n} lyde er allerede i dit bibliotek"
   ],
   "Open Triggers": "Åbn Triggere",
+  "Copy into library": "Kopiér til biblioteket",
+  "Local sounds": "Lokale lyde",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Fra: link til originalfilen. Slå til for at beholde lydene, hvis originalen flyttes, slettes eller er på et frakoblet drev. Bruger ekstra diskplads. Gælder kun nye lokale importer.",
   "Audio recovery": "Lydgendannelse",
   "Clean reinstall": "Ren geninstallation",
   "Fix problems sending sounds into your mic after an update.": "Løs problemer med at sende lyde til din mikrofon efter en opdatering.",

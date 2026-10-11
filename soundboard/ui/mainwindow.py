@@ -5700,6 +5700,8 @@ class MainWindow(QMainWindow):
         self._pending_imports += count
         start = len(self.cfg.sounds)
         known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
+        copy_local = self.cfg.copy_local_sounds
+        local_files = set(files)   # ZIP extraction adds temporary files later
 
         def run():
             with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
@@ -5736,7 +5738,9 @@ class MainWindow(QMainWindow):
                         raise importreport.AlreadyAdded(known[fp])
                     x = extras.get(shown)   # from another soundboard: named as it was there
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
-                                             name=x.name if x is not None else "")
+                                             name=x.name if x is not None else "",
+                                             copy=copy_local or shown not in local_files
+                                             or library.owns(Path(f)))
                     if x is not None:
                         meta.name = x.name or meta.name
                         meta.tags = clean_tags(x.tags)

@@ -3093,6 +3093,9 @@
     "{n} geluiden staan al in je bibliotheek"
   ],
   "Open Triggers": "Triggers openen",
+  "Copy into library": "Kopiëren naar bibliotheek",
+  "Local sounds": "Lokale geluiden",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Uit: link naar het oorspronkelijke bestand. Zet aan om geluiden te behouden als het origineel wordt verplaatst, verwijderd of op een losgekoppelde schijf staat. Gebruikt extra schijfruimte. Geldt alleen voor nieuwe lokale imports.",
   "Audio recovery": "Audioherstel",
   "Clean reinstall": "Schone herinstallatie",
   "Fix problems sending sounds into your mic after an update.": "Los problemen op met het sturen van geluiden naar je microfoon na een update.",

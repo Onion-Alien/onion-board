@@ -3093,6 +3093,9 @@
     "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं"
   ],
   "Open Triggers": "ट्रिगर खोलें",
+  "Copy into library": "लाइब्रेरी में कॉपी करें",
+  "Local sounds": "स्थानीय ध्वनियाँ",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "बंद: मूल फ़ाइल से लिंक करें। मूल फ़ाइल हटने, दूसरी जगह जाने या ड्राइव डिस्कनेक्ट होने पर भी ध्वनियाँ रखने के लिए चालू करें। अतिरिक्त डिस्क स्थान लगता है। केवल नए स्थानीय इंपोर्ट पर लागू होता है।",
   "Audio recovery": "ऑडियो सुधार",
   "Clean reinstall": "साफ़ इंस्टॉल",
   "Fix problems sending sounds into your mic after an update.": "अपडेट के बाद माइक में आवाज़ भेजने की समस्याएँ ठीक करें।",

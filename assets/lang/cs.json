@@ -3164,6 +3164,9 @@
     "{n} zvuků už je v knihovně"
   ],
   "Open Triggers": "Otevřít Spouštěče",
+  "Copy into library": "Kopírovat do knihovny",
+  "Local sounds": "Místní zvuky",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Vypnuto: odkaz na původní soubor. Zapněte pro zachování zvuků, pokud je původní soubor přesunut, smazán nebo na odpojeném disku. Zabere více místa. Platí jen pro nově přidané místní soubory.",
   "Audio recovery": "Obnovení zvuku",
   "Clean reinstall": "Čistá instalace",
   "Fix problems sending sounds into your mic after an update.": "Oprav problémy s posíláním zvuků do mikrofonu po aktualizaci.",
