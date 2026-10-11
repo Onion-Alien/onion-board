@@ -1611,6 +1611,8 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
+        scroll.verticalScrollBar().valueChanged.connect(
+            lambda __: self.grid.update() if self.grid.background_image else None)
         self._pad_scroll = scroll
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         # the pads fit the width
@@ -2132,7 +2134,6 @@ class MainWindow(QMainWindow):
         self.engine.eq_target = target
         self.engine.eq_gains = list(gains) if enabled else None
         self._save_later()
-
     # ------------------------------------------------------------------ devices
     def refresh_devices(self) -> str:
         """Re-scan the sound devices and reopen the streams. Returns a short result
@@ -3462,6 +3463,8 @@ class MainWindow(QMainWindow):
         attribute) and save shortly after. The small public surface the Settings
         window and dialogs use."""
         setattr(self.cfg, attr, v)
+        if attr in ("playing_background", "playing_background_opacity"):
+            self._update_playing_background(self.engine.playing())
         if hasattr(self.engine, attr):
             setattr(self.engine, attr, v)
         self._save_later()
@@ -8194,6 +8197,7 @@ class MainWindow(QMainWindow):
     def _tick_visuals(self, playing, now: float):
         """The part of tick() that only matters while the window is on screen."""
         e = self.engine
+        self._update_playing_background(playing)
         on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
         shown = self.isVisible()
         # only the pads playing now and the ones still showing a sound (cleared on the
@@ -8251,6 +8255,16 @@ class MainWindow(QMainWindow):
             want = any(sid in self._meta or sid == LINK_ID for sid in playing)
         if self.transport.isHidden() == want:
             self.transport.setVisible(want)
+
+    def _update_playing_background(self, playing):
+        image = ""
+        if self.cfg.playing_background:
+            # The first active sound owns the backdrop, including while paused.
+            # Waiting sounds and a merely selected pad never claim it.
+            sid = next((sid for sid in playing if sid in self._meta), None)
+            m = self.meta(sid) if sid else None
+            image = m.image if m else ""
+        self.grid.set_background(image, self.cfg.playing_background_opacity)
 
     def _update_transport(self, playing):
         sid = self.current

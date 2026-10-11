@@ -729,6 +729,7 @@ class SettingsDialog(QDialog):
         w, v = self._page()
         self.theme_cards = []
         v.addWidget(self._language_card())
+        v.addWidget(self._playing_background_card())
         # above the themes (it sat under every theme card, out of sight)
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
@@ -810,6 +811,31 @@ class SettingsDialog(QDialog):
         combo.currentIndexChanged.connect(picked)
         show()
         self.ui_scale_combo, self.ui_scale_note, self.ui_scale_restart = combo, note, restart
+        return card
+
+    def _playing_background_card(self) -> QFrame:
+        card, cv = self._card(_("Playing sound background"))
+        enabled = QCheckBox(_("Show the playing sound's thumbnail behind the cards"))
+        enabled.setChecked(self.mw.cfg.playing_background)
+        enabled.toggled.connect(lambda on: self.mw.set_option("playing_background", on))
+        cv.addWidget(enabled)
+        row = QHBoxLayout()
+        row.addWidget(QLabel(_("Opacity")))
+        opacity = QSlider(Qt.Orientation.Horizontal)
+        opacity.setRange(0, 100)
+        opacity.setValue(self.mw.cfg.playing_background_opacity)
+        opacity.setAccessibleName(_("Opacity"))
+        no_wheel(opacity)
+        value = QLabel(f"{opacity.value()}%")
+        value.setMinimumWidth(value.fontMetrics().horizontalAdvance("100%"))
+        opacity.valueChanged.connect(lambda n: (
+            value.setText(f"{n}%"), self.mw.set_option("playing_background_opacity", n)))
+        opacity.setEnabled(enabled.isChecked())
+        enabled.toggled.connect(opacity.setEnabled)
+        row.addWidget(opacity, 1)
+        row.addWidget(value)
+        cv.addLayout(row)
+        self.playing_background_check, self.playing_background_opacity = enabled, opacity
         return card
 
     def _language_card(self) -> QFrame:

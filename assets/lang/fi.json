@@ -3170,5 +3170,8 @@
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Siitä tulee uusi ääni boardillesi edellisten jälkeen. Mitään ei tarvitse painaa.",
   "Waiting to add": "Odottaa lisäystä",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows pitää {keys}-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows pitää <b>{key}</b>-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>"
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows pitää <b>{key}</b>-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>",
+  "Opacity": "Peittävyys",
+  "Playing sound background": "Soivan äänen tausta",
+  "Show the playing sound's thumbnail behind the cards": "Näytä soivan äänen pikkukuva korttien takana"
 }

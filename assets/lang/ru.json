@@ -3243,5 +3243,8 @@
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Станет новым звуком на твоей панели после предыдущих. Ничего нажимать не нужно.",
   "Waiting to add": "Ждёт добавления",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows оставляет {keys} себе, поэтому это не может быть горячей клавишей. Выбери другую клавишу.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows оставляет <b>{key}</b> себе, поэтому это не может быть горячей клавишей. Выбери другую клавишу.</span>"
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows оставляет <b>{key}</b> себе, поэтому это не может быть горячей клавишей. Выбери другую клавишу.</span>",
+  "Opacity": "Непрозрачность",
+  "Playing sound background": "Фон текущего звука",
+  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками"
 }
