@@ -98,7 +98,7 @@ the affected states; include its PR and validation evidence here.
   submenus, configuration and confirmation states with safe test fixtures; the
   initial spot audit did not cover them. Treat new observations as findings only
   after inspection. Triggers' add-on UI is maintained separately.
-- [ ] **U9: Menu interaction and accessibility pass.** Check Sounds/Apps/Radio/Voice
+- [x] **U9: Menu interaction and accessibility pass.** Check Sounds/Apps/Radio/Voice
   menus for action grouping, current-value checkmarks, destructive treatment,
   visible alternatives to right-click, keyboard navigation, focus return and screen
   edges. Existing `DropdownMenu` and `QMenu` usage is a starting point, not evidence
@@ -107,8 +107,21 @@ the affected states; include its PR and validation evidence here.
   Started (PR #399): the Sounds bulk Colour menu checks the shared colour (none
   for a mixed selection) and the empty and filled boards share one "Drop sound
   files here" hint. Checked offscreen in Dark, Light, High Contrast and Retro 98 at
-  narrow and normal sizes. Still open: the rest of the Sounds menus, and the Apps,
-  Radio and Voice menus.
+  narrow and normal sizes.
+
+  Done (PR #414): one colour list for both Sounds Colour menus
+  (`padbatch.fill_colour_menu`): named colours (the bulk one showed `#1fb6ff`), the
+  current one ticked on its own dot (the category one had a typed "✓" and bold). The
+  Apps card's Categories tick the program's category (it was greyed out) and keep
+  "Music & media"'s "&" (it read "Music _media"); the Apps card and category heading
+  menus got icons, a short red Remove / Delete category (the long words are the
+  tooltip). The picked-pads menu lost its empty first row (a section title our menu
+  style doesn't draw). Shuffled play got the shuffle icon. Checked offscreen in Dark
+  and Light (`tests/test_padbatch.py`, `test_appspanel.py`). Checked and fine as they
+  are: the pad menu (Menu key / Shift+F10 open it), Voice's saved-voice menu (red
+  Delete; Menu key on the focused tile), Radio's country dropdown. Left for later:
+  Apps cards and headings have no keyboard way to their menu (the card's ✕ and drag
+  cover remove and move), and Apps category names aren't translated.
 
 ## Merged in from the earlier audits
 
