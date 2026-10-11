@@ -10,17 +10,18 @@ import numpy as np
 from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QPointF, QRectF,
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
-                           QPainterPath, QPen)
+                           QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMenu, QScrollArea,
-                               QSlider, QStackedWidget, QStyle, QTabWidget, QVBoxLayout,
-                               QWidget)
+                               QSlider, QStackedWidget, QStyle, QTabWidget, QToolTip,
+                               QVBoxLayout, QWidget)
 
-from soundboard import midi, theme, thumbs
+from soundboard import library, midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import response_db as eq_response
 from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
 from soundboard.settings import pretty_key
+from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 
@@ -423,6 +424,18 @@ _SHADOW, _WHITE = QColor(0, 0, 0, 200), QColor("#ffffff")   # text on a picture
 _METER_WARM, _METER_HOT = QColor("#ffb84d"), QColor("#ff5a4f")   # a level meter near full scale
 _WHITE_DIM, _WHITE_MUTED = QColor(255, 255, 255, 170), QColor(255, 255, 255, 200)
 _ERROR_ON_PIC = QColor("#ff6b6b")
+LINK_PX = 12         # the linked-file mark: the footer text's height
+_link_pm: dict = {}  # (colour, real pixels) -> its pixmap
+
+
+def _link_pixmap(colour: QColor, dpr: float) -> QPixmap:
+    px = round(LINK_PX * dpr)
+    key = (colour.rgba(), px)
+    pm = _link_pm.get(key)
+    if pm is None:
+        pm = _link_pm[key] = icons.pixmap("link", px, colour.name(QColor.NameFormat.HexArgb))
+        pm.setDevicePixelRatio(dpr)
+    return pm
 
 
 def pad_colours() -> dict[str, QColor]:
@@ -480,6 +493,8 @@ class Pad(QAbstractButton):
         self._font_key = self.font().key()
         self._accent = (None, None)   # (meta.color, its QColor)
         self._foot = (None, None)     # (what the footer shows, its font, text and badge)
+        self._linked = (None, "")     # (meta.file, its path when outside the library)
+        self._link_rect: QRectF | None = None   # where the linked-file mark was painted
         self._wheel = 0               # Ctrl+wheel turned less than a notch (touchpads)
         self.setFixedSize(width, pad_height(width))
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -520,12 +535,37 @@ class Pad(QAbstractButton):
             bits.append(_("effects"))
         if m.tags:
             bits.append(_("in {categories}", categories=", ".join(m.tags)))
+        if self.linked_file():
+            bits.append(_("Plays from: {path}", path=self.linked_file()))
         desc = ", ".join(bits)
         if (m.name, desc) != self._described:
             self._described = (m.name, desc)
             self.setText(m.name.replace("&", "&&"))   # else "R&B" claims Alt+B
             self.setAccessibleName(m.name)
             self.setAccessibleDescription(desc)
+
+    def linked_file(self) -> str:
+        """The sound's file on the disk when the library didn't copy it in ("Copy into
+        library" is off: the pad plays the original), else ""."""
+        f = self.meta.file
+        if self._linked[0] != f:
+            self._linked = (f, str(Path(f)) if f and not library.owns(f) else "")
+        return self._linked[1]
+
+    def event(self, e):
+        """The linked-file mark's tooltip shows over the mark only, not the whole pad."""
+        if e.type() == QEvent.Type.ToolTip:
+            box = self._link_rect
+            hit = box.adjusted(-4, -4, 4, 4) if box is not None else None
+            if hit is not None and hit.contains(QPointF(e.pos())) and self.linked_file():
+                QToolTip.showText(e.globalPos(), _("Plays from: {path}",
+                                                   path=self.linked_file()),
+                                  self, hit.toAlignedRect())
+            else:
+                QToolTip.hideText()
+                e.ignore()
+            return True
+        return super().event(e)
 
     def focusInEvent(self, e):
         self._kbd_focus = e.reason() in (Qt.FocusReason.TabFocusReason,
@@ -849,6 +889,7 @@ class Pad(QAbstractButton):
         foot = r.adjusted(10, r.height() - 24, -10, -6)
         f, right, badge = self._footer(foot, f)
         p.setFont(f)
+        self._link_rect = None
         if self.state in ("loading", "rendering"):
             p.setPen(muted)
             p.drawText(foot, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
@@ -860,6 +901,12 @@ class Pad(QAbstractButton):
         else:
             p.setPen(muted)
             p.drawText(foot, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, right)
+            if self.linked_file():   # a small chain link just before the length
+                x = foot.right() - QFontMetrics(f).horizontalAdvance(right) - 5 - LINK_PX
+                if x >= foot.left() + (badge[1] + 6 if badge is not None else 0):
+                    box = QRectF(x, foot.center().y() - LINK_PX / 2, LINK_PX, LINK_PX)
+                    p.drawPixmap(box.topLeft(), _link_pixmap(muted, self.devicePixelRatioF()))
+                    self._link_rect = box
             if badge is not None:
                 hk, w = badge
                 box = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)
@@ -949,6 +996,14 @@ class Pad(QAbstractButton):
             right = "❚❚" if self.paused else f"{flags}{m.duration:.1f}s"
             rc = T["muted"]
         rw = fm.horizontalAdvance(right) + 4
+        self._link_rect = None
+        if self.state == "ready" and self.linked_file() and r.width() >= 160:
+            box = QRectF(r.right() - 9 - rw - 2 - LINK_PX, r.center().y() - LINK_PX / 2,
+                         LINK_PX, LINK_PX)
+            p.drawPixmap(box.topLeft(), _link_pixmap(QColor(T["muted"]),
+                                                     self.devicePixelRatioF()))
+            self._link_rect = box
+            rw += LINK_PX + 6
         p.setPen(QColor(rc))
         p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignmentFlag.AlignRight
                    | Qt.AlignmentFlag.AlignVCenter, right)

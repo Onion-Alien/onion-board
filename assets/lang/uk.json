@@ -3225,5 +3225,6 @@
   "On Air": "В ефірі",
   "Not configured": "Не налаштовано",
   "Not configured: click to fix": "Не налаштовано: натисни, щоб виправити",
-  "Can't send to {device}, click to fix": "Не вдається надіслати на {device}, натисни, щоб виправити"
+  "Can't send to {device}, click to fix": "Не вдається надіслати на {device}, натисни, щоб виправити",
+  "Plays from: {path}": "Грає з: {path}"
 }

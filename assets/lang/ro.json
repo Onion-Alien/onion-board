@@ -3225,5 +3225,6 @@
   "On Air": "În emisie",
   "Not configured": "Neconfigurat",
   "Not configured: click to fix": "Neconfigurat: dă clic pentru a repara",
-  "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara"
+  "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara",
+  "Plays from: {path}": "Se redă din: {path}"
 }

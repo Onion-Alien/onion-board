@@ -3152,5 +3152,6 @@
   "On Air": "ऑन एयर",
   "Not configured": "सेट अप नहीं",
   "Not configured: click to fix": "सेट अप नहीं: ठीक करने के लिए क्लिक करें",
-  "Can't send to {device}, click to fix": "{device} पर नहीं भेज सकते, ठीक करने के लिए क्लिक करें"
+  "Can't send to {device}, click to fix": "{device} पर नहीं भेज सकते, ठीक करने के लिए क्लिक करें",
+  "Plays from: {path}": "यहाँ से चलता है: {path}"
 }

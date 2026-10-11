@@ -3152,5 +3152,6 @@
   "On Air": "Lähetyksessä",
   "Not configured": "Ei määritetty",
   "Not configured: click to fix": "Ei määritetty: korjaa klikkaamalla",
-  "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla"
+  "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla",
+  "Plays from: {path}": "Soitetaan tiedostosta: {path}"
 }

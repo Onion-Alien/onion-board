@@ -3152,5 +3152,6 @@
   "On Air": "On air",
   "Not configured": "Hindi naka-set up",
   "Not configured: click to fix": "Hindi naka-set up: i-click para ayusin",
-  "Can't send to {device}, click to fix": "Hindi makapagpadala sa {device}, i-click para ayusin"
+  "Can't send to {device}, click to fix": "Hindi makapagpadala sa {device}, i-click para ayusin",
+  "Plays from: {path}": "Pinapatugtog mula sa: {path}"
 }

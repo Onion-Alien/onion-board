@@ -3152,5 +3152,6 @@
   "On Air": "À l'antenne",
   "Not configured": "Non configuré",
   "Not configured: click to fix": "Non configuré : clique pour corriger",
-  "Can't send to {device}, click to fix": "Impossible d'envoyer vers {device}, clique pour corriger"
+  "Can't send to {device}, click to fix": "Impossible d'envoyer vers {device}, clique pour corriger",
+  "Plays from: {path}": "Lu depuis : {path}"
 }

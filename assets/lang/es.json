@@ -3152,5 +3152,6 @@
   "On Air": "En directo",
   "Not configured": "Sin configurar",
   "Not configured: click to fix": "Sin configurar: haz clic para arreglarlo",
-  "Can't send to {device}, click to fix": "No se puede enviar a {device}, haz clic para arreglarlo"
+  "Can't send to {device}, click to fix": "No se puede enviar a {device}, haz clic para arreglarlo",
+  "Plays from: {path}": "Se reproduce desde: {path}"
 }

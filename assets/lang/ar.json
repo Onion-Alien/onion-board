@@ -3444,5 +3444,6 @@
   "On Air": "على الهواء",
   "Not configured": "غير مُعد",
   "Not configured: click to fix": "غير مُعد: انقر للإصلاح",
-  "Can't send to {device}, click to fix": "لا يمكن الإرسال إلى {device}، انقر للإصلاح"
+  "Can't send to {device}, click to fix": "لا يمكن الإرسال إلى {device}، انقر للإصلاح",
+  "Plays from: {path}": "يُشغَّل من: {path}"
 }

@@ -3079,5 +3079,6 @@
   "On Air": "Mengudara",
   "Not configured": "Belum diatur",
   "Not configured: click to fix": "Belum diatur: klik untuk memperbaiki",
-  "Can't send to {device}, click to fix": "Tidak bisa mengirim ke {device}, klik untuk memperbaiki"
+  "Can't send to {device}, click to fix": "Tidak bisa mengirim ke {device}, klik untuk memperbaiki",
+  "Plays from: {path}": "Diputar dari: {path}"
 }

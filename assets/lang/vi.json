@@ -3079,5 +3079,6 @@
   "On Air": "Đang phát",
   "Not configured": "Chưa thiết lập",
   "Not configured: click to fix": "Chưa thiết lập: bấm để sửa",
-  "Can't send to {device}, click to fix": "Không gửi được tới {device}, bấm để sửa"
+  "Can't send to {device}, click to fix": "Không gửi được tới {device}, bấm để sửa",
+  "Plays from: {path}": "Phát từ: {path}"
 }

@@ -3152,5 +3152,6 @@
   "On Air": "Στον αέρα",
   "Not configured": "Δεν έχει ρυθμιστεί",
   "Not configured: click to fix": "Δεν έχει ρυθμιστεί: κάνε κλικ για διόρθωση",
-  "Can't send to {device}, click to fix": "Δεν γίνεται αποστολή στο {device}, κάνε κλικ για διόρθωση"
+  "Can't send to {device}, click to fix": "Δεν γίνεται αποστολή στο {device}, κάνε κλικ για διόρθωση",
+  "Plays from: {path}": "Παίζει από: {path}"
 }
