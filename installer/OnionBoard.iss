@@ -129,6 +129,9 @@ Type: filesandordirs; Name: "{app}\_internal"
 #ifndef PREVIEW
 Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 #endif
+; The cable step runs first, before the files above are copied (see CurStepChanged), so it
+; needs its own copy of the script to extract into {tmp}.
+Source: "install-vbcable.ps1"; Flags: dontcopy
 
 [Icons]
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserModelID: "OnionBoard.App"; Tasks: desktopicon
@@ -157,14 +160,8 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg
   Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
-Filename: "{code:WingetPath}"; \
-  Parameters: "install --id Gyan.FFmpeg.Essentials --exact --silent --disable-interactivity --accept-package-agreements --accept-source-agreements"; \
-  StatusMsg: "Adding M4A and video support (FFmpeg)... this can take a minute."; \
-  Tasks: ffmpeg; Check: MayDownload('ffmpeg'); Flags: runhidden waituntilterminated
-Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --quiet"; \
-  WorkingDir: "{app}\modules\live-voice"; \
-  StatusMsg: "Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)..."; \
-  Tasks: livevoice; Check: HasPython and MayDownload('livevoice'); Flags: runhidden waituntilterminated
+; FFmpeg, live voice and Tor download from CurStepChanged in [Code] (RunExtra), so the
+; window keeps working and Cancel can stop them.
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
 ; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
 ; closing itself: open it again once the new version is in place.
@@ -581,13 +578,6 @@ begin
 #endif
 end;
 
-#ifdef PREVIEW
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin
-  Result := CurPageID <> HeardPage.ID;   // a look at the pages, never an install
-end;
-#endif
-
 // Next or Install on the pages before installing (there's no Ready page): Install on
 // whichever is last, which can change as Count me in is ticked.
 procedure UpdateInstallCaption;
@@ -840,29 +830,101 @@ begin
     Result := '';
 end;
 
-// Run install-vbcable.ps1 with `Args`; its exit code, or -1 if it couldn't start.
-function CableScript(Args: String): Integer;
+// The cable step, in three parts so the installer never sits frozen on it:
+//  1. leaving the boxes page with the cable ticked: download and check VB-Audio's setup
+//     in the background (install-vbcable.ps1 -Prefetch), while the user reads on;
+//  2. Install clicked: start the script without waiting, so Windows' permission box
+//     comes up at once while the files copy (and Cancel still works);
+//  3. after the files: wait for its exit code (a small page, only if they haven't
+//     answered Windows yet), then the restart / uninstaller bookkeeping.
+var
+  CablePrefetched, CableStarted, CableDone, CableHad: Boolean;
+
+function CableScriptPath: String;
 begin
-  if not Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' +
-              ExpandConstant('{app}\_internal\install-vbcable.ps1') + '" ' + Args,
-              '', SW_HIDE, ewWaitUntilTerminated, Result) then
-    Result := -1;
+  Result := ExpandConstant('{tmp}\install-vbcable.ps1');
+  if not FileExists(Result) then
+    ExtractTemporaryFile('install-vbcable.ps1');
 end;
 
-procedure InstallCable;
+function CableExitFile: String;
+begin
+  Result := ExpandConstant('{tmp}\cable-exit.txt');
+end;
+
+// the script's exit code (0 working, 3010 restart needed, 1 failed), or -2 while it runs
+function CableExitCode: Integer;
+var
+  S: AnsiString;
+begin
+  Result := -2;
+  if LoadStringFromFile(CableExitFile, S) then
+    Result := StrToIntDef(Trim(String(S)), -1);
+end;
+
+procedure PrefetchCable;
 var
   Code: Integer;
-  HadCable: Boolean;
 begin
-  // ask Windows whether the driver is there (2 = not installed): VB-Audio's own
-  // uninstaller leaves its setup program in Program Files, so that proves nothing
-  HadCable := CableScript('-Check') <> 2;
-  WizardForm.StatusLabel.Caption :=
-    'Installing the virtual cable. Windows will show a permission box: please click Yes.';
-  Code := CableScript('-Silent');
+  if CablePrefetched or not MayDownload('vbcable') or CableInstalled then
+    exit;
+  CablePrefetched := True;
+  Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + CableScriptPath +
+       '" -Prefetch "' + ExpandConstant('{tmp}\cable') + '"', '', SW_HIDE, ewNoWait, Code);
+end;
+
+function PsQuote(S: String): String;
+begin
+  Result := S;
+  StringChangeEx(Result, '''', '''''', True);
+  Result := '''' + Result + '''';
+end;
+
+procedure StartCable;
+var
+  Args: String;
+  Code: Integer;
+begin
+  CableHad := CableInstalled;
+  Args := '-Silent';
+  if CablePrefetched then   // silent installs never saw the boxes page: no prefetch
+    Args := Args + ' -From ' + PsQuote(ExpandConstant('{tmp}\cable'));
+  DeleteFile(CableExitFile);
+  CableStarted := Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -Command "& ' +
+    PsQuote(CableScriptPath) + ' ' + Args + '; Set-Content -LiteralPath ' +
+    PsQuote(CableExitFile) + ' -Value $LASTEXITCODE"', '', SW_HIDE, ewNoWait, Code);
+end;
+
+procedure FinishCable;
+var
+  Code, I: Integer;
+  Page: TOutputProgressWizardPage;
+begin
+  if not CableStarted then
+    exit;
+  if CableExitCode = -2 then
+  begin
+    Page := CreateOutputProgressPage('Adding the virtual cable',
+      'If Windows is asking for permission, click Yes.');
+    Page.Show;
+    try
+      // SetProgress keeps the window drawing while it waits; at most 15 minutes
+      for I := 0 to 3600 do
+      begin
+        if CableExitCode <> -2 then
+          break;
+        Page.SetProgress(I mod 40, 40);
+        Sleep(250);
+      end;
+    finally
+      Page.Hide;
+    end;
+  end;
+  Code := CableExitCode;
+  CableDone := True;
   CableNeedsRestart := (Code = 3010);
   // remembered for the uninstaller: a cable we put there is offered for removal first
-  if (not HadCable) and ((Code = 0) or (Code = 3010)) then
+  if (not CableHad) and ((Code = 0) or (Code = 3010)) then
     RegWriteStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', '1');
   // after that restart, open the app once by itself on the setup guide's cable step
   // (the same per-user RunOnce entry the guide sets; Windows deletes it as it runs)
@@ -871,6 +933,40 @@ begin
       'OnionBoardResumeSetup',
       '"' + ExpandConstant('{app}\{#AppExeName}.exe') + '" --resume-setup');
 end;
+
+// Cancelled after the cable went in: Inno takes Onion Board's files back out, but the
+// cable stays, so say where to remove it.
+procedure DeinitializeSetup;
+var
+  Code: Integer;
+begin
+  if not CableStarted or CableDone or WizardSilent then
+    exit;
+  Code := CableExitCode;
+  if (Code = 0) or (Code = 3010) then
+    MsgBox('Onion Board wasn''t installed, but the virtual cable (VB-Cable) was already ' +
+      'added to your PC.' + #13#10#13#10 + 'To remove it: Windows Settings > Apps > ' +
+      'Installed apps > "VBCABLE, The Virtual Audio Cable" > Uninstall.', mbInformation, MB_OK)
+  else if Code = -2 then
+    MsgBox('Onion Board wasn''t installed. The virtual cable (VB-Cable) may still be ' +
+      'added if you click Yes on Windows'' box.' + #13#10#13#10 + 'To remove it later: ' +
+      'Windows Settings > Apps > Installed apps > "VBCABLE, The Virtual Audio Cable" > ' +
+      'Uninstall.', mbInformation, MB_OK);
+end;
+
+#ifdef PREVIEW
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := CurPageID <> HeardPage.ID;   // a look at the pages, never an install
+end;
+#else
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := True;
+  if CurPageID = wpSelectTasks then
+    PrefetchCable;
+end;
+#endif
 
 function NeedRestart(): Boolean;
 begin
@@ -947,6 +1043,108 @@ begin
   RegDeleteKeyIfEmpty(HKCU, 'Software\OnionBoard');
 end;
 
+// The extras that download after the files (Tor, FFmpeg, live voice): each runs without
+// the installer waiting on it, through a small PowerShell wrapper that notes its PID and
+// exit code, while a progress page keeps the window working and Cancel is clickable.
+// Cancel stops the one running (its whole process tree) and skips the rest: Onion Board
+// itself is installed by then, so the Finished page still comes.
+var
+  ExtrasPage: TOutputProgressWizardPage;
+  ExtrasCancelled: Boolean;
+  ExtrasSkipped: String;
+
+procedure ExtrasCancelClick(Sender: TObject);
+begin
+  if MsgBox('Stop downloading the extras? Onion Board is already installed, and you can ' +
+            'add them later in the app.', mbConfirmation, MB_YESNO) = IDYES then
+    ExtrasCancelled := True;
+end;
+
+// Runs `Exe Params` hidden; True with its exit code, False if cancelled or not started.
+// `Later` says where to get it afterwards, for the "skipped" note.
+function RunExtra(Name, Status, Exe, Params, Dir, Later: String; var Code: Integer): Boolean;
+var
+  Wrapper, PidFile, ExitFile: String;
+  Pid: AnsiString;
+  S: AnsiString;
+  I, Dummy: Integer;
+  OldClick: TNotifyEvent;
+begin
+  Result := False;
+  Code := -1;
+  if ExtrasCancelled then
+  begin
+    ExtrasSkipped := ExtrasSkipped + #13#10 + '- ' + Name + ': ' + Later;
+    exit;
+  end;
+  Wrapper := ExpandConstant('{tmp}\extra-' + IntToStr(Random(1000000)) + '.ps1');
+  PidFile := Wrapper + '.pid';
+  ExitFile := Wrapper + '.exit';
+  SaveStringToFile(Wrapper,
+    '$PID | Set-Content -LiteralPath ' + PsQuote(PidFile) + #13#10 +
+    '$p = Start-Process -FilePath ' + PsQuote(Exe) + ' -ArgumentList ' + PsQuote(Params) +
+    ' -WorkingDirectory ' + PsQuote(Dir) + ' -WindowStyle Hidden -PassThru' + #13#10 +
+    '$p.WaitForExit()' + #13#10 +
+    'Set-Content -LiteralPath ' + PsQuote(ExitFile) + ' -Value $p.ExitCode' + #13#10, False);
+  if not Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + Wrapper + '"',
+              '', SW_HIDE, ewNoWait, Dummy) then
+    exit;
+  if ExtrasPage = nil then
+    ExtrasPage := CreateOutputProgressPage('Adding the extras',
+      'Onion Board is installed. Click Cancel to skip the rest.');
+  ExtrasPage.SetText(Status, '');
+  ExtrasPage.Show;
+  OldClick := WizardForm.CancelButton.OnClick;
+  WizardForm.CancelButton.OnClick := @ExtrasCancelClick;
+  try
+    I := 0;
+    while not FileExists(ExitFile) and not ExtrasCancelled do
+    begin
+      WizardForm.CancelButton.Enabled := True;
+      ExtrasPage.SetProgress(I mod 50, 50);   // keeps the window drawing and clickable
+      Sleep(200);
+      I := I + 1;
+    end;
+  finally
+    WizardForm.CancelButton.OnClick := OldClick;
+    WizardForm.CancelButton.Enabled := False;
+  end;
+  if ExtrasCancelled and not FileExists(ExitFile) then
+  begin
+    if LoadStringFromFile(PidFile, Pid) then
+      Exec(ExpandConstant('{sys}	askkill.exe'), '/F /T /PID ' + Trim(String(Pid)), '',
+           SW_HIDE, ewWaitUntilTerminated, Dummy);
+    ExtrasSkipped := ExtrasSkipped + #13#10 + '- ' + Name + ': ' + Later;
+    exit;
+  end;
+  if LoadStringFromFile(ExitFile, S) then
+    Code := StrToIntDef(Trim(String(S)), -1);
+  Result := True;
+end;
+
+// The FFmpeg box: winget's own package (Gyan.FFmpeg.Essentials).
+procedure GetFfmpeg;
+var
+  Code: Integer;
+begin
+  RunExtra('M4A and video support (FFmpeg)',
+    'Adding M4A and video support (FFmpeg)... this can take a minute.',
+    WingetPath(''), 'install --id Gyan.FFmpeg.Essentials --exact --silent ' +
+    '--disable-interactivity --accept-package-agreements --accept-source-agreements',
+    ExpandConstant('{tmp}'), 'Onion Board offers it when a file needs it', Code);
+end;
+
+// The live voice box: the add-on's own install.bat (needs Python).
+procedure GetLiveVoice;
+var
+  Code: Integer;
+begin
+  RunExtra('Live voice-to-speech',
+    'Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)...',
+    ExpandConstant('{cmd}'), '/c "' + ExpandConstant('{app}\modules\live-voice\install.bat') +
+    '" --quiet', ExpandConstant('{app}\modules\live-voice'), 'Voice tab > Install', Code);
+end;
+
 // The "tor" box: the app downloads Tor itself (OnionBoard.exe --get-tor, the same
 // routine as Settings' Get Tor button: checked against its pinned SHA-256, through the
 // saved proxy if there is one). Nothing to do when this Tor is already there.
@@ -954,11 +1152,11 @@ procedure GetTor;
 var
   Code: Integer;
 begin
-  WizardForm.StatusLabel.Caption :=
-    'Downloading Tor from the Tor Project (about 22 MB)... this can take a minute.';
-  if not Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--get-tor', '', SW_HIDE,
-              ewWaitUntilTerminated, Code) then
-    Code := -1;
+  if not RunExtra('Private connection (Tor)',
+           'Downloading Tor from the Tor Project (about 22 MB)... this can take a minute.',
+           ExpandConstant('{app}\{#AppExeName}.exe'), '--get-tor', ExpandConstant('{app}'),
+           'Settings > Connection > Get Tor', Code) then
+    exit;
   if Code <> 0 then
     SuppressibleMsgBox('Tor couldn''t be downloaded, so the private connection isn''t ' +
       'ready yet. Onion Board works fine without it.' + #13#10#13#10 +
@@ -1015,12 +1213,25 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
     CheckInternalNotInUse;
+  // first, right after Install is clicked: Windows' permission box comes up while the
+  // user is still looking, not minutes later at the end
+  if (CurStep = ssInstall) and MayDownload('vbcable') then
+    StartCable;
   if CurStep = ssPostInstall then
     QueueImports;
-  if (CurStep = ssPostInstall) and MayDownload('vbcable') then
-    InstallCable;
+  if CurStep = ssPostInstall then
+    FinishCable;
+  if (CurStep = ssPostInstall) and MayDownload('ffmpeg') then
+    GetFfmpeg;
+  if (CurStep = ssPostInstall) and MayDownload('livevoice') and HasPython then
+    GetLiveVoice;
   if (CurStep = ssPostInstall) and MayDownload('tor') then
     GetTor;
+  if (CurStep = ssPostInstall) and (ExtrasPage <> nil) then
+    ExtrasPage.Hide;
+  if (CurStep = ssPostInstall) and (ExtrasSkipped <> '') then
+    SuppressibleMsgBox('Stopped. Onion Board is installed; these weren''t added:' +
+      ExtrasSkipped, mbInformation, MB_OK, IDOK);
   if (CurStep = ssPostInstall) and MayDownload('livevoice') and not HasPython then
     SuppressibleMsgBox('Live voice-to-speech needs Python, which isn''t on this PC yet.' + #13#10#13#10 +
       'Get it free from python.org (tick "Add python.exe to PATH" while installing it). ' +
