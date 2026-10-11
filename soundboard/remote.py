@@ -143,7 +143,8 @@ ENDPOINTS = {
     "random": "a random sound from ?category=… (default: the one showing; "
               "category= blank: any sound)",
     "last": "play the last sound again",
-    "queue": "?name= / ?id= plays that sound once the ones playing now finish; "
+    "queue": "?name= / ?id= plays that sound once the ones playing now finish (answers "
+             "\"playing\" when nothing was, so it played at once, else \"queued\"); "
              "?category=Chill plays every sound in it one after another (&shuffle=1: "
              "in a random order); ?clear=1 empties the queue; alone: what's up next",
     "category": "show a category: ?name=Memes (name= blank: All) or ?step=next / prev",
@@ -804,8 +805,8 @@ def dispatch_queue(mw: MainWindow, params: dict) -> tuple[int, object]:
         return no_sound(mw.cfg, params)
     if m.id not in mw.audio:
         return 409, {"error": "that sound hasn't loaded (yet)"}
-    mw.queue_sound(m.id)
-    return 200, {"queued": m.id, "name": m.name, **queue_state(mw)}
+    now = mw.queue_sound(m.id)   # nothing playing: it plays at once, not after anything
+    return 200, {"playing" if now else "queued": m.id, "name": m.name, **queue_state(mw)}
 
 
 # --------------------------------------------------------------------------- the Voice tab
