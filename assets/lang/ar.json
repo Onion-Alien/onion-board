@@ -2057,7 +2057,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "إلى أي مدى يتأخر الصوت الذي تم تغييره عن صوتك الحقيقي: {effects} مللي ثانية من التأثيرات + {devices} مللي ثانية من أجهزة الصوت الخاصة بك. أقل من 100 مللي ثانية تقريبًا يبدو أمرًا طبيعيًا للتحدث؛ تأثيرات درجة الصوت هي الأكثر تكلفة، والباقي لا شيء تقريبًا.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "إلى أي مدى يقع الصوت المتغير خلف صوتك الحقيقي: {effects} مللي ثانية من التأثيرات. أقل من 100 مللي ثانية تقريبًا يبدو أمرًا طبيعيًا للتحدث؛ تأثيرات درجة الصوت هي الأكثر تكلفة، والباقي لا شيء تقريبًا.",
   "How high": "كيف عالية",
-  "How loud the spoken voice is": "ما مدى ارتفاع الصوت المنطوق",
   "How much of it: up to half": "وكم منه: إلى النصف",
   "I'd watch for you…": "كنت أراقبك...",
   "I'll watch anything…": "سأشاهد أي شيء...",

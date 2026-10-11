@@ -1837,7 +1837,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Khoảng cách so với giọng nói thật của bạn mà giọng nói đã thay đổi là: {effects} ms tính từ hiệu ứng + {devices} ms tính từ thiết bị âm thanh của bạn. Dưới khoảng 100 mili giây thì cảm thấy bình thường khi nói chuyện; hiệu ứng cao độ có giá cao nhất, còn lại hầu như không có gì.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Giọng nói thật của bạn bị thay đổi bao xa: {effects} mili giây so với hiệu ứng. Dưới khoảng 100 mili giây thì cảm thấy bình thường khi nói chuyện; hiệu ứng cao độ có giá cao nhất, còn lại hầu như không có gì.",
   "How high": "Cao bao nhiêu",
-  "How loud the spoken voice is": "Giọng nói lớn đến mức nào",
   "How much of it: up to half": "Bao nhiêu: lên đến một nửa",
   "I'd watch for you…": "Tôi sẽ trông chừng cho bạn…",
   "I'll watch anything…": "Tôi sẽ xem bất cứ thứ gì…",

@@ -23,7 +23,7 @@ from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import hint_label, section_label
+from soundboard.ui.panel import fold_button, hint_label, section_label
 from soundboard.ui.widgets import LoadingBar
 from soundboard.wheelguard import no_wheel
 
@@ -228,10 +228,7 @@ class AiVoicePanel(QWidget):
         mv.addLayout(setup_row)
         v.addWidget(self.missing)
 
-        self.btn_opts = QPushButton(_("More options"))
-        self.btn_opts.setObjectName("fold")
-        icons.set_icon(self.btn_opts, "fold", "muted", "text", size=12)
-        self.btn_opts.setCheckable(True)
+        self.btn_opts = fold_button(_("More options"))
         v.addWidget(self.btn_opts, 0, Qt.AlignLeft)
         self.opts = QWidget()
         ov = QVBoxLayout(self.opts)
@@ -269,10 +266,7 @@ class AiVoicePanel(QWidget):
         ov.addWidget(self.lbl_credits)
         v.addWidget(self.opts)
         self.opts.hide()
-        self.btn_opts.toggled.connect(lambda on: (
-            self.opts.setVisible(on),
-            icons.set_icon(self.btn_opts, "fold_open" if on else "fold", "muted", "text",
-                           size=12)))
+        self.btn_opts.toggled.connect(self.opts.setVisible)
         no_wheel(self.cb_voice, self.sl_pitch, self.cb_backup)
 
         self.cb_voice.currentIndexChanged.connect(self._voice_picked)

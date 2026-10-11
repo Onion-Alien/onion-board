@@ -551,7 +551,7 @@ def test_voice_settings_never_wait_on_a_line_being_spoken(panel, monkeypatch):
         saved = []
         s.changed.connect(saved.append)
         worst = 0.0
-        edits = [lambda v=v: s.sl_gain.slider.setValue(v) for v in range(0, 201, 4)]
+        edits = [lambda v=v: s.sl_rate.setValue(v) for v in range(-10, 11)]
         edits += [lambda: s.sl_rate.setValue(3), lambda: s.chk_mute.toggle(),
                   lambda: s.cb_voice.setCurrentIndex(s.cb_voice.count() - 1),
                   lambda: s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh")),
@@ -562,7 +562,6 @@ def test_voice_settings_never_wait_on_a_line_being_spoken(panel, monkeypatch):
             worst = max(worst, time.monotonic() - t)
         assert worst < 0.5, f"a settings edit waited {worst:.1f}s on the speech engine"
         assert not gate.is_set() and ctl.tts._lock.locked()   # still mid-line throughout
-        assert ctl.gain == pytest.approx(2.0) and saved[-1]["gain"] == pytest.approx(2.0)
         assert ctl.speaker.rate == 3
     finally:
         gate.set()
@@ -1287,3 +1286,50 @@ def test_first_visit_exposes_voice_presets(panel):
     p, _ = panel
     assert p._heads["fx"].is_open() and not p.fx.isHidden()
     assert not p._heads["ai"].is_open()
+
+
+def test_config_entries_sit_with_their_cards_main_controls(panel):
+    """U3: Make it yours (the big editor) is beside the on/off switch, not under 24
+    voices; Speak another language's More options comes before the past-lines box;
+    both More options use the one fold look and show/hide their fields."""
+    p, _eng = panel
+    fx = p.fx
+    assert fx.btn_tweak.parentWidget() is fx.btn_power.parentWidget()
+    sp = p.speech
+    lay = sp.layout()
+    at = {lay.itemAt(i).widget(): i for i in range(lay.count()) if lay.itemAt(i).widget()}
+    assert at[sp.btn_opts] < at[sp.opts] < at[sp.said_log]
+    for b, body in ((sp.btn_opts, sp.opts), (p.ai.btn_opts, p.ai.opts)):
+        assert b.objectName() == "fold" and b.isCheckable()
+        b.setChecked(True)
+        assert not body.isHidden()
+        b.setChecked(False)
+        assert body.isHidden()
+
+
+def test_make_it_yours_reopens_the_same_window(panel):
+    p, _eng = panel
+    fx = p.fx
+    fx.open_tweak()
+    first = fx.dlg
+    fx.open_tweak()                       # a second click raises it, no new window
+    assert fx.dlg is first and first.isVisible()
+    first.close()
+
+
+def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
+    """A typed line plays like a sound: the bottom bar's volumes set its loudness, so
+    the Say bar has no slider and an old saved gain no longer turns it down (it stays
+    in the settings for older versions)."""
+    from soundboard.ui.panel import VolumeControl
+    from soundboard.ui.voicepanel import VoicePanel
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
+                   {"voice": "Microsoft Zira Desktop", "gain": 0.4})
+    try:
+        assert not p.speech.say_bar.findChildren(VolumeControl)
+        assert p.speech.ctl.gain == 1.0
+        assert p.speech.s["gain"] == pytest.approx(0.4)
+    finally:
+        p.shutdown()
+        p.deleteLater()

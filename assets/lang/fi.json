@@ -1877,7 +1877,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Kuinka kaukana oikeasta äänestäsi muutettu on: {effects} ms tehosteista + {devices} ms äänilaitteistasi. Alle noin 100 ms tuntuu normaalilta puhua; pitch-efektit maksavat eniten, loput eivät juuri mitään.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Kuinka kaukana oikeasta äänestäsi muutettu on: {effects} ms tehosteista. Alle noin 100 ms tuntuu normaalilta puhua; pitch-efektit maksavat eniten, loput eivät juuri mitään.",
   "How high": "Kuinka korkealle",
-  "How loud the spoken voice is": "Kuinka kovaa puhuttu ääni on",
   "How much of it: up to half": "Kuinka paljon siitä: jopa puolet",
   "I'd watch for you…": "katsoisin sinua…",
   "I'll watch anything…": "katson mitä tahansa…",

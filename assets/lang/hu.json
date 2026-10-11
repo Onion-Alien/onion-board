@@ -1877,7 +1877,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Mennyivel van lemaradva a valódi hangodtól a megváltozott: {effects} ms az effektektől + {devices} ms a hangeszközeidtől. Körülbelül 100 ms alatt normálisnak tűnik a beszélgetés; pitch effektusok kerülnek a legtöbbbe, a többi szinte semmibe.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Mennyire van lemaradva a valódi hangodtól a megváltozott: {effects} ms az effektusoktól. Körülbelül 100 ms alatt normálisnak tűnik a beszélgetés; pitch effektusok kerülnek a legtöbbbe, a többi szinte semmibe.",
   "How high": "Milyen magas",
-  "How loud the spoken voice is": "Milyen hangos a kimondott hang",
   "How much of it: up to half": "Mennyi belőle: akár a fele",
   "I'd watch for you…": "vigyáznék rád…",
   "I'll watch anything…": "bármit megnézek…",
