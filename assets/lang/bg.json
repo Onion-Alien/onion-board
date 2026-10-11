@@ -3119,5 +3119,6 @@
   "Off air": "Извън ефир",
   "On air": "В ефир",
   "Not configured": "Не е настроено",
-  "Not configured: click to fix": "Не е настроено: кликни за поправка"
+  "Not configured: click to fix": "Не е настроено: кликни за поправка",
+  "Can't send to {device}, click to fix": "Не може да се изпраща към {device}, кликни за поправка"
 }

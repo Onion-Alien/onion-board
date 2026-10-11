@@ -3046,5 +3046,6 @@
   "Off air": "オフエア",
   "On air": "オンエア",
   "Not configured": "未設定",
-  "Not configured: click to fix": "未設定：クリックして修正"
+  "Not configured: click to fix": "未設定：クリックして修正",
+  "Can't send to {device}, click to fix": "{device} に送れません。クリックして修正"
 }

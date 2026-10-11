@@ -3119,5 +3119,6 @@
   "Off air": "Off air",
   "On air": "On air",
   "Not configured": "Niet ingesteld",
-  "Not configured: click to fix": "Niet ingesteld: klik om te herstellen"
+  "Not configured: click to fix": "Niet ingesteld: klik om te herstellen",
+  "Can't send to {device}, click to fix": "Kan niet naar {device} sturen, klik om te herstellen"
 }

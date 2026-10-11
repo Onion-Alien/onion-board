@@ -3192,5 +3192,6 @@
   "Off air": "Mimo vysílání",
   "On air": "Ve vysílání",
   "Not configured": "Nenastaveno",
-  "Not configured: click to fix": "Nenastaveno: klikni pro opravu"
+  "Not configured: click to fix": "Nenastaveno: klikni pro opravu",
+  "Can't send to {device}, click to fix": "Nejde posílat do {device}, klikni pro opravu"
 }

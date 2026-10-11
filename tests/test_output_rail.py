@@ -87,6 +87,7 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     window.show()
     window.rail.set_open(True)
     window.cfg.route = "device"
+    window.cfg.main_device = None   # nothing picked to send to
     monkeypatch.setattr(window, "_main_name", lambda: None)
     window._update_flow()
     qapp.processEvents()
@@ -114,6 +115,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     window.show()
     window.rail.set_open(True)
     window.cfg.route = "device"
+    window.cfg.main_device = None   # nothing picked to send to
     monkeypatch.setattr(window, "_main_name", lambda: None)
     window._update_flow()
     qapp.processEvents()
@@ -192,3 +194,23 @@ def test_output_block_stays_inside_rail_at_normal_and_narrow_sizes(window, qapp,
                 assert pos.x() >= 0 and pos.y() >= 0
                 assert pos.x() + widget.width() <= output.width()
                 assert pos.y() + widget.height() <= output.height()
+
+
+def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa: F811
+    """A cable (or device) is picked but won't open: "Not working", never the
+    "Not configured" of nothing picked."""
+    window.resize(1180, 720)
+    window.show()
+    window.rail.set_open(True)
+    window.cfg.route = "cable"
+    window.cfg.main_device = "CABLE Input (fake)"
+    stream = window.engine.main_stream
+    try:
+        window.engine.main_stream = None
+        window._update_flow()
+        qapp.processEvents()
+        output = window.rail.output
+        assert output.status_text.text() == "Not working" and output.arrow.isVisible()
+        assert "CABLE Input (fake)" in output.status_text.toolTip()
+    finally:
+        window.engine.main_stream = stream

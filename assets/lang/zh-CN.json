@@ -3046,5 +3046,6 @@
   "Off air": "已关播",
   "On air": "直播中",
   "Not configured": "未设置",
-  "Not configured: click to fix": "未设置：点击修复"
+  "Not configured: click to fix": "未设置：点击修复",
+  "Can't send to {device}, click to fix": "无法发送到 {device}，点击修复"
 }

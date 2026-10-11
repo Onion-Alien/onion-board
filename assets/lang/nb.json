@@ -3119,5 +3119,6 @@
   "Off air": "Av lufta",
   "On air": "På lufta",
   "Not configured": "Ikke satt opp",
-  "Not configured: click to fix": "Ikke satt opp: klikk for å fikse"
+  "Not configured: click to fix": "Ikke satt opp: klikk for å fikse",
+  "Can't send to {device}, click to fix": "Kan ikke sende til {device}, klikk for å fikse"
 }

@@ -3192,5 +3192,6 @@
   "Off air": "Poza anteną",
   "On air": "Na antenie",
   "Not configured": "Nieskonfigurowane",
-  "Not configured: click to fix": "Nieskonfigurowane: kliknij, aby naprawić"
+  "Not configured: click to fix": "Nieskonfigurowane: kliknij, aby naprawić",
+  "Can't send to {device}, click to fix": "Nie można wysyłać do {device}, kliknij, aby naprawić"
 }

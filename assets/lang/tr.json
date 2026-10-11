@@ -3119,5 +3119,6 @@
   "Off air": "Yayında değil",
   "On air": "Yayında",
   "Not configured": "Ayarlanmadı",
-  "Not configured: click to fix": "Ayarlanmadı: düzeltmek için tıkla"
+  "Not configured: click to fix": "Ayarlanmadı: düzeltmek için tıkla",
+  "Can't send to {device}, click to fix": "{device} cihazına gönderilemiyor, düzeltmek için tıkla"
 }

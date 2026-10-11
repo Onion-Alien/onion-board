@@ -3119,5 +3119,6 @@
   "Off air": "Adáson kívül",
   "On air": "Adásban",
   "Not configured": "Nincs beállítva",
-  "Not configured: click to fix": "Nincs beállítva: kattints a javításhoz"
+  "Not configured: click to fix": "Nincs beállítva: kattints a javításhoz",
+  "Can't send to {device}, click to fix": "Nem lehet küldeni ide: {device}, kattints a javításhoz"
 }

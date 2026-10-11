@@ -3119,5 +3119,6 @@
   "Off air": "Ej i sändning",
   "On air": "I sändning",
   "Not configured": "Inte inställt",
-  "Not configured: click to fix": "Inte inställt: klicka för att fixa"
+  "Not configured: click to fix": "Inte inställt: klicka för att fixa",
+  "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa"
 }

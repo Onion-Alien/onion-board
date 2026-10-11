@@ -3050,6 +3050,10 @@ class MainWindow(QMainWindow):
         self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
+        # a device is picked to send to (not the headphones): failing is "Not working",
+        # never "Not configured"
+        picked = (self.cfg.main_device if route in ("cable", "device")
+                  and self.cfg.main_device != self.cfg.mon_device else None)
         pills = []   # (short, whole): the open rail shows the short one
         for short in (True, False):
             if state == "off":
@@ -3073,6 +3077,9 @@ class MainWindow(QMainWindow):
             elif state == "missing":
                 pill = (_("Setup needed") if short
                         else _("One-time setup needed, others can't hear you yet"))
+            elif picked:   # set up, but it won't open (or the cable's mic end is gone)
+                pill = (_("Not working") if short
+                        else _("Can't send to {device}, click to fix", device=picked))
             elif route == "device":
                 pill = (_("Not configured") if short
                         else _("Not sending: pick a device on the Setup tab"))

@@ -3192,5 +3192,6 @@
   "Off air": "În afara emisiei",
   "On air": "În emisie",
   "Not configured": "Neconfigurat",
-  "Not configured: click to fix": "Neconfigurat: dă clic pentru a repara"
+  "Not configured: click to fix": "Neconfigurat: dă clic pentru a repara",
+  "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara"
 }

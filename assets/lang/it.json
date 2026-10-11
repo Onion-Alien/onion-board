@@ -3119,5 +3119,6 @@
   "Off air": "Fuori onda",
   "On air": "In onda",
   "Not configured": "Non configurato",
-  "Not configured: click to fix": "Non configurato: clicca per sistemare"
+  "Not configured: click to fix": "Non configurato: clicca per sistemare",
+  "Can't send to {device}, click to fix": "Impossibile inviare a {device}, clicca per sistemare"
 }

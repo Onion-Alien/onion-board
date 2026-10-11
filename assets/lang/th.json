@@ -3046,5 +3046,6 @@
   "Off air": "ไม่ออกอากาศ",
   "On air": "ออกอากาศ",
   "Not configured": "ยังไม่ได้ตั้งค่า",
-  "Not configured: click to fix": "ยังไม่ได้ตั้งค่า: คลิกเพื่อแก้"
+  "Not configured: click to fix": "ยังไม่ได้ตั้งค่า: คลิกเพื่อแก้",
+  "Can't send to {device}, click to fix": "ส่งไปที่ {device} ไม่ได้ คลิกเพื่อแก้"
 }
