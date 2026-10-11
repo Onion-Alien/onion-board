@@ -3246,5 +3246,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows залишає <b>{key}</b> собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>",
   "Opacity": "Непрозорість",
   "Playing sound background": "Тло поточного звуку",
-  "Show the playing sound's thumbnail behind the cards": "Показувати мініатюру поточного звуку за картками"
+  "Show the playing sound's thumbnail behind the cards": "Показувати мініатюру поточного звуку за картками",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Віртуальний кабель видалено. Перезавантаж комп'ютер, перш ніж встановлювати його знову."
 }

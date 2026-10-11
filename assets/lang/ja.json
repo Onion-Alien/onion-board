@@ -3100,5 +3100,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> は Windows 専用のため、ホットキーにできません。別のキーを選んでください。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "再生中のサウンドの背景",
-  "Show the playing sound's thumbnail behind the cards": "再生中のサウンドのサムネイルをカードの背後に表示"
+  "Show the playing sound's thumbnail behind the cards": "再生中のサウンドのサムネイルをカードの背後に表示",
+  "The virtual cable was removed. Restart your PC before you install it again.": "仮想ケーブルを削除しました。もう一度インストールする前にPCを再起動してください。"
 }

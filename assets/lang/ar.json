@@ -3465,5 +3465,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>يحتفظ Windows بـ <b>{key}</b> لنفسه، فلا يمكن أن يكون اختصارًا. اختر مفتاحًا آخر.</span>",
   "Opacity": "التعتيم",
   "Playing sound background": "خلفية الصوت الجاري",
-  "Show the playing sound's thumbnail behind the cards": "إظهار الصورة المصغرة للصوت الجاري خلف البطاقات"
+  "Show the playing sound's thumbnail behind the cards": "إظهار الصورة المصغرة للصوت الجاري خلف البطاقات",
+  "The virtual cable was removed. Restart your PC before you install it again.": "تمت إزالة الكابل الافتراضي. أعد تشغيل الكمبيوتر قبل تثبيته مرة أخرى."
 }

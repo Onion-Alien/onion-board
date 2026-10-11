@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows holder <b>{key}</b> for sig selv, så den kan ikke være en genvejstast. Vælg en anden tast.</span>",
   "Opacity": "Opacitet",
   "Playing sound background": "Baggrund for afspillet lyd",
-  "Show the playing sound's thumbnail behind the cards": "Vis den afspillede lyds miniature bag kortene"
+  "Show the playing sound's thumbnail behind the cards": "Vis den afspillede lyds miniature bag kortene",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Det virtuelle kabel er fjernet. Genstart din pc, før du installerer det igen."
 }

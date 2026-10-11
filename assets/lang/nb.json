@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows holder av <b>{key}</b> for seg selv, så den kan ikke være en hurtigtast. Velg en annen tast.</span>",
   "Opacity": "Ugjennomsiktighet",
   "Playing sound background": "Bakgrunn for lyden som spilles",
-  "Show the playing sound's thumbnail behind the cards": "Vis miniatyrbildet av lyden som spilles bak kortene"
+  "Show the playing sound's thumbnail behind the cards": "Vis miniatyrbildet av lyden som spilles bak kortene",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Den virtuelle kabelen er fjernet. Start PC-en på nytt før du installerer den igjen."
 }

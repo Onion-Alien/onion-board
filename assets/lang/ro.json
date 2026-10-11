@@ -3246,5 +3246,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows păstrează <b>{key}</b> pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>",
   "Opacity": "Opacitate",
   "Playing sound background": "Fundalul sunetului redat",
-  "Show the playing sound's thumbnail behind the cards": "Arată miniatura sunetului redat în spatele cardurilor"
+  "Show the playing sound's thumbnail behind the cards": "Arată miniatura sunetului redat în spatele cardurilor",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Cablul virtual a fost eliminat. Repornește PC-ul înainte să-l instalezi din nou."
 }

@@ -3100,5 +3100,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的键，不能用作热键。请换一个键。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的声音背景",
-  "Show the playing sound's thumbnail behind the cards": "在卡片后方显示正在播放的声音缩略图"
+  "Show the playing sound's thumbnail behind the cards": "在卡片后方显示正在播放的声音缩略图",
+  "The virtual cable was removed. Restart your PC before you install it again.": "虚拟线缆已移除。重新安装前请先重启电脑。"
 }

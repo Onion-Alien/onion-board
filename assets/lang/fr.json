@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows garde <b>{key}</b> pour lui, ce ne peut donc pas être un raccourci. Choisis une autre touche.</span>",
   "Opacity": "Opacité",
   "Playing sound background": "Arrière-plan du son en cours",
-  "Show the playing sound's thumbnail behind the cards": "Afficher la miniature du son en cours derrière les cartes"
+  "Show the playing sound's thumbnail behind the cards": "Afficher la miniature du son en cours derrière les cartes",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Le câble virtuel a été supprimé. Redémarre ton PC avant de le réinstaller."
 }

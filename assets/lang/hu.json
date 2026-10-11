@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>A Windows magának tartja a(z) <b>{key}</b> billentyűt, így nem lehet gyorsbillentyű. Válassz másik billentyűt.</span>",
   "Opacity": "Átlátszatlanság",
   "Playing sound background": "Lejátszott hang háttere",
-  "Show the playing sound's thumbnail behind the cards": "A lejátszott hang bélyegképének megjelenítése a kártyák mögött"
+  "Show the playing sound's thumbnail behind the cards": "A lejátszott hang bélyegképének megjelenítése a kártyák mögött",
+  "The virtual cable was removed. Restart your PC before you install it again.": "A virtuális kábel el lett távolítva. Indítsd újra a géped, mielőtt újra telepítenéd."
 }

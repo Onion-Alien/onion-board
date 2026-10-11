@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows håller <b>{key}</b> för sig själv, så den kan inte vara ett kortkommando. Välj en annan tangent.</span>",
   "Opacity": "Opacitet",
   "Playing sound background": "Bakgrund för ljudet som spelas",
-  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten"
+  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Den virtuella kabeln har tagits bort. Starta om datorn innan du installerar den igen."
 }

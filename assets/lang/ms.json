@@ -3100,5 +3100,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows menyimpan <b>{key}</b> untuk dirinya sendiri, jadi ia tidak boleh jadi hotkey. Pilih kekunci lain.</span>",
   "Opacity": "Kelegapan",
   "Playing sound background": "Latar bunyi yang dimainkan",
-  "Show the playing sound's thumbnail behind the cards": "Tunjukkan imej kecil bunyi yang dimainkan di belakang kad"
+  "Show the playing sound's thumbnail behind the cards": "Tunjukkan imej kecil bunyi yang dimainkan di belakang kad",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Kabel maya telah dibuang. Mulakan semula PC anda sebelum memasangnya semula."
 }

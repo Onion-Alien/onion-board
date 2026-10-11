@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> को अपने लिए रखता है, इसलिए यह हॉटकी नहीं बन सकती। कोई और की चुनें।</span>",
   "Opacity": "अपारदर्शिता",
   "Playing sound background": "चल रहे साउंड की पृष्ठभूमि",
-  "Show the playing sound's thumbnail behind the cards": "कार्ड के पीछे चल रहे साउंड का थंबनेल दिखाएँ"
+  "Show the playing sound's thumbnail behind the cards": "कार्ड के पीछे चल रहे साउंड का थंबनेल दिखाएँ",
+  "The virtual cable was removed. Restart your PC before you install it again.": "वर्चुअल केबल हटा दी गई है। इसे फिर से इंस्टॉल करने से पहले अपना PC रीस्टार्ट करें।"
 }

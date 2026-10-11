@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows houdt <b>{key}</b> voor zichzelf, dus het kan geen sneltoets zijn. Kies een andere toets.</span>",
   "Opacity": "Dekking",
   "Playing sound background": "Achtergrond van het spelende geluid",
-  "Show the playing sound's thumbnail behind the cards": "Toon de miniatuur van het spelende geluid achter de kaarten"
+  "Show the playing sound's thumbnail behind the cards": "Toon de miniatuur van het spelende geluid achter de kaarten",
+  "The virtual cable was removed. Restart your PC before you install it again.": "De virtuele kabel is verwijderd. Start je pc opnieuw op voordat je hem weer installeert."
 }

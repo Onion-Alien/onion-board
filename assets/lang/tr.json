@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>",
   "Opacity": "Opaklık",
   "Playing sound background": "Çalan sesin arka planı",
-  "Show the playing sound's thumbnail behind the cards": "Çalan sesin küçük resmini kartların arkasında göster"
+  "Show the playing sound's thumbnail behind the cards": "Çalan sesin küçük resmini kartların arkasında göster",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Sanal kablo kaldırıldı. Yeniden kurmadan önce bilgisayarını yeniden başlat."
 }

@@ -3100,5 +3100,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows menyimpan <b>{key}</b> untuk dirinya sendiri, jadi tidak bisa jadi hotkey. Pilih tombol lain.</span>",
   "Opacity": "Opasitas",
   "Playing sound background": "Latar suara yang diputar",
-  "Show the playing sound's thumbnail behind the cards": "Tampilkan thumbnail suara yang diputar di belakang kartu"
+  "Show the playing sound's thumbnail behind the cards": "Tampilkan thumbnail suara yang diputar di belakang kartu",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Kabel virtual sudah dihapus. Mulai ulang PC kamu sebelum memasangnya lagi."
 }

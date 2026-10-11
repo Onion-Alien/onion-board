@@ -3100,5 +3100,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows giữ <b>{key}</b> cho riêng nó, nên không thể làm phím tắt. Hãy chọn phím khác.</span>",
   "Opacity": "Độ mờ",
   "Playing sound background": "Nền âm thanh đang phát",
-  "Show the playing sound's thumbnail behind the cards": "Hiện hình thu nhỏ của âm thanh đang phát phía sau các thẻ"
+  "Show the playing sound's thumbnail behind the cards": "Hiện hình thu nhỏ của âm thanh đang phát phía sau các thẻ",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Đã gỡ cáp ảo. Hãy khởi động lại PC trước khi cài lại."
 }

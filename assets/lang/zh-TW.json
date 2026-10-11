@@ -3100,5 +3100,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的鍵，不能當作快速鍵。請換一個鍵。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的音效背景",
-  "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖"
+  "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖",
+  "The virtual cable was removed. Restart your PC before you install it again.": "虛擬線材已移除。重新安裝前請先重新啟動電腦。"
 }

@@ -3246,5 +3246,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows zostawia <b>{key}</b> dla siebie, więc nie może to być skrót. Wybierz inny klawisz.</span>",
   "Opacity": "Krycie",
   "Playing sound background": "Tło odtwarzanego dźwięku",
-  "Show the playing sound's thumbnail behind the cards": "Pokaż miniaturę odtwarzanego dźwięku za kartami"
+  "Show the playing sound's thumbnail behind the cards": "Pokaż miniaturę odtwarzanego dźwięku za kartami",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Wirtualny kabel został usunięty. Uruchom ponownie komputer, zanim zainstalujesz go znowu."
 }

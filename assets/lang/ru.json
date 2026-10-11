@@ -3246,5 +3246,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows оставляет <b>{key}</b> себе, поэтому это не может быть горячей клавишей. Выбери другую клавишу.</span>",
   "Opacity": "Непрозрачность",
   "Playing sound background": "Фон текущего звука",
-  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками"
+  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Виртуальный кабель удалён. Перезагрузи компьютер, прежде чем устанавливать его снова."
 }

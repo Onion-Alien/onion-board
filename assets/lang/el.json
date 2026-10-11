@@ -3173,5 +3173,6 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Τα Windows κρατούν το <b>{key}</b> για τον εαυτό τους, οπότε δεν μπορεί να γίνει πλήκτρο συντόμευσης. Διάλεξε άλλο πλήκτρο.</span>",
   "Opacity": "Αδιαφάνεια",
   "Playing sound background": "Φόντο ήχου που παίζει",
-  "Show the playing sound's thumbnail behind the cards": "Εμφάνιση της μικρογραφίας του ήχου που παίζει πίσω από τις κάρτες"
+  "Show the playing sound's thumbnail behind the cards": "Εμφάνιση της μικρογραφίας του ήχου που παίζει πίσω από τις κάρτες",
+  "The virtual cable was removed. Restart your PC before you install it again.": "Το εικονικό καλώδιο αφαιρέθηκε. Κάνε επανεκκίνηση του υπολογιστή πριν το εγκαταστήσεις ξανά."
 }
