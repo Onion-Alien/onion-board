@@ -11,7 +11,7 @@ from __future__ import annotations
 import html
 
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QSizePolicy, QSpacerItem, QTabWidget, QToolButton,
                                QVBoxLayout, QWidget)
@@ -23,6 +23,9 @@ from soundboard.ui import icons
 ICON = 20          # a tab's icon on the rail
 SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4...
 OPEN_W = 190       # room for the brand and expanded listening status
+FULL_W = (SHUT_W + OPEN_W) // 2   # dragged at least halfway, open (let go there, it
+                   # snaps open): the mid layout until everything fits (_full_fit), then
+                   # the full one. Short of halfway, the shut one, its icon column centred
 LOGO = 24          # the onion: with its 5 px glow room, a tab button's width (BUTTON_W)
 BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column
 COMPACT_H = 28     # only genuinely short windows use smaller targets
@@ -400,6 +403,11 @@ class _Arrow(QPushButton):
     """The open / shut arrow; with property "dot" a small warning dot on its corner
     (an alert is waiting on the shut rail)."""
 
+    def dot_rect(self) -> QRectF:
+        """Beside the arrow's icon, wherever the button's edge is."""
+        x = self.width() / 2 - (12 if self.isRightToLeft() else -4)
+        return QRectF(x, (self.height() - ICON) / 2 - 4, 8, 8)
+
     def paintEvent(self, e):
         super().paintEvent(e)
         if self.property("dot"):
@@ -407,7 +415,7 @@ class _Arrow(QPushButton):
             p.setRenderHint(QPainter.Antialiasing)
             p.setPen(Qt.NoPen)
             p.setBrush(QColor(theme.T["warn_text"]))
-            p.drawEllipse(QRectF(self.width() - 12, 4, 8, 8))
+            p.drawEllipse(self.dot_rect())
             p.end()
 
 
@@ -495,6 +503,7 @@ class SideRail(QFrame):
             w.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             words.addWidget(w)
         byline.setWordWrap(True)
+        brand.setWordWrap(True)   # (too narrow for one line: two, without the version)
         head.addLayout(words, 1)
         lay.addLayout(head)
         self._gaps = [self._gap(10)]   # (smaller in a short window: compact)
@@ -506,6 +515,7 @@ class SideRail(QFrame):
             self.buttons.append(b)
         self.set_order(order)
         self.extras = [*extras, *foot]
+        self.foot = list(foot)   # (beside the arrow on the open rail)
         for w in self.extras:   # the keyboard's ring, not one left by a click
             w.setFocusPolicy(Qt.TabFocus)
         self._gaps.append(self._gap(10))   # More tabs isn't a tab
@@ -563,9 +573,14 @@ class SideRail(QFrame):
         self.toggle.setFixedWidth(SHUT_W - 2 * SIDE_SHUT - 1)   # a tab button's, open too
         self._foot_box = QBoxLayout(QBoxLayout.TopToBottom)
         self._foot_box.setSpacing(4)
+        # (mid: these take the spare room, so Settings and the arrow sit centred)
+        self._foot_pads = [QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+                           for _ in range(2)]
+        self._foot_box.addSpacerItem(self._foot_pads[0])
         for w in foot:
             self._foot_box.addWidget(w, 1)
         self._foot_box.addWidget(self.toggle, 0)   # (mirrored: the right)
+        self._foot_box.addSpacerItem(self._foot_pads[1])
         lay.addLayout(self._foot_box)
         tabs.changed.connect(self.sync)
         tabs.currentChanged.connect(self.sync)
@@ -599,7 +614,7 @@ class SideRail(QFrame):
         waiting = [w for w in self.alerts if not w.isHidden()]
         self.div_alerts.setVisible(bool(waiting))
         # shut, the alerts are out of sight: a dot on the arrow, their names on hover
-        dot = bool(waiting) and not self.is_open()
+        dot = bool(waiting) and (not self.is_open() or self._mid())
         if self.toggle.property("dot") != dot:
             self.toggle.setProperty("dot", dot)
             self.toggle.update()
@@ -712,11 +727,11 @@ class SideRail(QFrame):
             b.update()
         self.update()   # the live bars
 
-    @staticmethod
-    def _fit(w: QWidget, text: str) -> str:
+    def _fit(self, w: QWidget, text: str) -> str:
         """`text` cut with "…" to what fits beside the icon on the open rail (a long
-        translation pushed past the rail's edge)."""
-        return ICON_PAD + w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
+        translation pushed past the rail's edge; dragged narrower, less fits)."""
+        room = TEXT_W - (OPEN_W - self._target_width())
+        return ICON_PAD + w.fontMetrics().elidedText(text, Qt.ElideRight, max(0, room))
 
     def _label(self, w: QPushButton, name: str, tip: str, shown: bool):
         """A button under the tabs: its name while open and help for screen readers."""
@@ -732,7 +747,7 @@ class SideRail(QFrame):
         text = w.property("railtext") or full
         if w.objectName() == "modebtn":
             text = _("Listening: {mode}", mode=text)
-        w.setText(self._fit(w, text) if self.is_open() else "")
+        w.setText(self._fit(w, text) if self.is_open() and not self._small(w) else "")
         w.setAccessibleName(full)
         if "<br>" in tip:   # rich text (Who's listening's tip)
             w.setToolTip(f"{html.escape(full)}<br>{tip}")
@@ -743,31 +758,107 @@ class SideRail(QFrame):
 
     # ---- open / shut
     def is_open(self) -> bool:
-        opened = self._drag_width == OPEN_W if self._drag_width is not None else self._open
+        opened = self._drag_width >= FULL_W if self._drag_width is not None else self._open
         return opened and not self._squeezed
+
+    def _target_width(self) -> int:
+        """The rail's width as set (width() lags until the layout runs)."""
+        if self._drag_width is not None:
+            return self._drag_width
+        return OPEN_W if self.is_open() else SHUT_W
+
+    def _inner_width(self) -> int:
+        """A control's width under the tabs: the open rail's, or one button's."""
+        return self._target_width() - 2 * SIDE_OPEN - 1 if self.is_open() else BUTTON_W
+
+    def _brand_width(self) -> int:
+        font = QFont(self.brand.font())
+        font.setPointSizeF(12)   # the wordmark's size (theme.py)
+        return QFontMetrics(font).horizontalAdvance(self.brand.text())
+
+    def _brand_fits(self) -> bool:
+        """The name on one line beside the onion, so the version fits under it (else
+        the name takes both lines: the header is the same height either way)."""
+        return self._target_width() - 2 * SIDE_OPEN - 1 - BUTTON_W - 6 >= self._brand_width()
+
+    def _full_fit(self) -> int:
+        """The narrowest open rail where the full layout fits, every word on its line:
+        the name, "Sound output" beside its switch, Settings beside the arrow (a longer
+        translation needs more room)."""
+        side = 2 * SIDE_OPEN + 1
+        need = [side + BUTTON_W + 6 + self._brand_width()]
+        if self.output:
+            title = self.output.title.fontMetrics().horizontalAdvance(_("Sound output"))
+            need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
+        for w in self.foot:
+            name = ICON_PAD + (w.property("railtext") or "")
+            need.append(side + ICON + 24 + w.fontMetrics().horizontalAdvance(name)
+                        + 4 + BUTTON_W)
+        return max(FULL_W, min(OPEN_W, max(need)))
+
+    def _small(self, w: QWidget) -> bool:
+        """The output's help button keeps its shut size on the mid layout (the small
+        output card's, until the full card fits)."""
+        return bool(self.output) and w is self.output.connection and self._mid()
+
+    def _mid(self) -> bool:
+        """Open but short of _full_fit: the output card its small shut one, Settings
+        just its icon, everything under the tabs centred."""
+        return self.is_open() and self._target_width() < self._full_fit()
 
     def drag_width(self, width: int):
         before = self.is_open()
         self._drag_width = max(SHUT_W, min(OPEN_W, width))
-        if self.is_open() != before:
-            self._apply()
-        else:
+        if before or self.is_open():
+            self._apply()   # open: everything fits the new width
+        else:   # shut: the column re-centres
             self.setFixedWidth(self._drag_width)
             self._size_lower_controls()
 
+    def _place_column(self):
+        """Shut, everything is one button wide, centred in the rail at any width
+        (dragging it wider moves the whole column together); open, the side margins."""
+        edge = 4 if self._compact else 10
+        if self.is_open():
+            left = right = SIDE_OPEN
+        else:
+            room = self._target_width() - 1 - BUTTON_W   # (its 1 px edge)
+            left = room // 2
+            right = room - left
+        self._lay.setContentsMargins(left, edge, right, edge)
+
     def _size_lower_controls(self):
-        """Icon-only controls follow the same widening column as the tabs."""
-        width = OPEN_W - 2 * SIDE_OPEN - 1 if self.is_open() else self.width() - 2 * SIDE_SHUT - 1
+        width = self._inner_width()
+        # mid: everything under the tabs centred, as on the shut rail (the small output
+        # card, Stop all as wide as its name, Settings' icon and the arrow side by side)
+        # until the full layout fits
+        mid = self._mid()
+        middle = Qt.AlignHCenter if mid else Qt.AlignLeading
         for widget in self.status:
-            widget.setFixedWidth(width)
+            if self._small(widget):
+                widget.setFixedWidth(BUTTON_W)
+            else:
+                widget.setFixedWidth(min(width, widget.sizeHint().width()) if mid else width)
+            self._status_box.setAlignment(widget, middle)
         if self.output:
-            self.output.setFixedWidth(width)
-        self.toggle.setFixedWidth(BUTTON_W if self.is_open() else width)
+            self.output.setFixedWidth(BUTTON_W if mid else width)
+            self._status_box.setAlignment(self.output, middle)
+        # (split by hand, rounded as the centred toggle above: Qt's stretch gave the
+        # odd pixel to the other side, so the pair wobbled 1 px against it while dragged)
+        spare = max(0, width - 2 * BUTTON_W - self._foot_box.spacing()) if mid else 0
+        for pad, room in zip(self._foot_pads, (spare // 2, spare - spare // 2)):
+            pad.changeSize(room, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self._foot_box.invalidate()
+        for widget in self.foot:
+            widget.setMinimumWidth(BUTTON_W if mid else 0)
+            widget.setMaximumWidth(BUTTON_W if mid else 16777215)
+        self.toggle.setFixedWidth(BUTTON_W)
+        self._place_column()
 
     def finish_resize(self):
         if self._drag_width is None:
             return
-        opened = self._drag_width >= (SHUT_W + OPEN_W) / 2
+        opened = self._drag_width >= FULL_W
         self._drag_width = None
         if opened != self._open:
             self.set_open(opened)
@@ -820,14 +911,18 @@ class SideRail(QFrame):
             self.style().polish(self)
         self.setFixedWidth(self._drag_width if self._drag_width is not None
                            else OPEN_W if shown else SHUT_W)
-        side = SIDE_OPEN if shown else SIDE_SHUT
-        edge = 4 if self._compact else 10
-        self._lay.setContentsMargins(side, edge, side, edge)
+        self._place_column()
         for gap, h in self._gaps:
             gap.changeSize(0, 2 if self._compact else h)
         self._lay.invalidate()
+        mid = self._mid()
         self.brand.setVisible(shown)
-        self.byline.setVisible(shown)
+        fits = not mid or self._brand_fits()   # (full: as it always was)
+        self.byline.setVisible(shown and fits)
+        if self.property("twolinebrand") != (not fits):   # two lines: a size smaller
+            self.setProperty("twolinebrand", not fits)
+            self.brand.style().unpolish(self.brand)
+            self.brand.style().polish(self.brand)
         style = Qt.ToolButtonTextBesideIcon if shown else Qt.ToolButtonIconOnly
         for b in self.buttons:
             b.setToolButtonStyle(style)
@@ -836,7 +931,8 @@ class SideRail(QFrame):
             if w.property("railtip") is None:   # its own tip, kept under the name
                 w.setProperty("railtip", w.toolTip())
             w.setProperty("railopen", shown)
-            self._label(w, w.property("railtext") or "", w.property("railtip"), shown)
+            self._label(w, w.property("railtext") or "", w.property("railtip"),
+                        shown and not (mid and w in self.foot))
             w.style().unpolish(w)
             w.style().polish(w)
         self._status_box.setDirection(QBoxLayout.TopToBottom)
@@ -845,14 +941,14 @@ class SideRail(QFrame):
         self._status_pad_after.changeSize(0, 0, pad_h, QSizePolicy.Minimum)
         self._status_box.invalidate()
         for w in self.status:
-            w.setFixedWidth(OPEN_W - 2 * SIDE_OPEN - 1 if shown else BUTTON_W)
-            w.setProperty("railopen", shown)
+            w.setFixedWidth(BUTTON_W if self._small(w) else self._inner_width())
+            w.setProperty("railopen", shown and not self._small(w))
             self.show_status(w)
             w.style().unpolish(w)
             w.style().polish(w)
         self._foot_box.setDirection(QBoxLayout.LeftToRight if shown else QBoxLayout.TopToBottom)
         for box in self._open_only:
-            box.setVisible(shown)
+            box.setVisible(shown and not mid)   # mid: as shut, the dot on the arrow
         self._sync_divider()
         self.toggle.setVisible(not self._squeezed)
         # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
@@ -889,7 +985,7 @@ class SideRail(QFrame):
 
     def refresh_output(self):
         if self.output:
-            shown = self.is_open()
+            shown = self.is_open() and not self._mid()   # mid: the small one, in the column
             self.output.set_expanded(shown)
             self.output.power.hide()
             self.output.connection.setVisible(

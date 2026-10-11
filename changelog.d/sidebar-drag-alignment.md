@@ -1,0 +1,2 @@
+- Dragging the sidebar open is smoother: icons stay in one centred column until halfway, then tab names show with a compact header, and the full sidebar appears once everything fits.
+- The sidebar's attention dot stays beside the expand arrow.
