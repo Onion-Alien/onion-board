@@ -53,7 +53,7 @@ the affected states; include its PR and validation evidence here.
   entry labels explain the task, reopening raises the existing editor, and collapsed
   cards keep the common controls visible.
 
-  Done (PR #PRNUM): checked each entry against section 0; the two kinds are right for
+  Done (PR #419): checked each entry against section 0; the two kinds are right for
   their size and stay. *Make it yours* (pitch, every effect, saved voices) is the one
   retained modeless editor: a second click raises it, closing keeps what you set.
   *More options* (two to four fields) expands in place on AI voices, Speak another
