@@ -297,3 +297,30 @@ def test_a_cards_parts_line_up(qapp):
         middle = part.mapTo(c, QPoint(0, 0)).y() + part.height() / 2
         assert abs(middle - first) <= 2, part
     w.close()
+
+
+def test_the_mini_player_shows_icons_on_top_or_none(main_window, qapp):  # noqa: F811
+    """Too small to read cards: icons over the pads (clicking one makes the window
+    bigger and closes nothing); none at all at its smallest; cards again once it grows."""
+    w = main_window
+    w.show()
+    w.resize(300, 260)
+    qapp.processEvents()
+    assert w.is_mini() and w._pads_scroll.isVisible()
+    ok = busy.toast(w, "Saved a clip", "ok")
+    err = busy.toast(w, "That station isn't working", "error")
+    s = toast._stack_for(w)
+    assert s.mode == "icons" and not ok.isVisible() and not err.isVisible()
+    dots = [d for d in s.dots if d.isVisible()]
+    assert len(dots) == 2 and dots[0].y() < 20               # on top, newest in the corner
+    assert dots[0].accessibleName() == "That station isn't working"
+    w.resize(260, 120)
+    qapp.processEvents()
+    assert s.mode == "hidden" and not any(d.isVisible() for d in s.dots)
+    s.mode = "icons"
+    w.resize(300, 260)
+    qapp.processEvents()
+    [d for d in s.dots if d.isVisible()][0].click()          # the window grows
+    qapp.processEvents()
+    assert not w.is_mini() and s.mode == "cards"
+    assert err.isVisible() and toast.shown(w) == [ok, err]   # nothing was closed

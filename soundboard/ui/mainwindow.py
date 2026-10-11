@@ -108,6 +108,7 @@ TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
 UNDO_KEY = "undo-sounds"   # its card (toast key)
+TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
@@ -3647,6 +3648,33 @@ class MainWindow(QMainWindow):
         when the player's hidden."""
         bar = next((w for w in (self.transport, self.mixer) if w.isVisible()), None)
         return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
+
+    def toast_mode(self) -> str:
+        """How the corner cards show (ui/toast.py): as cards in the window; as icons on
+        top of the mini player's pads; not at all in the mini player with no pads (a
+        remote: errors wait for the window to grow)."""
+        if not self.is_mini():
+            return "cards"
+        return "icons" if self._pads_scroll.isVisible() else "hidden"
+
+    def toast_expand(self):
+        """A card shrunk to its icon was clicked: make the window big enough to read
+        the cards (and leave the mini player), kept on its screen."""
+        if self.isMinimized():
+            self.showNormal()
+        if self.isMaximized() or self.isFullScreen():
+            return
+        room = self.screen().availableGeometry()
+        want = QSize(min(max(self.width(), TOAST_EXPAND.width()), room.width()),
+                     min(max(self.height(), TOAST_EXPAND.height()), room.height()))
+        if want == self.size():
+            return
+        frame = self.frameGeometry()
+        extra = frame.size() - self.size()   # the title bar and borders
+        x = min(max(frame.x(), room.left()), room.right() + 1 - want.width() - extra.width())
+        y = min(max(frame.y(), room.top()), room.bottom() + 1 - want.height() - extra.height())
+        self.resize(want)
+        self.move(max(room.left(), x), max(room.top(), y))
 
     def _make_radio(self):
         """The Radio tab, or with Radio switched off in Settings > Privacy & security a
@@ -8252,6 +8280,7 @@ class MainWindow(QMainWindow):
             show = room >= SLIM_PAD_H + m.top() + m.bottom()
             if self._pads_scroll.isHidden() == show:
                 self._pads_scroll.setVisible(show)
+                toastmod.relayout(self)   # icons on the pads, or none without them
 
     def _mini_pad_room(self, size: QSize) -> int:
         """The height above the mini player's card."""
@@ -8290,6 +8319,7 @@ class MainWindow(QMainWindow):
             self.apply_filter(self.search.text())
         finally:
             self.setUpdatesEnabled(True)
+        toastmod.relayout(self)   # cards in the window, icons in the mini player
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
