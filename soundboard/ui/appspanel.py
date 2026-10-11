@@ -1187,6 +1187,8 @@ class AppsTab(QWidget):
             spec = self._spec(key)
             cat = (category or (spec.get("category") if isinstance(spec, dict) else "")
                    or app_category(exe))
+            if cat not in self.grid.category_order:   # gone: the layout would skip the card
+                cat = app_category(exe)
             row = self.rows[key] = AppRow(exe, self._meter_cls, vol, hear, to, key, path,
                                           category=cat)
             row.show_to(self._stream_output())

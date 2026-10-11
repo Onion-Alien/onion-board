@@ -61,7 +61,7 @@ def focused(monkeypatch, w):
 def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monkeypatch):
     window.play("s0")
     assert player.paused("s0") is False
-    btn = window.btn_yt
+    btn = window.btn_record
     clicks = []
     btn.clicked.connect(lambda: clicks.append(1))
     focused(monkeypatch, btn)
@@ -75,7 +75,7 @@ def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monk
 def test_space_still_presses_a_button_reached_with_tab_and_types_in_text(
         window, player, monkeypatch):
     window.play("s0")
-    btn = window.btn_yt
+    btn = window.btn_record
     focused(monkeypatch, btn)
     focus(btn, Qt.TabFocusReason)
     space(btn)

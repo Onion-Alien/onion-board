@@ -46,8 +46,10 @@ jobs:
           RANGE: ${{ steps.range.outputs.range }}
         run: python scripts/check_sensitive.py --history "$RANGE"
       # A commit's time zone says where its author is: new commits must be in UTC
-      # (CLAUDE.md, "Commit times"). A PR: its commits not on main yet. main: what
-      # the push added (a merge made with GitHub's button or `gh pr merge` fails here).
+      # (CLAUDE.md, "Commit times"). A PR: its commits not on main yet, and it fails.
+      # main: what the push added (a merge made with GitHub's button or `gh pr merge`)
+      # is only a warning: it's pushed already and can't be re-stamped, so a red main
+      # would just stay red and notify everyone for nothing.
       - name: Commit times in UTC
         if: github.event_name != 'workflow_dispatch'
         env:
@@ -58,8 +60,8 @@ jobs:
         run: |
           if [ "$EVENT" = pull_request ]; then
             sh scripts/check_utc.sh "$PR_HEAD" --not origin/main
-          else
-            sh scripts/check_utc.sh "$BEFORE..$AFTER"
+          elif ! sh scripts/check_utc.sh "$BEFORE..$AFTER"; then
+            echo "::warning::A merge on main isn't in UTC: merge with scripts/merge_pr.sh, not gh pr merge or the button"
           fi
       # The CLI rather than gitleaks-action: the action scans `<first commit>^..`,
       # which errors on a repo's first push (the root commit has no parent).
@@ -83,6 +85,8 @@ jobs:
     outputs:
       tests: ${{ steps.pick.outputs.tests }}
       matrix: ${{ steps.pick.outputs.matrix }}
+      shards: ${{ steps.pick.outputs.shards }}
+      shard_tests: ${{ steps.pick.outputs.shard_tests }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -101,10 +105,15 @@ jobs:
             base=all
           fi
           tests=$(python scripts/pick_tests.py "$base" | tr '\n' ' ')
-          # the Windows jobs: a long run split in two (about the same length each)
+          # the test jobs: a long run split in four (about the same length each)
           matrix=$(python scripts/pick_tests.py "$base" --matrix)
           echo "tests=$tests" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          # the test jobs' matrix is just the shard names ("1/4"), each job's files
+          # looked up by name: a job skipped before it starts never gets its matrix, and
+          # a name built from matrix.shard showed up on it as raw expression text
+          echo "shards=$(jq -c '[.[].shard]' <<< "$matrix")" >> "$GITHUB_OUTPUT"
+          echo "shard_tests=$(jq -c 'map({(.shard): .tests}) | add // {}' <<< "$matrix")" >> "$GITHUB_OUTPUT"
           echo "Tests to run: ${tests:-none}"
           echo "Windows jobs: $matrix"
       - run: |
@@ -117,15 +126,15 @@ jobs:
         run: python scripts/check_code_doc.py
 
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
-  # most of the suite) in three jobs side by side, about a third of the wait.
+  # most of the suite) in four jobs side by side, about a quarter of the wait.
   windows:
     needs: pick
     if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: test (Windows ${{ matrix.shard }})
+    name: test-windows   # GitHub adds the shard: "test-windows (1/4)"
     strategy:
       fail-fast: false   # each job's failures are listed in full
       matrix:
-        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
+        shard: ${{ fromJSON(needs.pick.outputs.shards) }}
     runs-on: windows-latest
     timeout-minutes: 20   # a hung test fails the run instead of holding it for hours
     steps:
@@ -158,12 +167,27 @@ jobs:
           New-ItemProperty -Path $key -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
       # --durations: the slowest tests are listed at the end of every run, so one that
       # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there.
+      # --reruns 2: a failed test gets two more tries, a crashed worker's test too
+      # (pytest-rerunfailures), so a flake doesn't hold up a merge; a real break fails
+      # all three. The tests that needed a rerun are listed on the run's summary page.
       # TESTS: this job's share of the files the pick job chose.
       - shell: bash
-        run: .venv/Scripts/python -m pytest --durations=20 $TESTS
+        run: |
+          set -o pipefail
+          .venv/Scripts/python -m pytest --durations=20 --reruns 2 -rfER $TESTS | tee pytest.log
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ matrix.tests }}
+          TESTS: ${{ fromJSON(needs.pick.outputs.shard_tests)[matrix.shard] }}
+      - name: Flaky tests (passed on a rerun)
+        if: always()
+        shell: bash
+        run: |
+          flaky=$(grep -a '^RERUN ' pytest.log 2>/dev/null | sort -u || true)
+          if [ -n "$flaky" ]; then
+            { echo "### Needed a rerun (flaky: fix when there's time)"; echo '```'
+              echo "$flaky"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            echo "$flaky" | sed 's/^/::warning::/'
+          fi
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
@@ -197,14 +221,16 @@ jobs:
   # tests marked `windows` are skipped and Windows itself is stood in for
   # (tests/offwindows.py), so this run proves the Linux mode still works.
   # Split as the Windows jobs are (the whole suite in one job took ~6 min).
+  # Only on main (after each merge) and by hand: on every PR it doubled the runners a
+  # PR took, and with a few PRs at once they queued for minutes. It never gated a merge.
   test-linux:
     needs: pick
-    if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: test-linux (${{ matrix.shard }})
+    if: ${{ github.event_name != 'pull_request' && needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
+    name: test-linux   # GitHub adds the shard: "test-linux (1/4)"
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.pick.outputs.matrix) }}
+        shard: ${{ fromJSON(needs.pick.outputs.shards) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -229,7 +255,19 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/python -m pip install -r requirements.txt -r requirements-dev.txt
-      - run: .venv/bin/python -m pytest --durations=20 $TESTS
+      - run: |
+          set -o pipefail
+          .venv/bin/python -m pytest --durations=20 --reruns 2 -rfER $TESTS | tee pytest.log
         env:
           QT_QPA_PLATFORM: offscreen
-          TESTS: ${{ matrix.tests }}
+          TESTS: ${{ fromJSON(needs.pick.outputs.shard_tests)[matrix.shard] }}
+      - name: Flaky tests (passed on a rerun)
+        if: always()
+        shell: bash
+        run: |
+          flaky=$(grep -a '^RERUN ' pytest.log 2>/dev/null | sort -u || true)
+          if [ -n "$flaky" ]; then
+            { echo "### Needed a rerun (flaky: fix when there's time)"; echo '```'
+              echo "$flaky"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            echo "$flaky" | sed 's/^/::warning::/'
+          fi

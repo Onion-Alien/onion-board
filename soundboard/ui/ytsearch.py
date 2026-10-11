@@ -18,10 +18,10 @@ import random
 import threading
 
 from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
-from PySide6.QtGui import (QColor, QIcon, QPainter, QPainterPath, QPixmap,
-                           QTextLayout)
+from PySide6.QtGui import (QAction, QActionGroup, QColor, QIcon, QPainter, QPainterPath,
+                           QPixmap, QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QFrame, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import net, netlog, quality, theme, ytdl
@@ -43,6 +43,8 @@ log = logging.getLogger(__name__)
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
 LINK_CARD_MAX_W = 820        # a pasted link's card: picture beside the words, this wide at most
+PAGE = 20          # hits per search, and per Show more
+MAX_RESULTS = 200  # Show more stops here: more cards would only cost memory and scrolling
 TIPS = {"youtube": _("Search YouTube"),
         "ytmusic": _("Search YouTube Music: songs, the official versions"),
         "soundcloud": _("Search SoundCloud"),
@@ -729,12 +731,14 @@ class ResultRow(HoverCard):
 
 class SearchResults(RoundedFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
-    when its "My sounds" back button is (the owner shows its pads again). The site
-    buttons in the header pick where the search goes and re-run it there."""
+    when its "My sounds" back button is (the owner shows its pads again). Its site
+    actions (fill_site_menu: the search button's menu) pick where the search goes and
+    re-run it there; source_changed(key) says which one it is now."""
     play = Signal(object)
     add = Signal(object)
     closed = Signal()
     thumb_ready = Signal(str, object)
+    source_changed = Signal(str)
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
 
     def __init__(self):
@@ -743,6 +747,7 @@ class SearchResults(RoundedFrame):
         self.link = ""          # a pasted link shown as its own card (show_link), not a search
         self.source = "youtube"
         self._gen = 0
+        self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
         self.net = QNetworkAccessManager(self)
@@ -754,28 +759,24 @@ class SearchResults(RoundedFrame):
         v.setSpacing(6)
         header = QWidget()
         header.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
         back = self.btn_back = QPushButton(_("Back to my sounds"))
-        back.setObjectName("backhome")   # stands out: the way out of the results
+        back.setObjectName("backhome")   # the way out of the results: a plain button
         back.setCursor(Qt.PointingHandCursor)
-        icons.set_icon(back, "back", "danger_text", size=18)
+        icons.set_icon(back, "back", "text_hi", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
-        self.site_btns: dict[str, QPushButton] = {}
-        group = QButtonGroup(self)
+        self.site_actions: dict[str, QAction] = {}
+        group = QActionGroup(self)
         group.setExclusive(True)
         for key, (name, _prefix) in ytdl.SOURCES.items():
-            b = QPushButton(name)
-            b.setObjectName("searchsource")
-            b.setCursor(Qt.PointingHandCursor)
-            b.setCheckable(True)
-            b.setChecked(key == self.source)
-            icons.set_icon(b, key, size=16)
-            b.setToolTip(TIPS.get(key, f"Search {name}"))
-            b.clicked.connect(lambda _c=False, k=key: self.set_source(k))
-            group.addButton(b)
-            head.addWidget(b)
-            self.site_btns[key] = b
+            a = QAction(icons.icon(key, checked_color="accent"), name, self)
+            a.setCheckable(True)
+            a.setChecked(key == self.source)
+            a.triggered.connect(lambda _c=False, k=key: self.set_source(k))
+            group.addAction(a)
+            self.site_actions[key] = a
         v.addWidget(header)
         self.title = QLabel()
         self.title.setTextFormat(Qt.RichText)
@@ -804,6 +805,18 @@ class SearchResults(RoundedFrame):
         lv.addLayout(self.link_row)
         self.rows = CardGrid(min_w=CARD_MIN_W, gap=10)
         lv.addLayout(self.rows)
+        # the next page of the same search, added below: no paging back and forth
+        self.more_btn = QPushButton(_("Show more"))
+        self.more_btn.setCursor(Qt.PointingHandCursor)
+        icons.set_icon(self.more_btn, "fold_open", size=16)
+        self.more_btn.clicked.connect(self._more)
+        self.more_btn.hide()
+        more = QHBoxLayout()
+        more.setContentsMargins(0, 4, 0, 0)   # in line with Back and the cards' panels
+        more.addWidget(self.more_btn)
+        more.addStretch(1)
+        lv.addLayout(more)
+        self._more_release = None   # busy.hold's release while a page loads
         lv.addStretch(1)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -820,13 +833,13 @@ class SearchResults(RoundedFrame):
         """Settings > Privacy & security: a site switched off has its button greyed
         (saying why), and searching moves to one that's on. With finding sounds online
         switched off altogether, open results close."""
-        for key, b in self.site_btns.items():
+        for key, a in self.site_actions.items():
             ok = ytdl.site_allowed(key)
-            b.setEnabled(ok)
-            b.setToolTip(TIPS.get(key, f"Search {ytdl.SOURCES[key][0]}") if ok
+            a.setEnabled(ok)
+            a.setToolTip(TIPS.get(key, f"Search {ytdl.SOURCES[key][0]}") if ok
                          else net.off_message(ytdl.site_feature(key)))
         if not ytdl.site_allowed(self.source):
-            on = [k for k in self.site_btns if ytdl.site_allowed(k)]
+            on = [k for k in self.site_actions if ytdl.site_allowed(k)]
             if on:
                 self.set_source(on[0])
             elif not self.isHidden():
@@ -846,11 +859,17 @@ class SearchResults(RoundedFrame):
         """Search `key` (a ytdl.SOURCES key) from now on, re-running the current search."""
         if key not in ytdl.SOURCES:
             return
-        self.site_btns[key].setChecked(True)
+        self.site_actions[key].setChecked(True)
         if key != self.source:
             self.source = key
-            if self.query and not self.isHidden():
+            self.source_changed.emit(key)
+            if self.query and not self.isHidden() and not self.link:
                 self.search(self.query)
+
+    def fill_site_menu(self, menu: QMenu):
+        """The search button's menu: one line per site, the one searched ticked."""
+        menu.setToolTipsVisible(True)
+        menu.addActions(list(self.site_actions.values()))
 
     def search(self, query: str, direct: bool = False) -> bool:
         query = " ".join(query.split())
@@ -858,9 +877,9 @@ class SearchResults(RoundedFrame):
             return False
         self.query = query
         self.link = ""
-        self._show_sites(True)
         self._gen += 1
         self._clear()
+        self._asked = PAGE
         where = _("TikTok sounds") if self.source == "tiktok" else self.site
         netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
                      + (" (without Tor)" if direct else ""))
@@ -884,7 +903,6 @@ class SearchResults(RoundedFrame):
                 self._rows or self.loading.running()):
             return True   # already showing (Enter after the paste looked it up)
         self.query = self.link = url
-        self._show_sites(False)   # the site buttons pick where a search goes: not a link
         self._gen += 1
         self._clear()
         netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name, picture and "
@@ -898,10 +916,6 @@ class SearchResults(RoundedFrame):
         threading.Thread(target=self._work_link, args=(self._gen, url, direct),
                          daemon=True, name="link-lookup").start()
         return True
-
-    def _show_sites(self, on: bool):
-        for b in self.site_btns.values():
-            b.setVisible(on)
 
     def _without_tor(self):
         if self.link:
@@ -972,6 +986,10 @@ class SearchResults(RoundedFrame):
     def _clear(self):
         """Off the screen now, not when Qt gets round to deleting them: a pasted link's
         one card showed after the last search's cards until then."""
+        self.more_btn.hide()
+        if self._more_release is not None:   # a page still loading is for the old search
+            self._more_release()
+            self._more_release = None
         for r in self._rows:
             r.hide()
             self.rows.removeWidget(r)
@@ -979,9 +997,30 @@ class SearchResults(RoundedFrame):
             r.deleteLater()
         self._rows = []
 
-    def _work(self, gen: int, query: str, source: str, direct: bool = False):
+    def retheme(self):
+        """A theme switch with results open: the cards' own colours follow it."""
+        for r in self._rows:
+            r._style()
+            r.thumb.update()
+
+    def _more(self):
+        """Show more: the next PAGE hits of the same search, added under the cards."""
+        if self._more_release is not None or not self.query or self.link:
+            return
+        start, self._asked = self._asked + 1, min(self._asked + PAGE, MAX_RESULTS)
+        self._more_release = busy.hold(self.more_btn, _("Loading…"))
+        netlog.cause(ytdl.FEATURE, f"You asked for more {self.site} results for "
+                                   f"{netlog.quoted(self.query)}")
+        threading.Thread(target=self._work, args=(self._gen, self.query, self.source),
+                         kwargs={"start": start, "count": self._asked},
+                         daemon=True, name="web-search-more").start()
+
+    def _work(self, gen: int, query: str, source: str, direct: bool = False,
+              start: int = 1, count: int = PAGE):
         try:
             more = {"direct": True} if direct else {}   # the user's "without Tor" click
+            if start > 1:   # Show more (fakes in tests take the first page's arguments)
+                more.update(start=start, count=count)
             self._done.emit(gen, ytdl.search(query, source=source, **more), "")
         except ytdl.TorBlocked as e:   # offered without Tor, never done unasked
             log.info("%s search turned away over Tor", source)
@@ -1004,7 +1043,19 @@ class SearchResults(RoundedFrame):
     def _on_done(self, gen: int, results, err: str):
         if gen != self._gen:
             return
+        if self._more_release is not None:   # a Show more page: added under the others
+            self._more_release()
+            self._more_release = None
+            if err:
+                busy.toast(self.window(), err, "error", 8000)
+                return
+            seen = {r.result.url for r in self._rows}
+            new = [r for r in results if r.url not in seen]
+            self._add_rows(new, gen)
+            self.more_btn.setVisible(bool(new) and self._asked < MAX_RESULTS)
+            return
         self._loading(False)
+        self.more_btn.hide()
         q = html.escape(self.query)
         if err:
             red = theme.status("error")
@@ -1020,6 +1071,11 @@ class SearchResults(RoundedFrame):
             self.title.setText(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
             return
         self.title.hide()   # the cards say it all; the title is for "no results" / errors
+        self._add_rows(results, gen)
+        # a full first page: there may be more of them
+        self.more_btn.setVisible(not self.link and len(results) >= PAGE // 2)
+
+    def _add_rows(self, results, gen: int):
         for r in results:
             row = ResultRow(r, wide=bool(self.link))
             row.play.connect(self.play)

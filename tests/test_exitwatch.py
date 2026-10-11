@@ -132,12 +132,13 @@ def test_ended_by_windows_or_a_restart_is_not_a_problem(app_dir, monkeypatch,
 def test_the_heartbeat_notes_a_stuck_window(app_dir, monkeypatch):
     monkeypatch.setattr(exitwatch, "HEARTBEAT_S", 0.02)
     exitwatch.start(app_dir, lambda: 9.0)
-    deadline = time.time() + 5
-    while time.time() < deadline:
-        if exitwatch.read_last(app_dir)[0].get("stuck_s") == 9.0:
-            break
+    # one read that saw it: a second one can land while the heartbeat swaps the file in,
+    # which Windows refuses (read_last then says {}, as it would for no file)
+    seen, deadline = None, time.time() + 5
+    while seen != 9.0 and time.time() < deadline:
+        seen = exitwatch.read_last(app_dir)[0].get("stuck_s")
         time.sleep(0.02)
-    assert exitwatch.read_last(app_dir)[0]["stuck_s"] == 9.0
+    assert seen == 9.0
 
 
 def test_a_native_error_that_was_caught_is_cleared_at_the_next_heartbeat(app_dir, caplog):

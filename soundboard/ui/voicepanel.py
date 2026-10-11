@@ -2743,7 +2743,7 @@ class VoicePanel(QWidget):
         body.setMaximumWidth(960)   # compact headers; open panels wrap to this width
         self._body = body
         pv = QVBoxLayout(body)
-        pv.setContentsMargins(4, 4, 8, 12)
+        pv.setContentsMargins(0, 4, 8, 12)   # left edge in line with the download bar
         pv.setSpacing(16)
         cols = self._cols = QHBoxLayout()
         cols.setContentsMargins(0, 0, 0, 0)
@@ -3033,7 +3033,7 @@ class VoicePanel(QWidget):
                           _("What you say is said in {language}. Click to open it.",
                             language=lang)))
         if not items:
-            items.append(("none", _("Voice effects off — mic unchanged"), "off", "mic", None,
+            items.append(("none", _("Voice effects off: mic unchanged"), "off", "mic", None,
                           _("Your mic voice is unchanged. Open Voice changer or AI voices "
                             "below to choose a voice.")))
         self.bar.set_items(items)

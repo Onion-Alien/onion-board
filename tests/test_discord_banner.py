@@ -85,7 +85,7 @@ def test_guide_on_the_mic_says_custom_not_studio(window, monkeypatch):
     """Straight into my mic, Studio skips Onion Board: the guide must never send people
     there, and it shows what their Discord is set to."""
     (folder() / "000005.log").write_bytes(store(activeInputProfile="STUDIO"))
-    g = chatguide.DiscordGuide(window, window, "Microphone (G733)", kept=True)
+    g = chatguide.DiscordGuide(window, window, "Microphone (USB headset)", kept=True)
     assert process_events(QApplication.instance(), lambda: not g._reading, 3)
     text = " ".join(lbl.text() for lbl in g.findChildren(chatguide.QLabel))
     assert "choose <b>Custom</b>" in text and "choose <b>Studio</b>" not in text
@@ -114,7 +114,7 @@ def test_guide_reads_discords_files_off_the_ui_thread(window, monkeypatch):
     gate, real = threading.Event(), dc.signature
     monkeypatch.setattr(dc, "signature", lambda *a: (gate.wait(3), real(*a))[1])
     t0 = time.monotonic()
-    g = chatguide.DiscordGuide(window, window, "Microphone (G733)", kept=True)
+    g = chatguide.DiscordGuide(window, window, "Microphone (USB headset)", kept=True)
     g._read_settings()                       # the watch's tick while it's still reading
     assert time.monotonic() - t0 < 0.5
     assert g.settings.isHidden() and g._reading

@@ -448,13 +448,15 @@ def test_the_tabs_are_a_rail_down_the_left(window, qapp):
     rail.toggle.click()
     assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
     b = rail.buttons[1]
-    assert b.text() == "" and b.toolTip() == "" and b.accessibleName() == "Radio"
+    # shut, the icon is all there is: the hover tip gives its name and its Ctrl+number
+    assert b.text() == "" and b.toolTip().startswith("Radio  (Ctrl+") and \
+        b.accessibleName() == "Radio"
     assert not rail.buttons[0].icon().isNull()
     assert rail.buttons[0].isChecked() == (window.tabs.currentIndex() == 0)
     assert window.wordmark.isHidden()
     rail.toggle.click()
     assert rail.is_open() and window.cfg.sidebar_open
-    assert b.text() == "Radio" and b.toolTip() == ""
+    assert b.text().strip() == "Radio" and b.toolTip() == ""
     assert not window.wordmark.isHidden() and not window.tagline.isHidden()
     rail.buttons[5].click()
     assert window.tabs.currentIndex() == 5 and rail.buttons[5].isChecked()
@@ -817,7 +819,8 @@ def test_the_window_shows_which_version_is_running(window, monkeypatch):
     from soundboard import __version__
     from soundboard.ui import mainwindow
     assert window.windowTitle() == f"Onion Board {__version__} from source"
-    assert window.tagline.text().endswith(f"v{__version__} from source")
+    assert window.tagline.text() == f"v{__version__}"   # the header: no "from source"
+    assert "Onion Alien" in window.wordmark.toolTip()
     window.on_mic_check(True)          # the red banner says it; the title stays the app's name
     assert window.windowTitle() == f"Onion Board {__version__} from source"
     window.on_mic_check(False)
@@ -1154,3 +1157,25 @@ def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     assert all(b.height() >= 34 for b in buttons)
     assert all(b.y() - a.geometry().bottom() >= 4
                for a, b in zip(buttons, buttons[1:]))
+
+
+@pytest.mark.parametrize("page", [0, -1])   # Sounds, and the last tab (Setup)
+def test_the_tab_key_goes_from_the_side_rail_into_the_page(window, qapp, page):
+    """Tab walked the rail and its buttons, then stuck on the rail's last button (the
+    hidden tab bar was the next stop): a keyboard user never reached the page."""
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QApplication
+    window.resize(1100, 750)
+    window.show()
+    window.tabs.setCurrentIndex(page % window.tabs.count())
+    qapp.processEvents()
+    window.rail.toggle.setFocus(Qt.TabFocusReason)
+    QTest.keyClick(window.rail.toggle, Qt.Key_Tab)
+    qapp.processEvents()
+    now = QApplication.focusWidget()
+    assert now is not window.rail.toggle
+    assert window.tabs.currentWidget().isAncestorOf(now)
+
+
+def test_the_seek_sliders_have_a_name_a_screen_reader_can_say(window):
+    assert window.seek.accessibleName() and window.mini_seek.accessibleName()

@@ -152,6 +152,10 @@ class EqCurve(QWidget):
 class SeekSlider(QSlider):
     """Slider that jumps straight to where you click (then drags from there)."""
 
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setAccessibleName(_("Playback position"))   # a screen reader said nothing on it
+
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
             self.setValue(QStyle.sliderValueFromPosition(

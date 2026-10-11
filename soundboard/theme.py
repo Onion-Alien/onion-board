@@ -547,10 +547,9 @@ QPushButton#danger[quiet="true"] { background:transparent; }
 QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
-QPushButton#searchsource { padding:6px 12px; font-size:10pt; }
-QPushButton#backhome { background:$danger_bg; border:1px solid $danger_border; color:$danger_text;
-    font-weight:700; font-size:10pt; padding:6px 14px; border-radius:8px; }
-QPushButton#backhome:hover { background:$danger_hover; border-color:$danger_text; }
+QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
+    font-weight:600; font-size:10pt; padding:6px 12px; border-radius:8px; }
+QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$border_hi; }
@@ -579,7 +578,8 @@ QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
 QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
-QFrame#sidebar QLabel#wordmark { font-size:11pt; }
+QFrame#sidebar QLabel#wordmark { font-size:12pt; }
+QFrame#sidebar QFrame#raildiv { background:$border_hi; border:none; }
 QFrame#sidebar QWidget#railslot { background:transparent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
@@ -740,6 +740,7 @@ QScrollBar::add-page, QScrollBar::sub-page { background:transparent; }
 QMenu { background:$card; border:1px solid $border_hi; padding:5px; }
 QMenu::item { padding:7px 22px 7px 12px; border-radius:6px; margin:1px 0; }
 QMenu::item:selected { background:$btn_hover; color:$text_hi; }
+QMenu::item:checked { color:$accent_hi; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }

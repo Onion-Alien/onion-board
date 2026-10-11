@@ -1,11 +1,13 @@
 """The engine mustn't keep audio alive that nothing else holds: an effects preview, a
 link's Play once, a TTS clip. The library holds its own sounds, so those stay cached."""
 import gc
+import threading
 import time
 import weakref
 
 import numpy as np
 
+from soundboard import uigc
 from soundboard.engine import SR, Engine
 from tests.test_engine import FakeStream
 
@@ -40,6 +42,10 @@ def test_effects_preview_audio_is_freed_after_it_stops():
         assert "pad1~fx" in e._shares
         _finish(e)
         del data
+        for t in threading.enumerate():   # the resample thread's copy: once it's done,
+            if t.name == "resample":      # let go of on the UI thread (uigc)
+                t.join(10)
+        uigc.let_go()
         gc.collect()
         e.playing()   # the UI's poll sweeps what died
         assert dead() is None, rate

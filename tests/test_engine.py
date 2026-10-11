@@ -720,7 +720,7 @@ def test_is_virtual_cables(name):
 
 @pytest.mark.parametrize("name", [
     "Speakers (HyperX Virtual Surround Sound)", "Microphone (HyperX Virtual Surround Sound)",
-    "Headphones (Logitech G Virtual Surround)", "Speakers (Realtek High Definition Audio)",
+    "Headphones (Virtual Surround)", "Speakers (Realtek High Definition Audio)",
 ])
 def test_is_virtual_leaves_real_headsets(name):
     assert not eng.is_virtual(name)
