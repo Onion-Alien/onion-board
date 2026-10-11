@@ -496,6 +496,35 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
   bakes a colour in (an icon, a pixmap, a widget's own style sheet) is redrawn by
   `icons.retheme()` / `MainWindow._apply_theme` or reads `theme.T` when it paints.
 
+### The states a feature is built for
+
+Not "dark, light, maybe hover". Every new screen, card or control is built and checked
+for all of these at once:
+
+| Axis | States |
+| --- | --- |
+| Theme | all 31 in `theme.THEMES`, picked at launch **and** switched to live from another theme |
+| Control | rest, hover, pressed, keyboard focus, checked / picked, disabled, busy |
+| Content | empty, one item, full (scrolling), long translated words (German) |
+| Window | 1180x720, 800x600, the mini player, right-to-left |
+| Route | the On Air card connected and not (*Setup needed*), with a toast up |
+
+The theme traits that broke things before (pick one theme of each kind when checking by eye;
+the tests check the tokens in all 31):
+
+| Trait | Themes | What breaks |
+| --- | --- | --- |
+| Pale accent on a light background | Flashbang, Barbie | the accent as text or an icon can't be read: use `accent_text` |
+| Accent close to grey or to the text colour | Carbon, Arctic, Hacker, Amber Terminal | anything filled with the accent under `text`-coloured words (grey on grey) |
+| Light backgrounds | Light, Paper, Mint, Cherry Blossom, Vaporwave, Flashbang, Barbie, Comic Sans, Retro 98 | bright dark-theme status colours, white text, shadows that assume dark |
+| Outlined, black on black | High Contrast | flat fills vanish: it keeps borders at rest (`OUTLINED`) |
+| Textures | Carbon, Synthwave, Brainrot, Amber Terminal, Hacker, Swamp, Deep Fried | flat colours painted over panels show as patches |
+| Other fonts | Amber Terminal, Hacker (Consolas), Retro 98 (Tahoma), Comic Sans | wider words: fixed widths cut text off |
+| Loud colours | Deep Fried, Brainrot, Synthwave | `text` is yellow / lime, so a hard-coded white or grey stands out |
+
+Never draw a fixed colour except a sound's own colour, the user's own highlight colour
+(`live_override`) and the status colours: those three stay as they are in every theme.
+
 ## 7. Text
 
 - Plain, short, friendly words a non-technical gamer understands. Say what happens
