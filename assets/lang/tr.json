@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget {seconds} saniyeden uzun sürdü.",
   "✓ Got FFmpeg": "✓ FFmpeg alındı",
   "No settings match “{text}”": "“{text}” ile eşleşen ayar yok",
-  "+{count} queued": [
-    "+{count} sırada",
-    "+{count} sırada"
-  ],
   "Cancel download": "İndirmeyi iptal et",
   "Couldn't download": "İndirilemedi",
   "Parsing video…": "Video okunuyor…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>",
   "Opacity": "Opaklık",
   "Playing sound background": "Çalan sesin arka planı",
-  "Show the playing sound's thumbnail behind the cards": "Çalan sesin küçük resmini kartların arkasında göster"
+  "Show the playing sound's thumbnail behind the cards": "Çalan sesin küçük resmini kartların arkasında göster",
+  "Adding {n} sound": [
+    "{n} ses ekleniyor",
+    "{n} ses ekleniyor"
+  ]
 }

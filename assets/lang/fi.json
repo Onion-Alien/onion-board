@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget kesti yli {seconds} sekuntia.",
   "✓ Got FFmpeg": "✓ FFmpeg haettu",
   "No settings match “{text}”": "Mikään asetus ei vastaa \"{text}\"",
-  "+{count} queued": [
-    "+{count} jonossa",
-    "+{count} jonossa"
-  ],
   "Cancel download": "Peruuta lataus",
   "Couldn't download": "Lataus epäonnistui",
   "Parsing video…": "Luetaan videota…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows pitää <b>{key}</b>-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>",
   "Opacity": "Peittävyys",
   "Playing sound background": "Soivan äänen tausta",
-  "Show the playing sound's thumbnail behind the cards": "Näytä soivan äänen pikkukuva korttien takana"
+  "Show the playing sound's thumbnail behind the cards": "Näytä soivan äänen pikkukuva korttien takana",
+  "Adding {n} sound": [
+    "Lisätään {n} ääni",
+    "Lisätään {n} ääntä"
+  ]
 }

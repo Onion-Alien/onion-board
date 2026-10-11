@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget tog längre än {seconds} sekunder.",
   "✓ Got FFmpeg": "✓ FFmpeg hämtad",
   "No settings match “{text}”": "Ingen inställning matchar \"{text}\"",
-  "+{count} queued": [
-    "+{count} i kö",
-    "+{count} i kö"
-  ],
   "Cancel download": "Avbryt nedladdning",
   "Couldn't download": "Kunde inte ladda ner",
   "Parsing video…": "Läser videon…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows håller <b>{key}</b> för sig själv, så den kan inte vara ett kortkommando. Välj en annan tangent.</span>",
   "Opacity": "Opacitet",
   "Playing sound background": "Bakgrund för ljudet som spelas",
-  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten"
+  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten",
+  "Adding {n} sound": [
+    "Lägger till {n} ljud",
+    "Lägger till {n} ljud"
+  ]
 }

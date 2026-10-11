@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget отне повече от {seconds} секунди.",
   "✓ Got FFmpeg": "✓ FFmpeg е взет",
   "No settings match “{text}”": "Няма настройки, които да съответстват на „{text}“",
-  "+{count} queued": [
-    "+{count} на опашка",
-    "+{count} на опашка"
-  ],
   "Cancel download": "Отказ от изтеглянето",
   "Couldn't download": "Не можа да се изтегли",
   "Parsing video…": "Видеото се чете…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows пази <b>{key}</b> за себе си, така че не може да е бърз клавиш. Избери друг клавиш.</span>",
   "Opacity": "Непрозрачност",
   "Playing sound background": "Фон на текущия звук",
-  "Show the playing sound's thumbnail behind the cards": "Показвай миниатюрата на текущия звук зад картите"
+  "Show the playing sound's thumbnail behind the cards": "Показвай миниатюрата на текущия звук зад картите",
+  "Adding {n} sound": [
+    "Добавя се {n} звук",
+    "Добавят се {n} звука"
+  ]
 }

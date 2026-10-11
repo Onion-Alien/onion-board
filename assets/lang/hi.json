@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget को {seconds} सेकंड से ज़्यादा समय लगा।",
   "✓ Got FFmpeg": "✓ FFmpeg मिल गया",
   "No settings match “{text}”": "कोई भी सेटिंग \"{text}\" से मेल नहीं खाती",
-  "+{count} queued": [
-    "+{count} कतार में",
-    "+{count} कतार में"
-  ],
   "Cancel download": "डाउनलोड रद्द करें",
   "Couldn't download": "डाउनलोड नहीं हो सका",
   "Parsing video…": "वीडियो पढ़ा जा रहा है…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> को अपने लिए रखता है, इसलिए यह हॉटकी नहीं बन सकती। कोई और की चुनें।</span>",
   "Opacity": "अपारदर्शिता",
   "Playing sound background": "चल रहे साउंड की पृष्ठभूमि",
-  "Show the playing sound's thumbnail behind the cards": "कार्ड के पीछे चल रहे साउंड का थंबनेल दिखाएँ"
+  "Show the playing sound's thumbnail behind the cards": "कार्ड के पीछे चल रहे साउंड का थंबनेल दिखाएँ",
+  "Adding {n} sound": [
+    "{n} ध्वनि जोड़ी जा रही है",
+    "{n} ध्वनियाँ जोड़ी जा रही हैं"
+  ]
 }
