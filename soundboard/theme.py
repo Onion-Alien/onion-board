@@ -998,6 +998,14 @@ QFrame#setcard QPushButton#primary:pressed {
     background:$accent_press; border-top-color:$accent_rim_side; }
 QPushButton#primary:focus, QFrame#card QPushButton#primary:focus,
 QFrame#setcard QPushButton#primary:focus { border:1px solid $text_hi; }
+QPushButton#transport_play {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
+        stop:1 $accent_end);
+    border:1px solid $accent_rim_side; border-top-color:$accent_rim; }
+QPushButton#transport_play:hover:!disabled {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
+        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
+QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live); }
@@ -1054,6 +1062,26 @@ def _accent_shades(tk: dict[str, str]) -> dict[str, str]:
         accent_rim=_rgba(white, 0.30),
         accent_rim_side=_rgba(_mix(tk["accent"], black, 0.25), 0.55),
     )
+
+
+def accent_fill(hover: bool = False) -> str:
+    """A filled accent button's background as a stylesheet value, for widgets that style
+    themselves: the same gradient as `#primary`, or the flat accent in outlined themes."""
+    if not polished():
+        return T["accent_hover" if hover else "accent"]
+    s = _accent_shades(T)
+    top, mid, end = ((s["accent_top_hi"], T["accent_hover"], s["accent_end_hi"]) if hover
+                     else (s["accent_top"], T["accent"], s["accent_end"]))
+    return (f"qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {top}, stop:0.3 {mid}, "
+            f"stop:1 {end})")
+
+
+def accent_edge() -> str:
+    """The border that goes with accent_fill(): a light rim on top (stylesheet text)."""
+    if not polished():
+        return f"border:1px solid {T['accent']};"
+    s = _accent_shades(T)
+    return f"border:1px solid {s['accent_rim_side']}; border-top-color:{s['accent_rim']};"
 
 
 def _window_shades(tk: dict[str, str], light: bool) -> dict[str, str]:

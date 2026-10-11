@@ -73,6 +73,7 @@ class CountDialog(QDialog):
         v.addWidget(links)
         row = QHBoxLayout()
         done = QPushButton(_("Done"))
+        done.setObjectName("primary")
         done.setDefault(True)
         done.clicked.connect(self.accept)
         row.addStretch(1)   # bottom-right
