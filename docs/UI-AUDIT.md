@@ -13,12 +13,16 @@ the affected states; include its PR and validation evidence here.
 
 ## Fix first
 
-- [ ] **U1: Consistent dialog actions.** Feedback uses left-first Send/Cancel;
-  Settings Done and Edit sound actions are right-aligned in previews. Recording's
-  saved-state row and Program picker also put actions after a stretch in code.
-  Targets: `settings.py`, `ui/dialogs.py`, `ui/recordmic.py`, `ui/programpick.py`.
-  Reuse/extract a small action-row helper in the shared UI layer. Acceptance: main
-  action at logical start, then alternatives/Cancel/Done, one filled action;
+- [ ] **U1: Consistent bottom-right dialog actions.** The original audit treated
+  right-aligned actions as a defect under the old design rule. That finding is
+  superseded: bottom-right is the intended pattern. Settings Done and Edit sound's
+  original placement were appropriate; Feedback's left-first footer is an outlier.
+  PR #396 implements the superseded left-alignment rule and needs review/revision
+  against this preference before it can complete U1.
+  Targets: `settings.py`, `ui/dialogs.py`, `ui/recordmic.py`, `ui/programpick.py`,
+  `ui/feedbackdialog.py`. Reuse/extract a small action-row helper in the shared UI
+  layer. Acceptance: stretch before the bottom-right action group, main action
+  first within the group, then alternatives/Cancel/Done, one filled action;
   preview/reset stays with its content. Verify recording before/after capture,
   Edit Save/Save as new sound/Cancel, Enter/Escape, and narrow translated layouts.
 
@@ -88,14 +92,19 @@ origin/main in an isolated branch/worktree; check open PRs for overlapping work.
 Read docs/DESIGN.md: Fluent 2 supplies interaction guidance; our Qt components,
 themes and local action-order rules supply the implementation. Follow section 0
 for controls/surfaces and section 14 for the UI workflow.
-Use docs/UI-AUDIT.md as the backlog. Reverify and implement U1 first as a focused
-PR, then work through U2-U4 in separate reviewed changes. Report intentional
+Use docs/UI-AUDIT.md as the backlog. U1 requires bottom-right dialog actions:
+stretch before the action group, main action first within that group, then
+alternatives/Cancel/Done. Ordinary fields and card/toolbar actions stay beside
+their content. PR #396 used the superseded left-alignment rule; review and revise
+that existing PR before starting duplicate U1 work. Reverify current PR state.
+After U1 is reviewed, work through U2-U4 in separate changes. Report intentional
 differences instead of forcing every choice into one widget type. Preserve live
 settings versus draft Save/Cancel, preview, keyboard access and window lifetimes.
 Reuse small shared helpers, translate changed UI text in every language, inspect
 offscreen screenshots of the full affected page and secondary states, run scoped
 precommit checks, and show the pictures. Never launch the live app without asking.
-Follow repository CI and local UTC merge rules. Update the backlog with each
+Leave PRs open for review; do not merge unless explicitly asked. Any authorized
+merge must follow the repository's local UTC merge rules. Update the backlog with each
 completed PR and validation; leave unverified items open. This document records
 existing observations; no UI fixes have been implemented by the documentation PR.
 ```

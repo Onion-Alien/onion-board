@@ -85,7 +85,8 @@ dialog and button from it. The rules people trip over most:
 
 - **Narrow by default**: controls as wide as their words, then `addStretch(1)`;
   dialogs ≤ ~620 px; tiles in fixed-size grids that scroll down.
-- **Buttons on the left, the main one first** (`[Send] [Cancel]`), one filled
+- **Dialog actions at the bottom-right, the main one first within the group**
+  (`stretch [Send] [Cancel]`), one filled
   `#primary` button per card or dialog at most.
 - **Icons and pop-ups over long buttons**: a button is one to three words; anything
   a picture says is an icon with a tooltip; how-to text goes behind an ⓘ pop-up.

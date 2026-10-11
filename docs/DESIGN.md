@@ -3,7 +3,7 @@
 # Colour values live in soundboard/theme.py (THEMES): 30+ themes share these token
 # NAMES, so code always uses a token, never a hex value. The prose below says how.
 name: Onion Board
-version: 2
+version: 3
 platform: PySide6 (Qt Widgets), styled by one app style sheet (theme.stylesheet)
 font:
   family: "Segoe UI (a theme may swap it with its `font` token)"
@@ -61,7 +61,7 @@ Use **Microsoft Fluent 2 interaction guidance, implemented with our existing
 PySide6 widgets**. `theme.py`, painted icons and shared UI helpers are the component
 implementation. This file is the app's single design contract. The web examples
 linked below explain behaviour; they are not dependencies to embed. Our compact
-geometry, themes, left-first actions and existing wording take precedence where
+geometry, themes, bottom-right dialog actions and existing wording take precedence where
 Fluent examples differ. New UI must follow these decisions; older UI is migrated
 through [UI-AUDIT.md](UI-AUDIT.md) in small changes.
 
@@ -103,8 +103,12 @@ window must not steal focus back while the user is working elsewhere.
 
 ### Action rows and labels
 
-Place dialog actions at the bottom, logical start, main action first, then secondary
-actions, then stretch. Preview/reset tools stay beside what they affect. Do not let
+Place dialog actions at the **bottom-right**, with stretch before the action group.
+The main action is first within that group, then alternatives and Cancel/Done/Close:
+`stretch [Save] [Cancel]`, `stretch [Send] [Cancel]`, or `stretch [Done]`.
+The group mirrors to bottom-left in right-to-left languages. Preview/reset tools
+stay beside what they affect. This rule applies to dialog footer actions, not to
+ordinary fields, card controls or toolbar actions. Do not let
 `QDialogButtonBox`'s platform ordering silently override this app's action order.
 Use Save for a draft commit, Cancel for discarding a draft, Done for closing live
 settings and Close for information. A destructive action uses its verb and `#danger`.
@@ -127,7 +131,7 @@ These are the current reference points. Copy their structure before inventing a 
 | Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
 | Setup tab cards | `setcard`: heading, one-line hint, controls, buttons at their own width in a wrapping row. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
-| Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons on the left with the main one first, a second page instead of a second dialog. |
+| Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, a second page instead of a second dialog. Its footer needs the bottom-right action pattern. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |
 
 ## 2. Layout
@@ -153,9 +157,9 @@ These are the current reference points. Copy their structure before inventing a 
 
 ## 3. Buttons
 
-- **Button rows sit on the left, the main button first**:
-  `[Send] [Cancel]`, `[Open the feedback form] [Done]`, then a stretch. Never
-  right-aligned with the main button last.
+- **Dialog action rows sit bottom-right, main action first within the group**:
+  stretch, then `[Send] [Cancel]` or `[Open the feedback form] [Done]`.
+  Keep contextual actions beside their content; do not right-align every UI element.
 - **At most one filled button** (`setObjectName("primary")`) per card or dialog: the
   thing most people should press. Everything else is a plain button or a quiet one
   (`setProperty("quiet", True)`: no background until hover).
@@ -282,7 +286,7 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 
 - A hex colour, a pixel font size or an outline (`border:` at rest) in widget code.
 - A control stretched to fill a row, or a dialog as wide as its parent.
-- A right-aligned button row, or more than one filled button in one place.
+- A left-aligned dialog footer, or more than one filled button in one place.
 - ALL CAPS headings, Title Case Buttons, long dashes.
 - A new bitmap icon, a new font, or a third-party widget library (Fluent, Material,
   qt-material...). The app's look comes from `theme.py` and `ui/icons.py` only.
@@ -298,7 +302,7 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 
 1. Built from the pieces above (cards, hint, primary, quiet, icon buttons, tokens)?
 2. As narrow as its content; no stretched control; dialog ≤ 620 px?
-3. Buttons on the left, main one first, one filled button at most? Every button
+3. Dialog actions bottom-right, main first within the group, one filled button at most? Every button
    three words or fewer, icons wherever a picture says it, long text in a pop-up?
 4. Cards: at least three of section 5's pieces, nothing that looks like a plain form?
 5. Text: sentence case, no long dashes, `_()`, `23%`, short plain words?
@@ -351,7 +355,6 @@ below predate that spot audit: recheck them, rather than assuming they still app
 
 Fix these when a task touches them; don't sweep them all in one go.
 
-- Settings' *Done* and the setup guide's *Next* sit bottom-right.
 - Some Setup texts still have long dashes (open work: text style pass).
 - Voice tab cards stretch across the full width with empty space below.
 - Many word buttons that should be icons, and long ones ("Make it sound clean in
