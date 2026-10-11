@@ -227,7 +227,7 @@ def _card(margins: int = 16, spacing: int = 12,
 def _label(text: str, css: str = BODY_CSS) -> QLabel:
     lbl = QLabel(text)
     lbl.setWordWrap(True)
-    lbl.setTextFormat(Qt.RichText)
+    lbl.setTextFormat(Qt.TextFormat.RichText)
     lbl.setStyleSheet(css)
     return lbl
 
@@ -245,7 +245,7 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     col.addWidget(body)
     col.addStretch(1)
     row.addLayout(col, 1)
-    row.addWidget(bun, 0, Qt.AlignTop)
+    row.addWidget(bun, 0, Qt.AlignmentFlag.AlignTop)
     return row
 
 
@@ -256,17 +256,17 @@ class _RoundButton(QPushButton):
     def __init__(self, size: int):
         super().__init__()
         self.setFixedSize(size, size)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         t = theme.T
         col = QColor(t["accent_hover"] if self.underMouse() or self.isDown() else t["accent"])
         if self.isDown():
             col = col.darker(115)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
-        p.setPen(QPen(QColor(t["text"]), 2) if self.hasFocus() else Qt.NoPen)
+        p.setPen(QPen(QColor(t["text"]), 2) if self.hasFocus() else Qt.PenStyle.NoPen)
         p.setBrush(col)
         p.drawEllipse(r)
         s = self.iconSize()
@@ -380,7 +380,7 @@ class SetupWizard(QDialog):
         group.buttonClicked.connect(lambda b: on_pick(b.property("device")))
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(box)
         return scroll, group
 
@@ -545,7 +545,7 @@ class SetupWizard(QDialog):
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
         self.btn_attach.clicked.connect(self.attach_mic)
-        v.addWidget(self.btn_attach, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
         self.setup_show = SetupShow(height=96)
         self.setup_show.done.connect(lambda: self.recheck_cable(rescan=False))
         v.addWidget(self.setup_show)
@@ -581,7 +581,7 @@ class SetupWizard(QDialog):
         self.btn_restart.setObjectName("primary")
         self.btn_restart.clicked.connect(self.restart_pc)
         self.btn_restart.hide()
-        v.addWidget(self.btn_restart, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_restart, 0, Qt.AlignmentFlag.AlignLeft)
         # streamers and Voicemeeter / mixer users: send somewhere else instead
         self.btn_other = QPushButton(_("Other device"))
         icons.set_icon(self.btn_other, "sliders")
@@ -609,7 +609,7 @@ class SetupWizard(QDialog):
         icons.set_icon(self.btn_use_cable, "cable")
         self.btn_use_cable.clicked.connect(lambda: self._pick_route("cable"))
         self.btn_use_cable.hide()
-        v.addWidget(self.btn_use_cable, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_use_cable, 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         return p
 
@@ -693,7 +693,7 @@ class SetupWizard(QDialog):
         self.btn_discord.setToolTip(_("The Discord settings that stop it chopping up your "
                                       "sounds, and a check that listens to what Discord does"))
         self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
-        cl.addWidget(self.btn_discord, 0, Qt.AlignLeft)
+        cl.addWidget(self.btn_discord, 0, Qt.AlignmentFlag.AlignLeft)
         self.games_label = _label(_("Playing a game or on a call?"), "font-size:10pt;")
         self.games_label.setObjectName("muted")
         cl.addWidget(self.games_label)
@@ -814,7 +814,7 @@ class SetupWizard(QDialog):
             usage.used("use-skipped")
             self.win.cfg.use_mode = "normal"
             self.win.cfg.save()
-        if r != QDialog.Accepted:
+        if r != QDialog.DialogCode.Accepted:
             for k, v in self._saved_devices.items():   # keep what they had, unless
                 if k not in self._user_picked:         # they picked another one here
                     setattr(self.win.cfg, k, v)

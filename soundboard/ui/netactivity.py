@@ -57,7 +57,7 @@ def _count(connections: int, blocked: int, failed: int) -> str:
     return f"{connections} ({', '.join(extra)})" if extra else str(connections)
 
 
-_TONE = Qt.UserRole + 1   # the status colour a cell is drawn in (None: the default)
+_TONE = Qt.ItemDataRole.UserRole + 1   # the status colour a cell is drawn in (None: the default)
 
 
 def _tip(text: str) -> str:
@@ -74,7 +74,7 @@ def _put(t: QTableWidget, r: int, c: int, text: str, tip: str = "", align=None,
     it = t.item(r, c)
     if it is None:
         it = QTableWidgetItem(text)
-        it.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        it.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
         t.setItem(r, c, it)
     elif it.text() != text:
         it.setText(text)
@@ -129,23 +129,23 @@ def _table(headers: list[str], stretch: int) -> QTableWidget:
     t.setObjectName("activitytable")
     t.setHorizontalHeaderLabels(headers)
     t.verticalHeader().setVisible(False)
-    t.setSelectionBehavior(QAbstractItemView.SelectRows)
-    t.setSelectionMode(QAbstractItemView.SingleSelection)
-    t.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    t.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+    t.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+    t.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
     t.setWordWrap(False)
     t.setShowGrid(False)
     t.setAlternatingRowColors(True)
-    t.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-    t.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-    t.setTextElideMode(Qt.ElideRight)
+    t.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+    t.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+    t.setTextElideMode(Qt.TextElideMode.ElideRight)
     t.setMinimumHeight(220)
     t.setMaximumHeight(320)
     t.verticalHeader().setDefaultSectionSize(34)
     h = t.horizontalHeader()
     h.setMinimumSectionSize(64)
-    h.setSectionResizeMode(QHeaderView.Interactive)
+    h.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
     h.setStretchLastSection(True)
-    h.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+    h.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
     for i, width in enumerate(t._widths):
         t.setColumnWidth(i, width)
     return t
@@ -216,7 +216,7 @@ class NetActivity(QWidget):
                              _("Result"), _("Sent"), _("Received")], 2)
         self.info = QPlainTextEdit()
         self.info.setReadOnly(True)
-        self.info.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
+        self.info.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
         self.info.setPlaceholderText(_("Pick a connection to see everything about it."))
         self.info.setMinimumHeight(120)
         self.info.setMaximumHeight(180)
@@ -228,7 +228,7 @@ class NetActivity(QWidget):
         self.stack = _Stack()
         # no taller than the page on show: a tall Settings window gave the stack its
         # spare height, a blank band between the table and the buttons under it
-        self.stack.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
+        self.stack.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
         self.stack.addWidget(self.servers)
         self.stack.addWidget(detail)
         v.addWidget(self.stack)
@@ -320,7 +320,7 @@ class NetActivity(QWidget):
     def _fill_servers(self, servers: list[netlog.Server]):
         t = self.servers
         t.setRowCount(len(servers))
-        right = Qt.AlignRight | Qt.AlignVCenter
+        right = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         for r, s in enumerate(servers):
             count = _count(s.connections, s.blocked, s.failed)
             tone = "warn" if s.blocked == s.connections else None
@@ -360,7 +360,7 @@ class NetActivity(QWidget):
         if force or theme_key != self._conn_theme:   # a theme switch recolours them all
             self._conn_theme = theme_key
             self._conn_done.clear()
-        right = Qt.AlignRight | Qt.AlignVCenter
+        right = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         tone = {netlog.BLOCKED: "warn", netlog.FAILED: "error"}
         t.clearSelection()   # new rows push the others down: pick it again by number
         for r, e in enumerate(self._entries):
@@ -372,7 +372,7 @@ class NetActivity(QWidget):
                 self._conn_done.add(e.n)   # finished: it won't change again
             label = netlog.feature_label(e.feature)
             color = tone.get(e.state)
-            _put(t, r, 0, _when(e.started), tone=color).setData(Qt.UserRole, e.n)
+            _put(t, r, 0, _when(e.started), tone=color).setData(Qt.ItemDataRole.UserRole, e.n)
             _put(t, r, 1, netlog.where(e), tone=color)
             _put(t, r, 2, e.cause or "", e.cause, tone=color)
             _put(t, r, 3, label, label, tone=color)
@@ -390,7 +390,7 @@ class NetActivity(QWidget):
         if not rows:
             return None
         it = self.conns.item(rows[0].row(), 0)
-        return it.data(Qt.UserRole) if it is not None else None
+        return it.data(Qt.ItemDataRole.UserRole) if it is not None else None
 
     def _pick(self):
         n = self._picked_n()
@@ -406,7 +406,7 @@ class NetActivity(QWidget):
 
     def _show_totals(self):
         dlg = TotalsDialog(self)
-        dlg.setAttribute(Qt.WA_DeleteOnClose)
+        dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         dlg.show()
 
     def _open_log(self):
@@ -414,7 +414,7 @@ class NetActivity(QWidget):
         if path is None:
             if self._entries:
                 dlg = LogDialog(netlog.as_text(list(reversed(self._entries))), self)
-                dlg.setAttribute(Qt.WA_DeleteOnClose)
+                dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
                 dlg.show()
             return
         # Notepad: a .jsonl file usually has nothing set to open it
@@ -436,7 +436,8 @@ class _Num(QTableWidgetItem):
     """A cell that sorts by the number behind it, not its text ("2 KB" < "10 KB")."""
 
     def __lt__(self, other):
-        return (self.data(Qt.UserRole) or 0) < (other.data(Qt.UserRole) or 0)
+        role = Qt.ItemDataRole.UserRole
+        return (self.data(role) or 0) < (other.data(role) or 0)
 
 
 class LogDialog(QDialog):
@@ -451,8 +452,8 @@ class LogDialog(QDialog):
         v = QVBoxLayout(self)
         self.text = QPlainTextEdit(text)
         self.text.setReadOnly(True)
-        self.text.setLineWrapMode(QPlainTextEdit.NoWrap)
-        self.text.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
+        self.text.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        self.text.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
         v.addWidget(self.text)
         row = QHBoxLayout()
         row.addStretch(1)
@@ -487,17 +488,17 @@ class TotalsDialog(QDialog):
         t.setObjectName("activitytable")
         t.setHorizontalHeaderLabels(self.COLUMNS)
         t.verticalHeader().setVisible(False)
-        t.setSelectionBehavior(QAbstractItemView.SelectRows)
-        t.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        t.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        t.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         t.setShowGrid(False)
         t.setAlternatingRowColors(True)
         t.setWordWrap(False)
         t.verticalHeader().setDefaultSectionSize(30)
         h = t.horizontalHeader()
-        h.setSectionResizeMode(QHeaderView.Interactive)
-        h.setSectionResizeMode(0, QHeaderView.Stretch)
-        h.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        h.setSortIndicator(4, Qt.DescendingOrder)   # the most data first
+        h.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        h.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        h.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        h.setSortIndicator(4, Qt.SortOrder.DescendingOrder)   # the most data first
         for i, width in enumerate([0, 130, 90, 90, 90, 110, 110]):
             if width:
                 t.setColumnWidth(i, width)
@@ -546,7 +547,7 @@ class TotalsDialog(QDialog):
         t.horizontalHeaderItem(0).setText(_("Site") if by_site else _("Server"))
         t.setSortingEnabled(False)
         t.setRowCount(len(rows))
-        right = Qt.AlignRight | Qt.AlignVCenter
+        right = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         for r, row in enumerate(rows):
             count = _count(row.connections, row.blocked, row.failed)
             tone = "warn" if row.blocked == row.connections else None
@@ -565,10 +566,10 @@ class TotalsDialog(QDialog):
             for c, (text, num, tip) in enumerate(cells):
                 it = QTableWidgetItem(text) if num is None else _Num(text)
                 if num is not None:
-                    it.setData(Qt.UserRole, num)
+                    it.setData(Qt.ItemDataRole.UserRole, num)
                     if c <= 4:
                         it.setTextAlignment(right)
-                it.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                it.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
                 it.setToolTip(_tip(tip or text))
                 if tone:
                     it.setForeground(QColor(theme.status(tone)))

@@ -108,11 +108,11 @@ class _ClickBlocker(QObject):
         if not obj.property("busy"):
             return False
         t = ev.type()
-        if t in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
-                 QEvent.MouseButtonDblClick):
+        if t in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease,
+                 QEvent.Type.MouseButtonDblClick):
             return True
-        return t in (QEvent.KeyPress, QEvent.KeyRelease) and ev.key() in (
-            Qt.Key_Space, Qt.Key_Return, Qt.Key_Enter, Qt.Key_Select)
+        return t in (QEvent.Type.KeyPress, QEvent.Type.KeyRelease) and ev.key() in (
+            Qt.Key.Key_Space, Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Select)
 
 
 _blocker: _ClickBlocker | None = None

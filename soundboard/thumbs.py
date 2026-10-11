@@ -66,11 +66,12 @@ def store(src: str | Path | QImage, sid: str) -> str:
         log.info("couldn't read %s as a picture", src)
         return ""
     if img.width() > MAX_W or img.height() > MAX_H:
-        img = img.scaled(MAX_W, MAX_H, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+        img = img.scaled(MAX_W, MAX_H, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                         Qt.TransformationMode.SmoothTransformation)
     try:
         library.THUMBS_DIR.mkdir(parents=True, exist_ok=True)
         dest = library.THUMBS_DIR / f"{sid}_{uuid.uuid4().hex[:6]}.jpg"
-        if not img.convertToFormat(QImage.Format_RGB888).save(str(dest), "JPG", 88):
+        if not img.convertToFormat(QImage.Format.Format_RGB888).save(str(dest), "JPG", 88):
             return ""
         return str(dest)
     except OSError:
@@ -338,9 +339,10 @@ def fitted(path: str, w: int, h: int, dpr: float,
     src = pixmap(path, waiter)
     if src is None:
         return None
-    big = src.scaled(w, h, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+    big = src.scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                     Qt.TransformationMode.SmoothTransformation)
     pm = QPixmap(w, h)
-    pm.fill(Qt.transparent if radius else Qt.black)
+    pm.fill(Qt.GlobalColor.transparent if radius else Qt.GlobalColor.black)
     p = QPainter(pm)
     p.drawPixmap((w - big.width()) // 2, (h - big.height()) // 2, big)
     if shade:
@@ -353,9 +355,9 @@ def fitted(path: str, w: int, h: int, dpr: float,
         corners.addRect(0, 0, w, h)
         rounded = QPainterPath()
         rounded.addRoundedRect(0, 0, w, h, radius * dpr, radius * dpr)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setCompositionMode(QPainter.CompositionMode_Clear)
-        p.fillPath(corners.subtracted(rounded), Qt.black)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
+        p.fillPath(corners.subtracted(rounded), Qt.GlobalColor.black)
     p.end()
     pm.setDevicePixelRatio(dpr)
     # the pads are all one size: a new size (Pad size dragged, another screen's

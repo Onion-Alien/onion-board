@@ -593,7 +593,7 @@ def _app_in_front() -> bool:
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance()
-    return (app is not None and app.applicationState() == Qt.ApplicationActive
+    return (app is not None and app.applicationState() == Qt.ApplicationState.ApplicationActive
             and app.activeWindow() is not None)
 
 

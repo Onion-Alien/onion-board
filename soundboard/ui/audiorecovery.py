@@ -126,16 +126,16 @@ class RecoveryCard(QFrame):
                                  pixmap.height())
         icon.setPixmap(pixmap)
         icon.setFixedSize(pixmap.size())
-        head.addWidget(icon, 0, Qt.AlignVCenter)
+        head.addWidget(icon, 0, Qt.AlignmentFlag.AlignVCenter)
         title = QLabel(_("Audio recovery"))
         title.setObjectName("section")
         title.setProperty("keepline", True)
         self.heading = title
-        head.addWidget(title, 0, Qt.AlignVCenter)
+        head.addWidget(title, 0, Qt.AlignmentFlag.AlignVCenter)
         self.pill = QLabel()
         self.pill.setObjectName("pill")
         self.pill.hide()
-        head.addWidget(self.pill, 0, Qt.AlignVCenter)
+        head.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
         head.addStretch(1)
         self.more = QPushButton()
         self.more.setObjectName("iconbutton")
@@ -155,7 +155,7 @@ class RecoveryCard(QFrame):
             self.menu_actions[action] = act
         self.more.clicked.connect(
             lambda: self.menu.popup(self.more.mapToGlobal(self.more.rect().bottomLeft())))
-        head.addWidget(self.more, 0, Qt.AlignVCenter)
+        head.addWidget(self.more, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(head)
         hint = QLabel(_("Fix problems sending sounds into your mic after an update."))
         hint.setObjectName("hint")

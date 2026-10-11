@@ -182,4 +182,4 @@ class BoardHost:
         if tray is None or not tray.isVisible() or self.win.isActiveWindow():
             return
         from PySide6.QtWidgets import QSystemTrayIcon
-        tray.showMessage(title, body, QSystemTrayIcon.Information, 8000)
+        tray.showMessage(title, body, QSystemTrayIcon.MessageIcon.Information, 8000)

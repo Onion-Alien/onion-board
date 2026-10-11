@@ -29,27 +29,28 @@ def swatch(color: str, size: int = 14) -> QIcon:
     gets a check mark on it, so the picked one still shows which colour it is."""
     def dot(ticked: bool) -> QPixmap:
         pm = QPixmap(size, size)
-        pm.fill(Qt.transparent)
+        pm.fill(Qt.GlobalColor.transparent)
         p = QPainter(pm)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(color))
         p.drawEllipse(1, 1, size - 2, size - 2)
         if ticked:
-            ink = QColor(Qt.black if QColor(color).lightnessF() > 0.6 else Qt.white)
+            ink = QColor(Qt.GlobalColor.black if QColor(color).lightnessF() > 0.6
+                         else Qt.GlobalColor.white)
             pen = QPen(ink, max(1.6, size / 8))
-            pen.setCapStyle(Qt.RoundCap)
-            pen.setJoinStyle(Qt.RoundJoin)
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
             p.setPen(pen)
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawPolyline([QPointF(size * .3, size * .52), QPointF(size * .45, size * .67),
                             QPointF(size * .72, size * .36)])
         p.end()
         return pm
     icon = QIcon(dot(False))
     # QMenu draws a checked action's On icon in place of its tick
-    icon.addPixmap(dot(True), QIcon.Normal, QIcon.On)
-    icon.addPixmap(dot(True), QIcon.Active, QIcon.On)
+    icon.addPixmap(dot(True), QIcon.Mode.Normal, QIcon.State.On)
+    icon.addPixmap(dot(True), QIcon.Mode.Active, QIcon.State.On)
     return icon
 
 
@@ -89,11 +90,11 @@ class PadSelection(QObject):
         self.picked: set[str] = set()
         self.anchor: str | None = None      # where a Shift+click range starts
         self.bar = self._build_bar()
-        for seq, fn in ((QKeySequence.SelectAll, self.select_all),
-                        (QKeySequence(Qt.Key_Escape), self.clear),
-                        (QKeySequence.Delete, self._delete_key)):
+        for seq, fn in ((QKeySequence.StandardKey.SelectAll, self.select_all),
+                        (QKeySequence(Qt.Key.Key_Escape), self.clear),
+                        (QKeySequence.StandardKey.Delete, self._delete_key)):
             sc = QShortcut(seq, keys_on)
-            sc.setContext(Qt.WidgetWithChildrenShortcut)
+            sc.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
             sc.activated.connect(fn)
 
     # ------------------------------------------------------------------ the bar

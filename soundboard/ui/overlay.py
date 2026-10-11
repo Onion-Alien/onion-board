@@ -504,7 +504,7 @@ class _AnyInput(QObject):
         self._done = done
 
     def eventFilter(self, obj, e):
-        if e.type() in (QEvent.MouseButtonPress, QEvent.KeyPress):
+        if e.type() in (QEvent.Type.MouseButtonPress, QEvent.Type.KeyPress):
             QTimer.singleShot(0, self._done)   # not from inside the event's delivery
         return False
 
@@ -518,17 +518,19 @@ class OverlayWindow(QWidget):
     MARGIN = 36   # from the screen edge
 
     def __init__(self, ov: Overlay):
-        super().__init__(None, Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-                         | Qt.WindowDoesNotAcceptFocus | Qt.NoDropShadowWindowHint)
+        super().__init__(None, Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint
+                         | Qt.WindowType.WindowStaysOnTopHint
+                         | Qt.WindowType.WindowDoesNotAcceptFocus
+                         | Qt.WindowType.NoDropShadowWindowHint)
         self.ov = ov
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle(_("Onion Board overlay"))
         self.playing: dict = {}
         self._hover: str | None = None     # "slot:N" / "pause" / "stop" under the mouse
         self.setMouseTracking(True)
         self._fade = QPropertyAnimation(self, b"windowOpacity", self)
-        self._fade.setEasingCurve(QEasingCurve.OutCubic)
+        self._fade.setEasingCurve(QEasingCurve.Type.OutCubic)
         self._fade.finished.connect(self._faded)
         self._styled = False
         self._press: QPoint | None = None     # where a press on an empty part was
@@ -577,11 +579,11 @@ class OverlayWindow(QWidget):
     def mouseMoveEvent(self, e):
         self.ov.keep_preview()
         self.ov._touch()   # the mouse is on it: don't auto-hide from under it
-        if self._press is not None and e.buttons() & Qt.LeftButton:
+        if self._press is not None and e.buttons() & Qt.MouseButton.LeftButton:
             at = e.globalPosition().toPoint()
             if self._grab is None and (at - self._press).manhattanLength() >= DRAG_START_PX:
                 self._grab = self._press - self.pos()
-                self.setCursor(Qt.ClosedHandCursor)
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
             if self._grab is not None:
                 self.move(self._clamped(at - self._grab, at))
                 self.ov._touch()
@@ -589,7 +591,8 @@ class OverlayWindow(QWidget):
         hit = self._hit(e.position())
         if hit != self._hover:
             self._hover = hit
-            self.setCursor(Qt.PointingHandCursor if hit else Qt.OpenHandCursor)
+            self.setCursor(Qt.CursorShape.PointingHandCursor if hit
+                           else Qt.CursorShape.OpenHandCursor)
             self.update()
 
     def _clamped(self, top_left: QPoint, cursor: QPoint) -> QPoint:
@@ -602,10 +605,11 @@ class OverlayWindow(QWidget):
                       min(max(top_left.y(), g.top()), g.top() + g.height() - self.height()))
 
     def mouseReleaseEvent(self, e):
-        if e.button() != Qt.LeftButton:
+        if e.button() != Qt.MouseButton.LeftButton:
             return
         dragged, self._grab, self._press = self._grab is not None, None, None
-        self.setCursor(Qt.PointingHandCursor if self._hover else Qt.OpenHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor if self._hover
+                       else Qt.CursorShape.OpenHandCursor)
         if dragged:
             geo = self.geometry()
             sc = QGuiApplication.screenAt(geo.center()) or self.screen()
@@ -619,11 +623,11 @@ class OverlayWindow(QWidget):
             self.update()
 
     def mousePressEvent(self, e):
-        hit = self._hit(e.position()) if e.button() == Qt.LeftButton else None
+        hit = self._hit(e.position()) if e.button() == Qt.MouseButton.LeftButton else None
         if hit:
             self.ov.click(hit)
             self.update()
-        elif e.button() == Qt.LeftButton:     # anywhere else grabs it, to move it
+        elif e.button() == Qt.MouseButton.LeftButton:     # anywhere else grabs it, to move it
             self._press = e.globalPosition().toPoint()
 
     def _screen(self, follow_game: bool):
@@ -735,9 +739,9 @@ class OverlayWindow(QWidget):
         dpr = self.devicePixelRatioF()
         pm = QPixmap(max(1, round(self.width() * dpr)), max(1, round(self.height() * dpr)))
         pm.setDevicePixelRatio(dpr)
-        pm.fill(Qt.transparent)
+        pm.fill(Qt.GlobalColor.transparent)
         p = QPainter(pm)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.scale(self._k(), self._k())
         draw(p)
         p.end()
@@ -759,7 +763,7 @@ class OverlayWindow(QWidget):
         tiles = [(i, self._tile_rect(i), m) for i, m in enumerate(ov.page_sounds()[:SLOTS])]
         tiles = [t for t in tiles if dirty.intersects(self._scaled(t[1]))]
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.drawPixmap(0, 0, under)
         p.scale(k, k)
         for __, r, meta in tiles:
@@ -808,20 +812,21 @@ class OverlayWindow(QWidget):
         col = ov.host.cfg.category_colors.get(cat) if cat else None
         if col:   # the category's colour, as on its tab
             p.save()
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(col))
             p.drawEllipse(QRectF(head.left(), head.center().y() - 5, 10, 10))
             p.restore()
             head = head.adjusted(16, 0, 0, 0)
             room -= 16
-        p.drawText(head, Qt.AlignLeft | Qt.AlignVCenter,
-                   p.fontMetrics().elidedText(title, Qt.ElideRight, max(0, int(room))))
+        p.drawText(head, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                   p.fontMetrics().elidedText(title, Qt.TextElideMode.ElideRight,
+                                              max(0, int(room))))
         f.setBold(False)
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(QColor(T["muted"]))
         if hint:
-            p.drawText(head, Qt.AlignRight | Qt.AlignVCenter, hint)
+            p.drawText(head, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, hint)
 
         # tiles: an empty slot whole, a sound's card (the bar and the rest go on top)
         for i in range(SLOTS):
@@ -837,7 +842,7 @@ class OverlayWindow(QWidget):
         cat_key = ("     " + _("{key}  category", key=key_label(ks["cat"]))
                    if ov.host.cfg.categories else "")
         if not ov.sounds():
-            p.drawText(foot, Qt.AlignCenter,
+            p.drawText(foot, Qt.AlignmentFlag.AlignCenter,
                        _("Nothing in this category") + cat_key if cat
                        else _("No sounds yet: add some in the Sounds tab"))
         else:
@@ -852,8 +857,9 @@ class OverlayWindow(QWidget):
             left = btns["stop"].right() + 10
             rest = QRectF(left, btns["stop"].top(), W - self.PAD - 2 - left, self.BTN_H)
             close = _("let go to close") if ov.s.mode == "hold" else _("Esc  close")
-            p.drawText(rest, Qt.AlignLeft | Qt.AlignVCenter, cat_key.strip())
-            p.drawText(rest, Qt.AlignRight | Qt.AlignVCenter, close)
+            p.drawText(rest, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                       cat_key.strip())
+            p.drawText(rest, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, close)
 
     def _paint_over(self, p: QPainter):
         f = QFont(self.font())
@@ -872,12 +878,12 @@ class OverlayWindow(QWidget):
         card.setAlpha(240)
         p.fillPath(path, card)
         p.setPen(QPen(QColor(T["accent"] if hover else T["border"]), 1))
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
         ink = QColor(T["text_hi"] if live else T["muted"])
         # the icon is drawn, not a glyph: not every font has ⏸ / ⏹
         cx, cy, s = r.left() + 14, r.center().y(), 4.5
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(ink)
         if icon == "pause":
             p.drawRect(QRectF(cx - s, cy - s, 3.2, 2 * s))
@@ -892,18 +898,18 @@ class OverlayWindow(QWidget):
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(ink)
-        p.drawText(body, Qt.AlignLeft | Qt.AlignVCenter, text)
+        p.drawText(body, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, text)
         if key:   # the key on a little keycap, like a pad's hotkey badge
             f.setBold(False)
             p.setFont(f)
             fm = p.fontMetrics()
             w = fm.horizontalAdvance(key) + 10
             cap = QRectF(body.right() - w, cy - fm.height() / 2 - 1, w, fm.height() + 2)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(T["badge"]))
             p.drawRoundedRect(cap, 4, 4)
             p.setPen(QColor(T["badge_text"]))
-            p.drawText(cap, Qt.AlignCenter, key)
+            p.drawText(cap, Qt.AlignmentFlag.AlignCenter, key)
 
     @staticmethod
     def _path(r: QRectF) -> QPainterPath:
@@ -915,14 +921,15 @@ class OverlayWindow(QWidget):
         T = theme.T
         path = self._path(r)
         if meta is None:
-            p.setPen(QPen(QColor(T["border"]), 1, Qt.DashLine))
-            p.setBrush(Qt.NoBrush)
+            p.setPen(QPen(QColor(T["border"]), 1, Qt.PenStyle.DashLine))
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawPath(path)
             p.setPen(QColor(T["muted"]))   # faint was unreadable (2.6:1) in some themes
             f.setBold(False)
             f.setPointSizeF(8.5)
             p.setFont(f)
-            p.drawText(r.adjusted(10, 6, -8, -6), Qt.AlignLeft | Qt.AlignTop,
+            p.drawText(r.adjusted(10, 6, -8, -6), Qt.AlignmentFlag.AlignLeft
+                       | Qt.AlignmentFlag.AlignTop,
                        key_label(self.ov.keyset["slots"][i]))
             return
         card = QColor(T["card_hi"] if flash else T["card"])
@@ -955,17 +962,18 @@ class OverlayWindow(QWidget):
         p.setFont(f)
         badge = QRectF(r.left() + 11, r.top() + 7, max(18, p.fontMetrics().horizontalAdvance(key)
                                                        + 10), 17)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(T["badge"]))
         p.drawRoundedRect(badge, 5, 5)
         p.setPen(QColor(T["badge_text"]))
-        p.drawText(badge, Qt.AlignCenter, key)
+        p.drawText(badge, Qt.AlignmentFlag.AlignCenter, key)
         # name
         ready = meta.id in self.ov.host.audio
         f.setPointSizeF(9.5)
         p.setFont(f)
         p.setPen(QColor(T["text_hi"] if ready else T["muted"]))
-        p.drawText(r.adjusted(11, 27, -8, -5), Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
+        p.drawText(r.adjusted(11, 27, -8, -5), Qt.AlignmentFlag.AlignLeft
+                   | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap,
                    meta.name if ready else _("{name} (loading)", name=meta.name))
 
     def _tile_edge(self, p: QPainter, r: QRectF, i: int, meta, flash: bool):
@@ -976,8 +984,9 @@ class OverlayWindow(QWidget):
         elif self._hover == f"slot:{i}":
             p.setPen(QPen(QColor(T["accent"]), 1.6))
         elif prog is not None:
-            p.setPen(QPen(QColor(meta.color), 2, Qt.DashLine if paused else Qt.SolidLine))
+            p.setPen(QPen(QColor(meta.color), 2, Qt.PenStyle.DashLine if paused
+                          else Qt.PenStyle.SolidLine))
         else:
             p.setPen(QPen(QColor(T["border"]), 1))
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(self._path(r))

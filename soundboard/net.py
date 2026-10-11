@@ -968,9 +968,9 @@ def apply_qt(nam, feature: str) -> None:
 def qt_proxy(feature: str):
     from PySide6.QtNetwork import QNetworkProxy
     r = _relay_start()
-    p = QNetworkProxy(QNetworkProxy.HttpProxy, "127.0.0.1", r.port, feature, r.secret)
+    p = QNetworkProxy(QNetworkProxy.ProxyType.HttpProxy, "127.0.0.1", r.port, feature, r.secret)
     # names go to the relay unresolved; the relay hands them on (to the proxy)
-    p.setCapabilities(p.capabilities() | QNetworkProxy.HostNameLookupCapability)
+    p.setCapabilities(p.capabilities() | QNetworkProxy.Capability.HostNameLookupCapability)
     return p
 
 
