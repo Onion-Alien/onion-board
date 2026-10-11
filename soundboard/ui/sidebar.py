@@ -11,7 +11,7 @@ from __future__ import annotations
 import html
 
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QMouseEvent, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QSizePolicy, QSpacerItem, QTabWidget, QToolButton,
                                QVBoxLayout, QWidget)
@@ -500,8 +500,8 @@ class OutputBlock(QFrame):
         if obj is self.mark:
             if e.type() in (QEvent.Type.Move, QEvent.Type.Resize):
                 self._place_dot()
-            elif (e.type() == QEvent.Type.MouseButtonRelease and self.dot.isVisible()
-                  and e.button() == Qt.MouseButton.LeftButton):
+            elif (isinstance(e, QMouseEvent) and e.type() == QEvent.Type.MouseButtonRelease
+                  and self.dot.isVisible() and e.button() == Qt.MouseButton.LeftButton):
                 self.connection.click()   # (Setup)
                 return True
         return False
