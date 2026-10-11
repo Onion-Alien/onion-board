@@ -1226,9 +1226,10 @@ class SideRail(QFrame):
             box.setVisible(shown and not mid)   # mid: as shut, the dot on the arrow
         self._sync_divider()
         self.toggle.setVisible(not self._squeezed)
-        # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
-        icons.set_icon(self.toggle, "back" if shown != self.isRightToLeft() else "forward",
-                       size=ICON)
+        # a window with its side bar, the chevron pointing the way the rail will go:
+        # mirrored (Arabic), the bar is on the right and it opens leftwards
+        icons.set_icon(self.toggle, ("panel_close" if shown else "panel_open")
+                       + ("_rtl" if self.isRightToLeft() else ""), size=ICON)
         # only the arrow, open or shut ("Hide tab names" was cut short in most
         # languages); its name is what it does now, on hover and for a screen reader
         self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"), "",
