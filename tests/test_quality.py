@@ -67,6 +67,18 @@ def test_video_merges_with_ffmpeg_and_falls_back_to_single_files(monkeypatch):
     assert o["format"].startswith("b[height<=480]")
 
 
+@pytest.mark.parametrize("ff", ["ffmpeg.exe", None])
+def test_video_falls_back_to_the_sound_when_no_video_fits(monkeypatch, ff):
+    """SoundCloud has no video, and YouTube has no single files with both (so without
+    ffmpeg none fits): the format ends in the sound alone, else yt-dlp says "Requested
+    format is not available" and the whole Add fails."""
+    monkeypatch.setattr(ytdl.net, "ytdlp_proxy", lambda *a, **k: None)
+    monkeypatch.setattr(library, "_ffmpeg", lambda: ff)
+    assert ytdl._opts(video=True)["format"].endswith("/bestaudio/best")
+    quality.change(download="small")
+    assert ytdl._opts(video=True)["format"].endswith("/" + quality.current.audio_format())
+
+
 def test_save_video_copies_under_the_title_without_clobbering(tmp_path):
     quality.change(video_dir=str(tmp_path / "vids"))
     src = tmp_path / "abc.mp4"
