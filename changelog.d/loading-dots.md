@@ -1,0 +1,1 @@
+- Make the loading dots easier to see with a left-to-right accent highlight, growth and hop beneath Bun.
