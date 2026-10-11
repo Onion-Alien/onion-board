@@ -3170,5 +3170,8 @@
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Blir ett nytt ljud på ditt board efter de före. Du behöver inte trycka på något.",
   "Waiting to add": "Väntar på att läggas till",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows håller {keys} för sig själv, så den kan inte vara ett kortkommando. Välj en annan tangent.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows håller <b>{key}</b> för sig själv, så den kan inte vara ett kortkommando. Välj en annan tangent.</span>"
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows håller <b>{key}</b> för sig själv, så den kan inte vara ett kortkommando. Välj en annan tangent.</span>",
+  "Opacity": "Opacitet",
+  "Playing sound background": "Bakgrund för ljudet som spelas",
+  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten"
 }

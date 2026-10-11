@@ -1,0 +1,1 @@
+- Settings → Appearance can show the first playing or paused sound's whole thumbnail behind the sound cards, with adjustable opacity, rounded corners and padding. Off by default.

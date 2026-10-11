@@ -1124,6 +1124,9 @@ class PadGrid(QWidget):
     def __init__(self):
         super().__init__()
         self.pads: list[Pad] = []
+        self.background_image = ""
+        self.background_opacity = 0
+        self.background_pad_height = 0
         self.pad_w = 150         # the size picked (Pad size); narrower only when it won't fit
         self.two_up = False      # the mini player: two smaller pads a row rather than one
         self.slim = False        # a tiny mini player: one-line rows instead of cards
@@ -1163,6 +1166,20 @@ class PadGrid(QWidget):
         self._shape = None       # (columns, pad width) last laid out
         self._placed = None      # (columns, the pads shown) in the grid now
         self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
+
+    def set_background(self, image: str, opacity: int):
+        opacity = min(100, max(0, opacity))
+        if (image, opacity) != (self.background_image, self.background_opacity):
+            self.background_image, self.background_opacity = image, opacity
+            self.update()
+
+    def background_rect(self, size: QSize) -> QRectF:
+        view = self.parentWidget()
+        area = QRectF(0, -self.y(), self.width(),
+                      view.height() if view else self.height())
+        if size.isEmpty() or area.width() <= 0 or area.height() <= 0:
+            return QRectF()
+        return area
 
     def minimumSizeHint(self):
         # never wider than the scroll area around it: the pads fit themselves to its
@@ -1212,6 +1229,9 @@ class PadGrid(QWidget):
         return self.slim or self.listed
 
     def pad_h(self, w: int) -> int:
+        return self.background_pad_height or self.natural_pad_h(w)
+
+    def natural_pad_h(self, w: int) -> int:
         return SLIM_PAD_H if self.rows() else pad_height(w)
 
     def fit_width(self, room: int, slim: bool | None = None) -> tuple[int, int]:
@@ -1337,6 +1357,21 @@ class PadGrid(QWidget):
                                   root.width(), root.height())
         else:
             p.fillRect(e.rect(), QColor(theme.T["bg"]))
+        if self.background_image and self.background_opacity:
+            pm = thumbs.pixmap(self.background_image, waiter=self)
+            if pm is not None and not pm.isNull():
+                # Stretch the whole thumbnail across the visible board, with breathing
+                # room beside the scrollbar. Keep it fixed while the cards scroll.
+                target = self.background_rect(pm.size())
+                clip = QPainterPath()
+                clip.addRoundedRect(target, PAD_RADIUS, PAD_RADIUS)
+                p.save()
+                p.setRenderHint(QPainter.RenderHint.Antialiasing)
+                p.setClipPath(clip)
+                p.setOpacity(self.background_opacity / 100)
+                p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+                p.drawPixmap(target, pm, QRectF(pm.rect()))
+                p.restore()
         drop = self.drop_area()
         if drop is not None and drop.intersects(QRectF(e.rect())):
             # the empty room under the pads says what it's for, faintly

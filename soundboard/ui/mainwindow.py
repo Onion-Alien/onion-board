@@ -1612,6 +1612,7 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
+        scroll.verticalScrollBar().valueChanged.connect(self._scroll_background_board)
         self._pad_scroll = scroll
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         # the pads fit the width
@@ -2133,7 +2134,6 @@ class MainWindow(QMainWindow):
         self.engine.eq_target = target
         self.engine.eq_gains = list(gains) if enabled else None
         self._save_later()
-
     # ------------------------------------------------------------------ devices
     def refresh_devices(self) -> str:
         """Re-scan the sound devices and reopen the streams. Returns a short result
@@ -3463,6 +3463,8 @@ class MainWindow(QMainWindow):
         attribute) and save shortly after. The small public surface the Settings
         window and dialogs use."""
         setattr(self.cfg, attr, v)
+        if attr in ("playing_background", "playing_background_opacity"):
+            self._update_playing_background(self.engine.playing())
         if hasattr(self.engine, attr):
             setattr(self.engine, attr, v)
         self._save_later()
@@ -8195,6 +8197,7 @@ class MainWindow(QMainWindow):
     def _tick_visuals(self, playing, now: float):
         """The part of tick() that only matters while the window is on screen."""
         e = self.engine
+        self._update_playing_background(playing)
         on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
         shown = self.isVisible()
         # only the pads playing now and the ones still showing a sound (cleared on the
@@ -8252,6 +8255,57 @@ class MainWindow(QMainWindow):
             want = any(sid in self._meta or sid == LINK_ID for sid in playing)
         if self.transport.isHidden() == want:
             self.transport.setVisible(want)
+
+    def _scroll_background_board(self, value):
+        if not self.grid.background_image:
+            return
+        step = getattr(self, "_background_row_step", 0)
+        bar = self._pad_scroll.verticalScrollBar()
+        if step:
+            snapped = min(round(value / step), bar.maximum() // step) * step
+            if snapped != value:
+                bar.setValue(snapped)
+        self.grid.update()
+
+    def _update_playing_background(self, playing):
+        on = self.cfg.playing_background
+        fitted_height, step = 0, 0
+        if on and self.grid.pads and self.grid._shape is not None:
+            margins = self.grid.grid.contentsMargins()
+            height = self.grid.natural_pad_h(self.grid._shape[1])
+            spacing = self.grid.grid.spacing()
+            step = height + spacing
+            room = self._pad_scroll.height() - margins.top() - margins.bottom()
+            if room >= height:
+                rows = max(1, (room + spacing) // step)
+                fitted_height = (room - spacing * (rows - 1)) // rows
+                step = fitted_height + spacing
+        if fitted_height != self.grid.background_pad_height:
+            self.grid.background_pad_height = fitted_height
+            self.grid.relayout(force=True)
+        self._background_row_step = step
+        gap = (on, step)
+        if getattr(self, "_background_gap", None) != gap:
+            self._background_gap = gap
+            bar = self._pad_scroll.verticalScrollBar()
+            if not hasattr(self, "_background_scroll_step"):
+                self._background_scroll_step = bar.singleStep()
+            # The gap belongs outside the viewport, so the backdrop contains
+            # every card rather than cutting inside their edges.
+            rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
+            self._pad_scroll.setViewportMargins(12 if on and rtl else 0, 0,
+                                               12 if on and not rtl else 0, 0)
+            bar.setSingleStep(step or self._background_scroll_step)
+        image = ""
+        if on:
+            # The first active sound owns the backdrop, including while paused.
+            # Waiting sounds and a merely selected pad never claim it.
+            sid = next((sid for sid in playing if sid in self._meta), None)
+            m = self.meta(sid) if sid else None
+            image = m.image if m else ""
+        self.grid.set_background(image, self.cfg.playing_background_opacity)
+        if image and step and self._pad_scroll.verticalScrollBar().value() % step:
+            self._scroll_background_board(self._pad_scroll.verticalScrollBar().value())
 
     def _update_transport(self, playing):
         sid = self.current

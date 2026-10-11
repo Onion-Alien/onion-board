@@ -176,6 +176,7 @@ PAD_VIEWS = ("grid", "list")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
+                  "playing_background_opacity": (0, 100),
                   "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
 
@@ -380,6 +381,8 @@ class Config:
     # 1.6.7: a new name, so 1.6.5-1.6.6's saved live_tab_tint=False (the old default,
     # never picked by anyone) doesn't keep it off; older versions just ignore it
     live_tab_green: bool = True
+    playing_background: bool = False
+    playing_background_opacity: int = 20
     pad_width: int = 150
     pad_sort: str = "custom"   # the Sounds tab's order: PAD_SORTS
     pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)

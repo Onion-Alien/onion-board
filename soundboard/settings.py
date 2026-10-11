@@ -751,6 +751,7 @@ class SettingsDialog(QDialog):
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
+        v.addWidget(self._playing_background_card())
         v.addWidget(self._ui_scale_card())
         v.addWidget(self._highlight_card())
         hints = {"Classic": _("Changes the whole app instantly."),
@@ -810,6 +811,33 @@ class SettingsDialog(QDialog):
         combo.currentIndexChanged.connect(picked)
         show()
         self.ui_scale_combo, self.ui_scale_note, self.ui_scale_restart = combo, note, restart
+        return card
+
+    def _playing_background_card(self) -> QFrame:
+        card, cv = self._card(_("Playing sound background"),
+                              _("Show the playing sound's thumbnail behind the cards"))
+        enabled = QCheckBox(_("On"))
+        enabled.setAccessibleName(_("Playing sound background"))
+        enabled.setChecked(self.mw.cfg.playing_background)
+        enabled.toggled.connect(lambda on: self.mw.set_option("playing_background", on))
+        cv.addWidget(enabled)
+        row = QHBoxLayout()
+        row.addWidget(QLabel(_("Opacity")))
+        opacity = QSlider(Qt.Orientation.Horizontal)
+        opacity.setRange(0, 100)
+        opacity.setValue(self.mw.cfg.playing_background_opacity)
+        opacity.setAccessibleName(_("Opacity"))
+        no_wheel(opacity)
+        value = QLabel(f"{opacity.value()}%")
+        value.setMinimumWidth(value.fontMetrics().horizontalAdvance("100%"))
+        opacity.valueChanged.connect(lambda n: (
+            value.setText(f"{n}%"), self.mw.set_option("playing_background_opacity", n)))
+        opacity.setEnabled(enabled.isChecked())
+        enabled.toggled.connect(opacity.setEnabled)
+        row.addWidget(opacity, 1)
+        row.addWidget(value)
+        cv.addLayout(row)
+        self.playing_background_check, self.playing_background_opacity = enabled, opacity
         return card
 
     def _language_card(self) -> QFrame:

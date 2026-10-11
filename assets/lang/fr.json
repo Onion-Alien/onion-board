@@ -3170,5 +3170,8 @@
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Devient un nouveau son sur ton board après ceux d'avant. Rien à cliquer.",
   "Waiting to add": "En attente d'ajout",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows garde {keys} pour lui, ce ne peut donc pas être un raccourci. Choisis une autre touche.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows garde <b>{key}</b> pour lui, ce ne peut donc pas être un raccourci. Choisis une autre touche.</span>"
+  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows garde <b>{key}</b> pour lui, ce ne peut donc pas être un raccourci. Choisis une autre touche.</span>",
+  "Opacity": "Opacité",
+  "Playing sound background": "Arrière-plan du son en cours",
+  "Show the playing sound's thumbnail behind the cards": "Afficher la miniature du son en cours derrière les cartes"
 }
