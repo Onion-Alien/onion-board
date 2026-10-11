@@ -13,18 +13,22 @@ the affected states; include its PR and validation evidence here.
 
 ## Fix first
 
-- [ ] **U1: Consistent bottom-right dialog actions.** The original audit treated
+- [x] **U1: Consistent bottom-right dialog actions.** The original audit treated
   right-aligned actions as a defect under the old design rule. That finding is
-  superseded: bottom-right is the intended pattern. Settings Done and Edit sound's
-  original placement were appropriate; Feedback's left-first footer is an outlier.
-  PR #396 implements the superseded left-alignment rule and needs review/revision
-  against this preference before it can complete U1.
-  Targets: `settings.py`, `ui/dialogs.py`, `ui/recordmic.py`, `ui/programpick.py`,
-  `ui/feedbackdialog.py`. Reuse/extract a small action-row helper in the shared UI
-  layer. Acceptance: stretch before the bottom-right action group, main action
-  first within the group, then alternatives/Cancel/Done, one filled action;
-  preview/reset stays with its content. Verify recording before/after capture,
-  Edit Save/Save as new sound/Cancel, Enter/Escape, and narrow translated layouts.
+  superseded: bottom-right is the intended pattern, and Settings, Edit sound,
+  Recording and the Program picker already followed it (PR #396, which moved them
+  left, was closed unmerged). Acceptance: stretch before the bottom-right action
+  group, main action first within the group, then alternatives/Cancel/Done, one
+  filled action; preview/reset stays with its content.
+
+  Done (PR #398): the remaining left-aligned footers moved bottom-right: Send
+  feedback (both pages), Count me in (Done) and the sound source box (Open, Copy
+  link, Close; its Delete info bin stays on the left beside the details and stays
+  last in focus order). Order, defaults, Escape and focus unchanged; checked
+  offscreen in Dark and Light, English and German (`tests/test_dialog_actions.py`).
+  Left as is on purpose: Recently deleted's Bring back / Delete for good act on the
+  list above them (its Close is already bottom-right); setup and reset guides keep
+  Back on the left and Next/Go on the right.
 
 - [ ] **U2: A clear rule for choice controls.** Recording source uses radio tiles;
   Appearance's live indicator and Connection use plain radios; output modes use
@@ -95,9 +99,7 @@ for controls/surfaces and section 14 for the UI workflow.
 Use docs/UI-AUDIT.md as the backlog. U1 requires bottom-right dialog actions:
 stretch before the action group, main action first within that group, then
 alternatives/Cancel/Done. Ordinary fields and card/toolbar actions stay beside
-their content. PR #396 used the superseded left-alignment rule; review and revise
-that existing PR before starting duplicate U1 work. Reverify current PR state.
-After U1 is reviewed, work through U2-U4 in separate changes. Report intentional
+their content. U1 is done (PR #398); work through U2-U4 in separate changes. Report intentional
 differences instead of forcing every choice into one widget type. Preserve live
 settings versus draft Save/Cancel, preview, keyboard access and window lifetimes.
 Reuse small shared helpers, translate changed UI text in every language, inspect

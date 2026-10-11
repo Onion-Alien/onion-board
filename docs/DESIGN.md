@@ -131,7 +131,7 @@ These are the current reference points. Copy their structure before inventing a 
 | Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
 | Setup tab cards | `setcard`: heading, one-line hint, controls, buttons at their own width in a wrapping row. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
-| Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, a second page instead of a second dialog. Its footer needs the bottom-right action pattern. |
+| Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |
 
 ## 2. Layout

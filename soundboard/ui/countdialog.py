@@ -75,8 +75,8 @@ class CountDialog(QDialog):
         done = QPushButton(_("Done"))
         done.setDefault(True)
         done.clicked.connect(self.accept)
+        row.addStretch(1)   # bottom-right
         row.addWidget(done)
-        row.addStretch(1)
         v.addSpacing(6)
         v.addLayout(row)
         self.setMinimumWidth(540)   # English on one line a row; longer languages wrap Why
