@@ -1,6 +1,7 @@
 """Toasts (ui/toast.py), the import's summary and See why (ui/importreport.py), and the
 drop veil (ui/dropveil.py)."""
 import numpy as np
+import pytest
 import soundfile as sf
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QApplication, QDialog, QPushButton, QWidget
@@ -170,6 +171,17 @@ def test_the_summary_says_how_it_went():
     assert importreport.summary(0, [bad]) == ("Couldn't add 1 file", "error")
 
 
+def test_duplicates_are_not_counted_as_failed_files():
+    dupe = importreport.Skipped("a.wav", "already", "dupe")
+    empty = importreport.Skipped("empty.mp3", "empty", "not_sound")
+    locked = importreport.Skipped("locked.wav", "denied", "unreadable")
+    assert importreport.summary(0, [dupe] * 5 + [empty]) == (
+        "5 sounds are already in your library · 1 skipped", "warn")
+    assert importreport.summary(0, [dupe, empty, locked]) == (
+        "That sound is already in your library · 2 skipped", "warn")
+    assert importreport.summary(0, [empty, locked]) == ("Couldn't add 2 files", "error")
+
+
 def test_the_see_why_list_copies_everything(qapp):
     sk = [importreport.Skipped("b.mp3", "damaged", "not_sound"),
           importreport.Skipped("a.wav", "already", "dupe")]
@@ -198,6 +210,11 @@ def test_a_mixed_drop_ends_in_one_toast_with_see_why(main_window, qapp, tmp_path
     d = w.findChildren(importreport.SkippedDialog)[-1]
     assert not d.isModal() and {s.group for s in d.skipped} == {"dupe", "not_sound"}
     d.close()
+    w.import_files([str(good), str(bad)])
+    assert process_events(qapp, lambda: not w._pending_imports)
+    repeated = next(x for x in toast.shown(w) if x.key == "import")
+    assert repeated.text() == "That sound is already in your library · 1 skipped"
+    assert repeated.kind == "warn" and repeated.card.action.text() == "See why"
 
 
 def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # noqa: F811
@@ -297,6 +314,43 @@ def test_a_cards_parts_line_up(qapp):
         middle = part.mapTo(c, QPoint(0, 0)).y() + part.height() / 2
         assert abs(middle - first) <= 2, part
     w.close()
+
+
+@pytest.mark.windows
+def test_see_why_text_is_level_with_the_warning_icon(qapp):
+    """Check the painted baseline with the Windows font the app ships with."""
+    import os
+    from pathlib import Path
+    from PySide6.QtGui import QColor, QFont, QFontDatabase
+    from soundboard import theme
+
+    QFontDatabase.addApplicationFont(str(Path(os.environ["WINDIR"]) / "Fonts" / "segoeui.ttf"))
+
+    def ink_middle(widget, colour):
+        image = widget.grab().toImage()
+        target = QColor(colour)
+        rows = [y for y in range(image.height()) for x in range(image.width())
+                if max(abs(image.pixelColor(x, y).red() - target.red()),
+                       abs(image.pixelColor(x, y).green() - target.green()),
+                       abs(image.pixelColor(x, y).blue() - target.blue())) < 20]
+        assert rows
+        return widget.y() + (min(rows) + max(rows)) / 2
+
+    old = theme.current_name
+    w = _host(qapp)
+    try:
+        for name in ("Dark", "Light"):
+            theme.apply(qapp, name)
+            t = busy.toast(w, "5 sounds are already in your library · 1 skipped", "warn",
+                           key="import", action=("See why", lambda: None))
+            t.card.action.setFont(QFont("Segoe UI", 10))
+            qapp.processEvents()
+            assert t.card.action.height() == toast.LINE
+            assert abs(ink_middle(t.card.action, theme.T["accent_hi"])
+                       - ink_middle(t.card.icon, theme.T["warn_text"])) <= 1
+    finally:
+        w.close()
+        theme.apply(qapp, old)
 
 
 def test_the_mini_player_shows_icons_on_top_or_none(main_window, qapp):  # noqa: F811

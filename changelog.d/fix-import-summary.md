@@ -1,0 +1,2 @@
+- Reimporting sounds already in your library alongside an empty or unreadable file now reports the duplicates separately from the skipped files, as a warning.
+- Align toast action text, such as See why, with the status icon.

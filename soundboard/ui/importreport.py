@@ -69,7 +69,8 @@ def classify(file: str, e: BaseException | str) -> Skipped:
 def summary(added: int, skipped: list[Skipped]) -> tuple[str, str]:
     """The toast's text and kind for an import that's over."""
     k = len(skipped)
-    dupes_only = k and all(s.group == "dupe" for s in skipped)
+    dupes = sum(s.group == "dupe" for s in skipped)
+    dupes_only = k and dupes == k
     if added and not k:
         return ngettext("✓ Added {n} sound", "✓ Added {n} sounds", added), "ok"
     if added:
@@ -77,11 +78,14 @@ def summary(added: int, skipped: list[Skipped]) -> tuple[str, str]:
                   added=ngettext("Added {n} sound", "Added {n} sounds", added),
                   skipped=ngettext("{n} skipped", "{n} skipped", k)),
                 "" if dupes_only else "warn")
-    if dupes_only:
-        if k == 1:
-            return _("That sound is already in your library"), ""
-        return (ngettext("{n} sound is already in your library",
-                         "{n} sounds are already in your library", k), "")
+    if dupes:
+        already = (_("That sound is already in your library") if dupes == 1 else
+                   ngettext("{n} sound is already in your library",
+                            "{n} sounds are already in your library", dupes))
+        if dupes_only:
+            return already, ""
+        return (_("{added} · {skipped}", added=already,
+                  skipped=ngettext("{n} skipped", "{n} skipped", k - dupes)), "warn")
     return ngettext("Couldn't add {n} file", "Couldn't add {n} files", k), "error"
 
 
