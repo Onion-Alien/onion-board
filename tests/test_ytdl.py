@@ -643,6 +643,8 @@ def test_search_myinstants_reads_the_buttons_and_downloads_the_mp3(monkeypatch, 
     path, title = ytdl.download_audio(r[0].url, dest=tmp_path)   # no yt-dlp involved
     assert path == tmp_path / "vine-boom.mp3" and path.read_bytes() == b"ID3mp3"
     assert title == "Vine boom"
+    from soundboard import sourceinfo   # the pad menu's Open on Myinstants
+    assert sourceinfo.read_from(tmp_path)["link"] == r[0].url
 
 
 def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):

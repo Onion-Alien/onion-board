@@ -45,16 +45,25 @@ def test_each_kept_site(url, site):
     assert sourceinfo.pick({"webpage_url": url}, url)["site"] == site
 
 
-@pytest.mark.parametrize("url", ["https://www.myinstants.com/media/sounds/a.mp3",
-                                 "https://vimeo.com/1", "https://x.com/a/status/1"])
-def test_other_sites_keep_nothing(url):
-    assert sourceinfo.pick({"webpage_url": url, "title": "x"}, url) == {}
+@pytest.mark.parametrize("url,key,name", [
+    ("https://www.instagram.com/reel/1", "instagram", "Instagram"),
+    ("https://x.com/a/status/1", "x", "X"), ("https://vimeo.com/1", "vimeo", "Vimeo"),
+    ("https://www.myinstants.com/media/sounds/a.mp3", "myinstants", "Myinstants"),
+    ("https://www.some-other-site.example/v/1", "web", "some-other-site.example")])
+def test_every_download_site_keeps_it_named_after_the_site(url, key, name):
+    src = sourceinfo.pick({"webpage_url": url, "title": "x"}, url)
+    assert src["site"] == key and sourceinfo.site_name(src) == name
+
+
+@pytest.mark.parametrize("url", ["", "file:///C:/x.mp3", "C:/Music/x.mp3", "ftp://a/b"])
+def test_not_a_web_link_keeps_nothing(url):
+    assert sourceinfo.pick({"title": "x"}, url) == {}
 
 
 def test_a_stored_source_is_cleaned():
     assert sourceinfo.clean(SRC) == SRC
     assert sourceinfo.clean({"link": "javascript:alert(1)", "site": "youtube"}) == {}
-    assert sourceinfo.clean({"link": "https://evil.example/watch"}) == {}
+    assert sourceinfo.clean({"link": "https://a.example/w", "site": "youtube"})["site"] == "web"
     assert sourceinfo.clean("nonsense") == {} and sourceinfo.clean(None) == {}
     odd = sourceinfo.clean({"link": SRC["link"], "site": "bogus", "views": -3,
                             "channel_link": "file:///c:/x"})
@@ -84,7 +93,7 @@ def test_the_download_leaves_its_info_for_the_link_bar(tmp_path):
     other.mkdir()
     g = other / "a.mp3"
     g.write_bytes(b"x")
-    ytdl._found("https://vimeo.com/1", other, g, {"title": "a"})
+    ytdl._found("C:/not/a/link.mp3", other, g, {"title": "a"})
     assert sourceinfo.read_from(other) == {}
 
 
@@ -145,11 +154,12 @@ def test_details_box_shows_the_fields_and_opens_the_link(qapp, monkeypatch):
     from soundboard.ui import busy, sourcedialog
     opened = []
     monkeypatch.setattr(busy, "open_url", lambda url, **kw: opened.append(url) or True)
+    music = "https://music.youtube.com/watch?v=dQw4w9WgXcQ"
     d = sourcedialog.SourceDialog(SoundMeta(id="a", name="Song", file="x.mp3",
-                                            source=dict(SRC, site="ytmusic")))
+                                            source=dict(SRC, link=music)))
     texts = {lab.text() for lab in d.findChildren(QLabel)}
     assert {"Uploaded", "2009-10-25", "3:33", "Views", "1,700,000,000 (when added)"} <= texts
     assert d.windowTitle() == "YouTube Music"
     d.btn_open.click()
-    assert opened == [SRC["link"]]
+    assert opened == [music]
     d.close()

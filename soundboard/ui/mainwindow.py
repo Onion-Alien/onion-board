@@ -5790,7 +5790,7 @@ class MainWindow(QMainWindow):
         a_src_open = a_src_copy = a_src_info = None
         if src := sourceinfo.clean(m.source):   # downloaded from YouTube, TikTok…
             site = sourceinfo.site_name(src)
-            sm = menu.addMenu(icons.icon(src["site"]), site)
+            sm = menu.addMenu(icons.icon(sourceinfo.icon(src)), site)
             sm.setToolTipsVisible(True)
             a_src_open = add(("browser",), _("Open on {site}", site=site), src["link"], sm)
             a_src_copy = add(("copy",), _("Copy link"), src["link"], sm)

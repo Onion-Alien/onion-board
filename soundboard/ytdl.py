@@ -774,7 +774,9 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     except Exception as e:  # noqa: BLE001 - network: show why
         drop()
         raise DownloadError(_("Download failed ({error})", error=errors.plain(e))) from e
-    return path, _direct_title(url)
+    title = _direct_title(url)
+    sourceinfo.save_for(tmp, {"title": title}, url)   # the pad menu's Open on Myinstants
+    return path, title
 
 
 def _sendable(opts: dict) -> dict:

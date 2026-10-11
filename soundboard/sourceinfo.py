@@ -1,10 +1,11 @@
 """Where a downloaded sound came from: the video's link, channel, upload date, length
-and views, so the user can find the video again (the pad menu's *Open on YouTube*,
-*Copy link* and *Video info…*).
+and views, so the user can find it again (the pad menu's *Open on YouTube*, *Copy
+link* and *Details…*).
 
-Only for YouTube, YouTube Music, TikTok and SoundCloud. It is picked out of the reply
-yt-dlp already got for the download: nothing extra is asked of the site (a second
-lookup per download reads as a bot). Likes and comments are left out on purpose.
+For any sound added from a web link (YouTube, TikTok, SoundCloud, Instagram, X…;
+not files, recordings or packs). It is picked out of the reply yt-dlp already got
+for the download: nothing extra is asked of the site (a second lookup per download
+reads as a bot). Likes and comments are left out on purpose.
 
 The info is kept on the sound (SoundMeta.source) and written as a plain text file
 next to its audio, "YouTube/Song.txt", for anyone browsing the Sounds folder. The
@@ -24,22 +25,36 @@ log = logging.getLogger(__name__)
 # what download_audio leaves in its temp folder for the caller (like the thumbnail)
 FILE = "source.json"
 
-# host -> (site key, the name shown). Keys match ui/icons.py's site icons.
+# host -> (site key, the name shown: brand names, never translated). Keys with a
+# picture in ui/icons.py show it; the rest show a globe. Same sites as
+# library._SITES (the folder a download goes in).
 _SITES = {"music.youtube.com": ("ytmusic", "YouTube Music"),
           "youtube.com": ("youtube", "YouTube"), "youtu.be": ("youtube", "YouTube"),
-          "tiktok.com": ("tiktok", "TikTok"), "soundcloud.com": ("soundcloud", "SoundCloud")}
+          "tiktok.com": ("tiktok", "TikTok"), "soundcloud.com": ("soundcloud", "SoundCloud"),
+          "instagram.com": ("instagram", "Instagram"), "twitter.com": ("x", "X"),
+          "x.com": ("x", "X"), "reddit.com": ("reddit", "Reddit"),
+          "redd.it": ("reddit", "Reddit"), "twitch.tv": ("twitch", "Twitch"),
+          "facebook.com": ("facebook", "Facebook"), "fb.watch": ("facebook", "Facebook"),
+          "vimeo.com": ("vimeo", "Vimeo"), "bandcamp.com": ("bandcamp", "Bandcamp"),
+          "kick.com": ("kick", "Kick"), "dailymotion.com": ("dailymotion", "Dailymotion"),
+          "bilibili.com": ("bilibili", "Bilibili"), "myinstants.com": ("myinstants", "Myinstants"),
+          "streamable.com": ("streamable", "Streamable")}
 
 
 def site_of(url: str) -> tuple[str, str] | None:
-    """(key, name) of a site we keep the info for, or None."""
+    """(key, name) of the site a link is on: a site of ours, else ("web", its host
+    without "www."); None when it isn't a web link."""
     try:
-        host = (urlsplit(str(url).strip()).hostname or "").lower()
+        parts = urlsplit(str(url).strip())
+        host = (parts.hostname or "").lower()
     except ValueError:
+        return None
+    if parts.scheme not in ("http", "https") or not host:
         return None
     for site, found in _SITES.items():
         if host == site or host.endswith("." + site):
             return found
-    return None
+    return "web", host.removeprefix("www.")
 
 
 def _text(v, limit: int = 300) -> str:
@@ -56,8 +71,8 @@ def _number(v) -> int | None:
 
 
 def pick(info: dict, url: str) -> dict:
-    """The fields kept from yt-dlp's `info` for a download of `url`; {} for a site we
-    don't keep it for. The link is the video's own page (a short youtu.be link or a
+    """The fields kept from yt-dlp's `info` for a download of `url` ({} when it isn't a
+    web link). The link is the video's own page (a short youtu.be link or a
     search hit becomes the watch link)."""
     link = _http(info.get("webpage_url")) or _http(url)
     found = site_of(url) or site_of(link)
@@ -79,8 +94,8 @@ def pick(info: dict, url: str) -> dict:
 
 
 def clean(v) -> dict:
-    """A stored SoundMeta.source made safe to use: {} unless it has an http(s) link on
-    one of our sites."""
+    """A stored SoundMeta.source made safe to use: {} unless it has an http(s) link.
+    The site always comes from the link, never from what was stored."""
     if not isinstance(v, dict) or not _http(v.get("link")) or site_of(v["link"]) is None:
         return {}
     out = {k: _text(v.get(k)) for k in ("site", "title", "channel", "uploaded", "added")}
@@ -88,15 +103,20 @@ def clean(v) -> dict:
     out["channel_link"] = _http(v.get("channel_link"))
     out["seconds"] = _number(v.get("seconds"))
     out["views"] = _number(v.get("views"))
-    if out["site"] not in {k for k, _n in _SITES.values()}:
-        out["site"] = site_of(out["link"])[0]
+    out["site"] = site_of(out["link"])[0]
     return {k: x for k, x in out.items() if x not in ("", None)}
 
 
 def site_name(src: dict) -> str:
-    """"YouTube", "YouTube Music", "TikTok" or "SoundCloud" (brand names: never
-    translated)."""
-    return next((n for k, n in _SITES.values() if k == src.get("site")), "YouTube")
+    """"YouTube", "TikTok", "Instagram"… or the host of any other site."""
+    found = site_of(src.get("link", ""))
+    return found[1] if found else "YouTube"
+
+
+def icon(src: dict) -> str:
+    """The ui/icons.py picture for the site: its own, else a globe."""
+    key = src.get("site", "")
+    return key if key in ("youtube", "ytmusic", "tiktok", "soundcloud", "myinstants") else "browser"
 
 
 def length(seconds) -> str:

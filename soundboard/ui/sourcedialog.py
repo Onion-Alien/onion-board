@@ -55,7 +55,7 @@ class SourceDialog(QDialog):
                                     Qt.TransformationMode.SmoothTransformation))
         else:   # no thumbnail: the site's icon on an inner area
             pic.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 8px;")
-            pic.setPixmap(icons.pixmap(self.src.get("site", "youtube"), 40,
+            pic.setPixmap(icons.pixmap(sourceinfo.icon(self.src), 40,
                                        theme.T["muted"]))
         top.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
         names = QVBoxLayout()
@@ -101,7 +101,7 @@ class SourceDialog(QDialog):
 
         row = QHBoxLayout()
         row.setSpacing(8)
-        self.btn_open = QPushButton(icons.icon(self.src.get("site", "youtube")),
+        self.btn_open = QPushButton(icons.icon(sourceinfo.icon(self.src)),
                                     _("Open on {site}", site=site))
         self.btn_open.setObjectName("primary")
         self.btn_open.setToolTip(self.src.get("link", ""))
