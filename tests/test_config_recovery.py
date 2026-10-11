@@ -36,6 +36,8 @@ def test_broken_config_uses_the_newest_backup_that_loads(app_dir):
     assert cfg.stop_hotkey == "f9"
     assert "config.json.2" in cfg.load_note
     assert list(app_dir.glob("config.json.broken-*"))   # the damaged file is kept
+    # ...and the recovered copy is config.json again, without waiting for a change
+    assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["stop_hotkey"] == "f9"
 
 
 def test_nothing_loadable_says_so(app_dir):
@@ -57,6 +59,9 @@ def test_missing_config_with_backups_recovers_the_newest(app_dir):
     assert cfg.stop_hotkey == "f9" and [s.id for s in cfg.sounds] == ["a"]
     assert "missing" in cfg.load_note and "config.json.1" in cfg.load_note
     assert not list(app_dir.glob("config.json.broken-*"))   # nothing to set aside
+    assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["stop_hotkey"] == "f9"
+    # the backups it came from are all still there
+    assert library.CONFIG_PATH.with_name("config.json.2").exists()
 
 
 def test_missing_config_with_only_bad_backups_says_so(app_dir):
