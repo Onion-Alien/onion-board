@@ -26,6 +26,28 @@ the route (`Config.route`, `library.ROUTES`):
   admin step stops Windows' audio for a moment; a helper started first brings it back
   whenever that process ends, killed or not.
 
+  **The mic helper** (`soundboard/michelper.py`, 1.9.28): that first admin step also
+  installs `obmichelper.exe` in `Program Files\Onion Board Mic Helper` (the admin part
+  above frozen on its own by `scripts/build_michelper.py`: no Qt, no numpy, ~16 MB,
+  with its own copy of `obmic.dll`) and a scheduled task, `\Onion Board\Mic helper`,
+  that runs it as SYSTEM. The task has no trigger: it runs only when the app starts it,
+  does the job and exits, so nothing stays in the background. Only the account that
+  set it up (and admins) may start it. From then on every admin step the app wants
+  (`directmic._elevated`: set-up, repair, another mic, clean-up, removal) goes to the
+  helper first, with no prompt: the app writes a one-line request into
+  `%ProgramData%\OnionBoard\MicHelper\requests\`, starts the task, and reads the exit
+  code from `...\results\` (admins only). The helper runs only the commands in
+  `michelper.allowed()`, each with a mic GUID at most, through the same
+  `directmic.cli` as the admin copy. It installs only the DLL it carries, so it's used
+  for setting up only while its DLL is the app's (`stamp.txt`: `HELPER_VERSION` + the
+  DLL's SHA-256); a new effect DLL makes the app ask Windows once more, and that prompt
+  updates the helper. A helper older than `MIN_HELPER_VERSION` isn't used at all (raise
+  it when the helpers out there have a bug). No helper, or one that doesn't answer:
+  Windows' prompt, as before. The uninstaller's `--direct-mic remove` runs
+  `remove-all`: the effect off every mic, then the task is deleted and the helper's
+  files go (those in use at the next restart). When the admin code changes, bump
+  `HELPER_VERSION` (`tests/test_michelper.py` fails until it is).
+
   Board ↔ effect: `%ProgramData%\OnionBoard\MicPlugin\ring2.bin`, a shared file
   (layout in `directmic.py`'s docstring). The effect publishes the **clean mic**
   (before anything of the board's) and the board takes its mic from there: the meter,
@@ -49,8 +71,8 @@ the route (`Config.route`, `library.ROUTES`):
   is trusted (anyone signed in can write it); `test_effect_survives_a_fuzzed_ring`
   checks that.
   `directmic.status()` notices a mic Windows took the effect off ('wiped') or one with
-  an older copy of it ('outdated'); the Setup tab offers a one-click repair, or the
-  cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
+  an older copy of it ('outdated'); the Setup tab offers a one-click repair (no prompt
+  once the mic helper is there), or the cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
 - **The virtual cable** (the fallback). Settings on the cable route moved to the mic
   route once in 1.9.1 (`Config.mic_first`); a route picked after that stays. While the
   mic isn't set up yet the mic route sends through the cable, and once it is, the

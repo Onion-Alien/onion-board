@@ -293,7 +293,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 - Themed app icons: `%APPDATA%\OnionBoard\icons\` (the shortcuts point at one;
   deleting it leaves them blank until the next start writes it again).
 - Straight into my mic: the admin step logs to
-  `%ProgramData%\OnionBoard\directmic-admin.log`; the ring shared with the effect is
+  `%ProgramData%\OnionBoard\directmic-admin.log` (`michelper.log` when the mic helper
+  ran it: `%ProgramFiles%\Onion Board Mic Helper\`, task `\Onion Board\Mic helper`,
+  `schtasks /query /tn "\Onion Board\Mic helper"`; from source it's built by
+  `scripts\build_michelper.py` after `build_directmic.py`); the ring shared with the effect is
   `%ProgramData%\OnionBoard\MicPlugin\ring2.bin`, and what the set-up changed is noted
   under `HKLM\SOFTWARE\OnionBoard\MicPlugin`. `directmic.status()` says where it
   stands on a mic (missing / other / wiped / outdated / ready).

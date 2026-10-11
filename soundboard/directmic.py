@@ -45,6 +45,11 @@ registers it, puts it on the mic (keeping any effect the mic's driver had, which
 effect then runs first) and restarts Windows' audio service. `uninstall()` puts every
 mic back as it was. The DLL that's installed is always this app's own copy, never a path
 from the command line, so the admin step can't be pointed at another DLL.
+
+After that first prompt the admin steps go through the mic helper (soundboard/
+michelper.py: a SYSTEM scheduled task running a frozen copy of this module's admin
+part with its own DLL), with no prompt; `_elevated` tries it first and falls back to
+Windows' prompt.
 """
 from __future__ import annotations
 
