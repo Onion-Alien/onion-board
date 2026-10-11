@@ -1,0 +1,1 @@
+- A tick box you click no longer keeps a white ring around it.

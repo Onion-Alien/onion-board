@@ -13,7 +13,7 @@ from __future__ import annotations
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
 from PySide6.QtGui import QHoverEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QComboBox, QMenu, QProxyStyle,
+                               QApplication, QCheckBox, QComboBox, QMenu, QProxyStyle,
                                QScrollBar, QSizePolicy, QStyle, QWidget)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
@@ -38,6 +38,8 @@ class AppStyle(QProxyStyle):
       side near the screen's edge, right-to-left languages).
     - popups clear hover on the controls behind their mouse grab, so moving away
       while a menu is open never leaves its opener highlighted.
+    - tick boxes take keyboard focus from Tab, so mouse clicks do not leave a
+      focus ring behind. Keyboard users can still reach and toggle them.
     """
 
     COMBO_CAP = 360
@@ -49,6 +51,8 @@ class AppStyle(QProxyStyle):
         super().polish(arg)
         if isinstance(arg, QComboBox):
             snug_combo(arg, self.COMBO_CAP)
+        elif isinstance(arg, QCheckBox) and arg.focusPolicy() == Qt.FocusPolicy.StrongFocus:
+            arg.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         elif isinstance(arg, QMenu):
             arg.installEventFilter(_submenu_edge())   # once: Qt doesn't add it twice
         elif isinstance(arg, QWidget) and arg.windowType() == Qt.WindowType.Popup:
