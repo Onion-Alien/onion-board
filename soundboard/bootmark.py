@@ -76,7 +76,8 @@ def read(directory: Path) -> tuple[str, int]:
 
 
 def clear(directory: Path | None = None) -> None:
-    """Remove the breadcrumb: the app reached its running state, or ended on purpose."""
+    """Remove the breadcrumb: the app reached its running state, ended on purpose, or
+    (applog.py) a saved crash report is the trace of a start that died instead."""
     try:
         path = Path(directory) if directory is not None else app_dir()
         (path / NAME).unlink(missing_ok=True)
