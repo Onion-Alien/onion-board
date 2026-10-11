@@ -3247,21 +3247,14 @@
     "Přidávají se {n} zvuky",
     "Přidává se {n} zvuků"
   ],
-  "+{count} queued": [
-    "+{count} ve frontě",
-    "+{count} ve frontě",
-    "+{count} ve frontě"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Zmizí z {mic}: efekt mikrofonu funguje vždy jen na jednom mikrofonu.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efekt mikrofonu byl přeinstalován na {mic}. Vyzkoušej ho v hlasovém chatu.",
   "Mic effect removed from {mic}": "Efekt mikrofonu odstraněn z {mic}",
-  "Mic to fix": "Mikrofon k opravě",
   "Onion Board will send your sounds into {mic} from now on.": "Onion Board bude od teď posílat tvoje zvuky do {mic}.",
   "Plug this mic in to repair it.": "Připoj tento mikrofon, abys ho mohl opravit.",
   "Reinstall Onion Board's mic effect on {mic}.": "Přeinstaluj efekt mikrofonu Onion Board na {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Obnov {mic} a odstraň z něj efekt mikrofonu Onion Board. Zvuky se do něj přestanou posílat přímo.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Obnov {mic}, odstraň starý efekt mikrofonu a pak na něj nainstaluj novou kopii.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Efekt mikrofonu je na {mic}. Funguje vždy jen na jednom mikrofonu.",
   "{mic} (unplugged)": "{mic} (odpojený)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Tvoje zvuky jdou do {mic}. Chceš-li místo něj tento mikrofon, vyber ho i v Zařízeních.",
   "#{number} {mic}": "#{number} {mic}",

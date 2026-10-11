@@ -3174,20 +3174,14 @@
     "{n} geluid toevoegen",
     "{n} geluiden toevoegen"
   ],
-  "+{count} queued": [
-    "+{count} in de wachtrij",
-    "+{count} in de wachtrij"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Het gaat van {mic} af: het microfooneffect werkt op één microfoon tegelijk.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Microfooneffect opnieuw geïnstalleerd op {mic}. Test het in je voicechat.",
   "Mic effect removed from {mic}": "Microfooneffect verwijderd van {mic}",
-  "Mic to fix": "Te repareren microfoon",
   "Onion Board will send your sounds into {mic} from now on.": "Onion Board stuurt je geluiden vanaf nu naar {mic}.",
   "Plug this mic in to repair it.": "Sluit deze microfoon aan om hem te repareren.",
   "Reinstall Onion Board's mic effect on {mic}.": "Installeer het microfooneffect van Onion Board opnieuw op {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Herstel {mic} en verwijder het microfooneffect van Onion Board ervan. Geluiden worden dan niet meer rechtstreeks naar die microfoon gestuurd.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Herstel {mic}, verwijder het oude microfooneffect en installeer er daarna een nieuwe kopie op.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Het microfooneffect zit op {mic}. Het werkt op één microfoon tegelijk.",
   "{mic} (unplugged)": "{mic} (niet aangesloten)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Je geluiden gaan naar {mic}. Wil je deze microfoon gebruiken, kies hem dan ook bij Apparaten.",
   "#{number} {mic}": "#{number} {mic}",

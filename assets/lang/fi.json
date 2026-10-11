@@ -3174,20 +3174,14 @@
     "Lisätään {n} ääni",
     "Lisätään {n} ääntä"
   ],
-  "+{count} queued": [
-    "+{count} jonossa",
-    "+{count} jonossa"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Se poistetaan laitteesta {mic}: mikrofonitehoste toimii yhdessä mikrofonissa kerrallaan.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofonitehoste asennettu uudelleen laitteeseen {mic}. Testaa sitä äänichatissa.",
   "Mic effect removed from {mic}": "Mikrofonitehoste poistettu laitteesta {mic}",
-  "Mic to fix": "Korjattava mikrofoni",
   "Onion Board will send your sounds into {mic} from now on.": "Onion Board lähettää äänesi tästä lähtien laitteeseen {mic}.",
   "Plug this mic in to repair it.": "Kytke tämä mikrofoni, niin voit korjata sen.",
   "Reinstall Onion Board's mic effect on {mic}.": "Asenna Onion Boardin mikrofonitehoste uudelleen laitteeseen {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Palauta {mic} ennalleen ja poista siitä Onion Boardin mikrofonitehoste. Ääniä ei enää lähetetä suoraan siihen.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Palauta {mic} ennalleen, poista vanha mikrofonitehoste ja asenna siihen sitten uusi kopio.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofonitehoste on laitteessa {mic}. Se toimii yhdessä mikrofonissa kerrallaan.",
   "{mic} (unplugged)": "{mic} (irrotettu)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Äänesi menevät laitteeseen {mic}. Jos haluat käyttää tätä mikrofonia, valitse se myös kohdassa Laitteet.",
   "#{number} {mic}": "#{number} {mic}",

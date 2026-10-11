@@ -3174,20 +3174,14 @@
     "{n} hang hozzáadása",
     "{n} hang hozzáadása"
   ],
-  "+{count} queued": [
-    "+{count} sorban",
-    "+{count} sorban"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Lekerül erről: {mic}. A mikrofoneffekt egyszerre csak egy mikrofonon működik.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "A mikrofoneffekt újratelepítve erre: {mic}. Próbáld ki a hangcsevegésben.",
   "Mic effect removed from {mic}": "Mikrofoneffekt eltávolítva innen: {mic}",
-  "Mic to fix": "Javítandó mikrofon",
   "Onion Board will send your sounds into {mic} from now on.": "Mostantól az Onion Board ide küldi a hangjaidat: {mic}.",
   "Plug this mic in to repair it.": "Csatlakoztasd ezt a mikrofont a javításhoz.",
   "Reinstall Onion Board's mic effect on {mic}.": "Telepítsd újra az Onion Board mikrofoneffektjét erre: {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Állítsd vissza ezt: {mic}, és távolítsd el róla az Onion Board mikrofoneffektjét. A hangok többé nem kerülnek közvetlenül bele.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Állítsd vissza ezt: {mic}, távolítsd el a régi mikrofoneffektet, majd telepíts rá egy friss példányt.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "A mikrofoneffekt ezen van: {mic}. Egyszerre csak egy mikrofonon működik.",
   "{mic} (unplugged)": "{mic} (nincs csatlakoztatva)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "A hangjaid ide mennek: {mic}. Ha inkább ezt a mikrofont használnád, válaszd ki az Eszközöknél is.",
   "#{number} {mic}": "#{number} {mic}",

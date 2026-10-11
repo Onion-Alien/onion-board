@@ -3174,20 +3174,14 @@
     "{n} ध्वनि जोड़ी जा रही है",
     "{n} ध्वनियाँ जोड़ी जा रही हैं"
   ],
-  "+{count} queued": [
-    "+{count} कतार में",
-    "+{count} कतार में"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "यह {mic} से हट जाएगा: माइक इफ़ेक्ट एक समय में एक ही माइक पर चलता है।",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "{mic} पर माइक इफ़ेक्ट फिर से इंस्टॉल हो गया। इसे अपने वॉइस चैट में आज़माएँ।",
   "Mic effect removed from {mic}": "{mic} से माइक इफ़ेक्ट हट गया",
-  "Mic to fix": "ठीक करने वाला माइक",
   "Onion Board will send your sounds into {mic} from now on.": "अब से Onion Board आपकी आवाज़ें {mic} में भेजेगा।",
   "Plug this mic in to repair it.": "इसे ठीक करने के लिए यह माइक प्लग करें।",
   "Reinstall Onion Board's mic effect on {mic}.": "{mic} पर Onion Board का माइक इफ़ेक्ट फिर से इंस्टॉल करें।",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "{mic} की पुरानी सेटिंग बहाल करें और उससे Onion Board का माइक इफ़ेक्ट हटाएँ। आवाज़ें सीधे उसमें जाना बंद हो जाएँगी।",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic} की पुरानी सेटिंग बहाल करें, पुराना माइक इफ़ेक्ट हटाएँ, फिर उस पर नई कॉपी इंस्टॉल करें।",
-  "The mic effect is on {mic}. It works on one mic at a time.": "माइक इफ़ेक्ट {mic} पर है। यह एक समय में एक ही माइक पर चलता है।",
   "{mic} (unplugged)": "{mic} (प्लग नहीं है)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "आपकी आवाज़ें {mic} में जाती हैं। इसकी जगह यह माइक इस्तेमाल करने के लिए इसे डिवाइस में भी चुनें।",
   "#{number} {mic}": "#{number} {mic}",

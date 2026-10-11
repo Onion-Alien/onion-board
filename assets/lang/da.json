@@ -3174,20 +3174,14 @@
     "Tilføjer {n} lyd",
     "Tilføjer {n} lyde"
   ],
-  "+{count} queued": [
-    "+{count} i kø",
-    "+{count} i kø"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Den fjernes fra {mic}: mikrofoneffekten virker på én mikrofon ad gangen.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofoneffekten er geninstalleret på {mic}. Test den i din stemmechat.",
   "Mic effect removed from {mic}": "Mikrofoneffekten fjernet fra {mic}",
-  "Mic to fix": "Mikrofon der skal repareres",
   "Onion Board will send your sounds into {mic} from now on.": "Onion Board sender fremover dine lyde til {mic}.",
   "Plug this mic in to repair it.": "Tilslut denne mikrofon for at reparere den.",
   "Reinstall Onion Board's mic effect on {mic}.": "Geninstaller Onion Boards mikrofoneffekt på {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Gendan {mic}, og fjern Onion Boards mikrofoneffekt fra den. Lyde sendes så ikke længere direkte til den.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Gendan {mic}, fjern den gamle mikrofoneffekt, og installer så en ny kopi på den.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofoneffekten er på {mic}. Den virker på én mikrofon ad gangen.",
   "{mic} (unplugged)": "{mic} (ikke tilsluttet)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Dine lyde går til {mic}. Vælg også denne mikrofon under Enheder for at bruge den i stedet.",
   "#{number} {mic}": "#{number} {mic}",

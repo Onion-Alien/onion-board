@@ -3101,19 +3101,14 @@
   "Adding {n} sound": [
     "{n} 件のサウンドを追加中"
   ],
-  "+{count} queued": [
-    "+{count} 件待機中"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}からは外れます。マイクエフェクトは一度に1つのマイクでしか動作しません。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "マイクエフェクトを{mic}に再インストールしました。ボイスチャットで試してください。",
   "Mic effect removed from {mic}": "{mic}からマイクエフェクトを削除しました",
-  "Mic to fix": "修復するマイク",
   "Onion Board will send your sounds into {mic} from now on.": "これからOnion Boardはサウンドを{mic}に送ります。",
   "Plug this mic in to repair it.": "修復するには、このマイクを接続してください。",
   "Reinstall Onion Board's mic effect on {mic}.": "Onion Boardのマイクエフェクトを{mic}に再インストールします。",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "{mic}の設定を元に戻し、Onion Boardのマイクエフェクトを削除します。サウンドはこのマイクに直接送られなくなります。",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic}の設定を元に戻し、古いマイクエフェクトを削除してから、新しいコピーをインストールします。",
-  "The mic effect is on {mic}. It works on one mic at a time.": "マイクエフェクトは{mic}にあります。一度に1つのマイクでしか動作しません。",
   "{mic} (unplugged)": "{mic}(未接続)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "サウンドは{mic}に送られています。代わりにこのマイクを使うには、デバイスでも選んでください。",
   "#{number} {mic}": "#{number} {mic}",

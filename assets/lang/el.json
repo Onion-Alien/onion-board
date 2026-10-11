@@ -3174,20 +3174,14 @@
     "Προστίθεται {n} ήχος",
     "Προστίθενται {n} ήχοι"
   ],
-  "+{count} queued": [
-    "+{count} σε αναμονή",
-    "+{count} σε αναμονή"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Θα αφαιρεθεί από το {mic}: το εφέ μικροφώνου λειτουργεί σε ένα μικρόφωνο κάθε φορά.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Το εφέ μικροφώνου εγκαταστάθηκε ξανά στο {mic}. Δοκίμασέ το στη φωνητική συνομιλία.",
   "Mic effect removed from {mic}": "Το εφέ μικροφώνου αφαιρέθηκε από το {mic}",
-  "Mic to fix": "Μικρόφωνο για επιδιόρθωση",
   "Onion Board will send your sounds into {mic} from now on.": "Από τώρα και στο εξής το Onion Board θα στέλνει τους ήχους σου στο {mic}.",
   "Plug this mic in to repair it.": "Σύνδεσε αυτό το μικρόφωνο για να το επιδιορθώσεις.",
   "Reinstall Onion Board's mic effect on {mic}.": "Εγκατάστησε ξανά το εφέ μικροφώνου του Onion Board στο {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Επαναφέρε το {mic} και αφαίρεσε από αυτό το εφέ μικροφώνου του Onion Board. Οι ήχοι θα σταματήσουν να στέλνονται απευθείας σε αυτό.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Επαναφέρε το {mic}, αφαίρεσε το παλιό εφέ μικροφώνου και μετά εγκατάστησε ένα νέο αντίγραφο σε αυτό.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Το εφέ μικροφώνου είναι στο {mic}. Λειτουργεί σε ένα μικρόφωνο κάθε φορά.",
   "{mic} (unplugged)": "{mic} (αποσυνδεδεμένο)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Οι ήχοι σου πηγαίνουν στο {mic}. Για να χρησιμοποιήσεις αυτό το μικρόφωνο, διάλεξέ το και στις Συσκευές.",
   "#{number} {mic}": "#{number} {mic}",

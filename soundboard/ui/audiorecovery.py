@@ -1,23 +1,21 @@
 """Discoverable recovery for Onion Board's Windows microphone effect.
 
-The card in Settings > Audio shows where the mic effect stands as a pill. The one fix
-it needs (update, or repair when Windows took it off the mic) is the card's main
-button; the rare actions (repair, clean reinstall, remove) sit behind its ⋯ menu.
-While a fix runs, the setup guide's show plays under it (ui/setupshow.py: Bun
-builds a speaker, then it thumps and he cheers, or it goes BOOM).
-
-The mic it works on is picked on the card itself ("Mic to fix"), by the mic's Windows
-endpoint, not its name: two mics can share a name, and one can be unplugged. The
-effect sits on one mic at a time (they'd share one ring), so the list shows each mic
-with its own state, and a fix on another mic says it moves there."""
+The card in Settings > Audio lists every mic (by its Windows endpoint, not its name:
+two mics can share a name, and one can be unplugged) as a row of its own: the mic's
+name, where the mic effect stands on it, and each action it can take as a button,
+with nothing behind a menu. A mic with the effect gets its fix (update, or repair
+when Windows took it off), a clean reinstall and remove; a mic without it gets install
+and a clean-up of anything a cut-off set-up left. The effect sits on one mic at a time
+(they'd share one ring), so installing it on another mic says it moves there. While a
+fix runs, the setup guide's show plays under the list (ui/setupshow.py: Bun builds a
+speaker, then it thumps and he cheers, or it goes BOOM)."""
 from __future__ import annotations
 
 import logging
 import threading
 
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QComboBox, QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout)
+from PySide6.QtWidgets import QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 from shiboken6 import isValid as qt_valid
 
 from soundboard import directmic, errors, theme
@@ -25,8 +23,6 @@ from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
 from soundboard.ui.setupshow import SetupShow
-from soundboard.ui.widgets import DropdownMenu
-from soundboard.wheelguard import no_wheel, snug_combo
 
 log = logging.getLogger(__name__)
 INSTALLS = ("install", "repair", "update", "reinstall")   # these leave the effect on
@@ -177,6 +173,70 @@ class Recovery(QObject):
             self.mw.toast(_("{error}", error=err), "warn")
 
 
+class MicRow(QFrame):
+    """One mic on the card: its name, where the mic effect stands on it, and every
+    action that mic can take, as buttons (nothing hidden in a menu)."""
+
+    def __init__(self, card, mic, label, in_use):
+        super().__init__()
+        self.mic = mic
+        self.setObjectName("tabcard")   # a box inside the card
+        v = QVBoxLayout(self)
+        v.setContentsMargins(12, 10, 12, 10)
+        v.setSpacing(8)
+        top = QHBoxLayout()
+        top.setSpacing(8)
+        self.name = QLabel(label)
+        self.name.setToolTip(mic["name"])
+        self.name.setWordWrap(True)
+        top.addWidget(self.name, 1)
+        pill, tone, _fix = look(mic["state"])
+        self.pill = QLabel(pill)
+        self.pill.setObjectName("pill")
+        self.pill.setVisible(bool(pill))
+        theme.set_tone(self.pill, tone)
+        top.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.in_use = QLabel(_("In use"))
+        self.in_use.setObjectName("pill")
+        theme.set_tone(self.in_use, "muted")
+        self.in_use.setVisible(in_use)
+        top.addWidget(self.in_use, 0, Qt.AlignmentFlag.AlignVCenter)
+        v.addLayout(top)
+        self.buttons = {}
+        row = Flow(gap=8)
+        for action in actions_for(mic):
+            b = QPushButton(action_text(action))
+            if action in ("repair", "update"):
+                b.setObjectName("primary")   # the fix this mic needs
+            elif action == "remove":
+                b.setObjectName("danger")
+                b.setProperty("quiet", True)
+            b.clicked.connect(lambda _c=False, a=action: card.confirm(a, self.mic))
+            row.addWidget(b)
+            self.buttons[action] = b
+        v.addLayout(row)
+        self.hint = QLabel(_("Plug this mic in to repair it."))
+        self.hint.setObjectName("hint")
+        self.hint.setWordWrap(True)
+        self.hint.setVisible(not mic["active"])
+        v.addWidget(self.hint)
+
+
+def actions_for(mic):
+    """The buttons a mic gets: on it, its fix (if it needs one), a clean reinstall and
+    remove; not on it, install and a clean-up of anything left behind. Unplugged: only
+    remove. Without an endpoint (Windows listed no mics), no clean-up."""
+    state = mic["state"]
+    if not has_effect(state):
+        if state not in ("other", "missing") or not mic["active"]:
+            return []
+        return ["install"] + (["cleanup"] if mic["guid"] else [])
+    if not mic["active"]:
+        return ["remove"]
+    fix = look(state)[2]
+    return ([fix] if fix else []) + ["reinstall", "remove"]
+
+
 class RecoveryCard(QFrame):
     checked = Signal(str, str)
     listed = Signal(list, str)
@@ -187,7 +247,10 @@ class RecoveryCard(QFrame):
         if not hasattr(mw, "audio_recovery"):
             mw.audio_recovery = Recovery(mw)
         self.recovery = mw.audio_recovery
-        self._state = ""
+        self.mics = []      # directmic.mics(): one row each
+        self._state = ""    # the app's mic, for when Windows lists no mics
+        self._shown = None  # what the rows show, so a check that changed nothing keeps them
+        self.rows = {}      # endpoint GUID (None: the app's mic, unlisted) -> MicRow
         self.setObjectName("setcard")
         v = QVBoxLayout(self)
         v.setContentsMargins(14, 12, 14, 14)
@@ -211,62 +274,22 @@ class RecoveryCard(QFrame):
         title.setProperty("head", True)   # no top padding: it shares a line with the pill
         self.heading = title
         head.addWidget(title, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.pill = QLabel()
+        self.pill = QLabel()   # Working… while a fix runs
         self.pill.setObjectName("pill")
         self.pill.hide()
         head.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
         head.addStretch(1)
-        self.more = QPushButton()
-        self.more.setObjectName("iconbutton")
-        self.more.setProperty("quiet", True)
-        self.more.setFixedSize(28, 28)
-        icons.set_icon(self.more, "more")
-        self.more.setToolTip(_("More options"))
-        self.more.setAccessibleName(_("More options"))
-        self.menu = DropdownMenu(self.more)
-        self.menu_actions = {}
-        # cleanup: on a mic without the effect, anything a cut-off set-up left behind
-        for action, icon in (("repair", "reload"), ("reinstall", "reload"),
-                             ("cleanup", "reload"), ("remove", "trash")):
-            if action == "remove":
-                self.menu.addSeparator()
-            act = self.menu.addAction(icons.icon(icon), action_text(action))
-            act.triggered.connect(lambda checked=False, a=action: self.confirm(a))
-            self.menu_actions[action] = act
-        self.more.clicked.connect(
-            lambda: self.menu.popup(self.more.mapToGlobal(self.more.rect().bottomLeft())))
-        head.addWidget(self.more, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(head)
         hint = QLabel(_("Fix problems sending sounds into your mic after an update."))
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         v.addWidget(hint)
-        row = Flow(gap=8)
-        self.mics = []   # directmic.mics(): what the list shows
-        pick = QLabel(_("Mic to fix"))
-        pick.setProperty("keepline", True)   # one line beside its list, in every language
-        self.target_box = QComboBox()
-        self.target_box.setAccessibleName(_("Mic to fix"))
-        pick.setBuddy(self.target_box)
-        no_wheel(self.target_box)
-        self.target_box.activated.connect(lambda _i: self._picked())
-        row.addWidget(pick)
-        row.addWidget(self.target_box)
-        self.fix = QPushButton()
-        self.fix.setObjectName("primary")
-        self.fix.hide()
-        self.fix.clicked.connect(lambda: self.confirm(self.fix.property("action")))
-        row.addWidget(self.fix)
-        v.addLayout(row)
+        self.list = QVBoxLayout()
+        self.list.setSpacing(6)
+        v.addLayout(self.list)
         # the same job as the setup guide's mic step, so the same show (hides itself)
         self.show_ = SetupShow()
         v.addWidget(self.show_)
-        # where the effect is when that's not the picked mic, or why it can't be fixed
-        self.where = QLabel()
-        self.where.setWordWrap(True)
-        self.where.setObjectName("hint")
-        self.where.hide()
-        v.addWidget(self.where)
         self.note = QLabel()
         self.note.setWordWrap(True)
         self.note.setObjectName("hint")
@@ -307,81 +330,58 @@ class RecoveryCard(QFrame):
             busy.emit(self.checked, state, mic or "")
         threading.Thread(target=work, daemon=True, name="recovery-status").start()
 
-    def target(self):
-        """The picked mic (a directmic.mics() entry), or None when Windows lists none."""
-        guid = self.target_box.currentData()
-        return next((m for m in self.mics if m["guid"] == guid), None)
+    def shown(self):
+        """The mics the card lists: Windows' list, or, when it lists none, the app's
+        mic on its own (worked on by name)."""
+        if self.mics:
+            return self.mics
+        mic = self.mw.cfg.mic_device
+        return [{"guid": None, "name": mic or _("Your mic"), "active": True,
+                 "state": self._state, "pa": mic}]
 
     def _listed(self, found, mic):
-        """Fill the list, keeping the picked mic (by endpoint) or else the app's mic."""
+        self._checking = False
         if mic != (self.mw.cfg.mic_device or ""):
             return
-        keep = self.target_box.currentData()
         self.mics = found
-        box = self.target_box
-        box.blockSignals(True)
-        box.clear()
-        for m, text in zip(found, labels(found)):
-            box.addItem(text, m["guid"])
-            box.setItemData(box.count() - 1, m["name"], Qt.ItemDataRole.ToolTipRole)
-        ours = next((m["guid"] for m in found if mic and m["pa"] == mic), None)
-        i = box.findData(keep) if keep else -1
-        box.setCurrentIndex(i if i >= 0 else max(0, box.findData(ours)))
-        box.blockSignals(False)
-        box.setEnabled(bool(found) and not self.recovery.running)
-        snug_combo(box)
-        box.view().setMinimumWidth(box.view().sizeHintForColumn(0) + 32)   # whole names
-
-    def _picked(self):
-        t = self.target()
-        if t is not None:
-            self.note.hide()
-            self._checked(t["state"])
+        self._rebuild()
 
     def _checked(self, state, mic=None):
         self._checking = False
         if mic is not None and mic != (self.mw.cfg.mic_device or ""):
             return
-        t = self.target()
-        if t is not None and mic is not None:
-            state = t["state"]   # the picked mic's own state, not the app's mic's
         self._state = state
-        if self.recovery.running:
-            return   # the pill says Working… until the fix is done
-        pill, tone, fix = look(state)
-        self.pill.setText(pill)
-        self.pill.setVisible(bool(pill))
-        theme.set_tone(self.pill, tone)
-        unplugged = t is not None and not t["active"]
-        self.fix.setVisible(fix is not None and not unplugged)
-        if fix:
-            self.fix.setText(action_text(fix))
-            self.fix.setProperty("action", fix)
-        # repair, reinstall and remove need the effect on this mic: greyed out without
-        # it (the main button offers Install instead)
-        installed = has_effect(state)
-        self.menu_actions["cleanup"].setEnabled(t is not None and state in ("other", "missing"))
-        for a in ("repair", "reinstall"):
-            self.menu_actions[a].setEnabled(installed and not unplugged)
-        self.menu_actions["remove"].setEnabled(installed)
-        on = [i for i, m in enumerate(self.mics) if has_effect(m["state"]) and m is not t]
-        if unplugged:
-            self.where.setText(_("Plug this mic in to repair it."))
-        elif t is not None and state == "other" and on:
-            self.where.setText(_("The mic effect is on {mic}. It works on one mic at a "
-                                 "time.", mic=labels(self.mics)[on[0]]))
-        else:
-            self.where.setText("")
-        self.where.setVisible(bool(self.where.text()))
+        self._rebuild()
 
-    def confirm(self, action):
+    def _rebuild(self):
+        mics = self.shown()
+        sig = (tuple((m["guid"], m["name"], m["active"], m["state"], m["pa"]) for m in mics),
+               self.mw.cfg.mic_device)
+        if sig == self._shown:
+            return   # the same: keep the rows (and the keyboard focus in them)
+        self._shown = sig
+        for r in self.rows.values():
+            self.list.removeWidget(r)
+            r.deleteLater()
+        self.rows = {}
+        for m, text in zip(mics, labels(mics)):
+            r = MicRow(self, m, text, bool(m["pa"]) and m["pa"] == self.mw.cfg.mic_device)
+            self.list.addWidget(r)
+            self.rows[m["guid"]] = r
+        self._sync_busy()
+
+    def name_of(self, mic):
+        mics = self.shown()
+        return labels(mics)[mics.index(mic)] if mic in mics else mic["name"]
+
+    def confirm(self, action, mic):
         if self.recovery.running or self.mw._attaching:
             return
-        t = self.target()
-        name = labels(self.mics)[self.mics.index(t)] if t is not None else None
         if getattr(self, "dialog", None) and qt_valid(self.dialog) and self.dialog.isVisible():
             self.dialog.raise_()
             return
+        name = self.name_of(mic)
+        target = mic if mic["guid"] else None   # unlisted: the app's mic, by name
         d = QDialog(self.window())
         self.dialog = d
         d.setWindowTitle(action_text(action))
@@ -393,16 +393,16 @@ class RecoveryCard(QFrame):
         title.setObjectName("helptitle")
         v.addWidget(title)
         lines = [explanation(action, name)]
-        if t is not None and action in INSTALLS:
-            moved = [labels(self.mics)[i] for i, m in enumerate(self.mics)
-                     if has_effect(m["state"]) and m is not t]
+        if target is not None and action in INSTALLS:
+            moved = [self.name_of(m) for m in self.mics
+                     if has_effect(m["state"]) and m is not mic]
             if moved:
                 lines.append(_("It comes off {mic}: the mic effect works on one mic at a "
                                "time.", mic=moved[0]))
-            if t["pa"] and t["pa"] != self.mw.cfg.mic_device:
+            if mic["pa"] and mic["pa"] != self.mw.cfg.mic_device:
                 lines.append(_("Onion Board will send your sounds into {mic} from now on.",
                                mic=name))
-            elif not t["pa"] and self.mw.cfg.mic_device:
+            elif not mic["pa"] and self.mw.cfg.mic_device:
                 # its name is shared or unknown: the app can't switch to it by itself
                 lines.append(_("Your sounds go into {mic}. To use this mic instead, pick "
                                "it under Devices too.", mic=self.mw.cfg.mic_device))
@@ -425,7 +425,7 @@ class RecoveryCard(QFrame):
         go = QPushButton(action_text(action))
         go.setObjectName("danger" if action == "remove" else "primary")
         go.setDefault(True)
-        go.clicked.connect(lambda: self._start(action, d, t))
+        go.clicked.connect(lambda: self._start(action, d, target, name))
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(d.reject)
         row.addWidget(go)
@@ -435,9 +435,8 @@ class RecoveryCard(QFrame):
         d.finished.connect(d.deleteLater)
         d.open()
 
-    def _start(self, action, dialog, target=None):
-        self._target_name = (labels(self.mics)[self.mics.index(target)]
-                             if target in self.mics else None)
+    def _start(self, action, dialog, target, name):
+        self._target_name = name
         if self.recovery.start(action, target):
             dialog.accept()
             self.note.hide()
@@ -445,23 +444,22 @@ class RecoveryCard(QFrame):
 
     def _sync_busy(self):
         running = self.recovery.running
-        busy.set_busy(self.fix, running)
-        busy.set_busy(self.more, running)
-        self.target_box.setEnabled(not running and bool(self.mics))
+        for r in self.rows.values():
+            for b in r.buttons.values():
+                busy.set_busy(b, running)
         if running:
             self.pill.setText(_("Working…"))
             self.pill.show()
             theme.set_tone(self.pill, "muted")
-            self.show_.start()
+            if not self.show_.on:
+                self.show_.start()
+        else:
+            self.pill.hide()
 
     def _done(self, action, err, state):
         self._sync_busy()
         self.show_.finish(not err)
         name = getattr(self, "_target_name", None)
-        t = self.target()
-        if t is not None:   # the picked mic's state now, until the next check
-            t["state"] = state
-        self._checked(state)
         if err:
             text = err
         elif action == "cleanup":
@@ -480,6 +478,6 @@ class RecoveryCard(QFrame):
                     _("Mic effect reinstalled on {mic}. Test it in your voice chat.",
                       mic=name))
         self.note.setText(text)
-        QTimer.singleShot(0, self, self.check)   # every mic's state, fresh
         theme.set_tone(self.note, "warn" if err else "ok")
         self.note.show()
+        self.check()   # every mic's state, fresh

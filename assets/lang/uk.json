@@ -3247,21 +3247,14 @@
     "Додаються {n} звуки",
     "Додається {n} звуків"
   ],
-  "+{count} queued": [
-    "+{count} у черзі",
-    "+{count} у черзі",
-    "+{count} у черзі"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Його буде знято з {mic}: ефект мікрофона працює лише на одному мікрофоні водночас.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Ефект мікрофона перевстановлено на {mic}. Перевір його в голосовому чаті.",
   "Mic effect removed from {mic}": "Ефект мікрофона видалено з {mic}",
-  "Mic to fix": "Мікрофон для виправлення",
   "Onion Board will send your sounds into {mic} from now on.": "Відтепер Onion Board передаватиме звуки в {mic}.",
   "Plug this mic in to repair it.": "Під'єднай цей мікрофон, щоб виправити його.",
   "Reinstall Onion Board's mic effect on {mic}.": "Перевстанови ефект мікрофона Onion Board на {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Віднови {mic} і видали з нього ефект мікрофона Onion Board. Звуки більше не передаватимуться прямо в нього.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Віднови {mic}, видали старий ефект мікрофона, а потім встанови на нього нову копію.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Ефект мікрофона стоїть на {mic}. Він працює лише на одному мікрофоні водночас.",
   "{mic} (unplugged)": "{mic} (від'єднано)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Звуки йдуть у {mic}. Щоб використовувати цей мікрофон, обери його і в Пристроях.",
   "#{number} {mic}": "#{number} {mic}",

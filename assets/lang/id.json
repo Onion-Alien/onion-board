@@ -3101,19 +3101,14 @@
   "Adding {n} sound": [
     "Menambahkan {n} suara"
   ],
-  "+{count} queued": [
-    "+{count} dalam antrean"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Efek akan dilepas dari {mic}: efek mikrofon hanya bekerja di satu mikrofon sekaligus.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efek mikrofon sudah diinstal ulang di {mic}. Coba di obrolan suara.",
   "Mic effect removed from {mic}": "Efek mikrofon dihapus dari {mic}",
-  "Mic to fix": "Mikrofon yang diperbaiki",
   "Onion Board will send your sounds into {mic} from now on.": "Mulai sekarang Onion Board akan mengirim suaramu ke {mic}.",
   "Plug this mic in to repair it.": "Sambungkan mikrofon ini untuk memperbaikinya.",
   "Reinstall Onion Board's mic effect on {mic}.": "Instal ulang efek mikrofon Onion Board di {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Pulihkan {mic} dan hapus efek mikrofon Onion Board darinya. Suara tidak akan lagi dikirim langsung ke sana.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Pulihkan {mic}, hapus efek mikrofon lama, lalu instal salinan baru di sana.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Efek mikrofon ada di {mic}. Efek ini hanya bekerja di satu mikrofon sekaligus.",
   "{mic} (unplugged)": "{mic} (tidak tersambung)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Suaramu masuk ke {mic}. Untuk memakai mikrofon ini, pilih juga di Perangkat.",
   "#{number} {mic}": "#{number} {mic}",

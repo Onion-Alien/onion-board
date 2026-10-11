@@ -3174,20 +3174,14 @@
     "Adicionando {n} som",
     "Adicionando {n} sons"
   ],
-  "+{count} queued": [
-    "+{count} na fila",
-    "+{count} na fila"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Ele sai de {mic}: o efeito de microfone funciona em um microfone por vez.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efeito do microfone reinstalado em {mic}. Teste no seu chat de voz.",
   "Mic effect removed from {mic}": "Efeito do microfone removido de {mic}",
-  "Mic to fix": "Microfone a reparar",
   "Onion Board will send your sounds into {mic} from now on.": "A partir de agora, o Onion Board vai enviar seus sons para {mic}.",
   "Plug this mic in to repair it.": "Conecte este microfone para repará-lo.",
   "Reinstall Onion Board's mic effect on {mic}.": "Reinstale o efeito de microfone do Onion Board em {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Restaure {mic} e remova dele o efeito de microfone do Onion Board. Os sons deixarão de ir diretamente para ele.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Restaure {mic}, remova o efeito de microfone antigo e depois instale uma cópia nova nele.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "O efeito de microfone está em {mic}. Ele funciona em um microfone por vez.",
   "{mic} (unplugged)": "{mic} (desconectado)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Seus sons vão para {mic}. Para usar este microfone, escolha-o também em Dispositivos.",
   "#{number} {mic}": "#{number} {mic}",

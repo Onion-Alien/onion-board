@@ -1,7 +1,8 @@
-- Audio recovery in Settings now has a "Mic to fix" list: every plugged-in mic with its
-  own state (two mics with the same name are numbered, unplugged ones marked), and
-  every action works only on the mic you pick and names it. A mic without the mic
-  effect says "Not installed" and offers Install, with "Clean up leftovers" in the ⋯
-  menu to safely take out anything Onion Board left on it; Repair, Clean reinstall and
-  Remove are greyed out there. The mic effect works on one mic at a time, so the card
-  says where it is, and installing it on another mic moves your sounds to that mic.
+- Audio recovery in Settings now lists every mic as its own row: its name (two mics
+  with the same name are numbered, unplugged ones marked), whether the mic effect is
+  on it, which one Onion Board uses, and every action it can take as a button, with
+  nothing hidden in a menu. A mic with the effect gets its fix when it needs one, a
+  clean reinstall and remove; a mic without it gets Install and "Clean up leftovers",
+  which safely takes out anything Onion Board left on that mic. Every action works
+  only on its own mic. The mic effect works on one mic at a time, so installing it on
+  another mic says it moves there and where your sounds will go.

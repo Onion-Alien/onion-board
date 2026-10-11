@@ -3101,19 +3101,14 @@
   "Adding {n} sound": [
     "正在添加 {n} 个声音"
   ],
-  "+{count} queued": [
-    "+{count} 个排队中"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "它将从 {mic} 上移除:麦克风效果一次只能用于一个麦克风。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "已在 {mic} 上重新安装麦克风效果。请在语音聊天中测试。",
   "Mic effect removed from {mic}": "已从 {mic} 移除麦克风效果",
-  "Mic to fix": "要修复的麦克风",
   "Onion Board will send your sounds into {mic} from now on.": "从现在起,Onion Board 会把你的声音发送到 {mic}。",
   "Plug this mic in to repair it.": "请连接此麦克风后再修复。",
   "Reinstall Onion Board's mic effect on {mic}.": "在 {mic} 上重新安装 Onion Board 的麦克风效果。",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "还原 {mic} 并移除其上的 Onion Board 麦克风效果。声音将不再直接发送到它。",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "还原 {mic},移除旧的麦克风效果,然后在其上安装新副本。",
-  "The mic effect is on {mic}. It works on one mic at a time.": "麦克风效果在 {mic} 上。它一次只能用于一个麦克风。",
   "{mic} (unplugged)": "{mic}(未连接)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "你的声音会发送到 {mic}。要改用这个麦克风,请也在“设备”中选择它。",
   "#{number} {mic}": "#{number} {mic}",

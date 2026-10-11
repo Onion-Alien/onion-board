@@ -3174,20 +3174,14 @@
     "Добавя се {n} звук",
     "Добавят се {n} звука"
   ],
-  "+{count} queued": [
-    "+{count} на опашка",
-    "+{count} на опашка"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Ще бъде махнат от {mic}: ефектът за микрофона работи само на един микрофон наведнъж.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Ефектът за микрофона е преинсталиран на {mic}. Пробвай го в гласовия чат.",
   "Mic effect removed from {mic}": "Ефектът за микрофона е премахнат от {mic}",
-  "Mic to fix": "Микрофон за поправка",
   "Onion Board will send your sounds into {mic} from now on.": "Отсега нататък Onion Board ще изпраща звуците ти към {mic}.",
   "Plug this mic in to repair it.": "Включи този микрофон, за да го поправиш.",
   "Reinstall Onion Board's mic effect on {mic}.": "Преинсталирай ефекта за микрофона на Onion Board на {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Възстанови {mic} и премахни от него ефекта за микрофона на Onion Board. Звуците ще спрат да се изпращат директно към него.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Възстанови {mic}, премахни стария ефект за микрофона и после инсталирай ново копие на него.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Ефектът за микрофона е на {mic}. Работи само на един микрофон наведнъж.",
   "{mic} (unplugged)": "{mic} (изключен)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Звуците ти отиват към {mic}. За да ползваш този микрофон, избери го и в Устройства.",
   "#{number} {mic}": "#{number} {mic}",

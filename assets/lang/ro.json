@@ -3247,21 +3247,14 @@
     "Se adaugă {n} sunete",
     "Se adaugă {n} de sunete"
   ],
-  "+{count} queued": [
-    "+{count} în coadă",
-    "+{count} în coadă",
-    "+{count} în coadă"
-  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Va fi scos de pe {mic}: efectul de microfon merge pe un singur microfon odată.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efectul de microfon a fost reinstalat pe {mic}. Testează-l în chatul vocal.",
   "Mic effect removed from {mic}": "Efect de microfon eliminat de pe {mic}",
-  "Mic to fix": "Microfonul de reparat",
   "Onion Board will send your sounds into {mic} from now on.": "De acum, Onion Board îți va trimite sunetele în {mic}.",
   "Plug this mic in to repair it.": "Conectează acest microfon ca să-l repari.",
   "Reinstall Onion Board's mic effect on {mic}.": "Reinstalează efectul de microfon Onion Board pe {mic}.",
   "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Restabilește {mic} și elimină de pe el efectul de microfon Onion Board. Sunetele nu vor mai fi trimise direct în el.",
   "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Restabilește {mic}, elimină vechiul efect de microfon, apoi instalează pe el o copie nouă.",
-  "The mic effect is on {mic}. It works on one mic at a time.": "Efectul de microfon este pe {mic}. Merge pe un singur microfon odată.",
   "{mic} (unplugged)": "{mic} (deconectat)",
   "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Sunetele tale merg în {mic}. Ca să folosești acest microfon, alege-l și la Dispozitive.",
   "#{number} {mic}": "#{number} {mic}",
