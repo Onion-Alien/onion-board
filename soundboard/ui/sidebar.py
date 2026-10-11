@@ -882,14 +882,19 @@ class SideRail(QFrame):
 
     def _full_fit(self) -> int:
         """The narrowest open rail where the full layout fits, every word on its line:
-        the name, "On air" / "Off air" beside its switch, Settings beside the arrow (a longer
-        translation needs more room)."""
+        the name, "On air" / "Off air" beside its switch, the status line, Settings beside
+        the arrow (a longer translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
         need = [side + BUTTON_W + 6 + self._brand_width()]
         if self.output:
-            metrics = self.output.title.fontMetrics()
-            title = max(metrics.horizontalAdvance(t) for t in self.output.names())
-            need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
+            out = self.output
+            metrics = out.title.fontMetrics()
+            title = max(metrics.horizontalAdvance(t) for t in out.names())
+            need.append(side + out.TEXT_X + title + 1 + 8 + 38 + out.PAD)
+            # and the status line unwrapped, its chevron and all ("Not configured ›")
+            status = out.status_text.fontMetrics().horizontalAdvance(out.status_text.text())
+            need.append(side + out.TEXT_X + status + 1 + out.GAP - 2 + out.CHEVRON
+                        + 2 * out.PAD)
         return max(FULL_W, min(OPEN_W, max(need)))
 
     def _small(self, w: QWidget) -> bool:

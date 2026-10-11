@@ -214,3 +214,26 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
         assert "CABLE Input (fake)" in output.status_text.toolTip()
     finally:
         window.engine.main_stream = stream
+
+
+def test_full_card_only_once_its_status_fits(window, qapp):  # noqa: F811
+    """Dragging the rail open, the full output card only comes in once "Not
+    configured ›" fits on one line (it came in early and wrapped)."""
+    from soundboard.ui.sidebar import OPEN_W, SHUT_W
+    window.resize(1180, 720)
+    window.show()
+    window.cfg.route, window.cfg.main_device = "device", None
+    window._update_flow()
+    rail = window.rail
+    rail.set_open(True)
+    qapp.processEvents()
+    try:
+        for width in range(SHUT_W, OPEN_W + 1, 3):
+            rail.drag_width(width)
+            qapp.processEvents()
+            status = rail.output.status_text
+            if status.isVisible() and width < OPEN_W:   # (fully open, long words wrap)
+                assert status.text() == "Not configured"
+                assert status.height() < 2 * status.fontMetrics().height(), width
+    finally:
+        rail.finish_resize()
