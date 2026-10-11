@@ -874,6 +874,11 @@ class DownloadBar(QFrame):
     def set_progress(self, url: str, payload):
         if url != self.url:   # a cancelled download still finishing: not this one
             return
+        if self.stage == "done":
+            # it ended (✓ or ✗): a late update can't put it back to busy, or the card
+            # says "Processing audio…" under the tick and never goes. Only set_active
+            # starts it again.
+            return
         self._auto_hide.stop()
         if payload == "parsing":
             self.stage = "parsing"
