@@ -177,7 +177,7 @@ class _Card(QFrame):
         self.btn_copy = self._icon_button("copy", 13, _("Copy"))
         self.btn_copy.hide()
         row.addWidget(self.btn_copy, 0, Qt.AlignmentFlag.AlignTop)
-        self.btn_close = self._icon_button("close", 12, _("Dismiss"))
+        self.btn_close = self._icon_button("close", 16, _("Dismiss"))
         row.addWidget(self.btn_close, 0, Qt.AlignmentFlag.AlignTop)
 
     @staticmethod
