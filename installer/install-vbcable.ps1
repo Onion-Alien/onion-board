@@ -13,8 +13,10 @@
 # marker the app reads until the PC has restarted. Never install over a cable that's
 # waiting for a restart; VB-Audio wants a reboot between.
 #
-# The script elevates itself once (one "Yes" on the Windows prompt) when it has
-# something to install or wake; checking a working cable needs no admin.
+# Interactive, the script elevates itself once (one "Yes" on the Windows prompt) when it
+# has something to install or wake. -Silent doesn't: Windows asks once for VB-Audio's own
+# setup, and a cable that needs waking just reports "restart needed". Checking a working
+# cable needs no admin.
 #
 # Usage:  powershell -ExecutionPolicy Bypass -File installer\install-vbcable.ps1 [-Silent] [-Check]
 #                    [-StatusFile <path>]
@@ -221,36 +223,29 @@ if ($state -eq "ok") {
 # could be a different admin account, whose defaults aren't the ones that matter.
 if (-not $Elevated) { Save-AudioDefaults }
 
-# Everything past here needs admin: ask once, then carry on as the elevated copy.
-if (-not (Test-Admin) -and -not $Elevated) {
+# Interactive: everything past here runs as admin, so ask once and carry on as the
+# elevated copy. Silent (the installer and the setup wizard) stays unelevated and lets
+# Windows ask for VB-Audio's own signed setup instead: the box then names "VB-Audio
+# Virtual Cable Installer", and no PowerShell or console window shows up at all.
+$admin = Test-Admin
+if (-not $admin -and -not $Elevated -and -not $Silent) {
     Say "permission" "Waiting for you to click Yes..."
     $argv = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$PSCommandPath`"", "-Elevated")
-    if ($Silent) { $argv += "-Silent" }
     if ($StatusFile) { $argv += @("-StatusFile", "`"$StatusFile`"") }
     try {
-        # Silent (the installer): conhost --headless gives the admin copy no window at all.
-        # Plain -WindowStyle Hidden still flashes a console on Windows 11, which looks scary.
-        if ($Silent) {
-            $p = Start-Process conhost.exe -ArgumentList (@("--headless", "powershell.exe") + $argv) `
-                -Verb RunAs -PassThru -Wait -WindowStyle Hidden
-        } else {
-            $p = Start-Process powershell.exe -ArgumentList $argv -Verb RunAs -PassThru -Wait
-        }
+        $p = Start-Process powershell.exe -ArgumentList $argv -Verb RunAs -PassThru -Wait
     } catch {
         Say "cancelled" "Install was cancelled."
         Pause-Exit 1
     }
     Restore-AudioDefaults
-    if ($Silent) {
-        # conhost --headless doesn't pass the exit code back: read it from the result
-        switch (Get-CableState) { "ok" { exit 0 } "restart" { exit 3010 } default { exit 1 } }
-    }
     exit $p.ExitCode   # the elevated copy has already said everything (and paused)
 }
 
 if ($state -eq "restart") {
-    # installed earlier and still waiting on Windows: wake it, never install over it
-    if ((Wake-Cable) -eq "ok") { Exit-Working }
+    # installed earlier and still waiting on Windows: wake it (needs admin), never
+    # install over it
+    if ($admin -and (Wake-Cable) -eq "ok") { Exit-Working }
     Exit-NeedsRestart
 }
 
@@ -268,18 +263,25 @@ try {
 }
 if (-not $zipUrl) { $zipUrl = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip" }
 
-# A fresh folder only admins can write to: this copy runs elevated, and the user's own
-# %TEMP% would let any program swap the setup exe (or plant a DLL) before it runs.
-$work = Join-Path $env:SystemRoot ("Temp\vbcable-" + [guid]::NewGuid())
-New-Item -ItemType Directory -Force -Path $work | Out-Null
-$acl = New-Object Security.AccessControl.DirectorySecurity
-$acl.SetAccessRuleProtection($true, $false)
-foreach ($sid in "S-1-5-32-544", "S-1-5-18") {   # Administrators, SYSTEM
-    $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
-        (New-Object Security.Principal.SecurityIdentifier $sid), "FullControl",
-        "ContainerInherit,ObjectInherit", "None", "Allow")))
+# Elevated: a fresh folder only admins can write to, since the user's own %TEMP% would
+# let any program swap the setup exe (or plant a DLL) before it runs. Unelevated
+# (silent): a fresh random folder in %TEMP%; Windows checks the exe's signature again
+# when it asks for admin, and the box shows who signed it.
+if ($admin) {
+    $work = Join-Path $env:SystemRoot ("Temp\vbcable-" + [guid]::NewGuid())
+    New-Item -ItemType Directory -Force -Path $work | Out-Null
+    $acl = New-Object Security.AccessControl.DirectorySecurity
+    $acl.SetAccessRuleProtection($true, $false)
+    foreach ($sid in "S-1-5-32-544", "S-1-5-18") {   # Administrators, SYSTEM
+        $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
+            (New-Object Security.Principal.SecurityIdentifier $sid), "FullControl",
+            "ContainerInherit,ObjectInherit", "None", "Allow")))
+    }
+    Set-Acl -Path $work -AclObject $acl
+} else {
+    $work = Join-Path $env:TEMP ("vbcable-" + [guid]::NewGuid())
+    New-Item -ItemType Directory -Force -Path $work | Out-Null
 }
-Set-Acl -Path $work -AclObject $acl
 $zip = Join-Path $work "vbcable.zip"
 
 Write-Host "Downloading $zipUrl"
@@ -337,5 +339,5 @@ if ($state -eq "missing" -and -not $Silent) {
     Write-Host "The cable didn't get installed. Run this again and click 'Install Driver'." -ForegroundColor Yellow
     Pause-Exit 1
 }
-if ((Wake-Cable) -eq "ok") { Exit-Working }
+if ($admin -and (Wake-Cable) -eq "ok") { Exit-Working }
 Exit-NeedsRestart

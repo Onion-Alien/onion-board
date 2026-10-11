@@ -1,1 +1,1 @@
-- Installing the virtual cable no longer flashes a PowerShell window, and the setup text says Windows will show a permission box to click Yes on.
+- Installing the virtual cable no longer shows a PowerShell or console window: Windows asks once for VB-Audio's own signed setup ("VB-Audio Virtual Cable Installer"), and the setup text says to click Yes on it.
