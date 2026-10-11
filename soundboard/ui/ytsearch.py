@@ -16,6 +16,7 @@ import logging
 import math
 import random
 import threading
+from typing import Any
 
 from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
 from PySide6.QtGui import (QAction, QActionGroup, QColor, QIcon, QPainter, QPainterPath,
@@ -167,6 +168,7 @@ class SearchingView(QWidget):
         if isinstance(m, OwlWidget):
             m.owl_h, m.top = h, round(h * 0.34)
             return QSize(round(h * OWL_W / OWL_H) + 8, h + m.top + 8)
+        assert isinstance(m, BunnyWidget)   # _make makes an owl or a bunny
         m.bun_h, m.pad = h, round(h * 0.22)
         return QSize(round(h * BUN_W / BUN_H) + 2 * m.pad + 20, h + 2 * m.pad)
 
@@ -194,7 +196,7 @@ class SearchingView(QWidget):
             self.mascot.setVisible(not box.isEmpty())
         total = need + (box.height() + gap if not box.isEmpty() else 0)
         y = max(0, (h - total) // 2)
-        if not box.isEmpty():
+        if self.mascot is not None and not box.isEmpty():
             self.mascot.setGeometry((w - box.width()) // 2, y, box.width(), box.height())
             y += box.height() + gap
         self.bar.setVisible(show_bar)
@@ -577,8 +579,10 @@ class ResultRow(HoverCard):
             side = self.width() >= self.WIDE_MIN_W
             if side != self._side:
                 self._side = side
-                self.layout().setDirection(QBoxLayout.Direction.LeftToRight if side
-                                           else QBoxLayout.Direction.TopToBottom)
+                lay = self.layout()
+                assert isinstance(lay, QBoxLayout)   # made in __init__
+                lay.setDirection(QBoxLayout.Direction.LeftToRight if side
+                                 else QBoxLayout.Direction.TopToBottom)
                 if side:
                     self.thumb.setFixedWidth(self.WIDE_THUMB_W)
                     self.thumb.setMaximumHeight(16777215)
@@ -591,7 +595,8 @@ class ResultRow(HoverCard):
         return True
 
     def heightForWidth(self, w: int) -> int:
-        return self.layout().heightForWidth(w)
+        lay = self.layout()
+        return lay.heightForWidth(w) if lay is not None else -1
 
     def mouseDoubleClickEvent(self, e):
         if not busy.is_busy(self.btn_play):
@@ -723,7 +728,7 @@ class ResultRow(HoverCard):
             self.btn_add.setToolTip(_("Download its audio and add it to your sounds"))
         elif kind == "play":
             now, self.now = self.now, None   # its tooltip again, for what it's doing now
-            self.set_now(now)
+            self.set_now(now or "")   # (only None inside this call)
         self._style()
 
     def set_thumb(self, pm: QPixmap):
@@ -825,7 +830,7 @@ class SearchResults(RoundedFrame):
         scroll.setWidget(self.list)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         v.addWidget(scroll, 1)
-        self.scroll = scroll
+        self.scroll_area = scroll
         self.hide()
         self.follow_switches()
         net.on_change(self.follow_switches)
@@ -934,7 +939,7 @@ class SearchResults(RoundedFrame):
 
     def _loading(self, on: bool, text: str = ""):
         """The loading view in place of the title and list (on), or those back."""
-        for w in (self.title, self.scroll):
+        for w in (self.title, self.scroll_area):
             w.setVisible(not on)
         if on:
             self.loading.start(text)
@@ -1019,7 +1024,8 @@ class SearchResults(RoundedFrame):
     def _work(self, gen: int, query: str, source: str, direct: bool = False,
               start: int = 1, count: int = PAGE):
         try:
-            more = {"direct": True} if direct else {}   # the user's "without Tor" click
+            # the user's "without Tor" click
+            more: dict[str, Any] = {"direct": True} if direct else {}
             if start > 1:   # Show more (fakes in tests take the first page's arguments)
                 more.update(start=start, count=count)
             busy.emit(self._done, gen, ytdl.search(query, source=source, **more), "")

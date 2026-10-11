@@ -70,7 +70,7 @@ def animations_on() -> bool:
     if ANIMATE is not None:
         return ANIMATE
     app = QApplication.instance()
-    if app is None or app.platformName() in ("offscreen", "minimal"):
+    if not isinstance(app, QApplication) or app.platformName() in ("offscreen", "minimal"):
         return False
     if sys.platform == "win32":
         try:
@@ -91,7 +91,8 @@ class _Spinner(QWidget):
         super().__init__(parent)
         self.setFixedSize(18, LINE)
         self._angle = 0
-        self._timer = QTimer(self, interval=33, timeout=self._step)
+        # (PySide takes properties and signals as keywords; the stubs don't know)
+        self._timer = QTimer(self, interval=33, timeout=self._step)   # pyright: ignore[reportCallIssue]
 
     def _step(self):
         self._angle = (self._angle + 12) % 360
@@ -275,11 +276,11 @@ class _Toast(QWidget):
         self._n = 1
         self._callback: Callable[[], None] | None = None
         self._on_close: Callable[[], None] | None = None
-        self._timer = QTimer(self, singleShot=True, timeout=self.dismiss)
+        self._timer = QTimer(self, singleShot=True, timeout=self.dismiss)   # pyright: ignore[reportCallIssue]  # as _Spinner's
         self._left = 0          # ms left when the countdown was paused by hovering
         self._leaving = False
         self._squeezed = False   # hidden while the window shows icons (_Stack.place)
-        self._anims: list[QAbstractAnimation] = []
+        self._anims: list[QPropertyAnimation] = []
         self.hide()
 
     # -- what it says
@@ -317,10 +318,12 @@ class _Toast(QWidget):
             self._callback = None
             self.card.action.hide()
         self.card.progress = progress
+        lay = self.card.layout()
+        assert lay is not None   # made with the card
         if progress is not None:   # the bar sits under the text
-            self.card.layout().setContentsMargins(18, 10, 6, 14)
+            lay.setContentsMargins(18, 10, 6, 14)
         else:
-            self.card.layout().setContentsMargins(18, 10, 6, 10)
+            lay.setContentsMargins(18, 10, 6, 10)
         self._n = 1
         self.restart(ms)
         self.card.update()
@@ -412,7 +415,8 @@ class _Toast(QWidget):
         a.setStartValue(0.0)
         a.setEndValue(1.0)
         # the card's own shadow draws again once the fade is over
-        a.finished.connect(lambda: shiboken6.isValid(self) and self.setGraphicsEffect(None))
+        a.finished.connect(lambda: shiboken6.isValid(self)
+                           and self.setGraphicsEffect(None))   # pyright: ignore[reportArgumentType]  # None clears it
         self._anims.append(a)
         a.start()
 
@@ -477,8 +481,8 @@ class _Stack(QObject):
         floor = getattr(host, "toast_floor", None)
         if callable(floor):
             y = floor()
-            if y is not None:
-                return int(y)
+            if isinstance(y, int):   # (None: no say)
+                return y
         bottom = host.height() - 8
         if isinstance(host, QDialog):
             buttons = [b for b in host.findChildren(QPushButton)
@@ -501,7 +505,8 @@ class _Stack(QObject):
             t.ensurePolished()
             t.card.ensurePolished()
             lay = t.layout()
-            h = lay.totalHeightForWidth(w) if lay.hasHeightForWidth() else t.sizeHint().height()
+            h = (lay.totalHeightForWidth(w) if lay is not None and lay.hasHeightForWidth()
+                 else t.sizeHint().height())
             heights[t] = max(h, t.minimumSizeHint().height())
         # the host's say (the mini player: icons on top, or none at its smallest), else
         # cards; cards that can't all be read above the floor shrink to icons too
@@ -590,7 +595,7 @@ class _Dot(QPushButton):
         p.end()
 
 
-def _in_toast(w: QWidget) -> bool:
+def _in_toast(w: QWidget | None) -> bool:
     while w is not None:
         if isinstance(w, _Toast):
             return True

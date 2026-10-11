@@ -1,59 +1,5 @@
 [
 {
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"Overload[(dx: int, dy: int, /) -> None, (dx: int, dy: int, arg__3: QRect, /) -> None]\" cannot be assigned to parameter \"arg__1\" of type \"QWidget\" in function \"addWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"Store\" cannot be assigned to parameter \"source\" of type \"ModuleType\" in function \"__init__\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setFrameShape\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setMinimumSize\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidget\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidgetResizable\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"scroll\" for class \"AiVoiceBrowser*\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportOptionalCall",
-"message": "Object of type \"None\" cannot be called",
-"count": 2
-},
-{
-"file": "soundboard/ui/aivoicebrowser.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"clicked\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
 "file": "soundboard/ui/aivoicepanel.py",
 "rule": "reportArgumentType",
 "message": "Argument of type \"(line: str) -> bool\" cannot be assigned to parameter \"on_line\" of type \"(str) -> None\" in function \"install\"",
@@ -70,96 +16,6 @@
 "rule": "reportOptionalMemberAccess",
 "message": "\"play\" is not a known attribute of \"None\"",
 "count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"Overload[(dx: int, dy: int, /) -> None, (dx: int, dy: int, arg__3: QRect, /) -> None]\" cannot be assigned to parameter \"arg__1\" of type \"QWidget\" in function \"addWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"QWidget | None\" cannot be assigned to parameter \"child\" of type \"QWidget\" in function \"isAncestorOf\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"ensureWidgetVisible\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setFrameShape\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setHorizontalScrollBarPolicy\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidget\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidgetResizable\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"viewport\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"_tab_chain\" for class \"QWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"scroll\" for class \"AppsTab*\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"activate\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"addWidget\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"focusPolicy\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"nextInFocusChain\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/appspanel.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"widget\" is not a known attribute of \"None\"",
-"count": 4
 },
 {
 "file": "soundboard/ui/appstate.py",
@@ -195,42 +51,6 @@
 "file": "soundboard/ui/busy.py",
 "rule": "reportOptionalMemberAccess",
 "message": "\"thread\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/chatguide.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"() -> int\" cannot be assigned to parameter \"arg__1\" of type \"QWidget\" in function \"addWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/chatguide.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"hide\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/chatguide.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setObjectName\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/chatguide.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setText\" for class \"MethodType\"",
-"count": 3
-},
-{
-"file": "soundboard/ui/chatguide.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"show\" for class \"MethodType\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/chatguide.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"result\" for class \"DiscordGuide*\"",
 "count": 1
 },
 {
@@ -280,84 +100,6 @@
 "rule": "reportArgumentType",
 "message": "Argument of type \"ndarray[_AnyShape, dtype[Any]] | list[Unknown]\" cannot be assigned to parameter \"peaks\" of type \"ndarray[_AnyShape, dtype[Any]]\" in function \"__init__\"",
 "count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"Overload[(dx: int, dy: int, /) -> None, (dx: int, dy: int, arg__3: QRect, /) -> None]\" cannot be assigned to parameter \"arg__1\" of type \"QWidget\" in function \"addWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setFixedHeight\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setFrameShape\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setHorizontalScrollBarPolicy\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setObjectName\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidget\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidgetResizable\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"scroll\" for class \"DownloadBar*\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"deleteLater\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"rect\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"sizeHint\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"update\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/downloadbar.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"widget\" is not a known attribute of \"None\"",
-"count": 3
 },
 {
 "file": "soundboard/ui/dropveil.py",
@@ -441,6 +183,18 @@
 "file": "soundboard/ui/icons.py",
 "rule": "reportArgumentType",
 "message": "Argument of type \"str | None\" cannot be assigned to parameter \"color\" of type \"str\" in function \"pixmap\"",
+"count": 1
+},
+{
+"file": "soundboard/ui/icons.py",
+"rule": "reportAttributeAccessIssue",
+"message": "Cannot access attribute \"RoundCap\" for class \"type[Qt]\"",
+"count": 1
+},
+{
+"file": "soundboard/ui/icons.py",
+"rule": "reportAttributeAccessIssue",
+"message": "Cannot access attribute \"RoundJoin\" for class \"type[Qt]\"",
 "count": 1
 },
 {
@@ -840,60 +594,6 @@
 "count": 1
 },
 {
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"(done: int, total: int) -> bool\" cannot be assigned to parameter \"progress\" of type \"((int, int) -> None) | None\" in function \"download\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"Overload[(dx: int, dy: int, /) -> None, (dx: int, dy: int, arg__3: QRect, /) -> None]\" cannot be assigned to parameter \"arg__1\" of type \"QWidget\" in function \"addWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"add\" for class \"QWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setFrameShape\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setMinimumSize\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidget\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setWidgetResizable\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"scroll\" for class \"PacksDialog*\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/packsdialog.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"widget\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
 "file": "soundboard/ui/quietbox.py",
 "rule": "reportAttributeAccessIssue",
 "message": "Cannot access attribute \"_quietbox_filter\" for class \"QApplication\"",
@@ -924,219 +624,9 @@
 "count": 1
 },
 {
-"file": "soundboard/ui/setupwizard.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setText\" for class \"QWidget\"",
-"count": 3
-},
-{
-"file": "soundboard/ui/setupwizard.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"itemAt\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/setupwizard.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"layout\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/setupwizard.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setText\" is not a known attribute of \"None\"",
-"count": 3
-},
-{
-"file": "soundboard/ui/setupwizard.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"widget\" is not a known attribute of \"None\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"None\" cannot be assigned to parameter \"arg__1\" of type \"QWidget\" in function \"setFocusProxy\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"QObject\" cannot be assigned to parameter \"arg__1\" of type \"QPaintDevice\" in function \"__init__\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportArgumentType",
-"message": "Expression of type \"tuple[()]\" cannot be assigned to parameter of type \"list[QPushButton]\"",
-"count": 3
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"hasFocus\" for class \"QObject\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"height\" for class \"QObject\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"hide\" for class \"QObject\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"isChecked\" for class \"QObject\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"set_mark\" for class \"QWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"underMouse\" for class \"QObject\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"width\" for class \"QObject\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/sidebar.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"addWidget\" is not a known attribute of \"None\"",
-"count": 3
-},
-{
 "file": "soundboard/ui/spacekey.py",
 "rule": "reportArgumentType",
 "message": "Argument of type \"QWidget | None\" cannot be assigned to parameter \"w\" of type \"QWidget\" in function \"types_text\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"tuple[float, float]\" cannot be assigned to parameter \"top\" of type \"float\" in function \"__init__\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportAssignmentType",
-"message": "Type \"float\" is not assignable to declared type \"tuple[float, float]\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOperatorIssue",
-"message": "Operator \"<=\" not supported for types \"float\" and \"tuple[float, float]\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"activate\" is not a known attribute of \"None\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"itemAt\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"layout\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setContentsMargins\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setFixedWidth\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setSpacing\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/speedpitch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"widget\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"None\" cannot be assigned to parameter \"effect\" of type \"QGraphicsEffect\" in function \"setGraphicsEffect\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"object\" cannot be assigned to parameter \"x\" of type \"ConvertibleToInt\" in function \"__new__\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportAssignmentType",
-"message": "Type \"QWidget | None\" is not assignable to declared type \"QWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"platformName\" for class \"QCoreApplication\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"propertyName\" for class \"QAbstractAnimation\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportCallIssue",
-"message": "No parameter named \"timeout\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"hasHeightForWidth\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setContentsMargins\" is not a known attribute of \"None\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/toast.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"totalHeightForWidth\" is not a known attribute of \"None\"",
 "count": 1
 },
 {
@@ -1209,12 +699,6 @@
 "file": "soundboard/ui/voicepanel.py",
 "rule": "reportArgumentType",
 "message": "Argument of type \"QWidget | None\" cannot be assigned to parameter \"childWidget\" of type \"QWidget\" in function \"ensureWidgetVisible\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/voicepanel.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"Store\" cannot be assigned to parameter \"source\" of type \"ModuleType\" in function \"__init__\"",
 "count": 1
 },
 {
@@ -1401,90 +885,6 @@
 "file": "soundboard/ui/widgets.py",
 "rule": "reportReturnType",
 "message": "Type \"QColor | None\" is not assignable to return type \"QColor\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"int\" cannot be assigned to parameter \"count\" of type \"bool\" in function \"update\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"int\" cannot be assigned to parameter \"start\" of type \"bool\" in function \"update\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportArgumentType",
-"message": "Argument of type \"str | None\" cannot be assigned to parameter \"now\" of type \"str\" in function \"set_now\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"pad\" for class \"QWidget\"",
-"count": 2
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setDirection\" for class \"QLayout\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot access attribute \"setVisible\" for class \"MethodType\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"bun_h\" for class \"QWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"pad\" for class \"QWidget\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportAttributeAccessIssue",
-"message": "Cannot assign to attribute \"scroll\" for class \"SearchResults*\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"bun_h\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"heightForWidth\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"pad\" is not a known attribute of \"None\"",
-"count": 3
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setDirection\" is not a known attribute of \"None\"",
-"count": 1
-},
-{
-"file": "soundboard/ui/ytsearch.py",
-"rule": "reportOptionalMemberAccess",
-"message": "\"setGeometry\" is not a known attribute of \"None\"",
 "count": 1
 }
 ]

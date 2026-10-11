@@ -411,10 +411,10 @@ class DiscordGuide(QDialog):
         self._watch.timeout.connect(self._read_settings)
         self._watch.start()
         self._read_settings()
-        self.result = _label("", "font-size:10.5pt;")
-        self.result.setObjectName("resultbox")
-        self.result.hide()
-        v.addWidget(self.result)
+        self.result_box = _label("", "font-size:10.5pt;")
+        self.result_box.setObjectName("resultbox")
+        self.result_box.hide()
+        v.addWidget(self.result_box)
         row = QHBoxLayout()
         copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
@@ -481,8 +481,8 @@ class DiscordGuide(QDialog):
             return
         busy.set_busy(self.btn_check, True)   # not setEnabled: that moves the focus away
         self.btn_check.setText(_("Checking…"))
-        self.result.setText(_("Starting…"))
-        self.result.show()
+        self.result_box.setText(_("Starting…"))
+        self.result_box.show()
         QTimer.singleShot(0, self, self._start_check)   # paint "Starting…" first
 
     def _start_check(self):
@@ -494,14 +494,14 @@ class DiscordGuide(QDialog):
                                                      error=errors.plain(e))})
 
     def _progress(self, text: str):
-        self.result.setText(_("{text} (about {n} seconds; stay quiet for a moment)",
+        self.result_box.setText(_("{text} (about {n} seconds; stay quiet for a moment)",
                               text=text, n=round(chatcheck.LENGTH_S + TAIL_S)))
 
     def _checked(self, res: dict):
         busy.set_busy(self.btn_check, False)
         self.btn_check.setText(_("Check again"))
-        self.result.setText(result_html(res, self.vm, self.kept))
-        self.result.show()
+        self.result_box.setText(result_html(res, self.vm, self.kept))
+        self.result_box.show()
 
     def done(self, r):   # noqa: A003 - QDialog.done
         self._check.cancel()

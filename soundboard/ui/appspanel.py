@@ -32,8 +32,8 @@ from PySide6.QtGui import (QActionGroup, QColor, QDrag, QFont, QKeySequence, QPa
                            QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
                                QHBoxLayout, QInputDialog, QLabel,
-                               QLayout, QMenu, QPushButton, QScrollArea, QSizePolicy, QSlider,
-                               QVBoxLayout, QWidget)
+                               QLayout, QLayoutItem, QMenu, QPushButton, QScrollArea, QSizePolicy,
+                               QSlider, QVBoxLayout, QWidget)
 
 from soundboard import appaudio, errors, exeicon, library, theme, trash, usage
 from soundboard.clipedit import LiveBuffer
@@ -368,11 +368,11 @@ class AppGrid(CardGrid):
             inner = getattr(w, "_tab_chain", None)
             if inner is None:   # a card's own order, read while it's still in one piece
                 inner, n = [], w.nextInFocusChain()
-                while n is not w and w.isAncestorOf(n):
+                while n is not None and n is not w and w.isAncestorOf(n):
                     if n.focusPolicy() & Qt.FocusPolicy.TabFocus:
                         inner.append(n)
                     n = n.nextInFocusChain()
-                w._tab_chain = inner
+                w._tab_chain = inner   # pyright: ignore[reportAttributeAccessIssue]  # kept on the card
             chain += inner
         for a, b in zip(chain, chain[1:]):
             QWidget.setTabOrder(a, b)
@@ -799,7 +799,9 @@ class AppRow(HoverCard):
         self._label_send()
         if not self.btn_rec.isChecked():   # while recording it shows how long it's been
             self.btn_rec.setText("" if "rec" in on else _("Record"))
-        self.layout().activate()
+        lay = self.layout()
+        assert lay is not None   # made in __init__
+        lay.activate()
 
     @property
     def sending(self) -> bool:
@@ -971,10 +973,10 @@ class AppsTab(QWidget):
         v.addLayout(toolbar)
         self.undo_bar = UndoBar(_("Remember the program again, as it was"))
         v.addWidget(self.undo_bar)
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list = FitWidth()   # the cards re-flow to the width they get (AppRow._fit_width)
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)
@@ -1001,8 +1003,8 @@ class AppsTab(QWidget):
         self._tools_for_rows()
         self.list_layout.addLayout(self.grid)
         self.list_layout.addStretch(1)
-        self.scroll.setWidget(self.list)
-        v.addWidget(self.scroll, 1)
+        self.scroll_area.setWidget(self.list)
+        v.addWidget(self.scroll_area, 1)
         self.big: AppRow | None = None   # the card in the big view (the rest are hidden)
         # what the clip editors' Save keeps, under the cards
         self.shelf = ClipShelf(engine, cfg, self)
@@ -1135,19 +1137,33 @@ class AppsTab(QWidget):
         usage.used("apps-reorder")
         source.category = target_cat
         self._save_row_category(source)
-        order = [self.grid.itemAt(i).widget() for i in range(self.grid.count())]
+        order = self._grid_rows()
         order.remove(source)
         first_target = next((r for r in order if r.category == target_cat), None)
         if first_target is not None:
             order.insert(order.index(first_target), source)
         else:
             order.append(source)
-        items = {item.widget(): item for item in
-                 [self.grid.takeAt(0) for _ in range(self.grid.count())]}
+        items = self._take_grid_items()
         for row in order:
             self.grid.addItem(items[row])
         self.grid.invalidate()
         self.list_layout.activate()
+
+    def _grid_rows(self) -> list[AppRow]:
+        """The cards in the grid, in its order."""
+        rows = []
+        for i in range(self.grid.count()):
+            item = self.grid.itemAt(i)
+            w = item.widget() if item else None
+            assert isinstance(w, AppRow)   # the grid holds only cards (headings sit beside it)
+            rows.append(w)
+        return rows
+
+    def _take_grid_items(self) -> dict[QWidget | None, QLayoutItem]:
+        """Every item out of the grid, by its card."""
+        taken = [self.grid.takeAt(0) for _ in range(self.grid.count())]
+        return {item.widget(): item for item in taken if item is not None}
 
     def _save_row_category(self, row: AppRow):
         spec = self._spec(row.key)
@@ -1167,12 +1183,11 @@ class AppsTab(QWidget):
         if source.category != target.category:
             source.category = target.category
             self._save_row_category(source)
-        order = [self.grid.itemAt(i).widget() for i in range(self.grid.count())]
+        order = self._grid_rows()
         order.remove(source)
         order.insert(order.index(target) + (not before), source)
         # Move layout items, keeping the same cards, captures and clip editors alive.
-        items = {item.widget(): item for item in
-                 [self.grid.takeAt(0) for _ in range(self.grid.count())]}
+        items = self._take_grid_items()
         for row in order:
             self.grid.addItem(items[row])
         self.grid.invalidate()
@@ -1709,7 +1724,9 @@ class AppsTab(QWidget):
             row.editor = ClipEditor(self.engine, self.cfg, row)
             row.editor.save_clip.connect(lambda data, whole, r=row: self._save_edit(r, data, whole))
             row.editor.big_toggled.connect(lambda on, r=row: self._set_big(r, on))
-            row.layout().addWidget(row.editor)
+            lay = row.layout()
+            assert lay is not None   # made in AppRow.__init__
+            lay.addWidget(row.editor)
         row.set_clip_open(True)
         row.editor.show()
         if row.app is not None:
@@ -1770,7 +1787,7 @@ class AppsTab(QWidget):
         self.grid.invalidate()
         self._fit_big()
         if not on:
-            self.scroll.ensureWidgetVisible(row)
+            self.scroll_area.ensureWidgetVisible(row)
 
     def _fit_big(self):
         row = self.big
@@ -1778,7 +1795,7 @@ class AppsTab(QWidget):
             return
         wave = row.editor.wave
         rest = row.sizeHint().height() - max(wave.minimumHeight(), wave.sizeHint().height())
-        room = self.scroll.viewport().height() - rest - 12
+        room = self.scroll_area.viewport().height() - rest - 12
         wave.setMinimumHeight(max(WAVE_H, room))
         self.list_layout.activate()
 
