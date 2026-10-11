@@ -747,17 +747,6 @@ class MainWindow(QMainWindow):
         self.pill.setCursor(Qt.CursorShape.PointingHandCursor)
         self.pill.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         self.pill.clicked.connect(lambda: self.tabs.setCurrentWidget(self.setup_page))
-        # Offline mode: what only works online is out of the way, and this says why
-        # (one click to the switch)
-        self.btn_offline = QPushButton()
-        self.btn_offline.setObjectName("pill")
-        self.btn_offline.setCursor(Qt.CursorShape.PointingHandCursor)
-        sidebar.put(self.btn_offline, _("Offline"),
-                    tip=_("Offline mode is on: nothing goes online, and what needs the "
-                          "internet is hidden. Click to change it."))
-        self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
-        icons.set_icon(self.btn_offline, "offline", size=sidebar.ICON, gap=False)
-        self.btn_offline.setVisible(net.offline())
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
@@ -1009,7 +998,11 @@ class MainWindow(QMainWindow):
             # them and only show when needed (at the rail's foot, as icons)
             [self.btn_air, self.stop_btn],
             order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
-            alerts=[self.pill, self.btn_offline, self.btn_update])
+            alerts=[self.pill, self.btn_update])
+        # Proxy, Tor or Offline mode: a line in the On Air card (_net_follow)
+        if self.rail.output is not None:
+            self.rail.output.networkClicked.connect(lambda: self.open_settings("privacy"))
+        self._net_follow()
         # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
         # through them (the tab widget does that only while it has the focus)
         for n in range(1, 10):
@@ -4094,9 +4087,9 @@ class MainWindow(QMainWindow):
             self._refit()
 
     def _offline_follow(self):
-        """Offline mode: the Offline pill in the header, and the tabs that only work
-        online (needs_online) out of the tab bar and + More tabs; back when it's off."""
-        self.btn_offline.setVisible(net.offline())
+        """Offline mode: Offline in the On Air card, and the tabs that only work online
+        (needs_online) out of the tab bar and + More tabs; back when it's off."""
+        self._net_follow()
         for key in ("radio", "triggers"):
             i = TAB_INDEX[key]
             shown = self.tab_shown(key)
@@ -4147,8 +4140,44 @@ class MainWindow(QMainWindow):
         if playing:
             self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
 
+    def network_line(self) -> tuple[str, str, str, str] | None:
+        """What the On Air card says about the connection (OutputBlock.set_network):
+        Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
+        if net.offline():
+            return ("offline", _("Offline"), "",
+                    _("Offline mode is on: nothing goes online, and what needs the "
+                      "internet is hidden. Click to change it."))
+        mode = net.mode()
+        click = _("Click to change it.")
+        if mode == net.TOR:
+            t = tor.manager()
+            if t.state == tor.READY:
+                return ("tor", _("Through Tor"), "ok", "\n".join((t.status_text(), click)))
+            if t.state == tor.STARTING:
+                return ("tor", _("Tor {percent}%", percent=t.progress), "",
+                        "\n".join((t.status_text(), click)))
+            if t.state == tor.FAILED:
+                return ("tor", _("Tor failed"), "warn", "\n".join((t.status_text(), click)))
+            return ("tor", _("Tor"), "", "\n".join((t.status_text(), click)))
+        if mode == net.PROXY:
+            p = net.proxy()
+            if p is None:
+                return ("shield", _("Proxy not working"), "warn",
+                        "\n".join((net.describe(), click)))
+            return ("shield", _("Through proxy"), "ok",
+                    "\n".join((_("Everything goes through your proxy ({address}).",
+                                  address=p.where), click)))
+        return None
+
+    def _net_follow(self):
+        output = getattr(getattr(self, "rail", None), "output", None)
+        if output is not None:
+            output.set_network(self.network_line())
+            self.rail.refresh_output()   # (the card's widest line can change its scale)
+
     def _on_tor(self):
         """Something is waiting for Tor: say so (once), and when it's ready or failed."""
+        self._net_follow()
         t = tor.manager()
         if t.state == tor.STARTING and t.waiting:
             say = ("starting", _("Connecting to Tor… what you asked for goes once it's "

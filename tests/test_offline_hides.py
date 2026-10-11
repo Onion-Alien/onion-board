@@ -20,10 +20,11 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         window.set_tab_on(key, True)
     bar = window.tabs
     try:
-        assert window.btn_offline.isHidden() and bar.isTabVisible(TAB_INDEX["radio"])
+        assert window.network_line() is None and bar.isTabVisible(TAB_INDEX["radio"])
         window.tabs.setCurrentIndex(TAB_INDEX["radio"])
         offline(window, True)
-        assert not window.btn_offline.isHidden()
+        assert window.network_line()[1] == "Offline"   # said in the On Air card
+        assert window.rail.output._network == window.network_line()
         assert not bar.isTabVisible(TAB_INDEX["radio"])
         assert bar.currentIndex() == 0   # was on Radio: back to the Sounds tab
         # no Onion Watch in the test profile: the Triggers tab is only its Get button
@@ -35,7 +36,7 @@ def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch)
         window.set_tab_on("apps", False)
         assert window._more_tab_keys() == ["apps"]
         offline(window, False)
-        assert window.btn_offline.isHidden()
+        assert window.network_line() is None and window.rail.output._network is None
         assert bar.isTabVisible(TAB_INDEX["radio"]) and bar.isTabVisible(TAB_INDEX["triggers"])
         assert not window.btn_yt.isHidden()
         assert "paste a link" in window.search.placeholderText()
@@ -137,3 +138,25 @@ def test_addons_without_one_installed_goes_offline(window):  # noqa: F811
     finally:
         d.close()
         offline(window, False)
+
+
+def test_on_air_card_says_proxy_and_tor(window, monkeypatch):  # noqa: F811
+    from soundboard import tor
+    try:
+        net.configure(net.PROXY, "socks5h://127.0.0.1:9050")
+        QApplication.processEvents()
+        assert window.rail.output._network[:3] == ("shield", "Through proxy", "ok")
+        net.configure(net.PROXY, "not a proxy::")
+        assert window.rail.output._network[2] == "warn"
+        net.configure(net.TOR)
+        t = tor.manager()
+        for state, words, tone in ((tor.STARTING, "Tor 40%", ""), (tor.READY, "Through Tor", "ok"),
+                                   (tor.FAILED, "Tor failed", "warn")):
+            monkeypatch.setattr(t, "state", state)
+            monkeypatch.setattr(t, "progress", 40)
+            window._on_tor()
+            assert window.rail.output._network[1:3] == (words, tone)
+    finally:
+        net.configure(net.DIRECT)
+        QApplication.processEvents()
+    assert window.rail.output._network is None
