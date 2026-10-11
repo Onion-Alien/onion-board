@@ -3045,5 +3045,7 @@
   "Delete info": "Infos löschen",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Löschen, woher „{name}“ stammt?\n\nLink, Kanal und weitere Details sowie ihre Textdatei werden gelöscht. Der Sound bleibt.",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Merkt sich Link, Kanal, Upload-Datum, Länge und Aufrufe jedes Downloads (aus dem Download selbst, nichts wird extra abgerufen), auch in einer Textdatei neben dem Sound. Rechtsklick auf den Sound, um den Link zu öffnen oder zu kopieren. Aus: Neue Downloads merken sich nichts davon und das Menü blendet es aus; schon Gespeichertes bleibt.",
-  "Remember where it came from": "Merken, woher er kommt"
+  "Remember where it came from": "Merken, woher er kommt",
+  "Set up output": "Ausgabe einrichten",
+  "Sound output": "Tonausgabe"
 }

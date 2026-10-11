@@ -2980,5 +2980,7 @@
   "Delete info": "刪除資訊",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "要刪除「{name}」的來源嗎？\n\n它的連結、頻道和其他詳細資料以及對應的文字檔都會被刪除。音效會保留。",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "儲存每次下載的連結、頻道、上傳日期、長度和觀看次數（來自下載本身，不會額外取得任何內容），也會存到音效旁的文字檔。在音效上按右鍵即可開啟或複製連結。關閉後：新的下載不再儲存這些內容，選單也會隱藏；已儲存的內容會保留。",
-  "Remember where it came from": "記住來源"
+  "Remember where it came from": "記住來源",
+  "Set up output": "設定輸出",
+  "Sound output": "聲音輸出"
 }

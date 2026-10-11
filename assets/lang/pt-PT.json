@@ -3045,5 +3045,7 @@
   "Delete info": "Apagar informações",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Apagar de onde veio “{name}”?\n\nA ligação, o canal e os outros detalhes e o ficheiro de texto deles são apagados. O som fica.",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Guarda a ligação, o canal, a data de carregamento, a duração e as visualizações de cada transferência (da própria transferência, nada extra é obtido), também num ficheiro de texto ao lado do som. Clica com o botão direito no som para abrir ou copiar a ligação. Desligado: as novas transferências não guardam nada disto e o menu esconde-o; o que já foi guardado fica.",
-  "Remember where it came from": "Lembrar de onde veio"
+  "Remember where it came from": "Lembrar de onde veio",
+  "Set up output": "Configurar saída",
+  "Sound output": "Saída de áudio"
 }

@@ -2980,5 +2980,7 @@
   "Delete info": "情報を削除",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "「{name}」の入手元を削除しますか？\n\nリンク、チャンネルなどの詳細とそのテキストファイルが削除されます。サウンドは残ります。",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "ダウンロードごとのリンク、チャンネル、投稿日、長さ、再生回数を保存します（ダウンロード自体から取得し、追加では何も取りに行きません）。サウンドの横のテキストファイルにも保存します。サウンドを右クリックするとリンクを開いたりコピーしたりできます。オフ：新しいダウンロードは何も保存せず、メニューにも表示されません。保存済みのものは残ります。",
-  "Remember where it came from": "入手元を記録する"
+  "Remember where it came from": "入手元を記録する",
+  "Set up output": "出力を設定",
+  "Sound output": "音声出力"
 }

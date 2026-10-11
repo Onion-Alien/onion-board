@@ -84,7 +84,8 @@ class Switch(QCheckBox):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         on = self.isChecked()
-        r = QRectF(self.rect()).adjusted(1, 3, -1, -3)
+        offset = self.property("glyphoffset") or 0
+        r = QRectF(self.rect()).adjusted(1, 3 + offset, -1, -3 + offset)
         track = QColor(theme.T["accent"] if on else theme.T["groove"])
         if not self.isEnabled():
             track.setAlpha(110)

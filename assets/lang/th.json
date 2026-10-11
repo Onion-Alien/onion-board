@@ -2980,5 +2980,7 @@
   "Delete info": "ลบข้อมูล",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "ลบที่มาของ “{name}” ไหม\n\nลิงก์ ช่อง รายละเอียดอื่นๆ และไฟล์ข้อความจะถูกลบ เสียงยังอยู่",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "เก็บลิงก์ ช่อง วันที่อัปโหลด ความยาว และยอดดูของแต่ละการดาวน์โหลด (จากการดาวน์โหลดเอง ไม่ได้ดึงอะไรเพิ่ม) ในไฟล์ข้อความข้างเสียงด้วย คลิกขวาที่เสียงเพื่อเปิดหรือคัดลอกลิงก์ ปิด: การดาวน์โหลดใหม่จะไม่เก็บอะไรเลยและเมนูจะซ่อนไว้ ส่วนที่บันทึกไว้แล้วยังอยู่",
-  "Remember where it came from": "จำว่ามาจากไหน"
+  "Remember where it came from": "จำว่ามาจากไหน",
+  "Set up output": "ตั้งค่าเอาต์พุต",
+  "Sound output": "เอาต์พุตเสียง"
 }

@@ -3045,5 +3045,7 @@
   "Delete info": "Burahin ang info",
   "Delete where “{name}” came from?\n\nIts link, channel and other details and their text file are deleted. The sound stays.": "Burahin kung saan galing ang “{name}”?\n\nMabubura ang link, channel at iba pang detalye nito at ang text file nila. Mananatili ang sound.",
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Itinatabi ang link, channel, petsa ng upload, haba at views ng bawat download (mula mismo sa download, walang dagdag na kinukuha), pati sa text file sa tabi ng sound. I-right-click ang sound para buksan o kopyahin ang link. Naka-off: walang itatabi ang mga bagong download at itatago ito ng menu; mananatili ang naitabi na.",
-  "Remember where it came from": "Tandaan kung saan galing"
+  "Remember where it came from": "Tandaan kung saan galing",
+  "Set up output": "I-set up ang output",
+  "Sound output": "Output ng tunog"
 }

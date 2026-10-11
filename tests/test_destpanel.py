@@ -137,21 +137,21 @@ def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: 
     d.close()
 
 
-def test_the_rail_has_a_mode_button_that_follows_the_picker(window):  # noqa: F811
+def test_mode_controller_follows_setup_without_a_duplicate_rail_control(window):  # noqa: F811
     mode = window.mode_btn
     window.rail.set_open(False)   # shut: icons only
-    assert window.rail.isAncestorOf(mode) and mode.text() == ""   # an icon beside Live
+    assert mode.isHidden() and mode not in window.rail.status
     acts = [a for a in mode.menu_.actions() if a.isCheckable()]
     assert [a.text() for a in acts] == ["Game", "Voice chat", "Clean", "Advanced"]
     assert mode.currentData() == "clean" and acts[2].isChecked()
     assert all(len(a.toolTip()) > 80 for a in acts)   # each one says what it does
-    assert mode.accessibleName() == "Who's listening: Clean"
-    acts[1].trigger()                                 # picked on the rail
+    assert mode.property("railfull") == "Who's listening: Clean"
+    acts[1].trigger()                                 # shared mode command
     assert window.engine.dest is not None and window.engine.dest.key == "discord"
     assert window.cfg.dest == {"mode": "discord", "simple": "voice", "auto": False}
     assert window._save_timer.isActive()
-    assert "Voice chat: shaping for Discord." in mode.toolTip()
-    assert mode.accessibleName() == "Who's listening: Voice chat"
+    assert "Voice chat: shaping for Discord." in mode.property("railtip")
+    assert mode.property("railfull") == "Who's listening: Voice chat"
     window.dest_panel.refresh()                       # the Setup tab shows it
     assert window.dest_panel.buttons["voice"].isChecked()
     assert window.dest_panel.advanced.isHidden()      # the full list is Advanced's
@@ -159,7 +159,7 @@ def test_the_rail_has_a_mode_button_that_follows_the_picker(window):  # noqa: F8
     _dest_combo(d.tabs.currentWidget()).setCurrentIndex(
         _dest_combo(d.tabs.currentWidget()).findData("steam"))
     assert mode.currentData() == "advanced"
-    assert mode.accessibleName() == "Who's listening: Advanced: Steam voice"
+    assert mode.property("railfull") == "Who's listening: Advanced: Steam voice"
     d.close()
 
 
