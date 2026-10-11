@@ -834,10 +834,14 @@ _tabs: list[tuple[weakref.ref, int, str, str | None, bool]] = []
 
 
 def set_icon(widget, name: str, color: str | None = None, checked_color: str | None = None,
-             size: int = 18):
+             size: int = 18, gap: bool = True):
     """Give a button or menu action (anything with setIcon) an icon that follows theme
-    changes. A button with words gets TEXT_GAP between the icon and them."""
-    has_text = hasattr(widget, "setIconSize") and bool(getattr(widget, "text", str)())
+    changes. A button with words gets TEXT_GAP between the icon and them; `gap=False`
+    for one lined up on its own icon column (the sidebar's)."""
+    if not gap:
+        widget.setProperty("noTextGap", True)
+    has_text = (hasattr(widget, "setIconSize") and not widget.property("noTextGap")
+                and bool(getattr(widget, "text", str)()))
     pad = TEXT_GAP - 4 if has_text else 0
     widget.setIcon(icon(name, color, checked_color, pad=pad))
     if hasattr(widget, "setIconSize"):   # a QAction takes its menu's size
