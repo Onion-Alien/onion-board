@@ -693,7 +693,7 @@ QPushButton#transport_play:hover { background:$accent_hi; }
 QPushButton#transport_play:pressed { background:$accent; }
 QPushButton#transport_play:disabled { background:$btn; border:1px solid $border; }
 QPushButton#transport_stop { background:$btn; border:1px solid $border; border-radius:10px; padding:0; }
-QPushButton#transport_stop:hover { background:$btn_hover; border-color:$danger_text; }
+QPushButton#transport_stop:hover { background:$btn_hover; border:2px solid $danger_text; }
 QPushButton#transport_stop:pressed { background:$btn_press; }
 QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border; }
 QSlider#seek::groove:horizontal { margin:0 8px; height:6px; border-radius:3px; }

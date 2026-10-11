@@ -1,0 +1,1 @@
+- Keep the Stop button's red hover outline visible on every side at fractional display scales.
