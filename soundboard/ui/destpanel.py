@@ -241,6 +241,9 @@ class DestPanel(QWidget):
             _("Every mode in plain words, and what it's doing right now"))
         self.help_btn.clicked.connect(self.show_help)
         v.addLayout(row)
+        # the card's own gap (12) under the modes: at the rows' 6 the mode's line sat
+        # flush against the buttons
+        v.addSpacing(6)
         self.now = hint_label("")
         v.addWidget(self.now)
         # a hint that something else is in use: Discord listening while in Game, say,

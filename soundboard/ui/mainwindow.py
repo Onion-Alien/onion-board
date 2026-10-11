@@ -54,7 +54,8 @@ from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, re
                            sourcedialog, splash, taboff, themecover)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar, capped,
-                                 card, hint_label, icon_label, steady_number, vsep)
+                                 card, hint_label, icon_label, info_button, steady_number,
+                                 vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
@@ -77,7 +78,7 @@ from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
                                    SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
                                    spectrum, take_out, SLIM_PAD_H)
-from soundboard.wheelguard import no_wheel
+from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
 from soundboard import i18n
@@ -1895,10 +1896,17 @@ class MainWindow(QMainWindow):
         page.setWidget(inner)
 
         # ---- how it works + the one thing to set in Discord
-        howcard, cv = card(_("Your virtual mic"), roomy=True)
+        # straight into the mic: what to do if a voice app chops the sounds up sits
+        # behind an ⓘ (DESIGN section 4), not as a paragraph under "Nothing to set"
+        self.btn_mictips = info_button(_("Sounds chopped up?"))
+        self.btn_mictips.clicked.connect(self._show_mic_tips)
+        self.btn_mictips.hide()
+        howcard, cv = card(_("Your virtual mic"), roomy=True, beside=self.btn_mictips)
         item = cv.itemAt(0)
-        how_title = item.widget() if item else None
-        assert isinstance(how_title, QLabel)   # card() puts its title first
+        head = item.layout() if item else None   # card() puts its title row first
+        first = head.itemAt(0) if head else None
+        how_title = first.widget() if first else None
+        assert isinstance(how_title, QLabel)
         self.how_title = how_title   # renamed when not using the cable
         flow = QFrame()
         flow.setObjectName("micflow")
@@ -2051,12 +2059,15 @@ class MainWindow(QMainWindow):
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
                 grid.addWidget(w, r, col)
-            cb.setMinimumWidth(120)
-            # sized for a short name, not the longest device ("Headphones (2- Arctis Nova
-            # Pro Wireless Game)" gave the Setup tab a sideways scroll bar); the list
+            # a short floor, so a long device name ("Headphones (2- Arctis Nova Pro
+            # Wireless Game)") can't give the Setup tab a sideways scroll bar; the list
             # opens wide enough for whole names
-            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-            cb.setMinimumContentsLength(16)
+            cb.setMinimumWidth(120)
+            # one column: the three boxes share the widest one's width (up to the cap)
+            # instead of each fitting its own names, which left My mic's edge short
+            cb.setProperty("snug", False)   # (wheelguard.snug_combo: sized here)
+            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+            cb.setMaximumWidth(AppStyle.COMBO_CAP)
         grid.setColumnStretch(3, 1)   # the room past the boxes, not the boxes' column
         av.addLayout(grid)
         self.setup_connection = QLabel()
@@ -2880,6 +2891,10 @@ class MainWindow(QMainWindow):
                                       "sounds. Set <b>Send my sounds to</b> back to <b>My "
                                       "mic</b>, unless that's on purpose.</span>",
                                       status=theme.status('warn')))
+        elif c.route == "cable":
+            # the cable is picked, just not installed yet: the line above it and Your
+            # virtual mic already say so ("Nothing picked" was wrong, and said it twice)
+            self.setup_hint.setText("")
         else:
             self.setup_hint.setText(_("<span style='color:{status}'>Nothing picked: only you "
                                       "will hear sounds.</span>", status=theme.status('warn')))
@@ -2891,6 +2906,7 @@ class MainWindow(QMainWindow):
                 + _("<br><span style='color:{status}'>Can't open {devices} (under Also send to). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=devices))
+        self.setup_hint.setVisible(bool(self.setup_hint.text()))   # (no empty gap)
         self.set_sending(self.btn_air.isChecked())   # its label follows the route
         self._update_flow()
         where = {"main": _("sending"), "mon": _("headphones"), "mic": _("mic"),
@@ -2994,10 +3010,7 @@ class MainWindow(QMainWindow):
                    + ("  " + _("<b style='color:{colour}'>(live)</b>", colour=ok)
                       if apps else ""))
             step = _("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
-                      "your sounds are in it. If sounds get chopped up, switch off the "
-                      "voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, "
-                      "<b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not "
-                      "Studio: it skips Onion Board).").replace("</b>", "</b><br>", 1)
+                     "your sounds are in it.").replace("</b>", "</b><br>", 1)
         elif route == "mic":
             state = "unrouted"
             out = _("Into your mic  <b style='color:{colour}'>✗ can't reach it</b>",
@@ -3093,6 +3106,7 @@ class MainWindow(QMainWindow):
         self.flow_mic.setText(marks(mic))
         self.flow_out.setText(marks(out))
         self.step_lbl.setText(step)
+        self.btn_mictips.setVisible(route == "mic")
         update = route == "mic" and state == "ok" and direct == "outdated"
         self.mic_update_note.setVisible(update)
         if update:
@@ -4398,6 +4412,17 @@ class MainWindow(QMainWindow):
             button = next((b for b in self.rail.buttons if b.index == i), self.tabs)
             self._show_help(TabHelpPopup(*info, owl=self.tabs.widget(i) is self.triggers,
                                          parent=self), button)
+
+    def _show_mic_tips(self):
+        """Your mic's ⓘ: the voice app settings that stop it chopping your sounds up."""
+        box = TabHelpPopup(
+            _("Sounds chopped up?"),
+            _("If sounds get chopped up, switch off the voice app's noise suppression "
+              "(Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, "
+              "<b>Echo Cancellation</b> off. Not Studio: it skips Onion Board)."),
+            parent=self)
+        box.body.setTextFormat(Qt.TextFormat.RichText)   # (the setting names in bold)
+        self._show_help(box, self.btn_mictips)
 
     def _show_help(self, box: QDialog, beside: QWidget):
         """Open a help card to the right of `beside` (a rail button), inside the
