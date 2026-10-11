@@ -293,8 +293,9 @@ class _AddonGrid(QWidget):
 
     def _place(self):
         g, cols = self.grid, self.cols
+        from soundboard.ui.widgets import take_out   # (it imports this module)
         while g.count():
-            g.takeAt(0)
+            take_out(g)
         for r in range(g.rowCount()):
             g.setRowMinimumHeight(r, 0)
         r = 0
@@ -402,8 +403,9 @@ class ThemeGrid(QWidget):
             return
         for col in range(self.columns + 1):
             self.grid.setColumnStretch(col, 0)
+        from soundboard.ui.widgets import take_out   # (it imports this module)
         while self.grid.count():
-            self.grid.takeAt(0)
+            take_out(self.grid)
         for i, card in enumerate(self.cards):
             self.grid.addWidget(card, i // columns, i % columns, Qt.AlignmentFlag.AlignLeft)
         self.grid.setColumnStretch(columns, 1)

@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMainWindow
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QTabWidget, QToolTip,
                                QVBoxLayout, QWidget)
+from shiboken6 import delete as qt_delete
 
 from soundboard import library, midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -27,6 +28,20 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 
 PAD_MIME = "application/x-soundboard-pad"
+
+
+def take_out(layout, i: int = 0) -> None:
+    """Take item `i` out of `layout` and free it; its widget stays alive.
+
+    Qt's takeAt() hands the item to the caller, and from Python nobody ever frees it.
+    A widget remembers the first item made for it, so after it's added back to a
+    layout (columns re-stacked, a grid reflowed) its size changes kept going to the
+    old, orphaned item: the new one kept a stale height for that width, and a card
+    whose text grew was squeezed (its buttons drawn over the text) until the
+    width changed."""
+    item = layout.takeAt(i)
+    if item is not None:
+        qt_delete(item)
 
 
 class DropdownMenu(QMenu):
@@ -1302,7 +1317,7 @@ class PadGrid(QWidget):
             pad = it if isinstance(it, Pad) else None
             # (Bun's never wanted)
             if pad is None or pad not in want or slots.get(pad) != want[pad]:
-                grid.takeAt(i)
+                take_out(grid, i)
                 if pad is not None:
                     slots.pop(pad, None)
         if not shown:

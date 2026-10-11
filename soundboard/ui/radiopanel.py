@@ -32,7 +32,7 @@ from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import RoundedFrame, VolumeControl, bar, icon_label, vsep
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.widgets import paint_now_playing
+from soundboard.ui.widgets import paint_now_playing, take_out
 
 log = logging.getLogger(__name__)
 
@@ -336,7 +336,7 @@ class _FilterRow(QWidget):
             self.rows = rows
             for h in self._lines:
                 while h.count():
-                    h.takeAt(0)
+                    take_out(h)
             for i, c in enumerate(self.combos):
                 line = 0 if rows == 1 else (min(i, 1) if rows == 2 else i)
                 self._lines[line].addWidget(c)
