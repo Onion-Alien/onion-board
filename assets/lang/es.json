@@ -3047,5 +3047,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Guarda el enlace, canal, fecha de subida, duración y visualizaciones de cada descarga (de la propia descarga, no se pide nada extra), también en un archivo de texto junto al sonido. Haz clic derecho en el sonido para abrir o copiar el enlace. Desactivado: las descargas nuevas no guardan nada de esto y el menú lo oculta; lo ya guardado se queda.",
   "Remember where it came from": "Recordar de dónde viene",
   "Set up output": "Configurar salida",
-  "Sound output": "Salida de sonido"
+  "Sound output": "Salida de sonido",
+  "Interface size": "Tamaño de la interfaz",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Hace todo en Onion Board más grande o más pequeño: texto, botones y pads.",
+  "Onion Board changes size after a restart.": "Onion Board cambia de tamaño tras reiniciar."
 }

@@ -3112,5 +3112,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Запоминает ссылку, канал, дату загрузки, длительность и просмотры каждой загрузки (из самой загрузки, ничего лишнего не запрашивается), ещё и в текстовом файле рядом со звуком. Щёлкни звук правой кнопкой, чтобы открыть или скопировать ссылку. Выключено: новые загрузки ничего из этого не сохраняют, а меню это скрывает; уже сохранённое остаётся.",
   "Remember where it came from": "Запоминать, откуда взят",
   "Set up output": "Настроить вывод",
-  "Sound output": "Вывод звука"
+  "Sound output": "Вывод звука",
+  "Interface size": "Размер интерфейса",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Делает всё в Onion Board больше или меньше: текст, кнопки и пэды.",
+  "Onion Board changes size after a restart.": "Onion Board изменит размер после перезапуска."
 }

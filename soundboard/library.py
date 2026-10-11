@@ -97,6 +97,9 @@ def fits_type(default, v) -> bool:
     return isinstance(v, type(default))
 
 
+UI_SCALES = (80, 90, 100, 110, 125, 150)   # the interface sizes Settings offers (percent)
+
+
 @cache
 def field_names(cls) -> frozenset[str]:
     """A dataclass's settings: its fields, not its ClassVars (which __dataclass_fields__
@@ -358,6 +361,9 @@ class Config:
     theme: str = "Dark"
     # the app's language, a catalog code (assets/lang); "" = never picked (i18n.startup)
     language: str = ""
+    # the whole interface's size in percent (Settings > Appearance), on top of Windows'
+    # display scaling; read before the app starts (app.ui_scale_startup)
+    ui_scale: int = 100
     live_color: str = ""   # own colour for the "it's on" highlights ("" = the theme's)
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all

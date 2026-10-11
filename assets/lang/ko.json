@@ -2982,5 +2982,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "다운로드마다 링크, 채널, 업로드 날짜, 길이, 조회수를 저장해요(다운로드 자체에서 가져오며 따로 더 가져오지 않아요). 사운드 옆 텍스트 파일에도 저장해요. 사운드를 오른쪽 클릭해 링크를 열거나 복사하세요. 끄면: 새 다운로드는 아무것도 저장하지 않고 메뉴에서도 숨겨요. 이미 저장된 건 그대로예요.",
   "Remember where it came from": "출처 기억하기",
   "Set up output": "출력 설정",
-  "Sound output": "사운드 출력"
+  "Sound output": "사운드 출력",
+  "Interface size": "인터페이스 크기",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board의 모든 것을 크게 또는 작게 만듭니다: 글자, 버튼, 패드.",
+  "Onion Board changes size after a restart.": "Onion Board는 다시 시작한 뒤 크기가 바뀝니다."
 }

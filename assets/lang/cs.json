@@ -3112,5 +3112,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "U každého stažení si pamatuje odkaz, kanál, datum nahrání, délku a zhlédnutí (ze samotného stažení, nic navíc se nestahuje), také v textovém souboru vedle zvuku. Klikni pravým na zvuk a otevři nebo zkopíruj odkaz. Vypnuto: nová stažení si nic z toho neuloží a nabídka to skryje; co už je uložené, zůstane.",
   "Remember where it came from": "Pamatovat si, odkud je",
   "Set up output": "Nastavit výstup",
-  "Sound output": "Zvukový výstup"
+  "Sound output": "Zvukový výstup",
+  "Interface size": "Velikost rozhraní",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Zvětší nebo zmenší vše v Onion Board: text, tlačítka i pady.",
+  "Onion Board changes size after a restart.": "Onion Board změní velikost po restartu."
 }
