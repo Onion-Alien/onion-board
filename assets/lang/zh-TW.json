@@ -1703,7 +1703,6 @@
   "Call only": "僅限致電",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "在網頁瀏覽器（瀏覽器中的 Google Meet、Discord 或 Guilded、網路遊戲）、Zoom 和 Microsoft Teams 中通話。單聲道，具有應用程式本身的噪音抑制和增益控制：調低噪音抑制。",
   "Can't add a live stream, use Record instead.": "無法新增直播 - 請使用錄音。",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "無法解碼此格式（為 m4a/aac/video 安裝 ffmpeg）",
   "Cancelled.": "取消。",
   "Cancelling…": "取消…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "捕獲程式的音訊需要 Windows 11 或更新到版本 2004 或更高版本的 Windows 10（這是 build {build} ）。",

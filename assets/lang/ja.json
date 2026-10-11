@@ -1703,7 +1703,6 @@
   "Call only": "電話のみ",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Web ブラウザーでの通話 (Google Meet、ブラウザーでの Discord または Guilded、Web ゲーム)、Zoom、および Microsoft Teams。アプリ独自のノイズ抑制とゲイン制御を備えたモノラル: ノイズ抑制を下げます。",
   "Can't add a live stream, use Record instead.": "ライブ ストリームを追加できません。代わりに録画を使用してください。",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "この形式はデコードできません (m4a/aac/video の場合は ffmpeg をインストールしてください)",
   "Cancelled.": "キャンセル。",
   "Cancelling…": "キャンセル中…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "プログラムのオーディオをキャプチャするには、Windows 11、またはバージョン 2004 以降に更新された Windows 10 が必要です (これは build {build}です)。",

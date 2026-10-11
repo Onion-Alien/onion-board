@@ -1703,7 +1703,6 @@
   "Call only": "โทรเท่านั้น",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "การโทรผ่านเว็บเบราว์เซอร์ (Google Meet, Discord หรือ Guilded ในเบราว์เซอร์, เกมบนเว็บ), Zoom และ Microsoft Teams โมโน พร้อมการลดเสียงรบกวนของแอปและการควบคุม: ลดการลดเสียงรบกวนลง",
   "Can't add a live stream, use Record instead.": "เพิ่มสตรีมสดไม่ได้ โปรดใช้บันทึกแทน",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "ถอดรหัสรูปแบบนี้ไม่ได้ (ติดตั้ง ffmpeg สำหรับ m4a/aac/video)",
   "Cancelled.": "ยกเลิก.",
   "Cancelling…": "กำลังยกเลิก...",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "การจับเสียงของโปรแกรมต้องใช้ Windows 11 หรือ Windows 10 อัปเดตเป็นเวอร์ชัน 2004 หรือใหม่กว่า (นี่คือ build {build})",

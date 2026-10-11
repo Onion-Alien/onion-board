@@ -1651,7 +1651,6 @@
   "Call + stream": "Обаждане + поток",
   "Call only": "Само обаждане",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Обаждания в уеб браузър (Google Meet, Discord или Guilded в браузър, уеб игри), Zoom и Microsoft Teams. Моно, със собствено потискане на шума и контрол на усилването на приложението: намалете потискането на шума.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Не може да се декодира този формат (инсталирайте ffmpeg за m4a/aac/video)",
   "Cancelled.": "Отменено.",
   "Cancelling…": "Отменя се...",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Улавянето на аудио на програма изисква Windows 11 или Windows 10, актуализиран до версия 2004 или по-нова (това е build {build}).",

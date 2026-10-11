@@ -1741,7 +1741,6 @@
   "Call only": "Ring kun",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Opkald i en webbrowser (Google Meet, Discord eller Guilded i en browser, webspil), Zoom og Microsoft Teams. Mono, med appens egen støjdæmpning og gain control: skru ned for støjdæmpningen.",
   "Can't add a live stream, use Record instead.": "Kan ikke tilføje en livestream, brug Record i stedet.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Kan ikke afkode dette format (installer ffmpeg til m4a/aac/video)",
   "Cancelled.": "Annulleret.",
   "Cancelling…": "Annullerer...",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Optagelse af et programs lyd kræver Windows 11 eller Windows 10 opdateret til version 2004 eller nyere (dette er build {build}).",

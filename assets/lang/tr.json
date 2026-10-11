@@ -1746,7 +1746,6 @@
   "Call only": "Yalnızca arama",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Bir web tarayıcısındaki aramalar (tarayıcıda Google Meet, Discord veya Guilded, web oyunları), Zoom ve Microsoft Teams. Mono, uygulamanın kendi gürültü bastırma özelliği ve kontrolü kazanma özelliğiyle: gürültü bastırmayı azaltın.",
   "Can't add a live stream, use Record instead.": "Canlı yayın eklenemiyor; bunun yerine Kaydet'i kullanın.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Bu formatın kodu çözülemiyor (m4a/aac/video için ffmpeg'i yükleyin)",
   "Cancelled.": "İptal edildi.",
   "Cancelling…": "İptal…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Bir programın sesini yakalamak için Windows 11 veya Windows 10'un 2004 veya daha yeni bir sürüme güncellenmesi gerekir (bu build {build}).",

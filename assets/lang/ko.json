@@ -1703,7 +1703,6 @@
   "Call only": "통화 전용",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "웹 브라우저(브라우저의 Google Meet, Discord 또는 Guilded, 웹 게임), Zoom 및 Microsoft Teams에서 통화합니다. 앱 자체의 소음 억제 및 게인 제어 기능을 갖춘 모노: 소음 억제를 낮추세요.",
   "Can't add a live stream, use Record instead.": "실시간 스트림을 추가할 수 없습니다. 대신 녹화를 사용하세요.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "이 형식을 디코딩할 수 없습니다(m4a/aac/video용 ffmpeg 설치).",
   "Cancelled.": "취소.",
   "Cancelling…": "취소 중…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "프로그램의 오디오를 캡처하려면 Windows 11 또는 Windows 10이 버전 2004 이상으로 업데이트되어야 합니다(빌드 {build}).",

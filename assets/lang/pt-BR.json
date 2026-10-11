@@ -1746,7 +1746,6 @@
   "Call only": "Somente chamada",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Chamadas em navegador web (Google Meet, Discord ou Guilded em navegador, jogos web), Zoom e Microsoft Teams. Mono, com supressão de ruído e controle de ganho do próprio aplicativo: diminua a supressão de ruído.",
   "Can't add a live stream, use Record instead.": "Não é possível adicionar uma transmissão ao vivo. Use Gravar.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Não é possível decodificar este formato (instale o ffmpeg para m4a/aac/video)",
   "Cancelled.": "Cancelado.",
   "Cancelling…": "Cancelando…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "A captura do áudio de um programa precisa do Windows 11 ou do Windows 10 atualizado para a versão 2004 ou mais recente (isto é build {build}).",

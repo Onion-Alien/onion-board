@@ -1784,7 +1784,6 @@
   "Call only": "Numai sunați",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Apeluri într-un browser web (Google Meet, Discord sau Guild într-un browser, jocuri web), Zoom și Microsoft Teams. Mono, cu suprimarea zgomotului proprie a aplicației și controlul câștigului: reduceți suprimarea zgomotului.",
   "Can't add a live stream, use Record instead.": "Nu se poate adăuga un flux live - folosește în schimb Înregistrare.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Nu se poate decoda acest format (instalați ffmpeg pentru m4a/aac/video)",
   "Cancelled.": "Anulat.",
   "Cancelling…": "Se anulează…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Capturarea sunetului unui program necesită Windows 11 sau Windows 10 actualizat la versiunea 2004 sau mai nouă (aceasta este versiunea {build}).",

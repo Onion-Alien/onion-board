@@ -1741,7 +1741,6 @@
   "Call only": "Vain soittaa",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Puhelut verkkoselaimessa (Google Meet, Discord tai Guilded selaimessa, verkkopelit), Zoom ja Microsoft Teams. Mono, sovelluksen oma melunvaimennus ja vahvistuksen hallinta: käännä kohinanvaimennus alas.",
   "Can't add a live stream, use Record instead.": "Suoraa lähetystä ei voi lisätä, käytä sen sijaan Tallenna.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Tätä muotoa ei voi purkaa (asenna ffmpeg for m4a/aac/video)",
   "Cancelled.": "Peruutettu.",
   "Cancelling…": "Peruutetaan…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Ohjelman äänen sieppaamiseen tarvitaan Windows 11 tai Windows 10, joka on päivitetty versioon 2004 tai uudempaan (tämä on koontiversio {build}).",

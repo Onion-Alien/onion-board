@@ -1741,7 +1741,6 @@
   "Call only": "Καλέστε μόνο",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Κλήσεις σε πρόγραμμα περιήγησης ιστού (Google Meet, Discord ή Guilded σε πρόγραμμα περιήγησης, παιχνίδια Ιστού), Zoom και Microsoft Teams. Μονοφωνικό, με την καταστολή θορύβου της εφαρμογής και αποκτήστε έλεγχο: μειώστε την καταστολή θορύβου.",
   "Can't add a live stream, use Record instead.": "Δεν είναι δυνατή η προσθήκη ζωντανής ροής, αντ' αυτού χρησιμοποιήστε την εγγραφή.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Δεν είναι δυνατή η αποκωδικοποίηση αυτής της μορφής (εγκατάσταση ffmpeg για m4a/aac/video)",
   "Cancelled.": "Ακυρώθηκε.",
   "Cancelling…": "Ακύρωση…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Για τη λήψη του ήχου ενός προγράμματος απαιτείται ενημέρωση των Windows 11 ή των Windows 10 στην έκδοση 2004 ή νεότερη (αυτή είναι η έκδοση {build}).",

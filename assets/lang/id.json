@@ -1703,7 +1703,6 @@
   "Call only": "Telepon saja",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Panggilan di browser web (Google Meet, Discord atau Guilded di browser, game web), Zoom, dan Microsoft Teams. Mono, dengan peredam bising dan kendali yang dimiliki aplikasi: turunkan peredam bising.",
   "Can't add a live stream, use Record instead.": "Tidak dapat menambahkan streaming langsung, gunakan Rekam saja.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Tidak dapat memecahkan kode format ini (instal ffmpeg untuk m4a/aac/video)",
   "Cancelled.": "Dibatalkan.",
   "Cancelling…": "Membatalkan…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Merekam audio program memerlukan Windows 11, atau Windows 10 yang diperbarui ke versi 2004 atau lebih baru (ini adalah build {build}).",

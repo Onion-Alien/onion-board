@@ -1789,7 +1789,6 @@
   "Call only": "Тільки дзвінок",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Дзвінки у веб-браузері (Google Meet, Discord або Guilded у веб-переглядачі, веб-ігри), Zoom і Microsoft Teams. Моно з власним програмним придушенням шуму та контролем посилення: зменште шумоподавлення.",
   "Can't add a live stream, use Record instead.": "Не вдається додати пряму трансляцію: скористайтеся записом.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Неможливо декодувати цей формат (встановіть ffmpeg для m4a/aac/video)",
   "Cancelled.": "Скасовано.",
   "Cancelling…": "Скасування…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Для запису звуку програми потрібна Windows 11 або Windows 10, оновлена ​​до версії 2004 або новішої (це збірка {build}).",

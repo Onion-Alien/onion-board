@@ -1746,7 +1746,6 @@
   "Call only": "Alleen bellen",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Bellen in een webbrowser (Google Meet, Discord of Guilded in a browser, webgames), Zoom en Microsoft Teams. Mono, met eigen ruisonderdrukking en versterkingsregeling van de app: zet de ruisonderdrukking lager.",
   "Can't add a live stream, use Record instead.": "Kan geen livestream toevoegen. Gebruik in plaats daarvan Opnemen.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Kan dit formaat niet decoderen (installeer ffmpeg voor m4a/aac/video)",
   "Cancelled.": "Geannuleerd.",
   "Cancelling…": "Annuleren…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Voor het vastleggen van de audio van een programma is Windows 11 of Windows 10 bijgewerkt naar versie 2004 of nieuwer nodig (dit is build {build}).",

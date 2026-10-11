@@ -1741,7 +1741,6 @@
   "Call only": "Csak hívjon",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Hívások webböngészőben (Google Meet, Discord vagy Guilded böngészőben, webes játékok), Zoom és Microsoft Teams. Mono, az alkalmazás saját zajelnyomásával és erősítésvezérléssel: állítsa le a zajcsökkentést.",
   "Can't add a live stream, use Record instead.": "Nem lehet élő közvetítést hozzáadni, inkább használja a Felvétel lehetőséget.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Ezt a formátumot nem lehet dekódolni (telepítse az ffmpeg-et az m4a/aac/video számára)",
   "Cancelled.": "Törölve.",
   "Cancelling…": "Lemondás…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Egy program hangjának rögzítéséhez Windows 11 vagy 2004-es vagy újabb verzióra frissített Windows 10 szükséges (ez a build {build}).",

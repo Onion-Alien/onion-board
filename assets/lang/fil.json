@@ -1741,7 +1741,6 @@
   "Call only": "Tawag lang",
   "Calls in a web browser (Google Meet, Discord or Guilded in a browser, web games), Zoom and Microsoft Teams. Mono, with the app's own noise suppression and gain control: turn the noise suppression down.": "Mga tawag sa isang web browser (Google Meet, Discord o Guilded sa isang browser, mga laro sa web), Zoom at Microsoft Teams. Mono, na may sariling pagpigil sa ingay ng app at magkaroon ng kontrol: pababain ang pagpigil sa ingay.",
   "Can't add a live stream, use Record instead.": "Hindi makapagdagdag ng live stream, gamitin na lang ang Record.",
-  "Can't decode this format (install ffmpeg for m4a/aac/video)": "Hindi ma-decode ang format na ito (i-install ang ffmpeg para sa m4a/aac/video)",
   "Cancelled.": "Kinansela.",
   "Cancelling…": "Kinakansela…",
   "Capturing a program's audio needs Windows 11, or Windows 10 updated to version 2004 or newer (this is build {build}).": "Ang pagkuha ng audio ng program ay nangangailangan ng Windows 11, o Windows 10 na na-update sa bersyon 2004 o mas bago (ito ay build {build}).",
