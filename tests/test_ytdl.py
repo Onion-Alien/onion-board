@@ -683,7 +683,7 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     panel.search("bruh")
     qapp.processEvents()
     view = panel.loading
-    assert view.isVisible() and not panel.scroll.isVisible()
+    assert view.isVisible() and not panel.scroll_area.isVisible()
     assert view.kind in ("bunny", "owl")
     assert isinstance(view.mascot, OwlWidget if view.kind == "owl" else BunnyWidget)
     assert view.mascot.isVisible() and view.bar.ticking()
@@ -709,7 +709,7 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     gate.set()
     assert process_events(qapp, lambda: not view.running(), 5)
     assert not view.isVisible() and not view.bar.ticking()
-    assert panel.scroll.isVisible() and len(panel._rows) == 1
+    assert panel.scroll_area.isVisible() and len(panel._rows) == 1
     assert not panel.title.isVisible()   # results need no caption
     panel.close_results()
 

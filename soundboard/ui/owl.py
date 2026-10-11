@@ -2,7 +2,8 @@
 in the same style as Bun, so it's crisp at any size and needs no image files. The
 Triggers tab shows Hoot until the Onion Watch add-on is installed (a copy of
 onionwatch/owl.py from the Onion Watch project: the tab needs it before there's
-any Onion Watch to take it from; keep the two the same).
+any Onion Watch to take it from; keep the two the same, except that this one wears
+Bun's theme outfit, see _fit and docs/MASCOT.md).
 
     owl_image(160)             # QImage, transparent background
     OwlWidget(96, lines=...)   # Hoot alive: waiting, begging, sulking
@@ -17,7 +18,7 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from soundboard import theme
+from soundboard import bunnyfit, theme
 from soundboard.i18n import _
 from soundboard.ui import appstate
 
@@ -53,10 +54,28 @@ def _mix(a: float, b: float, k: float) -> float:
     return a + (b - a) * k
 
 
+def _fit(p: QPainter, fit, layer: str, ink: QPen, shut: bool = False):
+    """Hoot wears Bun's theme outfit (soundboard/bunnyfit.py, drawn for Bun's canvas):
+    each part is moved onto Hoot's shape. His head sits 12 higher than Bun's, his eyes
+    are 28 apart (Bun's 22) and 9 higher, and he has no neck, so a bow tie or scarf goes
+    just under his beak."""
+    if not fit:
+        return
+    places = {"back": [(None, (0, -12, 1.0))], "under": [(None, (0, -12, 1.0))],
+              "over": [(None, (0, -12, 1.0))],
+              "face": [(False, (50 - 50 * 1.3, 53 - 62 * 1.3, 1.3)), (True, (0, -14, 1.0))]}
+    for neck, (dx, dy, k) in places[layer]:
+        p.save()
+        p.translate(dx, dy)
+        p.scale(k, k)
+        bunnyfit.draw(p, fit, layer, ink, shut=shut, neck=neck)
+        p.restore()
+
+
 def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=None,
              *, look_y: float = 0.0, blink: float = 0.0, sad: float = 0.0,
              tufts: float = 0.0, clasp: float = 0.0, flap: float = 0.0,
-             plead: float = 0.0, tear: float = 0.0):
+             plead: float = 0.0, tear: float = 0.0, outfit: tuple[str, ...] | None = None):
     """Draw Hoot fitted (aspect kept, centred) into `rect`. `look` / `look_y` -1..1
     turn the pupils left / right and up / down: watching. The keywords pose him for
     OwlWidget: `blink` 0..1 closes the eyes, `sad` 0..1 worries the brows and wets
@@ -64,7 +83,9 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     up), `clasp` 0..1 brings the wings together in front (begging), `flap` 0..1 lifts
     them (joy), `plead` 0..1 makes the pupils big and shiny, and `tear` 0..1 rolls a
     tear down his cheek (0 = none). His feathers are the current theme's accent
-    unless `feather` / `dark` are given (FEATHER / FEATHER_DARK are his own teal)."""
+    unless `feather` / `dark` are given (FEATHER / FEATHER_DARK are his own teal).
+    `outfit`: Bun's outfit pieces to wear (None: the current theme's, (): none)."""
+    fit = bunnyfit.outfit() if outfit is None else outfit
     if feather is None:
         feather = QColor(theme.T["accent"])
     if dark is None:
@@ -78,6 +99,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     ink.setCapStyle(Qt.PenCapStyle.RoundCap)
 
+    _fit(p, fit, "back", ink)
     # ear tufts, turned about their base
     for sx in (-1, 1):
         p.save()
@@ -127,6 +149,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(QColor(255, 255, 255, 70))
     p.drawPath(face)
+    _fit(p, fit, "under", ink)
     # the big eyes
     pw, ph = _mix(13, 16.5, plead), _mix(14, 17.5, plead)
     for x in EYES:
@@ -187,6 +210,8 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
         p.setPen(QPen(QColor(INK.red(), INK.green(), INK.blue(), round(160 * c.alphaF())), 1))
         p.setBrush(c)
         p.drawPath(drop)
+    _fit(p, fit, "over", ink)
+    _fit(p, fit, "face", ink, shut=blink > 0.6)
     p.restore()
 
 
@@ -196,7 +221,8 @@ def owl_image(height: int, look: float = 0.5) -> QImage:
     img = QImage(w, h, QImage.Format.Format_ARGB32_Premultiplied)
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    draw_owl(p, QRectF(0, 0, w, h), look, FEATHER, FEATHER_DARK)   # artwork: his own teal
+    draw_owl(p, QRectF(0, 0, w, h), look, FEATHER, FEATHER_DARK,   # artwork: his own teal,
+             outfit=())                                           # no outfit
     p.end()
     return img
 

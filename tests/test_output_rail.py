@@ -63,7 +63,7 @@ def _assert_keylines(output, setup=True):
     labels = [output.title, output.status_text]
     starts = {label.mapTo(output, QPoint()).x() + label.contentsMargins().left()
               for label in labels}
-    assert starts == {output.TEXT_X}
+    assert starts == {output.text_x()}
     pairs = [(output.mark, output.title), (output.status_icon, output.status_text)]
     if setup:
         pairs.append((output.arrow, output.status_text))   # (on its x-height: within 1.5)
@@ -87,6 +87,7 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     window.show()
     window.rail.set_open(True)
     window.cfg.route = "device"
+    window.cfg.main_device = None   # nothing picked to send to
     monkeypatch.setattr(window, "_main_name", lambda: None)
     window._update_flow()
     qapp.processEvents()
@@ -99,7 +100,7 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     icon = _ink_box(img, QRect(at.x() + 2, at.y() + 4, 26, tab.height() - 8))   # (not its name)
     mark = _ink_box(img, QRect(output.mark.mapTo(rail, QPoint()), output.mark.size()))
     assert abs(icon.center().x() - mark.center().x()) <= 1
-    assert output.status_text.text() == "Not connected" and output.arrow.isVisible()
+    assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
     output.status_text.setText("Ausgabe nicht verbunden")
     output.adjustSize()
     qapp.processEvents()
@@ -114,11 +115,12 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     window.show()
     window.rail.set_open(True)
     window.cfg.route = "device"
+    window.cfg.main_device = None   # nothing picked to send to
     monkeypatch.setattr(window, "_main_name", lambda: None)
     window._update_flow()
     qapp.processEvents()
     output = window.rail.output
-    assert output.status_text.text() == "Not connected"
+    assert output.status_text.text() == "Not configured"
     height = output.height()
     stream = window.engine.main_stream
     try:
@@ -128,7 +130,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         qapp.processEvents()
         assert output.status_text.text() == "Connected"
         # the same line, no chevron, no hover, no click, out of the Tab order (no taller:
-        # a big font can wrap "Not connected ›", never "Connected")
+        # a big font can wrap "Not configured ›", never "Connected")
         assert output.setup.isVisible() and output.arrow.isHidden()
         assert output.height() <= height and output.setup.focusPolicy() == Qt.NoFocus
         assert output.setup.property("action") is False
@@ -138,13 +140,25 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         _assert_keylines(output, setup=False)
         window.rail.set_open(False)
         assert window.pill.isHidden() and not window.rail.toggle.property("dot")
+        assert not output.dot.isVisible()
         window.engine.main_stream = None
         window._update_flow()
         qapp.processEvents()
-        assert window.rail.toggle.property("dot")
+        # shut: the dot is on the On Air icon (the arrow has none), and the icon is
+        # the way to Setup
+        assert output.dot.isVisible() and not window.rail.toggle.property("dot")
+        mark = output.mark.geometry()
+        assert output.dot.geometry().intersects(mark.adjusted(-4, -4, 4, 4))
+        window.tabs.setCurrentWidget(window.sounds_page)
+        QTest.mouseClick(output.mark, Qt.LeftButton)
+        assert window.tabs.currentWidget() is window.setup_page
+        window.tabs.setCurrentWidget(window.sounds_page)   # (Setup is wider: it can shut the rail)
         window.rail.set_open(True)
         qapp.processEvents()
-        assert output.status_text.text() == "Not connected" and output.arrow.isVisible()
+        # the full card: its warning line says it, no dot (CI's wider fonts can keep
+        # the small card even fully open: the dot stays then)
+        assert output.dot.isVisible() == (not output.property("expanded"))
+        assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
         assert output.setup.property("action") is True
         assert output.setup.focusPolicy() == Qt.TabFocus and output.height() == height
     finally:
@@ -192,3 +206,49 @@ def test_output_block_stays_inside_rail_at_normal_and_narrow_sizes(window, qapp,
                 assert pos.x() >= 0 and pos.y() >= 0
                 assert pos.x() + widget.width() <= output.width()
                 assert pos.y() + widget.height() <= output.height()
+
+
+def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa: F811
+    """A cable (or device) is picked but won't open: "Not working", never the
+    "Not configured" of nothing picked."""
+    window.resize(1180, 720)
+    window.show()
+    window.rail.set_open(True)
+    window.cfg.route = "device"
+    window.cfg.main_device = "Speakers (fake)"
+    stream = window.engine.main_stream
+    try:
+        window.engine.main_stream = None
+        window._update_flow()
+        qapp.processEvents()
+        output = window.rail.output
+        assert output.status_text.text() == "Not working" and output.arrow.isVisible()
+        assert "Speakers (fake)" in output.status_text.toolTip()
+    finally:
+        window.engine.main_stream = stream
+
+
+def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
+    """Dragging the rail open, the full output card only comes in once "Off Air"
+    beside its switch and "Not configured ›" each fit on one line: never a squeezed
+    or wrapped card (the small one until then)."""
+    from soundboard.ui.sidebar import OPEN_W, SHUT_W
+    window.resize(1180, 720)
+    window.show()
+    window.cfg.route, window.cfg.main_device = "device", None
+    window._update_flow()
+    window.set_sending(False)
+    rail = window.rail
+    rail.set_open(True)
+    qapp.processEvents()
+    try:
+        for width in range(SHUT_W, OPEN_W, 3):   # (fully open, long translations wrap)
+            rail.drag_width(width)
+            qapp.processEvents()
+            out = rail.output
+            if out.title.isVisible():
+                for label in (out.title, out.status_text):
+                    assert label.height() < 2 * label.fontMetrics().height(), width
+                assert out.title.geometry().right() < out.switch.x(), width
+    finally:
+        rail.finish_resize()

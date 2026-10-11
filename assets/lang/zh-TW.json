@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "{site} 上找不到 <b>{q}</b> 的結果。",
   "Nobody: only I hear them": "不傳送：只有我聽得到",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "平常你的音效會送進你的麥克風，所以聽得到你麥克風的人都聽得到。只有要改送到別的地方時才選其他選項：Voicemeeter、混音器、OBS 擷取的裝置，或虛擬音源線。",
-  "Not connected": "未連線",
-  "Not connected: click to fix": "未連線：按一下修正",
   "Not reaching your mic, click to fix": "沒有送到你的麥克風，按一下修正",
   "Not sending to others (only you hear sounds)": "沒有傳送給別人（只有你聽得到音效）",
   "Not sending: pick a device on the Setup tab": "沒有傳送：請在「設置」分頁選一個裝置",
@@ -2957,7 +2955,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "點擊為別人靜音你的聲音（Discord、遊戲、OBS…）。除非開著變聲器，你的麥克風仍會傳出去。你自己仍能聽到一切",
   "Click to send your sounds again: right now others hear only your mic": "點擊重新傳送你的聲音：現在別人只聽到你的麥克風",
   "Only your mic": "只有你的麥克風",
-  "Others hear": "別人聽得到",
   "Others hear only your mic": "別人只聽到你的麥克風",
   "Can ring until you stop it": "可以一直響，直到你停止",
   "Free, from GitHub, and only downloaded when you click.": "免費，來自 GitHub，只在你點擊時下載。",
@@ -3077,5 +3074,10 @@
   "Your mic needs a quick repair": "你的麥克風需要快速修復",
   "Mute or unmute your mic for others. Your sounds still play for them.": "為其他人靜音或開啟你的麥克風。你的音效他們仍然聽得到。",
   "That page has no sound Onion Board can add.": "該頁面沒有 Onion Board 可以加入的音效。",
-  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "移除的音效可以用復原找回，之後也可以在 備份 → 最近刪除的音效 中找回。"
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "移除的音效可以用復原找回，之後也可以在 備份 → 最近刪除的音效 中找回。",
+  "Off Air": "已關播",
+  "On Air": "直播中",
+  "Not configured": "未設定",
+  "Not configured: click to fix": "未設定：點擊修復",
+  "Can't send to {device}, click to fix": "無法傳送到 {device}，點擊修復"
 }
