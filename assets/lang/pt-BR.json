@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "O winget levou mais de {seconds} segundos.",
   "✓ Got FFmpeg": "✓ FFmpeg obtido",
   "No settings match “{text}”": "Nenhuma configuração corresponde a “{text}”",
-  "+{count} queued": [
-    "+{count} na fila",
-    "+{count} na fila"
-  ],
   "Cancel download": "Cancelar download",
   "Couldn't download": "Não foi possível baixar",
   "Parsing video…": "Analisando vídeo…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>O Windows reserva <b>{key}</b> para ele mesmo, então não dá para usar como atalho. Escolha outra tecla.</span>",
   "Opacity": "Opacidade",
   "Playing sound background": "Fundo do som em reprodução",
-  "Show the playing sound's thumbnail behind the cards": "Mostrar a miniatura do som em reprodução atrás dos cartões"
+  "Show the playing sound's thumbnail behind the cards": "Mostrar a miniatura do som em reprodução atrás dos cartões",
+  "Adding {n} sound": [
+    "Adicionando {n} som",
+    "Adicionando {n} sons"
+  ]
 }

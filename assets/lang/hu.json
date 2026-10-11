@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "A winget {seconds} másodpercnél tovább tartott.",
   "✓ Got FFmpeg": "✓ FFmpeg megvan",
   "No settings match “{text}”": "Egyetlen beállítás sem felel meg a következőnek: „{text}”",
-  "+{count} queued": [
-    "+{count} sorban",
-    "+{count} sorban"
-  ],
   "Cancel download": "Letöltés megszakítása",
   "Couldn't download": "Nem sikerült letölteni",
   "Parsing video…": "Videó beolvasása…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>A Windows magának tartja a(z) <b>{key}</b> billentyűt, így nem lehet gyorsbillentyű. Válassz másik billentyűt.</span>",
   "Opacity": "Átlátszatlanság",
   "Playing sound background": "Lejátszott hang háttere",
-  "Show the playing sound's thumbnail behind the cards": "A lejátszott hang bélyegképének megjelenítése a kártyák mögött"
+  "Show the playing sound's thumbnail behind the cards": "A lejátszott hang bélyegképének megjelenítése a kártyák mögött",
+  "Adding {n} sound": [
+    "{n} hang hozzáadása",
+    "{n} hang hozzáadása"
+  ]
 }

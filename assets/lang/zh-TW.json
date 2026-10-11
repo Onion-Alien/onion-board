@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget 花了超過 {seconds} 秒。",
   "✓ Got FFmpeg": "✓ 已取得 FFmpeg",
   "No settings match “{text}”": "沒有設定符合“{text}”",
-  "+{count} queued": [
-    "+{count} 個排隊中"
-  ],
   "Cancel download": "取消下載",
   "Couldn't download": "無法下載",
   "Parsing video…": "正在解析影片…",
@@ -3100,5 +3097,8 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的鍵，不能當作快速鍵。請換一個鍵。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的音效背景",
-  "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖"
+  "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖",
+  "Adding {n} sound": [
+    "正在新增 {n} 個聲音"
+  ]
 }

@@ -3031,11 +3031,6 @@
   "winget took longer than {seconds} seconds.": "winget работал дольше {seconds} секунд.",
   "✓ Got FFmpeg": "✓ FFmpeg установлен",
   "No settings match “{text}”": "Ни одна настройка не соответствует «{text}»",
-  "+{count} queued": [
-    "+{count} в очереди",
-    "+{count} в очереди",
-    "+{count} в очереди"
-  ],
   "Cancel download": "Отменить скачивание",
   "Couldn't download": "Не удалось скачать",
   "Parsing video…": "Анализ видео…",
@@ -3246,5 +3241,10 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows оставляет <b>{key}</b> себе, поэтому это не может быть горячей клавишей. Выбери другую клавишу.</span>",
   "Opacity": "Непрозрачность",
   "Playing sound background": "Фон текущего звука",
-  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками"
+  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками",
+  "Adding {n} sound": [
+    "Добавляется {n} звук",
+    "Добавляются {n} звука",
+    "Добавляются {n} звуков"
+  ]
 }

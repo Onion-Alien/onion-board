@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget ใช้เวลานานกว่า {seconds} วินาที",
   "✓ Got FFmpeg": "✓ ได้ FFmpeg แล้ว",
   "No settings match “{text}”": "ไม่มีการตั้งค่าที่ตรงกับ “{text}”",
-  "+{count} queued": [
-    "+{count} อยู่ในคิว"
-  ],
   "Cancel download": "ยกเลิกการดาวน์โหลด",
   "Couldn't download": "ดาวน์โหลดไม่สำเร็จ",
   "Parsing video…": "กำลังอ่านวิดีโอ…",
@@ -3100,5 +3097,8 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows สงวน <b>{key}</b> ไว้ใช้เอง จึงตั้งเป็นปุ่มลัดไม่ได้ เลือกปุ่มอื่น</span>",
   "Opacity": "ความทึบ",
   "Playing sound background": "พื้นหลังเสียงที่กำลังเล่น",
-  "Show the playing sound's thumbnail behind the cards": "แสดงภาพขนาดย่อของเสียงที่กำลังเล่นด้านหลังการ์ด"
+  "Show the playing sound's thumbnail behind the cards": "แสดงภาพขนาดย่อของเสียงที่กำลังเล่นด้านหลังการ์ด",
+  "Adding {n} sound": [
+    "กำลังเพิ่ม {n} เสียง"
+  ]
 }

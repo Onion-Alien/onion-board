@@ -3031,11 +3031,6 @@
   "winget took longer than {seconds} seconds.": "winget trval déle než {seconds} sekund.",
   "✓ Got FFmpeg": "✓ FFmpeg získán",
   "No settings match “{text}”": "Žádné nastavení neodpovídá „{text}“",
-  "+{count} queued": [
-    "+{count} ve frontě",
-    "+{count} ve frontě",
-    "+{count} ve frontě"
-  ],
   "Cancel download": "Zrušit stahování",
   "Couldn't download": "Nepodařilo se stáhnout",
   "Parsing video…": "Načítá se video…",
@@ -3246,5 +3241,10 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows si <b>{key}</b> nechává pro sebe, takže nemůže být zkratkou. Vyber jinou klávesu.</span>",
   "Opacity": "Krytí",
   "Playing sound background": "Pozadí přehrávaného zvuku",
-  "Show the playing sound's thumbnail behind the cards": "Zobrazit náhled přehrávaného zvuku za kartami"
+  "Show the playing sound's thumbnail behind the cards": "Zobrazit náhled přehrávaného zvuku za kartami",
+  "Adding {n} sound": [
+    "Přidává se {n} zvuk",
+    "Přidávají se {n} zvuky",
+    "Přidává se {n} zvuků"
+  ]
 }

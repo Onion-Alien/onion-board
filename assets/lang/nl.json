@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget deed er langer dan {seconds} seconden over.",
   "✓ Got FFmpeg": "✓ FFmpeg opgehaald",
   "No settings match “{text}”": "Er komt geen instelling overeen met “{text}”",
-  "+{count} queued": [
-    "+{count} in de wachtrij",
-    "+{count} in de wachtrij"
-  ],
   "Cancel download": "Download annuleren",
   "Couldn't download": "Downloaden mislukt",
   "Parsing video…": "Video wordt gelezen…",
@@ -3173,5 +3169,9 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows houdt <b>{key}</b> voor zichzelf, dus het kan geen sneltoets zijn. Kies een andere toets.</span>",
   "Opacity": "Dekking",
   "Playing sound background": "Achtergrond van het spelende geluid",
-  "Show the playing sound's thumbnail behind the cards": "Toon de miniatuur van het spelende geluid achter de kaarten"
+  "Show the playing sound's thumbnail behind the cards": "Toon de miniatuur van het spelende geluid achter de kaarten",
+  "Adding {n} sound": [
+    "{n} geluid toevoegen",
+    "{n} geluiden toevoegen"
+  ]
 }
