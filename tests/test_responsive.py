@@ -62,3 +62,49 @@ def test_a_fit_measures_again_only_after_a_step_changed_something(qapp):
     narrow = f.fit(QSize(10, 400))                   # one step applied: and again after it
     assert pill.text() == SHORT and len(measured) == 2 and narrow.width() < wide.width()
     root.deleteLater()
+
+
+def test_touch_leaves_no_layout_item_wrappers(qapp):
+    """touch() walks every layout above a widget, a QStackedWidget's too. A Python
+    wrapper for a layout item is kept by its layout, and removing a stack's page
+    (Radio switched off) frees that item behind PySide's back: the next object made at
+    its address got the dead wrapper and the app crashed natively (issue #339)."""
+    import gc
+
+    from PySide6.QtWidgets import QLabel, QLayout, QLayoutItem, QStackedWidget
+
+    def items():   # the items themselves (a layout is an item too, and is safe)
+        gc.collect()
+        return sum(isinstance(o, QLayoutItem) and not isinstance(o, QLayout)
+                   for o in gc.get_objects())
+
+    root = QWidget()
+    v = QVBoxLayout(root)
+    stack = QStackedWidget()
+    v.addWidget(stack)
+    pages = []
+    for i in range(3):
+        page = QWidget()
+        row = QHBoxLayout()
+        QVBoxLayout(page).addLayout(row)
+        row.addWidget(QLabel(f"page {i}"))
+        stack.addWidget(page)
+        pages.append(page)
+    before = items()
+    responsive.touch(pages[1].findChild(QLabel))
+    assert items() == before
+    stack.removeWidget(pages[1])
+    pages[1].deleteLater()
+    root.deleteLater()
+
+
+def test_touch_still_reaches_nested_rows(qapp):
+    """Each nested row caches its own size: touch() marks them all stale."""
+    root, pill = header(LONG)
+    rows = root.layout().findChildren(QHBoxLayout)
+    hit = []
+    for row in rows:
+        row.invalidate = lambda r=row: hit.append(r)
+    responsive.touch(pill)
+    assert rows and all(r in hit for r in rows)
+    root.deleteLater()

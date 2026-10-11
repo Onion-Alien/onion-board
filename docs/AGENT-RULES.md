@@ -20,7 +20,7 @@ Every task, before changing anything (details in `CLAUDE.md`):
 | Task | Read | Skip |
 |---|---|---|
 | Small fix in one module | this file, the module, its test (`scripts/pick_tests.py --local`) | DESIGN, FEATURES, CHANGELOG |
-| Any UI change | this file, [DESIGN.md](DESIGN.md) | FEATURES, CHANGELOG |
+| Any UI change | this file, [DESIGN.md](DESIGN.md), relevant [UI-AUDIT.md](UI-AUDIT.md) items | FEATURES, CHANGELOG |
 | Audio path, mic effect, engine | this file, [CODE.md](CODE.md) *Audio notes* and *Sending sounds* | DESIGN |
 | New module or file | [CODE.md](CODE.md) *Code layout* (add it there) | |
 | Text a user sees | `CLAUDE.md` *Text the app shows*, [TRANSLATING.md](TRANSLATING.md) | |

@@ -199,7 +199,7 @@ def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window): 
     dlg = SettingsDialog(w, "audio")
     try:
         buttons = {b.text(): b for b in dlg.findChildren(QPushButton)}
-        assert {"Add a voice server…", "Open voices folder"} <= set(buttons)
+        assert {"Add a voice server", "Open voices folder"} <= set(buttons)
         buttons["Show on the Voice tab"].click()
         assert w.tabs.currentWidget() is w.voice and not s.custom_box.isHidden()
     finally:

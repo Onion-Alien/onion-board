@@ -603,7 +603,7 @@ class VoiceFxPanel(QWidget):
         v.addWidget(self.undo_bar)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
-        self.btn_tweak = QPushButton(_("Make it yours…"))
+        self.btn_tweak = QPushButton(_("Make it yours"))
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.setToolTip(_("Pitch, Randomize, every effect, and your saved voices: "
                                     "build your own voice in a window beside the app"))
@@ -652,7 +652,7 @@ class VoiceFxPanel(QWidget):
                                      "it changed lights up below. Click again for another."))
         self.btn_random.clicked.connect(lambda: self.randomize())
         srow.addWidget(self.btn_random)
-        self.btn_save = QPushButton(_("Save as a voice…"))
+        self.btn_save = QPushButton(_("Save as a voice"))
         icons.set_icon(self.btn_save, "plus")
         self.btn_save.setToolTip(_("Keep these settings as a voice with a name: it gets its "
                                    "own button under “Pick a voice”."))
@@ -665,7 +665,7 @@ class VoiceFxPanel(QWidget):
                                     "to a friend: just its name and settings"))
         self.btn_share.clicked.connect(lambda: self.copy_code(self._preset))
         srow.addWidget(self.btn_share)
-        self.btn_import = QPushButton(_("Import a code…"))
+        self.btn_import = QPushButton(_("Import a code"))
         icons.set_icon(self.btn_import, "plus")
         self.btn_import.setToolTip(_("Add a voice someone sent you as a code (it starts "
                                      "with “OB1-”)"))
@@ -992,7 +992,7 @@ class VoiceFxPanel(QWidget):
 
     def _saved_menu(self, name: str, at):
         m = QMenu(self)
-        m.addAction(icons.icon("edit"), _("Rename…"), lambda: self.rename_voice(name))
+        m.addAction(icons.icon("edit"), _("Rename"), lambda: self.rename_voice(name))
         m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
         m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
                     lambda: self.delete_voice(name))
@@ -1358,7 +1358,7 @@ class VoiceFxPanel(QWidget):
         self.tiles.setExclusive(True)
         n = self._count_on()
         self.btn_tweak.setText(ngettext("Make it yours…  ·  {n} on", "Make it yours…  ·  {n} on",
-                                        n) if n else _("Make it yours…"))
+                                        n) if n else _("Make it yours"))
         mine = self._preset in self.store.voices
         _enable(self.btn_share, mine, _("Turn on one of your saved voices to share it "
                                         "(or right-click its button)"))
@@ -1583,7 +1583,7 @@ class SpeechPanel(QWidget):
         self._voice_standin = True
         grid.addWidget(self.cb_voice, 0, 1)
         # custom voices have their own box, opened from next to the list itself
-        self.b_add_voices = QPushButton(_("Add voices…"))
+        self.b_add_voices = QPushButton(_("Add voices"))
         icons.set_icon(self.b_add_voices, "plus")
         self.b_add_voices.setToolTip(_("Your own voices: a TTS server on your PC (Kokoro, "
                                        "AllTalk…) or Piper voice packs"))
@@ -1695,7 +1695,7 @@ class SpeechPanel(QWidget):
         self.opts.hide()
         # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs.
         # Their own card under this one (VoicePanel puts it there), so they're easy to
-        # find; "Add voices…" opens it and scrolls to it
+        # find; "Add voices" opens it and scrolls to it
         self.custom_box = QWidget()
         ov = QVBoxLayout(self.custom_box)
         ov.setContentsMargins(0, 0, 0, 0)
@@ -1705,7 +1705,7 @@ class SpeechPanel(QWidget):
                                   "OpenAI-style one) or drop voice packs (Piper) into the "
                                   "voices folder. They join the Voice list above.")))
         crow = QHBoxLayout()
-        b_server = QPushButton(_("Add a voice server…"))
+        b_server = QPushButton(_("Add a voice server"))
         icons.set_icon(b_server, "plus")
         b_server.clicked.connect(self._add_voice_server)
         crow.addWidget(b_server)
@@ -1733,7 +1733,7 @@ class SpeechPanel(QWidget):
         self.say_bar, row = bar()
         row.addWidget(icon_label("speech", _("Or type a line and it's spoken in the voice")))
         self.ed = QLineEdit()
-        self.ed.setPlaceholderText(_("Type a line and press Enter…"))
+        self.ed.setPlaceholderText(_("Type a line and press Enter"))
         self.ed.returnPressed.connect(self._say)
         self.ed.textEdited.connect(self._warm_for_a_line)
         row.addWidget(self.ed, 1)
