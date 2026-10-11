@@ -2069,6 +2069,7 @@ class SettingsDialog(QDialog):
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
         from soundboard import library, quality
+        from soundboard.ui.panel import icon_button
         q = quality.current
         w, v = self._page()
         self._data_widgets = {}
@@ -2156,7 +2157,7 @@ class SettingsDialog(QDialog):
                 self._data_set(video_dir=folder)
         change.clicked.connect(pick)
         row.addWidget(change)
-        show = QPushButton(_("Open folder"))
+        show = icon_button("folder", _("Open folder"))
 
         def open_folder():
             folder = quality.current.videos()

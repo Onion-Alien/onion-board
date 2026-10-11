@@ -31,7 +31,7 @@ from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
 from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, capped, card, hint_label,
-                                 icon_label, section_label, steady_number, vsep)
+                                 icon_button, icon_label, section_label, steady_number, vsep)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.wheelguard import no_wheel
@@ -1641,7 +1641,7 @@ class SpeechPanel(QWidget):
         self.b_install.setToolTip(_("One-time download, about 300 MB. Requires Python 3.12+."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
-        b_open = QPushButton(_("Open folder"))
+        b_open = icon_button("folder", _("Open folder"))
         b_open.clicked.connect(lambda: self._open_folder(self.module, b_open))
         mrow.addWidget(b_open)
         mrow.addStretch(1)
@@ -2545,7 +2545,7 @@ class ModulesList(QWidget):
         row = QHBoxLayout()
         b = self.b_refresh = QPushButton(_("Refresh"))
         b.clicked.connect(self._refresh)
-        o = QPushButton(_("Open folder"))
+        o = icon_button("folder", _("Open folder"))
         o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)
