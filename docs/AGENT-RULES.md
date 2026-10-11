@@ -65,6 +65,10 @@ Every task, before changing anything (details in `CLAUDE.md`):
   voice) still exists and is still on before touching it. Tabs get switched off and
   dialogs get closed while work is in flight. `a885d6e` `42b9526`
 - Qt objects are created and freed on the UI thread only.
+- Never walk layouts with `layout.itemAt(i).layout()`: it gives every item a PySide
+  wrapper, and when a `QStackedWidget` page goes (a tab switched off) Qt frees the item
+  but the dead wrapper stays registered at its address; the next object Qt makes there
+  crashes natively on its first event. Use `layout.findChildren(QLayout)`. (#389, issue #339)
 
 ### Audio path (about 50)
 - Audio callbacks and the mic effect never block, take the engine lock, allocate,
@@ -94,6 +98,12 @@ Every task, before changing anything (details in `CLAUDE.md`):
   warning: it's still a bug to fix, not a pass to lean on.
 - Tests never touch the real `%APPDATA%\OnionBoard`, real devices or real hotkeys;
   `conftest.py` fakes them. Keep it that way in new fixtures.
+- Offscreen traps that look like app bugs but aren't: an offscreen window is never
+  active, so window shortcuts (Ctrl+1..9, Ctrl+Tab) don't fire; `QTest.keyClicks` with a
+  zero-width joiner (family emoji) kills even a bare `QLineEdit` (set the text instead);
+  Qt stores a label's `&` as `&&`.
+- `QMenu.exec` can't be monkeypatched on the C++ class: swap a Python subclass into the
+  module (`mod.QMenu = Shown`), as `tests/test_padbatch.py::menu_shows` does.
 
 ### Hotkeys and devices (about 10)
 - Global hotkeys use `RegisterHotKey`, never a low-level keyboard hook. Hooks left
