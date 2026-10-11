@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Pumupunta ang mga sound mo sa {name}.</b> Kung ano man ang nakikinig doon ay makakakuha sa kanila. Sa OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. Sa Voicemeeter o mixer, ipasa ang input na 'yon kung saan ito dapat pumunta. Hindi papunta sa voice chat? I-untick ang <b>Ipadala nang mono</b> sa Sino ang nakikinig para manatiling stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. I-untick ang <b>Automatically adjust microphone volume</b>, gawing <b>Low</b> ang <b>Background noise suppression</b>, o piliin ang <b>Original sound for musicians</b> (tapos i-on ito sa meeting, sa kaliwang itaas).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "Susunod ang <b>{name}</b>: hinihintay matapos ang download bago nito…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Opsyonal:</b> gumagana ang mic part mo, at may mas bagong version. Hindi ito kailangan, i-update sa ibaba kahit kailan mo gusto (isang beses magtatanong ang Windows, at mawawala ang sound mo nang isang segundo).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Nasa {rates} ang isang dulo ng cable, kaya kino-convert nito ang sound mo habang dumadaan. Ayusin ito para sa pinakamalinis na tunog.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (sa Ipadala rin sa). Nakasaksak ba? Kusa itong susubukan ulit.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Importanteng fix:</b> {fix}</p>",
@@ -776,7 +775,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Nagbubukas ng bug report sa GitHub sa browser mo, nakalagay na ang mga version",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Binubuksan ito ngayon, katulad ng hotkey: pumili ng sound gamit ang mga key nito o i-click. Isinasara ito ng Esc, ng button na ito o ng hotkey",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Binubuksan ang buong listahan (SECURITY.md) sa GitHub, sa browser mo",
-  "Optional: update the mic part": "Opsyonal: i-update ang mic part",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "O i-drag mo lang: hawakan ang kahit anong bakanteng bahagi ng overlay (title nito, gilid nito) at ilagay kahit saan, sa kahit anong monitor. Doon na ito magbubukas mula noon. Ipinapakita lang ng Show preview ang itsura: buksan ang overlay gamit ang hotkey nito para subukan o ilipat ito.",
   "Orange": "Orange",
   "Other games": "Ibang games",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Susunod: hihingi ng pahintulot ang Windows para sa OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Walang i-a-update ngayon: nagbago ang settings ng mic mo.",
   "The Windows prompt names Python because you're running from source.": "Python ang nakasulat sa prompt ng Windows dahil tumatakbo ka mula sa source.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Kinansela ang update. Gumagana pa rin ang mic mo: mag-update anumang oras sa Setup.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Hihingi ng pahintulot ang Windows. Saglit na hihinto ang audio habang nag-a-update.",
   "You can update later in Setup.": "Puwede kang mag-update mamaya sa Setup.",
   "Your mic is already up to date.": "Updated na ang mic mo.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Pindutin ang ↻ para subukan ulit.",
   "That station isn't on the air right now. Try another one.": "Hindi naka-ere ang istasyong iyan ngayon. Sumubok ng iba.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Down ang radio ngayon. Hindi ikaw ang may problema: hindi gumagana ang server ng listahan ng istasyon. Subukan ulit mamaya.",
-  "This station points into your home network, so it isn't played.": "Tumuturo ang istasyong ito sa home network mo, kaya hindi ito pinapatugtog."
+  "This station points into your home network, so it isn't played.": "Tumuturo ang istasyong ito sa home network mo, kaya hindi ito pinapatugtog.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>I-update ang mic part mo</b><br>Galing ito sa mas lumang bersyon ng Onion Board, kaya baka hindi marinig ng ilang laro, tawag at browser ang mga tunog mo. Isang beses magtatanong ang Windows, at mawawala ang tunog nang isang segundo.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, may lumang bersyon ng mic part ng Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Kinansela ang update. Luma pa rin ang mic part mo: i-update ito sa Setup tab."
 }

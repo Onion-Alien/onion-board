@@ -290,7 +290,6 @@
   "Open the sounds folder": "Otwórz folder dźwięków",
   "Opened the folder with the log in it.": "Otwarto folder z dziennikiem.",
   "Opened your sounds folder": "Otwarto folder dźwięków",
-  "Optional: update the mic part": "Opcjonalnie: zaktualizuj część mikrofonu",
   "Others hear it": "Inni to słyszą",
   "Overlap: every press plays a new copy": "Nakładanie: każde naciśnięcie gra nową kopię",
   "Pad size": "Rozmiar padów",
@@ -670,7 +669,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Twoje dźwięki trafiają do: {name} .</b> Cokolwiek tam słucha, dostaje to. W OBS: Źródła → + → <b>Przechwytywanie wyjścia audio</b> → <b>{name}</b> . W Voicemeeterze lub mikserze wyślij dane wejściowe tam, gdzie powinny trafić. Nie chcesz rozmawiać na czacie głosowym? Odznacz opcję <b>Wyślij mono w</b> sekcji Kto słucha, aby zachować dźwięk stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b> : Ustawienia → Dźwięk → Mikrofon: {mic} . Odznacz opcję <b>Automatycznie dostosuj głośność mikrofonu</b> , ustaw <b>Tłumienie szumów tła</b> na <b>Niskie</b> lub wybierz <b>Oryginalny dźwięk dla muzyków</b> (następnie włącz tę opcję podczas spotkania, w lewym górnym rogu).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "Następny jest <b>{name}</b> : czekam na zakończenie pobierania…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Opcjonalnie:</b> część mikrofonu działa i dostępna jest nowsza wersja. Nie jest to potrzebne, zaktualizuj poniżej, kiedy tylko Ci to odpowiada (system Windows zapyta raz, a dźwięk zaniknie na sekundę).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Jeden koniec kabla jest podłączony do łącza {rates} , więc po drodze konwertuje dźwięk. Napraw to, aby uzyskać najczystszy dźwięk.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Ważna poprawka:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>Ta kopia działa ze źródła: zaktualizuj ją za pomocą <code>git pull</code> .</p>",
@@ -3163,7 +3161,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Dalej: Windows poprosi o zgodę dla OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Nie ma teraz czego aktualizować: ustawienia mikrofonu się zmieniły.",
   "The Windows prompt names Python because you're running from source.": "Okno Windows wymienia Pythona, bo uruchamiasz aplikację z kodu źródłowego.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Aktualizacja anulowana. Mikrofon dalej działa: zaktualizuj kiedy chcesz w Konfiguracji.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows poprosi o zgodę. Dźwięk na chwilę zniknie podczas aktualizacji.",
   "You can update later in Setup.": "Możesz zaktualizować później w Konfiguracji.",
   "Your mic is already up to date.": "Twój mikrofon jest już aktualny.",
@@ -3330,5 +3327,8 @@
   "Press ↻ to try again.": "Naciśnij ↻, aby spróbować ponownie.",
   "That station isn't on the air right now. Try another one.": "Ta stacja teraz nie nadaje. Spróbuj innej.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio teraz nie działa. To nie twoja wina: serwer z listą stacji nie działa. Spróbuj ponownie za chwilę.",
-  "This station points into your home network, so it isn't played.": "Ta stacja wskazuje na twoją sieć domową, więc nie jest odtwarzana."
+  "This station points into your home network, so it isn't played.": "Ta stacja wskazuje na twoją sieć domową, więc nie jest odtwarzana.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Zaktualizuj część mikrofonu</b><br>Pochodzi ze starszej wersji Onion Board, więc niektóre gry, rozmowy i przeglądarki mogą nie słyszeć twoich dźwięków. Windows zapyta raz, a dźwięk zniknie na sekundę.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, ze starą wersją części mikrofonu Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Aktualizacja anulowana. Część mikrofonu jest nadal stara: zaktualizuj ją w karcie Konfiguracja."
 }

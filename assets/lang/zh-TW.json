@@ -278,7 +278,6 @@
   "Open the sounds folder": "開啟音效資料夾",
   "Opened the folder with the log in it.": "已開啟存放記錄的資料夾。",
   "Opened your sounds folder": "已開啟你的音效資料夾",
-  "Optional: update the mic part": "選用：更新麥克風部分",
   "Others hear it": "別人聽得到",
   "Overlap: every press plays a new copy": "重疊：每按一次就播放一份新的",
   "Pad size": "按鈕大小",
@@ -638,7 +637,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>你的音效會送到 {name}。</b>在那裡收聽的東西都會收到。在 OBS：來源 → + → <b>音訊輸出擷取</b> → <b>{name}</b>。在 Voicemeeter 或混音器裡，把那個輸入送到它該去的地方。不是要送到語音聊天？在「誰在聽」取消勾選<b>以單聲道傳送</b>，保持立體聲。",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>：設定 → 音訊 → 麥克風：{mic}。取消勾選<b>自動調整麥克風音量</b>，把<b>背景噪音抑制</b>設為<b>低</b>，或選擇<b>音樂人原音</b>（然後在會議中左上角開啟它）。",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "下一個是 <b>{name}</b>：正在等前一個下載完成…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>選用：</b>你的麥克風部分運作正常，而且有新版本了。這不是必要的，你方便時再在下方更新（Windows 會要求一次權限，你的聲音會中斷一秒）。",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>音源線的一端是 {rates}，所以聲音經過時會被轉換。修正它可以讓聲音最乾淨。</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>重要修正：</b>{fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>這份程式是從原始碼執行的：請用 <code>git pull</code> 更新。</p>",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "接下來：Windows 會要求 OnionBoard.exe 的權限。",
   "Nothing to update now: your mic settings changed.": "現在沒有可更新的：你的麥克風設定已變更。",
   "The Windows prompt names Python because you're running from source.": "因為你從原始碼執行，Windows 提示裡顯示的是 Python。",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "已取消更新。麥克風照常可用：隨時可以在設置裡更新。",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows 會要求權限。更新期間聲音會短暫中斷。",
   "You can update later in Setup.": "你可以稍後在設置裡更新。",
   "Your mic is already up to date.": "你的麥克風已是最新版本。",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "按 ↻ 重試。",
   "That station isn't on the air right now. Try another one.": "這個電台現在沒有在播。換一個試試。",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "電台現在掛了。不是你的問題：電台清單的伺服器故障了。過一會兒再試試。",
-  "This station points into your home network, so it isn't played.": "這個電台指向你的家用網路，所以不會播放。"
+  "This station points into your home network, so it isn't played.": "這個電台指向你的家用網路，所以不會播放。",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>請更新麥克風部分</b><br>它來自舊版 Onion Board，部分遊戲、通話和瀏覽器可能聽不到你的聲音。Windows 只會詢問一次，聲音會中斷一秒。",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>，使用的是舊版 Onion Board 麥克風部分",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "已取消更新。麥克風部分仍是舊版：請在設置分頁中更新。"
 }

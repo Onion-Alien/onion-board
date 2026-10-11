@@ -140,9 +140,9 @@ class Recovery(QObject):
             elif action == "remove":
                 err = directmic.uninstall(guid) if guid else directmic.uninstall()
             elif guid:
-                err = directmic.install_on(guid, clean=action == "reinstall")
+                err = directmic.install_on(guid, clean=action in ("reinstall", "update"))
             else:
-                err = directmic.install(mic, clean=action == "reinstall")
+                err = directmic.install(mic, clean=action in ("reinstall", "update"))
             err = err or ""
             directmic.forget_status()
             state = directmic.status_on(guid) if guid else directmic.status(mic)

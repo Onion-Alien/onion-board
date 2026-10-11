@@ -278,7 +278,6 @@
   "Open the sounds folder": "เปิดโฟลเดอร์เสียง",
   "Opened the folder with the log in it.": "เปิดโฟลเดอร์ที่มีล็อกแล้ว",
   "Opened your sounds folder": "เปิดโฟลเดอร์เสียงแล้ว",
-  "Optional: update the mic part": "ไม่บังคับ: อัปเดตส่วนไมค์",
   "Others hear it": "คนอื่นได้ยิน",
   "Overlap: every press plays a new copy": "ซ้อนกัน: กดแต่ละครั้งเล่นเสียงใหม่อีกชุด",
   "Pad size": "ขนาดแพด",
@@ -638,7 +637,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>เสียงของคุณไปที่ {name}</b> อะไรก็ตามที่ฟังที่นั่นก็ได้รับพวกเขา ใน OBS: แหล่งที่มา → + → <b>การจับเอาต์พุตเสียง</b> → <b>{name}</b> ใน Voicemeeter หรือ Mixer ให้ส่งข้อมูลนั้นไปยังทุกที่ที่ควรไป ไม่ไปแชทด้วยเสียงเหรอ? ยกเลิกการ <b>เลือกส่งแบบโมโน</b> ใต้ใครกำลังฟังอยู่เพื่อให้เป็นแบบสเตอริโอ",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>ซูม</b> : การตั้งค่า → เสียง → ไมโครโฟน: {mic} ยกเลิกการเลือก <b>ปรับระดับเสียงไมโครโฟนโดยอัตโนมัติ</b> ตั้งค่า <b>การลดเสียงรบกวนในพื้นหลัง</b> เป็น <b>ต่ำ</b> หรือเลือก <b>เสียงต้นฉบับสำหรับนักดนตรี</b> (จากนั้นเปิดในการประชุมที่ด้านซ้ายบน)",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> คือถัดไป: รอการดาวน์โหลดก่อนที่จะเสร็จสิ้น...",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>ทางเลือก:</b> ส่วนไมโครโฟนของคุณใช้งานได้ และมีเวอร์ชันใหม่กว่าอยู่ที่นี่ ไม่จำเป็น, อัปเดตด้านล่างเมื่อใดก็ตามที่เหมาะกับคุณ (Windows ถามหนึ่งครั้ง และเสียงของคุณจะหายไปชั่วขณะ)",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>ปลายด้านหนึ่งของสายเคเบิลอยู่ที่ {rates} ดังนั้นจึงแปลงเสียงของคุณระหว่างทาง แก้ไขเพื่อเสียงที่สะอาดที่สุด</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>การแก้ไขที่สำคัญ:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>สำเนานี้ทำงานจากแหล่งที่มา: อัปเดตด้วย <code>git pull</code></p>",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "ต่อไป: Windows จะขออนุญาตสำหรับ OnionBoard.exe",
   "Nothing to update now: your mic settings changed.": "ตอนนี้ไม่มีอะไรต้องอัปเดต: การตั้งค่าไมค์ของคุณเปลี่ยนไป",
   "The Windows prompt names Python because you're running from source.": "หน้าต่างของ Windows แสดงชื่อ Python เพราะคุณรันจากซอร์สโค้ด",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "ยกเลิกการอัปเดตแล้ว ไมค์ยังใช้ได้ตามปกติ: อัปเดตได้ทุกเมื่อในเซ็ตอัป",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows จะขออนุญาต เสียงจะหยุดสักครู่ระหว่างอัปเดต",
   "You can update later in Setup.": "คุณอัปเดตทีหลังได้ในเซ็ตอัป",
   "Your mic is already up to date.": "ไมค์ของคุณเป็นเวอร์ชันล่าสุดแล้ว",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "กด ↻ เพื่อลองอีกครั้ง",
   "That station isn't on the air right now. Try another one.": "สถานีนั้นไม่ได้ออกอากาศตอนนี้ ลองสถานีอื่น",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "วิทยุใช้งานไม่ได้ตอนนี้ ไม่ใช่ความผิดของคุณ: เซิร์ฟเวอร์รายชื่อสถานีไม่ทำงาน ลองใหม่อีกครั้งในอีกสักครู่",
-  "This station points into your home network, so it isn't played.": "สถานีนี้ชี้เข้าไปในเครือข่ายในบ้านของคุณ จึงไม่เล่น"
+  "This station points into your home network, so it isn't played.": "สถานีนี้ชี้เข้าไปในเครือข่ายในบ้านของคุณ จึงไม่เล่น",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>อัปเดตส่วนไมค์ของคุณ</b><br>ส่วนนี้มาจาก Onion Board เวอร์ชันเก่า บางเกม การโทร และเบราว์เซอร์อาจไม่ได้ยินเสียงของคุณ Windows จะถามครั้งเดียว และเสียงจะหายไปหนึ่งวินาที",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b> ใช้ส่วนไมค์ของ Onion Board เวอร์ชันเก่า",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "ยกเลิกการอัปเดตแล้ว ส่วนไมค์ยังเป็นเวอร์ชันเก่า: อัปเดตได้จากแท็บเซ็ตอัป"
 }

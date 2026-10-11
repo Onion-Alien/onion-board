@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Tvoje zvuky jdou do {name}.</b> Cokoli tam poslouchá, je dostane. V OBS: Zdroje → + → <b>Záznam zvukového výstupu</b> → <b>{name}</b>. Ve Voicemeeteru nebo mixpultu pošli ten vstup dál, kam má jít. Nejde to dál do voice chatu? Odškrtni <b>Posílat v mono</b> v Kdo poslouchá a zůstane to stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Nastavení → Zvuk → Mikrofon: {mic}. Odškrtni <b>Automaticky upravovat hlasitost mikrofonu</b>, nastav <b>Potlačení šumu na pozadí</b> na <b>Nízké</b>, nebo vyber <b>Původní zvuk pro hudebníky</b> (pak ho zapni na schůzce vlevo nahoře).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> je na řadě: čeká se na dokončení stahování před ním…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Volitelné:</b> část pro mikrofon funguje a je tu novější verze. Není potřeba, aktualizuj níže, kdy se ti to hodí (Windows se jednou zeptají a zvuk na vteřinu vypadne).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Jeden konec kabelu je na {rates}, takže tvůj zvuk cestou převádí. Oprav to pro nejčistší zvuk.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (v Posílat i do). Je připojené? Zkouší se to znovu samo.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Důležitá oprava:</b> {fix}</p>",
@@ -788,7 +787,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Otevře v prohlížeči hlášení chyby na GitHubu s vyplněnými verzemi",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Otevře ho hned, stejně jako zkratka: vyber zvuk jeho klávesou nebo klikem. Zavře ho Esc, toto tlačítko nebo zkratka",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Otevře úplný seznam (SECURITY.md) na GitHubu v prohlížeči",
-  "Optional: update the mic part": "Volitelné: aktualizovat část pro mikrofon",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Nebo ho prostě přetáhni: chyť kteroukoli prázdnou část překryvu (název, okraje) a pusť ho kamkoli, na libovolném monitoru. Od té doby se otevírá tam. Zobrazit náhled jen ukáže, jak vypadá: k vyzkoušení nebo přesunu ho otevři zkratkou.",
   "Orange": "Oranžová",
   "Other games": "Jiné hry",
@@ -3163,7 +3161,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Dál: Windows požádá o povolení pro OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Teď není co aktualizovat: nastavení mikrofonu se změnilo.",
   "The Windows prompt names Python because you're running from source.": "Okno Windows uvádí Python, protože aplikaci spouštíš ze zdrojového kódu.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Aktualizace zrušena. Mikrofon dál funguje: aktualizovat můžeš kdykoli v Zapojení.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows požádá o povolení. Zvuk se během aktualizace na chvíli přeruší.",
   "You can update later in Setup.": "Aktualizovat můžeš později v Zapojení.",
   "Your mic is already up to date.": "Tvůj mikrofon už je aktuální.",
@@ -3330,5 +3327,8 @@
   "Press ↻ to try again.": "Stiskni ↻ a zkus to znovu.",
   "That station isn't on the air right now. Try another one.": "Tahle stanice teď nevysílá. Zkus jinou.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Rádio teď nefunguje. Není to tebou: server se seznamem stanic nejede. Zkus to za chvíli znovu.",
-  "This station points into your home network, so it isn't played.": "Tahle stanice míří do tvé domácí sítě, takže se nepustí."
+  "This station points into your home network, so it isn't played.": "Tahle stanice míří do tvé domácí sítě, takže se nepustí.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Aktualizuj část pro mikrofon</b><br>Je ze starší verze Onion Board, takže některé hry, hovory a prohlížeče nemusí tvoje zvuky slyšet. Windows se zeptá jednou a zvuk na vteřinu vypadne.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, se starou verzí části pro mikrofon od Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Aktualizace zrušena. Část pro mikrofon je pořád ta stará: aktualizuj ji v kartě Zapojení."
 }

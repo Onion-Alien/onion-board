@@ -5,7 +5,6 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 
-from soundboard import __version__
 from soundboard import directmic as dm
 from soundboard.ui import mainwindow as main
 from soundboard.ui import micupdate
@@ -17,11 +16,12 @@ def outdated(window, monkeypatch):  # noqa: F811
     """On the mic, with an older mic part: the update is due. Records attach_mic
     (Windows' admin prompt) and toasts instead of running them."""
     w = window
-    w.cfg.route, w.cfg.mic_device, w.cfg.mic_update_tried = "mic", "My mic", ""
+    w.cfg.route, w.cfg.mic_device = "mic", "My mic"
     state = {"status": "outdated", "tried": [], "toasts": []}
     monkeypatch.setattr(dm, "status", lambda name=None: state["status"])
     monkeypatch.setattr(w.cfg, "save", lambda: True)
-    monkeypatch.setattr(w, "attach_mic", lambda: state["tried"].append(w.cfg.mic_device))
+    monkeypatch.setattr(w, "attach_mic", lambda clean=False: state["tried"].append(
+        (w.cfg.mic_device, clean)))
     monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **kw: state["toasts"].append(
         (text, kind)))
     monkeypatch.setattr(w, "isVisible", lambda: True)
@@ -34,7 +34,6 @@ def test_offered_not_installed(outdated):
     offer = w._mic_offer
     assert isinstance(offer, micupdate.MicUpdateOffer) and not offer.isHidden()
     assert state["tried"] == []   # asking isn't installing
-    assert w.cfg.mic_update_tried == __version__
     assert not offer.btn_install.icon().isNull()   # the admin shield
     assert offer.btn_install.objectName() == "primary"
 
@@ -52,8 +51,8 @@ def test_dismissing_never_installs(outdated, qapp, how):
         offer.dismiss()
     qapp.processEvents()
     assert state["tried"] == [] and w._mic_offer is None
-    offer_again = w._offer_mic_update()   # this version was offered: not again
-    assert offer_again is None and w._mic_offer is None
+    w._offer_mic_update()   # offered this start: not again until the next one
+    assert w._mic_offer is None
 
 
 def test_install_asks_windows_once(outdated, qapp):
@@ -63,18 +62,23 @@ def test_install_asks_windows_once(outdated, qapp):
     offer.btn_install.click()
     offer.btn_install.click()   # a double click doesn't ask twice
     qapp.processEvents()
-    assert state["tried"] == ["My mic"] and w._mic_offer is None
+    # the old part comes off completely first, then the new one goes on
+    assert state["tried"] == [("My mic", True)] and w._mic_offer is None
     assert w._mic_updating
 
 
-def test_offered_once_per_version(outdated):
+def test_offered_again_each_start(outdated):
+    """An old part may not reach every app: the offer comes back every start until
+    it's updated (once per start)."""
     w, state = outdated
     w._offer_mic_update()
     first = w._mic_offer
     w._offer_mic_update()   # while it's up: the same one
     assert w._mic_offer is first
     first.dismiss()
-    w.cfg.mic_update_tried = "1.0.0"   # a newer version starts: offered again
+    w._offer_mic_update()
+    assert w._mic_offer is None   # not twice in one start
+    w._mic_offered = False        # the next start
     w._offer_mic_update()
     assert w._mic_offer is not None and w._mic_offer is not first
 
@@ -83,7 +87,7 @@ def test_never_from_the_tray(outdated, monkeypatch):
     w, state = outdated
     monkeypatch.setattr(w, "isVisible", lambda: False)
     w._offer_mic_update()
-    assert w._mic_offer is None and w.cfg.mic_update_tried == ""
+    assert w._mic_offer is None and not w._mic_offered
 
 
 def test_shown_a_second_after_the_window_opens(outdated, qapp, monkeypatch):
@@ -124,7 +128,7 @@ def test_not_offered_when_not_needed(outdated):
         state["status"] = status
         w._offer_mic_update()
         assert w._mic_offer is None
-    assert w.cfg.mic_update_tried == ""   # not used up: offered once it's due
+    assert not w._mic_offered   # not used up: offered once it's due
 
 
 def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
@@ -152,3 +156,24 @@ def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
 def test_prompt_note_names_what_windows_asks_for():
     assert "Python" in micupdate.prompt_note(frozen=False)
     assert "OnionBoard.exe" in micupdate.prompt_note(frozen=True)
+
+
+def test_setup_card_says_update_and_does_the_same_update(outdated, monkeypatch):
+    """Said no to the offer: the Setup tab's mic card says the part needs updating (not
+    "nothing to set"), and its Update now runs the same clean update as the offer."""
+    w, state = outdated
+    e = w.engine
+    for k in ("mic_stream", "main_stream"):
+        monkeypatch.setattr(e, k, object(), raising=False)
+    monkeypatch.setattr(e, "effect_alive", lambda: True, raising=False)
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    w._update_status()
+    assert not w.mic_update_note.isHidden() and w.step_lbl.isHidden()
+    assert "Update your mic part" in w.mic_update_text.text()
+    assert "old version" in w.flow_out.text()
+    assert w.btn_install.isHidden()   # one button: the banner's
+    w.btn_micupdate.click()
+    assert state["tried"] == [("My mic", True)]
+    state["status"] = "ready"   # updated: the card is back to normal
+    w._update_status()
+    assert w.mic_update_note.isHidden() and not w.step_lbl.isHidden()

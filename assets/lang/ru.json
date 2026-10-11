@@ -263,7 +263,6 @@
   "Open the sounds folder": "Открыть папку звуков",
   "Opened the folder with the log in it.": "Открыта папка с журналом.",
   "Opened your sounds folder": "Папка звуков открыта",
-  "Optional: update the mic part": "Необязательно: обновить часть для микрофона",
   "Others hear it": "Слышат другие",
   "Pad size": "Размер кнопок",
   "Page {value} of {n}": "Страница {value} из {n}",
@@ -2852,7 +2851,6 @@
   "I've installed it: check again": "Я установил его: проверьте еще раз",
   "Already set up for you, only change these if something's wrong.": "Уже настроено для вас, меняйте их, только если что-то не так.",
   "(none)": "(никто)",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Необязательно:</b> ваша микрофонная часть работает, и более новая версия здесь. В этом нет необходимости: обновите ниже, когда вам удобно (Windows спрашивает один раз, и звук пропадает на секунду).",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "Откроется окно загрузки VB-Cable (бесплатно) с официального сайта VB-Audio. Windows запросит разрешение, нажмите «Да», затем нажмите «Установить драйвер». Когда все будет готово, нажмите «Я установил, проверьте еще раз». Если он не отображается, перезагрузите компьютер.",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Добавлено « {name} » ( {duration:.1f} s) в Звуки: щелкните его правой кнопкой мыши, чтобы переименовать или установить горячую клавишу.",
   "{name}: {pct}%": "{name} : {pct} %",
@@ -3163,7 +3161,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Дальше Windows попросит разрешение для OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Обновлять нечего: настройки микрофона изменились.",
   "The Windows prompt names Python because you're running from source.": "Окно Windows называет Python, потому что ты запускаешь из исходного кода.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Обновление отменено. Микрофон продолжает работать: обнови в любой момент в разделе Подключение.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows попросит разрешение. Звук ненадолго пропадёт во время обновления.",
   "You can update later in Setup.": "Обновить можно позже в разделе Подключение.",
   "Your mic is already up to date.": "Твой микрофон уже обновлён.",
@@ -3330,5 +3327,8 @@
   "Press ↻ to try again.": "Нажми ↻, чтобы попробовать ещё раз.",
   "That station isn't on the air right now. Try another one.": "Эта станция сейчас не в эфире. Попробуй другую.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Радио сейчас не работает. Дело не в тебе: сервер со списком станций не работает. Попробуй ещё раз чуть позже.",
-  "This station points into your home network, so it isn't played.": "Эта станция указывает на твою домашнюю сеть, поэтому она не играет."
+  "This station points into your home network, so it isn't played.": "Эта станция указывает на твою домашнюю сеть, поэтому она не играет.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Обнови часть для микрофона</b><br>Она из более старой версии Onion Board, поэтому некоторые игры, звонки и браузеры могут не слышать твои звуки. Windows спросит один раз, и звук пропадёт на секунду.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, со старой версией части Onion Board для микрофона",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Обновление отменено. Часть для микрофона всё ещё старая: обнови её на вкладке Подключение."
 }

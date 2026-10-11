@@ -59,8 +59,9 @@ class _Bit:
 class SetupShow(BunnyWidget):
     done = Signal()
 
-    def __init__(self, height: int = 58, parent=None):
+    def __init__(self, height: int = 58, parent=None, left: bool = False):
         super().__init__(None, height=height, pad=10, parent=parent)
+        self._left = left        # the scene starts at the left edge (under left-aligned buttons)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self._t = -1.0           # seconds into the show, -1 when not on
@@ -229,10 +230,13 @@ class SetupShow(BunnyWidget):
     # ------------------------------------------------------------------ layout
     def _bun_rect(self) -> QRectF:
         """Where he stands to build: toolbox on his left, speaker on his right, the
-        three of them centred."""
+        three of them centred (or from the left edge)."""
         w = self.bun_h * W / H
-        left = (self.width() - w * 2.35) / 2 + w * 0.55
+        left = self._scene_x(w * 2.35) + w * 0.55
         return QRectF(left, (self.height() - BAR_H - self.bun_h) / 2, w, self.bun_h)
+
+    def _scene_x(self, width: float) -> float:
+        return 0.0 if self._left else (self.width() - width) / 2
 
     def _speaker(self) -> QRectF:
         r = self._bun_rect()
@@ -354,7 +358,7 @@ class SetupShow(BunnyWidget):
         w = self.bun_h * W / H * 2.35   # as wide as toolbox, Bun and speaker together
         n = max(8, int((w + BAR_GAP) // (BAR_PX + BAR_GAP)))
         total = n * (BAR_PX + BAR_GAP) - BAR_GAP
-        x0 = (self.width() - total) / 2
+        x0 = self._scene_x(total)
         y = self.height() - BAR_H + (BAR_H - BAR_PX) / 2
         failed = self._end_at >= 0 and not self._ok
         lit = QColor(t["warn_text"] if failed else t["ok_text"])

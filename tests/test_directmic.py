@@ -2039,9 +2039,10 @@ def test_effect_not_running_check_reads_no_registry(window, monkeypatch, state, 
     assert w._direct_not_running() is dead
 
 
-def test_an_older_working_mic_part_offers_the_update_as_optional(window, monkeypatch):  # noqa: F811
-    """Sounds in the mic with an older mic part: the tab says it's all set, and the
-    update is plainly optional (not a primary button, not a "needs fixing")."""
+def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F811
+    """Sounds in the mic with an older mic part: it still counts as connected, but the
+    tab says the part needs updating (an old part may not reach every app), with one
+    Update now button, never "nothing to set" or "optional"."""
     w = window
     _routes(w, monkeypatch, "outdated", cables=())
     monkeypatch.setattr(w, "_direct_not_running", lambda: False)
@@ -2055,15 +2056,15 @@ def test_an_older_working_mic_part_offers_the_update_as_optional(window, monkeyp
         w._show_route()
         w._update_status()
         assert w.setup_state == "ok"
-        step = w.step_lbl.text()
-        assert "Nothing to set" in step
+        assert w.step_lbl.isHidden()
         assert not w.mic_update_note.isHidden()
-        assert "Optional" in w.mic_update_note.text()
-        assert w.btn_install.text().startswith("Optional")
-        assert w.btn_install.objectName() != "primary"
+        assert "Update your mic part" in w.mic_update_text.text()
+        assert "Optional" not in w.mic_update_text.text()
+        assert w.btn_install.isHidden() and w.btn_micupdate.objectName() == "primary"
         _routes(w, monkeypatch, "ready", cables=())
         w._update_flow()
         assert w.mic_update_note.isHidden()
+        assert "Nothing to set" in w.step_lbl.text()
     finally:
         w.engine.main_stream = None
 
@@ -2603,3 +2604,20 @@ def test_picking_the_mic_asks_for_admin_only_when_it_doesnt_work(window, monkeyp
         tried.clear()
         w.set_route("mic", attached=True)
         assert w.cfg.route == "mic" and not tried
+
+
+def test_a_held_old_copy_goes_at_the_next_restart(monkeypatch, tmp_path):
+    """The update takes the old effect off completely: a copy Windows still holds is
+    marked for removal at the next restart, never left behind for good."""
+    marked = []
+    monkeypatch.setattr(dm, "_gone_at_restart", lambda p: marked.append(p))
+    old = tmp_path / "obmic-old.dll"
+    old.write_bytes(b"old")
+
+    def unlink(self, missing_ok=False):
+        raise PermissionError("in use") if self.exists() else FileNotFoundError(self)
+    monkeypatch.setattr(Path, "unlink", unlink)
+    dm._remove(old)
+    assert marked == [old]
+    dm._remove(tmp_path / "gone.dll")   # already gone: nothing to mark
+    assert marked == [old]

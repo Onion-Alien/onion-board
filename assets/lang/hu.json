@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>A hangjaid ide mennek: {name}.</b> Aki ott figyel, megkapja őket. Az OBS-ben: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. Voicemeeterben vagy keverőben küldd tovább azt a bemenetet, ahová mennie kell. Nem megy tovább beszélgetőappba? Vedd ki a pipát a <b>Küldés monóban</b> elől a Ki hallgat alatt, hogy sztereó maradjon.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Vedd ki a pipát az <b>Automatically adjust microphone volume</b> elől, állítsd a <b>Background noise suppression</b> opciót erre: <b>Low</b>, vagy válaszd az <b>Original sound for musicians</b> opciót (aztán kapcsold be a megbeszélésen, bal felül).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "Következik: <b>{name}</b>. Várakozás az előtte lévő letöltés befejezésére…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Opcionális:</b> a mikrofonos rész működik, és van egy újabb verzió. Nem szükséges, frissíts lent, amikor jól esik (a Windows egyszer kérdez, és egy másodpercre kiesik a hang).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>A kábel egyik vége ezen van: {rates}, ezért átalakítja a hangodat útközben. Javítsd ki a legtisztább hangért.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nem nyitható meg: {devices} (a Küldés ide is alatt). Be van dugva? Magától újrapróbálja.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Fontos javítás:</b> {fix}</p>",
@@ -776,7 +775,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Hibajelentést nyit a GitHubon a böngésződben, kitöltött verziókkal",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Most megnyitja, ugyanúgy, mint a gyorsbillentyű: válassz hangot a gombjaival vagy kattintással. Az Esc, ez a gomb vagy a gyorsbillentyű bezárja",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Megnyitja a teljes listát (SECURITY.md) a GitHubon, a böngésződben",
-  "Optional: update the mic part": "Opcionális: a mikrofonos rész frissítése",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Vagy csak húzd: fogd meg az overlay bármelyik üres részét (a címét, a széleit), és tedd le bárhová, bármelyik monitoron. Onnantól ott nyílik meg. Az Előnézet mutatása csak azt mutatja, hogy néz ki: nyisd meg az overlayt a gyorsbillentyűjével, hogy kipróbáld vagy áthelyezd.",
   "Orange": "Narancs",
   "Other games": "Más játékok",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Következő: a Windows engedélyt kér az OnionBoard.exe számára.",
   "Nothing to update now: your mic settings changed.": "Most nincs mit frissíteni: megváltoztak a mikrofon beállításai.",
   "The Windows prompt names Python because you're running from source.": "A Windows ablaka a Pythont nevezi meg, mert forráskódból futtatod.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Frissítés megszakítva. A mikrofonod továbbra is működik: frissíts bármikor a Beüzemelésben.",
   "Windows asks for permission. Audio pauses briefly during the update.": "A Windows engedélyt kér. A hang a frissítés alatt egy pillanatra kimarad.",
   "You can update later in Setup.": "Később is frissíthetsz a Beüzemelésben.",
   "Your mic is already up to date.": "A mikrofonod már naprakész.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Nyomd meg a ↻ gombot az újrapróbáláshoz.",
   "That station isn't on the air right now. Try another one.": "Ez az állomás most nem ad adást. Próbálj egy másikat.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "A rádió most nem működik. Nem nálad van a hiba: az állomáslista szervere nem működik. Próbáld újra egy kicsit később.",
-  "This station points into your home network, so it isn't played.": "Ez az állomás az otthoni hálózatodba mutat, ezért nem játszható le."
+  "This station points into your home network, so it isn't played.": "Ez az állomás az otthoni hálózatodba mutat, ezért nem játszható le.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Frissítsd a mikrofonos részt</b><br>Az Onion Board egy régebbi verziójából való, ezért egyes játékok, hívások és böngészők talán nem hallják a hangjaidat. A Windows egyszer rákérdez, és a hang egy másodpercre kimarad.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, az Onion Board mikrofonos részének régi verziójával",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Frissítés megszakítva. A mikrofonos rész még mindig a régi: frissítsd a Beüzemelés lapon."
 }

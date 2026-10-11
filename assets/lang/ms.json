@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Bunyi anda pergi ke {name}.</b> Apa saja yang mendengar di sana mendapatnya. Dalam OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. Dalam Voicemeeter atau mikser, hantar input itu ke mana ia patut pergi. Tidak diteruskan ke sembang suara? Nyahtanda <b>Hantar dalam mono</b> di bawah Siapa yang mendengar untuk kekal stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Nyahtanda <b>Automatically adjust microphone volume</b>, tetapkan <b>Background noise suppression</b> kepada <b>Low</b>, atau pilih <b>Original sound for musicians</b> (kemudian hidupkannya dalam mesyuarat, di kiri atas).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> seterusnya: menunggu muat turun sebelumnya selesai…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Pilihan:</b> bahagian mikrofon anda berfungsi, dan versi lebih baharu sudah ada. Ia tidak diperlukan, kemas kini di bawah bila-bila masa yang sesuai (Windows bertanya sekali, dan bunyi anda hilang sesaat).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Satu hujung kabel pada {rates}, jadi ia menukar bunyi anda semasa melaluinya. Baikinya untuk bunyi paling bersih.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak dapat membuka {devices} (di bawah Hantar juga ke). Sudah dipasang? Ia dicuba semula sendiri.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Pembaikan penting:</b> {fix}</p>",
@@ -764,7 +763,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Membuka laporan pepijat di GitHub dalam pelayar anda, dengan versi sudah diisi",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Membukanya sekarang, sama seperti hotkey: pilih bunyi dengan kekuncinya atau satu klik. Esc, butang ini atau hotkey menutupnya",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Membuka senarai penuh (SECURITY.md) di GitHub, dalam pelayar anda",
-  "Optional: update the mic part": "Pilihan: kemas kini bahagian mikrofon",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Atau seret saja: pegang mana-mana bahagian kosong overlay (tajuknya, tepinya) dan lepaskan di mana-mana, pada mana-mana monitor. Ia dibuka di situ selepas itu. Tunjuk pratonton hanya menunjukkan rupanya: buka overlay dengan hotkeynya untuk mencubanya atau mengalihkannya.",
   "Orange": "Oren",
   "Other games": "Permainan lain",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Seterusnya: Windows akan meminta kebenaran untuk OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Tiada apa untuk dikemas kini: tetapan mikrofon anda telah berubah.",
   "The Windows prompt names Python because you're running from source.": "Gesaan Windows menyebut Python kerana anda menjalankannya dari kod sumber.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Kemas kini dibatalkan. Mikrofon anda masih berfungsi: kemas kini bila-bila masa dalam Persediaan.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows akan meminta kebenaran. Audio berhenti sekejap semasa kemas kini.",
   "You can update later in Setup.": "Anda boleh kemas kini kemudian dalam Persediaan.",
   "Your mic is already up to date.": "Mikrofon anda sudah terkini.",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "Tekan ↻ untuk cuba lagi.",
   "That station isn't on the air right now. Try another one.": "Stesen itu tidak bersiaran sekarang. Cuba yang lain.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio tidak berfungsi sekarang. Bukan salah anda: pelayan senarai stesen tidak berfungsi. Cuba lagi sekejap lagi.",
-  "This station points into your home network, so it isn't played.": "Stesen ini menghala ke rangkaian rumah anda, jadi ia tidak dimainkan."
+  "This station points into your home network, so it isn't played.": "Stesen ini menghala ke rangkaian rumah anda, jadi ia tidak dimainkan.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Kemas kini bahagian mikrofon anda</b><br>Ia daripada versi Onion Board yang lebih lama, jadi sesetengah permainan, panggilan dan pelayar mungkin tidak mendengar bunyi anda. Windows bertanya sekali, dan bunyi terputus sesaat.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, dengan versi lama bahagian mikrofon Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Kemas kini dibatalkan. Bahagian mikrofon anda masih yang lama: kemas kininya dalam tab Persediaan."
 }
