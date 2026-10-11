@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Δεν έγινε νέα σάρωση",
   "Couldn't reach GitHub ({error}).": "Δεν βρέθηκε το GitHub ({error}).",
   "Couldn't read the {name} board": "Δεν διαβάστηκε ο πίνακας {name}",
-  "Couldn't render it": "Δεν δημιουργήθηκε",
   "Couldn't render the preview with these effects (see the log).": "Δεν δημιουργήθηκε η προεπισκόπηση με αυτά τα εφέ (δες την καταγραφή).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Δεν έγινε επαναφορά: το αρχείο ρυθμίσεων ήταν κλειδωμένο. Δεν άλλαξε τίποτα.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Δεν έγινε ανάκτηση: το αρχείο ρυθμίσεων ήταν κλειδωμένο. Δεν άλλαξε τίποτα.",
@@ -754,7 +753,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Το Onion Board {version} είναι έτοιμο. Επανεκκίνηση τώρα για εγκατάσταση;",
   "Onion Board: quick setup": "Onion Board: γρήγορη ρύθμιση",
   "Onion Pocket isn't installed.": "Το Onion Pocket δεν είναι εγκατεστημένο.",
-  "Onion Pocket wasn't removed": "Το Onion Pocket δεν αφαιρέθηκε",
   "Onion Pocket wasn't removed: {error}": "Το Onion Pocket δεν αφαιρέθηκε: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: τα κουμπιά σου στο κινητό σου",
   "Onion Watch isn't installed.": "Το Onion Watch δεν είναι εγκατεστημένο.",
@@ -1256,7 +1254,6 @@
   "Update settings": "Ρυθμίσεις ενημερώσεων",
   "Update to {version}": "Ενημέρωση σε {version}",
   "Update: {version}": "Ενημέρωση: {version}",
-  "Updated": "Ενημερώθηκε",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Ενημερώθηκε σε Onion Board {version}. Δεν αλλάζει τίποτα μέχρι να το θελήσεις: όλα δουλεύουν όπως πριν.",
   "Updates": "Ενημερώσεις",
   "Updates and add-ons": "Ενημερώσεις και πρόσθετα",
@@ -1983,7 +1980,6 @@
   "Onion Watch download progress": "Πρόοδος λήψης Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Το Onion Watch γίνεται λήψη αυτή τη στιγμή. Δοκιμάστε ξανά όταν τελειώσει.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Το Onion Watch δεν είναι ακόμη διαθέσιμο για λήψη (το GitHub λέει ότι δεν μπορεί να το βρει). Δοκιμάστε ξανά αργότερα.",
-  "Onion Watch wasn't removed": "Το Onion Watch δεν αφαιρέθηκε",
   "Onion Watch wasn't removed: {error}": "Το Onion Watch δεν καταργήθηκε: {error}",
   "Onion Watch wasn't updated: {error}": "Το Onion Watch δεν ενημερώθηκε: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Το Onion Watch {version} έχει εγκατασταθεί. Επανεκκινήστε το Onion Board για να αρχίσετε να το χρησιμοποιείτε.",
@@ -2058,15 +2054,7 @@
   "Save as a voice": "Αποθήκευση ως φωνή",
   "Save clip": "Αποθήκευση κλιπ",
   "Saved clips": "Αποθηκευμένα κλιπ",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Αποθηκευμένα κλιπ ({clips}) · ✓ προστέθηκαν στους ήχους σας",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Αποθηκευμένα κλιπ ({clips}) · ✓ προστέθηκαν {n} στους ήχους σας",
-    "Αποθηκευμένα κλιπ ({clips}) · ✓ προστέθηκαν {n} στους ήχους σας"
-  ],
   "Saved clips ({n})": "Αποθηκευμένα κλιπ ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Αποθηκευμένα κλιπ ({n}) · αντιγράφηκε \"{name}\": Το Ctrl+V το επικολλά σε ένα πρόγραμμα επεξεργασίας ή στην καρτέλα Ήχοι",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Αποθηκευμένα κλιπ ({n}) · δεν υπάρχουν ακουστικά για αναπαραγωγή: επιλέξτε τα από την καρτέλα Ρύθμιση",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Αποθηκευμένα κλιπ ({n}) · πουθενά να τα στείλετε: επιλέξτε πού πηγαίνουν οι ήχοι σας στην καρτέλα Ρύθμιση",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Αποθηκευμένες φωνές που διαγράψατε, κρατήθηκαν για {n} ημέρα, ώστε να μπορείτε να τις επαναφέρετε",
     "Οι αποθηκευμένες φωνές που διαγράψατε, τις κρατήσατε για {n} ημέρες, ώστε να μπορείτε να τις επαναφέρετε"
@@ -2197,7 +2185,6 @@
   "There's no sound to download at that link.": "Δεν υπάρχει ήχος για λήψη σε αυτόν τον σύνδεσμο.",
   "This add-on has no install steps.": "Αυτό το πρόσθετο δεν έχει βήματα εγκατάστασης.",
   "This copy of Onion Board has no mic effect in it.": "Αυτό το αντίγραφο του Onion Board δεν έχει αποτέλεσμα μικροφώνου σε αυτό.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Αυτό μοιάζει με πρόβλημα στο Onion Board. Η αναφορά του ανοίγει μια σελίδα στο GitHub μας με συμπληρωμένα τα στοιχεία. εσείς επιλέγετε τι θα στείλετε.",
   "This program's volume in the mix": "Ο όγκος αυτού του προγράμματος στη μίξη",
   "Tone": "Τόνος",
   "Too short to keep.": "Πολύ σύντομο για να το κρατήσω.",
@@ -3116,7 +3103,22 @@
   "Your sounds and settings are kept.": "Οι ήχοι και οι ρυθμίσεις σου διατηρούνται.",
   "{error}": "{error}",
   "Update mic effect": "Ενημέρωση εφέ μικροφώνου",
-  "Update to new version": "Ενημέρωση στη νέα έκδοση",
+  "Added the voice “{name}”": "Προστέθηκε η φωνή «{name}»",
+  "Added {n} clip to your Sounds": [
+    "Προστέθηκε {n} κλιπ στους ήχους σου",
+    "Προστέθηκαν {n} κλιπ στους ήχους σου"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Αντιγράφηκε το «{name}»: το Ctrl+V το επικολλά σε έναν επεξεργαστή ή στην καρτέλα Ήχοι",
+  "Keep": "Διατήρηση",
+  "Keep your imported sounds?": "Να κρατηθούν οι εισαγόμενοι ήχοι;",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Φέραμε <b>{n}</b> ήχο από τα άλλα σου soundboard. Να τον κρατήσεις;",
+    "Φέραμε <b>{n}</b> ήχους από τα άλλα σου soundboard. Να τους κρατήσεις;"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Φέραμε <b>{n}</b> ήχο από το {name}. Να τον κρατήσεις;",
+    "Φέραμε <b>{n}</b> ήχους από το {name}. Να τους κρατήσεις;"
+  ],
   "Compatibility fixes for games, calls and browsers.": "Διορθώσεις συμβατότητας για παιχνίδια, κλήσεις και browsers.",
   "Install update": "Εγκατάσταση ενημέρωσης",
   "Mic updated: games, calls and browsers hear your sounds.": "Το μικρόφωνο ενημερώθηκε: παιχνίδια, κλήσεις και browsers ακούν τους ήχους σου.",

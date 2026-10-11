@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "最长 {value} 分钟。",
   "Update available": "有可用更新",
   "Update now": "立即更新",
-  "Updated": "已更新",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "已更新到 Onion Board {version}。在你需要之前什么都不会变：一切照旧。",
   "Use the virtual cable instead": "改用虚拟音频线",
   "Video": "视频",
@@ -787,7 +786,6 @@
   "Couldn't play it: {error}": "无法播放：{error}",
   "Couldn't re-scan": "无法重新扫描",
   "Couldn't reach GitHub ({error}).": "无法连接 GitHub（{error}）。",
-  "Couldn't render it": "无法生成",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "无法重置：设置文件被锁定了。什么都没改。",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "无法还原：设置文件被锁定了。什么都没改。",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "无法保存重置后的设置。你的还原点在 设置 > 常规 里。",
@@ -1046,7 +1044,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} 已发布，点击查看详情",
   "Onion Board: quick setup": "Onion Board：快速设置",
   "Onion Pocket isn't installed.": "Onion Pocket 没有安装。",
-  "Onion Pocket wasn't removed": "Onion Pocket 没有被移除",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket 没有被移除：{error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket：手机上的按钮",
   "Onion Watch isn't installed.": "Onion Watch 没有安装。",
@@ -1941,7 +1938,6 @@
   "Onion Watch download progress": "Onion Watch下载进度",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch 正在下载。完成后重试。",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch 尚无法下载（GitHub 表示找不到）。稍后再试。",
-  "Onion Watch wasn't removed": "洋葱手表没有被删除",
   "Onion Watch wasn't removed: {error}": "Onion Watch 未删除： {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch 未更新： {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version}已安装。重新启动 Onion Board 即可开始使用。",
@@ -2015,14 +2011,7 @@
   "Save as a voice": "另存为声音",
   "Save clip": "保存剪辑",
   "Saved clips": "已保存的剪辑",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "保存的剪辑 ({clips}) · ✓ 添加到您的声音",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "已保存的剪辑 ({clips}) · ✓ 将{n}添加到您的声音中"
-  ],
   "Saved clips ({n})": "已保存的剪辑 ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "已保存的剪辑 ({n}) · 复制的“{name}”：Ctrl+V 将其粘贴到编辑器中或“声音”选项卡上",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "已保存的剪辑 ({n}) · 没有耳机可以播放：在“设置”选项卡上选择它们",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "已保存的剪辑 ({n}) · 无处发送：在“设置”选项卡上选择声音的发送位置",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "您删除的已保存语音将保留{n}天，以便您可以将其恢复"
   ],
@@ -2149,7 +2138,6 @@
   "There's no sound to download at that link.": "该链接没有可供下载的声音。",
   "This add-on has no install steps.": "该附加组件没有安装步骤。",
   "This copy of Onion Board has no mic effect in it.": "此洋葱板副本中没有麦克风效果。",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "这看起来像是 Onion Board 中的一个问题。报告该问题会在我们的 GitHub 上打开一个页面，其中填写了详细信息；您选择要发送的内容。",
   "This program's volume in the mix": "该节目的混音音量",
   "Tone": "语气",
   "Too short to keep.": "太短了，无法保留。",
@@ -3045,7 +3033,19 @@
   "Your sounds and settings are kept.": "你的声音和设置会保留。",
   "{error}": "{error}",
   "Update mic effect": "更新麦克风效果",
-  "Update to new version": "更新到新版本",
+  "Added the voice “{name}”": "已添加声音“{name}”",
+  "Added {n} clip to your Sounds": [
+    "已将 {n} 个片段添加到你的声音"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "已复制“{name}”：按 Ctrl+V 可粘贴到编辑器或“声音”标签页",
+  "Keep": "保留",
+  "Keep your imported sounds?": "保留导入的音效吗？",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "已从你的其他音效板导入 <b>{n}</b> 个音效。要保留吗？"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "已从 {name} 导入 <b>{n}</b> 个音效。要保留吗？"
+  ],
   "Compatibility fixes for games, calls and browsers.": "修复与游戏、通话和浏览器的兼容性问题。",
   "Install update": "安装更新",
   "Mic updated: games, calls and browsers hear your sounds.": "麦克风已更新：游戏、通话和浏览器都能听到你的声音。",

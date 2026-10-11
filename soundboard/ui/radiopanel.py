@@ -40,7 +40,6 @@ CLIP_S = 15
 LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 TYPE_DELAY_MS = 80         # ...and before the list shows the matches already known
-ERROR_LINE_S = 30           # a station's error stays up this long (or till the next state)
 FAV_MAX = 200
 RECENT_MAX = 30
 ROW_H = 54
@@ -135,7 +134,7 @@ class _StationDelegate(QStyledItemDelegate):
         return c
 
     def sizeHint(self, opt, idx):
-        return QSize(1, ROW_H if idx.data(Qt.UserRole) else 96)   # as wide as the list
+        return QSize(1, ROW_H if idx.data(Qt.ItemDataRole.UserRole) else 96)   # as wide as the list
 
     @staticmethod
     def _rects(r: QRect):
@@ -148,20 +147,21 @@ class _StationDelegate(QStyledItemDelegate):
     def paint(self, p: QPainter, opt, idx):
         t = theme.T
         p.save()
-        p.setRenderHint(QPainter.Antialiasing)
-        uuid = idx.data(Qt.UserRole)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        uuid = idx.data(Qt.ItemDataRole.UserRole)
         s = self.tab._stations.get(uuid) if uuid else None
         if s is None:
             p.setPen(QColor(t["muted"]))
-            p.drawText(opt.rect.adjusted(20, 8, -20, -8), Qt.AlignCenter | Qt.TextWordWrap,
-                       idx.data(Qt.DisplayRole) or "")
+            p.drawText(opt.rect.adjusted(20, 8, -20, -8), Qt.AlignmentFlag.AlignCenter
+                       | Qt.TextFlag.TextWordWrap,
+                       idx.data(Qt.ItemDataRole.DisplayRole) or "")
             p.restore()
             return
         on = self.tab.player.station
         playing = on is not None and on.uuid == uuid
         fav = uuid in self.tab._fav_ids
-        hover = bool(opt.state & QStyle.State_MouseOver)
-        sel = bool(opt.state & QStyle.State_Selected)
+        hover = bool(opt.state & QStyle.StateFlag.State_MouseOver)
+        sel = bool(opt.state & QStyle.StateFlag.State_Selected)
         card, avatar, star = self._rects(opt.rect)
         cardf = QRectF(card)
         badge_f, pill_f, name_f, sub_f, pill_fm, name_fm, sub_fm = self._fonts_for(opt.font)
@@ -178,11 +178,11 @@ class _StationDelegate(QStyledItemDelegate):
             bg = QColor(accent) if playing else QColor(t["card_hi"])
             if playing:
                 bg.setAlpha(30)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(bg)
             p.drawRoundedRect(cardf, 9, 9)
         if playing:
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(accent)
             p.drawRoundedRect(QRectF(card.left(), card.top() + 10, 3, card.height() - 20), 1.5, 1.5)
 
@@ -191,7 +191,7 @@ class _StationDelegate(QStyledItemDelegate):
         path.addRoundedRect(QRectF(avatar), 10, 10)
         if playing or hover:
             p.fillPath(path, accent)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(t["on_accent"]))
             c = QRectF(avatar).center()
             if playing:          # a little equalizer, bouncing (still while tuning in)
@@ -209,7 +209,7 @@ class _StationDelegate(QStyledItemDelegate):
             p.fillPath(path, self._badge(s.cc or _country(s) or s.name))
             p.setFont(badge_f)
             p.setPen(QColor("#ffffff"))
-            p.drawText(avatar, Qt.AlignCenter, s.cc or (s.name[:1].upper() or "?"))
+            p.drawText(avatar, Qt.AlignmentFlag.AlignCenter, s.cc or (s.name[:1].upper() or "?"))
 
         # star
         if fav:
@@ -223,12 +223,12 @@ class _StationDelegate(QStyledItemDelegate):
         if pill_txt:
             w = pill_fm.horizontalAdvance(pill_txt) + 12
             pill = QRectF(right - w, card.center().y() - 9, w, 18)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(t["badge"]))
             p.drawRoundedRect(pill, 9, 9)
             p.setFont(pill_f)
             p.setPen(QColor(t["live_text"] if s.bitrate >= 256 else t["badge_text"]))
-            p.drawText(pill, Qt.AlignCenter, pill_txt)
+            p.drawText(pill, Qt.AlignmentFlag.AlignCenter, pill_txt)
             right = int(pill.left()) - 8
 
         # name over country · genres
@@ -236,23 +236,26 @@ class _StationDelegate(QStyledItemDelegate):
         width = max(10, right - left)
         p.setFont(name_f)
         p.setPen(QColor(t["accent_hi"] if playing else t["text_hi"]))
-        name = name_fm.elidedText(s.name, Qt.ElideRight, width)
-        p.drawText(QRect(left, card.top() + 7, width, 21), Qt.AlignLeft | Qt.AlignVCenter, name)
+        name = name_fm.elidedText(s.name, Qt.TextElideMode.ElideRight, width)
+        p.drawText(QRect(left, card.top() + 7, width, 21), Qt.AlignmentFlag.AlignLeft
+                   | Qt.AlignmentFlag.AlignVCenter, name)
         p.setFont(sub_f)
         p.setPen(QColor(t["muted"]))
         sub = " · ".join(b for b in (_country(s), ", ".join(s.tags[:3])) if b)
-        sub = sub_fm.elidedText(sub, Qt.ElideRight, width)
-        p.drawText(QRect(left, card.top() + 27, width, 18), Qt.AlignLeft | Qt.AlignVCenter, sub)
+        sub = sub_fm.elidedText(sub, Qt.TextElideMode.ElideRight, width)
+        p.drawText(QRect(left, card.top() + 27, width, 18), Qt.AlignmentFlag.AlignLeft
+                   | Qt.AlignmentFlag.AlignVCenter, sub)
         p.restore()
 
     def editorEvent(self, ev, model, opt, idx):
-        if (ev.type() in (QEvent.MouseButtonRelease, QEvent.MouseButtonDblClick)
-                and ev.button() == Qt.LeftButton and idx.data(Qt.UserRole)):
-            uuid = idx.data(Qt.UserRole)
+        if (ev.type() in (QEvent.Type.MouseButtonRelease, QEvent.Type.MouseButtonDblClick)
+                and ev.button() == Qt.MouseButton.LeftButton
+                and idx.data(Qt.ItemDataRole.UserRole)):
+            uuid = idx.data(Qt.ItemDataRole.UserRole)
             _card, avatar, star = self._rects(opt.rect)
             pos = ev.position().toPoint()
             on_button = star.adjusted(-4, -4, 4, 4).contains(pos) or avatar.contains(pos)
-            if ev.type() == QEvent.MouseButtonDblClick:
+            if ev.type() == QEvent.Type.MouseButtonDblClick:
                 # the first click already played / starred it: swallow the double-click
                 # (no "activated" play on top) and the release after it (no undo)
                 if on_button:
@@ -270,7 +273,7 @@ class _StationDelegate(QStyledItemDelegate):
             if avatar.contains(pos):
                 QTimer.singleShot(0, lambda: self.tab._play_or_stop(uuid))
                 return True
-            if ev.type() == QEvent.MouseButtonRelease and opt.rect.contains(pos):
+            if ev.type() == QEvent.Type.MouseButtonRelease and opt.rect.contains(pos):
                 QTimer.singleShot(0, lambda: self.tab.play_uuid(uuid))   # a click plays it
         return super().editorEvent(ev, model, opt, idx)
 
@@ -311,7 +314,8 @@ class _FilterRow(QWidget):
         text = max((fm.horizontalAdvance(t) for t in texts), default=0)
         opt = QStyleOptionComboBox()
         c.initStyleOption(opt)
-        full = c.style().sizeFromContents(QStyle.CT_ComboBox, opt, QSize(text, fm.height()), c)
+        full = c.style().sizeFromContents(QStyle.ContentsType.CT_ComboBox, opt,
+                                          QSize(text, fm.height()), c)
         return max(c.minimumSizeHint().width(), full.width())
 
     def fits(self, idx: list[int], width: int) -> bool:
@@ -363,14 +367,15 @@ class NowPlaying(QWidget):
         self.tuning = False
         self.setMinimumWidth(80)
         self.setFixedHeight(34)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setAccessibleName(_("Now playing"))
         self.setAccessibleDescription(_("Nothing playing"))
 
     def set_station(self, name: str, title: str = "", tuning: bool = False):
         if (name, title, tuning) != (self.name, self.title, self.tuning):
             self.name, self.title, self.tuning = name, title, tuning
-            self.setCursor(Qt.PointingHandCursor if name else Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.PointingHandCursor if name
+                           else Qt.CursorShape.ArrowCursor)
             self.setToolTip(_("Show it in the list") if name else "")
             what = (_("Tuning in to {name}", name=name) if tuning else
                     _("Playing {name}: {title}", name=name, title=title) if title else
@@ -379,7 +384,7 @@ class NowPlaying(QWidget):
         self.update()   # the bars move on every tick while it plays
 
     def mouseReleaseEvent(self, e):
-        if self.name and e.button() == Qt.LeftButton and self.rect().contains(
+        if self.name and e.button() == Qt.MouseButton.LeftButton and self.rect().contains(
                 e.position().toPoint()):
             self.clicked.emit()
         super().mouseReleaseEvent(e)
@@ -387,15 +392,16 @@ class NowPlaying(QWidget):
     def paintEvent(self, _e):
         t = theme.T
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         f = QFont(self.font())
         if not self.name:
             p.setPen(QColor(t["muted"]))
             p.setFont(f)
-            p.drawText(r.adjusted(10, 0, -4, 0), Qt.AlignLeft | Qt.AlignVCenter,
+            p.drawText(r.adjusted(10, 0, -4, 0), Qt.AlignmentFlag.AlignLeft
+                       | Qt.AlignmentFlag.AlignVCenter,
                        p.fontMetrics().elidedText(_("Nothing playing: click a station"),
-                                                  Qt.ElideRight, int(r.width()) - 14))
+                                                  Qt.TextElideMode.ElideRight, int(r.width()) - 14))
             p.end()
             return
         bg = QColor(t["accent"])
@@ -411,17 +417,18 @@ class NowPlaying(QWidget):
         p.setFont(f)
         p.setPen(QColor(t["text_hi"]))
         head = _("Tuning in to {name}…", name=self.name) if self.tuning else self.name
-        head = p.fontMetrics().elidedText(head, Qt.ElideRight, room)
-        p.drawText(QRectF(x, r.top(), room, r.height()), Qt.AlignLeft | Qt.AlignVCenter, head)
+        head = p.fontMetrics().elidedText(head, Qt.TextElideMode.ElideRight, room)
+        p.drawText(QRectF(x, r.top(), room, r.height()), Qt.AlignmentFlag.AlignLeft
+                   | Qt.AlignmentFlag.AlignVCenter, head)
         used = p.fontMetrics().horizontalAdvance(head)
         if self.title and not self.tuning and used + 40 < room:
             f.setBold(False)
             p.setFont(f)
             p.setPen(QColor(t["muted"]))
-            rest = p.fontMetrics().elidedText(f"— {self.title}", Qt.ElideRight,
+            rest = p.fontMetrics().elidedText(f"— {self.title}", Qt.TextElideMode.ElideRight,
                                               room - used - 8)
             p.drawText(QRectF(x + used + 8, r.top(), room - used - 8, r.height()),
-                       Qt.AlignLeft | Qt.AlignVCenter, rest)
+                       Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, rest)
         p.end()
 
 
@@ -442,7 +449,7 @@ class RadioTab(QWidget):
         self.dir.failed.connect(self._on_failed)
         self.player = RadioPlayer(self)
         # on the decoding thread: a busy window mustn't hold the radio up
-        self.player.audio.connect(self._on_audio, Qt.DirectConnection)
+        self.player.audio.connect(self._on_audio, Qt.ConnectionType.DirectConnection)
         self.player.state.connect(self._on_state)
         self.player.error.connect(self._on_error)
         self.player.now_playing.connect(self._on_now_playing)
@@ -518,7 +525,7 @@ class RadioTab(QWidget):
         v.addLayout(top)
 
         # ---- globe | station list
-        self.split = QSplitter(Qt.Horizontal)
+        self.split = QSplitter(Qt.Orientation.Horizontal)
         # Both ancestors must reveal the window through the map's corner cutouts.
         self.split.setStyleSheet("QSplitter { background:transparent; }")
         self.split.setChildrenCollapsible(False)
@@ -540,7 +547,7 @@ class RadioTab(QWidget):
 
         self.info = QLabel()
         self.info.setWordWrap(True)
-        self.info.setTextFormat(Qt.RichText)
+        self.info.setTextFormat(Qt.TextFormat.RichText)
         self.info.setObjectName("muted")
         v.addWidget(self.info)
 
@@ -676,18 +683,19 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             b.setObjectName("seg")
             b.setAccessibleName(b.text())    # kept when the fitter drops the words
             b.setCheckable(True)
-            b.setCursor(Qt.PointingHandCursor)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             self._mode.addButton(b)
             sh.addWidget(b)
         self.btn_popular.setChecked(True)
         self._mode.buttonClicked.connect(lambda _b: self._show_list())
         self.seg_box = seg
-        seg.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)   # as wide as its words
+        # as wide as its words
+        seg.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         v.addWidget(seg)
 
         # genre chips
         self.genre_box = QWidget()
-        self.genre_box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        self.genre_box.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         flow = _Flow(self.genre_box, gap=5)
         self._genres = QButtonGroup(self)
         self._genre_btns: dict[str, QPushButton] = {}
@@ -695,7 +703,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             b = QPushButton((GENRE_LABELS.get(g, g) if g else _("All")).replace("&", "&&"))
             b.setObjectName("genre")
             b.setCheckable(True)
-            b.setCursor(Qt.PointingHandCursor)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.setChecked(not g)
             b.clicked.connect(lambda _c=False, g=g: self.set_genre(g))
             self._genres.addButton(b)
@@ -709,7 +717,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         fv.setContentsMargins(0, 0, 0, 0)
         fv.setSpacing(8)
         self.cmb_country = QComboBox()
-        self.cmb_country.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.cmb_country.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.cmb_country.setMinimumContentsLength(8)
         self.cmb_country.addItem(_("All countries"), "")
         self.cmb_country.setAccessibleName(_("Country"))
@@ -737,7 +745,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         row.addWidget(self.count_label, 1)
         self.btn_clear = QPushButton(_("Clear filters"))
         self.btn_clear.setObjectName("clear")
-        self.btn_clear.setCursor(Qt.PointingHandCursor)
+        self.btn_clear.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_clear.clicked.connect(self.clear_filters)
         self.btn_clear.hide()
         row.addWidget(self.btn_clear)
@@ -754,8 +762,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.list.setUniformItemSizes(True)
         self.list.setWordWrap(False)
         self.list.setMouseTracking(True)
-        self.list.setVerticalScrollMode(QListWidget.ScrollPerPixel)
-        self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.list.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
+        self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list.setItemDelegate(_StationDelegate(self))
         self.list.itemActivated.connect(self._on_activated)          # double-click / Enter
         self.list.currentItemChanged.connect(self._on_current)
@@ -982,14 +990,12 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._reloading = False
             busy.set_busy(self.btn_refresh, False)
             stale = getattr(self.dir, "globe_stale", "")
-            self._refresh_info(
-                f"<span style='color:{theme.status('warn')}'>"
-                + _("Couldn't reach the station directory, showing the saved list.")
-                + "</span>" if stale else
-                f"<span style='color:{theme.status('ok')}'>✓ "
-                + ngettext("Station list updated: {n} station.",
-                           "Station list updated: {n} stations.", len(stations))
-                + "</span>")
+            if stale:
+                self._say(_("Couldn't reach the station directory, showing the saved list."),
+                          "warn")
+            else:
+                self._say(ngettext("Station list updated: {n} station.",
+                                   "Station list updated: {n} stations.", len(stations)), "ok")
         else:
             self._refresh_info()
 
@@ -1007,10 +1013,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         elif self._query:
             self._results, self._search_failed = [], True
             self._show_list()
-            self._refresh_info(
-                f"<span style='color:{theme.status('error')}'>"
-                + _("Search failed ({error}). Check your connection and press Enter to try "
-                    "again.", error=html.escape(msg)) + "</span>")
+            self._say(_("Search failed ({error}). Check your connection and press Enter to "
+                        "try again.", error=msg), "error")
 
     def _on_text(self, text: str):
         self._query = " ".join(text.split())
@@ -1141,7 +1145,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.count_label.setText(count)
         self.btn_clear.setVisible(self.filters_on())
         cur = self.list.currentItem()
-        keep = cur.data(Qt.UserRole) if cur is not None else None
+        keep = cur.data(Qt.ItemDataRole.UserRole) if cur is not None else None
         playing = self.player.station.uuid if self.player.station else None
         self._rows_playing = playing
         fav = self._fav_ids
@@ -1149,7 +1153,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.list.clear()
         for s in stations:
             it = QListWidgetItem(self._row_text(s, playing, fav))
-            it.setData(Qt.UserRole, s.uuid)
+            it.setData(Qt.ItemDataRole.UserRole, s.uuid)
             # station data is community-edited: escape it, or Qt renders it as HTML
             it.setToolTip(f"<p>{html.escape(s.name)}"
                           + (f"<br>{html.escape(s.homepage)}" if s.homepage else "") + "</p>")
@@ -1177,7 +1181,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 empty = self._no_stations_text()
             if empty:
                 it = QListWidgetItem(empty)
-                it.setFlags(Qt.NoItemFlags)
+                it.setFlags(Qt.ItemFlag.NoItemFlags)
                 self.list.addItem(it)
         self._update_buttons()
 
@@ -1201,7 +1205,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._rows_playing = playing
         for i in range(self.list.count() if todo else 0):
             it = self.list.item(i)
-            uuid = it.data(Qt.UserRole)
+            uuid = it.data(Qt.ItemDataRole.UserRole)
             s = self._stations.get(uuid) if uuid in todo else None
             if s is None:
                 continue
@@ -1218,17 +1222,17 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _highlight(self, uuid: str):
         for i in range(self.list.count()):
             it = self.list.item(i)
-            if it.data(Qt.UserRole) == uuid:
+            if it.data(Qt.ItemDataRole.UserRole) == uuid:
                 self.list.setCurrentItem(it)
                 self.list.scrollToItem(it)
                 return
 
     def selected(self) -> Station | None:
         it = self.list.currentItem()
-        return self._stations.get(it.data(Qt.UserRole)) if it is not None else None
+        return self._stations.get(it.data(Qt.ItemDataRole.UserRole)) if it is not None else None
 
     def _on_current(self, it, _prev):
-        s = self._stations.get(it.data(Qt.UserRole)) if it is not None else None
+        s = self._stations.get(it.data(Qt.ItemDataRole.UserRole)) if it is not None else None
         if s is not None and s.lat is not None and self.player.station is None:
             # browsing the list turns the map to the station (play one and it stays put)
             p = radio.globe_points([s])[0]
@@ -1236,7 +1240,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._update_buttons()
 
     def _on_activated(self, it):
-        self.play_uuid(it.data(Qt.UserRole))
+        self.play_uuid(it.data(Qt.ItemDataRole.UserRole))
 
     def play_uuid(self, uuid: str):
         """Play the station unless it's already the one playing (a click, a
@@ -1332,10 +1336,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_error(self, msg: str):
         self._restate_rows()
-        red = theme.status("error")
-        self._refresh_info(f"<span style='color:{red}'>"
-                           + _("That station isn't working ({error}). Try another one.",
-                               error=html.escape(msg)) + "</span>", ERROR_LINE_S)
+        self._say(_("That station isn't working ({error}). Try another one.", error=msg),
+                  "error")
         self._select_on_globe(fly=False)
 
     def _on_now_playing(self, title: str):
@@ -1371,6 +1373,13 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self._globe_error:
             return _("Can't reach the station directory, press ↻ to try again.")
         return _("Finding stations…") if self._started else ""
+
+    def _say(self, text: str, kind: str):
+        """A result or a problem as a corner card; the info line goes back to what's
+        playing (only "Refreshing…" / "Searching…" stay on it)."""
+        busy.toast(self, html.escape(text), kind)
+        self._flash_until = 0.0
+        self._refresh_info()
 
     def _refresh_info(self, msg: str = "", secs: float = 4):
         if msg:
@@ -1499,21 +1508,17 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
         if len(data) < int(0.2 * SR):
-            self._refresh_info(f"<span style='color:{theme.status('warn')}'>{empty_msg}</span>")
+            self._say(empty_msg, "warn")
             return False
         st = self.player.station or self._fed_by or self.selected()
         name = (st.name[:30] if st else _("Radio")) + " " + time.strftime("%H.%M.%S")
         self.clip_error = ""
         self.clip_ready.emit(data, name)   # the window saves it (and sets clip_error if not)
         if self.clip_error:
-            self._refresh_info(f"<span style='color:{theme.status('error')}'>"
-                               + _("Couldn't save the clip: {error}",
-                                   error=html.escape(self.clip_error)) + "</span>")
+            self._say(_("Couldn't save the clip: {error}", error=self.clip_error), "error")
             return False
-        green = theme.status("ok")
-        self._refresh_info(f"<span style='color:{green}'>✓ "
-                           + _("Saved a {secs}s clip to your Sounds.",
-                               secs=f"{len(data) / SR:.1f}") + "</span>")
+        self._say(_("Saved a {secs}s clip to your Sounds.", secs=f"{len(data) / SR:.1f}"),
+                  "ok")
         return True
 
     def _tick(self):
@@ -1530,7 +1535,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.now.update()
             for i in range(self.list.count()):
                 it = self.list.item(i)
-                if it.data(Qt.UserRole) == st.uuid:
+                if it.data(Qt.ItemDataRole.UserRole) == st.uuid:
                     self.list.viewport().update(self.list.visualItemRect(it))
                     break
         if self.recorder.recording:
@@ -1571,13 +1576,13 @@ class RadioOff(QWidget):
         v.addStretch(1)
         title = QLabel(_("Radio is off"))
         title.setObjectName("section")
-        title.setAlignment(Qt.AlignCenter)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         v.addWidget(title)
         note = QLabel(_("It's switched off in Settings > Privacy & security, so the radio "
                         "contacts nobody: no station directory, no stations."))
         note.setObjectName("hint")
         note.setWordWrap(True)
-        note.setAlignment(Qt.AlignCenter)
+        note.setAlignment(Qt.AlignmentFlag.AlignCenter)
         v.addWidget(note)
         go = QPushButton(_("Privacy && security settings"))
         go.clicked.connect(self.open_settings)

@@ -17,7 +17,7 @@ from PySide6.QtWidgets import QWidget
 def active() -> bool:
     """Is the app in front (one of its windows has focus)?"""
     app = QGuiApplication.instance()
-    return app is None or app.applicationState() == Qt.ApplicationActive
+    return app is None or app.applicationState() == Qt.ApplicationState.ApplicationActive
 
 
 class _Pauser(QObject):
@@ -28,7 +28,7 @@ class _Pauser(QObject):
         self._watching = None   # the minimised window we wait on to be restored
 
     def on_state(self, state):
-        if state != Qt.ApplicationActive:
+        if state != Qt.ApplicationState.ApplicationActive:
             self._stop()
         elif self._widget.isVisible():
             win = self._widget.window()
@@ -41,7 +41,7 @@ class _Pauser(QObject):
                 win.installEventFilter(self)
 
     def eventFilter(self, obj, e):
-        if obj is self._watching and e.type() == QEvent.WindowStateChange \
+        if obj is self._watching and e.type() == QEvent.Type.WindowStateChange \
                 and not obj.isMinimized():
             obj.removeEventFilter(self)
             self._watching = None

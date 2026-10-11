@@ -1,5 +1,5 @@
-# The quick checks a commit needs, in one go (about 15 s): ruff, the sensitive-data
-# scan, the i18n catalogs and CODE.md's module list. The tests are left to CI: a PR
+# The quick checks a commit needs, in one go (about 14 s): ruff, the sensitive-data
+# scan, the i18n catalogs and CODE.md's module list, and pyright on changed files. The tests are left to CI: a PR
 # runs the ones its changes need (scripts/pick_tests.py) on 4 jobs side by side, faster
 # than this PC, and you keep working meanwhile. A change to a busy module (theme.py,
 # mainwindow.py, library.py) picks most of the suite: about 4 minutes here.
@@ -38,6 +38,20 @@ Step "sensitive data" { & $py scripts\check_sensitive.py }
 # as CI's pick job: every text in every catalog, and every module in docs/CODE.md
 Step "translations" { & $py scripts\i18n_extract.py --check }
 Step "CODE.md modules" { & $py scripts\check_code_doc.py }
+# pyright on the changed files; only errors not in scripts/pyright_baseline.json fail
+Step "types (new errors only)" { & $py scripts\check_types.py --base $Base }
+
+# A fix comes with the test that would have caught it (docs/AGENT-RULES.md). Only a
+# warning: some fixes can't be tested, and the PR's "Regression test:" line says why.
+$ErrorActionPreference = "Continue"   # git's line-ending notes on stderr aren't failures
+$branch = git rev-parse --abbrev-ref HEAD
+$subjects = @(git log "$Base..HEAD" --format=%s 2>$null)
+$changed = @(git diff --name-only $Base 2>$null) + @(git ls-files --others --exclude-standard)
+$ErrorActionPreference = "Stop"
+$isFix = ($branch -like "fix/*") -or ($subjects -match '(?i)\bfix')
+if ($isFix -and ($changed -like "soundboard/*") -and -not ($changed -like "tests/*")) {
+    Write-Host "WARNING: this looks like a fix but changes no tests. Add the test that would have caught it, or say why not on the PR's 'Regression test:' line." -ForegroundColor Yellow
+}
 
 if ($All) { $picked = @("tests") }
 else {

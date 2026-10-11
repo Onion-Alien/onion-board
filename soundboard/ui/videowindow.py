@@ -25,7 +25,7 @@ class VideoWindow(QWidget):
     closed = Signal()
 
     def __init__(self, parent=None):
-        super().__init__(parent, Qt.Window)
+        super().__init__(parent, Qt.WindowType.Window)
         self.resize(640, 380)
         self.setMinimumSize(240, 150)
         self.sid = ""
@@ -38,7 +38,7 @@ class VideoWindow(QWidget):
         v.addWidget(self.view, 1)
         self.note = QLabel()
         self.note.setObjectName("muted")
-        self.note.setAlignment(Qt.AlignCenter)
+        self.note.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.note.setWordWrap(True)
         self.note.hide()
         v.addWidget(self.note)
@@ -68,7 +68,7 @@ class VideoWindow(QWidget):
         if dur <= 0 or audio_secs <= 0:   # not loaded yet (or can't be)
             return
         if state is None:
-            if p.playbackState() == QMediaPlayer.PlayingState:
+            if p.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
                 p.pause()
             return
         prog, paused = state
@@ -80,9 +80,9 @@ class VideoWindow(QWidget):
         if abs(p.position() - want) > DRIFT_MS * max(rate, 1.0):
             p.setPosition(want)
         if paused:
-            if p.playbackState() == QMediaPlayer.PlayingState:
+            if p.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
                 p.pause()
-        elif p.playbackState() != QMediaPlayer.PlayingState and want < dur - 50:
+        elif p.playbackState() != QMediaPlayer.PlaybackState.PlayingState and want < dur - 50:
             p.play()
 
     def _on_error(self, _err, text: str):
@@ -99,7 +99,7 @@ class VideoWindow(QWidget):
         super().closeEvent(e)
 
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Escape:
+        if e.key() == Qt.Key.Key_Escape:
             self.close()
             return
         super().keyPressEvent(e)

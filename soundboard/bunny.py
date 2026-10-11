@@ -42,7 +42,7 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
     p.save()
     p.translate(cx, cy)
     p.rotate(angle)
-    p.setPen(pen or Qt.NoPen)
+    p.setPen(pen or Qt.PenStyle.NoPen)
     p.setBrush(fill)
     p.drawEllipse(QRectF(-w / 2, -h / 2, w, h))
     p.restore()
@@ -51,7 +51,7 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
-               nightcap: bool = False, robot: bool = False):
+               nightcap: bool = False, robot: bool = False, smug: bool = False):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -59,20 +59,21 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `sad` 0..1 worries his brows, wets his eyes and turns his smile down, and
     `angry` 0..1 knits them the other way, reddens his cheeks and pops a cross mark
     on his head (`swing` also swings the "bat"). `nightcap` puts his sleeping cap on.
-    `robot` draws him as Robo-Bun, metal with glowing LED ears, eyes and chest."""
+    `robot` draws him as Robo-Bun, metal with glowing LED ears, eyes and chest.
+    `smug`: half-shut eyes, one brow up and a lopsided smirk (he got away with it)."""
     phones = QColor(theme.T["accent"])
     phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
     p.save()
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.translate(rect.center().x() - W * s / 2, rect.center().y() - H * s / 2)
     p.scale(s, s)
 
     fur = ROBOT_FUR if robot else FUR
     fur_shade = ROBOT_FUR_SHADE if robot else FUR_SHADE
     ink = QPen(ROBOT_INK if robot else INK, 2.4)
-    ink.setJoinStyle(Qt.RoundJoin)
-    ink.setCapStyle(Qt.RoundCap)
+    ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+    ink.setCapStyle(Qt.PenCapStyle.RoundCap)
 
     # ears (behind the head): the right one flops a little for character
     for bx, cx, cy, h, a, tilt in ((36, 36, 26, 50, -10, -ears), (64, 66, 28, 48, 18, ears)):
@@ -116,16 +117,17 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     # headphones: band over the head, cups on the sides
     band = QPainterPath(QPointF(17, 64))
     band.cubicTo(QPointF(15, 26), QPointF(85, 26), QPointF(83, 64))
-    p.setBrush(Qt.NoBrush)
-    p.setPen(QPen(ink.color(), 8.5, Qt.SolidLine, Qt.RoundCap))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.setPen(QPen(ink.color(), 8.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
     p.drawPath(band)
-    p.setPen(QPen(ROBOT_CYAN if robot else phones, 5, Qt.SolidLine, Qt.RoundCap))
+    p.setPen(QPen(ROBOT_CYAN if robot else phones, 5, Qt.PenStyle.SolidLine,
+                  Qt.PenCapStyle.RoundCap))
     p.drawPath(band)
     for x in (10, 80):
         p.setPen(ink)
         p.setBrush(QColor("#222838") if robot else phones)
         p.drawRoundedRect(QRectF(x, 54, 11, 22), 5, 5)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(ROBOT_CYAN if robot else phones_hi)
         p.drawRoundedRect(QRectF(x + 2.5, 57, 3, 10), 1.5, 1.5)
 
@@ -151,13 +153,19 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         if blink > 0.6:       # shut: a happy little arc
             arc = QPainterPath(QPointF(x - 4.5, 62))
             arc.quadTo(x, 65.5, x + 4.5, 62)
-            p.setPen(QPen(INK, 2.2, Qt.SolidLine, Qt.RoundCap))
-            p.setBrush(Qt.NoBrush)
+            p.setPen(QPen(INK, 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawPath(arc)
             continue
         _ellipse(p, x, 62, 9 + 1.5 * sad, (11.5 + 1.5 * sad) * (1 - blink), INK)
         _ellipse(p, x + 1.6, 59, 3.4 + sad, 3.8 + sad, QColor("white"))
         _ellipse(p, x - 1.6, 65.5, 1.6, 1.6, QColor("white"))
+        if smug:              # heavy lids: fur over the top half, a flat lid line
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(fur)
+            p.drawRect(QRectF(x - 6, 54, 12, 7.5))
+            p.setPen(QPen(INK, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.drawLine(QPointF(x - 5.2, 61.5), QPointF(x + 5.2, 61.5))
         if sad > 0.05:        # welling up
             c = QColor("#8fd3ff")
             c.setAlphaF(0.8 * sad)
@@ -173,13 +181,20 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         if sad > 0.05:            # worried brows, inner ends lifted
             c = QColor(INK)
             c.setAlphaF(min(1.0, sad * 1.4))
-            p.setPen(QPen(c, 2.2, Qt.SolidLine, Qt.RoundCap))
+            p.setPen(QPen(c, 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
             for x, sx in ((39, -1), (61, 1)):
                 p.drawLine(QPointF(x + sx * 6, 53 + sad), QPointF(x - sx * 3, 52 - 4 * sad))
+        if smug:                  # one brow flat, the other cocked up
+            p.setPen(QPen(INK, 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            p.drawLine(QPointF(34, 55), QPointF(44, 55.5))
+            arch = QPainterPath(QPointF(56, 52))
+            arch.quadTo(61, 46.5, 67, 50)
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawPath(arch)
         if angry > 0.05:          # cross brows, inner ends pulled down
             c = QColor(INK)
             c.setAlphaF(min(1.0, angry * 1.4))
-            p.setPen(QPen(c, 2.6, Qt.SolidLine, Qt.RoundCap))
+            p.setPen(QPen(c, 2.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
             for x, sx in ((39, -1), (61, 1)):
                 p.drawLine(QPointF(x + sx * 6, 51 - 2 * angry),
                            QPointF(x - sx * 3, 52 + 3 * angry))
@@ -192,7 +207,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         nose.lineTo(53.5, 69)
         nose.quadTo(50, 74, 50, 74)
         nose.closeSubpath()
-        p.setPen(QPen(QColor("#e0708f"), 1.2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setPen(QPen(QColor("#e0708f"), 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                      Qt.PenJoinStyle.RoundJoin))
         p.setBrush(QColor("#ff8fae"))
         p.drawPath(nose)
     if mouth > 0.08:          # open, as if talking
@@ -205,24 +221,32 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         else:
             _ellipse(p, 50, 76 + oh / 2, 7 + 2 * mouth, oh, QColor("#5a2238"), QPen(INK, 1.6))
             _ellipse(p, 50, 76 + oh * 0.78, 4.5, oh * 0.4, QColor("#ff8fae"))
+    elif smug and not robot:  # a lopsided smirk, up on one side
+        path = QPainterPath(QPointF(44, 76))
+        path.quadTo(51, 79, 57, 73.5)
+        p.setPen(QPen(INK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawPath(path)
     elif sad > 0.5 or angry > 0.4:   # a little wobbly frown
         path = QPainterPath(QPointF(45, 78.5))
         path.quadTo(50, 74.5, 55, 78.5)
-        p.setPen(QPen(ROBOT_CYAN if robot else INK, 1.8, Qt.SolidLine, Qt.RoundCap))
-        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(ROBOT_CYAN if robot else INK, 1.8, Qt.PenStyle.SolidLine,
+                      Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
     else:
         path = QPainterPath(QPointF(44, 75))
         path.quadTo(47, 79.5, 50, 75.5)
         path.quadTo(53, 79.5, 56, 75)
-        p.setPen(QPen(ROBOT_CYAN if robot else INK, 1.8, Qt.SolidLine, Qt.RoundCap))
-        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(ROBOT_CYAN if robot else INK, 1.8, Qt.PenStyle.SolidLine,
+                      Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(path)
 
     _draw_prop(p, prop, ink, swing, fur=fur)
     if angry > 0.5:           # the cartoon cross-vein mark, up on his forehead
-        p.setPen(QPen(CROSS, 2.4, Qt.SolidLine, Qt.RoundCap))
-        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(CROSS, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
         cx, cy, k = 72, 40, 0.6 + 0.4 * angry
         for ax, ay in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
             arc = QPainterPath(QPointF(cx + ax * 1.5 * k, cy + ay * 6 * k))
@@ -248,13 +272,13 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
     elif prop == "plug":        # holding a cable with a plug
         cable = QPainterPath(QPointF(80, 104))
         cable.cubicTo(QPointF(96, 112), QPointF(98, 92), QPointF(90, 86))
-        p.setPen(QPen(QColor(theme.T["accent"]), 3, Qt.SolidLine, Qt.RoundCap))
-        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(QColor(theme.T["accent"]), 3, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawPath(cable)
         p.setPen(ink)
         p.setBrush(QColor("#3a3452"))
         p.drawRoundedRect(QRectF(84, 76, 11, 12), 2.5, 2.5)
-        p.setPen(QPen(QColor("#c9ccd8"), 2, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor("#c9ccd8"), 2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(QPointF(87, 76), QPointF(87, 70))
         p.drawLine(QPointF(92, 76), QPointF(92, 70))
         _ellipse(p, 78, 100, 12, 10, fur, ink)
@@ -268,7 +292,7 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.setPen(ink)
         p.setBrush(WOOD)
         p.drawRoundedRect(QRectF(56, 109, 56, 8), 2, 2)
-        p.setPen(QPen(WOOD_DARK, 1.2, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(QPointF(70, 113), QPointF(86, 113))
         p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
         _ellipse(p, 66, 108, 12, 10, fur, ink)                 # a paw holding the plank
@@ -299,7 +323,7 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.setPen(ink)
         p.setBrush(BAT)
         p.drawPath(bat)
-        p.setPen(QPen(WOOD, 1.2, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(WOOD, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(QPointF(-1.5, -40), QPointF(-2.5, -30))   # a bit of wood grain
         p.setPen(ink)
         p.setBrush(GRIP)
@@ -349,20 +373,20 @@ def _nightcap(p: QPainter, ink: QPen):
         p.drawLine(QPointF(x - 10, 50), QPointF(x + 6, 14))
     p.restore()
     p.setPen(ink)
-    p.setBrush(Qt.NoBrush)
+    p.setBrush(Qt.BrushStyle.NoBrush)
     p.drawPath(body)
     brim = QPainterPath(QPointF(22, 50))   # the soft white band round the bottom
     brim.quadTo(QPointF(50, 39), QPointF(78, 48))
-    p.setPen(QPen(INK, 9, Qt.SolidLine, Qt.RoundCap))
+    p.setPen(QPen(INK, 9, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
     p.drawPath(brim)
-    p.setPen(QPen(FUR, 6, Qt.SolidLine, Qt.RoundCap))
+    p.setPen(QPen(FUR, 6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
     p.drawPath(brim)
     _ellipse(p, 91, 49, 11, 11, FUR, ink)   # the bobble
 
 
 def _music_note(p: QPainter, x, y, k, col: QColor | None = None):
     col = col or QColor(theme.T["accent"])
-    p.setPen(QPen(col, 2.2 * k, Qt.SolidLine, Qt.RoundCap))
+    p.setPen(QPen(col, 2.2 * k, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 4 * k, y + 12 * k))
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 9 * k, y + 3 * k))
     _ellipse(p, x + 1.5 * k, y + 12.5 * k, 6 * k, 4.5 * k, col, None, -20)
@@ -377,7 +401,7 @@ def _sparkle(p: QPainter, x, y, r, col: QColor):
     path.quadTo(QPointF(x, y), QPointF(x, y + r))
     path.quadTo(QPointF(x, y), QPointF(x - r, y))
     path.quadTo(QPointF(x, y), QPointF(x, y - r))
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(col)
     p.drawPath(path)
 
@@ -386,18 +410,18 @@ sparkle = _sparkle
 
 
 def bunny_image(height: int, prop: str | None = None, dpr: float = 1.0,
-                robot: bool = False) -> QImage:
+                robot: bool = False, smug: bool = False) -> QImage:
     h = max(1, round(height * dpr))
     w = max(1, round(h * W / H))
-    img = QImage(w, h, QImage.Format_ARGB32_Premultiplied)
-    img.fill(Qt.transparent)
+    img = QImage(w, h, QImage.Format.Format_ARGB32_Premultiplied)
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    draw_bunny(p, QRectF(0, 0, w, h), prop, robot=robot)
+    draw_bunny(p, QRectF(0, 0, w, h), prop, robot=robot, smug=smug)
     p.end()
     img.setDevicePixelRatio(dpr)
     return img
 
 
 def bunny_pixmap(height: int, prop: str | None = None, dpr: float = 1.0,
-                 robot: bool = False) -> QPixmap:
-    return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot))
+                 robot: bool = False, smug: bool = False) -> QPixmap:
+    return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot, smug=smug))

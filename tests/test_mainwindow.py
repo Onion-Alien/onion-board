@@ -50,7 +50,9 @@ def window(qapp, app_dir, monkeypatch):
 
 def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
     """The splash pumps events while the window is built: the load_triggers timer can
-    run before __init__ ends, and threw AttributeError (_shut_down) when it did."""
+    run before __init__ ends, and threw AttributeError (_shut_down) when it did. So can
+    the Discord check's answer on a slow start (_setup_app, CI 2026-10-11): it comes
+    in at every pump here."""
     import sys
     import time
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
@@ -63,8 +65,15 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
     monkeypatch.setattr(main.MainWindow, "load_triggers",
                         lambda self, now=True: (calls.append(now), real(self, now)))
 
+    building = []
+    real_build = main.MainWindow._build_ui
+    monkeypatch.setattr(main.MainWindow, "_build_ui",
+                        lambda self: (building.append(self), real_build(self))[1])
+
     def slow_pump():   # a slow start with the splash up
         time.sleep(main.TRIGGERS_LOAD_MS / 1000 + 0.03)
+        for w in building:   # Discord isn't running: what its check says then
+            w.bridge.discord.emit(([], None))
         qapp.processEvents()
     monkeypatch.setattr(main.splash, "pump", slow_pump)
     Config(sounds=[]).save()

@@ -162,7 +162,7 @@ class HotkeyDialog(QDialog):
         # a way out on screen too (Esc and the title bar's ✕ were the only ones); it
         # takes no focus, so the keys pressed here all go to the capture
         cancel = QPushButton(_("Cancel"))
-        cancel.setFocusPolicy(Qt.NoFocus)
+        cancel.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         cancel.setAutoDefault(False)
         cancel.clicked.connect(self.reject)
         row = QHBoxLayout()
@@ -219,10 +219,10 @@ class HotkeyDialog(QDialog):
         if vk in winkeys.MODIFIER_VKS or not vk:
             return                # wait for the real key
         m = e.modifiers()
-        mods = ((winkeys.MOD_CONTROL if m & Qt.ControlModifier else 0)
-                | (winkeys.MOD_ALT if m & Qt.AltModifier else 0)
-                | (winkeys.MOD_SHIFT if m & Qt.ShiftModifier else 0)
-                | (winkeys.MOD_WIN if m & Qt.MetaModifier else 0))
+        mods = ((winkeys.MOD_CONTROL if m & Qt.KeyboardModifier.ControlModifier else 0)
+                | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
+                | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
+                | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
         if not mods and is_typing_key(vk) and self._warned_vk != vk:
             # a global hotkey takes the key away from every other program: warn once
             self._warned_vk = vk
@@ -322,19 +322,19 @@ class ThemeCard(QPushButton):
         self.setObjectName("themecard")
         self.setCheckable(True)
         self.setFixedSize(QSize(150, 112))
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def paintEvent(self, e):
         super().paintEvent(e)   # frame + checked border from the stylesheet
         t = theme.THEMES[self.name]
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(8, 8, -8, -30)
         win = QPainterPath()
         win.addRoundedRect(r, 8, 8)
         p.fillPath(win, QColor(t["bg"]))
         # side panel, pads and a slider, in the theme's own colours
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(t["panel"]))
         p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
         for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
@@ -357,7 +357,7 @@ class ThemeCard(QPushButton):
         f.setBold(True)
         p.setFont(f)
         p.drawText(QRectF(10, self.height() - 28, self.width() - 20, 22),
-                   Qt.AlignLeft | Qt.AlignVCenter, self.name)
+                   Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.name)
         p.end()
 
 
@@ -371,7 +371,7 @@ class ThemeGrid(QWidget):
         self.grid = QGridLayout(self)
         self.grid.setContentsMargins(0, 0, 0, 0)
         self.grid.setSpacing(12)
-        self.grid.setSizeConstraint(QLayout.SetNoConstraint)
+        self.grid.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self._reflow(1)
 
     def minimumSizeHint(self):
@@ -396,7 +396,7 @@ class ThemeGrid(QWidget):
         while self.grid.count():
             self.grid.takeAt(0)
         for i, card in enumerate(self.cards):
-            self.grid.addWidget(card, i // columns, i % columns, Qt.AlignLeft)
+            self.grid.addWidget(card, i // columns, i % columns, Qt.AlignmentFlag.AlignLeft)
         self.grid.setColumnStretch(columns, 1)
         self.columns = columns
         self.updateGeometry()
@@ -418,7 +418,7 @@ class SettingsDialog(QDialog):
         super().__init__(mw)
         self.embedded = embedded
         if embedded:
-            self.setWindowFlags(Qt.Widget)
+            self.setWindowFlags(Qt.WindowType.Widget)
             self.setObjectName("settingspage")   # the window's own background
         else:
             fit.watch(self)   # grows to fit its text (ui/fit.py)
@@ -454,7 +454,7 @@ class SettingsDialog(QDialog):
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))
-        self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.categories.setFixedWidth(196)
         self._unbuilt: dict[int, object] = {}   # tab index -> its page's builder
         for i, (key, title, icon, build) in enumerate(pages):
@@ -466,16 +466,17 @@ class SettingsDialog(QDialog):
             self.tabs.addTab(sa, title)
             icons.set_tab_icon(self.tabs, i, icon)
             item = QListWidgetItem(icons.icon(icon), title.replace("&&", "&"))
-            item.setData(Qt.UserRole, icon)
-            item.setData(Qt.UserRole + 1, title.replace("&&", "&"))   # (narrow: no text)
+            item.setData(Qt.ItemDataRole.UserRole, icon)
+            # (narrow: no text)
+            item.setData(Qt.ItemDataRole.UserRole + 1, title.replace("&&", "&"))
             item.setSizeHint(QSize(180, 38))
             self.categories.addItem(item)
         self._category_icons()
         self.tabs.tabBar().hide()
         # the list is the tab bar now: the hidden one stayed in the Tab order (the tab
         # widget hands its focus to it), so Tab from the list went nowhere
-        self.tabs.tabBar().setFocusPolicy(Qt.NoFocus)
-        self.tabs.setFocusPolicy(Qt.NoFocus)
+        self.tabs.tabBar().setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.tabs.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.tabs.setFocusProxy(None)
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
         self.tabs.currentChanged.connect(self._build_page)
@@ -494,9 +495,10 @@ class SettingsDialog(QDialog):
         self._search_wait = QTimer(self, singleShot=True, interval=150)
         self._search_wait.timeout.connect(lambda: self._apply_search(self.search_box.text()))
         self.search_box.textChanged.connect(lambda _t: self._search_wait.start())
-        find = QShortcut(QKeySequence.Find, self)
-        find.activated.connect(lambda: (self.search_box.setFocus(Qt.ShortcutFocusReason),
-                                        self.search_box.selectAll()))
+        find = QShortcut(QKeySequence.StandardKey.Find, self)
+        find.activated.connect(lambda: (
+            self.search_box.setFocus(Qt.FocusReason.ShortcutFocusReason),
+            self.search_box.selectAll()))
         side = self._side = QVBoxLayout()
         side.setSpacing(8)
         self.back_btn = None
@@ -537,7 +539,7 @@ class SettingsDialog(QDialog):
         # a search that finds nothing says so, in place of the pages
         self.no_match = QLabel()
         self.no_match.setObjectName("hint")
-        self.no_match.setAlignment(Qt.AlignCenter)
+        self.no_match.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.no_match.setWordWrap(True)
         self.no_match.hide()
         right.addWidget(self.no_match, 1)
@@ -579,7 +581,7 @@ class SettingsDialog(QDialog):
         self._content.setSpacing(8 if narrow else 16)
         for i in range(self.categories.count()):
             item = self.categories.item(i)
-            title = item.data(Qt.UserRole + 1)
+            title = item.data(Qt.ItemDataRole.UserRole + 1)
             item.setText("" if narrow else title)
             item.setToolTip(title if narrow else "")
             item.setSizeHint(QSize(40 if narrow else 180, 38))
@@ -630,7 +632,7 @@ class SettingsDialog(QDialog):
         first = named = None
         for i in range(self.tabs.count()):
             page = self.tabs.widget(i).widget()
-            title = self.categories.item(i).data(Qt.UserRole + 1).lower()
+            title = self.categories.item(i).data(Qt.ItemDataRole.UserRole + 1).lower()
             if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
                 self.categories.item(i).setHidden(True)
                 continue
@@ -667,7 +669,7 @@ class SettingsDialog(QDialog):
     def _category_icons(self):
         for i in range(self.categories.count()):
             item = self.categories.item(i)
-            name = item.data(Qt.UserRole)
+            name = item.data(Qt.ItemDataRole.UserRole)
             item.setIcon(icons.icon(name, selected="text_hi"))
 
     # ------------------------------------------------------------------ pages
@@ -677,9 +679,9 @@ class SettingsDialog(QDialog):
         each other, whenever the window can't grow to fit it (maximized, small screen)."""
         sa = QScrollArea()
         sa.setWidgetResizable(True)
-        sa.setFrameShape(QScrollArea.NoFrame)
-        sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        sa.setFocusPolicy(Qt.NoFocus)   # Tab goes straight to the page's first control
+        sa.setFrameShape(QScrollArea.Shape.NoFrame)
+        sa.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        sa.setFocusPolicy(Qt.FocusPolicy.NoFocus)   # Tab goes straight to the page's first control
         return sa
 
     @staticmethod
@@ -689,7 +691,7 @@ class SettingsDialog(QDialog):
             # row squeezed it onto two with room to spare)
             label.setWordWrap(not label.property("keepline"))
         for combo in page.findChildren(QComboBox):
-            combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             combo.setMinimumContentsLength(6)
         sa.setWidget(page)
 
@@ -879,8 +881,8 @@ class SettingsDialog(QDialog):
                 note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: see
                 # MainWindow._offer_language)
                 restart.setText(button)
-                note.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(code)
-                                        else Qt.LeftToRight)
+                note.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
+                                        else Qt.LayoutDirection.LeftToRight)
             note.setVisible(later)
             restart.setVisible(later)
 
@@ -912,11 +914,11 @@ class SettingsDialog(QDialog):
         swatch.setObjectName("power")
         swatch.setCheckable(True)
         swatch.setChecked(True)
-        swatch.setFocusPolicy(Qt.NoFocus)
-        swatch.setAttribute(Qt.WA_TransparentForMouseEvents)
+        swatch.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        swatch.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         swatch.setFixedWidth(64)
         swatch.setAccessibleName(_("Highlight colour preview"))
-        hue = QSlider(Qt.Horizontal)
+        hue = QSlider(Qt.Orientation.Horizontal)
         hue.setObjectName("hue")
         hue.setRange(0, 359)
         hue.setAccessibleName(_("Highlight colour hue"))
@@ -1209,12 +1211,12 @@ class SettingsDialog(QDialog):
 
     def _ov_slider(self, key, lo, hi, value):
         row = QHBoxLayout()
-        sl = QSlider(Qt.Horizontal)
+        sl = QSlider(Qt.Orientation.Horizontal)
         sl.setRange(lo, hi)
         sl.setValue(value)
         val = QLabel(_("{percent}%", percent=value))
         val.setFixedWidth(48)
-        val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        val.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         sl.valueChanged.connect(lambda x: (val.setText(_("{percent}%", percent=x)),
                                            self._ov_set(key, x)))
         no_wheel(sl)
@@ -1367,7 +1369,7 @@ class SettingsDialog(QDialog):
             cb.setMinimumWidth(120)
             # sized for a short name, the list opens wide enough for whole ones (device
             # names in "Send my sounds to" made the page scroll sideways)
-            cb.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             cb.setMinimumContentsLength(16)
             no_wheel(cb)
             cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
@@ -1383,7 +1385,7 @@ class SettingsDialog(QDialog):
         ref = QPushButton(_("Re-scan devices"))
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: mw.rescan_with_feedback(ref, self._sync_devices))
-        cv.addWidget(ref, 0, Qt.AlignLeft)
+        cv.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
         self._sync_devices()
         return card
 
@@ -1693,7 +1695,7 @@ class SettingsDialog(QDialog):
         from soundboard.updates import REPO
         card, cv = self._card("Onion Board")
         ver = self.about_version = QLabel(_("Version {version}", version=version_text()))
-        ver.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        ver.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         cv.addWidget(ver)
         hint = QLabel(_("Free, with no ads and no account. Made by OnionAlien. MIT license with "
                         "the Commons Clause: use it for anything, share it for free, never sell "
@@ -1746,7 +1748,7 @@ class SettingsDialog(QDialog):
         text = QLabel(DISCLAIMER)
         text.setObjectName("hint")
         text.setWordWrap(True)
-        text.setTextFormat(Qt.RichText)
+        text.setTextFormat(Qt.TextFormat.RichText)
         cv.addWidget(text)
         return card
 
@@ -1783,7 +1785,7 @@ class SettingsDialog(QDialog):
         """An add-on's name and what it's for, a status line, and its buttons, as rows
         of the Add-ons grid. (status label, {key: button})."""
         title = QLabel(f"<b>{html.escape(name)}</b> · {html.escape(blurb)}")
-        title.setTextFormat(Qt.RichText)
+        title.setTextFormat(Qt.TextFormat.RichText)
         title.setWordWrap(True)
         status = QLabel()
         status.setObjectName("hint")
@@ -1844,7 +1846,7 @@ class SettingsDialog(QDialog):
         a newer one calls `on_offer(offer)`, else the button says it's up to date."""
         from soundboard import net, netlog, updates
         if not net.allowed(feature):
-            busy.flash(btn, _("Add-on downloads are off (Privacy)"), 4000)
+            busy.toast(self, html.escape(_("Add-on downloads are off (Privacy)")), "warn")
             return
         release = busy.hold(btn, _("Checking…"))
         relay = self._AddonRelay(self)
@@ -2293,9 +2295,9 @@ class SettingsDialog(QDialog):
         grid.addWidget(QLabel(_("Save videos in")), 1, 0)
         self.data_folder = QLabel()
         self.data_folder.setObjectName("hint")
-        self.data_folder.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.data_folder.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         # a path has no spaces to wrap at: it gets cut short instead of widening the page
-        self.data_folder.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        self.data_folder.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         grid.addWidget(self.data_folder, 1, 1, 1, 2)
         row = _button_row()
         change = QPushButton(_("Change"))
@@ -2707,7 +2709,7 @@ class SettingsDialog(QDialog):
         elif key in ("app_update", "ytdlp_update"):
             go = QPushButton(_("Update settings"))
             go.clicked.connect(lambda: self.tabs.setCurrentIndex(self._page_keys.index("updates")))
-            sl.addWidget(go, 0, Qt.AlignLeft)
+            sl.addWidget(go, 0, Qt.AlignmentFlag.AlignLeft)
 
     def _set_feature(self, key: str, on: bool):
         from soundboard import net, usage
@@ -2973,8 +2975,8 @@ class SettingsDialog(QDialog):
         kind = QComboBox()
         kind.addItem(_("Snowflake"), "snowflake")
         kind.addItem("obfs4", "obfs4")
-        kind.setItemData(0, _("Looks like a video call"), Qt.ToolTipRole)
-        kind.setItemData(1, _("Looks like random noise"), Qt.ToolTipRole)
+        kind.setItemData(0, _("Looks like a video call"), Qt.ItemDataRole.ToolTipRole)
+        kind.setItemData(1, _("Looks like random noise"), Qt.ItemDataRole.ToolTipRole)
         kind.setCurrentIndex(max(0, kind.findData(cfg.tor_bridges or tor.DEFAULT_BRIDGE)))
         kind.setToolTip(_("If one doesn't connect, try the other"))
         no_wheel(kind)
@@ -3235,14 +3237,14 @@ class SettingsDialog(QDialog):
         row.addWidget(QLabel(_("Key")), 1, 0)
         key = QLineEdit()
         key.setReadOnly(True)
-        key.setEchoMode(QLineEdit.Password)
+        key.setEchoMode(QLineEdit.EchoMode.Password)
         key.setAccessibleName(_("Key"))
         row.addWidget(key, 1, 1)
         show = QPushButton(_("Show"))
         show.setCheckable(True)
 
         def show_key(b: bool):
-            key.setEchoMode(QLineEdit.Normal if b else QLineEdit.Password)
+            key.setEchoMode(QLineEdit.EchoMode.Normal if b else QLineEdit.EchoMode.Password)
             show.setText(_("Hide") if b else _("Show"))
 
         show.toggled.connect(show_key)
@@ -3268,7 +3270,7 @@ class SettingsDialog(QDialog):
                          endpoints=" · ".join(f"/api/{a}" for a in remote.ENDPOINTS)))
         help_.setObjectName("hint")
         help_.setWordWrap(True)
-        help_.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        help_.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         cv.addWidget(help_)
 
         def refresh(err: str = ""):
@@ -3302,13 +3304,15 @@ class SettingsDialog(QDialog):
             refresh(mw.apply_remote())
             busy.flash(new, _("✓ New key made"))
             if mw.remote.running:
-                state.setText(_("New key made: anything using the old one has stopped working. "
-                                "Copy the example link for the new one."))
+                busy.toast(self, html.escape(_(
+                    "New key made: anything using the old one has stopped working. Copy the "
+                    "example link for the new one.")), "warn")
 
         def copy_link():
             QApplication.clipboard().setText(
                 f"http://{remote.HOST}:{cfg.api_port}/api/random?token={cfg.api_token}")
-            state.setText(_("Copied. It holds your key: only paste it into your own tools."))
+            busy.toast(self, html.escape(_("Copied. It holds your key: only paste it into your "
+                                           "own tools.")), "ok")
 
         on.toggled.connect(set_on)
         port.editingFinished.connect(set_port)
@@ -3393,15 +3397,15 @@ class SettingsDialog(QDialog):
                 _("Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play "
                   "your pads any more. Paired phones are kept for when you get it again.\n\nYou "
                   "can get it again from Settings → Remote any time."),
-                QMessageBox.Yes | QMessageBox.No, QMessageBox.No) != QMessageBox.Yes:
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
             return
         try:
             self.mw.remove_remote_addon(info)
         except modules.ModuleError as e:
             log.warning("Onion Pocket couldn't be removed: %s", e)
-            QMessageBox.warning(self, _("Onion Pocket wasn't removed"),
-                                _("Onion Pocket wasn't removed: {error}",
-                                  error=errors.plain(e)))
+            busy.toast(self, html.escape(_("Onion Pocket wasn't removed: {error}",
+                                           error=errors.plain(e))), "error")
             return
         self.mw.pocket_offer = None
         if getattr(self, "_pocket_slot", None) is not None:

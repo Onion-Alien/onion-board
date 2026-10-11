@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Uudelleenetsintä epäonnistui",
   "Couldn't reach GitHub ({error}).": "GitHubiin ei saatu yhteyttä ({error}).",
   "Couldn't read the {name} board": "{name}-boardia ei voitu lukea",
-  "Couldn't render it": "Sitä ei voitu tehdä",
   "Couldn't render the preview with these effects (see the log).": "Esikatselua ei voitu tehdä näillä efekteillä (katso loki).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Nollaus epäonnistui: asetustiedosto oli lukittu. Mitään ei muutettu.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Palautus epäonnistui: asetustiedosto oli lukittu. Mitään ei muutettu.",
@@ -754,7 +753,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} on valmis. Käynnistetäänkö uudelleen nyt asentamiseksi?",
   "Onion Board: quick setup": "Onion Board: pika-asennus",
   "Onion Pocket isn't installed.": "Onion Pocketia ei ole asennettu.",
-  "Onion Pocket wasn't removed": "Onion Pocketia ei poistettu",
   "Onion Pocket wasn't removed: {error}": "Onion Pocketia ei poistettu: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: nappisi puhelimessasi",
   "Onion Watch isn't installed.": "Onion Watchia ei ole asennettu.",
@@ -1256,7 +1254,6 @@
   "Update settings": "Päivitysasetukset",
   "Update to {version}": "Päivitä versioon {version}",
   "Update: {version}": "Päivitys: {version}",
-  "Updated": "Päivitetty",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Päivitetty: Onion Board {version}. Mikään ei muutu ennen kuin haluat: kaikki toimii kuten ennenkin.",
   "Updates": "Päivitykset",
   "Updates and add-ons": "Päivitykset ja lisäosat",
@@ -1983,7 +1980,6 @@
   "Onion Watch download progress": "Sipuli Katso latauksen edistymistä",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watchia ladataan juuri nyt. Yritä uudelleen, kun se on valmis.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch ei ole vielä ladattavissa (GitHub sanoo, ettei se löydä sitä). Yritä myöhemmin uudelleen.",
-  "Onion Watch wasn't removed": "Onion Watchia ei poistettu",
   "Onion Watch wasn't removed: {error}": "Sipulikelloa ei poistettu: {error}",
   "Onion Watch wasn't updated: {error}": "Sipulikelloa ei päivitetty: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} on asennettu. Käynnistä Onion Board uudelleen aloittaaksesi sen käytön.",
@@ -2058,15 +2054,7 @@
   "Save as a voice": "Tallenna äänenä",
   "Save clip": "Tallenna klippi",
   "Saved clips": "Tallennetut leikkeet",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Tallennetut leikkeet ({clips}) · ✓ lisätty ääniisi",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Tallennetut leikkeet ({clips}) · ✓ lisätty {n} ääniisi",
-    "Tallennetut leikkeet ({clips}) · ✓ lisätty {n} ääniisi"
-  ],
   "Saved clips ({n})": "Tallennetut leikkeet ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Tallennetut leikkeet ({n}) · kopioitu \"{name}\": Ctrl+V liittää sen editoriin tai Äänet-välilehteen",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Tallennetut leikkeet ({n}) · ei kuulokkeita toistettavaksi: valitse ne Asetukset-välilehdeltä",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Tallennetut leikkeet ({n}) · ei minne lähetettävää: valitse Asetukset-välilehdellä, minne äänesi kulkevat",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Tallennetut poistamasi äänet, säilytetty {n} päivän, jotta voit palauttaa ne",
     "Tallennetut poistamasi äänet, säilytetty {n} päivää, jotta voit palauttaa ne"
@@ -2197,7 +2185,6 @@
   "There's no sound to download at that link.": "Tuosta linkistä ei ole ladattavaa ääntä.",
   "This add-on has no install steps.": "Tässä lisäosassa ei ole asennusvaiheita.",
   "This copy of Onion Board has no mic effect in it.": "Tässä Onion Boardin kopiossa ei ole mikrofoniefektiä.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Tämä näyttää ongelmalta Onion Boardissa. Sen ilmoittaminen avaa GitHubissa sivun, jossa tiedot on täytetty; valitset mitä lähetät.",
   "This program's volume in the mix": "Tämän ohjelman äänenvoimakkuus sekoituksessa",
   "Tone": "Sävy",
   "Too short to keep.": "Liian lyhyt säilytettäväksi.",
@@ -3116,7 +3103,22 @@
   "Your sounds and settings are kept.": "Äänesi ja asetuksesi säilyvät.",
   "{error}": "{error}",
   "Update mic effect": "Päivitä mikrofonitehoste",
-  "Update to new version": "Päivitä uuteen versioon",
+  "Added the voice “{name}”": "Ääni ”{name}” lisätty",
+  "Added {n} clip to your Sounds": [
+    "{n} leike lisätty ääniisi",
+    "{n} leikettä lisätty ääniisi"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "”{name}” kopioitu: Ctrl+V liittää sen editoriin tai Äänet-välilehdelle",
+  "Keep": "Säilytä",
+  "Keep your imported sounds?": "Säilytetäänkö tuodut äänet?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Toimme <b>{n}</b> äänen muista soundboardeistasi. Säilytetäänkö se?",
+    "Toimme <b>{n}</b> ääntä muista soundboardeistasi. Säilytetäänkö ne?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Toimme <b>{n}</b> äänen sovelluksesta {name}. Säilytetäänkö se?",
+    "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
+  ],
   "Compatibility fixes for games, calls and browsers.": "Yhteensopivuuskorjauksia peleihin, puheluihin ja selaimiin.",
   "Install update": "Asenna päivitys",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikki päivitetty: pelit, puhelut ja selaimet kuulevat äänesi.",

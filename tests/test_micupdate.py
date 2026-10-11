@@ -22,7 +22,7 @@ def outdated(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(dm, "status", lambda name=None: state["status"])
     monkeypatch.setattr(w.cfg, "save", lambda: True)
     monkeypatch.setattr(w, "attach_mic", lambda: state["tried"].append(w.cfg.mic_device))
-    monkeypatch.setattr(w, "toast", lambda text, kind="", **kw: state["toasts"].append(
+    monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **kw: state["toasts"].append(
         (text, kind)))
     monkeypatch.setattr(w, "isVisible", lambda: True)
     return w, state
@@ -129,16 +129,14 @@ def test_not_offered_when_not_needed(outdated):
 
 def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
     w, state = outdated
-    boxes = []
-    monkeypatch.setattr(main.QMessageBox, "warning", lambda *a: boxes.append(a[2]))
     monkeypatch.setattr(w, "set_route", lambda *a, **k: None)
     w._mic_updating = True
-    w._mic_attached("My mic", dm.declined())   # No in Windows' prompt
-    assert not boxes and state["toasts"][-1][1] == "warn"
-    assert "cancelled" in state["toasts"][-1][0]
+    w._mic_attached("My mic", dm.declined())   # No in Windows' prompt: a note, no error
+    assert state["toasts"][-1][1] == "warn" and "cancelled" in state["toasts"][-1][0]
+    assert all(kind != "error" for _t, kind in state["toasts"])
     w._mic_updating = True
-    w._mic_attached("My mic", "Installing failed (code 5).")
-    assert boxes and "code 5" in boxes[-1]
+    w._mic_attached("My mic", "Installing failed (code 5).")   # a real failure: an error
+    assert state["toasts"][-1][1] == "error" and "code 5" in state["toasts"][-1][0]
     w._mic_updating = True
     w._mic_attached("My mic", "")
     assert state["toasts"][-1] == ("Mic updated: games, calls and browsers hear your "

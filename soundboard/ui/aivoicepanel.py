@@ -7,6 +7,7 @@ settings under "ai".
 """
 from __future__ import annotations
 
+import html
 import json
 import logging
 import re
@@ -134,9 +135,9 @@ class AiVoicePanel(QWidget):
         self.b_start.setMinimumHeight(40)
         self.b_start.setObjectName("primary")
         self.b_start.toggled.connect(self._toggle)
-        action.addWidget(self.b_start, 0, Qt.AlignTop)
+        action.addWidget(self.b_start, 0, Qt.AlignmentFlag.AlignTop)
         self.lbl_state = QLabel(IDLE)
-        self.lbl_state.setTextFormat(Qt.PlainText)
+        self.lbl_state.setTextFormat(Qt.TextFormat.PlainText)
         self.lbl_state.setObjectName("muted")
         self.lbl_state.setWordWrap(True)
         self.lbl_state.setMinimumWidth(0)
@@ -151,7 +152,7 @@ class AiVoicePanel(QWidget):
         vrow.setSpacing(10)
         self.cb_voice = QComboBox()
         self.cb_voice.setMinimumWidth(0)
-        self.cb_voice.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.cb_voice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         vrow.addWidget(self.cb_voice, 1)
         self.b_all = QPushButton(_("All voices"))
         icons.set_icon(self.b_all, "sounds")
@@ -168,8 +169,8 @@ class AiVoicePanel(QWidget):
         self.chk_auto.setToolTip(_("Moves your pitch to where this voice naturally sits, "
                                  "whoever is talking. Off: your own pitch."))
         self.chk_auto.setChecked(self.s["auto_pitch"])
-        grid.addWidget(self.chk_auto, 3, 1, Qt.AlignRight)
-        self.sl_pitch = QSlider(Qt.Horizontal)
+        grid.addWidget(self.chk_auto, 3, 1, Qt.AlignmentFlag.AlignRight)
+        self.sl_pitch = QSlider(Qt.Orientation.Horizontal)
         self.sl_pitch.setRange(-24, 24)            # half semitones
         self.sl_pitch.setValue(int(round(self.s["pitch"] * 2)))
         self.sl_pitch.setMinimumHeight(28)
@@ -177,7 +178,7 @@ class AiVoicePanel(QWidget):
         prow.addWidget(self.sl_pitch, 1)
         self.lbl_pitch = QLabel("")
         self.lbl_pitch.setMinimumWidth(38)
-        self.lbl_pitch.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.lbl_pitch.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         prow.addWidget(self.lbl_pitch)
         grid.addLayout(prow, 4, 0, 1, 2)
         grid.setColumnStretch(1, 1)
@@ -193,7 +194,7 @@ class AiVoicePanel(QWidget):
         setup_row = QHBoxLayout()
         setup_row.setSpacing(16)
         self.bun_robot = BunnyWidget(height=88, pad=14, robot=True)
-        setup_row.addWidget(self.bun_robot, 0, Qt.AlignVCenter)
+        setup_row.addWidget(self.bun_robot, 0, Qt.AlignmentFlag.AlignVCenter)
 
         info = QVBoxLayout()
         info.setSpacing(8)
@@ -229,7 +230,7 @@ class AiVoicePanel(QWidget):
         v.addWidget(self.missing)
 
         self.btn_opts = fold_button(_("More options"))
-        v.addWidget(self.btn_opts, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_opts, 0, Qt.AlignmentFlag.AlignLeft)
         self.opts = QWidget()
         ov = QVBoxLayout(self.opts)
         ov.setContentsMargins(0, 0, 0, 0)
@@ -623,12 +624,12 @@ class AiVoicePanel(QWidget):
             busy.toast(self, _("AI voices are installed. Pick a voice and press Start."), "ok")
         else:
             self._refresh()                 # the buttons come back to try again
-            self.lbl_install.show()
-            self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
-                                       "if it keeps failing, run install.bat in the add-on's "
-                                       "folder to see why.",
-                                       error=err or self._last_line[-160:] or
-                                       self.lbl_install.text()))
+            last = self.lbl_install.text()
+            self.lbl_install.hide()
+            busy.toast(self, html.escape(_(
+                "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, "
+                "run install.bat in the add-on's folder to see why.",
+                error=err or self._last_line[-160:] or last).removeprefix("⚠ ")), "error")
 
     def shutdown(self):
         self.ctl.shutdown()

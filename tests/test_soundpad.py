@@ -4,6 +4,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 import soundfile as sf
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
@@ -129,10 +131,12 @@ def test_a_dropped_spl_goes_to_the_soundpad_import(main_window, monkeypatch):  #
 
 
 @pytest.mark.windows   # Windows paths
-def test_the_installers_box_imports_on_first_start_without_asking(
-        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+@pytest.mark.parametrize("answer, kept", [("Keep", 5), ("Remove", 2), (None, 5)])
+def test_the_installers_box_imports_on_first_start_then_asks_to_keep(
+        main_window, qapp, tmp_path, monkeypatch, answer, kept):  # noqa: F811
     """Ticked in the installer, it leaves a note; the first start does the import with
-    no question (the tick was the yes), and only once."""
+    no question first (the tick was the yes), and only once. Once they're in, one box
+    asks whether to keep them: Remove takes them all off again, closing it keeps them."""
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
@@ -140,11 +144,35 @@ def test_the_installers_box_imports_on_first_start_without_asking(
     note.parent.mkdir(parents=True, exist_ok=True)
     note.write_text("soundpad", encoding="utf-8")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: pytest.fail("asked"))
+    asked = []
+
+    def answer_box(box):
+        asked.append(box.text())
+        if answer is None:
+            QTest.keyClick(box, Qt.Key_Escape)   # closed with Esc
+            return 0
+        next(b for b in box.buttons() if b.text() == answer).click()
+        return 0
+    monkeypatch.setattr(QMessageBox, "exec", answer_box)
     w.import_queued()
     assert not note.exists()
-    assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
+    assert process_events(qapp, lambda: not w._pending_imports and asked)
+    assert "<b>3</b> sounds from Soundpad" in asked[0]
+    assert len(w.cfg.sounds) == kept
     w.import_queued()                            # no note: nothing happens
-    assert not w._pending_imports and len(w.cfg.sounds) == 5
+    assert not w._pending_imports and len(w.cfg.sounds) == kept and len(asked) == 1
+
+
+@pytest.mark.windows   # Windows paths
+def test_an_import_from_the_menu_is_not_asked_again(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
+    w.import_other(soundpad.SOURCE)
+    assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
 
 
 def test_a_queued_import_with_soundpad_gone_does_nothing(

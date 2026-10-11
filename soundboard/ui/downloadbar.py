@@ -49,7 +49,7 @@ class SmoothProgressBar(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(1000 // 30)
         self._timer.timeout.connect(self.update)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
     def set_indeterminate(self, on: bool):
         if on:
@@ -82,10 +82,10 @@ class SmoothProgressBar(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect())
         rad = r.height() / 2
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         groove = QColor(theme.T.get("groove", theme.mix(theme.T["card"], theme.T["text"], 0.12)))
         p.setBrush(groove)
         p.drawRoundedRect(r, rad, rad)
@@ -110,8 +110,8 @@ class ElideLabel(QLabel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setTextFormat(Qt.PlainText)
-        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.setTextFormat(Qt.TextFormat.PlainText)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
     def minimumSizeHint(self) -> QSize:
         return QSize(0, super().minimumSizeHint().height())
@@ -122,9 +122,11 @@ class ElideLabel(QLabel):
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        text = self.fontMetrics().elidedText(self.text(), Qt.ElideRight, self.width())
-        self.style().drawItemText(p, self.rect(), int(Qt.AlignLeft | Qt.AlignVCenter),
-                                  self.palette(), self.isEnabled(), text, QPalette.WindowText)
+        text = self.fontMetrics().elidedText(self.text(), Qt.TextElideMode.ElideRight, self.width())
+        self.style().drawItemText(p, self.rect(),
+                                  int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter),
+                                  self.palette(), self.isEnabled(), text,
+                                  QPalette.ColorRole.WindowText)
         p.end()
 
 
@@ -139,7 +141,7 @@ class Outcome(QWidget):
 
     def __init__(self, bar: QFrame):
         super().__init__(bar)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.ok = True
         self.spot = QRectF()   # the picture's box, in the bar's pixels (empty: no badge)
         self._k = 0.0
@@ -164,7 +166,7 @@ class Outcome(QWidget):
         self.hide()
 
     def running(self) -> bool:
-        return self._anim.state() == QVariantAnimation.Running
+        return self._anim.state() == QVariantAnimation.State.Running
 
     def k(self) -> float:
         return self._k
@@ -178,7 +180,7 @@ class Outcome(QWidget):
     def paintEvent(self, _e):
         k = self._k
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         red = QColor(theme.status("error"))
         if self.spot.isEmpty():
             p.end()
@@ -198,14 +200,16 @@ class Outcome(QWidget):
             path.lineTo(c.x() + a, c.y() + a)
             path.moveTo(c.x() - a, c.y() + a)
             path.lineTo(c.x() + a, c.y() - a)
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         edge = QColor(theme.T["bg"]).darker(140)   # a thin dark edge: shows on any picture
         edge.setAlphaF(0.7 * fade)
-        p.setPen(QPen(edge, 5.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setPen(QPen(edge, 5.0, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                      Qt.PenJoinStyle.RoundJoin))
         p.drawPath(path)
         mark = QColor(theme.status("ok") if self.ok else red)
         mark.setAlphaF(fade)
-        p.setPen(QPen(mark, 3.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setPen(QPen(mark, 3.0, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                      Qt.PenJoinStyle.RoundJoin))
         p.drawPath(path)
         p.end()
 
@@ -262,15 +266,15 @@ def _rounded(pm: QPixmap, w: int, h: int, radius: int, dpr: float) -> QPixmap:
     """`pm` filled into a w x h box (cropped, not squashed) with rounded corners."""
     out = QPixmap(round(w * dpr), round(h * dpr))
     out.setDevicePixelRatio(dpr)
-    out.fill(Qt.transparent)
+    out.fill(Qt.GlobalColor.transparent)
     p = QPainter(out)
-    p.setRenderHint(QPainter.Antialiasing)
-    p.setRenderHint(QPainter.SmoothPixmapTransform)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     path = QPainterPath()
     path.addRoundedRect(QRectF(0, 0, w, h), radius, radius)
     p.setClipPath(path)
-    src = pm.scaled(round(w * dpr), round(h * dpr), Qt.KeepAspectRatioByExpanding,
-                    Qt.SmoothTransformation)
+    src = pm.scaled(round(w * dpr), round(h * dpr), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                    Qt.TransformationMode.SmoothTransformation)
     p.drawPixmap(QRectF(0, 0, w, h), src, QRectF(
         (src.width() - w * dpr) / 2, (src.height() - h * dpr) / 2, w * dpr, h * dpr))
     p.end()
@@ -283,14 +287,14 @@ def _placeholder(w: int, h: int, radius: int, dpr: float) -> QPixmap:
     T = theme.T
     out = QPixmap(round(w * dpr), round(h * dpr))
     out.setDevicePixelRatio(dpr)
-    out.fill(Qt.transparent)
+    out.fill(Qt.GlobalColor.transparent)
     p = QPainter(out)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     grad = QLinearGradient(0, 0, w, h)
     grad.setColorAt(0, QColor(theme.mix(T["card"], T["accent"], 0.75)))
     grad.setColorAt(1, QColor(theme.mix(T["card"], T["accent"], 0.25)))
     p.setBrush(grad)
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.drawRoundedRect(QRectF(0, 0, w, h), radius, radius)
     side = round(h * 0.6)
     glyph = icons.pixmap("wave", round(side * dpr), T["live_text"])
@@ -319,7 +323,7 @@ class _QueueRow(QFrame):
     clicked = Signal()
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.LeftButton:
+        if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         super().mousePressEvent(ev)
 
@@ -330,7 +334,7 @@ class _Summary(QWidget):
     clicked = Signal()
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.LeftButton:
+        if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         super().mousePressEvent(ev)
 
@@ -388,43 +392,43 @@ class DownloadBar(QFrame):
         # bar, and a chevron (or a click anywhere on it) to open it again
         sm = self.summary = _Summary()
         sm.setObjectName("downloadhead")
-        sm.setCursor(Qt.PointingHandCursor)
+        sm.setCursor(Qt.CursorShape.PointingHandCursor)
         sm.clicked.connect(lambda: self.set_collapsed(False))
         sl = QHBoxLayout(sm)
         sl.setContentsMargins(12, 6, 8, 6)
         sl.setSpacing(8)
         self.s_icon = QLabel()
         self.s_icon.setFixedSize(14, 14)
-        sl.addWidget(self.s_icon, 0, Qt.AlignVCenter)
+        sl.addWidget(self.s_icon, 0, Qt.AlignmentFlag.AlignVCenter)
         self.s_name = QLabel(_("Downloads"))
         self.s_name.setObjectName("summaryname")
-        sl.addWidget(self.s_name, 0, Qt.AlignVCenter)
+        sl.addWidget(self.s_name, 0, Qt.AlignmentFlag.AlignVCenter)
         self.s_text = ElideLabel()
         self.s_text.setObjectName("downloadstatus")
-        sl.addWidget(self.s_text, 0, Qt.AlignVCenter)
+        sl.addWidget(self.s_text, 0, Qt.AlignmentFlag.AlignVCenter)
         self.s_failed = QLabel()
         self.s_failed.setObjectName("summaryfailed")
         self.s_failed.hide()
-        sl.addWidget(self.s_failed, 0, Qt.AlignVCenter)
+        sl.addWidget(self.s_failed, 0, Qt.AlignmentFlag.AlignVCenter)
         sl.addStretch(1)
         self.s_bar = SmoothProgressBar()
         self.s_bar.setFixedHeight(4)
         self.s_bar.setMaximumWidth(220)
-        sl.addWidget(self.s_bar, 1, Qt.AlignVCenter)
+        sl.addWidget(self.s_bar, 1, Qt.AlignmentFlag.AlignVCenter)
         self.btn_expand = QPushButton()
         self.btn_expand.setObjectName("urgenthide")
         self.btn_expand.setToolTip(_("Show more"))
-        self.btn_expand.setCursor(Qt.PointingHandCursor)
+        self.btn_expand.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_expand.setFixedSize(22, 22)
         self.btn_expand.clicked.connect(lambda: self.set_collapsed(False))
-        sl.addWidget(self.btn_expand, 0, Qt.AlignVCenter)
+        sl.addWidget(self.btn_expand, 0, Qt.AlignmentFlag.AlignVCenter)
         self.s_close = QPushButton("✕")
         self.s_close.setObjectName("urgenthide")
         self.s_close.setToolTip(_("Dismiss"))
         self.s_close.setFixedSize(22, 22)
         self.s_close.clicked.connect(self._clear_and_hide)
         self.s_close.hide()
-        sl.addWidget(self.s_close, 0, Qt.AlignVCenter)
+        sl.addWidget(self.s_close, 0, Qt.AlignmentFlag.AlignVCenter)
         outer.addWidget(sm)
         sm.hide()
         self._collapsed = False
@@ -439,11 +443,11 @@ class DownloadBar(QFrame):
         # Thumbnail / icon
         self.thumb = QLabel()
         self.thumb.setFixedSize(THUMB_W, THUMB_H)
-        self.thumb.setAlignment(Qt.AlignCenter)
-        h.addWidget(self.thumb, 0, Qt.AlignVCenter)
+        self.thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h.addWidget(self.thumb, 0, Qt.AlignmentFlag.AlignVCenter)
         # no picture of its own (an MP3, a link without art): Bun writes the download down
         self.scribe = ScribeBunny()
-        h.addWidget(self.scribe, 0, Qt.AlignVCenter)
+        h.addWidget(self.scribe, 0, Qt.AlignmentFlag.AlignVCenter)
 
         # Center column: pill, title and uploader on line 1, status and progress on line 2
         col = self._col = QVBoxLayout()
@@ -461,7 +465,7 @@ class DownloadBar(QFrame):
             v = QVBoxLayout()
             v.setContentsMargins(0, 0, 0, 0)
             v.setSpacing(0)
-            drop = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Fixed)
+            drop = QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
             v.addItem(drop)
             v.addWidget(w)
             self._drops[w] = drop
@@ -470,7 +474,7 @@ class DownloadBar(QFrame):
 
         self.pill = QLabel()
         self.pill.setObjectName("actionpill")
-        self.pill.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.pill.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         hang(self.pill)
 
         self.lbl_title = ElideLabel()
@@ -482,7 +486,7 @@ class DownloadBar(QFrame):
 
         self.src_icon = QLabel()   # where it's from: the site's logo, then its name
         self.src_icon.setFixedSize(14, 14)
-        self.src_icon.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.src_icon.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         hang(self.src_icon)
         self.lbl_src = QLabel()
         self.lbl_src.setObjectName("downloadmeta")
@@ -499,7 +503,7 @@ class DownloadBar(QFrame):
         self.btn_min = QPushButton(self)
         self.btn_min.setObjectName("urgenthide")
         self.btn_min.setToolTip(_("Hide"))
-        self.btn_min.setCursor(Qt.PointingHandCursor)
+        self.btn_min.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_min.setFixedSize(22, 22)
         self.btn_min.clicked.connect(
             lambda: (usage.used("dl-bar-small"), self.set_collapsed(True)))
@@ -520,49 +524,49 @@ class DownloadBar(QFrame):
         self.bar = SmoothProgressBar()
         self.bar.setMaximumWidth(BAR_W)
         self.bar.setMinimumWidth(BAR_MIN_W)
-        row2.addWidget(self.bar, 1, Qt.AlignVCenter)
+        row2.addWidget(self.bar, 1, Qt.AlignmentFlag.AlignVCenter)
 
         self.lbl_status = QLabel()
         self.lbl_status.setObjectName("downloadstatus")
-        self.lbl_status.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        row2.addWidget(self.lbl_status, 0, Qt.AlignVCenter)
+        self.lbl_status.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        row2.addWidget(self.lbl_status, 0, Qt.AlignmentFlag.AlignVCenter)
         # what's left past the bar's length goes between the words and the buttons
         row2.addStretch(0)
 
         col.addLayout(row2)
         h.addLayout(col, 1)
-        h.setAlignment(col, Qt.AlignVCenter)   # the two lines together, in the middle
+        h.setAlignment(col, Qt.AlignmentFlag.AlignVCenter)   # the two lines together, in the middle
 
         # after the progress, on its line: the queue's button, Stop all, Cancel
         self.queue_badge = QPushButton()
         self.queue_badge.setObjectName("queuebadge")
         self.queue_badge.setCheckable(True)
-        self.queue_badge.setCursor(Qt.PointingHandCursor)
-        self.queue_badge.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.queue_badge.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.queue_badge.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.queue_badge.toggled.connect(self._toggle_panel)
         self.queue_badge.hide()
-        row2.addWidget(self.queue_badge, 0, Qt.AlignVCenter)
+        row2.addWidget(self.queue_badge, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.btn_stop_all = QPushButton(_("Stop all"))
         self.btn_stop_all.setObjectName("cancelbutton")
-        self.btn_stop_all.setCursor(Qt.PointingHandCursor)
+        self.btn_stop_all.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_stop_all.clicked.connect(self._on_stop_all)
         self.btn_stop_all.hide()
-        row2.addWidget(self.btn_stop_all, 0, Qt.AlignVCenter)
+        row2.addWidget(self.btn_stop_all, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.btn_retry = QPushButton(_("Retry"))   # it failed: try it again
         self.btn_retry.setObjectName("retrybutton")
-        self.btn_retry.setCursor(Qt.PointingHandCursor)
+        self.btn_retry.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_retry.clicked.connect(lambda: self._retry(self.url))
         self.btn_retry.hide()
-        row2.addWidget(self.btn_retry, 0, Qt.AlignVCenter)
+        row2.addWidget(self.btn_retry, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.btn_cancel = QPushButton(_("Cancel"))
         self.btn_cancel.setObjectName("cancelbutton")
-        self.btn_cancel.setCursor(Qt.PointingHandCursor)
+        self.btn_cancel.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_cancel.setToolTip(_("Cancel download"))
         self.btn_cancel.clicked.connect(self._on_cancel)
-        row2.addWidget(self.btn_cancel, 0, Qt.AlignVCenter)
+        row2.addWidget(self.btn_cancel, 0, Qt.AlignmentFlag.AlignVCenter)
 
         # The queue: one row per pick waiting, each with its own ✕
         self.panel = QWidget()
@@ -578,7 +582,7 @@ class DownloadBar(QFrame):
         ph.addStretch(1)
         self.btn_panel_stop = QPushButton(_("Stop all"))   # the head's is hidden in the mini player
         self.btn_panel_stop.setObjectName("cancelbutton")
-        self.btn_panel_stop.setCursor(Qt.PointingHandCursor)
+        self.btn_panel_stop.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_panel_stop.clicked.connect(self._on_stop_all)
         self.btn_panel_stop.hide()
         ph.addWidget(self.btn_panel_stop)
@@ -586,8 +590,8 @@ class DownloadBar(QFrame):
         self.scroll = QScrollArea()
         self.scroll.setObjectName("queuescroll")
         self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.NoFrame)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         holder = QWidget()
         holder.setObjectName("queueholder")
         self.rows = QVBoxLayout(holder)
@@ -677,7 +681,8 @@ class DownloadBar(QFrame):
         line_at[self.src_icon] = self.src_icon.height() / 2 + cap_mid
         base = max(line_at.values())
         for w, drop in self._drops.items():
-            drop.changeSize(0, round(base - line_at[w]), QSizePolicy.Minimum, QSizePolicy.Fixed)
+            drop.changeSize(0, round(base - line_at[w]), QSizePolicy.Policy.Minimum,
+                            QSizePolicy.Policy.Fixed)
         self._row1.invalidate()
 
     def paintEvent(self, ev):
@@ -687,7 +692,7 @@ class DownloadBar(QFrame):
             red = QColor(theme.status("error"))
             fade = 1.0 - self.outcome.k()
             p = QPainter(self)
-            p.setRenderHint(QPainter.Antialiasing)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
             fill = QColor(red)
             fill.setAlphaF(0.28 * fade)
             edge = QColor(red)
@@ -952,11 +957,11 @@ class DownloadBar(QFrame):
             row = _QueueRow()
             row.setObjectName("queuerow")
             if not bad and i > 1:   # the first one is next up already
-                row.setCursor(Qt.PointingHandCursor)
+                row.setCursor(Qt.CursorShape.PointingHandCursor)
                 row.setToolTip(_("Download this one next"))
                 row.clicked.connect(lambda u=q["url"]: self.front_requested.emit(u))
             row.setProperty("failed", bad)
-            row.setAttribute(Qt.WA_Hover)
+            row.setAttribute(Qt.WidgetAttribute.WA_Hover)
             rl = QHBoxLayout(row)
             rl.setContentsMargins(8, 4, 6, 4)
             rl.setSpacing(8)
@@ -980,18 +985,18 @@ class DownloadBar(QFrame):
                 rl.addWidget(why)
                 again = QPushButton(_("Retry"))
                 again.setObjectName("retrybutton")
-                again.setCursor(Qt.PointingHandCursor)
+                again.setCursor(Qt.CursorShape.PointingHandCursor)
                 again.clicked.connect(lambda _c=False, u=q["url"]: self._retry(u))
                 rl.addWidget(again)
             else:
                 kind = QLabel(_("Play once") if q.get("kind") == "play" else _("Add as sound"))
                 kind.setObjectName("actionpill")
-                kind.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                kind.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                 rl.addWidget(kind)
             x = QPushButton("✕")
             x.setObjectName("urgenthide")
             x.setToolTip(_("Remove"))
-            x.setCursor(Qt.PointingHandCursor)
+            x.setCursor(Qt.CursorShape.PointingHandCursor)
             x.setFixedSize(24, 24)
             x.clicked.connect(lambda _c=False, u=q["url"], b=bad: self._forget(u) if b
                               else (usage.used("dl-cancel"), self.cancel_requested.emit(u)))

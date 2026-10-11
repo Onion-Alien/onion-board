@@ -450,7 +450,7 @@ def main():
     app = QApplication(sys.argv)
     if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
         from PySide6.QtCore import Qt as _Qt
-        app.setLayoutDirection(_Qt.RightToLeft)
+        app.setLayoutDirection(_Qt.LayoutDirection.RightToLeft)
     from soundboard import theme as _theme
     i18n.use_fonts(_theme.font_families())
     # same-width digits everywhere, so a number that changes doesn't make its text jump

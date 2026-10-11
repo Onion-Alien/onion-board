@@ -17,6 +17,8 @@ from collections.abc import Callable
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QBoxLayout, QLayout, QPushButton, QWidget
 
+from soundboard.ui import icons
+
 Step = tuple[int, str, Callable[[bool], None]]   # (priority, "w" / "h", apply(compact))
 
 MIN_SIZE = QSize(260, 120)   # the mini player (see MainWindow._refit)
@@ -67,6 +69,7 @@ def icon_only(button: QPushButton) -> Callable[[bool], None]:
             button.setText("")
         elif not button.text() and button.property("full_text"):
             button.setText(button.property("full_text"))
+        icons.text_gap(button)
         touch(button)
     return apply
 
@@ -74,7 +77,8 @@ def icon_only(button: QPushButton) -> Callable[[bool], None]:
 def stack(layout: QBoxLayout) -> Callable[[bool], None]:
     """Side-by-side columns become one column."""
     def apply(compact: bool):
-        layout.setDirection(QBoxLayout.TopToBottom if compact else QBoxLayout.LeftToRight)
+        layout.setDirection(QBoxLayout.Direction.TopToBottom if compact
+                            else QBoxLayout.Direction.LeftToRight)
     return apply
 
 

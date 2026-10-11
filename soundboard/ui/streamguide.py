@@ -6,6 +6,7 @@ them through whatever tools they use.
 """
 from __future__ import annotations
 
+import html
 from urllib.parse import quote
 
 from PySide6.QtCore import Qt
@@ -106,7 +107,7 @@ class StreamerGuide(QDialog):
                 "every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it "
                 "into ChatGPT or Claude: it knows how Onion Board's links work and which "
                 "sounds you have, and walks you through it.") + "</span>")
-        steps.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         body = QWidget()
         bl = QVBoxLayout(body)
         bl.setContentsMargins(0, 0, 8, 0)
@@ -115,8 +116,8 @@ class StreamerGuide(QDialog):
         scroll = QScrollArea()
         scroll.setWidget(body)
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setMinimumHeight(300)
         v.addWidget(scroll, 1)
 
@@ -195,5 +196,5 @@ class StreamerGuide(QDialog):
     def _copy(self, btn, action: str, query: str):
         QApplication.clipboard().setText(link(self.mw.cfg, action, query))
         busy.flash(btn, _("✓  Copied"))
-        self.state.setText(_("Copied. It holds your key: paste it only into your own tools, "
-                             "never into chat."))
+        busy.toast(self, html.escape(_("Copied. It holds your key: paste it only into your "
+                                       "own tools, never into chat.")), "ok")

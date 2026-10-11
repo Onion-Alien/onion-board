@@ -5,6 +5,7 @@ right-click adds it to your Sounds, sends it, copies it or deletes it (the Undo
 bar brings it back)."""
 from __future__ import annotations
 
+import html
 import logging
 
 import numpy as np
@@ -16,7 +17,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QHBoxLayout, QHeaderView, QLab
 from soundboard import errors
 from soundboard.clipshelf import Clip, Shelf
 from soundboard.i18n import _, ngettext
-from soundboard.ui import clipeditor, icons
+from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import UndoBar
 from soundboard.engine import SR
@@ -62,27 +63,27 @@ class ClipShelf(QWidget):
         self.list.setHeaderLabels([_("Name"), _("Length"), _("From")])
         self.list.setRootIsDecorated(False)
         self.list.setUniformRowHeights(True)
-        self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.list.setEditTriggers(QAbstractItemView.EditKeyPressed
-                                  | QAbstractItemView.SelectedClicked)
-        self.list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list.setEditTriggers(QAbstractItemView.EditTrigger.EditKeyPressed
+                                  | QAbstractItemView.EditTrigger.SelectedClicked)
+        self.list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.list.customContextMenuRequested.connect(self._menu)
         self.list.itemDoubleClicked.connect(lambda it, _col: self.toggle_play(it))
         self.list.itemChanged.connect(self._renamed)
         self.list.itemSelectionChanged.connect(self._sync)
         h = self.list.header()
         h.setStretchLastSection(False)
-        h.setSectionResizeMode(0, QHeaderView.Stretch)
-        h.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        h.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        h.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        h.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        h.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         v.addWidget(self.list)
         self.undo_bar = UndoBar(_("Put the clip back in the list"))
         v.addWidget(self.undo_bar)
-        for keys, slot in ((Qt.Key_Delete, self.delete_picked),
-                           (QKeySequence.Copy, self.copy_picked)):
+        for keys, slot in ((Qt.Key.Key_Delete, self.delete_picked),
+                           (QKeySequence.StandardKey.Copy, self.copy_picked)):
             a = QAction(self.list)
             a.setShortcut(QKeySequence(keys))
-            a.setShortcutContext(Qt.WidgetShortcut)
+            a.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
             a.triggered.connect(slot)
             self.list.addAction(a)
         self.reload()
@@ -93,11 +94,11 @@ class ClipShelf(QWidget):
         self.list.clear()
         for c in self.shelf.clips:
             it = QTreeWidgetItem([c.name, fmt(c.seconds * SR), c.src])
-            it.setData(0, Qt.UserRole, c.id)
-            it.setFlags(it.flags() | Qt.ItemIsEditable)
+            it.setData(0, Qt.ItemDataRole.UserRole, c.id)
+            it.setFlags(it.flags() | Qt.ItemFlag.ItemIsEditable)
             it.setToolTip(0, _("{name}\nDouble-click plays it, F2 renames it, right-click "
                                "adds it to your Sounds.", name=c.name))
-            it.setTextAlignment(1, Qt.AlignRight | Qt.AlignVCenter)
+            it.setTextAlignment(1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.list.addTopLevelItem(it)
             if c.id == pick:
                 self.list.setCurrentItem(it)
@@ -106,7 +107,7 @@ class ClipShelf(QWidget):
         row_h = self.list.sizeHintForRow(0) if self.shelf.clips else 22
         self.list.setFixedHeight(self.list.header().sizeHint().height() + rows * max(row_h, 18)
                                  + 2 * self.list.frameWidth() + 2)
-        self.setVisible(bool(self.shelf.clips) or self.undo_bar.isVisible())
+        self.setVisible(bool(self.shelf.clips) or self.undo_bar.active())
         self._sync()
 
     def _sync(self):
@@ -118,7 +119,7 @@ class ClipShelf(QWidget):
         out = []
         for it in self.list.selectedItems() or ([self.list.currentItem()]
                                                 if self.list.currentItem() else []):
-            c = self.shelf.get(it.data(0, Qt.UserRole))
+            c = self.shelf.get(it.data(0, Qt.ItemDataRole.UserRole))
             if c is not None:
                 out.append(c)
         return out
@@ -126,7 +127,7 @@ class ClipShelf(QWidget):
     def _item(self, cid: str) -> QTreeWidgetItem | None:
         for i in range(self.list.topLevelItemCount()):
             it = self.list.topLevelItem(i)
-            if it.data(0, Qt.UserRole) == cid:
+            if it.data(0, Qt.ItemDataRole.UserRole) == cid:
                 return it
         return None
 
@@ -150,7 +151,7 @@ class ClipShelf(QWidget):
 
     def toggle_play(self, it: QTreeWidgetItem | None = None, send: bool = False):
         it = it or self.list.currentItem()
-        cid = it.data(0, Qt.UserRole) if it is not None else None
+        cid = it.data(0, Qt.ItemDataRole.UserRole) if it is not None else None
         sid = SEND if send else PREVIEW
         again = self._playing == (sid, cid) and self.engine.state(sid) is not None
         self.stop()
@@ -162,12 +163,9 @@ class ClipShelf(QWidget):
             return
         if self.engine.play(sid, data, self._gain(data), mode="restart",
                             preview=not send) is None:
-            n = len(self.shelf.clips)
-            self.title.setText(
-                _("Saved clips ({n}) · nowhere to send it: pick where your sounds go on the "
-                  "Setup tab", n=n) if send else
-                _("Saved clips ({n}) · no headphones to play it in: pick them on the Setup "
-                  "tab", n=n))
+            busy.toast(self, html.escape(
+                _("Nowhere to send it: pick where your sounds go on the Setup tab.") if send
+                else _("No headphones to play it in: pick them on the Setup tab.")), "error")
             return
         self._playing = (sid, cid)
 
@@ -179,7 +177,7 @@ class ClipShelf(QWidget):
     def _renamed(self, it: QTreeWidgetItem, col: int):
         if col != 0:
             return
-        cid = it.data(0, Qt.UserRole)
+        cid = it.data(0, Qt.ItemDataRole.UserRole)
         c = self.shelf.get(cid)
         if c is None:
             return
@@ -206,13 +204,9 @@ class ClipShelf(QWidget):
                 return
             added += 1
         if added:
-            self.undo_bar.hide()
-            clips = len(self.shelf.clips)
-            self.title.setText(
-                ngettext("Saved clips ({clips}) · ✓ added {n} to your Sounds",
-                         "Saved clips ({clips}) · ✓ added {n} to your Sounds", added,
-                         clips=clips) if added > 1 else
-                _("Saved clips ({clips}) · ✓ added to your Sounds", clips=clips))
+            self.undo_bar.finish()
+            busy.toast(self, ngettext("Added {n} clip to your Sounds",
+                                      "Added {n} clips to your Sounds", added), "ok")
 
     def copy_picked(self):
         picked = self._picked()
@@ -221,9 +215,8 @@ class ClipShelf(QWidget):
         data = self._audio(picked[0])
         if data is not None:
             clipeditor.set_clipboard(data)
-            self.title.setText(_("Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in "
-                                 "an editor or on the Sounds tab",
-                                 n=len(self.shelf.clips), name=picked[0].name))
+            busy.toast(self, _("Copied “{name}”: Ctrl+V pastes it in an editor or on the "
+                               "Sounds tab", name=html.escape(picked[0].name)), "ok")
 
     def delete_picked(self):
         gone = []
@@ -253,7 +246,7 @@ class ClipShelf(QWidget):
         if not it.isSelected():
             self.list.setCurrentItem(it)
         m = QMenu(self)
-        cid = it.data(0, Qt.UserRole)
+        cid = it.data(0, Qt.ItemDataRole.UserRole)
         playing = self._playing is not None and self._playing[1] == cid
 
         def act(text, slot, icon=None):

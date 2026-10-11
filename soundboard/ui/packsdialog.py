@@ -2,6 +2,7 @@
 add in one click (soundboard.packs), and where to share one of your own."""
 from __future__ import annotations
 
+import html
 import logging
 import threading
 from collections.abc import Callable
@@ -44,31 +45,31 @@ class PackCard(QFrame):
         top.setSpacing(10)
         emoji = QLabel(pack.emoji)
         emoji.setStyleSheet("font-size: 22pt; background: transparent;")
-        top.addWidget(emoji, 0, Qt.AlignTop)
+        top.addWidget(emoji, 0, Qt.AlignmentFlag.AlignTop)
         names = QVBoxLayout()
         names.setSpacing(0)
         self.name = QLabel(pack.name)
-        self.name.setTextFormat(Qt.PlainText)
+        self.name.setTextFormat(Qt.TextFormat.PlainText)
         self.name.setStyleSheet("font-weight: 600; font-size: 11pt; background: transparent;")
         names.addWidget(self.name)
         self.meta = QLabel(meta_line(pack))
         self.meta.setObjectName("muted")
-        self.meta.setTextFormat(Qt.PlainText)
+        self.meta.setTextFormat(Qt.TextFormat.PlainText)
         self.meta.setWordWrap(True)
         names.addWidget(self.meta)
         top.addLayout(names, 1)
         self.btn = QPushButton()
         self.btn.setObjectName("primary")
         self.btn.clicked.connect(lambda: self.window().add(self))
-        top.addWidget(self.btn, 0, Qt.AlignTop)
+        top.addWidget(self.btn, 0, Qt.AlignmentFlag.AlignTop)
         v.addLayout(top)
         if pack.description:
             about = hint_label(pack.description)
-            about.setTextFormat(Qt.PlainText)
+            about.setTextFormat(Qt.TextFormat.PlainText)
             v.addWidget(about)
         if pack.categories:
             cats = hint_label(_("Categories: {names}", names=", ".join(pack.categories)))
-            cats.setTextFormat(Qt.PlainText)
+            cats.setTextFormat(Qt.TextFormat.PlainText)
             v.addWidget(cats)
         self.show_idle()
 
@@ -105,7 +106,7 @@ class PacksDialog(QDialog):
         lay.addWidget(self.note)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.NoFrame)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
         self.body = QWidget()
         self.list = QVBoxLayout(self.body)
         self.list.setContentsMargins(0, 0, 0, 0)
@@ -125,9 +126,9 @@ class PacksDialog(QDialog):
         icons.set_icon(self.btn_share, "browser")
         self.btn_share.setToolTip(_("Opens the sharing form on GitHub in your browser"))
         self.btn_share.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(packs.SHARE_URL)))
-        sv.addWidget(self.btn_share, 0, Qt.AlignVCenter)
+        sv.addWidget(self.btn_share, 0, Qt.AlignmentFlag.AlignVCenter)
         lay.addWidget(share)
-        box = QDialogButtonBox(QDialogButtonBox.Close)
+        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         box.rejected.connect(self.reject)
         lay.addWidget(box)
         self.cards: list[PackCard] = []
@@ -155,8 +156,9 @@ class PacksDialog(QDialog):
         if self._closed:
             return
         if err:
-            self._say(_("Couldn't get the newest list of packs ({error}), so these are "
-                        "the ones this version knows.", error=err))
+            busy.toast(self, html.escape(_(
+                "Couldn't get the newest list of packs ({error}), so these are the ones "
+                "this version knows.", error=err)), "warn")
         if found is None or self._busy:   # don't pull a card out from under a download
             return
         while self.list.count():
@@ -206,7 +208,8 @@ class PacksDialog(QDialog):
         busy.set_busy(card.btn, False)
         card.show_idle()
         if path is None:
-            self._say(_("Couldn't download {name}: {error}", name=card.pack.name, error=err))
+            busy.toast(self, html.escape(_("Couldn't download {name}: {error}",
+                                           name=card.pack.name, error=err)), "error")
             return
         self._say("")
         self._add(Path(path))

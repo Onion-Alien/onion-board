@@ -50,7 +50,7 @@ def ico_bytes(c1: str, c2: str, sizes=ICO_SIZES) -> bytes:
     pngs = []
     for sz in sizes:
         buf = QBuffer()
-        buf.open(QIODevice.WriteOnly)
+        buf.open(QIODevice.OpenModeFlag.WriteOnly)
         theme.logo_pixmap(sz, c1, c2).toImage().save(buf, "PNG")
         pngs.append(bytes(buf.data()))
         buf.close()

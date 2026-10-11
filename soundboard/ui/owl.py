@@ -43,7 +43,7 @@ def _e(p, cx, cy, w, h, fill, pen=None, angle=0.0):
     p.save()
     p.translate(cx, cy)
     p.rotate(angle)
-    p.setPen(pen or Qt.NoPen)
+    p.setPen(pen or Qt.PenStyle.NoPen)
     p.setBrush(fill)
     p.drawEllipse(QRectF(-w / 2, -h / 2, w, h))
     p.restore()
@@ -71,12 +71,12 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
         dark = QColor(feather).darker(135)
     s = min(rect.width() / W, rect.height() / H)
     p.save()
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.translate(rect.center().x() - W * s / 2, rect.center().y() - H * s / 2)
     p.scale(s, s)
     ink = QPen(INK, 2.4)
-    ink.setJoinStyle(Qt.RoundJoin)
-    ink.setCapStyle(Qt.RoundCap)
+    ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+    ink.setCapStyle(Qt.PenCapStyle.RoundCap)
 
     # ear tufts, turned about their base
     for sx in (-1, 1):
@@ -100,8 +100,8 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     p.drawPath(body)
     # belly with little feather marks
     _e(p, 50, 88, 42, 40, BELLY)
-    p.setPen(QPen(BELLY_MARK, 1.8, Qt.SolidLine, Qt.RoundCap))
-    p.setBrush(Qt.NoBrush)
+    p.setPen(QPen(BELLY_MARK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.setBrush(Qt.BrushStyle.NoBrush)
     for x, y in ((42, 80), (50, 84), (58, 80), (46, 92), (54, 92), (50, 100)):
         m = QPainterPath(QPointF(x - 3, y))
         m.quadTo(x, y + 3, x + 3, y)
@@ -124,7 +124,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     face.cubicTo(QPointF(22, 70), QPointF(42, 72), QPointF(50, 64))
     face.cubicTo(QPointF(58, 72), QPointF(78, 70), QPointF(80, 54))
     face.cubicTo(QPointF(82, 34), QPointF(60, 30), QPointF(50, 40))
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(QColor(255, 255, 255, 70))
     p.drawPath(face)
     # the big eyes
@@ -149,20 +149,20 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
             _e(p, x, 64, 22, 7 * sad, c)
         if blink > 0.01:   # the lid comes down from the top
             lid = 24 * blink
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(feather)
             p.drawRect(QRectF(x - 13, 41, 26, lid))
             p.setPen(ink)
             p.drawLine(QPointF(x - 12, 41 + lid), QPointF(x + 12, 41 + lid))
         p.restore()
         p.setPen(ink)
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawEllipse(QRectF(x - 12, 41, 24, 24))
     # worried brows: inner ends lifted
     if sad > 0.05:
         c = QColor(INK)
         c.setAlphaF(min(1.0, sad * 1.4))
-        p.setPen(QPen(c, 2.6, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(c, 2.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         for x, sx in ((36, -1), (64, 1)):
             p.drawLine(QPointF(x + sx * 9, 38.5 + 1.5 * sad), QPointF(x - sx * 5, 38 - 5 * sad))
     _e(p, 25, 68, 10, 6, CHEEK)
@@ -172,7 +172,8 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
     beak.lineTo(54.5, 62)
     beak.quadTo(52, 70, 50, 72)
     beak.quadTo(48, 70, 45.5, 62)
-    p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+    p.setPen(QPen(INK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                  Qt.PenJoinStyle.RoundJoin))
     p.setBrush(BEAK)
     p.drawPath(beak)
     # a tear rolling down from the outer corner of his left eye
@@ -192,8 +193,8 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
 def owl_image(height: int, look: float = 0.5) -> QImage:
     h = max(1, height)
     w = max(1, round(h * W / H))
-    img = QImage(w, h, QImage.Format_ARGB32_Premultiplied)
-    img.fill(Qt.transparent)
+    img = QImage(w, h, QImage.Format.Format_ARGB32_Premultiplied)
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
     draw_owl(p, QRectF(0, 0, w, h), look, FEATHER, FEATHER_DARK)   # artwork: his own teal
     p.end()
@@ -207,7 +208,7 @@ def sparkle(p: QPainter, x: float, y: float, r: float, col: QColor):
     path.quadTo(QPointF(x, y), QPointF(x, y + r))
     path.quadTo(QPointF(x, y), QPointF(x - r, y))
     path.quadTo(QPointF(x, y), QPointF(x, y - r))
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(col)
     p.drawPath(path)
 
@@ -255,8 +256,8 @@ class OwlWidget(QWidget):
         self.top = round(height * 0.34)    # room above for "?" and z's
         # the room beside him gives way first when space is short (the bubble then
         # overlaps him a little)
-        self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip(_("Hoot is waiting for something to watch"))
         self._rng = random.Random()
         self._t0 = self._last = time.monotonic()
@@ -298,7 +299,7 @@ class OwlWidget(QWidget):
         super().hideEvent(ev)
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.LeftButton:
+        if ev.button() == Qt.MouseButton.LeftButton:
             self.cheer()
             self.clicked.emit()
         super().mousePressEvent(ev)
@@ -436,14 +437,14 @@ class OwlWidget(QWidget):
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
         r = self._owl_rect()
         u = self.owl_h / H     # one canvas unit, px
         # a soft shadow on the floor, shrinking as he rises
         lift = max(0.0, -pose["dy"])
         sw = r.width() * (0.6 - lift * 0.01)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, max(18, 60 - int(lift * 4))))
         p.drawEllipse(QRectF(r.center().x() - sw / 2, r.bottom() - 3, sw, 7))
         # sway about his feet
@@ -533,4 +534,4 @@ class OwlWidget(QWidget):
         p.setBrush(BUBBLE)
         p.drawPath(shape)
         p.setPen(INK)
-        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignCenter, text)
+        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter, text)

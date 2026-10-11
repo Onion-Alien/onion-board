@@ -65,8 +65,8 @@ def _grain_tile(light: bool) -> QPixmap:
     fades get on 8-bit screens (the same idea as the themes' window grain)."""
     if light not in _grain:
         rnd = random.Random(7)
-        img = QImage(96, 96, QImage.Format_ARGB32_Premultiplied)
-        img.fill(Qt.transparent)
+        img = QImage(96, 96, QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(Qt.GlobalColor.transparent)
         base = (0, 0, 0) if light else (255, 255, 255)
         for y in range(96):
             for x in range(96):
@@ -105,7 +105,7 @@ def _bubble(p: QPainter, text: str, x: float, y: float, px: int):
     p.setBrush(BUBBLE)
     p.drawPath(shape)
     p.setPen(INK)
-    p.drawText(box, Qt.AlignCenter, text)
+    p.drawText(box, Qt.AlignmentFlag.AlignCenter, text)
 
 
 class Court(QWidget):
@@ -117,7 +117,7 @@ class Court(QWidget):
         self.fx = random.Random()   # sparks and shakes: never moves the game's own dice
         self.setMouseTracking(True)
         self.setMinimumSize(320, 220)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.on_over = None   # called when someone reaches WIN_AT
         self.end_bun_left = 0.0   # where Bun stands at the end (the dialog centres him)
         self.reset()
@@ -160,7 +160,8 @@ class Court(QWidget):
     def _go(self, state: str):
         self.state, self.st = state, 0.0
         # the pointer hides while you play (your paddle is the pointer)
-        self.setCursor(Qt.BlankCursor if state in ("play", "point") else Qt.ArrowCursor)
+        self.setCursor(Qt.CursorShape.BlankCursor if state in ("play", "point")
+                       else Qt.CursorShape.ArrowCursor)
 
     def _say(self, text: str, secs: float = 1.2):
         self.say, self.say_until = text, time.monotonic() + secs
@@ -349,16 +350,16 @@ class Court(QWidget):
         self.aim_y = ev.position().y() / max(1, self.height())
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.LeftButton and self.state == "ready":
+        if ev.button() == Qt.MouseButton.LeftButton and self.state == "ready":
             self.serve("bun")
 
     def key(self, k) -> bool:
         """The keys: arrows / W S move your paddle, Space or Enter serves. True if used."""
-        if k in (Qt.Key_Up, Qt.Key_W):
+        if k in (Qt.Key.Key_Up, Qt.Key.Key_W):
             self.nudge(-0.08)
-        elif k in (Qt.Key_Down, Qt.Key_S):
+        elif k in (Qt.Key.Key_Down, Qt.Key.Key_S):
             self.nudge(0.08)
-        elif k in (Qt.Key_Space, Qt.Key_Return, Qt.Key_Enter) and self.state == "ready":
+        elif k in (Qt.Key.Key_Space, Qt.Key.Key_Return, Qt.Key.Key_Enter) and self.state == "ready":
             self.serve("bun")
         else:
             return False
@@ -377,7 +378,7 @@ class Court(QWidget):
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         g = self.geo()
         w, h, r = g["w"], g["h"], g["r"]
         t = time.monotonic()
@@ -401,14 +402,15 @@ class Court(QWidget):
                 f.setBold(True)
                 p.setFont(f)
                 p.setPen(col)
-                p.drawText(box.adjusted(-30, -30, 30, 30), Qt.AlignCenter, str(self.score[side]))
+                p.drawText(box.adjusted(-30, -30, 30, 30), Qt.AlignmentFlag.AlignCenter,
+                           str(self.score[side]))
             f.setPixelSize(max(10, round(h * 0.045)))
             f.setBold(False)
             p.setFont(f)
             p.setPen(QColor(theme.T["muted"]))
             under = QRectF(top.left(), top.bottom() - 4, nw, h * 0.07)
-            p.drawText(under, Qt.AlignCenter, _("Bun"))
-            p.drawText(under.translated(nw + w * 0.06, 0), Qt.AlignCenter, _("You"))
+            p.drawText(under, Qt.AlignmentFlag.AlignCenter, _("Bun"))
+            p.drawText(under.translated(nw + w * 0.06, 0), Qt.AlignmentFlag.AlignCenter, _("You"))
             if self.rally >= RALLY_SHOWN and self.state == "play":
                 self._paint_rally(p, w, h)
 
@@ -436,7 +438,7 @@ class Court(QWidget):
         ph = g["you_half"] * 2 * h
         py = self.you_y * h - ph / 2
         if not over:
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             for i, a in ((10, 0.06), (6, 0.12), (3, 0.2)):   # a soft glow round it
                 p.setBrush(_alpha(acc, a))
                 p.drawRoundedRect(QRectF(px - i, py - i, g["pad_w"] + 2 * i, ph + 2 * i),
@@ -453,12 +455,12 @@ class Court(QWidget):
             c = QColor(BALL)
             c.setAlphaF(0.7 * (1 - k))
             p.setPen(QPen(c, 2))
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             rr = r * (1.2 + 2.2 * k)
             p.drawEllipse(QPointF(fx * w, fy * h), rr, rr)
         for sp in self.sparks:
             k = sp.age / sp.life
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(_alpha(sp.col, 1 - k * k))
             if sp.spin:   # confetti: little turning paper strips
                 p.save()
@@ -472,7 +474,7 @@ class Court(QWidget):
         if self.state in ("play", "ready"):
             heat = max(0.0, min(1.0, (self._speed() - SPEED0) / (SPEED_MAX - SPEED0)))
             hot = _mix(BALL, QColor(theme.T["accent"]), heat)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             for i, (tx, ty) in enumerate(self.trail[:-1]):
                 k = i / len(self.trail)
                 p.setBrush(_alpha(hot, 0.06 + (0.25 + 0.2 * heat) * k))
@@ -491,7 +493,7 @@ class Court(QWidget):
             f.setBold(True)
             p.setFont(f)
             p.setPen(QColor(theme.T["text_hi"]))
-            p.drawText(QRectF(0, h * 0.62, w, h * 0.1), Qt.AlignCenter,
+            p.drawText(QRectF(0, h * 0.62, w, h * 0.1), Qt.AlignmentFlag.AlignCenter,
                        _("Click to serve"))
         if self.say and time.monotonic() < self.say_until:
             _bubble(p, self.say, br.center().x() + br.width() * 0.15,
@@ -538,20 +540,20 @@ class Court(QWidget):
         p.fillRect(court, QBrush(_grain_tile(light)))
         if not over:
             line = _alpha(hi, 0.10)
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QPen(line, 1.5))
             p.drawRoundedRect(court.adjusted(12, 12, -12, -12), 6, 6)
             rr = h * 0.17
             p.drawEllipse(QPointF(w / 2, h / 2), rr, rr)
-            p.setPen(QPen(_alpha(acc, 0.10), 7, Qt.SolidLine, Qt.RoundCap))
+            p.setPen(QPen(_alpha(acc, 0.10), 7, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
             p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))   # the net's glow
-            dash = QPen(_alpha(hi, 0.35), 2, Qt.CustomDashLine, Qt.RoundCap)
+            dash = QPen(_alpha(hi, 0.35), 2, Qt.PenStyle.CustomDashLine, Qt.PenCapStyle.RoundCap)
             dash.setDashPattern([2.5, 4])
             p.setPen(dash)
             p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))
         p.restore()
         # the lip: shade along the top edge, a catch of light along the bottom
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.setPen(QPen(_alpha(hi, 0.08 if not light else 0.0), 1))
         p.drawRoundedRect(court.adjusted(0.5, 0.5, -0.5, -0.5), 12, 12)
 
@@ -569,25 +571,26 @@ class Court(QWidget):
         g = QLinearGradient(0, box.top(), 0, box.bottom())
         g.setColorAt(0, _mix(acc, QColor("white"), 0.16))
         g.setColorAt(1, acc)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(_alpha(acc, 0.25))
         p.drawRoundedRect(box.adjusted(-3, -3, 3, 3), bh / 2 + 3, bh / 2 + 3)
         p.setBrush(g)
         p.drawRoundedRect(box, bh / 2, bh / 2)
         p.setPen(QColor(theme.T.get("on_accent", "#ffffff")))
-        p.drawText(box, Qt.AlignCenter, text)
+        p.drawText(box, Qt.AlignmentFlag.AlignCenter, text)
 
     @staticmethod
     def _paint_ball(p: QPainter, x: float, y: float, r: float):
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, 70))
         p.drawEllipse(QPointF(x + 1.5, y + 2), r, r)
         p.setPen(QPen(QColor("#9fb83a"), 1))
         p.setBrush(BALL)
         p.drawEllipse(QPointF(x, y), r, r)
-        seam = QPen(QColor(255, 255, 255, 220), max(1.0, r * 0.18), Qt.SolidLine, Qt.RoundCap)
+        seam = QPen(QColor(255, 255, 255, 220), max(1.0, r * 0.18), Qt.PenStyle.SolidLine,
+                    Qt.PenCapStyle.RoundCap)
         p.setPen(seam)
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawArc(QRectF(x - r * 1.6, y - r * 0.8, r * 1.4, r * 1.6), -60 * 16, 120 * 16)
         p.drawArc(QRectF(x + r * 0.2, y - r * 0.8, r * 1.4, r * 1.6), 120 * 16, 120 * 16)
 
@@ -600,7 +603,7 @@ def open_for(bun) -> BunPong:
     dlg = BunPong(win, bun)
     usage.used("egg-pong-opened")   # the names only (usage.py)
     dlg.open()
-    dlg.court.setFocus(Qt.OtherFocusReason)
+    dlg.court.setFocus(Qt.FocusReason.OtherFocusReason)
     return dlg
 
 
@@ -654,8 +657,8 @@ class BunPong(QDialog):
         el.addWidget(self.end_title)
         el.addWidget(self.end_score)
         el.addSpacing(8)
-        el.addWidget(self.again, 0, Qt.AlignLeft)
-        self.end.setCursor(Qt.ArrowCursor)
+        el.addWidget(self.again, 0, Qt.AlignmentFlag.AlignLeft)
+        self.end.setCursor(Qt.CursorShape.ArrowCursor)
         self.end.hide()
 
         row = QHBoxLayout()

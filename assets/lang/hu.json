@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Nem sikerült újra keresni",
   "Couldn't reach GitHub ({error}).": "Nem érhető el a GitHub ({error}).",
   "Couldn't read the {name} board": "Nem sikerült beolvasni ezt a boardot: {name}",
-  "Couldn't render it": "Nem sikerült elkészíteni",
   "Couldn't render the preview with these effects (see the log).": "Nem sikerült elkészíteni az előnézetet ezekkel az effektekkel (lásd a naplót).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Nem sikerült alaphelyzetbe állítani: a beállításfájl zárolva volt. Semmi nem változott.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Nem sikerült helyreállítani: a beállításfájl zárolva volt. Semmi nem változott.",
@@ -754,7 +753,6 @@
   "Onion Board {version} is ready. Restart now to install it?": "Az Onion Board {version} kész. Újraindítás most a telepítéshez?",
   "Onion Board: quick setup": "Onion Board: gyors beállítás",
   "Onion Pocket isn't installed.": "Az Onion Pocket nincs telepítve.",
-  "Onion Pocket wasn't removed": "Az Onion Pocket nem lett eltávolítva",
   "Onion Pocket wasn't removed: {error}": "Az Onion Pocket nem lett eltávolítva: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: a gombjaid a telefonodon",
   "Onion Watch isn't installed.": "Az Onion Watch nincs telepítve.",
@@ -1256,7 +1254,6 @@
   "Update settings": "Frissítési beállítások",
   "Update to {version}": "Frissítés erre: {version}",
   "Update: {version}": "Frissítés: {version}",
-  "Updated": "Frissítve",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Frissítve: Onion Board {version}. Semmi nem változik, amíg nem akarod: minden úgy működik, mint eddig.",
   "Updates": "Frissítések",
   "Updates and add-ons": "Frissítések és bővítmények",
@@ -1983,7 +1980,6 @@
   "Onion Watch download progress": "Hagyma Nézze meg a letöltés folyamatát",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Az Onion Watch letöltése folyamatban van. Próbálja újra, ha kész.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Az Onion Watch még nem tölthető le (a GitHub szerint nem találja). Próbálja újra később.",
-  "Onion Watch wasn't removed": "A Hagymaórát nem távolították el",
   "Onion Watch wasn't removed: {error}": "A Hagymaórát nem távolították el: {error}",
   "Onion Watch wasn't updated: {error}": "Az Onion Watch nem frissült: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Az Onion Watch {version} telepítve van. A használat megkezdéséhez indítsa újra az Onion Boardot.",
@@ -2058,15 +2054,7 @@
   "Save as a voice": "Mentés hangként",
   "Save clip": "Klip mentése",
   "Saved clips": "Mentett klipek",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Mentett klipek ({clips}) · ✓ hozzáadva a Hangokhoz",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Mentett klipek ({clips}) · ✓ {n} hozzáadva a Hangokhoz",
-    "Mentett klipek ({clips}) · ✓ {n} hozzáadva a Hangokhoz"
-  ],
   "Saved clips ({n})": "Mentett klipek ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Mentett klipek ({n}) · \"{name}\" másolva: Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Mentett klipek ({n}) · nincs fejhallgató a lejátszáshoz: válassza ki őket a Beállítás lapon",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Mentett klipek ({n}) · nincs hova küldeni: válassza ki a hangok helyét a Beállítás lapon",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "A törölt hangok mentve, {n} napig megőrizve, hogy visszahozhassa őket",
     "A törölt hangok mentve, {n} napig megőrizve, hogy visszahozhassa őket"
@@ -2197,7 +2185,6 @@
   "There's no sound to download at that link.": "Ezen a linken nincs letölthető hang.",
   "This add-on has no install steps.": "Ennek a kiegészítőnek nincsenek telepítési lépései.",
   "This copy of Onion Board has no mic effect in it.": "Az Onion Board ezen példányán nincs mikrofonhatás.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Úgy tűnik, ez probléma az Onion Boardban. Jelentése megnyílik egy oldal a GitHubon, amelyen a részleteket ki kell tölteni; te választod ki, hogy mit küldj.",
   "This program's volume in the mix": "Ennek a programnak a hangereje a keverékben",
   "Tone": "Hang",
   "Too short to keep.": "Túl rövid a tartáshoz.",
@@ -3116,7 +3103,22 @@
   "Your sounds and settings are kept.": "A hangjaid és beállításaid megmaradnak.",
   "{error}": "{error}",
   "Update mic effect": "Mikrofoneffekt frissítése",
-  "Update to new version": "Frissítés az új verzióra",
+  "Added the voice “{name}”": "„{name}” hang hozzáadva",
+  "Added {n} clip to your Sounds": [
+    "{n} klip hozzáadva a hangjaidhoz",
+    "{n} klip hozzáadva a hangjaidhoz"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” másolva: a Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra",
+  "Keep": "Megtartás",
+  "Keep your imported sounds?": "Megtartod az importált hangokat?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod?",
+    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod őket?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod?",
+    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod őket?"
+  ],
   "Compatibility fixes for games, calls and browsers.": "Kompatibilitási javítások játékokhoz, hívásokhoz és böngészőkhöz.",
   "Install update": "Frissítés telepítése",
   "Mic updated: games, calls and browsers hear your sounds.": "Mikrofon frissítve: a játékok, hívások és böngészők hallják a hangjaidat.",

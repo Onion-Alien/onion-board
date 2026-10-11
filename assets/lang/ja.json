@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "最大 {value} 分。",
   "Update available": "アップデートがあります",
   "Update now": "今すぐ更新",
-  "Updated": "更新しました",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version} に更新しました。使いたくなるまで何も変わりません: すべて今までどおり動きます。",
   "Use the virtual cable instead": "代わりに仮想ケーブルを使う",
   "Video": "動画",
@@ -787,7 +786,6 @@
   "Couldn't play it: {error}": "再生できませんでした: {error}",
   "Couldn't re-scan": "再スキャンできませんでした",
   "Couldn't reach GitHub ({error}).": "GitHub に接続できませんでした（{error}）。",
-  "Couldn't render it": "書き出せませんでした",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "リセットできませんでした: 設定ファイルがロックされていました。何も変更していません。",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "復元できませんでした: 設定ファイルがロックされていました。何も変更していません。",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "リセットした設定を保存できませんでした。復元ポイントは 設定 > 一般 にあります。",
@@ -1048,7 +1046,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version}がリリースされました - 詳細についてはクリックしてください",
   "Onion Board: quick setup": "オニオンボード：クイックセットアップ",
   "Onion Pocket isn't installed.": "オニオンポケットは搭載されていません。",
-  "Onion Pocket wasn't removed": "オニオンポケットは削除されませんでした",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket は削除されませんでした: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: 携帯電話のパッド",
   "Onion Watch isn't installed.": "Onion Watch がインストールされていません。",
@@ -1941,7 +1938,6 @@
   "Onion Watch download progress": "Onion Watch のダウンロードの進行状況",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch は現在ダウンロード中です。完了したらもう一度試してください。",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch はまだダウンロードできません (GitHub によると、見つからないとのことです)。後でもう一度試してください。",
-  "Onion Watch wasn't removed": "オニオンウォッチは削除されませんでした",
   "Onion Watch wasn't removed: {error}": "Onion Watch は削除されませんでした: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch が更新されませんでした: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version}がインストールされています。 Onion Board を再起動して使用を開始します。",
@@ -2015,14 +2011,7 @@
   "Save as a voice": "音声として保存",
   "Save clip": "クリップの保存",
   "Saved clips": "保存されたクリップ",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "保存されたクリップ ({clips}) · ✓ サウンドに追加されました",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "保存されたクリップ ({clips}) · ✓ {n}がサウンドに追加されました"
-  ],
   "Saved clips ({n})": "保存されたクリップ ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "保存されたクリップ ({n}) · コピーされた「{name}」：Ctrl+V でエディターまたは [サウンド] タブに貼り付けます",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "保存されたクリップ ({n}) · 再生するヘッドフォンがありません: [セットアップ] タブで選択してください",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "保存されたクリップ ({n}) · 送信先がない: サウンドの送信先を [設定] タブで選択してください",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "削除した保存済み音声は、 {n}日間保存されているため、取り戻すことができます"
   ],
@@ -2149,7 +2138,6 @@
   "There's no sound to download at that link.": "そのリンクにはダウンロードできるサウンドがありません。",
   "This add-on has no install steps.": "このアドオンにはインストール手順はありません。",
   "This copy of Onion Board has no mic effect in it.": "この Onion Board のコピーにはマイクエフェクトがありません。",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "これは Onion Board の問題のようです。報告すると、GitHub 上のページが開き、詳細が入力されます。何を送信するかを選択します。",
   "This program's volume in the mix": "このプログラムのミックスボリューム",
   "Tone": "トーン",
   "Too short to keep.": "保管するには短すぎます。",
@@ -3045,7 +3033,19 @@
   "Your sounds and settings are kept.": "サウンドと設定は保持されます。",
   "{error}": "{error}",
   "Update mic effect": "マイクエフェクトを更新",
-  "Update to new version": "新しいバージョンに更新",
+  "Added the voice “{name}”": "ボイス「{name}」を追加しました",
+  "Added {n} clip to your Sounds": [
+    "{n} 個のクリップをサウンドに追加しました"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "「{name}」をコピーしました: Ctrl+V でエディターかサウンドタブに貼り付けられます",
+  "Keep": "残す",
+  "Keep your imported sounds?": "取り込んだサウンドを残しますか？",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "ほかのサウンドボードから <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name} から <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
+  ],
   "Compatibility fixes for games, calls and browsers.": "ゲーム、通話、ブラウザーとの互換性を修正します。",
   "Install update": "アップデートをインストール",
   "Mic updated: games, calls and browsers hear your sounds.": "マイクを更新しました: ゲーム、通話、ブラウザーでサウンドが聞こえます。",

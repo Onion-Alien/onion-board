@@ -4,6 +4,8 @@ their widgets and emit plain values; the main window maps those onto the config
 and the engine."""
 from __future__ import annotations
 
+import html
+
 import math
 
 from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
@@ -52,7 +54,7 @@ def steady_number(lbl: QLabel, widest: str) -> QLabel:
     lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
     lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
     lbl.setText(text)
-    lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+    lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     return lbl
 
 
@@ -296,7 +298,7 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False,
         row = QHBoxLayout()
         row.setSpacing(4)
         lbl = section_label(title)
-        row.addWidget(lbl, 0, Qt.AlignTop)
+        row.addWidget(lbl, 0, Qt.AlignmentFlag.AlignTop)
         # centred on the title's cap height (DESIGN section 4), measured from its font:
         # its padding-top (8 px) + ascent - half the cap height
         lbl.ensurePolished()
@@ -373,7 +375,7 @@ def reset_button(tip: str) -> QPushButton:
     heading row taller). `tip` says what goes back."""
     b = QPushButton(_("Reset"))
     b.setObjectName("reset")
-    b.setCursor(Qt.PointingHandCursor)
+    b.setCursor(Qt.CursorShape.PointingHandCursor)
     icons.set_icon(b, "reload", "muted", size=12)
     b.setToolTip(tip)
     return b
@@ -390,8 +392,8 @@ class _LevelDot(Meter):
     def paintEvent(self, e):
         frac, color = self._bar()
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(color if frac > 0 else theme.T["groove"]))
         p.drawEllipse(self.rect())
         p.end()
@@ -409,7 +411,7 @@ class _Pct(QSpinBox):
 
     def changeEvent(self, e):
         super().changeEvent(e)
-        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+        if e.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
             text = f"{self.maximum()}{self.suffix()}"
             self.setFixedWidth(max(58, self.fontMetrics().horizontalAdvance(text) + 14))
 
@@ -427,7 +429,7 @@ class VolumeControl(QWidget):
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(4)
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Orientation.Horizontal)
         self.meter = _LevelDot() if meter else None
         if self.meter is not None:
             h.addWidget(self.meter)
@@ -441,7 +443,7 @@ class VolumeControl(QWidget):
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
         # beside its slider, on the row's centre line: right-aligned in a box as wide as
         # "1000%", "70%" sat 30-40 px away from its slider
-        self.spin.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.spin.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         # its text box rounds the centring down: the digits sat 1-1.5 px under the
         # slider and the labels beside it (measured ink); 2 px less at the bottom
         # moves the centre up by one
@@ -529,17 +531,17 @@ class EqPanel(QWidget):
         self.sliders, self.vals = [], []
         for i, lab in enumerate(EQ_LABELS):
             val = QLabel("0")
-            val.setAlignment(Qt.AlignCenter)
+            val.setAlignment(Qt.AlignmentFlag.AlignCenter)
             val.setObjectName("eqlabel")
-            s = QSlider(Qt.Vertical)
+            s = QSlider(Qt.Orientation.Vertical)
             s.setRange(-EQ_MAX_DB * 2, EQ_MAX_DB * 2)   # half-dB steps
             s.setFixedHeight(96)
             s.setToolTip(_("{lab} Hz", lab=lab))
             f = QLabel(lab)
-            f.setAlignment(Qt.AlignCenter)
+            f.setAlignment(Qt.AlignmentFlag.AlignCenter)
             f.setObjectName("eqlabel")
             grid.addWidget(val, 0, i)
-            grid.addWidget(s, 1, i, Qt.AlignHCenter)
+            grid.addWidget(s, 1, i, Qt.AlignmentFlag.AlignHCenter)
             grid.addWidget(f, 2, i)
             s.valueChanged.connect(self._on_slider)
             self.sliders.append(s)
@@ -643,57 +645,47 @@ class EqPanel(QWidget):
         self._refresh(emit=True)
 
 
-class UndoBar(QFrame):
-    """"Deleted X · Undo" for a few seconds after something is thrown away.
-    show_for(text, undo, done): Undo calls `undo`; the bar timing out, being
-    dismissed, or showing something else calls `done` (if given) instead."""
+class UndoBar(QWidget):
+    """"Deleted X · Undo" for a few seconds after something is thrown away, as a corner
+    card (ui/toast.py) with an Undo button; this widget itself is never seen.
+    show_for(text, undo, done): Undo calls `undo`; the card timing out, being closed,
+    or showing something else calls `done` (if given) instead."""
     SECONDS = 10
 
     def __init__(self, tip: str = ""):
         super().__init__()
-        from PySide6.QtCore import QTimer
-        from PySide6.QtWidgets import QPushButton
-        self.setObjectName("chip")
-        h = QHBoxLayout(self)
-        h.setContentsMargins(10, 4, 4, 4)
-        self.label = QLabel()
-        self.label.setTextFormat(Qt.PlainText)   # names are user / web text
-        h.addWidget(self.label, 1)
-        self.btn_undo = QPushButton(_("Undo"))
-        self.btn_undo.setObjectName("primary")
-        self.btn_undo.setToolTip(tip or _("Put it back, exactly as it was"))
-        self.btn_undo.clicked.connect(self.undo)
-        h.addWidget(self.btn_undo)
-        dismiss = QPushButton()
-        dismiss.setObjectName("chipstop")
-        dismiss.setToolTip(_("Dismiss"))
-        dismiss.setFixedSize(24, 24)
-        icons.set_icon(dismiss, "stop", size=10)
-        dismiss.clicked.connect(self.finish)
-        h.addWidget(dismiss)
-        self._timer = QTimer(self)
-        self._timer.setSingleShot(True)
-        self._timer.timeout.connect(self.finish)
+        self.tip = tip or _("Put it back, exactly as it was")
+        self.text = ""
         self._undo = self._done = None
+        self._key = f"undo-{id(self)}"
         self.hide()
 
+    def active(self) -> bool:
+        """Is its card up (Undo still possible)?"""
+        return self._undo is not None or self._done is not None
+
     def show_for(self, text: str, undo, done=None):
+        from soundboard.ui import busy
         self.finish()
-        self.label.setText(self.label.fontMetrics().elidedText(text, Qt.ElideRight, 320))
+        self.text = text
         self._undo, self._done = undo, done
-        self.show()
-        self._timer.start(self.SECONDS * 1000)
+        t = busy.toast(self, html.escape(text), "", self.SECONDS * 1000, key=self._key,
+                       action=(_("Undo"), self.undo), on_close=self.finish)
+        if t is not None:
+            t.card.action.setToolTip(self.tip)
+
+    def _take_down(self):
+        from soundboard.ui import toast
+        toast.close(self, self._key)
 
     def undo(self):
         cb, self._undo, self._done = self._undo, None, None
-        self._timer.stop()
-        self.hide()
+        self._take_down()
         if cb is not None:
             cb()
 
     def finish(self):
         cb, self._undo, self._done = self._done, None, None
-        self._timer.stop()
-        self.hide()
+        self._take_down()
         if cb is not None:
             cb()

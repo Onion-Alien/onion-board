@@ -474,7 +474,6 @@
   "Up to {value} minutes.": "Fino a {value} minuti.",
   "Update available": "Aggiornamento disponibile",
   "Update now": "Aggiorna ora",
-  "Updated": "Aggiornato",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Aggiornato a Onion Board {version}. Non cambia niente finché non lo vuoi tu: tutto funziona come prima.",
   "Use the virtual cable instead": "Usa invece il cavo virtuale",
   "Video": "Video",
@@ -804,7 +803,6 @@
   "Couldn't play it: {error}": "Impossibile riprodurlo: {error}",
   "Couldn't re-scan": "Impossibile ripetere la scansione",
   "Couldn't reach GitHub ({error}).": "Impossibile raggiungere GitHub ({error}).",
-  "Couldn't render it": "Impossibile renderizzarlo",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Impossibile ripristinare: il file delle impostazioni era bloccato. Niente è stato cambiato.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Impossibile ripristinare: il file delle impostazioni era bloccato. Niente è stato cambiato.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Impossibile salvare le impostazioni di ripristino. Il punto di ripristino è in Impostazioni > Generali.",
@@ -1069,7 +1067,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} è disponibile: fai clic per i dettagli",
   "Onion Board: quick setup": "Onion Board: configurazione rapida",
   "Onion Pocket isn't installed.": "Onion Pocket non è installato.",
-  "Onion Pocket wasn't removed": "Onion Pocket non è stato rimosso",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket non è stato rimosso: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: i tuoi assorbenti sul cellulare",
   "Onion Watch isn't installed.": "Onion Watch non è installato.",
@@ -1986,7 +1983,6 @@
   "Onion Watch download progress": "Onion Guarda l'avanzamento del download",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch è in fase di download in questo momento. Riprova al termine.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch non è ancora disponibile per il download (GitHub dice che non riesce a trovarlo). Riprova più tardi.",
-  "Onion Watch wasn't removed": "Onion Watch non è stato rimosso",
   "Onion Watch wasn't removed: {error}": "Onion Watch non è stato rimosso: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch non è stato aggiornato: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} è installato. Riavvia Onion Board per iniziare a usarla.",
@@ -2061,15 +2057,7 @@
   "Save as a voice": "Salva come voce",
   "Save clip": "Salva clip",
   "Saved clips": "Clip salvate",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Clip salvate ({clips}) · ✓ aggiunte ai tuoi suoni",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Clip salvate ({clips}) · ✓ aggiunti {n} ai tuoi suoni",
-    "Clip salvate ({clips}) · ✓ aggiunti {n} ai tuoi suoni"
-  ],
   "Saved clips ({n})": "Clip salvate ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Clip salvate ({n}) · “{name}” copiate: Ctrl+V lo incolla in un editor o nella scheda Suoni",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Clip salvate ({n}) · nessuna cuffia per riprodurle: selezionale nella scheda Configurazione",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Clip salvate ({n}) · nessun posto dove inviarlo: scegli dove vanno i tuoi suoni nella scheda Configurazione",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Voci salvate che hai eliminato, conservate per {n} giorni in modo da poterle ripristinare",
     "Voci salvate che hai eliminato, conservate per {n} giorni in modo da poterle ripristinare"
@@ -2197,7 +2185,6 @@
   "There's no sound to download at that link.": "Non c'è audio da scaricare a quel link.",
   "This add-on has no install steps.": "Questo componente aggiuntivo non prevede passaggi di installazione.",
   "This copy of Onion Board has no mic effect in it.": "Questa copia di Onion Board non ha alcun effetto microfono.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Sembra un problema in Onion Board. Segnalandolo si apre una pagina sul nostro GitHub con i dettagli compilati; scegli tu cosa inviare.",
   "This program's volume in the mix": "Il volume di questo programma nel mix",
   "Tone": "Tono",
   "Too short to keep.": "Troppo corto per mantenerlo.",
@@ -3116,7 +3103,22 @@
   "Your sounds and settings are kept.": "I tuoi suoni e le impostazioni vengono conservati.",
   "{error}": "{error}",
   "Update mic effect": "Aggiorna effetto microfono",
-  "Update to new version": "Aggiorna alla nuova versione",
+  "Added the voice “{name}”": "Voce “{name}” aggiunta",
+  "Added {n} clip to your Sounds": [
+    "{n} clip aggiunta ai tuoi suoni",
+    "{n} clip aggiunte ai tuoi suoni"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” copiato: Ctrl+V lo incolla in un editor o nella scheda Suoni",
+  "Keep": "Tieni",
+  "Keep your imported sounds?": "Tenere i suoni importati?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Abbiamo portato <b>{n}</b> suono dalle tue altre soundboard. Lo tieni?",
+    "Abbiamo portato <b>{n}</b> suoni dalle tue altre soundboard. Li tieni?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Abbiamo portato <b>{n}</b> suono da {name}. Lo tieni?",
+    "Abbiamo portato <b>{n}</b> suoni da {name}. Li tieni?"
+  ],
   "Compatibility fixes for games, calls and browsers.": "Correzioni di compatibilità per giochi, chiamate e browser.",
   "Install update": "Installa aggiornamento",
   "Mic updated: games, calls and browsers hear your sounds.": "Microfono aggiornato: giochi, chiamate e browser sentono i tuoi suoni.",

@@ -51,7 +51,7 @@ class CrashDialog(QDialog):
         v.addWidget(head)
 
         what = QLabel(rep.title)
-        what.setTextFormat(Qt.PlainText)   # exception text, not markup
+        what.setTextFormat(Qt.TextFormat.PlainText)   # exception text, not markup
         what.setWordWrap(True)
         what.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         v.addWidget(what)

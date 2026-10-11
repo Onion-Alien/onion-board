@@ -163,7 +163,8 @@ def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
     w.selection.picked = {"s1", "x1"}
     w.selection.delete()
     assert [m.id for m in w.cfg.sounds] == ["s0", "x0"]
-    assert "2 sounds" in w.undo_lbl.text() and not w.selection.picked
+    from soundboard.ui import toast
+    assert any("2 sounds" in t.text() for t in toast.shown(w)) and not w.selection.picked
     w.undo_remove()
     assert [m.id for m in w.cfg.sounds] == before
     assert set(w.pads) == set(before)
@@ -219,4 +220,5 @@ def test_click_selects_double_click_plays(window):
     QTest.mouseClick(pad, Qt.LeftButton, pos=QPoint(10, 10))
     assert played == [] and w.current == "s0"
     QTest.mouseDClick(pad, Qt.LeftButton, pos=QPoint(10, 10))
+    QTest.mouseRelease(pad, Qt.LeftButton, pos=QPoint(10, 10))   # mouseDClick ends held
     assert played == ["s0"]

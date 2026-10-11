@@ -52,12 +52,13 @@ def pixmap(key: str, size: int) -> QPixmap | None:
         return None
     side = min(img.width(), img.height())
     sq = img.copy((img.width() - side) // 2, (img.height() - side) // 2, side, side)
-    sq = sq.scaled(size, size, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+    sq = sq.scaled(size, size, Qt.AspectRatioMode.IgnoreAspectRatio,
+                   Qt.TransformationMode.SmoothTransformation)
     pm = QPixmap(size, size)
-    pm.fill(Qt.transparent)
+    pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    p.setRenderHint(QPainter.Antialiasing)
-    p.setRenderHint(QPainter.SmoothPixmapTransform)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     clip = QPainterPath()
     clip.addRoundedRect(QRectF(0, 0, size, size), size * ROUND, size * ROUND)
     p.setClipPath(clip)
@@ -79,14 +80,14 @@ def _dice(size: int) -> QPixmap:
     """The "Random voice" tile's picture, painted: a white die on a purple-to-pink
     rounded square, so it sits with the voices' pictures without being a file."""
     pm = QPixmap(size, size)
-    pm.fill(Qt.transparent)
+    pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     s = size / 24
     bg = QLinearGradient(0, 0, size, size)
     bg.setColorAt(0, QColor("#7c4dff"))
     bg.setColorAt(1, QColor("#ff4f9a"))
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(bg)
     p.drawRoundedRect(QRectF(0, 0, size, size), size * ROUND, size * ROUND)
     p.translate(size / 2, size / 2)
@@ -122,13 +123,13 @@ def _mystery(size: int) -> QPixmap:
     """The picture of a voice that has none yet: a white question mark on a slate
     rounded square, painted like the Random voice die."""
     pm = QPixmap(size, size)
-    pm.fill(Qt.transparent)
+    pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     bg = QLinearGradient(0, 0, size, size)
     bg.setColorAt(0, QColor("#5b6478"))
     bg.setColorAt(1, QColor("#343a4a"))
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.setBrush(bg)
     p.drawRoundedRect(QRectF(0, 0, size, size), size * ROUND, size * ROUND)
     f = QFont()
@@ -136,7 +137,7 @@ def _mystery(size: int) -> QPixmap:
     f.setPixelSize(max(6, int(size * 0.62)))
     p.setFont(f)
     p.setPen(QColor("#ffffff"))
-    p.drawText(QRectF(0, 0, size, size), Qt.AlignCenter, "?")
+    p.drawText(QRectF(0, 0, size, size), Qt.AlignmentFlag.AlignCenter, "?")
     p.end()
     return pm
 

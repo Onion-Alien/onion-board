@@ -210,7 +210,7 @@ def test_all_voices_window_lists_every_voice_with_its_words(qapp, app_dir):
         robo = d.cards[-1]
         assert robo.b_edit is not None and bear.b_edit is None
         robo.b_delete.click()
-        assert store.voices == [] and not d.undo_bar.isHidden()
+        assert store.voices == [] and d.undo_bar.active()
         assert d.b_bin.text() == "Recently deleted (1)"
         d.undo_bar.undo()
         assert [v["name"] for v in store.voices] == ["Robo"]

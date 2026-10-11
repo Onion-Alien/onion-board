@@ -71,7 +71,7 @@ class Switch(QCheckBox):
 
     def __init__(self, tip: str = ""):
         super().__init__()
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip(tip)
         self.setFixedSize(38, 22)
 
@@ -83,14 +83,14 @@ class Switch(QCheckBox):
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         on = self.isChecked()
         offset = self.property("glyphoffset") or 0
         r = QRectF(self.rect()).adjusted(1, 3 + offset, -1, -3 + offset)
         track = QColor(theme.T["accent"] if on else theme.T["groove"])
         if not self.isEnabled():
             track.setAlpha(110)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(track)
         p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
         d = r.height() - 4
@@ -98,7 +98,7 @@ class Switch(QCheckBox):
         p.setBrush(QColor(theme.T["on_accent"] if on else theme.T["text"]))
         p.drawEllipse(QRectF(x, r.top() + 2, d, d))
         if self.hasFocus():
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QColor(theme.T["accent_hi"]))
             p.drawRoundedRect(r.adjusted(-1, -1, 1, 1), r.height() / 2 + 1, r.height() / 2 + 1)
 
@@ -167,7 +167,7 @@ class _ValueLabel(QLabel):
 
     def changeEvent(self, e):
         super().changeEvent(e)
-        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+        if e.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
             self._hint = QSize()
             self.updateGeometry()
 
@@ -201,14 +201,14 @@ class ParamSlider(QWidget):
         self.val = (_ValueLabel(_value_shapes(q.lo, q.hi, q.unit, self.steps))
                     if not compact and not _is_switch(q) else QLabel())
         self.val.setObjectName("fxvalue")
-        self.val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.val.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         if compact:
             self.setMinimumHeight(26)
             h = QHBoxLayout(self)
             h.setContentsMargins(22, 0, 0, 0)
             self.name.setObjectName("")
             self.name.setFixedWidth(78)
-            self.slider = QSlider(Qt.Horizontal)
+            self.slider = QSlider(Qt.Orientation.Horizontal)
             self.slider.setRange(0, self.steps)
             self.val.setFixedWidth(64)
             self.val.setObjectName("eqlabel")
@@ -239,7 +239,7 @@ class ParamSlider(QWidget):
         top.addStretch(1)
         top.addWidget(self.val)
         v.addLayout(top)
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Orientation.Horizontal)
         self.slider.setRange(0, self.steps)
         self.slider.setMinimumWidth(90)
         no_wheel(self.slider)
@@ -342,7 +342,7 @@ class EffectRow(QFrame):
         self.hero = hero
         self.setObjectName("fxcard")
         self.setProperty("hero", hero)
-        self.setAttribute(Qt.WA_StyledBackground)   # so [on] / [fresh] can paint
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)   # so [on] / [fresh] can paint
         v = QVBoxLayout(self)
         v.setContentsMargins(12, 10, 12, 10)
         v.setSpacing(6)
@@ -366,9 +366,9 @@ class EffectRow(QFrame):
         self.arrow = QPushButton()
         self.arrow.setObjectName("fold")
         self.arrow.setProperty("icononly", True)   # centred, no text padding
-        self.arrow.setFocusPolicy(Qt.TabFocus)     # a click leaves no focus box on it
+        self.arrow.setFocusPolicy(Qt.FocusPolicy.TabFocus)     # a click leaves no focus box on it
         self.arrow.setFixedSize(24, 24)
-        self.arrow.setCursor(Qt.PointingHandCursor)
+        self.arrow.setCursor(Qt.CursorShape.PointingHandCursor)
         self.arrow.clicked.connect(lambda: self.set_folded(not self._folded, asked=True))
         head.addWidget(self.arrow)
         self._folded = False
@@ -451,7 +451,7 @@ class EffectRow(QFrame):
 
     def mousePressEvent(self, e):
         # a click on an off card's free space turns it on (it's mostly empty then)
-        if e.button() == Qt.LeftButton and not self.chk.isChecked() and not self.hero:
+        if e.button() == Qt.MouseButton.LeftButton and not self.chk.isChecked() and not self.hero:
             self.chk.setChecked(True)
             return
         super().mousePressEvent(e)
@@ -539,7 +539,7 @@ class VoiceFxPanel(QWidget):
         self.btn_power.setObjectName("power")
         self.btn_power.setCheckable(True)
         self.btn_power.setMinimumHeight(42)
-        self.btn_power.setCursor(Qt.PointingHandCursor)
+        self.btn_power.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(self.btn_power, "mic", checked_color="#ffffff")
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
@@ -620,7 +620,7 @@ class VoiceFxPanel(QWidget):
         self.dlg = QDialog(self)
         self.dlg.setWindowTitle(_("Make it yours"))
         self.dlg.setModal(False)
-        self.dlg.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.dlg.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.dlg.finished.connect(self._tweak_closed)
         self.dlg.installEventFilter(self)
         self.destroyed.connect(self.dlg.deleteLater)   # (it may belong to the window)
@@ -631,8 +631,8 @@ class VoiceFxPanel(QWidget):
         dv.setSpacing(8)
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
-        self._scroll.setFrameShape(QFrame.NoFrame)
-        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         page = QFrame()
         page.setObjectName("card")   # painted like the tab's cards (sliders see-through)
         pv = QVBoxLayout(page)
@@ -688,7 +688,7 @@ class VoiceFxPanel(QWidget):
         self.delay = QLabel()
         self.delay.setObjectName("pill")
         steady_number(self.delay, _("{ms} ms delay", ms="000"))
-        self.delay.setAlignment(Qt.AlignCenter)
+        self.delay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         srow.addWidget(self.delay)
         self.hero_box = QVBoxLayout()
         self.hero_box.setSpacing(10)
@@ -880,7 +880,7 @@ class VoiceFxPanel(QWidget):
             self.dlg.close()
 
     def eventFilter(self, obj, e):
-        if obj is self.dlg and e.type() == QEvent.Resize:
+        if obj is self.dlg and e.type() == QEvent.Type.Resize:
             if self.dlg.isVisible():
                 self._dlg_size = QSize(e.size())
             cols = 2 if e.size().width() >= 600 else 1
@@ -908,12 +908,12 @@ class VoiceFxPanel(QWidget):
         # a saved voice's name (up to 32 characters) was cut mid-word at the tile's
         # edge, and an "&" in it vanished (Qt reads it as a shortcut marker)
         room = TILE_MAX_W - b.iconSize().width() - 40
-        shown = b.fontMetrics().elidedText(title, Qt.ElideRight, room)
+        shown = b.fontMetrics().elidedText(title, Qt.TextElideMode.ElideRight, room)
         b.setText(shown.replace("&", "&&"))
         b.setAccessibleName(title)
         if shown != title:
             b.setToolTip(title)
-        b.setCursor(Qt.PointingHandCursor)
+        b.setCursor(Qt.CursorShape.PointingHandCursor)
         b.clicked.connect(lambda __=False, n=name: self.pick(n))
         self.tiles.addButton(b)
         self._tile[name] = b
@@ -932,7 +932,7 @@ class VoiceFxPanel(QWidget):
             b = self._make_tile(name, name, art.icon(art.voice_key(CUSTOM)), "sliders")
             b.setToolTip(_("Your saved voice “{name}”. Click to turn the voice changer on "
                            "with it; right-click to rename or delete it.", name=name))
-            b.setContextMenuPolicy(Qt.CustomContextMenu)
+            b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             b.customContextMenuRequested.connect(
                 lambda pos, n=name, w=b: self._saved_menu(n, w.mapToGlobal(pos)))
             self._saved_tiles.append(b)
@@ -957,7 +957,8 @@ class VoiceFxPanel(QWidget):
         the voice being renamed, whose own name is fine)."""
         builtin = self._builtin_names()
         while True:
-            name, ok = QInputDialog.getText(self._parent(), title, _("Name:"), QLineEdit.Normal,
+            name, ok = QInputDialog.getText(self._parent(), title, _("Name:"),
+                                            QLineEdit.EchoMode.Normal,
                                             text)
             name = savedvoices.clean_name(name) if ok else ""
             if not name:
@@ -973,7 +974,7 @@ class VoiceFxPanel(QWidget):
                 return name
             if QMessageBox.question(self._parent(), title,
                                     _("You already have a voice called “{name}”. Replace it?",
-                                      name=other)) == QMessageBox.Yes:
+                                      name=other)) == QMessageBox.StandardButton.Yes:
                 return other
             text = name
 
@@ -982,7 +983,7 @@ class VoiceFxPanel(QWidget):
         tile of its own (picked straight away)."""
         suggestion = self._based_on or self.store.free_name(_("My voice"))
         if self.store.full() and self.store.find(suggestion) is None:
-            QMessageBox.information(self._parent(), _("Save as a voice"), self._full_text())
+            busy.toast(self._parent(), html.escape(self._full_text()), "warn", 8000)
             return
         name = self._ask_name(_("Save as a voice"), suggestion)
         if not name:
@@ -1030,9 +1031,8 @@ class VoiceFxPanel(QWidget):
         return code
 
     def _note(self, text: str):
-        """A short line where Undo shows, with nothing to undo."""
-        self.undo_bar.show_for(text, None)
-        self.undo_bar.btn_undo.hide()
+        """A short result, as a corner card."""
+        busy.toast(self._parent(), html.escape(text), "ok")
 
     def import_code(self, text: str | None = None) -> str:
         """Add a voice from a share code (asked for if not given) as a new saved voice,
@@ -1041,16 +1041,16 @@ class VoiceFxPanel(QWidget):
         if text is None:
             text, ok = QInputDialog.getText(self._parent(), title,
                                             _("Paste the code someone sent you:"),
-                                            QLineEdit.Normal, "")
+                                            QLineEdit.EchoMode.Normal, "")
             if not ok or not text.strip():
                 return ""
         try:
             name, effects, notes = savedvoices.read_code(text)
         except savedvoices.CodeError as e:
-            QMessageBox.warning(self._parent(), title, str(e))
+            busy.toast(self._parent(), html.escape(str(e)), "warn")
             return ""
         if self.store.full():
-            QMessageBox.information(self._parent(), title, self._full_text())
+            busy.toast(self._parent(), html.escape(self._full_text()), "warn", 8000)
             return ""
         if name.casefold() in self._builtin_names():
             name = f"{name[:savedvoices.MAX_NAME - 9]} (shared)"
@@ -1060,13 +1060,16 @@ class VoiceFxPanel(QWidget):
                  effects=(html.escape(", ".join(on)) if on
                           else _("none (your normal voice)")))
                + "".join(f"<br><br>{html.escape(n)}" for n in notes))
-        if QMessageBox.question(self._parent(), title, ask) != QMessageBox.Yes:
+        if QMessageBox.question(self._parent(), title, ask) != QMessageBox.StandardButton.Yes:
             return ""
         name = self.store.put(name, effects)
         self._fill_saved()
         self.pick(name)
         if self.dlg.isVisible():
             busy.flash(self.btn_import, _("✓ Added"))
+        else:   # nothing else would say it worked
+            busy.toast(self._parent(), _("Added the voice “{name}”", name=html.escape(name)),
+                       "ok")
         return name
 
     @staticmethod
@@ -1107,7 +1110,6 @@ class VoiceFxPanel(QWidget):
             self._based_on = ""
         self._fill_saved()
         self._emit()
-        self.undo_bar.btn_undo.show()   # (a note hides it)
         self.undo_bar.show_for(_("Deleted the voice “{name}”", name=name),
                                lambda: self._undelete(item.id, was_on))
 
@@ -1406,7 +1408,7 @@ class _SameWidth(QObject):
             f.setFixedWidth(max(self._source.width(), need))
 
     def eventFilter(self, obj, e):
-        if e.type() == QEvent.Resize:
+        if e.type() == QEvent.Type.Resize:
             self.fit()
         return False
 
@@ -1484,9 +1486,9 @@ class SpeechPanel(QWidget):
         self.b_live.setMinimumHeight(40)
         self.b_live.setObjectName("primary")
         self.b_live.toggled.connect(self._toggle_live)
-        action.addWidget(self.b_live, 0, Qt.AlignTop)
+        action.addWidget(self.b_live, 0, Qt.AlignmentFlag.AlignTop)
         self.lbl_state = QLabel(IDLE_HINT)
-        self.lbl_state.setTextFormat(Qt.PlainText)   # shows the module's error text
+        self.lbl_state.setTextFormat(Qt.TextFormat.PlainText)   # shows the module's error text
         self.lbl_state.setObjectName("muted")
         self.lbl_state.setWordWrap(True)
         self.lbl_state.setMinimumWidth(0)
@@ -1524,7 +1526,7 @@ class SpeechPanel(QWidget):
         self.lbl_delay.hide()
         lv.addWidget(self.lbl_delay)
         self.lbl_bg = hint_label("")
-        self.lbl_bg.setTextFormat(Qt.PlainText)     # shows the helper's error text
+        self.lbl_bg.setTextFormat(Qt.TextFormat.PlainText)     # shows the helper's error text
         self.lbl_bg.hide()
         lv.addWidget(self.lbl_bg)
         self.tr_box = QWidget()
@@ -1599,7 +1601,7 @@ class SpeechPanel(QWidget):
         self.b_add_voices.clicked.connect(self.show_custom_voices)
         grid.addWidget(self.b_add_voices, 0, 2)
         grid.addWidget(QLabel(_("Speed")), 1, 0)
-        self.sl_rate = QSlider(Qt.Horizontal)
+        self.sl_rate = QSlider(Qt.Orientation.Horizontal)
         self.sl_rate.setMinimumHeight(28)
         self.sl_rate.setRange(-10, 10)
         self.sl_rate.setValue(int(self.s["rate"]))
@@ -1659,7 +1661,7 @@ class SpeechPanel(QWidget):
         v.addWidget(self.lbl_install)
 
         self.btn_opts = fold_button(_("More options"))
-        v.addWidget(self.btn_opts, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_opts, 0, Qt.AlignmentFlag.AlignLeft)
         self.opts = QWidget()
         ov = QVBoxLayout(self.opts)
         ov.setContentsMargins(0, 0, 0, 0)
@@ -1693,7 +1695,7 @@ class SpeechPanel(QWidget):
         self.b_update.setToolTip(_("Runs its install again: picks up what a newer Onion Board "
                                    "needs (translation, for one). Needs Python 3.12+."))
         self.b_update.clicked.connect(self._install)
-        ov.addWidget(self.b_update, 0, Qt.AlignLeft)
+        ov.addWidget(self.b_update, 0, Qt.AlignmentFlag.AlignLeft)
         v.addWidget(self.opts)
         self.opts.hide()
         # the log after the options: More options sits with the controls it adds to
@@ -1724,14 +1726,10 @@ class SpeechPanel(QWidget):
         crow.addStretch(1)
         ov.addLayout(crow)
         self.lbl_custom = hint_label("")
-        self.lbl_custom.setTextFormat(Qt.PlainText)    # shows file names and errors
+        self.lbl_custom.setTextFormat(Qt.TextFormat.PlainText)    # shows file names and errors
         self.lbl_custom.hide()
         ov.addWidget(self.lbl_custom)
         self.btn_opts.toggled.connect(self.opts.setVisible)
-        self.tts_err = hint_label("")
-        theme.set_tone(self.tts_err, "error")
-        self.tts_err.hide()
-        v.addWidget(self.tts_err)
         # ---- the Say bar (placed by VoicePanel at the top of the tab, out of the
         # crowded bottom): typing a line, then the voice's volume
         self.say_bar, row = bar()
@@ -1749,7 +1747,9 @@ class SpeechPanel(QWidget):
         b_keep = self.b_keep = QPushButton(_("Save as sound"))
         b_keep.setToolTip(_("Keep the line typed here as a pad on the Sounds tab, in this "
                             "voice (with the voice changer, if it's on for the computer voice)"))
-        icons.set_icon(b_keep, "plus", size=12)
+        # its small icon keeps Qt's own gap: the wider one pushed the Voice tab past the
+        # mini player's width
+        icons.set_icon(b_keep, "plus", size=12, gap=False)
         b_keep.clicked.connect(self._save_line)
         self._line_saved.connect(self._line_done)
         row.addWidget(b_say)
@@ -1929,7 +1929,7 @@ class SpeechPanel(QWidget):
         ed_model = QLineEdit()
         ed_model.setPlaceholderText(_("optional"))
         ed_key = QLineEdit()
-        ed_key.setEchoMode(QLineEdit.Password)
+        ed_key.setEchoMode(QLineEdit.EchoMode.Password)
         ed_key.setPlaceholderText(_("only if the server asks for one"))
         for lbl, w in ((_("Name"), ed_name), (_("Address"), ed_url), (_("Voice"), ed_voice),
                        (_("Model"), ed_model), (_("API key"), ed_key)):
@@ -1938,8 +1938,9 @@ class SpeechPanel(QWidget):
         theme.set_tone(err, "error")
         err.hide()
         form.addRow(err)
-        btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        btns.button(QDialogButtonBox.Ok).setObjectName("primary")
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok
+                                | QDialogButtonBox.StandardButton.Cancel)
+        btns.button(QDialogButtonBox.StandardButton.Ok).setObjectName("primary")
         form.addRow(btns)
         btns.rejected.connect(dlg.reject)
 
@@ -1955,7 +1956,7 @@ class SpeechPanel(QWidget):
                         dlg, _("Add a voice server"),
                         _("There's already a voice server called “{name}”. Replace it?",
                           name=name)
-                ) != QMessageBox.Yes:
+                ) != QMessageBox.StandardButton.Yes:
                     return
                 customvoices.save_server(name, url, ed_voice.text().strip(),
                                          ed_model.text().strip(), ed_key.text().strip())
@@ -1967,7 +1968,7 @@ class SpeechPanel(QWidget):
             self.s["voice"] = customvoices.PREFIX + name   # pick it once it's loaded
             dlg.accept()
         btns.accepted.connect(ok)
-        if dlg.exec() == QDialog.Accepted:
+        if dlg.exec() == QDialog.DialogCode.Accepted:
             self.changed.emit(dict(self.s))
             busy.toast(self, _("✓ Saved “{name}”: loading its voices…",
                                name=html.escape(ed_name.text().strip() or "Voice server")),
@@ -1975,8 +1976,7 @@ class SpeechPanel(QWidget):
             self._recheck_voices_asked()
 
     def _tts_error(self, msg: str):
-        self.tts_err.setText(f"⚠ {msg}")
-        self.tts_err.show()
+        busy.toast(self, html.escape(msg), "error")
 
     def _voice_picked(self, *_):
         self._voice_standin = False   # the user chose this one
@@ -2180,7 +2180,7 @@ class SpeechPanel(QWidget):
 
     def _app_state(self, state):
         # back from Windows settings: a voice may have just been installed
-        if state == Qt.ApplicationActive and self._voice_wait:
+        if state == Qt.ApplicationState.ApplicationActive and self._voice_wait:
             self._recheck_voices()
 
     def _watch_voices(self, on: bool):
@@ -2267,11 +2267,13 @@ class SpeechPanel(QWidget):
         _enable(self.b_live, not self._installing, _("Waiting for the install to finish"))
         self.b_dl_cancel.setEnabled(True)
         self._fill_langs()
-        if err and m is not None:
-            self.lbl_tr.setText(_("Download cancelled.") if err == "cancelled"
-                                else _("\u26a0 {language}: {error}. Check your internet "
-                                       "connection and press Download again.",
-                                       language=langnames.of(m), error=errors.plain(err)))
+        if err == "cancelled" and m is not None:
+            busy.toast(self, html.escape(_("Download cancelled.")))
+        elif err and m is not None:
+            busy.toast(self, html.escape(_(
+                "⚠ {language}: {error}. Check your internet connection and press "
+                "Download again.", language=langnames.of(m), error=errors.plain(err))
+                .removeprefix("⚠ ")), "error")
         self.downloaded.emit()
 
     def _remove_download(self):
@@ -2281,7 +2283,7 @@ class SpeechPanel(QWidget):
         if QMessageBox.question(
                 self, _("Delete download"),
                 _("Delete the downloaded {language} translation? You can download it again "
-                  "any time.", language=langnames.of(m))) != QMessageBox.Yes:
+                  "any time.", language=langnames.of(m))) != QMessageBox.StandardButton.Yes:
             return
 
         def go():
@@ -2361,10 +2363,12 @@ class SpeechPanel(QWidget):
             self._refresh_module()
             self.lbl_state.setText(_("Installed. Press Start and talk."))
         else:
-            self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
-                                       "if it keeps failing, run install.bat in the add-on's "
-                                       "folder to see why.",
-                                       error=err or self.lbl_install.text()))
+            last = self.lbl_install.text()
+            self.lbl_install.hide()
+            busy.toast(self, html.escape(_(
+                "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, "
+                "run install.bat in the add-on's folder to see why.",
+                error=err or last).removeprefix("⚠ ")), "error")
 
     def _live_args(self) -> list[str]:
         """The live-voice helper's arguments; sets the voice translated lines use."""
@@ -2562,7 +2566,7 @@ class ModulesList(QWidget):
 
         def row(text: str, tip: str):
             lbl = hint_label(text)
-            lbl.setTextFormat(Qt.RichText)
+            lbl.setTextFormat(Qt.TextFormat.RichText)
             lbl.setToolTip(tip)
             self.list.addWidget(lbl)
         # the Voice tab's own add-ons only: Onion Watch lives on the Triggers tab (and
@@ -2606,11 +2610,11 @@ class CardBadge(QWidget):
         super().__init__()
         self.name = name
         self.setFixedSize(36, 36)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
     def paintEvent(self, _event):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         accent = QColor(theme.T["accent"])
         wash = QColor(accent)
         wash.setAlpha(32)
@@ -2639,16 +2643,16 @@ class CardHead(QWidget):
 
     def __init__(self, title: str, icon_name: str | None = None):
         super().__init__()
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(12)
         if icon_name:
             self.badge = CardBadge(icon_name)
-            h.addWidget(self.badge, 0, Qt.AlignVCenter)
+            h.addWidget(self.badge, 0, Qt.AlignmentFlag.AlignVCenter)
         self.label = section_label(title)
         self.label.setProperty("head", True)   # centred on the arrow, no top padding
-        self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         h.addWidget(self.label)
         h.addStretch(1)
         self.pill = QLabel("")
@@ -2659,7 +2663,7 @@ class CardHead(QWidget):
         self.arrow = QPushButton()
         self.arrow.setObjectName("fold")
         self.arrow.setProperty("icononly", True)   # centred, no text padding
-        self.arrow.setFocusPolicy(Qt.TabFocus)     # a click leaves no focus box on it
+        self.arrow.setFocusPolicy(Qt.FocusPolicy.TabFocus)     # a click leaves no focus box on it
         self.arrow.setCheckable(True)
         self.arrow.setChecked(True)
         self.arrow.setFixedSize(28, 28)
@@ -2694,7 +2698,7 @@ class CardHead(QWidget):
         self.toggled.emit(open_)
 
     def mouseReleaseEvent(self, e):
-        if e.button() == Qt.LeftButton and self.rect().contains(e.position().toPoint()):
+        if e.button() == Qt.MouseButton.LeftButton and self.rect().contains(e.position().toPoint()):
             self.arrow.toggle()
         super().mouseReleaseEvent(e)
 
@@ -2730,8 +2734,8 @@ class VoicePanel(QWidget):
         self.bar.open_card.connect(self._open_card)
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
         body = QWidget()
         capped(body, page)  # not a 900 px wide card at full screen
@@ -2853,7 +2857,8 @@ class VoicePanel(QWidget):
         return [apply]
 
     def eventFilter(self, obj, e):
-        if e.type() in (QEvent.Resize, QEvent.Show, QEvent.Hide) and obj in self._cards:
+        if e.type() in (QEvent.Type.Resize, QEvent.Type.Show,
+                        QEvent.Type.Hide) and obj in self._cards:
             self._arranger.start(0)   # a card grew, shrank or came and went: re-stack
         return super().eventFilter(obj, e)
 

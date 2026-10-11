@@ -31,10 +31,9 @@ module's `install.bat` or `pip install -r requirements.txt`).
 
 ## 2. Change the code
 
-- Layout: [CODE.md](CODE.md) → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
-- Real-time audio callbacks never block and never take the engine lock.
-- Anything user-visible goes in a new file `changelog.d/<branch-name>.md` (never in
-  `CHANGELOG.md` itself: one file per PR can't merge-conflict).
+- Layout: [CODE.md](CODE.md) → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md)
+  and, for agents, [AGENT-RULES.md](AGENT-RULES.md) (audio callbacks, UI thread, tests).
+- Anything user-visible gets a changelog line: [changelog.d/README.md](../changelog.d/README.md).
 - The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
   add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab,
   Hoot and the download), `ui/triggershost.py` (the host interface the add-on
@@ -67,13 +66,9 @@ module's `install.bat` or `pip install -r requirements.txt`).
 .venv\Scripts\python scripts\check_sensitive.py
 ```
 
-Or the quick checks (ruff, the sensitive scan, translations, CODE.md) in one go. The
-tests are left to CI; `-Tests` also runs the test files your committed and uncommitted
-changes need (`scripts/pick_tests.py --local`), `-All` the whole suite:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1
-```
+Or the quick checks (ruff, the sensitive scan, translations, CODE.md) in one go,
+`scripts\precommit.ps1`: how and when to use it, and what's left to CI, is
+[AGENT-RULES.md *Before every commit*](AGENT-RULES.md#before-every-commit).
 
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
@@ -92,11 +87,8 @@ half-written ring files at the effect (built with sanitizer traps);
 `scripts\fuzz_directmic.py [seconds] [workers]` runs it for longer than the tests do.
 `fuzzhost --lead` replays a late board block by block (no timing luck) and checks the
 effect's lead grows just enough and comes back; the real-time tests can't pin that down.
-After changing the mic effect's admin install / uninstall (copying the DLL, registering
-it, putting it on a mic or taking it off) or the ring layout, run
-`scripts\sim_directmic.py`: it drives that code against a fake registry, killing it at
-every write, and checks a mic always ends up exactly as it started even when the step is
-cut off half-way.
+`scripts\sim_directmic.py` drives the mic effect's admin install / uninstall against a
+fake registry, killing it at every write (when to run it: AGENT-RULES *Audio path*).
 
 **Not on Windows?** The suite also runs on Linux and macOS: `tests/offwindows.py`
 stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
@@ -118,18 +110,16 @@ DLL, a Windows-only process or file), never to hide a real failure; anything tha
 changes Windows (the mic effect, the registry) is still checked only on Windows.
 
 To iterate faster, run just the file you touched, e.g.
-`.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
-before committing. `python scripts\pick_tests.py` lists the test files your branch's
-changes need (what a PR runs on CI). The full suite runs on 4 workers (pytest-xdist, about a minute);
-one or two files run in a single process. `-n 2` caps the workers (say, while a
+`.venv\Scripts\python -m pytest -q tests\test_engine.py`; CI runs the rest.
+`python scripts\pick_tests.py` lists the test files your branch's
+changes need (what a PR runs on CI). The full suite runs on 4 workers (pytest-xdist,
+about 4 minutes); one or two files run in a single process. `-n 2` caps the workers (say, while a
 game is running) and `-n 0` turns them off. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
 
 Keeping it fast: Windows takes ~2 s to refuse a connection to a closed port, even
-on 127.0.0.1, and `localhost` tries `::1` first. A test that needs "nothing is
-listening" takes its port from `conftest.closed_port()` (refused at once), and a
-test server on 127.0.0.1 only marks its port with `conftest.ipv4_only()`.
-`--durations=20` shows what's slow (CI lists them on every run).
+on 127.0.0.1, and `localhost` tries `::1` first (hence AGENT-RULES' `closed_port()` /
+`ipv4_only()` rule). `--durations=20` shows what's slow (CI lists them on every run).
 
 Hangs and flakes: a test still running after 2 minutes is hung; every thread's stack
 is printed and its worker stopped (`faulthandler_timeout` in `pyproject.toml`), and
@@ -184,8 +174,8 @@ bench found: [GAME-VOICE.md](GAME-VOICE.md).
 **After any change to the sending path** (the mic effect, `directmic.py`, routes, send volume or the *Who's listening* modes), run the maintainer's silent voice check (`voicecheck.py`, kept outside the repo because it needs Vivox and Epic developer keys; ~3 min) and paste its table into the PR: it shows what Discord, Vivox and Epic voice do to 3 songs, and whether apps opening the mic each way still get our sounds.
 
 **Launching the real app is not headless.** It opens a window, grabs global
-hotkeys and opens audio devices. Agents: ask the user before running
-`scripts\run.bat`, `python -m soundboard`, `OnionBoard.exe` or the installer.
+hotkeys and opens audio devices: `scripts\run.bat`, `python -m soundboard`,
+`OnionBoard.exe` and the installer all do (agents: ask first, CLAUDE.md).
 
 ## 4. Build the app and the installer
 
@@ -233,10 +223,14 @@ the add-ons in `modules\` copied into `dist\OnionBoard\modules\` (all but
 `installer\wizard*.bmp`, gitignored), then `ISCC` with `/DAppVersion` taken from
 `soundboard/__init__.py`. Bump `__version__` there for a release.
 
-Rebuild after changing anything under `soundboard\`, `main.py`, `native\`,
-`assets\`, `installer\` (including `install-vbcable.ps1`) or `modules\` (the build
-copies the add-ons from there). Changes to docs, tests
-or `scripts\` don't need a rebuild, except `scripts\make_bunny.py` (the installer art).
+**When to build.** Not to try a change: `scripts\run.bat` runs from source. Build for a
+release, or to check something only the built app shows: `build.ps1`, `installer\`
+(including `install-vbcable.ps1`), PyInstaller hooks, `scripts\prune_build.py`,
+`scripts\vc_runtime.py`, `scripts\make_bunny.py` or bundled data (then
+`build.ps1 -NoInstaller` and start it once). An existing `dist\` or install is out of
+date after any change under `soundboard\`, `main.py`, `native\`, `assets\`,
+`installer\` or `modules\` (the build copies the add-ons from there); docs, tests and
+other `scripts\` never need one.
 
 ## 5. Install / reinstall / uninstall
 
@@ -309,17 +303,15 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 
 1. Section 3 passes. The pre-commit hook re-runs the secrets scan.
 2. Commit, push, and open a pull request (main takes changes by PR only). Merge it
-   with `sh scripts/merge_pr.sh N`, never `gh pr merge` or GitHub's Merge / Update
-   branch buttons: those write the commit in your local time zone, and every commit
-   here must be in UTC (CLAUDE.md, *Commit times*). CI
+   with `sh scripts/merge_pr.sh N` (why: CLAUDE.md, *Commit times and merging*). CI
    (`.github/workflows/checks.yml`) runs on the PR and on main after a merge: the
    secrets scan over the full history, gitleaks, ruff and pytest. On a PR, pytest
    runs only the test files the change needs (`scripts/pick_tests.py`: the tests
    that import a changed module or name a changed file; all of them when
    `conftest.py`, `pyproject.toml`, the requirements or the workflow change; none for
    a change no test is about, like the changelog). main, after the merge, runs the
-   whole suite, and so does running the workflow by hand on a branch. So run the full
-   suite locally before you push. A newer push to the PR cancels its unfinished run.
+   whole suite, and so does running the workflow by hand on a branch. A newer push to
+   the PR cancels its unfinished run.
 3. For a release: `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps
    `__version__`, moves the `changelog.d/` entries into the CHANGELOG under the version, checks the
    translations, refreshes the README's release line; `--dry-run` checks only),

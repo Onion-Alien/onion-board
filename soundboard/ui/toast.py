@@ -16,6 +16,11 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
   ``on_close`` runs when the card goes without its button clicked: timed out, closed,
   pushed out by newer cards or replaced (an Undo card's "too late now").
 - **Timing**: hovering pauses the countdown. Errors stay until closed.
+- **Too small to read**: the host's ``toast_mode()`` says "icons" (the mini player
+  with pads) or "hidden" (its smallest); cards that don't all fit above the floor are
+  icons too. Icons sit in the window's top corner: hovering shows the words, clicking
+  makes the window big enough to read them (the host's ``toast_expand``) and closes
+  nothing. Hidden or not, they time out as cards do; errors wait for the window to grow.
 
 Child widgets of the window, never their own windows, so they never take focus from a
 game. Animations are skipped when Windows' "Animation effects" setting is off.
@@ -41,9 +46,13 @@ from soundboard.ui import icons
 TOAST_MS = 4000
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
 MAX_SHOWN = 3
+UNDER = 28                # where the text starts: past the icon (18) and a gap (10)
+ACTION_INLINE = 110       # a button wider than this goes under the text
 WIDTH = 380               # at most; narrower windows get their width less 32
 MARGIN = 16               # from the window's side
 ANIM_MS = 180
+DOT = 28                  # a card shrunk to its icon: the window's too small to read cards
+DOT_MARGIN = 8            # the icons' gap from the window's top corner
 LINE = 26                 # the row's height: icon, first text line, buttons
 ANIMATE: bool | None = None   # None: follow Windows' setting (off when offscreen)
 
@@ -99,13 +108,13 @@ class _Spinner(QWidget):
 
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(2.5, (self.height() - 13) / 2, 13, 13)
         pen = QPen(QColor(theme.T.get("border_hi", "#888")), 2.2)
         p.setPen(pen)
         p.drawEllipse(r)
         pen.setColor(QColor(theme.T.get("accent", "#7c5cff")))
-        pen.setCapStyle(Qt.RoundCap)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         p.setPen(pen)
         p.drawArc(r, -self._angle * 16, 100 * 16)
         p.end()
@@ -127,37 +136,46 @@ class _Card(QFrame):
 
         # every part of the row is LINE tall and centred in it, the text's first line
         # too (set_line), so icon, words, ×N, the button, copy and ✕ share one middle
-        row = QHBoxLayout(self)
-        row.setContentsMargins(18, 10, 6, 10)   # 18: room for the stripe
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(18, 10, 6, 10)   # 18: room for the stripe
+        outer.setSpacing(2)
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(10)
+        outer.addLayout(row)
+        self._row = row
+        # a long button goes on a line of its own under the text (set_action_place),
+        # so it doesn't squeeze the words into a thin column
+        self._under = QHBoxLayout()
+        outer.addLayout(self._under)
         self.icon = QLabel()
         self.icon.setFixedSize(18, LINE)
-        self.icon.setAlignment(Qt.AlignCenter)
+        self.icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.spinner = _Spinner()
         self.spinner.hide()
-        row.addWidget(self.icon, 0, Qt.AlignTop)
-        row.addWidget(self.spinner, 0, Qt.AlignTop)
+        row.addWidget(self.icon, 0, Qt.AlignmentFlag.AlignTop)
+        row.addWidget(self.spinner, 0, Qt.AlignmentFlag.AlignTop)
 
         self.label = QLabel()
         self.label.setObjectName("toasttext")
         self.label.setWordWrap(True)
-        self.label.setTextFormat(Qt.RichText)
+        self.label.setTextFormat(Qt.TextFormat.RichText)
         self.label.setOpenExternalLinks(False)
-        self.label.setTextInteractionFlags(Qt.NoTextInteraction)
-        row.addWidget(self.label, 1, Qt.AlignTop)
+        self.label.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        row.addWidget(self.label, 1, Qt.AlignmentFlag.AlignTop)
 
         self.action = QPushButton()
         self.action.setObjectName("toastaction")
         self.action.setFixedHeight(LINE)
-        self.action.setCursor(Qt.PointingHandCursor)
+        self.action.setCursor(Qt.CursorShape.PointingHandCursor)
         self.action.hide()
-        row.addWidget(self.action, 0, Qt.AlignTop)
+        row.addWidget(self.action, 0, Qt.AlignmentFlag.AlignTop)
 
         self.btn_copy = self._icon_button("copy", 13, _("Copy"))
         self.btn_copy.hide()
-        row.addWidget(self.btn_copy, 0, Qt.AlignTop)
+        row.addWidget(self.btn_copy, 0, Qt.AlignmentFlag.AlignTop)
         self.btn_close = self._icon_button("close", 12, _("Dismiss"))
-        row.addWidget(self.btn_close, 0, Qt.AlignTop)
+        row.addWidget(self.btn_close, 0, Qt.AlignmentFlag.AlignTop)
 
     @staticmethod
     def _icon_button(name: str, size: int, words: str) -> QPushButton:
@@ -166,9 +184,29 @@ class _Card(QFrame):
         b.setFixedSize(LINE, LINE)
         b.setToolTip(words)
         b.setAccessibleName(words)
-        b.setCursor(Qt.PointingHandCursor)
+        b.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(b, name, "muted", size=size)
         return b
+
+    def set_action_place(self):
+        """A short button (Undo, See why) sits on the text's line; a long one goes on a
+        line of its own under the text."""
+        self.action.ensurePolished()
+        wide = self.action.sizeHint().width() > ACTION_INLINE
+        self._row.removeWidget(self.action)
+        while self._under.count():   # the button and its stretch, if it was under
+            self._under.takeAt(0)
+        if wide:
+            # the button's words start where the text does: past the icon, less the
+            # button's own padding
+            inset = (self.action.sizeHint().width()
+                     - self.action.fontMetrics().horizontalAdvance(self.action.text())) // 2
+            self._under.setContentsMargins(max(0, UNDER - inset), 0, 0, 0)
+            self._under.addWidget(self.action)
+            self._under.addStretch(1)
+        else:
+            self._row.insertWidget(self._row.indexOf(self.btn_copy), self.action, 0,
+                                   Qt.AlignmentFlag.AlignTop)
 
     def set_line(self):
         """Pad the text so its first line sits in the middle of the LINE-tall row."""
@@ -188,10 +226,10 @@ class _Card(QFrame):
     def paintEvent(self, ev):
         super().paintEvent(ev)
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         tone = QColor(theme.T.get(self._tone, theme.T.get("accent", "#7c5cff")))
         x = 6 if not self.isRightToLeft() else self.width() - 10
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(tone)
         p.drawRoundedRect(QRectF(x, 10, 4, self.height() - 20), 2, 2)
         if self.progress is not None:
@@ -222,7 +260,7 @@ class _Toast(QWidget):
     def __init__(self, host: QWidget, stack: _Stack):
         super().__init__(host)
         self._stack = stack
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setAccessibleName(_("Notice"))
         lay = QVBoxLayout(self)
         lay.setContentsMargins(self.PAD, self.TOP, self.PAD, self.BOTTOM)
@@ -240,12 +278,17 @@ class _Toast(QWidget):
         self._timer = QTimer(self, singleShot=True, timeout=self.dismiss)
         self._left = 0          # ms left when the countdown was paused by hovering
         self._leaving = False
+        self._squeezed = False   # hidden while the window shows icons (_Stack.place)
         self._anims: list[QAbstractAnimation] = []
         self.hide()
 
     # -- what it says
     def text(self) -> str:
         return self._text
+
+    def words(self) -> str:
+        """What it says, as plain words (no markup, entities read)."""
+        return _strip_tags(self._text)
 
     def set_content(self, text: str, kind: str, ms: int, action, progress, on_close=None):
         self._closed()   # what it said before is gone now
@@ -261,11 +304,14 @@ class _Toast(QWidget):
         problem = kind in ("warn", "error")
         self.card.btn_copy.setVisible(problem)
         self.card.label.setTextInteractionFlags(
-            Qt.TextSelectableByMouse if problem else Qt.NoTextInteraction)
-        self.card.label.setCursor(Qt.IBeamCursor if problem else Qt.ArrowCursor)
+            Qt.TextInteractionFlag.TextSelectableByMouse if problem
+            else Qt.TextInteractionFlag.NoTextInteraction)
+        self.card.label.setCursor(Qt.CursorShape.IBeamCursor if problem
+                                  else Qt.CursorShape.ArrowCursor)
         if action:
             label, self._callback = action
             self.card.action.setText(label)
+            self.card.set_action_place()
             self.card.action.show()
         else:
             self._callback = None
@@ -379,10 +425,10 @@ class _Toast(QWidget):
             return
         a = QPropertyAnimation(self, b"pos", self)
         a.setDuration(ANIM_MS + 40)
-        a.setEasingCurve(QEasingCurve.OutCubic)
+        a.setEasingCurve(QEasingCurve.Type.OutCubic)
         a.setStartValue(pos + QPoint(0, 14) if from_below else self.pos())
         a.setEndValue(pos)
-        self._anims = [x for x in self._anims if x.state() == QAbstractAnimation.Running]
+        self._anims = [x for x in self._anims if x.state() == QAbstractAnimation.State.Running]
         self._anims.append(a)
         a.start()
 
@@ -395,10 +441,13 @@ class _Stack(QObject):
         self.setObjectName("toaststack")
         self.host = host
         self.toasts: list[_Toast] = []   # oldest first
+        self.compact = False             # too small to read: icons (_Dot) instead
+        self.dots: list[_Dot] = []
+        self.mode = "cards"              # or "icons" / "hidden" (host.toast_mode)
         host.installEventFilter(self)
 
     def eventFilter(self, obj, ev):
-        if ev.type() == QEvent.Resize and self.toasts:
+        if ev.type() == QEvent.Type.Resize and self.toasts:
             self.place(animate=False)
         return False
 
@@ -446,13 +495,30 @@ class _Stack(QObject):
         bottom = self._floor()
         rtl = host.isRightToLeft()
         x = MARGIN - _Toast.PAD if rtl else host.width() - w - MARGIN + _Toast.PAD
-        for t in reversed(self.toasts):   # newest at the bottom, older ones above it
+        heights = {}
+        for t in self.toasts:
             t.setFixedWidth(w)
             t.ensurePolished()
             t.card.ensurePolished()
             lay = t.layout()
             h = lay.totalHeightForWidth(w) if lay.hasHeightForWidth() else t.sizeHint().height()
-            h = max(h, t.minimumSizeHint().height())
+            heights[t] = max(h, t.minimumSizeHint().height())
+        # the host's say (the mini player: icons on top, or none at its smallest), else
+        # cards; cards that can't all be read above the floor shrink to icons too
+        mode = getattr(host, "toast_mode", None)
+        mode = mode() if callable(mode) else "cards"
+        if mode == "cards" and sum(heights.values()) > bottom - 4:
+            mode = "icons"
+        self.mode = mode
+        self.compact = mode != "cards"
+        self._place_dots(rtl)
+        if self.compact:   # they keep counting down (errors wait for the window to grow)
+            for t in self.toasts:
+                t._squeezed = True
+                t.hide()
+            return
+        for t in reversed(self.toasts):   # newest at the bottom, older ones above it
+            h = heights[t]
             t.setFixedHeight(h)
             top = bottom - h
             pos = QPoint(max(0, x), max(0, top))
@@ -460,9 +526,68 @@ class _Stack(QObject):
                 t.glide_to(pos)
             else:
                 t.move(pos)
+            if t._squeezed and not t._leaving:
+                t._squeezed = False
+                t.show()   # the window grew: the card is back
             bottom = top
         for t in self.toasts:
             t.raise_()
+
+    def _place_dots(self, rtl: bool):
+        """One round icon per card in the window's top corner (newest in the corner),
+        while the mode is "icons"."""
+        want = len(self.toasts) if self.mode == "icons" else 0
+        while len(self.dots) < want:
+            self.dots.append(_Dot(self))
+        for d in self.dots[want:]:
+            d.hide()
+        gap = 6
+        for i, t in enumerate(list(reversed(self.toasts))[:want]):
+            d = self.dots[i]
+            d.show_for(t)
+            step = DOT_MARGIN + i * (DOT + gap)
+            d.move(step if rtl else self.host.width() - step - DOT, DOT_MARGIN)
+            d.show()
+            d.raise_()
+
+    def expand(self):
+        grow = getattr(self.host, "toast_expand", None)
+        if callable(grow):
+            grow()
+
+
+class _Dot(QPushButton):
+    """A card shrunk to its icon (the window's too small to read cards): hovering shows
+    its words, clicking makes the window bigger. Clicking never closes it."""
+
+    def __init__(self, stack: _Stack):
+        super().__init__(stack.host)
+        self.setObjectName("toastdot")
+        self.setFixedSize(DOT, DOT)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self._tone = "accent"
+        self.clicked.connect(stack.expand)
+
+    def show_for(self, t: _Toast):
+        name, self._tone = KINDS.get(t.kind, KINDS[""])
+        icons.set_icon(self, name or "info", self._tone, size=16)
+        words = _strip_tags(t.text())
+        self.setToolTip(words)
+        self.setAccessibleName(words)
+        self.update()
+
+    def paintEvent(self, ev):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        tone = QColor(theme.T.get(self._tone, theme.T.get("accent", "#7c5cff")))
+        p.setPen(QPen(tone, 2))
+        bg = QColor(theme.T.get("card_hi" if self.underMouse() else "card", "#232633"))
+        p.setBrush(bg)
+        p.drawEllipse(QRectF(1, 1, DOT - 2, DOT - 2))
+        pm = self.icon().pixmap(16, 16)
+        p.drawPixmap((DOT - 16) // 2, (DOT - 16) // 2, pm)
+        p.end()
 
 
 def _in_toast(w: QWidget) -> bool:
@@ -479,7 +604,7 @@ def _strip_tags(text: str) -> str:
 
 
 def _stack_for(host: QWidget) -> _Stack:
-    s = host.findChild(_Stack, "toaststack", Qt.FindDirectChildrenOnly)
+    s = host.findChild(_Stack, "toaststack", Qt.FindChildOption.FindDirectChildrenOnly)
     return s if s is not None else _Stack(host)
 
 
@@ -491,6 +616,13 @@ def _announce(t: _Toast, text: str):
             QAccessible.updateAccessibility(QAccessibleAnnouncementEvent(t, _strip_tags(text)))
     except (ImportError, AttributeError, TypeError):
         pass
+
+
+def titled(title: str, text: str) -> str:
+    """A message box's title and plain words (lines kept) as a toast's rich text."""
+    import html
+    body = html.escape(text, quote=False).replace("\n", "<br>")
+    return f"<b>{html.escape(title, quote=False)}</b><br>{body}" if title else body
 
 
 def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, *,
@@ -524,11 +656,12 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
     if new:
         stack.add(t)
         stack.place(animate=False)
-        t.show()
-        t.raise_()
-        t.fade_in()
-        t.glide_to(t.pos(), from_below=True)
-        stack.place()   # the older cards make room
+        if not stack.compact:
+            t.show()
+            t.raise_()
+            t.fade_in()
+            t.glide_to(t.pos(), from_below=True)
+            stack.place()   # the older cards make room
     else:
         stack.place()
     _announce(t, text)
@@ -538,13 +671,21 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
 def close(window: QWidget | None, key: str):
     """Take down the card shown with ``key`` on ``window`` (or the dialog in front)."""
     for host in {w.window() for w in (QApplication.activeModalWidget(), window) if w}:
-        s = host.findChild(_Stack, "toaststack", Qt.FindDirectChildrenOnly)
+        s = host.findChild(_Stack, "toaststack", Qt.FindChildOption.FindDirectChildrenOnly)
         t = s.find("", "", key) if s is not None else None
         if t is not None:
             t.dismiss()
 
 
+def relayout(window: QWidget):
+    """The window changed how it shows cards (in or out of the mini player): place them
+    again, as cards or icons."""
+    s = window.window().findChild(_Stack, "toaststack", Qt.FindChildOption.FindDirectChildrenOnly)
+    if s is not None and s.toasts:
+        s.place(animate=False)
+
+
 def shown(window: QWidget) -> list[_Toast]:
     """The cards up on ``window`` (or nothing), oldest first. For tests."""
-    s = window.window().findChild(_Stack, "toaststack", Qt.FindDirectChildrenOnly)
+    s = window.window().findChild(_Stack, "toaststack", Qt.FindChildOption.FindDirectChildrenOnly)
     return [t for t in s.toasts if not t._leaving] if s is not None else []

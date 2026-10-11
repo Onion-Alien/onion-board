@@ -104,7 +104,8 @@ class AlsoSendRows:
         row.append(field)
         if minus is not None:
             # its own size at the left: this column takes the card's spare width
-            self.grid.addWidget(minus, r, first + 2, Qt.AlignLeft | Qt.AlignVCenter)
+            self.grid.addWidget(minus, r, first + 2, Qt.AlignmentFlag.AlignLeft
+                                | Qt.AlignmentFlag.AlignVCenter)
             row.append(minus)
         self.widgets += row
 
@@ -122,7 +123,7 @@ class AlsoSendRows:
         for i, (name, kind) in enumerate(self.rows()):
             box = QComboBox()
             box.setMinimumWidth(120)
-            box.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             box.setMinimumContentsLength(16)
             no_wheel(box)
             names = self.free(keep=name)
@@ -141,7 +142,7 @@ class AlsoSendRows:
                 if k == CALL and off:
                     continue   # (nothing goes to the call)
                 what.addItem(text, k)
-                what.setItemData(what.count() - 1, tip, Qt.ToolTipRole)
+                what.setItemData(what.count() - 1, tip, Qt.ItemDataRole.ToolTipRole)
             what.setCurrentIndex(max(0, what.findData(kind)))
             fm = what.fontMetrics()   # never cut off (the theme's padding and arrow: + 90)
             what.setMinimumWidth(max(fm.horizontalAdvance(t) for __, t, __t in KINDS) + 90)
@@ -198,7 +199,7 @@ class AlsoSendRows:
             for col, w in enumerate(row):
                 self.grid.addWidget(w, r, col)
             self.widgets += row
-        self.grid.addWidget(self.add, r, first + 1, Qt.AlignLeft)
+        self.grid.addWidget(self.add, r, first + 1, Qt.AlignmentFlag.AlignLeft)
         self.add.setVisible(bool(self.free()) and not (off and c.obs_device))
 
 

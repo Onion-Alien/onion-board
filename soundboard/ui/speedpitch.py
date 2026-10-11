@@ -65,14 +65,14 @@ class RevMeter(QWidget):
     def paintEvent(self, _e):
         t = theme.T
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = min(self.width() / 2 - 12, self.height() * 0.62)
         c = QPointF(self.width() / 2, r + 10)
         box = QRectF(c.x() - r, c.y() - r, 2 * r, 2 * r)
 
         def arc(v0, v1, color, width):
             a0, a1 = self._angle(v0), self._angle(v1)
-            p.setPen(QPen(QColor(color), width, Qt.SolidLine, Qt.FlatCap))
+            p.setPen(QPen(QColor(color), width, Qt.PenStyle.SolidLine, Qt.PenCapStyle.FlatCap))
             p.drawArc(box, int(a0 * 16), int((a1 - a0) * 16))
 
         def point(v, rad):
@@ -95,25 +95,27 @@ class RevMeter(QWidget):
             p.setPen(QPen(QColor(RED if hot else t["muted"]), 1.5))
             p.drawLine(point(i, r - 6), point(i, r - 13))
             q = point(i, r - 22)
-            p.drawText(QRectF(q.x() - 10, q.y() - 7, 20, 14), Qt.AlignCenter, str(i))
+            p.drawText(QRectF(q.x() - 10, q.y() - 7, 20, 14), Qt.AlignmentFlag.AlignCenter, str(i))
 
         hot = self.speed >= REDLINE_AT - 1e-6
         needle = QColor(RED if hot else t["text_hi"])
-        p.setPen(QPen(needle, 2.5, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(needle, 2.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(c, point(self.speed, r - 4))
         p.setBrush(needle)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.drawEllipse(c, 4.5, 4.5)
 
         f.setPointSizeF(11)
         f.setBold(True)
         p.setFont(f)
         p.setPen(QColor(RED if hot else t["text"]))
-        p.drawText(QRectF(c.x() - 60, c.y() + 6, 120, 20), Qt.AlignCenter, f"{self.speed:g}x")
+        p.drawText(QRectF(c.x() - 60, c.y() + 6, 120, 20), Qt.AlignmentFlag.AlignCenter,
+                   f"{self.speed:g}x")
         if hot:
             f.setPointSizeF(7)
             p.setFont(f)
-            p.drawText(QRectF(c.x() - 60, c.y() + 25, 120, 14), Qt.AlignCenter, _("Redline"))
+            p.drawText(QRectF(c.x() - 60, c.y() + 25, 120, 14), Qt.AlignmentFlag.AlignCenter,
+                       _("Redline"))
         p.end()
 
 
@@ -135,7 +137,7 @@ class SpeedPitchButton(QPushButton):
         self.setToolTip({"radio": _("Pitch and effects of the radio"),
                          "apps": _("Pitch and effects of the programs you send")}.get(
             what, _("Speed, pitch and effects of the sounds playing now")))
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         if not self.has_speed:   # "Effects" on its own reads as a label: show it's a control
             icons.set_icon(self, "wave", size=14)
         self._speed_hi = redline_speed(*redline)
@@ -145,7 +147,7 @@ class SpeedPitchButton(QPushButton):
         # the board does not dismiss the controls while configuring live audio.
         self.pop = QDialog(self)
         self.pop.setWindowTitle(_("Live controls"))
-        self.pop.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.pop.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self._placed = False
         self.pop.setObjectName("transport")
         v = QVBoxLayout(self.pop)
@@ -177,12 +179,12 @@ class SpeedPitchButton(QPushButton):
             w.setObjectName("spcol")    # sits on the popup, no box of its own
             w.setStyleSheet("QWidget#spcol { background:transparent; }")
             w.setFixedWidth(COL_W)
-        cols.addWidget(left_w, 0, Qt.AlignTop)
+        cols.addWidget(left_w, 0, Qt.AlignmentFlag.AlignTop)
         divider = QFrame()
         divider.setObjectName("vsep")
         divider.setFixedWidth(1)
         cols.addWidget(divider)
-        cols.addWidget(right_w, 0, Qt.AlignTop)
+        cols.addWidget(right_w, 0, Qt.AlignmentFlag.AlignTop)
         v.addLayout(cols)
         self._effects(right_w)
 
@@ -227,13 +229,13 @@ class SpeedPitchButton(QPushButton):
         icons.set_icon(self.redline, "shield", size=14)
         self.redline.setObjectName("small")
         self.redline.setCheckable(True)
-        self.redline.setCursor(Qt.PointingHandCursor)
+        self.redline.setCursor(Qt.CursorShape.PointingHandCursor)
         self.redline.setMinimumWidth(84)
         self.redline.setToolTip(_("Unlock silly speeds (up to {redline:g}x) and pitch (±{hi:g} "
                                   "st)", redline=redline, hi=REDLINE_PITCH.hi) if self.has_speed
                                 else _("Unlock silly pitch (±{hi:g} st)", hi=REDLINE_PITCH.hi))
         self.redline.toggled.connect(self.set_redline)
-        red_row.addWidget(self.redline, 0, Qt.AlignVCenter)
+        red_row.addWidget(self.redline, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(red_row)
         self.red_box = QWidget()
         self.red_box.setObjectName("redbox")    # sits on the popup, no box of its own
@@ -280,7 +282,7 @@ class SpeedPitchButton(QPushButton):
             b = QPushButton(name)
             b.setObjectName("small")
             b.setCheckable(True)
-            b.setCursor(Qt.PointingHandCursor)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.setToolTip(_("Click again to turn it off"))
             b.clicked.connect(lambda on, a=amounts: self.set_fx(a if on else {}))
             self.fx_presets[name] = b
@@ -315,7 +317,7 @@ class SpeedPitchButton(QPushButton):
         for s in speeds:
             b = QPushButton(f"{s:g}x")
             b.setObjectName("small")
-            b.setCursor(Qt.PointingHandCursor)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.clicked.connect(lambda __=False, s=s: self.speed.set_value(s) or self._edited())
             q.addWidget(b)
         return q

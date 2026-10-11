@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "Tối đa {value} phút.",
   "Update available": "Có bản cập nhật",
   "Update now": "Cập nhật ngay",
-  "Updated": "Đã cập nhật",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Đã cập nhật lên Onion Board {version}. Không gì thay đổi cho đến khi bạn muốn: mọi thứ vẫn như trước.",
   "Use the virtual cable instead": "Dùng cáp ảo thay thế",
   "Video": "Video",
@@ -787,7 +786,6 @@
   "Couldn't play it: {error}": "Không thể phát nội dung đó: {error}",
   "Couldn't re-scan": "Không thể quét lại",
   "Couldn't reach GitHub ({error}).": "Không thể truy cập GitHub ({error}).",
-  "Couldn't render it": "Không thể hiển thị nó",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Không thể đặt lại: tệp cài đặt đã bị khóa. Không có gì được thay đổi.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Không thể khôi phục: tệp cài đặt đã bị khóa. Không có gì được thay đổi.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Không thể lưu cài đặt đặt lại. Điểm khôi phục của bạn nằm trong Cài đặt > Chung.",
@@ -1048,7 +1046,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} đã hết, nhấp để biết chi tiết",
   "Onion Board: quick setup": "Onion Board - thiết lập nhanh",
   "Onion Pocket isn't installed.": "Onion Pocket chưa được cài đặt.",
-  "Onion Pocket wasn't removed": "Onion Pocket chưa bị xóa",
   "Onion Pocket wasn't removed: {error}": "Túi hành tây chưa được xóa: {error}",
   "Onion Pocket: your pads on your phone": "Onion Pocket: miếng đệm trên điện thoại của bạn",
   "Onion Watch isn't installed.": "Onion Watch chưa được cài đặt.",
@@ -1941,7 +1938,6 @@
   "Onion Watch download progress": "Tiến trình tải xuống của Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch hiện đang được tải xuống. Hãy thử lại khi hoàn tất.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch chưa có sẵn để tải xuống (GitHub cho biết họ không thể tìm thấy nó). Hãy thử lại sau.",
-  "Onion Watch wasn't removed": "Onion Watch chưa bị xóa",
   "Onion Watch wasn't removed: {error}": "Onion Watch chưa bị xóa: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch chưa được cập nhật: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} đã được cài đặt. Khởi động lại Onion Board để bắt đầu sử dụng.",
@@ -2015,14 +2011,7 @@
   "Save as a voice": "Lưu dưới dạng giọng nói",
   "Save clip": "Lưu đoạn phim",
   "Saved clips": "Clip đã lưu",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Các clip đã lưu ({clips}) · ✓ được thêm vào Âm thanh của bạn",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Các clip đã lưu ({clips}) · ✓ đã thêm {n} vào Âm thanh của bạn"
-  ],
   "Saved clips ({n})": "Các clip đã lưu ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Các clip đã lưu ({n}) · đã sao chép “{name}”: Ctrl+V dán nó vào trình chỉnh sửa hoặc trên tab Âm thanh",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Các clip đã lưu ({n}) · không có tai nghe để phát: chọn chúng trên tab Cài đặt",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Các clip đã lưu ({n}) · không nơi nào để gửi nó: chọn nơi âm thanh của bạn xuất hiện trên tab Thiết lập",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Những giọng nói đã lưu mà bạn đã xóa, được lưu giữ trong {n} ngày để bạn có thể khôi phục chúng"
   ],
@@ -2149,7 +2138,6 @@
   "There's no sound to download at that link.": "Không có âm thanh để tải xuống tại liên kết đó.",
   "This add-on has no install steps.": "Tiện ích bổ sung này không có bước cài đặt.",
   "This copy of Onion Board has no mic effect in it.": "Bản sao của Onion Board này không có hiệu ứng mic trong đó.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "Điều này có vẻ như là một vấn đề trong Onion Board. Báo cáo nó sẽ mở ra một trang trên GitHub của chúng tôi với các thông tin chi tiết được điền vào; bạn chọn những gì để gửi.",
   "This program's volume in the mix": "Khối lượng của chương trình này trong hỗn hợp",
   "Tone": "Giai điệu",
   "Too short to keep.": "Quá ngắn để giữ.",
@@ -3045,7 +3033,19 @@
   "Your sounds and settings are kept.": "Âm thanh và cài đặt của bạn vẫn được giữ lại.",
   "{error}": "{error}",
   "Update mic effect": "Cập nhật hiệu ứng mic",
-  "Update to new version": "Cập nhật lên bản mới",
+  "Added the voice “{name}”": "Đã thêm giọng “{name}”",
+  "Added {n} clip to your Sounds": [
+    "Đã thêm {n} đoạn vào Âm thanh của bạn"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Đã sao chép “{name}”: Ctrl+V dán vào trình chỉnh sửa hoặc thẻ Âm thanh",
+  "Keep": "Giữ lại",
+  "Keep your imported sounds?": "Giữ lại âm thanh đã nhập?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Đã chuyển <b>{n}</b> âm thanh từ các soundboard khác của bạn. Giữ lại không?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Đã chuyển <b>{n}</b> âm thanh từ {name}. Giữ lại không?"
+  ],
   "Compatibility fixes for games, calls and browsers.": "Sửa lỗi tương thích cho game, cuộc gọi và trình duyệt.",
   "Install update": "Cài bản cập nhật",
   "Mic updated: games, calls and browsers hear your sounds.": "Đã cập nhật mic: game, cuộc gọi và trình duyệt nghe được âm thanh của bạn.",

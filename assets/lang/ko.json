@@ -468,7 +468,6 @@
   "Up to {value} minutes.": "최대 {value}분.",
   "Update available": "업데이트 있음",
   "Update now": "지금 업데이트",
-  "Updated": "업데이트됨",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version}(으)로 업데이트했어요. 원할 때까지 아무것도 바뀌지 않아요: 모든 게 전처럼 작동해요.",
   "Use the virtual cable instead": "대신 가상 케이블 쓰기",
   "Video": "동영상",
@@ -787,7 +786,6 @@
   "Couldn't play it: {error}": "재생할 수 없음: {error}",
   "Couldn't re-scan": "다시 스캔할 수 없습니다.",
   "Couldn't reach GitHub ({error}).": "GitHub에 연결할 수 없습니다({error}).",
-  "Couldn't render it": "렌더링할 수 없습니다.",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "재설정할 수 없습니다. 설정 파일이 잠겨 있습니다. 아무것도 변경되지 않았습니다.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "복원할 수 없습니다. 설정 파일이 잠겨 있습니다. 아무것도 변경되지 않았습니다.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "재설정 설정을 저장할 수 없습니다. 복원 지점은 설정 > 일반에 있습니다.",
@@ -1048,7 +1046,6 @@
   "Onion Board {version} is out, click for details": "Onion Board {version} 이 출시되었습니다. 자세한 내용을 보려면 클릭하세요.",
   "Onion Board: quick setup": "양파 보드 - 빠른 설정",
   "Onion Pocket isn't installed.": "양파 포켓이 설치되지 않았습니다.",
-  "Onion Pocket wasn't removed": "양파 주머니가 제거되지 않았습니다",
   "Onion Pocket wasn't removed: {error}": "Onion Pocket이 제거되지 않았습니다: {error}",
   "Onion Pocket: your pads on your phone": "양파 포켓: 휴대폰의 패드",
   "Onion Watch isn't installed.": "양파 감시가 설치되지 않았습니다.",
@@ -1941,7 +1938,6 @@
   "Onion Watch download progress": "양파시계 다운로드 진행",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch가 지금 다운로드 중입니다. 완료되면 다시 시도하세요.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch는 아직 다운로드할 수 없습니다(GitHub에서는 찾을 수 없다고 합니다). 나중에 다시 시도하세요.",
-  "Onion Watch wasn't removed": "Onion Watch가 제거되지 않았습니다.",
   "Onion Watch wasn't removed: {error}": "Onion Watch가 제거되지 않았습니다: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch가 업데이트되지 않았습니다: {error}",
   "Onion Watch {version} is installed. Restart Onion Board to start using it.": "Onion Watch {version} 이 설치되었습니다. 사용을 시작하려면 Onion Board를 다시 시작하세요.",
@@ -2015,14 +2011,7 @@
   "Save as a voice": "음성으로 저장",
   "Save clip": "클립 저장",
   "Saved clips": "저장된 클립",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "저장된 클립({clips}) · ✓ 사운드에 추가됨",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "저장된 클립({clips}) · ✓ 사운드에 {n} 추가됨"
-  ],
   "Saved clips ({n})": "저장된 클립({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "저장된 클립({n}) · 복사된 \"{name}\": Ctrl+V를 사용하여 편집기나 사운드 탭에 붙여넣습니다.",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "저장된 클립({n}) · 재생할 헤드폰이 없습니다. 설정 탭에서 선택하세요.",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "저장된 클립({n}) · 보낼 곳 없음: 설정 탭에서 사운드가 이동할 위치를 선택하세요.",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "삭제한 저장된 음성은 다시 가져올 수 있도록 {n} 일 동안 보관되었습니다."
   ],
@@ -2149,7 +2138,6 @@
   "There's no sound to download at that link.": "해당 링크에서는 다운로드할 수 있는 사운드가 없습니다.",
   "This add-on has no install steps.": "이 추가 기능에는 설치 단계가 없습니다.",
   "This copy of Onion Board has no mic effect in it.": "이 Onion Board 사본에는 마이크 효과가 없습니다.",
-  "This looks like a problem in Onion Board. Reporting it opens a page on our GitHub with the details filled in; you choose what to send.": "이는 Onion Board의 문제인 것 같습니다. 이를 보고하면 세부 정보가 채워진 GitHub 페이지가 열립니다. 무엇을 보낼지 선택하세요.",
   "This program's volume in the mix": "이 프로그램의 믹스 볼륨",
   "Tone": "음정",
   "Too short to keep.": "너무 짧아서 보관할 수 없습니다.",
@@ -3045,7 +3033,19 @@
   "Your sounds and settings are kept.": "소리와 설정은 유지됩니다.",
   "{error}": "{error}",
   "Update mic effect": "마이크 효과 업데이트",
-  "Update to new version": "새 버전으로 업데이트",
+  "Added the voice “{name}”": "“{name}” 음성을 추가했어요",
+  "Added {n} clip to your Sounds": [
+    "클립 {n}개를 사운드에 추가했어요"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}”을(를) 복사했어요: Ctrl+V로 편집기나 사운드 탭에 붙여넣을 수 있어요",
+  "Keep": "유지",
+  "Keep your imported sounds?": "가져온 사운드를 유지할까요?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "다른 사운드보드에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ],
   "Compatibility fixes for games, calls and browsers.": "게임, 통화, 브라우저 호환성 수정.",
   "Install update": "업데이트 설치",
   "Mic updated: games, calls and browsers hear your sounds.": "마이크 업데이트 완료: 게임, 통화, 브라우저에서 사운드가 들립니다.",

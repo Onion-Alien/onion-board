@@ -91,7 +91,7 @@ class LinkBar(QFrame):
         h.setContentsMargins(10, 6, 10, 6)
         h.setSpacing(8)
         self.info = QLabel()
-        self.info.setTextFormat(Qt.RichText)
+        self.info.setTextFormat(Qt.TextFormat.RichText)
         self.info.setWordWrap(True)
         errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)
@@ -337,7 +337,8 @@ class LinkBar(QFrame):
         gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
-            self._say(_("No audio device is open, pick one in Setup."), theme.status("warn"))
+            busy.toast(self, html.escape(_("No audio device is open, pick one in Setup.")),
+                       "warn")
         else:
             self.played.emit(self.title or _("Link"), data, gain)
             name = html.escape(self.title or _("it"))

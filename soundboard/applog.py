@@ -324,17 +324,15 @@ def _plain(exc_info, where: str, sig: tuple):
 
 def _show_plain(v):
     try:
-        from PySide6.QtCore import Qt
-        from PySide6.QtWidgets import QApplication, QMessageBox
+        import html
+
+        from PySide6.QtWidgets import QApplication
 
         from soundboard import errors
+        from soundboard.ui import busy
         if QApplication.instance() is None or not _app_in_front():
             return   # never over a game: the log has it
-        box = QMessageBox(QMessageBox.Icon.Warning, "Onion Board", errors.plain(v),
-                          QMessageBox.StandardButton.Ok, QApplication.activeWindow())
-        box.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
-        box.show()
-        _state["plain_box"] = box
+        busy.toast(QApplication.activeWindow(), html.escape(errors.plain(v)), "error")
     except Exception:  # noqa: BLE001 - the crash reporter must never crash
         log.exception("couldn't show the problem")
 
@@ -595,7 +593,7 @@ def _app_in_front() -> bool:
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance()
-    return (app is not None and app.applicationState() == Qt.ApplicationActive
+    return (app is not None and app.applicationState() == Qt.ApplicationState.ApplicationActive
             and app.activeWindow() is not None)
 
 
