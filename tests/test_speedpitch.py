@@ -52,7 +52,11 @@ def test_live_stream_button_has_no_speed(qapp):
     b.set_fx({"reverb": 0.5})
     assert b.text() == "+3 st · FX"
     b.set_redline(True)
-    assert b.red_box.isHidden()            # the rev meter is for speed
+    assert not b.red_box.isHidden()        # Redline's meter shows the pitch here
+    assert b.meter.pitch and b.meter.speed == 3
+    b.pitch.set_value(30)
+    b._edited()
+    assert b.meter.speed == 30 and b.meter._hot(30) and not b.meter._hot(12)
     b.reset()
     assert b.text() == "Effects"
 

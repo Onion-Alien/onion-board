@@ -1,0 +1,3 @@
+- Radio and Apps: Redline shows its gauge again, for the pitch (-36 to +36 st, red past ±24), with quick pitch buttons under it.
+- Radio: with no saved station list (a first start, a reset), the most listened-to 300 stations show in a second or two instead of waiting 5-15 s for all 3000; the full list fills in behind them.
+- Radio: Popular, the star and Recent are the same height, and the star sits centred when the window is small.

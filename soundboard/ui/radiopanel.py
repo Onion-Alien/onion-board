@@ -645,7 +645,7 @@ QFrame#stations QComboBox QAbstractItemView, QFrame#stations QComboBoxPrivateCon
 QFrame#stations QMenu { background:$card; }
 QFrame#stations QListWidget { border:none; outline:0; }
 QFrame#stations QPushButton#seg { border:none; border-radius:7px; padding:5px 10px;
-    background:transparent; color:$muted; font-weight:600; }
+    min-height:18px; background:transparent; color:$muted; font-weight:600; }
 QFrame#stations QPushButton#seg:hover { color:$text_hi; background:$card_hi; }
 QFrame#stations QPushButton#seg:checked { background:$accent; color:$on_accent; }
 QFrame#stations QWidget#segbox { background:$inset; border-radius:9px; }
@@ -1460,6 +1460,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         def star_only(compact):
             self.btn_favs.setText("" if compact else _("Favorites"))
             self.btn_favs.setToolTip(_("Favorites") if compact else "")
+            # again: just the star must drop the gap kept for the words beside it,
+            # or it sits off-centre in a wider pill between Popular and Recent
+            icons.set_icon(self.btn_favs, "star", "muted")
             r.touch(self.btn_favs)
 
         def play_icon(compact):

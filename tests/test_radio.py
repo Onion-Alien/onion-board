@@ -9,12 +9,14 @@ import hashlib
 import http.server
 import io
 import json
+import re
 import threading
 import time
 
 import numpy as np
 import pytest
 import soundfile as sf
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QWidget
 
 from conftest import closed_port, process_events
@@ -421,6 +423,7 @@ class Server:
         self.stations.append(api_station(9, name="Rock Radio", tags="rock",
                                          country="Brazil", geo_lat=None, geo_long=None))
         self.audio = wav_bytes()
+        self.slow_over, self.slow_s = 10 ** 9, 0.0   # map lists past slow_over: slow_s late
         srv = self
 
         class H(http.server.BaseHTTPRequestHandler):
@@ -435,6 +438,10 @@ class Server:
                     q = self.path
                     if "has_geo_info" in q:
                         found = [s for s in srv.stations if s["geo_lat"] is not None]
+                        limit = int(re.search(r"limit=(\d+)", q).group(1))
+                        found = found[:limit]
+                        if limit > srv.slow_over:    # the whole list: slow to send
+                            time.sleep(srv.slow_s)
                     elif "name=rock" in q.lower() or "tag=rock" in q.lower():
                         found = [s for s in srv.stations if "rock" in s["tags"]]
                     else:
@@ -489,6 +496,56 @@ def test_directory_loads_the_globe_caches_it_and_fails_over(qapp, server, tmp_pa
     d2.load_globe()
     assert process_events(qapp, lambda: got2)
     assert len(got2[0]) == 5 and len(server.hits) == n   # served from the cache
+
+
+def test_with_no_saved_list_the_first_few_stations_come_first(qapp, server, tmp_path,
+                                                              monkeypatch):
+    """The directory takes 5-15 s to send all 3000 stations: with nothing saved (a first
+    start, a reset), Bun waited that long on an empty map. The most listened-to few,
+    asked for alongside, show in a second or two; only the full list is saved."""
+    monkeypatch.setattr(radio, "GLOBE_FIRST", 2)
+    server.slow_over, server.slow_s = 2, 1.5
+    d = RadioDirectory(tmp_path, bases=(server.base,))
+    got = []
+    d.globe_ready.connect(lambda st: got.append((time.monotonic(), len(st))))
+    t0 = time.monotonic()
+    d.load_globe()
+    assert process_events(qapp, lambda: len(got) >= 2, timeout=20)
+    assert [n for _t, n in got] == [2, 5]                   # the first few, then all
+    assert got[0][0] - t0 < 1.4                             # before the slow full list
+    saved = d._read_cache()
+    assert saved is not None and len(saved[1]) == 5         # never the first few
+    # with that list saved, the next start asks for nothing first
+    server.hits.clear()
+    d2 = RadioDirectory(tmp_path, bases=(server.base,))
+    got2 = []
+    d2.globe_ready.connect(got2.append)
+    d2.load_globe()
+    assert process_events(qapp, lambda: got2) and len(got2[0]) == 5
+    assert not server.hits
+
+
+def test_the_first_few_never_replace_a_full_list_that_came_first(qapp, server, tmp_path,
+                                                                 monkeypatch):
+    monkeypatch.setattr(radio, "GLOBE_FIRST", 2)
+    server.slow_over, server.slow_s = -1, 0.0       # every answer as quick
+    real_get = RadioDirectory._get
+
+    def full_first(self, path, done, fail, attempt=0, parse=radio.loads_gently):
+        if "limit=2&" in path or path.endswith("limit=2"):   # the first few: late
+            QTimer.singleShot(800, lambda: real_get(self, path, done, fail, attempt, parse))
+            return None
+        return real_get(self, path, done, fail, attempt, parse)
+    monkeypatch.setattr(RadioDirectory, "_get", full_first)
+    d = RadioDirectory(tmp_path, bases=(server.base,))
+    got = []
+    d.globe_ready.connect(lambda st: got.append(len(st)))
+    d.load_globe()
+    assert process_events(qapp, lambda: got)
+    end = time.monotonic() + 2
+    while time.monotonic() < end:
+        qapp.processEvents()
+    assert got == [5]
 
 
 def test_directory_falls_back_to_a_stale_cache_then_reports(qapp, tmp_path):
