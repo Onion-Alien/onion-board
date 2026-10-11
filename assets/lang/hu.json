@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Hangeszköz-probléma: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Nem játszható le: „{name}”{why}. Ha a fájlt áthelyezték vagy törölték, töröld a gombot, és add hozzá újra a hangot.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Nem sikerült újra keresni az eszközöket, indítsd újra az appot az újak felismeréséhez.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Nem sikerült elkészíteni az előnézetet (lásd a naplót).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Nem sikerült menteni a beállításaidat, lásd a naplót itt: %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>A gyorsbillentyűk ki vannak kapcsolva, ezzel visszakapcsolod őket: {key}.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Az azonnali visszajátszás nem tud figyelni: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Nincs megnyitva hangeszköz, válassz egyet a Beüzemelés lapon.</span>",
@@ -533,8 +531,6 @@
     "{n} hang importálva ({skipped} már megvolt a könyvtáradban)",
     "{n} hang importálva ({skipped} már megvolt a könyvtáradban)"
   ],
-  "Importing {count} file(s)…": "{count} fájl importálása…",
-  "Importing {n} sound(s)…": "{n} hang importálása…",
   "Importing {n} sound…": [
     "{n} hang importálása…",
     "{n} hang importálása…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} hang már a könyvtáradban van",
     "{n} hang már a könyvtáradban van"
-  ]
+  ],
+  "Open Triggers": "Triggerek megnyitása"
 }

@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Πρόβλημα συσκευής ήχου: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Δεν παίζει το «{name}»{why}. Αν το αρχείο μετακινήθηκε ή διαγράφηκε, αφαίρεσε το κουμπί και πρόσθεσε ξανά τον ήχο.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Δεν έγινε νέα σάρωση συσκευών, κάνε επανεκκίνηση της εφαρμογής για να βρει τις νέες.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Δεν δημιουργήθηκε η προεπισκόπηση (δες την καταγραφή).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Δεν αποθηκεύτηκαν οι ρυθμίσεις σου, δες την καταγραφή στο %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Οι συντομεύσεις είναι κλειστές: το {key} τις ξανανοίγει.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Το άμεσο replay δεν μπορεί να ακούσει: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Καμία συσκευή ήχου ανοιχτή, διάλεξε μία στη Διαμόρφωση.</span>",
@@ -533,8 +531,6 @@
     "Έγινε εισαγωγή {n} ήχου ({skipped} ήδη στη βιβλιοθήκη σου)",
     "Έγινε εισαγωγή {n} ήχων ({skipped} ήδη στη βιβλιοθήκη σου)"
   ],
-  "Importing {count} file(s)…": "Εισαγωγή {count} αρχείων…",
-  "Importing {n} sound(s)…": "Εισαγωγή {n} ήχων…",
   "Importing {n} sound…": [
     "Εισαγωγή {n} ήχου…",
     "Εισαγωγή {n} ήχων…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} ήχοι είναι ήδη στη βιβλιοθήκη σου",
     "{n} ήχοι είναι ήδη στη βιβλιοθήκη σου"
-  ]
+  ],
+  "Open Triggers": "Άνοιγμα Εναυσμάτων"
 }

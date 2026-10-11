@@ -77,7 +77,6 @@
   ],
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не успях да търся в {site}: {err}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не мога да пусна „{name}“{why}. Ако файлът е преместен или изтрит, махни бутона и добави звука отново.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Не успях да направя прегледа (виж дневника).</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Моменталният повтор не може да слуша: {error}</span>",
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нищо за запазване: {why}.</span>",
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Дистанционното управление е изключено: {err}.</span>",
@@ -491,8 +490,6 @@
     "Импортиран е {n} звук ({skipped} вече са в библиотеката ти)",
     "Импортирани са {n} звука ({skipped} вече са в библиотеката ти)"
   ],
-  "Importing {count} file(s)…": "Импортиране на {count} файл(а)…",
-  "Importing {n} sound(s)…": "Импортиране на {n} звук(а)…",
   "Importing {n} sound…": [
     "Импортирам {n} звук…",
     "Импортирам {n} звука…"
@@ -2873,7 +2870,6 @@
   "Reset to how it came": "Нулирайте до начина, по който дойде",
   "Remove from the board": "Извадете от дъската",
   "Onion Board {version} is out, click for details": "Onion Board {version} излезе, щракнете за подробности",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Настройките ви не можаха да бъдат запазени, вижте регистрационния файл в %APPDATA%\\OnionBoard.</span>",
   "Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.": "Настройките ви не можаха да бъдат запазени, вижте регистрационния файл в %APPDATA%\\OnionBoard.",
   "Live: others hear you": "На живо: другите ви чуват",
   "There's no picture at that link.": "Няма снимка на този линк.",
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} звука вече са в библиотеката ти",
     "{n} звука вече са в библиотеката ти"
-  ]
+  ],
+  "Open Triggers": "Отвори Тригери"
 }

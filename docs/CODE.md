@@ -350,7 +350,7 @@ the newest backup is used, so the pad list is never silently reset.
   otherwise start a pool of one thread per CPU each and reserve ~32 MB per thread: about
   1 GB of commit and 30 idle threads. Add-on helper processes (`net.child_env`) get the
   variable removed again, so their own maths isn't capped by the app's choice.
-- Drop-outs reported by the audio driver are counted and shown in the status line.
+- Drop-outs reported by the audio driver are counted and shown in a toast (key "audio").
   **⚙ Settings → Audio → Audio buffering: Safer** trades a little delay for bigger
   buffers if a device keeps crackling.
 - A stream whose callback stops (headset unplugged, sample rate changed, PC woke from

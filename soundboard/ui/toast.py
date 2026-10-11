@@ -13,6 +13,8 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
   notice in the same window, so "Adding 3 sounds…" becomes "Added 3 sounds" in place.
   ``key`` does the same for a named card: a later toast with that key updates it.
 - **Buttons**: ``action=(label, callback)`` adds one (Undo, See why); ✕ closes.
+  ``on_close`` runs when the card goes without its button clicked: timed out, closed,
+  pushed out by newer cards or replaced (an Undo card's "too late now").
 - **Timing**: hovering pauses the countdown. Errors stay until closed.
 
 Child widgets of the window, never their own windows, so they never take focus from a
@@ -234,6 +236,7 @@ class _Toast(QWidget):
         self._text = ""
         self._n = 1
         self._callback: Callable[[], None] | None = None
+        self._on_close: Callable[[], None] | None = None
         self._timer = QTimer(self, singleShot=True, timeout=self.dismiss)
         self._left = 0          # ms left when the countdown was paused by hovering
         self._leaving = False
@@ -244,7 +247,9 @@ class _Toast(QWidget):
     def text(self) -> str:
         return self._text
 
-    def set_content(self, text: str, kind: str, ms: int, action, progress):
+    def set_content(self, text: str, kind: str, ms: int, action, progress, on_close=None):
+        self._closed()   # what it said before is gone now
+        self._on_close = on_close
         self._text, self.kind = text, kind
         self.setProperty("tone", kind)
         self.card.set_kind(kind)
@@ -316,6 +321,7 @@ class _Toast(QWidget):
 
     def _act(self):
         cb = self._callback
+        self._on_close = None   # it was acted on
         self.dismiss()
         if cb is not None:
             cb()
@@ -326,6 +332,7 @@ class _Toast(QWidget):
         self._leaving = True
         self._timer.stop()
         self._stack.forget(self)
+        self._closed()
         if not animations_on() or not self.isVisible():
             self._gone()
             return
@@ -338,6 +345,11 @@ class _Toast(QWidget):
         a.finished.connect(self._gone)
         self._anims.append(a)
         a.start()
+
+    def _closed(self):
+        cb, self._on_close = self._on_close, None
+        if cb is not None:
+            cb()
 
     def _gone(self):
         self.hide()
@@ -483,7 +495,8 @@ def _announce(t: _Toast, text: str):
 
 def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, *,
          action: tuple[str, Callable[[], None]] | None = None, key: str | None = None,
-         progress: tuple[int, int] | None = None) -> _Toast | None:
+         progress: tuple[int, int] | None = None,
+         on_close: Callable[[], None] | None = None) -> _Toast | None:
     """Show ``text`` (rich text) on ``window``, or the dialog in front of it (Settings
     is modal over the window). Returns the card, or None with no window."""
     host = QApplication.activeModalWidget() or window
@@ -497,7 +510,7 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         kind = "busy"
     stack = _stack_for(host)
     t = stack.find(text, kind, key)
-    if t is not None and key is None and progress is None and not action:
+    if t is not None and key is None and progress is None and not action and not on_close:
         t.bump(ms)
         stack.place()
         return t
@@ -507,7 +520,7 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
     if new:
         t = _Toast(host, stack)
     t.key = key
-    t.set_content(text, kind, ms, action, progress)
+    t.set_content(text, kind, ms, action, progress, on_close)
     if new:
         stack.add(t)
         stack.place(animate=False)
@@ -520,6 +533,15 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         stack.place()
     _announce(t, text)
     return t
+
+
+def close(window: QWidget | None, key: str):
+    """Take down the card shown with ``key`` on ``window`` (or the dialog in front)."""
+    for host in {w.window() for w in (QApplication.activeModalWidget(), window) if w}:
+        s = host.findChild(_Stack, "toaststack", Qt.FindDirectChildrenOnly)
+        t = s.find("", "", key) if s is not None else None
+        if t is not None:
+            t.dismiss()
 
 
 def shown(window: QWidget) -> list[_Toast]:

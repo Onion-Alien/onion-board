@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problem mit dem Audiogerät: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>„{name}“ lässt sich nicht abspielen{why}. Wenn die Datei verschoben oder gelöscht wurde, entferne das Pad und füg den Sound neu hinzu.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Geräte konnten nicht neu gesucht werden, starte die App neu, um neue zu finden.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Die Vorschau ließ sich nicht erstellen (siehe Protokoll).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Deine Einstellungen konnten nicht gespeichert werden, siehe Protokoll in %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Hotkeys sind aus: {key} schaltet sie wieder ein.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Sofort-Replay kann nicht mithören: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Kein Audiogerät ist offen, wähl eins unter Setup.</span>",
@@ -180,8 +178,6 @@
     "{n} Sound importiert",
     "{n} Sounds importiert"
   ],
-  "Importing {count} file(s)…": "Importiere {count} Datei(en)…",
-  "Importing {n} sound(s)…": "Importiere {n} Sound(s)…",
   "Importing {n} sound…": [
     "Importiere {n} Sound…",
     "Importiere {n} Sounds…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} Sounds sind schon in deiner Bibliothek",
     "{n} Sounds sind schon in deiner Bibliothek"
-  ]
+  ],
+  "Open Triggers": "Trigger öffnen"
 }

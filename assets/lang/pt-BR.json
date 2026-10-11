@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema no dispositivo de áudio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Não dá para tocar “{name}”{why}. Se o arquivo foi movido ou excluído, remova o botão e adicione o som de novo.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Não deu para procurar dispositivos de novo, reinicie o app para achar os novos.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Não deu para gerar a prévia (veja o registro).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Não deu para salvar suas configurações, veja o registro em %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Os atalhos estão desligados: {key} liga de novo.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>O replay instantâneo não consegue ouvir: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Nenhum dispositivo de áudio aberto, escolha um em Configurar.</span>",
@@ -180,8 +178,6 @@
     "{n} som importado",
     "{n} sons importados"
   ],
-  "Importing {count} file(s)…": "Importando {count} arquivo(s)…",
-  "Importing {n} sound(s)…": "Importando {n} som(ns)…",
   "Importing {n} sound…": [
     "Importando {n} som…",
     "Importando {n} sons…"
@@ -3097,5 +3093,6 @@
   "{n} sound is already in your library": [
     "{n} sons já estão na sua biblioteca",
     "{n} sons já estão na sua biblioteca"
-  ]
+  ],
+  "Open Triggers": "Abrir Gatilhos"
 }

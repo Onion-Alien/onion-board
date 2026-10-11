@@ -641,7 +641,6 @@ QPushButton#onair:checked { background:$live; border:1px solid transparent; colo
 QPushButton#onair:checked:hover { background:$live_hi; }
 QWidget#decktop { background:transparent; }
 QLabel#decktitle { color:$text; font-size:9pt; font-weight:600; }
-QLabel#statusnote { background:$card_hi; color:$text; border-radius:8px; padding:6px 10px; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
 QAbstractSpinBox { background:$bg; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
 QAbstractSpinBox:hover { border-color:$border_hi; }

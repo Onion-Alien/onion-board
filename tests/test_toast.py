@@ -224,3 +224,21 @@ def test_the_veil_says_what_a_drop_does():
     assert label_for(["C:/Sounds/memes"]) == "Drop to add sounds"   # a folder
     assert label_for(["cover.png"]) is None   # a picture for a pad
     assert label_for([]) is None
+
+
+def test_on_close_runs_unless_the_button_was_clicked(qapp):
+    w = _host(qapp)
+    closed = []
+    t = busy.toast(w, "Removed “Boom”", "", 50, key="undo",
+                   action=("Undo", lambda: closed.append("undo")),
+                   on_close=lambda: closed.append("gone"))
+    t.card.action.click()
+    assert closed == ["undo"]                  # undone: not "too late now"
+    busy.toast(w, "Removed “Boom”", "", 5000, key="undo", on_close=lambda: closed.append(1))
+    busy.toast(w, "Removed “Bruh”", "", 5000, key="undo", on_close=lambda: closed.append(2))
+    assert closed == ["undo", 1]               # replaced: the first one's time is up
+    toast.shown(w)[0].card.btn_close.click()
+    assert closed == ["undo", 1, 2]
+    busy.toast(w, "Removed “Airhorn”", "", 50, on_close=lambda: closed.append(3))
+    assert process_events(qapp, lambda: 3 in closed)   # timed out
+    w.close()
