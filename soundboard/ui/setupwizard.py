@@ -23,12 +23,11 @@ import subprocess
 import time
 
 import numpy as np
-from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer
+from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-                               QPushButton, QRadioButton, QScrollArea, QStackedWidget,
-                               QVBoxLayout, QWidget)
+                               QPushButton, QRadioButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard import directmic
 from soundboard import engine as eng
@@ -163,6 +162,9 @@ TILE_COLS, TILE_GAP = 4, 12
 CONTENT_W = TILE_COLS * TILE_W + (TILE_COLS - 1) * TILE_GAP   # a page's width: one row
 MARGIN = 24                   # the dialog's sides: the step bar, pages and Back / Next
 USE_TILE_H = 64               # "What's it for?": wider, shorter tiles, two across
+# Bun beside each step's title: about as tall as the title and its words, so the
+# header ends where its text does (his default padding left an empty band under it)
+BUN = {"height": 100, "pad": 10}
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # DESIGN.md Standard kit: Display
 BODY_CSS = "font-size:11pt;"                      # ... Large (a full-page guide's body)
 
@@ -305,7 +307,7 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     col.addWidget(body)
     col.addStretch(1)
     row.addLayout(col, 1)
-    row.addWidget(bun, 0, Qt.AlignTop)
+    row.addWidget(bun, 0, Qt.AlignVCenter)
     return row
 
 
@@ -333,6 +335,52 @@ class _RoundButton(QPushButton):
         pm = self.icon().pixmap(s, self.devicePixelRatioF())
         p.drawPixmap(round((self.width() - s.width()) / 2),
                      round((self.height() - s.height()) / 2), pm)
+
+
+class _PageStack(QWidget):
+    """The steps, one shown at a time, sized by the one showing: a QStackedWidget
+    measures itself by its tallest page (its layout asks every page), so a short step
+    sat above an empty band. Here the others are hidden, and a hidden widget takes no
+    room (DESIGN.md: a multi-step dialog shrinks to the current page). The calls the
+    guide uses are QStackedWidget's."""
+    currentChanged = Signal(int)
+
+    def __init__(self):
+        super().__init__()
+        self._lay = QVBoxLayout(self)
+        self._lay.setContentsMargins(0, 0, 0, 0)
+        self._pages: list[QWidget] = []
+        self._current = -1
+
+    def addWidget(self, page: QWidget) -> int:
+        self._pages.append(page)
+        self._lay.addWidget(page)
+        if self._current < 0:
+            self._current = 0
+        else:
+            page.hide()
+        return len(self._pages) - 1
+
+    def count(self) -> int:
+        return len(self._pages)
+
+    def widget(self, i: int) -> QWidget | None:
+        return self._pages[i] if 0 <= i < len(self._pages) else None
+
+    def currentIndex(self) -> int:
+        return self._current
+
+    def currentWidget(self) -> QWidget | None:
+        return self.widget(self._current)
+
+    def setCurrentIndex(self, i: int):
+        if not 0 <= i < len(self._pages) or i == self._current:
+            return
+        old, self._current = self.currentWidget(), i
+        self._pages[i].show()
+        if old is not None:
+            old.hide()
+        self.currentChanged.emit(i)
 
 
 class StatusCard(QFrame):
@@ -474,7 +522,7 @@ class SetupWizard(QDialog):
         self.setWindowTitle(_("Onion Board: quick setup"))
         # as wide as a row of tiles plus the margins: the tiles' right edge lines up
         # with Next's (DESIGN.md: everything on the same edges)
-        self.setMinimumSize(CONTENT_W + 2 * MARGIN, 520)
+        self.setMinimumWidth(CONTENT_W + 2 * MARGIN)   # (the height follows each step)
         # the cable installer, while it runs (one a closed guide left running included)
         self._proc: subprocess.Popen | None = \
             _installer if _installer is not None and _installer.poll() is None else None
@@ -507,7 +555,7 @@ class SetupWizard(QDialog):
         top.addWidget(self.progress)
         top.addStretch(1)
         v.addLayout(top)
-        self.stack = QStackedWidget()
+        self.stack = _PageStack()
         v.addWidget(self.stack, 1)
         if self._ask_use:
             self.stack.addWidget(self._page_use())
@@ -517,8 +565,7 @@ class SetupWizard(QDialog):
         self.stack.addWidget(self._page_discord())
         for i in range(self.stack.count()):   # the pages' edges are the dialog's: their
             self.stack.widget(i).layout().setContentsMargins(0, 0, 0, 0)   # cards line up
-        # fill the last page's text now, so the window sizes itself for the tallest
-        # page when it opens and stays the same size through every step
+        # fill the last page's text now (its pill and card show from the start)
         self._fill_discord()
 
         nav = QHBoxLayout()
@@ -593,7 +640,7 @@ class SetupWizard(QDialog):
                             _label(_("Pick the closest one. It only decides which tabs you "
                                      "start with: change it any time in <b>Settings</b> "
                                      "→ <b>Tabs</b>.")),
-                            BunnyWidget("star")))
+                            BunnyWidget("star", **BUN)))
         box = QWidget()
         grid = QGridLayout(box)   # two across, icon beside the name
         grid.setContentsMargins(0, 0, 0, 0)
@@ -642,7 +689,7 @@ class SetupWizard(QDialog):
     def _page_mic(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_mic = BunnyWidget("mic")
+        self.bun_mic = BunnyWidget("mic", **BUN)
         v.addLayout(_header(_("Which microphone do you talk into?"),
                             _label(_("Pick the mic you use for gaming (your headset or desk "
                                      "mic). <b>Say something</b>, the bar below should move "
@@ -673,7 +720,7 @@ class SetupWizard(QDialog):
     def _page_headphones(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_phones = BunnyWidget("headphones")
+        self.bun_phones = BunnyWidget("headphones", **BUN)
         v.addLayout(_header(_("Where do you listen?"),
                             _label(_("Pick your headphones or speakers, then press the "
                                      "<b>speaker button</b>. Only you hear this.")),
@@ -717,7 +764,7 @@ class SetupWizard(QDialog):
     def _page_cable(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_cable = BunnyWidget("plug")
+        self.bun_cable = BunnyWidget("plug", **BUN)
         v.addLayout(_header(_("Where do your sounds go?"),
                             _label(_("Straight into <b>your mic</b>: one click, and Discord "
                                      "and games hear your sounds through the mic they already "
@@ -904,7 +951,7 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         self.discord_text = _label("")
         head = _header(_("Last step: tell Discord or your game"), self.discord_text,
-                       BunnyWidget("star", celebrate=True))
+                       BunnyWidget("star", celebrate=True, **BUN))
         self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
         v.addLayout(head)
         row = QHBoxLayout()
@@ -1008,11 +1055,25 @@ class SetupWizard(QDialog):
         self._update_next()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)
 
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # the first step's height
+
+    _settle_due = False
+
+    def event(self, ev):
+        # any change to what's shown (a state, a card opening): fit to it again, once
+        # things have settled (fit.watch grows the window; this also shrinks it)
+        if ev.type() == QEvent.LayoutRequest and not self._settle_due:
+            self._settle_due = True
+            QTimer.singleShot(SETTLE_MS, self, self._settle_size)
+        return super().event(ev)
+
     def _settle_size(self):
-        """Back to the height the steps need (the tallest one: the window doesn't jump
-        between steps). fit.watch only grows the window, and while a step switches Qt
-        can briefly ask for far more room than its wrapped text needs: that stuck as an
-        empty band under the last step."""
+        """To the height this step needs (_PageStack), shrinking too: fit.watch only
+        grows the window, so a short step after a tall one kept an empty band, and
+        while a step switches Qt can briefly ask for far more room than it needs."""
+        self._settle_due = False
         if not self.isVisible():
             return
         need = max(fit.needed_height(self, self.width()), self.minimumHeight())
@@ -1324,6 +1385,7 @@ class SetupWizard(QDialog):
                     "can't be downloaded here. Put your sounds straight into your mic "
                     "instead: nothing to install.", colour=_bad()))
         self._update_next()
+        QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # a shorter state: no band
 
     def _show_working(self):
         """On the mic and working: said in plain words, a green card and a pill."""
@@ -1643,7 +1705,7 @@ class SteamGuide(QDialog):
             "Games that use <b>Steam's voice chat</b> (like <b>Counter-Strike 2</b>, "
             "<b>Dota 2</b> and <b>Deadlock</b>) don't have their own mic setting. "
             "They use the mic you pick <b>in Steam</b>. Do this once:")),
-            BunnyWidget("headphones")))
+            BunnyWidget("headphones", **BUN)))
         small = "<br><span style='font-size:9pt'>{}</span>"
         items = [
             _("Open <b>Steam</b>. Click <b>Steam</b> in the top-left corner, then "
