@@ -31,9 +31,6 @@ be the owner's call rather than a fix.
   Enter: the card says "Looking up <host>…" with no progress and no Cancel. Idea: a small
   spinner or "still looking…" after about 3 s, and Cancel on the card.
   Target: `ui/ytsearch.py` (`show_link`).
-- [ ] **U18: Importing a long file gives no feedback.** A one-hour MP3 imports fine but
-  nothing says it's working until it appears. Idea: a busy toast while an import takes over
-  about 1 s. Target: `import_files` in `ui/mainwindow.py`.
 - [ ] **U19: Two mic-mute switches on Setup.** *Send my mic to others* and *Mute mic during
   sounds* both gate the mic, worded differently. Check what each does: if different, the
   words must say so; if the same, merge them. Also: Audio buffering's two choices only show
@@ -79,6 +76,7 @@ Decisions in the right-hand column are standing: don't undo them without the own
 | U13 program names | #424 | Apps cards use the .exe's FileDescription (*VLC media player*), stem as fallback. |
 | U14 category names | #425 | Built-in Apps categories translated for display; config keeps the English key. |
 | U15 heading keyboard | #426 | Apps category headings take focus; Menu key / Shift+F10 opens their menu. |
+| U18 long import | #484 | The import's busy card stays up until the import is done (`ms=0`), for one file too, not 4 s. Checked on main with a 1-hour MP3, offscreen: "Adding 1 sound…" the whole 9.4 s (before: gone at 4 s), then "Added 1 sound". Test: `test_one_slow_file_keeps_its_busy_card_until_its_in`. |
 
 ## Features for later (not UI fixes; after 2.0)
 
