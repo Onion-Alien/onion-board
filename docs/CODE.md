@@ -221,6 +221,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/countdialog.py` | *What Count me in sends*: the table behind the eye button by Settings' *Count me in* (keep it in step with `usage.py` and SECURITY.md) |
 | `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `soundboard/settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
+| `soundboard/ui/audiorecovery.py` | Settings audio recovery card, confirmation dialogs and background mic-effect repair, clean reinstall and removal |
 | `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget); the app style (`AppStyle`): snug dropdowns, and submenus that open just outside their menu |
 | `soundboard/exitwatch.py` | a black box for the next start: `last-run.json` (heartbeat every 30 s, window stuck or not, a quit started) and `native-crash.txt` (faulthandler's stacks on a native crash), emptied at a clean quit. After an unclean exit `check_last` reads them plus Windows' Application log (wevtutil, this run's pid) and says why (`native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`, `pc-restarted`, `ended`): in the usage event and a report in `crash-reports\` (not counted again as an error) |
 | `soundboard/applog.py` | rotating log in `%APPDATA%\OnionBoard\onionboard.log`, written on its own thread (a log line never waits for the disk); unhandled exceptions (any thread) and Qt warnings land there; each distinct crash is saved, scrubbed of personal paths, to `crash-reports\` and offered to the user. `report()` does the same for an error code caught but didn't expect. The PC's situation (disk full, a file in use, access denied, no memory, network down) is said in plain words instead, with no report saved. `ONIONBOARD_DEBUG=1` for more. *Keep an app log* off (config `app_log`): memory only, the last lines kept for crash reports |
@@ -294,6 +295,14 @@ the newest backup is used, so the pad list is never silently reset.
 
 ## Audio notes
 
+- Local imports link to their original absolute path by default. Settings > Data &
+  quality > Local sounds can enable `Config.copy_local_sounds` for new imports.
+  Downloads and extracted ZIP files always keep a library file. Both modes decode
+  at import and use the same int16 cache (including memory mapping, prefetch and
+  effect caches), so live speed, pitch and bass have the same playback path. After
+  cache eviction the source must be available again; external files are never moved
+  or deleted when removing their pads. Backups include the linked audio itself,
+  converting linked videos to audio rather than exporting the whole video.
 - Sounds are held as int16 stereo at 48 kHz (half the size of float32; the
   engine scales them in the same multiply as the gain): short ones in RAM, long ones
   memory-mapped from the cache (`mapped.py`). Only the first 15 minutes of a

@@ -60,14 +60,14 @@ class MicUpdateOffer(QFrame):
         self.head = QWidget()
         self.head.setStyleSheet("background:transparent;")   # the tint is painted below
         h = QHBoxLayout(self.head)
-        h.setContentsMargins(20, 12, 12, 12)
+        h.setContentsMargins(18, 12, 12, 12)
         h.setSpacing(12)
         words = QVBoxLayout()
         words.setSpacing(4)
         words.addStretch(1)
         self.title = QLabel(_("Your mic, upgraded"))
         self.title.setWordWrap(True)
-        self.title.setStyleSheet("font-size:15pt; font-weight:800;")   # like the guide's titles
+        self.title.setObjectName("helptitle")   # the Title role (DESIGN.md: Standard kit)
         words.addWidget(self.title)
         self.benefit = QLabel(_("Compatibility fixes for games, calls and browsers."))
         self.benefit.setWordWrap(True)
@@ -79,7 +79,7 @@ class MicUpdateOffer(QFrame):
         v.addWidget(self.head)
 
         body = QVBoxLayout()
-        body.setContentsMargins(20, 14, 20, 16)
+        body.setContentsMargins(18, 12, 18, 18)
         body.setSpacing(8)
         self.body = QLabel(_("Windows asks for permission. Audio pauses briefly during "
                              "the update."))

@@ -1263,6 +1263,8 @@ class SettingsDialog(QDialog):
     def _audio(self):
         w, v = self._page()
         v.addWidget(self._devices_card())
+        from soundboard.ui.audiorecovery import RecoveryCard
+        v.addWidget(RecoveryCard(self.mw))
         card, cv = self._card(_("Your mic"),
                               _("Normally others hear your voice and your sounds together. "
                                 "Untick this for sounds only: they hear the sounds but not your "
@@ -2211,6 +2213,16 @@ class SettingsDialog(QDialog):
         q = quality.current
         w, v = self._page()
         self._data_widgets = {}
+
+        card, cv = self._card(_("Local sounds"))
+        self.copy_local_sounds = self._option(
+            cv, _("Copy into library"),
+            _("Off: link to the original file. Turn on to keep sounds if the original is "
+              "moved, deleted or on a disconnected drive. Uses extra disk space. "
+              "Applies to new local imports only."),
+            self.mw.cfg.copy_local_sounds,
+            lambda b: self.mw.set_option("copy_local_sounds", b))
+        v.addWidget(card)
 
         card, cv = self._card(_("Low data mode"),
                               _("For a phone hotspot, capped plan or slow internet: smaller "

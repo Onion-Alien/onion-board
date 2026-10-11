@@ -1456,8 +1456,9 @@ def admin_install(guid: str, slot: str | None = None) -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
-    _audio_service(False)
     try:
+        if not _audio_service(False):
+            return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
         # a name of its own per version: a copy Windows still holds can't block it
         digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
         target = install_dir() / f"obmic-{digest}.dll"
@@ -1486,13 +1487,29 @@ def admin_install(guid: str, slot: str | None = None) -> int:
     return 0
 
 
+def admin_reinstall(guid: str) -> int:
+    """One admin prompt and lock; never remove a working effect without a replacement."""
+    dll = bundled_dll()
+    if not dll.is_file():
+        return 3
+    # Read the complete source before touching Windows: unreadable or empty builds
+    # must leave the existing setup alone. admin_install copies it atomically.
+    if not dll.read_bytes():
+        return 3
+    result = admin_uninstall()
+    if result:
+        return result   # keep the failed endpoint's recovery notes for another attempt
+    return admin_install(guid)
+
+
 def admin_uninstall() -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
-    _audio_service(False)
     failed = False
     try:
+        if not _audio_service(False):
+            return 6   # the existing effect and its recovery notes stay intact
         for guid in installed_on():
             try:
                 _uninstall_endpoint(guid)
@@ -1549,7 +1566,12 @@ def cli(args: list[str]) -> int:
             code = _elevated(["uninstall"])
             return 1 if code is None else code
         args = ["uninstall"]
-    if args[:1] == ["install"] and len(args) in (2, 3) and _GUID.fullmatch(args[1]) \
+    if args[:1] == ["reinstall"] and len(args) == 2 and _GUID.fullmatch(args[1]):
+        guid = args[1].lower()
+        if guid not in {e["guid"] for e in capture_endpoints()}:
+            return 2
+        step = lambda: admin_reinstall(guid)  # noqa: E731
+    elif args[:1] == ["install"] and len(args) in (2, 3) and _GUID.fullmatch(args[1]) \
             and (len(args) == 2 or args[2] in SLOTS_FX):
         guid = args[1].lower()
         if guid not in {e["guid"] for e in capture_endpoints()}:
@@ -1665,7 +1687,7 @@ def declined() -> str:
     return _("Windows' admin prompt was turned down (or didn't finish).")
 
 
-def install(mic_name: str | None) -> str | None:
+def install(mic_name: str | None, *, clean: bool = False) -> str | None:
     """Put the effect on the mic called `mic_name` (Windows asks for admin). None when
     done, else what went wrong, in plain words."""
     guid = endpoint_for(mic_name)
@@ -1673,7 +1695,7 @@ def install(mic_name: str | None) -> str | None:
         return _("That mic isn't plugged in (or Windows doesn't list it).")
     if not bundled_dll().is_file():
         return _("This copy of Onion Board has no mic effect in it.")
-    code = _elevated(["install", guid])
+    code = _elevated(["reinstall" if clean else "install", guid])
     if code is None:
         return declined()
     if code:

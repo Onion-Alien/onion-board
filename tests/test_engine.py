@@ -864,8 +864,9 @@ def test_hear_my_voice_alone_leaves_the_sounds_out_of_your_headphones():
     out = np.zeros((480, 2), np.float32)
     e._mon(out, 480)
     assert not out.any()                      # a sound playing: not heard here
-    e._mic(np.full((480, 1), 0.25, np.float32))
-    e._mon(out, 480)
+    for _ in range(2):                        # (the first block fades in)
+        e._mic(np.full((480, 1), 0.25, np.float32))
+        e._mon(out, 480)
     assert out.max() == pytest.approx(0.25 * e.mic_vol * e.mon_vol, rel=0.05)
     e.mon_voice_only = False                  # the mixer's Hear what they hear: everything
     e._mon(out, 480)
@@ -1008,3 +1009,28 @@ def test_radio_and_programs_get_their_own_live_pitch_and_effects(bus):
     assert heard(**{f"{bus}_fx": {"muffle": 1.0}}) < dry * 0.3
     pitched = heard(**{f"{bus}_pitch": -12.0})
     assert np.isfinite(pitched) and pitched > 0.05
+
+
+def test_spam_clicking_hear_what_they_hear_doesnt_click():
+    """Hear what they hear switches the headphones between your sounds as they are
+    and what's sent (mono, through the limiter's delay). Jumping between the two
+    mid-waveform clicked, and clicking the button over and over while a song played
+    made a buzz: now the old way fades out and the new one fades in."""
+    e = engine_with("main", "mon", send_stage=True)
+    e.monitor_sounds = True
+    t = np.arange(SR * 2) / SR
+    song = np.stack([0.5 * np.sin(2 * np.pi * 110 * t),
+                     0.5 * np.sin(2 * np.pi * 110 * t + 2.0)], 1).astype(np.float32)
+    e.play("s", song, 1.0)
+    out = np.zeros((480, 2), np.float32)
+    heard = []
+    for i in range(80):
+        if i >= 10 and i % 2 == 0:   # click, click, click... every 20 ms
+            e.mic_check = not e.mic_check
+        e._mon(out, 480)
+        heard.append(out.copy())
+    x = np.concatenate(heard)
+    assert np.abs(x).max() > 0.2                     # the song is heard throughout
+    # a 110 Hz sine at 0.5 moves under 0.01 a sample; a jump between the two ways was
+    # several times that
+    assert np.abs(np.diff(x, axis=0)).max() < 0.02

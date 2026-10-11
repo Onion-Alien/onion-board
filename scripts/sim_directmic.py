@@ -81,7 +81,7 @@ def admin_extras(tmp: Path) -> dict:
         "_enable_privileges": noop,
         "_running_dependents": lambda: [],
         "_audio_comes_back": noop,
-        "_audio_service": noop,
+        "_audio_service": lambda *a: True,
         "_register_com": noop,
         "_unregister_com": noop,
     }
