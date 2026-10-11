@@ -301,7 +301,6 @@
   "Couldn't re-scan": "Nu s-a putut rescana",
   "Couldn't reach GitHub ({error}).": "Nu s-a putut contacta GitHub ({error}).",
   "Couldn't read the {name} board": "Nu s-a putut citi tabla {name}",
-  "Couldn't render it": "Nu s-a putut genera",
   "Couldn't render the preview with these effects (see the log).": "Nu s-a putut genera previzualizarea cu efectele astea (vezi jurnalul).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Nu s-a putut reseta: fișierul de setări era blocat. Nu s-a schimbat nimic.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Nu s-a putut restaura: fișierul de setări era blocat. Nu s-a schimbat nimic.",
@@ -2101,16 +2100,7 @@
   "Save as a voice": "Salvați ca voce",
   "Save clip": "Salvați clipul",
   "Saved clips": "Clipuri salvate",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Clipuri salvate ({clips}) · ✓ adăugate la Sunete",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Clipuri salvate ({clips}) · ✓ adăugat {n} la Sunete",
-    "Clipuri salvate ({clips}) · ✓ adăugat {n} la Sunete",
-    "Clipuri salvate ({clips}) · ✓ adăugat {n} la Sunete"
-  ],
   "Saved clips ({n})": "Clipuri salvate ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Clipuri salvate ({n}) · copiat „{name}”: Ctrl+V îl lipește într-un editor sau în fila Sunete",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Clipuri salvate ({n}) · fără căști în care să le redați: alegeți-le din fila Configurare",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Clipuri salvate ({n}) · nicăieri să le trimiteți: alegeți unde merg sunetele dvs. din fila Configurare",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Voci salvate pe care le-ați șters, păstrate timp de {n} zi pentru a le putea aduce înapoi",
     "Vocile salvate pe care le-ați șters, păstrate timp de {n} zile pentru a le putea aduce înapoi",
@@ -3180,5 +3170,11 @@
   "Your sounds and settings are kept.": "Sunetele și setările tale sunt păstrate.",
   "{error}": "{error}",
   "Update mic effect": "Actualizează efectul",
-  "Update to new version": "Actualizează la versiunea nouă"
+  "Update to new version": "Actualizează la versiunea nouă",
+  "Added the voice “{name}”": "Vocea „{name}” a fost adăugată",
+  "Added {n} clip to your Sounds": [
+    "{n} clip adăugat la sunetele tale",
+    "Clipuri adăugate la sunetele tale: {n}"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” copiat: Ctrl+V îl lipește într-un editor sau în fila Sunete"
 }

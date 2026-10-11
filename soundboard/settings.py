@@ -1844,7 +1844,7 @@ class SettingsDialog(QDialog):
         a newer one calls `on_offer(offer)`, else the button says it's up to date."""
         from soundboard import net, netlog, updates
         if not net.allowed(feature):
-            busy.flash(btn, _("Add-on downloads are off (Privacy)"), 4000)
+            busy.toast(self, html.escape(_("Add-on downloads are off (Privacy)")), "warn")
             return
         release = busy.hold(btn, _("Checking…"))
         relay = self._AddonRelay(self)
@@ -3292,13 +3292,15 @@ class SettingsDialog(QDialog):
             refresh(mw.apply_remote())
             busy.flash(new, _("✓ New key made"))
             if mw.remote.running:
-                state.setText(_("New key made: anything using the old one has stopped working. "
-                                "Copy the example link for the new one."))
+                busy.toast(self, html.escape(_(
+                    "New key made: anything using the old one has stopped working. Copy the "
+                    "example link for the new one.")), "warn")
 
         def copy_link():
             QApplication.clipboard().setText(
                 f"http://{remote.HOST}:{cfg.api_port}/api/random?token={cfg.api_token}")
-            state.setText(_("Copied. It holds your key: only paste it into your own tools."))
+            busy.toast(self, html.escape(_("Copied. It holds your key: only paste it into your "
+                                           "own tools.")), "ok")
 
         on.toggled.connect(set_on)
         port.editingFinished.connect(set_port)

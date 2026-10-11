@@ -820,7 +820,6 @@
   "Couldn't play it: {error}": "Не вдалося відтворити: {error}",
   "Couldn't re-scan": "Не вдалося повторно відсканувати",
   "Couldn't reach GitHub ({error}).": "Не вдалося отримати доступ до GitHub ({error}).",
-  "Couldn't render it": "Не вдалося відобразити",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Не вдалося скинути: файл налаштувань заблоковано. Нічого не змінилося.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Не вдалося відновити: файл налаштувань заблоковано. Нічого не змінилося.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Не вдалося зберегти скинуті налаштування. Ваша точка відновлення знаходиться в Налаштуваннях > Загальні.",
@@ -2104,16 +2103,7 @@
   "Save as a voice": "Зберегти як голос",
   "Save clip": "Зберегти кліп",
   "Saved clips": "Збережені кліпи",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Збережені кліпи ({clips}) · ✓ додано до ваших звуків",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Збережені кліпи ({clips}) · ✓ додано {n} до ваших звуків",
-    "Збережені кліпи ({clips}) · ✓ додано {n} до ваших звуків",
-    "Збережені кліпи ({clips}) · ✓ додано {n} до ваших звуків"
-  ],
   "Saved clips ({n})": "Збережені кліпи ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Збережені кліпи ({n}) · скопійовано “{name}”: Ctrl+V вставляє його в редактор або на вкладку Звуки",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Збережені кліпи ({n}) · немає навушників для відтворення: виберіть їх на вкладці «Налаштування».",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Збережені кліпи ({n}) · немає куди надсилати: виберіть, куди будуть ваші звуки, на вкладці «Налаштування»",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Збережені голоси, які ви видалили, зберігаються {n} день, щоб ви могли їх відновити",
     "Збережені голоси, які ви видалили, зберігаються протягом {n} днів, щоб ви могли їх відновити",
@@ -3180,5 +3170,11 @@
   "Your sounds and settings are kept.": "Твої звуки й налаштування збережуться.",
   "{error}": "{error}",
   "Update mic effect": "Оновити ефект мікрофона",
-  "Update to new version": "Оновити до нової версії"
+  "Update to new version": "Оновити до нової версії",
+  "Added the voice “{name}”": "Голос «{name}» додано",
+  "Added {n} clip to your Sounds": [
+    "{n} кліп додано до ваших звуків",
+    "Кліпів додано до ваших звуків: {n}"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» скопійовано: Ctrl+V вставляє його в редактор або на вкладку «Звуки»"
 }

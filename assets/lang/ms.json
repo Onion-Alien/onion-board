@@ -297,7 +297,6 @@
   "Couldn't re-scan": "Tidak dapat mengimbas semula",
   "Couldn't reach GitHub ({error}).": "Tidak dapat mencapai GitHub ({error}).",
   "Couldn't read the {name} board": "Tidak dapat membaca board {name}",
-  "Couldn't render it": "Tidak dapat memprosesnya",
   "Couldn't render the preview with these effects (see the log).": "Tidak dapat memproses pratonton dengan kesan ini (lihat log).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Tidak dapat menetapkan semula: fail tetapan dikunci. Tiada apa yang diubah.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Tidak dapat memulihkan: fail tetapan dikunci. Tiada apa yang diubah.",
@@ -2009,14 +2008,7 @@
   "Save as a voice": "Simpan sebagai suara",
   "Save clip": "Simpan klip",
   "Saved clips": "Klip disimpan",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Klip disimpan ({clips}) · ✓ ditambahkan pada Bunyi anda",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Klip disimpan ({clips}) · ✓ ditambahkan {n} pada Bunyi anda"
-  ],
   "Saved clips ({n})": "Klip disimpan ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Klip disimpan ({n}) · disalin “{name}”: Ctrl+V menampalnya dalam editor atau pada tab Bunyi",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Klip disimpan ({n}) · tiada fon kepala untuk memainkannya: pilihnya pada tab Persediaan",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Klip disimpan ({n}) · tiada tempat untuk menghantarnya: pilih ke mana bunyi anda pergi pada tab Persediaan",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Suara yang disimpan yang anda padamkan, disimpan selama {n} hari supaya anda boleh membawanya kembali"
   ],
@@ -3038,5 +3030,11 @@
   "Your sounds and settings are kept.": "Bunyi dan tetapan anda dikekalkan.",
   "{error}": "{error}",
   "Update mic effect": "Kemas kini kesan mikrofon",
-  "Update to new version": "Kemas kini ke versi baharu"
+  "Update to new version": "Kemas kini ke versi baharu",
+  "Added the voice “{name}”": "Suara “{name}” ditambah",
+  "Added {n} clip to your Sounds": [
+    "{n} klip ditambah ke Bunyi anda",
+    "{n} klip ditambah ke Bunyi anda"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menampalnya dalam editor atau pada tab Bunyi"
 }

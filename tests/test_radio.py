@@ -910,7 +910,9 @@ def test_tab_search_failure_says_so_and_can_be_retried(qapp, tab):
     tab.search.setText("nothing like this")
     tab._on_failed("search", "timed out")
     assert tab._results == []
-    assert "Search failed" in tab.list.item(0).text() and "Enter" in tab.info.text()
+    from soundboard.ui import toast
+    assert "Search failed" in tab.list.item(0).text()
+    assert any("Enter" in t.text() and t.kind == "error" for t in toast.shown(tab))
     tab._search_now()                            # Enter: back to searching
     assert tab._results is None and "Searching" in tab.list.item(0).text()
 
@@ -1366,8 +1368,8 @@ def test_a_click_on_a_station_plays_it_and_the_bar_shows_what_plays(qapp, tab, s
     assert tab.player.station is None and tab.now.name == ""
 
 
-def test_tab_keeps_a_station_error_up_longer_than_a_notice(tab):
-    import time
+def test_a_station_error_is_an_error_card_that_stays(tab):
+    from soundboard.ui import toast
     tab._on_error("404")
-    assert "isn't working" in tab.info.text()
-    assert tab._flash_until - time.monotonic() > 20   # not the 4 s of a plain notice
+    [t] = [t for t in toast.shown(tab) if "isn't working" in t.words()]
+    assert t.kind == "error"   # errors stay until closed

@@ -786,7 +786,6 @@
   "Couldn't play it: {error}": "재생할 수 없음: {error}",
   "Couldn't re-scan": "다시 스캔할 수 없습니다.",
   "Couldn't reach GitHub ({error}).": "GitHub에 연결할 수 없습니다({error}).",
-  "Couldn't render it": "렌더링할 수 없습니다.",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "재설정할 수 없습니다. 설정 파일이 잠겨 있습니다. 아무것도 변경되지 않았습니다.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "복원할 수 없습니다. 설정 파일이 잠겨 있습니다. 아무것도 변경되지 않았습니다.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "재설정 설정을 저장할 수 없습니다. 복원 지점은 설정 > 일반에 있습니다.",
@@ -2012,14 +2011,7 @@
   "Save as a voice": "음성으로 저장",
   "Save clip": "클립 저장",
   "Saved clips": "저장된 클립",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "저장된 클립({clips}) · ✓ 사운드에 추가됨",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "저장된 클립({clips}) · ✓ 사운드에 {n} 추가됨"
-  ],
   "Saved clips ({n})": "저장된 클립({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "저장된 클립({n}) · 복사된 \"{name}\": Ctrl+V를 사용하여 편집기나 사운드 탭에 붙여넣습니다.",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "저장된 클립({n}) · 재생할 헤드폰이 없습니다. 설정 탭에서 선택하세요.",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "저장된 클립({n}) · 보낼 곳 없음: 설정 탭에서 사운드가 이동할 위치를 선택하세요.",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "삭제한 저장된 음성은 다시 가져올 수 있도록 {n} 일 동안 보관되었습니다."
   ],
@@ -3038,5 +3030,11 @@
   "Your sounds and settings are kept.": "소리와 설정은 유지됩니다.",
   "{error}": "{error}",
   "Update mic effect": "마이크 효과 업데이트",
-  "Update to new version": "새 버전으로 업데이트"
+  "Update to new version": "새 버전으로 업데이트",
+  "Added the voice “{name}”": "“{name}” 음성을 추가했어요",
+  "Added {n} clip to your Sounds": [
+    "클립 {n}개를 사운드에 추가했어요",
+    "클립 {n}개를 사운드에 추가했어요"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}”을(를) 복사했어요: Ctrl+V로 편집기나 사운드 탭에 붙여넣을 수 있어요"
 }

@@ -758,7 +758,6 @@
   "Couldn't play it: {error}": "Не удалось сыграть: {error}",
   "Couldn't re-scan": "Не удалось найти заново",
   "Couldn't reach GitHub ({error}).": "Не удалось связаться с GitHub ({error}).",
-  "Couldn't render it": "Не удалось обработать",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Не удалось сбросить: файл настроек был заблокирован. Ничего не изменено.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Не удалось восстановить: файл настроек был заблокирован. Ничего не изменено.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Не удалось сохранить сброшенные настройки. Твоя точка восстановления в Настройки > Общие.",
@@ -2011,15 +2010,7 @@
   "Save as a voice": "Сохранить как голос",
   "Save clip": "Сохранить клип",
   "Saved clips": "Сохраненные клипы",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Сохраненные клипы ({clips}) · ✓ добавлены в ваши Звуки",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Сохраненные клипы ({clips}) · ✓ добавлено {n} в ваши звуки",
-    "Сохраненные клипы ({clips}) · ✓ добавлено {n} в ваши звуки",
-    "Сохраненные клипы ({clips}) · ✓ добавлено {n} в ваши звуки"
-  ],
   "Saved clips ({n})": "Сохраненные клипы ({n})",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Сохраненные клипы ({n}) · нет наушников для воспроизведения: выберите их на вкладке «Настройка».",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Сохраненные клипы ({n}) · некуда отправить: выберите, куда поместить ваши звуки, на вкладке «Настройка».",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Сохраненные голоса, которые вы удалили, хранятся в течение {n} дня, чтобы вы могли их вернуть.",
     "Сохраненные голоса, которые вы удалили, хранятся {n} дней, чтобы вы могли их вернуть.",
@@ -2818,7 +2809,6 @@
   "Game voice chat: make your sounds come through clean": "Голосовой чат в игре: сделайте ваши звуки чистыми",
   "Zoom, Teams and browser calls: make your sounds come through clean": "Zoom, Teams и вызовы через браузер: сделайте звук чистым",
   "Couldn't open Discord: is it installed? Open it yourself: ⚙ User Settings → Voice & Video. The link was": "Не удалось открыть Discord: он установлен? Откройте его самостоятельно: ⚙ Настройки пользователя → Голос и видео. Ссылка была",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Сохраненные клипы ( {n} ) · скопированные « {name} »: Ctrl+V вставляет их в редактор или на вкладку «Звуки».",
   "Report copied: paste it into your message (Ctrl+V).": "Отчет скопирован: вставьте его в свое сообщение (Ctrl+V).",
   "Sorry, something went wrong.": "Извините, что-то пошло не так.",
   "Sorry, Onion Board couldn't start.": "Извините, Onion Board не удалось запустить.",
@@ -3180,5 +3170,11 @@
   "Your sounds and settings are kept.": "Твои звуки и настройки сохранятся.",
   "{error}": "{error}",
   "Update mic effect": "Обновить эффект микрофона",
-  "Update to new version": "Обновить до новой версии"
+  "Update to new version": "Обновить до новой версии",
+  "Added the voice “{name}”": "Голос «{name}» добавлен",
+  "Added {n} clip to your Sounds": [
+    "{n} клип добавлен в ваши звуки",
+    "Клипов добавлено в ваши звуки: {n}"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» скопирован: Ctrl+V вставляет его в редактор или на вкладку «Звуки»"
 }

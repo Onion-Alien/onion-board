@@ -803,7 +803,6 @@
   "Couldn't play it: {error}": "Oynatılamadı: {error}",
   "Couldn't re-scan": "Yeniden taranamadı",
   "Couldn't reach GitHub ({error}).": "GitHub'a ulaşılamadı ({error}).",
-  "Couldn't render it": "Oluşturulamadı",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Sıfırlanamadı: ayarlar dosyası kilitlendi. Hiçbir şey değişmedi.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Geri yüklenemedi: ayarlar dosyası kilitlendi. Hiçbir şey değişmedi.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Sıfırlama ayarları kaydedilemedi. Geri yükleme noktanız Ayarlar > Genel'dedir.",
@@ -2058,15 +2057,7 @@
   "Save as a voice": "Ses olarak kaydet",
   "Save clip": "Klibi kaydet",
   "Saved clips": "Kaydedilen klipler",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Kaydedilen klipler ({clips}) · ✓ Seslerinize eklendi",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Kaydedilen klipler ({clips}) · ✓ Seslerinize {n} eklendi",
-    "Kaydedilen klipler ({clips}) · ✓ Seslerinize {n} eklendi"
-  ],
   "Saved clips ({n})": "Kaydedilen klipler ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Kaydedilen klipler ({n}) · kopyalanan “{name}”: Ctrl+V bunu bir düzenleyiciye veya Sesler sekmesine yapıştırır",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Kayıtlı klipler ({n}) · oynatılacak kulaklık yok: bunları Kurulum sekmesinden seçin",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Kaydedilen klipler ({n}) · gönderilecek yer yok: Kurulum sekmesinde seslerinizin nereye gideceğini seçin",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Sildiğiniz kayıtlı sesler, geri getirebilmeniz için {n} gün boyunca saklandı",
     "Sildiğiniz kayıtlı sesler, geri getirebilmeniz için {n} gün boyunca saklandı"
@@ -3109,5 +3100,11 @@
   "Your sounds and settings are kept.": "Seslerin ve ayarların korunur.",
   "{error}": "{error}",
   "Update mic effect": "Mikrofon efektini güncelle",
-  "Update to new version": "Yeni sürüme güncelle"
+  "Update to new version": "Yeni sürüme güncelle",
+  "Added the voice “{name}”": "“{name}” sesi eklendi",
+  "Added {n} clip to your Sounds": [
+    "{n} klip seslerine eklendi",
+    "{n} klip seslerine eklendi"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopyalandı: Ctrl+V onu bir düzenleyiciye veya Sesler sekmesine yapıştırır"
 }

@@ -786,7 +786,6 @@
   "Couldn't play it: {error}": "Tidak dapat memutarnya: {error}",
   "Couldn't re-scan": "Tidak dapat memindai ulang",
   "Couldn't reach GitHub ({error}).": "Tidak dapat menjangkau GitHub ({error}).",
-  "Couldn't render it": "Tidak dapat merendernya",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Gagal mereset: file pengaturan sedang terkunci. Tidak ada yang diubah.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Gagal memulihkan: file pengaturan sedang terkunci. Tidak ada yang diubah.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Gagal menyimpan pengaturan hasil reset. Titik pemulihanmu ada di Pengaturan > Umum.",
@@ -2012,14 +2011,7 @@
   "Save as a voice": "Simpan sebagai suara",
   "Save clip": "Simpan klip",
   "Saved clips": "Klip yang disimpan",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Klip tersimpan ({clips}) · ✓ ditambahkan ke Suara Anda",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Klip tersimpan ({clips}) · ✓ ditambahkan {n} ke Suara Anda"
-  ],
   "Saved clips ({n})": "Klip tersimpan ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Klip tersimpan ({n}) · disalin “{name}”: Ctrl+V menempelkannya di editor atau di tab Suara",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Klip tersimpan ({n}) · tidak ada headphone untuk memutarnya: pilih klip tersebut di tab Penyetelan",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Klip tersimpan ({n}) · tidak dapat dikirim ke mana pun: pilih ke mana suara Anda akan dibawa pada tab Penyetelan",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Suara tersimpan yang Anda hapus, disimpan selama {n} hari sehingga Anda dapat mengembalikannya"
   ],
@@ -3038,5 +3030,11 @@
   "Your sounds and settings are kept.": "Suara dan pengaturanmu tetap tersimpan.",
   "{error}": "{error}",
   "Update mic effect": "Perbarui efek mikrofon",
-  "Update to new version": "Perbarui ke versi baru"
+  "Update to new version": "Perbarui ke versi baru",
+  "Added the voice “{name}”": "Suara “{name}” ditambahkan",
+  "Added {n} clip to your Sounds": [
+    "{n} klip ditambahkan ke Suara kamu",
+    "{n} klip ditambahkan ke Suara kamu"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menempelkannya di editor atau di tab Suara"
 }

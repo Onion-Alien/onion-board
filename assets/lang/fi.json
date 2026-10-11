@@ -299,7 +299,6 @@
   "Couldn't re-scan": "Uudelleenetsintä epäonnistui",
   "Couldn't reach GitHub ({error}).": "GitHubiin ei saatu yhteyttä ({error}).",
   "Couldn't read the {name} board": "{name}-boardia ei voitu lukea",
-  "Couldn't render it": "Sitä ei voitu tehdä",
   "Couldn't render the preview with these effects (see the log).": "Esikatselua ei voitu tehdä näillä efekteillä (katso loki).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Nollaus epäonnistui: asetustiedosto oli lukittu. Mitään ei muutettu.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Palautus epäonnistui: asetustiedosto oli lukittu. Mitään ei muutettu.",
@@ -2055,15 +2054,7 @@
   "Save as a voice": "Tallenna äänenä",
   "Save clip": "Tallenna klippi",
   "Saved clips": "Tallennetut leikkeet",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Tallennetut leikkeet ({clips}) · ✓ lisätty ääniisi",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Tallennetut leikkeet ({clips}) · ✓ lisätty {n} ääniisi",
-    "Tallennetut leikkeet ({clips}) · ✓ lisätty {n} ääniisi"
-  ],
   "Saved clips ({n})": "Tallennetut leikkeet ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Tallennetut leikkeet ({n}) · kopioitu \"{name}\": Ctrl+V liittää sen editoriin tai Äänet-välilehteen",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Tallennetut leikkeet ({n}) · ei kuulokkeita toistettavaksi: valitse ne Asetukset-välilehdeltä",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Tallennetut leikkeet ({n}) · ei minne lähetettävää: valitse Asetukset-välilehdellä, minne äänesi kulkevat",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Tallennetut poistamasi äänet, säilytetty {n} päivän, jotta voit palauttaa ne",
     "Tallennetut poistamasi äänet, säilytetty {n} päivää, jotta voit palauttaa ne"
@@ -3109,5 +3100,11 @@
   "Your sounds and settings are kept.": "Äänesi ja asetuksesi säilyvät.",
   "{error}": "{error}",
   "Update mic effect": "Päivitä mikrofonitehoste",
-  "Update to new version": "Päivitä uuteen versioon"
+  "Update to new version": "Päivitä uuteen versioon",
+  "Added the voice “{name}”": "Ääni ”{name}” lisätty",
+  "Added {n} clip to your Sounds": [
+    "{n} leike lisätty ääniisi",
+    "{n} leikettä lisätty ääniisi"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "”{name}” kopioitu: Ctrl+V liittää sen editoriin tai Äänet-välilehdelle"
 }

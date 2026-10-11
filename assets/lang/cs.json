@@ -301,7 +301,6 @@
   "Couldn't re-scan": "Nepovedlo se znovu vyhledat",
   "Couldn't reach GitHub ({error}).": "GitHub je nedostupný ({error}).",
   "Couldn't read the {name} board": "Board {name} se nepovedlo přečíst",
-  "Couldn't render it": "Nepovedlo se to vytvořit",
   "Couldn't render the preview with these effects (see the log).": "Náhled s těmito efekty se nepovedlo vytvořit (viz záznam).",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Reset se nepovedl: soubor nastavení byl zamčený. Nic se nezměnilo.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Obnovení se nepovedlo: soubor nastavení byl zamčený. Nic se nezměnilo.",
@@ -2101,16 +2100,7 @@
   "Save as a voice": "Uložit jako hlas",
   "Save clip": "Uložit klip",
   "Saved clips": "Uložené klipy",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Uložené klipy ({clips}) · ✓ přidány do vašich zvuků",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Uložené klipy ({clips}) · ✓ přidáno {n} do vašich zvuků",
-    "Uložené klipy ({clips}) · ✓ přidáno {n} do vašich zvuků",
-    "Uložené klipy ({clips}) · ✓ přidáno {n} do vašich zvuků"
-  ],
   "Saved clips ({n})": "Uložené klipy ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Uložené klipy ({n}) · zkopírováno „{name}“: Ctrl+V jej vloží do editoru nebo na kartu Zvuky",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Uložené klipy ({n}) · žádná sluchátka k přehrávání: vyberte je na kartě Nastavení",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Uložené klipy ({n}) · kam je poslat: na kartě Nastavení vyberte, kam se mají zvuky přesunout",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Uložené hlasy, které jste smazali, byly uchovány {n} den, abyste je mohli vrátit zpět",
     "Uložené hlasy, které jste smazali, byly uchovány po dobu {n} dnů, abyste je mohli vrátit zpět",
@@ -3180,5 +3170,11 @@
   "Your sounds and settings are kept.": "Tvoje zvuky a nastavení zůstanou zachované.",
   "{error}": "{error}",
   "Update mic effect": "Aktualizovat efekt mikrofonu",
-  "Update to new version": "Aktualizovat na novou verzi"
+  "Update to new version": "Aktualizovat na novou verzi",
+  "Added the voice “{name}”": "Přidán hlas „{name}“",
+  "Added {n} clip to your Sounds": [
+    "Přidán {n} klip do vašich zvuků",
+    "Klipy přidané do vašich zvuků: {n}"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ zkopírováno: Ctrl+V jej vloží do editoru nebo na kartu Zvuky"
 }

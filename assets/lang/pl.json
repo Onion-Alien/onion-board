@@ -820,7 +820,6 @@
   "Couldn't play it: {error}": "Nie udało się odtworzyć: {error}",
   "Couldn't re-scan": "Nie udało się ponownie przeskanować",
   "Couldn't reach GitHub ({error}).": "Nie można połączyć się z GitHubem ({error}).",
-  "Couldn't render it": "Nie udało się tego wyrenderować",
   "Couldn't reset: the settings file was locked. Nothing was changed.": "Nie można zresetować: plik ustawień został zablokowany. Nic nie zostało zmienione.",
   "Couldn't restore: the settings file was locked. Nothing was changed.": "Nie można przywrócić: plik ustawień został zablokowany. Nic nie zostało zmienione.",
   "Couldn't save the reset settings. Your restore point is in Settings > General.": "Nie udało się zapisać ustawień resetowania. Twój punkt przywracania znajduje się w Ustawieniach > Ogólne.",
@@ -2104,16 +2103,7 @@
   "Save as a voice": "Zapisz jako głos",
   "Save clip": "Zapisz klip",
   "Saved clips": "Zapisane klipy",
-  "Saved clips ({clips}) · ✓ added to your Sounds": "Zapisane klipy ({clips}) · ✓ dodane do Twoich dźwięków",
-  "Saved clips ({clips}) · ✓ added {n} to your Sounds": [
-    "Zapisane klipy ({clips}) · ✓ dodano {n} do Twoich dźwięków",
-    "Zapisane klipy ({clips}) · ✓ dodano {n} do Twoich dźwięków",
-    "Zapisane klipy ({clips}) · ✓ dodano {n} do Twoich dźwięków"
-  ],
   "Saved clips ({n})": "Zapisane klipy ({n})",
-  "Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Zapisane klipy ({n}) · skopiowane „{name}”: Ctrl+V wkleja je do edytora lub na zakładkę Dźwięki",
-  "Saved clips ({n}) · no headphones to play it in: pick them on the Setup tab": "Zapisane klipy ({n}) · brak słuchawek do odtwarzania: wybierz je na karcie Konfiguracja",
-  "Saved clips ({n}) · nowhere to send it: pick where your sounds go on the Setup tab": "Zapisane klipy ({n}) · Nie ma gdzie ich wysłać: wybierz, dokąd mają trafiać Twoje dźwięki na karcie Ustawienia",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
     "Zapisane głosy, które usunąłeś, będą przechowywane przez {n} dzień, abyś mógł je przywrócić",
     "Zapisane głosy, które usunąłeś, będą przechowywane przez {n} dni, abyś mógł je przywrócić",
@@ -3180,5 +3170,11 @@
   "Your sounds and settings are kept.": "Twoje dźwięki i ustawienia zostaną zachowane.",
   "{error}": "{error}",
   "Update mic effect": "Zaktualizuj efekt mikrofonu",
-  "Update to new version": "Zaktualizuj do nowej wersji"
+  "Update to new version": "Zaktualizuj do nowej wersji",
+  "Added the voice “{name}”": "Dodano głos „{name}”",
+  "Added {n} clip to your Sounds": [
+    "Dodano {n} klip do twoich dźwięków",
+    "Klipy dodane do twoich dźwięków: {n}"
+  ],
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Skopiowano „{name}”: Ctrl+V wkleja go w edytorze lub na karcie Dźwięki"
 }
