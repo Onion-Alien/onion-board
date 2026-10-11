@@ -472,7 +472,7 @@ class CustomDestDialog(QDialog):
         self.list.currentRowChanged.connect(self._select)
         left.addWidget(self.list, 1)
         self.empty = hint_label(_("No custom modes yet. Fill in the form to make one, or click "
-                                  "Add / Copy built-in…."))
+                                  "Add / Copy built-in."))
         left.addWidget(self.empty)
         btns = QHBoxLayout()
         self.b_add = QPushButton(_("Add"))
