@@ -299,17 +299,31 @@ goes online.
   copy of the effect DLL) to `%ProgramFiles%\Onion Board Mic Helper\` (admins only) and
   registers a scheduled task, `\Onion Board\Mic helper`, that runs it as SYSTEM. It has
   no trigger and isn't a service: it runs only when Onion Board starts it, for the few
-  seconds a job takes. The task's permissions let only the Windows account that set it
-  up (and admins) start it. The app asks for a job with a one-line file in
-  `%ProgramData%\OnionBoard\MicHelper\requests\` (that account may add files there,
-  nothing else) and reads the answer from `...\results\` (admins only, so nothing can
-  steer what SYSTEM writes). A request is only ever matched against a fixed list
+  seconds a job takes. The task's permissions let only the Windows accounts that set it
+  up (and admins) start it: each user account (local, domain or work / school) that
+  went through Windows' prompt for it, listed in `users.txt` in its folder. A standard
+  user who typed an admin's password there counts as the one who asked: the app passes
+  its account (`--for`), and the admin step accepts only a real user account with a
+  profile on this PC. Another account setting it up never takes it away from the first.
+  After registering, the task is read back from Task Scheduler and deleted again unless
+  it really runs as SYSTEM, has no trigger, runs our program and has exactly those
+  permissions. The app asks for a job with a one-line file in
+  `%ProgramData%\OnionBoard\MicHelper\requests\` (those accounts may add files there
+  and change only their own, nothing else) and reads the answer from `...\results\`
+  (admins only, so nothing can steer what SYSTEM writes). The helper opens each request
+  without following links, checks on that open handle that it is a small plain file
+  with one name, and reads it from the same handle. While it works on a job it keeps a
+  heartbeat file in `results\`: the app waits as long as that is fresh (a second admin
+  copy now would fail), and falls back to Windows' prompt soon after it stops (a helper
+  killed half-way). A request is only ever matched against a fixed list
   (`install`, `reinstall`, `cleanup` or `uninstall` with a mic id, `uninstall`,
   `remove-all`), never used as a path or shown, and anything else is refused. The
   helper installs only the DLL inside its own Program Files folder, so it can't be
   used to put any other code into Windows' audio: a new version of the effect still
   needs Windows' prompt, which also updates the helper. It logs to
-  `%ProgramData%\OnionBoard\michelper.log`.
+  `%ProgramData%\OnionBoard\michelper.log` (kept to about 1 MB, with one older copy,
+  as is `directmic-admin.log`). `obmichelper.exe` isn't code-signed; each release's
+  VirusTotal scan covers it.
 - **The data folders**: anyone signed in can make folders in `%ProgramData%`, so before
   writing anything there the admin step makes `%ProgramData%\OnionBoard` a real folder
   owned by Administrators that only admins can change (a link someone put there is
@@ -330,7 +344,16 @@ goes online.
   is there at all) does what `--direct-mic uninstall` (as admin) does: put every mic's
   values back from the notes, unregister the effect and delete `Onion Board Mic` and the
   notes. Then the helper's task is deleted and its files and `MicHelper` folder
-  removed (files in use at that moment, at the next restart). If Windows already took the effect off (a
+  removed (files in use at that moment, at the next restart); any piece of it counts,
+  a task without its folder or a half-done update's folder too. The helper is for the
+  whole PC: on a PC with several accounts, one of them uninstalling takes it away for
+  all (the next set-up asks Windows again). What can't be cleaned up: a helper left by
+  deleting the app's folder by hand (no uninstaller runs), or by uninstalling a version
+  older than the helper after going back to it. That task never runs on its own; the
+  next Onion Board install's first set-up replaces it and its uninstall removes it, or
+  delete the task `\Onion Board\Mic helper` and `%ProgramFiles%\Onion Board Mic Helper`
+  by hand. Taking the effect off a mic in Setup keeps the helper, so putting it back
+  needs no prompt. If Windows already took the effect off (a
   driver update, *Reset sound settings*), what's there now stays. The shared file and
   the admin log stay in `%ProgramData%\OnionBoard\`.
 - **The virtual cable**, the fallback, is VB-Audio's own signed driver: installed by

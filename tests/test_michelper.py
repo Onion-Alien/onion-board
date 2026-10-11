@@ -4,8 +4,12 @@ conftest guard points the helper's folders into tmp_path and fails any schtasks 
 from __future__ import annotations
 
 import hashlib
+import logging
+import os
 import subprocess
 import sys
+import threading
+import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -16,12 +20,16 @@ from soundboard import michelper as mh
 
 GUID = "{0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0}"
 SID = "S-1-5-21-1111111111-2222222222-3333333333-1001"
+SID2 = "S-1-5-21-1111111111-2222222222-3333333333-1002"
+ENTRA = "S-1-12-1-1234567890-1234567890-1234567890-1234567890"   # work / school account
 REAL_ELEVATED = dm._elevated   # (the conftest guard replaces it in every test)
+REAL_SCHTASKS = mh._schtasks   # (so is this)
 ROOT = Path(__file__).resolve().parent.parent
 
 # HELPER_VERSION and the admin code it stands for: change one, change the other
 ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4c620",
-                4: "b49bed37327a635032e846b3f51e1b47fc5ebcaef7ee4078d03c95528a142370"}
+                4: "b49bed37327a635032e846b3f51e1b47fc5ebcaef7ee4078d03c95528a142370",
+                5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467"}
 
 
 def _queue():
@@ -163,8 +171,18 @@ def test_without_a_helper_windows_asks(monkeypatch):
     monkeypatch.setattr(mh, "ask", lambda *a, **k: pytest.fail("asked an unusable helper"))
     monkeypatch.setattr(dm, "run_elevated",
                         lambda exe, params, wait_s: prompted.append(params) or 0)
+    monkeypatch.setattr(mh, "_token_sid", lambda: SID)
     assert REAL_ELEVATED(["install", GUID]) == 0
-    assert prompted and prompted[0].endswith(f"--direct-mic install {GUID}")
+    # (and who asked: a standard user typing an admin's password gets the helper too)
+    assert prompted and prompted[0].endswith(f"--direct-mic install {GUID} --for {SID}")
+
+
+def test_only_set_up_steps_say_who_asked(monkeypatch):
+    monkeypatch.setattr(mh, "_token_sid", lambda: SID)
+    assert mh.for_user(["cleanup", GUID]) == ["--for", SID]
+    assert mh.for_user(["uninstall"]) == [] and mh.for_user(["remove-all"]) == []
+    monkeypatch.setattr(mh, "_token_sid", lambda: "S-1-5-18")
+    assert mh.for_user(["install", GUID]) == []
 
 
 def test_a_helper_that_doesnt_answer_falls_back_to_windows(monkeypatch):
@@ -191,12 +209,13 @@ def admin_cli(monkeypatch):
     monkeypatch.setattr(dm, "_release", lambda h: None)
     monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
     monkeypatch.setattr(dm, "secure_data_dirs", lambda: None)
-    monkeypatch.setattr(dm.logging, "basicConfig", lambda **k: None)
+    monkeypatch.setattr(dm, "log_to", lambda path: None)
     monkeypatch.setattr(dm, "capture_endpoints", lambda: [{"guid": GUID, "name": "Mic",
                                                            "active": True}])
     monkeypatch.setattr(dm, "admin_install", lambda guid, slot=None: done.append("install") or 0)
     monkeypatch.setattr(dm, "admin_uninstall", lambda only=None: done.append("uninstall") or 0)
-    monkeypatch.setattr(mh, "install_helper", lambda: done.append("helper") or True)
+    monkeypatch.setattr(mh, "install_helper", lambda user=None: done.append(
+        f"helper for {user}" if user else "helper") or True)
     monkeypatch.setattr(mh, "remove_helper", lambda: done.append("helper gone"))
     return done
 
@@ -204,6 +223,11 @@ def admin_cli(monkeypatch):
 def test_the_one_prompt_sets_up_the_helper(admin_cli):
     assert dm.cli(["install", GUID]) == 0
     assert admin_cli == ["install", "helper"]
+
+
+def test_the_admin_copy_sets_it_up_for_whoever_asked(admin_cli):
+    assert dm.cli(["install", GUID, "--for", SID2]) == 0
+    assert admin_cli == ["install", f"helper for {SID2}"]
 
 
 def test_the_helper_never_installs_a_helper(admin_cli, monkeypatch):
@@ -220,9 +244,30 @@ def test_taking_it_off_keeps_the_helper(admin_cli):
 def test_uninstalling_the_app_removes_the_helper(admin_cli, monkeypatch):
     monkeypatch.setattr(dm, "_is_admin", lambda: True)
     monkeypatch.setattr(dm, "anything_installed", lambda: False)
-    monkeypatch.setattr(mh, "installed", lambda: True)   # only the helper is left
+    monkeypatch.setattr(mh, "leftover", lambda: True)   # only (some of) the helper is left
     assert dm.cli(["remove"]) == 0
     assert admin_cli == ["uninstall", "helper gone"]
+
+
+def test_nothing_left_nothing_to_remove(admin_cli, monkeypatch):
+    monkeypatch.setattr(dm, "anything_installed", lambda: False)
+    monkeypatch.setattr(mh, "leftover", lambda: False)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: pytest.fail("asked for admin"))
+    assert dm.cli(["remove"]) == 0 and admin_cli == []
+
+
+def test_any_trace_of_a_helper_is_a_leftover(monkeypatch):
+    """A half-done update's folder, or the task with its folder gone (the app folder
+    deleted by hand, an older version's uninstall): the uninstaller still clears it."""
+    tasks = []
+    monkeypatch.setattr(mh, "_schtasks", lambda *a, **k: tasks.append(a) or 1)
+    assert not mh.leftover()
+    old = mh.helper_dir().with_name(mh.helper_dir().name + ".old")
+    old.mkdir(parents=True)
+    assert mh.leftover()
+    old.rmdir()
+    monkeypatch.setattr(mh, "_schtasks", lambda *a, **k: 0)   # the task alone
+    assert mh.leftover()
 
 
 def test_the_uninstaller_asks_the_helper_for_remove_all(monkeypatch):
@@ -243,9 +288,103 @@ def test_task_xml():
     assert f"(A;;GRGX;;;{SID})" in sd and sd.startswith("D:P")
     assert root.find("t:Actions/t:Exec/t:Arguments", ns).text == mh.SERVE
     assert root.find("t:Settings/t:MultipleInstancesPolicy", ns).text == "Queue"
-    for bad in ("S-1-5-18", "S-1-1-0", f"{SID})(A;;FA;;;WD", "BU"):
+    for bad in ("S-1-5-18", "S-1-1-0", f"{SID})(A;;FA;;;WD", "BU", "S-1-5-32-545",
+                "S-1-12-1-1-2-3", f"{ENTRA}-5", "S-1-5-21-1-2", []):
         with pytest.raises(ValueError):
             mh.task_xml(Path("x.exe"), bad)
+
+
+def test_work_and_school_accounts_get_a_helper_too():
+    """Microsoft Entra ID accounts (S-1-12-1-...) are people too: they always got
+    Windows' prompt before."""
+    assert "(A;;GRGX;;;" + ENTRA + ")" in mh.task_sddl(ENTRA)
+    assert mh.task_sddl([SID, ENTRA]) == (
+        f"D:P(A;;FA;;;SY)(A;;FA;;;BA)(A;;GRGX;;;{SID})(A;;GRGX;;;{ENTRA})")
+
+
+def test_every_account_that_set_it_up_keeps_it(monkeypatch):
+    """A second account setting it up never takes it away from the first (they'd
+    each get the prompt every other time). Accounts gone from the PC drop out."""
+    mh.helper_dir().mkdir(parents=True)
+    gone = "S-1-5-21-1111111111-2222222222-3333333333-1099"
+    (mh.helper_dir() / mh.USERS).write_text(f"{SID}\n{gone}\nS-1-1-0\n{ENTRA}\n")
+    monkeypatch.setattr(mh, "_has_profile", lambda sid: sid != gone)
+    assert mh.helper_users(SID2) == [SID, ENTRA, SID2]
+    assert mh.helper_users(SID) == [SID, ENTRA]
+    sddl = mh._queue_sddl([SID, SID2])
+    assert f"(A;;{dm._FOLDER_WRITE};;;{SID})(A;;{dm._FOLDER_WRITE};;;{SID2})" in sddl
+    assert sddl.endswith(f"(A;OICIIO;{dm._MODIFY};;;CO)")   # each changes only its own
+
+
+@pytest.fixture
+def helper_setup(monkeypatch, tmp_path):
+    """install_helper() with a bundled build, its folders and schtasks faked."""
+    src = tmp_path / "bundled"
+    src.mkdir()
+    (src / mh.EXE_NAME).write_bytes(b"MZ")
+    (src / mh.STAMP).write_text("5 aaaa")
+    monkeypatch.setattr(mh, "bundled_helper", lambda: src)
+    monkeypatch.setattr(mh, "_has_profile", lambda sid: True)
+    monkeypatch.setattr(mh, "_token_sid", lambda: SID)
+    monkeypatch.setattr(dm, "_secure_dir", lambda path, sddl: path.mkdir(
+        parents=True, exist_ok=True))
+    calls, registered = [], {}
+
+    def schtasks(*args, timeout=30.0, out=None):
+        calls.append(args[0])
+        if args[0] == "/create":
+            registered["xml"] = Path(args[args.index("/xml") + 1]).read_text(
+                encoding="utf-16")
+        elif args[0] == "/query" and out is not None:
+            out.append(registered.get("readback", registered.get("xml", "")))
+        return 0
+    monkeypatch.setattr(mh, "_schtasks", schtasks)
+    return calls, registered
+
+
+def test_install_helper_keeps_the_first_user(helper_setup):
+    calls, registered = helper_setup
+    assert mh.install_helper()
+    assert mh.install_helper(SID2)   # a second account, its own prompt
+    assert (mh.helper_dir() / mh.USERS).read_text().split() == [SID, SID2]
+    assert mh.task_sddl([SID, SID2]) in registered["xml"]
+    assert calls.count("/create") == 2 and "/delete" not in calls
+
+
+def test_install_helper_checks_who_asked(helper_setup, monkeypatch):
+    """`--for` comes from the user's side: only a real account of this PC."""
+    calls, _ = helper_setup
+    assert not mh.install_helper("S-1-5-18") and not mh.install_helper("S-1-1-0")
+    monkeypatch.setattr(mh, "_has_profile", lambda sid: False)
+    assert not mh.install_helper(SID2)
+    assert calls == []
+
+
+def test_a_task_windows_registered_differently_is_removed(helper_setup):
+    """Read back after registering: a task without our security descriptor (or not
+    SYSTEM's, or running something else) is deleted, never left for anyone to start."""
+    calls, registered = helper_setup
+    registered["readback"] = "<Task/>"   # (it ignored what was asked for)
+    assert not mh.install_helper()
+    assert calls[-1] == "/delete"
+
+
+def test_verify_task_reads_back_what_was_registered(monkeypatch):
+    exe = Path(r"C:\Program Files\Onion Board Mic Helper\obmichelper.exe")
+    xml = mh.task_xml(exe, [SID])
+    shown: list[str] = []
+    monkeypatch.setattr(mh, "_schtasks", lambda *a, out=None, **k: out.append(shown[0]) or 0)
+    shown[:] = [xml]
+    assert mh.verify_task(exe, [SID])
+    assert not mh.verify_task(exe, [SID, SID2])   # someone's missing
+    assert not mh.verify_task(Path(r"C:\evil.exe"), [SID])
+    for before, after in [("S-1-5-18</UserId>", f"{SID}</UserId>"),
+                          ("<Triggers />", "<Triggers><BootTrigger /></Triggers>"),
+                          ("(A;;FA;;;BA)", "(A;;FA;;;BA)(A;;GA;;;WD)")]:
+        shown[:] = [xml.replace(before, after)]
+        assert not mh.verify_task(exe, [SID]), after
+    shown[:] = ["ERROR: not xml"]
+    assert not mh.verify_task(exe, [SID])
 
 
 def test_a_helper_request_file_must_be_plain(tmp_path):
@@ -253,6 +392,167 @@ def test_a_helper_request_file_must_be_plain(tmp_path):
     big = mh.requests_dir() / f"{'f' * 32}.req"
     big.write_bytes(b"uninstall" + b" " * 400)
     assert mh._take(big) is None and not big.exists()
+
+
+def test_a_request_with_a_second_name_is_refused():
+    """A hard link: the request is someone else's file under a second name."""
+    _queue()
+    other = mh.requests_dir().parent / "other.txt"
+    other.write_bytes(b"uninstall")
+    link = mh.requests_dir() / f"{'1' * 32}.req"
+    os.link(other, link)
+    assert mh._take(link) is None
+    assert not link.exists() and other.read_bytes() == b"uninstall"   # only our name went
+
+
+def test_a_linked_request_is_refused():
+    _queue()
+    target = mh.requests_dir().parent / "target.txt"
+    target.write_bytes(b"uninstall")
+    link = mh.requests_dir() / f"{'2' * 32}.req"
+    try:
+        link.symlink_to(target)
+    except OSError:
+        pytest.skip("making symlinks needs Developer Mode here")
+    assert mh._take(link) is None
+    assert not os.path.lexists(link) and target.exists()   # the link went, never its target
+
+
+def test_a_folder_named_like_a_request_is_refused():
+    _queue()
+    d = mh.requests_dir() / f"{'3' * 32}.req"
+    d.mkdir()
+    assert mh._take(d) is None
+
+
+def test_a_plain_request_is_read_and_gone():
+    _queue()
+    req = mh.requests_dir() / f"{'4' * 32}.req"
+    req.write_bytes(f"cleanup {GUID}".encode())
+    assert mh._take(req) == ["cleanup", GUID] and not req.exists()
+
+
+# ---------------------------------------------------------------- heartbeat
+
+def test_the_helper_beats_while_it_works(monkeypatch):
+    _queue()
+    monkeypatch.setattr(mh, "BEAT_S", 0.05)
+    ack = mh.results_dir() / f"{'5' * 32}.ack"
+    seen = []
+
+    def slow(args):
+        first = ack.stat().st_mtime_ns
+        time.sleep(0.4)
+        seen.append(ack.stat().st_mtime_ns > first)   # touched while working
+        return 0
+    _request("5" * 32, b"uninstall")
+    mh.serve(run=slow)
+    assert seen == [True]
+    assert not ack.exists() and (mh.results_dir() / f"{'5' * 32}.res").read_text() == "0"
+
+
+def _fake_task(monkeypatch, work):
+    """schtasks /run starts `work(rid)` on a thread, like the real task would."""
+    def schtasks(*args, timeout=30.0, out=None):
+        rid = next(mh.requests_dir().glob("*.req")).stem
+        threading.Thread(target=work, args=(rid,), daemon=True).start()
+        return 0
+    monkeypatch.setattr(mh, "_schtasks", schtasks)
+
+
+def test_a_working_helper_is_waited_for_past_the_timeout(monkeypatch):
+    """While its heartbeat is fresh the app keeps waiting: Windows' prompt now would
+    only find the helper holding the lock (code 4) and fail."""
+    _queue()
+    monkeypatch.setattr(mh, "BEAT_S", 0.05)
+
+    def work(rid):
+        mh.serve(run=lambda args: time.sleep(0.8) or 3)
+    _fake_task(monkeypatch, work)
+    assert mh.ask(["uninstall"], wait_s=0.2) == 3
+
+
+def test_a_helper_killed_half_way_falls_back_quickly(monkeypatch):
+    """It took the request, then died (its heartbeat stops): the app gives up after
+    STALE_S, not the full wait, and leaves the next step to Windows' prompt."""
+    _queue()
+    monkeypatch.setattr(mh, "STALE_S", 0.3)
+
+    def work(rid):   # took it, wrote the ack once, then nothing
+        mh._take(mh.requests_dir() / f"{rid}.req")
+        (mh.results_dir() / f"{rid}.ack").write_bytes(b"")
+    _fake_task(monkeypatch, work)
+    start = time.monotonic()
+    assert mh.ask(["uninstall"], wait_s=60) is None
+    assert time.monotonic() - start < 5
+
+
+def test_a_helper_killed_before_reading_leaves_nothing_to_redo(monkeypatch):
+    """Its heartbeat started, then it died with the request still there: the app
+    takes the request back, so the next run never does it after Windows' prompt did."""
+    _queue()
+    monkeypatch.setattr(mh, "STALE_S", 0.3)
+    _fake_task(monkeypatch, lambda rid: (mh.results_dir() / f"{rid}.ack").write_bytes(b""))
+    assert mh.ask(["uninstall"], wait_s=60) is None
+    assert not list(mh.requests_dir().iterdir())
+
+
+def test_an_older_helper_without_a_heartbeat_gets_the_full_wait(monkeypatch):
+    _queue()
+
+    def work(rid):   # a v2-v3 helper: takes it, answers later, no .ack
+        args = mh._take(mh.requests_dir() / f"{rid}.req")
+        time.sleep(0.5)
+        mh._answer(rid, 0 if args else 2)
+    _fake_task(monkeypatch, work)
+    assert mh.ask(["uninstall"], wait_s=5) == 0
+
+
+def test_the_next_request_works_after_a_killed_one(monkeypatch):
+    """A helper killed mid-job leaves its .ack behind: the next run answers the next
+    request as normal (the old .ack goes with the hour-old results)."""
+    _queue()
+    (mh.results_dir() / f"{'6' * 32}.ack").write_bytes(b"")   # the dead one's
+    _request("7" * 32, b"uninstall")
+    mh.serve(run=lambda args: 0)
+    assert (mh.results_dir() / f"{'7' * 32}.res").read_text() == "0"
+    old = time.time() - mh.RESULT_KEEP_S - 10
+    os.utime(mh.results_dir() / f"{'6' * 32}.ack", (old, old))
+    mh._prune(time.time())
+    assert not (mh.results_dir() / f"{'6' * 32}.ack").exists()
+
+
+# ---------------------------------------------------------------- logs, UI thread
+
+def test_admin_logs_stay_small(tmp_path, monkeypatch):
+    root = logging.getLogger()
+    monkeypatch.setattr(root, "handlers", [])
+    monkeypatch.setattr(dm, "LOG_BYTES", 2000)
+    path = tmp_path / "directmic-admin.log"
+    dm.log_to(path)
+    try:
+        for i in range(200):
+            logging.getLogger("soundboard.directmic").warning("line %d %s", i, "x" * 40)
+    finally:
+        for h in root.handlers:
+            h.close()
+    assert path.stat().st_size <= 2100
+    assert (tmp_path / "directmic-admin.log.1").exists()
+    assert not (tmp_path / "directmic-admin.log.2").exists()   # one old copy only
+
+
+def test_schtasks_on_the_ui_thread_is_flagged(qapp, monkeypatch, caplog):
+    """installed() / ready() run schtasks: never on the UI thread (AGENT-RULES)."""
+    monkeypatch.setattr(mh.subprocess, "run",
+                        lambda *a, **k: subprocess.CompletedProcess(a, 0, b"", b""))
+    with caplog.at_level(logging.WARNING, logger=mh.__name__):
+        REAL_SCHTASKS("/query", "/tn", mh.TASK)
+    assert "UI thread" in caplog.text
+    caplog.clear()
+    t = threading.Thread(target=REAL_SCHTASKS, args=("/query", "/tn", mh.TASK))
+    t.start()
+    t.join()
+    assert "UI thread" not in caplog.text
 
 
 def test_the_admin_part_runs_without_numpy():

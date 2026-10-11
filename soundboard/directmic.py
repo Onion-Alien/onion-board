@@ -1799,10 +1799,14 @@ def cli(args: list[str]) -> int:
     """`--direct-mic install <endpoint guid> [sfx|lfx|efx]` /`--direct-mic uninstall`: the
     admin copy. `--direct-mic remove`: the uninstaller's, not admin: runs the admin
     `remove-all` (the mic helper, or Windows asks first) if Onion Board is on a mic or
-    its helper is there at all. 0 when done."""
+    its helper (or any of it) is there at all. 0 when done. The app adds `--for <SID>`
+    (the account that asked) to the steps that may set up the helper."""
     from soundboard import michelper
+    user = None
+    if len(args) >= 2 and args[-2] == michelper.FOR:
+        user, args = args[-1], args[:-2]   # (install_helper checks it)
     if args == ["remove"]:
-        if not anything_installed() and not michelper.installed():
+        if not anything_installed() and not michelper.leftover():
             return 0
         if not _is_admin():
             code = _elevated(["remove-all"])
@@ -1840,8 +1844,7 @@ def cli(args: list[str]) -> int:
             secure_data_dirs()   # before the log or anything else is written there
         except Exception:  # noqa: BLE001 - nowhere safe to log to: just say it failed
             return 5
-        logging.basicConfig(filename=str(data_dir().parent / "directmic-admin.log"),
-                            level=logging.INFO, format="%(asctime)s %(message)s")
+        log_to(data_dir().parent / "directmic-admin.log")
         try:
             code = step()
         except Exception:  # noqa: BLE001
@@ -1850,10 +1853,27 @@ def cli(args: list[str]) -> int:
         if code == 0 and args[0] in ("install", "reinstall", "cleanup") \
                 and not michelper.is_helper():
             # the one prompt also sets up (or updates) the helper: no prompt next time
-            michelper.install_helper()
+            michelper.install_helper(user)
         return code
     finally:
         _release(lock)
+
+
+LOG_BYTES = 1 << 20
+
+
+def log_to(path: Path):
+    """The admin logs (directmic-admin.log, michelper.log): about 1 MB each, with one
+    older copy, instead of growing for good. Nothing if logging is set up already."""
+    from logging.handlers import RotatingFileHandler
+    root = logging.getLogger()
+    if root.handlers:
+        return
+    handler = RotatingFileHandler(path, maxBytes=LOG_BYTES, backupCount=1,
+                                  encoding="utf-8", delay=True)
+    handler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+    root.addHandler(handler)
+    root.setLevel(logging.INFO)
 
 
 _LOCK_NAME = "Global\\OnionBoardMicEffect"
@@ -1903,8 +1923,10 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
     code = _via_helper(args, wait_s)
     if code is not None or not ask_windows:
         return code
+    from soundboard import michelper
     try:
-        return run_elevated(sys.executable, relaunch_params(args), wait_s)
+        return run_elevated(sys.executable,
+                            relaunch_params(args + michelper.for_user(args)), wait_s)
     finally:
         _helper_check(args)   # the prompt's admin step may have set the helper up
 

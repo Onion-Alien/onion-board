@@ -91,6 +91,116 @@ def nonempty(reg):
     return {k: dict(v) for k, v in reg.keys.items() if v}
 
 
+# A stand-in for the helper's task (soundboard/michelper.py serve()), as its own
+# process on a temporary queue: it stops dead at STOP (the parent kills it there) and
+# logs each admin step it would have run.
+HELPER = """\
+import sys, time
+from pathlib import Path
+sys.path.insert(0, {root!r})
+from soundboard import michelper as mh
+queue, stop = Path(sys.argv[1]), sys.argv[2]
+mh.queue_dir = lambda: queue
+
+def hang():
+    (queue / "stopped").write_text(stop)
+    time.sleep(600)
+
+def wrap(name):
+    real = getattr(mh, name)
+    def step(*a):
+        if stop == "before " + name:
+            hang()
+        out = real(*a)
+        if stop == "after " + name:
+            hang()
+        return out
+    setattr(mh, name, step)
+
+wrap("_take")
+wrap("_answer")
+
+def run(args):
+    with open(queue / "ran.log", "a") as f:
+        f.write(" ".join(args) + "\\n")
+    if stop == "in the step":
+        hang()
+    return 7
+
+sys.exit(mh.serve(run=run))
+"""
+STOPS = ["before _take", "after _take", "in the step", "after _answer"]
+
+
+def helper_kills():
+    """Each kill point: ask() comes back soon (None, or the answer when it was written
+    already), leaves no request behind to be redone later, and the next request is
+    answered by a fresh helper."""
+    import subprocess
+    import time
+
+    from soundboard import michelper as mh
+    guid = "{11111111-2222-3333-4444-555555555555}"
+    saved = mh.queue_dir, mh._schtasks, mh.STALE_S, mh.START_S
+    mh.STALE_S, mh.START_S = 2.0, 5.0
+    try:
+        for stop in STOPS:
+            with tempfile.TemporaryDirectory() as td:
+                queue = Path(td)
+                script = queue / "helper.py"
+                script.write_text(HELPER.format(root=str(ROOT)), encoding="utf-8")
+                mh.queue_dir = lambda q=queue: q
+                mh.requests_dir().mkdir()
+                mh.results_dir().mkdir()
+                procs, mode = [], [stop]
+
+                def start(*_a, script=script, queue=queue, procs=procs, mode=mode, **_k):
+                    procs.append(subprocess.Popen(
+                        [sys.executable, str(script), str(queue), mode[0]],
+                        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)))
+                    return 0
+                mh._schtasks = start
+                t0 = time.monotonic()
+                killer = _kill_when(queue / "stopped", procs)
+                code = mh.ask(["cleanup", guid], wait_s=60)
+                killer.join()
+                took = time.monotonic() - t0
+                want = 7 if stop == "after _answer" else None
+                check(f"{stop}: ask() gives {want}", code == want, code)
+                check(f"{stop}: in {took:.0f} s, not the full wait", took < 15, took)
+                check(f"{stop}: no request left to redo",
+                      not list(mh.requests_dir().iterdir()), list(mh.requests_dir().iterdir()))
+                (queue / "ran.log").unlink(missing_ok=True)
+                mode[0] = "none"
+                code = mh.ask(["uninstall"], wait_s=30)
+                for p in procs:
+                    p.wait(30)
+                ran = (queue / "ran.log").read_text().split("\n") if (
+                    queue / "ran.log").exists() else []
+                check("  then the next request is answered", code == 7, code)
+                check("  and only that one is run", ran == ["uninstall", ""], ran)
+    finally:
+        mh.queue_dir, mh._schtasks, mh.STALE_S, mh.START_S = saved
+
+
+def _kill_when(marker: Path, procs: list):
+    """A thread killing the helper once it stops at its kill point (like Task
+    Scheduler ending it, or a crash)."""
+    import threading
+    import time
+
+    def watch():
+        deadline = time.monotonic() + 30
+        while not marker.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        for p in procs:
+            p.kill()
+            p.wait(10)
+    t = threading.Thread(target=watch, daemon=True)
+    t.start()
+    return t
+
+
 def run() -> int:
     print("== 1. install then uninstall restores every kind of mic, exactly")
     for mic in t.MICS:
@@ -223,6 +333,9 @@ def run() -> int:
         check("True when it stops", dm._audio_service(False) is True and len(ran) == 2, ran)
     finally:
         dm._run, dm._services_stopped = saved
+
+    print("== 8. the mic helper killed at every step: the next request still works")
+    helper_kills()
 
     print()
     if FAILS:
