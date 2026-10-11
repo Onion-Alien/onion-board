@@ -163,6 +163,7 @@ def test_the_installers_box_imports_on_first_start_then_asks_to_keep(
     assert not w._pending_imports and len(w.cfg.sounds) == kept and len(asked) == 1
 
 
+@pytest.mark.windows   # Windows paths
 def test_an_import_from_the_menu_is_not_asked_again(
         main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     w = main_window

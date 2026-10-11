@@ -617,6 +617,27 @@ def _stop_what_tests_left_running(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _let_go_of_the_mouse():
+    """Release any mouse button a test left held. QTest keeps the buttons it pressed
+    for the whole process (Qt 6's mouseDClick ends on a press), and with one held
+    every later test's mouseMove is a drag: no widget gets entered or hovered."""
+    yield
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication, QWidget
+    app = QApplication.instance()
+    if app is None or app.mouseButtons() == Qt.NoButton:
+        return
+    from PySide6.QtTest import QTest
+    spot = QWidget()
+    spot.show()
+    for button in (Qt.LeftButton, Qt.RightButton, Qt.MiddleButton):
+        if app.mouseButtons() & button:
+            QTest.mouseRelease(spot, button)
+    spot.close()
+    spot.deleteLater()
+
+
+@pytest.fixture(autouse=True)
 def _free_test_windows():
     """Close and free the windows a test leaves behind. Qt keeps a closed top-level
     window alive, and every theme change restyles all of them: with a few hundred
