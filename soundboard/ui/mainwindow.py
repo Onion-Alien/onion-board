@@ -6293,8 +6293,10 @@ class MainWindow(QMainWindow):
         if not self._removed:
             return
         done, self._removed = self._removed, []
-        toastmod.close(self, UNDO_KEY)   # (Ctrl+Z, not its button: its card goes too)
         self._put_back(done)
+        # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
+        # on_close finds their pack still in use)
+        toastmod.close(self, UNDO_KEY)
 
     def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
         """Put removed sounds back on the board: (meta, the index it had, its audio or
