@@ -836,6 +836,7 @@ class RadioPlayer(QObject):
         self.station: Station | None = None
         self._player: QMediaPlayer | None = None
         self._out: QAudioBufferOutput | None = None
+        self._halting = False
         self._retries = 0
         self._got_audio = False
         self._reconnecting = False   # a stream that played dropped: reopen until it's back
@@ -934,8 +935,7 @@ class RadioPlayer(QObject):
         self._set_state("connecting")
         player, station = self._player, self.station
         assert player is not None and station is not None   # play() made and set them
-        player.stop()
-        player.setSource(QUrl())   # the same URL again is ignored: really reopen it
+        self._halt_player()   # also empties the source: the same URL again would be ignored
         player.setSource(QUrl(station.url))
         player.play()
 
@@ -968,17 +968,28 @@ class RadioPlayer(QObject):
         self._gen += 1
         self._watch.stop()
         if self._player is not None:
-            # Qt's stop() waits for its decoding thread while this thread holds Python's
-            # lock; a buffer that thread is handing to _on_buffer needs that lock too: a
-            # deadlock. So _on_buffer is unhooked first and a buffer already on its way
-            # gets a moment (the GIL let go) to finish; station None makes it return.
+            self._halt_player()
+        self._set_state("stopped")
+
+    def _halt_player(self):
+        """Qt's stop() waits for its decoding thread while this thread holds Python's
+        lock; a buffer that thread is handing to _on_buffer needs that lock too: a
+        deadlock (stopping, and reopening a station that dropped). So _on_buffer is
+        unhooked first and a buffer already on its way gets a moment (the GIL let go)
+        to finish; _halting makes it return."""
+        player = self._player
+        if player is None:
+            return
+        self._halting = True
+        try:
             self._unhook_buffers()
             time.sleep(0.005)
-            self._player.stop()
-            self._player.setSource(QUrl())
+            player.stop()
+            player.setSource(QUrl())
+        finally:
+            self._halting = False
             if not self._closed:
                 self._hook_buffers()
-        self._set_state("stopped")
 
     def _hook_buffers(self):
         if self._out is not None:
@@ -1005,7 +1016,7 @@ class RadioPlayer(QObject):
                 self._take_buffer(buf)
 
     def _take_buffer(self, buf):
-        if self.station is None:
+        if self.station is None or self._halting:
             return
         gen = self._gen
         x = buffer_to_array(buf)
