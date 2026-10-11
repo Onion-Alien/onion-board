@@ -12,7 +12,7 @@ version. A request switched off in Settings > Privacy & security is listed as
 blocked: nothing was looked up or sent for it.
 
 Kept in memory only, at most MAX_ENTRIES, and gone when the app closes: unless
-"Keep a history" is on (Settings > Connection, or the installer's box: config
+"Keep a history" is on (Settings > Connection, or the installer's /KEEPNETLOG=1: config
 netlog_keep), when each connection is also added to FILE_NAME in the app's folder as
 it ends, and the next start lists them again (see keep()). The list isn't written to
 the app's log (though the log can name a site something failed on, unless "Keep an
