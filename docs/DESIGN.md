@@ -121,6 +121,7 @@ Sizes (the theme gives them; don't override):
 | --- | --- | --- |
 | Text button (primary, default, danger) | about 32 px tall (padding 7/12 px), as wide as its words | never `setFixedWidth` / `setMinimumWidth` on a text button: German is 30% longer |
 | Small | about 22 px tall (padding 2/8 px, 8pt) | |
+| Guide button | about 38 px tall (padding 9/20 px, 11pt, 10 px corners): `b.setProperty("guide", True)` | a full-page guide's Back / Next only (setup, reset); the Large text role matches the guide's body |
 | Icon button, normal | `setFixedSize(28, 28)`, 18 px glyph (`set_icon`'s default) | cards, dialogs, menus' anchors |
 | Icon button, dense | `setFixedSize(24, 24)`, `set_icon(b, name, size=16)` | list rows, chips; 24 px is the WCAG minimum, never smaller |
 | Bar control | height `panel.CONTROL_H` (36) inside a `panel.BAR_H` (48) bar | the Sounds toolbar, player and bottom bars only |
@@ -131,6 +132,17 @@ shows it with `busy.set_busy` / `busy.run_busy` (focus would jump otherwise).
 
 Rows of buttons: `Flow(gap=8)` (`settings._button_row()`) or an `QHBoxLayout` with
 spacing 8, buttons at their own width, then `addStretch(1)`.
+
+### Choice tiles, fold pills, status cards
+
+| Part | Code | When |
+| --- | --- | --- |
+| Choice tile | `choicetile.ChoiceTile(name, icon, w, h)` in a `QGridLayout` (spacing 12) | picking one of a few things that have a picture (devices, what the app is for): fixed-size tiles, the picked one tinted, ringed and ticked; never full-width radio rows |
+| Fold pill | `choicetile.FoldPill(words, icon)` + a `QFrame#card` under it, shown when checked | a tip most people don't need: as wide as its words, chevron right after them |
+| Status card | `setupwizard.StatusCard`: badge, bold line, words, pill | "is it working?" in a guide: tinted ok / warn / busy, never a coloured word at the start of a sentence |
+
+Keep a page's cards and tiles on the dialog's own edges (no extra page inset): their
+left edge is the button row's left, their right edge its right.
 
 ### Pop-ups, messages and modals: one way for each job
 

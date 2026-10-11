@@ -225,6 +225,22 @@ def _arrow(direction):
     return draw
 
 
+def _nav_arrow(direction):
+    """The setup guide's Back / Next: the arrow, heavier and with a wider head, so it
+    holds its own beside the buttons' semibold words."""
+    def draw(p, fill):
+        pen = p.pen()
+        pen.setWidthF(2.8)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        p.setPen(pen)
+        s = -1 if direction == "back" else 1
+        p.drawLine(QPointF(12 - 7 * s, 12), QPointF(12 + 7 * s, 12))
+        p.drawPolyline([QPointF(12 + 1 * s, 5), QPointF(12 + 7 * s, 12),
+                        QPointF(12 + 1 * s, 19)])
+    return draw
+
+
 def _reload(p, fill):
     p.drawArc(QRectF(5, 5, 14, 14), 60 * 16, 290 * 16)
     p.drawLine(QPointF(15.5, 6), QPointF(19, 5))
@@ -690,7 +706,8 @@ SHAPES = {
     "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
-    "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
+    "back": _arrow("back"), "forward": _arrow("forward"),
+    "nav_back": _nav_arrow("back"), "nav_next": _nav_arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
