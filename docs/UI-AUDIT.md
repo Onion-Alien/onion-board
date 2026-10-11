@@ -159,10 +159,24 @@ the affected states; include its PR and validation evidence here.
 
 ## Coverage still needed
 
-- [ ] **U8: Populated Apps and installed Triggers.** Check their item menus,
+- [x] **U8: Populated Apps and installed Triggers.** Check their item menus,
   submenus, configuration and confirmation states with safe test fixtures; the
   initial spot audit did not cover them. Treat new observations as findings only
   after inspection. Triggers' add-on UI is maintained separately.
+
+  Done (PR #422): rendered Apps with six programs in three categories (cards, the
+  card menu and its Categories submenu, a category heading's menu) and the Triggers
+  tab without the add-on, Dark and Light at 800x600 and 1180x720. Fine as they are:
+  the card menu (Categories ticked, red Remove), the heading menu. Fixed: **Triggers
+  without the add-on** was a window popping up on entering the tab and, once closed,
+  an empty page with one button. Now the tab itself is Onion Watch's card, short like an
+  ad (the owner's call): its logo (`assets/art/onion-watch.png`, from the add-on's own
+  painted logo) and name, one line, four points with painted icons, *Get Onion Watch*
+  as the one filled button, Hoot beside them, one line of fine print (the full privacy
+  words are its tooltip); centred on the tab, a `HoverCard`. No window. **Apps cards** open their
+  menu with the Menu key or Shift+F10 from anything in the card (it was right-click
+  only). New findings: U13, U14, U15 below (`tests/test_triggerstab.py`,
+  `tests/test_appspanel.py`).
 - [x] **U9: Menu interaction and accessibility pass.** Check Sounds/Apps/Radio/Voice
   menus for action grouping, current-value checkmarks, destructive treatment,
   visible alternatives to right-click, keyboard navigation, focus return and screen
@@ -230,6 +244,17 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   the meter and the drop box **keep following the window on purpose**: a longer seek
   bar seeks finer, and capping them only traded a long control for an empty gap
   (PR #410, capping all four, was closed for that). Don't re-cap them.
+
+- [ ] **U13: Program names from the file name.** Apps cards title a program from
+  its .exe: *Vlc*, *Obs64* (the window says VLC and OBS). Use the program's own
+  name (its file description, as Windows' volume mixer does) and keep the .exe
+  stem only as a fallback. Target: `appaudio.App.name`, `ui/appspanel.py`.
+- [ ] **U14: Apps category names aren't translated.** The built-in categories
+  (Browsers, Music & media, Calls & chat, Games, Other) show in English in every
+  language; translate the shown name, keep the saved key. Target: `ui/appspanel.py`.
+- [ ] **U15: Apps category headings have no keyboard way to their menu** (Rename,
+  Delete). They take no focus; give them one with a visible focus ring, or put the
+  menu on a small button beside the heading. Target: `ui/appspanel.py`.
 
 ### Features for later (not UI fixes; after 2.0)
 

@@ -1852,7 +1852,6 @@
   "Get AI voices": "Få AI-stemmer",
   "Get Onion Watch": "Få Onion Watch",
   "Get Onion Watch again": "Få Onion Watch igen",
-  "Get Onion Watch for the Triggers tab": "Få Onion Watch til fanen Triggers",
   "Get and update add-ons": "Hent og opdater tilføjelser",
   "Getting AI voices…": "Får AI-stemmer...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Hentning og opdatering af tilføjelser er slået fra i Indstillinger > Privatliv og sikkerhed.",
@@ -1989,7 +1988,6 @@
   "Onion Watch download progress": "Onion Watch download fremskridt",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch bliver downloadet lige nu. Prøv igen, når det er færdigt.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch er ikke tilgængelig til download endnu (GitHub siger, at den ikke kan finde den). Prøv igen senere.",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "Onion Watch afspiller en lyd, når noget dukker op i dit spil: en sjælden spawn, en kø, der springer, \"DU DØDE\". Den ser spillets eget vindue, selv mens andre vinduer dækker det, kan kende to kopier af et spil fra hinanden og kan ringe, indtil du stopper det. Dine lyde spiller gennem brættet som normalt.",
   "Onion Watch wasn't removed": "Onion Watch blev ikke fjernet",
   "Onion Watch wasn't removed: {error}": "Onion Watch blev ikke fjernet: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch blev ikke opdateret: {error}",
@@ -3050,5 +3048,11 @@
   "Click to send your sounds again: right now others hear only your mic": "Klik for at sende dine lyde igen: lige nu hører andre kun din mikrofon",
   "Only your mic": "Kun din mikrofon",
   "Others hear": "Andre hører",
-  "Others hear only your mic": "Andre hører kun din mikrofon"
+  "Others hear only your mic": "Andre hører kun din mikrofon",
+  "Can ring until you stop it": "Kan ringe, til du stopper den",
+  "Free, from GitHub, and only downloaded when you click.": "Gratis, fra GitHub, og hentes kun, når du klikker.",
+  "Only looks: never clicks or types in your game": "Kigger kun: klikker eller skriver aldrig i dit spil",
+  "Plays one of your sounds when something happens in your game.": "Afspiller en af dine lyde, når der sker noget i dit spil.",
+  "Rare spawns, queue pops, “YOU DIED”": "Sjældne spawns, kø der springer, “YOU DIED”",
+  "Watches the game's window, even behind others": "Holder øje med spillets vindue, også bag andre"
 }

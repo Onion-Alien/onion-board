@@ -1896,7 +1896,6 @@
   "Get AI voices": "Získejte hlasy AI",
   "Get Onion Watch": "Získejte cibulové hodinky",
   "Get Onion Watch again": "Získejte znovu Onion Watch",
-  "Get Onion Watch for the Triggers tab": "Získejte cibule Watch pro kartu Spouštěče",
   "Get and update add-ons": "Získejte a aktualizujte doplňky",
   "Getting AI voices…": "Získávání hlasů AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Získávání a aktualizace doplňků je vypnutá v Nastavení > Soukromí a zabezpečení.",
@@ -2034,7 +2033,6 @@
   "Onion Watch download progress": "Průběh stahování Onion Watch",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch se právě stahují. Zkuste to znovu, až bude hotovo.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch zatím není k dispozici ke stažení (GitHub říká, že je nemůže najít). Zkuste to znovu později.",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "Onion Watch přehraje zvuk, když se ve vaší hře něco objeví: vzácný spawn, vyskakující fronta, „ZEMŘELI JSTE“. Sleduje vlastní okno hry, i když je ostatní okna zakrývají, dokáže rozlišit dvě kopie hry a může zvonit, dokud ho nezastavíte. Vaše zvuky hrají na desce jako obvykle.",
   "Onion Watch wasn't removed": "Onion Watch nebyly odstraněny",
   "Onion Watch wasn't removed: {error}": "Onion Watch nebyly odstraněny: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch nebyly aktualizovány: {error}",
@@ -3115,5 +3113,11 @@
   "Click to send your sounds again: right now others hear only your mic": "Klikni a znovu posílej své zvuky: teď ostatní slyší jen tvůj mikrofon",
   "Only your mic": "Jen tvůj mikrofon",
   "Others hear": "Ostatní slyší",
-  "Others hear only your mic": "Ostatní slyší jen tvůj mikrofon"
+  "Others hear only your mic": "Ostatní slyší jen tvůj mikrofon",
+  "Can ring until you stop it": "Umí zvonit, dokud ho nezastavíte",
+  "Free, from GitHub, and only downloaded when you click.": "Zdarma, z GitHubu, a stáhne se jen po kliknutí.",
+  "Only looks: never clicks or types in your game": "Jen se dívá: nikdy neklikne ani nepíše do hry",
+  "Plays one of your sounds when something happens in your game.": "Přehraje jeden z vašich zvuků, když se ve hře něco stane.",
+  "Rare spawns, queue pops, “YOU DIED”": "Vzácné spawny, nalezená hra, “YOU DIED”",
+  "Watches the game's window, even behind others": "Sleduje okno hry, i když je za jinými"
 }

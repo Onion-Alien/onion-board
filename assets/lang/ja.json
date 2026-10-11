@@ -1812,7 +1812,6 @@
   "Get AI voices": "AI音声を取得する",
   "Get Onion Watch": "オニオンウォッチを入手",
   "Get Onion Watch again": "オニオンウォッチをもう一度入手",
-  "Get Onion Watch for the Triggers tab": "「トリガー」タブの Onion Watch を入手",
   "Get and update add-ons": "アドオンの取得と更新",
   "Getting AI voices…": "AI音声を取得中…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "アドオンの取得と更新は、[設定] > [プライバシーとセキュリティ] でオフになります。",
@@ -1947,7 +1946,6 @@
   "Onion Watch download progress": "Onion Watch のダウンロードの進行状況",
   "Onion Watch is being downloaded right now. Try again when it's done.": "Onion Watch は現在ダウンロード中です。完了したらもう一度試してください。",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "Onion Watch はまだダウンロードできません (GitHub によると、見つからないとのことです)。後でもう一度試してください。",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "Onion Watch は、レアなスポーン、キューのポップ、「YOU DIED」など、ゲーム内に何かが現れるとサウンドを再生します。他のウィンドウがそれを覆っている間でも、ゲーム自体のウィンドウを監視し、ゲームの 2 つのコピーを区別することができ、ユーザーが停止するまで呼び出し音を鳴らすことができます。あなたのサウンドはいつものようにボードを通して再生されます。",
   "Onion Watch wasn't removed": "オニオンウォッチは削除されませんでした",
   "Onion Watch wasn't removed: {error}": "Onion Watch は削除されませんでした: {error}",
   "Onion Watch wasn't updated: {error}": "Onion Watch が更新されませんでした: {error}",
@@ -2985,5 +2983,11 @@
   "Click to send your sounds again: right now others hear only your mic": "クリックしてサウンドの送信を再開：今は相手には自分のマイクだけ聞こえます",
   "Only your mic": "マイクだけ",
   "Others hear": "相手に聞こえる",
-  "Others hear only your mic": "相手には自分のマイクだけ聞こえます"
+  "Others hear only your mic": "相手には自分のマイクだけ聞こえます",
+  "Can ring until you stop it": "止めるまで鳴らし続けられます",
+  "Free, from GitHub, and only downloaded when you click.": "無料、GitHub から。クリックしたときだけダウンロードします。",
+  "Only looks: never clicks or types in your game": "見るだけ：ゲームでクリックや入力は一切しません",
+  "Plays one of your sounds when something happens in your game.": "ゲームで何か起きたとき、あなたのサウンドを鳴らします。",
+  "Rare spawns, queue pops, “YOU DIED”": "レア湧き、マッチング完了、“YOU DIED”",
+  "Watches the game's window, even behind others": "ゲームのウィンドウを見張ります（他のウィンドウの裏でも）"
 }
