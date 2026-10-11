@@ -29,6 +29,9 @@ COMPACT_H = 28     # only genuinely short windows use smaller targets
 SIDE_SHUT = 4      # the rail's own side margins, shut (a 34 px button)...
 SIDE_OPEN = 10     # ...and open
 LIVE_BAR_W = 3     # a live tab's bar on the rail's outer edge (Settings > Live tabs: tint)
+ICON_PAD = " "   # Qt puts only ~4 px between a button's icon and its words, and with a
+                      # style sheet on, no style or QSS rule can change that: an en space
+                      # (~6 px) in front of the words does
 TEXT_W = OPEN_W - 2 * SIDE_OPEN - ICON - 24   # a name's room on the open rail (icon,
                                               # padding, border, the gap after the icon)
 TINT_ALPHA = 0.16  # the current tab's soft accent fill (an outlined box looked heavy)
@@ -486,7 +489,7 @@ class SideRail(QFrame):
     def _fit(w: QWidget, text: str) -> str:
         """`text` cut with "…" to what fits beside the icon on the open rail (a long
         translation pushed past the rail's edge)."""
-        return w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
+        return ICON_PAD + w.fontMetrics().elidedText(text, Qt.ElideRight, TEXT_W)
 
     def _label(self, w: QPushButton, name: str, tip: str, shown: bool):
         """A button under the tabs: its name while open and help for screen readers."""

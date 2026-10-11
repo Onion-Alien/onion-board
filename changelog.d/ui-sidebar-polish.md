@@ -10,3 +10,4 @@
 - Ctrl+1 to Ctrl+9 jump to the tabs in the rail's order; Ctrl+Tab and Ctrl+Shift+Tab step
   through them. Clicking the version in the header opens What's new.
 - Stop all has its own icon (two squares), so it's not mistaken for the player's Stop.
+- Side rail: more room between each button's icon and its name (about 10 px instead of 4).

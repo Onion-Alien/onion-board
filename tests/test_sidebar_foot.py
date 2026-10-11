@@ -115,3 +115,32 @@ def test_the_header_version_opens_whats_new_and_stop_all_has_its_own_icon(window
     assert not window.stop_btn.icon().isNull()
     from soundboard.ui import icons
     assert "stop_all" in icons.SHAPES and icons.SHAPES["stop_all"] is not icons.SHAPES["stop"]
+
+
+def test_an_open_tab_has_room_between_its_icon_and_its_name(qapp):
+    """Qt leaves ~4 px there, which looked cramped: the rail adds to it (ICON_PAD)."""
+    from PySide6.QtGui import QColor, QIcon, QPixmap
+
+    from soundboard import theme
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "Radio")
+    pm = QPixmap(20, 20)
+    pm.fill(QColor("#ffffff"))
+    tabs.setTabIcon(0, QIcon(pm))
+    rail = SideRail(tabs, QWidget(), QLabel(), QLabel(), [], True)
+    rail.setStyleSheet(theme.stylesheet())
+    rail.show()
+    QApplication.processEvents()
+    QApplication.processEvents()
+    img = rail.buttons[0].grab().toImage()
+    bg = img.pixel(img.width() - 3, img.height() // 2) & 0xFFFFFF
+
+    def inked(x):
+        return any((img.pixel(x, y) & 0xFFFFFF) != bg and
+                   max(abs(((img.pixel(x, y) >> k) & 255) - ((bg >> k) & 255))
+                       for k in (0, 8, 16)) > 40 for y in range(4, img.height() - 4))
+    cols = [x for x in range(img.width()) if inked(x)]
+    first_end = next(x for x, nxt in zip(cols, cols[1:] + [10_000]) if nxt - x > 3)
+    words_start = next(x for x in cols if x > first_end)
+    assert words_start - first_end >= 9   # (4 px before, ~10 px now)
+    rail.close()
