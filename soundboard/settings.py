@@ -488,6 +488,7 @@ class SettingsDialog(QDialog):
         content.addLayout(side)
         content.addWidget(self.tabs, 1)
         lay.addLayout(content, 1)
+        lay.addSpacing(10)   # room above Done: it sat right under the page
         close = QPushButton(_("Done"))
         close.setObjectName("primary")
         close.clicked.connect(self.accept)
@@ -625,7 +626,8 @@ class SettingsDialog(QDialog):
     def _page(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(0, 12, 16, 12)
+        # no top margin: the first card lines up with the search box beside it
+        v.setContentsMargins(0, 0, 16, 12)
         v.setSpacing(12)
         return w, v
 

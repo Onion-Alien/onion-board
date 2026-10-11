@@ -1,0 +1,1 @@
+- Settings: the first card now lines up with the search box at the top, and the Done button has more room above it.

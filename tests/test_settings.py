@@ -560,3 +560,23 @@ def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
         dlg.close()
     finally:
         d.close()
+
+
+def test_first_card_lines_up_with_the_search_box_and_done_has_room(window, qapp):  # noqa: F811
+    """The page's first card starts level with the search box (it sat 12 px lower),
+    and Done isn't jammed right under the page."""
+    d = SettingsDialog(window, "appearance")
+    d.resize(1090, 720)
+    d.show()
+    qapp.processEvents()
+    try:
+        page = d.tabs.currentWidget().widget()
+        card = next(c for c in page.findChildren(QFrame, "setcard") if c.isVisible())
+        assert card.mapTo(d, card.rect().topLeft()).y() == \
+            d.search_box.mapTo(d, d.search_box.rect().topLeft()).y()
+        done = next(b for b in d.findChildren(QPushButton) if b.text() == "Done")
+        gap = done.mapTo(d, done.rect().topLeft()).y() - \
+            d.tabs.mapTo(d, d.tabs.rect().bottomLeft()).y()
+        assert gap >= 14
+    finally:
+        d.close()
