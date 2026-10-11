@@ -49,15 +49,13 @@ def test_a_picture_from_a_file_goes_on_only_on_save(window, tmp_path, monkeypatc
 
 
 def test_an_unreadable_file_is_refused(window, tmp_path, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QMessageBox
+    from soundboard.ui import toast
     bad = tmp_path / "x.png"
     bad.write_bytes(b"not a picture")
     monkeypatch.setattr(QFileDialog, "getOpenFileName", lambda *a, **k: (str(bad), ""))
-    warned = []
-    monkeypatch.setattr(QMessageBox, "warning", lambda *a: warned.append(a[2]))
     d = _dialog(window)
     d.btn_pic_file.click()
-    assert warned and d.picture is None
+    assert any("x.png" in t.text() for t in toast.shown(d)) and d.picture is None
     d.deleteLater()
 
 

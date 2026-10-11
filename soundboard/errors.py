@@ -372,23 +372,17 @@ def linkify(label) -> None:
 
 def warn(parent, title: str, e: BaseException | str | None, before: str = "",
          after: str = "", where: str = "") -> None:
-    """A warning box with the plain words; a reportable problem gets a *Report it*
-    button that opens the pre-filled issue in the browser."""
+    """An error toast (ui/toast.py) with the plain words, on ``parent``'s window; a
+    problem in the app gets a *Report it* button that opens the pre-filled issue in the
+    browser."""
     from PySide6.QtCore import QUrl
     from PySide6.QtGui import QDesktopServices
-    from PySide6.QtWidgets import QMessageBox
+
+    from soundboard.ui import busy, toast
     p = describe(e)
-    text = f"{before}{p.text}{after}"
-    if not p.reportable:
-        QMessageBox.warning(parent, title, text)
-        return
-    box = QMessageBox(QMessageBox.Icon.Warning, title,
-                      text + "\n\n" + _(
-                          "This looks like a problem in Onion Board. Reporting it opens a "
-                          "page on our GitHub with the details filled in; you choose what "
-                          "to send."), QMessageBox.StandardButton.NoButton, parent)
-    report = box.addButton(_("Report it"), QMessageBox.ButtonRole.HelpRole)
-    box.addButton(QMessageBox.StandardButton.Close)
-    box.exec()
-    if box.clickedButton() is report:
-        QDesktopServices.openUrl(QUrl(report_url(p, where or title)))
+    action = None
+    if p.reportable:
+        url = report_url(p, where or title)
+        action = (_("Report it"), lambda: QDesktopServices.openUrl(QUrl(url)))
+    busy.toast(parent, toast.titled(title, f"{before}{p.text}{after}"), "error",
+               action=action)
