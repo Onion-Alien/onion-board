@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "A winget {seconds} másodpercnél tovább tartott.",
   "✓ Got FFmpeg": "✓ FFmpeg megvan",
   "No settings match “{text}”": "Egyetlen beállítás sem felel meg a következőnek: „{text}”",
-  "+{count} queued": [
-    "+{count} sorban",
-    "+{count} sorban"
-  ],
   "Cancel download": "Letöltés megszakítása",
   "Couldn't download": "Nem sikerült letölteni",
   "Parsing video…": "Videó beolvasása…",
@@ -3174,6 +3170,14 @@
   "Opacity": "Átlátszatlanság",
   "Playing sound background": "Lejátszott hang háttere",
   "Show the playing sound's thumbnail behind the cards": "A lejátszott hang bélyegképének megjelenítése a kártyák mögött",
+  "Adding {n} sound": [
+    "{n} hang hozzáadása",
+    "{n} hang hozzáadása"
+  ],
+  "+{count} queued": [
+    "+{count} sorban",
+    "+{count} sorban"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Lekerül erről: {mic}. A mikrofoneffekt egyszerre csak egy mikrofonon működik.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "A mikrofoneffekt újratelepítve erre: {mic}. Próbáld ki a hangcsevegésben.",
   "Mic effect removed from {mic}": "Mikrofoneffekt eltávolítva innen: {mic}",

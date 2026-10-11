@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget mất hơn {seconds} giây.",
   "✓ Got FFmpeg": "✓ Đã có FFmpeg",
   "No settings match “{text}”": "Không có cài đặt nào khớp với “{text}”",
-  "+{count} queued": [
-    "+{count} đang chờ"
-  ],
   "Cancel download": "Hủy tải xuống",
   "Couldn't download": "Không tải được",
   "Parsing video…": "Đang đọc video…",
@@ -3101,6 +3098,12 @@
   "Opacity": "Độ mờ",
   "Playing sound background": "Nền âm thanh đang phát",
   "Show the playing sound's thumbnail behind the cards": "Hiện hình thu nhỏ của âm thanh đang phát phía sau các thẻ",
+  "Adding {n} sound": [
+    "Đang thêm {n} âm thanh"
+  ],
+  "+{count} queued": [
+    "+{count} đang chờ"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Nó sẽ được gỡ khỏi {mic}: mỗi lúc hiệu ứng mic chỉ chạy trên một mic.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Đã cài lại hiệu ứng mic trên {mic}. Hãy thử trong cuộc trò chuyện thoại.",
   "Mic effect removed from {mic}": "Đã gỡ hiệu ứng mic khỏi {mic}",

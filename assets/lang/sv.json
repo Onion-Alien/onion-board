@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget tog längre än {seconds} sekunder.",
   "✓ Got FFmpeg": "✓ FFmpeg hämtad",
   "No settings match “{text}”": "Ingen inställning matchar \"{text}\"",
-  "+{count} queued": [
-    "+{count} i kö",
-    "+{count} i kö"
-  ],
   "Cancel download": "Avbryt nedladdning",
   "Couldn't download": "Kunde inte ladda ner",
   "Parsing video…": "Läser videon…",
@@ -3174,6 +3170,14 @@
   "Opacity": "Opacitet",
   "Playing sound background": "Bakgrund för ljudet som spelas",
   "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten",
+  "Adding {n} sound": [
+    "Lägger till {n} ljud",
+    "Lägger till {n} ljud"
+  ],
+  "+{count} queued": [
+    "+{count} i kö",
+    "+{count} i kö"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Den tas bort från {mic}: mikrofoneffekten fungerar på en mikrofon i taget.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofoneffekten har installerats om på {mic}. Testa den i din röstchatt.",
   "Mic effect removed from {mic}": "Mikrofoneffekten borttagen från {mic}",

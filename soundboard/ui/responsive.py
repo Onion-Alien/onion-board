@@ -129,6 +129,17 @@ class Fitter:
         self.reset()
         self.steps = [s for s in self.steps if id(s[2]) not in gone]
 
+    def retry(self, steps: list[Step]):
+        """Undo these steps (by their apply function) if they're applied, so the next
+        fit() applies them again only if they're still needed: for a part whose own
+        size changed without the window's (the download bar showing a longer list)."""
+        again = {id(s[2]) for s in steps}
+        for i in sorted(self._at, reverse=True):
+            if id(self.steps[i][2]) in again:
+                self.steps[i][2](False)
+                del self._at[i]
+        self._known = None
+
     def reset(self):
         """Undo every step (everything shows again)."""
         for i in sorted(self._at, reverse=True):

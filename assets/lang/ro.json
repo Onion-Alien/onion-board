@@ -3031,11 +3031,6 @@
   "winget took longer than {seconds} seconds.": "winget a durat mai mult de {seconds} secunde.",
   "✓ Got FFmpeg": "✓ FFmpeg luat",
   "No settings match “{text}”": "Nicio setare nu se potrivește cu „{text}”",
-  "+{count} queued": [
-    "+{count} în coadă",
-    "+{count} în coadă",
-    "+{count} în coadă"
-  ],
   "Cancel download": "Anulează descărcarea",
   "Couldn't download": "Nu s-a putut descărca",
   "Parsing video…": "Se citește videoclipul…",
@@ -3247,6 +3242,16 @@
   "Opacity": "Opacitate",
   "Playing sound background": "Fundalul sunetului redat",
   "Show the playing sound's thumbnail behind the cards": "Arată miniatura sunetului redat în spatele cardurilor",
+  "Adding {n} sound": [
+    "Se adaugă {n} sunet",
+    "Se adaugă {n} sunete",
+    "Se adaugă {n} de sunete"
+  ],
+  "+{count} queued": [
+    "+{count} în coadă",
+    "+{count} în coadă",
+    "+{count} în coadă"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Va fi scos de pe {mic}: efectul de microfon merge pe un singur microfon odată.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efectul de microfon a fost reinstalat pe {mic}. Testează-l în chatul vocal.",
   "Mic effect removed from {mic}": "Efect de microfon eliminat de pe {mic}",

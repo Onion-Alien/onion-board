@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget이 {seconds}초보다 오래 걸렸습니다.",
   "✓ Got FFmpeg": "✓ FFmpeg 받음",
   "No settings match “{text}”": "“{text}”와 일치하는 설정이 없습니다.",
-  "+{count} queued": [
-    "+{count}개 대기 중"
-  ],
   "Cancel download": "다운로드 취소",
   "Couldn't download": "다운로드하지 못했어요",
   "Parsing video…": "동영상 읽는 중…",
@@ -3101,6 +3098,12 @@
   "Opacity": "불투명도",
   "Playing sound background": "재생 중인 사운드 배경",
   "Show the playing sound's thumbnail behind the cards": "재생 중인 사운드의 썸네일을 카드 뒤에 표시",
+  "Adding {n} sound": [
+    "사운드 {n}개 추가 중"
+  ],
+  "+{count} queued": [
+    "+{count}개 대기 중"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}에서는 빠져요. 마이크 효과는 한 번에 마이크 하나에서만 작동해요.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "{mic}에 마이크 효과를 재설치했어요. 음성 채팅에서 테스트해 보세요.",
   "Mic effect removed from {mic}": "{mic}에서 마이크 효과 제거됨",

@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget tardó más de {seconds} segundos.",
   "✓ Got FFmpeg": "✓ FFmpeg conseguido",
   "No settings match “{text}”": "Ningún ajuste coincide con \"{text}\"",
-  "+{count} queued": [
-    "+{count} en cola",
-    "+{count} en cola"
-  ],
   "Cancel download": "Cancelar descarga",
   "Couldn't download": "No se pudo descargar",
   "Parsing video…": "Analizando vídeo…",
@@ -3174,6 +3170,14 @@
   "Opacity": "Opacidad",
   "Playing sound background": "Fondo del sonido actual",
   "Show the playing sound's thumbnail behind the cards": "Mostrar la miniatura del sonido actual detrás de las tarjetas",
+  "Adding {n} sound": [
+    "Añadiendo {n} sonido",
+    "Añadiendo {n} sonidos"
+  ],
+  "+{count} queued": [
+    "+{count} en cola",
+    "+{count} en cola"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Se quitará de {mic}: el efecto de micro funciona en un micro a la vez.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efecto del micro reinstalado en {mic}. Pruébalo en tu chat de voz.",
   "Mic effect removed from {mic}": "Efecto del micro eliminado de {mic}",

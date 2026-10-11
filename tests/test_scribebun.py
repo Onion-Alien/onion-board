@@ -1,6 +1,7 @@
 """Bun the scribe's music: real, well-known pieces written out like sheet music, a
 different one each download."""
 import pytest
+from PySide6.QtWidgets import QLabel
 
 from soundboard.ui import scribebun as sb
 
@@ -91,15 +92,14 @@ def test_download_bar_first_line_lines_up(qapp):
             return top(w) + (w.height() - fm.height()) / 2 + fm.ascent()
 
         base = baseline(bar.lbl_title)
-        for w in (bar.lbl_src, bar.lbl_meta):
-            if w.isVisibleTo(bar):   # the mini player shows only the site's logo
-                assert abs(baseline(w) - base) <= 1, (mini, w.objectName())
+        if bar.lbl_meta.isVisibleTo(bar):   # the mini player has no room for it
+            assert abs(baseline(bar.lbl_meta) - base) <= 1, mini
         mid = base - QFontMetricsF(bar.lbl_title.font()).capHeight() / 2
-        for w in (bar.pill, bar.src_icon):
-            assert abs(top(w) + w.height() / 2 - mid) <= 1, (mini, w.objectName())
-        # Cancel sits on the progress line, centred with the bar
-        bar_mid = top(bar.bar) + bar.bar.height() / 2
-        assert abs(top(bar.btn_cancel) + bar.btn_cancel.height() / 2 - bar_mid) <= 1
+        assert abs(top(bar.src_icon) + bar.src_icon.height() / 2 - mid) <= 1, mini
+        # the running row's ✕ sits in the middle of its row
+        row = bar.cur_row
+        row_mid = top(row) + row.height() / 2
+        assert abs(top(bar.btn_cancel) + bar.btn_cancel.height() / 2 - row_mid) <= 1
         bar.close()
 
 
@@ -111,6 +111,16 @@ def _fail(bar, url, kind="add"):
 def _flash_over(bar):
     bar._hold.stop()
     bar._release()
+
+
+def _rows(bar):
+    """The list under the running row: (title, "wait" | "failed" | "added")."""
+    out = []
+    for i in range(bar.rows.count()):
+        w = bar.rows.itemAt(i).widget()
+        if w is not None:
+            out.append((w.findChild(QLabel, "queuetitle").text(), w.property("how")))
+    return out
 
 
 def test_download_bar_gradient_follows_how_it_ended(qapp):
@@ -186,10 +196,12 @@ def test_download_bar_waits_for_the_flash_then_moves_up(qapp):
     bar.set_queue([{"url": c, "title": "Three", "kind": "add"}])
     bar.set_active(b, "Two", "add", None)
     bar.set_progress(b, 0.5)
-    assert bar.url == a and bar.queue_badge.text() == "+2 queued"
+    assert bar.url == a and _rows(bar) == [("Two", "wait"), ("Three", "wait")]
     _flash_over(bar)
     assert bar.url == b and bar.lbl_status.text() == "50%"
-    assert bar.queue_badge.text() == "+1 queued"
+    # the one just added stays in the list, under what's still to come
+    assert _rows(bar) == [("Three", "wait"), ("One", "added")]
+    assert bar.h_text.text() == "Adding 2 sounds"
     bar.close()
 
 
@@ -249,20 +261,23 @@ def test_download_bar_failures_wait_for_retry(qapp):
     bar.set_active(b, "Two", "add", None)
     _flash_over(bar)
     assert bar.url == b and not bar.btn_retry.isVisibleTo(bar)
-    assert bar.queue_badge.text() == "1 failed"
-    bar.queue_badge.setChecked(True)
-    assert bar.panel.isVisibleTo(bar)
-    # minimised: the song, how far, what's left
+    assert bar.h_failed.text() == "1 failed" and bar.h_failed.isVisibleTo(bar)
+    assert _rows(bar) == [("One", "failed")]
+    # minimised: the summary line with how far the running one has got
     bar.set_progress(b, 0.6)
     bar.set_collapsed(True)
-    assert bar.s_text.text() == "Two · 60%" and "1 failed" in bar.s_failed.text()
+    assert not bar.panel.isVisibleTo(bar)
+    assert bar.h_text.text() == "Adding 1 sound" and bar.s_text.text() == "60%"
+    assert bar.h_failed.isVisibleTo(bar)
     bar.set_collapsed(False)
+    assert bar.panel.isVisibleTo(bar)
     # a finish doesn't hide the bar while a failed one waits
     bar.set_done(b, "add", True)
     assert not bar._auto_hide.isActive()
     bar._retry(a)
     assert asked == [{"url": a, "title": "One", "kind": "add", "seconds": 61}]
-    assert not bar._failed and not bar.queue_badge.isVisibleTo(bar)
+    assert not bar._failed and not bar.h_failed.isVisibleTo(bar)
+    assert _rows(bar) == [] and bar.h_text.text() == "Added 1 sound"
     bar.close()
 
 
@@ -284,27 +299,70 @@ def test_download_bar_cancel_is_not_a_failure(qapp):
 
 
 def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
-    from soundboard.ui.downloadbar import BAR_MIN_W, DownloadBar
+    from soundboard.ui.downloadbar import BAR_MIN_W, ROW_THUMB, DownloadBar
     bar = DownloadBar()
     links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
     bar.set_active(links[0], "A song with a long name", "add", None, "Someone", 90)
     bar.set_queue([{"url": u, "title": "x", "kind": "add"} for u in links[1:]])
     bar.show()
-    bar.resize(1000, 80)
+    bar.resize(1000, 200)
     qapp.processEvents()
-    assert bar.queue_badge.text() == "+2 queued" and bar.btn_stop_all.isVisibleTo(bar)
-    assert bar.lbl_src.isVisibleTo(bar)
+
+    def pictures():
+        return [w for w in bar.panel.findChildren(QLabel)
+                if w.isVisibleTo(bar) and (w.width(), w.height()) == ROW_THUMB]
+    assert bar.btn_stop_all.isVisibleTo(bar) and bar.lbl_meta.isVisibleTo(bar)
+    assert len(pictures()) == 2
     bar.setFixedWidth(360)   # the smallest window before the mini player
     qapp.processEvents()
-    assert bar.queue_badge.text() == "+2" and not bar.btn_stop_all.isVisibleTo(bar)
-    assert not bar.lbl_src.isVisibleTo(bar) and bar.src_icon.isVisibleTo(bar)
-    assert bar.bar.width() >= BAR_MIN_W
-    bar.queue_badge.setChecked(True)
-    assert bar.btn_panel_stop.isVisibleTo(bar)   # Stop all, in the list
+    assert not pictures() and not bar.lbl_meta.isVisibleTo(bar)
+    assert bar.btn_stop_all.isVisibleTo(bar) and bar.bar.width() >= BAR_MIN_W
+    assert bar.minimumSizeHint().width() <= 360
     bar.setFixedWidth(1000)
     qapp.processEvents()
-    assert bar.queue_badge.text() == "+2 queued" and bar.btn_stop_all.isVisibleTo(bar)
+    assert len(pictures()) == 2
     bar.close()
+
+
+def test_download_bar_folds_for_room(qapp):
+    """The window's fitter folds the list to its running row, then to its summary
+    line (with a thin bar), and opens it again: three states, no squashed steps."""
+    from soundboard.ui.downloadbar import DownloadBar
+    bar = DownloadBar()
+    links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
+    bar.set_active(links[0], "One", "add", None)
+    bar.set_queue([{"url": u, "title": "x", "kind": "add"} for u in links[1:]])
+    bar.set_progress(links[0], 0.4)
+    bar.show()
+    qapp.processEvents()
+    rows, line = (step[2] for step in bar.fit_steps())
+    assert bar.scroll_area.isVisibleTo(bar) and bar.btn_min.isVisibleTo(bar)
+    rows(True)
+    assert bar.cur_row.isVisibleTo(bar) and not bar.scroll_area.isVisibleTo(bar)
+    line(True)
+    assert not bar.panel.isVisibleTo(bar) and bar.s_bar.isVisibleTo(bar)
+    assert bar.s_text.text() == "40%"
+    assert not bar.btn_min.isVisibleTo(bar)   # it can't open: no button for it
+    line(False)
+    rows(False)
+    assert bar.scroll_area.isVisibleTo(bar) and not bar.s_bar.isVisibleTo(bar)
+    bar.close()
+
+
+def test_download_bar_glow_follows_the_theme(qapp):
+    """Full accent glow only where the theme's cards are its accent's colour; half
+    elsewhere, and always half for the green and red endings."""
+    from soundboard import theme
+    from soundboard.ui import downloadbar as db
+    was = theme.current_name
+    try:
+        for name, full in (("Lava", True), ("Ocean", True), ("Dark", False),
+                           ("Light", False), ("Royal", False), ("Carbon", False)):
+            theme.set_current(name)
+            assert db.theme_matches_accent() is full, name
+            assert db.glow() == (1.0 if full else db.SOFT)
+    finally:
+        theme.set_current(was)
 
 
 def test_tab_leaves_the_network_activity_table(qapp):

@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget 花了超過 {seconds} 秒。",
   "✓ Got FFmpeg": "✓ 已取得 FFmpeg",
   "No settings match “{text}”": "沒有設定符合“{text}”",
-  "+{count} queued": [
-    "+{count} 個排隊中"
-  ],
   "Cancel download": "取消下載",
   "Couldn't download": "無法下載",
   "Parsing video…": "正在解析影片…",
@@ -3101,6 +3098,12 @@
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的音效背景",
   "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖",
+  "Adding {n} sound": [
+    "正在新增 {n} 個聲音"
+  ],
+  "+{count} queued": [
+    "+{count} 個排隊中"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "它會從 {mic} 上移除:麥克風效果一次只能用於一支麥克風。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "已在 {mic} 上重新安裝麥克風效果。請在語音聊天中測試。",
   "Mic effect removed from {mic}": "已從 {mic} 移除麥克風效果",

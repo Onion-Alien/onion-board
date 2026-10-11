@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget が {seconds} 秒以上かかりました。",
   "✓ Got FFmpeg": "✓ FFmpeg を入手しました",
   "No settings match “{text}”": "「{text}」に一致する設定はありません",
-  "+{count} queued": [
-    "+{count} 件待機中"
-  ],
   "Cancel download": "ダウンロードをキャンセル",
   "Couldn't download": "ダウンロードできませんでした",
   "Parsing video…": "動画を解析中…",
@@ -3101,6 +3098,12 @@
   "Opacity": "不透明度",
   "Playing sound background": "再生中のサウンドの背景",
   "Show the playing sound's thumbnail behind the cards": "再生中のサウンドのサムネイルをカードの背後に表示",
+  "Adding {n} sound": [
+    "{n} 件のサウンドを追加中"
+  ],
+  "+{count} queued": [
+    "+{count} 件待機中"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}からは外れます。マイクエフェクトは一度に1つのマイクでしか動作しません。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "マイクエフェクトを{mic}に再インストールしました。ボイスチャットで試してください。",
   "Mic effect removed from {mic}": "{mic}からマイクエフェクトを削除しました",

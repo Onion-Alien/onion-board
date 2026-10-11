@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "Tumagal nang mahigit {seconds} segundo ang winget.",
   "✓ Got FFmpeg": "✓ Nakuha ang FFmpeg",
   "No settings match “{text}”": "Walang tugmang setting sa “{text}”",
-  "+{count} queued": [
-    "+{count} nakapila",
-    "+{count} nakapila"
-  ],
   "Cancel download": "Kanselahin ang download",
   "Couldn't download": "Hindi ma-download",
   "Parsing video…": "Binabasa ang video…",
@@ -3174,6 +3170,14 @@
   "Opacity": "Opacity",
   "Playing sound background": "Background ng tumutugtog na tunog",
   "Show the playing sound's thumbnail behind the cards": "Ipakita ang thumbnail ng tumutugtog na tunog sa likod ng mga card",
+  "Adding {n} sound": [
+    "Idinadagdag ang {n} sound",
+    "Idinadagdag ang {n} sound"
+  ],
+  "+{count} queued": [
+    "+{count} nakapila",
+    "+{count} nakapila"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Aalisin ito sa {mic}: gumagana ang mic effect sa isang mic lang bawat oras.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Na-reinstall ang mic effect sa {mic}. Subukan ito sa voice chat mo.",
   "Mic effect removed from {mic}": "Naalis ang mic effect sa {mic}",

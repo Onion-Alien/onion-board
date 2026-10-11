@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget deed er langer dan {seconds} seconden over.",
   "✓ Got FFmpeg": "✓ FFmpeg opgehaald",
   "No settings match “{text}”": "Er komt geen instelling overeen met “{text}”",
-  "+{count} queued": [
-    "+{count} in de wachtrij",
-    "+{count} in de wachtrij"
-  ],
   "Cancel download": "Download annuleren",
   "Couldn't download": "Downloaden mislukt",
   "Parsing video…": "Video wordt gelezen…",
@@ -3174,6 +3170,14 @@
   "Opacity": "Dekking",
   "Playing sound background": "Achtergrond van het spelende geluid",
   "Show the playing sound's thumbnail behind the cards": "Toon de miniatuur van het spelende geluid achter de kaarten",
+  "Adding {n} sound": [
+    "{n} geluid toevoegen",
+    "{n} geluiden toevoegen"
+  ],
+  "+{count} queued": [
+    "+{count} in de wachtrij",
+    "+{count} in de wachtrij"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Het gaat van {mic} af: het microfooneffect werkt op één microfoon tegelijk.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Microfooneffect opnieuw geïnstalleerd op {mic}. Test het in je voicechat.",
   "Mic effect removed from {mic}": "Microfooneffect verwijderd van {mic}",

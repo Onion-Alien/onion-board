@@ -56,7 +56,10 @@ Before the first edit, every task: latest `origin/main` and the open PRs
 #### Layout acceptance
 - Review the complete final screen, using the final branch with current main included,
   before presenting a UI change or merging it. Check Dark and Light, empty and populated
-  boards, 800x600, 1180x720, and the mini/full transition. Inspect controls together,
+  boards, 800x600, 1180x720, and the mini/full transition. A change to colours, icons
+  or the style sheet: check **all 31 themes** in `theme.THEMES`, not just Dark and Light
+  (fresh launch and a live switch from Dark; `tests/test_every_theme.py`). Half the
+  themes once looked unfinished because only two were ever looked at. Inspect controls together,
   including their spacing and unused areas, rather than approving individual widgets.
 - Keep the large drop target across the board's full width. Keep the audio footer compact
   and its controls using the available width. A hidden playback label must leave no

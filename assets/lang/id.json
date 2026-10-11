@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget memakan waktu lebih dari {seconds} detik.",
   "✓ Got FFmpeg": "✓ FFmpeg didapat",
   "No settings match “{text}”": "Tidak ada pengaturan yang cocok dengan “{text}”",
-  "+{count} queued": [
-    "+{count} dalam antrean"
-  ],
   "Cancel download": "Batalkan unduhan",
   "Couldn't download": "Gagal mengunduh",
   "Parsing video…": "Membaca video…",
@@ -3101,6 +3098,12 @@
   "Opacity": "Opasitas",
   "Playing sound background": "Latar suara yang diputar",
   "Show the playing sound's thumbnail behind the cards": "Tampilkan thumbnail suara yang diputar di belakang kartu",
+  "Adding {n} sound": [
+    "Menambahkan {n} suara"
+  ],
+  "+{count} queued": [
+    "+{count} dalam antrean"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Efek akan dilepas dari {mic}: efek mikrofon hanya bekerja di satu mikrofon sekaligus.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efek mikrofon sudah diinstal ulang di {mic}. Coba di obrolan suara.",
   "Mic effect removed from {mic}": "Efek mikrofon dihapus dari {mic}",

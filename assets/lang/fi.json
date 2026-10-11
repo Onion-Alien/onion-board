@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget kesti yli {seconds} sekuntia.",
   "✓ Got FFmpeg": "✓ FFmpeg haettu",
   "No settings match “{text}”": "Mikään asetus ei vastaa \"{text}\"",
-  "+{count} queued": [
-    "+{count} jonossa",
-    "+{count} jonossa"
-  ],
   "Cancel download": "Peruuta lataus",
   "Couldn't download": "Lataus epäonnistui",
   "Parsing video…": "Luetaan videota…",
@@ -3174,6 +3170,14 @@
   "Opacity": "Peittävyys",
   "Playing sound background": "Soivan äänen tausta",
   "Show the playing sound's thumbnail behind the cards": "Näytä soivan äänen pikkukuva korttien takana",
+  "Adding {n} sound": [
+    "Lisätään {n} ääni",
+    "Lisätään {n} ääntä"
+  ],
+  "+{count} queued": [
+    "+{count} jonossa",
+    "+{count} jonossa"
+  ],
   "It comes off {mic}: the mic effect works on one mic at a time.": "Se poistetaan laitteesta {mic}: mikrofonitehoste toimii yhdessä mikrofonissa kerrallaan.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofonitehoste asennettu uudelleen laitteeseen {mic}. Testaa sitä äänichatissa.",
   "Mic effect removed from {mic}": "Mikrofonitehoste poistettu laitteesta {mic}",
