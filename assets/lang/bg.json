@@ -897,7 +897,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Докладът е копиран. Постави го в issue-то, което току-що се отвори в браузъра ти (Ctrl+V).",
   "Report on GitHub": "Докладвай в GitHub",
   "Reset": "Нулирай",
-  "Reset all": "Нулирай всичко",
   "Reset and restart": "Нулирай и рестартирай",
   "Reset downloader": "Нулирай програмата за изтегляне",
   "Reset: {parts}. Changed your mind? Settings > General > Restore points.": "Нулирано: {parts}. Промени ли мнението си? Настройки > Общи > Точки за възстановяване.",
@@ -918,7 +917,6 @@
   "Run just this search straight from the site, not through Tor: the site will see your own address": "Пусни само това търсене директно от сайта, не през Tor: сайтът ще види собствения ти адрес",
   "Running in the background": "Работа на заден план",
   "Save": "Запази",
-  "Save as new sound": "Запази като нов звук",
   "Save it as a file to share with friends": "Запази го като файл, за да го споделиш с приятели",
   "Save videos in": "Запазвай видеата в",
   "Save what you just heard": "Запази каквото току-що чу",
@@ -3049,5 +3047,6 @@
   "Sound output": "Звуков изход",
   "Interface size": "Размер на интерфейса",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Прави всичко в Onion Board по-голямо или по-малко: текст, бутони и падове.",
-  "Onion Board changes size after a restart.": "Onion Board сменя размера си след рестарт."
+  "Onion Board changes size after a restart.": "Onion Board сменя размера си след рестарт.",
+  "Save a copy": "Запази копие"
 }

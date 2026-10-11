@@ -360,7 +360,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "レポートをコピーしました。ブラウザで開いた issue に貼り付けてください（Ctrl+V）。",
   "Report on GitHub": "GitHub で報告",
   "Reset": "リセット",
-  "Reset all": "すべてリセット",
   "Restart now": "今すぐ再起動",
   "Restart: press again restarts it": "最初から：もう一度押すと最初から再生",
   "Resume": "再開",
@@ -368,7 +367,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "パッドを右クリック → 「次に再生」で、再生中のサウンドの後に予約できます。",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "この検索だけ Tor を通さずサイトから直接行います: サイトにあなたのアドレスが見えます",
   "Save": "保存",
-  "Save as new sound": "新しいサウンドとして保存",
   "Search": "検索",
   "Search Myinstants: short meme sound buttons": "Myinstants を検索: 短いミーム効果音ボタン",
   "Search SoundCloud": "SoundCloud を検索",
@@ -2984,5 +2982,6 @@
   "Sound output": "音声出力",
   "Interface size": "画面の大きさ",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board のすべてを大きく、または小さくします: 文字、ボタン、パッド。",
-  "Onion Board changes size after a restart.": "Onion Board は再起動後に大きさが変わります。"
+  "Onion Board changes size after a restart.": "Onion Board は再起動後に大きさが変わります。",
+  "Save a copy": "コピーを保存"
 }

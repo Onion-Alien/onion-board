@@ -965,7 +965,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Rapport kopieret. Indsæt den i den sag, der lige er åbnet i din browser (Ctrl+V).",
   "Report on GitHub": "Rapportér på GitHub",
   "Reset": "Nulstil",
-  "Reset all": "Nulstil alt",
   "Reset and restart": "Nulstil og genstart",
   "Reset downloader": "Nulstil downloader",
   "Reset: {parts}. Changed your mind? Settings > General > Restore points.": "Nulstillet: {parts}. Fortrudt? Indstillinger > Generelt > Gendannelsespunkter.",
@@ -988,7 +987,6 @@
   "Running in the background": "Kører i baggrunden",
   "Safer: bigger buffers": "Sikrere: større buffere",
   "Save": "Gem",
-  "Save as new sound": "Gem som ny lyd",
   "Save it as a file to share with friends": "Gem den som en fil, du kan dele med venner",
   "Save videos in": "Gem videoer i",
   "Save what you just heard": "Gem det, du lige har hørt",
@@ -3049,5 +3047,6 @@
   "Sound output": "Lydoutput",
   "Interface size": "Grænsefladestørrelse",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Gør alt i Onion Board større eller mindre: tekst, knapper og pads.",
-  "Onion Board changes size after a restart.": "Onion Board skifter størrelse efter en genstart."
+  "Onion Board changes size after a restart.": "Onion Board skifter størrelse efter en genstart.",
+  "Save a copy": "Gem en kopi"
 }

@@ -360,7 +360,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "보고서를 복사했어요. 브라우저에 방금 열린 이슈에 붙여넣으세요(Ctrl+V).",
   "Report on GitHub": "GitHub에 보고",
   "Reset": "초기화",
-  "Reset all": "모두 초기화",
   "Restart now": "지금 다시 시작",
   "Restart: press again restarts it": "재시작: 다시 누르면 처음부터 재생",
   "Resume": "계속",
@@ -368,7 +367,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "패드 우클릭 → 다음에 재생을 고르면 지금 재생 중인 사운드 다음에 대기열에 넣어요.",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "이 검색만 Tor 없이 사이트에서 바로 하기: 사이트에 내 주소가 보여요",
   "Save": "저장",
-  "Save as new sound": "새 사운드로 저장",
   "Search": "검색",
   "Search Myinstants: short meme sound buttons": "Myinstants 검색: 짧은 밈 사운드 버튼",
   "Search SoundCloud": "SoundCloud 검색",
@@ -2984,5 +2982,6 @@
   "Sound output": "사운드 출력",
   "Interface size": "인터페이스 크기",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board의 모든 것을 크게 또는 작게 만듭니다: 글자, 버튼, 패드.",
-  "Onion Board changes size after a restart.": "Onion Board는 다시 시작한 뒤 크기가 바뀝니다."
+  "Onion Board changes size after a restart.": "Onion Board는 다시 시작한 뒤 크기가 바뀝니다.",
+  "Save a copy": "사본 저장"
 }

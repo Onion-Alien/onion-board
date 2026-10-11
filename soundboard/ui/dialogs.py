@@ -21,8 +21,8 @@ from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COL
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import busy, fit, icons, sourcedialog
-from soundboard.ui.panel import (EqPanel, hint_label, icon_button, section_label,
-                                 steady_number)
+from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
+                                 section_label, steady_number)
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
@@ -121,9 +121,7 @@ class EffectsPanel(QWidget):
         self.preset.addItem(_("Custom"), CUSTOM)
         no_wheel(self.preset)
         prow.addWidget(self.preset)
-        reset = QPushButton(_("Reset"))
-        reset.setObjectName("small")
-        reset.setToolTip(_("Back to the original sound (the trim stays)"))
+        reset = reset_button(_("Back to the original sound (the trim stays)"))
         reset.clicked.connect(lambda: self.preset.setCurrentIndex(0))   # the first preset
         prow.addWidget(reset)
         prow.addStretch(1)
@@ -249,7 +247,7 @@ class EffectsPanel(QWidget):
 class EditDialog(QDialog):
     """Edit one sound. Nothing is written to the SoundMeta until `apply()`;
     `hotkeys_changed` fires after a capture so the owner can re-register the (paused)
-    global hotkeys. After exec(), `as_copy` says whether "Save as new sound" was
+    global hotkeys. After exec(), `as_copy` says whether "Save a copy" was
     chosen (then apply() goes onto the copy, and the original stays as it was).
 
     preview_cb(sid, volume, fx, (fade_in, fade_out), done) plays the sound, with these
@@ -533,7 +531,7 @@ class EditDialog(QDialog):
         bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         bb.button(QDialogButtonBox.Save).setObjectName("primary")   # the one filled button
         bb.button(QDialogButtonBox.Cancel).setProperty("quiet", True)
-        copy = bb.addButton(_("Save as new sound"), QDialogButtonBox.AcceptRole)
+        copy = bb.addButton(_("Save a copy"), QDialogButtonBox.AcceptRole)
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
         copy.clicked.connect(lambda: setattr(self, "as_copy", True))
         bb.accepted.connect(self.accept)

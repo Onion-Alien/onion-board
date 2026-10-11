@@ -965,7 +965,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Relatório copiado. Cola-o no issue que acabou de abrir no teu browser (Ctrl+V).",
   "Report on GitHub": "Comunicar no GitHub",
   "Reset": "Repor",
-  "Reset all": "Repor tudo",
   "Reset and restart": "Repor e reiniciar",
   "Reset downloader": "Repor transferidor",
   "Reset: {parts}. Changed your mind? Settings > General > Restore points.": "Reposto: {parts}. Mudaste de ideias? Definições > Geral > Pontos de restauro.",
@@ -988,7 +987,6 @@
   "Running in the background": "A correr em segundo plano",
   "Safer: bigger buffers": "Mais seguro: buffers maiores",
   "Save": "Guardar",
-  "Save as new sound": "Guardar como som novo",
   "Save it as a file to share with friends": "Guardar como ficheiro para partilhar com amigos",
   "Save videos in": "Guardar vídeos em",
   "Save what you just heard": "Guardar o que acabaste de ouvir",
@@ -3049,5 +3047,6 @@
   "Sound output": "Saída de áudio",
   "Interface size": "Tamanho da interface",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Torna tudo no Onion Board maior ou mais pequeno: texto, botões e pads.",
-  "Onion Board changes size after a restart.": "O Onion Board muda de tamanho depois de reiniciar."
+  "Onion Board changes size after a restart.": "O Onion Board muda de tamanho depois de reiniciar.",
+  "Save a copy": "Guardar uma cópia"
 }

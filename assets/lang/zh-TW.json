@@ -360,7 +360,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "已複製報告。請貼到剛在瀏覽器開啟的問題回報裡（Ctrl+V）。",
   "Report on GitHub": "在 GitHub 回報",
   "Reset": "重設",
-  "Reset all": "全部重設",
   "Restart now": "立即重新啟動",
   "Restart: press again restarts it": "重新開始：再按一次從頭播放",
   "Resume": "繼續",
@@ -368,7 +367,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "在按鈕上按右鍵 → 下一首播放，就能排在目前播放的音效之後。",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "只有這次搜尋直接從網站進行，不經過 Tor：網站會看到你自己的位址",
   "Save": "儲存",
-  "Save as new sound": "另存為新音效",
   "Search": "搜尋",
   "Search Myinstants: short meme sound buttons": "搜尋 Myinstants：簡短的迷因音效按鈕",
   "Search SoundCloud": "搜尋 SoundCloud",
@@ -2984,5 +2982,6 @@
   "Sound output": "聲音輸出",
   "Interface size": "介面大小",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "讓 Onion Board 裡的一切變大或變小：文字、按鈕和音效鍵。",
-  "Onion Board changes size after a restart.": "Onion Board 重新啟動後改變大小。"
+  "Onion Board changes size after a restart.": "Onion Board 重新啟動後改變大小。",
+  "Save a copy": "另存副本"
 }
