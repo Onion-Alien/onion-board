@@ -1,4 +1,4 @@
-"""The update pill in the real MainWindow (offscreen): found → Update now → downloaded
+"""The update card in the real MainWindow (offscreen): found → Update now → downloaded
 → Restart to update → installer started and the app quits; and the note on the next
 start. No network and no installer run: updates.download / start_install are faked."""
 import pytest
@@ -85,8 +85,12 @@ def test_later_keeps_the_download_for_the_pill(window, boxes, qapp, monkeypatch,
     assert started == [setup] and window.cfg.update_pending == "99.0.0"
 
 
-def test_a_failed_download_puts_the_pill_back(window, boxes, qapp, monkeypatch):
+def test_a_failed_download_says_so_and_tries_again(window, boxes, qapp, monkeypatch):
+    calls = []
+
     def download(rel, progress, cancelled):
+        calls.append(1)
+        progress(50 * 1024 * 1024, 180 * 1024 * 1024)
         raise updates.UpdateError("the downloaded file isn't the one GitHub lists")
     monkeypatch.setattr(updates, "can_install", lambda: True)
     monkeypatch.setattr(updates, "download", download)
@@ -95,8 +99,77 @@ def test_a_failed_download_puts_the_pill_back(window, boxes, qapp, monkeypatch):
     assert process_events(qapp, lambda: not window._downloading)
     t = toast.shown(window)[-1]
     assert "Couldn't update" in t.text() and t.card.action.text() == "Open the download page"
-    assert window.btn_update.accessibleName() == "Update: 99.0.0" and window.btn_update.isEnabled()
+    card = window.btn_update
+    # never stuck at a percent: the warn state, the reason in its tip
+    assert card.state == "failed" and card.pct is None
+    assert card.accessibleName() == "Couldn't update" and card.hint == "Click to try again"
+    assert "isn't the one GitHub lists" in card.toolTip()
     assert window._update_file is None
+    assert card.copy.isHidden()                      # one failure: no Copy error yet
+    card.click()                                     # "Click to try again"
+    assert process_events(qapp, lambda: len(calls) == 2 and not window._downloading)
+    assert card.state == "failed" and not card.copy.isHidden()   # twice: Copy error
+    card.copy.click()
+    report = qapp.clipboard().text()
+    assert "isn't the one GitHub lists" in report and _rel().asset_url in report
+    assert "try 2" in report and "Traceback" in report
+
+
+def test_progress_fills_the_card_the_banner_and_settings(window, boxes, qapp):
+    rel = _rel()
+    rel.urgent = "sounds cut out after an hour"
+    window._on_update(rel, "", False)
+    window._downloading = True                       # (as download_update sets it)
+    mb = 1024 * 1024
+    window._on_update_progress(76 * mb, 180 * mb)
+    card = window.btn_update
+    assert card.state == "downloading" and card.pct == 42
+    assert card.title == "Downloading 42%" and card.hint == "76 of 180 MB"
+    assert window.urgent_prog.isVisibleTo(window.urgent_bar) and window.urgent_prog.value() == 42
+    assert "76 of 180 MB" in window.urgent_sub.text() and window.urgent_btn.text() == "Cancel"
+    assert window.update_status() == "Downloading 42% · 76 of 180 MB"
+    window._on_update_progress(180 * mb, 180 * mb)
+    assert card.pct == 100 and window.urgent_prog.value() == 100
+    window._downloading = False
+
+
+def test_cancel_stops_the_download(window, boxes, qapp, monkeypatch):
+    import time
+    started = []
+
+    def download(rel, progress, cancelled):
+        progress(1, 10)
+        started.append(1)
+        end = time.monotonic() + 5
+        while not cancelled() and time.monotonic() < end:
+            time.sleep(0.01)
+        raise updates.UpdateError("cancelled")
+    monkeypatch.setattr(updates, "can_install", lambda: True)
+    monkeypatch.setattr(updates, "download", download)
+    window._on_update(_rel(), "", False)
+    window.download_update()
+    assert process_events(qapp, lambda: started)
+    boxes.answers = {"Downloading the update": "Cancel download"}
+    window.btn_update.click()                        # what's going on, and Cancel
+    assert boxes.shown[-1][0] == "Downloading the update"
+    assert process_events(qapp, lambda: not window._downloading)
+    card = window.btn_update
+    assert card.state == "available" and card.accessibleName() == "Update to 99.0.0"
+    assert not any("Couldn't update" in t.text() for t in toast.shown(window))
+    assert window._update_err == "" and window._update_fails == 0
+
+
+def test_shut_the_update_is_one_rail_button(window, boxes):
+    from soundboard.ui import sidebar
+    window.resize(1180, 720)
+    window.show()
+    window._on_update(_rel(), "", False)
+    window.rail.set_open(False)
+    card = window.btn_update
+    assert not card.isHidden() and not card.is_card()
+    assert card.width() == sidebar.BUTTON_W and "Update to 99.0.0" in card.toolTip()
+    window.rail.set_open(True)
+    assert card.is_card() and card.width() == window.rail.output.width()
 
 
 def test_from_source_it_only_opens_the_page(window, boxes, monkeypatch):

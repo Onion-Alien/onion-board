@@ -266,3 +266,34 @@ def test_downloading_is_true_only_while_a_link_runs(qapp):
     assert not bar.downloading()
     bar._busy, bar._busy_url = "add", URL
     assert bar.downloading()
+
+
+@pytest.mark.parametrize("ffmpeg", [None, "ffmpeg.exe"])
+def test_add_with_save_video_says_why_no_video_was_kept(qapp, monkeypatch, tmp_path, ffmpeg):
+    """Also save the video, but the download is only the sound (SoundCloud has no video;
+    YouTube has none without ffmpeg to merge it): the sound is still added, and the bar
+    says why there's no video, naming FFmpeg when that's what's missing."""
+    from soundboard import library
+    from soundboard.ui import linkbar
+
+    bar, eng = _bar()
+    data = np.zeros((480, 2), np.int16)
+    meta = SoundMeta(id="x1", name="Clip", file=str(tmp_path / "Clip.mp3"))
+    audio = tmp_path / "abc.m4a"
+    audio.write_bytes(b"x")
+    asked = []
+    monkeypatch.setattr(linkbar.ytdl, "download_audio",
+                        lambda url, **kw: (asked.append(kw), (audio, "Clip"))[1])
+    monkeypatch.setattr(library, "_ffmpeg", lambda: ffmpeg)
+    monkeypatch.setattr(linkbar, "fingerprint", lambda path: "fp")
+    monkeypatch.setattr(linkbar, "import_file", lambda path, color, **kw: (meta, data))
+    monkeypatch.setattr(linkbar.thumbs, "find_in", lambda folder: None)
+    monkeypatch.setattr(eng, "prepare", lambda *args: None, raising=False)
+    added = []
+    bar.sound_ready.connect(lambda *args: added.append(args))
+    bar._busy, bar._busy_url = "add", URL
+    bar._work("add", URL, None, "#fff", {}, False, video=True)
+    assert asked[0].get("video") and len(added) == 1
+    text = bar.info.text()
+    assert "No video was saved" in text
+    assert ("needs FFmpeg" in text) == (ffmpeg is None), text

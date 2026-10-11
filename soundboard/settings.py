@@ -3197,6 +3197,9 @@ class SettingsDialog(QDialog):
         row.addWidget(self.upd_label, 1)
         cv.addLayout(row)
         self.mw.update_done.connect(self._updates_done)
+        # downloading, ready or failed: the same words as the side bar's update card
+        self.mw.update_state.connect(self._updates_state)
+        self._updates_state()
         self._net_sync()   # off in Settings > Privacy: greyed, with the reason
         return card
 
@@ -3227,11 +3230,21 @@ class SettingsDialog(QDialog):
         else:
             self.upd_label.setText(_("Version {version} is out.", version=rel.version))
 
+    def _updates_state(self):
+        if not qt_valid(self.upd_label):
+            return
+        status = self.mw.update_status() if self.mw.release is not None else ""
+        if status and (self.mw._downloading or self.mw._update_err
+                       or self.mw._update_file is not None):
+            self.upd_label.setText(status)
+
     def done(self, r):
-        try:
-            self.mw.update_done.disconnect(self._updates_done)
-        except (RuntimeError, TypeError):
-            pass
+        for sig, slot in ((self.mw.update_done, self._updates_done),
+                          (self.mw.update_state, self._updates_state)):
+            try:
+                sig.disconnect(slot)
+            except (RuntimeError, TypeError):
+                pass
         super().done(r)
 
     # ------------------------------------------------------------------ remote control
