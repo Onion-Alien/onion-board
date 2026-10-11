@@ -1306,7 +1306,6 @@
   "Volume for {count} (%):": "Kelantangan untuk {count} (%):",
   "Volume…": "Kelantangan…",
   "Wait first": "Tunggu dahulu",
-  "Wait for the other download to finish": "Tunggu muat turun lain selesai",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Menunggu untuk mendengar anda… jika bar tidak bergerak, pilih mikrofon lain.",
   "Waits for the sounds playing to finish": "Menunggu bunyi yang sedang dimainkan selesai",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Menunggu selama ini selepas ditekan sebelum dimainkan, contohnya untuk punchline. Hentikan semua membatalkannya.",
@@ -2966,7 +2965,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategori"
 }

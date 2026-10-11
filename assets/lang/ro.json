@@ -1340,7 +1340,6 @@
   "Volume for {count} (%):": "Volum pentru {count} (%):",
   "Volume…": "Volum…",
   "Wait first": "Așteaptă întâi",
-  "Wait for the other download to finish": "Așteaptă să se termine cealaltă descărcare",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Aștept să te aud… dacă bara nu se mișcă, alege alt microfon.",
   "Waits for the sounds playing to finish": "Așteaptă să se termine sunetele care se redau",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Așteaptă atât după apăsare înainte să redea, de exemplu pentru o poantă. Oprește tot o anulează.",
@@ -3094,7 +3093,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Categorie"
 }

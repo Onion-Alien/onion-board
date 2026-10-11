@@ -117,7 +117,7 @@ class DownloadBar(QFrame):
         self._auto_hide.timeout.connect(self._clear_and_hide)
 
         self._build_ui()
-        self._style()
+        self.retheme()
         self.hide()
 
     def _build_ui(self):
@@ -193,7 +193,7 @@ class DownloadBar(QFrame):
         self.btn_close.hide()
         h.addWidget(self.btn_close)
 
-    def _style(self):
+    def retheme(self):
         T = theme.T
         card_bg = theme.mix(T["card"], T["accent"], 0.12)
         border = theme.mix(T["card"], T["accent"], 0.35)
@@ -214,16 +214,18 @@ class DownloadBar(QFrame):
             f"font-weight:600; }}"
             f"QPushButton#cancelbutton:hover {{ background:{T['btn_hover']}; color:{T['text']}; }}"
             f"QPushButton#urgenthide {{ background:transparent; border:none; color:{T['muted']}; "
-            f"border-radius:6px; }}"
+            f"border-radius:6px; padding:0px; min-width:0px; font-size:10pt; }}"
             f"QPushButton#urgenthide:hover {{ background:{T['btn_hover']}; }}"
         )
+        self.bar.update()
+        if self.url:
+            self._update_thumb()   # the plain icon is drawn in the theme's colour
 
     def set_mini(self, mini: bool):
         self._mini = mini
         self.thumb.setVisible(not mini)
         margins = (8, 4, 8, 4) if mini else (12, 6, 10, 6)
         self.layout().setContentsMargins(*margins)
-
 
     def set_active(self, url: str, title: str, kind: str, thumb_pm: QPixmap | None = None):
         self._auto_hide.stop()
@@ -249,7 +251,7 @@ class DownloadBar(QFrame):
         self.show()
 
     def set_progress(self, url: str, payload):
-        if url != self.url and not self.url:
+        if url != self.url:   # a cancelled download still finishing: not this one
             return
         self._auto_hide.stop()
         if payload == "parsing":
@@ -301,7 +303,7 @@ class DownloadBar(QFrame):
         self.queue_badge.show()
 
     def set_done(self, url: str, kind: str, ok: bool):
-        if url != self.url and self.url:
+        if url != self.url:
             return
         self.stage = "done"
         self.btn_cancel.hide()

@@ -1323,7 +1323,6 @@
   "Volume for {count} (%):": "Äänenvoimakkuus ({count}) (%):",
   "Volume…": "Äänenvoimakkuus…",
   "Wait first": "Odota ensin",
-  "Wait for the other download to finish": "Odota, että toinen lataus valmistuu",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Odotetaan, että kuulen sinut… jos palkki ei liiku, valitse toinen mikki.",
   "Waits for the sounds playing to finish": "Odottaa soivien äänien loppumista",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Odottaa näin kauan painalluksen jälkeen ennen soittamista, vaikka vitsin huipennusta varten. Pysäytä kaikki peruu sen.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategoria"
 }

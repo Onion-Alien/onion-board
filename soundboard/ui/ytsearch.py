@@ -294,20 +294,14 @@ class Thumb(QWidget):
         p.setPen(QColor(theme.T["on_accent"]))
         p.drawText(pill, Qt.AlignCenter, word)
 
-        # Bottom 4px progress line
-        groove = QRectF(0, h - 4, w, 4)
+        if stage not in ("downloading", "processing"):
+            return   # nothing measured yet: no line that would look stuck
         p.setPen(Qt.NoPen)
         p.setBrush(QColor(0, 0, 0, 120))
-        p.drawRect(groove)
-        if stage == "processing":
-            fill_w = w
-        elif stage == "downloading":
-            fill_w = w * self.progress_frac
-        else:
-            fill_w = w * 0.3
-        fill = QRectF(0, h - 4, max(4.0, fill_w), 4)
+        p.drawRect(QRectF(0, h - 4, w, 4))
+        fill_w = w if stage == "processing" else w * self.progress_frac
         p.setBrush(QColor(theme.T["accent"]))
-        p.drawRect(fill)
+        p.drawRect(QRectF(0, h - 4, max(4.0, fill_w), 4))
 
     def set_progress(self, stage: str, frac: float):
         changed = (stage != self.progress_stage
@@ -526,7 +520,6 @@ class ResultRow(HoverCard):
         self._style()
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
-        self._locked = False
         self.now = ""           # "playing" / "paused": it's the one in the player
         self.setProperty("playing", False)
         self.setCursor(Qt.PointingHandCursor)
@@ -638,8 +631,6 @@ class ResultRow(HoverCard):
         if kind in self._release or (kind == "add" and self._added):
             return
         btn = self._btn(kind)
-        if self._locked:
-            busy.set_busy(btn, False)
         if not self._release:
             self.stage = "parsing"
             self.fill = 0.0
@@ -648,23 +639,23 @@ class ResultRow(HoverCard):
         text = (_("Processing…") if self.stage == "processing" else
                 (_("Adding… {pct:.0f}%", pct=self.fill * 100) if kind == "add" else
                  _("Loading… {pct:.0f}%", pct=self.fill * 100))
-                if self.fill > 0 else _("Parsing… 0%"))
+                if self.fill > 0 else _("Parsing…"))
         self._release[kind] = busy.hold(btn, text)
         btn.setToolTip(self._tip)
         self._style()
 
     def set_queued(self, kind: str):
-        """This card is queued behind another active download."""
-        if kind in self._release or (kind == "add" and self._added):
+        """This card waits for another download to finish first."""
+        if kind == "add" and self._added:
             return
         btn = self._btn(kind)
-        if self._locked:
-            busy.set_busy(btn, False)
         self.stage = "queued"
         self.fill = -0.5
         self._tip = _("Queued: waiting for current download to finish…")
-        text = _("Queued")
-        self._release[kind] = busy.hold(btn, text)
+        if kind in self._release:   # already held busy by the click (mark): relabel it
+            btn.setText(_("Queued"))
+        else:
+            self._release[kind] = busy.hold(btn, _("Queued"))
         btn.setToolTip(self._tip)
         self.thumb.set_progress("queued", 0.0)
         self._style()
@@ -722,8 +713,6 @@ class ResultRow(HoverCard):
             busy.set_busy(self.btn_add, True)
         else:
             release(None if ok else (_("Didn't add") if kind == "add" else _("Didn't play")))
-            if self._locked:
-                busy.set_busy(self._btn(kind), True)
             if kind == "play" and self.now:   # it started before the button let go
                 now, self.now = self.now, ""
                 self.set_now(now)
@@ -733,19 +722,6 @@ class ResultRow(HoverCard):
             now, self.now = self.now, None   # its tooltip again, for what it's doing now
             self.set_now(now)
         self._style()
-
-    def set_locked(self, on: bool):
-        """Another card's download is running: this one's buttons wait for it (one at a
-        time, so a click never cancels the one before it)."""
-        if on == self._locked:
-            return
-        self._locked = on
-        for kind in ("play", "add"):
-            if kind in self._release or (kind == "add" and self._added):
-                continue
-            busy.set_busy(self._btn(kind), on)
-        self.setToolTip(_("Wait for the other download to finish") if on
-                        else _("Double-click to play"))
 
     def set_thumb(self, pm: QPixmap):
         self.thumb.set_pixmap(pm)
@@ -952,11 +928,6 @@ class SearchResults(RoundedFrame):
 
     def mark(self, url: str, kind: str, ok: bool | None = None):
         """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
-        if kind == "queued":
-            for r in self._rows:
-                if r.result.url == url:
-                    r.set_queued(kind)
-            return
         if ok is None:
             self._fetching.setdefault(url, set()).add(kind)
         elif url in self._fetching:
@@ -969,7 +940,6 @@ class SearchResults(RoundedFrame):
                     r.set_busy(kind)
                 else:
                     r.set_done(kind, ok)
-        self._lock_rows()
 
     def show_now(self, url: str, now: str):
         """The player has `url` loaded ("playing" / "paused"), or nothing from here
@@ -977,15 +947,22 @@ class SearchResults(RoundedFrame):
         for r in self._rows:
             r.set_now(now if url and r.result.url == url else "")
 
+    def queued(self, url: str, kind: str):
+        """The link bar runs one download at a time: this pick waits its turn."""
+        for r in self._rows:
+            if r.result.url == url:
+                r.set_queued(kind)
+
+    def thumb_for(self, url: str) -> QPixmap | None:
+        """The picture of `url`'s card, if it has one yet (for the download bar)."""
+        return next((r.thumb._pm for r in self._rows
+                     if r.result.url == url and r.thumb.has_picture()), None)
+
     def progress(self, url: str, frac):
         """The link bar's download of `url`: 0..1, 'parsing', or below 0 / 'processing'."""
         for r in self._rows:
             if r.result.url == url:
                 r.set_progress(frac)
-
-    def _lock_rows(self):
-        for r in self._rows:
-            r.set_locked(bool(self._fetching) and r.result.url not in self._fetching)
 
     def _clear(self):
         """Off the screen now, not when Qt gets round to deleting them: a pasted link's
@@ -1053,7 +1030,6 @@ class SearchResults(RoundedFrame):
             reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
-        self._lock_rows()
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         data = reply.readAll()

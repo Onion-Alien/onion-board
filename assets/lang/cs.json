@@ -1340,7 +1340,6 @@
   "Volume for {count} (%):": "Hlasitost pro {count} (%):",
   "Volume…": "Hlasitost…",
   "Wait first": "Nejdřív počkat",
-  "Wait for the other download to finish": "Počkej, až doběhne druhé stahování",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Čekám, až tě uslyším… pokud se lišta nehýbe, vyber jiný mikrofon.",
   "Waits for the sounds playing to finish": "Počká, až dohrají hrající zvuky",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Po stisku počká takhle dlouho, než začne hrát, třeba kvůli pointě. Zastavit všechno ho zruší.",
@@ -3094,7 +3093,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategorie"
 }

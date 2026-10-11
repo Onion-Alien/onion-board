@@ -494,7 +494,6 @@
   "Volume": "Ses düzeyi",
   "Volume for {count} (%):": "{count} için ses düzeyi (%):",
   "Volume…": "Ses düzeyi…",
-  "Wait for the other download to finish": "Diğer indirmenin bitmesini bekle",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Mikrofon, kulaklık, seslerinin nereye gideceği (mikrofonun, kablo, başka bir cihaz ya da hiçbir yer) ve Discord için adım adım yol gösterir",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Bu ses çalarken videosunu izle. Ses yine normal şekilde gider; video sadece senin için.",
   "What's new": "Yenilikler",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategori"
 }

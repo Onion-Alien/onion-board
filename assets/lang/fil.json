@@ -1323,7 +1323,6 @@
   "Volume for {count} (%):": "Volume para sa {count} (%):",
   "Volume…": "Volume…",
   "Wait first": "Maghintay muna",
-  "Wait for the other download to finish": "Hintaying matapos ang ibang download",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Hinihintay kang marinig… kung hindi gumagalaw ang bar, pumili ng ibang mic.",
   "Waits for the sounds playing to finish": "Hinihintay matapos ang mga sound na nagpe-play",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Naghihintay nang ganitong tagal pagkapindot bago mag-play, halimbawa para sa punchline. Kinakansela ito ng Itigil lahat.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategorya"
 }

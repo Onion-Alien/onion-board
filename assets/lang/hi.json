@@ -494,7 +494,6 @@
   "Volume": "वॉल्यूम",
   "Volume for {count} (%):": "{count} के लिए वॉल्यूम (%):",
   "Volume…": "वॉल्यूम…",
-  "Wait for the other download to finish": "दूसरे डाउनलोड के पूरा होने का इंतज़ार करें",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "माइक, हेडफ़ोन, आपके साउंड कहाँ जाएँ (आपका माइक, केबल, कोई और डिवाइस या कहीं नहीं) और Discord, सब क़दम-दर-क़दम",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "चलते समय इस साउंड का वीडियो देखें। साउंड हमेशा की तरह बाहर जाता है; वीडियो सिर्फ़ आपके लिए है।",
   "What's new": "नया क्या है",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "श्रेणी"
 }

@@ -488,7 +488,6 @@
   "Volume": "音量",
   "Volume for {count} (%):": "{count} 的音量（%）：",
   "Volume…": "音量…",
-  "Wait for the other download to finish": "請等其他下載完成",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "帶你設定麥克風、耳機、音效要送到哪裡（你的麥克風、音源線、其他裝置或不傳送）以及 Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "播放時觀看這個音效的影片。音效仍會照常送出；影片只有你看得到。",
   "What's new": "新功能",
@@ -2966,7 +2965,6 @@
   "✓ Added to your sounds": "✓ 已新增到您的聲音",
   "Adding… {pct:.0f}%": "正在新增… {pct:.0f}%",
   "Loading… {pct:.0f}%": "正在載入… {pct:.0f}%",
-  "Parsing… 0%": "正在解析… 0%",
   "Queue is full": "隊列已滿",
   "Category": "分類"
 }

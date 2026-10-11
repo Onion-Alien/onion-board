@@ -1323,7 +1323,6 @@
   "Volume for {count} (%):": "Volum for {count} (%):",
   "Volume…": "Volum…",
   "Wait first": "Vent først",
-  "Wait for the other download to finish": "Vent til den andre nedlastingen er ferdig",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Venter på å høre deg… hvis stolpen ikke beveger seg, velg en annen mikrofon.",
   "Waits for the sounds playing to finish": "Venter til lydene som spilles, er ferdige",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Venter så lenge etter trykket før den spilles, for eksempel for en punchline. Stopp alt avbryter den.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategori"
 }

@@ -1323,7 +1323,6 @@
   "Volume for {count} (%):": "Volumen para {count} (%):",
   "Volume…": "Volumen…",
   "Wait first": "Esperar antes",
-  "Wait for the other download to finish": "Espera a que termine la otra descarga",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Esperando oírte… si la barra no se mueve, elige otro micrófono.",
   "Waits for the sounds playing to finish": "Espera a que terminen los sonidos que están sonando",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Espera este tiempo después de presionarlo antes de sonar, por ejemplo para el remate de un chiste. Detener todo lo cancela.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Agregado a tus sonidos",
   "Adding… {pct:.0f}%": "Agregando… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Cargando… {pct:.0f}%",
-  "Parsing… 0%": "Analizando… 0%",
   "Queue is full": "La fila está llena",
   "Category": "Categoría"
 }

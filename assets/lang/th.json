@@ -488,7 +488,6 @@
   "Volume": "ระดับเสียง",
   "Volume for {count} (%):": "ระดับเสียงของ {count} (%):",
   "Volume…": "ระดับเสียง…",
-  "Wait for the other download to finish": "รอให้ดาวน์โหลดอีกอันเสร็จก่อน",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "พาคุณตั้งค่าไมค์ หูฟัง ที่ที่เสียงของคุณไป (ไมค์, สาย, อุปกรณ์อื่น หรือไม่ไปไหน) และ Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "ดูวิดีโอของเสียงนี้ระหว่างที่เล่น เสียงยังส่งออกไปตามปกติ วิดีโอมีไว้ให้คุณดูคนเดียว",
   "What's new": "มีอะไรใหม่",
@@ -2966,7 +2965,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "หมวดหมู่"
 }

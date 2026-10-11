@@ -1323,7 +1323,6 @@
   "Volume for {count} (%):": "Ένταση για {count} (%):",
   "Volume…": "Ένταση…",
   "Wait first": "Αναμονή πριν",
-  "Wait for the other download to finish": "Περίμενε να τελειώσει η άλλη λήψη",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Περιμένω να σε ακούσω… αν η μπάρα δεν κουνιέται, διάλεξε άλλο μικρόφωνο.",
   "Waits for the sounds playing to finish": "Περιμένει να τελειώσουν οι ήχοι που παίζουν",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Περιμένει τόσο μετά το πάτημα πριν παίξει, π.χ. για την ατάκα. Το Σταμάτα τα πάντα το ακυρώνει.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Κατηγορία"
 }

@@ -500,7 +500,6 @@
   "Volume": "Гучність",
   "Volume for {count} (%):": "Гучність ({count}), %:",
   "Volume…": "Гучність…",
-  "Wait for the other download to finish": "Зачекай, поки завершиться інше завантаження",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Проведе тебе через мікрофон, навушники, куди йдуть звуки (мікрофон, кабель, інший пристрій чи нікуди) і Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Дивись відео цього звуку, поки він грає. Звук іде як звичайно; відео лише для тебе.",
   "What's new": "Що нового",
@@ -3094,7 +3093,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Категорія"
 }

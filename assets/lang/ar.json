@@ -518,7 +518,6 @@
   "Volume": "مستوى الصوت",
   "Volume for {count} (%):": "مستوى الصوت لـ {count} (%):",
   "Volume…": "مستوى الصوت…",
-  "Wait for the other download to finish": "انتظر انتهاء التنزيل الآخر",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "يرشدك خلال الميكروفون، والسماعات، ووجهة أصواتك (الميكروفون، الكابل، جهاز آخر أو لا مكان) وDiscord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "شاهد فيديو هذا الصوت أثناء تشغيله. الصوت يخرج كالمعتاد؛ والفيديو لك وحدك.",
   "What's new": "ما الجديد",
@@ -3286,7 +3285,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "فئة"
 }

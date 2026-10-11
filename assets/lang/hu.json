@@ -1323,7 +1323,6 @@
   "Volume for {count} (%):": "Hangerő ennyihez: {count} (%):",
   "Volume…": "Hangerő…",
   "Wait first": "Előtte várás",
-  "Wait for the other download to finish": "Várd meg, amíg a másik letöltés befejeződik",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Várom, hogy halljalak… ha a sáv nem mozdul, válassz másik mikrofont.",
   "Waits for the sounds playing to finish": "Megvárja, amíg a szóló hangok véget érnek",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Ennyit vár a nyomás után lejátszás előtt, mondjuk egy poénhoz. A Minden leállítása megszakítja.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Kategória"
 }

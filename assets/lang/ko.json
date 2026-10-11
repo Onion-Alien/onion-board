@@ -488,7 +488,6 @@
   "Volume": "볼륨",
   "Volume for {count} (%):": "{count}의 볼륨(%):",
   "Volume…": "볼륨…",
-  "Wait for the other download to finish": "다른 다운로드가 끝날 때까지 기다리세요",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "마이크, 헤드폰, 사운드가 갈 곳(내 마이크, 케이블, 다른 장치, 없음), Discord까지 차근차근 안내해요",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "재생하는 동안 이 사운드의 동영상을 봐요. 사운드는 평소처럼 나가고, 동영상은 나만 봐요.",
   "What's new": "새로운 기능",
@@ -2966,7 +2965,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "카테고리"
 }

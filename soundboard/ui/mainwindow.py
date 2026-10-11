@@ -1004,15 +1004,12 @@ class MainWindow(QMainWindow):
         self.linkbar.queue_updated.connect(self.mini_download_bar.set_queue)
         self.download_bar.cancel_requested.connect(self.linkbar.cancel)
         self.mini_download_bar.cancel_requested.connect(self.linkbar.cancel)
+        self.linkbar.queued.connect(self.ytresults.queued)
         self.ytresults.thumb_ready.connect(self.download_bar.set_thumb)
         self.ytresults.thumb_ready.connect(self.mini_download_bar.set_thumb)
 
     def _on_download_started(self, url: str, title: str, kind: str, secs: float = 0.0):
-        pm = None
-        for r in self.ytresults._rows:
-            if r.result.url == url and r.thumb.has_picture():
-                pm = r.thumb._pm
-                break
+        pm = self.ytresults.thumb_for(url)
         self.download_bar.set_active(url, title, kind, pm)
         self.mini_download_bar.set_active(url, title, kind, pm)
 
@@ -4120,6 +4117,8 @@ class MainWindow(QMainWindow):
         self.radio.retheme()
         self.apps.retheme()
         self.triggers.retheme()
+        self.download_bar.retheme()
+        self.mini_download_bar.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon

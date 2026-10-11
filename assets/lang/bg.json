@@ -1243,7 +1243,6 @@
   "Volume for {count} (%):": "Сила на звука за {count} (%):",
   "Volume…": "Сила на звука…",
   "Wait first": "Първо изчакай",
-  "Wait for the other download to finish": "Изчакай другото изтегляне да свърши",
   "Waiting to hear you… if the bar doesn't move, pick another mic.": "Чакам да те чуя… ако лентата не мърда, избери друг микрофон.",
   "Waits for the sounds playing to finish": "Чака звуците, които звучат, да свършат",
   "Waits this long after the press before it plays, say for a punchline. Stop everything cancels it.": "Чака толкова след натискането, преди да звучи, например за финала на шега. Спри всичко го отменя.",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Added to your sounds",
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
-  "Parsing… 0%": "Parsing… 0%",
   "Queue is full": "Queue is full",
   "Category": "Категория"
 }

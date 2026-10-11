@@ -494,7 +494,6 @@
   "Volume": "Volume",
   "Volume for {count} (%):": "Volume de {count} (%):",
   "Volume…": "Volume…",
-  "Wait for the other download to finish": "Espere o outro download terminar",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Guia você por microfone, fones de ouvido, para onde seus sons vão (seu microfone, o cabo, outro dispositivo ou lugar nenhum) e Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Assista ao vídeo deste som enquanto ele toca. O som sai normalmente; o vídeo é só para você.",
   "What's new": "Novidades",
@@ -3030,7 +3029,6 @@
   "✓ Added to your sounds": "✓ Adicionado aos seus sons",
   "Adding… {pct:.0f}%": "Adicionando… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Carregando… {pct:.0f}%",
-  "Parsing… 0%": "Analisando… 0%",
   "Queue is full": "A fila está cheia",
   "Category": "Categoria"
 }

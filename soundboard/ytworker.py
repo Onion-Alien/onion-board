@@ -106,7 +106,7 @@ class _Helper:
                     if progress:
                         progress(value)
                     continue
-                if kind in ("alive", "stage"):   # downloading, size unknown: not stuck
+                if kind == "alive":   # downloading, size unknown: not stuck
                     continue
                 return kind, value
         except (EOFError, OSError, BrokenPipeError) as e:

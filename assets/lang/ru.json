@@ -459,7 +459,6 @@
   "Volume": "Громкость",
   "Volume for {count} (%):": "Громкость для: {count} (%):",
   "Volume…": "Громкость…",
-  "Wait for the other download to finish": "Подожди, пока закончится другая загрузка",
   "Walks you through mic, headphones, where your sounds go (your mic, the cable, another device or nowhere) and Discord": "Проведёт по микрофону, наушникам, тому, куда идут твои звуки (микрофон, кабель, другое устройство или никуда), и Discord",
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Смотри видео этого звука, пока он играет. Звук уходит как обычно; видео только для тебя.",
   "What's new": "Что нового",
@@ -3094,7 +3093,6 @@
   "✓ Added to your sounds": "✓ Добавлено в звуки",
   "Adding… {pct:.0f}%": "Добавление… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Загрузка… {pct:.0f}%",
-  "Parsing… 0%": "Анализ… 0%",
   "Queue is full": "Очередь заполнена",
   "Category": "Категория"
 }
