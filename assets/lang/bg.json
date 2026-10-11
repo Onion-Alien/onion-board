@@ -3047,5 +3047,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Пази връзката, канала, датата на качване, дължината и гледанията на всяко изтегляне (от самото изтегляне, нищо допълнително не се тегли), и в текстов файл до звука. Щракни с десния бутон върху звука, за да отвориш или копираш връзката. Изключено: новите изтегляния не пазят нищо от това и менюто го скрива; вече запазеното остава.",
   "Remember where it came from": "Запомни откъде е",
   "Set up output": "Настройка на изхода",
-  "Sound output": "Звуков изход"
+  "Sound output": "Звуков изход",
+  "Interface size": "Размер на интерфейса",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Прави всичко в Onion Board по-голямо или по-малко: текст, бутони и падове.",
+  "Onion Board changes size after a restart.": "Onion Board сменя размера си след рестарт."
 }

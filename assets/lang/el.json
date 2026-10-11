@@ -3047,5 +3047,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Κρατά τον σύνδεσμο, το κανάλι, την ημερομηνία ανάρτησης, τη διάρκεια και τις προβολές κάθε λήψης (από την ίδια τη λήψη, τίποτα επιπλέον δεν κατεβαίνει), και σε αρχείο κειμένου δίπλα στον ήχο. Δεξί κλικ στον ήχο για άνοιγμα ή αντιγραφή του συνδέσμου. Κλειστό: οι νέες λήψεις δεν κρατούν τίποτα από αυτά και το μενού τα κρύβει· ό,τι έχει ήδη αποθηκευτεί μένει.",
   "Remember where it came from": "Θυμήσου από πού ήρθε",
   "Set up output": "Ρύθμιση εξόδου",
-  "Sound output": "Έξοδος ήχου"
+  "Sound output": "Έξοδος ήχου",
+  "Interface size": "Μέγεθος περιβάλλοντος",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Κάνει τα πάντα στο Onion Board μεγαλύτερα ή μικρότερα: κείμενο, κουμπιά και pads.",
+  "Onion Board changes size after a restart.": "Το Onion Board αλλάζει μέγεθος μετά από επανεκκίνηση."
 }

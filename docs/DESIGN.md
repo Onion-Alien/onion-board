@@ -40,6 +40,9 @@ size:
   dialog_max_width: 620px
   dropdown_max_width: 360px
   icon_button: 28-32px square
+  control_height: 36px  # panel.CONTROL_H: toolbar buttons, search box, play/stop
+  bar_height: 48px      # panel.BAR_H: the Sounds toolbar and every bottom bar
+  interface_size: 80-150%  # Settings > Appearance; Qt scales it all, so sizes stay in px
   focus_ring: always visible on keyboard focus
 ---
 

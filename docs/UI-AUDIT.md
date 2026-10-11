@@ -135,6 +135,16 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
 - [ ] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
   hear* meter, the search box and the drop box run the whole width. Cap utility widths
   (DESIGN: narrow by default) and recheck with a populated board.
+- [x] **U12: One control height, one bar height, an interface size.** The Sounds
+  toolbar (52 px, 40 px controls), player bar (51) and mic bar (47) were all
+  different, so the header looked heavy beside the tab rail. Now `panel.CONTROL_H`
+  (36) for the toolbar's buttons, the search box and play/stop, and `panel.BAR_H` (48)
+  for every bar (`panel.bar()` and the mixer strip). New *Interface size* card in
+  Settings > Appearance (80-150 %, `Config.ui_scale`): `app.ui_scale_startup` sets
+  `QT_SCALE_FACTOR` before the QApplication, so a change offers *Restart now*.
+  No Ctrl +/- keys: each press would restart the app. Search width is U11's.
+  Checked offscreen at 800x600, 1280x760 and 1920x1080, and at 125 %
+  (`tests/test_ui_size.py`).
 
 ### Features for later (not UI fixes; after 2.0)
 

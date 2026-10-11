@@ -2982,5 +2982,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "保存每次下载的链接、频道、上传日期、时长和播放量（来自下载本身，不会额外获取任何内容），也会存到声音旁边的文本文件里。右键点击声音即可打开或复制链接。关闭后：新下载不再保存这些内容，菜单也会隐藏；已保存的内容会保留。",
   "Remember where it came from": "记住来源",
   "Set up output": "设置输出",
-  "Sound output": "声音输出"
+  "Sound output": "声音输出",
+  "Interface size": "界面大小",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "让 Onion Board 里的一切变大或变小：文字、按钮和音效键。",
+  "Onion Board changes size after a restart.": "Onion Board 重启后改变大小。"
 }

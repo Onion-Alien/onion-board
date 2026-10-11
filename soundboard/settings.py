@@ -660,7 +660,6 @@ class SettingsDialog(QDialog):
         w, v = self._page()
         self.theme_cards = []
         v.addWidget(self._language_card())
-        v.addWidget(self._ui_scale_card())
         # above the themes (it sat under every theme card, out of sight)
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
@@ -681,6 +680,7 @@ class SettingsDialog(QDialog):
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
+        v.addWidget(self._ui_scale_card())
         v.addWidget(self._highlight_card())
         hints = {"Classic": _("Changes the whole app instantly."),
                  "Meme": _("For when you want your soundboard to be a bit.")}
