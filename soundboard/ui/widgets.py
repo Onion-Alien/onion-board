@@ -1126,6 +1126,7 @@ class PadGrid(QWidget):
         self.pads: list[Pad] = []
         self.background_image = ""
         self.background_opacity = 0
+        self.background_pad_height = 0
         self.pad_w = 150         # the size picked (Pad size); narrower only when it won't fit
         self.two_up = False      # the mini player: two smaller pads a row rather than one
         self.slim = False        # a tiny mini player: one-line rows instead of cards
@@ -1228,6 +1229,9 @@ class PadGrid(QWidget):
         return self.slim or self.listed
 
     def pad_h(self, w: int) -> int:
+        return self.background_pad_height or self.natural_pad_h(w)
+
+    def natural_pad_h(self, w: int) -> int:
         return SLIM_PAD_H if self.rows() else pad_height(w)
 
     def fit_width(self, room: int, slim: bool | None = None) -> tuple[int, int]:

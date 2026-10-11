@@ -26,7 +26,9 @@ def test_background_stretches_whole_thumbnail_with_padding(window, size):  # noq
         assert pad.x() + pad.width() <= target.right()
 
 
-def test_background_board_scrolls_without_partial_rows(window, qapp, monkeypatch):  # noqa: F811
+@pytest.mark.parametrize("size", [(1180, 720), (800, 600), (440, 720)])
+def test_background_board_scrolls_without_partial_rows(
+        window, qapp, monkeypatch, size):  # noqa: F811
     w = window
     for n in range(2, 24):
         w.cfg.sounds.append(SoundMeta(id=f"s{n}", name="Sound", file=w.meta("s0").file))
@@ -36,11 +38,14 @@ def test_background_board_scrolls_without_partial_rows(window, qapp, monkeypatch
     monkeypatch.setattr(w.engine, "playing", lambda: playing)
     w.cfg.playing_background = True
     w.tabs.setCurrentWidget(w.sounds_page)
-    w.resize(1180, 720)
+    w.resize(*size)
     w.show()
     w._update_playing_background(playing)
     qapp.processEvents()
+    w._update_playing_background(playing)
+    qapp.processEvents()
     bar = w._pad_scroll.verticalScrollBar()
+    assert w._pad_scroll.viewportMargins().bottom() == 0
     for value in (0, 31, 120, bar.maximum()):
         bar.setValue(value)
         qapp.processEvents()

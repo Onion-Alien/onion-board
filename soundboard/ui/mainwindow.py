@@ -8268,17 +8268,22 @@ class MainWindow(QMainWindow):
 
     def _update_playing_background(self, playing):
         on = self.cfg.playing_background
-        bottom, step = 0, 0
+        fitted_height, step = 0, 0
         if on and self.grid.pads and self.grid._shape is not None:
             margins = self.grid.grid.contentsMargins()
-            height = self.grid.pad_h(self.grid._shape[1])
+            height = self.grid.natural_pad_h(self.grid._shape[1])
             spacing = self.grid.grid.spacing()
             step = height + spacing
             room = self._pad_scroll.height() - margins.top() - margins.bottom()
             if room >= height:
-                bottom = (room + spacing) % step
+                rows = max(1, (room + spacing) // step)
+                fitted_height = (room - spacing * (rows - 1)) // rows
+                step = fitted_height + spacing
+        if fitted_height != self.grid.background_pad_height:
+            self.grid.background_pad_height = fitted_height
+            self.grid.relayout(force=True)
         self._background_row_step = step
-        gap = (on, bottom)
+        gap = (on, step)
         if getattr(self, "_background_gap", None) != gap:
             self._background_gap = gap
             bar = self._pad_scroll.verticalScrollBar()
@@ -8288,7 +8293,7 @@ class MainWindow(QMainWindow):
             # every card rather than cutting inside their edges.
             rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
             self._pad_scroll.setViewportMargins(12 if on and rtl else 0, 0,
-                                               12 if on and not rtl else 0, bottom)
+                                               12 if on and not rtl else 0, 0)
             bar.setSingleStep(step or self._background_scroll_step)
         image = ""
         if on:
