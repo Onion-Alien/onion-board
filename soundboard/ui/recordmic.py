@@ -92,8 +92,8 @@ class RecordDialog(QDialog):
         mark = QPushButton()
         mark.setObjectName("recordmark")
         mark.setFixedSize(44, 44)
-        mark.setAttribute(Qt.WA_TransparentForMouseEvents)
-        mark.setFocusPolicy(Qt.NoFocus)
+        mark.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        mark.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         icons.set_icon(mark, "wave", "accent", size=24)
         mark.setIconSize(QSize(24, 24))
         heading.addWidget(mark)
@@ -408,7 +408,7 @@ class RecordDialog(QDialog):
     def _to_devices(self):
         self.discard()
         self._open_devices()
-        self.done(QDialog.Rejected)
+        self.done(QDialog.DialogCode.Rejected)
 
     def discard(self):
         """Stop and forget whatever is recorded (closing)."""
@@ -423,15 +423,16 @@ class RecordDialog(QDialog):
         if self._unsaved():
             if self.take is not None and self.take.seconds < 0.5 and self.data is None:
                 pass   # just started: nothing worth asking about
-            elif QMessageBox.question(self, _("Record a sound"), _("Throw this recording away?"),
-                                      QMessageBox.Yes | QMessageBox.No,
-                                      QMessageBox.No) != QMessageBox.Yes:
+            elif QMessageBox.question(
+                    self, _("Record a sound"), _("Throw this recording away?"),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
                 return
         self.discard()
         super().reject()
 
     def done(self, r):
-        if r == QDialog.Accepted:
+        if r == QDialog.DialogCode.Accepted:
             self.discard()
         super().done(r)
 

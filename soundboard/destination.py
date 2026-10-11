@@ -374,13 +374,15 @@ class Processor:
         The band is divided by its own envelope before the saturator, so a quiet bass
         line gets the same harmonics as a loud one (just quieter): |u| makes the even
         ones (mostly the 2nd, an octave up), tanh the odd ones."""
-        low = self._lp(x.mean(axis=1, keepdims=True))[:, 0]
+        lp, bp = self._lp, self._bp
+        assert lp is not None and bp is not None   # _design made them: bass > 0
+        low = lp(x.mean(axis=1, keepdims=True))[:, 0]
         a = math.exp(-1.0 / (self.rate * self.ENV_S))
         env, self._env_zi = lfilter([1.0 - a], [1.0, -a], np.abs(low), zi=self._env_zi)
         env = np.maximum(env, 1e-5)
         u = low / env
         drive = (np.abs(u) + 0.5 * np.tanh(1.5 * u)) * env
-        return self._bp(drive.astype(F32)[:, None]) * F32(self.BASS_GAIN * amount)
+        return bp(drive.astype(F32)[:, None]) * F32(self.BASS_GAIN * amount)
 
     def _compress(self, x: np.ndarray, amount: float) -> np.ndarray:
         """Block-wise RMS compressor (one gain per block, ramped; no sample loop).

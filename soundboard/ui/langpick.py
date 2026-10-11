@@ -63,11 +63,11 @@ def _two_lines(text: str, fm: QFontMetrics, width: int) -> list[str]:
     """`text` on one line, or broken at a space onto two ("Español / (España)"): a
     long name keeps its region instead of losing it to "…"."""
     if fm.horizontalAdvance(text) <= width or " " not in text:
-        return [fm.elidedText(text, Qt.ElideRight, width)]
+        return [fm.elidedText(text, Qt.TextElideMode.ElideRight, width)]
     cut = max((i for i, c in enumerate(text) if c == " "
                and fm.horizontalAdvance(text[:i]) <= width), default=text.index(" "))
-    return [fm.elidedText(text[:cut], Qt.ElideRight, width),
-            fm.elidedText(text[cut + 1:], Qt.ElideRight, width)]
+    return [fm.elidedText(text[:cut], Qt.TextElideMode.ElideRight, width),
+            fm.elidedText(text[cut + 1:], Qt.TextElideMode.ElideRight, width)]
 
 
 class LangTile(QPushButton):
@@ -84,17 +84,18 @@ class LangTile(QPushButton):
         self.setObjectName("themecard")   # the theme previews' frame and checked border
         self.setCheckable(True)
         self.setFixedSize(TILE)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setAccessibleName(f"{own} {self.other}".strip())
         # each tile in its own direction: Arabic reads right to left in an English window
-        self.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(code) else Qt.LeftToRight)
+        self.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
+                                else Qt.LayoutDirection.LeftToRight)
 
     def paintEvent(self, e):
         super().paintEvent(e)
         t = theme.tokens()
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        rtl = self.layoutDirection() == Qt.RightToLeft
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
         h = self.height()
         badge = QRectF(self.width() - 12 - 38 if rtl else 12, (h - 38) / 2, 38, 38)
         path = QPainterPath()
@@ -105,10 +106,11 @@ class LangTile(QPushButton):
         f.setPointSizeF(f.pointSizeF() * (1.25 if len(self.mark) > 1 else 1.45))
         p.setFont(f)
         p.setPen(QColor(t["on_accent"] if self.isChecked() else t["text_hi"]))
-        p.drawText(badge, Qt.AlignCenter, self.mark)
+        p.drawText(badge, Qt.AlignmentFlag.AlignCenter, self.mark)
         text = QRectF(12, 0, self.width() - 12 - 38 - 22, h) if rtl \
             else QRectF(badge.right() + 10, 0, self.width() - badge.right() - 20, h)
-        align = (Qt.AlignRight if rtl else Qt.AlignLeft) | Qt.AlignAbsolute | Qt.AlignVCenter
+        align = ((Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft)
+                 | Qt.AlignmentFlag.AlignAbsolute | Qt.AlignmentFlag.AlignVCenter)
         bold = QFont(self.font())
         bold.setBold(True)
         small = QFont(self.font())
@@ -117,10 +119,12 @@ class LangTile(QPushButton):
         width = int(text.width())
         lines = [(own, bold, t["text"]) for own in _two_lines(self.own, bfm, width)]
         if self.other:
-            lines.append((sfm.elidedText(self.other, Qt.ElideRight, width), small, t["muted"]))
+            lines.append((sfm.elidedText(self.other, Qt.TextElideMode.ElideRight, width), small,
+                          t["muted"]))
         heights = [QFontMetrics(f).height() for __, f, __ in lines]
         if sum(heights) > h - 6 and len(lines) == 3:   # tall script: the name on one line
-            lines[:2] = [(bfm.elidedText(self.own, Qt.ElideRight, width), bold, t["text"])]
+            lines[:2] = [(bfm.elidedText(self.own, Qt.TextElideMode.ElideRight, width), bold,
+                          t["text"])]
             heights[:2] = [bfm.height()]
         y = (h - sum(heights)) / 2
         for (line, font, colour), lh in zip(lines, heights):
@@ -138,7 +142,7 @@ class LanguageDialog(QDialog):
     def __init__(self, parent=None, current: str | None = None):
         super().__init__(parent)
         self.setWindowTitle(_("Language"))
-        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.picked = ""
         current = current or i18n.current()
         v = QVBoxLayout(self)
@@ -155,7 +159,7 @@ class LanguageDialog(QDialog):
         self.grid = QGridLayout(holder)
         self.grid.setContentsMargins(0, 0, 0, 0)
         self.grid.setSpacing(8)
-        self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.grid.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         english, *rest = i18n.available()
         self.tiles = []
         for code, own in [english, *sorted(rest, key=lambda c: _fold(c[1]))]:
@@ -165,13 +169,13 @@ class LanguageDialog(QDialog):
             self.tiles.append(tile)
         self.none = QLabel()
         self.none.setObjectName("hint")
-        self.none.setAlignment(Qt.AlignCenter)
+        self.none.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.none.hide()
         self._place(self.tiles)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QScrollArea.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setWidget(holder)
         width = COLUMNS * TILE.width() + (COLUMNS - 1) * 8
         scroll.setFixedWidth(width + scroll.verticalScrollBar().sizeHint().width() + 4)

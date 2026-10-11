@@ -519,6 +519,7 @@ QFrame#card QFrame#micoutput { background:$panel; border:1px solid $border; bord
 QFrame#card QLabel#micguide { padding:2px 0; }
 QFrame#card QLabel#micupdatenote { background:$bg; color:$muted; border-radius:8px; padding:12px; font-size:9pt; }
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
+QFrame#card QFrame#alttile { background:$bg; border-radius:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }
 QPushButton { background:$btn; border:1px solid transparent; border-radius:8px; padding:7px 12px; }
@@ -533,6 +534,7 @@ QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent
 QPushButton:disabled { color:$muted; }
 QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
+QPushButton[guide="true"] { font-size:11pt; padding:9px 20px; border-radius:10px; }
 QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
@@ -852,6 +854,10 @@ QPushButton#vchip[state="warn"] { color:$warn_text; border-color:$warn_text; bac
 QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
+QLabel#pill[tone="muted"] { border-color:$muted; }
+QLabel#pill[tone="ok"] { color:$live_text; border-color:$live_border; }
+QLabel#pill[tone="warn"] { color:$warn_text; border-color:$warn_text; }
+QLabel#pill[tone="error"] { color:$error_text; border-color:$error_text; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
@@ -885,7 +891,6 @@ QFrame#setcard QPushButton:hover { background:$btn_hover; }
 QFrame#setcard QPushButton[quiet="true"] { background:transparent; }
 QFrame#setcard QPushButton[quiet="true"]:hover { background:$btn_hover; }
 QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
-QFrame#setcard QPushButton#primary[recoveryUpdate="true"] { border:1px solid $warn_text; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
@@ -1081,13 +1086,13 @@ def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: fl
 
 def _check_image(colour: str, size: int) -> QImage:
     """A rounded tick, drawn in code so it follows the theme's on-accent colour."""
-    img = QImage(size, size, QImage.Format_ARGB32)
-    img.fill(Qt.transparent)
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     pen = QPen(QColor(colour), size * 0.16)
-    pen.setCapStyle(Qt.RoundCap)
-    pen.setJoinStyle(Qt.RoundJoin)
+    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+    pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     p.setPen(pen)
     path = QPainterPath(QPointF(size * 0.22, size * 0.52))
     path.lineTo(QPointF(size * 0.42, size * 0.72))
@@ -1115,17 +1120,17 @@ def _check_url(colour: str) -> str:
 def _radio_image(ring: str, fill: str, dot: str, size: int) -> QImage:
     """A whole radio circle: a 1px ring (scaled with `size`) around `fill`, plus a centre
     dot when `dot` is set. Kept half a pixel inside the edge so no side gets clipped."""
-    img = QImage(size, size, QImage.Format_ARGB32)
-    img.fill(Qt.transparent)
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     pen_w = size / 16
     p.setPen(QPen(QColor(ring), pen_w))
     p.setBrush(QColor(fill))
     r = size / 2 - pen_w / 2 - size / 64
     p.drawEllipse(QPointF(size / 2, size / 2), r, r)
     if dot:
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(dot))
         p.drawEllipse(QPointF(size / 2, size / 2), size * 0.22, size * 0.22)
     p.end()
@@ -1149,13 +1154,13 @@ def _radio_url(ring: str, fill: str, dot: str = "") -> str:
 
 def _chevron_image(colour: str, size: int, up: bool) -> QImage:
     """A rounded chevron (dropdown / stepper arrow), drawn in code like the tick."""
-    img = QImage(size, size, QImage.Format_ARGB32)
-    img.fill(Qt.transparent)
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     pen = QPen(QColor(colour), size * 0.17)
-    pen.setCapStyle(Qt.RoundCap)
-    pen.setJoinStyle(Qt.RoundJoin)
+    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+    pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     p.setPen(pen)
     tip, ends = (0.34, 0.64) if up else (0.66, 0.36)
     path = QPainterPath(QPointF(size * 0.18, size * ends))
@@ -1187,7 +1192,7 @@ def _chevron_url(colour: str, size: int, up: bool, side: str = "") -> str:
 def _carbon_image(base: str, size: int) -> QImage:
     """One tile of 2x2 twill weave: each cell is a tow of fibres shaded across its
     width, the neighbouring cells turned 90 degrees, so it tiles into carbon fibre."""
-    img = QImage(size, size, QImage.Format_ARGB32)
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
     img.fill(QColor(base))
     p = QPainter(img)
     c = size / 2
@@ -1210,7 +1215,7 @@ def _carbon_image(base: str, size: int) -> QImage:
 def _pattern_image(kind: str, base: str, size: int) -> QImage:
     """The simpler tiling patterns: CRT scanlines, a neon grid, polka dots. Each is the
     panel colour a shade lighter or darker, so text on it stays readable."""
-    img = QImage(size, size, QImage.Format_ARGB32)
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
     img.fill(QColor(base))
     p = QPainter(img)
     if kind == "scanlines":   # a darker row every third pixel
@@ -1221,8 +1226,8 @@ def _pattern_image(kind: str, base: str, size: int) -> QImage:
         p.fillRect(QRectF(0, 0, size, 1), line)
         p.fillRect(QRectF(0, 0, 1, size), line)
     elif kind == "dots":
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(base).lighter(125))
         r = size * 0.14
         for c in (0.25, 0.75):
@@ -1408,7 +1413,7 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
     s = rect.width()
     x0, y0 = rect.left(), rect.top()
     p.save()
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     # body
     g = QLinearGradient(QPointF(x0, y0), QPointF(x0 + s, y0 + s))
     g.setColorAt(0.0, QColor(c1))
@@ -1440,28 +1445,28 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
 
     # sprout: two leaves curling out of the neck
     pen = QPen(fg, max(1.2, s * 0.05))
-    pen.setCapStyle(Qt.RoundCap)
+    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
     p.setPen(pen)
-    p.setBrush(Qt.NoBrush)
+    p.setBrush(Qt.BrushStyle.NoBrush)
     leaf = QPainterPath(pt(0, 0.29))
     leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
     leaf.moveTo(pt(0, 0.27))
     leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
     p.drawPath(leaf)
     # bulb
-    p.setPen(Qt.NoPen)
+    p.setPen(Qt.PenStyle.NoPen)
     p.fillPath(bulb(0.29), fg)
     # layers: inner outlines in the brand gradient, reading like sound waves
     if s >= 20:
         lp = QPen(g, max(1.0, s * 0.032))
-        lp.setCapStyle(Qt.RoundCap)
+        lp.setCapStyle(Qt.PenCapStyle.RoundCap)
         p.setPen(lp)
         for w in ((0.17, 0.07) if s >= 40 else (0.13,)):
             p.drawPath(bulb(w))
     # roots
     if s >= 32:
         rp = QPen(fg, max(1.0, s * 0.03))
-        rp.setCapStyle(Qt.RoundCap)
+        rp.setCapStyle(Qt.PenCapStyle.RoundCap)
         p.setPen(rp)
         for dx in (-0.06, 0.0, 0.06):
             p.drawLine(pt(dx * 0.6, 0.81), pt(dx, 0.87))
@@ -1473,7 +1478,7 @@ BRAND = ("#7c5cff", "#ff4d8d")   # the app icon keeps its own colours in every t
 
 def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None) -> QPixmap:
     pm = QPixmap(size, size)
-    pm.fill(Qt.transparent)
+    pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
     paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1])
     p.end()
@@ -1488,8 +1493,8 @@ def app_icon(c1: str | None = None, c2: str | None = None) -> QIcon:
 
 
 def logo_image(size: int) -> QImage:
-    img = QImage(size, size, QImage.Format_ARGB32)
-    img.fill(Qt.transparent)
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
     paint_logo(p, QRectF(0, 0, size, size), *BRAND)
     p.end()

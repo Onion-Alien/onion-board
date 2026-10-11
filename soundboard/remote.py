@@ -331,12 +331,12 @@ class RemoteControl(QObject):
         self._fails: dict[str, tuple[int, float]] = {}   # peer -> (wrong keys, locked until)
         self._fails_lock = threading.Lock()
         self._nonces: dict[str, float] = {}   # lan: nonce -> forget it after (monotonic)
-        self.request.connect(self._on_request, Qt.QueuedConnection)
+        self.request.connect(self._on_request, Qt.ConnectionType.QueuedConnection)
         self._network = QTimer(self)
         self._network.setInterval(int(NETWORK_CHECK_S * 1000))
         self._network.timeout.connect(self._check_network)
         self._net_asking = False
-        self._net_answer.connect(self._network_checked, Qt.QueuedConnection)
+        self._net_answer.connect(self._network_checked, Qt.ConnectionType.QueuedConnection)
 
     @property
     def running(self) -> bool:

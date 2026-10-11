@@ -16,7 +16,6 @@ import argparse
 import collections
 import json
 import os
-import re
 import subprocess
 import sys
 
@@ -26,20 +25,16 @@ CHECKED = ("soundboard/", "main.py")   # as [tool.pyright] include
 
 
 def pyright(files):
-    exe = os.path.join(os.path.dirname(sys.executable), "pyright")
-    out = subprocess.run([exe, "--outputjson", *files], cwd=ROOT, capture_output=True,
-                         text=True, encoding="utf-8")
+    # --pythonpath: the Python running this script, so a git worktree without its own
+    # .venv still finds PySide6 and the other packages
+    out = subprocess.run([sys.executable, "-m", "pyright", "--outputjson",
+                          "--pythonpath", sys.executable, *files], cwd=ROOT,
+                         capture_output=True, text=True, encoding="utf-8")
     try:
         diags = json.loads(out.stdout)["generalDiagnostics"]
     except (ValueError, KeyError):
         sys.exit(f"pyright failed:\n{out.stdout}\n{out.stderr}")
-    # Old-style Qt enum names (Qt.AlignLeft, QPainter.Antialiasing) work at run time but
-    # aren't in Qt's type stubs: ~1800 false alarms that new Qt code would keep adding.
-    return [d for d in diags if d["severity"] == "error"
-            and not QT_ENUM.search(d["message"])]
-
-
-QT_ENUM = re.compile(r'Cannot access attribute "[A-Za-z_]\w*" for class "type\[Q')
+    return [d for d in diags if d["severity"] == "error"]
 
 
 def key(d):

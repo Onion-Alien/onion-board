@@ -96,14 +96,16 @@ def pick(info: dict, url: str) -> dict:
 def clean(v) -> dict:
     """A stored SoundMeta.source made safe to use: {} unless it has an http(s) link.
     The site always comes from the link, never from what was stored."""
-    if not isinstance(v, dict) or not _http(v.get("link")) or site_of(v["link"]) is None:
+    site = site_of(v["link"]) if isinstance(v, dict) and _http(v.get("link")) else None
+    if not isinstance(v, dict) or site is None:
         return {}
-    out = {k: _text(v.get(k)) for k in ("site", "title", "channel", "uploaded", "added")}
+    out: dict[str, str | int | None] = {
+        k: _text(v.get(k)) for k in ("site", "title", "channel", "uploaded", "added")}
     out["link"] = _http(v["link"])
     out["channel_link"] = _http(v.get("channel_link"))
     out["seconds"] = _number(v.get("seconds"))
     out["views"] = _number(v.get("views"))
-    out["site"] = site_of(out["link"])[0]
+    out["site"] = site[0]   # (out["link"] is v["link"], stripped)
     return {k: x for k, x in out.items() if x not in ("", None)}
 
 

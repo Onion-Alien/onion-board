@@ -70,7 +70,7 @@ class Switcher:
             self.front_pid = pid
             exe = exe_name(path)
             cat = rules.get(exe)
-            if cat in cats:
+            if cat is not None and cat in cats:
                 if self.before is None:
                     self.before = current
                 self.pid, self.exe, self.shown = pid, exe, cat

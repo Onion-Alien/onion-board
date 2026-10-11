@@ -14,7 +14,7 @@ from PySide6.QtCore import QEvent, QObject, Qt
 from PySide6.QtWidgets import (QAbstractButton, QAbstractSpinBox, QApplication, QComboBox,
                                QLineEdit, QPlainTextEdit, QTextEdit, QWidget)
 
-KEYBOARD_FOCUS = (Qt.TabFocusReason, Qt.BacktabFocusReason)
+KEYBOARD_FOCUS = (Qt.FocusReason.TabFocusReason, Qt.FocusReason.BacktabFocusReason)
 
 
 def types_text(w: QWidget) -> bool:
@@ -49,11 +49,11 @@ class SpaceKey(QObject):
 
     def eventFilter(self, obj, ev) -> bool:
         t = ev.type()
-        if t == QEvent.FocusIn:
+        if t == QEvent.Type.FocusIn:
             self._kbd = obj if ev.reason() in KEYBOARD_FOCUS else None
             return False
-        if t != QEvent.KeyPress or ev.key() != Qt.Key_Space or ev.modifiers() not in (
-                Qt.NoModifier, Qt.KeypadModifier):
+        if t != QEvent.Type.KeyPress or ev.key() != Qt.Key.Key_Space or ev.modifiers() not in (
+                Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.KeypadModifier):
             return False
         fw = QApplication.focusWidget()
         # the key goes to the focus widget first, then up to its parents: act once

@@ -114,7 +114,7 @@ def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, c
 
 def test_settings_toggle_applies_and_survives_reload(window):  # noqa: F811
     d = window.open_settings("data")
-    assert d.embedded and d.done_btn is None
+    assert d.back_btn is not None
     assert not d.copy_local_sounds.isChecked()
     d.copy_local_sounds.setChecked(True)
     assert window.cfg.copy_local_sounds

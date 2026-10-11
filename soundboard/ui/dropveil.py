@@ -34,7 +34,7 @@ def label_for(paths: list[str]) -> str | None:
 class DropVeil(QWidget):
     def __init__(self, window: QWidget):
         super().__init__(window)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setAccessibleName(_("Drop files"))
         self.text = ""
         self._window = window
@@ -46,16 +46,17 @@ class DropVeil(QWidget):
 
     def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
         t = ev.type()
-        if t in (QEvent.DragEnter, QEvent.DragMove, QEvent.DragLeave, QEvent.Drop) \
+        if t in (QEvent.Type.DragEnter, QEvent.Type.DragMove, QEvent.Type.DragLeave,
+                 QEvent.Type.Drop) \
                 and isinstance(obj, QWidget) and obj.window() is self._window:
-            if t == QEvent.DragEnter:
+            if t == QEvent.Type.DragEnter:
                 self._leave.stop()
                 paths = [u.toLocalFile() for u in ev.mimeData().urls() if u.isLocalFile()] \
                     if ev.mimeData().hasUrls() else []
                 self.show_for(label_for(paths))
-            elif t == QEvent.DragLeave:
+            elif t == QEvent.Type.DragLeave:
                 self._leave.start()
-            elif t == QEvent.Drop:
+            elif t == QEvent.Type.Drop:
                 self.hide()
         return False
 
@@ -75,12 +76,12 @@ class DropVeil(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         bg = QColor(theme.T.get("bg", "#000"))
         bg.setAlpha(200)
         p.fillRect(self.rect(), bg)
         accent = QColor(theme.T.get("accent", "#7c5cff"))
-        pen = QPen(accent, 2, Qt.DashLine)
+        pen = QPen(accent, 2, Qt.PenStyle.DashLine)
         p.setPen(pen)
         tint = QColor(accent)
         tint.setAlpha(28)
@@ -95,7 +96,7 @@ class DropVeil(QWidget):
         w = icon_px + 12 + fm.horizontalAdvance(self.text) + 48
         h = max(icon_px, fm.height()) + 28
         pill = QRectF((self.width() - w) / 2, (self.height() - h) / 2, w, h)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(accent)
         p.drawRoundedRect(pill, h / 2, h / 2)
         on = theme.T.get("on_accent", "#fff")
@@ -107,5 +108,6 @@ class DropVeil(QWidget):
         p.setFont(f)
         text_rect = pill.adjusted(24 + icon_px + 12, 0, -24, 0) if not rtl \
             else pill.adjusted(24, 0, -(24 + icon_px + 12), 0)
-        p.drawText(text_rect, Qt.AlignVCenter | Qt.AlignLeading, self.text)
+        p.drawText(text_rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeading,
+                   self.text)
         p.end()

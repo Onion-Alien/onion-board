@@ -358,20 +358,22 @@ class Cleanup(Effect):
     def _dehiss(self, spec):
         strength = self.p["hiss"]
         power = (spec.real ** 2 + spec.imag ** 2).astype(np.float64)
-        if self.noise is None:   # start low: what you say first mustn't count as noise
-            self.noise = power.mean(axis=0) * 1e-3 + 1e-12
+        noise = self.noise
+        if noise is None:   # start low: what you say first mustn't count as noise
+            noise = power.mean(axis=0) * 1e-3 + 1e-12
         frame_db = 10 * np.log10(power.mean(axis=1) + 1e-20)
         out = np.empty_like(spec)
         over = 1.0 + strength            # subtract a bit more than the estimate
         floor = 10 ** (-18 * strength / 20)
         for f in range(len(spec)):
-            noise_db = 10 * np.log10(self.noise.mean() + 1e-20)
+            noise_db = 10 * np.log10(noise.mean() + 1e-20)
             gated = self.p["gate"] > 0 and not self.open
             if gated or frame_db[f] < noise_db + 3:   # quiet: learn the noise
-                self.noise = 0.9 * self.noise + 0.1 * power[f]
+                noise = 0.9 * noise + 0.1 * power[f]
             else:   # creeps up (~3 dB/s), so a louder room is learned even mid-talk
-                self.noise *= self.creep
-            g = np.maximum(1 - over * self.noise / (power[f] + 1e-20), floor)
+                noise *= self.creep
+            self.noise = noise
+            g = np.maximum(1 - over * noise / (power[f] + 1e-20), floor)
             g = np.convolve(g, (0.25, 0.5, 0.25), "same")     # less "musical noise"
             if self.prev_gain is not None:
                 g = np.maximum(g, 0.6 * self.prev_gain)      # fades out, never snaps
@@ -724,7 +726,7 @@ class PitchShift(Effect):
             if mix < 1 or m0 < 1:     # (glides, like every other level)
                 m = _glide(m0, mix, len(x))
                 if x.ndim == 2 and np.ndim(m):
-                    m = m[:, None]
+                    m = np.asarray(m)[:, None]
                 wet = dry * (1 - m) + wet * m
         g0, target = self.wet_g, 1.0 if on else 0.0
         if g0 == target:
@@ -1208,7 +1210,8 @@ class Reverb(Effect):
         k = rate / 44100
         self.combs = [np.zeros(int(d * k), F32) for d in self.COMBS]
         self.damp = [np.zeros(1, F32) for _ in self.COMBS]        # lowpass memory per comb
-        self.aps = [(np.zeros(int(d * k), F32),) * 2 for d in self.ALLPASSES]
+        self.aps: list[tuple[np.ndarray, ...]] = [
+            (np.zeros(int(d * k), F32),) * 2 for d in self.ALLPASSES]
         self.hp = _Filter()
 
     def _comb(self, x, k, g, a):

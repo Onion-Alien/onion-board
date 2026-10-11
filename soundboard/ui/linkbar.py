@@ -91,7 +91,7 @@ class LinkBar(QFrame):
         h.setContentsMargins(10, 6, 10, 6)
         h.setSpacing(8)
         self.info = QLabel()
-        self.info.setTextFormat(Qt.RichText)
+        self.info.setTextFormat(Qt.TextFormat.RichText)
         self.info.setWordWrap(True)
         errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)

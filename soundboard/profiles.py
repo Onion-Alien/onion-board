@@ -135,8 +135,9 @@ def current(cfg_dest: dict | None) -> Profile:
     """The simple mode a config's `dest` dict is in."""
     d = cfg_dest if isinstance(cfg_dest, dict) else {}
     mode = destination.resolve(d).key
-    p = BY_KEY.get(d.get("simple")) if isinstance(d.get("simple"), str) else None
-    if p is ADVANCED or (p is not None and mode in p.engines):
+    simple = d.get("simple")
+    p = BY_KEY.get(simple) if isinstance(simple, str) else None
+    if p is not None and (p is ADVANCED or mode in p.engines):
         return p
     if d.get("auto"):   # an older config switching between everything: keep doing that
         return ADVANCED

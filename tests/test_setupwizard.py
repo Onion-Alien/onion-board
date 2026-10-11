@@ -119,7 +119,8 @@ def test_mic_already_set_up_is_used_not_offered_again(wizard, monkeypatch):
     wiz.show()
     wiz.go(2)
     assert w.cfg.route == "mic" and not asked
-    assert "On your mic" in wiz.cable_status.text() and wiz.btn_mic_instead.isHidden()
+    assert wiz.status_card.tone == "ok" and "Working" in wiz.status_card.title.text()
+    assert wiz.btn_mic_instead.isHidden()
     wiz._pick_route("cable")   # picked the cable on purpose: it stays
     assert w.cfg.route == "cable"
     wiz.attach_mic()           # and back: no admin prompt, it's already there
@@ -519,7 +520,9 @@ def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
     wiz.go(wiz.base + 2)
     assert not wiz.btn_attach.isHidden() and "straight into my mic" in wiz.btn_attach.text()
     assert "permission once" in wiz.cable_status.text()
-    assert "instead" in wiz.btn_cable.text()
+    # the other ways are in their own card, not buttons under the status
+    assert wiz.btn_cable.isHidden() and wiz.btn_other.isHidden()
+    assert not wiz.alt_card.isHidden() and not wiz.btn_alt_cable.isHidden()
     wiz.go(wiz.base + 3)   # not on the mic yet: the last page says so
     assert "isn't on your mic yet" in wiz.discord_text.text()
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
@@ -589,7 +592,7 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     w.mic_attached.emit("Headset Mic (USB)", "")
 
     assert wiz.setup_show.on
-    assert "On your mic" in wiz.cable_status.text()
+    assert wiz.status_card.tone == "ok" and "Working" in wiz.status_card.title.text()
     assert not busy.is_busy(wiz.btn_next)
     assert wiz.btn_next.text().startswith("Next")
 
@@ -597,10 +600,160 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     toast = wiz.findChild(_Toast)
     assert toast is None or toast.isHidden()
 
+    assert wiz.alt_card.isHidden()   # not while Bun's show runs
     wiz.setup_show._stop()
-    assert not wiz.btn_cable.isHidden()
-    assert not wiz.btn_other.isHidden()
+    assert not wiz.alt_card.isHidden()
+    assert not wiz.btn_alt_cable.isHidden() and not wiz.btn_alt_other.isHidden()
     assert wiz.btn_attach.isHidden()
+
+
+def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
+    """On the mic: the cable and another device are optional, in their own card with
+    what each is for; Pick a device opens the device list in its place."""
+    from soundboard import directmic
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.go(wiz.base + 2)
+    assert wiz.status_card.tone == "ok" and "Working" in wiz.status_card.title.text()
+    assert not wiz.alt_card.isHidden()
+    texts = " ".join(lbl.text() for lbl in wiz.alt_card.findChildren(setupwizard.QLabel))
+    assert "driver" in texts and "Voicemeeter" in texts
+    wiz.btn_alt_other.click()
+    assert not wiz.other_box.isHidden() and wiz.alt_other_row.isHidden()
+    wiz.btn_alt_cable.click()   # the driver works: asked first
+    wiz._cable_confirm.btn_use.click()   # the cable is there: used, not installed again
+    assert w.cfg.route == "cable" and wiz.alt_card.isHidden()
+
+
+def test_switching_off_a_working_driver_asks_first(mic_wizard, monkeypatch):
+    """Use the cable while the driver works on the mic: a small dialog says it's
+    installed and working; Keep my mic (the default, and Escape) changes nothing,
+    Tell us why opens the feedback box, Use the cable switches."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard import directmic
+    from soundboard.ui import feedbackdialog
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    wiz.btn_alt_cable.click()
+    dlg = wiz._cable_confirm
+    assert dlg.isVisible() and dlg.btn_keep.isDefault()
+    assert "installed" in " ".join(lbl.text() for lbl in dlg.findChildren(setupwizard.QLabel))
+    dlg.btn_keep.click()
+    assert w.cfg.route == "mic" and not dlg.isVisible()
+    wiz.btn_alt_cable.click()
+    QTest.keyClick(wiz._cable_confirm, Qt.Key_Escape)
+    assert w.cfg.route == "mic"
+    opened = []
+    monkeypatch.setattr(feedbackdialog, "ask", lambda cfg, parent=None: opened.append(parent))
+    wiz.btn_alt_cable.click()
+    wiz._cable_confirm.btn_tell.click()
+    assert opened == [wiz] and w.cfg.route == "mic" and not wiz._cable_confirm.isVisible()
+
+
+def test_cable_without_a_working_driver_isnt_questioned(mic_wizard, monkeypatch):
+    from soundboard import directmic
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    wiz.go(wiz.base + 2)
+    wiz.btn_alt_cable.click()   # nothing to give up: straight to the cable
+    assert getattr(wiz, "_cable_confirm", None) is None and w.cfg.route == "cable"
+
+
+def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
+    from soundboard import directmic
+    _, wiz = mic_wizard
+    state = {"s": "missing"}
+    monkeypatch.setattr(directmic, "status", lambda name=None: state["s"])
+    wiz.go(wiz.base + 2)
+    for s, tone in (("missing", ""), ("wiped", "warn"), ("ready", "ok")):
+        state["s"] = s
+        wiz.recheck_cable(rescan=False)
+        card = wiz.status_card
+        assert card.tone == tone and card.title.text() and not card.pill.isHidden()
+
+
+def test_discord_tip_folds_away(mic_wizard, monkeypatch):
+    """On the mic, Discord needs nothing to work: its tip is shut under a heading
+    until clicked. On the cable Discord's steps are needed, so nothing folds."""
+    from soundboard import directmic
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.go(wiz.base + 3)
+    assert not wiz.discord_fold.isHidden() and wiz.discord_body.isHidden()
+    assert not wiz.discord_tip.text().startswith("<b>")   # its lead-in is the heading
+    assert "Noise Suppression" in wiz.discord_tip.text()
+    wiz.discord_fold.click()
+    assert not wiz.discord_body.isHidden() and not wiz.btn_discord.isHidden()
+    wiz.discord_fold.click()
+    assert wiz.discord_body.isHidden()
+    assert wiz.discord_fold.toolTip()   # says Show / Hide
+    w.set_route("cable")
+    wiz.go(wiz.base + 3)
+    assert wiz.discord_fold.isHidden()
+    assert wiz.btn_discord.isHidden() or not wiz.discord_body.isHidden()
+
+
+def test_discord_pill_is_only_as_wide_as_its_words(mic_wizard, monkeypatch):
+    from PySide6.QtWidgets import QSizePolicy
+    from soundboard import directmic
+    _, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.show()
+    wiz.go(wiz.base + 3)
+    # its words' width, never stretched across the page (the row's stretch takes the rest)
+    assert wiz.discord_fold.width() == wiz.discord_fold.sizeHint().width()
+    assert wiz.discord_fold.sizePolicy().horizontalPolicy() == QSizePolicy.Fixed
+
+
+def test_no_empty_band_after_a_step_grows_the_window(mic_wizard, qapp):
+    """fit.watch only grows the window; a step switch could leave it far taller than
+    any step needs (an empty band under the last step). It settles back."""
+    from PySide6.QtTest import QTest
+    from soundboard.ui import fit
+    _, wiz = mic_wizard
+    wiz.show()
+    wiz.go(wiz.base + 3)
+    QTest.qWait(setupwizard.SETTLE_MS + 100)
+    need = fit.needed_height(wiz, wiz.width())
+    wiz.resize(wiz.width(), need + 200)
+    wiz.go(wiz.base + 3)
+    QTest.qWait(setupwizard.SETTLE_MS + 100)
+    assert wiz.height() <= max(need, wiz.minimumHeight()) + 2
+
+
+def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
+    """The cards' and tiles' edges are Back's left and Next's right (the pages used
+    to add their own inset: everything sat 9 px in from the buttons)."""
+    from PySide6.QtCore import QPoint
+    from soundboard import directmic
+    _, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    qapp.processEvents()
+
+    def edges(wd):
+        x = wd.mapTo(wiz, QPoint(0, 0)).x()
+        return x, x + wd.width()
+    left, right = edges(wiz.btn_back)[0], edges(wiz.btn_next)[1]
+    for card in (wiz.status_card, wiz.alt_card):
+        assert edges(card) == (left, right)
+    wiz.go(wiz.base)   # the mic tiles: the first one starts on the same edge
+    qapp.processEvents()
+    tiles = wiz.mic_group.buttons()
+    assert edges(tiles[0])[0] == left
+    # a full row of tiles ends on Next's edge: no step makes the window wider than that
+    assert wiz.width() == setupwizard.CONTENT_W + 2 * setupwizard.MARGIN
+
+
+def test_step_bar_follows_the_pages(mic_wizard):
+    _, wiz = mic_wizard
+    for i in range(wiz.PAGES):
+        wiz.go(i)
+        assert wiz.step_bar.current == i and str(i + 1) in wiz.progress.text()
 
 
 def test_only_a_brand_new_install_is_asked_what_its_for(wizard, app_dir):

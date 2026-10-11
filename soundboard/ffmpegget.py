@@ -65,8 +65,9 @@ def get(progress: Callable[[], None] | None = None) -> str:
     if exe is None:
         raise GetError(_("winget isn't on this PC, so the app can't install FFmpeg. Get it "
                          "from ffmpeg.org instead."))
-    if installed():                      # it arrived meanwhile (another click, the installer)
-        return library._ffmpeg()
+    found = library._ffmpeg()
+    if found is not None:                # it arrived meanwhile (another click, the installer)
+        return found
     if progress is not None:
         progress()
     args = [exe, "install", "--id", PACKAGE, "--exact", "--silent",

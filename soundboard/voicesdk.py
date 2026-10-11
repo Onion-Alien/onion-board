@@ -334,7 +334,7 @@ class Listeners:
             self._wake.set()
         return self.found
 
-    def look(self, device: str) -> tuple:
+    def look(self, device: str | tuple | None) -> tuple:
         """One look, on the calling thread (poll runs it on its own)."""
         voice, games, apps = [], [], []
         devices = device if isinstance(device, tuple) else (device,)

@@ -28,6 +28,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field

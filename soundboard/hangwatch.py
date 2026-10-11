@@ -91,7 +91,8 @@ class HangWatch(QObject):
         """How busy each thread is (share of one core, over CPU_SAMPLE_S), by ident.
         A stuck window using no CPU waits on something (a lock, the disk, the GIL that
         a busy thread holds); one at 100% is working itself. {} where unknown."""
-        ids = {t.ident: t.native_id for t in threading.enumerate() if t.native_id}
+        ids = {t.ident: t.native_id for t in threading.enumerate()
+               if t.native_id and t.ident is not None}
         before, t0 = cpu_times(ids), time.monotonic()
         if not before or self._stop.wait(CPU_SAMPLE_S):
             return {}
@@ -136,7 +137,7 @@ def cpu_times(native_ids: dict[int, int]) -> dict[int, float]:
                         ctypes.byref)
             except (OSError, AttributeError):
                 pass
-    if not _api:
+    if not isinstance(_api, tuple):   # None / False: not there
         return {}
     open_thread, times, close, u64, byref = _api
     out = {}

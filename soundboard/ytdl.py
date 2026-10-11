@@ -104,6 +104,9 @@ class DownloadError(RuntimeError):
 class FetchError(DownloadError):
     """yt-dlp itself failed (vs. something we refused): a newer yt-dlp may fix it."""
 
+    problem: errors.Problem | None = None   # set by _readable
+    raw: str = ""
+
 
 class SwitchedOff(DownloadError):
     """The site (or finding sounds online at all) is switched off in Settings > Privacy
@@ -173,7 +176,7 @@ def _site_name(target: str) -> str:
     return host.removeprefix("www.")
 
 
-def _over_tor(fn, target: str):
+def _over_tor[T](fn: Callable[[], T], target: str) -> T:
     """fn(), and in Tor mode, when the site turns the Tor exit away, a new Tor identity
     and another try, up to TOR_TRIES times. Never falls back to a direct connection:
     the last refusal is raised as TorBlocked for the UI to offer that."""
@@ -200,6 +203,7 @@ def _over_tor(fn, target: str):
             log.info("site turned Tor away (%s); new identity, try %d of %d",
                      str(e)[:120], attempt + 1, TOR_TRIES)
             tor.new_identity()
+    raise AssertionError("unreachable: the last try returns or raises")
 
 
 # ---------------------------------------------------------------------- the updated copy

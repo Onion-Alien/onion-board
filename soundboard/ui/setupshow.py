@@ -35,6 +35,9 @@ MIN_BLOWS = PARTS - 1  # a result waits for this much speaker (the last part is 
 # the endings, seconds from when the result is shown
 YAY_SCOOT, YAY_END = 2.6, 4.0
 SHAKE, BOOM_SCOOT, BOOM_END = 0.8, 3.0, 4.3
+BAR_H = 18            # the pixel progress bar under the show
+BAR_PX, BAR_GAP = 7, 3   # one block of it, and the space between blocks
+BAR_EASE_S = 7.0      # it fills towards 92% with this time constant (Windows gives no %)
 SCOOT_S = 0.7         # how long scooting off takes (slower when sad)
 BOX = QColor("#e2574c")
 BOX_DARK = QColor("#b23a31")
@@ -58,8 +61,8 @@ class SetupShow(BunnyWidget):
 
     def __init__(self, height: int = 58, parent=None):
         super().__init__(None, height=height, pad=10, parent=parent)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self._t = -1.0           # seconds into the show, -1 when not on
         self._result = None      # what finish() said, until it's shown
         self._end_at = -1.0      # show time the ending began
@@ -72,10 +75,10 @@ class SetupShow(BunnyWidget):
 
     def sizeHint(self) -> QSize:
         w = self.bun_h * W / H
-        return QSize(round(w * 3.6), self.bun_h + 2 * self.pad)
+        return QSize(round(w * 3.6), self.bun_h + 2 * self.pad + BAR_H)
 
     def minimumSizeHint(self) -> QSize:
-        return QSize(round(self.bun_h * W / H * 2.6), self.bun_h + 2 * self.pad)
+        return QSize(round(self.bun_h * W / H * 2.6), self.bun_h + 2 * self.pad + BAR_H)
 
     # ------------------------------------------------------------------ inputs
     @property
@@ -229,7 +232,7 @@ class SetupShow(BunnyWidget):
         three of them centred."""
         w = self.bun_h * W / H
         left = (self.width() - w * 2.35) / 2 + w * 0.55
-        return QRectF(left, (self.height() - self.bun_h) / 2, w, self.bun_h)
+        return QRectF(left, (self.height() - BAR_H - self.bun_h) / 2, w, self.bun_h)
 
     def _speaker(self) -> QRectF:
         r = self._bun_rect()
@@ -293,14 +296,15 @@ class SetupShow(BunnyWidget):
         if not self.on:
             return
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
         r = self._bun_rect()
         phase = self.phase()
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, 45))
         sw = r.width() * 0.62
         p.drawEllipse(QRectF(r.center().x() + pose["dx"] - sw / 2, r.bottom() - 4, sw, 8))
+        self._paint_progress(p)
         self._paint_toolbox(p, phase)
         self._paint_speaker(p, phase)
         self._paint_puffs(p)
@@ -334,6 +338,38 @@ class SetupShow(BunnyWidget):
             p.restore()
         p.end()
 
+    def progress(self) -> float:
+        """How far along the bar shows (0-1). Windows says nothing until it's done, so
+        it eases towards 92% while it works, and fills once the answer is in."""
+        if not self.on:
+            return 0.0
+        if self._result is not None or self._end_at >= 0:
+            return 1.0
+        return 0.92 * (1 - math.exp(-self._t / BAR_EASE_S))
+
+    def _paint_progress(self, p: QPainter):
+        """A row of little square blocks under the show, lit green as it goes (amber
+        when it didn't work), the leading one pulsing: something is happening."""
+        t = theme.T
+        w = self.bun_h * W / H * 2.35   # as wide as toolbox, Bun and speaker together
+        n = max(8, int((w + BAR_GAP) // (BAR_PX + BAR_GAP)))
+        total = n * (BAR_PX + BAR_GAP) - BAR_GAP
+        x0 = (self.width() - total) / 2
+        y = self.height() - BAR_H + (BAR_H - BAR_PX) / 2
+        failed = self._end_at >= 0 and not self._ok
+        lit = QColor(t["warn_text"] if failed else t["ok_text"])
+        off = QColor(t["card_hi"])
+        frac = self.progress()
+        done = frac * n
+        p.setPen(Qt.PenStyle.NoPen)
+        for i in range(n):
+            col = QColor(lit if i < int(done) else off)
+            if i == int(done) and frac < 1:   # the leading block: pulses
+                col = QColor(lit)
+                col.setAlphaF(0.35 + 0.35 * (0.5 + 0.5 * math.sin(self._t * 6)))
+            p.setBrush(col)
+            p.drawRoundedRect(QRectF(x0 + i * (BAR_PX + BAR_GAP), y, BAR_PX, BAR_PX), 1.5, 1.5)
+
     def _paint_toolbox(self, p: QPainter, phase):
         if phase in ("roll", "dizzy"):
             return
@@ -356,10 +392,10 @@ class SetupShow(BunnyWidget):
         if phase == "scoot":   # he takes it with him
             box.translate(self._scoot_dx(), 0)
         ink = QPen(INK, 1.6)
-        ink.setJoinStyle(Qt.RoundJoin)
+        ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         # the handle, then the box, then the lid hinged at the back
         p.setPen(QPen(INK, 2.2))
-        p.setBrush(Qt.NoBrush)
+        p.setBrush(Qt.BrushStyle.NoBrush)
         hw = box.width() * 0.34
         if lid < 0.5:
             p.drawArc(QRectF(box.center().x() - hw / 2, box.top() - box.height() * 0.32,
@@ -402,7 +438,7 @@ class SetupShow(BunnyWidget):
             p.setOpacity(max(0.0, 1 - (e - YAY_SCOOT - SCOOT_S) / 0.5))
         accent = QColor(theme.T["accent"])
         ink = QPen(INK, 1.8)
-        ink.setJoinStyle(Qt.RoundJoin)
+        ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
 
         def pop(i: int) -> float:   # each part springs on a little bigger, then settles
             k = (self._t - self._part_at[i]) / 0.25
@@ -429,7 +465,7 @@ class SetupShow(BunnyWidget):
             p.drawEllipse(QPointF(cx, cy), rr, rr)
             p.setBrush(accent)
             p.drawEllipse(QPointF(cx, cy), rr * 0.55, rr * 0.55)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(INK)
             p.drawEllipse(QPointF(cx, cy), rr * 0.18, rr * 0.18)
         if self._parts >= 4:
@@ -439,7 +475,7 @@ class SetupShow(BunnyWidget):
             p.setPen(ink)
             p.setBrush(STEEL)
             p.drawEllipse(QPointF(cx, cy), rr, rr)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(accent.lighter(130))
             p.drawEllipse(QPointF(cx, cy), rr * 0.45, rr * 0.45)
         if self._parts < PARTS and self._end_at < 0:   # nails waiting, a work in progress
@@ -476,7 +512,7 @@ class SetupShow(BunnyWidget):
         if not self._bits:
             super()._paint_puffs(p)
             return
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(SMOKE)
         for f in self.puffs:
             k = f.age / f.life

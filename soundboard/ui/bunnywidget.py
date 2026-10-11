@@ -134,7 +134,7 @@ class BunnyWidget(QWidget):
         self._beg_at = -1.0
         self._joy_at = -1.0
         if joy_lines:
-            self.setCursor(Qt.PointingHandCursor)
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.sad = sad             # his mood at rest
         self._home_sad = sad       # ... which a failed build only dents until the next try
         self._sad = sad            # ... and right now (smoothed)
@@ -144,8 +144,8 @@ class BunnyWidget(QWidget):
         self.bun_h = height
         self.pad = pad
         self.celebrate = celebrate
-        self.setSizePolicy(QSizePolicy.Maximum if self.side else QSizePolicy.Fixed,
-                           QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Maximum if self.side else QSizePolicy.Policy.Fixed,
+                           QSizePolicy.Policy.Fixed)
         self._rng = random.Random()
         self._t0 = time.monotonic()
         self._last = self._t0
@@ -228,14 +228,14 @@ class BunnyWidget(QWidget):
         self._say_until = now + 2.2
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.LeftButton and self.asleep:
+        if ev.button() == Qt.MouseButton.LeftButton and self.asleep:
             self.wake()
             self.clicked.emit()
             super().mousePressEvent(ev)
             return
-        if ev.button() == Qt.LeftButton and self.naps:
+        if ev.button() == Qt.MouseButton.LeftButton and self.naps:
             self._woken_until = max(self._woken_until, time.monotonic() + WOKEN_S)
-        if ev.button() == Qt.LeftButton and self.joy_lines:
+        if ev.button() == Qt.MouseButton.LeftButton and self.joy_lines:
             if not self.poke():
                 self.cheer()
             self.clicked.emit()
@@ -545,7 +545,7 @@ class BunnyWidget(QWidget):
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         now = time.monotonic()
         pose = self.pose(now)
         r = self._bun_rect()
@@ -553,7 +553,7 @@ class BunnyWidget(QWidget):
         lift = max(0.0, -pose["dy"])
         shade = QColor(0, 0, 0, max(20, 70 - int(lift * 6)))
         sw = r.width() * (0.62 - lift * 0.012)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(shade)
         if pose["shown"]:
             p.drawEllipse(QRectF(r.center().x() + pose["dx"] - sw / 2, r.bottom() - 4, sw, 8))
@@ -622,10 +622,10 @@ class BunnyWidget(QWidget):
         p.setBrush(BUBBLE)
         p.drawPath(shape)
         p.setPen(INK)
-        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignCenter, text)
+        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter, text)
 
     def _paint_puffs(self, p: QPainter):
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(DUST)
         for f in self.puffs:
             k = f.age / f.life
@@ -649,7 +649,7 @@ class BunnyWidget(QWidget):
             x = cx + math.cos(a) * 20 * grow
             y = cy + math.sin(a) * 12 * grow
             p.drawEllipse(QRectF(x - rr, y - rr, 2 * rr, 2 * rr))
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.drawEllipse(QRectF(cx - 22 * grow, cy - 14 * grow, 44 * grow, 28 * grow))
         k = int(t * 9)   # a new spot every few frames
         for j in range(2):

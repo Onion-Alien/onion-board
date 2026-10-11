@@ -571,17 +571,17 @@ class RadioDirectory(QObject):
             QTimer.singleShot(0, lambda: fail(why))
             return None
         req = QNetworkRequest(QUrl(base + path))
-        req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
+        req.setHeader(QNetworkRequest.KnownHeaders.UserAgentHeader, USER_AGENT)
         req.setTransferTimeout(TIMEOUT_MS)
-        req.setAttribute(QNetworkRequest.RedirectPolicyAttribute,
-                         QNetworkRequest.NoLessSafeRedirectPolicy)
+        req.setAttribute(QNetworkRequest.Attribute.RedirectPolicyAttribute,
+                         QNetworkRequest.RedirectPolicy.NoLessSafeRedirectPolicy)
         started = time.monotonic()
         reply = _the_nam().get(req)
         reply.setParent(self)   # this directory going (its tab switched off) aborts it
 
         def finished():
             reply.deleteLater()
-            if reply.error() != QNetworkReply.NoError:
+            if reply.error() != QNetworkReply.NetworkError.NoError:
                 retry(net.explain(reply.errorString(), started))
                 return
             raw = bytes(reply.readAll())
@@ -760,13 +760,13 @@ def buffer_to_array(buf) -> np.ndarray:
     if raw is None:
         return np.zeros((0, 2), np.float32)
     kind = fmt.sampleFormat()
-    if kind == QAudioFormat.Float:
+    if kind == QAudioFormat.SampleFormat.Float:
         x = np.frombuffer(raw, np.float32).copy()
-    elif kind == QAudioFormat.Int16:
+    elif kind == QAudioFormat.SampleFormat.Int16:
         x = np.frombuffer(raw, np.int16).astype(np.float32) / 32768.0
-    elif kind == QAudioFormat.Int32:
+    elif kind == QAudioFormat.SampleFormat.Int32:
         x = np.frombuffer(raw, np.int32).astype(np.float32) / 2147483648.0
-    elif kind == QAudioFormat.UInt8:
+    elif kind == QAudioFormat.SampleFormat.UInt8:
         x = (np.frombuffer(raw, np.uint8).astype(np.float32) - 128.0) / 128.0
     else:
         return np.zeros((0, 2), np.float32)
@@ -853,14 +853,14 @@ class RadioPlayer(QObject):
         fmt = QAudioFormat()
         fmt.setSampleRate(SR)
         fmt.setChannelCount(2)
-        fmt.setSampleFormat(QAudioFormat.Float)
+        fmt.setSampleFormat(QAudioFormat.SampleFormat.Float)
         self._player = QMediaPlayer(self)
         self._out = QAudioBufferOutput(fmt, self)
         # no QAudioOutput: Qt decodes (at real-time pace) but never plays it itself
         self._player.setAudioBufferOutput(self._out)
         # straight on the decoding thread: queued to the window, the chunks waited out
         # every busy moment there and the radio ran dry (it skipped)
-        self._out.audioBufferReceived.connect(self._on_buffer, Qt.DirectConnection)
+        self._out.audioBufferReceived.connect(self._on_buffer, Qt.ConnectionType.DirectConnection)
         self._player.errorOccurred.connect(self._on_error)
         self._player.mediaStatusChanged.connect(self._on_status)
         self._player.metaDataChanged.connect(self._on_meta)
@@ -971,7 +971,8 @@ class RadioPlayer(QObject):
 
     def _hook_buffers(self):
         if self._out is not None:
-            self._out.audioBufferReceived.connect(self._on_buffer, Qt.DirectConnection)
+            self._out.audioBufferReceived.connect(self._on_buffer,
+                                                  Qt.ConnectionType.DirectConnection)
 
     def _unhook_buffers(self):
         if self._out is not None:
@@ -1041,9 +1042,10 @@ class RadioPlayer(QObject):
     def _on_status(self, st):
         if self.station is None:
             return
-        if st == QMediaPlayer.EndOfMedia:        # the server hung up: live radio never ends
+        # the server hung up: live radio never ends
+        if st == QMediaPlayer.MediaStatus.EndOfMedia:
             self._retry("the station stopped sending")
-        elif st == QMediaPlayer.InvalidMedia:
+        elif st == QMediaPlayer.MediaStatus.InvalidMedia:
             self._retry("the stream can't be played")
 
     def _retry(self, msg: str):
@@ -1077,7 +1079,7 @@ class RadioPlayer(QObject):
     def _on_meta(self):
         if self._player is None:
             return
-        title = self._player.metaData().stringValue(QMediaMetaData.Title)
+        title = self._player.metaData().stringValue(QMediaMetaData.Key.Title)
         title = " ".join(str(title or "").split())[:160]
         if title:
             self.now_playing.emit(title)

@@ -225,6 +225,22 @@ def _arrow(direction):
     return draw
 
 
+def _nav_arrow(direction):
+    """The setup guide's Back / Next: the arrow, heavier and with a wider head, so it
+    holds its own beside the buttons' semibold words."""
+    def draw(p, fill):
+        pen = p.pen()
+        pen.setWidthF(2.8)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        p.setPen(pen)
+        s = -1 if direction == "back" else 1
+        p.drawLine(QPointF(12 - 7 * s, 12), QPointF(12 + 7 * s, 12))
+        p.drawPolyline([QPointF(12 + 1 * s, 5), QPointF(12 + 7 * s, 12),
+                        QPointF(12 + 1 * s, 19)])
+    return draw
+
+
 def _reload(p, fill):
     p.drawArc(QRectF(5, 5, 14, 14), 60 * 16, 290 * 16)
     p.drawLine(QPointF(15.5, 6), QPointF(19, 5))
@@ -293,6 +309,14 @@ def _info(p, fill):
     dot.addEllipse(QPointF(12, 7.5), 1.1, 1.1)
     fill(dot)
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
+
+
+def _more(p, fill):
+    """More actions (a card's rare ones): three dots in a row."""
+    dots = QPainterPath()
+    for x in (5, 12, 19):
+        dots.addEllipse(QPointF(x, 12), 1.9, 1.9)
+    fill(dots)
 
 
 def _alert(p, fill):
@@ -527,7 +551,7 @@ def _chevron(direction):
             path.lineTo(snap(x), snap(y))
         if odd:   # a 1 px line at 45 degrees: solid steps, not two half-lit pixels each
             p.save()
-            p.setRenderHint(QPainter.Antialiasing, False)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing, False)
             p.drawPath(path)
             p.restore()
         else:
@@ -682,9 +706,10 @@ SHAPES = {
     "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
-    "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
+    "back": _arrow("back"), "forward": _arrow("forward"),
+    "nav_back": _nav_arrow("back"), "nav_next": _nav_arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
-    "shield": _shield, "info": _info, "alert": _alert, "onion": _onion,
+    "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
@@ -697,16 +722,16 @@ SHAPES = {
 
 def pixmap(name: str, size: int, color: str) -> QPixmap:
     pm = QPixmap(size, size)
-    pm.fill(Qt.transparent)
+    pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.scale(size / 24, size / 24)
     col = QColor(color)
     pen = QPen(col, 2.0)
-    pen.setCapStyle(Qt.RoundCap)
-    pen.setJoinStyle(Qt.RoundJoin)
+    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+    pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     p.setPen(pen)
-    p.setBrush(Qt.NoBrush)
+    p.setBrush(Qt.BrushStyle.NoBrush)
 
     def fill(path: QPainterPath, build=None):
         if build is not None:
@@ -745,7 +770,7 @@ class SharpEngine(QIconEngine):
         pm = QPixmap(self._get(max(1, round(side * scale)), mode, state))
         if self._pad:
             wide = QPixmap(round((side + self._pad) * scale), pm.height())
-            wide.fill(Qt.transparent)
+            wide.fill(Qt.GlobalColor.transparent)
             p = QPainter(wide)
             p.drawPixmap(0, 0, pm)
             p.end()
@@ -764,7 +789,7 @@ class SharpEngine(QIconEngine):
         side = min(size.width() - self._pad, size.height())
         return QSize(side + self._pad, side)
 
-    def availableSizes(self, mode=QIcon.Normal, state=QIcon.Off):
+    def availableSizes(self, mode=QIcon.Mode.Normal, state=QIcon.State.Off):
         return [QSize(s, s) for s in SIZES]
 
     def clone(self):
@@ -804,11 +829,11 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
     key = (name, normal, on, sel, pad)
     if key not in _cache:
         def draw(px, mode, state):
-            if mode == QIcon.Disabled:
+            if mode == QIcon.Mode.Disabled:
                 col = muted
-            elif state == QIcon.On:
+            elif state == QIcon.State.On:
                 col = on
-            elif mode == QIcon.Selected:
+            elif mode == QIcon.Mode.Selected:
                 col = sel
             else:
                 col = normal
@@ -920,21 +945,23 @@ def _with_badge(ic: QIcon) -> QIcon:
         r = s * 0.2
         gap = max(1.0, s / 12)
         c = QPointF(s - r, r)
-        for state in (QIcon.Off, QIcon.On):   # On: the current tab
-            for mode in (QIcon.Normal, QIcon.Selected, QIcon.Active, QIcon.Disabled):
+        for state in (QIcon.State.Off, QIcon.State.On):   # On: the current tab
+            for mode in (QIcon.Mode.Normal, QIcon.Mode.Selected, QIcon.Mode.Active,
+                         QIcon.Mode.Disabled):
                 # at a ratio of 1: on a scaled screen the plain pixmap() comes back bigger,
                 # with its own ratio, and the badge landed off its edge
                 pm = QPixmap(ic.pixmap(QSize(s, s), 1.0, mode, state))
                 if pm.size() != QSize(s, s):
-                    pm = pm.scaled(s, s, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                    pm = pm.scaled(s, s, Qt.AspectRatioMode.KeepAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
                 pm.setDevicePixelRatio(1.0)
                 p = QPainter(pm)
-                p.setRenderHint(QPainter.Antialiasing)
-                p.setPen(Qt.NoPen)
-                p.setCompositionMode(QPainter.CompositionMode_Clear)
-                p.setBrush(Qt.black)
+                p.setRenderHint(QPainter.RenderHint.Antialiasing)
+                p.setPen(Qt.PenStyle.NoPen)
+                p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
+                p.setBrush(Qt.GlobalColor.black)
                 p.drawEllipse(c, r + gap, r + gap)
-                p.setCompositionMode(QPainter.CompositionMode_SourceOver)
+                p.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
                 p.setBrush(color)
                 p.drawEllipse(c, r, r)
                 p.end()
