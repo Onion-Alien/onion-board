@@ -1,4 +1,4 @@
-"""A small start-up panel: a steady Bun, the app name and three gently pulsing dots.
+"""A small start-up panel: a steady Bun, the app name and three chasing dots.
 The theme is read straight from config.json; the rest of the settings load later.
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 
 CARD_W, CARD_H = 240, 248   # logical px, including 8 px around the rounded panel
 BUN_W, BUN_H = 80, 96
-PULSE_S = 1.8
+PULSE_S = 1.35   # one complete left-to-right wave
 FRAME = 1 / 30   # seconds between repaints while pumping (the Qt fallback)
 NATIVE_FPS = 30
 # while it's up, Python hands the GIL over every 0.5 ms instead of every 5: each frame
@@ -85,18 +85,26 @@ def _surface(w: float, h: float, scale: float) -> QImage:
 
 
 def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
-    """A stationary panel; only the three dots change opacity, never size or position."""
+    """A stationary panel with an accent, growing hop travelling across the dots."""
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale))
     p.setPen(Qt.PenStyle.NoPen)
     accent = QColor(theme.T["accent"])
+    resting = QColor(theme.T["muted"])
     for i in range(3):
-        pulse = (1 - math.cos(2 * math.pi * (t - i * 0.2) / PULSE_S)) / 2
-        c = QColor(accent)
-        c.setAlphaF(0.3 + 0.7 * pulse if _animate else 1.0)
+        # A raised cosine confined to one step gives a clear 1 -> 2 -> 3 chase,
+        # with a smooth handoff and the first dot highlighted from the first frame.
+        distance = ((t / PULSE_S * 3 - i + 1.5) % 3) - 1.5
+        pulse = (1 + math.cos(math.pi * distance)) / 2 if abs(distance) < 1 else 0.0
+        if not _animate:
+            pulse = 0.0
+        c = QColor.fromRgbF(*(resting.redF() + (accent.redF() - resting.redF()) * pulse,
+                              resting.greenF() + (accent.greenF() - resting.greenF()) * pulse,
+                              resting.blueF() + (accent.blueF() - resting.blueF()) * pulse))
         p.setBrush(c)
-        p.drawEllipse(QPointF(w / 2 + (i - 1) * 11, h - 35), 2.5, 2.5)
+        radius = 3 + 2.5 * pulse
+        p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, h - 35 - 5 * pulse), radius, radius)
 
 
 def _animations_enabled() -> bool:

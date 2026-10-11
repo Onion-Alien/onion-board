@@ -79,7 +79,28 @@ def test_only_loading_dots_animate(qapp, monkeypatch):
     changed = [(x, y) for y in range(200, first.height()) for x in range(first.width())
                if first.pixel(x, y) != later.pixel(x, y)]
     assert changed
-    assert all(100 <= x <= 140 and 210 <= y <= 216 for x, y in changed)
+    assert all(98 <= x <= 142 and 202 <= y <= 216 for x, y in changed)
+
+
+def test_highlight_and_hop_travel_left_to_right(qapp, monkeypatch):
+    from PySide6.QtGui import QColor
+
+    from soundboard import theme
+
+    monkeypatch.setattr(splash, "_animate", True)
+    accent = QColor(theme.T["accent"])
+    resting = QColor(theme.T["muted"])
+    for active in range(3):
+        img = _frame(active * splash.PULSE_S / 3)
+        for dot in range(3):
+            x = splash.CARD_W // 2 + (dot - 1) * 16
+            if dot == active:
+                assert img.pixelColor(x, 208) == accent
+                assert img.pixelColor(x + 4, 208) == accent   # visibly larger
+            else:
+                assert img.pixelColor(x, 213) == resting
+                assert img.pixelColor(x, 205).name() == theme.T["panel"]
+    assert _frame(0) == _frame(splash.PULSE_S)   # seamless repeat
 
 
 def test_reduced_motion_keeps_every_frame_static(qapp, monkeypatch):
