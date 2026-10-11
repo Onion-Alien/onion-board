@@ -434,6 +434,16 @@ class MainWindow(QMainWindow):
         self._downloading = False
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
+        # set up for the app you're using (appsetup): the bar's app and what it shows.
+        # Before the Discord check below: on a slow start its answer (_on_discord) comes
+        # in while the splash pumps events, before the end of __init__
+        self._setup_tracker = appsetup.Tracker()
+        self._setup_app: appsetup.Seen | None = None
+        self._setup_state = ""        # "offer", "done" or "" (hidden)
+        self._setup_skipped: set[str] = set()   # answered Not now, this run
+        self._setup_undo: dict | None = None    # the dest settings before a switch
+        self._setup_hide = QTimer(self, singleShot=True)
+        self._setup_hide.timeout.connect(self._hide_setup)
         # Discord's own voice settings (discordcfg), read while it runs: the ones that
         # wipe out sounds get the urgent bar
         self.discord_found: list = []
@@ -540,14 +550,6 @@ class MainWindow(QMainWindow):
         # who's still set to the cable while sounds go straight into the mic (_cable_tip)
         self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
-        # set up for the app you're using (appsetup): the bar's app and what it shows
-        self._setup_tracker = appsetup.Tracker()
-        self._setup_app: appsetup.Seen | None = None
-        self._setup_state = ""        # "offer", "done" or "" (hidden)
-        self._setup_skipped: set[str] = set()   # answered Not now, this run
-        self._setup_undo: dict | None = None    # the dest settings before a switch
-        self._setup_hide = QTimer(self, singleShot=True)
-        self._setup_hide.timeout.connect(self._hide_setup)
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self._voice_tick)
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)

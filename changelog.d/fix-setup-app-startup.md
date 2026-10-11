@@ -1,0 +1,1 @@
+- Fixed a rare error while the window opens: a Discord settings check that finished before the window was built tripped over the app-setup bar.
