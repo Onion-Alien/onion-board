@@ -1,0 +1,1 @@
+- Installer: the list of extras (virtual cable, voice-to-speech, Tor...) no longer flashes the row under the mouse as you move it.

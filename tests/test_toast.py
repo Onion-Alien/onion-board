@@ -189,7 +189,7 @@ def test_a_mixed_drop_ends_in_one_toast_with_see_why(main_window, qapp, tmp_path
     sf.write(good, np.stack([np.sin(2 * np.pi * 700 * t)] * 2, 1) * 0.3, SR)
     bad = tmp_path / "broken.mp3"
     bad.write_bytes(b"not audio" * 50)
-    w.import_files([str(good), str(bad), w.cfg.sounds[0].file])
+    w.import_files([str(good), str(bad), str(good)])   # the 2nd one: already in
     assert process_events(qapp, lambda: not w._pending_imports)
     t = next(x for x in toast.shown(w) if x.key == "import")
     assert t.text() == "Added 1 sound · 2 skipped" and t.kind == "warn"
@@ -215,7 +215,7 @@ def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # no
     t = next(x for x in toast.shown(w) if x.key == "import")
     assert t.kind == "ok" and t.card.action.text() == "Undo"
     t.card.action.click()
-    assert len(w.cfg.sounds) == before and w.undo_bar.isVisibleTo(w)   # undo-able too
+    assert len(w.cfg.sounds) == before and not w.undo_bar.isHidden()   # undo-able too
 
 
 def test_the_veil_says_what_a_drop_does():

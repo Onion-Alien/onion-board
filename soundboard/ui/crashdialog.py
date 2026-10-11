@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPu
 import shiboken6
 
 from soundboard.ui import fit
+from soundboard.ui.panel import icon_button
 from soundboard.updates import REPO
 from soundboard.i18n import _
 
@@ -84,8 +85,10 @@ class CrashDialog(QDialog):
         self.github_btn.setDefault(True)
         self.github_btn.setToolTip(_("Copies the report and opens a new issue in your browser"))
         self.github_btn.clicked.connect(self.open_issue)
-        self.folder_btn = QPushButton(_("Open folder"))
-        self.folder_btn.setToolTip(_("The saved report and the app's log"))
+        self.folder_btn = icon_button("folder", _("Open folder"))
+        # The name says what it does; the tooltip also says what's in there.
+        self.folder_btn.setToolTip(_("Open folder") + "\n"
+                                   + _("The saved report and the app's log"))
         self.folder_btn.clicked.connect(self.open_folder)
         self.folder_btn.setEnabled(self._folder() is not None)
         close = QPushButton(_("Quit") if rep.fatal else _("Close"))
@@ -134,11 +137,13 @@ class CrashDialog(QDialog):
 def free_dialog(dlg: QDialog):
     """Delete a modal dialog once its exec() has returned. Parented to the window and
     never freed, every closed copy stayed alive and made each theme change slower.
-    A crash report opened over it is moved to the dialog's parent first, so it stays.
+    A crash report opened over it is moved to the dialog's parent's window first, so it
+    stays (Settings is a page inside the window, not a window of its own).
     Already gone (its window was freed first, before a deferred call got here): done."""
     if not shiboken6.isValid(dlg):
         return
     parent = dlg.parentWidget()
+    parent = parent.window() if parent is not None else None
     for c in dlg.findChildren(CrashDialog):
         c.setParent(parent, c.windowFlags())
         c.show()

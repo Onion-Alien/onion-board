@@ -405,23 +405,36 @@ class ThemeGrid(QWidget):
 class SettingsDialog(QDialog):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
-    def __init__(self, mw, page: str = "privacy", lazy: bool = False):
+    # narrower than this, the categories are icons only and the search box goes over
+    # the page (the list and box took 212 px of a 440 px window)
+    NARROW_W = 640
+
+    def __init__(self, mw, page: str = "privacy", lazy: bool = False,
+                 embedded: bool = False):
         """`lazy`: build only `page` now and each other page the first time it's shown.
         Building all twelve under the app's style sheet took a second or two on every
-        click of the cog; the tests build them all at once."""
+        click of the cog; the tests build them all at once. `embedded`: a page in the
+        main window, in place of the tabs (MainWindow.open_settings), not a window."""
         super().__init__(mw)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        self.embedded = embedded
+        if embedded:
+            self.setWindowFlags(Qt.Widget)
+            self.setObjectName("settingspage")   # the window's own background
+        else:
+            fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
         if hasattr(mw, "tab_switched"):
             mw.tab_switched.connect(self._tab_switched)
         self.setWindowTitle(_("Settings"))
-        # short enough for a 1366x768 laptop at 125 % (the pages scroll): at 600 the
-        # Done button sat below the screen
-        self.setMinimumSize(720, 420)
+        if not embedded:
+            # short enough for a 1366x768 laptop at 125 % (the pages scroll): at 600
+            # the Done button sat below the screen
+            self.setMinimumSize(720, 420)
         lay = QVBoxLayout(self)
-        # one margin all round, and the same gap above Done as below and beside it
-        lay.setContentsMargins(16, 16, 16, 16)
-        lay.setSpacing(16)
+        # one margin all round, and the same gap above Done as below and beside it; in
+        # the main window its body has the margins, and pages start 8 px down like a tab's
+        lay.setContentsMargins(*((0, 8, 0, 0) if embedded else (16, 16, 16, 16)))
+        lay.setSpacing(12 if embedded else 16)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
@@ -454,6 +467,7 @@ class SettingsDialog(QDialog):
             icons.set_tab_icon(self.tabs, i, icon)
             item = QListWidgetItem(icons.icon(icon), title.replace("&&", "&"))
             item.setData(Qt.UserRole, icon)
+            item.setData(Qt.UserRole + 1, title.replace("&&", "&"))   # (narrow: no text)
             item.setSizeHint(QSize(180, 38))
             self.categories.addItem(item)
         self._category_icons()
@@ -466,17 +480,14 @@ class SettingsDialog(QDialog):
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
-        keys = self._page_keys = [p[0] for p in pages]
-        if page in self._offline_pages():   # hidden in Offline mode: its switch instead
-            page = "privacy"
-        self.categories.setCurrentRow(keys.index(page) if page in keys else 0)
-        self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
-        self._build_page(self.tabs.currentIndex())   # an unknown page: the first one
+        self._page_keys = [p[0] for p in pages]
+        self.show_page(page)
         self._offline_sync()
         # a search box over the categories: 13 pages are a lot to look through for one
         # switch. Typing hides every card without the word and every page without a card.
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText(_("Search settings"))
+        # (a page: "Settings" is the heading right over it)
+        self.search_box.setPlaceholderText(_("Search") if embedded else _("Search settings"))
         self.search_box.setClearButtonEnabled(True)
         self.search_box.setAccessibleName(_("Search settings"))
         self.search_box.setFixedWidth(196)
@@ -486,30 +497,109 @@ class SettingsDialog(QDialog):
         find = QShortcut(QKeySequence.Find, self)
         find.activated.connect(lambda: (self.search_box.setFocus(Qt.ShortcutFocusReason),
                                         self.search_box.selectAll()))
-        side = QVBoxLayout()
+        side = self._side = QVBoxLayout()
         side.setSpacing(8)
+        self.back_btn = None
+        if embedded:
+            # a page, not a window: back to the tab you were on (as Escape or a rail
+            # tab does), on its own row over the search with the page's name, so the
+            # search box still lines up with the categories; narrow, over the icons
+            back = self.back_btn = QPushButton()
+            back.setProperty("quiet", True)
+            icons.set_icon(back, "back")
+            back.setToolTip(_("Back"))
+            back.setAccessibleName(_("Back"))
+            back.setAutoDefault(False)
+            back.clicked.connect(self.accept)
+            self.page_title = QLabel(_("Settings"))
+            self.page_title.setObjectName("section")
+            self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
+            # the arrow over the categories' icons, the name over their names (an
+            # item: 4 px padding, a 20 px icon, then its text 36 px in)
+            back.setFixedWidth(36)
+            # its icon on the icons' centre line and level with the heading's letters
+            # (2 px lower than centred); the same 14 px of padding: the controls' height
+            back.setStyleSheet("padding:9px 0px 5px 3px")
+            top = QHBoxLayout()
+            top.setSpacing(0)
+            top.addWidget(back)
+            top.addWidget(self.page_title, 1)
+            side.addLayout(top)
         side.addWidget(self.search_box)
         side.addWidget(self.categories, 1)
-        content = QHBoxLayout()
+        right = self._right = QVBoxLayout()   # (narrow: the search box on top)
+        right.setSpacing(8)
+        right.addWidget(self.tabs, 1)
+        content = self._content = QHBoxLayout()
         content.setSpacing(16)
         content.addLayout(side)
-        content.addWidget(self.tabs, 1)
+        content.addLayout(right, 1)
         # a search that finds nothing says so, in place of the pages
         self.no_match = QLabel()
         self.no_match.setObjectName("hint")
         self.no_match.setAlignment(Qt.AlignCenter)
         self.no_match.setWordWrap(True)
         self.no_match.hide()
-        content.addWidget(self.no_match, 1)
+        right.addWidget(self.no_match, 1)
         lay.addLayout(content, 1)
-        close = QPushButton(_("Done"))
-        close.setObjectName("primary")
-        close.clicked.connect(self.accept)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        row.addWidget(close)
-        lay.addLayout(row)
-        self._initial_size()
+        self._narrow = False
+        self.done_btn = None
+        if not embedded:   # (embedded: the back arrow over the categories instead)
+            close = self.done_btn = QPushButton(_("Done"))
+            close.setObjectName("primary")
+            close.clicked.connect(self.accept)
+            row = QHBoxLayout()
+            row.addStretch(1)
+            row.addWidget(close)
+            lay.addLayout(row)
+            self._initial_size()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._fit_width(self.width())
+
+    def _fit_width(self, width: int):
+        """Narrow: the categories as an icon column (the name is the tip) and the
+        search box over the page, so a 440 px window has room for the page itself."""
+        narrow = width < self.NARROW_W
+        if narrow == self._narrow:
+            return
+        self._narrow = narrow
+        box = self.search_box
+        (self._side if narrow else self._right).removeWidget(box)
+        if narrow:
+            self._right.insertWidget(0, box)
+            box.setMinimumWidth(0)
+            box.setMaximumWidth(16777215)
+        else:
+            self._side.insertWidget(1 if self.back_btn is not None else 0, box)
+            box.setFixedWidth(196)
+        if self.back_btn is not None:
+            self.page_title.setVisible(not narrow)
+        self._content.setSpacing(8 if narrow else 16)
+        for i in range(self.categories.count()):
+            item = self.categories.item(i)
+            title = item.data(Qt.UserRole + 1)
+            item.setText("" if narrow else title)
+            item.setToolTip(title if narrow else "")
+            item.setSizeHint(QSize(40 if narrow else 180, 38))
+        self.categories.setFixedWidth(48 if narrow else 196)
+
+    def show_page(self, page: str):
+        """Go to `page` (also when the window is open already and asked for another).
+        Hidden in Offline mode: the Privacy page with its switch instead; an unknown
+        page: the first one. A search in the box is cleared first, or it hid the page."""
+        box = getattr(self, "search_box", None)
+        if box is not None and box.text():
+            box.clear()
+            self._apply_search("")
+        keys = self._page_keys
+        if page in self._offline_pages():
+            page = "privacy"
+        i = keys.index(page) if page in keys else 0
+        self.categories.setCurrentRow(i)
+        self.tabs.setCurrentIndex(i)
+        self._build_page(self.tabs.currentIndex())
 
     # ------------------------------------------------------------------ search
     @staticmethod
@@ -540,7 +630,7 @@ class SettingsDialog(QDialog):
         first = named = None
         for i in range(self.tabs.count()):
             page = self.tabs.widget(i).widget()
-            title = self.categories.item(i).text().lower()
+            title = self.categories.item(i).data(Qt.UserRole + 1).lower()
             if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
                 self.categories.item(i).setHidden(True)
                 continue
@@ -595,7 +685,9 @@ class SettingsDialog(QDialog):
     @staticmethod
     def _fill(sa: QScrollArea, page: QWidget):
         for label in page.findChildren(QLabel):
-            label.setWordWrap(True)
+            # (a short field label beside its control keeps one line: wrapping, the
+            # row squeezed it onto two with room to spare)
+            label.setWordWrap(not label.property("keepline"))
         for combo in page.findChildren(QComboBox):
             combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
             combo.setMinimumContentsLength(6)
@@ -665,7 +757,9 @@ class SettingsDialog(QDialog):
                               _("A tab whose feature is on right now (a sound playing, the voice "
                                 "changer, the radio…) is marked, so nothing is left on without "
                                 "you noticing."))
-        row = QVBoxLayout()   # one under the other: side by side made the page too wide
+        # side by side like Connection's and Network activity's choices (DESIGN section 0:
+        # comparable short choices look alike); they wrap when Settings is narrow
+        row = _button_row()
         green = QRadioButton(_("A bar beside the tab"))
         green.setToolTip(_("A bar at the edge of the tabs and a coloured icon, in the highlight "
                            "colour: easy to spot from across the room"))
@@ -680,6 +774,7 @@ class SettingsDialog(QDialog):
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
+        v.addWidget(self._ui_scale_card())
         v.addWidget(self._highlight_card())
         hints = {"Classic": _("Changes the whole app instantly."),
                  "Meme": _("For when you want your soundboard to be a bit.")}
@@ -696,6 +791,49 @@ class SettingsDialog(QDialog):
             v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _ui_scale_card(self) -> QFrame:
+        """Interface size: everything bigger or smaller, on top of Windows' display
+        scaling. Qt sizes the app only as it starts (app.ui_scale_startup), so a new
+        size offers a restart, like the language."""
+        import os
+        from soundboard.library import UI_SCALES
+        card, cv = self._card(_("Interface size"),
+                              _("Makes everything in Onion Board bigger or smaller: text, "
+                                "buttons and pads."))
+        now = round(float(os.environ.get("QT_SCALE_FACTOR") or 1) * 100)
+        combo = QComboBox()
+        combo.setAccessibleName(_("Interface size"))
+        for pct in UI_SCALES:
+            combo.addItem(_("{percent}%", percent=pct), pct)
+        combo.setCurrentIndex(max(0, combo.findData(self.mw.cfg.ui_scale)))
+        no_wheel(combo)
+        restart = QPushButton(_("Restart now"))
+        restart.clicked.connect(self.mw.restart_app)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        row.addWidget(combo)
+        row.addWidget(restart)
+        row.addStretch(1)   # as wide as their text, not the card
+        cv.addLayout(row)
+        note = QLabel(_("Onion Board changes size after a restart."))
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        cv.addWidget(note)
+
+        def show():
+            later = self.mw.cfg.ui_scale != now
+            note.setVisible(later)
+            restart.setVisible(later)
+
+        def picked(i):
+            self.mw.cfg.ui_scale = combo.itemData(i)
+            self.mw._save_later()
+            show()
+        combo.currentIndexChanged.connect(picked)
+        show()
+        self.ui_scale_combo, self.ui_scale_note, self.ui_scale_restart = combo, note, restart
+        return card
 
     def _language_card(self) -> QFrame:
         """The app's language: a button showing the one picked, opening a window of
@@ -787,14 +925,13 @@ class SettingsDialog(QDialog):
         row.addWidget(swatch)
         row.addWidget(hue, 1)
         cv.addLayout(row)
-        btns = QHBoxLayout()
+        btns = _button_row()   # (one under the other in a narrow window: no clipping)
         more = QPushButton(_("More colours"))
         more.setToolTip(_("Pick any colour, including how strong and how bright it is"))
         reset = QPushButton(_("Theme's colour"))
         reset.setToolTip(_("Go back to each theme's own highlight colour"))
         btns.addWidget(more)
         btns.addWidget(reset)
-        btns.addStretch(1)
         cv.addLayout(btns)
         now = QLabel()
         now.setObjectName("hint")
@@ -991,8 +1128,9 @@ class SettingsDialog(QDialog):
         test.clicked.connect(lambda: self.mw.overlay.open_by_click())
         row = QHBoxLayout()   # beside how the key works: two lines, not three
         row.setSpacing(8)
-        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode), 1)
-        row.addWidget(test)
+        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
+        row.addWidget(test)   # as wide as its words (it ran to the card's edge)
+        row.addStretch(1)
         cv.addLayout(row)
         v.addWidget(card)
 
@@ -1007,7 +1145,8 @@ class SettingsDialog(QDialog):
         row = QHBoxLayout()
         row.setSpacing(12)
         row.addWidget(QLabel(_("Auto-hide after")))
-        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide), 1)
+        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide))
+        row.addStretch(1)   # the choice right after its label, not at the card's far edge
         cv.addLayout(row)
         self.ov_toggle_only = (after, row.itemAt(1).widget())
         v.addWidget(card)
@@ -1266,15 +1405,12 @@ class SettingsDialog(QDialog):
         top.setChecked(self.mw.cfg.always_on_top)
         top.toggled.connect(self.mw.on_top_toggle)
         cv.addWidget(top)
-        one = QCheckBox(_("Play pads with one click"))
+        # its explanation under the box's text like every other option's (it sat at
+        # the card's edge)
+        one = self._option(cv, _("Play pads with one click"),
+                           _("Otherwise, double-click to play. Ctrl+click selects without "
+                             "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
         one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        one.setChecked(self.mw.cfg.single_click)
-        one.toggled.connect(self.mw.set_single_click)
-        cv.addWidget(one)
-        hint = QLabel(_("Otherwise, double-click to play. Ctrl+click selects without playing."))
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        cv.addWidget(hint)
         if hasattr(self.mw, "set_tips_on"):
             self.box_tips = self._option(
                 cv, _("Show tips"),
@@ -2071,6 +2207,7 @@ class SettingsDialog(QDialog):
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
         from soundboard import library, quality
+        from soundboard.ui.panel import icon_button
         q = quality.current
         w, v = self._page()
         self._data_widgets = {}
@@ -2158,7 +2295,7 @@ class SettingsDialog(QDialog):
                 self._data_set(video_dir=folder)
         change.clicked.connect(pick)
         row.addWidget(change)
-        show = QPushButton(_("Open folder"))
+        show = icon_button("folder", _("Open folder"))
 
         def open_folder():
             folder = quality.current.videos()

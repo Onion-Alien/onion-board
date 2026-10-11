@@ -109,13 +109,13 @@ FinishedLabel=Onion Board is installed. It will open now and ask you a few easy 
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you'd rather send sounds through a cable than your mic"; GroupDescription: "Other ways to send your sounds (optional)"; Flags: unchecked
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you know you need one"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked
 
 [InstallDelete]
 ; The Python runtime and libraries from the last version: cleared first so files a
@@ -622,6 +622,12 @@ begin
   UpdateInstallCaption;
 end;
 
+// Windows' own style bits, to draw the box list double-buffered (see InitializeWizard)
+function GetWindowLongW(hWnd: HWND; nIndex: Integer): Longint;
+  external 'GetWindowLongW@user32.dll stdcall';   // sensitive-scan: allow
+function SetWindowLongW(hWnd: HWND; nIndex: Integer; dwNewLong: Longint): Longint;
+  external 'SetWindowLongW@user32.dll stdcall';   // sensitive-scan: allow
+
 procedure InitializeWizard;
 var
   Body, Link, Note: TNewStaticText;
@@ -632,6 +638,9 @@ begin
   // (with FFmpeg offered and Count me in) fit without a scrollbar.
   WizardForm.TasksList.Height := WizardForm.TasksList.Parent.ClientHeight -
     WizardForm.TasksList.Top;
+  // the box list repainted the row under the mouse on every move (a flash): draw it off-screen first
+  SetWindowLongW(WizardForm.TasksList.Handle, -20,
+    GetWindowLongW(WizardForm.TasksList.Handle, -20) or $02000000);   // WS_EX_COMPOSITED
   PrivacyPage := CreateCustomPage(wpWelcome, 'Your privacy',
     'What Onion Board connects to, and when');
   Body := TNewStaticText.Create(PrivacyPage);
@@ -877,7 +886,7 @@ begin
   // uninstaller leaves its setup program in Program Files, so that proves nothing
   HadCable := CableScript('-Check') <> 2;
   WizardForm.StatusLabel.Caption :=
-    'Installing the virtual cable... click Yes if Windows asks for permission.';
+    'Installing the virtual cable. Windows will show a permission box: please click Yes.';
   Code := CableScript('-Silent');
   CableNeedsRestart := (Code = 3010);
   // remembered for the uninstaller: a cable we put there is offered for removal first
@@ -986,8 +995,54 @@ begin
       mbInformation, MB_OK, IDOK);
 end;
 
+// An update clears {app}\_internal first ([InstallDelete]). If a program (antivirus, a
+// leftover Onion Board or python process) holds a file in there open, that delete stops
+// halfway and leaves a broken install ("Failed to load Python DLL"). So before anything
+// is deleted, check the folder can be renamed: Windows refuses that while a file inside
+// is open. Not in PrepareToInstall: that runs before CloseApplications has closed a
+// running Onion Board, which would wrongly fail a normal update.
+procedure CheckInternalNotInUse;
+var
+  Dir, Probe: String;
+  Attempt: Integer;
+  Moved: Boolean;
+begin
+  Dir := ExpandConstant('{app}\_internal');
+  Probe := ExpandConstant('{app}\_internal.chk');
+  if not DirExists(Dir) then
+    exit;
+  Moved := False;
+  // a scanner often lets go within a second or two, so try for ~10 s
+  for Attempt := 1 to 20 do
+  begin
+    if RenameFile(Dir, Probe) then
+    begin
+      Moved := True;
+      break;
+    end;
+    Sleep(500);
+  end;
+  if not Moved then
+  begin
+    Log('A file in ' + Dir + ' is in use; stopping before anything is deleted');
+    RaiseException('Onion Board can''t be updated right now: a file in its folder is in ' +
+      'use by another program (antivirus, or Onion Board still running). Nothing was ' +
+      'changed and your current Onion Board still works. Close it (and pause your ' +
+      'antivirus for a moment), then run this installer again.');
+  end;
+  if not RenameFile(Probe, Dir) then
+  begin
+    // never leave the folder under the wrong name
+    Sleep(1000);
+    if not RenameFile(Probe, Dir) then
+      Log('Could not rename ' + Probe + ' back to ' + Dir);
+  end;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssInstall then
+    CheckInternalNotInUse;
   if CurStep = ssPostInstall then
     QueueImports;
   if (CurStep = ssPostInstall) and MayDownload('vbcable') then

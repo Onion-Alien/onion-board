@@ -227,6 +227,20 @@ def test_watchdog_reopens_a_stalled_stream():
     assert "main" in e.errors                    # "fake main" can't actually be opened
 
 
+def test_watchdog_never_reopens_a_device_after_shutdown():
+    """Quitting slowly: once shut down, a late watchdog check (or one already queued)
+    doesn't open the mic or the speakers again."""
+    e = engine_with("main")
+    e.shutdown()
+    opened = []
+    e.set_main_device = opened.append
+    e._last_cb["main"] = e._last_try["main"] = time.monotonic() - eng.RETRY_S - 10
+    assert e.check_streams() == []
+    assert e.devices.wait(5)
+    assert e._watch(time.monotonic()) == []
+    assert opened == [] and e.main_stream is None
+
+
 def test_watchdog_retries_a_failed_device_only_every_few_seconds():
     e = Engine()
     e.names["main"] = "no such device"

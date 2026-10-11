@@ -103,12 +103,9 @@ def test_save_as_new_sound_stays_in_the_category(window, monkeypatch, qapp):
     window.set_category("Memes")
     window.meta("s0").fade_in = 1.5
 
-    class AsCopy(main.EditDialog):
-        def exec(self):
-            self.as_copy = True
-            return 1
-    monkeypatch.setattr(main, "EditDialog", AsCopy)
-    window.edit("s0")
+    d = window.edit("s0")
+    d.as_copy = True
+    d.done(1)
     new = window.cfg.sounds[1]
     assert new.name == "Boom (edit)" and new.tags == ["Memes"] and new.fade_in == 1.5
     assert not window.pads[new.id].property("filtered")

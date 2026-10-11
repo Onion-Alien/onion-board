@@ -9,7 +9,7 @@ import math
 from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
+                               QLayout, QPushButton, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -19,6 +19,10 @@ from soundboard.ui import icons
 from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
+
+# the two heights the main window's controls and bars share (DESIGN.md "size")
+CONTROL_H = 36   # a toolbar button, the search box, the player's buttons
+BAR_H = 48       # a bar holding one row of them: the Sounds toolbar, the bottom bars
 
 
 class RoundedFrame(QFrame):
@@ -67,10 +71,12 @@ def vsep() -> QFrame:
     return f
 
 
-def bar(margins=(10, 8, 12, 8)) -> tuple[QFrame, QHBoxLayout]:
-    """The rounded control bar every tab has along its bottom (and the mixer strip)."""
+def bar(margins=(10, 5, 12, 6)) -> tuple[QFrame, QHBoxLayout]:
+    """The rounded control bar every tab has along its bottom (and the mixer strip).
+    A theme's 1 px top edge plus 5 + 6 around a CONTROL_H row makes BAR_H."""
     f = QFrame()
     f.setObjectName("transport")
+    f.setMinimumHeight(BAR_H)
     h = QHBoxLayout(f)
     h.setContentsMargins(*margins)
     h.setSpacing(10)
@@ -275,8 +281,10 @@ def capped(body: QWidget, outer: QWidget | None = None, *,
     return outer
 
 
-def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFrame, QVBoxLayout]:
-    """A titled card, the building block of the Voice and Setup pages."""
+def card(title: str = "", hint: str = "", *, roomy: bool = False,
+         beside: QWidget | None = None) -> tuple[QFrame, QVBoxLayout]:
+    """A titled card, the building block of the Voice and Setup pages. `beside` goes
+    right after the title (an ⓘ that explains the card: DESIGN section 4)."""
     f = QFrame()
     f.setObjectName("card")
     v = QVBoxLayout(f)
@@ -284,7 +292,24 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFram
     # the title label adds 8 px of its own above, so the top margin is 8 less
     v.setContentsMargins(*((18, 10, 18, 18) if roomy else (14, 8, 14, 14)))
     v.setSpacing(12 if roomy else 6)
-    if title:
+    if title and beside is not None:
+        row = QHBoxLayout()
+        row.setSpacing(4)
+        lbl = section_label(title)
+        row.addWidget(lbl, 0, Qt.AlignTop)
+        # centred on the title's cap height (DESIGN section 4), measured from its font:
+        # its padding-top (8 px) + ascent - half the cap height
+        lbl.ensurePolished()
+        fm = lbl.fontMetrics()
+        centre = 8 + fm.ascent() - fm.capHeight() / 2
+        pin = QVBoxLayout()
+        pin.setContentsMargins(0, max(0, round(centre - beside.minimumHeight() / 2)), 0, 0)
+        pin.addWidget(beside)
+        pin.addStretch(1)
+        row.addLayout(pin)
+        row.addStretch(1)
+        v.addLayout(row)
+    elif title:
         v.addWidget(section_label(title))
     if hint:
         v.addWidget(hint_label(hint))
@@ -299,6 +324,59 @@ def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     lbl.setObjectName("iconlabel")
     return lbl
 
+
+def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18) -> QPushButton:
+    """An icon-only button (section 4: a picture says it, quiet, 28-32 px).
+
+    `tip` is the button's whole meaning: it is the tooltip and the screen-reader name
+    (`setAccessibleName`), so nothing depends on the drawing alone. Its words stay in
+    every catalog: pass an already-translated string to `tip`."""
+    b = QPushButton()
+    b.setObjectName("iconbutton")
+    b.setProperty("quiet", quiet)
+    icons.set_icon(b, name, size=size)
+    b.setToolTip(tip)
+    b.setAccessibleName(tip)
+    return b
+
+
+def info_button(tip: str) -> QPushButton:
+    """The ⓘ beside a card's heading: 24 px (the smallest target), so the heading's
+    row doesn't grow. `tip` is its tooltip and screen-reader name."""
+    b = icon_button("info", tip, size=16)
+    b.setObjectName("infobutton")
+    b.setFixedSize(24, 24)
+    return b
+
+
+
+def fold_button(text: str, body: QWidget | None = None) -> QPushButton:
+    """The one look for a card's inline extras (DESIGN section 0: a few fields expand
+    in place): a quiet checkable link with the fold arrow, which turns when it's open.
+    `body` (hidden to start) shows and hides with it."""
+    b = QPushButton(text)
+    b.setObjectName("fold")
+    b.setCheckable(True)
+    icons.set_icon(b, "fold", "muted", "text", size=12)
+    b.toggled.connect(lambda on: icons.set_icon(b, "fold_open" if on else "fold", "muted",
+                                                "text", size=12))
+    if body is not None:
+        body.hide()
+        b.toggled.connect(body.setVisible)
+    return b
+
+
+def reset_button(tip: str) -> QPushButton:
+    """The one look for putting a part back to how it starts, beside that part (an
+    effect, Live controls, a sound's effects): small, quiet, the reset arrow and the
+    word, so it reads the same everywhere (a slim muted link: it never makes a card's
+    heading row taller). `tip` says what goes back."""
+    b = QPushButton(_("Reset"))
+    b.setObjectName("reset")
+    b.setCursor(Qt.PointingHandCursor)
+    icons.set_icon(b, "reload", "muted", size=12)
+    b.setToolTip(tip)
+    return b
 
 class _LevelDot(Meter):
     """Audio activity beside a volume control, without a second slider-like track."""
@@ -361,7 +439,13 @@ class VolumeControl(QWidget):
         self.spin.setRange(0, typed_max)
         self.spin.setSuffix("%")
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
-        self.spin.setAlignment(Qt.AlignRight)
+        # beside its slider, on the row's centre line: right-aligned in a box as wide as
+        # "1000%", "70%" sat 30-40 px away from its slider
+        self.spin.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # its text box rounds the centring down: the digits sat 1-1.5 px under the
+        # slider and the labels beside it (measured ink); 2 px less at the bottom
+        # moves the centre up by one
+        self.spin.lineEdit().setTextMargins(0, 0, 0, 2)
         self.spin.setToolTip(_("Type an exact volume (0–{typed_max}%)", typed_max=typed_max))
         if tip:
             self.slider.setToolTip(tip)

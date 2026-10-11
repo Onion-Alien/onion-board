@@ -48,6 +48,54 @@ def test_settings_and_the_arrow_share_a_row_open_and_stack_shut(qapp):
     rail.close()
 
 
+def test_settings_is_its_icon_only_and_selected_round_it(qapp):
+    """Open or shut, Settings is just the cog (its name for screen readers); showing its page,
+    it gets the current tab's fill and the tabs lose theirs. The arrow stays at the
+    far side of the open rail."""
+    from soundboard.ui.sidebar import BUTTON_W
+    rail, _alert, _live, gear = _rail(qapp, True)
+    gear.setProperty("railtext", "Settings")
+    rail.set_open(False)
+    QApplication.processEvents()
+    for is_open in (True, False):
+        rail.set_open(is_open)
+        QApplication.processEvents()
+        assert gear.text() == ""
+        assert gear.accessibleName() == "Settings" and gear.width() == BUTTON_W
+    rail.set_open(True)
+    QApplication.processEvents()
+    assert rail.toggle.geometry().right() > gear.geometry().right() + BUTTON_W
+    rail.select_foot(gear)
+    assert gear.isChecked() and not rail.buttons[0].isChecked()
+    rail.select_foot(None)
+    assert not gear.isChecked() and rail.buttons[0].isChecked()
+    rail.close()
+
+
+def test_the_line_over_settings_has_the_same_gap_on_both_sides(qapp):
+    """Stop all's icon over the line and Settings' icon under it sit as far from it,
+    open and shut (the cog is as tall as the buttons over it: its square is painted)."""
+    from PySide6.QtWidgets import QFrame
+    from soundboard.ui.sidebar import ICON
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "One")
+    stop, gear = QPushButton("Stop all"), QPushButton()
+    stop.setObjectName("danger")
+    rail = SideRail(tabs, QWidget(), QLabel(), QLabel(), [], True, [gear], status=[stop])
+    rail.resize(rail.width(), 600)
+    rail.show()
+    for is_open in (True, False):
+        rail.set_open(is_open)
+        QApplication.processEvents()
+        line = [f for f in rail.findChildren(QFrame, "raildiv") if f.isVisible()][-1]
+        y = line.geometry().top()
+        above = y - (stop.geometry().center().y() + ICON // 2)
+        below = gear.geometry().center().y() - ICON // 2 - y
+        assert abs(above - below) <= 1, (is_open, above, below)
+        assert gear.height() == stop.height()
+    rail.close()
+
+
 def test_a_rail_without_alerts_has_no_stray_window(qapp):
     tabs = SideTabs()
     tabs.addTab(QWidget(), "One")
@@ -144,3 +192,89 @@ def test_an_open_tab_has_room_between_its_icon_and_its_name(qapp):
     words_start = next(x for x in cols if x > first_end)
     assert words_start - first_end >= 9   # (4 px before, ~10 px now)
     rail.close()
+
+
+def _foot_three(qapp):
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "One")
+    gear, onion = QPushButton(), QPushButton()
+    rail = SideRail(tabs, QWidget(), QLabel(), QLabel(), [], True, [gear, onion])
+    rail.resize(rail.width(), 600)
+    rail.show()
+    QApplication.processEvents()
+    return rail, gear, onion
+
+
+def test_a_button_between_settings_and_the_arrow_sits_exactly_in_the_middle(qapp):
+    """Open: Settings at the near side, the arrow at the far one, the one between them
+    the same gap from both, on the cards' centre line (Qt's stretch gave one gap the
+    odd pixel)."""
+    rail, gear, onion = _foot_three(qapp)
+    g, o, a = gear.geometry(), onion.geometry(), rail.toggle.geometry()
+    assert g.center().y() == o.center().y() == a.center().y()
+    assert o.left() - g.right() == a.left() - o.right()
+    middle = rail._lay.contentsMargins().left() + rail._inner_width() // 2
+    assert o.left() + o.width() // 2 == middle
+    rail.close()
+
+
+def test_the_foot_never_overlaps_at_any_width(qapp):
+    """Dragged from open to shut and back: the three never overlap or leave the rail,
+    side by side they stay evenly spaced, stacked they stay in one column."""
+    from soundboard.ui.sidebar import BUTTON_W, OPEN_W, SHUT_W
+    rail, gear, onion = _foot_three(qapp)
+    for x in [*range(OPEN_W, SHUT_W - 1, -3), SHUT_W, *range(SHUT_W, OPEN_W + 1, 3)]:
+        rail.drag_width(x)
+        QApplication.processEvents()
+        rects = [gear.geometry(), onion.geometry(), rail.toggle.geometry()]
+        for i, r in enumerate(rects):
+            assert r.left() >= 0 and r.right() < rail.width() - 1, (x, r)
+            for s in rects[i + 1:]:
+                assert not r.intersects(s), (x, r, s)
+        g, o, a = rects
+        if g.center().y() == o.center().y():
+            assert o.left() - g.right() == a.left() - o.right(), x
+        else:
+            assert g.center().x() == o.center().x() == a.center().x(), x
+            # stacked: centred as the shut rail's column is (its 1 px edge not counted)
+            assert g.left() == (rail.width() - 1 - BUTTON_W) // 2, x
+    rail.finish_resize()
+    rail.close()
+
+
+def test_the_help_onion_opens_its_menu_and_is_never_left_selected(window):  # noqa: F811
+    window.show()
+    QApplication.processEvents()
+    window.btn_about.click()
+    QApplication.processEvents()
+    texts = [a.text() for a in window.about_menu.actions() if a.text()]
+    assert texts[:3] == ["Join the Discord", "Send feedback", "Report a problem"]
+    assert not window.btn_about.isChecked()
+    # up from the rail's foot, its edge over the onion's (down, it ran off the window)
+    menu, onion = window.about_menu.geometry(), window.btn_about
+    top_left = onion.mapToGlobal(onion.rect().topLeft())
+    assert menu.bottom() < top_left.y() and menu.left() == top_left.x()
+    window.about_menu.hide()
+
+
+def test_a_small_chevron_has_a_solid_tip(qapp):
+    """At 12 px (the sidebar card's ›) the tip fell between two pixel rows and came out
+    a dim smudge: its corners are snapped to the pixel grid now."""
+    from soundboard.ui import icons
+    img = icons.pixmap("fold", 12, "#ffffff").toImage()
+    tip_x = max(x for x in range(12) for y in range(12) if img.pixelColor(x, y).alpha() > 40)
+    assert max(img.pixelColor(tip_x, y).alpha() for y in range(12)) > 200
+
+
+def test_settings_showing_draws_its_cog_in_the_accent(window):  # noqa: F811
+    """Selected, the cog is the accent on the soft fill, as a selected tab's icon (it was
+    on_accent: white, nearly invisible in Light)."""
+    from PySide6.QtCore import QSize
+    from PySide6.QtGui import QColor, QIcon
+
+    from soundboard import theme
+    pm = window.gear.icon().pixmap(QSize(20, 20), QIcon.Normal, QIcon.On)
+    img = pm.toImage()
+    inked = [img.pixelColor(x, y) for x in range(20) for y in range(20)
+             if img.pixelColor(x, y).alpha() > 200]
+    assert inked and inked[0].rgb() == QColor(theme.T["accent"]).rgb()

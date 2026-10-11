@@ -4,9 +4,10 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QAccessible, QKeyEvent, QMouseEvent
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMenu
 
-from soundboard.library import SoundMeta
+from soundboard.i18n import _
+from soundboard.library import PAD_COLORS, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -30,8 +31,72 @@ def click(pad, mods=Qt.NoModifier):
                                                 Qt.LeftButton, Qt.LeftButton, mods))
 
 
+def menu_shows(monkeypatch, look):
+    """Menus open as a QMenu subclass that hands itself to `look` instead of blocking
+    (Qt's own exec can't be patched on the class)."""
+    from soundboard.ui import mainwindow, padbatch
+
+    class Shown(QMenu):
+        def exec(self, *a):
+            look(self)
+    for mod in (mainwindow, padbatch):
+        monkeypatch.setattr(mod, "QMenu", Shown)
+
+
 def key(pad, k, mods=Qt.NoModifier):
     QApplication.sendEvent(pad, QKeyEvent(QEvent.KeyPress, k, mods))
+
+
+@pytest.mark.parametrize("colors", [(PAD_COLORS[0], PAD_COLORS[0]),
+                                   (PAD_COLORS[0], PAD_COLORS[1])])
+def test_bulk_colour_menu_marks_shared_value_and_applies_choice(window, colors):
+    window.selection.picked = {"s0", "s1"}
+    for sid, color in zip(("s0", "s1"), colors):
+        window.meta(sid).color = color
+    menu = QMenu(window)
+    window.selection._fill_colors(menu)
+    actions = menu.actions()
+    assert all(action.isCheckable() for action in actions)
+    # by name, not "#7c5cff"
+    from soundboard.ui.dialogs import COLOUR_NAMES
+    assert [a.text() for a in actions] == [COLOUR_NAMES[c] for c in PAD_COLORS]
+    expected = [COLOUR_NAMES[colors[0]]] if colors[0] == colors[1] else []
+    assert [action.text() for action in actions if action.isChecked()] == expected
+    actions[1].trigger()
+    assert all(window.meta(sid).color == PAD_COLORS[1] for sid in ("s0", "s1"))
+    assert [a.text() for a in actions if a.isChecked()] == [COLOUR_NAMES[PAD_COLORS[1]]]
+
+
+def test_bulk_menu_starts_with_its_actions_not_a_blank_section(window, monkeypatch):
+    window.selection.picked = {"s0", "s1"}
+    seen = []
+    menu_shows(monkeypatch, lambda m: seen.extend(m.actions()))
+    window.selection.menu(window.mapToGlobal(window.rect().center()))
+    assert not seen[0].isSeparator() and seen[0].menu() is not None   # Colour
+
+
+def test_category_colour_menu_is_the_bulk_one_with_no_colour(window, monkeypatch):
+    """A category tab's Colour menu: names and a real tick, like the bulk one (it had
+    a "  ✓" typed after the name and bold text)."""
+    from soundboard.ui.dialogs import COLOUR_NAMES
+    w = window
+    w.cfg.categories = ["Memes"]
+    w.cfg.category_colors["Memes"] = PAD_COLORS[2]
+    w._fill_categories()
+    i = next(i for i in range(w.cat_tabs.count()) if w.cat_tabs.tabData(i) == "Memes")
+    subs = []
+
+    def grab(m):
+        for act in m.actions():
+            if act.menu() is not None and act.text() == _("Colour"):
+                subs.append(act.menu().actions())
+    menu_shows(monkeypatch, grab)
+    w._category_menu(w.cat_tabs.tabRect(i).center())
+    acts = [a for a in subs[0] if not a.isSeparator()]
+    assert [a.text() for a in acts[:-1]] == [COLOUR_NAMES[c] for c in PAD_COLORS]
+    assert [a.text() for a in acts if a.isChecked()] == [COLOUR_NAMES[PAD_COLORS[2]]]
+    acts[-1].trigger()                                  # No colour
+    assert not w.cfg.category_colors.get("Memes")
 
 
 def test_ctrl_click_toggles_and_shift_click_picks_a_range(window):

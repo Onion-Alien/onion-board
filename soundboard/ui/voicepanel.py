@@ -30,8 +30,9 @@ from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
-from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, capped, card, hint_label,
-                                 icon_label, section_label, steady_number, vsep)
+from soundboard.ui.panel import (Flow, UndoBar, bar, capped, card, fold_button, hint_label,
+                                 icon_button, icon_label, reset_button, section_label,
+                                 steady_number)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.wheelguard import no_wheel
@@ -84,7 +85,8 @@ class Switch(QCheckBox):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         on = self.isChecked()
-        r = QRectF(self.rect()).adjusted(1, 3, -1, -3)
+        offset = self.property("glyphoffset") or 0
+        r = QRectF(self.rect()).adjusted(1, 3 + offset, -1, -3 + offset)
         track = QColor(theme.T["accent"] if on else theme.T["groove"])
         if not self.isEnabled():
             track.setAlpha(110)
@@ -354,11 +356,8 @@ class EffectRow(QFrame):
         title.setObjectName("fxname")
         head.addWidget(title)
         head.addStretch(1)
-        self.btn_reset = QPushButton(_("Reset"))
-        self.btn_reset.setObjectName("fxreset")
-        self.btn_reset.setCursor(Qt.PointingHandCursor)
-        self.btn_reset.setToolTip(_("Put {effect}'s settings back to how they start",
-                                    effect=voicefx.shown(cls.name)))
+        self.btn_reset = reset_button(_("Put {effect}'s settings back to how they start",
+                                        effect=voicefx.shown(cls.name)))
         self.btn_reset.clicked.connect(self.reset)
         head.addWidget(self.btn_reset)
         self.chk = Switch(_("Turn {effect} on or off", effect=voicefx.shown(cls.name)))
@@ -546,7 +545,13 @@ class VoiceFxPanel(QWidget):
         self.btn_power.toggled.connect(self._on_power)
         # your mic level is in the tab's status bar (ui/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
-        v.addWidget(self.btn_power, 0, Qt.AlignLeft)
+        # beside it, Make it yours (set up below, with the tiles): under 24 voices it
+        # was off the bottom of a normal window (DESIGN section 0: the entry to the
+        # big editor sits with the card's main controls)
+        power_row = QWidget()
+        self._power_row = Flow(power_row, gap=8)
+        self._power_row.addWidget(self.btn_power)
+        v.addWidget(power_row)
         v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
                                  "a game, OBS). Pick a voice to turn it on, then use Hear what "
                                  "they hear at the bottom to try it.")))
@@ -607,8 +612,9 @@ class VoiceFxPanel(QWidget):
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.setToolTip(_("Pitch, Randomize, every effect, and your saved voices: "
                                     "build your own voice in a window beside the app"))
+        self.btn_tweak.setMinimumHeight(self.btn_power.minimumHeight())   # one row
         self.btn_tweak.clicked.connect(self.open_tweak)
-        v.addWidget(self.btn_tweak, 0, Qt.AlignLeft)
+        self._power_row.addWidget(self.btn_tweak)
 
         # ---- the "Make it yours" window: not modal, so the voices stay clickable
         self.dlg = QDialog(self)
@@ -1434,7 +1440,10 @@ class SpeechPanel(QWidget):
         self._dl_busy: mods.ModuleInfo | None = None
         self._installing = False
         self._last_said = ""   # Save as sound with the box empty keeps this line
-        controller.gain = self.s["gain"]
+        # a typed line plays like a sound, so the bottom bar's volumes set how loud it
+        # is; its own volume on the Say bar was one more to find (the saved "gain"
+        # stays in the settings for older versions)
+        controller.gain = 1.0
         controller.speaker.voice = self.s["voice"]
         controller.speaker.rate = int(self.s["rate"])
         controller.mute_real_voice = self.s["mute_real_voice"]
@@ -1610,13 +1619,11 @@ class SpeechPanel(QWidget):
         b_clear = QPushButton(_("Clear"))
         b_clear.setMinimumHeight(32)
         lrow.addWidget(b_clear)
-        v.addLayout(lrow)
         self.said_log = QPlainTextEdit()
         self.said_log.setObjectName("speechlog")
         self.said_log.setReadOnly(True)
         self.said_log.setMaximumBlockCount(500)
-        # short while empty (a tall blank box pushed More options far down), growing
-        # with what's said up to a few lines, then it scrolls
+        # short while empty, growing with what's said up to a few lines, then it scrolls
         def fit_log():
             fm = self.said_log.fontMetrics()
             lines = min(5, max(2, self.said_log.document().blockCount()))
@@ -1627,7 +1634,6 @@ class SpeechPanel(QWidget):
         self.said_log.setPlaceholderText(_("Nothing yet. Lines show up here as they're "
                                            "spoken."))
         b_clear.clicked.connect(self.said_log.clear)
-        v.addWidget(self.said_log)
 
         self.missing = QWidget()
         mv = QVBoxLayout(self.missing)
@@ -1641,7 +1647,7 @@ class SpeechPanel(QWidget):
         self.b_install.setToolTip(_("One-time download, about 300 MB. Requires Python 3.12+."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
-        b_open = QPushButton(_("Open folder"))
+        b_open = icon_button("folder", _("Open folder"))
         b_open.clicked.connect(lambda: self._open_folder(self.module, b_open))
         mrow.addWidget(b_open)
         mrow.addStretch(1)
@@ -1652,10 +1658,7 @@ class SpeechPanel(QWidget):
         self.lbl_install.hide()
         v.addWidget(self.lbl_install)
 
-        self.btn_opts = QPushButton(_("More options"))
-        self.btn_opts.setObjectName("fold")
-        icons.set_icon(self.btn_opts, "fold", "muted", "text", size=12)
-        self.btn_opts.setCheckable(True)
+        self.btn_opts = fold_button(_("More options"))
         v.addWidget(self.btn_opts, 0, Qt.AlignLeft)
         self.opts = QWidget()
         ov = QVBoxLayout(self.opts)
@@ -1693,6 +1696,10 @@ class SpeechPanel(QWidget):
         ov.addWidget(self.b_update, 0, Qt.AlignLeft)
         v.addWidget(self.opts)
         self.opts.hide()
+        # the log after the options: More options sits with the controls it adds to
+        # (DESIGN section 0), not under a box of past lines
+        v.addLayout(lrow)
+        v.addWidget(self.said_log)
         # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs.
         # Their own card under this one (VoicePanel puts it there), so they're easy to
         # find; "Add voices" opens it and scrolls to it
@@ -1720,10 +1727,7 @@ class SpeechPanel(QWidget):
         self.lbl_custom.setTextFormat(Qt.PlainText)    # shows file names and errors
         self.lbl_custom.hide()
         ov.addWidget(self.lbl_custom)
-        self.btn_opts.toggled.connect(lambda on: (
-            self.opts.setVisible(on),
-            icons.set_icon(self.btn_opts, "fold_open" if on else "fold", "muted", "text",
-                           size=12)))
+        self.btn_opts.toggled.connect(self.opts.setVisible)
         self.tts_err = hint_label("")
         theme.set_tone(self.tts_err, "error")
         self.tts_err.hide()
@@ -1751,19 +1755,11 @@ class SpeechPanel(QWidget):
         row.addWidget(b_say)
         row.addWidget(b_keep)
         row.addWidget(b_stop)
-        sep = vsep()
-        row.addWidget(sep)
-        vol_icon = icon_label("volume", _("How loud the spoken voice is"))
-        row.addWidget(vol_icon)
-        self.sl_gain = VolumeControl(self.s["gain"], slider_max=200, typed_max=400,
-                                     tip=_("How loud the spoken voice is"))
-        row.addWidget(self.sl_gain)
-        self.say_vol_group = (sep, vol_icon, self.sl_gain)
         self.say_stop = b_stop
 
         self.cb_voice.currentIndexChanged.connect(self._voice_picked)
         for sig in (self.sl_rate.valueChanged,
-                    self.sl_gain.changed, self.cb_model.currentIndexChanged,
+                    self.cb_model.currentIndexChanged,
                     self.chk_mute.toggled, self.chk_fx.toggled):
             sig.connect(self._settings_edited)
         self.ed_lang.editingFinished.connect(self._settings_edited)
@@ -1991,13 +1987,12 @@ class SpeechPanel(QWidget):
             self.s["voice"] = self.cb_voice.currentData() or ""
             self.ctl.speaker.voice = self.s["voice"]
         self.s.update(rate=self.sl_rate.value(),
-                      gain=self.sl_gain.value(), model=self.cb_model.currentData(),
+                      model=self.cb_model.currentData(),
                       language=self.ed_lang.text().strip() or "en",
                       mute_real_voice=self.chk_mute.isChecked(),
                       voice_fx=self.chk_fx.isChecked(),
                       translate=self.cb_lang.currentData() or "")
         self.ctl.speaker.rate = self.s["rate"]
-        self.ctl.gain = self.s["gain"]
         self.ctl.set_mute_real_voice(self.s["mute_real_voice"])
         if self.ctl.live and not self.bg_for:
             self.ctl.set_replace(self.s["mute_real_voice"])
@@ -2545,7 +2540,7 @@ class ModulesList(QWidget):
         row = QHBoxLayout()
         b = self.b_refresh = QPushButton(_("Refresh"))
         b.clicked.connect(self._refresh)
-        o = QPushButton(_("Open folder"))
+        o = icon_button("folder", _("Open folder"))
         o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)
@@ -2845,8 +2840,7 @@ class VoicePanel(QWidget):
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
-        return [(40, "w", r.hide(*self.speech.say_vol_group)),
-                (50, "w", r.hide(self.speech.say_stop))]
+        return [(50, "w", r.hide(self.speech.say_stop))]
 
     def stack_steps(self):
         from soundboard.ui import responsive as r

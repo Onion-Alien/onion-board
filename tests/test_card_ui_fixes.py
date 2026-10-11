@@ -97,3 +97,29 @@ def test_help_card_dismisses_without_a_button(qapp, dismiss):
     assert not timed_out
     assert not popup.isVisible()
     popup.deleteLater()
+
+
+def test_help_card_uses_shared_styles_and_returns_focus(qapp):
+    """U7: the help card's look comes from the style sheet (no local pixel sizes or
+    colours), its close is a painted icon with a name, and the focus goes back."""
+    from PySide6.QtWidgets import QPushButton, QWidget
+    opener_host = QWidget()
+    opener = QPushButton("About", opener_host)
+    opener_host.show()
+    opener.setFocus()
+    qapp.processEvents()
+    popup = TabHelpPopup("Radio", "Choose a station and listen.")
+    assert popup.styleSheet() == ""
+    assert all(not w.styleSheet() for w in popup.findChildren(QWidget))
+    assert popup.heading.objectName() == "helptitle"
+    assert popup.body.objectName() == "helpbody"
+    b = popup.close_btn
+    assert b.text() == "" and not b.icon().isNull()
+    assert b.accessibleName() == b.toolTip() == "Close"
+    popup.show()
+    qapp.processEvents()
+    popup.reject()
+    qapp.processEvents()
+    assert opener.hasFocus() or qapp.focusWidget() is opener
+    popup.deleteLater()
+    opener_host.deleteLater()

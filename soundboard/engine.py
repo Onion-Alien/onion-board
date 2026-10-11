@@ -1083,6 +1083,7 @@ class Engine:
         self.devices = DeviceWorker()
         self._touched: list[str] = []   # keys the device thread's last reopens touched
         self._touched_lock = threading.Lock()
+        self._shut = False   # shutdown() ran: the watchdog never reopens a device again
 
         # the mic's clock is its own device's: drift tracking switches itself on if it
         # turns out to wander from the output's (see Ring.auto_drift)
@@ -1486,6 +1487,8 @@ class Engine:
         can take the driver seconds), one check at a time. Returns the keys that were
         touched (reopened or came back since the last check, or whose callback raised),
         so the UI can refresh its status from errors_snapshot()."""
+        if self._shut:
+            return []
         now = time.monotonic()
         with self._touched_lock:
             touched, self._touched = self._touched, []
@@ -1508,6 +1511,8 @@ class Engine:
     @_holding_devices
     def _watch(self, now: float) -> list[str]:
         """check_streams' reopens, on the device thread. Returns the keys touched."""
+        if self._shut:   # queued before shutdown() closed everything
+            return []
         touched = []
         self._check_tap(now)
         self._check_copies(now)
@@ -1647,6 +1652,7 @@ class Engine:
     def shutdown(self, wait_s: float = 5.0):
         """Close every stream. Waits up to `wait_s` for the device thread's work
         (quitting mustn't hang on a driver that never answers)."""
+        self._shut = True
         held = DEVICES.acquire(timeout=wait_s)
         if not held:
             log.warning("the device thread is stuck; closing the streams anyway")
@@ -2362,8 +2368,14 @@ class Engine:
         if apps is not None:
             mix += self._live("main", "apps", apps)
         self.level_play = max(play, self.level_play * 0.85)
-        if not idle:
+        # off with only your voice going out (mic_only): the sounds, radio and programs
+        # fade out here, before the mic goes in; the send stage below stays open
+        voice = self.mic_only()
+        if idle:
+            self._glides[("main", "bus")] = 0.0 if voice else 1.0
+        else:
             finite(mix)
+            mix = self._vol("main", "bus", mix, 0.0 if voice else 1.0)
         if self.main_direct:
             m = self.fifo_direct.read(frames)
             add = self.direct_mode == directmic.MODE_REPLACE
@@ -2375,10 +2387,11 @@ class Engine:
         # still silence unless the mic went in: every stage below would only pass zeros
         silent = idle and not (add and m is not None and self.mic_enabled and not self.mic_muted)
         # muted: others get silence (faded, not cut), nothing else changes
+        send = 1.0 if self.sending or voice else 0.0
         if silent:
-            self._glides[("main", "send")] = 1.0 if self.sending else 0.0
+            self._glides[("main", "send")] = send
         else:
-            mix = self._vol("main", "send", mix, 1.0 if self.sending else 0.0)
+            mix = self._vol("main", "send", mix, send)
         if self.limiter_on:
             lim = self._stage("main", Limiter)
             if not silent:
@@ -2413,7 +2426,10 @@ class Engine:
                 self._rec_done = (rec, self.rates["main"])
 
     def _mon(self, outdata, frames):
-        check = self.mic_check and self.sending   # muted: they hear nothing, so neither do you
+        # muted: they hear nothing, so neither do you; only your voice going out
+        # (mic_only): just your voice, no sounds
+        voice = self.mic_check and self.mic_only()
+        check = self.mic_check and self.sending or voice
         if check and self.mon_voice_only:
             self._mon_voice(outdata, frames)
             return
@@ -2429,7 +2445,8 @@ class Engine:
             mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
         m = self.ring_mon.read(frames)
         if not idle:
-            mix = self._vol("mon", "sounds", mix, self.sound_vol if check else 1.0)
+            mix = self._vol("mon", "sounds", mix,
+                            0.0 if voice else self.sound_vol if check else 1.0)
             # the main output sees the rest; this one counts with no send device too
             play = peak(mix)
         take = self._play_take   # no send device: what's playing is recorded from here
@@ -2439,7 +2456,7 @@ class Engine:
             r = self._live("mon", "radio", r)
             idle = False
             play = max(play, peak(r) * self.radio_vol)
-            on = self.radio_monitor or (check and self.radio_live)
+            on = self.radio_monitor or (check and not voice and self.radio_live)
             mix += self._vol("mon", "radio", r, self.radio_vol if on else 0.0)
             if took is not None:
                 took += r * np.float32(self.radio_vol)
@@ -2452,7 +2469,7 @@ class Engine:
             if x is not None:
                 idle = False
                 play = max(play, peak(x) * a.vol)
-                on = a.monitor or (check and a.live)
+                on = a.monitor or (check and not voice and a.live)
                 apps = _add(apps, self._vol("mon", ("aux", a.key), x,
                                             a.gain("mon", lowcut) if on else 0.0))
         if apps is not None:
@@ -2565,15 +2582,25 @@ class Engine:
             self._gated(out, m)   # (keeps the gate's level current for _direct_mic_gain)
         return mix
 
+    def mic_only(self) -> bool:
+        """"Others hear" is off, but your own voice still goes out: your mic is sent
+        (Send my mic) and no voice changer is on, so only your sounds, the radio and
+        programs are cut. With a changed voice, off is silence, as before."""
+        if self.sending or not self.mic_enabled or self.mic_muted:
+            return False
+        chain = self.voice_chain
+        return not (chain is not None and chain.changes_voice)
+
     def _direct_mic_gain(self):
         """The real mic's level, applied by the mic effect (mute, mic volume, the gate
         while a sound plays, and nothing at all while sending is off). Add mode: always
         heard. Replace mode: only when the effect fills in for a block the board was
-        late with; a changed voice then stays quiet rather than let the real one out."""
+        late with; a changed voice then stays quiet rather than let the real one out.
+        Off with mic_only: your plain voice still goes."""
         d = self.direct_stream()
         if d is None:
             return
-        on = self.mic_enabled and not self.mic_muted and self.sending
+        on = self.mic_enabled and not self.mic_muted and (self.sending or self.mic_only())
         if self.direct_mode == directmic.MODE_REPLACE:
             chain = self.voice_chain
             on = on and not (chain is not None and getattr(chain, "changes_voice", True))

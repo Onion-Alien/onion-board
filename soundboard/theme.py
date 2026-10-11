@@ -394,13 +394,15 @@ def _add_hover_token(t: dict[str, str]) -> None:
          if _contrast(c, t["on_accent"]) >= 4.5), t["accent_hi"])
 
 
+SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
+
 for _t in THEMES.values():
-    # Secondary text must read on the brightest surface used behind it.
+    # Secondary text must read (4.5:1) on every surface it sits on: a quiet button's
+    # hover and the inset boxes too (they were 3.6-4.5:1 in most themes).
     for key in ("muted", "faint"):
         _t[key] = next(c for c in (_mix(_t[key], _t["text_hi"], i / 20)
                                   for i in range(21))
-                       if min(_contrast(c, _t[bg]) for bg in
-                              ("bg", "panel", "card", "card_hi", "btn")) >= 4.5
+                       if min(_contrast(c, _t[bg]) for bg in SECONDARY_ON if bg in _t) >= 4.5
                        or c == _t["text_hi"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
@@ -499,6 +501,12 @@ QLabel#section { color:$heading; font-size:10pt; font-weight:600; padding-top:8p
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
+/* the tab help card (dialogs.TabHelpPopup): a raised surface with an edge (it floats
+   over the board), the title role (1.3x base, bold) and body text */
+QFrame#helpcard { background:$panel; border:1px solid $border; border-radius:16px; }
+QFrame#helpcard QLabel { background:transparent; border:none; padding:0; }
+QLabel#helptitle { font-size:13pt; font-weight:700; color:$text_hi; }
+QLabel#helpbody { font-size:10.5pt; color:$text; }
 QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
 QLabel[tone="warn"], QLabel#hint[tone="warn"] { color:$warn_text; }
@@ -575,17 +583,37 @@ QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text
 QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
 QFrame#sidebar QPushButton#settings:focus, QFrame#sidebar QPushButton#modebtn:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
+QFrame#sidebar QPushButton#settings:checked { background:transparent; color:$text_hi; }
+QFrame#sidebar QPushButton#settings:hover, QFrame#sidebar QPushButton#settings:focus {
+    background:transparent; border-color:transparent; }   /* a square, painted: sidebar.py */
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
 QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
+QFrame#sidebar QPushButton#moretabs[railopen="false"],
+QFrame#sidebar QPushButton#tabinfo[railopen="false"],
+QFrame#sidebar QPushButton#settings[railopen="false"],
+QFrame#sidebar QPushButton#modebtn[railopen="false"],
+QFrame#sidebar QPushButton#railtoggle[railopen="false"],
+QFrame#sidebar QPushButton#pill[railopen="false"],
+QFrame#sidebar QPushButton#onair[railopen="false"],
+QFrame#sidebar QPushButton#danger[railopen="false"] { text-align:center; }
 QFrame#sidebar QLabel#wordmark { font-size:12pt; }
+QFrame#sidebar[twolinebrand="true"] QLabel#wordmark { font-size:10pt; }
 QFrame#sidebar QFrame#raildiv { background:$border_hi; border:none; }
 QFrame#sidebar QWidget#railslot { background:transparent; }
+QFrame#railoutput { background:$panel; border:none; border-radius:12px; }
+QFrame#railoutput[expanded="false"] { background:transparent; }
+QFrame#railoutput QLabel#railoutputtitle { font-weight:700; color:$text_hi; }
+QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
+    border:1px solid transparent; border-radius:6px; padding:0; }
+QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
+QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
+QDialog#settingspage { background:transparent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
@@ -660,7 +688,7 @@ QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
-QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:17px; padding:0; }
+QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:18px; padding:0; }
 QPushButton#transport_play[mini="true"] { border-radius:14px; }
 QPushButton#transport_play:hover { background:$accent_hi; }
 QPushButton#transport_play:pressed { background:$accent; }
@@ -675,6 +703,7 @@ QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-ra
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
 QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$border_hi; }
 QLineEdit { selection-background-color:$btn_press; selection-color:$text_hi; }
+QLineEdit, QPlainTextEdit, QTextEdit, QComboBox { placeholder-text-color:$muted; }
 QComboBox { padding:6px 10px; padding-right:6px; combobox-popup:0; }
 QComboBox::drop-down { subcontrol-origin:padding; subcontrol-position:center right;
     width:26px; border:none; background:transparent; }
@@ -780,6 +809,15 @@ QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* Spacious controls only in Voice and Setup cards. */
 QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
+/* the reset family (panel.reset_button): a slim muted link with the reset arrow, the
+   same beside an effect, the live controls and a sound's effects */
+QPushButton#reset, QFrame#card QPushButton#reset, QFrame#card[roomy="true"] QPushButton#reset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
+QPushButton#reset:hover, QFrame#card QPushButton#reset:hover, QFrame#card[roomy="true"] QPushButton#reset:hover { color:$text; background:transparent; }
+QPushButton#infobutton, QFrame#card QPushButton#infobutton, QFrame#card[roomy="true"] QPushButton#infobutton { background:transparent; padding:0; min-width:24px; max-width:24px; min-height:24px; max-height:24px; border-radius:6px; }
+QPushButton#infobutton:hover, QFrame#card QPushButton#infobutton:hover, QFrame#card[roomy="true"] QPushButton#infobutton:hover { background:$btn_hover; }
+/* a quiet icon button stays quiet inside a card too (the ⓘ after the sound modes) */
+QFrame#card QPushButton#iconbutton[quiet="true"], QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"] { background:transparent; padding:7px 10px; min-height:0; }
+QFrame#card QPushButton#iconbutton[quiet="true"]:hover, QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"]:hover { background:$btn_hover; }
 QFrame#card[roomy="true"] QPushButton#primary { padding:10px 16px; }
 QFrame#card[roomy="true"] QPushButton#voicetile { padding:7px 12px; text-align:left; }
 QFrame#card[roomy="true"] QPushButton#fold { padding:8px 10px; text-align:left; }
@@ -805,8 +843,6 @@ QLabel#fxparam { color:$text; font-size:9pt; }
 QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
 QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
-QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
-QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
 QFrame#voicebar { background:$panel; border-radius:12px; }
 QWidget#voicebarpart, QFrame#voicebar QLabel { background:transparent; }
 QLabel#voicebarlabel { color:$muted; font-size:9pt; font-weight:600; }

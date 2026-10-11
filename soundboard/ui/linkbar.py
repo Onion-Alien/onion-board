@@ -169,6 +169,10 @@ class LinkBar(QFrame):
             self._got = None
         self._kept = None
 
+    def downloading(self) -> bool:
+        """A link is being downloaded right now (closing would drop it)."""
+        return bool(self._busy)
+
     def shutdown(self):
         self.engine.stop(PLAY_ID)
         self._drop_download()
@@ -346,7 +350,7 @@ class LinkBar(QFrame):
         """Download (unless `got` already holds it), then import or decode. `shown`:
         the link's title as the bar has it (the file's name when `got` is used)."""
         def emit(kind, url, payload):
-            self._msg.emit(kind, url, payload, job)
+            busy.emit(self._msg, kind, url, payload, job)
         path = got[1] if got else None
         title = ""
         keep = False

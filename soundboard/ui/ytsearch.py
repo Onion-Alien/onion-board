@@ -1021,24 +1021,25 @@ class SearchResults(RoundedFrame):
             more = {"direct": True} if direct else {}   # the user's "without Tor" click
             if start > 1:   # Show more (fakes in tests take the first page's arguments)
                 more.update(start=start, count=count)
-            self._done.emit(gen, ytdl.search(query, source=source, **more), "")
+            busy.emit(self._done, gen, ytdl.search(query, source=source, **more), "")
         except ytdl.TorBlocked as e:   # offered without Tor, never done unasked
             log.info("%s search turned away over Tor", source)
-            self._done.emit(gen, "blocked", html.escape(str(e)))
+            busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("%s search failed for %r: %s", source, query, e)
             # rich text: the plain words, and a "Report it" link when it's one for us
-            self._done.emit(gen, [], errors.html(e, where=f"Searching {source}"))
+            busy.emit(self._done, gen, [], errors.html(e, where=f"Searching {source}"))
 
     def _work_link(self, gen: int, url: str, direct: bool):
         try:
-            self._done.emit(gen, [ytdl.lookup(url, **({"direct": True} if direct else {}))], "")
+            found = ytdl.lookup(url, **({"direct": True} if direct else {}))
+            busy.emit(self._done, gen, [found], "")
         except ytdl.TorBlocked as e:
             log.info("link look-up turned away over Tor")
-            self._done.emit(gen, "blocked", html.escape(str(e)))
+            busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("link look-up failed for %s: %s", url, e)
-            self._done.emit(gen, [], errors.html(e, where="Looking up a link"))
+            busy.emit(self._done, gen, [], errors.html(e, where="Looking up a link"))
 
     def _on_done(self, gen: int, results, err: str):
         if gen != self._gen:
@@ -1062,6 +1063,7 @@ class SearchResults(RoundedFrame):
             if self.link:
                 why = _("Can't use this link: {error}", error=err)   # err: rich text
                 self.title.setText(f"<span style='color:{red}'>{why}</span>")
+                busy.toast(self.window(), why, "error", 8000)   # not only in the panel
             else:
                 self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}"
                                      "</span>", red=red, site=self.site, err=err))  # from _work

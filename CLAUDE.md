@@ -79,6 +79,10 @@ both apps at once. Details: [docs/TRANSLATING.md](docs/TRANSLATING.md).
 
 ## Any UI work: read docs/DESIGN.md first
 
+**The UI to-do list is [docs/UI-AUDIT.md](docs/UI-AUDIT.md), and only that file.**
+"The UI audit doc" means it. Check an item against latest `origin/main` before
+suggesting or starting it, and tick it there with its PR when done.
+
 **[docs/DESIGN.md](docs/DESIGN.md) is the design system**: tokens, layout, buttons,
 colour, text, behaviour, a "never" list and a checklist. Build every new screen, card,
 dialog and button from it. The rules people trip over most:

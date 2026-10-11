@@ -647,3 +647,41 @@ def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qa
     right = d.width() - (done.mapTo(d, QPoint(0, 0)).x() + done.width())
     assert above == below == right, (above, below, right)
     d.close()
+
+
+def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: F811
+    """U2: comparable short choices look alike: Live tabs' two sit in one wrapping row,
+    as Connection's and Network activity's do (offscreen fonts here are too wide to
+    compare positions: the pictures check that)."""
+    from soundboard.ui.panel import Flow
+    d = SettingsDialog(window, "appearance")
+    card = d.live_green.parentWidget()
+    flows = [f for f in card.layout().findChildren(Flow)
+             if f.indexOf(d.live_green) >= 0 and f.indexOf(d.live_dot) >= 0]
+    assert flows
+    d.close()
+
+
+def test_settings_cards_line_up(window, qapp):  # noqa: F811
+    """U6: an option's explanation sits under its box's text (General's one-click one
+    sat at the card's edge); the overlay's Open overlay and Auto-hide choice are as wide
+    as their words, right after what they belong to; the ducking label keeps one line."""
+    from PySide6.QtWidgets import QComboBox, QPushButton
+    d = SettingsDialog(window, "general")
+    hint = next(lb for lb in d.findChildren(QLabel)
+                if lb.text().startswith("Otherwise, double-click to play"))
+    assert hint.contentsMargins().left() == 26
+    d.show_page("overlay")
+    d.resize(1000, 700)
+    d.show()
+    qapp.processEvents()
+    test = next(b for b in d.findChildren(QPushButton) if b.text() == "Open overlay")
+    assert test.width() <= test.sizeHint().width() + 2
+    auto = d.ov_toggle_only[1]
+    assert isinstance(auto, QComboBox) and auto.width() <= auto.sizeHint().width() + 2
+    d.show_page("audio")
+    qapp.processEvents()
+    duck = next(lb for lb in d.findChildren(QLabel)
+                if lb.text() == "While I talk, lower my sounds:")
+    assert not duck.wordWrap()
+    d.close()

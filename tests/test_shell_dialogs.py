@@ -2,6 +2,7 @@
 the icons-only tab bar, and status colours are readable on every theme."""
 import pytest
 from PySide6.QtCore import QEvent, QPoint, Qt
+from PySide6.QtTest import QTest
 
 from soundboard import engine, settings, theme, winkeys
 from soundboard.ui import mainwindow as main
@@ -28,27 +29,144 @@ def win(qapp, app_dir, monkeypatch):
 def test_closed_settings_and_setup_dialogs_are_freed(qapp, win, monkeypatch):
     """Parented to the window and never freed, every closed copy stayed alive and
     each theme change restyled all of them."""
-    monkeypatch.setattr(settings.SettingsDialog, "exec", lambda self: 0)
     monkeypatch.setattr(setupwizard.SetupWizard, "exec", lambda self: 0)
     for _ in range(3):
-        win.open_settings()
+        win.open_settings().done(0)   # Settings, a page in the window: Done closes it
+        qapp.processEvents()          # (freed just after its finished signal)
         win.run_setup()
     assert win.findChildren(settings.SettingsDialog) == []
     assert win.findChildren(setupwizard.SetupWizard) == []
 
 
-def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win, monkeypatch):
+def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
+    """Settings apply as they change, so they don't hold up the board (U4): a page in
+    the window where the tabs show, the rail still there with its cog selected. Asked
+    for again: the same page, switched to the page named."""
+    win.resize(1180, 720)
+    win.show()
+    win.tabs.setCurrentWidget(win.radio_page)
+    d = win.open_settings("audio")
+    assert win.settings_open() and not d.isWindow() and d.isVisible()
+    assert win._content.currentWidget() is d and not win._tabs_area.isVisible()
+    assert win.rail.isVisible() and win.mixer.isVisible()
+    assert win.gear.isChecked() and not any(b.isChecked() for b in win.rail.buttons)
+    assert win.isEnabled() and qapp.activeModalWidget() is None
+    assert win.open_settings("hotkeys") is d
+    assert d._page_keys[d.tabs.currentIndex()] == "hotkeys"
+    assert win.open_settings() is d                          # the cog: stays on its page
+    assert d._page_keys[d.tabs.currentIndex()] == "hotkeys"
+    d.search_box.setText("zzzz-nothing")
+    d._apply_search("zzzz-nothing")
+    win.open_settings("audio")                               # a page asked for: search cleared
+    assert d.search_box.text() == "" and d._page_keys[d.tabs.currentIndex()] == "audio"
+    assert d.done_btn is None and d.back_btn.toolTip() == "Back"   # no Done row: a back arrow
+    d.back_btn.click()                                       # back to the tab you were on
+    qapp.processEvents()
+    assert not win.settings_open() and win._settings_dlg is None
+    assert win._tabs_area.isVisible() and win.tabs.currentWidget() is win.radio_page
+    assert not win.gear.isChecked()
+    assert win.rail.buttons[win.tabs.indexOf(win.radio_page)].isChecked()
+    assert win.findChildren(settings.SettingsDialog) == []
+    again = win.open_settings()                              # a new one after closing
+    assert again.isVisible()
+    again.done(0)
+    qapp.processEvents()
+
+
+def test_escape_and_any_rail_tab_leave_settings(qapp, win):
+    win.resize(1180, 720)
+    win.show()
+    win.tabs.setCurrentWidget(win.sounds_page)
+    d = win.open_settings("appearance")
+    assert d.isAncestorOf(win.focusWidget())                 # so Escape reaches it
+    QTest.keyClick(win.focusWidget(), Qt.Key_Escape)         # Escape = Done
+    qapp.processEvents()
+    assert not win.settings_open() and win.tabs.currentWidget() is win.sounds_page
+    sounds = win.rail.buttons[win.tabs.indexOf(win.sounds_page)]
+    win.open_settings()
+    sounds.click()                                           # the tab you were on
+    qapp.processEvents()
+    assert not win.settings_open() and sounds.isChecked() and not win.gear.isChecked()
+    win.open_settings()
+    setup = win.rail.buttons[win.tabs.indexOf(win.setup_page)]
+    setup.click()                                            # another tab: that one
+    qapp.processEvents()
+    assert not win.settings_open() and win.tabs.currentWidget() is win.setup_page
+    win.open_settings()
+    win._go_tab(0, absolute=True)                            # Ctrl+1
+    qapp.processEvents()
+    assert not win.settings_open()
+
+
+def test_switching_the_open_tab_off_in_settings_keeps_settings_up(qapp, win):
+    """Settings > Tabs switching off the tab underneath moves the tabs to the first,
+    and Settings stays where it is."""
+    win.set_tab_on("voice", True)
+    win.tabs.setCurrentWidget(win.voice)
+    d = win.open_settings("tabs")
+    win.set_tab_on("voice", False)
+    qapp.processEvents()
+    assert win.settings_open() and win._settings_dlg is d
+    assert win.tabs.currentIndex() == 0
+    d.done(0)
+    qapp.processEvents()
+
+
+@pytest.mark.parametrize("width", [440, 800, 1180, 1920])
+def test_the_settings_page_fits_every_width(qapp, win, width):
+    """440 to 1920 wide with no sideways scroll: narrow, the categories go to an icon
+    column (their names as tips) and the search box over the page."""
+    win.show()
+    win.resize(width, 720)
+    d = win.open_settings("appearance")
+    for _ in range(3):
+        qapp.processEvents()
+    assert win.width() <= max(width, win.minimumWidth()) and win.minimumWidth() <= 440
+    assert d.geometry().right() <= win._content.width()
+    narrow = d.width() < d.NARROW_W
+    item = d.categories.item(0)
+    assert (item.text() == "") == narrow
+    assert item.toolTip() == ("Privacy & security" if narrow else "")
+    assert d.categories.width() == (48 if narrow else 196)
+    page = d.tabs.currentWidget()
+    from PySide6.QtGui import QFontDatabase
+    if "Segoe UI" in QFontDatabase.families():   # (offscreen without its fonts: wide boxes)
+        assert page.widget().width() <= page.viewport().width()   # nothing cut off
+    d.done(0)
+    qapp.processEvents()
+
+
+def test_too_small_closes_settings_and_the_mini_player_grows_for_them(qapp, win):
+    """Made too small for Settings: they close and the mini player shows. Asked for
+    from the mini player: the window grows to the smallest size that shows them."""
+    win.show()
+    win.resize(800, 600)
+    win.open_settings("appearance")
+    qapp.processEvents()
+    win.resize(320, 300)
+    qapp.processEvents()
+    assert not win.settings_open() and win.is_mini() and win._settings_dlg is None
+    d = win.open_settings("audio")
+    qapp.processEvents()
+    assert win.settings_open() and not win.is_mini() and d.isVisible()
+    size = win._pages.size()
+    assert size.width() >= main.SETTINGS_ROOM.width() - 1
+    assert size.height() >= min(main.SETTINGS_ROOM.height(),
+                                win.screen().availableGeometry().height() - 40)
+    d.done(0)
+    qapp.processEvents()
+    assert not win.settings_open()
+
+
+def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win):
     from soundboard import applog
     from soundboard.ui.crashdialog import CrashDialog
-    kept = []
-
-    def exec_(dlg):
-        kept.append(CrashDialog(applog.Report(title="E: x", text="t"), None, dlg))
-        return 0
-    monkeypatch.setattr(settings.SettingsDialog, "exec", exec_)
-    win.open_settings()
-    assert kept[0].parentWidget() is win
-    kept[0].done(0)
+    dlg = win.open_settings()
+    kept = CrashDialog(applog.Report(title="E: x", text="t"), None, dlg)
+    dlg.done(0)
+    qapp.processEvents()
+    assert kept.parentWidget() is win
+    kept.done(0)
 
 
 def test_live_tab_warning_shows_on_the_rail(qapp, win):

@@ -40,6 +40,9 @@ size:
   dialog_max_width: 620px
   dropdown_max_width: 360px
   icon_button: 28-32px square
+  control_height: 36px  # panel.CONTROL_H: toolbar buttons, search box, play/stop
+  bar_height: 48px      # panel.BAR_H: the Sounds toolbar and every bottom bar
+  interface_size: 80-150%  # Settings > Appearance; Qt scales it all, so sizes stay in px
   focus_ring: always visible on keyboard focus
 ---
 
@@ -154,6 +157,9 @@ These are the current reference points. Copy their structure before inventing a 
   smallest window size.
 - Right-to-left languages mirror automatically; don't hard-code left/right positions
   in painting code without checking `layoutDirection()`.
+- The sidebar's inner edge can be dragged between its collapsed and expanded widths.
+  Release snaps to the nearer existing state; it never grows wider than the expanded
+  rail. Keep the named expand/collapse button as the keyboard alternative.
 
 ## 3. Buttons
 
@@ -179,6 +185,31 @@ These are the current reference points. Copy their structure before inventing a 
   never before the first.
 
 ## 4. Icons and pop-ups instead of long buttons
+
+- **Icon and text alignment** (Fluent 2, Material 3 and Apple's lists agree on this).
+  Model: the sidebar's Sound output card (`OutputBlock` in `ui/sidebar.py`).
+  - **One icon column.** Icons in a stack of rows share one fixed-width column (16 px
+    in cards, the tab icon size on the rail), centred on one line. A card inside a
+    column of nav items puts its icons on the nav icons' centre line.
+  - **One text keyline.** Every line of words in the group starts at the same x: the
+    icon column plus one gap (6-8 px, the same gap on every row). A line with no icon
+    of its own (a "Set up" action, a hint, a second line) starts on the keyline too,
+    never under the icons.
+  - **Centre the icon on the cap height of the first line**, not on the label's box.
+    A box centre drifts with line height, descenders and wrapping; the cap height is
+    what the eye reads. Wrapped text keeps the icon (and a trailing chevron) on its
+    first line, so top-align the row and offset the icon from the font metrics
+    (`OutputBlock._pin`: `ascent - capHeight / 2`), never a hand-tuned margin.
+  - **Trailing controls** (a switch) centre on the title's first line; the title is
+    pushed down so the two share a centre.
+  - **A chevron sits right after its words** (one small gap), never at the row's far
+    edge; a link-style action's hover fill reaches 8 px past its words on each side.
+  - **Wrapping grows, never clips.** A button holding a wrapped label gets a
+    `Minimum` vertical size policy, so long translations push the card taller.
+  - **Measure the ink.** Widget bounds lie (glyphs have side bearings and empty
+    space in their box). Check a rendered grab, zoomed with guide lines, and keep a
+    test that measures the ink (`tests/test_output_rail.py::_assert_keylines`).
+    Within a pixel is aligned; 2+ px is a visible defect.
 
 The screen shows **what you can do**; the explaining happens on demand. Wherever it
 works, a short control plus a pop-up beats a long button or a paragraph on the page.
@@ -311,7 +342,10 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
    one light theme, and one long-word language (German) if text changed. Look at
    them before anyone else does: empty space, cut-off words, things the same colour
    as what's behind them.
-7. Tests: the new widget's flow, and that tooltips/accessible names exist on icon
+7. Icons and words aligned (section 4, *Icon and text alignment*): one icon column,
+   one text keyline for every line, icons on the first line's cap height? Check a
+   zoomed grab with guide lines.
+8. Tests: the new widget's flow, and that tooltips/accessible names exist on icon
    buttons.
 
 ## 11. Modern standards this follows (2025-2026)
@@ -324,6 +358,8 @@ The rules above are Onion Board's take on what the big design systems agree on n
 - **Nested rounding** (Fluent geometry): rounder outside, tighter inside; every
   surface of the same kind has the same radius.
 - **4 px spacing grid** (Fluent 2, Material 3): every gap and padding is a multiple of 4.
+  One exception: lining up with an existing keyline (the rail's icon column) beats
+  the grid, so an inset can be 11 px when that is what puts icons on one line.
 - **Shape and size show importance** (Material 3 Expressive): the one main action is
   bigger, filled and rounder; secondary actions are quiet icons.
 - **Progressive disclosure**: the common path is on screen, the rare one is a click
@@ -376,7 +412,10 @@ Fix these when a task touches them; don't sweep them all in one go.
    wheelguard and established card/choice widgets. If two screens need the same
    behaviour, extract a small shared helper instead of pasting another layout.
 4. **Review every affected state.** Render offscreen with the test fixtures and
-   `QT_QPA_FONTDIR` set to the system fonts. Inspect the complete page and each
+   `QT_QPA_FONTDIR` set to the system fonts. For MainWindow screenshots, switch
+   themes with `window.apply_theme(name)`: it refreshes registered icons as well
+   as the stylesheet; calling `theme.apply()` alone leaves stale icon colours.
+   Inspect the complete page and each
    menu, expanded card and dialog affected, including empty/populated and disabled/
    busy states where relevant. Use Dark/Light, narrow/normal sizes, and German when
    labels change; follow `AGENT-RULES.md` for full layout acceptance. Check focus,

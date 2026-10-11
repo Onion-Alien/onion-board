@@ -500,6 +500,16 @@ def test_a_hung_command_is_stopped(monkeypatch):
     assert dm._run(["net", "stop", "audiosrv", "/y"], timeout=1) == -1
 
 
+def test_a_tool_answering_in_another_code_page_is_read(monkeypatch):
+    """A German Windows tool's "ü" is byte 0x81 in its code page, which the default text
+    decoding can't read: that raised instead of returning the exit code."""
+    import sys
+    monkeypatch.setattr(dm, "_CREATE_NO_WINDOW", 0)
+    cmd = [sys.executable, "-c",
+           "import sys; sys.stdout.buffer.write(b'Ger\\x81t nicht gefunden'); sys.exit(3)"]
+    assert dm._run(cmd, timeout=30) == 3
+
+
 # ---------------------------------------------------------------------- the stream
 
 def test_stream_keeps_time_without_the_effect(ring_file):
@@ -1107,6 +1117,35 @@ def test_replace_mode_falls_back_to_the_mic_when_the_board_stops(ring_file):
     assert rms.min() > 0.1, np.round(rms[rms.argmin() - 4:rms.argmin() + 4], 3)   # no gap
 
 
+@needs_host
+@pytest.mark.parametrize("gap", [0.0, 0.005])
+@realtime
+def test_a_quick_reopen_keeps_the_board_on_the_mic(ring_file, gap):
+    """The stream closed and opened again at once (a buffering change reopens every
+    stream): the effect read on meanwhile, and the board, paced by the mic, never got
+    a lead ahead of it again. Its sounds stayed off the mic until the app restarted."""
+    board = Echo(gain=0.0, tone=0.4)   # the board sends only a tone
+    held = []
+
+    def during(s):
+        time.sleep(0.7)
+        s.close()
+        time.sleep(gap)
+        s2 = dm.DirectMicStream(board, ring_file, mic_callback=board.mic, mode=dm.MODE_REPLACE)
+        s2.start()
+        held.append(s2)
+
+    try:
+        (x,), _, _ = _run_host(ring_file, 48000, 1, 2.5, mic=0.3, mic_hz=-1, callback=board,
+                               mic_callback=board.mic, mode=dm.MODE_REPLACE, during=during)
+    finally:
+        for s in held:
+            s.close()
+    y = x[int(1.5 * 48000):int(2.4 * 48000), 0]
+    t = np.arange(len(y)) / 48000
+    assert 2 * abs(np.mean(y * np.exp(-2j * np.pi * 440 * t))) > 0.3   # the tone, not the mic
+
+
 def ramp(seconds):
     """A board whose send mix is a ramp from 0.1 to 0.45 over `seconds`: every ring
     frame has its own value, so a replayed stretch shows."""
@@ -1484,7 +1523,11 @@ def test_engine_add_mode_leaves_the_voice_to_the_effect(ring_file, monkeypatch):
             s.pump()
         assert np.abs(w.data[:w.write_pos]).max() < 1e-6   # no voice in the ring
         assert abs(w.h[0]["mic_gain"] - 0.7) < 1e-6        # the effect keeps it, at 70%
-        e.sending = False
+        e.sending = False   # "Others hear" off: your plain voice still goes (mic_only)...
+        _publish(w, np.full((480, 2), 0.2, np.float32))
+        s.pump()
+        assert abs(w.h[0]["mic_gain"] - 0.7) < 1e-6
+        e.mic_enabled = False   # ...unless it isn't sent
         _publish(w, np.full((480, 2), 0.2, np.float32))
         s.pump()
         assert w.h[0]["mic_gain"] == 0.0
