@@ -3112,5 +3112,15 @@
   "Your sounds and settings are kept.": "Lydene og innstillingene dine beholdes.",
   "{error}": "{error}",
   "Update mic effect": "Oppdater mikrofoneffekt",
-  "Update to new version": "Oppdater til ny versjon"
+  "Update to new version": "Oppdater til ny versjon",
+  "Keep": "Behold",
+  "Keep your imported sounds?": "Beholde de importerte lydene?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Vi hentet <b>{n}</b> lyd fra de andre soundboardene dine. Vil du beholde den?",
+    "Vi hentet <b>{n}</b> lyder fra de andre soundboardene dine. Vil du beholde dem?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Vi hentet <b>{n}</b> lyd fra {name}. Vil du beholde den?",
+    "Vi hentet <b>{n}</b> lyder fra {name}. Vil du beholde dem?"
+  ]
 }

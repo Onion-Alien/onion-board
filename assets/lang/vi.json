@@ -3041,5 +3041,13 @@
   "Your sounds and settings are kept.": "Âm thanh và cài đặt của bạn vẫn được giữ lại.",
   "{error}": "{error}",
   "Update mic effect": "Cập nhật hiệu ứng mic",
-  "Update to new version": "Cập nhật lên bản mới"
+  "Update to new version": "Cập nhật lên bản mới",
+  "Keep": "Giữ lại",
+  "Keep your imported sounds?": "Giữ lại âm thanh đã nhập?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Đã chuyển <b>{n}</b> âm thanh từ các soundboard khác của bạn. Giữ lại không?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Đã chuyển <b>{n}</b> âm thanh từ {name}. Giữ lại không?"
+  ]
 }

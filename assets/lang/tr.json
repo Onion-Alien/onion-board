@@ -3112,5 +3112,15 @@
   "Your sounds and settings are kept.": "Seslerin ve ayarların korunur.",
   "{error}": "{error}",
   "Update mic effect": "Mikrofon efektini güncelle",
-  "Update to new version": "Yeni sürüme güncelle"
+  "Update to new version": "Yeni sürüme güncelle",
+  "Keep": "Sakla",
+  "Keep your imported sounds?": "İçe aktarılan sesler kalsın mı?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Diğer ses panolarından <b>{n}</b> ses getirdik. Kalsın mı?",
+    "Diğer ses panolarından <b>{n}</b> ses getirdik. Kalsınlar mı?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsın mı?",
+    "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsınlar mı?"
+  ]
 }

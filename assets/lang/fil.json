@@ -3112,5 +3112,15 @@
   "Your sounds and settings are kept.": "Mananatili ang mga tunog at setting mo.",
   "{error}": "{error}",
   "Update mic effect": "I-update ang mic effect",
-  "Update to new version": "I-update sa bagong bersyon"
+  "Update to new version": "I-update sa bagong bersyon",
+  "Keep": "Itago",
+  "Keep your imported sounds?": "Itatago ba ang mga na-import na tunog?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Inilipat namin ang <b>{n}</b> tunog mula sa iba mong soundboard. Itatago ba?",
+    "Inilipat namin ang <b>{n}</b> tunog mula sa iba mong soundboard. Itatago ba?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Inilipat namin ang <b>{n}</b> tunog mula sa {name}. Itatago ba?",
+    "Inilipat namin ang <b>{n}</b> tunog mula sa {name}. Itatago ba?"
+  ]
 }

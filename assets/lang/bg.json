@@ -3112,5 +3112,15 @@
   "Your sounds and settings are kept.": "Звуците и настройките ти се запазват.",
   "{error}": "{error}",
   "Update mic effect": "Обнови ефекта",
-  "Update to new version": "Обнови до новата версия"
+  "Update to new version": "Обнови до новата версия",
+  "Keep": "Запази",
+  "Keep your imported sounds?": "Да запазя ли внесените звуци?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Пренесохме <b>{n}</b> звук от другите ти саундбордове. Да го запазя ли?",
+    "Пренесохме <b>{n}</b> звука от другите ти саундбордове. Да ги запазя ли?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Пренесохме <b>{n}</b> звук от {name}. Да го запазя ли?",
+    "Пренесохме <b>{n}</b> звука от {name}. Да ги запазя ли?"
+  ]
 }

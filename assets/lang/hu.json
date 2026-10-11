@@ -3112,5 +3112,15 @@
   "Your sounds and settings are kept.": "A hangjaid és beállításaid megmaradnak.",
   "{error}": "{error}",
   "Update mic effect": "Mikrofoneffekt frissítése",
-  "Update to new version": "Frissítés az új verzióra"
+  "Update to new version": "Frissítés az új verzióra",
+  "Keep": "Megtartás",
+  "Keep your imported sounds?": "Megtartod az importált hangokat?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod?",
+    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod őket?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod?",
+    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod őket?"
+  ]
 }

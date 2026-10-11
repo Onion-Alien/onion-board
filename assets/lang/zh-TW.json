@@ -3041,5 +3041,13 @@
   "Your sounds and settings are kept.": "你的聲音和設定會保留。",
   "{error}": "{error}",
   "Update mic effect": "更新麥克風效果",
-  "Update to new version": "更新至新版本"
+  "Update to new version": "更新至新版本",
+  "Keep": "保留",
+  "Keep your imported sounds?": "要保留匯入的音效嗎？",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "已從你的其他音效板匯入 <b>{n}</b> 個音效。要保留嗎？"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "已從 {name} 匯入 <b>{n}</b> 個音效。要保留嗎？"
+  ]
 }

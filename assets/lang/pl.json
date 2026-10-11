@@ -3183,5 +3183,17 @@
   "Your sounds and settings are kept.": "Twoje dźwięki i ustawienia zostaną zachowane.",
   "{error}": "{error}",
   "Update mic effect": "Zaktualizuj efekt mikrofonu",
-  "Update to new version": "Zaktualizuj do nowej wersji"
+  "Update to new version": "Zaktualizuj do nowej wersji",
+  "Keep": "Zachowaj",
+  "Keep your imported sounds?": "Zachować zaimportowane dźwięki?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?"
+  ]
 }
