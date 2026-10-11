@@ -22,7 +22,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import net, netlog, quality, sourceinfo, theme, thumbs, videos, ytdl
+from soundboard import net, netlog, quality, sourceinfo, theme, thumbs, usage, videos, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
                                 site_folder, to_int16)
 from soundboard.ui import busy
@@ -80,6 +80,8 @@ class LinkBar(QFrame):
         # the link, like _got: a 15-minute song is ~170 MB
         self._kept = None
         self._queued = ""             # "add" / "play" asked for while another download ran
+        self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
+        self._dups: set[str] = set()     # urls refused as already in the library
         self._msg.connect(self._on_msg)
         self._shown = False           # the line says something wrong (_say)
 
@@ -121,6 +123,8 @@ class LinkBar(QFrame):
         self.title = ""
         self._queued = ""
         self._blocked = ""
+        if url:
+            self._via[url] = "link"
         self._drop_download()
         self._say("")
         if url and not ytdl.site_allowed(url):   # switched off in Settings > Privacy
@@ -130,6 +134,7 @@ class LinkBar(QFrame):
 
     def open(self, url: str, title: str, secs: float = 0.0):
         """A video picked from the YouTube search: already looked up, so no probe."""
+        self._via.setdefault(url, "search")   # a pasted link's own card stays "link"
         if url != self.url:
             if self._queued:   # a pick waiting its turn is replaced: its row stops waiting
                 self.done.emit(self.url, self._queued, False)
@@ -226,6 +231,7 @@ class LinkBar(QFrame):
                                  "seconds": self._secs})
         self.queue_updated.emit(list(self._queue_list))
         self.queued.emit(self.url, kind)
+        usage.used("dl-queue")
         name = html.escape(self.title or self._host())
         self._say(_("<b>{name}</b> is next: waiting for the download before it to finish…",
                     name=name))
@@ -346,6 +352,7 @@ class LinkBar(QFrame):
                 return
             fp = fingerprint(str(path))
             if fp and fp in known:
+                emit("dup", url, None)   # counted apart from a failed download
                 raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
                                            name=known[fp]))
             # named after the video, in a folder for the site: YouTube/<title>.flac
@@ -396,7 +403,7 @@ class LinkBar(QFrame):
 
     def _on_msg(self, kind: str, url: str, payload, job=None):
         if job in self._dropped:   # a cancelled download, still sending: not the running one
-            if kind in ("progress", "title"):
+            if kind in ("progress", "title", "dup"):
                 return
             self._dropped.discard(job)
             if kind == "play":
@@ -404,6 +411,7 @@ class LinkBar(QFrame):
             elif kind == "added":   # cancelled too late: it's in the library already
                 meta, data, title, _saved = payload
                 meta.name = (title or meta.name)[:40].strip()
+                self._count(url, "add", True)
                 self.sound_ready.emit(meta, data)
                 busy.toast(self.window(), _("✓ Added <b>{name}</b> to your Sounds.",
                                             name=html.escape(meta.name)), "ok")
@@ -418,6 +426,9 @@ class LinkBar(QFrame):
         if kind == "progress":
             self.progress.emit(url, payload)   # the card's bar and button show it
             return
+        if kind == "dup":
+            self._dups.add(url)
+            return
         # the download finished one way or another
         was, self._busy = self._busy, ""
         self._busy_url = ""
@@ -430,6 +441,10 @@ class LinkBar(QFrame):
             self._added = url
             self._added_id = payload[0].id
         self._buttons()
+        if kind in ("added", "play"):
+            self._count(url, "add" if kind == "added" else "play", True)
+        elif kind == "error":
+            self._count(url, was or "add", False)
         if kind == "added":
             meta, data, title, saved = payload
             if current:   # one for a link no longer showing would never be played
@@ -464,6 +479,14 @@ class LinkBar(QFrame):
                 queued, self._queued = self._queued, ""
                 self.done.emit(url, queued, False)
         self._next()
+
+    def _count(self, url: str, kind: str, ok: bool):
+        """For the usage count: the site's name and how it was picked, never the link."""
+        if url in self._dups:
+            self._dups.discard(url)
+            usage.used("dl-already-have")
+            return
+        usage.downloaded(self.cfg, url, self._via.get(url, "link"), kind, ok)
 
     def _next(self):
         """The download finished or was cancelled: start what's waiting. The same

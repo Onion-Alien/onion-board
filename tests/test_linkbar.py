@@ -207,3 +207,21 @@ def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
     bar.cancel(f"{OTHER}1")           # a waiting pick: its row is told it was a Play
     assert done == [(f"{OTHER}1", "play", False)]
     assert [q["url"] for q in bar._queue_list] == [f"{OTHER}0", f"{OTHER}2"]
+
+
+def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatch):
+    from soundboard import usage
+    calls = []
+    monkeypatch.setattr(usage, "downloaded", lambda cfg, *a: calls.append(a))
+    monkeypatch.setattr(usage, "_used", set())
+    bar, eng = _bar()                          # a pasted link
+    bar._busy, bar._busy_url = "play", URL
+    bar._on_msg("play", URL, ("x.wav", np.zeros(4, np.int16), 1.0))
+    bar.open(OTHER, "Other", 3.0)              # a web search pick
+    bar._busy, bar._busy_url = "add", OTHER
+    bar._on_msg("error", OTHER, "Couldn't download it")
+    assert calls == [(URL, "link", "play", True), (OTHER, "search", "add", False)]
+    bar._busy, bar._busy_url = "add", OTHER    # already in the library: not a failure
+    bar._on_msg("dup", OTHER, None)
+    bar._on_msg("error", OTHER, "It's already in your Sounds")
+    assert len(calls) == 2 and "dl-already-have" in usage._used
