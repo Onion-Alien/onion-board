@@ -133,3 +133,9 @@ def test_foreground_monitor_info_shape():
     if rect is not None:
         assert rect[2] > 0 and rect[3] > 0
     assert wk.foreground_monitor() == name
+
+
+@pytest.mark.parametrize("combo, out", [("f12", True), ("F12", True), ("alt+f12", False),
+                                        ("f11", False), ("", False)])
+def test_bare_f12_is_windows_own(combo, out):
+    assert wk.reserved(combo) is out
