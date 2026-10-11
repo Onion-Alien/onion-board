@@ -97,9 +97,9 @@ def test_toast_shows_on_the_window_then_hides(qapp):
     t = w.findChild(busy._Toast)
     assert t is not None and t.isVisibleTo(w) and "Added 3" in t.text()
     assert t.y() + t.height() <= w.height() and t.property("tone") == "ok"
-    busy.toast(w, "again", ms=50)               # reuses the one pill
+    busy.toast(w, "✓ Added 3 sounds", "ok", ms=50)   # the same again: counted, not a 2nd card
     assert len(w.findChildren(busy._Toast)) == 1
-    process_events(qapp, lambda: not t.isVisibleTo(w))
+    process_events(qapp, lambda: not w.findChildren(busy._Toast))   # gone, then deleted
 
 
 def test_toast_keeps_all_its_lines_when_the_window_shrinks_under_it(qapp):
@@ -113,13 +113,14 @@ def test_toast_keeps_all_its_lines_when_the_window_shrinks_under_it(qapp):
                "sounds: click Yes when Windows asks.", ms=5000)
     t = w.findChild(busy._Toast)
     one_line = t.height()
-    # 200 high, not 120: on CI's fonts the wrapped notice is taller than 120 (it fit here)
-    for size in ((260, 200), (300, 400), (1280, 800)):
+    # 300 x 260: the corner card (icon, padding, ✕) wraps a long notice taller than the
+    # old pill did; smaller still, a long notice can't fit in any shape
+    for size in ((300, 260), (300, 400), (1280, 800)):
         w.resize(*size)
         qapp.processEvents()
         assert t.height() >= t.heightForWidth(t.width()), size
         assert 0 <= t.y() and t.y() + t.height() <= w.height(), size
-    w.resize(260, 200)
+    w.resize(300, 260)
     qapp.processEvents()
     assert t.height() > one_line
     w.close()

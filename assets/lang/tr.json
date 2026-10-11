@@ -405,7 +405,6 @@
   "Show “{category}” when a program is in front": "Bir program öndeyken “{category}” kategorisini göster",
   "Skip this version": "Bu sürümü atla",
   "Solo: stops every other sound first": "Tek başına: önce diğer tüm sesleri durdurur",
-  "Some files weren't added": "Bazı dosyalar eklenmedi",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Bazı oyunlar sadece Windows'un ana mikrofonunu kullanır. Bir ses penceresi açıldı:\n\n1.  {vm} öğesine sağ tıkla  →  Varsayılan Cihaz Olarak Ayarla\n2.  Tekrar sağ tıkla  →  Varsayılan İletişim Cihazı Olarak Ayarla\n     (birçok oyunda sesli sohbet Windows'tan bunu ister)\n3.  Oyunu yeniden başlat.\n\nDikkat: sesle yazma da artık seslerini duyar.\nGeri almak için aynısını normal mikrofonunda yap.",
   "Some sounds weren't imported": "Bazı sesler içe aktarılmadı",
   "Sorry, Onion Board couldn't start.": "Üzgünüz, Onion Board başlatılamadı.",
@@ -3064,5 +3063,39 @@
   "Onion Board on GitHub": "GitHub'da Onion Board",
   "A download is still running. If you close now, it's lost. Close anyway?": "Bir indirme hâlâ sürüyor. Şimdi kapatırsan kaybolur. Yine de kapatılsın mı?",
   "Download running": "İndirme sürüyor",
-  "Your sounds are back on your mic.": "Seslerin yine mikrofonunda."
+  "Your sounds are back on your mic.": "Seslerin yine mikrofonunda.",
+  "Added {n} sound": [
+    "{n} ses eklendi",
+    "{n} ses eklendi"
+  ],
+  "Adding {done} of {total}…": "{total} sesten {done} ekleniyor…",
+  "Already in your library": "Zaten kitaplığınızda",
+  "Couldn't add {n} file": [
+    "{n} dosya eklenemedi",
+    "{n} dosya eklenemedi"
+  ],
+  "Couldn't be opened": "Açılamadı",
+  "Drop files": "Dosyaları bırakın",
+  "Drop to add sounds": "Ses eklemek için bırakın",
+  "Drop to add {n} file": [
+    "{n} dosya eklemek için bırakın",
+    "{n} dosya eklemek için bırakın"
+  ],
+  "Files not added": "Eklenmeyen dosyalar",
+  "Not a sound we can play": "Çalabileceğimiz bir ses değil",
+  "See why": "Nedenini gör",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} dosya eklenmedi",
+    "{n} dosya eklenmedi"
+  ],
+  "{n} skipped": [
+    "{n} atlandı",
+    "{n} atlandı"
+  ],
+  "That sound is already in your library": "Bu ses zaten kitaplığınızda",
+  "{n} sound is already in your library": [
+    "{n} ses zaten kitaplığınızda",
+    "{n} ses zaten kitaplığınızda"
+  ]
 }

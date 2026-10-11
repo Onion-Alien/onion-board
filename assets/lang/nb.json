@@ -1071,7 +1071,6 @@
   "Slow or patchy connection": "Treg eller ustabil tilkobling",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: stopper alle andre lyder først",
-  "Some files weren't added": "Noen filer ble ikke lagt til",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Noen spill bruker bare hovedmikrofonen i Windows. Et lydvindu åpnet seg nå:\n\n1.  Høyreklikk  {vm}  →  Angi som standardenhet\n2.  Høyreklikk den igjen  →  Angi som standard kommunikasjonsenhet\n     (talechat i mange spill spør Windows om den)\n3.  Start spillet på nytt.\n\nObs: taleskriving vil da også høre lydene dine.\nFor å angre, gjør det samme på den vanlige mikrofonen din.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Noe av Nylig slettet kunne ikke hentes tilbake: det beholdes i dette gjenopprettingspunktet.",
   "Some sounds weren't imported": "Noen lyder ble ikke importert",
@@ -3064,5 +3063,39 @@
   "Onion Board on GitHub": "Onion Board på GitHub",
   "A download is still running. If you close now, it's lost. Close anyway?": "En nedlasting pågår fortsatt. Hvis du lukker nå, går den tapt. Lukke likevel?",
   "Download running": "Nedlasting pågår",
-  "Your sounds are back on your mic.": "Lydene dine er tilbake på mikrofonen din."
+  "Your sounds are back on your mic.": "Lydene dine er tilbake på mikrofonen din.",
+  "Added {n} sound": [
+    "{n} lyd lagt til",
+    "{n} lyder lagt til"
+  ],
+  "Adding {done} of {total}…": "Legger til {done} av {total}…",
+  "Already in your library": "Allerede i biblioteket ditt",
+  "Couldn't add {n} file": [
+    "Kunne ikke legge til {n} fil",
+    "Kunne ikke legge til {n} filer"
+  ],
+  "Couldn't be opened": "Kunne ikke åpnes",
+  "Drop files": "Slipp filer",
+  "Drop to add sounds": "Slipp for å legge til lyder",
+  "Drop to add {n} file": [
+    "Slipp for å legge til {n} fil",
+    "Slipp for å legge til {n} filer"
+  ],
+  "Files not added": "Filer ikke lagt til",
+  "Not a sound we can play": "Ikke en lyd vi kan spille av",
+  "See why": "Se hvorfor",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fil ble ikke lagt til",
+    "{n} filer ble ikke lagt til"
+  ],
+  "{n} skipped": [
+    "{n} hoppet over",
+    "{n} hoppet over"
+  ],
+  "That sound is already in your library": "Den lyden er allerede i biblioteket ditt",
+  "{n} sound is already in your library": [
+    "{n} lyder er allerede i biblioteket ditt",
+    "{n} lyder er allerede i biblioteket ditt"
+  ]
 }

@@ -405,7 +405,6 @@
   "Show “{category}” when a program is in front": "Mostrar “{category}” cuando un programa esté delante",
   "Skip this version": "Saltar esta versión",
   "Solo: stops every other sound first": "Solo: para todos los demás sonidos primero",
-  "Some files weren't added": "Algunos archivos no se añadieron",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Algunos juegos usan sin más el micro principal de Windows. Se acaba de abrir una ventana de sonido:\n\n1.  Clic derecho en  {vm}  →  Establecer como dispositivo predeterminado\n2.  Otra vez clic derecho  →  Establecer como dispositivo de comunicación predeterminado\n     (el chat de voz de muchos juegos le pide ese a Windows)\n3.  Reinicia el juego.\n\nOjo: el dictado por voz también oirá entonces tus sonidos.\nPara deshacerlo, haz lo mismo con tu micro normal.",
   "Some sounds weren't imported": "Algunos sonidos no se importaron",
   "Sorry, Onion Board couldn't start.": "Lo sentimos: Onion Board no pudo arrancar.",
@@ -3064,5 +3063,39 @@
   "Onion Board on GitHub": "Onion Board en GitHub",
   "A download is still running. If you close now, it's lost. Close anyway?": "Todavía hay una descarga en curso. Si cierras ahora, se perderá. ¿Cerrar de todos modos?",
   "Download running": "Descarga en curso",
-  "Your sounds are back on your mic.": "Tus sonidos vuelven a estar en tu micrófono."
+  "Your sounds are back on your mic.": "Tus sonidos vuelven a estar en tu micrófono.",
+  "Added {n} sound": [
+    "{n} sonido añadido",
+    "{n} sonidos añadidos"
+  ],
+  "Adding {done} of {total}…": "Añadiendo {done} de {total}…",
+  "Already in your library": "Ya está en tu biblioteca",
+  "Couldn't add {n} file": [
+    "No se pudo añadir {n} archivo",
+    "No se pudieron añadir {n} archivos"
+  ],
+  "Couldn't be opened": "No se pudo abrir",
+  "Drop files": "Soltar archivos",
+  "Drop to add sounds": "Suelta para añadir sonidos",
+  "Drop to add {n} file": [
+    "Suelta para añadir {n} archivo",
+    "Suelta para añadir {n} archivos"
+  ],
+  "Files not added": "Archivos no añadidos",
+  "Not a sound we can play": "No es un sonido que podamos reproducir",
+  "See why": "Ver por qué",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} archivo no se añadió",
+    "{n} archivos no se añadieron"
+  ],
+  "{n} skipped": [
+    "{n} omitido",
+    "{n} omitidos"
+  ],
+  "That sound is already in your library": "Ese sonido ya está en tu biblioteca",
+  "{n} sound is already in your library": [
+    "{n} sonidos ya están en tu biblioteca",
+    "{n} sonidos ya están en tu biblioteca"
+  ]
 }

@@ -1071,7 +1071,6 @@
   "Slow or patchy connection": "Lassú vagy akadozó kapcsolat",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Szóló: előbb minden más hangot leállít",
-  "Some files weren't added": "Néhány fájl nem lett hozzáadva",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Néhány játék egyszerűen a Windows fő mikrofonját használja. Most megnyílt egy hangablak:\n\n1.  Jobb klikk  {vm}  →  Beállítás alapértelmezett eszközként\n2.  Jobb klikk rá újra  →  Beállítás alapértelmezett kommunikációs eszközként\n     (sok játék beszédchatje ezt kéri a Windowstól)\n3.  Indítsd újra a játékot.\n\nFigyelem: a hangalapú gépelés is hallani fogja a hangjaidat.\nVisszavonáshoz csináld ugyanezt a szokásos mikrofonodon.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "A Nemrég törölt egy részét nem sikerült visszahozni: ebben a visszaállítási pontban megmarad.",
   "Some sounds weren't imported": "Néhány hang nem lett importálva",
@@ -3064,5 +3063,39 @@
   "Onion Board on GitHub": "Az Onion Board a GitHubon",
   "A download is still running. If you close now, it's lost. Close anyway?": "Még fut egy letöltés. Ha most bezárod, elveszik. Mégis bezárod?",
   "Download running": "Letöltés folyamatban",
-  "Your sounds are back on your mic.": "A hangjaid ismét a mikrofonodon vannak."
+  "Your sounds are back on your mic.": "A hangjaid ismét a mikrofonodon vannak.",
+  "Added {n} sound": [
+    "{n} hang hozzáadva",
+    "{n} hang hozzáadva"
+  ],
+  "Adding {done} of {total}…": "{done}/{total} hozzáadása…",
+  "Already in your library": "Már a könyvtáradban van",
+  "Couldn't add {n} file": [
+    "{n} fájlt nem sikerült hozzáadni",
+    "{n} fájlt nem sikerült hozzáadni"
+  ],
+  "Couldn't be opened": "Nem sikerült megnyitni",
+  "Drop files": "Fájlok elengedése",
+  "Drop to add sounds": "Engedd el a hangok hozzáadásához",
+  "Drop to add {n} file": [
+    "Engedd el {n} fájl hozzáadásához",
+    "Engedd el {n} fájl hozzáadásához"
+  ],
+  "Files not added": "Nem hozzáadott fájlok",
+  "Not a sound we can play": "Nem lejátszható hang",
+  "See why": "Miért?",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fájl nem lett hozzáadva",
+    "{n} fájl nem lett hozzáadva"
+  ],
+  "{n} skipped": [
+    "{n} kihagyva",
+    "{n} kihagyva"
+  ],
+  "That sound is already in your library": "Ez a hang már a könyvtáradban van",
+  "{n} sound is already in your library": [
+    "{n} hang már a könyvtáradban van",
+    "{n} hang már a könyvtáradban van"
+  ]
 }

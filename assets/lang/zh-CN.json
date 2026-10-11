@@ -399,7 +399,6 @@
   "Show “{category}” when a program is in front": "程序在前台时显示“{category}”",
   "Skip this version": "跳过这个版本",
   "Solo: stops every other sound first": "独奏：先停止其他所有音效",
-  "Some files weren't added": "有些文件没有添加",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "有些游戏只用 Windows 的主麦克风。刚刚打开了一个声音窗口：\n\n1.  右键  {vm}  →  设置为默认设备\n2.  再右键一次  →  设置为默认通信设备\n     （很多游戏的语音聊天会向 Windows 要这个设备）\n3.  重启游戏。\n\n注意：这样语音输入也会听到你的音效。\n要撤销，在你的正常麦克风上做同样的操作。",
   "Some sounds weren't imported": "有些音效没有导入",
   "Sorry, Onion Board couldn't start.": "抱歉，Onion Board 无法启动。",
@@ -2999,5 +2998,33 @@
   "Onion Board on GitHub": "GitHub 上的 Onion Board",
   "A download is still running. If you close now, it's lost. Close anyway?": "仍有下载正在进行。现在关闭会丢失它。仍要关闭吗?",
   "Download running": "正在下载",
-  "Your sounds are back on your mic.": "你的声音已回到麦克风上。"
+  "Your sounds are back on your mic.": "你的声音已回到麦克风上。",
+  "Added {n} sound": [
+    "已添加 {n} 个声音"
+  ],
+  "Adding {done} of {total}…": "正在添加第 {done}/{total} 个…",
+  "Already in your library": "已在你的音效库里",
+  "Couldn't add {n} file": [
+    "无法添加 {n} 个文件"
+  ],
+  "Couldn't be opened": "无法打开",
+  "Drop files": "拖放文件",
+  "Drop to add sounds": "松开以添加声音",
+  "Drop to add {n} file": [
+    "松开以添加 {n} 个文件"
+  ],
+  "Files not added": "未添加的文件",
+  "Not a sound we can play": "不是我们能播放的声音",
+  "See why": "查看原因",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} 个文件未添加"
+  ],
+  "{n} skipped": [
+    "已跳过 {n} 个"
+  ],
+  "That sound is already in your library": "这个声音已在你的音效库里",
+  "{n} sound is already in your library": [
+    "{n} 个声音已在你的音效库里"
+  ]
 }

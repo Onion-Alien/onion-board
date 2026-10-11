@@ -618,8 +618,14 @@ QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#vsep { background:$border; border:none; }
-QLabel#toast { background:$panel; border:1px solid $border_hi;
-               border-radius:12px; padding:8px 14px; }
+QFrame#toast { background:$panel; border:1px solid $border_hi; border-radius:12px; }
+QFrame#toast QLabel { background:transparent; }
+QFrame#toast QPushButton#toastaction { background:transparent; border:none; color:$accent_hi;
+    font-weight:600; padding:4px 8px; border-radius:6px; }
+QFrame#toast QPushButton#toastaction:hover { background:$btn_hover; }
+QFrame#toast QPushButton#toastclose { background:transparent; border:none; border-radius:12px;
+    padding:0; }
+QFrame#toast QPushButton#toastclose:hover { background:$btn_hover; }
 QFrame#chip { background:$panel; border:1px solid transparent; border-radius:14px; }
 QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
