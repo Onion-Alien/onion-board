@@ -625,7 +625,8 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
 
 def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qapp):  # noqa: F811
     """The first card on every page lines up with the top of the search box, and Done
-    has the same gap above it as below and beside it."""
+    (the dialog's one action, now on the left) has the same gap above, below and to
+    its left, lining up with the search box."""
     d = SettingsDialog(window, "privacy")
     d.resize(1020, 680)
     d.show()
@@ -644,6 +645,7 @@ def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qa
                 and b.parent() is d)
     above = top(done) - (top(d.tabs) + d.tabs.height())
     below = d.height() - (top(done) + done.height())
-    right = d.width() - (done.mapTo(d, QPoint(0, 0)).x() + done.width())
-    assert above == below == right, (above, below, right)
+    left = done.mapTo(d, QPoint(0, 0)).x()
+    assert left == d.search_box.mapTo(d, QPoint(0, 0)).x()   # lined up with the content
+    assert above == below == left, (above, below, left)
     d.close()
