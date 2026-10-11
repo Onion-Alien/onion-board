@@ -2489,8 +2489,6 @@
   "Add the selected station to Favorites": "將所選電台加入收藏夾",
   "Add to Favorites": "加入收藏夾",
   "All countries": "所有國家",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "無法到達電台目錄 ( {error} )，按 ↻ 重試。",
-  "Can't reach the station directory, press ↻ to try again.": "無法存取電台目錄，按 ↻ 重試。",
   "Chill": "放鬆音樂",
   "Classical": "古典",
   "Clear filters": "清除過濾器",
@@ -2540,7 +2538,6 @@
   "Rock": "搖滾",
   "Save the last {n} seconds of the radio as a sound": "將收音機的最後{n}秒儲存為聲音",
   "Saved a {secs}s clip to your Sounds.": "已將{secs}秒剪輯儲存到您的聲音中。",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "搜尋失敗（ {error} ）。檢查您的連線並按 Enter 鍵重試。",
   "Search failed: press Enter to try again.": "搜尋失敗：按 Enter 鍵重試。",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "搜尋廣播電台、流派、國家或城市…（或點擊地圖上的點）",
   "Searching…": "正在尋找...",
@@ -2549,8 +2546,6 @@
   "Station list updated: {n} station.": [
     "電台清單已更新： {n}電台。"
   ],
-  "That station isn't working ({error}). Try another one.": "該站不工作（ {error} ）。嘗試另一個。",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "目前無法存取車站目錄。檢查您的連線並按 ↻。",
   "Trending": "流行趨勢",
   "Tuning in to {name}": "收聽{name}",
   "Tuning in to {name}…": "正在收聽{name} …",
@@ -2558,7 +2553,6 @@
   "Zoom out": "縮小",
   "headphones": "耳機",
   "mic": "麥克風",
-  "no answer": "沒有答案",
   "only you hear the radio: press “Send” below so others hear it too": "只有您能聽到廣播：按下面的“發送”，以便其他人也能聽到",
   "others hear it": "其他人聽到",
   "sending": "傳送",
@@ -3144,5 +3138,11 @@
   "From a link": "從連結",
   "Paste a link into the search box": "把連結貼到搜尋框",
   "Record a sound with your mic: Add, then Record.": "用麥克風錄製音效：新增 → 錄音。",
-  "Sound files": "音效檔案"
+  "Sound files": "音效檔案",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "連不上電台清單。檢查一下網路，或過一會兒再試試。",
+  "Press Enter to search again.": "按 Enter 重新搜尋。",
+  "Press ↻ to try again.": "按 ↻ 重試。",
+  "That station isn't on the air right now. Try another one.": "這個電台現在沒有在播。換一個試試。",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "電台現在掛了。不是你的問題：電台清單的伺服器故障了。過一會兒再試試。",
+  "This station points into your home network, so it isn't played.": "這個電台指向你的家用網路，所以不會播放。"
 }

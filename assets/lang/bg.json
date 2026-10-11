@@ -2493,7 +2493,6 @@
   "Rock": "Рок",
   "Save the last {n} seconds of the radio as a sound": "Запазете последните {n} секунди от радиото като звук",
   "Saved a {secs}s clip to your Sounds.": "Запазен клип от {secs} във вашите звуци.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Неуспешно търсене ( {error} ). Проверете връзката си и натиснете Enter, за да опитате отново.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Търсете радиостанции, жанрове, държави или градове... (или щракнете върху точка на картата)",
   "Searching…": "Търсене...",
   "Send the radio out to others, the way your sounds go (Setup tab). Off: only you hear it.": "Изпратете радиото на други хора, както звучат вашите звуци (раздел Настройка). Изключено: само вие го чувате.",
@@ -2502,8 +2501,6 @@
     "Актуализиран списък със станции: {n} станция.",
     "Актуализиран списък със станции: {n} станции."
   ],
-  "That station isn't working ({error}). Try another one.": "Тази станция не работи ( {error} ). Пробвай друг.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Директорията на станциите не може да бъде достигната в момента. Проверете връзката си и натиснете ↻.",
   "Trending": "Тенденция",
   "Tuning in to {name}": "Настройване на {name}",
   "Tuning in to {name}…": "Настройвам {name} ...",
@@ -2511,7 +2508,6 @@
   "Zoom out": "Намаляване",
   "headphones": "слушалки",
   "mic": "микрофон",
-  "no answer": "без отговор",
   "only you hear the radio: press “Send” below so others hear it too": "само вие чувате радиото: натиснете „Изпрати“ по-долу, за да го чуят и другите",
   "others hear it": "други го чуват",
   "sending": "изпращане",
@@ -2871,14 +2867,12 @@
   "Not sending: pick a device on the Setup tab": "Не се изпраща: изберете устройство от раздела Настройка",
   "<b style='color:{colour}'>One-time setup:</b> install the free virtual cable. It's what lets Discord and games hear your sounds. Without it, only you can hear them. Easier: set <b>Send my sounds to</b> to <b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick that device there.": "<b style='color:{colour}'>Еднократна настройка:</b> инсталирайте безплатния виртуален кабел. Това е, което позволява на Discord и игрите да чуват вашите звуци. Без него само вие можете да ги чуете. По-лесно: задайте <b>Изпращане на моите звуци до</b> към <b>Моят микрофон</b> (нищо за инсталиране). Voicemeeter, миксер или OBS? Изберете това устройство там.",
   "Record the radio. Click again to stop and the clip is added to your Sounds.": "Запишете радиото. Щракнете отново, за да спрете и клипът се добавя към вашите звуци.",
-  "Can't reach the station directory, press ↻ to try again.": "Не можете да достигнете до директорията на станциите, натиснете ↻, за да опитате отново.",
   "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
     "{n} популярна станция: щракнете върху точка на картата или потърсете. Щракнете върху станция, за да я пуснете.",
     "{n} популярни станции: щракнете върху точка на картата или потърсете. Щракнете върху станция, за да я пуснете."
   ],
   "Nothing playing: click a station": "Нищо не се възпроизвежда: щракнете върху станция",
   "Search failed: press Enter to try again.": "Търсенето е неуспешно: натиснете Enter, за да опитате отново.",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Не може да се достигне до директорията на станциите ( {error} ), натиснете ↻, за да опитате отново.",
   "Couldn't reach the station directory, showing the saved list.": "Не можа да се достигне до директорията на станциите, показваща запазения списък.",
   "Onion Board: quick setup": "Onion Board: бърза настройка",
   "Steam games: set your mic": "Steam игри: настройте своя микрофон",
@@ -3217,5 +3211,11 @@
   "From a link": "От линк",
   "Paste a link into the search box": "Постави линк в полето за търсене",
   "Record a sound with your mic: Add, then Record.": "Запиши звук с микрофона: Добави, после Запис.",
-  "Sound files": "Звукови файлове"
+  "Sound files": "Звукови файлове",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Списъкът с радиостанции не може да се достигне. Провери интернета си или опитай пак след малко.",
+  "Press Enter to search again.": "Натисни Enter, за да търсиш пак.",
+  "Press ↻ to try again.": "Натисни ↻, за да опиташ пак.",
+  "That station isn't on the air right now. Try another one.": "Тази станция не излъчва в момента. Пробвай друга.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Радиото не работи в момента. Не е от теб: сървърът със списъка станции не работи. Опитай пак след малко.",
+  "This station points into your home network, so it isn't played.": "Тази станция сочи към домашната ти мрежа, затова не се пуска."
 }

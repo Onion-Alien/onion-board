@@ -2595,8 +2595,6 @@
   "Add the selected station to Favorites": "Přidejte vybranou stanici do oblíbených",
   "Add to Favorites": "Přidat k oblíbeným",
   "All countries": "Všechny země",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Nelze se dostat do adresáře stanice ( {error} ), stiskněte ↻ a zkuste to znovu.",
-  "Can't reach the station directory, press ↻ to try again.": "Nelze se dostat do adresáře stanice, stiskněte ↻ a zkuste to znovu.",
   "Chill": "Pohodová hudba",
   "Classical": "Klasika",
   "Clear filters": "Vymazat filtry",
@@ -2646,7 +2644,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Uložte posledních {n} sekund rádia jako zvuk",
   "Saved a {secs}s clip to your Sounds.": "Do vašich zvuků byl uložen klip o {secs} s.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Vyhledávání se nezdařilo ( {error} ). Zkontrolujte připojení a stisknutím klávesy Enter to zkuste znovu.",
   "Search failed: press Enter to try again.": "Vyhledávání se nezdařilo: stisknutím klávesy Enter to zkuste znovu.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Vyhledejte rozhlasové stanice, žánry, země nebo města... (nebo klikněte na tečku na mapě)",
   "Searching…": "Vyhledávání…",
@@ -2657,8 +2654,6 @@
     "Aktualizovaný seznam stanic: {n} stanic.",
     "Aktualizovaný seznam stanic: {n} stanic."
   ],
-  "That station isn't working ({error}). Try another one.": "Tato stanice nefunguje ( {error} ). Zkuste jiný.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Adresář stanic není momentálně dostupný. Zkontrolujte připojení a stiskněte ↻.",
   "Trending": "Trendy",
   "Tuning in to {name}": "Ladím {name}",
   "Tuning in to {name}…": "Ladění na {name} …",
@@ -2666,7 +2661,6 @@
   "Zoom out": "Oddálit",
   "headphones": "sluchátka",
   "mic": "mic",
-  "no answer": "žádná odpověď",
   "only you hear the radio: press “Send” below so others hear it too": "rádio slyšíte pouze vy: stiskněte tlačítko „Odeslat“ níže, aby ho slyšeli i ostatní",
   "others hear it": "ostatní to slyší",
   "sending": "odesílání",
@@ -3290,5 +3284,11 @@
   "From a link": "Z odkazu",
   "Paste a link into the search box": "Vlož odkaz do vyhledávacího pole",
   "Record a sound with your mic: Add, then Record.": "Nahraj zvuk mikrofonem: Přidat, pak Nahrát.",
-  "Sound files": "Zvukové soubory"
+  "Sound files": "Zvukové soubory",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Seznam rádiových stanic není dostupný. Zkontroluj internet, nebo to zkus za chvíli znovu.",
+  "Press Enter to search again.": "Stiskni Enter a hledej znovu.",
+  "Press ↻ to try again.": "Stiskni ↻ a zkus to znovu.",
+  "That station isn't on the air right now. Try another one.": "Tahle stanice teď nevysílá. Zkus jinou.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Rádio teď nefunguje. Není to tebou: server se seznamem stanic nejede. Zkus to za chvíli znovu.",
+  "This station points into your home network, so it isn't played.": "Tahle stanice míří do tvé domácí sítě, takže se nepustí."
 }

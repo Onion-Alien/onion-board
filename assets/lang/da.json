@@ -2542,8 +2542,6 @@
   "Add the selected station to Favorites": "Tilføj den valgte station til Favoritter",
   "Add to Favorites": "Føj til favoritter",
   "All countries": "Alle lande",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Kan ikke nå stationsoversigten ( {error} ), tryk på ↻ for at prøve igen.",
-  "Can't reach the station directory, press ↻ to try again.": "Kan ikke nå stationsoversigten, tryk på ↻ for at prøve igen.",
   "Chill": "Chill-out musik",
   "Classical": "Klassisk",
   "Clear filters": "Ryd filtre",
@@ -2593,7 +2591,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Gem de sidste {n} sekunder af radioen som en lyd",
   "Saved a {secs}s clip to your Sounds.": "Gemte et {secs} s klip til dine lyde.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Søgning mislykkedes ( {error} ). Tjek din forbindelse, og tryk på Enter for at prøve igen.",
   "Search failed: press Enter to try again.": "Søgning mislykkedes: tryk på Enter for at prøve igen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Søg efter radiostationer, genrer, lande eller byer... (eller klik på en prik på kortet)",
   "Searching…": "Søger...",
@@ -2603,8 +2600,6 @@
     "Stationsliste opdateret: {n} station.",
     "Stationsliste opdateret: {n} stationer."
   ],
-  "That station isn't working ({error}). Try another one.": "Den station virker ikke ( {error} ). Prøv en anden.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Stationsoversigten kan ikke nås lige nu. Tjek din forbindelse, og tryk på ↻.",
   "Trending": "Trending",
   "Tuning in to {name}": "Stiller ind på {name}",
   "Tuning in to {name}…": "Stiller ind på {name} …",
@@ -2612,7 +2607,6 @@
   "Zoom out": "Zoom ud",
   "headphones": "høretelefoner",
   "mic": "mikrofon",
-  "no answer": "intet svar",
   "only you hear the radio: press “Send” below so others hear it too": "kun du hører radioen: tryk på \"Send\" nedenfor, så andre også hører den",
   "others hear it": "andre hører det",
   "sending": "afsendelse",
@@ -3217,5 +3211,11 @@
   "From a link": "Fra et link",
   "Paste a link into the search box": "Indsæt et link i søgefeltet",
   "Record a sound with your mic: Add, then Record.": "Optag en lyd med din mikrofon: Tilføj, derefter Optag.",
-  "Sound files": "Lydfiler"
+  "Sound files": "Lydfiler",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Kan ikke nå listen over radiostationer. Tjek dit internet, eller prøv igen om lidt.",
+  "Press Enter to search again.": "Tryk på Enter for at søge igen.",
+  "Press ↻ to try again.": "Tryk på ↻ for at prøve igen.",
+  "That station isn't on the air right now. Try another one.": "Den station sender ikke lige nu. Prøv en anden.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radioen er nede lige nu. Det er ikke dig: serveren med stationslisten virker ikke. Prøv igen om lidt.",
+  "This station points into your home network, so it isn't played.": "Denne station peger ind i dit hjemmenetværk, så den afspilles ikke."
 }

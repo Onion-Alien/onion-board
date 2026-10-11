@@ -2489,8 +2489,6 @@
   "Add the selected station to Favorites": "選択したステーションをお気に入りに追加します",
   "Add to Favorites": "お気に入りに追加",
   "All countries": "すべての国",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "ステーション ディレクトリにアクセスできません ( {error} )、↻ を押して再試行してください。",
-  "Can't reach the station directory, press ↻ to try again.": "ステーション ディレクトリにアクセスできません、↻ を押して再試行してください。",
   "Chill": "チルアウトミュージック",
   "Classical": "クラシック",
   "Clear filters": "フィルターをクリアする",
@@ -2540,7 +2538,6 @@
   "Rock": "ロック",
   "Save the last {n} seconds of the radio as a sound": "ラジオの最後の{n}秒をサウンドとして保存します",
   "Saved a {secs}s clip to your Sounds.": "{secs}個のクリップをサウンドに保存しました。",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "検索に失敗しました ( {error} )。接続を確認し、Enter キーを押して再試行してください。",
   "Search failed: press Enter to try again.": "検索に失敗しました：Enter を押して再試行してください。",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ラジオ局、ジャンル、国、都市を検索... (または地図上の点をクリック)",
   "Searching…": "検索中…",
@@ -2549,8 +2546,6 @@
   "Station list updated: {n} station.": [
     "ステーション リストが更新されました: {n}ステーション。"
   ],
-  "That station isn't working ({error}). Try another one.": "そのステーションは動作していません ( {error} )。別のものを試してください。",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "現在、駅ディレクトリにアクセスできません。接続を確認し、↻を押してください。",
   "Trending": "トレンド",
   "Tuning in to {name}": "{name}に注目しています",
   "Tuning in to {name}…": "{name}に注目しています…",
@@ -2558,7 +2553,6 @@
   "Zoom out": "ズームアウト",
   "headphones": "ヘッドフォン",
   "mic": "マイク",
-  "no answer": "答えはありません",
   "only you hear the radio: press “Send” below so others hear it too": "あなただけにラジオが聞こえます: 下の「送信」を押すと他の人にもラジオが聞こえます",
   "others hear it": "他の人がそれを聞く",
   "sending": "送信する",
@@ -3144,5 +3138,11 @@
   "From a link": "リンクから",
   "Paste a link into the search box": "検索ボックスにリンクを貼り付けてください",
   "Record a sound with your mic: Add, then Record.": "マイクでサウンドを録音：追加 → 録音。",
-  "Sound files": "サウンドファイル"
+  "Sound files": "サウンドファイル",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "ラジオ局リストにつながりません。インターネットを確認するか、少ししてからもう一度お試しください。",
+  "Press Enter to search again.": "Enter を押してもう一度検索します。",
+  "Press ↻ to try again.": "↻ を押してもう一度お試しください。",
+  "That station isn't on the air right now. Try another one.": "その局は今放送していません。別の局を試してください。",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "ラジオは今ダウンしています。あなたのせいではありません：局リストのサーバーが動いていません。少ししてからもう一度お試しください。",
+  "This station points into your home network, so it isn't played.": "この局はホームネットワーク内を指しているため、再生しません。"
 }

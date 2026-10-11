@@ -2489,8 +2489,6 @@
   "Add the selected station to Favorites": "Tambahkan stasiun yang dipilih ke Favorit",
   "Add to Favorites": "Tambahkan ke Favorit",
   "All countries": "Semua negara",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Tidak dapat menjangkau direktori stasiun ( {error} ), tekan ↻ untuk mencoba lagi.",
-  "Can't reach the station directory, press ↻ to try again.": "Tidak dapat menjangkau direktori stasiun, tekan ↻ untuk mencoba lagi.",
   "Chill": "Musik santai",
   "Classical": "Klasik",
   "Clear filters": "Hapus filter",
@@ -2540,7 +2538,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Simpan {n} detik terakhir radio sebagai suara",
   "Saved a {secs}s clip to your Sounds.": "Menyimpan klip {secs} ke Suara Anda.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Pencarian gagal ( {error} ). Periksa koneksi Anda dan tekan Enter untuk mencoba lagi.",
   "Search failed: press Enter to try again.": "Pencarian gagal: tekan Enter untuk mencoba lagi.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Cari stasiun radio, genre, negara atau kota… (atau klik satu titik di peta)",
   "Searching…": "Mencari…",
@@ -2549,8 +2546,6 @@
   "Station list updated: {n} station.": [
     "Daftar stasiun diperbarui: {n} stasiun."
   ],
-  "That station isn't working ({error}). Try another one.": "Stasiun itu tidak berfungsi ( {error} ). Coba yang lain.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Direktori stasiun tidak dapat dijangkau saat ini. Periksa koneksi Anda dan tekan ↻.",
   "Trending": "Sedang tren",
   "Tuning in to {name}": "Menyimak {name}",
   "Tuning in to {name}…": "Menyimak {name} …",
@@ -2558,7 +2553,6 @@
   "Zoom out": "Perkecil",
   "headphones": "headphone",
   "mic": "mikrofon",
-  "no answer": "tidak ada jawaban",
   "only you hear the radio: press “Send” below so others hear it too": "hanya Anda yang mendengar radio: tekan “Kirim” di bawah agar orang lain juga mendengarnya",
   "others hear it": "orang lain mendengarnya",
   "sending": "mengirim",
@@ -3144,5 +3138,11 @@
   "From a link": "Dari tautan",
   "Paste a link into the search box": "Tempel tautan di kotak pencarian",
   "Record a sound with your mic: Add, then Record.": "Rekam suara dengan mikmu: Tambah, lalu Rekam.",
-  "Sound files": "File suara"
+  "Sound files": "File suara",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Tidak bisa menjangkau daftar stasiun radio. Periksa internetmu, atau coba lagi sebentar lagi.",
+  "Press Enter to search again.": "Tekan Enter untuk mencari lagi.",
+  "Press ↻ to try again.": "Tekan ↻ untuk mencoba lagi.",
+  "That station isn't on the air right now. Try another one.": "Stasiun itu sedang tidak mengudara. Coba yang lain.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio sedang mati sekarang. Bukan salahmu: server daftar stasiunnya tidak jalan. Coba lagi sebentar lagi.",
+  "This station points into your home network, so it isn't played.": "Stasiun ini mengarah ke jaringan rumahmu, jadi tidak diputar."
 }

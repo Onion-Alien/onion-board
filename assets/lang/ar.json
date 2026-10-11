@@ -2754,8 +2754,6 @@
   "Add the selected station to Favorites": "أضف المحطة المحددة إلى المفضلة",
   "Add to Favorites": "أضف إلى المفضلة",
   "All countries": "جميع البلدان",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "لا يمكن الوصول إلى دليل المحطة ( {error} ), اضغط على ↻ للمحاولة مرة أخرى.",
-  "Can't reach the station directory, press ↻ to try again.": "لا يمكن الوصول إلى دليل المحطة, اضغط على ↻ للمحاولة مرة أخرى.",
   "Chill": "موسيقى هادئة",
   "Classical": "كلاسيكية",
   "Clear filters": "مسح المرشحات",
@@ -2805,7 +2803,6 @@
   "Rock": "روك",
   "Save the last {n} seconds of the radio as a sound": "احفظ آخر {n} ثانية من الراديو كصوت",
   "Saved a {secs}s clip to your Sounds.": "تم حفظ مقطع {secs} s في الأصوات الخاصة بك.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "فشل البحث ( {error} ). تحقق من اتصالك واضغط على Enter للمحاولة مرة أخرى.",
   "Search failed: press Enter to try again.": "فشل البحث: اضغط على Enter للمحاولة مرة أخرى.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ابحث عن محطات الراديو أو الأنواع أو البلدان أو المدن... (أو انقر على نقطة على الخريطة)",
   "Searching…": "البحث…",
@@ -2819,8 +2816,6 @@
     "تم تحديث قائمة المحطات: {n} محطة.",
     "تم تحديث قائمة المحطات: {n} محطة."
   ],
-  "That station isn't working ({error}). Try another one.": "هذه المحطة لا تعمل ( {error} ). حاول واحدة أخرى.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "لا يمكن الوصول إلى دليل المحطة الآن. تحقق من اتصالك واضغط على ↻.",
   "Trending": "تتجه",
   "Tuning in to {name}": "ضبط على {name}",
   "Tuning in to {name}…": "ضبط على {name} ...",
@@ -2828,7 +2823,6 @@
   "Zoom out": "تصغير",
   "headphones": "سماعات الرأس",
   "mic": "ميكروفون",
-  "no answer": "لا إجابة",
   "only you hear the radio: press “Send” below so others hear it too": "أنت فقط من يسمع الراديو: اضغط على \"إرسال\" أدناه حتى يسمعه الآخرون أيضًا",
   "others hear it": "يسمعه الآخرون",
   "sending": "إرسال",
@@ -3509,5 +3503,11 @@
   "From a link": "من رابط",
   "Paste a link into the search box": "الصق رابطًا في مربع البحث",
   "Record a sound with your mic: Add, then Record.": "سجّل صوتًا بالميكروفون: إضافة، ثم تسجيل.",
-  "Sound files": "ملفات صوتية"
+  "Sound files": "ملفات صوتية",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "تعذر الوصول إلى قائمة محطات الراديو. تحقق من اتصالك بالإنترنت، أو حاول مرة أخرى بعد قليل.",
+  "Press Enter to search again.": "اضغط Enter للبحث مرة أخرى.",
+  "Press ↻ to try again.": "اضغط ↻ للمحاولة مرة أخرى.",
+  "That station isn't on the air right now. Try another one.": "هذه المحطة لا تبث الآن. جرّب محطة أخرى.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "الراديو متوقف الآن. المشكلة ليست عندك: خادم قائمة المحطات لا يعمل. حاول مرة أخرى بعد قليل.",
+  "This station points into your home network, so it isn't played.": "هذه المحطة تشير إلى شبكتك المنزلية، لذلك لا يتم تشغيلها."
 }

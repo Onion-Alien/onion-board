@@ -1,0 +1,2 @@
+- **Radio tab: plain words when something's wrong.** When the station list's server is down it now says so (*it's not you*), with a sad Bun on the map; offline says check your internet; a station that won't play says it isn't on the air. No more error text with the whole web address in it, and each reason shows once.
+- Tests no longer leave download folders in the real temp folder.

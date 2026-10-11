@@ -912,7 +912,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.dir.outlines_ready.connect(self._on_outlines)
         self.dir.load_outlines()
         if self._globe_error:
-            self.flat.show_message(self._no_stations_text())
+            self.flat.show_message(self._globe_error)   # sad Bun on the map says why
+            self._show_list()                           # ... so the list needn't
+            self._refresh_info()
         self._push_globe(force=True)
         self._select_on_globe(fly=False)
 
@@ -1005,18 +1007,19 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if kind == "globe":
             self._reloading = False
             busy.set_busy(self.btn_refresh, False)
-            self._map("show_message", _("The station directory can't be reached right "
-                                        "now. Check your connection and press ↻."))
-            # stays up (list and info line) until a reload gets through
-            self._globe_error = msg or _("no answer")
+            # plain words from radio (directory_down / _unreachable / a switch's reason);
+            # sad Bun says them on the map, and they stay up (list and info line)
+            # until a reload gets through
+            self._globe_error = msg or radio.directory_unreachable()
+            self._map("show_message", self._globe_error)
             self._flash_until = 0.0
             self._show_list()
             self._refresh_info()
         elif self._query:
             self._results, self._search_failed = [], True
             self._show_list()
-            self._say(_("Search failed ({error}). Check your connection and press Enter to "
-                        "try again.", error=msg), "error")
+            self._say((msg or radio.directory_unreachable()) + " "
+                      + _("Press Enter to search again."), "error")
 
     def _on_text(self, text: str):
         self._query = " ".join(text.split())
@@ -1338,8 +1341,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_error(self, msg: str):
         self._restate_rows()
-        self._say(_("That station isn't working ({error}). Try another one.", error=msg),
-                  "error")
+        # the player's own plain words (radio.station_off_air, a switch's reason)
+        self._say(msg or radio.station_off_air(), "error")
         self._select_on_globe(fly=False)
 
     def _on_now_playing(self, title: str):
@@ -1372,9 +1375,15 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.btn_fav.setEnabled(s is not None)
 
     def _no_stations_text(self) -> str:
-        if self._globe_error:
-            return _("Can't reach the station directory, press ↻ to try again.")
+        if self._globe_error:   # said once: by sad Bun on the map when it's showing
+            return "" if self._map_says_it() else (self._globe_error + " "
+                                                   + _("Press ↻ to try again."))
         return _("Finding stations…") if self._started else ""
+
+    def _map_says_it(self) -> bool:
+        """The map is showing why there are no stations (sad Bun's card)."""
+        return (self.flat is not None and bool(self.flat._msg)
+                and self.flat.isVisibleTo(self))
 
     def _say(self, text: str, kind: str):
         """A result or a problem as a corner card; the info line goes back to what's
@@ -1400,9 +1409,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                     self._no_stations_text())
             if not n and self._globe_error:
                 red = theme.status("error")
-                text = (f"<span style='color:{red}'>"
-                        + _("Can't reach the station directory ({error}), press ↻ to try "
-                            "again.", error=html.escape(self._globe_error)) + "</span>")
+                text = (f"<span style='color:{red}'>" + html.escape(
+                    _("Press ↻ to try again.") if self._map_says_it()
+                    else self._no_stations_text()) + "</span>")
         else:
             name = html.escape(st.name)
             where = html.escape(st.country) if st.country else ""

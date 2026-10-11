@@ -275,6 +275,17 @@ def app_dir(tmp_path, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _temp_files_in_the_tests_folder(monkeypatch, tmp_path):
+    """Downloads (ytdl's sb-ytdl-* folders), recordings and the like go in the test's
+    own folder, which pytest clears: the tests that download from a stand-in site
+    left hundreds of them in the real %TEMP%."""
+    import tempfile
+    d = tmp_path.with_name(tmp_path.name + "-temp")   # beside it: tests look inside tmp_path
+    d.mkdir(exist_ok=True)
+    monkeypatch.setattr(tempfile, "tempdir", str(d))
+
+
+@pytest.fixture(autouse=True)
 def _never_touch_real_appdata(monkeypatch, tmp_path):
     """Any test that forgets `app_dir` still can't write into %APPDATA%\\OnionBoard."""
     from soundboard import library

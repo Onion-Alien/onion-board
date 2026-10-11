@@ -2595,8 +2595,6 @@
   "Add the selected station to Favorites": "Dodaj wybraną stację do Ulubionych",
   "Add to Favorites": "Dodaj do ulubionych",
   "All countries": "Wszystkie kraje",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Nie można uzyskać dostępu do katalogu stacji ( {error} ), naciśnij ↻, aby spróbować ponownie.",
-  "Can't reach the station directory, press ↻ to try again.": "Nie można uzyskać dostępu do katalogu stacji, naciśnij ↻, aby spróbować ponownie.",
   "Chill": "Muzyka relaksacyjna",
   "Classical": "Klasyczna",
   "Clear filters": "Wyczyść filtry",
@@ -2646,7 +2644,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Zapisz ostatnie {n} sekundy radia jako dźwięk",
   "Saved a {secs}s clip to your Sounds.": "Zapisano klip o długości {secs} w Twoich dźwiękach.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Wyszukiwanie nie powiodło się ( {error} ). Sprawdź swoje połączenie i naciśnij Enter, aby spróbować ponownie.",
   "Search failed: press Enter to try again.": "Wyszukiwanie nie powiodło się: naciśnij klawisz Enter, aby spróbować ponownie.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Wyszukaj stacje radiowe, gatunki, kraje lub miasta… (lub kliknij kropkę na mapie)",
   "Searching…": "Badawczy…",
@@ -2657,8 +2654,6 @@
     "Zaktualizowano listę stacji: {n} stacji.",
     "Zaktualizowano listę stacji: {n} stacji."
   ],
-  "That station isn't working ({error}). Try another one.": "Ta stacja nie działa ( {error} ). Spróbuj innego.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Katalog stacji jest teraz nieosiągalny. Sprawdź swoje połączenie i naciśnij ↻.",
   "Trending": "Trendy",
   "Tuning in to {name}": "Dostrojenie do {name}",
   "Tuning in to {name}…": "Dostrajam się do {name} …",
@@ -2666,7 +2661,6 @@
   "Zoom out": "Pomniejsz",
   "headphones": "słuchawki",
   "mic": "mikrofon",
-  "no answer": "brak odpowiedzi",
   "only you hear the radio: press “Send” below so others hear it too": "tylko Ty słyszysz radio: naciśnij „Wyślij” poniżej, aby inni też je usłyszeli",
   "others hear it": "inni to słyszą",
   "sending": "przesyłka",
@@ -3290,5 +3284,11 @@
   "From a link": "Z linku",
   "Paste a link into the search box": "Wklej link w polu wyszukiwania",
   "Record a sound with your mic: Add, then Record.": "Nagraj dźwięk mikrofonem: Dodaj, potem Nagraj.",
-  "Sound files": "Pliki dźwiękowe"
+  "Sound files": "Pliki dźwiękowe",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Nie można połączyć się z listą stacji radiowych. Sprawdź internet albo spróbuj ponownie za chwilę.",
+  "Press Enter to search again.": "Naciśnij Enter, aby wyszukać ponownie.",
+  "Press ↻ to try again.": "Naciśnij ↻, aby spróbować ponownie.",
+  "That station isn't on the air right now. Try another one.": "Ta stacja teraz nie nadaje. Spróbuj innej.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio teraz nie działa. To nie twoja wina: serwer z listą stacji nie działa. Spróbuj ponownie za chwilę.",
+  "This station points into your home network, so it isn't played.": "Ta stacja wskazuje na twoją sieć domową, więc nie jest odtwarzana."
 }

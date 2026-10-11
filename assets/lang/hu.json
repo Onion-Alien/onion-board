@@ -2542,8 +2542,6 @@
   "Add the selected station to Favorites": "Adja hozzá a kiválasztott állomást a Kedvencekhez",
   "Add to Favorites": "Hozzáadás a kedvencekhez",
   "All countries": "Minden ország",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Nem érhető el az állomáskönyvtár ( {error} ), nyomja meg a ↻ gombot az újrapróbálkozáshoz.",
-  "Can't reach the station directory, press ↻ to try again.": "Nem érhető el az állomáskönyvtár, nyomja meg a ↻ gombot az újbóli próbálkozáshoz.",
   "Chill": "Chill-out zene",
   "Classical": "Klasszikus",
   "Clear filters": "Tiszta szűrők",
@@ -2593,7 +2591,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Mentse el a rádió utolsó {n} másodpercét hangként",
   "Saved a {secs}s clip to your Sounds.": "Mentettünk egy {secs} klipet a Hangok közé.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "A keresés sikertelen ( {error} ). Ellenőrizze a kapcsolatot, és nyomja meg az Enter billentyűt az újbóli próbálkozáshoz.",
   "Search failed: press Enter to try again.": "A keresés sikertelen: nyomja meg az Enter billentyűt az újbóli próbálkozáshoz.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Rádióállomások, műfajok, országok vagy városok keresése… (vagy kattintson egy pontra a térképen)",
   "Searching…": "Keresés…",
@@ -2603,8 +2600,6 @@
     "Állomáslista frissítve: {n} állomás.",
     "Állomáslista frissítve: {n} állomás."
   ],
-  "That station isn't working ({error}). Try another one.": "Ez az állomás nem működik ( {error} ). Próbáljon ki egy másikat.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Az állomáskönyvtár jelenleg nem érhető el. Ellenőrizze a kapcsolatot, és nyomja meg a ↻ gombot.",
   "Trending": "Felkapott",
   "Tuning in to {name}": "Ráhangolás a következőre: {name}",
   "Tuning in to {name}…": "Hangolás a következőre: {name} …",
@@ -2612,7 +2607,6 @@
   "Zoom out": "Kicsinyítés",
   "headphones": "fejhallgató",
   "mic": "mikrofon",
-  "no answer": "nincs válasz",
   "only you hear the radio: press “Send” below so others hear it too": "csak Ön hallja a rádiót: nyomja meg a „Küldés” gombot lent, hogy mások is hallják",
   "others hear it": "mások hallják",
   "sending": "küldés",
@@ -3217,5 +3211,11 @@
   "From a link": "Linkből",
   "Paste a link into the search box": "Illessz be egy linket a keresőmezőbe",
   "Record a sound with your mic: Add, then Record.": "Vegyél fel egy hangot a mikrofonoddal: Hozzáadás, majd Felvétel.",
-  "Sound files": "Hangfájlok"
+  "Sound files": "Hangfájlok",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "A rádióállomások listája nem érhető el. Ellenőrizd az internetet, vagy próbáld újra egy kicsit később.",
+  "Press Enter to search again.": "Nyomj Entert az újabb kereséshez.",
+  "Press ↻ to try again.": "Nyomd meg a ↻ gombot az újrapróbáláshoz.",
+  "That station isn't on the air right now. Try another one.": "Ez az állomás most nem ad adást. Próbálj egy másikat.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "A rádió most nem működik. Nem nálad van a hiba: az állomáslista szervere nem működik. Próbáld újra egy kicsit később.",
+  "This station points into your home network, so it isn't played.": "Ez az állomás az otthoni hálózatodba mutat, ezért nem játszható le."
 }

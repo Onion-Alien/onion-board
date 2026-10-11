@@ -318,7 +318,7 @@ def test_ffmpeg_in_direct_mode_only_reaches_a_station_through_the_relay(qapp, lo
         hits = len(local2.hits)
         net.configure_features(["radio"])
         assert process_events(qapp, lambda: errors, timeout=10)
-        assert "Radio was switched off" in errors[0] and p.station is None
+        assert errors[0] == net.off_message("radio") and p.station is None
         process_events(qapp, lambda: False, timeout=1.5)
         assert len(local2.hits) == hits                    # nothing reopened it
     finally:

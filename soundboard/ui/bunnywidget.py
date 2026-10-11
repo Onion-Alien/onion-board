@@ -429,7 +429,7 @@ class BunnyWidget(QWidget):
             while self._note_debt >= 1:
                 self._note_debt -= 1
                 self._spawn(max(0.3, loud))
-        elif self.prop == "headphones":
+        elif self.prop == "headphones" and self.sad < 0.5:   # sad: the music's gone
             self._note_debt += dt * 0.7   # something's always playing in his headphones
             if self._note_debt >= 1:
                 self._note_debt = 0.0

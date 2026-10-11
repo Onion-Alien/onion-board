@@ -2489,8 +2489,6 @@
   "Add the selected station to Favorites": "เพิ่มสถานีที่เลือกไปยังรายการโปรด",
   "Add to Favorites": "เพิ่มในรายการโปรด",
   "All countries": "ทุกประเทศ",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "ไม่สามารถเข้าถึงไดเรกทอรีสถานี ( {error} ), กด ↻ เพื่อลองอีกครั้ง",
-  "Can't reach the station directory, press ↻ to try again.": "ไม่สามารถเข้าถึงไดเรกทอรีสถานี, กด ↻ เพื่อลองอีกครั้ง",
   "Chill": "เพลงชิลๆ",
   "Classical": "คลาสสิก",
   "Clear filters": "ล้างตัวกรอง",
@@ -2540,7 +2538,6 @@
   "Rock": "ร็อค",
   "Save the last {n} seconds of the radio as a sound": "บันทึก {n} วินาทีสุดท้ายของวิทยุเป็นเสียง",
   "Saved a {secs}s clip to your Sounds.": "บันทึกคลิป {secs} วินาทีลงในเสียงของคุณ",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "การค้นหาล้มเหลว ( {error} ) ตรวจสอบการเชื่อมต่อของคุณแล้วกด Enter เพื่อลองอีกครั้ง",
   "Search failed: press Enter to try again.": "การค้นหาล้มเหลว: กด Enter เพื่อลองอีกครั้ง",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ค้นหาสถานีวิทยุ ประเภท ประเทศ หรือเมือง... (หรือคลิกจุดบนแผนที่)",
   "Searching…": "กำลังค้นหา...",
@@ -2549,8 +2546,6 @@
   "Station list updated: {n} station.": [
     "อัปเดตรายการสถานีแล้ว: {n} สถานี"
   ],
-  "That station isn't working ({error}). Try another one.": "สถานีนั้นไม่ทำงาน ( {error} ) ลองอันอื่น",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "ไม่สามารถเข้าถึงไดเรกทอรีสถานีได้ในขณะนี้ ตรวจสอบการเชื่อมต่อของคุณแล้วกด ↻",
   "Trending": "กำลังมาแรง",
   "Tuning in to {name}": "กำลังติดตาม {name}",
   "Tuning in to {name}…": "กำลังติดตาม {name} …",
@@ -2558,7 +2553,6 @@
   "Zoom out": "ซูมออก",
   "headphones": "หูฟัง",
   "mic": "ไมค์",
-  "no answer": "ไม่มีคำตอบ",
   "only you hear the radio: press “Send” below so others hear it too": "มีเพียงคุณเท่านั้นที่ได้ยินวิทยุ: กด \"ส่ง\" ด้านล่างเพื่อให้คนอื่นได้ยินด้วย",
   "others hear it": "คนอื่นได้ยินมัน",
   "sending": "กำลังส่ง",
@@ -3144,5 +3138,11 @@
   "From a link": "จากลิงก์",
   "Paste a link into the search box": "วางลิงก์ในช่องค้นหา",
   "Record a sound with your mic: Add, then Record.": "อัดเสียงด้วยไมค์ของคุณ: เพิ่ม แล้วกด อัด",
-  "Sound files": "ไฟล์เสียง"
+  "Sound files": "ไฟล์เสียง",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "เข้าถึงรายชื่อสถานีวิทยุไม่ได้ ตรวจสอบอินเทอร์เน็ตของคุณ หรือลองใหม่อีกครั้งในอีกสักครู่",
+  "Press Enter to search again.": "กด Enter เพื่อค้นหาอีกครั้ง",
+  "Press ↻ to try again.": "กด ↻ เพื่อลองอีกครั้ง",
+  "That station isn't on the air right now. Try another one.": "สถานีนั้นไม่ได้ออกอากาศตอนนี้ ลองสถานีอื่น",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "วิทยุใช้งานไม่ได้ตอนนี้ ไม่ใช่ความผิดของคุณ: เซิร์ฟเวอร์รายชื่อสถานีไม่ทำงาน ลองใหม่อีกครั้งในอีกสักครู่",
+  "This station points into your home network, so it isn't played.": "สถานีนี้ชี้เข้าไปในเครือข่ายในบ้านของคุณ จึงไม่เล่น"
 }

@@ -2595,8 +2595,6 @@
   "Add the selected station to Favorites": "Додайте вибрану станцію до вибраного",
   "Add to Favorites": "Додати в обране",
   "All countries": "Всі країни",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Не вдається отримати доступ до каталогу станцій ( {error} ): натисніть ↻, щоб повторити спробу.",
-  "Can't reach the station directory, press ↻ to try again.": "Не вдається отримати доступ до каталогу станцій: натисніть ↻, щоб повторити спробу.",
   "Chill": "Музика для відпочинку",
   "Classical": "Класика",
   "Clear filters": "Очистити фільтри",
@@ -2646,7 +2644,6 @@
   "Rock": "Рок",
   "Save the last {n} seconds of the radio as a sound": "Зберегти останні {n} секунд радіо як звук",
   "Saved a {secs}s clip to your Sounds.": "Збережено кліп тривалістю {secs} у ваші звуки.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Помилка пошуку ( {error} ). Перевірте підключення та натисніть Enter, щоб повторити спробу.",
   "Search failed: press Enter to try again.": "Помилка пошуку: натисніть Enter, щоб повторити спробу.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Шукайте радіостанції, жанри, країни чи міста… (або натисніть точку на карті)",
   "Searching…": "Пошук…",
@@ -2657,8 +2654,6 @@
     "Список станцій оновлено: {n} станцій.",
     "Список станцій оновлено: {n} станцій."
   ],
-  "That station isn't working ({error}). Try another one.": "Ця станція не працює ( {error} ). Спробуйте інший.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Зараз неможливо отримати доступ до каталогу станцій. Перевірте підключення та натисніть ↻.",
   "Trending": "В тренді",
   "Tuning in to {name}": "Налаштування на {name}",
   "Tuning in to {name}…": "Налаштування на {name} …",
@@ -2666,7 +2661,6 @@
   "Zoom out": "Зменшити масштаб",
   "headphones": "навушники",
   "mic": "мікрофон",
-  "no answer": "немає відповіді",
   "only you hear the radio: press “Send” below so others hear it too": "лише ви чуєте радіо: натисніть «Надіслати» нижче, щоб інші також почули його",
   "others hear it": "інші це чують",
   "sending": "відправлення",
@@ -3290,5 +3284,11 @@
   "From a link": "За посиланням",
   "Paste a link into the search box": "Встав посилання в поле пошуку",
   "Record a sound with your mic: Add, then Record.": "Запиши звук з мікрофона: Додати, потім Запис.",
-  "Sound files": "Звукові файли"
+  "Sound files": "Звукові файли",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Не вдається зв'язатися зі списком радіостанцій. Перевір інтернет або спробуй ще раз трохи згодом.",
+  "Press Enter to search again.": "Натисни Enter, щоб шукати знову.",
+  "Press ↻ to try again.": "Натисни ↻, щоб спробувати ще раз.",
+  "That station isn't on the air right now. Try another one.": "Ця станція зараз не в ефірі. Спробуй іншу.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Радіо зараз не працює. Справа не в тобі: сервер зі списком станцій не працює. Спробуй ще раз трохи згодом.",
+  "This station points into your home network, so it isn't played.": "Ця станція вказує на твою домашню мережу, тому вона не грає."
 }
