@@ -123,7 +123,7 @@ jobs:
   windows:
     needs: pick
     if: ${{ needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: test (Windows ${{ matrix.shard }})
+    name: ${{ matrix.shard && format('test (Windows {0})', matrix.shard) || 'test (Windows)' }}
     strategy:
       fail-fast: false   # each job's failures are listed in full
       matrix:
@@ -219,7 +219,8 @@ jobs:
   test-linux:
     needs: pick
     if: ${{ github.event_name != 'pull_request' && needs.pick.result == 'success' && needs.pick.outputs.matrix != '[]' }}
-    name: test-linux (${{ matrix.shard }})
+    # a skipped job never gets its matrix, so a bare matrix.shard shows up as raw text
+    name: ${{ matrix.shard && format('test-linux ({0})', matrix.shard) || 'test-linux (main only)' }}
     strategy:
       fail-fast: false
       matrix:
