@@ -73,6 +73,7 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
+from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
                                    SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
                                    spectrum, SLIM_PAD_H)
@@ -1148,7 +1149,7 @@ class MainWindow(QMainWindow):
         cv.setSpacing(4)
         top = QHBoxLayout()
         top.setSpacing(6)
-        self.mini_pp = QPushButton()
+        self.mini_pp = PlayButton()
         self.mini_pp.setObjectName("transport_play")
         self.mini_pp.setProperty("mini", True)
         self.mini_pp.setToolTip(_("Play / pause"))
@@ -1654,7 +1655,7 @@ class MainWindow(QMainWindow):
 
 
         f, th = bar()
-        self.btn_pp = QPushButton()
+        self.btn_pp = PlayButton()
         self.btn_pp.setObjectName("transport_play")
         self.btn_pp.setToolTip(_("Play / pause"))
         self.btn_pp.clicked.connect(self.toggle_play_pause)
