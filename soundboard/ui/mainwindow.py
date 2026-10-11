@@ -474,6 +474,10 @@ class MainWindow(QMainWindow):
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
+        self._import_card_shut = False   # its card closed with ✕: the import goes on
+        # the pads come in a few at a time while a big import runs, each playable at once
+        self._import_pads = QTimer(self, singleShot=True, interval=300,
+                                   timeout=self._rebuild_pads)   # pyright: ignore[reportCallIssue]
         self._import_ids: list[str] = []   # added in this batch: Undo takes them off
         # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
         # given to it once it's in if nothing here has that key
@@ -5865,12 +5869,29 @@ class MainWindow(QMainWindow):
         self._import_progress()
 
     def _import_progress(self):
-        """The import's toast while it runs: "Adding 3 of 12…", with a bar."""
+        """The import's toast while it runs: "Adding 3 of 12…", with a bar. Several
+        files get a bigger card with Bun; closing it (✕) only hides it: the import goes
+        on, its sounds keep showing up, and the finished card still comes."""
         total = self._import_total
         done = total - self._pending_imports
         text = (ngettext("Adding {count} sound…", "Adding {count} sounds…", total, count=total)
                 if not done else _("Adding {done} of {total}…", done=done, total=total))
-        self.toast(text, "busy", key="import", progress=(done, total) if total > 1 else None)
+        if total <= 1:
+            self.toast(text, "busy", key="import")
+            return
+        if self._import_card_shut:
+            return
+        text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
+                                                 "Closing this doesn't stop it."))
+        t = self.toast(text, "busy", 0, key="import", progress=(done, total),
+                       picture=bunny.bunny_pixmap(44, dpr=self.devicePixelRatioF()))
+        if t is not None and not t.property("import_card"):
+            t.setProperty("import_card", True)
+            t.card.btn_close.clicked.connect(self._shut_import_card)
+
+    def _shut_import_card(self):
+        if self._pending_imports > 0:
+            self._import_card_shut = True
 
     def on_imported(self, meta, data, err):
         self._pending_imports -= 1
@@ -5894,9 +5915,13 @@ class MainWindow(QMainWindow):
         elif err:
             self._import_errors.append(err)
         if self._pending_imports > 0:
+            if meta is not None and not self._import_pads.isActive():
+                self._import_pads.start()   # on the board soon, with the next few
             self._import_progress()
             return
+        self._import_pads.stop()
         self._pending_imports = 0
+        self._import_card_shut = False
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()   # categories and hotkeys from an Import from Soundpad

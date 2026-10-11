@@ -3152,5 +3152,6 @@
   "On Air": "I sändning",
   "Not configured": "Inte inställt",
   "Not configured: click to fix": "Inte inställt: klicka för att fixa",
-  "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa"
+  "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Varje ljud dyker upp så fort det är inne. Att stänga det här stoppar inte det."
 }

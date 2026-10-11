@@ -3152,5 +3152,6 @@
   "On Air": "No ar",
   "Not configured": "Não configurado",
   "Not configured: click to fix": "Não configurado: clique para corrigir",
-  "Can't send to {device}, click to fix": "Não dá para enviar para {device}, clique para corrigir"
+  "Can't send to {device}, click to fix": "Não dá para enviar para {device}, clique para corrigir",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Cada som aparece assim que entra. Fechar isto não para."
 }

@@ -3152,5 +3152,6 @@
   "On Air": "On air",
   "Not configured": "Niet ingesteld",
   "Not configured: click to fix": "Niet ingesteld: klik om te herstellen",
-  "Can't send to {device}, click to fix": "Kan niet naar {device} sturen, klik om te herstellen"
+  "Can't send to {device}, click to fix": "Kan niet naar {device} sturen, klik om te herstellen",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Elk geluid verschijnt zodra het erin staat. Sluiten stopt het niet."
 }

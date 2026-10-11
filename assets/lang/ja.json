@@ -3079,5 +3079,6 @@
   "On Air": "オンエア",
   "Not configured": "未設定",
   "Not configured: click to fix": "未設定：クリックして修正",
-  "Can't send to {device}, click to fix": "{device} に送れません。クリックして修正"
+  "Can't send to {device}, click to fix": "{device} に送れません。クリックして修正",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "サウンドは追加されるとすぐに表示されます。閉じても止まりません。"
 }

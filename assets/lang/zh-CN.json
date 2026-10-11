@@ -3079,5 +3079,6 @@
   "On Air": "直播中",
   "Not configured": "未设置",
   "Not configured: click to fix": "未设置：点击修复",
-  "Can't send to {device}, click to fix": "无法发送到 {device}，点击修复"
+  "Can't send to {device}, click to fix": "无法发送到 {device}，点击修复",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "每个声音一加入就会出现。关闭这里不会停止。"
 }

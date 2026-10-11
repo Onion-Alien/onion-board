@@ -3152,5 +3152,6 @@
   "On Air": "Lähetyksessä",
   "Not configured": "Ei määritetty",
   "Not configured: click to fix": "Ei määritetty: korjaa klikkaamalla",
-  "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla"
+  "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Jokainen ääni näkyy heti, kun se on lisätty. Sulkeminen ei pysäytä sitä."
 }

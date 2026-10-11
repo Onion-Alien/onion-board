@@ -3225,5 +3225,6 @@
   "On Air": "În emisie",
   "Not configured": "Neconfigurat",
   "Not configured: click to fix": "Neconfigurat: dă clic pentru a repara",
-  "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara"
+  "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Fiecare sunet apare imediat ce e adăugat. Închiderea nu îl oprește."
 }

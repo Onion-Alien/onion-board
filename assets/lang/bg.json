@@ -3152,5 +3152,6 @@
   "On Air": "В ефир",
   "Not configured": "Не е настроено",
   "Not configured: click to fix": "Не е настроено: кликни за поправка",
-  "Can't send to {device}, click to fix": "Не може да се изпраща към {device}, кликни за поправка"
+  "Can't send to {device}, click to fix": "Не може да се изпраща към {device}, кликни за поправка",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Всеки звук се появява веднага щом е добавен. Затварянето не го спира."
 }

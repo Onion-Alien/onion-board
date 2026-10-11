@@ -3225,5 +3225,6 @@
   "On Air": "В эфире",
   "Not configured": "Не настроено",
   "Not configured: click to fix": "Не настроено: нажми, чтобы исправить",
-  "Can't send to {device}, click to fix": "Не получается отправить на {device}, нажми, чтобы исправить"
+  "Can't send to {device}, click to fix": "Не получается отправить на {device}, нажми, чтобы исправить",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Каждый звук появляется, как только добавлен. Если закрыть, это не остановится."
 }

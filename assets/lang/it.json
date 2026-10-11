@@ -3152,5 +3152,6 @@
   "On Air": "In onda",
   "Not configured": "Non configurato",
   "Not configured: click to fix": "Non configurato: clicca per sistemare",
-  "Can't send to {device}, click to fix": "Impossibile inviare a {device}, clicca per sistemare"
+  "Can't send to {device}, click to fix": "Impossibile inviare a {device}, clicca per sistemare",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Ogni suono compare appena è dentro. Chiudere questo non lo ferma."
 }

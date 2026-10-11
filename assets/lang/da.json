@@ -3152,5 +3152,6 @@
   "On Air": "On air",
   "Not configured": "Ikke sat op",
   "Not configured: click to fix": "Ikke sat op: klik for at rette",
-  "Can't send to {device}, click to fix": "Kan ikke sende til {device}, klik for at rette"
+  "Can't send to {device}, click to fix": "Kan ikke sende til {device}, klik for at rette",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Hver lyd dukker op, så snart den er inde. At lukke dette stopper det ikke."
 }

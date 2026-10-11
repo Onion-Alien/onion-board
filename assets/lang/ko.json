@@ -3079,5 +3079,6 @@
   "On Air": "방송 중",
   "Not configured": "설정 안 됨",
   "Not configured: click to fix": "설정 안 됨: 클릭해서 고치기",
-  "Can't send to {device}, click to fix": "{device}(으)로 보낼 수 없어요. 클릭해서 고치기"
+  "Can't send to {device}, click to fix": "{device}(으)로 보낼 수 없어요. 클릭해서 고치기",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "각 사운드는 추가되는 즉시 나타나요. 닫아도 멈추지 않아요."
 }

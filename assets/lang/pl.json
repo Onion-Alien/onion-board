@@ -3225,5 +3225,6 @@
   "On Air": "Na antenie",
   "Not configured": "Nieskonfigurowane",
   "Not configured: click to fix": "Nieskonfigurowane: kliknij, aby naprawić",
-  "Can't send to {device}, click to fix": "Nie można wysyłać do {device}, kliknij, aby naprawić"
+  "Can't send to {device}, click to fix": "Nie można wysyłać do {device}, kliknij, aby naprawić",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Każdy dźwięk pojawia się, gdy tylko zostanie dodany. Zamknięcie tego go nie zatrzyma."
 }
