@@ -13,7 +13,9 @@ never edit the same lines of CHANGELOG.md and conflict). It:
    `scripts/docs.py --no-shots` (the README and website release line).
 
 It never builds, tags, pushes or commits. After it: build, scan the installer on
-VirusTotal, then `scripts/docs.py --vt <sha256> N/N`. A "What's new" note
+VirusTotal, then `scripts/docs.py --vt <sha256> N/N`. Scan the mic helper too
+(build\\michelper\\obmichelper\\obmichelper.exe): it is unsigned and runs as SYSTEM, and
+a scan of the installer doesn't always look inside it. A "What's new" note
 (soundboard/ui/whatsnew.py) is only for releases with something worth telling, and
 its text is translated like any other, so it stays a hand-written step.
 """
@@ -113,7 +115,9 @@ def main(argv: list[str] | None = None) -> int:
     for cmd in (["scripts/i18n_extract.py", "--check"], ["scripts/docs.py", "--no-shots"]):
         if subprocess.run([sys.executable, *cmd], cwd=ROOT).returncode:
             raise SystemExit(f"{' '.join(cmd)} failed: fix it, then run it again")
-    print("next: build, VirusTotal scan, then scripts/docs.py --vt <sha256> N/N")
+    print("next: build, VirusTotal scan (the installer and "
+          r"build\michelper\obmichelper\obmichelper.exe), then "
+          "scripts/docs.py --vt <sha256> N/N")
     return 0
 
 

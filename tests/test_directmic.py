@@ -1700,7 +1700,9 @@ def test_same_dll(tmp_path):
 
 
 def test_uninstaller_asks_nothing_when_nothing_is_installed(monkeypatch):
+    from soundboard import michelper
     monkeypatch.setattr(dm, "anything_installed", lambda: False)
+    monkeypatch.setattr(michelper, "leftover", lambda: False)   # no helper either
     assert dm.cli(["remove"]) == 0   # (_elevated would raise: the conftest guard)
 
 
