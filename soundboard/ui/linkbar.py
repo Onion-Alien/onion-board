@@ -24,8 +24,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import library, net, netlog, quality, sourceinfo, theme, thumbs, usage, videos, ytdl
-from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
-                                site_folder, to_int16)
+from soundboard.library import SR, decode_int16, fingerprint, import_file, site_folder
 from soundboard.ui import busy
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors
@@ -373,8 +372,8 @@ class LinkBar(QFrame):
                 return
             emit("progress", url, "processing")
             if kind == "play":
-                audio = decode(str(path))
-                emit("play", url, (path, to_int16(audio), level_gain(audio)))
+                audio, gain = decode_int16(str(path))   # a long one stays on disk
+                emit("play", url, (path, audio, gain))
                 del audio
                 keep = True   # the UI keeps it so Add as sound needn't download again
                 return

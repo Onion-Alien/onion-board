@@ -248,14 +248,28 @@ def test_live_tabs_are_tinted_green_by_default_even_after_1_6_6():
 def test_ffmpeg_finding_no_sound_says_so_in_words(tmp_path, monkeypatch):
     """A link to a page with only a picture on it: ffmpeg's "[out#0/f32le @ 0000…]
     Output file does not contain any stream" was shown as is."""
-    import subprocess
+    import io
     pic = tmp_path / "page.jpg"
     pic.write_bytes(b"\xff\xd8\xff\xe0 not a sound")
+
+    class Ffmpeg:   # what ffmpeg does with it: no audio out, this on stderr, exit -22
+        def __init__(self, args, stdout=None, stderr=None, **kw):
+            stderr.write(b"[out#0/f32le @ 0000020f82c35040] Output file does not contain "
+                         b"any stream\r\nError opening output file -.\r\nError opening "
+                         b"output files: Invalid argument")
+            self.stdout, self.returncode = io.BytesIO(b""), 4294967274
+
+        def poll(self):
+            return self.returncode
+
+        def wait(self, timeout=None):
+            return self.returncode
+
+        def kill(self):
+            pass
+
     monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
-    monkeypatch.setattr(library.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
-        a, 4294967274, b"", b"[out#0/f32le @ 0000020f82c35040] Output file does not contain "
-        b"any stream\r\nError opening output file -.\r\nError opening output files: "
-        b"Invalid argument"))
+    monkeypatch.setattr(library.subprocess, "Popen", Ffmpeg)
     with pytest.raises(RuntimeError) as e:
         library.decode(str(pic))
     assert str(e.value) == "this file has no audio in it"

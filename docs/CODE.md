@@ -243,7 +243,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/clipedit.py` | the clip editor without the window: `LiveBuffer` (the last minute and its waveform, filled on the capture thread) and `Take` (cut, paste, fades, gain, reverse, with undo capped by memory) |
 | `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk; `MicTake`, a mic (or what's-playing) recording spooled the same way (Record a sound) |
 | `soundboard/mapped.py` | long sounds stay on disk: decoded cache files over ~30 s (or past a RAM budget) are memory-mapped, and warmed (first second read, the rest prefetched) before they play |
-| `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups, saved on a background thread (`Saver`) so a slow disk never freezes the window |
+| `soundboard/library.py` | decoding (bounded to 2 h; long sounds streamed into the cache a second at a time), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups, saved on a background thread (`Saver`) so a slow disk never freezes the window |
 | `soundboard/winpath.py` | paths through folder links newer Windows 11 refuses to follow (error 448): the same path resolved past the link |
 | `soundboard/usage.py` | the anonymous usage count (*Count me in*, feature `usage_stats`): a daily "still here" to GoatCounter with the version and a random `stats_id`, a one-off first start (with the installer's *Where did you hear about Onion Board?* answer, tidied by `heard_tag`) and *Update now*; with the daily one the tabs opened (`stats_tabs`) and `about()`: age, route, sound and play buckets, language and the `FEATURES` used (`used()` → `stats_used`, kept at quit by `remember`); a new install's first `STEPS` once each (`step()`; `settle` marks them done for copies counted before); problem counts soon after a start (`crash/` `error/` `freeze/` per new report in `crash-reports\`, plus the error type and the deepest `soundboard/…py:line` of its stack (`_report_event`; never the message; a freeze also its caller, the library call it was stuck in, how long it lasted and who was busy: `_freeze_tag`), past `stats_problems_seen`, `unclean-exit/<version>/<why>` when `running.txt` was left by a run that never reached `mark_stopped`; the why from `exitwatch.py`), `startup-failed/<version>` (with the native stacks or Windows' error) when `bootmark.py`'s `starting.txt` was left by a run that died during start-up, and `warned/<version>/<type>@<soundboard/…py:line>` (`warned()`, from `errors.warn`/`html`) for a reportable problem the app handled and showed itself); installed copies only, never from source. `--usage-count on/off` is the installer's box, `--uninstall-count` the uninstaller's `uninstall/<version>` |
 | `soundboard/ui/countdialog.py` | *What Count me in sends*: the table behind the eye button by Settings' *Count me in* (keep it in step with `usage.py` and SECURITY.md) |
@@ -334,8 +334,11 @@ the newest backup is used, so the pad list is never silently reset.
   converting linked videos to audio rather than exporting the whole video.
 - Sounds are held as int16 stereo at 48 kHz (half the size of float32; the
   engine scales them in the same multiply as the gain): short ones in RAM, long ones
-  memory-mapped from the cache (`mapped.py`). Only the first 15 minutes of a
-  file are ever decoded. Video, m4a, aac and wma imports are stored as FLAC of their
+  memory-mapped from the cache (`mapped.py`). Only the first 2 hours of a
+  file are ever decoded, a second at a time: a sound over a minute (`STREAM_S`) is
+  resampled, levelled and written into its cache (and its converted copy) piece by
+  piece, never held whole, so a long import costs about as much memory as a short
+  one. Video, m4a, aac and wma imports are stored as FLAC of their
   audio rather than a copy of the source, so the library is small and stays playable
   without ffmpeg. Re-importing a file that's already in the library is refused by
   content fingerprint.
