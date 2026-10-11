@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabe
                                QVBoxLayout)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import directmic, errors, theme
+from soundboard import directmic, errors, michelper, theme
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
@@ -422,11 +422,16 @@ class RecoveryCard(QFrame):
                 # its name is shared or unknown: the app can't switch to it by itself
                 lines.append(_("Your sounds go into {mic}. To use this mic instead, pick "
                                "it under Devices too.", mic=self.mw.cfg.mic_device))
+        # the mic helper does it without Windows' prompt (setting up: only with this
+        # app's own mic effect in it)
+        ask = michelper.will_ask(action in INSTALLS)
         lines.append(
-            _("If anything is found, Windows will ask for permission and audio will "
-              "briefly stop.") if action == "cleanup" else
+            (_("If anything is found, Windows will ask for permission and audio will "
+               "briefly stop.") if ask else
+             _("If anything is found, audio will briefly stop.")) if action == "cleanup" else
             _("Windows will ask for permission. Audio will briefly stop, "
-              "including calls and games."))
+              "including calls and games.") if ask else
+            _("Audio will briefly stop, including calls and games."))
         for text in lines:
             label = QLabel(text)
             label.setWordWrap(True)

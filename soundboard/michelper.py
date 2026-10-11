@@ -188,13 +188,28 @@ def ready(same_dll: bool = True) -> bool:
     older effect on the mic). An older helper otherwise is fine: the next admin step
     that asks anyway updates it. Runs a process: not on the UI thread."""
     have = _read_stamp(helper_dir())
-    if _version_of(have) < MIN_HELPER_VERSION:
-        return False
-    if same_dll:
+    ok = _version_of(have) >= MIN_HELPER_VERSION
+    if ok and same_dll:
         want = _dll_of(_read_stamp(bundled_helper()))
-        if want is None or _dll_of(have) != want:
-            return False
-    return installed()
+        ok = want is not None and _dll_of(have) == want
+    ok = ok and installed()
+    _known[same_dll] = ok
+    return ok
+
+
+_known: dict[bool, bool] = {}   # ready()'s last answers, for the UI thread
+
+
+def known(same_dll: bool = True) -> bool | None:
+    """ready()'s last answer (None: not asked yet), for the UI thread."""
+    return _known.get(same_dll)
+
+
+def will_ask(setting_up: bool = True) -> bool:
+    """Will Windows' admin prompt come up for the next mic step (`setting_up`: putting
+    the effect on, else taking it off)? From ready()'s last answer, so the UI thread can
+    ask: not known yet counts as yes (the texts then say to click Yes)."""
+    return _known.get(setting_up, _known.get(True) if not setting_up else None) is not True
 
 
 def ask(args: list[str], wait_s: float = 300.0) -> int | None:

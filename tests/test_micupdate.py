@@ -170,10 +170,10 @@ def test_setup_card_says_update_and_does_the_same_update(outdated, monkeypatch):
     w._update_status()
     assert not w.mic_update_note.isHidden() and w.step_lbl.isHidden()
     assert "Update your mic part" in w.mic_update_text.text()
-    assert "old version" in w.flow_out.text()
     assert w.btn_install.isHidden()   # one button: the banner's
     w.btn_micupdate.click()
     assert state["tried"] == [("My mic", True)]
     state["status"] = "ready"   # updated: the card is back to normal
     w._update_status()
-    assert w.mic_update_note.isHidden() and not w.step_lbl.isHidden()
+    assert w.mic_update_note.isHidden()
+    assert w.mic_line.text() == "Your sounds go into your mic"

@@ -27,7 +27,9 @@ REAL_SCHTASKS = mh._schtasks   # (so is this)
 ROOT = Path(__file__).resolve().parent.parent
 
 # HELPER_VERSION and the admin code it stands for: change one, change the other
-ADMIN_DIGEST = {5: "88020557dd5a9a12cbf4b8e5b3c342ab6dae41e08175a67d440bb5d4aa3b210c"}
+ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4c620",
+                4: "b49bed37327a635032e846b3f51e1b47fc5ebcaef7ee4078d03c95528a142370",
+                5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467"}
 
 
 def _queue():
@@ -272,7 +274,7 @@ def test_the_uninstaller_asks_the_helper_for_remove_all(monkeypatch):
     asked = []
     monkeypatch.setattr(dm, "anything_installed", lambda: True)
     monkeypatch.setattr(dm, "_is_admin", lambda: False)
-    monkeypatch.setattr(dm, "_elevated", lambda args, wait_s=300.0: asked.append(args) or 0)
+    monkeypatch.setattr(dm, "_elevated", lambda args, wait_s=300.0, **k: asked.append(args) or 0)
     assert dm.cli(["remove"]) == 0 and asked == [["remove-all"]]
 
 

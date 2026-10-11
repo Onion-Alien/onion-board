@@ -1559,6 +1559,21 @@ def _make_ring():
         pass
 
 
+def _audio_off(work) -> int:
+    """Run `work` (it returns an exit code) with Windows' audio stopped: the endpoint
+    builder reads the mics' effect settings when it starts. The audio always starts
+    again, however `work` ends; if it won't stop, nothing is touched (6)."""
+    _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
+    try:
+        if not _audio_service(False):
+            return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
+        return work()
+    finally:
+        _audio_service(True, dependents)
+
+
 def admin_install(guid: str, slot: str | None = None, source: Path | None = None) -> int:
     """Put the effect on the mic `guid`: this app's own copy, or `source` (only
     admin_reinstall's saved copy of the part that was there, to put it back)."""
@@ -1566,55 +1581,53 @@ def admin_install(guid: str, slot: str | None = None, source: Path | None = None
     if not dll.is_file():
         log.error("no effect DLL at %s", dll)
         return 3
-    _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    dependents = _running_dependents()
-    _audio_comes_back(dependents)
+    return _audio_off(lambda: _put_on(guid, slot, dll))
+
+
+def _put_on(guid: str, slot: str | None, dll: Path) -> int:
+    """admin_install()'s work, with the audio stopped."""
+    # a name of its own per version: a copy Windows still holds can't block it
+    digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
+    target = install_dir() / f"obmic-{digest}.dll"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_suffix(".new")
+    shutil.copyfile(dll, tmp)   # whole, then in place: never a half-copied effect
+    os.replace(tmp, target)
+    _register_com(target)
+    for old in [*install_dir().glob("obmic*.dll"), *_old_install_dirs()]:
+        if old != target:
+            _remove(old)
+    _make_ring()
+    for other in installed_on():   # one mic at a time; this one is done afresh
+        _uninstall_endpoint(other)
+    for e in capture_endpoints():
+        # an older version's set-up cut off (or its notes lost) left the effect in
+        # this mic's slots with nothing to put back: just take it out
+        if e["guid"] != guid and any(without_ours(v)[0]
+                                     for v in _fx_values(e["guid"]).values()):
+            _strip_endpoint(e["guid"])
     try:
-        if not _audio_service(False):
-            return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
-        # a name of its own per version: a copy Windows still holds can't block it
-        digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
-        target = install_dir() / f"obmic-{digest}.dll"
-        target.parent.mkdir(parents=True, exist_ok=True)
-        tmp = target.with_suffix(".new")
-        shutil.copyfile(dll, tmp)   # whole, then in place: never a half-copied effect
-        os.replace(tmp, target)
-        _register_com(target)
-        for old in [*install_dir().glob("obmic*.dll"), *_old_install_dirs()]:
-            if old != target:
-                _remove(old)
-        _make_ring()
-        for other in installed_on():   # one mic at a time; this one is done afresh
-            _uninstall_endpoint(other)
-        for e in capture_endpoints():
-            # an older version's set-up cut off (or its notes lost) left the effect in
-            # this mic's slots with nothing to put back: just take it out
-            if e["guid"] != guid and any(without_ours(v)[0]
-                                         for v in _fx_values(e["guid"]).values()):
-                _strip_endpoint(e["guid"])
+        _install_endpoint(guid, slot)
+    except BaseException:
+        # cut off half-way: the mic goes back as it was rather than half set up
         try:
-            _install_endpoint(guid, slot)
-        except BaseException:
-            # cut off half-way: the mic goes back as it was rather than half set up
-            try:
-                _uninstall_endpoint(guid)
-            except Exception:  # noqa: BLE001 - the notes stay; a later uninstall finishes
-                log.exception("couldn't put %s back after a failed set-up", guid)
-            raise
-    finally:
-        _audio_service(True, dependents)
+            _uninstall_endpoint(guid)
+        except Exception:  # noqa: BLE001 - the notes stay; a later uninstall finishes
+            log.exception("couldn't put %s back after a failed set-up", guid)
+        raise
     return 0
 
 
 def admin_reinstall(guid: str) -> int:
-    """The old effect off completely, then this app's on: one admin prompt and lock.
-    Never leaves the mic without a working effect: a failed install is tried once
-    more, and if that fails too the part that was there is put back."""
+    """The old effect off completely, then this app's on: one admin prompt, one lock
+    and one restart of Windows' audio (it was two, ~35 s; now ~18 s). Never leaves the
+    mic without a working effect: a failed install is tried once more, and if that
+    fails too the part that was there is put back."""
     dll = bundled_dll()
     if not dll.is_file():
         return 3
     # Read the complete source before touching Windows: unreadable or empty builds
-    # must leave the existing setup alone. admin_install copies it atomically.
+    # must leave the existing setup alone. _put_on copies it atomically.
     if not dll.read_bytes():
         return 3
     # a copy of the part that's there now, in the admins-only data folder (the
@@ -1629,29 +1642,32 @@ def admin_reinstall(guid: str) -> int:
         except OSError:
             log.warning("couldn't keep a copy of the mic effect there now", exc_info=True)
             backup = None
-    try:
-        result = admin_uninstall()
+
+    def work() -> int:
+        result = _take_off(None)
         if result:
             return result   # keep the failed endpoint's recovery notes for another attempt
-        result = _try_install(guid)
+        result = _try_put_on(guid, dll)
         if result:
             log.warning("the new mic effect didn't go on (%s): trying once more", result)
             time.sleep(2)
-            result = _try_install(guid)
+            result = _try_put_on(guid, dll)
         if result and backup is not None:
             log.warning("the new mic effect didn't go on (%s): the old one goes back", result)
-            if _try_install(guid, source=backup):
+            if _try_put_on(guid, backup):
                 log.error("couldn't put the old mic effect back either")
         return result
+    try:
+        return _audio_off(work)
     finally:
         if backup is not None:
             _remove(backup)
 
 
-def _try_install(guid: str, source: Path | None = None) -> int:
-    """admin_install(), an exception counted as a failure (1)."""
+def _try_put_on(guid: str, dll: Path) -> int:
+    """_put_on(), an exception counted as a failure (1)."""
     try:
-        return admin_install(guid, source=source)
+        return _put_on(guid, None, dll)
     except Exception:  # noqa: BLE001 - reported by the caller, which tries again
         log.exception("mic effect install failed")
         return 1
@@ -1660,37 +1676,34 @@ def _try_install(guid: str, source: Path | None = None) -> int:
 def admin_uninstall(only: str | None = None) -> int:
     """Take the effect off every mic, or only off the mic `only` (a GUID): then the
     rest stays, and the effect itself is removed once it's on no mic at all."""
-    _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    dependents = _running_dependents()
-    _audio_comes_back(dependents)
+    return _audio_off(lambda: _take_off(only))
+
+
+def _take_off(only: str | None) -> int:
+    """admin_uninstall()'s work, with the audio stopped."""
     failed = False
-    try:
-        if not _audio_service(False):
-            return 6   # the existing effect and its recovery notes stay intact
-        for guid in installed_on():
-            if only is not None and guid != only:
-                continue
-            try:
-                _uninstall_endpoint(guid)
-            except Exception:  # noqa: BLE001 - one mic left behind mustn't strand the rest
-                failed = True
-                log.exception("couldn't take the mic effect off %s", guid)
-        if failed:
-            # its notes stay, and the effect is still registered and on a mic: leaving
-            # everything in place lets a later uninstall finish the job
-            return 1
-        if installed_on():
-            return 0   # still on another mic: it stays registered for that one
-        _unregister_com()
-        for d in (install_dir(), *_old_install_dirs(), data_dir()):
-            _remove(d)
+    for guid in installed_on():
+        if only is not None and guid != only:
+            continue
         try:
-            winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, ENDPOINTS_KEY)
-            winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, STATE_KEY)
-        except OSError:
-            pass
-    finally:
-        _audio_service(True, dependents)
+            _uninstall_endpoint(guid)
+        except Exception:  # noqa: BLE001 - one mic left behind mustn't strand the rest
+            failed = True
+            log.exception("couldn't take the mic effect off %s", guid)
+    if failed:
+        # its notes stay, and the effect is still registered and on a mic: leaving
+        # everything in place lets a later uninstall finish the job
+        return 1
+    if installed_on():
+        return 0   # still on another mic: it stays registered for that one
+    _unregister_com()
+    for d in (install_dir(), *_old_install_dirs(), data_dir()):
+        _remove(d)
+    try:
+        winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, ENDPOINTS_KEY)
+        winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, STATE_KEY)
+    except OSError:
+        pass
     return 0
 
 
@@ -1900,17 +1913,35 @@ def relaunch_params(args: list[str]) -> str:
     return " ".join(parts + [FLAG] + args)
 
 
-def _elevated(args: list[str], wait_s: float = 300.0) -> int | None:
+def _elevated(args: list[str], wait_s: float = 300.0, *,
+              ask_windows: bool = True) -> int | None:
     """Run the admin command `args`: through the mic helper when it's set up (no
-    prompt), else this app's admin copy (Windows asks first). Its exit code, or None if
-    the prompt was turned down or it didn't finish. The audio stop/start and the
-    dependent services can take a while on a slow PC, so allow generously."""
-    from soundboard import michelper
+    prompt), else this app's admin copy (Windows asks first; not with `ask_windows`
+    False: the app's own repair, which nobody clicked). Its exit code, or None if the
+    prompt was turned down, not allowed, or it didn't finish. The audio stop/start and
+    the dependent services can take a while on a slow PC, so allow generously."""
     code = _via_helper(args, wait_s)
-    if code is not None:
+    if code is not None or not ask_windows:
         return code
-    return run_elevated(sys.executable, relaunch_params(args + michelper.for_user(args)),
-                        wait_s)
+    from soundboard import michelper
+    try:
+        return run_elevated(sys.executable,
+                            relaunch_params(args + michelper.for_user(args)), wait_s)
+    finally:
+        _helper_check(args)   # the prompt's admin step may have set the helper up
+
+
+def _helper_check(args: list[str] | None = None):
+    """michelper.ready() again, so michelper.will_ask() is current (on a worker).
+    After `args`: only if it's a step the helper does (the others never set it up)."""
+    from soundboard import michelper
+    try:
+        if args is not None and not michelper.allowed(args):
+            return
+        michelper.ready(same_dll=True)
+        michelper.ready(same_dll=False)
+    except Exception:  # noqa: BLE001 - only the texts' "click Yes" depends on it
+        log.warning("couldn't check the mic helper", exc_info=True)
 
 
 def _via_helper(args: list[str], wait_s: float) -> int | None:
@@ -1969,21 +2000,29 @@ def declined() -> str:
     return _("Windows' admin prompt was turned down (or didn't finish).")
 
 
-def install(mic_name: str | None, *, clean: bool = False) -> str | None:
-    """Put the effect on the mic called `mic_name` (Windows asks for admin). None when
-    done, else what went wrong, in plain words."""
-    return install_on(endpoint_for(mic_name), clean=clean)
+def no_helper() -> str:
+    """What install returns when the mic helper couldn't do it and Windows wasn't asked."""
+    return _("Onion Board's mic helper didn't answer.")
 
 
-def install_on(guid: str | None, *, clean: bool = False) -> str | None:
+def install(mic_name: str | None, *, clean: bool = False,
+            ask_windows: bool = True) -> str | None:
+    """Put the effect on the mic called `mic_name` (Windows asks for admin, unless the
+    mic helper does it, or `ask_windows` is False). None when done, else what went
+    wrong, in plain words."""
+    return install_on(endpoint_for(mic_name), clean=clean, ask_windows=ask_windows)
+
+
+def install_on(guid: str | None, *, clean: bool = False,
+               ask_windows: bool = True) -> str | None:
     """install() for the mic with endpoint GUID `guid` (it comes off any other mic)."""
     if guid is None:
         return _("That mic isn't plugged in (or Windows doesn't list it).")
     if not bundled_dll().is_file():
         return _("This copy of Onion Board has no mic effect in it.")
-    code = _elevated(["reinstall" if clean else "install", guid])
+    code = _elevated(["reinstall" if clean else "install", guid], ask_windows=ask_windows)
     if code is None:
-        return declined()
+        return declined() if ask_windows else no_helper()
     if code:
         return _("Installing failed (code {code}). The log is in {folder}.",
                  code=code, folder=data_dir().parent)

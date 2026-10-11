@@ -48,7 +48,14 @@ the route (`Config.route`, `library.ROUTES`):
   DLL's SHA-256); a new effect DLL makes the app ask Windows once more, and that prompt
   updates the helper. A helper older than `MIN_HELPER_VERSION` isn't used at all (raise
   it when the helpers out there have a bug). No helper, or one that doesn't answer:
-  Windows' prompt, as before. While the helper works on a request it touches
+  Windows' prompt, as before. The Setup tab's mic card fixes a mic Windows took the
+  effect off by itself (`MainWindow._show_mic_status` / `_auto_fix`): through the
+  helper only (`install(..., ask_windows=False)`, never a prompt nobody clicked), once
+  per time it's found off; a fix that fails or doesn't hold turns the card into a Try
+  again button. `michelper.ready()` keeps its last answer (`known()`, `will_ask()`) so
+  the UI thread knows whether Windows will ask and says "click Yes" only then. A clean
+  reinstall (`admin_reinstall`) restarts Windows' audio once for the whole job.
+  While the helper works on a request it touches
   `results\<id>.ack` every `BEAT_S`: `ask()` keeps waiting while it's fresh (past
   `wait_s`: a prompt now would only hit the lock, code 4), gives up `STALE_S` after it
   stops (killed, crashed) and takes the request back; no `.ack` and no answer, the full
