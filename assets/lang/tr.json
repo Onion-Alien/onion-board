@@ -284,7 +284,6 @@
   "Open the sounds folder": "Ses klasörünü aç",
   "Opened the folder with the log in it.": "Günlüğün bulunduğu klasör açıldı.",
   "Opened your sounds folder": "Ses klasörün açıldı",
-  "Optional: update the mic part": "İsteğe bağlı: mikrofon kısmını güncelle",
   "Others hear it": "Diğerleri duyar",
   "Overlap: every press plays a new copy": "Üst üste: her basış yeni bir kopya çalar",
   "Pad size": "Pad boyutu",
@@ -654,7 +653,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Sesleriniz {name} adresine gidiyor.</b> Orada ne dinlerse onu alır. OBS'de: Kaynaklar → + → <b>Ses Çıkışı Yakalama</b> → <b>{name}</b> . Voicemeeter'da veya bir mikserde bu girişi gitmesi gereken yere gönderin. Sesli sohbete geçmiyor musunuz? Stereo kalmasını sağlamak için Kim dinliyor altında <b>Mono olarak gönder</b> seçeneğinin işaretini kaldırın.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Yakınlaştır</b> : Ayarlar → Ses → Mikrofon: {mic} . <b>Mikrofon ses düzeyini otomatik olarak ayarla</b> seçeneğinin işaretini kaldırın, <b>Arka plan gürültüsünü bastırma seçeneğini</b> <b>Düşük</b> olarak ayarlayın veya <b>Müzisyenler için orijinal ses seçeneğini</b> seçin (ardından toplantıda sol üstte açın).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "Sırada <b>{name}</b> var: indirme işleminin bitmesi bekleniyor…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>İsteğe bağlı:</b> Mikrofon bölümünüz çalışıyor ve daha yeni bir sürüm burada. Gerekli değildir; size uygun olduğunda aşağıdan güncelleme yapın (Windows bir kez sorar ve sesiniz bir saniyeliğine kesilir).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Kablonun bir ucu {rates} üzerinde olduğundan, sesinizi yolda dönüştürür. En temiz ses için düzeltin.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Önemli düzeltme:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>Bu kopya kaynaktan çalıştırılır: <code>git pull</code> ile güncelleyin.</p>",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Sırada: Windows, OnionBoard.exe için izin isteyecek.",
   "Nothing to update now: your mic settings changed.": "Şu an güncellenecek bir şey yok: mikrofon ayarların değişti.",
   "The Windows prompt names Python because you're running from source.": "Kaynak koddan çalıştırdığın için Windows penceresinde Python yazıyor.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Güncelleme iptal edildi. Mikrofonun çalışmaya devam ediyor: istediğin zaman Kurulum'dan güncelle.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows izin isteyecek. Güncelleme sırasında ses kısa bir süre durur.",
   "You can update later in Setup.": "Daha sonra Kurulum'dan güncelleyebilirsin.",
   "Your mic is already up to date.": "Mikrofonun zaten güncel.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Tekrar denemek için ↻ düğmesine bas.",
   "That station isn't on the air right now. Try another one.": "Bu istasyon şu an yayında değil. Başka birini dene.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radyo şu an çalışmıyor. Sorun sende değil: istasyon listesinin sunucusu çalışmıyor. Biraz sonra tekrar dene.",
-  "This station points into your home network, so it isn't played.": "Bu istasyon ev ağına işaret ediyor, bu yüzden çalınmıyor."
+  "This station points into your home network, so it isn't played.": "Bu istasyon ev ağına işaret ediyor, bu yüzden çalınmıyor.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Mikrofon kısmını güncelle</b><br>Onion Board'un eski bir sürümünden kalma, bu yüzden bazı oyunlar, aramalar ve tarayıcılar seslerini duymayabilir. Windows bir kez sorar ve ses bir saniyeliğine kesilir.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, Onion Board mikrofon kısmının eski bir sürümüyle",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Güncelleme iptal edildi. Mikrofon kısmın hâlâ eski: Kurulum sekmesinden güncelle."
 }

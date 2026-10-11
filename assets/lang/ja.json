@@ -278,7 +278,6 @@
   "Open the sounds folder": "サウンドフォルダーを開く",
   "Opened the folder with the log in it.": "ログのあるフォルダーを開きました。",
   "Opened your sounds folder": "サウンドフォルダーを開きました",
-  "Optional: update the mic part": "任意: マイク部分を更新",
   "Others hear it": "相手に聞こえる",
   "Overlap: every press plays a new copy": "重ねる：押すたびに新しく再生",
   "Pad size": "パッドのサイズ",
@@ -638,7 +637,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>サウンドは {name} に送られます。</b> そこで聞いているものが受け取ります。OBS では: ソース → + → <b>音声出力キャプチャ</b> → <b>{name}</b>。Voicemeeter やミキサーでは、その入力を送りたい先へ回してください。ボイスチャットに送らない？ 聞いている相手で<b>モノラルで送信</b>のチェックを外すとステレオのままになります。",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: 設定 → オーディオ → マイク: {mic}。<b>マイク音量を自動調整</b>のチェックを外し、<b>背景雑音の抑制</b>を<b>低</b>にするか、<b>ミュージシャン向けのオリジナルサウンド</b>を選んでください（その後ミーティング中に左上でオンにします）。",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "次は <b>{name}</b>: 前のダウンロードが終わるのを待っています…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>任意:</b> マイク部分は動作しており、新しいバージョンが出ています。必須ではありません、都合のいいときに下で更新してください（Windows が一度だけ確認し、サウンドが一瞬途切れます）。",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>ケーブルの片側が {rates} になっているため、途中で音が変換されます。一番きれいな音にするには直してください。</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>重要な修正:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>このコピーはソースから動いています: <code>git pull</code> で更新してください。</p>",
@@ -3019,7 +3017,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "次に、Windows が OnionBoard.exe の許可を求めます。",
   "Nothing to update now: your mic settings changed.": "今は更新するものがありません: マイクの設定が変わりました。",
   "The Windows prompt names Python because you're running from source.": "ソースから実行しているため、Windows の確認画面には Python と表示されます。",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "アップデートを取り消しました。マイクはそのまま使えます: いつでもセットアップから更新できます。",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows が許可を求めます。更新中は音が少し途切れます。",
   "You can update later in Setup.": "あとでセットアップから更新できます。",
   "Your mic is already up to date.": "マイクはすでに最新です。",
@@ -3184,5 +3181,8 @@
   "Press ↻ to try again.": "↻ を押してもう一度お試しください。",
   "That station isn't on the air right now. Try another one.": "その局は今放送していません。別の局を試してください。",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "ラジオは今ダウンしています。あなたのせいではありません：局リストのサーバーが動いていません。少ししてからもう一度お試しください。",
-  "This station points into your home network, so it isn't played.": "この局はホームネットワーク内を指しているため、再生しません。"
+  "This station points into your home network, so it isn't played.": "この局はホームネットワーク内を指しているため、再生しません。",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>マイク部分を更新してください</b><br>古いバージョンの Onion Board のものなので、一部のゲーム、通話、ブラウザーにサウンドが届かないことがあります。Windows の確認は 1 回だけで、音が 1 秒ほど途切れます。",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>（Onion Board のマイク部分が古いバージョン）",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "アップデートを取り消しました。マイク部分は古いままです: セットアップ タブから更新してください。"
 }

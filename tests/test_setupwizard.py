@@ -578,7 +578,7 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     assert not wiz.btn_attach.isHidden()
     assert wiz.setup_show.isHidden()
 
-    monkeypatch.setattr(directmic, "install", lambda name: "")
+    monkeypatch.setattr(directmic, "install", lambda name, **k: "")
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
 
     wiz.btn_attach.click()

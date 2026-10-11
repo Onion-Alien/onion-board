@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Os teus sons vão para {name}.</b> O que estiver a ouvir lá recebe-os. No OBS: Fontes → + → <b>Captura de saída de áudio</b> → <b>{name}</b>. No Voicemeeter ou numa mesa de mistura, envia essa entrada para onde ela deve ir. Não segue para um chat de voz? Desmarca <b>Enviar em mono</b> em Quem está a ouvir para manter em estéreo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Definições → Áudio → Microfone: {mic}. Desmarca <b>Ajustar automaticamente o volume do microfone</b>, põe <b>Supressão de ruído de fundo</b> em <b>Baixa</b>, ou escolhe <b>Som original para músicos</b> (e depois liga-o na reunião, em cima à esquerda).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> é o próximo: à espera que a transferência anterior acabe…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Opcional:</b> a parte do microfone funciona e há uma versão mais recente. Não é necessária, atualiza abaixo quando te der jeito (o Windows pergunta uma vez e o teu som falha durante um segundo).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Uma ponta do cabo está em {rates}, por isso converte o teu som pelo caminho. Corrige isso para o som mais limpo.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Não é possível abrir {devices} (em Enviar também para). Está ligado? Volta a tentar sozinho.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Correção importante:</b> {fix}</p>",
@@ -776,7 +775,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Abre um relatório de erro no GitHub no teu browser, com as versões preenchidas",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Abre-a já, tal como o atalho: escolhe um som com as teclas ou com um clique. Esc, este botão ou o atalho fecha-a",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Abre a lista completa (SECURITY.md) no GitHub, no teu browser",
-  "Optional: update the mic part": "Opcional: atualizar a parte do microfone",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Ou simplesmente arrasta-a: agarra numa parte vazia da sobreposição (o título, as margens) e larga-a onde quiseres, em qualquer monitor. A partir daí abre lá. Mostrar pré-visualização só mostra o aspeto: abre a sobreposição com o atalho dela para a experimentar ou mover.",
   "Orange": "Laranja",
   "Other games": "Outros jogos",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "A seguir: o Windows vai pedir permissão para o OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Nada para atualizar agora: as definições do teu microfone mudaram.",
   "The Windows prompt names Python because you're running from source.": "O aviso do Windows indica Python porque estás a correr a partir do código-fonte.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Atualização cancelada. O teu microfone continua a funcionar: atualiza quando quiseres em Configurar.",
   "Windows asks for permission. Audio pauses briefly during the update.": "O Windows vai pedir permissão. O áudio para por instantes durante a atualização.",
   "You can update later in Setup.": "Podes atualizar mais tarde em Configurar.",
   "Your mic is already up to date.": "O teu microfone já está atualizado.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Carrega em ↻ para tentar outra vez.",
   "That station isn't on the air right now. Try another one.": "Essa estação não está a emitir neste momento. Experimenta outra.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "A rádio está em baixo neste momento. Não és tu: o servidor da lista de estações não está a funcionar. Tenta outra vez daqui a pouco.",
-  "This station points into your home network, so it isn't played.": "Esta estação aponta para a tua rede de casa, por isso não é tocada."
+  "This station points into your home network, so it isn't played.": "Esta estação aponta para a tua rede de casa, por isso não é tocada.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Atualiza a parte do microfone</b><br>É de uma versão anterior do Onion Board, por isso alguns jogos, chamadas e browsers podem não ouvir os teus sons. O Windows pergunta uma vez, e o som falha durante um segundo.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, com uma versão antiga da parte do microfone do Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Atualização cancelada. A parte do microfone ainda é a antiga: atualiza-a no separador Configurar."
 }

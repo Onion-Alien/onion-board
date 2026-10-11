@@ -1541,8 +1541,10 @@ def _make_ring():
         pass
 
 
-def admin_install(guid: str, slot: str | None = None) -> int:
-    dll = bundled_dll()
+def admin_install(guid: str, slot: str | None = None, source: Path | None = None) -> int:
+    """Put the effect on the mic `guid`: this app's own copy, or `source` (only
+    admin_reinstall's saved copy of the part that was there, to put it back)."""
+    dll = source or bundled_dll()
     if not dll.is_file():
         log.error("no effect DLL at %s", dll)
         return 3
@@ -1581,7 +1583,9 @@ def admin_install(guid: str, slot: str | None = None) -> int:
 
 
 def admin_reinstall(guid: str) -> int:
-    """One admin prompt and lock; never remove a working effect without a replacement."""
+    """The old effect off completely, then this app's on: one admin prompt and lock.
+    Never leaves the mic without a working effect: a failed install is tried once
+    more, and if that fails too the part that was there is put back."""
     dll = bundled_dll()
     if not dll.is_file():
         return 3
@@ -1589,10 +1593,44 @@ def admin_reinstall(guid: str) -> int:
     # must leave the existing setup alone. admin_install copies it atomically.
     if not dll.read_bytes():
         return 3
-    result = admin_uninstall()
-    if result:
-        return result   # keep the failed endpoint's recovery notes for another attempt
-    return admin_install(guid)
+    # a copy of the part that's there now, in the admins-only data folder (the
+    # uninstall removes its own folder): what goes back if the new one won't go on
+    old, backup = registered_dll(), None
+    if guid in installed_on() and old is not None and old.is_file():
+        try:
+            backup = data_dir().parent / "obmic-previous.dll"
+            tmp = backup.with_suffix(".new")
+            shutil.copyfile(old, tmp)
+            os.replace(tmp, backup)
+        except OSError:
+            log.warning("couldn't keep a copy of the mic effect there now", exc_info=True)
+            backup = None
+    try:
+        result = admin_uninstall()
+        if result:
+            return result   # keep the failed endpoint's recovery notes for another attempt
+        result = _try_install(guid)
+        if result:
+            log.warning("the new mic effect didn't go on (%s): trying once more", result)
+            time.sleep(2)
+            result = _try_install(guid)
+        if result and backup is not None:
+            log.warning("the new mic effect didn't go on (%s): the old one goes back", result)
+            if _try_install(guid, source=backup):
+                log.error("couldn't put the old mic effect back either")
+        return result
+    finally:
+        if backup is not None:
+            _remove(backup)
+
+
+def _try_install(guid: str, source: Path | None = None) -> int:
+    """admin_install(), an exception counted as a failure (1)."""
+    try:
+        return admin_install(guid, source=source)
+    except Exception:  # noqa: BLE001 - reported by the caller, which tries again
+        log.exception("mic effect install failed")
+        return 1
 
 
 def admin_uninstall(only: str | None = None) -> int:
@@ -1672,13 +1710,31 @@ def admin_cleanup(guid: str) -> int:
 
 
 def _remove(path: Path):
+    """Delete a file or folder of ours. What Windows still holds open (an old copy of
+    the effect) goes at the next restart instead of staying behind for good."""
     if path.is_dir():
         shutil.rmtree(path, ignore_errors=True)
+        if path.exists():   # files first, deepest folders next, the folder itself last
+            left = sorted(path.rglob("*"), key=lambda p: (p.is_dir(), -len(p.parts)))
+            for entry in [*left, path]:
+                _gone_at_restart(entry)
     else:
         try:
             path.unlink()
+        except FileNotFoundError:
+            pass
         except OSError:
-            log.info("can't remove %s yet", path)
+            _gone_at_restart(path)
+
+
+def _gone_at_restart(path: Path):
+    log.info("can't remove %s yet: it goes at the next restart", path)
+    try:
+        # MOVEFILE_DELAY_UNTIL_REBOOT (admin only: the admin step is)
+        if not ctypes.windll.kernel32.MoveFileExW(str(path), None, 4):
+            log.warning("couldn't mark %s for removal", path)
+    except (AttributeError, OSError):
+        log.warning("couldn't mark %s for removal", path, exc_info=True)
 
 
 def anything_installed() -> bool:

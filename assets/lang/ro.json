@@ -69,7 +69,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Sunetele tale merg la {name}.</b> Ce ascultă acolo le primește. În OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. În Voicemeeter sau un mixer, trimite intrarea aia mai departe unde trebuie. Nu merge mai departe într-un chat vocal? Debifează <b>Trimite în mono</b> la Cine ascultă ca să rămână stereo.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b>: Setări → Audio → Microfon: {mic}. Debifează <b>Ajustează automat volumul microfonului</b>, setează <b>Suprimarea zgomotului de fundal</b> pe <b>Scăzut</b>, sau alege <b>Sunet original pentru muzicieni</b> (apoi pornește-l în ședință, sus în stânga).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> urmează: așteaptă să se termine descărcarea dinaintea lui…",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Opțional:</b> partea de microfon merge, și a apărut o versiune mai nouă. Nu e necesară, actualizează mai jos când ți-e comod (Windows întreabă o dată, iar sunetul se oprește o secundă).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Un capăt al cablului e pe {rates}, deci îți convertește sunetul pe drum. Repară asta pentru cel mai curat sunet.</span>",
   "<br><span style='color:{status}'>Can't open {devices} (under Also send to). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nu se poate deschide {devices} (la Trimite și la). E conectat? Se reîncearcă singur.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Reparație importantă:</b> {fix}</p>",
@@ -788,7 +787,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Deschide un raport de bug pe GitHub în browser, cu versiunile completate",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Îl deschide acum, la fel ca tasta rapidă: alege un sunet cu tastele lui sau cu un clic. Esc, butonul ăsta sau tasta rapidă îl închide",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Deschide lista completă (SECURITY.md) pe GitHub, în browser",
-  "Optional: update the mic part": "Opțional: actualizează partea de microfon",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Sau doar trage-l: prinde orice parte goală a overlay-ului (titlul, marginile) și lasă-l oriunde, pe orice monitor. De atunci se deschide acolo. Arată previzualizarea doar arată cum arată: deschide overlay-ul cu tasta lui rapidă ca să-l încerci sau să-l muți.",
   "Orange": "Portocaliu",
   "Other games": "Alte jocuri",
@@ -3163,7 +3161,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Urmează: Windows va cere permisiunea pentru OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Nimic de actualizat acum: setările microfonului s-au schimbat.",
   "The Windows prompt names Python because you're running from source.": "Fereastra Windows numește Python pentru că rulezi din codul sursă.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Actualizare anulată. Microfonul merge în continuare: actualizează oricând din Configurare.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows va cere permisiunea. Sunetul se oprește puțin în timpul actualizării.",
   "You can update later in Setup.": "Poți actualiza mai târziu din Configurare.",
   "Your mic is already up to date.": "Microfonul tău e deja la zi.",
@@ -3330,5 +3327,8 @@
   "Press ↻ to try again.": "Apasă ↻ ca să încerci din nou.",
   "That station isn't on the air right now. Try another one.": "Postul ăsta nu emite acum. Încearcă altul.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radioul nu merge acum. Nu e vina ta: serverul cu lista de posturi nu funcționează. Încearcă din nou puțin mai târziu.",
-  "This station points into your home network, so it isn't played.": "Postul ăsta trimite spre rețeaua ta de acasă, așa că nu e redat."
+  "This station points into your home network, so it isn't played.": "Postul ăsta trimite spre rețeaua ta de acasă, așa că nu e redat.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Actualizează partea de microfon</b><br>E dintr-o versiune mai veche de Onion Board, așa că unele jocuri, apeluri și browsere s-ar putea să nu-ți audă sunetele. Windows întreabă o dată, iar sunetul se oprește o secundă.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, cu o versiune veche a părții de microfon Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Actualizare anulată. Partea de microfon e tot cea veche: actualizeaz-o din fila Configurare."
 }

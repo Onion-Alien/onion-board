@@ -284,7 +284,6 @@
   "Open the sounds folder": "De geluidenmap openen",
   "Opened the folder with the log in it.": "De map met de log is geopend.",
   "Opened your sounds folder": "Je geluidenmap is geopend",
-  "Optional: update the mic part": "Optioneel: het mic-deel bijwerken",
   "Others hear it": "Anderen horen het",
   "Overlap: every press plays a new copy": "Overlappen: elke druk speelt een nieuwe kopie",
   "Pad size": "Padgrootte",
@@ -654,7 +653,6 @@
   "<b>Your sounds go to {name}.</b> Whatever listens there gets them. In OBS: Sources → + → <b>Audio Output Capture</b> → <b>{name}</b>. In Voicemeeter or a mixer, send that input on to wherever it should go. Not going on to a voice chat? Untick <b>Send in mono</b> under Who's listening to keep it stereo.": "<b>Je geluiden gaan naar {name} .</b> Wat daar ook luistert, het krijgt ze. In OBS: Bronnen → + → <b>Audio-uitvoer vastleggen</b> → <b>{name}</b> . Stuur die input in Voicemeeter of een mixer naar de gewenste plek. Ga je niet naar een voicechat? Haal het vinkje <b>weg bij In mono verzenden</b> onder Wie luistert om het in stereo te houden.",
   "<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically adjust microphone volume</b>, set <b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in the meeting, top left).": "<b>Zoom</b> : Instellingen → Audio → Microfoon: {mic} . Verwijder het vinkje <b>bij Microfoonvolume automatisch aanpassen</b> , stel <b>Onderdrukking van achtergrondgeluid</b> in op <b>Laag</b> of kies <b>Origineel geluid voor muzikanten</b> (zet dit vervolgens aan in de vergadering, linksboven).",
   "<b>{name}</b> is next: waiting for the download before it to finish…": "<b>{name}</b> is de volgende: wachtend op de download voordat deze is voltooid...",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>Optioneel:</b> je microfoongedeelte werkt en er is een nieuwere versie. Het is niet nodig: update hieronder wanneer het u uitkomt (Windows vraagt ​​dit één keer, en uw geluid valt even weg).",
   "<br><span style='color:{colour}'>One end of the cable is on {rates}, so it converts your sound on the way through. Fix it for the cleanest sound.</span>": "<br><span style='color:{colour}'>Het ene uiteinde van de kabel staat op {rates} , dus onderweg wordt je geluid omgezet. Repareer het voor het schoonste geluid.</span>",
   "<p><b>Important fix:</b> {fix}</p>": "<p><b>Belangrijke oplossing:</b> {fix}</p>",
   "<p>This copy runs from source: update it with <code>git pull</code>.</p>": "<p>Deze kopie wordt uitgevoerd vanuit de broncode: update deze met <code>git pull</code> .</p>",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Hierna vraagt Windows toestemming voor OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Niets bij te werken: je microfooninstellingen zijn veranderd.",
   "The Windows prompt names Python because you're running from source.": "De Windows-melding noemt Python omdat je vanuit de broncode draait.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Update geannuleerd. Je microfoon blijft werken: werk hem bij wanneer je wilt via Setup.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows vraagt om toestemming. Het geluid valt tijdens de update even weg.",
   "You can update later in Setup.": "Je kunt later bijwerken via Setup.",
   "Your mic is already up to date.": "Je microfoon is al bijgewerkt.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Druk op ↻ om het opnieuw te proberen.",
   "That station isn't on the air right now. Try another one.": "Die zender is nu niet in de lucht. Probeer een andere.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "De radio ligt er nu uit. Het ligt niet aan jou: de server met de zenderlijst werkt niet. Probeer het zo nog eens.",
-  "This station points into your home network, so it isn't played.": "Deze zender wijst naar je thuisnetwerk, dus hij wordt niet afgespeeld."
+  "This station points into your home network, so it isn't played.": "Deze zender wijst naar je thuisnetwerk, dus hij wordt niet afgespeeld.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Werk je mic-deel bij</b><br>Het komt van een oudere versie van Onion Board, dus sommige games, gesprekken en browsers horen je geluiden misschien niet. Windows vraagt het één keer, en je geluid valt een seconde weg.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, met een oude versie van het mic-deel van Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Update geannuleerd. Je mic-deel is nog het oude: werk het bij via het tabblad Setup."
 }

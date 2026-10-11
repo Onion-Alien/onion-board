@@ -718,7 +718,6 @@
   "Opens a bug report on GitHub in your browser, with the versions filled in": "Отваря доклад за бъг в GitHub в браузъра ти, с попълнени версии",
   "Opens it now, the same as the hotkey: pick a sound with its keys or a click. Esc, this button or the hotkey closes it": "Отваря го сега, също като бързия клавиш: избери звук с клавишите му или с клик. Esc, този бутон или бързият клавиш го затваря",
   "Opens the full list (SECURITY.md) on GitHub, in your browser": "Отваря пълния списък (SECURITY.md) в GitHub, в браузъра ти",
-  "Optional: update the mic part": "По желание: обнови частта с микрофона",
   "Or just drag it: grab any empty part of the overlay (its title, its edges) and drop it anywhere, on any monitor. It opens there from then on. Show preview only shows how it looks: open the overlay with its hotkey to try it or move it.": "Или просто го влачи: хвани която и да е празна част на овърлея (заглавието, краищата) и го пусни където искаш, на който и да е монитор. Оттогава се отваря там. Покажи преглед само показва как изглежда: отвори овърлея с бързия му клавиш, за да го пробваш или преместиш.",
   "Orange": "Оранжево",
   "Other games": "Други игри",
@@ -2794,7 +2793,6 @@
   "I've installed it: check again": "Инсталирах го: проверете отново",
   "Already set up for you, only change these if something's wrong.": "Вече са настроени за вас, променяйте ги само ако нещо не е наред.",
   "(none)": "(няма)",
-  "<br><br><b>Optional:</b> your mic part works, and a newer version is here. It's not needed: update below whenever suits you (Windows asks once, and your sound drops out for a second).": "<br><br><b>По избор:</b> микрофонната ви част работи и има по-нова версия. Не е необходимо: актуализирайте по-долу, когато ви е удобно (Windows пита веднъж и звукът ви изчезва за секунда).",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "Отвори се прозорец, който изтегля VB-Cable (безплатно) от официалния сайт на VB-Audio. Windows ще поиска разрешение, щракнете върху Да, след което щракнете върху „Инсталиране на драйвер“. Когато е готово, щракнете върху „Инсталирах го, проверете отново“. Ако не се появи, рестартирайте компютъра си.",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Добавено е „ {name} “ ( {duration:.1f} s) към Звуци: щракнете с десния бутон там, за да преименувате или зададете клавишна комбинация.",
   "{name}: {pct}%": "{name} : {pct} %",
@@ -3091,7 +3089,6 @@
   "Next: Windows will ask permission for OnionBoard.exe.": "Следва: Windows ще поиска разрешение за OnionBoard.exe.",
   "Nothing to update now: your mic settings changed.": "Няма какво да се обновява: настройките на микрофона се смениха.",
   "The Windows prompt names Python because you're running from source.": "Прозорецът на Windows споменава Python, защото пускаш от изходния код.",
-  "Update cancelled. Your mic keeps working: update any time in Setup.": "Обновлението е отказано. Микрофонът продължава да работи: обнови по всяко време от Свързване.",
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows ще поиска разрешение. Звукът спира за момент по време на обновлението.",
   "You can update later in Setup.": "Можеш да обновиш по-късно от Свързване.",
   "Your mic is already up to date.": "Микрофонът ти вече е обновен.",
@@ -3257,5 +3254,8 @@
   "Press ↻ to try again.": "Натисни ↻, за да опиташ пак.",
   "That station isn't on the air right now. Try another one.": "Тази станция не излъчва в момента. Пробвай друга.",
   "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Радиото не работи в момента. Не е от теб: сървърът със списъка станции не работи. Опитай пак след малко.",
-  "This station points into your home network, so it isn't played.": "Тази станция сочи към домашната ти мрежа, затова не се пуска."
+  "This station points into your home network, so it isn't played.": "Тази станция сочи към домашната ти мрежа, затова не се пуска.",
+  "<b style='color:{colour}'>Update your mic part</b><br>It's from an older version of Onion Board, so some games, calls and browsers may not hear your sounds. Windows asks once, and your sound drops out for a second.": "<b style='color:{colour}'>Обнови частта с микрофона</b><br>Тя е от по-стара версия на Onion Board, затова някои игри, разговори и браузъри може да не чуват звуците ти. Windows пита веднъж и звукът спира за секунда.",
+  "<b style='color:{colour}'>{name}</b>, with an old version of Onion Board's mic part": "<b style='color:{colour}'>{name}</b>, със стара версия на частта с микрофона на Onion Board",
+  "Update cancelled. Your mic part is still the old one: update it from the Setup tab.": "Обновлението е отказано. Частта с микрофона още е старата: обнови я от раздела Свързване."
 }
