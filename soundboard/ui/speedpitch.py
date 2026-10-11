@@ -7,7 +7,8 @@ treble, muffle, reverb, echo, distortion, and presets that set several) on the r
 
 The sane range (0.25–2x, ±12 st) is always there. The greyed-out **Redline**
 section under it unlocks the silly range (up to 10x, ±36 st) and shows a rev
-meter whose red zone starts at 8x."""
+meter whose red zone starts at 8x. A live stream (Radio, Apps) has no speed: its
+meter shows the pitch instead, red past ±24 st."""
 from __future__ import annotations
 
 import math
@@ -30,6 +31,8 @@ REDLINE_AT = 8.0                        # the meter's red zone starts here
 REDLINE_SPEED = (0.1, 10.0)             # sounds
 REDLINE_PITCH = voicefx.Param("pitch", _("Pitch"), -36, 36, 0, " st", 1)
 REDLINE_QUICK = (3.0, 4.0, 6.0, 8.0, 10.0)
+PITCH_RED_AT = 24.0                     # a stream's pitch meter: red past ±24 st
+PITCH_QUICK = (-24.0, -12.0, 12.0, 24.0, 36.0)
 RED = "#ff4d4f"
 NAME_W, VAL_W, GAP = 48, 52, 10         # popup slider columns: name | track | value
 FX_NAME_W = 70                          # the effects column: longer names
@@ -42,13 +45,16 @@ def redline_speed(lo: float, hi: float) -> voicefx.Param:
 
 class RevMeter(QWidget):
     """A tachometer for the speed: 0..top, the arc turns orange then red past
-    REDLINE_AT, and the needle shows where you are."""
+    REDLINE_AT, and the needle shows where you are. `pitch=True`: the same dial
+    for a stream's pitch, -top..top st, orange past ±12 and red past ±24."""
     SWEEP = 240.0                       # degrees, from lower-left round to lower-right
 
-    def __init__(self, top: float):
+    def __init__(self, top: float, pitch: bool = False):
         super().__init__()
+        self.pitch = pitch
         self.top = top
-        self.speed = 1.0
+        self.lo = -top if pitch else 0.0
+        self.speed = 0.0 if pitch else 1.0     # the value shown (st on a pitch meter)
         self.setFixedHeight(132)
         self.setMinimumWidth(200)
 
@@ -59,8 +65,37 @@ class RevMeter(QWidget):
 
     def _angle(self, v: float) -> float:
         """Qt angle (degrees, counter-clockwise from 3 o'clock) of value v."""
-        f = min(max(v / self.top, 0.0), 1.0)
+        f = min(max((v - self.lo) / (self.top - self.lo), 0.0), 1.0)
         return 90 + self.SWEEP / 2 - self.SWEEP * f
+
+    def _hot(self, v: float) -> bool:
+        if self.pitch:
+            return abs(v) >= PITCH_RED_AT - 1e-6
+        return v >= REDLINE_AT - 1e-6
+
+    def _zones(self, t) -> list[tuple[float, float, str]]:
+        """(from, to, colour) of the dial's coloured bands."""
+        if self.pitch:
+            warn, red = PITCH.hi, min(self.top, PITCH_RED_AT)
+            return [(self.lo, -red, RED), (-red, -warn, t["warn_text"]),
+                    (-warn, warn, t["accent"]), (warn, red, t["warn_text"]),
+                    (red, self.top, RED)]
+        warn_at = min(self.top, max(0.0, REDLINE_AT - 2))
+        red_at = min(self.top, REDLINE_AT)
+        return [(0, warn_at, t["accent"]), (warn_at, red_at, t["warn_text"]),
+                (red_at, self.top, RED)]
+
+    def _ticks(self) -> list[tuple[float, str]]:
+        """(value, label) per tick: every 1x, or every 12 st on a pitch meter."""
+        if self.pitch:
+            return [(float(v), f"{v:+d}" if v else "0")
+                    for v in range(int(self.lo), int(self.top) + 1, 12)]
+        return [(float(i), str(i)) for i in range(int(self.top) + 1)]
+
+    def _text(self) -> str:
+        if self.pitch:
+            return f"{self.speed:+g} st" if self.speed else "0 st"
+        return f"{self.speed:g}x"
 
     def paintEvent(self, _e):
         t = theme.T
@@ -79,25 +114,22 @@ class RevMeter(QWidget):
             a = math.radians(self._angle(v))
             return QPointF(c.x() + rad * math.cos(a), c.y() - rad * math.sin(a))
 
-        warn_at = min(self.top, max(0.0, REDLINE_AT - 2))
-        red_at = min(self.top, REDLINE_AT)
-        arc(0, self.top, t["faint"], 3)                  # the whole dial, dim
-        arc(0, warn_at, t["accent"], 7)
-        arc(warn_at, red_at, t["warn_text"], 7)
-        if red_at < self.top:
-            arc(red_at, self.top, RED, 7)
+        arc(self.lo, self.top, t["faint"], 3)            # the whole dial, dim
+        for v0, v1, colour in self._zones(t):
+            if v0 < v1:
+                arc(v0, v1, colour, 7)
 
         f = QFont(self.font())
         f.setPointSizeF(7)
         p.setFont(f)
-        for i in range(int(self.top) + 1):              # a tick + number per 1x
-            hot = i >= REDLINE_AT
-            p.setPen(QPen(QColor(RED if hot else t["muted"]), 1.5))
-            p.drawLine(point(i, r - 6), point(i, r - 13))
-            q = point(i, r - 22)
-            p.drawText(QRectF(q.x() - 10, q.y() - 7, 20, 14), Qt.AlignmentFlag.AlignCenter, str(i))
+        for v, label in self._ticks():                  # a tick + number each step
+            p.setPen(QPen(QColor(RED if self._hot(v) else t["muted"]), 1.5))
+            p.drawLine(point(v, r - 6), point(v, r - 13))
+            q = point(v, r - (26 if self.pitch else 22))   # "+12" is wider than "1"
+            p.drawText(QRectF(q.x() - 12, q.y() - 7, 24, 14), Qt.AlignmentFlag.AlignCenter,
+                       label)
 
-        hot = self.speed >= REDLINE_AT - 1e-6
+        hot = self._hot(self.speed)
         needle = QColor(RED if hot else t["text_hi"])
         p.setPen(QPen(needle, 2.5, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
         p.drawLine(c, point(self.speed, r - 4))
@@ -110,7 +142,7 @@ class RevMeter(QWidget):
         p.setFont(f)
         p.setPen(QColor(RED if hot else t["text"]))
         p.drawText(QRectF(c.x() - 60, c.y() + 6, 120, 20), Qt.AlignmentFlag.AlignCenter,
-                   f"{self.speed:g}x")
+                   self._text())
         if hot:
             f.setPointSizeF(7)
             p.setFont(f)
@@ -243,9 +275,11 @@ class SpeedPitchButton(QPushButton):
         rv = QVBoxLayout(self.red_box)
         rv.setContentsMargins(0, 4, 0, 0)
         rv.setSpacing(6)
-        self.meter = RevMeter(top)
+        self.meter = RevMeter(top if self.has_speed else REDLINE_PITCH.hi,
+                              pitch=not self.has_speed)
         rv.addWidget(self.meter)
-        rv.addLayout(self._quick_row(tuple(s for s in REDLINE_QUICK if s <= top)))
+        rv.addLayout(self._quick_row(tuple(s for s in REDLINE_QUICK if s <= top))
+                     if self.has_speed else self._pitch_row(PITCH_QUICK))
         self.red_box.hide()
         v.addWidget(self.red_box)
 
@@ -326,6 +360,19 @@ class SpeedPitchButton(QPushButton):
             q.addWidget(b)
         return q
 
+    def _pitch_row(self, steps) -> QHBoxLayout:
+        """A stream's Redline pitches, under its meter like the speeds are."""
+        q = QHBoxLayout()
+        q.setContentsMargins(NAME_W + GAP, 0, 0, 0)
+        q.setSpacing(4)
+        for st in steps:
+            b = QPushButton(f"{st:+g}")
+            b.setObjectName("small")
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda __=False, st=st: self.pitch.set_value(st) or self._edited())
+            q.addWidget(b)
+        return q
+
     def set_redline(self, on: bool):
         """Unlock (or lock again) the silly range. Locking pulls the values back in."""
         if self.redline.isChecked() != on:
@@ -335,7 +382,7 @@ class SpeedPitchButton(QPushButton):
         self.redline.setText(_("On") if on else _("Unlock"))
         self.speed.set_param(self._speed_hi if on else SPEED)
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
-        self.red_box.setVisible(on and self.has_speed)   # the rev meter: speed only
+        self.red_box.setVisible(on)        # the rev meter: the speed, or a stream's pitch
         if self.pop.isVisible():
             self._open()                  # resize, retaining the user's position
         self._edited()
@@ -431,5 +478,5 @@ class SpeedPitchButton(QPushButton):
 
     def _edited(self):
         self._label()
-        self.meter.set_value(self.speed.value())
+        self.meter.set_value(self.speed.value() if self.has_speed else self.pitch.value())
         self.changed.emit(*self.values())
