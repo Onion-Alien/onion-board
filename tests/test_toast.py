@@ -324,3 +324,96 @@ def test_the_mini_player_shows_icons_on_top_or_none(main_window, qapp):  # noqa:
     qapp.processEvents()
     assert not w.is_mini() and s.mode == "cards"
     assert err.isVisible() and toast.shown(w) == [ok, err]   # nothing was closed
+
+
+def test_a_big_import_shows_bun_and_closing_it_only_hides_it(main_window, qapp, tmp_path,  # noqa: F811
+                                                             monkeypatch):
+    """Several files: a card with Bun, the count and a bar. ✕ hides it while the rest go
+    on; each sound is on the board (playable) before the import ends; the finished card
+    with Undo still comes."""
+    import threading
+    from soundboard.ui import mainwindow
+    w = main_window
+    t = np.arange(SR // 10) / SR
+    files = []
+    for i in range(4):
+        p = tmp_path / f"Big {i}.wav"
+        sf.write(p, np.stack([np.sin(2 * np.pi * (300 + 90 * i) * t)] * 2, 1) * 0.3, SR)
+        files.append(str(p))
+    go, real = threading.Event(), mainwindow.import_file
+    calls = []
+
+    def slow(f, *a, **k):   # the first file goes in, the rest wait
+        calls.append(f)
+        if len(calls) > 1:
+            go.wait(10)
+        return real(f, *a, **k)
+    monkeypatch.setattr(mainwindow, "import_file", slow)
+    w.import_files(files)
+    card = next(x for x in toast.shown(w) if x.key == "import")
+    assert card.kind == "busy" and card.card.progress == (0, 4)
+    assert card.card.icon.pixmap() is not None and card.card.icon.width() > 30   # Bun
+    assert process_events(qapp, lambda: w._pending_imports == 3)
+    first = w._import_ids[0]
+    assert process_events(qapp, lambda: first in w.pads)   # on the board already
+    card.card.btn_close.click()
+    assert process_events(qapp, lambda: not any(x.key == "import" for x in toast.shown(w)))
+    go.set()
+    assert process_events(qapp, lambda: not w._pending_imports)
+    done = next(x for x in toast.shown(w) if x.key == "import")
+    assert done.kind == "ok" and done.card.action.text() == "Undo"
+    assert done.card.icon.width() == 18 and not w._import_card_shut   # next import: card again
+
+
+def test_stop_on_a_big_import_keeps_whats_in_and_skips_the_rest(main_window, qapp, tmp_path,  # noqa: F811
+                                                                 monkeypatch):
+    import threading
+    from soundboard.ui import mainwindow
+    w = main_window
+    t = np.arange(SR // 10) / SR
+    files = []
+    for i in range(6):
+        p = tmp_path / f"Oops {i}.wav"
+        sf.write(p, np.stack([np.sin(2 * np.pi * (300 + 70 * i) * t)] * 2, 1) * 0.3, SR)
+        files.append(str(p))
+    go, real, calls = threading.Event(), mainwindow.import_file, []
+
+    def slow(f, *a, **k):   # two go in, the third waits
+        calls.append(f)
+        if len(calls) == 3:
+            go.wait(10)
+        return real(f, *a, **k)
+    monkeypatch.setattr(mainwindow, "import_file", slow)
+    before = len(w.cfg.sounds)
+    w.import_files(files)
+    assert process_events(qapp, lambda: w._pending_imports == 4 and len(calls) == 3)
+    card = next(x for x in toast.shown(w) if x.key == "import")
+    assert card.card.action.text() == "Stop"
+    card.card.action.click()
+    go.set()
+    assert process_events(qapp, lambda: not w._pending_imports)
+    assert len(calls) == 3 and len(w.cfg.sounds) == before + 3   # the one being read finished
+    done = next(x for x in toast.shown(w) if x.key == "import")
+    assert done.card.action.text() == "Undo" and not w._import_stop.is_set()
+    done.card.action.click()
+    assert len(w.cfg.sounds) == before
+
+
+def test_one_slow_file_keeps_its_busy_card_until_its_in(main_window, qapp, tmp_path,  # noqa: F811
+                                                       monkeypatch):
+    """A long file can take longer to read than a notice stays up: its card waits."""
+    import threading
+    from soundboard.ui import mainwindow
+    w = main_window
+    p = tmp_path / "Hour.wav"
+    sf.write(p, np.zeros((SR // 10, 2)), SR)
+    go, real = threading.Event(), mainwindow.import_file
+    monkeypatch.setattr(mainwindow, "import_file", lambda f, *a, **k: (go.wait(10),
+                                                                      real(f, *a, **k))[1])
+    w.import_files([str(p)])
+    card = next(x for x in toast.shown(w) if x.key == "import")
+    assert card.kind == "busy" and card.card.progress is None
+    # a busy card's own long wait (minutes), not a notice's few seconds
+    assert card._timer.remainingTime() > 60_000
+    go.set()
+    assert process_events(qapp, lambda: not w._pending_imports)

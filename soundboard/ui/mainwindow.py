@@ -485,6 +485,11 @@ class MainWindow(QMainWindow):
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
+        self._import_card_shut = False   # its card closed with ✕: the import goes on
+        self._import_stop = threading.Event()   # its Stop: the files not started are skipped
+        # the pads come in a few at a time while a big import runs, each playable at once
+        self._import_pads = QTimer(self, singleShot=True, interval=300,
+                                   timeout=self._rebuild_pads)   # pyright: ignore[reportCallIssue]
         self._import_ids: list[str] = []   # added in this batch: Undo takes them off
         # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
         # given to it once it's in if nothing here has that key
@@ -830,11 +835,11 @@ class MainWindow(QMainWindow):
         self.urgent_btn.setObjectName("primary")
         self.urgent_btn.clicked.connect(self._urgent_clicked)
         uh.addWidget(self.urgent_btn)
-        hide = QPushButton("✕")
+        hide = QPushButton()
         hide.setObjectName("urgenthide")
         hide.setAccessibleName(_("Hide"))
         hide.setToolTip(_("Hide until Onion Board starts again"))
-        hide.setFixedSize(28, 28)
+        icons.close_button(hide, 28, "warn_text")
         hide.clicked.connect(self._hide_urgent)
         uh.addWidget(hide)
         self.urgent_bar.hide()
@@ -854,11 +859,11 @@ class MainWindow(QMainWindow):
         self.tip_btn.setObjectName("small")
         self.tip_btn.clicked.connect(self._tip_show_me)
         th.addWidget(self.tip_btn)
-        hide = QPushButton("✕")
+        hide = QPushButton()
         hide.setObjectName("urgenthide")
         hide.setAccessibleName(_("Hide the tip"))
         hide.setToolTip(_("Hide this tip (Settings → General turns tips off)"))
-        hide.setFixedSize(28, 28)
+        icons.close_button(hide, 28)
         hide.clicked.connect(self.tip_bar.hide)
         th.addWidget(hide)
         self.tip_bar.hide()
@@ -884,9 +889,9 @@ class MainWindow(QMainWindow):
         self.setup_no.setObjectName("small")
         self.setup_no.clicked.connect(self._setup_not_now)
         sh.addWidget(self.setup_no)
-        self.setup_x = QPushButton("✕")
+        self.setup_x = QPushButton()
         self.setup_x.setObjectName("urgenthide")
-        self.setup_x.setFixedSize(28, 28)
+        icons.close_button(self.setup_x, 28)
         self.setup_x.clicked.connect(self._setup_x_clicked)
         sh.addWidget(self.setup_x)
         self.setup_bar.hide()
@@ -907,9 +912,9 @@ class MainWindow(QMainWindow):
         self.lang_btn.setObjectName("small")
         self.lang_btn.clicked.connect(lambda: self.switch_language(self._lang_offered))
         lh.addWidget(self.lang_btn)
-        hide = QPushButton("✕")
+        hide = QPushButton()
         hide.setObjectName("urgenthide")
-        hide.setFixedSize(28, 28)
+        icons.close_button(hide, 28)
         hide.clicked.connect(self._no_language)
         lh.addWidget(hide)
         self.lang_hide = hide
@@ -1810,10 +1815,10 @@ class MainWindow(QMainWindow):
         name.setObjectName("chipname")
         name.setToolTip(tip)
         name.clicked.connect(on_click)
-        x = QPushButton("✕")
+        x = QPushButton()
         x.setObjectName("chipstop")
         x.setToolTip(x_tip)
-        x.setFixedSize(24, 24)
+        icons.close_button(x, 24)
         x.clicked.connect(on_x)
         ch.addWidget(name)
         ch.addWidget(x)
@@ -5872,11 +5877,16 @@ class MainWindow(QMainWindow):
         known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
         copy_local = self.cfg.copy_local_sounds
         local_files = set(files)   # ZIP extraction adds temporary files later
+        stop = self._import_stop
 
         def run():
             with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
                 todo = list(files)
                 for k, (z, names) in enumerate(zips.items()):
+                    if stop.is_set():   # Stop: not unpacked, only counted down
+                        for __ in names:
+                            self.bridge.imported.emit(None, None, None)
+                        continue
                     try:
                         res = backup.extract_loose(z, names, Path(tmp) / str(k))
                     except Exception as e:  # noqa: BLE001 - too big, no room, damaged
@@ -5897,6 +5907,9 @@ class MainWindow(QMainWindow):
 
         def import_all(files):
             for i, shown in enumerate(files):
+                if stop.is_set():   # Stop: the rest only count down, the ones in stay
+                    self.bridge.imported.emit(None, None, None)
+                    continue
                 f = shown   # read through any folder link Windows won't follow
                 try:
                     f = str(winpath.usable(shown))
@@ -5933,12 +5946,37 @@ class MainWindow(QMainWindow):
         self._import_progress()
 
     def _import_progress(self):
-        """The import's toast while it runs: "Adding 3 of 12…", with a bar."""
+        """The import's toast while it runs: "Adding 3 of 12…", with a bar. Several
+        files get a bigger card with Bun; closing it (✕) only hides it: the import goes
+        on, its sounds keep showing up, and the finished card still comes."""
         total = self._import_total
         done = total - self._pending_imports
         text = (ngettext("Adding {count} sound…", "Adding {count} sounds…", total, count=total)
                 if not done else _("Adding {done} of {total}…", done=done, total=total))
-        self.toast(text, "busy", key="import", progress=(done, total) if total > 1 else None)
+        if total <= 1:
+            self.toast(text, "busy", 0, key="import")   # up until it's in, however slow
+            return
+        if self._import_card_shut:
+            return
+        text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
+                                                 "Closing this doesn't stop it."))
+        t = self.toast(text, "busy", 0, key="import", progress=(done, total),
+                       action=(_("Stop"), self._stop_import),
+                       picture=bunny.bunny_pixmap(44, dpr=self.devicePixelRatioF()))
+        if t is not None and not t.property("import_card"):
+            t.setProperty("import_card", True)
+            t.card.btn_close.clicked.connect(self._shut_import_card)
+
+    def _shut_import_card(self):
+        if self._pending_imports > 0:
+            self._import_card_shut = True
+
+    def _stop_import(self):
+        """The card's Stop: the file being read finishes, the rest are skipped; the
+        sounds already in stay (the finished card's Undo takes them off too)."""
+        if self._pending_imports > 0:
+            self._import_stop.set()
+            self._import_card_shut = True
 
     def on_imported(self, meta, data, err):
         self._pending_imports -= 1
@@ -5962,9 +6000,14 @@ class MainWindow(QMainWindow):
         elif err:
             self._import_errors.append(err)
         if self._pending_imports > 0:
+            if meta is not None and not self._import_pads.isActive():
+                self._import_pads.start()   # on the board soon, with the next few
             self._import_progress()
             return
+        self._import_pads.stop()
         self._pending_imports = 0
+        self._import_card_shut = False
+        self._import_stop.clear()
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()   # categories and hotkeys from an Import from Soundpad

@@ -13,6 +13,8 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
   notice in the same window, so "Adding 3 sounds…" becomes "Added 3 sounds" in place.
   ``key`` does the same for a named card: a later toast with that key updates it.
 - **Buttons**: ``action=(label, callback)`` adds one (Undo, See why); ✕ closes.
+- **Picture**: ``picture=`` (a QPixmap, e.g. Bun) stands in the icon's place: a bigger
+  card for something that runs a while (a big import).
   ``on_close`` runs when the card goes without its button clicked: timed out, closed,
   pushed out by newer cards or replaced (an Undo card's "too late now").
 - **Timing**: hovering pauses the countdown. Errors stay until closed.
@@ -34,7 +36,7 @@ import shiboken6
 
 from PySide6.QtCore import (QAbstractAnimation, QEasingCurve, QEvent, QObject, QPoint,
                             QPointF, QPropertyAnimation, QRectF, Qt, QTimer)
-from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtGui import QColor, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShadowEffect,
                                QGraphicsOpacityEffect, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
@@ -175,7 +177,7 @@ class _Card(QFrame):
         self.btn_copy = self._icon_button("copy", 13, _("Copy"))
         self.btn_copy.hide()
         row.addWidget(self.btn_copy, 0, Qt.AlignmentFlag.AlignTop)
-        self.btn_close = self._icon_button("close", 12, _("Dismiss"))
+        self.btn_close = self._icon_button("close", 16, _("Dismiss"))
         row.addWidget(self.btn_close, 0, Qt.AlignmentFlag.AlignTop)
 
     @staticmethod
@@ -214,6 +216,17 @@ class _Card(QFrame):
         self.label.ensurePolished()
         pad = max(0, (LINE - self.label.fontMetrics().height()) // 2)
         self.label.setContentsMargins(0, pad, 0, pad)
+
+    def set_picture(self, pm: QPixmap | None):
+        """A picture (Bun) in the icon's place, or back to the kind's icon."""
+        if pm is None:
+            self.icon.setFixedSize(18, LINE)
+            return
+        self.spinner.hide()
+        self.icon.show()
+        dpr = pm.devicePixelRatio() or 1.0
+        self.icon.setFixedSize(round(pm.width() / dpr), round(pm.height() / dpr))
+        self.icon.setPixmap(pm)
 
     def set_kind(self, kind: str):
         name, self._tone = KINDS.get(kind, KINDS[""])
@@ -291,12 +304,14 @@ class _Toast(QWidget):
         """What it says, as plain words (no markup, entities read)."""
         return _strip_tags(self._text)
 
-    def set_content(self, text: str, kind: str, ms: int, action, progress, on_close=None):
+    def set_content(self, text: str, kind: str, ms: int, action, progress, on_close=None,
+                    picture: QPixmap | None = None):
         self._closed()   # what it said before is gone now
         self._on_close = on_close
         self._text, self.kind = text, kind
         self.setProperty("tone", kind)
         self.card.set_kind(kind)
+        self.card.set_picture(picture)
         self.card.label.setText(text)
         self.card.set_line()
         self.card.label.setAccessibleName(_strip_tags(text))
@@ -633,7 +648,8 @@ def titled(title: str, text: str) -> str:
 def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, *,
          action: tuple[str, Callable[[], None]] | None = None, key: str | None = None,
          progress: tuple[int, int] | None = None,
-         on_close: Callable[[], None] | None = None) -> _Toast | None:
+         on_close: Callable[[], None] | None = None,
+         picture: QPixmap | None = None) -> _Toast | None:
     """Show ``text`` (rich text) on ``window``, or the dialog in front of it (Settings
     is modal over the window). Returns the card, or None with no window."""
     host = QApplication.activeModalWidget() or window
@@ -647,7 +663,8 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         kind = "busy"
     stack = _stack_for(host)
     t = stack.find(text, kind, key)
-    if t is not None and key is None and progress is None and not action and not on_close:
+    if (t is not None and key is None and progress is None and not action and not on_close
+            and picture is None):
         t.bump(ms)
         stack.place()
         return t
@@ -657,7 +674,7 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
     if new:
         t = _Toast(host, stack)
     t.key = key
-    t.set_content(text, kind, ms, action, progress, on_close)
+    t.set_content(text, kind, ms, action, progress, on_close, picture)
     if new:
         stack.add(t)
         stack.place(animate=False)

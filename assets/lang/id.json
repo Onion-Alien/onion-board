@@ -3090,5 +3090,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Sekarang suaranya masuk ke <b>{device}</b>, speaker atau headset biasa, jadi cuma kamu yang dengar. Pilih cara yang sampai ke voice chat:",
   "Use my mic": "Pakai mic-ku",
   "Use the virtual cable": "Pakai kabel virtual",
-  "Plays from: {path}": "Diputar dari: {path}"
+  "Plays from: {path}": "Diputar dari: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap suara muncul begitu masuk. Menutup ini tidak menghentikannya."
 }

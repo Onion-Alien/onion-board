@@ -3236,5 +3236,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Teď jdou do <b>{device}</b>, běžných reproduktorů nebo sluchátek, takže je slyšíš jen ty. Vyber způsob, který se dostane do hlasového chatu:",
   "Use my mic": "Použít můj mikrofon",
   "Use the virtual cable": "Použít virtuální kabel",
-  "Plays from: {path}": "Přehrává se z: {path}"
+  "Plays from: {path}": "Přehrává se z: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Každý zvuk se objeví hned, jak je přidaný. Zavřením se to nezastaví."
 }

@@ -3455,5 +3455,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "أصواتك تذهب الآن إلى <b>{device}</b>، وهو سماعة أو مكبّر صوت عادي، لذا تسمعها أنت فقط. اختر طريقة تصل إلى الدردشة الصوتية:",
   "Use my mic": "استخدم ميكروفوني",
   "Use the virtual cable": "استخدم الكابل الافتراضي",
-  "Plays from: {path}": "يُشغَّل من: {path}"
+  "Plays from: {path}": "يُشغَّل من: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "يظهر كل صوت فور إضافته. إغلاق هذا لا يوقفه."
 }

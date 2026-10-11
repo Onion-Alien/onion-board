@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Most ide mennek: <b>{device}</b>, ami egy sima hangszóró vagy headset, így csak te hallod őket. Válassz egy módot, ami eljut a hangcsevegésbe:",
   "Use my mic": "Saját mikrofon használata",
   "Use the virtual cable": "Virtuális kábel használata",
-  "Plays from: {path}": "Innen szól: {path}"
+  "Plays from: {path}": "Innen szól: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Minden hang megjelenik, amint bekerült. A bezárás nem állítja le."
 }

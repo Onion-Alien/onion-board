@@ -286,7 +286,8 @@ def test_a_double_click_on_a_queue_chips_x_takes_out_only_that_one(window, monke
     w.queue_sound("s1")
     w.queue_sound("s0")
     w._update_chips({"s0": (0.5, False)})
-    first_x = [b for b in w.playing_row.findChildren(QPushButton) if b.text() == "✕"][0]
+    first_x = [b for b in w.playing_row.findChildren(QPushButton)
+               if b.toolTip() == "Take it out of the queue"][0]
     first_x.click()
     first_x.click()                   # the same ✕ again before the row is remade
     assert w._queue == ["s0"]

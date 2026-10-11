@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "अब ये <b>{device}</b> पर जाती हैं, जो एक सामान्य स्पीकर या हेडसेट है, इसलिए सिर्फ़ आप इन्हें सुनते हैं। ऐसा तरीका चुनें जो वॉइस चैट तक पहुँचे:",
   "Use my mic": "मेरा माइक इस्तेमाल करें",
   "Use the virtual cable": "वर्चुअल केबल इस्तेमाल करें",
-  "Plays from: {path}": "यहाँ से चलता है: {path}"
+  "Plays from: {path}": "यहाँ से चलता है: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "हर साउंड जुड़ते ही दिखने लगती है। इसे बंद करने से यह रुकता नहीं।"
 }

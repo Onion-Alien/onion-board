@@ -3163,5 +3163,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Ze gaan nu naar <b>{device}</b>, gewone speakers of een headset, dus alleen jij hoort ze. Kies een manier die de voicechat bereikt:",
   "Use my mic": "Mijn mic gebruiken",
   "Use the virtual cable": "De virtuele kabel gebruiken",
-  "Plays from: {path}": "Speelt af vanaf: {path}"
+  "Plays from: {path}": "Speelt af vanaf: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Elk geluid verschijnt zodra het erin staat. Sluiten stopt het niet."
 }

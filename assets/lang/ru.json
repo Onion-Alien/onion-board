@@ -3236,5 +3236,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Сейчас они идут на <b>{device}</b>, обычные колонки или гарнитуру, поэтому их слышите только вы. Выберите способ, который дойдёт до голосового чата:",
   "Use my mic": "Мой микрофон",
   "Use the virtual cable": "Виртуальный кабель",
-  "Plays from: {path}": "Играет из: {path}"
+  "Plays from: {path}": "Играет из: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Каждый звук появляется, как только добавлен. Если закрыть, это не остановится."
 }

@@ -426,10 +426,10 @@ class DownloadBar(QFrame):
         self.btn_expand.setFixedSize(22, 22)
         self.btn_expand.clicked.connect(lambda: self.set_collapsed(False))
         sl.addWidget(self.btn_expand, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.s_close = QPushButton("✕")
+        self.s_close = QPushButton()
         self.s_close.setObjectName("urgenthide")
         self.s_close.setToolTip(_("Dismiss"))
-        self.s_close.setFixedSize(22, 22)
+        icons.close_button(self.s_close, 22)
         self.s_close.clicked.connect(self._clear_and_hide)
         self.s_close.hide()
         sl.addWidget(self.s_close, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -511,10 +511,10 @@ class DownloadBar(QFrame):
         self.btn_min.setFixedSize(22, 22)
         self.btn_min.clicked.connect(
             lambda: (usage.used("dl-bar-small"), self.set_collapsed(True)))
-        self.btn_close = QPushButton("✕", self)
+        self.btn_close = QPushButton(self)
         self.btn_close.setObjectName("urgenthide")
         self.btn_close.setToolTip(_("Dismiss"))
-        self.btn_close.setFixedSize(22, 22)
+        icons.close_button(self.btn_close, 22)
         self.btn_close.clicked.connect(self._clear_and_hide)
         self.btn_close.hide()
         col.addLayout(row1)
@@ -646,7 +646,7 @@ class DownloadBar(QFrame):
             f"QFrame#queuerow[failed=\"true\"] {{ border-color:{bad_edge}; }}"
             f"QLabel#failedtag {{ color:{bad}; font-size:8.5pt; font-weight:700; }}"
             f"QPushButton#urgenthide {{ background:transparent; border:none; color:{T['muted']}; "
-            f"border-radius:6px; padding:0px; min-width:0px; font-size:10pt; }}"
+            f"border-radius:6px; padding:0px; }}"
             f"QPushButton#urgenthide:hover {{ background:{T['btn_hover']}; }}"
             f"QFrame#queuerow {{ background:{row_bg}; border:1px solid transparent; "
             f"border-radius:8px; }}"
@@ -998,11 +998,10 @@ class DownloadBar(QFrame):
                 kind.setObjectName("actionpill")
                 kind.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                 rl.addWidget(kind)
-            x = QPushButton("✕")
+            x = QPushButton()
             x.setObjectName("urgenthide")
             x.setToolTip(_("Remove"))
-            x.setCursor(Qt.CursorShape.PointingHandCursor)
-            x.setFixedSize(24, 24)
+            icons.close_button(x, 24)
             x.clicked.connect(lambda _c=False, u=q["url"], b=bad: self._forget(u) if b
                               else (usage.used("dl-cancel"), self.cancel_requested.emit(u)))
             rl.addWidget(x)

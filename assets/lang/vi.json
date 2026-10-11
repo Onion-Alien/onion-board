@@ -3090,5 +3090,6 @@
   "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Âm thanh giờ đi tới <b>{device}</b>, loa hoặc tai nghe bình thường, nên chỉ bạn nghe thấy. Chọn một cách đến được trò chuyện thoại:",
   "Use my mic": "Dùng mic của tôi",
   "Use the virtual cable": "Dùng cáp ảo",
-  "Plays from: {path}": "Phát từ: {path}"
+  "Plays from: {path}": "Phát từ: {path}",
+  "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Mỗi âm thanh hiện ra ngay khi được thêm. Đóng cái này không làm nó dừng."
 }
