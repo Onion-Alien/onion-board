@@ -2085,7 +2085,6 @@
   "That isn't a Myinstants sound link.": "這不是 Myinstants 聲音連結。",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "這不是代理位址：它應該看起來像socks5h://127.0.0.1:9050 或http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "這不是語音代碼（它們以“OB1-”開頭）。",
-  "That link isn't from a site sounds can be added from.": "該連結不是來自可以添加聲音的網站。",
   "That mic isn't plugged in (or Windows doesn't list it).": "此麥克風未插入（或 Windows 未列出它）。",
   "That needs signing in to the site, which Onion Board doesn't do.": "這需要登入網站，但 Onion Board 不這樣做。",
   "That program isn't running any more.": "該程式不再運行。",
@@ -2886,7 +2885,6 @@
   "Mic on": "麥克風已開啟",
   "Output": "輸出",
   "Mic muted": "麥克風已靜音",
-  "Mute or unmute your microphone for others": "為其他人靜音或開啟你的麥克風",
   "Library": "聲音庫",
   "Quick hotkeys": "快捷熱鍵",
   "{route}: {status}": "{route}：{status}",
@@ -3056,5 +3054,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows 會要求權限。更新期間聲音會短暫中斷。",
   "You can update later in Setup.": "你可以稍後在設置裡更新。",
   "Your mic is already up to date.": "你的麥克風已是最新版本。",
-  "Your mic, upgraded": "麥克風，升級了"
+  "Your mic, upgraded": "麥克風，升級了",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "為其他人靜音或開啟你的麥克風。你的音效他們仍然聽得到。",
+  "That page has no sound Onion Board can add.": "該頁面沒有 Onion Board 可以加入的音效。",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "移除的音效可以用復原找回，之後也可以在 備份 → 最近刪除的音效 中找回。"
 }

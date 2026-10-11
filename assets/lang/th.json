@@ -2085,7 +2085,6 @@
   "That isn't a Myinstants sound link.": "นั่นไม่ใช่ลิงก์เสียงของ Myinstants",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "นั่นไม่ใช่ที่อยู่พร็อกซี: ควรมีลักษณะดังนี้ Socks5h://127.0.0.1:9050 หรือ http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "นั่นไม่ใช่รหัสเสียง (ขึ้นต้นด้วย “OB1-”)",
-  "That link isn't from a site sounds can be added from.": "ลิงก์นั้นไม่ได้มาจากเสียงของไซต์ที่สามารถเพิ่มได้",
   "That mic isn't plugged in (or Windows doesn't list it).": "ไม่ได้เสียบปลั๊กไมโครโฟน (หรือ Windows ไม่แสดงรายการ)",
   "That needs signing in to the site, which Onion Board doesn't do.": "จำเป็นต้องลงชื่อเข้าใช้ไซต์ ซึ่ง Onion Board ไม่ทำ",
   "That program isn't running any more.": "โปรแกรมนั้นไม่ทำงานอีกต่อไป",
@@ -2886,7 +2885,6 @@
   "Mic on": "เปิดไมค์",
   "Output": "เอาต์พุต",
   "Mic muted": "ปิดเสียงไมค์",
-  "Mute or unmute your microphone for others": "ปิดหรือเปิดเสียงไมโครโฟนของคุณสำหรับผู้อื่น",
   "Library": "คลังเสียง",
   "Quick hotkeys": "ปุ่มลัดด่วน",
   "{route}: {status}": "{route}: {status}",
@@ -3056,5 +3054,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows จะขออนุญาต เสียงจะหยุดสักครู่ระหว่างอัปเดต",
   "You can update later in Setup.": "คุณอัปเดตทีหลังได้ในเซ็ตอัป",
   "Your mic is already up to date.": "ไมค์ของคุณเป็นเวอร์ชันล่าสุดแล้ว",
-  "Your mic, upgraded": "ไมค์ของคุณ อัปเกรดแล้ว"
+  "Your mic, upgraded": "ไมค์ของคุณ อัปเกรดแล้ว",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "ปิดหรือเปิดเสียงไมโครโฟนของคุณสำหรับผู้อื่น เสียงของคุณยังเล่นให้พวกเขาได้ยิน",
+  "That page has no sound Onion Board can add.": "หน้านั้นไม่มีเสียงที่ Onion Board เพิ่มได้",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "เสียงที่ลบจะกลับมาได้ด้วย เลิกทำ หรือภายหลังจาก สำรอง → เสียงที่ลบล่าสุด"
 }

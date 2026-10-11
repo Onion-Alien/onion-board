@@ -2085,7 +2085,6 @@
   "That isn't a Myinstants sound link.": "Itu bukan tautan suara Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Itu bukan alamat proxy: alamatnya akan terlihat seperti socks5h://127.0.0.1:9050 atau http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Itu bukan kode suara (dimulai dengan “OB1-”).",
-  "That link isn't from a site sounds can be added from.": "Tautan itu bukan dari situs yang kedengarannya dapat ditambahkan.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Mikrofon tersebut tidak dicolokkan (atau Windows tidak mencantumkannya).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Itu perlu masuk ke situs, yang tidak dilakukan Onion Board.",
   "That program isn't running any more.": "Program itu tidak berjalan lagi.",
@@ -2886,7 +2885,6 @@
   "Mic on": "Mik aktif",
   "Output": "Output",
   "Mic muted": "Mik dibisukan",
-  "Mute or unmute your microphone for others": "Bisukan atau aktifkan mikrofonmu untuk orang lain",
   "Library": "Pustaka",
   "Quick hotkeys": "Hotkey cepat",
   "{route}: {status}": "{route}: {status}",
@@ -3056,5 +3054,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows akan meminta izin. Audio berhenti sebentar selama pembaruan.",
   "You can update later in Setup.": "Kamu bisa memperbarui nanti di Penyiapan.",
   "Your mic is already up to date.": "Mic-mu sudah versi terbaru.",
-  "Your mic, upgraded": "Mic-mu, ditingkatkan"
+  "Your mic, upgraded": "Mic-mu, ditingkatkan",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Bisukan atau aktifkan mikmu untuk orang lain. Suaramu tetap terdengar oleh mereka.",
+  "That page has no sound Onion Board can add.": "Halaman itu tidak punya suara yang bisa ditambahkan Onion Board.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Suara yang dihapus bisa kembali lewat Urungkan, atau nanti dari Cadangan → Suara baru dihapus."
 }

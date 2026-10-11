@@ -40,7 +40,7 @@ def test_lookups_go_to_the_helper_without_hooks_and_come_back_worded(monkeypatch
         "Boom", "Chan", 4.0, "https://img/x.jpg", 12, "https://youtu.be/x")
     op, _target, opts = sent[0]
     assert op == "lookup" and "progress_hooks" not in opts and "logger" not in opts
-    with pytest.raises(ytdl.FetchError, match="^That link isn.t from a site"):
+    with pytest.raises(ytdl.FetchError, match="^That page has no sound"):
         ytdl.probe("https://example.com/bad")
 
 

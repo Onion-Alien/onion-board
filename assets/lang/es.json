@@ -2132,7 +2132,6 @@
   "That isn't a Myinstants sound link.": "Ese no es un enlace de sonido de Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Esa no es una dirección proxy: debería verse como calcetines5h://127.0.0.1:9050 o http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Eso no es un código de voz (empiezan con “OB1-”).",
-  "That link isn't from a site sounds can be added from.": "Ese enlace no proviene de un sitio desde el que se puedan agregar sonidos.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ese micrófono no está enchufado (o Windows no lo incluye).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Para ello es necesario iniciar sesión en el sitio, algo que Onion Board no hace.",
   "That program isn't running any more.": "Ese programa ya no se ejecuta.",
@@ -2949,7 +2948,6 @@
   "Mic on": "Micro activo",
   "Output": "Salida",
   "Mic muted": "Micro silenciado",
-  "Mute or unmute your microphone for others": "Silencia o activa tu micrófono para los demás",
   "Library": "Biblioteca",
   "Quick hotkeys": "Atajos rápidos",
   "{route}: {status}": "{route}: {status}",
@@ -3129,5 +3127,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows te pedirá permiso. El audio se pausa un momento durante la actualización.",
   "You can update later in Setup.": "Puedes actualizar más tarde en Configuración.",
   "Your mic is already up to date.": "Tu micrófono ya está actualizado.",
-  "Your mic, upgraded": "Tu micrófono, mejorado"
+  "Your mic, upgraded": "Tu micrófono, mejorado",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Silencia o activa tu micrófono para los demás. Tus sonidos se siguen oyendo.",
+  "That page has no sound Onion Board can add.": "Esa página no tiene ningún sonido que Onion Board pueda añadir.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Los sonidos quitados vuelven con Deshacer, o más tarde desde Copia de seguridad → Sonidos eliminados recientemente."
 }

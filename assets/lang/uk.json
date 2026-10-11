@@ -2179,7 +2179,6 @@
   "That isn't a Myinstants sound link.": "Це не звукове посилання Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Це не адреса проксі: вона має виглядати як socks5h://127.0.0.1:9050 або http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Це не голосовий код (вони починаються з «OB1-»).",
-  "That link isn't from a site sounds can be added from.": "Це посилання не із сайту, з якого можна додавати звуки.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Цей мікрофон не підключено (або Windows його не вказує).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Для цього потрібно ввійти на сайт, чого Onion Board не робить.",
   "That program isn't running any more.": "Ця програма більше не працює.",
@@ -3012,7 +3011,6 @@
   "Mic on": "Мікрофон увімкнено",
   "Output": "Вихід",
   "Mic muted": "Мікрофон вимкнено",
-  "Mute or unmute your microphone for others": "Вимкни або увімкни мікрофон для інших",
   "Library": "Бібліотека",
   "Quick hotkeys": "Швидкі клавіші",
   "{route}: {status}": "{route}: {status}",
@@ -3202,5 +3200,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows попросить дозвіл. Звук ненадовго зникне під час оновлення.",
   "You can update later in Setup.": "Оновити можна пізніше в розділі Підключення.",
   "Your mic is already up to date.": "Твій мікрофон уже оновлено.",
-  "Your mic, upgraded": "Твій мікрофон, кращий ніж був"
+  "Your mic, upgraded": "Твій мікрофон, кращий ніж був",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Вимкни або увімкни мікрофон для інших. Твої звуки вони все одно чують.",
+  "That page has no sound Onion Board can add.": "На цій сторінці немає звуку, який Onion Board може додати.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Видалені звуки повертає «Скасувати», а пізніше — Резервна копія → Нещодавно видалені звуки."
 }

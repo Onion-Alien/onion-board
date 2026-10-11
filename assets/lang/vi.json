@@ -2085,7 +2085,6 @@
   "That isn't a Myinstants sound link.": "Đó không phải là liên kết âm thanh Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Đó không phải là địa chỉ proxy: nó sẽ trông giống như socks5h://127.0.0.1:9050 hoặc http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Đó không phải là mã thoại (chúng bắt đầu bằng “OB1-”).",
-  "That link isn't from a site sounds can be added from.": "Liên kết đó không phải từ một trang web mà âm thanh có thể được thêm vào từ đó.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Mic đó chưa được cắm (hoặc Windows không liệt kê nó).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Điều đó cần phải đăng nhập vào trang web, điều mà Onion Board không làm được.",
   "That program isn't running any more.": "Chương trình đó không còn chạy nữa.",
@@ -2886,7 +2885,6 @@
   "Mic on": "Mic đang bật",
   "Output": "Đầu ra",
   "Mic muted": "Mic đã tắt tiếng",
-  "Mute or unmute your microphone for others": "Tắt hoặc bật tiếng mic của bạn cho người khác",
   "Library": "Thư viện",
   "Quick hotkeys": "Phím tắt nhanh",
   "{route}: {status}": "{route}: {status}",
@@ -3056,5 +3054,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows sẽ xin quyền. Âm thanh tạm dừng một chút khi cập nhật.",
   "You can update later in Setup.": "Bạn có thể cập nhật sau trong Thiết lập.",
   "Your mic is already up to date.": "Mic của bạn đã là bản mới nhất.",
-  "Your mic, upgraded": "Mic của bạn, đã nâng cấp"
+  "Your mic, upgraded": "Mic của bạn, đã nâng cấp",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Tắt hoặc bật tiếng mic của bạn cho người khác. Âm thanh của bạn vẫn phát cho họ.",
+  "That page has no sound Onion Board can add.": "Trang đó không có âm thanh nào Onion Board có thể thêm.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Âm thanh đã xóa có thể lấy lại bằng Hoàn tác, hoặc sau đó từ Sao lưu → Âm thanh đã xóa gần đây."
 }

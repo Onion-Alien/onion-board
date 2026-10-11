@@ -1192,7 +1192,8 @@ class MainWindow(QMainWindow):
         self.mini_mic = QPushButton()
         self.mini_mic.setCheckable(True)
         self.mini_mic.setFixedHeight(28)
-        self.mini_mic.setToolTip(_("Mute or unmute your microphone for others"))
+        self.mini_mic.setToolTip(_("Mute or unmute your mic for others. Your sounds still "
+                                   "play for them."))
         self.mini_mic.toggled.connect(self.on_mic_toggle)
         self.mini_mic.clicked.connect(lambda: usage.used("mini-mic-mute"))   # clicks only
         connection.addWidget(self.mini_mic)
@@ -5917,6 +5918,8 @@ class MainWindow(QMainWindow):
         box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF(), smug=True))
         keep = box.addButton(_("Keep"), QMessageBox.ButtonRole.YesRole)
         remove = box.addButton(_("Remove"), QMessageBox.ButtonRole.NoRole)
+        box.setInformativeText(_("Removed sounds come back with Undo, or later from Backup "
+                                 "→ Recently deleted sounds."))
         box.setDefaultButton(keep)
         box.setEscapeButton(keep)   # closing it never deletes anything
         box.exec()

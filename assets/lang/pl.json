@@ -2179,7 +2179,6 @@
   "That isn't a Myinstants sound link.": "To nie jest łącze dźwiękowe Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "To nie jest adres proxy: powinien wyglądać jak skarpetki5h://127.0.0.1:9050 lub http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "To nie jest kod głosowy (zaczynają się od „OB1-”).",
-  "That link isn't from a site sounds can be added from.": "Ten link nie pochodzi z witryny, z której można dodawać dźwięki.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ten mikrofon nie jest podłączony (lub system Windows go nie wyświetla).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Wymaga to zalogowania się na stronie, czego Onion Board nie robi.",
   "That program isn't running any more.": "Ten program już nie działa.",
@@ -3012,7 +3011,6 @@
   "Mic on": "Mikrofon włączony",
   "Output": "Wyjście",
   "Mic muted": "Mikrofon wyciszony",
-  "Mute or unmute your microphone for others": "Wycisz lub włącz mikrofon dla innych",
   "Library": "Biblioteka",
   "Quick hotkeys": "Szybkie skróty",
   "{route}: {status}": "{route}: {status}",
@@ -3202,5 +3200,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows poprosi o zgodę. Dźwięk na chwilę zniknie podczas aktualizacji.",
   "You can update later in Setup.": "Możesz zaktualizować później w Konfiguracji.",
   "Your mic is already up to date.": "Twój mikrofon jest już aktualny.",
-  "Your mic, upgraded": "Twój mikrofon, ulepszony"
+  "Your mic, upgraded": "Twój mikrofon, ulepszony",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Wycisz lub włącz mikrofon dla innych. Twoje dźwięki nadal do nich docierają.",
+  "That page has no sound Onion Board can add.": "Na tej stronie nie ma dźwięku, który Onion Board może dodać.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Usunięte dźwięki wrócą przez Cofnij albo później przez Kopia zapasowa → Ostatnio usunięte dźwięki."
 }

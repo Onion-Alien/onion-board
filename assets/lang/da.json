@@ -2129,7 +2129,6 @@
   "That isn't a Myinstants sound link.": "Det er ikke et Myinstants-lydlink.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Det er ikke en proxy-adresse: den skal ligne socks5h://127.0.0.1:9050 eller http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Det er ikke en stemmekode (de starter med \"OB1-\").",
-  "That link isn't from a site sounds can be added from.": "Det link er ikke fra et websted, lyde kan tilføjes fra.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Den mikrofon er ikke tilsluttet (eller Windows viser den ikke).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Det kræver at man logger ind på siden, hvilket Onion Board ikke gør.",
   "That program isn't running any more.": "Det program kører ikke mere.",
@@ -2949,7 +2948,6 @@
   "Mic on": "Mikrofon slået til",
   "Output": "Output",
   "Mic muted": "Mikrofon slået fra",
-  "Mute or unmute your microphone for others": "Slå din mikrofon fra eller til for andre",
   "Library": "Bibliotek",
   "Quick hotkeys": "Hurtige genveje",
   "{route}: {status}": "{route}: {status}",
@@ -3129,5 +3127,8 @@
   "Windows asks for permission. Audio pauses briefly during the update.": "Windows beder om tilladelse. Lyden stopper kort under opdateringen.",
   "You can update later in Setup.": "Du kan opdatere senere under Opsætning.",
   "Your mic is already up to date.": "Din mikrofon er allerede opdateret.",
-  "Your mic, upgraded": "Din mikrofon, opgraderet"
+  "Your mic, upgraded": "Din mikrofon, opgraderet",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Slå din mikrofon fra eller til for andre. Dine lyde spiller stadig for dem.",
+  "That page has no sound Onion Board can add.": "Den side har ingen lyd, Onion Board kan tilføje.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Fjernede lyde kommer tilbage med Fortryd, eller senere fra Backup → Nyligt slettede lyde."
 }
