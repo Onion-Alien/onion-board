@@ -848,7 +848,7 @@ class AppsTab(QWidget):
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
         v.addWidget(self.warn)
-        self.btn_bin = QPushButton(_("Forgotten programs…"))
+        self.btn_bin = QPushButton(_("Forgotten programs"))
         self.btn_bin.setToolTip(_("Bring back a program you forgot, with its volume and "
                                   "“Hear it myself”"))
         icons.set_icon(self.btn_bin, "trash")
@@ -1757,7 +1757,7 @@ class AppsTab(QWidget):
     def _on_forget(self, row: AppRow):
         """✕: forget what's remembered about the program and take it off the list. A
         running one stays off (cfg.apps_hidden) until it's brought back from the
-        Undo bar or *Forgotten programs…*."""
+        Undo bar or *Forgotten programs*."""
         key = row.key
         spec = self._unremember(key) or {}
         running = row.app is not None

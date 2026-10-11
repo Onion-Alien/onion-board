@@ -261,6 +261,7 @@ class EditDialog(QDialog):
     (unsaved) effects and fades, to your headphones only."""
     hotkeys_changed = Signal()
     picture_fetched = Signal(int, object, str)   # (which try, QImage or None, why not)
+    source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound"):
@@ -357,7 +358,7 @@ class EditDialog(QDialog):
             prow.addWidget(b)
             return b
         self.btn_pic_file = pic_button(
-            "folder", _("From a file… (you can also drop a picture on the pad)"),
+            "folder", _("From a file (you can also drop a picture on the pad)"),
             self._picture_from_file)
         self.btn_pic_link = pic_button(
             "browser", _("From a link: a picture's address, a YouTube video or a web page"),
@@ -374,7 +375,7 @@ class EditDialog(QDialog):
 
         # where a downloaded sound came from (soundboard.sourceinfo)
         self.btn_source = None
-        if src := sourceinfo.clean(meta.source):
+        if src := sourceinfo.shown(meta):
             srow = QHBoxLayout()
             srow.setSpacing(8)
             ic = QLabel()
@@ -388,11 +389,19 @@ class EditDialog(QDialog):
             self.btn_source = QPushButton(_("Details"))
             self.btn_source.setProperty("quiet", True)
             self.btn_source.setToolTip(src["link"])
-            self.btn_source.clicked.connect(
-                lambda: sourcedialog.SourceDialog(self.meta, self).show())
             srow.addWidget(self.btn_source)
             srow.addStretch(1)
-            g.addLayout(srow, g.rowCount(), 0, 1, 2)
+            self.source_row = QWidget()
+            self.source_row.setLayout(srow)
+            srow.setContentsMargins(0, 0, 0, 0)
+            g.addWidget(self.source_row, g.rowCount(), 0, 1, 2)
+
+            def details():
+                d = sourcedialog.SourceDialog(self.meta, self)
+                d.forgotten.connect(self.source_row.hide)
+                d.forgotten.connect(self.source_forgotten)   # the owner saves it
+                d.show()
+            self.btn_source.clicked.connect(details)
 
         # how it plays: the hotkey is what most people open this for
         g = card(_("Playback"))
@@ -686,7 +695,7 @@ class EditDialog(QDialog):
 
     def _set_hk(self, combo):
         self.hotkey = combo
-        self.hk_btn.setText(pretty_key(combo) or _("Click to set…"))
+        self.hk_btn.setText(pretty_key(combo) or _("Click to set"))
 
     def _capture(self):
         d = HotkeyDialog(self.hotkeys, self)

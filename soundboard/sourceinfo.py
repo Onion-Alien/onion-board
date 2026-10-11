@@ -1,6 +1,6 @@
 """Where a downloaded sound came from: the video's link, channel, upload date, length
 and views, so the user can find it again (the pad menu's *Open on YouTube*, *Copy
-link* and *Details…*).
+link* and *Details*).
 
 For any sound added from a web link (YouTube, TikTok, SoundCloud, Instagram, X…;
 not files, recordings or packs). It is picked out of the reply yt-dlp already got
@@ -105,6 +105,20 @@ def clean(v) -> dict:
     out["views"] = _number(v.get("views"))
     out["site"] = site_of(out["link"])[0]
     return {k: x for k, x in out.items() if x not in ("", None)}
+
+
+def shown(meta) -> dict:
+    """What the pad menu and Edit show for a sound: its cleaned source, or {} while
+    Settings > Data & quality > Remember where it came from is off (kept, not shown)."""
+    from soundboard import quality
+    return clean(meta.source) if quality.current.keep_source else {}
+
+
+def forget(meta) -> None:
+    """The Details box's Delete info: the sound keeps its audio, loses where it came
+    from, and its text file goes."""
+    remove(meta.file)
+    meta.source = {}
 
 
 def site_name(src: dict) -> str:

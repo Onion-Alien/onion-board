@@ -419,7 +419,9 @@ class SettingsDialog(QDialog):
         # Done button sat below the screen
         self.setMinimumSize(720, 420)
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(16, 14, 16, 14)
+        # one margin all round, and the same gap above Done as below and beside it
+        lay.setContentsMargins(16, 16, 16, 16)
+        lay.setSpacing(16)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
@@ -456,6 +458,11 @@ class SettingsDialog(QDialog):
             self.categories.addItem(item)
         self._category_icons()
         self.tabs.tabBar().hide()
+        # the list is the tab bar now: the hidden one stayed in the Tab order (the tab
+        # widget hands its focus to it), so Tab from the list went nowhere
+        self.tabs.tabBar().setFocusPolicy(Qt.NoFocus)
+        self.tabs.setFocusPolicy(Qt.NoFocus)
+        self.tabs.setFocusProxy(None)
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
@@ -487,6 +494,13 @@ class SettingsDialog(QDialog):
         content.setSpacing(16)
         content.addLayout(side)
         content.addWidget(self.tabs, 1)
+        # a search that finds nothing says so, in place of the pages
+        self.no_match = QLabel()
+        self.no_match.setObjectName("hint")
+        self.no_match.setAlignment(Qt.AlignCenter)
+        self.no_match.setWordWrap(True)
+        self.no_match.hide()
+        content.addWidget(self.no_match, 1)
         lay.addLayout(content, 1)
         close = QPushButton(_("Done"))
         close.setObjectName("primary")
@@ -523,7 +537,7 @@ class SettingsDialog(QDialog):
                     self._build_page(i)
             finally:
                 self._searching = False
-        first = None
+        first = named = None
         for i in range(self.tabs.count()):
             page = self.tabs.widget(i).widget()
             title = self.categories.item(i).text().lower()
@@ -545,8 +559,17 @@ class SettingsDialog(QDialog):
             self.categories.item(i).setHidden(bool(words) and not hits)
             if hits and first is None:
                 first = i
+            # "hotkey" goes to the Hotkeys page, not the first page that mentions one
+            if hits and named is None and words and all(w in title for w in words):
+                named = i
+        nothing = bool(words) and first is None
+        self.no_match.setText(_("No settings match “{text}”", text=text.strip()))
+        self.no_match.setVisible(nothing)
+        self.tabs.setVisible(not nothing)
         on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
-        if words and first is not None and on_hidden:
+        if named is not None:
+            self.tabs.setCurrentIndex(named)
+        elif words and first is not None and on_hidden:
             self.tabs.setCurrentIndex(first)
 
     def _category_icons(self):
@@ -564,6 +587,7 @@ class SettingsDialog(QDialog):
         sa.setWidgetResizable(True)
         sa.setFrameShape(QScrollArea.NoFrame)
         sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        sa.setFocusPolicy(Qt.NoFocus)   # Tab goes straight to the page's first control
         return sa
 
     @staticmethod
@@ -625,7 +649,8 @@ class SettingsDialog(QDialog):
     def _page(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(0, 12, 16, 12)
+        # no top margin: the first card starts level with the search box
+        v.setContentsMargins(0, 0, 16, 12)
         v.setSpacing(12)
         return w, v
 
@@ -761,7 +786,7 @@ class SettingsDialog(QDialog):
         row.addWidget(hue, 1)
         cv.addLayout(row)
         btns = QHBoxLayout()
-        more = QPushButton(_("More colours…"))
+        more = QPushButton(_("More colours"))
         more.setToolTip(_("Pick any colour, including how strong and how bright it is"))
         reset = QPushButton(_("Theme's colour"))
         reset.setToolTip(_("Go back to each theme's own highlight colour"))
@@ -918,7 +943,7 @@ class SettingsDialog(QDialog):
         b.setObjectName("hkbtn")
         b.clicked.connect(lambda __=False, a=attr: self._capture(a))
         # each row's buttons say which hotkey they're for (a screen reader read every
-        # row as "Click to set…" and "Clear")
+        # row as "Click to set" and "Clear")
         b.setAccessibleName(_("{label} hotkey", label=label))
         row.addWidget(b)
         x = QPushButton("✕")
@@ -935,7 +960,7 @@ class SettingsDialog(QDialog):
             combo = getattr(self.mw.cfg, attr)
             for b in buttons:
                 b.setText(pretty_key(combo)
-                          or (_("Off") if attr == "ptt_key" else _("Click to set…")))
+                          or (_("Off") if attr == "ptt_key" else _("Click to set")))
 
     def _capture(self, attr):
         # auto push-to-talk presses the key itself: that can't be a MIDI pad
@@ -1142,7 +1167,7 @@ class SettingsDialog(QDialog):
         return w
 
     def _voices_card(self):
-        """Custom text-to-speech voices live on the Voice tab (behind Add voices…); this
+        """Custom text-to-speech voices live on the Voice tab (behind Add voices); this
         card is where people look for them first. Hidden while the tab is switched off
         (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
         and on again while Settings is open, that's a new one."""
@@ -1155,7 +1180,7 @@ class SettingsDialog(QDialog):
               "Piper voice packs dropped into the voices folder. They join the Voice list on the "
               "Voice tab."))
         row = _button_row()   # one line, wrapping only when the window is narrow
-        add = QPushButton(_("Add a voice server…"))
+        add = QPushButton(_("Add a voice server"))
         icons.set_icon(add, "plus")
         add.clicked.connect(lambda: mw.tab_on("voice") and mw.voice.speech._add_voice_server())
         row.addWidget(add)
@@ -1348,7 +1373,7 @@ class SettingsDialog(QDialog):
         """Switch category when a program is in front: every rule in one place."""
         card, cv = self._card(
             _("Switch category by program"),
-            _("Right-click a category tab → Show this when a program is in front… and the board "
+            _("Right-click a category tab → Show this when a program is in front and the board "
               "shows that category by itself whenever the program is in front."))
         self.box_programs = self._option(
             cv, _("Switch by itself"),
@@ -1449,10 +1474,10 @@ class SettingsDialog(QDialog):
                                 "devices. A restore point is saved first, so it can always be "
                                 "undone."))
         row = QHBoxLayout()
-        rst = QPushButton(_("Reset…"))
+        rst = QPushButton(_("Reset"))
         icons.set_icon(rst, "reload")
         rst.clicked.connect(lambda: self._open_reset(points=False))
-        pts = QPushButton(_("Restore points…"))
+        pts = QPushButton(_("Restore points"))
         pts.clicked.connect(lambda: self._open_reset(points=True))
         row.addWidget(rst)
         row.addWidget(pts)
@@ -1597,7 +1622,7 @@ class SettingsDialog(QDialog):
         """Every add-on in one place, each with the same row of buttons in the same
         order: Check for updates (Update to X once one is out), Reinstall (a fresh
         copy of the newest; the user's triggers / paired phones are the board's and
-        stay), Report a problem, Remove… Not installed: Get it, and Report a problem.
+        stay), Report a problem, Remove. Not installed: Get it, and Report a problem.
         One grid for all of them (_AddonGrid): the buttons share columns, so they line
         up from one add-on to the next, folding to two columns in a narrow window."""
         card, cv = self._card(_("Add-ons"),
@@ -1628,7 +1653,7 @@ class SettingsDialog(QDialog):
                                 ("check", _("Check for updates"), "reload"),
                                 ("reinstall", _("Reinstall"), ""),
                                 ("report", _("Report a problem"), ""),
-                                ("remove", _("Remove…"), "trash")):
+                                ("remove", _("Remove"), "trash")):
             b = QPushButton(text)
             if icon:
                 icons.set_icon(b, icon, "danger_text" if key == "remove" else None)
@@ -2017,7 +2042,7 @@ class SettingsDialog(QDialog):
                                 "import it on another PC. Importing a friend's sound pack adds "
                                 "its sounds; ones you already have are skipped."))
         row = QHBoxLayout()
-        exp = QPushButton(_("Export everything…"))
+        exp = QPushButton(_("Export everything"))
         icons.set_icon(exp, "folder")
         def export():
             mw = self.mw
@@ -2027,7 +2052,7 @@ class SettingsDialog(QDialog):
                                 lambda _p, _n, err: _("Didn't export") if err
                                 else _("✓ Exported"))
         exp.clicked.connect(export)
-        imp = QPushButton(_("Import…"))
+        imp = QPushButton(_("Import"))
         imp.clicked.connect(self.mw.import_dialog)
         row.addWidget(exp)
         row.addWidget(imp)
@@ -2122,7 +2147,7 @@ class SettingsDialog(QDialog):
         self.data_folder.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         grid.addWidget(self.data_folder, 1, 1, 1, 2)
         row = _button_row()
-        change = QPushButton(_("Change…"))
+        change = QPushButton(_("Change"))
 
         def pick():
             folder = QFileDialog.getExistingDirectory(self, _("Save videos in"),
@@ -2143,6 +2168,13 @@ class SettingsDialog(QDialog):
         grid.setColumnStretch(2, 1)
         cv.addLayout(grid)
         self._data_video_rows = (vh, change, show, self.data_folder)
+        self._data_widgets["keep_source"] = self._option(
+            cv, _("Remember where it came from"),
+            _("Keeps each download's link, channel, upload date, length and views (from the "
+              "download itself, nothing extra is fetched), in a text file next to the sound "
+              "too. Right-click the sound to open or copy the link. Off: new downloads keep "
+              "none of it and the menu hides it; what's already saved stays."),
+            q.keep_source, lambda b: self._data_set(keep_source=b))
 
         # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
         # who skipped it had no way to add it later, so the app can get it itself now.
@@ -3160,12 +3192,12 @@ class SettingsDialog(QDialog):
                      if i.id == pocketaddon.MODULE_ID), None)
 
     def _pocket_remove_button(self, card, info):
-        """*Remove Onion Pocket…* at the foot of its own card on Settings → Remote."""
+        """*Remove Onion Pocket* at the foot of its own card on Settings → Remote."""
         from soundboard import pocketaddon
         lay = card.layout()
         if lay is None or not pocketaddon.removable(info):
             return
-        btn = QPushButton(_("Remove Onion Pocket…"))
+        btn = QPushButton(_("Remove Onion Pocket"))
         btn.setToolTip(_("Takes the add-on out of Onion Board: phones can't play your pads any "
                          "more. Paired phones are kept for when you get it again."))
         icons.set_icon(btn, "trash", "danger_text")
@@ -3387,7 +3419,7 @@ class SettingsDialog(QDialog):
                                 "so the AI can set up whatever tools you use with you."))
         # side by side, wrapping (not widening the window) when Settings is narrow
         btns = _button_row()
-        guide = QPushButton(_("Streamer guide…"))
+        guide = QPushButton(_("Streamer guide"))
         guide.setObjectName("primary")
         btns.addWidget(guide)
         ai = QPushButton(_("Copy AI prompt"))

@@ -162,7 +162,7 @@ class ModeButton(QPushButton):
             label = q.name
             if q is profiles.ADVANCED:
                 label = (_("Advanced: {label}", label=destination.resolve(d).name)
-                         if p is q else _("Advanced…"))
+                         if p is q else _("Advanced"))
             # the one in use: its icon in the highlight colour and its name in bold (a
             # tick doesn't show beside an icon)
             a = self.menu_.addAction(
@@ -264,7 +264,7 @@ class DestPanel(QWidget):
         self.combo = QComboBox()
         no_wheel(self.combo)
         arow.addWidget(self.combo)
-        custom = QPushButton(_("Custom modes…"))
+        custom = QPushButton(_("Custom modes"))
         custom.setToolTip(_("Describe another codec or service by what it does to the sound"))
         custom.clicked.connect(self.edit_custom)
         arow.addWidget(custom)
@@ -472,12 +472,12 @@ class CustomDestDialog(QDialog):
         self.list.currentRowChanged.connect(self._select)
         left.addWidget(self.list, 1)
         self.empty = hint_label(_("No custom modes yet. Fill in the form to make one, or click "
-                                  "Add / Copy built-in…."))
+                                  "Add / Copy built-in."))
         left.addWidget(self.empty)
         btns = QHBoxLayout()
         self.b_add = QPushButton(_("Add"))
         self.b_add.clicked.connect(self.add)
-        self.b_copy = QPushButton(_("Copy built-in…"))
+        self.b_copy = QPushButton(_("Copy built-in"))
         self.b_copy.setToolTip(_("Start from one of the measured modes"))
         self.b_copy.clicked.connect(self.copy_builtin)
         self.b_del = QPushButton(_("Remove"))
@@ -520,7 +520,7 @@ class CustomDestDialog(QDialog):
         form.addRow("", self.mono)
         self.note = QLineEdit()
         self.note.setMaxLength(200)
-        self.note.setPlaceholderText(_("e.g. Mumble at 72 kbps, TeamSpeak…"))
+        self.note.setPlaceholderText(_("e.g. Mumble at 72 kbps, TeamSpeak"))
         self.note.textEdited.connect(self._edited)
         form.addRow(_("Notes"), self.note)
         no_wheel(self.ceiling, self.lowcut, self.bass, self.comp)

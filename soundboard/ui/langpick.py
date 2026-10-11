@@ -145,7 +145,7 @@ class LanguageDialog(QDialog):
         v.setContentsMargins(16, 16, 16, 16)
         v.setSpacing(12)
         self.search = QLineEdit()
-        self.search.setPlaceholderText(_("Search languages…"))
+        self.search.setPlaceholderText(_("Search languages"))
         self.search.setClearButtonEnabled(True)
         self.search.setAccessibleName(_("Search languages"))
         self.search.textChanged.connect(self._filter)

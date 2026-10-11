@@ -163,3 +163,61 @@ def test_details_box_shows_the_fields_and_opens_the_link(qapp, monkeypatch):
     d.btn_open.click()
     assert opened == [music]
     d.close()
+
+
+def test_switched_off_new_downloads_keep_nothing_and_old_info_stays(qapp, monkeypatch,
+                                                                    tmp_path):
+    """Settings > Data & quality > Remember where it came from, off: a new download
+    keeps no source or text file; one kept before stays, just not shown."""
+    from soundboard import quality
+    from soundboard.ui import linkbar
+    monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
+    old = SoundMeta(id="o", name="Old", file=str(tmp_path / "old.mp3"), source=dict(SRC))
+    assert sourceinfo.shown(old) == {} and old.source == SRC
+    dl = tmp_path / "dl"
+    dl.mkdir()
+    path = dl / "v.wav"
+    path.write_bytes(b"x")
+    sourceinfo.save_for(dl, INFO, INFO["webpage_url"])
+    audio = tmp_path / "Song.wav"
+    meta = SoundMeta(id="x1", name="Song", file=str(audio))
+    monkeypatch.setattr(linkbar.ytdl, "download_audio", lambda url, **kw: (path, "Song"))
+    monkeypatch.setattr(linkbar, "fingerprint", lambda p: "")
+    monkeypatch.setattr(linkbar, "import_file",
+                        lambda p, color, **kw: (meta, np.zeros((480, 2), np.int16)))
+    monkeypatch.setattr(linkbar.thumbs, "find_in", lambda folder: None)
+
+    class Eng:
+        def prepare(self, *a):
+            pass
+    bar = linkbar.LinkBar(engine=Eng(), cfg=Config(), color_for=lambda: "#fff",
+                          known_for=dict)
+    bar._work("add", INFO["webpage_url"], None, "#fff", {}, False)
+    assert meta.source == {} and not audio.with_suffix(".txt").exists()
+    monkeypatch.setattr(quality, "current", quality.Prefs())   # back on: it shows again
+    assert sourceinfo.shown(old) == SRC
+
+
+@pytest.mark.parametrize("sure", [True, False])
+def test_delete_info_asks_then_drops_the_info_and_its_text_file(qapp, monkeypatch, tmp_path,
+                                                                sure):
+    from PySide6.QtWidgets import QMessageBox
+    from soundboard.ui import sourcedialog
+    audio = tmp_path / "Song.mp3"
+    audio.write_bytes(b"x")
+    m = SoundMeta(id="a", name="Song", file=str(audio), source=dict(SRC))
+    sourceinfo.write(audio, m.source)
+    asked = []
+    monkeypatch.setattr(QMessageBox, "exec", lambda self: asked.append(self.text())
+                        or (QMessageBox.Yes if sure else QMessageBox.Cancel))
+    d = sourcedialog.SourceDialog(m)
+    saved = []
+    d.forgotten.connect(lambda: saved.append(1))
+    d.btn_forget.click()
+    assert asked and "Song" in asked[0]
+    assert audio.exists()                                      # the sound always stays
+    if sure:
+        assert m.source == {} and not audio.with_suffix(".txt").exists() and saved
+    else:
+        assert m.source == SRC and audio.with_suffix(".txt").exists() and not saved
+    d.deleteLater()

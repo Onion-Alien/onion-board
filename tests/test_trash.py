@@ -154,7 +154,7 @@ def test_removing_from_the_menu_asks_first_and_deleted_sounds_stay_in_library(wi
     assert window.btn_bin.isHidden()
     assert len(trash.items()) == 1
     deleted = next(a for a in window.btn_more.menu().actions()
-                   if a.text() == "Recently deleted sounds…")
+                   if a.text() == "Recently deleted sounds")
     assert deleted.isEnabled() and deleted.isVisible()
 
 

@@ -262,6 +262,21 @@ class BannerButton(QPushButton):
             self.setText(text)
 
 
+class _Moved(QObject):
+    """Calls `fn` (once, after the layout settles) when the watched widget moves or
+    changes size."""
+
+    def __init__(self, widget: QWidget, fn):
+        super().__init__(widget)
+        self._fn = fn
+        widget.installEventFilter(self)
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.Resize, QEvent.Move, QEvent.Show):
+            QTimer.singleShot(0, self, self._fn)
+        return False
+
+
 class Pulse(QObject):
     """The mic-check banner's throb: its opacity goes from 1 down to PULSE_LOW and back
     every PULSE_MS, a step every PULSE_FRAME_MS. Each step draws the whole banner again
@@ -870,8 +885,13 @@ class MainWindow(QMainWindow):
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(0)
         self._tabs_lay = tv
+        # in a box of its own, so its edges can follow the page's cards (_fit_dl_bar)
+        dl_box = QWidget()
+        self._dl_lay = QHBoxLayout(dl_box)
+        self._dl_lay.setContentsMargins(0, 0, 0, 0)
         self.download_bar = DownloadBar(self)
-        tv.addWidget(self.download_bar)
+        self._dl_lay.addWidget(self.download_bar)
+        tv.addWidget(dl_box)
         self.download_bar.shown_changed.connect(self._dl_bar_gap)
 
         # ---- tabs
@@ -912,7 +932,7 @@ class MainWindow(QMainWindow):
         self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
         self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
         self.btn_more_tabs.setToolTip(_("Add a tab: radio, sending a program's sound, screen "
-                                        "triggers…"))
+                                        "triggers"))
         from soundboard.ui import moretabs
         mt = self.more_menu = moretabs.Menu(self.btn_more_tabs)
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
@@ -983,6 +1003,7 @@ class MainWindow(QMainWindow):
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
+        self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
         self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
         self._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
@@ -1020,7 +1041,13 @@ class MainWindow(QMainWindow):
         self.linkbar.progress.connect(self.download_bar.set_progress)
         self.linkbar.progress.connect(self.mini_download_bar.set_progress)
         self.linkbar.done.connect(self.download_bar.set_done)
+        self.linkbar.failed.connect(self.download_bar.set_failed)
+        self.linkbar.failed.connect(self.mini_download_bar.set_failed)
         self.linkbar.done.connect(self.mini_download_bar.set_done)
+        self.download_bar.retry_requested.connect(self._retry_download)
+        self.mini_download_bar.retry_requested.connect(self._retry_download)
+        self.download_bar.front_requested.connect(self.linkbar.move_to_front)
+        self.mini_download_bar.front_requested.connect(self.linkbar.move_to_front)
         self.linkbar.queue_updated.connect(self.download_bar.set_queue)
         self.linkbar.queue_updated.connect(self.mini_download_bar.set_queue)
         self.download_bar.cancel_requested.connect(self.linkbar.cancel)
@@ -1240,6 +1267,19 @@ class MainWindow(QMainWindow):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
 
+    def _fit_dl_bar(self):
+        """A page whose cards stop short of the edges (Setup: room for its scroll bar,
+        and centred past the width cap on a wide window) names that column `dl_column`:
+        the download bar then takes the cards' own left and right edges."""
+        col = getattr(self.tabs.currentWidget(), "dl_column", None)
+        left = right = 0
+        if col is not None and col.isVisible():
+            x = col.mapTo(self._tabs_box, QPoint(0, 0)).x()
+            left, right = max(0, x), max(0, self._tabs_box.width() - x - col.width())
+        m = self._dl_lay.contentsMargins()
+        if (m.left(), m.right()) != (left, right):
+            self._dl_lay.setContentsMargins(left, 0, right, 0)
+
     def _dl_bar_gap(self, shown: bool):
         """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
         and none from the Sounds page, whose first row then sits 8 px down like the rest."""
@@ -1307,9 +1347,9 @@ class MainWindow(QMainWindow):
                           "sound pack"))
         icons.set_icon(more, "archive", size=18)
         mm = DropdownMenu(more)
-        icons.set_icon(mm.addAction(_("Import a backup or sound pack…"), self.import_dialog),
+        icons.set_icon(mm.addAction(_("Import a backup or sound pack"), self.import_dialog),
                        "folder")
-        icons.set_icon(mm.addAction(_("Free sound packs…"), self.show_packs), "download")
+        icons.set_icon(mm.addAction(_("Free sound packs"), self.show_packs), "download")
         om = mm.addMenu(_("Import from another soundboard"))
         icons.set_icon(om.menuAction(), "copy")
         for src in otherboards.sources():
@@ -1319,12 +1359,12 @@ class MainWindow(QMainWindow):
         icons.set_icon(pm.menuAction(), "sounds")
         pm.aboutToShow.connect(lambda: self._fill_packs_menu(pm))
         mm.addSeparator()
-        icons.set_icon(mm.addAction(_("Export everything (sounds + settings)…"),
+        icons.set_icon(mm.addAction(_("Export everything (sounds + settings)"),
                                     self.export_board), "download")
-        self._act_export_cat = mm.addAction(_("Export this category…"), self.export_category)
+        self._act_export_cat = mm.addAction(_("Export this category"), self.export_category)
         icons.set_icon(self._act_export_cat, "download")
         mm.addSeparator()
-        icons.set_icon(mm.addAction(_("Recently deleted sounds…"), self.show_deleted), "trash")
+        icons.set_icon(mm.addAction(_("Recently deleted sounds"), self.show_deleted), "trash")
         icons.set_icon(mm.addAction(_("Open the sounds folder"), self.open_sounds_folder),
                        "folder")   # here too, for when the window's too narrow for its button
         mm.aboutToShow.connect(lambda: (
@@ -1442,7 +1482,7 @@ class MainWindow(QMainWindow):
         self.ytresults.fill_site_menu(self._site_menu)
         self.ytresults.source_changed.connect(self._on_site_picked)
         self._pads_scroll = scroll
-        # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
+        # ---- "3 selected · Colour · Volume · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
         left.addWidget(self.selection.bar)
         # Ctrl+V anywhere on the page (a text box keeps its own): a copied clip from
@@ -1481,7 +1521,7 @@ class MainWindow(QMainWindow):
         undo = QPushButton(_("Undo"))
         undo.setObjectName("primary")
         undo.setToolTip(_("Put the sound back, exactly as it was. Later: Backup → Recently "
-                          "deleted sounds…"))
+                          "deleted sounds"))
         undo.clicked.connect(self.undo_remove)
         uh.addWidget(undo)
         dismiss = QPushButton()
@@ -1699,6 +1739,8 @@ class MainWindow(QMainWindow):
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
         body = QWidget()
+        page.dl_column = body   # the download bar lines up with these cards
+        _Moved(body, self._fit_dl_bar)
         inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
         # cards' left edge lines up with the download bar and the other tabs
         sections = QVBoxLayout(body)
@@ -1929,7 +1971,7 @@ class MainWindow(QMainWindow):
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
         uv.addWidget(self.chk_level)
-        hk = QPushButton(_("Hotkeys && auto push-to-talk…"))
+        hk = QPushButton(_("Hotkeys && auto push-to-talk"))
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         uv.addWidget(hk, 0, Qt.AlignLeft)
         lcol.addWidget(utilitycard)
@@ -3621,7 +3663,7 @@ class MainWindow(QMainWindow):
             act = menu.addAction(icons.icon("check"), _("This tab is always shown"))
             act.setEnabled(False)
         menu.addSeparator()
-        menu.addAction(icons.icon("settings"), _("Choose tabs in Settings…"),
+        menu.addAction(icons.icon("settings"), _("Choose tabs in Settings"),
                        lambda: self.open_settings("tabs"))
         return menu
 
@@ -4009,7 +4051,7 @@ class MainWindow(QMainWindow):
             icons.set_icon(menu.addAction(f"{labels[attr]}	{key}",
                                           lambda a=attr: self._quick_set_hotkey(a)), "keyboard")
         menu.addSeparator()
-        icons.set_icon(menu.addAction(_("All hotkeys…"), lambda: self.open_settings("hotkeys")),
+        icons.set_icon(menu.addAction(_("All hotkeys"), lambda: self.open_settings("hotkeys")),
                        "settings")
 
     def _quick_set_hotkey(self, attr: str):
@@ -4505,6 +4547,15 @@ class MainWindow(QMainWindow):
         self._cat_row.hide()
         self._results_open = True
         self._sync_cat_bar()
+
+    def _retry_download(self, item: dict):
+        """The download bar's Retry on a pick that failed: picked again, as if its
+        search card was clicked (it starts, or waits its turn)."""
+        kind = item["kind"]
+        self.linkbar.open(item["url"], item["title"], item["seconds"])
+        self.ytresults.mark(item["url"], kind)
+        if not (self.linkbar.play_once() if kind == "play" else self.linkbar.add()):
+            self.ytresults.mark(item["url"], kind, False)
 
     def _from_youtube(self, r, play: bool):
         if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:
@@ -5058,7 +5109,7 @@ class MainWindow(QMainWindow):
         self.search.selectAll()
 
     def rename_sound(self, sid: str, new: str | None = None):
-        """F2 on a pad (and the pad menu's Rename…): just the name, without the Edit
+        """F2 on a pad (and the pad menu's Rename): just the name, without the Edit
         window."""
         m = self.meta(sid)
         if m is None:
@@ -5149,17 +5200,17 @@ class MainWindow(QMainWindow):
             return
         name = self.cat_tabs.tabData(i)
         menu = QMenu(self)
-        a_ren = menu.addAction(icons.icon("edit"), _("Rename…"))
+        a_ren = menu.addAction(icons.icon("edit"), _("Rename"))
         hk = self.cfg.category_hotkeys.get(name, "")
         a_hk = menu.addAction(icons.icon("keyboard"),
                               _("Random-sound hotkey: {hk} (change…)", hk=pretty_key(hk)) if hk
-                              else _("Set a random-sound hotkey…"))
+                              else _("Set a random-sound hotkey"))
         a_nohk = menu.addAction(icons.icon("trash"),
                                _("Clear the random-sound hotkey")) if hk else None
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
         a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
         a_shuf = menu.addAction(icons.icon("next"), _("Play them all, shuffled"))
-        a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack…"))
+        a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
         now = self.cfg.category_colors.get(name, "")
         a_cols = {}
@@ -5177,7 +5228,7 @@ class MainWindow(QMainWindow):
             cm.addSeparator()
             a_cols[cm.addAction(icons.icon("palette", checked_color="accent"), _("No colour"))] = ""
         menu.addSeparator()
-        a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front…"))
+        a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front"))
         a_unprog = {menu.addAction(icons.icon("offline"),
                                   _("Stop showing this for {exe}", exe=exe)): exe
                     for exe in catswitch.programs_for(self.cfg.category_programs, name)}
@@ -5234,7 +5285,7 @@ class MainWindow(QMainWindow):
                           shown=shown, exe=html.escape(sw.exe)))
 
     def pick_category_programs(self, name: str):
-        """A category's menu → Show this when a program is in front…"""
+        """A category's menu → Show this when a program is in front"""
         from soundboard.ui.programpick import ProgramPicker
         d = ProgramPicker(name, dict(self.cfg.category_programs), self)
         picked = d.picked if d.exec() else []
@@ -5775,18 +5826,18 @@ class MainWindow(QMainWindow):
         vol_before = m.volume
         menu.addAction(self._volume_action(menu, m))
         menu.addSeparator()
-        a_edit = add(("edit",), _("Edit…"), _("Name, colour, picture, volume, hotkey, "
+        a_edit = add(("edit",), _("Edit"), _("Name, colour, picture, volume, hotkey, "
                                               "timing and effects"))
-        a_ren = add(("rename",), _("Rename…"), _("Just the name (F2 on the pad does it too)"))
+        a_ren = add(("rename",), _("Rename"), _("Just the name (F2 on the pad does it too)"))
         a_hk_clear = None
         if m.hotkey:
             hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
                                                         hotkey=pretty_key(m.hotkey)))
             hk.setToolTipsVisible(True)
-            a_hk = add(("keyboard",), _("Change…"), _("Press a new key or combo for it"), hk)
+            a_hk = add(("keyboard",), _("Change"), _("Press a new key or combo for it"), hk)
             a_hk_clear = add(("trash",), _("Remove hotkey"), "", hk)
         else:
-            a_hk = add(("keyboard",), _("Set hotkey…"), _("A key or combo that plays it, even "
+            a_hk = add(("keyboard",), _("Set hotkey"), _("A key or combo that plays it, even "
                                                           "in-game"))
         cats = menu.addMenu(icons.icon("tag"), _("Categories"))
         cat_acts = {}
@@ -5797,19 +5848,19 @@ class MainWindow(QMainWindow):
             cat_acts[a] = c
         if cat_acts:
             cats.addSeparator()
-        a_newcat = cats.addAction(icons.icon("plus"), _("New category…"))
+        a_newcat = cats.addAction(icons.icon("plus"), _("New category"))
         menu.addSeparator()
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
-        a_export = add(("download",), _("Export…"), _("Save it as a file to share with friends"))
+        a_export = add(("download",), _("Export"), _("Save it as a file to share with friends"))
         a_src_open = a_src_copy = a_src_info = None
-        if src := sourceinfo.clean(m.source):   # downloaded from YouTube, TikTok…
+        if src := sourceinfo.shown(m):   # downloaded from YouTube, TikTok…
             site = sourceinfo.site_name(src)
             sm = menu.addMenu(icons.icon(sourceinfo.icon(src)), site)
             sm.setToolTipsVisible(True)
             a_src_open = add(("browser",), _("Open on {site}", site=site), src["link"], sm)
             a_src_copy = add(("copy",), _("Copy link"), src["link"], sm)
-            a_src_info = add(("info",), _("Details…"), _("Channel, upload date, length, views"),
+            a_src_info = add(("info",), _("Details"), _("Channel, upload date, length, views"),
                              sm)
         a_show = add(("folder",), _("Open file location"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
@@ -5830,7 +5881,9 @@ class MainWindow(QMainWindow):
         elif act is not None and act == a_src_copy:
             sourcedialog.copy_link(src, self)
         elif act is not None and act == a_src_info:
-            sourcedialog.SourceDialog(m, self).show()
+            d = sourcedialog.SourceDialog(m, self)
+            d.forgotten.connect(self._save_now)
+            d.show()
         elif act == a_stop:
             self._stop_sound(sid)
         elif act == a_next:
@@ -6030,7 +6083,7 @@ class MainWindow(QMainWindow):
         self.btn_bin.hide()   # Recently deleted is in the Library menu
 
     def show_deleted(self):
-        """Library → Recently deleted sounds…"""
+        """Library → Recently deleted sounds"""
         from soundboard.ui.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self)
@@ -6157,6 +6210,7 @@ class MainWindow(QMainWindow):
         m = self.meta(sid)
         d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
         d.hotkeys_changed.connect(self.register_hotkeys)
+        d.source_forgotten.connect(self._save_now)
         ok = d.exec()
         self.drop_preview()                        # a preview still rendering
         self.engine.stop(f"{sid}:preview")         # and the one playing, either kind
@@ -6876,7 +6930,7 @@ class MainWindow(QMainWindow):
         return addon
 
     def remove_remote_addon(self, info, base=None):
-        """Uninstall a remote add-on (Settings' *Remove Onion Pocket…*): the running
+        """Uninstall a remote add-on (Settings' *Remove Onion Pocket*): the running
         copy is stopped (its server lets go of the port), its folder in `base` (the
         modules folder in %APPDATA%) deleted and its package forgotten. Its settings
         in Config.remote_addons stay, for when it's got again. If the folder can't be

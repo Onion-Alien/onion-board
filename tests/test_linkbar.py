@@ -200,13 +200,47 @@ def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
     bar.add()
     for i in range(linkbar.MAX_QUEUED):
         bar.open(f"{OTHER}{i}", f"Other {i}")
-        assert bar.play_once()
-    assert len(queued) == linkbar.MAX_QUEUED and queued[0] == (f"{OTHER}0", "play")
+        assert bar.add()
+    assert len(queued) == linkbar.MAX_QUEUED and queued[0] == (f"{OTHER}0", "add")
     bar.open(OTHER, "One too many")
     assert not bar.add() and toasts   # no crash, a message instead
-    bar.cancel(f"{OTHER}1")           # a waiting pick: its row is told it was a Play
-    assert done == [(f"{OTHER}1", "play", False)]
+    bar.cancel(f"{OTHER}1")           # a waiting pick: its row is told it's off
+    assert done == [(f"{OTHER}1", "add", False)]
     assert [q["url"] for q in bar._queue_list] == [f"{OTHER}0", f"{OTHER}2"]
+
+
+def test_play_now_goes_next_and_replaces_a_waiting_play(qapp, monkeypatch):
+    from soundboard.ui import linkbar
+
+    bar, _eng = _bar()
+    _fake_start(bar, monkeypatch)
+    monkeypatch.setattr(linkbar.busy, "toast", lambda *args, **kw: None)
+    done, lists = [], []
+    bar.done.connect(lambda *args: done.append(args))
+    bar.queue_updated.connect(lambda q: lists.append([(x["url"], x["kind"]) for x in q]))
+    bar.add()                                   # downloading one song...
+    for i in range(2):                          # ...two more waiting to be added
+        bar.open(f"{OTHER}a{i}", "Add")
+        bar.add()
+    bar.open(f"{OTHER}p1", "Play")
+    assert bar.play_once()
+    # Play now: next up, the running Add untouched
+    assert lists[-1] == [(f"{OTHER}p1", "play"), (f"{OTHER}a0", "add"),
+                         (f"{OTHER}a1", "add")]
+    assert bar._busy == "add" and bar._busy_url == URL
+    # a newer Play now replaces the one waiting (its card is told it's off)
+    bar.open(f"{OTHER}p2", "Play")
+    bar.play_once()
+    assert lists[-1][0] == (f"{OTHER}p2", "play") and len(lists[-1]) == 3
+    assert (f"{OTHER}p1", "play", False) in done
+    # a full queue of Adds still takes a Play
+    bar.open(f"{OTHER}a2", "Add")
+    bar.add()
+    bar.open(f"{OTHER}p3", "Play")
+    assert bar.play_once() and lists[-1][0] == (f"{OTHER}p3", "play")
+    # the Add finishes: the Play starts before the other Adds
+    bar._on_msg("error", URL, "nope", bar._job)
+    assert bar._busy == "play" and bar._busy_url == f"{OTHER}p3"
 
 
 def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatch):

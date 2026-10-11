@@ -142,7 +142,7 @@ def test_the_rail_has_a_mode_button_that_follows_the_picker(window):  # noqa: F8
     window.rail.set_open(False)   # shut: icons only
     assert window.rail.isAncestorOf(mode) and mode.text() == ""   # an icon beside Live
     acts = [a for a in mode.menu_.actions() if a.isCheckable()]
-    assert [a.text() for a in acts] == ["Game", "Voice chat", "Clean", "Advanced…"]
+    assert [a.text() for a in acts] == ["Game", "Voice chat", "Clean", "Advanced"]
     assert mode.currentData() == "clean" and acts[2].isChecked()
     assert all(len(a.toolTip()) > 80 for a in acts)   # each one says what it does
     assert mode.accessibleName() == "Who's listening: Clean"

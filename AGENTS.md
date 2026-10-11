@@ -18,4 +18,7 @@ The rules agents break most, in short:
   this repo is public.
 - Never edit `CHANGELOG.md` for a change: add `changelog.d/<branch-name>.md`.
 - Text the app shows goes through `_()` and into every language in `assets/lang/`.
+- UI work follows [docs/DESIGN.md](docs/DESIGN.md), including its control/surface
+  decisions and UI workflow. [docs/UI-AUDIT.md](docs/UI-AUDIT.md) tracks existing
+  inconsistencies and has a handoff prompt; recheck an item before fixing it.
 - Check with `scripts\precommit.ps1` before committing.

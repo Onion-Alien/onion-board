@@ -97,6 +97,13 @@ def test_settings_page_switches_low_data_mode_and_saves_it(window):  # noqa: F81
     box.setChecked(True)
     assert window.cfg.data["save_video"] and d._data_widgets["video_height"].isEnabled()
     assert isinstance(d._data_widgets["video_height"], QComboBox)
+    keep = next(b for b in page.findChildren(QCheckBox)
+                if b.text() == "Remember where it came from")
+    assert keep.isChecked() and quality.current.keep_source       # on by default
+    keep.setChecked(False)
+    assert window.cfg.data["keep_source"] is False and not quality.current.keep_source
+    d.data_low.setChecked(True)                                  # not part of low data
+    assert not quality.current.keep_source
     d.close()
 
 

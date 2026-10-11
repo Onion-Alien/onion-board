@@ -51,6 +51,7 @@ class LinkBar(QFrame):
     played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
     _msg = Signal(str, str, object, object)   # worker -> UI: (kind, url, payload, job)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
+    failed = Signal(str, str)         # (url, kind): it ended in an error, just before its done
     progress = Signal(str, object)    # (url, 0..1 downloaded, or -1/stage while it's converted)
     link_changed = Signal(str)        # the search box's link ("" when it has none now)
     download_started = Signal(str, str, str, float)  # (url, title, kind, seconds)
@@ -219,16 +220,25 @@ class LinkBar(QFrame):
         return True
 
     def _queue(self, kind: str) -> bool:
-        """Another sound's download is running: queue this one after it."""
+        """Another sound's download is running: an Add waits at the back of the queue,
+        a Play goes next."""
         if self.url == self._busy_url and kind == self._busy:
             return True   # already running: don't import the same sound twice
         if any(q["url"] == self.url and q["kind"] == kind for q in self._queue_list):
             return True
-        if len(self._queue_list) >= MAX_QUEUED:
+        pick = {"url": self.url, "title": self.title, "kind": kind, "seconds": self._secs}
+        if kind == "play":
+            # Play once means now: it goes next (the running download keeps going), and
+            # it replaces a Play already waiting, like it replaces one still loading
+            for q in [q for q in self._queue_list if q["kind"] == "play"]:
+                self._queue_list.remove(q)
+                self.done.emit(q["url"], "play", False)
+            self._queue_list.insert(0, pick)
+        elif len(self._queue_list) >= MAX_QUEUED:
             busy.toast(self.window(), _("Queue is full"), "warn")
             return False
-        self._queue_list.append({"url": self.url, "title": self.title, "kind": kind,
-                                 "seconds": self._secs})
+        else:
+            self._queue_list.append(pick)
         self.queue_updated.emit(list(self._queue_list))
         self.queued.emit(self.url, kind)
         usage.used("dl-queue")
@@ -252,6 +262,14 @@ class LinkBar(QFrame):
             self.queue_updated.emit(list(left))
             for q in gone:
                 self.done.emit(url, q["kind"], False)
+
+    def move_to_front(self, url: str):
+        """A waiting pick clicked in the download bar's list: it goes next."""
+        i = next((i for i, q in enumerate(self._queue_list) if q["url"] == url), None)
+        if not i:   # not waiting, or next already
+            return
+        self._queue_list.insert(0, self._queue_list.pop(i))
+        self.queue_updated.emit(list(self._queue_list))
 
     def cancel_all(self):
         """The download bar's Stop all: the running download and every pick waiting."""
@@ -364,8 +382,9 @@ class LinkBar(QFrame):
             except OSError as e:
                 log.warning("couldn't keep the thumbnail of %s: %s", url, e)
             # the video's link, channel and views: the pad menu's Open on YouTube
-            meta.source = sourceinfo.read_from(Path(path).parent)
-            sourceinfo.write(meta.file, meta.source)
+            if quality.current.keep_source:
+                meta.source = sourceinfo.read_from(Path(path).parent)
+                sourceinfo.write(meta.file, meta.source)
             self.engine.prepare(meta.id, data)
             saved = ""
             if video:
@@ -472,6 +491,7 @@ class LinkBar(QFrame):
                 self._say(payload, theme.status("error"))   # already rich text
             else:   # it was for a link no longer showing: don't lose the reason
                 busy.toast(self.window(), payload, "error", 8000)
+            self.failed.emit(url, was or "add")
             self.done.emit(url, was or "add", False)
             if current and self._queued:
                 # Both clicks were waiting for this same failed download. A second

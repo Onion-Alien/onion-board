@@ -4,9 +4,10 @@ from contextlib import contextmanager
 
 import pytest
 
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, QPoint, Qt
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea, QWidget
 
 from conftest import process_events
 from soundboard import net
@@ -560,3 +561,89 @@ def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
         dlg.close()
     finally:
         d.close()
+
+
+@pytest.mark.parametrize("rtl", [False, True])
+def test_tab_moves_from_the_category_list_into_the_page_and_on_to_done(window, qapp, rtl):  # noqa: F811
+    """Keyboard and screen-reader users: Tab from the category list goes into the open
+    page, on through it to Done, and Shift+Tab comes back, on every page."""
+    if rtl:
+        qapp.setLayoutDirection(Qt.RightToLeft)
+    try:
+        d = SettingsDialog(window, "privacy")
+        d.show()
+        d.activateWindow()
+        done = next(b for b in d.findChildren(QPushButton) if b.objectName() == "primary"
+                    and b.parent() is d)
+        for row in range(d.categories.count()):
+            if d.categories.isRowHidden(row):
+                continue
+            d.categories.setCurrentRow(row)
+            d.categories.setFocus()
+            qapp.processEvents()
+            QTest.keyClick(d.categories, Qt.Key_Tab)
+            first = QApplication.focusWidget()
+            page = d.tabs.currentWidget()
+            assert first is not d.categories, d.categories.item(row).text()
+            assert page.isAncestorOf(first), (d.categories.item(row).text(), first)
+            QTest.keyClick(first, Qt.Key_Backtab)
+            assert QApplication.focusWidget() is d.categories
+            QTest.keyClick(d.categories, Qt.Key_Tab)
+            for _ in range(400):
+                if QApplication.focusWidget() is done:
+                    break
+                QTest.keyClick(QApplication.focusWidget(), Qt.Key_Tab)
+            assert QApplication.focusWidget() is done, d.categories.item(row).text()
+        d.categories.setFocus()
+        QTest.keyClick(d.categories, Qt.Key_Backtab)
+        assert QApplication.focusWidget() is d.search_box
+        d.close()
+    finally:
+        qapp.setLayoutDirection(Qt.LeftToRight)
+
+
+def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qapp):  # noqa: F811
+    d = SettingsDialog(window, "privacy", lazy=True)
+    d.show()
+    try:
+        for i in range(d.categories.count()):   # a page's own name opens that page
+            name = d.categories.item(i).text()
+            d.tabs.setCurrentIndex((i + 5) % d.tabs.count())
+            d._apply_search(name)
+            assert d.tabs.currentIndex() == i, name
+        d._apply_search("hotkey")   # General mentions hotkeys too, but comes first
+        assert d.categories.item(d.tabs.currentIndex()).text() == "Hotkeys"
+        d._apply_search("zzqq nothing")
+        assert d.no_match.isVisibleTo(d) and not d.tabs.isVisibleTo(d)
+        assert "zzqq nothing" in d.no_match.text()
+        d._apply_search("")
+        assert d.tabs.isVisibleTo(d) and not d.no_match.isVisibleTo(d)
+        assert not any(d.categories.item(r).isHidden() for r in range(d.categories.count()))
+    finally:
+        d.close()
+
+
+def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qapp):  # noqa: F811
+    """The first card on every page lines up with the top of the search box, and Done
+    has the same gap above it as below and beside it."""
+    d = SettingsDialog(window, "privacy")
+    d.resize(1020, 680)
+    d.show()
+    qapp.processEvents()
+
+    def top(w):
+        return w.mapTo(d, QPoint(0, 0)).y()
+    for row in range(d.categories.count()):
+        d.categories.setCurrentRow(row)
+        qapp.processEvents()
+        page = d.tabs.currentWidget().widget()
+        first = min((c for c in page.children() if isinstance(c, QWidget) and c.isVisible()),
+                    key=lambda c: c.y())
+        assert top(first) == top(d.search_box), d.categories.item(row).text()
+    done = next(b for b in d.findChildren(QPushButton) if b.objectName() == "primary"
+                and b.parent() is d)
+    above = top(done) - (top(d.tabs) + d.tabs.height())
+    below = d.height() - (top(done) + done.height())
+    right = d.width() - (done.mapTo(d, QPoint(0, 0)).x() + done.width())
+    assert above == below == right, (above, below, right)
+    d.close()
