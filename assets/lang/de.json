@@ -3048,5 +3048,7 @@
   "Queued": "In Warteschlange",
   "Queued: waiting for current download to finish…": "In Warteschlange: Warten auf Abschluss des aktuellen Downloads…",
   "▶ Playing": "▶ Wird abgespielt",
-  "✓ Added to your sounds": "✓ Zu deinen Sounds hinzugefügt"
+  "✓ Added to your sounds": "✓ Zu deinen Sounds hinzugefügt",
+  "Retry": "Erneut versuchen",
+  "Download this one next": "Das als Nächstes herunterladen"
 }

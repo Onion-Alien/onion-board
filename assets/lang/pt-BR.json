@@ -3048,5 +3048,7 @@
   "Queued": "Na fila",
   "Queued: waiting for current download to finish…": "Na fila: aguardando o download atual terminar…",
   "▶ Playing": "▶ Reproduzindo",
-  "✓ Added to your sounds": "✓ Adicionado aos seus sons"
+  "✓ Added to your sounds": "✓ Adicionado aos seus sons",
+  "Retry": "Tentar de novo",
+  "Download this one next": "Baixar este em seguida"
 }

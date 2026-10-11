@@ -101,6 +101,16 @@ def test_download_bar_first_line_lines_up(qapp):
         bar.close()
 
 
+def _fail(bar, url, kind="add"):
+    bar.set_failed(url, kind)
+    bar.set_done(url, kind, False)
+
+
+def _flash_over(bar):
+    bar._hold.stop()
+    bar._release()
+
+
 def test_download_bar_flags_how_it_ended(qapp):
     from soundboard.ui.downloadbar import DownloadBar
     bar = DownloadBar()
@@ -109,18 +119,94 @@ def test_download_bar_flags_how_it_ended(qapp):
         bar.set_active("https://www.youtube.com/watch?v=a", "Some song", "add", None)
         for _ in range(3):
             qapp.processEvents()
-        bar.set_done(bar.url, "add", ok)
+        if ok:
+            bar.set_done(bar.url, "add", True)
+        else:
+            _fail(bar, bar.url)
         assert bar.outcome.isVisible() and bar.outcome.ok is ok
         assert not bar.outcome.spot.isEmpty()   # over Bun (no thumbnail here)
         bar.outcome._anim.setCurrentTime(bar.outcome.SHOW_MS)   # a second later: gone
         assert not bar.outcome.isVisible()
+        _flash_over(bar)
     mini = DownloadBar()
     mini.set_mini(True)
     mini.set_active("https://www.youtube.com/watch?v=b", "Some song", "add", None)
     mini.set_done(mini.url, "add", True)
     assert not mini.outcome.isVisible()       # no picture to mark, nothing to glow about
+    _flash_over(mini)
     mini.set_active("https://www.youtube.com/watch?v=c", "Some song", "add", None)
-    mini.set_done(mini.url, "add", False)
+    _fail(mini, mini.url)
     assert mini.outcome.isVisible() and mini.outcome.spot.isEmpty()   # just the red glow
     bar.close()
     mini.close()
+
+
+def test_download_bar_waits_for_the_flash_then_moves_up(qapp):
+    from soundboard.ui.downloadbar import DownloadBar
+    bar = DownloadBar()
+    bar.resize(900, 80)
+    a, b, c = (f"https://www.youtube.com/watch?v={x}" for x in "abc")
+    bar.set_active(a, "One", "add", None)
+    bar.set_queue([{"url": b, "title": "Two", "kind": "add"},
+                   {"url": c, "title": "Three", "kind": "add"}])
+    bar.set_done(a, "add", True)
+    # the next one starts at once, but the card shows the tick for a second first
+    bar.set_queue([{"url": c, "title": "Three", "kind": "add"}])
+    bar.set_active(b, "Two", "add", None)
+    bar.set_progress(b, 0.5)
+    assert bar.url == a and bar.queue_badge.text() == "+2 queued"
+    _flash_over(bar)
+    assert bar.url == b and bar.lbl_status.text() == "50%"
+    assert bar.queue_badge.text() == "+1 queued"
+    bar.close()
+
+
+def test_download_bar_failures_wait_for_retry(qapp):
+    from soundboard.ui.downloadbar import DownloadBar
+    bar = DownloadBar()
+    bar.resize(900, 80)
+    asked = []
+    bar.retry_requested.connect(asked.append)
+    a, b = "https://www.youtube.com/watch?v=a", "https://www.youtube.com/watch?v=b"
+    # fails with another waiting: the next moves up, the failed one keeps a Retry row
+    bar.set_active(a, "One", "add", None, "", 61)
+    bar.set_queue([{"url": b, "title": "Two", "kind": "add"}])
+    _fail(bar, a)
+    assert bar.btn_retry.isVisibleTo(bar) and not bar.btn_cancel.isVisibleTo(bar)
+    assert not bar._auto_hide.isActive()   # waits for Retry or ✕
+    bar.set_queue([])
+    bar.set_active(b, "Two", "add", None)
+    _flash_over(bar)
+    assert bar.url == b and not bar.btn_retry.isVisibleTo(bar)
+    assert bar.queue_badge.text() == "1 failed"
+    bar.queue_badge.setChecked(True)
+    assert bar.panel.isVisibleTo(bar)
+    # minimised: the song, how far, what's left
+    bar.set_progress(b, 0.6)
+    bar.set_collapsed(True)
+    assert bar.s_text.text() == "Two · 60%" and "1 failed" in bar.s_failed.text()
+    bar.set_collapsed(False)
+    # a finish doesn't hide the bar while a failed one waits
+    bar.set_done(b, "add", True)
+    assert not bar._auto_hide.isActive()
+    bar._retry(a)
+    assert asked == [{"url": a, "title": "One", "kind": "add", "seconds": 61}]
+    assert not bar._failed and not bar.queue_badge.isVisibleTo(bar)
+    bar.close()
+
+
+def test_download_bar_cancel_is_not_a_failure(qapp):
+    from soundboard.ui.downloadbar import DownloadBar
+    bar = DownloadBar()
+    bar.resize(900, 80)
+    a = "https://www.youtube.com/watch?v=a"
+    bar.set_active(a, "One", "add", None)
+    bar.show()
+    bar.cancel_requested.connect(lambda url: bar.set_done(url, "add", False))
+    bar._on_cancel()
+    assert not bar._failed and not bar.outcome.isVisible() and bar.isHidden()
+    # a newer pick taking over (no error first): no flash, no Retry either
+    bar.set_active(a, "One", "play", None)
+    bar.set_done(a, "play", False)
+    assert not bar._failed and not bar.outcome.isVisible()
+    bar.close()

@@ -3048,5 +3048,7 @@
   "Queued": "कतार में",
   "Queued: waiting for current download to finish…": "कतार में: अभी का डाउनलोड पूरा होने का इंतज़ार…",
   "▶ Playing": "▶ चल रहा है",
-  "✓ Added to your sounds": "✓ आपके साउंड में जोड़ा गया"
+  "✓ Added to your sounds": "✓ आपके साउंड में जोड़ा गया",
+  "Retry": "फिर कोशिश करें",
+  "Download this one next": "इसे अगला डाउनलोड करें"
 }

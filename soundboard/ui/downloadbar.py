@@ -31,6 +31,11 @@ from soundboard.ui.scribebun import ScribeBunny
 from soundboard.ui.widgets import fmt_time
 
 
+CORNER = 22   # room line 1 leaves for the corner's minimise / ✕ button
+BAR_W = 480   # the progress bar's length in the banner
+LINE_GAP = 9  # between line 1 (the title) and line 2 (the bar); the mini player: 2
+
+
 class SmoothProgressBar(QWidget):
     """A sleek 6px progress bar that supports both indeterminate gliding shimmer
     (during video parsing / audio decoding) and determinate progress (during byte download)."""
@@ -292,6 +297,41 @@ def _placeholder(w: int, h: int, radius: int, dpr: float) -> QPixmap:
     return out
 
 
+def _after_hold(method):
+    """While the tick or red flash of the download that just ended shows, what comes
+    next (the next pick starting, its progress, the queue moving up) waits, then
+    plays out in order. The downloads themselves don't wait: only the banner does."""
+    def wrapper(self, *args):
+        if self._held is not None:
+            self._held.append((method, args))
+            return
+        method(self, *args)
+    wrapper.__name__ = method.__name__
+    wrapper.__doc__ = method.__doc__
+    return wrapper
+
+
+class _QueueRow(QFrame):
+    """A row of the queue list; clicking a waiting one makes it next up."""
+    clicked = Signal()
+
+    def mousePressEvent(self, ev):
+        if ev.button() == Qt.LeftButton:
+            self.clicked.emit()
+        super().mousePressEvent(ev)
+
+
+class _Summary(QWidget):
+    """The banner's slim top line: "Downloads · 2 of 4 · 45% · total 36%". Clicking it
+    folds the banner down to just this line, or opens it again."""
+    clicked = Signal()
+
+    def mousePressEvent(self, ev):
+        if ev.button() == Qt.LeftButton:
+            self.clicked.emit()
+        super().mousePressEvent(ev)
+
+
 class DownloadBar(QFrame):
     """The persistent top bar displaying ongoing downloads and preparation, with the
     queue of picks waiting behind it (open from the "+N queued" button)."""
@@ -299,6 +339,8 @@ class DownloadBar(QFrame):
     stop_all_requested = Signal()   # the running download and every pick waiting
     play_requested = Signal()
     shown_changed = Signal(bool)   # the bar appeared / went away
+    retry_requested = Signal(dict)  # a pick that failed: {url, title, kind, seconds}
+    front_requested = Signal(str)   # a waiting pick clicked in the list: it's next up
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -310,6 +352,14 @@ class DownloadBar(QFrame):
         self.progress_frac = 0.0
         self._mini = False
         self._queue: list[dict] = []
+        self._failed: list[dict] = []   # picks that couldn't download, to retry
+        self._raw = ("", 0.0)   # the running pick's title as given, and its length
+        self._failing = ""      # set_failed: the next set_done(False) for it is an error
+        self._cancelling = ""   # our own Cancel / Stop all: its set_done isn't a failure
+        self._held: list | None = None   # calls waiting for the tick / red flash (_after_hold)
+        self._hold = QTimer(self)
+        self._hold.setSingleShot(True)
+        self._hold.timeout.connect(self._release)
         self._pm: QPixmap | None = None
         self._meta = ""
         self._source = ("browser", "")
@@ -329,6 +379,52 @@ class DownloadBar(QFrame):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
+
+        # Minimised, the banner is one slim line: what the whole queue is up to, a thin
+        # bar, and a chevron (or a click anywhere on it) to open it again
+        sm = self.summary = _Summary()
+        sm.setObjectName("downloadhead")
+        sm.setCursor(Qt.PointingHandCursor)
+        sm.clicked.connect(lambda: self.set_collapsed(False))
+        sl = QHBoxLayout(sm)
+        sl.setContentsMargins(12, 6, 8, 6)
+        sl.setSpacing(8)
+        self.s_icon = QLabel()
+        self.s_icon.setFixedSize(14, 14)
+        sl.addWidget(self.s_icon, 0, Qt.AlignVCenter)
+        self.s_name = QLabel(_("Downloads"))
+        self.s_name.setObjectName("summaryname")
+        sl.addWidget(self.s_name, 0, Qt.AlignVCenter)
+        self.s_text = ElideLabel()
+        self.s_text.setObjectName("downloadstatus")
+        sl.addWidget(self.s_text, 0, Qt.AlignVCenter)
+        self.s_failed = QLabel()
+        self.s_failed.setObjectName("summaryfailed")
+        self.s_failed.hide()
+        sl.addWidget(self.s_failed, 0, Qt.AlignVCenter)
+        sl.addStretch(1)
+        self.s_bar = SmoothProgressBar()
+        self.s_bar.setFixedHeight(4)
+        self.s_bar.setMaximumWidth(220)
+        sl.addWidget(self.s_bar, 1, Qt.AlignVCenter)
+        self.btn_expand = QPushButton()
+        self.btn_expand.setObjectName("urgenthide")
+        self.btn_expand.setToolTip(_("Show more"))
+        self.btn_expand.setCursor(Qt.PointingHandCursor)
+        self.btn_expand.setFixedSize(22, 22)
+        self.btn_expand.clicked.connect(lambda: self.set_collapsed(False))
+        sl.addWidget(self.btn_expand, 0, Qt.AlignVCenter)
+        self.s_close = QPushButton("✕")
+        self.s_close.setObjectName("urgenthide")
+        self.s_close.setToolTip(_("Dismiss"))
+        self.s_close.setFixedSize(22, 22)
+        self.s_close.clicked.connect(self._clear_and_hide)
+        self.s_close.hide()
+        sl.addWidget(self.s_close, 0, Qt.AlignVCenter)
+        outer.addWidget(sm)
+        sm.hide()
+        self._collapsed = False
+
         head = self._head = QWidget()
         head.setObjectName("downloadhead")
         outer.addWidget(head)
@@ -347,7 +443,7 @@ class DownloadBar(QFrame):
 
         # Center column: pill, title and uploader on line 1, status and progress on line 2
         col = self._col = QVBoxLayout()
-        col.setSpacing(2)   # line 2 is as tall as its buttons: they make the gap
+        col.setSpacing(LINE_GAP)   # room between the title and the bar
         col.setContentsMargins(0, 0, 0, 0)
 
         row1 = self._row1 = QHBoxLayout()
@@ -393,34 +489,39 @@ class DownloadBar(QFrame):
         self.lbl_meta.hide()
         hang(self.lbl_meta, 1)
         row1.addStretch(1)   # a short title doesn't stretch the line
-        # top right: shrink the bar to one line (set_collapsed), and ✕ once it's over
-        self.btn_min = QPushButton()
+        row1.addSpacing(CORNER)   # line 1 stops short of the corner buttons
+        # in the bar's top right corner, clear of the buttons on line 2 (resizeEvent):
+        # minimise (set_collapsed), and ✕ once it's over
+        self.btn_min = QPushButton(self)
         self.btn_min.setObjectName("urgenthide")
         self.btn_min.setToolTip(_("Hide"))
         self.btn_min.setCursor(Qt.PointingHandCursor)
         self.btn_min.setFixedSize(22, 22)
         self.btn_min.clicked.connect(lambda: self.set_collapsed(True))
-        hang(self.btn_min)
-        self.btn_close = QPushButton("✕")
+        self.btn_close = QPushButton("✕", self)
         self.btn_close.setObjectName("urgenthide")
         self.btn_close.setToolTip(_("Dismiss"))
         self.btn_close.setFixedSize(22, 22)
-        self.btn_close.clicked.connect(self.hide)
+        self.btn_close.clicked.connect(self._clear_and_hide)
         self.btn_close.hide()
-        hang(self.btn_close)
         col.addLayout(row1)
 
         row2 = self._row2 = QHBoxLayout()
         row2.setSpacing(10)
         row2.setContentsMargins(0, 0, 0, 0)
 
+        # the bar first, one length whatever it says (BAR_W, less in a narrow window),
+        # starting under line 1's words; what it's doing comes after it
+        self.bar = SmoothProgressBar()
+        self.bar.setMaximumWidth(BAR_W)
+        row2.addWidget(self.bar, 1, Qt.AlignVCenter)
+
         self.lbl_status = QLabel()
         self.lbl_status.setObjectName("downloadstatus")
         self.lbl_status.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         row2.addWidget(self.lbl_status, 0, Qt.AlignVCenter)
-
-        self.bar = SmoothProgressBar()
-        row2.addWidget(self.bar, 1, Qt.AlignVCenter)
+        # what's left past the bar's length goes between the words and the buttons
+        row2.addStretch(0)
 
         col.addLayout(row2)
         h.addLayout(col, 1)
@@ -443,41 +544,19 @@ class DownloadBar(QFrame):
         self.btn_stop_all.hide()
         row2.addWidget(self.btn_stop_all, 0, Qt.AlignVCenter)
 
+        self.btn_retry = QPushButton(_("Retry"))   # it failed: try it again
+        self.btn_retry.setObjectName("retrybutton")
+        self.btn_retry.setCursor(Qt.PointingHandCursor)
+        self.btn_retry.clicked.connect(lambda: self._retry(self.url))
+        self.btn_retry.hide()
+        row2.addWidget(self.btn_retry, 0, Qt.AlignVCenter)
+
         self.btn_cancel = QPushButton(_("Cancel"))
         self.btn_cancel.setObjectName("cancelbutton")
         self.btn_cancel.setCursor(Qt.PointingHandCursor)
         self.btn_cancel.setToolTip(_("Cancel download"))
         self.btn_cancel.clicked.connect(self._on_cancel)
         row2.addWidget(self.btn_cancel, 0, Qt.AlignVCenter)
-
-        # Minimised: one slim line (title, how far, the queue) to keep using the app
-        self.strip = QWidget()
-        self.strip.setObjectName("downloadhead")
-        sl = QHBoxLayout(self.strip)
-        sl.setContentsMargins(12, 5, 8, 5)
-        sl.setSpacing(10)
-        self.s_title = ElideLabel()
-        self.s_title.setObjectName("downloadtitle")
-        self.s_title.setFont(f)
-        sl.addWidget(self.s_title, 0)
-        self.s_status = QLabel()
-        self.s_status.setObjectName("downloadstatus")
-        sl.addWidget(self.s_status)
-        self.s_bar = SmoothProgressBar()
-        sl.addWidget(self.s_bar, 1, Qt.AlignVCenter)
-        self.s_queue = QLabel()
-        self.s_queue.setObjectName("downloadmeta")
-        sl.addWidget(self.s_queue)
-        self.btn_expand = QPushButton()
-        self.btn_expand.setObjectName("urgenthide")
-        self.btn_expand.setToolTip(_("Show more"))
-        self.btn_expand.setCursor(Qt.PointingHandCursor)
-        self.btn_expand.setFixedSize(22, 22)
-        self.btn_expand.clicked.connect(lambda: self.set_collapsed(False))
-        sl.addWidget(self.btn_expand)
-        outer.addWidget(self.strip)
-        self.strip.hide()
-        self._collapsed = False
 
         # The queue: one row per pick waiting, each with its own ✕
         self.panel = QWidget()
@@ -520,6 +599,8 @@ class DownloadBar(QFrame):
         pill_bg = theme.mix(T["card"], T["accent"], 0.28)
         pill_color = T["live_text"]
         row_bg = theme.mix(card_bg, T["text"], 0.05)
+        bad = theme.status("error")
+        bad_edge = theme.mix(row_bg, bad, 0.45)
 
         self.setStyleSheet(
             f"QFrame#downloadbar {{ background:{card_bg}; border:1px solid {border}; "
@@ -532,6 +613,9 @@ class DownloadBar(QFrame):
             f"QLabel#downloadtitle {{ color:{T['text_hi']}; }}"
             f"QLabel#downloadmeta {{ color:{T['muted']}; font-size:9pt; }}"
             f"QLabel#downloadstatus {{ color:{T['muted']}; font-size:8.5pt; font-weight:600; }}"
+            f"QLabel#summaryname {{ color:{T['text_hi']}; font-size:8.5pt; font-weight:700; }}"
+            f"QLabel#summaryfailed {{ color:{theme.status('error')}; font-size:8.5pt; "
+            f"font-weight:700; }}"
             f"QPushButton#queuebadge {{ background:{T['btn']}; color:{T['text']}; "
             f"border:1px solid {T['border']}; border-radius:8px; padding:4px 10px; "
             f"font-size:8.5pt; font-weight:600; }}"
@@ -541,6 +625,12 @@ class DownloadBar(QFrame):
             f"border-radius:8px; padding:4px 12px; color:{T['muted']}; font-size:8.5pt; "
             f"font-weight:600; }}"
             f"QPushButton#cancelbutton:hover {{ background:{T['btn_hover']}; color:{T['text']}; }}"
+            f"QPushButton#retrybutton {{ background:{T['accent']}; border:none; "
+            f"border-radius:8px; padding:5px 14px; color:{T['on_accent']}; font-size:8.5pt; "
+            f"font-weight:700; }}"
+            f"QPushButton#retrybutton:hover {{ background:{T['accent_hi']}; }}"
+            f"QFrame#queuerow[failed=\"true\"] {{ border-color:{bad_edge}; }}"
+            f"QLabel#failedtag {{ color:{bad}; font-size:8.5pt; font-weight:700; }}"
             f"QPushButton#urgenthide {{ background:transparent; border:none; color:{T['muted']}; "
             f"border-radius:6px; padding:0px; min-width:0px; font-size:10pt; }}"
             f"QPushButton#urgenthide:hover {{ background:{T['btn_hover']}; }}"
@@ -554,6 +644,7 @@ class DownloadBar(QFrame):
         self.bar.update()
         for b, name in ((self.btn_min, "fold_up"), (self.btn_expand, "fold_open")):
             b.setIcon(QIcon(icons.pixmap(name, 16, T["muted"])))
+        self.s_icon.setPixmap(self._icon("download"))
         self._line_up()
         self._update_queue_badge()
         if self.url:
@@ -578,8 +669,6 @@ class DownloadBar(QFrame):
             line_at[w] = (w.height() - fm.height()) / 2 + fm.ascent()
         line_at[self.pill] = self.pill.sizeHint().height() / 2 + cap_mid
         line_at[self.src_icon] = self.src_icon.height() / 2 + cap_mid
-        for b in (self.btn_min, self.btn_close):
-            line_at[b] = b.height() / 2 + cap_mid
         base = max(line_at.values())
         for w, drop in self._drops.items():
             drop.changeSize(0, round(base - line_at[w]), QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -604,30 +693,45 @@ class DownloadBar(QFrame):
             p.end()
 
     def set_collapsed(self, on: bool):
-        """Minimised: the bar shrinks to one slim line (the title, how far it's got, how
-        many wait) so the page below gets the room back; its ⌄ opens it again."""
+        """Minimised: just the summary line (and a thin bar) so the page below gets the
+        room back; its chevron, or a click anywhere on it, opens it again."""
         self._collapsed = on and not self._mini
         if self._collapsed:
             self.queue_badge.setChecked(False)
         self._head.setVisible(not self._collapsed)
-        self.strip.setVisible(self._collapsed)
-        self._sync_strip()
+        self.summary.setVisible(self._collapsed)
+        self._corner()
+        self._sync_summary()
 
-    def _sync_strip(self):
-        """The slim line shows what the full bar does."""
-        if not self._collapsed:
-            return
-        self.s_title.setText(self.title)
-        self.s_title.setToolTip(self.title)
-        self.s_status.setText(self.lbl_status.text())
+    def _corner(self):
+        """The top right corner: minimise while it runs, ✕ once it's over; minimised,
+        the slim line has its own."""
+        done = self.stage == "done"
+        self.btn_min.setVisible(not (done or self._mini or self._collapsed))
+        self.btn_close.setVisible(done and not self._collapsed)
+        self.s_close.setVisible(done)
+
+    def _queued_text(self) -> str:
+        n = len(self._queue)
+        return ngettext("+{count} queued", "+{count} queued", n, count=n) if n else ""
+
+    def _failed_text(self) -> str:
+        n = len(self._failed)
+        return ngettext("{n} failed", "{n} failed", n) if n else ""
+
+    def _sync_summary(self):
+        """The minimised line: which song, how far it's got, how many wait, how many
+        failed (in red)."""
+        bits = [x for x in (self.title, self.lbl_status.text(), self._queued_text()) if x]
+        self.s_text.setText(" · ".join(bits))
+        self.s_text.setToolTip(self.title)
+        failed = self._failed_text()
+        self.s_failed.setText("· " + failed if failed else "")
+        self.s_failed.setVisible(bool(failed))
         if self.bar._mode == "indeterminate":
             self.s_bar.set_indeterminate(True)
         else:
             self.s_bar.set_progress(self.bar._progress)
-        n = len(self._queue)
-        self.s_queue.setText(ngettext("+{count} queued", "+{count} queued", n, count=n)
-                             if n else "")
-        self.s_queue.setVisible(bool(n))
 
     def showEvent(self, ev):
         super().showEvent(ev)
@@ -640,6 +744,9 @@ class DownloadBar(QFrame):
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
         self.outcome.setGeometry(self.rect())
+        for b in (self.btn_min, self.btn_close):
+            b.move(self.width() - b.width() - 6, 6)
+            b.raise_()
         self._show_meta()
 
     def set_mini(self, mini: bool):
@@ -647,10 +754,11 @@ class DownloadBar(QFrame):
         Stop all in the queue list (no room for it beside Cancel)."""
         self._mini = mini
         self.lbl_src.setVisible(not mini)
-        self.btn_min.setVisible(not mini)   # the mini player's bar is already one line
+        self._corner()   # no minimise: the mini player's bar is short already
         self.retheme()   # also lines line 1 up again
         self._apply_art()
         self._head_lay.setContentsMargins(*((8, 6, 8, 6) if mini else (12, 10, 12, 10)))
+        self._col.setSpacing(2 if mini else LINE_GAP)
         self._head_lay.setSpacing(8 if mini else 12)
         self._update_queue_badge()
         self._show_meta()
@@ -660,10 +768,24 @@ class DownloadBar(QFrame):
         self.lbl_meta.setVisible(bool(self._meta) and not self._mini
                                  and self.width() >= WIDE_AT)
 
+    @_after_hold
     def set_active(self, url: str, title: str, kind: str, thumb_pm: QPixmap | None = None,
                    channel: str = "", seconds: float = 0.0):
+        self._show_card(url, title, kind, thumb_pm, channel, seconds)
+        self.scribe.reset()
+        self.btn_cancel.show()
+        self.btn_retry.hide()
+        self._corner()
+        self.lbl_status.setText(_("Parsing video…"))
+        self.bar.set_indeterminate(True)
+        self._update_queue_badge()
+        self._sync_summary()
+        self.show()
+
+    def _show_card(self, url, title, kind, thumb_pm, channel, seconds):
         self._auto_hide.stop()
         self.outcome.stop()
+        self._raw = (title, seconds)
         self.url = url
         self.title = pretty_title(title) or _("Sound")
         self.kind = kind
@@ -683,19 +805,9 @@ class DownloadBar(QFrame):
         self._show_meta()
         pill_text = _("Play once") if kind == "play" else _("Add as sound")
         self.pill.setText(pill_text)
-
-        self.scribe.reset()
         self._update_thumb()
-        self.btn_cancel.show()
-        self.btn_close.hide()
-        self.btn_min.setVisible(not self._mini)
 
-        self.lbl_status.setText(_("Parsing video…"))
-        self.bar.set_indeterminate(True)
-        self._update_queue_badge()
-        self._sync_strip()
-        self.show()
-
+    @_after_hold
     def set_progress(self, url: str, payload):
         if url != self.url:   # a cancelled download still finishing: not this one
             return
@@ -716,9 +828,10 @@ class DownloadBar(QFrame):
             self.scribe.set_progress(self.progress_frac)
             self.lbl_status.setText(f"{self.progress_frac * 100:.0f}%")   # the title says what
             self.bar.set_progress(self.progress_frac)
-        self._sync_strip()
+        self._sync_summary()
         self.show()
 
+    @_after_hold
     def set_thumb(self, url: str, pm: QPixmap):
         if pm.isNull():
             return
@@ -756,52 +869,75 @@ class DownloadBar(QFrame):
         if not self._mini:   # Bun's slot is taller than a picture: less space above and below
             self._head_lay.setContentsMargins(12, 10 if has else 6, 12, 10 if has else 6)
 
+    @_after_hold
     def set_queue(self, queue: list[dict]):
         self._queue = list(queue)
         self._update_queue_badge()
-        self._sync_strip()
+        self._sync_summary()
         if self.panel.isVisible():
             self._fill_rows()
 
+    def _others_failed(self) -> list[dict]:
+        """The picks that failed, but not the one on the card (it says so itself)."""
+        return [f for f in self._failed if f["url"] != self.url]
+
+    def _failed_text_for(self, failed: list[dict]) -> str:
+        n = len(failed)
+        return ngettext("{n} failed", "{n} failed", n) if n else ""
+
     def _update_queue_badge(self):
-        if not self._queue:
+        failed = self._others_failed()
+        if not self._queue and not failed:
             self.queue_badge.setChecked(False)
             self.queue_badge.hide()
             self.btn_stop_all.hide()
+            self.btn_panel_stop.hide()
             self.panel.hide()
             return
-        n = len(self._queue)
-        self.queue_badge.setText(ngettext("+{count} queued", "+{count} queued", n, count=n))
+        self.queue_badge.setText(" · ".join(x for x in (self._queued_text(),
+                                                        self._failed_text_for(failed)) if x))
         self.queue_badge.setIcon(QIcon(icons.pixmap(
             "fold_open" if self.queue_badge.isChecked() else "fold", 14, theme.T["muted"])))
         names = [pretty_title(item.get("title", "")) or _("Sound") for item in self._queue]
-        self.queue_badge.setToolTip("\n".join([_("Up next")] + [f"• {n_}" for n_ in names]))
+        self.queue_badge.setToolTip("\n".join(([_("Up next")] + [f"• {n_}" for n_ in names])
+                                              if names else [self._failed_text_for(failed)]))
         self.queue_badge.show()
-        self.btn_stop_all.setVisible(not self._mini)
-        self.btn_panel_stop.setVisible(self._mini)
+        self.btn_stop_all.setVisible(bool(self._queue) and not self._mini)
+        self.btn_panel_stop.setVisible(bool(self._queue) and self._mini)
+        if self.panel.isVisible():
+            self._fill_rows()
 
     def _toggle_panel(self, on: bool):
-        if on and self._queue:
+        has = bool(self._queue or self._others_failed())
+        if on and has:
             self._fill_rows()
-        self.panel.setVisible(on and bool(self._queue))
-        self._update_queue_badge()
+        self.panel.setVisible(on and has)
+        self.queue_badge.setIcon(QIcon(icons.pixmap(
+            "fold_open" if on else "fold", 14, theme.T["muted"])))
 
     def _fill_rows(self):
-        """The queue list, rebuilt: it's a handful of rows (the queue is capped) and only
-        while it's open."""
+        """The queue list, rebuilt: the picks waiting, then the ones that failed (each
+        with Retry). A handful of rows (the queue is capped), and only while it's open."""
         while self.rows.count():
             item = self.rows.takeAt(0)
             if item.widget() is not None:
                 item.widget().deleteLater()
-        for i, q in enumerate(self._queue, 1):
-            row = QFrame()
+        failed = self._others_failed()
+        for i, q in enumerate(self._queue + failed, 1):
+            bad = i > len(self._queue)
+            row = _QueueRow()
             row.setObjectName("queuerow")
+            if not bad and i > 1:   # the first one is next up already
+                row.setCursor(Qt.PointingHandCursor)
+                row.setToolTip(_("Download this one next"))
+                row.clicked.connect(lambda u=q["url"]: self.front_requested.emit(u))
+            row.setProperty("failed", bad)
             row.setAttribute(Qt.WA_Hover)
             rl = QHBoxLayout(row)
             rl.setContentsMargins(8, 4, 6, 4)
             rl.setSpacing(8)
-            idx = QLabel(str(i))
-            idx.setObjectName("queueindex")
+            idx = QLabel("✗" if bad else str(i))
+            idx.setObjectName("failedtag" if bad else "queueindex")
             idx.setFixedWidth(14)
             rl.addWidget(idx)
             pic = QLabel()
@@ -814,30 +950,69 @@ class DownloadBar(QFrame):
             title.setToolTip(name)
             title.setObjectName("downloadtitle")
             rl.addWidget(title, 1)
-            kind = QLabel(_("Play once") if q.get("kind") == "play" else _("Add as sound"))
-            kind.setObjectName("actionpill")
-            kind.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            rl.addWidget(kind)
+            if bad:
+                why = QLabel(_("Couldn't download"))
+                why.setObjectName("failedtag")
+                rl.addWidget(why)
+                again = QPushButton(_("Retry"))
+                again.setObjectName("retrybutton")
+                again.setCursor(Qt.PointingHandCursor)
+                again.clicked.connect(lambda _c=False, u=q["url"]: self._retry(u))
+                rl.addWidget(again)
+            else:
+                kind = QLabel(_("Play once") if q.get("kind") == "play" else _("Add as sound"))
+                kind.setObjectName("actionpill")
+                kind.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                rl.addWidget(kind)
             x = QPushButton("✕")
             x.setObjectName("urgenthide")
             x.setToolTip(_("Remove"))
             x.setCursor(Qt.PointingHandCursor)
             x.setFixedSize(24, 24)
-            x.clicked.connect(lambda _c=False, u=q["url"]: self.cancel_requested.emit(u))
+            x.clicked.connect(lambda _c=False, u=q["url"], b=bad: self._forget(u) if b
+                              else self.cancel_requested.emit(u))
             rl.addWidget(x)
             self.rows.addWidget(row)
         self.rows.addStretch(1)
-        shown = min(len(self._queue), QUEUE_ROWS)
-        self.scroll.setFixedHeight(shown * (ROW_THUMB[1] + 8) + max(0, shown - 1) * 4)
+        # as tall as the first few rows really are (a failed one's Retry is taller)
+        rows = [self.rows.itemAt(i).widget() for i in range(self.rows.count() - 1)]
+        shown = rows[:QUEUE_ROWS]
+        self.scroll.setFixedHeight(sum(r.sizeHint().height() for r in shown)
+                                   + max(0, len(shown) - 1) * self.rows.spacing())
 
+    def _retry(self, url: str):
+        """Retry: the failed pick is picked again (it starts, or waits its turn)."""
+        item = next((f for f in self._failed if f["url"] == url), None)
+        if item is None:
+            return
+        self._forget(url)
+        self.retry_requested.emit(dict(item))
+
+    def _forget(self, url: str):
+        self._failed = [f for f in self._failed if f["url"] != url]
+        self._update_queue_badge()
+        self._sync_summary()
+
+    @_after_hold
+    def set_failed(self, url: str, kind: str):
+        """The download for `url` ended in an error (its set_done(False) follows): unlike
+        a Cancel, or a newer Play taking over, this one gets the red flash and Retry."""
+        self._failing = url
+
+    @_after_hold
     def set_done(self, url: str, kind: str, ok: bool):
-        if url != self.url:
+        if url != self.url or self.stage == "done":
+            return
+        failed = not ok and self._failing == url
+        self._failing = ""
+        if not ok and not failed:   # stopped (Cancel, a newer pick): no flash, no Retry
+            if self._cancelling != url:
+                self._ended_quietly()
             return
         self.stage = "done"
         self.scribe.finish(ok)
         self.btn_cancel.hide()
-        self.btn_close.show()
-        self.btn_min.hide()
+        self._corner()
         # a second of tick (or red ✗ and a red glow) over the picture so it's noticed; the
         # mini player has no picture: just the glow when it failed
         spot = QRectF()
@@ -845,42 +1020,90 @@ class DownloadBar(QFrame):
         if art is not None:
             top_left = art.mapTo(self, art.rect().topLeft())
             spot = QRectF(top_left.x(), top_left.y(), art.width(), art.height())
-        if spot.isValid() or not ok:
+        if spot.isValid() or failed:
             self.outcome.play(ok, spot)
+        # what comes next (the next pick, the queue moving up) waits for the flash
+        self._held = []
+        self._hold.start(Outcome.SHOW_MS)
 
         if ok:
+            self.btn_retry.hide()
+            self.bar.set_progress(1.0)
             if kind == "play":
                 self.lbl_status.setText(_("▶ Playing"))
-                self.bar.set_progress(1.0)
-                self._auto_hide.start(7000)
             else:
                 self.lbl_status.setText(_("✓ Added to your sounds"))
-                self.bar.set_progress(1.0)
-                self._auto_hide.start(4000)
+            if not self._others_failed():   # the failed ones wait for Retry or ✕
+                self._auto_hide.start(7000 if kind == "play" else 4000)
         else:
-            self.lbl_status.setText(_("Couldn't download"))
-            self.bar.set_progress(0.0)
-            self._auto_hide.start(6000)
-        self._sync_strip()
+            self._failed = [f for f in self._failed if f["url"] != url] + [{
+                "url": url, "title": self._raw[0], "kind": kind, "seconds": self._raw[1]}]
+            self._show_failed_state()
+        self._update_queue_badge()
+        self._sync_summary()
+
+    def _show_failed_state(self):
+        self.stage = "done"
+        self.lbl_status.setText(_("Couldn't download"))
+        self.bar.set_progress(0.0)
+        self.btn_cancel.hide()
+        self.btn_retry.show()
+        self._corner()
+
+    def _release(self):
+        """The flash is over: play out what waited, in order (one may be another finish,
+        which holds the rest again)."""
+        held, self._held = self._held or [], None
+        while held:
+            method, args = held.pop(0)
+            method(self, *args)
+            if self._held is not None:
+                self._held[:0] = held
+                return
+
+    def _ended_quietly(self):
+        """The running pick stopped without failing: the next pick takes over (it's
+        about to start), else a failed one waiting for Retry shows, else the bar goes."""
+        if self._queue:
+            return
+        if self._failed:
+            f = self._failed[-1]
+            self._show_card(f["url"], f["title"], f["kind"], self.thumb_lookup(f["url"]),
+                            "", f["seconds"])
+            self.scribe.finish(False)
+            self._show_failed_state()
+            self._update_queue_badge()
+            self._sync_summary()
+            return
+        self._clear_and_hide()
 
     def _on_cancel(self):
-        url = self.url
+        url = self._cancelling = self.url
         self.cancel_requested.emit(url)
+        self._cancelling = ""
         if self.url == url:   # nothing took its place (the next pick would have set_active)
-            self._clear_and_hide()
+            self._ended_quietly()
 
     def _on_stop_all(self):
+        self._cancelling = self.url
         self.stop_all_requested.emit()
+        self._cancelling = ""
         self._clear_and_hide()
 
     def _clear_and_hide(self):
         self._auto_hide.stop()
+        self._hold.stop()
+        self._held = None
+        self.outcome.stop()
         self.url = ""
         self.title = ""
         self.stage = ""
         self._queue = []
+        self._failed = []
+        self._failing = ""
         self._pm = None
         self._meta = ""
+        self.btn_retry.hide()
         self._update_queue_badge()
         self.set_collapsed(False)   # the next download opens full size again
         self.hide()

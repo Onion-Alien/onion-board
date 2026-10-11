@@ -2983,5 +2983,7 @@
   "Queued": "Đang chờ",
   "Queued: waiting for current download to finish…": "Đang chờ: đợi lượt tải hiện tại xong…",
   "▶ Playing": "▶ Đang phát",
-  "✓ Added to your sounds": "✓ Đã thêm vào âm thanh của bạn"
+  "✓ Added to your sounds": "✓ Đã thêm vào âm thanh của bạn",
+  "Retry": "Thử lại",
+  "Download this one next": "Tải cái này tiếp theo"
 }

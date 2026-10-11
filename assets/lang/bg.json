@@ -3048,5 +3048,7 @@
   "Queued": "На опашка",
   "Queued: waiting for current download to finish…": "На опашка: чака текущото изтегляне да свърши…",
   "▶ Playing": "▶ Свири",
-  "✓ Added to your sounds": "✓ Добавено към звуците ти"
+  "✓ Added to your sounds": "✓ Добавено към звуците ти",
+  "Retry": "Опитай пак",
+  "Download this one next": "Изтегли това следващо"
 }

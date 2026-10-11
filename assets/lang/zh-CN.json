@@ -2983,5 +2983,7 @@
   "Queued": "排队中",
   "Queued: waiting for current download to finish…": "排队中: 正在等待当前下载完成…",
   "▶ Playing": "▶ 正在播放",
-  "✓ Added to your sounds": "✓ 已添加到您的声音"
+  "✓ Added to your sounds": "✓ 已添加到您的声音",
+  "Retry": "重试",
+  "Download this one next": "下一个下载这个"
 }

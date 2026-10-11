@@ -262,6 +262,21 @@ class BannerButton(QPushButton):
             self.setText(text)
 
 
+class _Moved(QObject):
+    """Calls `fn` (once, after the layout settles) when the watched widget moves or
+    changes size."""
+
+    def __init__(self, widget: QWidget, fn):
+        super().__init__(widget)
+        self._fn = fn
+        widget.installEventFilter(self)
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.Resize, QEvent.Move, QEvent.Show):
+            QTimer.singleShot(0, self, self._fn)
+        return False
+
+
 class Pulse(QObject):
     """The mic-check banner's throb: its opacity goes from 1 down to PULSE_LOW and back
     every PULSE_MS, a step every PULSE_FRAME_MS. Each step draws the whole banner again
@@ -872,8 +887,13 @@ class MainWindow(QMainWindow):
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(0)
         self._tabs_lay = tv
+        # in a box of its own, so its edges can follow the page's cards (_fit_dl_bar)
+        dl_box = QWidget()
+        self._dl_lay = QHBoxLayout(dl_box)
+        self._dl_lay.setContentsMargins(0, 0, 0, 0)
         self.download_bar = DownloadBar(self)
-        tv.addWidget(self.download_bar)
+        self._dl_lay.addWidget(self.download_bar)
+        tv.addWidget(dl_box)
         self.download_bar.shown_changed.connect(self._dl_bar_gap)
 
         # ---- tabs
@@ -985,6 +1005,7 @@ class MainWindow(QMainWindow):
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
+        self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
         self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
         self._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
@@ -1022,7 +1043,13 @@ class MainWindow(QMainWindow):
         self.linkbar.progress.connect(self.download_bar.set_progress)
         self.linkbar.progress.connect(self.mini_download_bar.set_progress)
         self.linkbar.done.connect(self.download_bar.set_done)
+        self.linkbar.failed.connect(self.download_bar.set_failed)
+        self.linkbar.failed.connect(self.mini_download_bar.set_failed)
         self.linkbar.done.connect(self.mini_download_bar.set_done)
+        self.download_bar.retry_requested.connect(self._retry_download)
+        self.mini_download_bar.retry_requested.connect(self._retry_download)
+        self.download_bar.front_requested.connect(self.linkbar.move_to_front)
+        self.mini_download_bar.front_requested.connect(self.linkbar.move_to_front)
         self.linkbar.queue_updated.connect(self.download_bar.set_queue)
         self.linkbar.queue_updated.connect(self.mini_download_bar.set_queue)
         self.download_bar.cancel_requested.connect(self.linkbar.cancel)
@@ -1241,6 +1268,19 @@ class MainWindow(QMainWindow):
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
         return f
+
+    def _fit_dl_bar(self):
+        """A page whose cards stop short of the edges (Setup: room for its scroll bar,
+        and centred past the width cap on a wide window) names that column `dl_column`:
+        the download bar then takes the cards' own left and right edges."""
+        col = getattr(self.tabs.currentWidget(), "dl_column", None)
+        left = right = 0
+        if col is not None and col.isVisible():
+            x = col.mapTo(self._tabs_box, QPoint(0, 0)).x()
+            left, right = max(0, x), max(0, self._tabs_box.width() - x - col.width())
+        m = self._dl_lay.contentsMargins()
+        if (m.left(), m.right()) != (left, right):
+            self._dl_lay.setContentsMargins(left, 0, right, 0)
 
     def _dl_bar_gap(self, shown: bool):
         """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
@@ -1701,6 +1741,8 @@ class MainWindow(QMainWindow):
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
         body = QWidget()
+        page.dl_column = body   # the download bar lines up with these cards
+        _Moved(body, self._fit_dl_bar)
         inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
         # cards' left edge lines up with the download bar and the other tabs
         sections = QVBoxLayout(body)
@@ -4507,6 +4549,15 @@ class MainWindow(QMainWindow):
         self._cat_row.hide()
         self._results_open = True
         self._sync_cat_bar()
+
+    def _retry_download(self, item: dict):
+        """The download bar's Retry on a pick that failed: picked again, as if its
+        search card was clicked (it starts, or waits its turn)."""
+        kind = item["kind"]
+        self.linkbar.open(item["url"], item["title"], item["seconds"])
+        self.ytresults.mark(item["url"], kind)
+        if not (self.linkbar.play_once() if kind == "play" else self.linkbar.add()):
+            self.ytresults.mark(item["url"], kind, False)
 
     def _from_youtube(self, r, play: bool):
         if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:

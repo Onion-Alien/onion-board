@@ -3048,5 +3048,7 @@
   "Queued": "Sorban",
   "Queued: waiting for current download to finish…": "Sorban: vár, amíg a mostani letöltés befejeződik…",
   "▶ Playing": "▶ Szól",
-  "✓ Added to your sounds": "✓ Hozzáadva a hangjaidhoz"
+  "✓ Added to your sounds": "✓ Hozzáadva a hangjaidhoz",
+  "Retry": "Újra",
+  "Download this one next": "Ezt töltsd le következőnek"
 }

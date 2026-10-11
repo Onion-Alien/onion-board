@@ -3113,5 +3113,7 @@
   "Queued": "В очереди",
   "Queued: waiting for current download to finish…": "В очереди: ожидание завершения текущей загрузки…",
   "▶ Playing": "▶ Воспроизведение",
-  "✓ Added to your sounds": "✓ Добавлено в звуки"
+  "✓ Added to your sounds": "✓ Добавлено в звуки",
+  "Retry": "Повторить",
+  "Download this one next": "Скачать это следующим"
 }

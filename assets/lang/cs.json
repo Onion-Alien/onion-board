@@ -3113,5 +3113,7 @@
   "Queued": "Ve frontě",
   "Queued: waiting for current download to finish…": "Ve frontě: čeká na dokončení stahování…",
   "▶ Playing": "▶ Hraje",
-  "✓ Added to your sounds": "✓ Přidáno do tvých zvuků"
+  "✓ Added to your sounds": "✓ Přidáno do tvých zvuků",
+  "Retry": "Zkusit znovu",
+  "Download this one next": "Stáhnout tohle jako další"
 }

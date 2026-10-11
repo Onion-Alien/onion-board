@@ -3113,5 +3113,7 @@
   "Queued": "În coadă",
   "Queued: waiting for current download to finish…": "În coadă: așteaptă să se termine descărcarea curentă…",
   "▶ Playing": "▶ Se redă",
-  "✓ Added to your sounds": "✓ Adăugat la sunetele tale"
+  "✓ Added to your sounds": "✓ Adăugat la sunetele tale",
+  "Retry": "Reîncearcă",
+  "Download this one next": "Descarcă-l pe acesta următorul"
 }

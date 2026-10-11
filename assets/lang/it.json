@@ -3048,5 +3048,7 @@
   "Queued": "In coda",
   "Queued: waiting for current download to finish…": "In coda: in attesa del completamento del download…",
   "▶ Playing": "▶ In riproduzione",
-  "✓ Added to your sounds": "✓ Aggiunto ai tuoi suoni"
+  "✓ Added to your sounds": "✓ Aggiunto ai tuoi suoni",
+  "Retry": "Riprova",
+  "Download this one next": "Scarica questo come prossimo"
 }

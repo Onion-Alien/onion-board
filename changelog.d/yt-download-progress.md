@@ -7,3 +7,8 @@
 - A link with no picture shows Bun writing the music down on a little scroll while it
   downloads: the opening of a well-known piece (Fur Elise, Canon in D, Twinkle twinkle
   and 26 more) as real sheet music, as much of it as has downloaded.
+- The download bar can be minimised to one slim line (the song, how far it's got and
+  how many wait); a click opens it again. On Setup it lines up with the cards.
+- A download that worked shows a tick for a second before the next one takes its
+  place; one that failed flashes red and waits in the queue list with Retry.
+- Click a waiting song in the queue list to download it next.

@@ -2983,5 +2983,7 @@
   "Queued": "อยู่ในคิว",
   "Queued: waiting for current download to finish…": "อยู่ในคิว: รอให้การดาวน์โหลดปัจจุบันเสร็จ…",
   "▶ Playing": "▶ กำลังเล่น",
-  "✓ Added to your sounds": "✓ เพิ่มลงในเสียงของคุณแล้ว"
+  "✓ Added to your sounds": "✓ เพิ่มลงในเสียงของคุณแล้ว",
+  "Retry": "ลองอีกครั้ง",
+  "Download this one next": "ดาวน์โหลดอันนี้ต่อไป"
 }

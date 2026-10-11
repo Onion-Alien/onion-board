@@ -3113,5 +3113,7 @@
   "Queued": "W kolejce",
   "Queued: waiting for current download to finish…": "W kolejce: czeka na koniec bieżącego pobierania…",
   "▶ Playing": "▶ Gra",
-  "✓ Added to your sounds": "✓ Dodano do twoich dźwięków"
+  "✓ Added to your sounds": "✓ Dodano do twoich dźwięków",
+  "Retry": "Ponów",
+  "Download this one next": "Pobierz to jako następne"
 }

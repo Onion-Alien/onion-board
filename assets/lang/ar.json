@@ -3308,5 +3308,7 @@
   "Queued": "في الانتظار",
   "Queued: waiting for current download to finish…": "في الانتظار: حتى ينتهي التنزيل الحالي…",
   "▶ Playing": "▶ قيد التشغيل",
-  "✓ Added to your sounds": "✓ أُضيف إلى أصواتك"
+  "✓ Added to your sounds": "✓ أُضيف إلى أصواتك",
+  "Retry": "إعادة المحاولة",
+  "Download this one next": "نزّل هذا تاليًا"
 }

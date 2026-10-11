@@ -2983,5 +2983,7 @@
   "Queued": "대기 중",
   "Queued: waiting for current download to finish…": "대기 중: 지금 다운로드가 끝나길 기다리는 중…",
   "▶ Playing": "▶ 재생 중",
-  "✓ Added to your sounds": "✓ 내 사운드에 추가됨"
+  "✓ Added to your sounds": "✓ 내 사운드에 추가됨",
+  "Retry": "다시 시도",
+  "Download this one next": "이걸 다음에 다운로드"
 }

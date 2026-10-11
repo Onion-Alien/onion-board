@@ -51,6 +51,7 @@ class LinkBar(QFrame):
     played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
     _msg = Signal(str, str, object, object)   # worker -> UI: (kind, url, payload, job)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
+    failed = Signal(str, str)         # (url, kind): it ended in an error, just before its done
     progress = Signal(str, object)    # (url, 0..1 downloaded, or -1/stage while it's converted)
     link_changed = Signal(str)        # the search box's link ("" when it has none now)
     download_started = Signal(str, str, str, float)  # (url, title, kind, seconds)
@@ -246,6 +247,14 @@ class LinkBar(QFrame):
             self.queue_updated.emit(list(left))
             for q in gone:
                 self.done.emit(url, q["kind"], False)
+
+    def move_to_front(self, url: str):
+        """A waiting pick clicked in the download bar's list: it goes next."""
+        i = next((i for i, q in enumerate(self._queue_list) if q["url"] == url), None)
+        if not i:   # not waiting, or next already
+            return
+        self._queue_list.insert(0, self._queue_list.pop(i))
+        self.queue_updated.emit(list(self._queue_list))
 
     def cancel_all(self):
         """The download bar's Stop all: the running download and every pick waiting."""
@@ -454,6 +463,7 @@ class LinkBar(QFrame):
                 self._say(payload, theme.status("error"))   # already rich text
             else:   # it was for a link no longer showing: don't lose the reason
                 busy.toast(self.window(), payload, "error", 8000)
+            self.failed.emit(url, was or "add")
             self.done.emit(url, was or "add", False)
             if current and self._queued:
                 # Both clicks were waiting for this same failed download. A second

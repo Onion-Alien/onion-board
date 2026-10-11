@@ -3048,5 +3048,7 @@
   "Queued": "I kø",
   "Queued: waiting for current download to finish…": "I kø: venter på at den nuværende download bliver færdig…",
   "▶ Playing": "▶ Afspiller",
-  "✓ Added to your sounds": "✓ Tilføjet til dine lyde"
+  "✓ Added to your sounds": "✓ Tilføjet til dine lyde",
+  "Retry": "Prøv igen",
+  "Download this one next": "Hent denne som den næste"
 }

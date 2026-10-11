@@ -2983,5 +2983,7 @@
   "Queued": "待機中",
   "Queued: waiting for current download to finish…": "待機中: 現在のダウンロード完了を待っています…",
   "▶ Playing": "▶ 再生中",
-  "✓ Added to your sounds": "✓ サウンドに追加しました"
+  "✓ Added to your sounds": "✓ サウンドに追加しました",
+  "Retry": "再試行",
+  "Download this one next": "次にこれをダウンロード"
 }
