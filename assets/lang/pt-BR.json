@@ -3286,5 +3286,6 @@
   "Your PC's sound drops out for a second while Windows reloads it.": "O som do seu PC some por um segundo enquanto o Windows o recarrega.",
   "Your sounds go into your mic": "Seus sons vão para o seu microfone",
   "{mic} · not sent, sounds only": "{mic} · não enviado, só sons",
-  "{mic} · off": "{mic} · desligado"
+  "{mic} · off": "{mic} · desligado",
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "A etapa de administrador do Windows não terminou. Se o aviso ainda estiver aberto, responda a ele; depois tente de novo."
 }

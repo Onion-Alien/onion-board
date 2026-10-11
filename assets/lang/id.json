@@ -3213,5 +3213,6 @@
   "Your PC's sound drops out for a second while Windows reloads it.": "Suara PC-mu terputus sedetik saat Windows memuat ulang.",
   "Your sounds go into your mic": "Suaramu masuk ke mic-mu",
   "{mic} · not sent, sounds only": "{mic} · tidak dikirim, hanya suara",
-  "{mic} · off": "{mic} · mati"
+  "{mic} · off": "{mic} · mati",
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Langkah admin Windows tidak selesai. Jika permintaannya masih terbuka, jawab dulu; lalu coba lagi."
 }

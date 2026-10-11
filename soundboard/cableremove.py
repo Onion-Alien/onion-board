@@ -35,6 +35,8 @@ def remove() -> str | None:
                  "so it can't be removed here.")
     code = directmic.run_elevated(str(exe), "-u -h", wait_s=120.0)
     if code is None:
-        return _("Windows' admin prompt was turned down (or didn't finish).")
+        return directmic.declined()
+    if code == directmic.UNFINISHED:
+        return directmic.unfinished()
     log.info("VB-Cable removed (setup exit code %s)", code)   # (its codes aren't documented)
     return None

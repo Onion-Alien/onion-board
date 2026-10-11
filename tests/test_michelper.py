@@ -30,7 +30,8 @@ ROOT = Path(__file__).resolve().parent.parent
 ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4c620",
                 4: "b49bed37327a635032e846b3f51e1b47fc5ebcaef7ee4078d03c95528a142370",
                 5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467",
-                6: "9b83750c3d3586a89804c5ec5c97618fc1ce30b511723e4e3cf3525513c9a534"}
+                6: "9b83750c3d3586a89804c5ec5c97618fc1ce30b511723e4e3cf3525513c9a534",
+                7: "562d4f9cdb4cd0a53071284bf83aef9bbf8b2563c5ba7a3368dc190942d22c66"}
 
 
 def _queue():
@@ -560,6 +561,47 @@ def test_a_helper_killed_before_reading_leaves_nothing_to_redo(monkeypatch):
     _fake_task(monkeypatch, lambda rid: (mh.results_dir() / f"{rid}.ack").write_bytes(b""))
     assert mh.ask(["uninstall"], wait_s=60) is None
     assert not list(mh.requests_dir().iterdir())
+
+
+def test_a_request_queued_behind_a_long_one_is_waited_for(monkeypatch):
+    """Two requests at once (another account's, or one the helper is still on): the
+    helper does them in turn. The second must not give up at START_S while the
+    first is being worked on (then Windows' prompt found the helper holding the
+    lock: code 4)."""
+    _queue()
+    monkeypatch.setattr(mh, "START_S", 0.3)
+    monkeypatch.setattr(mh, "BEAT_S", 0.05)
+    started = threading.Event()
+
+    def schtasks(*args, timeout=30.0, out=None):
+        if not started.is_set():   # one task run: it finds both (the second one later)
+            started.set()
+            threading.Thread(target=lambda: mh.serve(run=lambda a: time.sleep(0.8) or 0),
+                             daemon=True).start()
+        return 0
+    monkeypatch.setattr(mh, "_schtasks", schtasks)
+    out = {}
+    t = threading.Thread(target=lambda: out.__setitem__("a", mh.ask(["uninstall"], wait_s=5)))
+    t.start()
+    time.sleep(0.2)   # the helper has taken the first
+    out["b"] = mh.ask(["cleanup", GUID], wait_s=5)
+    t.join()
+    assert out == {"a": 0, "b": 0}
+
+
+def test_a_stale_heartbeat_of_another_request_doesnt_hold_ours(monkeypatch):
+    """A helper killed on someone else's request left its .ack: ours still gives up
+    at START_S (nobody is at work), never waits the task's whole time limit."""
+    _queue()
+    monkeypatch.setattr(mh, "_schtasks", lambda *a, **k: 0)
+    monkeypatch.setattr(mh, "START_S", 0.2)
+    dead = mh.results_dir() / f"{'8' * 32}.ack"
+    dead.write_bytes(b"")
+    old = time.time() - mh.STALE_S - 10
+    os.utime(dead, (old, old))
+    start = time.monotonic()
+    assert mh.ask(["uninstall"], wait_s=5) is None
+    assert time.monotonic() - start < 3
 
 
 def test_an_older_helper_without_a_heartbeat_gets_the_full_wait(monkeypatch):

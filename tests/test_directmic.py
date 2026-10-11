@@ -2106,6 +2106,74 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     assert "mic" in w.pill.accessibleName().lower()
 
 
+def test_an_unfinished_prompt_isnt_called_a_no(window, monkeypatch):  # noqa: F811
+    """The admin step didn't finish (the prompt left open for minutes, or a PC that
+    won't start it): nobody clicked No, so the card mustn't say so. It's an error box,
+    and the one click stays on offer."""
+    w = window
+    _routes(w, monkeypatch, "missing")
+    told = []
+    monkeypatch.setattr(w, "tell", lambda *a, **k: told.append(a))
+    w._mic_attached("My mic", dm.unfinished())
+    assert not w._declined and "You clicked" not in w.mic_reason.text()
+    assert told and "didn't finish" in told[0][1]
+    assert w.btn_install.text() == "Put my sounds straight into my mic"
+
+
+def _fake_shell(monkeypatch, started: bool, error: int = 0, wait: int = 0, code: int = 0):
+    """run_elevated's Windows calls: ShellExecuteExW `started` (else failing with
+    `error`), WaitForSingleObject giving `wait`, the exit code `code`."""
+    class Fn:
+        argtypes = restype = None
+
+        def __init__(self, f):
+            self.f = f
+
+        def __call__(self, *a):
+            return self.f(*a)
+
+    def shell(info):
+        if started:
+            info._obj.hProcess = 1234   # (byref: the struct is ._obj)
+        return int(started)
+
+    def exit_code(h, out):
+        out._obj.value = code
+        return 1
+
+    class Lib:
+        ShellExecuteExW = Fn(shell)
+        WaitForSingleObject = Fn(lambda h, ms: wait)
+        GetExitCodeProcess = Fn(exit_code)
+        CloseHandle = Fn(lambda h: 1)
+    monkeypatch.setattr(dm.ctypes, "WinDLL", lambda name, use_last_error=False: Lib())
+    monkeypatch.setattr(dm.ctypes, "get_last_error", lambda: error)
+
+
+def test_run_elevated_tells_a_no_from_no_answer(monkeypatch):
+    _fake_shell(monkeypatch, started=False, error=1223)   # ERROR_CANCELLED: a No
+    assert dm.run_elevated("x.exe", "") is None
+    _fake_shell(monkeypatch, started=False, error=5)      # admin rights denied outright
+    assert dm.run_elevated("x.exe", "") == dm.UNFINISHED
+    _fake_shell(monkeypatch, started=True, wait=0x102)    # WAIT_TIMEOUT: still going
+    assert dm.run_elevated("x.exe", "", wait_s=0.01) == dm.UNFINISHED
+    _fake_shell(monkeypatch, started=True, wait=0, code=7)
+    assert dm.run_elevated("x.exe", "", wait_s=0.01) == 7
+
+
+def test_install_says_what_happened_to_the_prompt(monkeypatch):
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: None)
+    assert dm.install_on(GUID) == dm.declined()
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: dm.UNFINISHED)
+    assert dm.install_on(GUID) == dm.unfinished()
+    assert dm.uninstall() == dm.unfinished() and dm.cleanup(GUID) == dm.unfinished()
+    from soundboard import cableremove
+    monkeypatch.setattr(cableremove, "setup_exe", lambda: Path("x.exe"))
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: dm.UNFINISHED)
+    assert cableremove.remove() == dm.unfinished()
+
+
 def test_a_slow_status_check_never_holds_up_the_window(monkeypatch):
     """A 1.9.7 freeze: the window asks for the status every second, and re-checking it
     stat()ed the ring file on the UI thread (6 s on a busy disk). After the first

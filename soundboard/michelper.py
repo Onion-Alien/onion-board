@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 6
+HELPER_VERSION = 7
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -253,7 +253,10 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
                 _forget(req)   # (if it died before taking it: never done later too)
                 return None
         elif req.exists():
-            if waited > START_S:
+            # not picked up yet: give up after START_S, unless the helper is at work on
+            # another request (another account's, or one left behind): it takes ours
+            # next, so wait, within the task's own time limit
+            if waited > HARD_S or (waited > START_S and not _busy(ack)):
                 log.info("the mic helper didn't pick the request up")
                 _forget(req)
                 return None
@@ -261,6 +264,15 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
             log.info("the mic helper didn't answer in %.0f s", wait_s)
             return None
         time.sleep(0.1)
+
+
+def _busy(ours: Path) -> bool:
+    """The helper is at work on some other request (a fresh heartbeat of another)."""
+    try:
+        return any(p != ours and (_age(p) or 0.0) <= STALE_S
+                   for p in results_dir().glob("*.ack"))
+    except OSError:
+        return False
 
 
 def _age(path: Path) -> float | None:
