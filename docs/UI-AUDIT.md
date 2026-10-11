@@ -61,7 +61,7 @@ the affected states; include its PR and validation evidence here.
   tasks have an explicit reason. Before converting, check lifetime, repeated opening,
   deletion of the edited item, async results, preview rollback and shortcut behaviour.
 
-  Done (PR #PRNUM): Settings and Edit sound open with `show()`, beside the board, so
+  Done (PR #413): Settings and Edit sound open with `show()`, beside the board, so
   sounds, hotkeys and the tabs keep working. Settings is one live window (`[Done]`):
   opening it again raises it on the page asked for (`SettingsDialog.show_page`, which
   clears a search first). Edit sound stays a draft with `[Save] [Cancel]`, one window
