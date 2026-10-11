@@ -660,6 +660,7 @@ class SettingsDialog(QDialog):
         w, v = self._page()
         self.theme_cards = []
         v.addWidget(self._language_card())
+        v.addWidget(self._ui_scale_card())
         # above the themes (it sat under every theme card, out of sight)
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
@@ -696,6 +697,49 @@ class SettingsDialog(QDialog):
             v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _ui_scale_card(self) -> QFrame:
+        """Interface size: everything bigger or smaller, on top of Windows' display
+        scaling. Qt sizes the app only as it starts (app.ui_scale_startup), so a new
+        size offers a restart, like the language."""
+        import os
+        from soundboard.library import UI_SCALES
+        card, cv = self._card(_("Interface size"),
+                              _("Makes everything in Onion Board bigger or smaller: text, "
+                                "buttons and pads."))
+        now = round(float(os.environ.get("QT_SCALE_FACTOR") or 1) * 100)
+        combo = QComboBox()
+        combo.setAccessibleName(_("Interface size"))
+        for pct in UI_SCALES:
+            combo.addItem(_("{percent}%", percent=pct), pct)
+        combo.setCurrentIndex(max(0, combo.findData(self.mw.cfg.ui_scale)))
+        no_wheel(combo)
+        restart = QPushButton(_("Restart now"))
+        restart.clicked.connect(self.mw.restart_app)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        row.addWidget(combo)
+        row.addWidget(restart)
+        row.addStretch(1)   # as wide as their text, not the card
+        cv.addLayout(row)
+        note = QLabel(_("Onion Board changes size after a restart."))
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        cv.addWidget(note)
+
+        def show():
+            later = self.mw.cfg.ui_scale != now
+            note.setVisible(later)
+            restart.setVisible(later)
+
+        def picked(i):
+            self.mw.cfg.ui_scale = combo.itemData(i)
+            self.mw._save_later()
+            show()
+        combo.currentIndexChanged.connect(picked)
+        show()
+        self.ui_scale_combo, self.ui_scale_note, self.ui_scale_restart = combo, note, restart
+        return card
 
     def _language_card(self) -> QFrame:
         """The app's language: a button showing the one picked, opening a window of

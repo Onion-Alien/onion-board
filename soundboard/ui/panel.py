@@ -20,6 +20,10 @@ from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
+# the two heights the main window's controls and bars share (DESIGN.md "size")
+CONTROL_H = 36   # a toolbar button, the search box, the player's buttons
+BAR_H = 48       # a bar holding one row of them: the Sounds toolbar, the bottom bars
+
 
 class RoundedFrame(QFrame):
     """Clip a panel and its children to the same corners as the app's cards."""
@@ -67,10 +71,12 @@ def vsep() -> QFrame:
     return f
 
 
-def bar(margins=(10, 8, 12, 8)) -> tuple[QFrame, QHBoxLayout]:
-    """The rounded control bar every tab has along its bottom (and the mixer strip)."""
+def bar(margins=(10, 5, 12, 6)) -> tuple[QFrame, QHBoxLayout]:
+    """The rounded control bar every tab has along its bottom (and the mixer strip).
+    A theme's 1 px top edge plus 5 + 6 around a CONTROL_H row makes BAR_H."""
     f = QFrame()
     f.setObjectName("transport")
+    f.setMinimumHeight(BAR_H)
     h = QHBoxLayout(f)
     h.setContentsMargins(*margins)
     h.setSpacing(10)

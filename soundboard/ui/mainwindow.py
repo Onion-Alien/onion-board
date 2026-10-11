@@ -48,8 +48,8 @@ from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
                            sourcedialog, splash, taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card,
-                                 hint_label, icon_label, steady_number, vsep)
+from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar, capped,
+                                 card, hint_label, icon_label, steady_number, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
@@ -1221,6 +1221,7 @@ class MainWindow(QMainWindow):
         # labelled inline (a title row over each box made the strip twice as tall)
         f = QFrame()
         f.setObjectName("deck")
+        f.setMinimumHeight(BAR_H)
         h = self._mixer_layout = QHBoxLayout(f)
         h.setContentsMargins(12, 6, 12, 6)
         h.setSpacing(14)
@@ -1533,7 +1534,7 @@ class MainWindow(QMainWindow):
         self._pad_size = (size_lbl, size)
         for b in (add, self.btn_record, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
-            b.setFixedHeight(40)
+            b.setFixedHeight(CONTROL_H)
         left.addWidget(self.sounds_toolbar)
         self.cat_bar = self._build_categories()
         left.addWidget(self.cat_bar)
@@ -1640,14 +1641,14 @@ class MainWindow(QMainWindow):
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
         for b in (self.btn_pp, self.btn_st):
-            b.setFixedSize(38, 34)
+            b.setFixedSize(CONTROL_H, CONTROL_H)
         self.np_name = QLabel(_("Pick a sound"))
         self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
         self.np_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
         # the row's height, set by its buttons; its width follows the text inside
         # NameAndSeek, which never asks the page for a new layout (the name changes
         # with every pad press, and a relayout repainted every pad on the board)
-        self.np_name.setFixedHeight(34)
+        self.np_name.setFixedHeight(CONTROL_H)
         self.np_name.setStyleSheet("font-weight:600;")
         self.seek = SeekSlider(Qt.Horizontal)
         self.seek.setRange(0, 1000)
