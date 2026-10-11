@@ -45,6 +45,9 @@ class SideTabs(QTabWidget):
     says when anything the rail shows has changed."""
 
     changed = Signal()
+    # a tab was asked for, also the one already showing (MainWindow: Settings, shown in
+    # the tabs' place, goes back to the tabs)
+    picked = Signal()
 
     def __init__(self):
         super().__init__()
@@ -60,6 +63,19 @@ class SideTabs(QTabWidget):
         if obj is self.tabBar() and e.type() == QEvent.Show:
             obj.hide()   # QTabWidget shows it again when it lays itself out
         return False
+
+    def setCurrentIndex(self, i):
+        super().setCurrentIndex(i)
+        self.picked.emit()
+
+    def setCurrentWidget(self, w):
+        super().setCurrentWidget(w)
+        self.picked.emit()
+
+    def move_to(self, i):
+        """Another tab without `picked`: the app moving off a tab that's going away
+        (switched off in Settings, which stays open), not someone asking for one."""
+        super().setCurrentIndex(i)
 
     # what changes a tab's look, all through here
     def setTabText(self, i, text):
@@ -516,6 +532,12 @@ class SideRail(QFrame):
         self.set_order(order)
         self.extras = [*extras, *foot]
         self.foot = list(foot)   # (beside the arrow on the open rail)
+        # a foot button showing its page in the tabs' place (Settings): it gets the
+        # current tab's fill, and no tab has it
+        self.foot_selected: QPushButton | None = None
+        for w in self.foot:
+            w.setCheckable(True)
+            w.installEventFilter(self)
         for w in self.extras:   # the keyboard's ring, not one left by a click
             w.setFocusPolicy(Qt.TabFocus)
         self._gaps.append(self._gap(10))   # More tabs isn't a tab
@@ -578,7 +600,11 @@ class SideRail(QFrame):
                            for _ in range(2)]
         self._foot_box.addSpacerItem(self._foot_pads[0])
         for w in foot:
-            self._foot_box.addWidget(w, 1)
+            self._foot_box.addWidget(w, 0)
+        # Settings is its icon only (selected: the current tab's fill round it); open,
+        # the arrow stays at the far side
+        self._foot_gap = QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self._foot_box.addSpacerItem(self._foot_gap)
         self._foot_box.addWidget(self.toggle, 0)   # (mirrored: the right)
         self._foot_box.addSpacerItem(self._foot_pads[1])
         lay.addLayout(self._foot_box)
@@ -605,7 +631,28 @@ class SideRail(QFrame):
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
         if e.type() in (QEvent.Show, QEvent.Hide) and obj in self.alerts:
             QTimer.singleShot(0, self, self._sync_divider)   # (not after the rail's gone)
+        elif e.type() == QEvent.Paint and obj in self.foot and obj.isChecked():
+            # the same soft fill as the current tab (RailTab), under the button's icon
+            c = QColor(theme.T["accent"])
+            c.setAlphaF(TINT_ALPHA)
+            p = QPainter(obj)
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setPen(Qt.NoPen)
+            p.setBrush(c)
+            # a square round the icon (the button is the controls' height, taller)
+            side = min(obj.width(), obj.height())
+            r = QRectF((obj.width() - side) / 2, (obj.height() - side) / 2, side, side)
+            p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), 8, 8)
+            p.end()
         return False
+
+    def select_foot(self, w: QPushButton | None):
+        """`w` (Settings) is showing in the tabs' place, or (None) the tabs are again."""
+        self.foot_selected = w
+        for f in self.foot:
+            f.setChecked(f is w)
+            f.update()
+        self.sync()
 
     def _sync_divider(self):
         """The line under the alerts is there only while one of them is."""
@@ -723,7 +770,7 @@ class SideRail(QFrame):
             n = shown_idx.get(b)
             b.setToolTip("" if shown or n is None or n > 9 else f"{name}  (Ctrl+{n})")
             b.setAccessibleDescription(tip)
-            b.setChecked(i == cur)
+            b.setChecked(i == cur and self.foot_selected is None)
             b.update()
         self.update()   # the live bars
 
@@ -790,10 +837,6 @@ class SideRail(QFrame):
         if self.output:
             title = self.output.title.fontMetrics().horizontalAdvance(_("Sound output"))
             need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
-        for w in self.foot:
-            name = ICON_PAD + (w.property("railtext") or "")
-            need.append(side + ICON + 24 + w.fontMetrics().horizontalAdvance(name)
-                        + 4 + BUTTON_W)
         return max(FULL_W, min(OPEN_W, max(need)))
 
     def _small(self, w: QWidget) -> bool:
@@ -850,8 +893,9 @@ class SideRail(QFrame):
             pad.changeSize(room, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
         self._foot_box.invalidate()
         for widget in self.foot:
-            widget.setMinimumWidth(BUTTON_W if mid else 0)
-            widget.setMaximumWidth(BUTTON_W if mid else 16777215)
+            widget.setFixedSize(BUTTON_W, BUTTON_W)   # a square: its fill, its hover
+        self._foot_gap.changeSize(0, 0, QSizePolicy.Fixed if mid else QSizePolicy.Expanding,
+                                  QSizePolicy.Fixed)
         self.toggle.setFixedWidth(BUTTON_W)
         self._place_column()
 
@@ -930,9 +974,13 @@ class SideRail(QFrame):
         for w in self.extras:
             if w.property("railtip") is None:   # its own tip, kept under the name
                 w.setProperty("railtip", w.toolTip())
-            w.setProperty("railopen", shown)
-            self._label(w, w.property("railtext") or "", w.property("railtip"),
-                        shown and not (mid and w in self.foot))
+            name = w.property("railtext") or ""
+            if w in self.foot:   # its icon only, open or shut (its name: screen readers)
+                w.setProperty("railopen", False)
+                self._label(w, name, w.property("railtip"), False)
+            else:
+                w.setProperty("railopen", shown)
+                self._label(w, name, w.property("railtip"), shown)
             w.style().unpolish(w)
             w.style().polish(w)
         self._status_box.setDirection(QBoxLayout.TopToBottom)

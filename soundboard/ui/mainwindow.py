@@ -140,6 +140,7 @@ LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at agai
 LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
 BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
+SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -465,6 +466,10 @@ class MainWindow(QMainWindow):
         self.bridge.mic_users.connect(self._on_mic_users)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
+        # windows beside the board, not over it (U4): the one Settings, and an Edit
+        # sound for each sound being edited
+        self._settings_dlg: SettingsDialog | None = None
+        self._editors: dict[str, EditDialog] = {}
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -926,7 +931,20 @@ class MainWindow(QMainWindow):
         self.tabs.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         SteadyTabs(self.tabs)   # a change inside a page doesn't repaint the whole board
         tv.addWidget(self.tabs, 1)
-        rv.addWidget(tabs_box, 1)
+        # the tabs with the bars over them, or Settings in their place (open_settings):
+        # the rail and the player and mixer below stay, so sounds can still be stopped
+        area = self._tabs_area = QWidget()
+        av = QVBoxLayout(area)
+        av.setContentsMargins(0, 0, 0, 0)
+        av.setSpacing(rv.spacing())
+        for strip in (self.mic_banner, self.urgent_bar, self.tip_bar, self.setup_bar,
+                      self.lang_bar):
+            rv.removeWidget(strip)
+            av.addWidget(strip)
+        av.addWidget(tabs_box, 1)
+        self._content = QStackedWidget()
+        self._content.addWidget(area)
+        rv.addWidget(self._content, 1)
         self.sounds_page = self._build_sounds_page()
         self.tabs.addTab(self.sounds_page, "")
         # the Radio tab, or the panel saying it's switched off (Settings > Privacy)
@@ -982,6 +1000,9 @@ class MainWindow(QMainWindow):
         QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self._go_tab(-1))
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
+        # a tab asked for (the rail, Ctrl+1..., a link) while Settings is up: back to the
+        # tabs, on that one
+        self.tabs.picked.connect(self.close_settings)
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
         # page's box holds the download bar too, so the bar's buttons come just before it
@@ -3827,7 +3848,7 @@ class MainWindow(QMainWindow):
         self.set_option("tabs_off", off if on else [*off, key])
         i = TAB_INDEX[key]
         if not on and self.tabs.currentIndex() == i:
-            self.tabs.setCurrentIndex(0)
+            self.tabs.move_to(0)   # (Settings, where this is done, stays up)
         if key == "radio":
             self._radio_follow_switch()
         else:
@@ -3891,7 +3912,7 @@ class MainWindow(QMainWindow):
             i = TAB_INDEX[key]
             shown = self.tab_shown(key)
             if not shown and self.tabs.currentIndex() == i:
-                self.tabs.setCurrentIndex(0)
+                self.tabs.move_to(0)   # (Settings, where this is done, stays up)
             self.tabs.setTabVisible(i, shown)
         self._update_more_tabs()
 
@@ -4318,10 +4339,87 @@ class MainWindow(QMainWindow):
             self.tip_bar.hide()
         self._save_later()
 
-    def open_settings(self, page: str = "privacy"):
-        dlg = SettingsDialog(self, page, lazy=True)
-        dlg.exec()
-        free_dialog(dlg)
+    def open_settings(self, page: str | None = None):
+        """Settings as a page in the window, in the tabs' place (the rail stays, its
+        cog selected): they apply as they change, and sounds and hotkeys keep working
+        while it's up. [Done], Escape or any tab on the rail goes back to the tab you
+        were on. Asked for again while up: the same page, on `page` if one is named."""
+        dlg = self._settings_dlg
+        fresh = dlg is None or not qt_valid(dlg)
+        if not fresh:
+            if page:
+                dlg.show_page(page)
+        else:
+            dlg = self._settings_dlg = SettingsDialog(self, page or "privacy", lazy=True,
+                                                      embedded=True)
+            dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+            self._content.addWidget(dlg)
+        self._content.setCurrentWidget(dlg)
+        self._opening_settings = True   # (_refit: not closed again for being too small)
+        try:
+            self._board_counts(False)
+            if self.is_mini():
+                self._grow_for_settings()
+        finally:
+            self._opening_settings = False
+        self.rail.select_foot(self.gear)
+        self._show_transport()
+        # (Escape is for it now; fresh, not the back arrow: the mini player's swap
+        # handed the focus on to it, ringed)
+        if fresh or not dlg.isAncestorOf(QApplication.focusWidget()):
+            dlg.categories.setFocus(Qt.OtherFocusReason)
+        return dlg
+
+    def _board_counts(self, on: bool):
+        """The tabs hidden behind Settings don't count towards the room the window
+        needs (a stack takes its widest page's): the board needs 464 px, Settings fits
+        in less, so a 440 px window stayed the mini player with Settings out of sight."""
+        policy = QSizePolicy.Preferred if on else QSizePolicy.Ignored
+        self._tabs_area.setSizePolicy(policy, policy)
+        if hasattr(self, "_fit"):
+            self._refit()
+
+    def _grow_for_settings(self):
+        """Settings asked for from the mini player: the window grows to the smallest
+        size that shows them (SETTINGS_ROOM, or what the window needs), on the screen."""
+        screen = self.screen().availableGeometry() if self.screen() else None
+        for _try in range(4):
+            size = self._pages.size()
+            need = self._fit.fit(size).expandedTo(SETTINGS_ROOM)
+            if (not self.is_mini() and size.width() >= need.width()
+                    and size.height() >= need.height()):
+                break
+            grow = need.expandedTo(size) - size
+            w, h = self.width() + grow.width(), self.height() + grow.height()
+            if screen is not None:
+                w, h = min(w, screen.width()), min(h, screen.height())
+            self.resize(w, h)
+            self._refit()
+
+    def settings_open(self) -> bool:
+        dlg = self._settings_dlg
+        return dlg is not None and qt_valid(dlg) and self._content.currentWidget() is dlg
+
+    def close_settings(self):
+        """Back from Settings to the tabs, as [Done] does (nothing to undo: it's live)."""
+        if self.settings_open():
+            self._settings_dlg.accept()
+
+    def _settings_closed(self, dlg):
+        if self._settings_dlg is dlg:
+            self._settings_dlg = None
+        had_focus = dlg.isAncestorOf(QApplication.focusWidget())
+        self._content.setCurrentWidget(self._tabs_area)
+        self._content.removeWidget(dlg)
+        self._board_counts(True)
+        self.rail.select_foot(None)
+        self._show_transport()
+        if had_focus:   # (not left on a page that's gone)
+            self._focus_sounds_page(self.tabs.currentIndex())
+            if not self._tabs_area.isAncestorOf(QApplication.focusWidget()):
+                self.tabs.currentWidget().setFocus(Qt.OtherFocusReason)
+        # freed once its finished signal is over (deleting it inside that crashed)
+        QTimer.singleShot(0, lambda: free_dialog(dlg))
         self.register_hotkeys()   # in case a capture was cancelled
 
     def apply_theme(self, name: str):
@@ -6110,6 +6208,7 @@ class MainWindow(QMainWindow):
         gone = [m for m in (self.meta(s) for s in sids) if m]
         if not gone:
             return
+        self._close_editors([m.id for m in gone])
         self._finish_removals()   # only the latest removal can be undone
         for m in gone:
             self.engine.stop(m.id)
@@ -6324,20 +6423,44 @@ class MainWindow(QMainWindow):
         self.register_hotkeys()
 
     def edit(self, sid, tab: str = "sound"):
+        """Edit sound beside the board, not over it: sounds, hotkeys and the other
+        pads keep working. It's still a draft: nothing changes until Save, and Cancel
+        (or Escape, or closing it) drops it. One window per sound: editing the same
+        sound again raises the open one."""
+        d = self._editors.get(sid)
+        if d is not None and qt_valid(d):
+            if tab == "effects":
+                d.tabs.setCurrentIndex(1)
+            d.showNormal() if d.isMinimized() else d.show()
+            d.raise_()
+            d.activateWindow()
+            return d
         m = self.meta(sid)
-        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
+        if m is None:
+            return None
+        d = self._editors[sid] = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
         d.hotkeys_changed.connect(self.register_hotkeys)
         d.source_forgotten.connect(self._save_now)
-        ok = d.exec()
+        d.finished.connect(lambda ok, sid=sid, d=d: self._edit_done(sid, d, ok))
+        d.show()
+        return d
+
+    def _edit_done(self, sid: str, d: EditDialog, ok: int):
+        """An Edit sound window closed: Save puts its draft on the sound (or a copy)."""
+        if self._editors.get(sid) is d:
+            del self._editors[sid]
         self.drop_preview()                        # a preview still rendering
         self.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         self.engine.stop(f"{sid}~fx:preview")
+        # the sound as it is now: gone (removed while the window was open: nothing to
+        # save it onto), or the same sound in a new object (Undo put it back)
+        m = self.meta(sid)
         try:
-            if ok and d.as_copy:
+            if ok and m is not None and d.as_copy:
                 self._save_copy(m, d)
-            elif ok:
+            elif ok and m is not None:
                 old_key = soundfx.key(m.fx)
-                d.apply()
+                d.apply(m)
                 self._clear_dupe_hotkey(m)
                 self.engine.set_gain(sid, self.gain_for(m))
                 if soundfx.key(m.fx) != old_key:
@@ -6346,8 +6469,17 @@ class MainWindow(QMainWindow):
                 self.pads[sid].update()
                 self.apply_filter(self.search.text())
         finally:
-            free_dialog(d)
+            # freed once its finished signal is over (deleting it inside that crashed)
+            QTimer.singleShot(0, lambda: free_dialog(d))
         self.register_hotkeys()
+
+    def _close_editors(self, sids):
+        """The sounds are going: their open Edit sound windows close, unsaved (the
+        Undo bar brings the sound back as it was)."""
+        for sid in sids:
+            d = self._editors.get(sid)
+            if d is not None and qt_valid(d):
+                d.reject()
 
     def duplicate_sound(self, sid: str) -> SoundMeta | None:
         """The pad menu's Duplicate: a copy right after the original, with its own
@@ -7527,7 +7659,7 @@ class MainWindow(QMainWindow):
             if n < len(shown):
                 shown[n].click()
             return
-        cur = next((k for k, b in enumerate(shown) if b.isChecked()), 0)
+        cur = next((k for k, b in enumerate(shown) if b.index == self.tabs.currentIndex()), 0)
         shown[(cur + n) % len(shown)].click()
 
     def show_whats_new(self):
@@ -7787,7 +7919,7 @@ class MainWindow(QMainWindow):
         """The player bar: always on the Sounds tab; on the others only while a sound
         plays or is paused, so it can be stopped without going back to the pads (and
         doesn't take the room the rest of the time)."""
-        if self.tabs.currentWidget() is self.sounds_page:
+        if self.tabs.currentWidget() is self.sounds_page and not self.settings_open():
             want = True
         else:
             if playing is None:
@@ -8023,6 +8155,10 @@ class MainWindow(QMainWindow):
                 log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
                          size.width(), size.height(), need.width(), need.height(),
                          type(self.tabs.currentWidget()).__name__)
+        if mini and self.settings_open() and not getattr(self, "_opening_settings", False):
+            # made too small for Settings: they close (as Done does), the mini player shows
+            self.close_settings()
+            return
         self._set_mini(mini)
         if mini:   # the pads too: cards with room for a couple of rows of them, else
             # one-line rows, so they can still be seen and played however small it gets
