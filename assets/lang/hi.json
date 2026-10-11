@@ -3217,5 +3217,6 @@
   "From a link": "लिंक से",
   "Paste a link into the search box": "सर्च बॉक्स में लिंक पेस्ट करें",
   "Record a sound with your mic: Add, then Record.": "अपने माइक से साउंड रिकॉर्ड करें: जोड़ें, फिर रिकॉर्ड।",
-  "Sound files": "साउंड फ़ाइलें"
+  "Sound files": "साउंड फ़ाइलें",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "कोई वीडियो सहेजा नहीं गया: वीडियो सहेजने के लिए FFmpeg चाहिए (सेटिंग्स > आधार सामग्री की गुणवत्ता)।"
 }

@@ -3217,5 +3217,6 @@
   "From a link": "От линк",
   "Paste a link into the search box": "Постави линк в полето за търсене",
   "Record a sound with your mic: Add, then Record.": "Запиши звук с микрофона: Добави, после Запис.",
-  "Sound files": "Звукови файлове"
+  "Sound files": "Звукови файлове",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Не е запазено видео: за запазване на видео трябва FFmpeg (Настройки > Данни & качество)."
 }

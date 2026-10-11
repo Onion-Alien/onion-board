@@ -3290,5 +3290,6 @@
   "From a link": "Z odkazu",
   "Paste a link into the search box": "Vlož odkaz do vyhledávacího pole",
   "Record a sound with your mic: Add, then Record.": "Nahraj zvuk mikrofonem: Přidat, pak Nahrát.",
-  "Sound files": "Zvukové soubory"
+  "Sound files": "Zvukové soubory",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Video se neuložilo: ukládání videí potřebuje FFmpeg (Nastavení > Data & kvalita)."
 }

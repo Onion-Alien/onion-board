@@ -3144,5 +3144,6 @@
   "From a link": "Dari tautan",
   "Paste a link into the search box": "Tempel tautan di kotak pencarian",
   "Record a sound with your mic: Add, then Record.": "Rekam suara dengan mikmu: Tambah, lalu Rekam.",
-  "Sound files": "File suara"
+  "Sound files": "File suara",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Tidak ada video yang disimpan: menyimpan video butuh FFmpeg (Pengaturan > Data & kualitas)."
 }

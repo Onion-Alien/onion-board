@@ -3217,5 +3217,6 @@
   "From a link": "Från en länk",
   "Paste a link into the search box": "Klistra in en länk i sökrutan",
   "Record a sound with your mic: Add, then Record.": "Spela in ett ljud med mikrofonen: Lägg till, sedan Spela in.",
-  "Sound files": "Ljudfiler"
+  "Sound files": "Ljudfiler",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Ingen video sparades: för att spara videor behövs FFmpeg (Inställningar > Data & kvalitet)."
 }

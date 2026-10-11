@@ -3217,5 +3217,6 @@
   "From a link": "Desde un enlace",
   "Paste a link into the search box": "Pega un enlace en el cuadro de búsqueda",
   "Record a sound with your mic: Add, then Record.": "Graba un sonido con tu micro: Agregar y luego Grabar.",
-  "Sound files": "Archivos de sonido"
+  "Sound files": "Archivos de sonido",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "No se guardó ningún video: para guardar videos se necesita FFmpeg (Configuración > Datos & calidad)."
 }

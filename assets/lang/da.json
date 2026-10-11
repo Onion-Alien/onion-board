@@ -3217,5 +3217,6 @@
   "From a link": "Fra et link",
   "Paste a link into the search box": "Indsæt et link i søgefeltet",
   "Record a sound with your mic: Add, then Record.": "Optag en lyd med din mikrofon: Tilføj, derefter Optag.",
-  "Sound files": "Lydfiler"
+  "Sound files": "Lydfiler",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Ingen video blev gemt: for at gemme videoer skal du have FFmpeg (Indstillinger > Data & kvalitet)."
 }

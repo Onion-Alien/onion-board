@@ -3290,5 +3290,6 @@
   "From a link": "За посиланням",
   "Paste a link into the search box": "Встав посилання в поле пошуку",
   "Record a sound with your mic: Add, then Record.": "Запиши звук з мікрофона: Додати, потім Запис.",
-  "Sound files": "Звукові файли"
+  "Sound files": "Звукові файли",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Жодного відео не було збережено: для збереження відео потрібен FFmpeg (Налаштування > Дані та якість)."
 }

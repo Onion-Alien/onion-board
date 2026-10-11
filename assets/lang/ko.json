@@ -3144,5 +3144,6 @@
   "From a link": "링크에서",
   "Paste a link into the search box": "검색창에 링크를 붙여넣으세요",
   "Record a sound with your mic: Add, then Record.": "마이크로 사운드 녹음: 추가 → 녹음.",
-  "Sound files": "사운드 파일"
+  "Sound files": "사운드 파일",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "동영상이 저장되지 않았습니다. 동영상을 저장하려면 FFmpeg가 필요합니다(설정 > 데이터 및 품질)."
 }

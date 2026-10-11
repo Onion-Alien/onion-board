@@ -3217,5 +3217,6 @@
   "From a link": "Bir bağlantıdan",
   "Paste a link into the search box": "Arama kutusuna bir bağlantı yapıştır",
   "Record a sound with your mic: Add, then Record.": "Mikrofonunla ses kaydet: Ekle, sonra Kaydet.",
-  "Sound files": "Ses dosyaları"
+  "Sound files": "Ses dosyaları",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Hiçbir video kaydedilmedi: video kaydetmek için FFmpeg gerekir (Ayarlar > Veri ve kalite)."
 }

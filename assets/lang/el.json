@@ -3217,5 +3217,6 @@
   "From a link": "Από σύνδεσμο",
   "Paste a link into the search box": "Επικόλλησε έναν σύνδεσμο στο πλαίσιο αναζήτησης",
   "Record a sound with your mic: Add, then Record.": "Ηχογράφησε έναν ήχο με το μικρόφωνο: Προσθήκη, μετά Ηχογράφηση.",
-  "Sound files": "Αρχεία ήχου"
+  "Sound files": "Αρχεία ήχου",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Δεν αποθηκεύτηκε βίντεο: για την αποθήκευση βίντεο χρειάζεται το FFmpeg (Ρυθμίσεις > Δεδομένα & ποιότητα)."
 }

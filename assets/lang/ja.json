@@ -3144,5 +3144,6 @@
   "From a link": "リンクから",
   "Paste a link into the search box": "検索ボックスにリンクを貼り付けてください",
   "Record a sound with your mic: Add, then Record.": "マイクでサウンドを録音：追加 → 録音。",
-  "Sound files": "サウンドファイル"
+  "Sound files": "サウンドファイル",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "ビデオは保存されませんでした。ビデオの保存には FFmpeg が必要です（設定 > データと品質）。"
 }

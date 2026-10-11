@@ -898,6 +898,11 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
             opts.update(ffmpeg_location=ff, merge_output_format="mp4")
         else:    # no merging: only files that already hold both
             fmt = fmt.split("/", 2)[2]
+        # no video to be had (SoundCloud has none; YouTube has no single files with
+        # both any more, so without ffmpeg none of it fits): the sound alone, as Add
+        # without the video would get it. Else yt-dlp says "Requested format is not
+        # available" and the whole Add failed.
+        fmt += "/" + quality.current.audio_format()
         opts.update(format=fmt, max_filesize=VIDEO_MAX_BYTES)
     return opts
 

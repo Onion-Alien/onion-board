@@ -3217,5 +3217,6 @@
   "From a link": "Linkből",
   "Paste a link into the search box": "Illessz be egy linket a keresőmezőbe",
   "Record a sound with your mic: Add, then Record.": "Vegyél fel egy hangot a mikrofonoddal: Hozzáadás, majd Felvétel.",
-  "Sound files": "Hangfájlok"
+  "Sound files": "Hangfájlok",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nem lett videó mentve: a videók mentéséhez FFmpeg kell (Beállítások > Adat & minőség)."
 }

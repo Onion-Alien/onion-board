@@ -3217,5 +3217,6 @@
   "From a link": "Mula sa link",
   "Paste a link into the search box": "Mag-paste ng link sa search box",
   "Record a sound with your mic: Add, then Record.": "Mag-record ng tunog gamit ang mic mo: Magdagdag, tapos I-record.",
-  "Sound files": "Mga sound file"
+  "Sound files": "Mga sound file",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Walang na-save na video: kailangan ng FFmpeg para mag-save ng video (Settings > Data & kalidad)."
 }

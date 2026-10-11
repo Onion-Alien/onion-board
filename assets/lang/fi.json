@@ -3217,5 +3217,6 @@
   "From a link": "Linkistä",
   "Paste a link into the search box": "Liitä linkki hakukenttään",
   "Record a sound with your mic: Add, then Record.": "Nauhoita ääni mikrofonilla: Lisää, sitten Nauhoita.",
-  "Sound files": "Äänitiedostot"
+  "Sound files": "Äänitiedostot",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Videota ei tallennettu: videoiden tallennus tarvitsee FFmpegin (Asetukset > Data & laatu)."
 }

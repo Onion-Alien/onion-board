@@ -3144,5 +3144,6 @@
   "From a link": "Daripada pautan",
   "Paste a link into the search box": "Tampal pautan dalam kotak carian",
   "Record a sound with your mic: Add, then Record.": "Rakam bunyi dengan mikrofon anda: Tambah, kemudian Rakam.",
-  "Sound files": "Fail bunyi"
+  "Sound files": "Fail bunyi",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Tiada video disimpan: menyimpan video perlukan FFmpeg (Tetapan > Data & kualiti)."
 }

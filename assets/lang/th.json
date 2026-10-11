@@ -3144,5 +3144,6 @@
   "From a link": "จากลิงก์",
   "Paste a link into the search box": "วางลิงก์ในช่องค้นหา",
   "Record a sound with your mic: Add, then Record.": "อัดเสียงด้วยไมค์ของคุณ: เพิ่ม แล้วกด อัด",
-  "Sound files": "ไฟล์เสียง"
+  "Sound files": "ไฟล์เสียง",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "ไม่มีการบันทึกวิดีโอ: การบันทึกวิดีโอต้องใช้ FFmpeg (การตั้งค่า > ข้อมูล & คุณภาพ)"
 }

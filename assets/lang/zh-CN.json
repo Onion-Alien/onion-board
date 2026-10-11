@@ -3144,5 +3144,6 @@
   "From a link": "从链接",
   "Paste a link into the search box": "把链接粘贴到搜索框",
   "Record a sound with your mic: Add, then Record.": "用麦克风录制音效：添加 → 录制。",
-  "Sound files": "音效文件"
+  "Sound files": "音效文件",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "没有保存视频：保存视频需要 FFmpeg（设置 > 流量 & 音质）。"
 }

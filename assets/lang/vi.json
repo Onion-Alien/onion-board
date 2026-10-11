@@ -3144,5 +3144,6 @@
   "From a link": "Từ một liên kết",
   "Paste a link into the search box": "Dán liên kết vào ô tìm kiếm",
   "Record a sound with your mic: Add, then Record.": "Ghi âm bằng mic của bạn: Thêm, rồi Ghi.",
-  "Sound files": "Tệp âm thanh"
+  "Sound files": "Tệp âm thanh",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Không có video nào được lưu: lưu video cần FFmpeg (Cài đặt > Chất lượng & dữ liệu)."
 }

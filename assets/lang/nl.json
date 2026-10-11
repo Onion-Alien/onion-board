@@ -3217,5 +3217,6 @@
   "From a link": "Via een link",
   "Paste a link into the search box": "Plak een link in het zoekvak",
   "Record a sound with your mic: Add, then Record.": "Neem een geluid op met je microfoon: Toevoegen, dan Opnemen.",
-  "Sound files": "Geluidsbestanden"
+  "Sound files": "Geluidsbestanden",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Er is geen video opgeslagen: video's opslaan heeft FFmpeg nodig (Instellingen > Gegevens & kwaliteit)."
 }

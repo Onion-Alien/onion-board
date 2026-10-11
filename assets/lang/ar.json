@@ -3509,5 +3509,6 @@
   "From a link": "من رابط",
   "Paste a link into the search box": "الصق رابطًا في مربع البحث",
   "Record a sound with your mic: Add, then Record.": "سجّل صوتًا بالميكروفون: إضافة، ثم تسجيل.",
-  "Sound files": "ملفات صوتية"
+  "Sound files": "ملفات صوتية",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "لم يتم حفظ أي فيديو: حفظ الفيديوهات يحتاج إلى FFmpeg (الإعدادات > البيانات والجودة)."
 }

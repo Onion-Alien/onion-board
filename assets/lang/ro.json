@@ -3290,5 +3290,6 @@
   "From a link": "Dintr-un link",
   "Paste a link into the search box": "Lipește un link în caseta de căutare",
   "Record a sound with your mic: Add, then Record.": "Înregistrează un sunet cu microfonul: Adaugă, apoi Înregistrează.",
-  "Sound files": "Fișiere audio"
+  "Sound files": "Fișiere audio",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "Nu s-a salvat niciun videoclip: pentru salvarea videoclipurilor e nevoie de FFmpeg (Setări > Date & calitate)."
 }

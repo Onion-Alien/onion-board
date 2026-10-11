@@ -3144,5 +3144,6 @@
   "From a link": "從連結",
   "Paste a link into the search box": "把連結貼到搜尋框",
   "Record a sound with your mic: Add, then Record.": "用麥克風錄製音效：新增 → 錄音。",
-  "Sound files": "音效檔案"
+  "Sound files": "音效檔案",
+  "No video was saved: saving videos needs FFmpeg (Settings > Data & quality).": "沒有儲存影片：儲存影片需要 FFmpeg（設定 > 資料 & 品質）。"
 }
