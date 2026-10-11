@@ -1038,7 +1038,6 @@
   "Internet radio stations from around the world.": "محطات راديو الإنترنت من جميع أنحاء العالم.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "في الميكروفون الخاص بك <b style='color:{colour}'>بنقرة واحدة للذهاب</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "في الميكروفون الخاص بك <b style='color:{colour}'>الذي تم إعداده على ميكروفون آخر</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "في الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يقوم Windows بتشغيل Onion Board عليه</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "داخل الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يمكن الوصول إليه</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "<b style='color:{colour}'>يحتاج الميكروفون الخاص بك ✗ إلى إصلاح سريع</b>",
   "Into your mic  <b>setting up…</b>": "في <b>إعداد الميكروفون الخاص بك…</b>",
@@ -3490,6 +3489,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "ضع مؤثر الميكروفون من Onion Board على الميكروفون المحدد لتذهب أصواتك إليه مباشرة.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "ضع مؤثر الميكروفون من Onion Board على {mic} لتذهب أصواتك إليه مباشرة.",
   "Some leftovers couldn't be removed from {mic}.": "تعذّرت إزالة بعض البقايا من {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "داخل الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يعمل</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>لا شيء لتعيينه.</b> يحتفظ Discord والألعاب بالميكروفون العادي الخاص بك، وأصواتك فيه.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "إذا تم تقطيع الأصوات، فأوقف تشغيل ميزة منع الضوضاء في تطبيق الصوت (Discord: <b>ملف تعريف الإدخال → مخصص</b> ، <b>منع الضوضاء → لا شيء</b> ، <b>إيقاف تشغيل إلغاء الصدى</b> . ليس استوديو: فهو يتخطى Onion Board).",
   "Sounds chopped up?": "الأصوات متقطعة؟"

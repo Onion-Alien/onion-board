@@ -975,7 +975,6 @@
   "Internet radio stations from around the world.": "Internetowe stacje radiowe z całego świata.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Do mikrofonu <b style='color:{colour}'>wystarczy jedno kliknięcie i gotowe</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Do mikrofonu <b style='color:{colour}'>skonfigurowanego na innym mikrofonie</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Do mikrofonu <b style='color:{colour}'>✗ W systemie Windows nie jest uruchomiona funkcja Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Do mikrofonu <b style='color:{colour}'>✗ nie mogę go dosięgnąć</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Do mikrofonu <b style='color:{colour}'>✗ wymaga szybkiej naprawy</b>",
   "Into your mic  <b>setting up…</b>": "<b>Konfiguracja mikrofonu…</b>",
@@ -3271,6 +3270,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Załóż efekt mikrofonu Onion Board na wybrany mikrofon, żeby twoje dźwięki trafiały do niego bezpośrednio.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Załóż efekt mikrofonu Onion Board na {mic}, żeby twoje dźwięki trafiały do niego bezpośrednio.",
   "Some leftovers couldn't be removed from {mic}.": "Nie udało się usunąć części pozostałości z {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Do mikrofonu <b style='color:{colour}'>✗ nie działa</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nic do ustawienia.</b> Discord i gry zachowują Twój normalny mikrofon, a Twoje dźwięki są w nim.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jeśli dźwięki zostaną pocięte, wyłącz tłumienie szumów w aplikacji głosowej (Discord: <b>Profil wejściowy → Niestandardowy</b> , <b>Tłumienie szumów → Brak</b> , <b>Eliminacja echa</b> wyłączona. Nie Studio: pomija tablicę cebulową).",
   "Sounds chopped up?": "Dźwięki się tną?"

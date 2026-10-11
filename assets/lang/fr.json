@@ -952,7 +952,6 @@
   "Internet radio stations from around the world.": "Des radios internet du monde entier.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Dans ton micro  <b style='color:{colour}'>un clic et c'est parti</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Dans ton micro  <b style='color:{colour}'>configuré sur un autre micro</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Dans ton micro  <b style='color:{colour}'>✗ Windows ne fait pas tourner Onion Board dessus</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Dans ton micro  <b style='color:{colour}'>✗ impossible de l'atteindre</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Dans ton micro  <b style='color:{colour}'>✗ besoin d'une petite réparation</b>",
   "Into your mic  <b>setting up…</b>": "Dans ton micro  <b>configuration…</b>",
@@ -3198,6 +3197,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Mets l’effet micro d’Onion Board sur ton micro choisi, pour que tes sons y aillent directement.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Mets l’effet micro d’Onion Board sur {mic}, pour que tes sons y aillent directement.",
   "Some leftovers couldn't be removed from {mic}.": "Certains restes n’ont pas pu être retirés de {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Dans ton micro  <b style='color:{colour}'>✗ ne tourne pas</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Rien à régler.</b> Discord et les jeux gardent ton micro normal, et tes sons sont dedans.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Si les sons sont hachés, coupe la suppression de bruit de l'appli vocale (Discord : <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> désactivé. Pas Studio : il ignore Onion Board).",
   "Sounds chopped up?": "Sons hachés ?"

@@ -2997,8 +2997,7 @@ class MainWindow(QMainWindow):
                      colour=warn)
         elif route == "mic" and e.main_stream is not None and self._direct_not_running():
             state = "unrouted"
-            out = _("Into your mic  <b style='color:{colour}'>✗ Windows isn't running "
-                    "Onion Board on it</b>", colour=bad)
+            out = _("Into your mic  <b style='color:{colour}'>✗ not running</b>", colour=bad)
             step = _("Another app may have your mic to itself (an <b>exclusive mode</b> "
                      "setting), or Windows hasn't loaded Onion Board on it. Repair it below, "
                      "or send through the virtual cable instead.")
@@ -3098,8 +3097,14 @@ class MainWindow(QMainWindow):
             # one thing to do)
             mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
                     colour=warn)
-        self.flow_mic.setText(mic)
-        self.flow_out.setText(out)
+        # the app's own painted tick and cross, not the font's ✓ / ✗ (a brushy x)
+        dpr = self.flow_out.devicePixelRatioF() or 1.0
+
+        def marks(text: str) -> str:
+            return (text.replace("✗", icons.inline("cross", bad, dpr=dpr))
+                    .replace("✓", icons.inline("check", ok, dpr=dpr)))
+        self.flow_mic.setText(marks(mic))
+        self.flow_out.setText(marks(out))
         self.step_lbl.setText(step)
         self.btn_mictips.setVisible(route == "mic")
         update = route == "mic" and state == "ok" and direct == "outdated"
@@ -3558,8 +3563,8 @@ class MainWindow(QMainWindow):
         modes (soundboard.profiles) pick within their family from all of it; in
         Advanced, *Pick the mode by itself* switches to the one suggested."""
         key = self.voice_watch.poll() if self.voice_watch is not None else None
-        why = (_("The game you have open uses {engine} for voice chat",
-                 engine=voicesdk.NAMES.get(key, key))) if key else ""
+        why = i18n.keep_english(lambda: _("The game you have open uses {engine} for voice chat",
+                                          engine=voicesdk.NAMES.get(key, key))) if key else ""
         heard = ()
         if self.listeners is not None:
             heard = self.listeners.poll(self._heard_device())
@@ -3567,9 +3572,9 @@ class MainWindow(QMainWindow):
         # front, games on the cable (a per-program list would go first)
         apps = set(voicesdk.VOICE_APPS.values())
         def listening(name: str) -> str:
-            return (_("{name} is listening to your mic", name=name)
-                    if self.cfg.route == "mic" else
-                    _("{name} is listening to the virtual cable", name=name))
+            return i18n.keep_english(lambda: _("{name} is listening to your mic", name=name)
+                                     if self.cfg.route == "mic" else
+                                     _("{name} is listening to the virtual cable", name=name))
         hints = [profiles.Hint(h[0], listening(h[1]),
                                profiles.VOICE.key) for h in heard if h in apps]
         if key:

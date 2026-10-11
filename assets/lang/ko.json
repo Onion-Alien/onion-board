@@ -933,7 +933,6 @@
   "Internet radio stations from around the world.": "전 세계의 인터넷 라디오 방송국.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "마이크에 <b style='color:{colour}'>클릭 한 번으로 이동</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "<b style='color:{colour}'>다른 마이크에 설정된</b> 마이크에",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "마이크에 <b style='color:{colour}'>✗ Windows에서 Onion Board를 실행하지 않습니다.</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "마이크에 <b style='color:{colour}'>✗ 닿을 수 없음</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "마이크에 <b style='color:{colour}'>✗ 빠른 수리가 필요합니다</b>",
   "Into your mic  <b>setting up…</b>": "마이크 <b>설정에…</b>",
@@ -3125,6 +3124,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "선택한 마이크에 Onion Board 마이크 효과를 넣어 소리가 바로 들어가게 합니다.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "{mic}에 Onion Board 마이크 효과를 넣어 소리가 바로 들어가게 합니다.",
   "Some leftovers couldn't be removed from {mic}.": "{mic}에서 일부를 지우지 못했어요.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "마이크에 <b style='color:{colour}'>✗ 실행 안 됨</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>설정할 것이 없습니다.</b> Discord와 게임은 일반적인 마이크를 유지하며 사운드도 그 안에 있습니다.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "소리가 잘리는 경우 음성 앱의 소음 억제 기능을 끄세요(Discord: <b>입력 프로필 → 사용자 정의</b> , <b>소음 억제 → 없음</b> , <b>에코 제거</b> 끄기. Studio 아님: Onion Board 건너뛰기).",
   "Sounds chopped up?": "소리가 잘리나요?"

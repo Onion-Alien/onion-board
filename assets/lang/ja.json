@@ -933,7 +933,6 @@
   "Internet radio stations from around the world.": "世界中のインターネット ラジオ局。",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "<b style='color:{colour}'>ワンクリックでマイクに接続できます</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "<b style='color:{colour}'>別のマイクに設定されたマイク</b>に接続します",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "マイクに向かって<b style='color:{colour}'>✗ Windows では Onion Board が実行されていません</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "マイクに<b style='color:{colour}'>✗ 届かない</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "マイクに接続されています<b style='color:{colour}'>✗ 迅速な修理が必要です</b>",
   "Into your mic  <b>setting up…</b>": "マイクの<b>セットアップ中…</b>",
@@ -3125,6 +3124,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Onion Boardのマイクエフェクトを選択中のマイクに入れて、サウンドを直接送れるようにします。",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Onion Boardのマイクエフェクトを{mic}に入れて、サウンドを直接送れるようにします。",
   "Some leftovers couldn't be removed from {mic}.": "{mic}から一部の残りを取り除けませんでした。",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "マイクに<b style='color:{colour}'>✗ 動いていない</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>設定は不要です。</b> Discord やゲームは普段のマイクのままで、サウンドはそこに入っています。",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "サウンドが途切れる場合は、ボイスアプリのノイズ抑制をオフにしてください（Discord: <b>入力プロファイル → カスタム</b>、<b>ノイズ抑制 → なし</b>、<b>エコー除去</b>オフ。スタジオは不可: Onion Board を通りません）。",
   "Sounds chopped up?": "サウンドが途切れる？"

@@ -954,7 +954,6 @@
   "Internet radio stations from around the world.": "दुनिया भर से इंटरनेट रेडियो स्टेशन।",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "अपने माइक में <b style='color:{colour}'>जाने के लिए एक क्लिक करें</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "अपने माइक <b style='color:{colour}'>सेट अप में दूसरे माइक पर</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "आपके माइक में <b style='color:{colour}'>✗ विंडोज़ उस पर ओनियन बोर्ड नहीं चला रहा है</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "आपके माइक तक <b style='color:{colour}'>✗ नहीं पहुंच पा रहा है</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "आपके माइक में <b style='color:{colour}'>✗ को शीघ्र मरम्मत की आवश्यकता है</b>",
   "Into your mic  <b>setting up…</b>": "आपके माइक <b>सेटिंग में...</b>",
@@ -3198,6 +3197,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "चुने गए माइक्रोफ़ोन पर Onion Board का माइक इफ़ेक्ट लगाएँ, ताकि आपकी आवाज़ें सीधे उसमें जाएँ।",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "{mic} पर Onion Board का माइक इफ़ेक्ट लगाएँ, ताकि आपकी आवाज़ें सीधे उसमें जाएँ।",
   "Some leftovers couldn't be removed from {mic}.": "{mic} से कुछ बचा हुआ हटाया नहीं जा सका।",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "आपके माइक तक <b style='color:{colour}'>✗ नहीं चल रहा</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>कुछ सेट नहीं करना।</b> Discord और गेम आपका सामान्य माइक ही रखते हैं, और आपके साउंड उसमें हैं।",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "अगर साउंड कटे-कटे आएँ, तो वॉइस ऐप का noise suppression बंद करें (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> बंद। Studio नहीं: वह Onion Board को छोड़ देता है)।",
   "Sounds chopped up?": "साउंड कटे-कटे आ रहे हैं?"

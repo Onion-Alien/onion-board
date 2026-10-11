@@ -1,0 +1,1 @@
+- The control API's `/api/status` `explain` line stays in English like the rest of its JSON, whatever language the app is set to.

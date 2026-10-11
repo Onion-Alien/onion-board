@@ -86,3 +86,27 @@ def test_every_mode_says_what_it_does():
     assert "Nothing detected yet" in profiles.explain({"mode": "discord"})
     assert profiles.explain({"mode": "steam", "simple": "advanced"}) == (
         "Advanced: shaping for Steam voice.")
+
+
+def test_the_control_api_explains_in_english_whatever_the_language():
+    """/api/status's "explain" stays English like mode_label and simple_label: the
+    control API's JSON is never translated. The UI's own line follows the language."""
+    from types import SimpleNamespace
+
+    from soundboard import i18n, remote
+    from soundboard.i18n import _
+    try:
+        i18n.set_language("de")
+        why = i18n.keep_english(lambda: _("{name} is listening to your mic", name="Discord"))
+        mw = SimpleNamespace(cfg=SimpleNamespace(dest={"mode": "discord", "simple": "voice"}),
+                             mode_why=why)
+        assert why == "Discord hört dein Mikro ab"
+        assert "Discord is listening" not in profiles.explain(mw.cfg.dest, why)   # the UI's
+        st = remote.mode_state(mw, full=False)
+        assert st["explain"] == ("Voice chat: shaping for Discord. "
+                                 "Discord is listening to your mic.")
+        assert st["simple_label"] == "Voice chat"
+        assert profiles.explain({}, english=True) == "Clean: your sounds go out exactly as mixed."
+        assert _("Game") == "Spiel"    # english() ended with the call
+    finally:
+        i18n.set_language(i18n.ENGLISH)

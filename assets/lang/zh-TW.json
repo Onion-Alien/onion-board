@@ -931,7 +931,6 @@
   "Internet radio stations from around the world.": "世界各地的網路電台。",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "送進你的麥克風  <b style='color:{colour}'>一鍵即可完成</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "送進你的麥克風  <b style='color:{colour}'>已設定在另一個麥克風上</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "送進你的麥克風  <b style='color:{colour}'>✗ Windows 沒有在它上面執行 Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "送進你的麥克風  <b style='color:{colour}'>✗ 無法連到它</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "送進你的麥克風  <b style='color:{colour}'>✗ 需要快速修復</b>",
   "Into your mic  <b>setting up…</b>": "送進你的麥克風  <b>設定中…</b>",
@@ -3125,6 +3124,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "把 Onion Board 的麥克風效果裝到所選麥克風上,讓你的聲音直接進入它。",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "把 Onion Board 的麥克風效果裝到 {mic} 上,讓你的聲音直接進入它。",
   "Some leftovers couldn't be removed from {mic}.": "部分殘留無法從 {mic} 移除。",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "送進你的麥克風  <b style='color:{colour}'>✗ 沒有運作</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>不用設定。</b>Discord 和遊戲繼續用你平常的麥克風，你的音效已經在裡面了。",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "如果音效斷斷續續，就關掉語音程式的噪音抑制（Discord：<b>輸入設定檔 → 自訂</b>、<b>噪音抑制 → 無</b>、關掉<b>回音消除</b>。不要選錄音室：它會跳過 Onion Board）。",
   "Sounds chopped up?": "音效斷斷續續？"

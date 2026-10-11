@@ -552,7 +552,6 @@
   "Internet radio stations from around the world.": "Ραδιοφωνικοί σταθμοί internet από όλο τον κόσμο.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>ένα κλικ και πάει</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>ρυθμισμένο σε άλλο μικρόφωνο</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ τα Windows δεν τρέχουν το Onion Board σε αυτό</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ δεν είναι προσβάσιμο</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ θέλει γρήγορη επισκευή</b>",
   "Into your mic  <b>setting up…</b>": "Στο μικρόφωνό σου  <b>ρύθμιση…</b>",
@@ -3198,6 +3197,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Βάλε το εφέ μικροφώνου του Onion Board στο επιλεγμένο μικρόφωνο, ώστε οι ήχοι σου να πηγαίνουν απευθείας σε αυτό.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Βάλε το εφέ μικροφώνου του Onion Board στο {mic}, ώστε οι ήχοι σου να πηγαίνουν απευθείας σε αυτό.",
   "Some leftovers couldn't be removed from {mic}.": "Κάποια υπολείμματα δεν αφαιρέθηκαν από το {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ δεν τρέχει</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Τίποτα να ρυθμίσεις.</b> Το Discord και τα παιχνίδια κρατούν το κανονικό σου μικρόφωνο και οι ήχοι σου είναι μέσα.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Αν οι ήχοι κόβονται, κλείσε την καταστολή θορύβου της εφαρμογής φωνής (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> κλειστό. Όχι Studio: παρακάμπτει το Onion Board).",
   "Sounds chopped up?": "Οι ήχοι κόβονται;"

@@ -540,7 +540,6 @@
   "Internet radio stations from around the world.": "Stesen radio internet dari seluruh dunia.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Ke mikrofon anda  <b style='color:{colour}'>satu klik lagi</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Ke mikrofon anda  <b style='color:{colour}'>disediakan pada mikrofon lain</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Ke mikrofon anda  <b style='color:{colour}'>✗ Windows tidak menjalankan Onion Board padanya</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Ke mikrofon anda  <b style='color:{colour}'>✗ tidak dapat mencapainya</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Ke mikrofon anda  <b style='color:{colour}'>✗ perlu dibaiki sekejap</b>",
   "Into your mic  <b>setting up…</b>": "Ke mikrofon anda  <b>sedang disediakan…</b>",
@@ -3125,6 +3124,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Letakkan kesan mikrofon Onion Board pada mikrofon pilihan anda supaya bunyi anda terus masuk ke dalamnya.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Letakkan kesan mikrofon Onion Board pada {mic} supaya bunyi anda terus masuk ke dalamnya.",
   "Some leftovers couldn't be removed from {mic}.": "Sesetengah sisa tidak dapat dibuang daripada {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ke mikrofon anda  <b style='color:{colour}'>✗ tidak berjalan</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Tiada apa perlu ditetapkan.</b> Discord dan permainan mengekalkan mikrofon biasa anda, dan bunyi anda ada di dalamnya.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jika bunyi terpotong-potong, matikan penindasan hingar aplikasi suara (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> mati. Bukan Studio: ia melangkau Onion Board).",
   "Sounds chopped up?": "Bunyi terpotong-potong?"

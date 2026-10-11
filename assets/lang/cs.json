@@ -564,7 +564,6 @@
   "Internet radio stations from around the world.": "Internetová rádia z celého světa.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Do tvého mikrofonu  <b style='color:{colour}'>zbývá jedno kliknutí</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Do tvého mikrofonu  <b style='color:{colour}'>nastaveno na jiném mikrofonu</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ Windows na něm Onion Board nespouštějí</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ nejde se k němu dostat</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ potřebuje rychlou opravu</b>",
   "Into your mic  <b>setting up…</b>": "Do tvého mikrofonu  <b>nastavuji…</b>",
@@ -3271,6 +3270,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Dej efekt mikrofonu Onion Board na vybraný mikrofon, aby do něj šly tvoje zvuky přímo.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Dej efekt mikrofonu Onion Board na {mic}, aby do něj šly tvoje zvuky přímo.",
   "Some leftovers couldn't be removed from {mic}.": "Některé zbytky se z {mic} nepodařilo odstranit.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ neběží</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Není co nastavovat.</b> Discord a hry si nechají tvůj normální mikrofon a tvoje zvuky jsou v něm.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Pokud se zvuky sekají, vypni potlačení šumu v hlasové aplikaci (Discord: <b>Vstupní profil → Vlastní</b>, <b>Potlačení šumu → Žádné</b>, <b>Potlačení ozvěny</b> vypnout. Ne Studio: to Onion Board přeskakuje).",
   "Sounds chopped up?": "Zvuky se sekají?"

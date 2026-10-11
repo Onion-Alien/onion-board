@@ -552,7 +552,6 @@
   "Internet radio stations from around the world.": "Internetes rádióállomások a világ minden tájáról.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "A mikrofonodba  <b style='color:{colour}'>egy kattintás, és mehet</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "A mikrofonodba  <b style='color:{colour}'>másik mikrofonon van beállítva</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "A mikrofonodba  <b style='color:{colour}'>✗ a Windows nem futtatja rajta az Onion Boardot</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "A mikrofonodba  <b style='color:{colour}'>✗ nem érhető el</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "A mikrofonodba  <b style='color:{colour}'>✗ gyors javítás kell</b>",
   "Into your mic  <b>setting up…</b>": "A mikrofonodba  <b>beállítás…</b>",
@@ -3198,6 +3197,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Tedd az Onion Board mikrofoneffektjét a kiválasztott mikrofonra, hogy a hangjaid közvetlenül belekerüljenek.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Tedd az Onion Board mikrofoneffektjét erre: {mic}, hogy a hangjaid közvetlenül belekerüljenek.",
   "Some leftovers couldn't be removed from {mic}.": "Néhány maradványt nem sikerült törölni innen: {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "A mikrofonodba  <b style='color:{colour}'>✗ nem fut</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Nincs mit beállítani.</b> A Discord és a játékok a szokásos mikrofonodat használják, és a hangjaid benne vannak.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ha a hangok szaggatnak, kapcsold ki a beszélgetőapp zajszűrését (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> ki. Ne Studio: az kihagyja az Onion Boardot).",
   "Sounds chopped up?": "Szaggatnak a hangok?"

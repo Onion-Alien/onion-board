@@ -931,7 +931,6 @@
   "Internet radio stations from around the world.": "Stasiun radio internet dari seluruh dunia.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Ke mikrofon Anda <b style='color:{colour}'>, satu klik saja</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Ke dalam mikrofon Anda <b style='color:{colour}'>, siapkan mikrofon lain</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Ke dalam mikrofon Anda <b style='color:{colour}'>✗ Windows tidak menjalankan Onion Board di dalamnya</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Ke mikrofonmu <b style='color:{colour}'>✗ tidak dapat menjangkaunya</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Ke dalam mikrofon Anda <b style='color:{colour}'>✗ perlu perbaikan cepat</b>",
   "Into your mic  <b>setting up…</b>": "Ke dalam <b>pengaturan mikrofon Anda…</b>",
@@ -3125,6 +3124,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Pasang efek mikrofon Onion Board di mikrofon pilihanmu agar suaramu langsung masuk ke sana.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Pasang efek mikrofon Onion Board di {mic} agar suaramu langsung masuk ke sana.",
   "Some leftovers couldn't be removed from {mic}.": "Beberapa sisa tidak bisa dihapus dari {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ke mikrofonmu <b style='color:{colour}'>✗ tidak berjalan</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Tidak ada yang perlu diatur.</b> Discord dan game mempertahankan mikrofon normal Anda, dan suara Anda tetap ada di dalamnya.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Jika suara terpotong-potong, matikan peredam bising pada aplikasi suara (Discord: <b>Profil Input → Kustom</b> , <b>Peredam Kebisingan → Tidak Ada</b> , <b>Pembatalan Gema</b> nonaktif. Bukan Studio: ia melewati Onion Board).",
   "Sounds chopped up?": "Suara terpotong-potong?"

@@ -933,7 +933,6 @@
   "Internet radio stations from around the world.": "Các đài phát thanh Internet từ khắp nơi trên thế giới.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Vào micrô của bạn, <b style='color:{colour}'>chỉ cần một cú nhấp chuột là có thể sử dụng</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Vào micrô của bạn <b style='color:{colour}'>được thiết lập trên micrô khác</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Vào micrô của bạn <b style='color:{colour}'>✗ Windows không chạy Onion Board trên đó</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Vào mic của bạn <b style='color:{colour}'>✗ không thể chạm tới nó</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Micrô của bạn <b style='color:{colour}'>✗ cần được sửa chữa nhanh chóng</b>",
   "Into your mic  <b>setting up…</b>": "Vào <b>phần thiết lập micrô của bạn…</b>",
@@ -3125,6 +3124,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên micro đã chọn để âm thanh của bạn đi thẳng vào đó.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên {mic} để âm thanh của bạn đi thẳng vào đó.",
   "Some leftovers couldn't be removed from {mic}.": "Không gỡ được một số phần còn sót khỏi {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Vào mic của bạn <b style='color:{colour}'>✗ không chạy</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Không có gì để thiết lập.</b> Discord và trò chơi vẫn giữ micrô bình thường và âm thanh của bạn ở trong đó.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Nếu âm thanh bị ngắt quãng, hãy tắt tính năng khử tiếng ồn của ứng dụng giọng nói (Discord: <b>Cấu hình đầu vào → Tùy chỉnh</b> , <b>Giảm tiếng ồn → Không có</b> , <b>Tắt tiếng vang</b> . Không phải Studio: nó bỏ qua Onion Board).",
   "Sounds chopped up?": "Âm thanh bị ngắt quãng?"

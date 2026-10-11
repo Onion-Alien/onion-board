@@ -954,7 +954,6 @@
   "Internet radio stations from around the world.": "Stazioni radio Internet da tutto il mondo.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Nel tuo microfono <b style='color:{colour}'>, un clic per partire</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Nel tuo microfono <b style='color:{colour}'>impostato su un altro microfono</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Nel tuo microfono <b style='color:{colour}'>✗ Windows non esegue Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Nel tuo microfono <b style='color:{colour}'>✗ non riesco a raggiungerlo</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Il tuo microfono <b style='color:{colour}'>✗ necessita di una riparazione rapida</b>",
   "Into your mic  <b>setting up…</b>": "Nella <b>configurazione del microfono...</b>",
@@ -3198,6 +3197,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Metti l’effetto microfono di Onion Board sul microfono scelto, così i tuoi suoni ci vanno direttamente.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Metti l’effetto microfono di Onion Board su {mic}, così i tuoi suoni ci vanno direttamente.",
   "Some leftovers couldn't be removed from {mic}.": "Alcuni residui non si sono potuti rimuovere da {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Nel tuo microfono <b style='color:{colour}'>✗ non attivo</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Niente da impostare.</b> Discord e i giochi mantengono il tuo microfono normale e i tuoi suoni sono al suo interno.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Se i suoni vengono interrotti, disattiva la soppressione del rumore dell'app vocale (Discord: <b>Profilo di input → Personalizzato</b> , <b>Soppressione del rumore → Nessuno</b> , <b>Cancellazione eco</b> disattivata. Non Studio: salta Onion Board).",
   "Sounds chopped up?": "Suoni interrotti?"

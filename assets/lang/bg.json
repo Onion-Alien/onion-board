@@ -510,7 +510,6 @@
   "Internet radio stations from around the world.": "Интернет радиостанции от цял свят.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Към микрофона ти  <b style='color:{colour}'>един клик и готово</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Към микрофона ти  <b style='color:{colour}'>настроено на друг микрофон</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Към микрофона ти  <b style='color:{colour}'>✗ Windows не пуска Onion Board в него</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Към микрофона ти  <b style='color:{colour}'>✗ не мога да го достигна</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Към микрофона ти  <b style='color:{colour}'>✗ трябва бърза поправка</b>",
   "Into your mic  <b>setting up…</b>": "Към микрофона ти  <b>настройване…</b>",
@@ -3198,6 +3197,7 @@
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Сложи ефекта за микрофона на Onion Board на избрания микрофон, за да отиват звуците ти директно в него.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Сложи ефекта за микрофона на Onion Board на {mic}, за да отиват звуците ти директно в него.",
   "Some leftovers couldn't be removed from {mic}.": "Някои остатъци не можаха да се премахнат от {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Към микрофона ти  <b style='color:{colour}'>✗ не работи</b>",
   "<b>Nothing to set.</b> Discord and games keep your normal mic, and your sounds are in it.": "<b>Нищо за настройване.</b> Discord и игрите си ползват нормалния ти микрофон и звуците ти са в него.",
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ако звуците накъсват, изключи потискането на шума в гласовото приложение (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> изключено. Не Studio: то прескача Onion Board).",
   "Sounds chopped up?": "Звуците накъсват?"
