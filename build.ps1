@@ -26,6 +26,23 @@ Set-Location $PSScriptRoot
 $py = ".venv\Scripts\python.exe"
 if (-not (Test-Path $py)) { throw "No .venv - run scripts\install.bat first." }
 
+# PyInstaller's stock bootloader is in thousands of programs, some of them malware, so
+# virus scanners flag what's built with it (the mic helper got two VirusTotal hits):
+# compile one here first (scripts\build_bootloader.ps1, MinGW-w64's gcc), once per .venv.
+& $py -c "import sys; sys.path.insert(0, 'scripts'); import build_michelper; sys.exit(bool(build_michelper.stock_bootloader()))"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "PyInstaller's stock bootloader: compiling one here first" -ForegroundColor Yellow
+    & powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_bootloader.ps1 -Python $py
+    if ($LASTEXITCODE -ne 0) {
+        # Not fatal: fall back to the stock bootloader so a build without MinGW-w64's gcc
+        # still works. Such a build may draw antivirus false positives; a release build
+        # should install gcc (winget install BrechtSanders.WinLibs.POSIX.UCRT) so this
+        # step produces a clean bootloader.
+        Write-Warning "scripts\build_bootloader.ps1 failed (is MinGW-w64's gcc installed?): building with PyInstaller's stock bootloader, which may draw antivirus false positives."
+    } else {
+        $Clean = $true
+    }
+}
 $cleanArg = @()
 if ($Clean) { $cleanArg = @("--clean") }
 # The .exe's version info: Windows names the app by it (the firewall prompt, Task
