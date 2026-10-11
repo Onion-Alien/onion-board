@@ -1,0 +1,2 @@
+- Setup tab: the Equalizer card folds to its heading and on/off row while the EQ is off (seven flat sliders and an empty curve took a third of the tab).
+- Setup tab: Connect your chat shows once your sounds reach a mic. Until then (nothing set up yet, or Nobody) its Step-by-step guide button is in the mic card.

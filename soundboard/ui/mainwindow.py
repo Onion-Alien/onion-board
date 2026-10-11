@@ -1980,6 +1980,11 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.btn_install, "cable", "on_accent")
         ways.addWidget(self.btn_install)
         ways.addWidget(self.btn_usecable)   # (after the mic's own button: the second way)
+        # Connect your chat is hidden until there's a chat to connect: its guide is here
+        # meanwhile (that card held nothing else, while nothing was set up or on Nobody)
+        self.btn_guide = self._guide_button()
+        self.btn_guide.hide()
+        ways.addWidget(self.btn_guide)
         cv.addLayout(ways)
         # straight into the mic works: the cable is only a fallback, so offer to remove it
         self.btn_rmcable = QPushButton(_("Remove the virtual cable"))
@@ -2028,13 +2033,9 @@ class MainWindow(QMainWindow):
         self.btn_nomic = QPushButton(_("Game has no microphone setting?"))
         self.btn_nomic.clicked.connect(self.open_windows_mic)
         chat.addWidget(self.btn_nomic)
-        guide = QPushButton(_("Step-by-step guide"))
-        guide.setToolTip(_("Walks you through mic, headphones, where your sounds go (your mic, "
-                           "the cable, another device or nowhere) and Discord"))
-        icons.set_icon(guide, "check")
-        guide.clicked.connect(lambda: (usage.used("setup-guide-opened"), self.run_setup()))
-        chat.addWidget(guide)
+        chat.addWidget(self._guide_button())
         hv.addLayout(chat)
+        self.helpcard = helpcard
 
 
         # ---- devices
@@ -2110,7 +2111,7 @@ class MainWindow(QMainWindow):
 
         # ---- sound shaping
         eqcard, ev = card(roomy=True)
-        self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains)
+        self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains, fold=True)
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
         utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
@@ -2133,6 +2134,14 @@ class MainWindow(QMainWindow):
         from soundboard.ui.destpanel import apply_send
         apply_send(self.cfg, self.engine)          # ...and mono / ducking
         return page
+
+    def _guide_button(self) -> QPushButton:
+        guide = QPushButton(_("Step-by-step guide"))
+        guide.setToolTip(_("Walks you through mic, headphones, where your sounds go (your mic, "
+                           "the cable, another device or nowhere) and Discord"))
+        icons.set_icon(guide, "check")
+        guide.clicked.connect(lambda: (usage.used("setup-guide-opened"), self.run_setup()))
+        return guide
 
     def _stack_setup(self, compact: bool):
         """Setup's cards in two columns, or in one column in setup order."""
@@ -3166,6 +3175,10 @@ class MainWindow(QMainWindow):
         self.btn_chat.setVisible(mic_side)
         self.btn_game.setVisible(mic_side)
         self.btn_meeting.setVisible(mic_side)
+        # one rule: Connect your chat shows when there's a chat to connect; until then
+        # its one button (the guide) sits in the mic card
+        self.helpcard.setVisible(mic_side)
+        self.btn_guide.setVisible(not mic_side)
         self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
