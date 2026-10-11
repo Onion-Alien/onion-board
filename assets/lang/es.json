@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Haz clic para silenciar tus sonidos para los demás (Discord, el juego, OBS…). Tu micro se sigue enviando salvo que el cambiador de voz esté activado. Tú sigues oyendo todo",
   "Click to send your sounds again: right now others hear only your mic": "Haz clic para volver a enviar tus sonidos: ahora los demás oyen solo tu micro",
   "Only your mic": "Solo tu micro",
-  "Others hear": "Los demás oyen",
   "Others hear only your mic": "Los demás oyen solo tu micro",
   "Can ring until you stop it": "Puede sonar hasta que lo pares",
   "Free, from GitHub, and only downloaded when you click.": "Gratis, desde GitHub, y solo se descarga cuando haces clic.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Hemos traído <b>{n}</b> sonido de {name}. ¿Lo conservas?",
     "Hemos traído <b>{n}</b> sonidos de {name}. ¿Los conservas?"
-  ]
+  ],
+  "Off air": "Fuera de directo",
+  "On air": "En directo"
 }

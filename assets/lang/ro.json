@@ -3093,7 +3093,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Apasă ca să oprești sunetele tale pentru ceilalți (Discord, jocul, OBS…). Microfonul tău merge în continuare, dacă nu e pornit schimbătorul de voce. Tu auzi în continuare tot",
   "Click to send your sounds again: right now others hear only your mic": "Apasă ca să trimiți din nou sunetele tale: acum ceilalți aud doar microfonul tău",
   "Only your mic": "Doar microfonul tău",
-  "Others hear": "Ceilalți aud",
   "Others hear only your mic": "Ceilalți aud doar microfonul tău",
   "Can ring until you stop it": "Poate suna până îl oprești",
   "Free, from GitHub, and only downloaded when you click.": "Gratuit, de pe GitHub, și descărcat doar când dai clic.",
@@ -3191,5 +3190,7 @@
     "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?",
     "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?",
     "Sunete aduse din {name}: <b>{n}</b>. Le păstrezi?"
-  ]
+  ],
+  "Off air": "În afara emisiei",
+  "On air": "În emisie"
 }

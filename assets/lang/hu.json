@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Kattints, hogy elnémítsd a hangjaidat mások számára (Discord, a játék, OBS…). A mikrofonod továbbra is megy, hacsak nincs bekapcsolva a hangváltó. Te továbbra is mindent hallasz",
   "Click to send your sounds again: right now others hear only your mic": "Kattints, hogy újra küldd a hangjaidat: most mások csak a mikrofonodat hallják",
   "Only your mic": "Csak a mikrofonod",
-  "Others hear": "Mások hallják",
   "Others hear only your mic": "Mások csak a mikrofonodat hallják",
   "Can ring until you stop it": "Csöröghet, amíg le nem állítod",
   "Free, from GitHub, and only downloaded when you click.": "Ingyenes, a GitHubról, és csak kattintásra töltődik le.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod?",
     "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod őket?"
-  ]
+  ],
+  "Off air": "Adáson kívül",
+  "On air": "Adásban"
 }

@@ -2965,7 +2965,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik untuk senyapkan bunyi anda bagi orang lain (Discord, permainan, OBS…). Mikrofon anda masih dihantar kecuali penukar suara dihidupkan. Anda masih dengar semuanya",
   "Click to send your sounds again: right now others hear only your mic": "Klik untuk hantar bunyi anda semula: sekarang orang lain hanya dengar mikrofon anda",
   "Only your mic": "Hanya mikrofon anda",
-  "Others hear": "Orang lain dengar",
   "Others hear only your mic": "Orang lain hanya dengar mikrofon anda",
   "Can ring until you stop it": "Boleh berdering sehingga anda hentikan",
   "Free, from GitHub, and only downloaded when you click.": "Percuma, dari GitHub, dan hanya dimuat turun apabila anda klik.",
@@ -3045,5 +3044,7 @@
   ],
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Kami bawa <b>{n}</b> bunyi dari {name}. Simpan?"
-  ]
+  ],
+  "Off air": "Tidak ke udara",
+  "On air": "Ke udara"
 }

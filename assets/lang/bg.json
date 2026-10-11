@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Натисни, за да заглушиш звуците си за другите (Discord, играта, OBS…). Микрофонът ти продължава да се праща, освен ако промяната на гласа е включена. Ти чуваш всичко",
   "Click to send your sounds again: right now others hear only your mic": "Натисни, за да пращаш пак звуците си: сега другите чуват само микрофона ти",
   "Only your mic": "Само микрофона ти",
-  "Others hear": "Другите чуват",
   "Others hear only your mic": "Другите чуват само микрофона ти",
   "Can ring until you stop it": "Може да звъни, докато не го спрете",
   "Free, from GitHub, and only downloaded when you click.": "Безплатно, от GitHub, и се изтегля само когато щракнете.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Пренесохме <b>{n}</b> звук от {name}. Да го запазя ли?",
     "Пренесохме <b>{n}</b> звука от {name}. Да ги запазя ли?"
-  ]
+  ],
+  "Off air": "Извън ефир",
+  "On air": "В ефир"
 }

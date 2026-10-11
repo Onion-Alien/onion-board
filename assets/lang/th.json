@@ -2965,7 +2965,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "คลิกเพื่อปิดเสียงของคุณสำหรับคนอื่น (Discord, เกม, OBS…) ไมค์ของคุณยังส่งออกไป เว้นแต่จะเปิดโปรแกรมเปลี่ยนเสียงอยู่ คุณยังได้ยินทุกอย่าง",
   "Click to send your sounds again: right now others hear only your mic": "คลิกเพื่อส่งเสียงของคุณอีกครั้ง: ตอนนี้คนอื่นได้ยินแค่ไมค์ของคุณ",
   "Only your mic": "แค่ไมค์ของคุณ",
-  "Others hear": "คนอื่นได้ยิน",
   "Others hear only your mic": "คนอื่นได้ยินแค่ไมค์ของคุณ",
   "Can ring until you stop it": "ดังได้จนกว่าคุณจะหยุด",
   "Free, from GitHub, and only downloaded when you click.": "ฟรี จาก GitHub และดาวน์โหลดเมื่อคุณคลิกเท่านั้น",
@@ -3045,5 +3044,7 @@
   ],
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "เราย้ายเสียง <b>{n}</b> เสียงมาจาก {name} แล้ว เก็บไว้ไหม?"
-  ]
+  ],
+  "Off air": "ไม่ออกอากาศ",
+  "On air": "ออกอากาศ"
 }

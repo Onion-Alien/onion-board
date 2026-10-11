@@ -3093,7 +3093,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Натисни, щоб вимкнути свої звуки для інших (Discord, гра, OBS…). Мікрофон і далі надсилається, якщо не ввімкнена зміна голосу. Ти й далі чуєш усе",
   "Click to send your sounds again: right now others hear only your mic": "Натисни, щоб знову надсилати звуки: зараз інші чують лише твій мікрофон",
   "Only your mic": "Лише твій мікрофон",
-  "Others hear": "Інші чують",
   "Others hear only your mic": "Інші чують лише твій мікрофон",
   "Can ring until you stop it": "Може дзвонити, доки ви не зупините",
   "Free, from GitHub, and only downloaded when you click.": "Безкоштовно, з GitHub, і завантажується лише після клацання.",
@@ -3191,5 +3190,7 @@
     "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
     "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
     "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?"
-  ]
+  ],
+  "Off air": "Не в ефірі",
+  "On air": "В ефірі"
 }

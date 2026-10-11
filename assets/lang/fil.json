@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "I-click para i-mute ang mga sound mo para sa iba (Discord, ang laro, OBS…). Naipapadala pa rin ang mic mo maliban kung naka-on ang voice changer. Naririnig mo pa rin ang lahat",
   "Click to send your sounds again: right now others hear only your mic": "I-click para ipadala ulit ang mga sound mo: mic mo lang ang naririnig ng iba ngayon",
   "Only your mic": "Mic mo lang",
-  "Others hear": "Naririnig ng iba",
   "Others hear only your mic": "Mic mo lang ang naririnig ng iba",
   "Can ring until you stop it": "Puwedeng tumunog hanggang ihinto mo",
   "Free, from GitHub, and only downloaded when you click.": "Libre, mula sa GitHub, at dina-download lang kapag nag-click ka.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Inilipat namin ang <b>{n}</b> tunog mula sa {name}. Itatago ba?",
     "Inilipat namin ang <b>{n}</b> tunog mula sa {name}. Itatago ba?"
-  ]
+  ],
+  "Off air": "Off air",
+  "On air": "On air"
 }

@@ -2965,7 +2965,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "클릭하면 다른 사람에게 가는 사운드를 음소거해요 (Discord, 게임, OBS…). 보이스 체인저가 켜져 있지 않으면 마이크는 계속 나가요. 나는 계속 다 들려요",
   "Click to send your sounds again: right now others hear only your mic": "클릭하면 사운드를 다시 보내요: 지금 다른 사람은 내 마이크만 들어요",
   "Only your mic": "내 마이크만",
-  "Others hear": "다른 사람이 듣기",
   "Others hear only your mic": "다른 사람은 내 마이크만 들어요",
   "Can ring until you stop it": "멈출 때까지 울리게 할 수 있어요",
   "Free, from GitHub, and only downloaded when you click.": "무료, GitHub에서, 클릭할 때만 다운로드돼요.",
@@ -3045,5 +3044,7 @@
   ],
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
-  ]
+  ],
+  "Off air": "방송 꺼짐",
+  "On air": "방송 중"
 }

@@ -1,0 +1,1 @@
+- The sidebar switch now says "On air" while others hear you and "Off air" when it is off (it used to say "Others hear").

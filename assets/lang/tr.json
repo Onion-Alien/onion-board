@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Seslerini diğerleri için kapatmak için tıkla (Discord, oyun, OBS…). Ses değiştirici açık değilse mikrofonun gitmeye devam eder. Sen her şeyi duymaya devam edersin",
   "Click to send your sounds again: right now others hear only your mic": "Seslerini yeniden göndermek için tıkla: şu an diğerleri yalnızca mikrofonunu duyuyor",
   "Only your mic": "Yalnızca mikrofonun",
-  "Others hear": "Diğerleri duyar",
   "Others hear only your mic": "Diğerleri yalnızca mikrofonunu duyuyor",
   "Can ring until you stop it": "Sen durdurana kadar çalabilir",
   "Free, from GitHub, and only downloaded when you click.": "Ücretsiz, GitHub'dan ve yalnızca tıkladığında indirilir.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsın mı?",
     "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsınlar mı?"
-  ]
+  ],
+  "Off air": "Yayında değil",
+  "On air": "Yayında"
 }

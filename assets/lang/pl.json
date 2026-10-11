@@ -3093,7 +3093,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Kliknij, aby wyciszyć swoje dźwięki dla innych (Discord, gra, OBS…). Twój mikrofon dalej leci, chyba że zmieniacz głosu jest włączony. Ty dalej słyszysz wszystko",
   "Click to send your sounds again: right now others hear only your mic": "Kliknij, aby znów wysyłać swoje dźwięki: teraz inni słyszą tylko twój mikrofon",
   "Only your mic": "Tylko twój mikrofon",
-  "Others hear": "Inni słyszą",
   "Others hear only your mic": "Inni słyszą tylko twój mikrofon",
   "Can ring until you stop it": "Może dzwonić, aż go zatrzymasz",
   "Free, from GitHub, and only downloaded when you click.": "Za darmo, z GitHuba, pobierane dopiero po kliknięciu.",
@@ -3191,5 +3190,7 @@
     "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
     "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
     "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?"
-  ]
+  ],
+  "Off air": "Poza anteną",
+  "On air": "Na antenie"
 }

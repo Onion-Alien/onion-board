@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Πάτα για σίγαση των ήχων σου για τους άλλους (Discord, το παιχνίδι, OBS…). Το μικρόφωνό σου συνεχίζει να στέλνεται, εκτός αν είναι ενεργή η αλλαγή φωνής. Εσύ ακούς τα πάντα",
   "Click to send your sounds again: right now others hear only your mic": "Πάτα για να στέλνεις ξανά τους ήχους σου: τώρα οι άλλοι ακούν μόνο το μικρόφωνό σου",
   "Only your mic": "Μόνο το μικρόφωνό σου",
-  "Others hear": "Οι άλλοι ακούν",
   "Others hear only your mic": "Οι άλλοι ακούν μόνο το μικρόφωνό σου",
   "Can ring until you stop it": "Μπορεί να χτυπά μέχρι να το σταματήσεις",
   "Free, from GitHub, and only downloaded when you click.": "Δωρεάν, από το GitHub, και κατεβαίνει μόνο όταν κάνεις κλικ.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Φέραμε <b>{n}</b> ήχο από το {name}. Να τον κρατήσεις;",
     "Φέραμε <b>{n}</b> ήχους από το {name}. Να τους κρατήσεις;"
-  ]
+  ],
+  "Off air": "Εκτός αέρα",
+  "On air": "Στον αέρα"
 }

@@ -2965,7 +2965,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "クリックして相手へのサウンドをミュート（Discord、ゲーム、OBS…）。ボイスチェンジャーがオンでなければ、マイクはそのまま送られます。自分には全部聞こえます",
   "Click to send your sounds again: right now others hear only your mic": "クリックしてサウンドの送信を再開：今は相手には自分のマイクだけ聞こえます",
   "Only your mic": "マイクだけ",
-  "Others hear": "相手に聞こえる",
   "Others hear only your mic": "相手には自分のマイクだけ聞こえます",
   "Can ring until you stop it": "止めるまで鳴らし続けられます",
   "Free, from GitHub, and only downloaded when you click.": "無料、GitHub から。クリックしたときだけダウンロードします。",
@@ -3045,5 +3044,7 @@
   ],
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "{name} から <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
-  ]
+  ],
+  "Off air": "オフエア",
+  "On air": "オンエア"
 }

@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik om je geluiden voor anderen te dempen (Discord, de game, OBS…). Je microfoon gaat nog steeds mee, tenzij de stemverander aan staat. Jij hoort nog alles",
   "Click to send your sounds again: right now others hear only your mic": "Klik om je geluiden weer te sturen: nu horen anderen alleen je microfoon",
   "Only your mic": "Alleen je microfoon",
-  "Others hear": "Anderen horen",
   "Others hear only your mic": "Anderen horen alleen je microfoon",
   "Can ring until you stop it": "Kan rinkelen tot je het stopt",
   "Free, from GitHub, and only downloaded when you click.": "Gratis, van GitHub, en pas gedownload als je klikt.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "We hebben <b>{n}</b> geluid uit {name} overgezet. Houden?",
     "We hebben <b>{n}</b> geluiden uit {name} overgezet. Houden?"
-  ]
+  ],
+  "Off air": "Off air",
+  "On air": "On air"
 }

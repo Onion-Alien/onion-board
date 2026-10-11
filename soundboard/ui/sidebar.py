@@ -257,18 +257,19 @@ class OutputBlock(QFrame):
         top.setSpacing(0)   # icon GAP words, then a tighter 4 before the switch
         mark = self.mark = self._glyph()
         icons.set_label_icon(mark, "live", "accent", size=self.GLYPH)
-        self.title = QLabel(_("Others hear"))
+        self.title = QLabel()
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
         self.title.setAlignment(Qt.AlignmentFlag.AlignLeading | Qt.AlignmentFlag.AlignTop)
         self.title.setMinimumWidth(0)
         self.switch = Switch()
         self.switch.setProperty("glyphoffset", 1)
-        self.switch.setAccessibleName(_("Others hear"))
         self.title.setBuddy(self.switch)
         self.switch.setChecked(power.isChecked())
         self.switch.toggled.connect(power.setChecked)
         power.toggled.connect(self.switch.setChecked)
+        power.toggled.connect(self._name)
+        self._name(power.isChecked())
         top.addWidget(mark, 0, Qt.AlignmentFlag.AlignTop)
         self._title_gap = QSpacerItem(self.GAP, 0, QSizePolicy.Policy.Fixed,
                                       QSizePolicy.Policy.Minimum)
@@ -377,6 +378,16 @@ class OutputBlock(QFrame):
         if not expanded:   # shut: just the icon, centred over the switch
             self.mark.setContentsMargins(0, 0, 0, 0)
             self.mark.setFixedHeight(self.GLYPH)
+
+    @staticmethod
+    def names() -> tuple[str, str]:
+        return _("On air"), _("Off air")
+
+    def _name(self, on: bool):
+        """"On air" while others hear you, "Off air" while they don't."""
+        text = self.names()[0 if on else 1]
+        self.title.setText(text)
+        self.switch.setAccessibleName(text)
 
     def refresh(self):
         self.switch.setToolTip(self.power.toolTip())
@@ -864,12 +875,13 @@ class SideRail(QFrame):
 
     def _full_fit(self) -> int:
         """The narrowest open rail where the full layout fits, every word on its line:
-        the name, "Others hear" beside its switch, Settings beside the arrow (a longer
+        the name, "On air" / "Off air" beside its switch, Settings beside the arrow (a longer
         translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
         need = [side + BUTTON_W + 6 + self._brand_width()]
         if self.output:
-            title = self.output.title.fontMetrics().horizontalAdvance(_("Others hear"))
+            metrics = self.output.title.fontMetrics()
+            title = max(metrics.horizontalAdvance(t) for t in self.output.names())
             need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
         return max(FULL_W, min(OPEN_W, max(need)))
 

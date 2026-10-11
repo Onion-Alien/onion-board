@@ -2965,7 +2965,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "点击为别人静音你的声音（Discord、游戏、OBS…）。除非开着变声器，你的麦克风仍会发出去。你自己仍能听到一切",
   "Click to send your sounds again: right now others hear only your mic": "点击重新发送你的声音：现在别人只听到你的麦克风",
   "Only your mic": "只有你的麦克风",
-  "Others hear": "别人能听到",
   "Others hear only your mic": "别人只听到你的麦克风",
   "Can ring until you stop it": "可以一直响，直到你停止",
   "Free, from GitHub, and only downloaded when you click.": "免费，来自 GitHub，只在你点击时下载。",
@@ -3045,5 +3044,7 @@
   ],
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "已从 {name} 导入 <b>{n}</b> 个音效。要保留吗？"
-  ]
+  ],
+  "Off air": "已关播",
+  "On air": "直播中"
 }

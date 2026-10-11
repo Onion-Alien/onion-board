@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik for at slå dine lyde fra for andre (Discord, spillet, OBS…). Din mikrofon sendes stadig, medmindre stemmeskifteren er slået til. Du hører stadig alt",
   "Click to send your sounds again: right now others hear only your mic": "Klik for at sende dine lyde igen: lige nu hører andre kun din mikrofon",
   "Only your mic": "Kun din mikrofon",
-  "Others hear": "Andre hører",
   "Others hear only your mic": "Andre hører kun din mikrofon",
   "Can ring until you stop it": "Kan ringe, til du stopper den",
   "Free, from GitHub, and only downloaded when you click.": "Gratis, fra GitHub, og hentes kun, når du klikker.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Vi hentede <b>{n}</b> lyd fra {name}. Vil du beholde den?",
     "Vi hentede <b>{n}</b> lyde fra {name}. Vil du beholde dem?"
-  ]
+  ],
+  "Off air": "Off air",
+  "On air": "On air"
 }

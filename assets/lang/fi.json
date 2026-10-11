@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Napsauta mykistääksesi äänesi muilta (Discord, peli, OBS…). Mikkisi lähtee edelleen, ellei äänenmuuttaja ole päällä. Sinä kuulet edelleen kaiken",
   "Click to send your sounds again: right now others hear only your mic": "Napsauta lähettääksesi äänesi taas: nyt muut kuulevat vain mikkisi",
   "Only your mic": "Vain mikkisi",
-  "Others hear": "Muut kuulevat",
   "Others hear only your mic": "Muut kuulevat vain mikkisi",
   "Can ring until you stop it": "Voi soida, kunnes pysäytät sen",
   "Free, from GitHub, and only downloaded when you click.": "Ilmainen, GitHubista, ja ladataan vasta kun napsautat.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Toimme <b>{n}</b> äänen sovelluksesta {name}. Säilytetäänkö se?",
     "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
-  ]
+  ],
+  "Off air": "Ei lähetyksessä",
+  "On air": "Lähetyksessä"
 }

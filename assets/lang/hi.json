@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "दूसरों के लिए अपनी आवाज़ें म्यूट करने के लिए क्लिक करें (Discord, गेम, OBS…)। आपका माइक तब तक जाता रहता है जब तक आवाज परिवर्तक चालू न हो। आप सब कुछ सुनते रहते हैं",
   "Click to send your sounds again: right now others hear only your mic": "अपनी आवाज़ें फिर से भेजने के लिए क्लिक करें: अभी दूसरे सिर्फ़ आपका माइक सुनते हैं",
   "Only your mic": "सिर्फ़ आपका माइक",
-  "Others hear": "दूसरे सुनते हैं",
   "Others hear only your mic": "दूसरे सिर्फ़ आपका माइक सुनते हैं",
   "Can ring until you stop it": "जब तक आप रोकें, बजता रह सकता है",
   "Free, from GitHub, and only downloaded when you click.": "मुफ़्त, GitHub से, और सिर्फ़ क्लिक करने पर डाउनलोड होता है।",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "हमने {name} से <b>{n}</b> आवाज़ लाई है। इसे रखें?",
     "हमने {name} से <b>{n}</b> आवाज़ें लाई हैं। इन्हें रखें?"
-  ]
+  ],
+  "Off air": "ऑफ़ एयर",
+  "On air": "ऑन एयर"
 }

@@ -3029,7 +3029,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klicka för att tysta dina ljud för andra (Discord, spelet, OBS…). Din mikrofon skickas fortfarande, om inte röstväxlaren är på. Du hör fortfarande allt",
   "Click to send your sounds again: right now others hear only your mic": "Klicka för att skicka dina ljud igen: just nu hör andra bara din mikrofon",
   "Only your mic": "Bara din mikrofon",
-  "Others hear": "Andra hör",
   "Others hear only your mic": "Andra hör bara din mikrofon",
   "Can ring until you stop it": "Kan ringa tills du stoppar det",
   "Free, from GitHub, and only downloaded when you click.": "Gratis, från GitHub, och laddas bara ner när du klickar.",
@@ -3118,5 +3117,7 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla det?",
     "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla dem?"
-  ]
+  ],
+  "Off air": "Ej i sändning",
+  "On air": "I sändning"
 }

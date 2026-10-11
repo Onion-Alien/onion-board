@@ -3285,7 +3285,6 @@
   "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "انقر لكتم أصواتك عن الآخرين (Discord، اللعبة، OBS…). يبقى ميكروفونك مُرسلًا ما لم يكن مغير الصوت مفعّلًا. أنت تسمع كل شيء",
   "Click to send your sounds again: right now others hear only your mic": "انقر لإرسال أصواتك مجددًا: الآخرون يسمعون ميكروفونك فقط الآن",
   "Only your mic": "ميكروفونك فقط",
-  "Others hear": "الآخرون يسمعون",
   "Others hear only your mic": "الآخرون يسمعون ميكروفونك فقط",
   "Can ring until you stop it": "يمكنه الرنين حتى تُوقفه",
   "Free, from GitHub, and only downloaded when you click.": "مجاني، من GitHub، ولا يُنزَّل إلا عند النقر.",
@@ -3410,5 +3409,7 @@
     "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
     "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟",
     "عدد الأصوات المنقولة من {name}: <b>{n}</b>. هل تريد الاحتفاظ بها؟"
-  ]
+  ],
+  "Off air": "خارج الهواء",
+  "On air": "على الهواء"
 }
