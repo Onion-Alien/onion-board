@@ -13,7 +13,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   them or remove them together (one Undo). **From the keyboard:** arrows move
   between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
   removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
-  Right-click a pad for *Rename…*, *Duplicate* (a second pad with its own file, for
+  Right-click a pad for *Rename*, *Duplicate* (a second pad with its own file, for
   its own effects or hotkey) and *Show the file in its folder*.
 - **Record a sound with your mic, or from what's playing:** the **Record** button next
   to *Add sounds*. Record your own voice, your voice through the voice changer while
@@ -31,8 +31,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   *Use hotkeys per category* (Settings → Hotkeys) each category is its own set of
   keys: one key, a different sound per category.
 - **Switch category when a program is in front:** right-click a category →
-  *Show this when a program is in front…* lists the programs open now (with their
-  icons) and *Browse for a program…*. When one of them comes to the front, the board
+  *Show this when a program is in front* lists the programs open now (with their
+  icons) and *Browse for a program*. When one of them comes to the front, the board
   and the overlay switch to that category (with the category beep, if beeps are on);
   when it closes, the board goes back to the category it showed before. Alt-tabbing
   away changes nothing; a category you pick by hand while it's in front stays. Rules
@@ -62,8 +62,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   headphones), a **wait** before it plays, a **cooldown** against spamming, **fade in /
   fade out**, and **Hold to play** (plays only while you hold its key or pad down, like
   an air horn).
-- **Effects on any sound** (right-click a pad → **Effects…**, or the *Effects* tab
-  of **Edit…**): speed and pitch (separately, or together like a record player
+- **Effects on any sound** (right-click a pad → **Effects**, or the *Effects* tab
+  of **Edit**): speed and pitch (separately, or together like a record player
   with *Tape mode*), **trim** (drag the start and end on the sound's waveform, or
   type exact times — keep one line out of a 4-minute video), a 7-band EQ, a boost
   up to +36 dB that clips on purpose,
@@ -149,14 +149,14 @@ The full list. The [README](../README.md) has the short version and how to get s
   sound; the big-view button gives one program the whole tab. The tab's live
   controls change the pitch and effects of every program you send. A closed editor
   doesn't listen or keep anything. A program you removed comes back, settings and
-  all, from *Forgotten programs…*.
+  all, from *Forgotten programs*.
 - **Voice tab:** voice changer (21 ready voices, from Female / Male voice and Demon to
   Autotune, Talkbox, Masked caller and Dark lord; pitch with a natural-sound mode and a
   voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,
   robot / talkbox, helmet, shout blowout, radio with walkie-talkie clicks, echo, reverb,
-  distortion, 8-bit bitcrusher, plus add-on effects; *Save as a voice…* keeps your own
-  mix as a voice button (*Make it yours…* tweaks it, a share code copies it to a
-  friend and *Import a code…* adds theirs; removed ones wait in *Recently deleted*),
+  distortion, 8-bit bitcrusher, plus add-on effects; *Save as a voice* keeps your own
+  mix as a voice button (*Make it yours* tweaks it, a share code copies it to a
+  friend and *Import a code* adds theirs; removed ones wait in *Recently deleted*),
   and the dice picks a random one; it shows how much delay the
   voice adds, starts off every time the app opens, and a big ON / OFF button shows
   which it is), **AI voices** (optional: *Get AI voices* downloads about 55 MB, needs
@@ -190,7 +190,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   pad; a ringing one loops in your headphones. Triggers from before the add-on
   (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
   is out, the tab offers it (only while *Check for updates* is
-  ticked). *Remove Onion Watch…* in its *More* menu uninstalls it (after asking);
+  ticked). *Remove Onion Watch* in its *More* menu uninstalls it (after asking);
   your triggers are kept for when you get it again.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.
@@ -257,8 +257,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   sizes, radio quality and search extras; **Updates** holds update scheduling
   and maintenance; **Connection** also has *Keep an app log* (off stops
   `onionboard.log` being written and deletes it); **General** holds the window (*Keep window on top*, *Play pads with
-  one click*), tips, startup, backups and *Start over* (*Reset…* just the parts you
-  pick, with a restore point first; *Restore points…* undoes it); **Tabs** switches
+  one click*), tips, startup, backups and *Start over* (*Reset* just the parts you
+  pick, with a restore point first; *Restore points* undoes it); **Tabs** switches
   off the Radio, Apps, Triggers or Voice tab so it doesn't load at all;
   **Add-ons & help** holds Onion Watch, feedback and support; **About** holds the
   version and links. The other categories are Appearance, Audio (devices, *Also

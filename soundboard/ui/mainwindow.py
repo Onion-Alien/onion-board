@@ -1397,7 +1397,7 @@ class MainWindow(QMainWindow):
         self.ytresults.fill_site_menu(self._site_menu)
         self.ytresults.source_changed.connect(self._on_site_picked)
         self._pads_scroll = scroll
-        # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
+        # ---- "3 selected · Colour · Volume · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
         left.addWidget(self.selection.bar)
         # Ctrl+V anywhere on the page (a text box keeps its own): a copied clip from
@@ -5010,7 +5010,7 @@ class MainWindow(QMainWindow):
         self.search.selectAll()
 
     def rename_sound(self, sid: str, new: str | None = None):
-        """F2 on a pad (and the pad menu's Rename…): just the name, without the Edit
+        """F2 on a pad (and the pad menu's Rename): just the name, without the Edit
         window."""
         m = self.meta(sid)
         if m is None:
@@ -5186,7 +5186,7 @@ class MainWindow(QMainWindow):
                           shown=shown, exe=html.escape(sw.exe)))
 
     def pick_category_programs(self, name: str):
-        """A category's menu → Show this when a program is in front…"""
+        """A category's menu → Show this when a program is in front"""
         from soundboard.ui.programpick import ProgramPicker
         d = ProgramPicker(name, dict(self.cfg.category_programs), self)
         picked = d.picked if d.exec() else []
@@ -6040,7 +6040,7 @@ class MainWindow(QMainWindow):
         self.btn_bin.hide()   # Recently deleted is in the Library menu
 
     def show_deleted(self):
-        """Library → Recently deleted sounds…"""
+        """Library → Recently deleted sounds"""
         from soundboard.ui.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self)
@@ -6886,7 +6886,7 @@ class MainWindow(QMainWindow):
         return addon
 
     def remove_remote_addon(self, info, base=None):
-        """Uninstall a remote add-on (Settings' *Remove Onion Pocket…*): the running
+        """Uninstall a remote add-on (Settings' *Remove Onion Pocket*): the running
         copy is stopped (its server lets go of the port), its folder in `base` (the
         modules folder in %APPDATA%) deleted and its package forgotten. Its settings
         in Config.remote_addons stay, for when it's got again. If the folder can't be

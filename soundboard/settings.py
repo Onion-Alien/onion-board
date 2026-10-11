@@ -1167,7 +1167,7 @@ class SettingsDialog(QDialog):
         return w
 
     def _voices_card(self):
-        """Custom text-to-speech voices live on the Voice tab (behind Add voices…); this
+        """Custom text-to-speech voices live on the Voice tab (behind Add voices); this
         card is where people look for them first. Hidden while the tab is switched off
         (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
         and on again while Settings is open, that's a new one."""
@@ -1373,7 +1373,7 @@ class SettingsDialog(QDialog):
         """Switch category when a program is in front: every rule in one place."""
         card, cv = self._card(
             _("Switch category by program"),
-            _("Right-click a category tab → Show this when a program is in front… and the board "
+            _("Right-click a category tab → Show this when a program is in front and the board "
               "shows that category by itself whenever the program is in front."))
         self.box_programs = self._option(
             cv, _("Switch by itself"),
@@ -1622,7 +1622,7 @@ class SettingsDialog(QDialog):
         """Every add-on in one place, each with the same row of buttons in the same
         order: Check for updates (Update to X once one is out), Reinstall (a fresh
         copy of the newest; the user's triggers / paired phones are the board's and
-        stay), Report a problem, Remove… Not installed: Get it, and Report a problem.
+        stay), Report a problem, Remove. Not installed: Get it, and Report a problem.
         One grid for all of them (_AddonGrid): the buttons share columns, so they line
         up from one add-on to the next, folding to two columns in a narrow window."""
         card, cv = self._card(_("Add-ons"),
@@ -3185,7 +3185,7 @@ class SettingsDialog(QDialog):
                      if i.id == pocketaddon.MODULE_ID), None)
 
     def _pocket_remove_button(self, card, info):
-        """*Remove Onion Pocket…* at the foot of its own card on Settings → Remote."""
+        """*Remove Onion Pocket* at the foot of its own card on Settings → Remote."""
         from soundboard import pocketaddon
         lay = card.layout()
         if lay is None or not pocketaddon.removable(info):
