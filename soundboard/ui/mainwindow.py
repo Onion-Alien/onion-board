@@ -686,11 +686,17 @@ class MainWindow(QMainWindow):
         self.logo = LogoWidget()
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
-        self.tagline = QLabel(_("an app by Onion Alien · v{version_text}",
-                                version_text=version_text()))
+        from soundboard import __version__
+        # on the rail: the name over a quiet "v1.9.28" (the title bar says "from source");
+        # who made it is a tip on all three
+        self.tagline = sidebar.ClickLabel(f"v{__version__}")
         self.tagline.setObjectName("tagline")
-        # on the rail, the name and the version each on a line of their own
-        self.tagline.setText(self.tagline.text().replace(" · ", "\n", 1))
+        about = _("an app by Onion Alien · v{version_text}", version_text=version_text())
+        for w in (self.logo, self.wordmark):
+            w.setToolTip(about)
+        whats_new = _("What's new")   # the version is a button to it
+        self.tagline.setToolTip(f"{about}\n{whats_new}")
+        self.tagline.clicked.connect(self.show_whats_new)
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.PointingHandCursor)
@@ -731,7 +737,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
-        icons.set_icon(self.stop_btn, "stop", "danger_text", size=sidebar.ICON)
+        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -906,11 +912,18 @@ class MainWindow(QMainWindow):
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear],
             self._rail_opened,
-            # Live and Stop all first, so they never move; the pills only when needed
-            # (at the rail's foot, as icons)
-            [self.btn_air, self.mode_btn, self.stop_btn, self.pill, self.btn_offline,
-             self.btn_update], order=[TAB_INDEX[k] for k in self.cfg.sidebar_order
-                                     if k in TAB_INDEX])
+            # Live and Stop all never move; the pills (what needs attention) sit above
+            # them and only show when needed (at the rail's foot, as icons)
+            [self.btn_air, self.mode_btn, self.stop_btn],
+            order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
+            alerts=[self.pill, self.btn_offline, self.btn_update])
+        # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
+        # through them (the tab widget does that only while it has the focus)
+        for n in range(1, 10):
+            QShortcut(QKeySequence(f"Ctrl+{n}"), self,
+                      activated=lambda n=n: self._go_tab(n - 1, absolute=True))
+        QShortcut(QKeySequence("Ctrl+Tab"), self, activated=lambda: self._go_tab(1))
+        QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self._go_tab(-1))
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         self._full_row.insertWidget(0, self.rail)
@@ -7328,6 +7341,30 @@ class MainWindow(QMainWindow):
                 return
             log.info("updated to %s", __version__)
         self.whats_new(updated=bool(pending))
+
+    def _go_tab(self, n: int, absolute: bool = False):
+        """The n-th tab on the rail (`absolute`), or the one n steps from this one."""
+        shown = [b for b in self.rail.buttons if b.isVisible()]
+        if not shown:
+            return
+        if absolute:
+            if n < len(shown):
+                shown[n].click()
+            return
+        cur = next((k for k, b in enumerate(shown) if b.isChecked()), 0)
+        shown[(cur + n) % len(shown)].click()
+
+    def show_whats_new(self):
+        """The header's version, clicked: the newest release's notes, any time."""
+        from soundboard.ui import whatsnew
+        if not whatsnew.NOTES:
+            return
+        dlg = whatsnew.WhatsNewDialog(self, [whatsnew.NOTES[0]])
+        dlg.exec()
+        page = dlg.page
+        free_dialog(dlg)
+        if page:
+            self.open_settings(page)
 
     def whats_new(self, updated: bool = False):
         """What's new in this version (ui/whatsnew.py), if they haven't seen it: once,

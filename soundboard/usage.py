@@ -111,9 +111,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # FEATURES, keep in step
             *(f"triggers-{k}" for k in TRIGGERS_FEATURES),
             # the Easter eggs, to see if anyone finds them: Pong with Bun opened, left
-            # before the end, won or lost; the header onion made to cry; sleepy Bun woken
+            # before the end, won or lost; sleepy Bun woken
             "egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
-            "egg-onion-cried", "egg-bun-woken")
+            "egg-bun-woken")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")

@@ -448,7 +448,9 @@ def test_the_tabs_are_a_rail_down_the_left(window, qapp):
     rail.toggle.click()
     assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
     b = rail.buttons[1]
-    assert b.text() == "" and b.toolTip() == "" and b.accessibleName() == "Radio"
+    # shut, the icon is all there is: the hover tip gives its name and its Ctrl+number
+    assert b.text() == "" and b.toolTip().startswith("Radio  (Ctrl+") and \
+        b.accessibleName() == "Radio"
     assert not rail.buttons[0].icon().isNull()
     assert rail.buttons[0].isChecked() == (window.tabs.currentIndex() == 0)
     assert window.wordmark.isHidden()
@@ -817,7 +819,8 @@ def test_the_window_shows_which_version_is_running(window, monkeypatch):
     from soundboard import __version__
     from soundboard.ui import mainwindow
     assert window.windowTitle() == f"Onion Board {__version__} from source"
-    assert window.tagline.text().endswith(f"v{__version__} from source")
+    assert window.tagline.text() == f"v{__version__}"   # the header: no "from source"
+    assert "Onion Alien" in window.wordmark.toolTip()
     window.on_mic_check(True)          # the red banner says it; the title stays the app's name
     assert window.windowTitle() == f"Onion Board {__version__} from source"
     window.on_mic_check(False)
