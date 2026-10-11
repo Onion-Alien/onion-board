@@ -292,6 +292,18 @@ def test_a_capture_that_errors_says_so_and_stops_sending(tab):
     assert row.sending and "Switch Send on" not in row.sub.text()
 
 
+def test_cards_use_the_programs_own_name_and_keep_it_once_it_closes(qapp):
+    from soundboard.ui.appspanel import AppRow
+    row = AppRow("vlc.exe", Meter)
+    row.set_app(None)
+    assert row.name.text() == "Vlc"                 # never seen: from the .exe
+    row.set_app(App(5, "vlc.exe", description="VLC media player"))
+    assert row.name.text() == "VLC media player"
+    assert "VLC media player" in row.btn_send.accessibleName()
+    row.set_app(None)
+    assert row.name.text() == "VLC media player"
+
+
 def test_clearing_an_error_line_takes_the_red_off(qapp):
     from soundboard.ui.appspanel import AppRow
     row = AppRow("music.exe", Meter)

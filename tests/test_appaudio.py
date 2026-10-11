@@ -57,6 +57,19 @@ def test_to_stereo_f32_handles_widths_and_channel_counts():
 def test_app_display_name():
     assert App(1, "spotify.exe").name == "Spotify"
     assert App(7, "").name == "pid 7"
+    assert App(2, "vlc.exe", description="VLC media player").name == "VLC media player"
+
+
+@pytest.mark.windows   # version info is read from the .exe itself
+def test_file_description_is_the_programs_own_name_and_is_cached(monkeypatch):
+    assert appaudio.file_description(sys.executable) == "Python"
+    notepad = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "notepad.exe")
+    assert appaudio.file_description(notepad) == "Notepad"   # never 'Notepad.exe'
+    assert appaudio.file_description(r"C:\no\such.exe") == ""
+    assert appaudio.file_description("") == ""
+    monkeypatch.setattr(appaudio, "_version", None)
+    monkeypatch.setattr(appaudio.ctypes, "WinDLL", lambda *a, **k: 1 / 0)   # no file read
+    assert appaudio.file_description(sys.executable) == "Python"
 
 
 def test_supported_reports_windows_and_build():
