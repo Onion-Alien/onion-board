@@ -170,6 +170,17 @@ def test_the_summary_says_how_it_went():
     assert importreport.summary(0, [bad]) == ("Couldn't add 1 file", "error")
 
 
+def test_duplicates_are_not_counted_as_failed_files():
+    dupe = importreport.Skipped("a.wav", "already", "dupe")
+    empty = importreport.Skipped("empty.mp3", "empty", "not_sound")
+    locked = importreport.Skipped("locked.wav", "denied", "unreadable")
+    assert importreport.summary(0, [dupe] * 5 + [empty]) == (
+        "5 sounds are already in your library · 1 skipped", "warn")
+    assert importreport.summary(0, [dupe, empty, locked]) == (
+        "That sound is already in your library · 2 skipped", "warn")
+    assert importreport.summary(0, [empty, locked]) == ("Couldn't add 2 files", "error")
+
+
 def test_the_see_why_list_copies_everything(qapp):
     sk = [importreport.Skipped("b.mp3", "damaged", "not_sound"),
           importreport.Skipped("a.wav", "already", "dupe")]
@@ -198,6 +209,11 @@ def test_a_mixed_drop_ends_in_one_toast_with_see_why(main_window, qapp, tmp_path
     d = w.findChildren(importreport.SkippedDialog)[-1]
     assert not d.isModal() and {s.group for s in d.skipped} == {"dupe", "not_sound"}
     d.close()
+    w.import_files([str(good), str(bad)])
+    assert process_events(qapp, lambda: not w._pending_imports)
+    repeated = next(x for x in toast.shown(w) if x.key == "import")
+    assert repeated.text() == "That sound is already in your library · 1 skipped"
+    assert repeated.kind == "warn" and repeated.card.action.text() == "See why"
 
 
 def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # noqa: F811
