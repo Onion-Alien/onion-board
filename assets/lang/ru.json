@@ -339,14 +339,12 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Отчёт скопирован. Вставь его в issue, который только что открылся в браузере (Ctrl+V).",
   "Report on GitHub": "Сообщить на GitHub",
   "Reset": "Сброс",
-  "Reset all": "Сбросить всё",
   "Restart now": "Перезапустить",
   "Resume": "Продолжить",
   "Right-click a category → Show this when a program is in front, and the board switches to it by itself when you open your game.": "ПКМ по категории → Показывать, когда программа на переднем плане, — и доска сама переключится на неё, когда откроешь игру.",
   "Right-click a pad → Play next to queue it after the sound that's playing.": "ПКМ по кнопке → Сыграть следующим, чтобы поставить звук в очередь после текущего.",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "Выполнить только этот поиск напрямую с сайта, не через Tor: сайт увидит твой настоящий адрес",
   "Save": "Сохранить",
-  "Save as new sound": "Сохранить как новый звук",
   "Search": "Поиск",
   "Search Myinstants: short meme sound buttons": "Искать на Myinstants: короткие мемные звуки-кнопки",
   "Search SoundCloud": "Искать на SoundCloud",
@@ -3115,5 +3113,6 @@
   "Sound output": "Вывод звука",
   "Interface size": "Размер интерфейса",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Делает всё в Onion Board больше или меньше: текст, кнопки и пэды.",
-  "Onion Board changes size after a restart.": "Onion Board изменит размер после перезапуска."
+  "Onion Board changes size after a restart.": "Onion Board изменит размер после перезапуска.",
+  "Save a copy": "Сохранить копию"
 }

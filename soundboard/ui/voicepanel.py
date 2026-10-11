@@ -31,7 +31,8 @@ from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
 from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, capped, card, hint_label,
-                                 icon_button, icon_label, section_label, steady_number, vsep)
+                                 icon_button, icon_label, reset_button, section_label,
+                                 steady_number, vsep)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.wheelguard import no_wheel
@@ -355,11 +356,8 @@ class EffectRow(QFrame):
         title.setObjectName("fxname")
         head.addWidget(title)
         head.addStretch(1)
-        self.btn_reset = QPushButton(_("Reset"))
-        self.btn_reset.setObjectName("fxreset")
-        self.btn_reset.setCursor(Qt.PointingHandCursor)
-        self.btn_reset.setToolTip(_("Put {effect}'s settings back to how they start",
-                                    effect=voicefx.shown(cls.name)))
+        self.btn_reset = reset_button(_("Put {effect}'s settings back to how they start",
+                                        effect=voicefx.shown(cls.name)))
         self.btn_reset.clicked.connect(self.reset)
         head.addWidget(self.btn_reset)
         self.chk = Switch(_("Turn {effect} on or off", effect=voicefx.shown(cls.name)))

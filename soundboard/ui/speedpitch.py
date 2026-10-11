@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLa
 
 from soundboard import livefx, theme, voicefx
 from soundboard.ui import icons
-from soundboard.ui.panel import hint_label, section_label
+from soundboard.ui.panel import hint_label, reset_button, section_label
 from soundboard.ui.voicepanel import ParamSlider
 from soundboard.i18n import _
 
@@ -160,11 +160,8 @@ class SpeedPitchButton(QPushButton):
         sub = QLabel({"radio": _("The radio"), "apps": _("All programs")}.get(
             what, _("All sounds")))
         sub.setObjectName("muted")
-        reset = QPushButton(_("Reset all"))
-        reset.setObjectName("small")
-        reset.setToolTip(_("Back to 1x, no pitch change and no effects") if self.has_speed
-                         else _("Back to no pitch change and no effects"))
-        reset.setCursor(Qt.PointingHandCursor)
+        reset = reset_button(_("Back to 1x, no pitch change and no effects") if self.has_speed
+                             else _("Back to no pitch change and no effects"))
         reset.clicked.connect(self.reset)
         head.addWidget(title)
         head.addWidget(sub)

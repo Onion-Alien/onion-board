@@ -372,7 +372,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Звіт скопійовано. Встав його в issue, що щойно відкрився в браузері (Ctrl+V).",
   "Report on GitHub": "Повідомити на GitHub",
   "Reset": "Скинути",
-  "Reset all": "Скинути все",
   "Restart now": "Перезапустити зараз",
   "Restart: press again restarts it": "Спочатку: повторне натискання запускає знову",
   "Resume": "Продовжити",
@@ -380,7 +379,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "Правий клік на кнопці → Грати наступним, щоб поставити її в чергу після звуку, що грає.",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "Виконати лише цей пошук напряму, не через Tor: сайт побачить твою справжню адресу",
   "Save": "Зберегти",
-  "Save as new sound": "Зберегти як новий звук",
   "Search": "Пошук",
   "Search Myinstants: short meme sound buttons": "Пошук на Myinstants: короткі мем-звуки",
   "Search SoundCloud": "Пошук на SoundCloud",
@@ -3115,5 +3113,6 @@
   "Sound output": "Виведення звуку",
   "Interface size": "Розмір інтерфейсу",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Робить усе в Onion Board більшим або меншим: текст, кнопки й педи.",
-  "Onion Board changes size after a restart.": "Onion Board змінить розмір після перезапуску."
+  "Onion Board changes size after a restart.": "Onion Board змінить розмір після перезапуску.",
+  "Save a copy": "Зберегти копію"
 }

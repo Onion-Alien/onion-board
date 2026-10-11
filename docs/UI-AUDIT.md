@@ -63,7 +63,7 @@ the affected states; include its PR and validation evidence here.
 
 ## Polish next
 
-- [ ] **U5: Button/icon/label consistency.** Reset, help, folder and configuration
+- [x] **U5: Button/icon/label consistency.** Reset, help, folder and configuration
   actions mix text, icon-with-text and icon-only treatments. Examples include What
   do these do?, Save as new sound and Browse for a program. Targets: `ui/destpanel.py`,
   `ui/dialogs.py`, `ui/programpick.py`, `settings.py`. Acceptance: short labels, a
@@ -77,8 +77,18 @@ the affected states; include its PR and validation evidence here.
   named "Open folder"; its tooltip adds what the folder holds. Kept labelled on
   purpose: *Sounds folder* in the toolbar and *Browse for a program*, where a new
   person needs the words. Checked offscreen in Dark (`tests/test_icon_actions.py`).
-  Still open: the reset, help (*What do these do?*) and configuration families,
-  and *Save as new sound*.
+
+  Rest done (PR #415): **reset family** (`panel.reset_button`): one slim muted
+  *Reset* link with the reset arrow beside an effect, the live controls (was *Reset
+  all*, a filled button) and a sound's effects (was a small button); the tooltip says
+  what goes back, heading rows keep their height. **Help**: the sound modes' *What do
+  these do?* (a four-word button on its own row) is an ⓘ beside the *Who's listening*
+  heading (`panel.info_button`, `card(beside=...)`, centred on the heading's cap
+  height). The mode buttons got the sidebar mode button's pictures. *Save as new
+  sound* is *Save a copy* (three words at most). **Configuration**: the two *More
+  options* disclosures already share one look (`#fold`); *Make it yours* vs inline
+  options is U3. Checked offscreen in Dark and Light at 800x600 and 1180x720
+  (`tests/test_icon_actions.py`).
 
 - [ ] **U6: Settings card hierarchy.** Sampled General/Audio/Connection cards are
   predominantly stacked forms; Appearance and Recording have stronger grouping
