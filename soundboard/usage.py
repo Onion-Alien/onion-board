@@ -13,10 +13,15 @@ last send, as counts, never the report itself: a crash report or a freeze saved
 the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
 soundboard/engine.py:1090`; a freeze also its caller's line, the library function it
 was stuck in, how long it lasted and whether the window or another thread was busy:
-never its message or anything else from the report), or
-the last run ending without the app closing itself (`unclean-exit/<version>/<why>`:
-a hard crash, ended in Task Manager, a power cut; exitwatch.py works out which, on
-this PC). Past MAX_PROBLEMS in one send, one `problems-dropped/<bucket>` says roughly
+never its message or anything else from the report), an error the app caught itself and
+showed as a warning instead of crashing (`warned/<version>/<type>@<soundboard/…py:line>`
+from `warned()`, the type and the deepest line of our own code it came from, never the
+message), or the last run ending without the app closing itself
+(`unclean-exit/<version>/<why>`: a hard crash, ended in Task Manager, a power cut;
+exitwatch.py works out which, on this PC), or a run that died before it even started
+(`startup-failed/<version>` when the breadcrumb bootmark.py leaves in main.py is still
+there the next time, with the native stacks or Windows' own error for it when either is
+there). Past MAX_PROBLEMS in one send, one `problems-dropped/<bucket>` says roughly
 how many more. On the first start of a new version, `updated/<from>-to-<to>` (so an
 update that never finished shows up as an *Update now* without one). One-off events
 wait in config.json until a send takes them. And `uninstall/<version>` when the
@@ -467,6 +472,9 @@ _OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+
                         r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)
 _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
+# the same "our own file" rule as _OUR_FRAME, for a caught exception's traceback object
+# (warned): the package folder down, never the folders above it
+_OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+)?[\\/][a-z0-9_]+\.py")
 
 
 def _ours(stack: str) -> list[str]:
@@ -482,6 +490,20 @@ def _where(stack: str) -> str:
     """The deepest of our own lines in a report's stack, or ""."""
     frames = _ours(stack)
     return frames[-1] if frames else ""
+
+
+def _tb_where(tb) -> str:
+    """The deepest of our own lines in a caught exception's traceback, as
+    `soundboard/engine.py:1090` (deeper frames can be another library's: only ours
+    count), or ""."""
+    where = ""
+    while tb is not None:
+        name = str(tb.tb_frame.f_code.co_filename).replace(chr(92), "/")
+        m = _OUR_FILE.search(name)
+        if m and not m.group(0).startswith("soundboard/threadnames.py"):
+            where = f"{m.group(0)}:{tb.tb_lineno}"
+        tb = tb.tb_next
+    return where
 
 
 # the innermost frame of a stuck window, when it's outside our code: only the module's
@@ -645,6 +667,26 @@ def mark_stopped(app_dir: Path) -> None:
         pass
 
 
+def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "") -> str:
+    """`startup-failed/<version>` for a run that died before it started (bootmark.py's
+    breadcrumb was left behind): a crash while Qt or a module loaded, which left no
+    report and no running.txt. Adds what ended it when it's known -- the native stacks
+    faulthandler caught, or Windows' own error for that process -- as names and our own
+    file:line only, never a message. Runs wevtutil (call it off the UI thread)."""
+    from soundboard import exitwatch
+    event = f"startup-failed/{version}"
+    err, where = exitwatch.native_summary(native)
+    if err or where:
+        return event + "/" + "@".join(p for p in (err, where) if p)
+    events = exitwatch.windows_events(pid) if pid else []
+    for ev in events:
+        if ev["kind"] == "windows-error":
+            return event + "/" + "@".join(p for p in (ev["code"], ev["module"]) if p)
+    if any(ev["kind"] == "not-responding" for ev in events):
+        return event + "/not-responding"
+    return event
+
+
 _pending: list[str] = []   # an unclean exit found at start, for the next send
 MAX_PENDING = 20           # one-off events kept in cfg.stats_pending while unsent
 
@@ -660,6 +702,26 @@ def _keep(cfg, events) -> None:
     have = [e for e in (cfg.stats_pending if isinstance(cfg.stats_pending, list) else [])
             if isinstance(e, str)]
     cfg.stats_pending = [*have, *(e for e in events if e)][:MAX_PENDING]
+
+
+_warned: set[str] = set()   # reportable problems handled this run, for warned()
+
+
+def warned(e: BaseException) -> None:
+    """The app caught an error it couldn't fix and showed the user itself, as a warning
+    instead of a crash (errors.warn / errors.html): count that it happened, once per
+    distinct (type, place) per run, as `warned/<version>/<type>@<soundboard/…py:line>`
+    -- the type and the deepest line of our own code it came from (like error/ events),
+    never its message (a message can hold a path, a device or a user name). A string
+    problem (no traceback) isn't counted."""
+    if not isinstance(e, BaseException):
+        return
+    where = _tb_where(e.__traceback__)
+    key = f"{type(e).__name__}@{where}" if where else type(e).__name__
+    if key in _warned:
+        return
+    _warned.add(key)
+    note(f"warned/{__version__}/{key}")
 
 
 def uninstall_event() -> str:

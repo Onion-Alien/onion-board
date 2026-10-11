@@ -12,7 +12,9 @@ sentence to show, the original message (personal paths scrubbed) for a report, a
 whether it's worth reporting — things the user can't fix themselves, like a
 downloader hiccup or a bug, as opposed to a private video or a full disk.
 `report_url()` / `report_link()` / `warn()` offer such a problem as a pre-filled
-issue on this app's own GitHub; nothing is ever sent by the app itself.
+issue on this app's own GitHub; the app sends nothing itself, though a reportable one
+that `warn` / `html` shows is also counted for the anonymous usage count
+(`usage.warned`: its type and the deepest line of our own code only, never a message).
 """
 from __future__ import annotations
 
@@ -358,7 +360,21 @@ def html(e: BaseException | str | None, before: str = "", where: str = "") -> st
     """Rich text for a label: `before` + the plain words, escaped, + a report link."""
     import html as _html
     p = describe(e)
+    _count(p, e)
     return _html.escape(f"{before}{p.text}") + report_link(p, where)
+
+
+def _count(p: Problem, e) -> None:
+    """A reportable problem the app handled itself (warn / html): tell the usage count
+    it happened (usage.warned), so a bug the user can carry on past still shows up.
+    Type and place only, never the message. Counting never breaks a warning."""
+    if not p.reportable:
+        return
+    try:
+        from soundboard import usage
+        usage.warned(e)
+    except Exception:  # noqa: BLE001 - counting must never raise in a warning
+        log.debug("couldn't count the problem", exc_info=True)
 
 
 def linkify(label) -> None:
@@ -380,6 +396,7 @@ def warn(parent, title: str, e: BaseException | str | None, before: str = "",
 
     from soundboard.ui import busy, toast
     p = describe(e)
+    _count(p, e)
     action = None
     if p.reportable:
         url = report_url(p, where or title)

@@ -251,8 +251,10 @@ def test_update_now_fetches_its_own_copy_of_the_installer():
 @pytest.fixture(autouse=True)
 def _no_pending():
     usage._pending.clear()
+    usage._warned.clear()
     yield
     usage._pending.clear()
+    usage._warned.clear()
 
 
 def test_the_daily_count_says_which_tabs_were_opened_then_forgets_them(sent):
@@ -445,6 +447,62 @@ def test_a_run_that_never_closed_itself_is_an_unclean_exit(sent, app_dir):
     usage.maybe_send(cfg, app_dir=app_dir)
     assert [h["path"] for h in _hits(sent[0][0])] == [f"unclean-exit/{__version__}"]
     assert usage._pending == [] and cfg.stats_pending == []
+
+
+_NATIVE = ("Windows fatal exception: access violation\n\n"
+           "Current thread 0x1 (most recent call first):\n"
+           '  File "soundboard\\engine.py", line 1090 in _callback\n')
+
+
+def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
+    """A run whose breadcrumb was left (bootmark.py) died during start-up: counted as
+    startup-failed/<version>, with the native stacks faulthandler caught when there are
+    any, or Windows' own error for that process."""
+    from soundboard import exitwatch
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
+    assert usage.startup_failed("/x", "1.9.28", 42, _NATIVE) == (
+        "startup-failed/1.9.28/access-violation@soundboard/engine.py:1090")
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
+        {"kind": "windows-error", "code": "access-violation", "module": "Qt6Core.dll"}])
+    event = usage.startup_failed("/x", "1.9.28", 42)   # (split: not an e-mail address)
+    assert event.startswith("startup-failed/1.9.28/access-violation@")
+    assert event.endswith("Qt6Core.dll")
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
+        {"kind": "not-responding", "code": "", "module": ""}])
+    assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28/not-responding"
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
+    assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28"
+
+
+def test_a_handled_problem_is_counted_once_with_our_line_never_the_message():
+    """errors.warn / html show a problem the app caught; usage.warned counts it, once
+    per run, as the error's type and the deepest line of our own code it came from."""
+    try:
+        exec(compile("def f():\n    raise KeyError('D:/private/secret.wav')\nf()",
+                     "D:\\private\\code\\soundboard\\engine.py", "exec"), {})
+    except KeyError as e:
+        usage.warned(e)
+        usage.warned(e)   # the same (type, place) again: once
+    assert usage._pending == [f"warned/{__version__}/KeyError@soundboard/engine.py:2"]
+    assert "secret" not in usage._pending[0]
+    # a problem whose traceback is all another library's: the type only
+    try:
+        exec(compile("raise ValueError('x')", "C:\\Python\\Lib\\json\\decoder.py", "exec"), {})
+    except ValueError as e:
+        usage.warned(e)
+    assert usage._pending[-1] == f"warned/{__version__}/ValueError"
+    usage.warned("an error string, no traceback")   # never counted
+    assert len(usage._pending) == 2
+
+
+def test_errors_counts_a_reportable_problem_but_not_the_pc_situation(monkeypatch):
+    from soundboard import errors
+    counted = []
+    monkeypatch.setattr(usage, "warned", counted.append)
+    errors.html(TypeError("boom in our code"))     # a bug: counted, offered a report
+    assert [type(x).__name__ for x in counted] == ["TypeError"]
+    errors.html(OSError(112, "no space"))          # the disk is full, not a bug
+    assert len(counted) == 1
 
 
 def test_a_noted_event_survives_a_failed_send_and_a_quit(sent, app_dir, monkeypatch):
