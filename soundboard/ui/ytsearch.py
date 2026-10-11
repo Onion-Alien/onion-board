@@ -24,7 +24,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import net, netlog, quality, theme, ytdl
+from soundboard import net, netlog, quality, theme, usage, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
 from soundboard.ui import busy, icons
@@ -809,7 +809,7 @@ class SearchResults(RoundedFrame):
         self.more_btn = QPushButton(_("Show more"))
         self.more_btn.setCursor(Qt.PointingHandCursor)
         icons.set_icon(self.more_btn, "fold_open", size=16)
-        self.more_btn.clicked.connect(self._more)
+        self.more_btn.clicked.connect(lambda: (usage.used("search-show-more"), self._more()))
         self.more_btn.hide()
         more = QHBoxLayout()
         more.setContentsMargins(0, 4, 0, 0)   # in line with Back and the cards' panels

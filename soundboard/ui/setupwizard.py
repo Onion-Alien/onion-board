@@ -32,7 +32,7 @@ from soundboard import directmic
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
-from soundboard import library, net, otherboards
+from soundboard import library, net, otherboards, usage
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
@@ -441,6 +441,7 @@ class SetupWizard(QDialog):
         cfg = self.win.cfg
         if cfg.use_mode == self._use:
             return
+        usage.used(f"use-{self._use}")   # the answer's name only (usage.py)
         cfg.use_mode = self._use
         apply_use(self.win, self._use)
         cfg.save()
@@ -810,6 +811,7 @@ class SetupWizard(QDialog):
         if self.setup_show.on:
             self.setup_show._stop()
         if not self.win.cfg.use_mode:   # closed on "What's it for?": asked once is enough
+            usage.used("use-skipped")
             self.win.cfg.use_mode = "normal"
             self.win.cfg.save()
         if r != QDialog.Accepted:
