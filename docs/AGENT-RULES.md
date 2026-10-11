@@ -43,7 +43,10 @@ Every task, before changing anything (details in `CLAUDE.md`):
   boards, 800x600, 1180x720, and the mini/full transition. Inspect controls together,
   including their spacing and unused areas, rather than approving individual widgets.
 - Keep the large drop target across the board's full width. Keep the audio footer compact
-  and its controls using the available width. A hidden playback label must leave no
+  and its controls using the available width. On a full-screen window the search box,
+  seek bar, *What others hear* meter and drop box stop at their caps (`SEARCH_MAX_W`,
+  `SEEK_MAX_W`, `METER_MAX_W`, `DROP_MAX_W`, all above their 1180x720 widths) and the
+  spare room is one gap, not spread through the controls (U11). A hidden playback label must leave no
   reserved gap before the seek slider. Sidebar buttons need at least 34 px height and
   4 px spacing at normal window sizes. Preserve normal navigation at 800x600.
 - Add regression checks for a reported layout defect, and run them before committing.

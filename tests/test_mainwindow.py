@@ -1136,6 +1136,35 @@ def test_drop_target_keeps_the_full_board_width(window, qapp):
     assert rect.width() == window.grid.width() - margins.left() - margins.right() - 4
 
 
+def test_full_screen_caps_utility_widths(window, qapp):
+    """At 1920x1080 the search box, the seek bar, the What others hear meter and the
+    drop box stop at their caps (DESIGN: narrow by default); the volume groups stay at
+    the right edge, and the empty board's Bun stays over its drop box."""
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    window.resize(1920, 1080)
+    from PySide6.QtTest import QTest
+    QTest.qWait(150)   # the window's re-fit runs on a timer
+    assert window.search.width() == main.SEARCH_MAX_W
+    assert window._name_seek.width() == main.SEEK_MAX_W
+    assert 60 <= window.out_meter.width() <= main.METER_MAX_W
+    assert window.grid.drop_area().width() == window.grid.DROP_MAX_W
+    # the room past the caps is one gap after the time, not spread into the volume
+    assert window.vol_sound.width() <= window.vol_sound.maximumWidth()
+    gap = window.speed_btn.geometry().left() - window.np_time.geometry().right()
+    assert gap > 100
+    for edge, bar in ((window.chk_monitor, window.transport), (window.vol_mon, window.mixer)):
+        right = edge.mapTo(bar, edge.rect().topRight()).x()
+        assert bar.width() - right <= 24
+    window.cfg.sounds[:] = []
+    window._rebuild_pads()
+    qapp.processEvents()
+    box = window.grid.drop_area()
+    bun = window.grid.bun.geometry().translated(window.grid.empty.pos())
+    assert box.width() == window.grid.DROP_MAX_W
+    assert abs(bun.center().x() - box.center().x()) <= 3
+
+
 def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     window.apply_theme("Dark")
     window.tabs.setCurrentIndex(0)

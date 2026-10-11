@@ -1032,6 +1032,7 @@ class PadGrid(QWidget):
     HOW_TO = DROP_HINT = _("Drop sound files here")
     NO_MATCH = _("No sounds match the search\nor this category")
     DROP_HINT_HEIGHT = 110
+    DROP_MAX_W = 1000   # the drop box on a full-screen window (DESIGN: narrow by default)
 
     def __init__(self):
         super().__init__()
@@ -1050,6 +1051,7 @@ class PadGrid(QWidget):
         # files are dragged over
         self.empty = QWidget()
         self.empty.setAttribute(Qt.WA_TranslucentBackground)
+        self.empty.setMaximumWidth(self.DROP_MAX_W + 4)   # Bun stays over the drop box
         ev = QVBoxLayout(self.empty)
         ev.setContentsMargins(0, 24, 0, 4)
         ev.setSpacing(12)
@@ -1200,7 +1202,7 @@ class PadGrid(QWidget):
             # across the whole width, however wide that is now (a fixed width here kept
             # the grid as wide as the window once was: a shrunk window showed nothing)
             grid.setAlignment(Qt.AlignTop)
-            grid.addWidget(self.empty, 0, 0)
+            grid.addWidget(self.empty, 0, 0)   # (no alignment: that shrinks it to its hint)
             self.empty.show()
             return
         grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
@@ -1257,24 +1259,23 @@ class PadGrid(QWidget):
 
     def drop_area(self) -> QRectF | None:
         """The same drop box below Bun on an empty board or below the last card row."""
+        m = self.grid.contentsMargins()
+        # the board's width, whatever the pad size (as wide as the pads' columns, it
+        # jumped about as Pad size moved), up to DROP_MAX_W on a full-screen window
+        width = min(self.width() - m.left() - m.right() - 4, self.DROP_MAX_W)
         if not self.pads and not self.empty.isHidden():
-            m = self.grid.contentsMargins()
             top = self.empty.y() + self.empty_text.y()
-            return QRectF(m.left() + 2, top, self.width() - m.left() - m.right() - 4,
-                          self.DROP_HINT_HEIGHT)
+            return QRectF(m.left() + 2, top, width, self.DROP_HINT_HEIGHT)
         if not self._n_shown or self._shape is None or self.rows():
             return None
         cols, w = self._shape
-        m, sp = self.grid.contentsMargins(), self.grid.spacing()
+        sp = self.grid.spacing()
         rows = -(-self._n_shown // cols)
         top = m.top() + rows * (self.pad_h(w) + sp) + 2
         room = self.height() - top - m.bottom() - 4
         if room < 90:
             return None
-        # the full width, whatever the pad size: as wide as the pads' columns, it
-        # jumped about as Pad size moved
-        return QRectF(m.left() + 2, top, self.width() - m.left() - m.right() - 4,
-                      min(room, self.DROP_HINT_HEIGHT))
+        return QRectF(m.left() + 2, top, width, min(room, self.DROP_HINT_HEIGHT))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

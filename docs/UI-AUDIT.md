@@ -132,9 +132,20 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   4.0, Dark 4.2): the style sheet now gives it `$muted` (5.9, 11.4, 5.9). Checked
   offscreen in Dark, Light and High Contrast at 440, 800x600, 1180x720 and 1920x1080
   (`tests/test_ui_audit.py`).
-- [ ] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
+- [x] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
   hear* meter, the search box and the drop box run the whole width. Cap utility widths
   (DESIGN: narrow by default) and recheck with a populated board.
+
+  Done (PR #PRNUM): caps chosen above each control's width at 1180x720, so normal and
+  small windows are unchanged (the 10 October "full width" rule in AGENT-RULES still
+  holds there; it now names the caps): search 560 px, playing name + seek 720 (its
+  cap before 3e31240c), meter 320, drop box 1000. The spare room is one gap: after the
+  search's site button (library tools stay right), after the time (speed and volume
+  stay right), after *Hear what they hear* (headphones stay right). The Sounds volume
+  no longer grows, like the mixer's. The empty board's Bun area shares the drop box
+  cap, so Bun stays centred over it. Checked offscreen, populated and empty, Dark and
+  Light at 440, 800x600, 1180x720 and 1920x1080, width sweeps 1920 -> 440 -> 1920
+  (`tests/test_mainwindow.py::test_full_screen_caps_utility_widths`).
 
 ### Features for later (not UI fixes; after 2.0)
 

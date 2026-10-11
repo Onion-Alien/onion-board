@@ -154,6 +154,11 @@ TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
+# Full-screen caps (DESIGN: narrow by default). Each is above what the control gets at
+# 1180x720, so normal and small windows still use the whole width.
+SEARCH_MAX_W = 560    # the search box
+SEEK_MAX_W = 720      # the playing sound's name and its seek bar
+METER_MAX_W = 320     # the "What others hear" level meter
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
@@ -1287,6 +1292,7 @@ class MainWindow(QMainWindow):
                                 "OBS…): your mic plus whatever is live"))
         self.out_meter = Meter()
         self.out_meter.setMinimumWidth(60)
+        self.out_meter.setMaximumWidth(METER_MAX_W)
         self.out_meter.setToolTip(_("Level of what others receive (Discord, the game, OBS…)"))
         row.addWidget(self.out_meter, 1)
         self.btn_check = QPushButton(_("Hear what they hear"))
@@ -1297,6 +1303,7 @@ class MainWindow(QMainWindow):
         self.btn_check.toggled.connect(self.on_mic_check)
         icons.set_icon(self.btn_check, "ear", checked_color="#ffffff")
         row.addWidget(self.btn_check)
+        row.addStretch(0)   # past METER_MAX_W: the room after its button, not between
         self.btn_check.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         h.setStretchFactor(self._decks[1][-1], 1)   # the "what others hear" group takes the room
 
@@ -1414,6 +1421,7 @@ class MainWindow(QMainWindow):
         self.search.setToolTip(self._search_tip)
         self.search.setClearButtonEnabled(True)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
+        self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
         # and only once it pauses (_on_search_text); text set by the app filters at once
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
@@ -1497,6 +1505,7 @@ class MainWindow(QMainWindow):
         tb.addWidget(vsep())
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
+        tb.addStretch(0)   # past SEARCH_MAX_W: the room goes here, the library tools stay right
         tb.addWidget(vsep())
         tb.addWidget(more)
         tb.addWidget(vsep())
@@ -1666,8 +1675,10 @@ class MainWindow(QMainWindow):
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
         self._name_seek = NameAndSeek(self.np_name, self.seek, 190)
+        self._name_seek.setMaximumWidth(SEEK_MAX_W)
         th.addWidget(self._name_seek, 1)
         th.addWidget(self.np_time)
+        th.addStretch(0)   # past SEEK_MAX_W: the room goes here, the volume stays right
         # only for a pad made from a video (soundboard.videos): shows it in step
         self.btn_video = QPushButton(_("Video"))
         self.btn_video.setToolTip(_("Watch this sound's video while it plays. The sound still "
@@ -1695,6 +1706,9 @@ class MainWindow(QMainWindow):
                                                           "1000% in the box"))
         self.vol_sound.changed.connect(lambda v: self.set_option("sound_vol", v))
         th.addWidget(self.vol_sound)
+        # its own width: past SEEK_MAX_W the room is the gap after the time, not a
+        # longer slider with the % pushed away from it
+        self.vol_sound.setMaximumWidth(self.vol_sound.sizeHint().width())
         self.chk_monitor = QCheckBox(_("Hear it myself"))
         self.chk_monitor.setChecked(c.monitor_sounds)
         self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
