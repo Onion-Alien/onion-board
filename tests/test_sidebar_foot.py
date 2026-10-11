@@ -72,6 +72,30 @@ def test_settings_is_its_icon_only_and_selected_round_it(qapp):
     rail.close()
 
 
+def test_the_line_over_settings_has_the_same_gap_on_both_sides(qapp):
+    """Stop all's icon over the line and Settings' icon under it sit as far from it,
+    open and shut (the cog is as tall as the buttons over it: its square is painted)."""
+    from PySide6.QtWidgets import QFrame
+    from soundboard.ui.sidebar import ICON
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "One")
+    stop, gear = QPushButton("Stop all"), QPushButton()
+    stop.setObjectName("danger")
+    rail = SideRail(tabs, QWidget(), QLabel(), QLabel(), [], True, [gear], status=[stop])
+    rail.resize(rail.width(), 600)
+    rail.show()
+    for is_open in (True, False):
+        rail.set_open(is_open)
+        QApplication.processEvents()
+        line = [f for f in rail.findChildren(QFrame, "raildiv") if f.isVisible()][-1]
+        y = line.geometry().top()
+        above = y - (stop.geometry().center().y() + ICON // 2)
+        below = gear.geometry().center().y() - ICON // 2 - y
+        assert abs(above - below) <= 1, (is_open, above, below)
+        assert gear.height() == stop.height()
+    rail.close()
+
+
 def test_a_rail_without_alerts_has_no_stray_window(qapp):
     tabs = SideTabs()
     tabs.addTab(QWidget(), "One")
