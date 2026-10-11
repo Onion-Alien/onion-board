@@ -21,4 +21,7 @@ The rules agents break most, in short:
 - UI work follows [docs/DESIGN.md](docs/DESIGN.md), including its control/surface
   decisions and UI workflow. [docs/UI-AUDIT.md](docs/UI-AUDIT.md) tracks existing
   inconsistencies and has a handoff prompt; recheck an item before fixing it.
+- Dialog footer actions sit bottom-right (stretch before the action group), with
+  the main action first within the group. This does not right-align ordinary fields
+  or contextual card/toolbar actions.
 - Check with `scripts\precommit.ps1` before committing.

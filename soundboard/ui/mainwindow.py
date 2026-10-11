@@ -729,7 +729,7 @@ class MainWindow(QMainWindow):
             w.setToolTip(about)
         whats_new = _("What's new")   # the version is a button to it
         self.tagline.setToolTip(f"{about}\n{whats_new}")
-        self.tagline.clicked.connect(self.show_whats_new)
+        self.tagline.clicked.connect(lambda: (usage.used("whats-new"), self.show_whats_new()))
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.PointingHandCursor)
@@ -1173,6 +1173,7 @@ class MainWindow(QMainWindow):
         self.mini_mic.setFixedHeight(28)
         self.mini_mic.setToolTip(_("Mute or unmute your microphone for others"))
         self.mini_mic.toggled.connect(self.on_mic_toggle)
+        self.mini_mic.clicked.connect(lambda: usage.used("mini-mic-mute"))   # clicks only
         connection.addWidget(self.mini_mic)
         cv.addLayout(connection)
         v.addWidget(card)
@@ -1969,7 +1970,7 @@ class MainWindow(QMainWindow):
         guide.setToolTip(_("Walks you through mic, headphones, where your sounds go (your mic, "
                            "the cable, another device or nowhere) and Discord"))
         icons.set_icon(guide, "check")
-        guide.clicked.connect(self.run_setup)
+        guide.clicked.connect(lambda: (usage.used("setup-guide-opened"), self.run_setup()))
         chat.addWidget(guide)
         hv.addLayout(chat)
 
@@ -7501,6 +7502,7 @@ class MainWindow(QMainWindow):
         shown = [b for b in self.rail.buttons if b.isVisible()]
         if not shown:
             return
+        usage.used("tab-keys")
         if absolute:
             if n < len(shown):
                 shown[n].click()

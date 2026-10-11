@@ -10,7 +10,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
-from soundboard import sourceinfo, theme
+from soundboard import sourceinfo, theme, usage
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 
@@ -19,10 +19,12 @@ PIC_W, PIC_H = 160, 90   # a video's 16:9 thumbnail
 
 def open_link(src: dict, window=None) -> bool:
     """Open the video in the browser."""
+    usage.used("source-open")
     return busy.open_url(src.get("link", ""), window=window)
 
 
 def copy_link(src: dict, window=None) -> None:
+    usage.used("source-copy-link")
     QApplication.clipboard().setText(src.get("link", ""))
     busy.toast(window, _("✓ Link copied"), "ok")
 
@@ -32,6 +34,7 @@ class SourceDialog(QDialog):
 
     def __init__(self, meta, parent=None):
         super().__init__(parent)
+        usage.used("source-details")
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.meta = meta
         self.src = sourceinfo.clean(meta.source)
@@ -113,17 +116,21 @@ class SourceDialog(QDialog):
         self.btn_copy.clicked.connect(self._copy)
         close = QPushButton(_("Close"))
         close.clicked.connect(self.accept)
+        # the dialog's actions bottom-right, the main one first
+        row.addStretch(1)
         for b in (self.btn_open, self.btn_copy, close):
             row.addWidget(b)
+        # the bin acts on the details above: on the left, beside them, last in Tab
+        # order; focus starts on Open (set below), never on deleting
         self.btn_forget = QPushButton()
         self.btn_forget.setObjectName("iconbutton")
         icons.set_icon(self.btn_forget, "trash", "danger_text")
         self.btn_forget.setToolTip(_("Delete info"))
         self.btn_forget.setAccessibleName(_("Delete info"))
         self.btn_forget.clicked.connect(self._forget)
-        row.addWidget(self.btn_forget)
-        row.addStretch(1)
+        row.insertWidget(0, self.btn_forget)
         v.addLayout(row)
+        self.btn_open.setFocus()
         self.setMaximumWidth(620)
 
     def _forget(self):
@@ -138,9 +145,11 @@ class SourceDialog(QDialog):
         if box.exec() != QMessageBox.Yes:
             return
         sourceinfo.forget(self.meta)
+        usage.used("source-deleted")
         self.forgotten.emit()
         self.accept()
 
     def _copy(self):
+        usage.used("source-copy-link")
         QApplication.clipboard().setText(self.src.get("link", ""))
         busy.flash(self.btn_copy, _("✓ Copied"))

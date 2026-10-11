@@ -27,7 +27,7 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
-from soundboard import errors, i18n
+from soundboard import errors, i18n, usage
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -563,6 +563,8 @@ class SettingsDialog(QDialog):
             if hits and named is None and words and all(w in title for w in words):
                 named = i
         nothing = bool(words) and first is None
+        if words:   # the names only, never what was typed (usage.py)
+            usage.used("settings-search-nothing" if nothing else "settings-search")
         self.no_match.setText(_("No settings match “{text}”", text=text.strip()))
         self.no_match.setVisible(nothing)
         self.tabs.setVisible(not nothing)
@@ -2300,11 +2302,14 @@ class SettingsDialog(QDialog):
     def _get_ffmpeg(self):
         """Get FFmpeg in the background (winget, which can take a minute), then say so."""
         from soundboard import ffmpegget
+        usage.used("get-ffmpeg")
         release = busy.hold(self.btn_ffmpeg, _("Getting FFmpeg…"))
         relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
 
         def finish(err):
             relay.deleteLater()
+            if err:
+                usage.used("get-ffmpeg-failed")
             release(_("✗ Failed") if err else _("✓ Got FFmpeg"))
             if qt_valid(getattr(self, "btn_ffmpeg", None)):
                 self._ffmpeg_sync(err or _("FFmpeg is ready: M4A, AAC and video files "

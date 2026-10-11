@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
                                QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
-from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, voicefx
+from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, usage, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                 SoundMeta, original_peaks)
@@ -359,10 +359,10 @@ class EditDialog(QDialog):
             return b
         self.btn_pic_file = pic_button(
             "folder", _("From a file (you can also drop a picture on the pad)"),
-            self._picture_from_file)
+            lambda: (usage.used("pad-picture-file"), self._picture_from_file()))
         self.btn_pic_link = pic_button(
             "browser", _("From a link: a picture's address, a YouTube video or a web page"),
-            self._picture_from_link)
+            lambda: (usage.used("pad-picture-link"), self._picture_from_link()))
         self.btn_pic_clear = pic_button("trash", _("Remove picture"),
                                         lambda: self._set_picture(""))
         self.pic_note = QLabel()
@@ -498,6 +498,8 @@ class EditDialog(QDialog):
         scroll.setWidget(self.effects)
         scroll.setFrameShape(QScrollArea.NoFrame)
         self.tabs.addTab(scroll, _("Effects"))
+        self.tabs.currentChanged.connect(
+            lambda i: i == 1 and usage.used("pad-effects"))   # the name only (usage.py)
         if tab == "effects":
             self.tabs.setCurrentIndex(1)
 

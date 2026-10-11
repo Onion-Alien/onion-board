@@ -30,7 +30,9 @@ one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`os/win11`, `os/win10`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
-triggershost.BoardHost.count, as `used/triggers-mode-colour`). And once each,
+triggershost.BoardHost.count, as `used/triggers-mode-colour`). A use is only noted
+on this PC (used()); it goes with the next daily count, as a yes for that name, never
+how many times. And once each,
 the first steps of a new install (`step/added-sound`, `step/played-sound`,
 `step/sent-to-others`), to see where new people get stuck; never for a copy that was
 counted before these existed. Also once each, switching on a tab a new user starts
@@ -116,6 +118,33 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "more-tabs-opened", "more-tabs-closed",
             *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice")),
             *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice")),
+            # the first start's "What's it for?" answer (setupwizard.uses keys), or
+            # the guide closed on that page
+            *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),
+            # the Triggers tab's Get Onion Watch window: shown, Get clicked, closed
+            "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",
+            # Get FFmpeg clicked / failed; a file that couldn't play without it
+            "get-ffmpeg", "get-ffmpeg-failed", "needs-ffmpeg",
+            # the link download bar: Cancel, Retry, shrunk to one line
+            "dl-cancel", "dl-retry", "dl-bar-small",
+            # a downloaded sound's source: Open on <site>, Copy link, Details, its info
+            # deleted, and Remember where it came from switched off (features_now)
+            "source-open", "source-copy-link", "source-details", "source-deleted",
+            "source-off",
+            # the Apps tab: a card or section dragged, a category added / renamed /
+            # deleted, and own categories set up (features_now)
+            "apps-reorder", "apps-category-added", "apps-category-renamed",
+            "apps-category-deleted", "apps-own-categories",
+            # Settings' search box used, and a search that found nothing
+            "settings-search", "settings-search-nothing",
+            # the mini player's mic mute switch; the setup guide opened from Setup
+            "mini-mic-mute", "setup-guide-opened",
+            # the side rail: Ctrl+1-9 / Ctrl+Tab, the version clicked for What's new,
+            # kept shut (features_now)
+            "tab-keys", "whats-new", "rail-shut",
+            # Show more under web search results; a pad's Edit: Effects tab, a picture
+            # from a file or a link
+            "search-show-more", "pad-effects", "pad-picture-file", "pad-picture-link",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
             # FEATURES, keep in step
@@ -135,6 +164,9 @@ STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
+# the Apps tab's own categories (ui/appspanel.py APP_CATEGORIES + "Other"): any other
+# name in Config.apps_categories is one the user made (counted as apps-own-categories)
+APPS_BUILT_IN = ("Browsers", "Music & media", "Calls & chat", "Games", "Other")
 # the feedback box's "What would you improve?" picks (ui/feedbackdialog.py)
 IMPROVE = ("sounds", "setup", "voice-chat", "voice-changer", "speed", "looks", "bugs",
            "other")
@@ -208,6 +240,16 @@ def _event(name: str, sid: str) -> dict:
     return {"path": name, "title": name, "event": True, "session": sid, "ref": user_tag(sid)}
 
 
+def due(sent: float, now: float) -> bool:
+    """Is the daily count due: a new day on this PC's clock since the last one, or a
+    whole day gone by. By the calendar, not 24 hours: someone who used it at 8 pm
+    and again at 6 pm the next day counts on both days (with a 24-hour rule the
+    second day went with the third, and looked like a day off)."""
+    if now - sent >= EVERY_S:
+        return True
+    return now > sent and time.localtime(now)[:3] != time.localtime(sent)[:3]
+
+
 def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     """What a send would say: the daily "still here" for this version if one is due
     (with "first-start" the first time ever, and the tabs opened since the last one),
@@ -216,7 +258,7 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     if event:
         return [_event(event, sid)]
     out = [_event(e, sid) for e in extra]
-    if now - cfg.stats_sent < EVERY_S:
+    if not due(cfg.stats_sent, now):
         return out
     out.insert(0, {"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
                    "session": sid, "ref": user_tag(sid)})
@@ -382,6 +424,13 @@ def features_now(cfg) -> list[str]:
         out.append("phone-remote")
     if cfg.also_send:
         out.append("also-send")
+    from soundboard import quality
+    if not quality.current.keep_source:
+        out.append("source-off")
+    if set(cfg.apps_categories or ()) - set(APPS_BUILT_IN):
+        out.append("apps-own-categories")
+    if not cfg.sidebar_open:
+        out.append("rail-shut")
     return out
 
 
