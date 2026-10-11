@@ -1,0 +1,3 @@
+- Switching theme no longer shows a half-styled window: Bun covers it for a moment, then it fades to the new theme.
+- Switching theme does less work (a drag-and-drop helper no longer checks every restyle event).
+- Menus and dropdowns show clearly which row the mouse is on, in every theme.

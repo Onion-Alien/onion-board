@@ -105,6 +105,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
 | `soundboard/ui/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
 | `soundboard/ui/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
+| `soundboard/ui/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded out after: never a half-styled frame |
 | `soundboard/ui/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
 | `soundboard/ui/quietbox.py` | no Windows "ding" from information/warning message boxes (same picture, shown as a pixmap); only critical errors keep their sound |
 | `soundboard/ui/weblinks.py` | web links (http/https/mailto) open through a helper started with the user's own environment, so a browser the app starts doesn't inherit the relay's proxy variables |

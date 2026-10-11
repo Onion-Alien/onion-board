@@ -26,6 +26,7 @@ colour_roles:          # token names in theme.THEMES; values change per theme
   surface: panel        # cards (QFrame#card, #setcard), bars
   surface_raised: card_hi   # hover, selected, a box inside a card
   button: btn / btn_hover / btn_press
+  item_hover: item_hover # a hovered menu / dropdown row (worked out per theme: always shows)
   text: text, text_hi (titles), muted (secondary), faint (disabled-looking)
   heading: section
   accent: accent / accent_hi / on_accent   # main action, on-state, Live, playing

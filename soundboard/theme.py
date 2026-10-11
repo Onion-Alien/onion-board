@@ -394,6 +394,19 @@ def _add_hover_token(t: dict[str, str]) -> None:
          if _contrast(c, t["on_accent"]) >= 4.5), t["accent_hi"])
 
 
+def _add_item_hover_token(t: dict[str, str]) -> None:
+    """item_hover: a hovered menu or dropdown row. btn_hover was 1.07-1.5:1 against the
+    menu (Flashbang, Blood Moon, Lava: no visible change). The menu's colour moved
+    towards the accent (or the text, when the accent itself is too faint) until the row
+    stands out (1.6:1) while its words still read (4.5:1)."""
+    if "item_hover" in t:
+        return
+    card = t["card"]
+    tries = [_mix(card, to, i / 50) for to in (t["accent"], t["text"]) for i in range(6, 26)]
+    t["item_hover"] = next((c for c in tries if _contrast(c, card) >= 1.6
+                            and _contrast(c, t["text_hi"]) >= 4.5), _mix(card, t["text"], 0.25))
+
+
 SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
 
 for _t in THEMES.values():
@@ -406,6 +419,7 @@ for _t in THEMES.values():
                        or c == _t["text_hi"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
+    _add_item_hover_token(_t)
 
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
@@ -725,8 +739,8 @@ QFrame#card QPushButton#miccheck:checked { background:#d32f2f; }
 QComboBox QAbstractItemView { background:$card; color:$text; border:1px solid $border_hi;
     padding:4px; outline:0; selection-background-color:$btn_press; selection-color:$text_hi; }
 QComboBox QAbstractItemView::item { min-height:28px; padding:0 10px; border-radius:6px; }
-QComboBox QAbstractItemView::item:hover { background:$btn_hover; color:$text_hi; }
-QComboBox QAbstractItemView::item:selected { background:$btn_hover; color:$text_hi; }
+QComboBox QAbstractItemView::item:hover { background:$item_hover; color:$text_hi; }
+QComboBox QAbstractItemView::item:selected { background:$item_hover; color:$text_hi; }
 QComboBox QAbstractItemView::item:disabled { color:$faint; }
 QPushButton::menu-indicator { image:url("$down"); width:9px; height:9px;
     subcontrol-origin:padding; subcontrol-position:center right; right:2px; }
@@ -778,7 +792,7 @@ QScrollBar::add-line, QScrollBar::sub-line { height:0; width:0; }
 QScrollBar::add-page, QScrollBar::sub-page { background:transparent; }
 QMenu { background:$card; border:1px solid $border_hi; padding:5px; }
 QMenu::item { padding:7px 22px 7px 12px; border-radius:6px; margin:1px 0; }
-QMenu::item:selected { background:$btn_hover; color:$text_hi; }
+QMenu::item:selected { background:$item_hover; color:$text_hi; }
 QMenu::item:checked { color:$accent_hi; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
