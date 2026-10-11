@@ -1547,3 +1547,17 @@ def test_the_radio_being_down_is_sad_bun_on_the_map_and_plain_words(tab):
     assert card.isVisibleTo(tab.flat) and card.bun.sad > 0.5 and not card._notes.isActive()
     tab.flat.set_points([{"id": "u", "lo": 0.0, "la": 0.0, "k": 1}])
     assert not card.isVisibleTo(tab.flat) and card.bun.sad == 0.0   # stations: happy again
+
+
+def test_search_spammed_with_the_same_words_asks_once(qapp, server, tmp_path):
+    d = RadioDirectory(tmp_path, bases=(server.base,))
+    res = []
+    d.results.connect(lambda q, st: res.append(q))
+    for _i in range(10):
+        d.search("rock")            # Enter held down: still on its way
+    assert process_events(qapp, lambda: res)
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert res == ["rock"]
+    assert sum("name=rock" in h for h in server.hits) == 1
+    d.search("rock")                # answered: asked again
+    assert process_events(qapp, lambda: len(res) == 2)

@@ -978,3 +978,30 @@ def test_open_results_follow_a_theme_switch(qapp):
         assert row.btn_play.styleSheet() != dark   # no Dark-only colours left on Light
     finally:
         theme.apply(qapp, "Dark")
+
+
+def test_spammed_enter_waits_for_the_search_already_running(qapp, window,  # noqa: F811
+                                                             monkeypatch):
+    import threading
+    go, calls = threading.Event(), []
+
+    def search(q, count=20, source="youtube"):
+        calls.append(q)
+        go.wait(5)
+        return [ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)]
+    monkeypatch.setattr(ytdl, "search", search)
+    window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
+        finished=types.SimpleNamespace(connect=lambda f: None))
+    window.search.setText("what is love")
+    for _i in range(20):
+        window.search.returnPressed.emit()                   # held: one search only
+    process_events(qapp, lambda: False, timeout=0.2)
+    assert calls == ["what is love"] and window.ytresults.loading.running()
+    go.set()
+    assert process_events(qapp, lambda: window.ytresults._rows, 5)
+    assert len(window.ytresults._rows) == 1                  # one set of cards
+    window.search.returnPressed.emit()                       # done: Enter searches again
+    assert process_events(qapp, lambda: len(calls) == 2, 5)
+    window.search.setText("rick astley")                     # new words: searched at once
+    window.search.returnPressed.emit()
+    assert process_events(qapp, lambda: calls[-1] == "rick astley", 5)

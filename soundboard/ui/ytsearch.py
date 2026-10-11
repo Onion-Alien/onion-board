@@ -755,6 +755,7 @@ class SearchResults(RoundedFrame):
         self.link = ""          # a pasted link shown as its own card (show_link), not a search
         self.source = "youtube"
         self._gen = 0
+        self._running: tuple[str, str] | None = None   # (query, site) still being searched
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
@@ -895,6 +896,9 @@ class SearchResults(RoundedFrame):
         query = " ".join(query.split())
         if not query or not ytdl.site_allowed(self.source):
             return False
+        if not direct and self._running == (query, self.source) and not self.isHidden():
+            return True   # Enter spammed: the same search is still on its way
+        self._running = (query, self.source)
         self.query = query
         self.link = ""
         self._gen += 1
@@ -923,6 +927,7 @@ class SearchResults(RoundedFrame):
                 self._rows or self.loading.running()):
             return True   # already showing (Enter after the paste looked it up)
         self.query = self.link = url
+        self._running = None
         self._gen += 1
         self._clear()
         netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name, picture and "
@@ -945,6 +950,7 @@ class SearchResults(RoundedFrame):
 
     def close_results(self):
         self._gen += 1       # a search still running is ignored when it lands
+        self._running = None
         self._loading(False)
         self._clear()
         self.link = ""
@@ -1082,6 +1088,7 @@ class SearchResults(RoundedFrame):
             self._add_rows(new, gen)
             self.more_btn.setVisible(bool(new) and self._asked < MAX_RESULTS)
             return
+        self._running = None
         self._loading(False)
         self.more_btn.hide()
         q = html.escape(self.query)
