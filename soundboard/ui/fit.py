@@ -85,7 +85,9 @@ class _Fitter(QObject):
 
     def _run(self):
         self._pending = False
-        fit(self.parent())
+        dialog = self.parent()
+        assert isinstance(dialog, QWidget)   # made on it
+        fit(dialog)
 
 
 def watch(dialog: QDialog) -> QDialog:

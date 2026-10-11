@@ -175,7 +175,9 @@ class FeedbackDialog(QDialog):
     def _fit_height(self):
         if not shiboken6.isValid(self):
             return
-        self.layout().activate()
+        lay = self.layout()
+        assert lay is not None   # made in __init__
+        lay.activate()
         self.resize(self.width(), self.minimumSizeHint().height())
 
     def send(self):
@@ -185,8 +187,9 @@ class FeedbackDialog(QDialog):
                                   self.bugs_text.text())
         self.not_sent.setVisible(not self.sent)
         # the stack is as tall as its tallest page: let the short thanks page shrink it
-        self.pages.widget(0).setSizePolicy(QSizePolicy.Policy.Ignored,
-                                           QSizePolicy.Policy.Ignored)
+        form = self.pages.widget(0)
+        assert form is not None   # the form, then the thanks
+        form.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         self.pages.setCurrentIndex(1)
         self.resize(self.width(), self.minimumSizeHint().height())
         self.form_btn.setFocus()

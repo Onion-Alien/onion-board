@@ -208,7 +208,7 @@ class LogoWidget(QWidget):
 
         # embers
         for x, y, _vx, _vy, life, size, ci in self.embers:
-            ec = QColor(EMBER_COLORS[ci])
+            ec = QColor(EMBER_COLORS[int(ci)])
             ec.setAlpha(int(255 * min(1.0, life * 1.5)))
             p.setBrush(ec)
             r = size * (0.5 + 0.5 * life)

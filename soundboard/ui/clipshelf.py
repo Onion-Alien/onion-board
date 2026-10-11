@@ -117,8 +117,8 @@ class ClipShelf(QWidget):
 
     def _picked(self) -> list[Clip]:
         out = []
-        for it in self.list.selectedItems() or ([self.list.currentItem()]
-                                                if self.list.currentItem() else []):
+        cur = self.list.currentItem()
+        for it in self.list.selectedItems() or ([cur] if cur else []):
             c = self.shelf.get(it.data(0, Qt.ItemDataRole.UserRole))
             if c is not None:
                 out.append(c)
@@ -127,7 +127,7 @@ class ClipShelf(QWidget):
     def _item(self, cid: str) -> QTreeWidgetItem | None:
         for i in range(self.list.topLevelItemCount()):
             it = self.list.topLevelItem(i)
-            if it.data(0, Qt.ItemDataRole.UserRole) == cid:
+            if it is not None and it.data(0, Qt.ItemDataRole.UserRole) == cid:
                 return it
         return None
 
@@ -156,7 +156,7 @@ class ClipShelf(QWidget):
         again = self._playing == (sid, cid) and self.engine.state(sid) is not None
         self.stop()
         c = self.shelf.get(cid) if cid else None
-        if again or c is None:
+        if again or c is None or not cid:
             return
         data = self._audio(c)
         if data is None or not len(data):
@@ -247,7 +247,8 @@ class ClipShelf(QWidget):
             self.list.setCurrentItem(it)
         m = QMenu(self)
         cid = it.data(0, Qt.ItemDataRole.UserRole)
-        playing = self._playing is not None and self._playing[1] == cid
+        playing_sid = (self._playing[0] if self._playing is not None and self._playing[1] == cid
+                       else None)
 
         def act(text, slot, icon=None):
             a = m.addAction(text)
@@ -255,9 +256,9 @@ class ClipShelf(QWidget):
                 a.setIcon(icons.icon(icon))
             a.triggered.connect(slot)
             return a
-        act(_("Stop") if playing and self._playing[0] == PREVIEW else _("Play (headphones)"),
+        act(_("Stop") if playing_sid == PREVIEW else _("Play (headphones)"),
             lambda: self.toggle_play(it), "play")
-        act(_("Stop sending") if playing and self._playing[0] == SEND
+        act(_("Stop sending") if playing_sid == SEND
             else _("Send to whoever's listening"), lambda: self.toggle_play(it, send=True),
             "live")
         m.addSeparator()

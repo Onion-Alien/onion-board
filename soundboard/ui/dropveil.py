@@ -12,7 +12,7 @@ from __future__ import annotations
 from pathlib import PurePath
 
 from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QCursor, QFont, QFontMetrics, QPainter, QPen
+from PySide6.QtGui import QColor, QCursor, QDragEnterEvent, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme
@@ -40,16 +40,19 @@ class DropVeil(QWidget):
         self._window = window
         # a drag moving from one child to the next leaves one and enters the other:
         # only hide when it's really left the window
-        self._leave = QTimer(self, singleShot=True, interval=60, timeout=self._check_left)
+        # (PySide takes properties and signals as keywords; the stubs don't know)
+        self._leave = QTimer(self, singleShot=True, interval=60, timeout=self._check_left)   # pyright: ignore[reportCallIssue]
         self.hide()
-        QApplication.instance().installEventFilter(self)
+        app = QApplication.instance()
+        assert app is not None
+        app.installEventFilter(self)
 
     def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
         t = ev.type()
         if t in (QEvent.Type.DragEnter, QEvent.Type.DragMove, QEvent.Type.DragLeave,
                  QEvent.Type.Drop) \
                 and isinstance(obj, QWidget) and obj.window() is self._window:
-            if t == QEvent.Type.DragEnter:
+            if t == QEvent.Type.DragEnter and isinstance(ev, QDragEnterEvent):
                 self._leave.stop()
                 paths = [u.toLocalFile() for u in ev.mimeData().urls() if u.isLocalFile()] \
                     if ev.mimeData().hasUrls() else []

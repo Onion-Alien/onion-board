@@ -587,7 +587,7 @@ def _kill_tree(p: subprocess.Popen, job) -> None:
         pass
 
 
-def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
+def install(info: ModuleInfo, on_line: Callable[[str], object]) -> bool:
     """Run the module's "install" steps (module.json), streaming their output to
     `on_line`. Blocking: call from a worker thread. Returns True on success."""
     if not info.install_steps:

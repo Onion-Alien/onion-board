@@ -4,6 +4,8 @@ the file itself is never cut (the trim is part of the sound's effects, see
 soundfx.trim)."""
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 from PySide6.QtCore import QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
@@ -22,7 +24,7 @@ class Waveform(QWidget):
     end') while a handle is dragged."""
     moved = Signal(float, float)
 
-    def __init__(self, peaks: np.ndarray, length: float):
+    def __init__(self, peaks: np.ndarray | Sequence[float], length: float):
         super().__init__()
         self.peaks = peaks
         self.length = max(length, 0.001)
@@ -113,7 +115,7 @@ class TrimPanel(QWidget):
     (start, end) as soundfx wants them (end 0 = the end of the sound)."""
     changed = Signal()
 
-    def __init__(self, peaks: np.ndarray, length: float):
+    def __init__(self, peaks: np.ndarray | Sequence[float], length: float):
         super().__init__()
         self.length = max(length, 0.0)
         v = QVBoxLayout(self)

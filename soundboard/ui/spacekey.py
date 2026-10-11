@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (QAbstractButton, QAbstractSpinBox, QApplication, 
 KEYBOARD_FOCUS = (Qt.FocusReason.TabFocusReason, Qt.FocusReason.BacktabFocusReason)
 
 
-def types_text(w: QWidget) -> bool:
+def types_text(w: QWidget | None) -> bool:
     """Space types a space here."""
     if isinstance(w, (QLineEdit, QAbstractSpinBox)):
         return True

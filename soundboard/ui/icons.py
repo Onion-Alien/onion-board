@@ -231,8 +231,8 @@ def _nav_arrow(direction):
     def draw(p, fill):
         pen = p.pen()
         pen.setWidthF(2.8)
-        pen.setCapStyle(Qt.RoundCap)
-        pen.setJoinStyle(Qt.RoundJoin)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         p.setPen(pen)
         s = -1 if direction == "back" else 1
         p.drawLine(QPointF(12 - 7 * s, 12), QPointF(12 + 7 * s, 12))
@@ -820,7 +820,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
     """`color`/`checked_color` are theme token names (e.g. "text", "on_accent") or
     literal colours ("#ff4d4f"). `selected` colours the current tab / a highlighted
     list item (accent, not Qt's washed-out tint)."""
-    def resolve(c):
+    def resolve(c: str) -> str:
         return theme.T.get(c, c)
     normal = resolve(color or "text")
     on = resolve(checked_color or "on_accent")

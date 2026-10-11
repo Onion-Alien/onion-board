@@ -17,7 +17,8 @@ from PySide6.QtWidgets import QWidget
 def active() -> bool:
     """Is the app in front (one of its windows has focus)?"""
     app = QGuiApplication.instance()
-    return app is None or app.applicationState() == Qt.ApplicationState.ApplicationActive
+    return (not isinstance(app, QGuiApplication)
+            or app.applicationState() == Qt.ApplicationState.ApplicationActive)
 
 
 class _Pauser(QObject):
@@ -56,7 +57,7 @@ def pause_in_background(widget: QWidget, start: Callable[[], None],
     front with `widget` showing. The widget still starts / stops itself on show / hide
     (checking `active()` before it starts)."""
     app = QGuiApplication.instance()
-    if app is not None:
+    if isinstance(app, QGuiApplication):
         app.applicationStateChanged.connect(_Pauser(widget, start, stop).on_state)
 
 
@@ -85,5 +86,5 @@ def slow_in_background(widget: QWidget, timer, front_ms: int,
     behind a game (a recording's length cap), just less often; start them with
     interval(front_ms, back_ms)."""
     app = QGuiApplication.instance()
-    if app is not None:
+    if isinstance(app, QGuiApplication):
         app.applicationStateChanged.connect(_Pacer(widget, timer, front_ms, back_ms).on_state)
