@@ -126,11 +126,11 @@ jobs:
         run: python scripts/check_code_doc.py
 
   # pyright over the whole repo: errors not in scripts/pyright_baseline.json fail
-  # (it's empty now, so any type error does). Linux, as it's quicker to start; the
-  # config checks as on Windows (pyproject's pythonPlatform). Same venv cache as
-  # test-linux.
+  # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no
+  # Windows-only APIs (QImage.fromHICON), so pyright there flags code that's fine.
+  # Same venv cache as the Windows test jobs.
   types:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
@@ -146,8 +146,8 @@ jobs:
       - if: steps.venv.outputs.cache-hit != 'true'
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install -r requirements.txt -r requirements-dev.txt
-      - run: .venv/bin/python scripts/check_types.py --all
+          .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
+      - run: .venv\Scripts\python scripts/check_types.py --all
 
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
   # most of the suite) in four jobs side by side, about a quarter of the wait.
