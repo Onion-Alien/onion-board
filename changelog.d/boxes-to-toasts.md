@@ -4,3 +4,5 @@
   couldn't download or start (with *Open the download page*), "Onion Board is up to date"
   (with *What's new*), sounds that weren't imported (with *See why*), a voice share code
   that isn't one, and a problem in the app (with *Report it*). Questions still ask.
+- A corner card's long button (*Open the download page*) sits under the words instead of
+  squeezing them into a thin column.
