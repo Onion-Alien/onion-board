@@ -63,7 +63,7 @@ def _assert_keylines(output, setup=True):
     labels = [output.title, output.status_text]
     starts = {label.mapTo(output, QPoint()).x() + label.contentsMargins().left()
               for label in labels}
-    assert starts == {output.TEXT_X}
+    assert starts == {output.text_x()}
     pairs = [(output.mark, output.title), (output.status_icon, output.status_text)]
     if setup:
         pairs.append((output.arrow, output.status_text))   # (on its x-height: within 1.5)
@@ -202,8 +202,8 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
     window.resize(1180, 720)
     window.show()
     window.rail.set_open(True)
-    window.cfg.route = "cable"
-    window.cfg.main_device = "CABLE Input (fake)"
+    window.cfg.route = "device"
+    window.cfg.main_device = "Speakers (fake)"
     stream = window.engine.main_stream
     try:
         window.engine.main_stream = None
@@ -211,7 +211,7 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
         qapp.processEvents()
         output = window.rail.output
         assert output.status_text.text() == "Not working" and output.arrow.isVisible()
-        assert "CABLE Input (fake)" in output.status_text.toolTip()
+        assert "Speakers (fake)" in output.status_text.toolTip()
     finally:
         window.engine.main_stream = stream
 
