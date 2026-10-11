@@ -1,0 +1,5 @@
+- Setup tab: the mic card is rebuilt for the mic helper. It's one status box (what's happening, your mic's name and its live level) with a pill in the heading, and it only asks for a click when it needs one: the first set-up, a No on Windows' prompt, or a fix that didn't work.
+- When a Windows or driver update takes Onion Board off your mic, the app puts it back by itself at start-up through the mic helper (no click, no prompt): a toast says "Fixing your mic…", then "Done".
+- "Click Yes when Windows asks" only shows when Windows will actually ask.
+- A mic repair or update restarts Windows' audio once instead of twice (about 18 s instead of 35 s).
+- Bun's set-up show plays only for the first set-up, and its progress bar keeps moving on a slow PC instead of stopping at 92%.

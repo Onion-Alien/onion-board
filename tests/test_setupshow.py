@@ -88,3 +88,19 @@ def test_start_twice_and_finish_when_hidden(qapp):
     assert ended and not b.on
     b.finish(True)                 # (not on: nothing)
     assert len(ended) == 1
+
+
+def test_the_bar_keeps_moving_on_a_slow_job(qapp):
+    """Paced to the job: ~90% at the expected time, still moving at 35 s (it sat
+    at 92% from ~15 s on), never full until the answer is in."""
+    b = SetupShow()
+    b.start(expect_s=20.0)
+    at = {}
+    for t in (5.0, 20.0, 35.0, 120.0):
+        b._t = t
+        at[t] = b.progress()
+    assert 0.6 < at[5.0] < 0.8
+    assert abs(at[20.0] - 0.9) < 0.01
+    assert at[20.0] < at[35.0] < at[120.0] < 1.0
+    b.finish(True)
+    assert b.progress() == 1.0

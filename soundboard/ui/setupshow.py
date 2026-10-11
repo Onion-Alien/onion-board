@@ -37,7 +37,9 @@ YAY_SCOOT, YAY_END = 2.6, 4.0
 SHAKE, BOOM_SCOOT, BOOM_END = 0.8, 3.0, 4.3
 BAR_H = 18            # the pixel progress bar under the show
 BAR_PX, BAR_GAP = 7, 3   # one block of it, and the space between blocks
-BAR_EASE_S = 7.0      # it fills towards 92% with this time constant (Windows gives no %)
+EXPECT_S = 25.0       # a first set-up: the Yes, then ~20 s of Windows reloading its audio
+BAR_AT_EXPECT = 0.9   # the bar is this full at EXPECT_S, then keeps creeping (never stuck)
+BAR_MAX = 0.97        # how full it gets before the answer is in
 SCOOT_S = 0.7         # how long scooting off takes (slower when sad)
 BOX = QColor("#e2574c")
 BOX_DARK = QColor("#b23a31")
@@ -65,6 +67,7 @@ class SetupShow(BunnyWidget):
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self._t = -1.0           # seconds into the show, -1 when not on
+        self._expect = EXPECT_S  # about how long the job takes (the bar's pace)
         self._result = None      # what finish() said, until it's shown
         self._end_at = -1.0      # show time the ending began
         self._ok = False
@@ -86,10 +89,12 @@ class SetupShow(BunnyWidget):
     def on(self) -> bool:
         return self._t >= 0
 
-    def start(self):
-        """Start the show (harmless while it's on)."""
+    def start(self, expect_s: float = EXPECT_S):
+        """Start the show (harmless while it's on). `expect_s`: about how long the job
+        takes, for the progress bar's pace."""
         if self.on:
             return
+        self._expect = max(1.0, expect_s)
         self._t, self._act_t = 0.0, 0.0   # (_act_t: the base class sees us as mid-act)
         self._result, self._end_at, self._ok = None, -1.0, False
         self._parts, self._part_at = 0, [-1.0] * PARTS
@@ -344,12 +349,14 @@ class SetupShow(BunnyWidget):
 
     def progress(self) -> float:
         """How far along the bar shows (0-1). Windows says nothing until it's done, so
-        it eases towards 92% while it works, and fills once the answer is in."""
+        it's BAR_AT_EXPECT full at the expected time and keeps creeping after it (a slow
+        PC's 35 s never sits still at the end), and fills once the answer is in."""
         if not self.on:
             return 0.0
         if self._result is not None or self._end_at >= 0:
             return 1.0
-        return 0.92 * (1 - math.exp(-self._t / BAR_EASE_S))
+        k = self._expect * (1 - BAR_AT_EXPECT) / BAR_AT_EXPECT
+        return min(BAR_MAX, self._t / (self._t + k))
 
     def _paint_progress(self, p: QPainter):
         """A row of little square blocks under the show, lit green as it goes (amber
