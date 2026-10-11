@@ -409,32 +409,22 @@ class SettingsDialog(QDialog):
     # the page (the list and box took 212 px of a 440 px window)
     NARROW_W = 640
 
-    def __init__(self, mw, page: str = "privacy", lazy: bool = False,
-                 embedded: bool = False):
-        """`lazy`: build only `page` now and each other page the first time it's shown.
-        Building all twelve under the app's style sheet took a second or two on every
-        click of the cog; the tests build them all at once. `embedded`: a page in the
-        main window, in place of the tabs (MainWindow.open_settings), not a window."""
+    def __init__(self, mw, page: str = "privacy", lazy: bool = False):
+        """A page in the main window, in place of the tabs (MainWindow.open_settings),
+        never a window of its own. `lazy`: build only `page` now and each other page
+        the first time it's shown. Building all twelve under the app's style sheet took
+        a second or two on every click of the cog; the tests build them all at once."""
         super().__init__(mw)
-        self.embedded = embedded
-        if embedded:
-            self.setWindowFlags(Qt.WindowType.Widget)
-            self.setObjectName("settingspage")   # the window's own background
-        else:
-            fit.watch(self)   # grows to fit its text (ui/fit.py)
+        self.setWindowFlags(Qt.WindowType.Widget)
+        self.setObjectName("settingspage")   # the window's own background
         self.mw = mw
         if hasattr(mw, "tab_switched"):
             mw.tab_switched.connect(self._tab_switched)
         self.setWindowTitle(_("Settings"))
-        if not embedded:
-            # short enough for a 1366x768 laptop at 125 % (the pages scroll): at 600
-            # the Done button sat below the screen
-            self.setMinimumSize(720, 420)
         lay = QVBoxLayout(self)
-        # one margin all round, and the same gap above Done as below and beside it; in
-        # the main window its body has the margins, and pages start 8 px down like a tab's
-        lay.setContentsMargins(*((0, 8, 0, 0) if embedded else (16, 16, 16, 16)))
-        lay.setSpacing(12 if embedded else 16)
+        # the main window's body has the margins; pages start 8 px down like a tab's
+        lay.setContentsMargins(0, 8, 0, 0)
+        lay.setSpacing(12)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
@@ -488,7 +478,7 @@ class SettingsDialog(QDialog):
         # switch. Typing hides every card without the word and every page without a card.
         self.search_box = QLineEdit()
         # (a page: "Settings" is the heading right over it)
-        self.search_box.setPlaceholderText(_("Search") if embedded else _("Search settings"))
+        self.search_box.setPlaceholderText(_("Search"))
         self.search_box.setClearButtonEnabled(True)
         self.search_box.setAccessibleName(_("Search settings"))
         self.search_box.setFixedWidth(196)
@@ -501,32 +491,30 @@ class SettingsDialog(QDialog):
             self.search_box.selectAll()))
         side = self._side = QVBoxLayout()
         side.setSpacing(8)
-        self.back_btn = None
-        if embedded:
-            # a page, not a window: back to the tab you were on (as Escape or a rail
-            # tab does), on its own row over the search with the page's name, so the
-            # search box still lines up with the categories; narrow, over the icons
-            back = self.back_btn = QPushButton()
-            back.setProperty("quiet", True)
-            icons.set_icon(back, "back")
-            back.setToolTip(_("Back"))
-            back.setAccessibleName(_("Back"))
-            back.setAutoDefault(False)
-            back.clicked.connect(self.accept)
-            self.page_title = QLabel(_("Settings"))
-            self.page_title.setObjectName("section")
-            self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
-            # the arrow over the categories' icons, the name over their names (an
-            # item: 4 px padding, a 20 px icon, then its text 36 px in)
-            back.setFixedWidth(36)
-            # its icon on the icons' centre line and level with the heading's letters
-            # (2 px lower than centred); the same 14 px of padding: the controls' height
-            back.setStyleSheet("padding:9px 0px 5px 3px")
-            top = QHBoxLayout()
-            top.setSpacing(0)
-            top.addWidget(back)
-            top.addWidget(self.page_title, 1)
-            side.addLayout(top)
+        # a page, not a window: back to the tab you were on (as Escape or a rail
+        # tab does), on its own row over the search with the page's name, so the
+        # search box still lines up with the categories; narrow, over the icons
+        back = self.back_btn = QPushButton()
+        back.setProperty("quiet", True)
+        icons.set_icon(back, "back")
+        back.setToolTip(_("Back"))
+        back.setAccessibleName(_("Back"))
+        back.setAutoDefault(False)
+        back.clicked.connect(self.accept)
+        self.page_title = QLabel(_("Settings"))
+        self.page_title.setObjectName("section")
+        self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
+        # the arrow over the categories' icons, the name over their names (an
+        # item: 4 px padding, a 20 px icon, then its text 36 px in)
+        back.setFixedWidth(36)
+        # its icon on the icons' centre line and level with the heading's letters
+        # (2 px lower than centred); the same 14 px of padding: the controls' height
+        back.setStyleSheet("padding:9px 0px 5px 3px")
+        top = QHBoxLayout()
+        top.setSpacing(0)
+        top.addWidget(back)
+        top.addWidget(self.page_title, 1)
+        side.addLayout(top)
         side.addWidget(self.search_box)
         side.addWidget(self.categories, 1)
         right = self._right = QVBoxLayout()   # (narrow: the search box on top)
@@ -545,16 +533,6 @@ class SettingsDialog(QDialog):
         right.addWidget(self.no_match, 1)
         lay.addLayout(content, 1)
         self._narrow = False
-        self.done_btn = None
-        if not embedded:   # (embedded: the back arrow over the categories instead)
-            close = self.done_btn = QPushButton(_("Done"))
-            close.setObjectName("primary")
-            close.clicked.connect(self.accept)
-            row = QHBoxLayout()
-            row.addStretch(1)
-            row.addWidget(close)
-            lay.addLayout(row)
-            self._initial_size()
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -701,30 +679,6 @@ class SettingsDialog(QDialog):
         if build is not None:
             self._fill(self.tabs.widget(i), build())
 
-    def _initial_size(self):
-        """Open big enough for the tallest page, as far as the screen allows (a scroll
-        area on its own would open at its small default)."""
-        screen = self.screen() or QApplication.primaryScreen()
-        avail = screen.availableGeometry() if screen else None
-        # wide enough to show every tab (the bar scrolls only when the screen is too
-        # narrow for that)
-        width = 1020
-        # a page not built yet counts as tall (most are): switching to it later doesn't
-        # resize the window
-        need = 10_000 if self._unbuilt else 0
-        for i in range(self.tabs.count()):
-            if i in self._unbuilt:
-                continue
-            lay = self.tabs.widget(i).widget().layout()
-            need = max(need, lay.totalSizeHint().height(),
-                       lay.totalHeightForWidth(width - 260) if lay.hasHeightForWidth() else 0)
-        # tab bar, Done row, margins; a normal window size, not the whole screen: a
-        # tall page scrolls
-        height = min(need + 150, 760)
-        if avail is not None:
-            width = min(width, avail.width() - 40)
-            height = min(height, avail.height() - 60)
-        self.resize(max(width, self.minimumWidth()), max(height, self.minimumHeight()))
     @staticmethod
     def _card(title: str, hint: str = ""):
         card = QFrame()
