@@ -123,23 +123,24 @@ class RecoveryCard(QFrame):
         hint.setWordWrap(True)
         v.addWidget(hint)
         row = Flow(gap=8)
-        self.repair = QPushButton(_("Repair mic effect"))
+        self.repair = QPushButton(_("Update to new version"))
         self.repair.setObjectName("primary")
-        self.repair.clicked.connect(lambda: self.confirm(
-            "update" if self._state == "outdated" else "repair"))
+        self.repair.hide()
+        self.repair.clicked.connect(lambda: self.confirm("update"))
         row.addWidget(self.repair)
-        v.addLayout(row)
         self.actions = {"repair": self.repair}
-        bottom = Flow(gap=8)
         for action in ("reinstall", "remove"):
             button = QPushButton(action_text(action))
             icons.set_icon(button, "reload" if action == "reinstall" else "trash")
             if action == "remove":
                 button.setObjectName("danger")
+                button.setProperty("small", True)
+            else:
+                button.setObjectName("small")
             button.clicked.connect(lambda checked=False, a=action: self.confirm(a))
             self.actions[action] = button
-            bottom.addWidget(button)
-        v.addLayout(bottom)
+            row.addWidget(button)
+        v.addLayout(row)
         self.note = QLabel()
         self.note.setWordWrap(True)
         self.note.setObjectName("hint")
@@ -148,7 +149,6 @@ class RecoveryCard(QFrame):
         self.checked.connect(self._checked)
         self.recovery.finished.connect(self._done)
         self._sync_busy()
-        self._size_buttons()
         self._checking = False
         self.timer = QTimer(self)
         self.timer.setInterval(5000)
@@ -176,8 +176,8 @@ class RecoveryCard(QFrame):
         if mic is not None and mic != (self.mw.cfg.mic_device or ""):
             return
         self._state = state
-        self.repair.setText(_("Update to new version") if state == "outdated" else
-                            _("Repair mic effect"))
+        self.repair.setText(_("Update to new version"))
+        self.repair.setVisible(state == "outdated")
         self.repair.setProperty("recoveryUpdate", state == "outdated")
         self.repair.style().unpolish(self.repair)
         self.repair.style().polish(self.repair)
@@ -189,19 +189,6 @@ class RecoveryCard(QFrame):
             self.repair.setGraphicsEffect(glow)
         else:
             self.repair.setGraphicsEffect(None)
-        self._size_buttons()
-
-    def _size_buttons(self):
-        buttons = list(self.actions.values())
-        width = max(b.sizeHint().width() for b in buttons)
-        fm = self.repair.fontMetrics()
-        width = max(width, self.repair.sizeHint().width() +
-                    max(fm.horizontalAdvance(_("Update to new version")),
-                        fm.horizontalAdvance(_("Repair mic effect"))) -
-                    fm.horizontalAdvance(self.repair.text()))
-        height = max(b.sizeHint().height() for b in buttons)
-        for button in buttons:
-            button.setFixedSize(width, height)
 
     def confirm(self, action):
         if self.recovery.running or self.mw._attaching:
