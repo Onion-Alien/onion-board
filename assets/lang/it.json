@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "Guarda soltanto: non clicca né scrive mai nel tuo gioco",
   "Plays one of your sounds when something happens in your game.": "Riproduce uno dei tuoi suoni quando succede qualcosa nel gioco.",
   "Rare spawns, queue pops, “YOU DIED”": "Spawn rari, coda pronta, “YOU DIED”",
-  "Watches the game's window, even behind others": "Osserva la finestra del gioco, anche dietro le altre"
+  "Watches the game's window, even behind others": "Osserva la finestra del gioco, anche dietro le altre",
+  "Browsers": "Browser",
+  "Calls & chat": "Chiamate e chat",
+  "Games": "Giochi",
+  "Music & media": "Musica e media",
+  "Other": "Altro"
 }

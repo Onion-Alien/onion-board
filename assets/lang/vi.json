@@ -2989,5 +2989,10 @@
   "Only looks: never clicks or types in your game": "Chỉ nhìn: không bao giờ nhấp hay gõ trong game của bạn",
   "Plays one of your sounds when something happens in your game.": "Phát một âm thanh của bạn khi có gì đó xảy ra trong game.",
   "Rare spawns, queue pops, “YOU DIED”": "Quái hiếm xuất hiện, ghép trận xong, “YOU DIED”",
-  "Watches the game's window, even behind others": "Theo dõi cửa sổ game, kể cả khi bị che"
+  "Watches the game's window, even behind others": "Theo dõi cửa sổ game, kể cả khi bị che",
+  "Browsers": "Trình duyệt",
+  "Calls & chat": "Gọi & trò chuyện",
+  "Games": "Trò chơi",
+  "Music & media": "Nhạc & phương tiện",
+  "Other": "Khác"
 }

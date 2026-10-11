@@ -263,9 +263,13 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   Done (PR #424): `appaudio.file_description` reads the .exe's FileDescription on
   the lister's worker, cached per path; `App.name` uses it (*VLC media player*,
   *OBS Studio*), and a card keeps it once the program closes.
-- [ ] **U14: Apps category names aren't translated.** The built-in categories
+- [x] **U14: Apps category names aren't translated.** The built-in categories
   (Browsers, Music & media, Calls & chat, Games, Other) show in English in every
   language; translate the shown name, keep the saved key. Target: `ui/appspanel.py`.
+
+  Done (PR #425): `appspanel.category_label` gives the shown name (headings, the
+  card's Categories menu, the rename prompt) in all 32 languages; the config keeps
+  the English key.
 - [ ] **U15: Apps category headings have no keyboard way to their menu** (Rename,
   Delete). They take no focus; give them one with a visible focus ring, or put the
   menu on a small button beside the heading. Target: `ui/appspanel.py`.

@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "Csak néz: soha nem kattint és nem gépel a játékodban",
   "Plays one of your sounds when something happens in your game.": "Lejátssza egy hangodat, amikor valami történik a játékban.",
   "Rare spawns, queue pops, “YOU DIED”": "Ritka spawnok, várólista pukkan, „YOU DIED”",
-  "Watches the game's window, even behind others": "Figyeli a játék ablakát, mások mögött is"
+  "Watches the game's window, even behind others": "Figyeli a játék ablakát, mások mögött is",
+  "Browsers": "Böngészők",
+  "Calls & chat": "Hívások és csevegés",
+  "Games": "Játékok",
+  "Music & media": "Zene és média",
+  "Other": "Egyéb"
 }

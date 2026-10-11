@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "Sadece bakar: oyununda asla tıklamaz veya yazmaz",
   "Plays one of your sounds when something happens in your game.": "Oyununda bir şey olduğunda seslerinden birini çalar.",
   "Rare spawns, queue pops, “YOU DIED”": "Nadir doğmalar, sıra açılması, “YOU DIED”",
-  "Watches the game's window, even behind others": "Oyunun penceresini izler, diğerlerinin arkasında olsa bile"
+  "Watches the game's window, even behind others": "Oyunun penceresini izler, diğerlerinin arkasında olsa bile",
+  "Browsers": "Tarayıcılar",
+  "Calls & chat": "Aramalar ve sohbet",
+  "Games": "Oyunlar",
+  "Music & media": "Müzik ve medya",
+  "Other": "Diğer"
 }

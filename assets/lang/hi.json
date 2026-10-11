@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "सिर्फ़ देखता है: आपके गेम में कभी क्लिक या टाइप नहीं करता",
   "Plays one of your sounds when something happens in your game.": "आपके गेम में कुछ होने पर आपकी कोई आवाज़ चलाता है।",
   "Rare spawns, queue pops, “YOU DIED”": "दुर्लभ स्पॉन, क्यू पॉप, “YOU DIED”",
-  "Watches the game's window, even behind others": "गेम की विंडो पर नज़र रखता है, दूसरी विंडो के पीछे भी"
+  "Watches the game's window, even behind others": "गेम की विंडो पर नज़र रखता है, दूसरी विंडो के पीछे भी",
+  "Browsers": "ब्राउज़र",
+  "Calls & chat": "कॉल और चैट",
+  "Games": "गेम",
+  "Music & media": "संगीत और मीडिया",
+  "Other": "अन्य"
 }

@@ -96,6 +96,15 @@ APP_DRAG_MIME = "application/x-onionboard-app-card"
 CATEGORY_DRAG_MIME = "application/x-onionboard-app-category"
 
 
+def category_label(category: str) -> str:
+    """A category's shown name: the built-in ones in the app's language, the user's own
+    as typed. The config keeps the English name (usage.APPS_BUILT_IN), so a board
+    switched to another language, or opened by an older version, still finds them."""
+    return {"Browsers": _("Browsers"), "Music & media": _("Music & media"),
+            "Calls & chat": _("Calls & chat"), "Games": _("Games"),
+            "Other": _("Other")}.get(category, category)
+
+
 def app_category(exe: str) -> str:
     stem = exe.replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
     return next((category for category, names in APP_CATEGORIES.items() if stem in names),
@@ -109,7 +118,7 @@ class AppCategoryHeading(QLabel):
     delete_requested = Signal(str)        # (category)
 
     def __init__(self, category: str, host: QWidget, custom: bool = False):
-        super().__init__(category, host)
+        super().__init__(category_label(category), host)
         self.category = category
         self.custom = custom
         self._drag_press = None
@@ -262,7 +271,7 @@ class AppGrid(CardGrid):
         heading = self.headings.pop(old, None)
         if heading:
             heading.category = new
-            heading.setText(new)
+            heading.setText(category_label(new))
             self.headings[new] = heading
         self._sync_headings_order()
         self.invalidate()
@@ -684,7 +693,7 @@ class AppRow(HoverCard):
             group = QActionGroup(cat_menu)
             for cat in parent.grid.category_order:
                 act = cat_menu.addAction(icons.icon("tag", checked_color="accent"),
-                                         cat.replace("&", "&&"))   # "Music & media"
+                                         category_label(cat).replace("&", "&&"))
                 act.setCheckable(True)
                 act.setChecked(cat == self.category)
                 group.addAction(act)
@@ -1016,7 +1025,7 @@ class AppsTab(QWidget):
     def _prompt_new_category(self):
         name, ok = QInputDialog.getText(self, _("New category"), _("Name:"))
         name = (library.clean_tags([name]) or [""])[0] if ok else ""
-        if not name or name in self.grid.category_order:
+        if not name or self._category_taken(name):
             return
         usage.used("apps-category-added")
         label = self.grid.add_category(name)
@@ -1036,12 +1045,16 @@ class AppsTab(QWidget):
     def _on_card_dropped_on_category(self, source: AppRow, category: str):
         self._move_row_to_category(source, category)
 
+    def _category_taken(self, name: str) -> bool:
+        """A category already has this name, saved or shown ('Spiele' is Games)."""
+        return any(name in (c, category_label(c)) for c in self.grid.category_order)
+
     def _on_rename_category(self, old_cat: str):
         new_name, ok = QInputDialog.getText(self, _("Rename category"),
-                                            _("New name:"), text=old_cat)
+                                            _("New name:"), text=category_label(old_cat))
         new_name = (library.clean_tags([new_name]) or [""])[0] if ok else ""
-        if not new_name or new_name == old_cat or new_name in self.grid.category_order:
-            return
+        if not new_name or self._category_taken(new_name):
+            return   # unchanged too: OK on the shown name renames nothing
         usage.used("apps-category-renamed")
         self.grid.rename_category(old_cat, new_name)
         for row in self.rows.values():
