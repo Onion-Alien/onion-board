@@ -137,11 +137,13 @@ class CrashDialog(QDialog):
 def free_dialog(dlg: QDialog):
     """Delete a modal dialog once its exec() has returned. Parented to the window and
     never freed, every closed copy stayed alive and made each theme change slower.
-    A crash report opened over it is moved to the dialog's parent first, so it stays.
+    A crash report opened over it is moved to the dialog's parent's window first, so it
+    stays (Settings is a page inside the window, not a window of its own).
     Already gone (its window was freed first, before a deferred call got here): done."""
     if not shiboken6.isValid(dlg):
         return
     parent = dlg.parentWidget()
+    parent = parent.window() if parent is not None else None
     for c in dlg.findChildren(CrashDialog):
         c.setParent(parent, c.windowFlags())
         c.show()

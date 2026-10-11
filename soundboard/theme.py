@@ -577,6 +577,7 @@ QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text
 QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
 QFrame#sidebar QPushButton#settings:focus, QFrame#sidebar QPushButton#modebtn:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
+QFrame#sidebar QPushButton#settings:checked { background:transparent; color:$text_hi; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
 QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
@@ -605,6 +606,7 @@ QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QDialog#transport { background:$panel; }
+QDialog#settingspage { background:transparent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
