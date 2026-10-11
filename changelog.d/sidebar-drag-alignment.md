@@ -1,0 +1,2 @@
+- Keep sidebar icons aligned while dragging, show tab names halfway open, and fit the app name in the narrow header.
+- Keep the sidebar's attention dot beside the expand arrow as its width changes.
