@@ -25,8 +25,8 @@ import logging
 import threading
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import (QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton,
-                               QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
+                               QPushButton, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
 from soundboard.i18n import _, ngettext
@@ -387,6 +387,7 @@ class TriggersTab(QWidget):
             return False
         self.panel = panel
         lay = self.board_page.layout()
+        assert isinstance(lay, QBoxLayout)   # made in __init__
         lay.addWidget(panel, 1)
         if self.foot.parent() is not None:  # from an earlier load: put back only if needed
             lay.removeItem(self.foot)
@@ -554,7 +555,9 @@ class TriggersTab(QWidget):
                 panel.shutdown()
             except Exception:  # noqa: BLE001 - it's being removed anyway
                 log.warning("Onion Watch didn't shut down cleanly", exc_info=True)
-            self.board_page.layout().removeWidget(panel)
+            lay = self.board_page.layout()
+            if lay is not None:
+                lay.removeWidget(panel)
             panel.setParent(None)
             panel.deleteLater()
         self.btn_remove.hide()

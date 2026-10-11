@@ -102,7 +102,7 @@ def latest(cancelled: Callable[[], bool] | None = None) -> Offer | None:
                  urgent=updates.urgent(body))
 
 
-def fetch(offer: Offer, progress: Callable[[int, int], None] | None = None,
+def fetch(offer: Offer, progress: Callable[[int, int], object] | None = None,
           cancelled: Callable[[], bool] | None = None) -> Path:
     """The offer's zip on this PC: downloaded into the updates folder and checked
     against its SHA-256. Raises updates.UpdateError. Call off the UI thread."""

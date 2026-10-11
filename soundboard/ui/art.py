@@ -17,7 +17,7 @@ from PySide6.QtGui import (QColor, QFont, QIcon, QImage, QLinearGradient, QPaint
 
 from soundboard.ui import icons
 
-ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")
+ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
            else Path(__file__).resolve().parents[2] / "assets" / "art")
 ROUND = 0.24      # corner radius, as a fraction of the side
 

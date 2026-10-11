@@ -20,6 +20,7 @@ from __future__ import annotations
 import html
 import math
 import time
+from collections.abc import Iterator
 
 import numpy as np
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, Signal
@@ -664,7 +665,7 @@ class FlatMap(QWidget):
                       round((o.y() + j * TILE * f) * dpr) / dpr,
                       min(TILE, w - i * TILE) * f, min(TILE, h - j * TILE) * f)
 
-    def _tile_steps(self, level: tuple, i: int, j: int) -> tuple[QPixmap, object]:
+    def _tile_steps(self, level: tuple, i: int, j: int) -> tuple[QPixmap, Iterator[object]]:
         """A blank tile (i, j) of `level`, and the steps that draw it."""
         s, dpr = level[0], level[1]
         w, h, _nx, _ny = self._grid(level)
@@ -928,7 +929,8 @@ class FlatMap(QWidget):
         revealing = self.revealing()
         if complete and not revealing:
             for at, pm in shown:
-                p.drawPixmap(at, pm)
+                if pm is not None:   # (all of them: complete)
+                    p.drawPixmap(at, pm)
         else:
             # a new zoom (or new dots) shows all at once when it's all drawn, never a
             # patchwork of sharp and stretched squares; till then the last view
@@ -943,7 +945,8 @@ class FlatMap(QWidget):
             self._paint_reveal(p)
             self._paint_names(p)   # on top, as the tiles have them
         self._paint_towns(p, dpr)
-        hover, cur_i = self._hover, self._index.get(self._current, -1)
+        cur = self._current
+        hover, cur_i = self._hover, self._index.get(cur, -1) if cur is not None else -1
         if (0 <= hover < len(self._points)) or cur_i >= 0:
             xs, ys = self._screen()
             if 0 <= hover < len(self._points):
@@ -953,7 +956,7 @@ class FlatMap(QWidget):
                 p.drawEllipse(QPointF(xs[hover], ys[hover]), r, r)
             if cur_i >= 0:
                 hot = QColor(t["accent2"])
-                c = QPointF(xs[cur_i], ys[cur_i])
+                c = QPointF(float(xs[cur_i]), float(ys[cur_i]))
                 p.setPen(QPen(hot, 2))
                 p.setBrush(Qt.BrushStyle.NoBrush)
                 p.drawEllipse(c, 9, 9)

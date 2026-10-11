@@ -544,7 +544,9 @@ class TotalsDialog(QDialog):
                                "↓ {received} received, {total} in all.", **kw)
         self.summary.setText(self._head)
         t = self.table
-        t.horizontalHeaderItem(0).setText(_("Site") if by_site else _("Server"))
+        head = t.horizontalHeaderItem(0)
+        if head is not None:
+            head.setText(_("Site") if by_site else _("Server"))
         t.setSortingEnabled(False)
         t.setRowCount(len(rows))
         right = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter

@@ -45,5 +45,6 @@ class _Filter(QObject):
 def install(app: QApplication) -> None:
     """Silence every Information/Warning QMessageBox the app shows from now on."""
     from soundboard import theme
-    app._quietbox_filter = _Filter(app)   # kept alive with the app
-    theme.app_filter(app, app._quietbox_filter)   # (sits out theme switches: no boxes made)
+    f = _Filter(app)
+    app._quietbox_filter = f   # pyright: ignore[reportAttributeAccessIssue]  # kept alive with the app
+    theme.app_filter(app, f)   # (sits out theme switches: no boxes made)

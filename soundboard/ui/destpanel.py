@@ -407,7 +407,7 @@ class DestPanel(QWidget):
             self.suggest_text.setText(
                 _("{why}: <b>{label}</b> suits it.",
                   why=why, label=destination.BUILTIN_BY_KEY[key].name))
-        elif simple:
+        elif simple and hint is not None:   # (given together)
             self.suggest_text.setText(
                 _("{why}: <b>{label}</b> mode suits it.",
                   why=html.escape(hint.why), label=profiles.BY_KEY[simple].name))

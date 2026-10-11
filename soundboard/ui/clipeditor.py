@@ -574,16 +574,17 @@ class ClipEditor(QWidget):
         take = self.freeze()
         if take is None or not len(take):
             return False
-        set_clipboard(take.selected())
+        copied = take.selected()
+        set_clipboard(copied)
         self._copied_from = (id(take.data), take.a, take.b) if take.has_selection else None
         if take.has_selection:
             self.say(_("Copied {length}. Ctrl+V pastes it at the cursor, in another "
                          "program's editor, or on the Sounds tab as a new sound.",
-                         length=fmt(len(clipboard))), "ok")
+                         length=fmt(len(copied))), "ok")
         else:
             self.say(_("Copied all of it ({length}). Ctrl+V pastes it at the cursor, in "
                          "another program's editor, or on the Sounds tab as a new sound.",
-                         length=fmt(len(clipboard))), "ok")
+                         length=fmt(len(copied))), "ok")
         return True
 
     def cut(self) -> bool:
@@ -610,7 +611,7 @@ class ClipEditor(QWidget):
             return False
         self._copied_from = None
         self.say(_("Pasted {length} at {position}: it's {total} long now. Ctrl+Z undoes it.",
-                   length=fmt(len(piece)), position=fmt(at), total=fmt(len(self.take))), "ok")
+                   length=fmt(len(piece)), position=fmt(at), total=fmt(len(take))), "ok")
         return True
 
     def undo(self):

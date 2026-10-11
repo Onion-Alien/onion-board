@@ -141,7 +141,8 @@ class VoiceStatusBar(QFrame):
 
     def _row_widgets(self) -> list:
         row = self._chips_row
-        return [row.itemAt(i).widget() for i in range(row.count())]
+        items = (row.itemAt(i) for i in range(row.count()))
+        return [it.widget() for it in items if it is not None]
 
     # ---- the mic
     def set_level(self, level: float | None):
