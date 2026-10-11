@@ -203,9 +203,19 @@ def make_ring(path: Path | None = None) -> bool:
     try:
         if make_ring_ok(path):
             return True
-        tmp = path.with_suffix(".new")
-        tmp.write_bytes(new_ring_bytes())
-        os.replace(tmp, path)   # a effect still mapping the old one keeps its own copy
+        # a name of its own: two boards starting at once mustn't write the same temp
+        tmp = path.parent / f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(new_ring_bytes())
+            os.replace(tmp, path)   # replaces the entry itself, never a link's target
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
         return True
     except OSError:
         log.info("can't make the mic effect's ring at %s", path, exc_info=True)
@@ -1001,19 +1011,43 @@ def _audio_comes_back(dependents: list[str] = ()):
     log.warning("no helper to bring the audio back if this stops half-way")
 
 
-def _audio_service(start: bool, dependents: list[str] = ()):
+def _services_stopped() -> bool:
+    """Windows' audio is really stopped. The endpoint builder re-reads a mic's effect
+    settings when it starts, so a stop that silently failed leaves the change unread
+    until a restart: worth knowing."""
+    script = ("(Get-Service -Name " + ",".join(AUDIO_SERVICES) + " -ErrorAction SilentlyContinue"
+              " | Where-Object Status -ne 'Stopped' | Measure-Object).Count")
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                           capture_output=True, text=True, timeout=15,
+                           creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return r.stdout.strip() == "0"
+
+
+def _audio_service(start: bool, dependents: list[str] = ()) -> bool:
     """Stop / start Windows' audio. The endpoint builder reads the mics' effect settings
     when it starts, so it goes too (the audio service depends on it). `dependents`: the
-    services that were running on it (_running_dependents), started again after it."""
+    services that were running on it (_running_dependents), started again after it.
+    True when the audio ended up in the state asked for (a stop that didn't take is
+    logged: the effect's change may not be read until a restart)."""
     if start:
         _run(["net", "start", "AudioEndpointBuilder"])
         _run(["net", "start", "audiosrv"])
         for name in dependents:
             if _SERVICE_NAME.fullmatch(name):
                 _run(["net", "start", name], timeout=30.0)
-    else:
-        _run(["net", "stop", "audiosrv", "/y"])
-        _run(["net", "stop", "AudioEndpointBuilder", "/y"])
+        return True
+    _run(["net", "stop", "audiosrv", "/y"])
+    _run(["net", "stop", "AudioEndpointBuilder", "/y"])
+    if _services_stopped():
+        return True
+    _run(["net", "stop", "AudioEndpointBuilder", "/y"])   # a dependency held it: once more
+    if _services_stopped():
+        return True
+    log.warning("Windows' audio wouldn't stop: the mic effect may need a restart to take")
+    return False
 
 
 def _register_com(dll: Path):
@@ -1130,6 +1164,24 @@ def _note(name: str, v) -> str:
     return f"{name}=raw:{kind}:{raw.hex()}"
 
 
+def _note_value(item: str):
+    """The value a "Before" note puts back (None: it wasn't there). A raw note (an odd
+    kind) can't be compared to what's there: `_MISSING`."""
+    _, _, value = item.partition("=")
+    if not value:
+        return None
+    if value.startswith("multi:"):
+        return value[6:].split("|") if value[6:] else []
+    if value.startswith("dword:"):
+        return int(value[6:])
+    if value.startswith("raw:"):
+        return _MISSING
+    return value.removeprefix("sz:")
+
+
+_MISSING = object()
+
+
 def _put_back(fx, item: str):
     """Undo one "Before" note (see _note)."""
     name, _, value = item.partition("=")
@@ -1149,29 +1201,40 @@ def _put_back(fx, item: str):
 def _uninstall_endpoint(guid: str):
     """Put one mic back as it was before _install_endpoint. If Windows already took the
     effect off (a driver update or "Reset sound settings" rewrote the mic's effects),
-    what's there now is the driver's own and stays: the notes are only dropped."""
+    what's there now is the driver's own and stays: the notes are only dropped. If the
+    uninstall itself was cut off half-way (a crash, a reboot), the slot already matches
+    the notes and the rest of the change is finished now."""
     base = rf"{CAPTURE_KEY}\{guid}"
     with _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
         before = (state.get("Before") or ([],))[0] or []
         created = (state.get("FxCreated") or (0,))[0]
-        if not before and state.get("Slot"):   # an early test build's notes
-            pid = state.get("Slot")[0]
-            before = [f"{FX % pid}=sz:{state.get('Original')[0]}"
-                      if (state.get("Original") or ("",))[0] else f"{FX % pid}="]
+        slot = (state.get("Slot") or (None,))[0]
+        if not before and slot is not None:   # an early test build's notes
+            before = [f"{FX % slot}=sz:{state.get('Original')[0]}"
+                      if (state.get("Original") or ("",))[0] else f"{FX % slot}="]
             if (state.get("ModesCreated") or (0,))[0]:
                 before.append(f"{MODES_KEY % state.get('ModesCreated')[0]}=")
             if (state.get("AssocCreated") or (0,))[0]:
                 before.append(f"{FX % 0}=")
     try:
         with _BackupKey(base + r"\FxProperties", create=False) as fx:
-            ours = any(_is_ours((fx.get(FX % p) or (None,))[0])
-                       for p in OUR_SLOTS)
-            if ours:
+            if slot is None:
+                restore = any(_is_ours((fx.get(FX % p) or (None,))[0]) for p in OUR_SLOTS)
+            else:
+                cur = (fx.get(FX % slot) or (None,))[0]
+                want = _note_value(next((b for b in before
+                                         if b.partition("=")[0] == FX % slot),
+                                        f"{FX % slot}="))
+                # our CLSID still in the slot, or the slot already matches the notes (an
+                # uninstall cut off half-way): finish it. A slot holding some other value
+                # means Windows reset the mic: leave it all.
+                restore = _is_ours(cur) or cur == want
+            if restore:
                 for item in before:
                     _put_back(fx, item)
             else:
                 log.info("%s: Windows already took the effect off; left as it is", guid)
-        if created and ours:
+        if created and restore:
             _delete_if_empty(base + r"\FxProperties")
     except FileNotFoundError:
         pass   # the mic is gone
@@ -1413,11 +1476,20 @@ def admin_uninstall() -> int:
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     _audio_service(False)
+    failed = False
     try:
         for guid in installed_on():
-            _uninstall_endpoint(guid)
+            try:
+                _uninstall_endpoint(guid)
+            except Exception:  # noqa: BLE001 - one mic left behind mustn't strand the rest
+                failed = True
+                log.exception("couldn't take the mic effect off %s", guid)
+        if failed:
+            # its notes stay, and the effect is still registered and on a mic: leaving
+            # everything in place lets a later uninstall finish the job
+            return 1
         _unregister_com()
-        for d in (install_dir(), *_old_install_dirs()):
+        for d in (install_dir(), *_old_install_dirs(), data_dir()):
             _remove(d)
         try:
             winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, ENDPOINTS_KEY)
@@ -1529,9 +1601,10 @@ def relaunch_params(args: list[str]) -> str:
     return " ".join(parts + [FLAG] + args)
 
 
-def _elevated(args: list[str], wait_s: float = 180.0) -> int | None:
+def _elevated(args: list[str], wait_s: float = 300.0) -> int | None:
     """Run this app's admin copy with `args` (Windows asks first). Its exit code, or
-    None if the prompt was turned down or it didn't finish."""
+    None if the prompt was turned down or it didn't finish. The audio stop/start and
+    the dependent services can take a while on a slow PC, so allow generously."""
     return run_elevated(sys.executable, relaunch_params(args), wait_s)
 
 
