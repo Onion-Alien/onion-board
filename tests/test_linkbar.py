@@ -241,3 +241,21 @@ def test_play_now_goes_next_and_replaces_a_waiting_play(qapp, monkeypatch):
     # the Add finishes: the Play starts before the other Adds
     bar._on_msg("error", URL, "nope", bar._job)
     assert bar._busy == "play" and bar._busy_url == f"{OTHER}p3"
+
+
+def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatch):
+    from soundboard import usage
+    calls = []
+    monkeypatch.setattr(usage, "downloaded", lambda cfg, *a: calls.append(a))
+    monkeypatch.setattr(usage, "_used", set())
+    bar, eng = _bar()                          # a pasted link
+    bar._busy, bar._busy_url = "play", URL
+    bar._on_msg("play", URL, ("x.wav", np.zeros(4, np.int16), 1.0))
+    bar.open(OTHER, "Other", 3.0)              # a web search pick
+    bar._busy, bar._busy_url = "add", OTHER
+    bar._on_msg("error", OTHER, "Couldn't download it")
+    assert calls == [(URL, "link", "play", True), (OTHER, "search", "add", False)]
+    bar._busy, bar._busy_url = "add", OTHER    # already in the library: not a failure
+    bar._on_msg("dup", OTHER, None)
+    bar._on_msg("error", OTHER, "It's already in your Sounds")
+    assert len(calls) == 2 and "dl-already-have" in usage._used

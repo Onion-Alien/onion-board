@@ -52,7 +52,7 @@ class _Inline:
 
 
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
-         "launches/")
+         "launches/", "downloads/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -502,6 +502,47 @@ def test_launches_are_counted_only_while_the_count_is_on(sent):
     cfg.stats_sent -= usage.EVERY_S        # left open all day: 0
     usage.maybe_send(cfg)
     assert "launches/0" in _paths(sent[1][0])
+
+
+def test_downloads_say_the_site_and_how_many_never_the_link(sent):
+    cfg = Config()
+    net.configure_features(off=["usage_stats"])   # off: nothing piles up for later
+    usage.downloaded(cfg, "https://www.tiktok.com/@me/video/1", "link", "add", True)
+    assert cfg.stats_downloads == 0
+    net.configure_features()
+    usage.downloaded(cfg, "https://youtu.be/abc?si=secret", "search", "add", True)
+    usage.downloaded(cfg, "https://music.youtube.com/watch?v=x", "search", "play", True)
+    usage.downloaded(cfg, "https://example.org/my-file.mp3", "link", "add", False)
+    usage.maybe_send(cfg)
+    paths = _paths(sent[0][0])
+    assert "downloads/2-5" in paths
+    for k in ("dl-youtube", "dl-tiktok", "dl-search", "dl-link", "dl-add", "dl-play",
+              "dl-failed-other"):
+        assert f"used/{k}" in paths
+    assert "used/dl-other" not in paths   # it failed: only dl-failed-other
+    body = sent[0][0].data.decode("utf-8")
+    assert "secret" not in body and "example.org" not in body and "my-file" not in body
+    assert cfg.stats_downloads == 0       # counted: starts again
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)
+    assert "downloads/0" in _paths(sent[1][0])
+
+
+@pytest.mark.parametrize("url, site", [
+    ("https://www.youtube.com/shorts/x", "youtube"), ("https://m.youtube.com/watch", "youtube"),
+    ("https://vm.tiktok.com/abc", "tiktok"), ("https://soundcloud.com/a/b", "soundcloud"),
+    ("https://twitter.com/a/status/1", "x"), ("https://x.com/a/status/1", "x"),
+    ("https://old.reddit.com/r/a", "reddit"), ("https://www.myinstants.com/x", "myinstants"),
+    ("https://notyoutube.com/x", "other"), ("not a link", "other"),
+])
+def test_download_sites_are_from_a_fixed_list(url, site):
+    assert usage.download_site(url) == site
+    assert f"dl-{site}" in usage.FEATURES and f"dl-failed-{site}" in usage.FEATURES
+
+
+@pytest.mark.parametrize("n, b", [(0, "0"), (1, "1"), (5, "2-5"), (6, "6-20"), (21, "21-plus")])
+def test_downloads_are_a_rough_bucket(n, b):
+    assert usage.download_bucket(n) == b
 
 
 @pytest.mark.parametrize("n, b", [(0, "0"), (1, "1"), (2, "2-5"), (5, "2-5"), (6, "6-plus")])
