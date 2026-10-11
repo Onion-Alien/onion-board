@@ -1,0 +1,1 @@
+- Give Add sounds a music-note icon in place of the plus.

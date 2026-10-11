@@ -52,6 +52,18 @@ def _wave(p, fill):
         p.drawLine(QPointF(x, 12 - h / 2), QPointF(x, 12 + h / 2))
 
 
+def _music(p, fill):
+    """A pair of beamed notes, matching the toolbar's round line icons."""
+    path = QPainterPath(QPointF(9, 17))
+    path.lineTo(9, 6)
+    path.lineTo(20, 3)
+    path.lineTo(20, 14)
+    p.drawPath(path)
+    p.drawLine(QPointF(9, 10), QPointF(20, 7))
+    for x, y in ((6, 18), (17, 15)):
+        fill(QPainterPath(), lambda pp, x=x, y=y: pp.addEllipse(QPointF(x, y), 3, 2.5))
+
+
 def _sliders(p, fill):
     for y, k in ((6, 15), (12, 8), (18, 13)):
         p.drawLine(QPointF(3, y), QPointF(21, y))
@@ -663,7 +675,7 @@ SHAPES = {
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
-    "sliders": _sliders, "wave": _wave, "puzzle": _puzzle,
+    "sliders": _sliders, "wave": _wave, "music": _music, "puzzle": _puzzle,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
     "plus": _plus, "close": _close,

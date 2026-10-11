@@ -1378,7 +1378,7 @@ class MainWindow(QMainWindow):
         add.setObjectName("soundadd")
         add.setToolTip(_("Add sound files (or drag them onto the window)"))
         add.clicked.connect(self.add_dialog)
-        icons.set_icon(add, "plus", "accent", size=18)
+        icons.set_icon(add, "music", "accent", size=18)
         self.btn_record = QPushButton(_("Record"))
         self.btn_record.setObjectName("soundrecord")
         icons.set_icon(self.btn_record, "mic", size=18)
