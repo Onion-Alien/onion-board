@@ -502,6 +502,60 @@ def test_directory_loads_the_globe_caches_it_and_fails_over(qapp, server, tmp_pa
     assert len(got2[0]) == 5 and len(server.hits) == n   # served from the cache
 
 
+@pytest.mark.parametrize("separate_directories", [False, True])
+def test_station_cache_concurrent_writers_and_reader(qapp, tmp_path, caplog,
+                                                   separate_directories):
+    from concurrent.futures import ThreadPoolExecutor
+
+    directories = [RadioDirectory(tmp_path) for _ in range(8)]
+    if not separate_directories:
+        directories = [directories[0]] * 8
+    batches = [[Station.from_api(api_station(i * 10 + j)) for j in range(3)]
+               for i in range(8)]
+    expected = {tuple(s.uuid for s in batch) for batch in batches}
+    directories[0]._write_cache(batches[0])
+    start = threading.Barrier(9)
+
+    def write(d, batch):
+        start.wait(timeout=10)
+        for _ in range(30):
+            d._write_cache(batch)
+
+    def read():
+        start.wait(timeout=10)
+        for _ in range(100):
+            saved = directories[0]._read_cache()
+            assert saved is not None
+            assert tuple(s.uuid for s in saved[1]) in expected
+
+    with ThreadPoolExecutor(max_workers=9) as pool:
+        futures = [pool.submit(write, d, batch) for d, batch in zip(directories, batches)]
+        futures.append(pool.submit(read))
+        for future in futures:
+            future.result(timeout=30)
+    assert "can't cache the radio station list" not in caplog.text
+    assert tuple(s.uuid for s in directories[0]._read_cache()[1]) in expected
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["stations.json"]
+
+
+def test_station_cache_failed_replace_keeps_old_list_and_removes_temp(qapp, tmp_path,
+                                                                    monkeypatch, caplog):
+    from pathlib import Path
+
+    d = RadioDirectory(tmp_path)
+    old = Station.from_api(api_station(1))
+    d._write_cache([old])
+
+    def denied(*_args, **_kwargs):
+        raise PermissionError("cache replacement refused")
+
+    monkeypatch.setattr(Path, "replace", denied)
+    d._write_cache([Station.from_api(api_station(2))])
+    assert "can't cache the radio station list" in caplog.text
+    assert d._read_cache()[1] == [old]
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["stations.json"]
+
+
 def test_with_no_saved_list_the_first_few_stations_come_first(qapp, server, tmp_path,
                                                               monkeypatch):
     """The directory takes 5-15 s to send all 3000 stations: with nothing saved (a first
