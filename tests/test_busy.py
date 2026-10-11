@@ -97,7 +97,7 @@ def test_toast_shows_on_the_window_then_hides(qapp):
     t = w.findChild(busy._Toast)
     assert t is not None and t.isVisibleTo(w) and "Added 3" in t.text()
     assert t.y() + t.height() <= w.height() and t.property("tone") == "ok"
-    busy.toast(w, "again", ms=50)               # reuses the one pill
+    busy.toast(w, "✓ Added 3 sounds", "ok", ms=50)   # the same again: counted, not a 2nd card
     assert len(w.findChildren(busy._Toast)) == 1
     process_events(qapp, lambda: not t.isVisibleTo(w))
 

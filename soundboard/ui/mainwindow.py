@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
-                            Qt, QTimer, QUrl, Signal)
+                            Qt, QTimer, QUrl, QVariantAnimation, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
@@ -45,6 +45,9 @@ from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pr
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
+from soundboard.ui import importreport
+from soundboard.ui.dropveil import DropVeil
+from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
                            sourcedialog, splash, taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -358,7 +361,7 @@ class Bridge(QObject):
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
     counted = Signal()                         # the daily usage count was sent (usage.py)
-    imported = Signal(object, object, str)     # meta|None, data|None, error/filename
+    imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
 
 
@@ -507,7 +510,9 @@ class MainWindow(QMainWindow):
         self._pending_imports = 0
         self._imported_ok = 0
         self._exporting = False
-        self._import_errors: list[str] = []
+        self._import_errors: list[importreport.Skipped] = []
+        self._import_total = 0      # this batch, for the toast's "3 of 12"
+        self._import_ids: list[str] = []   # added in this batch: Undo takes them off
         # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
         # given to it once it's in if nothing here has that key
         self._import_keys: dict[str, str] = {}
@@ -1056,6 +1061,7 @@ class MainWindow(QMainWindow):
             body.height() - 10))
         self.status.setObjectName("statusnote")
         self.status.hide()
+        self.drop_veil = DropVeil(self)   # "Drop to add 4 files" while files are dragged in
         self._pages.addWidget(self._build_mini())
 
         self.linkbar.download_started.connect(self._on_download_started)
@@ -1559,6 +1565,7 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
+        self._pad_scroll = scroll
         scroll.setFrameShape(QFrame.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)   # the pads fit the width
         left.addWidget(scroll, 1)
@@ -3605,10 +3612,16 @@ class MainWindow(QMainWindow):
     def _save_later(self):
         self._save_timer.start(400)
 
-    def toast(self, text: str, kind: str = ""):
+    def toast(self, text: str, kind: str = "", ms: int = busy.TOAST_MS, **kw):
         """A result the user should see now, whatever tab or dialog is in front (the
         status line is rewritten on every tab change and hidden in small windows)."""
-        busy.toast(self, text, kind)
+        return busy.toast(self, text, kind, ms, **kw)
+
+    def toast_floor(self) -> int | None:
+        """Where toasts stand (window y): just above the player, or the mixer strip
+        when the player's hidden."""
+        bar = next((w for w in (self.transport, self.mixer) if w.isVisible()), None)
+        return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
 
     def _make_radio(self):
         """The Radio tab, or with Radio switched off in Settings > Privacy & security a
@@ -5583,14 +5596,15 @@ class MainWindow(QMainWindow):
                     except Exception as e:  # noqa: BLE001 - too big, no room, damaged
                         log.warning("can't unpack %s: %s", z, e)
                         # one message for the zip; the rest only count down
-                        self.bridge.imported.emit(None, None, f"{Path(z).name}: {errors.plain(e)}")
+                        self.bridge.imported.emit(None, None, importreport.classify(z, e))
                         for __ in names[1:]:
-                            self.bridge.imported.emit(None, None, "")
+                            self.bridge.imported.emit(None, None, None)
                         continue
                     for _n, dest, err in res:
                         if dest is None:
-                            self.bridge.imported.emit(None, None,
-                                                      f"{Path(z).name} → {errors.plain(err)}")
+                            sk = importreport.classify(z, err)
+                            sk.file = f"{Path(z).name} → {_n}"
+                            self.bridge.imported.emit(None, None, sk)
                         else:
                             todo.append(str(dest))
                 import_all(todo)
@@ -5603,10 +5617,9 @@ class MainWindow(QMainWindow):
                     fp = fingerprint(f)
                     if fp and fp in known:
                         if shown in extras:
-                            self.bridge.imported.emit(None, None, "")   # already moved over
+                            self.bridge.imported.emit(None, None, None)   # already moved over
                             continue
-                        raise RuntimeError(_("already in your library as “{name}”",
-                                             name=known[fp]))
+                        raise importreport.AlreadyAdded(known[fp])
                     x = extras.get(shown)   # from another soundboard: named as it was there
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
                                              name=x.name if x is not None else "")
@@ -5622,14 +5635,23 @@ class MainWindow(QMainWindow):
                     self.engine.prepare(meta.id, data)
                     if Path(f).parent == library.SOUNDS_DIR and Path(meta.file) != Path(f):
                         Path(f).unlink(missing_ok=True)   # dragged into the folder: now
-                    self.bridge.imported.emit(meta, data, "")   # it's in there as ours
+                    self.bridge.imported.emit(meta, data, None)   # it's in there as ours
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't import %s: %s", f, e)
-                    self.bridge.imported.emit(None, None, f"{Path(shown).name}: {errors.plain(e)}")
+                    self.bridge.imported.emit(None, None, importreport.classify(shown, e))
         threading.Thread(target=run, daemon=True, name="import").start()
         self.status.setText(_("Importing {count} file(s)…", count=count))
         busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in
-        self.toast(ngettext("Adding {count} sound…", "Adding {count} sounds…", count, count=count))
+        self._import_total += count
+        self._import_progress()
+
+    def _import_progress(self):
+        """The import's toast while it runs: "Adding 3 of 12…", with a bar."""
+        total = self._import_total
+        done = total - self._pending_imports
+        text = (ngettext("Adding {count} sound…", "Adding {count} sounds…", total, count=total)
+                if not done else _("Adding {done} of {total}…", done=done, total=total))
+        self.toast(text, "busy", key="import", progress=(done, total) if total > 1 else None)
 
     def on_imported(self, meta, data, err):
         self._pending_imports -= 1
@@ -5645,29 +5667,57 @@ class MainWindow(QMainWindow):
             self._index()
             self.audio[meta.id] = data
             self._imported_ok += 1
+            self._import_ids.append(meta.id)
             usage.used("add-files")
             usage.step(self.cfg, "added-sound")
         elif err:
             self._import_errors.append(err)
-        if self._pending_imports <= 0:
-            self._pending_imports = 0
-            self._save_now()
-            self._rebuild_pads()
-            self._fill_categories()   # categories and hotkeys from an Import from Soundpad
-            self.register_hotkeys()
-            n, self._imported_ok = self._imported_ok, 0
-            busy.set_busy(self.btn_add, False)
-            if n:
-                self.toast(ngettext("✓ Added {n} sound", "✓ Added {n} sounds", n), "ok")
-            elif not self._import_errors:
-                self.toast(_("Nothing new to add"))
-            self.triggers.import_done()   # a trigger's sound that failed to import
-            if self._import_errors:
-                # in <p>: escaped text with no tag in it (one error alone) was shown as
-                # plain text, "&#x27;" and all
-                errs, self._import_errors = self._import_errors[:15], []
-                QMessageBox.warning(self, _("Some files weren't added"),
-                                    "<p>" + "<br>".join(html.escape(e) for e in errs) + "</p>")
+        if self._pending_imports > 0:
+            self._import_progress()
+            return
+        self._pending_imports = 0
+        self._save_now()
+        self._rebuild_pads()
+        self._fill_categories()   # categories and hotkeys from an Import from Soundpad
+        self.register_hotkeys()
+        n, self._imported_ok = self._imported_ok, 0
+        ids, self._import_ids = self._import_ids, []
+        skipped, self._import_errors = self._import_errors, []
+        self._import_total = 0
+        busy.set_busy(self.btn_add, False)
+        self.triggers.import_done()   # a trigger's sound that failed to import
+        if not n and not skipped:
+            self.toast(_("Nothing new to add"), key="import")
+            return
+        text, kind = importreport.summary(n, skipped)
+        if skipped:
+            action = (_("See why"), lambda: self._show_skipped(skipped))
+        else:
+            action = (_("Undo"), lambda: self.remove_sounds(ids))
+        self.toast(text, kind, 8000 if skipped else 6000, key="import", action=action)
+        self._flash_new(ids)
+
+    def _show_skipped(self, skipped):
+        dlg = importreport.SkippedDialog(skipped, self)
+        dlg.show()   # not modal: sounds keep playing
+
+    def _flash_new(self, ids: list[str]):
+        """The pads just added light up once (their hover glow), the first scrolled
+        into view, so it's clear where they went."""
+        pads = [self.pads[i] for i in ids if i in self.pads]
+        if not pads:
+            return
+        self._pad_scroll.ensureWidgetVisible(pads[0])
+        if not toastmod.animations_on():
+            return
+        for pad in pads:
+            a = QVariantAnimation(pad)
+            a.setDuration(900)
+            a.setKeyValueAt(0.0, 0.0)
+            a.setKeyValueAt(0.3, 1.0)
+            a.setKeyValueAt(1.0, 0.0)
+            a.valueChanged.connect(lambda v, pad=pad: pad.hover or pad._on_hover_k(v))
+            a.start(QVariantAnimation.DeleteWhenStopped)
 
     def on_clip(self, data, name) -> SoundMeta | None:
         """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal

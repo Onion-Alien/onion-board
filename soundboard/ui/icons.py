@@ -277,6 +277,21 @@ def _info(p, fill):
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
 
 
+def _alert(p, fill):
+    """An error: a circle with an exclamation mark."""
+    p.drawEllipse(QRectF(3, 3, 18, 18))
+    p.drawLine(QPointF(12, 7.5), QPointF(12, 13))
+    dot = QPainterPath()
+    dot.addEllipse(QPointF(12, 16.5), 1.1, 1.1)
+    fill(dot)
+
+
+def _close(p, fill):
+    """Dismiss: a cross."""
+    p.drawLine(QPointF(6, 6), QPointF(18, 18))
+    p.drawLine(QPointF(18, 6), QPointF(6, 18))
+
+
 def _shield(p, fill):
     """Privacy & security: a shield with a tick."""
     path = QPainterPath(QPointF(12, 3))
@@ -633,7 +648,7 @@ SHAPES = {
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
-    "shield": _shield, "info": _info,
+    "shield": _shield, "info": _info, "alert": _alert, "close": _close,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,
