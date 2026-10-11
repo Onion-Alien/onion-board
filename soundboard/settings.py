@@ -620,11 +620,14 @@ class SettingsDialog(QDialog):
                 self._searching = False
         first = named = None
         for i in range(self.tabs.count()):
-            page = self._tab_page(i)
             title = self.categories.item(i).data(Qt.ItemDataRole.UserRole + 1).lower()
             if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
                 self.categories.item(i).setHidden(True)
                 continue
+            if i in self._unbuilt:   # (only with no words: spaces, or cleared first)
+                self.categories.item(i).setHidden(False)
+                continue
+            page = self._tab_page(i)
             hits = 0
             for card in page.findChildren(QFrame, "setcard"):
                 if card.property("offline_hid"):   # (_offline_hide) as if it weren't there
