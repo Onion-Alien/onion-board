@@ -16,7 +16,7 @@ so does a manual run of the workflow.
 Usage: python scripts/pick_tests.py [BASE] [--local] [--matrix]   (BASE: origin/main)
 Prints the test files, one per line: `tests` alone for all of them, nothing for none.
 --local also counts uncommitted and new files. Locally, scripts/precommit.ps1 runs
-ruff, the sensitive-data scan and these tests in one go.
+ruff and the other quick checks; with -Tests these tests too.
 
 --matrix prints CI's test jobs as JSON instead (BASE "all": the whole suite): the
 picked files split into SHARDS jobs of about the same length by test_times.json (each
@@ -114,12 +114,14 @@ def pick(changed: list[str]) -> list[str]:
     imports = {m: imported_names(p) for m, p in files.items()}
     tests = {m: p for m, p in files.items()
              if p.parent == TESTS and p.name.startswith("test_")}
-    # a test file "uses" what it imports and what the test files it imports do
+    # a test file "uses" what it imports and what the test files it imports do; not
+    # conftest's: a test taking process_events from it doesn't use the dozens of
+    # modules its fixtures patch (a conftest change runs everything anyway)
     uses = {}
     for t in tests:
         u = set(imports[t])
         for m in imports[t]:
-            if m in files and files[m].parent == TESTS:
+            if m in files and files[m].parent == TESTS and m != "conftest":
                 u |= imports[m]
         uses[t] = u
     # test_pick_tests names files of every kind as examples: it's about this script
