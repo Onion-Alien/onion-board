@@ -3246,5 +3246,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows si <b>{key}</b> nechává pro sebe, takže nemůže být zkratkou. Vyber jinou klávesu.</span>",
   "Opacity": "Krytí",
   "Playing sound background": "Pozadí přehrávaného zvuku",
-  "Show the playing sound's thumbnail behind the cards": "Zobrazit náhled přehrávaného zvuku za kartami"
+  "Show the playing sound's thumbnail behind the cards": "Zobrazit náhled přehrávaného zvuku za kartami",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Zmizí z {mic}: efekt mikrofonu funguje vždy jen na jednom mikrofonu.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efekt mikrofonu byl přeinstalován na {mic}. Vyzkoušej ho v hlasovém chatu.",
+  "Mic effect removed from {mic}": "Efekt mikrofonu odstraněn z {mic}",
+  "Mic to fix": "Mikrofon k opravě",
+  "Onion Board will send your sounds into {mic} from now on.": "Onion Board bude od teď posílat tvoje zvuky do {mic}.",
+  "Plug this mic in to repair it.": "Připoj tento mikrofon, abys ho mohl opravit.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Přeinstaluj efekt mikrofonu Onion Board na {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Obnov {mic} a odstraň z něj efekt mikrofonu Onion Board. Zvuky se do něj přestanou posílat přímo.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Obnov {mic}, odstraň starý efekt mikrofonu a pak na něj nainstaluj novou kopii.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Efekt mikrofonu je na {mic}. Funguje vždy jen na jednom mikrofonu.",
+  "{mic} (unplugged)": "{mic} (odpojený)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Tvoje zvuky jdou do {mic}. Chceš-li místo něj tento mikrofon, vyber ho i v Zařízeních."
 }

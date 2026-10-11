@@ -3465,5 +3465,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>يحتفظ Windows بـ <b>{key}</b> لنفسه، فلا يمكن أن يكون اختصارًا. اختر مفتاحًا آخر.</span>",
   "Opacity": "التعتيم",
   "Playing sound background": "خلفية الصوت الجاري",
-  "Show the playing sound's thumbnail behind the cards": "إظهار الصورة المصغرة للصوت الجاري خلف البطاقات"
+  "Show the playing sound's thumbnail behind the cards": "إظهار الصورة المصغرة للصوت الجاري خلف البطاقات",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "سيُزال من {mic}: يعمل مؤثر الميكروفون على ميكروفون واحد في كل مرة.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "أُعيد تثبيت مؤثر الميكروفون على {mic}. جرّبه في الدردشة الصوتية.",
+  "Mic effect removed from {mic}": "أُزيل مؤثر الميكروفون من {mic}",
+  "Mic to fix": "الميكروفون المراد إصلاحه",
+  "Onion Board will send your sounds into {mic} from now on.": "سيرسل Onion Board أصواتك إلى {mic} من الآن فصاعدًا.",
+  "Plug this mic in to repair it.": "صِل هذا الميكروفون لإصلاحه.",
+  "Reinstall Onion Board's mic effect on {mic}.": "أعد تثبيت مؤثر الميكروفون من Onion Board على {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "استعد إعدادات {mic} وأزل منه مؤثر الميكروفون من Onion Board. ستتوقف الأصوات عن الانتقال مباشرة إليه.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "استعد إعدادات {mic}، وأزل مؤثر الميكروفون القديم، ثم ثبّت نسخة جديدة عليه.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "مؤثر الميكروفون موجود على {mic}. يعمل على ميكروفون واحد في كل مرة.",
+  "{mic} (unplugged)": "{mic} (غير موصول)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "تذهب أصواتك إلى {mic}. لاستخدام هذا الميكروفون بدلًا منه، اختره في الأجهزة أيضًا."
 }

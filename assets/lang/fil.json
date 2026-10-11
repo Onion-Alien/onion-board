@@ -3173,5 +3173,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Nakareserba ang <b>{key}</b> para sa Windows, kaya hindi ito puwedeng hotkey. Pumili ng ibang key.</span>",
   "Opacity": "Opacity",
   "Playing sound background": "Background ng tumutugtog na tunog",
-  "Show the playing sound's thumbnail behind the cards": "Ipakita ang thumbnail ng tumutugtog na tunog sa likod ng mga card"
+  "Show the playing sound's thumbnail behind the cards": "Ipakita ang thumbnail ng tumutugtog na tunog sa likod ng mga card",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Aalisin ito sa {mic}: gumagana ang mic effect sa isang mic lang bawat oras.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Na-reinstall ang mic effect sa {mic}. Subukan ito sa voice chat mo.",
+  "Mic effect removed from {mic}": "Naalis ang mic effect sa {mic}",
+  "Mic to fix": "Mic na aayusin",
+  "Onion Board will send your sounds into {mic} from now on.": "Mula ngayon, ipapadala ng Onion Board ang mga tunog mo sa {mic}.",
+  "Plug this mic in to repair it.": "Isaksak ang mic na ito para maayos ito.",
+  "Reinstall Onion Board's mic effect on {mic}.": "I-reinstall ang mic effect ng Onion Board sa {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Ibalik sa dati ang {mic} at alisin dito ang mic effect ng Onion Board. Hindi na direktang mapupunta rito ang mga tunog.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Ibalik sa dati ang {mic}, alisin ang lumang mic effect, tapos mag-install ng bagong kopya rito.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Nasa {mic} ang mic effect. Gumagana ito sa isang mic lang bawat oras.",
+  "{mic} (unplugged)": "{mic} (hindi nakasaksak)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Napupunta ang mga tunog mo sa {mic}. Para gamitin ang mic na ito, piliin din ito sa Devices."
 }

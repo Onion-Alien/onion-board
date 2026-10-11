@@ -3100,5 +3100,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows สงวน <b>{key}</b> ไว้ใช้เอง จึงตั้งเป็นปุ่มลัดไม่ได้ เลือกปุ่มอื่น</span>",
   "Opacity": "ความทึบ",
   "Playing sound background": "พื้นหลังเสียงที่กำลังเล่น",
-  "Show the playing sound's thumbnail behind the cards": "แสดงภาพขนาดย่อของเสียงที่กำลังเล่นด้านหลังการ์ด"
+  "Show the playing sound's thumbnail behind the cards": "แสดงภาพขนาดย่อของเสียงที่กำลังเล่นด้านหลังการ์ด",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "จะถูกเอาออกจาก {mic} เพราะเอฟเฟกต์ไมค์ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "ติดตั้งเอฟเฟกต์ไมค์ใหม่บน {mic} แล้ว ลองทดสอบในแชทเสียง",
+  "Mic effect removed from {mic}": "ลบเอฟเฟกต์ไมค์ออกจาก {mic} แล้ว",
+  "Mic to fix": "ไมค์ที่จะซ่อม",
+  "Onion Board will send your sounds into {mic} from now on.": "ต่อจากนี้ Onion Board จะส่งเสียงของคุณเข้า {mic}",
+  "Plug this mic in to repair it.": "เสียบไมค์นี้เพื่อซ่อม",
+  "Reinstall Onion Board's mic effect on {mic}.": "ติดตั้งเอฟเฟกต์ไมค์ของ Onion Board ใหม่บน {mic}",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "คืนค่า {mic} และลบเอฟเฟกต์ไมค์ของ Onion Board ออก เสียงจะไม่ถูกส่งเข้าไมค์นี้โดยตรงอีกต่อไป",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "คืนค่า {mic} ลบเอฟเฟกต์ไมค์เก่า แล้วติดตั้งชุดใหม่ลงไป",
+  "The mic effect is on {mic}. It works on one mic at a time.": "เอฟเฟกต์ไมค์อยู่บน {mic} ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น",
+  "{mic} (unplugged)": "{mic} (ไม่ได้เสียบ)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "เสียงของคุณส่งเข้า {mic} หากต้องการใช้ไมค์นี้แทน ให้เลือกในอุปกรณ์ด้วย"
 }

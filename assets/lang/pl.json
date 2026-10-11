@@ -3246,5 +3246,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows zostawia <b>{key}</b> dla siebie, więc nie może to być skrót. Wybierz inny klawisz.</span>",
   "Opacity": "Krycie",
   "Playing sound background": "Tło odtwarzanego dźwięku",
-  "Show the playing sound's thumbnail behind the cards": "Pokaż miniaturę odtwarzanego dźwięku za kartami"
+  "Show the playing sound's thumbnail behind the cards": "Pokaż miniaturę odtwarzanego dźwięku za kartami",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Zniknie z {mic}: efekt mikrofonu działa naraz tylko na jednym mikrofonie.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efekt mikrofonu zainstalowany ponownie na {mic}. Sprawdź go na czacie głosowym.",
+  "Mic effect removed from {mic}": "Efekt mikrofonu usunięty z {mic}",
+  "Mic to fix": "Mikrofon do naprawy",
+  "Onion Board will send your sounds into {mic} from now on.": "Od teraz Onion Board będzie wysyłać dźwięki do {mic}.",
+  "Plug this mic in to repair it.": "Podłącz ten mikrofon, aby go naprawić.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Zainstaluj ponownie efekt mikrofonu Onion Board na {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Przywróć {mic} i usuń z niego efekt mikrofonu Onion Board. Dźwięki przestaną do niego trafiać bezpośrednio.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Przywróć {mic}, usuń stary efekt mikrofonu, a potem zainstaluj na nim nową kopię.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Efekt mikrofonu jest na {mic}. Działa naraz tylko na jednym mikrofonie.",
+  "{mic} (unplugged)": "{mic} (odłączony)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Twoje dźwięki trafiają do {mic}. Aby użyć tego mikrofonu, wybierz go też w Urządzeniach."
 }

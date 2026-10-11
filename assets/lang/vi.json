@@ -3100,5 +3100,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows giữ <b>{key}</b> cho riêng nó, nên không thể làm phím tắt. Hãy chọn phím khác.</span>",
   "Opacity": "Độ mờ",
   "Playing sound background": "Nền âm thanh đang phát",
-  "Show the playing sound's thumbnail behind the cards": "Hiện hình thu nhỏ của âm thanh đang phát phía sau các thẻ"
+  "Show the playing sound's thumbnail behind the cards": "Hiện hình thu nhỏ của âm thanh đang phát phía sau các thẻ",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Nó sẽ được gỡ khỏi {mic}: mỗi lúc hiệu ứng mic chỉ chạy trên một mic.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Đã cài lại hiệu ứng mic trên {mic}. Hãy thử trong cuộc trò chuyện thoại.",
+  "Mic effect removed from {mic}": "Đã gỡ hiệu ứng mic khỏi {mic}",
+  "Mic to fix": "Mic cần sửa",
+  "Onion Board will send your sounds into {mic} from now on.": "Từ giờ Onion Board sẽ gửi âm thanh của bạn vào {mic}.",
+  "Plug this mic in to repair it.": "Cắm mic này vào để sửa.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Cài lại hiệu ứng mic của Onion Board trên {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Khôi phục {mic} và gỡ hiệu ứng mic của Onion Board khỏi nó. Âm thanh sẽ không còn được gửi trực tiếp vào đó.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Khôi phục {mic}, gỡ hiệu ứng mic cũ, rồi cài một bản mới lên đó.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Hiệu ứng mic đang ở {mic}. Mỗi lúc nó chỉ chạy trên một mic.",
+  "{mic} (unplugged)": "{mic} (chưa cắm)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Âm thanh của bạn đang vào {mic}. Để dùng mic này thay thế, hãy chọn nó trong Thiết bị nữa."
 }

@@ -3100,5 +3100,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的鍵，不能當作快速鍵。請換一個鍵。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的音效背景",
-  "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖"
+  "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "它會從 {mic} 上移除:麥克風效果一次只能用於一支麥克風。",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "已在 {mic} 上重新安裝麥克風效果。請在語音聊天中測試。",
+  "Mic effect removed from {mic}": "已從 {mic} 移除麥克風效果",
+  "Mic to fix": "要修復的麥克風",
+  "Onion Board will send your sounds into {mic} from now on.": "從現在起,Onion Board 會把你的聲音傳送到 {mic}。",
+  "Plug this mic in to repair it.": "請連接這支麥克風後再修復。",
+  "Reinstall Onion Board's mic effect on {mic}.": "在 {mic} 上重新安裝 Onion Board 的麥克風效果。",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "還原 {mic} 並移除其上的 Onion Board 麥克風效果。聲音將不再直接傳送到它。",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "還原 {mic},移除舊的麥克風效果,然後在其上安裝新副本。",
+  "The mic effect is on {mic}. It works on one mic at a time.": "麥克風效果在 {mic} 上。它一次只能用於一支麥克風。",
+  "{mic} (unplugged)": "{mic}(未連接)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "你的聲音會傳送到 {mic}。要改用這支麥克風,請也在「裝置」中選擇它。"
 }

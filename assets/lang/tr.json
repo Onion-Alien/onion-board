@@ -3173,5 +3173,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> tuşunu kendine ayırır, bu yüzden kısayol olamaz. Başka bir tuş seç.</span>",
   "Opacity": "Opaklık",
   "Playing sound background": "Çalan sesin arka planı",
-  "Show the playing sound's thumbnail behind the cards": "Çalan sesin küçük resmini kartların arkasında göster"
+  "Show the playing sound's thumbnail behind the cards": "Çalan sesin küçük resmini kartların arkasında göster",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "{mic} üzerinden kaldırılacak: mikrofon efekti aynı anda yalnızca bir mikrofonda çalışır.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofon efekti {mic} üzerine yeniden kuruldu. Sesli sohbetinde dene.",
+  "Mic effect removed from {mic}": "Mikrofon efekti {mic} üzerinden kaldırıldı",
+  "Mic to fix": "Onarılacak mikrofon",
+  "Onion Board will send your sounds into {mic} from now on.": "Onion Board bundan sonra seslerini {mic} cihazına gönderecek.",
+  "Plug this mic in to repair it.": "Onarmak için bu mikrofonu tak.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Onion Board mikrofon efektini {mic} üzerine yeniden kur.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "{mic} cihazını eski haline getir ve Onion Board mikrofon efektini ondan kaldır. Sesler artık doğrudan ona gönderilmeyecek.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic} cihazını eski haline getir, eski mikrofon efektini kaldır, sonra üzerine yeni bir kopya kur.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofon efekti {mic} üzerinde. Aynı anda yalnızca bir mikrofonda çalışır.",
+  "{mic} (unplugged)": "{mic} (takılı değil)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Seslerin {mic} cihazına gidiyor. Bunun yerine bu mikrofonu kullanmak için Cihazlar'da da seç."
 }

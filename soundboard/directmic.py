@@ -677,7 +677,10 @@ def endpoint_for(name: str | None) -> str | None:
     lists it: its name may be cut short, so a prefix match counts)."""
     if not name:
         return None
-    active = [e for e in capture_endpoints() if e["active"]]
+    return _match(name, [e for e in capture_endpoints() if e["active"]])
+
+
+def _match(name: str, active: list[dict]) -> str | None:
     for e in active:
         if e["name"] == name:
             return e["guid"]
@@ -786,7 +789,13 @@ def _status(mic_name: str | None) -> str:
     on = installed_on()
     if not on:
         return "missing"
-    guid = endpoint_for(mic_name) if mic_name is not None else on[0]
+    return _state(endpoint_for(mic_name) if mic_name is not None else on[0], on)
+
+
+def _state(guid: str | None, on: list[str]) -> str:
+    """status() for one mic by its endpoint GUID, given installed_on()."""
+    if not on:
+        return "missing"
     if guid not in on:
         return "other"
     if not effect_in_place(guid) or not make_ring():
@@ -795,6 +804,40 @@ def _status(mic_name: str | None) -> str:
             or installed_slot(guid) in (SFX, COMPOSITE_SFX):   # raw streams skip it
         return "outdated"
     return "ready"
+
+
+def status_on(guid: str) -> str:
+    """status() for the mic with endpoint GUID `guid`, worked out now (no cache)."""
+    return _state(guid.lower(), installed_on())
+
+
+def mics(names: Sequence[str] = ()) -> list[dict]:
+    """The mics the recovery card offers, each by its endpoint GUID (two mics can share
+    a name): every plugged-in one, plus an unplugged one the effect is still on.
+    {"guid", "name", "active", "state" (as status()), "pa": the name in `names` (the
+    app's device list) that is this mic, or None}. Reads the registry: not on the UI
+    thread."""
+    found = capture_endpoints()
+    on = installed_on()
+    active = [e for e in found if e["active"]]
+    pa = {}
+    for n in names:
+        # a name two plugged-in mics share can't say which it is: neither gets it
+        twins = sum(e["name"] == n for e in active) > 1
+        guid = None if twins else _match(n, active)
+        if guid and guid not in pa:
+            pa[guid] = n
+    out = []
+    for e in found:
+        if not e["active"] and e["guid"] not in on:
+            continue
+        try:
+            state = _state(e["guid"], on)
+        except OSError:
+            state = "unknown"
+        out.append({**e, "state": state, "pa": pa.get(e["guid"])})
+    out.sort(key=lambda m: (not m["active"], m["name"].lower()))
+    return out
 
 
 def installed_slot(guid: str) -> int | None:
@@ -1505,7 +1548,9 @@ def admin_reinstall(guid: str) -> int:
     return admin_install(guid)
 
 
-def admin_uninstall() -> int:
+def admin_uninstall(only: str | None = None) -> int:
+    """Take the effect off every mic, or only off the mic `only` (a GUID): then the
+    rest stays, and the effect itself is removed once it's on no mic at all."""
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
@@ -1514,6 +1559,8 @@ def admin_uninstall() -> int:
         if not _audio_service(False):
             return 6   # the existing effect and its recovery notes stay intact
         for guid in installed_on():
+            if only is not None and guid != only:
+                continue
             try:
                 _uninstall_endpoint(guid)
             except Exception:  # noqa: BLE001 - one mic left behind mustn't strand the rest
@@ -1523,6 +1570,8 @@ def admin_uninstall() -> int:
             # its notes stay, and the effect is still registered and on a mic: leaving
             # everything in place lets a later uninstall finish the job
             return 1
+        if installed_on():
+            return 0   # still on another mic: it stays registered for that one
         _unregister_com()
         for d in (install_dir(), *_old_install_dirs(), data_dir()):
             _remove(d)
@@ -1582,6 +1631,9 @@ def cli(args: list[str]) -> int:
         step = lambda: admin_install(guid, args[2] if len(args) == 3 else None)  # noqa: E731
     elif args == ["uninstall"]:
         step = admin_uninstall
+    elif args[:1] == ["uninstall"] and len(args) == 2 and _GUID.fullmatch(args[1]):
+        guid = args[1].lower()   # an unplugged mic too: its settings are still there
+        step = lambda: admin_uninstall(guid)  # noqa: E731
     else:
         return 2
     lock = _admin_lock()
@@ -1693,7 +1745,11 @@ def declined() -> str:
 def install(mic_name: str | None, *, clean: bool = False) -> str | None:
     """Put the effect on the mic called `mic_name` (Windows asks for admin). None when
     done, else what went wrong, in plain words."""
-    guid = endpoint_for(mic_name)
+    return install_on(endpoint_for(mic_name), clean=clean)
+
+
+def install_on(guid: str | None, *, clean: bool = False) -> str | None:
+    """install() for the mic with endpoint GUID `guid` (it comes off any other mic)."""
     if guid is None:
         return _("That mic isn't plugged in (or Windows doesn't list it).")
     if not bundled_dll().is_file():
@@ -1707,8 +1763,9 @@ def install(mic_name: str | None, *, clean: bool = False) -> str | None:
     return None
 
 
-def uninstall() -> str | None:
-    code = _elevated(["uninstall"])
+def uninstall(guid: str | None = None) -> str | None:
+    """Take the effect off every mic, or only off the mic with endpoint GUID `guid`."""
+    code = _elevated(["uninstall", guid] if guid else ["uninstall"])
     if code is None:
         return declined()
     return _("Removing failed (code {code}).", code=code) if code else None

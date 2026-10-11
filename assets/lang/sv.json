@@ -3173,5 +3173,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows håller <b>{key}</b> för sig själv, så den kan inte vara ett kortkommando. Välj en annan tangent.</span>",
   "Opacity": "Opacitet",
   "Playing sound background": "Bakgrund för ljudet som spelas",
-  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten"
+  "Show the playing sound's thumbnail behind the cards": "Visa miniatyren för ljudet som spelas bakom korten",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Den tas bort från {mic}: mikrofoneffekten fungerar på en mikrofon i taget.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofoneffekten har installerats om på {mic}. Testa den i din röstchatt.",
+  "Mic effect removed from {mic}": "Mikrofoneffekten borttagen från {mic}",
+  "Mic to fix": "Mikrofon att reparera",
+  "Onion Board will send your sounds into {mic} from now on.": "Onion Board skickar dina ljud till {mic} från och med nu.",
+  "Plug this mic in to repair it.": "Anslut den här mikrofonen för att reparera den.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Installera om Onion Boards mikrofoneffekt på {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Återställ {mic} och ta bort Onion Boards mikrofoneffekt från den. Ljud skickas då inte längre direkt till den.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Återställ {mic}, ta bort den gamla mikrofoneffekten och installera sedan en ny kopia på den.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Mikrofoneffekten finns på {mic}. Den fungerar på en mikrofon i taget.",
+  "{mic} (unplugged)": "{mic} (ej ansluten)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Dina ljud går till {mic}. För att använda den här mikrofonen i stället, välj den även under Enheter."
 }

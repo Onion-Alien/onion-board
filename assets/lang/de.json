@@ -3173,5 +3173,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows behält <b>{key}</b> für sich, das kann kein Hotkey sein. Wähl eine andere Taste.</span>",
   "Opacity": "Deckkraft",
   "Playing sound background": "Hintergrund des laufenden Sounds",
-  "Show the playing sound's thumbnail behind the cards": "Vorschaubild des laufenden Sounds hinter den Karten anzeigen"
+  "Show the playing sound's thumbnail behind the cards": "Vorschaubild des laufenden Sounds hinter den Karten anzeigen",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Er wird von {mic} entfernt: Der Mikrofoneffekt läuft immer nur auf einem Mikrofon.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofoneffekt neu installiert auf {mic}. Teste ihn im Sprachchat.",
+  "Mic effect removed from {mic}": "Mikrofoneffekt entfernt von {mic}",
+  "Mic to fix": "Zu reparieren",
+  "Onion Board will send your sounds into {mic} from now on.": "Onion Board sendet deine Sounds ab jetzt an {mic}.",
+  "Plug this mic in to repair it.": "Schließ dieses Mikrofon an, um es zu reparieren.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Installiere den Mikrofoneffekt von Onion Board neu auf {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Stelle {mic} wieder her und entferne den Mikrofoneffekt von Onion Board davon. Sounds werden dann nicht mehr direkt daran gesendet.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Stelle {mic} wieder her, entferne den alten Mikrofoneffekt und installiere dann eine frische Kopie darauf.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Der Mikrofoneffekt ist auf {mic}. Er läuft immer nur auf einem Mikrofon.",
+  "{mic} (unplugged)": "{mic} (nicht angeschlossen)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Deine Sounds gehen an {mic}. Um stattdessen dieses Mikrofon zu nutzen, wähl es auch unter Geräte."
 }

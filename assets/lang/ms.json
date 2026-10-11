@@ -3100,5 +3100,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows menyimpan <b>{key}</b> untuk dirinya sendiri, jadi ia tidak boleh jadi hotkey. Pilih kekunci lain.</span>",
   "Opacity": "Kelegapan",
   "Playing sound background": "Latar bunyi yang dimainkan",
-  "Show the playing sound's thumbnail behind the cards": "Tunjukkan imej kecil bunyi yang dimainkan di belakang kad"
+  "Show the playing sound's thumbnail behind the cards": "Tunjukkan imej kecil bunyi yang dimainkan di belakang kad",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Ia akan dibuang daripada {mic}: kesan mikrofon berfungsi pada satu mikrofon pada satu masa.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Kesan mikrofon dipasang semula pada {mic}. Cuba dalam sembang suara anda.",
+  "Mic effect removed from {mic}": "Kesan mikrofon dibuang daripada {mic}",
+  "Mic to fix": "Mikrofon untuk dibaiki",
+  "Onion Board will send your sounds into {mic} from now on.": "Mulai sekarang Onion Board akan menghantar bunyi anda ke {mic}.",
+  "Plug this mic in to repair it.": "Sambungkan mikrofon ini untuk membaikinya.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Pasang semula kesan mikrofon Onion Board pada {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Pulihkan {mic} dan buang kesan mikrofon Onion Board daripadanya. Bunyi tidak lagi dihantar terus kepadanya.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Pulihkan {mic}, buang kesan mikrofon lama, kemudian pasang salinan baharu padanya.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Kesan mikrofon ada pada {mic}. Ia berfungsi pada satu mikrofon pada satu masa.",
+  "{mic} (unplugged)": "{mic} (tidak disambung)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Bunyi anda pergi ke {mic}. Untuk guna mikrofon ini, pilih juga di bawah Peranti."
 }

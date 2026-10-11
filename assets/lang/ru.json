@@ -3246,5 +3246,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows оставляет <b>{key}</b> себе, поэтому это не может быть горячей клавишей. Выбери другую клавишу.</span>",
   "Opacity": "Непрозрачность",
   "Playing sound background": "Фон текущего звука",
-  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками"
+  "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "Он будет снят с {mic}: эффект микрофона работает только на одном микрофоне за раз.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Эффект микрофона переустановлен на {mic}. Проверь его в голосовом чате.",
+  "Mic effect removed from {mic}": "Эффект микрофона удалён с {mic}",
+  "Mic to fix": "Микрофон для исправления",
+  "Onion Board will send your sounds into {mic} from now on.": "Теперь Onion Board будет передавать звуки в {mic}.",
+  "Plug this mic in to repair it.": "Подключи этот микрофон, чтобы исправить его.",
+  "Reinstall Onion Board's mic effect on {mic}.": "Переустанови эффект микрофона Onion Board на {mic}.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "Восстанови {mic} и удали с него эффект микрофона Onion Board. Звуки больше не будут передаваться прямо в него.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "Восстанови {mic}, удали старый эффект микрофона, затем установи на него новую копию.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "Эффект микрофона стоит на {mic}. Он работает только на одном микрофоне за раз.",
+  "{mic} (unplugged)": "{mic} (отключён)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "Звуки идут в {mic}. Чтобы использовать этот микрофон, выбери его и в Устройствах."
 }

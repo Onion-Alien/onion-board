@@ -4,14 +4,20 @@ The card in Settings > Audio shows where the mic effect stands as a pill. The on
 it needs (update, or repair when Windows took it off the mic) is the card's main
 button; the rare actions (repair, clean reinstall, remove) sit behind its ⋯ menu.
 While a fix runs, the setup guide's show plays under it (ui/setupshow.py: Bun
-builds a speaker, then it thumps and he cheers, or it goes BOOM)."""
+builds a speaker, then it thumps and he cheers, or it goes BOOM).
+
+The mic it works on is picked on the card itself ("Mic to fix"), by the mic's Windows
+endpoint, not its name: two mics can share a name, and one can be unplugged. The
+effect sits on one mic at a time (they'd share one ring), so the list shows each mic
+with its own state, and a fix on another mic says it moves there."""
 from __future__ import annotations
 
 import logging
 import threading
 
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtWidgets import QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import (QComboBox, QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
+                               QVBoxLayout)
 from shiboken6 import isValid as qt_valid
 
 from soundboard import directmic, errors, theme
@@ -20,6 +26,7 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.widgets import DropdownMenu
+from soundboard.wheelguard import no_wheel, snug_combo
 
 log = logging.getLogger(__name__)
 
@@ -44,16 +51,40 @@ def action_text(action):
             "remove": _("Remove mic effect")}[action]
 
 
-def explanation(action):
+def explanation(action, mic=None):
+    """What the action does, naming the mic it acts on (`mic`: its name)."""
     if action == "update":
         action = "repair"
+    if mic is None:
+        return {
+            "repair": _("Reinstall Onion Board's mic effect on your selected microphone."),
+            "reinstall": _("Restore your microphones, remove the old mic effect, then "
+                           "install a fresh copy on your selected microphone."),
+            "remove": _("Restore your microphones and remove Onion Board's mic effect. "
+                        "Sounds will stop going straight into your mic."),
+        }[action]
     return {
-        "repair": _("Reinstall Onion Board's mic effect on your selected microphone."),
-        "reinstall": _("Restore your microphones, remove the old mic effect, then install "
-                       "a fresh copy on your selected microphone."),
-        "remove": _("Restore your microphones and remove Onion Board's mic effect. "
-                    "Sounds will stop going straight into your mic."),
+        "repair": _("Reinstall Onion Board's mic effect on {mic}.", mic=mic),
+        "reinstall": _("Restore {mic}, remove the old mic effect, then install a fresh "
+                       "copy on it.", mic=mic),
+        "remove": _("Restore {mic} and remove Onion Board's mic effect from it. Sounds "
+                    "will stop going straight into it.", mic=mic),
     }[action]
+
+
+def labels(mics):
+    """The list's words for each mic: its name, numbered when two share one, marked
+    when unplugged."""
+    seen, out = {}, []
+    for m in mics:
+        n = seen[m["name"]] = seen.get(m["name"], 0) + 1
+        name = m["name"] if n == 1 else _("{mic} ({number})", mic=m["name"], number=n)
+        out.append(name if m["active"] else _("{mic} (unplugged)", mic=name))
+    return out
+
+
+def has_effect(state):
+    return state not in ("missing", "other", "unknown", "")
 
 
 class Recovery(QObject):
@@ -66,27 +97,40 @@ class Recovery(QObject):
         self.running = False
         self.finished.connect(self._finished)
 
-    def start(self, action):
+    def start(self, action, target=None):
+        """Run `action` on the mic `target` (a directmic.mics() entry), or, without
+        one, on the app's mic (remove: off every mic)."""
         if self.running or self.mw._attaching:
             return False
         mic = self.mw.cfg.mic_device
-        if action != "remove" and not mic:
+        if action != "remove" and target is None and not mic:
             self.mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn")
             return False
+        if action != "remove" and target is not None and not target["active"]:
+            self.mw.toast(_("Plug this mic in to repair it."), "warn")
+            return False
         self.running = True
+        self.target = target
         self.mw._attaching = True
-        threading.Thread(target=self._work, args=(action, mic), daemon=True,
+        threading.Thread(target=self._work, args=(action, mic, target), daemon=True,
                          name="audio-recovery").start()
         return True
 
-    def _work(self, action, mic):
+    def _work(self, action, mic, target=None):
         err, state = "", ""
+        guid = target["guid"] if target else None
         try:
-            err = (directmic.uninstall() if action == "remove" else
-                   directmic.install(mic, clean=action == "reinstall")) or ""
+            if action == "remove":
+                err = directmic.uninstall(guid) if guid else directmic.uninstall()
+            elif guid:
+                err = directmic.install_on(guid, clean=action == "reinstall")
+            else:
+                err = directmic.install(mic, clean=action == "reinstall")
+            err = err or ""
             directmic.forget_status()
-            state = directmic.status(mic)
-            if not err and action == "remove" and directmic.anything_installed():
+            state = directmic.status_on(guid) if guid else directmic.status(mic)
+            if not err and action == "remove" and (
+                    has_effect(state) if guid else directmic.anything_installed()):
                 err = _("Repair failed")
             elif not err and action != "remove" and state != "ready":
                 err = _("The mic effect could not be verified. Restart your PC, then try "
@@ -99,13 +143,23 @@ class Recovery(QObject):
     def _finished(self, action, err, state):
         self.running = False
         self.mw._attaching = False
-        self.mw._when_devices_free(lambda: self.mw._refresh_off_ui())
+        target, self.target = getattr(self, "target", None), None
+        pa = target and target.get("pa")
+        cb = getattr(self.mw, "cb_mic", None)
+        if not err and action != "remove" and pa and pa != self.mw.cfg.mic_device \
+                and cb is not None and cb.findData(pa) >= 0:
+            # the effect is on that mic now: the app sends into it (as picking it would)
+            cb.setCurrentIndex(cb.findData(pa))
+            self.mw.on_device(cb, "mic_device")
+        else:
+            self.mw._when_devices_free(lambda: self.mw._refresh_off_ui())
         if err:
             self.mw.toast(_("{error}", error=err), "warn")
 
 
 class RecoveryCard(QFrame):
     checked = Signal(str, str)
+    listed = Signal(list, str)
 
     def __init__(self, mw, parent=None):
         super().__init__(parent)
@@ -167,6 +221,16 @@ class RecoveryCard(QFrame):
         hint.setWordWrap(True)
         v.addWidget(hint)
         row = Flow(gap=8)
+        self.mics = []   # directmic.mics(): what the list shows
+        pick = QLabel(_("Mic to fix"))
+        pick.setProperty("keepline", True)   # one line beside its list, in every language
+        self.target_box = QComboBox()
+        self.target_box.setAccessibleName(_("Mic to fix"))
+        pick.setBuddy(self.target_box)
+        no_wheel(self.target_box)
+        self.target_box.activated.connect(lambda _i: self._picked())
+        row.addWidget(pick)
+        row.addWidget(self.target_box)
         self.fix = QPushButton()
         self.fix.setObjectName("primary")
         self.fix.hide()
@@ -176,12 +240,19 @@ class RecoveryCard(QFrame):
         # the same job as the setup guide's mic step, so the same show (hides itself)
         self.show_ = SetupShow()
         v.addWidget(self.show_)
+        # where the effect is when that's not the picked mic, or why it can't be fixed
+        self.where = QLabel()
+        self.where.setWordWrap(True)
+        self.where.setObjectName("hint")
+        self.where.hide()
+        v.addWidget(self.where)
         self.note = QLabel()
         self.note.setWordWrap(True)
         self.note.setObjectName("hint")
         self.note.hide()
         v.addWidget(self.note)
         self.checked.connect(self._checked)
+        self.listed.connect(self._listed)
         self.recovery.finished.connect(self._done)
         self._checking = False
         self._sync_busy()
@@ -196,20 +267,63 @@ class RecoveryCard(QFrame):
             return
         self._checking = True
         mic = self.mw.cfg.mic_device
+        cb = getattr(self.mw, "cb_mic", None)
+        names = [cb.itemData(i) for i in range(cb.count())] if cb is not None else []
+        names = [n for n in names if n]
 
         def work():
+            try:
+                found = directmic.mics(names)
+            except Exception:  # noqa: BLE001 - keep settings usable if Windows refuses
+                log.exception("couldn't list the mics")
+                found = []
             try:
                 state = directmic.status(mic)
             except Exception:  # noqa: BLE001 - keep settings usable if Windows refuses
                 log.exception("couldn't check mic effect")
                 state = "unknown"
+            busy.emit(self.listed, found, mic or "")
             busy.emit(self.checked, state, mic or "")
         threading.Thread(target=work, daemon=True, name="recovery-status").start()
+
+    def target(self):
+        """The picked mic (a directmic.mics() entry), or None when Windows lists none."""
+        guid = self.target_box.currentData()
+        return next((m for m in self.mics if m["guid"] == guid), None)
+
+    def _listed(self, found, mic):
+        """Fill the list, keeping the picked mic (by endpoint) or else the app's mic."""
+        if mic != (self.mw.cfg.mic_device or ""):
+            return
+        keep = self.target_box.currentData()
+        self.mics = found
+        box = self.target_box
+        box.blockSignals(True)
+        box.clear()
+        for m, text in zip(found, labels(found)):
+            box.addItem(text, m["guid"])
+            box.setItemData(box.count() - 1, m["name"], Qt.ItemDataRole.ToolTipRole)
+        ours = next((m["guid"] for m in found if mic and m["pa"] == mic), None)
+        i = box.findData(keep) if keep else -1
+        box.setCurrentIndex(i if i >= 0 else max(0, box.findData(ours)))
+        box.blockSignals(False)
+        box.setEnabled(bool(found) and not self.recovery.running)
+        snug_combo(box)
+        box.view().setMinimumWidth(box.view().sizeHintForColumn(0) + 32)   # whole names
+
+    def _picked(self):
+        t = self.target()
+        if t is not None:
+            self.note.hide()
+            self._checked(t["state"])
 
     def _checked(self, state, mic=None):
         self._checking = False
         if mic is not None and mic != (self.mw.cfg.mic_device or ""):
             return
+        t = self.target()
+        if t is not None and mic is not None:
+            state = t["state"]   # the picked mic's own state, not the app's mic's
         self._state = state
         if self.recovery.running:
             return   # the pill says Working… until the fix is done
@@ -217,15 +331,30 @@ class RecoveryCard(QFrame):
         self.pill.setText(pill)
         self.pill.setVisible(bool(pill))
         theme.set_tone(self.pill, tone)
-        self.fix.setVisible(fix is not None)
+        unplugged = t is not None and not t["active"]
+        self.fix.setVisible(fix is not None and not unplugged)
         if fix:
             self.fix.setText(action_text(fix))
             self.fix.setProperty("action", fix)
-        self.menu_actions["remove"].setEnabled(state != "missing")
+        for a in ("repair", "reinstall"):
+            self.menu_actions[a].setEnabled(not unplugged)
+        self.menu_actions["remove"].setEnabled(
+            state != "missing" if t is None else has_effect(state))
+        on = [i for i, m in enumerate(self.mics) if has_effect(m["state"]) and m is not t]
+        if unplugged:
+            self.where.setText(_("Plug this mic in to repair it."))
+        elif t is not None and state == "other" and on:
+            self.where.setText(_("The mic effect is on {mic}. It works on one mic at a "
+                                 "time.", mic=labels(self.mics)[on[0]]))
+        else:
+            self.where.setText("")
+        self.where.setVisible(bool(self.where.text()))
 
     def confirm(self, action):
         if self.recovery.running or self.mw._attaching:
             return
+        t = self.target()
+        name = labels(self.mics)[self.mics.index(t)] if t is not None else None
         if getattr(self, "dialog", None) and qt_valid(self.dialog) and self.dialog.isVisible():
             self.dialog.raise_()
             return
@@ -239,9 +368,23 @@ class RecoveryCard(QFrame):
         title = QLabel(action_text(action))
         title.setObjectName("helptitle")
         v.addWidget(title)
-        for text in (explanation(action),
-                     _("Windows will ask for permission. Audio will briefly stop, "
-                       "including calls and games.")):
+        lines = [explanation(action, name)]
+        if t is not None and action != "remove":
+            moved = [labels(self.mics)[i] for i, m in enumerate(self.mics)
+                     if has_effect(m["state"]) and m is not t]
+            if moved:
+                lines.append(_("It comes off {mic}: the mic effect works on one mic at a "
+                               "time.", mic=moved[0]))
+            if t["pa"] and t["pa"] != self.mw.cfg.mic_device:
+                lines.append(_("Onion Board will send your sounds into {mic} from now on.",
+                               mic=name))
+            elif not t["pa"] and self.mw.cfg.mic_device:
+                # its name is shared or unknown: the app can't switch to it by itself
+                lines.append(_("Your sounds go into {mic}. To use this mic instead, pick "
+                               "it under Devices too.", mic=self.mw.cfg.mic_device))
+        lines.append(_("Windows will ask for permission. Audio will briefly stop, "
+                       "including calls and games."))
+        for text in lines:
             label = QLabel(text)
             label.setWordWrap(True)
             v.addWidget(label)
@@ -255,7 +398,7 @@ class RecoveryCard(QFrame):
         go = QPushButton(action_text(action))
         go.setObjectName("danger" if action == "remove" else "primary")
         go.setDefault(True)
-        go.clicked.connect(lambda: self._start(action, d))
+        go.clicked.connect(lambda: self._start(action, d, t))
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(d.reject)
         row.addWidget(go)
@@ -265,8 +408,10 @@ class RecoveryCard(QFrame):
         d.finished.connect(d.deleteLater)
         d.open()
 
-    def _start(self, action, dialog):
-        if self.recovery.start(action):
+    def _start(self, action, dialog, target=None):
+        self._target_name = (labels(self.mics)[self.mics.index(target)]
+                             if target in self.mics else None)
+        if self.recovery.start(action, target):
             dialog.accept()
             self.note.hide()
             self._sync_busy()
@@ -275,6 +420,7 @@ class RecoveryCard(QFrame):
         running = self.recovery.running
         busy.set_busy(self.fix, running)
         busy.set_busy(self.more, running)
+        self.target_box.setEnabled(not running and bool(self.mics))
         if running:
             self.pill.setText(_("Working…"))
             self.pill.show()
@@ -284,8 +430,21 @@ class RecoveryCard(QFrame):
     def _done(self, action, err, state):
         self._sync_busy()
         self.show_.finish(not err)
+        name = getattr(self, "_target_name", None)
+        t = self.target()
+        if t is not None:   # the picked mic's state now, until the next check
+            t["state"] = state
         self._checked(state)
-        self.note.setText(err or (_("Mic effect removed") if action == "remove" else
-                                  _("Mic effect reinstalled. Test it in your voice chat.")))
+        if err:
+            text = err
+        elif name is None:
+            text = (_("Mic effect removed") if action == "remove" else
+                    _("Mic effect reinstalled. Test it in your voice chat."))
+        else:
+            text = (_("Mic effect removed from {mic}", mic=name) if action == "remove" else
+                    _("Mic effect reinstalled on {mic}. Test it in your voice chat.",
+                      mic=name))
+        self.note.setText(text)
+        QTimer.singleShot(0, self, self.check)   # every mic's state, fresh
         theme.set_tone(self.note, "warn" if err else "ok")
         self.note.show()

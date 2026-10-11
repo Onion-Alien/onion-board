@@ -3100,5 +3100,18 @@
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 키는 Windows가 직접 쓰기 때문에 단축키로 쓸 수 없어요. 다른 키를 고르세요.</span>",
   "Opacity": "불투명도",
   "Playing sound background": "재생 중인 사운드 배경",
-  "Show the playing sound's thumbnail behind the cards": "재생 중인 사운드의 썸네일을 카드 뒤에 표시"
+  "Show the playing sound's thumbnail behind the cards": "재생 중인 사운드의 썸네일을 카드 뒤에 표시",
+  "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}에서는 빠져요. 마이크 효과는 한 번에 마이크 하나에서만 작동해요.",
+  "Mic effect reinstalled on {mic}. Test it in your voice chat.": "{mic}에 마이크 효과를 재설치했어요. 음성 채팅에서 테스트해 보세요.",
+  "Mic effect removed from {mic}": "{mic}에서 마이크 효과 제거됨",
+  "Mic to fix": "고칠 마이크",
+  "Onion Board will send your sounds into {mic} from now on.": "이제부터 Onion Board가 소리를 {mic}(으)로 보내요.",
+  "Plug this mic in to repair it.": "고치려면 이 마이크를 연결하세요.",
+  "Reinstall Onion Board's mic effect on {mic}.": "{mic}에 Onion Board의 마이크 효과를 다시 설치합니다.",
+  "Restore {mic} and remove Onion Board's mic effect from it. Sounds will stop going straight into it.": "{mic} 설정을 복원하고 Onion Board의 마이크 효과를 제거합니다. 소리가 이 마이크로 직접 전송되지 않게 됩니다.",
+  "Restore {mic}, remove the old mic effect, then install a fresh copy on it.": "{mic} 설정을 복원하고 이전 마이크 효과를 제거한 다음 새로 설치합니다.",
+  "The mic effect is on {mic}. It works on one mic at a time.": "마이크 효과는 {mic}에 있어요. 한 번에 마이크 하나에서만 작동해요.",
+  "{mic} (unplugged)": "{mic} (연결 안 됨)",
+  "{mic} ({number})": "{mic} ({number})",
+  "Your sounds go into {mic}. To use this mic instead, pick it under Devices too.": "소리는 {mic}(으)로 가고 있어요. 이 마이크를 쓰려면 장치에서도 선택하세요."
 }
