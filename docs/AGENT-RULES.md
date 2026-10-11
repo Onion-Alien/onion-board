@@ -55,6 +55,10 @@ Every task, before changing anything (details in `CLAUDE.md`):
 - Disk, network, device, process and capture calls never run on the Qt UI thread.
   Run them on a worker, and the UI thread only applies the result.
   `9fa49b9` `154b0f5` `307ff86`
+- `MainWindow.__init__` pumps events (the splash) part-way through, so timers and
+  worker answers can reach any slot before `__init__` ends. Set every attribute a
+  slot reads before the first `splash.pump()`; `test_triggers_timer_during_start_up`
+  sends them in at each pump. `9636b3f4`
 - Work that grows with the data (drawing a map, listing a folder, filling a big list)
   goes in slices or tiles, never all at once. `307ff86`
 - A timer that repaints slows down while the app is in the background
