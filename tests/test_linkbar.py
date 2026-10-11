@@ -6,6 +6,19 @@ import pytest
 from soundboard.library import Config, SoundMeta
 from soundboard.ui.linkbar import LinkBar
 
+
+def _fake_threads(monkeypatch, module, worker):
+    """`module` starts `worker` for its threads; every other module keeps real threads
+    (patching threading.Thread itself also caught the app's network relay restarting
+    in a later fixture, on whichever test ran after the relay was stopped)."""
+    import threading
+    import types
+    fake = types.SimpleNamespace(**{k: getattr(threading, k) for k in dir(threading)
+                                    if not k.startswith("__")})
+    fake.Thread = worker
+    monkeypatch.setattr(module, "threading", fake)
+
+
 URL = "https://www.youtube.com/watch?v=abc"
 
 
@@ -82,7 +95,7 @@ def test_add_and_play_share_one_download(qapp, monkeypatch, tmp_path, first):
         def start(self):
             pass
 
-    monkeypatch.setattr(linkbar.threading, "Thread", Worker)
+    _fake_threads(monkeypatch, linkbar, Worker)
     bar.sound_ready.connect(lambda *args: added.append(args))
     bar.sound_ready.connect(lambda meta, _data: bar.cfg.sounds.append(meta))
     bar.done.connect(lambda *args: done.append(args))
@@ -149,7 +162,7 @@ def _fake_start(bar, monkeypatch):
         def start(self):
             pass
 
-    monkeypatch.setattr(linkbar.threading, "Thread", Worker)
+    _fake_threads(monkeypatch, linkbar, Worker)
 
 
 def test_a_cancelled_play_never_plays_when_its_download_lands(qapp, monkeypatch, tmp_path):
