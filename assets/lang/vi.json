@@ -934,7 +934,6 @@
   "Internet radio stations from around the world.": "Các đài phát thanh Internet từ khắp nơi trên thế giới.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Vào micrô của bạn, <b style='color:{colour}'>chỉ cần một cú nhấp chuột là có thể sử dụng</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Vào micrô của bạn <b style='color:{colour}'>được thiết lập trên micrô khác</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Vào micrô của bạn <b style='color:{colour}'>✗ Windows không chạy Onion Board trên đó</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Vào mic của bạn <b style='color:{colour}'>✗ không thể chạm tới nó</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Micrô của bạn <b style='color:{colour}'>✗ cần được sửa chữa nhanh chóng</b>",
   "Into your mic  <b>setting up…</b>": "Vào <b>phần thiết lập micrô của bạn…</b>",
@@ -3125,5 +3124,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Không còn gì của Onion Board trên {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên micro đã chọn để âm thanh của bạn đi thẳng vào đó.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Đặt hiệu ứng mic của Onion Board lên {mic} để âm thanh của bạn đi thẳng vào đó.",
-  "Some leftovers couldn't be removed from {mic}.": "Không gỡ được một số phần còn sót khỏi {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Không gỡ được một số phần còn sót khỏi {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Vào mic của bạn <b style='color:{colour}'>✗ không chạy</b>"
 }

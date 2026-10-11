@@ -565,7 +565,6 @@
   "Internet radio stations from around the world.": "Internetová rádia z celého světa.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Do tvého mikrofonu  <b style='color:{colour}'>zbývá jedno kliknutí</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Do tvého mikrofonu  <b style='color:{colour}'>nastaveno na jiném mikrofonu</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ Windows na něm Onion Board nespouštějí</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ nejde se k němu dostat</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ potřebuje rychlou opravu</b>",
   "Into your mic  <b>setting up…</b>": "Do tvého mikrofonu  <b>nastavuji…</b>",
@@ -3271,5 +3270,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Na {mic} nezůstalo nic z Onion Board.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Dej efekt mikrofonu Onion Board na vybraný mikrofon, aby do něj šly tvoje zvuky přímo.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Dej efekt mikrofonu Onion Board na {mic}, aby do něj šly tvoje zvuky přímo.",
-  "Some leftovers couldn't be removed from {mic}.": "Některé zbytky se z {mic} nepodařilo odstranit."
+  "Some leftovers couldn't be removed from {mic}.": "Některé zbytky se z {mic} nepodařilo odstranit.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Do tvého mikrofonu  <b style='color:{colour}'>✗ neběží</b>"
 }

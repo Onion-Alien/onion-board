@@ -565,7 +565,6 @@
   "Internet radio stations from around the world.": "Posturi de radio pe internet din toată lumea.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "În microfonul tău  <b style='color:{colour}'>un clic și gata</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "În microfonul tău  <b style='color:{colour}'>configurat pe alt microfon</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "În microfonul tău  <b style='color:{colour}'>✗ Windows nu rulează Onion Board pe el</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "În microfonul tău  <b style='color:{colour}'>✗ nu poate fi accesat</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "În microfonul tău  <b style='color:{colour}'>✗ are nevoie de o reparație rapidă</b>",
   "Into your mic  <b>setting up…</b>": "În microfonul tău  <b>se configurează…</b>",
@@ -3271,5 +3270,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Nu mai era nimic de la Onion Board pe {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Pune efectul de microfon Onion Board pe microfonul ales, ca sunetele tale să meargă direct în el.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Pune efectul de microfon Onion Board pe {mic}, ca sunetele tale să meargă direct în el.",
-  "Some leftovers couldn't be removed from {mic}.": "Unele resturi nu au putut fi eliminate de pe {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Unele resturi nu au putut fi eliminate de pe {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "În microfonul tău  <b style='color:{colour}'>✗ nu rulează</b>"
 }

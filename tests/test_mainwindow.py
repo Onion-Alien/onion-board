@@ -1048,9 +1048,42 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypat
     w._update_flow()
     assert w.setup_state == "missing"
     text = w.flow_mic.text() + w.flow_out.text()
-    assert "✗" not in text and theme.status("error") not in text
+    from soundboard.ui import icons
+    assert icons.inline("cross", theme.status("error")) not in text
     assert "after the setup below" in w.flow_mic.text()
     assert "not installed yet" in w.flow_out.text()
+
+
+def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
+    """The mic card's status lines show the app's own tick and cross (not the font's
+    ✓ / ✗), and "not running" fits beside "Into your mic" at 1180x720."""
+    from soundboard import directmic as dm
+    from soundboard import engine as eng
+    from soundboard import theme
+    from soundboard.ui import icons
+    from PySide6.QtWidgets import QApplication
+    w = window
+    dead = {"on": True}
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    monkeypatch.setattr(w, "_direct_not_running", lambda: dead["on"])
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    w.cfg.route = "mic"
+    w.cfg.mic_device = "Microphone (Example Gaming Headset)"
+    w.resize(1180, 720)
+    w.show()
+    w.tabs.setCurrentWidget(w.setup_page)
+    w._update_flow()
+    for _ in range(6):
+        QApplication.processEvents()
+    out = w.flow_out
+    assert "✗" not in out.text() and "✓" not in w.flow_mic.text() + out.text()
+    assert icons.inline("cross", theme.status("error")) in out.text()
+    assert out.height() < 2 * out.fontMetrics().lineSpacing()   # one line
+    dead["on"] = False
+    w._update_flow()
+    assert icons.inline("check", theme.status("ok")) in out.text()
 
 
 def test_sounds_toolbar_dropdown_menus_open_with_gap(window, qapp):

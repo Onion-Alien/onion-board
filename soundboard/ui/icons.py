@@ -12,7 +12,7 @@ import weakref
 
 import shiboken6
 
-from PySide6.QtCore import QPointF, QRectF, QSize, Qt
+from PySide6.QtCore import QBuffer, QByteArray, QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import (QColor, QIcon, QIconEngine, QPainter, QPainterPath, QPen, QPixmap,
                            QTransform)
 
@@ -324,6 +324,13 @@ def _check(p, fill):
     p.drawEllipse(QRectF(3, 3, 18, 18))
     p.drawLine(QPointF(8, 12.5), QPointF(11, 15.5))
     p.drawLine(QPointF(11, 15.5), QPointF(16.5, 9))
+
+
+def _cross(p, fill):
+    """A status cross: the check's circle with an x in it (something isn't working)."""
+    p.drawEllipse(QRectF(3, 3, 18, 18))
+    p.drawLine(QPointF(9, 9), QPointF(15, 15))
+    p.drawLine(QPointF(15, 9), QPointF(9, 15))
 
 
 def _info(p, fill):
@@ -734,7 +741,8 @@ SHAPES = {
     "panel_close": _panel("left", "left"), "panel_open": _panel("left", "right"),
     "panel_close_rtl": _panel("right", "right"), "panel_open_rtl": _panel("right", "left"),
     "nav_back": _nav_arrow("back"), "nav_next": _nav_arrow("forward"), "reload": _reload,
-    "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
+    "speech": _speech, "cable": _cable, "check": _check, "cross": _cross, "warn": _warn,
+    "folder": _folder,
     "link": _link,
     "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
@@ -927,6 +935,25 @@ def text_gap(button):
 
 
 _labels: list[tuple[weakref.ref, str, str, int]] = []
+
+
+_inline: dict[tuple, str] = {}
+
+
+def inline(name: str, color: str, size: int = 16) -> str:
+    """An icon inside rich text (a status tick or cross in a sentence), as an <img>.
+    Drawn at 3x so it stays sharp on a scaled screen; `color` is a real colour
+    (theme.status(...)), so a redraw after a theme change picks up the new one."""
+    key = (name, color, size)
+    if key not in _inline:
+        data = QByteArray()
+        buf = QBuffer(data)
+        buf.open(QBuffer.OpenModeFlag.WriteOnly)
+        pixmap(name, size * 3, color).save(buf, "PNG")
+        src = bytes(data.toBase64().data()).decode()
+        _inline[key] = (f"<img src='data:image/png;base64,{src}' width='{size}' "
+                        f"height='{size}' style='vertical-align: middle'>")
+    return _inline[key]
 
 
 def set_label_icon(label, name: str, color: str = "muted", size: int = 18):

@@ -932,7 +932,6 @@
   "Internet radio stations from around the world.": "来自世界各地的网络电台。",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "送进你的麦克风  <b style='color:{colour}'>点一下就好</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "送进你的麦克风  <b style='color:{colour}'>已设在另一个麦克风上</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "送进你的麦克风  <b style='color:{colour}'>✗ Windows 没有在它上面运行 Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "送进你的麦克风  <b style='color:{colour}'>✗ 无法连接</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "送进你的麦克风  <b style='color:{colour}'>✗ 需要快速修复</b>",
   "Into your mic  <b>setting up…</b>": "送进你的麦克风  <b>正在设置…</b>",
@@ -3125,5 +3124,6 @@
   "Nothing of Onion Board's was left on {mic}.": "{mic} 上没有留下 Onion Board 的任何东西。",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "把 Onion Board 的麦克风效果装到所选麦克风上,让你的声音直接进入它。",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "把 Onion Board 的麦克风效果装到 {mic} 上,让你的声音直接进入它。",
-  "Some leftovers couldn't be removed from {mic}.": "部分残留无法从 {mic} 移除。"
+  "Some leftovers couldn't be removed from {mic}.": "部分残留无法从 {mic} 移除。",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "送进你的麦克风  <b style='color:{colour}'>✗ 没有运行</b>"
 }

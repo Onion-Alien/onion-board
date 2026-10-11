@@ -553,7 +553,6 @@
   "Internet radio stations from around the world.": "Nettiradioasemia ympäri maailmaa.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Mikkiisi  <b style='color:{colour}'>yksi klikkaus jäljellä</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Mikkiisi  <b style='color:{colour}'>asetettu toiseen mikkiin</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Mikkiisi  <b style='color:{colour}'>✗ Windows ei aja Onion Boardia siinä</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Mikkiisi  <b style='color:{colour}'>✗ siihen ei saada yhteyttä</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Mikkiisi  <b style='color:{colour}'>✗ tarvitsee pikakorjauksen</b>",
   "Into your mic  <b>setting up…</b>": "Mikkiisi  <b>asetetaan…</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Laitteeseen {mic} ei jäänyt mitään Onion Boardista.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Laita Onion Boardin mikrofonitehoste valitsemaasi mikrofoniin, niin äänesi menevät suoraan siihen.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Laita Onion Boardin mikrofonitehoste laitteeseen {mic}, niin äänesi menevät suoraan siihen.",
-  "Some leftovers couldn't be removed from {mic}.": "Kaikkia jäänteitä ei voitu poistaa laitteesta {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Kaikkia jäänteitä ei voitu poistaa laitteesta {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Mikkiisi  <b style='color:{colour}'>✗ ei käynnissä</b>"
 }

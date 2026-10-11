@@ -976,7 +976,6 @@
   "Internet radio stations from around the world.": "Інтернет-радіостанції з усього світу.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "У свій мікрофон <b style='color:{colour}'>одним натисканням миші</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "У свій мікрофон <b style='color:{colour}'>, налаштований на інший мікрофон</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "У ваш мікрофон <b style='color:{colour}'>✗ Windows не запускає Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "У ваш мікрофон <b style='color:{colour}'>✗ не може дістатися до нього</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Ваш мікрофон <b style='color:{colour}'>✗ потребує швидкого ремонту</b>",
   "Into your mic  <b>setting up…</b>": "До <b>налаштування мікрофона…</b>",
@@ -3271,5 +3270,6 @@
   "Nothing of Onion Board's was left on {mic}.": "На {mic} нічого від Onion Board не залишилося.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Постав ефект мікрофона Onion Board на вибраний мікрофон, щоб звуки йшли прямо в нього.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Постав ефект мікрофона Onion Board на {mic}, щоб звуки йшли прямо в нього.",
-  "Some leftovers couldn't be removed from {mic}.": "Деякі залишки не вдалося прибрати з {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Деякі залишки не вдалося прибрати з {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "У ваш мікрофон <b style='color:{colour}'>✗ не працює</b>"
 }

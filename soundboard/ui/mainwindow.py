@@ -2981,8 +2981,7 @@ class MainWindow(QMainWindow):
                      colour=warn)
         elif route == "mic" and e.main_stream is not None and self._direct_not_running():
             state = "unrouted"
-            out = _("Into your mic  <b style='color:{colour}'>✗ Windows isn't running "
-                    "Onion Board on it</b>", colour=bad)
+            out = _("Into your mic  <b style='color:{colour}'>✗ not running</b>", colour=bad)
             step = _("Another app may have your mic to itself (an <b>exclusive mode</b> "
                      "setting), or Windows hasn't loaded Onion Board on it. Repair it below, "
                      "or send through the virtual cable instead.")
@@ -3085,8 +3084,12 @@ class MainWindow(QMainWindow):
             # one thing to do)
             mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
                     colour=warn)
-        self.flow_mic.setText(mic)
-        self.flow_out.setText(out)
+        # the app's own painted tick and cross, not the font's ✓ / ✗ (a brushy x)
+        def marks(text: str) -> str:
+            return (text.replace("✗", icons.inline("cross", bad))
+                    .replace("✓", icons.inline("check", ok)))
+        self.flow_mic.setText(marks(mic))
+        self.flow_out.setText(marks(out))
         self.step_lbl.setText(step)
         update = route == "mic" and state == "ok" and direct == "outdated"
         self.mic_update_note.setVisible(update)

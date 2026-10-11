@@ -955,7 +955,6 @@
   "Internet radio stations from around the world.": "Dünyanın dört bir yanından internet radyo istasyonları.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "<b style='color:{colour}'>Tek tıklamayla mikrofonunuza gidin</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "<b style='color:{colour}'>Başka bir mikrofondaki</b> mikrofonunuza",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Mikrofonunuza <b style='color:{colour}'>✗ Windows Onion Board'u çalıştırmıyor</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Mikrofonunuza <b style='color:{colour}'>✗ ulaşamıyorum</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Mikrofonunuzun <b style='color:{colour}'>✗ hızlı bir şekilde onarılması gerekiyor</b>",
   "Into your mic  <b>setting up…</b>": "Mikrofonunuzun <b>kurulumuna girin…</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "{mic} üzerinde Onion Board'dan bir şey kalmamış.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Seslerin doğrudan gitmesi için Onion Board mikrofon efektini seçili mikrofona koy.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Seslerin doğrudan gitmesi için Onion Board mikrofon efektini {mic} üzerine koy.",
-  "Some leftovers couldn't be removed from {mic}.": "Bazı kalıntılar {mic} üzerinden kaldırılamadı."
+  "Some leftovers couldn't be removed from {mic}.": "Bazı kalıntılar {mic} üzerinden kaldırılamadı.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Mikrofonunuza <b style='color:{colour}'>✗ çalışmıyor</b>"
 }

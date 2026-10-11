@@ -553,7 +553,6 @@
   "Internet radio stations from around the world.": "Mga internet radio station mula sa buong mundo.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Sa mic mo  <b style='color:{colour}'>isang click na lang</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Sa mic mo  <b style='color:{colour}'>naka-set up sa ibang mic</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Sa mic mo  <b style='color:{colour}'>✗ hindi pinapatakbo ng Windows ang Onion Board dito</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Sa mic mo  <b style='color:{colour}'>✗ hindi maabot</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Sa mic mo  <b style='color:{colour}'>✗ kailangan ng mabilis na repair</b>",
   "Into your mic  <b>setting up…</b>": "Sa mic mo  <b>sine-set up…</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Walang natirang bahagi ng Onion Board sa {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Ilagay ang mic effect ng Onion Board sa napili mong mikropono para diretso rito ang mga tunog mo.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Ilagay ang mic effect ng Onion Board sa {mic} para diretso rito ang mga tunog mo.",
-  "Some leftovers couldn't be removed from {mic}.": "May mga natirang hindi maalis sa {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "May mga natirang hindi maalis sa {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Sa mic mo  <b style='color:{colour}'>✗ hindi tumatakbo</b>"
 }
