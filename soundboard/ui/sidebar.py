@@ -586,6 +586,7 @@ class SideRail(QFrame):
         lay.addLayout(self._status_box)
         self._gaps.append(self._gap(6))
         lay.addWidget(self._divider())
+        self._gaps.append(self._gap(6))   # the same room under the line as over it
         # Settings and the open / shut arrow share a row when open, stack when shut
         self.toggle = _Arrow()
         self.toggle.setObjectName("railtoggle")
@@ -631,19 +632,27 @@ class SideRail(QFrame):
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
         if e.type() in (QEvent.Show, QEvent.Hide) and obj in self.alerts:
             QTimer.singleShot(0, self, self._sync_divider)   # (not after the rail's gone)
-        elif e.type() == QEvent.Paint and obj in self.foot and obj.isChecked():
-            # the same soft fill as the current tab (RailTab), under the button's icon
-            c = QColor(theme.T["accent"])
-            c.setAlphaF(TINT_ALPHA)
-            p = QPainter(obj)
-            p.setRenderHint(QPainter.Antialiasing)
-            p.setPen(Qt.NoPen)
-            p.setBrush(c)
-            # a square round the icon (the button is the controls' height, taller)
+        elif e.type() == QEvent.Paint and obj in self.foot:
+            # a square round the icon (the button is as tall as the others, so it sits
+            # level with them): selected, the current tab's soft fill (RailTab); else
+            # the hover fill; the keyboard's ring (theme.py leaves these to here)
             side = min(obj.width(), obj.height())
             r = QRectF((obj.width() - side) / 2, (obj.height() - side) / 2, side, side)
-            p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), 8, 8)
-            p.end()
+            r = r.adjusted(0.5, 0.5, -0.5, -0.5)
+            fill = None
+            if obj.isChecked():
+                fill = QColor(theme.T["accent"])
+                fill.setAlphaF(TINT_ALPHA)
+            elif obj.underMouse():
+                fill = QColor(theme.T["btn_hover"])
+            ring = obj.hasFocus()
+            if fill is not None or ring:
+                p = QPainter(obj)
+                p.setRenderHint(QPainter.Antialiasing)
+                p.setPen(QPen(QColor(theme.T["accent"]), 1) if ring else Qt.NoPen)
+                p.setBrush(fill if fill is not None else Qt.NoBrush)
+                p.drawRoundedRect(r, 8, 8)
+                p.end()
         return False
 
     def select_foot(self, w: QPushButton | None):
@@ -893,7 +902,7 @@ class SideRail(QFrame):
             pad.changeSize(room, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
         self._foot_box.invalidate()
         for widget in self.foot:
-            widget.setFixedSize(BUTTON_W, BUTTON_W)   # a square: its fill, its hover
+            widget.setFixedWidth(BUTTON_W)   # (its fill, hover and ring: a square, painted)
         self._foot_gap.changeSize(0, 0, QSizePolicy.Fixed if mid else QSizePolicy.Expanding,
                                   QSizePolicy.Fixed)
         self.toggle.setFixedWidth(BUTTON_W)
