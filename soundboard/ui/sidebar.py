@@ -434,7 +434,7 @@ class SideRail(QFrame):
             w.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             words.addWidget(w)
         byline.setWordWrap(True)
-        brand.setWordWrap(True)   # (the mid layout: two lines)
+        brand.setWordWrap(True)   # (too narrow for one line: two, without the version)
         head.addLayout(words, 1)
         lay.addLayout(head)
         self._gaps = [self._gap(10)]   # (smaller in a short window: compact)
@@ -702,14 +702,22 @@ class SideRail(QFrame):
         """A control's width under the tabs: the open rail's, or one button's."""
         return self._target_width() - 2 * SIDE_OPEN - 1 if self.is_open() else BUTTON_W
 
+    def _brand_width(self) -> int:
+        font = QFont(self.brand.font())
+        font.setPointSizeF(12)   # the wordmark's size (theme.py)
+        return QFontMetrics(font).horizontalAdvance(self.brand.text())
+
+    def _brand_fits(self) -> bool:
+        """The name on one line beside the onion, so the version fits under it (else
+        the name takes both lines: the header is the same height either way)."""
+        return self._target_width() - 2 * SIDE_OPEN - 1 - BUTTON_W - 6 >= self._brand_width()
+
     def _full_fit(self) -> int:
         """The narrowest open rail where the full layout fits, every word on its line:
         the name, "Sound output" beside its switch, Settings beside the arrow (a longer
         translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
-        font = QFont(self.brand.font())
-        font.setPointSizeF(12)   # the wordmark's full size (theme.py)
-        need = [side + BUTTON_W + 6 + QFontMetrics(font).horizontalAdvance(self.brand.text())]
+        need = [side + BUTTON_W + 6 + self._brand_width()]
         if self.output:
             title = self.output.title.fontMetrics().horizontalAdvance(_("Sound output"))
             need.append(side + 16 + 16 + 4 + title + 4 + 38 + 2)
@@ -725,8 +733,8 @@ class SideRail(QFrame):
         return bool(self.output) and w is self.output.connection and self._mid()
 
     def _mid(self) -> bool:
-        """Open but short of _full_fit: the name smaller on two lines without the
-        version, the output card its small shut one, Settings just its icon."""
+        """Open but short of _full_fit: the output card its small shut one, Settings
+        just its icon, everything under the tabs centred."""
         return self.is_open() and self._target_width() < self._full_fit()
 
     def drag_width(self, width: int):
@@ -838,11 +846,7 @@ class SideRail(QFrame):
         self._lay.invalidate()
         mid = self._mid()
         self.brand.setVisible(shown)
-        self.byline.setVisible(shown and not mid)
-        if self.property("narrowbrand") != mid:
-            self.setProperty("narrowbrand", mid)
-            self.brand.style().unpolish(self.brand)
-            self.brand.style().polish(self.brand)
+        self.byline.setVisible(shown and self._brand_fits())
         style = Qt.ToolButtonTextBesideIcon if shown else Qt.ToolButtonIconOnly
         for b in self.buttons:
             b.setToolButtonStyle(style)

@@ -78,8 +78,8 @@ def test_shut_then_mid_then_full_while_dragging(qapp):
             qapp.processEvents()
             named = bool(rail.buttons[0].text().strip())
             assert named == (width >= FULL_W) == rail.brand.isVisible()
-            # the mid layout: no version, Settings just its icon
-            assert rail.byline.isVisible() == (width >= full)
+            # the version shows once the name fits on one line; mid: Settings its icon
+            assert rail.byline.isVisible() == (named and rail._brand_fits())
             assert bool(settings.text().strip()) == (width >= full)
             assert not named or rail.rect().contains(rail.brand.geometry())
             # mid: Settings and the arrow side by side, centred as a pair
