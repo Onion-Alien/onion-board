@@ -1056,7 +1056,6 @@
   "Slow or patchy connection": "Sambungan perlahan atau tidak stabil",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: hentikan setiap bunyi lain dahulu",
-  "Some files weren't added": "Sesetengah fail tidak ditambah",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Sesetengah permainan hanya guna mikrofon utama Windows. Tetingkap bunyi baru dibuka:\n\n1.  Klik kanan  {vm}  →  Set as Default Device\n2.  Klik kanan sekali lagi  →  Set as Default Communication Device\n     (sembang suara dalam banyak permainan meminta yang itu daripada Windows)\n3.  Mulakan semula permainan.\n\nPerhatian: taip suara juga akan mendengar bunyi anda.\nUntuk buat asal, lakukan yang sama pada mikrofon biasa anda.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Sebahagian Baru dipadam tidak dapat dikembalikan: ia disimpan dalam titik pemulihan ini.",
   "Some sounds weren't imported": "Sesetengah bunyi tidak diimport",
@@ -2999,5 +2998,33 @@
   "Onion Board on GitHub": "Onion Board di GitHub",
   "A download is still running. If you close now, it's lost. Close anyway?": "Masih ada muat turun yang sedang berjalan. Jika anda tutup sekarang, ia akan hilang. Tutup juga?",
   "Download running": "Muat turun sedang berjalan",
-  "Your sounds are back on your mic.": "Bunyi anda kembali pada mikrofon anda."
+  "Your sounds are back on your mic.": "Bunyi anda kembali pada mikrofon anda.",
+  "Added {n} sound": [
+    "{n} bunyi ditambah"
+  ],
+  "Adding {done} of {total}…": "Menambah {done} daripada {total}…",
+  "Already in your library": "Sudah ada dalam pustaka anda",
+  "Couldn't add {n} file": [
+    "Tidak dapat menambah {n} fail"
+  ],
+  "Couldn't be opened": "Tidak dapat dibuka",
+  "Drop files": "Lepaskan fail",
+  "Drop to add sounds": "Lepaskan untuk menambah bunyi",
+  "Drop to add {n} file": [
+    "Lepaskan untuk menambah {n} fail"
+  ],
+  "Files not added": "Fail yang tidak ditambah",
+  "Not a sound we can play": "Bukan bunyi yang boleh kami mainkan",
+  "See why": "Lihat sebabnya",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fail tidak ditambah"
+  ],
+  "{n} skipped": [
+    "{n} dilangkau"
+  ],
+  "That sound is already in your library": "Bunyi itu sudah ada dalam pustaka anda",
+  "{n} sound is already in your library": [
+    "{n} bunyi sudah ada dalam pustaka anda"
+  ]
 }

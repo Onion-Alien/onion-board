@@ -78,7 +78,9 @@ def summary(added: int, skipped: list[Skipped]) -> tuple[str, str]:
                   skipped=ngettext("{n} skipped", "{n} skipped", k)),
                 "" if dupes_only else "warn")
     if dupes_only:
-        return (ngettext("That sound is already in your library",
+        if k == 1:
+            return _("That sound is already in your library"), ""
+        return (ngettext("{n} sound is already in your library",
                          "{n} sounds are already in your library", k), "")
     return ngettext("Couldn't add {n} file", "Couldn't add {n} files", k), "error"
 

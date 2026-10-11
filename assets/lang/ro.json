@@ -1086,7 +1086,6 @@
   "Slow or patchy connection": "Conexiune lentă sau instabilă",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: oprește întâi toate celelalte sunete",
-  "Some files weren't added": "Unele fișiere nu s-au adăugat",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Unele jocuri folosesc pur și simplu microfonul principal din Windows. Tocmai s-a deschis o fereastră de sunet:\n\n1.  Clic dreapta pe  {vm}  →  Setare ca dispozitiv implicit\n2.  Clic dreapta din nou  →  Setare ca dispozitiv de comunicații implicit\n     (chatul vocal din multe jocuri îi cere lui Windows pe acela)\n3.  Repornește jocul.\n\nAtenție: și dictarea vocală îți va auzi atunci sunetele.\nCa să anulezi, fă la fel pe microfonul tău normal.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "O parte din Șterse recent n-a putut fi readusă: e păstrată în punctul ăsta de restaurare.",
   "Some sounds weren't imported": "Unele sunete nu s-au importat",
@@ -3129,5 +3128,45 @@
   "Onion Board on GitHub": "Onion Board pe GitHub",
   "A download is still running. If you close now, it's lost. Close anyway?": "O descărcare este încă în curs. Dacă închizi acum, se pierde. Închizi oricum?",
   "Download running": "Descărcare în curs",
-  "Your sounds are back on your mic.": "Sunetele tale sunt din nou pe microfon."
+  "Your sounds are back on your mic.": "Sunetele tale sunt din nou pe microfon.",
+  "Added {n} sound": [
+    "{n} sunet adăugat",
+    "{n} sunete adăugate",
+    "{n} de sunete adăugate"
+  ],
+  "Adding {done} of {total}…": "Se adaugă {done} din {total}…",
+  "Already in your library": "E deja în biblioteca ta",
+  "Couldn't add {n} file": [
+    "Nu s-a putut adăuga {n} fișier",
+    "Nu s-au putut adăuga {n} fișiere",
+    "Nu s-au putut adăuga {n} de fișiere"
+  ],
+  "Couldn't be opened": "Nu s-a putut deschide",
+  "Drop files": "Lasă fișierele",
+  "Drop to add sounds": "Lasă aici ca să adaugi sunete",
+  "Drop to add {n} file": [
+    "Lasă aici ca să adaugi {n} fișier",
+    "Lasă aici ca să adaugi {n} fișiere",
+    "Lasă aici ca să adaugi {n} de fișiere"
+  ],
+  "Files not added": "Fișiere neadăugate",
+  "Not a sound we can play": "Nu e un sunet pe care îl putem reda",
+  "See why": "Vezi de ce",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fișier nu a fost adăugat",
+    "{n} fișiere nu au fost adăugate",
+    "{n} de fișiere nu au fost adăugate"
+  ],
+  "{n} skipped": [
+    "{n} omis",
+    "{n} omise",
+    "{n} omise"
+  ],
+  "That sound is already in your library": "Sunetul e deja în biblioteca ta",
+  "{n} sound is already in your library": [
+    "{n} sunet e deja în biblioteca ta",
+    "{n} sunete sunt deja în biblioteca ta",
+    "{n} de sunete sunt deja în biblioteca ta"
+  ]
 }
