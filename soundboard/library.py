@@ -1085,6 +1085,8 @@ def _decode(path: str) -> tuple[np.ndarray, bool]:
         log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
         ff = _ffmpeg()
         if not ff:
+            from soundboard import usage   # the name only, never the file
+            usage.used("needs-ffmpeg")
             raise RuntimeError(_("This file needs FFmpeg to play. Get it in "
                                  "Settings > Data & quality.")) from e
         try:

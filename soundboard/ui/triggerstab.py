@@ -27,7 +27,7 @@ from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QDialog, QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import modules, net, netlog, theme, updates, watchaddon
+from soundboard import modules, net, netlog, theme, updates, usage, watchaddon
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
@@ -83,6 +83,7 @@ class TriggersTab(QWidget):
         self.offer: watchaddon.Offer | None = None   # a newer version to update to
         self._busy = False
         self._closed = False
+        self._leaving = False   # the tab hid or closed: the window's going isn't a "no"
         self._cancel = False
         self._compact: dict[str, bool] = {}          # fit steps applied (see fit_steps)
         self._progress.connect(self._on_progress)
@@ -158,7 +159,7 @@ class TriggersTab(QWidget):
         self.btn_get = QPushButton()
         self.btn_get.setObjectName("primary")
         icons.set_icon(self.btn_get, "triggers", "on_accent")
-        self.btn_get.clicked.connect(self.get)
+        self.btn_get.clicked.connect(lambda: (usage.used("watch-prompt-get"), self.get()))
         self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.OtherFocusReason))
         buttons.addWidget(self.btn_get)
         self.btn_cancel = QPushButton(_("Cancel"))
@@ -323,16 +324,21 @@ class TriggersTab(QWidget):
 
     def hideEvent(self, event):
         super().hideEvent(event)
+        self._leaving = True
         self.install_popup.reject()
+        self._leaving = False
 
     def _show_install_popup(self):
         if (self._closed or self.pending or self.panel is not None or not self.isVisible()
                 or self.install_popup.isVisible()):
             return
         self.install_popup.open()
+        usage.used("watch-prompt-shown")   # the names only (usage.py)
         self.btn_get.setFocus(Qt.OtherFocusReason)
 
     def _dismiss_install(self):
+        if not (self._leaving or self._closed):
+            usage.used("watch-prompt-closed")
         if self._busy and self.panel is None:
             self.cancel()
 

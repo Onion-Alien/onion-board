@@ -704,3 +704,43 @@ def test_the_daily_count_says_roughly_how_long_it_was_open(sent):
                                         (3 * 3600, "3-8h"), (8 * 3600, "8h-plus")])
 def test_open_time_is_a_rough_bucket(seconds, b):
     assert usage.open_bucket(seconds) == b
+
+
+def test_settings_that_are_set_count_every_day(monkeypatch):
+    from soundboard import quality
+    monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
+    cfg = Config(sidebar_open=False, apps_categories=["Games", "Other", "Stream stuff"])
+    assert {"source-off", "rail-shut", "apps-own-categories"} <= set(usage.features_now(cfg))
+    monkeypatch.setattr(quality, "current", quality.Prefs())
+    cfg = Config(sidebar_open=True, apps_categories=["Browsers", "Games", "Other"])
+    assert not {"source-off", "rail-shut", "apps-own-categories"} & set(usage.features_now(cfg))
+    assert set(usage.features_now(cfg)) <= set(usage.FEATURES)
+
+
+def test_apps_built_in_categories_match_the_apps_tab():
+    from soundboard.ui.appspanel import APP_CATEGORIES
+    assert set(usage.APPS_BUILT_IN) == {*APP_CATEGORIES, "Other"}
+
+
+def test_every_name_the_app_counts_is_in_features():
+    """A usage.used("x") anywhere in the app whose name isn't in FEATURES is silently
+    dropped: catch the typo here."""
+    import re
+    from pathlib import Path
+    root = Path(usage.__file__).parent
+    names = set()
+    for f in root.rglob("*.py"):
+        names |= set(re.findall(r'usage\.used\("([a-z0-9-]+)"', f.read_text(encoding="utf-8")))
+    assert names and not names - set(usage.FEATURES)
+    for k in ("normal", "streamer", "games", "all"):   # setupwizard.uses() keys
+        assert f"use-{k}" in usage.FEATURES
+
+
+def test_the_daily_count_goes_by_the_calendar_day():
+    """8 pm, then 6 pm the next day: both days count (22 hours isn't a whole day)."""
+    import time as _t
+    eight_pm = _t.mktime((2026, 10, 12, 20, 0, 0, 0, 0, -1))
+    assert usage.due(eight_pm, eight_pm + 22 * 3600)
+    assert not usage.due(eight_pm, eight_pm + 60)            # the same evening
+    assert usage.due(eight_pm, eight_pm + usage.EVERY_S)    # a whole day
+    assert not usage.due(1e18, eight_pm)                     # the clock went back
