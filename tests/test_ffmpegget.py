@@ -1,24 +1,37 @@
-"""Getting FFmpeg from the app (soundboard.ffmpegget): Settings > Data & quality.
-The installer offers FFmpeg once; someone who skipped it had no way to add it later."""
+"""Checking, getting and repairing FFmpeg (soundboard.ffmpegget): the check behind the
+loading screen, getting it by itself, the bar's Fix it and Settings > Data & quality.
+No test runs the real ffmpeg or winget, or downloads anything (conftest blocks them)."""
+import hashlib
+import io
 import subprocess
+import threading
+import zipfile
 
 import pytest
 
 from soundboard import ffmpegget, library, net
 
+# the real steps, before conftest's _ffmpeg_works blocks them for every test
+REAL = {name: getattr(ffmpegget, name)
+        for name in ("_with_winget", "_own_copy", "_winget", "_download_once")}
 
-def test_can_offer_only_when_it_is_missing_and_winget_is_here(monkeypatch):
-    monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
-    assert not ffmpegget.can_offer()          # already have it
-    monkeypatch.setattr(library, "_ffmpeg", lambda: None)
-    monkeypatch.setattr(ffmpegget, "winget", lambda: None)
-    assert not ffmpegget.can_offer()          # no winget to get it with
-    monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
-    assert ffmpegget.can_offer()
 
+@pytest.fixture(autouse=True)
+def _online():
+    net.configure_features([], offline=False)
+    yield
+    net.configure_features()
+
+
+def _real(monkeypatch, *names):
+    for name in names:
+        monkeypatch.setattr(ffmpegget, name, REAL[name])
+
+
+# --------------------------------------------------------------------------- winget
 
 def test_get_runs_winget_and_returns_the_new_ffmpeg(monkeypatch):
-    net.configure_features([], offline=False)
+    _real(monkeypatch, "_winget")
     have = []
     monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
     monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe" if have else None)
@@ -37,7 +50,7 @@ def test_get_runs_winget_and_returns_the_new_ffmpeg(monkeypatch):
 
 
 def test_get_says_winget_could_not_install_it(monkeypatch):
-    net.configure_features([], offline=False)
+    _real(monkeypatch, "_winget")
     monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
     monkeypatch.setattr(library, "_ffmpeg", lambda: None)   # still missing afterwards
     monkeypatch.setattr(ffmpegget.subprocess, "run",
@@ -48,17 +61,292 @@ def test_get_says_winget_could_not_install_it(monkeypatch):
     assert "No package found matching input criteria." in str(e.value)
 
 
-def test_get_is_refused_in_offline_mode(monkeypatch):
-    net.configure_features([], offline=True)
+def test_get_is_refused_offline_or_switched_off(monkeypatch):
     monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
+    net.configure_features([], offline=True)
     with pytest.raises(ffmpegget.GetError, match="Offline"):
         ffmpegget.get()
-    net.configure_features([], offline=False)
-
-
-def test_get_is_refused_when_its_switch_is_off(monkeypatch):
     net.configure_features(["ffmpeg_download"], offline=False)
-    monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
     with pytest.raises(ffmpegget.GetError, match="switched off"):
         ffmpegget.get()
-    net.configure_features()
+
+
+def test_winget_reinstalls_then_takes_it_off_first(monkeypatch):
+    """--force first (winget can count a broken copy as installed); still broken:
+    uninstall, then install fresh."""
+    _real(monkeypatch, "_with_winget", "_winget")
+    monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
+    monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
+    calls = []
+    monkeypatch.setattr(ffmpegget.subprocess, "run", lambda args, **kw: (
+        calls.append(args[1:]), subprocess.CompletedProcess(args, 0, b"", b""))[1])
+    _states(monkeypatch, ffmpegget.BROKEN, ffmpegget.OK)
+    assert ffmpegget._with_winget().state == ffmpegget.OK
+    assert [c[0] for c in calls] == ["install", "uninstall", "install"]
+    assert "--force" in calls[0]
+
+
+# --------------------------------------------------------------------------- check
+
+def _version_says(monkeypatch, rc=0, out=b"ffmpeg version 7.1-essentials_build-www.gyan.dev "
+                  b"Copyright (c) 2000-2024", exc=None):
+    calls = []
+
+    def run(args, **kw):
+        calls.append((args, kw))
+        if exc is not None:
+            raise exc
+        return subprocess.CompletedProcess(args, rc, out, b"bad")
+    monkeypatch.setattr(ffmpegget.subprocess, "run", run)
+    return calls
+
+
+def test_check_says_it_works_and_which_version(monkeypatch):
+    monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
+    calls = _version_says(monkeypatch)
+    h = ffmpegget._check()
+    assert h == ffmpegget.Health(ffmpegget.OK, "7.1", "ffmpeg.exe")
+    args, kw = calls[0]
+    assert args == ["ffmpeg.exe", "-version"]          # hidden, and never hangs the check
+    assert kw["timeout"] == ffmpegget.CHECK_TIMEOUT_S
+    assert kw["creationflags"] == getattr(subprocess, "CREATE_NO_WINDOW", 0)
+
+
+def test_version_words():
+    assert ffmpegget._version("ffmpeg version n7.0.2 Copyright") == "7.0.2"
+    assert ffmpegget._version("ffmpeg version 9.0.1-essentials_build-www.gyan.dev") == "9.0.1"
+    assert ffmpegget._version("ffmpeg version N-117000-gabc Copyright") == "N-117000-gabc"
+    assert ffmpegget._version("something else") == ""
+
+
+def test_check_says_missing_when_there_is_none(monkeypatch, tmp_path):
+    monkeypatch.setattr(library, "_ffmpeg", lambda: None)
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    assert ffmpegget._check() == ffmpegget.Health(ffmpegget.MISSING)
+
+
+def test_check_says_broken_when_winget_left_half_of_it(monkeypatch, tmp_path):
+    """The package folder is there without ffmpeg.exe: winget still thinks it's
+    installed, so a plain install would skip it."""
+    monkeypatch.setattr(library, "_ffmpeg", lambda: None)
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    (tmp_path / "Microsoft" / "WinGet" / "Packages" / (ffmpegget.PACKAGE + "_Microsoft.Winget"
+                                                       ".Source_8wekyb3d8bbwe")).mkdir(parents=True)
+    h = ffmpegget._check()
+    assert h.state == ffmpegget.BROKEN and h.why
+
+
+@pytest.mark.parametrize("how", ["oserror", "timeout", "exit-code"])
+def test_check_says_broken_when_it_wont_start(monkeypatch, how):
+    """Won't start (the wrong kind for this PC, a dead file), hangs, or stops with an
+    error: all broken, with words for why."""
+    monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
+    if how == "oserror":
+        _version_says(monkeypatch, exc=OSError(193, "%1 is not a valid Win32 application"))
+    elif how == "timeout":
+        _version_says(monkeypatch, exc=subprocess.TimeoutExpired("ffmpeg", 8))
+    else:
+        _version_says(monkeypatch, rc=-1073741515, out=b"")
+    h = ffmpegget._check()
+    assert h.state == ffmpegget.BROKEN and h.path == "ffmpeg.exe" and h.why
+
+
+def test_the_check_behind_the_loading_screen_is_the_answer(monkeypatch):
+    runs = []
+
+    def check():
+        runs.append(threading.current_thread().name)
+        h = ffmpegget.Health(ffmpegget.MISSING)
+        monkeypatch.setattr(ffmpegget, "_last", h)
+        return h
+    monkeypatch.setattr(ffmpegget, "check", check)
+    monkeypatch.setattr(ffmpegget, "_early", threading.Thread(target=lambda: check()))
+    ffmpegget._early.start()
+    assert ffmpegget.answer().state == ffmpegget.MISSING
+    assert len(runs) == 1                     # not checked twice
+
+
+def test_library_uses_the_apps_own_copy_first(monkeypatch, tmp_path):
+    if library.os.name != "nt":
+        pytest.skip("the app's own copy is a Windows build")
+    monkeypatch.setattr(library, "APP_DIR", tmp_path)
+    own = tmp_path / "ffmpeg" / "bin" / "ffmpeg.exe"
+    own.parent.mkdir(parents=True)
+    own.write_bytes(b"MZ")
+    assert library._ffmpeg() == str(own)
+
+
+def test_why_not(monkeypatch):
+    assert ffmpegget.why_not() == ""
+    net.configure_features(["ffmpeg_download"], offline=False)
+    assert "switched off" in ffmpegget.why_not()
+    net.configure_features([], offline=True)
+    assert "Offline" in ffmpegget.why_not()
+
+
+# --------------------------------------------------------------------------- fix
+
+def _states(monkeypatch, *states):
+    """check() answers these in turn (the last one again after that)."""
+    seq = [ffmpegget.Health(s, "9.0.1" if s == ffmpegget.OK else "", why="x") for s in states]
+
+    def check():
+        h = seq.pop(0) if len(seq) > 1 else seq[0]
+        monkeypatch.setattr(ffmpegget, "_last", h)
+        return h
+    monkeypatch.setattr(ffmpegget, "check", check)
+
+
+def _steps(monkeypatch, winget_ok=True, own_ok=True):
+    did = []
+    ok = ffmpegget.Health(ffmpegget.OK, "9.0.1")
+
+    def with_winget():
+        did.append("winget")
+        if not winget_ok:
+            raise ffmpegget.GetError("winget couldn't install FFmpeg (it said: nope).")
+        ffmpegget._last = ok
+        return ok
+
+    def own_copy(progress, stop):
+        did.append("own")
+        if not own_ok:
+            raise ffmpegget.GetError("Couldn't reach github.com (timed out).")
+        return ok
+    monkeypatch.setattr(ffmpegget, "_with_winget", with_winget)
+    monkeypatch.setattr(ffmpegget, "_own_copy", own_copy)
+    monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
+    return did
+
+
+def test_fix_uses_winget_when_it_works(monkeypatch):
+    did = _steps(monkeypatch)
+    _states(monkeypatch, ffmpegget.BROKEN)
+    assert ffmpegget.fix().state == ffmpegget.OK and did == ["winget"]
+
+
+def test_fix_falls_back_to_the_apps_own_download(monkeypatch):
+    did = _steps(monkeypatch, winget_ok=False)
+    _states(monkeypatch, ffmpegget.MISSING)
+    assert ffmpegget.fix().state == ffmpegget.OK and did == ["winget", "own"]
+
+
+def test_fix_downloads_it_without_winget(monkeypatch):
+    did = _steps(monkeypatch)
+    monkeypatch.setattr(ffmpegget, "winget", lambda: None)
+    _states(monkeypatch, ffmpegget.MISSING)
+    assert ffmpegget.fix().state == ffmpegget.OK and did == ["own"]
+
+
+def test_fix_never_lets_winget_skip_the_proxy_or_tor(monkeypatch):
+    """winget goes direct: with a proxy or Tor set, only the app's own download, which
+    follows Connection."""
+    did = _steps(monkeypatch)
+    monkeypatch.setattr(net, "mode", lambda: net.TOR)
+    _states(monkeypatch, ffmpegget.MISSING)
+    assert ffmpegget.fix().state == ffmpegget.OK and did == ["own"]
+
+
+def test_fix_says_so_when_nothing_worked(monkeypatch):
+    _steps(monkeypatch, winget_ok=False, own_ok=False)
+    _states(monkeypatch, ffmpegget.MISSING)
+    with pytest.raises(ffmpegget.GetError, match="github.com"):
+        ffmpegget.fix()
+
+
+def test_fix_does_nothing_when_it_works_unless_asked_to_reinstall(monkeypatch):
+    did = _steps(monkeypatch)
+    _states(monkeypatch, ffmpegget.OK)
+    assert ffmpegget.fix().state == ffmpegget.OK and did == []
+    assert ffmpegget.fix(force=True).state == ffmpegget.OK and did == ["winget"]
+
+
+def test_fix_is_refused_offline_or_switched_off(monkeypatch):
+    did = _steps(monkeypatch)
+    _states(monkeypatch, ffmpegget.MISSING)
+    net.configure_features(["ffmpeg_download"], offline=False)
+    with pytest.raises(ffmpegget.GetError, match="switched off"):
+        ffmpegget.fix()
+    net.configure_features([], offline=True)
+    with pytest.raises(ffmpegget.GetError, match="Offline"):
+        ffmpegget.fix()
+    assert did == []
+
+
+def test_stop_after_winget_skips_the_download(monkeypatch):
+    did = _steps(monkeypatch, winget_ok=False)
+    _states(monkeypatch, ffmpegget.MISSING)
+    stop = threading.Event()
+    stop.set()
+    with pytest.raises(ffmpegget.Stopped):
+        ffmpegget.fix(stop=stop)
+    assert did == ["winget"]
+
+
+# --------------------------------------------------------------------------- own copy
+
+def test_download_retries_then_tries_the_other_source(monkeypatch, tmp_path):
+    monkeypatch.setattr(ffmpegget, "RETRY_WAIT_S", (0.0, 0.0))
+    tried = []
+
+    def once(url, to, progress, stop):
+        tried.append(url)
+        if len(tried) < ffmpegget.TRIES + 1:      # every try on the first source fails
+            raise ffmpegget.GetError("Couldn't reach github.com (reset).")
+    monkeypatch.setattr(ffmpegget, "_download_once", once)
+    ffmpegget.download(tmp_path / "z.zip")
+    assert tried == [ffmpegget.URLS[0]] * ffmpegget.TRIES + [ffmpegget.URLS[1]]
+
+
+def test_download_stops_at_once(monkeypatch, tmp_path):
+    tried = []
+
+    def once(url, to, progress, stop):
+        tried.append(url)
+        raise ffmpegget.Stopped("Stopped.")
+    monkeypatch.setattr(ffmpegget, "_download_once", once)
+    with pytest.raises(ffmpegget.Stopped):
+        ffmpegget.download(tmp_path / "z.zip")
+    assert len(tried) == 1
+
+
+class _Resp(io.BytesIO):
+    def __init__(self, data):
+        super().__init__(data)
+        self.headers = {"Content-Length": str(len(data))}
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_download_once_checks_the_checksum(monkeypatch, tmp_path):
+    _real(monkeypatch, "_download_once")
+    data = b"x" * 1000
+    monkeypatch.setattr(net, "urlopen", lambda *a, **k: _Resp(data))
+    to = tmp_path / "z.zip"
+    with pytest.raises(ffmpegget.GetError, match="checksum"):
+        ffmpegget._download_once(ffmpegget.URLS[0], to, None, None)
+    monkeypatch.setattr(ffmpegget, "SHA256", hashlib.sha256(data).hexdigest())
+    seen = []
+    ffmpegget._download_once(ffmpegget.URLS[0], to, lambda d, t: seen.append((d, t)), None)
+    assert to.read_bytes() == data and seen[-1] == (1000, 1000)
+
+
+def test_unpack_takes_only_the_named_files(tmp_path):
+    z = tmp_path / "z.zip"
+    with zipfile.ZipFile(z, "w") as f:
+        for name in ffmpegget.KEEP:
+            f.writestr(name, b"data:" + name.encode())
+        f.writestr("../../evil.exe", b"no")
+    dest = ffmpegget.unpack(z, tmp_path / "bin")
+    assert sorted(p.name for p in dest.iterdir()) == sorted(ffmpegget.KEEP.values())
+    assert not (tmp_path.parent / "evil.exe").exists()
+
+
+def test_unpack_says_what_is_missing(tmp_path):
+    z = tmp_path / "z.zip"
+    with zipfile.ZipFile(z, "w") as f:
+        f.writestr("nothing", b"")
+    with pytest.raises(ffmpegget.GetError, match="ffmpeg.exe"):
+        ffmpegget.unpack(z, tmp_path / "bin")
+    assert not (tmp_path / "bin").exists()

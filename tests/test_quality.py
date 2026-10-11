@@ -154,35 +154,65 @@ def test_settings_page_picks_the_save_format(window):  # noqa: F811
     d.close()
 
 
-def test_settings_offers_get_ffmpeg_only_when_it_is_missing(window, monkeypatch):  # noqa: F811
+def _ff(monkeypatch, state, why=""):
+    """The FFmpeg check (MainWindow.check_ffmpeg) found ``state``."""
     from soundboard import ffmpegget
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
-    d = SettingsDialog(window, "data")
-    page = d.tabs.currentWidget().widget()
-    assert d.btn_ffmpeg.isVisibleTo(page) and d.btn_ffmpeg.isEnabled()
-    assert "FFmpeg" in d.ff_note.text()
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: False)   # it's there now
-    d._ffmpeg_sync()
-    assert not d.ff_box.isVisibleTo(page)
-    d.close()
+    h = ffmpegget.Health(state, "9.0.1" if state == ffmpegget.OK else "", why=why)
+    monkeypatch.setattr(ffmpegget, "_last", h)
+    return h
 
 
-def test_get_ffmpeg_greys_out_when_its_switch_is_off(window, monkeypatch):  # noqa: F811
+def _data_page(window):  # noqa: F811
+    window.open_settings("data")   # Settings is a page in the window
+    return window._settings_dlg
+
+
+def test_settings_always_shows_ffmpeg_and_what_to_do(window, monkeypatch):  # noqa: F811
+    from soundboard import ffmpegget
+    d = None
+    for state, pill, button in ((ffmpegget.OK, "Working: version 9.0.1", "Reinstall"),
+                                (ffmpegget.MISSING, "Missing", "Get FFmpeg"),
+                                (ffmpegget.BROKEN, "Won't start", "Fix it")):
+        _ff(monkeypatch, state, "some of its files are gone")
+        d = _data_page(window)
+        d._ffmpeg_sync()
+        assert not d.ff_box.isHidden() and d.ff_state.text() == pill
+        assert not d.btn_ffmpeg.isHidden() and d.btn_ffmpeg.text() == button
+        if state == ffmpegget.BROKEN:
+            assert "some of its files are gone" in d.ff_note.text()
+
+
+def test_settings_says_why_it_wasnt_got_but_still_offers_it(window, monkeypatch):  # noqa: F811
     from soundboard import ffmpegget, net
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
+    _ff(monkeypatch, ffmpegget.MISSING)
     net.configure_features(["ffmpeg_download"])
-    d = SettingsDialog(window, "data")
-    assert not d.btn_ffmpeg.isEnabled()
-    d.close()
+    d = _data_page(window)
+    d._ffmpeg_sync()
+    assert d.btn_ffmpeg.text() == "Get FFmpeg" and not d.btn_ffmpeg.isHidden()
+    assert "switched off" in d.ff_note.text()
+    net.configure_features()
 
 
-def test_get_ffmpeg_button_goes_once_ffmpeg_is_here(window, monkeypatch):  # noqa: F811
+def test_settings_checks_ffmpeg_when_nobody_has_yet(window, qapp):  # noqa: F811
+    from conftest import process_events
     from soundboard import ffmpegget
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
-    d = SettingsDialog(window, "data")
-    page = d.tabs.currentWidget().widget()
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: False)   # winget just got it
-    d._ffmpeg_sync("FFmpeg is ready: M4A, AAC and video files play now.")
-    assert d.ff_note.isVisibleTo(page) and "ready" in d.ff_note.text()
-    assert not d.btn_ffmpeg.isVisibleTo(page)
-    d.close()
+    assert ffmpegget.last() is None
+    d = _data_page(window)
+    process_events(qapp, lambda: d.ff_state.text() not in ("", "Checking…"))
+    assert d.ff_state.text() == "Working: version 7.1"   # (conftest's FFmpeg works)
+
+
+def test_settings_follows_the_download_and_a_fix(window, monkeypatch):  # noqa: F811
+    from soundboard import ffmpegget
+    _ff(monkeypatch, ffmpegget.MISSING)
+    d = _data_page(window)
+    d._ffmpeg_sync()
+    assert "360p" in d._save_video_hint.text()
+    window._ff_getting, window._ff_percent = True, 42
+    window._ffmpeg_news()
+    assert "42%" in d.ff_note.text() and d.btn_ffmpeg.text() == "Getting FFmpeg…"
+    h = _ff(monkeypatch, ffmpegget.OK)
+    window._ff_getting = False
+    window._on_ffmpeg(h, "")               # the fix worked
+    assert d.ff_state.text() == "Working: version 9.0.1" and d.btn_ffmpeg.text() == "Reinstall"
+    assert "ready" in d.ff_note.text() and "360p" not in d._save_video_hint.text()

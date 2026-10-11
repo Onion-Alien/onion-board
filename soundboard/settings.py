@@ -2233,7 +2233,7 @@ class SettingsDialog(QDialog):
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
         from soundboard import library, quality
-        from soundboard.ui.panel import icon_button
+        from soundboard.ui.panel import icon_button, section_label
         q = quality.current
         w, v = self._page()
         self._data_widgets = {}
@@ -2302,6 +2302,11 @@ class SettingsDialog(QDialog):
               "Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg "
               "installed only lower-quality videos can be saved (usually 360p)."),
             q.save_video, lambda b: self._data_set(save_video=b))
+        item = cv.itemAt(cv.count() - 1)   # _option's hint: its words follow FFmpeg
+        hint_lbl = item.widget() if item is not None else None
+        assert isinstance(hint_lbl, QLabel)
+        self._save_video_hint = hint_lbl
+        self._has_ff = has_ff
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setContentsMargins(26, 0, 0, 0)
@@ -2353,10 +2358,21 @@ class SettingsDialog(QDialog):
 
         # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
         # who skipped it had no way to add it later, so the app can get it itself now.
+        # Always shown: whether it works (MainWindow.check_ffmpeg), and a way to fix it.
         ff_box = QWidget()
         ff_col = QVBoxLayout(ff_box)
         ff_col.setContentsMargins(0, 0, 0, 0)
         ff_col.setSpacing(6)
+        head = QHBoxLayout()
+        head.setSpacing(8)
+        name = section_label("FFmpeg")   # a name: the same in every language
+        name.setProperty("head", True)   # no gap above: it shares its line with the pill
+        head.addWidget(name)
+        self.ff_state = QLabel()
+        self.ff_state.setObjectName("pill")       # works / missing / won't start
+        head.addWidget(self.ff_state)
+        head.addStretch(1)
+        ff_col.addLayout(head)
         self.ff_note = QLabel()
         self.ff_note.setObjectName("hint")
         self.ff_note.setWordWrap(True)
@@ -2448,61 +2464,75 @@ class SettingsDialog(QDialog):
         finally:
             self._data_syncing = False
 
-    def _ffmpeg_sync(self, msg: str = ""):
-        """The Get FFmpeg row: shown while FFmpeg is missing (or a download is going),
-        with the button greyed out when the app may not go online for it."""
-        from soundboard import ffmpegget, net
+    def _ffmpeg_sync(self):
+        """The FFmpeg row: whether it works, how far its download is, and Reinstall /
+        Get FFmpeg / Fix it. It shows the main window's state (MainWindow._ffmpeg_news
+        calls this), so it and the bar always agree."""
+        from soundboard import ffmpegget
         button = getattr(self, "btn_ffmpeg", None)
-        if button is None:
+        if button is None or not qt_valid(button):
             return
-        show = ffmpegget.can_offer() or busy.is_busy(button) or bool(msg)
-        self.ff_box.setVisible(show)
-        if not show:
-            return
-        offer = ffmpegget.can_offer() or busy.is_busy(button)
-        if not offer and button.hasFocus():
-            button.clearFocus()   # hiding a focused button jumps focus to the next control
-        button.setVisible(offer)  # once it's here, "FFmpeg is ready" stays without the button
-        allowed = net.allowed(ffmpegget.FEATURE)
-        button.setEnabled(allowed)
-        button.setToolTip(net.off_message(ffmpegget.FEATURE) if not allowed else
-                          _("Install FFmpeg (about 100 MB) through winget, Microsoft's "
-                            "package manager, to play and add M4A, AAC and video files"))
-        self.ff_note.setText(msg or _("M4A, AAC and video files need FFmpeg. It's a free "
-                                      "download of about 100 MB."))
+        mw = self.mw
+        h = ffmpegget.last()
+        working = h is not None and h.state == ffmpegget.OK
+        getting = getattr(mw, "_ff_getting", False)
+        if h is None:
+            mw.check_ffmpeg()   # its answer comes back through MainWindow._ffmpeg_news
+            state, tone, label = _("Checking…"), "", _("Get FFmpeg")
+            note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
+                     "about 100 MB.")
+        elif working:
+            state = (_("Working: version {version}", version=h.version) if h.version
+                     else _("Working"))
+            tone, label = "on", _("Reinstall")
+            note = _("M4A, AAC and video files play, and videos can be saved. If "
+                     "they stop working, reinstall it.")
+        elif h.state == ffmpegget.MISSING:
+            state, tone, label = _("Missing"), "slow", _("Get FFmpeg")
+            note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
+                     "about 100 MB.")
+        else:
+            state, tone, label = _("Won't start"), "slow", _("Fix it")
+            note = _("It's installed but won't start ({error}), so M4A, AAC and "
+                     "video files won't play. Fix it installs it again.",
+                     error=h.why or _("no reason given"))
+        pct = getattr(mw, "_ff_percent", -1)
+        if getting:
+            note = (_("Getting FFmpeg… {percent}%", percent=pct) if pct >= 0
+                    else _("Getting FFmpeg…"))
+        elif getattr(mw, "_ff_error", ""):
+            note = mw._ff_error
+        elif getattr(mw, "_ff_done", False) and working:
+            note = _("FFmpeg is ready: M4A, AAC and video files play now.")
+        elif not working and ffmpegget.why_not():
+            note = "\n".join((note, ffmpegget.why_not()))
+        self.ff_state.setText(state)
+        for prop in ("on", "slow"):   # the pill's own colours: on = works, slow = a problem
+            self.ff_state.setProperty(prop, "true" if tone == prop else "false")
+        self.ff_state.style().unpolish(self.ff_state)
+        self.ff_state.style().polish(self.ff_state)
+        self.ff_note.setText(note)
+        if not busy.is_busy(button):
+            button.setText(_("Getting FFmpeg…") if getting else label)
+            button.setToolTip(_("Download FFmpeg (about 110 MB) so M4A, AAC and video "
+                                "files play and videos can be saved"))
+        if h is not None and working != self._has_ff:   # the video hint's words follow
+            self._has_ff = working
+            self._save_video_hint.setText(
+                _("Add as sound keeps a copy of the video too (the pad is still just its "
+                  "sound). Videos use a lot more data: about 5 to 25 MB a minute.") if working
+                else _("Add as sound keeps a copy of the video too (the pad is still just its "
+                       "sound). Videos use a lot more data: about 5 to 25 MB a minute. "
+                       "Without ffmpeg installed only lower-quality videos can be saved "
+                       "(usually 360p)."))
 
     def _get_ffmpeg(self):
-        """Get FFmpeg in the background (winget, which can take a minute), then say so."""
+        """Get FFmpeg, fix it or reinstall it (MainWindow.fix_ffmpeg_clicked: on a worker,
+        winget then the app's own download)."""
         from soundboard import ffmpegget
-        usage.used("get-ffmpeg")
-        release = busy.hold(self.btn_ffmpeg, _("Getting FFmpeg…"))
-        relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
-
-        def finish(err):
-            relay.deleteLater()
-            if err:
-                usage.used("get-ffmpeg-failed")
-            release(_("✗ Failed") if err else _("✓ Got FFmpeg"))
-            if qt_valid(getattr(self, "btn_ffmpeg", None)):
-                self._ffmpeg_sync(err or _("FFmpeg is ready: M4A, AAC and video files "
-                                           "play now."))
-                self._data_sync()
-
-        def work():
-            from soundboard import netlog
-            netlog.cause(ffmpegget.FEATURE, "You clicked Get FFmpeg (Settings > "
-                                            "Data & quality)")
-            try:
-                ffmpegget.get()
-                relay.done.emit("")
-            except ffmpegget.GetError as e:
-                relay.done.emit(errors.plain(e))
-            except Exception as e:  # noqa: BLE001 - shown, never a stuck button
-                logging.getLogger(__name__).exception("Get FFmpeg failed")
-                relay.done.emit(_("Couldn't get FFmpeg ({error}).", error=errors.plain(e)))
-
-        relay.done.connect(finish)
-        threading.Thread(target=work, daemon=True, name="ffmpeg-get").start()
+        h = ffmpegget.last()
+        self.mw.fix_ffmpeg_clicked(self.btn_ffmpeg,
+                                   force=h is not None and h.state == ffmpegget.OK)
 
     # ------------------------------------------------------------------ privacy & security
     def _privacy(self):
