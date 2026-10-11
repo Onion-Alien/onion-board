@@ -107,7 +107,7 @@ def _downloader() -> list[tuple[str, str]]:
          r"account .* terminated|does not exist", _("That video isn't available any more.")),
         (r"requested format is not available|no video formats|no formats found",
          _("There's no sound to download at that link.")),
-        (r"unsupported url", _("That link isn't from a site sounds can be added from.")),
+        (r"unsupported url", _("That page has no sound Onion Board can add.")),
         (r"http error 404|not found", _("Nothing was found at that link (404).")),
         (r"http error 429|too many requests",
          _("The site is turning down too many requests. Try again in a few minutes.")),

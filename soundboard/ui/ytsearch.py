@@ -541,10 +541,10 @@ class ResultRow(HoverCard):
             "play": (f"QPushButton {{ {base} background:{tint}; border:1px solid {edge};"
                      f" color:{T['live_text']}; }}"
                      f"QPushButton:hover {{ background:{tint_hi}; }}"),
-            "add": (f"QPushButton {{ {base} background:{T['accent']};"
-                    f" border:1px solid {T['accent']};"
+            "add": (f"QPushButton {{ {base} background:{theme.accent_fill()};"
+                    f" {theme.accent_edge()}"
                     f" color:{T['on_accent']}; }}"
-                    f"QPushButton:hover {{ background:{T['accent_hover']}; }}"),
+                    f"QPushButton:hover {{ background:{theme.accent_fill(hover=True)}; }}"),
         }
         # waiting for another card's download: greyed, like any busy button
         waiting = (f"QPushButton[busy=\"true\"] {{ background:{T['btn']}; border:1px solid"

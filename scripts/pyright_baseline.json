@@ -642,6 +642,18 @@
 "count": 1
 },
 {
+"file": "soundboard/ui/icons.py",
+"rule": "reportAttributeAccessIssue",
+"message": "Cannot access attribute \"RoundCap\" for class \"type[Qt]\"",
+"count": 1
+},
+{
+"file": "soundboard/ui/icons.py",
+"rule": "reportAttributeAccessIssue",
+"message": "Cannot access attribute \"RoundJoin\" for class \"type[Qt]\"",
+"count": 1
+},
+{
 "file": "soundboard/ui/linkbar.py",
 "rule": "reportArgumentType",
 "message": "Argument of type \"bool\" cannot be assigned to parameter \"dest\" of type \"Path | None\" in function \"download_audio\"",

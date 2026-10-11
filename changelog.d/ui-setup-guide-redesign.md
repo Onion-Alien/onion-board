@@ -1,0 +1,4 @@
+- **The quick setup guide looks designed now.** Mics and headphones are tiles (the product name big, "Microphone" small under it), four across, and your voice level moves along the picked mic's tile. A step bar shows where you are, Back / Next are bigger with bolder arrows, and everything lines up on the same edges.
+- **"Where do your sounds go?" says plainly whether it works**: a green "Working" card with the mic Onion Board's audio driver is on, an amber one when it needs a repair, a grey one when it isn't set up. The virtual cable and another device moved into an "Optional" card, each with why you'd want it.
+- **Switching from a working mic driver to the cable asks first**, and offers to tell us what went wrong with the driver.
+- **The last step is shorter**: the Discord tip is a small pill you open if you want it, and the "Bring my ... sounds over" button is gone (the installer's tick boxes and Backup > Import from another soundboard do it).

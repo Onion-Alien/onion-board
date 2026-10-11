@@ -526,6 +526,7 @@ class Config:
         and the newest backup that loads is used instead; only if there is none
         do the defaults apply. A missing file with backups beside it (deleted, or lost
         mid-save) is recovered the same way, before a save rotates the backups away.
+        A recovered backup is written back as config.json at once.
         The pad list is never silently thrown away."""
         raw, err, missing, locked = None, None, False, False
         for attempt in range(LOAD_TRIES):   # OneDrive / antivirus can hold it for a moment
@@ -586,6 +587,8 @@ class Config:
                 log.warning("backup %s doesn't load either", name, exc_info=True)
                 continue
             log.warning("recovered settings from backup %s", name)
+            if missing or broken:   # put it back as config.json now, not at the next
+                cfg.save()          # change (a damaged file left in place stays kept)
             cfg.load_note = (_("Your settings file was missing, so the last good copy "   # pyright: ignore[reportAttributeAccessIssue]
                                "({name}) was loaded instead.", name=name) if missing else
                              _("Your settings file was damaged, so the last good copy "
