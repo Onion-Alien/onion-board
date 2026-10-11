@@ -18,9 +18,9 @@ import re
 import time
 import urllib.parse
 
-from PySide6.QtCore import QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal
 from PySide6.QtGui import (QColor, QFontMetricsF, QIcon, QLinearGradient, QPainter,
-                           QPainterPath, QPalette, QPixmap)
+                           QPainterPath, QPalette, QPen, QPixmap)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
@@ -120,6 +120,88 @@ class ElideLabel(QLabel):
         text = self.fontMetrics().elidedText(self.text(), Qt.ElideRight, self.width())
         self.style().drawItemText(p, self.rect(), int(Qt.AlignLeft | Qt.AlignVCenter),
                                   self.palette(), self.isEnabled(), text, QPalette.WindowText)
+        p.end()
+
+
+class Outcome(QWidget):
+    """How a download ended, flashed for a moment: a small green tick in front of the
+    picture (or Bun) when it worked, a red ✗ there when it didn't (the bar's background
+    turns red then too: DownloadBar.paintEvent, under the words). No badge behind the
+    mark; it pops in and fades straight away. Clicks go through it."""
+
+    SHOW_MS = 1000
+    MARK = 20.0          # the tick's or ✗'s size, px
+
+    def __init__(self, bar: QFrame):
+        super().__init__(bar)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.ok = True
+        self.spot = QRectF()   # the picture's box, in the bar's pixels (empty: no badge)
+        self._k = 0.0
+        self._anim = QVariantAnimation(self)
+        self._anim.setStartValue(0.0)
+        self._anim.setEndValue(1.0)
+        self._anim.setDuration(self.SHOW_MS)
+        self._anim.valueChanged.connect(self._step)
+        self._anim.finished.connect(self.hide)
+        self.hide()
+
+    def play(self, ok: bool, spot: QRectF):
+        self.ok, self.spot = ok, spot
+        self.setGeometry(self.parentWidget().rect())
+        self.raise_()
+        self.show()
+        self._anim.stop()
+        self._anim.start()
+
+    def stop(self):
+        self._anim.stop()
+        self.hide()
+
+    def running(self) -> bool:
+        return self._anim.state() == QVariantAnimation.Running
+
+    def k(self) -> float:
+        return self._k
+
+    def _step(self, k):
+        self._k = float(k)
+        self.update()
+        if not self.ok:
+            self.parentWidget().update()   # its red background fades with it
+
+    def paintEvent(self, _e):
+        k = self._k
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        red = QColor(theme.status("error"))
+        if self.spot.isEmpty():
+            p.end()
+            return
+        pop = min(1.0, k / 0.15)                               # pops in, then fades out
+        fade = min(1.0, (1.0 - k) / 0.4)
+        u = self.MARK / 2 * (0.6 + 0.4 * pop)
+        c = self.spot.center()
+        path = QPainterPath()
+        if self.ok:
+            path.moveTo(c.x() - 0.8 * u, c.y() + 0.05 * u)
+            path.lineTo(c.x() - 0.25 * u, c.y() + 0.6 * u)
+            path.lineTo(c.x() + 0.85 * u, c.y() - 0.6 * u)
+        else:
+            a = 0.62 * u
+            path.moveTo(c.x() - a, c.y() - a)
+            path.lineTo(c.x() + a, c.y() + a)
+            path.moveTo(c.x() - a, c.y() + a)
+            path.lineTo(c.x() + a, c.y() - a)
+        p.setBrush(Qt.NoBrush)
+        edge = QColor(theme.T["bg"]).darker(140)   # a thin dark edge: shows on any picture
+        edge.setAlphaF(0.7 * fade)
+        p.setPen(QPen(edge, 5.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.drawPath(path)
+        mark = QColor(theme.status("ok") if self.ok else red)
+        mark.setAlphaF(fade)
+        p.setPen(QPen(mark, 3.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.drawPath(path)
         p.end()
 
 
@@ -239,6 +321,7 @@ class DownloadBar(QFrame):
         self._auto_hide.timeout.connect(self._clear_and_hide)
 
         self._build_ui()
+        self.outcome = Outcome(self)
         self.retheme()
         self.hide()
 
@@ -246,7 +329,7 @@ class DownloadBar(QFrame):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
-        head = QWidget()
+        head = self._head = QWidget()
         head.setObjectName("downloadhead")
         outer.addWidget(head)
         h = self._head_lay = QHBoxLayout(head)
@@ -310,6 +393,21 @@ class DownloadBar(QFrame):
         self.lbl_meta.hide()
         hang(self.lbl_meta, 1)
         row1.addStretch(1)   # a short title doesn't stretch the line
+        # top right: shrink the bar to one line (set_collapsed), and ✕ once it's over
+        self.btn_min = QPushButton()
+        self.btn_min.setObjectName("urgenthide")
+        self.btn_min.setToolTip(_("Hide"))
+        self.btn_min.setCursor(Qt.PointingHandCursor)
+        self.btn_min.setFixedSize(22, 22)
+        self.btn_min.clicked.connect(lambda: self.set_collapsed(True))
+        hang(self.btn_min)
+        self.btn_close = QPushButton("✕")
+        self.btn_close.setObjectName("urgenthide")
+        self.btn_close.setToolTip(_("Dismiss"))
+        self.btn_close.setFixedSize(22, 22)
+        self.btn_close.clicked.connect(self.hide)
+        self.btn_close.hide()
+        hang(self.btn_close)
         col.addLayout(row1)
 
         row2 = self._row2 = QHBoxLayout()
@@ -328,8 +426,7 @@ class DownloadBar(QFrame):
         h.addLayout(col, 1)
         h.setAlignment(col, Qt.AlignVCenter)   # the two lines together, in the middle
 
-        # after the progress, on its line: the queue's button, Stop all, Cancel (or ✕ once
-        # it's over)
+        # after the progress, on its line: the queue's button, Stop all, Cancel
         self.queue_badge = QPushButton()
         self.queue_badge.setObjectName("queuebadge")
         self.queue_badge.setCheckable(True)
@@ -353,13 +450,34 @@ class DownloadBar(QFrame):
         self.btn_cancel.clicked.connect(self._on_cancel)
         row2.addWidget(self.btn_cancel, 0, Qt.AlignVCenter)
 
-        self.btn_close = QPushButton("✕")
-        self.btn_close.setObjectName("urgenthide")
-        self.btn_close.setToolTip(_("Dismiss"))
-        self.btn_close.setFixedSize(26, 26)
-        self.btn_close.clicked.connect(self.hide)
-        self.btn_close.hide()
-        row2.addWidget(self.btn_close, 0, Qt.AlignVCenter)
+        # Minimised: one slim line (title, how far, the queue) to keep using the app
+        self.strip = QWidget()
+        self.strip.setObjectName("downloadhead")
+        sl = QHBoxLayout(self.strip)
+        sl.setContentsMargins(12, 5, 8, 5)
+        sl.setSpacing(10)
+        self.s_title = ElideLabel()
+        self.s_title.setObjectName("downloadtitle")
+        self.s_title.setFont(f)
+        sl.addWidget(self.s_title, 0)
+        self.s_status = QLabel()
+        self.s_status.setObjectName("downloadstatus")
+        sl.addWidget(self.s_status)
+        self.s_bar = SmoothProgressBar()
+        sl.addWidget(self.s_bar, 1, Qt.AlignVCenter)
+        self.s_queue = QLabel()
+        self.s_queue.setObjectName("downloadmeta")
+        sl.addWidget(self.s_queue)
+        self.btn_expand = QPushButton()
+        self.btn_expand.setObjectName("urgenthide")
+        self.btn_expand.setToolTip(_("Show more"))
+        self.btn_expand.setCursor(Qt.PointingHandCursor)
+        self.btn_expand.setFixedSize(22, 22)
+        self.btn_expand.clicked.connect(lambda: self.set_collapsed(False))
+        sl.addWidget(self.btn_expand)
+        outer.addWidget(self.strip)
+        self.strip.hide()
+        self._collapsed = False
 
         # The queue: one row per pick waiting, each with its own ✕
         self.panel = QWidget()
@@ -426,10 +544,16 @@ class DownloadBar(QFrame):
             f"QPushButton#urgenthide {{ background:transparent; border:none; color:{T['muted']}; "
             f"border-radius:6px; padding:0px; min-width:0px; font-size:10pt; }}"
             f"QPushButton#urgenthide:hover {{ background:{T['btn_hover']}; }}"
-            f"QFrame#queuerow {{ background:{row_bg}; border-radius:8px; }}"
+            f"QFrame#queuerow {{ background:{row_bg}; border:1px solid transparent; "
+            f"border-radius:8px; }}"
+            # lights up under the mouse like the app's other cards (More tabs)
+            f"QFrame#queuerow:hover {{ background:{theme.mix(row_bg, T['text'], 0.06)}; "
+            f"border-color:{T['border_hi']}; }}"
             f"QLabel#queueindex {{ color:{T['muted']}; font-size:8.5pt; font-weight:700; }}"
         )
         self.bar.update()
+        for b, name in ((self.btn_min, "fold_up"), (self.btn_expand, "fold_open")):
+            b.setIcon(QIcon(icons.pixmap(name, 16, T["muted"])))
         self._line_up()
         self._update_queue_badge()
         if self.url:
@@ -454,10 +578,56 @@ class DownloadBar(QFrame):
             line_at[w] = (w.height() - fm.height()) / 2 + fm.ascent()
         line_at[self.pill] = self.pill.sizeHint().height() / 2 + cap_mid
         line_at[self.src_icon] = self.src_icon.height() / 2 + cap_mid
+        for b in (self.btn_min, self.btn_close):
+            line_at[b] = b.height() / 2 + cap_mid
         base = max(line_at.values())
         for w, drop in self._drops.items():
             drop.changeSize(0, round(base - line_at[w]), QSizePolicy.Minimum, QSizePolicy.Fixed)
         self._row1.invalidate()
+
+    def paintEvent(self, ev):
+        super().paintEvent(ev)
+        if self.outcome.running() and not self.outcome.ok:
+            # it failed: the background turns red for a moment, under the words, and fades
+            red = QColor(theme.status("error"))
+            fade = 1.0 - self.outcome.k()
+            p = QPainter(self)
+            p.setRenderHint(QPainter.Antialiasing)
+            fill = QColor(red)
+            fill.setAlphaF(0.28 * fade)
+            edge = QColor(red)
+            edge.setAlphaF(fade)
+            p.setPen(QPen(edge, 1.5))
+            p.setBrush(fill)
+            # the same rounded corners as the bar's own border
+            p.drawRoundedRect(QRectF(self.rect()).adjusted(0.75, 0.75, -0.75, -0.75), 12, 12)
+            p.end()
+
+    def set_collapsed(self, on: bool):
+        """Minimised: the bar shrinks to one slim line (the title, how far it's got, how
+        many wait) so the page below gets the room back; its ⌄ opens it again."""
+        self._collapsed = on and not self._mini
+        if self._collapsed:
+            self.queue_badge.setChecked(False)
+        self._head.setVisible(not self._collapsed)
+        self.strip.setVisible(self._collapsed)
+        self._sync_strip()
+
+    def _sync_strip(self):
+        """The slim line shows what the full bar does."""
+        if not self._collapsed:
+            return
+        self.s_title.setText(self.title)
+        self.s_title.setToolTip(self.title)
+        self.s_status.setText(self.lbl_status.text())
+        if self.bar._mode == "indeterminate":
+            self.s_bar.set_indeterminate(True)
+        else:
+            self.s_bar.set_progress(self.bar._progress)
+        n = len(self._queue)
+        self.s_queue.setText(ngettext("+{count} queued", "+{count} queued", n, count=n)
+                             if n else "")
+        self.s_queue.setVisible(bool(n))
 
     def showEvent(self, ev):
         super().showEvent(ev)
@@ -469,6 +639,7 @@ class DownloadBar(QFrame):
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
+        self.outcome.setGeometry(self.rect())
         self._show_meta()
 
     def set_mini(self, mini: bool):
@@ -476,6 +647,7 @@ class DownloadBar(QFrame):
         Stop all in the queue list (no room for it beside Cancel)."""
         self._mini = mini
         self.lbl_src.setVisible(not mini)
+        self.btn_min.setVisible(not mini)   # the mini player's bar is already one line
         self.retheme()   # also lines line 1 up again
         self._apply_art()
         self._head_lay.setContentsMargins(*((8, 6, 8, 6) if mini else (12, 10, 12, 10)))
@@ -491,6 +663,7 @@ class DownloadBar(QFrame):
     def set_active(self, url: str, title: str, kind: str, thumb_pm: QPixmap | None = None,
                    channel: str = "", seconds: float = 0.0):
         self._auto_hide.stop()
+        self.outcome.stop()
         self.url = url
         self.title = pretty_title(title) or _("Sound")
         self.kind = kind
@@ -515,10 +688,12 @@ class DownloadBar(QFrame):
         self._update_thumb()
         self.btn_cancel.show()
         self.btn_close.hide()
+        self.btn_min.setVisible(not self._mini)
 
         self.lbl_status.setText(_("Parsing video…"))
         self.bar.set_indeterminate(True)
         self._update_queue_badge()
+        self._sync_strip()
         self.show()
 
     def set_progress(self, url: str, payload):
@@ -541,6 +716,7 @@ class DownloadBar(QFrame):
             self.scribe.set_progress(self.progress_frac)
             self.lbl_status.setText(f"{self.progress_frac * 100:.0f}%")   # the title says what
             self.bar.set_progress(self.progress_frac)
+        self._sync_strip()
         self.show()
 
     def set_thumb(self, url: str, pm: QPixmap):
@@ -583,6 +759,7 @@ class DownloadBar(QFrame):
     def set_queue(self, queue: list[dict]):
         self._queue = list(queue)
         self._update_queue_badge()
+        self._sync_strip()
         if self.panel.isVisible():
             self._fill_rows()
 
@@ -619,6 +796,7 @@ class DownloadBar(QFrame):
         for i, q in enumerate(self._queue, 1):
             row = QFrame()
             row.setObjectName("queuerow")
+            row.setAttribute(Qt.WA_Hover)
             rl = QHBoxLayout(row)
             rl.setContentsMargins(8, 4, 6, 4)
             rl.setSpacing(8)
@@ -659,6 +837,16 @@ class DownloadBar(QFrame):
         self.scribe.finish(ok)
         self.btn_cancel.hide()
         self.btn_close.show()
+        self.btn_min.hide()
+        # a second of tick (or red ✗ and a red glow) over the picture so it's noticed; the
+        # mini player has no picture: just the glow when it failed
+        spot = QRectF()
+        art = next((w for w in (self.thumb, self.scribe) if w.isVisibleTo(self)), None)
+        if art is not None:
+            top_left = art.mapTo(self, art.rect().topLeft())
+            spot = QRectF(top_left.x(), top_left.y(), art.width(), art.height())
+        if spot.isValid() or not ok:
+            self.outcome.play(ok, spot)
 
         if ok:
             if kind == "play":
@@ -673,6 +861,7 @@ class DownloadBar(QFrame):
             self.lbl_status.setText(_("Couldn't download"))
             self.bar.set_progress(0.0)
             self._auto_hide.start(6000)
+        self._sync_strip()
 
     def _on_cancel(self):
         url = self.url
@@ -693,4 +882,5 @@ class DownloadBar(QFrame):
         self._pm = None
         self._meta = ""
         self._update_queue_badge()
+        self.set_collapsed(False)   # the next download opens full size again
         self.hide()

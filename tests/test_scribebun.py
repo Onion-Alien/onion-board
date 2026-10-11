@@ -99,3 +99,28 @@ def test_download_bar_first_line_lines_up(qapp):
         bar_mid = top(bar.bar) + bar.bar.height() / 2
         assert abs(top(bar.btn_cancel) + bar.btn_cancel.height() / 2 - bar_mid) <= 1
         bar.close()
+
+
+def test_download_bar_flags_how_it_ended(qapp):
+    from soundboard.ui.downloadbar import DownloadBar
+    bar = DownloadBar()
+    bar.resize(900, 80)
+    for ok in (True, False):
+        bar.set_active("https://www.youtube.com/watch?v=a", "Some song", "add", None)
+        for _ in range(3):
+            qapp.processEvents()
+        bar.set_done(bar.url, "add", ok)
+        assert bar.outcome.isVisible() and bar.outcome.ok is ok
+        assert not bar.outcome.spot.isEmpty()   # over Bun (no thumbnail here)
+        bar.outcome._anim.setCurrentTime(bar.outcome.SHOW_MS)   # a second later: gone
+        assert not bar.outcome.isVisible()
+    mini = DownloadBar()
+    mini.set_mini(True)
+    mini.set_active("https://www.youtube.com/watch?v=b", "Some song", "add", None)
+    mini.set_done(mini.url, "add", True)
+    assert not mini.outcome.isVisible()       # no picture to mark, nothing to glow about
+    mini.set_active("https://www.youtube.com/watch?v=c", "Some song", "add", None)
+    mini.set_done(mini.url, "add", False)
+    assert mini.outcome.isVisible() and mini.outcome.spot.isEmpty()   # just the red glow
+    bar.close()
+    mini.close()

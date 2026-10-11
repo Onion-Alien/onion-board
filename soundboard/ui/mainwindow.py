@@ -867,7 +867,7 @@ class MainWindow(QMainWindow):
 
         # the bar and the tabs share a box with no gap of its own: every tab page already
         # starts 8 px down, so the bar's gap to the first row matches the rows below it
-        tabs_box = QWidget()
+        tabs_box = self._tabs_box = QWidget()
         tv = QVBoxLayout(tabs_box)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(0)
@@ -940,11 +940,12 @@ class MainWindow(QMainWindow):
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         self._full_row.insertWidget(0, self.rail)
-        # Tab goes header, rail, page (as it did with the top tabs), not page, rail
-        prev = self.tabs.previousInFocusChain()
+        # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
+        # page's box holds the download bar too, so the bar's buttons come just before it
+        prev = self._tabs_box.previousInFocusChain()
         for w in (*self.rail.buttons, self.btn_more_tabs, *self.rail.status,
                   self.gear,
-                  self.rail.toggle, self.tabs):
+                  self.rail.toggle, self._tabs_box):
             QWidget.setTabOrder(prev, w)
             prev = w
         # right-click a tab: what it's for, or hide it (+ More tabs or Settings > Tabs
