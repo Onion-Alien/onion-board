@@ -82,6 +82,12 @@ def test_shut_then_mid_then_full_while_dragging(qapp):
             assert rail.byline.isVisible() == (width >= full)
             assert bool(settings.text().strip()) == (width >= full)
             assert not named or rail.rect().contains(rail.brand.geometry())
+            # mid: Settings and the arrow side by side, centred as a pair
+            if FULL_W <= width < full:
+                qapp.processEvents()
+                left = settings.mapTo(rail, settings.rect().topLeft()).x()
+                right = rail.toggle.mapTo(rail, rail.toggle.rect().topRight()).x()
+                assert abs((left + right) / 2 - (rail.width() - 1) / 2) <= 2
         rail.finish_resize()
     finally:
         rail.close()

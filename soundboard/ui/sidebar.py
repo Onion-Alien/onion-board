@@ -504,9 +504,14 @@ class SideRail(QFrame):
         self.toggle.setFixedWidth(SHUT_W - 2 * SIDE_SHUT - 1)   # a tab button's, open too
         self._foot_box = QBoxLayout(QBoxLayout.TopToBottom)
         self._foot_box.setSpacing(4)
+        # (mid: these take the spare room, so Settings and the arrow sit centred)
+        self._foot_pads = [QSpacerItem(0, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+                           for _ in range(2)]
+        self._foot_box.addSpacerItem(self._foot_pads[0])
         for w in foot:
             self._foot_box.addWidget(w, 1)
         self._foot_box.addWidget(self.toggle, 0)   # (mirrored: the right)
+        self._foot_box.addSpacerItem(self._foot_pads[1])
         lay.addLayout(self._foot_box)
         tabs.changed.connect(self.sync)
         tabs.currentChanged.connect(self.sync)
@@ -747,16 +752,27 @@ class SideRail(QFrame):
 
     def _size_lower_controls(self):
         width = self._inner_width()
-        # mid: the small output card (and its help button) stays centred, where it was
-        # on the shut rail, until the full card fits
-        middle = Qt.AlignHCenter if self._mid() else Qt.AlignLeading
+        # mid: everything under the tabs centred, as on the shut rail (the small output
+        # card, Stop all as wide as its name, Settings' icon and the arrow side by side)
+        # until the full layout fits
+        mid = self._mid()
+        middle = Qt.AlignHCenter if mid else Qt.AlignLeading
         for widget in self.status:
-            widget.setFixedWidth(BUTTON_W if self._small(widget) else width)
-            self._status_box.setAlignment(
-                widget, middle if self._small(widget) else Qt.AlignLeading)
+            if self._small(widget):
+                widget.setFixedWidth(BUTTON_W)
+            else:
+                widget.setFixedWidth(min(width, widget.sizeHint().width()) if mid else width)
+            self._status_box.setAlignment(widget, middle)
         if self.output:
-            self.output.setFixedWidth(BUTTON_W if self._mid() else width)
+            self.output.setFixedWidth(BUTTON_W if mid else width)
             self._status_box.setAlignment(self.output, middle)
+        for pad in self._foot_pads:
+            pad.changeSize(0, 0, QSizePolicy.Expanding if mid else QSizePolicy.Fixed,
+                           QSizePolicy.Minimum)
+        self._foot_box.invalidate()
+        for widget in self.foot:
+            widget.setMinimumWidth(BUTTON_W if mid else 0)
+            widget.setMaximumWidth(BUTTON_W if mid else 16777215)
         self.toggle.setFixedWidth(BUTTON_W)
         self._place_column()
 
