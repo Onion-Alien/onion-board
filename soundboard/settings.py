@@ -755,7 +755,9 @@ class SettingsDialog(QDialog):
                               _("A tab whose feature is on right now (a sound playing, the voice "
                                 "changer, the radio…) is marked, so nothing is left on without "
                                 "you noticing."))
-        row = QVBoxLayout()   # one under the other: side by side made the page too wide
+        # side by side like Connection's and Network activity's choices (DESIGN section 0:
+        # comparable short choices look alike); they wrap when Settings is narrow
+        row = _button_row()
         green = QRadioButton(_("A bar beside the tab"))
         green.setToolTip(_("A bar at the edge of the tabs and a coloured icon, in the highlight "
                            "colour: easy to spot from across the room"))

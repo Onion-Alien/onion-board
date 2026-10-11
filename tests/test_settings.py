@@ -647,3 +647,16 @@ def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qa
     right = d.width() - (done.mapTo(d, QPoint(0, 0)).x() + done.width())
     assert above == below == right, (above, below, right)
     d.close()
+
+
+def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: F811
+    """U2: comparable short choices look alike: Live tabs' two sit in one wrapping row,
+    as Connection's and Network activity's do (offscreen fonts here are too wide to
+    compare positions: the pictures check that)."""
+    from soundboard.ui.panel import Flow
+    d = SettingsDialog(window, "appearance")
+    card = d.live_green.parentWidget()
+    flows = [f for f in card.layout().findChildren(Flow)
+             if f.indexOf(d.live_green) >= 0 and f.indexOf(d.live_dot) >= 0]
+    assert flows
+    d.close()
