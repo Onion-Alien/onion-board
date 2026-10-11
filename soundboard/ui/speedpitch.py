@@ -141,7 +141,7 @@ class SpeedPitchButton(QPushButton):
         if not self.has_speed:   # "Effects" on its own reads as a label: show it's a control
             icons.set_icon(self, "wave", size=14)
         self._speed_hi = redline_speed(*redline)
-        redline = redline[1]
+        top = redline[1]
 
         # A regular modeless window: its title bar can be dragged, and clicking
         # the board does not dismiss the controls while configuring live audio.
@@ -219,7 +219,7 @@ class SpeedPitchButton(QPushButton):
         red_name = QLabel(_("Redline"))
         red_name.setStyleSheet("font-weight:700;")
         red_sub = QLabel(_("Up to {redline:g}x speed and ±{hi:g} st pitch",
-                           redline=redline, hi=REDLINE_PITCH.hi) if self.has_speed
+                           redline=top, hi=REDLINE_PITCH.hi) if self.has_speed
                          else _("Up to ±{hi:g} st pitch", hi=REDLINE_PITCH.hi))
         red_sub.setObjectName("hint")
         red_text.addWidget(red_name)
@@ -232,7 +232,7 @@ class SpeedPitchButton(QPushButton):
         self.redline.setCursor(Qt.CursorShape.PointingHandCursor)
         self.redline.setMinimumWidth(84)
         self.redline.setToolTip(_("Unlock silly speeds (up to {redline:g}x) and pitch (±{hi:g} "
-                                  "st)", redline=redline, hi=REDLINE_PITCH.hi) if self.has_speed
+                                  "st)", redline=top, hi=REDLINE_PITCH.hi) if self.has_speed
                                 else _("Unlock silly pitch (±{hi:g} st)", hi=REDLINE_PITCH.hi))
         self.redline.toggled.connect(self.set_redline)
         red_row.addWidget(self.redline, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -243,9 +243,9 @@ class SpeedPitchButton(QPushButton):
         rv = QVBoxLayout(self.red_box)
         rv.setContentsMargins(0, 4, 0, 0)
         rv.setSpacing(6)
-        self.meter = RevMeter(redline)
+        self.meter = RevMeter(top)
         rv.addWidget(self.meter)
-        rv.addLayout(self._quick_row(tuple(s for s in REDLINE_QUICK if s <= redline)))
+        rv.addLayout(self._quick_row(tuple(s for s in REDLINE_QUICK if s <= top)))
         self.red_box.hide()
         v.addWidget(self.red_box)
 
@@ -295,9 +295,13 @@ class SpeedPitchButton(QPushButton):
         column so both sliders (and the quick buttons) line up, a readable value."""
         s = ParamSlider(q, value)
         h = s.layout()
+        assert h is not None   # name, slider, value
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(GAP)
-        h.itemAt(0).widget().setFixedWidth(name_w)
+        name = h.itemAt(0)
+        name_label = name.widget() if name else None
+        assert name_label is not None
+        name_label.setFixedWidth(name_w)
         s.val.setObjectName("")
         s.val.setFixedWidth(VAL_W)
         return s
@@ -377,8 +381,10 @@ class SpeedPitchButton(QPushButton):
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
         # taller height, so adjustSize alone would never shrink it back
-        self.red_box.parentWidget().layout().activate()
-        self.pop.layout().activate()
+        for w in (self.red_box.parentWidget(), self.pop):
+            lay = w.layout() if w is not None else None
+            if lay is not None:
+                lay.activate()
         self.pop.adjustSize()
         if not self._placed:
             # Open over the owner, rather than aligning a wide panel to a small

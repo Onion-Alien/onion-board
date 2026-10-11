@@ -986,10 +986,26 @@ QFrame#card[interactive="true"] { border-left:1px solid transparent; border-righ
 QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
 QFrame#transport, QFrame#deck { background:$glass; border-top:1px solid $edge; }
 QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton#primary {
-    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $accent_top, stop:1 $accent); }
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
+        stop:1 $accent_end);
+    border:1px solid $accent_rim_side; border-top-color:$accent_rim; }
 QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
 QFrame#setcard QPushButton#primary:hover {
-    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $accent_top_hi, stop:1 $accent_hover); }
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
+        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
+QPushButton#primary:pressed, QFrame#card QPushButton#primary:pressed,
+QFrame#setcard QPushButton#primary:pressed {
+    background:$accent_press; border-top-color:$accent_rim_side; }
+QPushButton#primary:focus, QFrame#card QPushButton#primary:focus,
+QFrame#setcard QPushButton#primary:focus { border:1px solid $text_hi; }
+QPushButton#transport_play {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
+        stop:1 $accent_end);
+    border:1px solid $accent_rim_side; border-top-color:$accent_rim; }
+QPushButton#transport_play:hover:!disabled {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
+        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
+QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live); }
@@ -1011,10 +1027,61 @@ def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
         surface_border=_mix(panel, tk["border"], 0.55),
         edge=_mix(panel, tk["border"], 0.55),
         glass=_rgba(panel, 0.86),
-        accent_top=_mix(tk["accent"], white, 0.16),
-        accent_top_hi=_mix(tk["accent_hover"], white, 0.16),
+        **_accent_shades(tk),
         live_top=_mix(tk["live"], white, 0.16),
     )
+
+
+def _accent_shades(tk: dict[str, str]) -> dict[str, str]:
+    """A filled accent button's gradient: lit top-left corner, the accent, then a blend
+    into the theme's second colour (accent2) at the bottom-right, with a light rim on
+    top. Every shade keeps the button's text as readable as on the plain accent (4.5:1,
+    or the accent's own ratio when that's lower): the lit corner lightens less, and the
+    blend's end is deepened (away from the text colour) until the text reads."""
+    on = tk["on_accent"]
+    white, black = "#ffffff", "#000000"
+    away = black if _contrast(on, black) > _contrast(on, white) else white
+
+    def lit(base: str) -> str:
+        need = min(4.5, _contrast(on, base))
+        return next((c for c in (_mix(base, white, 0.2 * (10 - i) / 10) for i in range(11))
+                     if _contrast(on, c) >= need), base)
+
+    def blend(base: str) -> str:
+        need = min(4.5, _contrast(on, base))
+        mixed = _mix(base, tk["accent2"], 0.35)
+        return next((c for c in (_mix(mixed, away, i / 20) for i in range(15))
+                     if _contrast(on, c) >= need), _mix(mixed, away, 0.7))
+
+    return dict(
+        accent_top=lit(tk["accent"]),
+        accent_top_hi=lit(tk["accent_hover"]),
+        accent_end=blend(tk["accent"]),
+        accent_end_hi=blend(tk["accent_hover"]),
+        accent_press=_mix(tk["accent"], black, 0.15),
+        accent_rim=_rgba(white, 0.30),
+        accent_rim_side=_rgba(_mix(tk["accent"], black, 0.25), 0.55),
+    )
+
+
+def accent_fill(hover: bool = False) -> str:
+    """A filled accent button's background as a stylesheet value, for widgets that style
+    themselves: the same gradient as `#primary`, or the flat accent in outlined themes."""
+    if not polished():
+        return T["accent_hover" if hover else "accent"]
+    s = _accent_shades(T)
+    top, mid, end = ((s["accent_top_hi"], T["accent_hover"], s["accent_end_hi"]) if hover
+                     else (s["accent_top"], T["accent"], s["accent_end"]))
+    return (f"qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {top}, stop:0.3 {mid}, "
+            f"stop:1 {end})")
+
+
+def accent_edge() -> str:
+    """The border that goes with accent_fill(): a light rim on top (stylesheet text)."""
+    if not polished():
+        return f"border:1px solid {T['accent']};"
+    s = _accent_shades(T)
+    return f"border:1px solid {s['accent_rim_side']}; border-top-color:{s['accent_rim']};"
 
 
 def _window_shades(tk: dict[str, str], light: bool) -> dict[str, str]:
@@ -1276,7 +1343,7 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             new = votes.setdefault(old[k].lower(), {})
             new[T[k]] = new.get(T[k], 0) + 1
     # max() keeps the first of equal counts, and dicts keep _INLINE_KEYS order
-    swap = {a: max(c, key=lambda b, c=c: c[b]) for a, c in votes.items()}
+    swap = {a: max(c, key=lambda k, c=c: c[k]) for a, c in votes.items()}
     swap = {a: b for a, b in swap.items() if a != b.lower()}
     if not swap:
         return

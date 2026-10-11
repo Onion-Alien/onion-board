@@ -139,7 +139,7 @@ def test_a_playlist_with_a_private_video_first_is_still_a_playlist(monkeypatch, 
      "That video isn't available any more."),
     # a page yt-dlp really can't read
     ("https://example.com/some/page", "https://example.com/some/page",
-     "That link isn't from a site sounds can be added from."),
+     "That page has no sound Onion Board can add."),
 ])
 def test_a_link_that_went_nowhere_says_the_video_is_gone(monkeypatch, tmp_path, url, to,
                                                          words):
@@ -394,7 +394,7 @@ def test_probe_returns_title_and_duration_without_downloading(monkeypatch):
     with pytest.raises(ytdl.DownloadError, match="playlist"):
         ytdl.probe("https://youtu.be/x")
     fake_yt_dlp(monkeypatch, {}, fail="ERROR: Unsupported URL: https://example.com")
-    with pytest.raises(ytdl.FetchError, match="^That link isn.t from a site"):
+    with pytest.raises(ytdl.FetchError, match="^That page has no sound"):
         ytdl.probe("https://example.com")
 
 
@@ -683,7 +683,7 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     panel.search("bruh")
     qapp.processEvents()
     view = panel.loading
-    assert view.isVisible() and not panel.scroll.isVisible()
+    assert view.isVisible() and not panel.scroll_area.isVisible()
     assert view.kind in ("bunny", "owl")
     assert isinstance(view.mascot, OwlWidget if view.kind == "owl" else BunnyWidget)
     assert view.mascot.isVisible() and view.bar.ticking()
@@ -709,7 +709,7 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     gate.set()
     assert process_events(qapp, lambda: not view.running(), 5)
     assert not view.isVisible() and not view.bar.ticking()
-    assert panel.scroll.isVisible() and len(panel._rows) == 1
+    assert panel.scroll_area.isVisible() and len(panel._rows) == 1
     assert not panel.title.isVisible()   # results need no caption
     panel.close_results()
 

@@ -155,7 +155,9 @@ class Outcome(QWidget):
 
     def play(self, ok: bool, spot: QRectF):
         self.ok, self.spot = ok, spot
-        self.setGeometry(self.parentWidget().rect())
+        bar = self.parentWidget()
+        assert bar is not None   # made on the bar
+        self.setGeometry(bar.rect())
         self.raise_()
         self.show()
         self._anim.stop()
@@ -174,8 +176,9 @@ class Outcome(QWidget):
     def _step(self, k):
         self._k = float(k)
         self.update()
-        if not self.ok:
-            self.parentWidget().update()   # its red background fades with it
+        bar = self.parentWidget()
+        if not self.ok and bar is not None:
+            bar.update()   # its red background fades with it
 
     def paintEvent(self, _e):
         k = self._k
@@ -587,18 +590,18 @@ class DownloadBar(QFrame):
         self.btn_panel_stop.hide()
         ph.addWidget(self.btn_panel_stop)
         pv.addLayout(ph)
-        self.scroll = QScrollArea()
-        self.scroll.setObjectName("queuescroll")
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setObjectName("queuescroll")
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         holder = QWidget()
         holder.setObjectName("queueholder")
         self.rows = QVBoxLayout(holder)
         self.rows.setContentsMargins(0, 0, 0, 0)
         self.rows.setSpacing(4)
-        self.scroll.setWidget(holder)
-        pv.addWidget(self.scroll)
+        self.scroll_area.setWidget(holder)
+        pv.addWidget(self.scroll_area)
         outer.addWidget(self.panel)
         self.panel.hide()
 
@@ -635,10 +638,10 @@ class DownloadBar(QFrame):
             f"border-radius:8px; padding:4px 12px; color:{T['muted']}; font-size:8.5pt; "
             f"font-weight:600; }}"
             f"QPushButton#cancelbutton:hover {{ background:{T['btn_hover']}; color:{T['text']}; }}"
-            f"QPushButton#retrybutton {{ background:{T['accent']}; border:none; "
-            f"border-radius:8px; padding:5px 14px; color:{T['on_accent']}; font-size:8.5pt; "
+            f"QPushButton#retrybutton {{ background:{theme.accent_fill()}; {theme.accent_edge()} "
+            f"border-radius:8px; padding:4px 13px; color:{T['on_accent']}; font-size:8.5pt; "
             f"font-weight:700; }}"
-            f"QPushButton#retrybutton:hover {{ background:{T['accent_hi']}; }}"
+            f"QPushButton#retrybutton:hover {{ background:{theme.accent_fill(hover=True)}; }}"
             f"QFrame#queuerow[failed=\"true\"] {{ border-color:{bad_edge}; }}"
             f"QLabel#failedtag {{ color:{bad}; font-size:8.5pt; font-weight:700; }}"
             f"QPushButton#urgenthide {{ background:transparent; border:none; color:{T['muted']}; "
@@ -949,8 +952,9 @@ class DownloadBar(QFrame):
         with Retry). A handful of rows (the queue is capped), and only while it's open."""
         while self.rows.count():
             item = self.rows.takeAt(0)
-            if item.widget() is not None:
-                item.widget().deleteLater()
+            w = item.widget() if item else None
+            if w is not None:
+                w.deleteLater()
         failed = self._others_failed()
         for i, q in enumerate(self._queue + failed, 1):
             bad = i > len(self._queue)
@@ -1004,9 +1008,14 @@ class DownloadBar(QFrame):
             self.rows.addWidget(row)
         self.rows.addStretch(1)
         # as tall as the first few rows really are (a failed one's Retry is taller)
-        rows = [self.rows.itemAt(i).widget() for i in range(self.rows.count() - 1)]
+        rows = []
+        for i in range(self.rows.count() - 1):
+            item = self.rows.itemAt(i)
+            w = item.widget() if item else None
+            assert w is not None   # a row each (the stretch is last)
+            rows.append(w)
         shown = rows[:QUEUE_ROWS]
-        self.scroll.setFixedHeight(sum(r.sizeHint().height() for r in shown)
+        self.scroll_area.setFixedHeight(sum(r.sizeHint().height() for r in shown)
                                    + max(0, len(shown) - 1) * self.rows.spacing())
 
     def _retry(self, url: str):

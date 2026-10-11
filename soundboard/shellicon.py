@@ -51,7 +51,7 @@ def ico_bytes(c1: str, c2: str, sizes=ICO_SIZES) -> bytes:
     for sz in sizes:
         buf = QBuffer()
         buf.open(QIODevice.OpenModeFlag.WriteOnly)
-        # (a str format: the stubs' bytes one fails at run time)
+        # a str format: the stubs say bytes, which PySide6 refuses at run time
         theme.logo_pixmap(sz, c1, c2).toImage().save(buf, "PNG")   # pyright: ignore[reportCallIssue, reportArgumentType]
         pngs.append(buf.data().data())
         buf.close()
@@ -107,8 +107,7 @@ if sys.platform == "win32":
         ctypes.oledll.ole32.CLSIDFromString(ctypes.c_wchar_p(text), ctypes.byref(g))
         return g
 
-    def _call(obj, index: int, argtypes, *args,
-              restype: type[ctypes.HRESULT] | type[ctypes.c_ulong] = ctypes.HRESULT):
+    def _call(obj, index: int, argtypes, *args, restype: type = ctypes.HRESULT):
         """Method `index` of a COM interface pointer (HRESULT failures raise OSError)."""
         vtbl = ctypes.cast(obj, ctypes.POINTER(ctypes.POINTER(ctypes.c_void_p))).contents
         fn = ctypes.WINFUNCTYPE(restype, ctypes.c_void_p, *argtypes)(vtbl[index])

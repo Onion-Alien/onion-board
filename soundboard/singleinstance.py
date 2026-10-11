@@ -65,8 +65,7 @@ def claim_single_instance() -> bool:
 
 
 class InstanceServer(QLocalServer):
-    """`show_requested`: launched again while the window didn't exist yet."""
-    show_requested = False
+    show_requested = False   # launched again before the window existed
 
 
 def listen_for_second_launch(app, get_window) -> InstanceServer:
