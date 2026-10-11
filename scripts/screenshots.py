@@ -238,7 +238,6 @@ def main():
         print("saved", name)
 
     from soundboard import __version__
-    from soundboard.settings import SettingsDialog
     from soundboard.ui import mainwindow
     from soundboard.ui.setupwizard import SetupWizard
 
@@ -280,11 +279,11 @@ def main():
         print("triggers not captured: set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip")
     w.tabs.setCurrentWidget(w.sounds_page)
 
-    d = SettingsDialog(w, "hotkeys")
-    d.show()
+    d = w.open_settings("hotkeys")   # a page in the window, not a window of its own
     spin()
-    save(d, "settings-hotkeys")
-    d.close()
+    save(w, "settings-hotkeys")
+    d.accept()
+    spin()
 
     wz = SetupWizard(w)
     wz.show()
