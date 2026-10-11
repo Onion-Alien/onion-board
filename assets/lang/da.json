@@ -3092,5 +3092,22 @@
     "{n} lyde er allerede i dit bibliotek",
     "{n} lyde er allerede i dit bibliotek"
   ],
-  "Open Triggers": "Åbn Triggere"
+  "Open Triggers": "Åbn Triggere",
+  "Audio recovery": "Lydgendannelse",
+  "Clean reinstall": "Ren geninstallation",
+  "Fix problems sending sounds into your mic after an update.": "Løs problemer med at sende lyde til din mikrofon efter en opdatering.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Mikrofoneffekten er geninstalleret. Test den i din stemmechat.",
+  "Mic effect removed": "Mikrofoneffekten fjernet",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Geninstaller Onion Boards mikrofoneffekt på den valgte mikrofon.",
+  "Remove mic effect": "Fjern mikrofoneffekt",
+  "Repair failed": "Reparation mislykkedes",
+  "Repair mic effect": "Reparer mikrofoneffekt",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Gendan dine mikrofoner, og fjern Onion Boards mikrofoneffekt. Lyde sendes så ikke længere direkte til din mikrofon.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Gendan dine mikrofoner, fjern den gamle mikrofoneffekt, og installer derefter en ny kopi på den valgte mikrofon.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Mikrofoneffekten kunne ikke bekræftes. Genstart din pc, og prøv derefter at reparere mikrofoneffekten igen.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows beder om tilladelse. Lyden stopper kortvarigt, også i opkald og spil.",
+  "Your sounds and settings are kept.": "Dine lyde og indstillinger bevares.",
+  "{error}": "{error}",
+  "Update mic effect": "Opdater mikrofoneffekt",
+  "Update to new version": "Opdater til ny version"
 }

@@ -3021,5 +3021,22 @@
   "{n} sound is already in your library": [
     "{n} 个声音已在你的音效库里"
   ],
-  "Open Triggers": "打开触发器"
+  "Open Triggers": "打开触发器",
+  "Audio recovery": "音频恢复",
+  "Clean reinstall": "全新安装",
+  "Fix problems sending sounds into your mic after an update.": "修复更新后无法将声音发送到麦克风的问题。",
+  "Mic effect reinstalled. Test it in your voice chat.": "已重新安装麦克风效果。请在语音聊天中测试。",
+  "Mic effect removed": "已移除麦克风效果",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "在所选麦克风上重新安装 Onion Board 的麦克风效果。",
+  "Remove mic effect": "移除麦克风效果",
+  "Repair failed": "修复失败",
+  "Repair mic effect": "修复麦克风效果",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "还原麦克风设置并移除 Onion Board 的麦克风效果。声音将不再直接发送到麦克风。",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "还原麦克风设置，移除旧的麦克风效果，然后在所选麦克风上安装全新副本。",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "无法验证麦克风效果。请重启电脑，然后再次尝试修复麦克风效果。",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows 将请求权限。音频会短暂停止，包括通话和游戏。",
+  "Your sounds and settings are kept.": "你的声音和设置会保留。",
+  "{error}": "{error}",
+  "Update mic effect": "更新麦克风效果",
+  "Update to new version": "更新到新版本"
 }

@@ -3092,5 +3092,22 @@
     "{n} sound ang nasa library mo na",
     "{n} sound ang nasa library mo na"
   ],
-  "Open Triggers": "Buksan ang Triggers"
+  "Open Triggers": "Buksan ang Triggers",
+  "Audio recovery": "Pag-ayos ng audio",
+  "Clean reinstall": "Malinis na reinstall",
+  "Fix problems sending sounds into your mic after an update.": "Ayusin ang mga problema sa pagpapadala ng tunog sa mic mo pagkatapos ng update.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Na-reinstall ang mic effect. Subukan ito sa voice chat mo.",
+  "Mic effect removed": "Naalis ang mic effect",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "I-reinstall ang mic effect ng Onion Board sa pinili mong mikropono.",
+  "Remove mic effect": "Alisin ang mic effect",
+  "Repair failed": "Hindi naayos",
+  "Repair mic effect": "Ayusin ang mic effect",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Ibalik sa dati ang mga mikropono mo at alisin ang mic effect ng Onion Board. Hindi na direktang mapupunta sa mic mo ang mga tunog.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Ibalik sa dati ang mga mikropono mo, alisin ang lumang mic effect, at mag-install ng bagong kopya sa pinili mong mikropono.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Hindi ma-verify ang mic effect. I-restart ang PC mo, at subukan ulit ang Ayusin ang mic effect.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Hihingi ng pahintulot ang Windows. Saglit na titigil ang audio, pati sa mga tawag at laro.",
+  "Your sounds and settings are kept.": "Mananatili ang mga tunog at setting mo.",
+  "{error}": "{error}",
+  "Update mic effect": "I-update ang mic effect",
+  "Update to new version": "I-update sa bagong bersyon"
 }

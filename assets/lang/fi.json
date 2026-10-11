@@ -3092,5 +3092,22 @@
     "{n} ääntä on jo kirjastossasi",
     "{n} ääntä on jo kirjastossasi"
   ],
-  "Open Triggers": "Avaa Laukaisimet"
+  "Open Triggers": "Avaa Laukaisimet",
+  "Audio recovery": "Äänen palautus",
+  "Clean reinstall": "Puhdas uudelleenasennus",
+  "Fix problems sending sounds into your mic after an update.": "Korjaa päivityksen jälkeiset ongelmat äänten lähettämisessä mikrofoniin.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Mikrofonitehoste asennettu uudelleen. Testaa sitä äänichatissa.",
+  "Mic effect removed": "Mikrofonitehoste poistettu",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Asenna Onion Boardin mikrofonitehoste uudelleen valittuun mikrofoniin.",
+  "Remove mic effect": "Poista mikrofonitehoste",
+  "Repair failed": "Korjaus epäonnistui",
+  "Repair mic effect": "Korjaa mikrofonitehoste",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Palauta mikrofonisi ennalleen ja poista Onion Boardin mikrofonitehoste. Ääniä ei enää lähetetä suoraan mikrofoniin.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Palauta mikrofonisi ennalleen, poista vanha mikrofonitehoste ja asenna sitten uusi kopio valittuun mikrofoniin.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Mikrofonitehostetta ei voitu tarkistaa. Käynnistä tietokone uudelleen ja yritä sitten korjata mikrofonitehoste uudelleen.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows pyytää lupaa. Ääni katkeaa hetkeksi myös puheluissa ja peleissä.",
+  "Your sounds and settings are kept.": "Äänesi ja asetuksesi säilyvät.",
+  "{error}": "{error}",
+  "Update mic effect": "Päivitä mikrofonitehoste",
+  "Update to new version": "Päivitä uuteen versioon"
 }

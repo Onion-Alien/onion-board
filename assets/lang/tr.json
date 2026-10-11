@@ -3092,5 +3092,22 @@
     "{n} ses zaten kitaplığınızda",
     "{n} ses zaten kitaplığınızda"
   ],
-  "Open Triggers": "Tetikleyicileri aç"
+  "Open Triggers": "Tetikleyicileri aç",
+  "Audio recovery": "Ses kurtarma",
+  "Clean reinstall": "Temiz kurulum",
+  "Fix problems sending sounds into your mic after an update.": "Güncellemeden sonra sesleri mikrofonuna gönderirken yaşanan sorunları düzelt.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Mikrofon efekti yeniden kuruldu. Sesli sohbetinde dene.",
+  "Mic effect removed": "Mikrofon efekti kaldırıldı",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Onion Board mikrofon efektini seçtiğin mikrofona yeniden kur.",
+  "Remove mic effect": "Mikrofon efektini kaldır",
+  "Repair failed": "Onarım başarısız",
+  "Repair mic effect": "Mikrofon efektini onar",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Mikrofonlarını eski haline getir ve Onion Board mikrofon efektini kaldır. Sesler artık doğrudan mikrofonuna gönderilmeyecek.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Mikrofonlarını eski haline getir, eski mikrofon efektini kaldır ve seçtiğin mikrofona yeni bir kopya kur.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Mikrofon efekti doğrulanamadı. Bilgisayarını yeniden başlat ve mikrofon efektini onarmayı tekrar dene.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows izin isteyecek. Aramalar ve oyunlar dahil ses kısa süreliğine duracak.",
+  "Your sounds and settings are kept.": "Seslerin ve ayarların korunur.",
+  "{error}": "{error}",
+  "Update mic effect": "Mikrofon efektini güncelle",
+  "Update to new version": "Yeni sürüme güncelle"
 }

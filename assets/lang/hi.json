@@ -3092,5 +3092,22 @@
     "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं",
     "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं"
   ],
-  "Open Triggers": "ट्रिगर खोलें"
+  "Open Triggers": "ट्रिगर खोलें",
+  "Audio recovery": "ऑडियो सुधार",
+  "Clean reinstall": "साफ़ इंस्टॉल",
+  "Fix problems sending sounds into your mic after an update.": "अपडेट के बाद माइक में आवाज़ भेजने की समस्याएँ ठीक करें।",
+  "Mic effect reinstalled. Test it in your voice chat.": "माइक इफ़ेक्ट फिर से इंस्टॉल हो गया। इसे अपने वॉइस चैट में आज़माएँ।",
+  "Mic effect removed": "माइक इफ़ेक्ट हट गया",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "चुने हुए माइक्रोफ़ोन पर Onion Board का माइक इफ़ेक्ट फिर से इंस्टॉल करें।",
+  "Remove mic effect": "माइक इफ़ेक्ट हटाएँ",
+  "Repair failed": "सुधार नहीं हुआ",
+  "Repair mic effect": "माइक इफ़ेक्ट ठीक करें",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "अपने माइक्रोफ़ोन की पुरानी सेटिंग बहाल करें और Onion Board का माइक इफ़ेक्ट हटाएँ। आवाज़ें सीधे आपके माइक में जाना बंद हो जाएँगी।",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "अपने माइक्रोफ़ोन की पुरानी सेटिंग बहाल करें, पुराना माइक इफ़ेक्ट हटाएँ और चुने हुए माइक्रोफ़ोन पर नया इंस्टॉल करें।",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "माइक इफ़ेक्ट की पुष्टि नहीं हो सकी। PC रीस्टार्ट करें, फिर माइक इफ़ेक्ट ठीक करें दोबारा आज़माएँ।",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows अनुमति माँगेगा। कॉल और गेम सहित ऑडियो थोड़ी देर के लिए बंद होगा।",
+  "Your sounds and settings are kept.": "आपकी आवाज़ें और सेटिंग सुरक्षित रहेंगी।",
+  "{error}": "{error}",
+  "Update mic effect": "माइक इफ़ेक्ट अपडेट करें",
+  "Update to new version": "नए संस्करण में अपडेट करें"
 }

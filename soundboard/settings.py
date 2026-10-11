@@ -1263,6 +1263,8 @@ class SettingsDialog(QDialog):
     def _audio(self):
         w, v = self._page()
         v.addWidget(self._devices_card())
+        from soundboard.ui.audiorecovery import RecoveryCard
+        v.addWidget(RecoveryCard(self.mw))
         card, cv = self._card(_("Your mic"),
                               _("Normally others hear your voice and your sounds together. "
                                 "Untick this for sounds only: they hear the sounds but not your "

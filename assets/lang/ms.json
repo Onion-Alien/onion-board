@@ -3021,5 +3021,22 @@
   "{n} sound is already in your library": [
     "{n} bunyi sudah ada dalam pustaka anda"
   ],
-  "Open Triggers": "Buka Pencetus"
+  "Open Triggers": "Buka Pencetus",
+  "Audio recovery": "Pemulihan audio",
+  "Clean reinstall": "Pasang semula bersih",
+  "Fix problems sending sounds into your mic after an update.": "Baiki masalah menghantar bunyi ke mikrofon selepas kemas kini.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Kesan mikrofon dipasang semula. Cuba dalam sembang suara anda.",
+  "Mic effect removed": "Kesan mikrofon dibuang",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Pasang semula kesan mikrofon Onion Board pada mikrofon pilihan anda.",
+  "Remove mic effect": "Buang kesan mikrofon",
+  "Repair failed": "Pembaikan gagal",
+  "Repair mic effect": "Baiki kesan mikrofon",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Pulihkan mikrofon anda dan buang kesan mikrofon Onion Board. Bunyi tidak lagi dihantar terus ke mikrofon anda.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Pulihkan mikrofon anda, buang kesan mikrofon lama, kemudian pasang salinan baharu pada mikrofon pilihan anda.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Kesan mikrofon tidak dapat disahkan. Mulakan semula PC, kemudian cuba Baiki kesan mikrofon sekali lagi.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows akan meminta kebenaran. Audio akan berhenti seketika, termasuk panggilan dan permainan.",
+  "Your sounds and settings are kept.": "Bunyi dan tetapan anda dikekalkan.",
+  "{error}": "{error}",
+  "Update mic effect": "Kemas kini kesan mikrofon",
+  "Update to new version": "Kemas kini ke versi baharu"
 }

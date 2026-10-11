@@ -3092,5 +3092,22 @@
     "{n} звука вече са в библиотеката ти",
     "{n} звука вече са в библиотеката ти"
   ],
-  "Open Triggers": "Отвори Тригери"
+  "Open Triggers": "Отвори Тригери",
+  "Audio recovery": "Възстановяване на звука",
+  "Clean reinstall": "Чиста инсталация",
+  "Fix problems sending sounds into your mic after an update.": "Отстрани проблеми с изпращането на звуци към микрофона след актуализация.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Ефектът за микрофона е преинсталиран. Пробвай го в гласовия чат.",
+  "Mic effect removed": "Ефектът за микрофона е премахнат",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Преинсталирай ефекта за микрофона на Onion Board на избрания микрофон.",
+  "Remove mic effect": "Премахни ефекта",
+  "Repair failed": "Поправката е неуспешна",
+  "Repair mic effect": "Поправи ефекта",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Възстанови микрофоните и премахни ефекта за микрофона на Onion Board. Звуците ще спрат да се изпращат директно към микрофона.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Възстанови микрофоните, премахни стария ефект и инсталирай ново копие на избрания микрофон.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Ефектът за микрофона не може да бъде проверен. Рестартирай компютъра и опитай отново да поправиш ефекта.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows ще поиска разрешение. Звукът ще спре за кратко, включително в разговори и игри.",
+  "Your sounds and settings are kept.": "Звуците и настройките ти се запазват.",
+  "{error}": "{error}",
+  "Update mic effect": "Обнови ефекта",
+  "Update to new version": "Обнови до новата версия"
 }
