@@ -3444,5 +3444,15 @@
   "On Air": "على الهواء",
   "Not configured": "غير مُعد",
   "Not configured: click to fix": "غير مُعد: انقر للإصلاح",
-  "Can't send to {device}, click to fix": "لا يمكن الإرسال إلى {device}، انقر للإصلاح"
+  "Can't send to {device}, click to fix": "لا يمكن الإرسال إلى {device}، انقر للإصلاح",
+  "A second mic to pick in Discord or the game.": "ميكروفون ثانٍ تختاره في Discord أو اللعبة.",
+  "Discord and games won't hear your sounds": "Discord والألعاب لن تسمع أصواتك",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "مجاني. يفتح التهيئة ويثبّته، ثم تختاره كميكروفون في Discord أو اللعبة.",
+  "Install a virtual cable": "ثبّت كابلًا افتراضيًا",
+  "Keep it": "احتفظ به",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "هل هو مقصود لـ OBS أو Voicemeeter أو جهاز مزج؟ احتفظ به.",
+  "Straight into the mic you already use. Nothing to install.": "مباشرة إلى الميكروفون الذي تستخدمه. لا شيء لتثبيته.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "أصواتك تذهب الآن إلى <b>{device}</b>، وهو سماعة أو مكبّر صوت عادي، لذا تسمعها أنت فقط. اختر طريقة تصل إلى الدردشة الصوتية:",
+  "Use my mic": "استخدم ميكروفوني",
+  "Use the virtual cable": "استخدم الكابل الافتراضي"
 }

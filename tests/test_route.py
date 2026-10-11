@@ -386,3 +386,60 @@ def test_also_send_is_kept_on_this_pc_and_reset_with_the_devices():
     assert "also_send" in backup.LOCAL_SETTINGS and "also_send" in reset.DEVICE_FIELDS
     assert Config.from_raw({"version": 2, "also_send": ["X"]}).also_send == ["X"]
     assert Config.from_raw({"version": 2, "also_send": "X"}).also_send == []
+
+
+def test_leaving_settings_on_a_new_non_cable_device_asks_once(win, monkeypatch):
+    from soundboard.ui import routewarn
+    assert routewarn.needs_warning("device", "Speakers", PHONES)
+    assert not routewarn.needs_warning("device", CABLE, PHONES)   # a cable: fine
+    assert not routewarn.needs_warning("device", "VoiceMeeter Input (VB-Audio)", PHONES)
+    assert not routewarn.needs_warning("device", PHONES, PHONES)   # has its own hint
+    assert not routewarn.needs_warning("mic", "Speakers", PHONES)
+    picked, installs = [], []
+    monkeypatch.setattr(win, "set_route", lambda r, d=None, **k: picked.append((r, d)))
+    monkeypatch.setattr(win, "install_cable", lambda: installs.append(1))
+
+    def leave_on(device):
+        win.open_settings("audio")
+        win.cfg.route, win.cfg.main_device = "device", device
+        win._show_route()
+        win.close_settings()
+        return win._route_warning
+    # the cable picked in Settings: nothing asked
+    win.open_settings("audio")
+    win.close_settings()
+    assert getattr(win, "_route_warning", None) is None
+    # speakers picked in Settings: asked on the way out, Keep leaves it be
+    box = leave_on("Speakers")
+    assert box is not None and box.keep.text() == "Keep it"
+    assert box.to_cable.text() == "Use the virtual cable"   # one is installed
+    box.keep.click()
+    assert picked == [] and win._route_warning is None
+    # not asked again while it stays on the speakers
+    win.open_settings("audio")
+    win.close_settings()
+    assert win._route_warning is None
+    # [Use my mic]
+    leave_on("Monitor (HDMI)").to_mic.click()
+    assert picked[-1] == ("mic", None)
+    # [Use the virtual cable]: on the cable, and Setup shows it
+    leave_on("TV (HDMI)").to_cable.click()
+    assert picked[-1] == ("cable", CABLE) and installs == []
+    assert win.tabs.currentWidget() is win.setup_page
+
+
+def test_without_a_cable_the_warning_offers_to_install_one(win, devices, monkeypatch):  # noqa: F811
+    devices["cable"] = False
+    win.refresh_devices()
+    picked, installs = [], []
+    monkeypatch.setattr(win, "set_route", lambda r, d=None, **k: picked.append((r, d)))
+    monkeypatch.setattr(win, "install_cable", lambda: installs.append(1))
+    win.open_settings("audio")
+    win.cfg.route, win.cfg.main_device = "device", "Speakers"
+    win._show_route()
+    win.close_settings()
+    box = win._route_warning
+    assert box.to_cable.text() == "Install a virtual cable"
+    box.to_cable.click()
+    assert picked == [("cable", None)] and installs == [1]
+    assert win.tabs.currentWidget() is win.setup_page

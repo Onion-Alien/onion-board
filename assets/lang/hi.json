@@ -3152,5 +3152,15 @@
   "On Air": "ऑन एयर",
   "Not configured": "सेट अप नहीं",
   "Not configured: click to fix": "सेट अप नहीं: ठीक करने के लिए क्लिक करें",
-  "Can't send to {device}, click to fix": "{device} पर नहीं भेज सकते, ठीक करने के लिए क्लिक करें"
+  "Can't send to {device}, click to fix": "{device} पर नहीं भेज सकते, ठीक करने के लिए क्लिक करें",
+  "A second mic to pick in Discord or the game.": "एक दूसरा माइक जिसे आप Discord या गेम में चुनते हैं।",
+  "Discord and games won't hear your sounds": "Discord और गेम आपकी आवाज़ें नहीं सुनेंगे",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "मुफ़्त। सेटअप खोलकर इसे इंस्टॉल करता है, फिर आप इसे Discord या गेम में माइक के रूप में चुनते हैं।",
+  "Install a virtual cable": "वर्चुअल केबल इंस्टॉल करें",
+  "Keep it": "रखें",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "OBS, Voicemeeter या मिक्सर के लिए है? इसे रखें।",
+  "Straight into the mic you already use. Nothing to install.": "सीधे उसी माइक में जो आप पहले से इस्तेमाल करते हैं। कुछ इंस्टॉल नहीं करना।",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "अब ये <b>{device}</b> पर जाती हैं, जो एक सामान्य स्पीकर या हेडसेट है, इसलिए सिर्फ़ आप इन्हें सुनते हैं। ऐसा तरीका चुनें जो वॉइस चैट तक पहुँचे:",
+  "Use my mic": "मेरा माइक इस्तेमाल करें",
+  "Use the virtual cable": "वर्चुअल केबल इस्तेमाल करें"
 }

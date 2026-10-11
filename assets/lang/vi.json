@@ -3079,5 +3079,15 @@
   "On Air": "Đang phát",
   "Not configured": "Chưa thiết lập",
   "Not configured: click to fix": "Chưa thiết lập: bấm để sửa",
-  "Can't send to {device}, click to fix": "Không gửi được tới {device}, bấm để sửa"
+  "Can't send to {device}, click to fix": "Không gửi được tới {device}, bấm để sửa",
+  "A second mic to pick in Discord or the game.": "Một mic thứ hai để chọn trong Discord hoặc game.",
+  "Discord and games won't hear your sounds": "Discord và game sẽ không nghe thấy âm thanh của bạn",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Miễn phí. Mở Thiết lập và cài nó, rồi bạn chọn nó làm mic trong Discord hoặc game.",
+  "Install a virtual cable": "Cài cáp ảo",
+  "Keep it": "Giữ nguyên",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Dùng cho OBS, Voicemeeter hay bàn trộn? Cứ giữ nguyên.",
+  "Straight into the mic you already use. Nothing to install.": "Đi thẳng vào mic bạn đang dùng. Không cần cài gì.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Âm thanh giờ đi tới <b>{device}</b>, loa hoặc tai nghe bình thường, nên chỉ bạn nghe thấy. Chọn một cách đến được trò chuyện thoại:",
+  "Use my mic": "Dùng mic của tôi",
+  "Use the virtual cable": "Dùng cáp ảo"
 }
