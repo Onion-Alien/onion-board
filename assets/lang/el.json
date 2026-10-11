@@ -553,7 +553,6 @@
   "Internet radio stations from around the world.": "Ραδιοφωνικοί σταθμοί internet από όλο τον κόσμο.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>ένα κλικ και πάει</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>ρυθμισμένο σε άλλο μικρόφωνο</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ τα Windows δεν τρέχουν το Onion Board σε αυτό</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ δεν είναι προσβάσιμο</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ θέλει γρήγορη επισκευή</b>",
   "Into your mic  <b>setting up…</b>": "Στο μικρόφωνό σου  <b>ρύθμιση…</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Δεν έμεινε τίποτα από το Onion Board στο {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Βάλε το εφέ μικροφώνου του Onion Board στο επιλεγμένο μικρόφωνο, ώστε οι ήχοι σου να πηγαίνουν απευθείας σε αυτό.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Βάλε το εφέ μικροφώνου του Onion Board στο {mic}, ώστε οι ήχοι σου να πηγαίνουν απευθείας σε αυτό.",
-  "Some leftovers couldn't be removed from {mic}.": "Κάποια υπολείμματα δεν αφαιρέθηκαν από το {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Κάποια υπολείμματα δεν αφαιρέθηκαν από το {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Στο μικρόφωνό σου  <b style='color:{colour}'>✗ δεν τρέχει</b>"
 }

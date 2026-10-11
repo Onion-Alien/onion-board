@@ -12,7 +12,7 @@ import weakref
 
 import shiboken6
 
-from PySide6.QtCore import QPointF, QRectF, QSize, Qt
+from PySide6.QtCore import QBuffer, QByteArray, QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import (QColor, QIcon, QIconEngine, QPainter, QPainterPath, QPen, QPixmap,
                            QTransform)
 
@@ -734,7 +734,8 @@ SHAPES = {
     "panel_close": _panel("left", "left"), "panel_open": _panel("left", "right"),
     "panel_close_rtl": _panel("right", "right"), "panel_open_rtl": _panel("right", "left"),
     "nav_back": _nav_arrow("back"), "nav_next": _nav_arrow("forward"), "reload": _reload,
-    "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
+    "speech": _speech, "cable": _cable, "check": _check, "warn": _warn,
+    "folder": _folder,
     "link": _link,
     "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
@@ -927,6 +928,59 @@ def text_gap(button):
 
 
 _labels: list[tuple[weakref.ref, str, str, int]] = []
+
+
+_inline: dict[tuple, str] = {}
+
+
+def _mark(name: str, px: int, color: str) -> QPixmap:
+    """A status tick or cross in a circle, drawn on the pixel grid at `px` pixels.
+    The 24-unit icons scaled to 16 px get 1.3 px lines that fall between pixels and
+    come out thin and fuzzy; this one's lines are a whole number of pixels wide and
+    its circle's edges sit on pixel boundaries, so it's solid and smooth."""
+    pm = QPixmap(px, px)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    w = max(1, round(px / 8))   # 2 px at 16 px, like bold text
+    pen = QPen(QColor(color), w)
+    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+    pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+    p.setPen(pen)
+    c = px / 2
+    r = c - w / 2 - 0.5
+    # the stroke's edges (r +- w/2 from the centre) on whole pixels
+    r = math.floor(c + r + w / 2) - w / 2 - c
+    p.drawEllipse(QPointF(c, c), r, r)
+    k = px / 24
+    if name == "check":
+        p.drawPolyline([QPointF(c - 4 * k, c + 0.5 * k), QPointF(c - 1 * k, c + 3.5 * k),
+                        QPointF(c + 4.5 * k, c - 3 * k)])
+    else:
+        d = r * 0.42
+        p.drawLine(QPointF(c - d, c - d), QPointF(c + d, c + d))
+        p.drawLine(QPointF(c + d, c - d), QPointF(c - d, c + d))
+    p.end()
+    return pm
+
+
+def inline(name: str, color: str, size: int = 16, dpr: float = 1.0) -> str:
+    """A status mark ("check" or "cross") inside rich text, as an <img>.
+    Drawn at exactly the screen pixels it fills (`size` x the label's
+    devicePixelRatioF): rich text scales an image without smoothing, so one drawn
+    bigger and shrunk came out jagged. `color` is a real colour (theme.status(...)),
+    so a redraw after a theme change picks up the new one."""
+    px = max(1, round(size * dpr))
+    key = (name, color, px)
+    if key not in _inline:
+        data = QByteArray()
+        buf = QBuffer(data)
+        buf.open(QBuffer.OpenModeFlag.WriteOnly)
+        _mark(name, px, color).save(buf, "PNG")
+        src = bytes(data.toBase64().data()).decode()
+        _inline[key] = (f"<img src='data:image/png;base64,{src}' width='{px / dpr:g}' "
+                        f"height='{px / dpr:g}' style='vertical-align: middle'>")
+    return _inline[key]
 
 
 def set_label_icon(label, name: str, color: str = "muted", size: int = 18):

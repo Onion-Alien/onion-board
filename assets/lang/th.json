@@ -934,7 +934,6 @@
   "Internet radio stations from around the world.": "สถานีวิทยุอินเทอร์เน็ตจากทั่วโลก",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "เข้าสู่ไมโครโฟนของคุณ <b style='color:{colour}'>เพียงคลิกเดียวเพื่อไป</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "<b style='color:{colour}'>ตั้งค่าไมโครโฟนอีกตัวลงในไมโครโฟน</b> ของคุณ",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "เข้าไปในไมโครโฟนของคุณ <b style='color:{colour}'>✗ Windows ไม่ได้ใช้ Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "เข้าไมค์ของคุณ <b style='color:{colour}'>✗ เข้าไม่ถึง</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "เข้าไปในไมโครโฟนของคุณ <b style='color:{colour}'>✗ ต้องการการซ่อมแซมอย่างรวดเร็ว</b>",
   "Into your mic  <b>setting up…</b>": "เข้าสู่ <b>การตั้งค่าไมโครโฟนของคุณ...</b>",
@@ -3125,5 +3124,6 @@
   "Nothing of Onion Board's was left on {mic}.": "ไม่มีอะไรของ Onion Board เหลือบน {mic}",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "ใส่เอฟเฟกต์ไมค์ของ Onion Board บนไมโครโฟนที่เลือก เพื่อให้เสียงของคุณเข้าไปโดยตรง",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "ใส่เอฟเฟกต์ไมค์ของ Onion Board บน {mic} เพื่อให้เสียงของคุณเข้าไปโดยตรง",
-  "Some leftovers couldn't be removed from {mic}.": "ลบของที่ค้างบางส่วนออกจาก {mic} ไม่ได้"
+  "Some leftovers couldn't be removed from {mic}.": "ลบของที่ค้างบางส่วนออกจาก {mic} ไม่ได้",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "เข้าไมค์ของคุณ <b style='color:{colour}'>✗ ไม่ทำงาน</b>"
 }

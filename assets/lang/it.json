@@ -955,7 +955,6 @@
   "Internet radio stations from around the world.": "Stazioni radio Internet da tutto il mondo.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Nel tuo microfono <b style='color:{colour}'>, un clic per partire</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Nel tuo microfono <b style='color:{colour}'>impostato su un altro microfono</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Nel tuo microfono <b style='color:{colour}'>✗ Windows non esegue Onion Board</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Nel tuo microfono <b style='color:{colour}'>✗ non riesco a raggiungerlo</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Il tuo microfono <b style='color:{colour}'>✗ necessita di una riparazione rapida</b>",
   "Into your mic  <b>setting up…</b>": "Nella <b>configurazione del microfono...</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Su {mic} non restava niente di Onion Board.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Metti l’effetto microfono di Onion Board sul microfono scelto, così i tuoi suoni ci vanno direttamente.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Metti l’effetto microfono di Onion Board su {mic}, così i tuoi suoni ci vanno direttamente.",
-  "Some leftovers couldn't be removed from {mic}.": "Alcuni residui non si sono potuti rimuovere da {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Alcuni residui non si sono potuti rimuovere da {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Nel tuo microfono <b style='color:{colour}'>✗ non attivo</b>"
 }

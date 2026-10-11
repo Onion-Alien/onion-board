@@ -1,0 +1,1 @@
+- The "Your virtual mic" card shows a proper red cross and green tick, and "Into your mic: not running" fits on one line.

@@ -955,7 +955,6 @@
   "Internet radio stations from around the world.": "Internetradiostations van over de hele wereld.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "<b style='color:{colour}'>Met één klik</b> naar uw microfoon",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "In je microfoon <b style='color:{colour}'>die op een andere microfoon is geïnstalleerd</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "In je microfoon <b style='color:{colour}'>✗ Windows gebruikt Onion Board niet</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "In je microfoon <b style='color:{colour}'>✗ kan er niet bij</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "In je microfoon <b style='color:{colour}'>✗ heeft een snelle reparatie nodig</b>",
   "Into your mic  <b>setting up…</b>": "In je microfoon <b>instellen...</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Er was niets van Onion Board meer op {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Zet het microfooneffect van Onion Board op je gekozen microfoon, zodat je geluiden er rechtstreeks in gaan.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Zet het microfooneffect van Onion Board op {mic}, zodat je geluiden er rechtstreeks in gaan.",
-  "Some leftovers couldn't be removed from {mic}.": "Sommige restjes konden niet van {mic} worden verwijderd."
+  "Some leftovers couldn't be removed from {mic}.": "Sommige restjes konden niet van {mic} worden verwijderd.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "In je microfoon <b style='color:{colour}'>✗ niet actief</b>"
 }

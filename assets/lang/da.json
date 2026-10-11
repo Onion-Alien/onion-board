@@ -553,7 +553,6 @@
   "Internet radio stations from around the world.": "Internetradiostationer fra hele verden.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "Ind i din mikrofon  <b style='color:{colour}'>ét klik, så er du i gang</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "Ind i din mikrofon  <b style='color:{colour}'>sat op på en anden mikrofon</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "Ind i din mikrofon  <b style='color:{colour}'>✗ Windows kører ikke Onion Board på den</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "Ind i din mikrofon  <b style='color:{colour}'>✗ kan ikke nå den</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "Ind i din mikrofon  <b style='color:{colour}'>✗ skal lige repareres</b>",
   "Into your mic  <b>setting up…</b>": "Ind i din mikrofon  <b>sætter op…</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Der var intet tilbage fra Onion Board på {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Sæt Onion Boards mikrofoneffekt på din valgte mikrofon, så dine lyde kan gå direkte ind i den.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Sæt Onion Boards mikrofoneffekt på {mic}, så dine lyde kan gå direkte ind i den.",
-  "Some leftovers couldn't be removed from {mic}.": "Nogle rester kunne ikke fjernes fra {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Nogle rester kunne ikke fjernes fra {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "Ind i din mikrofon  <b style='color:{colour}'>✗ kører ikke</b>"
 }

@@ -553,7 +553,6 @@
   "Internet radio stations from around the world.": "Internetradiostationer från hela världen.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "I din mikrofon  <b style='color:{colour}'>ett klick kvar</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "I din mikrofon  <b style='color:{colour}'>inställt på en annan mikrofon</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "I din mikrofon  <b style='color:{colour}'>✗ Windows kör inte Onion Board på den</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "I din mikrofon  <b style='color:{colour}'>✗ kan inte nå den</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "I din mikrofon  <b style='color:{colour}'>✗ behöver en snabb reparation</b>",
   "Into your mic  <b>setting up…</b>": "I din mikrofon  <b>ställer in…</b>",
@@ -3198,5 +3197,6 @@
   "Nothing of Onion Board's was left on {mic}.": "Inget från Onion Board fanns kvar på {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "Lägg Onion Boards mikrofoneffekt på din valda mikrofon, så att dina ljud går direkt in i den.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "Lägg Onion Boards mikrofoneffekt på {mic}, så att dina ljud går direkt in i den.",
-  "Some leftovers couldn't be removed from {mic}.": "Vissa rester kunde inte tas bort från {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "Vissa rester kunde inte tas bort från {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "I din mikrofon  <b style='color:{colour}'>✗ kör inte</b>"
 }

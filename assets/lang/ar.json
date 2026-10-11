@@ -1039,7 +1039,6 @@
   "Internet radio stations from around the world.": "محطات راديو الإنترنت من جميع أنحاء العالم.",
   "Into your mic  <b style='color:{colour}'>one click to go</b>": "في الميكروفون الخاص بك <b style='color:{colour}'>بنقرة واحدة للذهاب</b>",
   "Into your mic  <b style='color:{colour}'>set up on another mic</b>": "في الميكروفون الخاص بك <b style='color:{colour}'>الذي تم إعداده على ميكروفون آخر</b>",
-  "Into your mic  <b style='color:{colour}'>✗ Windows isn't running Onion Board on it</b>": "في الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يقوم Windows بتشغيل Onion Board عليه</b>",
   "Into your mic  <b style='color:{colour}'>✗ can't reach it</b>": "داخل الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يمكن الوصول إليه</b>",
   "Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>": "<b style='color:{colour}'>يحتاج الميكروفون الخاص بك ✗ إلى إصلاح سريع</b>",
   "Into your mic  <b>setting up…</b>": "في <b>إعداد الميكروفون الخاص بك…</b>",
@@ -3490,5 +3489,6 @@
   "Nothing of Onion Board's was left on {mic}.": "لم يبقَ شيء من Onion Board على {mic}.",
   "Put Onion Board's mic effect on your selected microphone, so your sounds can go straight into it.": "ضع مؤثر الميكروفون من Onion Board على الميكروفون المحدد لتذهب أصواتك إليه مباشرة.",
   "Put Onion Board's mic effect on {mic}, so your sounds can go straight into it.": "ضع مؤثر الميكروفون من Onion Board على {mic} لتذهب أصواتك إليه مباشرة.",
-  "Some leftovers couldn't be removed from {mic}.": "تعذّرت إزالة بعض البقايا من {mic}."
+  "Some leftovers couldn't be removed from {mic}.": "تعذّرت إزالة بعض البقايا من {mic}.",
+  "Into your mic  <b style='color:{colour}'>✗ not running</b>": "داخل الميكروفون الخاص بك <b style='color:{colour}'>✗ لا يعمل</b>"
 }
