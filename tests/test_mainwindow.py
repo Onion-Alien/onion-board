@@ -1210,6 +1210,8 @@ def test_narrow_setup_puts_getting_set_up_before_the_eq(window, qapp):
         tops = [c.mapTo(body, QPoint()).y() for c in cards]
         if width == 800:
             assert window._setup_cols.direction() == QBoxLayout.TopToBottom
+            # (Connect your chat is hidden until there's a chat to connect)
+            tops = [t for t, c in zip(tops, cards) if not c.isHidden()]
             assert tops == sorted(tops) and len(set(tops)) == len(tops)
         else:
             assert window._setup_cols.direction() == QBoxLayout.LeftToRight
