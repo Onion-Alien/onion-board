@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>อุปกรณ์เสียงมีปัญหา: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>เล่น “{name}” ไม่ได้{why} ถ้าไฟล์ถูกย้ายหรือลบ ให้ลบแพดแล้วเพิ่มเสียงใหม่</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>สแกนอุปกรณ์ใหม่ไม่ได้, รีสตาร์ทแอปเพื่อหาอุปกรณ์ใหม่</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>สร้างตัวอย่างไม่ได้ (ดูล็อก)</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>บันทึกการตั้งค่าไม่ได้, ดูล็อกใน %APPDATA%\\OnionBoard</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>ปุ่มลัดปิดอยู่: กด {key} เพื่อเปิดอีกครั้ง</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>รีเพลย์ทันทีฟังไม่ได้: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>ไม่มีอุปกรณ์เสียงที่เปิดอยู่, เลือกในแท็บ เซ็ตอัป</span>",
@@ -175,8 +173,6 @@
   "Imported {n} sound": [
     "นำเข้า {n} เสียงแล้ว"
   ],
-  "Importing {count} file(s)…": "กำลังนำเข้า {count} ไฟล์…",
-  "Importing {n} sound(s)…": "กำลังนำเข้า {n} เสียง…",
   "Importing {n} sound…": [
     "กำลังนำเข้า {n} เสียง…"
   ],
@@ -399,7 +395,6 @@
   "Show “{category}” when a program is in front": "แสดง “{category}” เมื่อโปรแกรมอยู่ด้านหน้า",
   "Skip this version": "ข้ามเวอร์ชันนี้",
   "Solo: stops every other sound first": "เดี่ยว: หยุดเสียงอื่นทั้งหมดก่อน",
-  "Some files weren't added": "บางไฟล์ไม่ได้เพิ่ม",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "บางเกมใช้แค่ไมค์หลักของ Windows หน้าต่างเสียงเพิ่งเปิดขึ้น:\n\n1.  คลิกขวา  {vm}  →  Set as Default Device\n2.  คลิกขวาอีกครั้ง  →  Set as Default Communication Device\n     (แชทเสียงในหลายเกมขอตัวนี้จาก Windows)\n3.  รีสตาร์ทเกม\n\nข้อควรรู้: การพิมพ์ด้วยเสียงจะได้ยินเสียงของคุณด้วย\nถ้าจะย้อนกลับ ทำแบบเดียวกันกับไมค์ปกติของคุณ",
   "Some sounds weren't imported": "บางเสียงไม่ได้นำเข้า",
   "Sorry, Onion Board couldn't start.": "ขอโทษ, Onion Board เปิดไม่ได้",
@@ -2997,7 +2992,38 @@
   "Other": "อื่นๆ",
   "Help and community": "ความช่วยเหลือและชุมชน",
   "Onion Board on GitHub": "Onion Board บน GitHub",
+  "A sound you added is very short, so it may be barely heard.": "เสียงที่คุณเพิ่มสั้นมาก อาจแทบไม่ได้ยิน",
+  "Both files are in {folder}.": "ไฟล์ทั้งสองอยู่ใน {folder}",
   "A download is still running. If you close now, it's lost. Close anyway?": "ยังมีการดาวน์โหลดที่กำลังทำงานอยู่ ถ้าปิดตอนนี้จะสูญหาย ปิดต่อไหม?",
   "Download running": "กำลังดาวน์โหลดอยู่",
-  "Your sounds are back on your mic.": "เสียงของคุณกลับมาอยู่ที่ไมค์แล้ว"
+  "Your sounds are back on your mic.": "เสียงของคุณกลับมาอยู่ที่ไมค์แล้ว",
+  "Added {n} sound": [
+    "เพิ่ม {n} เสียงแล้ว"
+  ],
+  "Adding {done} of {total}…": "กำลังเพิ่ม {done} จาก {total}…",
+  "Already in your library": "มีอยู่ในคลังของคุณแล้ว",
+  "Couldn't add {n} file": [
+    "เพิ่ม {n} ไฟล์ไม่ได้"
+  ],
+  "Couldn't be opened": "เปิดไม่ได้",
+  "Drop files": "วางไฟล์",
+  "Drop to add sounds": "วางเพื่อเพิ่มเสียง",
+  "Drop to add {n} file": [
+    "วางเพื่อเพิ่ม {n} ไฟล์"
+  ],
+  "Files not added": "ไฟล์ที่ไม่ได้เพิ่ม",
+  "Not a sound we can play": "ไม่ใช่เสียงที่เราเล่นได้",
+  "See why": "ดูสาเหตุ",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} ไฟล์ไม่ได้ถูกเพิ่ม"
+  ],
+  "{n} skipped": [
+    "ข้าม {n}"
+  ],
+  "That sound is already in your library": "เสียงนี้มีอยู่ในคลังของคุณแล้ว",
+  "{n} sound is already in your library": [
+    "{n} เสียงมีอยู่ในคลังของคุณแล้ว"
+  ],
+  "Open Triggers": "เปิดทริกเกอร์"
 }

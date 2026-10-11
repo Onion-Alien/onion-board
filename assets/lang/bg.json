@@ -77,7 +77,6 @@
   ],
   "<span style='color:{red}'>Couldn't search {site}: {err}</span>": "<span style='color:{red}'>Не успях да търся в {site}: {err}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не мога да пусна „{name}“{why}. Ако файлът е преместен или изтрит, махни бутона и добави звука отново.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Не успях да направя прегледа (виж дневника).</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Моменталният повтор не може да слуша: {error}</span>",
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нищо за запазване: {why}.</span>",
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Дистанционното управление е изключено: {err}.</span>",
@@ -491,8 +490,6 @@
     "Импортиран е {n} звук ({skipped} вече са в библиотеката ти)",
     "Импортирани са {n} звука ({skipped} вече са в библиотеката ти)"
   ],
-  "Importing {count} file(s)…": "Импортиране на {count} файл(а)…",
-  "Importing {n} sound(s)…": "Импортиране на {n} звук(а)…",
   "Importing {n} sound…": [
     "Импортирам {n} звук…",
     "Импортирам {n} звука…"
@@ -998,7 +995,6 @@
   "Skip this version": "Пропусни тази версия",
   "Slow or patchy connection": "Бавна или накъсана връзка",
   "Snowflake": "Snowflake",
-  "Some files weren't added": "Някои файлове не бяха добавени",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Някои игри просто ползват главния микрофон на Windows. Току-що се отвори прозорец за звука:\n\n1.  Десен клик върху  {vm}  →  Set as Default Device\n2.  Десен клик пак  →  Set as Default Communication Device\n     (гласовият чат в много игри иска точно него от Windows)\n3.  Рестартирай играта.\n\nВнимание: гласовото въвеждане тогава също ще чува звуците ти.\nЗа да го отмениш, направи същото с нормалния си микрофон.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Част от Наскоро изтрити не можа да се върне: пази се в тази точка за възстановяване.",
   "Some sounds weren't imported": "Някои звуци не бяха импортирани",
@@ -2874,7 +2870,6 @@
   "Reset to how it came": "Нулирайте до начина, по който дойде",
   "Remove from the board": "Извадете от дъската",
   "Onion Board {version} is out, click for details": "Onion Board {version} излезе, щракнете за подробности",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Настройките ви не можаха да бъдат запазени, вижте регистрационния файл в %APPDATA%\\OnionBoard.</span>",
   "Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.": "Настройките ви не можаха да бъдат запазени, вижте регистрационния файл в %APPDATA%\\OnionBoard.",
   "Live: others hear you": "На живо: другите ви чуват",
   "There's no picture at that link.": "Няма снимка на този линк.",
@@ -3062,7 +3057,44 @@
   "Other": "Други",
   "Help and community": "Помощ и общност",
   "Onion Board on GitHub": "Onion Board в GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Добавеният звук е много кратък и може почти да не се чуе.",
+  "Both files are in {folder}.": "И двата файла са в {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Все още тече изтегляне. Ако затворите сега, то ще се загуби. Да се затвори ли въпреки това?",
   "Download running": "Тече изтегляне",
-  "Your sounds are back on your mic.": "Звуците ви отново са на микрофона."
+  "Your sounds are back on your mic.": "Звуците ви отново са на микрофона.",
+  "Added {n} sound": [
+    "Добавен е {n} звук",
+    "Добавени са {n} звука"
+  ],
+  "Adding {done} of {total}…": "Добавяне на {done} от {total}…",
+  "Already in your library": "Вече е в библиотеката ти",
+  "Couldn't add {n} file": [
+    "{n} файл не можа да се добави",
+    "{n} файла не можаха да се добавят"
+  ],
+  "Couldn't be opened": "Не можа да се отвори",
+  "Drop files": "Пусни файлове",
+  "Drop to add sounds": "Пусни, за да добавиш звуци",
+  "Drop to add {n} file": [
+    "Пусни, за да добавиш {n} файл",
+    "Пусни, за да добавиш {n} файла"
+  ],
+  "Files not added": "Недобавени файлове",
+  "Not a sound we can play": "Не е звук, който можем да пуснем",
+  "See why": "Виж защо",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} файл не беше добавен",
+    "{n} файла не бяха добавени"
+  ],
+  "{n} skipped": [
+    "{n} пропуснат",
+    "{n} пропуснати"
+  ],
+  "That sound is already in your library": "Този звук вече е в библиотеката ти",
+  "{n} sound is already in your library": [
+    "{n} звука вече са в библиотеката ти",
+    "{n} звука вече са в библиотеката ти"
+  ],
+  "Open Triggers": "Отвори Тригери"
 }

@@ -93,8 +93,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Masalah peranti audio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Tidak dapat memainkan “{name}”{why}. Jika fail telah dialih atau dipadam, buang pad dan tambah bunyi itu semula.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Tidak dapat mengimbas semula peranti, mulakan semula aplikasi untuk mengesan yang baharu.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Tidak dapat memproses pratonton (lihat log).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Tidak dapat menyimpan tetapan anda, lihat log dalam %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Hotkey dimatikan: {key} menghidupkannya semula.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Main semula segera tidak dapat mendengar: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Tiada peranti audio dibuka, pilih satu dalam Persediaan.</span>",
@@ -522,8 +520,6 @@
   "Imported {n} sound ({skipped} already in your library)": [
     "{n} bunyi diimport ({skipped} sudah ada dalam pustaka anda)"
   ],
-  "Importing {count} file(s)…": "Mengimport {count} fail…",
-  "Importing {n} sound(s)…": "Mengimport {n} bunyi…",
   "Importing {n} sound…": [
     "Mengimport {n} bunyi…"
   ],
@@ -1056,7 +1052,6 @@
   "Slow or patchy connection": "Sambungan perlahan atau tidak stabil",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: hentikan setiap bunyi lain dahulu",
-  "Some files weren't added": "Sesetengah fail tidak ditambah",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Sesetengah permainan hanya guna mikrofon utama Windows. Tetingkap bunyi baru dibuka:\n\n1.  Klik kanan  {vm}  →  Set as Default Device\n2.  Klik kanan sekali lagi  →  Set as Default Communication Device\n     (sembang suara dalam banyak permainan meminta yang itu daripada Windows)\n3.  Mulakan semula permainan.\n\nPerhatian: taip suara juga akan mendengar bunyi anda.\nUntuk buat asal, lakukan yang sama pada mikrofon biasa anda.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Sebahagian Baru dipadam tidak dapat dikembalikan: ia disimpan dalam titik pemulihan ini.",
   "Some sounds weren't imported": "Sesetengah bunyi tidak diimport",
@@ -2997,7 +2992,38 @@
   "Other": "Lain-lain",
   "Help and community": "Bantuan dan komuniti",
   "Onion Board on GitHub": "Onion Board di GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Bunyi yang anda tambah sangat pendek, jadi mungkin hampir tidak kedengaran.",
+  "Both files are in {folder}.": "Kedua-dua fail berada dalam {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Masih ada muat turun yang sedang berjalan. Jika anda tutup sekarang, ia akan hilang. Tutup juga?",
   "Download running": "Muat turun sedang berjalan",
-  "Your sounds are back on your mic.": "Bunyi anda kembali pada mikrofon anda."
+  "Your sounds are back on your mic.": "Bunyi anda kembali pada mikrofon anda.",
+  "Added {n} sound": [
+    "{n} bunyi ditambah"
+  ],
+  "Adding {done} of {total}…": "Menambah {done} daripada {total}…",
+  "Already in your library": "Sudah ada dalam pustaka anda",
+  "Couldn't add {n} file": [
+    "Tidak dapat menambah {n} fail"
+  ],
+  "Couldn't be opened": "Tidak dapat dibuka",
+  "Drop files": "Lepaskan fail",
+  "Drop to add sounds": "Lepaskan untuk menambah bunyi",
+  "Drop to add {n} file": [
+    "Lepaskan untuk menambah {n} fail"
+  ],
+  "Files not added": "Fail yang tidak ditambah",
+  "Not a sound we can play": "Bukan bunyi yang boleh kami mainkan",
+  "See why": "Lihat sebabnya",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fail tidak ditambah"
+  ],
+  "{n} skipped": [
+    "{n} dilangkau"
+  ],
+  "That sound is already in your library": "Bunyi itu sudah ada dalam pustaka anda",
+  "{n} sound is already in your library": [
+    "{n} bunyi sudah ada dalam pustaka anda"
+  ],
+  "Open Triggers": "Buka Pencetus"
 }

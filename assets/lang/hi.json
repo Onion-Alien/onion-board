@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>ऑडियो डिवाइस में दिक्कत: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>“{name}” नहीं चल सकता{why}। अगर फ़ाइल हटाई या डिलीट की गई है, तो पैड हटाकर साउंड फिर से जोड़ें।</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>डिवाइस दोबारा स्कैन नहीं हो सके, नए डिवाइस के लिए ऐप रीस्टार्ट करें।</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>प्रीव्यू नहीं बन सका (लॉग देखें)।</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>आपकी सेटिंग्स सेव नहीं हो सकीं, %APPDATA%\\OnionBoard में लॉग देखें।</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>हॉटकी बंद हैं: {key} से वापस चालू करें।</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>इंस्टेंट रीप्ले सुन नहीं पा रहा: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>कोई ऑडियो डिवाइस खुला नहीं है, सेटअप में एक चुनें।</span>",
@@ -180,8 +178,6 @@
     "{n} साउंड इम्पोर्ट किया",
     "{n} साउंड इम्पोर्ट किए"
   ],
-  "Importing {count} file(s)…": "{count} फ़ाइल(ें) इम्पोर्ट हो रही हैं…",
-  "Importing {n} sound(s)…": "{n} साउंड इम्पोर्ट हो रहे हैं…",
   "Importing {n} sound…": [
     "{n} साउंड इम्पोर्ट हो रहा है…",
     "{n} साउंड इम्पोर्ट हो रहे हैं…"
@@ -405,7 +401,6 @@
   "Show “{category}” when a program is in front": "कोई प्रोग्राम सामने हो तो “{category}” दिखाएँ",
   "Skip this version": "यह वर्शन छोड़ें",
   "Solo: stops every other sound first": "सोलो: पहले बाक़ी सब साउंड रोक देता है",
-  "Some files weren't added": "कुछ फ़ाइलें नहीं जुड़ीं",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "कुछ गेम बस Windows का मुख्य माइक इस्तेमाल करते हैं। अभी एक साउंड विंडो खुली है:\n\n1.  {vm} पर राइट-क्लिक करें  →  Set as Default Device\n2.  उस पर फिर राइट-क्लिक करें  →  Set as Default Communication Device\n     (कई गेम का वॉइस चैट Windows से यही वाला माँगता है)\n3.  गेम रीस्टार्ट करें।\n\nध्यान दें: वॉइस टाइपिंग भी तब आपके साउंड सुनेगी।\nवापस करने के लिए, अपने सामान्य माइक पर यही करें।",
   "Some sounds weren't imported": "कुछ साउंड इम्पोर्ट नहीं हुए",
   "Sorry, Onion Board couldn't start.": "माफ़ करें, Onion Board शुरू नहीं हो सका।",
@@ -3062,7 +3057,44 @@
   "Other": "अन्य",
   "Help and community": "मदद और समुदाय",
   "Onion Board on GitHub": "GitHub पर Onion Board",
+  "A sound you added is very short, so it may be barely heard.": "आपके जोड़े गए एक साउंड की लंबाई बहुत कम है, इसलिए वह मुश्किल से सुनाई दे सकता है।",
+  "Both files are in {folder}.": "दोनों फ़ाइलें {folder} में हैं।",
   "A download is still running. If you close now, it's lost. Close anyway?": "एक डाउनलोड अभी भी चल रहा है। अभी बंद करने पर वह खो जाएगा। फिर भी बंद करें?",
   "Download running": "डाउनलोड चल रहा है",
-  "Your sounds are back on your mic.": "आपकी आवाज़ें फिर से आपके माइक पर हैं।"
+  "Your sounds are back on your mic.": "आपकी आवाज़ें फिर से आपके माइक पर हैं।",
+  "Added {n} sound": [
+    "{n} ध्वनि जोड़ी गई",
+    "{n} ध्वनियाँ जोड़ी गईं"
+  ],
+  "Adding {done} of {total}…": "{total} में से {done} जोड़ी जा रही हैं…",
+  "Already in your library": "आपकी लाइब्रेरी में पहले से है",
+  "Couldn't add {n} file": [
+    "{n} फ़ाइल नहीं जोड़ी जा सकी",
+    "{n} फ़ाइलें नहीं जोड़ी जा सकीं"
+  ],
+  "Couldn't be opened": "खोली नहीं जा सकी",
+  "Drop files": "फ़ाइलें छोड़ें",
+  "Drop to add sounds": "ध्वनियाँ जोड़ने के लिए छोड़ें",
+  "Drop to add {n} file": [
+    "{n} फ़ाइल जोड़ने के लिए छोड़ें",
+    "{n} फ़ाइलें जोड़ने के लिए छोड़ें"
+  ],
+  "Files not added": "फ़ाइलें नहीं जोड़ी गईं",
+  "Not a sound we can play": "यह ऐसी ध्वनि नहीं जिसे हम चला सकें",
+  "See why": "कारण देखें",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} फ़ाइल नहीं जोड़ी गई",
+    "{n} फ़ाइलें नहीं जोड़ी गईं"
+  ],
+  "{n} skipped": [
+    "{n} छोड़ी गई",
+    "{n} छोड़ी गईं"
+  ],
+  "That sound is already in your library": "यह ध्वनि पहले से आपकी लाइब्रेरी में है",
+  "{n} sound is already in your library": [
+    "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं",
+    "{n} ध्वनियाँ पहले से आपकी लाइब्रेरी में हैं"
+  ],
+  "Open Triggers": "ट्रिगर खोलें"
 }

@@ -2,7 +2,7 @@
 categories, undo after Remove, export / import, the trim control, the tray."""
 from pathlib import Path
 
-from conftest import process_events
+from conftest import process_events, said, unsay
 from soundboard import backup
 from soundboard.ui.dialogs import EditDialog
 import pytest
@@ -137,17 +137,17 @@ def test_export_then_import_through_the_window(window, qapp, tmp_path):
     _loaded(window, qapp)   # loading fills in the fingerprints the import compares
     out = tmp_path / "pack.zip"
     window._export(str(out), list(window.cfg.sounds), with_settings=False)
-    assert process_events(qapp, lambda: "Exported" in window.status.text())
+    assert process_events(qapp, lambda: "Exported" in said(window))
     assert len(backup.read(out).sounds) == 2
     window.import_package(str(out))                # all already here: nothing added
-    assert process_events(qapp, lambda: "Imported" in window.status.text())
-    assert "2 already" in window.status.text() and len(window.cfg.sounds) == 2
+    assert process_events(qapp, lambda: "Imported" in said(window))
+    assert "2 already" in said(window) and len(window.cfg.sounds) == 2
     for sid in ("s0", "s1"):
         window.remove_sound(sid)
     window._finish_removals()
-    window.status.setText("")
+    unsay(window)
     window.import_package(str(out))
-    assert process_events(qapp, lambda: "Imported" in window.status.text())
+    assert process_events(qapp, lambda: "Imported" in said(window))
     assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn"]
     _loaded(window, qapp)
 

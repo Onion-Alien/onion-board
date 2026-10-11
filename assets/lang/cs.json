@@ -95,8 +95,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problém se zvukovým zařízením: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>„{name}“ nejde přehrát{why}. Pokud byl soubor přesunut nebo smazán, odeber pad a přidej zvuk znovu.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Zařízení se nepovedlo znovu vyhledat, restartuj aplikaci, aby načetla nová.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Náhled se nepovedlo vytvořit (viz záznam).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Nastavení se nepovedlo uložit, viz záznam v %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Zkratky jsou vypnuté: {key} je zase zapne.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Okamžitý záznam nemůže poslouchat: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Není otevřené žádné zvukové zařízení, vyber ho v Zapojení.</span>",
@@ -544,8 +542,6 @@
     "Importovány {n} zvuky ({skipped} už v knihovně je)",
     "Importováno {n} zvuků ({skipped} už v knihovně je)"
   ],
-  "Importing {count} file(s)…": "Importuji soubory ({count})…",
-  "Importing {n} sound(s)…": "Importuji zvuky ({n})…",
   "Importing {n} sound…": [
     "Importuji {n} zvuk…",
     "Importuji {n} zvuky…",
@@ -1086,7 +1082,6 @@
   "Slow or patchy connection": "Pomalé nebo nestabilní připojení",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Sólo: nejdřív zastaví všechny ostatní zvuky",
-  "Some files weren't added": "Některé soubory se nepřidaly",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Některé hry prostě používají hlavní mikrofon Windows. Právě se otevřelo okno Zvuk:\n\n1.  Pravý klik na  {vm}  →  Nastavit jako výchozí zařízení\n2.  Znovu na něj pravým  →  Nastavit jako výchozí komunikační zařízení\n     (voice chat v mnoha hrách chce od Windows právě to)\n3.  Restartuj hru.\n\nPozor: hlasové psaní pak bude slyšet i tvoje zvuky.\nPro vrácení udělej totéž s normálním mikrofonem.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Část Nedávno smazaných nešla vrátit: zůstává v tomto bodu obnovení.",
   "Some sounds weren't imported": "Některé zvuky se neimportovaly",
@@ -3127,7 +3122,50 @@
   "Other": "Ostatní",
   "Help and community": "Pomoc a komunita",
   "Onion Board on GitHub": "Onion Board na GitHubu",
+  "A sound you added is very short, so it may be barely heard.": "Přidaný zvuk je velmi krátký, takže může být sotva slyšet.",
+  "Both files are in {folder}.": "Oba soubory jsou ve složce {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Stále probíhá stahování. Pokud nyní zavřete, ztratí se. Přesto zavřít?",
   "Download running": "Probíhá stahování",
-  "Your sounds are back on your mic.": "Vaše zvuky jsou zpět na mikrofonu."
+  "Your sounds are back on your mic.": "Vaše zvuky jsou zpět na mikrofonu.",
+  "Added {n} sound": [
+    "Přidán {n} zvuk",
+    "Přidány {n} zvuky",
+    "Přidáno {n} zvuků"
+  ],
+  "Adding {done} of {total}…": "Přidávám {done} z {total}…",
+  "Already in your library": "Už je v knihovně",
+  "Couldn't add {n} file": [
+    "{n} soubor se nepodařilo přidat",
+    "{n} soubory se nepodařilo přidat",
+    "{n} souborů se nepodařilo přidat"
+  ],
+  "Couldn't be opened": "Nepodařilo se otevřít",
+  "Drop files": "Pusťte soubory",
+  "Drop to add sounds": "Pusťte pro přidání zvuků",
+  "Drop to add {n} file": [
+    "Pusťte pro přidání {n} souboru",
+    "Pusťte pro přidání {n} souborů",
+    "Pusťte pro přidání {n} souborů"
+  ],
+  "Files not added": "Nepřidané soubory",
+  "Not a sound we can play": "Není to zvuk, který umíme přehrát",
+  "See why": "Proč?",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} soubor nebyl přidán",
+    "{n} soubory nebyly přidány",
+    "{n} souborů nebylo přidáno"
+  ],
+  "{n} skipped": [
+    "{n} přeskočen",
+    "{n} přeskočeny",
+    "{n} přeskočeno"
+  ],
+  "That sound is already in your library": "Tento zvuk už je v knihovně",
+  "{n} sound is already in your library": [
+    "{n} zvuk už je v knihovně",
+    "{n} zvuky už jsou v knihovně",
+    "{n} zvuků už je v knihovně"
+  ],
+  "Open Triggers": "Otevřít Spouštěče"
 }

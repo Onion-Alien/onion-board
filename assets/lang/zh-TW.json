@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>音訊裝置有問題：{problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>無法播放「{name}」{why}。如果檔案被移動或刪除了，請移除這個按鈕再重新加入音效。</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>無法重新掃描裝置，重新啟動程式即可偵測新裝置。</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>無法產生預覽（請看記錄）。</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>無法儲存你的設定，請看 %APPDATA%\\OnionBoard 裡的記錄。</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>快速鍵已關閉：按 {key} 可重新開啟。</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>即時重播無法收音：{error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>沒有開啟任何音訊裝置，請在「設置」裡選一個。</span>",
@@ -175,8 +173,6 @@
   "Imported {n} sound": [
     "已匯入 {n} 個音效"
   ],
-  "Importing {count} file(s)…": "正在匯入 {count} 個檔案…",
-  "Importing {n} sound(s)…": "正在匯入 {n} 個音效…",
   "Importing {n} sound…": [
     "正在匯入 {n} 個音效…"
   ],
@@ -399,7 +395,6 @@
   "Show “{category}” when a program is in front": "程式在最前面時顯示「{category}」",
   "Skip this version": "略過這個版本",
   "Solo: stops every other sound first": "獨奏：先停止其他所有音效",
-  "Some files weren't added": "有些檔案沒有加入",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "有些遊戲只會用 Windows 的主要麥克風。已開啟一個音效視窗：\n\n1.  在  {vm}  上按右鍵  →  設定為預設裝置\n2.  再按一次右鍵  →  設定為預設通訊裝置\n     （很多遊戲的語音聊天會向 Windows 要這一個）\n3.  重新啟動遊戲。\n\n注意：語音輸入也會聽到你的音效。\n要還原，請對你平常的麥克風做一樣的步驟。",
   "Some sounds weren't imported": "有些音效沒有匯入",
   "Sorry, Onion Board couldn't start.": "抱歉，Onion Board 無法啟動。",
@@ -2997,7 +2992,38 @@
   "Other": "其他",
   "Help and community": "說明與社群",
   "Onion Board on GitHub": "GitHub 上的 Onion Board",
+  "A sound you added is very short, so it may be barely heard.": "你新增的一個聲音很短,可能幾乎聽不到。",
+  "Both files are in {folder}.": "兩個檔案都在 {folder} 中。",
   "A download is still running. If you close now, it's lost. Close anyway?": "仍有下載正在進行。現在關閉會遺失它。仍要關閉嗎?",
   "Download running": "正在下載",
-  "Your sounds are back on your mic.": "你的聲音已回到麥克風上。"
+  "Your sounds are back on your mic.": "你的聲音已回到麥克風上。",
+  "Added {n} sound": [
+    "已新增 {n} 個聲音"
+  ],
+  "Adding {done} of {total}…": "正在新增第 {done}/{total} 個…",
+  "Already in your library": "已經在你的音效庫裡",
+  "Couldn't add {n} file": [
+    "無法新增 {n} 個檔案"
+  ],
+  "Couldn't be opened": "無法開啟",
+  "Drop files": "拖放檔案",
+  "Drop to add sounds": "放開以新增聲音",
+  "Drop to add {n} file": [
+    "放開以新增 {n} 個檔案"
+  ],
+  "Files not added": "未新增的檔案",
+  "Not a sound we can play": "不是我們能播放的聲音",
+  "See why": "查看原因",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} 個檔案未新增"
+  ],
+  "{n} skipped": [
+    "已略過 {n} 個"
+  ],
+  "That sound is already in your library": "這個聲音已經在你的音效庫裡",
+  "{n} sound is already in your library": [
+    "{n} 個聲音已經在你的音效庫裡"
+  ],
+  "Open Triggers": "開啟觸發器"
 }

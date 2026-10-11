@@ -5,9 +5,10 @@ link bar's queue and the Discord check's clean-up. Offscreen, fake devices."""
 import numpy as np
 import pytest
 import shiboken6
-from PySide6.QtCore import QEvent, QSize, Qt
+from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
+from conftest import said
 from soundboard import appaudio, applog, autostart, library, net
 from soundboard.ui import chatguide, crashdialog, responsive
 from soundboard.ui import mainwindow as main
@@ -87,12 +88,11 @@ def test_refresh_keeps_task_managers_off(monkeypatch):
     assert "OnionBoard" in reg.approved and not autostart.is_enabled()
 
 
-# --------------------------------------------------------------------------- status line
+# --------------------------------------------------------------------------- notices
 
-def test_status_line_is_always_rich_text(window):
-    assert window.status.textFormat() == Qt.RichText
-    window.status.setText("It&#x27;s here")
-    assert window.status.textFormat() == Qt.RichText
+def test_an_old_status_text_loses_its_colour_wrapper(window):
+    t = window.say("<span style='color:#f00'>It&#x27;s here</span>", "warn")
+    assert t.text() == "It&#x27;s here" and t.kind == "warn"
 
 
 # --------------------------------------------------------------------------- hotkeys
@@ -125,10 +125,10 @@ def test_plain_preview_drops_a_render_in_flight(window, monkeypatch):
     window.audio["s0"] = np.zeros((100, 2), np.float32)
     window._preview_gen = 5
     window._preview_done = lambda ok: played.append(("done", ok))
-    window.status.setText("Rendering the preview…")
+    window.toast("Rendering the preview…", "busy", key="preview")
     assert window.preview("s0") == "playing"
     assert window._preview_gen == 6 and window._preview_done is None
-    assert window.status.text() != "Rendering the preview…"
+    assert "Rendering the preview" not in said(window)
     window._on_fx_preview("s0", np.zeros((10, 2), np.float32), 1.0, 5)   # the old render
     assert played == ["s0:preview"]
 
@@ -136,10 +136,10 @@ def test_plain_preview_drops_a_render_in_flight(window, monkeypatch):
 def test_closing_the_edit_dialog_mid_render_clears_the_status(window, qapp):
     d = window.edit("s0")
     window._preview_done = lambda ok: None   # a render was going
-    window.status.setText("Rendering the preview…")
+    window.toast("Rendering the preview…", "busy", key="preview")
     d.done(0)
     qapp.processEvents()
-    assert window.status.text() != "Rendering the preview…"
+    assert "Rendering the preview" not in said(window)
     assert window._preview_done is None
 
 

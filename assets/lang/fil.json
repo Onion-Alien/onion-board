@@ -94,8 +94,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problema sa audio device: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Hindi ma-play ang “{name}”{why}. Kung nailipat o nabura ang file, alisin ang pad at idagdag ulit ang sound.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Hindi ma-scan ulit ang mga device, i-restart ang app para makuha ang mga bago.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Hindi ma-render ang preview (tingnan ang log).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Hindi ma-save ang settings mo, tingnan ang log sa %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Naka-off ang mga hotkey: ino-on ulit sila ng {key}.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Hindi makapakinig ang Instant replay: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Walang bukas na audio device, pumili sa Setup.</span>",
@@ -533,8 +531,6 @@
     "Na-import ang {n} sound ({skipped} ang nasa library mo na)",
     "Na-import ang {n} sound ({skipped} ang nasa library mo na)"
   ],
-  "Importing {count} file(s)…": "Ini-import ang {count} file…",
-  "Importing {n} sound(s)…": "Ini-import ang {n} sound…",
   "Importing {n} sound…": [
     "Ini-import ang {n} sound…",
     "Ini-import ang {n} sound…"
@@ -1071,7 +1067,6 @@
   "Slow or patchy connection": "Mabagal o putol-putol na connection",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: itinitigil muna ang lahat ng ibang sound",
-  "Some files weren't added": "May mga file na hindi naidagdag",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "May mga game na gumagamit lang ng main mic ng Windows. May bumukas na sound window:\n\n1.  I-right-click ang  {vm}  →  Set as Default Device\n2.  I-right-click ulit  →  Set as Default Communication Device\n     (ito ang hinihingi sa Windows ng voice chat ng maraming game)\n3.  I-restart ang game.\n\nPaalala: maririnig na rin ng voice typing ang mga sound mo.\nPara i-undo, gawin din ito sa normal mong mic.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "May bahagi ng Kamakailang binura na hindi maibalik: nakatago ito sa restore point na ito.",
   "Some sounds weren't imported": "May mga sound na hindi na-import",
@@ -3062,7 +3057,44 @@
   "Other": "Iba pa",
   "Help and community": "Tulong at komunidad",
   "Onion Board on GitHub": "Onion Board sa GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Napakaikli ng tunog na idinagdag mo, kaya halos hindi ito maririnig.",
+  "Both files are in {folder}.": "Parehong nasa {folder} ang dalawang file.",
   "A download is still running. If you close now, it's lost. Close anyway?": "May download pang tumatakbo. Kapag nagsara ka ngayon, mawawala ito. Isara pa rin?",
   "Download running": "Tumatakbo ang download",
-  "Your sounds are back on your mic.": "Nasa mic mo na ulit ang mga tunog mo."
+  "Your sounds are back on your mic.": "Nasa mic mo na ulit ang mga tunog mo.",
+  "Added {n} sound": [
+    "{n} sound ang naidagdag",
+    "{n} sound ang naidagdag"
+  ],
+  "Adding {done} of {total}…": "Idinadagdag ang {done} sa {total}…",
+  "Already in your library": "Nasa library mo na",
+  "Couldn't add {n} file": [
+    "Hindi maidagdag ang {n} file",
+    "Hindi maidagdag ang {n} file"
+  ],
+  "Couldn't be opened": "Hindi mabuksan",
+  "Drop files": "I-drop ang mga file",
+  "Drop to add sounds": "I-drop para magdagdag ng mga sound",
+  "Drop to add {n} file": [
+    "I-drop para idagdag ang {n} file",
+    "I-drop para idagdag ang {n} file"
+  ],
+  "Files not added": "Mga file na hindi naidagdag",
+  "Not a sound we can play": "Hindi ito sound na kaya naming i-play",
+  "See why": "Tingnan kung bakit",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} file ang hindi naidagdag",
+    "{n} file ang hindi naidagdag"
+  ],
+  "{n} skipped": [
+    "{n} nilaktawan",
+    "{n} nilaktawan"
+  ],
+  "That sound is already in your library": "Nasa library mo na ang sound na iyan",
+  "{n} sound is already in your library": [
+    "{n} sound ang nasa library mo na",
+    "{n} sound ang nasa library mo na"
+  ],
+  "Open Triggers": "Buksan ang Triggers"
 }

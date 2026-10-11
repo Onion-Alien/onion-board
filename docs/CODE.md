@@ -101,6 +101,9 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
 | `soundboard/ui/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
 | `soundboard/ui/busy.py` | click feedback for buttons: a greyed-out *Scanning…* while the work runs, then a short *✓ done* on the button (`run_busy`, `hold`, `flash`) |
+| `soundboard/ui/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
+| `soundboard/ui/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
+| `soundboard/ui/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
 | `soundboard/ui/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
 | `soundboard/ui/quietbox.py` | no Windows "ding" from information/warning message boxes (same picture, shown as a pixmap); only critical errors keep their sound |
 | `soundboard/ui/weblinks.py` | web links (http/https/mailto) open through a helper started with the user's own environment, so a browser the app starts doesn't inherit the relay's proxy variables |
@@ -347,7 +350,7 @@ the newest backup is used, so the pad list is never silently reset.
   otherwise start a pool of one thread per CPU each and reserve ~32 MB per thread: about
   1 GB of commit and 30 idle threads. Add-on helper processes (`net.child_env`) get the
   variable removed again, so their own maths isn't capped by the app's choice.
-- Drop-outs reported by the audio driver are counted and shown in the status line.
+- Drop-outs reported by the audio driver are counted and shown in a toast (key "audio").
   **⚙ Settings → Audio → Audio buffering: Safer** trades a little delay for bigger
   buffers if a device keeps crackling.
 - A stream whose callback stops (headset unplugged, sample rate changed, PC woke from

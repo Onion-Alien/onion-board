@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Проблема з аудіопристроєм: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Не вдається відтворити «{name}»{why}. Якщо файл перемістили чи видалили, прибери кнопку й додай звук знову.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Не вдалося перешукати пристрої: перезапусти програму, щоб побачити нові.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Не вдалося створити прослуховування (див. журнал).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Не вдалося зберегти налаштування: див. журнал у %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Гарячі клавіші вимкнено: {key} увімкне їх знову.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>Миттєвий повтор не може слухати: {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Жоден аудіопристрій не відкрито: вибери його в «Підключенні».</span>",
@@ -185,8 +183,6 @@
     "Імпортовано {n} звуки",
     "Імпортовано {n} звуків"
   ],
-  "Importing {count} file(s)…": "Імпорт файлів: {count}…",
-  "Importing {n} sound(s)…": "Імпорт звуків: {n}…",
   "Importing {n} sound…": [
     "Імпортую {n} звук…",
     "Імпортую {n} звуки…",
@@ -411,7 +407,6 @@
   "Show “{category}” when a program is in front": "Показувати «{category}», коли програма на передньому плані",
   "Skip this version": "Пропустити цю версію",
   "Solo: stops every other sound first": "Соло: спершу зупиняє всі інші звуки",
-  "Some files weren't added": "Деякі файли не додано",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Деякі ігри просто беруть основний мікрофон Windows. Щойно відкрилося вікно звуку:\n\n1.  Правий клік на  {vm}  →  Використовувати як пристрій за замовчуванням\n2.  Ще раз правий клік  →  Використовувати як пристрій зв'язку за замовчуванням\n     (голосовий чат у багатьох іграх бере саме його)\n3.  Перезапусти гру.\n\nУвага: голосовий набір тоді теж чутиме твої звуки.\nЩоб скасувати, зроби те саме зі своїм звичайним мікрофоном.",
   "Some sounds weren't imported": "Деякі звуки не імпортовано",
   "Sorry, Onion Board couldn't start.": "Вибач: Onion Board не вдалося запустити.",
@@ -3127,7 +3122,50 @@
   "Other": "Інше",
   "Help and community": "Допомога і спільнота",
   "Onion Board on GitHub": "Onion Board на GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Доданий звук дуже короткий, тому його може бути ледве чутно.",
+  "Both files are in {folder}.": "Обидва файли лежать у {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Завантаження ще триває. Якщо закрити зараз, воно буде втрачене. Усе одно закрити?",
   "Download running": "Триває завантаження",
-  "Your sounds are back on your mic.": "Твої звуки знову на мікрофоні."
+  "Your sounds are back on your mic.": "Твої звуки знову на мікрофоні.",
+  "Added {n} sound": [
+    "Додано {n} звук",
+    "Додано {n} звуки",
+    "Додано {n} звуків"
+  ],
+  "Adding {done} of {total}…": "Додаю {done} з {total}…",
+  "Already in your library": "Вже у вашій бібліотеці",
+  "Couldn't add {n} file": [
+    "Не вдалося додати {n} файл",
+    "Не вдалося додати {n} файли",
+    "Не вдалося додати {n} файлів"
+  ],
+  "Couldn't be opened": "Не вдалося відкрити",
+  "Drop files": "Перетягніть файли",
+  "Drop to add sounds": "Відпустіть, щоб додати звуки",
+  "Drop to add {n} file": [
+    "Відпустіть, щоб додати {n} файл",
+    "Відпустіть, щоб додати {n} файли",
+    "Відпустіть, щоб додати {n} файлів"
+  ],
+  "Files not added": "Не додані файли",
+  "Not a sound we can play": "Це не звук, який ми можемо відтворити",
+  "See why": "Чому?",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} файл не додано",
+    "{n} файли не додано",
+    "{n} файлів не додано"
+  ],
+  "{n} skipped": [
+    "{n} пропущено",
+    "{n} пропущено",
+    "{n} пропущено"
+  ],
+  "That sound is already in your library": "Цей звук уже у вашій бібліотеці",
+  "{n} sound is already in your library": [
+    "{n} звук уже у вашій бібліотеці",
+    "{n} звуки вже у вашій бібліотеці",
+    "{n} звуків уже у вашій бібліотеці"
+  ],
+  "Open Triggers": "Відкрити тригери"
 }

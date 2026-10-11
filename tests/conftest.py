@@ -226,6 +226,19 @@ def _collect_on_the_main_thread():
     uigc.collect_due()
 
 
+def said(w) -> str:
+    """What the toasts up on window ``w`` say, oldest first, one a line."""
+    from soundboard.ui import toast
+    return "\n".join(t.text() for t in toast.shown(w))
+
+
+def unsay(w):
+    """Take every toast on window ``w`` down at once."""
+    from soundboard.ui import toast
+    for t in toast.shown(w):
+        t.dismiss()
+
+
 def process_events(app, until, timeout=8.0, step=0.02):
     """Spin the Qt event loop until `until()` is true (or the timeout passes)."""
     import time

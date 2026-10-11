@@ -18,8 +18,6 @@
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Problème de périphérique audio: {problems}</span>",
   "<span style='color:{status}'>Can't play “{name}”{why}. If the file was moved or deleted, remove the pad and add the sound again.</span>": "<span style='color:{status}'>Impossible de jouer « {name} »{why}. Si le fichier a été déplacé ou supprimé, retire le pad et ajoute le son à nouveau.</span>",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Impossible de rescanner les périphériques, redémarre l'appli pour voir les nouveaux.</span>",
-  "<span style='color:{status}'>Couldn't render the preview (see the log).</span>": "<span style='color:{status}'>Impossible de créer l'aperçu (voir le journal).</span>",
-  "<span style='color:{status}'>Couldn't save your settings, see the log in %APPDATA%\\OnionBoard.</span>": "<span style='color:{status}'>Impossible d'enregistrer tes paramètres, vois le journal dans %APPDATA%\\OnionBoard.</span>",
   "<span style='color:{status}'>Hotkeys are off: {key} turns them back on.</span>": "<span style='color:{status}'>Les raccourcis sont coupés: {key} les réactive.</span>",
   "<span style='color:{status}'>Instant replay can't listen: {error}</span>": "<span style='color:{status}'>La rediffusion instantanée ne peut pas écouter : {error}</span>",
   "<span style='color:{status}'>No audio device is open, pick one in Setup.</span>": "<span style='color:{status}'>Aucun périphérique audio n'est ouvert, choisis-en un dans Config.</span>",
@@ -180,8 +178,6 @@
     "{n} son importé",
     "{n} sons importés"
   ],
-  "Importing {count} file(s)…": "Import de {count} fichier(s)…",
-  "Importing {n} sound(s)…": "Import de {n} son(s)…",
   "Importing {n} sound…": [
     "Import de {n} son…",
     "Import de {n} sons…"
@@ -405,7 +401,6 @@
   "Show “{category}” when a program is in front": "Afficher « {category} » quand un programme est au premier plan",
   "Skip this version": "Ignorer cette version",
   "Solo: stops every other sound first": "Solo: arrête d'abord tous les autres sons",
-  "Some files weren't added": "Certains fichiers n'ont pas été ajoutés",
   "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Certains jeux utilisent juste le micro principal de Windows. Une fenêtre Son vient de s'ouvrir :\n\n1.  Clic droit sur  {vm}  →  Définir en tant que périphérique par défaut\n2.  Clic droit à nouveau  →  Définir en tant que périphérique de communication par défaut\n     (le chat vocal de beaucoup de jeux demande celui-là à Windows)\n3.  Relance le jeu.\n\nAttention : la saisie vocale entendra alors aussi tes sons.\nPour annuler, fais pareil sur ton micro normal.",
   "Some sounds weren't imported": "Certains sons n'ont pas été importés",
   "Sorry, Onion Board couldn't start.": "Désolé, Onion Board n'a pas pu démarrer.",
@@ -3062,7 +3057,44 @@
   "Other": "Autres",
   "Help and community": "Aide et communauté",
   "Onion Board on GitHub": "Onion Board sur GitHub",
+  "A sound you added is very short, so it may be barely heard.": "Un son que tu as ajouté est très court, il risque d'être à peine audible.",
+  "Both files are in {folder}.": "Les deux fichiers sont dans {folder}.",
   "A download is still running. If you close now, it's lost. Close anyway?": "Un téléchargement est encore en cours. Si tu fermes maintenant, il sera perdu. Fermer quand même ?",
   "Download running": "Téléchargement en cours",
-  "Your sounds are back on your mic.": "Tes sons sont de nouveau sur ton micro."
+  "Your sounds are back on your mic.": "Tes sons sont de nouveau sur ton micro.",
+  "Added {n} sound": [
+    "{n} son ajouté",
+    "{n} sons ajoutés"
+  ],
+  "Adding {done} of {total}…": "Ajout de {done} sur {total}…",
+  "Already in your library": "Déjà dans ta bibliothèque",
+  "Couldn't add {n} file": [
+    "Impossible d'ajouter {n} fichier",
+    "Impossible d'ajouter {n} fichiers"
+  ],
+  "Couldn't be opened": "Impossible de l'ouvrir",
+  "Drop files": "Déposer des fichiers",
+  "Drop to add sounds": "Dépose pour ajouter des sons",
+  "Drop to add {n} file": [
+    "Dépose pour ajouter {n} fichier",
+    "Dépose pour ajouter {n} fichiers"
+  ],
+  "Files not added": "Fichiers non ajoutés",
+  "Not a sound we can play": "Pas un son qu'on peut lire",
+  "See why": "Voir pourquoi",
+  "{added} · {skipped}": "{added} · {skipped}",
+  "{n} file wasn't added": [
+    "{n} fichier n'a pas été ajouté",
+    "{n} fichiers n'ont pas été ajoutés"
+  ],
+  "{n} skipped": [
+    "{n} ignoré",
+    "{n} ignorés"
+  ],
+  "That sound is already in your library": "Ce son est déjà dans ta bibliothèque",
+  "{n} sound is already in your library": [
+    "{n} sons sont déjà dans ta bibliothèque",
+    "{n} sons sont déjà dans ta bibliothèque"
+  ],
+  "Open Triggers": "Ouvrir les déclencheurs"
 }

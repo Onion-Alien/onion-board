@@ -1,6 +1,7 @@
 """Adversarial checks for the release audit, using isolated files and silent Qt."""
 from pathlib import Path
 
+from conftest import said
 import pytest
 
 from soundboard import backup, library, reset
@@ -190,7 +191,7 @@ def test_overlapping_pack_reset_and_removal_preserve_first_pack(window, tmp_path
                 content = json.dumps(entry).encode()
             dest.writestr(name, content)
     window.import_package(str(second))
-    assert process_events(qapp, lambda: "already" in window.status.text(), 10)
+    assert process_events(qapp, lambda: "already" in said(window), 10)
     second_id, = set(backup.packs()) - {first_id}
     assert all(m.pack == first_id for m in originals)
     monkeypatch.setattr(window, "_take_pack_hotkeys", lambda *args: False)
