@@ -164,7 +164,7 @@ TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
-FF_CHECK_MS = 5000     # FFmpeg is checked this long after the start (check_ffmpeg)
+FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
 FF_ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask again
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
@@ -319,7 +319,8 @@ class Bridge(QObject):
     counted = Signal()                         # the daily usage count was sent (usage.py)
     imported = Signal(object, object, object)  # meta|None, data|None, Skipped|None
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
-    ffmpeg = Signal(object, object)            # ffmpegget.Health, a fix's error ("": it worked)
+    ffmpeg = Signal(object, object)            # ffmpegget.Health, after a fix: "" or its error
+    ffmpeg_progress = Signal(int)              # percent of FFmpeg downloaded (-1: not known)
 
 
 def is_hands_free(name: str | None) -> bool:
@@ -429,6 +430,7 @@ class MainWindow(QMainWindow):
         self.bridge.mic_users.connect(self._on_mic_users)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self.bridge.ffmpeg.connect(self._on_ffmpeg)
+        self.bridge.ffmpeg_progress.connect(self._on_ffmpeg_progress)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         # windows beside the board, not over it (U4): the one Settings, and an Edit
         # sound for each sound being edited
@@ -588,6 +590,8 @@ class MainWindow(QMainWindow):
         self._tip_timer.timeout.connect(self._maybe_tip)
         QTimer.singleShot(TIP_DELAY_MS, self, self._start_tips)
         self._offer_language()
+        # the check started behind the loading screen (app.py); its answer, and a
+        # download if one is needed, once the window is up
         QTimer.singleShot(FF_CHECK_MS, self, self.check_ffmpeg)
         # Switch category when a program is in front: a cheap look at the window in
         # front each second, only while a rule exists (and runs while the board is hidden)
@@ -894,8 +898,9 @@ class MainWindow(QMainWindow):
         self.setup_bar.hide()
         rv.addWidget(self.setup_bar)
 
-        # FFmpeg missing or won't start (check_ffmpeg): what stops working and one Fix
-        # it, in the same slim bar as the Discord offer, never a window
+        # FFmpeg (check_ffmpeg): its download's progress with Stop, or, when the app
+        # couldn't get it by itself, what stops working and Fix it. The same slim bar as
+        # the Discord offer, never a window
         self.ff_bar = QFrame()
         self.ff_bar.setObjectName("tipbar")
         fh = QHBoxLayout(self.ff_bar)
@@ -909,6 +914,10 @@ class MainWindow(QMainWindow):
         self.ff_fix.setObjectName("primary")
         self.ff_fix.clicked.connect(self._ffmpeg_fix_clicked)
         fh.addWidget(self.ff_fix)
+        self.ff_stop = QPushButton(_("Stop"))
+        self.ff_stop.setObjectName("small")
+        self.ff_stop.clicked.connect(self._ffmpeg_stop)
+        fh.addWidget(self.ff_stop)
         self.ff_never = QPushButton(_("Don't ask again"))
         self.ff_never.setObjectName("small")
         self.ff_never.setToolTip(_("Settings → Data & quality still has it"))
@@ -928,6 +937,11 @@ class MainWindow(QMainWindow):
         self._ff_not_now = False   # hidden until the next start
         self._ff_error = ""        # the last fix's error, shown on the bar
         self._ff_waiting: list = []   # (button, release) of fixes still going
+        self._ff_getting = False   # a fix is going (by itself or clicked)
+        self._ff_percent = -1      # ...how far its download is (-1: not known)
+        self._ff_stop_flag: threading.Event | None = None   # Stop sets it
+        self._ff_auto_tried = False   # got by itself once this start (not again)
+        self._ff_done = False         # the last fix worked (Settings says so)
         rv.addWidget(self.ff_bar)
 
         # Windows is in a language the board has but isn't showing: offered in that
@@ -4557,99 +4571,171 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------ FFmpeg
     def check_ffmpeg(self):
-        """Is FFmpeg there and does it start? Asked on a worker (it runs ffmpeg); the
-        answer comes back to _on_ffmpeg."""
+        """Is FFmpeg there and does it start? The answer of the check started behind the
+        loading screen (ffmpegget.start_check), or a new one, taken on a worker (it runs
+        ffmpeg); it comes back to _on_ffmpeg, which gets FFmpeg by itself when needed."""
         if self._ff_checking:
             return
         self._ff_checking = True
 
         def work():
             try:
-                h = ffmpegget.check()
+                h = ffmpegget.answer()
             except Exception:  # noqa: BLE001 - no answer, never a crash
                 log.exception("FFmpeg check failed")
                 h = None
             busy.emit(self.bridge.ffmpeg, h, None)
         threading.Thread(target=work, daemon=True, name="ffmpeg-check").start()
 
-    def fix_ffmpeg(self, btn: QPushButton, force: bool = False):
-        """Get FFmpeg, or install it again over one that won't start (``force``: over a
-        working one), on a worker: winget takes a minute or more. ``btn`` shows it's busy
-        and then whether it worked; the bar and Settings show the new state."""
+    def _may_get_ffmpeg(self) -> bool:
+        """Get FFmpeg without asking: unless the user said not to go online for it
+        (Offline mode, its switch, Low data mode) or not to ask about it again."""
+        return (not self._ff_auto_tried and FF_ASK_OFF not in self.cfg.tips_seen
+                and not ffmpegget.why_not() and not quality.current.low_data)
+
+    def fix_ffmpeg_clicked(self, btn: QPushButton, force: bool = False):
+        """Fix it / Get FFmpeg / Reinstall (the bar or Settings): pressing it is a yes,
+        so a switched-off FFmpeg download is switched back on. Offline mode stays: it
+        says so instead."""
+        if self._ff_getting or busy.is_busy(btn):
+            return
+        if net.offline():
+            self.toast(html.escape(net.off_message(ffmpegget.FEATURE)), "warn", 8000)
+            return
+        if not net.allowed(ffmpegget.FEATURE):
+            off = [k for k in self.cfg.net_off if k != ffmpegget.FEATURE]
+            self.set_option("net_off", off)
+            net.configure_features(self.cfg.net_off, self.cfg.net_offline)
+            self.toast(_("FFmpeg downloads are switched on again (Settings → Privacy & "
+                         "security)."))
+        self.fix_ffmpeg(btn, force)
+
+    def fix_ffmpeg(self, btn: QPushButton | None = None, force: bool = False,
+                   auto: bool = False):
+        """Get FFmpeg, or repair one that won't start (``force``: reinstall a working
+        one), on a worker: winget, then the app's own download (ffmpegget.fix). The bar
+        shows how far it is, with Stop; ``btn`` shows it's busy and then whether it
+        worked; the bar and Settings show the new state."""
+        if self._ff_getting:
+            return
         usage.used("get-ffmpeg")
-        self._ff_error = ""
-        self._ff_waiting.append((btn, busy.hold(btn, _("Getting FFmpeg…"))))
+        self._ff_getting, self._ff_percent, self._ff_error = True, -1, ""
+        self._ff_auto_tried = self._ff_auto_tried or auto
+        stop = self._ff_stop_flag = threading.Event()
+        if btn is not None:
+            self._ff_waiting.append((btn, busy.hold(btn, _("Getting FFmpeg…"))))
+        seen = [-1]
+
+        def progress(done: int, total: int):
+            pct = min(99, done * 100 // total) if total else -1
+            if pct != seen[0]:
+                seen[0] = pct
+                busy.emit(self.bridge.ffmpeg_progress, pct)
 
         def work():
-            netlog.cause(ffmpegget.FEATURE, "You clicked Get FFmpeg or Fix it (the FFmpeg "
-                                            "bar, or Settings > Data & quality)")
-            err = ""
+            netlog.cause(ffmpegget.FEATURE,
+                         "FFmpeg was missing or wouldn't start when the app started" if auto
+                         else "You clicked Fix it, Get FFmpeg or Reinstall (the FFmpeg bar, "
+                              "or Settings > Data & quality)")
+            err: object = ""
             try:
-                ffmpegget.fix(force)
+                ffmpegget.fix(force, progress, stop)
             except ffmpegget.GetError as e:
-                err = errors.plain(e)
+                err = e
             except Exception as e:  # noqa: BLE001 - shown, never a stuck button
                 log.exception("Get FFmpeg failed")
-                err = _("Couldn't get FFmpeg ({error}).", error=errors.plain(e))
+                err = ffmpegget.GetError(_("Couldn't get FFmpeg ({error}).",
+                                           error=errors.plain(e)))
             busy.emit(self.bridge.ffmpeg, ffmpegget.last(), err)
         threading.Thread(target=work, daemon=True, name="ffmpeg-get").start()
+        self._ffmpeg_news()
+
+    def _on_ffmpeg_progress(self, pct: int):
+        if self._ff_getting:
+            self._ff_percent = pct
+            self._ffmpeg_news()
 
     def _on_ffmpeg(self, h, err):
-        """A check's answer (``err`` None) or a fix's (``err`` "" when it worked)."""
-        if err is None:
-            self._ff_checking = False
+        """A check's answer (``err`` None) or a fix's (``err`` "" when it worked, else
+        the GetError)."""
         if h is not None:
             self.ffmpeg = h
-        if err is not None:
-            if err:
+        if err is None:
+            self._ff_checking = False
+            if h is not None and h.state != ffmpegget.OK and self._may_get_ffmpeg():
+                self.fix_ffmpeg(auto=True)
+                return
+        else:
+            self._ff_getting, self._ff_stop_flag = False, None
+            stopped = isinstance(err, ffmpegget.Stopped)
+            if err and not stopped:
                 usage.used("get-ffmpeg-failed")
             for btn, release in self._ff_waiting:
                 if qt_valid(btn):
-                    release(_("✗ Failed") if err else _("✓ Got FFmpeg"))
+                    release(None if stopped else _("✗ Failed") if err else _("✓ Got FFmpeg"))
             self._ff_waiting.clear()
-            self._ff_error = err
-            if err:
-                self.toast(html.escape(err), "error", 8000)
+            self._ff_error = "" if stopped else errors.plain(err) if err else ""
+            self._ff_done = not err
+            if stopped:
+                pass
+            elif err:
+                self.toast(html.escape(self._ff_error), "error", 8000)
             elif h is not None and h.version:
                 self.toast(_("FFmpeg works now (version {version}).",
                              version=html.escape(h.version)), "ok")
             else:
                 self.toast(_("FFmpeg works now."), "ok")
-        self._show_ffmpeg_bar()
+        self._ffmpeg_news()
 
-    def _ffmpeg_needed(self) -> bool:
-        """Something here needs FFmpeg: a sound only it can read, or videos being saved.
-        Someone who uses none of that isn't asked at every start."""
-        return bool(quality.current.save_video) or any(
-            Path(s.file).suffix.lower() in ffmpegget.NEEDS_FFMPEG for s in self.cfg.sounds)
+    def _ffmpeg_news(self):
+        """The bar, and Settings' FFmpeg row if it's built, show the current state."""
+        self._show_ffmpeg_bar()
+        dlg = self._settings_dlg
+        if dlg is not None and qt_valid(dlg):
+            dlg._ffmpeg_sync()
 
     def _show_ffmpeg_bar(self):
-        """The bar shows while FFmpeg won't start, or is missing and something here needs
-        it, until Don't ask again (or ✕, until the next start)."""
+        """While FFmpeg downloads: how far, with Stop. When it's missing or won't start
+        and the app couldn't get it by itself: what stops working, and Fix it. Hidden by
+        ✕ until the next start, and for good by Don't ask again."""
         h = self.ffmpeg
-        if (h is None or h.state == ffmpegget.OK or self._ff_not_now
-                or FF_ASK_OFF in self.cfg.tips_seen
-                or (h.state == ffmpegget.MISSING and not self._ffmpeg_needed())):
+        if self._ff_not_now or (not self._ff_getting and (
+                h is None or h.state == ffmpegget.OK or FF_ASK_OFF in self.cfg.tips_seen)):
             self.ff_bar.hide()
             return
-        if h.state == ffmpegget.MISSING:
-            text = _("FFmpeg is missing, so M4A, AAC and video files won't play and videos "
-                     "can't be saved.")
+        if self._ff_getting:
+            text = (_("Getting FFmpeg, so M4A, AAC and video files play and videos can be "
+                      "saved… {percent}%", percent=self._ff_percent)
+                    if self._ff_percent >= 0 else
+                    _("Getting FFmpeg, so M4A, AAC and video files play and videos can be "
+                      "saved…"))
+            why = ""
         else:
-            text = _("FFmpeg won't start ({error}), so M4A, AAC and video files won't play "
-                     "and videos can't be saved.", error=h.why or _("no reason given"))
-        cant = ffmpegget.why_cant_fix()
-        self.ff_lbl.setText("\n".join(t for t in (text, self._ff_error or cant) if t))
-        if not busy.is_busy(self.ff_fix):
-            self.ff_fix.setText(_("Open ffmpeg.org") if cant else _("Fix it"))
+            assert h is not None
+            if h.state == ffmpegget.MISSING:
+                text = _("FFmpeg is missing, so M4A, AAC and video files won't play and "
+                         "videos can't be saved.")
+            else:
+                text = _("FFmpeg won't start ({error}), so M4A, AAC and video files won't "
+                         "play and videos can't be saved.", error=h.why or _("no reason given"))
+            why = (self._ff_error or ffmpegget.why_not()
+                   or (_("Low data mode is on, so it wasn't downloaded by itself (about "
+                         "110 MB).") if quality.current.low_data else ""))
+        self.ff_lbl.setText("\n".join(t for t in (text, why) if t))
+        for b, on in ((self.ff_fix, not self._ff_getting), (self.ff_never, not self._ff_getting),
+                      (self.ff_stop, self._ff_getting)):
+            if not on and b.hasFocus():
+                self.ff_hide.setFocus()   # hiding a focused button jumps focus elsewhere
+            b.setVisible(on)
         self.ff_bar.show()
 
     def _ffmpeg_fix_clicked(self):
-        if ffmpegget.why_cant_fix():
-            busy.open_url(ffmpegget.SITE, self.ff_fix, self)
-            return
-        if not busy.is_busy(self.ff_fix):
-            self.fix_ffmpeg(self.ff_fix)
+        self.fix_ffmpeg_clicked(self.ff_fix)
+
+    def _ffmpeg_stop(self):
+        if self._ff_stop_flag is not None:
+            self._ff_stop_flag.set()
+            busy.flash(self.ff_stop, _("Stopping…"))
 
     def _ffmpeg_not_now(self):
         self._ff_not_now = True

@@ -1,27 +1,50 @@
-"""Getting FFmpeg from the app (Settings > Data & quality > Get FFmpeg).
+"""FFmpeg: checking it works, and getting or repairing it from the app.
 
-The installer offers FFmpeg on its "Pick what you want" page, but only there: someone
-who left that box unticked (or installed before the option existed) had no way to add it
-later, and playing an M4A, AAC or video link only said "install ffmpeg" with nowhere to
-do it. This runs the installer's own install (the Gyan.FFmpeg.Essentials package through
-winget, the package manager Windows 10/11 ships) from the app itself.
+M4A, AAC and video files only decode through FFmpeg, pad pictures come out of video
+files with it, and "Also save the video" needs it to join a video to its sound. The
+installer offers it once; someone who left that box unticked, or whose copy broke, had
+no way to fix it. So the app checks it at every start (MainWindow.check_ffmpeg), gets
+it by itself when it's missing or won't start, and Settings > Data & quality always
+shows how it is.
 
-winget downloads from Microsoft's package source itself, so, like the installer, this
-can't go through the app's proxy or Tor; net's "ffmpeg_download" switch only decides
-whether the app runs it at all.
+Getting it tries, in turn, until one works (fix):
+
+1. winget, the package manager Windows 10/11 ships: the installer's own install of the
+   Gyan.FFmpeg.Essentials package, then with ``--force`` (winget can count a deleted or
+   broken copy as installed), then uninstalled and installed fresh. winget downloads
+   from Microsoft's package source itself and can't go through the app's proxy or Tor,
+   so it's skipped when Connection is set to either.
+2. The app's own copy: the same build winget installs (PINNED below, from the
+   GyanD/codexffmpeg release winget's manifest points to), downloaded through net.urlopen
+   (so it follows Connection), checked against its SHA-256 before anything is unpacked,
+   tried a few times on each of two sources, and unpacked into
+   %APPDATA%\\OnionBoard\\ffmpeg\\bin, which library._ffmpeg looks in first.
+
+net's "ffmpeg_download" switch and Offline mode decide whether the app goes online for
+it at all.
+
+To move to a newer FFmpeg: take VERSION and the zip's InstallerSha256 from the newest
+manifests/g/Gyan/FFmpeg/Essentials/<version> in github.com/microsoft/winget-pkgs, and
+check that GitHub's digest for the release asset says the same.
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 import os
 import shutil
 import subprocess
 import threading
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+import zipfile
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library, net
+from soundboard import errors, library, net
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -31,7 +54,22 @@ FEATURE = "ffmpeg_download"          # net's switch for this download
 TIMEOUT_S = 900.0                    # winget fetches about 100 MB; a stuck one is cut here
 CHECK_TIMEOUT_S = 8.0                # `ffmpeg -version` answers in well under a second;
                                      # a cold disk and a virus scan get a few more
-SITE = "https://ffmpeg.org/download.html"   # where to get it by hand
+
+# the app's own copy (step 2): exactly the zip winget's 9.0.1 manifest installs
+VERSION = "9.0.1"
+ZIP = f"ffmpeg-{VERSION}-essentials_build.zip"
+SHA256 = "fec81ae03971d9dd4be3ebe02e263bd2ec1d789483f931bdba5f5715e65da2e9"
+URLS = (f"https://github.com/GyanD/codexffmpeg/releases/download/{VERSION}/{ZIP}",
+        f"https://www.gyan.dev/ffmpeg/builds/packages/{ZIP}")   # the builder's own site
+MAX_BYTES = 200_000_000             # the zip is 111 MB; anything far bigger isn't it
+CHUNK = 256 * 1024
+DOWNLOAD_TIMEOUT_S = 60.0           # with no bytes arriving for this long
+TRIES = 3                           # per source
+RETRY_WAIT_S = (2.0, 6.0)           # before the 2nd and 3rd try
+# member in the zip -> where it goes in the bin folder
+KEEP = {f"ffmpeg-{VERSION}-essentials_build/bin/ffmpeg.exe": "ffmpeg.exe",
+        f"ffmpeg-{VERSION}-essentials_build/bin/ffprobe.exe": "ffprobe.exe",
+        f"ffmpeg-{VERSION}-essentials_build/LICENSE": "LICENSE.txt"}
 
 OK, MISSING, BROKEN = "ok", "missing", "broken"
 # sound files only FFmpeg can read (libsndfile reads the rest of library.AUDIO_EXTS)
@@ -39,7 +77,11 @@ NEEDS_FFMPEG = {".m4a", ".aac", ".wma", ".webm", ".mp4", ".mkv", ".mov"}
 
 
 class GetError(Exception):
-    """winget couldn't install FFmpeg; the message is fit to show the user."""
+    """FFmpeg couldn't be got or repaired; the message is fit to show the user."""
+
+
+class Stopped(GetError):
+    """Stop was pressed while it downloaded."""
 
 
 @dataclass(frozen=True)
@@ -53,7 +95,7 @@ class Health:
 
 
 _last: Health | None = None   # check()'s latest answer, for the UI thread to show
-_fixing = threading.Lock()    # one install at a time (the bar's Fix it and Settings')
+_fixing = threading.Lock()    # one fix at a time (automatic, the bar's Fix it, Settings')
 _has_winget: bool | None = None   # winget() at the last check (None: not looked yet)
 
 
@@ -61,6 +103,18 @@ def last() -> Health | None:
     """The latest check() (None: not checked yet). Cheap: safe on the UI thread."""
     return _last
 
+
+def busy() -> bool:
+    """A fix is going (any of them)."""
+    return _fixing.locked()
+
+
+def own_dir() -> Path:
+    """The app's own FFmpeg: %APPDATA%\\OnionBoard\\ffmpeg\\bin."""
+    return library.APP_DIR / "ffmpeg" / "bin"
+
+
+# --------------------------------------------------------------------------- check
 
 def _run_version(exe: str) -> subprocess.CompletedProcess:
     return subprocess.run([exe, "-version"], capture_output=True, timeout=CHECK_TIMEOUT_S,
@@ -104,6 +158,28 @@ def check() -> Health:
     return h
 
 
+_early: threading.Thread | None = None   # start_check's, behind the loading screen
+
+
+def start_check() -> None:
+    """Check FFmpeg on a worker while the loading screen is up (app.py): its answer is
+    ready when the window is, and nothing waits for it."""
+    global _early
+    _early = threading.Thread(target=check, daemon=True, name="ffmpeg-early-check")
+    _early.start()
+
+
+def answer() -> Health:
+    """start_check's answer (waiting for it if it's still going), else a new check.
+    Never on the UI thread."""
+    t = _early
+    if t is not None:
+        t.join(CHECK_TIMEOUT_S + 2)
+        if _last is not None and not t.is_alive():
+            return _last
+    return check()
+
+
 def _check() -> Health:
     exe = library._ffmpeg()
     if exe is None:
@@ -126,40 +202,14 @@ def _check() -> Health:
     return Health(OK, _version(out), exe)
 
 
-def why_cant_fix() -> str:
-    """Why the app can't install FFmpeg itself (words for the user), or "" when it can.
-    Safe on the UI thread once check() has run (it remembers whether winget is here)."""
+def why_not() -> str:
+    """Why the app may not go online for FFmpeg (words for the user), or ""."""
     if net.offline() or not net.allowed(FEATURE):
         return net.off_message(FEATURE)
-    if not (winget() is not None if _has_winget is None else _has_winget):
-        return _("winget isn't on this PC, so the app can't install FFmpeg. Get it "
-                 "from ffmpeg.org instead.")
     return ""
 
 
-def fix(force: bool = False, progress: Callable[[], None] | None = None) -> Health:
-    """Get FFmpeg, or install it again over one that won't start (or, with ``force``,
-    over a working one), then check it runs. Returns the new Health; raises GetError
-    with words for the user. Never on the UI thread."""
-    with _fixing:
-        before = check()
-        if before.state == OK and not force:
-            return before            # fixed meanwhile (the other button, the installer)
-        # --force: winget may count a deleted or broken one as installed and skip it;
-        # with nothing there it's a plain install
-        get(progress, force=True)
-        after = check()
-        if after.state != OK:
-            # it still won't start: take it off first, then install it fresh
-            _winget(["uninstall", "--id", PACKAGE, "--exact", "--silent",
-                     "--disable-interactivity", "--accept-source-agreements"])
-            get(force=True)
-            after = check()
-        if after.state == OK:
-            return after
-        raise GetError(_("FFmpeg was installed but still won't start ({error}).",
-                         error=after.why or _("no reason given")))
-
+# --------------------------------------------------------------------------- winget
 
 def winget() -> str | None:
     """winget.exe, where the installer looks for it (installer/OnionBoard.iss)."""
@@ -178,7 +228,7 @@ def _winget(args: list[str]) -> subprocess.CompletedProcess:
     """winget with ``args``, hidden; raises GetError with words for the user."""
     exe = winget()
     if exe is None:
-        raise GetError(why_cant_fix())
+        raise GetError(_("winget isn't on this PC."))
     try:
         return subprocess.run([exe, *args], capture_output=True, timeout=TIMEOUT_S,
                               stdin=subprocess.DEVNULL,
@@ -194,10 +244,8 @@ def get(progress: Callable[[], None] | None = None, force: bool = False) -> str:
     """Install FFmpeg with winget and return ffmpeg.exe's path. Raises GetError with words
     for the user. ``progress`` (called once, just before the wait) is for the UI.
     ``force`` installs it again over what's there (one that won't start)."""
-    if net.offline() or not net.allowed(FEATURE):
-        raise GetError(net.off_message(FEATURE))
-    if winget() is None:
-        raise GetError(why_cant_fix())
+    if why_not():
+        raise GetError(why_not())
     found = library._ffmpeg()
     if found is not None and not force:  # it arrived meanwhile (another click, the installer)
         return found
@@ -214,3 +262,181 @@ def get(progress: Callable[[], None] | None = None, force: bool = False) -> str:
     log.info("winget couldn't install %s (rc=%s): %s", PACKAGE, p.returncode, out.strip())
     raise GetError(_("winget couldn't install FFmpeg (it said: {error}).",
                      error=_last_line(out) or _("no reason given")))
+
+
+def _with_winget() -> Health:
+    """Steps 1: install, then uninstall + install. The Health after; raises GetError."""
+    get(force=True)   # --force: with nothing there it's a plain install
+    after = check()
+    if after.state != OK:
+        log.info("FFmpeg still won't start after winget --force: uninstalling first")
+        _winget(["uninstall", "--id", PACKAGE, "--exact", "--silent",
+                 "--disable-interactivity", "--accept-source-agreements"])
+        get(force=True)
+        after = check()
+    return after
+
+
+# --------------------------------------------------------------------------- own copy
+
+def _length(header) -> int:
+    try:
+        return max(int(str(header or 0).strip()), 0)
+    except ValueError:
+        return 0
+
+
+def _download_once(url: str, to: Path, progress, stop) -> None:
+    """``url`` into the file ``to``, checked against SHA256. Raises GetError."""
+    host = urllib.parse.urlsplit(url).hostname
+    req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
+    h = hashlib.sha256()
+    got = 0
+    try:
+        with net.urlopen(req, timeout=DOWNLOAD_TIMEOUT_S, feature=FEATURE) as r, \
+                open(to, "wb") as f:
+            total = _length(r.headers.get("Content-Length"))
+            if total > MAX_BYTES:
+                raise GetError(_("The download is {mb} MB, far bigger than FFmpeg: not "
+                                 "taking it.", mb=f"{total / 1e6:.0f}"))
+            while chunk := r.read(CHUNK):
+                if stop is not None and stop.is_set():
+                    raise Stopped(_("Stopped."))
+                h.update(chunk)
+                f.write(chunk)
+                got += len(chunk)
+                if got > MAX_BYTES:
+                    raise GetError(_("The download kept going far past FFmpeg's size: "
+                                     "not taking it."))
+                if progress:
+                    progress(got, total)
+    except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
+        raise GetError(errors.plain(e)) from None
+    except urllib.error.HTTPError as e:
+        raise GetError(_("{host} said {error}.", host=host,
+                         error=f"{e.code} {e.reason}")) from None
+    except (urllib.error.URLError, OSError) as e:
+        why = getattr(e, "reason", None) or e
+        raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why)) from None
+    if h.hexdigest() != SHA256:
+        log.warning("ffmpeg download from %s: SHA-256 %s, expected %s", host,
+                    h.hexdigest(), SHA256)
+        raise GetError(_("The download isn't the FFmpeg it should be (its checksum doesn't "
+                         "match), so it wasn't used. It was cut short, or something "
+                         "between you and the site changed it."))
+
+
+def download(to: Path, progress=None, stop: threading.Event | None = None) -> None:
+    """The zip into ``to``: each source in turn, a few tries each (a dropped connection,
+    a busy server). Raises GetError with the last reason; Stopped at once."""
+    why: GetError | None = None
+    for url in URLS:
+        for n in range(TRIES):
+            if n:
+                wait = RETRY_WAIT_S[min(n - 1, len(RETRY_WAIT_S) - 1)]
+                if stop is not None and stop.wait(wait):
+                    raise Stopped(_("Stopped."))
+                if stop is None:
+                    time.sleep(wait)
+            try:
+                _download_once(url, to, progress, stop)
+                return
+            except Stopped:
+                raise
+            except GetError as e:
+                log.info("ffmpeg download from %s, try %d: %s", url, n + 1, e)
+                why = e
+    assert why is not None
+    raise why
+
+
+def unpack(zip_path: Path, dest: Path | None = None) -> Path:
+    """The kept files from a checked zip into ``dest`` (the bin folder by default),
+    replacing what's there. Only the named members are read, each written to a fixed
+    path, so nothing in the zip picks where a file goes."""
+    dest = dest or own_dir()
+    tmp = dest.with_name(dest.name + ".partial")
+    shutil.rmtree(tmp, ignore_errors=True)
+    try:
+        tmp.mkdir(parents=True)
+        with zipfile.ZipFile(zip_path) as z:
+            for name, rel in KEEP.items():
+                try:
+                    data = z.read(name)
+                except KeyError:
+                    raise GetError(_("{name} is missing from {file}", name=name,
+                                     file=ZIP)) from None
+                (tmp / rel).write_bytes(data)
+        old = dest.with_name(dest.name + ".old")
+        shutil.rmtree(old, ignore_errors=True)
+        if dest.exists():
+            dest.rename(old)   # fails while an ffmpeg.exe in it runs
+        try:
+            tmp.rename(dest)
+        except OSError:
+            if old.exists() and not dest.exists():
+                old.rename(dest)   # put the old copy back
+            raise
+        shutil.rmtree(old, ignore_errors=True)
+    except GetError:
+        shutil.rmtree(tmp, ignore_errors=True)
+        raise
+    except (OSError, zipfile.BadZipFile) as e:
+        shutil.rmtree(tmp, ignore_errors=True)
+        raise GetError(_("Couldn't unpack FFmpeg into {folder} ({error}). An antivirus may "
+                         "have blocked ffmpeg.exe.", folder=dest,
+                         error=getattr(e, "strerror", "") or e)) from None
+    return dest
+
+
+def _own_copy(progress, stop) -> Health:
+    """Step 2: download, check and unpack the app's own copy. Raises GetError."""
+    log.info("downloading FFmpeg %s for the app (%s)", VERSION, net.describe())
+    folder = own_dir().parent
+    folder.mkdir(parents=True, exist_ok=True)
+    part = folder / (ZIP + ".partial")
+    try:
+        download(part, progress, stop)
+        unpack(part)
+    finally:
+        try:
+            part.unlink()
+        except OSError:
+            pass
+    log.info("FFmpeg %s unpacked into the ffmpeg\\bin folder", VERSION)
+    return check()
+
+
+# --------------------------------------------------------------------------- fix
+
+def fix(force: bool = False, progress: Callable[[int, int], None] | None = None,
+        stop: threading.Event | None = None) -> Health:
+    """Get FFmpeg, or repair one that won't start (``force``: reinstall a working one),
+    trying winget and then the app's own copy until it works. Returns the new Health;
+    raises GetError (Stopped when ``stop`` is set) with words for the user.
+    ``progress(done, total)`` follows the app's own download. Never on the UI thread."""
+    with _fixing:
+        before = check()
+        if before.state == OK and not force:
+            return before            # fixed meanwhile (the other button, the installer)
+        if why_not():
+            raise GetError(why_not())
+        reasons: list[str] = []
+        # winget can't go through a proxy or Tor: then only the app's own download
+        if winget() is not None and net.mode() == net.DIRECT:
+            try:
+                after = _with_winget()
+                if after.state == OK:
+                    return after
+                reasons.append(after.why)
+            except GetError as e:
+                log.info("winget couldn't fix FFmpeg: %s", e)
+                reasons.append(str(e))
+        if stop is not None and stop.is_set():   # (winget itself can't be stopped midway)
+            raise Stopped(_("Stopped."))
+        after = _own_copy(progress, stop)
+        if after.state == OK:
+            return after
+        raise GetError(_("FFmpeg was installed but still won't start ({error}).",
+                         error=after.why or (reasons[-1] if reasons else "")
+                         or _("no reason given")))

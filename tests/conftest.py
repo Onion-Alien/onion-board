@@ -672,15 +672,24 @@ def _free_test_windows():
 
 @pytest.fixture(autouse=True)
 def _ffmpeg_works(monkeypatch):
-    """The start-up FFmpeg check (and Settings' FFmpeg row) never runs the PC's real
-    ffmpeg or winget: it works, version 7.1. Tests of a missing or broken one patch
-    ``ffmpegget.check`` / ``ffmpegget._check`` themselves."""
+    """The FFmpeg check (start-up and Settings' FFmpeg row) never runs the PC's real
+    ffmpeg: it works, version 7.1. And no test ever runs the real winget or downloads
+    FFmpeg: both steps of ffmpegget.fix fail at once unless a test fakes them. Tests of
+    a missing or broken one patch ``ffmpegget.check`` / ``ffmpegget._check`` themselves."""
     from soundboard import ffmpegget
     works = ffmpegget.Health(ffmpegget.OK, "7.1", "ffmpeg.exe")
 
     def check():
         monkeypatch.setattr(ffmpegget, "_last", works)
         return works
+
+    def no(*a, **k):
+        raise ffmpegget.GetError("(tests never install or download FFmpeg)")
     monkeypatch.setattr(ffmpegget, "_last", None)
+    monkeypatch.setattr(ffmpegget, "_early", None)
     monkeypatch.setattr(ffmpegget, "_has_winget", True)
     monkeypatch.setattr(ffmpegget, "check", check)
+    monkeypatch.setattr(ffmpegget, "_with_winget", no)
+    monkeypatch.setattr(ffmpegget, "_own_copy", no)
+    monkeypatch.setattr(ffmpegget, "_winget", no)
+    monkeypatch.setattr(ffmpegget, "_download_once", no)

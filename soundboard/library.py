@@ -1075,8 +1075,12 @@ MIGRATIONS = {1: _migrate_1_to_2, 2: _migrate_2_to_3, 3: _migrate_3_to_4}
 # --------------------------------------------------------------------------- decoding
 
 def _ffmpeg() -> str | None:
-    """ffmpeg on PATH, or where winget links it (the installer's M4A/video option uses
+    """The app's own FFmpeg (ffmpegget downloads it there when winget can't fix one),
+    else ffmpeg on PATH, or where winget links it (the installer's M4A/video option uses
     winget, and a process started before that doesn't see the new PATH yet)."""
+    own = APP_DIR / "ffmpeg" / "bin" / "ffmpeg.exe"
+    if os.name == "nt" and own.is_file():
+        return str(own)
     found = shutil.which("ffmpeg")
     if found:
         return found

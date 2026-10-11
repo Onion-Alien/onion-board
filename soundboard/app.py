@@ -482,6 +482,8 @@ def main():
     from soundboard.ui import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
+    from soundboard import ffmpegget
+    ffmpegget.start_check()   # meanwhile: is FFmpeg there and does it start? (never waited on)
     from soundboard.wheelguard import AppStyle
     app.setStyle(AppStyle("Fusion"))   # also: the wheel never changes a dropdown or tab
     from soundboard.ui import a11y
