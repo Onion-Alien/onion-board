@@ -488,11 +488,15 @@ class VolumeControl(QWidget):
 
 class EqPanel(QWidget):
     """On/off, target, preset, curve and the seven band sliders.
-    `changed(gains, enabled, target, preset)` fires on any change."""
+    `changed(gains, enabled, target, preset)` fires on any change. `fold`: while the EQ
+    is off, only its heading and on/off row show (the Setup tab: seven flat sliders and
+    an empty curve took a third of it)."""
     changed = Signal(list, bool, str, str)
 
-    def __init__(self, enabled: bool, target: str, preset: str, gains: list[float]):
+    def __init__(self, enabled: bool, target: str, preset: str, gains: list[float],
+                 fold: bool = False):
         super().__init__()
+        self.fold = fold
         pv = QVBoxLayout(self)
         pv.setContentsMargins(0, 0, 0, 0)
         pv.setSpacing(8)
@@ -512,6 +516,11 @@ class EqPanel(QWidget):
         row.addWidget(self.cb_target)
         row.addStretch(1)
         pv.addLayout(row)
+        self.body = QWidget()   # everything under the on/off row (folds away: `fold`)
+        bv = QVBoxLayout(self.body)
+        bv.setContentsMargins(0, 0, 0, 0)
+        bv.setSpacing(8)
+        pv.addWidget(self.body)
 
         self.cb_preset = QComboBox()
         # the item data is the preset's key, "Custom" for none; the keys are saved in
@@ -519,11 +528,11 @@ class EqPanel(QWidget):
         for name in EQ_PRESETS:
             self.cb_preset.addItem(name.replace(" — ", ": "), name)
         self.cb_preset.addItem(_("Custom"), "Custom")
-        pv.addWidget(self.cb_preset)
+        bv.addWidget(self.cb_preset)
         no_wheel(self.cb_target, self.cb_preset)
 
         self.curve = EqCurve()
-        pv.addWidget(self.curve)
+        bv.addWidget(self.curve)
 
         grid = QGridLayout()
         grid.setHorizontalSpacing(2)
@@ -547,8 +556,8 @@ class EqPanel(QWidget):
             self.sliders.append(s)
             self.vals.append(val)
         no_wheel(*self.sliders)
-        pv.addLayout(grid)
-        pv.addWidget(hint_label(_("Low = bass (left) · high = treble (right). Drag up to boost, "
+        bv.addLayout(grid)
+        bv.addWidget(hint_label(_("Low = bass (left) · high = treble (right). Drag up to boost, "
                                   "down to cut. Double-click the curve to reset.")))
 
         self._set_sliders(gains)
@@ -632,6 +641,7 @@ class EqPanel(QWidget):
     def _refresh(self, emit=True):
         gains, on, _target, _preset = self.state()
         self.curve.set_gains(gains, on)
+        self.body.setVisible(on or not self.fold)
         for w in self.sliders + [self.cb_target]:
             if bool(w.property("dim")) != (not on):
                 w.setProperty("dim", not on)
