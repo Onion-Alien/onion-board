@@ -636,6 +636,23 @@ def test_search_lands_on_the_named_page_and_says_when_nothing_matches(window, qa
         d.close()
 
 
+@pytest.mark.parametrize("text", ["   ", ""])
+def test_search_of_only_spaces_before_the_pages_are_built(window, qapp, text):  # noqa: F811
+    """Spaces typed into a fresh Settings' search (or the box cleared before its timer)
+    searched for no words with the lazy pages still unbuilt: an AssertionError."""
+    d = SettingsDialog(window, "privacy", lazy=True)
+    try:
+        assert d._unbuilt
+        d._apply_search(text)
+        assert not any(d.categories.item(r).isHidden() for r in range(d.categories.count()))
+        for word in ("Größe", "日本語", "مرحبا", "😀"):   # any language: no crash
+            d._apply_search(word)
+        d._apply_search(text)
+        assert d.tabs.isVisibleTo(d) and not d.no_match.isVisibleTo(d)
+    finally:
+        d.close()
+
+
 @pytest.mark.parametrize("width", [800, 1180])
 @pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
 def test_back_hover_has_room_before_settings_title(window, qapp, width, direction):  # noqa: F811
