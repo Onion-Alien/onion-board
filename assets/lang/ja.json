@@ -2953,5 +2953,6 @@
   "Listening: {mode}": "リスニング: {mode}",
   "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "英語で話せば、他の人には別の言語が聞こえます。 AI 音声またはボイスチェンジャーのいずれかがオンになっている場合は、その声が発せられます。それ以外の場合は、「スタート」を押すとコンピュータの音声が聞こえます。",
   "Type a line and press Enter…": "行を入力して Enter キーを押します…",
-  "Category": "カテゴリ"
+  "Category": "カテゴリ",
+  "Show more": "もっと見る"
 }

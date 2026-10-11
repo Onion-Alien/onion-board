@@ -1233,13 +1233,17 @@ class MainWindow(QMainWindow):
         self.search.returnPressed.connect(self.on_search_enter)
         icons.set_icon(self.search.addAction(QIcon(), QLineEdit.LeadingPosition), "search",
                        "muted")
-        # the web search: Enter does it too, so a small globe, not a second "Search" box
+        # the web search: Enter does it; this button shows the site it goes to and picks
+        # another from its menu
         self.btn_yt = QPushButton()
         self.btn_yt.setAccessibleName(_("Search"))
         self.btn_yt.setToolTip(_("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
                                  "what's typed (or press Enter), play or add the audio"))
-        icons.set_icon(self.btn_yt, "browser", size=18)
-        self.btn_yt.clicked.connect(self.search_youtube)
+        icons.set_icon(self.btn_yt, "youtube", size=18)
+        # which site Enter searches: the button shows it, its menu picks another
+        self._site_menu = DropdownMenu(self.btn_yt)
+        self.btn_yt.setMenu(self._site_menu)
+        self.btn_yt.setProperty("toolbarMenu", True)
         more = self.btn_more = QPushButton(_("Library"))
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
                           "sound pack"))
@@ -1377,6 +1381,8 @@ class MainWindow(QMainWindow):
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self._cat_row.show)   # ...and the categories' row
         self.ytresults.closed.connect(self._results_closed)
+        self.ytresults.fill_site_menu(self._site_menu)
+        self.ytresults.source_changed.connect(self._on_site_picked)
         self._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
@@ -4092,6 +4098,7 @@ class MainWindow(QMainWindow):
         self.radio.retheme()
         self.apps.retheme()
         self.triggers.retheme()
+        self.ytresults.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self._pill_long = ""   # forces _update_flow to repaint its icon
@@ -4381,6 +4388,13 @@ class MainWindow(QMainWindow):
         if self.current == LINK_ID:
             self.current = None   # a new link: refresh the name
         self.select(LINK_ID)
+
+    def _on_site_picked(self, key: str):
+        """A site picked in the search button's menu: it shows that site, and the
+        search box's words are searched there now (open results re-run themselves)."""
+        icons.set_icon(self.btn_yt, key, size=18)
+        if self.ytresults.isHidden() and self.search.text().strip():
+            self.search_youtube()
 
     def search_youtube(self):
         """Enter / the Search button: search the site the results header has
@@ -5100,7 +5114,7 @@ class MainWindow(QMainWindow):
             a_cols[a] = col
         if now:
             cm.addSeparator()
-            a_cols[cm.addAction(icons.icon("palette", checked_color="text"), _("No colour"))] = ""
+            a_cols[cm.addAction(icons.icon("palette", checked_color="accent"), _("No colour"))] = ""
         menu.addSeparator()
         a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front…"))
         a_unprog = {menu.addAction(icons.icon("offline"),
@@ -5602,7 +5616,7 @@ class MainWindow(QMainWindow):
                       "plays": "star"}
         for key, name in self._sort_names().items():
             a = menu.addAction(name, lambda k=key: self.set_pad_sort(k))
-            icons.set_icon(a, sort_icons[key], checked_color="text")
+            icons.set_icon(a, sort_icons[key], checked_color="accent")
             a.setCheckable(True)
             a.setChecked(self.cfg.pad_sort == key)
             a.setToolTip(tips[key])
@@ -5613,7 +5627,7 @@ class MainWindow(QMainWindow):
                 ("grid", _("Pads"), "sounds", _("Cards, with pictures")),
                 ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
             a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
-            icons.set_icon(a, icon, checked_color="text")
+            icons.set_icon(a, icon, checked_color="accent")
             a.setCheckable(True)
             a.setChecked(self.cfg.pad_view == key)
             a.setToolTip(tip)
@@ -5717,7 +5731,7 @@ class MainWindow(QMainWindow):
         cats = menu.addMenu(icons.icon("tag"), _("Categories"))
         cat_acts = {}
         for c in self.cfg.categories:
-            a = cats.addAction(icons.icon("tag", checked_color="text"), c.replace("&", "&&"))
+            a = cats.addAction(icons.icon("tag", checked_color="accent"), c.replace("&", "&&"))
             a.setCheckable(True)
             a.setChecked(c in m.tags)
             cat_acts[a] = c
@@ -7721,6 +7735,8 @@ class MainWindow(QMainWindow):
         # the search box keeps room to type in until the buttons beside it have shrunk
         f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
                                       r.touch(self.search)))
+        # very narrow: the search button (and its site menu) goes; Enter still searches
+        # the site picked last
         f.add(63, "w", lambda tight: (
             self.btn_yt.setVisible(not tight and self.ytresults.available()),
             r.touch(self.btn_yt)))
