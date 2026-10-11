@@ -672,7 +672,7 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     assert p.fx.preset == "Two"
     sound = p.fx.spec()["effects"]
     p.fx.delete_voice("One")
-    assert "One" not in p.fx._tile and p.fx.undo_bar.isVisibleTo(p.fx)
+    assert "One" not in p.fx._tile and p.fx.undo_bar.active()
     p.fx.undo_bar.undo()
     assert list(p.fx.store.voices) == ["One", "Two"]
     p.fx.delete_voice("Two")                       # the one that's on: you still sound
@@ -1064,9 +1064,11 @@ def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
     p.fx.save_voice()
     p.fx.save_voice()
     p.fx.copy_code("Mine")
-    assert p.fx.undo_bar.isVisibleTo(p.fx) and p.fx.undo_bar.btn_undo.isHidden()
-    p.fx.delete_voice("Mine")                        # a real Undo shows its button again
-    assert not p.fx.undo_bar.btn_undo.isHidden()
+    from soundboard.ui import toast
+    [t] = [t for t in toast.shown(p.fx) if "share code" in t.text()]
+    assert t.kind == "ok" and t.card.action.isHidden() and not p.fx.undo_bar.active()
+    p.fx.delete_voice("Mine")                        # a real Undo has its button
+    assert p.fx.undo_bar.active()
 
 
 def test_make_it_yours_buttons_are_at_the_top(panel):

@@ -336,7 +336,7 @@ def test_saved_clips_play_rename_add_and_delete_with_undo(tab, qapp):
     (data, name), = tab.clips
     assert name == "airhorn bit" and len(data) == SR
     sh.delete_picked()
-    assert not sh.shelf.clips and sh.undo_bar.isVisible()
+    assert not sh.shelf.clips and sh.undo_bar.active()
     sh.undo_bar.undo()
     assert [c.name for c in sh.shelf.clips] == ["airhorn bit"]
 

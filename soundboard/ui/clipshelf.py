@@ -106,7 +106,7 @@ class ClipShelf(QWidget):
         row_h = self.list.sizeHintForRow(0) if self.shelf.clips else 22
         self.list.setFixedHeight(self.list.header().sizeHint().height() + rows * max(row_h, 18)
                                  + 2 * self.list.frameWidth() + 2)
-        self.setVisible(bool(self.shelf.clips) or self.undo_bar.isVisible())
+        self.setVisible(bool(self.shelf.clips) or self.undo_bar.active())
         self._sync()
 
     def _sync(self):
@@ -206,7 +206,7 @@ class ClipShelf(QWidget):
                 return
             added += 1
         if added:
-            self.undo_bar.hide()
+            self.undo_bar.finish()
             clips = len(self.shelf.clips)
             self.title.setText(
                 ngettext("Saved clips ({clips}) · ✓ added {n} to your Sounds",

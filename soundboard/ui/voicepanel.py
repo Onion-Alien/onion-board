@@ -1030,9 +1030,8 @@ class VoiceFxPanel(QWidget):
         return code
 
     def _note(self, text: str):
-        """A short line where Undo shows, with nothing to undo."""
-        self.undo_bar.show_for(text, None)
-        self.undo_bar.btn_undo.hide()
+        """A short result, as a corner card."""
+        busy.toast(self._parent(), html.escape(text), "ok")
 
     def import_code(self, text: str | None = None) -> str:
         """Add a voice from a share code (asked for if not given) as a new saved voice,
@@ -1107,7 +1106,6 @@ class VoiceFxPanel(QWidget):
             self._based_on = ""
         self._fill_saved()
         self._emit()
-        self.undo_bar.btn_undo.show()   # (a note hides it)
         self.undo_bar.show_for(_("Deleted the voice “{name}”", name=name),
                                lambda: self._undelete(item.id, was_on))
 
