@@ -724,11 +724,13 @@ class SharpEngine(QIconEngine):
     Pixmaps made ahead of time at a few sizes (16, 20, 24...) get shrunk to the
     18 / 14 / 12 px the app asks for, and to 22 / 18 / 15 px on a 125 % screen,
     which blurs thin lines. This draws each size the first time it's needed, once.
-    `draw(px, mode, state)` returns a `px`-pixel square QPixmap."""
+    `draw(px, mode, state)` returns a `px`-pixel square QPixmap. `pad`: empty pixels
+    after it, so a button's words sit TEXT_GAP from its icon (Qt's own gap is 4 px)."""
 
-    def __init__(self, draw):
+    def __init__(self, draw, pad: int = 0):
         super().__init__()
         self._draw = draw
+        self._pad = pad
         self._made: dict[tuple, QPixmap] = {}
 
     def _get(self, px: int, mode, state) -> QPixmap:
@@ -739,8 +741,15 @@ class SharpEngine(QIconEngine):
         return pm
 
     def scaledPixmap(self, size, mode, state, scale):
-        side = max(1, min(size.width(), size.height()))
+        side = max(1, min(size.width() - self._pad, size.height()))
         pm = QPixmap(self._get(max(1, round(side * scale)), mode, state))
+        if self._pad:
+            wide = QPixmap(round((side + self._pad) * scale), pm.height())
+            wide.fill(Qt.transparent)
+            p = QPainter(wide)
+            p.drawPixmap(0, 0, pm)
+            p.end()
+            pm = wide
         pm.setDevicePixelRatio(scale)
         return pm
 
@@ -752,8 +761,8 @@ class SharpEngine(QIconEngine):
         painter.drawPixmap(rect, self.scaledPixmap(rect.size(), mode, state, scale))
 
     def actualSize(self, size, mode, state):
-        side = min(size.width(), size.height())
-        return QSize(side, side)
+        side = min(size.width() - self._pad, size.height())
+        return QSize(side + self._pad, side)
 
     def availableSizes(self, mode=QIcon.Normal, state=QIcon.Off):
         return [QSize(s, s) for s in SIZES]
@@ -762,7 +771,7 @@ class SharpEngine(QIconEngine):
         # a copy (QIcon detaching, e.g. on addPixmap, which this engine ignores): Qt
         # deletes it, but PySide drops the Python side as soon as this returns, so
         # keep it here (rare: the app never adds pixmaps to these icons)
-        c = SharpEngine(self._draw)
+        c = SharpEngine(self._draw, self._pad)
         _clones.append(c)
         return c
 
@@ -782,7 +791,7 @@ _cache: dict[tuple, QIcon] = {}
 
 
 def icon(name: str, color: str | None = None, checked_color: str | None = None,
-         selected: str = "accent") -> QIcon:
+         selected: str = "accent", pad: int = 0) -> QIcon:
     """`color`/`checked_color` are theme token names (e.g. "text", "on_accent") or
     literal colours ("#ff4d4f"). `selected` colours the current tab / a highlighted
     list item (accent, not Qt's washed-out tint)."""
@@ -792,7 +801,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
     on = resolve(checked_color or "on_accent")
     sel = resolve(selected)
     muted = resolve("muted")
-    key = (name, normal, on, sel)
+    key = (name, normal, on, sel, pad)
     if key not in _cache:
         def draw(px, mode, state):
             if mode == QIcon.Disabled:
@@ -804,7 +813,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
             else:
                 col = normal
             return pixmap(name, px, col)
-        _cache[key] = sharp_icon(draw)
+        _cache[key] = QIcon(SharpEngine(draw, pad))
     return _cache[key]
 
 
@@ -817,20 +826,34 @@ def _gone(ref: weakref.ref) -> bool:
     return w is None or not shiboken6.isValid(w)
 
 
-_applied: list[tuple[weakref.ref, str, str | None, str | None]] = []
+_applied: list[tuple[weakref.ref, str, str | None, str | None, int]] = []
+
+# icon to words on a button, the same everywhere (DESIGN.md: 6-8 px); Qt puts 4 px
+TEXT_GAP = 8
 _tabs: list[tuple[weakref.ref, int, str, str | None, bool]] = []
 
 
 def set_icon(widget, name: str, color: str | None = None, checked_color: str | None = None,
              size: int = 18):
     """Give a button or menu action (anything with setIcon) an icon that follows theme
-    changes."""
-    widget.setIcon(icon(name, color, checked_color))
+    changes. A button with words gets TEXT_GAP between the icon and them."""
+    has_text = hasattr(widget, "setIconSize") and bool(getattr(widget, "text", str)())
+    pad = TEXT_GAP - 4 if has_text else 0
+    widget.setIcon(icon(name, color, checked_color, pad=pad))
     if hasattr(widget, "setIconSize"):   # a QAction takes its menu's size
-        widget.setIconSize(QSize(size, size))
+        widget.setIconSize(QSize(size + pad, size))
     # one entry per widget: buttons re-iconed on every click must not grow the list
     _applied[:] = [e for e in _applied if e[0]() is not None and e[0]() is not widget]
-    _applied.append((weakref.ref(widget), name, color, checked_color))
+    _applied.append((weakref.ref(widget), name, color, checked_color, pad))
+
+
+def text_gap(button):
+    """Re-fit the icon's gap after a button's words were dropped or put back (a
+    narrow window's icon-only step): no words, no empty space after the icon."""
+    for ref, name, color, checked, __ in _applied:
+        if ref() is button:
+            set_icon(button, name, color, checked, button.iconSize().height())
+            return
 
 
 _labels: list[tuple[weakref.ref, str, str, int]] = []
@@ -943,11 +966,11 @@ def tab_icon_name(tabs, index: int) -> str | None:
 def retheme_live():
     """Re-draw only the icons in the live colour (a live tab's, the mic pill's) after
     the user picks a new one: retheme() re-draws every icon in the app."""
-    for ref, name, color, checked in _applied:
+    for ref, name, color, checked, pad in _applied:
         w = ref()
         if w is not None and "live_text" in (color, checked):
             try:
-                w.setIcon(icon(name, color, checked))
+                w.setIcon(icon(name, color, checked, pad=pad))
             except RuntimeError:   # the C++ widget is gone
                 pass
     for ref, index, name, tint, badge in _tabs:
@@ -963,12 +986,12 @@ def retheme():
     _cache.clear()
     _tab_cache.clear()
     alive = []
-    for ref, name, color, checked in _applied:
+    for ref, name, color, checked, pad in _applied:
         w = ref()
         try:
             if w is not None:
-                w.setIcon(icon(name, color, checked))
-                alive.append((ref, name, color, checked))
+                w.setIcon(icon(name, color, checked, pad=pad))
+                alive.append((ref, name, color, checked, pad))
         except RuntimeError:   # the C++ widget is gone
             pass
     _applied[:] = alive
