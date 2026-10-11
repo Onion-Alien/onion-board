@@ -4454,7 +4454,11 @@ class MainWindow(QMainWindow):
     def _show_about_menu(self):
         # (a foot button is checkable for Settings' "showing" fill: this one never is)
         self.btn_about.setChecked(False)
-        self.about_menu.popup(self.btn_about.mapToGlobal(self.btn_about.rect().topRight()))
+        # up from the rail's foot, its edge over the onion's (down, it ran off the window)
+        m = self.about_menu
+        self._fill_about_menu()
+        edge = 0 if not self.isRightToLeft() else self.btn_about.width() - m.sizeHint().width()
+        m.popup(self.btn_about.mapToGlobal(QPoint(edge, -m.sizeHint().height())))
 
     def _fill_about_menu(self):
         """The onion at the rail's foot: where to talk to us, and where the app lives."""

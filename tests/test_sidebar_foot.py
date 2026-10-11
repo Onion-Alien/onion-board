@@ -250,6 +250,10 @@ def test_the_help_onion_opens_its_menu_and_is_never_left_selected(window):  # no
     texts = [a.text() for a in window.about_menu.actions() if a.text()]
     assert texts[:3] == ["Join the Discord", "Send feedback", "Report a problem"]
     assert not window.btn_about.isChecked()
+    # up from the rail's foot, its edge over the onion's (down, it ran off the window)
+    menu, onion = window.about_menu.geometry(), window.btn_about
+    top_left = onion.mapToGlobal(onion.rect().topLeft())
+    assert menu.bottom() < top_left.y() and menu.left() == top_left.x()
     window.about_menu.hide()
 
 
