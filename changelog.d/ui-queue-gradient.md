@@ -1,0 +1,1 @@
+- The download banner and its queue rows get the theme gradient: the accent lit at the top left, a green tint when a song is added, a red tint and edge when it fails. High Contrast stays flat.

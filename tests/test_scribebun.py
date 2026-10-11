@@ -113,6 +113,36 @@ def _flash_over(bar):
     bar._release()
 
 
+def test_download_bar_gradient_follows_how_it_ended(qapp):
+    """The banner's gradient: tinted green when added, red when it failed, back to the
+    accent for the next pick; the outlined theme keeps it flat."""
+    from soundboard import theme
+    from soundboard.ui.downloadbar import DownloadBar
+    was = theme.current_name
+    try:
+        theme.apply(qapp, "Dark")
+        bar = DownloadBar()
+        bar.resize(900, 80)
+        a, b = "https://www.youtube.com/watch?v=a", "https://www.youtube.com/watch?v=b"
+        assert "qlineargradient" in bar.styleSheet()
+        bar.set_active(a, "One", "add", None)
+        assert bar.property("ended") == ""
+        bar.set_done(a, "add", True)
+        assert bar.property("ended") == "ok"
+        _flash_over(bar)
+        bar.set_active(b, "Two", "add", None)
+        assert bar.property("ended") == ""
+        _fail(bar, b)
+        assert bar.property("ended") == "failed"
+        bar.close()
+        theme.apply(qapp, "High Contrast")
+        flat = DownloadBar()
+        assert "qlineargradient" not in flat.styleSheet()
+        flat.close()
+    finally:
+        theme.apply(qapp, was)
+
+
 def test_download_bar_flags_how_it_ended(qapp):
     from soundboard.ui.downloadbar import DownloadBar
     bar = DownloadBar()
