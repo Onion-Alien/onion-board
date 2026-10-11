@@ -225,6 +225,20 @@ def _arrow(direction):
     return draw
 
 
+def _panel(stripe, way):
+    """The tab rail's hide / show: a window with its side bar (`stripe`, the side it's
+    on) and a chevron pointing `way`, the way the bar will go."""
+    def draw(p, fill):
+        p.drawRoundedRect(QRectF(3, 4, 18, 16), 3, 3)
+        x = 9 if stripe == "left" else 15
+        p.drawLine(QPointF(x, 4), QPointF(x, 20))
+        c = 15 if stripe == "left" else 9   # the chevron, centred in the rest
+        s = -1 if way == "left" else 1
+        p.drawPolyline([QPointF(c - 1.5 * s, 9), QPointF(c + 1.5 * s, 12),
+                        QPointF(c - 1.5 * s, 15)])
+    return draw
+
+
 def _nav_arrow(direction):
     """The setup guide's Back / Next: the arrow, heavier and with a wider head, so it
     holds its own beside the buttons' semibold words."""
@@ -707,6 +721,8 @@ SHAPES = {
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
     "back": _arrow("back"), "forward": _arrow("forward"),
+    "panel_close": _panel("left", "left"), "panel_open": _panel("left", "right"),
+    "panel_close_rtl": _panel("right", "right"), "panel_open_rtl": _panel("right", "left"),
     "nav_back": _nav_arrow("back"), "nav_next": _nav_arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,

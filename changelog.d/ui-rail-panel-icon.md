@@ -1,0 +1,1 @@
+- The button that shows and hides the tab names is now a side-panel icon instead of a plain arrow.
