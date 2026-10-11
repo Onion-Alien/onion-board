@@ -3214,5 +3214,6 @@
   "Your sounds go into your mic": "เสียงของคุณเข้าไมค์",
   "{mic} · not sent, sounds only": "{mic} · ไม่ได้ส่ง มีแค่เสียงเอฟเฟกต์",
   "{mic} · off": "{mic} · ปิดอยู่",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "ขั้นตอนผู้ดูแลระบบของ Windows ยังไม่เสร็จ ถ้าหน้าต่างขอสิทธิ์ยังเปิดอยู่ ให้ตอบก่อน แล้วลองอีกครั้ง"
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "ขั้นตอนผู้ดูแลระบบของ Windows ยังไม่เสร็จ ถ้าหน้าต่างขอสิทธิ์ยังเปิดอยู่ ให้ตอบก่อน แล้วลองอีกครั้ง",
+  "{title}  ·  quiet on {devices}": "{title} · เงียบอยู่บน {devices}"
 }

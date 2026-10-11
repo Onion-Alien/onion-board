@@ -3579,5 +3579,6 @@
   "Your sounds go into your mic": "أصواتك تدخل الميكروفون",
   "{mic} · not sent, sounds only": "{mic} · غير مُرسل، الأصوات فقط",
   "{mic} · off": "{mic} · متوقف",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "لم تنتهِ خطوة مسؤول Windows. إذا كانت نافذتها لا تزال مفتوحة، أجب عليها؛ ثم حاول مرة أخرى."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "لم تنتهِ خطوة مسؤول Windows. إذا كانت نافذتها لا تزال مفتوحة، أجب عليها؛ ثم حاول مرة أخرى.",
+  "{title}  ·  quiet on {devices}": "{title} · صامت على {devices}"
 }

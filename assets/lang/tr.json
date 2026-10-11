@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "Seslerin mikrofonuna gidiyor",
   "{mic} · not sent, sounds only": "{mic} · gönderilmiyor, sadece sesler",
   "{mic} · off": "{mic} · kapalı",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows yönetici adımı tamamlanmadı. İstemi hâlâ açıksa yanıtla; sonra yeniden dene."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows yönetici adımı tamamlanmadı. İstemi hâlâ açıksa yanıtla; sonra yeniden dene.",
+  "{title}  ·  quiet on {devices}": "{title} · {devices} üzerinde sessiz"
 }

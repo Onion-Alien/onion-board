@@ -3214,5 +3214,6 @@
   "Your sounds go into your mic": "사운드가 마이크로 들어갑니다",
   "{mic} · not sent, sounds only": "{mic} · 보내지 않음, 사운드만",
   "{mic} · off": "{mic} · 꺼짐",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 관리자 단계가 끝나지 않았습니다. 프롬프트가 아직 열려 있으면 응답한 뒤 다시 시도하세요."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 관리자 단계가 끝나지 않았습니다. 프롬프트가 아직 열려 있으면 응답한 뒤 다시 시도하세요.",
+  "{title}  ·  quiet on {devices}": "{title} · {devices} 에서 조용함"
 }

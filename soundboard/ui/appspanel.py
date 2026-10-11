@@ -831,8 +831,11 @@ class AppRow(HoverCard):
             self._set_icon(app.path)
             where = ", ".join(app.devices[:2])
             sub = app.title or app.exe
-            if where:
+            # a quiet program keeps its audio session (and its devices): it says so
+            if where and app.active:
                 sub = _("{title}  ·  playing on {devices}", title=sub, devices=where)
+            elif where:
+                sub = _("{title}  ·  quiet on {devices}", title=sub, devices=where)
             if not self.status_text:   # an error stays up until the next attempt
                 self.sub.setText(sub)
         else:
