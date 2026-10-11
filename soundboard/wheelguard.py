@@ -10,10 +10,11 @@ measurable idle cost.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject, Qt, QTimer
+from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
+from PySide6.QtGui import QHoverEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
                                QApplication, QComboBox, QMenu, QProxyStyle,
-                               QScrollBar, QSizePolicy, QStyle)
+                               QScrollBar, QSizePolicy, QStyle, QWidget)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
 
@@ -35,6 +36,8 @@ class AppStyle(QProxyStyle):
       inside the menu's border and padding, theme.py's QMenu). SUBMENU_GAP does it
       where Qt uses it; _SubmenuEdge where it doesn't (a submenu flipped to the other
       side near the screen's edge, right-to-left languages).
+    - popups clear hover on the controls behind their mouse grab, so moving away
+      while a menu is open never leaves its opener highlighted.
     """
 
     COMBO_CAP = 360
@@ -48,6 +51,8 @@ class AppStyle(QProxyStyle):
             snug_combo(arg, self.COMBO_CAP)
         elif isinstance(arg, QMenu):
             arg.installEventFilter(_submenu_edge())   # once: Qt doesn't add it twice
+        elif isinstance(arg, QWidget) and arg.windowType() == Qt.Popup:
+            arg.installEventFilter(_submenu_edge())
 
     def pixelMetric(self, metric, opt=None, widget=None):
         if metric == QStyle.PM_SubMenuOverlap:
@@ -64,11 +69,27 @@ class AppStyle(QProxyStyle):
 
 
 class _SubmenuEdge(QObject):
-    """On a submenu about to show (before it's on screen, so it never jumps): if it
-    covers its menu, move it just outside, on the side it opened towards."""
+    """Clear hover behind popups and keep submenus outside their parent menu."""
     GAP = 2
 
     def eventFilter(self, obj, ev):
+        if ev.type() == QEvent.Show and obj.windowType() == Qt.Popup:
+            # A popup grabs the mouse before the opener receives Leave. Moving away
+            # while it is open can then leave both QSS and custom hover fills stuck.
+            # Send the normal leave events, including to hovered cards and parents.
+            for window in QApplication.topLevelWidgets():
+                if window is obj or window.windowType() == Qt.Popup:
+                    continue
+                for widget in [window, *window.findChildren(QWidget)]:
+                    if widget.window() is window and widget.underMouse():
+                        widget.setAttribute(Qt.WA_UnderMouse, False)
+                        QApplication.sendEvent(widget, QEvent(QEvent.Leave))
+                        if widget.testAttribute(Qt.WA_Hover):
+                            QApplication.sendEvent(widget, QHoverEvent(
+                                QEvent.HoverLeave, QPointF(-1, -1),
+                                QPointF(widget.mapToGlobal(widget.rect().center())),
+                                QPointF(-1, -1)))
+                        widget.update()
         if ev.type() == QEvent.Show and isinstance(obj, QMenu):
             parent = obj.parentWidget()
             if isinstance(parent, QMenu) and parent.isVisible():
