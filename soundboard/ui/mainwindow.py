@@ -8303,6 +8303,8 @@ class MainWindow(QMainWindow):
             m = self.meta(sid) if sid else None
             image = m.image if m else ""
         self.grid.set_background(image, self.cfg.playing_background_opacity)
+        if image and step and self._pad_scroll.verticalScrollBar().value() % step:
+            self._scroll_background_board(self._pad_scroll.verticalScrollBar().value())
 
     def _update_transport(self, playing):
         sid = self.current

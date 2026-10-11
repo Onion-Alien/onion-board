@@ -40,6 +40,7 @@ def test_background_board_scrolls_without_partial_rows(
     w.tabs.setCurrentWidget(w.sounds_page)
     w.resize(*size)
     w.show()
+    w._pad_scroll.verticalScrollBar().setValue(31)
     w._update_playing_background(playing)
     qapp.processEvents()
     w._update_playing_background(playing)
