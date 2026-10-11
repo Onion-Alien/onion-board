@@ -293,7 +293,9 @@ class DestPanel(QWidget):
               "a game would: wide stereo sounds and phasey bass don't cancel out"))
         v.addWidget(self.chk_mono)
         duck = QHBoxLayout()
-        duck.addWidget(QLabel(_("While I talk, lower my sounds:")))
+        duck_lbl = QLabel(_("While I talk, lower my sounds:"))
+        duck_lbl.setProperty("keepline", True)   # (Settings wraps its labels)
+        duck.addWidget(duck_lbl)
         self.cb_duck = QComboBox()
         no_wheel(self.cb_duck)
         for label, db in DUCK_LABELS:
