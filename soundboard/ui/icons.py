@@ -978,34 +978,28 @@ def _with_badge(ic: QIcon) -> QIcon:
     """`ic` with a small "live" dot on its top-right corner, cut out of the picture by
     a thin gap so it reads on any background. Drawn into the icon itself, so the
     tab it's on keeps its size."""
-    out = QIcon()
     color = QColor(theme.T["live_text"])
-    for s in SIZES:
+
+    def draw(s, mode, state):
         r = s * 0.2
         gap = max(1.0, s / 12)
         c = QPointF(s - r, r)
-        for state in (QIcon.State.Off, QIcon.State.On):   # On: the current tab
-            for mode in (QIcon.Mode.Normal, QIcon.Mode.Selected, QIcon.Mode.Active,
-                         QIcon.Mode.Disabled):
-                # at a ratio of 1: on a scaled screen the plain pixmap() comes back bigger,
-                # with its own ratio, and the badge landed off its edge
-                pm = QPixmap(ic.pixmap(QSize(s, s), 1.0, mode, state))
-                if pm.size() != QSize(s, s):
-                    pm = pm.scaled(s, s, Qt.AspectRatioMode.KeepAspectRatio,
-                                   Qt.TransformationMode.SmoothTransformation)
-                pm.setDevicePixelRatio(1.0)
-                p = QPainter(pm)
-                p.setRenderHint(QPainter.RenderHint.Antialiasing)
-                p.setPen(Qt.PenStyle.NoPen)
-                p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
-                p.setBrush(Qt.GlobalColor.black)
-                p.drawEllipse(c, r + gap, r + gap)
-                p.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
-                p.setBrush(color)
-                p.drawEllipse(c, r, r)
-                p.end()
-                out.addPixmap(pm, mode, state)
-    return out
+        # Paint both the glyph and badge at the requested physical pixel size.
+        pm = QPixmap(ic.pixmap(QSize(s, s), 1.0, mode, state))
+        pm.setDevicePixelRatio(1.0)
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
+        p.setBrush(Qt.GlobalColor.black)
+        p.drawEllipse(c, r + gap, r + gap)
+        p.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+        p.setBrush(color)
+        p.drawEllipse(c, r, r)
+        p.end()
+        return pm
+
+    return sharp_icon(draw)
 
 
 def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bool = False):

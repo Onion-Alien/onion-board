@@ -61,8 +61,7 @@ class SourceDialog(QDialog):
                                     Qt.TransformationMode.SmoothTransformation))
         else:   # no thumbnail: the site's icon on an inner area
             pic.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 8px;")
-            pic.setPixmap(icons.pixmap(sourceinfo.icon(self.src), 40,
-                                       theme.T["muted"]))
+            icons.set_label_icon(pic, sourceinfo.icon(self.src), size=40)
         top.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
         names = QVBoxLayout()
         names.setSpacing(2)

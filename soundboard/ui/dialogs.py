@@ -372,7 +372,7 @@ class EditDialog(QDialog):
             srow = QHBoxLayout()
             srow.setSpacing(8)
             ic = QLabel()
-            ic.setPixmap(icons.pixmap(sourceinfo.icon(src), 16, theme.T["muted"]))
+            icons.set_label_icon(ic, sourceinfo.icon(src), size=16)
             srow.addWidget(ic)
             site, who = sourceinfo.site_name(src), src.get("channel")
             from_lbl = QLabel(_("From {site}: {channel}", site=site, channel=who) if who
