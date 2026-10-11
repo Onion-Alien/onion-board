@@ -18,8 +18,12 @@ from soundboard.ui import icons
 
 RADIUS = 12   # a card's corners
 HINT_PT = 8.5  # DESIGN.md Standard kit: Hint
-FOOT_PAD = 10  # under the words / level bar of a stacked tile
+FOOT_PAD = 10  # under the level bar of a stacked tile
 PAD = 14      # inside the tile (DESIGN.md: card padding)
+ICON = 24     # a stacked tile's icon
+ICON_GAP = 6  # ... and the gap under it
+METER_ROOM = FOOT_PAD + 4 + 8   # the level bar, its foot and a gap above it
+MAX_LINES = 3  # a stacked tile's name: at most this many lines
 
 
 def wrap(text: str, fm: QFontMetrics, width: int, max_lines: int) -> list[str]:
@@ -49,6 +53,7 @@ class ChoiceTile(QRadioButton):
         self.title, self.sub = title, sub
         self.stacked = stacked
         self.level: float | None = None   # None: no level bar
+        self.meter = False   # keeps room for the level bar even before it shows
         self._drawn_level = -1
         self.setFixedSize(width, height)
         self.setCursor(Qt.PointingHandCursor)
@@ -68,6 +73,32 @@ class ChoiceTile(QRadioButton):
     def mousePressEvent(self, ev):
         self._keyboard = False
         super().mousePressEvent(ev)
+
+    def _name_font(self) -> QFont:
+        """The name's font: the same weight picked or not (the tint, ring and tick
+        show the pick), so a picked name never rewraps or needs more room."""
+        f = QFont(self.font())
+        f.setWeight(f.Weight.Normal)
+        return f
+
+    def _foot(self) -> int:
+        return METER_ROOM if self.meter or self.level is not None else 0
+
+    def _block(self, lines: int) -> float:
+        """A stacked tile's icon, `lines` of name and its kind, as one block."""
+        small = QFont(self.font())
+        small.setPointSizeF(HINT_PT)
+        sub_h = QFontMetrics(small).height() if self.sub else 0
+        return ICON + ICON_GAP + lines * QFontMetrics(self._name_font()).lineSpacing() + sub_h
+
+    def needed_height(self) -> int:
+        """How tall a stacked tile must be for its name, with PAD above and below:
+        the tiles of a list take the tallest one's height, so none sits on an empty
+        band and none is cut short."""
+        self.ensurePolished()   # the theme's font, as it paints (not Qt's plain one)
+        text = self.title or self.text().replace("&&", "&")
+        lines = len(wrap(text, QFontMetrics(self._name_font()), self.width() - 20, MAX_LINES))
+        return math.ceil(self._block(lines)) + 2 * PAD + self._foot()
 
     def _ring(self) -> bool:
         return self._keyboard and self.hasFocus()
@@ -118,28 +149,27 @@ class ChoiceTile(QRadioButton):
             p.drawRoundedRect(r.adjusted(4, 4, -4, -4), RADIUS - 4, RADIUS - 4)
 
         text = self.title or self.text().replace("&&", "&")
-        f = self.font()
-        f.setWeight(f.Weight.DemiBold if on else f.Weight.Normal)
-        p.setFont(f)
+        p.setFont(self._name_font())
         p.setPen(QColor(t["text_hi"] if on else t["text"]))
         colour = "accent" if on else "muted"
-        foot = 8 if self.level is not None else 0   # room for the level bar
         if self.stacked:
-            size = 24
+            size = ICON
             pm = icons.icon(self.icon_name, colour).pixmap(QSize(size, size),
                                                             self.devicePixelRatioF())
             small = QFont(self.font())
             small.setPointSizeF(HINT_PT)
             sub_h = QFontMetrics(small).height() if self.sub else 0
             fm = QFontMetrics(p.font())
-            bottom = self.height() - FOOT_PAD - foot
-            room = max(1, int((bottom - 12 - size - 6 - sub_h) // fm.lineSpacing()))
+            bottom = self.height() - self._foot()   # above the level bar's room
+            room = max(1, min(MAX_LINES, int((bottom - 2 * PAD - self._block(0))
+                                             // fm.lineSpacing())))
             lines = wrap(text, fm, self.width() - 20, room)
-            # icon, words and kind centred as one block: no band under a short name
-            block = size + 6 + len(lines) * fm.lineSpacing() + sub_h
-            y0 = max(10.0, (bottom - block) / 2 + 2)
+            # icon, words and kind centred as one block: even room above and below
+            block = self._block(len(lines))
+            y0 = max(10.0, (bottom - block) / 2)
             p.drawPixmap(round((self.width() - size) / 2), round(y0), pm)
-            words = QRectF(10, y0 + size + 6, self.width() - 20, len(lines) * fm.lineSpacing())
+            words = QRectF(10, y0 + size + ICON_GAP, self.width() - 20,
+                           len(lines) * fm.lineSpacing())
             y = words.top()
             for line in lines:
                 p.drawText(QRectF(words.left(), y, words.width(), fm.lineSpacing()),

@@ -749,6 +749,67 @@ def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
     assert wiz.width() == setupwizard.CONTENT_W + 2 * setupwizard.MARGIN
 
 
+def test_header_ends_where_its_words_do(mic_wizard, qapp):
+    """Bun is no taller than a step's title and words: the gap under the words is
+    HEADER_GAP, not a band left by a Bun taller than the text beside him."""
+    from PySide6.QtCore import QPoint
+    _, wiz = mic_wizard
+    wiz.show()
+    qapp.processEvents()
+    page = wiz.stack.currentWidget()   # "What's it for?"
+    title, words = page.findChildren(setupwizard.QLabel)[:2]
+    bun = page.findChildren(setupwizard.BunnyWidget)[0]
+
+    def y(wd, at_bottom=False):
+        return wd.mapTo(wiz, QPoint(0, wd.height() if at_bottom else 0)).y()
+    assert y(bun) == y(title)   # top-aligned with the title, not centred below it
+    assert bun.height() <= setupwizard.BUN_H + 2 * setupwizard.BUN_PAD
+    bottom = max(y(words, True), y(bun, True))
+    tiles = y(wiz.use_buttons["normal"])
+    assert tiles - bottom <= setupwizard.HEADER_GAP + 8   # (+ the page's own spacing)
+
+
+def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
+    """One-line names get short tiles (no empty band above and below), long ones get
+    room for every line; a list's tiles share one height. A picked name keeps its
+    weight, so picking never needs more room."""
+    from soundboard.ui.choicetile import ChoiceTile
+    _, wiz = mic_wizard
+    wiz.show()
+    qapp.processEvents()
+    short = list(wiz.use_buttons.values())
+    assert len({t.height() for t in short}) == 1
+    assert short[0].height() == max(setupwizard.TILE_MIN_H,
+                                    max(t.needed_height() for t in short))
+    long_ = ChoiceTile("x", "volume", setupwizard.TILE_W, 50,
+                       title="LG ULTRAGEAR (NVIDIA High Definition Audio)")
+    one = ChoiceTile("x", "volume", setupwizard.TILE_W, 50, title="Speakers")
+    assert long_.needed_height() > one.needed_height()
+    before = short[1].needed_height()
+    short[1].click()
+    assert short[1].needed_height() == before
+
+
+def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch, qapp):
+    """The test sound's card is the page's width (it ended at a spot nothing lined up
+    with), and with the device list open the cable's tile fills the optional card's
+    row instead of sitting at half width beside a hole."""
+    from soundboard import directmic
+    _, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.show()
+    wiz.go(wiz.base + 1)
+    qapp.processEvents()
+    card = wiz.btn_test.parentWidget()
+    assert card.width() == wiz.btn_next.geometry().right() - wiz.btn_back.x() + 1
+    wiz.go(wiz.base + 2)
+    wiz._show_other(True)
+    qapp.processEvents()
+    assert wiz.alt_other_row.isHidden()
+    inner = wiz.alt_cable_row.parentWidget().contentsRect().width() - 2 * 14
+    assert wiz.alt_cable_row.width() >= inner - 2
+
+
 def test_step_bar_follows_the_pages(mic_wizard):
     _, wiz = mic_wizard
     for i in range(wiz.PAGES):
