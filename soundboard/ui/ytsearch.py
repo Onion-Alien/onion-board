@@ -485,12 +485,12 @@ class ResultRow(HoverCard):
         self.btn_play = QPushButton(_("Play"))
         self.btn_play.setObjectName("cardplay")
         self.btn_play.setToolTip(_("Download its audio and play it once (it isn't kept)"))
-        icons.set_icon(self.btn_play, "play", "live_text", size=14)
+        icons.set_icon(self.btn_play, "play", "on_accent", size=14)
         self.btn_play.clicked.connect(lambda: self.play.emit(self.result))
         self.btn_add = QPushButton(_("Add"))
         self.btn_add.setObjectName("cardadd")
         self.btn_add.setToolTip(_("Download its audio and add it to your sounds"))
-        icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
+        icons.set_icon(self.btn_add, "plus", "text_hi", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
         for b in (self.btn_play, self.btn_add):
             b.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -531,21 +531,22 @@ class ResultRow(HoverCard):
         self.setToolTip(_("Double-click to play"))
 
     def _style(self):
-        """The card's two buttons: Play a soft accent tint, Add the filled accent; the
+        """The card's two buttons: Play the filled accent, Add a quiet outline; the
         one downloading fills with the accent as it goes; Added goes quiet."""
         T = theme.T
         base = "border-radius:9px; padding:8px 12px; font-weight:600;"
-        tint, edge = theme.mix(T["card"], T["accent"], 0.2), theme.mix(T["card"], T["accent"], 0.5)
-        tint_hi = theme.mix(T["card"], T["accent"], 0.32)
+        edge = theme.mix(T["card"], T["accent"], 0.5)
         styles = {
-            "play": (f"QPushButton {{ {base} background:{tint}; border:1px solid {edge};"
-                     f" color:{T['live_text']}; }}"
-                     f"QPushButton:hover {{ background:{tint_hi}; }}"),
-            "add": (f"QPushButton {{ {base} background:{theme.accent_fill()};"
-                    f" {theme.accent_edge()}"
-                    f" color:{T['on_accent']}; }}"
-                    f"QPushButton:hover {{ background:{theme.accent_fill(hover=True)}; }}"),
+            "play": (f"QPushButton {{ {base} background:{theme.accent_fill()};"
+                     f" {theme.accent_edge()} color:{T['on_accent']}; }}"
+                     f"QPushButton:hover {{ background:{theme.accent_fill(hover=True)}; }}"
+                     f"QPushButton:pressed {{ background:{T['accent']}; }}"),
+            "add": (f"QPushButton {{ {base} background:transparent;"
+                    f" border:1px solid {T['accent']}; color:{T['text_hi']}; }}"
+                    f"QPushButton:hover {{ background:{T['btn_hover']}; }}"
+                    f"QPushButton:pressed {{ background:{T['btn_press']}; }}"),
         }
+        focus = f"QPushButton:focus {{ border:1px solid {T['text_hi']}; }}"
         # waiting for another card's download: greyed, like any busy button
         waiting = (f"QPushButton[busy=\"true\"] {{ background:{T['btn']}; border:1px solid"
                    f" {T['border']}; color:{T['muted']}; }}")
@@ -567,6 +568,7 @@ class ResultRow(HoverCard):
                     tint_bg = theme.mix(T["card"], T["accent"], 0.28)
                     css = (f"QPushButton {{ {base} background:{tint_bg}; border:1px solid {edge};"
                            f" color:{T['live_text']}; }}")
+            css += focus
             if b.styleSheet() != css:
                 b.setStyleSheet(css)
 
@@ -628,7 +630,7 @@ class ResultRow(HoverCard):
             self.btn_play.setText({"playing": _("Pause"), "paused": _("Resume")}.get(
                 now, _("Play")))
             icons.set_icon(self.btn_play, "pause" if now == "playing" else "play",
-                           "live_text", size=14)
+                           "on_accent", size=14)
         self.btn_play.setToolTip(_("Pause it") if now == "playing" else
                                  _("Carry on playing it") if now == "paused" else
                                  _("Download its audio and play it once (it isn't kept)"))
