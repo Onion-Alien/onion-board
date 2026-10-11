@@ -419,7 +419,9 @@ class SettingsDialog(QDialog):
         # Done button sat below the screen
         self.setMinimumSize(720, 420)
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(16, 14, 16, 14)
+        # one margin all round, and the same gap above Done as below and beside it
+        lay.setContentsMargins(16, 16, 16, 16)
+        lay.setSpacing(16)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
@@ -631,7 +633,8 @@ class SettingsDialog(QDialog):
     def _page(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(0, 12, 16, 12)
+        # no top margin: the first card starts level with the search box
+        v.setContentsMargins(0, 0, 16, 12)
         v.setSpacing(12)
         return w, v
 

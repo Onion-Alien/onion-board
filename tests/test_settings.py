@@ -4,10 +4,10 @@ from contextlib import contextmanager
 
 import pytest
 
-from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtCore import QEvent, QObject, QPoint, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea, QWidget
 
 from conftest import process_events
 from soundboard import net
@@ -600,3 +600,29 @@ def test_tab_moves_from_the_category_list_into_the_page_and_on_to_done(window, q
         d.close()
     finally:
         qapp.setLayoutDirection(Qt.LeftToRight)
+
+
+def test_pages_start_level_with_the_search_box_and_done_has_even_room(window, qapp):  # noqa: F811
+    """The first card on every page lines up with the top of the search box, and Done
+    has the same gap above it as below and beside it."""
+    d = SettingsDialog(window, "privacy")
+    d.resize(1020, 680)
+    d.show()
+    qapp.processEvents()
+
+    def top(w):
+        return w.mapTo(d, QPoint(0, 0)).y()
+    for row in range(d.categories.count()):
+        d.categories.setCurrentRow(row)
+        qapp.processEvents()
+        page = d.tabs.currentWidget().widget()
+        first = min((c for c in page.children() if isinstance(c, QWidget) and c.isVisible()),
+                    key=lambda c: c.y())
+        assert top(first) == top(d.search_box), d.categories.item(row).text()
+    done = next(b for b in d.findChildren(QPushButton) if b.objectName() == "primary"
+                and b.parent() is d)
+    above = top(done) - (top(d.tabs) + d.tabs.height())
+    below = d.height() - (top(done) + done.height())
+    right = d.width() - (done.mapTo(d, QPoint(0, 0)).x() + done.width())
+    assert above == below == right, (above, below, right)
+    d.close()
