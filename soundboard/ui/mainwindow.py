@@ -22,7 +22,7 @@ from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIco
 from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
                                QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
-                               QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
+                               QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
                                QSystemTrayIcon, QTabBar, QToolTip, QVBoxLayout, QWidgetItem,
                                QWidget, QWidgetAction)
@@ -309,7 +309,8 @@ class Bridge(QObject):
     exported = Signal(str, int, str)           # file, sounds written, error
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
-    update_progress = Signal(int)              # percent of the new version downloaded
+    update_progress = Signal(object, object)   # bytes of the new version downloaded, of
+                                               # how many (0: not known)
     update_ready = Signal(object, str)         # its installer's Path|None, error
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
@@ -362,6 +363,7 @@ DISCORD_URGENT = {
 
 class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
+    update_state = Signal()             # the update card changed (Settings > Updates follows)
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
     cable_removed = Signal(str)         # remove_cable finished: error ("" = done)
     remote_changed = Signal()           # a remote control server started or stopped
@@ -448,6 +450,12 @@ class MainWindow(QMainWindow):
         self.release: updates.Release | None = None   # a newer version, once found
         self._update_file: Path | None = None   # its downloaded, checked installer
         self._downloading = False
+        self._update_got = (0, 0)     # bytes downloaded, of how many (0: not known)
+        self._update_cancel = False   # Cancel was clicked: the download stops at its next chunk
+        self._update_err = ""         # why the last try failed ("" = it didn't)
+        self._update_detail = ""      # what went wrong, for Copy error
+        self._update_fails = 0        # failed tries in a row: from 2, Copy error
+        self._update_box: QMessageBox | None = None   # "Downloading…" open over it
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
         # set up for the app you're using (appsetup): the bar's app and what it shows.
@@ -748,13 +756,11 @@ class MainWindow(QMainWindow):
         self.pill.setCursor(Qt.CursorShape.PointingHandCursor)
         self.pill.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         self.pill.clicked.connect(lambda: self.tabs.setCurrentWidget(self.setup_page))
-        self.btn_update = QPushButton()
-        self.btn_update.setObjectName("pill")
-        self.btn_update.setProperty("state", "ok")
-        self.btn_update.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_update.clicked.connect(self.show_update)
-        icons.set_icon(self.btn_update, "next", size=sidebar.ICON, gap=False)
-        self.btn_update.hide()
+        # a new version: a card over the On Air card (an icon, shut) that follows it
+        # from found to downloading to ready (_show_update_state)
+        self.btn_update = sidebar.UpdateCard()
+        self.btn_update.clicked.connect(self._update_clicked)
+        self.btn_update.copy.clicked.connect(self._copy_update_error)
         # the two switches for everything at once, whatever tab you're on
         self.btn_air = QPushButton()
         self.btn_air.setObjectName("onair")
@@ -822,7 +828,24 @@ class MainWindow(QMainWindow):
         self.urgent_lbl = QLabel()
         self.urgent_lbl.setTextFormat(Qt.TextFormat.PlainText)   # the reason is release-note text
         self.urgent_lbl.setWordWrap(True)   # never makes the window wider
-        uh.addWidget(self.urgent_lbl, 1)
+        # Onion Board's fix downloading: the update card's bar and words, not new ones
+        self.urgent_prog = QProgressBar()
+        self.urgent_prog.setObjectName("updatebar")
+        self.urgent_prog.setRange(0, 100)
+        self.urgent_prog.setTextVisible(False)
+        self.urgent_prog.setFixedHeight(sidebar.UpdateCard.BAR_H)
+        self.urgent_prog.hide()
+        self.urgent_sub = QLabel()
+        self.urgent_sub.setObjectName("hint")
+        self.urgent_sub.setTextFormat(Qt.TextFormat.PlainText)
+        self.urgent_sub.setWordWrap(True)
+        self.urgent_sub.hide()
+        uv = QVBoxLayout()
+        uv.setSpacing(4)
+        uv.addWidget(self.urgent_lbl)
+        uv.addWidget(self.urgent_prog)
+        uv.addWidget(self.urgent_sub)
+        uh.addLayout(uv, 1)
         self.urgent_btn = QPushButton()
         self.urgent_btn.setObjectName("primary")
         self.urgent_btn.clicked.connect(self._urgent_clicked)
@@ -999,7 +1022,7 @@ class MainWindow(QMainWindow):
             # them and only show when needed (at the rail's foot, as icons)
             [self.btn_air, self.stop_btn],
             order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
-            alerts=[self.pill, self.btn_update])
+            alerts=[self.pill], update=self.btn_update)
         # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
         # (_net_follow), each one click to its Settings page
         if self.rail.output is not None:
@@ -7778,10 +7801,10 @@ class MainWindow(QMainWindow):
         self._save_later()   # update_checked
         busy = self._downloading or self._update_file is not None
         if rel is not None and not busy:
+            if self.release is None or self.release.version != rel.version:
+                self._update_err, self._update_fails = "", 0   # a new version: a fresh start
             self.release = rel
-            self._set_update_pill(_("Update: {version}", version=rel.version),
-                                  _("Onion Board {version} is out, click for details",
-                                    version=rel.version))
+            self._show_update_state()
             if self.tray is not None and not self.isVisible():
                 self.tray.showMessage(
                     "Onion Board", _("Important fix: {fix}", fix=rel.urgent) if rel.urgent
@@ -7806,9 +7829,13 @@ class MainWindow(QMainWindow):
         """The urgent fix to show on the banner: (key, text, button), Onion Board's
         before Onion Watch's; None when there's none, or it was hidden."""
         rel = self.release
-        if (rel is not None and rel.urgent and not self._downloading
+        if (rel is not None and rel.urgent
                 and f"board {rel.version}" not in self._urgent_hidden):
-            button = (_("Restart to update") if self._update_file is not None
+            # the same steps as the update card (its progress shows under the words)
+            button = (_("Cancel") if self._downloading
+                      else _("Restart to update") if self._update_file is not None
+                      and not self._update_err
+                      else _("Try again") if self._update_err
                       else _("Update now") if updates.can_install() and rel.asset_url
                       else _("Details"))
             return (f"board {rel.version}",
@@ -7940,10 +7967,19 @@ class MainWindow(QMainWindow):
         if now is None:
             self.urgent_bar.hide()
             return
-        _key, text, button = now
+        key, text, button = now
         self.urgent_lbl.setText(text)
         self.urgent_btn.setText(button)
         self.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
+        # Onion Board's own fix: the update card's progress and words, under the reason
+        board = key.startswith("board") and (self._downloading or bool(self._update_err))
+        self.urgent_prog.setVisible(board and self._downloading)
+        self.urgent_prog.setValue(self._update_pct())
+        self.urgent_sub.setVisible(board)
+        if board:
+            state = self._update_words()   # failed: the reason (Try again is beside it)
+            self.urgent_sub.setText(state[3] if state[0] == "failed"
+                                    else " · ".join(filter(None, (state[1], state[2]))))
         self.urgent_bar.show()
         if self._setup_state == "offer":
             self._hide_setup()   # one bar at a time: the warning beats "Set up for it?"
@@ -7963,7 +7999,9 @@ class MainWindow(QMainWindow):
             self._show_urgent()   # fixed meanwhile, or still to do
             return
         if now[0].startswith("board"):
-            if self._update_file is not None:
+            if self._downloading:
+                self.cancel_update()
+            elif self._update_file is not None and not self._update_err:
                 self.install_update()
             elif updates.can_install() and self.release is not None and self.release.asset_url:
                 self.download_update()
@@ -7977,11 +8015,6 @@ class MainWindow(QMainWindow):
             self.triggers.get()
         self.watch_offer = None
         self._show_urgent()
-
-    def _set_update_pill(self, text: str, tip: str, enabled: bool = True):
-        sidebar.put(self.btn_update, text, tip=tip)
-        self.btn_update.setEnabled(enabled)
-        self.btn_update.show()
 
     def show_update(self):
         """The update pill was clicked: what's new, and what can be done about it."""
@@ -8027,7 +8060,133 @@ class MainWindow(QMainWindow):
         elif skip is not None and clicked is skip:
             self.set_option("update_skip", rel.version)
             self.release = None
+            self._show_update_state()
+
+    # ---- Onion Board's own update: one state, shown on the card, the urgent bar and
+    # in Settings > Updates in the same words
+    def _update_pct(self) -> int:
+        done, total = self._update_got
+        return min(done * 100 // total, 100) if total else 0
+
+    def _update_words(self) -> tuple[str, str, str, str]:
+        """(state, title, hint, tip) for the update as it is now; state "" when
+        there's none."""
+        rel = self.release
+        if rel is None:
+            return "", "", "", ""
+        if self._downloading:
+            done, total = self._update_got
+            mb = 1024 * 1024
+            hint = (_("{done} of {total} MB", done=done // mb, total=max(1, round(total / mb)))
+                    if total else _("{done} MB", done=done // mb))
+            return ("downloading", _("Downloading {pct}%", pct=self._update_pct()), hint,
+                    _("Downloading Onion Board {version}: click to see how far it is, "
+                      "or to cancel.", version=rel.version))
+        if self._update_err:
+            return ("failed", _("Couldn't update"), _("Click to try again"),
+                    _("Updating to Onion Board {version} didn't work: {rstrip}.",
+                      version=rel.version, rstrip=self._update_err.rstrip(".")))
+        if self._update_file is not None:
+            return ("ready", _("Restart to update"), "",
+                    _("Onion Board {version} is downloaded, click to install it",
+                      version=rel.version))
+        return ("available", _("Update to {version}", version=rel.version), "",
+                _("Onion Board {version} is out, click for details", version=rel.version))
+
+    def update_status(self) -> str:
+        """The update's state in one line (Settings > Updates): the card's words."""
+        state, title, hint, tip = self._update_words()
+        if state == "failed":
+            return tip   # (with the reason)
+        return " · ".join(filter(None, (title, hint)))
+
+    def _show_update_state(self):
+        """The card (and the urgent bar, Settings, a Downloading box) say where the
+        update is."""
+        state, title, hint, tip = self._update_words()
+        if not state:
             self.btn_update.hide()
+        else:
+            self.btn_update.set_state(state, title, hint, tip,
+                                      pct=self._update_pct() if state == "downloading" else None,
+                                      copy=state == "failed" and self._update_fails >= 2)
+            self.btn_update.show()
+        box = self._update_box
+        if box is not None and qt_valid(box):
+            box.setText(self._update_box_text())
+        self._show_urgent()
+        self.update_state.emit()
+
+    def _update_clicked(self):
+        """The update card: the next step from where it is."""
+        if self._downloading:
+            self._update_info()
+        elif self._update_err:
+            self.download_update()   # "Couldn't update, try again"
+        else:
+            self.show_update()
+
+    def _update_box_text(self) -> str:
+        rel = self.release
+        done, total = self._update_got
+        mb = 1024 * 1024
+        if total:
+            return _("Downloading Onion Board {version}: {done} of {total} MB ({pct}%).",
+                     version=rel.version if rel else "", done=done // mb,
+                     total=max(1, round(total / mb)), pct=self._update_pct())
+        return _("Downloading Onion Board {version}: {done} MB so far.",
+                 version=rel.version if rel else "", done=done // mb)
+
+    def _update_info(self):
+        """Clicked while it downloads: how far it is, and a way to stop it."""
+        if self._update_box is not None or self.release is None:
+            return   # (never a second one)
+        box = QMessageBox(QMessageBox.Icon.Information, _("Downloading the update"),
+                          self._update_box_text(), QMessageBox.StandardButton.NoButton, self)
+        box.setInformativeText(_("You can keep using Onion Board meanwhile. When it's done, "
+                                 "the button says Restart to update."))
+        stop = box.addButton(_("Cancel download"), QMessageBox.ButtonRole.DestructiveRole)
+        box.addButton(_("Keep going"), QMessageBox.ButtonRole.RejectRole)
+        self._update_box = box
+        box.exec()
+        clicked = box.clickedButton()
+        self._update_box = None
+        free_dialog(box)
+        if clicked is stop and self._downloading:
+            self.cancel_update()
+
+    def cancel_update(self):
+        """Stop the download (updates.download checks between chunks)."""
+        if self._downloading:
+            self._update_cancel = True
+
+    def _copy_update_error(self):
+        """Copy error: what went wrong, where, for the user to send to the developer."""
+        QApplication.clipboard().setText(self._update_detail or self._update_err)
+        self.toast(_("Error details copied: paste them into a message to the developer."),
+                   "ok")
+
+    def _update_report(self, rel, err: str, trace: str = "", step: str = "download") -> str:
+        """Copy error's text: everything needed to find the cause, nothing private
+        beyond what the error itself says."""
+        import platform
+        from datetime import UTC, datetime
+
+        from soundboard import __version__
+        done, total = self._update_got
+        lines = [
+            f"Onion Board update failed ({step}), try {self._update_fails + 1}",
+            f"From {__version__} to {rel.version}",
+            f"Windows: {platform.platform()}  frozen: {bool(getattr(sys, 'frozen', False))}",
+            f"Time (UTC): {datetime.now(UTC):%Y-%m-%d %H:%M:%S}",
+            f"URL: {rel.asset_url}",
+            f"File: {updates.installer_path(rel)}",
+            f"Got: {done} of {total or rel.size or '?'} bytes",
+            f"Error: {err}",
+        ]
+        if trace:
+            lines += ["", trace.strip()]
+        return "\n".join(lines)
 
     def download_update(self):
         """Fetch the new version's installer on a thread (updates.download)."""
@@ -8038,46 +8197,62 @@ class MainWindow(QMainWindow):
             self.toast(html.escape(net.off_message(updates.FEATURE)), "warn")
             return
         self._downloading = True
+        self._update_cancel = False
+        self._update_err = ""
+        self._update_got = (0, rel.size or 0)
         netlog.cause(updates.FEATURE, f"You clicked to download Onion Board {rel.version}")
         usage.maybe_send(self.cfg, event=usage.update_event(rel.version))
-        self._set_update_pill(_("Downloading update…"),
-                              _("Downloading Onion Board {version}", version=rel.version),
-                              enabled=False)
-        self._show_urgent()   # the pill shows how it's going
+        self._show_update_state()
         last = [-1]
 
         def progress(done, total):
-            pct = min(done * 100 // total, 100) if total else 0
+            pct = min(done * 100 // total, 100) if total else done // (1024 * 1024)
             if pct != last[0]:
                 last[0] = pct
-                self.bridge.update_progress.emit(pct)
+                self.bridge.update_progress.emit(done, total)
 
         def run():
+            import traceback
             try:
-                path = updates.download(rel, progress, lambda: self._shut_down)
+                path = updates.download(rel, progress,
+                                        lambda: self._shut_down or self._update_cancel)
                 self.bridge.update_ready.emit(path, "")
             except updates.UpdateError as e:
+                self._update_detail_next = traceback.format_exc(limit=8)
                 self.bridge.update_ready.emit(None, errors.plain(e))
-            except Exception as e:  # noqa: BLE001 - never leave the pill stuck
+            except Exception as e:  # noqa: BLE001 - never leave the card stuck
                 log.exception("update download failed")
+                self._update_detail_next = traceback.format_exc(limit=8)
                 self.bridge.update_ready.emit(None, errors.plain(e))
+        self._update_detail_next = ""
         threading.Thread(target=run, daemon=True, name="update-download").start()
 
-    def _on_update_progress(self, pct: int):
-        if self._downloading:
-            sidebar.put(self.btn_update, _("Downloading update… {pct}%", pct=pct),
-                        tip=self.btn_update.property("railtip") or "")
+    def _on_update_progress(self, done, total):
+        if self._downloading and qt_valid(self):
+            self._update_got = (int(done), int(total or 0))
+            self._show_update_state()
 
     def _on_update_ready(self, path, err: str):
+        if not qt_valid(self) or self._shut_down:
+            return
         self._downloading = False
+        box, self._update_box = self._update_box, None
+        if box is not None and qt_valid(box):
+            box.reject()   # the Downloading box: done, one way or the other
         rel = self.release
         if rel is None:
             return
-        self._show_urgent()   # back, as "Update now" or "Restart to update"
+        if path is None and self._update_cancel:   # Cancel: back to "Update to …"
+            self._update_cancel = False
+            self._update_got = (0, 0)
+            self._show_update_state()
+            return
         if path is None:
-            self._set_update_pill(_("Update: {version}", version=rel.version),
-                                  _("Onion Board {version} is out, click for details",
-                                    version=rel.version))
+            self._update_detail = self._update_report(rel, err,
+                                                      getattr(self, "_update_detail_next", ""))
+            self._update_fails += 1
+            self._update_err = errors.plain(err) or _("the download failed")
+            self._show_update_state()
             url = rel.url
             self.tell(_("Couldn't update"),
                       _("Onion Board {version} couldn't be downloaded: {rstrip}.",
@@ -8086,10 +8261,8 @@ class MainWindow(QMainWindow):
                               lambda: QDesktopServices.openUrl(QUrl(url))))
             return
         self._update_file = path
-        self._show_urgent()
-        self._set_update_pill(_("Restart to update"),
-                              _("Onion Board {version} is downloaded, click to install it",
-                                version=rel.version))
+        self._update_err, self._update_fails = "", 0
+        self._show_update_state()
         if self.tray is not None and not self.isVisible():
             # hidden in the tray, maybe mid-game: don't pop a question, just say so
             self.tray.showMessage("Onion Board", _("Version {version} is ready to install: "
@@ -8097,6 +8270,8 @@ class MainWindow(QMainWindow):
                                                    "update.", version=rel.version),
                                   QSystemTrayIcon.MessageIcon.Information, 8000)
             return
+        if QApplication.activeModalWidget() is not None:
+            return   # something else is open: the card says Restart to update
         self.install_update()
 
     def install_update(self):
@@ -8131,6 +8306,12 @@ class MainWindow(QMainWindow):
             log.warning("couldn't start the update installer: %s", e)
             self.cfg.update_pending = ""
             self._save_later()
+            import traceback
+            self._update_detail = self._update_report(rel, errors.plain(e),
+                                                      traceback.format_exc(limit=8), "install")
+            self._update_fails += 1
+            self._update_err = errors.plain(e)
+            self._show_update_state()   # "Couldn't update", click to try again
             self.tell(_("Couldn't update"),
                       _("The installer couldn't be started ({e}). You can download it "
                         "from the release page instead.", e=errors.plain(e)), "error",
