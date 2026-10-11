@@ -3118,5 +3118,16 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Toimme <b>{n}</b> äänen sovelluksesta {name}. Säilytetäänkö se?",
     "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
-  ]
+  ],
+  "Compatibility fixes for games, calls and browsers.": "Yhteensopivuuskorjauksia peleihin, puheluihin ja selaimiin.",
+  "Install update": "Asenna päivitys",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikki päivitetty: pelit, puhelut ja selaimet kuulevat äänesi.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Seuraavaksi: Windows kysyy lupaa OnionBoard.exelle.",
+  "Nothing to update now: your mic settings changed.": "Ei päivitettävää nyt: mikin asetukset muuttuivat.",
+  "The Windows prompt names Python because you're running from source.": "Windowsin kehote mainitsee Pythonin, koska ajat lähdekoodista.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Päivitys peruttu. Mikki toimii edelleen: päivitä milloin vain Käyttöönotossa.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows kysyy lupaa. Ääni katkeaa hetkeksi päivityksen aikana.",
+  "You can update later in Setup.": "Voit päivittää myöhemmin Käyttöönotossa.",
+  "Your mic is already up to date.": "Mikkisi on jo ajan tasalla.",
+  "Your mic, upgraded": "Mikkisi, paranneltuna"
 }

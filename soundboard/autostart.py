@@ -56,6 +56,8 @@ def current() -> str | None:
 def _disabled_in_task_manager() -> bool:
     """The first byte of Task Manager's record is even when the entry may run and odd
     when the user switched it off there."""
+    if winreg is None:
+        return False
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, APPROVED_KEY) as k:
             v, _t = winreg.QueryValueEx(k, VALUE)

@@ -353,7 +353,8 @@ class JobObject:
     def assign(self, proc: subprocess.Popen):
         if self.handle is None:
             return
-        if not self._k32.AssignProcessToJobObject(self.handle, int(proc._handle)):
+        handle = proc._handle   # pyright: ignore[reportAttributeAccessIssue]  # CPython's, on Windows
+        if not self._k32.AssignProcessToJobObject(self.handle, int(handle)):
             raise OSError(ctypes.get_last_error(), "AssignProcessToJobObject failed")
 
     def close(self):
@@ -675,6 +676,7 @@ class Tor:
         return proc, port_file
 
     def _read_log(self, proc: subprocess.Popen):
+        assert proc.stdout is not None   # stdout=PIPE
         for raw in proc.stdout:
             line = raw.decode("utf-8", "replace").rstrip()
             self._log.append(line)

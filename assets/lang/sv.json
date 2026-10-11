@@ -3118,5 +3118,16 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla det?",
     "Vi hämtade <b>{n}</b> ljud från {name}. Vill du behålla dem?"
-  ]
+  ],
+  "Compatibility fixes for games, calls and browsers.": "Kompatibilitetsfixar för spel, samtal och webbläsare.",
+  "Install update": "Installera uppdatering",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikrofonen uppdaterad: spel, samtal och webbläsare hör dina ljud.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Nästa: Windows ber om tillåtelse för OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Inget att uppdatera nu: dina mikrofoninställningar har ändrats.",
+  "The Windows prompt names Python because you're running from source.": "Windows-rutan nämner Python eftersom du kör från källkoden.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Uppdateringen avbröts. Mikrofonen fungerar fortfarande: uppdatera när du vill under Konfiguration.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows ber om tillåtelse. Ljudet pausar kort under uppdateringen.",
+  "You can update later in Setup.": "Du kan uppdatera senare under Konfiguration.",
+  "Your mic is already up to date.": "Din mikrofon är redan uppdaterad.",
+  "Your mic, upgraded": "Din mikrofon, uppgraderad"
 }

@@ -29,6 +29,7 @@ import time
 import uuid
 import zipfile
 import zlib
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field, fields
 from pathlib import Path, PurePosixPath
 
@@ -268,11 +269,14 @@ class _Source:
 
     def size(self, name: str) -> int:
         it = self._names[name]
-        return it.file_size if self.zip is not None else it.stat().st_size
+        return it.file_size if isinstance(it, zipfile.ZipInfo) else it.stat().st_size
 
     def open(self, name: str):
         it = self._names[name]
-        return self.zip.open(it) if self.zip is not None else it.open("rb")
+        if isinstance(it, Path):
+            return it.open("rb")
+        assert self.zip is not None
+        return self.zip.open(it)
 
     def json(self, name: str) -> dict:
         if self.size(name) > MAX_JSON:
@@ -449,7 +453,7 @@ class Imported:
 
 
 def install(pkg: Package, known_fingerprints: set[str], color_for=None,
-            on_board: set[tuple[str, str]] = frozenset()) -> Imported:
+            on_board: AbstractSet[tuple[str, str]] = frozenset()) -> Imported:
     """Copy the package's sounds into the library, as new sounds with ids of their own.
     Sounds whose fingerprint is already in the library are skipped (importing the same
     backup twice adds nothing); copies inside the package are all kept, since "Save as
@@ -744,7 +748,7 @@ def apply_settings(cfg: Config, raw: dict) -> list[str]:
         if not ok:
             continue
         if isinstance(want, float):
-            v = float(v)
+            v = float(v)   # pyright: ignore[reportArgumentType]  # _accept: a number
         if v is not None:
             v = clean_setting(k, v)   # into its control's range (None: unusable)
             if v is None:
@@ -753,7 +757,7 @@ def apply_settings(cfg: Config, raw: dict) -> list[str]:
             v = _clean_speech(clean_speech_settings(v))
         elif k == "voice_fx":
             v = voicefx.clean_spec(v)
-        elif k == "radio":
+        elif k == "radio" and isinstance(v, dict):   # always, after _accept
             v = _clean_radio(v)
         if getattr(cfg, k) != v:
             setattr(cfg, k, v)

@@ -3118,5 +3118,16 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Wir haben <b>{n}</b> Sound aus {name} übernommen. Behalten?",
     "Wir haben <b>{n}</b> Sounds aus {name} übernommen. Behalten?"
-  ]
+  ],
+  "Compatibility fixes for games, calls and browsers.": "Kompatibilitätsfixes für Spiele, Anrufe und Browser.",
+  "Install update": "Update installieren",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mikro aktualisiert: Spiele, Anrufe und Browser hören deine Sounds.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Gleich fragt Windows nach der Erlaubnis für OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Gerade nichts zu aktualisieren: deine Mikro-Einstellungen haben sich geändert.",
+  "The Windows prompt names Python because you're running from source.": "Die Windows-Abfrage nennt Python, weil du aus dem Quellcode startest.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Update abgebrochen. Dein Mikro funktioniert weiter: aktualisiere jederzeit unter Setup.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows fragt nach der Erlaubnis. Der Ton setzt während des Updates kurz aus.",
+  "You can update later in Setup.": "Du kannst später unter Setup aktualisieren.",
+  "Your mic is already up to date.": "Dein Mikro ist schon aktuell.",
+  "Your mic, upgraded": "Dein Mikro, verbessert"
 }

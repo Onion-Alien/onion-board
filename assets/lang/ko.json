@@ -3045,5 +3045,16 @@
   ],
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
-  ]
+  ],
+  "Compatibility fixes for games, calls and browsers.": "게임, 통화, 브라우저 호환성 수정.",
+  "Install update": "업데이트 설치",
+  "Mic updated: games, calls and browsers hear your sounds.": "마이크 업데이트 완료: 게임, 통화, 브라우저에서 사운드가 들립니다.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "다음: Windows가 OnionBoard.exe에 대한 권한을 묻습니다.",
+  "Nothing to update now: your mic settings changed.": "지금은 업데이트할 것이 없습니다: 마이크 설정이 바뀌었습니다.",
+  "The Windows prompt names Python because you're running from source.": "소스에서 실행 중이라 Windows 창에 Python이 표시됩니다.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "업데이트를 취소했습니다. 마이크는 계속 작동합니다: 언제든 셋업에서 업데이트하세요.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows가 권한을 묻습니다. 업데이트 중 소리가 잠깐 끊깁니다.",
+  "You can update later in Setup.": "나중에 셋업에서 업데이트할 수 있습니다.",
+  "Your mic is already up to date.": "마이크가 이미 최신입니다.",
+  "Your mic, upgraded": "마이크 업그레이드"
 }
