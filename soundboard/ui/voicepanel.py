@@ -593,7 +593,7 @@ class VoiceFxPanel(QWidget):
             pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
                                                     else None)
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
-            b.setToolTip(_("Your own settings: Make it yours… opens them") if name == CUSTOM
+            b.setToolTip(_("Your own settings: Make it yours opens them") if name == CUSTOM
                          else _("Sound like: {voice}. Click to turn the voice changer on "
                                 "with it.", voice=title))
         for c in range(self.COLS):
@@ -1357,7 +1357,7 @@ class VoiceFxPanel(QWidget):
             b.setChecked(on and name == self._preset)
         self.tiles.setExclusive(True)
         n = self._count_on()
-        self.btn_tweak.setText(ngettext("Make it yours…  ·  {n} on", "Make it yours…  ·  {n} on",
+        self.btn_tweak.setText(ngettext("Make it yours  ·  {n} on", "Make it yours  ·  {n} on",
                                         n) if n else _("Make it yours"))
         mine = self._preset in self.store.voices
         _enable(self.btn_share, mine, _("Turn on one of your saved voices to share it "
@@ -1418,7 +1418,7 @@ class SpeechPanel(QWidget):
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
     lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
-    custom_wanted = Signal()        # Add voices…: VoicePanel unfolds the Custom voices card
+    custom_wanted = Signal()        # Add voices: VoicePanel unfolds the Custom voices card
     clip_ready = Signal(object, str)   # Save as sound: the line's audio, its name
     _line_saved = Signal(object, str, str)   # its worker: audio (or None), name, error
 
@@ -1597,7 +1597,7 @@ class SpeechPanel(QWidget):
         grid.addWidget(self.sl_rate, 1, 1)
         for w in (self.cb_voice, self.sl_rate):   # a list and a slider, not bars across
             w.setMinimumWidth(160)                # the whole card at full screen (and
-            w.setMaximumWidth(380)                # Add voices… fits a narrow window)
+            w.setMaximumWidth(380)                # Add voices fits a narrow window)
         _SameWidth(self.cb_voice, self.cb_lang)
         grid.setColumnStretch(1, 1)
         grid.setColumnStretch(3, 2)

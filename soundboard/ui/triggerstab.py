@@ -15,7 +15,7 @@ side of it:
 An add-on that fails to load shows Hoot again with why, and a button to get it
 afresh: a broken add-on never stops the app.
 
-*Remove Onion Watch…* (last in the add-on's More menu, or beside *Get Onion Watch
+*Remove Onion Watch* (last in the add-on's More menu, or beside *Get Onion Watch
 again* when it's broken) uninstalls it after asking, and Hoot is back; the triggers are kept.
 """
 from __future__ import annotations

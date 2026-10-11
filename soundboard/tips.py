@@ -26,7 +26,7 @@ class Tip:
 
 
 TIPS: tuple[Tip, ...] = (
-    Tip("effects", _("Right-click any pad → Effects… for bass boost, nightcore, slowed + "
+    Tip("effects", _("Right-click any pad → Effects for bass boost, nightcore, slowed + "
         "reverb, trim and more. The original file is never changed."), "tab:sounds"),
     Tip("record", _("Record a sound with your mic: the Record button next to Add sounds."),
         "record"),
@@ -39,7 +39,7 @@ TIPS: tuple[Tip, ...] = (
     Tip("overlay", _("The in-game overlay shows your pads over the game, played with the "
         "number keys. Set it up in Settings → Overlay."), "settings:overlay"),
     Tip("hold", _("Hold to play: a sound plays only while you hold its key down, like an "
-        "air horn. Right-click a pad → Edit… to switch it on."), "tab:sounds"),
+        "air horn. Right-click a pad → Edit to switch it on."), "tab:sounds"),
     Tip("categories", _("Make categories with the + above your pads, then right-click "
         "one to give it a random-sound hotkey."), "tab:sounds"),
     Tip("scoped", _("Hotkeys per category: one key plays a different sound in each "
