@@ -3079,5 +3079,15 @@
   "On Air": "Ke udara",
   "Not configured": "Belum disediakan",
   "Not configured: click to fix": "Belum disediakan: klik untuk betulkan",
-  "Can't send to {device}, click to fix": "Tidak boleh hantar ke {device}, klik untuk betulkan"
+  "Can't send to {device}, click to fix": "Tidak boleh hantar ke {device}, klik untuk betulkan",
+  "A second mic to pick in Discord or the game.": "Mikrofon kedua untuk dipilih dalam Discord atau permainan.",
+  "Discord and games won't hear your sounds": "Discord dan permainan tidak akan dengar bunyi anda",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Percuma. Membuka Persediaan dan memasangnya, kemudian anda pilih sebagai mikrofon dalam Discord atau permainan.",
+  "Install a virtual cable": "Pasang kabel maya",
+  "Keep it": "Kekalkan",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Untuk OBS, Voicemeeter atau pengadun? Kekalkan.",
+  "Straight into the mic you already use. Nothing to install.": "Terus ke mikrofon yang anda sudah guna. Tiada apa untuk dipasang.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Bunyi kini pergi ke <b>{device}</b>, pembesar suara atau set kepala biasa, jadi hanya anda yang dengar. Pilih cara yang sampai ke sembang suara:",
+  "Use my mic": "Guna mikrofon saya",
+  "Use the virtual cable": "Guna kabel maya"
 }

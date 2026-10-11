@@ -3225,5 +3225,15 @@
   "On Air": "В эфире",
   "Not configured": "Не настроено",
   "Not configured: click to fix": "Не настроено: нажми, чтобы исправить",
-  "Can't send to {device}, click to fix": "Не получается отправить на {device}, нажми, чтобы исправить"
+  "Can't send to {device}, click to fix": "Не получается отправить на {device}, нажми, чтобы исправить",
+  "A second mic to pick in Discord or the game.": "Второй микрофон, который выбирается в Discord или игре.",
+  "Discord and games won't hear your sounds": "Discord и игры не услышат ваши звуки",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Бесплатно. Открывает Подключение и устанавливает его, потом выберите его как микрофон в Discord или игре.",
+  "Install a virtual cable": "Установить виртуальный кабель",
+  "Keep it": "Оставить",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Это для OBS, Voicemeeter или микшера? Оставьте.",
+  "Straight into the mic you already use. Nothing to install.": "Прямо в микрофон, которым вы уже пользуетесь. Ничего не нужно устанавливать.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Сейчас они идут на <b>{device}</b>, обычные колонки или гарнитуру, поэтому их слышите только вы. Выберите способ, который дойдёт до голосового чата:",
+  "Use my mic": "Мой микрофон",
+  "Use the virtual cable": "Виртуальный кабель"
 }

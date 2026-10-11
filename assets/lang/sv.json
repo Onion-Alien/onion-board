@@ -3152,5 +3152,15 @@
   "On Air": "I sändning",
   "Not configured": "Inte inställt",
   "Not configured: click to fix": "Inte inställt: klicka för att fixa",
-  "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa"
+  "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa",
+  "A second mic to pick in Discord or the game.": "En andra mikrofon som du väljer i Discord eller spelet.",
+  "Discord and games won't hear your sounds": "Discord och spel hör inte dina ljud",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Gratis. Öppnar Konfiguration och installerar den, sedan väljer du den som mikrofon i Discord eller spelet.",
+  "Install a virtual cable": "Installera en virtuell kabel",
+  "Keep it": "Behåll det",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Är det för OBS, Voicemeeter eller en mixer? Behåll det.",
+  "Straight into the mic you already use. Nothing to install.": "Direkt in i mikrofonen du redan använder. Inget att installera.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "De går nu till <b>{device}</b>, vanliga högtalare eller ett headset, så bara du hör dem. Välj ett sätt som når röstchatten:",
+  "Use my mic": "Använd min mikrofon",
+  "Use the virtual cable": "Använd den virtuella kabeln"
 }

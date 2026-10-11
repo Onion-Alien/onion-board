@@ -3079,5 +3079,15 @@
   "On Air": "ออกอากาศ",
   "Not configured": "ยังไม่ได้ตั้งค่า",
   "Not configured: click to fix": "ยังไม่ได้ตั้งค่า: คลิกเพื่อแก้",
-  "Can't send to {device}, click to fix": "ส่งไปที่ {device} ไม่ได้ คลิกเพื่อแก้"
+  "Can't send to {device}, click to fix": "ส่งไปที่ {device} ไม่ได้ คลิกเพื่อแก้",
+  "A second mic to pick in Discord or the game.": "ไมค์ตัวที่สองที่คุณเลือกใน Discord หรือในเกม",
+  "Discord and games won't hear your sounds": "Discord และเกมจะไม่ได้ยินเสียงของคุณ",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "ฟรี เปิด เซ็ตอัป แล้วติดตั้งให้ จากนั้นเลือกเป็นไมค์ใน Discord หรือในเกม",
+  "Install a virtual cable": "ติดตั้งสายเสมือน",
+  "Keep it": "เก็บไว้",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "ตั้งใจใช้กับ OBS, Voicemeeter หรือมิกเซอร์ใช่ไหม? เก็บไว้แบบนี้",
+  "Straight into the mic you already use. Nothing to install.": "ส่งเข้าไมค์ที่คุณใช้อยู่แล้วโดยตรง ไม่ต้องติดตั้งอะไร",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "ตอนนี้เสียงไปที่ <b>{device}</b> ซึ่งเป็นลำโพงหรือหูฟังธรรมดา จึงมีแค่คุณที่ได้ยิน เลือกวิธีที่ไปถึงแชทเสียง:",
+  "Use my mic": "ใช้ไมค์ของฉัน",
+  "Use the virtual cable": "ใช้สายเสมือน"
 }

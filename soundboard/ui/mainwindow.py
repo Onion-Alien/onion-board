@@ -47,6 +47,7 @@ from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui import importreport
+from soundboard.ui import routewarn
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
@@ -4456,6 +4457,8 @@ class MainWindow(QMainWindow):
         else:
             dlg = self._settings_dlg = SettingsDialog(self, page or "privacy", lazy=True)
             dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+            # (what "Send my sounds to" was: a new pick is checked on the way out)
+            self._route_at_open = (self.cfg.route, self.cfg.main_device)
             self._content.addWidget(dlg)
         self._content.setCurrentWidget(dlg)
         self._opening_settings = True   # (_refit: not closed again for being too small)
@@ -4524,6 +4527,41 @@ class MainWindow(QMainWindow):
         # freed once its finished signal is over (deleting it inside that crashed)
         QTimer.singleShot(0, lambda: free_dialog(dlg))
         self.register_hotkeys()   # in case a capture was cancelled
+        self._check_route_pick()
+
+    def _check_route_pick(self):
+        """Leaving Settings with "Send my sounds to" newly on a device that isn't a
+        virtual cable (speakers, a headset): asks whether that's meant, since Discord
+        and games don't hear it. Only for a new pick, so OBS and mixer users who chose
+        it on purpose aren't asked every time."""
+        c = self.cfg
+        before = getattr(self, "_route_at_open", None)
+        self._route_at_open = None
+        if before == (c.route, c.main_device) or not c.main_device \
+                or not routewarn.needs_warning(c.route, c.main_device, c.mon_device):
+            return
+        # (the picker already lists the outputs: no device call here)
+        names = [self.cb_route.itemData(i) or "" for i in range(self.cb_route.count())]
+        cables = [n[len(ROUTE_DEVICE):] for n in names
+                  if n.startswith(ROUTE_DEVICE) and is_virtual_cable(n[len(ROUTE_DEVICE):])]
+        box = self._route_warning = routewarn.RouteWarning(c.main_device, bool(cables), self)
+
+        def done(code, dev=c.main_device):
+            self._route_warning = None
+            QTimer.singleShot(0, lambda: free_dialog(box))   # (not inside finished)
+            # (still that device: not changed elsewhere while it was up)
+            if self.cfg.main_device != dev or self.cfg.route != "device":
+                return
+            if code == routewarn.MIC:
+                self.set_route("mic", by_hand=True)
+            elif code == routewarn.CABLE:
+                # on the cable, then Setup: it shows the cable working, or installing it
+                self.set_route("cable", cables[0] if cables else None, by_hand=True)
+                self.tabs.setCurrentWidget(self.setup_page)
+                if not cables:
+                    self.install_cable()
+        box.finished.connect(done)
+        box.open()
 
     def apply_theme(self, name: str):
         self.cfg.theme = theme.apply(QApplication.instance(), name)
