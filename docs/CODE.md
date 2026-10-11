@@ -294,6 +294,14 @@ the newest backup is used, so the pad list is never silently reset.
 
 ## Audio notes
 
+- Local imports link to their original absolute path by default. Settings > Data &
+  quality > Local sounds can enable `Config.copy_local_sounds` for new imports.
+  Downloads and extracted ZIP files always keep a library file. Both modes decode
+  at import and use the same int16 cache (including memory mapping, prefetch and
+  effect caches), so live speed, pitch and bass have the same playback path. After
+  cache eviction the source must be available again; external files are never moved
+  or deleted when removing their pads. Backups include the linked audio itself,
+  converting linked videos to audio rather than exporting the whole video.
 - Sounds are held as int16 stereo at 48 kHz (half the size of float32; the
   engine scales them in the same multiply as the gain): short ones in RAM, long ones
   memory-mapped from the cache (`mapped.py`). Only the first 15 minutes of a

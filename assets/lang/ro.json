@@ -3168,6 +3168,9 @@
     "{n} de sunete sunt deja în biblioteca ta"
   ],
   "Open Triggers": "Deschide Declanșatoare",
+  "Copy into library": "Copiază în bibliotecă",
+  "Local sounds": "Sunete locale",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Dezactivat: legătură către fișierul original. Activează pentru a păstra sunetele dacă originalul este mutat, șters sau se află pe o unitate deconectată. Folosește spațiu suplimentar. Se aplică doar importurilor locale noi.",
   "Audio recovery": "Recuperare audio",
   "Clean reinstall": "Reinstalare curată",
   "Fix problems sending sounds into your mic after an update.": "Rezolvă problemele de trimitere a sunetelor în microfon după o actualizare.",

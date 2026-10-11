@@ -3381,6 +3381,9 @@
     "{n} صوت موجودة بالفعل في مكتبتك"
   ],
   "Open Triggers": "افتح المحفّزات",
+  "Copy into library": "نسخ إلى المكتبة",
+  "Local sounds": "أصوات محلية",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "عند الإيقاف: ربط بالملف الأصلي. فعّل للاحتفاظ بالأصوات إذا نُقل الأصل أو حُذف أو كان على قرص غير متصل. يستخدم مساحة إضافية. ينطبق فقط على الملفات المحلية المضافة حديثًا.",
   "Audio recovery": "استعادة الصوت",
   "Clean reinstall": "إعادة تثبيت نظيفة",
   "Fix problems sending sounds into your mic after an update.": "أصلح مشاكل إرسال الأصوات إلى الميكروفون بعد التحديث.",

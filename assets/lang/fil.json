@@ -3097,6 +3097,9 @@
     "{n} sound ang nasa library mo na"
   ],
   "Open Triggers": "Buksan ang Triggers",
+  "Copy into library": "Kopyahin sa library",
+  "Local sounds": "Mga lokal na tunog",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Naka-off: i-link sa orihinal na file. I-on para manatili ang mga tunog kung inilipat o binura ang orihinal, o nasa drive na hindi nakakonekta. Gumagamit ng dagdag na espasyo. Para lang sa mga bagong lokal na import.",
   "Audio recovery": "Pag-ayos ng audio",
   "Clean reinstall": "Malinis na reinstall",
   "Fix problems sending sounds into your mic after an update.": "Ayusin ang mga problema sa pagpapadala ng tunog sa mic mo pagkatapos ng update.",

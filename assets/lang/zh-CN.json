@@ -3026,6 +3026,9 @@
     "{n} 个声音已在你的音效库里"
   ],
   "Open Triggers": "打开触发器",
+  "Copy into library": "复制到音效库",
+  "Local sounds": "本地音效",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "关闭：链接到原始文件。开启后，即使原文件被移动、删除或所在驱动器断开连接，也能保留音效。会占用额外磁盘空间。仅适用于新导入的本地文件。",
   "Audio recovery": "音频恢复",
   "Clean reinstall": "全新安装",
   "Fix problems sending sounds into your mic after an update.": "修复更新后无法将声音发送到麦克风的问题。",

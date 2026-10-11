@@ -3097,6 +3097,9 @@
     "{n} ljud finns redan i ditt bibliotek"
   ],
   "Open Triggers": "Öppna Triggers",
+  "Copy into library": "Kopiera till biblioteket",
+  "Local sounds": "Lokala ljud",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Av: länka till originalfilen. Slå på för att behålla ljuden om originalet flyttas, raderas eller finns på en frånkopplad enhet. Använder extra diskutrymme. Gäller bara nya lokala importer.",
   "Audio recovery": "Ljudåterställning",
   "Clean reinstall": "Ren ominstallation",
   "Fix problems sending sounds into your mic after an update.": "Åtgärda problem med att skicka ljud till din mikrofon efter en uppdatering.",

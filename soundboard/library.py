@@ -326,6 +326,7 @@ class SoundMeta:
 
 @dataclass
 class Config:
+    copy_local_sounds: bool = False   # new local imports link to their source by default
     version: int = CONFIG_VERSION
     route: str = "cable"      # where what others hear goes: ROUTES ("mic": see mic_first)
     # straight into my mic became the main way in 1.9.1: settings on the cable were
@@ -1525,8 +1526,10 @@ def write_stored(dest: Path, data: np.ndarray) -> None:
 
 
 def import_file(src: str, color: str, name: str = "",
-                folder: str = MY_SOUNDS) -> tuple[SoundMeta, np.ndarray]:
-    """Decode, bring into the library folder, and return metadata + int16 audio.
+                folder: str = MY_SOUNDS, *, copy: bool = True) -> tuple[SoundMeta, np.ndarray]:
+    """Decode, optionally bring into the library, and return metadata + int16 audio.
+    `copy=False` links a persistent local source without changing its format. Both
+    modes populate the same decoded cache; temporary sources must keep `copy=True`.
     The copy is SOUNDS_DIR/`folder`/`name`.ext (`name`: the sound's name, else the
     file's own; a download passes its title, its temp file is named by video id).
 
@@ -1543,6 +1546,13 @@ def import_file(src: str, color: str, name: str = "",
     srcp = Path(src)
     convert = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
     name = name.strip() or srcp.stem.replace("_", " ").strip()
+    if not copy:
+        # The same decoded cache feeds playback and effects in either storage mode.
+        # Only persistent local files may use this path; temporary imports must copy.
+        meta = SoundMeta(id=sid, added=time.time(), name=name[:40].strip() or "Sound",
+                         file=str(srcp.absolute()), color=color, level_gain=level_gain(data),
+                         duration=len(data) / SR, fingerprint=fingerprint(src))
+        return meta, store_cached(sid, data)
     # Never fall back to using `src` in place: a download's temp folder is deleted
     # right after this. A failed copy leaves nothing behind and says what to do.
     dest = None

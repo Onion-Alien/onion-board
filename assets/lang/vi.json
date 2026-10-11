@@ -3026,6 +3026,9 @@
     "{n} âm thanh đã có trong thư viện của bạn"
   ],
   "Open Triggers": "Mở Kích hoạt",
+  "Copy into library": "Sao chép vào thư viện",
+  "Local sounds": "Âm thanh trên máy",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Tắt: liên kết đến tệp gốc. Bật để giữ âm thanh nếu tệp gốc bị di chuyển, xóa hoặc nằm trên ổ đĩa đã ngắt kết nối. Dùng thêm dung lượng đĩa. Chỉ áp dụng cho lần nhập tệp trên máy mới.",
   "Audio recovery": "Khôi phục âm thanh",
   "Clean reinstall": "Cài lại hoàn toàn",
   "Fix problems sending sounds into your mic after an update.": "Khắc phục lỗi gửi âm thanh vào mic sau khi cập nhật.",

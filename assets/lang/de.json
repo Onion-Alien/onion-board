@@ -3097,6 +3097,9 @@
     "{n} Sounds sind schon in deiner Bibliothek"
   ],
   "Open Triggers": "Trigger öffnen",
+  "Copy into library": "In Bibliothek kopieren",
+  "Local sounds": "Lokale Sounds",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Aus: Originaldatei verknüpfen. Einschalten, um Sounds zu behalten, wenn das Original verschoben, gelöscht oder auf einem getrennten Laufwerk ist. Braucht zusätzlichen Speicherplatz. Gilt nur für neue lokale Importe.",
   "Audio recovery": "Audio-Wiederherstellung",
   "Clean reinstall": "Sauber neu installieren",
   "Fix problems sending sounds into your mic after an update.": "Behebe Probleme beim Senden von Sounds an dein Mikrofon nach einem Update.",

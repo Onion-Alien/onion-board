@@ -3097,6 +3097,9 @@
     "{n} sons já estão na sua biblioteca"
   ],
   "Open Triggers": "Abrir Gatilhos",
+  "Copy into library": "Copiar para a biblioteca",
+  "Local sounds": "Sons locais",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Desativado: vincula ao arquivo original. Ative para manter os sons se o original for movido, excluído ou estiver em uma unidade desconectada. Usa espaço extra em disco. Aplica-se apenas a novas importações locais.",
   "Audio recovery": "Recuperação de áudio",
   "Clean reinstall": "Reinstalação limpa",
   "Fix problems sending sounds into your mic after an update.": "Resolva problemas ao enviar sons para seu microfone após uma atualização.",

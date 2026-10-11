@@ -3168,6 +3168,9 @@
     "{n} звуків уже у вашій бібліотеці"
   ],
   "Open Triggers": "Відкрити тригери",
+  "Copy into library": "Копіювати до бібліотеки",
+  "Local sounds": "Локальні звуки",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Вимкнено: посилання на вихідний файл. Увімкніть, щоб зберегти звуки, якщо оригінал переміщено, видалено або він на від’єднаному диску. Використовує додаткове місце. Лише для нових локальних імпортів.",
   "Audio recovery": "Відновлення звуку",
   "Clean reinstall": "Чисте перевстановлення",
   "Fix problems sending sounds into your mic after an update.": "Виправ проблеми з передаванням звуків у мікрофон після оновлення.",

@@ -3026,6 +3026,9 @@
     "{n} 個聲音已經在你的音效庫裡"
   ],
   "Open Triggers": "開啟觸發器",
+  "Copy into library": "複製到音效庫",
+  "Local sounds": "本機音效",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "關閉：連結到原始檔案。開啟後，即使原檔案被移動、刪除或所在磁碟機中斷連線，也能保留音效。會佔用額外磁碟空間。僅適用於新匯入的本機檔案。",
   "Audio recovery": "音訊復原",
   "Clean reinstall": "全新安裝",
   "Fix problems sending sounds into your mic after an update.": "修復更新後無法將聲音傳送到麥克風的問題。",
