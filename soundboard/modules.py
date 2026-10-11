@@ -288,11 +288,13 @@ def _load_all(package: str, pkg_dir: Path):
     The running copy then never reads its folder again, so an update installed
     while the app runs (it's used after a restart) can't hand the old code a new
     file, or none: a missing one crashed *Recently deleted*. A file that fails is
-    logged and left to fail where it's used, as it would have."""
+    logged and left to fail where it's used, as it would have. A `__main__.py` is
+    skipped: it's the add-on's own `python -m` start, and importing it runs the
+    add-on as an app of its own (a second QApplication)."""
     for path in sorted(pkg_dir.rglob("*.py")):
         rel = path.relative_to(pkg_dir).with_suffix("")
         parts = [p for p in rel.parts if p != "__init__"]
-        if any(not p.isidentifier() for p in parts):
+        if any(not p.isidentifier() for p in parts) or "__main__" in parts:
             continue
         name = ".".join([package, *parts])
         if name in sys.modules:

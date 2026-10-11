@@ -203,6 +203,18 @@ def test_all_its_files_load_up_front_so_an_update_on_disk_cant_break_the_running
     assert entry.later() == "old"                            # a lazy import still works
 
 
+def test_its_python_m_start_file_is_never_run_by_the_up_front_load(tmp_path, pkgname):
+    """An add-on's __main__.py starts it as its own app (its own QApplication):
+    importing it with the rest would run that inside the board."""
+    folder = make_module(tmp_path / "onion-watch", package=pkgname)
+    (folder / pkgname / "__main__.py").write_text(
+        "raise SystemExit('started as its own app')\n", encoding="utf-8")
+    (m,) = modules.discover([tmp_path])
+    modules.load_package(m)
+    assert f"{pkgname}.board" in sys.modules
+    assert f"{pkgname}.__main__" not in sys.modules
+
+
 # What each released Onion Watch lists in its module.json "imports" from outside the
 # standard library and PySide6. The built app has no pip: dropping one of these from
 # build.ps1 breaks the Triggers tab for everyone still on that release (0.5.6 needs
