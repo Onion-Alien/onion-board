@@ -3274,5 +3274,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Dacă sunetele se taie, oprește suprimarea zgomotului din aplicația de voce (Discord: <b>Profil de intrare → Personalizat</b>, <b>Suprimarea zgomotului → Niciuna</b>, <b>Anularea ecoului</b> oprită. Nu Studio: sare peste Onion Board).",
   "Sounds chopped up?": "Sunetele se taie?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Traduce ce spui în această limbă. Oprit: fiecare voce vorbește engleză, iar limba rămâne aleasă.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Vorbește în engleză și ceilalți aud altă limbă. Pornește comutatorul de mai jos: o spune vocea AI sau modificatorul de voce când unul dintre ele e pornit; altfel apasă Start și o spune o voce de computer."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Vorbește în engleză și ceilalți aud altă limbă. Pornește comutatorul de mai jos: o spune vocea AI sau modificatorul de voce când unul dintre ele e pornit; altfel apasă Start și o spune o voce de computer.",
+  "Click to change it.": "Dă clic ca să-l schimbi.",
+  "Everything goes through your proxy ({address}).": "Totul trece prin proxy-ul tău ({address}).",
+  "Phone remote on": "Telecomanda de pe telefon pornită",
+  "Phones on your home network can control the board ({address}).": "Telefoanele din rețeaua ta de acasă pot controla board-ul ({address}).",
+  "Proxy not working": "Proxy-ul nu merge",
+  "Remote control on": "Control de la distanță pornit",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Butoanele Stream Deck și scripturile de pe acest PC pot controla board-ul (portul {port}).",
+  "Through Tor": "Prin Tor",
+  "Through proxy": "Prin proxy",
+  "Tor": "Tor",
+  "Tor failed": "Tor a eșuat",
+  "Tor {percent}%": "Tor {percent}%"
 }

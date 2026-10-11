@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Si los sonidos se cortan, desactiva la supresión de ruido de la app de voz (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> desactivado. No Studio: se salta Onion Board).",
   "Sounds chopped up?": "¿Los sonidos se cortan?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Traduce lo que dices a este idioma. Apagado: todas las voces hablan inglés y el idioma queda elegido.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Habla en inglés y los demás oyen otro idioma. Activa el interruptor de abajo: lo dice la voz de IA o el cambiador de voz cuando uno está encendido; si no, presiona Iniciar y lo dice una voz de computadora."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Habla en inglés y los demás oyen otro idioma. Activa el interruptor de abajo: lo dice la voz de IA o el cambiador de voz cuando uno está encendido; si no, presiona Iniciar y lo dice una voz de computadora.",
+  "Click to change it.": "Haz clic para cambiarlo.",
+  "Everything goes through your proxy ({address}).": "Todo pasa por tu proxy ({address}).",
+  "Phone remote on": "Control desde el celular activado",
+  "Phones on your home network can control the board ({address}).": "Los celulares en tu red de casa pueden controlar el board ({address}).",
+  "Proxy not working": "El proxy no funciona",
+  "Remote control on": "Control remoto activado",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Los botones del Stream Deck y los scripts en esta PC pueden controlar el board (puerto {port}).",
+  "Through Tor": "Por Tor",
+  "Through proxy": "Por proxy",
+  "Tor": "Tor",
+  "Tor failed": "Tor falló",
+  "Tor {percent}%": "Tor {percent} %"
 }

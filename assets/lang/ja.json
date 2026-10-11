@@ -3128,5 +3128,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "サウンドが途切れる場合は、ボイスアプリのノイズ抑制をオフにしてください（Discord: <b>入力プロファイル → カスタム</b>、<b>ノイズ抑制 → なし</b>、<b>エコー除去</b>オフ。スタジオは不可: Onion Board を通りません）。",
   "Sounds chopped up?": "サウンドが途切れる？",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "話した内容をこの言語に翻訳します。オフ：どの声も英語で話し、言語は選んだままになります。",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "英語で話すと、ほかの人には別の言語で聞こえます。下のスイッチをオンにしてください：AI ボイスかボイスチェンジャーがオンならそれが話します。どちらもオフなら「スタート」を押すとコンピューターの声が話します。"
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "英語で話すと、ほかの人には別の言語で聞こえます。下のスイッチをオンにしてください：AI ボイスかボイスチェンジャーがオンならそれが話します。どちらもオフなら「スタート」を押すとコンピューターの声が話します。",
+  "Click to change it.": "クリックで変更します。",
+  "Everything goes through your proxy ({address}).": "すべてプロキシ経由です（{address}）。",
+  "Phone remote on": "スマホリモコン オン",
+  "Phones on your home network can control the board ({address}).": "家のネットワークのスマホからボードを操作できます（{address}）。",
+  "Proxy not working": "プロキシが使えません",
+  "Remote control on": "リモート操作 オン",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "このPCのStream Deckボタンやスクリプトからボードを操作できます（ポート {port}）。",
+  "Through Tor": "Tor経由",
+  "Through proxy": "プロキシ経由",
+  "Tor": "Tor",
+  "Tor failed": "Tor 失敗",
+  "Tor {percent}%": "Tor {percent}%"
 }

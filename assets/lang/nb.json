@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Hvis lydene blir hakkete, slå av støydempingen i taleappen (Discord: <b>Inndataprofil → Egendefinert</b>, <b>Støydemping → Ingen</b>, <b>Ekkokansellering</b> av. Ikke Studio: den hopper over Onion Board).",
   "Sounds chopped up?": "Hakkete lyder?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Oversetter det du sier til dette språket. Av: alle stemmer snakker engelsk, og språket forblir valgt.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Snakk engelsk, så hører andre et annet språk. Slå på bryteren nedenfor: AI-stemmen eller stemmeendreren sier det når en av dem er på; ellers trykker du Start, så sier en datastemme det."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Snakk engelsk, så hører andre et annet språk. Slå på bryteren nedenfor: AI-stemmen eller stemmeendreren sier det når en av dem er på; ellers trykker du Start, så sier en datastemme det.",
+  "Click to change it.": "Klikk for å endre det.",
+  "Everything goes through your proxy ({address}).": "Alt går gjennom proxyen din ({address}).",
+  "Phone remote on": "Telefonfjernkontroll på",
+  "Phones on your home network can control the board ({address}).": "Telefoner på hjemmenettverket ditt kan styre boardet ({address}).",
+  "Proxy not working": "Proxyen virker ikke",
+  "Remote control on": "Fjernstyring på",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "Stream Deck-knapper og skript på denne PC-en kan styre boardet (port {port}).",
+  "Through Tor": "Gjennom Tor",
+  "Through proxy": "Gjennom proxy",
+  "Tor": "Tor",
+  "Tor failed": "Tor mislyktes",
+  "Tor {percent}%": "Tor {percent} %"
 }

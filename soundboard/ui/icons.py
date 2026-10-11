@@ -57,6 +57,15 @@ def _tor(p, fill):
     fill(dot)
 
 
+def _phone(p, fill):
+    """A phone remote listening: a phone, its speaker slot and button."""
+    p.drawRoundedRect(QRectF(7, 3, 10, 18), 2.2, 2.2)
+    p.drawLine(QPointF(10.5, 6), QPointF(13.5, 6))
+    dot = QPainterPath()
+    dot.addEllipse(QPointF(12, 17.6), 1.1, 1.1)
+    fill(dot)
+
+
 def _wave(p, fill):
     for x, h in ((4, 4), (8, 10), (12, 16), (16, 10), (20, 4)):
         p.drawLine(QPointF(x, 12 - h / 2), QPointF(x, 12 + h / 2))
@@ -732,7 +741,7 @@ SHAPES = {
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
-    "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor,
+    "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
     "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave, "music": _music, "puzzle": _puzzle,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,

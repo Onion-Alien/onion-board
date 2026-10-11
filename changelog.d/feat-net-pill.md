@@ -1,1 +1,1 @@
-- The On Air card in the side bar now says when the app goes online through a proxy or Tor (and how far Tor got), or not at all in Offline mode. One click opens Privacy & security.
+- The On Air card in the side bar now says when the app goes online through a proxy or Tor (and how far Tor got), or not at all in Offline mode, and when a phone remote or the remote control is listening. One click opens its Settings page.

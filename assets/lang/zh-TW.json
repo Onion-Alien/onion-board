@@ -3128,5 +3128,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "如果音效斷斷續續，就關掉語音程式的噪音抑制（Discord：<b>輸入設定檔 → 自訂</b>、<b>噪音抑制 → 無</b>、關掉<b>回音消除</b>。不要選錄音室：它會跳過 Onion Board）。",
   "Sounds chopped up?": "音效斷斷續續？",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "把你說的話翻譯成這種語言。關閉：所有聲音都說英語，語言仍保持選取。",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英語說，別人聽到的是另一種語言。打開下面的開關：AI 聲音或變聲器開著時由它來說；否則按「開始」，由電腦聲音來說。"
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "用英語說，別人聽到的是另一種語言。打開下面的開關：AI 聲音或變聲器開著時由它來說；否則按「開始」，由電腦聲音來說。",
+  "Click to change it.": "點一下即可變更。",
+  "Everything goes through your proxy ({address}).": "所有連線都經過你的 Proxy（{address}）。",
+  "Phone remote on": "手機遙控已開啟",
+  "Phones on your home network can control the board ({address}).": "你家中網路上的手機可以控制面板（{address}）。",
+  "Proxy not working": "Proxy 無法使用",
+  "Remote control on": "遠端控制已開啟",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "這台電腦上的 Stream Deck 按鍵和腳本可以控制面板（連接埠 {port}）。",
+  "Through Tor": "透過 Tor",
+  "Through proxy": "透過 Proxy",
+  "Tor": "Tor",
+  "Tor failed": "Tor 失敗",
+  "Tor {percent}%": "Tor {percent}%"
 }

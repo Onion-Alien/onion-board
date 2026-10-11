@@ -3201,5 +3201,17 @@
   "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).": "Ha a hangok szaggatnak, kapcsold ki a beszélgetőapp zajszűrését (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> ki. Ne Studio: az kihagyja az Onion Boardot).",
   "Sounds chopped up?": "Szaggatnak a hangok?",
   "Translate what you say into this language. Off: every voice speaks English, and the language stays picked.": "Lefordítja, amit mondasz, erre a nyelvre. Ki: minden hang angolul beszél, és a nyelv kiválasztva marad.",
-  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszélj angolul, és mások más nyelvet hallanak. Kapcsold be a lenti kapcsolót: az AI hang vagy a hangváltó mondja ki, ha valamelyik be van kapcsolva; különben nyomd meg a Start gombot, és egy gépi hang mondja ki."
+  "Talk in English and others hear another language. Turn on the switch below: the AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Beszélj angolul, és mások más nyelvet hallanak. Kapcsold be a lenti kapcsolót: az AI hang vagy a hangváltó mondja ki, ha valamelyik be van kapcsolva; különben nyomd meg a Start gombot, és egy gépi hang mondja ki.",
+  "Click to change it.": "Kattints a módosításhoz.",
+  "Everything goes through your proxy ({address}).": "Minden a proxyn keresztül megy ({address}).",
+  "Phone remote on": "Telefonos távirányító be",
+  "Phones on your home network can control the board ({address}).": "Az otthoni hálózatod telefonjai irányíthatják a boardot ({address}).",
+  "Proxy not working": "A proxy nem működik",
+  "Remote control on": "Távvezérlés be",
+  "Stream Deck buttons and scripts on this PC can control the board (port {port}).": "A Stream Deck gombjai és a gép szkriptjei irányíthatják a boardot ({port}. port).",
+  "Through Tor": "Toron át",
+  "Through proxy": "Proxyn át",
+  "Tor": "Tor",
+  "Tor failed": "A Tor nem sikerült",
+  "Tor {percent}%": "Tor {percent}%"
 }

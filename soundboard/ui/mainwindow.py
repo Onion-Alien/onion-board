@@ -364,6 +364,7 @@ class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
     cable_removed = Signal(str)         # remove_cable finished: error ("" = done)
+    remote_changed = Signal()           # a remote control server started or stopped
     cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
     video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
     config_saved = Signal(bool)         # the background save finished: ok
@@ -999,9 +1000,12 @@ class MainWindow(QMainWindow):
             [self.btn_air, self.stop_btn],
             order=[TAB_INDEX[k] for k in self.cfg.sidebar_order if k in TAB_INDEX],
             alerts=[self.pill, self.btn_update])
-        # Proxy, Tor or Offline mode: a line in the On Air card (_net_follow)
+        # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
+        # (_net_follow), each one click to its Settings page
         if self.rail.output is not None:
-            self.rail.output.networkClicked.connect(lambda: self.open_settings("privacy"))
+            self.rail.output.lineClicked.connect(self.open_settings)
+        self.remote_changed.connect(self._net_follow, Qt.ConnectionType.QueuedConnection)
+        remote.on_change(self._remote_watch)
         self._net_follow()
         # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
         # through them (the tab widget does that only while it has the focus)
@@ -4140,39 +4144,67 @@ class MainWindow(QMainWindow):
         if playing:
             self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
 
-    def network_line(self) -> tuple[str, str, str, str] | None:
-        """What the On Air card says about the connection (OutputBlock.set_network):
-        Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
+    def card_lines(self) -> list[sidebar.Line]:
+        """What the On Air card says under its status (OutputBlock.set_lines): how the
+        app goes online, and a remote control listening."""
+        return [line for line in (self._network_line(), self._remote_line()) if line]
+
+    def _network_line(self) -> sidebar.Line | None:
+        """Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
         if net.offline():
-            return ("offline", _("Offline"), "",
-                    _("Offline mode is on: nothing goes online, and what needs the "
-                      "internet is hidden. Click to change it."))
+            return sidebar.Line("offline", _("Offline"), "",
+                                _("Offline mode is on: nothing goes online, and what needs "
+                                  "the internet is hidden. Click to change it."), "privacy")
         mode = net.mode()
         click = _("Click to change it.")
         if mode == net.TOR:
             t = tor.manager()
+            tip = "\n".join((t.status_text(), click))
             if t.state == tor.READY:
-                return ("tor", _("Through Tor"), "ok", "\n".join((t.status_text(), click)))
+                return sidebar.Line("tor", _("Through Tor"), "ok", tip, "privacy")
             if t.state == tor.STARTING:
-                return ("tor", _("Tor {percent}%", percent=t.progress), "",
-                        "\n".join((t.status_text(), click)))
+                return sidebar.Line("tor", _("Tor {percent}%", percent=t.progress), "", tip,
+                                    "privacy")
             if t.state == tor.FAILED:
-                return ("tor", _("Tor failed"), "warn", "\n".join((t.status_text(), click)))
-            return ("tor", _("Tor"), "", "\n".join((t.status_text(), click)))
+                return sidebar.Line("tor", _("Tor failed"), "warn", tip, "privacy")
+            return sidebar.Line("tor", _("Tor"), "", tip, "privacy")
         if mode == net.PROXY:
             p = net.proxy()
             if p is None:
-                return ("shield", _("Proxy not working"), "warn",
-                        "\n".join((net.describe(), click)))
-            return ("shield", _("Through proxy"), "ok",
-                    "\n".join((_("Everything goes through your proxy ({address}).",
-                                  address=p.where), click)))
+                return sidebar.Line("shield", _("Proxy not working"), "warn",
+                                    "\n".join((net.describe(), click)), "privacy")
+            return sidebar.Line("shield", _("Through proxy"), "ok",
+                                "\n".join((_("Everything goes through your proxy "
+                                             "({address}).", address=p.where), click)),
+                                "privacy")
         return None
+
+    def _remote_line(self) -> sidebar.Line | None:
+        """A phone remote (a remote add-on such as Onion Pocket) listening on the home
+        network, or else the control API listening on this PC; None when neither."""
+        servers = remote.listening()
+        click = _("Click to change it.")
+        phone = [s for s in servers if s.lan]
+        if phone:
+            return sidebar.Line("phone", _("Phone remote on"), "ok",
+                                "\n".join((_("Phones on your home network can control the "
+                                             "board ({address}).",
+                                             address=f"{phone[0].host}:{phone[0].port}"),
+                                            click)), "remote")
+        if servers:
+            return sidebar.Line("phone", _("Remote control on"), "",
+                                "\n".join((_("Stream Deck buttons and scripts on this PC "
+                                             "can control the board (port {port}).",
+                                             port=servers[0].port), click)), "remote")
+        return None
+
+    def _remote_watch(self):
+        self.remote_changed.emit()   # (maybe from the thread that stopped it)
 
     def _net_follow(self):
         output = getattr(getattr(self, "rail", None), "output", None)
         if output is not None:
-            output.set_network(self.network_line())
+            output.set_lines(self.card_lines())
             self.rail.refresh_output()   # (the card's widest line can change its scale)
 
     def _on_tor(self):
