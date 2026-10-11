@@ -610,7 +610,8 @@ def test_web_results_hide_the_empty_category_bar(qapp, window,  # noqa: F811
     which left a gap between the toolbar and the results' buttons. It now goes with
     the results and comes back when they close."""
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": [])
-    assert window.ytresults.layout().contentsMargins().top() == 0
+    m = window.ytresults.layout().contentsMargins()
+    assert m.top() == m.left()   # Back as far in from the card's top as its side
     window.search.setText("cat")
     window.search.returnPressed.emit()
     assert process_events(qapp, lambda: not window.ytresults.isHidden(), 5)
