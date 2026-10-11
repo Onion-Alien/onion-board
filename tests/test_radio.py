@@ -1364,3 +1364,10 @@ def test_a_click_on_a_station_plays_it_and_the_bar_shows_what_plays(qapp, tab, s
     assert tab.btn_live.text() == "Sending" and tab.engine.radio_live
     tab.toggle_play()                                # Space / the Stop button
     assert tab.player.station is None and tab.now.name == ""
+
+
+def test_tab_keeps_a_station_error_up_longer_than_a_notice(tab):
+    import time
+    tab._on_error("404")
+    assert "isn't working" in tab.info.text()
+    assert tab._flash_until - time.monotonic() > 20   # not the 4 s of a plain notice
