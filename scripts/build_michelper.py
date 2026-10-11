@@ -21,6 +21,23 @@ WORK = ROOT / "build" / "michelper-work"
 # everything else the app ships: the helper imports none of it
 EXCLUDE = ("numpy", "PySide6", "shiboken6", "scipy", "sounddevice", "soundfile", "soxr",
            "yt_dlp", "curl_cffi", "tkinter")
+# SHA-256 of the windowed bootloader (runw.exe) in PyInstaller's PyPI wheels. That file
+# is in thousands of programs, some of them malware, so virus scanners flagged a helper
+# built with it: scripts/build_bootloader.ps1 compiles one here instead.
+STOCK_RUNW = {
+    "6.22.3": "2291f269c3a3804fde1079462239e09a8b32fffbeeaa8f628a531faf5be77d41",
+}
+
+
+def stock_bootloader() -> str:
+    """PyInstaller's version when its bootloader is the stock one from PyPI, else ''."""
+    import hashlib
+
+    import PyInstaller
+    runw = (Path(PyInstaller.__file__).parent / "bootloader" / "Windows-64bit-intel"
+            / "runw.exe")
+    digest = hashlib.sha256(runw.read_bytes()).hexdigest()
+    return PyInstaller.__version__ if digest == STOCK_RUNW.get(PyInstaller.__version__) else ""
 
 
 def version_file() -> Path:
@@ -43,6 +60,10 @@ def version_file() -> Path:
 def build(clean: bool = False) -> int:
     if not DLL.is_file():
         print(f"no {DLL}: run scripts/build_directmic.py first", file=sys.stderr)
+        return 1
+    if stock := stock_bootloader():
+        print(f"PyInstaller {stock} has its stock bootloader, which virus scanners flag:"
+              " run scripts/build_bootloader.ps1 first", file=sys.stderr)
         return 1
     sys.path.insert(0, str(ROOT))
     from soundboard import michelper

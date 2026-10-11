@@ -204,9 +204,14 @@ installer's *Private connection (Tor)* box runs `OnionBoard.exe --get-tor`). To 
 Tor mode from source without pressing *Get Tor*, `scripts\fetch_tor.py` unpacks the
 same files into the gitignored `vendor\tor`.
 
-Build steps, in order: `scripts\version_info.py` (the .exe's version resource),
+Build steps, in order: `scripts\build_bootloader.ps1` (only when `.venv` has
+PyInstaller's stock bootloader: rebuilds PyInstaller with one compiled here by
+MinGW-w64's gcc, as virus scanners flag the stock one, which is in thousands of
+programs, some of them malware; that build is then `-Clean`),
+`scripts\version_info.py` (the .exe's version resource),
 `scripts\build_directmic.py` (the mic effect; the build stops
-if g++ is missing), PyInstaller (bundles `installer\install-vbcable.ps1` and
+if g++ is missing), `scripts\build_michelper.py` (the mic helper `obmichelper.exe`;
+it refuses PyInstaller's stock bootloader), PyInstaller (bundles `installer\install-vbcable.ps1` and
 `assets\onionboard.ico` as data, both at the root of `_internal\`, and `obmic.dll` in
 `_internal\directmic\`),
 `scripts\vc_runtime.py` (overwrites any older copy of the C++ runtime, `msvcp140.dll`
