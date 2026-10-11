@@ -11,6 +11,7 @@ measurable idle cost.
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
+from PySide6 import QtWidgets
 from PySide6.QtGui import QHoverEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
                                QApplication, QComboBox, QMenu, QProxyStyle,
@@ -49,6 +50,8 @@ class AppStyle(QProxyStyle):
         super().polish(arg)
         if isinstance(arg, QComboBox):
             snug_combo(arg, self.COMBO_CAP)
+        elif isinstance(arg, QtWidgets.QCheckBox) and arg.focusPolicy() == Qt.StrongFocus:
+            arg.setFocusPolicy(Qt.TabFocus)   # a click leaves no focus ring on it
         elif isinstance(arg, QMenu):
             arg.installEventFilter(_submenu_edge())   # once: Qt doesn't add it twice
         elif isinstance(arg, QWidget) and arg.windowType() == Qt.WindowType.Popup:
