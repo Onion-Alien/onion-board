@@ -554,7 +554,7 @@ QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#danger[quiet="true"] { background:transparent; }
 QPushButton#danger[quiet="true"]:hover { background:$danger_bg; }
 QPushButton#danger:focus { border-color:$accent; }
-QPushButton#small { padding:2px 8px; font-size:8pt; }
+QPushButton#small, QPushButton#danger[small="true"] { padding:2px 8px; font-size:8pt; }
 QPushButton#backhome { background:$btn; border:1px solid $border; color:$text_hi;
     font-weight:600; font-size:10pt; padding:6px 12px; border-radius:8px; }
 QPushButton#backhome:hover { background:$btn_hover; border-color:$border_hi; }
@@ -885,6 +885,7 @@ QFrame#setcard QPushButton:hover { background:$btn_hover; }
 QFrame#setcard QPushButton[quiet="true"] { background:transparent; }
 QFrame#setcard QPushButton[quiet="true"]:hover { background:$btn_hover; }
 QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
+QFrame#setcard QPushButton#primary[recoveryUpdate="true"] { border:1px solid $warn_text; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }

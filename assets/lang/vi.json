@@ -3028,5 +3028,22 @@
   "Open Triggers": "Mở Kích hoạt",
   "Copy into library": "Sao chép vào thư viện",
   "Local sounds": "Âm thanh trên máy",
-  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Tắt: liên kết đến tệp gốc. Bật để giữ âm thanh nếu tệp gốc bị di chuyển, xóa hoặc nằm trên ổ đĩa đã ngắt kết nối. Dùng thêm dung lượng đĩa. Chỉ áp dụng cho lần nhập tệp trên máy mới."
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Tắt: liên kết đến tệp gốc. Bật để giữ âm thanh nếu tệp gốc bị di chuyển, xóa hoặc nằm trên ổ đĩa đã ngắt kết nối. Dùng thêm dung lượng đĩa. Chỉ áp dụng cho lần nhập tệp trên máy mới.",
+  "Audio recovery": "Khôi phục âm thanh",
+  "Clean reinstall": "Cài lại hoàn toàn",
+  "Fix problems sending sounds into your mic after an update.": "Khắc phục lỗi gửi âm thanh vào mic sau khi cập nhật.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Đã cài lại hiệu ứng mic. Hãy thử trong cuộc trò chuyện thoại.",
+  "Mic effect removed": "Đã gỡ hiệu ứng mic",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Cài lại hiệu ứng mic của Onion Board trên micro đã chọn.",
+  "Remove mic effect": "Gỡ hiệu ứng mic",
+  "Repair failed": "Sửa không thành công",
+  "Repair mic effect": "Sửa hiệu ứng mic",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Khôi phục micro và gỡ hiệu ứng mic của Onion Board. Âm thanh sẽ không còn được gửi trực tiếp vào mic.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Khôi phục micro, gỡ hiệu ứng mic cũ, rồi cài bản mới trên micro đã chọn.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Không thể xác minh hiệu ứng mic. Khởi động lại PC, rồi thử Sửa hiệu ứng mic lần nữa.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows sẽ yêu cầu quyền. Âm thanh sẽ tạm dừng trong chốc lát, kể cả cuộc gọi và trò chơi.",
+  "Your sounds and settings are kept.": "Âm thanh và cài đặt của bạn vẫn được giữ lại.",
+  "{error}": "{error}",
+  "Update mic effect": "Cập nhật hiệu ứng mic",
+  "Update to new version": "Cập nhật lên bản mới"
 }

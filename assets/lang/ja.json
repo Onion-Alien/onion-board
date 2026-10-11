@@ -3028,5 +3028,22 @@
   "Open Triggers": "トリガーを開く",
   "Copy into library": "ライブラリにコピー",
   "Local sounds": "ローカルの音声",
-  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "オフ：元のファイルにリンクします。元のファイルを移動・削除したり、保存先のドライブを取り外したりしても音声を残すにはオンにします。追加のディスク容量を使います。新しく追加するローカルファイルにのみ適用されます。"
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "オフ：元のファイルにリンクします。元のファイルを移動・削除したり、保存先のドライブを取り外したりしても音声を残すにはオンにします。追加のディスク容量を使います。新しく追加するローカルファイルにのみ適用されます。",
+  "Audio recovery": "オーディオの復旧",
+  "Clean reinstall": "クリーン再インストール",
+  "Fix problems sending sounds into your mic after an update.": "アップデート後にサウンドがマイクに送れない問題を修復します。",
+  "Mic effect reinstalled. Test it in your voice chat.": "マイクエフェクトを再インストールしました。ボイスチャットで試してください。",
+  "Mic effect removed": "マイクエフェクトを削除しました",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "選択したマイクにOnion Boardのマイクエフェクトを再インストールします。",
+  "Remove mic effect": "マイクエフェクトを削除",
+  "Repair failed": "修復に失敗",
+  "Repair mic effect": "マイクエフェクトを修復",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "マイクの設定を元に戻し、Onion Boardのマイクエフェクトを削除します。サウンドはマイクに直接送られなくなります。",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "マイクの設定を元に戻し、古いマイクエフェクトを削除してから、選択したマイクに新しくインストールします。",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "マイクエフェクトを確認できませんでした。PCを再起動して、もう一度「マイクエフェクトを修復」を試してください。",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windowsが許可を求めます。通話やゲームを含む音声が一時的に停止します。",
+  "Your sounds and settings are kept.": "サウンドと設定は保持されます。",
+  "{error}": "{error}",
+  "Update mic effect": "マイクエフェクトを更新",
+  "Update to new version": "新しいバージョンに更新"
 }

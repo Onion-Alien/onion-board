@@ -3099,5 +3099,22 @@
   "Open Triggers": "Άνοιγμα Εναυσμάτων",
   "Copy into library": "Αντιγραφή στη βιβλιοθήκη",
   "Local sounds": "Τοπικοί ήχοι",
-  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Ανενεργό: σύνδεση με το αρχικό αρχείο. Ενεργοποιήστε για να διατηρούνται οι ήχοι αν το αρχικό μετακινηθεί, διαγραφεί ή βρίσκεται σε αποσυνδεδεμένο δίσκο. Χρησιμοποιεί επιπλέον χώρο. Ισχύει μόνο για νέες τοπικές εισαγωγές."
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Ανενεργό: σύνδεση με το αρχικό αρχείο. Ενεργοποιήστε για να διατηρούνται οι ήχοι αν το αρχικό μετακινηθεί, διαγραφεί ή βρίσκεται σε αποσυνδεδεμένο δίσκο. Χρησιμοποιεί επιπλέον χώρο. Ισχύει μόνο για νέες τοπικές εισαγωγές.",
+  "Audio recovery": "Ανάκτηση ήχου",
+  "Clean reinstall": "Καθαρή εγκατάσταση",
+  "Fix problems sending sounds into your mic after an update.": "Διόρθωσε προβλήματα αποστολής ήχων στο μικρόφωνο μετά από ενημέρωση.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Το εφέ μικροφώνου εγκαταστάθηκε ξανά. Δοκίμασέ το στη φωνητική συνομιλία.",
+  "Mic effect removed": "Το εφέ μικροφώνου αφαιρέθηκε",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Εγκατάστησε ξανά το εφέ μικροφώνου του Onion Board στο επιλεγμένο μικρόφωνο.",
+  "Remove mic effect": "Αφαίρεση εφέ μικροφώνου",
+  "Repair failed": "Η επιδιόρθωση απέτυχε",
+  "Repair mic effect": "Επιδιόρθωση εφέ μικροφώνου",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Επαναφέρε τα μικρόφωνα και αφαίρεσε το εφέ μικροφώνου του Onion Board. Οι ήχοι θα σταματήσουν να στέλνονται απευθείας στο μικρόφωνο.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Επαναφέρε τα μικρόφωνα, αφαίρεσε το παλιό εφέ και εγκατάστησε ένα νέο αντίγραφο στο επιλεγμένο μικρόφωνο.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Δεν ήταν δυνατή η επαλήθευση του εφέ μικροφώνου. Επανεκκίνησε τον υπολογιστή και δοκίμασε ξανά την επιδιόρθωση εφέ μικροφώνου.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Τα Windows θα ζητήσουν άδεια. Ο ήχος θα σταματήσει για λίγο, ακόμη και σε κλήσεις και παιχνίδια.",
+  "Your sounds and settings are kept.": "Οι ήχοι και οι ρυθμίσεις σου διατηρούνται.",
+  "{error}": "{error}",
+  "Update mic effect": "Ενημέρωση εφέ μικροφώνου",
+  "Update to new version": "Ενημέρωση στη νέα έκδοση"
 }

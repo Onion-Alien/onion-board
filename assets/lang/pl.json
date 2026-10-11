@@ -3170,5 +3170,22 @@
   "Open Triggers": "Otwórz Wyzwalacze",
   "Copy into library": "Kopiuj do biblioteki",
   "Local sounds": "Lokalne dźwięki",
-  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Wyłączone: odnośnik do oryginalnego pliku. Włącz, aby zachować dźwięki, gdy oryginał zostanie przeniesiony, usunięty lub jest na odłączonym dysku. Zajmuje dodatkowe miejsce. Dotyczy tylko nowych importów lokalnych."
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Wyłączone: odnośnik do oryginalnego pliku. Włącz, aby zachować dźwięki, gdy oryginał zostanie przeniesiony, usunięty lub jest na odłączonym dysku. Zajmuje dodatkowe miejsce. Dotyczy tylko nowych importów lokalnych.",
+  "Audio recovery": "Odzyskiwanie dźwięku",
+  "Clean reinstall": "Czysta instalacja",
+  "Fix problems sending sounds into your mic after an update.": "Napraw problemy z wysyłaniem dźwięków do mikrofonu po aktualizacji.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Efekt mikrofonu zainstalowany ponownie. Sprawdź go na czacie głosowym.",
+  "Mic effect removed": "Efekt mikrofonu usunięty",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Zainstaluj ponownie efekt mikrofonu Onion Board na wybranym mikrofonie.",
+  "Remove mic effect": "Usuń efekt mikrofonu",
+  "Repair failed": "Naprawa nie powiodła się",
+  "Repair mic effect": "Napraw efekt mikrofonu",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Przywróć mikrofony i usuń efekt mikrofonu Onion Board. Dźwięki przestaną trafiać bezpośrednio do mikrofonu.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Przywróć mikrofony, usuń stary efekt mikrofonu, a następnie zainstaluj nową kopię na wybranym mikrofonie.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Nie udało się zweryfikować efektu mikrofonu. Uruchom ponownie komputer i spróbuj jeszcze raz naprawić efekt mikrofonu.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows poprosi o pozwolenie. Dźwięk na chwilę się zatrzyma, także w rozmowach i grach.",
+  "Your sounds and settings are kept.": "Twoje dźwięki i ustawienia zostaną zachowane.",
+  "{error}": "{error}",
+  "Update mic effect": "Zaktualizuj efekt mikrofonu",
+  "Update to new version": "Zaktualizuj do nowej wersji"
 }

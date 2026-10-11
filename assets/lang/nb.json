@@ -3099,5 +3099,22 @@
   "Open Triggers": "Åpne Triggere",
   "Copy into library": "Kopier til biblioteket",
   "Local sounds": "Lokale lyder",
-  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Av: lenk til originalfilen. Slå på for å beholde lydene hvis originalen flyttes, slettes eller ligger på en frakoblet disk. Bruker ekstra diskplass. Gjelder bare nye lokale importer."
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Av: lenk til originalfilen. Slå på for å beholde lydene hvis originalen flyttes, slettes eller ligger på en frakoblet disk. Bruker ekstra diskplass. Gjelder bare nye lokale importer.",
+  "Audio recovery": "Lydgjenoppretting",
+  "Clean reinstall": "Ren reinstallasjon",
+  "Fix problems sending sounds into your mic after an update.": "Løs problemer med å sende lyder til mikrofonen din etter en oppdatering.",
+  "Mic effect reinstalled. Test it in your voice chat.": "Mikrofoneffekten er installert på nytt. Test den i talechatten din.",
+  "Mic effect removed": "Mikrofoneffekt fjernet",
+  "Reinstall Onion Board's mic effect on your selected microphone.": "Installer Onion Boards mikrofoneffekt på nytt på den valgte mikrofonen.",
+  "Remove mic effect": "Fjern mikrofoneffekt",
+  "Repair failed": "Reparasjon mislyktes",
+  "Repair mic effect": "Reparer mikrofoneffekt",
+  "Restore your microphones and remove Onion Board's mic effect. Sounds will stop going straight into your mic.": "Gjenopprett mikrofonene dine og fjern Onion Boards mikrofoneffekt. Lyder sendes da ikke lenger rett til mikrofonen din.",
+  "Restore your microphones, remove the old mic effect, then install a fresh copy on your selected microphone.": "Gjenopprett mikrofonene dine, fjern den gamle mikrofoneffekten og installer deretter en ny kopi på den valgte mikrofonen.",
+  "The mic effect could not be verified. Restart your PC, then try Repair mic effect again.": "Mikrofoneffekten kunne ikke bekreftes. Start PC-en på nytt, og prøv deretter å reparere mikrofoneffekten igjen.",
+  "Windows will ask for permission. Audio will briefly stop, including calls and games.": "Windows ber om tillatelse. Lyden stopper et øyeblikk, også i samtaler og spill.",
+  "Your sounds and settings are kept.": "Lydene og innstillingene dine beholdes.",
+  "{error}": "{error}",
+  "Update mic effect": "Oppdater mikrofoneffekt",
+  "Update to new version": "Oppdater til ny versjon"
 }

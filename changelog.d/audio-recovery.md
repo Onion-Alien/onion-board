@@ -1,0 +1,1 @@
+- Added Audio recovery in Settings: update the mic effect, clean reinstall it, or restore normal microphone operation by removing it. A compact action row highlights available updates and keeps the smaller reinstall/remove actions visible. Recovery runs in the background, verifies the resulting setup, and refuses to change mic settings if Windows audio cannot be stopped.
