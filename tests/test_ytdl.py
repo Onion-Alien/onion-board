@@ -45,6 +45,15 @@ def test_clean_title_drops_video_noise():
     assert ytdl.clean_title("Just a title") == "Just a title"
 
 
+def test_clean_title_reads_html_entities_and_drops_the_myinstants_suffix():
+    """Seen on real links: TikTok's titles come with "&amp;", and a pasted Myinstants
+    page is titled "<name> - Sound Button"."""
+    assert ytdl.clean_title("Scramble up ur name &amp; I&#39;ll guess it") == \
+        "Scramble up ur name & I'll guess it"
+    assert ytdl.clean_title("VINE BOOM SOUND - Sound Button") == "VINE BOOM SOUND"
+    assert ytdl.clean_title("Sound Button") == "Sound Button"
+
+
 def test_ytdlp_can_impersonate_a_browser():
     """TikTok answers only a real browser: without curl_cffi (or with a version this
     yt-dlp refuses) every pasted TikTok link fails with "Unexpected response"."""
@@ -113,6 +122,22 @@ def test_download_audio_errors_are_readable(monkeypatch, tmp_path):
         ytdl.download_audio("https://youtu.be/x", tmp_path, auto_update=False)
     assert str(e.value) == "That video isn't available any more."   # errors.describe
     assert isinstance(e.value, ytdl.FetchError)   # yt-dlp's fault: an update may help
+
+
+def test_a_dead_proxy_is_named_not_the_internet(monkeypatch, tmp_path):
+    """Through a proxy that didn't answer, the download said "Check your internet
+    connection" (seen with a real dead proxy); radio already named the proxy."""
+    fake_yt_dlp(monkeypatch, {}, fail="ERROR: Unable to download webpage: connection refused")
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.PROXY)
+    monkeypatch.setattr(ytdl.net, "last_failure",
+                        lambda since=0.0: "Couldn't reach the proxy at 127.0.0.1:1.")
+    with pytest.raises(ytdl.DownloadError) as e:
+        ytdl.download_audio("https://youtu.be/x", tmp_path, auto_update=False)
+    assert "proxy at 127.0.0.1:1" in str(e.value)
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.DIRECT)   # direct: as before
+    with pytest.raises(ytdl.DownloadError) as e:
+        ytdl.download_audio("https://youtu.be/x", tmp_path, auto_update=False)
+    assert "internet connection" in str(e.value)
 
 
 def test_a_playlist_with_a_private_video_first_is_still_a_playlist(monkeypatch, tmp_path):
