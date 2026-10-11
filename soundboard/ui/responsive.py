@@ -36,12 +36,15 @@ def touch(*widgets: QWidget):
 
 
 def _invalidate(layout):
-    """A layout and the rows / columns nested in it (each caches its own size)."""
+    """A layout and the rows / columns nested in it (each caches its own size).
+
+    The nested ones are found as the layout's children, never with itemAt(): that
+    gives each item a Python wrapper the layout keeps, and a page removed from a
+    QStackedWidget (Radio switched off) frees its item behind PySide's back. The next
+    object made at that address then got the dead wrapper: a native crash."""
     layout.invalidate()
-    for i in range(layout.count()):
-        sub = layout.itemAt(i).layout()
-        if sub is not None:
-            _invalidate(sub)
+    for sub in layout.findChildren(QLayout):
+        sub.invalidate()
 
 
 def hide(*widgets: QWidget) -> Callable[[bool], None]:

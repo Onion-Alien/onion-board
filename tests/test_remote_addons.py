@@ -301,7 +301,7 @@ def test_remembered_nonces_stay_bounded(loaded, monkeypatch):
 
 def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # noqa: F811
                                                                monkeypatch):
-    """*Remove Onion Pocket…* on its card (Settings → Remote) and on the Add-ons card:
+    """*Remove Onion Pocket* on its card (Settings → Remote) and on the Add-ons card:
     asks first, stops it, deletes its folder, keeps its settings, and the card turns
     back into *Get Onion Pocket*."""
     from PySide6.QtWidgets import QMessageBox

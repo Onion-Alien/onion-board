@@ -395,24 +395,24 @@ def menu_pick(monkeypatch, path):
 
 def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     w = window
-    shown = menu_pick(monkeypatch, ["Set hotkey…"])
+    shown = menu_pick(monkeypatch, ["Set hotkey"])
     from soundboard.ui import mainwindow
     monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.pad_menu("s0", None)
-    assert shown == ["Play next", "Volume", "---", "Edit…", "Rename…",
-                     "Set hotkey…", "Categories", "---", "Duplicate",
-                     "Export…", "Open file location", "Remove"]
+    assert shown == ["Play next", "Volume", "---", "Edit", "Rename",
+                     "Set hotkey", "Categories", "---", "Duplicate",
+                     "Export", "Open file location", "Remove"]
     assert w.meta("s0").hotkey == "ctrl+alt+7"
     shown = menu_pick(monkeypatch, ["Hotkey: Ctrl+Alt+7", "Remove hotkey"])
     w.pad_menu("s0", None)
-    assert "Hotkey: Ctrl+Alt+7" in shown and "Set hotkey…" not in shown
+    assert "Hotkey: Ctrl+Alt+7" in shown and "Set hotkey" not in shown
     assert w.meta("s0").hotkey == ""
 
 
 def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     """A sound from YouTube (TikTok, SoundCloud) gets Open on YouTube, Copy link and
-    Details… under the site's name; any other sound doesn't."""
+    Details under the site's name; any other sound doesn't."""
     LINK = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     from soundboard.ui import busy, sourcedialog
     w = window
@@ -433,7 +433,7 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     dialogs = []
     monkeypatch.setattr(sourcedialog.SourceDialog, "show",
                         lambda self: dialogs.append(self))
-    menu_pick(monkeypatch, ["YouTube", "Details…"])
+    menu_pick(monkeypatch, ["YouTube", "Details"])
     w.pad_menu("s0", None)
     [d] = dialogs
     assert d.btn_open.text() == "Open on YouTube" and d.btn_open.toolTip() == LINK

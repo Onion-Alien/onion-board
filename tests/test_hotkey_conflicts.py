@@ -114,7 +114,7 @@ def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
     menu = QMenu()
     window._fill_quick_hotkeys(menu)
     texts = [a.text() for a in menu.actions()]
-    assert "Stop everything\tF9" in texts and texts[-1] == "All hotkeys…"
+    assert "Stop everything\tF9" in texts and texts[-1] == "All hotkeys"
 
     class Picked:   # the key capture, answered with F10
         result_combo = "f10"

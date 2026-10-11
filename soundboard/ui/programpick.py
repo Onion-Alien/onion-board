@@ -1,5 +1,5 @@
-"""Pick programs for *Show this when a program is in front…* (a category tab's menu):
-the programs with a window open now, with their icons, plus *Browse for a program…*.
+"""Pick programs for *Show this when a program is in front* (a category tab's menu):
+the programs with a window open now, with their icons, plus *Browse for a program*.
 The listing runs on a thread (catswitch.windowed_programs)."""
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ class ProgramPicker(QDialog):
         self.list.itemDoubleClicked.connect(lambda _i: self._ok())
         lay.addWidget(self.list, 1)
         row = QHBoxLayout()
-        browse = QPushButton(_("Browse for a program…"))
+        browse = QPushButton(_("Browse for a program"))
         icons.set_icon(browse, "folder")
         browse.clicked.connect(self.browse)
         row.addWidget(browse)
@@ -93,7 +93,7 @@ class ProgramPicker(QDialog):
         for exe, path, title in programs:
             self._add(exe, path, title)
         if not self.list.count():
-            li = QListWidgetItem(_("No open programs found. Use Browse for a program…."))
+            li = QListWidgetItem(_("No open programs found. Use Browse for a program."))
             li.setFlags(Qt.NoItemFlags)
             self.list.addItem(li)
         self._update()

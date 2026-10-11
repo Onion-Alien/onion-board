@@ -103,6 +103,9 @@ class ActivityTable(QTableWidget):
         # tooltip, while a column pushed out behind a scroll bar was just missing
         self._mins = ([70, 64, 64, 72, 110, 72] if stretch == 1 else
                       [64] * len(self._widths))
+        # Tab leaves the table (the arrow keys move between its cells): otherwise a
+        # keyboard user with any rows in it is stuck stepping through every cell
+        self.setTabKeyNavigation(False)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -234,7 +237,7 @@ class NetActivity(QWidget):
         # in a small Settings window (Copy and Clear far right beside the summary looked
         # out of line with Totals and Open log)
         row = Flow(gap=8)
-        self.totals = QPushButton(_("Totals…"))
+        self.totals = QPushButton(_("Totals"))
         self.totals.setToolTip(_("How much data went to each site, added up over the whole "
                                  "history"))
         self.open_log = QPushButton(_("Open log"))

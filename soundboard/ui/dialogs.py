@@ -357,7 +357,7 @@ class EditDialog(QDialog):
             prow.addWidget(b)
             return b
         self.btn_pic_file = pic_button(
-            "folder", _("From a file… (you can also drop a picture on the pad)"),
+            "folder", _("From a file (you can also drop a picture on the pad)"),
             self._picture_from_file)
         self.btn_pic_link = pic_button(
             "browser", _("From a link: a picture's address, a YouTube video or a web page"),
@@ -686,7 +686,7 @@ class EditDialog(QDialog):
 
     def _set_hk(self, combo):
         self.hotkey = combo
-        self.hk_btn.setText(pretty_key(combo) or _("Click to set…"))
+        self.hk_btn.setText(pretty_key(combo) or _("Click to set"))
 
     def _capture(self):
         d = HotkeyDialog(self.hotkeys, self)

@@ -67,8 +67,8 @@ class PadSelection(QObject):
         h.addWidget(self.lbl, 1)
         for text, tip, fn in (
                 (_("Colour"), _("Give every picked pad the same colour"), self._color_menu),
-                (_("Volume…"), _("Set every picked sound's volume"), self.ask_volume),
-                (_("Fades…"), _("Set every picked sound's fade in / fade out"),
+                (_("Volume"), _("Set every picked sound's volume"), self.ask_volume),
+                (_("Fades"), _("Set every picked sound's fade in / fade out"),
                  self.ask_fades),
                 (_("Categories"), _("Put the picked sounds in a category, or take them out"),
                  self._cats_menu)):
@@ -150,10 +150,10 @@ class PadSelection(QObject):
         m = QMenu(self.mw)
         m.addSection(count(n))
         self._fill_colors(m.addMenu(swatch(PAD_COLORS[0]), _("Colour")))
-        m.addAction(icons.icon("volume"), _("Volume…"), self.ask_volume)
-        m.addAction(icons.icon("wave"), _("Fade in / out…"), self.ask_fades)
+        m.addAction(icons.icon("volume"), _("Volume"), self.ask_volume)
+        m.addAction(icons.icon("wave"), _("Fade in / out"), self.ask_fades)
         self._fill_cats(m.addMenu(icons.icon("tag"), _("Categories")))
-        m.addAction(icons.icon("folder"), _("Export…"),
+        m.addAction(icons.icon("folder"), _("Export"),
                     lambda: self.mw.export_sounds(
                         self.sounds(), count(n)))
         m.addSeparator()
@@ -190,7 +190,7 @@ class PadSelection(QObject):
                                 self.set_category(c, not out))
         if self.mw.cfg.categories:
             menu.addSeparator()
-        menu.addAction(icons.icon("plus"), _("New category…"), self.new_category)
+        menu.addAction(icons.icon("plus"), _("New category"), self.new_category)
 
     def _changed(self, sids=None):
         for sid in sids or self.picked:

@@ -1,4 +1,4 @@
-"""The pad menu's *Details…* for a sound downloaded from YouTube, YouTube Music, TikTok
+"""The pad menu's *Details* for a sound downloaded from YouTube, YouTube Music, TikTok
 or SoundCloud: its picture, title and channel, when it was uploaded and added, its
 length and views, and Open on YouTube / Copy link (soundboard.sourceinfo)."""
 from __future__ import annotations

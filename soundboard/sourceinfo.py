@@ -1,6 +1,6 @@
 """Where a downloaded sound came from: the video's link, channel, upload date, length
 and views, so the user can find it again (the pad menu's *Open on YouTube*, *Copy
-link* and *Details…*).
+link* and *Details*).
 
 For any sound added from a web link (YouTube, TikTok, SoundCloud, Instagram, X…;
 not files, recordings or packs). It is picked out of the reply yt-dlp already got
