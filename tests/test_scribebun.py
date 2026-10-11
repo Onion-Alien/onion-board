@@ -1,5 +1,7 @@
 """Bun the scribe's music: real, well-known pieces written out like sheet music, a
 different one each download."""
+import pytest
+
 from soundboard.ui import scribebun as sb
 
 
@@ -111,6 +113,36 @@ def _flash_over(bar):
     bar._release()
 
 
+def test_download_bar_gradient_follows_how_it_ended(qapp):
+    """The banner's gradient: tinted green when added, red when it failed, back to the
+    accent for the next pick; the outlined theme keeps it flat."""
+    from soundboard import theme
+    from soundboard.ui.downloadbar import DownloadBar
+    was = theme.current_name
+    try:
+        theme.apply(qapp, "Dark")
+        bar = DownloadBar()
+        bar.resize(900, 80)
+        a, b = "https://www.youtube.com/watch?v=a", "https://www.youtube.com/watch?v=b"
+        assert "qlineargradient" in bar.styleSheet()
+        bar.set_active(a, "One", "add", None)
+        assert bar.property("ended") == ""
+        bar.set_done(a, "add", True)
+        assert bar.property("ended") == "ok"
+        _flash_over(bar)
+        bar.set_active(b, "Two", "add", None)
+        assert bar.property("ended") == ""
+        _fail(bar, b)
+        assert bar.property("ended") == "failed"
+        bar.close()
+        theme.apply(qapp, "High Contrast")
+        flat = DownloadBar()
+        assert "qlineargradient" not in flat.styleSheet()
+        flat.close()
+    finally:
+        theme.apply(qapp, was)
+
+
 def test_download_bar_flags_how_it_ended(qapp):
     from soundboard.ui.downloadbar import DownloadBar
     bar = DownloadBar()
@@ -158,6 +190,45 @@ def test_download_bar_waits_for_the_flash_then_moves_up(qapp):
     _flash_over(bar)
     assert bar.url == b and bar.lbl_status.text() == "50%"
     assert bar.queue_badge.text() == "+1 queued"
+    bar.close()
+
+
+@pytest.mark.parametrize("ok", [True, False])
+def test_download_bar_last_pick_stays_ended_after_a_late_update(qapp, ok):
+    """The last of three picks: once it shows ✓ (or ✗), a late "processing" or
+    progress for it can't put it back to busy, and the banner still goes away."""
+    from soundboard.ui.downloadbar import DownloadBar
+    bar = DownloadBar()
+    bar.resize(900, 80)
+    a, b, c = (f"https://www.youtube.com/watch?v={x}" for x in "abc")
+    bar.set_active(a, "One", "add", None)
+    bar.set_queue([{"url": b, "title": "Two", "kind": "add"},
+                   {"url": c, "title": "Three", "kind": "add"}])
+    for url, left in ((a, [c]), (b, [])):
+        bar.set_done(url, "add", True)
+        _flash_over(bar)
+        nxt = b if url == a else c
+        bar.set_queue([{"url": u, "title": "x", "kind": "add"} for u in left])
+        bar.set_active(nxt, "Next", "add", None)
+    bar.set_progress(c, 0.4)
+    bar.set_progress(c, "processing")
+    if ok:
+        bar.set_done(c, "add", True)
+    else:
+        _fail(bar, c)
+    ended = bar.lbl_status.text()
+    for late in ("processing", -1, 0.9, "parsing"):   # during the flash, then after it
+        bar.set_progress(c, late)
+    _flash_over(bar)
+    for late in ("processing", -1, 0.9, "parsing"):
+        bar.set_progress(c, late)
+    assert bar.url == c and bar.stage == "done" and bar.lbl_status.text() == ended
+    assert ended == ("✓ Added to your sounds" if ok else "Couldn't download")
+    assert bar._auto_hide.isActive() == ok   # a failed one waits for Retry or ✕
+    # picked again: it's a new download, so its progress shows once more
+    bar.set_active(c, "Three", "add", None)
+    bar.set_progress(c, "processing")
+    assert bar.stage == "processing" and bar.lbl_status.text() == "Processing audio…"
     bar.close()
 
 
