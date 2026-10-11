@@ -2538,8 +2538,6 @@
   "Add the selected station to Favorites": "Lisää valittu asema suosikkeihin",
   "Add to Favorites": "Lisää suosikkeihin",
   "All countries": "Kaikki maat",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Asemahakemistoon ei saada yhteyttä ( {error} ), paina ↻ yrittääksesi uudelleen.",
-  "Can't reach the station directory, press ↻ to try again.": "Asemahakemistoon ei saada yhteyttä, yritä uudelleen painamalla ↻.",
   "Chill": "Rentouttavaa musiikkia",
   "Classical": "Klassinen",
   "Clear filters": "Selkeät suodattimet",
@@ -2589,7 +2587,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Tallenna radion viimeiset {n} sekuntia äänenä",
   "Saved a {secs}s clip to your Sounds.": "Tallentui {secs} s:n leikkeen Sounds-palveluun.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Haku epäonnistui ( {error} ). Tarkista yhteys ja yritä uudelleen painamalla Enter.",
   "Search failed: press Enter to try again.": "Haku epäonnistui: yritä uudelleen painamalla Enter.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Hae radioasemia, genrejä, maita tai kaupunkeja… (tai napsauta pistettä kartalla)",
   "Searching…": "Haetaan…",
@@ -2599,8 +2596,6 @@
     "Asemaluettelo päivitetty: {n} asema.",
     "Asemaluettelo päivitetty: {n} asemaa."
   ],
-  "That station isn't working ({error}). Try another one.": "Tämä asema ei toimi ( {error} ). Kokeile toista.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Asemahakemistoon ei saada yhteyttä juuri nyt. Tarkista yhteys ja paina ↻.",
   "Trending": "Trendaavat",
   "Tuning in to {name}": "Viritys kohteeseen {name}",
   "Tuning in to {name}…": "Viritetään kohteeseen {name} …",
@@ -2608,7 +2603,6 @@
   "Zoom out": "Loitonna",
   "headphones": "kuulokkeet",
   "mic": "mikrofoni",
-  "no answer": "ei vastausta",
   "only you hear the radio: press “Send” below so others hear it too": "vain sinä kuulet radion: paina \"Lähetä\" alla, jotta muut kuulevat sen",
   "others hear it": "muut kuulevat sen",
   "sending": "lähettäminen",
@@ -3257,5 +3251,11 @@
   "the download failed": "lataus epäonnistui",
   "{done} MB": "{done} Mt",
   "{done} of {total} MB": "{done}/{total} Mt",
-  "Click to try again": "Klikkaa yrittääksesi uudelleen"
+  "Click to try again": "Klikkaa yrittääksesi uudelleen",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Radioasemien listaan ei saada yhteyttä. Tarkista internet tai yritä hetken päästä uudelleen.",
+  "Press Enter to search again.": "Paina Enter hakeaksesi uudelleen.",
+  "Press ↻ to try again.": "Paina ↻ yrittääksesi uudelleen.",
+  "That station isn't on the air right now. Try another one.": "Tämä asema ei ole nyt lähetyksessä. Kokeile toista.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio ei toimi juuri nyt. Vika ei ole sinussa: asemalistan palvelin ei toimi. Yritä hetken päästä uudelleen.",
+  "This station points into your home network, so it isn't played.": "Tämä asema osoittaa kotiverkkoosi, joten sitä ei soiteta."
 }

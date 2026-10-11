@@ -2485,8 +2485,6 @@
   "Add the selected station to Favorites": "Thêm đài đã chọn vào Mục ưa thích",
   "Add to Favorites": "Thêm vào mục yêu thích",
   "All countries": "Tất cả các nước",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Không thể truy cập thư mục đài phát ( {error} ), nhấn ↻ để thử lại.",
-  "Can't reach the station directory, press ↻ to try again.": "Không thể truy cập thư mục đài, nhấn ↻ để thử lại.",
   "Chill": "Âm nhạc thư giãn",
   "Classical": "Cổ điển",
   "Clear filters": "Xóa bộ lọc",
@@ -2536,7 +2534,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Lưu {n} giây cuối cùng của đài dưới dạng âm thanh",
   "Saved a {secs}s clip to your Sounds.": "Đã lưu clip {secs} giây vào Âm thanh của bạn.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Tìm kiếm không thành công ( {error} ). Kiểm tra kết nối của bạn và nhấn Enter để thử lại.",
   "Search failed: press Enter to try again.": "Tìm kiếm không thành công: nhấn Enter để thử lại.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Tìm kiếm đài phát thanh, thể loại, quốc gia hoặc thành phố… (hoặc nhấp vào dấu chấm trên bản đồ)",
   "Searching…": "Đang tìm kiếm…",
@@ -2545,8 +2542,6 @@
   "Station list updated: {n} station.": [
     "Danh sách trạm đã cập nhật: {n} trạm."
   ],
-  "That station isn't working ({error}). Try another one.": "Trạm đó không hoạt động ( {error} ). Hãy thử một cái khác.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Không thể truy cập thư mục đài ngay bây giờ. Kiểm tra kết nối của bạn và nhấn ↻.",
   "Trending": "Xu hướng",
   "Tuning in to {name}": "Đang theo dõi {name}",
   "Tuning in to {name}…": "Đang theo dõi {name} …",
@@ -2554,7 +2549,6 @@
   "Zoom out": "Thu nhỏ",
   "headphones": "tai nghe",
   "mic": "micrô",
-  "no answer": "không có câu trả lời",
   "only you hear the radio: press “Send” below so others hear it too": "chỉ mình bạn nghe thấy radio: nhấn “Gửi” bên dưới để những người khác cũng nghe thấy",
   "others hear it": "những người khác nghe thấy nó",
   "sending": "gửi",
@@ -3184,5 +3178,11 @@
   "the download failed": "tải xuống thất bại",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done}/{total} MB",
-  "Click to try again": "Bấm để thử lại"
+  "Click to try again": "Bấm để thử lại",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Không kết nối được danh sách đài radio. Hãy kiểm tra internet, hoặc thử lại sau một lát.",
+  "Press Enter to search again.": "Nhấn Enter để tìm lại.",
+  "Press ↻ to try again.": "Nhấn ↻ để thử lại.",
+  "That station isn't on the air right now. Try another one.": "Đài đó hiện không phát sóng. Hãy thử đài khác.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radio đang bị sập. Không phải lỗi của bạn: máy chủ danh sách đài không hoạt động. Hãy thử lại sau một lát.",
+  "This station points into your home network, so it isn't played.": "Đài này trỏ vào mạng gia đình của bạn, nên không được phát."
 }

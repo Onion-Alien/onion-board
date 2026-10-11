@@ -74,6 +74,7 @@ HEAD_LIMIT = 64 * 1024              # a request head bigger than this isn't FFmp
 # processes (pip, the live-voice helper)
 ENV_KEYS = ("http_proxy", "https_proxy", "all_proxy", "no_proxy")
 LOOPBACK_NAMES = ("localhost", "localhost.")
+RELAY_HEADER = "X-Onion-Relay"   # on the relay's own refusals (see _Relay._refuse)
 DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the proxy / Tor
 # features with nothing on this PC: the relay refuses them 127.x / localhost in every
 # mode (every station comes from Radio Browser, so one leading here is a redirect)
@@ -1188,7 +1189,10 @@ class _Relay:
         reason = {400: "Bad Request", 403: "Forbidden", 502: "Bad Gateway"}[code]
         body = why.encode("utf-8", "replace")[:500]
         try:
+            # RELAY_HEADER: the relay's own answer, not the site's (a 502 here is "couldn't
+            # connect", where a site's 502 is the site being down: radio tells them apart)
             c.sendall(f"HTTP/1.1 {code} {reason}\r\nContent-Type: text/plain; charset=utf-8"
+                      f"\r\n{RELAY_HEADER}: {code}"
                       f"\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n"
                       .encode() + body)
         except OSError:

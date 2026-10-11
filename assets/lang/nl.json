@@ -2538,8 +2538,6 @@
   "Add the selected station to Favorites": "Voeg de geselecteerde zender toe aan Favorieten",
   "Add to Favorites": "Toevoegen aan Favorieten",
   "All countries": "Alle landen",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Kan de zenderlijst niet bereiken ( {error} ), druk op ↻ om het opnieuw te proberen.",
-  "Can't reach the station directory, press ↻ to try again.": "Kan de zenderlijst niet bereiken, druk op ↻ om het opnieuw te proberen.",
   "Chill": "Chill-out muziek",
   "Classical": "Klassiek",
   "Clear filters": "Filters wissen",
@@ -2589,7 +2587,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Bewaar de laatste {n} seconden van de radio als geluid",
   "Saved a {secs}s clip to your Sounds.": "Er is een fragment van {secs} sec. opgeslagen in je geluiden.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Zoeken mislukt ( {error} ). Controleer uw verbinding en druk op Enter om het opnieuw te proberen.",
   "Search failed: press Enter to try again.": "Zoeken mislukt. Druk op Enter om het opnieuw te proberen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Zoek radiostations, genres, landen of steden… (of klik op een stip op de kaart)",
   "Searching…": "Zoeken…",
@@ -2599,8 +2596,6 @@
     "Zenderlijst bijgewerkt: {n} station.",
     "Zenderlijst bijgewerkt: {n} stations."
   ],
-  "That station isn't working ({error}). Try another one.": "Dat station werkt niet ( {error} ). Probeer een andere.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "De zenderlijst is momenteel niet bereikbaar. Controleer je verbinding en druk op ↻.",
   "Trending": "Populair",
   "Tuning in to {name}": "Afstemmen op {name}",
   "Tuning in to {name}…": "Afstemmen op {name} …",
@@ -2608,7 +2603,6 @@
   "Zoom out": "Uitzoomen",
   "headphones": "hoofdtelefoon",
   "mic": "microfoon",
-  "no answer": "geen antwoord",
   "only you hear the radio: press “Send” below so others hear it too": "alleen jij hoort de radio: druk hieronder op “Verzenden” zodat anderen het ook kunnen horen",
   "others hear it": "anderen horen het",
   "sending": "verzenden",
@@ -3257,5 +3251,11 @@
   "the download failed": "het downloaden is mislukt",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done} van {total} MB",
-  "Click to try again": "Klik om het opnieuw te proberen"
+  "Click to try again": "Klik om het opnieuw te proberen",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "De lijst met radiozenders is niet bereikbaar. Controleer je internet, of probeer het zo nog eens.",
+  "Press Enter to search again.": "Druk op Enter om opnieuw te zoeken.",
+  "Press ↻ to try again.": "Druk op ↻ om het opnieuw te proberen.",
+  "That station isn't on the air right now. Try another one.": "Die zender is nu niet in de lucht. Probeer een andere.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "De radio ligt er nu uit. Het ligt niet aan jou: de server met de zenderlijst werkt niet. Probeer het zo nog eens.",
+  "This station points into your home network, so it isn't played.": "Deze zender wijst naar je thuisnetwerk, dus hij wordt niet afgespeeld."
 }

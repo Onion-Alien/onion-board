@@ -36,3 +36,13 @@ def test_only_our_old_temp_folders_are_removed(tmp_path, monkeypatch):
 def test_a_missing_temp_folder_is_no_error(tmp_path, monkeypatch):
     monkeypatch.setattr(tempfile, "gettempdir", lambda: str(tmp_path / "nope"))
     assert app.clean_temp_leftovers() == 0
+
+
+def test_tests_never_write_into_the_real_temp_folder(tmp_path):
+    """Downloads from the tests' stand-in sites (ytdl's sb-ytdl-* folders) left
+    hundreds of folders in the real %TEMP%: every test's temp files go in its own."""
+    import tempfile as tf
+    from pathlib import Path
+    mine = tmp_path.parent   # pytest's own folder for this run, which it clears
+    assert Path(tf.gettempdir()).is_relative_to(mine)
+    assert Path(tf.mkdtemp(prefix="sb-ytdl-")).is_relative_to(mine)

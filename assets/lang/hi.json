@@ -2538,8 +2538,6 @@
   "Add the selected station to Favorites": "चयनित स्टेशन को पसंदीदा में जोड़ें",
   "Add to Favorites": "पसंदीदा में जोड़े",
   "All countries": "सभी देश",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "स्टेशन निर्देशिका तक नहीं पहुंच सकता ( {error} ) - पुनः प्रयास करने के लिए ↻ दबाएँ।",
-  "Can't reach the station directory, press ↻ to try again.": "स्टेशन निर्देशिका तक नहीं पहुँच सकते - पुनः प्रयास करने के लिए ↻ दबाएँ।",
   "Chill": "शांत करने वाला संगीत",
   "Classical": "शास्त्रीय",
   "Clear filters": "फ़िल्टर साफ़ करें",
@@ -2589,7 +2587,6 @@
   "Rock": "रॉक",
   "Save the last {n} seconds of the radio as a sound": "रेडियो के अंतिम {n} सेकंड को ध्वनि के रूप में सहेजें",
   "Saved a {secs}s clip to your Sounds.": "आपकी ध्वनि में एक {secs} क्लिप सहेजी गई।",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "खोज विफल ( {error} )। अपना कनेक्शन जाँचें और पुनः प्रयास करने के लिए Enter दबाएँ।",
   "Search failed: press Enter to try again.": "खोज विफल - पुनः प्रयास करने के लिए Enter दबाएँ।",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "रेडियो स्टेशन, शैलियाँ, देश या शहर खोजें... (या मानचित्र पर एक बिंदु पर क्लिक करें)",
   "Searching…": "खोज रहे हैं...",
@@ -2599,8 +2596,6 @@
     "स्टेशन सूची अपडेट की गई: {n} स्टेशन।",
     "स्टेशन सूची अपडेट की गई: {n} स्टेशन।"
   ],
-  "That station isn't working ({error}). Try another one.": "वह स्टेशन काम नहीं कर रहा है ( {error} )। एक और प्रयास करें.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "स्टेशन निर्देशिका तक अभी नहीं पहुंचा जा सकता. अपना कनेक्शन जांचें और ↻ दबाएँ।",
   "Trending": "रुझान",
   "Tuning in to {name}": "{name} में ट्यूनिंग",
   "Tuning in to {name}…": "{name} पर ट्यूनिंग ...",
@@ -2608,7 +2603,6 @@
   "Zoom out": "ज़ूम आउट",
   "headphones": "हेडफोन",
   "mic": "एमआईसी",
-  "no answer": "कोई जवाब नहीं",
   "only you hear the radio: press “Send” below so others hear it too": "केवल आप ही रेडियो सुनते हैं: नीचे \"भेजें\" दबाएँ ताकि अन्य लोग भी इसे सुन सकें",
   "others hear it": "दूसरे इसे सुनते हैं",
   "sending": "भेज रहा हूँ",
@@ -3257,5 +3251,11 @@
   "the download failed": "डाउनलोड विफल रहा",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{total} में से {done} MB",
-  "Click to try again": "फिर से कोशिश करने के लिए क्लिक करें"
+  "Click to try again": "फिर से कोशिश करने के लिए क्लिक करें",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "रेडियो स्टेशन सूची तक नहीं पहुँच पा रहे। अपना इंटरनेट जाँचें, या थोड़ी देर बाद फिर कोशिश करें।",
+  "Press Enter to search again.": "फिर से खोजने के लिए Enter दबाएँ।",
+  "Press ↻ to try again.": "फिर से कोशिश करने के लिए ↻ दबाएँ।",
+  "That station isn't on the air right now. Try another one.": "वह स्टेशन अभी प्रसारण नहीं कर रहा। कोई दूसरा आज़माएँ।",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "रेडियो अभी बंद है। गलती आपकी नहीं है: स्टेशन सूची का सर्वर काम नहीं कर रहा। थोड़ी देर बाद फिर कोशिश करें।",
+  "This station points into your home network, so it isn't played.": "यह स्टेशन आपके घरेलू नेटवर्क की ओर इशारा करता है, इसलिए इसे नहीं चलाया जाता।"
 }

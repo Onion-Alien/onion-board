@@ -2538,8 +2538,6 @@
   "Add the selected station to Favorites": "Προσθέστε τον επιλεγμένο σταθμό στα Αγαπημένα",
   "Add to Favorites": "Προσθήκη στα Αγαπημένα",
   "All countries": "Όλες οι χώρες",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Δεν είναι δυνατή η πρόσβαση στον κατάλογο του σταθμού ( {error} ), πατήστε ↻ για να προσπαθήσετε ξανά.",
-  "Can't reach the station directory, press ↻ to try again.": "Δεν είναι δυνατή η πρόσβαση στον κατάλογο σταθμών, πατήστε ↻ για να προσπαθήσετε ξανά.",
   "Chill": "Μουσική χαλάρωσης",
   "Classical": "Κλασική",
   "Clear filters": "Καθαρίστε τα φίλτρα",
@@ -2589,7 +2587,6 @@
   "Rock": "Ροκ",
   "Save the last {n} seconds of the radio as a sound": "Αποθηκεύστε τα τελευταία {n} δευτερόλεπτα του ραδιοφώνου ως ήχο",
   "Saved a {secs}s clip to your Sounds.": "Αποθηκεύτηκε ένα κλιπ {secs} στους ήχους σας.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Η αναζήτηση απέτυχε ( {error} ). Ελέγξτε τη σύνδεσή σας και πατήστε Enter για να προσπαθήσετε ξανά.",
   "Search failed: press Enter to try again.": "Η αναζήτηση απέτυχε: πατήστε Enter για να προσπαθήσετε ξανά.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Αναζητήστε ραδιοφωνικούς σταθμούς, είδη, χώρες ή πόλεις… (ή κάντε κλικ σε μια κουκκίδα στον χάρτη)",
   "Searching…": "Ερευνητικός…",
@@ -2599,8 +2596,6 @@
     "Η λίστα σταθμών ενημερώθηκε: {n} σταθμός.",
     "Η λίστα σταθμών ενημερώθηκε: {n} σταθμοί."
   ],
-  "That station isn't working ({error}). Try another one.": "Αυτός ο σταθμός δεν λειτουργεί ( {error} ). Δοκιμάστε ένα άλλο.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Δεν είναι δυνατή η πρόσβαση στον κατάλογο του σταθμού αυτήν τη στιγμή. Ελέγξτε τη σύνδεσή σας και πατήστε ↻.",
   "Trending": "Τάσεις",
   "Tuning in to {name}": "Συντονισμός στο {name}",
   "Tuning in to {name}…": "Συντονισμός στο {name} …",
@@ -2608,7 +2603,6 @@
   "Zoom out": "Σμίκρυνση",
   "headphones": "ακουστικά",
   "mic": "μικρόφωνο",
-  "no answer": "καμία απάντηση",
   "only you hear the radio: press “Send” below so others hear it too": "μόνο εσείς ακούτε το ραδιόφωνο: πατήστε \"Αποστολή\" παρακάτω για να το ακούσουν και άλλοι",
   "others hear it": "το ακούν άλλοι",
   "sending": "αποστολή",
@@ -3257,5 +3251,11 @@
   "the download failed": "η λήψη απέτυχε",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done} από {total} MB",
-  "Click to try again": "Κάνε κλικ για να δοκιμάσεις ξανά"
+  "Click to try again": "Κάνε κλικ για να δοκιμάσεις ξανά",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Δεν είναι δυνατή η σύνδεση με τη λίστα ραδιοφωνικών σταθμών. Έλεγξε το ίντερνετ ή δοκίμασε ξανά σε λίγο.",
+  "Press Enter to search again.": "Πάτησε Enter για να ψάξεις ξανά.",
+  "Press ↻ to try again.": "Πάτησε ↻ για να δοκιμάσεις ξανά.",
+  "That station isn't on the air right now. Try another one.": "Αυτός ο σταθμός δεν εκπέμπει αυτή τη στιγμή. Δοκίμασε άλλον.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Το ραδιόφωνο δεν λειτουργεί αυτή τη στιγμή. Δεν φταις εσύ: ο διακομιστής με τη λίστα σταθμών δεν δουλεύει. Δοκίμασε ξανά σε λίγο.",
+  "This station points into your home network, so it isn't played.": "Αυτός ο σταθμός δείχνει στο οικιακό σου δίκτυο, οπότε δεν παίζει."
 }

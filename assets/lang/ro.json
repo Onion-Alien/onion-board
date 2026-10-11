@@ -2591,8 +2591,6 @@
   "Add the selected station to Favorites": "Adăugați postul selectat la Favorite",
   "Add to Favorites": "Adăugați la Favorite",
   "All countries": "Toate țările",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Nu se poate ajunge la directorul stației ( {error} ), apăsați ↻ pentru a încerca din nou.",
-  "Can't reach the station directory, press ↻ to try again.": "Nu se poate ajunge la directorul postului, apăsați ↻ pentru a încerca din nou.",
   "Chill": "Muzică chill-out",
   "Classical": "Clasic",
   "Clear filters": "Ștergeți filtrele",
@@ -2642,7 +2640,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Salvați ultimele {n} secunde ale radioului ca sunet",
   "Saved a {secs}s clip to your Sounds.": "A salvat un clip de {secs} în Sunete.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Căutarea nu a reușit ( {error} ). Verificați conexiunea și apăsați Enter pentru a încerca din nou.",
   "Search failed: press Enter to try again.": "Căutarea eșuată: apăsați pe Enter pentru a încerca din nou.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Căutați posturi de radio, genuri, țări sau orașe... (sau faceți clic pe un punct de pe hartă)",
   "Searching…": "Se caută…",
@@ -2653,8 +2650,6 @@
     "Lista posturilor actualizată: {n} stații.",
     "Lista posturilor actualizată: {n} stații."
   ],
-  "That station isn't working ({error}). Try another one.": "Stația respectivă nu funcționează ( {error} ). Încearcă altul.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Directorul stației nu poate fi accesat în acest moment. Verificați conexiunea și apăsați ↻.",
   "Trending": "Trending",
   "Tuning in to {name}": "Conectați-vă la {name}",
   "Tuning in to {name}…": "Vă acordați {name} …",
@@ -2662,7 +2657,6 @@
   "Zoom out": "Micșorați",
   "headphones": "căștile",
   "mic": "microfon",
-  "no answer": "nici un raspuns",
   "only you hear the radio: press “Send” below so others hear it too": "doar tu auzi radioul: apasă pe „Trimite” de mai jos pentru ca și alții să-l audă",
   "others hear it": "alții o aud",
   "sending": "trimitere",
@@ -3330,5 +3324,11 @@
   "the download failed": "descărcarea a eșuat",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done} din {total} MB",
-  "Click to try again": "Dă clic ca să încerci din nou"
+  "Click to try again": "Dă clic ca să încerci din nou",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Lista posturilor de radio nu poate fi accesată. Verifică-ți internetul sau încearcă din nou puțin mai târziu.",
+  "Press Enter to search again.": "Apasă Enter ca să cauți din nou.",
+  "Press ↻ to try again.": "Apasă ↻ ca să încerci din nou.",
+  "That station isn't on the air right now. Try another one.": "Postul ăsta nu emite acum. Încearcă altul.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radioul nu merge acum. Nu e vina ta: serverul cu lista de posturi nu funcționează. Încearcă din nou puțin mai târziu.",
+  "This station points into your home network, so it isn't played.": "Postul ăsta trimite spre rețeaua ta de acasă, așa că nu e redat."
 }

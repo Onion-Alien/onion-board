@@ -2538,8 +2538,6 @@
   "Add the selected station to Favorites": "Idagdag ang napiling istasyon sa Mga Paborito",
   "Add to Favorites": "Idagdag sa Mga Paborito",
   "All countries": "Lahat ng bansa",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Hindi maabot ang direktoryo ng istasyon ( {error} ), pindutin ang ↻ upang subukang muli.",
-  "Can't reach the station directory, press ↻ to try again.": "Hindi maabot ang direktoryo ng istasyon, pindutin ang ↻ upang subukang muli.",
   "Chill": "Chill-out na musika",
   "Classical": "Classical",
   "Clear filters": "I-clear ang mga filter",
@@ -2589,7 +2587,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "I-save ang huling {n} segundo ng radyo bilang tunog",
   "Saved a {secs}s clip to your Sounds.": "Nag-save ng {secs} s clip sa iyong Sounds.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Nabigo ang paghahanap ( {error} ). Suriin ang iyong koneksyon at pindutin ang Enter upang subukang muli.",
   "Search failed: press Enter to try again.": "Nabigo ang paghahanap: pindutin ang Enter upang subukang muli.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Maghanap sa mga istasyon ng radyo, genre, bansa o lungsod... (o mag-click ng tuldok sa mapa)",
   "Searching…": "Naghahanap…",
@@ -2599,8 +2596,6 @@
     "Na-update ang listahan ng istasyon: {n} istasyon.",
     "Na-update ang listahan ng istasyon: {n} istasyon."
   ],
-  "That station isn't working ({error}). Try another one.": "Hindi gumagana ang istasyong iyon ( {error} ). Subukan ang isa pa.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Hindi maabot ang direktoryo ng istasyon sa ngayon. Suriin ang iyong koneksyon at pindutin ang ↻.",
   "Trending": "Trending",
   "Tuning in to {name}": "Nag-tune in kay {name}",
   "Tuning in to {name}…": "Nag-tune in kay {name} ...",
@@ -2608,7 +2603,6 @@
   "Zoom out": "Mag-zoom out",
   "headphones": "mga headphone",
   "mic": "mic",
-  "no answer": "walang sagot",
   "only you hear the radio: press “Send” below so others hear it too": "ikaw lang ang nakakarinig ng radyo: pindutin ang “Send” sa ibaba para marinig din ito ng iba",
   "others hear it": "naririnig ito ng iba",
   "sending": "nagpapadala",
@@ -3257,5 +3251,11 @@
   "the download failed": "pumalya ang download",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done} sa {total} MB",
-  "Click to try again": "I-click para subukan ulit"
+  "Click to try again": "I-click para subukan ulit",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Hindi maabot ang listahan ng mga radio station. Tingnan ang internet mo, o subukan ulit mamaya.",
+  "Press Enter to search again.": "Pindutin ang Enter para maghanap ulit.",
+  "Press ↻ to try again.": "Pindutin ang ↻ para subukan ulit.",
+  "That station isn't on the air right now. Try another one.": "Hindi naka-ere ang istasyong iyan ngayon. Sumubok ng iba.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Down ang radio ngayon. Hindi ikaw ang may problema: hindi gumagana ang server ng listahan ng istasyon. Subukan ulit mamaya.",
+  "This station points into your home network, so it isn't played.": "Tumuturo ang istasyong ito sa home network mo, kaya hindi ito pinapatugtog."
 }

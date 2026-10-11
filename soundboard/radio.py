@@ -47,6 +47,7 @@ from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaDat
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
 from soundboard import library, net, netlog, quality
+from soundboard.i18n import _
 from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
@@ -479,6 +480,28 @@ def parse_stations(raw: bytes | str) -> list[Station]:
 
 # --------------------------------------------------------------------------- directory
 
+def _server_down(status) -> bool:
+    """An HTTP answer saying the directory itself is down or overloaded (not you)."""
+    return isinstance(status, int) and (status >= 500 or status == 429)
+
+
+# What the Radio tab says when something isn't working: plain words, never Qt's or
+# FFmpeg's (those name the whole address and are logged instead). Functions: the
+# language is picked after this module is imported.
+def directory_down() -> str:
+    return _("The radio is down right now. It's not you: the station list's server "
+             "isn't working. Try again in a little while.")
+
+
+def directory_unreachable() -> str:
+    return _("Can't reach the radio station list. Check your internet, or try again in "
+             "a little while.")
+
+
+def station_off_air() -> str:
+    return _("That station isn't on the air right now. Try another one.")
+
+
 def _refused(url: str) -> str:
     """Radio switched off (or Offline mode): `url` listed as blocked in Network
     activity (netlog), as a connection refused before anything was looked up. The
@@ -592,19 +615,27 @@ class RadioDirectory(QObject):
         def finished():
             reply.deleteLater()
             if reply.error() != QNetworkReply.NetworkError.NoError:
-                retry(net.explain(reply.errorString(), started))
+                status = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
+                # the relay's own 502 is "couldn't connect", not the directory being down
+                ours = reply.hasRawHeader(net.RELAY_HEADER)
+                retry(f"{reply.errorString()} (HTTP {status}{', relay' if ours else ''})",
+                      net.last_failure(started) or (
+                          directory_down() if _server_down(status) and not ours
+                          else directory_unreachable()))
                 return
             raw = reply.readAll().data()
             # a maintenance page or a captive portal, say, raises in parse
             self._off_thread(lambda: parse(raw), done, lambda: retry(
-                "the directory sent something that isn't station data"))
+                "the directory sent something that isn't station data", directory_down()))
 
-        def retry(err):
+        def retry(err, words):
+            """`err` for the log (Qt's words, with the address); `words` for people."""
             if attempt + 1 < len(self.bases):
                 log.info("radio directory %s failed (%s); trying another mirror", base, err)
                 self._get(path, done, fail, attempt + 1, parse)
             else:
-                fail(err)
+                log.warning("radio directory %s failed (%s), the last mirror", base, err)
+                fail(words)
         reply.finished.connect(finished)
         return reply
 
@@ -946,7 +977,7 @@ class RadioPlayer(QObject):
                     self.station.url)
         self.station = None
         self._set_state("error")
-        self.error.emit("this station points into your home network, so it isn't played")
+        self.error.emit(_("This station points into your home network, so it isn't played."))
 
     def _open(self):
         self._got_audio = False
@@ -970,8 +1001,7 @@ class RadioPlayer(QObject):
             log.info("radio: stopped, it was switched off")
             self.stop()
             self._set_state("error")
-            self.error.emit(net.off_message(FEATURE) if net.offline() else
-                            "Radio was switched off in Settings > Privacy & security.")
+            self.error.emit(net.off_message(FEATURE))
             return
         if net.generation() != self._conn:   # the connection itself changed, not a switch
             self._conn = net.generation()
@@ -1105,13 +1135,16 @@ class RadioPlayer(QObject):
             gen = self._gen
             QTimer.singleShot(delay, lambda: self._reopen(gen))
             return
+        url = self.station.url if self.station is not None else ""
         self.station = None
         self._reconnecting = False
         self._watch.stop()
         if self._player is not None:
             self._player.stop()
         self._set_state("error")
-        self.error.emit(net.explain(msg, self._opened))
+        log.warning("radio: gave up on %s (%s)", url, msg)
+        # the proxy's / a switch's reason if that's what failed it, else plain words
+        self.error.emit(net.last_failure(self._opened) or station_off_air())
 
     def _reopen(self, gen: int):
         if gen != self._gen or self.station is None:

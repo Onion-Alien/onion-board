@@ -2485,8 +2485,6 @@
   "Add the selected station to Favorites": "将所选电台添加到收藏夹",
   "Add to Favorites": "添加到收藏夹",
   "All countries": "所有国家",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "无法到达电台目录 ( {error} )，按 ↻ 重试。",
-  "Can't reach the station directory, press ↻ to try again.": "无法访问电台目录，按 ↻ 重试。",
   "Chill": "放松音乐",
   "Classical": "古典",
   "Clear filters": "清除过滤器",
@@ -2536,7 +2534,6 @@
   "Rock": "摇滚",
   "Save the last {n} seconds of the radio as a sound": "将收音机的最后{n}秒保存为声音",
   "Saved a {secs}s clip to your Sounds.": "已将{secs}秒剪辑保存到您的声音中。",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "搜索失败（ {error} ）。检查您的连接并按 Enter 键重试。",
   "Search failed: press Enter to try again.": "搜索失败：按 Enter 键重试。",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "搜索广播电台、流派、国家或城市……（或单击地图上的点）",
   "Searching…": "正在寻找...",
@@ -2545,8 +2542,6 @@
   "Station list updated: {n} station.": [
     "电台列表已更新： {n}电台。"
   ],
-  "That station isn't working ({error}). Try another one.": "该站不工作（ {error} ）。尝试另一个。",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "目前无法访问车站目录。检查您的连接并按 ↻。",
   "Trending": "流行趋势",
   "Tuning in to {name}": "收听{name}",
   "Tuning in to {name}…": "正在收听{name} …",
@@ -2554,7 +2549,6 @@
   "Zoom out": "缩小",
   "headphones": "耳机",
   "mic": "麦克风",
-  "no answer": "没有答案",
   "only you hear the radio: press “Send” below so others hear it too": "只有您能听到广播：按下面的“发送”，以便其他人也能听到",
   "others hear it": "其他人听到",
   "sending": "发送",
@@ -3184,5 +3178,11 @@
   "the download failed": "下载失败",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done} / {total} MB",
-  "Click to try again": "点击重试"
+  "Click to try again": "点击重试",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "连不上电台列表。检查一下网络，或者过一会儿再试试。",
+  "Press Enter to search again.": "按 Enter 重新搜索。",
+  "Press ↻ to try again.": "按 ↻ 重试。",
+  "That station isn't on the air right now. Try another one.": "这个电台现在没在播。换一个试试。",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "电台现在挂了。不是你的问题：电台列表的服务器出故障了。过一会儿再试试。",
+  "This station points into your home network, so it isn't played.": "这个电台指向你的家庭网络，所以不会播放。"
 }

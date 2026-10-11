@@ -2538,8 +2538,6 @@
   "Add the selected station to Favorites": "Lägg till den valda stationen i Favoriter",
   "Add to Favorites": "Lägg till i Favoriter",
   "All countries": "Alla länder",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "Kan inte nå stationskatalogen ( {error} ), tryck på ↻ för att försöka igen.",
-  "Can't reach the station directory, press ↻ to try again.": "Kan inte nå stationskatalogen, tryck på ↻ för att försöka igen.",
   "Chill": "Chill-out musik",
   "Classical": "Klassisk",
   "Clear filters": "Rensa filter",
@@ -2589,7 +2587,6 @@
   "Rock": "Rock",
   "Save the last {n} seconds of the radio as a sound": "Spara de sista {n} sekunderna av radion som ett ljud",
   "Saved a {secs}s clip to your Sounds.": "Sparade ett {secs} s klipp till dina ljud.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "Sökningen misslyckades ( {error} ). Kontrollera din anslutning och tryck på Enter för att försöka igen.",
   "Search failed: press Enter to try again.": "Sökningen misslyckades: tryck på Enter för att försöka igen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Sök efter radiostationer, genrer, länder eller städer... (eller klicka på en prick på kartan)",
   "Searching…": "Sökande…",
@@ -2599,8 +2596,6 @@
     "Stationslistan uppdaterad: {n} station.",
     "Stationslistan uppdaterad: {n} stationer."
   ],
-  "That station isn't working ({error}). Try another one.": "Den stationen fungerar inte ( {error} ). Prova en annan.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "Stationskatalogen kan inte nås just nu. Kontrollera din anslutning och tryck på ↻.",
   "Trending": "Trendigt",
   "Tuning in to {name}": "Ställer in på {name}",
   "Tuning in to {name}…": "Ställer in på {name} …",
@@ -2608,7 +2603,6 @@
   "Zoom out": "Zooma ut",
   "headphones": "hörlurar",
   "mic": "mikrofon",
-  "no answer": "inget svar",
   "only you hear the radio: press “Send” below so others hear it too": "bara du hör radion: tryck på \"Skicka\" nedan så att andra också hör den",
   "others hear it": "andra hör det",
   "sending": "sändning",
@@ -3257,5 +3251,11 @@
   "the download failed": "nedladdningen misslyckades",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{done} av {total} MB",
-  "Click to try again": "Klicka för att försöka igen"
+  "Click to try again": "Klicka för att försöka igen",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "Kan inte nå listan över radiostationer. Kolla ditt internet, eller försök igen om en liten stund.",
+  "Press Enter to search again.": "Tryck på Enter för att söka igen.",
+  "Press ↻ to try again.": "Tryck på ↻ för att försöka igen.",
+  "That station isn't on the air right now. Try another one.": "Den stationen sänder inte just nu. Prova en annan.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "Radion ligger nere just nu. Det är inte du: servern med stationslistan fungerar inte. Försök igen om en liten stund.",
+  "This station points into your home network, so it isn't played.": "Den här stationen pekar in i ditt hemnätverk, så den spelas inte."
 }

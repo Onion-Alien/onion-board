@@ -424,6 +424,7 @@ class Server:
                                          country="Brazil", geo_lat=None, geo_long=None))
         self.audio = wav_bytes()
         self.slow_over, self.slow_s = 10 ** 9, 0.0   # map lists past slow_over: slow_s late
+        self.down = False   # the directory answers 503 (Radio Browser does, now and then)
         srv = self
 
         class H(http.server.BaseHTTPRequestHandler):
@@ -432,6 +433,9 @@ class Server:
 
             def do_GET(self):
                 srv.hits.append(self.path)
+                if srv.down and self.path.startswith("/json/"):
+                    self.send_error(503)
+                    return
                 if self.path.startswith("/stream.wav"):
                     body, kind = srv.audio, "audio/wav"
                 elif self.path.startswith("/json/stations/search"):
@@ -559,6 +563,23 @@ def test_directory_falls_back_to_a_stale_cache_then_reports(qapp, tmp_path):
     d.globe_ready.connect(got.append)
     d.load_globe(force=True)
     assert process_events(qapp, lambda: got) and got[0][0].uuid == "uuid-1"
+
+
+def test_a_directory_problem_is_said_in_plain_words(qapp, server, tmp_path):
+    """Radio Browser down (503) is "the radio is down, it's not you"; no answer at all
+    is "can't reach it". Never Qt's words with the whole address in them."""
+    server.down = True
+    for bases, want in (((server.base, server.base), radio.directory_down()),
+                        ((dead_base(),), radio.directory_unreachable())):
+        d = RadioDirectory(tmp_path / str(len(bases)), bases=bases)
+        fails = []
+        d.failed.connect(lambda kind, msg, fails=fails: fails.append((kind, msg)))
+        d.load_globe()
+        d.search("rock")
+        assert process_events(qapp, lambda fails=fails: len(fails) >= 2)
+        assert {k for k, _m in fails} == {"globe", "search"}
+        assert all(m == want for _k, m in fails), fails
+        assert not any("http" in m or "127.0.0.1" in m or "503" in m for _k, m in fails)
 
 
 def test_a_day_old_station_list_shows_at_once_and_is_refreshed_behind_it(
@@ -967,8 +988,11 @@ def test_tab_reports_a_playing_station_for_the_live_dot(tab, server):
     tab.stop()                                    # already stopped: nothing new
     assert seen == [True, True, False]
     tab.play(s)
-    tab.player._retry("the station didn't answer")   # the player gives the station up
+    errors = []
+    tab.player.error.connect(errors.append)
+    tab.player._retry("Could not open http://127.0.0.1/stream")   # the player gives it up
     assert seen[-2:] == [True, False] and not tab.is_active()
+    assert errors == [radio.station_off_air()]   # plain words, never FFmpeg's
 
 
 def test_tab_favorites_are_saved(tab):
@@ -1033,13 +1057,14 @@ def test_tab_takes_results_for_a_query_cut_to_the_search_limit(tab):
 def test_tab_keeps_a_directory_failure_up_until_a_reload_works(tab):
     stations = tab._globe_list
     tab._globe_list = []
-    tab._on_failed("globe", "no route")
-    assert "press ↻" in tab.list.item(0).text() and "press ↻" in tab.info.text()
+    tab._on_failed("globe", radio.directory_unreachable())
+    assert "press ↻" in tab.list.item(0).text().lower()
+    assert "press ↻" in tab.info.text().lower()
     tab._flash_until = 0.0
     tab._refresh_info()                          # later refreshes keep saying so
-    assert "press ↻" in tab.info.text() and "Finding" not in tab.info.text()
+    assert "press ↻" in tab.info.text().lower() and "Finding" not in tab.info.text()
     tab._on_globe_stations(stations)
-    assert "press ↻" not in tab.info.text() and tab.list.count() == 5
+    assert "press ↻" not in tab.info.text().lower() and tab.list.count() == 5
 
 
 def test_tab_filters_by_genre_country_and_quality(tab):
@@ -1446,6 +1471,25 @@ def test_a_click_on_a_station_plays_it_and_the_bar_shows_what_plays(qapp, tab, s
 
 def test_a_station_error_is_an_error_card_that_stays(tab):
     from soundboard.ui import toast
-    tab._on_error("404")
-    [t] = [t for t in toast.shown(tab) if "isn't working" in t.words()]
+    tab._on_error(radio.station_off_air())
+    [t] = [t for t in toast.shown(tab) if "isn't on the air" in t.words()]
     assert t.kind == "error"   # errors stay until closed
+
+
+def test_the_radio_being_down_is_sad_bun_on_the_map_and_plain_words(tab):
+    """Radio Browser down: Bun is sad on the map with the reason, the line under the
+    list says it too, and nothing shows an address."""
+    tab._globe_list = []              # none saved either: the map has nothing to show
+    tab._on_failed("globe", radio.directory_down())   # no map (a narrow tab): the list says it
+    said = tab.list.item(0).text()
+    assert said.startswith(radio.directory_down()) and "↻" in said and "http" not in said
+    tab._make_flat()                  # the map: sad Bun says it, once
+    text = tab.info.text()
+    assert "↻" in text and "http" not in text
+    if tab._map_says_it():            # (this tab's map area is hidden: then the list does)
+        assert radio.directory_down() not in text + tab.list.item(0).text()
+    card = tab.flat._loading
+    assert tab.flat._msg == radio.directory_down() and card.label.text() == tab.flat._msg
+    assert card.isVisibleTo(tab.flat) and card.bun.sad > 0.5 and not card._notes.isActive()
+    tab.flat.set_points([{"id": "u", "lo": 0.0, "la": 0.0, "k": 1}])
+    assert not card.isVisibleTo(tab.flat) and card.bun.sad == 0.0   # stations: happy again

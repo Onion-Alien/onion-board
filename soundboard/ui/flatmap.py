@@ -113,9 +113,31 @@ class _Loading(QFrame):
         self._notes = QTimer(self)
         self._notes.setInterval(700)
         self._notes.timeout.connect(lambda: self.bun.burst(2))
+        self.problem = ""
+
+    def set_problem(self, text: str):
+        """Something's wrong (the station list can't be had): sad Bun, no music notes,
+        and the words; "" is Bun tuning in again."""
+        self.problem = text
+        self.bun.sad = self.bun._home_sad = 0.85 if text else 0.0
+        # nothing to listen to: headphones off (their drawing has a note by the ear)
+        self.bun.prop = None if text else "headphones"
+        self.label.setText(text or LOADING_TEXT)
+        # about three lines for a problem, two for "Tuning in…" (as in __init__)
+        wide = self.label.fontMetrics().horizontalAdvance(text or LOADING_TEXT)
+        self.label.setFixedWidth(min(340, max(150, wide * (36 if text else 55) // 100)))
+        if text:
+            self._notes.stop()
+            self.bun.notes.clear()   # no music floating round a sad Bun
+            self.bun.update()
+        elif self.isVisible():
+            self._notes.start()
+        self.adjustSize()
 
     def showEvent(self, e):
         super().showEvent(e)
+        if self.problem:
+            return
         self.bun.burst(3)
         self._notes.start()
 
@@ -263,6 +285,7 @@ class FlatMap(QWidget):
         self._hover = -1
         if pts:
             self._msg = ""
+            self._loading.set_problem("")
             self._loading.hide()
         if first:
             # the map fills up: the most listened first, the rest in a shuffled wave
@@ -322,15 +345,19 @@ class FlatMap(QWidget):
         self.update()
 
     def show_message(self, text: str):
+        """Why there are no stations (the list can't be fetched): sad Bun says it, in
+        his card; "" takes it away."""
         self._msg = text
-        if text:
-            self._loading.hide()
+        self._loading.set_problem(text)
+        self._loading.setVisible(bool(text) or (self._loading.isVisibleTo(self)
+                                                and not self._points))
+        self._place_loading()
         self.update()
 
     def set_loading(self, on: bool):
         """Bun waiting on the map for the stations (on from the start; the first
-        stations or a message take him away)."""
-        self._loading.setVisible(on and not self._points and not self._msg)
+        stations take him away). A message keeps him there, sad."""
+        self._loading.setVisible(bool(self._msg) or (on and not self._points))
         self._place_loading()
 
     def set_theme(self, *_):
@@ -963,15 +990,6 @@ class FlatMap(QWidget):
                 p.setPen(QPen(QColor(t["bg"]), 1.5))
                 p.setBrush(hot)
                 p.drawEllipse(c, 5, 5)
-        if self._msg:   # on a card of its own, not over the country names
-            area = QRectF(self.rect().adjusted(24, 24, -24, -24))
-            flags = Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap
-            box = p.boundingRect(area, flags, self._msg).adjusted(-14, -8, 14, 8)
-            p.setPen(QPen(QColor(t["border"]), 1))
-            p.setBrush(QColor(t["card"]))
-            p.drawRoundedRect(box, 8, 8)
-            p.setPen(QColor(t["text"]))
-            p.drawText(area, flags, self._msg)
 
     # ------------------------------------------------------------------ input
     def _hit(self, pos: QPointF) -> int:

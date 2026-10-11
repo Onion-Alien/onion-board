@@ -2485,8 +2485,6 @@
   "Add the selected station to Favorites": "선택한 방송국을 즐겨찾기에 추가",
   "Add to Favorites": "즐겨찾기에 추가",
   "All countries": "제국",
-  "Can't reach the station directory ({error}), press ↻ to try again.": "방송국 디렉토리에 연결할 수 없습니다( {error} ). 다시 시도하려면 ↻를 누르세요.",
-  "Can't reach the station directory, press ↻ to try again.": "방송국 디렉토리에 연결할 수 없습니다. 다시 시도하려면 ↻를 누르세요.",
   "Chill": "편안한 음악",
   "Classical": "클래식",
   "Clear filters": "필터 지우기",
@@ -2536,7 +2534,6 @@
   "Rock": "록",
   "Save the last {n} seconds of the radio as a sound": "라디오의 마지막 {n} 초를 소리로 저장",
   "Saved a {secs}s clip to your Sounds.": "{secs} 개의 클립을 사운드에 저장했습니다.",
-  "Search failed ({error}). Check your connection and press Enter to try again.": "검색에 실패했습니다( {error} ). 연결을 확인하고 Enter를 눌러 다시 시도하세요.",
   "Search failed: press Enter to try again.": "검색 실패: 다시 시도하려면 Enter를 누르세요.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "라디오 방송국, 장르, 국가 또는 도시를 검색하세요… (또는 지도에서 점을 클릭하세요)",
   "Searching…": "수색…",
@@ -2545,8 +2542,6 @@
   "Station list updated: {n} station.": [
     "업데이트된 역 목록: {n} 개 역."
   ],
-  "That station isn't working ({error}). Try another one.": "해당 방송국이 작동하지 않습니다( {error} ). 다른 것을 시도해 보세요.",
-  "The station directory can't be reached right now. Check your connection and press ↻.": "지금은 방송국 디렉토리에 접속할 수 없습니다. 연결 상태를 확인하고 ↻를 누르세요.",
   "Trending": "인기 급상승",
   "Tuning in to {name}": "{name} 채널을 듣는 중입니다",
   "Tuning in to {name}…": "{name} 채널을 듣는 중…",
@@ -2554,7 +2549,6 @@
   "Zoom out": "축소",
   "headphones": "헤드폰",
   "mic": "마이크",
-  "no answer": "대답이 없다",
   "only you hear the radio: press “Send” below so others hear it too": "라디오는 나만 들을 수 있습니다. 다른 사람도 들을 수 있도록 아래의 '보내기'를 누르세요.",
   "others hear it": "다른 사람들도 그걸 듣고",
   "sending": "배상",
@@ -3184,5 +3178,11 @@
   "the download failed": "다운로드 실패",
   "{done} MB": "{done} MB",
   "{done} of {total} MB": "{total} MB 중 {done} MB",
-  "Click to try again": "클릭해서 다시 시도"
+  "Click to try again": "클릭해서 다시 시도",
+  "Can't reach the radio station list. Check your internet, or try again in a little while.": "라디오 방송국 목록에 연결할 수 없습니다. 인터넷을 확인하거나 잠시 후 다시 시도하세요.",
+  "Press Enter to search again.": "다시 검색하려면 Enter를 누르세요.",
+  "Press ↻ to try again.": "다시 시도하려면 ↻를 누르세요.",
+  "That station isn't on the air right now. Try another one.": "그 방송국은 지금 방송 중이 아닙니다. 다른 방송국을 시도해 보세요.",
+  "The radio is down right now. It's not you: the station list's server isn't working. Try again in a little while.": "지금 라디오가 안 됩니다. 사용자 문제가 아니에요: 방송국 목록 서버가 작동하지 않습니다. 잠시 후 다시 시도하세요.",
+  "This station points into your home network, so it isn't played.": "이 방송국은 홈 네트워크를 가리키므로 재생하지 않습니다."
 }
