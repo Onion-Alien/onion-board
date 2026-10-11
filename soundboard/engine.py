@@ -1126,6 +1126,8 @@ class Engine:
         self._mic_pow = [0.0, 0.0]   # each mic channel's recent power (_mic_channels)
         self._mic_dead: int | None = None   # the mic channel found dead, if one is
         self._mon_fed = False        # the mic wrote to ring_mon last block (mic check)
+        self._mon_path = (False, False, False)   # what _mon played last block (see there)
+        self._mon_ramp = False       # _mon's send stage starts from silence next block
         self._obs_fed = False        # ...and to ring_obs (your voice on the stream output)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
         # Record a sound: the mic's blocks while set to a list (start_mic_take); the UI
@@ -2430,8 +2432,22 @@ class Engine:
         # (mic_only): just your voice, no sounds
         voice = self.mic_check and self.mic_only()
         check = self.mic_check and self.sending or voice
-        if check and self.mon_voice_only:
-            self._mon_voice(outdata, frames)
+        path = (check, voice, check and self.mon_voice_only)
+        # Switching what the headphones hear (Hear what they hear on or off): this block
+        # still plays the old way, faded out, and the new way fades in from silence
+        # next block. Jumping straight from one to the other (stereo to the mono send,
+        # in and out of the limiter's delay) clicked, and clicking the button over and
+        # over while a sound played made a buzz.
+        fade = path != self._mon_path
+        if fade:
+            check, voice, _ = self._mon_path
+            if path[0] and not check:   # the limiter's delay still holds the end of
+                self._send.pop(("mon", "Limiter"), None)   # last time: start it empty
+                self._mon_ramp = True   # ...and what goes in from silence (below)
+            path, self._mon_path = self._mon_path, path
+        out_vol = 0.0 if fade else self.mon_vol
+        if path[2]:
+            self._mon_voice(outdata, frames, out_vol)
             return
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
@@ -2477,7 +2493,7 @@ class Engine:
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
         if idle:   # silence all the way: only the volume's glide and the limiter to keep
             self._bus_quiet("mon", mix, silent=True)
-            self._glides[("mon", "out")] = float(self.mon_vol)
+            self._glides[("mon", "out")] = float(out_vol)
             y = self._stage("mon", SafetyLimiter).silence(frames)
             if y is None:
                 outdata.fill(0)
@@ -2488,16 +2504,19 @@ class Engine:
             finite(mix)
             if check:   # you hear what others get: the same send stage, your mic in it
                 mix = self._send_bus("mon", mix, m)
+                if self._mon_ramp:   # an empty limiter starts with its delay of silence
+                    self._mon_ramp = False
+                    mix = mix * np.linspace(0.0, 1.0, len(mix), dtype=np.float32)[:, None]
                 if self.limiter_on:
                     mix = self._stage("mon", Limiter).process(mix)
             elif not self._bus_quiet("mon", mix):
                 mix = self._dest("mon", self._eq("mon", "sounds", mix))
-            mix = self._vol("mon", "out", mix, self.mon_vol)
+            mix = self._vol("mon", "out", mix, out_vol)
             mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
-    def _mon_voice(self, outdata, frames):
+    def _mon_voice(self, outdata, frames, out_vol: float | None = None):
         """Hear my voice: your changed voice alone in your headphones (previews still
         play), to tune a voice without your sounds over it."""
         mix = self._sounds("mon", frames, previews_only=True, makeup=False)   # no _dest here
@@ -2508,7 +2527,7 @@ class Engine:
         if m is not None:
             on = self.mic_enabled and not self.mic_muted
             mix += self._vol("mon", "mic", m, self.mic_vol if on else 0.0)
-        mix = self._vol("mon", "out", finite(mix), self.mon_vol)
+        mix = self._vol("mon", "out", finite(mix), self.mon_vol if out_vol is None else out_vol)
         mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)

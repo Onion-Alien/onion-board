@@ -3154,6 +3154,9 @@
     "{n} zvuků už je v knihovně"
   ],
   "Open Triggers": "Otevřít Spouštěče",
+  "Copy into library": "Kopírovat do knihovny",
+  "Local sounds": "Místní zvuky",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Vypnuto: odkaz na původní soubor. Zapněte pro zachování zvuků, pokud je původní soubor přesunut, smazán nebo na odpojeném disku. Zabere více místa. Platí jen pro nově přidané místní soubory.",
   "Audio recovery": "Obnovení zvuku",
   "Clean reinstall": "Čistá instalace",
   "Fix problems sending sounds into your mic after an update.": "Oprav problémy s posíláním zvuků do mikrofonu po aktualizaci.",
@@ -3176,5 +3179,17 @@
     "Přidán {n} klip do vašich zvuků",
     "Klipy přidané do vašich zvuků: {n}"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ zkopírováno: Ctrl+V jej vloží do editoru nebo na kartu Zvuky"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ zkopírováno: Ctrl+V jej vloží do editoru nebo na kartu Zvuky",
+  "Keep": "Ponechat",
+  "Keep your imported sounds?": "Ponechat importované zvuky?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z tvých jiných soundboardů: <b>{n}</b>. Ponechat je?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?",
+    "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?"
+  ]
 }

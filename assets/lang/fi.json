@@ -3084,6 +3084,9 @@
     "{n} ääntä on jo kirjastossasi"
   ],
   "Open Triggers": "Avaa Laukaisimet",
+  "Copy into library": "Kopioi kirjastoon",
+  "Local sounds": "Paikalliset äänet",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Pois: linkitä alkuperäiseen tiedostoon. Ota käyttöön, jotta äänet säilyvät, jos alkuperäinen siirretään, poistetaan tai on irrotetulla asemalla. Vie lisää levytilaa. Koskee vain uusia paikallisia tuonteja.",
   "Audio recovery": "Äänen palautus",
   "Clean reinstall": "Puhdas uudelleenasennus",
   "Fix problems sending sounds into your mic after an update.": "Korjaa päivityksen jälkeiset ongelmat äänten lähettämisessä mikrofoniin.",
@@ -3106,5 +3109,15 @@
     "{n} leike lisätty ääniisi",
     "{n} leikettä lisätty ääniisi"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "”{name}” kopioitu: Ctrl+V liittää sen editoriin tai Äänet-välilehdelle"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "”{name}” kopioitu: Ctrl+V liittää sen editoriin tai Äänet-välilehdelle",
+  "Keep": "Säilytä",
+  "Keep your imported sounds?": "Säilytetäänkö tuodut äänet?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Toimme <b>{n}</b> äänen muista soundboardeistasi. Säilytetäänkö se?",
+    "Toimme <b>{n}</b> ääntä muista soundboardeistasi. Säilytetäänkö ne?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Toimme <b>{n}</b> äänen sovelluksesta {name}. Säilytetäänkö se?",
+    "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
+  ]
 }

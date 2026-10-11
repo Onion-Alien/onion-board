@@ -3014,6 +3014,9 @@
     "{n} suara sudah ada di perpustakaan Anda"
   ],
   "Open Triggers": "Buka Pemicu",
+  "Copy into library": "Salin ke pustaka",
+  "Local sounds": "Suara lokal",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Nonaktif: tautkan ke file asli. Aktifkan agar suara tetap tersedia jika file asli dipindahkan, dihapus, atau berada di drive yang terputus. Memakai ruang disk tambahan. Hanya berlaku untuk impor lokal baru.",
   "Audio recovery": "Pemulihan audio",
   "Clean reinstall": "Instal ulang bersih",
   "Fix problems sending sounds into your mic after an update.": "Atasi masalah pengiriman suara ke mikrofon setelah pembaruan.",
@@ -3036,5 +3039,13 @@
     "{n} klip ditambahkan ke Suara kamu",
     "{n} klip ditambahkan ke Suara kamu"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menempelkannya di editor atau di tab Suara"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menempelkannya di editor atau di tab Suara",
+  "Keep": "Simpan",
+  "Keep your imported sounds?": "Simpan suara yang diimpor?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Kami memindahkan <b>{n}</b> suara dari soundboard lainmu. Simpan?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Kami memindahkan <b>{n}</b> suara dari {name}. Simpan?"
+  ]
 }

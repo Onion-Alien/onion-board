@@ -3084,6 +3084,9 @@
     "{n} suoni sono già nella tua raccolta"
   ],
   "Open Triggers": "Apri Trigger",
+  "Copy into library": "Copia nella libreria",
+  "Local sounds": "Suoni locali",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Disattivato: collega al file originale. Attiva per conservare i suoni se l’originale viene spostato, eliminato o si trova su un disco scollegato. Usa spazio aggiuntivo. Vale solo per le nuove importazioni locali.",
   "Audio recovery": "Ripristino audio",
   "Clean reinstall": "Reinstallazione pulita",
   "Fix problems sending sounds into your mic after an update.": "Risolvi i problemi di invio dei suoni al microfono dopo un aggiornamento.",
@@ -3106,5 +3109,15 @@
     "{n} clip aggiunta ai tuoi suoni",
     "{n} clip aggiunte ai tuoi suoni"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” copiato: Ctrl+V lo incolla in un editor o nella scheda Suoni"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” copiato: Ctrl+V lo incolla in un editor o nella scheda Suoni",
+  "Keep": "Tieni",
+  "Keep your imported sounds?": "Tenere i suoni importati?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Abbiamo portato <b>{n}</b> suono dalle tue altre soundboard. Lo tieni?",
+    "Abbiamo portato <b>{n}</b> suoni dalle tue altre soundboard. Li tieni?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Abbiamo portato <b>{n}</b> suono da {name}. Lo tieni?",
+    "Abbiamo portato <b>{n}</b> suoni da {name}. Li tieni?"
+  ]
 }

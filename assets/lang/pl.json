@@ -3154,6 +3154,9 @@
     "{n} dźwięków jest już w Twojej bibliotece"
   ],
   "Open Triggers": "Otwórz Wyzwalacze",
+  "Copy into library": "Kopiuj do biblioteki",
+  "Local sounds": "Lokalne dźwięki",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Wyłączone: odnośnik do oryginalnego pliku. Włącz, aby zachować dźwięki, gdy oryginał zostanie przeniesiony, usunięty lub jest na odłączonym dysku. Zajmuje dodatkowe miejsce. Dotyczy tylko nowych importów lokalnych.",
   "Audio recovery": "Odzyskiwanie dźwięku",
   "Clean reinstall": "Czysta instalacja",
   "Fix problems sending sounds into your mic after an update.": "Napraw problemy z wysyłaniem dźwięków do mikrofonu po aktualizacji.",
@@ -3176,5 +3179,17 @@
     "Dodano {n} klip do twoich dźwięków",
     "Klipy dodane do twoich dźwięków: {n}"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Skopiowano „{name}”: Ctrl+V wkleja go w edytorze lub na karcie Dźwięki"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Skopiowano „{name}”: Ctrl+V wkleja go w edytorze lub na karcie Dźwięki",
+  "Keep": "Zachowaj",
+  "Keep your imported sounds?": "Zachować zaimportowane dźwięki?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z twoich innych soundboardów: <b>{n}</b>. Zachować je?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?",
+    "Przeniesione dźwięki z {name}: <b>{n}</b>. Zachować je?"
+  ]
 }

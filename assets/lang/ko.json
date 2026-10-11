@@ -3014,6 +3014,9 @@
     "사운드 {n}개가 이미 라이브러리에 있어요"
   ],
   "Open Triggers": "트리거 열기",
+  "Copy into library": "라이브러리에 복사",
+  "Local sounds": "로컬 사운드",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "끄기: 원본 파일에 연결합니다. 원본이 이동 또는 삭제되거나 드라이브 연결이 끊겨도 사운드를 유지하려면 켜세요. 추가 디스크 공간을 사용합니다. 새 로컬 가져오기에만 적용됩니다.",
   "Audio recovery": "오디오 복구",
   "Clean reinstall": "완전히 재설치",
   "Fix problems sending sounds into your mic after an update.": "업데이트 후 마이크로 소리가 전송되지 않는 문제를 해결하세요.",
@@ -3036,5 +3039,13 @@
     "클립 {n}개를 사운드에 추가했어요",
     "클립 {n}개를 사운드에 추가했어요"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}”을(를) 복사했어요: Ctrl+V로 편집기나 사운드 탭에 붙여넣을 수 있어요"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}”을(를) 복사했어요: Ctrl+V로 편집기나 사운드 탭에 붙여넣을 수 있어요",
+  "Keep": "유지",
+  "Keep your imported sounds?": "가져온 사운드를 유지할까요?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "다른 사운드보드에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
+  ]
 }

@@ -3084,6 +3084,9 @@
     "{n} lyde er allerede i dit bibliotek"
   ],
   "Open Triggers": "Åbn Triggere",
+  "Copy into library": "Kopiér til biblioteket",
+  "Local sounds": "Lokale lyde",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Fra: link til originalfilen. Slå til for at beholde lydene, hvis originalen flyttes, slettes eller er på et frakoblet drev. Bruger ekstra diskplads. Gælder kun nye lokale importer.",
   "Audio recovery": "Lydgendannelse",
   "Clean reinstall": "Ren geninstallation",
   "Fix problems sending sounds into your mic after an update.": "Løs problemer med at sende lyde til din mikrofon efter en opdatering.",
@@ -3106,5 +3109,15 @@
     "{n} klip tilføjet til dine lyde",
     "{n} klip tilføjet til dine lyde"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopieret: Ctrl+V indsætter det i en editor eller på fanen Lyde"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopieret: Ctrl+V indsætter det i en editor eller på fanen Lyde",
+  "Keep": "Behold",
+  "Keep your imported sounds?": "Behold dine importerede lyde?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Vi hentede <b>{n}</b> lyd fra dine andre soundboards. Vil du beholde den?",
+    "Vi hentede <b>{n}</b> lyde fra dine andre soundboards. Vil du beholde dem?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Vi hentede <b>{n}</b> lyd fra {name}. Vil du beholde den?",
+    "Vi hentede <b>{n}</b> lyde fra {name}. Vil du beholde dem?"
+  ]
 }

@@ -3154,6 +3154,9 @@
     "{n} звуків уже у вашій бібліотеці"
   ],
   "Open Triggers": "Відкрити тригери",
+  "Copy into library": "Копіювати до бібліотеки",
+  "Local sounds": "Локальні звуки",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Вимкнено: посилання на вихідний файл. Увімкніть, щоб зберегти звуки, якщо оригінал переміщено, видалено або він на від’єднаному диску. Використовує додаткове місце. Лише для нових локальних імпортів.",
   "Audio recovery": "Відновлення звуку",
   "Clean reinstall": "Чисте перевстановлення",
   "Fix problems sending sounds into your mic after an update.": "Виправ проблеми з передаванням звуків у мікрофон після оновлення.",
@@ -3176,5 +3179,17 @@
     "{n} кліп додано до ваших звуків",
     "Кліпів додано до ваших звуків: {n}"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» скопійовано: Ctrl+V вставляє його в редактор або на вкладку «Звуки»"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "«{name}» скопійовано: Ctrl+V вставляє його в редактор або на вкладку «Звуки»",
+  "Keep": "Залишити",
+  "Keep your imported sounds?": "Залишити імпортовані звуки?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків з інших твоїх саундбордів: <b>{n}</b>. Залишити їх?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?",
+    "Перенесено звуків із {name}: <b>{n}</b>. Залишити їх?"
+  ]
 }

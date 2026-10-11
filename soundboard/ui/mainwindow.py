@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys, winpath, ytdl, ytworker
+from soundboard import bunny, theme, winkeys, winpath, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -457,6 +457,8 @@ class MainWindow(QMainWindow):
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self._pending_imports = 0
         self._imported_ok = 0
+        # boards the installer's ticked box brought over: asked once they're in
+        self._ask_keep: list[str] = []
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
@@ -5700,6 +5702,8 @@ class MainWindow(QMainWindow):
         self._pending_imports += count
         start = len(self.cfg.sounds)
         known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
+        copy_local = self.cfg.copy_local_sounds
+        local_files = set(files)   # ZIP extraction adds temporary files later
 
         def run():
             with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
@@ -5736,7 +5740,9 @@ class MainWindow(QMainWindow):
                         raise importreport.AlreadyAdded(known[fp])
                     x = extras.get(shown)   # from another soundboard: named as it was there
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
-                                             name=x.name if x is not None else "")
+                                             name=x.name if x is not None else "",
+                                             copy=copy_local or shown not in local_files
+                                             or library.owns(Path(f)))
                     if x is not None:
                         meta.name = x.name or meta.name
                         meta.tags = clean_tags(x.tags)
@@ -5802,6 +5808,9 @@ class MainWindow(QMainWindow):
         self._import_total = 0
         busy.set_busy(self.btn_add, False)
         self.triggers.import_done()   # a trigger's sound that failed to import
+        boards, self._ask_keep = self._ask_keep, []
+        if boards and ids and not self._keep_imported(boards, ids):
+            return
         if not n and not skipped:
             self.toast(_("Nothing new to add"), key="import")
             return
@@ -5815,6 +5824,32 @@ class MainWindow(QMainWindow):
         if short:
             self.toast(_("A sound you added is very short, so it may be barely "
                          "heard."), "warn")
+
+    def _keep_imported(self, boards: list[str], ids: list[str]) -> bool:
+        """The installer's box brought another soundboard's sounds over without asking:
+        ask now whether to keep them, so nobody has to delete a big board pad by pad.
+        False: they're removed (Undo and Recently deleted still have them)."""
+        text = (ngettext("We brought over <b>{n}</b> sound from {name}. Keep it?",
+                         "We brought over <b>{n}</b> sounds from {name}. Keep them?",
+                         len(ids), name=boards[0]) if len(boards) == 1 else
+                ngettext("We brought over <b>{n}</b> sound from your other soundboards. "
+                         "Keep it?",
+                         "We brought over <b>{n}</b> sounds from your other soundboards. "
+                         "Keep them?", len(ids)))
+        box = QMessageBox(QMessageBox.Question, _("Keep your imported sounds?"), text,
+                          QMessageBox.NoButton, self)
+        # Bun, smug: got your board and its settings in one go
+        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF(), smug=True))
+        keep = box.addButton(_("Keep"), QMessageBox.YesRole)
+        remove = box.addButton(_("Remove"), QMessageBox.NoRole)
+        box.setDefaultButton(keep)
+        box.setEscapeButton(keep)   # closing it never deletes anything
+        box.exec()
+        kept = box.clickedButton() is not remove   # closed some other way: kept
+        free_dialog(box)
+        if not kept:
+            self.remove_sounds(ids)
+        return kept
 
     def _show_skipped(self, skipped):
         dlg = importreport.SkippedDialog(skipped, self)
@@ -6293,8 +6328,10 @@ class MainWindow(QMainWindow):
         if not self._removed:
             return
         done, self._removed = self._removed, []
-        toastmod.close(self, UNDO_KEY)   # (Ctrl+Z, not its button: its card goes too)
         self._put_back(done)
+        # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
+        # on_close finds their pack still in use)
+        toastmod.close(self, UNDO_KEY)
 
     def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
         """Put removed sounds back on the board: (meta, the index it had, its audio or
@@ -6726,6 +6763,7 @@ class MainWindow(QMainWindow):
         note.unlink(missing_ok=True)
         for key in dict.fromkeys(keys):
             if (src := otherboards.by_key(key)) is not None:
+                self._ask_keep.append(src.name)
                 self.import_other(src, ask=False)
 
     def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
@@ -6905,6 +6943,7 @@ class MainWindow(QMainWindow):
         yes = box.addButton(_("Use the new ones"), QMessageBox.YesRole)
         keep = box.addButton(_("Keep mine"), QMessageBox.NoRole)
         box.setDefaultButton(keep)
+        box.setEscapeButton(keep)   # closing it never deletes anything
         box.setEscapeButton(keep)
         box.exec()
         clicked = box.clickedButton()

@@ -3084,6 +3084,9 @@
     "{n} ses zaten kitaplığınızda"
   ],
   "Open Triggers": "Tetikleyicileri aç",
+  "Copy into library": "Kitaplığa kopyala",
+  "Local sounds": "Yerel sesler",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Kapalı: özgün dosyaya bağlanır. Özgün dosya taşınırsa, silinirse veya bağlantısı kesilmiş bir sürücüdeyse sesleri korumak için açın. Ek disk alanı kullanır. Yalnızca yeni yerel içe aktarmalara uygulanır.",
   "Audio recovery": "Ses kurtarma",
   "Clean reinstall": "Temiz kurulum",
   "Fix problems sending sounds into your mic after an update.": "Güncellemeden sonra sesleri mikrofonuna gönderirken yaşanan sorunları düzelt.",
@@ -3106,5 +3109,15 @@
     "{n} klip seslerine eklendi",
     "{n} klip seslerine eklendi"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopyalandı: Ctrl+V onu bir düzenleyiciye veya Sesler sekmesine yapıştırır"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” kopyalandı: Ctrl+V onu bir düzenleyiciye veya Sesler sekmesine yapıştırır",
+  "Keep": "Sakla",
+  "Keep your imported sounds?": "İçe aktarılan sesler kalsın mı?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Diğer ses panolarından <b>{n}</b> ses getirdik. Kalsın mı?",
+    "Diğer ses panolarından <b>{n}</b> ses getirdik. Kalsınlar mı?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsın mı?",
+    "{name} uygulamasından <b>{n}</b> ses getirdik. Kalsınlar mı?"
+  ]
 }

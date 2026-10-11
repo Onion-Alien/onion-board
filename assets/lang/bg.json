@@ -3084,6 +3084,9 @@
     "{n} звука вече са в библиотеката ти"
   ],
   "Open Triggers": "Отвори Тригери",
+  "Copy into library": "Копиране в библиотеката",
+  "Local sounds": "Локални звуци",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Изключено: връзка към оригиналния файл. Включете, за да запазите звуците, ако оригиналът бъде преместен, изтрит или е на изключен диск. Използва допълнително място. Важи само за нови локални импорти.",
   "Audio recovery": "Възстановяване на звука",
   "Clean reinstall": "Чиста инсталация",
   "Fix problems sending sounds into your mic after an update.": "Отстрани проблеми с изпращането на звуци към микрофона след актуализация.",
@@ -3106,5 +3109,15 @@
     "Добавен е {n} клип към звуците ви",
     "Добавени са {n} клипа към звуците ви"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ е копиран: Ctrl+V го поставя в редактор или в раздела „Звуци“"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}“ е копиран: Ctrl+V го поставя в редактор или в раздела „Звуци“",
+  "Keep": "Запази",
+  "Keep your imported sounds?": "Да запазя ли внесените звуци?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Пренесохме <b>{n}</b> звук от другите ти саундбордове. Да го запазя ли?",
+    "Пренесохме <b>{n}</b> звука от другите ти саундбордове. Да ги запазя ли?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Пренесохме <b>{n}</b> звук от {name}. Да го запазя ли?",
+    "Пренесохме <b>{n}</b> звука от {name}. Да ги запазя ли?"
+  ]
 }

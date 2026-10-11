@@ -3014,6 +3014,9 @@
     "{n} âm thanh đã có trong thư viện của bạn"
   ],
   "Open Triggers": "Mở Kích hoạt",
+  "Copy into library": "Sao chép vào thư viện",
+  "Local sounds": "Âm thanh trên máy",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Tắt: liên kết đến tệp gốc. Bật để giữ âm thanh nếu tệp gốc bị di chuyển, xóa hoặc nằm trên ổ đĩa đã ngắt kết nối. Dùng thêm dung lượng đĩa. Chỉ áp dụng cho lần nhập tệp trên máy mới.",
   "Audio recovery": "Khôi phục âm thanh",
   "Clean reinstall": "Cài lại hoàn toàn",
   "Fix problems sending sounds into your mic after an update.": "Khắc phục lỗi gửi âm thanh vào mic sau khi cập nhật.",
@@ -3036,5 +3039,13 @@
     "Đã thêm {n} đoạn vào Âm thanh của bạn",
     "Đã thêm {n} đoạn vào Âm thanh của bạn"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Đã sao chép “{name}”: Ctrl+V dán vào trình chỉnh sửa hoặc thẻ Âm thanh"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Đã sao chép “{name}”: Ctrl+V dán vào trình chỉnh sửa hoặc thẻ Âm thanh",
+  "Keep": "Giữ lại",
+  "Keep your imported sounds?": "Giữ lại âm thanh đã nhập?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Đã chuyển <b>{n}</b> âm thanh từ các soundboard khác của bạn. Giữ lại không?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Đã chuyển <b>{n}</b> âm thanh từ {name}. Giữ lại không?"
+  ]
 }

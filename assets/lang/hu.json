@@ -3084,6 +3084,9 @@
     "{n} hang már a könyvtáradban van"
   ],
   "Open Triggers": "Triggerek megnyitása",
+  "Copy into library": "Másolás a könyvtárba",
+  "Local sounds": "Helyi hangok",
+  "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Kikapcsolva: hivatkozás az eredeti fájlra. Kapcsold be, hogy a hangok megmaradjanak, ha az eredetit áthelyezed, törlöd vagy leválasztott meghajtón van. Több tárhelyet használ. Csak az új helyi importokra vonatkozik.",
   "Audio recovery": "Hang helyreállítása",
   "Clean reinstall": "Tiszta újratelepítés",
   "Fix problems sending sounds into your mic after an update.": "Javítsd ki a hangok mikrofonba küldésének frissítés utáni hibáit.",
@@ -3106,5 +3109,15 @@
     "{n} klip hozzáadva a hangjaidhoz",
     "{n} klip hozzáadva a hangjaidhoz"
   ],
-  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” másolva: a Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra"
+  "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” másolva: a Ctrl+V beilleszti egy szerkesztőbe vagy a Hangok lapra",
+  "Keep": "Megtartás",
+  "Keep your imported sounds?": "Megtartod az importált hangokat?",
+  "We brought over <b>{n}</b> sound from your other soundboards. Keep it?": [
+    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod?",
+    "Áthoztunk <b>{n}</b> hangot a többi soundboardodról. Megtartod őket?"
+  ],
+  "We brought over <b>{n}</b> sound from {name}. Keep it?": [
+    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod?",
+    "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod őket?"
+  ]
 }
