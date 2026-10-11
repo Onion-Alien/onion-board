@@ -963,7 +963,7 @@ def mode_state(mw: MainWindow, full: bool = True) -> dict:
     p = profiles.current(d)
     out: dict[str, object] = {"mode": now.key, "mode_label": now.label, "simple": p.key,
            "simple_label": p.label,
-           "explain": profiles.explain(d, getattr(mw, "mode_why", ""))}
+           "explain": profiles.explain(d, getattr(mw, "mode_why", ""), english=True)}
     if full:
         out["modes"] = [{"key": m.key, "label": m.label, "note": m.note}
                         for m in destination.all_modes(d.get("custom"))]

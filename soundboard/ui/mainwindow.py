@@ -3549,8 +3549,8 @@ class MainWindow(QMainWindow):
         modes (soundboard.profiles) pick within their family from all of it; in
         Advanced, *Pick the mode by itself* switches to the one suggested."""
         key = self.voice_watch.poll() if self.voice_watch is not None else None
-        why = (_("The game you have open uses {engine} for voice chat",
-                 engine=voicesdk.NAMES.get(key, key))) if key else ""
+        why = i18n.keep_english(lambda: _("The game you have open uses {engine} for voice chat",
+                                          engine=voicesdk.NAMES.get(key, key))) if key else ""
         heard = ()
         if self.listeners is not None:
             heard = self.listeners.poll(self._heard_device())
@@ -3558,9 +3558,9 @@ class MainWindow(QMainWindow):
         # front, games on the cable (a per-program list would go first)
         apps = set(voicesdk.VOICE_APPS.values())
         def listening(name: str) -> str:
-            return (_("{name} is listening to your mic", name=name)
-                    if self.cfg.route == "mic" else
-                    _("{name} is listening to the virtual cable", name=name))
+            return i18n.keep_english(lambda: _("{name} is listening to your mic", name=name)
+                                     if self.cfg.route == "mic" else
+                                     _("{name} is listening to the virtual cable", name=name))
         hints = [profiles.Hint(h[0], listening(h[1]),
                                profiles.VOICE.key) for h in heard if h in apps]
         if key:
