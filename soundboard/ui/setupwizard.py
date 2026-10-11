@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QPushButton, QScrollArea, QSizePolicy,
                                QVBoxLayout, QWidget)
 
-from soundboard import directmic
+from soundboard import directmic, michelper
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
@@ -1266,7 +1266,9 @@ class SetupWizard(QDialog):
         if other_works:
             self.btn_attach.hide()
         self.btn_mic_instead.setVisible(other_works and not busy and not self.setup_show.on)
-        self.btn_attach.setText(_("Setting up… click Yes when Windows asks") if attaching
+        ask = michelper.will_ask()   # (the mic helper does it without Windows' prompt)
+        self.btn_attach.setText((_("Setting up… click Yes when Windows asks") if ask
+                                 else _("Setting up…")) if attaching
                                 else _("Repair (one click)") if directmic.needs_repair(state)
                                 else _("Put my sounds straight into my mic"))
         if self.setup_show.on and not attaching:
@@ -1279,8 +1281,8 @@ class SetupWizard(QDialog):
                     self._show_working()
                 else:
                     self.status_card.set_state("busy", _("Setting up"), _("Setting up…"))
-                    self.cable_status.setText(_("Click Yes when Windows asks.") if attaching
-                                              else "")
+                    self.cable_status.setText(_("Click Yes when Windows asks.")
+                                              if attaching and ask else "")
                 self.btn_cable.hide()
                 self.btn_recheck.hide()
                 self.btn_other.hide()
@@ -1293,11 +1295,15 @@ class SetupWizard(QDialog):
                                            _("Your mic needs a quick repair"))
                 self.cable_status.setText(_("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>, and Windows asks for "
-                                            "permission once."))
+                                            "permission once.") if ask else
+                                          _("Onion Board was on your mic but needs a quick "
+                                            "repair: <b>one click</b>."))
             else:
                 self.status_card.set_state("", _("Not set up"), _("Not set up yet"))
                 self.cable_status.setText(_("Windows asks for permission once, and your PC's "
-                                            "sound drops out for a second."))
+                                            "sound drops out for a second.") if ask else
+                                          _("Your PC's sound drops out for a second while "
+                                            "Windows reloads it."))
             # the other ways sit in their own card, not as buttons under the status
             self.btn_cable.hide()
             self.btn_other.hide()
