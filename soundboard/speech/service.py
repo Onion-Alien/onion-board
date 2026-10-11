@@ -27,6 +27,7 @@ import threading
 import time
 from pathlib import Path
 from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import soxr
@@ -49,7 +50,7 @@ class ServiceHost:
                  cwd: Path | None = None, log_path: Path | None = None, name: str = "module",
                  env: dict[str, str] | None = None,
                  on_audio: Callable[[bytes], None] | None = None,
-                 make_resampler: Callable[[int, int], object] | None = None):
+                 make_resampler: Callable[[int, int], Any] | None = None):
         """`make_resampler(src, dst)`: a streaming resampler (resample_chunk) for the
         mic -> 16 kHz; default soxr's HQ, which lets its output out in ~30 ms lumps (fine
         for speech recognition; the AI voice uses soundboard.speech.resample)."""
@@ -90,7 +91,7 @@ class ServiceHost:
             srv.close()
             raise RuntimeError(f"couldn't start {self.name}: {errors.plain(e)}") from e
         finally:
-            if out is not subprocess.DEVNULL:
+            if not isinstance(out, int):   # (DEVNULL is an int)
                 out.close()      # the child has its own handle
         log.info("started %s (pid %d): %s", self.name, self._proc.pid, " ".join(self.argv))
         threading.Thread(target=self._serve, args=(srv, token), name=f"{self.name}-reader",
@@ -215,6 +216,7 @@ class ServiceHost:
         _send_timeout(conn, SEND_TIMEOUT_S)
         self._sock = conn
         self.connected = True
+        assert hello is not None   # conn is only set with a good hello
         self.on_event(hello)
         threading.Thread(target=self._send_audio, args=(conn,), name=f"{self.name}-sender",
                          daemon=True).start()
@@ -244,7 +246,8 @@ class ServiceHost:
         self.on_event({"type": "stopped", "text": reason})
 
     def _send_audio(self, conn: socket.socket):
-        rs, rs_rate = None, 0
+        rs: Any = None
+        rs_rate = 0
         while self.connected and not self._stop.is_set():
             try:
                 blocks = [self._q.get(timeout=0.25)]      # wakes as soon as a block is put

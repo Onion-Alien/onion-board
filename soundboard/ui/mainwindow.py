@@ -155,7 +155,7 @@ LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays t
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = _("All")       # the category tab that shows every sound
-AUTO_MIC_UPDATE_MS = 4000   # an older mic part moves on by itself this long after the start
+MIC_OFFER_MS = 1000   # an older mic part's update is offered this long after the window shows
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
@@ -592,7 +592,6 @@ class MainWindow(QMainWindow):
         self._pending_note: str | None = None
         if self.cfg.load_note:   # settings came from a backup or the defaults: say so
             QTimer.singleShot(1200, self._show_load_note)
-        QTimer.singleShot(AUTO_MIC_UPDATE_MS, self, self._auto_mic_update)
         QTimer.singleShot(TLS_WARM_MS, self, self._warm_tls)
         QTimer.singleShot(TLS_WARM_MS, self, self._precompile_addons)
 
@@ -622,23 +621,55 @@ class MainWindow(QMainWindow):
         except Exception:  # noqa: BLE001 - a later request sets it up as before
             log.debug("warming up TLS failed", exc_info=True)
 
-    def _auto_mic_update(self):
+    _mic_offer = None       # the open MicUpdateOffer
+    _mic_updating = False   # attach_mic was started from it (its own result messages)
+
+    def _mic_update_due(self) -> bool:
+        cfg = self.cfg
+        return (cfg.route == "mic" and bool(cfg.mic_device) and not self._attaching
+                and directmic.status(cfg.mic_device) == "outdated")
+
+    def _offer_mic_update(self):
         """An older mic part (1.9.20 and before sat where raw streams skip it: Discord's
-        Studio, Chrome, Edge) is moved on the first start of a new version, not left to
-        a button nobody looks for. Windows asks once; a No waits for the next version.
-        Only with the window open: a prompt at sign-in, in the tray, would be a surprise."""
+        Studio, Chrome, Edge) is offered an update a second after the window opens, not
+        left to a button nobody looks for. Windows' admin prompt only comes after
+        *Install update*: never by itself, and never from the tray (showEvent asks again
+        once the window is open). Offered once per version; Setup keeps the button."""
         from soundboard import __version__
         cfg = self.cfg
-        if cfg.route != "mic" or not cfg.mic_device or cfg.mic_update_tried == __version__:
+        if self._shut_down or self._mic_offer is not None or cfg.mic_update_tried == __version__:
             return
         if not self.isVisible():
-            QTimer.singleShot(AUTO_MIC_UPDATE_MS, self, self._auto_mic_update)
             return
-        if directmic.status(cfg.mic_device) != "outdated" or self._attaching:
+        if self.isMinimized() or QApplication.activeModalWidget() is not None:
+            QTimer.singleShot(MIC_OFFER_MS, self, self._offer_mic_update)   # once it's free
+            return
+        if not self._mic_update_due():
             return
         cfg.mic_update_tried = __version__
         cfg.save()
-        log.info("moving the older mic part on by itself")
+        log.info("offering the newer mic part")
+        from soundboard.ui.micupdate import MicUpdateOffer
+        offer = self._mic_offer = MicUpdateOffer(self)
+        offer.accepted.connect(self._accept_mic_update)
+        offer.finished.connect(self._mic_offer_closed)
+        offer.popup()
+
+    def _mic_offer_closed(self):
+        self._mic_offer = None
+
+    def _accept_mic_update(self):
+        """Install update: the mic, the route or the part may have changed while the
+        offer was up, so check again before Windows is asked."""
+        if not self._mic_update_due():
+            cfg = self.cfg
+            if cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device)):
+                self.toast(_("Your mic is already up to date."), "ok")
+            else:
+                self.toast(_("Nothing to update now: your mic settings changed."))
+            return
+        log.info("updating the mic part (asked)")
+        self._mic_updating = True
         self.toast(_("Updating Onion Board's part of your mic so every app hears your "
                      "sounds: click Yes when Windows asks."))
         self.attach_mic()
@@ -3150,6 +3181,7 @@ class MainWindow(QMainWindow):
 
     def _mic_attached(self, mic: str, err: str):
         self._attaching = False
+        updating, self._mic_updating = self._mic_updating, False
         directmic.forget_status()
         if err:
             if self._attach_release is not None:
@@ -3159,10 +3191,15 @@ class MainWindow(QMainWindow):
             # an older mic part can still be working (the optional update failed): the
             # status then reads fine, but this attempt didn't work, so Bun mustn't cheer
             self.setup_show.finish(False)
-            # the route stays on the mic: until it's set up, the cable carries the
-            # sounds meanwhile (_main_name), and the one-click stays on offer
-            err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
-            self.tell(_("Couldn't put Onion Board on your mic"), err, "error")
+            if updating and err == directmic.declined():
+                # No to the optional update: the old part keeps working, no box needed
+                self.toast(_("Update cancelled. Your mic keeps working: update any time "
+                             "in Setup."), "warn")
+            else:
+                # the route stays on the mic: until it's set up, the cable carries the
+                # sounds meanwhile (_main_name), and the one-click stays on offer
+                err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
+                self.tell(_("Couldn't put Onion Board on your mic"), err, "error")
         else:
             log.info("on the mic now: %s", mic)
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
@@ -3173,7 +3210,10 @@ class MainWindow(QMainWindow):
             self.set_route("mic", attached=True)
             from soundboard.ui.setupwizard import SetupWizard
             modal = QApplication.activeModalWidget()
-            if not isinstance(modal, SetupWizard):
+            if updating:
+                self.toast(_("Mic updated: games, calls and browsers hear your sounds."),
+                           "ok")
+            elif not isinstance(modal, SetupWizard):
                 self.toast(_("Done: Discord and games hear your sounds through your mic now."),
                            "ok")
             if is_hands_free(mic):
@@ -7901,6 +7941,8 @@ class MainWindow(QMainWindow):
         later, self._whats_new_later = getattr(self, "_whats_new_later", None), None
         if later is not None:   # held back while the window was in the tray
             QTimer.singleShot(700, lambda: self.whats_new(later))
+        # an older mic part: its update is offered a moment after the window opens
+        QTimer.singleShot(MIC_OFFER_MS, self, self._offer_mic_update)
 
     def hideEvent(self, ev):
         super().hideEvent(ev)

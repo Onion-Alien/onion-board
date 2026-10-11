@@ -3043,8 +3043,19 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "已從 {name} 匯入 <b>{n}</b> 個音效。要保留嗎？"
   ],
-  "Off air": "已關播",
-  "On air": "直播中",
+  "Compatibility fixes for games, calls and browsers.": "修正與遊戲、通話和瀏覽器的相容性問題。",
+  "Install update": "安裝更新",
+  "Mic updated: games, calls and browsers hear your sounds.": "麥克風已更新：遊戲、通話和瀏覽器都聽得到你的聲音。",
+  "Next: Windows will ask permission for OnionBoard.exe.": "接下來：Windows 會要求 OnionBoard.exe 的權限。",
+  "Nothing to update now: your mic settings changed.": "現在沒有可更新的：你的麥克風設定已變更。",
+  "The Windows prompt names Python because you're running from source.": "因為你從原始碼執行，Windows 提示裡顯示的是 Python。",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "已取消更新。麥克風照常可用：隨時可以在設置裡更新。",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows 會要求權限。更新期間聲音會短暫中斷。",
+  "You can update later in Setup.": "你可以稍後在設置裡更新。",
+  "Your mic is already up to date.": "你的麥克風已是最新版本。",
+  "Your mic, upgraded": "麥克風，升級了",
+  "Off Air": "已關播",
+  "On Air": "直播中",
   "Not configured": "未設定",
   "Not configured: click to fix": "未設定：點擊修復",
   "Can't send to {device}, click to fix": "無法傳送到 {device}，點擊修復"

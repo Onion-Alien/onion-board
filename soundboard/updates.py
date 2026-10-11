@@ -29,6 +29,7 @@ import re
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -219,7 +220,8 @@ def latest_settled() -> Release | None:
     found = [r for d in (data if isinstance(data, list) else [])
              if isinstance(d, dict) and not d.get("draft") and not d.get("prerelease")
              and (r := _release(d)) is not None and settled(r)]
-    return max(found, key=lambda r: parse_version(r.version), default=None)
+    # (a Release's version is made from a parsed one, so never None here)
+    return max(found, key=lambda r: parse_version(r.version) or (), default=None)
 
 
 def _release(data: dict) -> Release | None:

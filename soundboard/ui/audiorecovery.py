@@ -2,7 +2,9 @@
 
 The card in Settings > Audio shows where the mic effect stands as a pill. The one fix
 it needs (update, or repair when Windows took it off the mic) is the card's main
-button; the rare actions (repair, clean reinstall, remove) sit behind its ⋯ menu."""
+button; the rare actions (repair, clean reinstall, remove) sit behind its ⋯ menu.
+While a fix runs, the setup guide's show plays under it (ui/setupshow.py: Bun
+builds a speaker, then it thumps and he cheers, or it goes BOOM)."""
 from __future__ import annotations
 
 import logging
@@ -16,13 +18,15 @@ from soundboard import directmic, errors, theme
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
+from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.widgets import DropdownMenu
 
 log = logging.getLogger(__name__)
 
 
 def look(state):
-    """What the card shows for a directmic.status(): (pill text, pill tone, the one fix
+    """What the card shows for a directmic.status(): (pill text, pill tone ("muted" =
+    neutral, still outlined so it reads as a pill), the one fix
     offered as the main button, or None)."""
     off = (_("Off"), "warn", "repair")
     return {
@@ -30,7 +34,7 @@ def look(state):
         "outdated": (_("Update available"), "warn", "update"),
         "wiped": off,      # Windows took it off the mic
         "other": off,      # it's on another mic, not the one picked
-        "missing": (_("Off"), "", None),
+        "missing": (_("Off"), "muted", None),
     }.get(state, ("", "", None))
 
 
@@ -130,6 +134,7 @@ class RecoveryCard(QFrame):
         title = QLabel(_("Audio recovery"))
         title.setObjectName("section")
         title.setProperty("keepline", True)
+        title.setProperty("head", True)   # no top padding: it shares a line with the pill
         self.heading = title
         head.addWidget(title, 0, Qt.AlignmentFlag.AlignVCenter)
         self.pill = QLabel()
@@ -168,6 +173,9 @@ class RecoveryCard(QFrame):
         self.fix.clicked.connect(lambda: self.confirm(self.fix.property("action")))
         row.addWidget(self.fix)
         v.addLayout(row)
+        # the same job as the setup guide's mic step, so the same show (hides itself)
+        self.show_ = SetupShow()
+        v.addWidget(self.show_)
         self.note = QLabel()
         self.note.setWordWrap(True)
         self.note.setObjectName("hint")
@@ -270,10 +278,12 @@ class RecoveryCard(QFrame):
         if running:
             self.pill.setText(_("Working…"))
             self.pill.show()
-            theme.set_tone(self.pill, "")
+            theme.set_tone(self.pill, "muted")
+            self.show_.start()
 
     def _done(self, action, err, state):
         self._sync_busy()
+        self.show_.finish(not err)
         self._checked(state)
         self.note.setText(err or (_("Mic effect removed") if action == "remove" else
                                   _("Mic effect reinstalled. Test it in your voice chat.")))

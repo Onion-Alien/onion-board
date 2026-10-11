@@ -3043,8 +3043,19 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "{name} から <b>{n}</b> 個のサウンドを取り込みました。残しますか？"
   ],
-  "Off air": "オフエア",
-  "On air": "オンエア",
+  "Compatibility fixes for games, calls and browsers.": "ゲーム、通話、ブラウザーとの互換性を修正します。",
+  "Install update": "アップデートをインストール",
+  "Mic updated: games, calls and browsers hear your sounds.": "マイクを更新しました: ゲーム、通話、ブラウザーでサウンドが聞こえます。",
+  "Next: Windows will ask permission for OnionBoard.exe.": "次に、Windows が OnionBoard.exe の許可を求めます。",
+  "Nothing to update now: your mic settings changed.": "今は更新するものがありません: マイクの設定が変わりました。",
+  "The Windows prompt names Python because you're running from source.": "ソースから実行しているため、Windows の確認画面には Python と表示されます。",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "アップデートを取り消しました。マイクはそのまま使えます: いつでもセットアップから更新できます。",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows が許可を求めます。更新中は音が少し途切れます。",
+  "You can update later in Setup.": "あとでセットアップから更新できます。",
+  "Your mic is already up to date.": "マイクはすでに最新です。",
+  "Your mic, upgraded": "マイクをアップグレード",
+  "Off Air": "オフエア",
+  "On Air": "オンエア",
   "Not configured": "未設定",
   "Not configured: click to fix": "未設定：クリックして修正",
   "Can't send to {device}, click to fix": "{device} に送れません。クリックして修正"

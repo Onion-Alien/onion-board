@@ -240,6 +240,7 @@ class OutputBlock(QFrame):
     GLYPH = 16            # the icon column
     GAP = 6               # icon to words (8 wraps longer titles on the 190 px rail)
     TEXT_X = LEAD + GLYPH + GAP   # the keyline: where every line of words starts
+    SWITCH_GAP = 8        # words to the switch
     ROW_PAD = 4           # the status line's hover fill past its icon
     ROW_GAP = 6           # title row to the status line's fill
     ROW_H = 28            # the status line's height, fill and all
@@ -275,7 +276,7 @@ class OutputBlock(QFrame):
                                       QSizePolicy.Policy.Minimum)
         top.addSpacerItem(self._title_gap)
         top.addWidget(self.title, 0, Qt.AlignmentFlag.AlignTop)
-        top.addSpacing(8)
+        top.addSpacing(self.SWITCH_GAP)
         top.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
         top.addStretch(1)   # the switch stays beside its words
         box.addLayout(top)
@@ -382,10 +383,10 @@ class OutputBlock(QFrame):
 
     @staticmethod
     def names() -> tuple[str, str]:
-        return _("On air"), _("Off air")
+        return _("On Air"), _("Off Air")
 
     def _name(self, on: bool):
-        """"On air" while others hear you, "Off air" while they don't."""
+        """"On Air" while others hear you, "Off Air" while they don't."""
         text = self.names()[0 if on else 1]
         self.title.setText(text)
         self.switch.setAccessibleName(text)
@@ -882,19 +883,15 @@ class SideRail(QFrame):
 
     def _full_fit(self) -> int:
         """The narrowest open rail where the full layout fits, every word on its line:
-        the name, "On air" / "Off air" beside its switch, the status line, Settings beside
-        the arrow (a longer translation needs more room)."""
+        the name, "On Air" / "Off Air" beside its switch, Settings beside the arrow (a longer translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
         need = [side + BUTTON_W + 6 + self._brand_width()]
         if self.output:
             out = self.output
             metrics = out.title.fontMetrics()
             title = max(metrics.horizontalAdvance(t) for t in out.names())
-            need.append(side + out.TEXT_X + title + 1 + 8 + 38 + out.PAD)
-            # and the status line unwrapped, its chevron and all ("Not configured ›")
-            status = out.status_text.fontMetrics().horizontalAdvance(out.status_text.text())
-            need.append(side + out.TEXT_X + status + 1 + out.GAP - 2 + out.CHEVRON
-                        + 2 * out.PAD)
+            # (the status line under it wraps, the card growing taller, until it fits)
+            need.append(side + out.TEXT_X + title + 1 + out.SWITCH_GAP + 38 + out.PAD)
         return max(FULL_W, min(OPEN_W, max(need)))
 
     def _small(self, w: QWidget) -> bool:

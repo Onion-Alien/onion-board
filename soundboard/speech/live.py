@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 import math
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
 import numpy as np
 
@@ -115,7 +115,7 @@ class SpeechController:
     def live(self) -> bool:
         return self.host is not None
 
-    def start_live(self, module: ModuleInfo, args: list[str] = (),
+    def start_live(self, module: ModuleInfo, args: Sequence[str] = (),
                    replace: bool | None = None):
         """`replace`: mute your real voice (None: the mute_real_voice setting)."""
         self.stop_live()

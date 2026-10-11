@@ -87,9 +87,10 @@ def _get_format(pc, dev_id: str, mix: bool):
         pc.call(4, (c_wchar_p, c_int, POINTER(c_void_p)), dev_id, 0, byref(p),
                 what="GetDeviceFormat")
     try:
-        wf = cast(p.value, POINTER(WAVEFORMATEX)).contents
+        addr = p.value or 0   # 0 (no format): .contents raises, as for None
+        wf = cast(addr, POINTER(WAVEFORMATEX)).contents
         size = 18 + (wf.cbSize if wf.wFormatTag == 0xFFFE else 0)
-        return bytearray(string_at(p.value, size))
+        return bytearray(string_at(addr, size))
     finally:
         _ole32.CoTaskMemFree(p.value)
 

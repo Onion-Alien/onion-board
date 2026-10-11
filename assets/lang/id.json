@@ -3043,8 +3043,19 @@
   "We brought over <b>{n}</b> sound from {name}. Keep it?": [
     "Kami memindahkan <b>{n}</b> suara dari {name}. Simpan?"
   ],
-  "Off air": "Tidak mengudara",
-  "On air": "Mengudara",
+  "Compatibility fixes for games, calls and browsers.": "Perbaikan kompatibilitas untuk game, panggilan, dan browser.",
+  "Install update": "Pasang pembaruan",
+  "Mic updated: games, calls and browsers hear your sounds.": "Mic diperbarui: game, panggilan, dan browser mendengar suaramu.",
+  "Next: Windows will ask permission for OnionBoard.exe.": "Berikutnya: Windows akan meminta izin untuk OnionBoard.exe.",
+  "Nothing to update now: your mic settings changed.": "Tidak ada yang perlu diperbarui: pengaturan mic-mu berubah.",
+  "The Windows prompt names Python because you're running from source.": "Jendela Windows menyebut Python karena kamu menjalankan dari kode sumber.",
+  "Update cancelled. Your mic keeps working: update any time in Setup.": "Pembaruan dibatalkan. Mic-mu tetap berfungsi: perbarui kapan saja di Penyiapan.",
+  "Windows asks for permission. Audio pauses briefly during the update.": "Windows akan meminta izin. Audio berhenti sebentar selama pembaruan.",
+  "You can update later in Setup.": "Kamu bisa memperbarui nanti di Penyiapan.",
+  "Your mic is already up to date.": "Mic-mu sudah versi terbaru.",
+  "Your mic, upgraded": "Mic-mu, ditingkatkan",
+  "Off Air": "Tidak mengudara",
+  "On Air": "Mengudara",
   "Not configured": "Belum diatur",
   "Not configured: click to fix": "Belum diatur: klik untuk memperbaiki",
   "Can't send to {device}, click to fix": "Tidak bisa mengirim ke {device}, klik untuk memperbaiki"

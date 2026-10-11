@@ -216,14 +216,16 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
         window.engine.main_stream = stream
 
 
-def test_full_card_only_once_its_status_fits(window, qapp):  # noqa: F811
-    """Dragging the rail open, the full output card only comes in once "Not
-    configured ›" fits on one line (it came in early and wrapped)."""
+def test_full_card_once_its_title_row_fits(window, qapp):  # noqa: F811
+    """Dragging the rail open, the full output card comes in as soon as "Off Air"
+    and its switch fit (the status line may wrap, the card growing taller), never
+    with the title squeezed or wrapped."""
     from soundboard.ui.sidebar import OPEN_W, SHUT_W
     window.resize(1180, 720)
     window.show()
     window.cfg.route, window.cfg.main_device = "device", None
     window._update_flow()
+    window.set_sending(False)
     rail = window.rail
     rail.set_open(True)
     qapp.processEvents()
@@ -231,9 +233,13 @@ def test_full_card_only_once_its_status_fits(window, qapp):  # noqa: F811
         for width in range(SHUT_W, OPEN_W + 1, 3):
             rail.drag_width(width)
             qapp.processEvents()
-            status = rail.output.status_text
-            if status.isVisible() and width < OPEN_W:   # (fully open, long words wrap)
-                assert status.text() == "Not configured"
-                assert status.height() < 2 * status.fontMetrics().height(), width
+            out = rail.output
+            if out.title.isVisible():
+                assert out.title.text() == "Off Air"
+                assert out.title.height() < 2 * out.title.fontMetrics().height() + 8, width
+                assert out.title.geometry().right() < out.switch.x(), width
+                assert out.switch.geometry().right() <= out.contentsRect().right(), width
+                status = out.status_text
+                assert status.geometry().bottom() <= out.setup.contentsRect().bottom(), width
     finally:
         rail.finish_resize()
