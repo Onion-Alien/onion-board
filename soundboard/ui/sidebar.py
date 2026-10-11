@@ -963,12 +963,12 @@ class SideRail(QFrame):
         return self._target_width() - 2 * SIDE_OPEN - 1 - BUTTON_W - 6 >= self._brand_width()
 
     def _full_fit(self) -> int:
-        """The narrowest open rail where the full layout fits: the output card with
-        every line on one line, as small as it scales (a longer translation needs
-        more room)."""
+        """The narrowest open rail where the full layout fits (from 80% open): the
+        name on one line, the output card with every line on one line, as small as it
+        scales (a longer translation needs more room)."""
         side = 2 * SIDE_OPEN + 1
-        # (the name doesn't count: short of room it takes two lines, mid or full)
-        need = [FULL_W, SHUT_W + round(0.8 * (OPEN_W - SHUT_W))]   # (from 80% open)
+        need = [FULL_W, SHUT_W + round(0.8 * (OPEN_W - SHUT_W)),   # (from 80% open)
+                side + BUTTON_W + 6 + self._brand_width()]   # the name on one line
         if self.output:
             # the card with every line on one line, scaled down as far as it goes
             # (never wrapped: the small card until then)
@@ -1124,7 +1124,7 @@ class SideRail(QFrame):
         self._lay.invalidate()
         mid = self._mid()
         self.brand.setVisible(shown)
-        fits = self._brand_fits()
+        fits = not mid or self._brand_fits()   # (full: as it always was)
         self.byline.setVisible(shown and fits)
         if self.property("twolinebrand") != (not fits):   # two lines: a size smaller
             self.setProperty("twolinebrand", not fits)
