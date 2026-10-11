@@ -1787,7 +1787,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Колко далеч зад истинския ви глас е промененият: {effects} ms от ефектите + {devices} ms от звуковите ви устройства. Под около 100 ms се чувства нормално за разговор; pitch ефектите струват най-много, останалите почти нищо.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Колко далеч зад истинския ви глас е промененият: {effects} ms от ефектите. Под около 100 ms се чувства нормално за разговор; pitch ефектите струват най-много, останалите почти нищо.",
   "How high": "Колко високо",
-  "How loud the spoken voice is": "Колко силен е изговореният глас",
   "How much of it: up to half": "Колко от него: до половината",
   "I'd watch for you…": "Бих те гледал...",
   "I'll watch anything…": "Ще гледам всичко…",

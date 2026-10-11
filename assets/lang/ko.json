@@ -1837,7 +1837,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "변경된 실제 음성이 얼마나 뒤처졌는가: 효과의 {effects} ms + 사운드 장치의 {devices} ms. 약 100ms 미만은 대화하기에 정상적인 느낌입니다. 피치 효과는 비용이 가장 많이 들고 나머지는 거의 아무것도 들지 않습니다.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "변경된 목소리가 실제 목소리보다 얼마나 뒤쳐져 있는지: 효과로부터 {effects} ms. 약 100ms 미만은 대화하기에 정상적인 느낌입니다. 피치 효과는 비용이 가장 많이 들고 나머지는 거의 아무것도 들지 않습니다.",
   "How high": "얼마나 높은가",
-  "How loud the spoken voice is": "말하는 목소리가 얼마나 큰지",
   "How much of it: up to half": "금액 : 최대 절반",
   "I'd watch for you…": "나는 당신을 지켜볼 것입니다…",
   "I'll watch anything…": "뭐든지 지켜볼게…",

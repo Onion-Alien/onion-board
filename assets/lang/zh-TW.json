@@ -1837,7 +1837,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "更改後的聲音落後於您的真實聲音有多遠：來自效果​​的{effects}毫秒 + 來自聲音設備的{devices}毫秒。 100ms左右感覺通話正常；音調效果的成本最高，其餘的幾乎沒有。",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "更改後的聲音比您的真實聲音落後多遠：距效果{effects}毫秒。 100ms左右感覺通話正常；音調效果的成本最高，其餘的幾乎沒有。",
   "How high": "多高",
-  "How loud the spoken voice is": "說話的聲音有多大",
   "How much of it: up to half": "數量：最多一半",
   "I'd watch for you…": "我會看著你…",
   "I'll watch anything…": "我什麼都會看…",

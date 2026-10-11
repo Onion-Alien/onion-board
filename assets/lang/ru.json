@@ -1835,7 +1835,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Насколько сильно измененный голос отстает от вашего реального голоса: {effects} мс от эффектов + {devices} мс от ваших звуковых устройств. Менее 100 мс кажется нормальным для разговора; Эффекты высоты тона стоят больше всего, остальные почти ничего.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Насколько сильно измененный голос отстает от вашего реального голоса: {effects} мс от эффектов. Менее 100 мс кажется нормальным для разговора; Эффекты высоты тона стоят больше всего, остальные почти ничего.",
   "How high": "Как высоко",
-  "How loud the spoken voice is": "Насколько громок разговорный голос",
   "How much of it: up to half": "Сколько: до половины",
   "I'd watch for you…": "Я бы присмотрел за тобой…",
   "I'll watch anything…": "Я посмотрю что угодно…",

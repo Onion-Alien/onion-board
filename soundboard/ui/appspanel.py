@@ -43,7 +43,8 @@ from soundboard.ui import appstate, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import WAVE_H, ClipEditor
 from soundboard.ui.clipshelf import ClipShelf
-from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
+from soundboard.ui.panel import (CardGrid, HoverCard, UndoBar, VolumeControl, fold_button,
+                                 hint_label)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.wheelguard import no_wheel
@@ -583,13 +584,10 @@ class AppRow(HoverCard):
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
         mix.addWidget(self.chk_hear)
         v.addLayout(mix)
-        self.btn_clip = QPushButton(_("Clip editor"))
-        self.btn_clip.setObjectName("fold")
-        self.btn_clip.setCheckable(True)
+        self.btn_clip = fold_button(_("Clip editor"))
         self.btn_clip.setToolTip(_("Keep this program's last minute as a waveform you can cut "
                                    "bits out of, play, save as sounds or send straight back. "
                                    "It only listens while it's open."))
-        icons.set_icon(self.btn_clip, "fold", "muted", "text", size=12)
         self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
         v.addWidget(self.btn_clip, 0, Qt.AlignLeft)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)

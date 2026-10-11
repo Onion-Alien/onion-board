@@ -1837,7 +1837,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "เสียงที่เปลี่ยนไปนั้นตามหลังเสียงจริงของคุณมากเพียงใด: {effects} มิลลิวินาทีจากเอฟเฟกต์ + {devices} มิลลิวินาทีจากอุปกรณ์เสียงของคุณ ต่ำกว่า 100 มิลลิวินาที รู้สึกว่าเป็นเรื่องปกติที่จะพูดคุย เอฟเฟกต์สนามมีค่าใช้จ่ายมากที่สุด ที่เหลือแทบไม่มีอะไรเลย",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "เสียงจริงของคุณที่เปลี่ยนไปนั้นล้าหลังแค่ไหน: {effects} มิลลิวินาทีจากเอฟเฟกต์ ต่ำกว่า 100 มิลลิวินาที รู้สึกว่าเป็นเรื่องปกติที่จะพูดคุย เอฟเฟกต์สนามมีค่าใช้จ่ายมากที่สุด ที่เหลือแทบไม่มีอะไรเลย",
   "How high": "สูงแค่ไหน",
-  "How loud the spoken voice is": "เสียงพูดดังแค่ไหน.",
   "How much of it: up to half": "เท่าไหร่: มากถึงครึ่งหนึ่ง",
   "I'd watch for you…": "ฉันจะคอยดูคุณ…",
   "I'll watch anything…": "ฉันจะดูอะไรก็ได้…",

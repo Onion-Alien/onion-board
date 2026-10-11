@@ -1881,7 +1881,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Değiştirilen ses gerçek sesinizin ne kadar gerisindedir: efektlerden {effects} ms + ses cihazlarınızdan {devices} ms. Yaklaşık 100 ms'nin altında konuşmak normal geliyor; Saha efektleri en maliyetli olanıdır, geri kalanı neredeyse hiçbir şeydir.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Değiştirilen ses gerçek sesinizin ne kadar gerisindedir: efektlerden {effects} ms. Yaklaşık 100 ms'nin altında konuşmak normal geliyor; Saha efektleri en maliyetli olanıdır, geri kalanı neredeyse hiçbir şeydir.",
   "How high": "Ne kadar yüksek",
-  "How loud the spoken voice is": "Konuşulan sesin ne kadar yüksek olduğu",
   "How much of it: up to half": "Ne kadarı: yarısına kadar",
   "I'd watch for you…": "senin için izlerdim…",
   "I'll watch anything…": "Ne olursa olsun izleyeceğim…",

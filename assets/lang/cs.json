@@ -1921,7 +1921,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Jak daleko za vaším skutečným hlasem je ten změněný: {effects} ms z efektů + {devices} ms z vašich zvukových zařízení. Méně než 100 ms je normální mluvit; pitch efekty stojí nejvíc, zbytek skoro nic.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Jak daleko za vaším skutečným hlasem je ten změněný: {effects} ms od efektů. Méně než 100 ms je normální mluvit; pitch efekty stojí nejvíc, zbytek skoro nic.",
   "How high": "jak vysoko",
-  "How loud the spoken voice is": "Jak hlasitý je mluvený hlas",
   "How much of it: up to half": "Kolik z toho: až polovina",
   "I'd watch for you…": "hlídal bych tě…",
   "I'll watch anything…": "budu sledovat cokoliv…",

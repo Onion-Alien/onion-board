@@ -1877,7 +1877,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Hvor langt efter din rigtige stemme er den ændrede stemme: {effects} ms fra effekterne + {devices} ms fra dine lydenheder. Under omkring 100 ms føles normalt at tale om; pitch-effekter koster mest, resten næsten ingenting.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Hvor langt efter din rigtige stemme er den ændrede stemme: {effects} ms fra effekterne. Under omkring 100 ms føles normalt at tale om; pitch-effekter koster mest, resten næsten ingenting.",
   "How high": "Hvor højt",
-  "How loud the spoken voice is": "Hvor høj den talte stemme er",
   "How much of it: up to half": "Hvor meget af det: op til halvdelen",
   "I'd watch for you…": "Jeg ville holde øje med dig...",
   "I'll watch anything…": "Jeg vil se hvad som helst...",

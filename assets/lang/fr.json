@@ -1881,7 +1881,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "À quelle distance de votre vraie voix se trouve la voix modifiée : {effects} ms des effets + {devices} ms de vos appareils audio. En dessous d'environ 100 ms, il semble normal de parler ; les effets de pitch coûtent le plus cher, le reste presque rien.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "À quelle distance de votre vraie voix se trouve la voix modifiée : {effects} ms par rapport aux effets. En dessous d'environ 100 ms, il semble normal de parler ; les effets de pitch coûtent le plus cher, le reste presque rien.",
   "How high": "À quelle hauteur",
-  "How loud the spoken voice is": "À quel point la voix parlée est forte",
   "How much of it: up to half": "Quelle quantité : jusqu'à la moitié",
   "I'd watch for you…": "Je veillerais pour toi…",
   "I'll watch anything…": "Je regarderai n'importe quoi…",

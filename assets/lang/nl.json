@@ -1881,7 +1881,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Hoe ver ligt de gewijzigde stem achter op je echte stem: {effects} ms van de effecten + {devices} ms van je geluidsapparaten. Minder dan 100 ms voelt normaal om over te praten; pitcheffecten kosten het meeste, de rest bijna niets.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Hoe ver achter je echte stem ligt de gewijzigde stem: {effects} ms van de effecten. Minder dan 100 ms voelt normaal om over te praten; pitcheffecten kosten het meeste, de rest bijna niets.",
   "How high": "Hoe hoog",
-  "How loud the spoken voice is": "Hoe luid de gesproken stem is",
   "How much of it: up to half": "Hoeveel ervan: maximaal de helft",
   "I'd watch for you…": "Ik zou voor je uitkijken...",
   "I'll watch anything…": "Ik zal alles bekijken...",

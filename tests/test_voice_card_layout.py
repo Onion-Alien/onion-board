@@ -146,7 +146,9 @@ def test_voice_changer_action_precedes_description(qapp):
     panel = VoiceFxPanel({})
     try:
         layout = panel.layout()
-        assert layout.itemAt(1).widget() is panel.btn_power
+        # the switch's row (Make it yours beside it, U3), then the description
+        assert layout.itemAt(1).widget() is panel.btn_power.parentWidget()
+        assert panel.btn_tweak.parentWidget() is panel.btn_power.parentWidget()
         assert isinstance(layout.itemAt(2).widget(), QLabel)
         assert layout.itemAt(2).widget().wordWrap()
     finally:
