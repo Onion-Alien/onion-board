@@ -88,6 +88,8 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   (`ui/appstate.py`: `slow_in_background`, `pause_in_background`).
 
 ### Async results (about 26)
+- Background cache writers use unique temporary files and coordinate replacement
+  with readers across owner instances; Windows refuses replacement of open files.
 - A worker's result or a delayed callback checks that its owner (tab, dialog, engine
   voice) still exists and is still on before touching it. Tabs get switched off and
   dialogs get closed while work is in flight. `a885d6e` `42b9526`

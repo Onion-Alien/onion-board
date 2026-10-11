@@ -32,6 +32,7 @@ import logging
 import random
 import re
 import socket
+import tempfile
 import threading
 import sys
 import time
@@ -512,6 +513,10 @@ def _refused(url: str) -> str:
     return why
 
 
+# Directory instances can overlap while a Radio tab is replaced. On Windows even
+# a reader holding stations.json open can prevent its atomic replacement.
+_cache_lock = threading.Lock()
+
 _kept: list[tuple[threading.Thread, QObject]] = []   # UI thread only (see _start_for)
 
 
@@ -708,7 +713,9 @@ class RadioDirectory(QObject):
     def _read_cache(self) -> tuple[float, list[Station]] | None:
         try:
             p = self.cache_path
-            raw = loads_gently(p.read_text(encoding="utf-8"))
+            with _cache_lock:
+                text = p.read_text(encoding="utf-8")
+            raw = loads_gently(text)
             if not isinstance(raw, dict):
                 return None
             stations = [s for s in map(Station.from_saved, raw.get("stations", [])) if s]
@@ -719,12 +726,21 @@ class RadioDirectory(QObject):
     def _write_cache(self, stations: list[Station]):
         try:
             self.cache_dir.mkdir(parents=True, exist_ok=True)
-            tmp = self.cache_path.with_suffix(".tmp")
             # the same JSON as one json.dumps, made a station at a time (see loads_gently)
             body = ", ".join(json.dumps(s.to_saved()) for s in stations)
-            tmp.write_text(f'{{"time": {json.dumps(time.time())}, "stations": [{body}]}}',
-                           encoding="utf-8")
-            tmp.replace(self.cache_path)
+            with _cache_lock:
+                tmp = None
+                try:
+                    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", delete=False,
+                                                     dir=self.cache_dir, prefix="stations-",
+                                                     suffix=".tmp") as out:
+                        tmp = Path(out.name)
+                        out.write(f'{{"time": {json.dumps(time.time())}, "stations": [{body}]}}')
+                    # Windows requires the source file to be closed before replacing.
+                    tmp.replace(self.cache_path)
+                finally:
+                    if tmp is not None:
+                        tmp.unlink(missing_ok=True)
         except OSError:
             log.warning("can't cache the radio station list", exc_info=True)
 
