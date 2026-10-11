@@ -20,6 +20,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from soundboard import destination
+from soundboard import i18n
 from soundboard.i18n import _
 
 
@@ -183,8 +184,12 @@ def pick(cfg_dest: dict, key: str, hints=()) -> str:
     return why
 
 
-def explain(cfg_dest: dict | None, why: str = "") -> str:
-    """What the current mode does right now, in one or two plain lines."""
+def explain(cfg_dest: dict | None, why: str = "", english: bool = False) -> str:
+    """What the current mode does right now, in one or two plain lines; `english`:
+    untranslated, for the control API (`why` from i18n.keep_english keeps its English)."""
+    if english:
+        with i18n.english():
+            return explain(cfg_dest, getattr(why, "english", "") or why)
     d = cfg_dest if isinstance(cfg_dest, dict) else {}
     p = current(d)
     m = destination.resolve(d)

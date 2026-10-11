@@ -25,6 +25,8 @@ import locale
 import logging
 import re
 import sys
+import threading
+from contextlib import contextmanager
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -94,12 +96,15 @@ FONTS = {"zh-CN": "Microsoft YaHei UI", "zh-TW": "Microsoft JhengHei UI",
 
 _lang = ENGLISH
 _catalog: dict[str, str | list[str]] = {}
+_here = threading.local()   # .english: this thread's _() / ngettext() stay English (english())
 
 
 # ------------------------------------------------------------------ looking up
 def _(text: str, /, **kw) -> str:
     """`text` in the current language, its `{placeholders}` filled from `kw`."""
-    if _lang == PSEUDO:
+    if getattr(_here, "english", False):
+        out = text
+    elif _lang == PSEUDO:
         out = pseudo(text)
     else:
         t = _catalog.get(text)
@@ -110,6 +115,8 @@ def _(text: str, /, **kw) -> str:
 def ngettext(singular: str, plural: str, n: int, /, **kw) -> str:
     """The form for `n` ("1 sound" / "{n} sounds"); `{n}` is filled in too."""
     kw.setdefault("n", n)
+    if getattr(_here, "english", False):
+        return _fill(singular if n == 1 else plural, kw)
     if _lang == PSEUDO:
         return _fill(pseudo(singular if n == 1 else plural), kw)
     forms = _catalog.get(singular)
@@ -127,6 +134,33 @@ def _fill(text: str, kw: dict) -> str:
     except (KeyError, IndexError, ValueError):   # a translation with a broken placeholder
         log.warning("bad placeholder in translation %r", text)
         return text
+
+
+@contextmanager
+def english():
+    """Inside it, _() and ngettext() give the English on this thread only: for text
+    that must stay untranslated (the control API's JSON) made by code the UI uses
+    too."""
+    was = getattr(_here, "english", False)
+    _here.english = True
+    try:
+        yield
+    finally:
+        _here.english = was
+
+
+class Said(str):
+    """A text in the current language that remembers its English (`.english`)."""
+    english = ""
+
+
+def keep_english(make) -> Said:
+    """`make()` (a lambda around `_()`) in the current language, its English kept as
+    `.english` for the control API: `keep_english(lambda: _("{n} is on", n=n))`."""
+    out = Said(make())
+    with english():
+        out.english = make()
+    return out
 
 
 # ------------------------------------------------------------------ languages
