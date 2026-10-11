@@ -51,9 +51,9 @@ def glow_icon(c1: str, c2: str, amount: float) -> QIcon:
     icon = QIcon()
     for sz in (16, 24, 32, 48, 64, 128, 256):
         pm = QPixmap(sz, sz)
-        pm.fill(Qt.transparent)
+        pm.fill(Qt.GlobalColor.transparent)
         p = QPainter(pm)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         c = sz / 2
         rg = QRadialGradient(QPointF(c, c), c)
         col = _mix(QColor(c2), FLAME, 0.6 + 0.4 * amount)
@@ -61,7 +61,7 @@ def glow_icon(c1: str, c2: str, amount: float) -> QIcon:
         rg.setColorAt(0.5, col)
         col.setAlpha(0)
         rg.setColorAt(1.0, col)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(rg)
         p.drawEllipse(QPointF(c, c), c, c)
         m = sz * (0.86 - 0.08 * amount)   # the halo needs room at the edge
@@ -77,7 +77,7 @@ class LogoWidget(QWidget):
         self.mark = mark
         self.pad = pad
         self.setFixedSize(QSize(mark + 2 * pad, mark + 2 * pad))
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.level = 0.0          # smoothed output level, 0..1
         self._target = 0.0
         self.embers: list[list[float]] = []   # [x, y, vx, vy, life, size, colour index]
@@ -86,7 +86,7 @@ class LogoWidget(QWidget):
         self._t0 = time.monotonic()
         self._last = self._t0
         self._timer = QTimer(self)
-        self._timer.setTimerType(Qt.CoarseTimer)
+        self._timer.setTimerType(Qt.TimerType.CoarseTimer)
         self._timer.timeout.connect(self._step)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
@@ -98,7 +98,7 @@ class LogoWidget(QWidget):
             self.update()
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             self.squish = 1.0
             self._resume()
         super().mousePressEvent(e)
@@ -161,7 +161,7 @@ class LogoWidget(QWidget):
         t = time.monotonic() - self._t0
         lv = self.level
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         c = self.width() / 2
         s = float(self.mark)
         x0 = y0 = float(self.pad)
@@ -182,7 +182,7 @@ class LogoWidget(QWidget):
         rg.setColorAt(0.45, col)
         col.setAlpha(0)
         rg.setColorAt(1.0, col)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(rg)
         p.drawEllipse(QPointF(c, c), c, c)
 

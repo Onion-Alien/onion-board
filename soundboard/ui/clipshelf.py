@@ -63,27 +63,27 @@ class ClipShelf(QWidget):
         self.list.setHeaderLabels([_("Name"), _("Length"), _("From")])
         self.list.setRootIsDecorated(False)
         self.list.setUniformRowHeights(True)
-        self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.list.setEditTriggers(QAbstractItemView.EditKeyPressed
-                                  | QAbstractItemView.SelectedClicked)
-        self.list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list.setEditTriggers(QAbstractItemView.EditTrigger.EditKeyPressed
+                                  | QAbstractItemView.EditTrigger.SelectedClicked)
+        self.list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.list.customContextMenuRequested.connect(self._menu)
         self.list.itemDoubleClicked.connect(lambda it, _col: self.toggle_play(it))
         self.list.itemChanged.connect(self._renamed)
         self.list.itemSelectionChanged.connect(self._sync)
         h = self.list.header()
         h.setStretchLastSection(False)
-        h.setSectionResizeMode(0, QHeaderView.Stretch)
-        h.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        h.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        h.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        h.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        h.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         v.addWidget(self.list)
         self.undo_bar = UndoBar(_("Put the clip back in the list"))
         v.addWidget(self.undo_bar)
-        for keys, slot in ((Qt.Key_Delete, self.delete_picked),
-                           (QKeySequence.Copy, self.copy_picked)):
+        for keys, slot in ((Qt.Key.Key_Delete, self.delete_picked),
+                           (QKeySequence.StandardKey.Copy, self.copy_picked)):
             a = QAction(self.list)
             a.setShortcut(QKeySequence(keys))
-            a.setShortcutContext(Qt.WidgetShortcut)
+            a.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
             a.triggered.connect(slot)
             self.list.addAction(a)
         self.reload()
@@ -94,11 +94,11 @@ class ClipShelf(QWidget):
         self.list.clear()
         for c in self.shelf.clips:
             it = QTreeWidgetItem([c.name, fmt(c.seconds * SR), c.src])
-            it.setData(0, Qt.UserRole, c.id)
-            it.setFlags(it.flags() | Qt.ItemIsEditable)
+            it.setData(0, Qt.ItemDataRole.UserRole, c.id)
+            it.setFlags(it.flags() | Qt.ItemFlag.ItemIsEditable)
             it.setToolTip(0, _("{name}\nDouble-click plays it, F2 renames it, right-click "
                                "adds it to your Sounds.", name=c.name))
-            it.setTextAlignment(1, Qt.AlignRight | Qt.AlignVCenter)
+            it.setTextAlignment(1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.list.addTopLevelItem(it)
             if c.id == pick:
                 self.list.setCurrentItem(it)
@@ -119,7 +119,7 @@ class ClipShelf(QWidget):
         out = []
         for it in self.list.selectedItems() or ([self.list.currentItem()]
                                                 if self.list.currentItem() else []):
-            c = self.shelf.get(it.data(0, Qt.UserRole))
+            c = self.shelf.get(it.data(0, Qt.ItemDataRole.UserRole))
             if c is not None:
                 out.append(c)
         return out
@@ -127,7 +127,7 @@ class ClipShelf(QWidget):
     def _item(self, cid: str) -> QTreeWidgetItem | None:
         for i in range(self.list.topLevelItemCount()):
             it = self.list.topLevelItem(i)
-            if it.data(0, Qt.UserRole) == cid:
+            if it.data(0, Qt.ItemDataRole.UserRole) == cid:
                 return it
         return None
 
@@ -151,7 +151,7 @@ class ClipShelf(QWidget):
 
     def toggle_play(self, it: QTreeWidgetItem | None = None, send: bool = False):
         it = it or self.list.currentItem()
-        cid = it.data(0, Qt.UserRole) if it is not None else None
+        cid = it.data(0, Qt.ItemDataRole.UserRole) if it is not None else None
         sid = SEND if send else PREVIEW
         again = self._playing == (sid, cid) and self.engine.state(sid) is not None
         self.stop()
@@ -177,7 +177,7 @@ class ClipShelf(QWidget):
     def _renamed(self, it: QTreeWidgetItem, col: int):
         if col != 0:
             return
-        cid = it.data(0, Qt.UserRole)
+        cid = it.data(0, Qt.ItemDataRole.UserRole)
         c = self.shelf.get(cid)
         if c is None:
             return
@@ -246,7 +246,7 @@ class ClipShelf(QWidget):
         if not it.isSelected():
             self.list.setCurrentItem(it)
         m = QMenu(self)
-        cid = it.data(0, Qt.UserRole)
+        cid = it.data(0, Qt.ItemDataRole.UserRole)
         playing = self._playing is not None and self._playing[1] == cid
 
         def act(text, slot, icon=None):

@@ -54,7 +54,7 @@ def steady_number(lbl: QLabel, widest: str) -> QLabel:
     lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
     lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
     lbl.setText(text)
-    lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+    lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     return lbl
 
 
@@ -298,7 +298,7 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False,
         row = QHBoxLayout()
         row.setSpacing(4)
         lbl = section_label(title)
-        row.addWidget(lbl, 0, Qt.AlignTop)
+        row.addWidget(lbl, 0, Qt.AlignmentFlag.AlignTop)
         # centred on the title's cap height (DESIGN section 4), measured from its font:
         # its padding-top (8 px) + ascent - half the cap height
         lbl.ensurePolished()
@@ -375,7 +375,7 @@ def reset_button(tip: str) -> QPushButton:
     heading row taller). `tip` says what goes back."""
     b = QPushButton(_("Reset"))
     b.setObjectName("reset")
-    b.setCursor(Qt.PointingHandCursor)
+    b.setCursor(Qt.CursorShape.PointingHandCursor)
     icons.set_icon(b, "reload", "muted", size=12)
     b.setToolTip(tip)
     return b
@@ -392,8 +392,8 @@ class _LevelDot(Meter):
     def paintEvent(self, e):
         frac, color = self._bar()
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(color if frac > 0 else theme.T["groove"]))
         p.drawEllipse(self.rect())
         p.end()
@@ -411,7 +411,7 @@ class _Pct(QSpinBox):
 
     def changeEvent(self, e):
         super().changeEvent(e)
-        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+        if e.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
             text = f"{self.maximum()}{self.suffix()}"
             self.setFixedWidth(max(58, self.fontMetrics().horizontalAdvance(text) + 14))
 
@@ -429,7 +429,7 @@ class VolumeControl(QWidget):
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(4)
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Orientation.Horizontal)
         self.meter = _LevelDot() if meter else None
         if self.meter is not None:
             h.addWidget(self.meter)
@@ -443,7 +443,7 @@ class VolumeControl(QWidget):
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
         # beside its slider, on the row's centre line: right-aligned in a box as wide as
         # "1000%", "70%" sat 30-40 px away from its slider
-        self.spin.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.spin.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         # its text box rounds the centring down: the digits sat 1-1.5 px under the
         # slider and the labels beside it (measured ink); 2 px less at the bottom
         # moves the centre up by one
@@ -531,17 +531,17 @@ class EqPanel(QWidget):
         self.sliders, self.vals = [], []
         for i, lab in enumerate(EQ_LABELS):
             val = QLabel("0")
-            val.setAlignment(Qt.AlignCenter)
+            val.setAlignment(Qt.AlignmentFlag.AlignCenter)
             val.setObjectName("eqlabel")
-            s = QSlider(Qt.Vertical)
+            s = QSlider(Qt.Orientation.Vertical)
             s.setRange(-EQ_MAX_DB * 2, EQ_MAX_DB * 2)   # half-dB steps
             s.setFixedHeight(96)
             s.setToolTip(_("{lab} Hz", lab=lab))
             f = QLabel(lab)
-            f.setAlignment(Qt.AlignCenter)
+            f.setAlignment(Qt.AlignmentFlag.AlignCenter)
             f.setObjectName("eqlabel")
             grid.addWidget(val, 0, i)
-            grid.addWidget(s, 1, i, Qt.AlignHCenter)
+            grid.addWidget(s, 1, i, Qt.AlignmentFlag.AlignHCenter)
             grid.addWidget(f, 2, i)
             s.valueChanged.connect(self._on_slider)
             self.sliders.append(s)

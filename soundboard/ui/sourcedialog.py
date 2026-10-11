@@ -135,14 +135,14 @@ class SourceDialog(QDialog):
 
     def _forget(self):
         """Ask, then drop the link and details and the text file (the sound stays)."""
-        box = QMessageBox(QMessageBox.Question, _("Delete info"),
+        box = QMessageBox(QMessageBox.Icon.Question, _("Delete info"),
                           _("Delete where “{name}” came from?\n\nIts link, channel and other "
                             "details and their text file are deleted. The sound stays.",
                             name=self.meta.name),
-                          QMessageBox.Yes | QMessageBox.Cancel, self)
-        box.button(QMessageBox.Yes).setText(_("Delete"))
-        box.setDefaultButton(QMessageBox.Cancel)
-        if box.exec() != QMessageBox.Yes:
+                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel, self)
+        box.button(QMessageBox.StandardButton.Yes).setText(_("Delete"))
+        box.setDefaultButton(QMessageBox.StandardButton.Cancel)
+        if box.exec() != QMessageBox.StandardButton.Yes:
             return
         sourceinfo.forget(self.meta)
         usage.used("source-deleted")

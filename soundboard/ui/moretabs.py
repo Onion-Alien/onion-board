@@ -55,8 +55,8 @@ class TabCard(QFrame):
     def __init__(self, key: str, name: str, parent=None):
         super().__init__(parent)
         self.setObjectName("tabcard")
-        self.setAttribute(Qt.WA_Hover)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setFixedWidth(CARD_W)
         h = QHBoxLayout(self)
         h.setContentsMargins(12, 10, 12, 10)
@@ -64,11 +64,11 @@ class TabCard(QFrame):
         pic = QLabel()
         pic.setObjectName("tabcardpic")
         pic.setFixedSize(ICON + 16, ICON + 16)
-        pic.setAlignment(Qt.AlignCenter)
+        pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pm = icons.pixmap(key, int(ICON * self.devicePixelRatio()), theme.T["accent_hi"])
         pm.setDevicePixelRatio(self.devicePixelRatio())
         pic.setPixmap(pm)
-        h.addWidget(pic, 0, Qt.AlignTop)
+        h.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
         words = QVBoxLayout()
         words.setSpacing(3)
         title = QLabel(name)
@@ -82,16 +82,17 @@ class TabCard(QFrame):
         add = QPushButton(_("Add"))
         add.setObjectName("primary")
         icons.set_icon(add, "plus", "on_accent")
-        add.setCursor(Qt.PointingHandCursor)
-        add.setFocusPolicy(Qt.NoFocus)
+        add.setCursor(Qt.CursorShape.PointingHandCursor)
+        add.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         add.clicked.connect(self.picked)
-        h.addWidget(add, 0, Qt.AlignVCenter)
+        h.addWidget(add, 0, Qt.AlignmentFlag.AlignVCenter)
         # a wrapped label's height follows its width, which a menu doesn't settle
         # before measuring: fixed, so no line is cut off
         blurb.setFixedWidth(CARD_W - 24 - (ICON + 16) - 2 * 12 - add.sizeHint().width() - 4)
 
     def mouseReleaseEvent(self, ev):
-        if ev.button() == Qt.LeftButton and self.rect().contains(ev.position().toPoint()):
+        if (ev.button() == Qt.MouseButton.LeftButton
+                and self.rect().contains(ev.position().toPoint())):
             self.picked.emit()
         super().mouseReleaseEvent(ev)
 

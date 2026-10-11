@@ -135,7 +135,7 @@ class ResetGuide(QDialog):
         v.addWidget(_heading(_("Ready to reset")))
         self.summary = QLabel()
         self.summary.setWordWrap(True)
-        self.summary.setTextFormat(Qt.RichText)
+        self.summary.setTextFormat(Qt.TextFormat.RichText)
         card = QFrame()
         card.setObjectName("setcard")
         cv = QVBoxLayout(card)
@@ -193,7 +193,7 @@ class RestorePoints(QDialog):
               "Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've "
               "added since are kept.", max_points=reset.MAX_POINTS)))
         self.list = QListWidget()
-        self.list.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.list.setMinimumSize(420, 200)
         self.list.itemSelectionChanged.connect(self._update)
         self.list.itemDoubleClicked.connect(lambda _i: self.restore())
@@ -219,20 +219,20 @@ class RestorePoints(QDialog):
         self.list.clear()
         for p in reset.points():
             li = QListWidgetItem(f"{p.title}  ·  {trash.ago(p.when)}\n{p.describe()}")
-            li.setData(Qt.UserRole, p.id)
+            li.setData(Qt.ItemDataRole.UserRole, p.id)
             self.list.addItem(li)
         if self.list.count():
             self.list.setCurrentRow(0)
         else:
             li = QListWidgetItem(_("No restore points yet. One is saved every time you reset "
                                    "something."))
-            li.setFlags(Qt.NoItemFlags)
+            li.setFlags(Qt.ItemFlag.NoItemFlags)
             self.list.addItem(li)
         self._update()
 
     def _picked(self) -> reset.Point | None:
         li = self.list.currentItem()
-        pid = li.data(Qt.UserRole) if li is not None and li.isSelected() else None
+        pid = li.data(Qt.ItemDataRole.UserRole) if li is not None and li.isSelected() else None
         return next((p for p in reset.points() if p.id == pid), None) if pid else None
 
     def _update(self):
@@ -248,7 +248,7 @@ class RestorePoints(QDialog):
                 self, _("Restore"),
                 _("Put things back the way they were {ago}?\n\nOnion Board restarts to do it. A "
                   "new restore point is saved first, so this can be undone too.",
-                  ago=trash.ago(p.when))) != QMessageBox.Yes:
+                  ago=trash.ago(p.when))) != QMessageBox.StandardButton.Yes:
             return
         reset.schedule_restore(p.id)
         self.accept()
@@ -261,7 +261,7 @@ class RestorePoints(QDialog):
         if QMessageBox.question(
                 self, _("Delete restore point"),
                 _("Delete this restore point? You won't be able to go back to it. Sounds kept in "
-                  "it go to the Windows Recycle Bin.")) != QMessageBox.Yes:
+                  "it go to the Windows Recycle Bin.")) != QMessageBox.StandardButton.Yes:
             return
         reset.delete_point(p.id)
         self.fill()

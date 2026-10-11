@@ -122,9 +122,9 @@ class SearchingView(QWidget):
         self._rng = random.Random()
         self.bar = LoadingBar(self)
         self.label = QLabel(self)
-        self.label.setTextFormat(Qt.RichText)
+        self.label.setTextFormat(Qt.TextFormat.RichText)
         self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.hide()
 
     def sizeHint(self) -> QSize:
@@ -215,7 +215,7 @@ class Thumb(QWidget):
         self.now = ""   # "playing" / "paused" while it's the one in the player
         self.progress_stage = ""
         self.progress_frac = 0.0
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         policy = self.sizePolicy()
         policy.setHeightForWidth(True)
         self.setSizePolicy(policy)
@@ -241,8 +241,8 @@ class Thumb(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setRenderHint(QPainter.SmoothPixmapTransform)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         w, h = self.width(), self.height()
         path = QPainterPath()
         path.addRoundedRect(QRectF(0, 0, w, h), 8, 8)
@@ -260,8 +260,9 @@ class Thumb(QWidget):
             if pm is None or pm.devicePixelRatio() != dpr or not (
                     pm.width() >= pw and pm.height() >= ph and
                     (pm.width() == pw or pm.height() == ph)):
-                pm = self._scaled = self._pm.scaled(pw, ph, Qt.KeepAspectRatioByExpanding,
-                                                    Qt.SmoothTransformation)
+                pm = self._scaled = self._pm.scaled(pw, ph,
+                                                    Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                                                    Qt.TransformationMode.SmoothTransformation)
                 pm.setDevicePixelRatio(dpr)
             size = pm.deviceIndependentSize()
             p.drawPixmap(QPointF((w - size.width()) / 2, (h - size.height()) / 2), pm)
@@ -290,15 +291,15 @@ class Thumb(QWidget):
         p.setFont(f)
         pill_w = p.fontMetrics().horizontalAdvance(word) + 20
         pill = QRectF((w - pill_w) / 2, (h - 22) / 2, pill_w, 22)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T["accent"]))
         p.drawRoundedRect(pill, 11, 11)
         p.setPen(QColor(theme.T["on_accent"]))
-        p.drawText(pill, Qt.AlignCenter, word)
+        p.drawText(pill, Qt.AlignmentFlag.AlignCenter, word)
 
         if stage not in ("downloading", "processing"):
             return   # nothing measured yet: no line that would look stuck
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, 120))
         p.drawRect(QRectF(0, h - 4, w, 4))
         fill_w = w if stage == "processing" else w * self.progress_frac
@@ -321,7 +322,7 @@ class Thumb(QWidget):
         eq = min(44.0, h * 0.42)
         box = QRectF((w - eq) / 2, h / 2 - eq * 0.75, eq, eq)
         if paused:   # a pause sign: still bars read as dots
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor("#ffffff"))
             bw = eq * 0.24
             for x in (box.center().x() - bw * 1.4, box.center().x() + bw * 0.4):
@@ -335,11 +336,11 @@ class Thumb(QWidget):
         word = _("Paused") if paused else _("Playing")
         pill_w = p.fontMetrics().horizontalAdvance(word) + 18
         pill = QRectF((w - pill_w) / 2, h / 2 + eq * 0.35, pill_w, 20)
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T["accent"]))
         p.drawRoundedRect(pill, 10, 10)
         p.setPen(QColor(theme.T["on_accent"]))
-        p.drawText(pill, Qt.AlignCenter, word)
+        p.drawText(pill, Qt.AlignmentFlag.AlignCenter, word)
 
     def set_now(self, now: str):
         changed, self.now = now != self.now, now
@@ -360,7 +361,7 @@ class ClampLabel(QLabel):
         f.setBold(bold)
         self.setFont(f)
         self.setToolTip(text)
-        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         self._fit()
 
     def set_full(self, text: str, tip: str = ""):
@@ -375,7 +376,7 @@ class ClampLabel(QLabel):
         # the theme's font comes with its style sheet, after __init__ (and changes with
         # the theme): sized by the font it had then, the last line lost its descenders
         super().changeEvent(e)
-        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+        if e.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
             self._fit()
 
     def _wrapped(self) -> list[tuple[str, float]]:
@@ -400,7 +401,7 @@ class ClampLabel(QLabel):
         for i, (start, length, ly) in enumerate(shown):
             text = self.full[start:start + length].rstrip()
             if i == len(shown) - 1 and start + length < len(self.full):
-                text = fm.elidedText(self.full[start:], Qt.ElideRight, self.width())
+                text = fm.elidedText(self.full[start:], Qt.TextElideMode.ElideRight, self.width())
             out.append((text, ly))
         self._wrap = (key, out)
         return out
@@ -445,7 +446,7 @@ class StatsLabel(ClampLabel):
                 break
             icons.icon(icon, "muted").paint(p, x, (self.height() - side) // 2, side, side)
             x += side + 5
-            shown = fm.elidedText(text, Qt.ElideRight, room)
+            shown = fm.elidedText(text, Qt.TextElideMode.ElideRight, room)
             p.drawText(QPointF(x, (self.height() - fm.height()) / 2 + fm.ascent()), shown)
             x += fm.horizontalAdvance(shown) + 14
         p.end()
@@ -465,7 +466,7 @@ class ResultRow(HoverCard):
         self.result = r
         self.wide = wide
         self._side: bool | None = None   # a wide card: picture beside the words (resizeEvent)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setProperty("own_space", True)   # Space plays / pauses this one (spacekey.py)
         self.setAccessibleName(r.title)
         self.thumb = Thumb()
@@ -490,12 +491,12 @@ class ResultRow(HoverCard):
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
         for b in (self.btn_play, self.btn_add):
-            b.setCursor(Qt.PointingHandCursor)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             if wide:   # as wide as their words (and the download's), not the whole card
                 b.setMinimumWidth(140)
-                b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+                b.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
             else:
-                b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                b.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.fill = -1.0        # the download's 0..1 (or -1: none), shown in its button
         self._tip = ""          # its words: the buttons' tooltip while it downloads
 
@@ -511,7 +512,7 @@ class ResultRow(HoverCard):
         if wide:
             buttons.addStretch(1)
         self.text_box.addLayout(buttons)
-        box = QBoxLayout(QBoxLayout.TopToBottom, self)
+        box = QBoxLayout(QBoxLayout.Direction.TopToBottom, self)
         box.setContentsMargins(10, 10, 10, 10) if wide else box.setContentsMargins(8, 8, 8, 8)
         box.setSpacing(14 if wide else 8)
         box.addWidget(self.thumb)
@@ -524,7 +525,7 @@ class ResultRow(HoverCard):
         self._added = False
         self.now = ""           # "playing" / "paused": it's the one in the player
         self.setProperty("playing", False)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip(_("Double-click to play"))
 
     def _style(self):
@@ -576,8 +577,8 @@ class ResultRow(HoverCard):
             side = self.width() >= self.WIDE_MIN_W
             if side != self._side:
                 self._side = side
-                self.layout().setDirection(QBoxLayout.LeftToRight if side
-                                           else QBoxLayout.TopToBottom)
+                self.layout().setDirection(QBoxLayout.Direction.LeftToRight if side
+                                           else QBoxLayout.Direction.TopToBottom)
                 if side:
                     self.thumb.setFixedWidth(self.WIDE_THUMB_W)
                     self.thumb.setMaximumHeight(16777215)
@@ -598,7 +599,7 @@ class ResultRow(HoverCard):
         super().mouseDoubleClickEvent(e)
 
     def keyPressEvent(self, e):
-        if e.key() in (Qt.Key_Return, Qt.Key_Enter, Qt.Key_Space):
+        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space):
             if not busy.is_busy(self.btn_play):
                 self.play.emit(self.result)
             e.accept()
@@ -758,12 +759,12 @@ class SearchResults(RoundedFrame):
         v.setContentsMargins(12, 0, 12, 12)
         v.setSpacing(6)
         header = QWidget()
-        header.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        header.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         header.setContentsMargins(0, 0, 0, 0)   # Back starts where the cards' panels do
         head = Flow(header, gap=8)
         back = self.btn_back = QPushButton(_("Back to my sounds"))
         back.setObjectName("backhome")   # the way out of the results: a plain button
-        back.setCursor(Qt.PointingHandCursor)
+        back.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(back, "back", "text_hi", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
@@ -779,7 +780,7 @@ class SearchResults(RoundedFrame):
             self.site_actions[key] = a
         v.addWidget(header)
         self.title = QLabel()
-        self.title.setTextFormat(Qt.RichText)
+        self.title.setTextFormat(Qt.TextFormat.RichText)
         self.title.setWordWrap(True)
         errors.linkify(self.title)   # an error's "Report it" link
         v.addWidget(self.title)
@@ -807,7 +808,7 @@ class SearchResults(RoundedFrame):
         lv.addLayout(self.rows)
         # the next page of the same search, added below: no paging back and forth
         self.more_btn = QPushButton(_("Show more"))
-        self.more_btn.setCursor(Qt.PointingHandCursor)
+        self.more_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(self.more_btn, "fold_open", size=16)
         self.more_btn.clicked.connect(lambda: (usage.used("search-show-more"), self._more()))
         self.more_btn.hide()
@@ -820,9 +821,9 @@ class SearchResults(RoundedFrame):
         lv.addStretch(1)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setWidget(self.list)
-        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
         v.addWidget(scroll, 1)
         self.scroll = scroll
         self.hide()

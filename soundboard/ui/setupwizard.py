@@ -164,7 +164,7 @@ MARGIN = 24                   # the dialog's sides: the step bar, pages and Back
 USE_TILE_H = 64               # "What's it for?": wider, shorter tiles, two across
 # Bun beside each step's title: about as tall as the title and its words, so the
 # header ends where its text does (his default padding left an empty band under it)
-BUN = {"height": 100, "pad": 10}
+BUN_H, BUN_PAD = 100, 10
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # DESIGN.md Standard kit: Display
 BODY_CSS = "font-size:11pt;"                      # ... Large (a full-page guide's body)
 
@@ -289,7 +289,7 @@ def _card(margins: int = 16, spacing: int = 12,
 def _label(text: str, css: str = BODY_CSS) -> QLabel:
     lbl = QLabel(text)
     lbl.setWordWrap(True)
-    lbl.setTextFormat(Qt.RichText)
+    lbl.setTextFormat(Qt.TextFormat.RichText)
     lbl.setStyleSheet(css)
     return lbl
 
@@ -318,17 +318,17 @@ class _RoundButton(QPushButton):
     def __init__(self, size: int):
         super().__init__()
         self.setFixedSize(size, size)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def paintEvent(self, ev):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         t = theme.T
         col = QColor(t["accent_hover"] if self.underMouse() or self.isDown() else t["accent"])
         if self.isDown():
             col = col.darker(115)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
-        p.setPen(QPen(QColor(t["text"]), 2) if self.hasFocus() else Qt.NoPen)
+        p.setPen(QPen(QColor(t["text"]), 2) if self.hasFocus() else Qt.PenStyle.NoPen)
         p.setBrush(col)
         p.drawEllipse(r)
         s = self.iconSize()
@@ -407,9 +407,9 @@ class StatusCard(QFrame):
         self.title.setStyleSheet("font-size:11pt; font-weight:700;")   # Standard kit: Large
         col.addWidget(self.title)
         col.addWidget(text)
-        self.actions = QVBoxLayout()   # a button that belongs to the state (Repair...)
-        self.actions.setContentsMargins(0, 4, 0, 0)
-        col.addLayout(self.actions)
+        self.action_box = QVBoxLayout()   # a button that belongs to the state (Repair...)
+        self.action_box.setContentsMargins(0, 4, 0, 0)
+        col.addLayout(self.action_box)
         h.addLayout(col, 1)
         self.pill = QLabel()
         h.addWidget(self.pill, 0, Qt.AlignTop)
@@ -564,7 +564,9 @@ class SetupWizard(QDialog):
         self.stack.addWidget(self._page_cable())
         self.stack.addWidget(self._page_discord())
         for i in range(self.stack.count()):   # the pages' edges are the dialog's: their
-            self.stack.widget(i).layout().setContentsMargins(0, 0, 0, 0)   # cards line up
+            page = self.stack.widget(i)          # cards line up with Back / Next
+            if page is not None and (lay := page.layout()) is not None:
+                lay.setContentsMargins(0, 0, 0, 0)
         # fill the last page's text now (its pill and card show from the start)
         self._fill_discord()
 
@@ -625,7 +627,7 @@ class SetupWizard(QDialog):
         group.buttonClicked.connect(lambda b: on_pick(b.property("device")))
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(box)
         rows = min(2, max(1, -(-len(names) // TILE_COLS)))
         scroll.setFixedHeight(rows * TILE_H + (rows - 1) * TILE_GAP if names else TILE_H)
@@ -640,7 +642,7 @@ class SetupWizard(QDialog):
                             _label(_("Pick the closest one. It only decides which tabs you "
                                      "start with: change it any time in <b>Settings</b> "
                                      "→ <b>Tabs</b>.")),
-                            BunnyWidget("star", **BUN)))
+                            BunnyWidget("star", height=BUN_H, pad=BUN_PAD)))
         box = QWidget()
         grid = QGridLayout(box)   # two across, icon beside the name
         grid.setContentsMargins(0, 0, 0, 0)
@@ -689,7 +691,7 @@ class SetupWizard(QDialog):
     def _page_mic(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_mic = BunnyWidget("mic", **BUN)
+        self.bun_mic = BunnyWidget("mic", height=BUN_H, pad=BUN_PAD)
         v.addLayout(_header(_("Which microphone do you talk into?"),
                             _label(_("Pick the mic you use for gaming (your headset or desk "
                                      "mic). <b>Say something</b>, the bar below should move "
@@ -720,7 +722,7 @@ class SetupWizard(QDialog):
     def _page_headphones(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_phones = BunnyWidget("headphones", **BUN)
+        self.bun_phones = BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)
         v.addLayout(_header(_("Where do you listen?"),
                             _label(_("Pick your headphones or speakers, then press the "
                                      "<b>speaker button</b>. Only you hear this.")),
@@ -764,7 +766,7 @@ class SetupWizard(QDialog):
     def _page_cable(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_cable = BunnyWidget("plug", **BUN)
+        self.bun_cable = BunnyWidget("plug", height=BUN_H, pad=BUN_PAD)
         v.addLayout(_header(_("Where do your sounds go?"),
                             _label(_("Straight into <b>your mic</b>: one click, and Discord "
                                      "and games hear your sounds through the mic they already "
@@ -785,7 +787,7 @@ class SetupWizard(QDialog):
         self.cable_status.setStyleSheet("font-size:10pt;")
         # the answer to "is it working?" right under the intro, in a card of its own
         self.status_card = StatusCard(self.cable_status)
-        self.status_card.actions.addWidget(self.btn_attach, 0, Qt.AlignLeft)
+        self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignLeft)
         v.insertSpacing(1, 4)
         v.insertWidget(2, self.status_card)
         self.cable_bar = QProgressBar()
@@ -814,7 +816,7 @@ class SetupWizard(QDialog):
         self.btn_restart.setObjectName("primary")
         self.btn_restart.clicked.connect(self.restart_pc)
         self.btn_restart.hide()
-        v.addWidget(self.btn_restart, 0, Qt.AlignLeft)
+        v.addWidget(self.btn_restart, 0, Qt.AlignmentFlag.AlignLeft)
         # streamers and Voicemeeter / mixer users: send somewhere else instead
         self.btn_other = QPushButton(_("Other device"))
         icons.set_icon(self.btn_other, "sliders")
@@ -951,7 +953,7 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         self.discord_text = _label("")
         head = _header(_("Last step: tell Discord or your game"), self.discord_text,
-                       BunnyWidget("star", celebrate=True, **BUN))
+                       BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD))
         self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
         v.addLayout(head)
         row = QHBoxLayout()
@@ -1143,7 +1145,7 @@ class SetupWizard(QDialog):
             usage.used("use-skipped")
             self.win.cfg.use_mode = "normal"
             self.win.cfg.save()
-        if r != QDialog.Accepted:
+        if r != QDialog.DialogCode.Accepted:
             for k, v in self._saved_devices.items():   # keep what they had, unless
                 if k not in self._user_picked:         # they picked another one here
                     setattr(self.win.cfg, k, v)
@@ -1658,7 +1660,8 @@ class SetupWizard(QDialog):
             e = self.win.engine
             lvl = e.level_mic if e.mic_stream is not None else 0.0
             for tile in self.mic_group.buttons():   # the level on the picked mic's tile
-                tile.set_level(lvl if tile.isChecked() else None)
+                if isinstance(tile, ChoiceTile):
+                    tile.set_level(lvl if tile.isChecked() else None)
             self.bun_mic.set_level(lvl)
             if lvl > TALK:
                 self._mic_peak_seen = True
@@ -1705,7 +1708,7 @@ class SteamGuide(QDialog):
             "Games that use <b>Steam's voice chat</b> (like <b>Counter-Strike 2</b>, "
             "<b>Dota 2</b> and <b>Deadlock</b>) don't have their own mic setting. "
             "They use the mic you pick <b>in Steam</b>. Do this once:")),
-            BunnyWidget("headphones", **BUN)))
+            BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)))
         small = "<br><span style='font-size:9pt'>{}</span>"
         items = [
             _("Open <b>Steam</b>. Click <b>Steam</b> in the top-left corner, then "

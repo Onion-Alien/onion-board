@@ -118,10 +118,10 @@ class ModesHelp(QDialog):
             lbl = QLabel(f"<b>{p.name}</b> &nbsp;<i>{html.escape(p.blurb)}</i><br>"
                          f"{html.escape(p.about)}")
             lbl.setWordWrap(True)
-            lbl.setTextFormat(Qt.RichText)
+            lbl.setTextFormat(Qt.TextFormat.RichText)
             v.addWidget(lbl)
         v.addWidget(hint_label(profiles.shared()))
-        bb = QDialogButtonBox(QDialogButtonBox.Close)
+        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         bb.rejected.connect(self.accept)
         v.addWidget(bb)
 
@@ -140,7 +140,7 @@ class ModeButton(QPushButton):
         super().__init__()
         self.mw = mw
         self.setObjectName("modebtn")
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.menu_ = QMenu(self)
         self.menu_.setToolTipsVisible(True)
         self.menu_.aboutToShow.connect(self.refresh)   # changed elsewhere meanwhile
@@ -255,7 +255,7 @@ class DestPanel(QWidget):
         self.suggest_btn.setToolTip(_("Switch to the mode that suits what's listening"))
         self.suggest_btn.setObjectName("small")
         self.suggest_btn.clicked.connect(self._use_suggestion)
-        sr.addWidget(self.suggest_btn, 0, Qt.AlignLeft)
+        sr.addWidget(self.suggest_btn, 0, Qt.AlignmentFlag.AlignLeft)
         self.suggest.hide()
         v.addWidget(self.suggest)
 
@@ -500,7 +500,7 @@ class CustomDestDialog(QDialog):
 
         self.form_box = QWidget()
         form = QFormLayout(self.form_box)
-        form.setLabelAlignment(Qt.AlignRight)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         self.name = QLineEdit()
         self.name.setMaxLength(40)
         self.name.textEdited.connect(self._edited)
@@ -535,7 +535,7 @@ class CustomDestDialog(QDialog):
         body.addWidget(self.form_box, 2)
         lay.addLayout(body, 1)
 
-        bb = QDialogButtonBox(QDialogButtonBox.Close)
+        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         bb.rejected.connect(self.accept)
         bb.accepted.connect(self.accept)
         lay.addWidget(bb)
@@ -546,12 +546,12 @@ class CustomDestDialog(QDialog):
         w = QWidget()
         h = QHBoxLayout(w)
         h.setContentsMargins(0, 0, 0, 0)
-        s = QSlider(Qt.Horizontal)
+        s = QSlider(Qt.Orientation.Horizontal)
         s.setRange(0, 100)
         s.setToolTip(tip)
         lbl = QLabel("0%")
         lbl.setFixedWidth(40)
-        lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         s.valueChanged.connect(lambda v: lbl.setText(f"{v}%"))
         s.valueChanged.connect(self._edited)
         h.addWidget(s, 1)
