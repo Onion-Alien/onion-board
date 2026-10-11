@@ -5,7 +5,7 @@
 
 Each target becomes one PNG in --out (default: a ui_shots folder in the temp folder):
   window            the whole main window
-  settings[:page]   the Settings dialog, open on that page (e.g. settings:tabs)
+  settings[:page]   the whole window with Settings open on that page (e.g. settings:tabs)
   <expression>      any widget, as Python on the main window `w` (e.g. w.voice)
 
 It builds the window exactly as the tests do (tests/test_mainwindow.py's `window`
@@ -26,7 +26,6 @@ ROOT = Path(__file__).resolve().parent.parent
 TEST = '''\
 import pytest
 from soundboard import i18n, theme
-from soundboard.settings import SettingsDialog
 from test_mainwindow import window as main_window  # noqa: F401
 
 TARGETS = {targets!r}
@@ -65,8 +64,10 @@ def test_zz_ui_shots(window, qapp):
             widget, close = w, None
         elif target.split(":")[0] == "settings":
             page = target.partition(":")[2] or "privacy"
-            widget = close = SettingsDialog(w, page)
-            widget.show()
+            # Settings is a page in the window (never a window of its own): shoot the
+            # window with it open, then go back to the tabs
+            w.open_settings(page)
+            widget, close = w, w._settings_dlg
         else:
             widget, close = eval(target, {{"w": w}}), None
         process_events(qapp, lambda: False, timeout=0.3)
@@ -74,8 +75,7 @@ def test_zz_ui_shots(window, qapp):
         assert widget.grab().save(str(path)), path
         print("saved", path)
         if close is not None:
-            close.close()
-            close.deleteLater()
+            close.accept()
 '''
 
 

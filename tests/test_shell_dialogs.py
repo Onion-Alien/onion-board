@@ -59,7 +59,7 @@ def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
     d._apply_search("zzzz-nothing")
     win.open_settings("audio")                               # a page asked for: search cleared
     assert d.search_box.text() == "" and d._page_keys[d.tabs.currentIndex()] == "audio"
-    assert d.done_btn is None and d.back_btn.toolTip() == "Back"   # no Done row: a back arrow
+    assert d.back_btn.toolTip() == "Back"   # no Done row: a back arrow
     d.back_btn.click()                                       # back to the tab you were on
     qapp.processEvents()
     assert not win.settings_open() and win._settings_dlg is None

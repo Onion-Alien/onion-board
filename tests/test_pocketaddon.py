@@ -228,8 +228,8 @@ def test_settings_offers_the_update_and_swaps_it_in(qapp, window, tmp_path,  # n
     try:
         info, old = _running_old(window, tmp_path)
         stops = __import__(PKG).stops
-        d = SettingsDialog(window, "remote")
-        d.show()
+        window.show()
+        d = window.open_settings("remote")   # a page in the window, as the cog opens it
         assert process_events(qapp, lambda: _update_button(d) is not None
                               and _update_button(d).isVisible(), timeout=3)
         assert _update_button(d).text() == "Update Onion Pocket to 0.2.0"
@@ -257,8 +257,8 @@ def test_a_failed_update_keeps_the_old_one_running(qapp, window, tmp_path,  # no
         info, old = _running_old(window, tmp_path)
         window.pocket_offer = pocketaddon.Offer("0.2.0")
         monkeypatch.setattr(pocketaddon, "get", lambda *a, **k: None)    # offline, bad zip…
-        d = SettingsDialog(window, "remote")
-        d.show()
+        window.show()
+        d = window.open_settings("remote")   # a page in the window, as the cog opens it
         btn = _update_button(d)
         assert btn is not None and btn.isVisible()     # known already: nothing asked
         btn.click()
