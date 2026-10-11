@@ -103,6 +103,25 @@ def test_all_hotkeys_off_leaves_only_its_own_key(window, monkeypatch, calls):
     assert registered[-1]["f1"] == "s0"
 
 
+def test_clearing_the_hotkeys_off_key_while_off_turns_them_back_on(window, monkeypatch):
+    w = window
+    registered = []
+    monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
+    w.meta("s0").hotkey = "f1"
+    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.on_hotkey("__hotkeys__")
+    assert registered[-1] == {"f12": "__hotkeys__"}
+    w.set_global_hotkey("hotkeys_off_hotkey", "")   # nothing left to turn them on
+    assert not w._hotkeys_off and registered[-1]["f1"] == "s0"
+    w.set_global_hotkey("hotkeys_off_hotkey", "f12")
+    w.on_hotkey("__hotkeys__")
+    w.set_global_hotkey("pause_hotkey", "f12")      # the key went to something else
+    assert not w._hotkeys_off and registered[-1]["f1"] == "s0"
+    w.cfg.hotkeys_off_hotkey = ""
+    w.toggle_hotkeys()                               # no key: they don't go off
+    assert not w._hotkeys_off
+
+
 def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
     w = window
     registered = []
