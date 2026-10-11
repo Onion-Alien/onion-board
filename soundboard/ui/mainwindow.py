@@ -2070,12 +2070,12 @@ class MainWindow(QMainWindow):
         av.addWidget(ref, 0, Qt.AlignLeft)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
+        from soundboard.ui.destpanel import DestPanel
+        self.dest_panel = DestPanel(self)
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
                                                     "chat app, or a stream. Your sounds are "
                                                     "shaped to come through clearly."),
-                            roomy=True)
-        from soundboard.ui.destpanel import DestPanel
-        self.dest_panel = DestPanel(self)
+                            roomy=True, beside=self.dest_panel.help_btn)   # What do these do?
         dv.addWidget(self.dest_panel)
 
         # ---- sound shaping
@@ -6519,7 +6519,7 @@ class MainWindow(QMainWindow):
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(path.parent)))
 
     def _save_copy(self, m: SoundMeta, d: EditDialog):
-        """'Save as new sound': the edits go onto a copy placed after the original."""
+        """'Save a copy': the edits go onto a copy placed after the original."""
         name = d.name.text().strip() or m.name
         try:
             new = duplicate(m, name if name != m.name else f"{name} (edit)")

@@ -281,8 +281,10 @@ def capped(body: QWidget, outer: QWidget | None = None, *,
     return outer
 
 
-def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFrame, QVBoxLayout]:
-    """A titled card, the building block of the Voice and Setup pages."""
+def card(title: str = "", hint: str = "", *, roomy: bool = False,
+         beside: QWidget | None = None) -> tuple[QFrame, QVBoxLayout]:
+    """A titled card, the building block of the Voice and Setup pages. `beside` goes
+    right after the title (an ⓘ that explains the card: DESIGN section 4)."""
     f = QFrame()
     f.setObjectName("card")
     v = QVBoxLayout(f)
@@ -290,7 +292,24 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFram
     # the title label adds 8 px of its own above, so the top margin is 8 less
     v.setContentsMargins(*((18, 10, 18, 18) if roomy else (14, 8, 14, 14)))
     v.setSpacing(12 if roomy else 6)
-    if title:
+    if title and beside is not None:
+        row = QHBoxLayout()
+        row.setSpacing(4)
+        lbl = section_label(title)
+        row.addWidget(lbl, 0, Qt.AlignTop)
+        # centred on the title's cap height (DESIGN section 4), measured from its font:
+        # its padding-top (8 px) + ascent - half the cap height
+        lbl.ensurePolished()
+        fm = lbl.fontMetrics()
+        centre = 8 + fm.ascent() - fm.capHeight() / 2
+        pin = QVBoxLayout()
+        pin.setContentsMargins(0, max(0, round(centre - beside.minimumHeight() / 2)), 0, 0)
+        pin.addWidget(beside)
+        pin.addStretch(1)
+        row.addLayout(pin)
+        row.addStretch(1)
+        v.addLayout(row)
+    elif title:
         v.addWidget(section_label(title))
     if hint:
         v.addWidget(hint_label(hint))
@@ -320,6 +339,28 @@ def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18) -> Q
     b.setAccessibleName(tip)
     return b
 
+
+def info_button(tip: str) -> QPushButton:
+    """The ⓘ beside a card's heading: 24 px (the smallest target), so the heading's
+    row doesn't grow. `tip` is its tooltip and screen-reader name."""
+    b = icon_button("info", tip, size=16)
+    b.setObjectName("infobutton")
+    b.setFixedSize(24, 24)
+    return b
+
+
+
+def reset_button(tip: str) -> QPushButton:
+    """The one look for putting a part back to how it starts, beside that part (an
+    effect, Live controls, a sound's effects): small, quiet, the reset arrow and the
+    word, so it reads the same everywhere (a slim muted link: it never makes a card's
+    heading row taller). `tip` says what goes back."""
+    b = QPushButton(_("Reset"))
+    b.setObjectName("reset")
+    b.setCursor(Qt.PointingHandCursor)
+    icons.set_icon(b, "reload", "muted", size=12)
+    b.setToolTip(tip)
+    return b
 
 class _LevelDot(Meter):
     """Audio activity beside a volume control, without a second slider-like track."""

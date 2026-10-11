@@ -965,7 +965,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Informe copiado. Pégalo en el reporte que se acaba de abrir en tu navegador (Ctrl+V).",
   "Report on GitHub": "Reportar en GitHub",
   "Reset": "Restablecer",
-  "Reset all": "Restablecer todo",
   "Reset and restart": "Restablecer y reiniciar",
   "Reset downloader": "Restablecer descargador",
   "Reset: {parts}. Changed your mind? Settings > General > Restore points.": "Restablecido: {parts}. ¿Cambiaste de opinión? Configuración > General > Puntos de restauración.",
@@ -988,7 +987,6 @@
   "Running in the background": "Ejecutándose en segundo plano",
   "Safer: bigger buffers": "Más seguro: búferes más grandes",
   "Save": "Guardar",
-  "Save as new sound": "Guardar como sonido nuevo",
   "Save it as a file to share with friends": "Guardarlo como archivo para compartirlo con amigos",
   "Save videos in": "Guardar videos en",
   "Save what you just heard": "Guardar lo que acabas de oír",
@@ -2865,7 +2863,6 @@
   "ha!": "¡Ja!",
   "too slow!": "¡demasiado lento!",
   "bonk!": "¡joder!",
-  "Click outside to close": "Haga clic afuera para cerrar",
   "More sounds and packs": "Más sonidos y packs",
   "Easier to set up": "Más fácil de configurar",
   "Others hearing my sounds in games and calls": "Otros escuchan mis sonidos en juegos y llamadas.",
@@ -3050,5 +3047,6 @@
   "Sound output": "Salida de sonido",
   "Interface size": "Tamaño de la interfaz",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Hace todo en Onion Board más grande o más chico: texto, botones y pads.",
-  "Onion Board changes size after a restart.": "Onion Board cambia de tamaño después de reiniciar."
+  "Onion Board changes size after a restart.": "Onion Board cambia de tamaño después de reiniciar.",
+  "Save a copy": "Guardar una copia"
 }

@@ -366,7 +366,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Rapor kopyalandı. Tarayıcında az önce açılan sorun kaydına yapıştır (Ctrl+V).",
   "Report on GitHub": "GitHub'da bildir",
   "Reset": "Sıfırla",
-  "Reset all": "Hepsini sıfırla",
   "Restart now": "Şimdi yeniden başlat",
   "Restart: press again restarts it": "Baştan başlat: tekrar basınca baştan çalar",
   "Resume": "Devam et",
@@ -374,7 +373,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "Bir pad'e sağ tıkla → Sonra çal; çalan sesten sonra sıraya girer.",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "Sadece bu aramayı Tor üzerinden değil, doğrudan siteden yap: site senin kendi adresini görür",
   "Save": "Kaydet",
-  "Save as new sound": "Yeni ses olarak kaydet",
   "Search": "Ara",
   "Search Myinstants: short meme sound buttons": "Myinstants'ta ara: kısa meme ses düğmeleri",
   "Search SoundCloud": "SoundCloud'da ara",
@@ -2865,7 +2863,6 @@
   "ha!": "Ha!",
   "too slow!": "çok yavaş!",
   "bonk!": "kahretsin!",
-  "Click outside to close": "Kapatmak için dışarıyı tıklayın",
   "More sounds and packs": "Daha fazla ses ve paket",
   "Easier to set up": "Kurulumu daha kolay",
   "Others hearing my sounds in games and calls": "Diğerleri oyunlarda ve aramalarda seslerimi duyuyor",
@@ -3050,5 +3047,6 @@
   "Sound output": "Ses çıkışı",
   "Interface size": "Arayüz boyutu",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Onion Board'daki her şeyi büyütür ya da küçültür: yazılar, düğmeler ve pad'ler.",
-  "Onion Board changes size after a restart.": "Onion Board yeniden başlatınca boyut değiştirir."
+  "Onion Board changes size after a restart.": "Onion Board yeniden başlatınca boyut değiştirir.",
+  "Save a copy": "Kopya kaydet"
 }

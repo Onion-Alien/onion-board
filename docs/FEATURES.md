@@ -71,7 +71,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   add-on effects too). One-click presets: **Deep fried**, Bass boosted,
   Slowed + reverb, Nightcore, Chipmunk, Demon, Fast / Slow-mo (same pitch), Old
   radio, Reversed. *Preview* plays it to you only; **Save** changes that pad,
-  **Save as new sound** keeps the original and adds the edited version as its own
+  **Save a copy** keeps the original and adds the edited version as its own
   pad. Pads with effects show **FX**; *Reset* goes back to the original. The
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.

@@ -360,7 +360,6 @@
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "报告已复制。把它粘贴到浏览器里刚打开的问题页面（Ctrl+V）。",
   "Report on GitHub": "在 GitHub 上报告",
   "Reset": "重置",
-  "Reset all": "全部重置",
   "Restart now": "立即重启",
   "Restart: press again restarts it": "重播：再按一次从头播放",
   "Resume": "继续",
@@ -368,7 +367,6 @@
   "Right-click a pad → Play next to queue it after the sound that's playing.": "右键按钮 → 下一个播放，把它排在正在播放的音效之后。",
   "Run just this search straight from the site, not through Tor: the site will see your own address": "只有这次搜索直接从网站进行，不经过 Tor：网站会看到你的真实地址",
   "Save": "保存",
-  "Save as new sound": "另存为新音效",
   "Search": "搜索",
   "Search Myinstants: short meme sound buttons": "搜索 Myinstants：简短的梗音效按钮",
   "Search SoundCloud": "搜索 SoundCloud",
@@ -2805,7 +2803,6 @@
   "ha!": "哈！",
   "too slow!": "太慢了！",
   "bonk!": "棒极了！",
-  "Click outside to close": "点击外部关闭",
   "More sounds and packs": "更多声音和包",
   "Easier to set up": "设置更容易",
   "Others hearing my sounds in games and calls": "其他人在游戏和通话中听到我的声音",
@@ -2985,5 +2982,6 @@
   "Sound output": "声音输出",
   "Interface size": "界面大小",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "让 Onion Board 里的一切变大或变小：文字、按钮和音效键。",
-  "Onion Board changes size after a restart.": "Onion Board 重启后改变大小。"
+  "Onion Board changes size after a restart.": "Onion Board 重启后改变大小。",
+  "Save a copy": "另存副本"
 }
