@@ -210,3 +210,53 @@ def test_download_bar_cancel_is_not_a_failure(qapp):
     bar.set_done(a, "play", False)
     assert not bar._failed and not bar.outcome.isVisible()
     bar.close()
+
+
+def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
+    from soundboard.ui.downloadbar import BAR_MIN_W, DownloadBar
+    bar = DownloadBar()
+    links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
+    bar.set_active(links[0], "A song with a long name", "add", None, "Someone", 90)
+    bar.set_queue([{"url": u, "title": "x", "kind": "add"} for u in links[1:]])
+    bar.show()
+    bar.resize(1000, 80)
+    qapp.processEvents()
+    assert bar.queue_badge.text() == "+2 queued" and bar.btn_stop_all.isVisibleTo(bar)
+    assert bar.lbl_src.isVisibleTo(bar)
+    bar.setFixedWidth(360)   # the smallest window before the mini player
+    qapp.processEvents()
+    assert bar.queue_badge.text() == "+2" and not bar.btn_stop_all.isVisibleTo(bar)
+    assert not bar.lbl_src.isVisibleTo(bar) and bar.src_icon.isVisibleTo(bar)
+    assert bar.bar.width() >= BAR_MIN_W
+    bar.queue_badge.setChecked(True)
+    assert bar.btn_panel_stop.isVisibleTo(bar)   # Stop all, in the list
+    bar.setFixedWidth(1000)
+    qapp.processEvents()
+    assert bar.queue_badge.text() == "+2 queued" and bar.btn_stop_all.isVisibleTo(bar)
+    bar.close()
+
+
+def test_tab_leaves_the_network_activity_table(qapp):
+    """With rows in it, Tab used to step through every cell and never get out."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QLineEdit, QTableWidgetItem, QVBoxLayout, QWidget
+
+    from soundboard.ui.netactivity import ActivityTable
+    host = QWidget()
+    lay = QVBoxLayout(host)
+    table = ActivityTable(["a", "b", "c", "d", "e", "f"], 1)
+    after = QLineEdit()
+    lay.addWidget(table)
+    lay.addWidget(after)
+    table.setRowCount(3)
+    for r in range(3):
+        for c in range(6):
+            table.setItem(r, c, QTableWidgetItem("x"))
+    host.show()
+    host.activateWindow()
+    table.setFocus()
+    qapp.processEvents()
+    QTest.keyClick(table, Qt.Key_Tab)
+    assert after.hasFocus()
+    host.close()

@@ -14,3 +14,6 @@
 - Click a waiting song in the queue list to download it next.
 - Play once while other songs download goes next in the queue (it doesn't wait behind
   the Adds), and a newer Play replaces one still waiting.
+- Tab no longer gets stuck in Settings' network activity list when it has rows.
+- In a narrow window the download bar keeps its progress bar: Stop all moves into the
+  queue list and "+2 queued" reads "+2".

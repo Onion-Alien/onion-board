@@ -213,6 +213,9 @@ class Outcome(QWidget):
 THUMB_W, THUMB_H = 64, 36     # the picture at the left of the banner
 ROW_THUMB = (40, 24)          # and in the queue list
 WIDE_AT = 720                 # the banner is this wide or more: the uploader and length show
+TIGHT_BELOW = 640             # narrower: the site as just its logo, Stop all in the queue list,
+                              # "+2" for "+2 queued" (as in the mini player)
+BAR_MIN_W = 48                # the progress bar never shrinks past this
 QUEUE_ROWS = 5                # queue rows shown before the list scrolls
 
 
@@ -351,6 +354,7 @@ class DownloadBar(QFrame):
         self.stage = ""  # "parsing", "downloading", "processing", "done"
         self.progress_frac = 0.0
         self._mini = False
+        self._tight = False   # _fit_tight: a narrow banner (or the mini player's)
         self._queue: list[dict] = []
         self._failed: list[dict] = []   # picks that couldn't download, to retry
         self._raw = ("", 0.0)   # the running pick's title as given, and its length
@@ -514,6 +518,7 @@ class DownloadBar(QFrame):
         # starting under line 1's words; what it's doing comes after it
         self.bar = SmoothProgressBar()
         self.bar.setMaximumWidth(BAR_W)
+        self.bar.setMinimumWidth(BAR_MIN_W)
         row2.addWidget(self.bar, 1, Qt.AlignVCenter)
 
         self.lbl_status = QLabel()
@@ -747,13 +752,26 @@ class DownloadBar(QFrame):
         for b in (self.btn_min, self.btn_close):
             b.move(self.width() - b.width() - 6, 6)
             b.raise_()
+        self._fit_tight()
         self._show_meta()
+
+    def _fit_tight(self):
+        """In a narrow window the banner drops what it can do without, like the mini
+        player's: the site's name (its logo stays), Stop all (it moves into the queue
+        list) and the word "queued"."""
+        tight = self._mini or self.width() < TIGHT_BELOW
+        if tight == self._tight:
+            return
+        self._tight = tight
+        self.lbl_src.setVisible(not tight)
+        self._update_queue_badge()
 
     def set_mini(self, mini: bool):
         """The mini player's narrow bar: no picture, the site as just its logo, and its
         Stop all in the queue list (no room for it beside Cancel)."""
         self._mini = mini
-        self.lbl_src.setVisible(not mini)
+        self._tight = not mini   # makes _fit_tight apply it
+        self._fit_tight()
         self._corner()   # no minimise: the mini player's bar is short already
         self.retheme()   # also lines line 1 up again
         self._apply_art()
@@ -894,16 +912,21 @@ class DownloadBar(QFrame):
             self.btn_panel_stop.hide()
             self.panel.hide()
             return
-        self.queue_badge.setText(" · ".join(x for x in (self._queued_text(),
-                                                        self._failed_text_for(failed)) if x))
+        if self._tight:   # "+2 · ✗ 1": the tooltip and the list say the rest
+            short = [f"+{len(self._queue)}" if self._queue else "",
+                     f"✗ {len(failed)}" if failed else ""]
+            self.queue_badge.setText(" · ".join(x for x in short if x))
+        else:
+            self.queue_badge.setText(" · ".join(x for x in (self._queued_text(),
+                                                            self._failed_text_for(failed)) if x))
         self.queue_badge.setIcon(QIcon(icons.pixmap(
             "fold_open" if self.queue_badge.isChecked() else "fold", 14, theme.T["muted"])))
         names = [pretty_title(item.get("title", "")) or _("Sound") for item in self._queue]
         self.queue_badge.setToolTip("\n".join(([_("Up next")] + [f"• {n_}" for n_ in names])
                                               if names else [self._failed_text_for(failed)]))
         self.queue_badge.show()
-        self.btn_stop_all.setVisible(bool(self._queue) and not self._mini)
-        self.btn_panel_stop.setVisible(bool(self._queue) and self._mini)
+        self.btn_stop_all.setVisible(bool(self._queue) and not self._tight)
+        self.btn_panel_stop.setVisible(bool(self._queue) and self._tight)
         if self.panel.isVisible():
             self._fill_rows()
 
