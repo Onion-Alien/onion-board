@@ -151,10 +151,13 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         assert output.dot.geometry().intersects(mark.adjusted(-4, -4, 4, 4))
         window.tabs.setCurrentWidget(window.sounds_page)
         QTest.mouseClick(output.mark, Qt.LeftButton)
-        assert window.tabs.currentWidget() is not window.sounds_page
+        assert window.tabs.currentWidget() is window.setup_page
+        window.tabs.setCurrentWidget(window.sounds_page)   # (Setup is wider: it can shut the rail)
         window.rail.set_open(True)
         qapp.processEvents()
-        assert not output.dot.isVisible()   # open: the warning line says it
+        # the full card: its warning line says it, no dot (CI's wider fonts can keep
+        # the small card even fully open: the dot stays then)
+        assert output.dot.isVisible() == (not output.property("expanded"))
         assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
         assert output.setup.property("action") is True
         assert output.setup.focusPolicy() == Qt.TabFocus and output.height() == height
