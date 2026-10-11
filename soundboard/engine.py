@@ -1083,6 +1083,7 @@ class Engine:
         self.devices = DeviceWorker()
         self._touched: list[str] = []   # keys the device thread's last reopens touched
         self._touched_lock = threading.Lock()
+        self._shut = False   # shutdown() ran: the watchdog never reopens a device again
 
         # the mic's clock is its own device's: drift tracking switches itself on if it
         # turns out to wander from the output's (see Ring.auto_drift)
@@ -1486,6 +1487,8 @@ class Engine:
         can take the driver seconds), one check at a time. Returns the keys that were
         touched (reopened or came back since the last check, or whose callback raised),
         so the UI can refresh its status from errors_snapshot()."""
+        if self._shut:
+            return []
         now = time.monotonic()
         with self._touched_lock:
             touched, self._touched = self._touched, []
@@ -1508,6 +1511,8 @@ class Engine:
     @_holding_devices
     def _watch(self, now: float) -> list[str]:
         """check_streams' reopens, on the device thread. Returns the keys touched."""
+        if self._shut:   # queued before shutdown() closed everything
+            return []
         touched = []
         self._check_tap(now)
         self._check_copies(now)
@@ -1647,6 +1652,7 @@ class Engine:
     def shutdown(self, wait_s: float = 5.0):
         """Close every stream. Waits up to `wait_s` for the device thread's work
         (quitting mustn't hang on a driver that never answers)."""
+        self._shut = True
         held = DEVICES.acquire(timeout=wait_s)
         if not held:
             log.warning("the device thread is stuck; closing the streams anyway")

@@ -7805,7 +7805,7 @@ class MainWindow(QMainWindow):
         if not self._tick_busy:
             self._tick_busy = True
             pace = self._tick_pace()
-            if self.timer.interval() != pace:
+            if self.timer.interval() != pace and not self._shut_down:
                 self.timer.start(pace)
 
     def _busy(self, playing) -> bool:
@@ -7823,7 +7823,7 @@ class MainWindow(QMainWindow):
         # the mic-check banner pulses only while it can be seen, in front
         self._pulse.set_live(live and appstate.active())
         pace = self._tick_pace()
-        if live == was and self.timer.interval() == pace:
+        if (live == was and self.timer.interval() == pace) or getattr(self, "_shut_down", False):
             return
         self.timer.start(pace)
         if not live:   # a level frozen mid-flight would show as stuck on the next show
@@ -7833,6 +7833,8 @@ class MainWindow(QMainWindow):
                 thumbs.trim()          # from their small files when it's back
 
     def tick(self):
+        if self._shut_down:   # a tick already queued when the window shut down
+            return
         e = self.engine
         now = time.monotonic()
         self._tick_n += 1
