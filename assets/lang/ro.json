@@ -3031,11 +3031,6 @@
   "winget took longer than {seconds} seconds.": "winget a durat mai mult de {seconds} secunde.",
   "✓ Got FFmpeg": "✓ FFmpeg luat",
   "No settings match “{text}”": "Nicio setare nu se potrivește cu „{text}”",
-  "+{count} queued": [
-    "+{count} în coadă",
-    "+{count} în coadă",
-    "+{count} în coadă"
-  ],
   "Cancel download": "Anulează descărcarea",
   "Couldn't download": "Nu s-a putut descărca",
   "Parsing video…": "Se citește videoclipul…",
@@ -3247,5 +3242,10 @@
   "Opacity": "Opacitate",
   "Playing sound background": "Fundalul sunetului redat",
   "Show the playing sound's thumbnail behind the cards": "Arată miniatura sunetului redat în spatele cardurilor",
+  "Adding {n} sound": [
+    "Se adaugă {n} sunet",
+    "Se adaugă {n} sunete",
+    "Se adaugă {n} de sunete"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Cablul virtual a fost eliminat. Repornește PC-ul înainte să-l instalezi din nou."
 }

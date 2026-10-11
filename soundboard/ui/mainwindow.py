@@ -938,6 +938,8 @@ class MainWindow(QMainWindow):
         self._dl_lay.addWidget(self.download_bar)
         tv.addWidget(dl_box)
         self.download_bar.shown_changed.connect(self._dl_bar_gap)
+        self.download_bar.shown_changed.connect(lambda _on: self._refit_dl_bar())
+        self.download_bar.room_changed.connect(self._refit_dl_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -1416,6 +1418,19 @@ class MainWindow(QMainWindow):
         m = self._dl_lay.contentsMargins()
         if (m.left(), m.right()) != (left, right):
             self._dl_lay.setContentsMargins(left, 0, right, 0)
+
+    def _refit_dl_bar(self):
+        """The download bar came, went or needs another height (rows added, opened):
+        fit the window again for it, once the change is laid out."""
+        if getattr(self, "_dl_refit_due", False) or not hasattr(self, "_dl_steps"):
+            return
+        self._dl_refit_due = True
+
+        def run():
+            self._dl_refit_due = False
+            self._fit.retry(self._dl_steps)   # open again if it fits now
+            self._refit()
+        QTimer.singleShot(0, self, run)   # with the window: not after it's gone
 
     def _dl_bar_gap(self, shown: bool):
         """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
@@ -8498,6 +8513,10 @@ class MainWindow(QMainWindow):
         f.add(40, "h", lambda tight: r.hide(self.mixer)(
             tight and (self.height() < 520 or self.width() < 760)))
         f.add(50, "h", self._cat_bar_step)   # the overlay's category key still works
+        # the download list folds to its running row, then to its summary line, before
+        # the mixer goes (a long queue at 800x600 isn't a reason for the mini player)
+        self._dl_steps = self.download_bar.fit_steps()
+        f.extend(self._dl_steps)
         self._stack_cols = (self._stack_setup,
                             *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)

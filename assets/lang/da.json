@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget tog mere end {seconds} sekunder.",
   "✓ Got FFmpeg": "✓ FFmpeg hentet",
   "No settings match “{text}”": "Ingen indstillinger matcher \"{text}\"",
-  "+{count} queued": [
-    "+{count} i kø",
-    "+{count} i kø"
-  ],
   "Cancel download": "Annuller download",
   "Couldn't download": "Kunne ikke downloade",
   "Parsing video…": "Læser videoen…",
@@ -3174,5 +3170,9 @@
   "Opacity": "Opacitet",
   "Playing sound background": "Baggrund for afspillet lyd",
   "Show the playing sound's thumbnail behind the cards": "Vis den afspillede lyds miniature bag kortene",
+  "Adding {n} sound": [
+    "Tilføjer {n} lyd",
+    "Tilføjer {n} lyde"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Det virtuelle kabel er fjernet. Genstart din pc, før du installerer det igen."
 }

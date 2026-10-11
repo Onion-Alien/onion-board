@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget 用时超过 {seconds} 秒。",
   "✓ Got FFmpeg": "✓ 已获取 FFmpeg",
   "No settings match “{text}”": "没有设置匹配“{text}”",
-  "+{count} queued": [
-    "+{count} 个排队中"
-  ],
   "Cancel download": "取消下载",
   "Couldn't download": "无法下载",
   "Parsing video…": "正在解析视频…",
@@ -3101,5 +3098,8 @@
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的声音背景",
   "Show the playing sound's thumbnail behind the cards": "在卡片后方显示正在播放的声音缩略图",
+  "Adding {n} sound": [
+    "正在添加 {n} 个声音"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "虚拟线缆已移除。重新安装前请先重启电脑。"
 }

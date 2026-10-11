@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget hat länger als {seconds} Sekunden gebraucht.",
   "✓ Got FFmpeg": "✓ FFmpeg geholt",
   "No settings match “{text}”": "Keine Einstellung passt zu „{text}“",
-  "+{count} queued": [
-    "+{count} wartet",
-    "+{count} warten"
-  ],
   "Cancel download": "Download abbrechen",
   "Couldn't download": "Konnte nicht heruntergeladen werden",
   "Parsing video…": "Video wird analysiert…",
@@ -3174,5 +3170,9 @@
   "Opacity": "Deckkraft",
   "Playing sound background": "Hintergrund des laufenden Sounds",
   "Show the playing sound's thumbnail behind the cards": "Vorschaubild des laufenden Sounds hinter den Karten anzeigen",
+  "Adding {n} sound": [
+    "{n} Sound wird hinzugefügt",
+    "{n} Sounds werden hinzugefügt"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Das virtuelle Kabel wurde entfernt. Starte deinen PC neu, bevor du es wieder installierst."
 }

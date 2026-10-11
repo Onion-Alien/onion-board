@@ -3031,11 +3031,6 @@
   "winget took longer than {seconds} seconds.": "winget работал дольше {seconds} секунд.",
   "✓ Got FFmpeg": "✓ FFmpeg установлен",
   "No settings match “{text}”": "Ни одна настройка не соответствует «{text}»",
-  "+{count} queued": [
-    "+{count} в очереди",
-    "+{count} в очереди",
-    "+{count} в очереди"
-  ],
   "Cancel download": "Отменить скачивание",
   "Couldn't download": "Не удалось скачать",
   "Parsing video…": "Анализ видео…",
@@ -3247,5 +3242,10 @@
   "Opacity": "Непрозрачность",
   "Playing sound background": "Фон текущего звука",
   "Show the playing sound's thumbnail behind the cards": "Показывать миниатюру текущего звука за карточками",
+  "Adding {n} sound": [
+    "Добавляется {n} звук",
+    "Добавляются {n} звука",
+    "Добавляются {n} звуков"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Виртуальный кабель удалён. Перезагрузи компьютер, прежде чем устанавливать его снова."
 }

@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "winget को {seconds} सेकंड से ज़्यादा समय लगा।",
   "✓ Got FFmpeg": "✓ FFmpeg मिल गया",
   "No settings match “{text}”": "कोई भी सेटिंग \"{text}\" से मेल नहीं खाती",
-  "+{count} queued": [
-    "+{count} कतार में",
-    "+{count} कतार में"
-  ],
   "Cancel download": "डाउनलोड रद्द करें",
   "Couldn't download": "डाउनलोड नहीं हो सका",
   "Parsing video…": "वीडियो पढ़ा जा रहा है…",
@@ -3174,5 +3170,9 @@
   "Opacity": "अपारदर्शिता",
   "Playing sound background": "चल रहे साउंड की पृष्ठभूमि",
   "Show the playing sound's thumbnail behind the cards": "कार्ड के पीछे चल रहे साउंड का थंबनेल दिखाएँ",
+  "Adding {n} sound": [
+    "{n} ध्वनि जोड़ी जा रही है",
+    "{n} ध्वनियाँ जोड़ी जा रही हैं"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "वर्चुअल केबल हटा दी गई है। इसे फिर से इंस्टॉल करने से पहले अपना PC रीस्टार्ट करें।"
 }

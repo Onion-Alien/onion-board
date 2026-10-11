@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "Tumagal nang mahigit {seconds} segundo ang winget.",
   "✓ Got FFmpeg": "✓ Nakuha ang FFmpeg",
   "No settings match “{text}”": "Walang tugmang setting sa “{text}”",
-  "+{count} queued": [
-    "+{count} nakapila",
-    "+{count} nakapila"
-  ],
   "Cancel download": "Kanselahin ang download",
   "Couldn't download": "Hindi ma-download",
   "Parsing video…": "Binabasa ang video…",
@@ -3174,5 +3170,9 @@
   "Opacity": "Opacity",
   "Playing sound background": "Background ng tumutugtog na tunog",
   "Show the playing sound's thumbnail behind the cards": "Ipakita ang thumbnail ng tumutugtog na tunog sa likod ng mga card",
+  "Adding {n} sound": [
+    "Idinadagdag ang {n} sound",
+    "Idinadagdag ang {n} sound"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Tinanggal na ang virtual cable. I-restart ang PC mo bago mo ito i-install ulit."
 }

@@ -2968,10 +2968,6 @@
   "winget took longer than {seconds} seconds.": "Το winget πήρε περισσότερο από {seconds} δευτερόλεπτα.",
   "✓ Got FFmpeg": "✓ Το FFmpeg αποκτήθηκε",
   "No settings match “{text}”": "Καμία ρύθμιση δεν ταιριάζει με το \"{text}\"",
-  "+{count} queued": [
-    "+{count} σε αναμονή",
-    "+{count} σε αναμονή"
-  ],
   "Cancel download": "Ακύρωση λήψης",
   "Couldn't download": "Η λήψη απέτυχε",
   "Parsing video…": "Ανάγνωση βίντεο…",
@@ -3174,5 +3170,9 @@
   "Opacity": "Αδιαφάνεια",
   "Playing sound background": "Φόντο ήχου που παίζει",
   "Show the playing sound's thumbnail behind the cards": "Εμφάνιση της μικρογραφίας του ήχου που παίζει πίσω από τις κάρτες",
+  "Adding {n} sound": [
+    "Προστίθεται {n} ήχος",
+    "Προστίθενται {n} ήχοι"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Το εικονικό καλώδιο αφαιρέθηκε. Κάνε επανεκκίνηση του υπολογιστή πριν το εγκαταστήσεις ξανά."
 }

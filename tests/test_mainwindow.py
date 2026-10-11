@@ -275,6 +275,33 @@ def test_window_shrinks_and_still_fits(window, size, qapp):
     assert window.mixer.isVisibleTo(window) and window.np_name.isVisibleTo(window)
 
 
+def test_long_download_list_folds_before_the_mini_player(window, qapp):
+    """A queue of picks makes the download list tall: at 800x600 it folds (to its running
+    row, then its summary line) instead of the window turning into the mini player,
+    and it opens again once the window is big enough."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    bar = window.download_bar
+    links = [f"https://www.youtube.com/watch?v={c}" for c in "abcd"]
+    window.resize(1400, 1000)
+    window._refit()
+    bar.set_active(links[0], "One", "add", None, "Someone", 90)
+    bar.set_queue([{"url": u, "title": "x", "kind": "add", "seconds": 60} for u in links[1:]])
+    QTest.qWait(50)   # the bar asks for a refit once it's laid out
+    assert bar._room == "open" and bar.scroll_area.isVisibleTo(bar)
+    window.resize(800, 600)
+    window._refit()
+    assert not window.is_mini() and bar.isVisibleTo(window)
+    assert bar._room in ("row", "line")
+    need = window._full.minimumSizeHint()
+    assert need.height() <= 600
+    window.resize(1400, 1000)
+    window._refit()
+    assert bar._room == "open" and bar.scroll_area.isVisibleTo(bar)
+    bar._clear_and_hide()
+
+
 def test_tiny_window_becomes_mini_player_and_back(window, qapp):
     """Too small to use: just the player (plus the pads if it's tall enough), and the
     whole window again, pads back in the Sounds tab, once it's big enough."""

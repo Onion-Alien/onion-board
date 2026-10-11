@@ -2905,9 +2905,6 @@
   "winget took longer than {seconds} seconds.": "winget mất hơn {seconds} giây.",
   "✓ Got FFmpeg": "✓ Đã có FFmpeg",
   "No settings match “{text}”": "Không có cài đặt nào khớp với “{text}”",
-  "+{count} queued": [
-    "+{count} đang chờ"
-  ],
   "Cancel download": "Hủy tải xuống",
   "Couldn't download": "Không tải được",
   "Parsing video…": "Đang đọc video…",
@@ -3101,5 +3098,8 @@
   "Opacity": "Độ mờ",
   "Playing sound background": "Nền âm thanh đang phát",
   "Show the playing sound's thumbnail behind the cards": "Hiện hình thu nhỏ của âm thanh đang phát phía sau các thẻ",
+  "Adding {n} sound": [
+    "Đang thêm {n} âm thanh"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Đã gỡ cáp ảo. Hãy khởi động lại PC trước khi cài lại."
 }

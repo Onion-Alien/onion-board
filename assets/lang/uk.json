@@ -3031,11 +3031,6 @@
   "winget took longer than {seconds} seconds.": "winget працював довше ніж {seconds} секунд.",
   "✓ Got FFmpeg": "✓ FFmpeg отримано",
   "No settings match “{text}”": "Жодне налаштування не відповідає “{text}”",
-  "+{count} queued": [
-    "+{count} у черзі",
-    "+{count} у черзі",
-    "+{count} у черзі"
-  ],
   "Cancel download": "Скасувати завантаження",
   "Couldn't download": "Не вдалося завантажити",
   "Parsing video…": "Читаємо відео…",
@@ -3247,5 +3242,10 @@
   "Opacity": "Непрозорість",
   "Playing sound background": "Тло поточного звуку",
   "Show the playing sound's thumbnail behind the cards": "Показувати мініатюру поточного звуку за картками",
+  "Adding {n} sound": [
+    "Додається {n} звук",
+    "Додаються {n} звуки",
+    "Додається {n} звуків"
+  ],
   "The virtual cable was removed. Restart your PC before you install it again.": "Віртуальний кабель видалено. Перезавантаж комп'ютер, перш ніж встановлювати його знову."
 }
