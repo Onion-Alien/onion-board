@@ -3173,5 +3173,6 @@
   "Adding {n} sound": [
     "{n} Sound wird hinzugefügt",
     "{n} Sounds werden hinzugefügt"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Das virtuelle Kabel wurde entfernt. Starte deinen PC neu, bevor du es wieder installierst."
 }

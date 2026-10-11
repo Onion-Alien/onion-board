@@ -3173,5 +3173,6 @@
   "Adding {n} sound": [
     "{n} ses ekleniyor",
     "{n} ses ekleniyor"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Sanal kablo kaldırıldı. Yeniden kurmadan önce bilgisayarını yeniden başlat."
 }

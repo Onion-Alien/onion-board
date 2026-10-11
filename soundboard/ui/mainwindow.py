@@ -1968,6 +1968,7 @@ class MainWindow(QMainWindow):
         self._attaching = False
         self._attach_release = None   # busy.hold on btn_install while it's being set up
         self._settle_until = 0.0      # just set up: Windows is still loading it
+        self._done_toast = None       # "done" / "updated": said once it works
         icons.set_icon(self.btn_install, "cable", "on_accent")
         ways.addWidget(self.btn_install)
         ways.addWidget(self.btn_usecable)   # (after the mic's own button: the second way)
@@ -2261,11 +2262,15 @@ class MainWindow(QMainWindow):
         n = len({d["name"] for d in outs} | {d["name"] for d in eng.list_devices("input")})
         return ngettext("✓ Found {n} device", "✓ Found {n} devices", n)
 
+    RESCAN_SHOWN_S = 3.0   # a Re-scan button shows what it found this long
+
     def rescan_with_feedback(self, btn, after=None):
         """A Re-scan button: "Scanning…" while it runs (on the device thread: the
         window stays usable even if a driver is stuck), then what it found."""
-        if busy.is_busy(btn):
-            return   # already scanning: a double click mustn't queue a second one
+        if busy.is_busy(btn) or time.monotonic() < (btn.property("scanned_until") or 0):
+            # already scanning, or still showing what it found: a re-scan closes and
+            # reopens every device, so spam clicks restarted them all over and over
+            return
         release = busy.hold(btn, _("Scanning…"))
 
         def done(msg):
@@ -2274,7 +2279,11 @@ class MainWindow(QMainWindow):
                     after()
                 except RuntimeError:   # its dialog was closed while it scanned
                     pass
-            release(msg, 3000)
+            try:
+                btn.setProperty("scanned_until", time.monotonic() + self.RESCAN_SHOWN_S)
+            except RuntimeError:   # (its dialog was closed)
+                pass
+            release(msg, int(self.RESCAN_SHOWN_S * 1000))
         self._when_devices_free(lambda: self._refresh_off_ui(done))
 
     def set_latency(self, mode: str):
@@ -2936,7 +2945,7 @@ class MainWindow(QMainWindow):
         vm = self.virtual_mic
         route = self.cfg.route
         dev = self._main_name()
-        any_cable = bool(eng.virtual_outputs())
+        any_cable = not self._cable_gone and bool(eng.virtual_outputs())
         direct = directmic.status(self.cfg.mic_device) if route == "mic" else ""
         warn = theme.status("warn")
         # just set up: until Windows has it running, say so (not "Repair" straight away)
@@ -3094,6 +3103,18 @@ class MainWindow(QMainWindow):
             release()
         if self.setup_show.on and not mic_busy:
             self.setup_show.finish(route == "mic" and state == "ok")
+        elif mic_busy and not self.setup_show.on:
+            # still setting up or starting, but Bun's show ended (he left while the tab
+            # was hidden): back on, never a Repair button beside "starting…"
+            self.setup_show.start()
+        said = self._done_toast
+        if said and not mic_busy:
+            self._done_toast = None
+            if route == "mic" and state == "ok":   # (the wait ran out: no "Done")
+                self.toast(_("Mic updated: games, calls and browsers hear your sounds.")
+                           if said == "updated" else
+                           _("Done: Discord and games hear your sounds through your mic now."),
+                           "ok")
         self.btn_install.setVisible((state == "missing" or update
                                      or (route == "mic" and state != "ok"))
                                     and not self.setup_show.on)   # Bun's show instead
@@ -3108,7 +3129,8 @@ class MainWindow(QMainWindow):
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
-        self.btn_usecable.setVisible(route == "mic" and not mic_busy)   # also when it works
+        self.btn_usecable.setVisible(route == "mic" and not mic_busy   # also when it works
+                                     and not self._cable_gone)   # (back after a restart)
         spare = route == "mic" and state == "ok" and self._spare_cable()
         self.btn_rmcable.setVisible(spare)
         self.rmcable_note.setVisible(spare)
@@ -3228,6 +3250,7 @@ class MainWindow(QMainWindow):
 
     def _mic_attached(self, mic: str, err: str):
         self._attaching = False
+        self._done_toast = None
         updating, self._mic_updating = self._mic_updating, False
         directmic.forget_status()
         if err:
@@ -3257,12 +3280,11 @@ class MainWindow(QMainWindow):
             self.set_route("mic", attached=True)
             from soundboard.ui.setupwizard import SetupWizard
             modal = QApplication.activeModalWidget()
-            if updating:
-                self.toast(_("Mic updated: games, calls and browsers hear your sounds."),
-                           "ok")
-            elif not isinstance(modal, SetupWizard):
-                self.toast(_("Done: Discord and games hear your sounds through your mic now."),
-                           "ok")
+            # said once it works (_update_flow), with the card turning green and Bun
+            # cheering: said now, it came while the card still read "starting…" and Bun
+            # was still hammering, and Windows can still fail to load it
+            self._done_toast = ("updated" if updating else
+                                None if isinstance(modal, SetupWizard) else "done")
             if is_hands_free(mic):
                 self.toast(_("That's a Bluetooth headset's call mic: some of them skip Windows' "
                              "sound effects. If nobody hears your sounds, use the headset's USB "
@@ -3299,6 +3321,12 @@ class MainWindow(QMainWindow):
     def use_cable_instead(self):
         """Straight into my mic isn't working here: send through the virtual cable (set
         it up first if it isn't installed)."""
+        if self._cable_gone:
+            # removed this session: Windows still lists it until a restart, but it won't
+            # open (sending into it lost the mic until it was set up again)
+            self.toast(_("The virtual cable was removed. Restart your PC before you "
+                         "install it again."), "warn")
+            return
         if eng.virtual_outputs():
             self.set_route("cable")
             self.toast(_("Sending through the virtual cable. Pick it as the mic in Discord and "

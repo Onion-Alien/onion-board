@@ -3173,5 +3173,6 @@
   "Adding {n} sound": [
     "{n} hang hozzáadása",
     "{n} hang hozzáadása"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "A virtuális kábel el lett távolítva. Indítsd újra a géped, mielőtt újra telepítenéd."
 }

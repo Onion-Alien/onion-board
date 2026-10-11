@@ -3100,5 +3100,6 @@
   "Show the playing sound's thumbnail behind the cards": "แสดงภาพขนาดย่อของเสียงที่กำลังเล่นด้านหลังการ์ด",
   "Adding {n} sound": [
     "กำลังเพิ่ม {n} เสียง"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "ลบเคเบิลเสมือนแล้ว รีสตาร์ท PC ก่อนติดตั้งใหม่อีกครั้ง"
 }

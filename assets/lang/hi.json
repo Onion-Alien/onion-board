@@ -3173,5 +3173,6 @@
   "Adding {n} sound": [
     "{n} ध्वनि जोड़ी जा रही है",
     "{n} ध्वनियाँ जोड़ी जा रही हैं"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "वर्चुअल केबल हटा दी गई है। इसे फिर से इंस्टॉल करने से पहले अपना PC रीस्टार्ट करें।"
 }

@@ -3100,5 +3100,6 @@
   "Show the playing sound's thumbnail behind the cards": "再生中のサウンドのサムネイルをカードの背後に表示",
   "Adding {n} sound": [
     "{n} 件のサウンドを追加中"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "仮想ケーブルを削除しました。もう一度インストールする前にPCを再起動してください。"
 }

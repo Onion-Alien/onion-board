@@ -3100,5 +3100,6 @@
   "Show the playing sound's thumbnail behind the cards": "在卡片後方顯示正在播放的音效縮圖",
   "Adding {n} sound": [
     "正在新增 {n} 個聲音"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "虛擬線材已移除。重新安裝前請先重新啟動電腦。"
 }

@@ -3100,5 +3100,6 @@
   "Show the playing sound's thumbnail behind the cards": "재생 중인 사운드의 썸네일을 카드 뒤에 표시",
   "Adding {n} sound": [
     "사운드 {n}개 추가 중"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "가상 케이블이 제거되었습니다. 다시 설치하기 전에 PC를 재시작하세요."
 }

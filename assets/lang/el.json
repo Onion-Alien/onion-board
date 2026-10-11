@@ -3173,5 +3173,6 @@
   "Adding {n} sound": [
     "Προστίθεται {n} ήχος",
     "Προστίθενται {n} ήχοι"
-  ]
+  ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Το εικονικό καλώδιο αφαιρέθηκε. Κάνε επανεκκίνηση του υπολογιστή πριν το εγκαταστήσεις ξανά."
 }
