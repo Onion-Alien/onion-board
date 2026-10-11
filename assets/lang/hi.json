@@ -1856,7 +1856,6 @@
   "Get AI voices": "एआई आवाजें प्राप्त करें",
   "Get Onion Watch": "प्याज घड़ी प्राप्त करें",
   "Get Onion Watch again": "फिर से ओनियन वॉच प्राप्त करें",
-  "Get Onion Watch for the Triggers tab": "ट्रिगर्स टैब के लिए अनियन वॉच प्राप्त करें",
   "Get and update add-ons": "ऐड-ऑन प्राप्त करें और अपडेट करें",
   "Getting AI voices…": "AI आवाजें प्राप्त हो रही हैं...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "सेटिंग्स > गोपनीयता और सुरक्षा में ऐड-ऑन प्राप्त करना और अपडेट करना बंद है।",
@@ -1992,7 +1991,6 @@
   "Onion Watch download progress": "अनियन वॉच डाउनलोड प्रगति",
   "Onion Watch is being downloaded right now. Try again when it's done.": "ओनियन वॉच अभी डाउनलोड की जा रही है। जब यह पूरा हो जाए तो पुनः प्रयास करें.",
   "Onion Watch isn't available to download yet (GitHub says it can't find it). Try again later.": "अनियन वॉच अभी तक डाउनलोड करने के लिए उपलब्ध नहीं है (GitHub का कहना है कि वह इसे नहीं ढूंढ सकता)। बाद में पुन: प्रयास।",
-  "Onion Watch plays a sound when something shows up in your game: a rare spawn, a queue popping, “YOU DIED”. It watches the game's own window, even while other windows cover it, can tell two copies of a game apart, and can ring until you stop it. Your sounds play through the board as usual.": "जब आपके गेम में कुछ दिखाई देता है तो ओनियन वॉच एक ध्वनि बजाती है: एक दुर्लभ स्पॉन, एक कतार पॉपिंग, \"आप मर गए\"। यह गेम की अपनी विंडो पर नज़र रखता है, भले ही अन्य विंडो इसे कवर करती हों, यह गेम की दो प्रतियों को अलग बता सकता है, और तब तक बज सकता है जब तक आप इसे रोक नहीं देते। आपकी ध्वनियाँ हमेशा की तरह बोर्ड पर बजती हैं।",
   "Onion Watch wasn't removed": "अनियन वॉच को हटाया नहीं गया",
   "Onion Watch wasn't removed: {error}": "अनियन वॉच को हटाया नहीं गया: {error}",
   "Onion Watch wasn't updated: {error}": "अनियन वॉच अपडेट नहीं किया गया: {error}",
@@ -3050,5 +3048,11 @@
   "Click to send your sounds again: right now others hear only your mic": "अपनी आवाज़ें फिर से भेजने के लिए क्लिक करें: अभी दूसरे सिर्फ़ आपका माइक सुनते हैं",
   "Only your mic": "सिर्फ़ आपका माइक",
   "Others hear": "दूसरे सुनते हैं",
-  "Others hear only your mic": "दूसरे सिर्फ़ आपका माइक सुनते हैं"
+  "Others hear only your mic": "दूसरे सिर्फ़ आपका माइक सुनते हैं",
+  "Can ring until you stop it": "जब तक आप रोकें, बजता रह सकता है",
+  "Free, from GitHub, and only downloaded when you click.": "मुफ़्त, GitHub से, और सिर्फ़ क्लिक करने पर डाउनलोड होता है।",
+  "Only looks: never clicks or types in your game": "सिर्फ़ देखता है: आपके गेम में कभी क्लिक या टाइप नहीं करता",
+  "Plays one of your sounds when something happens in your game.": "आपके गेम में कुछ होने पर आपकी कोई आवाज़ चलाता है।",
+  "Rare spawns, queue pops, “YOU DIED”": "दुर्लभ स्पॉन, क्यू पॉप, “YOU DIED”",
+  "Watches the game's window, even behind others": "गेम की विंडो पर नज़र रखता है, दूसरी विंडो के पीछे भी"
 }

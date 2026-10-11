@@ -27,7 +27,8 @@ import zlib
 
 from PySide6.QtCore import (QEvent, QMimeData, QObject, QRect, QSize, Qt,
                             QTimer, Signal)
-from PySide6.QtGui import QActionGroup, QDrag, QFont, QPainter, QPixmap
+from PySide6.QtGui import (QActionGroup, QDrag, QFont, QKeySequence, QPainter, QPixmap,
+                           QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
                                QHBoxLayout, QInputDialog, QLabel,
                                QLayout, QMenu, QPushButton, QScrollArea, QSizePolicy, QSlider,
@@ -489,6 +490,12 @@ class AppRow(HoverCard):
         self.setCursor(Qt.OpenHandCursor)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_card_menu)
+        # the keyboard's way to the same menu (DESIGN section 0: never right-click
+        # only): the Menu key or Shift+F10 on anything in the card
+        for keys in (QKeySequence(Qt.Key_Menu), QKeySequence("Shift+F10")):
+            sc = QShortcut(keys, self)
+            sc.setContext(Qt.WidgetWithChildrenShortcut)
+            sc.activated.connect(self._menu_from_keyboard)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
         self.last_sound_at = time.monotonic()
@@ -657,6 +664,13 @@ class AppRow(HoverCard):
         if event.isAccepted():
             self.reordered.emit(event.source(), self, event.position().x() < self.width() / 2)
         self._hover(False)
+
+    def _menu_from_keyboard(self):
+        """Under the focused control (Send, the volume…), or mid-card."""
+        f = QApplication.focusWidget()
+        at = (f.mapTo(self, f.rect().bottomLeft()) if f is not None and self.isAncestorOf(f)
+              else self.rect().center())
+        self._show_card_menu(at)
 
     def _show_card_menu(self, pos):
         menu = QMenu(self)
