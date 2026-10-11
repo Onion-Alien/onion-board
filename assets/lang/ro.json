@@ -3126,5 +3126,8 @@
   "Music & media": "Muzică și media",
   "Other": "Altele",
   "Help and community": "Ajutor și comunitate",
-  "Onion Board on GitHub": "Onion Board pe GitHub"
+  "Onion Board on GitHub": "Onion Board pe GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "O descărcare este încă în curs. Dacă închizi acum, se pierde. Închizi oricum?",
+  "Download running": "Descărcare în curs",
+  "Your sounds are back on your mic.": "Sunetele tale sunt din nou pe microfon."
 }

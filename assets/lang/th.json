@@ -2996,5 +2996,8 @@
   "Music & media": "เพลงและสื่อ",
   "Other": "อื่นๆ",
   "Help and community": "ความช่วยเหลือและชุมชน",
-  "Onion Board on GitHub": "Onion Board บน GitHub"
+  "Onion Board on GitHub": "Onion Board บน GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "ยังมีการดาวน์โหลดที่กำลังทำงานอยู่ ถ้าปิดตอนนี้จะสูญหาย ปิดต่อไหม?",
+  "Download running": "กำลังดาวน์โหลดอยู่",
+  "Your sounds are back on your mic.": "เสียงของคุณกลับมาอยู่ที่ไมค์แล้ว"
 }

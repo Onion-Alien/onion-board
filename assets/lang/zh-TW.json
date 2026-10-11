@@ -2996,5 +2996,8 @@
   "Music & media": "音樂與媒體",
   "Other": "其他",
   "Help and community": "說明與社群",
-  "Onion Board on GitHub": "GitHub 上的 Onion Board"
+  "Onion Board on GitHub": "GitHub 上的 Onion Board",
+  "A download is still running. If you close now, it's lost. Close anyway?": "仍有下載正在進行。現在關閉會遺失它。仍要關閉嗎?",
+  "Download running": "正在下載",
+  "Your sounds are back on your mic.": "你的聲音已回到麥克風上。"
 }

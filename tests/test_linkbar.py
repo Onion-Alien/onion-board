@@ -259,3 +259,10 @@ def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatc
     bar._on_msg("dup", OTHER, None)
     bar._on_msg("error", OTHER, "It's already in your Sounds")
     assert len(calls) == 2 and "dl-already-have" in usage._used
+
+
+def test_downloading_is_true_only_while_a_link_runs(qapp):
+    bar, _eng = _bar()
+    assert not bar.downloading()
+    bar._busy, bar._busy_url = "add", URL
+    assert bar.downloading()

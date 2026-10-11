@@ -2996,5 +2996,8 @@
   "Music & media": "Musik & media",
   "Other": "Lainnya",
   "Help and community": "Bantuan dan komunitas",
-  "Onion Board on GitHub": "Onion Board di GitHub"
+  "Onion Board on GitHub": "Onion Board di GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Masih ada unduhan yang berjalan. Jika kamu menutup sekarang, unduhan itu hilang. Tutup saja?",
+  "Download running": "Unduhan berjalan",
+  "Your sounds are back on your mic.": "Suaramu kembali ada di mikrofonmu."
 }

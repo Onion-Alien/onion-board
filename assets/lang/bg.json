@@ -3061,5 +3061,8 @@
   "Music & media": "Музика и медия",
   "Other": "Други",
   "Help and community": "Помощ и общност",
-  "Onion Board on GitHub": "Onion Board в GitHub"
+  "Onion Board on GitHub": "Onion Board в GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Все още тече изтегляне. Ако затворите сега, то ще се загуби. Да се затвори ли въпреки това?",
+  "Download running": "Тече изтегляне",
+  "Your sounds are back on your mic.": "Звуците ви отново са на микрофона."
 }

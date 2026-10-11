@@ -2282,6 +2282,13 @@ class MainWindow(QMainWindow):
         self.engine.reopen_all()
         self._save_now()
         self._update_status()
+        self._say_back_on_mic()
+
+    def _say_back_on_mic(self):
+        """After a restart or an audio buffering change: tell them the board is on the
+        mic again (the only other sign is the status strip)."""
+        if self.cfg.route == "mic" and directmic.works(directmic.status()):
+            self.toast(_("Your sounds are back on your mic."), "ok")
 
     def _init_devices(self):
         self._pick_devices()
@@ -2349,6 +2356,8 @@ class MainWindow(QMainWindow):
         """_init_devices' last part (UI thread): what the cable check found, the status."""
         self._set_cable_bad(ends)
         self._update_status()
+        if "--restart-after" in sys.argv:   # started again by the app (Settings > Reset)
+            self._say_back_on_mic()
 
     def _default_output(self) -> str | None:
         """Windows' default output as the device lists name it (None: unknown, or the
@@ -3671,7 +3680,7 @@ class MainWindow(QMainWindow):
                      label=mode.name, voice_why=self.voice_why))
 
     def _save_later(self):
-        self._save_timer.start(400)
+        self._save_timer.start(100)   # short: a crash loses at most this much
 
     def toast(self, text: str, kind: str = ""):
         """A result the user should see now, whatever tab or dialog is in front (the
@@ -8281,6 +8290,16 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(0, lambda: self.import_files(expand_dropped(files)))
 
     def closeEvent(self, ev):
+        hiding = (self.tray is not None and self.tray.isVisible() and self.cfg.tray
+                  and not self._quitting)
+        if (not hiding and not self._shut_down and self.linkbar.downloading()
+                and QMessageBox.question(
+                    self, _("Download running"),
+                    _("A download is still running. If you close now, it's lost. "
+                      "Close anyway?")) != QMessageBox.Yes):
+            ev.ignore()
+            self._quitting = False
+            return
         if self.tray is not None and self.tray.isVisible() and self.cfg.tray \
                 and not self._quitting:
             ev.ignore()   # keep running in the tray: hotkeys, overlay and sounds go on

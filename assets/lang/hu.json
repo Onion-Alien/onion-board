@@ -3061,5 +3061,8 @@
   "Music & media": "Zene és média",
   "Other": "Egyéb",
   "Help and community": "Súgó és közösség",
-  "Onion Board on GitHub": "Az Onion Board a GitHubon"
+  "Onion Board on GitHub": "Az Onion Board a GitHubon",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Még fut egy letöltés. Ha most bezárod, elveszik. Mégis bezárod?",
+  "Download running": "Letöltés folyamatban",
+  "Your sounds are back on your mic.": "A hangjaid ismét a mikrofonodon vannak."
 }

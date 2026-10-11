@@ -1063,6 +1063,7 @@ class SearchResults(RoundedFrame):
             if self.link:
                 why = _("Can't use this link: {error}", error=err)   # err: rich text
                 self.title.setText(f"<span style='color:{red}'>{why}</span>")
+                busy.toast(self.window(), why, "error", 8000)   # not only in the panel
             else:
                 self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}"
                                      "</span>", red=red, site=self.site, err=err))  # from _work
