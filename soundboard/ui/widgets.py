@@ -11,7 +11,8 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMenu, QScrollArea,
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMainWindow, QMenu,
+                               QScrollArea,
                                QSlider, QStackedWidget, QStyle, QTabWidget, QToolTip,
                                QVBoxLayout, QWidget)
 
@@ -345,7 +346,7 @@ class SteadyTabs(QObject):
         return False
 
 
-def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
+def spectrum(data: np.ndarray | None, frac: float, n: int) -> np.ndarray:
     """`n` log-spaced band levels (0..1) of int16/float (m, 2) audio around position
     `frac` (0..1): what a pad's visualizer shows. Cheap: one 2048-point FFT."""
     if data is None or not len(data) or n <= 0:
@@ -370,7 +371,7 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
 
 
-def loudness(data: np.ndarray, frac: float, gain: float = 1.0) -> float:
+def loudness(data: np.ndarray | None, frac: float, gain: float = 1.0) -> float:
     """How loud (0..1) the stretch just played around `frac` is: its RMS times `gain`,
     -48 dBFS..0 dBFS. What a playing pad's level meter shows; the same window as
     spectrum() (what's ahead of a long sound may not be read in yet)."""
@@ -468,10 +469,10 @@ class Pad(QAbstractButton):
         super().__init__()
         self.setProperty("own_space", True)   # Space pauses / plays this pad (ui/spacekey.py)
         self.meta = meta
-        self.progress = None     # None = not playing
+        self.progress: float | None = None     # None = not playing
         self.paused = False
-        self.bands = None        # visualizer levels (0..1) while playing
-        self.peaks = None        # the little caps that fall slowly
+        self.bands: np.ndarray | None = None   # visualizer levels (0..1) while playing
+        self.peaks: np.ndarray | None = None   # the little caps that fall slowly
         self.meter = None        # how loud it is right now (0..1) while playing
         self.meter_peak = 0.0    # the meter's peak mark, falling slowly
         self.selected = False    # the sound in the transport bar
@@ -485,14 +486,15 @@ class Pad(QAbstractButton):
         self._hover_anim.setEasingCurve(QEasingCurve.Type.OutCubic)   # quick up, soft landing
         self._hover_anim.valueChanged.connect(self._on_hover_k)
         self._down = False       # pressed: the card sinks a little
-        self._play_t = None      # when it started playing (the flash on start)
+        self._play_t: float | None = None   # when it started playing (the flash on start)
         self._press = None
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
         self._described = None
         self._name_fit = None    # (what it was fitted to, how) - see _fit_name
         self._font_key = self.font().key()
-        self._accent = (None, None)   # (meta.color, its QColor)
-        self._foot = (None, None)     # (what the footer shows, its font, text and badge)
+        self._accent: tuple[str | None, QColor] = (None, QColor())   # (meta.color, its QColor)
+        # (what the footer shows, its font, text and badge)
+        self._foot: tuple[tuple | None, tuple[QFont, str, tuple[str, int] | None] | None] =             (None, None)
         self._linked = (None, "")     # (meta.file, its path when outside the library)
         self._link_rect: QRectF | None = None   # where the linked-file mark was painted
         self._wheel = 0               # Ctrl+wheel turned less than a notch (touchpads)
@@ -638,7 +640,7 @@ class Pad(QAbstractButton):
             self._accent = (self.meta.color, QColor(self.meta.color))
         return self._accent[1]
 
-    def _footer(self, foot: QRectF, name_font: QFont):
+    def _footer(self, foot: QRectF, name_font: QFont) -> tuple[QFont, str, tuple[str, int] | None]:
         """(font, the right-hand text, the hotkey badge's (text, width) or None): only
         worked out again when something it shows changes."""
         m = self.meta
@@ -660,7 +662,9 @@ class Pad(QAbstractButton):
             if hk and fm.horizontalAdvance(hk) + 12 <= foot.width() * 0.68:
                 badge = (hk, fm.horizontalAdvance(hk) + 12)
             self._foot = (key, (f, right, badge))
-        return self._foot[1]
+        out = self._foot[1]
+        assert out is not None   # made above
+        return out
 
     @property
     def n_bands(self) -> int:
@@ -675,6 +679,7 @@ class Pad(QAbstractButton):
         if self.bands is None or len(self.bands) != len(levels):
             self.bands, self.peaks = levels.copy(), levels.copy()
             return
+        assert self.peaks is not None   # set with the bands
         self.bands = np.maximum(levels, self.bands * 0.78)
         self.peaks = np.maximum(self.bands, self.peaks - 0.025)
 
@@ -829,8 +834,9 @@ class Pad(QAbstractButton):
             p.setClipPath(path)
             done = QColor(accent)   # how far it's got: the card fills from the left
             done.setAlpha(34)
-            p.fillRect(QRectF(r.left(), r.top(), r.width() * self.progress, r.height()), done)
-            flash = 1 - (now - self._play_t) / 0.35
+            progress = self.progress or 0.0   # (playing: set)
+            p.fillRect(QRectF(r.left(), r.top(), r.width() * progress, r.height()), done)
+            flash = 1 - (now - (self._play_t if self._play_t is not None else now)) / 0.35
             if flash > 0:   # a quick wash of its colour as it starts
                 wash = QColor(accent)
                 wash.setAlpha(int(90 * flash))
@@ -838,7 +844,7 @@ class Pad(QAbstractButton):
             self._paint_visualizer(p, r, accent)
             self._paint_meter(p, r, accent)
             # progress: a thin accent line along the bottom edge
-            p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * self.progress, 3), accent)
+            p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * progress, 3), accent)
             p.restore()
         p.setBrush(Qt.BrushStyle.NoBrush)
         if playing:
@@ -953,7 +959,8 @@ class Pad(QAbstractButton):
             wash = QColor(accent)
             wash.setAlpha(40)
             p.fillPath(path, wash)
-            p.fillRect(QRectF(r.left(), r.bottom() - 2, r.width() * self.progress, 2), accent)
+            p.fillRect(QRectF(r.left(), r.bottom() - 2, r.width() * (self.progress or 0.0), 2),
+                       accent)
             p.restore()
         if playing:
             pen = QPen(accent, 1.8)
@@ -1252,10 +1259,14 @@ class PadGrid(QWidget):
         # the hundreds out of sight
         slots, grid = self._slots, self.grid
         for i in reversed(range(grid.count())):   # from the end: each take is cheap
-            it = grid.itemAt(i).widget()
-            if it not in want or slots.get(it) != want[it]:   # (Bun's never wanted)
+            item = grid.itemAt(i)
+            it = item.widget() if item else None
+            pad = it if isinstance(it, Pad) else None
+            # (Bun's never wanted)
+            if pad is None or pad not in want or slots.get(pad) != want[pad]:
                 grid.takeAt(i)
-                slots.pop(it, None)
+                if pad is not None:
+                    slots.pop(pad, None)
         if not shown:
             # every pad filtered out showed nothing at all: Bun says why instead
             for p in self.pads:
@@ -1301,7 +1312,7 @@ class PadGrid(QWidget):
         # the window's faint glow, fixed to the pads (so a scroll can still copy
         # what's on screen): it lines up with the window at the top of the board
         win, view = self.window(), self.parentWidget()
-        root = win.centralWidget() if hasattr(win, "centralWidget") else None
+        root = win.centralWidget() if isinstance(win, QMainWindow) else None
         if root is not None and view is not None:
             at = view.mapTo(root, QPoint(0, 0))
             theme.paint_window_bg(p, e.rect(), QPointF(-at.x(), -at.y()),
@@ -1356,7 +1367,8 @@ class PadGrid(QWidget):
         i = shown.index(pad) + dx + dy * max(1, self._cols)
         if 0 <= i < len(shown):
             shown[i].setFocus(Qt.FocusReason.TabFocusReason)
-            area = self.parentWidget() and self.parentWidget().parentWidget()
+            view = self.parentWidget()
+            area = view.parentWidget() if view is not None else None
             if isinstance(area, QScrollArea):
                 area.ensureWidgetVisible(shown[i])
 

@@ -758,6 +758,7 @@ class OverlayWindow(QWidget):
             self._layers = (self._layer(lambda p: self._paint_under(p, flash)),
                             self._layer(self._paint_over))
             self._cache_key = key
+        assert self._layers is not None   # made above on the first paint (no key yet)
         under, over = self._layers
         dirty = e.rect()
         tiles = [(i, self._tile_rect(i), m) for i, m in enumerate(ov.page_sounds()[:SLOTS])]
@@ -774,7 +775,7 @@ class OverlayWindow(QWidget):
         for i, r, meta in tiles:
             self._tile_edge(p, r, i, meta, flash == i)
         p.end()
-        if flash is not None:
+        if flash is not None and ov.flash is not None:   # (flash is read from it)
             QTimer.singleShot(int((ov.flash[1] - now) * 1000) + 20, self.update)
 
     def _paint_under(self, p: QPainter, flash: int | None):

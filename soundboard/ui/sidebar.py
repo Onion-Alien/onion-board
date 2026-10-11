@@ -228,7 +228,8 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
 
 
 class _Dot(QWidget):
-    """A small warning dot, over the corner of an icon (it never takes clicks)."""
+    """A small status dot, over the corner of an icon (it never takes clicks): a
+    warning, or with `ok` set, all good."""
 
     SIZE = 8
 
@@ -236,13 +237,19 @@ class _Dot(QWidget):
         super().__init__(parent)
         self.setFixedSize(self.SIZE, self.SIZE)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.ok = False
         self.hide()
+
+    def set_ok(self, ok: bool):
+        if ok != self.ok:
+            self.ok = ok
+            self.update()
 
     def paintEvent(self, _e):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(theme.T["warn_text"]))
+        p.setBrush(QColor(theme.T["ok_text" if self.ok else "warn_text"]))
         p.drawEllipse(QRectF(self.rect()))
         p.end()
 
@@ -284,8 +291,9 @@ class OutputBlock(QFrame):
         top.setSpacing(0)   # icon GAP words, 8 to the switch right after them
         mark = self.mark = self._glyph()
         self._scale = 1.0
-        # the small card (the warning line hidden): a dot on the On Air icon says
-        # sending isn't set up, and the icon is the way to Setup
+        # the small card (the status line hidden): a dot on the On Air icon says
+        # whether sending is set up (yellow: not yet, and the icon is the way to
+        # Setup; green: working)
         self.dot = _Dot(self)
         mark.installEventFilter(self)
         self.title = _HugLabel("", widest=self.names())
@@ -455,7 +463,7 @@ class OutputBlock(QFrame):
         icon_x = round(self.ICON_X - glyph / 2)   # the icon column's centre stays put
         row_pad = px(self.ROW_PAD)
         self.box.setContentsMargins(*(icon_x - row_pad, px(self.TOP), px(self.PAD), px(self.PAD))
-                                    if expanded else (0, 4, 0, 4))
+                                    if expanded else (0, 4, 0, 0))
         self.top.setContentsMargins(row_pad if expanded else 0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.Direction.LeftToRight if expanded
                               else QBoxLayout.Direction.TopToBottom)
@@ -535,7 +543,9 @@ class OutputBlock(QFrame):
         self.setup.setAccessibleDescription(self.connection.property("railfull") or "")
         self.arrow.setVisible(not good)
         small = not self.property("expanded")
-        self.dot.setVisible(small and not good)
+        # the small card's status line: yellow until it's set up, then green
+        self.dot.set_ok(good)
+        self.dot.setVisible(small)
         self.mark.setCursor(Qt.CursorShape.PointingHandCursor if small and not good
                             else Qt.CursorShape.ArrowCursor)
         self.mark.setToolTip(self.connection.toolTip() if small and not good else "")
@@ -1226,9 +1236,10 @@ class SideRail(QFrame):
             box.setVisible(shown and not mid)   # mid: as shut, the dot on the arrow
         self._sync_divider()
         self.toggle.setVisible(not self._squeezed)
-        # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
-        icons.set_icon(self.toggle, "back" if shown != self.isRightToLeft() else "forward",
-                       size=ICON)
+        # a window with its side bar, the chevron pointing the way the rail will go:
+        # mirrored (Arabic), the bar is on the right and it opens leftwards
+        icons.set_icon(self.toggle, ("panel_close" if shown else "panel_open")
+                       + ("_rtl" if self.isRightToLeft() else ""), size=ICON)
         # only the arrow, open or shut ("Hide tab names" was cut short in most
         # languages); its name is what it does now, on hover and for a screen reader
         self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"), "",

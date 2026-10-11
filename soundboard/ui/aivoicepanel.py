@@ -91,7 +91,7 @@ class AiVoicePanel(QWidget):
     _install_note = Signal(str)     # our own words for the card, shown as they are
     _install_done = Signal(bool, str)
 
-    def __init__(self, controller: aivoice.AiVoiceController, settings: dict,
+    def __init__(self, controller: aivoice.AiVoiceController, settings: dict | None,
                  module_list: list[mods.ModuleInfo], engine=None):
         super().__init__()
         self.ctl = controller
@@ -361,6 +361,7 @@ class AiVoicePanel(QWidget):
         return self.voices
 
     def _play_sample(self, data):
+        assert self.engine is not None   # only offered with one
         self.engine.play("__ai_voice_sample", data, 1.0, preview=True)
 
     def open_browser(self):
@@ -439,8 +440,10 @@ class AiVoicePanel(QWidget):
 
     def _start_helper(self) -> bool:
         self._connected = False      # the helper said hello (it can still fail to load)
+        module = self.module
+        assert module is not None   # both callers checked
         try:
-            self.ctl.start(self.module, self.s["voice"] or self.cb_voice.currentData() or "",
+            self.ctl.start(module, self.s["voice"] or self.cb_voice.currentData() or "",
                            self.s["auto_pitch"], self.s["pitch"])
         except RuntimeError as e:
             self._set_ui(False, f"⚠ {errors.plain(e)}")

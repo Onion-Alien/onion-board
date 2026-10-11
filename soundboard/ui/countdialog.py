@@ -83,7 +83,7 @@ class CountDialog(QDialog):
         self.setMinimumWidth(540)   # English on one line a row; longer languages wrap Why
         self.setMaximumWidth(620)   # DESIGN.md: dialogs about 620 px at most
         # as tall as the rows at that width (wrapped labels first guess a narrower one)
-        self.resize(540, self.layout().totalHeightForWidth(540))
+        self.resize(540, v.totalHeightForWidth(540))
 
 
 def show(parent=None) -> CountDialog:

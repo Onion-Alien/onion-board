@@ -12,7 +12,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Literal, overload
+from typing import Any, Literal, overload
 
 import numpy as np
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignalBlocker, QSize,
@@ -193,15 +193,18 @@ class WidthScroll(QScrollArea):
     enough (`room()`: the page's width with the rail shut): wider content scrolls
     sideways rather than turn the window into the mini player."""
 
+    dl_column: QWidget | None = None   # the column the download bar lines up with
+
     def __init__(self, room):
         super().__init__()
         self._room = room
 
     def minimumSizeHint(self) -> QSize:
         m = super().minimumSizeHint()
-        if self.widget() is None or not self.isVisible():   # a page not showing
+        page = self.widget()
+        if page is None or not self.isVisible():   # a page not showing
             return m
-        need = self.widget().minimumSizeHint().width() + self.verticalScrollBar().sizeHint().width()
+        need = page.minimumSizeHint().width() + self.verticalScrollBar().sizeHint().width()
         return QSize(max(m.width(), need), m.height()) if need <= self._room() else m
 
 
@@ -319,6 +322,12 @@ def is_hands_free(name: str | None) -> bool:
     return "hands-free" in n or "hands free" in n
 
 
+def _holds_focus(w: QWidget) -> bool:
+    """The keyboard focus is in `w`."""
+    fw = QApplication.focusWidget()
+    return fw is not None and w.isAncestorOf(fw)
+
+
 def _listed(name: str, names) -> bool:
     """`name` (as the app saved it) is one of `names` (Windows' own), spacing aside."""
     squash = " ".join(name.split()).lower()
@@ -380,7 +389,8 @@ class MainWindow(QMainWindow):
         self._tor_told = ""             # what the last Tor toast said (one per change)
         tor.qt_status().changed.connect(self._on_tor)
         app = QApplication.instance()
-        if app is not None:   # before the UI is built, so everything polishes in-theme
+        # before the UI is built, so everything polishes in-theme
+        if isinstance(app, QApplication):
             self.cfg.theme = theme.apply(app, self.cfg.theme, self.cfg.live_color)
             self.cfg.live_color = theme.live_override
             app.commitDataRequest.connect(self._on_session_end)   # log-off / installer
@@ -539,7 +549,9 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
         self.timer.start(TICK_MS)
-        QApplication.instance().applicationStateChanged.connect(self._set_tick_rate)
+        app = QApplication.instance()
+        assert isinstance(app, QApplication)   # made before the window
+        app.applicationStateChanged.connect(self._set_tick_rate)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self._space_action)
         theme.app_filter(QApplication.instance(), self._space)
@@ -578,7 +590,8 @@ class MainWindow(QMainWindow):
         self.default_found.connect(self._on_default_found)
         self.device_step.connect(lambda step: step())
         self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
-        self._dev_retry = QTimer(self, singleShot=True, interval=100, timeout=self._dev_pump)
+        # (PySide takes properties and signals as keywords; the stubs don't know)
+        self._dev_retry = QTimer(self, singleShot=True, interval=100, timeout=self._dev_pump)   # pyright: ignore[reportCallIssue]
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         self._gone_n = 0   # checks in a row that found the failing device unplugged
         if sys.platform == "win32":
@@ -990,10 +1003,10 @@ class MainWindow(QMainWindow):
         # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
         # through them (the tab widget does that only while it has the focus)
         for n in range(1, 10):
-            QShortcut(QKeySequence(f"Ctrl+{n}"), self,
+            QShortcut(QKeySequence(f"Ctrl+{n}"), self,   # pyright: ignore[reportCallIssue]  # signal keyword
                       activated=lambda n=n: self._go_tab(n - 1, absolute=True))
-        QShortcut(QKeySequence("Ctrl+Tab"), self, activated=lambda: self._go_tab(1))
-        QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self._go_tab(-1))
+        QShortcut(QKeySequence("Ctrl+Tab"), self, activated=lambda: self._go_tab(1))   # pyright: ignore[reportCallIssue]
+        QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self._go_tab(-1))   # pyright: ignore[reportCallIssue]
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         # a tab asked for (the rail, Ctrl+1..., a link) while Settings is up: back to the
@@ -1003,7 +1016,8 @@ class MainWindow(QMainWindow):
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
         # page's box holds the download bar too, so the bar's buttons come just before it
         prev = self._tabs_box.previousInFocusChain()
-        status_focus = []
+        assert prev is not None   # (the chain is a ring)
+        status_focus: list[QWidget] = []
         for button in self.rail.status:
             if button is self.btn_air and self.rail.output:
                 status_focus.extend((self.rail.output.switch, self.rail.output.setup))
@@ -1098,7 +1112,7 @@ class MainWindow(QMainWindow):
         self.download_bar.stop_all_requested.connect(self.linkbar.cancel_all)
         self.mini_download_bar.stop_all_requested.connect(self.linkbar.cancel_all)
         for b in (self.download_bar, self.mini_download_bar):
-            b.thumb_lookup = self.ytresults.thumb_for
+            b.thumb_lookup = self.ytresults.thumb_for   # (typed in downloadbar.py)
         self.linkbar.queued.connect(self.ytresults.queued)
         self.ytresults.thumb_ready.connect(self.download_bar.set_thumb)
         self.ytresults.thumb_ready.connect(self.mini_download_bar.set_thumb)
@@ -1245,7 +1259,7 @@ class MainWindow(QMainWindow):
         self.mixer = f
         self._deck_titles: list[QWidget] = []
         self._deck_rows: list[QHBoxLayout] = []
-        self._decks: list[QWidget] = []   # each group, with the line before it
+        self._decks: list[tuple[QWidget, ...]] = []   # each group, with the line before it
         # too narrow for all three: one group shown whole (what others hear, unless
         # you pick another) and the other two as icon buttons that bring theirs up
         self._deck_tabs: list[QPushButton] = []
@@ -1294,7 +1308,9 @@ class MainWindow(QMainWindow):
         self.vol_mic = VolumeControl(c.mic_vol, meter=True,
                                      tip=_("How loud your voice is for others. The dot shows "
                                            "activity when you talk"))
-        self.mic_meter = self.vol_mic.meter
+        mic_meter = self.vol_mic.meter
+        assert mic_meter is not None   # meter=True
+        self.mic_meter = mic_meter
         # shown alone (_mixer_one_at_a_time) its slider takes the room, up to its own
         # most (150 px), with what's left after it
         row.addWidget(self.vol_mic, 1)
@@ -1325,7 +1341,9 @@ class MainWindow(QMainWindow):
         row.addWidget(self.vol_mon, 1)
         row.addStretch(0)
         for vol in (self.vol_mic, self.vol_mon):   # no gap between the slider and its %
-            vol.setMaximumWidth(vol.layout().maximumSize().width())
+            lay = vol.layout()
+            assert lay is not None   # made in VolumeControl.__init__
+            vol.setMaximumWidth(lay.maximumSize().width())
         self._mic_text = self.chk_mic.text()
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
@@ -1721,7 +1739,8 @@ class MainWindow(QMainWindow):
         if (ids, queue) != self._chip_ids:
             self._chip_ids = (ids, queue)
             while self._chips_hl.count():
-                w = self._chips_hl.takeAt(0).widget()
+                item = self._chips_hl.takeAt(0)
+                w = item.widget() if item else None
                 if w:
                     w.deleteLater()
             self._chips = {}
@@ -1826,7 +1845,7 @@ class MainWindow(QMainWindow):
                 if b is not None:
                     icons.set_icon(b, name, "on_accent", size=16)
 
-    def _build_setup_page(self) -> QWidget:
+    def _build_setup_page(self) -> WidthScroll:
         """One-time setup and the rarely-touched stuff: where the audio goes,
         devices, the recorded test, EQ, levelling."""
         c = self.cfg
@@ -1854,7 +1873,10 @@ class MainWindow(QMainWindow):
 
         # ---- how it works + the one thing to set in Discord
         howcard, cv = card(_("Your virtual mic"), roomy=True)
-        self.how_title = cv.itemAt(0).widget()   # renamed when not using the cable
+        item = cv.itemAt(0)
+        how_title = item.widget() if item else None
+        assert isinstance(how_title, QLabel)   # card() puts its title first
+        self.how_title = how_title   # renamed when not using the cable
         flow = QFrame()
         flow.setObjectName("micflow")
         fv = QVBoxLayout(flow)
@@ -2332,9 +2354,10 @@ class MainWindow(QMainWindow):
         changed in Windows' sound settings), and the engine's retries can't fix that.
         Re-scan, waiting longer each time it doesn't help (RECOVER_WAIT_S)."""
         e = self.engine
-        failing = [(k, e.names[k]) for k in ("main", "mon", "mic", "obs")
-                   if e.names.get(k) and getattr(e, f"{k}_stream") is None
-                   and k in e.errors_snapshot()]
+        failing: list[tuple[str, str]] = [
+            (k, name) for k in ("main", "mon", "mic", "obs")
+            if (name := e.names.get(k)) and getattr(e, f"{k}_stream") is None
+            and k in e.errors_snapshot()]
         if not failing:
             self._recover_n = self._gone_n = 0
             return
@@ -3963,9 +3986,11 @@ class MainWindow(QMainWindow):
             self.load_triggers(now=False)   # (or once it's shown)
         if hasattr(self, "_fit"):
             if key in ("voice", "triggers"):
+                assert not isinstance(new, AppsTab)
                 self._tab_steps[key] = new.fit_steps()
                 self._fit.extend(self._tab_steps[key])
             if key == "voice":
+                assert isinstance(new, (VoicePanel, taboff.TabOff))
                 self._stack_cols = (*self._stack_cols[:1], *new.stack_steps())
             self._refit()
 
@@ -4306,7 +4331,9 @@ class MainWindow(QMainWindow):
     def _show_help(self, box: QDialog, beside: QWidget):
         """Open a help card to the right of `beside` (a rail button), inside the
         window: never off its left edge."""
-        box.layout().activate()   # wrapped text: as tall as the words need
+        lay = box.layout()
+        assert lay is not None   # the popup's own
+        lay.activate()   # wrapped text: as tall as the words need
         box.resize(box.width(), box.heightForWidth(box.width()) if box.hasHeightForWidth()
                    else box.sizeHint().height())
         top_left = beside.mapToGlobal(QPoint(beside.width() + 8, 0))
@@ -4423,7 +4450,7 @@ class MainWindow(QMainWindow):
         were on. Asked for again while up: the same page, on `page` if one is named."""
         dlg = self._settings_dlg
         fresh = dlg is None or not qt_valid(dlg)
-        if not fresh:
+        if dlg is not None and not fresh:
             if page:
                 dlg.show_page(page)
         else:
@@ -4442,7 +4469,7 @@ class MainWindow(QMainWindow):
         self._show_transport()
         # (Escape is for it now; fresh, not the back arrow: the mini player's swap
         # handed the focus on to it, ringed)
-        if fresh or not dlg.isAncestorOf(QApplication.focusWidget()):
+        if fresh or not _holds_focus(dlg):
             dlg.categories.setFocus(Qt.FocusReason.OtherFocusReason)
         return dlg
 
@@ -4478,13 +4505,13 @@ class MainWindow(QMainWindow):
 
     def close_settings(self):
         """Back from Settings to the tabs, as [Done] does (nothing to undo: it's live)."""
-        if self.settings_open():
+        if self.settings_open() and self._settings_dlg is not None:   # (settings_open checked)
             self._settings_dlg.accept()
 
     def _settings_closed(self, dlg):
         if self._settings_dlg is dlg:
             self._settings_dlg = None
-        had_focus = dlg.isAncestorOf(QApplication.focusWidget())
+        had_focus = _holds_focus(dlg)
         self._content.setCurrentWidget(self._tabs_area)
         self._content.removeWidget(dlg)
         self._board_counts(True)
@@ -4492,7 +4519,7 @@ class MainWindow(QMainWindow):
         self._show_transport()
         if had_focus:   # (not left on a page that's gone)
             self._focus_sounds_page(self.tabs.currentIndex())
-            if not self._tabs_area.isAncestorOf(QApplication.focusWidget()):
+            if not _holds_focus(self._tabs_area):
                 self.tabs.currentWidget().setFocus(Qt.FocusReason.OtherFocusReason)
         # freed once its finished signal is over (deleting it inside that crashed)
         QTimer.singleShot(0, lambda: free_dialog(dlg))
@@ -4780,7 +4807,8 @@ class MainWindow(QMainWindow):
         Windows' first paint message, a TRIGGERS_LOAD_MS one runs after it. Runs once.
         `now` False (the window's start, the tab switched back on): only if it has to
         run now (watching was on); otherwise the tab loads it when first shown."""
-        if not self.triggers.pending or self._shut_down:
+        if not isinstance(self.triggers, TriggersTab) or not self.triggers.pending \
+                or self._shut_down:   # (switched off: its stand-in has nothing pending)
             return
         if not now and not self.triggers.needed_now():
             return
@@ -5078,7 +5106,8 @@ class MainWindow(QMainWindow):
         media player; play it when it isn't."""
         if self.engine.state(sid):
             self.select(sid)
-            self.engine.set_paused(sid, not self.engine.state(sid)[1])
+            st = self.engine.state(sid)
+            self.engine.set_paused(sid, not (st is not None and st[1]))
             self._wake()
         else:
             self.play(sid)
@@ -5141,7 +5170,7 @@ class MainWindow(QMainWindow):
             return "missing"
         gain = self.gain_for(m, volume)
         fade_in, fade_out = fades if fades is not None else (m.fade_in, m.fade_out)
-        self._preview_fades = {"fade_in": fade_in, "fade_out": fade_out}
+        self._preview_fades: dict[str, Any] = {"fade_in": fade_in, "fade_out": fade_out}
         if fx is None or soundfx.key(fx) == soundfx.key(m.fx):
             self.drop_preview()   # an effects render still going mustn't play over it
             self.engine.play(sid + ":preview", data, gain, mode="restart", preview=True,
@@ -5340,7 +5369,8 @@ class MainWindow(QMainWindow):
     @staticmethod
     def _dot_icon(color: str) -> QIcon:
         """A category's colour on its tab: a round dot."""
-        dpr = QApplication.instance().devicePixelRatio() if QApplication.instance() else 1.0
+        app = QApplication.instance()
+        dpr = app.devicePixelRatio() if isinstance(app, QApplication) else 1.0
         pm = QPixmap(round(12 * dpr), round(12 * dpr))
         pm.setDevicePixelRatio(dpr)
         pm.fill(Qt.GlobalColor.transparent)
@@ -5984,7 +6014,7 @@ class MainWindow(QMainWindow):
             log.exception("can't save clip")
             src = self.sender()
             if src is not None and hasattr(src, "clip_error"):
-                src.clip_error = errors.plain(e)   # the tab says so on its row
+                src.clip_error = errors.plain(e)   # pyright: ignore[reportAttributeAccessIssue]  # the tab says so on its row (hasattr)
             else:
                 errors.warn(self, _("Couldn't save clip"), e)
             return None
@@ -6354,6 +6384,7 @@ class MainWindow(QMainWindow):
         for sid in done:
             self.pads[sid].update()
         m = self.meta(done[0])
+        assert m is not None   # done holds only sounds with a meta
         self.toast(_("Picture pasted on “{name}”.",
                      name=html.escape(m.name)) if len(done) == 1
                    else ngettext("Picture pasted on {n} pad.",
@@ -6979,7 +7010,7 @@ class MainWindow(QMainWindow):
             if clicked is cancel:
                 return
             use_settings = clicked is yes
-        if use_settings:
+        if use_settings and pkg.settings:   # (only asked when there are some)
             self._apply_backup_settings(pkg.settings)
         if not pkg.sounds:
             return
@@ -7241,7 +7272,7 @@ class MainWindow(QMainWindow):
         t.activated.connect(self._on_tray)
         t.messageClicked.connect(self.show_from_tray)
         t.show()
-        QApplication.instance().setQuitOnLastWindowClosed(False)
+        QApplication.setQuitOnLastWindowClosed(False)
 
     def ask_feedback(self):
         """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
@@ -7356,7 +7387,7 @@ class MainWindow(QMainWindow):
                      if pkg and (n == pkg or n.startswith(pkg + "."))}
             modules._forget(pkg)
         addon = self._start_remote_addon(info)
-        if addon is None and saved:
+        if addon is None and saved and old is not None:   # (saved: only with an old one)
             log.warning("remote add-on %s %s didn't start (%s): keeping %s",
                         info.id, info.version, info.error, old[0].version)
             if info.package:
@@ -7578,11 +7609,11 @@ class MainWindow(QMainWindow):
         if apps is None or self.engine.direct_stream() is None:
             return
         before = [a.exe for a in self.raw_watch.culprits]
-        now = self.raw_watch.update(apps, self.engine.direct_apps(),
-                                   time.monotonic() if now is None else now)
-        if [a.exe for a in now] != before:
+        culprits = self.raw_watch.update(apps, self.engine.direct_apps(),
+                                        time.monotonic() if now is None else now)
+        if [a.exe for a in culprits] != before:
             log.info("recording the mic without Onion Board: %s",
-                     [a.exe for a in now] or "nobody")
+                     [a.exe for a in culprits] or "nobody")
             self._show_urgent()
 
     def discord_problems(self) -> list[str]:
@@ -7658,14 +7689,15 @@ class MainWindow(QMainWindow):
         if now[0].startswith("board"):
             if self._update_file is not None:
                 self.install_update()
-            elif updates.can_install() and self.release.asset_url:
+            elif updates.can_install() and self.release is not None and self.release.asset_url:
                 self.download_update()
             else:
                 self.show_update()
             return
         # Onion Watch: its tab does the updating (and shows how it's going)
         self.tabs.setCurrentWidget(self.triggers)
-        if self.triggers.offer is not None and not self.triggers._busy:
+        if (isinstance(self.triggers, TriggersTab) and self.triggers.offer is not None
+                and not self.triggers._busy):
             self.triggers.get()
         self.watch_offer = None
         self._show_urgent()
@@ -8201,9 +8233,9 @@ class MainWindow(QMainWindow):
         sound if it isn't playing)."""
         sid = self.current
         m = self.meta(sid) if sid else None
-        path = videos.get(sid) if m else None
+        path = videos.get(sid) if m and sid else None
         self._video_for = (sid, path)
-        if path is None:
+        if path is None or sid is None or m is None:   # (a path: there's a sound)
             self.btn_video.hide()
             self.toast(_("This sound's video isn't there any more"), "warn")
             return
@@ -8323,9 +8355,13 @@ class MainWindow(QMainWindow):
             # Translated controls can need more room than the fixed breakpoint.
             # Measure both Setup columns even while they are stacked, so growing
             # the window brings them back only when neither will be clipped.
-            margins = self.setup_page.widget().layout().contentsMargins()
+            body = self.setup_page.widget()
+            lay = body.layout() if body is not None else None
+            holder = self._setup_cols.parentWidget()
+            assert lay is not None and holder is not None   # built in _build_setup_page
+            margins = lay.contentsMargins()
             room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            available = min(room, self._setup_cols.parentWidget().maximumWidth())
+            available = min(room, holder.maximumWidth())
             self._stack_cols[0](narrow or self._setup_need() > available)
             for apply in self._stack_cols[1:]:
                 apply(narrow)
@@ -8448,7 +8484,7 @@ class MainWindow(QMainWindow):
             return
         if self.tray is not None:
             self.tray.hide()
-            QTimer.singleShot(0, QApplication.instance().quit)
+            QTimer.singleShot(0, QApplication.quit)
         self.shutdown()
         super().closeEvent(ev)
 

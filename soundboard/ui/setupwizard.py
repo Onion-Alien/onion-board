@@ -27,7 +27,8 @@ from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-                               QPushButton, QRadioButton, QScrollArea, QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QSizePolicy,
+                               QVBoxLayout, QWidget)
 
 from soundboard import directmic
 from soundboard import engine as eng
@@ -157,15 +158,17 @@ def test_tune() -> np.ndarray:
     return (out * (TUNE_PEAK / np.abs(out).max())).astype(np.float32)
 
 
-TILE_W, TILE_H = 138, 112     # a device tile; TILE_COLS of them fill the page's width
+TILE_W = 138                  # a device tile; TILE_COLS of them fill the page's width
+TILE_MIN_H = 72               # a tile's least height (as tall as its names need: tile_h)
 TILE_COLS, TILE_GAP = 4, 12
 CONTENT_W = TILE_COLS * TILE_W + (TILE_COLS - 1) * TILE_GAP   # a page's width: one row
 MARGIN = 24                   # the dialog's sides: the step bar, pages and Back / Next
-USE_TILE_H = 72               # "What's it for?": the same tiles, one row, no second line
 HEADER_GAP = 20               # every step: between the title + words and what's below
-# Bun beside each step's title: about as tall as the title and its words, so the
-# header ends where its text does (his default padding left an empty band under it)
-BUN_H, BUN_PAD = 100, 10
+SECTION_GAP = 16              # between a step's parts (a card, a list, the footer line)
+# Bun beside each step's title, top-aligned with it and no taller than the title and
+# two lines of words: the header ends where its text does, so the gap under every
+# step's words is HEADER_GAP and nothing more (a taller Bun left a band under them)
+BUN_H, BUN_PAD = 74, 5
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # DESIGN.md Standard kit: Display
 BODY_CSS = "font-size:11pt;"                      # ... Large (a full-page guide's body)
 
@@ -274,6 +277,15 @@ def _choice_icon(name: str, kind: str) -> str:
                                                  "airpods", "buds")) else "volume"
 
 
+def tile_h(tiles: list[ChoiceTile]) -> int:
+    """One height for a list's tiles: what the tallest name needs (at least
+    TILE_MIN_H), set on each of them."""
+    h = max([TILE_MIN_H, *(t.needed_height() for t in tiles)])
+    for t in tiles:
+        t.setFixedHeight(h)
+    return h
+
+
 def _card(margins: int = 16, spacing: int = 12,
           roomy: bool = True) -> tuple[QFrame, QVBoxLayout]:
     """A rounded panel (the theme's card) to group a page's buttons; `roomy` gives
@@ -297,9 +309,8 @@ def _label(text: str, css: str = BODY_CSS) -> QLabel:
 
 def _header(title: str | QLabel, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     """A page's title and intro, with Bun (holding something that fits the page)
-    beside both. He sits in the same top-right spot on every page, and his widget
-    carries its own padding, so he has even room all round instead of sitting on top
-    of the text."""
+    beside both, top-aligned with the title. He's no taller than the words, so the
+    header ends where they do (BUN_H)."""
     row = QHBoxLayout()
     row.setSpacing(16)
     col = QVBoxLayout()
@@ -308,7 +319,7 @@ def _header(title: str | QLabel, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     col.addWidget(body)
     col.addStretch(1)
     row.addLayout(col, 1)
-    row.addWidget(bun, 0, Qt.AlignmentFlag.AlignVCenter)
+    row.addWidget(bun, 0, Qt.AlignmentFlag.AlignTop)
     return row
 
 
@@ -603,18 +614,22 @@ class SetupWizard(QDialog):
     # ------------------------------------------------------------------ pages
     def _choice_list(self, names: list[str], current: str | None,
                      on_pick, kind: str = "output") -> tuple[QWidget, QButtonGroup]:
-        """The devices as fixed-size tiles in a grid (TILE_COLS across), each with its
-        picture; the picked one is filled, ringed and ticked. More than two rows
-        scroll."""
+        """The devices as tiles in a grid (TILE_COLS across), each with its picture;
+        the picked one is filled, ringed and ticked. Every tile is as tall as the
+        longest name needs (tile_h), so short names don't float in a tall tile. More
+        than two rows scroll."""
         box = QWidget()
         grid = QGridLayout(box)
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(TILE_GAP)
         group = QButtonGroup(box)
+        tiles = []
         for i, n in enumerate(names):
             title, sub = _split_name(n)
             tile = ChoiceTile(n, "stop" if n == NOWHERE else _choice_icon(n, kind),
-                              TILE_W, TILE_H, title=title, sub=sub)
+                              TILE_W, TILE_MIN_H, title=title, sub=sub)
+            tile.meter = kind == "input"   # the picked mic shows your voice's level
+            tiles.append(tile)
             tile.setToolTip(n)
             tile.setProperty("device", n)
             group.addButton(tile)
@@ -625,6 +640,7 @@ class SetupWizard(QDialog):
             grid.addWidget(_label(_("<span style='color:{colour}'>None found. Plug it in, close "
                                     "this, then press <b>Step-by-step guide</b> on the Setup "
                                     "tab.</span>", colour=_bad())), 0, 0, 1, TILE_COLS)
+        h = tile_h(tiles)
         grid.setColumnStretch(TILE_COLS, 1)   # tiles keep their size; room goes to the end
         group.buttonClicked.connect(lambda b: on_pick(b.property("device")))
         scroll = QScrollArea()
@@ -632,7 +648,7 @@ class SetupWizard(QDialog):
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(box)
         rows = min(2, max(1, -(-len(names) // TILE_COLS)))
-        scroll.setFixedHeight(rows * TILE_H + (rows - 1) * TILE_GAP if names else TILE_H)
+        scroll.setFixedHeight(rows * h + (rows - 1) * TILE_GAP if names else h)
         return scroll, group
 
     def _page_use(self) -> QWidget:
@@ -650,16 +666,17 @@ class SetupWizard(QDialog):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(TILE_GAP)
         self.use_group = QButtonGroup(box)
-        self.use_buttons: dict[str, QRadioButton] = {}
+        self.use_buttons: dict[str, ChoiceTile] = {}
         self._use_words: dict[str, str] = {}
         for i, (key, icon, title, words) in enumerate(uses()):
-            rb = ChoiceTile(title, icon, TILE_W, USE_TILE_H)
+            rb = ChoiceTile(title, icon, TILE_W, TILE_MIN_H)
             rb.setProperty("use", key)
             rb.setChecked(key == self._use)
             self.use_group.addButton(rb)
             grid.addWidget(rb, 0, i)
             self.use_buttons[key] = rb
             self._use_words[key] = words
+        tile_h(list(self.use_buttons.values()))
         grid.setColumnStretch(len(uses()), 1)
         v.addSpacing(HEADER_GAP)
         v.addWidget(box)
@@ -737,11 +754,11 @@ class SetupWizard(QDialog):
                                    lambda n: self._pick_headphones(n, by_user=True))
         v.addSpacing(HEADER_GAP)
         v.addWidget(lst)
-        v.addSpacing(12)
-        # a round speaker button in a card, with what to do next to it: as wide as
-        # its words (not the page), with room above and below
+        v.addSpacing(SECTION_GAP)
+        # a round speaker button in a card, with what to do next to it: the page's
+        # width, so its edges are the tiles' and Next's (a card as wide as its words
+        # ended at a spot nothing else lines up with)
         card, cl = _card(16, roomy=False)
-        cl.setContentsMargins(16, 16, 24, 16)
         row = QHBoxLayout()
         row.setSpacing(16)
         play = self.btn_test = _RoundButton(56)
@@ -758,22 +775,18 @@ class SetupWizard(QDialog):
         hint = _label(_("Only you hear it. Didn't hear it? Pick another one and try again."),
                       "font-size:10pt;")
         hint.setObjectName("muted")
-        for lbl in (self.test_hint, hint):   # one line each: the card is as wide as them
-            lbl.setWordWrap(False)
         words.addWidget(hint)
         words.addStretch(1)
         row.addLayout(words, 1)
         cl.addLayout(row)
-        card_row = QHBoxLayout()
-        card_row.addWidget(card)
-        card_row.addStretch(1)
-        v.addLayout(card_row)
+        v.addWidget(card)
         v.addStretch(1)
         return p
 
     def _page_cable(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
+        v.setSpacing(SECTION_GAP)   # the same gap between every part of the step
         self.bun_cable = BunnyWidget("plug", height=BUN_H, pad=BUN_PAD)
         v.addLayout(_header(_("Where do your sounds go?"),
                             _label(_("Straight into <b>your mic</b>: one click, and Discord "
@@ -796,7 +809,7 @@ class SetupWizard(QDialog):
         # the answer to "is it working?" right under the intro, in a card of its own
         self.status_card = StatusCard(self.cable_status)
         self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
-        v.insertSpacing(1, HEADER_GAP)
+        v.insertSpacing(1, HEADER_GAP - SECTION_GAP)
         v.insertWidget(2, self.status_card)
         self.cable_bar = QProgressBar()
         self.cable_bar.setRange(0, 0)   # busy: we can't know how long Windows takes
@@ -853,7 +866,6 @@ class SetupWizard(QDialog):
         self.btn_use_cable.clicked.connect(lambda: self._pick_route("cable"))
         self.btn_use_cable.hide()
         v.addWidget(self.btn_use_cable, 0, Qt.AlignmentFlag.AlignLeft)
-        v.addSpacing(12)
         v.addWidget(self._alt_card())
         v.addStretch(1)
         return p
@@ -868,14 +880,13 @@ class SetupWizard(QDialog):
         head.setObjectName("section")
         head.setProperty("head", True)
         cl.addWidget(head)
-        tiles = QHBoxLayout()
-        tiles.setSpacing(12)
-        width = (CONTENT_W - 2 * 14 - 2 - 12) // 2   # (the card's 1 px edges: 2)
+        tiles = QHBoxLayout()   # two halves; one left alone (the other's list is open)
+        tiles.setSpacing(12)    # takes the whole row, not half of it beside a hole
 
         def tile(icon: str, title: str, words: str, button: QPushButton) -> QFrame:
             box = QFrame()
             box.setObjectName("alttile")   # an inner area (DESIGN.md: cards)
-            box.setFixedWidth(width)
+            box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             v = QVBoxLayout(box)
             v.setContentsMargins(14, 12, 14, 14)
             v.setSpacing(8)
@@ -890,7 +901,7 @@ class SetupWizard(QDialog):
             v.addWidget(panel.hint_label(words))
             v.addStretch(1)
             v.addWidget(button, 0, Qt.AlignmentFlag.AlignLeft)
-            tiles.addWidget(box)
+            tiles.addWidget(box, 1)
             return box
 
         self.btn_alt_cable = QPushButton(_("Use the cable"))
@@ -911,7 +922,6 @@ class SetupWizard(QDialog):
             _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
               "capture card, or to nobody."),
             self.btn_alt_other)
-        tiles.addStretch(1)
         cl.addLayout(tiles)
         self.alt_card.hide()
         return self.alt_card
@@ -930,8 +940,11 @@ class SetupWizard(QDialog):
         if not on:
             return
         cfg = self.win.cfg
-        self.other_lay.setSpacing(12)
-        self.other_lay.addSpacing(4)
+        self.other_lay.setSpacing(6)
+        head = QLabel(_("Another device"))   # what this list is, like the card's head
+        head.setObjectName("section")
+        head.setProperty("head", True)
+        self.other_lay.addWidget(head)
         self.other_lay.addWidget(panel.hint_label(_(
             "Pick where your sounds go instead. Onion Board plays them (and your voice, if "
             "you send it) into that device, and whatever listens to it gets them: OBS "
@@ -940,6 +953,7 @@ class SetupWizard(QDialog):
         cur = (NOWHERE if cfg.route == "off" else
                cfg.main_device if cfg.route == "device" else None)
         lst, __ = self._choice_list(outs + [NOWHERE], cur, self._pick_route)
+        self.other_lay.addSpacing(12 - 6)
         self.other_lay.addWidget(lst, 1)
 
     def _pick_route(self, choice: str):
@@ -1040,6 +1054,7 @@ class SetupWizard(QDialog):
         cl.addLayout(games)
         v.addWidget(self.help_card)
         v.addStretch(1)
+        v.addSpacing(SECTION_GAP - 8)   # the closing words: apart from the cards above
         v.addWidget(_label(_("That's it. Add sounds by dragging files onto the window, then "
                              "click one to play it. You can open this guide again any time "
                              "from the <b>Setup</b> tab (<b>Step-by-step guide</b>)."),

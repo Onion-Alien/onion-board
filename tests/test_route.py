@@ -166,7 +166,7 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     assert wiz.btn_next.text().startswith("Skip")
     wiz.btn_other.click()
     assert not wiz.other_box.isHidden()
-    choices = [b.text() for b in wiz.other_box.findChildren(setupwizard.QRadioButton)]
+    choices = [b.text() for b in wiz.other_box.findChildren(setupwizard.ChoiceTile)]
     assert PHONES not in choices and "Speakers" in choices and setupwizard.NOWHERE in choices
     wiz._pick_route("Speakers")
     assert w.cfg.route == "device" and devices["picked"]["set_main_device"] == "Speakers"

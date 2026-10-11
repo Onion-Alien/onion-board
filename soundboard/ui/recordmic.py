@@ -68,7 +68,7 @@ class RecordDialog(QDialog):
     last_source = "mic"   # what the window offers first: the last one used
 
     def __init__(self, engine, voice_on: Callable[[], bool], names: Callable[[], list],
-                 save: Callable[[np.ndarray, str], bool], open_devices: Callable[[], None],
+                 save: Callable[..., bool], open_devices: Callable[[], None],
                  parent=None, playing_name: Callable[[], str] | None = None,
                  playing_picture: Callable[[], str] | None = None):
         super().__init__(parent)

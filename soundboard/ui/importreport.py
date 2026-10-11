@@ -52,7 +52,7 @@ class Skipped:
         return f"{self.file}: {self.reason}" if self.reason else self.file
 
 
-def classify(file: str, e: BaseException) -> Skipped:
+def classify(file: str, e: BaseException | str) -> Skipped:
     name = Path(file).name
     if isinstance(e, AlreadyAdded):
         return Skipped(name, str(e), "dupe")
