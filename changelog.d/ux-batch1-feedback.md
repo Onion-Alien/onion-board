@@ -1,0 +1,4 @@
+- Closing Onion Board while a link is still downloading now asks first, instead of dropping the download silently.
+- A link that can't be used now also shows its reason as a message, not only in the results panel.
+- Settings are saved 100 ms after a change instead of 400 ms, so a crash loses less.
+- After a restart or an audio buffering change, a message says your sounds are back on your mic.

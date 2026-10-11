@@ -169,6 +169,10 @@ class LinkBar(QFrame):
             self._got = None
         self._kept = None
 
+    def downloading(self) -> bool:
+        """A link is being downloaded right now (closing would drop it)."""
+        return bool(self._busy)
+
     def shutdown(self):
         self.engine.stop(PLAY_ID)
         self._drop_download()

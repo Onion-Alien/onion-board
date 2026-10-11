@@ -3061,5 +3061,8 @@
   "Music & media": "Musika at media",
   "Other": "Iba pa",
   "Help and community": "Tulong at komunidad",
-  "Onion Board on GitHub": "Onion Board sa GitHub"
+  "Onion Board on GitHub": "Onion Board sa GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "May download pang tumatakbo. Kapag nagsara ka ngayon, mawawala ito. Isara pa rin?",
+  "Download running": "Tumatakbo ang download",
+  "Your sounds are back on your mic.": "Nasa mic mo na ulit ang mga tunog mo."
 }

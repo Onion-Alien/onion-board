@@ -3061,5 +3061,8 @@
   "Music & media": "Musica e media",
   "Other": "Altro",
   "Help and community": "Aiuto e community",
-  "Onion Board on GitHub": "Onion Board su GitHub"
+  "Onion Board on GitHub": "Onion Board su GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Un download è ancora in corso. Se chiudi ora, andrà perso. Chiudere comunque?",
+  "Download running": "Download in corso",
+  "Your sounds are back on your mic.": "I tuoi suoni sono di nuovo sul microfono."
 }

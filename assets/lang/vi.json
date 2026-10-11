@@ -2996,5 +2996,8 @@
   "Music & media": "Nhạc & phương tiện",
   "Other": "Khác",
   "Help and community": "Trợ giúp và cộng đồng",
-  "Onion Board on GitHub": "Onion Board trên GitHub"
+  "Onion Board on GitHub": "Onion Board trên GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Vẫn còn một lượt tải xuống đang chạy. Nếu đóng bây giờ, nó sẽ mất. Vẫn đóng?",
+  "Download running": "Đang tải xuống",
+  "Your sounds are back on your mic.": "Âm thanh của bạn đã quay lại micro."
 }

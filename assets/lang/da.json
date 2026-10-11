@@ -3061,5 +3061,8 @@
   "Music & media": "Musik og medier",
   "Other": "Andet",
   "Help and community": "Hjælp og fællesskab",
-  "Onion Board on GitHub": "Onion Board på GitHub"
+  "Onion Board on GitHub": "Onion Board på GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Der kører stadig en download. Hvis du lukker nu, går den tabt. Luk alligevel?",
+  "Download running": "Download kører",
+  "Your sounds are back on your mic.": "Dine lyde er tilbage på din mikrofon."
 }

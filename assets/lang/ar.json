@@ -3321,5 +3321,8 @@
   "Music & media": "الموسيقى والوسائط",
   "Other": "أخرى",
   "Help and community": "المساعدة والمجتمع",
-  "Onion Board on GitHub": "Onion Board على GitHub"
+  "Onion Board on GitHub": "Onion Board على GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "لا يزال هناك تنزيل قيد التشغيل. إذا أغلقت الآن فسيضيع. هل تريد الإغلاق على أي حال؟",
+  "Download running": "التنزيل قيد التشغيل",
+  "Your sounds are back on your mic.": "عادت أصواتك إلى الميكروفون."
 }

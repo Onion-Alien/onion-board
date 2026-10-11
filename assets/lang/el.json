@@ -3061,5 +3061,8 @@
   "Music & media": "Μουσική και πολυμέσα",
   "Other": "Άλλα",
   "Help and community": "Βοήθεια και κοινότητα",
-  "Onion Board on GitHub": "Το Onion Board στο GitHub"
+  "Onion Board on GitHub": "Το Onion Board στο GitHub",
+  "A download is still running. If you close now, it's lost. Close anyway?": "Μια λήψη βρίσκεται ακόμα σε εξέλιξη. Αν κλείσεις τώρα, θα χαθεί. Κλείσιμο παρόλα αυτά;",
+  "Download running": "Λήψη σε εξέλιξη",
+  "Your sounds are back on your mic.": "Οι ήχοι σου είναι ξανά στο μικρόφωνό σου."
 }
