@@ -2982,5 +2982,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "เก็บลิงก์ ช่อง วันที่อัปโหลด ความยาว และยอดดูของแต่ละการดาวน์โหลด (จากการดาวน์โหลดเอง ไม่ได้ดึงอะไรเพิ่ม) ในไฟล์ข้อความข้างเสียงด้วย คลิกขวาที่เสียงเพื่อเปิดหรือคัดลอกลิงก์ ปิด: การดาวน์โหลดใหม่จะไม่เก็บอะไรเลยและเมนูจะซ่อนไว้ ส่วนที่บันทึกไว้แล้วยังอยู่",
   "Remember where it came from": "จำว่ามาจากไหน",
   "Set up output": "ตั้งค่าเอาต์พุต",
-  "Sound output": "เอาต์พุตเสียง"
+  "Sound output": "เอาต์พุตเสียง",
+  "Interface size": "ขนาดหน้าจอ",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "ทำให้ทุกอย่างใน Onion Board ใหญ่ขึ้นหรือเล็กลง: ข้อความ ปุ่ม และแพด",
+  "Onion Board changes size after a restart.": "Onion Board จะเปลี่ยนขนาดหลังรีสตาร์ท"
 }

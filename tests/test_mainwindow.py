@@ -1161,6 +1161,39 @@ def test_drop_target_keeps_the_full_board_width(window, qapp):
     assert rect.width() == window.grid.width() - margins.left() - margins.right() - 4
 
 
+def test_full_screen_caps_only_the_search_box(window, qapp):
+    """At 1920x1080 the search box stops at SEARCH_MAX_W (the library tools stay at
+    the right); the seek bar and the drop box still follow the window (U11)."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    window.resize(1920, 1080)
+    QTest.qWait(150)   # the window's re-fit runs on a timer
+    assert window.search.width() == main.SEARCH_MAX_W
+    last = window._pad_size[1]   # Pad size: the toolbar's last control
+    right = last.mapTo(window.sounds_toolbar, last.rect().topRight()).x()
+    assert window.sounds_toolbar.width() - right < 40
+    assert window._name_seek.width() > 720   # its old cap: it follows the window now
+    margins = window.grid.grid.contentsMargins()
+    assert window.grid.drop_area().width() == (
+        window.grid.width() - margins.left() - margins.right() - 4)
+
+
+def test_volume_percent_sits_beside_its_slider_on_the_row_line(window, qapp):
+    """The bottom row's 100% / 70% were right-aligned in a box as wide as "1000%":
+    25-30 px from their slider, and 1 px under the labels beside them."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.resize(1180, 720)
+    QTest.qWait(150)
+    for vol in (window.vol_mic, window.vol_mon):
+        spin = vol.spin
+        assert spin.alignment() & Qt.AlignLeft and spin.alignment() & Qt.AlignVCenter
+        text_x = spin.mapTo(vol, spin.lineEdit().geometry().topLeft()).x()
+        assert text_x - vol.slider.geometry().right() <= 12
+        assert spin.lineEdit().textMargins().bottom() == 2
+
+
 def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     window.apply_theme("Dark")
     window.tabs.setCurrentIndex(0)

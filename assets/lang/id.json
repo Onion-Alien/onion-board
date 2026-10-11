@@ -2982,5 +2982,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Menyimpan link, channel, tanggal unggah, durasi, dan penayangan setiap unduhan (dari unduhan itu sendiri, tidak ada yang diambil tambahan), juga di file teks di samping suara. Klik kanan suara untuk membuka atau menyalin link. Mati: unduhan baru tidak menyimpan apa pun dan menu menyembunyikannya; yang sudah tersimpan tetap ada.",
   "Remember where it came from": "Ingat asalnya",
   "Set up output": "Atur output",
-  "Sound output": "Output suara"
+  "Sound output": "Output suara",
+  "Interface size": "Ukuran antarmuka",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Membuat semua di Onion Board lebih besar atau lebih kecil: teks, tombol, dan pad.",
+  "Onion Board changes size after a restart.": "Ukuran Onion Board berubah setelah dimulai ulang."
 }

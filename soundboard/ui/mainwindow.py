@@ -44,12 +44,12 @@ from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, So
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
+from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
                            sourcedialog, splash, taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card,
-                                 hint_label, icon_label, steady_number, vsep)
+from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar, capped,
+                                 card, hint_label, icon_label, steady_number, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
@@ -61,7 +61,7 @@ from soundboard.ui.sidebar import SHUT_W, SideTabs
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.spacekey import SpaceKey
-from soundboard.ui.padbatch import PadSelection
+from soundboard.ui.padbatch import PadSelection, fill_colour_menu
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab, ElidedLabel
 from soundboard.ui.triggershost import BoardHost
@@ -155,6 +155,10 @@ TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
+# ...and its most: a few words go in it, so past this it's only a longer empty bar
+# (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
+# the drop box still follow the window: wider is useful there (U11).
+SEARCH_MAX_W = 480
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
@@ -1242,6 +1246,7 @@ class MainWindow(QMainWindow):
         # labelled inline (a title row over each box made the strip twice as tall)
         f = QFrame()
         f.setObjectName("deck")
+        f.setMinimumHeight(BAR_H)
         h = self._mixer_layout = QHBoxLayout(f)
         h.setContentsMargins(12, 6, 12, 6)
         h.setSpacing(14)
@@ -1435,6 +1440,7 @@ class MainWindow(QMainWindow):
         self.search.setToolTip(self._search_tip)
         self.search.setClearButtonEnabled(True)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
+        self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
         # and only once it pauses (_on_search_text); text set by the app filters at once
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
@@ -1518,6 +1524,7 @@ class MainWindow(QMainWindow):
         tb.addWidget(vsep())
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
+        tb.addStretch(0)   # past SEARCH_MAX_W: the room goes here, the library tools stay right
         tb.addWidget(vsep())
         tb.addWidget(more)
         tb.addWidget(vsep())
@@ -1554,7 +1561,7 @@ class MainWindow(QMainWindow):
         self._pad_size = (size_lbl, size)
         for b in (add, self.btn_record, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
-            b.setFixedHeight(40)
+            b.setFixedHeight(CONTROL_H)
         left.addWidget(self.sounds_toolbar)
         self.cat_bar = self._build_categories()
         left.addWidget(self.cat_bar)
@@ -1661,14 +1668,14 @@ class MainWindow(QMainWindow):
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
         for b in (self.btn_pp, self.btn_st):
-            b.setFixedSize(38, 34)
+            b.setFixedSize(CONTROL_H, CONTROL_H)
         self.np_name = QLabel(_("Pick a sound"))
         self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
         self.np_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
         # the row's height, set by its buttons; its width follows the text inside
         # NameAndSeek, which never asks the page for a new layout (the name changes
         # with every pad press, and a relayout repainted every pad on the board)
-        self.np_name.setFixedHeight(34)
+        self.np_name.setFixedHeight(CONTROL_H)
         self.np_name.setStyleSheet("font-weight:600;")
         self.seek = SeekSlider(Qt.Horizontal)
         self.seek.setRange(0, 1000)
@@ -5427,24 +5434,12 @@ class MainWindow(QMainWindow):
                                _("Clear the random-sound hotkey")) if hk else None
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
         a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
-        a_shuf = menu.addAction(icons.icon("next"), _("Play them all, shuffled"))
+        a_shuf = menu.addAction(icons.icon("shuffle"), _("Play them all, shuffled"))
         a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
-        now = self.cfg.category_colors.get(name, "")
-        a_cols = {}
-        for col in PAD_COLORS:
-            picked = col.lower() == now.lower()
-            # the dot sits where a tick would: the one it has now is bold, with a ✓
-            a = cm.addAction(self._dot_icon(col), COLOUR_NAMES.get(col, col)
-                             + ("  ✓" if picked else ""))
-            if picked:
-                bold = a.font()
-                bold.setBold(True)
-                a.setFont(bold)
-            a_cols[a] = col
-        if now:
-            cm.addSeparator()
-            a_cols[cm.addAction(icons.icon("palette", checked_color="accent"), _("No colour"))] = ""
+        # the same colour list as the bulk Colour menu: names, the current one ticked
+        fill_colour_menu(cm, self.cfg.category_colors.get(name, ""),
+                         lambda col: self.set_category_color(name, col), none=True)
         menu.addSeparator()
         a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front"))
         a_unprog = {menu.addAction(icons.icon("offline"),
@@ -5469,8 +5464,6 @@ class MainWindow(QMainWindow):
             self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
-        elif act in a_cols:
-            self.set_category_color(name, a_cols[act])
         elif act == a_del:
             self.delete_category(name)
         elif act == a_prog:

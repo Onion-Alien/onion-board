@@ -3047,5 +3047,8 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Bewaart van elke download de link, het kanaal, de uploaddatum, de lengte en de weergaven (uit de download zelf, er wordt niets extra opgehaald), ook in een tekstbestand naast het geluid. Klik met rechts op het geluid om de link te openen of te kopiëren. Uit: nieuwe downloads bewaren hier niets van en het menu verbergt het; wat al bewaard is, blijft.",
   "Remember where it came from": "Onthouden waar het vandaan komt",
   "Set up output": "Uitvoer instellen",
-  "Sound output": "Geluidsuitvoer"
+  "Sound output": "Geluidsuitvoer",
+  "Interface size": "Grootte van de interface",
+  "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Maakt alles in Onion Board groter of kleiner: tekst, knoppen en pads.",
+  "Onion Board changes size after a restart.": "Onion Board verandert van grootte na een herstart."
 }

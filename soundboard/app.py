@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import ctypes
 import gc
+import json
 import logging
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 # (Up to 1.9.7 QT_WIDGETS_RHI=1 was set here so the Radio tab's 3D globe could show
 # without rebuilding the window. It gave every window its own Direct3D device, 16
@@ -380,6 +382,26 @@ def _selftest_addon_in(path, tmp) -> int:
     return 0
 
 
+def ui_scale_startup(app_dir: Path) -> int:
+    """Size the whole interface by config.json's `ui_scale` (Settings > Appearance >
+    Interface size). Qt can only scale before the QApplication is made, so a change
+    shows after a restart. QT_SCALE_FACTOR set from outside wins (scripts, tests)."""
+    from soundboard.library import UI_SCALES
+    if "QT_SCALE_FACTOR" in os.environ:
+        return 100
+    try:
+        raw = json.loads((app_dir / "config.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return 100
+    pct = raw.get("ui_scale", 100) if isinstance(raw, dict) else 100
+    if pct not in UI_SCALES or isinstance(pct, bool):
+        return 100
+    if pct != 100:
+        os.environ["QT_SCALE_FACTOR"] = str(pct / 100)
+    log.info("interface size: %d%%", pct)
+    return pct
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):   # a path with emoji or Cyrillic in it, sent
         if stream is not None and hasattr(stream, "reconfigure"):   # to a file or pipe,
@@ -424,6 +446,7 @@ def main():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("OnionBoard.App")
     except Exception:  # noqa: BLE001
         log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
+    ui_scale_startup(APP_DIR)
     app = QApplication(sys.argv)
     if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
         from PySide6.QtCore import Qt as _Qt

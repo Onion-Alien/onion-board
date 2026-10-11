@@ -9,8 +9,9 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QObject, Qt
-from PySide6.QtGui import QActionGroup, QColor, QIcon, QKeySequence, QPainter, QPixmap, QShortcut
+from PySide6.QtCore import QObject, QPointF, Qt
+from PySide6.QtGui import (QActionGroup, QColor, QIcon, QKeySequence, QPainter, QPen,
+                           QPixmap, QShortcut)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QWidget)
 
@@ -24,15 +25,54 @@ if TYPE_CHECKING:
 
 
 def swatch(color: str, size: int = 14) -> QIcon:
-    pm = QPixmap(size, size)
-    pm.fill(Qt.transparent)
-    p = QPainter(pm)
-    p.setRenderHint(QPainter.Antialiasing)
-    p.setPen(Qt.NoPen)
-    p.setBrush(QColor(color))
-    p.drawEllipse(1, 1, size - 2, size - 2)
-    p.end()
-    return QIcon(pm)
+    """A round colour dot; ticked (a menu's current colour) it keeps its colour and
+    gets a check mark on it, so the picked one still shows which colour it is."""
+    def dot(ticked: bool) -> QPixmap:
+        pm = QPixmap(size, size)
+        pm.fill(Qt.transparent)
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(color))
+        p.drawEllipse(1, 1, size - 2, size - 2)
+        if ticked:
+            ink = QColor(Qt.black if QColor(color).lightnessF() > 0.6 else Qt.white)
+            pen = QPen(ink, max(1.6, size / 8))
+            pen.setCapStyle(Qt.RoundCap)
+            pen.setJoinStyle(Qt.RoundJoin)
+            p.setPen(pen)
+            p.setBrush(Qt.NoBrush)
+            p.drawPolyline([QPointF(size * .3, size * .52), QPointF(size * .45, size * .67),
+                            QPointF(size * .72, size * .36)])
+        p.end()
+        return pm
+    icon = QIcon(dot(False))
+    # QMenu draws a checked action's On icon in place of its tick
+    icon.addPixmap(dot(True), QIcon.Normal, QIcon.On)
+    icon.addPixmap(dot(True), QIcon.Active, QIcon.On)
+    return icon
+
+
+def fill_colour_menu(menu: QMenu, current: str | None, pick, none: bool = False):
+    """The pad colours by name, the current one ticked (none for a mixed pick). With
+    `none`, a "No colour" item too (ticked when there's none). The Sounds menus share
+    it: the bulk Colour menu and a category tab's."""
+    from soundboard.ui.dialogs import COLOUR_NAMES
+    group = QActionGroup(menu)
+    group.setExclusive(True)
+    cur = (current or "").lower()
+    for c in PAD_COLORS:
+        a = menu.addAction(swatch(c), COLOUR_NAMES.get(c, c), lambda c=c: pick(c))
+        a.setCheckable(True)
+        a.setChecked(c.lower() == cur)
+        group.addAction(a)
+    if none:
+        menu.addSeparator()
+        a = menu.addAction(icons.icon("palette", checked_color="accent"), _("No colour"),
+                           lambda: pick(""))
+        a.setCheckable(True)
+        a.setChecked(current == "")
+        group.addAction(a)
 
 
 def count(n: int) -> str:
@@ -148,7 +188,6 @@ class PadSelection(QObject):
         """Right-click on a picked pad: the actions for all of them."""
         n = len(self.picked)
         m = QMenu(self.mw)
-        m.addSection(count(n))
         self._fill_colors(m.addMenu(swatch(PAD_COLORS[0]), _("Colour")))
         m.addAction(icons.icon("volume"), _("Volume"), self.ask_volume)
         m.addAction(icons.icon("wave"), _("Fade in / out"), self.ask_fades)
@@ -175,18 +214,8 @@ class PadSelection(QObject):
 
     def _fill_colors(self, menu: QMenu):
         colors = {m.color for m in self.sounds()}
-        current = next(iter(colors)) if len(colors) == 1 else None
-        group = QActionGroup(menu)
-        group.setExclusive(True)
-        for c in PAD_COLORS:
-            color_icon = swatch(c)
-            # QMenu uses the icon slot for checked actions too: supply an On icon.
-            color_icon.addPixmap(icons.icon("check", "text").pixmap(14, 14),
-                                 QIcon.Normal, QIcon.On)
-            action = menu.addAction(color_icon, c, lambda c=c: self.set_color(c))
-            action.setCheckable(True)
-            action.setChecked(c == current)
-            group.addAction(action)
+        fill_colour_menu(menu, next(iter(colors)) if len(colors) == 1 else None,
+                         self.set_color)
 
     def _fill_cats(self, menu: QMenu):
         sounds = self.sounds()

@@ -117,7 +117,7 @@ the affected states; include its PR and validation evidence here.
   submenus, configuration and confirmation states with safe test fixtures; the
   initial spot audit did not cover them. Treat new observations as findings only
   after inspection. Triggers' add-on UI is maintained separately.
-- [ ] **U9: Menu interaction and accessibility pass.** Check Sounds/Apps/Radio/Voice
+- [x] **U9: Menu interaction and accessibility pass.** Check Sounds/Apps/Radio/Voice
   menus for action grouping, current-value checkmarks, destructive treatment,
   visible alternatives to right-click, keyboard navigation, focus return and screen
   edges. Existing `DropdownMenu` and `QMenu` usage is a starting point, not evidence
@@ -126,8 +126,21 @@ the affected states; include its PR and validation evidence here.
   Started (PR #399): the Sounds bulk Colour menu checks the shared colour (none
   for a mixed selection) and the empty and filled boards share one "Drop sound
   files here" hint. Checked offscreen in Dark, Light, High Contrast and Retro 98 at
-  narrow and normal sizes. Still open: the rest of the Sounds menus, and the Apps,
-  Radio and Voice menus.
+  narrow and normal sizes.
+
+  Done (PR #414): one colour list for both Sounds Colour menus
+  (`padbatch.fill_colour_menu`): named colours (the bulk one showed `#1fb6ff`), the
+  current one ticked on its own dot (the category one had a typed "✓" and bold). The
+  Apps card's Categories tick the program's category (it was greyed out) and keep
+  "Music & media"'s "&" (it read "Music _media"); the Apps card and category heading
+  menus got icons, a short red Remove / Delete category (the long words are the
+  tooltip). The picked-pads menu lost its empty first row (a section title our menu
+  style doesn't draw). Shuffled play got the shuffle icon. Checked offscreen in Dark
+  and Light (`tests/test_padbatch.py`, `test_appspanel.py`). Checked and fine as they
+  are: the pad menu (Menu key / Shift+F10 open it), Voice's saved-voice menu (red
+  Delete; Menu key on the focused tile), Radio's country dropdown. Left for later:
+  Apps cards and headings have no keyboard way to their menu (the card's ✕ and drag
+  cover remove and move), and Apps category names aren't translated.
 
 ## Merged in from the earlier audits
 
@@ -151,9 +164,26 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   4.0, Dark 4.2): the style sheet now gives it `$muted` (5.9, 11.4, 5.9). Checked
   offscreen in Dark, Light and High Contrast at 440, 800x600, 1180x720 and 1920x1080
   (`tests/test_ui_audit.py`).
-- [ ] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
+- [x] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
   hear* meter, the search box and the drop box run the whole width. Cap utility widths
   (DESIGN: narrow by default) and recheck with a populated board.
+- [x] **U12: One control height, one bar height, an interface size.** The Sounds
+  toolbar (52 px, 40 px controls), player bar (51) and mic bar (47) were all
+  different, so the header looked heavy beside the tab rail. Now `panel.CONTROL_H`
+  (36) for the toolbar's buttons, the search box and play/stop, and `panel.BAR_H` (48)
+  for every bar (`panel.bar()` and the mixer strip). New *Interface size* card in
+  Settings > Appearance (80-150 %, `Config.ui_scale`): `app.ui_scale_startup` sets
+  `QT_SCALE_FACTOR` before the QApplication, so a change offers *Restart now*.
+  No Ctrl +/- keys: each press would restart the app. Search width is U11's.
+  Checked offscreen at 800x600, 1280x760 and 1920x1080, and at 125 %
+  (`tests/test_ui_size.py`).
+
+  Decided with the owner (11 October): **only the search box is capped**
+  (`SEARCH_MAX_W` 480, PR #411; 456 px at 1180x720, so normal windows are unchanged).
+  A few words go in it, so past that it was only a longer empty bar. The seek bar,
+  the meter and the drop box **keep following the window on purpose**: a longer seek
+  bar seeks finer, and capping them only traded a long control for an empty gap
+  (PR #410, capping all four, was closed for that). Don't re-cap them.
 
 ### Features for later (not UI fixes; after 2.0)
 

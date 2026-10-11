@@ -675,7 +675,7 @@ QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
-QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:17px; padding:0; }
+QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:18px; padding:0; }
 QPushButton#transport_play[mini="true"] { border-radius:14px; }
 QPushButton#transport_play:hover { background:$accent_hi; }
 QPushButton#transport_play:pressed { background:$accent; }

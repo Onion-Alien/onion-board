@@ -1002,3 +1002,29 @@ def test_program_icons_are_read_off_the_ui_thread(tab, monkeypatch):
     tab._on_apps([music()])
     pm = tab.rows["music.exe"].icon.pixmap()
     assert not pm.isNull() and pm.toImage().pixelColor(12, 12).green() == 255
+
+
+def test_card_menu_ticks_its_category_and_shows_ampersands(tab, monkeypatch):
+    """The card menu's Categories: the current one ticked (it was greyed out), "Music &
+    media" with its "&" (it showed "Music _media"), and Remove in the danger colour."""
+    from PySide6.QtWidgets import QMenu
+    from soundboard.ui import appspanel
+    seen = []
+
+    class Shown(QMenu):
+        def exec(self, *a):
+            seen.append(self)
+    monkeypatch.setattr(appspanel, "QMenu", Shown)
+    row = tab._row("spotify.exe")
+    row._show_card_menu(row.rect().center())
+    cats = next(a.menu() for a in seen[0].actions() if a.menu() is not None)
+    acts = cats.actions()
+    assert "Music && media" in [a.text() for a in acts]
+    assert [a.text() for a in acts if a.isChecked()] == [row.category.replace("&", "&&")]
+    assert all(a.isEnabled() and a.isCheckable() for a in acts)
+    moved = []
+    row.move_to_category.connect(lambda r, c: moved.append(c))
+    next(a for a in acts if a.text() == "Games").trigger()
+    assert moved == ["Games"]
+    remove = seen[0].actions()[-1]
+    assert remove.toolTip() == "Take this program off the list" and not remove.icon().isNull()

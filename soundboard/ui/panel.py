@@ -20,6 +20,10 @@ from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
+# the two heights the main window's controls and bars share (DESIGN.md "size")
+CONTROL_H = 36   # a toolbar button, the search box, the player's buttons
+BAR_H = 48       # a bar holding one row of them: the Sounds toolbar, the bottom bars
+
 
 class RoundedFrame(QFrame):
     """Clip a panel and its children to the same corners as the app's cards."""
@@ -67,10 +71,12 @@ def vsep() -> QFrame:
     return f
 
 
-def bar(margins=(10, 8, 12, 8)) -> tuple[QFrame, QHBoxLayout]:
-    """The rounded control bar every tab has along its bottom (and the mixer strip)."""
+def bar(margins=(10, 5, 12, 6)) -> tuple[QFrame, QHBoxLayout]:
+    """The rounded control bar every tab has along its bottom (and the mixer strip).
+    A theme's 1 px top edge plus 5 + 6 around a CONTROL_H row makes BAR_H."""
     f = QFrame()
     f.setObjectName("transport")
+    f.setMinimumHeight(BAR_H)
     h = QHBoxLayout(f)
     h.setContentsMargins(*margins)
     h.setSpacing(10)
@@ -376,7 +382,13 @@ class VolumeControl(QWidget):
         self.spin.setRange(0, typed_max)
         self.spin.setSuffix("%")
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
-        self.spin.setAlignment(Qt.AlignRight)
+        # beside its slider, on the row's centre line: right-aligned in a box as wide as
+        # "1000%", "70%" sat 30-40 px away from its slider
+        self.spin.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # its text box rounds the centring down: the digits sat 1-1.5 px under the
+        # slider and the labels beside it (measured ink); 2 px less at the bottom
+        # moves the centre up by one
+        self.spin.lineEdit().setTextMargins(0, 0, 0, 2)
         self.spin.setToolTip(_("Type an exact volume (0–{typed_max}%)", typed_max=typed_max))
         if tip:
             self.slider.setToolTip(tip)
