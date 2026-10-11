@@ -674,8 +674,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "Το Noise Suppression είναι <b>Standard</b>: τρώει τους σταθερούς ήχους: βάλε το <b>Noise Suppression</b> σε <b>None</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Κανονικά οι άλλοι ακούν τη φωνή σου και τους ήχους σου μαζί. Ξετσέκαρέ το για μόνο ήχους: ακούν τους ήχους αλλά όχι το μικρόφωνό σου. (Ίδιο με το κουτάκι «Το ακούν οι άλλοι» στο Το μικρόφωνό μου.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Κανονικά οι ήχοι σου μπαίνουν στο μικρόφωνό σου, οπότε όποιος ακούει το μικρόφωνό σου τους ακούει. Διάλεξε κάτι άλλο μόνο για να τους στείλεις αλλού: Voicemeeter, μίκτη, μια συσκευή που καταγράφει το OBS, ή εικονικό καλώδιο.",
-  "Not connected": "Δεν συνδέθηκε",
-  "Not connected: click to fix": "Δεν συνδέθηκε: κάνε κλικ για διόρθωση",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Δεν καλύπτονται από αυτά: links που ανοίγεις στον δικό σου browser (Υποστήριξη, Αναφορά προβλήματος, σελίδες εκδόσεων) και οι λήψεις του ίδιου του προγράμματος εγκατάστασης.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Δεν είναι στη λίστα; Κλείσε τελείως το Steam (δεξί κλικ στο εικονίδιό του δίπλα στο ρολόι → Exit) και άνοιξέ το ξανά.",
   "Not loaded yet: try again in a moment": "Δεν έχει φορτώσει ακόμα: ξαναδοκίμασε σε λίγο",
@@ -3119,5 +3117,7 @@
     "Φέραμε <b>{n}</b> ήχους από το {name}. Να τους κρατήσεις;"
   ],
   "Off air": "Εκτός αέρα",
-  "On air": "Στον αέρα"
+  "On air": "Στον αέρα",
+  "Not configured": "Δεν έχει ρυθμιστεί",
+  "Not configured: click to fix": "Δεν έχει ρυθμιστεί: κάνε κλικ για διόρθωση"
 }

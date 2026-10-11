@@ -686,8 +686,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "Potlačení šumu je <b>Standardní</b>: požírá ustálené zvuky: nastav <b>Potlačení šumu</b> na <b>Žádné</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Normálně ostatní slyší tvůj hlas a tvoje zvuky dohromady. Odškrtni to, chceš-li jen zvuky: uslyší zvuky, ale ne tvůj mikrofon. (Stejné jako políčko „Ostatní to slyší“ u Můj mikrofon.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normálně jdou tvoje zvuky do mikrofonu, takže je slyší každý, kdo slyší tvůj mikrofon. Něco jiného vyber, jen pokud je chceš poslat jinam: Voicemeeter, mixpult, zařízení, které zachytává OBS, nebo virtuální kabel.",
-  "Not connected": "Nepřipojeno",
-  "Not connected: click to fix": "Nepřipojeno: klikni a oprav",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Na tohle se nevztahuje: odkazy, které otevřeš ve vlastním prohlížeči (Podpora, Nahlásit problém, stránky verzí), a vlastní stahování instalátoru.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Není v seznamu? Úplně zavři Steam (pravý klik na ikonu u hodin → Ukončit) a otevři ho znovu.",
   "Not loaded yet: try again in a moment": "Ještě se nenačetl: zkus to za chvilku",
@@ -3192,5 +3190,7 @@
     "Převzaté zvuky z {name}: <b>{n}</b>. Ponechat je?"
   ],
   "Off air": "Mimo vysílání",
-  "On air": "Ve vysílání"
+  "On air": "Ve vysílání",
+  "Not configured": "Nenastaveno",
+  "Not configured: click to fix": "Nenastaveno: klikni pro opravu"
 }

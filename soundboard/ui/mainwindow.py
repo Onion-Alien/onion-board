@@ -3074,11 +3074,11 @@ class MainWindow(QMainWindow):
                 pill = (_("Setup needed") if short
                         else _("One-time setup needed, others can't hear you yet"))
             elif route == "device":
-                pill = (_("Not connected") if short
+                pill = (_("Not configured") if short
                         else _("Not sending: pick a device on the Setup tab"))
             else:   # (the Setup tab offers straight into the mic first)
-                pill = (_("Not connected") if short
-                        else _("Not connected: click to fix"))
+                pill = (_("Not configured") if short
+                        else _("Not configured: click to fix"))
             pills.append(pill)
         pill_short, pill = pills
         self.setup_connection.setText(pill)

@@ -674,8 +674,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "A Noise Suppression értéke <b>Standard</b>: elnyeli az egyenletes hangokat: állítsd a <b>Noise Suppression</b> opciót erre: <b>None</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Alapból mások együtt hallják a beszédhangodat és a hangjaidat. Vedd ki a pipát, ha csak hangokat akarsz: a hangokat hallják, a mikrofonodat nem. (Ugyanaz, mint a „Mások hallják” mező a Saját mikrofon alatt.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Alapból a hangjaid a mikrofonodba mennek, így mindenki hallja őket, aki a mikrofonodat hallja. Csak akkor válassz mást, ha máshová akarod küldeni őket: Voicemeeter, keverő, egy eszköz, amit az OBS rögzít, vagy virtuális kábel.",
-  "Not connected": "Nincs csatlakozva",
-  "Not connected: click to fix": "Nincs csatlakozva: kattints a javításhoz",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Ezek nem vonatkoznak: a saját böngésződben megnyitott linkekre (Támogatás, Probléma jelentése, kiadási oldalak) és a telepítő saját letöltéseire.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Nincs a listában? Zárd be teljesen a Steamet (jobb klikk az ikonjára az óra mellett → Exit), és nyisd meg újra.",
   "Not loaded yet: try again in a moment": "Még nincs betöltve: próbáld újra egy pillanat múlva",
@@ -3119,5 +3117,7 @@
     "Áthoztunk <b>{n}</b> hangot innen: {name}. Megtartod őket?"
   ],
   "Off air": "Adáson kívül",
-  "On air": "Adásban"
+  "On air": "Adásban",
+  "Not configured": "Nincs beállítva",
+  "Not configured: click to fix": "Nincs beállítva: kattints a javításhoz"
 }

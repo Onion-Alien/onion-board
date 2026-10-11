@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "{site} 上找不到 <b>{q}</b> 的結果。",
   "Nobody: only I hear them": "不傳送：只有我聽得到",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "平常你的音效會送進你的麥克風，所以聽得到你麥克風的人都聽得到。只有要改送到別的地方時才選其他選項：Voicemeeter、混音器、OBS 擷取的裝置，或虛擬音源線。",
-  "Not connected": "未連線",
-  "Not connected: click to fix": "未連線：按一下修正",
   "Not reaching your mic, click to fix": "沒有送到你的麥克風，按一下修正",
   "Not sending to others (only you hear sounds)": "沒有傳送給別人（只有你聽得到音效）",
   "Not sending: pick a device on the Setup tab": "沒有傳送：請在「設置」分頁選一個裝置",
@@ -3046,5 +3044,7 @@
     "已從 {name} 匯入 <b>{n}</b> 個音效。要保留嗎？"
   ],
   "Off air": "已關播",
-  "On air": "直播中"
+  "On air": "直播中",
+  "Not configured": "未設定",
+  "Not configured: click to fix": "未設定：點擊修復"
 }

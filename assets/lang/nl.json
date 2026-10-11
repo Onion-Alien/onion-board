@@ -236,8 +236,6 @@
   "No {site} results for <b>{q}</b>.": "Geen resultaten op {site} voor <b>{q}</b>.",
   "Nobody: only I hear them": "Niemand: alleen ik hoor ze",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normaal gaan je geluiden in je mic, dus iedereen die je mic hoort, hoort ze ook. Kies alleen iets anders als je ze ergens anders heen wilt sturen: Voicemeeter, een mixer, een apparaat dat OBS opneemt, of een virtuele kabel.",
-  "Not connected": "Niet verbonden",
-  "Not connected: click to fix": "Niet verbonden: klik om te repareren",
   "Not reaching your mic, click to fix": "Komt niet in je mic, klik om te repareren",
   "Not sending to others (only you hear sounds)": "Stuurt niet naar anderen (alleen jij hoort geluiden)",
   "Not sending: pick a device on the Setup tab": "Stuurt niet: kies een apparaat op het tabblad Setup",
@@ -3119,5 +3117,7 @@
     "We hebben <b>{n}</b> geluiden uit {name} overgezet. Houden?"
   ],
   "Off air": "Off air",
-  "On air": "On air"
+  "On air": "On air",
+  "Not configured": "Niet ingesteld",
+  "Not configured: click to fix": "Niet ingesteld: klik om te herstellen"
 }

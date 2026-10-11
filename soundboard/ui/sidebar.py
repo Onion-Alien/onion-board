@@ -232,7 +232,7 @@ class OutputBlock(QFrame):
     the same column as the tab icons above and the buttons below, every line of
     words starts at the same x after them, and each icon is centred on the cap
     height of its label's first line. The status line is the setup action too:
-    "Not connected ›" is one click to Setup, "Connected" is only words."""
+    "Not configured ›" is one click to Setup, "Connected" is only words."""
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
     TOP = 12              # card padding over the title row (the 12 of settings cards)
@@ -254,10 +254,10 @@ class OutputBlock(QFrame):
         box = self.box = QVBoxLayout(self)
         box.setSpacing(0)
         top = self.top = QHBoxLayout()
-        top.setSpacing(0)   # icon GAP words, then a tighter 4 before the switch
+        top.setSpacing(0)   # icon GAP words, 8 to the switch right after them
         mark = self.mark = self._glyph()
         icons.set_label_icon(mark, "live", "accent", size=self.GLYPH)
-        self.title = QLabel()
+        self.title = _HugLabel("", widest=self.names())
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
         self.title.setAlignment(Qt.AlignmentFlag.AlignLeading | Qt.AlignmentFlag.AlignTop)
@@ -274,9 +274,10 @@ class OutputBlock(QFrame):
         self._title_gap = QSpacerItem(self.GAP, 0, QSizePolicy.Policy.Fixed,
                                       QSizePolicy.Policy.Minimum)
         top.addSpacerItem(self._title_gap)
-        top.addWidget(self.title, 1, Qt.AlignmentFlag.AlignTop)
-        top.addSpacing(4)
+        top.addWidget(self.title, 0, Qt.AlignmentFlag.AlignTop)
+        top.addSpacing(8)
         top.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
+        top.addStretch(1)   # the switch stays beside its words
         box.addLayout(top)
         self._status_gap = QSpacerItem(0, self.ROW_GAP, QSizePolicy.Policy.Minimum,
                                        QSizePolicy.Policy.Fixed)
@@ -395,7 +396,7 @@ class OutputBlock(QFrame):
         self.status_text.setText(self.connection.property("railtext") or "")
         self.status_text.setToolTip(self.connection.property("railfull") or "")
         good = self._good()
-        # "Not connected ›" takes you to Setup; "Connected" is words only: no hover, no
+        # "Not configured ›" takes you to Setup; "Connected" is words only: no hover, no
         # hand, out of the Tab order (never disabled: that would throw the focus)
         self.setup.setProperty("action", not good)
         self.setup.setCursor(Qt.CursorShape.ArrowCursor if good
@@ -416,10 +417,16 @@ class OutputBlock(QFrame):
 
 class _HugLabel(QLabel):
     """A wrapping label that asks only for its words' width, so whatever follows it
-    (a chevron) sits right after the words; short of room, it wraps."""
+    (a chevron) sits right after the words; short of room, it wraps. `widest`: texts
+    it swaps between, sized for the widest so what follows never jumps."""
+
+    def __init__(self, text: str, widest: tuple[str, ...] = ()):
+        super().__init__(text)
+        self._widest = widest
 
     def sizeHint(self):
-        width = self.fontMetrics().horizontalAdvance(self.text()) + 1
+        fm = self.fontMetrics()
+        width = max(fm.horizontalAdvance(t) for t in (self.text(), *self._widest)) + 1
         return QSize(width, self.heightForWidth(width))
 
     def minimumSizeHint(self):

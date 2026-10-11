@@ -674,8 +674,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "A Noise Suppression está em <b>Standard</b>: come os sons contínuos: põe <b>Noise Suppression</b> em <b>None</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Normalmente os outros ouvem a tua voz e os teus sons juntos. Desmarca isto para só sons: ouvem os sons mas não o teu microfone. (O mesmo que a caixa “Os outros ouvem” em O meu microfone.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normalmente os teus sons vão para o teu microfone, por isso todos os que ouvem o teu microfone ouvem-nos. Só escolhe outra coisa para os enviar para outro sítio: Voicemeeter, uma mesa de mistura, um dispositivo que o OBS capte ou um cabo virtual.",
-  "Not connected": "Não ligado",
-  "Not connected: click to fix": "Não ligado: clica para corrigir",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Não abrangido por isto: ligações que abres no teu próprio browser (Apoio, Comunicar um problema, páginas de versões) e as transferências do próprio instalador.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Não está na lista? Fecha o Steam por completo (clica com o botão direito no ícone ao pé do relógio → Sair) e abre-o outra vez.",
   "Not loaded yet: try again in a moment": "Ainda não carregado: tenta outra vez daqui a pouco",
@@ -3119,5 +3117,7 @@
     "Trouxemos <b>{n}</b> sons do {name}. Manter?"
   ],
   "Off air": "Fora do ar",
-  "On air": "No ar"
+  "On air": "No ar",
+  "Not configured": "Não configurado",
+  "Not configured: click to fix": "Não configurado: clica para corrigir"
 }

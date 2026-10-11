@@ -674,8 +674,6 @@
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "Kohinanvaimennus on <b>Vakio</b>: se syö tasaisia ääniä: aseta <b>Kohinanvaimennus</b> tilaan <b>Ei mitään</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Normaalisti muut kuulevat puheesi ja äänesi yhdessä. Poista ruksi, jos haluat vain äänet: he kuulevat äänet mutta eivät mikkiäsi. (Sama kuin “Muut kuulevat sen” -ruutu kohdassa Oma mikki.)",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normaalisti äänesi menevät mikkiisi, joten kaikki, jotka kuulevat mikkisi, kuulevat ne. Valitse jotain muuta vain, jos haluat lähettää ne muualle: Voicemeeter, mikseri, laite, jonka OBS kaappaa, tai virtuaalikaapeli.",
-  "Not connected": "Ei yhdistetty",
-  "Not connected: click to fix": "Ei yhdistetty: klikkaa korjataksesi",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Näihin ei kuulu: linkit, jotka avaat omassa selaimessasi (Tuki, Ilmoita ongelmasta, julkaisusivut), eikä asennusohjelman omat lataukset.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Eikö listalla? Sulje Steam kokonaan (klikkaa sen kuvaketta kellon vieressä oikealla → Exit) ja avaa se uudelleen.",
   "Not loaded yet: try again in a moment": "Ei vielä ladattu: yritä hetken päästä uudelleen",
@@ -3119,5 +3117,7 @@
     "Toimme <b>{n}</b> ääntä sovelluksesta {name}. Säilytetäänkö ne?"
   ],
   "Off air": "Ei lähetyksessä",
-  "On air": "Lähetyksessä"
+  "On air": "Lähetyksessä",
+  "Not configured": "Ei määritetty",
+  "Not configured: click to fix": "Ei määritetty: korjaa klikkaamalla"
 }

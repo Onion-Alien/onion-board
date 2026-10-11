@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "<b>{q}</b>에 대한 {site} 결과가 없어요.",
   "Nobody: only I hear them": "아무도 없음: 나만 들음",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "보통 사운드는 마이크로 들어가서, 내 마이크를 듣는 모두가 들어요. 다른 곳으로 보내고 싶을 때만 다른 걸 고르세요: Voicemeeter, 믹서, OBS가 캡처하는 장치, 가상 케이블.",
-  "Not connected": "연결 안 됨",
-  "Not connected: click to fix": "연결 안 됨: 클릭해서 고치기",
   "Not reaching your mic, click to fix": "마이크에 안 들어가요, 클릭해서 고치기",
   "Not sending to others (only you hear sounds)": "다른 사람에게 안 보냄(사운드는 나만 들음)",
   "Not sending: pick a device on the Setup tab": "안 보내는 중: 셋업 탭에서 장치를 고르세요",
@@ -3046,5 +3044,7 @@
     "{name}에서 사운드 <b>{n}</b>개를 가져왔어요. 유지할까요?"
   ],
   "Off air": "방송 꺼짐",
-  "On air": "방송 중"
+  "On air": "방송 중",
+  "Not configured": "설정 안 됨",
+  "Not configured: click to fix": "설정 안 됨: 클릭해서 고치기"
 }

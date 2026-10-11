@@ -236,8 +236,6 @@
   "No {site} results for <b>{q}</b>.": "Keine Ergebnisse auf {site} für <b>{q}</b>.",
   "Nobody: only I hear them": "Niemand: nur ich höre sie",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normalerweise gehen deine Sounds in dein Mikro, also hört sie jeder, der dein Mikro hört. Wähl nur etwas anderes, wenn du sie stattdessen woanders hinschicken willst: Voicemeeter, ein Mischpult, ein Gerät, das OBS aufnimmt, oder ein virtuelles Kabel.",
-  "Not connected": "Nicht verbunden",
-  "Not connected: click to fix": "Nicht verbunden: zum Reparieren klicken",
   "Not reaching your mic, click to fix": "Erreicht dein Mikro nicht, zum Reparieren klicken",
   "Not sending to others (only you hear sounds)": "Sendet nicht an andere (nur du hörst Sounds)",
   "Not sending: pick a device on the Setup tab": "Sendet nicht: wähl ein Gerät im Setup-Tab",
@@ -3119,5 +3117,7 @@
     "Wir haben <b>{n}</b> Sounds aus {name} übernommen. Behalten?"
   ],
   "Off air": "Off Air",
-  "On air": "On Air"
+  "On air": "On Air",
+  "Not configured": "Nicht eingerichtet",
+  "Not configured: click to fix": "Nicht eingerichtet: zum Beheben klicken"
 }

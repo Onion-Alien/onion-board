@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "Tidak ada hasil {site} untuk <b>{q}</b>.",
   "Nobody: only I hear them": "Tidak ada: hanya aku yang dengar",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Biasanya suaramu masuk ke mic-mu, jadi semua yang mendengar mic-mu juga mendengarnya. Pilih yang lain hanya kalau mau mengirimnya ke tempat lain: Voicemeeter, mixer, perangkat yang direkam OBS, atau kabel virtual.",
-  "Not connected": "Tidak terhubung",
-  "Not connected: click to fix": "Tidak terhubung: klik untuk memperbaiki",
   "Not reaching your mic, click to fix": "Tidak sampai ke mic-mu, klik untuk memperbaiki",
   "Not sending to others (only you hear sounds)": "Tidak dikirim ke orang lain (hanya kamu yang dengar suaranya)",
   "Not sending: pick a device on the Setup tab": "Tidak mengirim: pilih perangkat di tab Penyiapan",
@@ -3046,5 +3044,7 @@
     "Kami memindahkan <b>{n}</b> suara dari {name}. Simpan?"
   ],
   "Off air": "Tidak mengudara",
-  "On air": "Mengudara"
+  "On air": "Mengudara",
+  "Not configured": "Belum diatur",
+  "Not configured: click to fix": "Belum diatur: klik untuk memperbaiki"
 }

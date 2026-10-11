@@ -1,1 +1,2 @@
-- The sidebar switch now says "On air" while others hear you and "Off air" when it is off (it used to say "Others hear").
+- The sidebar switch now says "On air" while others hear you and "Off air" when it is off (it used to say "Others hear"), and sits right after its words.
+- The sidebar status says "Not configured" instead of "Not connected" when sending isn't set up.

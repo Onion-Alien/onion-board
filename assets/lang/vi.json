@@ -230,8 +230,6 @@
   "No {site} results for <b>{q}</b>.": "Không có kết quả {site} cho <b>{q}</b>.",
   "Nobody: only I hear them": "Không ai: chỉ tôi nghe",
   "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Bình thường âm thanh của bạn đi vào mic, nên ai nghe mic của bạn cũng nghe chúng. Chỉ chọn cái khác nếu muốn gửi chúng đi chỗ khác: Voicemeeter, bàn mixer, thiết bị OBS thu, hoặc cáp ảo.",
-  "Not connected": "Chưa kết nối",
-  "Not connected: click to fix": "Chưa kết nối: bấm để sửa",
   "Not reaching your mic, click to fix": "Chưa tới được mic của bạn, bấm để sửa",
   "Not sending to others (only you hear sounds)": "Không gửi tới người khác (chỉ bạn nghe âm thanh)",
   "Not sending: pick a device on the Setup tab": "Không gửi: chọn thiết bị ở thẻ Thiết lập",
@@ -3046,5 +3044,7 @@
     "Đã chuyển <b>{n}</b> âm thanh từ {name}. Giữ lại không?"
   ],
   "Off air": "Tắt phát",
-  "On air": "Đang phát"
+  "On air": "Đang phát",
+  "Not configured": "Chưa thiết lập",
+  "Not configured: click to fix": "Chưa thiết lập: bấm để sửa"
 }

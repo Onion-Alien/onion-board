@@ -99,7 +99,7 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     icon = _ink_box(img, QRect(at.x() + 2, at.y() + 4, 26, tab.height() - 8))   # (not its name)
     mark = _ink_box(img, QRect(output.mark.mapTo(rail, QPoint()), output.mark.size()))
     assert abs(icon.center().x() - mark.center().x()) <= 1
-    assert output.status_text.text() == "Not connected" and output.arrow.isVisible()
+    assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
     output.status_text.setText("Ausgabe nicht verbunden")
     output.adjustSize()
     qapp.processEvents()
@@ -118,7 +118,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
     window._update_flow()
     qapp.processEvents()
     output = window.rail.output
-    assert output.status_text.text() == "Not connected"
+    assert output.status_text.text() == "Not configured"
     height = output.height()
     stream = window.engine.main_stream
     try:
@@ -128,7 +128,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         qapp.processEvents()
         assert output.status_text.text() == "Connected"
         # the same line, no chevron, no hover, no click, out of the Tab order (no taller:
-        # a big font can wrap "Not connected ›", never "Connected")
+        # a big font can wrap "Not configured ›", never "Connected")
         assert output.setup.isVisible() and output.arrow.isHidden()
         assert output.height() <= height and output.setup.focusPolicy() == Qt.NoFocus
         assert output.setup.property("action") is False
@@ -144,7 +144,7 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         assert window.rail.toggle.property("dot")
         window.rail.set_open(True)
         qapp.processEvents()
-        assert output.status_text.text() == "Not connected" and output.arrow.isVisible()
+        assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
         assert output.setup.property("action") is True
         assert output.setup.focusPolicy() == Qt.TabFocus and output.height() == height
     finally:
