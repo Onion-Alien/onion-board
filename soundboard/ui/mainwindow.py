@@ -4415,8 +4415,7 @@ class MainWindow(QMainWindow):
             if page:
                 dlg.show_page(page)
         else:
-            dlg = self._settings_dlg = SettingsDialog(self, page or "privacy", lazy=True,
-                                                      embedded=True)
+            dlg = self._settings_dlg = SettingsDialog(self, page or "privacy", lazy=True)
             dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
             self._content.addWidget(dlg)
         self._content.setCurrentWidget(dlg)

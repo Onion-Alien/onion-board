@@ -149,9 +149,9 @@ def test_clean_reinstall_uses_one_admin_prompt(monkeypatch, tmp_path):
 ])
 def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, pill, fix):  # noqa: F811
     monkeypatch.setattr(dm, 'status', lambda mic=None: state)
-    d = SettingsDialog(window, 'audio')
-    d.resize(1180, 720)
-    d.show()
+    window.resize(1180, 720)
+    window.show()
+    d = window.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
     card._checked(state)
     for _i in range(5):
@@ -200,8 +200,8 @@ def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch
     monkeypatch.setattr(window, 'toast', lambda *a: None)
     monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
     monkeypatch.setattr(dm, 'install', lambda *a, **kw: gate.wait(5) and error)
-    d = SettingsDialog(window, 'audio')
-    d.show()
+    window.show()
+    d = window.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
     card.confirm('repair')
     next(b for b in card.dialog.findChildren(QPushButton)
