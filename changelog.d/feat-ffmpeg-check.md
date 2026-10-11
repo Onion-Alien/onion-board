@@ -1,0 +1,2 @@
+- FFmpeg check at start-up: when FFmpeg is missing (and you have M4A, AAC or video sounds, or save videos) or is installed but won't start, a slim bar says what stops working, with one *Fix it* button and *Don't ask again*.
+- Settings → Data & quality always shows FFmpeg now: working (with its version), missing or won't start, with *Reinstall*, *Get FFmpeg* or *Fix it*. A fix shows up at once, no restart needed.

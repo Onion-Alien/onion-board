@@ -142,35 +142,63 @@ def test_settings_page_picks_the_save_format(window):  # noqa: F811
     d.close()
 
 
-def test_settings_offers_get_ffmpeg_only_when_it_is_missing(window, monkeypatch):  # noqa: F811
+def _ff(monkeypatch, state, why=""):
+    """The FFmpeg check (MainWindow.check_ffmpeg) found ``state``."""
     from soundboard import ffmpegget
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
-    d = SettingsDialog(window, "data")
-    page = d.tabs.currentWidget().widget()
-    assert d.btn_ffmpeg.isVisibleTo(page) and d.btn_ffmpeg.isEnabled()
-    assert "FFmpeg" in d.ff_note.text()
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: False)   # it's there now
-    d._ffmpeg_sync()
-    assert not d.ff_box.isVisibleTo(page)
-    d.close()
+    h = ffmpegget.Health(state, "7.1" if state == ffmpegget.OK else "", why=why)
+    monkeypatch.setattr(ffmpegget, "_last", h)
+    return h
 
 
-def test_get_ffmpeg_greys_out_when_its_switch_is_off(window, monkeypatch):  # noqa: F811
+def test_settings_always_shows_ffmpeg_and_what_to_do(window, monkeypatch):  # noqa: F811
+    from soundboard import ffmpegget
+    for state, pill, button in ((ffmpegget.OK, "Working: version 7.1", "Reinstall"),
+                                (ffmpegget.MISSING, "Missing", "Get FFmpeg"),
+                                (ffmpegget.BROKEN, "Won't start", "Fix it")):
+        _ff(monkeypatch, state, "some of its files are gone")
+        d = SettingsDialog(window, "data")
+        page = d.tabs.currentWidget().widget()
+        assert d.ff_box.isVisibleTo(page) and d.ff_state.text() == pill
+        assert d.btn_ffmpeg.isVisibleTo(page) and d.btn_ffmpeg.text() == button
+        assert d.btn_ffmpeg.isEnabled()
+        if state == ffmpegget.BROKEN:
+            assert "some of its files are gone" in d.ff_note.text()
+        d.close()
+
+
+def test_settings_links_to_ffmpeg_org_when_the_app_cant_get_it(window, monkeypatch):  # noqa: F811
     from soundboard import ffmpegget, net
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
+    _ff(monkeypatch, ffmpegget.MISSING)
     net.configure_features(["ffmpeg_download"])
     d = SettingsDialog(window, "data")
-    assert not d.btn_ffmpeg.isEnabled()
+    page = d.tabs.currentWidget().widget()
+    assert d.btn_ffmpeg.text() == "Open ffmpeg.org" and d.btn_ffmpeg.isEnabled()
+    assert "switched off" in d.ff_note.text()
+    _ff(monkeypatch, ffmpegget.OK)   # it works and can't be reinstalled from here: no button
+    d._ffmpeg_sync()
+    assert not d.btn_ffmpeg.isVisibleTo(page)
+    d.close()
+    net.configure_features()
+
+
+def test_settings_checks_ffmpeg_when_nobody_has_yet(window, qapp):  # noqa: F811
+    from conftest import process_events
+    from soundboard import ffmpegget
+    assert ffmpegget.last() is None
+    d = SettingsDialog(window, "data")
+    assert d.ff_state.text() == "Checking…"
+    process_events(qapp, lambda: d.ff_state.text() != "Checking…")
+    assert d.ff_state.text() == "Working: version 7.1"   # (conftest's FFmpeg works)
     d.close()
 
 
-def test_get_ffmpeg_button_goes_once_ffmpeg_is_here(window, monkeypatch):  # noqa: F811
+def test_settings_follows_a_fix_without_a_restart(window, monkeypatch):  # noqa: F811
     from soundboard import ffmpegget
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
+    _ff(monkeypatch, ffmpegget.MISSING)
     d = SettingsDialog(window, "data")
-    page = d.tabs.currentWidget().widget()
-    monkeypatch.setattr(ffmpegget, "can_offer", lambda: False)   # winget just got it
-    d._ffmpeg_sync("FFmpeg is ready: M4A, AAC and video files play now.")
-    assert d.ff_note.isVisibleTo(page) and "ready" in d.ff_note.text()
-    assert not d.btn_ffmpeg.isVisibleTo(page)
+    assert "360p" in d._save_video_hint.text()
+    h = _ff(monkeypatch, ffmpegget.OK)
+    window.bridge.ffmpeg.emit(h, "")       # the fix worked
+    assert d.ff_state.text() == "Working: version 7.1" and d.btn_ffmpeg.text() == "Reinstall"
+    assert "ready" in d.ff_note.text() and "360p" not in d._save_video_hint.text()
     d.close()

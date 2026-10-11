@@ -668,3 +668,19 @@ def _free_test_windows():
             except RuntimeError:   # already gone on the C++ side
                 pass
     app.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+@pytest.fixture(autouse=True)
+def _ffmpeg_works(monkeypatch):
+    """The start-up FFmpeg check (and Settings' FFmpeg row) never runs the PC's real
+    ffmpeg or winget: it works, version 7.1. Tests of a missing or broken one patch
+    ``ffmpegget.check`` / ``ffmpegget._check`` themselves."""
+    from soundboard import ffmpegget
+    works = ffmpegget.Health(ffmpegget.OK, "7.1", "ffmpeg.exe")
+
+    def check():
+        monkeypatch.setattr(ffmpegget, "_last", works)
+        return works
+    monkeypatch.setattr(ffmpegget, "_last", None)
+    monkeypatch.setattr(ffmpegget, "_has_winget", True)
+    monkeypatch.setattr(ffmpegget, "check", check)
