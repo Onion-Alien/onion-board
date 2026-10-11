@@ -17,6 +17,7 @@ import math
 import re
 import time
 import urllib.parse
+from collections.abc import Callable
 
 from PySide6.QtCore import QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal
 from PySide6.QtGui import (QColor, QFontMetricsF, QIcon, QLinearGradient, QPainter,
@@ -375,7 +376,7 @@ class DownloadBar(QFrame):
         self._meta = ""
         self._source = ("browser", "")
         # set by the window: url -> picture (or None), url -> (uploader, seconds)
-        self.thumb_lookup = lambda url: None
+        self.thumb_lookup: Callable[[str], QPixmap | None] = lambda url: None
 
         self._auto_hide = QTimer(self)
         self._auto_hide.setSingleShot(True)

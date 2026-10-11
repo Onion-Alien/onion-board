@@ -344,7 +344,7 @@ class SteadyTabs(QObject):
         return False
 
 
-def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
+def spectrum(data: np.ndarray | None, frac: float, n: int) -> np.ndarray:
     """`n` log-spaced band levels (0..1) of int16/float (m, 2) audio around position
     `frac` (0..1): what a pad's visualizer shows. Cheap: one 2048-point FFT."""
     if data is None or not len(data) or n <= 0:
@@ -369,7 +369,7 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
 
 
-def loudness(data: np.ndarray, frac: float, gain: float = 1.0) -> float:
+def loudness(data: np.ndarray | None, frac: float, gain: float = 1.0) -> float:
     """How loud (0..1) the stretch just played around `frac` is: its RMS times `gain`,
     -48 dBFS..0 dBFS. What a playing pad's level meter shows; the same window as
     spectrum() (what's ahead of a long sound may not be read in yet)."""

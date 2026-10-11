@@ -19,7 +19,7 @@ from PySide6.QtWidgets import QBoxLayout, QLayout, QPushButton, QWidget
 
 from soundboard.ui import icons
 
-Step = tuple[int, str, Callable[[bool], None]]   # (priority, "w" / "h", apply(compact))
+Step = tuple[int, str, Callable[[bool], object]]   # (priority, "w" / "h", apply(compact))
 
 MIN_SIZE = QSize(260, 120)   # the mini player (see MainWindow._refit)
 
@@ -113,7 +113,7 @@ class Fitter:
         self._layouts: list[QLayout] | None = None
         self._known: QSize | None = None
 
-    def add(self, priority: int, axis: str, apply: Callable[[bool], None]):
+    def add(self, priority: int, axis: str, apply: Callable[[bool], object]):
         self.reset()
         self.steps.append((priority, axis, apply))
         self.steps.sort(key=lambda s: s[0])   # stable: same priority keeps its order
