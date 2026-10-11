@@ -1,0 +1,1 @@
+- Settings: the Tab key now moves from the category list into the open page and on to Done, so every setting can be reached with the keyboard or a screen reader.

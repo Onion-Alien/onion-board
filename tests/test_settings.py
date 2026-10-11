@@ -4,8 +4,9 @@ from contextlib import contextmanager
 
 import pytest
 
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, Qt
 from PySide6.QtGui import QColor
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea
 
 from conftest import process_events
@@ -560,3 +561,42 @@ def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
         dlg.close()
     finally:
         d.close()
+
+
+@pytest.mark.parametrize("rtl", [False, True])
+def test_tab_moves_from_the_category_list_into_the_page_and_on_to_done(window, qapp, rtl):  # noqa: F811
+    """Keyboard and screen-reader users: Tab from the category list goes into the open
+    page, on through it to Done, and Shift+Tab comes back, on every page."""
+    if rtl:
+        qapp.setLayoutDirection(Qt.RightToLeft)
+    try:
+        d = SettingsDialog(window, "privacy")
+        d.show()
+        d.activateWindow()
+        done = next(b for b in d.findChildren(QPushButton) if b.objectName() == "primary"
+                    and b.parent() is d)
+        for row in range(d.categories.count()):
+            if d.categories.isRowHidden(row):
+                continue
+            d.categories.setCurrentRow(row)
+            d.categories.setFocus()
+            qapp.processEvents()
+            QTest.keyClick(d.categories, Qt.Key_Tab)
+            first = QApplication.focusWidget()
+            page = d.tabs.currentWidget()
+            assert first is not d.categories, d.categories.item(row).text()
+            assert page.isAncestorOf(first), (d.categories.item(row).text(), first)
+            QTest.keyClick(first, Qt.Key_Backtab)
+            assert QApplication.focusWidget() is d.categories
+            QTest.keyClick(d.categories, Qt.Key_Tab)
+            for _ in range(400):
+                if QApplication.focusWidget() is done:
+                    break
+                QTest.keyClick(QApplication.focusWidget(), Qt.Key_Tab)
+            assert QApplication.focusWidget() is done, d.categories.item(row).text()
+        d.categories.setFocus()
+        QTest.keyClick(d.categories, Qt.Key_Backtab)
+        assert QApplication.focusWidget() is d.search_box
+        d.close()
+    finally:
+        qapp.setLayoutDirection(Qt.LeftToRight)

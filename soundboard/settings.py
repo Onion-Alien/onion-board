@@ -456,6 +456,11 @@ class SettingsDialog(QDialog):
             self.categories.addItem(item)
         self._category_icons()
         self.tabs.tabBar().hide()
+        # the list is the tab bar now: the hidden one stayed in the Tab order (the tab
+        # widget hands its focus to it), so Tab from the list went nowhere
+        self.tabs.tabBar().setFocusPolicy(Qt.NoFocus)
+        self.tabs.setFocusPolicy(Qt.NoFocus)
+        self.tabs.setFocusProxy(None)
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
@@ -564,6 +569,7 @@ class SettingsDialog(QDialog):
         sa.setWidgetResizable(True)
         sa.setFrameShape(QScrollArea.NoFrame)
         sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        sa.setFocusPolicy(Qt.NoFocus)   # Tab goes straight to the page's first control
         return sa
 
     @staticmethod
