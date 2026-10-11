@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "Tumitingin lang: hindi kailanman nagki-click o nagta-type sa laro mo",
   "Plays one of your sounds when something happens in your game.": "Nagpapatugtog ng isa sa mga tunog mo kapag may nangyari sa laro mo.",
   "Rare spawns, queue pops, “YOU DIED”": "Bihirang spawn, pumutok na queue, “YOU DIED”",
-  "Watches the game's window, even behind others": "Binabantayan ang window ng laro, kahit nasa likod ng iba"
+  "Watches the game's window, even behind others": "Binabantayan ang window ng laro, kahit nasa likod ng iba",
+  "Browsers": "Mga browser",
+  "Calls & chat": "Mga tawag at chat",
+  "Games": "Mga laro",
+  "Music & media": "Musika at media",
+  "Other": "Iba pa"
 }

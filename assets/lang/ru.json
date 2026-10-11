@@ -3119,5 +3119,10 @@
   "Only looks: never clicks or types in your game": "Только смотрит: никогда не кликает и не печатает в игре",
   "Plays one of your sounds when something happens in your game.": "Играет один из ваших звуков, когда в игре что-то происходит.",
   "Rare spawns, queue pops, “YOU DIED”": "Редкие спавны, найдена игра, «YOU DIED»",
-  "Watches the game's window, even behind others": "Следит за окном игры, даже за другими окнами"
+  "Watches the game's window, even behind others": "Следит за окном игры, даже за другими окнами",
+  "Browsers": "Браузеры",
+  "Calls & chat": "Звонки и чат",
+  "Games": "Игры",
+  "Music & media": "Музыка и медиа",
+  "Other": "Другое"
 }

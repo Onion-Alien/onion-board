@@ -3119,5 +3119,10 @@
   "Only looks: never clicks or types in your game": "Jen se dívá: nikdy neklikne ani nepíše do hry",
   "Plays one of your sounds when something happens in your game.": "Přehraje jeden z vašich zvuků, když se ve hře něco stane.",
   "Rare spawns, queue pops, “YOU DIED”": "Vzácné spawny, nalezená hra, “YOU DIED”",
-  "Watches the game's window, even behind others": "Sleduje okno hry, i když je za jinými"
+  "Watches the game's window, even behind others": "Sleduje okno hry, i když je za jinými",
+  "Browsers": "Prohlížeče",
+  "Calls & chat": "Hovory a chat",
+  "Games": "Hry",
+  "Music & media": "Hudba a média",
+  "Other": "Ostatní"
 }

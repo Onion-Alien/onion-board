@@ -2989,5 +2989,10 @@
   "Only looks: never clicks or types in your game": "只看不动：绝不在游戏里点击或打字",
   "Plays one of your sounds when something happens in your game.": "游戏里发生某件事时，播放你的一个声音。",
   "Rare spawns, queue pops, “YOU DIED”": "稀有刷新、排队成功、“YOU DIED”",
-  "Watches the game's window, even behind others": "盯着游戏窗口，即使被其他窗口挡住"
+  "Watches the game's window, even behind others": "盯着游戏窗口，即使被其他窗口挡住",
+  "Browsers": "浏览器",
+  "Calls & chat": "通话和聊天",
+  "Games": "游戏",
+  "Music & media": "音乐和媒体",
+  "Other": "其他"
 }

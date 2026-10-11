@@ -3119,5 +3119,10 @@
   "Only looks: never clicks or types in your game": "Doar privește: nu dă niciodată clic și nu tastează în joc",
   "Plays one of your sounds when something happens in your game.": "Redă unul dintre sunetele tale când se întâmplă ceva în joc.",
   "Rare spawns, queue pops, “YOU DIED”": "Spawn-uri rare, coadă gata, „YOU DIED”",
-  "Watches the game's window, even behind others": "Urmărește fereastra jocului, chiar și în spatele altora"
+  "Watches the game's window, even behind others": "Urmărește fereastra jocului, chiar și în spatele altora",
+  "Browsers": "Browsere",
+  "Calls & chat": "Apeluri și chat",
+  "Games": "Jocuri",
+  "Music & media": "Muzică și media",
+  "Other": "Altele"
 }

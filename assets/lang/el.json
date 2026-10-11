@@ -3054,5 +3054,10 @@
   "Only looks: never clicks or types in your game": "Μόνο κοιτάζει: ποτέ δεν κάνει κλικ ή πληκτρολογεί στο παιχνίδι",
   "Plays one of your sounds when something happens in your game.": "Παίζει έναν από τους ήχους σου όταν κάτι συμβαίνει στο παιχνίδι.",
   "Rare spawns, queue pops, “YOU DIED”": "Σπάνια spawn, ουρά που ανοίγει, “YOU DIED”",
-  "Watches the game's window, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού, ακόμα και πίσω από άλλα"
+  "Watches the game's window, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού, ακόμα και πίσω από άλλα",
+  "Browsers": "Περιηγητές",
+  "Calls & chat": "Κλήσεις και συνομιλίες",
+  "Games": "Παιχνίδια",
+  "Music & media": "Μουσική και πολυμέσα",
+  "Other": "Άλλα"
 }

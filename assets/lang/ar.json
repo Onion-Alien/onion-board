@@ -3314,5 +3314,10 @@
   "Only looks: never clicks or types in your game": "يراقب فقط: لا ينقر ولا يكتب في لعبتك أبدًا",
   "Plays one of your sounds when something happens in your game.": "يشغّل أحد أصواتك عندما يحدث شيء في لعبتك.",
   "Rare spawns, queue pops, “YOU DIED”": "ظهور نادر، بدء المباراة، “YOU DIED”",
-  "Watches the game's window, even behind others": "يراقب نافذة اللعبة، حتى خلف النوافذ الأخرى"
+  "Watches the game's window, even behind others": "يراقب نافذة اللعبة، حتى خلف النوافذ الأخرى",
+  "Browsers": "المتصفحات",
+  "Calls & chat": "المكالمات والدردشة",
+  "Games": "الألعاب",
+  "Music & media": "الموسيقى والوسائط",
+  "Other": "أخرى"
 }
