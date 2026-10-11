@@ -1042,9 +1042,11 @@ def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
 
 def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
+
+    from soundboard.ui import busy
     p, _ = panel
     said = []
-    monkeypatch.setattr(QMessageBox, "warning", lambda *a: said.append(a[2]))
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
     assert p.fx.import_code("OB1-not-a-real-code") == ""
     assert said and not p.fx.store.voices
     # a built-in voice's name gets "(shared)"; saying No adds nothing

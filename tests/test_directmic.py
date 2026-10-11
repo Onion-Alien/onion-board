@@ -16,6 +16,7 @@ import numpy as np
 import pytest
 
 from conftest import own_module, real_pc_timing, said
+from soundboard.ui import toast
 from soundboard import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
@@ -2017,15 +2018,13 @@ def test_on_the_mic_the_cable_gets_the_same(window, monkeypatch, state):  # noqa
 def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables):  # noqa: F811
     """The admin prompt turned down: the route stays on the mic (one click still on
     offer), and the cable, if there is one, carries the sounds meanwhile."""
-    from PySide6.QtWidgets import QMessageBox
     w = window
     _routes(w, monkeypatch, "missing", cables)
-    said = []
-    monkeypatch.setattr(QMessageBox, "warning", lambda *a: said.append(a[2]))
     w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
     assert w.cfg.route == "mic" and w._main_name() == (cables[0] if cables else None)
-    assert "cable" not in said[0].lower()   # the mic is the way; the cable just quietly helps
-    assert "Try again" in said[0]
+    [t] = [t for t in toast.shown(w) if t.kind == "error"]
+    assert "cable" not in t.text().lower()   # the mic is the way; the cable just quietly helps
+    assert "Try again" in t.text()
     assert "mic" in w.pill.accessibleName().lower()
 
 

@@ -493,6 +493,13 @@ def _announce(t: _Toast, text: str):
         pass
 
 
+def titled(title: str, text: str) -> str:
+    """A message box's title and plain words (lines kept) as a toast's rich text."""
+    import html
+    body = html.escape(text).replace("\n", "<br>")
+    return f"<b>{html.escape(title)}</b><br>{body}" if title else body
+
+
 def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, *,
          action: tuple[str, Callable[[], None]] | None = None, key: str | None = None,
          progress: tuple[int, int] | None = None,

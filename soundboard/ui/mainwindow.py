@@ -642,7 +642,7 @@ class MainWindow(QMainWindow):
         """Started hidden in the tray (--tray at sign-in)? Then the box waits for the
         window to be opened, instead of popping up over whatever the user is doing."""
         if self.isVisible():
-            QMessageBox.warning(self, _("Settings were restored"), self.cfg.load_note)
+            self.tell(_("Settings were restored"), self.cfg.load_note, "warn", 20000)
         else:
             self._pending_note = self.cfg.load_note
 
@@ -3168,7 +3168,7 @@ class MainWindow(QMainWindow):
             # the route stays on the mic: until it's set up, the cable carries the
             # sounds meanwhile (_main_name), and the one-click stays on offer
             err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
-            QMessageBox.warning(self, _("Couldn't put Onion Board on your mic"), err)
+            self.tell(_("Couldn't put Onion Board on your mic"), err, "error")
         else:
             log.info("on the mic now: %s", mic)
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
@@ -3342,8 +3342,8 @@ class MainWindow(QMainWindow):
             return
         script = RESOURCE_DIR / "install-vbcable.ps1"
         if not script.exists():
-            QMessageBox.warning(self, _("Installer missing"),
-                                _("Can't find {name}.", name=script.name))
+            self.tell(_("Installer missing"), _("Can't find {name}.", name=script.name),
+                      "error")
             return
         try:
             subprocess.Popen(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
@@ -3351,11 +3351,11 @@ class MainWindow(QMainWindow):
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
         except OSError as e:
             log.warning("couldn't start the cable installer", exc_info=True)
-            QMessageBox.warning(
-                self, _("Couldn't start the installer"),
+            self.tell(
+                _("Couldn't start the installer"),
                 _("Windows wouldn't run PowerShell ({e}).\n\nYou can install VB-Cable by hand: "
                   "download it from vb-audio.com, unzip it, right-click VBCABLE_Setup_x64.exe → "
-                  "Run as administrator → Install Driver.", e=errors.plain(e)))
+                  "Run as administrator → Install Driver.", e=errors.plain(e)), "error")
             return
         QMessageBox.information(
             self, _("Installing the virtual cable"),
@@ -3379,9 +3379,9 @@ class MainWindow(QMainWindow):
             subprocess.Popen(["control", "mmsys.cpl,,1"], creationflags=0x08000000)
         except OSError:
             log.warning("couldn't open the Sound control panel", exc_info=True)
-            QMessageBox.warning(self, _("Couldn't open the Sound settings"),
-                                _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
-                                  "Enter, then go to the Recording tab."))
+            self.tell(_("Couldn't open the Sound settings"),
+                      _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
+                        "Enter, then go to the Recording tab."), "warn", 15000)
             return
         QMessageBox.information(
             self, _("Game with no mic setting"),
@@ -3646,6 +3646,11 @@ class MainWindow(QMainWindow):
         card's colour says it now."""
         m = _TONE_SPAN.fullmatch(text)
         return self.toast(m.group(1) if m else text, kind, ms, **kw)
+
+    def tell(self, title: str, text: str, kind: str, ms: int = 8000, **kw):
+        """What a message box would have said (a title and plain words, maybe on
+        several lines) as one toast: the title bold on its own line."""
+        return self.toast(toastmod.titled(title, text), kind, ms, **kw)
 
     def unsay(self, key: str):
         """Take the toast with this key down (what it said is over)."""
@@ -5391,8 +5396,7 @@ class MainWindow(QMainWindow):
         if not new or new == old or old not in self.cfg.categories:
             return
         if new.lower() in {c.lower() for c in self.cfg.categories if c != old}:
-            QMessageBox.information(self, _("Rename category"), _("There's already a “{new}”.",
-                                                               new=new))
+            self.toast(_("There's already a “{new}”.", new=html.escape(new)), "warn")
             return
         self.cfg.categories[self.cfg.categories.index(old)] = new
         if old in self.cfg.category_hotkeys:
@@ -6183,9 +6187,9 @@ class MainWindow(QMainWindow):
         if not m:
             return
         if not thumbs.set_image(m, path):
-            QMessageBox.warning(self, _("Couldn't use that picture"),
-                                _("{name} isn't a picture this app can read.",
-                                  name=Path(path).name))
+            self.tell(_("Couldn't use that picture"),
+                      _("{name} isn't a picture this app can read.", name=Path(path).name),
+                      "warn")
             return
         self._save_now()
         self.pads[sid].update()
@@ -6664,7 +6668,7 @@ class MainWindow(QMainWindow):
     def export_sounds(self, sounds: list[SoundMeta], name: str):
         """A sound pack: just these sounds (no settings), e.g. to share with friends."""
         if not sounds:
-            QMessageBox.information(self, _("Export"), _("There are no sounds in it to export."))
+            self.toast(_("There are no sounds in it to export."), "warn")
             return
         f = self._save_name(_("Export sounds"), backup._safe(name) + ".zip")
         if f:
@@ -6695,9 +6699,9 @@ class MainWindow(QMainWindow):
     def _on_exported(self, path: str, n: int, err: str):
         self._exporting = False
         if err:
-            QMessageBox.warning(self, _("Export failed"),
-                                _("Couldn't write {name}:\n{err}",
-                                  name=Path(path).name, err=errors.plain(err)))
+            self.tell(_("Export failed"),   # in place of the "Exporting…" card
+                      _("Couldn't write {name}:\n{err}",
+                        name=Path(path).name, err=errors.plain(err)), "error")
             return
         msg = (ngettext("Exported {n} sound to {name}.",
                         "Exported {n} sounds to {name}.",
@@ -6770,10 +6774,7 @@ class MainWindow(QMainWindow):
             msg = (_("No sounds to bring over: the sound files {name} points at have been moved "
                      "or deleted.", name=src.name) if entries else
                    _("There are no sounds on your {name} board.", name=src.name))
-            if ask:
-                QMessageBox.information(self, title, msg)
-            else:
-                self.toast(msg, "warn")
+            self.toast(html.escape(msg), "warn")
             return
         if ask:
             keys = sum(1 for e in ok if e.hotkey)
@@ -6821,9 +6822,9 @@ class MainWindow(QMainWindow):
         except Exception as e:  # noqa: BLE001 - a damaged or odd file, never a crash
             QApplication.restoreOverrideCursor()
             log.warning("couldn't read %s", path, exc_info=True)
-            QMessageBox.warning(self, _("Can't import"),
-                                _("{name} is damaged or in a format Onion Board can't read ({e}).",
-                                  name=Path(path).name, e=errors.plain(e)))
+            self.tell(_("Can't import"),
+                      _("{name} is damaged or in a format Onion Board can't read ({e}).",
+                        name=Path(path).name, e=errors.plain(e)), "error")
             return
         QApplication.restoreOverrideCursor()
         use_settings = False
@@ -6892,9 +6893,9 @@ class MainWindow(QMainWindow):
         self._save_now()
         self.register_hotkeys()
         if changed:
-            QMessageBox.information(self, _("Settings imported"),
-                                    _("Done. Hotkeys and the theme apply now; everything else "
-                                      "the next time Onion Board starts."))
+            self.tell(_("Settings imported"),
+                      _("Done. Hotkeys and the theme apply now; everything else "
+                        "the next time Onion Board starts."), "ok")
 
     def _take_pack_hotkeys(self, clashes: list[tuple[str, SoundMeta, SoundMeta]],
                            name: str) -> bool:
@@ -6923,7 +6924,7 @@ class MainWindow(QMainWindow):
     def _on_unpacked(self, res, pkg, err: str):
         self._update_status()
         if res is None:
-            QMessageBox.warning(self, _("Import failed"), err)
+            self.tell(_("Import failed"), err, "error")
             return
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.library import merge_tags
@@ -6955,8 +6956,9 @@ class MainWindow(QMainWindow):
             msg = ngettext("Imported {n} sound", "Imported {n} sounds", n)
         self.toast(msg, "ok" if n or pkg.restored else "")
         if res.failed:
-            QMessageBox.warning(self, _("Some sounds weren't imported"),
-                                "\n".join(res.failed[:15]))
+            skipped = [importreport.Skipped(line, "", "unreadable") for line in res.failed]
+            self.toast(html.escape(_("Some sounds weren't imported")), "warn", 10000,
+                       action=(_("See why"), lambda: self._show_skipped(skipped)))
 
     def _settle_hotkeys(self, incoming: list[SoundMeta], name: str):
         """Hotkeys coming in with a pack that are already in use. Ones a sound here has:
@@ -7630,17 +7632,12 @@ class MainWindow(QMainWindow):
             self._set_update_pill(_("Update: {version}", version=rel.version),
                                   _("Onion Board {version} is out, click for details",
                                     version=rel.version))
-            box = QMessageBox(QMessageBox.Warning, _("Couldn't update"),
-                              _("Onion Board {version} couldn't be downloaded: {rstrip}.",
-                                version=rel.version, rstrip=errors.plain(err).rstrip('.')),
-                              QMessageBox.NoButton, self)
-            page = box.addButton(_("Open the download page"), QMessageBox.AcceptRole)
-            box.addButton(_("Close"), QMessageBox.RejectRole)
-            box.exec()
-            clicked = box.clickedButton()
-            free_dialog(box)
-            if clicked is page:
-                QDesktopServices.openUrl(QUrl(rel.url))
+            url = rel.url
+            self.tell(_("Couldn't update"),
+                      _("Onion Board {version} couldn't be downloaded: {rstrip}.",
+                        version=rel.version, rstrip=errors.plain(err).rstrip('.')), "error",
+                      action=(_("Open the download page"),
+                              lambda: QDesktopServices.openUrl(QUrl(url))))
             return
         self._update_file = path
         self._show_urgent()
@@ -7688,9 +7685,11 @@ class MainWindow(QMainWindow):
             log.warning("couldn't start the update installer: %s", e)
             self.cfg.update_pending = ""
             self._save_later()
-            QMessageBox.warning(self, _("Couldn't update"),
-                                _("The installer couldn't be started ({e}). You can download it "
-                                  "from the release page instead.", e=errors.plain(e)))
+            self.tell(_("Couldn't update"),
+                      _("The installer couldn't be started ({e}). You can download it "
+                        "from the release page instead.", e=errors.plain(e)), "error",
+                      action=(_("Open the download page"),
+                              lambda: QDesktopServices.openUrl(QUrl(updates.RELEASES))))
             return
         exitwatch.closed_by_windows()   # the installer closes us if the quit is slow
         self.quit_app()
@@ -7759,17 +7758,10 @@ class MainWindow(QMainWindow):
             return
         if not updated:
             return
-        box = QMessageBox(QMessageBox.Information, _("Updated"),
-                          _("Onion Board is up to date: version {version}.", version=__version__),
-                          QMessageBox.NoButton, self)
-        new = box.addButton(_("What's new"), QMessageBox.HelpRole)
-        box.addButton(QMessageBox.Ok)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        if clicked is new:
-            QDesktopServices.openUrl(QUrl(
-                f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"))
+        url = f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"
+        self.toast(_("Onion Board is up to date: version {version}.", version=__version__),
+                   "ok", 10000,
+                   action=(_("What's new"), lambda: QDesktopServices.openUrl(QUrl(url))))
 
     def _update_failed(self, pending: str):
         from soundboard import __version__
@@ -7824,8 +7816,8 @@ class MainWindow(QMainWindow):
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
-            QTimer.singleShot(400, lambda: QMessageBox.warning(
-                self, _("Settings were restored"), note))
+            QTimer.singleShot(400, lambda: self.tell(
+                _("Settings were restored"), note, "warn", 20000))
         later, self._whats_new_later = getattr(self, "_whats_new_later", None), None
         if later is not None:   # held back while the window was in the tray
             QTimer.singleShot(700, lambda: self.whats_new(later))
