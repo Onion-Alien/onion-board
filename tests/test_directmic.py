@@ -500,6 +500,16 @@ def test_a_hung_command_is_stopped(monkeypatch):
     assert dm._run(["net", "stop", "audiosrv", "/y"], timeout=1) == -1
 
 
+def test_a_tool_answering_in_another_code_page_is_read(monkeypatch):
+    """A German Windows tool's "ü" is byte 0x81 in its code page, which the default text
+    decoding can't read: that raised instead of returning the exit code."""
+    import sys
+    monkeypatch.setattr(dm, "_CREATE_NO_WINDOW", 0)
+    cmd = [sys.executable, "-c",
+           "import sys; sys.stdout.buffer.write(b'Ger\\x81t nicht gefunden'); sys.exit(3)"]
+    assert dm._run(cmd, timeout=30) == 3
+
+
 # ---------------------------------------------------------------------- the stream
 
 def test_stream_keeps_time_without_the_effect(ring_file):

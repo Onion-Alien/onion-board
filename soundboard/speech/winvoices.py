@@ -160,7 +160,7 @@ def install(lang: str, timeout: float = INSTALL_TIMEOUT_S) -> str:
             r = subprocess.run(
                 ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
                  "-EncodedCommand", enc],
-                capture_output=True, text=True, timeout=timeout,
+                capture_output=True, text=True, errors="replace", timeout=timeout,
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except subprocess.TimeoutExpired:
             raise RuntimeError("Windows took too long downloading the voice") from None
