@@ -1,0 +1,1 @@
+- Give the collapsed sidebar equal visible spacing above and below the output toggle.
