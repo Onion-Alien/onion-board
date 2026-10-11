@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "카테고리"
+  "Category": "카테고리",
+  "Added": "추가한 날",
+  "Channel": "채널",
+  "Channel link": "채널 링크",
+  "Channel, upload date, length, views": "채널, 업로드 날짜, 길이, 조회수",
+  "Copy link": "링크 복사",
+  "Details…": "자세히…",
+  "Open on {site}": "{site}에서 열기",
+  "Title": "제목",
+  "Uploaded": "업로드",
+  "Views": "조회수",
+  "{n} (when added)": "{n} (추가할 때 기준)",
+  "✓ Link copied": "✓ 링크 복사됨"
 }

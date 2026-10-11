@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategori"
+  "Category": "Kategori",
+  "Added": "Ditambahkan",
+  "Channel": "Channel",
+  "Channel link": "Link channel",
+  "Channel, upload date, length, views": "Channel, tanggal unggah, durasi, penayangan",
+  "Copy link": "Salin link",
+  "Details…": "Detail…",
+  "Open on {site}": "Buka di {site}",
+  "Title": "Judul",
+  "Uploaded": "Diunggah",
+  "Views": "Penayangan",
+  "{n} (when added)": "{n} (saat ditambahkan)",
+  "✓ Link copied": "✓ Link disalin"
 }

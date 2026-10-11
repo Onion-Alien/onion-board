@@ -22,7 +22,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import net, netlog, quality, theme, thumbs, videos, ytdl
+from soundboard import net, netlog, quality, sourceinfo, theme, thumbs, videos, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
                                 site_folder, to_int16)
 from soundboard.ui import busy
@@ -356,6 +356,9 @@ class LinkBar(QFrame):
                     meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
             except OSError as e:
                 log.warning("couldn't keep the thumbnail of %s: %s", url, e)
+            # the video's link, channel and views: the pad menu's Open on YouTube
+            meta.source = sourceinfo.read_from(Path(path).parent)
+            sourceinfo.write(meta.file, meta.source)
             self.engine.prepare(meta.id, data)
             saved = ""
             if video:

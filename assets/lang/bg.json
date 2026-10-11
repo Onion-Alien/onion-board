@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Категория"
+  "Category": "Категория",
+  "Added": "Добавено",
+  "Channel": "Канал",
+  "Channel link": "Връзка към канала",
+  "Channel, upload date, length, views": "Канал, дата на качване, дължина, гледания",
+  "Copy link": "Копирай връзката",
+  "Details…": "Подробности…",
+  "Open on {site}": "Отвори в {site}",
+  "Title": "Заглавие",
+  "Uploaded": "Качено",
+  "Views": "Гледания",
+  "{n} (when added)": "{n} (при добавяне)",
+  "✓ Link copied": "✓ Връзката е копирана"
 }

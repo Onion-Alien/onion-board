@@ -3093,5 +3093,17 @@
   "Adding… {pct:.0f}%": "Добавление… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Загрузка… {pct:.0f}%",
   "Queue is full": "Очередь заполнена",
-  "Category": "Категория"
+  "Category": "Категория",
+  "Added": "Добавлено",
+  "Channel": "Канал",
+  "Channel link": "Ссылка на канал",
+  "Channel, upload date, length, views": "Канал, дата загрузки, длительность, просмотры",
+  "Copy link": "Копировать ссылку",
+  "Details…": "Подробнее…",
+  "Open on {site}": "Открыть на {site}",
+  "Title": "Название",
+  "Uploaded": "Загружено",
+  "Views": "Просмотры",
+  "{n} (when added)": "{n} (на момент добавления)",
+  "✓ Link copied": "✓ Ссылка скопирована"
 }

@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Danh mục"
+  "Category": "Danh mục",
+  "Added": "Đã thêm",
+  "Channel": "Kênh",
+  "Channel link": "Liên kết kênh",
+  "Channel, upload date, length, views": "Kênh, ngày tải lên, độ dài, lượt xem",
+  "Copy link": "Sao chép liên kết",
+  "Details…": "Chi tiết…",
+  "Open on {site}": "Mở trên {site}",
+  "Title": "Tiêu đề",
+  "Uploaded": "Đã tải lên",
+  "Views": "Lượt xem",
+  "{n} (when added)": "{n} (lúc thêm)",
+  "✓ Link copied": "✓ Đã sao chép liên kết"
 }

@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "追加中… {pct:.0f}%",
   "Loading… {pct:.0f}%": "読み込み中… {pct:.0f}%",
   "Queue is full": "待機キューがいっぱいです",
-  "Category": "カテゴリ"
+  "Category": "カテゴリ",
+  "Added": "追加日",
+  "Channel": "チャンネル",
+  "Channel link": "チャンネルのリンク",
+  "Channel, upload date, length, views": "チャンネル、投稿日、長さ、再生回数",
+  "Copy link": "リンクをコピー",
+  "Details…": "詳細…",
+  "Open on {site}": "{site} で開く",
+  "Title": "タイトル",
+  "Uploaded": "投稿日",
+  "Views": "再生回数",
+  "{n} (when added)": "{n}（追加した時点）",
+  "✓ Link copied": "✓ リンクをコピーしました"
 }

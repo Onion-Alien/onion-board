@@ -3093,5 +3093,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Categorie"
+  "Category": "Categorie",
+  "Added": "Adăugat",
+  "Channel": "Canal",
+  "Channel link": "Linkul canalului",
+  "Channel, upload date, length, views": "Canal, data încărcării, durată, vizualizări",
+  "Copy link": "Copiază linkul",
+  "Details…": "Detalii…",
+  "Open on {site}": "Deschide pe {site}",
+  "Title": "Titlu",
+  "Uploaded": "Încărcat",
+  "Views": "Vizualizări",
+  "{n} (when added)": "{n} (la adăugare)",
+  "✓ Link copied": "✓ Link copiat"
 }

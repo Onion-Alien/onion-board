@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategori"
+  "Category": "Kategori",
+  "Added": "Tillagd",
+  "Channel": "Kanal",
+  "Channel link": "Länk till kanalen",
+  "Channel, upload date, length, views": "Kanal, uppladdningsdatum, längd, visningar",
+  "Copy link": "Kopiera länk",
+  "Details…": "Detaljer…",
+  "Open on {site}": "Öppna på {site}",
+  "Title": "Titel",
+  "Uploaded": "Uppladdad",
+  "Views": "Visningar",
+  "{n} (when added)": "{n} (när den lades till)",
+  "✓ Link copied": "✓ Länken kopierad"
 }

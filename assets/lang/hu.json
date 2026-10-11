@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategória"
+  "Category": "Kategória",
+  "Added": "Hozzáadva",
+  "Channel": "Csatorna",
+  "Channel link": "Csatorna linkje",
+  "Channel, upload date, length, views": "Csatorna, feltöltés dátuma, hossz, megtekintések",
+  "Copy link": "Link másolása",
+  "Details…": "Részletek…",
+  "Open on {site}": "Megnyitás itt: {site}",
+  "Title": "Cím",
+  "Uploaded": "Feltöltve",
+  "Views": "Megtekintések",
+  "{n} (when added)": "{n} (hozzáadáskor)",
+  "✓ Link copied": "✓ Link másolva"
 }

@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Categorie"
+  "Category": "Categorie",
+  "Added": "Toegevoegd",
+  "Channel": "Kanaal",
+  "Channel link": "Link naar kanaal",
+  "Channel, upload date, length, views": "Kanaal, uploaddatum, lengte, weergaven",
+  "Copy link": "Link kopiëren",
+  "Details…": "Details…",
+  "Open on {site}": "Openen op {site}",
+  "Title": "Titel",
+  "Uploaded": "Geüpload",
+  "Views": "Weergaven",
+  "{n} (when added)": "{n} (bij toevoegen)",
+  "✓ Link copied": "✓ Link gekopieerd"
 }

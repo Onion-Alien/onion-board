@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "正在添加… {pct:.0f}%",
   "Loading… {pct:.0f}%": "正在加载… {pct:.0f}%",
   "Queue is full": "队列已满",
-  "Category": "分类"
+  "Category": "分类",
+  "Added": "添加日期",
+  "Channel": "频道",
+  "Channel link": "频道链接",
+  "Channel, upload date, length, views": "频道、上传日期、时长、播放量",
+  "Copy link": "复制链接",
+  "Details…": "详情…",
+  "Open on {site}": "在 {site} 打开",
+  "Title": "标题",
+  "Uploaded": "上传日期",
+  "Views": "播放量",
+  "{n} (when added)": "{n}（添加时）",
+  "✓ Link copied": "✓ 链接已复制"
 }

@@ -41,7 +41,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library, net, quality, ytworker
+from soundboard import library, net, quality, sourceinfo, ytworker
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
@@ -964,4 +964,5 @@ def _found(url: str, dest: Path, path: Path, info: dict) -> tuple[Path, str]:
             raise DownloadError(_("Nothing was downloaded (the file may be over {mb} MB).",
                                   mb=MAX_BYTES // 2**20))
         path = found[0]
+    sourceinfo.save_for(path.parent, info, url)   # the pad menu's Open on YouTube
     return path, clean_title(info.get("title") or path.stem)

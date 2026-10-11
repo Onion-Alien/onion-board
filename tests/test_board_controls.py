@@ -410,6 +410,36 @@ def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     assert w.meta("s0").hotkey == ""
 
 
+def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
+    """A sound from YouTube (TikTok, SoundCloud) gets Open on YouTube, Copy link and
+    Details… under the site's name; any other sound doesn't."""
+    LINK = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    from soundboard.ui import busy, sourcedialog
+    w = window
+    shown = menu_pick(monkeypatch, ["Duplicate"])
+    monkeypatch.setattr(w, "duplicate_sound", lambda sid: None)
+    w.pad_menu("s0", None)
+    assert "YouTube" not in shown
+    w.meta("s0").source = {"site": "youtube", "link": LINK}
+    opened = []
+    monkeypatch.setattr(busy, "open_url", lambda url, **kw: opened.append(url) or True)
+    shown = menu_pick(monkeypatch, ["YouTube", "Open on YouTube"])
+    w.pad_menu("s0", None)
+    assert shown.index("YouTube") == shown.index("Export…") + 1 and opened == [LINK]
+    menu_pick(monkeypatch, ["YouTube", "Copy link"])
+    w.pad_menu("s0", None)
+    from PySide6.QtWidgets import QApplication
+    assert QApplication.clipboard().text() == LINK
+    dialogs = []
+    monkeypatch.setattr(sourcedialog.SourceDialog, "show",
+                        lambda self: dialogs.append(self))
+    menu_pick(monkeypatch, ["YouTube", "Details…"])
+    w.pad_menu("s0", None)
+    [d] = dialogs
+    assert d.btn_open.text() == "Open on YouTube" and d.btn_open.toolTip() == LINK
+    d.close()
+
+
 def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w = window
     w.cfg.stop_hotkey = "ctrl+alt+s"

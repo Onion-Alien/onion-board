@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategorya"
+  "Category": "Kategorya",
+  "Added": "Idinagdag",
+  "Channel": "Channel",
+  "Channel link": "Link ng channel",
+  "Channel, upload date, length, views": "Channel, petsa ng upload, haba, views",
+  "Copy link": "Kopyahin ang link",
+  "Details…": "Mga detalye…",
+  "Open on {site}": "Buksan sa {site}",
+  "Title": "Pamagat",
+  "Uploaded": "Na-upload",
+  "Views": "Views",
+  "{n} (when added)": "{n} (nang idinagdag)",
+  "✓ Link copied": "✓ Nakopya ang link"
 }

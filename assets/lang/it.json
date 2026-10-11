@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Aggiunta… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Caricamento… {pct:.0f}%",
   "Queue is full": "La coda è piena",
-  "Category": "Categoria"
+  "Category": "Categoria",
+  "Added": "Aggiunto",
+  "Channel": "Canale",
+  "Channel link": "Link del canale",
+  "Channel, upload date, length, views": "Canale, data di caricamento, durata, visualizzazioni",
+  "Copy link": "Copia link",
+  "Details…": "Dettagli…",
+  "Open on {site}": "Apri su {site}",
+  "Title": "Titolo",
+  "Uploaded": "Caricato",
+  "Views": "Visualizzazioni",
+  "{n} (when added)": "{n} (quando aggiunto)",
+  "✓ Link copied": "✓ Link copiato"
 }

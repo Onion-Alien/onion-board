@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Κατηγορία"
+  "Category": "Κατηγορία",
+  "Added": "Προστέθηκε",
+  "Channel": "Κανάλι",
+  "Channel link": "Σύνδεσμος καναλιού",
+  "Channel, upload date, length, views": "Κανάλι, ημερομηνία ανάρτησης, διάρκεια, προβολές",
+  "Copy link": "Αντιγραφή συνδέσμου",
+  "Details…": "Λεπτομέρειες…",
+  "Open on {site}": "Άνοιγμα στο {site}",
+  "Title": "Τίτλος",
+  "Uploaded": "Ανέβηκε",
+  "Views": "Προβολές",
+  "{n} (when added)": "{n} (κατά την προσθήκη)",
+  "✓ Link copied": "✓ Ο σύνδεσμος αντιγράφηκε"
 }

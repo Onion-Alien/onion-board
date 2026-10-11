@@ -3285,5 +3285,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "فئة"
+  "Category": "فئة",
+  "Added": "أُضيف",
+  "Channel": "القناة",
+  "Channel link": "رابط القناة",
+  "Channel, upload date, length, views": "القناة وتاريخ الرفع والمدة والمشاهدات",
+  "Copy link": "نسخ الرابط",
+  "Details…": "التفاصيل…",
+  "Open on {site}": "فتح على {site}",
+  "Title": "العنوان",
+  "Uploaded": "تاريخ الرفع",
+  "Views": "المشاهدات",
+  "{n} (when added)": "{n} (عند الإضافة)",
+  "✓ Link copied": "✓ تم نسخ الرابط"
 }

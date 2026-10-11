@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "หมวดหมู่"
+  "Category": "หมวดหมู่",
+  "Added": "เพิ่มเมื่อ",
+  "Channel": "ช่อง",
+  "Channel link": "ลิงก์ช่อง",
+  "Channel, upload date, length, views": "ช่อง วันที่อัปโหลด ความยาว ยอดดู",
+  "Copy link": "คัดลอกลิงก์",
+  "Details…": "รายละเอียด…",
+  "Open on {site}": "เปิดใน {site}",
+  "Title": "ชื่อ",
+  "Uploaded": "อัปโหลดเมื่อ",
+  "Views": "ยอดดู",
+  "{n} (when added)": "{n} (ตอนที่เพิ่ม)",
+  "✓ Link copied": "✓ คัดลอกลิงก์แล้ว"
 }

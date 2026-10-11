@@ -35,7 +35,7 @@ from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
 from soundboard import (appsetup, directmic, discordcfg, net, netlog, profiles, quality, rawmic,
-                        shellicon, tips, tor, usage, watchaddon)
+                        shellicon, sourceinfo, tips, tor, usage, watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -45,8 +45,8 @@ from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pr
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog, TabHelpPopup
-from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash,
-                           taboff)
+from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
+                           sourcedialog, splash, taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card,
                                  hint_label, icon_label, steady_number, vsep)
@@ -5787,6 +5787,15 @@ class MainWindow(QMainWindow):
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
         a_export = add(("download",), _("Export…"), _("Save it as a file to share with friends"))
+        a_src_open = a_src_copy = a_src_info = None
+        if src := sourceinfo.clean(m.source):   # downloaded from YouTube, TikTok…
+            site = sourceinfo.site_name(src)
+            sm = menu.addMenu(icons.icon(src["site"]), site)
+            sm.setToolTipsVisible(True)
+            a_src_open = add(("browser",), _("Open on {site}", site=site), src["link"], sm)
+            a_src_copy = add(("copy",), _("Copy link"), src["link"], sm)
+            a_src_info = add(("info",), _("Details…"), _("Channel, upload date, length, views"),
+                             sm)
         a_show = add(("folder",), _("Show the file in its folder"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
@@ -5801,6 +5810,12 @@ class MainWindow(QMainWindow):
             self.new_category(sid)
         elif act == a_export:
             self.export_sounds([m], m.name)
+        elif act is not None and act == a_src_open:
+            sourcedialog.open_link(src, self)
+        elif act is not None and act == a_src_copy:
+            sourcedialog.copy_link(src, self)
+        elif act is not None and act == a_src_info:
+            sourcedialog.SourceDialog(m, self).show()
         elif act == a_stop:
             self._stop_sound(sid)
         elif act == a_next:

@@ -3093,5 +3093,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Категорія"
+  "Category": "Категорія",
+  "Added": "Додано",
+  "Channel": "Канал",
+  "Channel link": "Посилання на канал",
+  "Channel, upload date, length, views": "Канал, дата завантаження, тривалість, перегляди",
+  "Copy link": "Копіювати посилання",
+  "Details…": "Докладніше…",
+  "Open on {site}": "Відкрити на {site}",
+  "Title": "Назва",
+  "Uploaded": "Завантажено",
+  "Views": "Перегляди",
+  "{n} (when added)": "{n} (на момент додавання)",
+  "✓ Link copied": "✓ Посилання скопійовано"
 }

@@ -3093,5 +3093,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategoria"
+  "Category": "Kategoria",
+  "Added": "Dodano",
+  "Channel": "Kanał",
+  "Channel link": "Link do kanału",
+  "Channel, upload date, length, views": "Kanał, data przesłania, długość, wyświetlenia",
+  "Copy link": "Kopiuj link",
+  "Details…": "Szczegóły…",
+  "Open on {site}": "Otwórz w {site}",
+  "Title": "Tytuł",
+  "Uploaded": "Przesłano",
+  "Views": "Wyświetlenia",
+  "{n} (when added)": "{n} (w chwili dodania)",
+  "✓ Link copied": "✓ Skopiowano link"
 }

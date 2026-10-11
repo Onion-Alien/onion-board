@@ -2965,5 +2965,17 @@
   "Adding… {pct:.0f}%": "正在新增… {pct:.0f}%",
   "Loading… {pct:.0f}%": "正在載入… {pct:.0f}%",
   "Queue is full": "隊列已滿",
-  "Category": "分類"
+  "Category": "分類",
+  "Added": "新增日期",
+  "Channel": "頻道",
+  "Channel link": "頻道連結",
+  "Channel, upload date, length, views": "頻道、上傳日期、長度、觀看次數",
+  "Copy link": "複製連結",
+  "Details…": "詳細資料…",
+  "Open on {site}": "在 {site} 開啟",
+  "Title": "標題",
+  "Uploaded": "上傳日期",
+  "Views": "觀看次數",
+  "{n} (when added)": "{n}（新增時）",
+  "✓ Link copied": "✓ 已複製連結"
 }

@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "श्रेणी"
+  "Category": "श्रेणी",
+  "Added": "जोड़ा गया",
+  "Channel": "चैनल",
+  "Channel link": "चैनल का लिंक",
+  "Channel, upload date, length, views": "चैनल, अपलोड की तारीख, लंबाई, व्यूज़",
+  "Copy link": "लिंक कॉपी करें",
+  "Details…": "विवरण…",
+  "Open on {site}": "{site} पर खोलें",
+  "Title": "शीर्षक",
+  "Uploaded": "अपलोड हुआ",
+  "Views": "व्यूज़",
+  "{n} (when added)": "{n} (जोड़ते समय)",
+  "✓ Link copied": "✓ लिंक कॉपी हो गया"
 }

@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategori"
+  "Category": "Kategori",
+  "Added": "Eklendi",
+  "Channel": "Kanal",
+  "Channel link": "Kanal bağlantısı",
+  "Channel, upload date, length, views": "Kanal, yükleme tarihi, süre, görüntülenme",
+  "Copy link": "Bağlantıyı kopyala",
+  "Details…": "Ayrıntılar…",
+  "Open on {site}": "{site} üzerinde aç",
+  "Title": "Başlık",
+  "Uploaded": "Yüklendi",
+  "Views": "Görüntülenme",
+  "{n} (when added)": "{n} (eklendiğinde)",
+  "✓ Link copied": "✓ Bağlantı kopyalandı"
 }

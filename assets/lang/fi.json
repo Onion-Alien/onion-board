@@ -3029,5 +3029,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategoria"
+  "Category": "Kategoria",
+  "Added": "Lisätty",
+  "Channel": "Kanava",
+  "Channel link": "Kanavan linkki",
+  "Channel, upload date, length, views": "Kanava, latauspäivä, pituus, katselut",
+  "Copy link": "Kopioi linkki",
+  "Details…": "Tiedot…",
+  "Open on {site}": "Avaa palvelussa {site}",
+  "Title": "Nimi",
+  "Uploaded": "Ladattu",
+  "Views": "Katselut",
+  "{n} (when added)": "{n} (lisättäessä)",
+  "✓ Link copied": "✓ Linkki kopioitu"
 }

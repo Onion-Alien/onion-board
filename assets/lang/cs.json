@@ -3093,5 +3093,17 @@
   "Adding… {pct:.0f}%": "Adding… {pct:.0f}%",
   "Loading… {pct:.0f}%": "Loading… {pct:.0f}%",
   "Queue is full": "Queue is full",
-  "Category": "Kategorie"
+  "Category": "Kategorie",
+  "Added": "Přidáno",
+  "Channel": "Kanál",
+  "Channel link": "Odkaz na kanál",
+  "Channel, upload date, length, views": "Kanál, datum nahrání, délka, zhlédnutí",
+  "Copy link": "Kopírovat odkaz",
+  "Details…": "Podrobnosti…",
+  "Open on {site}": "Otevřít na {site}",
+  "Title": "Název",
+  "Uploaded": "Nahráno",
+  "Views": "Zhlédnutí",
+  "{n} (when added)": "{n} (při přidání)",
+  "✓ Link copied": "✓ Odkaz zkopírován"
 }
