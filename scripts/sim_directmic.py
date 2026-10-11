@@ -159,7 +159,7 @@ def run() -> int:
     print("== 4. two mics: install both, uninstall both")
     reg = t.FakeReg()
     with patched(reg):
-        t._mic(reg, t.MICS["a G733 (EFX + old LFX)"])
+        t._mic(reg, t.MICS["a gaming headset (EFX + old LFX)"])
         before = nonempty(reg)
         dm._install_endpoint(t.GUID, None)
         dm._install_endpoint("{22222222-3333-4444-5555-666666666666}", None)
@@ -200,7 +200,7 @@ def run() -> int:
         ex["_uninstall_endpoint"] = take
         ex["_unregister_com"] = lambda: com.append("com")
         with patched(reg, **ex):
-            t._mic(reg, t.MICS["a G733 (EFX + old LFX)"])
+            t._mic(reg, t.MICS["a gaming headset (EFX + old LFX)"])
             dm._install_endpoint(t.GUID, None)
             dm._install_endpoint("{22222222-3333-4444-5555-666666666666}", None)
             rc = dm.admin_uninstall()
