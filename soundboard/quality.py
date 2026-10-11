@@ -66,6 +66,7 @@ class Prefs:
     radio_kbps: int = 0           # a RADIO_KBPS key
     patient: bool = False         # slow connection: wait longer, retry more (radio)
     web_extras: bool = True       # search result pictures
+    keep_source: bool = True      # remember where a download came from (sourceinfo)
 
     def audio_format(self) -> str:
         return DOWNLOADS.get(self.download, DOWNLOADS["best"])[1]

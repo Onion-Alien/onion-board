@@ -118,7 +118,7 @@ Optional: if you never get it, nothing changes.
    - **Nobody**: only you hear your sounds (and a device set to *Clean, for streaming* under *Also send to*).
      Nothing to change in Discord or your game.
 4. **Drag sounds onto the window** and double-click a pad to play it. Right-click a
-   pad for a hotkey or **Effects**.
+   pad for a hotkey, or **Edit** for its picture and effects.
 
 > **Windows or your browser may warn you.** That's normal for a free app that isn't
 > code-signed (that costs hundreds a year). Edge / Chrome: **⋯ → Keep**. Blue

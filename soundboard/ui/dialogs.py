@@ -2,19 +2,24 @@
 (speed, pitch, EQ, boost, reverse and every voice effect, modules' included)."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QPixmap
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
-                               QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLineEdit, QPushButton, QScrollArea, QSlider, QTabWidget,
-                               QVBoxLayout, QWidget)
+import logging
+import threading
+from pathlib import Path
 
-from soundboard import soundfx, theme, voicefx
+from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QFont, QImage, QPixmap
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox, QDialog,
+                               QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
+                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMessageBox,
+                               QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
+                               QWidget)
+
+from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
-from soundboard.ui import busy, fit, icons
+from soundboard.ui import busy, fit, icons, sourcedialog
 from soundboard.ui.panel import EqPanel, hint_label, section_label, steady_number
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
@@ -22,7 +27,10 @@ from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard.i18n import _
 
+log = logging.getLogger(__name__)
+
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
+PIC_W, PIC_H = 64, 36   # the Picture row's 16:9 preview
 # what the pad colour swatches are called (tooltip and screen reader)
 COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue"),
                 "#13ce66": _("Green"), "#ffb020": _("Yellow"), "#ff7849": _("Orange"),
@@ -252,6 +260,8 @@ class EditDialog(QDialog):
     preview_cb(sid, volume, fx, (fade_in, fade_out), done) plays the sound, with these
     (unsaved) effects and fades, to your headphones only."""
     hotkeys_changed = Signal()
+    picture_fetched = Signal(int, object, str)   # (which try, QImage or None, why not)
+    source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound"):
@@ -267,24 +277,26 @@ class EditDialog(QDialog):
         self.tabs = QTabWidget()
         lay.addWidget(self.tabs, 1)
 
-        # three cards: the sound itself, its hotkey, its timings. Labels share one
+        # three cards: how the pad looks, how it plays, its timings. Labels share one
         # column width across the cards so the fields line up down the page.
         basics = QWidget()
         page = QVBoxLayout(basics)
         page.setContentsMargins(2, 14, 2, 2)   # room under the tabs
         page.setSpacing(10)
-        labels = [_("Name"), _("Volume"), _("Colour"), _("Hotkey"), _("On press")]
+        labels = [_("Name"), _("Colour"), _("Picture"), _("Volume"), _("Hotkey"),
+                  _("On press")]
         label_w = max(self.fontMetrics().horizontalAdvance(t) for t in labels) + 12
 
-        def card():
+        def card(title: str):
             c = QFrame()
             c.setObjectName("setcard")   # (its buttons and boxes keep their fill)
             g = QGridLayout(c)
-            g.setContentsMargins(14, 12, 14, 12)
+            g.setContentsMargins(14, 10, 14, 12)
             g.setHorizontalSpacing(12)
             g.setVerticalSpacing(10)
             g.setColumnMinimumWidth(0, label_w)
             g.setColumnStretch(1, 1)
+            g.addWidget(section_label(title), 0, 0, 1, 2)
             page.addWidget(c)
             return g
 
@@ -299,29 +311,13 @@ class EditDialog(QDialog):
             else:
                 g.addLayout(field, r, 1)
 
-        g = card()
+        g = card(_("Look"))
         self.name = QLineEdit(meta.name)
         f = self.name.font()
         f.setPointSizeF(f.pointSizeF() + 1.5)
         f.setWeight(QFont.DemiBold)
         self.name.setFont(f)
         row(g, _("Name"), self.name)
-
-        vrow = QHBoxLayout()
-        vrow.setSpacing(10)
-        self.vol = QSlider(Qt.Horizontal)
-        self.vol.setRange(0, 200)
-        self.vol.setValue(round(meta.volume * 100))   # int() made 0.29 read as 28 %
-        self.vol.setAccessibleName(_("Volume"))
-        no_wheel(self.vol)
-        self.vol_lbl = QLabel()
-        self.vol_lbl.setObjectName("muted")
-        self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))
-        self.vol_lbl.setText(f"{self.vol.value()}%")
-        steady_number(self.vol_lbl, "200%")
-        vrow.addWidget(self.vol, 1)
-        vrow.addWidget(self.vol_lbl)
-        row(g, _("Volume"), vrow)
 
         crow = QHBoxLayout()
         crow.setSpacing(8)
@@ -341,14 +337,90 @@ class EditDialog(QDialog):
         crow.addStretch()
         row(g, _("Colour"), crow)
 
-        self.only_them = QCheckBox(_("Only others hear it, not played in my headphones"))
-        self.only_them.setToolTip(_("It still goes out to others (Discord, the game, OBS…); you "
-                                    "just don't hear it yourself (Preview still plays it to you)"))
-        self.only_them.setChecked(meta.only_them)
-        g.addWidget(self.only_them, g.rowCount(), 1)
+        # the pad's picture: changed here, kept only on Save (self.picture)
+        self.picture: QImage | str | None = None   # None: as it is, "": removed
+        self._pic_gen = 0
+        prow = QHBoxLayout()
+        prow.setSpacing(8)
+        self.pic_view = QLabel()
+        self.pic_view.setFixedSize(PIC_W, PIC_H)
+        self.pic_view.setAlignment(Qt.AlignCenter)
+        self.pic_view.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 6px;")
+        prow.addWidget(self.pic_view)
 
-        # the hotkey is what most people open this for: near the top, not under the timings
-        g = card()
+        def pic_button(icon, tip, slot):
+            b = QPushButton()
+            b.setObjectName("iconbutton")
+            icons.set_icon(b, icon)
+            b.setToolTip(tip)
+            b.setAccessibleName(tip)
+            b.clicked.connect(slot)
+            prow.addWidget(b)
+            return b
+        self.btn_pic_file = pic_button(
+            "folder", _("From a file (you can also drop a picture on the pad)"),
+            self._picture_from_file)
+        self.btn_pic_link = pic_button(
+            "browser", _("From a link: a picture's address, a YouTube video or a web page"),
+            self._picture_from_link)
+        self.btn_pic_clear = pic_button("trash", _("Remove picture"),
+                                        lambda: self._set_picture(""))
+        self.pic_note = QLabel()
+        self.pic_note.setObjectName("muted")
+        prow.addWidget(self.pic_note)
+        prow.addStretch(1)
+        row(g, _("Picture"), prow)
+        self.picture_fetched.connect(self._on_picture_fetched)
+        self._show_picture()
+
+        # where a downloaded sound came from (soundboard.sourceinfo)
+        self.btn_source = None
+        if src := sourceinfo.shown(meta):
+            srow = QHBoxLayout()
+            srow.setSpacing(8)
+            ic = QLabel()
+            ic.setPixmap(icons.pixmap(sourceinfo.icon(src), 16, theme.T["muted"]))
+            srow.addWidget(ic)
+            site, who = sourceinfo.site_name(src), src.get("channel")
+            from_lbl = QLabel(_("From {site}: {channel}", site=site, channel=who) if who
+                              else _("From {site}", site=site))
+            from_lbl.setObjectName("muted")
+            srow.addWidget(from_lbl)
+            self.btn_source = QPushButton(_("Details"))
+            self.btn_source.setProperty("quiet", True)
+            self.btn_source.setToolTip(src["link"])
+            srow.addWidget(self.btn_source)
+            srow.addStretch(1)
+            self.source_row = QWidget()
+            self.source_row.setLayout(srow)
+            srow.setContentsMargins(0, 0, 0, 0)
+            g.addWidget(self.source_row, g.rowCount(), 0, 1, 2)
+
+            def details():
+                d = sourcedialog.SourceDialog(self.meta, self)
+                d.forgotten.connect(self.source_row.hide)
+                d.forgotten.connect(self.source_forgotten)   # the owner saves it
+                d.show()
+            self.btn_source.clicked.connect(details)
+
+        # how it plays: the hotkey is what most people open this for
+        g = card(_("Playback"))
+        vrow = QHBoxLayout()
+        vrow.setSpacing(10)
+        self.vol = QSlider(Qt.Horizontal)
+        self.vol.setRange(0, 200)
+        self.vol.setValue(round(meta.volume * 100))   # int() made 0.29 read as 28 %
+        self.vol.setAccessibleName(_("Volume"))
+        no_wheel(self.vol)
+        self.vol_lbl = QLabel()
+        self.vol_lbl.setObjectName("muted")
+        self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))
+        self.vol_lbl.setText(f"{self.vol.value()}%")
+        steady_number(self.vol_lbl, "200%")
+        vrow.addWidget(self.vol, 1)
+        vrow.addWidget(self.vol_lbl)
+        row(g, _("Volume"), vrow)
+
         hrow = QHBoxLayout()
         hrow.setSpacing(8)
         self.hk_btn = QPushButton()
@@ -384,13 +456,23 @@ class EditDialog(QDialog):
         self.hold.setChecked(meta.hold)
         g.addWidget(self.hold, g.rowCount(), 1)
 
+        self.only_them = QCheckBox(_("Only others hear it, not played in my headphones"))
+        self.only_them.setToolTip(_("It still goes out to others (Discord, the game, OBS…); you "
+                                    "just don't hear it yourself (Preview still plays it to you)"))
+        self.only_them.setChecked(meta.only_them)
+        g.addWidget(self.only_them, g.rowCount(), 1)
+
         # timings two by two, each its name and value over its slider
         c = QFrame()
         c.setObjectName("setcard")
-        tg = QGridLayout(c)
-        tg.setContentsMargins(14, 12, 14, 14)
+        tv = QVBoxLayout(c)
+        tv.setContentsMargins(14, 10, 14, 14)
+        tv.setSpacing(10)
+        tv.addWidget(section_label(_("Timing")))
+        tg = QGridLayout()
         tg.setHorizontalSpacing(24)
         tg.setVerticalSpacing(12)
+        tv.addLayout(tg)
         page.addWidget(c)
         self.fade_in = self._fade_cell(tg, 0, 0, _("Fade in"), meta.fade_in,
                                        _("Starts silent and rises to full volume over this long"))
@@ -525,6 +607,78 @@ class EditDialog(QDialog):
                     self._fx_note()
             QTimer.singleShot(ms, self, back)
 
+    # ------------------------------------------------------------------ picture
+    def _show_picture(self):
+        """The picture as it will be after Save, and only the buttons that apply."""
+        if isinstance(self.picture, QImage):
+            pm = QPixmap.fromImage(self.picture)
+        elif self.picture is None and self.meta.image:
+            pm = QPixmap(self.meta.image)
+        else:
+            pm = QPixmap()
+        if not pm.isNull():
+            self.pic_view.setPixmap(pm.scaled(PIC_W, PIC_H, Qt.KeepAspectRatio,
+                                              Qt.SmoothTransformation))
+        self.pic_view.setVisible(not pm.isNull())   # no picture: just the buttons
+        self.btn_pic_clear.setVisible(not pm.isNull())
+
+    def _set_picture(self, pic):
+        self._pic_gen += 1   # a link still loading no longer counts
+        self.pic_note.setText("")
+        self.picture = pic
+        self._show_picture()
+
+    def _picture_from_file(self):
+        f, __ = QFileDialog.getOpenFileName(
+            self, _("Pick a picture"), str(Path.home()),
+            _("Pictures ({patterns})",
+              patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
+        if not f:
+            return
+        img = QImage(f)
+        if img.isNull():
+            QMessageBox.warning(self, _("Couldn't use that picture"),
+                                _("{name} isn't a picture this app can read.",
+                                  name=Path(f).name))
+            return
+        self._set_picture(img)
+
+    def _picture_from_link(self):
+        copied = QApplication.clipboard().text().strip()
+        copied = copied if "://" in copied and len(copied) < 2000 and \
+            not any(c.isspace() for c in copied) else ""
+        url, ok = QInputDialog.getText(
+            self, _("Picture from a link"),
+            _("The picture's address (right-click it → Copy image address),\nor a link "
+              "to a YouTube video or a web page:"), text=copied)
+        url = url.strip()
+        if not ok or not url:
+            return
+        self._pic_gen += 1
+        gen = self._pic_gen
+        self.pic_note.setText(_("Getting the picture…"))
+
+        def work():   # the network, off the UI thread
+            try:
+                img, err = thumbs.fetch(url), ""
+            except (thumbs.LinkError, net.FeatureOff) as e:
+                img, err = None, str(e)
+            except Exception as e:  # noqa: BLE001 - never leave it saying "Getting…"
+                log.exception("picture from a link")
+                img, err = None, errors.plain(e)
+            busy.emit(self.picture_fetched, gen, img, err)
+        threading.Thread(target=work, daemon=True, name="edit-picture-link").start()
+
+    def _on_picture_fetched(self, gen: int, img, err: str):
+        if gen != self._pic_gen:   # another picture was picked meanwhile
+            return
+        if img is None or img.isNull():
+            self.pic_note.setText("")
+            QMessageBox.warning(self, _("Couldn't use that picture"),
+                                err or _("There's no picture at that link."))
+            return
+        self._set_picture(img)
+
     def _set_color(self, c):
         self.color = c
         t = theme.T
@@ -563,3 +717,7 @@ class EditDialog(QDialog):
         m.color = self.color
         m.fade_in, m.fade_out = self.fades()
         m.fx = self.effects.fx()
+        if self.picture == "":
+            thumbs.clear(m)
+        elif self.picture is not None:
+            thumbs.set_image(m, self.picture)

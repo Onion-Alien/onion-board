@@ -28,7 +28,7 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__, mapped, winpath
+from soundboard import __version__, mapped, sourceinfo, winpath
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -318,6 +318,7 @@ class SoundMeta:
     added: float = 0.0        # time.time() it joined the board; 0 = before this was kept
     pack: str = ""            # the sound pack it came from (backup.packs()), or ""
     pack_item: str = ""       # its folder in that pack, to reset it to how it came
+    source: dict = field(default_factory=dict)   # the video it came from (sourceinfo)
 
 
 @dataclass
@@ -701,6 +702,7 @@ class Config:
             if s.get("image") and not Path(s["image"]).is_absolute():
                 s["image"] = str(THUMBS_DIR / s["image"])
             s["tags"] = clean_tags(s.get("tags"))
+            s["source"] = sourceinfo.clean(s.get("source"))
             for k in ("fade_in", "fade_out"):
                 s[k] = clean_fade(s.get(k))
             for k in ("delay", "cooldown"):
@@ -1599,6 +1601,7 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
         except BaseException:
             discard(dest)
             raise
+        sourceinfo.write(dest, meta.source)   # its own "Song (copy).txt"
     try:
         if cache_path(meta.id).exists():
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1619,7 +1622,8 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
                      level_gain=meta.level_gain, duration=meta.duration,
                      fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),
                      fade_in=meta.fade_in, fade_out=meta.fade_out, hold=meta.hold,
-                     only_them=meta.only_them, delay=meta.delay, cooldown=meta.cooldown)
+                     only_them=meta.only_them, delay=meta.delay, cooldown=meta.cooldown,
+                     source=dict(meta.source))
 
 
 def recycle(path: Path) -> bool:
@@ -1671,6 +1675,8 @@ def delete_file(meta: SoundMeta):
     try:
         if owns(p) and not (USE_RECYCLE_BIN and recycle(p)):
             p.unlink(missing_ok=True)
+        if owns(p) and meta.source:
+            sourceinfo.remove(p)
         if meta.image and Path(meta.image).parent == THUMBS_DIR:
             Path(meta.image).unlink(missing_ok=True)
     except OSError:
