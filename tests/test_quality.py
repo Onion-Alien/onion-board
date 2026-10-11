@@ -155,3 +155,15 @@ def test_get_ffmpeg_greys_out_when_its_switch_is_off(window, monkeypatch):  # no
     d = SettingsDialog(window, "data")
     assert not d.btn_ffmpeg.isEnabled()
     d.close()
+
+
+def test_get_ffmpeg_button_goes_once_ffmpeg_is_here(window, monkeypatch):  # noqa: F811
+    from soundboard import ffmpegget
+    monkeypatch.setattr(ffmpegget, "can_offer", lambda: True)
+    d = SettingsDialog(window, "data")
+    page = d.tabs.currentWidget().widget()
+    monkeypatch.setattr(ffmpegget, "can_offer", lambda: False)   # winget just got it
+    d._ffmpeg_sync("FFmpeg is ready: M4A, AAC and video files play now.")
+    assert d.ff_note.isVisibleTo(page) and "ready" in d.ff_note.text()
+    assert not d.btn_ffmpeg.isVisibleTo(page)
+    d.close()

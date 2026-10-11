@@ -2147,17 +2147,17 @@ class SettingsDialog(QDialog):
         # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
         # who skipped it had no way to add it later, so the app can get it itself now.
         ff_box = QWidget()
-        ff_row = QHBoxLayout(ff_box)
-        ff_row.setContentsMargins(0, 0, 0, 0)
-        ff_row.setSpacing(8)
+        ff_col = QVBoxLayout(ff_box)
+        ff_col.setContentsMargins(0, 0, 0, 0)
+        ff_col.setSpacing(6)
         self.ff_note = QLabel()
         self.ff_note.setObjectName("hint")
         self.ff_note.setWordWrap(True)
-        ff_row.addWidget(self.ff_note, 1)
+        ff_col.addWidget(self.ff_note)
         self.btn_ffmpeg = QPushButton(_("Get FFmpeg"))
         icons.set_icon(self.btn_ffmpeg, "download")
         self.ff_box = ff_box
-        ff_row.addWidget(self.btn_ffmpeg)
+        ff_col.addWidget(self.btn_ffmpeg, 0, Qt.AlignmentFlag.AlignLeft)   # buttons sit left
         cv.addWidget(ff_box)
         self.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
         v.addWidget(card)
@@ -2252,6 +2252,10 @@ class SettingsDialog(QDialog):
         self.ff_box.setVisible(show)
         if not show:
             return
+        offer = ffmpegget.can_offer() or busy.is_busy(button)
+        if not offer and button.hasFocus():
+            button.clearFocus()   # hiding a focused button jumps focus to the next control
+        button.setVisible(offer)  # once it's here, "FFmpeg is ready" stays without the button
         allowed = net.allowed(ffmpegget.FEATURE)
         button.setEnabled(allowed)
         button.setToolTip(net.off_message(ffmpegget.FEATURE) if not allowed else
