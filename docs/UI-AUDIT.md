@@ -136,9 +136,9 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   hear* meter, the search box and the drop box run the whole width. Cap utility widths
   (DESIGN: narrow by default) and recheck with a populated board.
 
-  Done (PR #PRNUM): caps chosen above each control's width at 1180x720, so normal and
+  Done (PR #410): caps chosen above each control's width at 1180x720, so normal and
   small windows are unchanged (the 10 October "full width" rule in AGENT-RULES still
-  holds there; it now names the caps): search 560 px, playing name + seek 720 (its
+  holds there; it now names the caps): search 480 px, playing name + seek 720 (its
   cap before 3e31240c), meter 320, drop box 1000. The spare room is one gap: after the
   search's site button (library tools stay right), after the time (speed and volume
   stay right), after *Hear what they hear* (headphones stay right). The Sounds volume

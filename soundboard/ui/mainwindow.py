@@ -156,7 +156,7 @@ LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 # Full-screen caps (DESIGN: narrow by default). Each is above what the control gets at
 # 1180x720, so normal and small windows still use the whole width.
-SEARCH_MAX_W = 560    # the search box
+SEARCH_MAX_W = 480    # the search box (456 px at 1180x720)
 SEEK_MAX_W = 720      # the playing sound's name and its seek bar
 METER_MAX_W = 320     # the "What others hear" level meter
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
