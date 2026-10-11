@@ -892,6 +892,18 @@ def set_icon(widget, name: str, color: str | None = None, checked_color: str | N
     _applied.append((weakref.ref(widget), name, color, checked_color, pad))
 
 
+def close_button(btn, side: int, color: str = "muted"):
+    """Make `btn` a square ✕ button drawn with the painted "close" icon, never the "✕"
+    character: a font's glyph got clipped by small buttons' padding, and a layout could
+    squeeze it (a style sheet's min-width:0). Its tooltip names it (a11y.label_tree)."""
+    from PySide6.QtWidgets import QSizePolicy
+    btn.setText("")
+    set_icon(btn, "close", color, size=16 if side >= 22 else 14)
+    btn.setFixedSize(side, side)
+    btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+    btn.setCursor(Qt.CursorShape.PointingHandCursor)
+
+
 def text_gap(button):
     """Re-fit the icon's gap after a button's words were dropped or put back (a
     narrow window's icon-only step): no words, no empty space after the icon."""

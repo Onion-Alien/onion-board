@@ -596,10 +596,10 @@ class AppRow(HoverCard):
         for label in (self.header, self.icon, self.name, self.sub):
             label.setCursor(Qt.CursorShape.OpenHandCursor)
             label.installEventFilter(self)
-        self.btn_forget = QPushButton("✕")
+        self.btn_forget = QPushButton()
         self.btn_forget.setObjectName("small")
         self.btn_forget.setToolTip(_("Take this program off the list"))
-        self.btn_forget.setFixedWidth(26)
+        icons.close_button(self.btn_forget, 26)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
         top.addWidget(self.btn_forget, 0, Qt.AlignmentFlag.AlignTop)
         v.addWidget(self.header)
