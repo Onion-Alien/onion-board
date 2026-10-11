@@ -1,4 +1,11 @@
-# UI consistency backlog
+# UI audit: the one UI to-do list
+
+**This is the only UI to-do list.** "The UI audit doc" or "the UI doc" means this file.
+Older audit notes (8 and 11 October) were merged in here and retired; don't start new
+audit files: add findings here as new U-items. Before suggesting or starting an item,
+check it against latest `origin/main` (git log + an offscreen render): many sessions
+fix UI in parallel and an item can be done within hours. Tick it with its PR when done.
+
 
 Spot audit of `origin/main` at `44a35c6`. Evidence: Dark offscreen previews of all
 six main tabs, General/Appearance/Audio/Connection settings, Edit sound and the
@@ -103,6 +110,31 @@ the affected states; include its PR and validation evidence here.
   narrow and normal sizes. Still open: the rest of the Sounds menus, and the Apps,
   Radio and Voice menus.
 
+## Merged in from the earlier audits
+
+Rechecked against `origin/main` 09b72491 (1.9.28) on 11 October with offscreen renders
+at 360×320 to 1920×1080. Everything else from those audits is already on main: mini
+mode only at very small sizes (360×320 yes, 440×380 no) with status + mic in it, Setup devices first, labelled sidebar
+and audio footer, grouped Sounds toolbar, Voice changer open by default, pad sorting
+with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colours.
+
+- [ ] **U10: Dim secondary text.** Hints, pad durations, "Drop sound files here",
+  "Pad size" and empty-state lines are still faint on the dark background. Measure
+  contrast (aim for WCAG AA, 4.5:1) in Dark, Light and the other themes, then raise
+  the secondary text colour token rather than patching single labels.
+- [ ] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
+  hear* meter, the search box and the drop box run the whole width. Cap utility widths
+  (DESIGN: narrow by default) and recheck with a populated board.
+
+### Features for later (not UI fixes; after 2.0)
+
+- Lower other programs (Spotify, the game) while a sound plays; `appaudio` already
+  lists the sessions.
+- Timed sounds: play X every N minutes or at a set time.
+- Twitch / YouTube chat and channel-point triggers built in.
+- A native Stream Deck plugin.
+- Multiple boards / profiles with one switch (low priority).
+
 ## Ready-to-paste LLM handoff
 
 ```text
@@ -112,11 +144,11 @@ origin/main in an isolated branch/worktree; check open PRs for overlapping work.
 Read docs/DESIGN.md: Fluent 2 supplies interaction guidance; our Qt components,
 themes and local action-order rules supply the implementation. Follow section 0
 for controls/surfaces and section 14 for the UI workflow.
-Use docs/UI-AUDIT.md as the backlog. U1 requires bottom-right dialog actions:
+Use docs/UI-AUDIT.md as the backlog (the only UI to-do list). U1 requires bottom-right dialog actions:
 stretch before the action group, main action first within that group, then
 alternatives/Cancel/Done. Ordinary fields and card/toolbar actions stay beside
 their content. U1 is done (PR #398); U5's folder family (PR #400) and part of
-U9 (PR #399) are done. Work through U2-U4 in separate changes. Report intentional
+U9 (PR #399) are done. Work through the open U-items in separate changes. Report intentional
 differences instead of forcing every choice into one widget type. Preserve live
 settings versus draft Save/Cancel, preview, keyboard access and window lifetimes.
 Reuse small shared helpers, translate changed UI text in every language, inspect
