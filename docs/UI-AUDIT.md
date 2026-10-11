@@ -132,9 +132,16 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   4.0, Dark 4.2): the style sheet now gives it `$muted` (5.9, 11.4, 5.9). Checked
   offscreen in Dark, Light and High Contrast at 440, 800x600, 1180x720 and 1920x1080
   (`tests/test_ui_audit.py`).
-- [ ] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
+- [x] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
   hear* meter, the search box and the drop box run the whole width. Cap utility widths
   (DESIGN: narrow by default) and recheck with a populated board.
+
+  Decided with the owner (11 October): **only the search box is capped**
+  (`SEARCH_MAX_W` 480, PR #411; 456 px at 1180x720, so normal windows are unchanged).
+  A few words go in it, so past that it was only a longer empty bar. The seek bar,
+  the meter and the drop box **keep following the window on purpose**: a longer seek
+  bar seeks finer, and capping them only traded a long control for an empty gap
+  (PR #410, capping all four, was closed for that). Don't re-cap them.
 
 ### Features for later (not UI fixes; after 2.0)
 

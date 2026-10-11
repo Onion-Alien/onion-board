@@ -154,6 +154,10 @@ TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
+# ...and its most: a few words go in it, so past this it's only a longer empty bar
+# (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
+# the drop box still follow the window: wider is useful there (U11).
+SEARCH_MAX_W = 480
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
@@ -1414,6 +1418,7 @@ class MainWindow(QMainWindow):
         self.search.setToolTip(self._search_tip)
         self.search.setClearButtonEnabled(True)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
+        self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
         # and only once it pauses (_on_search_text); text set by the app filters at once
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
@@ -1497,6 +1502,7 @@ class MainWindow(QMainWindow):
         tb.addWidget(vsep())
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
+        tb.addStretch(0)   # past SEARCH_MAX_W: the room goes here, the library tools stay right
         tb.addWidget(vsep())
         tb.addWidget(more)
         tb.addWidget(vsep())
