@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 5
+HELPER_VERSION = 6
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -187,11 +187,15 @@ def ready(same_dll: bool = True) -> bool:
     (`same_dll`), carrying the same effect DLL as this app (an older one would put an
     older effect on the mic). An older helper otherwise is fine: the next admin step
     that asks anyway updates it. Runs a process: not on the UI thread."""
-    have = _read_stamp(helper_dir())
+    have, mine = _read_stamp(helper_dir()), _read_stamp(bundled_helper())
     ok = _version_of(have) >= MIN_HELPER_VERSION
     if ok and same_dll:
-        want = _dll_of(_read_stamp(bundled_helper()))
+        want = _dll_of(mine)
         ok = want is not None and _dll_of(have) == want
+    if ok and have == mine:
+        # this app's own build: a file of it gone (a virus scanner) and the task can't
+        # start it. Asking Windows now puts it back, rather than a wait for nothing first
+        ok = all((helper_dir() / name).is_file() for name in _build_files(bundled_helper()))
     ok = ok and installed()
     _known[same_dll] = ok
     return ok
@@ -422,8 +426,9 @@ def serve(run=None) -> int:
     _prune(time.time())
     for _round in range(50):   # (requests keep coming: the task's next run takes them)
         try:
+            # (_age: one the app gave up on and deleted meanwhile never stops the rest)
             found = sorted((p for p in requests_dir().glob("*.req")),
-                           key=lambda p: p.stat().st_mtime)
+                           key=lambda p: -(_age(p) or 0.0))
         except OSError:
             return 0
         if not found:
@@ -624,6 +629,25 @@ def verify_task(exe: Path, sids: list[str], arguments: str = SERVE) -> bool:
             and one("t:Actions/t:Exec/t:Arguments") == arguments)
 
 
+def _build_files(folder: Path) -> dict[str, Path]:
+    """A helper folder's files by relative path, without what install_helper writes."""
+    return {p.relative_to(folder).as_posix(): p for p in folder.rglob("*")
+            if p.is_file() and p.relative_to(folder).as_posix() not in (USERS, "task.xml")}
+
+
+def _same_build(src: Path, dest: Path) -> bool:
+    """`dest` holds exactly `src`'s helper build, byte for byte. The stamp alone isn't
+    enough: it names the helper version and effect DLL, not how the exe was packed (a
+    rebuild can change that) or whether a file of it went missing (a virus scanner)."""
+    import filecmp
+    try:
+        have, want = _build_files(dest), _build_files(src)
+        return have.keys() == want.keys() and all(
+            filecmp.cmp(want[name], have[name], shallow=False) for name in want)
+    except OSError:
+        return False
+
+
 def install_helper(user: str | None = None) -> bool:
     """Admin step (the app's elevated copy): put this app's helper build in Program
     Files and register its task for `user` (the account that asked, from the app's
@@ -641,7 +665,7 @@ def install_helper(user: str | None = None) -> bool:
     try:
         users = helper_users(sid)
         dest = helper_dir()
-        if _read_stamp(dest) != _read_stamp(src) or not (dest / EXE_NAME).is_file():
+        if not _same_build(src, dest):
             new, old = dest.with_name(dest.name + ".new"), dest.with_name(dest.name + ".old")
             for d in (new, old):
                 if d.exists():

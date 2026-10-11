@@ -29,7 +29,8 @@ ROOT = Path(__file__).resolve().parent.parent
 # HELPER_VERSION and the admin code it stands for: change one, change the other
 ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4c620",
                 4: "b49bed37327a635032e846b3f51e1b47fc5ebcaef7ee4078d03c95528a142370",
-                5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467"}
+                5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467",
+                6: "9b83750c3d3586a89804c5ec5c97618fc1ce30b511723e4e3cf3525513c9a534"}
 
 
 def _queue():
@@ -145,6 +146,47 @@ def test_ready_needs_the_same_effect_dll(monkeypatch, tmp_path):
     monkeypatch.setattr(mh, "installed", lambda: False)
     (mh.helper_dir() / mh.STAMP).write_text("5 aaaa")
     assert not mh.ready()   # its task is gone
+
+
+def test_ready_needs_all_of_this_apps_build(monkeypatch, tmp_path):
+    """This app's own build missing a file can't start: Windows' prompt (which puts it
+    back) at once, not a wait for a helper that never answers first. An older helper
+    is packed its own way: not held to this build's files."""
+    bundled = tmp_path / "bundled"
+    bundled.mkdir()
+    monkeypatch.setattr(mh, "bundled_helper", lambda: bundled)
+    monkeypatch.setattr(mh, "installed", lambda: True)
+    for folder in (bundled, mh.helper_dir()):
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
+        (folder / mh.EXE_NAME).write_bytes(b"MZ")
+    (bundled / "obmichelper.pkg").write_bytes(b"PKG")
+    assert not mh.ready() and not mh.ready(same_dll=False)
+    (mh.helper_dir() / "obmichelper.pkg").write_bytes(b"PKG")
+    assert mh.ready() and mh.ready(same_dll=False)
+    (mh.helper_dir() / "obmichelper.pkg").unlink()
+    (mh.helper_dir() / mh.STAMP).write_text(f"{mh.HELPER_VERSION - 1} aaaa")
+    assert mh.ready()   # an older helper, same DLL: as before
+
+
+def test_a_request_gone_meanwhile_doesnt_stop_the_rest(monkeypatch):
+    """Listed, then deleted by the app (it gave up waiting) before it was looked at."""
+    _queue()
+    real = mh.requests_dir()
+    _request("a" * 32, f"install {GUID}".encode())
+    gone = real / ("b" * 32 + ".req")
+
+    class Listing:
+        calls = 0
+
+        def glob(self, pattern):
+            Listing.calls += 1
+            return [*real.glob(pattern), gone] if Listing.calls == 1 else real.glob(pattern)
+    monkeypatch.setattr(mh, "requests_dir", Listing)
+    ran = []
+    assert mh.serve(run=lambda args: ran.append(args) or 0) == 0
+    assert ran == [["install", GUID]]
+    assert (mh.results_dir() / ("a" * 32 + ".res")).read_text() == "0"
 
 
 def test_make_stamp(tmp_path):
@@ -349,6 +391,29 @@ def test_install_helper_keeps_the_first_user(helper_setup):
     assert (mh.helper_dir() / mh.USERS).read_text().split() == [SID, SID2]
     assert mh.task_sddl([SID, SID2]) in registered["xml"]
     assert calls.count("/create") == 2 and "/delete" not in calls
+
+
+def test_install_helper_repairs_a_build_with_the_same_stamp(helper_setup, monkeypatch):
+    """The stamp names the helper version and effect DLL only: a helper packed another
+    way (the .pkg beside the exe) or missing a file (a virus scanner took it) has the
+    same stamp, and Windows' prompt must still put this app's build in place, or every
+    mic step waits for a helper that can't start and then asks again, for ever."""
+    src = mh.bundled_helper()
+    (src / "obmichelper.pkg").write_bytes(b"PKG")
+    copies = []
+    real_copytree = mh.shutil.copytree
+    monkeypatch.setattr(mh.shutil, "copytree",
+                        lambda a, b: copies.append(a) or real_copytree(a, b))
+    dest = mh.helper_dir()
+    assert mh.install_helper() and len(copies) == 1
+    assert mh.install_helper() and len(copies) == 1   # the same build: left as it is
+    (dest / "obmichelper.pkg").unlink()
+    assert mh.install_helper() and len(copies) == 2
+    assert (dest / "obmichelper.pkg").read_bytes() == b"PKG"
+    (dest / mh.EXE_NAME).write_bytes(b"MZ old packing")   # same stamp, another exe
+    assert mh.install_helper() and len(copies) == 3
+    assert (dest / mh.EXE_NAME).read_bytes() == b"MZ"
+    assert (dest / mh.USERS).read_text().split() == [SID]   # users kept through it
 
 
 def test_install_helper_checks_who_asked(helper_setup, monkeypatch):
