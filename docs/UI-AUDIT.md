@@ -123,7 +123,7 @@ with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colo
   contrast (aim for WCAG AA, 4.5:1) in Dark, Light and the other themes, then raise
   the secondary text colour token rather than patching single labels.
 
-  Done (PR #PRNUM): measured every theme. `muted`/`faint` already cleared 4.5:1 on
+  Done (PR #409): measured every theme. `muted`/`faint` already cleared 4.5:1 on
   bg, panel, card, card_hi and btn, but not on `btn_hover` (quiet buttons and rail
   tabs under the mouse) or `inset`: 3.6-4.5:1 in 30 of 31 themes (Deep Fried 3.6,
   Barbie 3.95, Dark 4.06). `theme.SECONDARY_ON` now lists those surfaces too, so the
