@@ -41,6 +41,10 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
 & $py scripts\build_directmic.py
 if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
+# Its mic helper (soundboard\michelper.py): the admin part alone, frozen with the effect
+# DLL, so after the first admin prompt the app sets the effect up without asking.
+& $py scripts\build_michelper.py @cleanArg
+if ($LASTEXITCODE -ne 0) { throw "build_michelper.py failed" }
 # PyInstaller looks for the DLLs it bundles on PATH too, so a folder there with another
 # program's copy (an AI tool's ICU, an older C++ runtime) ends up in the app and Qt
 # can't start. Only Windows' own folders while it runs; vc_runtime.py below cleans up
@@ -57,6 +61,7 @@ try {
     --add-data "assets\radio;radio" `
     --add-data "assets\lang;lang" `
     --add-binary "build\directmic\obmic.dll;directmic" `
+    --add-data "build\michelper\obmichelper;michelper" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --collect-all curl_cffi --hidden-import yt_dlp.networking._curlcffi `
     --hidden-import scipy.fft --hidden-import scipy.ndimage `

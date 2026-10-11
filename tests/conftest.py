@@ -345,6 +345,14 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     monkeypatch.setattr(directmic, "_elevated", no_admin)
     monkeypatch.setattr(directmic, "installed_on", lambda: [])
     monkeypatch.setattr(directmic, "capture_endpoints", lambda: [])   # nor this PC's mics
+    # nor its mic helper (soundboard.michelper): no real Program Files, task or queue
+    from soundboard import michelper
+
+    def no_task(*_a, **_k):
+        raise AssertionError("a test tried to use Windows' Task Scheduler")
+    monkeypatch.setattr(michelper, "helper_dir", lambda: tmp_path / "guard" / "Helper")
+    monkeypatch.setattr(michelper, "queue_dir", lambda: tmp_path / "guard" / "MicHelper")
+    monkeypatch.setattr(michelper, "_schtasks", no_task)
     directmic.forget_status()
 
 
