@@ -26,14 +26,16 @@ entirely, so nightcore / slowed versions are a pure resample.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
 import logging
 import math
 
 import numpy as np
+import soxr
 
-from soundboard import eq, voicefx
-from soundboard.engine import SR, resample
+from soundboard import dsp, eq, voicefx
+from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
 
@@ -156,32 +158,108 @@ def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
     return x[a:b]
 
 
-# --------------------------------------------------------------------------- stretch
+# --------------------------------------------------------------------------- streaming
+#
+# A sound is rendered a piece at a time (CHUNK frames, ~2.7 s), every step carrying its
+# state from one piece to the next: the int16 to float conversion, the resample, the
+# stretch, the EQ, the effects, the boost and the clip. A two-hour sound used to be
+# converted to float32 whole (2.8 GB) and copied by each step; now only a few pieces
+# are in memory at once, and library.render_cached writes each one straight into the
+# cache file. Two things wait for the end: the effects' tail (the last TAIL_S is held
+# to be trimmed) and reverse, which needs the end first: library.render_cached
+# reverses the finished file on disk, render() the array.
+#
+# The result is what rendering the whole array at once gave, with one exception: the
+# EQ's filters keep their memory as float32 between pieces (as they do between the
+# mic's blocks), where one call over the whole sound kept it as float64. That moves a
+# sample by at most one int16 step (tests/test_soundfx.py checks it).
 
-def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
-            chunk: int = 64) -> np.ndarray:
-    """Make (n, 2) float32 audio `factor` times longer without changing its pitch.
+CHUNK = 64 * BLOCK    # frames per piece; a whole number of BLOCKs (the effects' grid)
 
-    Phase vocoder with identity phase locking (each bin keeps its phase relation
-    to the nearest spectral peak), which keeps it from sounding washed out. The
-    phase is taken from the mid (L+R) signal and shared by both channels, so the
-    stereo image doesn't smear. Frames are processed `chunk` at a time, and each
-    stretch of the overlap-add is written to the output as soon as no later frame
-    can reach it, so memory beyond the output itself stays bounded on long sounds."""
-    n = len(x)
-    if n == 0 or abs(factor - 1.0) < 1e-3:
-        return np.ascontiguousarray(x, dtype=F32)
+
+def _pieces(x: np.ndarray):
+    """(n, 2) int16 or float audio as float32 pieces (int16 scaled to [-1, 1])."""
+    chunk = CHUNK
+    for i in range(0, len(x), chunk):
+        y = x[i:i + chunk]
+        yield y.astype(F32) * F32(1 / 32767.0) if y.dtype == np.int16 else y.astype(F32)
+
+
+def _exactly(pieces, n: int):
+    """The pieces cut (or padded with silence) to n frames in all."""
+    left = n
+    for p in pieces:
+        if left <= 0:
+            return
+        if len(p) > left:
+            p = p[:left]
+        left -= len(p)
+        yield p
+    if left > 0:
+        yield np.zeros((left, 2), F32)
+
+
+def _rechunk(pieces, size: int):
+    """The same audio in pieces of exactly `size` frames (the last one shorter)."""
+    held: list[np.ndarray] = []
+    have = 0
+    for p in pieces:
+        held.append(p)
+        have += len(p)
+        if have < size:
+            continue
+        x = np.concatenate(held) if len(held) > 1 else held[0]
+        cut = have - have % size
+        for i in range(0, cut, size):
+            yield x[i:i + size]
+        held = [x[cut:]] if cut < have else []
+        have -= cut
+    if have:
+        yield np.concatenate(held) if len(held) > 1 else held[0]
+
+
+class _Window:
+    """A stream of pieces read as [pad zeros, x, pad zeros] (n frames of x), one range
+    at a time, never going back: what's before a range's start is dropped."""
+
+    def __init__(self, pieces, n: int, pad: int):
+        self._it = self._padded(pieces, n, np.zeros((pad, 2), F32))
+        self._buf = np.zeros((0, 2), F32)
+        self._at = 0           # padded position of _buf[0]
+
+    @staticmethod
+    def _padded(pieces, n, z):
+        yield z
+        yield from _exactly(pieces, n)
+        yield z
+
+    def get(self, a: int, b: int) -> np.ndarray:
+        if a > self._at:
+            self._buf = self._buf[a - self._at:]
+            self._at = a
+        held, end = [self._buf], self._at + len(self._buf)
+        while end < b:
+            p = next(self._it)
+            held.append(p)
+            end += len(p)
+        if len(held) > 1:
+            self._buf = np.concatenate(held)
+        return self._buf[:b - self._at]
+
+
+def _stretch(pieces, n: int, factor: float, n_fft: int = 2048, hop: int = 512,
+             chunk: int = 64):
+    """stretch() of the n frames the pieces hold, given out in pieces as they're done."""
     out_len = int(round(n * factor))
     ha = hop / factor                        # analysis hop (fractional)
     win = np.hanning(n_fft + 1)[:-1].astype(F32)
-    pad = np.zeros((n_fft, 2), F32)
-    xp = np.concatenate([pad, x.astype(F32, copy=False), pad])
+    src = _Window(pieces, n, n_fft)
     n_frames = int(np.ceil((n + n_fft) / ha)) + 1
-    starts = np.minimum(np.round(np.arange(n_frames) * ha).astype(np.int64), len(xp) - n_fft)
+    starts = np.minimum(np.round(np.arange(n_frames) * ha).astype(np.int64), n + n_fft)
     lead = int(round(n_fft * factor))         # the zero padding, stretched
-    res = np.zeros((out_len, 2), F32)
+    sent = 0
     # overlap-add accumulators for one chunk of frames plus the overlap it leaves;
-    # acc[0] is output-timeline position `base` (res[0] is `lead`)
+    # acc[0] is output-timeline position `base` (output frame 0 is `lead`)
     acc = np.zeros((chunk * hop + n_fft, 2), np.float64)
     wacc = np.zeros(chunk * hop + n_fft, np.float64)
     bins = np.arange(n_fft // 2 + 1)
@@ -194,7 +272,8 @@ def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
     for c0 in range(0, n_frames, chunk):
         st = starts[c0:c0 + chunk]
         k = len(st)
-        frames = xp[st[:, None] + idx]                     # (k, n_fft, 2)
+        span = src.get(int(st[0]), int(st[-1]) + n_fft)
+        frames = span[(st - st[0])[:, None] + idx]         # (k, n_fft, 2)
         spec = np.fft.rfft(frames * win[None, :, None], axis=1)
         mid = spec[..., 0] + spec[..., 1]
         ang = np.angle(mid)
@@ -232,70 +311,153 @@ def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
             acc[o:o + n_fft] += out[j]
             wacc[o:o + n_fft] += win2
         prev_ang, prev_phase, prev_start = ang[-1], phase[-1], st[-1]
-        # everything before the next frame's start is final: normalise and flush it
+        # everything before the next frame's start is final: normalise and give it out
         base = c0 * hop
         done = k * hop if c0 + k < n_frames else k * hop + n_fft
         w = wacc[:done]
         w[w < 1e-3] = 1.0
         a, b = max(base, lead), min(base + done, lead + out_len)
         if a < b:
-            res[a - lead:b - lead] = acc[a - base:b - base] / w[a - base:b - base, None]
+            yield (acc[a - base:b - base] / w[a - base:b - base, None]).astype(F32)
+            sent += b - a
         keep = len(acc) - done
         acc[:keep] = acc[done:].copy()
         acc[keep:] = 0.0
         wacc[:keep] = wacc[done:].copy()
         wacc[keep:] = 0.0
-    return res
+    if sent < out_len:
+        yield np.zeros((out_len - sent, 2), F32)
+
+
+def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
+            chunk: int = 64) -> np.ndarray:
+    """Make (n, 2) float32 audio `factor` times longer without changing its pitch.
+
+    Phase vocoder with identity phase locking (each bin keeps its phase relation
+    to the nearest spectral peak), which keeps it from sounding washed out. The
+    phase is taken from the mid (L+R) signal and shared by both channels, so the
+    stereo image doesn't smear. Frames are processed `chunk` at a time, and each
+    stretch of the overlap-add is given out as soon as no later frame can reach it
+    (_stretch), so memory beyond the output itself stays bounded on long sounds."""
+    n = len(x)
+    if n == 0 or abs(factor - 1.0) < 1e-3:
+        return np.ascontiguousarray(x, dtype=F32)
+    return np.concatenate(list(_stretch(_pieces(x), n, factor, n_fft, hop, chunk)))
+
+
+def _resampled(pieces, dst: int):
+    """engine.resample(x, SR, dst) of the pieces' audio, in pieces (the same samples:
+    soxr's stream gives exactly what its one-call resample does)."""
+    rs = soxr.ResampleStream(SR, dst, 2, dtype="float32", quality="VHQ")
+    for p in pieces:
+        y = rs.resample_chunk(np.ascontiguousarray(p), last=False)
+        if len(y):
+            yield y
+    y = rs.resample_chunk(np.zeros((0, 2), F32), last=True)
+    if len(y):
+        yield y
+
+
+def resampled_len(n: int, dst: int) -> int:
+    """How many frames soxr makes of n at SR resampled to dst (its own rounding)."""
+    return int(n * dst / SR + 0.5)
+
+
+def _speed_pitch(pieces, n: int, speed: float, semitones: float, tape: bool):
+    """(pieces, frames) of change_speed_pitch."""
+    ratio = 2.0 ** (semitones / 12.0) * (speed if tape else 1.0)   # pitch ratio
+    if abs(ratio - 1) >= 1e-4:
+        dst = int(round(SR / ratio))
+        if dst != SR and n:
+            pieces, n = _resampled(pieces, dst), resampled_len(n, dst)
+    # after the resample the sound is len/ratio long; it must end up len/speed long
+    factor = ratio / speed
+    if abs(factor - 1) >= 1e-3 and n:
+        pieces, n = _stretch(pieces, n, factor), int(round(n * factor))
+    return pieces, n
 
 
 def change_speed_pitch(x: np.ndarray, speed: float, semitones: float,
                        tape: bool = False) -> np.ndarray:
     """Speed and pitch at SR. With `tape`, speed also shifts the pitch (and
     `semitones` adds to that)."""
-    ratio = 2.0 ** (semitones / 12.0) * (speed if tape else 1.0)   # pitch ratio
-    y = x
-    if abs(ratio - 1) >= 1e-4:
-        y = resample(np.ascontiguousarray(x, dtype=F32), SR, int(round(SR / ratio)))
-    # after the resample the sound is len/ratio long; it must end up len/speed long
-    factor = ratio / speed
-    if abs(factor - 1) >= 1e-3:
-        y = stretch(y, factor)
-    return y
+    pieces, _n = _speed_pitch(_pieces(x), len(x), speed, semitones, tape)
+    parts = list(pieces)
+    return np.concatenate(parts) if parts else np.zeros((0, 2), F32)
 
 
 # --------------------------------------------------------------------------- render
 
-def _run_effects(x: np.ndarray, fx: dict) -> np.ndarray:
+class _Broken(Exception):
+    """A voice effect failed on one channel: render again without it there."""
+
+    def __init__(self, kind: str, chan: int):
+        super().__init__(kind, chan)
+        self.kind, self.chan = kind, chan
+
+
+def _effects(pieces, fx: dict, skip: set):
+    """The active voice effects over the pieces, then TAIL_S more for their tails,
+    trimmed back to where it falls silent. Raises _Broken when one fails (the caller
+    starts over with it in `skip`): what was already given out can't be taken back."""
     types = _active_effects(fx)
     if not types:
-        return x
-    x = np.concatenate([x, np.zeros((int(TAIL_S * SR), 2), F32)])
+        yield from pieces
+        return
+    chain = []
     for t in types:
         cls = voicefx.REGISTRY[t]
-        cfg = fx["effects"][t]
-        chans = []
+        inst = []
         for c in range(2):          # voice effects are mono: one instance per channel
-            src = np.ascontiguousarray(x[:, c])
-            parts = []
-            try:
-                e = cls(SR, cfg)
-            except Exception:  # noqa: BLE001 - a module effect that can't even start
-                log.exception("sound effect %r failed to start; skipped", t)
-                chans.append(src)
-                continue
-            for i in range(0, len(src), BLOCK):
-                blk = src[i:i + BLOCK]
+            e = None
+            if (t, c) not in skip:
                 try:
-                    yb = np.asarray(e.run(blk, SR), dtype=F32)
-                    if yb.shape != blk.shape or not np.all(np.isfinite(yb)):
-                        raise ValueError(f"returned {yb.shape} / non-finite audio")
-                except Exception:  # noqa: BLE001 - a broken module effect is skipped
-                    log.exception("sound effect %r failed; skipped", t)
-                    parts = None
-                    break
-                parts.append(yb)
-            chans.append(np.concatenate(parts) if parts is not None else src)
-        x = np.stack(chans, 1)
+                    e = cls(SR, fx["effects"][t])
+                except Exception:  # noqa: BLE001 - a module effect that can't even start
+                    log.exception("sound effect %r failed to start; skipped", t)
+            inst.append(e)
+        chain.append((t, inst))
+    length = [0, None]               # frames of the sound so far, its length once known
+
+    def counted():
+        for p in pieces:
+            length[0] += len(p)
+            yield p
+        length[1] = length[0]
+
+    tail_n = int(TAIL_S * SR)
+    at = 0
+    tail = []
+    for x in _rechunk(itertools.chain(counted(), [np.zeros((tail_n, 2), F32)]), CHUNK):
+        for t, inst in chain:
+            chans = []
+            for c, e in enumerate(inst):
+                col = np.ascontiguousarray(x[:, c])
+                if e is None:
+                    chans.append(col)
+                    continue
+                parts = []
+                for i in range(0, len(col), BLOCK):
+                    blk = col[i:i + BLOCK]
+                    try:
+                        yb = np.asarray(e.run(blk, SR), dtype=F32)
+                        if yb.shape != blk.shape or not np.all(np.isfinite(yb)):
+                            raise ValueError(f"returned {yb.shape} / non-finite audio")
+                    except Exception:  # noqa: BLE001 - a broken module effect is skipped
+                        log.exception("sound effect %r failed; skipped", t)
+                        raise _Broken(t, c) from None
+                    parts.append(yb)
+                chans.append(np.concatenate(parts))
+            x = np.stack(chans, 1)
+        # the sound itself goes on; what's past its end is the tail, held to be trimmed
+        end = length[1]
+        main = len(x) if end is None else max(0, min(len(x), end - at))
+        if main:
+            yield x[:main]
+        if main < len(x):
+            tail.append(x[main:])
+        at += len(x)
+    x = np.concatenate(tail) if tail else np.zeros((0, 2), F32)
     # trim the tail back to where it falls silent: below 1e-3, or to the level the
     # effects settle at once the sound is over (the Radio's static never stops, and
     # would otherwise keep the whole TAIL_S pad). Decaying tails end well below
@@ -304,32 +466,61 @@ def _run_effects(x: np.ndarray, fx: dict) -> np.ndarray:
     floor = float(lvl[-int(0.25 * SR):].max()) if len(lvl) else 0.0
     thr = max(1e-3, 2.0 * floor)
     loud = np.flatnonzero(lvl > thr)
-    end = max(int(loud[-1]) + 1 if len(loud) else 0, len(x) - int(TAIL_S * SR))
+    end = int(loud[-1]) + 1 if len(loud) else 0
     if thr > 1e-3 and end < len(x):   # cut into a noise bed: fade it out, no click
         k = min(int(0.02 * SR), len(x) - end)
         x[end:end + k] *= np.linspace(1, 0, k, dtype=F32)[:, None]
         end += k
-    return np.ascontiguousarray(x[:end])
+    if end:
+        yield x[:end]
+
+
+def _render_pieces(data: np.ndarray, f: dict, skip: set):
+    """The rendered sound in float32 pieces, clipped, not reversed (f: cleaned)."""
+    x = trim(data, f)
+    pieces, _n = _speed_pitch(_pieces(x), len(x), f["speed"], f["pitch"], f["tape"])
+    sos = eq.design(f["eq"], SR)
+    if sos is not None:
+        e = dsp.SosRun(sos)
+        pieces = (e.run(p) for p in pieces)
+    pieces = _effects(pieces, f, skip)
+    g = F32(10 ** (f["gain_db"] / 20)) if abs(f["gain_db"]) >= 1e-3 else None
+    for p in pieces:
+        yield np.clip(p * g if g is not None else p, -1.0, 1.0)
+
+
+def render_into(data: np.ndarray, fx: dict | None, start, put) -> None:
+    """Render a sound piece by piece: start() before the first piece (and again, to
+    begin from scratch, if a voice effect fails partway and is left out), then
+    put(piece) for each (m, 2) float32 piece, clipped to [-1, 1]. Reverse is left to
+    the caller: it needs the end first."""
+    f = clean(fx)
+    skip: set = set()
+    while True:
+        start()
+        try:
+            for p in _render_pieces(data, f, skip):
+                put(p)
+            return
+        except _Broken as b:
+            skip.add((b.kind, b.chan))
 
 
 def render(data: np.ndarray, fx: dict | None) -> np.ndarray:
     """The sound with its effects applied: (n, 2) int16 or float32 at SR in,
     (m, 2) float32 at SR out, clipped to [-1, 1]. Slow for long sounds (the
-    stretch): call it off the UI thread."""
+    stretch): call it off the UI thread. All of it is in memory: a long sound's
+    render goes straight into its cache file instead (library.render_cached)."""
     f = clean(fx)
-    x = trim(data, f)
-    x = x.astype(F32) * F32(1 / 32767.0) if x.dtype == np.int16 else x.astype(F32)
     if is_neutral(f):
-        return x
-    x = change_speed_pitch(x, f["speed"], f["pitch"], f["tape"])
-    if eq.design(f["eq"], SR) is not None:
-        x = eq.EQ(SR).process(np.ascontiguousarray(x), f["eq"])
-    x = _run_effects(x, f)
-    if abs(f["gain_db"]) >= 1e-3:
-        x = x * F32(10 ** (f["gain_db"] / 20))
+        x = trim(data, f)
+        return x.astype(F32) * F32(1 / 32767.0) if x.dtype == np.int16 else x.astype(F32)
+    parts: list[np.ndarray] = []
+    render_into(data, f, parts.clear, parts.append)
+    x = np.concatenate(parts) if parts else np.zeros((0, 2), F32)
     if f["reverse"]:
         x = x[::-1]
-    return np.ascontiguousarray(np.clip(x, -1.0, 1.0, out=x), dtype=F32)   # x is ours
+    return np.ascontiguousarray(x, dtype=F32)
 
 
 # --------------------------------------------------------------------------- presets

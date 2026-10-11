@@ -5679,7 +5679,9 @@ class MainWindow(QMainWindow):
 
         def run():
             try:
-                out = soundfx.render(load_original(m), fx)
+                # into the cache file for these effects: a long sound is never all in
+                # memory, and saving them afterwards finds it rendered
+                out = library.render_cached(m.id, load_original(m), fx)
             except Exception:  # noqa: BLE001
                 log.exception("effects preview failed")
                 out = None
