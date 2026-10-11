@@ -958,6 +958,11 @@ class SearchResults(RoundedFrame):
         return next((r.thumb._pm for r in self._rows
                      if r.result.url == url and r.thumb.has_picture()), None)
 
+    def meta_for(self, url: str) -> tuple[str, float]:
+        """The uploader and length of `url`'s card, if it has one (for the download bar)."""
+        r = next((r.result for r in self._rows if r.result.url == url), None)
+        return (r.channel, r.seconds) if r else ("", 0.0)
+
     def progress(self, url: str, frac):
         """The link bar's download of `url`: 0..1, 'parsing', or below 0 / 'processing'."""
         for r in self._rows:

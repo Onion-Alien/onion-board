@@ -247,6 +247,16 @@ class LinkBar(QFrame):
             for q in gone:
                 self.done.emit(url, q["kind"], False)
 
+    def cancel_all(self):
+        """The download bar's Stop all: the running download and every pick waiting."""
+        gone, self._queue_list = self._queue_list, []
+        if gone:
+            self.queue_updated.emit([])
+            for q in gone:
+                self.done.emit(q["url"], q["kind"], False)
+        if self._busy:
+            self._drop_running()
+
     def _drop_running(self):
         """Stop waiting for the running download: its worker finishes on its own and
         whatever it sends is dropped (_on_msg). Its rows stop waiting too."""

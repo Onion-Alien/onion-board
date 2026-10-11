@@ -1013,14 +1013,19 @@ class MainWindow(QMainWindow):
         self.linkbar.queue_updated.connect(self.mini_download_bar.set_queue)
         self.download_bar.cancel_requested.connect(self.linkbar.cancel)
         self.mini_download_bar.cancel_requested.connect(self.linkbar.cancel)
+        self.download_bar.stop_all_requested.connect(self.linkbar.cancel_all)
+        self.mini_download_bar.stop_all_requested.connect(self.linkbar.cancel_all)
+        for b in (self.download_bar, self.mini_download_bar):
+            b.thumb_lookup = self.ytresults.thumb_for
         self.linkbar.queued.connect(self.ytresults.queued)
         self.ytresults.thumb_ready.connect(self.download_bar.set_thumb)
         self.ytresults.thumb_ready.connect(self.mini_download_bar.set_thumb)
 
     def _on_download_started(self, url: str, title: str, kind: str, secs: float = 0.0):
         pm = self.ytresults.thumb_for(url)
-        self.download_bar.set_active(url, title, kind, pm)
-        self.mini_download_bar.set_active(url, title, kind, pm)
+        channel, card_secs = self.ytresults.meta_for(url)
+        self.download_bar.set_active(url, title, kind, pm, channel, secs or card_secs)
+        self.mini_download_bar.set_active(url, title, kind, pm, channel, secs or card_secs)
 
     def _build_mini(self) -> QWidget:
         """The mini player: what's playing, play / stop, where it's at, Live and Stop

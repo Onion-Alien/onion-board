@@ -4,3 +4,6 @@
 - Search cards stay clickable while one downloads: a new Play replaces the one still
   loading, and Add waits its turn (up to 3 waiting).
 - Videos up to 2 hours long can be added or played (was 15 minutes).
+- A link with no picture shows Bun writing the music down on a little scroll while it
+  downloads: the opening of a well-known piece (Fur Elise, Canon in D, Twinkle twinkle
+  and 26 more) as real sheet music, as much of it as has downloaded.
