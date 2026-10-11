@@ -78,7 +78,8 @@ def listen_for_second_launch(app, get_window) -> QLocalServer:
         if w is None:   # still starting up: app.main() shows it once it exists
             server.show_requested = True
         else:
-            w.setWindowState((w.windowState() & ~Qt.WindowMinimized) | Qt.WindowActive)
+            w.setWindowState((w.windowState() & ~Qt.WindowState.WindowMinimized)
+                             | Qt.WindowState.WindowActive)
             w.show()
             w.raise_()
             w.activateWindow()
