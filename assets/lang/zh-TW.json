@@ -3080,5 +3080,15 @@
   "Not configured": "未設定",
   "Not configured: click to fix": "未設定：點擊修復",
   "Can't send to {device}, click to fix": "無法傳送到 {device}，點擊修復",
+  "A second mic to pick in Discord or the game.": "在 Discord 或遊戲裡選擇的第二個麥克風。",
+  "Discord and games won't hear your sounds": "Discord 和遊戲聽不到你的音效",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "免費。開啟設置並安裝，然後在 Discord 或遊戲裡把它選為麥克風。",
+  "Install a virtual cable": "安裝虛擬音源線",
+  "Keep it": "保留",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "是給 OBS、Voicemeeter 或混音器用的？那就保留。",
+  "Straight into the mic you already use. Nothing to install.": "直接送進你正在用的麥克風。不必安裝。",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "音效現在送往 <b>{device}</b>，這是一般的喇叭或耳機，只有你自己聽得到。選一種能傳到語音聊天的方式：",
+  "Use my mic": "用我的麥克風",
+  "Use the virtual cable": "用虛擬音源線",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "每個聲音一加入就會出現。關閉這裡不會停止。"
 }

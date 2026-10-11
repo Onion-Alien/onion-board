@@ -3226,5 +3226,15 @@
   "Not configured": "Neconfigurat",
   "Not configured: click to fix": "Neconfigurat: dă clic pentru a repara",
   "Can't send to {device}, click to fix": "Nu se poate trimite la {device}, dă clic pentru a repara",
+  "A second mic to pick in Discord or the game.": "Un al doilea microfon pe care îl alegi în Discord sau în joc.",
+  "Discord and games won't hear your sounds": "Discord și jocurile nu îți vor auzi sunetele",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Gratuit. Deschide Configurare și îl instalează, apoi îl alegi ca microfon în Discord sau în joc.",
+  "Install a virtual cable": "Instalează un cablu virtual",
+  "Keep it": "Păstrează",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "E pentru OBS, Voicemeeter sau un mixer? Păstrează-l.",
+  "Straight into the mic you already use. Nothing to install.": "Direct în microfonul pe care îl folosești deja. Nimic de instalat.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Acum merg la <b>{device}</b>, niște boxe sau căști obișnuite, deci doar tu le auzi. Alege o cale care ajunge în chatul vocal:",
+  "Use my mic": "Folosește microfonul meu",
+  "Use the virtual cable": "Folosește cablul virtual",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Fiecare sunet apare imediat ce e adăugat. Închiderea nu îl oprește."
 }

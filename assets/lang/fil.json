@@ -3153,5 +3153,15 @@
   "Not configured": "Hindi naka-set up",
   "Not configured: click to fix": "Hindi naka-set up: i-click para ayusin",
   "Can't send to {device}, click to fix": "Hindi makapagpadala sa {device}, i-click para ayusin",
+  "A second mic to pick in Discord or the game.": "Pangalawang mic na pipiliin mo sa Discord o sa laro.",
+  "Discord and games won't hear your sounds": "Hindi maririnig ng Discord at mga laro ang mga tunog mo",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Libre. Bubuksan ang Setup at ii-install ito, tapos pipiliin mo ito bilang mic sa Discord o sa laro.",
+  "Install a virtual cable": "Mag-install ng virtual cable",
+  "Keep it": "Itago ito",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "Para ba ito sa OBS, Voicemeeter o mixer? Itago ito.",
+  "Straight into the mic you already use. Nothing to install.": "Diretso sa mic na gamit mo na. Walang kailangang i-install.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Napupunta na sila sa <b>{device}</b>, isang normal na speaker o headset, kaya ikaw lang ang nakakarinig. Pumili ng paraang aabot sa voice chat:",
+  "Use my mic": "Gamitin ang mic ko",
+  "Use the virtual cable": "Gamitin ang virtual cable",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Lumalabas ang bawat tunog pagkapasok nito. Hindi ito titigil kapag isinara mo ito."
 }

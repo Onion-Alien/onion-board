@@ -125,6 +125,30 @@ jobs:
       - name: CODE.md lists every module
         run: python scripts/check_code_doc.py
 
+  # pyright over the whole repo: errors not in scripts/pyright_baseline.json fail
+  # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no
+  # Windows-only APIs (QImage.fromHICON), so pyright there flags code that's fine.
+  # Same venv cache as the Windows test jobs.
+  types:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        id: py
+        with:
+          python-version: "3.13"
+      - uses: actions/cache@v6
+        id: venv
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+      - if: steps.venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
+      - run: .venv\Scripts\python scripts/check_types.py --all
+
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
   # most of the suite) in four jobs side by side, about a quarter of the wait.
   windows:
@@ -197,21 +221,25 @@ jobs:
           retention-days: 14
 
   # One check named `test` whatever the split: passed when every Windows job did, or
-  # when the change needs no tests; failed when ruff or the pick did, so it can't pass
-  # over a lint error.
+  # when the change needs no tests; failed when ruff, the pick or the type check did,
+  # so it can't pass over a lint or type error.
   test:
-    needs: [pick, windows]
+    needs: [pick, windows, types]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - env:
           PICK: ${{ needs.pick.result }}
           WINDOWS: ${{ needs.windows.result }}
+          TYPES: ${{ needs.types.result }}
           MATRIX: ${{ needs.pick.outputs.matrix }}
         run: |
-          echo "pick: $PICK, Windows jobs: $WINDOWS ($MATRIX)"
+          echo "pick: $PICK, types: $TYPES, Windows jobs: $WINDOWS ($MATRIX)"
           if [ "$PICK" != success ]; then
             echo "ruff or the test pick failed: see the pick job"; exit 1
+          fi
+          if [ "$TYPES" != success ]; then
+            echo "new type errors: see the types job (scripts/check_types.py)"; exit 1
           fi
           if [ "$MATRIX" != "[]" ] && [ "$WINDOWS" != success ]; then
             echo "a Windows test job didn't pass"; exit 1

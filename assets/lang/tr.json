@@ -3153,5 +3153,15 @@
   "Not configured": "Ayarlanmadı",
   "Not configured: click to fix": "Ayarlanmadı: düzeltmek için tıkla",
   "Can't send to {device}, click to fix": "{device} cihazına gönderilemiyor, düzeltmek için tıkla",
+  "A second mic to pick in Discord or the game.": "Discord'da veya oyunda seçeceğin ikinci bir mikrofon.",
+  "Discord and games won't hear your sounds": "Discord ve oyunlar seslerini duymayacak",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Ücretsiz. Kurulum sekmesini açar ve kurar, sonra onu Discord'da veya oyunda mikrofon olarak seçersin.",
+  "Install a virtual cable": "Sanal kablo kur",
+  "Keep it": "Böyle kalsın",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "OBS, Voicemeeter ya da mikser için mi? Böyle kalsın.",
+  "Straight into the mic you already use. Nothing to install.": "Zaten kullandığın mikrofona doğrudan. Kurulacak bir şey yok.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Sesler artık <b>{device}</b> cihazına gidiyor; bu normal bir hoparlör ya da kulaklık, yani onları sadece sen duyuyorsun. Sesli sohbete ulaşan bir yol seç:",
+  "Use my mic": "Mikrofonumu kullan",
+  "Use the virtual cable": "Sanal kabloyu kullan",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Her ses eklenir eklenmez görünür. Bunu kapatmak durdurmaz."
 }

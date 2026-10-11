@@ -3153,5 +3153,15 @@
   "Not configured": "Nincs beállítva",
   "Not configured: click to fix": "Nincs beállítva: kattints a javításhoz",
   "Can't send to {device}, click to fix": "Nem lehet küldeni ide: {device}, kattints a javításhoz",
+  "A second mic to pick in Discord or the game.": "Egy második mikrofon, amit a Discordban vagy a játékban választasz ki.",
+  "Discord and games won't hear your sounds": "A Discord és a játékok nem hallják a hangjaidat",
+  "Free. Opens Setup and installs it, then you pick it as the mic in Discord or the game.": "Ingyenes. Megnyitja a(z) Beüzemelés lapot és telepíti, aztán kiválasztod mikrofonként a Discordban vagy a játékban.",
+  "Install a virtual cable": "Virtuális kábel telepítése",
+  "Keep it": "Maradjon így",
+  "Meant for OBS, Voicemeeter or a mixer? Keep it.": "OBS-hez, Voicemeeterhez vagy keverőhöz kell? Maradjon így.",
+  "Straight into the mic you already use. Nothing to install.": "Egyenesen abba a mikrofonba, amit már használsz. Nincs mit telepíteni.",
+  "They now go to <b>{device}</b>, a normal speaker or headset, so only you hear them. Pick a way that reaches voice chat:": "Most ide mennek: <b>{device}</b>, ami egy sima hangszóró vagy headset, így csak te hallod őket. Válassz egy módot, ami eljut a hangcsevegésbe:",
+  "Use my mic": "Saját mikrofon használata",
+  "Use the virtual cable": "Virtuális kábel használata",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Minden hang megjelenik, amint bekerült. A bezárás nem állítja le."
 }
