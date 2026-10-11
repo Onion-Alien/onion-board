@@ -2908,12 +2908,10 @@
   "+{count} queued": [
     "+{count} 个排队中"
   ],
-  "Add as sound": "添加为声音",
   "Cancel download": "取消下载",
   "Couldn't download": "无法下载",
   "Parsing video…": "正在解析视频…",
   "Parsing…": "正在解析…",
-  "Play once": "播放一次",
   "Queue is full": "队列已满",
   "Queued": "排队中",
   "Queued: waiting for current download to finish…": "排队中: 正在等待当前下载完成…",
@@ -3092,6 +3090,12 @@
   "Use the virtual cable": "用虚拟音频线",
   "Plays from: {path}": "播放自：{path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "每个声音一加入就会出现。关闭这里不会停止。",
+  "Adding to sounds": "正在添加到声音",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "准备好后会成为你声音板上的新声音。不用按任何东西。",
+  "Playing once": "播放一次",
+  "Plays once when it's ready. It isn't added to your sounds.": "准备好后播放一次。不会添加到你的声音里。",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "在前面的之后成为你声音板上的新声音。不用按任何东西。",
+  "Waiting to add": "等待添加",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} 是 Windows 自己保留的键，不能用作热键。请换一个键。</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的键，不能用作热键。请换一个键。</span>"
 }

@@ -2908,12 +2908,10 @@
   "+{count} queued": [
     "+{count} đang chờ"
   ],
-  "Add as sound": "Thêm làm âm thanh",
   "Cancel download": "Hủy tải xuống",
   "Couldn't download": "Không tải được",
   "Parsing video…": "Đang đọc video…",
   "Parsing…": "Đang đọc…",
-  "Play once": "Phát một lần",
   "Queue is full": "Hàng chờ đã đầy",
   "Queued": "Đang chờ",
   "Queued: waiting for current download to finish…": "Đang chờ: đợi lượt tải hiện tại xong…",
@@ -3092,6 +3090,12 @@
   "Use the virtual cable": "Dùng cáp ảo",
   "Plays from: {path}": "Phát từ: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Mỗi âm thanh hiện ra ngay khi được thêm. Đóng cái này không làm nó dừng.",
+  "Adding to sounds": "Đang thêm vào âm thanh",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Sẽ thành âm thanh mới trên bảng của bạn khi xong. Không cần bấm gì.",
+  "Playing once": "Phát một lần",
+  "Plays once when it's ready. It isn't added to your sounds.": "Phát một lần khi xong. Không được thêm vào âm thanh của bạn.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Sẽ thành âm thanh mới trên bảng của bạn sau các mục trước. Không cần bấm gì.",
+  "Waiting to add": "Đang chờ thêm",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows giữ {keys} cho riêng nó, nên không thể làm phím tắt. Hãy chọn phím khác.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows giữ <b>{key}</b> cho riêng nó, nên không thể làm phím tắt. Hãy chọn phím khác.</span>"
 }

@@ -2908,12 +2908,10 @@
   "+{count} queued": [
     "+{count} dalam baris gilir"
   ],
-  "Add as sound": "Tambah sebagai bunyi",
   "Cancel download": "Batalkan muat turun",
   "Couldn't download": "Tidak dapat memuat turun",
   "Parsing video…": "Membaca video…",
   "Parsing…": "Membaca…",
-  "Play once": "Main sekali",
   "Queue is full": "Baris gilir penuh",
   "Queued": "Dalam baris gilir",
   "Queued: waiting for current download to finish…": "Dalam baris gilir: menunggu muat turun semasa selesai…",
@@ -3092,6 +3090,12 @@
   "Use the virtual cable": "Guna kabel maya",
   "Plays from: {path}": "Dimainkan dari: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Setiap bunyi muncul sebaik sahaja masuk. Menutup ini tidak menghentikannya.",
+  "Adding to sounds": "Menambah ke bunyi",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Menjadi bunyi baharu di board anda apabila siap. Tiada apa perlu ditekan.",
+  "Playing once": "Dimainkan sekali",
+  "Plays once when it's ready. It isn't added to your sounds.": "Dimainkan sekali apabila siap. Tidak ditambah ke bunyi anda.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Menjadi bunyi baharu di board anda selepas yang sebelumnya. Tiada apa perlu ditekan.",
+  "Waiting to add": "Menunggu untuk ditambah",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows menyimpan {keys} untuk dirinya sendiri, jadi ia tidak boleh jadi hotkey. Pilih kekunci lain.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows menyimpan <b>{key}</b> untuk dirinya sendiri, jadi ia tidak boleh jadi hotkey. Pilih kekunci lain.</span>"
 }

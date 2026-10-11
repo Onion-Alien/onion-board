@@ -2972,12 +2972,10 @@
     "+{count} en cola",
     "+{count} en cola"
   ],
-  "Add as sound": "Agregar como sonido",
   "Cancel download": "Cancelar descarga",
   "Couldn't download": "No se pudo descargar",
   "Parsing video…": "Analizando video…",
   "Parsing…": "Analizando…",
-  "Play once": "Reproducir una vez",
   "Queue is full": "La fila está llena",
   "Queued": "En cola",
   "Queued: waiting for current download to finish…": "En cola: esperando a que termine la descarga actual…",
@@ -3165,6 +3163,12 @@
   "Use the virtual cable": "Usar el cable virtual",
   "Plays from: {path}": "Se reproduce desde: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Cada sonido aparece en cuanto entra. Cerrar esto no lo detiene.",
+  "Adding to sounds": "Agregando a sonidos",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Se vuelve un sonido nuevo en tu tablero cuando esté listo. No tienes que presionar nada.",
+  "Playing once": "Se reproduce una vez",
+  "Plays once when it's ready. It isn't added to your sounds.": "Se reproduce una vez cuando esté listo. No se agrega a tus sonidos.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Se vuelve un sonido nuevo en tu tablero después de los anteriores. No tienes que presionar nada.",
+  "Waiting to add": "Esperando para agregar",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows se guarda {keys} para sí mismo, así que no puede ser un atajo. Elige otra tecla.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows se guarda <b>{key}</b> para sí mismo, así que no puede ser un atajo. Elige otra tecla.</span>"
 }

@@ -2972,12 +2972,10 @@
     "+{count} σε αναμονή",
     "+{count} σε αναμονή"
   ],
-  "Add as sound": "Προσθήκη ως ήχος",
   "Cancel download": "Ακύρωση λήψης",
   "Couldn't download": "Η λήψη απέτυχε",
   "Parsing video…": "Ανάγνωση βίντεο…",
   "Parsing…": "Ανάγνωση…",
-  "Play once": "Αναπαραγωγή μία φορά",
   "Queue is full": "Η ουρά είναι γεμάτη",
   "Queued": "Σε αναμονή",
   "Queued: waiting for current download to finish…": "Σε αναμονή: περιμένει να τελειώσει η τρέχουσα λήψη…",
@@ -3165,6 +3163,12 @@
   "Use the virtual cable": "Χρήση του εικονικού καλωδίου",
   "Plays from: {path}": "Παίζει από: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Κάθε ήχος εμφανίζεται μόλις μπει. Το κλείσιμο δεν το σταματά.",
+  "Adding to sounds": "Προστίθεται στους ήχους",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Γίνεται νέος ήχος στο board σου μόλις είναι έτοιμος. Δεν χρειάζεται να πατήσεις τίποτα.",
+  "Playing once": "Παίζει μία φορά",
+  "Plays once when it's ready. It isn't added to your sounds.": "Παίζει μία φορά μόλις είναι έτοιμος. Δεν προστίθεται στους ήχους σου.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Γίνεται νέος ήχος στο board σου μετά από τους προηγούμενους. Δεν χρειάζεται να πατήσεις τίποτα.",
+  "Waiting to add": "Περιμένει να προστεθεί",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Τα Windows κρατούν το {keys} για τον εαυτό τους, οπότε δεν μπορεί να γίνει πλήκτρο συντόμευσης. Διάλεξε άλλο πλήκτρο.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Τα Windows κρατούν το <b>{key}</b> για τον εαυτό τους, οπότε δεν μπορεί να γίνει πλήκτρο συντόμευσης. Διάλεξε άλλο πλήκτρο.</span>"
 }

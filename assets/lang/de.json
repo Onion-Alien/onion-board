@@ -2972,12 +2972,10 @@
     "+{count} wartet",
     "+{count} warten"
   ],
-  "Add as sound": "Als Sound hinzufügen",
   "Cancel download": "Download abbrechen",
   "Couldn't download": "Konnte nicht heruntergeladen werden",
   "Parsing video…": "Video wird analysiert…",
   "Parsing…": "Wird analysiert…",
-  "Play once": "Einmal abspielen",
   "Queue is full": "Warteschlange ist voll",
   "Queued": "In Warteschlange",
   "Queued: waiting for current download to finish…": "In Warteschlange: Warten auf Abschluss des aktuellen Downloads…",
@@ -3165,6 +3163,12 @@
   "Use the virtual cable": "Virtuelles Kabel nehmen",
   "Plays from: {path}": "Wird abgespielt aus: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Jeder Sound erscheint, sobald er drin ist. Schließen hält es nicht an.",
+  "Adding to sounds": "Wird zu Sounds hinzugefügt",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Wird ein neuer Sound auf deinem Board, sobald er fertig ist. Du musst nichts drücken.",
+  "Playing once": "Wird einmal abgespielt",
+  "Plays once when it's ready. It isn't added to your sounds.": "Wird einmal abgespielt, sobald er fertig ist. Er wird nicht zu deinen Sounds hinzugefügt.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Wird nach den vorherigen ein neuer Sound auf deinem Board. Du musst nichts drücken.",
+  "Waiting to add": "Wartet aufs Hinzufügen",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows behält {keys} für sich, das kann kein Hotkey sein. Wähl eine andere Taste.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows behält <b>{key}</b> für sich, das kann kein Hotkey sein. Wähl eine andere Taste.</span>"
 }

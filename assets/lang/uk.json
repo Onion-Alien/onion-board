@@ -3036,12 +3036,10 @@
     "+{count} у черзі",
     "+{count} у черзі"
   ],
-  "Add as sound": "Додати як звук",
   "Cancel download": "Скасувати завантаження",
   "Couldn't download": "Не вдалося завантажити",
   "Parsing video…": "Читаємо відео…",
   "Parsing…": "Читаємо…",
-  "Play once": "Відтворити раз",
   "Queue is full": "Черга заповнена",
   "Queued": "У черзі",
   "Queued: waiting for current download to finish…": "У черзі: чекає, поки завершиться поточне завантаження…",
@@ -3238,6 +3236,12 @@
   "Use the virtual cable": "Віртуальний кабель",
   "Plays from: {path}": "Грає з: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Кожен звук з'являється, щойно доданий. Якщо закрити, це не зупиниться.",
+  "Adding to sounds": "Додається до звуків",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Стане новим звуком на твоїй панелі, коли буде готовий. Нічого натискати не треба.",
+  "Playing once": "Грає один раз",
+  "Plays once when it's ready. It isn't added to your sounds.": "Зіграє один раз, коли буде готовий. До твоїх звуків не додається.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Стане новим звуком на твоїй панелі після попередніх. Нічого натискати не треба.",
+  "Waiting to add": "Чекає на додавання",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows залишає {keys} собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows залишає <b>{key}</b> собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>"
 }

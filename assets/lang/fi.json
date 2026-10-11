@@ -2972,12 +2972,10 @@
     "+{count} jonossa",
     "+{count} jonossa"
   ],
-  "Add as sound": "Lisää äänenä",
   "Cancel download": "Peruuta lataus",
   "Couldn't download": "Lataus epäonnistui",
   "Parsing video…": "Luetaan videota…",
   "Parsing…": "Luetaan…",
-  "Play once": "Toista kerran",
   "Queue is full": "Jono on täynnä",
   "Queued": "Jonossa",
   "Queued: waiting for current download to finish…": "Jonossa: odottaa nykyisen latauksen valmistumista…",
@@ -3165,6 +3163,12 @@
   "Use the virtual cable": "Käytä virtuaalikaapelia",
   "Plays from: {path}": "Soitetaan tiedostosta: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Jokainen ääni näkyy heti, kun se on lisätty. Sulkeminen ei pysäytä sitä.",
+  "Adding to sounds": "Lisätään ääniin",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Siitä tulee uusi ääni boardillesi, kun se on valmis. Mitään ei tarvitse painaa.",
+  "Playing once": "Toistetaan kerran",
+  "Plays once when it's ready. It isn't added to your sounds.": "Toistetaan kerran, kun se on valmis. Sitä ei lisätä ääniisi.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Siitä tulee uusi ääni boardillesi edellisten jälkeen. Mitään ei tarvitse painaa.",
+  "Waiting to add": "Odottaa lisäystä",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows pitää {keys}-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows pitää <b>{key}</b>-näppäimen itsellään, joten se ei voi olla pikanäppäin. Valitse toinen näppäin.</span>"
 }

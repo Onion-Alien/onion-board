@@ -2972,12 +2972,10 @@
     "+{count} на опашка",
     "+{count} на опашка"
   ],
-  "Add as sound": "Добави като звук",
   "Cancel download": "Отказ от изтеглянето",
   "Couldn't download": "Не можа да се изтегли",
   "Parsing video…": "Видеото се чете…",
   "Parsing…": "Чете се…",
-  "Play once": "Пусни веднъж",
   "Queue is full": "Опашката е пълна",
   "Queued": "На опашка",
   "Queued: waiting for current download to finish…": "На опашка: чака текущото изтегляне да свърши…",
@@ -3165,6 +3163,12 @@
   "Use the virtual cable": "Използвай виртуалния кабел",
   "Plays from: {path}": "Пуска се от: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Всеки звук се появява веднага щом е добавен. Затварянето не го спира.",
+  "Adding to sounds": "Добавя се към звуците",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Става нов звук на дъската ти, когато е готов. Не трябва да натискаш нищо.",
+  "Playing once": "Пуска се веднъж",
+  "Plays once when it's ready. It isn't added to your sounds.": "Пуска се веднъж, когато е готов. Не се добавя към звуците ти.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Става нов звук на дъската ти след тези преди него. Не трябва да натискаш нищо.",
+  "Waiting to add": "Чака да се добави",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows пази {keys} за себе си, така че не може да е бърз клавиш. Избери друг клавиш.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows пази <b>{key}</b> за себе си, така че не може да е бърз клавиш. Избери друг клавиш.</span>"
 }

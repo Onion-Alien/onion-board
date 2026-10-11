@@ -3228,12 +3228,10 @@
     "+{count} في الانتظار",
     "+{count} في الانتظار"
   ],
-  "Add as sound": "أضف كصوت",
   "Cancel download": "إلغاء التنزيل",
   "Couldn't download": "تعذّر التنزيل",
   "Parsing video…": "جارٍ قراءة الفيديو…",
   "Parsing…": "جارٍ القراءة…",
-  "Play once": "تشغيل مرة واحدة",
   "Queue is full": "قائمة الانتظار ممتلئة",
   "Queued": "في الانتظار",
   "Queued: waiting for current download to finish…": "في الانتظار: حتى ينتهي التنزيل الحالي…",
@@ -3457,6 +3455,12 @@
   "Use the virtual cable": "استخدم الكابل الافتراضي",
   "Plays from: {path}": "يُشغَّل من: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "يظهر كل صوت فور إضافته. إغلاق هذا لا يوقفه.",
+  "Adding to sounds": "تتم الإضافة إلى الأصوات",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "يصبح صوتًا جديدًا في لوحتك عندما يجهز. لا شيء لتضغطه.",
+  "Playing once": "تشغيل مرة واحدة",
+  "Plays once when it's ready. It isn't added to your sounds.": "يُشغَّل مرة واحدة عندما يجهز. لا يُضاف إلى أصواتك.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "يصبح صوتًا جديدًا في لوحتك بعد التي قبله. لا شيء لتضغطه.",
+  "Waiting to add": "بانتظار الإضافة",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>يحتفظ Windows بـ {keys} لنفسه، فلا يمكن أن يكون اختصارًا. اختر مفتاحًا آخر.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>يحتفظ Windows بـ <b>{key}</b> لنفسه، فلا يمكن أن يكون اختصارًا. اختر مفتاحًا آخر.</span>"
 }

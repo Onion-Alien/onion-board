@@ -3036,12 +3036,10 @@
     "+{count} în coadă",
     "+{count} în coadă"
   ],
-  "Add as sound": "Adaugă ca sunet",
   "Cancel download": "Anulează descărcarea",
   "Couldn't download": "Nu s-a putut descărca",
   "Parsing video…": "Se citește videoclipul…",
   "Parsing…": "Se citește…",
-  "Play once": "Redă o dată",
   "Queue is full": "Coada e plină",
   "Queued": "În coadă",
   "Queued: waiting for current download to finish…": "În coadă: așteaptă să se termine descărcarea curentă…",
@@ -3238,6 +3236,12 @@
   "Use the virtual cable": "Folosește cablul virtual",
   "Plays from: {path}": "Se redă din: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Fiecare sunet apare imediat ce e adăugat. Închiderea nu îl oprește.",
+  "Adding to sounds": "Se adaugă la sunete",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Devine un sunet nou pe board-ul tău când e gata. Nu trebuie să apeși nimic.",
+  "Playing once": "Se redă o dată",
+  "Plays once when it's ready. It isn't added to your sounds.": "Se redă o dată când e gata. Nu se adaugă la sunetele tale.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Devine un sunet nou pe board-ul tău după cele dinainte. Nu trebuie să apeși nimic.",
+  "Waiting to add": "Așteaptă să fie adăugat",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows păstrează {keys} pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows păstrează <b>{key}</b> pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>"
 }

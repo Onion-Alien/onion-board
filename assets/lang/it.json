@@ -2972,12 +2972,10 @@
     "+{count} in coda",
     "+{count} in coda"
   ],
-  "Add as sound": "Aggiungi come suono",
   "Cancel download": "Annulla download",
   "Couldn't download": "Impossibile scaricare",
   "Parsing video…": "Analisi video in corso…",
   "Parsing…": "Analisi in corso…",
-  "Play once": "Riproduci una volta",
   "Queue is full": "La coda è piena",
   "Queued": "In coda",
   "Queued: waiting for current download to finish…": "In coda: in attesa del completamento del download…",
@@ -3165,6 +3163,12 @@
   "Use the virtual cable": "Usa il cavo virtuale",
   "Plays from: {path}": "Riprodotto da: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "Ogni suono compare appena è dentro. Chiudere questo non lo ferma.",
+  "Adding to sounds": "Aggiunta ai suoni",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "Diventa un nuovo suono sulla tua board quando è pronto. Non devi premere niente.",
+  "Playing once": "Riproduzione singola",
+  "Plays once when it's ready. It isn't added to your sounds.": "Si riproduce una volta quando è pronto. Non viene aggiunto ai tuoi suoni.",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "Diventa un nuovo suono sulla tua board dopo quelli prima. Non devi premere niente.",
+  "Waiting to add": "In attesa di aggiunta",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows tiene {keys} per sé, quindi non può essere una scorciatoia. Scegli un altro tasto.</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows tiene <b>{key}</b> per sé, quindi non può essere una scorciatoia. Scegli un altro tasto.</span>"
 }

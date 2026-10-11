@@ -2908,12 +2908,10 @@
   "+{count} queued": [
     "+{count} อยู่ในคิว"
   ],
-  "Add as sound": "เพิ่มเป็นเสียง",
   "Cancel download": "ยกเลิกการดาวน์โหลด",
   "Couldn't download": "ดาวน์โหลดไม่สำเร็จ",
   "Parsing video…": "กำลังอ่านวิดีโอ…",
   "Parsing…": "กำลังอ่าน…",
-  "Play once": "เล่นครั้งเดียว",
   "Queue is full": "คิวเต็มแล้ว",
   "Queued": "อยู่ในคิว",
   "Queued: waiting for current download to finish…": "อยู่ในคิว: รอให้การดาวน์โหลดปัจจุบันเสร็จ…",
@@ -3092,6 +3090,12 @@
   "Use the virtual cable": "ใช้สายเสมือน",
   "Plays from: {path}": "เล่นจาก: {path}",
   "Each sound shows up as soon as it's in. Closing this doesn't stop it.": "แต่ละเสียงจะขึ้นทันทีที่เพิ่มเสร็จ ปิดอันนี้ก็ไม่หยุด",
+  "Adding to sounds": "กำลังเพิ่มลงในเสียง",
+  "Becomes a new sound on your board when it's ready. Nothing to press.": "จะกลายเป็นเสียงใหม่บนบอร์ดของคุณเมื่อพร้อม ไม่ต้องกดอะไร",
+  "Playing once": "เล่นครั้งเดียว",
+  "Plays once when it's ready. It isn't added to your sounds.": "จะเล่นครั้งเดียวเมื่อพร้อม ไม่ได้เพิ่มลงในเสียงของคุณ",
+  "Becomes a new sound on your board after the ones before it. Nothing to press.": "จะกลายเป็นเสียงใหม่บนบอร์ดของคุณหลังจากรายการก่อนหน้า ไม่ต้องกดอะไร",
+  "Waiting to add": "รอเพิ่ม",
   "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows สงวน {keys} ไว้ใช้เอง จึงตั้งเป็นปุ่มลัดไม่ได้ เลือกปุ่มอื่น</span>",
   "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows สงวน <b>{key}</b> ไว้ใช้เอง จึงตั้งเป็นปุ่มลัดไม่ได้ เลือกปุ่มอื่น</span>"
 }

@@ -3590,6 +3590,11 @@ class MainWindow(QMainWindow):
         self._setup_undo = None
 
     def _show_setup(self, state: str, app: appsetup.Seen):
+        if state == "offer" and not self.urgent_bar.isHidden():
+            # The urgent bar (a Discord warning, a fix...) is already saying its piece:
+            # never two bars at once. The offer waits; the warning wins (_show_urgent).
+            self._setup_app, self._setup_state = None, ""
+            return
         self._setup_app, self._setup_state = app, state
         self._setup_hide.stop()
         name = html.escape(app.name)
@@ -7761,6 +7766,8 @@ class MainWindow(QMainWindow):
         self.urgent_btn.setText(button)
         self.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
         self.urgent_bar.show()
+        if self._setup_state == "offer":
+            self._hide_setup()   # one bar at a time: the warning beats "Set up for it?"
 
     def _hide_urgent(self):
         now = self._urgent_now()
