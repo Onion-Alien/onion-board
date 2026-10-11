@@ -1,0 +1,1 @@
+- Installing the virtual cable no longer flashes a PowerShell window, and the setup text says Windows will show a permission box to click Yes on.

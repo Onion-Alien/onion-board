@@ -886,7 +886,7 @@ begin
   // uninstaller leaves its setup program in Program Files, so that proves nothing
   HadCable := CableScript('-Check') <> 2;
   WizardForm.StatusLabel.Caption :=
-    'Installing the virtual cable... click Yes if Windows asks for permission.';
+    'Installing the virtual cable. Windows will show a permission box: please click Yes.';
   Code := CableScript('-Silent');
   CableNeedsRestart := (Code = 3010);
   // remembered for the uninstaller: a cable we put there is offered for removal first
