@@ -622,6 +622,12 @@ begin
   UpdateInstallCaption;
 end;
 
+// Windows' own style bits, to draw the box list double-buffered (see InitializeWizard)
+function GetWindowLongW(hWnd: HWND; nIndex: Integer): Longint;
+  external 'GetWindowLongW@user32.dll stdcall';   // sensitive-scan: allow
+function SetWindowLongW(hWnd: HWND; nIndex: Integer; dwNewLong: Longint): Longint;
+  external 'SetWindowLongW@user32.dll stdcall';   // sensitive-scan: allow
+
 procedure InitializeWizard;
 var
   Body, Link, Note: TNewStaticText;
@@ -632,6 +638,9 @@ begin
   // (with FFmpeg offered and Count me in) fit without a scrollbar.
   WizardForm.TasksList.Height := WizardForm.TasksList.Parent.ClientHeight -
     WizardForm.TasksList.Top;
+  // the box list repainted the row under the mouse on every move (a flash): draw it off-screen first
+  SetWindowLongW(WizardForm.TasksList.Handle, -20,
+    GetWindowLongW(WizardForm.TasksList.Handle, -20) or $02000000);   // WS_EX_COMPOSITED
   PrivacyPage := CreateCustomPage(wpWelcome, 'Your privacy',
     'What Onion Board connects to, and when');
   Body := TNewStaticText.Create(PrivacyPage);
