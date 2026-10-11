@@ -156,6 +156,18 @@ class SeekSlider(QSlider):
     def __init__(self, *args):
         super().__init__(*args)
         self.setAccessibleName(_("Playback position"))   # a screen reader said nothing on it
+        # at 0:00 Qt still paints a sliver of fill beside the handle (it looked a few
+        # seconds in): the theme hides the fill while "atstart" is set
+        self.setProperty("atstart", True)
+        self.valueChanged.connect(self._mark_start)
+
+    def _mark_start(self, v):
+        at = v <= self.minimum()
+        if self.property("atstart") != at:   # restyle only when it flips, not every tick
+            self.setProperty("atstart", at)
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
 
     def mousePressEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton:
