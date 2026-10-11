@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "Äänesi menevät mikkiisi",
   "{mic} · not sent, sounds only": "{mic} · ei lähetetä, vain äänet",
   "{mic} · off": "{mic} · pois päältä",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windowsin järjestelmänvalvojavaihe ei valmistunut. Jos sen kehote on vielä auki, vastaa siihen; yritä sitten uudelleen."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windowsin järjestelmänvalvojavaihe ei valmistunut. Jos sen kehote on vielä auki, vastaa siihen; yritä sitten uudelleen.",
+  "{title}  ·  quiet on {devices}": "{title} · hiljaa laitteella {devices}"
 }

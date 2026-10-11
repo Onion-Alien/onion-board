@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "A hangjaid a mikrofonodba mennek",
   "{mic} · not sent, sounds only": "{mic} · nem küldi, csak hangok",
   "{mic} · off": "{mic} · kikapcsolva",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "A Windows rendszergazdai lépése nem fejeződött be. Ha a kérdése még nyitva van, válaszolj rá; aztán próbáld újra."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "A Windows rendszergazdai lépése nem fejeződött be. Ha a kérdése még nyitva van, válaszolj rá; aztán próbáld újra.",
+  "{title}  ·  quiet on {devices}": "{title} · csendes ezen: {devices}"
 }

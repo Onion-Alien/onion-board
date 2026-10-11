@@ -3214,5 +3214,6 @@
   "Your sounds go into your mic": "Bunyi anda masuk ke mikrofon anda",
   "{mic} · not sent, sounds only": "{mic} · tidak dihantar, bunyi sahaja",
   "{mic} · off": "{mic} · dimatikan",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Langkah pentadbir Windows tidak selesai. Jika gesaannya masih terbuka, jawab dahulu; kemudian cuba lagi."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Langkah pentadbir Windows tidak selesai. Jika gesaannya masih terbuka, jawab dahulu; kemudian cuba lagi.",
+  "{title}  ·  quiet on {devices}": "{title} · senyap pada {devices}"
 }

@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "Tus sonidos van a tu micro",
   "{mic} · not sent, sounds only": "{mic} · no se envía, solo sonidos",
   "{mic} · off": "{mic} · apagado",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "El paso de administrador de Windows no terminó. Si su aviso sigue abierto, respóndelo; luego inténtalo de nuevo."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "El paso de administrador de Windows no terminó. Si su aviso sigue abierto, respóndelo; luego inténtalo de nuevo.",
+  "{title}  ·  quiet on {devices}": "{title} · en silencio en {devices}"
 }

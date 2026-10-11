@@ -3360,5 +3360,6 @@
   "Your sounds go into your mic": "Твої звуки йдуть у мікрофон",
   "{mic} · not sent, sounds only": "{mic} · не надсилається, лише звуки",
   "{mic} · off": "{mic} · вимкнено",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Крок адміністратора Windows не завершився. Якщо його запит ще відкритий, дайте відповідь; потім спробуйте ще раз."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Крок адміністратора Windows не завершився. Якщо його запит ще відкритий, дайте відповідь; потім спробуйте ще раз.",
+  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}"
 }

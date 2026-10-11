@@ -3360,5 +3360,6 @@
   "Your sounds go into your mic": "Sunetele tale intră în microfon",
   "{mic} · not sent, sounds only": "{mic} · nu se trimite, doar sunete",
   "{mic} · off": "{mic} · oprit",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Pasul de administrator din Windows nu s-a terminat. Dacă fereastra lui e încă deschisă, răspunde-i; apoi încearcă din nou."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Pasul de administrator din Windows nu s-a terminat. Dacă fereastra lui e încă deschisă, răspunde-i; apoi încearcă din nou.",
+  "{title}  ·  quiet on {devices}": "{title} · liniște pe {devices}"
 }
