@@ -165,3 +165,28 @@ def test_rescan_runs_on_the_device_thread(window, monkeypatch, qapp):
     devices_done(window)
     assert len(threads) == 1 and not busy.is_busy(btn)
     assert btn.text() == "✓ Found 3 devices"
+    # spam clicks while it shows what it found: each re-scan reopened every device
+    window.rescan_with_feedback(btn)
+    assert not window._dev_waiting and len(threads) == 1
+    btn.setProperty("scanned_until", 0.0)   # (the result has been shown)
+    window.rescan_with_feedback(btn)
+    assert process_events(qapp, lambda: len(threads) == 2, timeout=5)
+    devices_done(window)
+
+
+def test_a_rescan_finding_the_same_devices_keeps_the_rows(window):
+    """Also send to's rows were made again on every re-scan and route redraw: the new
+    boxes showed for a moment before the layout placed them (device names flashed
+    over the Devices card)."""
+    devices_done(window)
+    window.cfg.also_send = [OUTS[1]]
+    window._show_route()
+    rows = window.also_rows
+    boxes = list(rows.boxes)
+    assert boxes
+    for _ in range(3):
+        window._show_route()
+    assert rows.boxes == boxes
+    window.cfg.also_send = []   # a real change: made again
+    window._show_route()
+    assert rows.boxes == []

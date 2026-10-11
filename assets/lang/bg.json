@@ -3174,6 +3174,7 @@
     "Добавя се {n} звук",
     "Добавят се {n} звука"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Виртуалният кабел е премахнат. Рестартирай компютъра, преди да го инсталираш отново.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Ще бъде махнат от {mic}: ефектът за микрофона работи само на един микрофон наведнъж.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Ефектът за микрофона е преинсталиран на {mic}. Пробвай го в гласовия чат.",
   "Mic effect removed from {mic}": "Ефектът за микрофона е премахнат от {mic}",

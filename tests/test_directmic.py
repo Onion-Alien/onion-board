@@ -2288,6 +2288,95 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
 
 
+def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
+    """Removed: Windows lists the cable until a restart, but it won't open. "Use the
+    virtual cable instead" switched to it anyway: sounds went nowhere and the mic had
+    to be set up again."""
+    from soundboard import cableremove
+    w = window
+    _working_on_the_mic(w, monkeypatch)
+    said = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": said.append((text, kind)))
+    _no_threads(monkeypatch, run=True)
+    monkeypatch.setattr(cableremove, "remove", lambda: None)
+    w.remove_cable()
+    w._update_flow()
+    assert w.btn_usecable.isHidden()
+    w.use_cable_instead()   # (still there for a moment, or clicked by keyboard)
+    assert w.cfg.route == "mic" and "Restart" in said[-1][0] and said[-1][1] == "warn"
+
+
+def _toasts(w, monkeypatch):
+    said = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": said.append(text))
+    return said
+
+
+def test_done_is_said_when_it_works_not_while_it_starts(window, monkeypatch):  # noqa: F811
+    """Set up, then Windows takes a few seconds to load it ("starting…", Bun still
+    building). "Done" came at once, beside the "starting…" card and the hammering:
+    it comes when the card turns green, once."""
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    said = _toasts(w, monkeypatch)
+    w.attach_mic()
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
+    w._mic_attached("My mic", "")
+    assert "starting" in w.flow_out.text() and w.setup_show.on
+    assert not [t for t in said if t.startswith("Done")]
+    monkeypatch.setattr(w.engine, "main_stream", object())   # Windows has it running
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    w._update_flow()
+    w._update_flow()
+    assert "starting" not in w.flow_out.text()
+    assert [t for t in said if t.startswith("Done")] == [
+        "Done: Discord and games hear your sounds through your mic now."]
+
+
+def test_no_done_when_windows_never_loads_it(window, monkeypatch):  # noqa: F811
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    said = _toasts(w, monkeypatch)
+    w.attach_mic()
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
+    w._mic_attached("My mic", "")
+    w._settle_until = 0.0   # the wait ran out and it still isn't running
+    w._update_flow()
+    assert not w.setup_show.on or w.setup_show._result is False
+    assert not [t for t in said if t.startswith("Done")] and w._done_toast is None
+    monkeypatch.setattr(w.engine, "main_stream", object())   # later on it works:
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    w._update_flow()
+    assert not [t for t in said if t.startswith("Done")]   # (no stale "Done" then)
+
+
+def test_bun_stays_on_while_it_starts(window, monkeypatch):  # noqa: F811
+    """Bun's show ends by itself when nobody watches (another tab): coming back while
+    it's still starting showed a clickable Repair beside "starting…"."""
+    from soundboard.ui import busy
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    w.attach_mic()
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
+    w._mic_attached("My mic", "")
+    w.setup_show._stop()   # (what finish() does while it can't be seen)
+    assert w.setup_show.on and "starting" in w.flow_out.text()
+    assert w.btn_install.isHidden() and busy.is_busy(w.btn_install)
+    w._settle_until = 0.0   # over: the button's back, and Bun's off for good
+    w._update_flow()
+    assert not w.setup_show.on and not busy.is_busy(w.btn_install)
+
+
 @pytest.mark.parametrize("state", ["ready", "missing", "wiped"])
 def test_no_cable_or_speaker_hint_on_the_mic(window, monkeypatch, state):  # noqa: F811
     """Straight into the mic has no "send into" device: the Devices card never warns

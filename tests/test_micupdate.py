@@ -129,7 +129,7 @@ def test_not_offered_when_not_needed(outdated):
 
 def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
     w, state = outdated
-    monkeypatch.setattr(w, "set_route", lambda *a, **k: None)
+    monkeypatch.setattr(w, "set_route", lambda route, *a, **k: setattr(w.cfg, "route", route))
     w._mic_updating = True
     w._mic_attached("My mic", dm.declined())   # No in Windows' prompt: a note, no error
     assert state["toasts"][-1][1] == "warn" and "cancelled" in state["toasts"][-1][0]
@@ -139,9 +139,14 @@ def test_cancel_and_failure_and_success_feedback(outdated, monkeypatch):
     assert state["toasts"][-1][1] == "error" and "code 5" in state["toasts"][-1][0]
     w._mic_updating = True
     w._mic_attached("My mic", "")
+    assert not w._mic_updating
+    assert state["toasts"][-1][1] == "error"   # not "updated" while Windows still loads it
+    monkeypatch.setattr(w.engine, "main_stream", object())   # ...it runs now
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    w._update_flow()
     assert state["toasts"][-1] == ("Mic updated: games, calls and browsers hear your "
                                    "sounds.", "ok")
-    assert not w._mic_updating
 
 
 def test_prompt_note_names_what_windows_asks_for():

@@ -82,3 +82,58 @@ def test_built_cards_in_board(window, qapp, tmp_path, monkeypatch):  # noqa: F81
         return  # now owned and cleaned up by the window fixture
     tab.close()
     tab.deleteLater()
+
+
+@pytest.mark.skipif(not os.environ.get("ONIONBOARD_CARD_TEST_ZIP"), reason="local add-on opt-in")
+def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
+        qapp, app_dir, monkeypatch):
+    """The real add-on's bottom bar in a window tight for another tab: its buttons keep
+    their words from no triggers to one blank one, after deleting it and across tab
+    switches, and go icon only only when the bar itself is narrow."""
+    from PySide6.QtCore import QEvent
+
+    from soundboard import engine, winkeys
+    from soundboard.library import Config
+    from soundboard.ui import mainwindow as main
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    modules.install_zip(Path(os.environ["ONIONBOARD_CARD_TEST_ZIP"]), "onion-watch",
+                        "triggers", app_dir / "modules")
+    Config(screen={"on": False, "triggers": []}, mic_first=True).save()
+    w = main.MainWindow()
+    w._load_thread.join(15)
+    try:
+        w.load_triggers()
+        w.resize(1100, 800)
+        w.show()
+        w.tabs.setCurrentWidget(w.triggers)
+        qapp.processEvents()
+        panel = w.triggers.panel
+        assert panel is not None, w.triggers.error.text()
+        if not hasattr(panel, "_new"):
+            panel = panel.panel
+        words = (panel.btn_watch, panel.btn_cut, panel.btn_add)
+
+        def shown():
+            for _ in range(5):
+                qapp.processEvents()
+            return all(b.text() for b in words)
+
+        assert w._fit.compact_count() and shown()      # no triggers
+        panel.btn_new.click()                          # one, blank
+        assert len(panel.triggers) == 1 and shown()
+        w.tabs.setCurrentIndex(0)
+        w.tabs.setCurrentWidget(w.triggers)
+        assert shown()
+        panel._remove(next(iter(panel.rows.values())))  # the last one deleted
+        assert not panel.triggers and shown()
+        w.resize(640, 800)                             # the bar itself narrow
+        assert not shown() and panel.btn_cut.text() == ""
+        w.resize(1100, 800)
+        assert shown()
+    finally:
+        w.close()
+        w._load_thread.join(15)
+        w.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)

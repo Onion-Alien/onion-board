@@ -3174,6 +3174,7 @@
     "Ajout de {n} son",
     "Ajout de {n} sons"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Le câble virtuel a été supprimé. Redémarre ton PC avant de le réinstaller.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Il sera retiré de {mic} : l’effet micro marche sur un seul micro à la fois.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Effet micro réinstallé sur {mic}. Teste-le dans ton chat vocal.",
   "Mic effect removed from {mic}": "Effet micro supprimé de {mic}",

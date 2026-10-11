@@ -3101,6 +3101,7 @@
   "Adding {n} sound": [
     "正在添加 {n} 个声音"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "虚拟线缆已移除。重新安装前请先重启电脑。",
   "It comes off {mic}: the mic effect works on one mic at a time.": "它将从 {mic} 上移除:麦克风效果一次只能用于一个麦克风。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "已在 {mic} 上重新安装麦克风效果。请在语音聊天中测试。",
   "Mic effect removed from {mic}": "已从 {mic} 移除麦克风效果",

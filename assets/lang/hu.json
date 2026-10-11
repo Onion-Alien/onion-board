@@ -3174,6 +3174,7 @@
     "{n} hang hozzáadása",
     "{n} hang hozzáadása"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "A virtuális kábel el lett távolítva. Indítsd újra a géped, mielőtt újra telepítenéd.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Lekerül erről: {mic}. A mikrofoneffekt egyszerre csak egy mikrofonon működik.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "A mikrofoneffekt újratelepítve erre: {mic}. Próbáld ki a hangcsevegésben.",
   "Mic effect removed from {mic}": "Mikrofoneffekt eltávolítva innen: {mic}",

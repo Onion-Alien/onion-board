@@ -3247,6 +3247,7 @@
     "Přidávají se {n} zvuky",
     "Přidává se {n} zvuků"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Virtuální kabel byl odebrán. Než ho nainstaluješ znovu, restartuj počítač.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Zmizí z {mic}: efekt mikrofonu funguje vždy jen na jednom mikrofonu.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efekt mikrofonu byl přeinstalován na {mic}. Vyzkoušej ho v hlasovém chatu.",
   "Mic effect removed from {mic}": "Efekt mikrofonu odstraněn z {mic}",

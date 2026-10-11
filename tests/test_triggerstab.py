@@ -20,7 +20,7 @@ from test_triggers_module import make_module, zip_of
 
 PANEL = '''
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QLabel, QMenu, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QLabel, QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 from . import __version__
 
 
@@ -33,6 +33,7 @@ class Panel(QWidget):
         v = QVBoxLayout(self)
         self.hint = QLabel("hint")
         self.watch = QPushButton("Start watching")
+        self.watch.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)   # (Watch's bar wraps)
         v.addWidget(self.hint)
         v.addWidget(self.watch)
         if not host.screen.get("no_more"):
@@ -271,6 +272,34 @@ def test_watching_on_loads_onion_watch_at_the_start(qapp, app_dir, monkeypatch, 
         close_window(qapp, w)
 
 
+def test_the_bar_keeps_its_words_while_it_has_room(qapp, app_dir, monkeypatch, pkg):
+    """The bar's buttons go icon only by the bar's own room, not the window's: another
+    tab not fitting used to take their words, and they stayed off until the window
+    grew (whatever the tab showed meanwhile, or which tab was picked)."""
+    w = watch_window(qapp, app_dir, monkeypatch, pkg, {"on": False, "triggers": []})
+    try:
+        w.load_triggers()
+        w.resize(900, 700)
+        w.show()
+        w.tabs.setCurrentWidget(w.triggers)
+        qapp.processEvents()
+        watch = w.triggers.panel.watch
+        assert w._fit.compact_count()        # the window squeezed parts of other tabs...
+        assert watch.text() == "Start watching"   # ...and left the bar's words alone
+        w.tabs.setCurrentIndex(0)
+        w.resize(880, 700)                   # (while another tab shows)
+        w.tabs.setCurrentWidget(w.triggers)
+        qapp.processEvents()
+        assert watch.text() == "Start watching"
+        w.triggers.resize(80, w.triggers.height())   # the bar itself too narrow
+        assert watch.text() == "" and watch.property("full_text") == "Start watching"
+        w.resize(900, 700)
+        qapp.processEvents()
+        assert watch.text() == "Start watching"
+    finally:
+        close_window(qapp, w)
+
+
 def test_watching_on_with_no_triggers_still_waits(qapp, app_dir, monkeypatch, pkg):
     """Onion Watch only starts watching again when there's a trigger to watch."""
     w = watch_window(qapp, app_dir, monkeypatch, pkg, {"on": True, "triggers": []})
@@ -374,8 +403,6 @@ def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, mo
     monkeypatch.setattr(updates, "_get", lambda url, *_f: pytest.fail("asked GitHub"))
     host = FakeHost(two_triggers())
     tab = TriggersTab(host, [tmp_path / "modules"])
-    step = dict((p, f) for p, _axis, f in tab.fit_steps() if p in (20, 28))
-    step[28](True)                        # the window is small before it's even loaded
     live = []
     tab.active_changed.connect(live.append)
     tab.show()
@@ -385,7 +412,14 @@ def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, mo
     assert tab.stack.currentWidget() is tab.board_page and not tab.needs_nudge()
     assert (tmp_path / "modules" / "onion-watch" / "module.json").is_file()
     assert tab.panel.host is host
-    assert tab.panel.watch.text() == ""   # ...so its Watch button came in icon only
+    qapp.processEvents()                  # (laid out in the tab)
+    assert tab.panel.watch.text() == "Start watching"
+    tab.panel.setFixedWidth(60)           # its bar has no room for the words...
+    qapp.processEvents()
+    assert tab.panel.watch.text() == ""   # ...so its Watch button shows its icon only
+    tab.panel.setFixedWidth(400)
+    qapp.processEvents()
+    assert tab.panel.watch.text() == "Start watching"   # room again: its words are back
     tab.panel.set_active(True)
     assert live == [True] and tab.is_active()
     tab.sounds_changed()

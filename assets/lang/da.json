@@ -3174,6 +3174,7 @@
     "Tilføjer {n} lyd",
     "Tilføjer {n} lyde"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Det virtuelle kabel er fjernet. Genstart din pc, før du installerer det igen.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Den fjernes fra {mic}: mikrofoneffekten virker på én mikrofon ad gangen.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofoneffekten er geninstalleret på {mic}. Test den i din stemmechat.",
   "Mic effect removed from {mic}": "Mikrofoneffekten fjernet fra {mic}",

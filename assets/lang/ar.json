@@ -3466,6 +3466,7 @@
     "تتم إضافة {n} صوتًا",
     "تتم إضافة {n} صوت"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "تمت إزالة الكابل الافتراضي. أعد تشغيل الكمبيوتر قبل تثبيته مرة أخرى.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "سيُزال من {mic}: يعمل مؤثر الميكروفون على ميكروفون واحد في كل مرة.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "أُعيد تثبيت مؤثر الميكروفون على {mic}. جرّبه في الدردشة الصوتية.",
   "Mic effect removed from {mic}": "أُزيل مؤثر الميكروفون من {mic}",

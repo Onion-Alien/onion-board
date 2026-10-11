@@ -3174,6 +3174,7 @@
     "{n} geluid toevoegen",
     "{n} geluiden toevoegen"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "De virtuele kabel is verwijderd. Start je pc opnieuw op voordat je hem weer installeert.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Het gaat van {mic} af: het microfooneffect werkt op één microfoon tegelijk.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Microfooneffect opnieuw geïnstalleerd op {mic}. Test het in je voicechat.",
   "Mic effect removed from {mic}": "Microfooneffect verwijderd van {mic}",

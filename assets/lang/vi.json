@@ -3101,6 +3101,7 @@
   "Adding {n} sound": [
     "Đang thêm {n} âm thanh"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Đã gỡ cáp ảo. Hãy khởi động lại PC trước khi cài lại.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Nó sẽ được gỡ khỏi {mic}: mỗi lúc hiệu ứng mic chỉ chạy trên một mic.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Đã cài lại hiệu ứng mic trên {mic}. Hãy thử trong cuộc trò chuyện thoại.",
   "Mic effect removed from {mic}": "Đã gỡ hiệu ứng mic khỏi {mic}",

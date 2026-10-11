@@ -3174,6 +3174,7 @@
     "{n} ses ekleniyor",
     "{n} ses ekleniyor"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Sanal kablo kaldırıldı. Yeniden kurmadan önce bilgisayarını yeniden başlat.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic} üzerinden kaldırılacak: mikrofon efekti aynı anda yalnızca bir mikrofonda çalışır.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofon efekti {mic} üzerine yeniden kuruldu. Sesli sohbetinde dene.",
   "Mic effect removed from {mic}": "Mikrofon efekti {mic} üzerinden kaldırıldı",

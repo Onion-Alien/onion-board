@@ -46,7 +46,15 @@ class AlsoSendRows:
         self.kinds: list[QComboBox] = []   # ...and what each one gets
         self.stream_vol: VolumeControl | None = None
         self.stream_voice: QCheckBox | None = None
+        self._shown = None   # what the rows were built for (_state)
         self.rebuild()
+
+    def _state(self) -> tuple:
+        """Everything the rows show: the same again (a re-scan finding the same
+        devices) leaves them as they are."""
+        c = self.mw.cfg
+        return (tuple(self.rows()), tuple(d["name"] for d in eng.list_devices("output")),
+                tuple(self.mw.sending_to()), c.route, c.mon_device, c.obs_vol, c.obs_voice)
 
     def rows(self) -> list[tuple[str, str]]:
         """(device, CALL / STREAM) per row: the call copies (none while sending to
@@ -110,6 +118,13 @@ class AlsoSendRows:
         self.widgets += row
 
     def rebuild(self):
+        """The rows again, if anything they show changed. Every re-scan and route
+        redraw asked for new rows: new boxes appeared for a moment before the layout
+        placed them (device names flashed over the card)."""
+        state = self._state()
+        if state == self._shown:
+            return
+        self._shown = state
         for w in self.widgets:
             self.grid.removeWidget(w)
             w.hide()   # (gone at once, not when the deletion comes round)

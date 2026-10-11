@@ -3174,6 +3174,7 @@
     "Lisätään {n} ääni",
     "Lisätään {n} ääntä"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Virtuaalikaapeli poistettiin. Käynnistä tietokone uudelleen ennen kuin asennat sen taas.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Se poistetaan laitteesta {mic}: mikrofonitehoste toimii yhdessä mikrofonissa kerrallaan.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofonitehoste asennettu uudelleen laitteeseen {mic}. Testaa sitä äänichatissa.",
   "Mic effect removed from {mic}": "Mikrofonitehoste poistettu laitteesta {mic}",

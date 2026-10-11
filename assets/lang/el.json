@@ -3174,6 +3174,7 @@
     "Προστίθεται {n} ήχος",
     "Προστίθενται {n} ήχοι"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "Το εικονικό καλώδιο αφαιρέθηκε. Κάνε επανεκκίνηση του υπολογιστή πριν το εγκαταστήσεις ξανά.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Θα αφαιρεθεί από το {mic}: το εφέ μικροφώνου λειτουργεί σε ένα μικρόφωνο κάθε φορά.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Το εφέ μικροφώνου εγκαταστάθηκε ξανά στο {mic}. Δοκίμασέ το στη φωνητική συνομιλία.",
   "Mic effect removed from {mic}": "Το εφέ μικροφώνου αφαιρέθηκε από το {mic}",

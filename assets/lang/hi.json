@@ -3174,6 +3174,7 @@
     "{n} ध्वनि जोड़ी जा रही है",
     "{n} ध्वनियाँ जोड़ी जा रही हैं"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "वर्चुअल केबल हटा दी गई है। इसे फिर से इंस्टॉल करने से पहले अपना PC रीस्टार्ट करें।",
   "It comes off {mic}: the mic effect works on one mic at a time.": "यह {mic} से हट जाएगा: माइक इफ़ेक्ट एक समय में एक ही माइक पर चलता है।",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "{mic} पर माइक इफ़ेक्ट फिर से इंस्टॉल हो गया। इसे अपने वॉइस चैट में आज़माएँ।",
   "Mic effect removed from {mic}": "{mic} से माइक इफ़ेक्ट हट गया",

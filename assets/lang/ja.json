@@ -3101,6 +3101,7 @@
   "Adding {n} sound": [
     "{n} 件のサウンドを追加中"
   ],
+  "The virtual cable was removed. Restart your PC before you install it again.": "仮想ケーブルを削除しました。もう一度インストールする前にPCを再起動してください。",
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}からは外れます。マイクエフェクトは一度に1つのマイクでしか動作しません。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "マイクエフェクトを{mic}に再インストールしました。ボイスチャットで試してください。",
   "Mic effect removed from {mic}": "{mic}からマイクエフェクトを削除しました",
