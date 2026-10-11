@@ -1,0 +1,1 @@
+- Keep sounds reaching the mic when Windows quickly restarts its audio engine or another recording app takes over the mic effect.
