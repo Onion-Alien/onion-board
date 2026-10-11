@@ -102,7 +102,7 @@ the affected states; include its PR and validation evidence here.
   typography/surface/action roles; coherent help placement, Escape/outside dismissal,
   focus return and accessible close action. Verify Dark, Light and High Contrast.
 
-  Done (PR #PRNUM): `TabHelpPopup` sets no style of its own: `#helpcard` (panel
+  Done (PR #416): `TabHelpPopup` sets no style of its own: `#helpcard` (panel
   surface, an edge because it floats over the board, 16 px corners), `#helptitle` (the
   title role, 13pt bold `text_hi`) and `#helpbody`, all in
   `theme.py`, so it follows every theme. Close is the painted `close` icon
