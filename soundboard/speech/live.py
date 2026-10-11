@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 import math
 from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -28,6 +29,9 @@ from soundboard.speech.customvoices import VoiceSet
 from soundboard.speech.service import ServiceHost
 from soundboard.speech.tts import Speaker
 from soundboard.voicefx import VoiceChain
+
+if TYPE_CHECKING:
+    from soundboard.speech.aivoice import AiVoiceController
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +75,7 @@ class SpeechController:
         self.mute_real_voice = True
         self.voice_fx = True    # the voice changer's effects go on the computer voice too
         self.live_voice: str | None = None   # voice for live lines (None: the chosen one)
-        self.dub = None         # the AI voice controller saying the lines, or None
+        self.dub: AiVoiceController | None = None   # the AI voice controller saying the lines
         self.fx_always = False  # translating for the voice changer: its effect, always
         self._ready = False     # the module said "ready": an error after that isn't fatal
         self._replace = False   # live voice mutes your real voice

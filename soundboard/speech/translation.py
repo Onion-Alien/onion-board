@@ -54,7 +54,7 @@ def size_mb(info) -> int:
     return round(int(info.download.get("bytes", 0) or 0) / 1e6)
 
 
-def download(info, on_progress: Callable[[int, int], None] = lambda done, total: None,
+def download(info, on_progress: Callable[[int, int], object] = lambda done, total: None,
              cancelled: Callable[[], bool] = lambda: False) -> None:
     """Fetch, check and unpack a language's model. Blocking: call from a worker thread.
     Raises RuntimeError (with a message for the user) or Cancelled."""
