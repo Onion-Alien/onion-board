@@ -584,6 +584,8 @@ QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:fo
 QFrame#sidebar QPushButton#settings:focus, QFrame#sidebar QPushButton#modebtn:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
 QFrame#sidebar QPushButton#settings:checked { background:transparent; color:$text_hi; }
+QFrame#sidebar QPushButton#settings:hover, QFrame#sidebar QPushButton#settings:focus {
+    background:transparent; border-color:transparent; }   /* a square, painted: sidebar.py */
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
 QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
@@ -604,8 +606,7 @@ QFrame#railoutput[expanded="false"] { background:transparent; }
 QFrame#railoutput QLabel#railoutputtitle { font-weight:700; color:$text_hi; }
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }
-QFrame#railoutput QPushButton#railoutputsetup QLabel { color:$accent; }
-QFrame#railoutput QPushButton#railoutputsetup:hover { background:$btn_hover; }
+QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
 QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }

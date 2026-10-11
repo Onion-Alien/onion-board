@@ -71,7 +71,6 @@
   "Clear the selection (Esc)": "Снять выделение (Esc)",
   "Click again to turn it off": "Нажми ещё раз, чтобы выключить",
   "Click to go live again: others hear you and your sounds": "Нажми, чтобы снова выйти в эфир: другие слышат тебя и твои звуки",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Нажми, чтобы заглушить: к другим (Discord, игра, OBS…) не уходит вообще ничего. Ты по-прежнему слышишь всё",
   "Close": "Закрыть",
   "Close Onion Board and open it again to finish.": "Закрой Onion Board и открой снова, чтобы закончить.",
   "Colour": "Цвет",
@@ -1835,7 +1834,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Насколько сильно измененный голос отстает от вашего реального голоса: {effects} мс от эффектов + {devices} мс от ваших звуковых устройств. Менее 100 мс кажется нормальным для разговора; Эффекты высоты тона стоят больше всего, остальные почти ничего.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Насколько сильно измененный голос отстает от вашего реального голоса: {effects} мс от эффектов. Менее 100 мс кажется нормальным для разговора; Эффекты высоты тона стоят больше всего, остальные почти ничего.",
   "How high": "Как высоко",
-  "How loud the spoken voice is": "Насколько громок разговорный голос",
   "How much of it: up to half": "Сколько: до половины",
   "I'd watch for you…": "Я бы присмотрел за тобой…",
   "I'll watch anything…": "Я посмотрю что угодно…",
@@ -3109,9 +3107,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Запоминает ссылку, канал, дату загрузки, длительность и просмотры каждой загрузки (из самой загрузки, ничего лишнего не запрашивается), ещё и в текстовом файле рядом со звуком. Щёлкни звук правой кнопкой, чтобы открыть или скопировать ссылку. Выключено: новые загрузки ничего из этого не сохраняют, а меню это скрывает; уже сохранённое остаётся.",
   "Remember where it came from": "Запоминать, откуда взят",
   "Set up output": "Настроить вывод",
-  "Sound output": "Вывод звука",
   "Interface size": "Размер интерфейса",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Делает всё в Onion Board больше или меньше: текст, кнопки и пэды.",
   "Onion Board changes size after a restart.": "Onion Board изменит размер после перезапуска.",
-  "Save a copy": "Сохранить копию"
+  "Save a copy": "Сохранить копию",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Нажми, чтобы заглушить свои звуки для других (Discord, игра, OBS…). Микрофон по-прежнему идёт, если не включена смена голоса. Ты по-прежнему слышишь всё",
+  "Click to send your sounds again: right now others hear only your mic": "Нажми, чтобы снова отправлять звуки: сейчас другие слышат только твой микрофон",
+  "Only your mic": "Только твой микрофон",
+  "Others hear": "Другие слышат",
+  "Others hear only your mic": "Другие слышат только твой микрофон"
 }

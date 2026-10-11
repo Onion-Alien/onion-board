@@ -241,7 +241,6 @@
   "Click again to turn it off": "Dalším kliknutím vypneš",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Klikni na pole <b>Vstupní zařízení hlasu</b> a zvol <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Klikni a jdi zase naživo: ostatní slyší tebe i tvoje zvuky",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klikni pro ztlumení: ostatním nejde vůbec nic (Discord, hra, OBS…). Ty pořád slyšíš všechno",
   "Click to set": "Klikni a nastav",
   "Clip {time}": "Klip {time}",
   "Close": "Zavřít",
@@ -1921,7 +1920,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Jak daleko za vaším skutečným hlasem je ten změněný: {effects} ms z efektů + {devices} ms z vašich zvukových zařízení. Méně než 100 ms je normální mluvit; pitch efekty stojí nejvíc, zbytek skoro nic.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Jak daleko za vaším skutečným hlasem je ten změněný: {effects} ms od efektů. Méně než 100 ms je normální mluvit; pitch efekty stojí nejvíc, zbytek skoro nic.",
   "How high": "jak vysoko",
-  "How loud the spoken voice is": "Jak hlasitý je mluvený hlas",
   "How much of it: up to half": "Kolik z toho: až polovina",
   "I'd watch for you…": "hlídal bych tě…",
   "I'll watch anything…": "budu sledovat cokoliv…",
@@ -3109,9 +3107,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "U každého stažení si pamatuje odkaz, kanál, datum nahrání, délku a zhlédnutí (ze samotného stažení, nic navíc se nestahuje), také v textovém souboru vedle zvuku. Klikni pravým na zvuk a otevři nebo zkopíruj odkaz. Vypnuto: nová stažení si nic z toho neuloží a nabídka to skryje; co už je uložené, zůstane.",
   "Remember where it came from": "Pamatovat si, odkud je",
   "Set up output": "Nastavit výstup",
-  "Sound output": "Zvukový výstup",
   "Interface size": "Velikost rozhraní",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Zvětší nebo zmenší vše v Onion Board: text, tlačítka i pady.",
   "Onion Board changes size after a restart.": "Onion Board změní velikost po restartu.",
-  "Save a copy": "Uložit kopii"
+  "Save a copy": "Uložit kopii",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klikni a ztlum své zvuky pro ostatní (Discord, hra, OBS…). Tvůj mikrofon se dál posílá, pokud není zapnutý měnič hlasu. Ty slyšíš všechno",
+  "Click to send your sounds again: right now others hear only your mic": "Klikni a znovu posílej své zvuky: teď ostatní slyší jen tvůj mikrofon",
+  "Only your mic": "Jen tvůj mikrofon",
+  "Others hear": "Ostatní slyší",
+  "Others hear only your mic": "Ostatní slyší jen tvůj mikrofon"
 }

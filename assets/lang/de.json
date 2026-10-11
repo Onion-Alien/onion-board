@@ -83,7 +83,6 @@
   "Clear the selection (Esc)": "Die Auswahl aufheben (Esc)",
   "Click again to turn it off": "Nochmal klicken zum Ausschalten",
   "Click to go live again: others hear you and your sounds": "Klicken, um wieder live zu gehen: Andere hören dich und deine Sounds",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klicken zum Stummschalten: Gar nichts geht mehr an andere raus (Discord, das Spiel, OBS…). Du hörst weiter alles",
   "Close": "Schließen",
   "Close Onion Board and open it again to finish.": "Schließ Onion Board und öffne es wieder, um abzuschließen.",
   "Colour": "Farbe",
@@ -1881,7 +1880,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Wie weit die veränderte Stimme hinter Ihrer echten Stimme liegt: {effects} ms von den Effekten + {devices} ms von Ihren Audiogeräten. Unter etwa 100 ms fühlt es sich normal an, darüber zu reden; Pitch-Effekte kosten am meisten, der Rest fast nichts.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Wie weit die veränderte Stimme hinter Ihrer echten Stimme liegt: {effects} ms von den Effekten. Unter etwa 100 ms fühlt es sich normal an, darüber zu reden; Pitch-Effekte kosten am meisten, der Rest fast nichts.",
   "How high": "Wie hoch",
-  "How loud the spoken voice is": "Wie laut die gesprochene Stimme ist",
   "How much of it: up to half": "Wie viel davon: bis zur Hälfte",
   "I'd watch for you…": "Ich würde auf dich aufpassen ...",
   "I'll watch anything…": "Ich werde mir alles ansehen ...",
@@ -3044,9 +3042,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Merkt sich Link, Kanal, Upload-Datum, Länge und Aufrufe jedes Downloads (aus dem Download selbst, nichts wird extra abgerufen), auch in einer Textdatei neben dem Sound. Rechtsklick auf den Sound, um den Link zu öffnen oder zu kopieren. Aus: Neue Downloads merken sich nichts davon und das Menü blendet es aus; schon Gespeichertes bleibt.",
   "Remember where it came from": "Merken, woher er kommt",
   "Set up output": "Ausgabe einrichten",
-  "Sound output": "Tonausgabe",
   "Interface size": "Oberflächengröße",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Macht alles in Onion Board größer oder kleiner: Text, Schaltflächen und Pads.",
   "Onion Board changes size after a restart.": "Onion Board ändert die Größe nach einem Neustart.",
-  "Save a copy": "Kopie speichern"
+  "Save a copy": "Kopie speichern",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klicken, um deine Sounds für andere stummzuschalten (Discord, das Spiel, OBS…). Dein Mikro geht weiter raus, außer der Stimmverzerrer ist an. Du hörst weiter alles",
+  "Click to send your sounds again: right now others hear only your mic": "Klicken, um deine Sounds wieder zu senden: gerade hören andere nur dein Mikro",
+  "Only your mic": "Nur dein Mikro",
+  "Others hear": "Andere hören",
+  "Others hear only your mic": "Andere hören nur dein Mikro"
 }

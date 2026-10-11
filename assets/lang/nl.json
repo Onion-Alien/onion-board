@@ -83,7 +83,6 @@
   "Clear the selection (Esc)": "De selectie wissen (Esc)",
   "Click again to turn it off": "Klik nog eens om het uit te zetten",
   "Click to go live again: others hear you and your sounds": "Klik om weer live te gaan: anderen horen jou en je geluiden",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klik om te dempen: er gaat helemaal niets naar anderen (Discord, de game, OBS…). Jij hoort nog alles",
   "Close": "Sluiten",
   "Close Onion Board and open it again to finish.": "Sluit Onion Board en open het opnieuw om af te ronden.",
   "Colour": "Kleur",
@@ -1881,7 +1880,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Hoe ver ligt de gewijzigde stem achter op je echte stem: {effects} ms van de effecten + {devices} ms van je geluidsapparaten. Minder dan 100 ms voelt normaal om over te praten; pitcheffecten kosten het meeste, de rest bijna niets.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Hoe ver achter je echte stem ligt de gewijzigde stem: {effects} ms van de effecten. Minder dan 100 ms voelt normaal om over te praten; pitcheffecten kosten het meeste, de rest bijna niets.",
   "How high": "Hoe hoog",
-  "How loud the spoken voice is": "Hoe luid de gesproken stem is",
   "How much of it: up to half": "Hoeveel ervan: maximaal de helft",
   "I'd watch for you…": "Ik zou voor je uitkijken...",
   "I'll watch anything…": "Ik zal alles bekijken...",
@@ -3044,9 +3042,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Bewaart van elke download de link, het kanaal, de uploaddatum, de lengte en de weergaven (uit de download zelf, er wordt niets extra opgehaald), ook in een tekstbestand naast het geluid. Klik met rechts op het geluid om de link te openen of te kopiëren. Uit: nieuwe downloads bewaren hier niets van en het menu verbergt het; wat al bewaard is, blijft.",
   "Remember where it came from": "Onthouden waar het vandaan komt",
   "Set up output": "Uitvoer instellen",
-  "Sound output": "Geluidsuitvoer",
   "Interface size": "Grootte van de interface",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Maakt alles in Onion Board groter of kleiner: tekst, knoppen en pads.",
   "Onion Board changes size after a restart.": "Onion Board verandert van grootte na een herstart.",
-  "Save a copy": "Kopie opslaan"
+  "Save a copy": "Kopie opslaan",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Klik om je geluiden voor anderen te dempen (Discord, de game, OBS…). Je microfoon gaat nog steeds mee, tenzij de stemverander aan staat. Jij hoort nog alles",
+  "Click to send your sounds again: right now others hear only your mic": "Klik om je geluiden weer te sturen: nu horen anderen alleen je microfoon",
+  "Only your mic": "Alleen je microfoon",
+  "Others hear": "Anderen horen",
+  "Others hear only your mic": "Anderen horen alleen je microfoon"
 }

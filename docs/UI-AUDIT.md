@@ -56,13 +56,28 @@ the affected states; include its PR and validation evidence here.
   Checked offscreen in Dark and Light at 800x600 and 1180x720 (`tests/test_settings.py`,
   `tests/test_destpanel.py`).
 
-- [ ] **U3: Predictable configuration entry points.** Voice's Make it yours opens a
+- [x] **U3: Predictable configuration entry points.** Voice's Make it yours opens a
   retained modeless editor, AI voice More options expands inline, and mode options
   also appear in menus. Decide by complexity using section 0; retain intentional
   differences. Targets: `ui/voicepanel.py`, `ui/aivoicepanel.py`, `ui/destpanel.py`.
   Acceptance: a few fields expand inline; large/live tuning gets one retained editor;
   entry labels explain the task, reopening raises the existing editor, and collapsed
   cards keep the common controls visible.
+
+  Done (PR #419): checked each entry against section 0; the two kinds are right for
+  their size and stay. *Make it yours* (pitch, every effect, saved voices) is the one
+  retained modeless editor: a second click raises it, closing keeps what you set.
+  *More options* (two to four fields) expands in place on AI voices, Speak another
+  language and, as *Clip editor*, an Apps card; all three now come from one helper
+  (`panel.fold_button`). Fixed: *Make it yours* was under all 24 voice tiles (off the
+  bottom at 1180x720); it now sits beside the on/off switch and wraps under it when
+  narrow. Speak another language's *More options* was below the *What the voice said*
+  box; it now follows the voice and speed. The Say bar lost its own volume (the owner's
+  call): a typed line plays like a sound, so the bottom bar's volumes set it. Left on
+  purpose: Who's listening is both a rail menu (a quick switch) and Settings > Audio's card (the full choice);
+  *What do these do?* there and the AI voice browser still open modal (help and a
+  pick-a-voice list; converting them needs the lifecycle review U4 did). Checked
+  offscreen in Dark and Light at 440, 800x600 and 1180x720 (`tests/test_voicepanel.py`).
 
 - [x] **U4: Consistent live/draft and modal contracts.** MainWindow opens Settings
   and Edit sound with `exec()`; Voice tuning explicitly stays modeless. Settings

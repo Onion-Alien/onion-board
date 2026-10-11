@@ -239,7 +239,6 @@
   "Click again to turn it off": "Klikkaa uudelleen laittaaksesi sen pois",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Klikkaa <b>Puheen syöttölaite</b> -ruutua ja valitse <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Klikkaa palataksesi liveen: muut kuulevat sinut ja äänesi",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Klikkaa mykistääksesi: mitään ei lähde muille (Discord, peli, OBS…). Kuulet silti kaiken",
   "Click to set": "Klikkaa asettaaksesi",
   "Clip {time}": "Klippi {time}",
   "Close": "Sulje",
@@ -1877,7 +1876,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Kuinka kaukana oikeasta äänestäsi muutettu on: {effects} ms tehosteista + {devices} ms äänilaitteistasi. Alle noin 100 ms tuntuu normaalilta puhua; pitch-efektit maksavat eniten, loput eivät juuri mitään.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Kuinka kaukana oikeasta äänestäsi muutettu on: {effects} ms tehosteista. Alle noin 100 ms tuntuu normaalilta puhua; pitch-efektit maksavat eniten, loput eivät juuri mitään.",
   "How high": "Kuinka korkealle",
-  "How loud the spoken voice is": "Kuinka kovaa puhuttu ääni on",
   "How much of it: up to half": "Kuinka paljon siitä: jopa puolet",
   "I'd watch for you…": "katsoisin sinua…",
   "I'll watch anything…": "katson mitä tahansa…",
@@ -3044,9 +3042,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Muistaa jokaisen latauksen linkin, kanavan, latauspäivän, pituuden ja katselut (itse latauksesta, mitään ei haeta lisää), myös tekstitiedostossa äänen vieressä. Napsauta ääntä hiiren oikealla avataksesi tai kopioidaksesi linkin. Pois: uudet lataukset eivät tallenna mitään tästä ja valikko piilottaa sen; jo tallennettu jää.",
   "Remember where it came from": "Muista mistä se tuli",
   "Set up output": "Määritä lähtö",
-  "Sound output": "Äänilähtö",
   "Interface size": "Käyttöliittymän koko",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Tekee kaikesta Onion Boardissa suurempaa tai pienempää: tekstit, painikkeet ja padit.",
   "Onion Board changes size after a restart.": "Onion Boardin koko muuttuu uudelleenkäynnistyksen jälkeen.",
-  "Save a copy": "Tallenna kopio"
+  "Save a copy": "Tallenna kopio",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Napsauta mykistääksesi äänesi muilta (Discord, peli, OBS…). Mikkisi lähtee edelleen, ellei äänenmuuttaja ole päällä. Sinä kuulet edelleen kaiken",
+  "Click to send your sounds again: right now others hear only your mic": "Napsauta lähettääksesi äänesi taas: nyt muut kuulevat vain mikkisi",
+  "Only your mic": "Vain mikkisi",
+  "Others hear": "Muut kuulevat",
+  "Others hear only your mic": "Muut kuulevat vain mikkisi"
 }

@@ -82,7 +82,6 @@
   "Clear the selection (Esc)": "取消选择（Esc）",
   "Click again to turn it off": "再点一次关闭",
   "Click to go live again: others hear you and your sounds": "点击重新开麦：别人能听到你和你的音效",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "点击静音：完全不向别人发送任何声音（Discord、游戏、OBS…）。你自己仍然能听到一切",
   "Close": "关闭",
   "Close Onion Board and open it again to finish.": "关闭 Onion Board 再重新打开即可完成。",
   "Colour": "颜色",
@@ -1837,7 +1836,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "更改后的声音落后于您的真实声音有多远：来自效果的{effects}毫秒 + 来自声音设备的{devices}毫秒。 100ms左右感觉通话正常；音调效果的成本最高，其余的几乎没有。",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "更改后的声音比您的真实声音落后多远：距效果{effects}毫秒。 100ms左右感觉通话正常；音调效果的成本最高，其余的几乎没有。",
   "How high": "多高",
-  "How loud the spoken voice is": "说话的声音有多大",
   "How much of it: up to half": "数量：最多一半",
   "I'd watch for you…": "我会看着你……",
   "I'll watch anything…": "我什么都会看…",
@@ -2979,9 +2977,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "保存每次下载的链接、频道、上传日期、时长和播放量（来自下载本身，不会额外获取任何内容），也会存到声音旁边的文本文件里。右键点击声音即可打开或复制链接。关闭后：新下载不再保存这些内容，菜单也会隐藏；已保存的内容会保留。",
   "Remember where it came from": "记住来源",
   "Set up output": "设置输出",
-  "Sound output": "声音输出",
   "Interface size": "界面大小",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "让 Onion Board 里的一切变大或变小：文字、按钮和音效键。",
   "Onion Board changes size after a restart.": "Onion Board 重启后改变大小。",
-  "Save a copy": "另存副本"
+  "Save a copy": "另存副本",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "点击为别人静音你的声音（Discord、游戏、OBS…）。除非开着变声器，你的麦克风仍会发出去。你自己仍能听到一切",
+  "Click to send your sounds again: right now others hear only your mic": "点击重新发送你的声音：现在别人只听到你的麦克风",
+  "Only your mic": "只有你的麦克风",
+  "Others hear": "别人能听到",
+  "Others hear only your mic": "别人只听到你的麦克风"
 }

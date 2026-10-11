@@ -1,0 +1,2 @@
+- The sidebar's output card is now **Others hear**: one line under it says "Not connected ›" (click it to set up) or "Connected", with even spacing all round.
+- Switching **Others hear** off now cuts only your sounds, the radio and programs: your own voice still goes out while "Send my mic to others" is on and no voice changer is on. With a voice changer on, off is silence as before.

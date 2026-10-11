@@ -350,6 +350,22 @@ def info_button(tip: str) -> QPushButton:
 
 
 
+def fold_button(text: str, body: QWidget | None = None) -> QPushButton:
+    """The one look for a card's inline extras (DESIGN section 0: a few fields expand
+    in place): a quiet checkable link with the fold arrow, which turns when it's open.
+    `body` (hidden to start) shows and hides with it."""
+    b = QPushButton(text)
+    b.setObjectName("fold")
+    b.setCheckable(True)
+    icons.set_icon(b, "fold", "muted", "text", size=12)
+    b.toggled.connect(lambda on: icons.set_icon(b, "fold_open" if on else "fold", "muted",
+                                                "text", size=12))
+    if body is not None:
+        body.hide()
+        b.toggled.connect(body.setVisible)
+    return b
+
+
 def reset_button(tip: str) -> QPushButton:
     """The one look for putting a part back to how it starts, beside that part (an
     effect, Live controls, a sound's effects): small, quiet, the reset arrow and the

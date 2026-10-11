@@ -87,7 +87,6 @@
   "Clear the selection (Esc)": "ألغِ التحديد (Esc)",
   "Click again to turn it off": "انقر مجددًا لإيقافه",
   "Click to go live again: others hear you and your sounds": "انقر للعودة إلى البث المباشر: الآخرون يسمعونك ويسمعون أصواتك",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "انقر للكتم: لا يخرج أي شيء إلى الآخرين (Discord، اللعبة، OBS…). ما زلت تسمع كل شيء",
   "Close": "إغلاق",
   "Close Onion Board and open it again to finish.": "أغلق Onion Board وافتحه مجددًا لإكمال العملية.",
   "Colour": "اللون",
@@ -2057,7 +2056,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "إلى أي مدى يتأخر الصوت الذي تم تغييره عن صوتك الحقيقي: {effects} مللي ثانية من التأثيرات + {devices} مللي ثانية من أجهزة الصوت الخاصة بك. أقل من 100 مللي ثانية تقريبًا يبدو أمرًا طبيعيًا للتحدث؛ تأثيرات درجة الصوت هي الأكثر تكلفة، والباقي لا شيء تقريبًا.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "إلى أي مدى يقع الصوت المتغير خلف صوتك الحقيقي: {effects} مللي ثانية من التأثيرات. أقل من 100 مللي ثانية تقريبًا يبدو أمرًا طبيعيًا للتحدث؛ تأثيرات درجة الصوت هي الأكثر تكلفة، والباقي لا شيء تقريبًا.",
   "How high": "كيف عالية",
-  "How loud the spoken voice is": "ما مدى ارتفاع الصوت المنطوق",
   "How much of it: up to half": "وكم منه: إلى النصف",
   "I'd watch for you…": "كنت أراقبك...",
   "I'll watch anything…": "سأشاهد أي شيء...",
@@ -3304,9 +3302,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "يحتفظ برابط كل تنزيل وقناته وتاريخ رفعه ومدته ومشاهداته (من التنزيل نفسه، دون جلب أي شيء إضافي)، وفي ملف نصي بجانب الصوت أيضًا. انقر بالزر الأيمن على الصوت لفتح الرابط أو نسخه. عند الإيقاف: لا تحتفظ التنزيلات الجديدة بأي منها وتخفيها القائمة، ويبقى ما حُفظ من قبل.",
   "Remember where it came from": "تذكّر من أين جاء",
   "Set up output": "إعداد الإخراج",
-  "Sound output": "إخراج الصوت",
   "Interface size": "حجم الواجهة",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "يكبّر أو يصغّر كل شيء في Onion Board: النصوص والأزرار والأزرار الصوتية.",
   "Onion Board changes size after a restart.": "يتغيّر حجم Onion Board بعد إعادة التشغيل.",
-  "Save a copy": "حفظ نسخة"
+  "Save a copy": "حفظ نسخة",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "انقر لكتم أصواتك عن الآخرين (Discord، اللعبة، OBS…). يبقى ميكروفونك مُرسلًا ما لم يكن مغير الصوت مفعّلًا. أنت تسمع كل شيء",
+  "Click to send your sounds again: right now others hear only your mic": "انقر لإرسال أصواتك مجددًا: الآخرون يسمعون ميكروفونك فقط الآن",
+  "Only your mic": "ميكروفونك فقط",
+  "Others hear": "الآخرون يسمعون",
+  "Others hear only your mic": "الآخرون يسمعون ميكروفونك فقط"
 }

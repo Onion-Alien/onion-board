@@ -4605,9 +4605,11 @@ class MainWindow(QMainWindow):
                          mode="restart", preview=True)
 
     def set_sending(self, on: bool):
-        """The header's master switch: Live (others hear your mic and whatever is live)
-        or Muted (they hear nothing at all). Everything keeps playing for you. Not
-        saved: the app always opens live, so nobody's left wondering why they're silent."""
+        """The master switch, "Others hear": on (others hear your mic and whatever is
+        live) or off (they hear nothing at all, or only your plain voice while your mic is
+        sent and no voice changer is on: engine.mic_only). Everything keeps playing for
+        you. Not saved: the app always opens live, so nobody's left wondering why they're
+        silent."""
         self.engine.sending = on
         if self.btn_air.isChecked() != on:
             self.btn_air.setChecked(on)   # comes back here
@@ -4616,7 +4618,10 @@ class MainWindow(QMainWindow):
         # others hear you; muting still silences the stream output, if there is one
         others = self._main_name() is not None
         stream = bool(self.engine.names["obs"])
-        if not on:
+        voice = not on and others and self.engine.mic_only()
+        if voice:
+            text = (_("Others hear only your mic"), _("Only your mic"), "")
+        elif not on:
             text = (_("Muted: others hear nothing"), _("Muted"), "")
         elif others:
             text = (_("Live: others hear you"), _("Live"), "")
@@ -4626,11 +4631,14 @@ class MainWindow(QMainWindow):
             text = (_("Only you hear sounds"), _("Only you"), "")
         # one word ("Live") on the open rail; the whole sentence leads its tooltip and
         # is what a screen reader says
-        if not on:
+        if voice:
+            tip = _("Click to send your sounds again: right now others hear only your mic")
+        elif not on:
             tip = _("Click to go live again: others hear you and your sounds")
         elif others:
-            tip = (_("Click to mute: nothing at all goes out to others (Discord, the game, "
-                     "OBS…). You still hear everything"))
+            tip = (_("Click to mute your sounds for others (Discord, the game, OBS…). Your "
+                     "mic still goes out unless a voice changer is on. You still hear "
+                     "everything"))
         elif stream:
             tip = (_("Nothing goes out to others, only to the stream output. Click to mute that "
                      "too (you still hear everything)"))
@@ -7255,6 +7263,9 @@ class MainWindow(QMainWindow):
         if spec.get("enabled"):
             usage.used("voice-changer")
         self.set_option("voice_fx", spec)
+        # off, a voice changer decides whether your mic still goes out: the switch says so
+        # (tied to the button: a window closing meanwhile drops it)
+        QTimer.singleShot(0, self.btn_air, lambda: self.set_sending(self.btn_air.isChecked()))
 
     def _remember_usage(self):   # features used and time open, for the next daily count
         usage.open_tick(self.cfg)

@@ -211,7 +211,6 @@
   "Click again to turn it off": "Кликни пак, за да го изключиш",
   "Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>{mic}</b>.": "Кликни полето <b>Voice Input Device</b> и избери <b style='color:{colour}'>{mic}</b>.",
   "Click to go live again: others hear you and your sounds": "Кликни, за да си пак на живо: другите чуват теб и звуците ти",
-  "Click to mute: nothing at all goes out to others (Discord, the game, OBS…). You still hear everything": "Кликни, за да заглушиш: нищо не излиза към другите (Discord, играта, OBS…). Ти пак чуваш всичко",
   "Click to set": "Кликни, за да зададеш",
   "Clip {time}": "Клип {time}",
   "Close": "Затвори",
@@ -1787,7 +1786,6 @@
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Колко далеч зад истинския ви глас е промененият: {effects} ms от ефектите + {devices} ms от звуковите ви устройства. Под около 100 ms се чувства нормално за разговор; pitch ефектите струват най-много, останалите почти нищо.",
   "How far behind your real voice the changed one is: {effects} ms from the effects. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Колко далеч зад истинския ви глас е промененият: {effects} ms от ефектите. Под около 100 ms се чувства нормално за разговор; pitch ефектите струват най-много, останалите почти нищо.",
   "How high": "Колко високо",
-  "How loud the spoken voice is": "Колко силен е изговореният глас",
   "How much of it: up to half": "Колко от него: до половината",
   "I'd watch for you…": "Бих те гледал...",
   "I'll watch anything…": "Ще гледам всичко…",
@@ -3044,9 +3042,13 @@
   "Keeps each download's link, channel, upload date, length and views (from the download itself, nothing extra is fetched), in a text file next to the sound too. Right-click the sound to open or copy the link. Off: new downloads keep none of it and the menu hides it; what's already saved stays.": "Пази връзката, канала, датата на качване, дължината и гледанията на всяко изтегляне (от самото изтегляне, нищо допълнително не се тегли), и в текстов файл до звука. Щракни с десния бутон върху звука, за да отвориш или копираш връзката. Изключено: новите изтегляния не пазят нищо от това и менюто го скрива; вече запазеното остава.",
   "Remember where it came from": "Запомни откъде е",
   "Set up output": "Настройка на изхода",
-  "Sound output": "Звуков изход",
   "Interface size": "Размер на интерфейса",
   "Makes everything in Onion Board bigger or smaller: text, buttons and pads.": "Прави всичко в Onion Board по-голямо или по-малко: текст, бутони и падове.",
   "Onion Board changes size after a restart.": "Onion Board сменя размера си след рестарт.",
-  "Save a copy": "Запази копие"
+  "Save a copy": "Запази копие",
+  "Click to mute your sounds for others (Discord, the game, OBS…). Your mic still goes out unless a voice changer is on. You still hear everything": "Натисни, за да заглушиш звуците си за другите (Discord, играта, OBS…). Микрофонът ти продължава да се праща, освен ако промяната на гласа е включена. Ти чуваш всичко",
+  "Click to send your sounds again: right now others hear only your mic": "Натисни, за да пращаш пак звуците си: сега другите чуват само микрофона ти",
+  "Only your mic": "Само микрофона ти",
+  "Others hear": "Другите чуват",
+  "Others hear only your mic": "Другите чуват само микрофона ти"
 }
