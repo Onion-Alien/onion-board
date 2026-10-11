@@ -2912,7 +2912,7 @@
   "Voice changer: {voice}. Click to open it.": "ボイスチェンジャー: {voice} 。クリックして開きます。",
   "The computer voice ({voice}) speaks for you. Click to open it.": "コンピューターの音声 ( {voice} ) があなたの代わりに話します。クリックして開きます。",
   "What you say is said in {language}. Click to open it.": "あなたが言ったことは{language}で言われています。クリックして開きます。",
-  "Voice effects off — mic unchanged": "音声エフェクトはオフ - マイクは変更されません",
+  "Voice effects off: mic unchanged": "音声エフェクトはオフ：マイクは変更されません",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "マイクの声は変わりません。以下のボイスチェンジャーまたは AI 音声を開いて音声を選択します。",
   "AI voice off": "AI音声オフ",
   "Click to open AI voices.": "クリックすると AI 音声が開きます。",

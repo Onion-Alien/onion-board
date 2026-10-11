@@ -2976,7 +2976,7 @@
   "Voice changer: {voice}. Click to open it.": "Ses değiştirici: {voice} . Açmak için tıklayın.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Bilgisayar sesi ( {voice} ) sizin adınıza konuşur. Açmak için tıklayın.",
   "What you say is said in {language}. Click to open it.": "Söyledikleriniz {language} dilinde söyleniyor. Açmak için tıklayın.",
-  "Voice effects off — mic unchanged": "Ses efektleri kapalı — mikrofon değişmedi",
+  "Voice effects off: mic unchanged": "Ses efektleri kapalı: mikrofon değişmedi",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Mikrofon sesiniz değişmedi. Bir ses seçmek için aşağıda Ses değiştiriciyi veya AI seslerini açın.",
   "AI voice off": "AI sesi kapalı",
   "Click to open AI voices.": "AI seslerini açmak için tıklayın.",

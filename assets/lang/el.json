@@ -2976,7 +2976,7 @@
   "Voice changer: {voice}. Click to open it.": "Αλλαγή φωνής: {voice} . Κάντε κλικ για να το ανοίξετε.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Η φωνή του υπολογιστή ( {voice} ) μιλάει για εσάς. Κάντε κλικ για να το ανοίξετε.",
   "What you say is said in {language}. Click to open it.": "Αυτό που λέτε λέγεται στη {language} . Κάντε κλικ για να το ανοίξετε.",
-  "Voice effects off — mic unchanged": "Φωνητικά εφέ απενεργοποιημένα — το μικρόφωνο αμετάβλητο",
+  "Voice effects off: mic unchanged": "Φωνητικά εφέ απενεργοποιημένα: το μικρόφωνο αμετάβλητο",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Η φωνή του μικροφώνου σας δεν έχει αλλάξει. Ανοίξτε το Voice changer ή τις φωνές AI παρακάτω για να επιλέξετε φωνή.",
   "AI voice off": "Η φωνή AI σβήνει",
   "Click to open AI voices.": "Κάντε κλικ για να ανοίξετε τις φωνές AI.",

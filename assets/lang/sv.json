@@ -2976,7 +2976,7 @@
   "Voice changer: {voice}. Click to open it.": "Röstväxlare: {voice} . Klicka för att öppna den.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Datorrösten ( {voice} ) talar för dig. Klicka för att öppna den.",
   "What you say is said in {language}. Click to open it.": "Det du säger sägs på {language} . Klicka för att öppna den.",
-  "Voice effects off — mic unchanged": "Rösteffekter av — mikrofonen oförändrad",
+  "Voice effects off: mic unchanged": "Rösteffekter av: mikrofonen oförändrad",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Din mikrofonröst är oförändrad. Öppna Voice changer eller AI-röster nedan för att välja en röst.",
   "AI voice off": "AI-röst avstängd",
   "Click to open AI voices.": "Klicka för att öppna AI-röster.",

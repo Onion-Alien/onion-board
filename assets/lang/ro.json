@@ -3040,7 +3040,7 @@
   "Voice changer: {voice}. Click to open it.": "Schimbător de voce: {voice} . Faceți clic pentru a-l deschide.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Vocea computerului ( {voice} ) vorbește pentru tine. Faceți clic pentru a-l deschide.",
   "What you say is said in {language}. Click to open it.": "Ceea ce spui este spus în {language} . Faceți clic pentru a-l deschide.",
-  "Voice effects off — mic unchanged": "Efecte vocale dezactivate — microfon neschimbat",
+  "Voice effects off: mic unchanged": "Efecte vocale dezactivate: microfon neschimbat",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Vocea dvs. de microfon este neschimbată. Deschideți mai jos Schimbător de voce sau voci AI pentru a alege o voce.",
   "AI voice off": "Vocea AI oprită",
   "Click to open AI voices.": "Faceți clic pentru a deschide voci AI.",

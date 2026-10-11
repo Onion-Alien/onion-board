@@ -2912,7 +2912,7 @@
   "Voice changer: {voice}. Click to open it.": "Pengubah suara: {voice} . Klik untuk membukanya.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Suara komputer ( {voice} ) berbicara mewakili Anda. Klik untuk membukanya.",
   "What you say is said in {language}. Click to open it.": "Apa yang Anda ucapkan disampaikan dalam {language} . Klik untuk membukanya.",
-  "Voice effects off — mic unchanged": "Efek suara mati — mikrofon tidak berubah",
+  "Voice effects off: mic unchanged": "Efek suara mati: mikrofon tidak berubah",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Suara mikrofon Anda tidak berubah. Buka Pengubah suara atau suara AI di bawah untuk memilih suara.",
   "AI voice off": "Suara AI mati",
   "Click to open AI voices.": "Klik untuk membuka suara AI.",

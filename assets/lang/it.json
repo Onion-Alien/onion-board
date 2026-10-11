@@ -2976,7 +2976,7 @@
   "Voice changer: {voice}. Click to open it.": "Cambia voce: {voice} . Fare clic per aprirlo.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "La voce computerizzata ( {voice} ) parla per te. Fare clic per aprirlo.",
   "What you say is said in {language}. Click to open it.": "Ciò che dici è detto in {language} . Fare clic per aprirlo.",
-  "Voice effects off — mic unchanged": "Effetti vocali disattivati: microfono invariato",
+  "Voice effects off: mic unchanged": "Effetti vocali disattivati: microfono invariato",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "La voce del tuo microfono è rimasta invariata. Apri Cambia voce o Voci AI di seguito per scegliere una voce.",
   "AI voice off": "Voce AI disattivata",
   "Click to open AI voices.": "Fare clic per aprire le voci AI.",
