@@ -10,7 +10,6 @@ from test_engine import engine_with
 from test_mainwindow import window  # noqa: F401
 
 from soundboard import backup, eq, library, mapped, soundfx, trash
-from soundboard.settings import SettingsDialog
 
 
 def test_setting_defaults_and_roundtrips(app_dir):
@@ -114,11 +113,12 @@ def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, c
 
 
 def test_settings_toggle_applies_and_survives_reload(window):  # noqa: F811
-    d = SettingsDialog(window, "data")
+    d = window.open_settings("data")
+    assert d.embedded and d.done_btn is None
     assert not d.copy_local_sounds.isChecked()
     d.copy_local_sounds.setChecked(True)
     assert window.cfg.copy_local_sounds
     assert library.Config.from_raw(window.cfg.to_raw()).copy_local_sounds
     d.copy_local_sounds.setChecked(False)
     assert not window.cfg.copy_local_sounds
-    d.close()
+    window.close_settings()
