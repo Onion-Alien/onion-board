@@ -3036,7 +3036,6 @@
   "Update to new version": "Cập nhật lên bản mới",
   "Added the voice “{name}”": "Đã thêm giọng “{name}”",
   "Added {n} clip to your Sounds": [
-    "Đã thêm {n} đoạn vào Âm thanh của bạn",
     "Đã thêm {n} đoạn vào Âm thanh của bạn"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "Đã sao chép “{name}”: Ctrl+V dán vào trình chỉnh sửa hoặc thẻ Âm thanh",

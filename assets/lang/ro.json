@@ -3177,6 +3177,7 @@
   "Added the voice “{name}”": "Vocea „{name}” a fost adăugată",
   "Added {n} clip to your Sounds": [
     "{n} clip adăugat la sunetele tale",
+    "Clipuri adăugate la sunetele tale: {n}",
     "Clipuri adăugate la sunetele tale: {n}"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "„{name}” copiat: Ctrl+V îl lipește într-un editor sau în fila Sunete",

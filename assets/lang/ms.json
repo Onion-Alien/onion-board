@@ -3036,7 +3036,6 @@
   "Update to new version": "Kemas kini ke versi baharu",
   "Added the voice “{name}”": "Suara “{name}” ditambah",
   "Added {n} clip to your Sounds": [
-    "{n} klip ditambah ke Bunyi anda",
     "{n} klip ditambah ke Bunyi anda"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}” disalin: Ctrl+V menampalnya dalam editor atau pada tab Bunyi",

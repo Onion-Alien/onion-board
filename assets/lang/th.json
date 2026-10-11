@@ -3036,7 +3036,6 @@
   "Update to new version": "อัปเดตเป็นเวอร์ชันใหม่",
   "Added the voice “{name}”": "เพิ่มเสียง “{name}” แล้ว",
   "Added {n} clip to your Sounds": [
-    "เพิ่ม {n} คลิปไปยังเสียงของคุณแล้ว",
     "เพิ่ม {n} คลิปไปยังเสียงของคุณแล้ว"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "คัดลอก “{name}” แล้ว: Ctrl+V จะวางในโปรแกรมแก้ไขหรือในแท็บเสียง",

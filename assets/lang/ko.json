@@ -3036,7 +3036,6 @@
   "Update to new version": "새 버전으로 업데이트",
   "Added the voice “{name}”": "“{name}” 음성을 추가했어요",
   "Added {n} clip to your Sounds": [
-    "클립 {n}개를 사운드에 추가했어요",
     "클립 {n}개를 사운드에 추가했어요"
   ],
   "Copied “{name}”: Ctrl+V pastes it in an editor or on the Sounds tab": "“{name}”을(를) 복사했어요: Ctrl+V로 편집기나 사운드 탭에 붙여넣을 수 있어요",
