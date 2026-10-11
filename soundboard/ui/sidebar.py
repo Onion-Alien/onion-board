@@ -205,7 +205,19 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
 
 
 class OutputBlock(QFrame):
-    """Named output switch and connection help for the expanded rail."""
+    """Named output switch and connection help for the expanded rail.
+
+    Built on keylines (docs/DESIGN.md *Icon and text alignment*): its icons sit in
+    the same column as the tab icons above and the buttons below, every line of
+    words starts at the same x after them, and each icon is centred on the cap
+    height of its label's first line."""
+
+    LEAD = 11             # card edge to the icon column: the tab icons' centre line
+    PAD = 8               # the card's other padding
+    GLYPH = 16            # the icon column
+    GAP = 6               # icon to words (8 wraps "Sound output" on the 190 px rail)
+    TEXT_X = LEAD + GLYPH + GAP   # the keyline: where every line of words starts
+    ACTION_PAD = 8        # the setup action's hover fill past its words
 
     def __init__(self, power: QPushButton, connection: QPushButton):
         super().__init__()
@@ -214,19 +226,16 @@ class OutputBlock(QFrame):
         self.setObjectName("railoutput")
         self.power, self.connection = power, connection
         box = self.box = QVBoxLayout(self)
-        box.setContentsMargins(8, 8, 8, 8)
+        box.setContentsMargins(self.LEAD, self.PAD, self.PAD, self.PAD)
         box.setSpacing(0)
         top = self.top = QHBoxLayout()
-        top.setSpacing(4)
-        mark = self.mark = QLabel()
-        mark.setFixedSize(16, 20)
-        mark.setContentsMargins(0, 4, 0, 0)   # optical centre of Segoe's visible glyphs
-        mark.setAlignment(Qt.AlignCenter)
-        icons.set_label_icon(mark, "live", "accent", size=16)
+        top.setSpacing(0)   # icon GAP words, then a tighter 4 before the switch
+        mark = self.mark = self._glyph()
+        icons.set_label_icon(mark, "live", "accent", size=self.GLYPH)
         self.title = QLabel(_("Sound output"))
         self.title.setObjectName("railoutputtitle")
         self.title.setWordWrap(True)
-        self.title.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
+        self.title.setAlignment(Qt.AlignLeading | Qt.AlignTop)
         self.title.setMinimumWidth(0)
         self.switch = Switch()
         self.switch.setProperty("glyphoffset", 1)
@@ -235,54 +244,97 @@ class OutputBlock(QFrame):
         self.switch.setChecked(power.isChecked())
         self.switch.toggled.connect(power.setChecked)
         power.toggled.connect(self.switch.setChecked)
-        top.addWidget(mark, 0, Qt.AlignVCenter)
-        top.addWidget(self.title, 1)
-        top.addWidget(self.switch)
+        top.addWidget(mark, 0, Qt.AlignTop)
+        self._title_gap = QSpacerItem(self.GAP, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        top.addSpacerItem(self._title_gap)
+        top.addWidget(self.title, 1, Qt.AlignTop)
+        top.addSpacing(4)
+        top.addWidget(self.switch, 0, Qt.AlignTop)
         box.addLayout(top)
         self._status_gap = QSpacerItem(0, 4, QSizePolicy.Minimum, QSizePolicy.Fixed)
         box.addSpacerItem(self._status_gap)
         status = QHBoxLayout()
-        status.setSpacing(6)
-        self.status_icon = QLabel()
-        self.status_icon.setFixedSize(16, 20)
-        self.status_icon.setContentsMargins(0, 4, 0, 0)
-        self.status_icon.setAlignment(Qt.AlignCenter)
+        status.setSpacing(self.GAP)
+        self.status_icon = self._glyph()
         self.status_text = QLabel()
         self.status_text.setWordWrap(True)
-        self.status_text.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
+        self.status_text.setAlignment(Qt.AlignLeading | Qt.AlignTop)
         self.status_text.setMinimumWidth(0)
-        status.addWidget(self.status_icon, 0, Qt.AlignVCenter)
-        status.addWidget(self.status_text, 1)
+        status.addWidget(self.status_icon, 0, Qt.AlignTop)
+        status.addWidget(self.status_text, 1, Qt.AlignTop)
         box.addLayout(status)
+        # the action is a second line of the status row: its words start on the
+        # keyline too, and its hover fill reaches GAP past them on each side
         self.setup = QPushButton()
         self.setup.setObjectName("railoutputsetup")
         self.setup.setProperty("quiet", True)
         self.setup.setCursor(Qt.PointingHandCursor)
         self.setup.setMinimumHeight(34)
+        # grows with a wrapped (translated) label instead of clipping it
+        self.setup.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         self.setup.setAccessibleName(_("Set up output"))
-        action = QHBoxLayout(self.setup)
-        action.setContentsMargins(0, 4, 0, 4)
-        action.setSpacing(4)
-        label = QLabel(_("Set up output"))
+        action = self.action = QHBoxLayout(self.setup)
+        action.setContentsMargins(self.ACTION_PAD, 4, self.ACTION_PAD, 4)
+        action.setSpacing(0)   # the chevron glyph has ~5 px of air in its 16 px box
+        label = self.setup_label = _HugLabel(_("Set up output"))
         label.setWordWrap(True)
-        label.setAlignment(Qt.AlignLeading | Qt.AlignVCenter)
-        label.setMinimumWidth(0)
+        label.setAlignment(Qt.AlignLeading | Qt.AlignTop)
         label.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.arrow = QLabel()
-        self.arrow.setFixedSize(16, 24)
-        self.arrow.setContentsMargins(0, 2, 0, 0)
-        self.arrow.setAlignment(Qt.AlignCenter)
+        self.arrow = self._glyph()
         self.arrow.setAttribute(Qt.WA_TransparentForMouseEvents)
-        action.addWidget(label, 0, Qt.AlignVCenter)
-        action.addWidget(self.arrow, 0, Qt.AlignVCenter)
-        action.addStretch(1)
+        action.addWidget(label, 0, Qt.AlignTop)
+        action.addWidget(self.arrow, 0, Qt.AlignTop)
+        action.addStretch(1)   # the chevron stays beside its words
         self.setup.clicked.connect(connection.click)
-        box.addWidget(self.setup)
+        row = self.setup_row = QHBoxLayout()
+        row.setSpacing(0)
+        self._setup_indent = QSpacerItem(self.GLYPH + self.GAP - self.ACTION_PAD, 0,
+                                         QSizePolicy.Fixed, QSizePolicy.Minimum)
+        row.addSpacerItem(self._setup_indent)
+        row.addWidget(self.setup, 1)
+        box.addLayout(row)
         self.refresh()
+
+    def _glyph(self) -> QLabel:
+        g = QLabel()
+        g.setFixedWidth(self.GLYPH)
+        g.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        return g
+
+    def _pin(self, glyph: QLabel, label: QLabel, lead: int = 0):
+        """Centre `glyph` on the cap height of `label`'s first line (not on the
+        label's box: a wrapped label's box centre falls between its lines). `lead`:
+        how far the label's first line is pushed down."""
+        label.ensurePolished()
+        fm = label.fontMetrics()
+        centre = lead + fm.ascent() - fm.capHeight() / 2
+        top = max(0, int(centre - self.GLYPH / 2))   # (a half pixel up: the overshoot)
+        glyph.setContentsMargins(0, top, 0, 0)
+        glyph.setFixedHeight(max(fm.height(), top + self.GLYPH))
+
+    def _pin_all(self):
+        # the title's first line is centred on the switch, and the mark on that line
+        self.title.ensurePolished()
+        lead = max(0, -(-(self.switch.height() - self.title.fontMetrics().height()) // 2))
+        self.title.setContentsMargins(0, lead, 0, 0)
+        self._pin(self.mark, self.title, lead)
+        self._pin(self.status_icon, self.status_text)
+        # one line of the action: centred in its 34 px; wrapped, the chevron stays
+        # on the first line
+        self.setup_label.ensurePolished()
+        pad = max(4, (34 - self.setup_label.fontMetrics().height()) // 2)
+        self.action.setContentsMargins(self.ACTION_PAD, pad, self.ACTION_PAD, pad)
+        self._pin(self.arrow, self.setup_label)
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() in (QEvent.StyleChange, QEvent.FontChange):
+            self._pin_all()
 
     def set_expanded(self, expanded: bool):
         self.setProperty("expanded", expanded)
-        self.box.setContentsMargins(*(8, 8, 8, 8) if expanded else (0, 4, 0, 4))
+        self.box.setContentsMargins(*(self.LEAD, self.PAD, self.PAD, self.PAD) if expanded
+                                    else (0, 4, 0, 4))
         self.top.setDirection(QBoxLayout.LeftToRight if expanded else QBoxLayout.TopToBottom)
         self.title.setVisible(expanded)
         self.status_icon.setVisible(expanded)
@@ -292,11 +344,15 @@ class OutputBlock(QFrame):
         self._status_gap.changeSize(0, 4 if expanded else 0,
                                     QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.box.invalidate()
-        self.top.setAlignment(self.mark, Qt.AlignVCenter if expanded else Qt.AlignHCenter)
-        self.top.setAlignment(self.switch, Qt.AlignVCenter if expanded else Qt.AlignHCenter)
+        self.top.setAlignment(self.mark, Qt.AlignTop if expanded else Qt.AlignHCenter)
+        self.top.setAlignment(self.switch, Qt.AlignTop if expanded else Qt.AlignHCenter)
         self.setFixedWidth(OPEN_W - 2 * SIDE_OPEN - 1 if expanded else BUTTON_W)
         self.style().unpolish(self)
         self.style().polish(self)
+        self._pin_all()
+        if not expanded:   # shut: just the icon, centred over the switch
+            self.mark.setContentsMargins(0, 0, 0, 0)
+            self.mark.setFixedHeight(self.GLYPH)
 
     def refresh(self):
         self.switch.setToolTip(self.power.toolTip())
@@ -306,10 +362,23 @@ class OutputBlock(QFrame):
         good = self.connection.property("state") == "ok"
         self.setup.setVisible(bool(self.property("expanded")) and not good)
         theme.set_tone(self.status_text, "ok" if good else "warn")
-        self.status_icon.setPixmap(self.connection.icon().pixmap(16, 16))
+        self.status_icon.setPixmap(self.connection.icon().pixmap(self.GLYPH, self.GLYPH))
         self.setup.setToolTip(self.connection.toolTip())
         icons.set_label_icon(self.arrow, "fold_back" if self.isRightToLeft() else "fold",
-                             "accent", size=16)
+                             "accent", size=self.GLYPH)
+        self._pin_all()
+
+
+class _HugLabel(QLabel):
+    """A wrapping label that asks only for its words' width, so whatever follows it
+    (a chevron) sits right after the words; short of room, it wraps."""
+
+    def sizeHint(self):
+        width = self.fontMetrics().horizontalAdvance(self.text()) + 1
+        return QSize(width, self.heightForWidth(width))
+
+    def minimumSizeHint(self):
+        return QSize(0, super().minimumSizeHint().height())
 
 
 class ClickLabel(QLabel):
