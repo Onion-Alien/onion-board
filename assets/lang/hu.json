@@ -2124,7 +2124,6 @@
   "That isn't a Myinstants sound link.": "Ez nem egy Myinstants hanglink.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Ez nem proxycím: így kell kinéznie: socks5h://127.0.0.1:9050 vagy http://host:8080",
   "That isn't a voice code (they start with “OB1-”).": "Ez nem hangkód (az „OB1-”-vel kezdődnek).",
-  "That link isn't from a site sounds can be added from.": "Ez a link nem olyan webhelyről származik, ahonnan hangokat lehet hozzáadni.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Ez a mikrofon nincs bedugva (vagy a Windows nem tartalmazza).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Ehhez be kell jelentkezni az oldalra, amit az Onion Board nem tesz meg.",
   "That program isn't running any more.": "Ez a program már nem fut.",
@@ -2943,7 +2942,6 @@
   "Mic on": "Mikrofon bekapcsolva",
   "Output": "Kimenet",
   "Mic muted": "Mikrofon némítva",
-  "Mute or unmute your microphone for others": "Némítsd vagy kapcsold be a mikrofonod másoknak",
   "Library": "Könyvtár",
   "Quick hotkeys": "Gyorsbillentyűk",
   "{route}: {status}": "{route}: {status}",
@@ -3149,5 +3147,8 @@
   "Virtual cable": "Virtuális kábel",
   "Working": "Működik",
   "Working: your sounds go into your mic": "Működik: a hangjaid a mikrofonodba mennek",
-  "Your mic needs a quick repair": "A mikrofonodnak gyors javítás kell"
+  "Your mic needs a quick repair": "A mikrofonodnak gyors javítás kell",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Némítsd vagy kapcsold be a mikrofonod másoknak. A hangjaid továbbra is szólnak nekik.",
+  "That page has no sound Onion Board can add.": "Ezen az oldalon nincs olyan hang, amit az Onion Board hozzá tudna adni.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Az eltávolított hangok visszajönnek a Visszavonással, vagy később a Biztonsági mentés → Nemrég törölt hangok menüből."
 }

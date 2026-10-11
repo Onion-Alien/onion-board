@@ -2082,7 +2082,6 @@
   "That isn't a Myinstants sound link.": "Это не звуковая ссылка Myinstants.",
   "That isn't a proxy address: it should look like socks5h://127.0.0.1:9050 or http://host:8080": "Это не прокси-адрес: он должен выглядеть так: socks5h://127.0.0.1:9050 или http://host:8080.",
   "That isn't a voice code (they start with “OB1-”).": "Это не голосовой код (они начинаются с «OB1-»).",
-  "That link isn't from a site sounds can be added from.": "Эта ссылка не с сайта, с которого можно добавить звуки.",
   "That mic isn't plugged in (or Windows doesn't list it).": "Этот микрофон не подключен (или Windows его не показывает).",
   "That needs signing in to the site, which Onion Board doesn't do.": "Для этого необходимо войти на сайт, чего Onion Board не делает.",
   "That program isn't running any more.": "Эта программа больше не работает.",
@@ -3006,7 +3005,6 @@
   "Mic on": "Микрофон включён",
   "Output": "Выход",
   "Mic muted": "Микрофон выключен",
-  "Mute or unmute your microphone for others": "Выключи или включи микрофон для других",
   "Library": "Библиотека",
   "Quick hotkeys": "Быстрые клавиши",
   "{route}: {status}": "{route}: {status}",
@@ -3222,5 +3220,8 @@
   "Virtual cable": "Виртуальный кабель",
   "Working": "Работает",
   "Working: your sounds go into your mic": "Работает: твои звуки идут в микрофон",
-  "Your mic needs a quick repair": "Микрофону нужен быстрый ремонт"
+  "Your mic needs a quick repair": "Микрофону нужен быстрый ремонт",
+  "Mute or unmute your mic for others. Your sounds still play for them.": "Выключи или включи микрофон для других. Твои звуки они всё равно слышат.",
+  "That page has no sound Onion Board can add.": "На этой странице нет звука, который Onion Board может добавить.",
+  "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Удалённые звуки вернёт «Отменить», а позже — Копия → Недавно удалённые звуки."
 }
