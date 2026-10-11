@@ -394,13 +394,15 @@ def _add_hover_token(t: dict[str, str]) -> None:
          if _contrast(c, t["on_accent"]) >= 4.5), t["accent_hi"])
 
 
+SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
+
 for _t in THEMES.values():
-    # Secondary text must read on the brightest surface used behind it.
+    # Secondary text must read (4.5:1) on every surface it sits on: a quiet button's
+    # hover and the inset boxes too (they were 3.6-4.5:1 in most themes).
     for key in ("muted", "faint"):
         _t[key] = next(c for c in (_mix(_t[key], _t["text_hi"], i / 20)
                                   for i in range(21))
-                       if min(_contrast(c, _t[bg]) for bg in
-                              ("bg", "panel", "card", "card_hi", "btn")) >= 4.5
+                       if min(_contrast(c, _t[bg]) for bg in SECONDARY_ON if bg in _t) >= 4.5
                        or c == _t["text_hi"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
@@ -685,6 +687,7 @@ QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-ra
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
 QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$border_hi; }
 QLineEdit { selection-background-color:$btn_press; selection-color:$text_hi; }
+QLineEdit, QPlainTextEdit, QTextEdit, QComboBox { placeholder-text-color:$muted; }
 QComboBox { padding:6px 10px; padding-right:6px; combobox-popup:0; }
 QComboBox::drop-down { subcontrol-origin:padding; subcontrol-position:center right;
     width:26px; border:none; background:transparent; }

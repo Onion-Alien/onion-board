@@ -118,10 +118,20 @@ mode only at very small sizes (360×320 yes, 440×380 no) with status + mic in i
 and audio footer, grouped Sounds toolbar, Voice changer open by default, pad sorting
 with play counts, Ctrl+wheel pad volume, Save as sound, list view, category colours.
 
-- [ ] **U10: Dim secondary text.** Hints, pad durations, "Drop sound files here",
+- [x] **U10: Dim secondary text.** Hints, pad durations, "Drop sound files here",
   "Pad size" and empty-state lines are still faint on the dark background. Measure
   contrast (aim for WCAG AA, 4.5:1) in Dark, Light and the other themes, then raise
   the secondary text colour token rather than patching single labels.
+
+  Done (PR #PRNUM): measured every theme. `muted`/`faint` already cleared 4.5:1 on
+  bg, panel, card, card_hi and btn, but not on `btn_hover` (quiet buttons and rail
+  tabs under the mouse) or `inset`: 3.6-4.5:1 in 30 of 31 themes (Deep Fried 3.6,
+  Barbie 3.95, Dark 4.06). `theme.SECONDARY_ON` now lists those surfaces too, so the
+  tokens lift until they pass; nothing got dimmer. Placeholder text ("Search sounds
+  or paste a link") was Qt's half-see-through text colour (Light 3.2:1, Retro 98
+  4.0, Dark 4.2): the style sheet now gives it `$muted` (5.9, 11.4, 5.9). Checked
+  offscreen in Dark, Light and High Contrast at 440, 800x600, 1180x720 and 1920x1080
+  (`tests/test_ui_audit.py`).
 - [ ] **U11: Full-screen stretching.** At 1920×1080 the seek bar, the *What others
   hear* meter, the search box and the drop box run the whole width. Cap utility widths
   (DESIGN: narrow by default) and recheck with a populated board.
