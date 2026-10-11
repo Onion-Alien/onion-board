@@ -15,7 +15,8 @@ def _assert_icon_only_folder(btn: QPushButton):
     assert btn.objectName() == "iconbutton"
     assert not btn.icon().isNull()                    # a folder is drawn
     assert btn.toolTip()                              # the words moved to the tooltip
-    assert btn.accessibleName() == btn.toolTip()      # and name it for a screen reader
+    assert btn.accessibleName() == "Open folder"      # a screen reader hears what it does
+    assert btn.toolTip().startswith(btn.accessibleName())  # and the tooltip leads with it
     assert btn.minimumSizeHint().height() >= 24       # not a smaller click target
 
 
