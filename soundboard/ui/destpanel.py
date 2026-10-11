@@ -292,9 +292,12 @@ class DestPanel(QWidget):
             _("Every voice chat sends one channel. Onion Board makes it, smarter than Discord or "
               "a game would: wide stereo sounds and phasey bass don't cancel out"))
         v.addWidget(self.chk_mono)
-        duck = QHBoxLayout()
+        # the label on one line (Settings wraps its labels: it went onto two with room
+        # to spare); in a narrow window the choice goes under it instead
+        duck_row = QWidget()
+        duck = Flow(duck_row, gap=8)
         duck_lbl = QLabel(_("While I talk, lower my sounds:"))
-        duck_lbl.setProperty("keepline", True)   # (Settings wraps its labels)
+        duck_lbl.setProperty("keepline", True)
         duck.addWidget(duck_lbl)
         self.cb_duck = QComboBox()
         no_wheel(self.cb_duck)
@@ -303,8 +306,7 @@ class DestPanel(QWidget):
         self.cb_duck.setToolTip(_("Turns your sounds down while the mic hears you, so your voice "
                                   "isn't buried under a song"))
         duck.addWidget(self.cb_duck)
-        duck.addStretch(1)
-        v.addLayout(duck)
+        v.addWidget(duck_row)
         self.chk_gate = QCheckBox(_("Mute my mic while a sound plays"))
         self.chk_gate.setToolTip(_("Others hear only the sound, clean, and your mic comes back "
                                    "the moment it ends. Handy with a noisy room or keyboard."))
