@@ -272,3 +272,27 @@ def test_a_long_button_goes_under_the_text(qapp):
     assert t.card._under.indexOf(t.card.action) >= 0
     assert short.card._row.indexOf(short.card.action) >= 0
     w.close()
+
+
+def test_a_cards_parts_line_up(qapp):
+    """The long button's words start where the message does; the icon, copy and ✕
+    sit in the middle of the first line."""
+    from PySide6.QtCore import QPoint
+    w = _host(qapp)
+    t = busy.toast(w, "<b>Couldn't update</b><br>It couldn't be downloaded.", "error",
+                   action=("Open the download page", lambda: None))
+    qapp.processEvents()
+    c = t.card
+
+    def left_of_words(widget, words):
+        inset = (widget.width() - widget.fontMetrics().horizontalAdvance(words)) // 2 \
+            if widget is c.action else widget.contentsMargins().left()
+        return widget.mapTo(c, QPoint(0, 0)).x() + inset
+
+    assert abs(left_of_words(c.action, c.action.text()) - left_of_words(c.label, "")) <= 1
+    first = c.label.mapTo(c, QPoint(0, 0)).y() + c.label.contentsMargins().top() \
+        + c.label.fontMetrics().height() / 2
+    for part in (c.icon, c.btn_copy, c.btn_close):
+        middle = part.mapTo(c, QPoint(0, 0)).y() + part.height() / 2
+        assert abs(middle - first) <= 2, part
+    w.close()

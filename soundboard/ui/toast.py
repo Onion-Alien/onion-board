@@ -41,6 +41,7 @@ from soundboard.ui import icons
 TOAST_MS = 4000
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
 MAX_SHOWN = 3
+UNDER = 28                # where the text starts: past the icon (18) and a gap (10)
 ACTION_INLINE = 110       # a button wider than this goes under the text
 WIDTH = 380               # at most; narrower windows get their width less 32
 MARGIN = 16               # from the window's side
@@ -139,7 +140,6 @@ class _Card(QFrame):
         # a long button goes on a line of its own under the text (set_action_place),
         # so it doesn't squeeze the words into a thin column
         self._under = QHBoxLayout()
-        self._under.setContentsMargins(28, 0, 0, 0)   # 28: under the text, past the icon
         outer.addLayout(self._under)
         self.icon = QLabel()
         self.icon.setFixedSize(18, LINE)
@@ -190,6 +190,11 @@ class _Card(QFrame):
         while self._under.count():   # the button and its stretch, if it was under
             self._under.takeAt(0)
         if wide:
+            # the button's words start where the text does: past the icon, less the
+            # button's own padding
+            inset = (self.action.sizeHint().width()
+                     - self.action.fontMetrics().horizontalAdvance(self.action.text())) // 2
+            self._under.setContentsMargins(max(0, UNDER - inset), 0, 0, 0)
             self._under.addWidget(self.action)
             self._under.addStretch(1)
         else:
