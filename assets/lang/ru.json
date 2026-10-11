@@ -28,7 +28,6 @@
   "Above 0 dB the sound gets louder until it clips.": "Выше 0 дБ звук становится громче, пока не начнёт хрипеть.",
   "Add": "Добавить",
   "Add a tab: radio, sending a program's sound, screen triggers": "Добавить вкладку: радио, отправка звука программы, триггеры по экрану",
-  "Add sound files (or drag them onto the window)": "Добавить звуковые файлы (или перетащи их на окно)",
   "Add sounds": "Добавить звуки",
   "Adding {count} sound…": [
     "Добавляю {count} звук…",
@@ -307,7 +306,6 @@
   "Recently deleted ({n})": "Недавно удалённые ({n})",
   "Record": "Запись",
   "Record a sound": "Записать звук",
-  "Record a sound with your mic: the Record button next to Add sounds.": "Записывай звук с микрофона: кнопка «Запись» рядом с «Добавить звуки».",
   "Record again": "Записать заново",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "Запиши свой голос или кусочек звука, песни или радио, пока он играет, и сохрани как звук.",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "Записываю то, что играет… включи сейчас звук, результат поиска или радио, затем нажми «Стоп».",
@@ -3286,5 +3284,11 @@
   "Through proxy": "Через прокси",
   "Tor": "Tor",
   "Tor failed": "Tor не подключился",
-  "Tor {percent}%": "Tor {percent}%"
+  "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "Целую папку",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "Добавить звуки: файлы, папку, запись, ссылку или бесплатный пак (или перетащи файлы в окно)",
+  "From a link": "По ссылке",
+  "Paste a link into the search box": "Вставь ссылку в поле поиска",
+  "Record a sound with your mic: Add, then Record.": "Запиши звук с микрофона: Добавить, затем Запись.",
+  "Sound files": "Звуковые файлы"
 }

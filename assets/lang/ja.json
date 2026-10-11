@@ -39,7 +39,6 @@
   "Above 0 dB the sound gets louder until it clips.": "0 dB を超えると、音が割れるまで大きくなります。",
   "Add": "追加",
   "Add a tab: radio, sending a program's sound, screen triggers": "タブを追加: ラジオ、プログラムの音の送信、画面トリガー",
-  "Add sound files (or drag them onto the window)": "サウンドファイルを追加（ウィンドウにドラッグしても可）",
   "Add sounds": "サウンドを追加",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "「{name}」（{duration:.1f}秒）をサウンドに追加しました、そこで右クリックすると名前変更やホットキー設定ができます。",
   "Adding {count} sound…": [
@@ -325,7 +324,6 @@
   "Recently deleted ({n})": "最近削除した項目（{n}）",
   "Record": "録音",
   "Record a sound": "サウンドを録音",
-  "Record a sound with your mic: the Record button next to Add sounds.": "マイクでサウンドを録音: 「サウンドを追加」の隣の録音ボタンから。",
   "Record again": "録り直す",
   "Record your voice, or a bit of a sound, song or the radio while it plays, and keep it as a sound.": "自分の声や、再生中のサウンド・曲・ラジオの一部を録音して、サウンドとして残せます。",
   "Recording what's playing… play a sound, a search result or the radio now, then click Stop.": "再生中の音を録音中… 今サウンド、検索結果、ラジオを再生して、停止をクリックしてください。",
@@ -3140,5 +3138,11 @@
   "Through proxy": "プロキシ経由",
   "Tor": "Tor",
   "Tor failed": "Tor 失敗",
-  "Tor {percent}%": "Tor {percent}%"
+  "Tor {percent}%": "Tor {percent}%",
+  "A whole folder": "フォルダーごと",
+  "Add sounds: files, a folder, a recording, a link or a free pack (or drag files onto the window)": "サウンドを追加：ファイル、フォルダー、録音、リンク、無料パック（ファイルをウィンドウにドラッグしてもOK）",
+  "From a link": "リンクから",
+  "Paste a link into the search box": "検索ボックスにリンクを貼り付けてください",
+  "Record a sound with your mic: Add, then Record.": "マイクでサウンドを録音：追加 → 録音。",
+  "Sound files": "サウンドファイル"
 }

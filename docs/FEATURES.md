@@ -16,8 +16,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   Right-click a pad for *Rename*, *Duplicate* (a second pad with its own file, for
   its own effects or hotkey) and *Open file location*. A pad's picture is set in
   **Edit** (from a file or a link), or by dropping or pasting a picture on it.
-- **Record a sound with your mic, or from what's playing:** the **Record** button next
-  to *Add sounds*. Record your own voice, your voice through the voice changer while
+- **Record a sound with your mic, or from what's playing:** **Add** → *Record*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
   you hear it (the window stays out of the way, so you can play it while it records);
   after *Stop* the quiet ends are already cut off, drag the start and end to cut
