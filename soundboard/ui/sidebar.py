@@ -358,7 +358,10 @@ class OutputBlock(QFrame):
             col.setContentsMargins(0, self.INK_DOWN, 0, 0)
             col.addWidget(self.stop)
             top.addLayout(col)
-        top.addStretch(1)   # the switch and Stop all stay beside their words
+        # the slack: open, between the switch and Stop all (Stop all at the card's far
+        # edge, as far in as the icon is on the near one); shut, under the column
+        self._tail = QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        top.addSpacerItem(self._tail)
         box.addLayout(top)
         self._status_gap = QSpacerItem(0, self.ROW_GAP, QSizePolicy.Policy.Minimum,
                                        QSizePolicy.Policy.Fixed)
@@ -530,7 +533,12 @@ class OutputBlock(QFrame):
         px = self._px
         glyph = px(self.GLYPH) if expanded else self.GLYPH
         icon_x = round(self.ICON_X - glyph / 2)   # the icon column's centre stays put
-        self.box.setContentsMargins(*(icon_x, px(self.PAD), px(self.PAD), px(self.PAD))
+        # Stop all's square (half its 18 px glyph) as far from the far edge as the
+        # mark is from the near one
+        # (the mark's ink starts 1 px into its column)
+        end = (max(0, icon_x + 1 - (px(self.STOP) - px(18) // 2) // 2) if self.stop is not None
+               else px(self.PAD))
+        self.box.setContentsMargins(*(icon_x, px(self.PAD), end, px(self.PAD))
                                     if expanded else (0, 4, 0, 0))
         self.top.setContentsMargins(0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.Direction.LeftToRight if expanded
@@ -546,9 +554,14 @@ class OutputBlock(QFrame):
         icons.set_label_icon(self.mark, "live", "accent", size=glyph)
         self.switch.setFixedSize(*((px(self.SWITCH[0]), px(self.SWITCH[1])) if expanded
                                    else (34, 22)))
+        self._tail.changeSize(0, 0, *(((QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+                                       if self.stop is not None else
+                                       (QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+                                      if expanded else
+                                      (QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)))
         if self.stop is not None:
             self.stop.setFixedSize(px(self.STOP), px(self.STOP))
-            self._stop_gap.changeSize(px(self.SWITCH_GAP), 0, QSizePolicy.Policy.Fixed,
+            self._stop_gap.changeSize(px(self.SWITCH_GAP), 0, QSizePolicy.Policy.Expanding,
                                       QSizePolicy.Policy.Minimum)
         for gap, n in ((self._title_gap, self.GAP), (self._switch_gap, self.SWITCH_GAP),
                        (self._icon_gap, self.GAP), (self._arrow_gap, self.GAP - 2)):
