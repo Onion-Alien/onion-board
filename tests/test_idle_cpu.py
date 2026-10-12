@@ -183,3 +183,19 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
     for _ in range(80):                                     # ...until it shows nothing
         window.tick()
     assert window.timer.interval() == main.TICK_QUIET_MS
+
+
+def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeypatch):  # noqa: F811
+    e = window.engine
+    monkeypatch.setattr(window, "isVisible", lambda: True)
+    monkeypatch.setattr(e, "mic_stream", object())
+    e.level_main, e.level_mic = 0.0, 0.6
+    window.cfg.route, e.main_direct = "mic", False   # into the mic, effect not set up:
+    window._tick_visuals({}, 0.0)                    # apps take the real mic as it is
+    assert window.out_meter.level == 0.6
+    e.main_direct = True                             # in the mic: only what's sent
+    window._tick_visuals({}, 0.0)
+    assert window.out_meter.level == 0.0
+    window.cfg.route, e.main_direct = "cable", False
+    window._tick_visuals({}, 0.0)
+    assert window.out_meter.level == 0.0
