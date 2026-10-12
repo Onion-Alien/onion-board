@@ -655,7 +655,7 @@ QFrame#stations QPushButton#genre { border-radius:6px; padding:3px 10px; font-si
 QFrame#stations QPushButton#genre:hover { background:$btn_hover; }
 QFrame#stations QPushButton#genre:checked { background:$accent; border-color:$accent;
     color:$on_accent; }
-QFrame#stations QComboBox { background:$card; padding:4px 8px; font-size:9pt; }
+QFrame#stations QComboBox { background:$card_ctl; padding:4px 8px; font-size:9pt; }
 QFrame#stations QLabel#count { color:$muted; font-size:8.5pt; }
 QFrame#stations QPushButton#clear { border:none; background:transparent; color:$accent_hi;
     font-size:8.5pt; padding:0 2px; }
