@@ -769,3 +769,28 @@ def test_notifications_only_while_the_board_is_not_in_front():
 def test_the_zip_names_its_own_folder(addon_zip):
     with zipfile.ZipFile(addon_zip()) as z:
         assert all(n.startswith("onion-watch/") for n in z.namelist())
+
+
+def test_addon_download_keeps_focus(qapp, tmp_path, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard import net
+    from soundboard.ui import busy, triggerstab
+    monkeypatch.setattr(net, "allowed", lambda key: True)
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
+    workers = []
+    class Thread:
+        def __init__(self, target, **kw): self.target = target
+        def start(self): workers.append(self.target)
+    monkeypatch.setattr(triggerstab, "threading", type("Threads", (), {"Thread": Thread}))
+    tab.show()
+    qapp.processEvents()
+    tab.btn_get.setFocus()
+    QTest.mouseClick(tab.btn_get, Qt.LeftButton)
+    assert tab.focusWidget() is tab.btn_get and busy.is_busy(tab.btn_get)
+    QTest.mouseClick(tab.btn_get, Qt.LeftButton)
+    assert len(workers) == 1
+    tab._finish(None, "offline", False)
+    assert tab.focusWidget() is tab.btn_get and not busy.is_busy(tab.btn_get)
+    tab.shutdown()
+    tab.close()

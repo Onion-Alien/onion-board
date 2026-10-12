@@ -3306,5 +3306,6 @@
   "Theme style": "Téma stílusa",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Hangjaid áthozása a többi soundboardodból: {done}/{total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Hangjaid áthozása innen: {name}: {done}/{total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Telepítve van, de a hangjaid most már a mikrofonodba mennek. Használd, ha egy játék kihagyja a mikrofonodat, vagy távolítsd el, ha semmi más nem használja."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Telepítve van, de a hangjaid most már a mikrofonodba mennek. Használd, ha egy játék kihagyja a mikrofonodat, vagy távolítsd el, ha semmi más nem használja.",
+  "⚠ Another sound already has this name.": "⚠ Egy másik hangnak már ez a neve."
 }

@@ -489,3 +489,63 @@ def test_card_shows_robot_bunny_and_setup_stages_not_pip_output(qapp):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_ai_voice_download_keeps_its_button_visible_and_focused(qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard import net
+    from soundboard.ui import aivoicepanel, busy
+    monkeypatch.setattr(net, "offline", lambda: False)
+    p = aivoicepanel.AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
+    workers = []
+    class Thread:
+        def __init__(self, target, **kw): self.target = target
+        def start(self): workers.append(self.target)
+    monkeypatch.setattr(aivoicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    try:
+        p.show()
+        qapp.processEvents()
+        p.b_get.setFocus()
+        QTest.mouseClick(p.b_get, Qt.LeftButton)
+        assert p.b_get.isVisible() and busy.is_busy(p.b_get) and p.focusWidget() is p.b_get
+        QTest.mouseClick(p.b_get, Qt.LeftButton)
+        assert len(workers) == 1
+        p._on_install_done(False, "offline")
+        assert not busy.is_busy(p.b_get) and p.focusWidget() is p.b_get
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_ai_voice_install_keeps_focus(qapp, tmp_path, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard import net
+    from soundboard.ui import aivoicepanel, busy
+    monkeypatch.setattr(net, "offline", lambda: False)
+    folder = tmp_path / "ai-voices"
+    folder.mkdir()
+    for name in ("module.json", "voices.json"):
+        (folder / name).write_bytes((ADDON / name).read_bytes())
+    (info,) = modules.discover([tmp_path])
+    p = aivoicepanel.AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [info])
+    workers = []
+    class Thread:
+        def __init__(self, target, **kw): self.target = target
+        def start(self): workers.append(self.target)
+    monkeypatch.setattr(aivoicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    try:
+        p.show()
+        qapp.processEvents()
+        p.b_install.setFocus()
+        QTest.mouseClick(p.b_install, Qt.LeftButton)
+        assert p.b_install.isVisible() and busy.is_busy(p.b_install)
+        assert p.focusWidget() is p.b_install
+        QTest.mouseClick(p.b_install, Qt.LeftButton)
+        assert len(workers) == 1
+        p._on_install_done(False, "offline")
+        assert not busy.is_busy(p.b_install) and p.focusWidget() is p.b_install
+    finally:
+        p.shutdown()
+        p.deleteLater()
