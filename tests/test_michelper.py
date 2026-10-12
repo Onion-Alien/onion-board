@@ -34,7 +34,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                 7: "562d4f9cdb4cd0a53071284bf83aef9bbf8b2563c5ba7a3368dc190942d22c66",
                 8: "2e6e7bce58fff25b999c3779c61576bc676a39765c974e83b62ad437f5a15a2d",
                 9: "f60c119dabaad07489532ae0fbb58b600cc3ac6f864f4b52622a5a95476a8894",
-               10: "e9d84913fb40a44975302aed80f4875feeb7ae9626065a410678e62a3f3b4383"}
+               10: "e9d84913fb40a44975302aed80f4875feeb7ae9626065a410678e62a3f3b4383",
+               11: "eeedff2b4f38cd99b8f919dd3f60f120d0977ab0be28055f52330e587103119b"}
 
 
 def _queue():
@@ -171,8 +172,8 @@ def test_ready_needs_all_of_this_apps_build(monkeypatch, tmp_path):
     mh.write_manifest(mh.helper_dir())
     assert mh.ready() and mh.ready(same_dll=False)
     (mh.helper_dir() / "obmichelper.pkg").unlink()
-    (mh.helper_dir() / mh.STAMP).write_text(f"{mh.HELPER_VERSION - 1} aaaa")
-    assert mh.ready()   # an older helper, same DLL: as before
+    (mh.helper_dir() / mh.STAMP).write_text(f"{mh.MANIFEST_SINCE - 1} aaaa")
+    assert mh.ready()   # an older helper (no manifest yet), same DLL: as before
 
 
 def test_a_request_gone_meanwhile_doesnt_stop_the_rest(monkeypatch):
@@ -220,7 +221,7 @@ def test_without_a_helper_windows_asks(monkeypatch):
     monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": not same_dll)   # older DLL's
     monkeypatch.setattr(mh, "ask", lambda *a, **k: pytest.fail("asked an unusable helper"))
     monkeypatch.setattr(dm, "run_elevated",
-                        lambda exe, params, wait_s: prompted.append(params) or 0)
+                        lambda exe, params, wait_s, **k: prompted.append(params) or 0)
     monkeypatch.setattr(mh, "_token_sid", lambda: SID)
     assert REAL_ELEVATED(["install", GUID]) == 0
     # (and who asked: a standard user typing an admin's password gets the helper too)
@@ -943,3 +944,107 @@ def test_an_older_helper_without_a_manifest_is_still_used(helper_setup, monkeypa
     (dest / mh.STAMP).write_text("9 aaaa")
     (mh.bundled_helper() / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
     assert mh.ready()
+
+
+# ---------------------------------------------------------------- measured waits
+
+def _task_status(monkeypatch, status: str | None, take_after: float | None = None):
+    """schtasks: /run starts nothing at once; /query /v says `status` (None: fails).
+    `take_after`: the helper picks the request up (and answers 0) that late."""
+    def schtasks(*args, timeout=30.0, out=None):
+        if args[0] == "/run":
+            if take_after is not None:
+                def late():
+                    time.sleep(take_after)
+                    mh.serve(run=lambda a: 0)
+                threading.Thread(target=late, daemon=True).start()
+            return 0
+        if args[0] == "/query" and "/v" in args:
+            if status is None:
+                return 1
+            if out is not None:
+                out.append(f"HostName: PC\r\nTaskName: {mh.TASK}\r\nStatus: {status}\r\n"
+                           "Last Result: 0\r\n")
+            return 0
+        return 0
+    monkeypatch.setattr(mh, "_schtasks", schtasks)
+
+
+@pytest.mark.parametrize("status", ["Running", "Queued"])
+def test_a_task_scheduler_says_is_starting_is_waited_for(monkeypatch, status):
+    """A slow PC (or a busy Task Scheduler) starts the task late: past START_S, but it
+    says the task is running or queued, so the app keeps waiting for it."""
+    _queue()
+    monkeypatch.setattr(mh, "START_S", 0.2)
+    monkeypatch.setattr(mh, "STATUS_EVERY_S", 0.05)
+    _task_status(monkeypatch, status, take_after=0.8)
+    assert mh.ask(["uninstall"], wait_s=5) == 0
+
+
+@pytest.mark.parametrize("status", ["Ready", "Disabled", "Bereit", None])
+def test_a_task_that_isnt_running_is_given_up_on_at_start_s(monkeypatch, status):
+    """Not running at all (or a status it can't read: another language, schtasks
+    failed): Windows' prompt after START_S, as before."""
+    _queue()
+    monkeypatch.setattr(mh, "START_S", 0.2)
+    monkeypatch.setattr(mh, "STATUS_EVERY_S", 0.05)
+    _task_status(monkeypatch, status)
+    start = time.monotonic()
+    assert mh.ask(["uninstall"], wait_s=5) is None
+    assert time.monotonic() - start < 3
+    assert not list(mh.requests_dir().iterdir())
+
+
+@pytest.mark.parametrize("text, want", [
+    ("Status: Running\r\nLast Result: 267009", True),
+    ("Status:                               Queued", True),
+    ("Statut : En cours\r\nDernier résultat : 267009", True),   # the running code, any language
+    ("Status: Ready\r\nLast Result: 0", False),
+    ("Statut : Prêt\r\nDernier résultat : 0", False),
+    ("", False)])
+def test_task_running_reads_schtasks(text, want):
+    assert mh.task_running_in(text) is want
+
+
+def test_the_prompt_wait_stops_once_silent(tmp_path):
+    """An admin step that does nothing (its prompt left open, no log written): given
+    up at wait_s, as before."""
+    start = time.monotonic()
+    assert not dm.wait_for(lambda s: time.sleep(s) or False, 0.3, tmp_path / "admin.log",
+                           cap_s=10, poll_s=0.05)
+    assert 0.25 < time.monotonic() - start < 2
+
+
+def test_the_prompt_wait_goes_on_while_the_log_grows(tmp_path):
+    """A slow PC: the admin step is still writing its log past wait_s, so it isn't
+    stuck: waited for until it finishes."""
+    logf = tmp_path / "admin.log"
+    end = time.monotonic() + 1.0
+
+    def grow():
+        while time.monotonic() < end:
+            with open(logf, "a") as f:
+                f.write("step\n")
+            time.sleep(0.05)
+    threading.Thread(target=grow, daemon=True).start()
+    assert dm.wait_for(lambda s: time.sleep(s) or time.monotonic() > end + 0.1, 0.3, logf,
+                       cap_s=10, poll_s=0.05)
+
+
+def test_the_prompt_wait_has_a_hard_cap(tmp_path):
+    logf = tmp_path / "admin.log"
+    stop = threading.Event()
+
+    def grow():
+        while not stop.is_set():
+            with open(logf, "a") as f:
+                f.write("again\n")
+            time.sleep(0.03)
+    threading.Thread(target=grow, daemon=True).start()
+    start = time.monotonic()
+    try:
+        assert not dm.wait_for(lambda s: time.sleep(s) or False, 0.2, logf, cap_s=0.6,
+                               poll_s=0.05)
+    finally:
+        stop.set()
+    assert time.monotonic() - start < 2
