@@ -1,5 +1,6 @@
 """Translated labels fit the complete screen when each built-in theme is applied."""
 import pytest
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel
 from test_mainwindow import window as main_window  # noqa: F401
 
@@ -7,10 +8,14 @@ from soundboard import i18n, theme
 
 
 @pytest.fixture(params=["en", "de", "ar", "zh-CN"])
-def language(request):
+def language(qapp, request):
+    direction = qapp.layoutDirection()
     i18n.set_language(request.param)
+    qapp.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(request.param)
+                           else Qt.LayoutDirection.LeftToRight)
     yield request.param
     i18n.set_language("en")
+    qapp.setLayoutDirection(direction)
 
 
 @pytest.fixture
