@@ -4,7 +4,6 @@ from PySide6.QtCore import QPoint, QRect, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtTest import QTest
 
-from soundboard.ui.sidebar import RailTab
 from test_mainwindow import window  # noqa: F401
 
 
@@ -18,38 +17,41 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     qapp.processEvents()
     output = window.rail.output
     assert window.mode_btn.isHidden() and window.mode_btn not in window.rail.status
-    # open: Stop all is the card's icon button, the rail's own is hidden
-    assert output.stop.isVisible() and window.stop_btn.isHidden()
+    # open: Mute and Stop all, two buttons; the rail's own Live and Stop all are hidden
+    assert output.mute.isVisible() and output.stop.isVisible() and window.stop_btn.isHidden()
+    assert output.switch.isHidden() and output.title.isHidden()
     assert output.isVisible() and window.btn_air.isHidden() and window.pill.isHidden()
-    output.switch.setFocus(Qt.TabFocusReason)
-    QTest.keyClick(output.switch, Qt.Key_Space)
+    output.mute.setFocus(Qt.TabFocusReason)
+    QTest.keyClick(output.mute, Qt.Key_Space)
     assert not window.engine.sending and not window.btn_air.isChecked()
+    assert output.mute.isChecked() and output.mute.accessibleName() == "Muted"
     # off: your plain mic still goes (no voice changer), only the sounds are cut
-    assert "only your mic" in output.switch.accessibleDescription()
-    QTest.keyClick(output.switch, Qt.Key_Tab)
+    assert "only your mic" in output.mute.accessibleDescription()
+    QTest.keyClick(output.mute, Qt.Key_Tab)
     assert output.stop.hasFocus()
     QTest.keyClick(output.stop, Qt.Key_Tab)
     assert output.setup.hasFocus()
     window.btn_air.setChecked(True)
-    assert output.switch.isChecked() and window.engine.sending
+    assert not output.mute.isChecked() and window.engine.sending
     for _ in range(8):
-        output.switch.click()
-    assert output.switch.isChecked() and window.engine.sending
+        output.mute.click()
+    assert not output.mute.isChecked() and window.engine.sending
     output.setup.setFocus(Qt.TabFocusReason)
     QTest.keyClick(output.setup, Qt.Key_Space)
     assert window.tabs.currentWidget() is window.setup_page
     window.rail.set_open(False)
     assert output.isVisible() and window.btn_air.isHidden()
-    assert output.title.isHidden() and not output.setup.isVisible()
-    assert window.stop_btn.isVisible() and not output.stop.isVisible()
+    assert output.title.isHidden() and not output.setup.isVisible() and output.pair.isHidden()
+    assert window.stop_btn.isVisible() and output.switch.isVisible()
     output.switch.click()
     window.rail.set_open(True)
-    assert not output.switch.isChecked() and not window.engine.sending
+    assert output.mute.isChecked() and not window.engine.sending
 
 
-def _ink_box(img, rect):
-    """The bounding box of everything in `rect` that isn't the card's background."""
-    bg = QColor(img.pixel(1, img.height() // 2))
+def _ink_box(img, rect, bg=None):
+    """The bounding box of everything in `rect` that isn't the card's background (or
+    the colour at `bg`)."""
+    bg = QColor(img.pixel(*(bg or (1, img.height() // 2))))
     xs, ys = [], []
     for y in range(rect.top(), rect.bottom() + 1):
         for x in range(rect.left(), rect.right() + 1):
@@ -83,27 +85,46 @@ def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_na
         assert above >= 16
         rail.set_open(True)
         qapp.processEvents()
-        assert rail.output._switch_gap.sizeHint().width() == rail.output.SWITCH_GAP
-        assert rail.output._switch_gap.sizeHint().height() == 0
+        _assert_pair(rail.output)
         if direction == Qt.LeftToRight:
             _assert_keylines(rail.output)
 
 
+def _assert_pair(output):
+    """Open: Mute and Stop all, the same width, the same padding round them and
+    between them, each icon in its button's middle."""
+    from PySide6.QtWidgets import QApplication
+    QApplication.processEvents()
+    mute, stop = sorted((output.mute, output.stop), key=lambda b: b.mapTo(output, QPoint()).x())
+    left, right = mute.mapTo(output, QPoint()), stop.mapTo(output, QPoint())
+    assert mute.width() == stop.width() and mute.height() == stop.height()
+    near, far = left.x(), output.width() - right.x() - stop.width()
+    gap = right.x() - left.x() - mute.width()
+    assert near == far == left.y() and abs(gap - near) <= 1
+    img = output.grab().toImage()
+    for b in (mute, stop):
+        at = b.mapTo(output, QPoint())
+        ink = _ink_box(img, QRect(at.x() + 4, at.y() + 4, b.width() - 8, b.height() - 8),
+                       (at.x() + 3, at.y() + b.height() // 2))   # (the button's own fill)
+        box = QRect(at, b.size())
+        assert abs(ink.center().x() - box.center().x()) <= 1.5
+        assert abs(ink.center().y() - box.center().y()) <= 1.5
+
+
 def _assert_keylines(output, setup=True):
-    """Every icon is centred on its label's first-line cap height and every line of
-    words starts on one keyline (docs/DESIGN.md *Icon and text alignment*)."""
+    """Every icon is centred on its label's first-line cap height
+    (docs/DESIGN.md *Icon and text alignment*)."""
     from PySide6.QtWidgets import QApplication
     QApplication.processEvents()   # (a rescale: the rail gives the card its new height)
     img = output.grab().toImage()
-    title = output.title
-    assert title.mapTo(output, QPoint()).x() + title.contentsMargins().left() == output.text_x()
-    pairs = [(output.mark, output.title)]
+    pairs = []
     if setup:
-        # the strip's line: centred in the card, its icon and chevron on its cap height
-        line = [output.status_icon, output.status_text, output.arrow]
-        left = line[0].mapTo(output, QPoint()).x()
-        right = line[-1].mapTo(output, QPoint()).x() + line[-1].width()
-        assert abs(left + right - output.width()) <= 2
+        # the strip's line: its ink centred in the card (to the odd pixel), its icon and
+        # chevron on its cap height
+        icon = output.status_icon
+        y = icon.mapTo(output, QPoint()).y()
+        ink = _ink_box(img, QRect(0, y, output.width(), icon.height()), (2, y + 2))
+        assert abs(ink.left() - (output.width() - 1 - ink.right())) <= 1
         pairs += [(output.status_icon, output.status_text), (output.arrow, output.status_text)]
     for icon, label in pairs:
         glyph = _ink_box(img, QRect(icon.mapTo(output, QPoint()), icon.size()))
@@ -111,12 +132,6 @@ def _assert_keylines(output, setup=True):
         cap = (label.mapTo(output, QPoint()).y() + label.contentsMargins().top()
                + fm.ascent() - fm.capHeight() / 2)
         assert abs((glyph.top() + glyph.bottom() + 1) / 2 - cap) <= 1.5, label.text()
-    switch = (output.switch.mapTo(output, QPoint()).y() + output.switch.height() / 2
-              + output.INK_DOWN)   # (the switch paints its track that far down)
-    fm = output.title.fontMetrics()
-    title = (output.title.mapTo(output, QPoint()).y() + output.title.contentsMargins().top()
-             + fm.ascent() - fm.capHeight() / 2)
-    assert abs(switch - title) <= 1.5
 
 
 def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch):  # noqa: F811
@@ -132,13 +147,8 @@ def test_output_card_icons_and_words_share_keylines(window, qapp, monkeypatch): 
     qapp.processEvents()
     rail, output = window.rail, window.rail.output
     _assert_keylines(output)
-    assert output.title.geometry().right() < output.switch.x()
-    img = rail.grab().toImage()
-    tab = rail.findChildren(RailTab)[0]
-    at = tab.mapTo(rail, QPoint())
-    icon = _ink_box(img, QRect(at.x() + 2, at.y() + 4, 26, tab.height() - 8))   # (not its name)
-    mark = _ink_box(img, QRect(output.mark.mapTo(rail, QPoint()), output.mark.size()))
-    assert abs(icon.center().x() - mark.center().x()) <= 1
+    _assert_pair(output)
+    assert rail.rect().contains(output.geometry())
     assert output.status_text.text() == "Not configured" and output.arrow.isVisible()
     output.status_text.setText("Ausgabe nicht verbunden")
     output.adjustSize()
@@ -239,7 +249,7 @@ def test_output_block_stays_inside_rail_at_normal_and_narrow_sizes(window, qapp,
         output = window.rail.output
         if output.isVisible():
             assert window.rail.rect().contains(output.geometry())
-            for widget in (output.mark, output.title, output.switch,
+            for widget in (output.mark, output.title, output.switch, output.mute, output.stop,
                            output.status_text, output.setup):
                 if not widget.isVisible():
                     continue
@@ -287,9 +297,9 @@ def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
             qapp.processEvents()
             out = rail.output
             # the small card in the shut column, then (snapped fully open) the full one
-            assert out.title.isVisible() == (width >= SNAP_W), width
-            if out.title.isVisible():
+            assert out.pair.isVisible() == (width >= SNAP_W), width
+            if out.pair.isVisible():
                 assert rail.width() == OPEN_W
-                assert out.title.geometry().right() < out.switch.x(), width
+                assert out.mute.geometry().right() < out.stop.x(), width
     finally:
         rail.finish_resize()

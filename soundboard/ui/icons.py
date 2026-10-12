@@ -222,6 +222,12 @@ def _live(p, fill):
         p.drawArc(rect, 135 * 16, 90 * 16)
 
 
+def _live_off(p, fill):
+    """Muted: the live waves, struck through."""
+    _live(p, fill)
+    p.drawLine(QPointF(4, 4), QPointF(20, 20))
+
+
 def _ear(p, fill):
     """Hear what they hear."""
     path = QPainterPath(QPointF(7, 9))
@@ -750,6 +756,7 @@ SHAPES = {
     "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
+    "live_off": _live_off,
     "back": _arrow("back"), "forward": _arrow("forward"),
     "panel_close": _panel("left", "left"), "panel_open": _panel("left", "right"),
     "panel_close_rtl": _panel("right", "right"), "panel_open_rtl": _panel("right", "left"),

@@ -727,6 +727,12 @@ QFrame#sidebar QWidget#railslot { background:transparent; }
 QFrame#railoutput { background:$panel; border:none; border-radius:12px; }
 QFrame#railoutput[expanded="false"] { background:transparent; }
 QFrame#railoutput QLabel#railoutputtitle { font-weight:700; color:$text_hi; }
+QFrame#railoutput QWidget#railpairrow { background:transparent; }
+QFrame#railoutput QPushButton#railpair { background:$btn; border:1px solid transparent;
+    border-radius:8px; padding:0; }
+QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
+QFrame#railoutput QPushButton#railpair:checked { background:$danger_bg; }
+QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }
 QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
