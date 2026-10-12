@@ -422,7 +422,7 @@ class SettingsDialog(QDialog):
     NARROW_W = 640
     TITLE_COG = 18   # the heading's cog, px
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
-    BACK_PAD = "padding:6px 0px 8px 3px"
+    BACK_PAD = "padding:{}px 0px {}px 3px"   # (top, bottom: _level_icons)
 
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
         """A page in the main window, in place of the tabs (MainWindow.open_settings),
@@ -525,14 +525,14 @@ class SettingsDialog(QDialog):
         self.page_title.setObjectName("pagetitle")
         self.title_cog = QLabel()
         self.title_cog.setObjectName("pagetitlecog")
-        self.title_cog.setContentsMargins(0, 0, 0, 2)   # 1 px up, as the arrow
+        self.title_cog.setContentsMargins(0, 0, 0, 2)   # (moved by _level_icons)
         self._title_cog()
         # Keep the arrow over the category icons, with room between its hover
         # background and the heading.
         back.setFixedWidth(26)   # (just round the arrow: the heading right after it)
         # its icon on the icons' centre line; the same 14 px of padding: the controls'
         # height (BACK_PAD: the arrow level with the middle of the heading's capitals)
-        back.setStyleSheet(self.BACK_PAD)
+        back.setStyleSheet(self.BACK_PAD.format(6, 8))
         top = self._top = QHBoxLayout()
         top.setSpacing(2)   # (the heading close after the arrow)
         top.addWidget(back)
@@ -578,7 +578,7 @@ class SettingsDialog(QDialog):
         heading a pixel off the rail's name."""
         fm, k = label.fontMetrics(), label.devicePixelRatioF()
         top = label.mapTo(self.window(), QPoint(0, 0)).y() + dy
-        base = round((top + (label.height() - fm.height()) / 2 + fm.ascent()) * k)
+        base = math.floor((top + (label.height() - fm.height()) / 2 + fm.ascent()) * k + 0.5)
         return base - fm.capHeight() * k / 2
 
     def _level_with_rail(self):
@@ -610,6 +610,35 @@ class SettingsDialog(QDialog):
             lift = max(0, min(self.PAGE_TOP, side.top() + dy))
         if lift != side.top():
             self._side.setContentsMargins(side.left(), lift, side.right(), side.bottom())
+            if lay is not None:
+                lay.activate()
+        self._level_icons()
+
+    def _level_icons(self):
+        """The arrow and cog centred on the middle of "Settings"' capitals, wherever the
+        theme's font puts them: Consolas (Amber Terminal, Hacker) draws its capitals
+        lower in the line than Bahnschrift, and a fixed nudge left both 2 px high."""
+        title = self.page_title
+        if not title.isVisible():
+            return
+        fm = title.fontMetrics()
+        ty = title.mapTo(self, QPoint(0, 0)).y()
+        # (the baseline on a whole pixel, as drawn: Consolas' lands on a half one)
+        base = math.floor(ty + (title.height() - fm.height()) / 2 + fm.ascent() + 0.5)
+        caps = base - fm.capHeight() / 2
+        for w in (self.back_btn, self.title_cog):
+            # how far below the box's middle the drawing goes, in half pixels
+            n = round(2 * (caps - w.mapTo(self, QPoint(0, 0)).y() - w.height() / 2))
+            if w is self.back_btn:   # the same 14 px of padding, split to move the arrow
+                n = max(-14, min(14, n))
+                top = (14 + n) // 2
+                pad = self.BACK_PAD.format(top, 14 - top)
+                if w.styleSheet() != pad:
+                    w.setStyleSheet(pad)
+            else:   # the same 2 px of margin + n, the cog drawn in the middle of the rest
+                m = (max(0, n), max(0, -n))
+                if (w.contentsMargins().top(), w.contentsMargins().bottom()) != m:
+                    w.setContentsMargins(0, m[0], 0, m[1])
 
     def _fit_width(self, width: int):
         """Narrow: the categories as an icon column (the name is the tip) and the
@@ -728,6 +757,7 @@ class SettingsDialog(QDialog):
             item.setIcon(icons.icon(name, selected="text_hi"))
         if getattr(self, "title_cog", None) is not None:
             self._title_cog()
+            QTimer.singleShot(0, self._level_with_rail)   # (a new theme: maybe a new font)
 
     def _title_cog(self):
         """The heading's cog in this theme's accent (redrawn when the theme changes)."""
