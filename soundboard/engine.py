@@ -2437,8 +2437,9 @@ class Engine:
                 self._rec_done = (rec, self.rates["main"])
 
     def _mon(self, outdata, frames):
-        # muted: they hear nothing, so neither do you; only your voice going out
-        # (mic_only): just your voice, no sounds
+        # muted only changes what others hear: your sounds keep playing for you as
+        # usual. With only your voice going out (mic_only) you still hear your mic, and
+        # your sounds as with mic check off (they were cut here once: muting went silent)
         voice = self.mic_check and self.mic_only()
         check = self.mic_check and self.sending or voice
         path = (check, voice, check and self.mon_voice_only)
@@ -2467,11 +2468,12 @@ class Engine:
             play = 0.0
         else:
             self._wake_bus("mon")
-            mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
+            mix = self._sounds("mon", frames,
+                               previews_only=not (check and not voice or self.monitor_sounds))
         m = self.ring_mon.read(frames)
         if not idle:
             mix = self._vol("mon", "sounds", mix,
-                            0.0 if voice else self.sound_vol if check else 1.0)
+                            self.sound_vol if check and not voice else 1.0)
             # the main output sees the rest; this one counts with no send device too
             play = peak(mix)
         take = self._play_take   # no send device: what's playing is recorded from here
