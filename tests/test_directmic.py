@@ -3028,7 +3028,7 @@ def test_sync_recovers_an_interrupted_writer(ring_file, monkeypatch, seq, clear)
 
 
 @needs_fuzz
-@pytest.mark.parametrize("case", ["factory", "slot", "add-stop"])
+@pytest.mark.parametrize("case", ["factory", "slot", "add-stop", "add-stall"])
 def test_effect_lifecycle_audit(tmp_path, case):
     r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "--audit", case],
                        capture_output=True, text=True, timeout=30)

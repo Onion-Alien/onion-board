@@ -1152,7 +1152,8 @@ private:
         float ramp = 1.0f / (float)(FADE_S * m_rate);
         float w = m_w, mg = m_mg, b = useMic ? m_b : 1.0f;
         float addW = m_addW;
-        float addTarget = board && have ? 1.0f : 0.0f;
+        // (as wTarget: out over the last block there is, never cut dead when it runs out)
+        float addTarget = board && ahead ? 1.0f : 0.0f;
         float sLast = 1.0f;
         bool any = false;
         if (have || useMic || w > 0.0f || mg != 1.0f || mgTarget != 1.0f) {

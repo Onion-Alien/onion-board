@@ -776,9 +776,12 @@ static int auditcase(const char *name, HMODULE dll) {
         for (uint32_t i = 0; i < L.cap; i++) samples[i] = 0.4f;
         wr<uint32_t>(m.p, 36, 0);
         wr<uint32_t>(m.p, 32, 1);
-        wr<uint64_t>(m.p, 24, GetTickCount64());
-        wr<uint64_t>(m.p, 16, 10000);
-        block();
+        // the board writing a block after each mic block, as it does
+        for (uint64_t wp = 10000; wp < 10000 + 6 * frames; wp += frames) {
+            wr<uint64_t>(m.p, 24, GetTickCount64());
+            wr<uint64_t>(m.p, 16, wp);
+            block();
+        }
         check(x.out[frames * 2 - 1] > 0.5f, "add mode did not start");
         wr<uint32_t>(m.p, 32, 0);
         // Enough queued audio to outlast the 10 ms fade, but less than half a ring.
@@ -787,6 +790,48 @@ static int auditcase(const char *name, HMODULE dll) {
         check(fabsf(x.out[frames * 2 - 1] - 0.2f) < 1e-6f,
               "disabled board still audible in add mode after the fade");
         destroy(x);
+    } else if (!strcmp(name, "add-stall")) {
+        // Add mode, the board writing right after each mic block, then it hangs: still
+        // enabled, its tick fresh, no more audio. The sound must fade out, not cut dead.
+        destroy(x);
+        Instance z;
+        const UINT32 F = 480;
+        if (!create(z, 48000, 1, F)) return 1;
+        float *samples = (float *)(m.p + HEADER);
+        memset(samples, 0, (size_t)L.cap * 4);
+        wr<uint32_t>(m.p, 36, 0);   // MODE_ADD
+        uint64_t wp = 0;
+        auto write = [&](uint32_t n) {
+            for (uint32_t i = 0; i < n; i++) samples[(wp + i) & (L.cap - 1)] = 0.4f;
+            wp += n;
+            wr<uint64_t>(m.p, 16, wp);
+            wr<uint64_t>(m.p, 24, GetTickCount64());
+            wr<uint32_t>(m.p, 32, 1);
+        };
+        float last = 0.0f, jump = 0.0f, loud = 0.0f;
+        auto run = [&](bool measure) {
+            for (UINT32 i = 0; i < F; i++) z.in[i] = 0.0f;
+            APO_CONNECTION_PROPERTY input = {(UINT_PTR)z.in, F, BUFFER_VALID, 0};
+            APO_CONNECTION_PROPERTY output = {(UINT_PTR)z.out, 0, BUFFER_INVALID, 0};
+            APO_CONNECTION_PROPERTY *pi = &input, *po = &output;
+            z.rt->APOProcess(1, &pi, 1, &po);
+            for (UINT32 i = 0; i < F; i++) {
+                float v = output.u32BufferFlags == BUFFER_VALID ? z.out[i] : 0.0f;
+                if (measure && fabsf(v - last) > jump) jump = fabsf(v - last);
+                if (v > loud) loud = v;
+                last = v;
+            }
+        };
+        write(3 * F);
+        for (int k = 0; k < 50; k++) { run(false); write(F); }
+        check(loud > 0.39f, "add mode did not start");
+        wr<uint64_t>(m.p, 24, GetTickCount64());
+        for (int k = 0; k < 4; k++) run(true);   // the board hung: what's queued runs out
+        check(fabsf(last) < 1e-6f, "hung board still audible");
+        // a 10 ms fade at 48 kHz moves 0.4 / 480 a sample; a dead stop moves all 0.4
+        check(jump < 0.01f, "add mode cut dead when the board hung (a click)");
+        if (jump >= 0.01f) printf("  biggest step %.3f\n", (double)jump);
+        destroy(z);
     } else { destroy(x); check(false, "unknown audit case"); }
     m.close();
     printf("AUDIT %s: %d failures\n", name, fails);
