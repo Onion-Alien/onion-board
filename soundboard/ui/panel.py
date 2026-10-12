@@ -12,7 +12,7 @@ from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QSlider, QSpinBox, QVBoxLayout,
+                               QLayout, QPushButton, QSlider, QSpinBox, QStyle, QVBoxLayout,
                                QWidget)
 
 from soundboard import theme
@@ -177,10 +177,16 @@ class Flow(QLayout):
         x, y, line = rect.x(), rect.y(), 0
         row: list = []   # (item, x, hint) of the line being filled
 
+        owner = self.parentWidget()
+        rtl = owner is not None and owner.layoutDirection() == Qt.LayoutDirection.RightToLeft
+
         def put():
             if move:
                 for it, ix, hint in row:
-                    it.setGeometry(QRect(QPoint(ix, y + (line - hint.height()) // 2), hint))
+                    r = QRect(QPoint(ix, y + (line - hint.height()) // 2), hint)
+                    # Arabic: the lines fill from the right, like the rest of the app
+                    it.setGeometry(QStyle.visualRect(Qt.LayoutDirection.RightToLeft, rect, r)
+                                   if rtl else r)
             row.clear()
 
         for it in self._alive():

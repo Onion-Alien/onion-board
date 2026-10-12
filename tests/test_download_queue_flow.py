@@ -66,8 +66,11 @@ class Net:
         monkeypatch.setattr(linkbar_mod, "import_file", import_file)
         monkeypatch.setattr(linkbar_mod.thumbs, "find_in", lambda folder: None)
         monkeypatch.setattr(w.engine, "prepare", lambda *a, **kw: None)
+        self.now: dict[str, tuple[float, bool]] = {}   # what the fake engine plays
         monkeypatch.setattr(w.engine, "play", lambda sid, data, gain, **kw:
-                            net.plays.append((sid, len(data))) or object())
+                            net.plays.append((sid, len(data))) or
+                            net.now.__setitem__(sid, (0.0, False)) or object())
+        monkeypatch.setattr(w.engine, "playing", lambda: dict(net.now))
         monkeypatch.setattr(w, "_save_now", lambda: None)
         w.linkbar.done.connect(lambda *a: self.done.append(a))
 
@@ -83,6 +86,11 @@ class Net:
         _u, run = self.jobs.pop(i)
         run()
         self.settle()
+
+    def end(self):
+        """The search song playing comes to its end; the window's next tick sees it."""
+        self.now.pop(PLAY_ID, None)
+        self.w.tick()
 
     def settle(self):
         """The banner's tick / red flash is over: what waited for it plays out."""
@@ -135,13 +143,65 @@ def test_play_then_add_another_plays_then_adds_it(net):
     assert not net.jobs
 
 
-def test_a_second_play_replaces_the_first_and_the_first_never_plays(net):
+def test_plays_clicked_while_one_loads_all_play_in_order_never_cut_off(net):
+    """The reported bug: Play on three cards, the third cancelled, and the second's
+    download landed while the first played and cut it off. Every Play now plays, one
+    after another, in the order clicked: one landing while another plays waits."""
     net.click(A, play=True)
     net.click(B, play=True)
-    net.land(A)    # the old one lands late
+    net.click(C, play=True)
+    assert net.bar().waiting == [B, C]                # in the order clicked
+    net.w.download_bar.cancel_requested.emit(C)       # its ✕
+    net.land(A)
+    assert net.played() == [480]
     net.land(B)
-    assert net.played() == [960]
-    assert net.w._link_url == B
+    assert net.played() == [480] and net.w._link_url == A   # A keeps playing
+    assert net.w.linkbar.up_next() == ["Random"]
+    assert (B, "play", True) in net.done
+    net.end()                                         # A ends: B starts
+    assert net.played() == [480, 960] and net.w._link_url == B
+    assert net.w.linkbar.up_next() == []
+    net.end()
+    assert net.played() == [480, 960] and not net.jobs
+
+
+def test_up_next_chips_play_now_or_come_out_and_stop_all_clears_them(net):
+    for u in (A, B, C, D):
+        net.click(u, play=True)
+    for u in (A, B, C, D):
+        net.land(u)
+    assert net.played() == [480]
+    assert net.w.linkbar.up_next() == ["Random", "Third", "Fourth"]
+    shown = tuple(net.w.linkbar.up_next())
+    assert not net.w.playing_row.isHidden() and net.w._chip_ids[2] == shown
+    row, flow = net.w.playing_row, net.w._chips_hl
+    assert flow.itemAt(0).widget().text() == "Now playing"     # first, then Up next
+    lbl, chips, more, total = net.w._waiting_chips
+    assert total == 3
+    row.resize(2000, row.height())
+    net.w._fit_up_next()
+    assert not lbl.isHidden() and all(not c.isHidden() for c in chips) and more.isHidden()
+    row.resize(330, row.height())                               # narrow: Now playing only
+    net.w._fit_up_next()
+    assert lbl.isHidden() and all(c.isHidden() for c in chips) and more.isHidden()
+    net.w.linkbar.drop_up_next(0, shown)              # Random's ✕
+    net.w.linkbar.drop_up_next(0, shown)              # a double click: out of date
+    assert net.w.linkbar.up_next() == ["Third", "Fourth"]
+    net.w.linkbar.play_next(1, ("Third", "Fourth"))   # Fourth's chip: plays now
+    assert net.played() == [480, 1920] and net.w._link_url == D
+    net.w.stop_all()
+    assert net.w.linkbar.up_next() == []
+    net.end()
+    assert net.played() == [480, 1920]
+
+
+def test_a_play_while_nothing_plays_starts_at_once(net):
+    net.click(A, play=True)
+    net.land(A)
+    net.end()                                         # it ended: the player is free
+    net.click(B, play=True)
+    net.land(B)
+    assert net.played() == [480, 960] and net.w.linkbar.up_next() == []
 
 
 def test_play_on_the_card_already_loading_doesnt_start_it_again(net):

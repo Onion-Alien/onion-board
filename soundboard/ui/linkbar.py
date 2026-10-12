@@ -56,6 +56,7 @@ class LinkBar(QFrame):
     link_changed = Signal(str)        # the search box's link ("" when it has none now)
     download_started = Signal(str, str, str, float)  # (url, title, kind, seconds)
     queue_updated = Signal(list)      # the picks waiting their turn: [{url, title, kind}]
+    up_next_changed = Signal(list)    # downloaded Plays waiting for the one playing: [title]
     queued = Signal(str, str)         # (url, "add" | "play"): a pick now waits its turn
 
     def __init__(self, engine, cfg, color_for, known_for):
@@ -82,6 +83,9 @@ class LinkBar(QFrame):
         # the link, like _got: a 15-minute song is ~170 MB
         self._kept = None
         self._queued = ""             # "add" / "play" asked for while another download ran
+        # (title, int16 audio, gain, url) of Plays that finished downloading while
+        # another link was playing: they wait their turn instead of cutting it off
+        self._up_next: list[tuple] = []
         self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
         self._dups: set[str] = set()     # urls refused as already in the library
         self._msg.connect(self._on_msg)
@@ -176,6 +180,7 @@ class LinkBar(QFrame):
 
     def shutdown(self):
         self.engine.stop(PLAY_ID)
+        self._up_next.clear()
         self._drop_download()
 
     # ------------------------------------------------------------------ actions
@@ -208,11 +213,9 @@ class LinkBar(QFrame):
                 return True
             self._queued = "play"
             return True
-        # Another link's Play is still loading: this newer pick replaces it, so the
-        # old one never starts playing over it later
-        if self._busy == "play":
-            self._drop_running()
-        elif self._busy == "add":   # another link is being added: play after it
+        # another link is downloading: this one waits its turn. A Play already
+        # loading isn't dropped: five Plays play all five, one after another (_play)
+        if self._busy:
             return self._queue("play")
 
         have = next((g for g in (self._got, self._kept)
@@ -233,12 +236,11 @@ class LinkBar(QFrame):
             return True
         pick = {"url": self.url, "title": self.title, "kind": kind, "seconds": self._secs}
         if kind == "play":
-            # Play once means now: it goes next (the running download keeps going), and
-            # it replaces a Play already waiting, like it replaces one still loading
-            for q in [q for q in self._queue_list if q["kind"] == "play"]:
-                self._queue_list.remove(q)
-                self.done.emit(q["url"], "play", False)
-            self._queue_list.insert(0, pick)
+            # a Play goes before the Adds waiting (the running download keeps going)
+            # and after the Plays already waiting, so they play in the order clicked
+            at = max((i + 1 for i, q in enumerate(self._queue_list) if q["kind"] == "play"),
+                     default=0)
+            self._queue_list.insert(at, pick)
         elif len(self._queue_list) >= MAX_QUEUED:
             busy.toast(self.window(), _("Queue is full"), "warn")
             return False
@@ -339,12 +341,55 @@ class LinkBar(QFrame):
         pick's own, when another card shows now."""
         title = self.title if title is None else title
         gain = gain if self.cfg.level_volumes else 1.0
+        url = url or self.url
+        if self._in_player() or self._up_next:
+            # another link is playing (or paused): never cut it off, play this after it
+            if all(u != url for *_r, u in self._up_next):
+                self._up_next.append((title or _("Link"), data, gain, url))
+                self.up_next_changed.emit(self.up_next())
+                busy.toast(self.window(), _("Up next: “{name}” · Stop all clears the queue",
+                                            name=html.escape(title or _("Link"))), "ok")
+            return True
+        return self._start_playing(data, gain, title, url)
+
+    def _in_player(self) -> bool:
+        """A link's Play is playing or paused right now."""
+        playing = getattr(self.engine, "playing", None)
+        return playing is not None and PLAY_ID in playing()
+
+    def up_next(self) -> list[str]:
+        """The titles of the downloaded Plays waiting their turn, in order."""
+        return [t for t, *_r in self._up_next]
+
+    def play_next(self, i: int = 0, shown=None) -> bool:
+        """Start Up next's song `i` (the first: the one playing ended or was stopped;
+        another: its chip was clicked, so it plays now). `shown`: Up next as the chips
+        showed it; out of date does nothing (a double click hit a moved chip)."""
+        if shown is not None and tuple(self.up_next()) != tuple(shown):
+            return False
+        if not 0 <= i < len(self._up_next):
+            return False
+        title, data, gain, url = self._up_next.pop(i)
+        self.up_next_changed.emit(self.up_next())
+        return self._start_playing(data, gain, title, url)
+
+    def drop_up_next(self, i: int = -1, shown=None):
+        """Take Up next's song `i` out (a chip's ✕), or all of them (Stop all)."""
+        if shown is not None and tuple(self.up_next()) != tuple(shown):
+            return
+        if i < 0:
+            self._up_next.clear()
+        elif i < len(self._up_next):
+            del self._up_next[i]
+        self.up_next_changed.emit(self.up_next())
+
+    def _start_playing(self, data, gain: float, title: str, url: str) -> bool:
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
             busy.toast(self, html.escape(_("No audio device is open, pick one in Setup.")),
                        "warn")
             return False
-        self.played.emit(title or _("Link"), data, gain, url or self.url)
+        self.played.emit(title or _("Link"), data, gain, url)
         if title == self.title:
             name = html.escape(title or _("it"))
             self._say(_("▶ Playing <b>{name}</b> ({time}): <i>Add as sound</i> keeps it.",

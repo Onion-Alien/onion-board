@@ -33,6 +33,9 @@ class Eng:
     def stop(self, sid):
         pass
 
+    def playing(self):
+        return getattr(self, "now", {})
+
 
 def _bar():
     eng = Eng()
@@ -182,21 +185,28 @@ def test_a_cancelled_play_never_plays_when_its_download_lands(qapp, monkeypatch,
     assert eng.played == [] and old not in bar._dropped
 
 
-def test_a_new_play_replaces_the_one_still_loading(qapp, monkeypatch, tmp_path):
+def test_a_new_play_waits_for_the_one_still_loading(qapp, monkeypatch, tmp_path):
+    from soundboard.ui import linkbar
+
     bar, eng = _bar()
     _fake_start(bar, monkeypatch)
+    monkeypatch.setattr(linkbar.busy, "toast", lambda *args, **kw: None)
     done = []
     bar.done.connect(lambda *args: done.append(args))
     bar.play_once()
     first = bar._job
     bar.open(OTHER, "Other")
     bar.play_once()
-    assert done == [(URL, "play", False)] and bar._busy_url == OTHER
+    assert done == [] and bar._busy_url == URL   # the first isn't dropped
+    assert [q["url"] for q in bar._queue_list] == [OTHER]
     data = np.zeros((480, 2), np.int16)
-    bar._on_msg("play", URL, (tmp_path / "a.wav", data, 1.0), first)   # late: dropped
-    assert eng.played == [] and bar._busy == "play"
+    bar._on_msg("play", URL, (tmp_path / "a.wav", data, 1.0), first)
+    assert len(eng.played) == 1 and bar._busy_url == OTHER
+    eng.now = {"__link__": (0.0, False)}           # the first is playing
     bar._on_msg("play", OTHER, (tmp_path / "b.wav", data, 1.0), bar._job)
-    assert len(eng.played) == 1
+    assert len(eng.played) == 1 and bar.up_next() == ["Other"]   # not cut off
+    eng.now = {}
+    assert bar.play_next() and len(eng.played) == 2 and bar.up_next() == []
 
 
 def test_a_play_still_plays_after_another_card_is_queued_and_removed(qapp, monkeypatch,
@@ -243,7 +253,7 @@ def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
     assert [q["url"] for q in bar._queue_list] == [f"{OTHER}0", f"{OTHER}2"]
 
 
-def test_play_now_goes_next_and_replaces_a_waiting_play(qapp, monkeypatch):
+def test_play_now_goes_before_adds_after_waiting_plays(qapp, monkeypatch):
     from soundboard.ui import linkbar
 
     bar, _eng = _bar()
@@ -262,19 +272,19 @@ def test_play_now_goes_next_and_replaces_a_waiting_play(qapp, monkeypatch):
     assert lists[-1] == [(f"{OTHER}p1", "play"), (f"{OTHER}a0", "add"),
                          (f"{OTHER}a1", "add")]
     assert bar._busy == "add" and bar._busy_url == URL
-    # a newer Play now replaces the one waiting (its card is told it's off)
+    # a second Play waits after the first, both before the Adds (none dropped)
     bar.open(f"{OTHER}p2", "Play")
     bar.play_once()
-    assert lists[-1][0] == (f"{OTHER}p2", "play") and len(lists[-1]) == 3
-    assert (f"{OTHER}p1", "play", False) in done
+    assert [u for u, _k in lists[-1][:2]] == [f"{OTHER}p1", f"{OTHER}p2"]
+    assert len(lists[-1]) == 4 and not done
     # a full queue of Adds still takes a Play
     bar.open(f"{OTHER}a2", "Add")
     bar.add()
     bar.open(f"{OTHER}p3", "Play")
-    assert bar.play_once() and lists[-1][0] == (f"{OTHER}p3", "play")
-    # the Add finishes: the Play starts before the other Adds
+    assert bar.play_once() and lists[-1][2] == (f"{OTHER}p3", "play")
+    # the Add finishes: the Plays start before the other Adds
     bar._on_msg("error", URL, "nope", bar._job)
-    assert bar._busy == "play" and bar._busy_url == f"{OTHER}p3"
+    assert bar._busy == "play" and bar._busy_url == f"{OTHER}p1"
 
 
 def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatch):
