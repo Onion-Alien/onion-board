@@ -3303,6 +3303,9 @@
     "{n} pad ble funnet og lagt tilbake på brettet.",
     "{n} pads ble funnet og lagt tilbake på brettet."
   ],
+  "Skip to the next sound": "Hopp til neste lyd",
+  "Skip to the next sound in Up next": "Hopp til neste lyd i Neste i køen",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stopper lyden som spilles og starter den neste i Neste i køen. Venter ingen, stopper den bare lyden.",
   "Plain": "Ensfarget",
   "Textured": "Med mønster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mønster får hvert tema sitt eget mønster på panelene: skjermlinjer, karbonfiber, bølger og mer. Ensfarget holder dem flate.",

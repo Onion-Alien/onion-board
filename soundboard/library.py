@@ -362,6 +362,7 @@ class Config:
     level_volumes: bool = True
     stop_hotkey: str = "ctrl+alt+s"
     pause_hotkey: str = ""
+    skip_hotkey: str = ""             # the player's ⏭: the next sound in Up next
     overlay_hotkey: str = "`"         # in-game overlay (see ui.overlay)
     overlay_key_checked: bool = False   # "`" looked at against the keyboard layout once
     cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves

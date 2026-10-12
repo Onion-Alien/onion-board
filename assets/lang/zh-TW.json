@@ -3229,6 +3229,9 @@
   "{n} pad was found and put back on the board.": [
     "找到 {n} 個按鍵，已放回面板。"
   ],
+  "Skip to the next sound": "跳到下一個音效",
+  "Skip to the next sound in Up next": "跳到「下一首」中的下一個音效",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "停止正在播放的音效，並開始「下一首」中的下一個。沒有等待的音效時，只會停止目前的音效。",
   "Plain": "純色",
   "Textured": "紋理",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "紋理會為每個主題的面板加上專屬圖案：老式螢幕掃描線、碳纖維、波浪等。純色則保持平整。",

@@ -3229,6 +3229,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} pad ditemukan dan dikembalikan ke papan."
   ],
+  "Skip to the next sound": "Lompat ke suara berikutnya",
+  "Skip to the next sound in Up next": "Lompat ke suara berikutnya di Berikutnya",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Menghentikan suara yang diputar dan memulai suara berikutnya di Berikutnya. Jika tidak ada yang menunggu, suara hanya dihentikan.",
   "Plain": "Polos",
   "Textured": "Bertekstur",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Bertekstur memberi tiap tema pola sendiri di panel: garis layar jadul, serat karbon, ombak, dan lainnya. Polos membuatnya datar.",

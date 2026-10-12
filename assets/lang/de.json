@@ -3303,6 +3303,9 @@
     "{n} Pad wurde gefunden und wieder aufs Board gelegt.",
     "{n} Pads wurden gefunden und wieder aufs Board gelegt."
   ],
+  "Skip to the next sound": "Zum nächsten Sound springen",
+  "Skip to the next sound in Up next": "Zum nächsten Sound in „Als Nächstes“ springen",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stoppt den laufenden Sound und startet den nächsten aus „Als Nächstes“. Wartet keiner, wird der Sound nur gestoppt.",
   "Plain": "Schlicht",
   "Textured": "Mit Muster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Mit Muster bekommt jedes Theme sein eigenes Muster auf den Feldern: Bildschirmlinien, Carbon, Wellen und mehr. Schlicht lässt sie einfarbig.",

@@ -3377,6 +3377,9 @@
     "{n} pad-uri au fost găsite și puse înapoi pe board.",
     "{n} de pad-uri au fost găsite și puse înapoi pe board."
   ],
+  "Skip to the next sound": "Treci la sunetul următor",
+  "Skip to the next sound in Up next": "Treci la sunetul următor din Urmează",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Oprește sunetul care se aude și pornește următorul din Urmează. Dacă nu așteaptă niciunul, doar oprește sunetul.",
   "Plain": "Simplu",
   "Textured": "Cu textură",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Cu textură, fiecare temă are propriul model pe panouri: linii de ecran vechi, fibră de carbon, valuri și altele. Simplu le lasă plate.",

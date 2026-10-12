@@ -3229,6 +3229,9 @@
   "{n} pad was found and put back on the board.": [
     "{n}個のパッドが見つかったので、ボードに戻しました。"
   ],
+  "Skip to the next sound": "次のサウンドへスキップ",
+  "Skip to the next sound in Up next": "「次に再生」の次のサウンドへスキップ",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "再生中のサウンドを止めて、「次に再生」の次のサウンドを始めます。待っているものがなければ、止めるだけです。",
   "Plain": "無地",
   "Textured": "テクスチャあり",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "テクスチャありでは、テーマごとにパネルに模様が付きます：ブラウン管の走査線、カーボン、波など。無地はフラットのままです。",

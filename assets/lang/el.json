@@ -3303,6 +3303,9 @@
     "Βρέθηκε {n} κουμπί και μπήκε ξανά στο board.",
     "Βρέθηκαν {n} κουμπιά και μπήκαν ξανά στο board."
   ],
+  "Skip to the next sound": "Μετάβαση στον επόμενο ήχο",
+  "Skip to the next sound in Up next": "Μετάβαση στον επόμενο ήχο στο «Επόμενο»",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Σταματά τον ήχο που παίζει και ξεκινά τον επόμενο στο «Επόμενο». Αν δεν περιμένει κανένας, απλώς σταματά τον ήχο.",
   "Plain": "Απλό",
   "Textured": "Με υφή",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Με υφή κάθε θέμα παίρνει το δικό του μοτίβο στα πάνελ: γραμμές παλιάς οθόνης, ανθρακονήματα, κύματα και άλλα. Το απλό τα αφήνει επίπεδα.",

@@ -3303,6 +3303,9 @@
     "{n} ruta hittades och lades tillbaka på brädan.",
     "{n} rutor hittades och lades tillbaka på brädan."
   ],
+  "Skip to the next sound": "Hoppa till nästa ljud",
+  "Skip to the next sound in Up next": "Hoppa till nästa ljud i Härnäst",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stoppar ljudet som spelas och startar nästa i Härnäst. Väntar inget, stoppar det bara ljudet.",
   "Plain": "Enfärgad",
   "Textured": "Med mönster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mönster får varje tema sitt eget mönster på panelerna: skärmlinjer, kolfiber, vågor och mer. Enfärgad håller dem platta.",

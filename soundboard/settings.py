@@ -43,6 +43,9 @@ HOTKEY_GROUPS = [
          _("Stops every sound, the radio and every program, and turns the voices off.")),
         ("pause_hotkey", "__pause__", _("Pause / resume sounds"),
          _("Pauses everything playing; press again to carry on.")),
+        ("skip_hotkey", "__skip__", _("Skip to the next sound"),
+         _("Stops the sound playing and starts the next one in Up next. With nothing "
+           "waiting, it just stops the sound.")),
         ("random_hotkey", "__random__", _("Play a random sound"),
          _("From the category showing (All = any sound), never the same one twice in a row. "
            "A category can have its own: right-click its tab.")),

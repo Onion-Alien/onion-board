@@ -3303,6 +3303,9 @@
     "{n} бутон беше намерен и върнат на таблото.",
     "{n} бутона бяха намерени и върнати на таблото."
   ],
+  "Skip to the next sound": "Към следващия звук",
+  "Skip to the next sound in Up next": "Към следващия звук в „Следва“",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Спира звука, който свири, и пуска следващия в „Следва“. Ако няма чакащ, просто спира звука.",
   "Plain": "Обикновен",
   "Textured": "С текстура",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "С текстура всяка тема получава свой шарка по панелите: линии като на стар екран, карбон, вълни и още. Обикновеният ги оставя гладки.",

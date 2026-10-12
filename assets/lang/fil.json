@@ -3303,6 +3303,9 @@
     "{n} pad ang nahanap at ibinalik sa board.",
     "{n} pad ang nahanap at ibinalik sa board."
   ],
+  "Skip to the next sound": "Lumaktaw sa susunod na tunog",
+  "Skip to the next sound in Up next": "Lumaktaw sa susunod na tunog sa Susunod",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Ihihinto ang tumutugtog na tunog at sisimulan ang susunod sa Susunod. Kung walang naghihintay, ihihinto lang ang tunog.",
   "Plain": "Plain",
   "Textured": "May texture",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Sa may texture, may sariling disenyo ang bawat tema sa mga panel: linya ng lumang screen, carbon fiber, alon at iba pa. Pinapanatili itong patag ng Plain.",
