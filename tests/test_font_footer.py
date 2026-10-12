@@ -5,13 +5,21 @@ from pathlib import Path
 import pytest
 import numpy as np
 from PySide6.QtCore import QPoint
+from PySide6.QtGui import QFontDatabase
 from PySide6.QtWidgets import QApplication, QLabel
 from test_mainwindow import window  # noqa: F401
 
-# Set before the qapp fixture creates Qt's font database, including on CI.
-font_dir = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
-if font_dir.is_dir():
-    os.environ.setdefault("QT_QPA_FONTDIR", str(font_dir))
+@pytest.fixture(autouse=True)
+def pixel_fonts(qapp):
+    """Load real glyphs for these pixel checks without changing other tests' fonts."""
+    font_dir = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+    ids = [QFontDatabase.addApplicationFont(str(font_dir / name))
+           for name in ("bahnschrift.ttf", "consola.ttf", "consolab.ttf", "comic.ttf",
+                        "comicbd.ttf") if (font_dir / name).is_file()]
+    yield
+    for font_id in ids:
+        if font_id >= 0:
+            QFontDatabase.removeApplicationFont(font_id)
 
 
 def pixels(widget):
