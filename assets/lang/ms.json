@@ -3217,5 +3217,11 @@
   "Volumes levelled": "Kelantangan diratakan",
   "Live: click to mute": "Langsung: klik untuk bisukan",
   "Muted: click to go live": "Dibisukan: klik untuk langsung semula",
-  "Pause or resume": "Jeda atau sambung"
+  "Pause or resume": "Jeda atau sambung",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord dan permainan tidak mendengar apa-apa daripada mikrofon anda. Jika ia diredamkan, nyahredamkannya. Jika tidak, klik <b>Baiki</b>, kemudian <b>Yes</b> apabila Windows bertanya.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan permainan tidak mendengar apa-apa daripada mikrofon anda. Jika ia diredamkan, nyahredamkannya. Jika tidak, klik <b>Baiki</b>: bunyi anda hilang selama beberapa saat.",
+  "No sound": "Tiada bunyi",
+  "Your mic sends no sound": "Mikrofon anda tidak menghantar bunyi",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikrofon anda tidak menghantar bunyi, walaupun selepas audio Windows dimulakan semula. Jika mikrofon set kepala anda diredamkan, nyahredamkannya. Jika tidak, mulakan semula PC anda, kemudian cuba lagi.",
+  "Your mic sends no sound: see the Setup tab.": "Mikrofon anda tidak menghantar bunyi: lihat tab Persediaan."
 }

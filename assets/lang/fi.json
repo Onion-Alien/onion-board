@@ -3290,5 +3290,11 @@
   "Volumes levelled": "Äänenvoimakkuudet tasattu",
   "Live: click to mute": "Live: mykistä napsauttamalla",
   "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
-  "Pause or resume": "Tauko tai jatka"
+  "Pause or resume": "Tauko tai jatka",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ja pelit eivät kuule mikistäsi mitään. Jos se on mykistetty, poista mykistys. Jos ei, klikkaa <b>Korjaa</b> ja sitten <b>Kyllä</b>, kun Windows kysyy.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ja pelit eivät kuule mikistäsi mitään. Jos se on mykistetty, poista mykistys. Jos ei, klikkaa <b>Korjaa</b>: ääni katkeaa muutamaksi sekunniksi.",
+  "No sound": "Ei ääntä",
+  "Your mic sends no sound": "Mikkisi ei lähetä ääntä",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikkisi ei lähetä ääntä edes Windowsin äänen uudelleenkäynnistyksen jälkeen. Jos kuulokkeidesi mikki on mykistetty, poista mykistys. Jos ei, käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
+  "Your mic sends no sound: see the Setup tab.": "Mikkisi ei lähetä ääntä: katso Asetukset-välilehti."
 }

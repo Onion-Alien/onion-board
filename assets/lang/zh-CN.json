@@ -3217,5 +3217,11 @@
   "Volumes levelled": "音量已统一",
   "Live: click to mute": "直播中：点击静音",
   "Muted: click to go live": "已静音：点击恢复直播",
-  "Pause or resume": "暂停或继续"
+  "Pause or resume": "暂停或继续",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord 和游戏听不到你麦克风的任何声音。如果麦克风静音了，请取消静音。如果没有，点 <b>修复</b>，然后在 Windows 询问时点 <b>是</b>。",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord 和游戏听不到你麦克风的任何声音。如果麦克风静音了，请取消静音。如果没有，点 <b>修复</b>：声音会中断几秒。",
+  "No sound": "没有声音",
+  "Your mic sends no sound": "你的麦克风没有声音",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "即使重启了 Windows 的音频，你的麦克风仍然没有声音。如果耳机麦克风静音了，请取消静音。如果没有，请重启电脑，然后再试一次。",
+  "Your mic sends no sound: see the Setup tab.": "你的麦克风没有声音：请查看设置标签页。"
 }

@@ -1,6 +1,8 @@
 """Apps recording the mic without Onion Board (soundboard.rawmic): the count check, and
 its line on the real MainWindow's urgent bar (offscreen). Windows isn't asked: the
 session list and the effect's stream count are fed in."""
+from types import SimpleNamespace
+
 import pytest
 
 from soundboard import rawmic
@@ -91,7 +93,8 @@ def test_an_app_leaving_forgets_it():
 def window(main_window, monkeypatch):  # noqa: F811
     w = main_window
     w.raw_watch = rawmic.BypassWatch(me=ME)
-    monkeypatch.setattr(w.engine, "direct_stream", lambda: object())
+    stream = SimpleNamespace(mic_silent_s=lambda: 0.0)   # a working mic
+    monkeypatch.setattr(w.engine, "direct_stream", lambda: stream)
     return w
 
 

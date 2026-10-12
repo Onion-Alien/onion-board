@@ -3290,5 +3290,11 @@
   "Volumes levelled": "Volumes égalisés",
   "Live: click to mute": "En direct : cliquez pour couper le son",
   "Muted: click to go live": "Muet : cliquez pour repasser en direct",
-  "Pause or resume": "Pause ou reprise"
+  "Pause or resume": "Pause ou reprise",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord et les jeux n'entendent rien de ton micro. S'il est coupé, réactive-le. Sinon, clique sur <b>Réparer</b>, puis sur <b>Oui</b> quand Windows demande.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord et les jeux n'entendent rien de ton micro. S'il est coupé, réactive-le. Sinon, clique sur <b>Réparer</b> : ton son se coupe quelques secondes.",
+  "No sound": "Pas de son",
+  "Your mic sends no sound": "Ton micro n'envoie aucun son",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Ton micro n'envoie aucun son, même après le redémarrage du son de Windows. Si le micro de ton casque est coupé, réactive-le. Sinon, redémarre ton PC, puis réessaie.",
+  "Your mic sends no sound: see the Setup tab.": "Ton micro n'envoie aucun son : regarde l'onglet Configuration."
 }

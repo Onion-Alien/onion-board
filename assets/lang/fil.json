@@ -3290,5 +3290,11 @@
   "Volumes levelled": "Pantay ang volume",
   "Live: click to mute": "Live: i-click para i-mute",
   "Muted: click to go live": "Naka-mute: i-click para mag-live",
-  "Pause or resume": "I-pause o ituloy"
+  "Pause or resume": "I-pause o ituloy",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Kung naka-mute ito, i-unmute. Kung hindi, i-click ang <b>I-repair</b>, tapos <b>Yes</b> kapag nagtanong ang Windows.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Kung naka-mute ito, i-unmute. Kung hindi, i-click ang <b>I-repair</b>: mawawala ang tunog mo nang ilang segundo.",
+  "No sound": "Walang tunog",
+  "Your mic sends no sound": "Walang tunog na pinapadala ang mic mo",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Walang tunog na pinapadala ang mic mo, kahit na-restart na ang audio ng Windows. Kung naka-mute ang mic ng headset mo, i-unmute ito. Kung hindi, i-restart ang PC mo, tapos subukan ulit.",
+  "Your mic sends no sound: see the Setup tab.": "Walang tunog na pinapadala ang mic mo: tingnan ang Setup tab."
 }

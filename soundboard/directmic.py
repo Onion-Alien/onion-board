@@ -484,6 +484,8 @@ class DirectMicStream:
         self._fed_period = BLOCK_S
         self._fed_here = True
         self._due_at: float | None = None
+        # since when (perf_counter) the clean mic has been nothing but exact zeros
+        self._zeros_since: float | None = None
 
     def start(self):
         self._ring.set_enabled(True)
@@ -532,6 +534,14 @@ class DirectMicStream:
             return self._ring.late()
         except (ValueError, KeyError, AttributeError):
             return 0
+
+    def mic_silent_s(self) -> float:
+        """How long the clean mic has been nothing but exact zeros: a mic stuck that way
+        after an audio restart (every app hears nothing). A quiet room still has noise,
+        so a working mic is never at it long. 0 at the first real sample, and without
+        any clean mic (nobody records the mic: nothing to tell)."""
+        since = self._zeros_since
+        return 0.0 if since is None or not self.mic_live else time.perf_counter() - since
 
     def pump(self) -> bool:
         """Take whatever clean mic came in and send the same stretch out. Safe from any
@@ -592,6 +602,7 @@ class DirectMicStream:
                 self._publisher = publisher
                 self._mic_pos, self.mic_rate, self._acc = wp, rate, 0.0   # (re)start here
                 self.mic_live = True
+                self._zeros_since = None
                 self._catch_up()
                 ring.heartbeat()
                 return
@@ -600,6 +611,10 @@ class DirectMicStream:
                 return
             x = ring.read_mic(self._mic_pos, gap)
             self._mic_pos = wp
+            if x.any():
+                self._zeros_since = None
+            elif self._zeros_since is None:
+                self._zeros_since = time.perf_counter()
             # (never counted as more than a block: after a hiccup two can come at once,
             # and the next one is still only a block away)
             self._fed_at, self._fed_period = time.perf_counter(), min(gap / rate, BLOCK_S)
@@ -615,6 +630,7 @@ class DirectMicStream:
             return
         if self.mic_live:   # the mic stopped: keep time from here on our own
             self.mic_live = False
+            self._zeros_since = None
             self._fed_at = None
             ring.clear_sync()
             self._start, self._made = time.perf_counter(), 0
@@ -1577,20 +1593,27 @@ def _make_ring():
 def _audio_off(work) -> int:
     """Run `work` (it returns an exit code) with Windows' audio stopped: the endpoint
     builder reads the mics' effect settings when it starts. The audio always starts
-    again, however `work` ends; if it won't stop, nothing is touched (6)."""
+    again, however `work` ends; if it won't stop, nothing is touched (6). `work` done
+    but a mic still sends only silence after every restart (_mics_come_back_live):
+    MIC_SILENT."""
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     mics: list[str] | None = None
+    code = None
     try:
         if not _audio_service(False):
             return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
         mics = installed_on()   # the one it comes off is listened to as well
-        return work()
+        code = work()
     finally:
         _audio_service(True, dependents)
-        if mics is not None:
-            _mics_come_back_live(mics, dependents)
+        live = mics is None or _mics_come_back_live(mics, dependents)
+    return MIC_SILENT if code == 0 and not live else code
+
+
+MIC_SILENT = 7        # the step was done, but a mic still sends only silence
+EXTRA_RESTARTS = 3    # ...after this many more restarts of Windows' audio
 
 
 def _mic_is_silent(guid: str) -> bool | None:
@@ -1599,39 +1622,46 @@ def _mic_is_silent(guid: str) -> bool | None:
     return appaudio.mic_is_silent(guid)
 
 
-def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str]):
+def _silent(guid: str) -> bool:
+    """Only exact zeros, twice 2 s apart (a mic still waking up can be silent a moment)."""
+    heard = _mic_is_silent(guid)
+    if heard:
+        log.info("mic %s silent just after the audio restart: listening again", guid)
+        time.sleep(2)
+        heard = _mic_is_silent(guid)
+    log.info("mic %s after the audio restart: %s", guid,
+             {True: "only silence", False: "sound", None: "can't tell"}[heard])
+    return bool(heard)
+
+
+def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str]) -> bool:
     """After the audio restart a mic can come back sending only exact zeros (an app
     such as a voice chat grabbed it the moment it was back), to every app and to Windows'
     own mic test, until the audio restarts again. So the mics the effect was on (`before`)
-    and is on now are listened to for a second: digital silence gets one more restart,
-    never two."""
+    and is on now are listened to: digital silence gets another restart, up to
+    EXTRA_RESTARTS of them. False if a mic still sends only silence after those (the app
+    then says so); True otherwise, "can't tell" and a failed check included."""
     try:
-        silent = []
-        for g in dict.fromkeys([*before, *installed_on()]):
-            heard = _mic_is_silent(g)
-            if heard:   # a mic still waking up can be silent a moment: only twice counts
-                log.info("mic %s silent just after the audio restart: listening again", g)
-                time.sleep(2)
-                heard = _mic_is_silent(g)
-            log.info("mic %s after the audio restart: %s", g,
-                     {True: "only silence", False: "sound", None: "can't tell"}[heard])
-            if heard:
-                silent.append(g)
-        if not silent:
-            return
-        log.warning("%s sends only silence after the audio restart: "
-                    "restarting the audio once more", ", ".join(silent))
-        try:
-            _audio_service(False)
-        finally:
-            _audio_service(True, dependents)
-        still = [g for g in silent if _mic_is_silent(g)]
-        if still:
-            log.warning("%s still sends only silence after a second restart", ", ".join(still))
-        else:
-            log.info("the mic is back after a second restart")
+        silent = [g for g in dict.fromkeys([*before, *installed_on()]) if _silent(g)]
+        for n in range(1, EXTRA_RESTARTS + 1):
+            if not silent:
+                break
+            log.warning("%s sends only silence after the audio restart: restarting the "
+                        "audio again (%d of %d)", ", ".join(silent), n, EXTRA_RESTARTS)
+            try:
+                _audio_service(False)
+            finally:
+                _audio_service(True, dependents)
+            silent = [g for g in silent if _silent(g)]
+            if not silent:
+                log.info("the mic is back after %d more restart(s)", n)
+        if silent:
+            log.warning("%s still sends only silence after %d more restarts",
+                        ", ".join(silent), EXTRA_RESTARTS)
+            return False
     except Exception:  # noqa: BLE001 - a check: never fails the install or uninstall
         log.warning("couldn't check the mic after the audio restart", exc_info=True)
+    return True
 
 
 def admin_install(guid: str, slot: str | None = None, source: Path | None = None) -> int:
@@ -1910,7 +1940,7 @@ def cli(args: list[str]) -> int:
         except Exception:  # noqa: BLE001
             log.exception("mic effect %s failed", args[:1])
             return 1
-        if code == 0 and args[0] in ("install", "reinstall", "cleanup") \
+        if code in (0, MIC_SILENT) and args[0] in ("install", "reinstall", "cleanup") \
                 and not michelper.is_helper():
             # the one prompt also sets up (or updates) the helper: no prompt next time
             michelper.install_helper(user)
@@ -2110,6 +2140,13 @@ def unfinished() -> str:
              "then try again.")
 
 
+def mic_silent() -> str:
+    """What a step returns when it was done, but the mic still sends only silence after
+    every restart of Windows' audio (MIC_SILENT)."""
+    return _("Your mic sends no sound, even after restarting Windows' audio. If your "
+             "headset's mic is muted, unmute it. If not, restart your PC, then try again.")
+
+
 def no_helper() -> str:
     """What install returns when the mic helper couldn't do it and Windows wasn't asked."""
     return _("Onion Board's mic helper didn't answer.")
@@ -2135,6 +2172,8 @@ def install_on(guid: str | None, *, clean: bool = False,
         return declined() if ask_windows else no_helper()
     if code == UNFINISHED:
         return unfinished()
+    if code == MIC_SILENT:
+        return mic_silent()
     if code:
         return _("Installing failed (code {code}). The log is in {folder}.",
                  code=code, folder=data_dir().parent)
@@ -2158,4 +2197,6 @@ def uninstall(guid: str | None = None) -> str | None:
         return declined()
     if code == UNFINISHED:
         return unfinished()
+    if code == MIC_SILENT:
+        return mic_silent()
     return _("Removing failed (code {code}).", code=code) if code else None

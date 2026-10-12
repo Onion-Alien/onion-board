@@ -3290,5 +3290,11 @@
   "Volumes levelled": "Εντάσεις εξισωμένες",
   "Live: click to mute": "Ζωντανά: κάντε κλικ για σίγαση",
   "Muted: click to go live": "Σε σίγαση: κάντε κλικ για ζωντανά",
-  "Pause or resume": "Παύση ή συνέχεια"
+  "Pause or resume": "Παύση ή συνέχεια",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Αν είναι σε σίγαση, βγάλ' το από τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b> και μετά στο <b>Ναι</b> όταν ρωτήσουν τα Windows.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Αν είναι σε σίγαση, βγάλ' το από τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b>: ο ήχος σου κόβεται για λίγα δευτερόλεπτα.",
+  "No sound": "Χωρίς ήχο",
+  "Your mic sends no sound": "Το μικρόφωνό σου δεν στέλνει ήχο",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο, ακόμα και μετά από επανεκκίνηση του ήχου των Windows. Αν το μικρόφωνο των ακουστικών σου είναι σε σίγαση, βγάλ' το από τη σίγαση. Αν όχι, κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
+  "Your mic sends no sound: see the Setup tab.": "Το μικρόφωνό σου δεν στέλνει ήχο: δες την καρτέλα Ρύθμιση."
 }

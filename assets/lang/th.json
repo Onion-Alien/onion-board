@@ -3217,5 +3217,11 @@
   "Volumes levelled": "ปรับความดังเท่ากันแล้ว",
   "Live: click to mute": "สด: คลิกเพื่อปิดเสียง",
   "Muted: click to go live": "ปิดเสียงอยู่: คลิกเพื่อกลับมาสด",
-  "Pause or resume": "หยุดชั่วคราวหรือเล่นต่อ"
+  "Pause or resume": "หยุดชั่วคราวหรือเล่นต่อ",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย ถ้าปิดเสียงไมค์อยู่ ให้เปิดเสียง ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b> แล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย ถ้าปิดเสียงไมค์อยู่ ให้เปิดเสียง ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b>: เสียงจะหายไปสองสามวินาที",
+  "No sound": "ไม่มีเสียง",
+  "Your mic sends no sound": "ไมค์ของคุณไม่ส่งเสียงออกมา",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา แม้จะรีสตาร์ทเสียงของ Windows แล้ว ถ้าไมค์ของหูฟังปิดเสียงอยู่ ให้เปิดเสียง ถ้าไม่ได้ปิด ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
+  "Your mic sends no sound: see the Setup tab.": "ไมค์ของคุณไม่ส่งเสียงออกมา: ดูที่แท็บตั้งค่า"
 }

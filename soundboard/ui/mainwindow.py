@@ -689,6 +689,7 @@ class MainWindow(QMainWindow):
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
     _mic_offered = False    # shown this start (it comes back next start until updated)
+    _silent_said = False    # the "your mic sends no sound" toast came this run
 
     def _mic_update_due(self) -> bool:
         cfg = self.cfg
@@ -3583,6 +3584,19 @@ class MainWindow(QMainWindow):
                           "games hear them. Windows asks once: click <b>Yes</b>.") if ask else
                         _("One click puts your sounds straight into your mic, so Discord and "
                           "games hear them.")), _("Put my sounds straight into my mic"))
+        elif state == "ok" and self._mic_sends_nothing():
+            # the mic itself sends nothing (stuck after an audio restart, or its own mute):
+            # Repair restarts the audio and listens to it again
+            if not self._silent_said:
+                self._silent_said = True
+                self.toast(_("Your mic sends no sound: see the Setup tab."), "warn")
+            look = ("warn", "warn", _("Your mic sends no sound"), _("No sound"), needed(
+                _("Discord and games hear nothing from your mic. If its mute is on, switch "
+                  "it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.")
+                if ask else
+                _("Discord and games hear nothing from your mic. If its mute is on, switch "
+                  "it off. If not, click <b>Repair</b>: your sound drops out for a few "
+                  "seconds.")), _("Repair (one click)"))
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)
         else:   # set up, but Windows isn't running it or it won't open: the step says why
@@ -3730,6 +3744,9 @@ class MainWindow(QMainWindow):
                 # No to the optional update: the old part keeps working, no box needed
                 self.toast(_("Update cancelled. Your mic part is still the old one: "
                              "update it from the Setup tab."), "warn")
+            elif err == directmic.mic_silent():
+                # it's on the mic, but the mic came back from the audio restart dead
+                self.tell(_("Your mic sends no sound"), err, "error")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -3812,8 +3829,13 @@ class MainWindow(QMainWindow):
         e = self.engine
         h = (directmic.status(self.cfg.mic_device), e.main_stream is not None,
              self._direct_not_running(), bool(e.direct_apps()),
-             time.monotonic() < self._settle_until and e.effect_alive())   # "starting…" ends
+             time.monotonic() < self._settle_until and e.effect_alive(),   # "starting…" ends
+             self._mic_sends_nothing())
         return h
+
+    def _mic_sends_nothing(self) -> bool:
+        """The mic, with the effect on it, has sent only exact zeros for MIC_SILENT_S."""
+        return self.engine.direct_mic_silent_s() >= self.MIC_SILENT_S
 
     _following_effect = False
 
@@ -3845,6 +3867,7 @@ class MainWindow(QMainWindow):
 
     DIRECT_GRACE_S = 4.0   # the board's own mic open this long, and still no sign of it
     SETTLE_S = 20.0        # after setting it up: how long Windows gets to load it
+    MIC_SILENT_S = 20.0    # the mic sent only exact zeros this long: it's stuck (or muted)
 
     def _spare_cable(self) -> bool:
         """Straight into the mic, and VB-Cable still installed: it's only the fallback

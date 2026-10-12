@@ -3363,5 +3363,11 @@
   "Volumes levelled": "Громкость выровнена",
   "Live: click to mute": "В эфире: нажмите, чтобы выключить звук",
   "Muted: click to go live": "Без звука: нажмите, чтобы выйти в эфир",
-  "Pause or resume": "Пауза или продолжить"
+  "Pause or resume": "Пауза или продолжить",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord и игры ничего не слышат с твоего микрофона. Если он выключен, включи его. Если нет, нажми <b>Починить</b>, затем <b>Да</b>, когда Windows спросит.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord и игры ничего не слышат с твоего микрофона. Если он выключен, включи его. Если нет, нажми <b>Починить</b>: звук пропадёт на несколько секунд.",
+  "No sound": "Нет звука",
+  "Your mic sends no sound": "Микрофон не передаёт звук",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Микрофон не передаёт звук даже после перезапуска звука Windows. Если микрофон на гарнитуре выключен, включи его. Если нет, перезагрузи ПК и попробуй ещё раз.",
+  "Your mic sends no sound: see the Setup tab.": "Микрофон не передаёт звук: загляни на вкладку «Настройка»."
 }

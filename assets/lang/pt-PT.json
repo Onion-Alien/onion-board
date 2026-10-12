@@ -3290,5 +3290,11 @@
   "Volumes levelled": "Volumes nivelados",
   "Live: click to mute": "Em direto: clique para silenciar",
   "Muted: click to go live": "Silenciado: clique para voltar ao direto",
-  "Pause or resume": "Pausar ou retomar"
+  "Pause or resume": "Pausar ou retomar",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "O Discord e os jogos não ouvem nada do teu microfone. Se estiver silenciado, tira o silêncio. Se não, clica em <b>Reparar</b> e depois em <b>Sim</b> quando o Windows perguntar.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "O Discord e os jogos não ouvem nada do teu microfone. Se estiver silenciado, tira o silêncio. Se não, clica em <b>Reparar</b>: o som falha durante alguns segundos.",
+  "No sound": "Sem som",
+  "Your mic sends no sound": "O teu microfone não está a enviar som",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "O teu microfone não está a enviar som, mesmo depois de reiniciar o áudio do Windows. Se o microfone dos teus auscultadores estiver silenciado, tira o silêncio. Se não, reinicia o PC e tenta outra vez.",
+  "Your mic sends no sound: see the Setup tab.": "O teu microfone não está a enviar som: vê o separador Configuração."
 }
