@@ -102,14 +102,16 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     monkeypatch.setattr(QMessageBox, "question",
                         lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)
     w.import_other(soundpad.SOURCE)
-    assert "<b>3</b> sounds" in asked[0] and "2 categories" in asked[0]
+    assert "<b>3</b> sounds" in asked[0] and "3 categories" in asked[0]   # + "Soundpad"
     assert "2 hotkeys" in asked[0] and "Gone" in asked[0]
     assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
     new = {m.name: m for m in w.cfg.sounds[2:]}
     assert set(new) == {"Bruh", "Vine - Boom", "airhorn"}
     assert new["Bruh"].hotkey == "ctrl+1" and new["Vine - Boom"].hotkey == ""
-    assert new["Vine - Boom"].tags == ["Memes", "Loud"]
-    assert {"Memes", "Loud"} <= set(w.cfg.categories)
+    # each in a "Soundpad" category too, so they're easy to find, as well as its own
+    assert new["Vine - Boom"].tags == ["Soundpad", "Memes", "Loud"]
+    assert all(m.tags[0] == "Soundpad" for m in new.values())
+    assert {"Soundpad", "Memes", "Loud"} <= set(w.cfg.categories)
     assert {n: Path(m.file) for n, m in new.items()} == {   # linked to Soundpad's files
         "Bruh": tmp_path / "My sounds" / "bruh.wav",
         "Vine - Boom": tmp_path / "My sounds" / "sub" / "vine boom.wav",
