@@ -236,10 +236,22 @@ def discover(dirs: list[Path] | None = None) -> list[ModuleInfo]:
     """Every module found; the first folder wins when two have the same id."""
     found: dict[str, ModuleInfo] = {}
     for base in dirs if dirs is not None else search_dirs():
-        if not base.is_dir():
+        try:
+            subs = sorted(p for p in base.iterdir() if p.is_dir()) if base.is_dir() else []
+        except OSError as e:
+            log.warning("can't list the add-ons in %s: %s", base, e)
             continue
-        for sub in sorted(p for p in base.iterdir() if p.is_dir()):
-            info = _read(sub)
+        for sub in subs:
+            # a folder Windows won't let us read (locked by an antivirus, no permission, a
+            # link it refuses to follow: WinError 448) is one broken add-on, never a crash
+            # at start-up
+            try:
+                info = _read(sub)
+            except OSError as e:
+                log.warning("can't read the add-on in %s: %s", sub, e)
+                info = ModuleInfo(id=sub.name, name=sub.name, version="?", description="",
+                                  kind="?", path=sub,
+                                  error=f"can't read its folder: {errors.plain(e)}")
             if info is not None and info.id not in found:
                 found[info.id] = info
     return list(found.values())

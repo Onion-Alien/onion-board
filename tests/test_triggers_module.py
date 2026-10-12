@@ -6,6 +6,7 @@ Made-up add-ons only."""
 import json
 import sys
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -44,6 +45,26 @@ def test_a_triggers_module_is_read_with_its_interface_version(tmp_path, pkgname)
     (m,) = modules.discover([tmp_path])
     assert (m.kind, m.api_version, m.package, m.imports, m.error) == (
         "triggers", 1, pkgname, ["numpy"], "")
+
+
+def test_an_add_on_folder_windows_wont_read_is_skipped_not_a_crash(tmp_path, pkgname,
+                                                                    monkeypatch):
+    # WinError 448: a link Windows refuses to follow inside the add-on (an antivirus
+    # lock or missing permission raise the same way) once closed the app at start-up
+    make_module(tmp_path / "onion-watch", package=pkgname)
+    make_module(tmp_path / "other", package=pkgname + "b", mid="other")
+    real = Path.is_file
+
+    def is_file(self):
+        if "onion-watch" in self.parts and self.name == "__init__.py":
+            raise OSError(448, "The path cannot be traversed because it contains an "
+                               "untrusted mount point")
+        return real(self)
+
+    monkeypatch.setattr(Path, "is_file", is_file)
+    by_id = {m.id: m for m in modules.discover([tmp_path])}
+    assert "can't read its folder" in by_id["onion-watch"].error
+    assert by_id["other"].error == ""
 
 
 @pytest.mark.parametrize("change, why", [
