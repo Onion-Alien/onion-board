@@ -119,6 +119,7 @@ TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to th
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
                 "who are fine with it.")
+CHIPS_GAP = 6         # between the now-playing row's chips
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
@@ -1781,16 +1782,18 @@ class MainWindow(QMainWindow):
         find.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         find.activated.connect(self.focus_search)
 
-        # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
-        # them can be stopped (■) or taken into the player (name) without clicking
-        # its pad, which would restart it
+        # ---- "now playing" chips: every sound playing, so each can be stopped (■) or
+        # taken into the player (name) without clicking its pad, which would restart it
         self.playing_row = QWidget()
-        # wraps onto more lines: one line of four overlapping sounds' chips (~900 px)
-        # turned a narrower window into the mini player, and every playing sound must
-        # stay reachable, so none are left out
-        self._chips_hl = Flow(self.playing_row, gap=6)
+        # the playing chips wrap onto more lines: one line of four overlapping sounds'
+        # chips (~900 px) turned a narrower window into the mini player, and every
+        # playing sound must stay reachable, so none are left out. Up next only fills
+        # what's left of the line (_fit_up_next)
+        self._chips_hl = Flow(self.playing_row, gap=CHIPS_GAP)
         self._chips: dict[str, QWidget] = {}
         self._chip_ids: tuple = ()
+        self._waiting_chips = None   # (Up next label, its chips, "+n more", how many wait)
+        _Moved(self.playing_row, self._fit_up_next)
         self.playing_row.hide()
         left.addWidget(self.playing_row)
 
@@ -1894,31 +1897,8 @@ class MainWindow(QMainWindow):
                 if w:
                     w.deleteLater()
             self._chips = {}
-            if queue or links:
-                lbl = QLabel(_("Up next"))
-                lbl.setObjectName("muted")
-                self._chips_hl.addWidget(lbl)
-                for i, title in enumerate(links[:QUEUE_CHIPS]):
-                    self._chips_hl.addWidget(self._chip(
-                        title, _("Waits for the sounds playing to finish"),
-                        lambda __=False, i=i, q=links: self.linkbar.play_next(i, q),
-                        _("Take it out of the queue"),
-                        lambda __=False, i=i, q=links: self.linkbar.drop_up_next(i, q)))
-                if len(links) > QUEUE_CHIPS:
-                    more = QLabel(_("+{value} more", value=len(links) - QUEUE_CHIPS))
-                    more.setObjectName("muted")
-                    self._chips_hl.addWidget(more)
-                for i, sid in enumerate(queue[:QUEUE_CHIPS]):
-                    m = self.meta(sid)
-                    self._chips_hl.addWidget(self._chip(
-                        m.name if m else sid, _("Waits for the sounds playing to finish"),
-                        lambda __=False, s=sid: self.select(s),
-                        _("Take it out of the queue"),
-                        lambda __=False, i=i, q=queue: self._unqueue(i, q)))
-                if len(queue) > QUEUE_CHIPS:
-                    more = QLabel(_("+{value} more", value=len(queue) - QUEUE_CHIPS))
-                    more.setObjectName("muted")
-                    self._chips_hl.addWidget(more)
+            # Now playing first, then Up next: one line, read the way the app reads
+            # (the Flow mirrors it in Arabic)
             if ids:
                 lbl = QLabel(_("Now playing"))
                 lbl.setObjectName("muted")
@@ -1945,6 +1925,31 @@ class MainWindow(QMainWindow):
                     ch.addWidget(stop)
                     self._chips_hl.addWidget(chip)
                     self._chips[sid] = chip
+            self._waiting_chips = None
+            if queue or links:
+                lbl = QLabel(_("Up next"))
+                lbl.setObjectName("muted")
+                self._chips_hl.addWidget(lbl)
+                # web search / link songs, then the board's queued sounds
+                waiting: list[tuple] = [(title,
+                            lambda __=False, i=i, q=links: self.linkbar.play_next(i, q),
+                            lambda __=False, i=i, q=links: self.linkbar.drop_up_next(i, q))
+                           for i, title in enumerate(links)]
+                for i, sid in enumerate(queue):
+                    m = self.meta(sid)
+                    waiting.append((m.name if m else sid,
+                                    lambda __=False, s=sid: self.select(s),
+                                    lambda __=False, i=i, q=queue: self._unqueue(i, q)))
+                chips = []
+                for text, on_click, on_x in waiting[:QUEUE_CHIPS]:
+                    chips.append(self._chip(text, _("Waits for the sounds playing to finish"),
+                                            on_click, _("Take it out of the queue"), on_x))
+                    self._chips_hl.addWidget(chips[-1])
+                more = QLabel()
+                more.setObjectName("muted")
+                self._chips_hl.addWidget(more)
+                self._waiting_chips = (lbl, chips, more, len(waiting))
+            self._fit_up_next()
             # at least a line high, taller when the chips wrap (the Flow's height for
             # its width); a row that shrank and grew back with every overlapping
             # sound resized and repainted the whole board under it
@@ -1956,6 +1961,43 @@ class MainWindow(QMainWindow):
                 chip.setProperty("sel", sel)
                 chip.style().unpolish(chip)
                 chip.style().polish(chip)
+
+    def _fit_up_next(self):
+        """Up next shares the Now playing line and never starts a line of its own: the
+        playing chips always show (every playing sound keeps its ■), then as many Up
+        next chips as fit beside them, then "+n more". If not one fits (a narrow
+        window), Up next isn't shown at all."""
+        if not self._waiting_chips:
+            return
+        lbl, chips, more, total = self._waiting_chips
+        if not all(qt_valid(w) for w in (lbl, more, *chips)):
+            return
+        gap = CHIPS_GAP
+        room = self.playing_row.width()
+        for i in range(self._chips_hl.count()):   # the Now playing label and chips
+            item = self._chips_hl.itemAt(i)
+            w = item.widget() if item is not None else None
+            if w is None:
+                continue
+            if w is lbl:
+                break
+            room -= w.sizeHint().width() + gap
+        room -= lbl.sizeHint().width() + gap
+        fm = more.fontMetrics()
+        shown = 0
+        for i, c in enumerate(chips):
+            left = total - i - 1
+            need = c.sizeHint().width() + gap
+            tail = fm.horizontalAdvance(_("+{value} more", value=left)) + gap if left else 0
+            if need + tail > room:
+                break
+            room -= need
+            shown += 1
+        lbl.setVisible(shown > 0)
+        for i, c in enumerate(chips):
+            c.setVisible(i < shown)
+        more.setText(_("+{value} more", value=total - shown))
+        more.setVisible(0 < shown < total)
 
     def _chip(self, text: str, tip: str, on_click, x_tip: str, on_x) -> QFrame:
         """A queued sound's chip: its name, and a ✕."""
