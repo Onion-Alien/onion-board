@@ -42,6 +42,11 @@ def ink_middle(widget, parent, capital=False):
     assert len(ys)
     if capital:
         ys = ys[xs < min(xs) + widget.fontMetrics().horizontalAdvance(text[0])]
+        rows = set(ys)
+        end = min(rows)
+        while end + 1 in rows:
+            end += 1
+        ys = ys[ys <= end]   # first line only, even when another line starts below it
     return (min(ys) + max(ys)) / 2 + widget.mapTo(parent, QPoint()).y()
 
 

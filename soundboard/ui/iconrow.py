@@ -15,6 +15,7 @@ class CapIcon(QLabel):
         super().__init__()
         self.label, self.glyph_size = label, size
         self._rich_key, self._rich_line = None, (0.0, 0.0)
+        self._ink_key, self._ink_mid = None, (size - 1) / 2
         self.setFixedWidth(size)
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         self.setToolTip(tip)
@@ -42,6 +43,13 @@ class CapIcon(QLabel):
         pm = self.pixmap()
         if pm.isNull():
             return
+        if pm.cacheKey() != self._ink_key:
+            img = pm.toImage()
+            rows = [y for y in range(img.height())
+                    if any(img.pixelColor(x, y).alpha() > 40 for x in range(img.width()))]
+            if rows:
+                self._ink_mid = (rows[0] + rows[-1]) / (2 * pm.devicePixelRatio())
+            self._ink_key = pm.cacheKey()
         label = self.label
         fm = label.fontMetrics()
         text = label.text()
@@ -74,8 +82,9 @@ class CapIcon(QLabel):
         elif align & Qt.AlignmentFlag.AlignBottom:
             top += rect.height() - text_h
         base = math.floor(top + ascent + 0.5)
-        cap = base - fm.capHeight() / 2
+        # Ink ends on the row before the baseline, as in panel.heading_row().
+        cap = base - (fm.capHeight() + 1) / 2
         origin = self.mapFromGlobal(label.mapToGlobal(QPoint()))
         painter = QPainter(self)
-        painter.drawPixmap(0, round(origin.y() + cap - (self.glyph_size - 1) / 2), pm)
+        painter.drawPixmap(0, round(origin.y() + cap - self._ink_mid), pm)
         painter.end()
