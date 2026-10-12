@@ -48,6 +48,7 @@ from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pr
 from soundboard.shuffle import ShuffleBag
 from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog, TabHelpPopup
+from soundboard.ui.iconrow import CapIcon
 from soundboard.ui import importreport
 from soundboard.ui import routewarn
 from soundboard.ui.dropveil import DropVeil
@@ -1465,10 +1466,10 @@ class MainWindow(QMainWindow):
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(8)
             self._deck_rows.append(row)
-            row.addWidget(icon_label(icon, tip))
             lbl = QLabel(title)
             lbl.setObjectName("decktitle")
             lbl.setToolTip(tip)
+            row.addWidget(CapIcon(lbl, icon, tip=tip))
             row.addWidget(lbl)
             self._deck_titles.append(lbl)
             self._decks.append((deck,) if sep is None else (sep, deck))
