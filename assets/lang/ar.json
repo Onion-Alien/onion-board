@@ -1805,7 +1805,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>تحديد حساسية الإدخال تلقائيًا</b> قيد التشغيل: في المكالمة، يستمر في تحويل أصواتك إلى صمت ويقطعها: قم بإيقاف تشغيله (حساسية الإدخال) واترك شريط التمرير منخفضًا، أو استخدم ميزة الضغط والتحدث.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>وضع الإدخال</b> : يعمل <b>الضغط والتحدث</b> بشكل أفضل (اضبط نفس المفتاح ضمن الإعدادات ← مفاتيح التشغيل السريع ← الضغط والتحدث التلقائي ويحتفظ به Onion Board لك أثناء تشغيل الصوت). في <b>النشاط الصوتي</b> ، قم بإيقاف تشغيل <b>تحديد حساسية الإدخال تلقائيًا</b> واسحب شريط التمرير إلى أقصى اليسار تقريبًا، أو يستمر Discord في قطع الأصوات، والأصوات العالية أيضًا.",
   "<b>Languages</b> · {state}": "<b>اللغات</b> · {state}",
-  "<b>Pick a voice</b>": "<b>اختر صوتًا</b>",
   "A built-in voice (still hides yours)": "صوت مدمج (لا يزال يخفي صوتك)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "مزيج عشوائي سخيف من التأثيرات، مثل \"المزيج الخاص بي\": ما تغير يضيء أدناه. انقر مرة أخرى لآخر.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "عينة قصيرة بهذا الصوت، في سماعاتك فقط (لا يسمعها أحد). الأول يستغرق بضع ثوان.",
@@ -1993,7 +1992,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "يتم إيقاف البحث عن الأصوات وتنزيلها عبر الإنترنت في الإعدادات > الخصوصية والأمان.",
   "Finding the newest Onion Watch…": "العثور على أحدث ساعة Onion Watch...",
   "Finding the newest…": "العثور على أحدث…",
-  "Fold this card away": "قم بطي هذه البطاقة بعيدًا",
   "Fold {effect} away": "قم بطي {effect} بعيدًا",
   "Follow my pitch": "اتبع الملعب الخاص بي",
   "Forget {name}": "ننسى {name}",
@@ -2132,7 +2130,6 @@
   "Nothing was recorded: it didn't make a sound.": "لم يتم تسجيل أي شيء: لم يصدر صوتًا.",
   "Nothing yet. Lines show up here as they're spoken.": "لا شيء بعد. تظهر الأسطر هنا أثناء نطقها.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "ليس هناك مكان لإرسالها: اختر المكان الذي تنتقل إليه أصواتك من علامة التبويب \"الإعداد\".",
-  "ON: everyone hears it": "تشغيل - الجميع يسمعها",
   "Off (no shaping)": "إيقاف (بدون تشكيل)",
   "Off (send as is)": "إيقاف (إرسال كما هو)",
   "Old telephone": "هاتف قديم",
@@ -2256,7 +2253,6 @@
   "Shout and your voice blows out like a megaphone.": "اصرخ وصوتك ينطلق مثل مكبر الصوت.",
   "Shout blowout": "صرخة انفجار",
   "Show me how": "أرني كيف",
-  "Show this card": "أظهر هذه البطاقة",
   "Show {effect}": "عرض {effect}",
   "Silence": "الصمت",
   "Smaller files": "ملفات أصغر",
@@ -3580,5 +3576,6 @@
   "{mic} · not sent, sounds only": "{mic} · غير مُرسل، الأصوات فقط",
   "{mic} · off": "{mic} · متوقف",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "لم تنتهِ خطوة مسؤول Windows. إذا كانت نافذتها لا تزال مفتوحة، أجب عليها؛ ثم حاول مرة أخرى.",
-  "{title}  ·  quiet on {devices}": "{title} · صامت على {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · صامت على {devices}",
+  "Languages": "اللغات"
 }

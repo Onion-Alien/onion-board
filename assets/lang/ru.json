@@ -1591,7 +1591,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Автоматическое определение чувствительности входа</b> включено: во время разговора система принимает ваши звуки за тишину и отключает их: выключите ее (Чувствительность входа) и оставьте ползунок низким или используйте «Нажми и говори».",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Режим ввода</b> : лучше всего работает режим <b>«Нажми и говори»</b> (установите ту же клавишу в меню «Настройки» → «Горячие клавиши» → «Автонажатие и разговор», и Onion Board будет удерживать ее во время воспроизведения звука). В разделе <b>«Голосовая активность»</b> отключите <b>параметр «Автоматически определять чувствительность ввода»</b> и перетащите ползунок почти до упора влево, иначе Discord продолжит отключать ваши звуки, в том числе и громкие.",
   "<b>Languages</b> · {state}": "<b>Языки</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Выберите голос</b>",
   "A built-in voice (still hides yours)": "Встроенный голос (по-прежнему скрывает ваш)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Случайная дурацкая смесь эффектов, типа «Мой собственный микс»: то, что изменилось, светится внизу. Нажмите еще раз, чтобы увидеть другой.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Короткий отрывок этого голоса, только в наушниках (его больше никто не слышит). Первый занимает несколько секунд.",
@@ -1775,7 +1774,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Поиск и загрузка звуков онлайн отключена в меню «Настройки» > «Конфиденциальность и безопасность».",
   "Finding the newest Onion Watch…": "В поисках новейших луковых часов…",
   "Finding the newest…": "Находим новейшие…",
-  "Fold this card away": "Сложите эту карту",
   "Fold {effect} away": "Сложите {effect}",
   "Follow my pitch": "Следуй за моей подачей",
   "Forget {name}": "Забудь {name}",
@@ -2025,7 +2023,6 @@
   "Shout and your voice blows out like a megaphone.": "Кричи, и твой голос раздастся, как мегафон.",
   "Shout blowout": "Крик выброса",
   "Show me how": "Покажи мне, как",
-  "Show this card": "Покажи эту карту",
   "Show {effect}": "Показать {effect}",
   "Silence": "Тишина",
   "Smaller files": "Меньшие файлы",
@@ -2945,7 +2942,6 @@
   "<b>Turn it on.</b> Click <b>Turn it on</b> below (or tick <i>Enable remote control</i> in Settings → Remote). Onion Board has to be open (the tray is fine).": "<b>Включите его.</b> Нажмите <b>«Включить»</b> ниже (или установите флажок <i>«Включить удаленное управление»</i> в меню «Настройки» → «Удаленный»). Доска для лука должна быть открыта (лоток в порядке).",
   "<b>Keep the key secret.</b> Every link holds your key. Don't show it on stream or paste it into chat. If it leaks, click <b>New key</b> in Settings → Remote: the old links stop working and you paste the new ones.": "<b>Держите ключ в секрете.</b> Каждая ссылка содержит ваш ключ. Не показывайте это в стриме и не вставляйте в чат. Если утечка, нажмите <b>«Новый ключ»</b> в «Настройки» → «Удаленный»: старые ссылки перестают работать, и вы вставляете новые.",
   "{name}: video": "{name} : видео",
-  "ON: everyone hears it": "ВКЛ: все это слышат",
   "✓ Saved “{name}”: loading its voices…": "✓ Сохранено « {name} »: загружаем его голоса…",
   "Voice changer: {voice}. Click to open it.": "Сменщик голоса: {voice} . Нажмите, чтобы открыть его.",
   "The computer voice ({voice}) speaks for you. Click to open it.": "Компьютерный голос ( {voice} ) говорит за вас. Нажмите, чтобы открыть его.",
@@ -3361,5 +3357,6 @@
   "{mic} · not sent, sounds only": "{mic} · не отправляется, только звуки",
   "{mic} · off": "{mic} · выключен",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Шаг администратора Windows не завершился. Если его запрос ещё открыт, ответьте на него; затем попробуйте снова.",
-  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}",
+  "Languages": "Языки"
 }

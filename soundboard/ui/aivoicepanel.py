@@ -14,8 +14,8 @@ import re
 import threading
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QLabel,
-                               QPushButton, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
+                               QPushButton, QSizePolicy, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import aiaddon, applog, errors, net
 from soundboard import modules as mods
@@ -80,6 +80,9 @@ def install_step(line: str) -> str | None:
     if m:
         return _("Downloading the voices: {percent}%", percent=int(m.group(1)))
     return None
+
+
+BOX_MAX_W = 560   # px: the voice and pitch box at its widest
 
 
 class AiVoicePanel(QWidget):
@@ -153,12 +156,15 @@ class AiVoicePanel(QWidget):
         self.cb_voice = QComboBox()
         self.cb_voice.setMinimumWidth(0)
         self.cb_voice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.cb_voice.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         vrow.addWidget(self.cb_voice, 1)
         self.b_all = QPushButton(_("All voices"))
         icons.set_icon(self.b_all, "sounds")
         self.b_all.setToolTip(_("Every voice with what it sounds like, a sample to hear, "
                               "and making your own"))
         self.b_all.clicked.connect(self.open_browser)
+        # the list takes the room, not the button
+        self.b_all.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         vrow.addWidget(self.b_all)
         grid.addLayout(vrow, 1, 0, 1, 2)
         self.lbl_about = hint_label("")
@@ -182,7 +188,13 @@ class AiVoicePanel(QWidget):
         prow.addWidget(self.lbl_pitch)
         grid.addLayout(prow, 4, 0, 1, 2)
         grid.setColumnStretch(1, 1)
-        rv.addLayout(grid)
+        # the voice and its pitch, together in one inner area under Start
+        box = QFrame()
+        box.setObjectName("voicebox")
+        box.setMaximumWidth(BOX_MAX_W)   # a list and a slider, not bars across the card
+        grid.setContentsMargins(14, 4, 14, 14)
+        box.setLayout(grid)
+        rv.addWidget(box)
         v.addWidget(self.ready_box)
 
         self.missing = QWidget()
@@ -226,7 +238,12 @@ class AiVoicePanel(QWidget):
         info.addWidget(self.loading_bar)
 
         setup_row.addLayout(info, 1)
-        mv.addLayout(setup_row)
+        # Robo-Bun and the install, in their own inner area
+        setup = QFrame()
+        setup.setObjectName("voicebox")
+        setup_row.setContentsMargins(8, 8, 16, 8)
+        setup.setLayout(setup_row)
+        mv.addWidget(setup)
         v.addWidget(self.missing)
 
         self.btn_opts = fold_button(_("More options"))
