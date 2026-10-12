@@ -162,7 +162,10 @@ Your sounds and settings live in `%APPDATA%\OnionBoard\` and survive reinstalls.
   listed in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network), and the app
   shows each one live under *Settings → Connection → Network activity*.
 - **Getting rid of it:** uninstall it like any app. Your mic goes back the way it was;
-  your own sounds stay in `%APPDATA%\OnionBoard\` until you delete them.
+  your own sounds stay in `%APPDATA%\OnionBoard\` until you delete them. This works
+  for every version with *straight into my mic* (1.9.0 and later): the uninstaller
+  takes the mic effect off your mic and out of Windows. Versions before 1.9.28 leave
+  a few small log files in `C:\ProgramData\OnionBoard\` that you can delete.
 
 <a id="license"></a>
 
