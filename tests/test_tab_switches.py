@@ -246,16 +246,16 @@ def test_onion_watch_download_finishing_after_the_tab_is_off(window, qapp, monke
 
 
 def test_the_onion_watch_fix_banner_with_the_tab_off(window):
-    """Onion Watch's updates are checked for while its Triggers tab is switched off, so
-    an urgent one's banner can show then: its button raised AttributeError, reaching
-    for the tab's offer (the stand-in has none)."""
+    """Onion Watch's updates are checked for while its Triggers tab is switched off: an
+    urgent one's banner shows on that tab only, so it doesn't show at all then (its
+    button once raised AttributeError, reaching for the stand-in tab's offer)."""
     from types import SimpleNamespace
     w = window
     w.set_tab_on("triggers", False)
     w.watch_offer = SimpleNamespace(version="9.9.9", urgent="a fix")
-    assert w._urgent_now()[0] == "watch 9.9.9"
-    w._urgent_clicked()
-    assert w.watch_offer is None
+    assert w._urgent_now() is None
+    w._show_urgent()
+    assert w.urgent_bar.isHidden()
 
 
 def test_importing_settings_switches_the_tabs_live(window, qapp):
