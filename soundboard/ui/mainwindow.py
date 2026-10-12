@@ -577,6 +577,7 @@ class MainWindow(QMainWindow):
         app = QApplication.instance()
         assert isinstance(app, QApplication)   # made before the window
         app.applicationStateChanged.connect(self._set_tick_rate)
+        app.applicationStateChanged.connect(self._app_state)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self._space_action)
         theme.app_filter(QApplication.instance(), self._space)
@@ -3565,7 +3566,18 @@ class MainWindow(QMainWindow):
         self._autofix_tried = True
         self.attach_mic(auto=True)
 
-    def _check_helper(self):
+    def _app_state(self, state):
+        """Back in front after a while (behind a game for an hour, say): the mic
+        helper's answer may be stale (another account removed or set it up), so check
+        it again; the card's "click Yes" and the fix-by-itself follow the new answer."""
+        if (state != Qt.ApplicationState.ApplicationActive or self._shut_down
+                or self.cfg.route != "mic"):
+            return
+        ago = michelper.checked_ago()
+        if ago is not None and ago > michelper.RECHECK_S:
+            self._check_helper("window back")
+
+    def _check_helper(self, via: str = "card"):
         """Is the mic helper usable (michelper.ready runs a process: on a thread)? The
         card redraws with the answer."""
         if self._helper_checking:
@@ -3573,7 +3585,7 @@ class MainWindow(QMainWindow):
         self._helper_checking = True
 
         def work():
-            directmic._helper_check()
+            directmic._helper_check(via)
             if qt_valid(self):
                 try:
                     self.helper_checked.emit()
