@@ -98,14 +98,15 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
         # with a smooth handoff and the first dot highlighted from the first frame.
         distance = ((t / PULSE_S * 3 - i + 1.5) % 3) - 1.5
         pulse = (1 + math.cos(math.pi * distance)) / 2 if abs(distance) < 1 else 0.0
-        if not _animate:
-            pulse = 0.0
+        # Windows' Animation effects off: the colour still walks 1 -> 2 -> 3 so the
+        # app visibly isn't stuck, but nothing grows or hops
+        move = pulse if _animate else 0.0
         c = QColor.fromRgbF(*(resting.redF() + (accent.redF() - resting.redF()) * pulse,
                               resting.greenF() + (accent.greenF() - resting.greenF()) * pulse,
                               resting.blueF() + (accent.blueF() - resting.blueF()) * pulse))
         p.setBrush(c)
-        radius = 3 + 2.5 * pulse
-        p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, h - 35 - 5 * pulse), radius, radius)
+        radius = 3 + 2.5 * move
+        p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, h - 35 - 5 * move), radius, radius)
 
 
 def _animations_enabled() -> bool:
@@ -278,8 +279,7 @@ class NativeSplash:
                 while user.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):   # PM_REMOVE
                     user.TranslateMessage(ctypes.byref(msg))
                     user.DispatchMessageW(ctypes.byref(msg))
-                interval = 1 / NATIVE_FPS if _animate else 0.25
-                self._stop.wait(max(0.0, interval - (time.monotonic() - start)))
+                self._stop.wait(max(0.0, 1 / NATIVE_FPS - (time.monotonic() - start)))
         finally:
             user.DestroyWindow(hwnd)
             gdi.SelectObject(dc, old)

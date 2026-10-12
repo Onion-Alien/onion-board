@@ -103,9 +103,23 @@ def test_highlight_and_hop_travel_left_to_right(qapp, monkeypatch):
     assert _frame(0) == _frame(splash.PULSE_S)   # seamless repeat
 
 
-def test_reduced_motion_keeps_every_frame_static(qapp, monkeypatch):
+def test_reduced_motion_moves_only_the_colour(qapp, monkeypatch):
+    """Animation effects off: the highlight still walks, but no dot grows or hops."""
+    from PySide6.QtGui import QColor
+
+    from soundboard import theme
+
     monkeypatch.setattr(splash, "_animate", False)
-    assert _frame(0) == _frame(0.9) == _frame(2.5)
+    accent = QColor(theme.T["accent"])
+    resting = QColor(theme.T["muted"])
+    for active in range(3):
+        img = _frame(active * splash.PULSE_S / 3)
+        for dot in range(3):
+            x = splash.CARD_W // 2 + (dot - 1) * 16
+            assert img.pixelColor(x, 213) == (accent if dot == active else resting)
+            assert img.pixelColor(x + 4, 213).name() == theme.T["panel"]   # same size
+            assert img.pixelColor(x, 208).name() == theme.T["panel"]   # no hop
+    assert _frame(0) != _frame(splash.PULSE_S / 3)
 
 
 def test_windows_animation_preference(monkeypatch):
