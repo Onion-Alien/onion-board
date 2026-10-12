@@ -155,7 +155,6 @@
   "Hold to show, let go to hide": "Giữ để hiện, thả để ẩn",
   "Hotkey removed from “{name}”": "Đã gỡ phím tắt khỏi “{name}”",
   "Hotkey: {hotkey}": "Phím tắt: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Phím tắt && tự động push-to-talk",
   "Hotkeys are on again.": "Phím tắt đã bật lại.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Phím tắt theo danh mục: một phím phát âm thanh khác nhau ở mỗi danh mục. Bật trong Cài đặt → Phím tắt.",
   "How loud your sounds are, type up to 1000% in the box": "Âm lượng âm thanh của bạn, gõ đến 1000% vào ô",
@@ -2686,7 +2685,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Nhập để lọc âm thanh của bạn; Nhập tìm kiếm trên web (YouTube, TikTok, Myinstants…). Hoặc dán liên kết (YouTube, SoundCloud, TikTok, hầu hết các trang truyền thông) để xem, sau đó phát hoặc thêm liên kết đó",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Thay vào đó, hãy sử dụng cáp ảo miễn phí: bạn chọn cáp đó làm micrô trong Discord và trò chơi",
   "Voice changer": "Đổi giọng nói",
-  "Volume & shortcuts": "Âm lượng & phím tắt",
   "What others hear": "Những gì người khác nghe thấy",
   "What the voice said": "Giọng nói nói gì",
   "Where your sounds go": "Âm thanh của bạn đi đâu",
@@ -3215,5 +3213,9 @@
   "{mic} · not sent, sounds only": "{mic} · không gửi, chỉ âm thanh",
   "{mic} · off": "{mic} · tắt",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Bước quản trị của Windows chưa hoàn tất. Nếu lời nhắc của nó vẫn còn mở, hãy trả lời; rồi thử lại.",
-  "{title}  ·  quiet on {devices}": "{title} · đang im lặng trên {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · đang im lặng trên {devices}",
+  "Discord, games, Zoom and Teams": "Discord, trò chơi, Zoom và Teams",
+  "Equalizer and volume": "Bộ chỉnh hóa và âm lượng",
+  "Volumes as they are": "Âm lượng giữ nguyên",
+  "Volumes levelled": "Âm lượng đã cân bằng"
 }

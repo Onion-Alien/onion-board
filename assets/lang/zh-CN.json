@@ -155,7 +155,6 @@
   "Hold to show, let go to hide": "按住显示，松开隐藏",
   "Hotkey removed from “{name}”": "已移除“{name}”的快捷键",
   "Hotkey: {hotkey}": "快捷键：{hotkey}",
-  "Hotkeys && auto push-to-talk": "快捷键 && 自动按键说话",
   "Hotkeys are on again.": "快捷键已重新开启。",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "按分类设置快捷键：同一个键在每个分类里播放不同的音效。在 设置 → 快捷键 里开启。",
   "How loud your sounds are, type up to 1000% in the box": "音效有多响，在框里最高可输入 1000%",
@@ -2686,7 +2685,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "键入以过滤您的声音； Enter 搜索网络（YouTube、TikTok、Myinstants...）。或者粘贴链接（YouTube、SoundCloud、TikTok、大多数媒体网站）来查看它，然后播放或添加它",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "使用免费的虚拟电缆：您可以在 Discord 和游戏中选择它作为麦克风",
   "Voice changer": "变声器",
-  "Volume & shortcuts": "音量 & 快捷键",
   "What others hear": "别人听到的",
   "What the voice said": "声音说了什么",
   "Where your sounds go": "你的音效去哪里",
@@ -3215,5 +3213,9 @@
   "{mic} · not sent, sounds only": "{mic} · 不发送，只有音效",
   "{mic} · off": "{mic} · 已关闭",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 管理员步骤未完成。如果它的提示仍然打开，请先回应它，然后再试一次。",
-  "{title}  ·  quiet on {devices}": "{title} · 在{devices}上静音"
+  "{title}  ·  quiet on {devices}": "{title} · 在{devices}上静音",
+  "Discord, games, Zoom and Teams": "Discord、游戏、Zoom 和 Teams",
+  "Equalizer and volume": "均衡器和音量",
+  "Volumes as they are": "音量保持原样",
+  "Volumes levelled": "音量已统一"
 }

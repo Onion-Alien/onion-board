@@ -159,7 +159,6 @@
   "Hold to show, let go to hide": "Vasthouden om te tonen, loslaten om te verbergen",
   "Hotkey removed from “{name}”": "Sneltoets verwijderd van “{name}”",
   "Hotkey: {hotkey}": "Sneltoets: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Sneltoetsen && automatisch push-to-talk",
   "Hotkeys are on again.": "Sneltoetsen staan weer aan.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Sneltoetsen per categorie: één toets speelt in elke categorie een ander geluid. Zet het aan in Instellingen → Sneltoetsen.",
   "How loud your sounds are, type up to 1000% in the box": "Hoe hard je geluiden zijn, typ tot 1000% in het vak",
@@ -2745,7 +2744,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Type om uw geluiden te filteren; Voer zoekopdrachten op internet in (YouTube, TikTok, Myinstants…). Of plak een link (YouTube, SoundCloud, TikTok, de meeste mediasites) om deze te bekijken en speel deze vervolgens af of voeg deze toe",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Gebruik in plaats daarvan een gratis virtuele kabel: u kiest deze als microfoon in Discord en games",
   "Voice changer": "Stemverander",
-  "Volume & shortcuts": "Volume en snelkoppelingen",
   "What others hear": "Wat anderen horen",
   "What the voice said": "Wat de stem zei",
   "Where your sounds go": "Waar je geluiden heen gaan",
@@ -3288,5 +3286,9 @@
   "{mic} · not sent, sounds only": "{mic} · niet verzonden, alleen geluiden",
   "{mic} · off": "{mic} · uit",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "De Windows-beheerdersstap is niet afgerond. Als de prompt nog open staat, beantwoord die; probeer het daarna opnieuw.",
-  "{title}  ·  quiet on {devices}": "{title} · stil op {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · stil op {devices}",
+  "Discord, games, Zoom and Teams": "Discord, games, Zoom en Teams",
+  "Equalizer and volume": "Equalizer en volume",
+  "Volumes as they are": "Volumes zoals ze zijn",
+  "Volumes levelled": "Volumes gelijkgetrokken"
 }

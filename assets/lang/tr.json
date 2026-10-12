@@ -159,7 +159,6 @@
   "Hold to show, let go to hide": "Göstermek için basılı tut, gizlemek için bırak",
   "Hotkey removed from “{name}”": "“{name}” sesinin kısayol tuşu kaldırıldı",
   "Hotkey: {hotkey}": "Kısayol tuşu: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Kısayol tuşları && otomatik bas-konuş",
   "Hotkeys are on again.": "Kısayol tuşları tekrar açık.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Kategori başına kısayol tuşları: tek bir tuş her kategoride farklı bir ses çalar. Ayarlar → Kısayol tuşları'ndan aç.",
   "How loud your sounds are, type up to 1000% in the box": "Seslerinin ne kadar yüksek olduğu, kutuya %1000'e kadar yazabilirsin",
@@ -2745,7 +2744,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Seslerinizi filtrelemek için yazın; Enter, web'de arama yapar (YouTube, TikTok, Myinstants…). Veya görmek için bir bağlantı yapıştırın (YouTube, SoundCloud, TikTok, çoğu medya sitesi) ve ardından oynatın veya ekleyin",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Bunun yerine ücretsiz bir sanal kablo kullanın: Discord'da ve oyunlarda mikrofon olarak onu seçersiniz",
   "Voice changer": "Ses değiştirici",
-  "Volume & shortcuts": "Ses düzeyi ve kısayollar",
   "What others hear": "Başkalarının duydukları",
   "What the voice said": "Ses ne dedi",
   "Where your sounds go": "Seslerin nereye gidiyor",
@@ -3288,5 +3286,9 @@
   "{mic} · not sent, sounds only": "{mic} · gönderilmiyor, sadece sesler",
   "{mic} · off": "{mic} · kapalı",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows yönetici adımı tamamlanmadı. İstemi hâlâ açıksa yanıtla; sonra yeniden dene.",
-  "{title}  ·  quiet on {devices}": "{title} · {devices} üzerinde sessiz"
+  "{title}  ·  quiet on {devices}": "{title} · {devices} üzerinde sessiz",
+  "Discord, games, Zoom and Teams": "Discord, oyunlar, Zoom ve Teams",
+  "Equalizer and volume": "Ekolayzer ve ses seviyesi",
+  "Volumes as they are": "Ses seviyeleri olduğu gibi",
+  "Volumes levelled": "Ses seviyeleri eşit"
 }

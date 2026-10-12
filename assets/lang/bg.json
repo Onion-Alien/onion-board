@@ -456,7 +456,6 @@
   "Hotkey sounds": "Звуци при бързи клавиши",
   "Hotkey: {hotkey}": "Бърз клавиш: {hotkey}",
   "Hotkeys": "Бързи клавиши",
-  "Hotkeys && auto push-to-talk": "Бързи клавиши && автоматичен push-to-talk",
   "Hotkeys are on again.": "Бързите клавиши са включени отново.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Бързи клавиши за категория: един клавиш пуска различен звук във всяка категория. Включи го в Настройки → Бързи клавиши.",
   "How loud the stream output is (only OBS hears it)": "Колко силен е изходът за стрийма (само OBS го чува)",
@@ -2640,7 +2639,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Въведете, за да филтрирате звуците си; Enter търси в мрежата (YouTube, TikTok, Myinstants…). Или поставете връзка (YouTube, SoundCloud, TikTok, повечето медийни сайтове), за да го видите, след което го пуснете или добавете",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Вместо това използвайте безплатен виртуален кабел: избирате го като микрофон в Discord и игри",
   "Voice changer": "Промяна на гласа",
-  "Volume & shortcuts": "Сила на звука и клавиши",
   "What others hear": "Какво чуват другите",
   "What the voice said": "Какво каза гласът",
   "Where your sounds go": "Къде отиват звуците ти",
@@ -3288,5 +3286,9 @@
   "{mic} · not sent, sounds only": "{mic} · не се изпраща, само звуци",
   "{mic} · off": "{mic} · изключен",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Административната стъпка на Windows не завърши. Ако прозорецът ѝ още е отворен, отговорете му; после опитайте отново.",
-  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}",
+  "Discord, games, Zoom and Teams": "Discord, игри, Zoom и Teams",
+  "Equalizer and volume": "Еквалайзер и сила на звука",
+  "Volumes as they are": "Силата на звука както е",
+  "Volumes levelled": "Силата е изравнена"
 }

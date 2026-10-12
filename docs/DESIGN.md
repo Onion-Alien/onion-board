@@ -324,7 +324,7 @@ These are the current reference points. Copy their structure before inventing a 
 | --- | --- |
 | Sounds tab board (`ui/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
 | Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
-| Setup tab cards | `setcard`: heading, one-line hint, controls, buttons at their own width in a wrapping row. |
+| Setup tab cards | `setcard`: heading, one-line hint, controls, buttons at their own width in a wrapping row. What you check every day (your mic, Who's listening) stays open; the rarely-touched parts (Devices, Connect your chat, Equalizer and volume) are `FoldCard`s: shut to one line with an icon, title, short summary and chevron, opened in place. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
 | Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |

@@ -493,7 +493,6 @@
   "Hotkey sounds": "Lyde for genvejstaster",
   "Hotkey: {hotkey}": "Genvejstast: {hotkey}",
   "Hotkeys": "Genvejstaster",
-  "Hotkeys && auto push-to-talk": "Genvejstaster && auto-push-to-talk",
   "Hotkeys are on again.": "Genvejstaster er slået til igen.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Genvejstaster pr. kategori: én tast afspiller en forskellig lyd i hver kategori. Slå det til under Indstillinger → Genvejstaster.",
   "How loud the stream output is (only OBS hears it)": "Hvor høj stream-udgangen er (kun OBS hører den)",
@@ -2745,7 +2744,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Skriv for at filtrere dine lyde; Indtast søgninger på nettet (YouTube, TikTok, Myinstants…). Eller indsæt et link (YouTube, SoundCloud, TikTok, de fleste mediesider) for at se det, og afspil eller tilføj det derefter",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Brug et gratis virtuelt kabel i stedet: du vælger det som mikrofonen i Discord og spil",
   "Voice changer": "Stemmeskifter",
-  "Volume & shortcuts": "Lydstyrke & genveje",
   "What others hear": "Hvad andre hører",
   "What the voice said": "Hvad stemmen sagde",
   "Where your sounds go": "Hvor dine lyde går hen",
@@ -3288,5 +3286,9 @@
   "{mic} · not sent, sounds only": "{mic} · sendes ikke, kun lyde",
   "{mic} · off": "{mic} · slukket",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows' administratortrin blev ikke færdigt. Hvis dets prompt stadig er åben, så svar på den; prøv derefter igen.",
-  "{title}  ·  quiet on {devices}": "{title} · stille på {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · stille på {devices}",
+  "Discord, games, Zoom and Teams": "Discord, spil, Zoom og Teams",
+  "Equalizer and volume": "Equalizer og lydstyrke",
+  "Volumes as they are": "Lydstyrker som de er",
+  "Volumes levelled": "Lydstyrker udjævnet"
 }

@@ -1150,72 +1150,90 @@ def test_audit_expanded_sidebar_labels_status(window, qapp):
             assert button.text() and button.accessibleName()
 
 
-def test_audit_setup_routes_precede_advanced_controls(window, qapp):
+def test_audit_setup_rows_fit_the_first_screen_and_open_in_place(window, qapp):
+    """Setup on a 1080p screen: your mic, who's listening and the three shut rows all
+    show without scrolling; Devices opens in place with its boxes, before the EQ's row."""
+    window._setup_cols.parentWidget().setMaximumWidth(1500)   # (the offscreen font)
     window.show()
-    window.resize(1180, 720)
+    window.resize(1920, 1080)
     window.tabs.setCurrentWidget(window.setup_page)
-    qapp.processEvents()
+    for _ in range(5):
+        qapp.processEvents()
+        window._refit()
     view = window.setup_page.viewport()
-    for widget in (window.cb_mic, window.cb_route):
-        assert 0 <= widget.mapTo(view, QPoint()).y() < view.height()
+    for fold in (window.dev_fold, window.sound_fold):
+        top = fold.mapTo(view, QPoint()).y()
+        assert 0 <= top and top + fold.head.height() <= view.height()
+        assert not fold.is_open() and fold.inner.isHidden()
     assert not hasattr(window, "btn_rec")   # the local mix test card is gone
-    assert window.cb_route.mapTo(view, QPoint()).y() < window.eq.mapTo(view, QPoint()).y()
+    window.dev_fold.head.click()
+    qapp.processEvents()
+    assert window.dev_fold.is_open() and window.cb_route.isVisible()
+    assert window.cb_route.mapTo(view, QPoint()).y() < window.sound_fold.mapTo(view, QPoint()).y()
+    window.dev_fold.head.click()
+    assert not window.dev_fold.is_open()
 
 
-def test_devices_card_aligns_with_setup_columns_and_stacks_when_narrow(window, qapp):
-    window.apply_theme("Dark")
-    # The offscreen fallback font needs wider columns than the app's Segoe UI.
-    window._setup_cols.parentWidget().setMaximumWidth(1500)
-    window.tabs.setCurrentWidget(window.setup_page)
-    window.show()
-    card = window.cb_main.parentWidget()
-    for width, height in ((1920, 1080), (1180, 720), (800, 600), (1920, 1080)):
-        window.resize(width, height)
-        for _ in range(5):
-            qapp.processEvents()
-        assert not window.is_mini()
-        assert window.setup_page.horizontalScrollBar().maximum() == 0
-        assert card.x() == 0
-        for combo in (window.cb_mon, window.cb_mic, window.cb_route):
-            assert card.rect().contains(combo.mapTo(card, combo.rect().bottomRight()))
-        if width == 1920:
-            mic_card = window.how_title.parentWidget()
-            assert card.width() == mic_card.width()
-            assert card.y() == mic_card.y()
-            assert card.width() <= 750
-            assert card.geometry().right() < mic_card.x()
-            eq_card = window.eq.parentWidget()
-            assert eq_card.x() == card.x() and eq_card.width() == card.width()
-            assert eq_card.y() == card.geometry().bottom() + 17
-        else:
-            assert card.width() <= window.setup_page.viewport().width()
-
-
-def test_narrow_setup_puts_getting_set_up_before_the_eq(window, qapp):
-    """One column: devices, then the virtual mic and Connect your chat, and only then the
-    sound shaping. Stacked as two columns' worth, the EQ came before the setup button."""
+def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
+    """Wide: your mic with the shut rows under it on the left, who's listening on the
+    right. Narrow: one column, mic, who's listening, then the rows. Never a sideways
+    scroll bar, open or shut."""
     from PySide6.QtWidgets import QBoxLayout
+    window.apply_theme("Dark")
     body = window._setup_cols.parentWidget()
     body.setMaximumWidth(1500)   # the offscreen fallback font needs wider columns
     window.tabs.setCurrentWidget(window.setup_page)
     window.show()
-    cards = (window.cb_main.parentWidget(), window.how_title.parentWidget(),
-             window.btn_chat.parentWidget(), window.dest_panel.parentWidget(),
-             window.eq.parentWidget(), window.chk_level.parentWidget())
-    for width, height in ((800, 600), (1920, 1080), (800, 600)):
-        window.resize(width, height)
-        for _ in range(5):
-            qapp.processEvents()
-            window._refit()
-        tops = [c.mapTo(body, QPoint()).y() for c in cards]
-        if width == 800:
-            assert window._setup_cols.direction() == QBoxLayout.TopToBottom
-            # (Connect your chat is hidden until there's a chat to connect)
-            tops = [t for t, c in zip(tops, cards) if not c.isHidden()]
-            assert tops == sorted(tops) and len(set(tops)) == len(tops)
-        else:
-            assert window._setup_cols.direction() == QBoxLayout.LeftToRight
-            assert tops[0] == tops[1]   # devices and the virtual mic side by side
+    mic, dest = window.how_title.parentWidget(), window.dest_panel.parentWidget()
+    folds = (window.dev_fold, window.helpcard, window.sound_fold)
+    for opened in (False, True):
+        for f in folds:
+            f.set_open(opened)
+        for width, height in ((1920, 1080), (1180, 720), (800, 600), (1920, 1080)):
+            window.resize(width, height)
+            for _ in range(5):
+                qapp.processEvents()
+                window._refit()
+            assert not window.is_mini()
+            assert window.setup_page.horizontalScrollBar().maximum() == 0
+            shown = [w for w in (mic, *folds) if not w.isHidden()]
+            if window._setup_cols.direction() == QBoxLayout.LeftToRight:
+                assert mic.y() == dest.y() and mic.geometry().right() < dest.x()
+                for w in shown[1:]:   # the rows under the mic, as wide as it
+                    assert w.x() == mic.x() and w.width() == mic.width()
+            else:
+                tops = [w.mapTo(body, QPoint()).y() for w in (mic, dest, *shown[1:])]
+                assert tops == sorted(tops) and len(set(tops)) == len(tops)
+            if opened:
+                card = window.dev_fold
+                for combo in (window.cb_mon, window.cb_mic, window.cb_route):
+                    assert card.rect().contains(combo.mapTo(card, combo.rect().bottomRight()))
+        assert window._setup_cols.direction() == QBoxLayout.LeftToRight   # (at 1920)
+    window.resize(800, 600)
+    for _ in range(5):
+        qapp.processEvents()
+        window._refit()
+    assert window._setup_cols.direction() == QBoxLayout.TopToBottom
+
+
+def test_setup_two_columns_never_shut_the_rail(window, qapp):
+    """Two columns that only fit with the rail shut: Setup stacks them instead. The
+    page asked for their width and the narrow-window step shut the rail for it (open
+    it, and it shut again)."""
+    from PySide6.QtWidgets import QBoxLayout
+    window.apply_theme("Dark")
+    window.tabs.setCurrentWidget(window.setup_page)
+    window.resize(1180, 720)
+    window.show()
+    rail = window.rail
+    for _ in range(2):
+        rail.set_open(False)
+        qapp.processEvents()
+        rail.set_open(True)
+        qapp.processEvents()
+        assert rail.is_open()
+        assert window._setup_cols.direction() == QBoxLayout.TopToBottom
+        assert window.setup_page.horizontalScrollBar().maximum() == 0
 
 
 def test_drop_target_keeps_the_full_board_width(window, qapp):

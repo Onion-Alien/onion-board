@@ -54,8 +54,8 @@ from soundboard.ui import toast as toastmod
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive,
                            sourcedialog, splash, taboff, themecover)
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar, capped,
-                                 card, hint_label, icon_label, info_button,
+from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, FoldCard, VolumeControl, bar,
+                                 capped, card, hint_label, icon_label, info_button,
                                  steady_number, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
@@ -202,16 +202,21 @@ class WidthScroll(QScrollArea):
 
     dl_column: QWidget | None = None   # the column the download bar lines up with
 
-    def __init__(self, room):
+    def __init__(self, room, narrowest=None):
         super().__init__()
         self._room = room
+        # the content's width in its narrowest arrangement (Setup: one column). What it
+        # needs, not what it has now: two columns side by side mustn't shut the rail
+        self._narrowest = narrowest
 
     def minimumSizeHint(self) -> QSize:
         m = super().minimumSizeHint()
         page = self.widget()
         if page is None or not self.isVisible():   # a page not showing
             return m
-        need = page.minimumSizeHint().width() + self.verticalScrollBar().sizeHint().width()
+        content = (self._narrowest() if self._narrowest is not None
+                   else page.minimumSizeHint().width())
+        need = content + self.verticalScrollBar().sizeHint().width()
         return QSize(max(m.width(), need), m.height()) if need <= self._room() else m
 
 
@@ -1964,7 +1969,8 @@ class MainWindow(QMainWindow):
         """One-time setup and the rarely-touched stuff: where the audio goes,
         devices, the recorded test, EQ, levelling."""
         c = self.cfg
-        page = WidthScroll(lambda: self._pages.width() - SHUT_W - 2 * BODY_SIDE)
+        page = WidthScroll(lambda: self._pages.width() - SHUT_W - 2 * BODY_SIDE,
+                           lambda: self._setup_one_col())
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.Shape.NoFrame)
         body = QWidget()
@@ -2180,9 +2186,10 @@ class MainWindow(QMainWindow):
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
         cv.addWidget(self.btn_rescan, 0, Qt.AlignmentFlag.AlignLeft)
-        helpcard, hv = card(_("Connect your chat"),
-                            _("Choose your app for the recommended microphone settings."),
-                            roomy=True)
+        helpcard = FoldCard("speech", _("Connect your chat"))
+        helpcard.set_summary(_("Discord, games, Zoom and Teams"))
+        hv = helpcard.body
+        hv.addWidget(hint_label(_("Choose your app for the recommended microphone settings.")))
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
         self.btn_chat = QPushButton(_("Make it sound clean in Discord"))
         self.btn_chat.setToolTip(_("The Discord settings that stop it chopping up your sounds, "
@@ -2207,8 +2214,11 @@ class MainWindow(QMainWindow):
 
 
         # ---- devices
-        devcard, av = card(_("Devices"), _("Already set up for you, only change these if "
-                                           "something's wrong."), roomy=True)
+        devcard = self.dev_fold = FoldCard("headphones", _("Devices"))
+        av = devcard.body
+        av.addWidget(hint_label(_("Already set up for you, only change these if "
+                                  "something's wrong.")))
+        self._cablefix_shown = False
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(12)
@@ -2278,26 +2288,24 @@ class MainWindow(QMainWindow):
         dv.addWidget(self.dest_panel)
 
         # ---- sound shaping
-        eqcard, ev = card(roomy=True)
+        eqcard = self.sound_fold = FoldCard("sliders", _("Equalizer and volume"))
+        ev = eqcard.body
         self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains, fold=True)
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
-        utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
-        uv.addWidget(self.chk_level)
-        hk = QPushButton(_("Hotkeys && auto push-to-talk"))
-        hk.clicked.connect(lambda: self.open_settings("hotkeys"))
-        uv.addWidget(hk, 0, Qt.AlignmentFlag.AlignLeft)
-        # side by side: devices + sound shaping on the left, getting it heard on the
-        # right. One column (narrow): everything a new user needs to get set up comes
-        # before the EQ, or they scrolled past it to find the setup button
-        self._setup_wide = ((devcard, eqcard, utilitycard), (howcard, destcard, helpcard))
-        self._setup_narrow = (devcard, howcard, helpcard, destcard, eqcard, utilitycard)
+        ev.addWidget(self.chk_level)
+        # side by side: your mic and the rarely-touched parts under it (each shut to one
+        # line with a summary) on the left, who's listening on the right. One column
+        # when narrow: what you check every day first, the shut ones last
+        self._setup_wide = ((howcard, devcard, helpcard, eqcard), (destcard,))
+        self._setup_narrow = (howcard, destcard, devcard, helpcard, eqcard)
         self._setup_stacked = None
         self._stack_setup(False)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
+        self._fold_summaries()
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
         from soundboard.ui.destpanel import apply_send
         apply_send(self.cfg, self.engine)          # ...and mono / ducking
@@ -2326,6 +2334,16 @@ class MainWindow(QMainWindow):
                 col.addWidget(w)
             col.addStretch(1)
 
+    def _setup_one_col(self) -> int:
+        """The width Setup needs in one column: its widest card, and the page's margins."""
+        widest = max(QWidgetItem(w).minimumSize().width() for w in self._setup_narrow)
+        inner = self.setup_page.widget()
+        lay = inner.layout() if inner is not None else None
+        if lay is None:   # (built in _build_setup_page: always there)
+            return widest
+        m = lay.contentsMargins()
+        return widest + m.left() + m.right()
+
     def _setup_need(self) -> int:
         """The width Setup's two columns need side by side, measured the same way
         whether they're stacked or not (stacked, the right column is empty)."""
@@ -2338,6 +2356,17 @@ class MainWindow(QMainWindow):
         self.engine.eq_target = target
         self.engine.eq_gains = list(gains) if enabled else None
         self._save_later()
+        if hasattr(self, "sound_fold"):
+            self._fold_summaries()
+
+    def _fold_summaries(self):
+        """The one-line summaries on Setup's shut cards: the devices in use, and
+        whether the EQ and levelling are on."""
+        self.dev_fold.set_summary(" · ".join(
+            t for t in (self.cb_mon.currentText(), self.cb_mic.currentText()) if t))
+        self.sound_fold.set_summary(" · ".join((
+            _("EQ on") if self.cfg.eq_enabled else _("EQ off"),
+            _("Volumes levelled") if self.cfg.level_volumes else _("Volumes as they are"))))
     # ------------------------------------------------------------------ devices
     def refresh_devices(self) -> str:
         """Re-scan the sound devices and reopen the streams. Returns a short result
@@ -3029,6 +3058,8 @@ class MainWindow(QMainWindow):
     def _update_status(self):
         e = self.engine
         c = self.cfg
+        if hasattr(self, "dev_fold"):
+            self._fold_summaries()   # (the devices may have changed)
         main = self._main_name() or ""
         self.virtual_mic = eng.virtual_mic_for(main)
         if c.route == "off":
@@ -3378,7 +3409,11 @@ class MainWindow(QMainWindow):
         # its one button (the guide) sits in the mic card
         self.helpcard.setVisible(mic_side)
         self.btn_guide.setVisible(not mic_side)   # (Connect your chat has it then)
-        self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
+        cablefix = state == "ok" and bool(vm) and bool(self.cable_bad)
+        self.btn_cablefix.setVisible(cablefix)
+        if cablefix and not self._cablefix_shown:
+            self.dev_fold.set_open(True)   # (the fix is in there: don't hide it)
+        self._cablefix_shown = cablefix
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
         # a device is picked to send to (not the headphones): failing is "Not working",
@@ -4625,6 +4660,7 @@ class MainWindow(QMainWindow):
 
     def on_level_toggle(self, b):
         self.set_option("level_volumes", b)
+        self._fold_summaries()
         for m in self.cfg.sounds:
             self.engine.set_gain(m.id, self.gain_for(m))
 
