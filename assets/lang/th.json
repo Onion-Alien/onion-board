@@ -3214,5 +3214,8 @@
   "Discord, games, Zoom and Teams": "Discord, เกม, Zoom และ Teams",
   "Equalizer and volume": "อีควอไลเซอร์และความดัง",
   "Volumes as they are": "ความดังตามเดิม",
-  "Volumes levelled": "ปรับความดังเท่ากันแล้ว"
+  "Volumes levelled": "ปรับความดังเท่ากันแล้ว",
+  "Live: click to mute": "สด: คลิกเพื่อปิดเสียง",
+  "Muted: click to go live": "ปิดเสียงอยู่: คลิกเพื่อกลับมาสด",
+  "Pause or resume": "หยุดชั่วคราวหรือเล่นต่อ"
 }

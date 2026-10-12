@@ -3287,5 +3287,8 @@
   "Discord, games, Zoom and Teams": "Discord, pelit, Zoom ja Teams",
   "Equalizer and volume": "Taajuuskorjain ja äänenvoimakkuus",
   "Volumes as they are": "Äänenvoimakkuudet ennallaan",
-  "Volumes levelled": "Äänenvoimakkuudet tasattu"
+  "Volumes levelled": "Äänenvoimakkuudet tasattu",
+  "Live: click to mute": "Live: mykistä napsauttamalla",
+  "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
+  "Pause or resume": "Tauko tai jatka"
 }

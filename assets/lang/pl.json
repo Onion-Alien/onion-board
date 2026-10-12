@@ -3360,5 +3360,8 @@
   "Discord, games, Zoom and Teams": "Discord, gry, Zoom i Teams",
   "Equalizer and volume": "Korektor i głośność",
   "Volumes as they are": "Głośność bez zmian",
-  "Volumes levelled": "Głośność wyrównana"
+  "Volumes levelled": "Głośność wyrównana",
+  "Live: click to mute": "Na żywo: kliknij, aby wyciszyć",
+  "Muted: click to go live": "Wyciszono: kliknij, aby wrócić na żywo",
+  "Pause or resume": "Wstrzymaj lub wznów"
 }

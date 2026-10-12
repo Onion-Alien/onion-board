@@ -3287,5 +3287,8 @@
   "Discord, games, Zoom and Teams": "Discord, игри, Zoom и Teams",
   "Equalizer and volume": "Еквалайзер и сила на звука",
   "Volumes as they are": "Силата на звука както е",
-  "Volumes levelled": "Силата е изравнена"
+  "Volumes levelled": "Силата е изравнена",
+  "Live: click to mute": "На живо: щракнете за заглушаване",
+  "Muted: click to go live": "Заглушено: щракнете, за да сте на живо",
+  "Pause or resume": "Пауза или продължаване"
 }

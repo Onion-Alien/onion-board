@@ -3287,5 +3287,8 @@
   "Discord, games, Zoom and Teams": "Discord, játékok, Zoom és Teams",
   "Equalizer and volume": "Hangszínszabályzó és hangerő",
   "Volumes as they are": "Hangerők változatlanok",
-  "Volumes levelled": "Hangerők kiegyenlítve"
+  "Volumes levelled": "Hangerők kiegyenlítve",
+  "Live: click to mute": "Élő: kattints a némításhoz",
+  "Muted: click to go live": "Némítva: kattints, hogy újra élő legyél",
+  "Pause or resume": "Szünet vagy folytatás"
 }
