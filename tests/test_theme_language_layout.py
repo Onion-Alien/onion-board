@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication, QLabel
 from test_mainwindow import window as main_window  # noqa: F401
 
 from soundboard import i18n, theme
+from soundboard.ui.appspanel import ElidedLabel
 
 
 @pytest.fixture(params=["en", "de", "ar", "zh-CN"])
@@ -42,7 +43,10 @@ def test_translated_labels_fit_across_themes(translated_window):
                         assert label.heightForWidth(label.width()) <= label.height(), (
                             name, width, label.text(), label.height())
                 for label in w.findChildren(QLabel):
-                    if (not label.isVisibleTo(w) or not label.text() or label.wordWrap()
+                    # The transport intentionally elides names in its paintEvent;
+                    # QLabel.text() keeps the complete value for its tooltip.
+                    if (isinstance(label, ElidedLabel) or not label.isVisibleTo(w)
+                            or not label.text() or label.wordWrap()
                             or "<" in label.text()):
                         continue
                     rect = label.contentsRect().adjusted(label.margin(), label.margin(),
