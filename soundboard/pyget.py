@@ -211,4 +211,11 @@ def for_module(module_dir: Path, on_line: Callable[[str], object]) -> str:
     found = pc_python()
     if found is not None:
         return found
-    return get(module_dir, on_line)
+    from soundboard import usage
+    try:
+        exe = get(module_dir, on_line)
+    except GetError:
+        usage.used("addon-python-failed")
+        raise
+    usage.used("addon-got-python")
+    return exe

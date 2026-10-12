@@ -143,7 +143,11 @@ def run_pending() -> str:
         if isinstance(raw, dict) and isinstance(raw.get("reset"), list):
             return reset([str(x) for x in raw["reset"]])
         if isinstance(raw, dict) and isinstance(raw.get("restore"), str):
-            return restore(raw["restore"])
+            said = restore(raw["restore"])
+            if last_ok:   # counted for the daily usage count (usage.py: that it was used)
+                from soundboard import usage
+                usage.used("restore-point-used")
+            return said
     except Exception:  # noqa: BLE001 - start up anyway, on the settings as they are
         log.exception("the reset / restore failed")
         return _("Couldn't finish that: nothing was changed. The log has the details.")

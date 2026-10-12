@@ -427,12 +427,14 @@ class MainWindow(QMainWindow):
         self.replay = InstantReplay(self.cfg.replay_seconds)
         # buttons in the taskbar's hover preview, like Discord's mute / deafen
         tb = thumbbar
+        def counted(do):   # a taskbar button pressed (usage.py), then what it does
+            return lambda: (usage.used("taskbar-buttons"), do())
         self.thumbbar = tb.ThumbBar(self, {
-            tb.LAST: self.play_last,
-            tb.PAUSE: self._pause_clicked,
-            tb.STOP: self._stop_all_clicked,
-            tb.RANDOM: self.play_random,
-            tb.LIVE: lambda: self.set_sending(not self.engine.sending)})
+            tb.LAST: counted(self.play_last),
+            tb.PAUSE: counted(self._pause_clicked),
+            tb.STOP: counted(self._stop_all_clicked),
+            tb.RANDOM: counted(self.play_random),
+            tb.LIVE: counted(lambda: self.set_sending(not self.engine.sending))})
         self._radio_paused = None   # the station Pause stopped, for Play to turn back on
         self.replay.state_changed.connect(self.on_replay_state)
         self.overlay = Overlay(self, self.cfg.overlay)
@@ -572,7 +574,8 @@ class MainWindow(QMainWindow):
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
             self.rail.sync()   # (it heard nothing)
-        reset.before_update(self.cfg)   # a restore point first, when this is an update
+        if reset.before_update(self.cfg):   # a restore point first, when this is an update
+            usage.used("restore-point-update")
         library.tidy_files(self.cfg)   # files from before library folders move in
         self._rebuild_pads()
         splash.pump()
@@ -3184,10 +3187,12 @@ class MainWindow(QMainWindow):
         ok = box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
         box.setDefaultButton(setup)
         box.setEscapeButton(ok)
+        usage.used("mute-warning-shown")
         box.exec()
         chosen = box.clickedButton() is setup
         free_dialog(box)
         if chosen:
+            usage.used("mute-warning-setup")
             self.attach_mic()
 
     def _update_status(self):
@@ -5730,6 +5735,7 @@ class MainWindow(QMainWindow):
             self.mini_air.setToolTip(self.btn_air.toolTip())
 
     def _stop_all_clicked(self):
+        usage.used("stop-all")
         self.stop_all()
         # only an icon on the rail: a tick for a moment says it worked
         icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
@@ -5751,6 +5757,7 @@ class MainWindow(QMainWindow):
     def _pause_clicked(self):
         """Pause everything playing (sounds and the radio), or bring it all back. A
         station is live, so pausing it stops it and Play turns the same one back on."""
+        usage.used("pause")
         playing = self.engine.playing()
         radio_on = self.radio.is_active()
         if radio_on or any(not paused for _p, paused in playing.values()):
