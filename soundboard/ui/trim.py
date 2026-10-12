@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton,
 from soundboard import soundfx, theme
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 HANDLE_PX = 8   # how close to a handle a press grabs it
 
@@ -75,6 +76,7 @@ class Waveform(QWidget):
     def paintEvent(self, e):
         T = theme.T
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         p.setPen(QPen(QColor(T["border"]), 1))

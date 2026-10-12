@@ -23,6 +23,7 @@ from soundboard.ui import icons
 from soundboard.ui.panel import hint_label, reset_button, section_label
 from soundboard.ui.voicepanel import ParamSlider
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 SPEED = voicefx.Param("speed", _("Speed"), 0.25, 2.0, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), -12, 12, 0, " st", 1)
@@ -100,6 +101,7 @@ class RevMeter(QWidget):
     def paintEvent(self, _e):
         t = theme.T
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = min(self.width() / 2 - 12, self.height() * 0.62)
         c = QPointF(self.width() / 2, r + 10)

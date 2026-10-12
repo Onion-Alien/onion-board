@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QAbstractButton, QRadioButton, QSizePolicy
 
 from soundboard import theme
 from soundboard.ui import icons
+from soundboard.ui.pixels import snap_to_pixels
 
 RADIUS = 12   # a card's corners
 HINT_PT = 8.5  # DESIGN.md Standard kit: Hint
@@ -125,6 +126,7 @@ class ChoiceTile(QRadioButton):
     def paintEvent(self, ev):
         t = theme.T
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         on, hover = self.isChecked(), self.underMouse()
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
@@ -256,6 +258,7 @@ class FoldPill(QAbstractButton):
     def paintEvent(self, ev):
         t = theme.T
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         on = self.isChecked()

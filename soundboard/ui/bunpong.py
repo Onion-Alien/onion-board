@@ -25,6 +25,7 @@ from soundboard.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
 from soundboard.ui import appstate, fit
 from soundboard.ui.panel import hint_label
+from soundboard.ui.pixels import snap_to_pixels
 
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # as the guides' titles (setupwizard.py)
 BODY_CSS = "font-size:11pt;"
@@ -379,6 +380,7 @@ class Court(QWidget):
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         g = self.geo()
         w, h, r = g["w"], g["h"], g["r"]

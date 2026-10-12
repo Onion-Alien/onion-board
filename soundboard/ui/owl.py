@@ -21,6 +21,7 @@ from PySide6.QtWidgets import QSizePolicy, QWidget
 from soundboard import bunnyfit, theme
 from soundboard.i18n import _
 from soundboard.ui import appstate
+from soundboard.ui.pixels import snap_to_pixels
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
@@ -463,6 +464,7 @@ class OwlWidget(QWidget):
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
         r = self._owl_rect()

@@ -26,6 +26,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
 from soundboard.ui import appstate
+from soundboard.ui.pixels import snap_to_pixels
 
 FLAME = QColor("#ff8a2b")
 EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")
@@ -161,6 +162,7 @@ class LogoWidget(QWidget):
         t = time.monotonic() - self._t0
         lv = self.level
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         c = self.width() / 2
         s = float(self.mark)

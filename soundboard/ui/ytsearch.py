@@ -38,6 +38,7 @@ from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
 from soundboard.i18n import _, ngettext
+from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -243,6 +244,7 @@ class Thumb(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         w, h = self.width(), self.height()
@@ -410,6 +412,7 @@ class ClampLabel(QLabel):
 
     def paintEvent(self, e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setPen(self.palette().color(self.foregroundRole()))
         p.setFont(self.font())
         ascent = self.fontMetrics().ascent()
@@ -437,6 +440,7 @@ class StatsLabel(ClampLabel):
 
     def paintEvent(self, e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setFont(self.font())
         p.setPen(QColor(theme.T["muted"]))
         fm = self.fontMetrics()

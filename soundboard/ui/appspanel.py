@@ -50,6 +50,7 @@ from soundboard.ui.panel import (CardGrid, HoverCard, UndoBar, VolumeControl, fo
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.wheelguard import no_wheel
+from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -208,6 +209,7 @@ class AppCategoryHeading(QLabel):
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
+        snap_to_pixels(painter)
         if self.hasFocus():   # the focus ring: the rule under it in the accent, solid
             painter.fillRect(0, self.height() - 2, self.width(), 2,
                              QColor(theme.T.get("accent", "#7c5cff")))
@@ -514,6 +516,7 @@ class ElidedLabel(QLabel):
         if tip != self.toolTip():   # every paint (meters, hover): only when it changes
             self.setToolTip(tip)
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setPen(self.palette().color(self.foregroundRole()))
         p.drawText(r, int(self.alignment() | Qt.AlignmentFlag.AlignVCenter), shown)
 

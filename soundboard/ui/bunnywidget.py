@@ -44,6 +44,7 @@ from soundboard import theme, usage
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
 from soundboard.i18n import _
 from soundboard.ui import appstate
+from soundboard.ui.pixels import snap_to_pixels
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
@@ -545,6 +546,7 @@ class BunnyWidget(QWidget):
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         now = time.monotonic()
         pose = self.pose(now)

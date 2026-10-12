@@ -30,6 +30,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 from soundboard import theme
 from soundboard.bunny import draw_bunny
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -135,6 +136,7 @@ class Splash(QWidget):
 
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         paint_frame(p, time.monotonic() - self._t0, self.width(), self.height(),
                     self.devicePixelRatioF())
         p.end()

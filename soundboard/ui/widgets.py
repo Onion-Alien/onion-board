@@ -26,6 +26,7 @@ from soundboard.settings import pretty_key
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 PAD_MIME = "application/x-soundboard-pad"
 
@@ -100,6 +101,7 @@ class Meter(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = self.rect()
         p.setPen(Qt.PenStyle.NoPen)
@@ -134,6 +136,7 @@ class EqCurve(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
         p.setPen(Qt.PenStyle.NoPen)
@@ -288,6 +291,7 @@ class LoadingBar(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect())
         rad = r.height() / 2
@@ -817,6 +821,7 @@ class Pad(QAbstractButton):
             self._paint_slim()
             return
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
         accent = self._accent_colour()
@@ -1362,6 +1367,7 @@ class PadGrid(QWidget):
         # the same colour the page behind it shows; read on each paint, so a theme
         # change (theme.apply repaints every widget) follows
         p = QPainter(self)
+        snap_to_pixels(p)
         # the window's faint glow, fixed to the pads (so a scroll can still copy
         # what's on screen): it lines up with the window at the top of the board
         win, view = self.window(), self.parentWidget()

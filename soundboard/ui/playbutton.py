@@ -4,6 +4,7 @@ from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPen
 from PySide6.QtWidgets import QPushButton, QStyle, QStyleOptionButton
 
 from soundboard import theme
+from soundboard.ui.pixels import snap_to_pixels
 
 
 class PlayButton(QPushButton):
@@ -21,6 +22,7 @@ class PlayButton(QPushButton):
         rect = QRectF((self.width() - side) / 2, (self.height() - side) / 2,
                       side, side).adjusted(0.5, 0.5, -0.5, -0.5)
         painter = QPainter(self)
+        snap_to_pixels(painter)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         if not enabled:
             fill = QColor(tokens['btn'])

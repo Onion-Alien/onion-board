@@ -34,6 +34,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme, winkeys
 from soundboard.i18n import _, ngettext
+from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -764,6 +765,7 @@ class OverlayWindow(QWidget):
         tiles = [(i, self._tile_rect(i), m) for i, m in enumerate(ov.page_sounds()[:SLOTS])]
         tiles = [t for t in tiles if dirty.intersects(self._scaled(t[1]))]
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.drawPixmap(0, 0, under)
         p.scale(k, k)

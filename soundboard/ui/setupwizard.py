@@ -42,6 +42,7 @@ from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.choicetile import ChoiceTile, FoldPill
 from soundboard import errors
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 # step 3's "I don't use the cable" list: this choice sends nowhere (Config.route "off")
 NOWHERE = _("Nobody: only I hear them")
@@ -189,6 +190,7 @@ class StepBar(QWidget):
 
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
         t = theme.T
@@ -334,6 +336,7 @@ class _RoundButton(QPushButton):
 
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         t = theme.T
         col = QColor(t["accent_hover"] if self.underMouse() or self.isDown() else t["accent"])
@@ -446,6 +449,7 @@ class StatusCard(QFrame):
     def paintEvent(self, ev):
         t = theme.T
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
         r = QRectF(self.rect())

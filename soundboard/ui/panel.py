@@ -22,6 +22,7 @@ from soundboard.ui import icons
 from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 # the two heights the main window's controls and bars share (DESIGN.md "size")
 CONTROL_H = 36   # a toolbar button, the search box, the player's buttons
@@ -470,6 +471,7 @@ class _LevelDot(Meter):
     def paintEvent(self, e):
         frac, color = self._bar()
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(color if frac > 0 else theme.T["groove"]))

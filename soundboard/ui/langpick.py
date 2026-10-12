@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QLabel, QLineEdit,
 
 from soundboard import i18n, theme
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 WIDTH = 380            # the drop-down: as wide as the longest name, no wider
 ROW_H = 46
@@ -156,6 +157,7 @@ class LangRow(QPushButton):
     def paintEvent(self, e):
         t = theme.tokens()
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         on = self.isChecked()
         lit = self.underMouse() or self.hasFocus()

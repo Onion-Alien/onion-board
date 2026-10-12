@@ -26,6 +26,7 @@ from PySide6.QtWidgets import QSizePolicy
 from soundboard import theme
 from soundboard.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, music_note, sparkle
 from soundboard.ui.bunnywidget import NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note
+from soundboard.ui.pixels import snap_to_pixels
 
 # when each part of the show ends, in seconds from start()
 ROLL_END, DIZZY_END, TOOL_END = 1.1, 1.5, 2.4
@@ -305,6 +306,7 @@ class SetupShow(BunnyWidget):
         if not self.on:
             return
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pose = self.pose()
         r = self._bun_rect()

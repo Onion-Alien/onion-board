@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QL
 from soundboard import theme
 from soundboard.i18n import _
 from soundboard.ui import icons
+from soundboard.ui.pixels import snap_to_pixels
 
 ICON = 20          # a tab's icon on the rail
 SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4...
@@ -134,6 +135,7 @@ class RailTab(QToolButton):
         super().paintEvent(e)
         if self.hasFocus() and self._kbd_focus:
             p = QPainter(self)
+            snap_to_pixels(p)
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
             p.setPen(QPen(QColor(theme.T["accent"]), 1))
             p.setBrush(Qt.BrushStyle.NoBrush)
@@ -251,6 +253,7 @@ class _Dot(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T["ok_text" if self.ok else "warn_text"]))
@@ -791,6 +794,7 @@ class _Arrow(QPushButton):
         super().paintEvent(e)
         if self.property("dot"):
             p = QPainter(self)
+            snap_to_pixels(p)
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(theme.T["warn_text"]))
@@ -970,6 +974,7 @@ class UpdateCard(QPushButton):
     # ---- painting
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         hover, ring = self.underMouse(), self.hasFocus()
         if self._card:
@@ -1374,12 +1379,14 @@ class SideRail(QFrame):
         super().paintEvent(e)
         if self._drop_y is not None:
             p = QPainter(self)
+            snap_to_pixels(p)
             p.setPen(QPen(QColor(theme.T["accent"]), 2))
             p.drawLine(SIDE_OPEN, self._drop_y, self.width() - SIDE_OPEN, self._drop_y)
             p.end()
         if not self.tabs.property("_live_tint"):
             return   # the dot: in the icon itself (livedot / icons.set_tab_icon)
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(theme.T["live_text"]))

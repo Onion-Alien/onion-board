@@ -18,6 +18,7 @@ from soundboard import michelper, theme
 from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.pixels import snap_to_pixels
 
 WIDTH = 460
 RADIUS = 12      # a card's corners (DESIGN.md: radius.card)
@@ -175,6 +176,7 @@ class MicUpdateOffer(QFrame):
         """A card with a header tinted from the accent colours (theme tokens, so it
         follows every theme)."""
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         t = theme.T
         clip = QPainterPath()
