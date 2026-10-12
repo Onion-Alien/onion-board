@@ -8,8 +8,11 @@ the memory (it isn't counted as the app's own memory either).
 The catch is the audio thread: reading a page that isn't in memory yet waits for the
 disk, and on a slow drive that's a stutter. So a press warms the sound first (warm):
 the first second is read on the pressing thread, and the system is asked to read
-the rest in the background (PrefetchVirtualMemory), so the audio thread only ever
-finds pages already in memory.
+the next couple of minutes in the background (PrefetchVirtualMemory); while it plays,
+the engine keeps asking for the minutes ahead (Engine._read_ahead). So the audio
+thread only ever finds pages already in memory. Never the whole file at once: asking
+for a 2-hour song's 1.4 GB took 70 ms on the pressing thread, at every press and
+seek, and far longer from a slow drive.
 
 Windows can't delete or replace a mapped file while any array still points into
 it. library.unlink_cache (deletes) and store_cached (replaces) cope with that: what
@@ -33,6 +36,7 @@ FRAME_BYTES = 4                   # int16 stereo
 MAP_MIN_BYTES = 30 * SR * FRAME_BYTES   # sounds over ~30 s are mapped...
 RAM_BUDGET = 512 * 2**20          # ...and every sound once this much was read into RAM
 WARM_S = 1.0                      # read on the pressing thread before it plays
+AHEAD_S = 120.0                   # asked for in the background ahead of where it plays
 
 _lock = threading.Lock()
 _held = 0   # bytes read into RAM by load() this session (only grows: a cap, not a count)
@@ -103,25 +107,41 @@ _scratch = ctypes.create_string_buffer(int(WARM_S * SR) * FRAME_BYTES)
 _scratch_lock = threading.Lock()
 
 
+def prefetch(a: np.ndarray, frame: int = 0, seconds: float | None = None,
+             wrap: bool = False) -> None:
+    """Ask the system to read `seconds` (AHEAD_S) of a mapped sound from `frame` on
+    into memory, in the background (large I/Os into the file cache, so the audio thread's reads are
+    soft faults). wrap: what runs past the end carries on from the start (a loop).
+    Does nothing for audio in RAM."""
+    if (_prefetch is None or not len(a) or not a.flags.c_contiguous
+            or not is_mapped(a)):
+        return
+    try:
+        base, row, n = a.ctypes.data, a.strides[0], len(a)
+        frame = min(max(int(frame), 0), n - 1)
+        k = max(1, int((AHEAD_S if seconds is None else seconds) * SR))
+        ranges = [(base + frame * row, min(k, n - frame) * row)]
+        rest = k - (n - frame)
+        if wrap and rest > 0 and frame > 0:
+            ranges.append((base, min(rest, frame) * row))
+        arr = (_Range * len(ranges))(*[_Range(p, m) for p, m in ranges])
+        _prefetch(_proc, len(ranges), arr, 0)
+    except Exception:  # noqa: BLE001 - a hint only: playing works without it
+        log.debug("couldn't prefetch a mapped sound", exc_info=True)
+
+
 def warm(a: np.ndarray, frame: int = 0) -> None:
     """Get a mapped sound ready to play from `frame`: its first second is read now
     (with the GIL released: ctypes.memmove, so a slow disk holds up only this
-    thread, never the audio callback), the rest is prefetched in the background,
-    from `frame` on and then what's before it (loops come back to the start).
+    thread, never the audio callback) and the next AHEAD_S are prefetched.
     Does nothing for audio in RAM."""
     if not len(a) or not a.flags.c_contiguous or not is_mapped(a):
         return
+    prefetch(a, frame, wrap=True)
     try:
-        base = a.ctypes.data
-        row = a.strides[0]
         frame = min(max(int(frame), 0), len(a) - 1)
-        at = base + frame * row
-        end = base + a.nbytes
-        if _prefetch is not None:
-            ranges = [(at, end - at)] + ([(base, at - base)] if at > base else [])
-            arr = (_Range * len(ranges))(*[_Range(p, n) for p, n in ranges])
-            _prefetch(_proc, len(ranges), arr, 0)
-        n = min(end - at, len(_scratch))
+        at = a.ctypes.data + frame * a.strides[0]
+        n = min(a.ctypes.data + a.nbytes - at, len(_scratch))
         with _scratch_lock:
             ctypes.memmove(_scratch, at, n)
     except Exception:  # noqa: BLE001 - a hint only: playing works without it

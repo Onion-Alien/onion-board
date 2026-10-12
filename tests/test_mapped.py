@@ -1,6 +1,7 @@
 """Long sounds stay on disk (soundboard.mapped): mapped cache files, warmed before
 they play, and deletes that cope with Windows refusing to remove a mapped file."""
 import gc
+import time
 
 import numpy as np
 import pytest
@@ -124,3 +125,61 @@ def test_a_sound_cached_just_now_is_mapped_too(app_dir, map_all):
     x = song(1.0)
     out = store_cached("new", x)                # decoded, imported or rendered now
     assert mapped.is_mapped(out) and np.array_equal(out, library.to_int16(x))
+
+
+def test_warm_and_prefetch_ask_for_minutes_not_the_whole_file(app_dir, map_all, monkeypatch):
+    """A 2-hour song's whole file took 70 ms just to ask for, at every press and seek."""
+    store_cached("long", song(3.0))
+    d = load_cached("long")
+    asked = []
+    monkeypatch.setattr(mapped, "_prefetch", lambda _p, n, arr, _f: asked.append(
+        [arr[i].NumberOfBytes for i in range(n)]))
+    monkeypatch.setattr(mapped, "AHEAD_S", 1.0)
+    mapped.warm(d, 0)
+    assert asked[-1] == [SR * 4]                        # one second, not three
+    mapped.prefetch(d, int(2.5 * SR), 1.0, wrap=True)   # a loop: the rest from the start
+    assert asked[-1] == [SR // 2 * 4, SR // 2 * 4]
+    mapped.prefetch(d, int(2.5 * SR), 1.0)              # a one-shot stops at its end
+    assert asked[-1] == [SR // 2 * 4]
+    mapped.prefetch(np.array(d), 0)                     # in RAM: nothing to ask for
+    assert len(asked) == 3
+
+
+def test_a_long_sound_playing_keeps_its_next_minutes_asked_for(app_dir, map_all, monkeypatch):
+    from soundboard import engine as E
+    store_cached("long", song(3.0))
+    d = load_cached("long")
+    asked = []
+    monkeypatch.setattr(mapped, "prefetch", lambda a, frame=0, *_a, **_k: asked.append(frame))
+    monkeypatch.setattr(mapped, "AHEAD_S", 1.0)
+    monkeypatch.setattr(E, "READ_AHEAD_EVERY_S", 0.01)
+    e = engine_with("main")
+    v = e.play("long", d, 1.0)
+    assert e._ahead_on
+    v.pos["main"] = 2 * SR                     # played on (or sought) past what was asked
+    deadline = time.monotonic() + 5
+    while 2 * SR not in asked and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert 2 * SR in asked
+    e.stop_all()
+    v.done.add("main")                         # finished: the thread lets go and ends
+    while e._ahead_on and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert not e._ahead_on
+
+
+def test_a_very_long_sound_is_never_copied_at_another_rate(app_dir, map_all, monkeypatch):
+    """It plays read at the device's rate: a 2-hour song's copy took 17 s and 1.2 GB."""
+    from soundboard import engine as E
+    store_cached("long", song(3.0))
+    d = load_cached("long")
+    e = engine_with("main")
+    e.rates["main"] = 44100
+    monkeypatch.setattr(E, "NO_COPY_S", 2.0)
+    copies = []
+    monkeypatch.setattr(e, "_resample_soon", lambda *a: copies.append(a))
+    v = e.play("long", d, 1.0)
+    assert not copies and v.step["main"] == SR / 44100
+    monkeypatch.setattr(E, "NO_COPY_S", 5.0)   # shorter than that: copied as before
+    e.play("long", d, 1.0)
+    assert len(copies) == 1
