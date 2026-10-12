@@ -48,7 +48,7 @@ class LinkBar(QFrame):
     """`sound_ready(meta, int16 audio)` fires when Add as sound finished (the audio
     is already stored and prepared); the owner adds it to the library."""
     sound_ready = Signal(object, object)
-    played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
+    played = Signal(str, object, float, str)   # Play once started: (title, audio, gain, url)
     _msg = Signal(str, str, object, object)   # worker -> UI: (kind, url, payload, job)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
     failed = Signal(str, str)         # (url, kind): it ended in an error, just before its done
@@ -333,10 +333,10 @@ class LinkBar(QFrame):
                                           "newer downloader")
         threading.Thread(target=self._work, args=args, daemon=True, name="link-dl").start()
 
-    def _play(self, data, gain: float, title: str | None = None) -> bool:
+    def _play(self, data, gain: float, title: str | None = None, url: str = "") -> bool:
         """`gain` is the levelling gain the worker worked out (a float copy of a
-        whole song is too slow and too big for the UI thread). `title`: the pick's own,
-        when another card shows now."""
+        whole song is too slow and too big for the UI thread). `title` and `url`: the
+        pick's own, when another card shows now."""
         title = self.title if title is None else title
         gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
@@ -344,7 +344,7 @@ class LinkBar(QFrame):
             busy.toast(self, html.escape(_("No audio device is open, pick one in Setup.")),
                        "warn")
             return False
-        self.played.emit(title or _("Link"), data, gain)
+        self.played.emit(title or _("Link"), data, gain, url or self.url)
         if title == self.title:
             name = html.escape(title or _("it"))
             self._say(_("▶ Playing <b>{name}</b> ({time}): <i>Add as sound</i> keeps it.",
@@ -506,7 +506,7 @@ class LinkBar(QFrame):
                 # another card was clicked while it loaded (to queue an Add, say): the
                 # Play still stands, only a newer Play or Cancel stops it (_drop_running)
                 _drop_temp(path)
-                ok = self._play(data, gain, busy_title)
+                ok = self._play(data, gain, busy_title, url)
             self.done.emit(url, "play", ok)
         elif kind == "error":
             if current:
