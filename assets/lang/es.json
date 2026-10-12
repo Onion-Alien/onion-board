@@ -3133,8 +3133,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "Se reproduce una vez cuando esté listo. No se añade a tus sonidos.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Se convierte en un sonido nuevo en tu tablero después de los anteriores. No tienes que pulsar nada.",
   "Waiting to add": "Esperando para añadir",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows se reserva {keys} para sí mismo, así que no puede ser un atajo. Elige otra tecla.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows se reserva <b>{key}</b> para sí mismo, así que no puede ser un atajo. Elige otra tecla.</span>",
   "Opacity": "Opacidad",
   "Playing sound background": "Fondo del sonido actual",
   "Show the playing sound's thumbnail behind the cards": "Mostrar la miniatura del sonido actual detrás de las tarjetas",

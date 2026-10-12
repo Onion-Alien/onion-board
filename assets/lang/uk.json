@@ -3205,8 +3205,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "Зіграє один раз, коли буде готовий. До твоїх звуків не додається.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Стане новим звуком на твоїй панелі після попередніх. Нічого натискати не треба.",
   "Waiting to add": "Чекає на додавання",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows залишає {keys} собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows залишає <b>{key}</b> собі, тому це не може бути гарячою клавішею. Вибери іншу клавішу.</span>",
   "Opacity": "Непрозорість",
   "Playing sound background": "Тло поточного звуку",
   "Show the playing sound's thumbnail behind the cards": "Показувати мініатюру поточного звуку за картками",

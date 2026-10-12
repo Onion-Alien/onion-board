@@ -3061,8 +3061,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "准备好后播放一次。不会添加到你的声音里。",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "在前面的之后成为你声音板上的新声音。不用按任何东西。",
   "Waiting to add": "等待添加",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} 是 Windows 自己保留的键，不能用作热键。请换一个键。</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 是 Windows 自己保留的键，不能用作热键。请换一个键。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "正在播放的声音背景",
   "Show the playing sound's thumbnail behind the cards": "在卡片后方显示正在播放的声音缩略图",

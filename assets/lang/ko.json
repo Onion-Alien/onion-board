@@ -3061,8 +3061,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "준비되면 한 번 재생돼요. 사운드에 추가되지 않아요.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "앞의 것들 다음에 보드에 새 사운드로 들어가요. 누를 건 없어요.",
   "Waiting to add": "추가 대기 중",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} 키는 Windows가 직접 쓰기 때문에 단축키로 쓸 수 없어요. 다른 키를 고르세요.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> 키는 Windows가 직접 쓰기 때문에 단축키로 쓸 수 없어요. 다른 키를 고르세요.</span>",
   "Opacity": "불투명도",
   "Playing sound background": "재생 중인 사운드 배경",
   "Show the playing sound's thumbnail behind the cards": "재생 중인 사운드의 썸네일을 카드 뒤에 표시",

@@ -3133,8 +3133,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "Afspilles én gang, når den er klar. Den bliver ikke tilføjet til dine lyde.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Bliver en ny lyd på dit board efter dem foran. Du skal ikke trykke på noget.",
   "Waiting to add": "Venter på at blive tilføjet",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows holder {keys} for sig selv, så den kan ikke være en genvejstast. Vælg en anden tast.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows holder <b>{key}</b> for sig selv, så den kan ikke være en genvejstast. Vælg en anden tast.</span>",
   "Opacity": "Opacitet",
   "Playing sound background": "Baggrund for afspillet lyd",
   "Show the playing sound's thumbnail behind the cards": "Vis den afspillede lyds miniature bag kortene",

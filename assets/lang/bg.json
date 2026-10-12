@@ -3133,8 +3133,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "Пуска се веднъж, когато е готов. Не се добавя към звуците ти.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Става нов звук на дъската ти след тези преди него. Не трябва да натискаш нищо.",
   "Waiting to add": "Чака да се добави",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows пази {keys} за себе си, така че не може да е бърз клавиш. Избери друг клавиш.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows пази <b>{key}</b> за себе си, така че не може да е бърз клавиш. Избери друг клавиш.</span>",
   "Opacity": "Непрозрачност",
   "Playing sound background": "Фон на текущия звук",
   "Show the playing sound's thumbnail behind the cards": "Показвай миниатюрата на текущия звук зад картите",

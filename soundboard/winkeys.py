@@ -63,8 +63,12 @@ MODIFIER_VKS = {0x10, 0x11, 0x12, 0x5B, 0x5C, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5
 
 def reserved(combo: str) -> bool:
     """F12 on its own: Windows keeps it for debuggers, so RegisterHotKey always says
-    another program has it, even with nothing else running."""
+    another program has it, even with nothing else running. Such a key is watched
+    instead (`Hotkeys`: a key-state check every POLL_MS, still no hook)."""
     return parse(combo) == (0, 0x7B)
+
+
+POLL_MS = 20   # how often a watched (reserved) key is checked while one is set
 
 
 def parse(combo: str) -> tuple[int, int] | None:
@@ -174,6 +178,10 @@ class Hotkeys(QObject):
         actions: dict[int, tuple[str, int]] = {}   # hotkey id -> (action, vk)
         self._held: dict[int, str] = {}            # vk -> action, until let go
         self._timer = 0
+        self._watched: dict[int, str] = {}         # reserved vk -> action (see reserved)
+        self._watch_seen: set[int] = set()         # watched keys down at the last check
+        self._watch_down: set[int] = set()         # ... of those, the ones that fired
+        self._watch_timer = 0
         try:
             self._tid = kernel32.GetCurrentThreadId()
             msg = _MSG()
@@ -203,6 +211,8 @@ class Hotkeys(QObject):
                 self._held[vk] = act
                 if not self._timer:
                     self._timer = user32.SetTimer(None, 0, HELD_POLL_MS, None)
+        elif msg.message == WM_TIMER and self._watch_timer and msg.wParam == self._watch_timer:
+            self._poll_watched()
         elif msg.message == WM_TIMER:
             for vk, act in list(self._held.items()):
                 if not is_down(vk):
@@ -219,6 +229,12 @@ class Hotkeys(QObject):
             for hid in actions:
                 user32.UnregisterHotKey(None, hid)
             actions.clear()
+            for vk in self._watch_down:   # a watched key held through the change
+                if vk in self._watched:
+                    self.released.emit(self._watched[vk])
+            self._watched.clear()
+            self._watch_down.clear()
+            self._watch_seen.clear()
             failed = []
             for i, (combo, act) in enumerate(mapping.items(), start=1):
                 if not combo:
@@ -228,12 +244,37 @@ class Hotkeys(QObject):
                     failed.append(combo)   # shown as not working, not silently dropped
                     continue
                 mods, vk = parsed
-                if user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
+                if reserved(combo):
+                    self._watched[vk] = act
+                elif user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
                     actions[i] = (act, vk)
                 else:
                     failed.append(combo)
+            # a key already down now (just picked in the hotkey box) isn't a press
+            self._watch_seen = {vk for vk in self._watched if is_down(vk)}
+            if self._watched and not self._watch_timer:
+                self._watch_timer = user32.SetTimer(None, 0, POLL_MS, None)
+            elif not self._watched and self._watch_timer:
+                user32.KillTimer(None, self._watch_timer)
+                self._watch_timer = 0
             self.failed = failed
             self.failed_changed.emit(list(failed))
+
+    def _poll_watched(self):
+        """A watched key went down (alone: Ctrl+F12 is its own hotkey) or back up.
+        Unlike RegisterHotKey, the press still reaches the game too."""
+        for vk, act in self._watched.items():
+            down = is_down(vk)
+            if down and vk not in self._watch_seen:
+                self._watch_seen.add(vk)
+                if not any(is_down(m) for m in (0x10, 0x11, 0x12, 0x5B, 0x5C)):
+                    self._watch_down.add(vk)
+                    self.fired.emit(act)
+            elif not down and vk in self._watch_seen:
+                self._watch_seen.discard(vk)
+                if vk in self._watch_down:
+                    self._watch_down.discard(vk)
+                    self.released.emit(act)
 
 
 # ---------------------------------------------------------------- key presses (PTT)

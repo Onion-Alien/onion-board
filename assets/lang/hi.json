@@ -3133,8 +3133,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "तैयार होते ही एक बार चलेगा। आपकी साउंड्स में नहीं जुड़ता।",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "पहले वालों के बाद आपके बोर्ड पर नई साउंड बन जाएगा। कुछ दबाना नहीं है।",
   "Waiting to add": "जुड़ने का इंतज़ार",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows {keys} को अपने लिए रखता है, इसलिए यह हॉटकी नहीं बन सकती। कोई और की चुनें।</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows <b>{key}</b> को अपने लिए रखता है, इसलिए यह हॉटकी नहीं बन सकती। कोई और की चुनें।</span>",
   "Opacity": "अपारदर्शिता",
   "Playing sound background": "चल रहे साउंड की पृष्ठभूमि",
   "Show the playing sound's thumbnail behind the cards": "कार्ड के पीछे चल रहे साउंड का थंबनेल दिखाएँ",

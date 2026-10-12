@@ -240,8 +240,9 @@ def test_a_slow_device_list_doesnt_block_the_ui(qapp):
     m.capture(False)
 
 
-def test_the_hotkey_dialog_refuses_bare_f12(qapp):
-    """Windows keeps F12 for itself: it used to be taken and then blamed on another program."""
+def test_the_hotkey_dialog_takes_bare_f12(qapp):
+    """F12 alone is a usual soundboard key: Windows won't register it, so winkeys
+    watches it instead, and the picker takes it like any other key."""
     from PySide6.QtCore import QEvent, Qt
     from PySide6.QtGui import QKeyEvent
     from PySide6.QtWidgets import QApplication
@@ -251,9 +252,6 @@ def test_the_hotkey_dialog_refuses_bare_f12(qapp):
         d.show()
         QApplication.sendEvent(d, QKeyEvent(QEvent.KeyPress, Qt.Key_F12, Qt.NoModifier,
                                             0, 0x7B, 0))
-        assert d.result_combo is None and "Windows keeps" in d.hint.text()
-        QApplication.sendEvent(d, QKeyEvent(QEvent.KeyPress, Qt.Key_F12, Qt.AltModifier,
-                                            0, 0x7B, 0))
-        assert d.result_combo == "alt+f12"
+        assert d.result_combo == "f12"
     finally:
         hk.stop()

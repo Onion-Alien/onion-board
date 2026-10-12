@@ -4876,18 +4876,10 @@ class MainWindow(QMainWindow):
         if not failed:
             return
         log.warning("hotkeys that couldn't be claimed: %s", failed)
-        mine = [c for c in failed if winkeys.reserved(c)]
-        others = [c for c in failed if c not in mine]
-        if others:
-            self.say(_("<span style='color:{status}'>Another program is already "
-                       "using {keys}, pick a different hotkey.</span>",
-                       status=theme.status('warn'),
-                       keys=html.escape(", ".join(pretty_key(c) for c in others))), "warn")
-        else:
-            self.say(_("<span style='color:{status}'>Windows keeps {keys} for itself, so "
-                       "it can't be a hotkey. Pick a different key.</span>",
-                       status=theme.status('warn'),
-                       keys=html.escape(", ".join(pretty_key(c) for c in mine))), "warn")
+        self.say(_("<span style='color:{status}'>Another program is already "
+                   "using {keys}, pick a different hotkey.</span>",
+                   status=theme.status('warn'),
+                   keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn")
 
     def set_global_hotkey(self, attr: str, combo: str):
         """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
