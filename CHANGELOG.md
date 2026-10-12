@@ -2,6 +2,15 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.0.1 — 2026-10-12
+
+- Skip with a sound waiting for a web search's song now stops the song, instead of playing your sound on top of it.
+- Apps tab: an eye button on each program card with a window shows a small live picture of that window under the card.
+- Added a persistent Stop voice effects button across the Voice tabs to turn off all voice modifiers and translation in one click.
+- The app opens with the focus on the page you left it on, not on the Sounds button in the side menu: a tab other than Sounds no longer opens with Sounds outlined as if it were picked too.
+- A web search's Play waits for the sound you're playing (it goes in *Up next*) instead of playing over it, and a sound set to play next waits for a web search's song. A looping background sound doesn't hold anything up.
+- Setup tab: when your sounds go straight into your mic, its card has *Reinstall* and *Remove* for the mic effect, after the same are-you-sure box as Settings.
+
 ## 2.0.0 — 2026-10-12
 
 - An add-on folder Windows won't let Onion Board read (locked by an antivirus, no permission, or a link it refuses to follow) is now skipped as a broken add-on, instead of closing the app at start-up.

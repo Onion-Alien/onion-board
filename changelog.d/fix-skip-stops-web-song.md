@@ -1,1 +1,0 @@
-- Skip with a sound waiting for a web search's song now stops the song, instead of playing your sound on top of it.
