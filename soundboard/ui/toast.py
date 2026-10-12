@@ -35,6 +35,7 @@ import sys
 from collections.abc import Callable
 
 import shiboken6
+import math
 
 from PySide6.QtCore import (QAbstractAnimation, QEasingCurve, QEvent, QObject, QPoint,
                             QPointF, QPropertyAnimation, QRectF, Qt, QTimer)
@@ -169,6 +170,7 @@ class _Card(QFrame):
         self.label.setTextFormat(Qt.TextFormat.RichText)
         self.label.setOpenExternalLinks(False)
         self.label.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        self.label.installEventFilter(self)
         row.addWidget(self.label, 1, Qt.AlignmentFlag.AlignTop)
 
         self.action = QPushButton()
@@ -216,10 +218,16 @@ class _Card(QFrame):
                                    Qt.AlignmentFlag.AlignTop)
 
     def set_line(self):
-        """Pad the text so its first line sits in the middle of the LINE-tall row."""
+        """Put the first line's capital ink on the icon/button row's middle."""
         self.label.ensurePolished()
-        pad = max(0, (LINE - self.label.fontMetrics().height()) // 2)
+        fm = self.label.fontMetrics()
+        pad = max(0, math.floor(LINE / 2 + fm.capHeight() / 2 - fm.ascent() + 0.5))
         self.label.setContentsMargins(0, pad, 0, pad)
+
+    def eventFilter(self, obj, event):
+        if obj is self.label and event.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
+            self.set_line()
+        return False
 
     def set_picture(self, pm: QPixmap | None):
         """A picture (Bun) in the icon's place, or back to the kind's icon."""

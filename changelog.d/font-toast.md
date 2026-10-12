@@ -1,0 +1,1 @@
+- Toast icons and message capitals line up using each theme's font metrics.
