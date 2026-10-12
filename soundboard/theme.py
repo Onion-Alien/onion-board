@@ -786,7 +786,7 @@ QComboBox::down-arrow { image:url("$down"); width:10px; height:10px; }
 QComboBox::down-arrow:on { image:url("$up"); }
 QComboBox::down-arrow:disabled { image:url("$down_off"); }
 QComboBox:disabled, QLineEdit:disabled { color:$muted; background:$inset; }
-QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card; }
+QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card_ctl; }
 QFrame#card QPushButton:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#card QPushButton:focus { border-color:$accent; }
@@ -1402,6 +1402,11 @@ def stylesheet(name: str | None = None) -> str:
     tk["rail_border"] = tk["border"] if outlined else _mix(tk["bg"], tk["border"], 0.35)
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
+    # controls on a card: the card's colour, or where cards are the panel's (Light: white
+    # on white, the buttons read as plain text) the button colour, or its hover one when
+    # that's white too (Flashbang)
+    tk["card_ctl"] = next((c for c in (tk["card"], tk["btn"], tk["btn_hover"], tk["groove"])
+                           if _contrast(c, tk["panel"]) >= 1.05), tk["groove"])
     tk["check"] = _check_url(tk["on_accent"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])

@@ -3395,11 +3395,11 @@ class MainWindow(QMainWindow):
                                     and not self.setup_show.on)   # Bun's show instead
         if not busy.is_busy(self.btn_install):
             self.btn_install.setText(button or _("Install the free virtual cable"))
-            # Windows' shield when its prompt comes, like Windows' own buttons. White
-            # only on the filled button: on a plain one it vanished in light themes
-            filled = route == "mic" and not update
+            # Windows' shield when its prompt comes, like Windows' own buttons
+            # white only while it's the filled main button: on the cable route it's a
+            # plain one, and white vanished on Light's grey
             look = (("shield" if michelper.will_ask() else "mic") if mic_route else "cable",
-                    "on_accent" if filled else "muted" if update else None)
+                    "muted" if update else "on_accent" if route == "mic" else None)
             if look != self._install_icon:
                 self._install_icon = look
                 if look[0] == "shield":
