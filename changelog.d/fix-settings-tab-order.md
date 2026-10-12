@@ -1,3 +1,0 @@
-- Settings: the Tab key now moves from the category list into the open page and on to Done, so every setting can be reached with the keyboard or a screen reader.
-- Settings: the first card on every page now lines up with the top of the search box, and Done has the same room above it as below and beside it.
-- Settings search: typing a page's name opens that page (hotkey opens Hotkeys), and a search that finds nothing says so instead of showing an empty window.

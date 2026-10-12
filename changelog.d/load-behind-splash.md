@@ -1,1 +1,0 @@
-- The board is ready the moment it appears: your sounds finish loading and the window draws itself while the loading screen is still up, instead of in the first half-second after.

@@ -1,1 +1,0 @@
-- The download queue no longer gets stuck on "Processing audio…" under the ✓ after the last song was already added: a late update can't undo a finished (or failed) download, and the banner goes away as it should.

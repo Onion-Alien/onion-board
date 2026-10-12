@@ -1,1 +1,0 @@
-- Live controls and a pad's Effects: "no change" (1x, +0 dB) now sits in the middle of every slider, like the pitch one, with a small notch to find it again.

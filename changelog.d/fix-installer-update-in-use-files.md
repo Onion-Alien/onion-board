@@ -1,1 +1,0 @@
-- Updating: if another program (antivirus, a leftover process) is holding one of the app's files open, the installer now stops before changing anything and says so, instead of failing halfway and leaving an app that will not start.

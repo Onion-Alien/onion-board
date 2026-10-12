@@ -1,2 +1,0 @@
-- Mic effect: a mic that comes back silent from the audio restart gets up to three more restarts. If it's still silent after those, the set-up says so (and what to do) instead of "Done".
-- Setup tab: a mic with the effect on that sends nothing but silence for 20 seconds (during a call, say) shows "Your mic sends no sound" with a one-click Repair. It goes away at the first sound.

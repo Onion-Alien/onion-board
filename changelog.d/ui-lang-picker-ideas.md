@@ -1,1 +1,0 @@
-- Language picker: a drop-down right under the Language button instead of a window, each language with its own letter on a coin (ß, Ñ, Я, あ, ع) in the theme colour; arrow keys walk the list.

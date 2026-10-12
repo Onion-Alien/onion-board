@@ -1,3 +1,0 @@
-- Setup tab: Your mic and Who's listening are the same height with their titles on one line, and Equalizer and volume sits under Who's listening.
-- Setup tab: Devices, Connect your chat and Equalizer and volume are always open; they no longer fold shut.
-- Card headings: the ⓘ, the heading icon and the status pill sit exactly level with the title.

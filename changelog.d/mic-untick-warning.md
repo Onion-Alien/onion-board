@@ -1,1 +1,0 @@
-- Unticking "Others hear it" while your sounds aren't in your mic yet now says your voice still goes out (voice apps take your mic straight from Windows) and offers the one-click set-up.

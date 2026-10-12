@@ -1,1 +1,0 @@
-- Search results: the back button is now a short "Back" (hover still says "Back to my sounds") and sits as far in from the top of the results panel as from its side.

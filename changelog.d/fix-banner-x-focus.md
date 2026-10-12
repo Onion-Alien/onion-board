@@ -1,1 +1,0 @@
-- Closing a warning or tip bar at the top of the window no longer jumps the keyboard focus to the Sounds tab.

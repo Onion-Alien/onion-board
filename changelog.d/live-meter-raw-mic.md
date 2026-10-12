@@ -1,1 +1,0 @@
-- The "What others hear" meter now moves when you talk before your sounds are set up in your mic: voice apps hear your real mic then, so it was showing nothing while others heard you.

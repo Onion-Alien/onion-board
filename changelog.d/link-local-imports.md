@@ -1,1 +1,0 @@
-- Local sound imports now link to the original file by default. Settings > Data & quality > Local sounds can keep a library copy instead. Both modes use the same decoded cache for playback, speed and effects; downloads, recordings and ZIP imports still keep their own files.

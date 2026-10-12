@@ -1,1 +1,0 @@
-- Voice cards now use a consistent order: the start or power control at the top, followed by the description and settings. The computer voice status sits beside Start and wraps at narrow widths.

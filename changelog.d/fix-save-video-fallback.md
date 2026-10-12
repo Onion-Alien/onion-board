@@ -1,1 +1,0 @@
-- **Also save the video** no longer breaks Add as sound for SoundCloud (it has no video), or for YouTube without FFmpeg (it has no single video files any more): the sound is added and the bar says why no video was kept, naming FFmpeg when that's what's missing. Before, both failed with a wrong *That video isn't available any more*.

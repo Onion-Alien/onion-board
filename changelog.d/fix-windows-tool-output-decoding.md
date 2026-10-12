@@ -1,1 +1,0 @@
-- Straight into my mic set-up and Windows voice downloads no longer fail on Windows in languages whose tools answer with letters like "ü".

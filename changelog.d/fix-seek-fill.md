@@ -1,1 +1,0 @@
-- Fix the playback bar staying grey until seeking: its fill now follows normal playback in both players.

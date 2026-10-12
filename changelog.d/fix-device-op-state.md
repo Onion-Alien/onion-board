@@ -1,3 +1,0 @@
-- Setting up your mic: "Done" shows when it really works (the card turns green and Bun cheers), not while it still reads "starting…" and Bun is still hammering.
-- After removing the virtual cable, "Use the virtual cable instead" is gone until you restart: sending to the removed cable lost your mic.
-- Re-scan devices ignores extra clicks while it shows what it found, and Also send to's rows aren't rebuilt when nothing changed (no more flashing device names).

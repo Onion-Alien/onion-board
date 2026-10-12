@@ -1,2 +1,0 @@
-- The installer is shorter: a one-line welcome, a three-line privacy page, no group headings in the list of extras, and no "Keep a history" box (it's in Settings > Connection). "Where did you hear about Onion Board?" lost GitHub and its fine print.
-- The virtual cable box is left out of the installer when a cable already works, instead of showing greyed out.

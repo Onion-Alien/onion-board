@@ -1,1 +1,0 @@
-- Line up the sidebar's Sound output card: its icons share the tab icons' column, every line of words (including "Set up output") starts on one line, icons sit centred on their words, and long translations wrap instead of being cut off.
