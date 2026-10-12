@@ -136,8 +136,8 @@ class EffectsPanel(QWidget):
             v.addWidget(hint_label(_("Trimming works once the sound has loaded.")))
 
         v.addWidget(section_label(_("Speed & pitch")))
-        self.speed = ParamSlider(SPEED, 1.0)
-        self.pitch = ParamSlider(PITCH, 0.0)
+        self.speed = ParamSlider(SPEED, 1.0, centred=True)
+        self.pitch = ParamSlider(PITCH, 0.0, centred=True)
         self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
         self.tape.setToolTip(_("Off: speed and pitch are independent. On: like a record player, "
                                "faster is also higher; Pitch adds on top."))
@@ -145,7 +145,7 @@ class EffectsPanel(QWidget):
             v.addWidget(w)
 
         v.addWidget(section_label(_("Loudness")))
-        self.boost = ParamSlider(BOOST, 0.0)
+        self.boost = ParamSlider(BOOST, 0.0, centred=True)
         v.addWidget(self.boost)
         self.boost_hint = hint_label("")
         v.addWidget(self.boost_hint)

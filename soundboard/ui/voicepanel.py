@@ -13,13 +13,14 @@ import re
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
                                QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy,
-                               QSlider, QToolButton, QVBoxLayout, QWidget)
+                               QSlider, QStyle, QStyleOptionSlider, QToolButton,
+                               QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard import applog
@@ -190,17 +191,50 @@ def _is_switch(q: voicefx.Param) -> bool:
     return q.lo == 0 and q.hi == 1 and q.step == 1
 
 
+class _NotchSlider(QSlider):
+    """A slider with a small notch across its groove at `notch` (a position), where
+    the "no change" value sits; hidden while the handle covers it."""
+
+    def __init__(self):
+        super().__init__(Qt.Orientation.Horizontal)
+        self.notch: int | None = None
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        if self.notch is None:
+            return
+        opt = QStyleOptionSlider()
+        self.initStyleOption(opt)
+        st = self.style()
+        handle = st.subControlRect(QStyle.ComplexControl.CC_Slider, opt,
+                                   QStyle.SubControl.SC_SliderHandle, self)
+        x = handle.width() / 2 + QStyle.sliderPositionFromValue(
+            self.minimum(), self.maximum(), self.notch, self.width() - handle.width())
+        if handle.left() - 2 <= x <= handle.right() + 2:
+            return
+        p = QPainter(self)
+        p.setPen(QColor(theme.tokens()["muted"]))
+        y = self.height() / 2
+        p.drawLine(QPointF(x, y - 5), QPointF(x, y + 5))
+
+
 class ParamSlider(QWidget):
     """One effect setting. Compact (the speed & pitch popup, a sound's effects): name,
     slider and value on one row. Otherwise (the Voice tab's effect cards): name and
     value on top, the slider, and (when the parameter names them) what its two ends
-    mean underneath. A 0/1 setting is a switch instead (`slider` is then None)."""
+    mean underneath. A 0/1 setting is a switch instead (`slider` is then None).
+
+    `centred`: the default ("no change": 1x, 0 st, +0 dB) sits in the middle of the
+    slider even when the range is lopsided (0.25x to 2x), with a notch there; each
+    half spreads its own side of the range."""
     changed = Signal()
 
-    def __init__(self, q: voicefx.Param, value: float, compact: bool = True):
+    def __init__(self, q: voicefx.Param, value: float, compact: bool = True,
+                 centred: bool = False):
         super().__init__()
         self.q = q
-        self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
+        self.centred = centred
+        self.steps = self._steps(q)
         self.slider: QSlider | None = None
         self.switch: Switch | None = None
         self.name = QLabel(voicefx.shown(q.label))
@@ -216,8 +250,8 @@ class ParamSlider(QWidget):
             h.setContentsMargins(22, 0, 0, 0)
             self.name.setObjectName("")
             self.name.setFixedWidth(78)
-            self.slider = QSlider(Qt.Orientation.Horizontal)
-            self.slider.setRange(0, self.steps)
+            self.slider = _NotchSlider()
+            self._set_range()
             self.val.setFixedWidth(64)
             self.val.setObjectName("eqlabel")
             h.addWidget(self.name)
@@ -247,8 +281,8 @@ class ParamSlider(QWidget):
         top.addStretch(1)
         top.addWidget(self.val)
         v.addLayout(top)
-        self.slider = QSlider(Qt.Orientation.Horizontal)
-        self.slider.setRange(0, self.steps)
+        self.slider = _NotchSlider()
+        self._set_range()
         self.slider.setMinimumWidth(90)
         no_wheel(self.slider)
         v.addWidget(self.slider)
@@ -268,32 +302,68 @@ class ParamSlider(QWidget):
         """Swap the range (keeps the value, clamped into the new one)."""
         v = self.value()
         self.q = q
-        self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
+        self.steps = self._steps(q)
         if self.slider is not None:
             self.slider.blockSignals(True)
-            self.slider.setRange(0, self.steps)
+            self._set_range()
             self.slider.blockSignals(False)
         if isinstance(self.val, _ValueLabel):
             self.val.set_shapes(_value_shapes(q.lo, q.hi, q.unit, self.steps))
         self.set_value(v)
 
+    @staticmethod
+    def _steps(q: voicefx.Param) -> int:
+        return max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
+
+    def _half(self) -> int:
+        """Centred: positions in each half (the busier side's steps), else 0."""
+        q = self.q
+        if not (self.centred and q.lo < q.default < q.hi):
+            return 0
+        if not q.step:
+            return 100
+        return max(int(round((q.default - q.lo) / q.step)),
+                   int(round((q.hi - q.default) / q.step)))
+
+    def _set_range(self):
+        assert isinstance(self.slider, _NotchSlider)
+        half = self._half()
+        self.slider.setRange(0, 2 * half if half else self.steps)
+        self.slider.notch = half or None
+
     def value(self) -> float:
         if self.switch is not None:
             return 1.0 if self.switch.isChecked() else 0.0
         assert self.slider is not None   # a switch or a slider
-        return self.q.lo + (self.q.hi - self.q.lo) * self.slider.value() / self.steps
+        q, pos, half = self.q, self.slider.value(), self._half()
+        if not half:
+            return q.lo + (q.hi - q.lo) * pos / self.steps
+        if pos <= half:
+            v = q.lo + (q.default - q.lo) * pos / half
+        else:
+            v = q.default + (q.hi - q.default) * (pos - half) / half
+        if q.step:   # a half with fewer steps than positions: snap to a real step
+            v = q.default + round((v - q.default) / q.step) * q.step
+        return q.clamp(round(v, 9))
 
     def set_value(self, v: float):
-        v = self.q.clamp(v)
+        q = self.q
+        v = q.clamp(v)
         if self.switch is not None:
             self.switch.blockSignals(True)
             self.switch.setChecked(v >= 0.5)
             self.switch.blockSignals(False)
             return
-        span = (self.q.hi - self.q.lo) or 1.0
         assert self.slider is not None   # a switch or a slider
+        half = self._half()
+        if not half:
+            pos = (v - q.lo) / ((q.hi - q.lo) or 1.0) * self.steps
+        elif v <= q.default:
+            pos = (v - q.lo) / (q.default - q.lo) * half
+        else:
+            pos = half + (v - q.default) / (q.hi - q.default) * half
         self.slider.blockSignals(True)
-        self.slider.setValue(int(round((v - self.q.lo) / span * self.steps)))
+        self.slider.setValue(int(round(pos)))
         self.slider.blockSignals(False)
         self._label()
 

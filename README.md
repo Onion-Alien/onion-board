@@ -166,6 +166,13 @@ Your sounds and settings live in `%APPDATA%\OnionBoard\` and survive reinstalls.
   for every version with *straight into my mic* (1.9.0 and later): the uninstaller
   takes the mic effect off your mic and out of Windows. Versions before 1.9.28 leave
   a few small log files in `C:\ProgramData\OnionBoard\` that you can delete.
+- **Uninstall didn't finish, or the app folder is already gone?** (Windows' prompt was
+  answered No, or the folder was deleted by hand.) Download
+  [OnionBoardCleanup.exe](https://github.com/Onion-Alien/onion-board/releases/download/cleanup-tool/OnionBoardCleanup.exe)
+  and run it. It lists what's left, then takes it all off when you say so: the mic
+  effect (your mic goes back the way it was), the mic helper, the app, its shortcuts
+  and logs. Your sounds stay unless you ask it to delete them too. Windows asks once,
+  because putting your mic back needs admin.
 
 <a id="license"></a>
 

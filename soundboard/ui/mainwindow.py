@@ -9312,6 +9312,15 @@ class MainWindow(QMainWindow):
             if want and winkeys.press(want):
                 self._ptt_held = want
 
+    def _heard_level(self) -> float:
+        """The "What others hear" meter. Sending into the mic but not in it yet (no mic
+        effect): voice apps still take the real mic as it is, so others hear your voice
+        even with nothing sent; the meter showed nothing while you talked."""
+        e = self.engine
+        if self.cfg.route == "mic" and not e.main_direct and e.mic_stream is not None:
+            return max(e.level_main, e.level_mic)
+        return e.level_main
+
     def _tick_visuals(self, playing, now: float):
         """The part of tick() that only matters while the window is on screen."""
         e = self.engine
@@ -9350,7 +9359,7 @@ class MainWindow(QMainWindow):
             self.ytresults.show_now(self._link_url, "" if prog is None else
                                     "paused" if paused else "playing")
         self._update_chips(playing)
-        self.out_meter.set_level(e.level_main)
+        self.out_meter.set_level(self._heard_level())
         self.logo.set_level(e.level_play)   # anything playing, not your voice
         self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         if self.card_meter.isVisible():

@@ -330,7 +330,7 @@ class SpeedPitchButton(QPushButton):
     def _slider(q: voicefx.Param, value: float, name_w: int = NAME_W) -> ParamSlider:
         """A ParamSlider laid out for the popup: no effect-row indent, a fixed name
         column so both sliders (and the quick buttons) line up, a readable value."""
-        s = ParamSlider(q, value)
+        s = ParamSlider(q, value, centred=True)
         h = s.layout()
         assert h is not None   # name, slider, value
         h.setContentsMargins(0, 0, 0, 0)
