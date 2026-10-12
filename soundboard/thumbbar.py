@@ -54,7 +54,8 @@ def tips() -> dict:
     """Tooltips, translated when they're asked for (the language can change)."""
     from soundboard.i18n import _
     return {LAST: _("Play the last sound again"), PAUSE: _("Pause"),
-            STOP: _("Stop all sounds"), RANDOM: _("Play a random sound")}
+            STOP: _("Stops every sound, the radio and every program, and turns the voices off"),
+            RANDOM: _("Play a random sound")}
 
 
 def live_tip(on: bool) -> str:
