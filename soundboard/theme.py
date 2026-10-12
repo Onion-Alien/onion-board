@@ -575,7 +575,7 @@ def font_families() -> list[str]:
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
 live_override = ""   # the user's own highlight colour ("" = each theme's own)
-textures_on = True   # Settings > Appearance: Textured (each theme's pattern) or Plain
+textures_on = False  # Settings > Appearance: Textured (each theme's pattern) or Plain
 
 
 def valid_colour(colour: str) -> str:
