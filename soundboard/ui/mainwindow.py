@@ -5623,8 +5623,9 @@ class MainWindow(QMainWindow):
         self.stop_all()
         # only an icon on the rail: a tick for a moment says it worked
         icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
-        QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
-                                                       size=sidebar.ICON))
+        QTimer.singleShot(1200, self.stop_btn,   # (the button: never after it's gone)
+                          lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
+                                                 size=sidebar.ICON))
         card = self.rail.output.stop if self.rail.output else None
         if card is not None:   # the open card's Stop all: the same tick
             icons.set_icon(card, "check", "live_text", gap=False)
