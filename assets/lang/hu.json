@@ -3290,6 +3290,12 @@
   "Live: click to mute": "Élő: kattints a némításhoz",
   "Muted: click to go live": "Némítva: kattints, hogy újra élő legyél",
   "Pause or resume": "Szünet vagy folytatás",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ha le van némítva, kapcsold vissza. Ha nem, kattints a <b>Javítás</b> gombra, majd az <b>Igen</b> gombra, amikor a Windows kérdez.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ha le van némítva, kapcsold vissza. Ha nem, kattints a <b>Javítás</b> gombra: a hang pár másodpercre kimarad.",
+  "No sound": "Nincs hang",
+  "Your mic sends no sound": "A mikrofonod nem küld hangot",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "A mikrofonod a Windows hangjának újraindítása után sem küld hangot. Ha a headseted mikrofonja le van némítva, kapcsold vissza. Ha nem, indítsd újra a géped, aztán próbáld újra.",
+  "Your mic sends no sound: see the Setup tab.": "A mikrofonod nem küld hangot: nézd meg a Beállítás fület.",
   "Before update": "Frissítés előtt",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor és az app minden frissítésekor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak."
 }

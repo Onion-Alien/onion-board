@@ -3217,6 +3217,12 @@
   "Live: click to mute": "直播中：點一下即可靜音",
   "Muted: click to go live": "已靜音：點一下即可恢復直播",
   "Pause or resume": "暫停或繼續",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord 和遊戲聽不到你麥克風的任何聲音。如果麥克風靜音了，請取消靜音。如果沒有，按 <b>修復</b>，然後在 Windows 詢問時按 <b>是</b>。",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord 和遊戲聽不到你麥克風的任何聲音。如果麥克風靜音了，請取消靜音。如果沒有，按 <b>修復</b>：聲音會中斷幾秒。",
+  "No sound": "沒有聲音",
+  "Your mic sends no sound": "你的麥克風沒有聲音",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "即使重新啟動了 Windows 的音訊，你的麥克風仍然沒有聲音。如果耳機麥克風靜音了，請取消靜音。如果沒有，請重新啟動電腦，然後再試一次。",
+  "Your mic sends no sound: see the Setup tab.": "你的麥克風沒有聲音：請查看設定分頁。",
   "Before update": "更新之前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西或更新應用程式時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。"
 }

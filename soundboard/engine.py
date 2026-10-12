@@ -1321,6 +1321,12 @@ class Engine:
         s = self.direct_stream()
         return s.apps() if s is not None else 0
 
+    def direct_mic_silent_s(self) -> float:
+        """How long the mic has sent nothing but exact zeros into the mic effect (see
+        DirectMicStream.mic_silent_s); 0 when it hasn't, or nothing to tell."""
+        s = self.direct_stream()
+        return s.mic_silent_s() if s is not None else 0.0
+
     def direct_stream(self):
         s = self.main_stream
         return s if self.main_direct and isinstance(s, directmic.DirectMicStream) else None

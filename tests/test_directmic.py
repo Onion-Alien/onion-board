@@ -476,12 +476,29 @@ def test_a_mic_still_waking_up_is_listened_to_again(fake_reg, monkeypatch, tmp_p
     assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID), ("listen", GUID)]
 
 
-def test_a_mic_that_stays_silent_gets_only_one_more_restart(fake_reg, monkeypatch, tmp_path,
-                                                            caplog):
-    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, True, True])
-    assert dm.admin_install(GUID) == 0
-    assert [c for c in calls if c[0] is False] == [(False, ()), (False, ())]
+def test_a_mic_that_stays_silent_is_tried_a_few_times_then_reported(
+        fake_reg, monkeypatch, tmp_path, caplog):
+    """Still exact zeros after the extra restart: the audio restarts again, up to
+    EXTRA_RESTARTS times, then the admin step says so (MIC_SILENT): the app must never
+    call a set-up done while the mic sends nothing."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True] * 40)
+    assert dm.admin_install(GUID) == dm.MIC_SILENT
+    stops = [c for c in calls if c[0] is False]
+    assert len(stops) == 1 + dm.EXTRA_RESTARTS
     assert "still sends only silence" in caplog.text
+
+
+def test_a_mic_back_on_a_later_restart_stops_the_restarts(fake_reg, monkeypatch, tmp_path):
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, True, True, True, False])
+    assert dm.admin_install(GUID) == 0
+    assert len([c for c in calls if c[0] is False]) == 3   # the set-up's and two more
+
+
+def test_a_silent_mic_never_hides_a_failed_step(fake_reg, monkeypatch, tmp_path):
+    """The step's own failure is what it reports, silent mic or not."""
+    _restart_kit(fake_reg, monkeypatch, tmp_path, [True] * 40)
+    monkeypatch.setattr(dm, "_put_on", lambda *a: 1)
+    assert dm.admin_install(GUID) == 1
 
 
 @pytest.mark.parametrize("heard", [False, None])
@@ -745,6 +762,41 @@ def test_stream_runs_on_the_clean_mic(ring_file):
         s.pump()
         assert sum(made) == 480 + 108   # (the fraction carries over)
         assert s._ring.write_pos == sum(made)
+    finally:
+        w.close()
+        s.close()
+
+
+def test_stream_knows_how_long_the_mic_sent_only_silence(ring_file, monkeypatch):
+    """A mic stuck sending exact zeros (after an audio restart Windows thinks went fine)
+    is seen for free in the clean mic the effect already hands over: how long it's been
+    nothing but zeros, back to 0 at the first real sample or when it stops coming."""
+    clock = [100.0]
+    monkeypatch.setattr(dm.time, "perf_counter", lambda: clock[0])
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
+    w = dm.RingWriter(ring_file)
+    try:
+        s.active = True
+        zeros = np.zeros((480, 2), np.float32)
+        assert s.mic_silent_s() == 0.0   # no clean mic at all: can't tell
+        _publish(w, zeros)
+        s.pump()          # (finds where the mic is)
+        _publish(w, zeros)
+        s.pump()
+        clock[0] += 25.0
+        _publish(w, zeros)
+        s.pump()
+        assert s.mic_silent_s() == pytest.approx(25.0)
+        _publish(w, np.full((480, 2), 1e-6, np.float32))   # the faintest real sound
+        s.pump()
+        assert s.mic_silent_s() == 0.0
+        _publish(w, zeros)
+        s.pump()
+        clock[0] += 5.0
+        assert s.mic_silent_s() == pytest.approx(5.0)
+        w.h[0]["mic_tick"] = dm._tick() - 10 * dm.MIC_LIVE_MS   # nobody records it now
+        s.pump()
+        assert s.mic_silent_s() == 0.0
     finally:
         w.close()
         s.close()
@@ -2255,6 +2307,16 @@ def test_install_says_what_happened_to_the_prompt(monkeypatch):
     assert cableremove.remove() == dm.unfinished()
 
 
+def test_a_silent_mic_is_never_called_done(monkeypatch):
+    """The admin step put the effect on, but the mic still sends only silence after
+    every restart: install / uninstall say what to do, so Bun never cheers over it."""
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: dm.MIC_SILENT)
+    assert dm.install_on(GUID) == dm.mic_silent()
+    assert dm.uninstall() == dm.mic_silent()
+    assert "restart your PC" in dm.mic_silent()
+
+
 def test_a_slow_status_check_never_holds_up_the_window(monkeypatch):
     """A 1.9.7 freeze: the window asks for the status every second, and re-checking it
     stat()ed the ring file on the UI thread (6 s on a busy disk). After the first
@@ -2378,6 +2440,29 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     w._update_flow()
     assert not busy.is_busy(w.btn_install) and w._attach_release is None
     assert not w.setup_show.on   # (off screen here, so no ending to watch)
+
+
+def test_a_mic_left_silent_by_the_set_up_never_cheers(window, monkeypatch):  # noqa: F811
+    """The effect went on, but the mic still sends only silence after every audio
+    restart: Bun's show ends badly, no "Done" toast, and a box says what to do."""
+    from soundboard.ui import mainwindow as mw
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    monkeypatch.setattr(type(w.setup_show), "isVisible", lambda self: True)   # watched
+    monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
+    told, said = [], []
+    monkeypatch.setattr(w, "tell", lambda *a, **k: told.append(a))
+    monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
+    w.attach_mic()
+    assert w.setup_show.on
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")   # (it is on the mic)
+    w._mic_attached("My mic", dm.mic_silent())
+    w._update_flow()
+    assert w.setup_show._result is False
+    assert told and told[0][0] == "Your mic sends no sound" and "restart your PC" in told[0][1]
+    assert not [k for _t, k in said if k == "ok"]
 
 
 def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
@@ -2841,6 +2926,38 @@ def test_windows_taking_it_off_is_fixed_by_itself(window, monkeypatch):  # noqa:
     w._update_flow()
     assert ("Done: your sounds are back in your mic.", "ok") in said
     assert "Your sounds go into your mic" in w.mic_line.text()
+
+
+def test_a_mic_sending_only_silence_offers_the_repair(window, monkeypatch):  # noqa: F811
+    """Set up and working, but the mic itself has sent nothing but exact zeros for a
+    while (Discord and Windows' own mic test hear nothing): the card says so with its
+    Repair (which restarts the audio and listens again), once a toast too. Gone at the
+    first real sound: a headset's own mute does the same, and talking ends it."""
+    w = window
+    _routes(w, monkeypatch, "ready")
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    silent = [w.MIC_SILENT_S - 1]
+    monkeypatch.setattr(type(w.engine), "direct_mic_silent_s", lambda self: silent[0])
+    said = _said(w, monkeypatch)
+    w._update_flow()
+    assert w.mic_line.text() == "Your sounds go into your mic"
+    silent[0] = w.MIC_SILENT_S + 1
+    assert w._direct_health() != w._direct_shown   # the once-a-second check redraws it
+    w._update_flow()
+    assert w.mic_line.text() == "Your mic sends no sound"
+    assert "Repair" in w.btn_install.text() and not w.btn_install.isHidden()
+    assert "mute" in w.mic_reason.text()
+    assert [t for t, k in said if "no sound" in t]
+    w._update_flow()
+    silent[0] = 0.0
+    w._update_flow()
+    assert w.mic_line.text() == "Your sounds go into your mic"
+    silent[0] = w.MIC_SILENT_S + 1
+    w._update_flow()
+    assert len([t for t, k in said if "no sound" in t]) == 1   # the toast: once a run
 
 
 def test_the_fix_never_asks_windows_by_itself(monkeypatch):
