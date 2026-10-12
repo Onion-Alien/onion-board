@@ -380,7 +380,6 @@
   "Stop hearing it": "Перестать слушать",
   "Stop showing this for {exe}": "Больше не показывать для {exe}",
   "Stop this sound": "Остановить этот звук",
-  "Stops every sound, the radio and every program": "Останавливает все звуки, радио и все программы",
   "Switched to “{shown}” ({exe} is in front)": "Переключено на «{shown}» ({exe} на переднем плане)",
   "Tap to open, tap again to close": "Нажми — открыть, ещё раз — закрыть",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Режим кассеты: скорость меняет и тон (nightcore / slowed)",
@@ -1203,7 +1202,6 @@
   "Stop switching to “{category}” when {program} is in front": "Не переключаться на «{category}», когда {program} на переднем плане",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "При остановке звук затухает за это время, а не обрывается; звук без повтора тоже затухает в последние секунды. «Остановить всё» по-прежнему обрывает сразу.",
   "Stops every sound": "Останавливает все звуки",
-  "Stops every sound, the radio and every program.": "Останавливает все звуки, радио и все программы.",
   "Streamer guide": "Гайд для стримеров",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Стримишь или используешь несколько приложений? Каждое устройство здесь тоже получает копию того, что слышат другие: Voicemeeter, устройство, которое захватывает OBS, второй кабель, колонки...",
   "Stuck, or want something fancier (a key per category, a random sound for every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it into ChatGPT or Claude: it knows how Onion Board's links work and which sounds you have, and walks you through it.": "Застрял или хочешь что-то навороченнее (клавиша на категорию, случайный звук на каждого нового фолловера, AutoHotkey)? Нажми <b>Копировать запрос для ИИ</b> и вставь в ChatGPT или Claude: он знает, как работают ссылки Onion Board и какие у тебя звуки, и проведёт тебя по шагам.",
@@ -3363,5 +3361,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Микрофон не передаёт звук даже после перезапуска звука Windows. Если микрофон на гарнитуре выключен, включи его. Если нет, перезагрузи ПК и попробуй ещё раз.",
   "Your mic sends no sound: see the Setup tab.": "Микрофон не передаёт звук: загляни на вкладку «Настройка».",
   "Before update": "До обновления",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе и каждом обновлении приложения (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе и каждом обновлении приложения (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Останавливает все звуки, радио и все программы и выключает голоса",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Останавливает все звуки, радио и все программы и выключает голоса."
 }

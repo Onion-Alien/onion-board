@@ -405,7 +405,6 @@
   "Stop hearing it": "Thôi nghe",
   "Stop showing this for {exe}": "Thôi hiện cái này cho {exe}",
   "Stop this sound": "Dừng âm thanh này",
-  "Stops every sound, the radio and every program": "Dừng mọi âm thanh, radio và mọi chương trình",
   "Switched to “{shown}” ({exe} is in front)": "Đã chuyển sang “{shown}” ({exe} đang ở phía trước)",
   "Tap to open, tap again to close": "Chạm để mở, chạm lần nữa để đóng",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Chế độ băng: tốc độ cũng đổi cao độ (nightcore / slowed)",
@@ -1237,7 +1236,6 @@
   "Stop switching to “{category}” when {program} is in front": "Dừng chuyển sang “{category}” khi có {program} ở phía trước",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Việc dừng nó sẽ làm nó mờ đi trong thời gian dài thay vì cắt nó; âm thanh không lặp lại cũng mờ dần trong những giây cuối cùng. Dừng lại mọi thứ vẫn cắt ngay lập tức.",
   "Stops every sound": "Dừng mọi âm thanh",
-  "Stops every sound, the radio and every program.": "Dừng mọi âm thanh, đài và mọi chương trình.",
   "Streamer guide": "Hướng dẫn truyền phát",
   "Streamer guide: play sounds from your Stream Deck and chat": "Hướng dẫn dành cho người phát trực tiếp: phát âm thanh từ Stream Deck của bạn và trò chuyện",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Truyền trực tuyến hoặc sử dụng nhiều ứng dụng? Mỗi thiết bị ở đây cũng nhận được một bản sao của những gì người khác nghe được: Máy đo giọng nói, thiết bị ghi OBS, cáp thứ hai, loa...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mic của bạn không gửi âm thanh, kể cả sau khi khởi động lại âm thanh của Windows. Nếu mic trên tai nghe đang tắt tiếng, hãy bật lại. Nếu không, khởi động lại PC rồi thử lại.",
   "Your mic sends no sound: see the Setup tab.": "Mic của bạn không gửi âm thanh: xem tab Thiết lập.",
   "Before update": "Trước khi cập nhật",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó hoặc cập nhật ứng dụng ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó hoặc cập nhật ứng dụng ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Dừng mọi âm thanh, radio và mọi chương trình, rồi tắt các giọng",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Dừng mọi âm thanh, radio và mọi chương trình, rồi tắt các giọng."
 }

@@ -435,7 +435,6 @@
   "Stop hearing it": "توقف عن سماعه",
   "Stop showing this for {exe}": "توقف عن إظهار هذه لـ {exe}",
   "Stop this sound": "أوقف هذا الصوت",
-  "Stops every sound, the radio and every program": "يوقف كل صوت والراديو وكل برنامج",
   "Switched to “{shown}” ({exe} is in front)": "انتقل إلى “{shown}” ({exe} في المقدمة)",
   "Tap to open, tap again to close": "انقر للفتح، وانقر مجددًا للإغلاق",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "وضع الشريط: السرعة تغيّر الحدّة أيضًا (nightcore / slowed)",
@@ -1352,7 +1351,6 @@
   "Stop switching to “{category}” when {program} is in front": "توقف عن التبديل إلى \"{category}\" عندما يكون {program} في المقدمة",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "يؤدي إيقافه إلى تلاشيه طوال هذه المدة بدلاً من قطعه؛ الصوت الذي لا يتكرر يتلاشى أيضًا خلال الثواني الأخيرة. وقف كل شيء لا يزال يقطع على الفور.",
   "Stops every sound": "يوقف كل صوت",
-  "Stops every sound, the radio and every program.": "يوقف كل صوت والراديو وكل برنامج.",
   "Streamer guide": "دليل البث",
   "Streamer guide: play sounds from your Stream Deck and chat": "دليل Streamer - قم بتشغيل الأصوات من Stream Deck الخاص بك وقم بالدردشة",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "البث أم استخدام أكثر من تطبيق؟ يحصل كل جهاز هنا على نسخة مما يسمعه الآخرون أيضًا: جهاز قياس الصوت، وجهاز يلتقطه OBS، وكابل ثانٍ، ومكبرات صوت...",
@@ -3582,5 +3580,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "الميكروفون لا يرسل أي صوت، حتى بعد إعادة تشغيل صوت Windows. إذا كان ميكروفون السماعة مكتومًا، فألغِ الكتم. وإلا، أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى.",
   "Your mic sends no sound: see the Setup tab.": "الميكروفون لا يرسل أي صوت: راجع علامة تبويب الإعداد.",
   "Before update": "قبل التحديث",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما أو تحديث التطبيق (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما أو تحديث التطبيق (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين.",
+  "Stops every sound, the radio and every program, and turns the voices off": "يوقف كل صوت والراديو وكل برنامج، ويطفئ الأصوات",
+  "Stops every sound, the radio and every program, and turns the voices off.": "يوقف كل صوت والراديو وكل برنامج، ويطفئ الأصوات."
 }

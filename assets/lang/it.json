@@ -411,7 +411,6 @@
   "Stop hearing it": "Smetti di sentirlo",
   "Stop showing this for {exe}": "Non mostrarlo più per {exe}",
   "Stop this sound": "Ferma questo suono",
-  "Stops every sound, the radio and every program": "Ferma ogni suono, la radio e ogni programma",
   "Switched to “{shown}” ({exe} is in front)": "Passato a “{shown}” ({exe} è in primo piano)",
   "Tap to open, tap again to close": "Tocca per aprire, tocca di nuovo per chiudere",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Modalità nastro: la velocità cambia anche il tono (nightcore / slowed)",
@@ -1260,7 +1259,6 @@
   "Stop switching to “{category}” when {program} is in front": "Smetti di passare a \"{category}\" quando {program} è in primo piano",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Fermarlo lo sbiadisce per così tanto tempo invece di tagliarlo; anche un suono che non viene ripetuto svanisce negli ultimi secondi. Smetti di tagliare tutto ancora subito.",
   "Stops every sound": "Interrompe ogni suono",
-  "Stops every sound, the radio and every program.": "Blocca ogni suono, la radio e ogni programma.",
   "Streamer guide": "Guida agli streamer",
   "Streamer guide: play sounds from your Stream Deck and chat": "Guida per lo streamer: riproduci i suoni dal tuo Stream Deck e chatta",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streaming o utilizzo di più di un'app? Ogni dispositivo qui riceve una copia di ciò che sentono anche gli altri: Voicemeeter, un dispositivo che cattura OBS, un secondo cavo, altoparlanti...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Il tuo microfono non invia nessun suono, anche dopo il riavvio dell'audio di Windows. Se il microfono delle cuffie è disattivato, riattivalo. Altrimenti riavvia il PC e riprova.",
   "Your mic sends no sound: see the Setup tab.": "Il tuo microfono non invia nessun suono: guarda la scheda Configurazione.",
   "Before update": "Prima dell'aggiornamento",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ne viene salvato uno ogni volta che reimposti qualcosa o aggiorni l'app (vengono mantenuti gli ultimi {max_points}). Il ripristino ripristina le impostazioni, i tasti di scelta rapida e i suoni com'erano. I suoni che hai aggiunto da allora vengono mantenuti."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ne viene salvato uno ogni volta che reimposti qualcosa o aggiorni l'app (vengono mantenuti gli ultimi {max_points}). Il ripristino ripristina le impostazioni, i tasti di scelta rapida e i suoni com'erano. I suoni che hai aggiunto da allora vengono mantenuti.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Ferma ogni suono, la radio e ogni programma, e spegne le voci",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Ferma ogni suono, la radio e ogni programma, e spegne le voci."
 }

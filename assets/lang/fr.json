@@ -411,7 +411,6 @@
   "Stop hearing it": "Arrêter de l'entendre",
   "Stop showing this for {exe}": "Ne plus afficher ça pour {exe}",
   "Stop this sound": "Arrêter ce son",
-  "Stops every sound, the radio and every program": "Arrête chaque son, la radio et chaque programme",
   "Switched to “{shown}” ({exe} is in front)": "Passé sur « {shown} » ({exe} est au premier plan)",
   "Tap to open, tap again to close": "Appuie pour ouvrir, appuie à nouveau pour fermer",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Mode cassette : la vitesse change aussi la hauteur (nightcore / slowed)",
@@ -1258,7 +1257,6 @@
   "Stop switching to “{category}” when {program} is in front": "Ne plus passer sur « {category} » quand {program} est au premier plan",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "L'arrêter le fait disparaître en fondu pendant cette durée au lieu de le couper ; un son qui ne boucle pas fait aussi un fondu sur ses dernières secondes. Tout arrêter coupe toujours net.",
   "Stops every sound": "Arrête tous les sons",
-  "Stops every sound, the radio and every program.": "Arrête chaque son, la radio et chaque programme.",
   "Streamer guide": "Guide streamer",
   "Streamer guide: play sounds from your Stream Deck and chat": "Guide streamer: joue des sons depuis ton Stream Deck et le chat",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Tu streames, ou tu utilises plus d'une appli ? Chaque périphérique ici reçoit aussi une copie de ce que les autres entendent : Voicemeeter, un périphérique qu'OBS capture, un second câble, des haut-parleurs...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Ton micro n'envoie aucun son, même après le redémarrage du son de Windows. Si le micro de ton casque est coupé, réactive-le. Sinon, redémarre ton PC, puis réessaie.",
   "Your mic sends no sound: see the Setup tab.": "Ton micro n'envoie aucun son : regarde l'onglet Configuration.",
   "Before update": "Avant la mise à jour",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Un est enregistré chaque fois que tu réinitialises quelque chose ou mets l'app à jour (les {max_points} derniers sont gardés). Restaurer remet tes paramètres, raccourcis et sons comme ils étaient. Les sons ajoutés depuis sont gardés."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Un est enregistré chaque fois que tu réinitialises quelque chose ou mets l'app à jour (les {max_points} derniers sont gardés). Restaurer remet tes paramètres, raccourcis et sons comme ils étaient. Les sons ajoutés depuis sont gardés.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Arrête chaque son, la radio et chaque programme, et coupe les voix",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Arrête chaque son, la radio et chaque programme, et coupe les voix."
 }

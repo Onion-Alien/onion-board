@@ -417,7 +417,6 @@
   "Stop hearing it": "Przestań słuchać",
   "Stop showing this for {exe}": "Przestań to pokazywać dla {exe}",
   "Stop this sound": "Zatrzymaj ten dźwięk",
-  "Stops every sound, the radio and every program": "Zatrzymuje wszystkie dźwięki, radio i każdy program",
   "Switched to “{shown}” ({exe} is in front)": "Przełączono na „{shown}” ({exe} jest na wierzchu)",
   "Tap to open, tap again to close": "Stuknij, by otworzyć, stuknij ponownie, by zamknąć",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Tryb taśmy: prędkość zmienia też wysokość (nightcore / slowed)",
@@ -1283,7 +1282,6 @@
   "Stop switching to “{category}” when {program} is in front": "Przestań przełączać się do „{category}”, gdy {program} jest na czele",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Zatrzymanie go zanika na tak długi czas, zamiast go wycinać; dźwięk, który nie jest zapętlony, również zanika w ostatnich sekundach. Zatrzymaj wszystko, co nadal tnie od razu.",
   "Stops every sound": "Zatrzymuje każdy dźwięk",
-  "Stops every sound, the radio and every program.": "Zatrzymuje każdy dźwięk, radio i każdy program.",
   "Streamer guide": "Przewodnik po streamerze",
   "Streamer guide: play sounds from your Stream Deck and chat": "Przewodnik po streamerze: odtwarzaj dźwięki ze swojej talii strumieniowej i rozmawiaj",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Przesyłasz strumieniowo lub korzystasz z więcej niż jednej aplikacji? Każde urządzenie tutaj otrzymuje kopię tego, co słyszą inni: Voicemeeter, urządzenie przechwytywane przez OBS, drugi kabel, głośniki…",
@@ -3363,5 +3361,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Twój mikrofon nie wysyła dźwięku nawet po ponownym uruchomieniu dźwięku Windows. Jeśli mikrofon w słuchawkach jest wyciszony, wyłącz wyciszenie. Jeśli nie, uruchom ponownie komputer i spróbuj jeszcze raz.",
   "Your mic sends no sound: see the Setup tab.": "Twój mikrofon nie wysyła dźwięku: zajrzyj na kartę Ustawienia.",
   "Before update": "Przed aktualizacją",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Jeden jest zapisywany za każdym razem, gdy coś resetujesz lub aktualizujesz aplikację (ostatnie {max_points} zostają zachowane). Przywracanie przywraca ustawienia, klawisze skrótów i dźwięki do stanu poprzedniego. Dźwięki dodane od tego czasu zostaną zachowane."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Jeden jest zapisywany za każdym razem, gdy coś resetujesz lub aktualizujesz aplikację (ostatnie {max_points} zostają zachowane). Przywracanie przywraca ustawienia, klawisze skrótów i dźwięki do stanu poprzedniego. Dźwięki dodane od tego czasu zostaną zachowane.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Zatrzymuje wszystkie dźwięki, radio i każdy program oraz wyłącza głosy",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Zatrzymuje wszystkie dźwięki, radio i każdy program oraz wyłącza głosy."
 }

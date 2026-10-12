@@ -1106,8 +1106,6 @@
   "Stop this sound": "Itigil ang sound na ito",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Kapag itinigil, unti-unti itong hihina sa loob ng ganitong tagal imbes na biglang putulin; humihina rin ang sound na hindi naka-loop sa huling mga segundo nito. Biglang pinuputol pa rin ng Itigil lahat.",
   "Stops every sound": "Itinitigil ang bawat sound",
-  "Stops every sound, the radio and every program": "Itinitigil ang bawat sound, ang radio at bawat program",
-  "Stops every sound, the radio and every program.": "Itinitigil ang bawat sound, ang radio at bawat program.",
   "Streamer guide": "Streamer guide",
   "Streamer guide: play sounds from your Stream Deck and chat": "Streamer guide: mag-play ng mga sound mula sa Stream Deck at chat mo",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Nag-i-stream, o gumagamit ng higit sa isang app? Bawat device dito ay nakakakuha rin ng kopya ng naririnig ng iba: Voicemeeter, device na kinukuha ng OBS, pangalawang cable, speakers...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Walang tunog na pinapadala ang mic mo, kahit na-restart na ang audio ng Windows. Kung naka-mute ang mic ng headset mo, i-unmute ito. Kung hindi, i-restart ang PC mo, tapos subukan ulit.",
   "Your mic sends no sound: see the Setup tab.": "Walang tunog na pinapadala ang mic mo: tingnan ang Setup tab.",
   "Before update": "Bago mag-update",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka o ina-update mo ang app (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka o ina-update mo ang app (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses."
 }

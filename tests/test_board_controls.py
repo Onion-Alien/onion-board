@@ -356,6 +356,15 @@ def test_the_mini_players_stop_all_says_all(window):
     assert window.mini_stop.text() == "All" and window.mini_st.text() == ""
 
 
+def test_stop_all_turns_the_voice_changer_off_but_the_say_bars_stop_doesnt(window):
+    w = window
+    w.voice.fx.btn_power.setChecked(True)
+    w.voice.speech.say_stop.click()   # the Say bar's Stop: only the typed line
+    assert w.voice.fx.btn_power.isChecked()
+    w.stop_btn.click()                # the side rail's Stop all: the voices go off too
+    assert not w.voice.fx.btn_power.isChecked()
+
+
 def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, calls):
     w = window
     playing(monkeypatch, w, ["s0"])

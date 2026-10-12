@@ -411,7 +411,6 @@
   "Stop hearing it": "Dinlemeyi bırak",
   "Stop showing this for {exe}": "{exe} için bunu artık gösterme",
   "Stop this sound": "Bu sesi durdur",
-  "Stops every sound, the radio and every program": "Her sesi, radyoyu ve her programı durdurur",
   "Switched to “{shown}” ({exe} is in front)": "“{shown}” kategorisine geçildi ({exe} önde)",
   "Tap to open, tap again to close": "Açmak için dokun, kapatmak için tekrar dokun",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Kaset modu: hız perdeyi de değiştirir (nightcore / yavaşlatılmış)",
@@ -1260,7 +1259,6 @@
   "Stop switching to “{category}” when {program} is in front": "{program} öndeyken \"{category}\"a geçişi durdurun",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Durdurmak, onu kesmek yerine bu kadar sürede yok eder; Döngülenmeyen bir ses de son saniyelerde kaybolur. Her şeyi durdurun, hala hemen kesiyor.",
   "Stops every sound": "Her sesi durdurur",
-  "Stops every sound, the radio and every program.": "Her sesi, radyoyu ve her programı durdurur.",
   "Streamer guide": "Yayıncı kılavuzu",
   "Streamer guide: play sounds from your Stream Deck and chat": "Yayıncı kılavuzu: Yayın Destenizden sesler çalın ve sohbet edin",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Yayın mı yapıyorsunuz yoksa birden fazla uygulama mı kullanıyorsunuz? Buradaki her cihaz, başkalarının da duyduğu şeylerin bir kopyasını alır: Voicemeeter, OBS'nin yakaladığı bir cihaz, ikinci bir kablo, hoparlörler...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows sesi yeniden başlatıldıktan sonra bile mikrofonun ses göndermiyor. Kulaklığının mikrofonu sessizdeyse aç. Değilse bilgisayarını yeniden başlat, sonra tekrar dene.",
   "Your mic sends no sound: see the Setup tab.": "Mikrofonun ses göndermiyor: Kurulum sekmesine bak.",
   "Before update": "Güncellemeden önce",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda veya uygulamayı her güncellediğinizde bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda veya uygulamayı her güncellediğinizde bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Her sesi, radyoyu ve her programı durdurur ve sesleri kapatır",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Her sesi, radyoyu ve her programı durdurur ve sesleri kapatır."
 }

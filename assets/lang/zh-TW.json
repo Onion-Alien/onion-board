@@ -405,7 +405,6 @@
   "Stop hearing it": "停止收聽",
   "Stop showing this for {exe}": "不再為 {exe} 顯示這個",
   "Stop this sound": "停止這個音效",
-  "Stops every sound, the radio and every program": "停止所有音效、電台和所有程式",
   "Switched to “{shown}” ({exe} is in front)": "已切換到「{shown}」（{exe} 在最前面）",
   "Tap to open, tap again to close": "點一下開啟，再點一下關閉",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "錄音帶模式：速度也會改變音高（nightcore／降速）",
@@ -1235,7 +1234,6 @@
   "Stop switching to “{category}” when {program} is in front": "{program} 在最前面時不再切換到「{category}」",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "停止時會在這段時間內淡出，而不是直接切斷；沒有重複播放的音效也會在最後幾秒淡出。「停止所有東西」仍然會立即切斷。",
   "Stops every sound": "停止所有音效",
-  "Stops every sound, the radio and every program.": "停止所有音效、電台和每個程式。",
   "Streamer guide": "實況主教學",
   "Streamer guide: play sounds from your Stream Deck and chat": "實況主教學：從 Stream Deck 和聊天室播放音效",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "在直播，或使用不只一個程式？這裡的每個裝置也會收到一份別人聽到的聲音：Voicemeeter、OBS 擷取的裝置、第二條音源線、喇叭...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "即使重新啟動了 Windows 的音訊，你的麥克風仍然沒有聲音。如果耳機麥克風靜音了，請取消靜音。如果沒有，請重新啟動電腦，然後再試一次。",
   "Your mic sends no sound: see the Setup tab.": "你的麥克風沒有聲音：請查看設定分頁。",
   "Before update": "更新之前",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西或更新應用程式時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。"
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西或更新應用程式時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。",
+  "Stops every sound, the radio and every program, and turns the voices off": "停止所有音效、電台和所有程式，並關閉變聲",
+  "Stops every sound, the radio and every program, and turns the voices off.": "停止所有音效、電台和所有程式，並關閉變聲。"
 }

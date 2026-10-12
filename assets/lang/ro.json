@@ -1122,8 +1122,6 @@
   "Stop this sound": "Oprește sunetul ăsta",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Oprirea îl estompează în timpul ăsta în loc să-l taie; un sunet care nu se repetă se estompează și în ultimele secunde. Oprește tot îl taie în continuare imediat.",
   "Stops every sound": "Oprește toate sunetele",
-  "Stops every sound, the radio and every program": "Oprește toate sunetele, radioul și toate programele",
-  "Stops every sound, the radio and every program.": "Oprește toate sunetele, radioul și toate programele.",
   "Streamer guide": "Ghid pentru streameri",
   "Streamer guide: play sounds from your Stream Deck and chat": "Ghid pentru streameri: redă sunete de pe Stream Deck și din chat",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Faci stream sau folosești mai multe aplicații? Fiecare dispozitiv de aici primește și el o copie a ce aud ceilalți: Voicemeeter, un dispozitiv pe care îl captează OBS, un al doilea cablu, difuzoare...",
@@ -3363,5 +3361,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet, nici după repornirea sunetului din Windows. Dacă microfonul căștilor e pe mut, scoate-l de pe mut. Dacă nu, repornește PC-ul, apoi încearcă din nou.",
   "Your mic sends no sound: see the Setup tab.": "Microfonul tău nu trimite niciun sunet: vezi fila Configurare.",
   "Before update": "Înainte de actualizare",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva sau actualizezi aplicația (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva sau actualizezi aplicația (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Oprește toate sunetele, radioul și toate programele și oprește vocile",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Oprește toate sunetele, radioul și toate programele și oprește vocile."
 }

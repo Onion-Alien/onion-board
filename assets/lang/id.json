@@ -405,7 +405,6 @@
   "Stop hearing it": "Berhenti mendengar",
   "Stop showing this for {exe}": "Berhenti menampilkan ini untuk {exe}",
   "Stop this sound": "Hentikan suara ini",
-  "Stops every sound, the radio and every program": "Menghentikan semua suara, radio, dan semua program",
   "Switched to “{shown}” ({exe} is in front)": "Pindah ke “{shown}” ({exe} di depan)",
   "Tap to open, tap again to close": "Tekan untuk buka, tekan lagi untuk tutup",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Mode kaset: kecepatan juga mengubah nada (nightcore / slowed)",
@@ -1235,7 +1234,6 @@
   "Stop switching to “{category}” when {program} is in front": "Berhenti beralih ke “{category}” ketika {program} ada di depan",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Menghentikannya akan memudarkannya selama ini alih-alih memotongnya; suara yang tidak berulang juga memudar pada detik-detik terakhirnya. Hentikan semuanya masih langsung terpotong.",
   "Stops every sound": "Menghentikan setiap suara",
-  "Stops every sound, the radio and every program.": "Menghentikan setiap suara, radio, dan setiap program.",
   "Streamer guide": "Panduan streamer",
   "Streamer guide: play sounds from your Stream Deck and chat": "Panduan streamer: memutar suara dari Stream Deck dan mengobrol",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streaming, atau menggunakan lebih dari satu aplikasi? Setiap perangkat di sini mendapat salinan dari apa yang didengar orang lain juga: Voicemeeter, perangkat yang ditangkap OBS, kabel kedua, speaker...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mic-mu tidak mengirim suara, bahkan setelah audio Windows dimulai ulang. Kalau mic headset-mu di-mute, nyalakan lagi. Kalau tidak, restart PC-mu, lalu coba lagi.",
   "Your mic sends no sound: see the Setup tab.": "Mic-mu tidak mengirim suara: lihat tab Setup.",
   "Before update": "Sebelum pembaruan",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu atau memperbarui aplikasi ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu atau memperbarui aplikasi ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Menghentikan semua suara, radio, dan semua program, lalu mematikan suara-suara pengubah",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Menghentikan semua suara, radio, dan semua program, lalu mematikan suara-suara pengubah."
 }

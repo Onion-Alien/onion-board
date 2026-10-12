@@ -809,7 +809,8 @@ class MainWindow(QMainWindow):
         self.stop_btn.setObjectName("danger")
         self.stop_btn.setProperty("quiet", True)   # red text, no box: Live is the loud one
         sidebar.put(self.stop_btn, _("Stop all"),
-                    tip=_("Stops every sound, the radio and every program"))
+                    tip=_("Stops every sound, the radio and every program, and turns "
+                          "the voices off"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
         icons.set_icon(self.stop_btn, "stop", "danger_text", size=sidebar.ICON, gap=False)
         self.gear = QPushButton(_("Settings"))
@@ -5649,6 +5650,7 @@ class MainWindow(QMainWindow):
         self.radio.stop()
         self.apps.stop_all()
         self.triggers.cancel_pending()
+        self.voice.stop_all()   # the voice changer and the other voices go off too
 
     def load_triggers(self, now: bool = True):
         """Put the Onion Watch add-on into the Triggers tab. It took 0.4-1 s on the UI
