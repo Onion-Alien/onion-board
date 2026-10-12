@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Ha egy másik nyelvet beszél, először beszédfelismerést kell telepíteni (ezen a számítógépen fut; amit mond, soha nem hagyja el).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "A beszédfelismerés leállt: a Python, amellyel be lett állítva, már nincs ezen a gépen. Nyomd meg a Javítás gombot az újbóli beállításhoz.",
   "The download isn't the Python it should be, so it wasn't used.": "A letöltött fájl nem a megfelelő Python, ezért nem lett használva.",
-  "stopped working: needs a repair": "leállt: javítani kell"
+  "stopped working: needs a repair": "leállt: javítani kell",
+  "Set it up": "Beállítás",
+  "One click sets it up.": "Egy kattintással beállítható.",
+  "This won't mute you yet": "Ez még nem némít le",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé! Ez még nem csinál semmit, mert az Onion Board nincs beállítva a mikrofonodban. Még mindig hallanak."
 }

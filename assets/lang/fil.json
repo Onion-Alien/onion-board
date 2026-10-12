@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Ang pagsasalita ng ibang wika ay nangangailangan ng speech recognition na naka-install muna (tumatakbo sa PC na ito; ang sinasabi mo ay hindi kailanman umalis dito).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Huminto ang speech recognition: wala na sa PC na ito ang Python na ginamit sa pag-set up nito. Pindutin ang Ayusin para i-set up ulit.",
   "The download isn't the Python it should be, so it wasn't used.": "Hindi ito ang tamang Python, kaya hindi ginamit.",
-  "stopped working: needs a repair": "huminto: kailangang ayusin"
+  "stopped working: needs a repair": "huminto: kailangang ayusin",
+  "Set it up": "I-set up",
+  "One click sets it up.": "Isang click lang para i-set up.",
+  "This won't mute you yet": "Hindi ka pa nito mamu-mute",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Uy! Wala pang ginagawa ito, kasi hindi pa naka-set up ang Onion Board sa mic mo. Naririnig ka pa rin nila."
 }

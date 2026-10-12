@@ -3586,5 +3586,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "يحتاج التحدث بلغة أخرى إلى تثبيت ميزة التعرف على الكلام أولاً (يعمل على هذا الكمبيوتر، وما تقوله لا يتركه أبدًا).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "توقف التعرف على الكلام عن العمل: بايثون الذي ثُبّت به لم يعد على هذا الكمبيوتر. اضغط إصلاح لتثبيته من جديد.",
   "The download isn't the Python it should be, so it wasn't used.": "الملف الذي نُزّل ليس بايثون الصحيح، لذلك لم يُستخدم.",
-  "stopped working: needs a repair": "توقف عن العمل: يحتاج إلى إصلاح"
+  "stopped working: needs a repair": "توقف عن العمل: يحتاج إلى إصلاح",
+  "Set it up": "إعداده",
+  "One click sets it up.": "نقرة واحدة تُعدّه.",
+  "This won't mute you yet": "هذا لن يكتم صوتك بعد",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "مرحبًا! هذا لا يفعل شيئًا بعد، لأن Onion Board غير مُعدّ في الميكروفون. الناس لا يزالون يسمعونك."
 }

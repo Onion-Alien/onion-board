@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "किसी अन्य भाषा को बोलने के लिए पहले वाक् पहचान स्थापित करने की आवश्यकता होती है (यह इस पीसी पर चलता है; आप जो कहते हैं वह इसे कभी नहीं छोड़ता)।",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "वाक् पहचान काम नहीं कर रही: जिस Python से इसे सेट किया गया था, वह अब इस पीसी पर नहीं है। फिर से सेट करने के लिए ठीक करें दबाएँ।",
   "The download isn't the Python it should be, so it wasn't used.": "डाउनलोड सही Python नहीं है, इसलिए उसका इस्तेमाल नहीं किया गया।",
-  "stopped working: needs a repair": "काम नहीं कर रहा: ठीक करना होगा"
+  "stopped working: needs a repair": "काम नहीं कर रहा: ठीक करना होगा",
+  "Set it up": "सेट अप करें",
+  "One click sets it up.": "एक क्लिक में सेट अप हो जाता है।",
+  "This won't mute you yet": "यह अभी तुम्हें म्यूट नहीं करेगा",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "अरे! यह अभी कुछ नहीं करता, क्योंकि Onion Board तुम्हारे माइक में सेट अप नहीं है। लोग अब भी तुम्हें सुन रहे हैं।"
 }

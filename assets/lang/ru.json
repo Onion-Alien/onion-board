@@ -3367,5 +3367,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Чтобы говорить на другом языке, сначала необходимо установить распознавание речи (работает на этом компьютере; то, что вы говорите, никогда не покидает его).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Распознавание речи перестало работать: Python, с которым его настраивали, пропал с этого компьютера. Нажмите «Починить», чтобы настроить его заново.",
   "The download isn't the Python it should be, so it wasn't used.": "Скачанный файл — не тот Python, поэтому он не использован.",
-  "stopped working: needs a repair": "перестало работать: нужна починка"
+  "stopped working: needs a repair": "перестало работать: нужна починка",
+  "Set it up": "Настроить",
+  "One click sets it up.": "Настраивается одним кликом.",
+  "This won't mute you yet": "Это пока тебя не заглушит",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Эй! Это пока ничего не делает, потому что Onion Board ещё не настроен в твоём микрофоне. Тебя всё ещё слышат."
 }

@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Pour parler une autre langue, la reconnaissance vocale doit d'abord être installée (fonctionne sur ce PC ; ce que vous dites ne le quitte jamais).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "La reconnaissance vocale ne fonctionne plus : le Python avec lequel elle a été installée n'est plus sur ce PC. Appuie sur Réparer pour la réinstaller.",
   "The download isn't the Python it should be, so it wasn't used.": "Le téléchargement n'est pas le bon Python, il n'a donc pas été utilisé.",
-  "stopped working: needs a repair": "ne fonctionne plus : à réparer"
+  "stopped working: needs a repair": "ne fonctionne plus : à réparer",
+  "Set it up": "Configurer",
+  "One click sets it up.": "Un clic suffit pour le configurer.",
+  "This won't mute you yet": "Ça ne te coupe pas encore",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé ! Ça ne fait encore rien, parce qu'Onion Board n'est pas configuré dans ton micro. Les autres t'entendent toujours."
 }

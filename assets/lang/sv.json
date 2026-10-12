@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Att tala ett annat språk måste taligenkänning installeras först (körs på den här datorn; det du säger lämnar den aldrig).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Taligenkänningen slutade fungera: den Python den konfigurerades med finns inte längre på den här datorn. Tryck på Reparera för att konfigurera den igen.",
   "The download isn't the Python it should be, so it wasn't used.": "Nedladdningen är inte rätt Python, så den användes inte.",
-  "stopped working: needs a repair": "slutade fungera: behöver repareras"
+  "stopped working: needs a repair": "slutade fungera: behöver repareras",
+  "Set it up": "Ställ in",
+  "One click sets it up.": "Ett klick ställer in det.",
+  "This won't mute you yet": "Det här stänger inte av dig än",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Det här gör inget än, eftersom Onion Board inte är inställt i din mikrofon. Folk hör dig fortfarande."
 }

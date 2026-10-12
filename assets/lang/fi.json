@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Jos puhut toista kieltä, puheentunnistus on asennettava ensin (toimii tässä tietokoneessa; sanomasi ei koskaan jätä sitä pois).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Puheentunnistus lakkasi toimimasta: Python, jolla se asennettiin, on poistunut tältä tietokoneelta. Paina Korjaa asentaaksesi sen uudelleen.",
   "The download isn't the Python it should be, so it wasn't used.": "Lataus ei ole oikea Python, joten sitä ei käytetty.",
-  "stopped working: needs a repair": "lakkasi toimimasta: tarvitsee korjauksen"
+  "stopped working: needs a repair": "lakkasi toimimasta: tarvitsee korjauksen",
+  "Set it up": "Ota käyttöön",
+  "One click sets it up.": "Yksi klikkaus ottaa sen käyttöön.",
+  "This won't mute you yet": "Tämä ei vielä mykistä sinua",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Tämä ei vielä tee mitään, koska Onion Boardia ei ole otettu käyttöön mikrofonissasi. Muut kuulevat sinut yhä."
 }

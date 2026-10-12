@@ -3221,5 +3221,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "다른 언어를 사용하려면 먼저 음성 인식이 설치되어 있어야 합니다(이 PC에서 실행되며 말한 내용이 PC를 떠나지 않습니다).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "음성 인식이 작동하지 않아요: 설정할 때 쓴 Python이 이 PC에서 사라졌어요. 복구를 누르면 다시 설정해요.",
   "The download isn't the Python it should be, so it wasn't used.": "받은 파일이 올바른 Python이 아니어서 쓰지 않았어요.",
-  "stopped working: needs a repair": "작동하지 않음: 복구 필요"
+  "stopped working: needs a repair": "작동하지 않음: 복구 필요",
+  "Set it up": "설정하기",
+  "One click sets it up.": "클릭 한 번이면 설정돼요.",
+  "This won't mute you yet": "아직 음소거되지 않아요",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "저기요! 이건 아직 아무것도 안 해요. Onion Board가 마이크에 설정되지 않았거든요. 다른 사람들에게 아직 들려요."
 }

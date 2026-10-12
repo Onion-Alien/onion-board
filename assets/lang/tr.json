@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Başka bir dil konuşmak için öncelikle konuşma tanımanın kurulması gerekir (bu bilgisayarda çalışır; söyledikleriniz asla oradan ayrılmaz).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Konuşma tanıma çalışmayı bıraktı: Kurulurken kullanılan Python artık bu bilgisayarda yok. Yeniden kurmak için Onar'a bas.",
   "The download isn't the Python it should be, so it wasn't used.": "İndirilen dosya olması gereken Python değil, bu yüzden kullanılmadı.",
-  "stopped working: needs a repair": "çalışmayı bıraktı: onarılması gerekiyor"
+  "stopped working: needs a repair": "çalışmayı bıraktı: onarılması gerekiyor",
+  "Set it up": "Kur",
+  "One click sets it up.": "Tek tıkla kurulur.",
+  "This won't mute you yet": "Bu seni henüz susturmaz",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hey! Bu henüz bir şey yapmıyor, çünkü Onion Board mikrofonunda kurulu değil. İnsanlar seni hâlâ duyuyor."
 }

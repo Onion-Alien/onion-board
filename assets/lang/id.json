@@ -3221,5 +3221,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Berbicara dalam bahasa lain memerlukan pengenalan ucapan yang diinstal terlebih dahulu (berjalan di PC ini; apa yang Anda ucapkan tidak akan pernah hilang).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Pengenalan suara berhenti bekerja: Python yang dipakai saat memasangnya sudah tidak ada di PC ini. Tekan Perbaiki untuk memasangnya lagi.",
   "The download isn't the Python it should be, so it wasn't used.": "Unduhan ini bukan Python yang seharusnya, jadi tidak dipakai.",
-  "stopped working: needs a repair": "berhenti bekerja: perlu diperbaiki"
+  "stopped working: needs a repair": "berhenti bekerja: perlu diperbaiki",
+  "Set it up": "Atur",
+  "One click sets it up.": "Satu klik untuk mengaturnya.",
+  "This won't mute you yet": "Ini belum membisukanmu",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Ini belum berfungsi, karena Onion Board belum diatur di mikmu. Orang masih bisa mendengarmu."
 }

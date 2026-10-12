@@ -3221,5 +3221,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "การพูดภาษาอื่นจำเป็นต้องติดตั้งการรู้จำเสียงก่อน (ทำงานบนพีซีเครื่องนี้ สิ่งที่คุณพูดจะไม่มีวันหายไป)",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "การรู้จำเสียงหยุดทำงาน: Python ที่ใช้ตั้งค่าไม่อยู่ในพีซีเครื่องนี้แล้ว กด ซ่อมแซม เพื่อตั้งค่าใหม่",
   "The download isn't the Python it should be, so it wasn't used.": "ไฟล์ที่ดาวน์โหลดไม่ใช่ Python ที่ถูกต้อง จึงไม่ได้ใช้",
-  "stopped working: needs a repair": "หยุดทำงาน: ต้องซ่อมแซม"
+  "stopped working: needs a repair": "หยุดทำงาน: ต้องซ่อมแซม",
+  "Set it up": "ตั้งค่า",
+  "One click sets it up.": "คลิกเดียวก็ตั้งค่าได้",
+  "This won't mute you yet": "ยังปิดเสียงคุณไม่ได้",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "เฮ้! อันนี้ยังไม่มีผล เพราะยังไม่ได้ตั้งค่า Onion Board ในไมค์ของคุณ คนอื่นยังได้ยินคุณอยู่"
 }

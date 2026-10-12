@@ -3367,5 +3367,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Щоб розмовляти іншою мовою, спочатку потрібно встановити розпізнавання мовлення (працює на цьому ПК; те, що ви говорите, ніколи не залишає його).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Розпізнавання мовлення перестало працювати: Python, з яким його налаштували, зник із цього комп'ютера. Натисніть «Полагодити», щоб налаштувати його знову.",
   "The download isn't the Python it should be, so it wasn't used.": "Завантажений файл — не той Python, тому його не використано.",
-  "stopped working: needs a repair": "перестало працювати: потрібно полагодити"
+  "stopped working: needs a repair": "перестало працювати: потрібно полагодити",
+  "Set it up": "Налаштувати",
+  "One click sets it up.": "Налаштовується одним кліком.",
+  "This won't mute you yet": "Це поки тебе не вимкне",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Гей! Це поки нічого не робить, бо Onion Board ще не налаштований у твоєму мікрофоні. Тебе досі чують."
 }

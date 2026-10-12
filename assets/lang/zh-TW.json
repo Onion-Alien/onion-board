@@ -3221,5 +3221,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "說另一種語言需要先安裝語音辨識（在這台電腦上運作；你所說的永遠不會離開它）。",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "語音辨識無法使用了：安裝它時用的 Python 已不在這台電腦上。按「修復」重新安裝。",
   "The download isn't the Python it should be, so it wasn't used.": "下載的不是正確的 Python，所以沒有使用。",
-  "stopped working: needs a repair": "無法使用：需要修復"
+  "stopped working: needs a repair": "無法使用：需要修復",
+  "Set it up": "去設定",
+  "One click sets it up.": "點一下就能設定好。",
+  "This won't mute you yet": "這還不能讓你靜音",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "嘿！這個現在還沒用，因為 Onion Board 還沒在你的麥克風裡設定好。別人還是聽得到你。"
 }

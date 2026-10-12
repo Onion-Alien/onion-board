@@ -3367,5 +3367,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Chcete-li mluvit jiným jazykem, musíte nejprve nainstalovat rozpoznávání řeči (běží na tomto počítači; to, co řeknete, ho nikdy neopustí).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Rozpoznávání řeči přestalo fungovat: Python, se kterým bylo nastavené, už na tomto PC není. Stiskněte Opravit a nastavte ho znovu.",
   "The download isn't the Python it should be, so it wasn't used.": "Stažený soubor není ten správný Python, takže se nepoužil.",
-  "stopped working: needs a repair": "přestalo fungovat: potřebuje opravu"
+  "stopped working: needs a repair": "přestalo fungovat: potřebuje opravu",
+  "Set it up": "Nastavit",
+  "One click sets it up.": "Jedno kliknutí to nastaví.",
+  "This won't mute you yet": "Tohle tě zatím neztlumí",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Tohle zatím nic nedělá, protože Onion Board ještě není nastavený v tvém mikrofonu. Lidi tě pořád slyší."
 }

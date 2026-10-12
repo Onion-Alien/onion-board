@@ -3294,5 +3294,9 @@
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Η ομιλία άλλης γλώσσας χρειάζεται πρώτα να εγκατασταθεί η αναγνώριση ομιλίας (εκτελείται σε αυτόν τον υπολογιστή, αυτό που λέτε δεν το αφήνει ποτέ).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Η αναγνώριση ομιλίας σταμάτησε να λειτουργεί: η Python με την οποία ρυθμίστηκε δεν υπάρχει πια σε αυτόν τον υπολογιστή. Πάτησε Επισκευή για να ρυθμιστεί ξανά.",
   "The download isn't the Python it should be, so it wasn't used.": "Η λήψη δεν είναι η σωστή Python, οπότε δεν χρησιμοποιήθηκε.",
-  "stopped working: needs a repair": "σταμάτησε να λειτουργεί: χρειάζεται επισκευή"
+  "stopped working: needs a repair": "σταμάτησε να λειτουργεί: χρειάζεται επισκευή",
+  "Set it up": "Ρύθμισέ το",
+  "One click sets it up.": "Ένα κλικ το ρυθμίζει.",
+  "This won't mute you yet": "Αυτό δεν σε κάνει σίγαση ακόμα",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Γεια! Αυτό δεν κάνει τίποτα ακόμα, γιατί το Onion Board δεν έχει ρυθμιστεί στο μικρόφωνό σου. Σε ακούνε ακόμα."
 }
