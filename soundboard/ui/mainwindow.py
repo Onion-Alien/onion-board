@@ -56,7 +56,8 @@ from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, re
                            sourcedialog, splash, taboff, themecover)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar,
-                                 capped, card, hint_label, icon_label, info_button,
+                                 alt_tile, capped, card, hint_label, icon_label,
+                                 info_button,
                                  steady_number, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
@@ -2272,9 +2273,9 @@ class MainWindow(QMainWindow):
         # the ways to set it up, side by side at their own size (wraps when narrow)
         ways = Flow(gap=8)
         ways.addWidget(self.btn_attach)
-        self.btn_usecable = QPushButton(_("Use the virtual cable instead"))
-        self.btn_usecable.setToolTip(_("The other way to reach Discord and games: a free virtual "
-                                       "cable you pick as the mic there"))
+        self.btn_usecable = QPushButton(_("Use the cable"))   # (in its tile, below)
+        self.btn_usecable.setToolTip(_("Use a free virtual cable instead: you pick it as the "
+                                       "mic in Discord and games"))
         self.btn_usecable.clicked.connect(self.use_cable_instead)
         icons.set_icon(self.btn_usecable, "cable")
         self.btn_usecable.hide()
@@ -2285,9 +2286,6 @@ class MainWindow(QMainWindow):
         self._done_toast = None       # "done" / "updated": said once it works
         icons.set_icon(self.btn_install, "cable", "on_accent")
         ways.addWidget(self.btn_install)
-        ways.addWidget(self.btn_usecable)   # (after the mic's own button: the second way)
-        for b in (self.btn_usecable,):
-            b.setProperty("quiet", True)   # the rarer ways: plain words, no fill
         # Connect your chat is hidden until there's a chat to connect: its guide is here
         # meanwhile (that card held nothing else, while nothing was set up or on Nobody)
         self.btn_guide = self._guide_button()
@@ -2297,7 +2295,8 @@ class MainWindow(QMainWindow):
         cv.addLayout(ways)
         self._ways = ways
         # straight into the mic works: the cable is only a fallback, so offer to remove it
-        self.btn_rmcable = QPushButton(_("Remove the virtual cable"))
+        self.btn_rmcable = QPushButton(_("Remove"))   # (in the cable's tile: it says which)
+        self.btn_rmcable.setAccessibleName(_("Remove the virtual cable"))
         self.btn_rmcable.setToolTip(_("Uninstalls VB-Cable. Your sounds go straight into your "
                                       "mic, so Onion Board doesn't need it"))
         icons.set_icon(self.btn_rmcable, "cable")
@@ -2317,12 +2316,37 @@ class MainWindow(QMainWindow):
         self.rmcable_note.setTextFormat(Qt.TextFormat.RichText)
         self.rmcable_note.hide()
         cv.addWidget(self.rmcable_note)
-        self.btn_rmcable.setProperty("quiet", True)
-        ways.addWidget(self.btn_rmcable)   # beside the other ways, when there's one
+        self.btn_rmcable.setProperty("quiet", True)   # (beside Use the cable, in its tile)
         self.btn_rescan = QPushButton(_("I've installed it: check again"))
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
         ways.addWidget(self.btn_rescan)   # with the other ways, not a row of its own
+        # straight into the mic: the other ways as two tiles under the status, like the
+        # setup guide's (before, two lone buttons said "use the cable" and "remove the
+        # cable" side by side with no why, over an empty card)
+        alt = self.mic_alt = QWidget()
+        al = QVBoxLayout(alt)
+        al.setContentsMargins(0, 4, 0, 0)
+        al.setSpacing(10)
+        head = QLabel(_("Optional: other ways to send your sounds"))
+        head.setObjectName("section")
+        head.setProperty("head", True)
+        al.addWidget(head)
+        tiles = QHBoxLayout()
+        tiles.setSpacing(12)
+        self.alt_cable, self.alt_cable_words = alt_tile(
+            "cable", _("Virtual cable"), "", self.btn_usecable, self.btn_rmcable)
+        tiles.addWidget(self.alt_cable, 1)
+        self.btn_pickdev = QPushButton(_("Pick a device"))
+        icons.set_icon(self.btn_pickdev, "sliders")
+        self.btn_pickdev.clicked.connect(self._pick_send_device)
+        tiles.addWidget(alt_tile(
+            "sliders", _("Another device"),
+            _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
+              "capture card, or to nobody."), self.btn_pickdev)[0], 1)
+        al.addLayout(tiles)
+        alt.hide()
+        cv.addWidget(alt)
         helpcard, hv = card(_("Connect your chat"), roomy=True, icon="speech")
         hv.addWidget(hint_label(_("Choose your app for the recommended microphone settings.")))
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
@@ -3566,10 +3590,17 @@ class MainWindow(QMainWindow):
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
         # the other ways sit beside the main button as plain words, every time
-        self.btn_usecable.setVisible(route == "mic" and not mic_busy   # also when it works
-                                     and not self._cable_gone)   # (back after a restart)
+        self.mic_alt.setVisible(route == "mic" and not mic_busy)   # also when it works
+        self.alt_cable.setVisible(not self._cable_gone)   # (back after a restart)
+        self.btn_usecable.setVisible(route == "mic" and not mic_busy and not self._cable_gone)
         spare = route == "mic" and state == "ok" and self._spare_cable()
         self.btn_rmcable.setVisible(spare)
+        # installed and spare: say why there's a Use and a Remove, not two puzzles
+        self.alt_cable_words.setText(
+            _("It's installed, but your sounds go into your mic now. Use it if a game skips "
+              "your mic, or remove it if nothing else needs it.") if spare else
+            _("If you'd rather not add Onion Board's audio driver to your mic, or a game "
+              "skips it: a free virtual cable you pick as the mic in Discord and games."))
         self.rmcable_note.hide()   # (its tooltip says it)
         if route == "mic":
             self._direct_shown = self._direct_health()
@@ -3673,8 +3704,7 @@ class MainWindow(QMainWindow):
         self._ways_in = mic
         src, dst = (self._ways, self.mic_ways) if mic else (self.mic_ways, self._ways)
         # (check again too: it stays last, after them)
-        for b in (self.btn_install, self.btn_usecable, self.btn_guide, self.btn_rmcable,
-                  self.btn_rescan):
+        for b in (self.btn_install, self.btn_guide, self.btn_rescan):
             src.removeWidget(b)
             dst.addWidget(b)
         self.mic_ways.invalidate()
@@ -3959,6 +3989,12 @@ class MainWindow(QMainWindow):
             self.toast(_("{value} still uses the virtual cable as its mic. It still hears you, "
                          "but you can set its input back to your normal mic: your sounds are in "
                          "it now.", value=heard[0][1]))
+
+    def _pick_send_device(self):
+        """Setup tab -> Another device: Devices' "Send my sounds to", opened."""
+        self.setup_page.ensureWidgetVisible(self.cb_route)
+        self.cb_route.setFocus()
+        self.cb_route.showPopup()
 
     def use_cable_instead(self):
         """Straight into my mic isn't working here: send through the virtual cable (set

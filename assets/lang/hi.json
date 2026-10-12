@@ -425,7 +425,6 @@
   "The game you have open uses {engine} for voice chat": "आपका खुला गेम वॉइस चैट के लिए {engine} इस्तेमाल करता है",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "इन-गेम ओवरले आपके पैड गेम के ऊपर दिखाता है, जिन्हें नंबर की से चलाया जाता है। इसे सेटिंग्स → ओवरले में सेट करें।",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "इंस्टॉलर शुरू नहीं हो सका ({e})। आप इसे रिलीज़ पेज से डाउनलोड कर सकते हैं।",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Discord और गेम तक पहुँचने का दूसरा तरीक़ा: एक मुफ़्त वर्चुअल केबल, जिसे आप वहाँ माइक के रूप में चुनते हैं",
   "The saved report and the app's log": "सेव की गई रिपोर्ट और ऐप का लॉग",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoom, Microsoft Teams और वेब पेज वाली कॉल की वे सेटिंग्स जो आपके साउंड को शोर समझना बंद करती हैं",
   "The update didn't finish": "अपडेट पूरा नहीं हुआ",
@@ -465,7 +464,6 @@
   "Update available": "अपडेट उपलब्ध है",
   "Update now": "अभी अपडेट करें",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version} पर अपडेट हो गया। जब तक आप न चाहें कुछ नहीं बदलता: सब पहले जैसा चलता है।",
-  "Use the virtual cable instead": "इसके बजाय वर्चुअल केबल इस्तेमाल करें",
   "Video": "वीडियो",
   "Videos can't be shown in this copy of Onion Board": "Onion Board की इस कॉपी में वीडियो नहीं दिखाए जा सकते",
   "Voice": "वॉइस",
@@ -3311,5 +3309,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "टेक्सचर वाले में हर थीम के पैनलों पर उसका अपना पैटर्न होता है: पुरानी स्क्रीन की लाइनें, कार्बन फ़ाइबर, लहरें और बहुत कुछ। सादा उन्हें समतल रखता है।",
   "Theme style": "थीम की शैली",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "तुम्हारे दूसरे साउंडबोर्ड से आवाज़ें लाई जा रही हैं: {total} में से {done}…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "{name} से तुम्हारी आवाज़ें लाई जा रही हैं: {total} में से {done}…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name} से तुम्हारी आवाज़ें लाई जा रही हैं: {total} में से {done}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "यह इंस्टॉल है, पर अब आपकी आवाज़ें आपके माइक में जाती हैं। अगर कोई गेम आपका माइक छोड़ देता है तो इसे इस्तेमाल करें, या अगर किसी और चीज़ को इसकी ज़रूरत नहीं है तो इसे हटा दें।"
 }

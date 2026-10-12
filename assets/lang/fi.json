@@ -1150,7 +1150,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Pelin sisäinen overlay näyttää nappisi pelin päällä, soitettavina numeronäppäimillä. Säädä se kohdassa Asetukset → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Asennusohjelmaa ei voitu käynnistää ({e}). Voit ladata sen sen sijaan julkaisusivulta.",
   "The one the game is on": "Se, jolla peli on",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Toinen tapa tavoittaa Discord ja pelit: ilmainen virtuaalikaapeli, jonka valitset siellä mikiksi",
   "The saved report and the app's log": "Tallennettu raportti ja sovelluksen loki",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoomin, Microsoft Teamsin ja verkkosivupuheluiden asetukset, jotka estävät niitä pitämästä ääniäsi kohinana",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Asennusoppaan Asenna-painike lataa VB-Cablen (virtuaalikaapelin) osoitteesta vb-audio.com. Ei tarvita, jos äänesi menevät suoraan mikkiisi, toiseen laitteeseen tai ei minnekään. Pois: asenna se itse sieltä.",
@@ -1242,7 +1241,6 @@
   "Use it": "Käytä sitä",
   "Use less data": "Käytä vähemmän dataa",
   "Use the virtual cable after all": "Käytä sittenkin virtuaalikaapelia",
-  "Use the virtual cable instead": "Käytä sen sijaan virtuaalikaapelia",
   "Used for": "Käyttötarkoitus",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… tärkeät puhechattiasetukset",
   "Version {version}": "Versio {version}",
@@ -3311,5 +3309,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Kuvioitu antaa jokaiselle teemalle oman kuvion paneeleihin: vanhan näytön juovat, hiilikuitu, aallot ja muuta. Tasainen pitää ne yksivärisinä.",
   "Theme style": "Teeman tyyli",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Tuodaan äänesi muista soundboardeistasi: {done}/{total}…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "Tuodaan äänesi sovelluksesta {name}: {done}/{total}…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "Tuodaan äänesi sovelluksesta {name}: {done}/{total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Se on asennettu, mutta äänesi menevät nyt mikrofoniisi. Käytä sitä, jos peli ohittaa mikrofonisi, tai poista se, jos mikään muu ei tarvitse sitä."
 }

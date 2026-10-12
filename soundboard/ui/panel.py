@@ -12,8 +12,8 @@ from PySide6.QtCore import QEvent, QObject, QPoint, QRect, QRectF, QSize, Qt, QT
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QSlider, QSpinBox, QStyle, QVBoxLayout,
-                               QWidget)
+                               QLayout, QPushButton, QSizePolicy, QSlider, QSpinBox, QStyle,
+                               QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -436,6 +436,36 @@ def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     lbl.setToolTip(tip)
     lbl.setObjectName("iconlabel")
     return lbl
+
+
+def alt_tile(icon: str, title: str, words: str, *buttons: QPushButton
+             ) -> tuple[QFrame, QLabel]:
+    """One of the "other ways" side by side in a card: an inner area with an icon,
+    a bold name, why you'd want it, then its buttons along the bottom edge. Gives the
+    tile and its words (changed when its state does). Setup tab and the setup guide."""
+    box = QFrame()
+    box.setObjectName("alttile")   # an inner area (DESIGN.md: cards)
+    box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+    v = QVBoxLayout(box)
+    v.setContentsMargins(14, 12, 14, 14)
+    v.setSpacing(8)
+    top = QHBoxLayout()
+    top.setSpacing(8)
+    pic = QLabel()
+    icons.set_label_icon(pic, icon, "accent", size=18)
+    top.addWidget(pic)
+    top.addWidget(QLabel(f"<b>{html.escape(title)}</b>"))
+    top.addStretch(1)
+    v.addLayout(top)
+    text = hint_label(words)
+    text.setTextFormat(Qt.TextFormat.RichText)
+    v.addWidget(text)
+    v.addStretch(1)
+    row = Flow(gap=8)   # at their own size, wrapping when the tile is narrow
+    for b in buttons:
+        row.addWidget(b)
+    v.addLayout(row)
+    return box, text
 
 
 def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18) -> QPushButton:

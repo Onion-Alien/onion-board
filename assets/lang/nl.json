@@ -425,7 +425,6 @@
   "The game you have open uses {engine} for voice chat": "De game die je open hebt, gebruikt {engine} voor voicechat",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "De in-game overlay toont je pads over de game, af te spelen met de cijfertoetsen. Stel hem in bij Instellingen → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Het installatieprogramma kon niet worden gestart ({e}). Je kunt het in plaats daarvan downloaden van de releasepagina.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "De andere manier om Discord en games te bereiken: een gratis virtuele kabel die je daar als mic kiest",
   "The saved report and the app's log": "Het opgeslagen rapport en de log van de app",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "De instellingen in Zoom, Microsoft Teams en gesprekken in een webpagina die voorkomen dat ze je geluiden als ruis behandelen",
   "The update didn't finish": "De update is niet afgerond",
@@ -465,7 +464,6 @@
   "Update available": "Update beschikbaar",
   "Update now": "Nu updaten",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Bijgewerkt naar Onion Board {version}. Er verandert niets tot jij dat wilt: alles werkt zoals eerst.",
-  "Use the virtual cable instead": "Gebruik in plaats daarvan de virtuele kabel",
   "Video": "Video",
   "Videos can't be shown in this copy of Onion Board": "Video's kunnen in deze versie van Onion Board niet worden getoond",
   "Voice": "Stem",
@@ -3311,5 +3309,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Met patroon krijgt elk thema een eigen patroon op de panelen: lijnen van een oud scherm, carbon, golven en meer. Effen houdt ze vlak.",
   "Theme style": "Themastijl",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Je geluiden uit je andere soundboards overzetten: {done} van {total}…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "Je geluiden uit {name} overzetten: {done} van {total}…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "Je geluiden uit {name} overzetten: {done} van {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Hij is geïnstalleerd, maar je geluiden gaan nu in je microfoon. Gebruik hem als een game je microfoon overslaat, of verwijder hem als niets anders hem nodig heeft."
 }

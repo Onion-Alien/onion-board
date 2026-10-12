@@ -419,7 +419,6 @@
   "The game you have open uses {engine} for voice chat": "你開啟的遊戲用 {engine} 進行語音聊天",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "遊戲內覆蓋畫面會把你的按鈕顯示在遊戲上，用數字鍵播放。在 設定 → 覆蓋畫面 裡設定。",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "無法啟動安裝程式（{e}）。你可以改從版本頁面下載。",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "連接 Discord 和遊戲的另一種方式：一條免費的虛擬音源線，在那裡把它選為麥克風",
   "The saved report and the app's log": "已儲存的報告和程式的記錄",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoom、Microsoft Teams 和網頁通話裡的設定，讓它們不會把你的音效當成雜音",
   "The update didn't finish": "更新沒有完成",
@@ -459,7 +458,6 @@
   "Update available": "有可用的更新",
   "Update now": "立即更新",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "已更新到 Onion Board {version}。在你想要之前什麼都不會變：一切照舊運作。",
-  "Use the virtual cable instead": "改用虛擬音源線",
   "Video": "影片",
   "Videos can't be shown in this copy of Onion Board": "這個版本的 Onion Board 無法顯示影片",
   "Voice": "語音",
@@ -3237,5 +3235,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "紋理會為每個主題的面板加上專屬圖案：老式螢幕掃描線、碳纖維、波浪等。純色則保持平整。",
   "Theme style": "主題樣式",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "正在從你的其他音效板搬入音效：第 {done}/{total} 個…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "正在從 {name} 搬入你的音效：第 {done}/{total} 個…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "正在從 {name} 搬入你的音效：第 {done}/{total} 個…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安裝，但你的聲音現在會進入麥克風。如果某個遊戲略過了你的麥克風就用它，如果沒有其他東西需要它就移除它。"
 }
