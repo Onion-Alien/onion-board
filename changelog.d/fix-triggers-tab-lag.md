@@ -1,0 +1,1 @@
+- The Triggers tab opens about twice as fast: Onion Watch's tab is made right on the board's page instead of being moved there when done (with the next Onion Watch update).

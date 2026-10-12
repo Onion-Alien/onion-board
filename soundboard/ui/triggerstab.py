@@ -21,6 +21,7 @@ again* when it's broken) uninstalls it after asking, and Hoot is back; the trigg
 from __future__ import annotations
 
 import html
+import inspect
 import logging
 import threading
 
@@ -50,6 +51,17 @@ STEPS = {"Finding the newest…": (_("Finding the newest…"), _("Finding the ne
          "Installing…": (_("Installing…"), _("Installing Onion Watch…")),
          "Starting…": (_("Starting…"), _("Starting Onion Watch…"))}
 SHOW_LOAD_MS = 50   # first shown, the add-on loads after the tab's first paint, or this
+
+
+def _create(entry, host, parent):
+    """The add-on's tab, made straight inside `parent` when it can be (a newer Onion
+    Watch): moving a finished tab of a thousand widgets into the window afterwards
+    restyles every one of them again, a good part of the second it took to open."""
+    try:
+        takes = "parent" in inspect.signature(entry.create).parameters
+    except (TypeError, ValueError):
+        takes = False
+    return entry.create(host, parent=parent) if takes else entry.create(host)
 
 
 class _WaitPage(QWidget):
@@ -381,7 +393,7 @@ class TriggersTab(QWidget):
             return False
         try:
             entry = modules.load_package(self.info)
-            panel = entry.create(self.host)
+            panel = _create(entry, self.host, self.board_page)
         except Exception as e:  # noqa: BLE001 - a broken add-on can't stop the app
             log.warning("Onion Watch couldn't be loaded: %s", e, exc_info=True)
             self._label_get(watchaddon.friendly(e))

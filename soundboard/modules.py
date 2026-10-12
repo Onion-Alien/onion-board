@@ -28,7 +28,8 @@ The kinds:
   "triggers" The Triggers tab (Onion Watch, soundboard.watchaddon). A Python
              package (`package`, a folder inside the module's) loaded into the app
              from the module's folder, and `entry`, a module in it whose
-             `create(host)` makes the tab (see soundboard.ui.triggershost for the
+             `create(host)` makes the tab (or `create(host, parent)`, made on the
+             page it goes on; see soundboard.ui.triggershost for the
              host). `api_version` is the version of that host interface it was
              written for: TRIGGERS_API is what this app can host, and anything else
              is refused with a message. `imports` lists what it needs from outside
