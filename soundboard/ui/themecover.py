@@ -37,9 +37,11 @@ class ThemeCover(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
-        snap_to_pixels(p)
+        # opaque: the full cover goes down before snap_to_pixels, or its nudge leaves
+        # an edge row of whatever was on screen before
         p.drawPixmap(self.rect(), self.still)
         p.fillRect(self.rect(), self.scrim)
+        snap_to_pixels(p)
         size = self.bunny.deviceIndependentSize()
         at = QRectF((self.width() - size.width()) / 2, (self.height() - size.height()) / 2,
                     size.width(), size.height())
