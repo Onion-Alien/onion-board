@@ -3,6 +3,7 @@ and the status pill sit on the title's cap-height centre, measured on the drawn 
 and two cards side by side have their titles on one line."""
 from PySide6.QtCore import QPoint, QRect
 from PySide6.QtWidgets import QApplication, QLabel, QWidget
+import pytest
 from test_mainwindow import window  # noqa: F401
 
 
@@ -32,7 +33,8 @@ def cap_centre(title: QLabel, card: QWidget, img) -> float:
     left = min(x for x, _y in ink)
     cols = {x for x, _y in ink}
     end = left
-    while end + 1 in cols:   # the first glyph: up to the first empty column
+    limit = left + title.fontMetrics().horizontalAdvance(title.text()[0]) - 1
+    while end + 1 in cols and end < limit:   # never include a touching descender
         end += 1
     ys = [y for x, y in ink if left <= x <= end]
     return (min(ys) + max(ys)) / 2
@@ -81,6 +83,25 @@ def test_setup_card_headings_line_up(window):  # noqa: F811
         # side by side: your mic and who's listening's titles on one line
         mic, dest = window._setup_top
         assert abs(titles[mic] - titles[dest]) <= 1, route
+
+
+@pytest.mark.parametrize("theme_name", ["Dark", "Amber Terminal", "Comic Sans"])
+def test_setup_heading_ink_follows_live_font_changes(window, theme_name):  # noqa: F811
+    _shown_setup(window, "mic")
+    # The cards were built in the default font; a live theme switch must realign them.
+    for name in (theme_name, "Dark", theme_name):
+        window.apply_theme(name)
+        for _ in range(8):
+            QApplication.processEvents()
+            window._refit()
+        for card in window._setup_narrow:
+            if not card.isVisible():
+                continue
+            title, marks = heading_parts(card)
+            img = card.grab().toImage()
+            cap = cap_centre(title, card, img)
+            for mark in marks:
+                assert abs(ink_centre(mark, card, img) - cap) <= 1, (name, title.text())
 
 
 def test_setup_card_pairs_share_top_and_bottom_with_the_eq_on_or_off(window):  # noqa: F811
