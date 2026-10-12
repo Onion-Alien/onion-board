@@ -142,3 +142,28 @@ def test_redline_starts_at_eight_times(qapp):
     assert abs(pixel.red() - red.red()) < 10
     assert abs(pixel.green() - red.green()) < 10
     assert abs(pixel.blue() - red.blue()) < 10
+
+
+def test_no_change_sits_mid_slider_on_lopsided_ranges(qapp):
+    """1x speed and +0 dB bass sit in the middle like 0 st pitch does, though
+    their ranges are lopsided (0.25x to 2x, -12 to +18 dB)."""
+    from soundboard import livefx
+    from soundboard.ui.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton()
+    for s in (b.speed, b.pitch, b.fx["bass"], b.fx["treble"]):
+        sl = s.slider
+        assert sl.value() * 2 == sl.maximum(), s.q.key
+        sl.setValue(sl.minimum())
+        assert s.value() == s.q.lo
+        sl.setValue(sl.maximum())
+        assert s.value() == s.q.hi
+        for v in (s.q.lo, s.q.default, s.q.hi):   # every value comes back as set
+            s.set_value(v)
+            assert s.value() == v
+    b.speed.set_value(1.5)
+    assert b.speed.value() == 1.5 and b.speed.slider.value() > b.speed.slider.maximum() / 2
+    b.set_redline(True)                            # 0.1x to 10x: 1x still mid
+    b.speed.set_value(1.0)
+    assert b.speed.slider.value() * 2 == b.speed.slider.maximum()
+    assert b.fx["muffle"].slider.value() == 0      # 0 to 100 %: starts at the left
+    assert livefx.MUFFLE.default == livefx.MUFFLE.lo
