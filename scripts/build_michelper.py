@@ -126,6 +126,7 @@ def build(clean: bool = False) -> int:
         print(f"the built mic helper failed its self-test ({r.returncode})", file=sys.stderr)
         return 1
     (folder / michelper.STAMP).write_text(michelper.make_stamp(DLL), encoding="ascii")
+    michelper.write_manifest(folder)   # last: it lists the stamp too
     shutil.rmtree(WORK / "obmichelper", ignore_errors=True)
     size = sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())
     print(f"built {folder} ({size / 1e6:.1f} MB)")

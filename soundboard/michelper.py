@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 9
+HELPER_VERSION = 10
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -54,6 +54,8 @@ MIN_HELPER_VERSION = 2
 TASK = r"\Onion Board\Mic helper"
 EXE_NAME = "obmichelper.exe"
 STAMP = "stamp.txt"
+MANIFEST = "manifest.txt"   # a build's files, "<sha256> <path>" a line (since 10)
+MANIFEST_SINCE = 10   # helpers from this version on must match their manifest
 USERS = "users.txt"   # the accounts it is set up for, a SID a line (admins only)
 SERVE = "--serve"
 FOR = "--for"         # admin copy: `... --for <SID>`, the account that asked
@@ -193,6 +195,9 @@ def _check() -> dict[bool, bool]:
         # this app's own build: a file of it gone (a virus scanner) and the task can't
         # start it. Asking Windows now puts it back, rather than a wait for nothing first
         ok = all((helper_dir() / name).is_file() for name in _build_files(bundled_helper()))
+    # a file of it changed or gone since it was built: asking Windows puts it back
+    if ok and _version_of(have) >= MANIFEST_SINCE:   # (older ones have none)
+        ok = verify_build(helper_dir())
     ok = bool(ok and installed())
     want = _dll_of(mine)
     return {False: ok, True: ok and want is not None and _dll_of(have) == want}
@@ -757,6 +762,48 @@ def _build_files(folder: Path) -> dict[str, Path]:
             if p.is_file() and p.relative_to(folder).as_posix() not in (USERS, "task.xml")}
 
 
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def write_manifest(folder: Path):
+    """scripts/build_michelper.py: every file of the build in `folder` with its sha256,
+    so a changed, added or missing file is noticed before it runs as SYSTEM."""
+    files = {k: v for k, v in _build_files(folder).items() if k != MANIFEST}
+    (folder / MANIFEST).write_text(
+        "".join(f"{_sha256(path)} {name}\n" for name, path in sorted(files.items())),
+        encoding="utf-8")
+
+
+def verify_build(folder: Path, required: bool = True) -> bool:
+    """`folder`'s files are exactly the ones its manifest lists, byte for byte. Without
+    a manifest: `not required` (a helper from before it). It finds damage (a file a
+    virus scanner took or changed, a half-done copy) and a build changed after it was
+    made; who could also rewrite the manifest could change the app itself anyway."""
+    try:
+        lines = (folder / MANIFEST).read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return not required
+    except (OSError, UnicodeDecodeError):
+        return False
+    want: dict[str, str] = {}
+    for line in lines:
+        sha, _, name = line.partition(" ")
+        if not re.fullmatch(r"[0-9a-f]{64}", sha) or not name or name in want:
+            return False
+        want[name] = sha
+    try:
+        have = {k: v for k, v in _build_files(folder).items() if k != MANIFEST}
+        return have.keys() == want.keys() and all(
+            _sha256(have[name]) == sha for name, sha in want.items())
+    except OSError:
+        return False
+
+
 def _same_build(src: Path, dest: Path) -> bool:
     """`dest` holds exactly `src`'s helper build, byte for byte. The stamp alone isn't
     enough: it names the helper version and effect DLL, not how the exe was packed (a
@@ -780,6 +827,10 @@ def install_helper(user: str | None = None) -> bool:
     src = bundled_helper()
     if is_helper() or not (src / EXE_NAME).is_file() or _read_stamp(src) is None:
         return False
+    if not verify_build(src):
+        log.warning("mic helper: this app's helper build doesn't match its manifest "
+                    "(%s): not set up", src)
+        return False
     sid = user if user is not None else _token_sid()
     if sid is None or not _SID.fullmatch(sid) or not _has_profile(sid):
         log.info("mic helper: not set up for this account (%s)", sid)
@@ -793,6 +844,10 @@ def install_helper(user: str | None = None) -> bool:
                 if d.exists():
                     shutil.rmtree(d, ignore_errors=True)
             shutil.copytree(src, new)   # whole, then in place
+            if not verify_build(new):   # (changed meanwhile, or a bad copy)
+                log.warning("mic helper: the copy doesn't match the manifest: not set up")
+                shutil.rmtree(new, ignore_errors=True)
+                return False
             if dest.exists():
                 os.replace(dest, old)
             os.replace(new, dest)

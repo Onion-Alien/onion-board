@@ -99,6 +99,10 @@ if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 # It also deletes any bundled ICU DLL (same error): Qt uses Windows' own.
 & $py scripts\vc_runtime.py dist\OnionBoard
 if ($LASTEXITCODE -ne 0) { throw "vc_runtime.py failed" }
+# ...which can swap a runtime DLL in the bundled mic helper too: list its files again,
+# as shipped (soundboard\michelper.py install_helper refuses a build that doesn't match)
+& $py -c "import sys; from pathlib import Path; sys.path.insert(0, '.'); from soundboard import michelper; michelper.write_manifest(Path(r'dist\OnionBoard\_internal\michelper'))"
+if ($LASTEXITCODE -ne 0) { throw "listing the mic helper's files failed" }
 
 # PyInstaller ships all of Qt (QML, 3D, Charts, dev tools, 186 translations...).
 # Drop what the app never loads, then prove the trimmed app still starts.

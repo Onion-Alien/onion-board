@@ -33,7 +33,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                 6: "9b83750c3d3586a89804c5ec5c97618fc1ce30b511723e4e3cf3525513c9a534",
                 7: "562d4f9cdb4cd0a53071284bf83aef9bbf8b2563c5ba7a3368dc190942d22c66",
                 8: "2e6e7bce58fff25b999c3779c61576bc676a39765c974e83b62ad437f5a15a2d",
-                9: "f60c119dabaad07489532ae0fbb58b600cc3ac6f864f4b52622a5a95476a8894"}
+                9: "f60c119dabaad07489532ae0fbb58b600cc3ac6f864f4b52622a5a95476a8894",
+               10: "e9d84913fb40a44975302aed80f4875feeb7ae9626065a410678e62a3f3b4383"}
 
 
 def _queue():
@@ -164,8 +165,10 @@ def test_ready_needs_all_of_this_apps_build(monkeypatch, tmp_path):
         (folder / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
         (folder / mh.EXE_NAME).write_bytes(b"MZ")
     (bundled / "obmichelper.pkg").write_bytes(b"PKG")
+    mh.write_manifest(bundled)
     assert not mh.ready() and not mh.ready(same_dll=False)
     (mh.helper_dir() / "obmichelper.pkg").write_bytes(b"PKG")
+    mh.write_manifest(mh.helper_dir())
     assert mh.ready() and mh.ready(same_dll=False)
     (mh.helper_dir() / "obmichelper.pkg").unlink()
     (mh.helper_dir() / mh.STAMP).write_text(f"{mh.HELPER_VERSION - 1} aaaa")
@@ -371,6 +374,7 @@ def helper_setup(monkeypatch, tmp_path):
     src.mkdir()
     (src / mh.EXE_NAME).write_bytes(b"MZ")
     (src / mh.STAMP).write_text("5 aaaa")
+    mh.write_manifest(src)
     monkeypatch.setattr(mh, "bundled_helper", lambda: src)
     monkeypatch.setattr(mh, "_has_profile", lambda sid: True)
     monkeypatch.setattr(mh, "_token_sid", lambda: SID)
@@ -406,6 +410,7 @@ def test_install_helper_repairs_a_build_with_the_same_stamp(helper_setup, monkey
     mic step waits for a helper that can't start and then asks again, for ever."""
     src = mh.bundled_helper()
     (src / "obmichelper.pkg").write_bytes(b"PKG")
+    mh.write_manifest(src)
     copies = []
     real_copytree = mh.shutil.copytree
     monkeypatch.setattr(mh.shutil, "copytree",
@@ -873,3 +878,68 @@ def test_every_admin_step_checks_the_helper_again(monkeypatch, helper):
     monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": checks.append(via) or True)
     assert dm._elevated(["install", GUID, "efx"]) == 0   # (a slot choice sets it up too)
     assert checks == ["after a step"]
+
+
+# ---------------------------------------------------------------- the build's manifest
+
+def test_a_build_matches_its_manifest(tmp_path):
+    (tmp_path / mh.EXE_NAME).write_bytes(b"MZ")
+    (tmp_path / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
+    (tmp_path / "_internal").mkdir()
+    (tmp_path / "_internal" / "python313.dll").write_bytes(b"py")
+    mh.write_manifest(tmp_path)
+    assert mh.verify_build(tmp_path)
+    (tmp_path / mh.USERS).write_text(SID)   # what install_helper adds: not the build's
+    assert mh.verify_build(tmp_path)
+    (tmp_path / "_internal" / "extra.dll").write_bytes(b"?")
+    assert not mh.verify_build(tmp_path)    # a file the build never had
+    (tmp_path / "_internal" / "extra.dll").unlink()
+    (tmp_path / mh.EXE_NAME).write_bytes(b"MZ evil")
+    assert not mh.verify_build(tmp_path)    # changed
+    (tmp_path / mh.MANIFEST).unlink()
+    assert not mh.verify_build(tmp_path) and mh.verify_build(tmp_path, required=False)
+
+
+def test_a_tampered_bundled_build_is_refused(helper_setup, caplog):
+    """The admin copy installs the helper from the app's own folder: a build whose files
+    don't match its manifest is never put in Program Files to run as SYSTEM. The mic
+    step itself still worked (through Windows' prompt)."""
+    calls, _registered = helper_setup
+    (mh.bundled_helper() / mh.EXE_NAME).write_bytes(b"MZ evil")
+    with caplog.at_level(logging.WARNING, logger="soundboard.michelper"):
+        assert not mh.install_helper()
+    assert "manifest" in caplog.text
+    assert not (mh.helper_dir() / mh.EXE_NAME).exists() and "/create" not in calls
+
+
+def test_an_untouched_build_installs_with_its_manifest(helper_setup):
+    assert mh.install_helper()
+    assert mh.verify_build(mh.helper_dir())
+
+
+def test_a_tampered_installed_helper_is_replaced_on_the_next_prompt(helper_setup,
+                                                                    monkeypatch):
+    """ready() fails fast on an installed helper that doesn't match its manifest (no
+    request left for it), so Windows' prompt comes up, and its step puts this app's
+    build back."""
+    src = mh.bundled_helper()
+    (src / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
+    mh.write_manifest(src)
+    assert mh.install_helper()
+    monkeypatch.setattr(mh, "installed", lambda: True)
+    assert mh.ready()
+    (mh.helper_dir() / mh.EXE_NAME).write_bytes(b"MZ evil")
+    assert not mh.ready() and not mh.ready(same_dll=False)
+    assert mh.install_helper()
+    assert (mh.helper_dir() / mh.EXE_NAME).read_bytes() == b"MZ" and mh.ready()
+
+
+def test_an_older_helper_without_a_manifest_is_still_used(helper_setup, monkeypatch):
+    """Helpers from before the manifest (version 9 and older) have none: still fine."""
+    monkeypatch.setattr(mh, "installed", lambda: True)
+    dest = mh.helper_dir()
+    dest.mkdir(parents=True)
+    (dest / mh.EXE_NAME).write_bytes(b"MZ")
+    (dest / mh.STAMP).write_text("9 aaaa")
+    (mh.bundled_helper() / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
+    assert mh.ready()
