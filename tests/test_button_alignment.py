@@ -1,5 +1,7 @@
 """Buttons side by side line up: one height in a row, the icon's gap before the words,
 and no row of its own for one button (UI-AUDIT U23, U26, U27, U38, U40, U43, U45, U52)."""
+from types import SimpleNamespace
+
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401
 
@@ -68,9 +70,38 @@ def test_radio_bar_buttons_line_up_and_keep_their_size_when_narrow(window):  # n
     assert has_gap(r.btn_live)
     w.resize(800, 600)
     pump()
-    # Now playing hidden: its room isn't shared out into Play / shuffle / Send
+    # Now playing hidden: its room isn't shared out into Play / shuffle / Send (Play and
+    # Send keep the room of their other word, Stop / Sending, and no more)
     for b in (r.btn_play, r.btn_random, r.btn_live):
-        assert b.width() <= b.sizeHint().width(), b.accessibleName() or b.text()
+        assert b.width() <= max(b.sizeHint().width(), b.minimumWidth()), \
+            b.accessibleName() or b.text()
+
+
+def test_radio_bar_buttons_stay_put_on_play_stop_and_send(window, monkeypatch):  # noqa: F811
+    w = window
+    w.resize(2000, 900)          # wide enough that Play keeps its word with any font
+    w.show()
+    w.tabs.setCurrentIndex(TAB_INDEX["radio"])
+    pump()
+    r = w.radio
+    spots = lambda: [(b.x(), b.width()) for b in (r.btn_play, r.btn_random, r.btn_live,  # noqa: E731
+                                                  r.btn_rec)]
+    before = spots()
+    monkeypatch.setattr(r.player, "station", SimpleNamespace(name="Some radio", uuid="u"))
+    r._update_buttons()          # Play -> Stop
+    r.btn_live.blockSignals(True)
+    r.btn_live.setChecked(True)  # Send -> Sending
+    r._label_live()
+    pump()
+    assert r.btn_play.text() == "Stop" and r.btn_live.text() == "Sending"
+    assert spots() == before
+    r.btn_live.setChecked(False)
+    r._label_live()
+    r.btn_live.blockSignals(False)
+    monkeypatch.setattr(r.player, "station", None)
+    r._update_buttons()
+    pump()
+    assert spots() == before
 
 
 def test_app_card_send_and_record_line_up(window, monkeypatch):  # noqa: F811
