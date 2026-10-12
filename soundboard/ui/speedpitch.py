@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QGridLa
                                QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard import livefx, theme, voicefx
-from soundboard.ui import icons
+from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label, reset_button, section_label
 from soundboard.ui.voicepanel import ParamSlider
 from soundboard.i18n import _
@@ -180,6 +180,7 @@ class SpeedPitchButton(QPushButton):
         # A regular modeless window: its title bar can be dragged, and clicking
         # the board does not dismiss the controls while configuring live audio.
         self.pop = QDialog(self)
+        fit.watch(self.pop)
         self.pop.setWindowTitle(_("Live controls"))
         self.pop.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self._placed = False

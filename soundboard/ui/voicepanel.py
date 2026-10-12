@@ -29,7 +29,7 @@ from soundboard import langnames, library, net, netlog, savedvoices, theme, usag
 from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
-from soundboard.ui import appstate, art, busy, icons
+from soundboard.ui import appstate, art, busy, fit, icons
 from soundboard.ui.widgets import take_out
 from soundboard.ui.panel import (Flow, UndoBar, bar, card, fold_button, hint_label,
                                  icon_button, icon_label, reset_button, section_label,
@@ -1976,6 +1976,7 @@ class SpeechPanel(QWidget):
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""
         dlg = QDialog(self)
+        fit.watch(dlg)
         dlg.setWindowTitle(_("Add a voice server"))
         form = QFormLayout(dlg)
         form.addRow(hint_label(_("A text-to-speech server running on your PC. Most have an "
