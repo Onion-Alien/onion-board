@@ -3063,8 +3063,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "準備ができたら1回だけ再生します。サウンドには追加されません。",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "前のものの後でボードの新しいサウンドになります。押すものはありません。",
   "Waiting to add": "追加待ち",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>{keys} は Windows 専用のため、ホットキーにできません。別のキーを選んでください。</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'><b>{key}</b> は Windows 専用のため、ホットキーにできません。別のキーを選んでください。</span>",
   "Opacity": "不透明度",
   "Playing sound background": "再生中のサウンドの背景",
   "Show the playing sound's thumbnail behind the cards": "再生中のサウンドのサムネイルをカードの背後に表示",

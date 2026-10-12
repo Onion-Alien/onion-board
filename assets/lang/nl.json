@@ -3135,8 +3135,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "Speelt één keer af zodra het klaar is. Wordt niet aan je geluiden toegevoegd.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Wordt een nieuw geluid op je board na de vorige. Je hoeft niets te drukken.",
   "Waiting to add": "Wacht op toevoegen",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows houdt {keys} voor zichzelf, dus het kan geen sneltoets zijn. Kies een andere toets.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows houdt <b>{key}</b> voor zichzelf, dus het kan geen sneltoets zijn. Kies een andere toets.</span>",
   "Opacity": "Dekking",
   "Playing sound background": "Achtergrond van het spelende geluid",
   "Show the playing sound's thumbnail behind the cards": "Toon de miniatuur van het spelende geluid achter de kaarten",

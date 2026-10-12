@@ -139,3 +139,47 @@ def test_foreground_monitor_info_shape():
                                         ("f11", False), ("", False)])
 def test_bare_f12_is_windows_own(combo, out):
     assert wk.reserved(combo) is out
+
+
+def test_bare_f12_is_watched_not_refused(qapp):
+    """F12 alone can't be a RegisterHotKey, so it's watched: it works and isn't reported
+    as taken (it used to warn on every start)."""
+    from conftest import process_events
+    from soundboard import midi
+    from test_midi import FakeWinMM
+    hk = wk.Hotkeys(midi.MidiIn(FakeWinMM([])))
+    got = []
+    hk.failed_changed.connect(got.append)
+    try:
+        hk.register({"f12": "sound:a", "f11": "sound:b"})
+        assert process_events(qapp, lambda: got)
+        assert got[-1] == [] and hk._watched == {0x7B: "sound:a"} and hk._watch_timer
+        hk.register({"f11": "sound:b"})
+        assert process_events(qapp, lambda: len(got) > 1)
+        assert not hk._watched and not hk._watch_timer
+    finally:
+        hk.stop()
+
+
+def test_a_watched_key_fires_alone_and_releases(qapp, monkeypatch):
+    from PySide6.QtCore import QObject
+    hk = wk.Hotkeys.__new__(wk.Hotkeys)
+    QObject.__init__(hk)
+    hk._watched, hk._watch_seen, hk._watch_down = {0x7B: "sound:a"}, set(), set()
+    down: set[int] = set()
+    monkeypatch.setattr(wk, "is_down", lambda vk: vk in down)
+    fired, released = [], []
+    hk.fired.connect(fired.append)
+    hk.released.connect(released.append)
+    down.add(0x7B)
+    hk._poll_watched()
+    hk._poll_watched()                  # still held: once only
+    assert fired == ["sound:a"] and not released
+    down.clear()
+    hk._poll_watched()
+    assert released == ["sound:a"]
+    down.update({0x11, 0x7B})           # Ctrl+F12 is another hotkey: not this one
+    hk._poll_watched()
+    down.clear()
+    hk._poll_watched()
+    assert fired == ["sound:a"] and released == ["sound:a"]

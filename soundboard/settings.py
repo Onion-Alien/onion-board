@@ -226,12 +226,6 @@ class HotkeyDialog(QDialog):
                 | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
                 | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
                 | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
-        if not mods and vk == 0x7B:   # winkeys.reserved: Windows never lets it go
-            self.hint.setText(_("<span style='color:{warn}'>Windows keeps <b>{key}</b> for "
-                                "itself, so it can't be a hotkey. Pick another key.</span>",
-                                warn=theme.status("warn"),
-                                key=pretty_key(winkeys.combo_name(0, vk))))
-            return
         if not mods and is_typing_key(vk) and self._warned_vk != vk:
             # a global hotkey takes the key away from every other program: warn once
             self._warned_vk = vk

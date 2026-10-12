@@ -3207,8 +3207,6 @@
   "Plays once when it's ready. It isn't added to your sounds.": "Se redă o dată când e gata. Nu se adaugă la sunetele tale.",
   "Becomes a new sound on your board after the ones before it. Nothing to press.": "Devine un sunet nou pe board-ul tău după cele dinainte. Nu trebuie să apeși nimic.",
   "Waiting to add": "Așteaptă să fie adăugat",
-  "<span style='color:{status}'>Windows keeps {keys} for itself, so it can't be a hotkey. Pick a different key.</span>": "<span style='color:{status}'>Windows păstrează {keys} pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>",
-  "<span style='color:{warn}'>Windows keeps <b>{key}</b> for itself, so it can't be a hotkey. Pick another key.</span>": "<span style='color:{warn}'>Windows păstrează <b>{key}</b> pentru el, așa că nu poate fi o scurtătură. Alege altă tastă.</span>",
   "Opacity": "Opacitate",
   "Playing sound background": "Fundalul sunetului redat",
   "Show the playing sound's thumbnail behind the cards": "Arată miniatura sunetului redat în spatele cardurilor",
