@@ -3228,5 +3228,8 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "嘿！这个现在还没用，因为 Onion Board 还没在你的麦克风里设置好。别人还是能听到你。",
   "{n} pad was found and put back on the board.": [
     "找到 {n} 个按键，已放回面板。"
-  ]
+  ],
+  "Skip to the next sound": "跳到下一个声音",
+  "Skip to the next sound in Up next": "跳到“下一个”中的下一个声音",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "停止正在播放的声音，并开始“下一个”中的下一个。没有等待的声音时，只会停止当前声音。"
 }

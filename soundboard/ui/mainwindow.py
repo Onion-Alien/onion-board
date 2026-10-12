@@ -1307,7 +1307,12 @@ class MainWindow(QMainWindow):
         self.mini_st.setToolTip(_("Stop"))
         self.mini_st.clicked.connect(self.stop_current)
         icons.set_icon(self.mini_st, "stop", size=16)
-        for b in (self.mini_pp, self.mini_st):
+        self.mini_skip = QPushButton()
+        self.mini_skip.setObjectName("transport_stop")
+        self.mini_skip.setToolTip(_("Skip to the next sound in Up next"))
+        self.mini_skip.clicked.connect(self.skip_next)
+        icons.set_icon(self.mini_skip, "next", size=16)
+        for b in (self.mini_pp, self.mini_st, self.mini_skip):
             b.setFixedSize(34, 30)
             top.addWidget(b)
         self.mini_name = ElidedLabel(self.np_name.text(), hide_overflow=True)
@@ -1860,7 +1865,12 @@ class MainWindow(QMainWindow):
         self.btn_st.setToolTip(_("Stop"))
         self.btn_st.clicked.connect(self.stop_current)
         icons.set_icon(self.btn_st, "stop", size=16)
-        for b in (self.btn_pp, self.btn_st):
+        self.btn_skip = QPushButton()
+        self.btn_skip.setObjectName("transport_stop")   # the same quiet square as ■
+        self.btn_skip.setToolTip(_("Skip to the next sound in Up next"))
+        self.btn_skip.clicked.connect(self.skip_next)
+        icons.set_icon(self.btn_skip, "next", size=16)
+        for b in (self.btn_pp, self.btn_st, self.btn_skip):
             b.setFixedSize(CONTROL_H, CONTROL_H)
         self.np_name = QLabel(_("Pick a sound"))
         self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
@@ -1887,6 +1897,7 @@ class MainWindow(QMainWindow):
         self.np_time.hide()   # until there is a time to show (_set_np_time)
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
+        th.addWidget(self.btn_skip)
         self._name_seek = NameAndSeek(self.np_name, self.seek, 190)
         th.addWidget(self._name_seek, 1)
         th.addWidget(self.np_time)
@@ -5047,8 +5058,8 @@ class MainWindow(QMainWindow):
                          hotkey=html.escape(pretty_key(combo)), what=html.escape(what),
                          lost=html.escape(_(" and ").join(lost))), "warn")
 
-    QUICK_HOTKEYS = ("stop_hotkey", "pause_hotkey", "random_hotkey", "last_hotkey",
-                     "mic_hotkey", "hotkeys_off_hotkey", "overlay_hotkey")
+    QUICK_HOTKEYS = ("stop_hotkey", "pause_hotkey", "skip_hotkey", "random_hotkey",
+                     "last_hotkey", "mic_hotkey", "hotkeys_off_hotkey", "overlay_hotkey")
 
     def _fill_quick_hotkeys(self, menu: QMenu):
         """The Sounds tab's keyboard button: the common hotkeys with their keys (click
@@ -5664,6 +5675,8 @@ class MainWindow(QMainWindow):
             self.save_replay()
         elif action == "__pause__":
             self._pause_clicked()
+        elif action == "__skip__":
+            self.skip_next()
         elif action == "__random__":
             self.play_random()
         elif action.startswith(RANDOM):
@@ -6184,6 +6197,27 @@ class MainWindow(QMainWindow):
         if self.current:
             self._stop_one(self.current)
         self.start_frac = 0.0
+
+    def skip_next(self):
+        """The player's ⏭ (and its hotkey): the next sound in Up next starts now. The
+        board's queue waits for every pad sound, so they all make way (as Play all
+        does); a web search's Up next waits for its song. Nothing waiting: it stops
+        the player's sound, like ■."""
+        if self._queue:
+            for sid in self.engine.playing():
+                if sid in self._meta:
+                    self.engine.stop(sid)
+            self._next_in_queue()
+        elif self.linkbar.up_next():
+            self.engine.stop(LINK_ID)
+            self.linkbar.play_next()
+        elif self.current:
+            self._stop_sound(self.current)
+            self.start_frac = 0.0
+        else:
+            self.cue("fail")
+            return
+        self._wake()
 
     def _stop_one(self, sid: str):
         """A ■ for one sound (the player's, or a Now playing chip's). A second press

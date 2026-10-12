@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} gomb előkerült, és visszakerült a táblára.",
     "{n} gomb előkerült, és visszakerült a táblára."
-  ]
+  ],
+  "Skip to the next sound": "Ugrás a következő hangra",
+  "Skip to the next sound in Up next": "Ugrás a Következik lista következő hangjára",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Leállítja a szóló hangot, és elindítja a következőt a Következik listából. Ha nincs várakozó, csak leállítja a hangot."
 }

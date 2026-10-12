@@ -1,0 +1,1 @@
+- A ⏭ Skip button next to ■ in the player (and the mini player), plus a "Skip to the next sound" hotkey in Settings → Hotkeys: the next sound in Up next starts at once. With nothing waiting it stops the sound.

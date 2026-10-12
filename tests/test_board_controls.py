@@ -165,6 +165,26 @@ def test_play_next_and_stop_everything_clears_the_queue(window, monkeypatch, cal
     assert w._queue == []
 
 
+def test_skip_starts_the_next_queued_sound_now(window, monkeypatch, calls):
+    w = window
+    stopped = []
+    monkeypatch.setattr(w.engine, "stop", stopped.append)
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s1")
+    w.btn_skip.click()
+    assert stopped == ["s0"] and [c[0] for c in calls] == ["s1"] and w._queue == []
+
+
+def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypatch, calls):
+    w = window
+    stopped = []
+    monkeypatch.setattr(w.engine, "stop", stopped.append)
+    playing(monkeypatch, w, ["s0"])
+    w.select("s0")
+    w.on_hotkey("__skip__")
+    assert stopped == ["s0"] and calls == []
+
+
 def test_play_a_whole_category_one_after_another(window, monkeypatch, calls):
     w = window
     w.new_category(name="Memes")

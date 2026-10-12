@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} पैड मिला और बोर्ड पर वापस रख दिया गया।",
     "{n} पैड मिले और बोर्ड पर वापस रख दिए गए।"
-  ]
+  ],
+  "Skip to the next sound": "अगली साउंड पर जाएँ",
+  "Skip to the next sound in Up next": "‘अगला’ में अगली साउंड पर जाएँ",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "चल रही साउंड रोककर ‘अगला’ में अगली साउंड शुरू करता है। कुछ इंतज़ार में न हो तो बस साउंड रोक देता है।"
 }

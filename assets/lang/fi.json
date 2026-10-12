@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} nappi löytyi ja palautettiin taululle.",
     "{n} nappia löytyi ja palautettiin taululle."
-  ]
+  ],
+  "Skip to the next sound": "Siirry seuraavaan ääneen",
+  "Skip to the next sound in Up next": "Siirry seuraavaan ääneen kohdassa Seuraavana",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Pysäyttää soivan äänen ja aloittaa seuraavan kohdasta Seuraavana. Jos mikään ei odota, se vain pysäyttää äänen."
 }

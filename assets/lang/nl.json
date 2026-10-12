@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} blok is teruggevonden en weer op het bord gezet.",
     "{n} blokken zijn teruggevonden en weer op het bord gezet."
-  ]
+  ],
+  "Skip to the next sound": "Naar het volgende geluid",
+  "Skip to the next sound in Up next": "Naar het volgende geluid in Hierna",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stopt het geluid dat speelt en start het volgende in Hierna. Wacht er niets, dan stopt het alleen het geluid."
 }

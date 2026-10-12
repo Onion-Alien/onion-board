@@ -3228,5 +3228,8 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Ini belum berfungsi lagi, sebab Onion Board belum disediakan dalam mik anda. Orang masih boleh dengar anda.",
   "{n} pad was found and put back on the board.": [
     "{n} pad ditemui dan diletakkan semula pada papan."
-  ]
+  ],
+  "Skip to the next sound": "Langkau ke bunyi seterusnya",
+  "Skip to the next sound in Up next": "Langkau ke bunyi seterusnya dalam Seterusnya",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Menghentikan bunyi yang dimainkan dan memulakan bunyi seterusnya dalam Seterusnya. Jika tiada yang menunggu, ia hanya menghentikan bunyi."
 }

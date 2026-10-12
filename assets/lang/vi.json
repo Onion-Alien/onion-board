@@ -3228,5 +3228,8 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Này! Cái này chưa có tác dụng, vì Onion Board chưa được thiết lập trong mic của bạn. Mọi người vẫn nghe thấy bạn.",
   "{n} pad was found and put back on the board.": [
     "Đã tìm thấy {n} pad và đặt lại lên bảng."
-  ]
+  ],
+  "Skip to the next sound": "Chuyển sang âm thanh tiếp theo",
+  "Skip to the next sound in Up next": "Chuyển sang âm thanh tiếp theo trong Tiếp theo",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Dừng âm thanh đang phát và bắt đầu âm thanh kế tiếp trong Tiếp theo. Nếu không có gì đang chờ, chỉ dừng âm thanh."
 }

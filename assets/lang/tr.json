@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} tuş bulundu ve panoya geri kondu.",
     "{n} tuş bulundu ve panoya geri kondu."
-  ]
+  ],
+  "Skip to the next sound": "Sonraki sese geç",
+  "Skip to the next sound in Up next": "Sıradaki listesindeki sonraki sese geç",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Çalan sesi durdurur ve Sıradaki listesindeki sonrakini başlatır. Bekleyen yoksa yalnızca sesi durdurur."
 }
