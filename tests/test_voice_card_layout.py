@@ -159,3 +159,25 @@ def test_voice_changer_switch_heads_the_card_and_picked_bar_holds_actions(qapp):
     finally:
         panel.close()
         panel.deleteLater()
+
+
+def test_a_short_window_scrolls_the_picked_voice_bar_with_the_voices(qapp, monkeypatch):
+    """Pinned under the voices; in a short window (the fitter's step) it goes to the end
+    of the voice changer's card instead, still there, and comes back when there's room."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    panel = VoicePanel(FakeEngine(), {}, {})
+    try:
+        picked = panel.fx.picked
+        step = next(fn for _p, axis, fn in panel.fit_steps() if axis == "h")
+        assert picked.parentWidget() is panel and picked.property("pinned")
+        step(True)
+        assert picked.parentWidget() is panel.fx and not picked.property("pinned")
+        lay = panel.fx.layout()
+        assert lay.itemAt(lay.count() - 1).widget() is picked
+        step(False)
+        assert picked.parentWidget() is panel and picked.property("pinned")
+        panel.show_tab("ai")
+        assert not picked.isVisibleTo(panel)
+    finally:
+        panel.shutdown()
+        panel.deleteLater()

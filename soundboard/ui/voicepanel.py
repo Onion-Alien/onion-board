@@ -652,6 +652,7 @@ class VoiceFxPanel(QWidget):
         ph.addWidget(self.picked_pic)
         self.picked_name = QLabel()
         self.picked_name.setObjectName("pickedname")
+        self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
         ph.addWidget(self.picked_name)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
@@ -2870,7 +2871,29 @@ class VoicePanel(QWidget):
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
-        return [(50, "w", r.hide(self.speech.say_stop))]
+        return [(50, "w", r.hide(self.speech.say_stop)),
+                # a short window: the picked voice's bar scrolls with the voices (still
+                # there, under them) rather than the window turning into the mini player
+                (45, "h", self._pin_picked_off)]
+
+    def _pin_picked_off(self, compact: bool):
+        """Pinned under the scrolling card, or (`compact`) at the end of the voice
+        changer's card, scrolling with it."""
+        picked = self.fx.picked
+        if bool(picked.property("pinned")) != compact:
+            return
+        outer, fx_lay = self.layout(), self.fx.layout()
+        assert isinstance(outer, QVBoxLayout) and isinstance(fx_lay, QVBoxLayout)
+        outer.removeWidget(picked)
+        fx_lay.removeWidget(picked)
+        if compact:
+            fx_lay.addWidget(picked)
+        else:
+            outer.insertWidget(outer.indexOf(self.bar), picked)
+        picked.setProperty("pinned", not compact)
+        picked.style().unpolish(picked)
+        picked.style().polish(picked)
+        picked.setVisible(compact or self._tab == "fx")
 
     def stack_steps(self):
         return []   # one card at a time: nothing to stack when narrow
@@ -2983,7 +3006,7 @@ class VoicePanel(QWidget):
         self._tab = key
         for k, f in self._cards.items():
             f.setVisible(k == key)
-        if self.fx.picked.property("pinned"):   # (pinned once the tab is made)
+        if self.fx.picked.property("pinned"):   # (in its card when not: shown with it)
             self.fx.picked.setVisible(key == "fx")
         self._tabs[key].setChecked(True)
         self._update_heads()
