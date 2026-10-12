@@ -1371,7 +1371,9 @@ class PadGrid(QWidget):
         # the same colour the page behind it shows; read on each paint, so a theme
         # change (theme.apply repaints every widget) follows
         p = QPainter(self)
-        snap_to_pixels(p)
+        # no snap_to_pixels until the background is down: it's opaque (nothing is
+        # cleared first), and the half-pixel nudge left a one-pixel strip of the old
+        # picture at the edge of each repaint, lines behind the cards at 125 %
         # the window's faint glow, fixed to the pads (so a scroll can still copy
         # what's on screen): it lines up with the window at the top of the board
         win, view = self.window(), self.parentWidget()
@@ -1397,6 +1399,7 @@ class PadGrid(QWidget):
                 p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
                 p.drawPixmap(target, pm, QRectF(pm.rect()))
                 p.restore()
+        snap_to_pixels(p)
         drop = self.drop_area()
         if drop is not None and drop.intersects(QRectF(e.rect())):
             # the empty room under the pads says what it's for, faintly

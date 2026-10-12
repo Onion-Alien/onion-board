@@ -1,0 +1,1 @@
+- Thin leftover lines no longer show behind and between the sound cards after scrolling at 125 % / 150 % display scaling
