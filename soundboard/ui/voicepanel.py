@@ -1775,7 +1775,7 @@ class SpeechPanel(QWidget):
         mrow = QHBoxLayout()
         self.b_install = QPushButton(_("Install speech recognition"))
         icons.set_icon(self.b_install, "plus")
-        self.b_install.setToolTip(_("One-time download, about 300 MB. Requires Python 3.12+."))
+        self.b_install.setToolTip(_("One-time download, about 300 MB."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
         b_open = icon_button("folder", _("Open folder"))
@@ -1822,7 +1822,7 @@ class SpeechPanel(QWidget):
         ov.addWidget(self.chk_fx)
         self.b_update = QPushButton(_("Update speech recognition"))
         self.b_update.setToolTip(_("Runs its install again: picks up what a newer Onion Board "
-                                   "needs (translation, for one). Needs Python 3.12+."))
+                                   "needs (translation, for one)."))
         self.b_update.clicked.connect(self._install)
         ov.addWidget(self.b_update, 0, Qt.AlignmentFlag.AlignLeft)
         v.addWidget(self.opts)
@@ -2474,11 +2474,20 @@ class SpeechPanel(QWidget):
             self.lbl_missing.setText(_(
                 "The live-voice add-on is missing from this copy of Onion Board. Run the "
                 "installer again (it comes with every install), then press Refresh below."))
+        elif m.broken:   # the Python it was set up with is gone (soundboard.pyget)
+            self.lbl_missing.setText(_("Speech recognition stopped working: the Python it "
+                                       "was set up with is gone from this PC. Press Repair "
+                                       "to set it up again."))
+            self.lbl_missing.setToolTip(str(m.path))
         elif not ok:
             self.lbl_missing.setText(_("Speaking another language needs speech recognition "
                                        "installed first (runs on this PC; what you say never "
-                                       "leaves it). Needs Python 3.12+ from python.org."))
+                                       "leaves it)."))
             self.lbl_missing.setToolTip(str(m.path))
+        if not self._installing:
+            fix = m is not None and m.broken
+            self.b_install.setText(_("Repair") if fix else _("Install speech recognition"))
+            icons.set_icon(self.b_install, "reload" if fix else "plus")
 
     def _install(self):
         m = self.module
@@ -2517,6 +2526,7 @@ class SpeechPanel(QWidget):
         else:
             last = self.lbl_install.text()
             self.lbl_install.hide()
+            self._refresh_module()   # Repair stays Repair
             busy.toast(self, html.escape(_(
                 "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, "
                 "run install.bat in the add-on's folder to see why.",
@@ -2740,6 +2750,8 @@ class ModulesList(QWidget):
                 continue
             if m.error:
                 state = f"⚠ {m.error}"
+            elif m.kind == "service" and m.broken:
+                state = _("stopped working: needs a repair")
             elif m.kind == "service" and not m.installed:
                 state = (_("not set up yet: press Install speech recognition above")
                          if m.id == LIVE_MODULE and not net.offline() else _("not set up yet"))

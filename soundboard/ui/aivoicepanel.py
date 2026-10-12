@@ -209,7 +209,10 @@ class AiVoicePanel(QWidget):
         setup_row.addWidget(self.bun_robot, 0, Qt.AlignmentFlag.AlignVCenter)
 
         info = QVBoxLayout()
-        info.setSpacing(8)
+        info.setSpacing(10)
+        # the words, the button and the progress stay together, centred beside Robo-Bun
+        # (spread over his height they left a gap between the words and the button)
+        info.addStretch(1)
         self.lbl_missing = hint_label("")
         info.addWidget(self.lbl_missing)
 
@@ -217,13 +220,13 @@ class AiVoicePanel(QWidget):
         mrow.setSpacing(8)
         self.b_install = QPushButton(_("Install AI voices"))
         icons.set_icon(self.b_install, "plus")
-        self.b_install.setToolTip(_("One-time download, about 90 MB. Needs Python 3.12+."))
+        self.b_install.setToolTip(_("One-time download, about 90 MB."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
         self.b_get = QPushButton(_("Get AI voices"))
         icons.set_icon(self.b_get, "plus")
         self.b_get.setToolTip(_("An optional add-on: about 55 MB, from this project's GitHub "
-                                "page. Needs Python 3.12+ from python.org."))
+                                "page."))
         self.b_get.clicked.connect(self._get)
         mrow.addWidget(self.b_get)
         mrow.addStretch(1)
@@ -236,6 +239,7 @@ class AiVoicePanel(QWidget):
         self.loading_bar = LoadingBar()
         self.loading_bar.hide()
         info.addWidget(self.loading_bar)
+        info.addStretch(1)
 
         setup_row.addLayout(info, 1)
         # Robo-Bun and the install, in their own inner area
@@ -268,7 +272,7 @@ class AiVoicePanel(QWidget):
         ov.addLayout(brow)
         self.b_update = QPushButton(_("Update AI voices"))
         self.b_update.setToolTip(_("Runs its install again (and fetches the voice model if "
-                                   "it's missing). Needs Python 3.12+."))
+                                   "it's missing)."))
         self.b_update.clicked.connect(self._install)
         urow = QHBoxLayout()
         urow.setSpacing(8)
@@ -341,11 +345,19 @@ class AiVoicePanel(QWidget):
             self.lbl_missing.setText(_(
                 "AI voices are an optional add-on (about 55 MB, the voice model and its "
                 "runtime). Nothing is downloaded until you press Get AI voices."))
+        elif m.broken:   # the Python they were set up with is gone (soundboard.pyget)
+            self.lbl_missing.setText(_("AI voices stopped working: the Python they were set "
+                                       "up with is gone from this PC. Press Repair to set "
+                                       "them up again."))
+            self.lbl_missing.setToolTip(str(m.path))
         elif not ok:
             self.lbl_missing.setText(_("AI voices need a one-time install first: about 90 MB "
-                                       "(the voice model and its runtime). Needs Python 3.12+ "
-                                       "from python.org."))
+                                       "(the voice model and its runtime)."))
             self.lbl_missing.setToolTip(str(m.path))
+        if not self._installing:
+            fix = m is not None and m.broken
+            self.b_install.setText(_("Repair") if fix else _("Install AI voices"))
+            icons.set_icon(self.b_install, "reload" if fix else "plus")
 
     # ------------------------------------------------------------ settings
     def _emit(self):
@@ -569,7 +581,8 @@ class AiVoicePanel(QWidget):
                 info = aiaddon.install(aiaddon.fetch(offer, progress))
                 busy.emit(self._install_note,
                           _("setting up its Python environment (a few minutes)…"))
-                ok = mods.install(info, lambda line: busy.emit(self._install_line, line))
+                ok = mods.install(info, lambda line: busy.emit(self._install_line, line),
+                                  on_note=lambda t: busy.emit(self._install_note, t))
                 busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the button must come back
                 if not isinstance(e, (mods.ModuleError, OSError)):   # a bug: report it
@@ -611,7 +624,8 @@ class AiVoicePanel(QWidget):
 
         def work():
             try:
-                ok = mods.install(m, lambda line: busy.emit(self._install_line, line))
+                ok = mods.install(m, lambda line: busy.emit(self._install_line, line),
+                                  on_note=lambda t: busy.emit(self._install_note, t))
                 busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the buttons must come back
                 if not isinstance(e, (mods.ModuleError, OSError)):   # a bug: report it

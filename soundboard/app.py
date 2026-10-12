@@ -219,6 +219,35 @@ def get_tor() -> int:
     return 0
 
 
+def install_addon(module_id: str) -> int:
+    """`OnionBoard.exe --install-addon live-voice`: the installer's live voice box. Runs
+    the add-on's install (soundboard.modules.install, the same as the Voice tab's
+    Install button), getting a Python for it first when the PC has no good one
+    (soundboard.pyget), the way the saved Connection setting says. No window. Returns
+    0 when it's set up (already, or now), 1 if it couldn't be."""
+    applog.setup(APP_DIR)
+    from soundboard import library, modules, net, tor
+    info = next((m for m in modules.discover() if m.id == module_id), None)
+    if info is None or info.error:
+        print(f"FAIL: no usable add-on {module_id!r}", file=sys.stderr)
+        return 1
+    if info.installed:
+        return 0
+    cfg = library.Config.load()
+    tor.configure_from(cfg)
+    net.configure_from(cfg)
+    try:
+        ok = modules.install(info, print)
+    finally:
+        tor.shutdown()
+    if not ok:
+        log.warning("--install-addon %s failed", module_id)
+        print("FAIL", file=sys.stderr)
+        return 1
+    print(f"OK: {module_id} is set up")
+    return 0
+
+
 def set_offline() -> int:
     """`OnionBoard.exe --set-offline`: the installer's "Offline mode" box (or
     /OFFLINE=1). Switches on Offline mode in config.json before the app's first start,
@@ -410,6 +439,9 @@ def main():
         sys.exit(selftest())
     if "--get-tor" in sys.argv:
         sys.exit(get_tor())
+    if "--install-addon" in sys.argv:
+        i = sys.argv.index("--install-addon")
+        sys.exit(install_addon(sys.argv[i + 1] if i + 1 < len(sys.argv) else ""))
     if "--set-offline" in sys.argv:
         sys.exit(set_offline())
     if "--keep-netlog" in sys.argv:
