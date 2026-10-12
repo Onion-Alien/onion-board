@@ -793,7 +793,7 @@ class MainWindow(QMainWindow):
         self.btn_air.setCheckable(True)
         self.btn_air.setChecked(True)
         self.btn_air.toggled.connect(self.set_sending)
-        icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON, gap=False)
+        icons.set_icon(self.btn_air, "live", "danger_text", "on_live", size=sidebar.ICON, gap=False)
         self.set_sending(True)
         # Keep the mode controller for shared commands; its full picker lives on Setup.
         from soundboard.ui.destpanel import ModeButton
@@ -1269,7 +1269,7 @@ class MainWindow(QMainWindow):
         self.mini_air.setChecked(self.btn_air.isChecked())
         self.mini_air.setToolTip(self.btn_air.toolTip())
         self.mini_air.toggled.connect(self.set_sending)
-        icons.set_icon(self.mini_air, "live", "danger_text", "#ffffff")
+        icons.set_icon(self.mini_air, "live", "danger_text", "on_live")
         # "All" in words: an icon-only ■ here looked just like the one-sound ■ on
         # the left, and stopped everything
         self.mini_stop = QPushButton(_("All"))

@@ -37,7 +37,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#2a2e3d", btn_hover="#333849", btn_press="#3c4257",
         border="#363b4e", border_hi="#5a6080", groove="#343849", inset="#1b1d26",
         text="#e6e8f0", text_hi="#f1f3f9", muted="#8a90a6", faint="#6b7189", section="#8f96b3",
-        accent="#7c5cff", accent_hi="#8d71ff", accent2="#ff4d8d", on_accent="#ffffff",
+        accent="#7859f7", accent_hi="#8d71ff", accent2="#ff4d8d", on_accent="#ffffff",
         off="#4a5068", badge="#343849", badge_text="#d6d9e6",
         danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
         warn_bg="#3a2e14", warn_text="#ffb020",
@@ -357,13 +357,40 @@ def _mix(a: str, b: str, t: float) -> str:
 mix = _mix   # for widgets that tint with the theme's colours
 
 
+def _away(on: str) -> str:
+    """Black or white, whichever is further from text colour `on`."""
+    return "#000000" if _contrast(on, "#000000") > _contrast(on, "#ffffff") else "#ffffff"
+
+
+def _readable_fill(fill: str, on: str, need: float = 4.5) -> str:
+    """`fill` moved away from its text colour `on`, just far enough for `on` to read on
+    it (`need`); unchanged when it already does."""
+    away = _away(on)
+    return next((c for c in (_mix(fill, away, i / 40) for i in range(41))
+                 if _contrast(on, c) >= need), away)
+
+
+# The surfaces text in the live or accent colour sits on (a pill on a card, a link in a
+# dialog, a hovered card): it must read on each of them, not just the window.
+TEXT_ON = ("bg", "panel", "card", "card_hi")
+
+
+def _readable_text(colour: str, t: dict[str, str], need: float, on=TEXT_ON) -> str:
+    """`colour` moved towards the theme's text colour until it reads (`need`) on every
+    surface in `on`; the text colour itself when nothing short of it does."""
+    return next(c for c in (_mix(colour, t["text_hi"], i / 20) for i in range(21))
+                if min(_contrast(c, t[b]) for b in on if b in t) >= need or c == t["text_hi"])
+
+
 def _add_live_tokens(t: dict[str, str], colour: str = "") -> None:
-    """The "it's on" highlight (voice changer on, live on air, the mic pill when it's
-    connected, a live tab's tint): the theme's own accent, not one green for every
-    theme. `live` / `live_hi` / `on_live` fill a switched-on button; `live_text` is
-    the same colour where it's drawn on the background (text, icons, a tab's wash),
-    moved towards the theme's text colour until it reads there (Flashbang's yellow
-    on white, Onion's purple on purple). A theme can set any of these itself.
+    """The "it's on" highlight (voice changer on, live on air, Send, the mic pill when
+    it's connected, a live tab's tint): the theme's own accent, not one green for every
+    theme. `live` / `live_hover` / `live_top` fill a switched-on button (its plain, hovered
+    and lit-top shades), each dark or light enough for its `on_live` words and icon to
+    read (4.5:1); `live_hi` is its border. `live_text` is the same colour where it's
+    drawn on a surface (text, icons, a tab's wash), moved towards the theme's text colour
+    until it reads on each of them (Flashbang's yellow on white, Onion's purple on
+    purple). A theme can set live / live_hi / on_live / live_text itself.
     `colour`: one the user picked instead (Settings → Appearance), whatever the theme."""
     if colour:
         t["live"], t["live_hi"] = colour, _mix(colour, "#ffffff", 0.18)
@@ -373,9 +400,14 @@ def _add_live_tokens(t: dict[str, str], colour: str = "") -> None:
     t.setdefault("live", t["accent"])
     t.setdefault("live_hi", t["accent_hi"])
     t.setdefault("on_live", t["on_accent"])
+    on = t["on_live"]
+    t["live"] = _readable_fill(t["live"], on)
+    t["live_hover"] = _readable_fill(t["live_hi"], on)
+    # the lit top of its gradient: as much lighter as still reads
+    t["live_top"] = next((c for c in (_mix(t["live"], "#ffffff", 0.16 * (8 - i) / 8)
+                                      for i in range(9)) if _contrast(on, c) >= 4.5), t["live"])
     if "live_text" not in t:
-        t["live_text"] = next(c for c in (_mix(t["live"], t["text_hi"], i / 10) for i in range(11))
-                              if _contrast(c, t["bg"]) >= 4.5 or c == t["text_hi"])
+        t["live_text"] = _readable_text(t["live"], t, 4.5)
     t.setdefault("live_border", _mix(t["live_text"], t["bg"], 0.45))
 
 
@@ -388,9 +420,8 @@ def _add_hover_token(t: dict[str, str]) -> None:
         return
     # light text: darker; dark text: lighter
     on = t["on_accent"]
-    away = "#000000" if _contrast(on, "#000000") > _contrast(on, "#ffffff") else "#ffffff"
     t["accent_hover"] = next(
-        (c for c in (_mix(t["accent_hi"], away, i / 20) for i in range(13))
+        (c for c in (_mix(t["accent_hi"], _away(on), i / 20) for i in range(13))
          if _contrast(c, t["on_accent"]) >= 4.5), t["accent_hi"])
 
 
@@ -408,15 +439,16 @@ def _add_item_hover_token(t: dict[str, str]) -> None:
 
 
 def _add_accent_text_token(t: dict[str, str]) -> None:
-    """accent_text: the accent where it's drawn straight on the window or a card (an
-    icon, the bold *Add sounds*), not as a fill. Flashbang's yellow was 1.4:1 on white:
-    the accent moved towards the text colour until it reads (3:1, the bar for icons and
-    bold words). Most themes' accent already does, and keeps its exact colour."""
-    if "accent_text" in t:
-        return
-    t["accent_text"] = next(c for c in (_mix(t["accent"], t["text_hi"], i / 20) for i in range(21))
-                            if min(_contrast(c, t[b]) for b in ("bg", "panel", "card")) >= 3.0
-                            or c == t["text_hi"])
+    """The accent where it's drawn straight on a surface, not as a fill, in two
+    strengths. accent_text: icons and edges (3:1); Flashbang's yellow was 1.4:1 on white.
+    accent_link: words (links, an effect's value, a checked menu row, a small action
+    label), which need 4.5:1 on every surface they sit on (TEXT_ON and a hovered menu
+    row). Both are the accent moved towards the text colour only as far as needed; most
+    themes' accent keeps its exact colour for icons."""
+    if "accent_text" not in t:
+        t["accent_text"] = _readable_text(t["accent"], t, 3.0, ("bg", "panel", "card"))
+    if "accent_link" not in t:
+        t["accent_link"] = _readable_text(t["accent"], t, 4.5, TEXT_ON + ("item_hover",))
 
 
 SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
@@ -579,7 +611,7 @@ QFrame#soundstoolbar QPushButton { background:transparent; border:1px solid tran
 QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }
 QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
-QFrame#soundstoolbar QPushButton#soundadd { color:$accent_text; font-weight:600; }
+QFrame#soundstoolbar QPushButton#soundadd { color:$accent_link; font-weight:600; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
 QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
@@ -646,7 +678,7 @@ QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:
 QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
 QPushButton#railupdate { background:transparent; border:none; padding:0; }   /* painted: sidebar.UpdateCard */
 QPushButton#railupdatecopy { background:transparent; border:1px solid transparent;
-    border-radius:6px; padding:2px 6px; color:$accent; font-size:8.5pt; font-weight:600; }
+    border-radius:6px; padding:2px 6px; color:$accent_link; font-size:8.5pt; font-weight:600; }
 QPushButton#railupdatecopy:hover { background:$panel; }
 QPushButton#railupdatecopy:focus { border-color:$accent; }
 QFrame#sidebar[compact="true"] QToolButton#railtab,
@@ -661,7 +693,7 @@ QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#vsep { background:$border; border:none; }
 QFrame#toast { background:$panel; border:1px solid $border_hi; border-radius:12px; }
 QFrame#toast QLabel { background:transparent; }
-QFrame#toast QPushButton#toastaction { background:transparent; border:none; color:$accent_hi;
+QFrame#toast QPushButton#toastaction { background:transparent; border:none; color:$accent_link;
     font-weight:600; padding:2px 8px 6px; border-radius:6px; }
 QFrame#toast QPushButton#toastaction:hover { background:$btn_hover; }
 QFrame#toast QPushButton#toastclose { background:transparent; border:none; border-radius:12px;
@@ -674,12 +706,13 @@ QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }
+QFrame#card QLabel#sourcepic { background:$inset; border-radius:8px; }   /* ui/sourcedialog.py: no thumbnail */
 QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
 QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
 QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
     background:$danger_bg; border:1px solid transparent; color:$danger_text; }
 QPushButton#onair:checked { background:$live; border:1px solid transparent; color:$on_live; }
-QPushButton#onair:checked:hover { background:$live_hi; }
+QPushButton#onair:checked:hover { background:$live_hover; }
 QWidget#decktop { background:transparent; }
 QLabel#decktitle { color:$text; font-size:9pt; font-weight:600; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
@@ -818,7 +851,7 @@ QScrollBar::add-page, QScrollBar::sub-page { background:transparent; }
 QMenu { background:$card; border:1px solid $border_hi; padding:5px; }
 QMenu::item { padding:7px 22px 7px 12px; border-radius:6px; margin:1px 0; }
 QMenu::item:selected { background:$item_hover; color:$text_hi; }
-QMenu::item:checked { color:$accent_hi; }
+QMenu::item:checked { color:$accent_link; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
@@ -897,7 +930,7 @@ QFrame#fxcard QLabel, QFrame#fxcard QCheckBox { background:transparent; }
 QLabel#fxname { font-weight:700; font-size:10pt; color:$text_hi; }
 QLabel#fxdesc { color:$muted; font-size:8.5pt; }
 QLabel#fxparam { color:$text; font-size:9pt; }
-QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
+QLabel#fxvalue { color:$accent_link; font-size:9pt; font-weight:700; }
 QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QFrame#voicebar { background:$panel; border-radius:12px; }
@@ -919,8 +952,9 @@ QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:trans
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
 QPushButton#power { font-weight:700; }
 QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
-QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
-QPushButton#live:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
+QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hover; }
+QPushButton#live:checked, QFrame#card QPushButton#live:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
+QPushButton#live:checked:hover, QFrame#card QPushButton#live:checked:hover { background:$live_hover; }
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
 QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
 QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }
@@ -1014,13 +1048,14 @@ QFrame#setcard QPushButton#primary[busy="true"]:hover { background:$inset; color
 
 # The widgets drawn in the live colour (by objectName): a colour change restyles just
 # these (apply_live), not the whole app, which takes seconds on a full board.
-LIVE_NAMES = ("power", "onair", "pill")
+LIVE_NAMES = ("power", "onair", "pill", "live")
 LIVE_STYLE = Template("""
-QPushButton#power:checked, QPushButton#onair:checked {
+QPushButton#power:checked, QPushButton#onair:checked, QPushButton#live:checked {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live);
     border:1px solid $live_hi; color:$on_live; }
 QPushButton#onair:checked { border-color:transparent; }
-QPushButton#power:checked:hover, QPushButton#onair:checked:hover { background:$live_hi; }
+QPushButton#power:checked:hover, QPushButton#onair:checked:hover,
+QPushButton#live:checked:hover { background:$live_hover; }
 QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
 """)
 
@@ -1028,7 +1063,7 @@ QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
 def live_sheet() -> str:
     """The live rules in the current colours, as a widget's own stylesheet (it wins
     over the app's, so it also beats the cards' generic `:checked` rules)."""
-    return LIVE_STYLE.substitute(T, live_top=_mix(T["live"], "#ffffff", 0.16))
+    return LIVE_STYLE.substitute(T)
 
 
 # A faint accent glow behind the logo gives the window a little warmth. Cards
@@ -1068,7 +1103,8 @@ QPushButton#transport_play:hover:!disabled {
         stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
 QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
-QFrame#setcard QPushButton#power:checked {
+QFrame#setcard QPushButton#power:checked, QPushButton#live:checked,
+QFrame#card QPushButton#live:checked {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live); }
 """)
 
@@ -1080,7 +1116,6 @@ def _rgba(colour: str, alpha: float) -> str:
 
 def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
     """The extra shades POLISH_STYLE paints with, from theme tokens `tk`."""
-    white = "#ffffff"
     panel = tk["panel"]
     return dict(
         tk,
@@ -1089,7 +1124,6 @@ def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
         edge=_mix(panel, tk["border"], 0.55),
         glass=_rgba(panel, 0.86),
         **_accent_shades(tk),
-        live_top=_mix(tk["live"], white, 0.16),
     )
 
 
@@ -1387,7 +1421,8 @@ def stylesheet(name: str | None = None) -> str:
 # Text colours code writes straight into a label's rich text or a widget's own stylesheet
 # (status(), T["faint"]...): a live theme switch swaps the old theme's for the new one's.
 _INLINE_KEYS = ("ok_text", "warn_text", "error_text", "danger_text", "text", "text_hi",
-                "muted", "faint", "section", "accent", "accent_hi", "live_text", "accent_text")
+                "muted", "faint", "section", "accent", "accent_hi", "live_text", "accent_text",
+                "accent_link")
 _TEXT_COLOUR = re.compile(r"(?<![-\w])(color:\s*)(#[0-9a-fA-F]{6})(?![0-9a-fA-F])")
 
 

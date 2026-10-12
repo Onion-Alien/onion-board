@@ -346,7 +346,7 @@ def test_see_why_text_is_level_with_the_warning_icon(qapp):
             t.card.action.setFont(QFont("Segoe UI", 10))
             qapp.processEvents()
             assert t.card.action.height() == toast.LINE
-            assert abs(ink_middle(t.card.action, theme.T["accent_hi"])
+            assert abs(ink_middle(t.card.action, theme.T["accent_link"])
                        - ink_middle(t.card.icon, theme.T["warn_text"])) <= 1
     finally:
         w.close()

@@ -575,7 +575,7 @@ class RadioTab(QWidget):
         self.btn_live = QPushButton()   # Send, like a program's on the Apps tab
         self.btn_live.setObjectName("live")
         self.btn_live.setCheckable(True)
-        icons.set_icon(self.btn_live, "live", checked_color="#ffffff")
+        icons.set_icon(self.btn_live, "live", checked_color="on_live")
         self.btn_live.toggled.connect(self._on_live)
         bh.addWidget(self.btn_live)
         self.now = NowPlaying()

@@ -613,7 +613,7 @@ class AppRow(HoverCard):
         self.btn_send.setCheckable(True)
         self.btn_send.setToolTip(_("Send this program's sound out to others, the way your "
                                    "sounds go (Setup tab)"))
-        icons.set_icon(self.btn_send, "live", checked_color="#ffffff")
+        icons.set_icon(self.btn_send, "live", checked_color="on_live")
         self.btn_send.toggled.connect(lambda on: self.send_toggled.emit(self, on))
         self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")

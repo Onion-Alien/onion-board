@@ -1103,12 +1103,16 @@ def tab_icon_name(tabs, index: int) -> str | None:
     return None
 
 
+LIVE_TOKENS = {"live_text", "on_live", "live"}   # the tokens a live-colour change moves
+
+
 def retheme_live():
-    """Re-draw only the icons in the live colour (a live tab's, the mic pill's) after
-    the user picks a new one: retheme() re-draws every icon in the app."""
+    """Re-draw only the icons in the live colour (a live tab's, the mic pill's) or on it
+    (a switched-on button's, in on_live) after the user picks a new one: retheme()
+    re-draws every icon in the app."""
     for ref, name, color, checked, pad in _applied:
         w = ref()
-        if w is not None and "live_text" in (color, checked):
+        if w is not None and {color, checked} & LIVE_TOKENS:
             try:
                 w.setIcon(icon(name, color, checked, pad=pad))
             except RuntimeError:   # the C++ widget is gone

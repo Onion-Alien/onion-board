@@ -2988,7 +2988,7 @@ class VoicePanel(QWidget):
         b.setObjectName("voicetab")
         b.setCheckable(True)
         b.setCursor(Qt.CursorShape.PointingHandCursor)
-        icons.set_icon(b, CARD_ICONS[key], checked_color="#ffffff", size=16)
+        icons.set_icon(b, CARD_ICONS[key], checked_color="on_accent", size=16)
         b.clicked.connect(lambda __=False, k=key: self.show_tab(k, asked=True))
         self._tab_group.addButton(b)
         self._tab_flow.addWidget(b)
