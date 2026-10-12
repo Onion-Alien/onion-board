@@ -1982,11 +1982,12 @@ class Engine:
             v = self._current(sid)
             return (v.progress(), v.paused) if v else None
 
-    def pause_all(self) -> bool:
-        """Pause everything playing, or resume if everything is already paused."""
+    def pause_all(self, on: bool | None = None) -> bool:
+        """Pause everything playing, or resume if everything is already paused.
+        on=True / False pauses / resumes everything instead of flipping."""
         with self.lock:
             live = [v for v in self.voices if not v.stopping and not v.finished and not v.preview]
-            resume = bool(live) and all(v.paused for v in live)
+            resume = (bool(live) and all(v.paused for v in live)) if on is None else not on
             for v in live:
                 v.paused = not resume
             return not resume
