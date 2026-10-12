@@ -726,8 +726,9 @@ class VoiceFxPanel(QWidget):
         ph.addWidget(self.picked_pic)
         self.picked_name = QLabel()
         self.picked_name.setObjectName("pickedname")
+        self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
-        ph.addWidget(self.picked_name)
+        ph.addWidget(self.picked_name, 1)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
         self.btn_tweak = QPushButton(_("Make it yours"))

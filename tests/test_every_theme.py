@@ -1,4 +1,4 @@
-"""Every theme in theme.THEMES (31 of them), not just Dark and Light: the bugs a full
+"""Every theme in theme.THEMES, not just Dark and Light: the bugs a full
 render of each one found, kept from coming back."""
 import pytest
 from PySide6.QtCore import QSize
@@ -9,6 +9,23 @@ from test_mainwindow import window as main_window  # noqa: F401 - the real windo
 from soundboard import theme
 from soundboard.settings import ThemeCard
 from soundboard.ui import icons
+
+
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_heading_colours_read_on_all_card_surfaces(name):
+    t = theme.tokens(name)
+    for surface in theme.TEXT_ON:
+        assert theme._contrast(t["section"], t[surface]) >= 4.5, surface
+
+
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_button_hover_is_distinct_and_keeps_readable_words(name):
+    t = theme.tokens(name)
+    # A chosen feedback floor, not a WCAG requirement between hover/rest states.
+    for base, hover, text in (("btn", "btn_hover", "text"),
+                              ("accent", "accent_hover", "on_accent")):
+        assert theme._contrast(t[base], t[hover]) >= 1.3, hover
+        assert theme._contrast(t[text], t[hover]) >= 4.5, hover
 
 
 @pytest.mark.parametrize("name", list(theme.THEMES))
