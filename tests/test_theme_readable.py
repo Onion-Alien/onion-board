@@ -36,6 +36,17 @@ def test_the_filled_accent_reads(name):
 
 
 @pytest.mark.parametrize("name", list(theme.THEMES))
+def test_buttons_and_boxes_on_a_card_stand_out_from_it(name):
+    """Light's card buttons were filled with the card's own white on a white card: the
+    Setup tab's Install / check again / Game read as plain text."""
+    css = theme.stylesheet(name)
+    rule = next(r for r in css.splitlines()
+                if r.startswith("QFrame#card QComboBox, QFrame#card QPushButton"))
+    fill = rule.split("background:")[1].split(";")[0].strip()
+    assert fill != theme.THEMES[name]["panel"], fill
+
+
+@pytest.mark.parametrize("name", list(theme.THEMES))
 def test_live_text_reads_on_every_surface_it_sits_on(name):
     """live_text was checked against the window only: 3.53:1 on Dark's hovered card."""
     for live in PICKED:
