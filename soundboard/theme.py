@@ -202,7 +202,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#2a2336", btn_hover="#342b43", btn_press="#3e3450",
         border="#3a3049", border_hi="#5e5079", groove="#352c44", inset="#19141f",
         text="#ebe5f4", text_hi="#f7f2ff", muted="#9b90b0", faint="#75698b", section="#a598c4",
-        accent="#9150f5", accent_hi="#a066ff", accent2="#ff5fa2", on_accent="#ffffff",
+        accent="#8f4cf5", accent_hi="#a066ff", accent2="#ff5fa2", on_accent="#ffffff",
         off="#4d4262", badge="#352c44", badge_text="#e2d9f0", **_DARK_STATUS,
     ),
     "Mint": dict(   # fresh mint and white
