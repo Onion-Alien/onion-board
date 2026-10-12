@@ -79,7 +79,7 @@ def test_radio_bar_buttons_line_up_and_keep_their_size_when_narrow(window):  # n
 
 def test_radio_bar_buttons_stay_put_on_play_stop_and_send(window, monkeypatch):  # noqa: F811
     w = window
-    w.resize(1400, 900)
+    w.resize(2000, 900)          # wide enough that Play keeps its word with any font
     w.show()
     w.tabs.setCurrentIndex(TAB_INDEX["radio"])
     pump()

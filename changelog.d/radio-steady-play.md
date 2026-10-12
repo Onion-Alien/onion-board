@@ -1,1 +1,1 @@
-﻿- Radio tab: the buttons no longer shift a few pixels when you click Play / Stop or Send.
+- Radio tab: the buttons no longer shift a few pixels when you click Play / Stop or Send.
