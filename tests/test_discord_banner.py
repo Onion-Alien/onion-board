@@ -129,3 +129,15 @@ def test_every_problem_has_words():
         assert p in chatguide.SETTING_FIXES
         from soundboard.ui.mainwindow import DISCORD_URGENT
         assert "{name}" in DISCORD_URGENT[p]
+
+
+def test_hiding_a_top_bar_leaves_the_focus_alone(window):
+    """A click on a bar's ✕ never takes the focus, so hiding the bar can't pass it on to
+    the sidebar's Sounds button."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QPushButton
+    for bar in window.TOP_BARS:
+        buttons = getattr(window, bar).findChildren(QPushButton)
+        assert buttons, bar
+        for b in buttons:
+            assert b.focusPolicy() == Qt.FocusPolicy.TabFocus, (bar, b.objectName())

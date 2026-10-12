@@ -384,6 +384,9 @@ class MainWindow(QMainWindow):
     category_programs_changed = Signal()   # a program -> category rule added / removed
     app_setup_changed = Signal()   # an app remembered / forgotten (appsetup)
 
+    # the slim bars across the top of the window (urgent fix, tip, app offer, FFmpeg, language)
+    TOP_BARS = ("urgent_bar", "tip_bar", "setup_bar", "ff_bar", "lang_bar")
+
     def __init__(self):
         super().__init__()
         # shutdown() ran (app.py also calls it on aboutToQuit). Set first: the splash
@@ -1016,6 +1019,12 @@ class MainWindow(QMainWindow):
         self.lang_bar.hide()
         self._lang_offered = ""
         rv.addWidget(self.lang_bar)
+
+        # the bars' buttons take focus from Tab only, never a click: a clicked ✕ held the
+        # focus, its bar hid, and Qt passed the focus on to the sidebar's Sounds button
+        for name in self.TOP_BARS:
+            for b in getattr(self, name).findChildren(QPushButton):
+                b.setFocusPolicy(Qt.FocusPolicy.TabFocus)
 
         # the bar and the tabs share a box with no gap of its own: every tab page already
         # starts 8 px down, so the bar's gap to the first row matches the rows below it
