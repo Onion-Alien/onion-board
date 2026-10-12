@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import html
 import logging
+import math
 import re
 import threading
 import time
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QObject, QPoint, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import (QColor, QFont, QKeySequence, QPainter, QPainterPath,
                            QShortcut)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QCheckBox,
@@ -416,6 +417,9 @@ class SettingsDialog(QDialog):
     # narrower than this, the categories are icons only and the search box goes over
     # the page (the list and box took 212 px of a 440 px window)
     NARROW_W = 640
+    TITLE_COG = 18   # the heading's cog, px
+    PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
+    BACK_PAD = "padding:6px 0px 8px 3px"
 
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
         """A page in the main window, in place of the tabs (MainWindow.open_settings),
@@ -430,8 +434,10 @@ class SettingsDialog(QDialog):
             mw.tab_switched.connect(self._tab_switched)
         self.setWindowTitle(_("Settings"))
         lay = QVBoxLayout(self)
-        # the main window's body has the margins; pages start 8 px down like a tab's
-        lay.setContentsMargins(0, 8, 0, 0)
+        # the main window's body has the side margins and none on top under Settings:
+        # the heading rises level with the rail's name (_level_with_rail) and the pages
+        # start PAGE_TOP down, where a tab's do
+        lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(12)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
@@ -498,6 +504,7 @@ class SettingsDialog(QDialog):
             self.search_box.setFocus(Qt.FocusReason.ShortcutFocusReason),
             self.search_box.selectAll()))
         side = self._side = QVBoxLayout()
+        side.setContentsMargins(0, self.PAGE_TOP, 0, 0)   # (raised by _level_with_rail)
         side.setSpacing(8)
         # a page, not a window: back to the tab you were on (as Escape or a rail
         # tab does), on its own row over the search with the page's name, so the
@@ -509,23 +516,32 @@ class SettingsDialog(QDialog):
         back.setAccessibleName(_("Back"))
         back.setAutoDefault(False)
         back.clicked.connect(self.accept)
+        # the page's name in the rail's "Onion Board" size, with a cog after it in the
+        # theme's colour (decoration, not a button)
         self.page_title = QLabel(_("Settings"))
-        self.page_title.setObjectName("section")
-        self.page_title.setProperty("head", True)   # (no gap on top: level with the arrow)
+        self.page_title.setObjectName("pagetitle")
+        self.title_cog = QLabel()
+        self.title_cog.setObjectName("pagetitlecog")
+        self.title_cog.setContentsMargins(0, 0, 0, 2)   # 1 px up, as the arrow
+        self._title_cog()
         # Keep the arrow over the category icons, with room between its hover
         # background and the heading.
-        back.setFixedWidth(36)
-        # its icon on the icons' centre line and level with the heading's letters
-        # (2 px lower than centred); the same 14 px of padding: the controls' height
-        back.setStyleSheet("padding:9px 0px 5px 3px")
-        top = QHBoxLayout()
-        top.setSpacing(8)
+        back.setFixedWidth(26)   # (just round the arrow: the heading right after it)
+        # its icon on the icons' centre line; the same 14 px of padding: the controls'
+        # height (BACK_PAD: the arrow level with the middle of the heading's capitals)
+        back.setStyleSheet(self.BACK_PAD)
+        top = self._top = QHBoxLayout()
+        top.setSpacing(2)   # (the heading close after the arrow)
         top.addWidget(back)
-        top.addWidget(self.page_title, 1)
+        top.addWidget(self.page_title)
+        top.addSpacing(4)   # (the cog as close as the arrow)
+        top.addWidget(self.title_cog)
+        top.addStretch(1)
         side.addLayout(top)
         side.addWidget(self.search_box)
         side.addWidget(self.categories, 1)
         right = self._right = QVBoxLayout()   # (narrow: the search box on top)
+        right.setContentsMargins(0, self.PAGE_TOP, 0, 0)
         right.setSpacing(8)
         right.addWidget(self.tabs, 1)
         content = self._content = QHBoxLayout()
@@ -545,6 +561,52 @@ class SettingsDialog(QDialog):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._fit_width(self.width())
+        QTimer.singleShot(0, self._level_with_rail)   # once the rows have their places
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        QTimer.singleShot(0, self._level_with_rail)
+
+    def _caps_mid(self, label: QLabel, dy: int = 0) -> float:
+        """The middle of a one-line, vertically centred label's capitals in the window,
+        in screen pixels (what the eye lines up: not the box, not the descenders), were
+        it `dy` px lower. Qt centres the text in fractions of a pixel and the screen
+        draws its baseline on a whole one: at 125% and 175% that rounding alone put the
+        heading a pixel off the rail's name."""
+        fm, k = label.fontMetrics(), label.devicePixelRatioF()
+        top = label.mapTo(self.window(), QPoint(0, 0)).y() + dy
+        base = round((top + (label.height() - fm.height()) / 2 + fm.ascent()) * k)
+        return base - fm.capHeight() * k / 2
+
+    def _level_with_rail(self):
+        """The heading row moves down until the middle of "Settings"' capitals is level
+        with the rail's "Onion Board" (the arrow and cog are centred on it); with the
+        name hidden (the rail shut) or a bar above the pages, it sits where the pages
+        start."""
+        if not qt_valid(self) or self.back_btn is None:
+            return
+        lay = self.layout()
+        if lay is not None:
+            lay.activate()   # (a lift just set: measured where it put the row)
+        side = self._side.contentsMargins()
+        lift = self.PAGE_TOP
+        wm = getattr(self.mw, "wordmark", None)
+        if wm is not None and qt_valid(wm) and wm.isVisible():
+            want = self._caps_mid(wm)
+            titled = self.page_title.isVisible()
+            k = self.back_btn.devicePixelRatioF()
+            at = self.back_btn.mapTo(self.window(), QPoint(0, 0)).y()
+
+            def off(dy):   # how far off the name, in screen pixels, dy px lower
+                if titled:
+                    return abs(self._caps_mid(self.page_title, dy) - want)
+                return abs((at + dy + self.back_btn.height() / 2) * k - want)   # (narrow)
+            # the whole-pixel lifts either side of the exact one: the nearer on screen
+            near = (want - self._caps_mid(self.page_title)) / self.devicePixelRatioF()
+            dy = min(range(math.floor(near) - 1, math.ceil(near) + 2), key=off)
+            lift = max(0, min(self.PAGE_TOP, side.top() + dy))
+        if lift != side.top():
+            self._side.setContentsMargins(side.left(), lift, side.right(), side.bottom())
 
     def _fit_width(self, width: int):
         """Narrow: the categories as an icon column (the name is the tip) and the
@@ -564,6 +626,7 @@ class SettingsDialog(QDialog):
             box.setFixedWidth(196)
         if self.back_btn is not None:
             self.page_title.setVisible(not narrow)
+            self.title_cog.setVisible(not narrow)
         self._content.setSpacing(8 if narrow else 16)
         for i in range(self.categories.count()):
             item = self.categories.item(i)
@@ -660,6 +723,13 @@ class SettingsDialog(QDialog):
             item = self.categories.item(i)
             name = item.data(Qt.ItemDataRole.UserRole)
             item.setIcon(icons.icon(name, selected="text_hi"))
+        if getattr(self, "title_cog", None) is not None:
+            self._title_cog()
+
+    def _title_cog(self):
+        """The heading's cog in this theme's accent (redrawn when the theme changes)."""
+        self.title_cog.setPixmap(icons.icon("settings", "accent").pixmap(
+            self.TITLE_COG, self.TITLE_COG))
 
     # ------------------------------------------------------------------ pages
     @staticmethod

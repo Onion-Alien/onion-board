@@ -614,6 +614,7 @@ QFrame#card[interactive="true"][playing="true"] { background:$card_hi; border:2p
 QLabel#section { color:$heading; font-size:10pt; font-weight:600; padding-top:8px;
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
+QLabel#pagetitle { color:$text_hi; font-size:12pt; font-weight:700; qproperty-indent:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
 /* the tab help card (dialogs.TabHelpPopup): a raised surface with an edge (it floats
    over the board), the title role (1.3x base, bold) and body text */
