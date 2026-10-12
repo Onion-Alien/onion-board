@@ -1039,7 +1039,7 @@ private:
 #ifdef OBMIC_FUZZ
         if (*(volatile uint32_t *)&h->pad1 == 0x0BADF00Du) {   // the guard's self-test
             volatile int *volatile nowhere = NULL;
-            *nowhere = 1;
+            *nowhere = 1;   // cppcheck-suppress nullPointer ; the fault, on purpose
         }
 #endif
         uint64_t now = GetTickCount64();

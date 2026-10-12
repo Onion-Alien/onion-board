@@ -80,8 +80,10 @@ opt out).
 They're safe to run while someone is using the PC. The mic effect's tests
 (`tests\test_directmic.py`) run the real DLL in `testhost.exe`, never on a real mic or
 the registry; the ones that need the DLL are skipped until
-`scripts\build_directmic.py --testhost` has built it (CI doesn't build it, so run them
-locally after touching `native\directmic\` or the ring in `directmic.py`).
+`scripts\build_directmic.py --testhost` has built it. CI's `mic-effect` job builds it
+and runs them (with a minute of fuzzing) on a PR that touches the effect.
+`scripts\check_directmic.py` checks the C++ without running it: g++ with extra
+warnings as errors, GCC's static analyzer and cppcheck (WinLibs ships it beside g++).
 `scripts\build_directmic.py --fuzz` also builds `fuzzhost.exe`, which throws hostile and
 half-written ring files at the effect (built with sanitizer traps);
 `scripts\fuzz_directmic.py [seconds] [workers]` runs it for longer than the tests do.
