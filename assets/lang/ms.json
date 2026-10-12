@@ -136,7 +136,6 @@
   "Add-on downloads": "Muat turun add-on",
   "Add-on downloads are off (Privacy)": "Muat turun add-on dimatikan (Privasi)",
   "Add-ons": "Add-on",
-  "Add-ons && help": "Add-on && bantuan",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "“{name}” ({duration:.1f}s) ditambah ke Bunyi, klik kanan di sana untuk menamakan semula atau menetapkan hotkey.",
   "Adding {count} sound…": [
     "Menambah {count} bunyi…"
@@ -410,7 +409,6 @@
   "Fade in / out": "Fade masuk / keluar",
   "Fade out": "Fade keluar",
   "Fades": "Fade",
-  "Feedback and problems": "Maklum balas dan masalah",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Mengambil yt-dlp yang lebih baharu dari PyPI apabila anda tekan Kemas kini sekarang atau Tetapkan semula pemuat turun (halaman Kemas kini), atau sendiri jika anda tandakan Kemas kini secara automatik di sana.",
   "Fetching the parts (downloading)": "Mengambil bahagian (memuat turun)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "Cari bunyi TikTok (carian TikTok sendiri perlukan akaun, jadi ini mencarinya di YouTube, tempat ia dimuat naik semula)",
@@ -920,7 +918,6 @@
   "Repair needed": "Perlu dibaiki",
   "Replay {time}": "Main semula {time}",
   "Report a problem": "Laporkan masalah",
-  "Report a problem on GitHub": "Laporkan masalah di GitHub",
   "Report a security issue": "Laporkan isu keselamatan",
   "Report copied: paste it into your message (Ctrl+V).": "Laporan disalin: tampal ke dalam mesej anda (Ctrl+V).",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Laporan disalin, tetapi pelayar tidak dibuka. Pergi ke {issue_url} dan tampal di sana.",
@@ -2057,7 +2054,6 @@
   "That's a members-only video.": "Itu video ahli sahaja.",
   "That's a playlist: open one video and try again.": "Itu senarai main: buka satu video dan cuba lagi.",
   "That's far too long to be a voice code.": "Itu terlalu panjang untuk dijadikan kod suara.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord ialah tempat untuk bersembang, meminta bantuan dan mendengar tentang versi baharu. Menemui pepijat atau kehilangan sesuatu? Semuanya dibuka dalam penyemak imbas anda, dan tiada apa yang dihantar melainkan anda menyerahkannya ke sana.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord ialah tempat untuk bersembang, meminta bantuan dan mendengar tentang versi baharu. Borang maklum balas tidak memerlukan akaun. Menemui masalah keselamatan? Laporkan secara peribadi di GitHub, bukan dalam isu awam.",
   "The Onion Board Discord server, in your browser": "Pelayan Onion Board Discord, dalam penyemak imbas anda",
   "The address starts with http:// or https://": "Alamat bermula dengan http:// atau https://",

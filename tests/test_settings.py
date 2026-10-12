@@ -57,7 +57,7 @@ def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  #
 def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "help")
+    d = SettingsDialog(window, "about")
     btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
     btn.click()
     assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
@@ -71,8 +71,8 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
              "audio": ("Devices", "Your mic", "Who's listening", "Audio buffering"),
              "hotkeys": ("Hotkey sounds",),
              "general": ("Window", "Running in the background", "Backup"),
-             "help": ("Add-ons", "Feedback and problems",
-                         "Support Onion Board"),
+             "help": ("Add-ons",),
+             "about": ("Onion Board", "Get in touch", "Support Onion Board"),
              "updates": ("App updates", "Downloader (yt-dlp)"),
              "remote": ("Remote control (Stream Deck, scripts)", "Set it up the easy way")}
     for page, titles in where.items():
@@ -157,7 +157,7 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     from soundboard import __version__, feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "help")
+    d = SettingsDialog(window, "about")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
     d.feedback_btn.click()      # asks "What would you improve?" first (test_feedbackdialog)
     assert d.feedback_box.isVisible() and not opened
@@ -177,7 +177,7 @@ def test_join_the_discord_comes_first_and_only_opens_the_browser(window, monkeyp
     from soundboard import feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "help")
+    d = SettingsDialog(window, "about")
     assert d.discord_btn.objectName() == "primary"
 
     def rows(lay):   # every layout under the card's, depth first

@@ -670,7 +670,6 @@
   "Add-on downloads": "Tải xuống tiện ích bổ sung",
   "Add-on downloads are off (Privacy)": "Tải xuống tiện ích bổ sung đã tắt (Quyền riêng tư)",
   "Add-ons": "Tiện ích bổ sung",
-  "Add-ons && help": "Tiện ích bổ sung && trợ giúp",
   "Advanced: {label}": "Nâng cao: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "Sau khi nó bắt đầu, các lần nhấn sẽ bị bỏ qua trong thời gian dài nên không ai có thể spam nó",
   "All hotkeys off / on": "Tắt/bật tất cả các phím nóng",
@@ -837,7 +836,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "Xuất đặt mọi âm thanh (với hình ảnh, hiệu ứng, phím nóng và danh mục) và cài đặt của bạn vào một .zip: giữ an toàn hoặc nhập nó vào một PC khác. Nhập gói âm thanh của một người bạn sẽ thêm âm thanh của bạn bè đó; những cái bạn đã có sẽ bị bỏ qua.",
   "Export sounds": "Xuất âm thanh",
   "Fades": "Fade",
-  "Feedback and problems": "Phản hồi và vấn đề",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Tìm nạp yt-dlp mới hơn từ PyPI khi bạn nhấn Cập nhật ngay hoặc Đặt lại trình tải xuống (trang Cập nhật) hoặc tự nó nếu bạn đã đánh dấu Tự động cập nhật ở đó.",
   "Fetching the parts (downloading)": "Đang tìm nạp các phần (tải xuống)",
   "Finish  ✓": "Kết thúc ✓",
@@ -858,7 +856,6 @@
   "Found <b>{n}</b> sound in {name}.": [
     "Đã tìm thấy âm thanh <b>{n}</b> trong {name} ."
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord là nơi để trò chuyện, nhờ giúp đỡ và nghe tin về phiên bản mới. Tìm thấy lỗi hoặc thiếu gì đó? Mọi thứ mở trong trình duyệt của bạn, và không có gì được gửi trừ khi bạn tự gửi ở đó.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Tiện ích bổ sung miễn phí từ GitHub. Việc gỡ bỏ hoặc cài đặt lại một cái sẽ giữ lại trình kích hoạt và điện thoại được ghép nối của bạn.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Miễn phí, không có quảng cáo và không có tài khoản. Được thực hiện bởi OnionAlien. Giấy phép MIT với Điều khoản Commons: sử dụng nó cho mọi mục đích, chia sẻ miễn phí, không bao giờ bán nó.",
   "Frequencies": "Tần số",
@@ -1131,7 +1128,6 @@
   "Removed “{name}”: Who's listening is Off now": "Đã xóa “{name}”: Ai đang nghe hiện đang Tắt",
   "Replay {time}": "Phát lại {time}",
   "Report a problem": "Báo cáo sự cố",
-  "Report a problem on GitHub": "Báo cáo sự cố trên GitHub",
   "Report a security issue": "Báo cáo vấn đề bảo mật",
   "Reset and restart": "Đặt lại và khởi động lại",
   "Reset downloader": "Đặt lại trình tải xuống",

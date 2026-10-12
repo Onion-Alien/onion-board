@@ -114,7 +114,6 @@
   "Add-on downloads": "Изтегляне на добавки",
   "Add-on downloads are off (Privacy)": "Изтеглянето на добавки е изключено (Поверителност)",
   "Add-ons": "Добавки",
-  "Add-ons && help": "Добавки && помощ",
   "Adding {count} sound…": [
     "Добавям {count} звук…",
     "Добавям {count} звука…"
@@ -383,7 +382,6 @@
   "Fade in / out": "Плавно начало / край",
   "Fade out": "Плавен край",
   "Fades": "Плавни преходи",
-  "Feedback and problems": "Обратна връзка и проблеми",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Сваля по-нов yt-dlp от PyPI, когато натиснеш Обнови сега или Нулирай програмата за изтегляне (страница Обновления), или сам, ако си отметнал Обновявай автоматично там.",
   "Fetching the parts (downloading)": "Сваляне на частите (изтегляне)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "Търси TikTok звуци (търсенето на TikTok иска акаунт, затова това ги търси в YouTube, където се качват отново)",
@@ -872,7 +870,6 @@
   "Repair needed": "Трябва поправка",
   "Replay {time}": "Повтор {time}",
   "Report a problem": "Докладвай проблем",
-  "Report a problem on GitHub": "Докладвай проблем в GitHub",
   "Report a security issue": "Докладвай проблем със сигурността",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Докладът е копиран, но браузърът не се отвори. Отиди на {issue_url} и го постави там.",
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Докладът е копиран. Постави го в issue-то, което току-що се отвори в браузъра ти (Ctrl+V).",
@@ -2015,7 +2012,6 @@
   "That's a folder, not a file.": "Това е папка, а не файл.",
   "That's a members-only video.": "Това е видео само за членове.",
   "That's far too long to be a voice code.": "Това е твърде дълго, за да бъде гласов код.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord е мястото, където да чатите, да поискате помощ и да чуете за нови версии. Открихте грешка или нещо липсва? Всичко се отваря в браузъра ви и нищо не се изпраща, освен ако не го изпратите там.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord е мястото, където да чатите, да поискате помощ и да чуете за нови версии. Формата за обратна връзка не се нуждае от акаунт. Открихте проблем със сигурността? Докладвайте го частно в GitHub, а не в публично издание.",
   "The Onion Board Discord server, in your browser": "Сървърът Onion Board Discord във вашия браузър",
   "The address starts with http:// or https://": "Адресът започва с http:// или https://",
