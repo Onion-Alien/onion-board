@@ -57,7 +57,9 @@ SOUNDS = [("Airhorn", "F1", "Memes"), ("Vine Boom", "F2", "Memes"),
           ("Crickets", "", "Memes"), ("Victory Fanfare", "ctrl+2", "Music"),
           ("Oof", "", "Memes"), ("Record Scratch", "", "Music"),
           ("Dun Dun Dunn", "", "Memes"), ("Laugh Track", "", "Reactions"),
-          ("Bonk", "F5", "Memes")]
+          ("Bonk", "F5", "Memes"), ("Ta-da", "", "Reactions"),
+          ("Boing", "", "Memes"), ("Buzzer", "F6", "Reactions"), ("Whoosh", "", "Memes"),
+          ("Ding", "", "Reactions"), ("Mystery Theme", "", "Music")]   # 21: three full rows
 # Pad pictures, drawn in code: sound name -> (emoji, top colour, bottom colour)
 PICTURES = {"Airhorn": ("📯", "#ffb347", "#ff6a3d"),
             "Sad Trombone": ("🎺", "#5b8def", "#2c3e91"),
@@ -66,7 +68,9 @@ PICTURES = {"Airhorn": ("📯", "#ffb347", "#ff6a3d"),
             "Crickets": ("🦗", "#7bd389", "#2d6a4f"),
             "Victory Fanfare": ("🏆", "#ffe066", "#e09f3e"),
             "Laugh Track": ("😂", "#a0e7e5", "#4ea8de"),
-            "Bonk": ("🔨", "#c77dff", "#7b2cbf")}
+            "Bonk": ("🔨", "#c77dff", "#7b2cbf"),
+            "Ta-da": ("🎉", "#ff9ecd", "#d6336c"),
+            "Mystery Theme": ("🕵️", "#6c757d", "#212529")}
 # Triggers tab: (name, picture (see trigger_picture), sound index, wait, live match %)
 TRIGGERS = [("Died", "died", 2, 1.5, 12),
             ("Boss beaten", "victory", 9, 0.0, 91),
@@ -102,6 +106,10 @@ def fake_machine(tmp: Path):
     directmic.installed_on = lambda: ["{demo}"]
     directmic.endpoint_for = lambda name: "{demo}"
     engine.Engine.effect_alive = lambda self: True
+    # this PC's own Discord settings stay out too (a warning bar would show them)
+    from soundboard import discordcfg
+    discordcfg.read = lambda appdata=None: []
+    discordcfg.signature = lambda appdata=None: ()
     engine.Engine.direct_apps = lambda self: 2
     engine.Engine.set_tap_device = lambda self, n: setattr(self, "tap_name", n)
     appaudio.list_apps = lambda *a, **k: [
@@ -250,9 +258,10 @@ def main():
     w._update_status()
     spin(1.5)
     # wide enough that nothing folds away (the tagline with the version, the buttons'
-    # words): the top row grows as features are added, and 1180 stopped being enough
+    # words): the top row grows as features are added, and 1180 stopped being enough.
+    # At least 1400, so the Voice tab's voice grid fits without a half-cut last row
     w._fit.reset()
-    need = w._fit.need().width()
+    need = max(w._fit.need().width(), 1400)
     if need > w.width():
         w.resize(need, round(need * 720 / 1180))
         spin(1.5)
