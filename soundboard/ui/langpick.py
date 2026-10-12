@@ -142,7 +142,8 @@ class LangRow(QPushButton):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setAccessibleName(f"{own} {self.other}".strip())
         # each row in its own direction: Arabic reads right to left in an English window
-        self.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code) else Qt.LayoutDirection.LeftToRight)
+        self.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
+                                else Qt.LayoutDirection.LeftToRight)
 
     def enterEvent(self, e):
         super().enterEvent(e)
@@ -183,15 +184,17 @@ class LangRow(QPushButton):
         own = bfm.elidedText(self.own, Qt.TextElideMode.ElideRight, int(text.width()))
         gap = 8
         rest = int(text.width()) - bfm.horizontalAdvance(own) - gap
-        other = sfm.elidedText(self.other, Qt.TextElideMode.ElideRight, rest) if self.other and rest > 30 \
-            else ""
+        other = ""
+        if self.other and rest > 30:
+            other = sfm.elidedText(self.other, Qt.TextElideMode.ElideRight, rest)
         align = Qt.AlignmentFlag.AlignAbsolute | Qt.AlignmentFlag.AlignVCenter
         # the own name, then the other name after it on the same line (before it, RTL)
         p.setFont(bold)
         p.setPen(QColor(t["text"]))
         ow = bfm.horizontalAdvance(own)
         own_r = QRectF(text.right() - ow, 0, ow, h) if rtl else QRectF(text.left(), 0, ow + 2, h)
-        p.drawText(own_r, align | (Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft), own)
+        side = Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft
+        p.drawText(own_r, align | side, own)
         if other:
             p.setFont(small)
             p.setPen(QColor(t["muted"]))
