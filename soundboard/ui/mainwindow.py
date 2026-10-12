@@ -1137,8 +1137,9 @@ class MainWindow(QMainWindow):
         status_focus: list[QWidget] = []
         for button in self.rail.status:
             if button is self.btn_air and self.rail.output:
-                status_focus.extend(w for w in (self.rail.output.switch, self.rail.output.stop,
-                                                self.rail.output.setup) if w is not None)
+                out = self.rail.output   # (shut: its switch; open: Mute and Stop all)
+                status_focus.extend(w for w in (out.switch, out.mute, out.stop, out.setup)
+                                    if w is not None)
             status_focus.append(button)
         for w in (*self.rail.buttons, self.btn_more_tabs, *status_focus,
                   self.gear, self.btn_about,

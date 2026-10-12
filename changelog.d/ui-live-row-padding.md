@@ -1,0 +1,1 @@
+﻿- Side bar: the Live switch and the stop square are now two matching buttons, Mute and Stop all, centred in the card.

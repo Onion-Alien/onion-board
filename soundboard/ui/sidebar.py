@@ -289,6 +289,8 @@ class OutputBlock(QFrame):
     ROW_H = 28            # the status line's height, fill and all
     CHEVRON = 12          # the status line's chevron: lighter than the icons
     STOP = 28             # Stop all after the switch, open: a normal icon button
+    PAIR_H = 34           # open: Mute and Stop all, two halves of one row...
+    PAIR_GAP = 8          # ...this far apart
     INK_DOWN = 1          # the switch's and Stop all's ink this far under their box's
                           # centre: on the title's cap-height centre (measured)
 
@@ -340,29 +342,36 @@ class OutputBlock(QFrame):
                                        QSizePolicy.Policy.Minimum)
         top.addSpacerItem(self._switch_gap)
         top.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
-        # open: Stop all right after the switch, an icon button (shut, the rail's own)
-        self.stop = None
-        if stop is not None:
-            self.stop = QPushButton()
-            self.stop.setObjectName("iconbutton")
-            self.stop.setProperty("quiet", True)
-            self.stop.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-            self.stop.setFixedSize(self.STOP, self.STOP)
-            self.stop.clicked.connect(stop.click)
-            icons.set_icon(self.stop, "stop", "danger_text", gap=False)
-            self._stop_gap = QSpacerItem(self.SWITCH_GAP, 0, QSizePolicy.Policy.Fixed,
-                                         QSizePolicy.Policy.Minimum)
-            top.addSpacerItem(self._stop_gap)
-            # (in a column of its own: INK_DOWN over it, as the switch paints its own)
-            col = self._stop_col = QVBoxLayout()
-            col.setContentsMargins(0, self.INK_DOWN, 0, 0)
-            col.addWidget(self.stop)
-            top.addLayout(col)
-        # the slack: open, between the switch and Stop all (Stop all at the card's far
-        # edge, as far in as the icon is on the near one); shut, under the column
+        # shut: under the column
         self._tail = QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         top.addSpacerItem(self._tail)
         box.addLayout(top)
+        # open: two halves of one row instead of the icon, word and switch: Mute (red,
+        # struck through while muted) and Stop all (shut, the rail's own Stop all)
+        self.pair = QWidget()
+        self.pair.setObjectName("railpairrow")
+        pair = self.pair_lay = QHBoxLayout(self.pair)
+        pair.setSpacing(self.PAIR_GAP)
+        self.mute = QPushButton()
+        self.mute.setObjectName("railpair")
+        self.mute.setCheckable(True)   # checked: muted
+        self.mute.setChecked(not power.isChecked())
+        self.mute.toggled.connect(lambda muted: power.setChecked(not muted))
+        power.toggled.connect(lambda on: self.mute.setChecked(not on))
+        self.stop = None
+        if stop is not None:
+            self.stop = QPushButton()
+            self.stop.setObjectName("railpair")
+            self.stop.clicked.connect(stop.click)
+            icons.set_icon(self.stop, "stop", "danger_text", gap=False)
+        for b in filter(None, (self.mute, self.stop)):
+            b.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            pair.addWidget(b, 1)
+        outer.insertWidget(0, self.pair)
+        power.toggled.connect(self._mute_look)
+        self._mute_look(power.isChecked())
         self._status_gap = QSpacerItem(0, self.ROW_GAP, QSizePolicy.Policy.Minimum,
                                        QSizePolicy.Policy.Fixed)
         box.addSpacerItem(self._status_gap)
@@ -441,8 +450,6 @@ class OutputBlock(QFrame):
         # and the mark on that line
         self.title.ensurePolished()
         high = self.switch.height()
-        if self.stop is not None and self.property("expanded"):
-            high = max(high, self.stop.height() + self.INK_DOWN)   # (its column's)
         lead = max(0, -(-(high - self.title.fontMetrics().height()) // 2))
         self.title.setContentsMargins(0, lead, 0, 0)
         self._pin(self.mark, self.title, lead)
@@ -489,19 +496,16 @@ class OutputBlock(QFrame):
         return round(self.ICON_X - glyph / 2) + glyph + self._px(self.GAP)
 
     def need(self, scale: float) -> int:
-        """The card's width at `scale` with every line on one line: "Off Air" beside
-        its switch, and the status line, chevron and all."""
+        """The card's width at `scale` with every line on one line: Mute and Stop all,
+        and the status line, chevron and all."""
         def px(n: float) -> int:
             return max(1, round(n * scale))
         text_x = round(self.ICON_X - px(self.GLYPH) / 2) + px(self.GLYPH) + px(self.GAP)
-        bold = self._metrics(scale, bold=True)
-        title = max(bold.horizontalAdvance(t) for t in self.names())
         status = self._metrics(scale).horizontalAdvance(self.status_text.text())
         network = max((self._metrics(scale).horizontalAdvance(line.words)
                        for line in self._lines), default=0)
-        stop = px(self.SWITCH_GAP) + px(self.STOP) if self.stop is not None else 0
-        return max(text_x + title + 1 + px(self.SWITCH_GAP) + px(self.SWITCH[0]) + px(self.PAD)
-                   + stop,
+        halves = 2 if self.stop is not None else 1
+        return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
                    text_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON) + px(self.PAD)
                    + px(self.PAD),
                    text_x + network + 1 + 2 * px(self.PAD))
@@ -533,19 +537,27 @@ class OutputBlock(QFrame):
         px = self._px
         glyph = px(self.GLYPH) if expanded else self.GLYPH
         icon_x = round(self.ICON_X - glyph / 2)   # the icon column's centre stays put
-        # Stop all's square (half its 18 px glyph) as far from the far edge as the
-        # mark is from the near one
-        # (the mark's ink starts 1 px into its column)
-        end = (max(0, icon_x + 1 - (px(self.STOP) - px(18) // 2) // 2) if self.stop is not None
-               else px(self.PAD))
-        self.box.setContentsMargins(*(icon_x, px(self.PAD), end, px(self.PAD))
-                                    if expanded else (0, 4, 0, 0))
-        self.top.setContentsMargins(0, 0, 0, 0)
-        self.top.setDirection(QBoxLayout.Direction.LeftToRight if expanded
-                              else QBoxLayout.Direction.TopToBottom)
-        self.title.setVisible(expanded)
+        # open: Mute and Stop all, the same padding all round them; the network lines
+        # under them keep the icon column's keyline
+        pad = px(self.PAD)
+        self.pair_lay.setContentsMargins(pad, pad, pad, pad)
+        halves = [b for b in (self.mute, self.stop) if b is not None]
+        inner = OPEN_W - 2 * SIDE_OPEN - 1 - 2 * pad
+        half = (inner - px(self.PAIR_GAP) * (len(halves) - 1)) // len(halves)
+        # (the odd pixel goes to the gap: the halves stay the same width)
+        self.pair_lay.setSpacing(inner - half * len(halves) if len(halves) > 1 else 0)
+        for b in halves:
+            b.setFixedSize(half, px(self.PAIR_H))
+        self._mute_look(self.power.isChecked())
         if self.stop is not None:
-            self.stop.setVisible(expanded)
+            icons.set_icon(self.stop, "stop", "danger_text", gap=False, size=px(18))
+        self.pair.setVisible(expanded)
+        self.box.setContentsMargins(*(icon_x, 0, pad, 0) if expanded else (0, 4, 0, 0))
+        self.top.setContentsMargins(0, 0, 0, 0)
+        self.top.setDirection(QBoxLayout.Direction.TopToBottom)
+        self.title.hide()   # open, Mute says it (its tip: Live or Muted, in full)
+        for w in (self.mark, self.switch):
+            w.setVisible(not expanded)
         for g in (self.mark, self.status_icon):
             g.setFixedWidth(glyph)
         for n in self.net:
@@ -554,19 +566,15 @@ class OutputBlock(QFrame):
         icons.set_label_icon(self.mark, "live", "accent", size=glyph)
         self.switch.setFixedSize(*((px(self.SWITCH[0]), px(self.SWITCH[1])) if expanded
                                    else (34, 22)))
-        self._tail.changeSize(0, 0, *(((QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-                                       if self.stop is not None else
-                                       (QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
-                                      if expanded else
-                                      (QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)))
-        if self.stop is not None:
-            self.stop.setFixedSize(px(self.STOP), px(self.STOP))
-            self._stop_gap.changeSize(px(self.SWITCH_GAP), 0, QSizePolicy.Policy.Expanding,
-                                      QSizePolicy.Policy.Minimum)
+        self._tail.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+                              if not expanded else QSizePolicy.Policy.Fixed)
         for gap, n in ((self._title_gap, self.GAP), (self._switch_gap, self.SWITCH_GAP),
                        (self._icon_gap, self.GAP), (self._arrow_gap, self.GAP - 2)):
             gap.changeSize(px(n), 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        if not expanded:
+        if expanded:   # (the hidden row takes no room)
+            for gap in (self._title_gap, self._switch_gap):
+                gap.changeSize(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        else:
             # Match the visible switch-to-stop gap below the small output block.
             self._switch_gap.changeSize(0, 14, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setup.setMinimumHeight(px(self.ROW_H))
@@ -578,13 +586,8 @@ class OutputBlock(QFrame):
         if layout is not None:   # (the card's own height follows a rescale at once)
             layout.invalidate()
         self.updateGeometry()
-        self.top.setAlignment(self.mark, Qt.AlignmentFlag.AlignTop if expanded
-                              else Qt.AlignmentFlag.AlignHCenter)
-        # open: the switch and Stop all share the title's first line's centre
-        self.top.setAlignment(self.switch, Qt.AlignmentFlag.AlignVCenter if expanded
-                              else Qt.AlignmentFlag.AlignHCenter)
-        if self.stop is not None:
-            self.top.setAlignment(self._stop_col, Qt.AlignmentFlag.AlignVCenter)
+        self.top.setAlignment(self.mark, Qt.AlignmentFlag.AlignHCenter)
+        self.top.setAlignment(self.switch, Qt.AlignmentFlag.AlignHCenter)
         self.setFixedWidth(OPEN_W - 2 * SIDE_OPEN - 1 if expanded else BUTTON_W)
         self.style().unpolish(self)
         self.style().polish(self)
@@ -635,6 +638,14 @@ class OutputBlock(QFrame):
     def names() -> tuple[str, str]:
         return _("Live"), _("Muted")
 
+    def _mute_look(self, on: bool):
+        """Mute: the live waves while others hear you, struck through on red while
+        they don't."""
+        self.mute.setAccessibleName(self.names()[0 if on else 1])
+        tone = "accent" if on else "danger_text"
+        icons.set_icon(self.mute, "live" if on else "live_off", tone, tone, gap=False,
+                       size=self._px(18))
+
     def _name(self, on: bool):
         """"Live" while others hear you, "Muted" while they don't."""
         text = self.names()[0 if on else 1]
@@ -643,6 +654,8 @@ class OutputBlock(QFrame):
 
     def refresh(self):
         self.switch.setToolTip(self.power.toolTip())
+        self.mute.setToolTip(self.power.toolTip())
+        self.mute.setAccessibleDescription(self.power.property("railfull") or "")
         self.switch.setAccessibleDescription(self.power.property("railfull") or "")
         self.status_text.setText(self.connection.property("railtext") or "")
         self.status_text.setToolTip(self.connection.property("railfull") or "")
