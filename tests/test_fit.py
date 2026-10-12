@@ -74,3 +74,35 @@ def _last_page_fits(qapp, wiz):
     wiz.go(3)
     assert process_events(qapp, lambda: not clipped(wiz.discord_text), 3)
     assert wiz.height() >= fit.needed_height(wiz, wiz.width())
+
+
+def test_a_watched_dialog_cant_be_dragged_bigger_but_code_can_resize_it(qapp):
+    import sys
+
+    from PySide6.QtCore import Qt
+    d, _lbl = long_dialog(watch=True)
+    if sys.platform == "win32":   # dragged tall, a guide was mostly an empty gap
+        assert d.windowFlags() & Qt.WindowType.MSWindowsFixedSizeDialogHint
+    d.resize(420, 500)
+    assert (d.width(), d.height()) == (420, 500)
+
+
+def test_every_dialog_window_is_watched():
+    """Each QDialog subclass that's a window calls fit.watch (pop-up cards are
+    frameless, and Settings is a page in the main window)."""
+    import ast
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent / "soundboard"
+    exempt = {"SettingsDialog"}
+    missing = []
+    for path in root.rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not (isinstance(node, ast.ClassDef) and any(
+                    getattr(b, "id", None) == "QDialog" for b in node.bases)):
+                continue
+            src = ast.get_source_segment(path.read_text(encoding="utf-8"), node) or ""
+            if node.name in exempt or "fit.watch(" in src or "WindowType.Popup" in src:
+                continue
+            missing.append(f"{path.name}:{node.name}")
+    assert not missing, missing

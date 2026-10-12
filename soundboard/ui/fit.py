@@ -11,12 +11,16 @@ wrapping) and grows the window to that, moving it up if it would run off the
 bottom of the screen. A dialog already as tall as the screen gets wider instead,
 so its text wraps less.
 
-It never shrinks a dialog: whatever the user (or the code) sized it to is kept.
+It never shrinks a dialog: whatever the code sized it to is kept. The user can't
+drag a watched dialog's edges (on Windows its border is the fixed-size kind), so a
+dialog never ends up stretched around a big empty gap; the code can still resize it.
 Message boxes and file dialogs size themselves and aren't watched.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject, QTimer
+import sys
+
+from PySide6.QtCore import QEvent, QObject, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QWidget
 from shiboken6 import isValid as qt_valid
 
@@ -92,6 +96,9 @@ class _Fitter(QObject):
 
 def watch(dialog: QDialog) -> QDialog:
     """Make `dialog` grow to fit its text from now on. Call it in every dialog's
-    __init__ (message boxes and file dialogs size themselves already)."""
+    __init__ (message boxes and file dialogs size themselves already). It also stops
+    the user dragging its edges: it's sized to its content, so a drag only made gaps."""
+    if sys.platform == "win32":   # a thin border: no resize by dragging; resize() works
+        dialog.setWindowFlag(Qt.WindowType.MSWindowsFixedSizeDialogHint, True)
     _Fitter(dialog)
     return dialog
