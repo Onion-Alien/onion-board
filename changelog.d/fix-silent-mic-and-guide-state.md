@@ -1,2 +1,0 @@
-- A mic that sends only silence because the headset is switched off or its mic muted no longer makes a mic set-up or repair restart Windows' audio over and over, and the messages ask about the headset first instead of telling you to restart your PC.
-- The quick setup guide's mic step follows changes made outside it (a repair, Remove, or a Windows update taking the mic effect off) instead of still saying it works.
