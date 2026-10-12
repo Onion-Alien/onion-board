@@ -3298,5 +3298,9 @@
   "Set it up": "Kur",
   "One click sets it up.": "Tek tıkla kurulur.",
   "This won't mute you yet": "Bu seni henüz susturmaz",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hey! Bu henüz bir şey yapmıyor, çünkü Onion Board mikrofonunda kurulu değil. İnsanlar seni hâlâ duyuyor."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hey! Bu henüz bir şey yapmıyor, çünkü Onion Board mikrofonunda kurulu değil. İnsanlar seni hâlâ duyuyor.",
+  "{n} pad was found and put back on the board.": [
+    "{n} tuş bulundu ve panoya geri kondu.",
+    "{n} tuş bulundu ve panoya geri kondu."
+  ]
 }

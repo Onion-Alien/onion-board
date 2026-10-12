@@ -767,9 +767,16 @@ class MainWindow(QMainWindow):
         """Started hidden in the tray (--tray at sign-in)? Then the box waits for the
         window to be opened, instead of popping up over whatever the user is doing."""
         if self.isVisible():
-            self.tell(_("Settings were restored"), self.cfg.load_note, "warn", 20000)
+            self._tell_load_note(self.cfg.load_note)
         else:
             self._pending_note = self.cfg.load_note
+
+    def _tell_load_note(self, note: str):
+        """Settings lost or taken from a backup: a card that stays until it's closed (a
+        timed one was gone before anyone read it), with the settings folder a click away."""
+        self.tell(_("Settings were restored"), note, "warn", 0, key="load-note",
+                  action=(_("Open folder"),
+                          lambda: busy.open_folder(library.CONFIG_PATH.parent, window=self)))
 
     # ------------------------------------------------------------------ UI build
     # Layout: the tab rail (with Live, Stop all and the setup pill) / tabs / mixer strip.
@@ -9389,8 +9396,7 @@ class MainWindow(QMainWindow):
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
-            QTimer.singleShot(400, lambda: self.tell(
-                _("Settings were restored"), note, "warn", 20000))
+            QTimer.singleShot(400, lambda: self._tell_load_note(note))
         later, self._whats_new_later = getattr(self, "_whats_new_later", None), None
         if later is not None:   # held back while the window was in the tray
             QTimer.singleShot(700, lambda: self.whats_new(later))

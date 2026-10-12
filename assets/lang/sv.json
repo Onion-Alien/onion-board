@@ -3298,5 +3298,9 @@
   "Set it up": "Ställ in",
   "One click sets it up.": "Ett klick ställer in det.",
   "This won't mute you yet": "Det här stänger inte av dig än",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Det här gör inget än, eftersom Onion Board inte är inställt i din mikrofon. Folk hör dig fortfarande."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Det här gör inget än, eftersom Onion Board inte är inställt i din mikrofon. Folk hör dig fortfarande.",
+  "{n} pad was found and put back on the board.": [
+    "{n} ruta hittades och lades tillbaka på brädan.",
+    "{n} rutor hittades och lades tillbaka på brädan."
+  ]
 }

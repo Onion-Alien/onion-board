@@ -3298,5 +3298,9 @@
   "Set it up": "Instellen",
   "One click sets it up.": "Eén klik stelt het in.",
   "This won't mute you yet": "Dit dempt je nog niet",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé! Dit doet nog niets, want Onion Board is nog niet ingesteld in je microfoon. Mensen horen je nog steeds."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé! Dit doet nog niets, want Onion Board is nog niet ingesteld in je microfoon. Mensen horen je nog steeds.",
+  "{n} pad was found and put back on the board.": [
+    "{n} blok is teruggevonden en weer op het bord gezet.",
+    "{n} blokken zijn teruggevonden en weer op het bord gezet."
+  ]
 }

@@ -3225,5 +3225,8 @@
   "Set it up": "去設定",
   "One click sets it up.": "點一下就能設定好。",
   "This won't mute you yet": "這還不能讓你靜音",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "嘿！這個現在還沒用，因為 Onion Board 還沒在你的麥克風裡設定好。別人還是聽得到你。"
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "嘿！這個現在還沒用，因為 Onion Board 還沒在你的麥克風裡設定好。別人還是聽得到你。",
+  "{n} pad was found and put back on the board.": [
+    "找到 {n} 個按鍵，已放回面板。"
+  ]
 }

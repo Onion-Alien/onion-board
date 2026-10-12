@@ -3371,5 +3371,10 @@
   "Set it up": "Configurează",
   "One click sets it up.": "Un clic îl configurează.",
   "This won't mute you yet": "Asta încă nu te oprește",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Asta încă nu face nimic, pentru că Onion Board nu e configurat în microfonul tău. Oamenii încă te aud."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Asta încă nu face nimic, pentru că Onion Board nu e configurat în microfonul tău. Oamenii încă te aud.",
+  "{n} pad was found and put back on the board.": [
+    "{n} pad a fost găsit și pus înapoi pe board.",
+    "{n} pad-uri au fost găsite și puse înapoi pe board.",
+    "{n} de pad-uri au fost găsite și puse înapoi pe board."
+  ]
 }

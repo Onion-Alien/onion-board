@@ -37,7 +37,7 @@ from soundboard import __version__, mapped, sourceinfo, winpath
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
@@ -584,6 +584,10 @@ class Config:
                               "saved until you restart it.")
             return cfg
         log.error("config %s is unreadable: %r", CONFIG_PATH, err)
+        damaged = ""
+        if not missing:   # its pads may still be readable (see _salvage)
+            with contextlib.suppress(OSError):
+                damaged = CONFIG_PATH.read_text(encoding="utf-8-sig", errors="replace")
         broken = "" if missing else cls._set_aside()
         kept = ("" if missing else " " + _("The damaged file was kept as {file}.",
                                            file=broken or "config.json")
@@ -595,21 +599,62 @@ class Config:
                 log.warning("backup %s doesn't load either", name, exc_info=True)
                 continue
             log.warning("recovered settings from backup %s", name)
+            back = cls._salvage(cfg, damaged)
             if missing or broken:   # put it back as config.json now, not at the next
                 cfg.save()          # change (a damaged file left in place stays kept)
             cfg.load_note = (_("Your settings file was missing, so the last good copy "   # pyright: ignore[reportAttributeAccessIssue]
                                "({name}) was loaded instead.", name=name) if missing else
                              _("Your settings file was damaged, so the last good copy "
-                               "({name}) was loaded instead.", name=name)) + kept
+                               "({name}) was loaded instead.", name=name)) + back + kept
             return cfg
         cfg = cls()
+        back = cls._salvage(cfg, damaged)
+        if back and (missing or broken):   # the pads found are on disk again at once
+            cfg.save()
         cfg.load_note = (_("Your settings file was missing and no backup could be read, "   # pyright: ignore[reportAttributeAccessIssue]
                            "so Onion Board started with default settings. Your sound files "
                            "are still in {folder}.", folder=SOUNDS_DIR) if missing else
                          _("Your settings file was damaged and no backup could be read, "
                            "so Onion Board started with default settings. Your sound files "
-                           "are still in {folder}.", folder=SOUNDS_DIR)) + kept
+                           "are still in {folder}.", folder=SOUNDS_DIR)) + back + kept
         return cfg
+
+    @classmethod
+    def _salvage(cls, cfg: Config, damaged: str) -> str:
+        """Pads the recovered settings don't have, put back on the board: the sound
+        entries still whole in the damaged file (a file cut off mid-save keeps the pads
+        before the cut), then audio in the library's folders that no pad uses (added
+        after the backup was made). Adds to cfg.sounds; returns the sentence saying how
+        many came back ("" for none)."""
+        have = {os.path.normcase(m.file) for m in cfg.sounds}
+        ids = {m.id for m in cfg.sounds}
+        found: list[SoundMeta] = []
+        entries = _sound_entries(damaged)
+        if entries:
+            v = re.search(r'"version"\s*:\s*(\d{1,4})\b', damaged)
+            try:
+                found = cls.from_raw({"version": int(v.group(1)) if v else CONFIG_VERSION,
+                                      "sounds": entries}).sounds
+            except (TypeError, ValueError, KeyError, AttributeError, IndexError):
+                log.warning("couldn't read the pads in the damaged config", exc_info=True)
+        for p in _library_audio():
+            found.append(SoundMeta(id=uuid.uuid4().hex[:10], file=str(p),
+                                   name=_OUR_SOUND_FILE.sub("", p.stem, count=1)[:40].strip()
+                                   or "Sound", added=_mtime(p)))
+        n = 0
+        for m in found:
+            key = os.path.normcase(m.file)
+            if key in have or m.id in ids:
+                continue
+            have.add(key)
+            ids.add(m.id)
+            cfg.sounds.append(m)
+            n += 1
+        if not n:
+            return ""
+        log.warning("put back %d pad(s) the recovered settings didn't have", n)
+        return " " + ngettext("{n} pad was found and put back on the board.",
+                              "{n} pads were found and put back on the board.", n)
 
     @classmethod
     def first_start(cls) -> Config:
@@ -2069,6 +2114,48 @@ def loose_sounds(cfg: Config) -> list[Path]:
                   if p.suffix.lower() in AUDIO_EXTS and not _OUR_SOUND_FILE.match(p.name)
                   and os.path.normcase(str(p)) not in used and p.is_file())
 
+
+
+def _sound_entries(text: str) -> list:
+    """The pad entries still whole in a damaged config's text: each object of its
+    "sounds" list up to the first one that's cut off or garbled ([] when there's no
+    list to read)."""
+    m = re.search(r'"sounds"\s*:\s*\[', text)
+    if not m:
+        return []
+    dec, i, out = json.JSONDecoder(), m.end(), []
+    while True:
+        while i < len(text) and text[i] in " \t\r\n,":
+            i += 1
+        if i >= len(text) or text[i] != "{":
+            return out
+        try:
+            obj, i = dec.raw_decode(text, i)
+        except ValueError:
+            return out
+        out.append(obj)
+
+
+def _library_audio() -> list[Path]:
+    """The audio the library keeps in its sounds folder: its folders' files, and the
+    "<id>_name" ones from before folders (a file dragged in by hand is the loose-sounds
+    offer's, not a lost pad)."""
+    out = []
+    try:
+        for p in sorted(SOUNDS_DIR.rglob("*")):
+            if (p.suffix.lower() in AUDIO_EXTS and p.is_file()
+                    and (p.parent != SOUNDS_DIR or _OUR_SOUND_FILE.match(p.name))):
+                out.append(p)
+    except OSError:
+        log.warning("couldn't list %s", SOUNDS_DIR, exc_info=True)
+    return out
+
+
+def _mtime(p: Path) -> float:
+    try:
+        return p.stat().st_mtime
+    except OSError:
+        return time.time()
 
 def delete_file(meta: SoundMeta):
     """Remove a sound's files: the audio goes to the Recycle Bin (it's the one thing

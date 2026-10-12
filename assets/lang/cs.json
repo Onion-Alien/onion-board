@@ -3371,5 +3371,10 @@
   "Set it up": "Nastavit",
   "One click sets it up.": "Jedno kliknutí to nastaví.",
   "This won't mute you yet": "Tohle tě zatím neztlumí",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Tohle zatím nic nedělá, protože Onion Board ještě není nastavený v tvém mikrofonu. Lidi tě pořád slyší."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Tohle zatím nic nedělá, protože Onion Board ještě není nastavený v tvém mikrofonu. Lidi tě pořád slyší.",
+  "{n} pad was found and put back on the board.": [
+    "{n} pad byl nalezen a vrácen na desku.",
+    "{n} pady byly nalezeny a vráceny na desku.",
+    "{n} padů bylo nalezeno a vráceno na desku."
+  ]
 }

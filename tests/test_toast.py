@@ -79,6 +79,21 @@ def test_errors_stay_and_others_go(qapp):
     w.close()
 
 
+
+def test_a_card_that_stays_isnt_pushed_out_by_newer_ones(qapp):
+    """Damaged settings at start-up: the start's other notices came after the card and
+    pushed it out before anyone read it."""
+    w = _host(qapp)
+    note = busy.toast(w, "Settings were restored", "warn", 0)
+    for i in range(5):
+        busy.toast(w, f"Notice {i}")
+    up = toast.shown(w)
+    assert note in up and [t.text() for t in up if t is not note] == ["Notice 3", "Notice 4"]
+    assert not note._timer.isActive()   # no countdown: it goes when it's closed
+    note.card.btn_close.click()
+    assert note not in toast.shown(w)
+    w.close()
+
 def test_problems_can_be_copied(qapp):
     w = _host(qapp)
     t = busy.toast(w, "Couldn't open <b>x.wav</b>", "error")
@@ -471,3 +486,14 @@ def test_one_slow_file_keeps_its_busy_card_until_its_in(main_window, qapp, tmp_p
     assert card._timer.remainingTime() > 60_000
     go.set()
     assert process_events(qapp, lambda: not w._pending_imports)
+
+
+def test_a_long_path_wraps_but_copies_whole(qapp):
+    """A folder path or file name longer than the card's line could only be cut off."""
+    w = _host(qapp)
+    path = "D:/Games/Stuff/AppData/Roaming/OnionBoard/config.json.broken-20261013-101500"
+    t = busy.toast(w, toast.titled("Settings were restored", f"It was kept as {path}."), "warn", 0)
+    assert "\u200b" in t._text   # somewhere to wrap
+    t.copy()
+    assert QApplication.clipboard().text() == f"Settings were restored\nIt was kept as {path}."
+    w.close()

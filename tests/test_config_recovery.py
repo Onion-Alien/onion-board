@@ -46,6 +46,53 @@ def test_nothing_loadable_says_so(app_dir):
     assert cfg.sounds == [] and "default settings" in cfg.load_note
 
 
+
+def _pad(sid, name):
+    return {"id": sid, "name": name, "file": f"{name}.wav", "hotkey": f"ctrl+{sid}"}
+
+
+def test_pads_only_in_a_half_written_config_are_put_back(app_dir):
+    """A save cut off part-way: the backup is loaded, and the pads still whole in the
+    damaged file (added after the backup was made) come back with their settings."""
+    _write(library.CONFIG_PATH.with_name("config.json.1"),
+           {"stop_hotkey": "f9", "sounds": [_pad("a", "Boom")]})
+    whole = json.dumps({"version": library.CONFIG_VERSION, "stop_hotkey": "f8",
+                        "sounds": [_pad("a", "Boom"), _pad("b", "New one"), _pad("c", "Cut")]})
+    library.CONFIG_PATH.write_text(whole[:whole.index('"Cut"')], encoding="utf-8")
+    cfg = Config.load()
+    assert cfg.stop_hotkey == "f9"   # the settings are the backup's...
+    assert [(s.id, s.name, s.hotkey) for s in cfg.sounds] == [("a", "Boom", "ctrl+a"),
+                                                              ("b", "New one", "ctrl+b")]
+    assert "config.json.1" in cfg.load_note and "1 pad was found" in cfg.load_note
+    saved = json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))
+    assert [s["id"] for s in saved["sounds"]] == ["a", "b"]   # on disk again at once
+
+
+def test_sound_files_no_pad_uses_come_back_after_a_damaged_config(app_dir):
+    """Junk with no pads in it and no backup: the library's own audio files come back
+    as pads (a file dragged into the folder by hand is the loose-sounds offer's)."""
+    folder = library.SOUNDS_DIR / library.MY_SOUNDS
+    folder.mkdir(parents=True)
+    (folder / "Airhorn.wav").write_bytes(b"RIFF")
+    (library.SOUNDS_DIR / "0123456789_Boom.wav").write_bytes(b"RIFF")
+    (library.SOUNDS_DIR / "dragged in.wav").write_bytes(b"RIFF")
+    library.CONFIG_PATH.write_text("garbage {{{ not json", encoding="utf-8")
+    cfg = Config.load()
+    assert sorted(s.name for s in cfg.sounds) == ["Airhorn", "Boom"]
+    assert "default settings" in cfg.load_note and "2 pads were found" in cfg.load_note
+    assert len(json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["sounds"]) == 2
+
+
+def test_a_backup_with_every_pad_has_nothing_put_back(app_dir):
+    folder = library.SOUNDS_DIR / library.MY_SOUNDS
+    folder.mkdir(parents=True)
+    (folder / "Boom.wav").write_bytes(b"RIFF")
+    _write(library.CONFIG_PATH.with_name("config.json.1"),
+           {"sounds": [{"id": "a", "name": "Boom", "file": f"{library.MY_SOUNDS}/Boom.wav"}]})
+    library.CONFIG_PATH.write_text("{not json", encoding="utf-8")
+    cfg = Config.load()
+    assert [s.id for s in cfg.sounds] == ["a"] and "found" not in cfg.load_note
+
 def test_first_start_has_defaults_and_nothing_to_say(app_dir):
     cfg = Config.load()
     assert cfg.sounds == [] and cfg.load_note == ""
