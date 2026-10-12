@@ -128,7 +128,9 @@ class TriggersTab(QWidget):
         # it does as a few points, the button, Hoot beside it all.
         box = HoverCard()   # lights up under the mouse, as the Apps cards do
         bv = QVBoxLayout(box)
-        bv.setContentsMargins(18, 16, 18, 16)
+        # (16 at the sides: the Get button's icon gap needed 4 px, and this card sets the
+        # narrowest window that isn't the mini player)
+        bv.setContentsMargins(16, 16, 16, 16)
         box.setMaximumWidth(620)
         row = QHBoxLayout()
         row.setSpacing(18)
@@ -283,6 +285,7 @@ class TriggersTab(QWidget):
                            "Onion Watch")
         self.btn_get.setText(_("Get Onion Watch again") if broken and error
                              else _("Get Onion Watch"))
+        icons.text_gap(self.btn_get)   # (its icon was set before it had words)
         local = watchaddon.local_zip()
         self.btn_get.setToolTip(_("Install {file}", file=local) if local is not None else
                                 _("Download Onion Watch from GitHub and install it"))

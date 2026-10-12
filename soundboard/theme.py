@@ -965,7 +965,7 @@ QPushButton#infobutton:hover, QFrame#card QPushButton#infobutton:hover, QFrame#c
 /* a quiet icon button stays quiet inside a card too (the ⓘ after the sound modes) */
 QFrame#card QPushButton#iconbutton[quiet="true"], QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"] { background:transparent; padding:7px 10px; min-height:0; }
 QFrame#card QPushButton#iconbutton[quiet="true"]:hover, QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"]:hover { background:$btn_hover; }
-QFrame#card[roomy="true"] QPushButton#primary { padding:10px 16px; }
+QFrame#card[roomy="true"] QPushButton#primary { padding:9px 16px; }
 QFrame#card[roomy="true"] QPushButton#voicetile { padding:7px 12px; text-align:left; }
 QFrame#card[roomy="true"] QPushButton#fold { padding:8px 10px; text-align:left; }
 QFrame#card[roomy="true"] QComboBox { padding:9px 12px; }
@@ -1012,6 +1012,7 @@ QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$l
 QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hover; }
 QPushButton#live:checked, QFrame#card QPushButton#live:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QPushButton#live:checked:hover, QFrame#card QPushButton#live:checked:hover { background:$live_hover; }
+QPushButton#rec { min-height:18px; }   /* its 14px dot: as tall as Send beside it */
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
 QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
 QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }

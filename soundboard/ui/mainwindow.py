@@ -2159,7 +2159,7 @@ class MainWindow(QMainWindow):
         self.btn_install.clicked.connect(
             lambda: self.attach_mic() if self.cfg.route == "mic" else self.install_cable())
         self._install_icon = None   # what set_icon last put on it (only set when it changes)
-        self.btn_attach = QPushButton(_("Straight into my mic instead (no cable)"))
+        self.btn_attach = QPushButton(_("Straight into my mic instead"))   # (tip: no cable)
         self.btn_attach.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                      "Discord and games need no virtual cable and nothing picked"))
         self.btn_attach.clicked.connect(self.attach_mic)
@@ -2218,7 +2218,7 @@ class MainWindow(QMainWindow):
         self.btn_rescan = QPushButton(_("I've installed it: check again"))
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
-        cv.addWidget(self.btn_rescan, 0, Qt.AlignmentFlag.AlignLeft)
+        ways.addWidget(self.btn_rescan)   # with the other ways, not a row of its own
         helpcard = FoldCard("speech", _("Connect your chat"))
         helpcard.set_summary(_("Discord, games, Zoom and Teams"))
         helpcard.head.clicked.connect(lambda on: on and usage.used("setup-opened-chat"))
@@ -3536,7 +3536,9 @@ class MainWindow(QMainWindow):
             return
         self._ways_in = mic
         src, dst = (self._ways, self.mic_ways) if mic else (self.mic_ways, self._ways)
-        for b in (self.btn_install, self.btn_usecable, self.btn_guide, self.btn_rmcable):
+        # (check again too: it stays last, after them)
+        for b in (self.btn_install, self.btn_usecable, self.btn_guide, self.btn_rmcable,
+                  self.btn_rescan):
             src.removeWidget(b)
             dst.addWidget(b)
         self.mic_ways.invalidate()
