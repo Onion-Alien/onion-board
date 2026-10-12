@@ -434,12 +434,12 @@ def test_an_add_on_with_a_bad_slider_is_reported_not_fatal(qapp, app_dir, monkey
         p.deleteLater()
 
 
-def test_discord_notice_shows_with_the_changer_on_until_dismissed(panel):
+def test_discord_notice_always_shows_until_dismissed(panel):
     p, _ = panel
     fx = p.fx
-    assert fx.tip.isHidden()                     # changer off: nothing to warn about
+    assert not fx.tip.isHidden()                 # changer off: shown all the same
     fx.pick(next(iter(voicefx.PRESETS)))
-    assert not fx.tip.isHidden()
+    assert not fx.tip.isHidden()                 # picking a voice doesn't move the card
     helped, dismissed = [], []
     fx.chat_help.connect(lambda: helped.append(1))
     fx.tip_dismissed.connect(lambda: dismissed.append(1))
