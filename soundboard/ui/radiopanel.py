@@ -80,6 +80,25 @@ QUALITIES = ((_("Any quality"), 0), (_("{kbps} kbps +", kbps=128), 128),
              (_("{kbps} kbps +", kbps=192), 192), (_("{kbps} kbps +", kbps=256), 256))
 
 
+def _steady_text(btn: QPushButton, text: str, *others: str):
+    """Show `text` on a button that switches between labels (Play / Stop), kept as wide
+    as the widest of them so the buttons beside it don't shift on every click. A
+    checkable one is measured on and off too: its on look has a border."""
+    btn.ensurePolished()                # measured in its stylesheet's (bold) font
+    widest = 0
+    was = btn.isChecked()
+    blocked = btn.blockSignals(True)
+    for on in {was, not was} if btn.isCheckable() else {was}:
+        btn.setChecked(on)
+        for t in (*others, text):
+            btn.setText(t)
+            widest = max(widest, btn.sizeHint().width())
+    btn.setChecked(was)
+    btn.blockSignals(blocked)
+    btn.setText(text)
+    btn.setMinimumWidth(widest if text else 0)
+
+
 def in_genre(s: Station, genre: str) -> bool:
     words = _GENRE_WORDS.get(genre)
     if not words:
@@ -875,8 +894,16 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     # ------------------------------------------------------------------ first open
     def showEvent(self, e):
         super().showEvent(e)
+        self._update_buttons()   # Play / Send measured in the font they're shown in
+        self._label_live()
         self.timer.start(appstate.interval(50))
         self.start()
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() in (QEvent.Type.StyleChange, QEvent.Type.FontChange) and self.isVisible():
+            self._update_buttons()   # a new theme or text size: measure them again
+            self._label_live()
 
     def hideEvent(self, e):
         super().hideEvent(e)
@@ -1365,7 +1392,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         on = self.player.station is not None
         self._update_now()
         word = _("Stop") if on else _("Play")
-        self.btn_play.setText("" if self._play_short else word)
+        _steady_text(self.btn_play, "" if self._play_short else word, _("Stop"), _("Play"))
         self.btn_play.setAccessibleName(word)     # still named when it's only an icon
         self.btn_play.setToolTip(word if self._play_short else "")
         icons.set_icon(self.btn_play, "stop" if on else "play")
@@ -1462,7 +1489,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _label_live(self):
         on = self.btn_live.isChecked()
-        self.btn_live.setText(_("Sending") if on else _("Send"))
+        _steady_text(self.btn_live, _("Sending") if on else _("Send"), _("Sending"), _("Send"))
         icons.text_gap(self.btn_live)   # (its icon was set before it had words)
         self.btn_live.setToolTip(_("Others hear the radio. Click so only you do.") if on else
                                  _("Send the radio out to others, the way your sounds go "
