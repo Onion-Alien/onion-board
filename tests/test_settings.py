@@ -314,6 +314,11 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
             last = grid.cards[expected - 1].geometry()
             assert grid.width() - 1 - last.right() < expected
             assert grid.cards[0].geometry().left() == 0
+            # every group shares those columns: its cards line up with the first group's
+            xs = [c.geometry().left() for c in grid.cards]
+            for other in d.findChildren(ThemeGrid):
+                for i, c in enumerate(other.cards[:expected]):
+                    assert c.geometry().left() == xs[i]
     finally:
         d.close()
 

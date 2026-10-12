@@ -390,10 +390,13 @@ class ThemeGrid(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        columns = max(1, min(len(self.cards), (self.width() + 12) // 162))
+        # as many columns as fit, even past this group's cards: every group then gets
+        # the same columns and gaps and they line up (a short group spread its few
+        # cards over the whole width, out of line with the groups above and below)
+        columns = max(1, (self.width() + 12) // 162)
         self._reflow(columns)
         # the width left over is shared out as equal gaps, first card on the left edge
-        # and last on the right (all of it sat on the right, a big empty strip)
+        # and a full row's last on the right (all of it sat on the right, an empty strip)
         gap = 12
         if columns > 1:
             gap = max(12, (self.width() - columns * 150) // (columns - 1))
