@@ -545,7 +545,7 @@ class VoiceFxPanel(QWidget):
         self.btn_power.setCheckable(True)
         self.btn_power.setMinimumHeight(42)
         self.btn_power.setCursor(Qt.CursorShape.PointingHandCursor)
-        icons.set_icon(self.btn_power, "mic", checked_color="#ffffff")
+        icons.set_icon(self.btn_power, "mic", checked_color="on_live")
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
         # your mic level is in the tab's status bar (ui/voicestatus.py), over every card

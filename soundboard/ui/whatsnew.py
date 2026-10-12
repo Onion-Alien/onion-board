@@ -273,7 +273,7 @@ class WhatsNewDialog(QDialog):
                 lay.addWidget(self._item(icon, title, text))
         lay.addStretch(1)   # any spare height goes here, not between the rows
         chat = self.discord_link = QLabel(   # the theme's colour: Qt's own blue is dark
-            f'<a href="{feedback.DISCORD_URL}" style="color: {theme.T["accent"]};">'
+            f'<a href="{feedback.DISCORD_URL}" style="color: {theme.T["accent_link"]};">'
             f'{_("Chat about it on Discord")}</a>')
         chat.setObjectName("hint")
         chat.setToolTip(_("The Onion Board Discord server, in your browser"))

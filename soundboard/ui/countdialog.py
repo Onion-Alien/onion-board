@@ -64,7 +64,7 @@ class CountDialog(QDialog):
         grid.setColumnStretch(2, 1)
         v.addSpacing(4)
         v.addLayout(grid)
-        style = f'style="color: {theme.T["accent"]};"'
+        style = f'style="color: {theme.T["accent_link"]};"'
         links = QLabel(f'<a href="{PRIVACY_URL}" {style}>{_("The full list")}</a> · '
                        f'<a href="{GOATCOUNTER_PRIVACY}" {style}>'
                        f'{_("GoatCounter privacy policy")}</a>')

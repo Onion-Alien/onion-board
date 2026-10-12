@@ -60,7 +60,7 @@ class SourceDialog(QDialog):
             pic.setPixmap(pm.scaled(PIC_W, PIC_H, Qt.AspectRatioMode.KeepAspectRatio,
                                     Qt.TransformationMode.SmoothTransformation))
         else:   # no thumbnail: the site's icon on an inner area
-            pic.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 8px;")
+            pic.setObjectName("sourcepic")   # its inner-area look: the theme's (theme.py)
             icons.set_label_icon(pic, sourceinfo.icon(self.src), size=40)
         top.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
         names = QVBoxLayout()
@@ -77,7 +77,7 @@ class SourceDialog(QDialog):
             chl = QLabel()
             chl.setObjectName("hint")
             if link := self.src.get("channel_link"):
-                chl.setText(f'<a href="{html.escape(link)}" style="color: {theme.T["accent"]};'
+                chl.setText(f'<a href="{html.escape(link)}" style="color: {theme.T["accent_link"]};'
                             f' text-decoration: none;">{html.escape(ch)}</a>')
                 chl.setOpenExternalLinks(True)
                 chl.setToolTip(link)
@@ -106,12 +106,15 @@ class SourceDialog(QDialog):
 
         row = QHBoxLayout()
         row.setSpacing(8)
-        self.btn_open = QPushButton(icons.icon(sourceinfo.icon(self.src)),
-                                    _("Open on {site}", site=site))
+        # icons that follow a theme switch while it's open (set_icon), on the filled
+        # Open button in its words' colour
+        self.btn_open = QPushButton(_("Open on {site}", site=site))
         self.btn_open.setObjectName("primary")
+        icons.set_icon(self.btn_open, sourceinfo.icon(self.src), "on_accent")
         self.btn_open.setToolTip(self.src.get("link", ""))
         self.btn_open.clicked.connect(lambda: open_link(self.src, self))
-        self.btn_copy = QPushButton(icons.icon("copy"), _("Copy link"))
+        self.btn_copy = QPushButton(_("Copy link"))
+        icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self._copy)
         close = QPushButton(_("Close"))
         close.clicked.connect(self.accept)
