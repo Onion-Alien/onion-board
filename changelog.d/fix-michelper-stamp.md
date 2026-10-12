@@ -1,1 +1,0 @@
-- Mic helper: a repair now puts the helper back when one of its files went missing (a virus scanner) or it was packed differently, instead of the mic step waiting 20 seconds and asking Windows again every time.

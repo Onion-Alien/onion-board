@@ -1,4 +1,0 @@
-- Setup tab: with the virtual cable picked but not installed, Devices no longer also says "Nothing picked: only you will hear sounds" under the setup line.
-- Setup tab: when your sounds go straight into your mic, the mic card says "Nothing to set." and one short line; what to do if a voice app chops your sounds up is behind the card's ⓘ.
-- Setup tab: the My mic dropdown now lines up with My headphones and Send my sounds to.
-- Setup tab: Who's listening has a proper gap between the mode buttons and the line about the picked mode.

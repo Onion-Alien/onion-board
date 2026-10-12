@@ -1,1 +1,0 @@
-- Triggers tab: loading Onion Watch no longer runs its stand-alone start file, which logged an error about a second app every time the tab loaded.

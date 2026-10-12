@@ -1,2 +1,0 @@
-- Give Add sounds a music-note icon in place of the plus.
-- Buttons with an icon and words have the same, slightly wider gap between them everywhere.

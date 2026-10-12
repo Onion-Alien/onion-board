@@ -1,1 +1,0 @@
-- Developers: `scripts/precommit.ps1` runs only the quick checks (about 10 s) and leaves the tests to CI; `-Tests` runs the picked tests here. The test picker no longer counts everything `conftest.py` imports for a test that borrows a helper from it.

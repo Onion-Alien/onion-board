@@ -1,2 +1,0 @@
-- Mic helper: work and school (Microsoft account) Windows accounts now get it too instead of Windows' prompt every time, and on a PC with several accounts each one that set it up keeps it.
-- Mic helper: if it stops half-way, the app notices within seconds and asks Windows instead of waiting five minutes; uninstalling also clears a half-removed helper, and its logs no longer grow forever.

@@ -1,1 +1,0 @@
-- Closing Free sound packs before the online list loaded no longer offers a crash report a moment later. Search results and link downloads that finish after their panel closed are dropped quietly too.

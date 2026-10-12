@@ -1,1 +1,0 @@
-- Flashbang: the language tiles, the Radio Favorites / Recent switch and the map's + / − buttons get a light grey fill instead of vanishing white on white.

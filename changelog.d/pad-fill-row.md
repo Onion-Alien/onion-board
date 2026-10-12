@@ -1,1 +1,0 @@
-- Sound cards now stretch to fill the row, so there's no empty strip on the right in a narrow window. Pad size still picks roughly how big they are.

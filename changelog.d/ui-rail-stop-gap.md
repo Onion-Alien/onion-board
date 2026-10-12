@@ -1,1 +1,0 @@
-- The small On Air toggle on the side bar sits closer to Stop all, and its dot turns green once your sounds are set up and working (yellow still means not set up).

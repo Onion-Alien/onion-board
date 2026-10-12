@@ -1,2 +1,0 @@
-- Align Setup cards in two consistent columns, with Devices and Your mic at the top, and stack them in smaller windows.
-- Show the Onion Watch install prompt in a dismissible dialog when entering Triggers without the add-on, with a button to reopen it.

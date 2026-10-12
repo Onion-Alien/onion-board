@@ -1,1 +1,0 @@
-- Quitting no longer reopens the mic or speakers when closing takes a moment: once Onion Board is shutting down, its device watchdog leaves them closed.

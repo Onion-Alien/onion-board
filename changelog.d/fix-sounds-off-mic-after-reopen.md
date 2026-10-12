@@ -1,1 +1,0 @@
-- Straight into my mic: changing the audio buffering (or any quick reopen of the mic) no longer leaves your sounds off the mic until Onion Board restarts.

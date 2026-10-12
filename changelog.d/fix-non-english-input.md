@@ -1,1 +1,0 @@
-- Typing only spaces into the Settings search box no longer closes the app with an error.

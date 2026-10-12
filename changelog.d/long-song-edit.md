@@ -1,1 +1,0 @@
-- Editing a very long sound: Preview with effects plays within a second (it renders only the first 30 seconds of a sound over 5 minutes, not all of it), and saving new effects again stops the render still going instead of running both.

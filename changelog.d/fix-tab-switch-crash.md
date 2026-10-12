@@ -1,1 +1,0 @@
-- Fixed a rare crash after switching a tab off (or closing a window) while it was still busy in the background: what the background work held is now always let go of on the window's own thread.

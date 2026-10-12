@@ -1,2 +1,0 @@
-- The sidebar switch now says "On Air" while others hear you and "Off Air" when it is off (it used to say "Others hear"), and sits right after its words. Dragging the sidebar open, its card shows from 80%, a little smaller until it fits at full size.
-- The sidebar status says "Not configured" only when nothing is picked to send your sounds to; a picked cable or device that fails says "Not working".

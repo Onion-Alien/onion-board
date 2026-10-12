@@ -1,1 +1,0 @@
-- Downloads: the progress bar fills once per sound and never jumps back to empty. Looking the link up, downloading (even in parts) and converting are now one bar, and the download banner's top line shows how far the whole list has got.

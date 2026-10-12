@@ -1,1 +1,0 @@
-- Round buttons and other drawn shapes keep their left and top edge on 125 % / 150 % Windows scaling (the play button looked flat on its left).

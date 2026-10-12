@@ -1,1 +1,0 @@
-- Settings and Edit sound are built behind the loading screen, so even their first open after starting is almost instant (about 20 ms instead of 100-300 ms).

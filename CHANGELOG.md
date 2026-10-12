@@ -2,6 +2,649 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.0.0 — 2026-10-12
+
+- *Also send to*: a device's − button is a small button again, not a bar across the
+  rest of the Devices card.
+- The side menu's *How it works* button moved from under the tabs down to the bottom,
+  just above Settings, so it isn't mistaken for a tab.
+- Radio: the map's corners are smoothly rounded like the stations card, not cut into
+  little steps.
+- Running the installer while Onion Board is open in a way Windows can't close (another
+  account, a remote session) now offers to close it and carries on, instead of
+  stopping with nothing changed (a silent install just closes it).
+- *Straight into my mic*: after putting the effect back without a prompt, Onion Board
+  now checks the mic really sends sound again (that check failed every time before).
+- *Straight into my mic*: if the mic effect's file is deleted (by a cleaner or an
+  antivirus, say), the board now notices and puts it back by itself, instead of your
+  sounds silently no longer reaching the mic.
+- Settings heading: in themes with their own font (Amber Terminal, Hacker, Comic Sans)
+  the back arrow and the cog sit on the same line as "Settings" again, instead of a
+  couple of pixels higher.
+- Theme textures are back, and now every theme has one: scanlines, carbon fibre, waves,
+  ruled paper, onion rings and more. Settings > Appearance > Theme style switches
+  between Textured and Plain.
+- A ⏭ Skip button next to ■ in the player (and the mini player), plus a "Skip to the next sound" hotkey in Settings → Hotkeys: the next sound in Up next starts at once. With nothing waiting it stops the sound.
+- A damaged settings file no longer loses pads: the ones still readable in it, and sound
+  files in your library no pad uses, are put back on the board, and the message says how
+  many came back.
+- The "Settings were restored" message now stays until you close it (newer messages no
+  longer push it away) and has an Open folder button.
+- "Others hear it" keeps its words in a narrow window: the little % numbers make room
+  instead, so the box is never an empty square beside the mic icon.
+- The open side rail's Live button now reads the right way round for screen readers
+  ("Live, on" while others hear you), like every other switch.
+- The taskbar preview's Stop button says "Stop everything" on its small hover tip; the
+  full sentence stays on Stop all's own tooltip.
+- An urgent Onion Watch fix now shows its banner on the Triggers tab only, not across the whole board.
+- The first click on the Triggers tab is as quick as any other (~30 ms, was ~220 ms): it's shown once behind the loading screen, like Settings.
+- SoundCloud searches no longer ask SoundCloud's picture server about every result's full-size
+  cover: fewer connections per search, and none to it at all with search pictures off.
+- Settings and Edit sound are built behind the loading screen, so even their first open after starting is almost instant (about 20 ms instead of 100-300 ms).
+- Settings and Edit sound open again almost at once (about 15 ms instead of 100-300 ms): a closed one is kept and reused instead of being built again each time.
+- Count me in also counts Pause, Stop all, the taskbar buttons, add-on set-ups and
+  repairs, restore points and sounds set to play over each other (names only, listed in
+  SECURITY.md).
+- The board is ready the moment it appears: your sounds finish loading and the window draws itself while the loading screen is still up, instead of in the first half-second after.
+- The loading dots under Bun now light up one after another even with Windows'
+  Animation effects off (they just don't grow or hop), so you can see it's working.
+- Editing a very long sound: Preview with effects plays within a second (it renders only the first 30 seconds of a sound over 5 minutes, not all of it), and saving new effects again stops the render still going instead of running both.
+- The Triggers tab opens instantly: Onion Watch now loads behind the loading screen when the app starts, not the first time you click the tab.
+- Unticking "Others hear it" while your sounds aren't in your mic yet now says your voice still goes out (voice apps take your mic straight from Windows) and offers the one-click set-up.
+- The Triggers tab opens about twice as fast: Onion Watch's tab is made right on the board's page instead of being moved there when done (with the next Onion Watch update).
+- Live voice and AI voices no longer need you to install Python. When your PC has no
+  suitable Python, the add-on gets its own copy (about 15 MB) that stays in the add-on's
+  folder and goes when you remove it. The installer's live voice box works without
+  Python too.
+- If the Python one of those add-ons was set up with goes away (uninstalled or
+  upgraded), the Voice tab now says so and offers Repair, instead of the add-on just
+  failing to start.
+- Very long sounds (an hour or more) start at once and no longer cut out: the app reads the next couple of minutes ahead while one plays instead of the whole file on every press or skip, and on a 44.1 kHz device it no longer makes a full copy of a song over 20 minutes long.
+- The "What others hear" meter now moves when you talk before your sounds are set up in your mic: voice apps hear your real mic then, so it was showing nothing while others heard you.
+- Resizing the window no longer makes the sound cards jump: they keep their height as a row gains or loses one, and names stay on one line (cut with "…", the whole name shows on hover).
+- New: OnionBoardCleanup.exe, a separate download linked from the README, takes
+  everything of Onion Board off a PC whose uninstall didn't finish (the mic effect, the
+  mic helper, the app, shortcuts, logs). Your sounds stay unless you ask.
+- Live controls and a pad's Effects: "no change" (1x, +0 dB) now sits in the middle of every slider, like the pitch one, with a small notch to find it again.
+- The Sounds toolbar, the category tabs and the sound cards now line up on both sides.
+- Sound cards now stretch to fill the row, so there's no empty strip on the right in a narrow window. Pad size still picks roughly how big they are.
+- Downloads: the progress bar fills once per sound and never jumps back to empty. Looking the link up, downloading (even in parts) and converting are now one bar, and the download banner's top line shows how far the whole list has got.
+- Web search and link songs: a Play that finishes downloading while another song plays
+  no longer cuts it off. It waits in *Up next* and plays when that song ends, so five
+  Plays play all five, in the order you clicked. Click its chip to play it now, its ✕
+  to take it out; Stop all clears them.
+- The row above the pads shows *Now playing* first, then *Up next* on the same line:
+  as many as fit, then "+n more". In a narrow window Up next steps aside instead of
+  stacking chips on top of each other. In Arabic the row reads right to left.
+- Closing a warning or tip bar at the top of the window no longer jumps the keyboard focus to the Sounds tab.
+- Thin leftover lines no longer show behind and between the sound cards after scrolling at 125 % / 150 % display scaling
+- Setup tab: Your mic and Who's listening are the same height with their titles on one line, and Equalizer and volume sits under Who's listening.
+- Setup tab: Devices, Connect your chat and Equalizer and volume are always open; they no longer fold shut.
+- Card headings: the ⓘ, the heading icon and the status pill sit exactly level with the title.
+- Settings: the "Settings" heading is the size of the "Onion Board" name beside it, level with it, with a cog after it; the back arrow sits level with its letters
+- Stop all (the red button on the side) and the Stop everything hotkey now also turn the
+  voice changer, the AI voice and the computer voice off, not just sounds, the radio and
+  programs.
+- The Voice tab's Custom tab is now part of Add-ons: custom voices (voice servers and voice packs) sit under the add-ons list, one tab fewer.
+- Muted with "Hear what they hear" on no longer silences your own headphones: your sounds
+  keep playing for you, only others stop hearing them.
+- Screen readers now say each theme card's name and the Overlay page's Size and
+  Background sliders.
+- Side bar: the Live switch and the stop square are now two matching buttons, Mute and Stop all, centred in the card; the Tor, proxy and Offline lines are centred too, their icons level with their words.
+- Radio tab: the buttons no longer shift a few pixels when you click Play / Stop or Send.
+- Round buttons and other drawn shapes keep their left and top edge on 125 % / 150 % Windows scaling (the play button looked flat on its left).
+- Sounds brought over from another soundboard (Soundpad, Resanance, Soundux, EXP) now
+  also go in a category named after it, so they're easy to find. Their own categories
+  come over as before.
+- The taskbar and tray icon no longer flicker while a sound plays (the onion kept
+  losing and getting back its layers). Only the logo inside the app glows now.
+- Plain **F12** works as a hotkey again. Windows won't hand it out the usual way, so Onion Board now watches the key itself, and the "can't be a hotkey" warning at every start is gone.
+- Playing a sound now stops the one already playing, so only one sound plays at a time
+  (before, a new sound played on top of the old one). Want sounds to layer? Set a sound's
+  "On press" to Overlap.
+- Language picker: a drop-down right under the Language button instead of a window, each language with its own letter on a coin (ß, Ñ, Я, あ, ع) in the theme colour; arrow keys walk the list.
+- Flashbang: the language tiles, the Radio Favorites / Recent switch and the map's + / − buttons get a light grey fill instead of vanishing white on white.
+- The player's seek line now runs the whole width of its bar when no sound is picked, instead of stopping at an empty gap.
+- New look: the app font is now Bahnschrift. New Lilac theme: Dark's greys with a touch of purple.
+- The sidebar's On Air card is now one slim Live row: the switch (Live or Muted) and a
+  Stop all button side by side, with a yellow "Setup needed" strip under it only while
+  something needs a click.
+- Dragging the sidebar wider keeps the icon column until about 60%, then opens all the
+  way, so it never shows a squeezed half-open layout.
+- Setup: the virtual mic's buttons are one height and sit together in one group, and the
+  main one is shorter: *Straight into my mic instead*.
+- Radio and Apps: *Record* is as tall as *Send*, and *Send* (and Triggers' *Get Onion
+  Watch*) has the usual space between its icon and its words. In a narrow window the
+  Radio bar's buttons no longer stretch across it.
+- Updating saves a restore point first (*Before update*, in Settings > General >
+  Restore points), so the settings, hotkeys and pad list from before the update can be
+  put back. Restoring it keeps the sounds where the update moved them.
+- If the app is closed or the PC loses power while the first start after an update is
+  moving sound files into their folders, the next start puts them back and finishes
+  the job, instead of some sounds showing as missing.
+- Mic effect: a mic that comes back silent from the audio restart gets up to three more restarts. If it's still silent after those, the set-up says so (and what to do) instead of "Done".
+- Setup tab: a mic with the effect on that sends nothing but silence for 20 seconds (during a call, say) shows "Your mic sends no sound" with a one-click Repair. It goes away at the first sound.
+- The anonymous usage count (Count me in) now also says whether the mic effect set up
+  and kept working, whether Onion Board's own updates went through, and which of the
+  newer parts get used (On Air, the Voice tab's tabs, Radio, the Setup tab's folded
+  cards, Audio recovery, imports, the theme). Names from a fixed list only, as before;
+  the full list is in SECURITY.md.
+- Hover the app's taskbar button: the preview has buttons to play the last sound again,
+  pause, stop all, play a random sound and go Live / Muted, like Discord's mute button.
+- Putting the mic effect on or off no longer can leave your mic sending pure silence
+  (to every app, Windows' own mic test included) when a voice chat grabbed the mic the
+  moment Windows' audio came back. After the restart Onion Board listens to the mic for
+  a second, and if it hears nothing but digital silence it restarts the audio once more.
+- Every theme: words and icons on a switched-on button (On Air, Send, the Voice tab's
+  tabs) stay readable, including on its hover and its lit top, and with your own
+  highlight colour. The icons no longer stay white on bright fills like High Contrast's yellow.
+- Links and small accent words (privacy links, effect values, a ticked menu row, What's
+  new) use a readable shade of the accent: Flashbang's were yellow on white.
+- Radio's and Apps' Send is on in your highlight colour like every other switch, not
+  recording red.
+- A sound's details left open across a theme switch now take the new theme's colours.
+- "Add to my mic" mode: if the board freezes for a moment mid-sound, the sound now fades
+  out instead of stopping dead with a click.
+- The Setup tab is tidier: your mic and Who's listening stay in view, and Devices,
+  Connect your chat and Equalizer and volume fold into one line each with a short
+  summary (the devices in use, EQ on or off). Click a line to open it. Hotkeys are in
+  Settings → Hotkeys.
+- Mic effect fixes from a code review: turning sounds off in "add to my mic" mode now
+  fades out instead of playing the last queued bit; Windows can no longer unload the
+  effect while it's still handing it out; a mic stream that paused for a while no longer
+  writes over another app's entry when it comes back; and a second copy of the board
+  starting up can no longer take over the mic from the first one.
+- The Voice tab has tabs of its own: Voice changer, AI voices, Languages, Custom and
+  Add-ons, one card at a time instead of a long page of folding cards. It opens on the
+  one you used last.
+- Voices are picture cards now, as many a row as the window fits. The voice you picked
+  sits in a bar under them with Make it yours, and that bar never scrolls out of sight.
+- The voice changer's on/off is a switch at the top of its card.
+- AI voices and Languages group their settings into neat boxes, and Clear (what the
+  voice said) only shows once something has been said.
+- Mic effect: when checking the mic helper keeps failing, the app now tries again once a minute
+  instead of on every redraw of the mic card.
+- Mic effect: putting the PC's clock forward an hour or more can no longer make the mic helper
+  delete an answer before the app has read it.
+- Mic effect: on a slow PC the mic helper is no longer given up on after 20 s while Windows
+  is still starting it, and an admin step still writing its log is waited for instead of
+  being cut off after 5 minutes.
+- Mic helper: its build lists every file with a checksum, and the admin step only sets up
+  a build that matches; a damaged installed helper is noticed at once and replaced at the
+  next Windows prompt, instead of every mic step waiting on a helper that can't start.
+- Mic card: when another account removes the mic helper (or sets it up), the card's "click
+  Yes when Windows asks" and the fix-by-itself follow the change after every mic step and
+  when the window comes back after a while, without a restart.
+- Apps tab: a program that goes quiet now says `quiet on <device>` on its card instead of
+  `playing on <device>`.
+- Mic helper: a laptop going to sleep, or the clock being corrected, while the helper puts
+  the mic effect on no longer makes the app think it died and ask Windows (which then
+  failed on the lock, code 4); a dead helper is still noticed after the clock went back.
+- Mic helper: a request left while the helper is busy with another (a second account's) waits its turn instead of giving up after 20 s and sending Windows' prompt into the lock (code 4).
+- Mic card: an admin step that didn't finish (the prompt left open, admin rights denied) is an error with what to do, not "You clicked No".
+- Mic helper: a repair now puts the helper back when one of its files went missing (a virus scanner) or it was packed differently, instead of the mic step waiting 20 seconds and asking Windows again every time.
+- Remote control: `/api/queue` answers `"playing"` instead of `"queued"` when nothing was playing and the sound started at once.
+- Triggers tab: loading Onion Watch no longer runs its stand-alone start file, which logged an error about a second app every time the tab loaded.
+- Setup tab: the mic card is rebuilt for the mic helper. It's one status box (what's happening, your mic's name and its live level) with a pill in the heading, and it only asks for a click when it needs one: the first set-up, a No on Windows' prompt, or a fix that didn't work.
+- When a Windows or driver update takes Onion Board off your mic, the app puts it back by itself at start-up through the mic helper (no click, no prompt): a toast says "Fixing your mic…", then "Done".
+- "Click Yes when Windows asks" only shows when Windows will actually ask.
+- A mic repair or update restarts Windows' audio once instead of twice (about 18 s instead of 35 s).
+- Bun's set-up show plays only for the first set-up, and its progress bar keeps moving on a slow PC instead of stopping at 92%.
+- Mic helper: work and school (Microsoft account) Windows accounts now get it too instead of Windows' prompt every time, and on a PC with several accounts each one that set it up keeps it.
+- Mic helper: if it stops half-way, the app notices within seconds and asks Windows instead of waiting five minutes; uninstalling also clears a half-removed helper, and its logs no longer grow forever.
+- Pressing Enter over and over in the search box (or the Radio tab's search) no longer
+  starts the same search again each time: it waits for the one already running.
+- Search results: the back button is now a short "Back" (hover still says "Back to my sounds") and sits as far in from the top of the results panel as from its side.
+- Web search and pasted links: "No results", "Can't use this link" and other search
+  messages now show in the middle of the results area, where "Searching…" was, instead of
+  a corner under Back. The "Search this without Tor" button has the Tor icon.
+- Effects on long sounds no longer need gigabytes of memory: speed, pitch, EQ, boost,
+  reverse and voice effects are worked out a few seconds at a time and saved straight to
+  disk. An hour-long sound with an effect used to need about 10 GB; now about 100 MB.
+- *Straight into my mic* asks for Windows' permission once. After that, repairing it
+  after a Windows update, switching to another mic, taking it off and uninstalling go
+  through a small helper without asking again. Only a new version of the mic effect
+  itself asks once more.
+- Setting up the mic effect also clears what older versions left on other mics.
+- Adding a long sound no longer takes gigabytes of memory: it's read and saved a second at a time. A 1-hour MP3 used about 4.5 GB while it was added, now about 30 MB, and a sound up to the 2-hour limit costs the same.
+- Playing a long link before adding it no longer loads the whole thing into memory.
+- *Straight into my mic*: an older mic part is now updated cleanly: *Install update* takes
+  the old part off completely, then puts the new one on, under one Windows prompt. If the
+  new one won't go on, it's tried once more, and if that fails the old part is put back,
+  so your mic is never left without one. A copy Windows still holds is removed at the
+  next restart.
+- An older mic part is no longer called optional: the update offer comes back each time
+  the board opens until it's done, and the Setup tab shows an amber *Update your mic
+  part* box with an *Update now* button (instead of "Nothing to set").
+- While the mic is being set up, Bun works on the left, under the buttons, instead of in
+  the middle.
+- Fixed overlapping radio station-list loads occasionally failing to save their cache.
+- Keep sounds reaching the mic when Windows quickly restarts its audio engine or another recording app takes over the mic effect.
+- Reimporting sounds already in your library alongside an empty or unreadable file now reports the duplicates separately from the skipped files, as a warning.
+- Align toast action text, such as See why, with the status icon.
+- **Radio tab: plain words when something's wrong.** When the station list's server is down it now says so (*it's not you*), with a sad Bun on the map; offline says check your internet; a station that won't play says it isn't on the air. No more error text with the whole web address in it, and each reason shows once.
+- Tests no longer leave download folders in the real temp folder.
+- FFmpeg (needed for M4A, AAC and video files, pad pictures from videos and saving videos) is checked while the app loads. When it's missing or won't start, the app gets it by itself once the window is up, with a progress bar and *Stop*: winget first, then its own checked download of the same build, with retries. Offline mode, Low data mode, the FFmpeg download switch and *Don't ask again* keep it from downloading; the bar then says why, with *Fix it*.
+- Settings → Data & quality always shows FFmpeg now: working (with its version), missing or won't start, with *Reinstall*, *Get FFmpeg* or *Fix it*, and the download's progress. A fix shows up at once, no restart.
+- Add sounds is now one *Add* menu: sound files, a whole folder, Record, a link or a free
+  pack. A stray click opens the menu instead of a file box, and the toolbar has one
+  button less (Record moved into it).
+- **Also save the video** no longer breaks Add as sound for SoundCloud (it has no video), or for YouTube without FFmpeg (it has no single video files any more): the sound is added and the bar says why no video was kept, naming FFmpeg when that's what's missing. Before, both failed with a wrong *That video isn't available any more*.
+- The On Air card in the side bar now says when the app goes online through a proxy or Tor (and how far Tor got), or not at all in Offline mode, and when a phone remote or the remote control is listening. One click opens its Settings page.
+- Sounds added from a TikTok link no longer get names like "Me &amp; you", and a pasted
+  Myinstants page no longer adds " - Sound Button" to the name.
+- With a proxy or Tor that isn't answering, a download now says so instead of telling you
+  to check your internet connection.
+- Voice tab: Speak in has its own on/off switch, off by default. Turning on a voice
+  changer voice or the AI voice no longer starts translating by itself after you switched
+  it off; picking a language still switches it on.
+- Setup tab: the Equalizer card folds to its heading and on/off row while the EQ is off (seven flat sliders and an empty curve took a third of the tab).
+- Setup tab: Connect your chat shows once your sounds reach a mic. Until then (nothing set up yet, or Nobody) its Step-by-step guide button is in the mic card.
+- Typing only spaces into the Settings search box no longer closes the app with an error.
+- Setup tab: with the virtual cable picked but not installed, Devices no longer also says "Nothing picked: only you will hear sounds" under the setup line.
+- Setup tab: when your sounds go straight into your mic, the mic card says "Nothing to set." and one short line; what to do if a voice app chops your sounds up is behind the card's ⓘ.
+- Setup tab: the My mic dropdown now lines up with My headphones and Send my sounds to.
+- Setup tab: Who's listening has a proper gap between the mode buttons and the line about the picked mode.
+- The control API's `/api/status` `explain` line stays in English like the rest of its JSON, whatever language the app is set to.
+- The "Your virtual mic" card shows a proper red cross and green tick, and "Into your mic: not running" fits on one line.
+- Setup's cards no longer get squeezed (buttons drawn over their text) after your mic's status changes; the same fix covers the Voice tab's effect columns and other layouts that rearrange themselves.
+- Setting up your mic: "Done" shows when it really works (the card turns green and Bun cheers), not while it still reads "starting…" and Bun is still hammering.
+- After removing the virtual cable, "Use the virtual cable instead" is gone until you restart: sending to the removed cable lost your mic.
+- Re-scan devices ignores extra clicks while it shows what it found, and Also send to's rows aren't rebuilt when nothing changed (no more flashing device names).
+- Switching themes does far less work while sounds or the mic effect are running, so it
+  freezes the window much less: the app no longer answers ~28,000 small style questions in
+  Python on every switch.
+- The download banner is one list now: a summary line ("Adding 3 sounds", how many
+  failed) over a row per song, the one downloading with its bar, the ones waiting, the
+  ones that failed with Retry and the ones added already. No more "+2 queued" button to
+  open. A short window folds it to the running song, then to the summary line, instead
+  of switching to the mini player.
+- Every one of the 31 themes checked on every screen: the picked theme card in Settings no longer fills with the accent colour (its name was grey on grey in Carbon), and the accent-coloured *Add sounds* and icons stay readable in light themes with a pale accent (Flashbang).
+- Theme switches make about a third fewer slow style calls.
+- Audio recovery in Settings now lists every mic as its own row: its name (two mics
+  with the same name are numbered, unplugged ones marked), whether the mic effect is
+  on it, which one Onion Board uses, and every action it can take as a button, with
+  nothing hidden in a menu. A mic with the effect gets its fix when it needs one, a
+  clean reinstall and remove; a mic without it gets Install and "Clean up leftovers",
+  which safely takes out anything Onion Board left on that mic. Every action works
+  only on its own mic. The mic effect works on one mic at a time, so installing it on
+  another mic says it moves there and where your sounds will go.
+- Radio and Apps: Redline shows its gauge again, for the pitch (-36 to +36 st, red past ±24), with quick pitch buttons under it.
+- Radio: with no saved station list (a first start, a reset), the most listened-to 300 stations show in a second or two instead of waiting 5-15 s for all 3000; the full list fills in behind them.
+- Radio: Popular, the star and Recent are the same height, and the star sits centred when the window is small.
+- Switching theme no longer shows a half-styled window: Bun covers it for a moment, then it fades to the new theme.
+- Switching theme does less work (a drag-and-drop helper no longer checks every restyle event).
+- Menus and dropdowns show clearly which row the mouse is on, in every theme.
+- The download banner and its rows get the theme gradient: the accent lit at the top left,
+  in full on themes whose own colours match it (Lava, Ocean, Onion, Barbie) and softer on
+  the rest, a light green tint when a song is added and a light red one when it fails.
+  High Contrast stays flat.
+- The download queue no longer gets stuck on "Processing audio…" under the ✓ after the last song was already added: a late update can't undo a finished (or failed) download, and the banner goes away as it should.
+- Make the loading dots easier to see with a left-to-right accent highlight, growth and hop beneath Bun.
+- Smooth the playback button's circular edge and keep Live tab badges, download controls and source icons crisp on scaled screens.
+- Make Play the filled accent button on search results, with a dark outlined Add button and clearer icons.
+- Settings → Appearance can show the first playing or paused sound's whole thumbnail behind the sound cards, with adjustable opacity, rounded corners and padding. Off by default.
+- Give the collapsed sidebar equal visible spacing above and below the output toggle.
+- Fix the playback bar staying grey until seeking: its fill now follows normal playback in both players.
+- Leave room between the Settings back arrow's hover highlight and its heading.
+- If Onion Board crashes while it is still loading (before its window appears, e.g. a
+  broken install), that start-up failure is now noticed and counted on the next start
+  instead of leaving no trace, so it can be fixed. A problem Onion Board catches and
+  shows you as a warning, rather than letting it crash, is now counted too (only the
+  error's type and the line of its own code, never your data).
+- A tick box you click no longer keeps a white ring around it.
+- Downloads: the "Add as sound" box at the top of the download bar and in its queue looked like a button. It is now a plain status tag with an icon: "Adding to sounds" (or "Playing once"), and "Waiting to add" for each queued row.
+- Plain F12 as a hotkey: the app now says Windows keeps that key for itself (it blamed another program before), and the hotkey picker won't take it.
+- A settings save that hit a file another program had open for a moment (an antivirus scan) is tried again instead of showing "Couldn't save your settings".
+- The Discord warning bar (*Fix Discord*) and the "Looks like you're using Discord.
+  Set up for it?" bar no longer appear together: while Discord's own settings are
+  hurting your sounds, only the warning shows.
+- The seek bar no longer looks a few seconds in when a sound starts at 0:00.
+- Picking speakers or a headset under *Send my sounds to* now asks, when you leave
+  Settings, whether you meant it: Discord and games don't hear sounds sent there. It
+  offers *Use my mic*, the virtual cable (or installing it from Setup), or *Keep it*
+  for OBS, Voicemeeter or a mixer. A virtual cable is never asked about.
+- Adding several sounds at once shows a corner card with Bun, the count and a bar. Each
+  sound shows up on the board, ready to play, as soon as it's in, and closing the card
+  only hides it: the rest keep coming and the finished card (Undo) still appears.
+  Its Stop skips the files not started yet; Undo takes off the ones already in.
+- Every close ✕ (notices, tip and warning bars, the download bar, queue chips, hotkey
+  rows) is drawn the same crisp way and can no longer be cut off or squashed.
+- The small On Air toggle on the side bar sits closer to Stop all, and its dot turns green once your sounds are set up and working (yellow still means not set up).
+- A pad whose sound plays from its own file elsewhere on your PC (*Copy into library*
+  off) shows a small link mark before its length. Hover the mark to see where the file is.
+- The button that shows and hides the tab names is now a side-panel icon instead of a plain arrow.
+- Radio: a station that drops out and reconnects no longer freezes the window.
+- When the sidebar is narrow, a dot on the On Air icon (not on the open/close arrow) says sending isn't set up; clicking the icon opens Setup. The arrow keeps its dot for the other alerts (offline, update).
+- The quick setup guide is tidier: no empty band under each step's words, mic and speaker
+  tiles only as tall as their names, the test sound card lined up with everything else,
+  and the "Another device" list gets its own heading.
+- Bun the bunny and Hoot the owl dress up for each theme: a crown in Royal, a cape and fangs in Vampire, laser eyes in Deep Fried, an onion hat in Onion, and more.
+- Clearer words: the mini player's mic button says your sounds still play when it's muted,
+  a link to a page with no sound says so plainly, and the "Keep your imported sounds?"
+  box says how to get removed sounds back.
+- Main buttons look richer: a soft gradient from your theme's colour into its second colour, a light top edge, and a deeper look while pressed. Text stays as readable as before in every theme.
+- Clearing the "All hotkeys off / on" key (or giving it to something else) while hotkeys
+  are off turns them back on, instead of leaving them off until a restart.
+- When a damaged or missing settings file is restored from a backup, the restored copy
+  is saved straight away, instead of waiting for the next change.
+- The sidebar switch now says "On Air" while others hear you and "Off Air" when it is off (it used to say "Others hear"), and sits right after its words. Dragging the sidebar open, its card shows from 80%, a little smaller until it fits at full size.
+- The sidebar status says "Not configured" only when nothing is picked to send your sounds to; a picked cable or device that fails says "Not working".
+- **The quick setup guide looks designed now.** Mics and headphones are tiles (the product name big, "Microphone" small under it), four across, and your voice level moves along the picked mic's tile. A step bar shows where you are, Back / Next are bigger with bolder arrows, and everything lines up on the same edges.
+- **"Where do your sounds go?" says plainly whether it works**: a green "Working" card with the mic Onion Board's audio driver is on, an amber one when it needs a repair, a grey one when it isn't set up. The virtual cable and another device moved into an "Optional" card, each with why you'd want it.
+- **Switching from a working mic driver to the cable asks first**, and offers to tell us what went wrong with the driver.
+- **The last step is shorter**: the Discord tip is a small pill you open if you want it, and the "Bring my ... sounds over" button is gone (the installer's tick boxes and Backup > Import from another soundboard do it).
+- The mini player no longer gets covered by corner cards: with pads showing they're small
+  icons at the top (hover to read, click to make the window bigger; nothing closes), and
+  at its smallest they wait. Errors stay until the window is big enough to read them.
+- Results and problems that showed as a line inside a panel are corner cards now: text-to-
+  speech errors, a translation or speech download that failed or was cancelled, an add-on
+  install that failed, Apps and Radio clip results, the clip editor's copy / paste results
+  and errors, the clip shelf, Radio's station errors and list refresh, sound pack downloads,
+  "No audio device" in the link bar, and copying a remote-control link. A voice added from
+  a share code says so even with the voice window closed. Hints and progress stay put.
+- Fixed a rare error while the window opens: a Discord settings check that finished before the window was built tripped over the app-setup bar.
+- **The mic part's update asks first.** An older mic part no longer starts its update (and Windows' permission prompt) by itself at start: a small card offers it a second after the window opens, never from the tray, once per version. *Install update* checks your mic is still set up the same, then Windows asks; *Not now*, Escape or closing installs nothing, and Setup keeps the update button. Saying No in Windows' prompt is a short note now, not an error box.
+- After the installer brings your sounds over from another soundboard, one box asks whether to keep them; Remove takes them all off again (Undo and Recently deleted still have them).
+- "Removed X · Undo" is a corner card with an Undo button now, everywhere: removed sounds,
+  deleted voices and AI voices, forgotten programs, deleted clips and modes, and the
+  "Game mode for X" switch. When it goes, the thing is in Recently deleted as before.
+- Turning *Hear what they hear* on or off while a sound plays no longer clicks, and
+  clicking it over and over no longer makes a fuzzy buzz: the sound fades across.
+- Give Add sounds a music-note icon in place of the plus.
+- Buttons with an icon and words have the same, slightly wider gap between them everywhere.
+- Local sound imports now link to the original file by default. Settings > Data & quality > Local sounds can keep a library copy instead. Both modes use the same decoded cache for playback, speed and effects; downloads, recordings and ZIP imports still keep their own files.
+- Added Audio recovery in Settings: update the mic effect, clean reinstall it, or restore normal microphone operation by removing it. The card shows where the mic effect stands (Ready, Update available, Off) and offers the one fix it needs, including a repair when Windows has switched the effect off; the rarer actions sit in its ⋯ menu. Recovery runs in the background, verifies the resulting setup, and refuses to change mic settings if Windows audio cannot be stopped.
+- Fixed icons and cards staying highlighted after opening a popup and moving the mouse away.
+- A smaller, calmer startup splash with a steady Bun, the app name and three gentle loading dots. It follows your theme and Windows' Animation effects setting.
+- Pop-up boxes that only told you something are corner cards now, so they don't stop
+  what you're doing: couldn't use a picture, export failed, import failed, settings
+  imported, settings restored, couldn't open Windows' sound settings, an update that
+  couldn't download or start (with *Open the download page*), "Onion Board is up to date"
+  (with *What's new*), sounds that weren't imported (with *See why*), a voice share code
+  that isn't one, and a problem in the app (with *Report it*). Questions still ask.
+- A corner card's long button (*Open the download page*) sits under the words instead of
+  squeezing them into a thin column.
+- The little note that floated over the bottom of the page is gone: everything it said
+  (device problems, drop-outs, hotkeys off, "Up next", "Category: Memes", the volume,
+  pasted pictures, a hotkey taken from something else…) now shows as a corner card in the
+  right colour, and goes when it's over. A hotkey that took another one's key says so in
+  one yellow card instead of a yellow note and a green card at once.
+- The installer is shorter: a one-line welcome, a three-line privacy page, no group headings in the list of extras, and no "Keep a history" box (it's in Settings > Connection). "Where did you hear about Onion Board?" lost GitHub and its fine print.
+- The virtual cable box is left out of the installer when a cable already works, instead of showing greyed out.
+- Messages now show as cards in the bottom corner, above the player: green when
+  something worked, yellow for a warning, red for an error (with a Copy button), up to
+  three at once, and the same message twice is counted (×2) instead of stacking.
+- Adding sounds shows "Adding 3 of 12…" with a bar, then one result with *Undo*, or
+  *See why* when some files were skipped (a list of what and why, sorted into plain
+  groups, that you can copy). The new pads light up once so you can see where they went.
+- Dragging files over the window says what dropping them will do ("Drop to add 4 files").
+- The installer's virtual cable box moved to the bottom of the list under "Advanced", with plainer wording (most people don't need it).
+- Setup keeps the "Use the virtual cable instead" button when the mic effect works, for people who prefer the cable.
+- A station's error line on the Radio tab stays up for 30 seconds instead of 4.
+- The message after a damaged settings file says which folder holds both files.
+- Adding a very short sound (under 0.3 s) shows a note that it may be barely heard.
+- Closing Onion Board while a link is still downloading now asks first, instead of dropping the download silently.
+- A link that can't be used now also shows its reason as a message, not only in the results panel.
+- Settings are saved 100 ms after a change instead of 400 ms, so a crash loses less.
+- After a restart or an audio buffering change, a message says your sounds are back on your mic.
+- Installing the virtual cable no longer shows a PowerShell or console window: Windows asks once for VB-Audio's own signed setup ("VB-Audio Virtual Cable Installer").
+- The installer downloads the cable while you're still picking boxes and asks Windows' permission the moment you click Install, instead of at the very end after a pause. The window keeps working meanwhile, and Cancel still works.
+- Cancel the install after the cable went in, and the installer now says the cable is still on your PC and where to remove it.
+- Cancel works while the installer downloads its extras (FFmpeg, live voice, Tor): it stops the one running and skips the rest, and says where to add them later.
+- Updating: if another program (antivirus, a leftover process) is holding one of the app's files open, the installer now stops before changing anything and says so, instead of failing halfway and leaving an app that will not start.
+- Installer: the list of extras (virtual cable, voice-to-speech, Tor...) no longer flashes the row under the mouse as you move it.
+- Straight into my mic: changing the audio buffering (or any quick reopen of the mic) no longer leaves your sounds off the mic until Onion Board restarts.
+- Quitting no longer reopens the mic or speakers when closing takes a moment: once Onion Board is shutting down, its device watchdog leaves them closed.
+- Closing Free sound packs before the online list loaded no longer offers a crash report a moment later. Search results and link downloads that finish after their panel closed are dropped quietly too.
+- Sidebar: an onion button between Settings and the arrow opens Join the Discord, Send feedback, Report a problem, the GitHub page and What's new. It sits exactly halfway at every sidebar width, and the small › on the sidebar card has a sharp tip again.
+- Apps category headings work from the keyboard: Tab reaches each one (its line turns
+  the accent colour), and the Menu key or Shift+F10 opens Rename / Delete. Tab goes
+  heading, its cards, then the next heading, as they're shown.
+- The Apps tab's own categories (Browsers, Music & media, Calls & chat, Games, Other)
+  show in your language, in their headings and a card's Categories menu. They're
+  still saved under their English names, so switching language or version keeps them.
+- Apps cards show a program's own name, the way Windows' volume mixer does: *VLC media
+  player* and *OBS Studio* instead of *Vlc* and *Obs64*. A program without one keeps
+  the name from its file.
+- Settings: *Play pads with one click*'s explanation sits under its words like every
+  other option's; the overlay's *Open overlay* button and *Auto-hide after* choice
+  are as wide as their words, beside what they belong to; *While I talk, lower my
+  sounds* stays on one line.
+- Triggers tab: without Onion Watch, the tab itself shows its card (the logo, one
+  line, what it does in four points, *Get Onion Watch* and Hoot), centred, lighting
+  up under the mouse. No more window popping up on entering the tab, and no empty
+  page once it was closed.
+- Apps: the Menu key or Shift+F10 opens a program card's menu (it was right-click only).
+- Developers: `scripts/precommit.ps1` runs only the quick checks (about 10 s) and leaves the tests to CI; `-Tests` runs the picked tests here. The test picker no longer counts everything `conftest.py` imports for a test that borrows a helper from it.
+- Settings > Appearance: the two *Live tabs* choices sit side by side, like the
+  Connection choices (they wrap when Settings is narrow).
+- Voice tab: *Make it yours* sits beside the voice changer's on/off switch, so you no
+  longer scroll past every voice to find it. In *Speak another language*, *More
+  options* comes right after the voice and speed, before the box of what was said.
+- The *Type a line* bar has no volume slider of its own any more: a typed line plays
+  like a sound, so the volumes at the bottom set how loud it is.
+- The line above the Settings cog sits halfway between Stop all and the cog, with the
+  same gap on both sides.
+- The sidebar's output card is now **Others hear**: one line under it says "Not connected ›" (click it to set up) or "Connected", with even spacing all round.
+- Switching **Others hear** off now cuts only your sounds, the radio and programs: your own voice still goes out while "Send my mic to others" is on and no voice changer is on. With a voice changer on, off is silence as before.
+- A tab's "About this tab" card follows the theme like the rest of the app: its close
+  is the app's own x icon (named Close for screen readers), its title and text use the
+  shared sizes, and closing it puts the focus back on the tab you opened it from. Its "Click outside to close" line is gone
+  (it still closes that way).
+- Every "Reset" beside an effect, the live controls or a sound's effects looks the same:
+  a small Reset with the reset arrow ("Reset all" is just Reset now; its tooltip says
+  what goes back).
+- The sound modes' "What do these do?" is an ⓘ beside the "Who's listening" heading.
+- Edit sound's "Save as new sound" is "Save a copy".
+- The sound mode buttons (Game, Voice chat, Clean, Advanced) have pictures, the same as
+  the mode button in the sidebar.
+- The Colour menus name their colours (Purple, Blue…) instead of showing codes like
+  #1fb6ff, and tick the current one on its own colour dot, the same in the selection
+  menu and on a category tab.
+- A program's Categories menu on the Apps tab ticks the category it's in and shows
+  "Music & media" properly (it read "Music _media"); its menus have icons, and Remove
+  and Delete category are in red.
+- The menu for picked pads no longer starts with an empty row.
+- New *Interface size* in Settings > Appearance: make the whole app bigger or smaller
+  (80 to 150%), on top of Windows' display scaling. Applies after a restart.
+- The Sounds toolbar, the player bar and the mic bar are now all the same height, with
+  the same 36 px buttons, so the top of the window no longer looks heavier than the
+  tab rail.
+- Settings is now a page in the main window instead of a separate window: the tab bar
+  on the left and the player and volume strip at the bottom stay, so you can still
+  play and stop sounds while you change settings. The back arrow, Escape or any tab on
+  the left takes you back. The Settings cog is just its icon now, highlighted while
+  open. Shrinking the window too small closes Settings; opening Settings from the mini
+  player grows the window just enough to show it.
+- Edit sound no longer locks the rest of the app: sounds, hotkeys and the board keep
+  working while it's open. It still saves only on Save; removing a sound closes its
+  Edit sound window without saving.
+- On a full-screen window the search box no longer runs across the whole screen; the
+  seek bar, the levels and the drop box still use the window's width.
+- The volume numbers (100%, 70%) sit right beside their sliders and on the same line as
+  the words around them, not floating off to the side a pixel low.
+- Straight into my mic set-up and Windows voice downloads no longer fail on Windows in languages whose tools answer with letters like "ü".
+- Hints, sound lengths and other grey text now read clearly in every theme, also on a
+  button under the mouse and in the inset boxes, and the grey "Search…" text in empty
+  boxes is no longer see-through (4.5:1 contrast or better everywhere).
+- Radio: the info line no longer keeps saying "Searching…" for a few seconds after the results are in or the search box is cleared.
+- Setup in a narrow window: the cards now go Devices, Your virtual mic, Connect your chat and Who's listening before the Equalizer and Volume, so the setup button isn't pushed below the EQ.
+- Line up the sidebar's Sound output card: its icons share the tab icons' column, every line of words (including "Set up output") starts on one line, icons sit centred on their words, and long translations wrap instead of being cut off.
+- Dragging the sidebar open is smoother: icons stay in one centred column until halfway, then tab names show with a compact header, and the full sidebar appears once everything fits.
+- The sidebar's attention dot stays beside the expand arrow.
+- Group the expanded sidebar's output switch and connection status, with visible labels and a broadcast icon.
+- Keep Stop all visible and leave the listening mode picker on Setup instead of duplicating it on the sidebar.
+- Drag the sidebar's inner edge to open or close it, bounded by its existing widths.
+- The buttons that open a folder are now the same small folder icon everywhere
+  (Settings, the Voice tab, a crash report), with the words in the tooltip.
+- The bulk colour menu marks the selected sounds' shared colour. Mixed colours leave every option unmarked until a colour is chosen.
+- The empty and populated soundboards use the same "Drop sound files here" hint.
+- The anonymous daily usage count (*Count me in*) also says which of the newer features
+  were used that day, as names from a fixed list (the first start's "What's it for?"
+  answer, the Get Onion Watch window, Get FFmpeg, the download bar, a sound's source
+  menu, Apps categories, Settings search and a few more). Nothing extra is sent on a
+  click: each is a yes for the day in the one daily message. SECURITY.md lists them.
+- The daily usage count goes by the day on your PC's clock, not every 24 hours: using
+  the app in the evening and again the next afternoon counts as two days (it used to
+  count as one, and the second looked like a day off). Still one count a day.
+- Count me in also counts sounds fetched from a link or a web search: which site
+  (YouTube, TikTok…), pasted link or search, how many a day, and failed sites. Never the
+  link, its title or what you searched for (SECURITY.md lists every name).
+- In a narrow window the levels strip at the bottom no longer drops your headphones'
+  volume and the level of what others hear: it shows what others hear, with your mic and
+  headphones as icons beside it. Click one to show its controls instead.
+- The "Make it yours" button no longer gains "…" once a setting is on, and its count
+  reads properly in every language; the last tips and hints that still named labels
+  with "…" match the menus now.
+- Menus, buttons and other labels no longer end in "…": the trailing dots are gone
+  everywhere except the progress messages (Loading, Scanning and the like).
+- Corrected a number of menu and button translations across the shipped languages:
+  wrong or awkward wording for Edit, Rename, Advanced, Import, Fades, Search
+  languages, Make it yours and more, and the Onion Watch and Onion Pocket names in
+  their Remove labels.
+- Settings: the Tab key now moves from the category list into the open page and on to Done, so every setting can be reached with the keyboard or a screen reader.
+- Settings: the first card on every page now lines up with the top of the search box, and Done has the same room above it as below and beside it.
+- Settings search: typing a page's name opens that page (hotkey opens Hotkeys), and a search that finds nothing says so instead of showing an empty window.
+- Switching tabs off and on quickly, then opening *+ More tabs*, can no longer close the
+  app with a crash now and then (Radio most often).
+- A sound added from a web link (YouTube, TikTok, SoundCloud, Instagram, X, Myinstants
+  and the rest) remembers where it came from: right-click it for *Open on YouTube*,
+  *Copy link* and *Details* (channel, upload date, length, views), and a text file
+  with the same next to the sound in your Sounds folder. Nothing extra is asked of the site: it's all from the download itself.
+- The pad right-click menu is shorter: *Effects* and *Add picture* moved into
+  **Edit** (its *Effects* tab, and a *Picture* row you can set from a file or a
+  link), and *Show the file in its folder* is now *Open file location*, as Windows
+  calls it. Edit's Sound tab is in three cards: Look, Playback and Timing.
+- Submenus (Categories, the site's menu, and every other one) open just outside their
+  menu instead of covering its edge, on either side and in right-to-left languages.
+- Settings → Data & quality → Downloads → *Remember where it came from* (on by default)
+  switches it off: new downloads keep no link or text file and the menu hides it; what
+  was saved before stays. The *Details* box's bin button deletes one sound's info and
+  its text file (it asks first; the sound stays).
+- The Tab key now goes from the side rail into the page. It used to stop on the rail's
+  last button, so the board, the search box and every setting were out of reach without
+  a mouse.
+- Screen readers now name the player's seek slider ("Playback position").
+- Apps tab: a program saved in a category that no longer exists shows up in its usual
+  category instead of vanishing from the tab.
+- Radio tab: screen readers now name the Play / Stop button, the country, quality and
+  sort boxes, the station list and the Popular / Favorites / Recent buttons, also when
+  a small window shows them as icons only.
+- Closing the app while a radio station is still connecting no longer prints an error.
+- Control API: `/api/volume` and `/api/radio_volume` now say their real range (0-1000 %,
+  100 is normal) in the help and the error messages.
+- Fixed a rare crash after switching a tab off (or closing a window) while it was still busy in the background: what the background work held is now always let go of on the window's own thread.
+- The search button picks the site (YouTube, YouTube Music, SoundCloud, TikTok,
+  Myinstants) from its menu, in place of the row of site buttons over the results.
+- Show more under the search results loads the next 20, up to 200.
+- Back to my sounds is a plain button, lined up with the cards.
+- Open search results follow a theme switch (Play buttons stayed dark in Light).
+- Menus show the picked item in the accent colour.
+- Side rail: the header is the name over a plain version number (no "from source" or
+  byline; the title bar still says it, and hovering the header shows who made it).
+- Side rail: the bottom is three groups with thin lines between them: what needs attention
+  (not connected, offline, update) on top, then Live, who's listening and Stop all, then
+  Settings with the open / shut arrow beside it.
+- The header onion no longer cries when clicked ten times; a click still gives it a wobble.
+- Side rail, shut: only Live, Stop all, Settings and the arrow stay (the warnings and
+  "Listening" show on the open rail; a small dot on the arrow says a warning is waiting),
+  and hovering a tab shows its name and key.
+- Ctrl+1 to Ctrl+9 jump to the tabs in the rail's order; Ctrl+Tab and Ctrl+Shift+Tab step
+  through them. Clicking the version in the header opens What's new.
+- Stop all has its own icon (two squares), so it's not mistaken for the player's Stop.
+- Side rail: more room between each button's icon and its name (about 10 px instead of 4).
+- The Voice tab says "Voice effects off: mic unchanged" with a colon, not a long dash, in every language.
+- A download bar at the top of every tab (and in the mini player) shows a web link's
+  download as it goes: looking it up, how much has downloaded, then processing, with
+  a Cancel button and how many picks wait their turn.
+- Search cards stay clickable while one downloads: a new Play replaces the one still
+  loading, and Add waits its turn (up to 3 waiting).
+- Videos up to 2 hours long can be added or played (was 15 minutes).
+- A link with no picture shows Bun writing the music down on a little scroll while it
+  downloads: the opening of a well-known piece (Fur Elise, Canon in D, Twinkle twinkle
+  and 26 more) as real sheet music, as much of it as has downloaded.
+- The download bar can be minimised to one slim line (the song, how far it's got and
+  how many wait); a click opens it again. On Setup it lines up with the cards.
+- A download that worked shows a tick for a second before the next one takes its
+  place; one that failed flashes red and waits in the queue list with Retry.
+- Click a waiting song in the queue list to download it next.
+- Play once while other songs download goes next in the queue (it doesn't wait behind
+  the Adds), and a newer Play replaces one still waiting.
+- Tab no longer gets stuck in Settings' network activity list when it has rows.
+- In a narrow window the download bar keeps its progress bar: Stop all moves into the
+  queue list and "+2 queued" reads "+2".
+- Settings > Data & quality can now get FFmpeg itself (a Get FFmpeg button), so M4A, AAC
+  and video files can be played and added without re-running the installer; the message
+  when a file can't be played now says where to get it.
+- **Uninstalling the mic effect is more reliable.** Taking *Straight into my mic* off a mic now keeps going if one mic can't be put back (it used to stop at the first one and leave the rest set up), removes the ring file with everything else, checks that Windows' audio really stopped before it changes a mic's effects (retrying once, and saying so if it wouldn't), and waits longer for the admin step so a slow PC isn't reported as a failure.
+- **An uninstall cut off half-way finishes on the next run.** If taking the effect off is interrupted (a crash, a reboot) after it's already removed from the mic's effect slot, running it again now puts the rest of the mic's settings back. Before, it mistook the half-done state for Windows having reset the mic and left some of the change behind.
+- Web search results now sit right under the toolbar: the empty category bar that
+  used to leave a gap above the Back to my sounds and site buttons is hidden while
+  results show, and the results' top padding is gone.
+- **The mic effect now names itself.** `obmic.dll` (the Windows audio effect behind *Straight into my mic*) carries a version resource, so Windows' file Properties and security tools see "Onion Board" rather than a nameless, unsigned DLL. The build stays byte-identical for the same version.
+- Apps tab: cards can be dragged anywhere on their surface to reorder or move between
+  categories. Category section headers can be dragged to reorder sections.
+- Apps tab: add custom categories with the "+ Category" toolbar button, or rename and
+  delete categories from their section heading menu.
+- Align Setup cards in two consistent columns, with Devices and Your mic at the top, and stack them in smaller windows.
+- Show the Onion Watch install prompt in a dismissible dialog when entering Triggers without the add-on, with a button to reopen it.
+- Data & quality settings keep dropdowns beside their labels and folder buttons together,
+  with enough room for the video folder path and complete dropdown choices.
+- **Builds no longer pick up another program's DLLs.** A build made on a PC with another program's ICU on PATH failed at start ("DLL load failed while importing QtWidgets"): `build.ps1` now runs PyInstaller with only Windows' folders on PATH, and `scripts/vc_runtime.py` deletes any bundled ICU DLL (Qt uses Windows' own).
+- Empty sound boards show the same drop-file box as populated boards, below Bun,
+  with instructions for adding sounds inside it.
+- Fixed Voice cards briefly jumping to the wrong position when rapidly opening and
+  closing them.
+- Voice cards now use a consistent order: the start or power control at the top, followed by the description and settings. The computer voice status sits beside Start and wraps at narrow widths.
+- Setup: Volume & shortcuts now sits below the equalizer in the left column,
+  making better use of the available space.
+- Removed the sidebar's How it works button and its app explanation popup.
+- Fix the radio map's square corner backing: its container and splitter now reveal the window behind the map's smooth rounded corners.
+- Voice tab: the "Type a line" bar moved to the top of the tab, so the bottom only has your mic level and the mixer.
+- Restarting Windows, logging off or installing an update while Onion Board is open no longer counts as an unclean exit (it came in as "while-closing" or "pc-restarted") or saves a crash report.
+- Tests: the highlight-colour test no longer writes its test board ("Boom", "Airhorn") into the real settings folder; a check stops tests from undoing every patch at once again.
+- Switching the Radio tab off and on again (Settings → Tabs) can no longer crash the
+  app now and then.
+- Setup no longer has the *Test your local mix* card (Record 6s). To check what others
+  get, use *Hear what they hear* or your chat app's microphone test.
+- The side menu starts open on a new install, so the tabs show their names and not
+  just icons. The button at the bottom still shuts it, and that choice is kept.
+
+- Themes use clean, flat cards and a faint accent glow, without window grain,
+  dark background fades or panel textures. High Contrast keeps its strong outlines.
+
+- Quick setup: on the very first launch the guide starts by asking what you'll use Onion
+  Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and links
+  the *Streamer guide* on the last step, *Competitive games* adds the Triggers tab
+  (Onion Watch), and *Show me everything* adds every tab. It's asked once only; Settings →
+  Tabs changes it later.
+- Mini player shows connection status and a microphone mute switch. Expanded sidebar
+  actions have labels; Setup puts devices first. Sounds groups
+  library tools, Voice opens its presets on first visit, and secondary text reads more
+  clearly. The full-width drop target is preserved.
+- Add sounds and Record are flat icon buttons like the rest of the Sounds toolbar
+  (Add sounds in the accent colour), with a divider before the search box.
+- AI voices puts Start and live status at the top, with a wider voice picker,
+  grouped pitch controls and shorter explanatory text in every language.
+- The note that pops up above the player ("Added … to Sounds", device changes and so
+  on) now sits centred over the page instead of jammed in the bottom-left corner on
+  top of the sidebar, and is no wider than 560 px.
+- YouTube and YouTube Music searches are about a second faster after the first one:
+  YouTube's page settings are kept for an hour instead of being fetched before every
+  search (Direct connection only; if a search with them fails, it's done again the old
+  way, with fresh ones).
+- *Straight into my mic*: when Windows starts running the mic effect after Onion Board
+  opened (it loads it late sometimes), your sounds switch to it within a second instead
+  of staying on the virtual cable until the app was restarted. If Windows takes the
+  effect off, they go back to the cable the same way.
+- The log no longer warns about "a native error was caught and survived" for Windows
+  error code 0x8001010d and its kin: COM raises and handles those itself, so they're
+  harmless. They no longer count as a crash at the next start either.
+- The Voice tab's status bar (mic level and what others hear) moved from the top to
+  just above the *type a line* bar at the bottom, and keeps the same height when a
+  voice turns on or off, so nothing jumps.
+
 ## 1.9.28 — 2026-10-10
 
 - AI voices: when the AI voice stops, the message says "Others now hear your real

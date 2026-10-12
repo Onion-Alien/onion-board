@@ -1,1 +1,0 @@
-- Setup in a narrow window: the cards now go Devices, Your virtual mic, Connect your chat and Who's listening before the Equalizer and Volume, so the setup button isn't pushed below the EQ.

@@ -1,1 +1,0 @@
-- After the installer brings your sounds over from another soundboard, one box asks whether to keep them; Remove takes them all off again (Undo and Recently deleted still have them).

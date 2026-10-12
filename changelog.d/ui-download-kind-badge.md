@@ -1,1 +1,0 @@
-- Downloads: the "Add as sound" box at the top of the download bar and in its queue looked like a button. It is now a plain status tag with an icon: "Adding to sounds" (or "Playing once"), and "Waiting to add" for each queued row.
