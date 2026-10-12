@@ -11,7 +11,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QPushButton
 
 from soundboard.ui import toast
-from soundboard import backup
+from soundboard import backup, thumbbar
 from soundboard.library import Config, SoundMeta
 from soundboard.ui.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
@@ -362,6 +362,9 @@ def test_stop_all_turns_the_voice_changer_off_but_the_say_bars_stop_doesnt(windo
     w.voice.speech.say_stop.click()   # the Say bar's Stop: only the typed line
     assert w.voice.fx.btn_power.isChecked()
     w.stop_btn.click()                # the side rail's Stop all: the voices go off too
+    assert not w.voice.fx.btn_power.isChecked()
+    w.voice.fx.btn_power.setChecked(True)
+    w.thumbbar.actions[thumbbar.STOP]()   # the taskbar preview's Stop: the same Stop all
     assert not w.voice.fx.btn_power.isChecked()
 
 
