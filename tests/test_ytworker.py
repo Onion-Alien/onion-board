@@ -192,3 +192,22 @@ def test_alive_messages_keep_the_wait_going():
     seen = []
     assert h.call(("download",), timeout=5, progress=seen.append) == ("ok", 7)
     assert seen == [0.5]
+
+
+def test_a_soundcloud_search_asks_the_picture_server_nothing():
+    """yt-dlp checks every result's full-size cover with a request of its own; the
+    card only uses the listed one (and none at all with search pictures off)."""
+    yt_dlp = pytest.importorskip("yt_dlp")
+    with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+        ytworker._listed_art_only(ydl)
+        ie = ydl.get_info_extractor("SoundcloudSearch")
+        ie._request_webpage = lambda *a, **k: pytest.fail("asked the picture server")
+        art = "https://i1.sndcdn.com/artworks-abc-large.jpg"
+        assert ie._extract_thumbnails({"id": 1, "artwork_url": art}) == [{"url": art}]
+        avatar = "https://i1.sndcdn.com/avatars-abc-large.jpg"
+        only_avatar = {"id": 1, "user": {"avatar_url": avatar}}
+        assert ie._extract_thumbnails(only_avatar) == [{"url": avatar}]
+        assert ie._extract_thumbnails({"id": 1}) is None
+        hit = ytdl._soundcloud_hit({"id": 1, "title": "t", "thumbnails": [{"url": art}],
+                                    "webpage_url": "https://soundcloud.com/a/b"})
+        assert hit.art == "https://i1.sndcdn.com/artworks-abc-t300x300.jpg"

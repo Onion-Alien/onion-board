@@ -255,7 +255,25 @@ def extract(yt_dlp, target: str, opts: dict, keep: bool = False):
     with yt_dlp.YoutubeDL(opts) as ydl:
         if keep:
             _keep_configs(ydl, [], fresh=True)
+        if target.startswith("scsearch"):
+            _listed_art_only(ydl)
         return ydl.extract_info(target, download=False)
+
+
+def _listed_art_only(ydl):
+    """A SoundCloud search: yt-dlp asks SoundCloud's picture server about every
+    result's full-size cover (one request each, even with search pictures off in
+    Settings > Data & quality), and the card only ever shows the 300 px one
+    (ytdl._soundcloud_hit). The cover link the search lists is all it needs."""
+    try:
+        ie = ydl.get_info_extractor("SoundcloudSearch")
+    except Exception:  # noqa: BLE001 - another yt-dlp: it just asks, as before
+        return
+
+    def listed(info):
+        url = info.get("artwork_url") or (info.get("user") or {}).get("avatar_url")
+        return [{"url": url}] if isinstance(url, str) and url.startswith("https://") else None
+    ie._extract_thumbnails = listed
 
 
 def _lookup(conn, yt_dlp, target: str, opts: dict, keep: bool = False):
