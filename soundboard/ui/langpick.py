@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (QDialog, QGridLayout, QLabel, QLineEdit, QPushBut
 
 from soundboard import i18n, theme
 from soundboard.i18n import _
+from soundboard.ui.pixels import snap_to_pixels
 
 COLUMNS = 3            # narrow on purpose: three tiles across is enough to scan
 TILE = QSize(168, 70)
@@ -94,6 +95,7 @@ class LangTile(QPushButton):
         super().paintEvent(e)
         t = theme.tokens()
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
         h = self.height()

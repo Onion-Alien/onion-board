@@ -29,6 +29,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
 from soundboard.ui.scribebun import ScribeBunny
 from soundboard.ui.widgets import fmt_time
+from soundboard.ui.pixels import snap_to_pixels
 
 
 BAR_W = 480   # the progress bar's length in the banner
@@ -81,6 +82,7 @@ class SmoothProgressBar(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect())
         rad = r.height() / 2
@@ -121,6 +123,7 @@ class ElideLabel(QLabel):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         text = self.fontMetrics().elidedText(self.text(), Qt.TextElideMode.ElideRight, self.width())
         self.style().drawItemText(p, self.rect(),
                                   int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter),
@@ -222,6 +225,7 @@ class Outcome(QWidget):
     def paintEvent(self, _e):
         k = self._k
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         red = QColor(theme.status("error"))
         if self.spot.isEmpty():
@@ -759,6 +763,7 @@ class DownloadBar(QFrame):
             red = QColor(theme.status("error"))
             fade = 1.0 - self.outcome.k()
             p = QPainter(self)
+            snap_to_pixels(p)
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
             fill = QColor(red)
             fill.setAlphaF(0.28 * fade)

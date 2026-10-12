@@ -27,6 +27,7 @@ from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import level_gain
 from soundboard.ui import appstate, busy, icons
+from soundboard.ui.pixels import snap_to_pixels
 
 PAD = 4                 # the waveform's inner margin, px
 EDGE_PX = 6             # how close to a selection edge a press grabs it
@@ -230,6 +231,7 @@ class ClipWave(QWidget):
         T = theme.T
         ed = self.ed
         p = QPainter(self)
+        snap_to_pixels(p)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(QPen(QColor(T["accent"] if self.hasFocus() else T["border"]), 1))

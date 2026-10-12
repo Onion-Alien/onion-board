@@ -18,6 +18,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 from soundboard import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
+from soundboard.ui.pixels import snap_to_pixels
 
 PICTURE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".jfif"}
 
@@ -79,6 +80,7 @@ class DropVeil(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         bg = QColor(theme.T.get("bg", "#000"))
         bg.setAlpha(200)

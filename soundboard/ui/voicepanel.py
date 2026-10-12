@@ -39,6 +39,7 @@ from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.wheelguard import no_wheel
 from soundboard import errors
 from soundboard.i18n import _, ngettext
+from soundboard.ui.pixels import snap_to_pixels
 
 CUSTOM = "Custom"
 TILE_ART = 48     # px: a voice card's picture (when there is one, see ui/art.py)
@@ -88,6 +89,7 @@ class Switch(QCheckBox):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         on = self.isChecked()
         offset = self.property("glyphoffset") or 0
@@ -178,6 +180,7 @@ class _ValueLabel(QLabel):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setPen(self.palette().color(self.foregroundRole()))
         p.drawText(self.contentsRect(), int(self.alignment()), self._text)
 
@@ -2697,6 +2700,7 @@ class CardBadge(QWidget):
 
     def paintEvent(self, _event):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         accent = QColor(theme.T["accent"])
         wash = QColor(accent)

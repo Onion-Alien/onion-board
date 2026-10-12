@@ -30,6 +30,7 @@ from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors, i18n, usage
 from soundboard.i18n import _, ngettext
+from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -338,6 +339,7 @@ class ThemeCard(QPushButton):
         super().paintEvent(e)   # frame + checked border from the stylesheet
         t = theme.THEMES[self.name]
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(8, 8, -8, -30)
         win = QPainterPath()

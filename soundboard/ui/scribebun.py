@@ -27,6 +27,7 @@ from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme
 from soundboard.bunny import FUR, H, INK, W, WOOD, draw_bunny, sparkle
+from soundboard.ui.pixels import snap_to_pixels
 
 SLOT_W, SLOT_H = 56, 59          # about the old thumbnail's size: Bun's head over the scroll
 BUN_SCALE = 0.41                 # Bun's canvas (100 x 120) to pixels
@@ -346,6 +347,7 @@ class ScribeBunny(QWidget):
         t = time.monotonic()
         age = self._age()
         p = QPainter(self)
+        snap_to_pixels(p)
         # the kept pictures are made at the screen's real pixel size (or a zoomed render's)
         self._scale = round(max(p.device().devicePixelRatioF(), p.deviceTransform().m11()), 2)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)

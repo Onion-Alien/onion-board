@@ -14,6 +14,7 @@ from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 from soundboard import theme
+from soundboard.ui.pixels import snap_to_pixels
 
 FADE_MS = 180
 BUNNY_H = 96
@@ -36,6 +37,7 @@ class ThemeCover(QWidget):
 
     def paintEvent(self, _e):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.drawPixmap(self.rect(), self.still)
         p.fillRect(self.rect(), self.scrim)
         size = self.bunny.deviceIndependentSize()

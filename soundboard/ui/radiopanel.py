@@ -33,6 +33,7 @@ from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import RoundedFrame, VolumeControl, bar, icon_label, vsep
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.widgets import paint_now_playing, take_out
+from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 
@@ -392,6 +393,7 @@ class NowPlaying(QWidget):
     def paintEvent(self, _e):
         t = theme.T
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         f = QFont(self.font())

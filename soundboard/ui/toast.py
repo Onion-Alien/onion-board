@@ -44,6 +44,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShado
 from soundboard import theme
 from soundboard.i18n import _
 from soundboard.ui import icons
+from soundboard.ui.pixels import snap_to_pixels
 
 TOAST_MS = 4000
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
@@ -111,6 +112,7 @@ class _Spinner(QWidget):
 
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(2.5, (self.height() - 13) / 2, 13, 13)
         pen = QPen(QColor(theme.T.get("border_hi", "#888")), 2.2)
@@ -240,6 +242,7 @@ class _Card(QFrame):
     def paintEvent(self, ev):
         super().paintEvent(ev)
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         tone = QColor(theme.T.get(self._tone, theme.T.get("accent", "#7c5cff")))
         x = 6 if not self.isRightToLeft() else self.width() - 10
@@ -599,6 +602,7 @@ class _Dot(QPushButton):
 
     def paintEvent(self, ev):
         p = QPainter(self)
+        snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         tone = QColor(theme.T.get(self._tone, theme.T.get("accent", "#7c5cff")))
         p.setPen(QPen(tone, 2))

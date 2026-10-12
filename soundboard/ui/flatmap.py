@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QToolTi
 
 from soundboard import theme
 from soundboard.i18n import _, ngettext
+from soundboard.ui.pixels import snap_to_pixels
 
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
 ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
@@ -942,6 +943,7 @@ class FlatMap(QWidget):
         q.fillPath(corners, QColor(0, 0, 0))
         q.end()
         p = QPainter(self)
+        snap_to_pixels(p)
         p.drawImage(0, 0, buf)
         p.end()
 
