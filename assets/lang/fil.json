@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Huminto ang speech recognition: wala na sa PC na ito ang Python na ginamit sa pag-set up nito. Pindutin ang Ayusin para i-set up ulit.",
   "The download isn't the Python it should be, so it wasn't used.": "Hindi ito ang tamang Python, kaya hindi ginamit.",
   "stopped working: needs a repair": "huminto: kailangang ayusin",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Naririnig pa rin ng Discord at mga laro ang boses mo: kinukuha nila ang mic mo diretso sa Windows, kaya hindi pa ito kayang i-mute ng box na ito.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Ilagay ang mga sound mo diretso sa mic mo at gagana ito. O i-mute muna ang mic mo sa Discord.",
   "Set it up": "I-set up",
-  "Your mic still goes out": "Lumalabas pa rin ang mic mo"
+  "One click sets it up.": "Isang click lang para i-set up.",
+  "This won't mute you yet": "Hindi ka pa nito mamu-mute",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Uy! Wala pang ginagawa ito, kasi hindi pa naka-set up ang Onion Board sa mic mo. Naririnig ka pa rin nila."
 }

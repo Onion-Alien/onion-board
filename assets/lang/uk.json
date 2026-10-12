@@ -3368,8 +3368,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Розпізнавання мовлення перестало працювати: Python, з яким його налаштували, зник із цього комп'ютера. Натисніть «Полагодити», щоб налаштувати його знову.",
   "The download isn't the Python it should be, so it wasn't used.": "Завантажений файл — не той Python, тому його не використано.",
   "stopped working: needs a repair": "перестало працювати: потрібно полагодити",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord та ігри досі чують твій голос: вони беруть мікрофон прямо з Windows, тому ця галочка поки не може його вимкнути.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Пусти звуки прямо в мікрофон, і все запрацює. Або поки вимкни мікрофон у Discord.",
   "Set it up": "Налаштувати",
-  "Your mic still goes out": "Твій мікрофон досі чути"
+  "One click sets it up.": "Налаштовується одним кліком.",
+  "This won't mute you yet": "Це поки тебе не вимкне",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Гей! Це поки нічого не робить, бо Onion Board ще не налаштований у твоєму мікрофоні. Тебе досі чують."
 }

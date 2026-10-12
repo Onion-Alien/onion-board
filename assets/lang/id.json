@@ -3222,8 +3222,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Pengenalan suara berhenti bekerja: Python yang dipakai saat memasangnya sudah tidak ada di PC ini. Tekan Perbaiki untuk memasangnya lagi.",
   "The download isn't the Python it should be, so it wasn't used.": "Unduhan ini bukan Python yang seharusnya, jadi tidak dipakai.",
   "stopped working: needs a repair": "berhenti bekerja: perlu diperbaiki",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord dan game masih mendengar suaramu: mereka mengambil mikmu langsung dari Windows, jadi kotak ini belum bisa membisukannya.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Masukkan suaramu langsung ke mikmu, maka ini akan berfungsi. Atau bisukan mikmu di Discord untuk sementara.",
   "Set it up": "Atur",
-  "Your mic still goes out": "Mikmu masih terkirim"
+  "One click sets it up.": "Satu klik untuk mengaturnya.",
+  "This won't mute you yet": "Ini belum membisukanmu",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Ini belum berfungsi, karena Onion Board belum diatur di mikmu. Orang masih bisa mendengarmu."
 }

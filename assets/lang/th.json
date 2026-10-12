@@ -3222,8 +3222,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "การรู้จำเสียงหยุดทำงาน: Python ที่ใช้ตั้งค่าไม่อยู่ในพีซีเครื่องนี้แล้ว กด ซ่อมแซม เพื่อตั้งค่าใหม่",
   "The download isn't the Python it should be, so it wasn't used.": "ไฟล์ที่ดาวน์โหลดไม่ใช่ Python ที่ถูกต้อง จึงไม่ได้ใช้",
   "stopped working: needs a repair": "หยุดทำงาน: ต้องซ่อมแซม",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord และเกมยังได้ยินเสียงคุณอยู่: เพราะดึงไมค์ของคุณจาก Windows โดยตรง ช่องนี้จึงยังปิดเสียงไม่ได้",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "ส่งเสียงของคุณเข้าไมค์โดยตรงแล้วจะใช้ได้ หรือปิดไมค์ใน Discord ไปก่อน",
   "Set it up": "ตั้งค่า",
-  "Your mic still goes out": "ไมค์ของคุณยังส่งออกไปอยู่"
+  "One click sets it up.": "คลิกเดียวก็ตั้งค่าได้",
+  "This won't mute you yet": "ยังปิดเสียงคุณไม่ได้",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "เฮ้! อันนี้ยังไม่มีผล เพราะยังไม่ได้ตั้งค่า Onion Board ในไมค์ของคุณ คนอื่นยังได้ยินคุณอยู่"
 }

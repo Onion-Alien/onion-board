@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "El reconocimiento de voz dejó de funcionar: el Python con el que se configuró ya no está en esta PC. Presiona Reparar para configurarlo de nuevo.",
   "The download isn't the Python it should be, so it wasn't used.": "La descarga no es el Python que debería ser, así que no se usó.",
   "stopped working: needs a repair": "dejó de funcionar: necesita una reparación",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord y los juegos siguen escuchando tu voz: toman tu micrófono directo de Windows, así que esta casilla todavía no puede silenciarlo.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Pon tus sonidos directo en tu micrófono y va a funcionar. O silencia tu micrófono en Discord por ahora.",
   "Set it up": "Configurarlo",
-  "Your mic still goes out": "Tu micrófono sigue saliendo"
+  "One click sets it up.": "Un clic lo configura.",
+  "This won't mute you yet": "Esto todavía no te silencia",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "¡Oye! Esto todavía no hace nada, porque Onion Board no está configurado en tu micrófono. Te siguen escuchando."
 }

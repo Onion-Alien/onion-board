@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "वाक् पहचान काम नहीं कर रही: जिस Python से इसे सेट किया गया था, वह अब इस पीसी पर नहीं है। फिर से सेट करने के लिए ठीक करें दबाएँ।",
   "The download isn't the Python it should be, so it wasn't used.": "डाउनलोड सही Python नहीं है, इसलिए उसका इस्तेमाल नहीं किया गया।",
   "stopped working: needs a repair": "काम नहीं कर रहा: ठीक करना होगा",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord और गेम अब भी तुम्हारी आवाज़ सुनते हैं: वे तुम्हारा माइक सीधे Windows से लेते हैं, इसलिए यह बॉक्स अभी उसे म्यूट नहीं कर सकता।",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "अपनी आवाज़ें सीधे अपने माइक में डालो, फिर यह काम करेगा। या अभी के लिए Discord में अपना माइक म्यूट कर दो।",
   "Set it up": "सेट अप करें",
-  "Your mic still goes out": "तुम्हारा माइक अब भी जा रहा है"
+  "One click sets it up.": "एक क्लिक में सेट अप हो जाता है।",
+  "This won't mute you yet": "यह अभी तुम्हें म्यूट नहीं करेगा",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "अरे! यह अभी कुछ नहीं करता, क्योंकि Onion Board तुम्हारे माइक में सेट अप नहीं है। लोग अब भी तुम्हें सुन रहे हैं।"
 }

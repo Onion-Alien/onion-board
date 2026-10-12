@@ -3368,8 +3368,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Rozpoznávání řeči přestalo fungovat: Python, se kterým bylo nastavené, už na tomto PC není. Stiskněte Opravit a nastavte ho znovu.",
   "The download isn't the Python it should be, so it wasn't used.": "Stažený soubor není ten správný Python, takže se nepoužil.",
   "stopped working: needs a repair": "přestalo fungovat: potřebuje opravu",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord a hry tvůj hlas pořád slyší: berou mikrofon přímo z Windows, takže ho toto políčko zatím neztlumí.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Pusť své zvuky přímo do mikrofonu a bude to fungovat. Nebo zatím ztlum mikrofon v Discordu.",
   "Set it up": "Nastavit",
-  "Your mic still goes out": "Tvůj mikrofon pořád jde ven"
+  "One click sets it up.": "Jedno kliknutí to nastaví.",
+  "This won't mute you yet": "Tohle tě zatím neztlumí",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Tohle zatím nic nedělá, protože Onion Board ještě není nastavený v tvém mikrofonu. Lidi tě pořád slyší."
 }

@@ -3222,8 +3222,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "語音辨識無法使用了：安裝它時用的 Python 已不在這台電腦上。按「修復」重新安裝。",
   "The download isn't the Python it should be, so it wasn't used.": "下載的不是正確的 Python，所以沒有使用。",
   "stopped working: needs a repair": "無法使用：需要修復",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord 和遊戲仍聽得到你的聲音：它們直接從 Windows 取用你的麥克風，所以這個勾選框暫時無法靜音。",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "把你的音效直接送進麥克風就能用了。或者先在 Discord 裡把麥克風靜音。",
   "Set it up": "去設定",
-  "Your mic still goes out": "你的麥克風仍在傳出"
+  "One click sets it up.": "點一下就能設定好。",
+  "This won't mute you yet": "這還不能讓你靜音",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "嘿！這個現在還沒用，因為 Onion Board 還沒在你的麥克風裡設定好。別人還是聽得到你。"
 }

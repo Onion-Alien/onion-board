@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Konuşma tanıma çalışmayı bıraktı: Kurulurken kullanılan Python artık bu bilgisayarda yok. Yeniden kurmak için Onar'a bas.",
   "The download isn't the Python it should be, so it wasn't used.": "İndirilen dosya olması gereken Python değil, bu yüzden kullanılmadı.",
   "stopped working: needs a repair": "çalışmayı bıraktı: onarılması gerekiyor",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord ve oyunlar hâlâ sesini duyuyor: mikrofonunu doğrudan Windows'tan alıyorlar, bu yüzden bu kutu onu henüz susturamaz.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Seslerini doğrudan mikrofonuna gönder, o zaman çalışır. Ya da şimdilik mikrofonunu Discord'da sustur.",
   "Set it up": "Kur",
-  "Your mic still goes out": "Mikrofonun hâlâ gidiyor"
+  "One click sets it up.": "Tek tıkla kurulur.",
+  "This won't mute you yet": "Bu seni henüz susturmaz",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hey! Bu henüz bir şey yapmıyor, çünkü Onion Board mikrofonunda kurulu değil. İnsanlar seni hâlâ duyuyor."
 }

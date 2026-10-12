@@ -3170,16 +3170,15 @@ class MainWindow(QMainWindow):
         Not on the hotkey: no pop-up mid-game."""
         if on or not self._mute_does_nothing():
             return
-        box = QMessageBox(QMessageBox.Icon.Information, _("Your mic still goes out"),
-                          _("Discord and games still hear your voice: they take your mic "
-                            "straight from Windows, so this box can't mute it yet."),
+        box = QMessageBox(QMessageBox.Icon.Information, _("This won't mute you yet"),
+                          _("Hey! This does nothing yet, because Onion Board isn't set "
+                            "up in your mic. People still hear you."),
                           QMessageBox.StandardButton.NoButton, self)
         box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF()))
-        box.setInformativeText(_("Put your sounds straight into your mic and it works. Or "
-                                 "mute your mic in Discord for now."))
+        box.setInformativeText(_("One click sets it up."))
         setup = box.addButton(_("Set it up"), QMessageBox.ButtonRole.AcceptRole)
         setup.setObjectName("primary")
-        ok = box.addButton(_("OK"), QMessageBox.ButtonRole.RejectRole)
+        ok = box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
         box.setDefaultButton(setup)
         box.setEscapeButton(ok)
         box.exec()

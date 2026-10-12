@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Talegenkendelse holdt op med at virke: den Python, den blev sat op med, er væk fra denne pc. Tryk på Reparér for at sætte den op igen.",
   "The download isn't the Python it should be, so it wasn't used.": "Det hentede er ikke den Python, det skulle være, så det blev ikke brugt.",
   "stopped working: needs a repair": "holdt op med at virke: skal repareres",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord og spil hører stadig din stemme: de tager din mikrofon direkte fra Windows, så denne boks kan ikke slå den fra endnu.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Send dine lyde direkte ind i din mikrofon, så virker det. Eller slå mikrofonen fra i Discord indtil videre.",
   "Set it up": "Sæt det op",
-  "Your mic still goes out": "Din mikrofon sendes stadig"
+  "One click sets it up.": "Ét klik sætter det op.",
+  "This won't mute you yet": "Det her slår dig ikke fra endnu",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hej! Det her gør ikke noget endnu, fordi Onion Board ikke er sat op i din mikrofon. Folk kan stadig høre dig."
 }

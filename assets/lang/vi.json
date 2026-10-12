@@ -3222,8 +3222,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Nhận dạng giọng nói đã ngừng hoạt động: Python dùng để cài đặt nó không còn trên máy này. Nhấn Sửa chữa để cài đặt lại.",
   "The download isn't the Python it should be, so it wasn't used.": "Tệp tải về không phải Python đúng, nên không được dùng.",
   "stopped working: needs a repair": "ngừng hoạt động: cần sửa chữa",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord và game vẫn nghe thấy giọng bạn: chúng lấy mic trực tiếp từ Windows, nên ô này chưa thể tắt tiếng được.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Đưa âm thanh thẳng vào mic là được. Hoặc tạm thời tắt mic trong Discord.",
   "Set it up": "Thiết lập",
-  "Your mic still goes out": "Mic của bạn vẫn đang phát ra"
+  "One click sets it up.": "Một cú nhấp là xong.",
+  "This won't mute you yet": "Cái này chưa tắt tiếng bạn được",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Này! Cái này chưa có tác dụng, vì Onion Board chưa được thiết lập trong mic của bạn. Mọi người vẫn nghe thấy bạn."
 }

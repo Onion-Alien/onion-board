@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Η αναγνώριση ομιλίας σταμάτησε να λειτουργεί: η Python με την οποία ρυθμίστηκε δεν υπάρχει πια σε αυτόν τον υπολογιστή. Πάτησε Επισκευή για να ρυθμιστεί ξανά.",
   "The download isn't the Python it should be, so it wasn't used.": "Η λήψη δεν είναι η σωστή Python, οπότε δεν χρησιμοποιήθηκε.",
   "stopped working: needs a repair": "σταμάτησε να λειτουργεί: χρειάζεται επισκευή",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Το Discord και τα παιχνίδια ακούνε ακόμα τη φωνή σου: παίρνουν το μικρόφωνο κατευθείαν από τα Windows, οπότε αυτό το κουτί δεν μπορεί ακόμα να το σβήσει.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Βάλε τους ήχους σου κατευθείαν στο μικρόφωνο και θα δουλέψει. Ή κάνε σίγαση στο Discord προς το παρόν.",
   "Set it up": "Ρύθμισέ το",
-  "Your mic still goes out": "Το μικρόφωνό σου ακούγεται ακόμα"
+  "One click sets it up.": "Ένα κλικ το ρυθμίζει.",
+  "This won't mute you yet": "Αυτό δεν σε κάνει σίγαση ακόμα",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Γεια! Αυτό δεν κάνει τίποτα ακόμα, γιατί το Onion Board δεν έχει ρυθμιστεί στο μικρόφωνό σου. Σε ακούνε ακόμα."
 }

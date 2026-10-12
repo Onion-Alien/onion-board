@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Puheentunnistus lakkasi toimimasta: Python, jolla se asennettiin, on poistunut tältä tietokoneelta. Paina Korjaa asentaaksesi sen uudelleen.",
   "The download isn't the Python it should be, so it wasn't used.": "Lataus ei ole oikea Python, joten sitä ei käytetty.",
   "stopped working: needs a repair": "lakkasi toimimasta: tarvitsee korjauksen",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord ja pelit kuulevat yhä äänesi: ne ottavat mikrofonin suoraan Windowsista, joten tämä ruutu ei vielä voi mykistää sitä.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Laita äänesi suoraan mikrofoniin, niin se toimii. Tai mykistä mikrofoni toistaiseksi Discordissa.",
   "Set it up": "Ota käyttöön",
-  "Your mic still goes out": "Mikrofonisi kuuluu yhä"
+  "One click sets it up.": "Yksi klikkaus ottaa sen käyttöön.",
+  "This won't mute you yet": "Tämä ei vielä mykistä sinua",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Tämä ei vielä tee mitään, koska Onion Boardia ei ole otettu käyttöön mikrofonissasi. Muut kuulevat sinut yhä."
 }

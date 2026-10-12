@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Разпознаването на реч спря да работи: Python, с който беше настроено, вече го няма на този компютър. Натиснете Поправи, за да го настроите отново.",
   "The download isn't the Python it should be, so it wasn't used.": "Изтегленото не е Python, който трябва да бъде, затова не е използвано.",
   "stopped working: needs a repair": "спря да работи: нужна е поправка",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord и игрите още чуват гласа ти: те взимат микрофона направо от Windows, затова това поле още не може да го заглуши.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Пусни звуците си направо в микрофона и ще работи. Или засега заглуши микрофона в Discord.",
   "Set it up": "Настрой",
-  "Your mic still goes out": "Микрофонът ти още се чува"
+  "One click sets it up.": "Едно щракване го настройва.",
+  "This won't mute you yet": "Това още няма да те заглуши",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Ей! Това още не прави нищо, защото Onion Board не е настроен в микрофона ти. Хората още те чуват."
 }

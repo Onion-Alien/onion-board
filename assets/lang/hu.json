@@ -3295,8 +3295,8 @@
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "A beszédfelismerés leállt: a Python, amellyel be lett állítva, már nincs ezen a gépen. Nyomd meg a Javítás gombot az újbóli beállításhoz.",
   "The download isn't the Python it should be, so it wasn't used.": "A letöltött fájl nem a megfelelő Python, ezért nem lett használva.",
   "stopped working: needs a repair": "leállt: javítani kell",
-  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "A Discord és a játékok még mindig hallják a hangodat: a mikrofont egyenesen a Windowsból veszik, ezért ez a jelölőnégyzet még nem tudja lenémítani.",
-  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Tedd a hangjaidat egyenesen a mikrofonodba, és működni fog. Vagy egyelőre némítsd le a mikrofont a Discordban.",
   "Set it up": "Beállítás",
-  "Your mic still goes out": "A mikrofonod még mindig kimegy"
+  "One click sets it up.": "Egy kattintással beállítható.",
+  "This won't mute you yet": "Ez még nem némít le",
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé! Ez még nem csinál semmit, mert az Onion Board nincs beállítva a mikrofonodban. Még mindig hallanak."
 }
