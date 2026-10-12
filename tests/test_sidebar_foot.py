@@ -167,9 +167,16 @@ def test_the_header_version_opens_whats_new_and_stop_all_has_its_own_icon(window
 
 def test_an_open_tab_has_room_between_its_icon_and_its_name(qapp):
     """Qt leaves ~4 px there, which looked cramped: the rail adds to it (ICON_PAD)."""
-    from PySide6.QtGui import QColor, QIcon, QPixmap
+    import os
+    from pathlib import Path
+
+    from PySide6.QtGui import QColor, QFontDatabase, QIcon, QPixmap
 
     from soundboard import theme
+    # the app's font: without it (CI has no font folder) the name is drawn as boxes,
+    # and the test only passed by counting the open tab's accent edge as the icon
+    if (font := Path(os.environ.get("WINDIR", "")) / "Fonts" / "segoeui.ttf").exists():
+        QFontDatabase.addApplicationFont(str(font))
     tabs = SideTabs()
     tabs.addTab(QWidget(), "Radio")
     pm = QPixmap(20, 20)
