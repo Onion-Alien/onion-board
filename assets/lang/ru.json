@@ -3187,8 +3187,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "Выключи или включи микрофон для других. Твои звуки они всё равно слышат.",
   "That page has no sound Onion Board can add.": "На этой странице нет звука, который Onion Board может добавить.",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Удалённые звуки вернёт «Отменить», а позже — Копия → Недавно удалённые звуки.",
-  "Off Air": "Не в эфире",
-  "On Air": "В эфире",
   "Not configured": "Не настроено",
   "Not configured: click to fix": "Не настроено: нажми, чтобы исправить",
   "Can't send to {device}, click to fix": "Не получается отправить на {device}, нажми, чтобы исправить",

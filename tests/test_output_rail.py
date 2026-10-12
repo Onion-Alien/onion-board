@@ -18,7 +18,8 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     qapp.processEvents()
     output = window.rail.output
     assert window.mode_btn.isHidden() and window.mode_btn not in window.rail.status
-    assert window.stop_btn.isVisible()
+    # open: Stop all is the card's icon button, the rail's own is hidden
+    assert output.stop.isVisible() and window.stop_btn.isHidden()
     assert output.isVisible() and window.btn_air.isHidden() and window.pill.isHidden()
     output.switch.setFocus(Qt.TabFocusReason)
     QTest.keyClick(output.switch, Qt.Key_Space)
@@ -26,6 +27,8 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     # off: your plain mic still goes (no voice changer), only the sounds are cut
     assert "only your mic" in output.switch.accessibleDescription()
     QTest.keyClick(output.switch, Qt.Key_Tab)
+    assert output.stop.hasFocus()
+    QTest.keyClick(output.stop, Qt.Key_Tab)
     assert output.setup.hasFocus()
     window.btn_air.setChecked(True)
     assert output.switch.isChecked() and window.engine.sending
@@ -37,7 +40,8 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     assert window.tabs.currentWidget() is window.setup_page
     window.rail.set_open(False)
     assert output.isVisible() and window.btn_air.isHidden()
-    assert output.title.isHidden() and output.setup.isHidden()
+    assert output.title.isHidden() and not output.setup.isVisible()
+    assert window.stop_btn.isVisible() and not output.stop.isVisible()
     output.switch.click()
     window.rail.set_open(True)
     assert not output.switch.isChecked() and not window.engine.sending
@@ -88,21 +92,27 @@ def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_na
 def _assert_keylines(output, setup=True):
     """Every icon is centred on its label's first-line cap height and every line of
     words starts on one keyline (docs/DESIGN.md *Icon and text alignment*)."""
+    from PySide6.QtWidgets import QApplication
+    QApplication.processEvents()   # (a rescale: the rail gives the card its new height)
     img = output.grab().toImage()
-    labels = [output.title, output.status_text]
-    starts = {label.mapTo(output, QPoint()).x() + label.contentsMargins().left()
-              for label in labels}
-    assert starts == {output.text_x()}
-    pairs = [(output.mark, output.title), (output.status_icon, output.status_text)]
+    title = output.title
+    assert title.mapTo(output, QPoint()).x() + title.contentsMargins().left() == output.text_x()
+    pairs = [(output.mark, output.title)]
     if setup:
-        pairs.append((output.arrow, output.status_text))   # (on its x-height: within 1.5)
+        # the strip's line: centred in the card, its icon and chevron on its cap height
+        line = [output.status_icon, output.status_text, output.arrow]
+        left = line[0].mapTo(output, QPoint()).x()
+        right = line[-1].mapTo(output, QPoint()).x() + line[-1].width()
+        assert abs(left + right - output.width()) <= 2
+        pairs += [(output.status_icon, output.status_text), (output.arrow, output.status_text)]
     for icon, label in pairs:
         glyph = _ink_box(img, QRect(icon.mapTo(output, QPoint()), icon.size()))
         fm = label.fontMetrics()
         cap = (label.mapTo(output, QPoint()).y() + label.contentsMargins().top()
                + fm.ascent() - fm.capHeight() / 2)
         assert abs((glyph.top() + glyph.bottom() + 1) / 2 - cap) <= 1.5, label.text()
-    switch = output.switch.mapTo(output, QPoint()).y() + output.switch.height() / 2
+    switch = (output.switch.mapTo(output, QPoint()).y() + output.switch.height() / 2
+              + output.INK_DOWN)   # (the switch paints its track that far down)
     fm = output.title.fontMetrics()
     title = (output.title.mapTo(output, QPoint()).y() + output.title.contentsMargins().top()
              + fm.ascent() - fm.capHeight() / 2)
@@ -160,8 +170,9 @@ def test_connected_output_is_only_words_then_a_link_again(window, qapp, monkeypa
         assert output.status_text.text() == "Connected"
         # the same line, no chevron, no hover, no click, out of the Tab order (no taller:
         # a big font can wrap "Not configured ›", never "Connected")
-        assert output.setup.isVisible() and output.arrow.isHidden()
-        assert output.height() <= height and output.setup.focusPolicy() == Qt.NoFocus
+        # all good: no strip, the switch says it
+        assert not output.strip.isVisible() and output.arrow.isHidden()
+        assert output.height() < height and output.setup.focusPolicy() == Qt.NoFocus
         assert output.setup.property("action") is False
         window.tabs.setCurrentWidget(window.sounds_page)
         output.setup.click()
@@ -259,10 +270,9 @@ def test_picked_but_failing_says_not_working(window, qapp, monkeypatch):  # noqa
 
 
 def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
-    """Dragging the rail open, the full output card only comes in once "Off Air"
-    beside its switch and "Not configured ›" each fit on one line: never a squeezed
-    or wrapped card (the small one until then)."""
-    from soundboard.ui.sidebar import OPEN_W, SHUT_W
+    """Dragging the rail open, the small card stays until the rail snaps fully open:
+    never a squeezed in-between card."""
+    from soundboard.ui.sidebar import OPEN_W, SHUT_W, SNAP_W
     window.resize(1180, 720)
     window.show()
     window.cfg.route, window.cfg.main_device = "device", None
@@ -272,13 +282,14 @@ def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
     rail.set_open(True)
     qapp.processEvents()
     try:
-        for width in range(SHUT_W, OPEN_W, 3):   # (fully open, long translations wrap)
+        for width in range(SHUT_W, OPEN_W, 3):
             rail.drag_width(width)
             qapp.processEvents()
             out = rail.output
+            # the small card in the shut column, then (snapped fully open) the full one
+            assert out.title.isVisible() == (width >= SNAP_W), width
             if out.title.isVisible():
-                for label in (out.title, out.status_text):
-                    assert label.height() < 2 * label.fontMetrics().height(), width
+                assert rail.width() == OPEN_W
                 assert out.title.geometry().right() < out.switch.x(), width
     finally:
         rail.finish_resize()

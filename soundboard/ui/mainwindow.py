@@ -819,7 +819,7 @@ class MainWindow(QMainWindow):
         sidebar.put(self.stop_btn, _("Stop all"),
                     tip=_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(self._stop_all_clicked)
-        icons.set_icon(self.stop_btn, "stop_all", "danger_text", size=sidebar.ICON, gap=False)
+        icons.set_icon(self.stop_btn, "stop", "danger_text", size=sidebar.ICON, gap=False)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
         self.gear.setProperty("quiet", True)
@@ -1137,7 +1137,8 @@ class MainWindow(QMainWindow):
         status_focus: list[QWidget] = []
         for button in self.rail.status:
             if button is self.btn_air and self.rail.output:
-                status_focus.extend((self.rail.output.switch, self.rail.output.setup))
+                status_focus.extend(w for w in (self.rail.output.switch, self.rail.output.stop,
+                                                self.rail.output.setup) if w is not None)
             status_focus.append(button)
         for w in (*self.rail.buttons, self.btn_more_tabs, *status_focus,
                   self.gear, self.btn_about,
@@ -5647,6 +5648,11 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
         QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
                                                        size=sidebar.ICON))
+        card = self.rail.output.stop if self.rail.output else None
+        if card is not None:   # the open card's Stop all: the same tick
+            icons.set_icon(card, "check", "live_text", gap=False)
+            QTimer.singleShot(1200, card, lambda: icons.set_icon(card, "stop", "danger_text",
+                                                                 gap=False))
 
     def play_last(self):
         if self._last_sid is None or self.meta(self._last_sid) is None:

@@ -3115,8 +3115,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "Coupe ou active ton micro pour les autres. Tes sons continuent de leur parvenir.",
   "That page has no sound Onion Board can add.": "Cette page n'a aucun son qu'Onion Board peut ajouter.",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Les sons retirés reviennent avec Annuler, ou plus tard depuis Sauvegarde → Sons supprimés récemment.",
-  "Off Air": "Hors antenne",
-  "On Air": "À l'antenne",
   "Not configured": "Non configuré",
   "Not configured: click to fix": "Non configuré : clique pour corriger",
   "Can't send to {device}, click to fix": "Impossible d'envoyer vers {device}, clique pour corriger",

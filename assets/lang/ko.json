@@ -3043,8 +3043,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "다른 사람에게 들리는 마이크를 음소거하거나 해제합니다. 사운드는 계속 들립니다.",
   "That page has no sound Onion Board can add.": "그 페이지에는 Onion Board가 추가할 수 있는 사운드가 없습니다.",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "삭제한 사운드는 실행 취소로, 또는 나중에 백업 → 최근 삭제된 사운드에서 되돌릴 수 있습니다.",
-  "Off Air": "방송 꺼짐",
-  "On Air": "방송 중",
   "Not configured": "설정 안 됨",
   "Not configured: click to fix": "설정 안 됨: 클릭해서 고치기",
   "Can't send to {device}, click to fix": "{device}(으)로 보낼 수 없어요. 클릭해서 고치기",

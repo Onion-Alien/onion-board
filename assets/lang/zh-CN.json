@@ -3043,8 +3043,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "为其他人静音或开启你的麦克风。你的音效他们仍然听得到。",
   "That page has no sound Onion Board can add.": "该页面没有 Onion Board 可以添加的音效。",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "移除的音效可以用撤销找回，之后也可以在 备份 → 最近删除的音效 中找回。",
-  "Off Air": "已关播",
-  "On Air": "直播中",
   "Not configured": "未设置",
   "Not configured: click to fix": "未设置：点击修复",
   "Can't send to {device}, click to fix": "无法发送到 {device}，点击修复",
