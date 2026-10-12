@@ -24,7 +24,8 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     output.mute.setFocus(Qt.TabFocusReason)
     QTest.keyClick(output.mute, Qt.Key_Space)
     assert not window.engine.sending and not window.btn_air.isChecked()
-    assert output.mute.isChecked() and output.mute.accessibleName() == "Muted"
+    # checked = live, like the switch: muted is unchecked, and named so
+    assert not output.mute.isChecked() and output.mute.accessibleName() == "Muted"
     # off: your plain mic still goes (no voice changer), only the sounds are cut
     assert "only your mic" in output.mute.accessibleDescription()
     QTest.keyClick(output.mute, Qt.Key_Tab)
@@ -32,10 +33,11 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     QTest.keyClick(output.stop, Qt.Key_Tab)
     assert output.setup.hasFocus()
     window.btn_air.setChecked(True)
-    assert not output.mute.isChecked() and window.engine.sending
+    assert output.mute.isChecked() and window.engine.sending
+    assert output.mute.accessibleName() == "Live"
     for _ in range(8):
         output.mute.click()
-    assert not output.mute.isChecked() and window.engine.sending
+    assert output.mute.isChecked() and window.engine.sending
     output.setup.setFocus(Qt.TabFocusReason)
     QTest.keyClick(output.setup, Qt.Key_Space)
     assert window.tabs.currentWidget() is window.setup_page
@@ -45,7 +47,14 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     assert window.stop_btn.isVisible() and output.switch.isVisible()
     output.switch.click()
     window.rail.set_open(True)
-    assert output.mute.isChecked() and not window.engine.sending
+    assert not output.mute.isChecked() and not window.engine.sending
+    # muted still wears red (the style follows "not checked" now), live doesn't
+    qapp.processEvents()
+    muted = output.mute.grab().toImage().pixelColor(4, output.mute.height() // 2)
+    window.btn_air.setChecked(True)
+    qapp.processEvents()
+    live = output.mute.grab().toImage().pixelColor(4, output.mute.height() // 2)
+    assert muted.red() - muted.blue() > live.red() - live.blue() + 20, (muted.name(), live.name())
 
 
 def _ink_box(img, rect, bg=None):

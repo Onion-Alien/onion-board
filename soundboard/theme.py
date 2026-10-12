@@ -729,7 +729,7 @@ QFrame#railoutput QWidget#railpairrow { background:transparent; }
 QFrame#railoutput QPushButton#railpair { background:$btn; border:1px solid transparent;
     border-radius:8px; padding:0; }
 QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
-QFrame#railoutput QPushButton#railpair:checked { background:$danger_bg; }
+QFrame#railoutput QPushButton#railpair[muted="true"] { background:$danger_bg; }
 QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }

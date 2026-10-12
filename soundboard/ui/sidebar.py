@@ -358,10 +358,12 @@ class OutputBlock(QFrame):
         pair.setSpacing(self.PAIR_GAP)
         self.mute = QPushButton()
         self.mute.setObjectName("railpair")
-        self.mute.setCheckable(True)   # checked: muted
-        self.mute.setChecked(not power.isChecked())
-        self.mute.toggled.connect(lambda muted: power.setChecked(not muted))
-        power.toggled.connect(lambda on: self.mute.setChecked(not on))
+        # checked: live, as the switch and every other on/off control (named "Live" or
+        # "Muted", so a screen reader says "Live, pressed", never "Live, not pressed")
+        self.mute.setCheckable(True)
+        self.mute.setChecked(power.isChecked())
+        self.mute.toggled.connect(power.setChecked)
+        power.toggled.connect(self.mute.setChecked)
         self.stop = None
         if stop is not None:
             self.stop = QPushButton()
@@ -682,6 +684,9 @@ class OutputBlock(QFrame):
         """Mute: the live waves while others hear you, struck through on red while
         they don't."""
         self.mute.setAccessibleName(self.names()[0 if on else 1])
+        self.mute.setProperty("muted", not on)   # red while muted (theme.py)
+        self.mute.style().unpolish(self.mute)
+        self.mute.style().polish(self.mute)
         tone = "accent" if on else "danger_text"
         icons.set_icon(self.mute, "live" if on else "live_off", tone, tone, gap=False,
                        size=self._px(18))

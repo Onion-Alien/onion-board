@@ -1507,7 +1507,6 @@ class MainWindow(QMainWindow):
             lay = vol.layout()
             assert lay is not None   # made in VolumeControl.__init__
             vol.setMaximumWidth(lay.maximumSize().width())
-        self._mic_text = self.chk_mic.text()
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
@@ -1516,12 +1515,12 @@ class MainWindow(QMainWindow):
     def _fit_mixer(self, tight: bool):
         """The levels strip's responsive step. Only when the strip itself is too wide
         (not for whatever else is): one group whole, the other two as icons; still too
-        wide, that group's words go too."""
+        wide, the % boxes go (the sliders still say it). "Others hear it" keeps its
+        words: an empty box beside a mic icon said nothing, and it's the switch a warning
+        sends you to."""
         stages = (lambda: self._mixer_one_at_a_time(True),
-                  lambda: self.chk_mic.setText(""),   # its tooltip says what it is
                   lambda: (self.vol_mic.spin.hide(), self.vol_mon.spin.hide()))
         self._mixer_one_at_a_time(False)
-        self.chk_mic.setText(self._mic_text)
         self.vol_mic.spin.show()
         self.vol_mon.spin.show()
         self._touch_mixer()

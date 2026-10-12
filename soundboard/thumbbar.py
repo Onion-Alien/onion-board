@@ -54,7 +54,8 @@ def tips() -> dict:
     """Tooltips, translated when they're asked for (the language can change)."""
     from soundboard.i18n import _
     return {LAST: _("Play the last sound again"), PAUSE: _("Pause"),
-            STOP: _("Stops every sound, the radio and every program, and turns the voices off"),
+            # the hover flyout is small: the rail's Stop all tooltip has the long form
+            STOP: _("Stop everything"),
             RANDOM: _("Play a random sound")}
 
 
