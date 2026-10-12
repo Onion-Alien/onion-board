@@ -3382,5 +3382,6 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Переношу твои звуки из {name}: {done} из {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Он установлен, но теперь твои звуки идут в микрофон. Используй его, если игра пропускает твой микрофон, или удали, если он больше ничему не нужен.",
   "⚠ Another sound already has this name.": "⚠ Другой звук уже так называется.",
-  "Don't show this again": "Больше не показывать"
+  "Don't show this again": "Больше не показывать",
+  "Stop voice effects": "Остановить эффекты голоса"
 }

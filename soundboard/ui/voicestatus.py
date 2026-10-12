@@ -77,6 +77,13 @@ class VoiceStatusBar(QFrame):
         mh = QHBoxLayout(mic)
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
+        self.stop_button = QPushButton(_("Stop voice effects"))
+        self.stop_button.setObjectName("small")
+        self.stop_button.setFixedHeight(ROW_H)
+        self.stop_button.setAccessibleName(self.stop_button.text())
+        self.stop_button.setToolTip(self.stop_button.text())
+        icons.set_icon(self.stop_button, "stop", "muted", "text", size=16)
+        mh.addWidget(self.stop_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
         mh.addWidget(self.mic_icon)
         self.lbl_mic = QLabel(_("No mic open"))   # only then: the icon says the rest

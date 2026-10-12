@@ -1,6 +1,7 @@
 """The Voice panel, offscreen: presets reach the chain, settings round-trip."""
 import numpy as np
 import pytest
+from PySide6.QtCore import QPoint
 
 from soundboard import voicefx
 from soundboard.speech import tts
@@ -35,6 +36,52 @@ def test_panel_installs_the_chain_on_the_engine(panel):
     p, eng = panel
     assert eng.voice_chain is p.chain
     assert set(voicefx.REGISTRY) <= set(p.fx.rows)       # built-ins and add-ons get rows
+
+
+@pytest.mark.parametrize("tab", ["fx", "ai", "speak", "addons"])
+def test_global_voice_stop_is_visible_and_keeps_the_preset(panel, qapp, tab):
+    p, eng = panel
+    p.resize(800, 600)
+    p.show()
+    p.fx.pick("Robot")
+    before = p.fx.spec()
+    p.show_tab(tab)
+    qapp.processEvents()
+    button = p.bar.stop_button
+    assert button.isVisibleTo(p)
+    assert button.accessibleName() == "Stop voice effects"
+    assert p.bar.rect().contains(button.rect().translated(button.mapTo(p.bar, QPoint())))
+    stopped = []
+    p.controller.stop_speaking = lambda: stopped.append(True)
+    for _attempt in range(3):
+        button.click()
+    assert len(stopped) == 3
+    assert not p.is_active()
+    assert p.current_tab() == tab
+    assert p.fx.spec() == {**before, "enabled": False}
+    assert eng.voice_chain is p.chain
+
+
+def test_global_voice_stop_turns_off_replacements_and_translation(panel, monkeypatch):
+    p, eng = panel
+    calls = []
+    # Set the switches without starting real helpers, then restore their signals.
+    for button in (p.speech.b_live, p.ai.b_start, p.speech.sw_lang):
+        button.blockSignals(True)
+        button.setChecked(True)
+        button.blockSignals(False)
+    monkeypatch.setattr(type(p.ai_controller), "running", property(lambda self: True))
+    monkeypatch.setattr(p.ai_controller, "stop", lambda: calls.append("ai"))
+    monkeypatch.setattr(type(p.controller), "live", property(lambda self: True))
+    monkeypatch.setattr(p.controller, "stop_live", lambda: calls.append("speech"))
+    monkeypatch.setattr(p.controller, "stop_speaking", lambda: calls.append("typed"))
+    p.stop_all()
+    assert not p.speech.b_live.isChecked()
+    assert not p.ai.is_on()
+    assert not p.speech.sw_lang.isChecked()
+    assert "typed" in calls
+    assert "ai" in calls
+    assert "speech" in calls
 
 
 def test_preset_turns_the_changer_on_and_configures_the_chain(panel):

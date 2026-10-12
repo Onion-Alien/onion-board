@@ -3382,5 +3382,6 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Przenoszenie dźwięków z {name}: {done} z {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Jest zainstalowany, ale twoje dźwięki idą teraz do mikrofonu. Użyj go, jeśli gra pomija twój mikrofon, albo usuń go, jeśli nic innego go nie potrzebuje.",
   "⚠ Another sound already has this name.": "⚠ Inny dźwięk ma już tę nazwę.",
-  "Don't show this again": "Nie pokazuj ponownie"
+  "Don't show this again": "Nie pokazuj ponownie",
+  "Stop voice effects": "Zatrzymaj efekty głosu"
 }

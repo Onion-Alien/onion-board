@@ -1,0 +1,1 @@
+- Added a persistent Stop voice effects button across the Voice tabs to turn off all voice modifiers and translation in one click.

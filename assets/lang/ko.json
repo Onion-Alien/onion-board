@@ -3234,5 +3234,6 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "{name}에서 사운드 가져오는 중: {total}개 중 {done}개…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "설치되어 있지만 이제 사운드는 마이크로 들어갑니다. 게임이 마이크를 건너뛰면 이걸 쓰고, 다른 데서 쓰지 않으면 제거하세요.",
   "⚠ Another sound already has this name.": "⚠ 같은 이름의 사운드가 이미 있어요.",
-  "Don't show this again": "다시 표시하지 않기"
+  "Don't show this again": "다시 표시하지 않기",
+  "Stop voice effects": "음성 효과 중지"
 }
