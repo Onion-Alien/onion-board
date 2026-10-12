@@ -419,7 +419,6 @@
   "The game you have open uses {engine} for voice chat": "開いているゲームはボイスチャットに {engine} を使っています",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "ゲーム内オーバーレイは、ゲームの上にパッドを表示し、数字キーで再生できます。設定 → オーバーレイ で設定してください。",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "インストーラーを起動できませんでした（{e}）。代わりにリリースページからダウンロードできます。",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Discord やゲームに届けるもう1つの方法: そこでマイクとして選ぶ無料の仮想ケーブル",
   "The saved report and the app's log": "保存されたレポートとアプリのログ",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoom、Microsoft Teams、ブラウザでの通話がサウンドをノイズ扱いしないための設定",
   "The update didn't finish": "アップデートが完了しませんでした",
@@ -459,7 +458,6 @@
   "Update available": "アップデートがあります",
   "Update now": "今すぐ更新",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version} に更新しました。使いたくなるまで何も変わりません: すべて今までどおり動きます。",
-  "Use the virtual cable instead": "代わりに仮想ケーブルを使う",
   "Video": "動画",
   "Videos can't be shown in this copy of Onion Board": "この Onion Board では動画を表示できません",
   "Voice": "ボイス",
@@ -3235,5 +3233,8 @@
   "Plain": "無地",
   "Textured": "テクスチャあり",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "テクスチャありでは、テーマごとにパネルに模様が付きます：ブラウン管の走査線、カーボン、波など。無地はフラットのままです。",
-  "Theme style": "テーマのスタイル"
+  "Theme style": "テーマのスタイル",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "ほかのサウンドボードからサウンドを移行中: {total} 件中 {done} 件…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name} からサウンドを移行中: {total} 件中 {done} 件…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "インストール済みですが、今はサウンドがマイクに流れています。ゲームがマイクを通さないときに使うか、ほかに使うものがなければ削除してください。"
 }

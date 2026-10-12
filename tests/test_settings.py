@@ -314,6 +314,11 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
             last = grid.cards[expected - 1].geometry()
             assert grid.width() - 1 - last.right() < expected
             assert grid.cards[0].geometry().left() == 0
+            # every group shares those columns: its cards line up with the first group's
+            xs = [c.geometry().left() for c in grid.cards]
+            for other in d.findChildren(ThemeGrid):
+                for i, c in enumerate(other.cards[:expected]):
+                    assert c.geometry().left() == xs[i]
     finally:
         d.close()
 
@@ -422,18 +427,18 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
 
 
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
-    """Textured puts the theme's pattern on the panels; Plain leaves them flat."""
+    """Plain (the default) leaves the panels flat; Textured puts the theme's pattern on."""
     from soundboard import theme
     window.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
-    assert d.texture_on.isChecked() and window.cfg.theme_texture
+    assert d.texture_off.isChecked() and window.cfg.theme_texture is False
+    assert "/tex-" not in qapp.styleSheet()
+    d.texture_on.click()
+    assert window.cfg.theme_texture is True and theme.textures_on
     assert "/tex-" in qapp.styleSheet()
     d.texture_off.click()
     assert window.cfg.theme_texture is False and not theme.textures_on
     assert "/tex-" not in qapp.styleSheet()
-    d.texture_on.click()
-    assert window.cfg.theme_texture is True
-    assert "/tex-" in qapp.styleSheet()
     d.close()
 
 

@@ -394,7 +394,6 @@
   "The game you have open uses {engine} for voice chat": "Открытая у тебя игра использует {engine} для голосового чата",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Игровой оверлей показывает твои кнопки поверх игры, играются цифровыми клавишами. Настрой его в Настройки → Оверлей.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Не удалось запустить установщик ({e}). Можешь скачать его со страницы версии.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Другой способ попасть в Discord и игры: бесплатный виртуальный кабель, который выбираешь там как микрофон",
   "The saved report and the app's log": "Сохранённый отчёт и журнал приложения",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Настройки в Zoom, Microsoft Teams и звонках в браузере, которые не дают им считать твои звуки шумом",
   "The update didn't finish": "Обновление не завершилось",
@@ -433,7 +432,6 @@
   "Update available": "Доступно обновление",
   "Update now": "Обновить сейчас",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Обновлено до Onion Board {version}. Ничего не меняется, пока ты сам не захочешь: всё работает как раньше.",
-  "Use the virtual cable instead": "Использовать виртуальный кабель",
   "Video": "Видео",
   "Videos can't be shown in this copy of Onion Board": "В этой копии Onion Board видео не показываются",
   "Voice": "Голос",
@@ -3383,5 +3381,8 @@
   "Plain": "Простой",
   "Textured": "С текстурой",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "С текстурой у каждой темы свой узор на панелях: строки старого экрана, карбон, волны и не только. Простой оставляет их ровными.",
-  "Theme style": "Стиль темы"
+  "Theme style": "Стиль темы",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Переношу твои звуки из других саундбордов: {done} из {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Переношу твои звуки из {name}: {done} из {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Он установлен, но теперь твои звуки идут в микрофон. Используй его, если игра пропускает твой микрофон, или удали, если он больше ничему не нужен."
 }

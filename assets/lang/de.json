@@ -425,7 +425,6 @@
   "The game you have open uses {engine} for voice chat": "Das offene Spiel nutzt {engine} für den Sprachchat",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Das Ingame-Overlay zeigt deine Pads über dem Spiel, gespielt mit den Zahlentasten. Richte es unter Einstellungen → Overlay ein.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Der Installer ließ sich nicht starten ({e}). Du kannst ihn stattdessen von der Release-Seite herunterladen.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Der andere Weg zu Discord und Spielen: ein kostenloses virtuelles Kabel, das du dort als Mikro wählst",
   "The saved report and the app's log": "Der gespeicherte Bericht und das Protokoll der App",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Die Einstellungen in Zoom, Microsoft Teams und Anrufen im Browser, die verhindern, dass sie deine Sounds als Rauschen behandeln",
   "The update didn't finish": "Das Update wurde nicht abgeschlossen",
@@ -465,7 +464,6 @@
   "Update available": "Update verfügbar",
   "Update now": "Jetzt aktualisieren",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Auf Onion Board {version} aktualisiert. Nichts ändert sich, bis du es willst: Alles funktioniert wie vorher.",
-  "Use the virtual cable instead": "Stattdessen das virtuelle Kabel nutzen",
   "Video": "Video",
   "Videos can't be shown in this copy of Onion Board": "Videos lassen sich in dieser Version von Onion Board nicht zeigen",
   "Voice": "Stimme",
@@ -3309,5 +3307,8 @@
   "Plain": "Schlicht",
   "Textured": "Mit Muster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Mit Muster bekommt jedes Theme sein eigenes Muster auf den Feldern: Bildschirmlinien, Carbon, Wellen und mehr. Schlicht lässt sie einfarbig.",
-  "Theme style": "Theme-Stil"
+  "Theme style": "Theme-Stil",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Deine Sounds aus deinen anderen Soundboards werden übernommen: {done} von {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Deine Sounds aus {name} werden übernommen: {done} von {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Es ist installiert, aber deine Sounds gehen jetzt in dein Mikro. Nutz es, wenn ein Spiel dein Mikro überspringt, oder entferne es, wenn nichts anderes es braucht."
 }

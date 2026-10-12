@@ -1150,7 +1150,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Η επικάλυψη μέσα στο παιχνίδι δείχνει τα κουμπιά σου πάνω από το παιχνίδι, και παίζουν με τα πλήκτρα αριθμών. Ρύθμισέ τη στις Ρυθμίσεις → Επικάλυψη.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Το πρόγραμμα εγκατάστασης δεν ξεκίνησε ({e}). Μπορείς να το κατεβάσεις από τη σελίδα της έκδοσης.",
   "The one the game is on": "Αυτή όπου είναι το παιχνίδι",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Ο άλλος τρόπος να φτάσεις σε Discord και παιχνίδια: ένα δωρεάν εικονικό καλώδιο που το διαλέγεις εκεί ως μικρόφωνο",
   "The saved report and the app's log": "Η αποθηκευμένη αναφορά και η καταγραφή της εφαρμογής",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Οι ρυθμίσεις σε Zoom, Microsoft Teams και κλήσεις σε ιστοσελίδα που τα σταματούν από το να θεωρούν τους ήχους σου θόρυβο",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Το κουμπί Εγκατάσταση του οδηγού ρύθμισης κατεβάζει το VB-Cable (το εικονικό καλώδιο) από το vb-audio.com. Δεν χρειάζεται αν οι ήχοι σου πάνε κατευθείαν στο μικρόφωνό σου, σε άλλη συσκευή ή πουθενά. Κλειστό: εγκατέστησέ το μόνος σου από εκεί.",
@@ -1242,7 +1241,6 @@
   "Use it": "Χρησιμοποίησέ το",
   "Use less data": "Λιγότερα δεδομένα",
   "Use the virtual cable after all": "Χρησιμοποίησε τελικά το εικονικό καλώδιο",
-  "Use the virtual cable instead": "Χρησιμοποίησε το εικονικό καλώδιο",
   "Used for": "Χρήση για",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… οι ρυθμίσεις φωνητικού chat που μετράνε",
   "Version {version}": "Έκδοση {version}",
@@ -3309,5 +3307,8 @@
   "Plain": "Απλό",
   "Textured": "Με υφή",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Με υφή κάθε θέμα παίρνει το δικό του μοτίβο στα πάνελ: γραμμές παλιάς οθόνης, ανθρακονήματα, κύματα και άλλα. Το απλό τα αφήνει επίπεδα.",
-  "Theme style": "Στυλ θέματος"
+  "Theme style": "Στυλ θέματος",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Μεταφορά των ήχων σου από τα άλλα soundboard σου: {done} από {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Μεταφορά των ήχων σου από {name}: {done} από {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Είναι εγκατεστημένο, αλλά οι ήχοι σου πάνε πλέον στο μικρόφωνό σου. Χρησιμοποίησέ το αν ένα παιχνίδι παρακάμπτει το μικρόφωνό σου, ή αφαίρεσέ το αν δεν το χρειάζεται τίποτα άλλο."
 }

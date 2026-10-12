@@ -1150,7 +1150,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Overlayet i spillet viser dine pads ovenpå spillet, afspillet med taltasterne. Sæt det op under Indstillinger → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Installationsprogrammet kunne ikke startes ({e}). Du kan hente det fra udgivelsessiden i stedet.",
   "The one the game is on": "Den, spillet er på",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Den anden vej til Discord og spil: et gratis virtuelt kabel, som du vælger som mikrofon dér",
   "The saved report and the app's log": "Den gemte rapport og appens log",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Indstillingerne i Zoom, Microsoft Teams og opkald på en hjemmeside, der forhindrer dem i at behandle dine lyde som støj",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Opsætningsguidens Installér-knap henter VB-Cable (det virtuelle kabel) fra vb-audio.com. Ikke nødvendigt, hvis dine lyde går direkte ind i din mikrofon, til en anden enhed eller ingen steder. Fra: installér det selv derfra.",
@@ -1242,7 +1241,6 @@
   "Use it": "Brug den",
   "Use less data": "Brug mindre data",
   "Use the virtual cable after all": "Brug alligevel det virtuelle kabel",
-  "Use the virtual cable instead": "Brug det virtuelle kabel i stedet",
   "Used for": "Brugt til",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… de stemmechatindstillinger, der betyder noget",
   "Version {version}": "Version {version}",
@@ -3309,5 +3307,8 @@
   "Plain": "Ensfarvet",
   "Textured": "Med mønster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mønster får hvert tema sit eget mønster på panelerne: skærmlinjer, kulfiber, bølger og mere. Ensfarvet holder dem flade.",
-  "Theme style": "Temastil"
+  "Theme style": "Temastil",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Henter dine lyde fra dine andre soundboards: {done} af {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Henter dine lyde fra {name}: {done} af {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Det er installeret, men dine lyde går ind i din mikrofon nu. Brug det, hvis et spil springer din mikrofon over, eller fjern det, hvis intet andet har brug for det."
 }
