@@ -1,1 +1,1 @@
-- Keep focus on update buttons while checking or updating, and ignore repeat clicks until the work finishes.
+- Keep focus on buttons while checking updates, reloading voices, downloading or installing add-ons, and cancelling a translation download. Ignore repeat clicks until the work finishes.
