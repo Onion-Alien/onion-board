@@ -419,7 +419,6 @@
   "The game you have open uses {engine} for voice chat": "เกมที่คุณเปิดอยู่ใช้ {engine} สำหรับแชทเสียง",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "โอเวอร์เลย์ในเกมแสดงแพดของคุณทับบนเกม เล่นด้วยปุ่มตัวเลข ตั้งค่าได้ใน การตั้งค่า → โอเวอร์เลย์",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "เริ่มตัวติดตั้งไม่ได้ ({e}) คุณดาวน์โหลดจากหน้ารุ่นที่ออกแทนได้",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "อีกทางที่จะถึง Discord และเกม: สายเสมือนฟรีที่คุณเลือกเป็นไมค์ที่นั่น",
   "The saved report and the app's log": "รายงานที่บันทึกไว้และล็อกของแอป",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "การตั้งค่าใน Zoom, Microsoft Teams และการโทรบนหน้าเว็บ ที่ทำให้มันไม่มองเสียงของคุณเป็นเสียงรบกวน",
   "The update didn't finish": "อัปเดตไม่เสร็จ",
@@ -459,7 +458,6 @@
   "Update available": "มีอัปเดต",
   "Update now": "อัปเดตเลย",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "อัปเดตเป็น Onion Board {version} แล้ว ไม่มีอะไรเปลี่ยนจนกว่าคุณจะต้องการ: ทุกอย่างใช้ได้เหมือนเดิม",
-  "Use the virtual cable instead": "ใช้สายเสมือนแทน",
   "Video": "วิดีโอ",
   "Videos can't be shown in this copy of Onion Board": "Onion Board ชุดนี้แสดงวิดีโอไม่ได้",
   "Voice": "เสียงพูด",
@@ -3237,5 +3235,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "แบบมีลวดลายจะให้แต่ละธีมมีลายของตัวเองบนแผง: เส้นจอเก่า คาร์บอนไฟเบอร์ คลื่น และอีกมาก แบบเรียบจะคงไว้เป็นพื้นเรียบ",
   "Theme style": "สไตล์ธีม",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "กำลังย้ายเสียงของคุณจากซาวด์บอร์ดอื่น: {done} จาก {total}…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "กำลังย้ายเสียงของคุณจาก {name}: {done} จาก {total}…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "กำลังย้ายเสียงของคุณจาก {name}: {done} จาก {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "ติดตั้งไว้แล้ว แต่ตอนนี้เสียงของคุณเข้าไมค์แล้ว ใช้มันถ้าเกมข้ามไมค์ของคุณ หรือลบออกถ้าไม่มีอะไรต้องใช้มันแล้ว"
 }
