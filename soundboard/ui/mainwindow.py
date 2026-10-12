@@ -3808,12 +3808,14 @@ class MainWindow(QMainWindow):
                 self._silent_said = True
                 self.toast(_("Your mic sends no sound: see the Setup tab."), "warn")
             look = ("warn", "warn", _("Your mic sends no sound"), _("No sound"), needed(
-                _("Discord and games hear nothing from your mic. If its mute is on, switch "
-                  "it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.")
+                _("Discord and games hear nothing from your mic. Is your headset switched "
+                  "off, or its mic muted? Turn it on or unmute it. If not, click "
+                  "<b>Repair</b>, then <b>Yes</b> when Windows asks.")
                 if ask else
-                _("Discord and games hear nothing from your mic. If its mute is on, switch "
-                  "it off. If not, click <b>Repair</b>: your sound drops out for a few "
-                  "seconds.")), _("Repair (one click)"))
+                _("Discord and games hear nothing from your mic. Is your headset switched "
+                  "off, or its mic muted? Turn it on or unmute it. If not, click "
+                  "<b>Repair</b>: your sound drops out for a few seconds.")),
+                _("Repair (one click)"))
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)
         else:   # set up, but Windows isn't running it or it won't open: the step says why

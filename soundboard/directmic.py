@@ -66,7 +66,7 @@ import sys
 import threading
 import time
 import winreg
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from typing import TYPE_CHECKING
 from pathlib import Path
 
@@ -1598,15 +1598,18 @@ def _make_ring():
         pass
 
 
-def _audio_off(work) -> int:
+def _audio_off(work, also: Sequence[str] = ()) -> int:
     """Run `work` (it returns an exit code) with Windows' audio stopped: the endpoint
     builder reads the mics' effect settings when it starts. The audio always starts
     again, however `work` ends; if it won't stop, nothing is touched (6). `work` done
     but a mic still sends only silence after every restart (_mics_come_back_live):
-    MIC_SILENT."""
+    MIC_SILENT. A mic (the effect's, or `also`: the one it goes on) that was already
+    silent before isn't the step's doing: a headset that's switched off, or its mic
+    muted, sends only zeros too, and restarting the audio for it only cut the sound."""
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
+    quiet = _silent_before([*installed_on(), *also])
     mics: list[str] | None = None
     code = None
     try:
@@ -1616,8 +1619,23 @@ def _audio_off(work) -> int:
         code = work()
     finally:
         _audio_service(True, dependents)
-        live = mics is None or _mics_come_back_live(mics, dependents)
+        live = mics is None or _mics_come_back_live(mics, dependents, quiet)
     return MIC_SILENT if code == 0 and not live else code
+
+
+def _silent_before(guids: Sequence[str]) -> set[str]:
+    """The mics among `guids` sending only exact zeros now (a check: never fails)."""
+    quiet = set()
+    for g in dict.fromkeys(g.lower() for g in guids):
+        try:
+            if _mic_is_silent(g):
+                quiet.add(g)
+        except Exception:  # noqa: BLE001
+            log.info("couldn't listen to mic %s before the step", g, exc_info=True)
+    if quiet:
+        log.info("%s already sends only silence (switched off or muted?): not the "
+                 "step's doing", ", ".join(sorted(quiet)))
+    return quiet
 
 
 MIC_SILENT = 7        # the step was done, but a mic still sends only silence
@@ -1642,15 +1660,18 @@ def _silent(guid: str) -> bool:
     return bool(heard)
 
 
-def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str]) -> bool:
+def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str],
+                          quiet: Collection[str] = ()) -> bool:
     """After the audio restart a mic can come back sending only exact zeros (an app
     such as a voice chat grabbed it the moment it was back), to every app and to Windows'
     own mic test, until the audio restarts again. So the mics the effect was on (`before`)
     and is on now are listened to: digital silence gets another restart, up to
     EXTRA_RESTARTS of them. False if a mic still sends only silence after those (the app
-    then says so); True otherwise, "can't tell" and a failed check included."""
+    then says so); True otherwise, "can't tell" and a failed check included. Mics in
+    `quiet` were silent before the step already (_silent_before): left alone."""
     try:
-        silent = [g for g in dict.fromkeys([*before, *installed_on()]) if _silent(g)]
+        silent = [g for g in dict.fromkeys([*before, *installed_on()])
+                  if g.lower() not in quiet and _silent(g)]
         for n in range(1, EXTRA_RESTARTS + 1):
             if not silent:
                 break
@@ -1679,7 +1700,7 @@ def admin_install(guid: str, slot: str | None = None, source: Path | None = None
     if not dll.is_file():
         log.error("no effect DLL at %s", dll)
         return 3
-    return _audio_off(lambda: _put_on(guid, slot, dll))
+    return _audio_off(lambda: _put_on(guid, slot, dll), also=(guid,))
 
 
 def _put_on(guid: str, slot: str | None, dll: Path) -> int:
@@ -1756,7 +1777,7 @@ def admin_reinstall(guid: str) -> int:
                 log.error("couldn't put the old mic effect back either")
         return result
     try:
-        return _audio_off(work)
+        return _audio_off(work, also=(guid,))
     finally:
         if backup is not None:
             _remove(backup)
@@ -2151,8 +2172,8 @@ def unfinished() -> str:
 def mic_silent() -> str:
     """What a step returns when it was done, but the mic still sends only silence after
     every restart of Windows' audio (MIC_SILENT)."""
-    return _("Your mic sends no sound, even after restarting Windows' audio. If your "
-             "headset's mic is muted, unmute it. If not, restart your PC, then try again.")
+    return _("Your mic sends no sound. Is your headset switched off, or its mic muted? "
+             "Turn it on or unmute it. Still nothing? Restart your PC, then try again.")
 
 
 def no_helper() -> str:

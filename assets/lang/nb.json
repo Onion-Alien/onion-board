@@ -3263,11 +3263,8 @@
   "Equalizer and volume": "Equalizer og volum",
   "Live: click to mute": "Live: klikk for å dempe",
   "Muted: click to go live": "Dempet: klikk for å gå live",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord og spill hører ingenting fra mikrofonen din. Hvis den er dempet, slå på lyden. Hvis ikke, klikk <b>Reparer</b>, og deretter <b>Ja</b> når Windows spør.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord og spill hører ingenting fra mikrofonen din. Hvis den er dempet, slå på lyden. Hvis ikke, klikk <b>Reparer</b>: lyden forsvinner i noen sekunder.",
   "No sound": "Ingen lyd",
   "Your mic sends no sound": "Mikrofonen din sender ingen lyd",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikrofonen din sender ingen lyd, selv etter at lyden i Windows er startet på nytt. Hvis mikrofonen på headsettet er dempet, slå på lyden. Hvis ikke, start PC-en på nytt, og prøv igjen.",
   "Your mic sends no sound: see the Setup tab.": "Mikrofonen din sender ingen lyd: se fanen Oppsett.",
   "Before update": "Før oppdatering",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Et lagres hver gang du tilbakestiller noe eller oppdaterer appen (de siste {max_points} beholdes). Gjenoppretting setter tilbake innstillingene, hurtigtastene og lydene dine slik de var. Lyder du har lagt til siden, beholdes.",
@@ -3316,5 +3313,8 @@
   "No window to show": "Ingen vindu å vise",
   "Show this program's window": "Vis vinduet til dette programmet",
   "This program doesn't share its picture": "Dette programmet deler ikke bildet sitt",
-  "Window of {name}": "Vinduet til {name}"
+  "Window of {name}": "Vinduet til {name}",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord og spill hører ingenting fra mikrofonen din. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Hvis ikke, klikk <b>Reparer</b>, og deretter <b>Ja</b> når Windows spør.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord og spill hører ingenting fra mikrofonen din. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Hvis ikke, klikk <b>Reparer</b>: lyden forsvinner i noen sekunder.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen din sender ingen lyd. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Fortsatt ingenting? Start PC-en på nytt, og prøv igjen."
 }

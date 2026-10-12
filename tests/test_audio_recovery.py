@@ -97,7 +97,7 @@ def test_clean_install_preflights_replacement_and_preserves_failed_removal(monke
     dll = tmp_path / 'missing.dll'
     calls = []
     monkeypatch.setattr(dm, 'bundled_dll', lambda: dll)
-    monkeypatch.setattr(dm, '_audio_off', lambda work: work())
+    monkeypatch.setattr(dm, '_audio_off', lambda work, also=(): work())
     monkeypatch.setattr(dm, '_take_off', lambda only: calls.append('remove') or 1)
     monkeypatch.setattr(dm, '_put_on', lambda guid, slot, dll: calls.append('install') or 0)
     monkeypatch.setattr(dm, 'registered_dll', lambda: None)
@@ -146,7 +146,7 @@ def test_clean_reinstall_never_leaves_the_mic_without_a_part(monkeypatch, tmp_pa
     monkeypatch.setattr(dm, '_put_on', install)
     monkeypatch.setattr(dm.time, 'sleep', lambda s: None)
     stops = []
-    monkeypatch.setattr(dm, '_audio_off', lambda work: stops.append(1) or work())
+    monkeypatch.setattr(dm, '_audio_off', lambda work, also=(): stops.append(1) or work())
     assert dm.admin_reinstall('guid') == result
     assert tried == sources
     assert stops == [1]   # one restart of Windows' audio for the whole job, retries too
@@ -164,7 +164,10 @@ def test_refusal_to_stop_audio_changes_nothing(monkeypatch, tmp_path, action):  
     monkeypatch.setattr(dm, '_audio_comes_back', lambda deps: None)
     monkeypatch.setattr(dm, '_audio_service', lambda start, deps=(): calls.append(start) or start)
     monkeypatch.setattr(dm, '_register_com', lambda *a: pytest.fail('registration changed'))
-    monkeypatch.setattr(dm, 'installed_on', lambda: pytest.fail('mic settings touched'))
+    # (reading which mics have it is fine: the mics are listened to before the step)
+    monkeypatch.setattr(dm, 'installed_on', lambda: [])
+    monkeypatch.setattr(dm, '_put_on', lambda *a: pytest.fail('mic settings touched'))
+    monkeypatch.setattr(dm, '_take_off', lambda *a: pytest.fail('mic settings touched'))
     result = dm.admin_install('guid') if action == 'install' else dm.admin_uninstall()
     assert result == 6
     assert calls == [False, True]  # restart is attempted even after a stop fails

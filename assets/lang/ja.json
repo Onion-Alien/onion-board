@@ -3190,11 +3190,8 @@
   "Equalizer and volume": "イコライザーと音量",
   "Live: click to mute": "ライブ: クリックでミュート",
   "Muted: click to go live": "ミュート中: クリックでライブに戻る",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord やゲームにマイクの音が何も届いていません。ミュートになっていれば解除してください。そうでなければ<b>修復</b>をクリックし、Windows の確認で<b>はい</b>をクリックしてください。",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ミュートになっていれば解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
   "No sound": "音なし",
   "Your mic sends no sound": "マイクから音が出ていません",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows のオーディオを再起動しても、マイクから音が出ていません。ヘッドセットのマイクがミュートになっていれば解除してください。そうでなければ PC を再起動してから、もう一度お試しください。",
   "Your mic sends no sound: see the Setup tab.": "マイクから音が出ていません: セットアップ タブを確認してください。",
   "Before update": "更新前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットしたりアプリを更新したりするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。",
@@ -3242,5 +3239,8 @@
   "No window to show": "表示するウィンドウがありません",
   "Show this program's window": "このプログラムのウィンドウを表示",
   "This program doesn't share its picture": "このプログラムは画面を共有しません",
-  "Window of {name}": "{name} のウィンドウ"
+  "Window of {name}": "{name} のウィンドウ",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックし、Windows の確認で<b>はい</b>をクリックしてください。",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "マイクから音が出ていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。それでも出ない場合は、PC を再起動してから、もう一度お試しください。"
 }

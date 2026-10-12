@@ -3263,11 +3263,8 @@
   "Equalizer and volume": "Taajuuskorjain ja äänenvoimakkuus",
   "Live: click to mute": "Live: mykistä napsauttamalla",
   "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ja pelit eivät kuule mikistäsi mitään. Jos se on mykistetty, poista mykistys. Jos ei, klikkaa <b>Korjaa</b> ja sitten <b>Kyllä</b>, kun Windows kysyy.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ja pelit eivät kuule mikistäsi mitään. Jos se on mykistetty, poista mykistys. Jos ei, klikkaa <b>Korjaa</b>: ääni katkeaa muutamaksi sekunniksi.",
   "No sound": "Ei ääntä",
   "Your mic sends no sound": "Mikkisi ei lähetä ääntä",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikkisi ei lähetä ääntä edes Windowsin äänen uudelleenkäynnistyksen jälkeen. Jos kuulokkeidesi mikki on mykistetty, poista mykistys. Jos ei, käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
   "Your mic sends no sound: see the Setup tab.": "Mikkisi ei lähetä ääntä: katso Asetukset-välilehti.",
   "Before update": "Ennen päivitystä",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
@@ -3316,5 +3313,8 @@
   "No window to show": "Ei ikkunaa näytettäväksi",
   "Show this program's window": "Näytä tämän ohjelman ikkuna",
   "This program doesn't share its picture": "Tämä ohjelma ei jaa kuvaansa",
-  "Window of {name}": "Ohjelman {name} ikkuna"
+  "Window of {name}": "Ohjelman {name} ikkuna",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ja pelit eivät kuule mikistäsi mitään. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Jos ei, klikkaa <b>Korjaa</b> ja sitten <b>Kyllä</b>, kun Windows kysyy.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ja pelit eivät kuule mikistäsi mitään. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Jos ei, klikkaa <b>Korjaa</b>: ääni katkeaa muutamaksi sekunniksi.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikkisi ei lähetä ääntä. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Käynnistä tietokone uudelleen ja yritä sitten uudestaan."
 }
