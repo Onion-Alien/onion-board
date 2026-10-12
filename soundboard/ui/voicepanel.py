@@ -2860,6 +2860,7 @@ class VoicePanel(QWidget):
         # bottom, just above the mixer (added below, after the cards; the Say bar on top)
         self.bar = VoiceStatusBar()
         self.bar.open_card.connect(self._open_card)
+        self.bar.stop_button.clicked.connect(self.stop_all)
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -3036,6 +3037,7 @@ class VoicePanel(QWidget):
         self.ai.stop()
         self.speech.b_live.setChecked(False)
         self.fx.btn_power.setChecked(False)   # its toggled handler applies it
+        self.speech.sw_lang.setChecked(False)
 
     def is_active(self) -> bool:
         """Something here is changing what others hear from your mic."""

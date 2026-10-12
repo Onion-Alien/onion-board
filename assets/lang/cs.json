@@ -3382,5 +3382,6 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Přenáším tvoje zvuky z {name}: {done} z {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Je nainstalovaný, ale tvoje zvuky teď jdou do mikrofonu. Použij ho, když hra tvůj mikrofon přeskočí, nebo ho odeber, pokud ho nic jiného nepotřebuje.",
   "⚠ Another sound already has this name.": "⚠ Tento název už má jiný zvuk.",
-  "Don't show this again": "Už nezobrazovat"
+  "Don't show this again": "Už nezobrazovat",
+  "Stop voice effects": "Zastavit hlasové efekty"
 }

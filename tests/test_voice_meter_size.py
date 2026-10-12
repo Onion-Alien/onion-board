@@ -26,7 +26,8 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
             for _ in range(4):
                 qapp.processEvents()
             if width >= 800:
-                assert bar.meter.width() >= width // 2
+                # The persistent stop action reserves its own width beside the meter.
+                assert bar.meter.width() >= (width - bar.stop_button.width()) // 2
             assert bar.meter.geometry().right() < bar._mic.width()
             assert bar._right.geometry().right() < bar.width()
     finally:
@@ -37,7 +38,8 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
 def test_bar_keeps_its_height_when_chips_come_and_go(qapp):
     bar = VoiceStatusBar()
     bar.set_level(0.1)
-    bar.resize(1200, 60)
+    # Enough room for the stop action, meter and both status chips on one line.
+    bar.resize(1368, 60)
     bar.show()
     try:
         heights = []
