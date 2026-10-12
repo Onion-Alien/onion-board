@@ -2793,7 +2793,8 @@ class VoicePanel(QWidget):
         self._folded = ({k for k in saved_folds if isinstance(k, str)}
                         if isinstance(saved_folds, list) else set())
         tab = speech.get("tab") if isinstance(speech, dict) else None
-        tab = {"custom": "addons"}.get(tab, tab)   # Custom voices joined Add-ons
+        if tab == "custom":
+            tab = "addons"                # Custom voices joined Add-ons
         self._tab = tab if tab in TAB_KEYS else "fx"
         scroll.setWidget(page)
         outer.addWidget(tab_row)
