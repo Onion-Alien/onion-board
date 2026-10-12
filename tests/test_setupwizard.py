@@ -631,6 +631,51 @@ def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
     w._attaching = False
 
 
+@pytest.mark.parametrize("err", ["", "Windows said no"])
+def test_the_real_mic_set_up_holds_the_guide_until_it_ends(mic_wizard, qapp, monkeypatch,
+                                                          err):
+    """The real path: the set-up button, the install on its thread (held until we
+    let it go), then success or failure. All the while Back, Next, Esc and the X
+    do nothing; once it ends, either way, they all work again."""
+    import threading
+    from soundboard import directmic
+    w, wiz = mic_wizard
+    release = threading.Event()
+
+    def install(name, **k):
+        release.wait(20)
+        return err
+    monkeypatch.setattr(directmic, "install", install)
+    monkeypatch.setattr(directmic, "status",
+                        lambda name=None: "missing" if err or not release.is_set() else "ready")
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    page = wiz.stack.currentIndex()
+    wiz.btn_attach.click()
+    assert w._attaching and wiz.setup_show.on
+    for _round in range(3):   # spammed, with time passing in between
+        _settle(qapp, 0.3)
+        assert busy.is_busy(wiz.btn_next) and busy.is_busy(wiz.btn_back)
+        wiz.btn_next.click()
+        wiz.btn_back.click()
+        wiz.reject()   # Esc
+        wiz.close()    # the X
+        assert wiz.isVisible() and wiz.stack.currentIndex() == page
+    release.set()   # the set-up ends
+    deadline = __import__("time").monotonic() + 10
+    while w._attaching and __import__("time").monotonic() < deadline:
+        _settle(qapp, 0.05)
+    _settle(qapp, 0.4)
+    assert not w._attaching
+    assert not busy.is_busy(wiz.btn_next) and not busy.is_busy(wiz.btn_back)
+    wiz.btn_back.click()   # Back works again
+    assert wiz.stack.currentIndex() == page - 1
+    wiz.btn_next.click()   # and Next
+    assert wiz.stack.currentIndex() == page
+    wiz.close()            # and the X closes it
+    assert not wiz.isVisible()
+
+
 def _settle(qapp, s=0.25):
     import time
     t = time.monotonic()
