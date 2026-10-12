@@ -50,6 +50,7 @@ RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must resta
 TICK_MS = 40            # the mic page's meter
 SETTLE_MS = 60          # after a step change, the window settles to what the steps need
 SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
+LOCK_MAX_S = 180        # the mic set-up holds the guide shut at most this long
 
 # install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
 # guide shows them, in order ("wake" only happens if the cable needs a nudge)
@@ -392,9 +393,11 @@ class _PageStack(QWidget):
         if not 0 <= i < len(self._pages) or i == self._current:
             return
         old, self._current = self.currentWidget(), i
-        self._pages[i].show()
+        # the old one goes first: with both shown for a moment, Qt grew the window to
+        # fit the two (to the screen's height, moved up) before it shrank back
         if old is not None:
             old.hide()
+        self._pages[i].show()
         self.currentChanged.emit(i)
 
 
@@ -686,8 +689,23 @@ class SetupWizard(QDialog):
         v.addWidget(box)
         v.addSpacing(12)
         card, cl = _card(14, 8, roomy=False)
-        self.use_hint = _label("")
-        cl.addWidget(self.use_hint)
+        # every answer's words sit hidden in the same spot, keeping their room: the
+        # card is always as tall as the longest, so clicking between the tiles
+        # doesn't grow and shrink the window (it jumped around when spammed)
+        words = QGridLayout()
+        words.setContentsMargins(0, 0, 0, 0)
+        for text in self._use_words.values():
+            ghost = _label(text)
+            keep = ghost.sizePolicy()
+            keep.setRetainSizeWhenHidden(True)
+            ghost.setSizePolicy(keep)
+            ghost.hide()
+            words.addWidget(ghost, 0, 0)
+        self.use_hint = _label("")   # fills that room, its words at the top: a pick
+        self.use_hint.setAlignment(Qt.AlignmentFlag.AlignLeading   # never re-lays it out
+                                   | Qt.AlignmentFlag.AlignTop)
+        words.addWidget(self.use_hint, 0, 0)
+        cl.addLayout(words)
         v.addWidget(card)
         v.addStretch(1)
         self.use_group.buttonClicked.connect(lambda b: self._pick_use(b.property("use")))
@@ -1085,6 +1103,10 @@ class SetupWizard(QDialog):
         elif page == 3:
             self._fill_discord()
         self._update_next()
+        # to the new step's size now, before it's drawn: drawn first at the old size,
+        # a taller step showed squeezed for a moment
+        fit.fit(self)
+        self._settle_size()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)
 
     def showEvent(self, ev):
@@ -1110,7 +1132,7 @@ class SetupWizard(QDialog):
             return
         need = max(fit.needed_height(self, self.width()), self.minimumHeight())
         if self.height() > need:
-            self.resize(self.width(), need)
+            fit.shrink(self, need)
 
     def _update_next(self):
         i = self.stack.currentIndex()
@@ -1119,7 +1141,8 @@ class SetupWizard(QDialog):
         # back through mic_attached wherever the guide is)
         # (greyed out with set_busy, not setEnabled: that would throw the keyboard focus
         # to another control; the click handlers check too, for Enter on the dialog)
-        installing = self._proc is not None
+        self._was_locked = self._locked()   # (_tick updates these when that changes)
+        installing = self._proc is not None or self._was_locked
         busy.set_busy(self.btn_next, installing)
         busy.set_busy(self.btn_back, installing)
         if i == self.PAGES - 1:
@@ -1133,13 +1156,31 @@ class SetupWizard(QDialog):
         self.btn_next.setText(_nav_words(text) + NAV_GAP)
         icons.set_icon(self.btn_next, icon, "on_accent")
 
+    _lock_since: float | None = None
+    _was_locked = False
+
+    def _locked(self) -> bool:
+        """Bun is putting the sounds into the mic: the guide stays open on its page
+        until it's done (closed or moved on mid-way, they couldn't tell how it went).
+        At most LOCK_MAX_S: a set-up that never answers can't trap them."""
+        if not self.win._attaching:
+            self._lock_since = None
+            return False
+        if self._lock_since is None:
+            self._lock_since = time.monotonic()
+        return time.monotonic() - self._lock_since < LOCK_MAX_S
+
+    def _busy(self) -> bool:
+        """Back / Next wait: the cable is installing or the mic is being set up."""
+        return self._proc is not None or self._locked()
+
     def back_clicked(self):
-        if self._proc is None:
+        if not self._busy():
             self.go(self.stack.currentIndex() - 1)
 
     def next_clicked(self):
-        if self._proc is not None:
-            return   # the cable is installing: stay on its page
+        if self._busy():
+            return   # the cable is installing / the mic is set up: stay on its page
         i = self.stack.currentIndex()
         if i == self.PAGES - 1:
             self.finish()
@@ -1157,7 +1198,10 @@ class SetupWizard(QDialog):
 
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
-        either way, and reopening the guide picks it back up."""
+        either way, and reopening the guide picks it back up. While the mic is set up,
+        they do nothing (_locked)."""
+        if self._locked():
+            return
         if self._proc is not None and self._proc.poll() is None and QMessageBox.question(
                 self, _("Still installing"),
                 _("Bun is still installing the virtual cable.\n\nClose the guide anyway? The "
@@ -1235,6 +1279,7 @@ class SetupWizard(QDialog):
         if self.setup_show.on:
             self.setup_show.finish(not bool(err))
         self.recheck_cable(rescan=False)
+        self._update_next()
 
     def recheck_cable(self, rescan: bool = True):
         if rescan:
@@ -1460,6 +1505,7 @@ class SetupWizard(QDialog):
         self.setup_show.start()
         self.win.attach_mic()
         self.recheck_cable(rescan=False)
+        self._update_next()   # Back / Next wait for it
 
     def install_cable(self):
         if self.setup_show.on:
@@ -1562,7 +1608,13 @@ class SetupWizard(QDialog):
         self.discord_fold.setToolTip(_("Hide") if open_ else _("Show"))
         self.discord_fold.setAccessibleDescription(self.discord_fold.toolTip())
         self._show_discord_body()
-        QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # shut again: no empty band
+        # shut again: no empty band, not even for a moment (the layouts first hear
+        # the tip went away, or it's measured as still there: the news goes up one
+        # layout per pass, the tip -> the page -> the steps -> the guide)
+        for _pass in range(4):
+            QApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+        self._settle_size()
+        QTimer.singleShot(SETTLE_MS, self, self._settle_size)
 
     def _show_discord_body(self):
         # one rule: a Discord tip folds under its heading; without one (on the cable,
@@ -1693,6 +1745,9 @@ class SetupWizard(QDialog):
         busy.flash(self.btn_copy, _("✓  Copied"))
 
     def _tick(self):
+        if (locked := self._locked()) != self._was_locked:   # the mic set-up began / ended
+            self._was_locked = locked
+            self._update_next()
         if self.stack.currentIndex() == self.base:   # the mic page: its meter and Bun
             e = self.win.engine
             lvl = e.level_mic if e.mic_stream is not None else 0.0
