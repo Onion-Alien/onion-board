@@ -1359,8 +1359,22 @@ class MainWindow(QMainWindow):
         self._name_seek.relayout()
         self.mini_name.setText(text)   # hides itself when it has no room
         if text == _("Pick a sound"):   # nothing picked: no time either
-            self.np_time.setText("")
-            self.mini_time.setText("")
+            self._set_np_time("")
+
+    def _set_np_time(self, text: str):
+        """The player's time. Blank (nothing picked) it hides, so the seek line runs
+        all the way to the buttons instead of stopping at an empty gap."""
+        self.np_time.setText(text)
+        self.mini_time.setText(text)
+        self._show_np_time()
+
+    def _show_np_time(self, tight: bool | None = None):
+        if tight is not None:
+            self._np_time_tight = tight   # the fitter's say: no room for it
+        show = bool(self.np_time.text()) and not getattr(self, "_np_time_tight", False)
+        if show == self.np_time.isHidden():
+            self.np_time.setVisible(show)
+            responsive.touch(self.np_time)
 
     def _build_mixer(self) -> QFrame:
         """The levels strip along the bottom, the same on every tab: three labelled
@@ -1819,6 +1833,7 @@ class MainWindow(QMainWindow):
             self.np_time.fontMetrics().horizontalAdvance("888:88 / 888:88") + 4)
         self.np_time.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.np_time.setObjectName("muted")
+        self.np_time.hide()   # until there is a time to show (_set_np_time)
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
         self._name_seek = NameAndSeek(self.np_name, self.seek, 190)
@@ -6019,8 +6034,7 @@ class MainWindow(QMainWindow):
         if self._seeking:
             m = self.meta(self.current) if self.current else None
             if m:
-                self.np_time.setText(fmt_pos(v / 1000 * m.duration, m.duration))
-                self.mini_time.setText(self.np_time.text())
+                self._set_np_time(fmt_pos(v / 1000 * m.duration, m.duration))
 
     def do_seek(self, slider=None):
         self._seeking = False
@@ -9333,8 +9347,7 @@ class MainWindow(QMainWindow):
                 slider.blockSignals(True)
                 slider.setValue(int(frac * 1000))
                 slider.blockSignals(False)
-            self.np_time.setText(fmt_pos(frac * m.duration, m.duration))
-            self.mini_time.setText(self.np_time.text())
+            self._set_np_time(fmt_pos(frac * m.duration, m.duration))
 
     def _video_of(self, sid: str | None) -> Path | None:
         """The current sound's video, looked up once per selection, on a thread (it
@@ -9439,7 +9452,7 @@ class MainWindow(QMainWindow):
         # picker is on the Setup tab)
         # the ear button shrinks to its icon first: the level bar is the live part
         f.add(12, "w", r.icon_only(self.btn_check))
-        f.add(14, "w", r.hide(self.np_time))
+        f.add(14, "w", self._show_np_time)   # also hidden while it's blank
         f.add(45, "w", r.hide(self.speed_btn))
         f.add(30, "w", r.hide(self.chk_monitor))
         # the levels strip never drops a group: one is shown whole and the other two

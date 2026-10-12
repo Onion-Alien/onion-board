@@ -1,0 +1,1 @@
+- The player's seek line now runs the whole width of its bar when no sound is picked, instead of stopping at an empty gap.
