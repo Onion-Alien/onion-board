@@ -1676,7 +1676,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Автоматично визначати, що вхідна чутливість</b> увімкнена: під час виклику він продовжує сприймати ваші звуки як тишу та вимикає їх: вимкніть (Вхідна чутливість) і залиште повзунок низьким або скористайтеся «Натискай і говори».",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Режим введення</b> : найкраще працює функція <b>«Натисни і говори»</b> (встановіть ту саму клавішу в меню «Налаштування» → «Гарячі клавіші» → «Автоматична функція «Натисни і говори», і Onion Board утримуватиме її під час відтворення звуку). У розділі <b>«Голосова активність»</b> вимкніть <b>«Автоматично визначати чутливість вхідного сигналу»</b> та перетягніть повзунок майже до кінця вліво, інакше Discord продовжуватиме виключати ваші звуки, навіть гучні.",
   "<b>Languages</b> · {state}": "<b>Мови</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Виберіть голос</b>",
   "A built-in voice (still hides yours)": "Вбудований голос (все ще приховує ваш)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Випадкове безглузде поєднання ефектів, наприклад «Мій власний поєднання»: те, що воно змінило, відображається нижче. Клацніть ще раз для іншого.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Короткий фрагмент цього голосу лише у ваших навушниках (більше ніхто не чує). Перший займає кілька секунд.",
@@ -1861,7 +1860,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Пошук і завантаження звуків онлайн вимкнено в Налаштуваннях > Конфіденційність і безпека.",
   "Finding the newest Onion Watch…": "Пошук найновішого Onion Watch…",
   "Finding the newest…": "Пошук найновішого…",
-  "Fold this card away": "Складіть цю картку",
   "Fold {effect} away": "Складіть {effect} геть",
   "Follow my pitch": "Дотримуйтесь моєї пропозиції",
   "Forget {name}": "Забути {name}",
@@ -1997,7 +1995,6 @@
   "Nothing was recorded: it didn't make a sound.": "Нічого не записувалося: не було звуку.",
   "Nothing yet. Lines show up here as they're spoken.": "Поки нічого. Рядки з’являються тут, коли вони промовляються.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Нікуди його надсилати: виберіть, куди будуть ваші звуки, на вкладці «Налаштування».",
-  "ON: everyone hears it": "ON: це всі чують",
   "Off (no shaping)": "Вимкнено (без формування)",
   "Off (send as is)": "Вимкнено (надсилати як є)",
   "Old telephone": "Старий телефон",
@@ -2115,7 +2112,6 @@
   "Shout and your voice blows out like a megaphone.": "Кричи, і твій голос гримне, як мегафон.",
   "Shout blowout": "Крик вибуху",
   "Show me how": "Покажи мені як",
-  "Show this card": "Покажіть цю картку",
   "Show {effect}": "Показати {effect}",
   "Silence": "Тиша",
   "Smaller files": "Менші файли",
@@ -3361,5 +3357,6 @@
   "{mic} · not sent, sounds only": "{mic} · не надсилається, лише звуки",
   "{mic} · off": "{mic} · вимкнено",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Крок адміністратора Windows не завершився. Якщо його запит ще відкритий, дайте відповідь; потім спробуйте ще раз.",
-  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}",
+  "Languages": "Мови"
 }

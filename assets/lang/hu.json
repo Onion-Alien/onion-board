@@ -1628,7 +1628,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Automatikusan határozza meg, hogy a bemeneti érzékenység</b> be van-e kapcsolva: hívás közben folyamatosan elhallgatja a hangokat, és levágja azokat: kapcsolja ki (Bemeneti érzékenység), és hagyja alacsonyan a csúszkát, vagy használja a Push to Talk funkciót.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Beviteli mód</b> : <b>a Push to Talk</b> működik a legjobban (ezt a billentyűt állítsa be a Beállítások → Gyorsbillentyűk → Automatikus push-to-talk menüpontban, és az Onion Board megtartja azt, miközben hang szól). <b>A Hangtevékenység</b> beállításnál kapcsolja ki <b>a Bemeneti érzékenység automatikus meghatározása kikapcsolt állapotot</b> , és húzza el a csúszkát szinte teljesen balra, különben a Discord folyamatosan kivágja a hangokat, akár a hangosakat is.",
   "<b>Languages</b> · {state}": "<b>Nyelvek</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Válassz egy hangot</b>",
   "A built-in voice (still hides yours)": "Beépített hang (még mindig elrejti a tiédet)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Az effektusok véletlenszerű ostoba keveréke, mint a „Saját mix”: lent világít, hogy mit változtatott. Kattintson újra a másikért.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Egy rövid minta ezen a hangon, csak a fejhallgatón (senki más nem hallja). Az első néhány másodpercet vesz igénybe.",
@@ -1813,7 +1812,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "A hangok online keresése és letöltése ki van kapcsolva a Beállítások > Adatvédelem és biztonság menüpontban.",
   "Finding the newest Onion Watch…": "A legújabb Onion Watch keresése…",
   "Finding the newest…": "A legújabb megtalálása…",
-  "Fold this card away": "Hajtsa félre ezt a kártyát",
   "Fold {effect} away": "Hajtsa félre a következőt: {effect}",
   "Follow my pitch": "Kövesd a pályámat",
   "Forget {name}": "Felejtsd el {name}",
@@ -1949,7 +1947,6 @@
   "Nothing was recorded: it didn't make a sound.": "Semmit nem rögzítettek: nem adott hangot.",
   "Nothing yet. Lines show up here as they're spoken.": "Még semmi. A sorok itt jelennek meg, ahogy kimondják őket.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Nincs hova küldeni: a Beállítás lapon válassza ki a hangok helyét.",
-  "ON: everyone hears it": "BE: mindenki hallja",
   "Off (no shaping)": "Ki (nincs formázás)",
   "Off (send as is)": "Ki (elküldés úgy, ahogy van)",
   "Old telephone": "Régi telefon",
@@ -2065,7 +2062,6 @@
   "Shout and your voice blows out like a megaphone.": "Kiálts, és a hangod úgy csap ki, mint egy megafon.",
   "Shout blowout": "Kiabálás",
   "Show me how": "Mutasd meg, hogyan",
-  "Show this card": "Mutasd meg ezt a kártyát",
   "Show {effect}": "{effect} megjelenítése",
   "Silence": "Csend",
   "Smaller files": "Kisebb fájlok",
@@ -3288,5 +3284,6 @@
   "{mic} · not sent, sounds only": "{mic} · nem küldi, csak hangok",
   "{mic} · off": "{mic} · kikapcsolva",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "A Windows rendszergazdai lépése nem fejeződött be. Ha a kérdése még nyitva van, válaszolj rá; aztán próbáld újra.",
-  "{title}  ·  quiet on {devices}": "{title} · csendes ezen: {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · csendes ezen: {devices}",
+  "Languages": "Nyelvek"
 }

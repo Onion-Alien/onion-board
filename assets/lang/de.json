@@ -1633,7 +1633,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Stellen Sie automatisch fest, dass die Eingangsempfindlichkeit</b> aktiviert ist: Während eines Anrufs werden Ihre Töne weiterhin als Stille interpretiert und unterdrückt: Schalten Sie sie aus (Eingangsempfindlichkeit) und lassen Sie den Schieberegler niedrig oder verwenden Sie Push-to-Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Eingabemodus</b> : <b>Push-to-Talk</b> funktioniert am besten (stellen Sie die gleiche Taste unter Einstellungen → Hotkeys → Auto-Push-to-Talk ein und Onion Board hält sie für Sie bereit, während ein Ton abgespielt wird). Deaktivieren Sie unter <b>„Sprachaktivität“</b> <b>die Option „Eingangsempfindlichkeit automatisch ermitteln“</b> und ziehen Sie den Schieberegler fast ganz nach links. Andernfalls unterdrückt Discord weiterhin Ihre Töne, auch die lauten.",
   "<b>Languages</b> · {state}": "<b>Sprachen</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Wählen Sie eine Stimme</b>",
   "A built-in voice (still hides yours)": "Eine eingebaute Stimme (versteckt immer noch Ihre)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Eine zufällige, alberne Mischung von Effekten, als „Mein eigener Mix“: Was sich geändert hat, wird unten angezeigt. Klicken Sie erneut für ein weiteres.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Ein kurzes Sample mit dieser Stimme, nur in Ihren Kopfhörern (niemand sonst hört es). Der erste dauert ein paar Sekunden.",
@@ -1817,7 +1816,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Das Online-Suchen und Herunterladen von Sounds ist unter „Einstellungen“ > „Datenschutz und Sicherheit“ deaktiviert.",
   "Finding the newest Onion Watch…": "Suche nach der neuesten Onion Watch…",
   "Finding the newest…": "Das Neueste finden…",
-  "Fold this card away": "Falten Sie diese Karte weg",
   "Fold {effect} away": "{effect} wegklappen",
   "Follow my pitch": "Folgen Sie meinem Pitch",
   "Forget {name}": "{name} vergessen",
@@ -1952,7 +1950,6 @@
   "Nothing was recorded: it didn't make a sound.": "Es wurde nichts aufgezeichnet: Es gab keinen Ton.",
   "Nothing yet. Lines show up here as they're spoken.": "Noch nichts. Zeilen werden hier angezeigt, während sie gesprochen werden.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Nirgendwo zum Senden: Wählen Sie auf der Registerkarte „Setup“ aus, wohin Ihre Sounds gesendet werden sollen.",
-  "ON: everyone hears it": "ON: jeder hört es",
   "Off (no shaping)": "Aus (keine Formgebung)",
   "Off (send as is)": "Aus (so wie es ist senden)",
   "Old telephone": "Altes Telefon",
@@ -2068,7 +2065,6 @@
   "Shout and your voice blows out like a megaphone.": "Wenn du schreist, ertönt deine Stimme wie ein Megaphon.",
   "Shout blowout": "Schrei, Blowout",
   "Show me how": "Zeig mir wie",
-  "Show this card": "Zeigen Sie diese Karte",
   "Show {effect}": "{effect} anzeigen",
   "Silence": "Schweigen",
   "Smaller files": "Kleinere Dateien",
@@ -3288,5 +3284,6 @@
   "{mic} · not sent, sounds only": "{mic} · nicht gesendet, nur Sounds",
   "{mic} · off": "{mic} · aus",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Der Windows-Administratorschritt wurde nicht beendet. Wenn seine Aufforderung noch offen ist, beantworte sie; dann versuch es noch einmal.",
-  "{title}  ·  quiet on {devices}": "{title} · still auf {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · still auf {devices}",
+  "Languages": "Sprachen"
 }

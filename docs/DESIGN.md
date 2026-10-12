@@ -116,6 +116,7 @@ kinds below.
 | Small | `b.setObjectName("small")` | an action inside a dense row (a list item, a chip); never a card's main action |
 | Icon | `b.setObjectName("iconbutton")`, `quiet`, `icons.set_icon(b, "name")`, `setToolTip` + `setAccessibleName` | any action a picture says (section 4) |
 | Toggle | `b.setCheckable(True)` (fills with the accent when on) | a feature's on/off (`#power`); a mode in an exclusive `QButtonGroup` |
+| Page tab | `#voicetab`: checkable, icon + name, in a `Flow`, an exclusive `QButtonGroup` (semi-bold always, so picking one never changes its width; `live` property: that page is on) | a tab's own pages, one card shown at a time (the Voice tab) |
 
 Sizes (the theme gives them; don't override):
 

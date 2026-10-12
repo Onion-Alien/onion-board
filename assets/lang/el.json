@@ -1628,7 +1628,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Προσδιορίστε αυτόματα ότι η ευαισθησία εισόδου</b> είναι ενεργοποιημένη: σε μια κλήση συνεχίζει να λαμβάνει τους ήχους σας για σιωπή και να τους κόβει: απενεργοποιήστε το (Ευαισθησία εισόδου) και αφήστε το ρυθμιστικό χαμηλά ή χρησιμοποιήστε το Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Λειτουργία εισαγωγής</b> : <b>Το Push to Talk</b> λειτουργεί καλύτερα (ρυθμίστε το ίδιο πλήκτρο στις Ρυθμίσεις → Πλήκτρα συντόμευσης → Αυτόματο push-to-talk και το Onion Board το κρατά για εσάς ενώ αναπαράγεται ένας ήχος). Στη <b>Δραστηριότητα φωνής</b> , απενεργοποιήστε <b>τον Αυτόματο προσδιορισμό της ευαισθησίας εισόδου</b> και σύρετε το ρυθμιστικό σχεδόν μέχρι τέρμα αριστερά, διαφορετικά το Discord συνεχίζει να κόβει τους ήχους σας, καθώς και τους δυνατούς.",
   "<b>Languages</b> · {state}": "<b>Γλώσσες</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Διάλεξε μια φωνή</b>",
   "A built-in voice (still hides yours)": "Μια ενσωματωμένη φωνή (ακόμα κρύβει τη δική σας)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Ένας τυχαίος ανόητος συνδυασμός εφέ, ως \"My own mix\": αυτό που άλλαξε φωτίζεται παρακάτω. Κάντε κλικ ξανά για άλλο.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Ένα σύντομο δείγμα σε αυτή τη φωνή, μόνο στα ακουστικά σας (κανείς άλλος δεν το ακούει). Το πρώτο διαρκεί λίγα δευτερόλεπτα.",
@@ -1813,7 +1812,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Η εύρεση και η λήψη ήχων στο διαδίκτυο είναι απενεργοποιημένη στις Ρυθμίσεις > Απόρρητο και ασφάλεια.",
   "Finding the newest Onion Watch…": "Εύρεση του νεότερου Onion Watch…",
   "Finding the newest…": "Εύρεση του νεότερου…",
-  "Fold this card away": "Διπλώστε αυτή την κάρτα μακριά",
   "Fold {effect} away": "Διπλώστε το {effect} μακριά",
   "Follow my pitch": "Ακολουθήστε τον αγωνιστικό χώρο μου",
   "Forget {name}": "Ξεχάστε {name}",
@@ -1949,7 +1947,6 @@
   "Nothing was recorded: it didn't make a sound.": "Τίποτα δεν ηχογραφήθηκε: δεν έβγαζε ήχο.",
   "Nothing yet. Lines show up here as they're spoken.": "Τίποτα ακόμα. Οι γραμμές εμφανίζονται εδώ καθώς εκφωνούνται.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Πουθενά να το στείλετε: επιλέξτε πού πηγαίνουν οι ήχοι σας στην καρτέλα Ρύθμιση.",
-  "ON: everyone hears it": "ON: το ακούνε όλοι",
   "Off (no shaping)": "Απενεργοποίηση (χωρίς διαμόρφωση)",
   "Off (send as is)": "Απενεργοποίηση (αποστολή ως έχει)",
   "Old telephone": "Παλιό τηλέφωνο",
@@ -2065,7 +2062,6 @@
   "Shout and your voice blows out like a megaphone.": "Φώναξε και η φωνή σου φυσάει σαν μεγάφωνο.",
   "Shout blowout": "Κραυγή έκρηξη",
   "Show me how": "Δείξε μου πώς",
-  "Show this card": "Δείξτε αυτήν την κάρτα",
   "Show {effect}": "Εμφάνιση {effect}",
   "Silence": "Σιωπή",
   "Smaller files": "Μικρότερα αρχεία",
@@ -3288,5 +3284,6 @@
   "{mic} · not sent, sounds only": "{mic} · δεν στέλνεται, μόνο ήχοι",
   "{mic} · off": "{mic} · κλειστό",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Το βήμα διαχειριστή των Windows δεν ολοκληρώθηκε. Αν το παράθυρό του είναι ακόμα ανοιχτό, απάντησέ το· μετά δοκίμασε ξανά.",
-  "{title}  ·  quiet on {devices}": "{title} · σιωπηλό σε {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · σιωπηλό σε {devices}",
+  "Languages": "Γλώσσες"
 }

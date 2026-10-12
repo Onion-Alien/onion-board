@@ -1590,7 +1590,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Tự động xác định độ nhạy đầu vào</b> được bật: trong cuộc gọi, nó sẽ giữ âm thanh của bạn ở chế độ im lặng và cắt chúng đi: tắt nó (Độ nhạy đầu vào) và để thanh trượt ở mức thấp hoặc sử dụng Nhấn để nói.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Chế độ đầu vào</b> : <b>Nhấn để nói</b> hoạt động tốt nhất (đặt cùng một phím trong Cài đặt → Phím nóng → Tự động nhấn để nói và Onion Board giữ phím đó cho bạn trong khi âm thanh phát). Trên <b>Hoạt động giọng nói</b> , hãy tắt <b>Tự động xác định độ nhạy đầu vào</b> và kéo thanh trượt gần hết sang trái hoặc Discord tiếp tục cắt âm thanh của bạn, cả những âm thanh lớn.",
   "<b>Languages</b> · {state}": "<b>Ngôn ngữ</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Chọn một giọng nói</b>",
   "A built-in voice (still hides yours)": "Giọng nói tích hợp (vẫn ẩn giọng nói của bạn)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Một sự kết hợp ngẫu nhiên ngớ ngẩn của các hiệu ứng, chẳng hạn như “Sự kết hợp của riêng tôi”: những gì nó thay đổi sẽ sáng lên bên dưới. Bấm lại để xem cái khác.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Một mẫu ngắn bằng giọng nói này, chỉ trong tai nghe của bạn (không ai khác nghe thấy). Cái đầu tiên mất vài giây.",
@@ -1773,7 +1772,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Việc tìm và tải xuống âm thanh trực tuyến bị tắt trong Cài đặt > Quyền riêng tư & bảo mật.",
   "Finding the newest Onion Watch…": "Đang tìm Đồng hồ hành tây mới nhất…",
   "Finding the newest…": "Đang tìm cái mới nhất…",
-  "Fold this card away": "Gấp tấm thẻ này lại",
   "Fold {effect} away": "Gấp {effect} đi",
   "Follow my pitch": "Theo dõi quảng cáo chiêu hàng của tôi",
   "Forget {name}": "Quên {name}",
@@ -1907,7 +1905,6 @@
   "Nothing was recorded: it didn't make a sound.": "Không có gì được ghi lại: nó không tạo ra âm thanh.",
   "Nothing yet. Lines show up here as they're spoken.": "Chưa có gì. Các dòng hiển thị ở đây khi chúng được nói.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Không nơi nào để gửi nó: chọn nơi âm thanh của bạn xuất hiện trên tab Cài đặt.",
-  "ON: everyone hears it": "BẬT - mọi người đều nghe thấy nó",
   "Off (no shaping)": "Tắt (không định hình)",
   "Off (send as is)": "Tắt (gửi nguyên trạng)",
   "Old telephone": "Điện thoại cũ",
@@ -2021,7 +2018,6 @@
   "Shout and your voice blows out like a megaphone.": "Hét lên và giọng nói của bạn phát ra như một cái loa.",
   "Shout blowout": "Hét lên",
   "Show me how": "Chỉ cho tôi cách",
-  "Show this card": "Hiển thị thẻ này",
   "Show {effect}": "Hiển thị {effect}",
   "Silence": "Im lặng",
   "Smaller files": "Tệp nhỏ hơn",
@@ -3215,5 +3211,6 @@
   "{mic} · not sent, sounds only": "{mic} · không gửi, chỉ âm thanh",
   "{mic} · off": "{mic} · tắt",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Bước quản trị của Windows chưa hoàn tất. Nếu lời nhắc của nó vẫn còn mở, hãy trả lời; rồi thử lại.",
-  "{title}  ·  quiet on {devices}": "{title} · đang im lặng trên {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · đang im lặng trên {devices}",
+  "Languages": "Ngôn ngữ"
 }

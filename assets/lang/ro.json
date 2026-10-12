@@ -1671,7 +1671,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Determinați automat că sensibilitatea de intrare</b> este activată: într-un apel, vă preia în continuare sunetele pentru tăcere și le întrerupe: dezactivați-o (Sensibilitate de intrare) și lăsați glisorul scăzut sau utilizați Apăsați pentru a vorbi.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Modul de introducere</b> : <b>Push to Talk</b> funcționează cel mai bine (setați aceeași tastă în Setări → Taste rapide → Apăsare și vorbire automată și Onion Board o ține pentru tine în timp ce se aude un sunet). În <b>Activitate vocală</b> , dezactivează <b>Determinarea automată a sensibilității de intrare</b> și trage glisorul aproape până la stânga, sau Discord continuă să-ți taie sunetele, de asemenea, cele puternice.",
   "<b>Languages</b> · {state}": "<b>Limbi</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Alege o voce</b>",
   "A built-in voice (still hides yours)": "O voce încorporată (încă o ascunde pe a ta)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Un amestec prostesc aleatoriu de efecte, cum ar fi „My own mix”: ceea ce a schimbat se aprinde mai jos. Faceți clic din nou pentru altul.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "O scurtă mostră în această voce, doar în căști (nimeni altcineva nu o aude). Prima durează câteva secunde.",
@@ -1857,7 +1856,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Găsirea și descărcarea de sunete online este dezactivată în Setări > Confidențialitate și securitate.",
   "Finding the newest Onion Watch…": "Găsesc cel mai nou ceas Onion...",
   "Finding the newest…": "Găsirea celui mai nou...",
-  "Fold this card away": "Îndoiți acest card",
   "Fold {effect} away": "Îndoiți {effect}",
   "Follow my pitch": "Urmează-mi propunerea",
   "Forget {name}": "Uită de {name}",
@@ -1994,7 +1992,6 @@
   "Nothing was recorded: it didn't make a sound.": "Nu s-a înregistrat nimic: nu a scos niciun sunet.",
   "Nothing yet. Lines show up here as they're spoken.": "Nimic încă. Rândurile apar aici pe măsură ce sunt rostite.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Nicăieri să-l trimiteți: alegeți unde merg sunetele dvs. din fila Configurare.",
-  "ON: everyone hears it": "ON: toată lumea o aude",
   "Off (no shaping)": "Dezactivat (fără modelare)",
   "Off (send as is)": "Dezactivat (trimite așa cum este)",
   "Old telephone": "Telefon vechi",
@@ -2112,7 +2109,6 @@
   "Shout and your voice blows out like a megaphone.": "Strigă și vocea ta suflă ca un megafon.",
   "Shout blowout": "Strigă explozie",
   "Show me how": "Arată-mi cum",
-  "Show this card": "Arată acest card",
   "Show {effect}": "Arată {effect}",
   "Silence": "Tăcere",
   "Smaller files": "Fișiere mai mici",
@@ -3361,5 +3357,6 @@
   "{mic} · not sent, sounds only": "{mic} · nu se trimite, doar sunete",
   "{mic} · off": "{mic} · oprit",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Pasul de administrator din Windows nu s-a terminat. Dacă fereastra lui e încă deschisă, răspunde-i; apoi încearcă din nou.",
-  "{title}  ·  quiet on {devices}": "{title} · liniște pe {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · liniște pe {devices}",
+  "Languages": "Limbi"
 }
