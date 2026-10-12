@@ -154,9 +154,6 @@ def test_theme_change_refreshes_the_shell_icon(qapp, win, monkeypatch):
     try:
         assert calls == [(win, theme.THEMES["Mint"]["accent"],
                           theme.THEMES["Mint"]["accent2"])]
-        # the playing glow swaps the window icon often: that never rewrites files
-        win._glow_icons(1.0, 1e9, force=True)
-        assert len(calls) == 1
     finally:
         win.apply_theme("Dark")
 

@@ -48,12 +48,13 @@ def test_glow_icon_is_the_plain_icon_at_rest_and_glows_warm_with_sound(qapp):
 from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixture)
 
 
-def test_main_window_icon_glows_while_the_radio_plays(window):  # noqa: F811
-    window.show()   # a hidden window's icon stays plain (nobody sees it)
-    plain = window.windowIcon().cacheKey()
-    window.engine.level_play = 0.9
-    window._glow_icons(window.engine.level_play, 1e9)
-    # the window's own icon (the taskbar's): the app-wide one isn't swapped per step
-    assert window._icon_step == 4 and window.windowIcon().cacheKey() != plain
-    window._glow_icons(0.0, 2e9)
-    assert window._icon_step == 0
+def test_taskbar_and_tray_icons_stay_still_while_sound_plays(window, monkeypatch):  # noqa: F811
+    """Only the header logo glows: swapping the window / tray icon made Windows redraw
+    the taskbar button, which kept dropping and redrawing the onion's layers."""
+    window.show()
+    swaps = []
+    monkeypatch.setattr(window, "setWindowIcon", lambda ic: swaps.append(ic))
+    for _ in range(5):
+        window.engine.level_play = 0.9
+        window.tick()
+    assert not swaps
