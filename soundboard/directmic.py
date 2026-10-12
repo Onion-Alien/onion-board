@@ -1934,13 +1934,16 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
         _helper_check("after a step")
 
 
-def _helper_check(via: str = "check"):
-    """michelper.ready() again, so michelper.will_ask() is current (on a worker)."""
+def _helper_check(via: str = "check") -> bool:
+    """michelper.ready() again, so michelper.will_ask() is current (on a worker).
+    False if the check itself failed."""
     from soundboard import michelper
     try:
         michelper.ready(via=via)
+        return True
     except Exception:  # noqa: BLE001 - only the texts' "click Yes" depends on it
         log.warning("couldn't check the mic helper", exc_info=True)
+        return False
 
 
 def _via_helper(args: list[str], wait_s: float) -> int | None:
