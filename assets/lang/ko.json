@@ -672,7 +672,6 @@
   "Add-on downloads": "추가 기능 다운로드",
   "Add-on downloads are off (Privacy)": "부가기능 다운로드가 꺼져 있습니다(개인정보 보호).",
   "Add-ons": "부가기능",
-  "Add-ons && help": "추가 기능 및 도움말",
   "Advanced: {label}": "고급: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "시작된 후에는 이 기간 동안 프레스가 무시되므로 누구도 스팸을 보낼 수 없습니다.",
   "All hotkeys off / on": "모든 단축키 끄기/켜기",
@@ -839,7 +838,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "내보내기는 모든 사운드(그림, 효과, 단축키 및 카테고리 포함)와 설정을 하나의 .zip으로 저장하여 안전하게 보관하거나 다른 PC로 가져옵니다. 친구의 사운드 팩을 가져오면 해당 사운드가 추가됩니다. 이미 가지고 있는 항목은 건너뜁니다.",
   "Export sounds": "사운드 내보내기",
   "Fades": "페이드",
-  "Feedback and problems": "피드백 및 문제",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "지금 업데이트 또는 다운로더 재설정(업데이트 페이지)을 누르면 PyPI에서 최신 yt-dlp를 가져오거나 자동으로 업데이트를 선택한 경우 자체적으로 가져옵니다.",
   "Fetching the parts (downloading)": "부품 가져오기(다운로드)",
   "Finish  ✓": "마침 ✓",
@@ -860,7 +858,6 @@
   "Found <b>{n}</b> sound in {name}.": [
     "{name} 에서 <b>{n}</b> 개의 소리를 찾았습니다."
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord에서는 수다를 떨고, 도움을 청하고, 새 버전 소식을 들을 수 있어요. 버그를 찾았거나 뭔가 아쉬운가요? 모든 건 브라우저에서 열리고, 거기서 직접 보내기 전엔 아무것도 전송되지 않아요.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub의 무료 추가 기능. 제거하거나 다시 설치하면 트리거와 페어링된 휴대폰이 유지됩니다.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "무료이며 광고도 없고 계정도 없습니다. OnionAlien이 제작했습니다. Commons 조항이 포함된 MIT 라이선스: 무엇이든 사용하고, 무료로 공유하고, 절대 판매하지 마세요.",
   "Frequencies": "주파수",
@@ -1133,7 +1130,6 @@
   "Removed “{name}”: Who's listening is Off now": "\"{name}\" 제거됨: 지금 듣고 있는 사람이 꺼져 있습니다.",
   "Replay {time}": "{time} 다시 재생",
   "Report a problem": "문제 신고",
-  "Report a problem on GitHub": "GitHub에 문제 신고",
   "Report a security issue": "보안 문제 신고",
   "Reset and restart": "재설정하고 다시 시작하세요",
   "Reset downloader": "다운로더 재설정",
