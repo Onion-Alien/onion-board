@@ -3336,15 +3336,17 @@ class SettingsDialog(QDialog):
             self.mw.check_updates(why="You turned on update checks")
 
     def _updates_check(self):
+        if busy.is_busy(self.upd_btn) or not self.upd_btn.isEnabled():
+            return
         self._upd_asked = True
-        self.upd_btn.setEnabled(False)
+        busy.set_busy(self.upd_btn, True)
         self.upd_label.setText(_("Checking…"))
         self.mw.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
 
     def _updates_done(self, rel, err: str):
         if not qt_valid(self.upd_label):
             return
-        self.upd_btn.setEnabled(True)
+        busy.set_busy(self.upd_btn, False)
         self._net_sync()
         asked, self._upd_asked = getattr(self, "_upd_asked", False), False
         if err:
@@ -3827,11 +3829,13 @@ class SettingsDialog(QDialog):
         self.ytdlp_label.setText(f"{msg} {now}".strip())
 
     def _ytdlp_run(self, job, button: str = ""):
+        if any(busy.is_busy(b) or not b.isEnabled() for b in self.ytdlp_btns):
+            return
         from soundboard import netlog
         netlog.cause(ytdl.UPDATE_FEATURE, f"You clicked {button} (Settings > Updates)"
                      if button else "You asked to update the downloader")
         for b in self.ytdlp_btns:
-            b.setEnabled(False)
+            busy.set_busy(b, True)
         self.ytdlp_label.setText(_("Working…"))
         relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
 
@@ -3839,7 +3843,7 @@ class SettingsDialog(QDialog):
             relay.deleteLater()
             if qt_valid(self.ytdlp_label):
                 for b in self.ytdlp_btns:
-                    b.setEnabled(True)
+                    busy.set_busy(b, False)
                 self._net_sync()
                 self._ytdlp_show(msg)
 

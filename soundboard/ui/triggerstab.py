@@ -442,8 +442,8 @@ class TriggersTab(QWidget):
         self._busy, self._cancel = True, False
         update = self.panel is not None
         offer = self.offer
-        self.btn_get.setEnabled(False)
-        self.btn_update.setEnabled(False)
+        busy.set_busy(self.btn_get, True)
+        busy.set_busy(self.btn_update, True)
         self.btn_cancel.show()
         self.error.hide()
         netlog.cause(watchaddon.FEATURE, "You clicked to get Onion Watch (Triggers tab)")
@@ -516,8 +516,8 @@ class TriggersTab(QWidget):
         self._busy = False
         self.working.stop()
         self.working.hide()
-        self.btn_get.setEnabled(True)
-        self.btn_update.setEnabled(True)
+        busy.set_busy(self.btn_get, False)
+        busy.set_busy(self.btn_update, False)
         self.btn_update.setText(_("Update"))
         self._label_get()                   # the get button's own words (and switch) again
         self.btn_cancel.hide()
