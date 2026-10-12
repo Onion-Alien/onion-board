@@ -1252,6 +1252,26 @@ def test_drop_target_keeps_the_full_board_width(window, qapp):
     assert rect.width() == window.grid.width() - margins.left() - margins.right() - 4
 
 
+def test_toolbar_tabs_and_pads_share_their_edges(window, qapp):
+    """The toolbar, the first category tab and the first pad start on one line, and
+    the toolbar ends where a full row of pads does (the pads widen to fill the row)."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    g = window.grid
+    m = g.grid.contentsMargins()
+    for w in (1700, 1275, 1003, 777):
+        window.resize(w, 760)
+        QTest.qWait(80)
+        x = lambda wid, px=0: wid.mapTo(window, QPoint(px, 0)).x()
+        bar, tabs = window.sounds_toolbar, window.cat_tabs
+        assert x(bar) == x(tabs, tabs.tabRect(0).x()) == x(g.pads[0]), w
+        cols, pw = g._shape
+        row_end = x(g) + m.left() + cols * pw + g.grid.horizontalSpacing() * (cols - 1)
+        assert x(bar) + bar.width() == row_end, w
+        assert 0 <= g.slack() < cols, w
+
+
 def test_full_screen_caps_only_the_search_box(window, qapp):
     """At 1920x1080 the search box stops at SEARCH_MAX_W (the library tools stay at
     the right); the seek bar and the drop box still follow the window (U11)."""

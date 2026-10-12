@@ -1141,6 +1141,7 @@ class PadGrid(QWidget):
     reorder = Signal(str, int)   # sound id, new index
     files_dropped = Signal(list)
     image_dropped = Signal(str, str)   # sound id, picture file dropped on its pad
+    laid_out = Signal()   # after each relayout: slack() may have changed
     HOW_TO = DROP_HINT = _("Drop sound files here")
     NO_MATCH = _("No sounds match the search\nor this category")
     DROP_HINT_HEIGHT = 110
@@ -1188,6 +1189,7 @@ class PadGrid(QWidget):
         self._cols = 0
         self._n_shown = 0        # pads in the grid now (drop_area)
         self._shape = None       # (columns, pad width) last laid out
+        self._slack = 0          # pixels right of a full row (slack())
         self._placed = None      # (columns, the pads shown) in the grid now
         self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
 
@@ -1282,6 +1284,10 @@ class PadGrid(QWidget):
             cols += 1
         return cols, max(1, (room - sp * (cols - 1)) // cols)
 
+    def slack(self) -> int:
+        """Pixels left over right of a full row (the width rarely splits evenly)."""
+        return self._slack if self.pads else 0
+
     def row_height(self) -> int:
         """One row of pads as they're laid out now, margins included (0 with none)."""
         m = self.grid.contentsMargins()
@@ -1291,7 +1297,10 @@ class PadGrid(QWidget):
 
     def relayout(self, force=False):
         m = self.grid.contentsMargins()
-        cols, w = self.fit_width(self.width() - m.left() - m.right())
+        room = self.width() - m.left() - m.right()
+        cols, w = self.fit_width(room)
+        self._slack = max(0, room - cols * w - self.grid.horizontalSpacing() * (cols - 1))
+        self.laid_out.emit()
         if (cols, w) == self._shape and not force:
             return
         self._shape = (cols, w)
