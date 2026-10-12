@@ -3307,5 +3307,6 @@
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "A trazer os teus sons dos teus outros soundboards: {done} de {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "A trazer os teus sons do {name}: {done} de {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Está instalado, mas agora os teus sons vão para o teu microfone. Usa-o se um jogo ignorar o teu microfone, ou remove-o se mais nada precisar dele.",
-  "⚠ Another sound already has this name.": "⚠ Outro som já tem este nome."
+  "⚠ Another sound already has this name.": "⚠ Outro som já tem este nome.",
+  "Don't show this again": "Não mostrar novamente"
 }

@@ -220,3 +220,32 @@ def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monk
     window.cfg.route, works[0] = "cable", False      # the cable: it mutes there too
     window._warn_mute_does_nothing(False)
     assert len(shown) == 1
+
+
+def test_mute_warning_can_be_turned_off_for_good(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QMessageBox
+
+    from soundboard.ui import mainwindow as main
+    shown = []
+
+    def answer(box):
+        shown.append(box.text())
+        box.checkBox().setChecked(True)              # Don't show this again
+    monkeypatch.setattr(QMessageBox, "exec", answer)
+    monkeypatch.setattr(main.directmic, "works", lambda _s: False)
+    window.cfg.route = "mic"
+    window._warn_mute_does_nothing(False)
+    assert len(shown) == 1 and window.cfg.mute_warning_off
+    window._warn_mute_does_nothing(False)            # the next untick says nothing
+    assert len(shown) == 1
+
+
+def test_mini_mic_shows_its_state_with_an_icon(window):  # noqa: F811
+    window.cfg.mic_enabled = False
+    window._sync_mini_mic()
+    off = window.mini_mic.icon().cacheKey()
+    assert window.mini_mic.text() == "Mic muted" and window.mini_mic.accessibleName() == "My mic"
+    window.cfg.mic_enabled = True
+    window._sync_mini_mic()
+    assert window.mini_mic.text() == "Mic on" and window.mini_mic.isChecked()
+    assert window.mini_mic.icon().cacheKey() != off   # a struck-through mic only when muted

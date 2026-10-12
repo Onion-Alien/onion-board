@@ -339,6 +339,7 @@ class Config:
     # moved to it once (from_raw); after that a route picked by hand stays as picked
     mic_first: bool = False
     cable_tip_done: bool = False   # told once that a voice app is still on the cable
+    mute_warning_off: bool = False   # "This won't mute you yet": Don't show this again
     main_device: str | None = None
     mon_device: str | None = None
     # the headphones are Windows' default output, and move with it when it changes

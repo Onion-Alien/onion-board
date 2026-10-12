@@ -1396,8 +1396,12 @@ class MainWindow(QMainWindow):
         with QSignalBlocker(self.mini_mic), QSignalBlocker(self.chk_mic):
             self.mini_mic.setChecked(on)
             self.chk_mic.setChecked(on)
+        # the state in words and a struck-through mic when muted (as voice apps show it),
+        # so "Mic on" reads as how it is, not as what a click does
         self.mini_mic.setText(_("Mic on") if on else _("Mic muted"))
-        self.mini_mic.setAccessibleName(self.mini_mic.text())
+        icons.set_icon(self.mini_mic, "mic" if on else "mic_off", None, "on_accent", size=16)
+        self.mini_mic.setAccessibleName(_("My mic"))   # a toggle: "checked" says the state
+        self.mini_mic.setAccessibleDescription(self.mini_mic.text())
 
     def _set_np_name(self, text: str):
         self.np_name.setText(self.np_name.fontMetrics().elidedText(
@@ -3236,7 +3240,7 @@ class MainWindow(QMainWindow):
     def _warn_mute_does_nothing(self, on: bool):
         """Unticked by a click while that's so: say it, and offer the one-click set-up.
         Not on the hotkey: no pop-up mid-game."""
-        if on or not self._mute_does_nothing():
+        if on or self.cfg.mute_warning_off or not self._mute_does_nothing():
             return
         box = QMessageBox(QMessageBox.Icon.Information, _("This won't mute you yet"),
                           _("Hey! This does nothing yet, because Onion Board isn't set "
@@ -3249,9 +3253,13 @@ class MainWindow(QMainWindow):
         ok = box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
         box.setDefaultButton(setup)
         box.setEscapeButton(ok)
+        # someone who plays on the cable on purpose met this on every untick
+        box.setCheckBox(QCheckBox(_("Don't show this again"), box))   # box owns it
         usage.used("mute-warning-shown")
         box.exec()
         chosen = box.clickedButton() is setup
+        if box.checkBox().isChecked():
+            self.set_option("mute_warning_off", True)
         free_dialog(box)
         if chosen:
             usage.used("mute-warning-setup")

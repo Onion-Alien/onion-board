@@ -3307,5 +3307,6 @@
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Hämtar dina ljud från dina andra soundboards: {done} av {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Hämtar dina ljud från {name}: {done} av {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Den är installerad, men dina ljud går in i din mikrofon nu. Använd den om ett spel hoppar över din mikrofon, eller ta bort den om inget annat behöver den.",
-  "⚠ Another sound already has this name.": "⚠ Ett annat ljud har redan det här namnet."
+  "⚠ Another sound already has this name.": "⚠ Ett annat ljud har redan det här namnet.",
+  "Don't show this again": "Visa inte igen"
 }
