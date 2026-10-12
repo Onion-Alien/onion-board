@@ -19,7 +19,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/categories              ["Memes", ...]
     /api/play?id=… or ?name=…    play a pad (name: exact, any case)
     /api/stop?id=… or ?name=…    stop one sound;  /api/stop alone stops everything
-    /api/pause                   pause everything / resume
+    /api/pause[?on=1|0|toggle]   pause everything / resume (no on=: toggle)
     /api/random[?category=…]     a random sound (default: the category showing;
                                  category= with nothing after it: any sound)
     /api/last                    play the last sound again
@@ -139,7 +139,7 @@ ENDPOINTS = {
     "categories": "the category names",
     "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
     "stop": "stop one sound (?name= or ?id=); with neither, stop everything",
-    "pause": "pause everything, or resume if it's all paused",
+    "pause": "pause everything (?on=1), resume it (?on=0), or flip (?on=toggle or nothing)",
     "random": "a random sound from ?category=… (default: the one showing; "
               "category= blank: any sound)",
     "last": "play the last sound again",
@@ -668,7 +668,11 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     if action == "categories":
         return 200, list(cfg.categories)
     if action == "pause":
-        return 200, {"paused": mw.engine.pause_all()}
+        paused = bool(playing) and all(p for _, p in playing.values())
+        on = on_value(params, paused)
+        if on is None:
+            return 400, BAD_ON
+        return 200, {"paused": mw.engine.pause_all(on)}
     if action == "random":
         cat = params.get("category")
         if cat:
