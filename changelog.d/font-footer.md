@@ -1,0 +1,1 @@
+- Bottom-strip icons follow the capital height of each theme's font.
