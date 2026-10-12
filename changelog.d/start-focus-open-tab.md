@@ -1,1 +1,0 @@
-- The app opens with the focus on the page you left it on, not on the Sounds button in the side menu: a tab other than Sounds no longer opens with Sounds outlined as if it were picked too.
