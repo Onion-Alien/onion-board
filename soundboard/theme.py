@@ -197,6 +197,14 @@ THEMES: dict[str, dict[str, str]] = {
         off="#5e416b", badge="#40274d", badge_text="#ecdcf2",
         **_DARK_STATUS | dict(error_text="#ff6b6b"),
     ),
+    "Lilac": dict(   # Dark's calm greys with a touch of purple, logo pink as the second colour
+        bg="#16121c", panel="#1d1826", card="#251e31", card_hi="#2e263c",
+        btn="#2a2336", btn_hover="#342b43", btn_press="#3e3450",
+        border="#3a3049", border_hi="#5e5079", groove="#352c44", inset="#19141f",
+        text="#ebe5f4", text_hi="#f7f2ff", muted="#9b90b0", faint="#75698b", section="#a598c4",
+        accent="#8f4cf5", accent_hi="#a066ff", accent2="#ff5fa2", on_accent="#ffffff",
+        off="#4d4262", badge="#352c44", badge_text="#e2d9f0", **_DARK_STATUS,
+    ),
     "Mint": dict(   # fresh mint and white
         bg="#e8f5ef", panel="#f7fcfa", card="#ffffff", card_hi="#eef8f3",
         btn="#dcefe6", btn_hover="#cfe7db", btn_press="#bfdecf",
@@ -511,7 +519,7 @@ GROUPS: list[tuple[str, list[str]]] = [
     ("Classic", ["Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
                  "High Contrast"]),
     ("Colourful", ["Ocean", "Toxic", "Vampire", "Forest", "Mocha", "Sunset", "Royal", "Onion",
-                   "Mint", "Cherry Blossom"]),
+                   "Lilac", "Mint", "Cherry Blossom"]),
     ("Wild", ["Synthwave", "Vaporwave", "Blood Moon", "Lava", "Amber Terminal", "Hacker"]),
     ("Meme", ["Flashbang", "Barbie", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
               "Brainrot"]),
@@ -525,7 +533,7 @@ def group_name(group: str) -> str:
             "Meme": _("Meme")}.get(group, group)
 
 
-FONT = "Segoe UI"   # a theme can swap it with a `font` token
+FONT = "Bahnschrift"   # ships with Windows 10+; a theme can swap it with a `font` token
 
 
 def font_families() -> list[str]:
