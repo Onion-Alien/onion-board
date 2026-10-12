@@ -7855,6 +7855,8 @@ class MainWindow(QMainWindow):
                    _("There are no sounds on your {name} board.", name=src.name))
             self.toast(html.escape(msg), "warn")
             return
+        for e in ok:   # all in a category named after it too, so they're easy to find
+            e.tags = [src.name, *(t for t in e.tags if t != src.name)]
         if ask:
             keys = sum(1 for e in ok if e.hotkey)
             cats = {t for e in ok for t in e.tags}
