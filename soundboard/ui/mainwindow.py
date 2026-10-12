@@ -1220,6 +1220,7 @@ class MainWindow(QMainWindow):
               "test that records what goes out and plays it back.")))
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
+        self._focus_open_tab()
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
         self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
@@ -4524,6 +4525,16 @@ class MainWindow(QMainWindow):
     def _radio_live(self, on: bool):
         set_tab_live(self.tabs, self.tabs.indexOf(self.radio_page), on,
                      self.radio.live_tip(), "radio")
+
+    def _focus_open_tab(self):
+        """The window's first focus: the open tab's page (Ctrl+V on Sounds works at
+        once). Left to Qt, a window shown with nothing focused focuses its first
+        focusable widget as if Tab were pressed: the Sounds rail button, with its
+        keyboard ring, whatever tab was open, so it looked like a second picked tab."""
+        if (fw := self.focusWidget()) is not None and not self.rail.isAncestorOf(fw):
+            return   # something else has it already
+        if (page := self.tabs.currentWidget()) is not None:
+            page.setFocus(Qt.FocusReason.OtherFocusReason)
 
     def tab_on(self, key: str) -> bool:
         """Whether a tab (taboff.KEYS) is switched on in Settings > Tabs."""
@@ -9507,6 +9518,10 @@ class MainWindow(QMainWindow):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         shellicon.paint_background(self, theme.T["bg"])
         super().showEvent(ev)
+        if not getattr(self, "_start_focus_set", False):
+            # (again here: start-up can still switch the tab after __init__, to Setup)
+            self._start_focus_set = True
+            self._focus_open_tab()
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
