@@ -8,17 +8,17 @@ Or send it to your stream, or keep it to your own headphones.
 
 <!-- release -->
 Version **2.0.2** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/b4b3dd1e34893eec77bf79b540e4135fe61690b4790c02999622e77596217a8f) ·
+[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/200d8ede3c64450721974ead29e7cdd5f3ad660a40ee67df73aad862b1d96598) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
-![Onion Board's sound pads](docs/screenshots/sounds.png?v=b0c32c84)
+![Onion Board's sound pads](docs/screenshots/sounds.png?v=e4854f5a)
 
 | | |
 |---|---|
-| ![Voice changer and text-to-speech](docs/screenshots/voice.png?v=47fabd92) | ![Screen triggers](docs/screenshots/triggers.png?v=0f4d9357) |
+| ![Voice changer and text-to-speech](docs/screenshots/voice.png?v=61f7a762) | ![Screen triggers](docs/screenshots/triggers.png?v=0f4d9357) |
 | **Voice**: change your voice live, or type and a computer voice says it | **Triggers**: a sound the moment "YOU DIED" shows up in your game |
-| ![Send a program's sound](docs/screenshots/apps.png?v=f8abb714) | ![Setup at a glance](docs/screenshots/setup.png?v=544a86e9) |
+| ![Send a program's sound](docs/screenshots/apps.png?v=eff0dd4d) | ![Setup at a glance](docs/screenshots/setup.png?v=9aa967bc) |
 | **Apps**: send one program's sound (music, a video) to your friends | **Setup**: one look tells you whether others can hear you |
 
 ## What it does
