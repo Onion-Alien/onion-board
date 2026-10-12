@@ -2715,7 +2715,9 @@ def test_a_held_old_copy_goes_at_the_next_restart(monkeypatch, tmp_path):
 def _helper(monkeypatch, ready):
     """michelper.ready()'s last answer, as the window's check on a thread left it."""
     from soundboard import michelper
-    monkeypatch.setattr(michelper, "_known", {True: ready, False: ready})
+    state = (michelper.HelperState() if ready is None
+             else michelper.HelperState({True: ready, False: ready}, "test"))
+    monkeypatch.setattr(michelper, "state", state)
 
 
 def _said(w, monkeypatch):
@@ -2791,6 +2793,44 @@ def test_without_the_helper_the_card_asks_for_the_click(window, monkeypatch, rea
         return
     assert "Windows took Onion Board off your mic" in w.mic_line.text()
     assert "<b>Yes</b> when Windows asks" in w.mic_reason.text()
+    assert w.btn_install.text() == "Repair (one click)" and not w.btn_install.isHidden()
+
+
+def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window, monkeypatch):  # noqa: F811
+    """Another account removed the helper while this window sat behind a game: coming
+    back after RECHECK_S checks it again (on a thread), and the card follows the new
+    answer without a restart: "click Yes" is back, and Windows taking the effect off is
+    no longer fixed by itself (that would need a prompt nobody asked for)."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+
+    from conftest import process_events
+    from soundboard import michelper
+    from soundboard.ui import appstate
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _helper(monkeypatch, True)
+    w._update_flow()
+    assert "Windows asks" not in w.mic_reason.text()
+    gone = []   # (the same build as this app's, but its task is gone)
+    monkeypatch.setattr(michelper, "_read_stamp", lambda folder: "8 aaaa")
+    monkeypatch.setattr(michelper, "_build_files", lambda folder: {})
+    monkeypatch.setattr(michelper, "installed", lambda: gone.append(1) or False)
+    monkeypatch.setattr(appstate, "active", lambda: True)
+    threads = _no_threads(monkeypatch, run=True)
+    w._app_state(Qt.ApplicationState.ApplicationActive)
+    assert not gone   # checked a moment ago: nothing to do
+    monkeypatch.setattr(michelper.state, "when", time.monotonic() - michelper.RECHECK_S - 1)
+    w._app_state(Qt.ApplicationState.ApplicationActive)
+    assert process_events(QApplication.instance(), lambda: michelper.known() is False)
+    _qt_run()
+    assert gone and michelper.state.via == "window back"
+    assert "Windows asks once: click <b>Yes</b>" in w.mic_reason.text()
+    _routes(w, monkeypatch, "wiped")
+    w._update_flow()
+    _qt_run()
+    assert not threads.setups()   # no fix by itself
     assert w.btn_install.text() == "Repair (one click)" and not w.btn_install.isHidden()
 
 

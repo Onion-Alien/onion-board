@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 8
+HELPER_VERSION = 9
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -184,38 +184,77 @@ def _version_of(stamp: str | None) -> int:
         return 0
 
 
-def ready(same_dll: bool = True) -> bool:
-    """A helper this app can use: at least MIN_HELPER_VERSION and, for setting up
-    (`same_dll`), carrying the same effect DLL as this app (an older one would put an
-    older effect on the mic). An older helper otherwise is fine: the next admin step
-    that asks anyway updates it. Runs a process: not on the UI thread."""
+def _check() -> dict[bool, bool]:
+    """Is there a helper this app can use, for setting up (True) and for taking the
+    effect off (False)? Both at once, with one look at Task Scheduler."""
     have, mine = _read_stamp(helper_dir()), _read_stamp(bundled_helper())
     ok = _version_of(have) >= MIN_HELPER_VERSION
-    if ok and same_dll:
-        want = _dll_of(mine)
-        ok = want is not None and _dll_of(have) == want
     if ok and have == mine:
         # this app's own build: a file of it gone (a virus scanner) and the task can't
         # start it. Asking Windows now puts it back, rather than a wait for nothing first
         ok = all((helper_dir() / name).is_file() for name in _build_files(bundled_helper()))
-    ok = ok and installed()
-    _known[same_dll] = ok
-    return ok
+    ok = bool(ok and installed())
+    want = _dll_of(mine)
+    return {False: ok, True: ok and want is not None and _dll_of(have) == want}
 
 
-_known: dict[bool, bool] = {}   # ready()'s last answers, for the UI thread
+def ready(same_dll: bool = True, via: str = "ready") -> bool:
+    """A helper this app can use: at least MIN_HELPER_VERSION and, for setting up
+    (`same_dll`), carrying the same effect DLL as this app (an older one would put an
+    older effect on the mic). An older helper otherwise is fine: the next admin step
+    that asks anyway updates it. Both answers go into `state` (`via`: who asked, for
+    the log). Runs a process: not on the UI thread."""
+    answers = _check()
+    state.set(answers, via)
+    return answers[same_dll]
+
+
+RECHECK_S = 600.0   # the window, back in front after this long, checks the helper again
+
+
+class HelperState:
+    """ready()'s last answers, for the UI thread: both of them (setting up, taking off),
+    when they were found (time.monotonic()) and who asked. Another account can remove
+    the helper (or set it up) any time: the window checks again when the answers are
+    older than RECHECK_S, so they never go stale for good."""
+
+    def __init__(self, answers: dict[bool, bool] | None = None, via: str = ""):
+        self.answers: dict[bool, bool] = dict(answers or {})
+        self.when: float | None = time.monotonic() if answers else None
+        self.via = via
+
+    def set(self, answers: dict[bool, bool], via: str):
+        if answers != self.answers:
+            log.info("mic helper: %s (%s)", "usable" if answers.get(False) else "not usable",
+                     via)
+        # (one assignment each: a reader on the UI thread never sees half of it)
+        self.answers, self.when, self.via = dict(answers), time.monotonic(), via
+
+    def forget(self):
+        self.answers, self.when, self.via = {}, None, ""
+
+    def age(self) -> float | None:
+        return None if self.when is None else time.monotonic() - self.when
+
+
+state = HelperState()
 
 
 def known(same_dll: bool = True) -> bool | None:
     """ready()'s last answer (None: not asked yet), for the UI thread."""
-    return _known.get(same_dll)
+    return state.answers.get(same_dll)
+
+
+def checked_ago() -> float | None:
+    """Seconds since ready() last answered (None: never), for the UI thread."""
+    return state.age()
 
 
 def will_ask(setting_up: bool = True) -> bool:
     """Will Windows' admin prompt come up for the next mic step (`setting_up`: putting
     the effect on, else taking it off)? From ready()'s last answer, so the UI thread can
     ask: not known yet counts as yes (the texts then say to click Yes)."""
-    return _known.get(setting_up, _known.get(True) if not setting_up else None) is not True
+    return known(setting_up) is not True
 
 
 def ask(args: list[str], wait_s: float = 300.0) -> int | None:

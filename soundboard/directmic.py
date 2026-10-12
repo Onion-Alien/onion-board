@@ -1920,26 +1920,24 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
     False: the app's own repair, which nobody clicked). Its exit code, or None if the
     prompt was turned down, not allowed, or it didn't finish. The audio stop/start and
     the dependent services can take a while on a slow PC, so allow generously."""
-    code = _via_helper(args, wait_s)
-    if code is not None or not ask_windows:
-        return code
     from soundboard import michelper
     try:
+        code = _via_helper(args, wait_s)
+        if code is not None or not ask_windows:
+            return code
         return run_elevated(sys.executable,
                             relaunch_params(args + michelper.for_user(args)), wait_s)
     finally:
-        _helper_check(args)   # the prompt's admin step may have set the helper up
+        # what the UI shows follows the helper as it is now: the prompt's step may
+        # have set it up, and another account may have removed it meanwhile
+        _helper_check("after a step")
 
 
-def _helper_check(args: list[str] | None = None):
-    """michelper.ready() again, so michelper.will_ask() is current (on a worker).
-    After `args`: only if it's a step the helper does (the others never set it up)."""
+def _helper_check(via: str = "check"):
+    """michelper.ready() again, so michelper.will_ask() is current (on a worker)."""
     from soundboard import michelper
     try:
-        if args is not None and not michelper.allowed(args):
-            return
-        michelper.ready(same_dll=True)
-        michelper.ready(same_dll=False)
+        michelper.ready(via=via)
     except Exception:  # noqa: BLE001 - only the texts' "click Yes" depends on it
         log.warning("couldn't check the mic helper", exc_info=True)
 
@@ -1951,7 +1949,8 @@ def _via_helper(args: list[str], wait_s: float) -> int | None:
     try:
         if not michelper.allowed(args):
             return None
-        usable = michelper.ready(same_dll=args[0] in ("install", "reinstall"))
+        usable = michelper.ready(same_dll=args[0] in ("install", "reinstall"),
+                                 via="before a step")
         return michelper.ask(args, wait_s) if usable else None
     except Exception:  # noqa: BLE001 - Windows' prompt still works
         log.warning("the mic helper failed", exc_info=True)

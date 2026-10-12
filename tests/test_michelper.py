@@ -32,7 +32,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                 5: "bcb73271a6c0e0f7fc1730791a24626a6dedf6ea39d258831ef5aca196012467",
                 6: "9b83750c3d3586a89804c5ec5c97618fc1ce30b511723e4e3cf3525513c9a534",
                 7: "562d4f9cdb4cd0a53071284bf83aef9bbf8b2563c5ba7a3368dc190942d22c66",
-                8: "2e6e7bce58fff25b999c3779c61576bc676a39765c974e83b62ad437f5a15a2d"}
+                8: "2e6e7bce58fff25b999c3779c61576bc676a39765c974e83b62ad437f5a15a2d",
+                9: "f60c119dabaad07489532ae0fbb58b600cc3ac6f864f4b52622a5a95476a8894"}
 
 
 def _queue():
@@ -202,16 +203,18 @@ def test_make_stamp(tmp_path):
     (["uninstall"], False), (["cleanup", GUID], False), (["remove-all"], False)])
 def test_admin_steps_go_through_the_helper_when_it_can(monkeypatch, args, same_dll):
     asked, prompted = [], []
-    monkeypatch.setattr(mh, "ready", lambda same_dll=True: asked.append(same_dll) or True)
+    monkeypatch.setattr(mh, "ready",
+                        lambda same_dll=True, via="": asked.append((same_dll, via)) or True)
     monkeypatch.setattr(mh, "ask", lambda a, wait_s=300.0: asked.append(a) or 0)
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: prompted.append(a) or 0)
     assert REAL_ELEVATED(args) == 0
-    assert asked == [same_dll, args] and not prompted
+    assert asked == [(same_dll, "before a step"), args, (True, "after a step")]
+    assert not prompted
 
 
 def test_without_a_helper_windows_asks(monkeypatch):
     prompted = []
-    monkeypatch.setattr(mh, "ready", lambda same_dll=True: not same_dll)   # older DLL's
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": not same_dll)   # older DLL's
     monkeypatch.setattr(mh, "ask", lambda *a, **k: pytest.fail("asked an unusable helper"))
     monkeypatch.setattr(dm, "run_elevated",
                         lambda exe, params, wait_s: prompted.append(params) or 0)
@@ -231,7 +234,7 @@ def test_only_set_up_steps_say_who_asked(monkeypatch):
 
 def test_a_helper_that_doesnt_answer_falls_back_to_windows(monkeypatch):
     prompted = []
-    monkeypatch.setattr(mh, "ready", lambda same_dll=True: True)
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": True)
     monkeypatch.setattr(mh, "ask", lambda *a, **k: None)
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: prompted.append(a) or 0)
     assert REAL_ELEVATED(["uninstall"]) == 0 and prompted
@@ -240,7 +243,8 @@ def test_a_helper_that_doesnt_answer_falls_back_to_windows(monkeypatch):
 def test_a_slot_choice_always_asks_windows(monkeypatch):
     """`install <guid> <slot>` (the recovery card's expert choice) isn't a helper step."""
     prompted = []
-    monkeypatch.setattr(mh, "ready", lambda **k: pytest.fail("looked for the helper"))
+    monkeypatch.setattr(mh, "ready", lambda via="", **k: via == "after a step"
+                        or pytest.fail("looked for the helper first"))
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: prompted.append(a) or 0)
     assert REAL_ELEVATED(["install", GUID, "efx"]) == 0 and prompted
 
@@ -827,3 +831,45 @@ def test_a_new_app_still_watches_an_older_helper_that_only_touches(monkeypatch):
         ack.unlink()
     _fake_task(monkeypatch, work)
     assert mh.ask(["uninstall"], wait_s=60) == 0
+
+
+# ---------------------------------------------------------------- what the UI knows
+
+def test_ready_refreshes_both_answers_at_once(monkeypatch):
+    """A step that only needed one answer (taking the effect off) refreshes the other
+    too, with one Task Scheduler look: the set-up text never keeps an old answer."""
+    looks = []
+    monkeypatch.setattr(mh, "state", mh.HelperState())
+    monkeypatch.setattr(mh, "_read_stamp", lambda folder: "8 aaaa")
+    monkeypatch.setattr(mh, "_build_files", lambda folder: {})
+    monkeypatch.setattr(mh, "installed", lambda: looks.append(1) or True)
+    assert mh.known(True) is None and mh.checked_ago() is None
+    assert mh.ready(same_dll=False, via="step") is True
+    assert looks == [1]
+    assert mh.known(True) is True and mh.known(False) is True and not mh.will_ask()
+    assert mh.state.via == "step" and mh.checked_ago() < 5
+    monkeypatch.setattr(mh, "installed", lambda: False)   # removed meanwhile
+    mh.ready(same_dll=False)
+    assert mh.known(True) is False and mh.will_ask() and mh.will_ask(False)
+
+
+def test_a_stale_answer_is_noticed(monkeypatch):
+    monkeypatch.setattr(mh, "state", mh.HelperState({True: True, False: True}, "test"))
+    assert mh.checked_ago() < 5
+    monkeypatch.setattr(mh.state, "when", time.monotonic() - mh.RECHECK_S - 1)
+    assert mh.checked_ago() > mh.RECHECK_S
+    mh.state.forget()
+    assert mh.known() is None and mh.checked_ago() is None and mh.will_ask()
+
+
+@pytest.mark.parametrize("helper", [True, False])
+def test_every_admin_step_checks_the_helper_again(monkeypatch, helper):
+    """Through the helper or Windows' prompt (which may have set it up, or not), the
+    answers the UI reads are checked again after the step, both of them."""
+    checks = []
+    monkeypatch.setattr(dm, "_elevated", REAL_ELEVATED)
+    monkeypatch.setattr(dm, "_via_helper", lambda args, wait_s: 0 if helper else None)
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: 0)
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": checks.append(via) or True)
+    assert dm._elevated(["install", GUID, "efx"]) == 0   # (a slot choice sets it up too)
+    assert checks == ["after a step"]
