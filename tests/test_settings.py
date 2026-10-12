@@ -121,6 +121,20 @@ def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window): 
     d.close()
 
 
+def test_closing_settings_before_the_updates_page_is_built_warns_nothing(window):  # noqa: F811
+    """Closing unhooked the update signals the never-built Updates card hadn't hooked,
+    and PySide printed "Failed to disconnect" warnings on every close."""
+    import warnings
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        d = SettingsDialog(window, "audio", lazy=True)
+        d.done(0)
+        d = SettingsDialog(window, "updates", lazy=True)
+        d.done(0)
+        d.done(0)   # twice: the second has nothing left to unhook
+    assert not [w for w in caught if "disconnect" in str(w.message)]
+
+
 def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatch):  # noqa: F811
     window._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
     window._fill_combo(window.cb_mon, ["Speakers", "Headset"], "Speakers")

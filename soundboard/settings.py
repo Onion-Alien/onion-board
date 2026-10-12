@@ -3231,6 +3231,7 @@ class SettingsDialog(QDialog):
         self.mw.update_done.connect(self._updates_done)
         # downloading, ready or failed: the same words as the side bar's update card
         self.mw.update_state.connect(self._updates_state)
+        self._upd_wired = True   # done() unhooks only what was hooked
         self._updates_state()
         self._net_sync()   # off in Settings > Privacy: greyed, with the reason
         return card
@@ -3271,12 +3272,16 @@ class SettingsDialog(QDialog):
             self.upd_label.setText(status)
 
     def done(self, r):
-        for sig, slot in ((self.mw.update_done, self._updates_done),
-                          (self.mw.update_state, self._updates_state)):
-            try:
-                sig.disconnect(slot)
-            except (RuntimeError, TypeError):
-                pass
+        # unhooking a slot that was never hooked (Updates card not built, or done()
+        # twice) only prints PySide's "Failed to disconnect" RuntimeWarning
+        if getattr(self, "_upd_wired", False):
+            self._upd_wired = False
+            for sig, slot in ((self.mw.update_done, self._updates_done),
+                              (self.mw.update_state, self._updates_state)):
+                try:
+                    sig.disconnect(slot)
+                except (RuntimeError, TypeError):
+                    pass
         super().done(r)
 
     # ------------------------------------------------------------------ remote control
