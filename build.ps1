@@ -122,7 +122,7 @@ if ($env:ONIONBOARD_ONION_WATCH_ZIP) {
 # AI voices don't: they're an optional download (soundboard\aiaddon.py,
 # scripts\make_ai_voices_zip.py).
 foreach ($m in Get-ChildItem modules -Directory | Where-Object Name -ne "ai-voices") {
-    robocopy $m.FullName "dist\OnionBoard\modules\$($m.Name)" /E /XD .venv __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS /NP | Out-Null
+    robocopy $m.FullName "dist\OnionBoard\modules\$($m.Name)" /E /XD .venv .python __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "copying module $($m.Name) failed" }
 }
 $global:LASTEXITCODE = 0
@@ -134,8 +134,8 @@ if ($LASTEXITCODE -ne 0) { throw "make_notices.py failed" }
 
 function Publish-Build {
     if ($AppDir) {
-        # /XD .venv: keep an add-on's environment installed from the app's Voice tab
-        robocopy "dist\OnionBoard" $AppDir /MIR /XD .venv /NFL /NDL /NJH /NJS /NP | Out-Null
+        # /XD .venv .python: keep an add-on's environment (and its own Python) installed from the app's Voice tab
+        robocopy "dist\OnionBoard" $AppDir /MIR /XD .venv .python /NFL /NDL /NJH /NJS /NP | Out-Null
         if ($LASTEXITCODE -ge 8) { throw "copying the app to $AppDir failed" }
         Write-Host "Copied the app to $AppDir" -ForegroundColor Green
     }

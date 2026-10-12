@@ -137,7 +137,25 @@ class ModuleInfo:
             return translation.is_downloaded(self)
         if self.kind != "service" or not any("{python}" in a for a in self.command):
             return True
-        return (self.path / ".venv" / "Scripts" / "python.exe").exists()
+        return (self.path / ".venv" / "Scripts" / "python.exe").exists() and not self.broken
+
+    @property
+    def broken(self) -> bool:
+        """A service set up once whose environment can't start any more: the Python it
+        was made from is gone (uninstalled, or upgraded into another folder). Its
+        install, run again, repairs it (soundboard.pyget)."""
+        venv = self.path / ".venv"
+        if self.kind != "service" or not (venv / "Scripts" / "python.exe").exists():
+            return False
+        try:
+            cfg = (venv / "pyvenv.cfg").read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            return False   # can't tell: only a Python seen to be gone counts
+        for line in cfg.splitlines():
+            key, _eq, value = line.partition("=")
+            if key.strip().lower() == "home":
+                return not (Path(value.strip()) / "python.exe").is_file()
+        return False
 
 
 def _strings(v, what: str) -> list[str]:
@@ -541,18 +559,6 @@ def prune_leftovers(app_dir: Path | None = None, loaded=None,
     return gone
 
 
-def base_python() -> str | None:
-    """A Python to build a module's own environment from. From source that's the one
-    running the app; the packaged exe has none of its own, so look on PATH."""
-    if not getattr(sys, "frozen", False):
-        return sys.executable
-    for name in ("py", "python"):
-        found = shutil.which(name)
-        if found and "WindowsApps" not in found:   # the Store stub only opens the Store
-            return found
-    return None
-
-
 def _job_for(p: subprocess.Popen):
     """A job object holding `p` and whatever it starts (Windows), or None."""
     if os.name != "nt":
@@ -589,9 +595,12 @@ def _kill_tree(p: subprocess.Popen, job) -> None:
         pass
 
 
-def install(info: ModuleInfo, on_line: Callable[[str], object]) -> bool:
+def install(info: ModuleInfo, on_line: Callable[[str], object],
+            on_note: Callable[[str], object] | None = None) -> bool:
     """Run the module's "install" steps (module.json), streaming their output to
-    `on_line`. Blocking: call from a worker thread. Returns True on success."""
+    `on_line`; getting a Python for it first when the PC has no good one (pyget), whose
+    progress goes to `on_note` (our own words, not a step's output) or else `on_line`.
+    Blocking: call from a worker thread. Returns True on success."""
     if not info.install_steps:
         on_line(_("This add-on has no install steps."))
         return False
@@ -601,10 +610,14 @@ def install(info: ModuleInfo, on_line: Callable[[str], object]) -> bool:
     from soundboard import netlog
     netlog.cause("addons", f"You installed or updated the {netlog.quoted(info.name)} "
                            "add-on")
-    py = base_python()
-    if py is None:
-        on_line(_("Python isn't installed. Get it from python.org (tick \"Add python.exe to "
-                  "PATH\"), then press Install again."))
+    from soundboard import pyget
+    if info.broken:   # its Python is gone: a new environment, made from one that's there
+        log.info("module %s: its environment's Python is gone; making it again", info.id)
+        shutil.rmtree(info.path / ".venv", ignore_errors=True)
+    try:
+        py = pyget.for_module(info.path, on_note or on_line)
+    except pyget.GetError as e:
+        on_line(str(e))
         return False
     for step in info.install_steps:
         argv = [info._fill(a, py) for a in step]
