@@ -25,7 +25,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import net, netlog, quality, theme, usage, ytdl
+from soundboard import jobprogress, net, netlog, quality, theme, usage, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
 from soundboard.ui import busy, icons
@@ -306,7 +306,7 @@ class Thumb(QWidget):
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(0, 0, 0, 120))
         p.drawRect(QRectF(0, h - 4, w, 4))
-        fill_w = w if stage == "processing" else w * self.progress_frac
+        fill_w = w * self.progress_frac   # one bar for the whole job (jobprogress)
         p.setBrush(QColor(theme.T["accent"]))
         p.drawRect(QRectF(0, h - 4, max(4.0, fill_w), 4))
 
@@ -504,6 +504,7 @@ class ResultRow(HoverCard):
             else:
                 b.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.fill = -1.0        # the download's 0..1 (or -1: none), shown in its button
+        self._job = jobprogress.JobProgress()   # every step of it on that one bar
         self._tip = ""          # its words: the buttons' tooltip while it downloads
 
         self.text_box = QVBoxLayout()
@@ -648,6 +649,7 @@ class ResultRow(HoverCard):
         if not self._release:
             self.stage = "parsing"
             self.fill = 0.0
+            self._job.reset()
             self._tip = _("Parsing video…")
             self.thumb.set_progress("parsing", 0.0)
         text = (_("Processing…") if self.stage == "processing" else
@@ -678,27 +680,29 @@ class ResultRow(HoverCard):
         """0..1 of its audio downloaded, 'parsing', or below 0 / 'processing' while converted."""
         if not self._release:
             return
-        if frac == "parsing":
+        # each step continues the last one's bar: it never fills up and starts again
+        value = self._job.update(frac)
+        if self._job.stage == "parsing":
             self.stage = "parsing"
-            self.fill = -0.5
+            self.fill = value or -0.5
             self._tip = _("Parsing video…")
             self.thumb.set_progress("parsing", 0.0)
             for kind in self._release:
                 btn = self._btn(kind)
                 btn.setText(_("Parsing…"))
                 btn.setToolTip(self._tip)
-        elif frac == "processing" or (isinstance(frac, (int, float)) and frac < 0):
+        elif self._job.stage == "processing":
             self.stage = "processing"
             self._tip = _("Processing audio…")
-            self.fill = 1.0
-            self.thumb.set_progress("processing", 1.0)
+            self.fill = value
+            self.thumb.set_progress("processing", value)
             for kind in self._release:
                 btn = self._btn(kind)
                 btn.setText(_("Processing…"))
                 btn.setToolTip(self._tip)
-        elif isinstance(frac, (int, float)):
+        elif self._job.stage == "downloading":
             self.stage = "downloading"
-            self.fill = max(0.0, min(1.0, float(frac)))
+            self.fill = value
             pct = self.fill * 100
             self._tip = _("Downloading audio · {value:.0f}%", value=pct)
             self.thumb.set_progress("downloading", self.fill)

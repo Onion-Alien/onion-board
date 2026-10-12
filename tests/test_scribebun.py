@@ -198,7 +198,8 @@ def test_download_bar_waits_for_the_flash_then_moves_up(qapp):
     bar.set_progress(b, 0.5)
     assert bar.url == a and _rows(bar) == [("Two", "wait"), ("Three", "wait")]
     _flash_over(bar)
-    assert bar.url == b and bar.lbl_status.text() == "50%"
+    # its own bar carries on from looking it up (jobprogress): 50% downloaded is 48%
+    assert bar.url == b and bar.lbl_status.text() == "48%"
     # the one just added stays in the list, under what's still to come
     assert _rows(bar) == [("Three", "wait"), ("One", "added")]
     assert bar.h_text.text() == "Adding 2 sounds"
@@ -263,11 +264,12 @@ def test_download_bar_failures_wait_for_retry(qapp):
     assert bar.url == b and not bar.btn_retry.isVisibleTo(bar)
     assert bar.h_failed.text() == "1 failed" and bar.h_failed.isVisibleTo(bar)
     assert _rows(bar) == [("One", "failed")]
-    # minimised: the summary line with how far the running one has got
+    # minimised: the summary line with how far the whole list has got (the failed one
+    # is over: half of it, and the running one's 56% of the other half)
     bar.set_progress(b, 0.6)
     bar.set_collapsed(True)
     assert not bar.panel.isVisibleTo(bar)
-    assert bar.h_text.text() == "Adding 1 sound" and bar.s_text.text() == "60%"
+    assert bar.h_text.text() == "Adding 1 sound" and bar.s_text.text() == "78%"
     assert bar.h_failed.isVisibleTo(bar)
     bar.set_collapsed(False)
     assert bar.panel.isVisibleTo(bar)
@@ -299,7 +301,7 @@ def test_download_bar_cancel_is_not_a_failure(qapp):
 
 
 def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
-    from soundboard.ui.downloadbar import BAR_MIN_W, ROW_THUMB, DownloadBar
+    from soundboard.ui.downloadbar import BAR_MIN_W, ROW_THUMB, THUMB_W, DownloadBar
     bar = DownloadBar()
     links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
     bar.set_active(links[0], "A song with a long name", "add", None, "Someone", 90)
@@ -310,7 +312,7 @@ def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
 
     def pictures():
         return [w for w in bar.panel.findChildren(QLabel)
-                if w.isVisibleTo(bar) and (w.width(), w.height()) == ROW_THUMB]
+                if w.isVisibleTo(bar) and (w.width(), w.height()) == (THUMB_W, ROW_THUMB[1])]
     assert bar.btn_stop_all.isVisibleTo(bar) and bar.lbl_meta.isVisibleTo(bar)
     assert len(pictures()) == 2
     bar.setFixedWidth(360)   # the smallest window before the mini player
@@ -341,11 +343,12 @@ def test_download_bar_folds_for_room(qapp):
     assert bar.cur_row.isVisibleTo(bar) and not bar.scroll_area.isVisibleTo(bar)
     line(True)
     assert not bar.panel.isVisibleTo(bar) and bar.s_bar.isVisibleTo(bar)
-    assert bar.s_text.text() == "40%"
+    # the whole list's bar: 1 of 3 picks running, 39% of the way (jobprogress)
+    assert bar.s_text.text() == f"{bar.progress_frac / 3 * 100:.0f}%" == "13%"
     assert not bar.btn_min.isVisibleTo(bar)   # it can't open: no button for it
     line(False)
     rows(False)
-    assert bar.scroll_area.isVisibleTo(bar) and not bar.s_bar.isVisibleTo(bar)
+    assert bar.scroll_area.isVisibleTo(bar) and bar.s_bar.isVisibleTo(bar)   # open too
     bar.close()
 
 
