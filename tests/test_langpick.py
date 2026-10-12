@@ -27,7 +27,7 @@ def test_search_finds_a_language_by_any_of_its_names(qapp):
     assert find("日本") == ["ja"] and find("japanese") == ["ja"]
     assert set(find("espanol")) == {"es-419", "es"}           # without the accent
     assert set(find("portug")) == {"pt-BR", "pt-PT"}
-    assert d.scroll.height() == 2 * (ROW_H + 2)               # shrinks to the two rows
+    assert d.area.height() == 2 * (ROW_H + 2)               # shrinks to the two rows
     assert find("zz-nothing") == [] and d.none.isVisibleTo(d)
     assert len(find("")) == len(d.tiles) and not d.none.isVisibleTo(d)
 
@@ -37,15 +37,15 @@ def test_a_click_or_enter_picks_and_esc_picks_nothing(qapp):
     got = []
     d.chosen.connect(got.append)
     next(t for t in d.tiles if t.code == "ko").click()
-    assert got == ["ko"] and d.picked == "ko" and d.result() == QDialog.Accepted
+    assert got == ["ko"] and d.picked == "ko" and d.result() == QDialog.DialogCode.Accepted
     d = LanguageDialog()
     d.search.setText("svenska")
-    QTest.keyClick(d.search, Qt.Key_Return)
+    QTest.keyClick(d.search, Qt.Key.Key_Return)
     assert d.picked == "sv"
     d = LanguageDialog()
     d.show()
-    QTest.keyClick(d, Qt.Key_Escape)
-    assert d.picked == "" and d.result() == QDialog.Rejected
+    QTest.keyClick(d, Qt.Key.Key_Escape)
+    assert d.picked == "" and d.result() == QDialog.DialogCode.Rejected
 
 
 def test_every_language_has_its_own_letter():
@@ -77,9 +77,9 @@ def test_arrow_keys_walk_the_list_and_enter_picks(qapp):
     d = LanguageDialog(current="en")
     d.show()
     d.search.setText("port")
-    QTest.keyClick(d.search, Qt.Key_Down)
+    QTest.keyClick(d.search, Qt.Key.Key_Down)
     rows = d.visible_tiles()
     assert rows[0].hasFocus()
-    QTest.keyClick(rows[0], Qt.Key_Down)
-    QTest.keyClick(rows[1], Qt.Key_Return)
+    QTest.keyClick(rows[0], Qt.Key.Key_Down)
+    QTest.keyClick(rows[1], Qt.Key.Key_Return)
     assert d.picked == rows[1].code

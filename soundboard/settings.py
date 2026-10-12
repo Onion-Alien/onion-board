@@ -900,7 +900,7 @@ class SettingsDialog(QDialog):
                 return
             dlg = LanguageDialog(self, chosen())
             self.lang_dialog = dlg   # (tests reach it while it's open)
-            dlg.setAttribute(Qt.WA_DeleteOnClose)
+            dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
             dlg.chosen.connect(lambda code: (
                 self.mw.switch_language(code, restart=False), show()))
             dlg.destroyed.connect(lambda *__: setattr(self, "lang_dialog", None))

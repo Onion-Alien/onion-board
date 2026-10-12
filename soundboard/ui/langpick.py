@@ -73,9 +73,9 @@ def paint_coin(p: QPainter, r: QRectF, mark: str, on: bool, font: QFont):
     accent ring on the card colour."""
     t = theme.tokens()
     p.save()
-    p.setRenderHint(QPainter.Antialiasing)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     if on:
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QColor(t["accent"]))
     else:
         p.setPen(QPen(QColor(t["accent"]), 1.6))
@@ -86,7 +86,7 @@ def paint_coin(p: QPainter, r: QRectF, mark: str, on: bool, font: QFont):
     f.setPixelSize(round(r.height() * (0.46 if len(mark) == 1 else 0.36)))
     p.setFont(f)
     p.setPen(QColor(t["on_accent"] if on else t["text_hi"]))
-    p.drawText(r, Qt.AlignCenter, mark)
+    p.drawText(r, Qt.AlignmentFlag.AlignCenter, mark)
     p.restore()
 
 
@@ -94,7 +94,7 @@ def coin_icon(mark: str, font: QFont, size: int = 26, dpr: float = 1.0) -> QIcon
     """The picked language's coin as an icon (the Settings button wears it)."""
     pm = QPixmap(round(size * dpr), round(size * dpr))
     pm.setDevicePixelRatio(dpr)
-    pm.fill(Qt.transparent)
+    pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
     paint_coin(p, QRectF(0, 0, size, size), mark, True, font)
     p.end()
@@ -121,7 +121,7 @@ class LangButton(QPushButton):
 
     def changeEvent(self, e):
         super().changeEvent(e)
-        if e.type() in (QEvent.StyleChange, QEvent.PaletteChange):
+        if e.type() in (QEvent.Type.StyleChange, QEvent.Type.PaletteChange):
             self._repaint_coin()
 
 
@@ -139,10 +139,10 @@ class LangRow(QPushButton):
         self.setObjectName("langrow")
         self.setCheckable(True)
         self.setFixedHeight(ROW_H)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setAccessibleName(f"{own} {self.other}".strip())
         # each row in its own direction: Arabic reads right to left in an English window
-        self.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(code) else Qt.LeftToRight)
+        self.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code) else Qt.LayoutDirection.LeftToRight)
 
     def enterEvent(self, e):
         super().enterEvent(e)
@@ -155,20 +155,20 @@ class LangRow(QPushButton):
     def paintEvent(self, e):
         t = theme.tokens()
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         on = self.isChecked()
         lit = self.underMouse() or self.hasFocus()
         if on or lit:
             c = QColor(t["accent"])
             c.setAlpha(46 if on else 22)
-            p.setPen(Qt.NoPen)
+            p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(c)
             p.drawRoundedRect(QRectF(self.rect()).adjusted(1, 1, -1, -1), 8, 8)
         if self.hasFocus():
             p.setPen(QPen(QColor(t["accent"]), 1.5))
-            p.setBrush(Qt.NoBrush)
+            p.setBrush(Qt.BrushStyle.NoBrush)
             p.drawRoundedRect(QRectF(self.rect()).adjusted(1.5, 1.5, -1.5, -1.5), 8, 8)
-        rtl = self.layoutDirection() == Qt.RightToLeft
+        rtl = self.layoutDirection() == Qt.LayoutDirection.RightToLeft
         w, h = self.width(), self.height()
         coin = QRectF(w - 8 - COIN if rtl else 8, (h - COIN) / 2, COIN, COIN)
         paint_coin(p, coin, self.mark, on, self.font())
@@ -180,25 +180,25 @@ class LangRow(QPushButton):
         small = QFont(self.font())
         small.setPointSizeF(small.pointSizeF() * 0.88)
         bfm, sfm = QFontMetrics(bold), QFontMetrics(small)
-        own = bfm.elidedText(self.own, Qt.ElideRight, int(text.width()))
+        own = bfm.elidedText(self.own, Qt.TextElideMode.ElideRight, int(text.width()))
         gap = 8
         rest = int(text.width()) - bfm.horizontalAdvance(own) - gap
-        other = sfm.elidedText(self.other, Qt.ElideRight, rest) if self.other and rest > 30 \
+        other = sfm.elidedText(self.other, Qt.TextElideMode.ElideRight, rest) if self.other and rest > 30 \
             else ""
-        align = Qt.AlignAbsolute | Qt.AlignVCenter
+        align = Qt.AlignmentFlag.AlignAbsolute | Qt.AlignmentFlag.AlignVCenter
         # the own name, then the other name after it on the same line (before it, RTL)
         p.setFont(bold)
         p.setPen(QColor(t["text"]))
         ow = bfm.horizontalAdvance(own)
         own_r = QRectF(text.right() - ow, 0, ow, h) if rtl else QRectF(text.left(), 0, ow + 2, h)
-        p.drawText(own_r, align | (Qt.AlignRight if rtl else Qt.AlignLeft), own)
+        p.drawText(own_r, align | (Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft), own)
         if other:
             p.setFont(small)
             p.setPen(QColor(t["muted"]))
             ox = own_r.left() - gap - sfm.horizontalAdvance(other) if rtl \
                 else own_r.right() + gap
             p.drawText(QRectF(ox, 1, sfm.horizontalAdvance(other) + 2, h),
-                       align | Qt.AlignLeft, other)
+                       align | Qt.AlignmentFlag.AlignLeft, other)
         if on:
             f = QFont(self.font())
             f.setBold(True)
@@ -206,7 +206,7 @@ class LangRow(QPushButton):
             p.setFont(f)
             p.setPen(QColor(t["accent"]))
             tr = QRectF(8, 0, 20, h) if rtl else QRectF(w - 8 - 20, 0, 20, h)
-            p.drawText(tr, Qt.AlignCenter, "✓")
+            p.drawText(tr, Qt.AlignmentFlag.AlignCenter, "✓")
         p.end()
 
 
@@ -231,7 +231,7 @@ class LanguageDialog(QDialog):
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
         self.search = QLineEdit()
-        self.search.setPlaceholderText(_("Search languages…"))
+        self.search.setPlaceholderText(_("Search languages"))
         self.search.setClearButtonEnabled(True)
         self.search.setAccessibleName(_("Search languages"))
         self.search.textChanged.connect(self._filter)
@@ -240,9 +240,9 @@ class LanguageDialog(QDialog):
         v.addWidget(self.search)
         holder = QWidget()
         holder.setObjectName("langlist")
-        self.list = QVBoxLayout(holder)
-        self.list.setContentsMargins(0, 0, 0, 0)
-        self.list.setSpacing(2)
+        self.column = QVBoxLayout(holder)
+        self.column.setContentsMargins(0, 0, 0, 0)
+        self.column.setSpacing(2)
         english, *rest = i18n.available()
         self.tiles: list[LangRow] = []
         for code, own in [english, *sorted(rest, key=lambda c: _fold(c[1]))]:
@@ -250,22 +250,22 @@ class LanguageDialog(QDialog):
             row.setChecked(code == current)
             row.clicked.connect(lambda __=False, c=code: self._pick(c))
             row.installEventFilter(self)
-            self.list.addWidget(row)
+            self.column.addWidget(row)
             self.tiles.append(row)
-        self.list.addStretch(1)
+        self.column.addStretch(1)
         self.none = QLabel()
         self.none.setObjectName("hint")
-        self.none.setAlignment(Qt.AlignCenter)
+        self.none.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.none.hide()
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setFrameShape(QScrollArea.NoFrame)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll.setWidget(holder)
-        self.scroll.viewport().setAutoFillBackground(False)
+        self.area = QScrollArea()
+        self.area.setWidgetResizable(True)
+        self.area.setFrameShape(QFrame.Shape.NoFrame)
+        self.area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.area.setWidget(holder)
+        self.area.viewport().setAutoFillBackground(False)
         holder.setAutoFillBackground(False)
         self._fit_rows(len(self.tiles))
-        v.addWidget(self.scroll)
+        v.addWidget(self.area)
         v.addWidget(self.none)
         self.setFixedWidth(WIDTH)
         self.search.setFocus()   # type straight away
@@ -285,7 +285,7 @@ class LanguageDialog(QDialog):
         self.show()
         on = next((t for t in self.tiles if t.isChecked()), None)
         if on is not None:
-            self.scroll.ensureWidgetVisible(on, 0, ROW_H)
+            self.area.ensureWidgetVisible(on, 0, ROW_H)
         self.search.setFocus()
 
     def visible_tiles(self) -> list[LangRow]:
@@ -298,33 +298,33 @@ class LanguageDialog(QDialog):
         shown = self.visible_tiles()
         self.none.setText(_("No language matches “{text}”", text=text.strip()))
         self.none.setVisible(not shown)
-        self.scroll.setVisible(bool(shown))
+        self.area.setVisible(bool(shown))
         self._fit_rows(len(shown))
 
     def _fit_rows(self, n: int):
         """As tall as the rows showing, up to ROWS_SHOWN, then it scrolls."""
-        self.scroll.setFixedHeight(max(1, min(n, ROWS_SHOWN)) * (ROW_H + 2))
+        self.area.setFixedHeight(max(1, min(n, ROWS_SHOWN)) * (ROW_H + 2))
         self.adjustSize()
 
     def eventFilter(self, obj, e):
         """↓ from the search box goes into the list, ↑/↓ move along it, ↑ from the top
         row goes back to the search box."""
-        if e.type() == QEvent.KeyPress and e.key() in (Qt.Key_Up, Qt.Key_Down):
+        if e.type() == QEvent.Type.KeyPress and e.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down):
             rows = self.visible_tiles()
             if obj is self.search:
-                if e.key() == Qt.Key_Down and rows:
+                if e.key() == Qt.Key.Key_Down and rows:
                     rows[0].setFocus()
                     return True
             elif obj in rows:
-                i = rows.index(obj) + (1 if e.key() == Qt.Key_Down else -1)
+                i = rows.index(obj) + (1 if e.key() == Qt.Key.Key_Down else -1)
                 if i < 0:
                     self.search.setFocus()
                 elif i < len(rows):
                     rows[i].setFocus()
-                    self.scroll.ensureWidgetVisible(rows[i], 0, 4)
+                    self.area.ensureWidgetVisible(rows[i], 0, 4)
                 return True
-        if e.type() == QEvent.KeyPress and obj in self.tiles \
-                and e.key() in (Qt.Key_Return, Qt.Key_Enter):
+        if e.type() == QEvent.Type.KeyPress and obj in self.tiles \
+                and e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self._pick(obj.code)
             return True
         return super().eventFilter(obj, e)
