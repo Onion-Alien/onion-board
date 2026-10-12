@@ -96,6 +96,12 @@ def _mic(p, fill):
     p.drawLine(QPointF(8.5, 21), QPointF(15.5, 21))
 
 
+def _mic_off(p, fill):
+    """Muted for others: the mic, struck through."""
+    _mic(p, fill)
+    p.drawLine(QPointF(4, 4), QPointF(20, 20))
+
+
 def _headphones(p, fill):
     p.drawArc(QRectF(4, 4, 16, 16), 0, 180 * 16)
     p.drawLine(QPointF(4, 12), QPointF(4, 15))
@@ -750,7 +756,7 @@ SHAPES = {
     "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
     "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave, "music": _music, "puzzle": _puzzle,
-    "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
+    "mic": _mic, "mic_off": _mic_off, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
     "plus": _plus, "close": _close,
     "download": _download,

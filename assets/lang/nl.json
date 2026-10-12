@@ -3306,5 +3306,6 @@
   "Theme style": "Themastijl",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Je geluiden uit je andere soundboards overzetten: {done} van {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Je geluiden uit {name} overzetten: {done} van {total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Hij is geïnstalleerd, maar je geluiden gaan nu in je microfoon. Gebruik hem als een game je microfoon overslaat, of verwijder hem als niets anders hem nodig heeft."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Hij is geïnstalleerd, maar je geluiden gaan nu in je microfoon. Gebruik hem als een game je microfoon overslaat, of verwijder hem als niets anders hem nodig heeft.",
+  "Don't show this again": "Niet meer tonen"
 }

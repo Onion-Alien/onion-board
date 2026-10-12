@@ -3306,5 +3306,6 @@
   "Theme style": "Estilo do tema",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Trazendo seus sons dos seus outros soundboards: {done} de {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Trazendo seus sons do {name}: {done} de {total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Ele está instalado, mas agora seus sons vão para o seu microfone. Use-o se um jogo pular o seu microfone, ou remova-o se mais nada precisar dele."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Ele está instalado, mas agora seus sons vão para o seu microfone. Use-o se um jogo pular o seu microfone, ou remova-o se mais nada precisar dele.",
+  "Don't show this again": "Não mostrar novamente"
 }

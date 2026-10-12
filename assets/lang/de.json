@@ -3306,5 +3306,6 @@
   "Theme style": "Theme-Stil",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Deine Sounds aus deinen anderen Soundboards werden übernommen: {done} von {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Deine Sounds aus {name} werden übernommen: {done} von {total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Es ist installiert, aber deine Sounds gehen jetzt in dein Mikro. Nutz es, wenn ein Spiel dein Mikro überspringt, oder entferne es, wenn nichts anderes es braucht."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Es ist installiert, aber deine Sounds gehen jetzt in dein Mikro. Nutz es, wenn ein Spiel dein Mikro überspringt, oder entferne es, wenn nichts anderes es braucht.",
+  "Don't show this again": "Nicht mehr anzeigen"
 }

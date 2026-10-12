@@ -1,0 +1,2 @@
+- The mini player's mic button shows a mic icon, struck through when muted, so "Mic on" reads as the state it's in.
+- "This won't mute you yet" has a *Don't show this again* box, for people who play on the cable on purpose.

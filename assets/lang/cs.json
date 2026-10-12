@@ -3380,5 +3380,6 @@
   "Theme style": "Styl motivu",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Přenáším tvoje zvuky z tvých jiných soundboardů: {done} z {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Přenáším tvoje zvuky z {name}: {done} z {total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Je nainstalovaný, ale tvoje zvuky teď jdou do mikrofonu. Použij ho, když hra tvůj mikrofon přeskočí, nebo ho odeber, pokud ho nic jiného nepotřebuje."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Je nainstalovaný, ale tvoje zvuky teď jdou do mikrofonu. Použij ho, když hra tvůj mikrofon přeskočí, nebo ho odeber, pokud ho nic jiného nepotřebuje.",
+  "Don't show this again": "Už nezobrazovat"
 }
