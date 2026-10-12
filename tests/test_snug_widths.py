@@ -4,7 +4,8 @@ Settings' device boxes were 600-720 px for a 30-letter name and Edit sound's hot
 button ran 369 px for "Click to set". The app style sizes every dropdown to its
 longest choice (capped) unless the code chose otherwise (wheelguard.AppStyle)."""
 from PySide6.QtCore import QEvent
-from PySide6.QtWidgets import QApplication, QComboBox, QHBoxLayout, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QHBoxLayout, QVBoxLayout,
+                               QWidget)
 
 from soundboard.settings import SettingsDialog
 from soundboard.wheelguard import AppStyle
@@ -32,6 +33,33 @@ def test_a_dropdown_in_a_wide_row_keeps_its_own_width(qapp):
         assert cb.width() < 200
         assert long.width() == CAP
         assert mine.width() == 500
+    finally:
+        box.close()
+
+
+def test_dropdowns_stacked_in_a_column_share_the_widest_width(qapp):
+    """Settings -> Devices' three boxes were 300, 358 and 358 px, each fitting its
+    own device name: a column of them lines up on the widest (still capped)."""
+    box = QWidget()
+    grid = QGridLayout(box)
+    names = ("Mic (short)", "Headphones (a much longer device name here)", "Off")
+    boxes = []
+    for r, name in enumerate(names):
+        cb = QComboBox()
+        cb.addItem(name)
+        grid.addWidget(cb, r, 1)
+        boxes.append(cb)
+    grid.setColumnStretch(2, 1)
+    alone = QComboBox()   # another column: its own width
+    alone.addItem("Off")
+    grid.addWidget(alone, 0, 3)
+    box.resize(1200, 200)
+    box.show()
+    QApplication.processEvents()
+    try:
+        widths = {cb.width() for cb in boxes}
+        assert len(widths) == 1 and widths.pop() <= CAP
+        assert alone.width() < boxes[0].width()
     finally:
         box.close()
 
@@ -68,3 +96,18 @@ def test_settings_device_boxes_are_not_card_wide(window):  # noqa: F811
         d.close()
         d.deleteLater()
         QApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_settings_device_boxes_line_up(window):  # noqa: F811
+    """Input / Output / Send my sounds to: one column, one width (300, 358 and 358 px
+    before, each fitting its own device name)."""
+    window.resize(1280, 900)
+    window.show()
+    window.open_settings("audio")
+    for __ in range(3):
+        QApplication.processEvents()
+    d = window._settings_dlg
+    try:
+        assert len({cb.width() for cb, _src in d.dev_combos}) == 1
+    finally:
+        window.close_settings()

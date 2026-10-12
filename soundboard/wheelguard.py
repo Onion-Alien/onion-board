@@ -13,7 +13,8 @@ from __future__ import annotations
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
 from PySide6.QtGui import QHoverEvent, QMouseEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QCheckBox, QComboBox, QMenu, QProxyStyle,
+                               QApplication, QCheckBox, QComboBox, QFormLayout,
+                               QGridLayout, QLayout, QMenu, QProxyStyle,
                                QScrollBar, QSizePolicy, QSlider, QTabBar, QWidget)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
@@ -166,9 +167,48 @@ def snug_combo(cb: QComboBox, cap: int = AppStyle.COMBO_CAP):
     QTimer.singleShot(0, cb, lambda: _refit(cb, cap))
 
 
+def _own_width(cb: QComboBox, cap: int) -> int:
+    return max(cb.minimumWidth(), min(cap, cb.sizeHint().width()))
+
+
+def _column_mates(cb: QComboBox) -> list[QComboBox]:
+    """The snug dropdowns stacked in cb's grid / form column, cb included: they share
+    the widest one's width (Settings -> Devices' three boxes were 300, 358 and 358 px,
+    each fitting its own device name). Just cb when it isn't in one."""
+    parent = cb.parentWidget()
+    top = parent.layout() if parent is not None else None
+    todo: list[QLayout] = [top] if top is not None else []
+    while todo:
+        lay = todo.pop()
+        i = lay.indexOf(cb)
+        if i >= 0:
+            if isinstance(lay, QGridLayout):
+                col = lay.getItemPosition(i)[1]  # pyright: ignore[reportIndexIssue]  (a tuple)
+                cells = [lay.itemAtPosition(r, col) for r in range(lay.rowCount())]
+            elif isinstance(lay, QFormLayout):
+                role = lay.getItemPosition(i)[1]  # pyright: ignore[reportIndexIssue]  (a tuple)
+                cells = [lay.itemAt(r, role) for r in range(lay.rowCount())]
+            else:
+                return [cb]
+            mates = [c.widget() for c in cells if c is not None]
+            return [w for w in mates if isinstance(w, QComboBox)
+                    and w.property("snug") is True and not w.isHidden()] or [cb]
+        for j in range(lay.count()):
+            item = lay.itemAt(j)
+            sub = item.layout() if item is not None else None
+            if sub is not None:
+                todo.append(sub)
+    return [cb]
+
+
 def _refit(cb: QComboBox, cap: int):
     try:
-        cb.setMaximumWidth(max(cb.minimumWidth(), min(cap, cb.sizeHint().width())))
+        mates = _column_mates(cb)
+        width = max(_own_width(m, cap) for m in mates)
+        for m in mates:
+            m.setMaximumWidth(width)
+        if cb not in mates:
+            cb.setMaximumWidth(_own_width(cb, cap))
     except RuntimeError:   # the model outlived its dropdown
         pass
 
