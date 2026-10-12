@@ -472,7 +472,6 @@ def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  #
 
 
 def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeypatch):  # noqa: F811
-    from PySide6.QtCore import QTimer
     from soundboard import i18n
     monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
     restarts = []
@@ -484,17 +483,13 @@ def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeyp
     # the title in Windows' language too: found by someone who can't read English
     assert card.findChild(QLabel).text() == "Language · Sprache"
     assert btn.text().startswith("English") and not d.lang_restart.isVisibleTo(d)
-    seen = []
-
-    def in_the_picker():
-        dlg = d.lang_dialog
-        seen.append(dlg.search.hasFocus() or True)
-        dlg.search.setText("germ")                                   # English name
-        assert [t.code for t in dlg.visible_tiles()] == ["de"]
-        dlg.search.returnPressed.emit()                              # Enter picks it
-    QTimer.singleShot(0, in_the_picker)
-    btn.click()
-    assert seen and window.cfg.language == "de" and not restarts   # saved, no surprise restart
+    btn.click()                                  # a drop-down: nothing waits on it
+    dlg = d.lang_dialog
+    assert dlg.isVisible()
+    dlg.search.setText("germ")                                   # English name
+    assert [t.code for t in dlg.visible_tiles()] == ["de"]
+    dlg.search.returnPressed.emit()                              # Enter picks it
+    assert window.cfg.language == "de" and not restarts   # saved, no surprise restart
     assert btn.text().startswith("Deutsch")
     # what happens next, in the language picked
     assert d.lang_note.text() == "Onion Board zeigt nach einem Neustart Deutsch an."
