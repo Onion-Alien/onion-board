@@ -183,17 +183,19 @@ def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
 
 
 def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
-    """Custom voices are their own tab on the Voice tab. Add voices beside the Voice
-    list, and Settings → Audio's card, both open it (from any other tab)."""
+    """Custom voices are in the Voice tab's Add-ons tab (no Custom tab of their own).
+    Add voices beside the Voice list, and Settings → Audio's card, both open it (from
+    any other tab)."""
     from PySide6.QtWidgets import QPushButton
     from soundboard.settings import SettingsDialog
     w = window
     s = w.voice.speech
     vp = w.voice
-    assert vp.current_tab() != "custom" and not s.custom_box.isVisibleTo(vp)
-    assert not s.isAncestorOf(s.custom_box)          # its own card, not inside Speak
+    assert "custom" not in vp._tabs and vp.addons.isAncestorOf(s.custom_box)
+    assert vp.current_tab() != "addons" and not s.custom_box.isVisibleTo(vp)
+    assert not s.isAncestorOf(s.custom_box)          # in Add-ons, not inside Speak
     s.b_add_voices.click()
-    assert vp.current_tab() == "custom" and s.custom_box.isVisibleTo(vp)
+    assert vp.current_tab() == "addons" and s.custom_box.isVisibleTo(vp)
     assert not s.btn_opts.isChecked()
     vp.show_tab("fx")
     dlg = SettingsDialog(w, "audio")
@@ -204,3 +206,14 @@ def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window): 
         assert w.tabs.currentWidget() is w.voice and s.custom_box.isVisibleTo(vp)
     finally:
         dlg.deleteLater()
+
+
+def test_a_saved_custom_tab_opens_add_ons(qapp):
+    """Someone who last had the old Custom tab open lands on Add-ons, where it went."""
+    from soundboard.ui.voicepanel import VoicePanel
+    from tests.test_voicepanel import FakeEngine
+    vp = VoicePanel(FakeEngine(), None, {"tab": "custom"})
+    try:
+        assert vp.current_tab() == "addons"
+    finally:
+        vp.deleteLater()

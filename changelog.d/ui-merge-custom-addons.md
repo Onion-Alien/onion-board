@@ -1,0 +1,1 @@
+- The Voice tab's Custom tab is now part of Add-ons: custom voices (voice servers and voice packs) sit under the add-ons list, one tab fewer.
