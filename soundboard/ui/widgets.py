@@ -1274,7 +1274,13 @@ class PadGrid(QWidget):
         w = max(1, min(self.pad_w, room))
         if self.two_up and (room + sp) // (w + sp) < 2 and room - sp >= 2 * MINI_PAD_MIN_W:
             w = (room - sp) // 2
-        return max(1, (room + sp) // (w + sp)), w
+        # the picked size is roughly what they get: the pads stretch so the row ends at
+        # the edge (a fixed size left a strip as wide as most of a pad on the right),
+        # or take one more a row when that shrinks them by a fifth at most
+        cols = max(1, (room + sp) // (w + sp))
+        if (room - sp * cols) // (cols + 1) >= w * 0.8:
+            cols += 1
+        return cols, max(1, (room - sp * (cols - 1)) // cols)
 
     def row_height(self) -> int:
         """One row of pads as they're laid out now, margins included (0 with none)."""

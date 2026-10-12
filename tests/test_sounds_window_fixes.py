@@ -312,7 +312,7 @@ def test_pads_are_built_at_a_size_the_slider_can_show(qapp, app_dir, quiet, monk
     w = main.MainWindow()
     try:
         w._load_thread.join(10)
-        assert 110 <= w.pads["a"].width() <= 240
+        assert 110 <= w.grid.pad_w <= 240   # (the pads stretch from it to the edge)
         assert w.cfg.pad_width == (110 if pad_width < 110 else 240)
     finally:
         _close(qapp, w)
