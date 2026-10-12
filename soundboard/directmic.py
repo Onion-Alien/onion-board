@@ -242,6 +242,7 @@ class RingWriter:
 
     def __init__(self, path: Path | None = None):
         path = Path(path or ring_path())
+        self._claimed = False
         self._f = open(path, "r+b")
         try:
             self._mm = mmap.mmap(self._f.fileno(), FILE_BYTES)
@@ -327,12 +328,26 @@ class RingWriter:
         """This board writes the ring from now on. Another board still writing it (a
         second copy of the app on its own profile) keeps it: two writing at once would
         put both mixes, chopped up, on the mic."""
+        if self._claimed:
+            return
+        if sys.platform == "win32":
+            import msvcrt
+
+            # Held for this writer's lifetime, including startup and stalled callbacks.
+            # A process crash closes the handle and releases it. Never on the APO thread.
+            self._f.seek(84)
+            try:
+                msvcrt.locking(self._f.fileno(), msvcrt.LK_NBLCK, 4)
+            except OSError:
+                raise RuntimeError(_("Another Onion Board is already sending into your mic. "
+                                     "Close it, and this one takes over.")) from None
         pid, me = int(self._get("board_pid")), os.getpid()
         if pid and pid != me and self._get("enabled") \
                 and _tick() - int(self._btick[0]) < OTHER_BOARD_MS and _pid_alive(pid):
             raise RuntimeError(_("Another Onion Board is already sending into your mic. "
                                  "Close it, and this one takes over."))
         self._set("board_pid", me)
+        self._claimed = True
 
     def set_enabled(self, on: bool):
         self._set("enabled", 1 if on else 0)
@@ -354,18 +369,18 @@ class RingWriter:
         """Ring frame `wp` is the board's audio for clean-mic frame `mic`: a board late
         with a block, the effect fills in with the mic from the same moment (no skip or
         repeat in the voice). Odd sync_seq while it changes: the effect reads it then."""
-        seq = int(self._get("sync_seq"))
-        self._set("sync_seq", (seq + 1) & 0xFFFFFFFF)
+        seq = int(self._get("sync_seq")) | 1
+        self._set("sync_seq", seq)
         self._set("sync_wp", wp)
         self._set("sync_mic", mic)
-        self._set("sync_seq", (seq + 2) & 0xFFFFFFFE)
+        self._set("sync_seq", (seq + 1) & 0xFFFFFFFE)
 
     def clear_sync(self):
-        seq = int(self._get("sync_seq"))
-        self._set("sync_seq", (seq + 1) & 0xFFFFFFFF)
+        seq = int(self._get("sync_seq")) | 1
+        self._set("sync_seq", seq)
         self._set("sync_wp", 0)
         self._set("sync_mic", 0)
-        self._set("sync_seq", (seq + 2) & 0xFFFFFFFE)
+        self._set("sync_seq", (seq + 1) & 0xFFFFFFFE)
 
     def jump(self, pos: int):
         """Start writing at `pos`."""
