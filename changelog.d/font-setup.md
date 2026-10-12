@@ -1,0 +1,1 @@
+- Setup's mix-diagram icons follow the first line's capital height in every theme font.

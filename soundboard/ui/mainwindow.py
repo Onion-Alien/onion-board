@@ -2172,7 +2172,7 @@ class MainWindow(QMainWindow):
             row = QHBoxLayout()
             row.setSpacing(8)
             if ic:
-                row.addWidget(icon_label(ic))
+                row.addWidget(CapIcon(w, ic))
             else:
                 row.addSpacing(26)
             row.addWidget(w, 1)
