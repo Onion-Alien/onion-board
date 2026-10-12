@@ -453,6 +453,29 @@ def _add_accent_text_token(t: dict[str, str]) -> None:
 
 SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
 
+
+def is_light_colour(colour: str) -> bool:
+    """Whether `colour` is a light one (the window background of a light theme)."""
+    c = QColor(colour)
+    return 0.299 * c.red() + 0.587 * c.green() + 0.114 * c.blue() > 140
+
+
+def _lift_buttons(t: dict[str, str]) -> None:
+    """A light theme's buttons a shade darker until they stand out (1.12:1) from both the
+    window and the panels: Light's were 1.06:1 on the window, so a pop-up's Done or Copy
+    read as plain words. Hover and press move with them. Dark themes are left alone (a
+    small step shows on dark colours), and so are outlined ones (High Contrast)."""
+    if not is_light_colour(t["bg"]):
+        return
+    for i in range(16):
+        c = _mix(t["btn"], t["text"], i / 40)
+        if min(_contrast(c, t["bg"]), _contrast(c, t["panel"])) >= 1.12:
+            break
+    if i:
+        for key in ("btn", "btn_hover", "btn_press"):
+            t[key] = _mix(t[key], t["text"], i / 40)
+
+
 for _t in THEMES.values():
     # Secondary text must read (4.5:1) on every surface it sits on: a quiet button's
     # hover and the inset boxes too (they were 3.6-4.5:1 in most themes).
@@ -461,6 +484,22 @@ for _t in THEMES.values():
                                   for i in range(21))
                        if min(_contrast(c, _t[bg]) for bg in SECONDARY_ON if bg in _t) >= 4.5
                        or c == _t["text_hi"])
+    _lift_buttons(_t)
+    # boxes and buttons on a panel or card: the card's colour, or where cards are (near
+    # enough) the panel's (Light: white on white, the buttons read as plain text; Paper
+    # and Cherry Blossom a hair off it) the button colour, or its hover one when that's
+    # the panel's too (Flashbang). Light colours need a bigger step to show; a dark theme
+    # whose buttons are no better keeps its card colour (High Contrast: outlined anyway)
+    light = is_light_colour(_t["bg"])
+    need = 1.10 if light else 1.08
+    _t.setdefault("card_ctl", next(
+        (c for c in ((_t["card"], _t["btn"], _t["btn_hover"], _t["groove"]) if light
+                     else (_t["card"], _t["btn"]))
+         if _contrast(c, _t["panel"]) >= need), _t["groove"] if light else _t["card"]))
+    # boxes drawn in the window colour on a panel (Settings' boxes, number boxes, the
+    # sounds search): the card one where the window is the panel's (Flashbang, Comic Sans)
+    _t.setdefault("field", _t["bg"] if _contrast(_t["bg"], _t["panel"]) >= need
+                  else _t["card_ctl"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
     _add_item_hover_token(_t)
@@ -613,7 +652,7 @@ QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
 QFrame#soundstoolbar QPushButton#soundadd { color:$accent_link; font-weight:600; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
-QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
+QLineEdit#soundssearch { background:$field; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
 QLineEdit#soundssearch:hover { border-color:$border_hi; }
 QLineEdit#soundssearch:focus { border-color:$accent; }
@@ -716,14 +755,14 @@ QPushButton#onair:checked:hover { background:$live_hover; }
 QWidget#decktop { background:transparent; }
 QLabel#decktitle { color:$text; font-size:9pt; font-weight:600; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
-QAbstractSpinBox { background:$bg; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
+QAbstractSpinBox { background:$field; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
 QAbstractSpinBox:hover { border-color:$border_hi; }
 QAbstractSpinBox:focus { border-color:$border_hi; }
 QSpinBox::up-button, QSpinBox::down-button { width:0; }
 QSpinBox#pct, QFrame#card QSpinBox#pct { background:transparent; border-color:transparent;
     padding:3px 2px; }
-QSpinBox#pct:hover, QFrame#card QSpinBox#pct:hover { background:$bg; border-color:$border_hi; }
-QSpinBox#pct:focus, QFrame#card QSpinBox#pct:focus { background:$bg; border-color:$border_hi; }
+QSpinBox#pct:hover, QFrame#card QSpinBox#pct:hover { background:$field; border-color:$border_hi; }
+QSpinBox#pct:focus, QFrame#card QSpinBox#pct:focus { background:$field; border-color:$border_hi; }
 QDoubleSpinBox, QSpinBox#stepper { padding-right:2px; }
 QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
 QSpinBox#stepper::up-button, QSpinBox#stepper::down-button {
@@ -774,7 +813,7 @@ QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border;
    purple stub sticking out past the handle at 0:00 (it looked a few seconds in) */
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
-QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
+QLineEdit, QComboBox { background:$card_ctl; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
 QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$border_hi; }
 QLineEdit { selection-background-color:$btn_press; selection-color:$text_hi; }
@@ -791,7 +830,7 @@ QFrame#card QPushButton:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#card QPushButton:focus { border-color:$accent; }
 QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
-QFrame#card QAbstractSpinBox { background:$bg; }
+QFrame#card QAbstractSpinBox { background:$field; }
 QFrame#card QPushButton:checked { background:$accent; }
 QFrame#card QPushButton#miccheck:checked { background:#d32f2f; }
 QComboBox QAbstractItemView { background:$card; color:$text; border:1px solid $border_hi;
@@ -890,7 +929,7 @@ QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* the Voice tab: its row of tabs, the voice changer's picture cards, the picked voice */
-QPushButton#voicetab { border-radius:10px; padding:7px 14px; background:$inset; border:1px solid $border; font-weight:600; }
+QPushButton#voicetab { border-radius:10px; padding:7px 14px; background:$btn; border:1px solid $border; font-weight:600; }
 QPushButton#voicetab:hover:!checked { background:$btn_hover; border-color:$border_hi; }
 QPushButton#voicetab:checked { background:$accent; color:$on_accent; border-color:$accent_hi; }
 QPushButton#voicetab[live="true"]:!checked { color:$live_text; border-color:$live_border; }
@@ -990,7 +1029,11 @@ QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
-QFrame#setcard QLineEdit, QFrame#setcard QComboBox { background:$bg; }
+QFrame#setcard QLineEdit, QFrame#setcard QComboBox { background:$field; }
+/* setcard's QWidget rule made number boxes see-through: Remote's Port had no box */
+QFrame#setcard QAbstractSpinBox { background:$field; }
+QFrame#setcard QSpinBox#pct { background:transparent; }
+QFrame#setcard QSpinBox#pct:hover, QFrame#setcard QSpinBox#pct:focus { background:$field; }
 QFrame#setcard QLineEdit:hover, QFrame#setcard QComboBox:hover { background:$card; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid transparent; border-radius:6px;
@@ -1401,11 +1444,6 @@ def stylesheet(name: str | None = None) -> str:
     tk["rail_border"] = tk["border"] if outlined else _mix(tk["bg"], tk["border"], 0.35)
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
-    # controls on a card: the card's colour, or where cards are the panel's (Light: white
-    # on white, the buttons read as plain text) the button colour, or its hover one when
-    # that's white too (Flashbang)
-    tk["card_ctl"] = next((c for c in (tk["card"], tk["btn"], tk["btn_hover"], tk["groove"])
-                           if _contrast(c, tk["panel"]) >= 1.05), tk["groove"])
     tk["check"] = _check_url(tk["on_accent"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])
