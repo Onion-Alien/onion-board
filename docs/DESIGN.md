@@ -649,7 +649,8 @@ The rules above are Onion Board's take on what the big design systems agree on n
   ring that nothing covers, tooltips show on keyboard focus too and close with Esc,
   nothing relies on colour alone (a tick, an icon or a word goes with it).
 - **Calm motion**: short and purposeful; respect Windows' "Animation effects" off
-  setting by skipping animations when it's off.
+  setting by skipping animations when it's off. A loading indicator keeps a quiet
+  colour change (no movement) so a busy app never looks frozen.
 
 ## 12. Where things live
 
