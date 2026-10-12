@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMainWindow
                                QSlider, QStackedWidget, QStyle, QTabWidget, QToolTip,
                                QVBoxLayout, QWidget)
 from shiboken6 import delete as qt_delete
+from shiboken6 import isValid as qt_valid
 
 from soundboard import library, midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -366,6 +367,9 @@ class SteadyTabs(QObject):
 
     def _state(self):
         t, bar = self._tabs, self._tabs.tabBar()
+        if self._stack is not None and not qt_valid(self._stack):   # (seen once: find it again)
+            self._stack = t.findChild(QStackedWidget, "qt_tabwidget_stackedwidget",
+                                      Qt.FindChildOption.FindDirectChildrenOnly)
         corners = tuple(w.sizeHint() if w is not None and w.isVisible() else None
                         for w in (t.cornerWidget(Qt.Corner.TopLeftCorner),
                                   t.cornerWidget(Qt.Corner.TopRightCorner)))
