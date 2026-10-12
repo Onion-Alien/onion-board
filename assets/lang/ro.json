@@ -3360,5 +3360,11 @@
   "Discord, games, Zoom and Teams": "Discord, jocuri, Zoom și Teams",
   "Equalizer and volume": "Egalizator și volum",
   "Volumes as they are": "Volumele așa cum sunt",
-  "Volumes levelled": "Volume egalizate"
+  "Volumes levelled": "Volume egalizate",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord și jocurile nu aud nimic de la microfonul tău. Dacă e pe mut, scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>, apoi pe <b>Da</b> când întreabă Windows.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord și jocurile nu aud nimic de la microfonul tău. Dacă e pe mut, scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>: sunetul se oprește câteva secunde.",
+  "No sound": "Fără sunet",
+  "Your mic sends no sound": "Microfonul tău nu trimite niciun sunet",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet, nici după repornirea sunetului din Windows. Dacă microfonul căștilor e pe mut, scoate-l de pe mut. Dacă nu, repornește PC-ul, apoi încearcă din nou.",
+  "Your mic sends no sound: see the Setup tab.": "Microfonul tău nu trimite niciun sunet: vezi fila Configurare."
 }

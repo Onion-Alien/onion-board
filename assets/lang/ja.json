@@ -3214,5 +3214,11 @@
   "Discord, games, Zoom and Teams": "Discord、ゲーム、Zoom、Teams",
   "Equalizer and volume": "イコライザーと音量",
   "Volumes as they are": "音量はそのまま",
-  "Volumes levelled": "音量をそろえ済み"
+  "Volumes levelled": "音量をそろえ済み",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord やゲームにマイクの音が何も届いていません。ミュートになっていれば解除してください。そうでなければ<b>修復</b>をクリックし、Windows の確認で<b>はい</b>をクリックしてください。",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ミュートになっていれば解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
+  "No sound": "音なし",
+  "Your mic sends no sound": "マイクから音が出ていません",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows のオーディオを再起動しても、マイクから音が出ていません。ヘッドセットのマイクがミュートになっていれば解除してください。そうでなければ PC を再起動してから、もう一度お試しください。",
+  "Your mic sends no sound: see the Setup tab.": "マイクから音が出ていません: セットアップ タブを確認してください。"
 }

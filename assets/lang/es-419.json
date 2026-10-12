@@ -3287,5 +3287,11 @@
   "Discord, games, Zoom and Teams": "Discord, juegos, Zoom y Teams",
   "Equalizer and volume": "Ecualizador y volumen",
   "Volumes as they are": "Volúmenes sin cambios",
-  "Volumes levelled": "Volúmenes igualados"
+  "Volumes levelled": "Volúmenes igualados",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord y los juegos no oyen nada de tu micrófono. Si está silenciado, quita el silencio. Si no, haz clic en <b>Reparar</b> y luego en <b>Sí</b> cuando Windows pregunte.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord y los juegos no oyen nada de tu micrófono. Si está silenciado, quita el silencio. Si no, haz clic en <b>Reparar</b>: el sonido se corta unos segundos.",
+  "No sound": "Sin sonido",
+  "Your mic sends no sound": "Tu micrófono no envía sonido",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Tu micrófono no envía sonido, ni siquiera después de reiniciar el audio de Windows. Si el micrófono de tus audífonos está silenciado, quita el silencio. Si no, reinicia tu PC y vuelve a intentarlo.",
+  "Your mic sends no sound: see the Setup tab.": "Tu micrófono no envía sonido: ve a la pestaña Configuración."
 }

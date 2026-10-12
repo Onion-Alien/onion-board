@@ -3287,5 +3287,11 @@
   "Discord, games, Zoom and Teams": "Discord, игри, Zoom и Teams",
   "Equalizer and volume": "Еквалайзер и сила на звука",
   "Volumes as they are": "Силата на звука както е",
-  "Volumes levelled": "Силата е изравнена"
+  "Volumes levelled": "Силата е изравнена",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord и игрите не чуват нищо от микрофона ти. Ако е заглушен, включи го. Ако не е, кликни <b>Поправи</b>, после <b>Да</b>, когато Windows попита.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord и игрите не чуват нищо от микрофона ти. Ако е заглушен, включи го. Ако не е, кликни <b>Поправи</b>: звукът ще изчезне за няколко секунди.",
+  "No sound": "Няма звук",
+  "Your mic sends no sound": "Микрофонът ти не праща звук",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Микрофонът ти не праща звук дори след рестарт на звука на Windows. Ако микрофонът на слушалките е заглушен, включи го. Ако не е, рестартирай компютъра и опитай пак.",
+  "Your mic sends no sound: see the Setup tab.": "Микрофонът ти не праща звук: виж раздела Настройка."
 }

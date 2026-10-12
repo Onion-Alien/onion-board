@@ -3287,5 +3287,11 @@
   "Discord, games, Zoom and Teams": "Discord, spil, Zoom og Teams",
   "Equalizer and volume": "Equalizer og lydstyrke",
   "Volumes as they are": "Lydstyrker som de er",
-  "Volumes levelled": "Lydstyrker udjævnet"
+  "Volumes levelled": "Lydstyrker udjævnet",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord og spil hører intet fra din mikrofon. Hvis den er slået fra, så slå den til. Hvis ikke, klik <b>Reparér</b> og derefter <b>Ja</b>, når Windows spørger.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord og spil hører intet fra din mikrofon. Hvis den er slået fra, så slå den til. Hvis ikke, klik <b>Reparér</b>: lyden forsvinder i et par sekunder.",
+  "No sound": "Ingen lyd",
+  "Your mic sends no sound": "Din mikrofon sender ingen lyd",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Din mikrofon sender ingen lyd, selv efter at Windows' lyd er genstartet. Hvis mikrofonen på dit headset er slået fra, så slå den til. Hvis ikke, genstart din pc, og prøv igen.",
+  "Your mic sends no sound: see the Setup tab.": "Din mikrofon sender ingen lyd: se fanen Opsætning."
 }

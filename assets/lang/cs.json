@@ -3360,5 +3360,11 @@
   "Discord, games, Zoom and Teams": "Discord, hry, Zoom a Teams",
   "Equalizer and volume": "Ekvalizér a hlasitost",
   "Volumes as they are": "Hlasitost beze změn",
-  "Volumes levelled": "Hlasitost vyrovnaná"
+  "Volumes levelled": "Hlasitost vyrovnaná",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord a hry z tvého mikrofonu nic neslyší. Jestli je ztlumený, zapni ho. Jestli ne, klikni na <b>Opravit</b> a pak na <b>Ano</b>, až se Windows zeptají.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord a hry z tvého mikrofonu nic neslyší. Jestli je ztlumený, zapni ho. Jestli ne, klikni na <b>Opravit</b>: zvuk na pár sekund vypadne.",
+  "No sound": "Bez zvuku",
+  "Your mic sends no sound": "Tvůj mikrofon neposílá žádný zvuk",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk ani po restartu zvuku Windows. Jestli máš mikrofon na sluchátkách ztlumený, zapni ho. Jestli ne, restartuj počítač a zkus to znovu.",
+  "Your mic sends no sound: see the Setup tab.": "Tvůj mikrofon neposílá žádný zvuk: podívej se na kartu Nastavení."
 }

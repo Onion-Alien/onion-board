@@ -3360,5 +3360,11 @@
   "Discord, games, Zoom and Teams": "Discord, ігри, Zoom і Teams",
   "Equalizer and volume": "Еквалайзер і гучність",
   "Volumes as they are": "Гучність як є",
-  "Volumes levelled": "Гучність вирівняно"
+  "Volumes levelled": "Гучність вирівняно",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord та ігри нічого не чують з твого мікрофона. Якщо його вимкнено, увімкни. Якщо ні, натисни <b>Полагодити</b>, потім <b>Так</b>, коли Windows запитає.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord та ігри нічого не чують з твого мікрофона. Якщо його вимкнено, увімкни. Якщо ні, натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
+  "No sound": "Немає звуку",
+  "Your mic sends no sound": "Мікрофон не передає звук",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Мікрофон не передає звук навіть після перезапуску звуку Windows. Якщо мікрофон на гарнітурі вимкнено, увімкни його. Якщо ні, перезавантаж ПК і спробуй ще раз.",
+  "Your mic sends no sound: see the Setup tab.": "Мікрофон не передає звук: глянь вкладку «Налаштування»."
 }

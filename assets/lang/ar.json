@@ -3579,5 +3579,11 @@
   "Discord, games, Zoom and Teams": "Discord والألعاب وZoom وTeams",
   "Equalizer and volume": "المعادل ومستوى الصوت",
   "Volumes as they are": "مستويات الصوت كما هي",
-  "Volumes levelled": "مستوى الصوت موحّد"
+  "Volumes levelled": "مستوى الصوت موحّد",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. إذا كان كتم الصوت مفعّلًا، فأوقفه. وإلا، انقر <b>إصلاح</b>، ثم <b>نعم</b> عندما يطلب Windows الإذن.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. إذا كان كتم الصوت مفعّلًا، فأوقفه. وإلا، انقر <b>إصلاح</b>: سينقطع الصوت لبضع ثوانٍ.",
+  "No sound": "لا صوت",
+  "Your mic sends no sound": "الميكروفون لا يرسل أي صوت",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "الميكروفون لا يرسل أي صوت، حتى بعد إعادة تشغيل صوت Windows. إذا كان ميكروفون السماعة مكتومًا، فألغِ الكتم. وإلا، أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى.",
+  "Your mic sends no sound: see the Setup tab.": "الميكروفون لا يرسل أي صوت: راجع علامة تبويب الإعداد."
 }

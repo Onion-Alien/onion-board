@@ -3214,5 +3214,11 @@
   "Discord, games, Zoom and Teams": "Discord, trò chơi, Zoom và Teams",
   "Equalizer and volume": "Bộ chỉnh hóa và âm lượng",
   "Volumes as they are": "Âm lượng giữ nguyên",
-  "Volumes levelled": "Âm lượng đã cân bằng"
+  "Volumes levelled": "Âm lượng đã cân bằng",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord và game không nghe thấy gì từ mic của bạn. Nếu mic đang tắt tiếng, hãy bật lại. Nếu không, bấm <b>Sửa</b>, rồi bấm <b>Có</b> khi Windows hỏi.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord và game không nghe thấy gì từ mic của bạn. Nếu mic đang tắt tiếng, hãy bật lại. Nếu không, bấm <b>Sửa</b>: âm thanh sẽ mất vài giây.",
+  "No sound": "Không có tiếng",
+  "Your mic sends no sound": "Mic của bạn không gửi âm thanh",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mic của bạn không gửi âm thanh, kể cả sau khi khởi động lại âm thanh của Windows. Nếu mic trên tai nghe đang tắt tiếng, hãy bật lại. Nếu không, khởi động lại PC rồi thử lại.",
+  "Your mic sends no sound: see the Setup tab.": "Mic của bạn không gửi âm thanh: xem tab Thiết lập."
 }

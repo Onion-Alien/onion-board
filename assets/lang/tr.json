@@ -3287,5 +3287,11 @@
   "Discord, games, Zoom and Teams": "Discord, oyunlar, Zoom ve Teams",
   "Equalizer and volume": "Ekolayzer ve ses seviyesi",
   "Volumes as they are": "Ses seviyeleri olduğu gibi",
-  "Volumes levelled": "Ses seviyeleri eşit"
+  "Volumes levelled": "Ses seviyeleri eşit",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Sesi kapalıysa aç. Değilse <b>Onar</b>'a, sonra Windows sorunca <b>Evet</b>'e tıkla.",
+  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Sesi kapalıysa aç. Değilse <b>Onar</b>'a tıkla: sesin birkaç saniye kesilir.",
+  "No sound": "Ses yok",
+  "Your mic sends no sound": "Mikrofonun ses göndermiyor",
+  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows sesi yeniden başlatıldıktan sonra bile mikrofonun ses göndermiyor. Kulaklığının mikrofonu sessizdeyse aç. Değilse bilgisayarını yeniden başlat, sonra tekrar dene.",
+  "Your mic sends no sound: see the Setup tab.": "Mikrofonun ses göndermiyor: Kurulum sekmesine bak."
 }

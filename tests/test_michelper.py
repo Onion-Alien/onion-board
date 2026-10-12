@@ -37,7 +37,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                10: "e9d84913fb40a44975302aed80f4875feeb7ae9626065a410678e62a3f3b4383",
                11: "eeedff2b4f38cd99b8f919dd3f60f120d0977ab0be28055f52330e587103119b",
                12: "3b389974f12790f2d46748bd7ce4b2574784de39c3e5e8b326d4df433a948f67",
-               13: "2b9a8b2aa795c38c77edac07e71c306a9011b81e2df7e37c9137d5699167b47c"}
+               13: "2b9a8b2aa795c38c77edac07e71c306a9011b81e2df7e37c9137d5699167b47c",
+               14: "d4c592e4156e26c16ab50fa4674833da0e125264091e8ac31bc52c69abec9c3b"}
 
 
 def _queue():
@@ -276,6 +277,15 @@ def admin_cli(monkeypatch):
 
 def test_the_one_prompt_sets_up_the_helper(admin_cli):
     assert dm.cli(["install", GUID]) == 0
+    assert admin_cli == ["install", "helper"]
+
+
+def test_a_set_up_left_with_a_silent_mic_still_sets_up_the_helper(admin_cli, monkeypatch):
+    """The effect went on (only the mic came back silent): the helper is set up as
+    after any set-up, and the app hears MIC_SILENT."""
+    monkeypatch.setattr(dm, "admin_install",
+                        lambda guid, slot=None: admin_cli.append("install") or dm.MIC_SILENT)
+    assert dm.cli(["install", GUID]) == dm.MIC_SILENT
     assert admin_cli == ["install", "helper"]
 
 
