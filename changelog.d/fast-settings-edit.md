@@ -1,0 +1,1 @@
+- Settings and Edit sound open again almost at once (about 15 ms instead of 100-300 ms): a closed one is kept and reused instead of being built again each time.

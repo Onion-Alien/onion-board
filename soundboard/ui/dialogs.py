@@ -128,12 +128,10 @@ class EffectsPanel(QWidget):
         v.addLayout(prow)
 
         v.addWidget(section_label(_("Trim")))
-        peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
-        self.trim = TrimPanel(peaks, length)
-        v.addWidget(self.trim)              # in the layout first: shown with no parent,
-        self.trim.setVisible(length > 0)    # it flashed up as a window of its own
-        if length <= 0:
-            v.addWidget(hint_label(_("Trimming works once the sound has loaded.")))
+        self._v = v
+        self.trim_hint = hint_label(_("Trimming works once the sound has loaded."))
+        self.trim = self._new_trim(meta)
+        v.addWidget(self.trim_hint)
 
         v.addWidget(section_label(_("Speed & pitch")))
         self.speed = ParamSlider(SPEED, 1.0, centred=True)
@@ -176,10 +174,32 @@ class EffectsPanel(QWidget):
             s.changed.connect(self._edited)
         self.tape.toggled.connect(self._edited)
         self.reverse.toggled.connect(self._edited)
-        self.trim.changed.connect(self._edited)
         self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentIndexChanged.connect(
             lambda __: self._on_preset(self.preset.currentData()))
+        self._matching_preset()
+
+    def _new_trim(self, meta: SoundMeta | None, at: int = -1) -> TrimPanel:
+        """The trim for `meta`'s sound (its waveform is that sound's)."""
+        peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
+        trim = TrimPanel(peaks, length)
+        if at < 0:
+            self._v.addWidget(trim)     # in the layout first: shown with no parent,
+        else:
+            self._v.insertWidget(at, trim)
+        trim.setVisible(length > 0)     # it flashed up as a window of its own
+        self.trim_hint.setVisible(length <= 0)
+        trim.changed.connect(self._edited)
+        return trim
+
+    def set_sound(self, meta: SoundMeta):
+        """Show another sound (Edit sound reused, MainWindow.edit): its trim and fx."""
+        old = self.trim
+        self.trim = self._new_trim(meta, self._v.indexOf(old))
+        self._v.removeWidget(old)
+        old.hide()
+        old.deleteLater()
+        self.load(meta.fx or {})
         self._matching_preset()
 
     def load(self, fx: dict):
@@ -367,34 +387,9 @@ class EditDialog(QDialog):
         self._show_picture()
 
         # where a downloaded sound came from (soundboard.sourceinfo)
-        self.btn_source = None
-        if src := sourceinfo.shown(meta):
-            srow = QHBoxLayout()
-            srow.setSpacing(8)
-            ic = QLabel()
-            icons.set_label_icon(ic, sourceinfo.icon(src), size=16)
-            srow.addWidget(ic)
-            site, who = sourceinfo.site_name(src), src.get("channel")
-            from_lbl = QLabel(_("From {site}: {channel}", site=site, channel=who) if who
-                              else _("From {site}", site=site))
-            from_lbl.setObjectName("muted")
-            srow.addWidget(from_lbl)
-            self.btn_source = QPushButton(_("Details"))
-            self.btn_source.setProperty("quiet", True)
-            self.btn_source.setToolTip(src["link"])
-            srow.addWidget(self.btn_source)
-            srow.addStretch(1)
-            self.source_row = QWidget()
-            self.source_row.setLayout(srow)
-            srow.setContentsMargins(0, 0, 0, 0)
-            g.addWidget(self.source_row, g.rowCount(), 0, 1, 2)
-
-            def details():
-                d = sourcedialog.SourceDialog(self.meta, self)
-                d.forgotten.connect(self.source_row.hide)
-                d.forgotten.connect(self.source_forgotten)   # the owner saves it
-                d.show()
-            self.btn_source.clicked.connect(details)
+        self._look, self._source_at = g, g.rowCount()
+        self.btn_source = self.source_row = None
+        self._fill_source()
 
         # how it plays: the hotkey is what most people open this for
         g = card(_("Playback"))
@@ -489,6 +484,7 @@ class EditDialog(QDialog):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.effects)
+        self._fx_scroll = scroll
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self.tabs.addTab(scroll, _("Effects"))
         self.tabs.currentChanged.connect(
@@ -549,6 +545,75 @@ class EditDialog(QDialog):
         lay.addLayout(brow)
         self.setMinimumWidth(500)
         self.resize(540, 640)
+
+    def _fill_source(self):
+        """The "From YouTube: channel  [Details]" row, for the sound shown (none: no row)."""
+        if self.source_row is not None:
+            self._look.removeWidget(self.source_row)
+            self.source_row.hide()
+            self.source_row.deleteLater()
+        self.btn_source = self.source_row = None
+        if not (src := sourceinfo.shown(self.meta)):
+            return
+        srow = QHBoxLayout()
+        srow.setSpacing(8)
+        ic = QLabel()
+        icons.set_label_icon(ic, sourceinfo.icon(src), size=16)
+        srow.addWidget(ic)
+        site, who = sourceinfo.site_name(src), src.get("channel")
+        from_lbl = QLabel(_("From {site}: {channel}", site=site, channel=who) if who
+                          else _("From {site}", site=site))
+        from_lbl.setObjectName("muted")
+        srow.addWidget(from_lbl)
+        self.btn_source = QPushButton(_("Details"))
+        self.btn_source.setProperty("quiet", True)
+        self.btn_source.setToolTip(src["link"])
+        srow.addWidget(self.btn_source)
+        srow.addStretch(1)
+        row = self.source_row = QWidget()
+        row.setLayout(srow)
+        srow.setContentsMargins(0, 0, 0, 0)
+        self._look.addWidget(row, self._source_at, 0, 1, 2)
+
+        def details():
+            d = sourcedialog.SourceDialog(self.meta, self)
+            d.forgotten.connect(row.hide)
+            d.forgotten.connect(self.source_forgotten)   # the owner saves it
+            d.show()
+        self.btn_source.clicked.connect(details)
+
+    def load(self, meta: SoundMeta, tab: str = "sound"):
+        """Show another sound, as a new window would: MainWindow.edit reuses a closed
+        one (building one took ~200 ms each time)."""
+        for child in self.findChildren(QDialog):   # its Details / hotkey boxes
+            child.close()
+        self.meta = meta
+        self.hotkey = meta.hotkey
+        self.as_copy = False
+        self.setResult(0)
+        self.name.setText(meta.name)
+        self.name.setCursorPosition(0)
+        self.picture = None
+        self._set_picture(None)
+        self.pic_view.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 6px;")
+        self._fill_source()
+        self.vol.setValue(round(meta.volume * 100))
+        self._set_hk(self.hotkey)
+        self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
+        self.loop.setChecked(meta.loop)
+        self.hold.setChecked(meta.hold)
+        self.only_them.setChecked(meta.only_them)
+        for sl, value in ((self.fade_in, meta.fade_in), (self.fade_out, meta.fade_out),
+                          (self.delay, meta.delay), (self.cooldown, meta.cooldown)):
+            sl.setValue(int(round(min(max(value, 0.0), sl.maximum() / 10) * 10)))
+        self._set_color(meta.color)
+        self.effects.set_sound(meta)
+        self._fx_scroll.verticalScrollBar().setValue(0)
+        busy.set_busy(self.btn_preview, False)
+        self._saying = False
+        self._said = getattr(self, "_said", 0) + 1   # a "Playing" still timing out
+        self._fx_note()
+        self.tabs.setCurrentIndex(1 if tab == "effects" else 0)
 
     @staticmethod
     def _fade_cell(grid: QGridLayout, r: int, col: int, label: str, value: float, tip: str,

@@ -143,9 +143,15 @@ def free_dialog(dlg: QDialog):
     Already gone (its window was freed first, before a deferred call got here): done."""
     if not shiboken6.isValid(dlg):
         return
+    rehome_crash_reports(dlg)
+    shiboken6.delete(dlg)
+
+
+def rehome_crash_reports(dlg: QDialog):
+    """Crash reports opened over `dlg` move to its parent's window and stay up: it's
+    being freed, or kept hidden to be opened again (MainWindow's Settings, Edit sound)."""
     parent = dlg.parentWidget()
     parent = parent.window() if parent is not None else None
     for c in dlg.findChildren(CrashDialog):
         c.setParent(parent, c.windowFlags())
         c.show()
-    shiboken6.delete(dlg)

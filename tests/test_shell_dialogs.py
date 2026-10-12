@@ -34,8 +34,32 @@ def test_closed_settings_and_setup_dialogs_are_freed(qapp, win, monkeypatch):
         win.open_settings().done(0)   # Settings, a page in the window: Done closes it
         qapp.processEvents()          # (freed just after its finished signal)
         win.run_setup()
-    assert win.findChildren(settings.SettingsDialog) == []
+    # (one closed Settings is kept to open again quickly: never one per opening)
+    assert len(win.findChildren(settings.SettingsDialog)) <= 1
     assert win.findChildren(setupwizard.SetupWizard) == []
+
+
+def test_settings_opened_again_is_the_kept_one_unless_its_config_changed(qapp, win):
+    """Building Settings took 100-300 ms on every click of the cog: closed, it's kept,
+    and opened again as it was. Config it shows changed meanwhile: built fresh."""
+    d = win.open_settings("audio")
+    d.accept()
+    qapp.processEvents()
+    assert win._settings_dlg is None and not win.settings_open()
+    again = win.open_settings("appearance")
+    assert again is d and win.settings_open()
+    assert d._page_keys[d.tabs.currentIndex()] == "appearance"
+    again.accept()
+    qapp.processEvents()
+    win.cfg.always_on_top = not win.cfg.always_on_top   # changed outside Settings
+    fresh = win.open_settings("general")
+    assert fresh is not d and win.settings_open()
+    fresh.accept()
+    qapp.processEvents()
+    d2 = win.open_settings("updates")   # shows live state: never kept
+    d2.accept()
+    qapp.processEvents()
+    assert win.open_settings() is not d2
 
 
 def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):

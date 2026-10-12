@@ -46,7 +46,7 @@ from soundboard.library import (AUDIO_EXTS, PAD_COLORS, PRESS_MODE, RESOURCE_DIR
                                 prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui import importreport
 from soundboard.ui import routewarn
@@ -459,6 +459,9 @@ class MainWindow(QMainWindow):
         # sound for each sound being edited
         self._settings_dlg: SettingsDialog | None = None
         self._editors: dict[str, EditDialog] = {}
+        self._spare_editor: EditDialog | None = None   # a closed one, reused (edit)
+        self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
+        self._settings_kept_print = None
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -5379,8 +5382,19 @@ class MainWindow(QMainWindow):
             if page:
                 dlg.show_page(page)
         else:
-            dlg = self._settings_dlg = SettingsDialog(self, page or "privacy", lazy=True)
-            dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+            dlg, self._settings_kept = self._settings_kept, None
+            # nothing it shows changed since it closed: the same one, as it was left
+            if dlg is not None and qt_valid(dlg) \
+                    and self._settings_print() == self._settings_kept_print:
+                dlg.show_page(page or "privacy")
+                if getattr(dlg, "dev_combos", None):
+                    dlg._sync_devices()
+            else:
+                if dlg is not None and qt_valid(dlg):
+                    free_dialog(dlg)
+                dlg = SettingsDialog(self, page or "privacy", lazy=True)
+                dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+            self._settings_dlg = dlg
             # (what "Send my sounds to" was: a new pick is checked on the way out)
             self._route_at_open = (self.cfg.route, self.cfg.main_device)
             self._content.addWidget(dlg)
@@ -5459,10 +5473,41 @@ class MainWindow(QMainWindow):
             self._focus_sounds_page(self.tabs.currentIndex())
             if not _holds_focus(self._tabs_area):
                 self.tabs.currentWidget().setFocus(Qt.FocusReason.OtherFocusReason)
-        # freed once its finished signal is over (deleting it inside that crashed)
-        QTimer.singleShot(0, lambda: free_dialog(dlg))
+        if self._settings_reusable(dlg):   # opened again as it is: no 100-300 ms rebuild
+            rehome_crash_reports(dlg)
+            old, self._settings_kept = self._settings_kept, dlg
+            self._settings_kept_print = self._settings_print()
+            if old is not None and old is not dlg and qt_valid(old):
+                QTimer.singleShot(0, lambda: free_dialog(old))
+        else:   # freed once its finished signal is over (deleting it inside that crashed)
+            QTimer.singleShot(0, lambda: free_dialog(dlg))
         self.register_hotkeys()   # in case a capture was cancelled
         self._check_route_pick()
+
+    # Settings pages showing state from outside the config (downloads, add-ons, Tor,
+    # updates, the remote's add-ons): a kept Settings with one of them built is rebuilt
+    SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about")
+    # config that changes without Settings showing it (counts, tips, the tab shown)
+    SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
+                           "update_checked", "whats_new_seen", "load_note")
+
+    def _settings_reusable(self, dlg) -> bool:
+        if not qt_valid(dlg) or dlg.search_box.text():
+            return False
+        built = [k for i, k in enumerate(dlg._page_keys) if i not in dlg._unbuilt]
+        return not any(k in self.SETTINGS_LIVE_PAGES for k in built)
+
+    def _settings_print(self) -> str:
+        """What a kept Settings shows: the config (less what it doesn't show) and the
+        device lists. Anything else changed since it closed: a new one is built."""
+        from dataclasses import fields
+        c = self.cfg
+        state = {f.name: getattr(c, f.name) for f in fields(c)
+                 if f.name not in self.SETTINGS_PRINT_SKIP and not f.name.startswith("stats_")}
+        for key, cb in (("~mic", self.cb_mic), ("~mon", self.cb_mon), ("~route", self.cb_route)):
+            state[key] = (
+                [cb.itemData(i) for i in range(cb.count())], cb.currentIndex())
+        return repr(sorted(state.items()))
 
     def _check_route_pick(self):
         """Leaving Settings with "Send my sounds to" newly on a device that isn't a
@@ -5506,6 +5551,7 @@ class MainWindow(QMainWindow):
 
     def _apply_theme(self, name: str):
         self.cfg.theme = theme.apply(QApplication.instance(), name)
+        self._drop_spare_dialogs()
         icons.retheme()
         self.radio.retheme()
         self.apps.retheme()
@@ -7741,15 +7787,22 @@ class MainWindow(QMainWindow):
         m = self.meta(sid)
         if m is None:
             return None
-        d = self._editors[sid] = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
-        d.hotkeys_changed.connect(self.register_hotkeys)
-        d.source_forgotten.connect(self._save_now)
-        d.finished.connect(lambda ok, sid=sid, d=d: self._edit_done(sid, d, ok))
+        # a closed one shows this sound instead: building one took ~200 ms every time
+        d, self._spare_editor = self._spare_editor, None
+        if d is not None and qt_valid(d):
+            d.load(m, tab)
+        else:
+            d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
+            d.hotkeys_changed.connect(self.register_hotkeys)
+            d.source_forgotten.connect(self._save_now)
+            d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
+        self._editors[sid] = d
         d.show()
         return d
 
     def _edit_done(self, sid: str, d: EditDialog, ok: int):
-        """An Edit sound window closed: Save puts its draft on the sound (or a copy)."""
+        """An Edit sound window closed: Save puts its draft on the sound (or a copy).
+        It's kept for the next sound edited (the first one closed; any more are freed)."""
         if self._editors.get(sid) is d:
             del self._editors[sid]
         self.drop_preview()                        # a preview still rendering
@@ -7772,9 +7825,20 @@ class MainWindow(QMainWindow):
                 self.pads[sid].update()
                 self.apply_filter(self.search.text())
         finally:
-            # freed once its finished signal is over (deleting it inside that crashed)
-            QTimer.singleShot(0, lambda: free_dialog(d))
+            if self._spare_editor is None and d not in self._editors.values():
+                rehome_crash_reports(d)
+                self._spare_editor = d
+            else:   # freed once its finished signal is over (deleting it inside crashed)
+                QTimer.singleShot(0, lambda: free_dialog(d))
         self.register_hotkeys()
+
+    def _drop_spare_dialogs(self):
+        """The kept Edit sound and Settings go (a new theme: built again in it)."""
+        for attr in ("_spare_editor", "_settings_kept"):
+            d = getattr(self, attr, None)
+            setattr(self, attr, None)
+            if d is not None and qt_valid(d):
+                free_dialog(d)
 
     def _close_editors(self, sids):
         """The sounds are going: their open Edit sound windows close, unsaved (the
