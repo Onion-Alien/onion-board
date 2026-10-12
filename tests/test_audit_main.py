@@ -364,3 +364,24 @@ def test_discord_check_cleans_up_when_play_fails(qapp, monkeypatch):
     assert process_events(qapp, lambda: got, timeout=5)
     assert "couldn't start" in got[0]["error"] and "no device" in got[0]["error"]
     assert not c.running and e.main_tap is None and stopped
+
+
+def test_settings_and_edit_built_behind_the_loading_screen(window, qapp):
+    """Built behind the loading screen (app.main): the first click of the cog or Edit
+    opens the ones already made, and the window stays as it was meanwhile."""
+    window.preload_dialogs()
+    window.show()
+    qapp.processEvents()
+    size = window.size()
+    window.warm_settings()
+    assert window.size() == size and not window.settings_open()
+    kept, spare = window._settings_kept, window._spare_editor
+    assert kept is not None and spare is not None
+    assert window.open_settings("audio") is kept and window.settings_open()
+    kept.accept()
+    qapp.processEvents()
+    sid = window.cfg.sounds[-1].id
+    d = window.edit(sid)
+    assert d is spare and d.meta is window.meta(sid) and d.name.text() == window.meta(sid).name
+    d.reject()
+    qapp.processEvents()

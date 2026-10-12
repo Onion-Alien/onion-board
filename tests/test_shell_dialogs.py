@@ -443,3 +443,4 @@ def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
                 assert f"color:{c}" not in (text + w.styleSheet()).lower(), (w, c)
     finally:
         win.apply_theme("Dark")
+
