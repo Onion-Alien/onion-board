@@ -54,3 +54,33 @@ def test_off_is_silence_with_the_mic_not_sent_muted_or_changed():
     assert not e.mic_only() and not sent(e, 0.5)
     chain.replace = False                    # a chain that doesn't change you (a speech tap)
     assert e.mic_only()
+
+
+
+def heard(e: Engine, mic: float) -> float:
+    """The loudest sample of the last of a few blocks in your headphones, mic at `mic`."""
+    out = np.zeros((BLOCK, 2), np.float32)
+    for _ in range(12):   # past every glide and the path fade
+        e.ring_mon.write(np.full((BLOCK, 2), mic, np.float32))
+        e._mon(out, BLOCK)
+    return float(np.abs(out).max())
+
+
+def test_off_with_hear_what_they_hear_still_plays_your_sounds_for_you():
+    """Off only cuts what others hear: with "Hear what they hear" on and your plain mic
+    going out, the headphones went silent too."""
+    e = Engine()
+    e.dest, e.limiter_on, e.send_mono = None, False, False
+    e.main_stream, e.mon_stream = object(), object()
+    e.names["main"], e.names["mon"] = "fake main", "fake headphones"
+    t = np.arange(SR) / SR
+    e.play("song", np.stack([np.sin(2 * np.pi * 440 * t)] * 2, 1).astype(np.float32) * 0.5,
+           1.0, loop=True)
+    e.mic_vol = e.mon_vol = 1.0
+    e.mic_check = True
+    e.ring_mon.prefill = 0
+    live = heard(e, 0.0)
+    assert live > 0.1
+    e.sending = False
+    assert e.mic_only()
+    assert heard(e, 0.0) > 0.1   # the sound still plays for you

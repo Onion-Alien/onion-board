@@ -325,6 +325,7 @@ class ThemeCard(QPushButton):
         super().__init__()
         self.name = name
         self.setObjectName("themecard")
+        self.setAccessibleName(name)   # it draws its name: a screen reader had nothing to say
         self.setCheckable(True)
         self.setFixedSize(QSize(150, 112))
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -1178,9 +1179,9 @@ class SettingsDialog(QDialog):
         self.ov_position = self._ov_combo("position", ovl.POSITIONS, s.position)
         grid.addWidget(self.ov_position, 1, 1)
         grid.addWidget(QLabel(_("Size")), 2, 0)
-        grid.addLayout(self._ov_slider("scale", 60, 160, s.scale), 2, 1)
+        grid.addLayout(self._ov_slider("scale", 60, 160, s.scale, _("Size")), 2, 1)
         grid.addWidget(QLabel(_("Background")), 3, 0)
-        grid.addLayout(self._ov_slider("opacity", 30, 100, s.opacity), 3, 1)
+        grid.addLayout(self._ov_slider("opacity", 30, 100, s.opacity, _("Background")), 3, 1)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
         # a drag on the overlay changes monitor / position: show it here
@@ -1218,9 +1219,10 @@ class SettingsDialog(QDialog):
         no_wheel(cb)
         return cb
 
-    def _ov_slider(self, key, lo, hi, value):
+    def _ov_slider(self, key, lo, hi, value, name):
         row = QHBoxLayout()
         sl = QSlider(Qt.Orientation.Horizontal)
+        sl.setAccessibleName(name)
         sl.setRange(lo, hi)
         sl.setValue(value)
         val = QLabel(_("{percent}%", percent=value))

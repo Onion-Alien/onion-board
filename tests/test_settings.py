@@ -730,3 +730,18 @@ def test_settings_cards_line_up(window, qapp):  # noqa: F811
                 if lb.text() == "While I talk, lower my sounds:")
     assert not duck.wordWrap()
     d.close()
+
+
+def test_theme_cards_and_sliders_have_a_name_a_screen_reader_can_say(window):  # noqa: F811
+    """A theme card draws its name and the Overlay sliders sat beside plain labels: a
+    screen reader said nothing on any of them."""
+    from PySide6.QtWidgets import QSlider
+    from soundboard.settings import ThemeCard
+    for page in ("appearance", "overlay"):
+        d = SettingsDialog(window, page)
+        body = d.tabs.currentWidget().widget()
+        parts = body.findChildren(QSlider) + body.findChildren(ThemeCard)
+        assert parts, page
+        assert all(p.accessibleName() for p in parts), [type(p).__name__ for p in parts
+                                                        if not p.accessibleName()]
+        d.close()
