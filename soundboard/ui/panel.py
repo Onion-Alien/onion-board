@@ -8,7 +8,7 @@ import html
 
 import math
 
-from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QRect, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
@@ -321,6 +321,41 @@ def capped(body: QWidget, outer: QWidget | None = None, *,
     return outer
 
 
+class _HeadingAlignment(QObject):
+    """Keep a heading on its current font's capitals after polish and theme changes."""
+
+    def __init__(self, title: QLabel, boxes: dict[QWidget, QVBoxLayout]):
+        super().__init__(title)
+        self.title, self.boxes = title, boxes
+        self.pending = False
+        for widget in boxes:
+            widget.installEventFilter(self)
+        self.align()
+
+    def eventFilter(self, watched, event):
+        if event.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange,
+                            QEvent.Type.Show, QEvent.Type.Resize):
+            if not self.pending:
+                self.pending = True
+                QTimer.singleShot(0, self.align)
+        return False
+
+    def align(self):
+        self.pending = False
+        if not qt_valid(self.title):
+            return
+        fm = self.title.fontMetrics()
+        centre = fm.ascent() - (fm.capHeight() + 1) / 2
+        tops = {w: round(centre - (max(w.minimumHeight(), w.sizeHint().height()) - 1) / 2)
+                for w in self.boxes if w is not self.title}
+        lead = max([0, *(-top for top in tops.values())])
+        tops[self.title] = 0
+        for widget, box in self.boxes.items():
+            top = tops[widget] + lead
+            if box.contentsMargins().top() != top:
+                box.setContentsMargins(0, top, 0, 0)
+
+
 def heading_row(title: str, icon: str = "", *, beside=(), end=()
                 ) -> tuple[QHBoxLayout, QLabel, list[QWidget]]:
     """A card's heading line (DESIGN section 4, *Card headings*): the icon, the title,
@@ -335,36 +370,32 @@ def heading_row(title: str, icon: str = "", *, beside=(), end=()
     lbl = section_label(title)
     lbl.setProperty("head", True)   # (no padding above: the row places it)
     lbl.ensurePolished()
-    fm = lbl.fontMetrics()
-    # the cap's ink runs from row ascent - capHeight to ascent - 1
-    centre = fm.ascent() - (fm.capHeight() + 1) / 2
     marks: list[QWidget] = []
     if icon:
         marks.append(icon_label(icon, color="text"))
     marks += [*beside, *end]
-    tops = {}
+    boxes = {}
     for w in marks:
         w.ensurePolished()
-        h = max(w.minimumHeight(), w.sizeHint().height())
-        tops[w] = round(centre - (h - 1) / 2)   # its middle row on the cap's middle row
-    lead = max([0, *(-t for t in tops.values())])   # a taller part: the title comes down
 
-    def pin(w: QWidget, top: int):
+    def pin(w: QWidget):
         box = QVBoxLayout()
-        box.setContentsMargins(0, top, 0, 0)
+        box.setContentsMargins(0, 0, 0, 0)
         box.setSpacing(0)
         box.addWidget(w)
         box.addStretch(1)
         row.addLayout(box)
+        boxes[w] = box
 
     if icon:
-        pin(marks[0], tops[marks[0]] + lead)
-    pin(lbl, lead)
+        pin(marks[0])
+    pin(lbl)
     for w in beside:
-        pin(w, tops[w] + lead)
+        pin(w)
     row.addStretch(1)
     for w in end:
-        pin(w, tops[w] + lead)
+        pin(w)
+    _HeadingAlignment(lbl, boxes)   # owned by the title, including the queued callback
     return row, lbl, marks
 
 

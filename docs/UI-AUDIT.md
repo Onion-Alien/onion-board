@@ -12,6 +12,15 @@ PR and what was checked (themes, sizes, test file) only after reviewing the affe
 
 ## Open
 
+- [ ] **U56 (defect): Card headings retain the default font's offsets.** Verified on
+  `3db47c52`, offscreen at 1700, 1020 and 440 px in Dark, Amber Terminal, Hacker,
+  Comic Sans and Retro 98. Setup's heading icons are 3 px above the capitals in
+  Consolas, 4 px in Comic Sans, and 3.5 px in Tahoma; Dark is within 0.5 px.
+  `panel.heading_row()` calculates margins before the live font changes. Recalculate
+  from the current metrics after polish, font changes and layout. Regression:
+  `test_setup_heading_ink_follows_live_font_changes` in `tests/test_card_headings.py`.
+  Awaiting picture approval before merging.
+
 - [ ] **U16: Move old screens onto the standard sizes.** DESIGN.md's *Standard kit*
   fixes 7 text sizes, 3 icon-button sizes and one pop-up per job. Old code (11 October,
   `origin/main` `67ea807`) still has: inline `font-size` / `setPointSizeF` in about 60

@@ -1,0 +1,1 @@
+- Card heading icons stay level with the text when changing to a theme with its own font.
