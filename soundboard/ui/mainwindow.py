@@ -1727,6 +1727,7 @@ class MainWindow(QMainWindow):
             lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
         self.linkbar.sound_ready.connect(self.on_downloaded)
         self.linkbar.played.connect(self.on_link_played)
+        self.linkbar.up_next_changed.connect(lambda *__: self._update_chips(self.engine.playing()))
         # a link in the search box shows as a result card (nothing downloads until Play / Add)
         self._link_wait = QTimer(self, singleShot=True, interval=LINK_WAIT_MS)
         self._link_wait.timeout.connect(self._show_link)
@@ -1884,18 +1885,29 @@ class MainWindow(QMainWindow):
         if LINK_ID in playing:
             ids += (LINK_ID,)
         queue = tuple(self._queue)
-        if (ids, queue) != self._chip_ids:
-            self._chip_ids = (ids, queue)
+        links = tuple(self.linkbar.up_next())   # web search / link Plays waiting their turn
+        if (ids, queue, links) != self._chip_ids:
+            self._chip_ids = (ids, queue, links)
             while self._chips_hl.count():
                 item = self._chips_hl.takeAt(0)
                 w = item.widget() if item else None
                 if w:
                     w.deleteLater()
             self._chips = {}
-            if queue:
+            if queue or links:
                 lbl = QLabel(_("Up next"))
                 lbl.setObjectName("muted")
                 self._chips_hl.addWidget(lbl)
+                for i, title in enumerate(links[:QUEUE_CHIPS]):
+                    self._chips_hl.addWidget(self._chip(
+                        title, _("Waits for the sounds playing to finish"),
+                        lambda __=False, i=i, q=links: self.linkbar.play_next(i, q),
+                        _("Take it out of the queue"),
+                        lambda __=False, i=i, q=links: self.linkbar.drop_up_next(i, q)))
+                if len(links) > QUEUE_CHIPS:
+                    more = QLabel(_("+{value} more", value=len(links) - QUEUE_CHIPS))
+                    more.setObjectName("muted")
+                    self._chips_hl.addWidget(more)
                 for i, sid in enumerate(queue[:QUEUE_CHIPS]):
                     m = self.meta(sid)
                     self._chips_hl.addWidget(self._chip(
@@ -1937,7 +1949,7 @@ class MainWindow(QMainWindow):
             # its width); a row that shrank and grew back with every overlapping
             # sound resized and repainted the whole board under it
             self.playing_row.setMinimumHeight(CHIPS_ROW_H)
-            self.playing_row.setVisible(bool(ids) or bool(queue))
+            self.playing_row.setVisible(bool(ids) or bool(queue) or bool(links))
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
             if chip.property("sel") != sel:
@@ -5667,6 +5679,7 @@ class MainWindow(QMainWindow):
         self._radio_paused = None
         self._queue.clear()
         self._say_queue()
+        self.linkbar.drop_up_next()
         for sid in list(self._waiting):
             self._cancel_waiting(sid)
         self.engine.stop_all()
@@ -9148,6 +9161,7 @@ class MainWindow(QMainWindow):
         e = self.engine
         return (any(not paused for _p, paused in playing.values())
                 or self.radio.is_active() or bool(self._queue) or bool(e.aux)
+                or bool(self.linkbar.up_next())
                 or max(e.level_play, e.level_main,
                        e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
 
@@ -9184,6 +9198,8 @@ class MainWindow(QMainWindow):
         if self._queue and not any(sid in self._meta for sid in playing):
             self._next_in_queue()
             playing = e.playing()
+        if LINK_ID not in playing and self.linkbar.up_next() and self.linkbar.play_next():
+            playing = e.playing()   # the web search song ended: the next one waiting
         live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
                    for sid, (_p, paused) in playing.items())                # Play too
         if live != self._sounds_live:   # the Sounds tab glows while a sound plays
