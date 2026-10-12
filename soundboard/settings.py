@@ -585,21 +585,22 @@ class SettingsDialog(QDialog):
         start."""
         if not qt_valid(self) or self.back_btn is None:
             return
-        self.layout().activate()   # (a lift just set: measured where it put the row)
+        lay = self.layout()
+        if lay is not None:
+            lay.activate()   # (a lift just set: measured where it put the row)
         side = self._side.contentsMargins()
         lift = self.PAGE_TOP
         wm = getattr(self.mw, "wordmark", None)
         if wm is not None and qt_valid(wm) and wm.isVisible():
             want = self._caps_mid(wm)
-            if self.page_title.isVisible():
-                def off(dy):   # how far off the name, in screen pixels, dy px lower
-                    return abs(self._caps_mid(self.page_title, dy) - want)
-            else:   # (narrow: the arrow alone)
-                k = self.back_btn.devicePixelRatioF()
-                at = self.back_btn.mapTo(self.window(), QPoint(0, 0)).y()
+            titled = self.page_title.isVisible()
+            k = self.back_btn.devicePixelRatioF()
+            at = self.back_btn.mapTo(self.window(), QPoint(0, 0)).y()
 
-                def off(dy):
-                    return abs((at + dy + self.back_btn.height() / 2) * k - want)
+            def off(dy):   # how far off the name, in screen pixels, dy px lower
+                if titled:
+                    return abs(self._caps_mid(self.page_title, dy) - want)
+                return abs((at + dy + self.back_btn.height() / 2) * k - want)   # (narrow)
             # the whole-pixel lifts either side of the exact one: the nearer on screen
             near = (want - self._caps_mid(self.page_title)) / self.devicePixelRatioF()
             dy = min(range(math.floor(near) - 1, math.ceil(near) + 2), key=off)
