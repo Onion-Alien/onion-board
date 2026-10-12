@@ -1380,3 +1380,23 @@ def test_add_is_a_menu_of_every_way_in(window, monkeypatch):
     QApplication.clipboard().setText("not a link")
     window.add_from_link()
     assert window.search.text() == ""
+
+
+def test_a_link_pasted_in_offline_mode_says_why_nothing_happens(window, monkeypatch):
+    """Offline, a pasted link showed nothing at all: now one note names Offline mode."""
+    from soundboard import net
+    said = []
+    monkeypatch.setattr(window, "toast", lambda text, *a, **k: said.append(text))
+    window.show()                            # offscreen: nothing appears
+    window.resize(800, 600)
+    window._refit()
+    assert not window.is_mini()
+    net.configure_features(offline=True)
+    try:
+        window.search.setText("https://www.youtube.com/watch?v=abc")
+        window.on_search_enter()
+        window.on_search_enter()   # Enter again: still the one note
+    finally:
+        net.configure_features()
+    assert len(said) == 1 and "Offline mode" in said[0]
+    assert window.ytresults.isHidden()
