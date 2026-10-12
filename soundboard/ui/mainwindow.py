@@ -2202,7 +2202,7 @@ class MainWindow(QMainWindow):
         self.btn_rescan = QPushButton(_("I've installed it: check again"))
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
-        cv.addWidget(self.btn_rescan, 0, Qt.AlignmentFlag.AlignLeft)
+        ways.addWidget(self.btn_rescan)   # with the other ways, not a row of its own
         helpcard = FoldCard("speech", _("Connect your chat"))
         helpcard.set_summary(_("Discord, games, Zoom and Teams"))
         helpcard.head.clicked.connect(lambda on: on and usage.used("setup-opened-chat"))
@@ -3395,9 +3395,11 @@ class MainWindow(QMainWindow):
                                     and not self.setup_show.on)   # Bun's show instead
         if not busy.is_busy(self.btn_install):
             self.btn_install.setText(button or _("Install the free virtual cable"))
-            # Windows' shield when its prompt comes, like Windows' own buttons
+            # Windows' shield when its prompt comes, like Windows' own buttons. White
+            # only on the filled button: on a plain one it vanished in light themes
+            filled = route == "mic" and not update
             look = (("shield" if michelper.will_ask() else "mic") if mic_route else "cable",
-                    "muted" if update else "on_accent")
+                    "on_accent" if filled else "muted" if update else None)
             if look != self._install_icon:
                 self._install_icon = look
                 if look[0] == "shield":
@@ -3518,7 +3520,9 @@ class MainWindow(QMainWindow):
             return
         self._ways_in = mic
         src, dst = (self._ways, self.mic_ways) if mic else (self.mic_ways, self._ways)
-        for b in (self.btn_install, self.btn_usecable, self.btn_guide, self.btn_rmcable):
+        # (check again too: it stays last, after them)
+        for b in (self.btn_install, self.btn_usecable, self.btn_guide, self.btn_rmcable,
+                  self.btn_rescan):
             src.removeWidget(b)
             dst.addWidget(b)
         self.mic_ways.invalidate()

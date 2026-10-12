@@ -599,7 +599,7 @@ class AppRow(HoverCard):
         self.btn_forget = QPushButton()
         self.btn_forget.setObjectName("small")
         self.btn_forget.setToolTip(_("Take this program off the list"))
-        icons.close_button(self.btn_forget, 26)
+        icons.close_button(self.btn_forget, 28)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
         top.addWidget(self.btn_forget, 0, Qt.AlignmentFlag.AlignTop)
         v.addWidget(self.header)
@@ -820,6 +820,7 @@ class AppRow(HoverCard):
     def _label_send(self):
         self.btn_send.setText("" if "send" in self._TIGHTEN[:self._tight]
                               else _("Sending") if self.sending else _("Send"))
+        icons.text_gap(self.btn_send)   # (its icon was set before it had words)
 
     def set_app(self, app: appaudio.App | None):
         """The program is running (app) or not (None)."""

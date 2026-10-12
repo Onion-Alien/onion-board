@@ -581,6 +581,7 @@ class RadioTab(QWidget):
         self.now = NowPlaying()
         self.now.clicked.connect(self._show_playing)
         bh.addWidget(self.now, 1)
+        bh.addStretch(0)   # what Now playing leaves when it's hidden: not into the buttons
         self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
@@ -1462,6 +1463,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _label_live(self):
         on = self.btn_live.isChecked()
         self.btn_live.setText(_("Sending") if on else _("Send"))
+        icons.text_gap(self.btn_live)   # (its icon was set before it had words)
         self.btn_live.setToolTip(_("Others hear the radio. Click so only you do.") if on else
                                  _("Send the radio out to others, the way your sounds go "
                                    "(Setup tab). Off: only you hear it."))

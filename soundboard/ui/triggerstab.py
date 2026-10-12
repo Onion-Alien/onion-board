@@ -179,7 +179,7 @@ class TriggersTab(QWidget):
         self.error.hide()
         text.addWidget(self.error)
         buttons = Flow(gap=8)
-        self.btn_get = QPushButton()
+        self.btn_get = QPushButton(_("Get Onion Watch"))   # words first: the icon's gap
         self.btn_get.setObjectName("primary")
         icons.set_icon(self.btn_get, "triggers", "on_accent")
         self.btn_get.clicked.connect(lambda: (usage.used("watch-prompt-get"), self.get()))
