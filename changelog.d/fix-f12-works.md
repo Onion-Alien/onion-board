@@ -1,1 +1,1 @@
-Plain **F12** works as a hotkey again. Windows won't hand it out the usual way, so Onion Board now watches the key itself, and the "can't be a hotkey" warning at every start is gone.
+- Plain **F12** works as a hotkey again. Windows won't hand it out the usual way, so Onion Board now watches the key itself, and the "can't be a hotkey" warning at every start is gone.
