@@ -1633,7 +1633,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Déterminer automatiquement que la sensibilité d'entrée</b> est activée : lors d'un appel, il continue de prendre vos sons pour le silence et les coupe : désactivez-le (Sensibilité d'entrée) et laissez le curseur bas, ou utilisez Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Mode de saisie</b> :<b> Push to Talk</b> fonctionne mieux (définissez la même touche sous Paramètres → Raccourcis clavier → Push-to-talk automatique et Onion Board la maintient pour vous pendant la lecture d'un son). Sur <b>Activité vocale</b> , désactivez <b>Déterminer automatiquement la sensibilité d'entrée</b> et faites glisser le curseur presque complètement vers la gauche, sinon Discord continue de couper vos sons, même les plus forts.",
   "<b>Languages</b> · {state}": "<b>Langues</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Choisissez une voix</b>",
   "A built-in voice (still hides yours)": "Une voix intégrée (cache toujours la vôtre)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Un mélange aléatoire et idiot d'effets, comme « My own mix » : ce que cela a changé s'allume en dessous. Cliquez à nouveau pour un autre.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Un court extrait de cette voix, dans vos écouteurs uniquement (personne d'autre ne l'entend). Le premier prend quelques secondes.",
@@ -1817,7 +1816,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "La recherche et le téléchargement de sons en ligne sont désactivés dans Paramètres > Confidentialité et sécurité.",
   "Finding the newest Onion Watch…": "À la recherche de la dernière Onion Watch…",
   "Finding the newest…": "Trouver le plus récent…",
-  "Fold this card away": "Pliez cette carte",
   "Fold {effect} away": "Pliez {effect}",
   "Follow my pitch": "Suivez mon pitch",
   "Forget {name}": "Oubliez {name}",
@@ -1952,7 +1950,6 @@
   "Nothing was recorded: it didn't make a sound.": "Rien n'a été enregistré : ça n'a pas fait de bruit.",
   "Nothing yet. Lines show up here as they're spoken.": "Rien pour l'instant. Les lignes apparaissent ici au fur et à mesure qu'elles sont prononcées.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Nulle part où l'envoyer : choisissez où vont vos sons dans l'onglet Configuration.",
-  "ON: everyone hears it": "ON - tout le monde l'entend",
   "Off (no shaping)": "Désactivé (pas de mise en forme)",
   "Off (send as is)": "Désactivé (envoyer tel quel)",
   "Old telephone": "Vieux téléphone",
@@ -2068,7 +2065,6 @@
   "Shout and your voice blows out like a megaphone.": "Criez et votre voix explose comme un mégaphone.",
   "Shout blowout": "Explosion de cri",
   "Show me how": "Montre-moi comment",
-  "Show this card": "Montrer cette carte",
   "Show {effect}": "Afficher {effect}",
   "Silence": "Silence",
   "Smaller files": "Fichiers plus petits",
@@ -3288,5 +3284,6 @@
   "{mic} · not sent, sounds only": "{mic} · pas envoyé, sons seulement",
   "{mic} · off": "{mic} · coupé",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "L'étape administrateur de Windows ne s'est pas terminée. Si son invite est encore ouverte, réponds-y, puis réessaie.",
-  "{title}  ·  quiet on {devices}": "{title} · silencieux sur {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · silencieux sur {devices}",
+  "Languages": "Langues"
 }

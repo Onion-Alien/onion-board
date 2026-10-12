@@ -1633,7 +1633,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Giriş hassasiyetini otomatik olarak belirle</b> açık: bir arama sırasında seslerinizi susturmaya devam eder ve keser: kapatın (Giriş Hassasiyeti) ve kaydırıcıyı düşük bırakın veya Bas-Konuş'u kullanın.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Giriş Modu</b> : <b>Bas-Konuş</b> en iyi şekilde çalışır (Ayarlar → Kısayol Tuşları → Otomatik bas-konuş altında aynı tuşu ayarlayın ve Soğan Kartı ses çalarken onu sizin için tutar). <b>Ses Etkinliği'nde</b> <b>Giriş hassasiyetini otomatik olarak belirle</b> seçeneğini kapatın ve kaydırıcıyı neredeyse tamamen sola sürükleyin; aksi takdirde Discord, yüksek sesli olanlar da dahil olmak üzere seslerinizi kesmeye devam eder.",
   "<b>Languages</b> · {state}": "<b>Diller</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Bir ses seç</b>",
   "A built-in voice (still hides yours)": "Yerleşik bir ses (sizinkini hâlâ gizliyor)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "\"Kendi karışımım\" gibi rastgele aptalca bir efekt karışımı: değiştirdiği şey aşağıda yanıyor. Başka bir tane için tekrar tıklayın.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Bu sesin kısa bir örneği, yalnızca kulaklığınızda (başka kimse duyamaz). İlki birkaç saniye sürüyor.",
@@ -1817,7 +1816,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Sesleri çevrimiçi bulma ve indirme, Ayarlar > Gizlilik ve güvenlik bölümünde kapatılmıştır.",
   "Finding the newest Onion Watch…": "En yeni Onion Watch'ı bulmak…",
   "Finding the newest…": "En yeniyi bulmak…",
-  "Fold this card away": "Bu kartı katlayın",
   "Fold {effect} away": "{effect} i katlayın",
   "Follow my pitch": "Konuşmamı takip et",
   "Forget {name}": "{name} i unut",
@@ -1952,7 +1950,6 @@
   "Nothing was recorded: it didn't make a sound.": "Hiçbir şey kaydedilmedi: ses çıkarmadı.",
   "Nothing yet. Lines show up here as they're spoken.": "Henüz hiçbir şey yok. Çizgiler konuşuldukça burada ortaya çıkıyor.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Gönderilecek yer yok: Kurulum sekmesinde seslerinizin nereye gideceğini seçin.",
-  "ON: everyone hears it": "AÇIK: herkes duyar",
   "Off (no shaping)": "Kapalı (şekillendirme yok)",
   "Off (send as is)": "Kapalı (olduğu gibi gönder)",
   "Old telephone": "Eski telefon",
@@ -2068,7 +2065,6 @@
   "Shout and your voice blows out like a megaphone.": "Bağırın ve sesiniz bir megafon gibi patlar.",
   "Shout blowout": "Patlamayı haykır",
   "Show me how": "Bana nasıl olduğunu göster",
-  "Show this card": "Bu kartı göster",
   "Show {effect}": "{effect} i göster",
   "Silence": "Sessizlik",
   "Smaller files": "Daha küçük dosyalar",
@@ -3288,5 +3284,6 @@
   "{mic} · not sent, sounds only": "{mic} · gönderilmiyor, sadece sesler",
   "{mic} · off": "{mic} · kapalı",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows yönetici adımı tamamlanmadı. İstemi hâlâ açıksa yanıtla; sonra yeniden dene.",
-  "{title}  ·  quiet on {devices}": "{title} · {devices} üzerinde sessiz"
+  "{title}  ·  quiet on {devices}": "{title} · {devices} üzerinde sessiz",
+  "Languages": "Diller"
 }

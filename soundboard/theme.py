@@ -847,6 +847,20 @@ QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
+/* the Voice tab: its row of tabs, the voice changer's picture cards, the picked voice */
+QPushButton#voicetab { border-radius:10px; padding:7px 14px; background:$inset; border:1px solid $border; font-weight:600; }
+QPushButton#voicetab:hover:!checked { background:$btn_hover; border-color:$border_hi; }
+QPushButton#voicetab:checked { background:$accent; color:$on_accent; border-color:$accent_hi; }
+QPushButton#voicetab[live="true"]:!checked { color:$live_text; border-color:$live_border; }
+QFrame#card QToolButton#voicetile { background:$card; color:$text; border:1px solid transparent; border-radius:12px; padding:8px 4px 6px 4px; font-size:8.5pt; }
+QFrame#card QToolButton#voicetile:hover:!checked { background:$btn_hover; border-color:$border_hi; }
+QFrame#card QToolButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
+QFrame#card QToolButton#voicetile:focus { border-color:$accent; }
+QFrame#card QToolButton#voicetile:checked:focus { border-color:$text_hi; }
+QFrame#card QFrame#picked { background:$inset; border-radius:10px; }
+QFrame#card QFrame#voicebox { background:$inset; border:1px solid $border; border-radius:8px; }
+QFrame#picked[pinned="true"] { background:$panel; border-radius:12px; }
+QFrame#picked QLabel#pickedname { color:$text_hi; font-size:11pt; font-weight:700; }
 /* Spacious controls only in Voice and Setup cards. */
 QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
 /* the reset family (panel.reset_button): a slim muted link with the reset arrow, the
@@ -1322,8 +1336,9 @@ def texture_image(kind: str, base: str, size: int | None = None) -> QImage:
 OUTLINED = {"High Contrast"}
 OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
-QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip { border:1px solid $border; }
-QFrame#card, QFrame#setcard, QFrame#voicebar { border:1px solid $border; }
+QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip,
+QFrame#card QToolButton#voicetile { border:1px solid $border; }
+QFrame#card, QFrame#setcard, QFrame#voicebar, QFrame#picked { border:1px solid $border; }
 """)
 
 

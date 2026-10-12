@@ -1590,7 +1590,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>入力感度がオンになっているかどうかを自動的に判断します</b>。通話中はあなたの音を無音として捉え続け、それらをカットします。オフ (入力感度) にしてスライダーを低いままにするか、プッシュ トゥ トークを使用します。",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>入力モード</b>:<b>プッシュ トゥ トーク</b>が最適に機能します ([設定] → [ホットキー] → [自動プッシュ トゥ トーク] で同じキーを設定すると、サウンドが再生されている間、Onion Board がそのキーを保持します)。 <b>[音声アクティビティ]</b>で、 <b>[入力感度を自動的に決定する]</b>をオフにして、スライダーをほぼ左端までドラッグします。そうしないと、Discord は大きな音も含めて音をカットし続けます。",
   "<b>Languages</b> · {state}": "<b>言語</b>· {state}",
-  "<b>Pick a voice</b>": "<b>声を選ぶ</b>",
   "A built-in voice (still hides yours)": "内蔵音声 (あなたの音声はまだ隠されています)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "「自分のミックス」として、エフェクトをランダムに組み合わせたばかばかしいもの: 変更された部分が下に点灯します。もう一度クリックすると別の画面が表示されます。",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "この音声の短いサンプルをヘッドフォンのみで再生します (他の人には聞こえません)。最初の処理には数秒かかります。",
@@ -1773,7 +1772,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "オンラインでのサウンドの検索とダウンロードは、[設定] > [プライバシーとセキュリティ] でオフになります。",
   "Finding the newest Onion Watch…": "最新の Onion Watch を探しています…",
   "Finding the newest…": "最新のものを探しています…",
-  "Fold this card away": "このカードを折りたたんで保管してください",
   "Fold {effect} away": "{effect}を折りたたむ",
   "Follow my pitch": "私のピッチに従ってください",
   "Forget {name}": "{name}ことは忘れてください",
@@ -1907,7 +1905,6 @@
   "Nothing was recorded: it didn't make a sound.": "何も録音されず、音も出ませんでした。",
   "Nothing yet. Lines show up here as they're spoken.": "まだ何もありません。話しているとセリフがここに表示されます。",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "送信先がありません。サウンドの送信先を [設定] タブで選択します。",
-  "ON: everyone hears it": "オン：誰もがそれを聞きます",
   "Off (no shaping)": "オフ (整形なし)",
   "Off (send as is)": "オフ（そのまま送信）",
   "Old telephone": "古い電話",
@@ -2021,7 +2018,6 @@
   "Shout and your voice blows out like a megaphone.": "叫ぶとメガホンのように声が飛び出す。",
   "Shout blowout": "シャウト吹き飛ばし",
   "Show me how": "方法を教えてください",
-  "Show this card": "このカードを見せる",
   "Show {effect}": "{effect}を表示",
   "Silence": "沈黙",
   "Smaller files": "より小さいファイル",
@@ -3215,5 +3211,6 @@
   "{mic} · not sent, sounds only": "{mic} · 送信なし、サウンドのみ",
   "{mic} · off": "{mic} · オフ",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows の管理者ステップが終了しませんでした。プロンプトがまだ開いていれば応答し、そのあともう一度お試しください。",
-  "{title}  ·  quiet on {devices}": "{title} · {devices}で無音"
+  "{title}  ·  quiet on {devices}": "{title} · {devices}で無音",
+  "Languages": "言語"
 }

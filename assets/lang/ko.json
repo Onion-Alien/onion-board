@@ -1590,7 +1590,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>입력 감도가 켜져 있는지 자동으로 결정합니다</b> . 통화 중에는 소리를 계속 묵음 처리하고 차단합니다. 이 기능을 끄고(입력 감도) 슬라이더를 낮게 두거나 눌러서 말하기를 사용합니다.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>입력 모드</b> : <b>눌러서 말하기가</b> 가장 잘 작동합니다(설정 → 단축키 → 자동 눌러서 말하기에서 동일한 키를 설정하면 소리가 재생되는 동안 Onion Board가 이를 유지합니다). <b>음성 활동</b> 에서 <b>입력 감도 자동 결정을</b> 끄고 슬라이더를 거의 왼쪽 끝까지 드래그합니다. 그렇지 않으면 Discord가 계속해서 큰 소리도 차단합니다.",
   "<b>Languages</b> · {state}": "<b>언어</b> · {state}",
-  "<b>Pick a voice</b>": "<b>음성 선택</b>",
   "A built-in voice (still hides yours)": "내장된 음성(아직도 음성이 숨겨져 있음)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "\"나만의 믹스\"와 같은 임의의 어리석은 효과 믹스: 변경된 내용이 아래에 표시됩니다. 다른 것을 보려면 다시 클릭하세요.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "이 음성의 짧은 샘플은 헤드폰에서만 가능합니다(다른 사람은 들을 수 없음). 첫 번째는 몇 초 정도 걸립니다.",
@@ -1773,7 +1772,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "온라인으로 사운드 찾기 및 다운로드는 설정 > 개인 정보 보호 및 보안에서 꺼져 있습니다.",
   "Finding the newest Onion Watch…": "최신 Onion Watch 찾기…",
   "Finding the newest…": "최신 것을 찾아서…",
-  "Fold this card away": "이 카드를 접어주세요",
   "Fold {effect} away": "{effect} 접어보세요",
   "Follow my pitch": "내 피치를 따르세요",
   "Forget {name}": "{name} 잊어버리세요",
@@ -1907,7 +1905,6 @@
   "Nothing was recorded: it didn't make a sound.": "아무것도 녹음되지 않았습니다. 소리도 나지 않았습니다.",
   "Nothing yet. Lines show up here as they're spoken.": "아직 아무것도 없습니다. 말하는 동안 여기에 대사가 표시됩니다.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "보낼 곳이 없습니다. 설정 탭에서 사운드를 어디로 보낼지 선택하세요.",
-  "ON: everyone hears it": "ON: 모두가 듣습니다",
   "Off (no shaping)": "끄기(변형 없음)",
   "Off (send as is)": "끄기(그대로 보내기)",
   "Old telephone": "오래된 전화기",
@@ -2021,7 +2018,6 @@
   "Shout and your voice blows out like a megaphone.": "소리치면 목소리가 확성기처럼 울려퍼집니다.",
   "Shout blowout": "외쳐 폭발",
   "Show me how": "방법을 보여주세요",
-  "Show this card": "이 카드를 보여주세요",
   "Show {effect}": "{effect} 표시",
   "Silence": "고요",
   "Smaller files": "더 작은 파일",
@@ -3215,5 +3211,6 @@
   "{mic} · not sent, sounds only": "{mic} · 보내지 않음, 사운드만",
   "{mic} · off": "{mic} · 꺼짐",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 관리자 단계가 끝나지 않았습니다. 프롬프트가 아직 열려 있으면 응답한 뒤 다시 시도하세요.",
-  "{title}  ·  quiet on {devices}": "{title} · {devices} 에서 조용함"
+  "{title}  ·  quiet on {devices}": "{title} · {devices} 에서 조용함",
+  "Languages": "언어"
 }

@@ -1,6 +1,7 @@
-"""Card actions stay above their choices; square fold arrows have usable content boxes."""
+"""The Voice tab's tabs; card actions stay above their choices; square fold arrows
+have usable content boxes."""
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QLabel, QStyle, QStyleOptionButton
 
 from soundboard import theme
@@ -13,43 +14,44 @@ from soundboard.voicefx import VoiceChain
 from tests.test_voicepanel import FakeEngine
 
 
-@pytest.mark.parametrize("stacked", [False, True])
-def test_card_columns_use_new_fold_size_before_resize(qapp, monkeypatch, stacked):
-    """A fold must place later cards using the new size, even before Qt resizes."""
+def at(w, ancestor):
+    """`w`'s rectangle in `ancestor`'s coordinates (it may sit in a box inside it)."""
+    return w.geometry().translated(w.parentWidget().mapTo(ancestor, QPoint(0, 0)))
+
+
+def test_tabs_show_one_card_and_the_tab_is_remembered(qapp, monkeypatch):
+    """One card at a time under the row of tabs; the tab you pick opens next time."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    panel = VoicePanel(FakeEngine(), {}, {"folded": []})
+    panel = VoicePanel(FakeEngine(), {}, {"folded": ["ai", "fx.echo"]})   # an old save
+    saved = []
+    panel.speech_changed.connect(saved.append)
     try:
-        panel.resize(600 if stacked else 1000, 800)
-        panel.stack_steps()[0](stacked)
+        panel.resize(1000, 800)
         panel.show()
-        for _ in range(8):
-            qapp.processEvents()
-
-        def check():
-            heights = [0, 0]
-            for i, card in enumerate(panel._cards):
-                column = 0 if stacked else (i if i < 2 else int(heights[1] < heights[0]))
-                layout = (panel._lcol, panel._rcol)[column]
-                assert layout.indexOf(card) >= 0
-                height = (card.heightForWidth(card.width()) if card.hasHeightForWidth()
-                          else card.sizeHint().height())
-                heights[column] += height + layout.spacing()
-            for layout in (panel._lcol, panel._rcol):
-                cards = [layout.itemAt(i).widget() for i in range(layout.count() - 1)]
-                for first, second in zip(cards, cards[1:]):
-                    assert second.y() >= first.geometry().bottom() + layout.spacing()
-
-        for _ in range(12):
-            panel._heads["speak"].arrow.click()
-            # Check before the pending resize as well as after each event pass.
-            check()
-            for _ in range(3):
-                qapp.processEvents()
-                check()
+        qapp.processEvents()
+        assert panel.current_tab() == "fx" and panel._tabs["fx"].isChecked()
+        assert [k for k, c in panel._cards.items() if c.isVisibleTo(panel)] == ["fx"]
+        panel._tabs["speak"].click()
+        qapp.processEvents()
+        assert [k for k, c in panel._cards.items() if c.isVisibleTo(panel)] == ["speak"]
+        assert panel.speech.isVisibleTo(panel) and saved[-1]["tab"] == "speak"
+        assert saved[-1]["folded"] == ["ai", "fx.echo"]   # left as an older version wrote it
     finally:
         panel.shutdown()
         panel.close()
         panel.deleteLater()
+    again = VoicePanel(FakeEngine(), {}, saved[-1])
+    try:
+        assert again.current_tab() == "speak" and again._tabs["speak"].isChecked()
+    finally:
+        again.shutdown()
+        again.deleteLater()
+    junk = VoicePanel(FakeEngine(), {}, {"tab": 7})   # a damaged setting: the first tab
+    try:
+        assert junk.current_tab() == "fx"
+    finally:
+        junk.shutdown()
+        junk.deleteLater()
 
 
 @pytest.mark.parametrize("name", ["Dark", "Light", "High Contrast", "Retro 98"])
@@ -59,8 +61,7 @@ def test_all_voice_card_arrows_keep_centered_content(qapp, monkeypatch, name):
     theme.apply(qapp, name)
     panel = VoicePanel(FakeEngine(), {}, {})
     try:
-        buttons = [head.arrow for head in panel._heads.values()]
-        buttons += [row.arrow for row in panel.fx.rows.values()]
+        buttons = [row.arrow for row in panel.fx.rows.values()]
         for button in buttons:
             button.ensurePolished()
             for focused in (False, True):
@@ -95,9 +96,10 @@ def test_ai_action_precedes_choices_and_status_wraps(qapp, monkeypatch, tmp_path
         panel._set_ui(True, "Starting: a built-in voice covers you until the AI voice is ready.")
         panel.show()
         qapp.processEvents()
-        assert panel.b_start.geometry().bottom() < panel.cb_voice.geometry().top()
-        assert panel.ready_box.rect().contains(panel.lbl_state.geometry())
-        assert panel.ready_box.rect().contains(panel.cb_voice.geometry())
+        box = panel.ready_box
+        assert at(panel.b_start, box).bottom() < at(panel.cb_voice, box).top()
+        assert box.rect().contains(at(panel.lbl_state, box))
+        assert box.rect().contains(at(panel.cb_voice, box))
         panel._set_ui(False, "Ready")
         assert not panel.b_start.isChecked()
         assert panel.lbl_state.text() == "Ready"
@@ -125,8 +127,8 @@ def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp
                                  "your words in the selected language.")
         speech.show()
         qapp.processEvents()
-        assert speech.start_box.geometry().bottom() < speech.lbl_intro.geometry().top()
-        assert speech.lbl_intro.geometry().bottom() < speech.cb_voice.geometry().top()
+        assert at(speech.start_box, speech).bottom() < at(speech.lbl_intro, speech).top()
+        assert at(speech.lbl_intro, speech).bottom() < at(speech.cb_voice, speech).top()
         assert speech.b_live.geometry().left() == 0
         assert speech.b_live.geometry().right() < speech.lbl_state.geometry().left()
         assert speech.start_box.rect().contains(speech.lbl_state.geometry())
@@ -141,16 +143,19 @@ def test_computer_action_precedes_description_and_choices(qapp, monkeypatch, tmp
         theme.apply(qapp, old)
 
 
-def test_voice_changer_action_precedes_description(qapp):
+def test_voice_changer_switch_heads_the_card_and_picked_bar_holds_actions(qapp):
     from soundboard.ui.voicepanel import VoiceFxPanel
     panel = VoiceFxPanel({})
     try:
+        # the switch goes in the card's title row (VoicePanel puts `head` there); the
+        # description comes first in the panel, the picked voice's bar last
+        assert panel.btn_power.parentWidget() is panel.head
         layout = panel.layout()
-        # the switch's row (Make it yours beside it, U3), then the description
-        assert layout.itemAt(1).widget() is panel.btn_power.parentWidget()
-        assert panel.btn_tweak.parentWidget() is panel.btn_power.parentWidget()
-        assert isinstance(layout.itemAt(2).widget(), QLabel)
-        assert layout.itemAt(2).widget().wordWrap()
+        assert isinstance(layout.itemAt(1).widget(), QLabel)
+        assert layout.itemAt(1).widget().wordWrap()
+        assert panel.btn_tweak.parentWidget() is panel.picked
+        assert not hasattr(panel, "btn_hear")   # hearing it: the mixer's one switch
+        assert layout.itemAt(layout.count() - 1).widget() is panel.picked
     finally:
         panel.close()
         panel.deleteLater()

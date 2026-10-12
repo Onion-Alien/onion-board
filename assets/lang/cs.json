@@ -1671,7 +1671,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Automaticky zjistěte, zda je vstupní citlivost</b> zapnutá: při hovoru ztiší vaše zvuky a přeruší je: vypněte (Input Sensitivity) a nechte posuvník nízko, nebo použijte Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Režim zadávání</b> : Nejlépe funguje <b>Push to Talk</b> (nastavte stejnou klávesu v Nastavení → Klávesové zkratky → Auto push-to-talk a Onion Board ji podrží za vás, když hraje zvuk). Na <b>Hlasové aktivitě</b> vypněte možnost <b>Automaticky určit vstupní citlivost</b> a přetáhněte posuvník téměř úplně doleva, nebo Discord bude stále vyřazovat vaše zvuky, i ty hlasité.",
   "<b>Languages</b> · {state}": "<b>Jazyky</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Vyberte si hlas</b>",
   "A built-in voice (still hides yours)": "Vestavěný hlas (stále skrývá váš)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Náhodný hloupý mix efektů, jako „Můj vlastní mix“: co se změnilo, se rozsvítí níže. Klikněte znovu pro další.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Krátká ukázka v tomto hlase, pouze ve vašich sluchátkách (nikdo jiný to neslyší). První trvá několik sekund.",
@@ -1857,7 +1856,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Hledání a stahování zvuků online je vypnuto v Nastavení > Soukromí a zabezpečení.",
   "Finding the newest Onion Watch…": "Hledání nejnovějších Onion Watch…",
   "Finding the newest…": "Hledání nejnovější…",
-  "Fold this card away": "Složte tuto kartu",
   "Fold {effect} away": "Přeložte {effect} pryč",
   "Follow my pitch": "Sledujte můj názor",
   "Forget {name}": "Zapomenout na {name}",
@@ -1994,7 +1992,6 @@
   "Nothing was recorded: it didn't make a sound.": "Nic nebylo zaznamenáno: nevydalo to ani zvuk.",
   "Nothing yet. Lines show up here as they're spoken.": "Zatím nic. Řádky se zde zobrazují tak, jak jsou vysloveny.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Nikam to poslat: na kartě Nastavení vyberte, kam se mají zvuky přesunout.",
-  "ON: everyone hears it": "ON: všichni to slyší",
   "Off (no shaping)": "Vypnuto (bez tvarování)",
   "Off (send as is)": "Vypnuto (odeslat tak, jak je)",
   "Old telephone": "Starý telefon",
@@ -2112,7 +2109,6 @@
   "Shout and your voice blows out like a megaphone.": "Křičte a váš hlas vybuchne jako megafon.",
   "Shout blowout": "Výkřik výstřelu",
   "Show me how": "Ukaž mi jak",
-  "Show this card": "Ukažte tuto kartu",
   "Show {effect}": "Zobrazit {effect}",
   "Silence": "Umlčet",
   "Smaller files": "Menší soubory",
@@ -3361,5 +3357,6 @@
   "{mic} · not sent, sounds only": "{mic} · neposílá se, jen zvuky",
   "{mic} · off": "{mic} · vypnutý",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Krok správce Windows se nedokončil. Pokud je jeho výzva stále otevřená, odpovězte na ni; pak to zkuste znovu.",
-  "{title}  ·  quiet on {devices}": "{title} · ticho na {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · ticho na {devices}",
+  "Languages": "Jazyky"
 }

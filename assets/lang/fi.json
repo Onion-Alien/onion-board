@@ -1628,7 +1628,6 @@
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Määritä automaattisesti, että tuloherkkyys</b> on päällä: puhelun aikana se ottaa äänesi hiljaiseksi ja poistaa ne: sammuta se (Input Sensitivity) ja jätä liukusäädin alhaiseksi tai käytä Push to Talk -toimintoa.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Syöttötila</b> : <b>Push to Talk</b> toimii parhaiten (asettamalla sama näppäin kohdassa Asetukset → Pikanäppäimet → Automaattinen push-to-talk ja Onion Board pitää sen puolestasi, kun ääni kuuluu). Laita <b>Äänitoiminto pois päältä</b> <b>Määritä tuloherkkyys automaattisesti</b> ja vedä liukusäädintä lähes kokonaan vasemmalle, tai Discord leikkaa jatkuvasti äänesi, myös kovia.",
   "<b>Languages</b> · {state}": "<b>Kielet</b> · {state}",
-  "<b>Pick a voice</b>": "<b>Valitse ääni</b>",
   "A built-in voice (still hides yours)": "Sisäänrakennettu ääni (piilottaa silti sinun)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Satunnainen typerä tehosteiden sekoitus, kuten \"Oma miksaus\": mitä se muutti, näkyy alla. Napsauta uudelleen saadaksesi toisen.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Lyhyt näyte tällä äänellä, vain kuulokkeissasi (kukaan muu ei kuule sitä). Ensimmäinen kestää muutaman sekunnin.",
@@ -1813,7 +1812,6 @@
   "Finding and downloading sounds online is switched off in Settings > Privacy & security.": "Äänien etsiminen ja lataaminen verkossa on kytketty pois päältä kohdassa Asetukset > Tietosuoja ja suojaus.",
   "Finding the newest Onion Watch…": "Löytää uusimman sipulikellon…",
   "Finding the newest…": "Löytää uusimmat…",
-  "Fold this card away": "Taita tämä kortti pois",
   "Fold {effect} away": "Taita {effect} pois",
   "Follow my pitch": "Seuraa puhettani",
   "Forget {name}": "Unohda {name}",
@@ -1949,7 +1947,6 @@
   "Nothing was recorded: it didn't make a sound.": "Mitään ei tallennettu: siitä ei kuulunut ääntä.",
   "Nothing yet. Lines show up here as they're spoken.": "Ei vielä mitään. Linjat näkyvät täällä, kun ne puhutaan.",
   "Nowhere to send it: pick where your sounds go on the Setup tab.": "Ei minne lähetettävää sitä: valitse Asetukset-välilehdellä, minne äänesi menevät.",
-  "ON: everyone hears it": "ON: kaikki kuulevat sen",
   "Off (no shaping)": "Pois päältä (ei muotoilua)",
   "Off (send as is)": "Pois päältä (lähetä sellaisenaan)",
   "Old telephone": "Vanha puhelin",
@@ -2065,7 +2062,6 @@
   "Shout and your voice blows out like a megaphone.": "Huuta ja äänesi puhaltaa kuin megafoni.",
   "Shout blowout": "Huuto räjähdys",
   "Show me how": "Näytä minulle miten",
-  "Show this card": "Näytä tämä kortti",
   "Show {effect}": "Näytä {effect}",
   "Silence": "Hiljaisuus",
   "Smaller files": "Pienemmät tiedostot",
@@ -3288,5 +3284,6 @@
   "{mic} · not sent, sounds only": "{mic} · ei lähetetä, vain äänet",
   "{mic} · off": "{mic} · pois päältä",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windowsin järjestelmänvalvojavaihe ei valmistunut. Jos sen kehote on vielä auki, vastaa siihen; yritä sitten uudelleen.",
-  "{title}  ·  quiet on {devices}": "{title} · hiljaa laitteella {devices}"
+  "{title}  ·  quiet on {devices}": "{title} · hiljaa laitteella {devices}",
+  "Languages": "Kielet"
 }
