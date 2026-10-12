@@ -92,8 +92,8 @@ def test_sound_modes_help_is_an_info_icon(window, qapp):  # noqa: F811
     heading = next(lbl for lbl in b.parentWidget().findChildren(QLabel)
                    if lbl.objectName() == "section")
     assert heading.text() == "Who's listening"
-    fm = heading.fontMetrics()           # centred on the heading's cap height
-    cap_centre = heading.geometry().top() + 8 + fm.ascent() - fm.capHeight() / 2
+    fm = heading.fontMetrics()           # centred on the heading's cap height (heading_row)
+    cap_centre = heading.geometry().top() + fm.ascent() - (fm.capHeight() + 1) / 2
     assert abs(b.geometry().center().y() - cap_centre) <= 1.5
 
 
