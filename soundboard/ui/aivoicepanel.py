@@ -156,6 +156,7 @@ class AiVoicePanel(QWidget):
         self.cb_voice = QComboBox()
         self.cb_voice.setMinimumWidth(0)
         self.cb_voice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.cb_voice.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         vrow.addWidget(self.cb_voice, 1)
         self.b_all = QPushButton(_("All voices"))
         icons.set_icon(self.b_all, "sounds")
