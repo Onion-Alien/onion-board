@@ -46,7 +46,7 @@ from soundboard.library import (AUDIO_EXTS, PAD_COLORS, PRESS_MODE, RESOURCE_DIR
                                 prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.dialogs import EditDialog, TabHelpPopup
 from soundboard.ui import importreport
 from soundboard.ui import routewarn
@@ -5474,6 +5474,7 @@ class MainWindow(QMainWindow):
             if not _holds_focus(self._tabs_area):
                 self.tabs.currentWidget().setFocus(Qt.FocusReason.OtherFocusReason)
         if self._settings_reusable(dlg):   # opened again as it is: no 100-300 ms rebuild
+            rehome_crash_reports(dlg)
             old, self._settings_kept = self._settings_kept, dlg
             self._settings_kept_print = self._settings_print()
             if old is not None and old is not dlg and qt_valid(old):
@@ -7825,6 +7826,7 @@ class MainWindow(QMainWindow):
                 self.apply_filter(self.search.text())
         finally:
             if self._spare_editor is None and d not in self._editors.values():
+                rehome_crash_reports(d)
                 self._spare_editor = d
             else:   # freed once its finished signal is over (deleting it inside crashed)
                 QTimer.singleShot(0, lambda: free_dialog(d))
