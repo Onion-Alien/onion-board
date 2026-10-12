@@ -127,7 +127,6 @@ HELPER_RETRY_S = 60.0   # a mic helper check that failed is tried again after th
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
-TRIGGERS_LOAD_MS = 50   # Onion Watch loads this long after the window is built
 PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright again
 PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
@@ -391,7 +390,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # shutdown() ran (app.py also calls it on aboutToQuit). Set first: the splash
-        # pumps events while the window is built, so its timers (load_triggers) can run
+        # pumps events while the window is built, so its timers can run
         # before the end of __init__
         self._shut_down = False
         self.title = _("Onion Board {version_text}", version_text=version_text())
@@ -574,6 +573,8 @@ class MainWindow(QMainWindow):
         self._rebuild_pads()
         splash.pump()
         self._load_all()
+        splash.pump()
+        self.load_triggers()   # behind the loading screen, not on the tab's first click
         splash.pump()
         self._watch_sounds_folder()
         self._fit_overlay_key()
@@ -1198,8 +1199,6 @@ class MainWindow(QMainWindow):
         set_live_tint(self.tabs, self.cfg.live_tab_green)
         for key in ("voice", "triggers", "apps"):
             self._tab_live(key, getattr(self, key).is_active())
-        # only if watching has to pick up again; else when the tab is first shown
-        QTimer.singleShot(TRIGGERS_LOAD_MS, self, lambda: self.load_triggers(now=False))
         self._radio_live(self.radio.is_active())
         self._search_follow_switch()
         net.on_change(self._follow_switches)
@@ -4643,7 +4642,7 @@ class MainWindow(QMainWindow):
         old.deleteLater()
         self._tab_live(key, False)
         if key == "triggers":
-            self.load_triggers(now=False)   # (or once it's shown)
+            self.load_triggers()
         if hasattr(self, "_fit"):
             if key in ("voice", "triggers"):
                 assert not isinstance(new, AppsTab)
@@ -5778,16 +5777,13 @@ class MainWindow(QMainWindow):
         self.triggers.cancel_pending()
         self.voice.stop_all()   # the voice changer and the other voices go off too
 
-    def load_triggers(self, now: bool = True):
-        """Put the Onion Watch add-on into the Triggers tab. It took 0.4-1 s on the UI
-        thread, so it waits until the window is up: a 0 ms timer would still run before
-        Windows' first paint message, a TRIGGERS_LOAD_MS one runs after it. Runs once.
-        `now` False (the window's start, the tab switched back on): only if it has to
-        run now (watching was on); otherwise the tab loads it when first shown."""
+    def load_triggers(self):
+        """Put the Onion Watch add-on into the Triggers tab (~0.4 s on the UI thread).
+        At the start it's done while the window is built, behind the loading screen (it
+        draws on its own thread), so opening the tab is instant; also when the tab is
+        switched back on in Settings > Tabs. Runs once."""
         if not isinstance(self.triggers, TriggersTab) or not self.triggers.pending \
                 or self._shut_down:   # (switched off: its stand-in has nothing pending)
-            return
-        if not now and not self.triggers.needed_now():
             return
         self.triggers.load()
         if self.triggers.needs_nudge():

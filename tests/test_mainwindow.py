@@ -50,10 +50,10 @@ def window(qapp, app_dir, monkeypatch):
 
 
 def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
-    """The splash pumps events while the window is built: the load_triggers timer can
-    run before __init__ ends, and threw AttributeError (_shut_down) when it did. So can
-    the Discord check's answer on a slow start (_setup_app, CI 2026-10-11): it comes
-    in at every pump here."""
+    """The splash pumps events while the window is built: a timer can run before
+    __init__ ends (load_triggers' once threw AttributeError, _shut_down). So can the
+    Discord check's answer on a slow start (_setup_app, CI 2026-10-11): it comes in at
+    every pump here. Onion Watch loads during the build, behind the loading screen."""
     import sys
     import time
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
@@ -64,7 +64,7 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
     calls = []
     real = main.MainWindow.load_triggers
     monkeypatch.setattr(main.MainWindow, "load_triggers",
-                        lambda self, now=True: (calls.append(now), real(self, now)))
+                        lambda self: (calls.append(self), real(self)))
 
     building = []
     real_build = main.MainWindow._build_ui
@@ -72,7 +72,7 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
                         lambda self: (building.append(self), real_build(self))[1])
 
     def slow_pump():   # a slow start with the splash up
-        time.sleep(main.TRIGGERS_LOAD_MS / 1000 + 0.03)
+        time.sleep(0.08)
         for w in building:   # Discord isn't running: what its check says then
             w.bridge.discord.emit(([], None))
         qapp.processEvents()
@@ -81,6 +81,7 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
     w = main.MainWindow()
     try:
         assert calls and not errors
+        assert not w.triggers.pending   # loaded while the window was built
     finally:
         w._load_thread.join(15)
         w.close()

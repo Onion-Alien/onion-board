@@ -84,9 +84,9 @@ class TriggersTab(QWidget):
 
     def __init__(self, host, dirs=None, defer: bool = False):
         """`host` is the BoardHost; `dirs` where to look for the add-on (tests).
-        `defer`: don't load the add-on yet, the window calls load() once it's up
-        (loading it takes up to a second, and the window used to wait for it), or
-        only when the tab is first shown, when nothing has to run (needed_now)."""
+        `defer`: don't load the add-on yet; the window calls load() while it's built,
+        behind the loading screen (MainWindow.load_triggers). If nothing has by the
+        time the tab is shown, it loads then."""
         super().__init__()
         self.host = host
         self._dirs = dirs
