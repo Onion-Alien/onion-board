@@ -5768,7 +5768,15 @@ class MainWindow(QMainWindow):
         """The search box's link as a result card: looked up, not downloaded."""
         self._link_wait.stop()
         url = self.linkbar.url
-        if not url or self.is_mini() or not self.ytresults.show_link(url):
+        if not url or self.is_mini():
+            return
+        if not ytdl.site_allowed(url):
+            # Offline mode or that site switched off: say so once per link, not nothing
+            if url != getattr(self, "_link_off_said", None):
+                self._link_off_said = url
+                self.toast(net.off_message(ytdl.site_feature(url)))
+            return
+        if not self.ytresults.show_link(url):
             return
         self._pads_scroll.hide()
         self._cat_row.hide()
