@@ -117,11 +117,8 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Setup: start here
 
-- [ ] **U29 (polish): Setup heading indents differ.** Every Setup card heading now
-  comes from `heading_row()` (same height, icon/ⓘ/pill on the cap height, measured
-  by `tests/test_card_headings.py`) and nothing folds any more. Left: Who's listening
-  has no heading icon, so its title starts further left than the others. Target:
-  Who's listening's `card(..., icon=...)`.
+- [x] **U29 (polish): Setup heading indents differ.** Done: every Setup card heading
+  comes from `heading_row()` with an icon, measured by `tests/test_card_headings.py`.
 
 ### Shared rail and bottom controls
 

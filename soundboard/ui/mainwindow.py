@@ -2301,7 +2301,8 @@ class MainWindow(QMainWindow):
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
                                                     "chat app, or a stream. Your sounds are "
                                                     "shaped to come through clearly."),
-                            roomy=True, beside=self.dest_panel.help_btn)   # What do these do?
+                            roomy=True, icon="ear",
+                            beside=self.dest_panel.help_btn)   # What do these do?
         dv.addWidget(self.dest_panel)
         dv.addStretch(1)   # as tall as your mic beside it: the room goes at the bottom
 
