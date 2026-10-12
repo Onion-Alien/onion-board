@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication, QScrollArea, QSlider, QVBoxLayout, Q
 from soundboard import engine
 from soundboard import library
 from soundboard.ui import mainwindow as main
-from soundboard import winkeys
+from soundboard import __version__, winkeys
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui.livedot import is_tab_live
 from soundboard.wheelguard import no_wheel
@@ -30,7 +30,8 @@ def window(qapp, app_dir, monkeypatch):
         t = np.arange(SR // 10) / SR
         sf.write(p, np.stack([np.sin(2 * np.pi * 440 * t)] * 2, 1) * 0.3, SR)
         sounds.append(SoundMeta(id=f"s{i}", name=name, file=str(p)))
-    Config(sounds=sounds, mic_first=True).save()   # (on the cable)
+    # (on the cable; this version ran last: no update restore point in every test)
+    Config(sounds=sounds, mic_first=True, stats_version=__version__).save()
     w = main.MainWindow()
     # the loader thread writes the cache and prunes orphans: it must finish while the
     # temp paths are still patched in, never after the fixture is torn down

@@ -659,7 +659,6 @@
   "On: listening on {host}:{port}.": "Включено: слуша на {host}:{port}.",
   "One click": "Един клик",
   "One click: put your sounds straight into your mic": "Един клик: пусни звуците си направо в микрофона",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Един клавиш може да пуска различен звук във всяка категория: смени категорията (раздела ѝ или клавишите по-горе) и същите клавиши пускат звуците на тази категория. Звуците без категория винаги пазят клавишите си.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Един клавиш може да изключва всички други бързи клавиши, докато пишеш в чата. Задай го в Настройки → Бързи клавиши.",
   "One of them": "Един от тях",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Силата е изравнена",
   "Live: click to mute": "На живо: щракнете за заглушаване",
   "Muted: click to go live": "Заглушено: щракнете, за да сте на живо",
-  "Pause or resume": "Пауза или продължаване"
+  "Pause or resume": "Пауза или продължаване",
+  "Before update": "Преди обновяването",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят."
 }

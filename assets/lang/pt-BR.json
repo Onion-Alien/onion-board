@@ -1035,7 +1035,6 @@
   "On the left, click <b>Voice</b>.": "À esquerda, clique em <b>Voz</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Ligado, em {host}:{port}. Escolha um link para copiar.",
   "On: listening on {host}:{port}.": "Ligado: ouvindo em {host}:{port}.",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Um é salvo toda vez que você redefine algo (os últimos {max_points} ficam guardados). Restaurar devolve suas configurações, atalhos e sons como estavam. Sons que você adicionou depois são mantidos.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Uma tecla pode tocar um som diferente em cada categoria: troque de categoria (pela aba dela, ou pelas teclas acima) e as mesmas teclas tocam os sons dessa categoria. Sons sem categoria sempre mantêm suas teclas.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Uma linha por conexão: o que você fez que a criou, rota, resultado, bytes, e as requisições que o app conseguiu ler",
   "One row per server: what it was for, why, and how often": "Uma linha por servidor: para que foi, por quê e com que frequência",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Volumes nivelados",
   "Live: click to mute": "Ao vivo: clique para silenciar",
   "Muted: click to go live": "Silenciado: clique para entrar ao vivo",
-  "Pause or resume": "Pausar ou retomar"
+  "Pause or resume": "Pausar ou retomar",
+  "Before update": "Antes de atualizar",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Um é salvo toda vez que você redefine algo ou atualiza o app (os últimos {max_points} ficam guardados). Restaurar devolve suas configurações, atalhos e sons como estavam. Sons que você adicionou depois são mantidos."
 }

@@ -710,7 +710,6 @@
   "One click": "Yksi klikkaus",
   "One click needed: repair your mic": "Yksi klikkaus tarvitaan: korjaa mikkisi",
   "One click: put your sounds straight into your mic": "Yksi klikkaus: laita äänesi suoraan mikkiisi",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Yksi näppäin voi soittaa eri äänen jokaisessa kategoriassa: vaihda kategoriaa (sen välilehdestä tai yllä olevilla näppäimillä), niin samat näppäimet soittavat sen kategorian ääniä. Kategoriattomat äänet pitävät aina näppäimensä.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Yksi näppäin voi laittaa kaikki muut pikanäppäimet pois, kun kirjoitat chattiin. Aseta se kohdassa Asetukset → Pikanäppäimet.",
   "One of them": "Yksi niistä",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Äänenvoimakkuudet tasattu",
   "Live: click to mute": "Live: mykistä napsauttamalla",
   "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
-  "Pause or resume": "Tauko tai jatka"
+  "Pause or resume": "Tauko tai jatka",
+  "Before update": "Ennen päivitystä",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät."
 }

@@ -34,7 +34,8 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
-                        remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
+                        remote, otherboards, reset, soundfx, thumbs, trash, updates, videos,
+                        voicesdk)
 from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, net, netlog,
                         profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
@@ -571,6 +572,7 @@ class MainWindow(QMainWindow):
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
             self.rail.sync()   # (it heard nothing)
+        reset.before_update(self.cfg)   # a restore point first, when this is an update
         library.tidy_files(self.cfg)   # files from before library folders move in
         self._rebuild_pads()
         splash.pump()

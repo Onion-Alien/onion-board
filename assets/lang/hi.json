@@ -1037,7 +1037,6 @@
   "On the left, click <b>Voice</b>.": "बाईं ओर, <b>वॉयस</b> पर क्लिक करें।",
   "On, at {host}:{port}. Pick a link to copy.": "चालू, {host} पर: {port} । कॉपी करने के लिए एक लिंक चुनें.",
   "On: listening on {host}:{port}.": "चालू: {host} : {port} पर सुन रहा हूँ।",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "एक कुंजी प्रत्येक श्रेणी में एक अलग ध्वनि बजा सकती है: श्रेणी स्विच करें (उसका टैब, या ऊपर की कुंजियाँ) और वही कुंजियाँ उस श्रेणी की ध्वनियाँ बजाती हैं। किसी भी श्रेणी की ध्वनियाँ हमेशा अपनी कुंजी नहीं रखतीं।",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "प्रति कनेक्शन एक पंक्ति: आपने क्या किया जिससे यह बना, रूट, परिणाम, बाइट्स और वे अनुरोध जिन्हें ऐप पढ़ सकता है",
   "One row per server: what it was for, why, and how often": "प्रति सर्वर एक पंक्ति: यह किस लिए, क्यों और कितनी बार थी",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "वॉल्यूम बराबर",
   "Live: click to mute": "लाइव: म्यूट करने के लिए क्लिक करें",
   "Muted: click to go live": "म्यूट: लाइव होने के लिए क्लिक करें",
-  "Pause or resume": "रोकें या फिर से चलाएँ"
+  "Pause or resume": "रोकें या फिर से चलाएँ",
+  "Before update": "अपडेट से पहले",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं या ऐप अपडेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।"
 }

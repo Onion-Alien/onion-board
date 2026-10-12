@@ -722,7 +722,6 @@
   "One click": "Jedno kliknutí",
   "One click needed: repair your mic": "Potřeba jedno kliknutí: oprav svůj mikrofon",
   "One click: put your sounds straight into your mic": "Jedno kliknutí: dej svoje zvuky rovnou do mikrofonu",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Jedna klávesa může v každé kategorii přehrát jiný zvuk: přepni kategorii (její kartou nebo klávesami výš) a stejné klávesy přehrají zvuky té kategorie. Zvuky bez kategorie si své klávesy nechávají vždy.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Jedna klávesa může vypnout všechny ostatní zkratky, zatímco píšeš v chatu. Nastavíš ji v Nastavení → Zkratky.",
   "One of them": "Jedna z nich",
@@ -3363,5 +3362,7 @@
   "Volumes levelled": "Hlasitost vyrovnaná",
   "Live: click to mute": "Živě: kliknutím ztlumíte",
   "Muted: click to go live": "Ztlumeno: kliknutím přejdete živě",
-  "Pause or resume": "Pozastavit nebo pokračovat"
+  "Pause or resume": "Pozastavit nebo pokračovat",
+  "Before update": "Před aktualizací",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ nebo aktualizuješ aplikaci (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou."
 }

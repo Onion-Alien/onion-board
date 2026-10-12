@@ -698,7 +698,6 @@
   "One click": "Satu klik",
   "One click needed: repair your mic": "Perlu satu klik: baiki mikrofon anda",
   "One click: put your sounds straight into your mic": "Satu klik: letakkan bunyi anda terus ke mikrofon anda",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali anda menetapkan semula sesuatu ({max_points} terakhir dikekalkan). Memulihkan mengembalikan tetapan, hotkey dan bunyi anda seperti dahulu. Bunyi yang anda tambah sejak itu dikekalkan.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Satu kekunci boleh memainkan bunyi berbeza dalam setiap kategori: tukar kategori (tabnya, atau kekunci di atas) dan kekunci yang sama memainkan bunyi kategori itu. Bunyi tanpa kategori sentiasa mengekalkan kekuncinya.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Satu kekunci boleh mematikan setiap hotkey lain semasa anda menaip dalam sembang. Tetapkannya di Tetapan → Hotkey.",
   "One of them": "Salah satu daripadanya",
@@ -3217,5 +3216,7 @@
   "Volumes levelled": "Kelantangan diratakan",
   "Live: click to mute": "Langsung: klik untuk bisukan",
   "Muted: click to go live": "Dibisukan: klik untuk langsung semula",
-  "Pause or resume": "Jeda atau sambung"
+  "Pause or resume": "Jeda atau sambung",
+  "Before update": "Sebelum kemas kini",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali anda menetapkan semula sesuatu atau mengemas kini apl ({max_points} terakhir dikekalkan). Memulihkan mengembalikan tetapan, hotkey dan bunyi anda seperti dahulu. Bunyi yang anda tambah sejak itu dikekalkan."
 }

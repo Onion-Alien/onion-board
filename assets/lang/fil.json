@@ -710,7 +710,6 @@
   "One click": "Isang click",
   "One click needed: repair your mic": "Isang click na lang: i-repair ang mic mo",
   "One click: put your sounds straight into your mic": "Isang click: ilagay ang mga sound mo diretso sa mic mo",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Pwedeng mag-play ang isang key ng ibang sound sa bawat kategorya: magpalit ng kategorya (tab nito, o ang mga key sa itaas) at ipe-play ng parehong mga key ang mga sound ng kategoryang 'yon. Laging nasa mga sound na walang kategorya ang mga key nila.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Kaya ng isang key na i-off ang lahat ng ibang hotkey habang nagta-type ka sa chat. I-set ito sa Settings → Mga hotkey.",
   "One of them": "Isa sa kanila",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Pantay ang volume",
   "Live: click to mute": "Live: i-click para i-mute",
   "Muted: click to go live": "Naka-mute: i-click para mag-live",
-  "Pause or resume": "I-pause o ituloy"
+  "Pause or resume": "I-pause o ituloy",
+  "Before update": "Bago mag-update",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka o ina-update mo ang app (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon."
 }

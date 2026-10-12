@@ -1058,7 +1058,6 @@
   "On the left, click <b>Voice</b>.": "Ліворуч натисніть <b>значок</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Увімкнено на {host} : {port} . Виберіть посилання для копіювання.",
   "On: listening on {host}:{port}.": "Увімкнено: прослуховування на {host} : {port} .",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Одна клавіша може відтворювати різні звуки в кожній категорії: перемикайте категорію (її вкладку або клавіші вище), і ті самі клавіші відтворюють звуки цієї категорії. Звуки жодної категорії не завжди зберігають свої ключі.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Один рядок для кожного з’єднання: що ви зробили, що вдалося, маршрут, результат, байти та запити, які програма могла прочитати",
   "One row per server: what it was for, why, and how often": "Один рядок на сервер: для чого це було, чому та як часто",
@@ -3363,5 +3362,7 @@
   "Volumes levelled": "Гучність вирівняно",
   "Live: click to mute": "В ефірі: натисніть, щоб вимкнути звук",
   "Muted: click to go live": "Без звуку: натисніть, щоб вийти в ефір",
-  "Pause or resume": "Пауза або продовжити"
+  "Pause or resume": "Пауза або продовжити",
+  "Before update": "Перед оновленням",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте або оновлюєте застосунок (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються."
 }

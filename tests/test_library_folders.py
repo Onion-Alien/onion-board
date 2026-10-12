@@ -180,3 +180,38 @@ def test_a_backups_folder_name_cant_leave_the_library():
     assert backup._lib_folder("..") == library.MY_SOUNDS
     assert backup._lib_folder(None) == library.MY_SOUNDS
     assert backup._lib_folder("YouTube") == "YouTube"
+
+
+def test_a_crash_before_the_save_is_undone_at_the_next_start(app_dir, monkeypatch):
+    cfg = _old_board(app_dir)
+    before = [m.file for m in cfg.sounds]
+
+    def power_cut(self):
+        raise KeyboardInterrupt   # the app gone between the moves and the save
+    with monkeypatch.context() as mp:
+        mp.setattr(Config, "save", power_cut)
+        try:
+            library.tidy_files(cfg)
+        except KeyboardInterrupt:
+            pass
+    assert not Path(before[0]).exists()   # moved, but the settings still name it
+    cfg = Config.load()
+    assert [m.file for m in cfg.sounds] == before
+    assert library.tidy_files(cfg) == 3   # put back, then moved again and saved
+    assert all(Path(m.file).is_file() for m in Config.load().sounds)
+    assert not (app_dir / "tidy-moves.txt").exists()
+    assert sorted(p.name for p in (library.SOUNDS_DIR / "YouTube").iterdir()) == \
+        ["Never Gonna.flac"]   # no "Never Gonna (2)" left from the first try
+
+
+def test_the_moves_list_leaves_saved_moves_and_drops_unused_names(app_dir):
+    cfg = _old_board(app_dir)
+    assert library.tidy_files(cfg) == 3
+    claimed = library.new_file("Never used", ".wav", "My sounds")   # empty, never filled
+    (app_dir / "tidy-moves.txt").write_text(
+        f"{cfg.sounds[0].file}.old\t{cfg.sounds[0].file}\n"   # saved already: stays
+        f"{library.SOUNDS_DIR / 'x.wav'}\t{claimed}\n"
+        "cut short by the power cut", encoding="utf-8")
+    assert library.tidy_files(cfg) == 0
+    assert Path(cfg.sounds[0].file).is_file() and not claimed.exists()
+    assert not (app_dir / "tidy-moves.txt").exists()

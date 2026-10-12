@@ -710,7 +710,6 @@
   "One click": "Ett klick",
   "One click needed: repair your mic": "Ett klick behövs: reparera din mikrofon",
   "One click: put your sounds straight into your mic": "Ett klick: lägg dina ljud direkt i din mikrofon",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "En sparas varje gång du återställer något (de senaste {max_points} behålls). Att återställa lägger tillbaka dina inställningar, snabbtangenter och ljud som de var. Ljud du lagt till sedan dess behålls.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "En tangent kan spela olika ljud i varje kategori: byt kategori (dess flik, eller tangenterna ovan) så spelar samma tangenter den kategorins ljud. Ljud utan kategori behåller alltid sina tangenter.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "En tangent kan stänga av alla andra snabbtangenter medan du skriver i chatten. Ställ in den under Inställningar → Snabbtangenter.",
   "One of them": "En av dem",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Volymer utjämnade",
   "Live: click to mute": "Live: klicka för att stänga av ljudet",
   "Muted: click to go live": "Ljud av: klicka för att gå live",
-  "Pause or resume": "Pausa eller fortsätt"
+  "Pause or resume": "Pausa eller fortsätt",
+  "Before update": "Före uppdatering",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "En sparas varje gång du återställer något eller uppdaterar appen (de senaste {max_points} behålls). Att återställa lägger tillbaka dina inställningar, snabbtangenter och ljud som de var. Ljud du lagt till sedan dess behålls."
 }

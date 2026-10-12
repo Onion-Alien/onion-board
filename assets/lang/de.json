@@ -1035,7 +1035,6 @@
   "On the left, click <b>Voice</b>.": "Klick links auf <b>Sprache</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "An, auf {host}:{port}. Wähl einen Link zum Kopieren.",
   "On: listening on {host}:{port}.": "An: lauscht auf {host}:{port}.",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bei jedem Zurücksetzen wird einer gespeichert (die letzten {max_points} bleiben erhalten). Wiederherstellen bringt deine Einstellungen, Hotkeys und Sounds zurück, wie sie waren. Sounds, die du seitdem hinzugefügt hast, bleiben.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Eine Taste kann in jeder Kategorie einen anderen Sound spielen: Wechsle die Kategorie (über ihren Tab oder die Tasten oben), und dieselben Tasten spielen die Sounds dieser Kategorie. Sounds ohne Kategorie behalten immer ihre Tasten.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Eine Zeile pro Verbindung: was du getan hast, das sie ausgelöst hat, Route, Ergebnis, Bytes und die Anfragen, die die App lesen konnte",
   "One row per server: what it was for, why, and how often": "Eine Zeile pro Server: wofür, warum und wie oft",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Lautstärken angeglichen",
   "Live: click to mute": "Live: Klicken zum Stummschalten",
   "Muted: click to go live": "Stumm: Klicken, um live zu gehen",
-  "Pause or resume": "Pausieren oder fortsetzen"
+  "Pause or resume": "Pausieren oder fortsetzen",
+  "Before update": "Vor dem Update",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bei jedem Zurücksetzen und jedem Update der App wird einer gespeichert (die letzten {max_points} bleiben erhalten). Wiederherstellen bringt deine Einstellungen, Hotkeys und Sounds zurück, wie sie waren. Sounds, die du seitdem hinzugefügt hast, bleiben."
 }

@@ -710,7 +710,6 @@
   "One click": "Ét klik",
   "One click needed: repair your mic": "Ét klik nødvendigt: reparér din mikrofon",
   "One click: put your sounds straight into your mic": "Ét klik: læg dine lyde direkte i din mikrofon",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Der gemmes et, hver gang du nulstiller noget (de sidste {max_points} beholdes). Gendannelse sætter dine indstillinger, genvejstaster og lyde tilbage, som de var. Lyde, du har tilføjet siden, beholdes.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Én tast kan afspille en forskellig lyd i hver kategori: skift kategori (dens fane, eller tasterne ovenfor), så afspiller de samme taster den kategoris lyde. Lyde uden kategori beholder altid deres taster.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Én tast kan slå alle andre genvejstaster fra, mens du skriver i chatten. Sæt den under Indstillinger → Genvejstaster.",
   "One of them": "En af dem",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Lydstyrker udjævnet",
   "Live: click to mute": "Live: klik for at slå lyden fra",
   "Muted: click to go live": "Lyd fra: klik for at gå live",
-  "Pause or resume": "Pause eller fortsæt"
+  "Pause or resume": "Pause eller fortsæt",
+  "Before update": "Før opdatering",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Der gemmes et, hver gang du nulstiller noget eller opdaterer appen (de sidste {max_points} beholdes). Gendannelse sætter dine indstillinger, genvejstaster og lyde tilbage, som de var. Lyde, du har tilføjet siden, beholdes."
 }

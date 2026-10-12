@@ -1037,7 +1037,6 @@
   "On the left, click <b>Voice</b>.": "Solda <b>Ses'i</b> tıklayın.",
   "On, at {host}:{port}. Pick a link to copy.": "Açık, {host} konumunda: {port} . Kopyalanacak bir bağlantı seçin.",
   "On: listening on {host}:{port}.": "Açık: {host} : {port} üzerinde dinleme.",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Bir tuş her kategoride farklı bir ses çalabilir: kategoriyi değiştirin (kendi sekmesi veya yukarıdaki tuşlar) ve aynı tuşlar o kategorinin seslerini çalar. Hiçbir kategorideki sesler her zaman anahtarlarını saklamaz.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Bağlantı başına bir satır: bunu yapan şey, rota, sonuç, bayt ve uygulamanın okuyabildiği istekler",
   "One row per server: what it was for, why, and how often": "Sunucu başına bir satır: ne içindi, neden ve ne sıklıktaydı",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Ses seviyeleri eşit",
   "Live: click to mute": "Canlı: sessize almak için tıkla",
   "Muted: click to go live": "Sessiz: canlıya geçmek için tıkla",
-  "Pause or resume": "Duraklat veya sürdür"
+  "Pause or resume": "Duraklat veya sürdür",
+  "Before update": "Güncellemeden önce",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda veya uygulamayı her güncellediğinizde bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur."
 }

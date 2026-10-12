@@ -189,7 +189,8 @@ class RestorePoints(QDialog):
         lay.setSpacing(10)
         lay.addWidget(_heading(_("Restore points")))
         lay.addWidget(hint_label(
-            _("One is saved every time you reset something (the last {max_points} are kept). "
+            _("One is saved every time you reset something or update the app (the last "
+              "{max_points} are kept). "
               "Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've "
               "added since are kept.", max_points=reset.MAX_POINTS)))
         self.list = QListWidget()

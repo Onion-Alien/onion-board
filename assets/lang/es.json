@@ -1035,7 +1035,6 @@
   "On the left, click <b>Voice</b>.": "A la izquierda, haz clic en <b>Voz</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Activado, en {host}:{port}. Elige un enlace para copiarlo.",
   "On: listening on {host}:{port}.": "Activado: escuchando en {host}:{port}.",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo (se conservan los últimos {max_points}). Restaurar devuelve tus ajustes, atajos y sonidos a como estaban. Los sonidos que hayas añadido desde entonces se conservan.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Una tecla puede reproducir un sonido distinto en cada categoría: cambia de categoría (su pestaña, o las teclas de arriba) y las mismas teclas reproducen los sonidos de esa categoría. Los sonidos sin categoría siempre conservan sus teclas.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Una fila por conexión: qué hiciste para provocarla, ruta, resultado, bytes y las peticiones que la app pudo leer",
   "One row per server: what it was for, why, and how often": "Una fila por servidor: para qué fue, por qué y con qué frecuencia",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Volúmenes igualados",
   "Live: click to mute": "En directo: haz clic para silenciar",
   "Muted: click to go live": "Silenciado: haz clic para salir en directo",
-  "Pause or resume": "Pausar o reanudar"
+  "Pause or resume": "Pausar o reanudar",
+  "Before update": "Antes de actualizar",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo o actualizas la app (se conservan los últimos {max_points}). Restaurar devuelve tus ajustes, atajos y sonidos a como estaban. Los sonidos que hayas añadido desde entonces se conservan."
 }

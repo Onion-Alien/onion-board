@@ -1016,7 +1016,6 @@
   "On the left, click <b>Voice</b>.": "ทางด้านซ้าย ให้คลิก <b>เสียง</b>",
   "On, at {host}:{port}. Pick a link to copy.": "เปิดที่ {host} : {port} เลือกลิงก์ที่จะคัดลอก",
   "On: listening on {host}:{port}.": "เปิด: กำลังฟังบน {host} : {port}",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งบางอย่าง (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "คีย์หนึ่งสามารถเล่นเสียงที่แตกต่างกันในแต่ละหมวดหมู่ ได้แก่ สลับหมวดหมู่ (แท็บหรือคีย์ด้านบน) และคีย์เดียวกันจะเล่นเสียงของหมวดหมู่นั้น เสียงที่ไม่มีหมวดหมู่จะเก็บคีย์ไว้เสมอ",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "หนึ่งแถวต่อการเชื่อมต่อ: สิ่งที่คุณทำ เส้นทาง ผลลัพธ์ ไบต์ และคำขอที่แอปสามารถอ่านได้",
   "One row per server: what it was for, why, and how often": "หนึ่งแถวต่อเซิร์ฟเวอร์: มีไว้เพื่ออะไร ทำไม และบ่อยแค่ไหน",
@@ -3217,5 +3216,7 @@
   "Volumes levelled": "ปรับความดังเท่ากันแล้ว",
   "Live: click to mute": "สด: คลิกเพื่อปิดเสียง",
   "Muted: click to go live": "ปิดเสียงอยู่: คลิกเพื่อกลับมาสด",
-  "Pause or resume": "หยุดชั่วคราวหรือเล่นต่อ"
+  "Pause or resume": "หยุดชั่วคราวหรือเล่นต่อ",
+  "Before update": "ก่อนอัปเดต",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งหรืออัปเดตแอป (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้"
 }

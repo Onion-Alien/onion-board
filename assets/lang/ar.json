@@ -1121,7 +1121,6 @@
   "On the left, click <b>Voice</b>.": "على اليسار، انقر على <b>الصوت</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "تشغيل، في {host} : {port} . اختر رابطًا لنسخه.",
   "On: listening on {host}:{port}.": "تشغيل: الاستماع على {host} : {port} .",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "يمكن لمفتاح واحد تشغيل صوت مختلف في كل فئة: تبديل الفئة (علامة التبويب الخاصة بها، أو المفاتيح أعلاه) وتقوم نفس المفاتيح بتشغيل أصوات تلك الفئة. الأصوات في أي فئة تحتفظ دائمًا بمفاتيحها.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "صف واحد لكل اتصال: ما فعلته هو ما جعله، والتوجيه، والنتيجة، والبايتات، والطلبات التي يمكن للتطبيق قراءتها",
   "One row per server: what it was for, why, and how often": "صف واحد لكل خادم: الغرض منه، ولماذا، وكم مرة",
@@ -3582,5 +3581,7 @@
   "Volumes levelled": "مستوى الصوت موحّد",
   "Live: click to mute": "مباشر: انقر لكتم الصوت",
   "Muted: click to go live": "مكتوم: انقر للعودة مباشرًا",
-  "Pause or resume": "إيقاف مؤقت أو استئناف"
+  "Pause or resume": "إيقاف مؤقت أو استئناف",
+  "Before update": "قبل التحديث",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما أو تحديث التطبيق (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين."
 }

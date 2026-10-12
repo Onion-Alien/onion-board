@@ -722,7 +722,6 @@
   "One click": "Un clic",
   "One click needed: repair your mic": "E nevoie de un clic: repară-ți microfonul",
   "One click: put your sounds straight into your mic": "Un clic: pune-ți sunetele direct în microfon",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "O tastă poate reda alt sunet în fiecare categorie: schimbă categoria (fila ei, sau tastele de mai sus) și aceleași taste redau sunetele categoriei respective. Sunetele fără categorie își păstrează mereu tastele.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "O tastă poate opri toate celelalte taste rapide cât scrii în chat. Seteaz-o în Setări → Taste rapide.",
   "One of them": "Unul dintre ele",
@@ -3363,5 +3362,7 @@
   "Volumes levelled": "Volume egalizate",
   "Live: click to mute": "Live: clic pentru a dezactiva sunetul",
   "Muted: click to go live": "Fără sunet: clic pentru a reveni live",
-  "Pause or resume": "Pauză sau reluare"
+  "Pause or resume": "Pauză sau reluare",
+  "Before update": "Înainte de actualizare",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva sau actualizezi aplicația (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate."
 }

@@ -2085,15 +2085,66 @@ def _old_folder(rest: str) -> str:
     return MY_SOUNDS
 
 
+def _tidy_journal() -> Path:
+    """tidy_files' list of moves ("<was>\\t<now>" a line), written before each one and
+    deleted once the settings are saved: a crash or power cut in between is undone at
+    the next start (_undo_tidy)."""
+    return APP_DIR / "tidy-moves.txt"
+
+
+def _undo_tidy(cfg: Config) -> int:
+    """A tidy_files that stopped before its settings were saved: the sounds still name
+    the old files, so put back each one that moved (and drop a name claimed but never
+    used). Moves the settings already know about stay. The list is kept while a file
+    won't move back (open in another program), for the next start. Returns how many
+    went back."""
+    journal = _tidy_journal()
+    try:
+        lines = journal.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return 0
+    except OSError:
+        log.warning("couldn't read %s", journal, exc_info=True)
+        return 0
+    used = {os.path.normcase(m.file) for m in cfg.sounds}
+    back, stuck = 0, False
+    for line in lines:
+        was, sep, now = line.partition("\t")
+        if not sep:   # cut short by the power cut: its move never happened
+            continue
+        was_p, now_p = Path(was), Path(now)
+        if os.path.normcase(now) in used or not now_p.is_file():
+            continue
+        try:
+            if os.path.normcase(was) in used and not was_p.exists():
+                os.replace(now_p, was_p)
+                back += 1
+            elif now_p.stat().st_size == 0:   # claimed by new_file, never filled
+                discard(now_p)
+        except OSError:
+            log.warning("couldn't put %s back after an unfinished tidy", now, exc_info=True)
+            stuck = True
+    if not stuck:
+        journal.unlink(missing_ok=True)
+    if back:
+        log.warning("put %d sound files back after an unfinished tidy", back)
+    return back
+
+
 def tidy_files(cfg: Config) -> int:
     """Move the sound files from before library folders ("<id>_<name>" in SOUNDS_DIR
     itself) into them, under the sound's own name: "YouTube/Never Gonna Give You
     Up.flac". At the start, before anything reads them. A file that can't move (open
     in another program) stays as it is, for the next start. The settings are saved
-    at once: if they can't be, the files go back. Returns how many moved."""
+    at once: if they can't be, the files go back; if the app stops before then, the
+    next start puts them back (_undo_tidy) and tries again. Returns how many moved."""
     if cfg.read_only:
         return 0
+    _undo_tidy(cfg)
+    if _tidy_journal().exists():   # some couldn't go back yet: don't add to the list
+        return 0
     moved: dict[Path, Path] = {}
+    journal = None
     changed: list[tuple[SoundMeta, str]] = []
     for m in cfg.sounds:
         p = Path(m.file)
@@ -2106,6 +2157,11 @@ def tidy_files(cfg: Config) -> int:
             dest = None
             try:
                 dest = new_file(m.name or rest, p.suffix, _old_folder(rest))
+                if journal is None:
+                    journal = open(_tidy_journal(), "a", encoding="utf-8")  # noqa: SIM115
+                journal.write(f"{p}\t{dest}\n")
+                journal.flush()
+                os.fsync(journal.fileno())   # on disk before the move it undoes
                 os.replace(p, dest)
             except OSError:
                 log.warning("couldn't move %s into a library folder", p.name, exc_info=True)
@@ -2115,17 +2171,29 @@ def tidy_files(cfg: Config) -> int:
             moved[p] = dest
         changed.append((m, m.file))
         m.file = str(moved[p])
-    if moved and not cfg.save():
+    if journal is not None:
+        journal.close()
+    saved = not moved or cfg.save()
+    if saved:
+        try:
+            _tidy_journal().unlink(missing_ok=True)
+        except OSError:   # harmless: the sounds name the new files, nothing goes back
+            log.warning("couldn't remove the tidy list", exc_info=True)
+    if not saved:
         log.warning("couldn't save the settings: the sound files go back where they were")
+        all_back = True
         for was, now in moved.items():
             try:
                 os.replace(now, was)
-            except OSError:   # then the sounds keep the new place (saved next time)
+            except OSError:   # then the sounds keep the new place: saved next time, or
                 log.warning("couldn't move %s back", now, exc_info=True)
+                all_back = False   # if never saved, the kept list puts it back next start
                 continue
             for m, old in changed:
                 if Path(old) == was:
                     m.file = old
+        if all_back:
+            _tidy_journal().unlink(missing_ok=True)
         return 0
     if moved:
         log.info("moved %d sound files into library folders", len(moved))

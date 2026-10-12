@@ -1016,7 +1016,6 @@
   "On the left, click <b>Voice</b>.": "Ở bên trái, nhấp vào <b>Giọng nói</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Bật, tại {host} : {port} . Chọn một liên kết để sao chép.",
   "On: listening on {host}:{port}.": "Bật: đang nghe trên {host} : {port} .",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Một phím có thể phát âm thanh khác nhau trong mỗi danh mục: chuyển đổi danh mục (tab của nó hoặc các phím ở trên) và các phím giống nhau sẽ phát âm thanh của danh mục đó. Âm thanh không thuộc danh mục nào luôn giữ chìa khóa của chúng.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Một hàng cho mỗi kết nối: những gì bạn đã làm để tạo ra kết nối đó, định tuyến, kết quả, byte và các yêu cầu mà ứng dụng có thể đọc",
   "One row per server: what it was for, why, and how often": "Một hàng trên mỗi máy chủ: nó dùng để làm gì, tại sao và tần suất",
@@ -3217,5 +3216,7 @@
   "Volumes levelled": "Âm lượng đã cân bằng",
   "Live: click to mute": "Trực tiếp: bấm để tắt tiếng",
   "Muted: click to go live": "Đã tắt tiếng: bấm để phát trực tiếp",
-  "Pause or resume": "Tạm dừng hoặc tiếp tục"
+  "Pause or resume": "Tạm dừng hoặc tiếp tục",
+  "Before update": "Trước khi cập nhật",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó hoặc cập nhật ứng dụng ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại."
 }

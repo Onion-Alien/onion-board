@@ -710,7 +710,6 @@
   "One click": "Un clic",
   "One click needed: repair your mic": "Falta un clic: repara tu micrófono",
   "One click: put your sounds straight into your mic": "Un clic: pon tus sonidos directo en tu micrófono",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo (se conservan los últimos {max_points}). Restaurar devuelve tu configuración, tus atajos y tus sonidos a como estaban. Los sonidos que agregaste después se conservan.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Una tecla puede reproducir un sonido distinto en cada categoría: cambia de categoría (su pestaña, o las teclas de arriba) y las mismas teclas reproducen los sonidos de esa categoría. Los sonidos sin categoría siempre conservan sus teclas.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Una tecla puede desactivar todos los demás atajos mientras escribes en el chat. Elígela en Configuración → Atajos.",
   "One of them": "Uno de ellos",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Volúmenes igualados",
   "Live: click to mute": "En vivo: haz clic para silenciar",
   "Muted: click to go live": "Silenciado: haz clic para salir en vivo",
-  "Pause or resume": "Pausar o reanudar"
+  "Pause or resume": "Pausar o reanudar",
+  "Before update": "Antes de actualizar",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo o actualizas la app (se conservan los últimos {max_points}). Restaurar devuelve tu configuración, tus atajos y tus sonidos a como estaban. Los sonidos que agregaste después se conservan."
 }

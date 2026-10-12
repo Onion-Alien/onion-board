@@ -1037,7 +1037,6 @@
   "On the left, click <b>Voice</b>.": "Klik aan de linkerkant op <b>Stem</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Aan, op {host} : {port} . Kies een link om te kopiëren.",
   "On: listening on {host}:{port}.": "Aan: luisteren op {host} : {port} .",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Elke keer dat u iets reset, wordt er één opgeslagen (de laatste {max_points} blijven behouden). Bij het herstellen worden uw instellingen, sneltoetsen en geluiden teruggezet zoals ze waren. Geluiden die u sindsdien heeft toegevoegd, blijven behouden.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Eén toets kan in elke categorie een ander geluid spelen: verander van categorie (het tabblad ervan of de toetsen erboven) en dezelfde toetsen spelen de geluiden van die categorie. Geluiden in geen enkele categorie behouden altijd hun sleutels.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Eén rij per verbinding: wat je hebt gedaan waardoor het is gelukt, route, resultaat, bytes en de verzoeken die de app kon lezen",
   "One row per server: what it was for, why, and how often": "Eén rij per server: waar het voor was, waarom en hoe vaak",
@@ -3290,5 +3289,7 @@
   "Volumes levelled": "Volumes gelijkgetrokken",
   "Live: click to mute": "Live: klik om te dempen",
   "Muted: click to go live": "Gedempt: klik om live te gaan",
-  "Pause or resume": "Pauzeren of hervatten"
+  "Pause or resume": "Pauzeren of hervatten",
+  "Before update": "Vóór de update",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Elke keer dat u iets reset of de app bijwerkt, wordt er één opgeslagen (de laatste {max_points} blijven behouden). Bij het herstellen worden uw instellingen, sneltoetsen en geluiden teruggezet zoals ze waren. Geluiden die u sindsdien heeft toegevoegd, blijven behouden."
 }
