@@ -2936,9 +2936,13 @@ class MainWindow(QMainWindow):
         c = self.cfg
         if getattr(self, "_cable_gone", False):
             return None
-        if c.main_device and is_virtual_cable(c.main_device):
+        present = eng.virtual_outputs()
+        # the picked one only while it's plugged in: a cable saved in the settings but
+        # not installed (any more) was opened anyway, and "device not found: CABLE
+        # Input" stood where "not in your mic yet" should have been the only news
+        if c.main_device and is_virtual_cable(c.main_device) and c.main_device in present:
             return c.main_device
-        return next(iter(eng.virtual_outputs()), None)
+        return next(iter(present), None)
 
     def _apply_send_outputs(self, force_main: bool = False):
         """(Re)open what others hear and the stream output for the current devices and
