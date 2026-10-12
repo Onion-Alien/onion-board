@@ -786,7 +786,8 @@ def status(mic_name: str | None = None) -> str:
     """Where Onion Board stands on the mic called `mic_name` (any mic it's on if None):
       'missing'   not attached to any mic
       'other'     attached, but to another mic
-      'wiped'     attached, but Windows (a driver or Windows update) took the effect off
+      'wiped'     attached, but Windows (a driver or Windows update) took the effect off,
+                  or its DLL file (or that file's registration) is gone
       'outdated'  attached, but with another version of the effect than this app's
       'ready'     attached and working
     'wiped' and 'outdated' need the one-click repair (attaching again).
@@ -853,9 +854,13 @@ def _state(guid: str | None, on: list[str]) -> str:
         return "missing"
     if guid not in on:
         return "other"
-    if not effect_in_place(guid) or not make_ring():
+    dll = registered_dll()
+    # the DLL deleted (a cleaner, an antivirus) or its registration gone: Windows has
+    # nothing to load, so sounds stop reaching the mic. Not 'outdated' (which counts as
+    # working, so nothing happened): the repair copies it back.
+    if not effect_in_place(guid) or dll is None or not dll.is_file() or not make_ring():
         return "wiped"
-    if not same_dll(registered_dll(), bundled_dll()) \
+    if not same_dll(dll, bundled_dll()) \
             or installed_slot(guid) in (SFX, COMPOSITE_SFX):   # raw streams skip it
         return "outdated"
     return "ready"
