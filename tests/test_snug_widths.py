@@ -92,8 +92,22 @@ def test_settings_device_boxes_are_not_card_wide(window):  # noqa: F811
         assert d.dev_combos
         for cb, _src in d.dev_combos:
             assert cb.width() <= CAP
-        assert len({cb.width() for cb, _src in d.dev_combos}) == 1   # one column, one width
     finally:
         d.close()
         d.deleteLater()
         QApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_settings_device_boxes_line_up(window):  # noqa: F811
+    """Input / Output / Send my sounds to: one column, one width (300, 358 and 358 px
+    before, each fitting its own device name)."""
+    window.resize(1280, 900)
+    window.show()
+    window.open_settings("audio")
+    for __ in range(3):
+        QApplication.processEvents()
+    d = window._settings_dlg
+    try:
+        assert len({cb.width() for cb, _src in d.dev_combos}) == 1
+    finally:
+        window.close_settings()
