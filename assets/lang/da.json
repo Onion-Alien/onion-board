@@ -137,7 +137,6 @@
   "Add-on downloads": "Add-on-downloads",
   "Add-on downloads are off (Privacy)": "Add-on-downloads er slået fra (Privatliv)",
   "Add-ons": "Add-ons",
-  "Add-ons && help": "Add-ons && hjælp",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Tilføjede “{name}” ({duration:.1f}s) til Lyde, højreklik på den dér for at omdøbe eller sætte en genvejstast.",
   "Adding {count} sound…": [
     "Tilføjer {count} lyd…",
@@ -416,7 +415,6 @@
   "Fade in / out": "Fade ind / ud",
   "Fade out": "Fade ud",
   "Fades": "Fades",
-  "Feedback and problems": "Feedback og problemer",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Henter en nyere yt-dlp fra PyPI, når du trykker Opdater nu eller Nulstil downloader (siden Opdateringer), eller af sig selv, hvis du har sat flueben ved Opdater automatisk dér.",
   "Fetching the parts (downloading)": "Henter delene (downloader)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "Find TikTok-lyde (TikToks egen søgning kræver en konto, så den her leder efter dem på YouTube, hvor de bliver lagt op igen)",
@@ -935,7 +933,6 @@
   "Repair needed": "Skal repareres",
   "Replay {time}": "Replay {time}",
   "Report a problem": "Rapportér et problem",
-  "Report a problem on GitHub": "Rapportér et problem på GitHub",
   "Report a security issue": "Rapportér et sikkerhedsproblem",
   "Report copied: paste it into your message (Ctrl+V).": "Rapport kopieret: indsæt den i din besked (Ctrl+V).",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Rapport kopieret, men browseren åbnede ikke. Gå til {issue_url}, og indsæt den dér.",
@@ -1150,7 +1147,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Overlayet i spillet viser dine pads ovenpå spillet, afspillet med taltasterne. Sæt det op under Indstillinger → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Installationsprogrammet kunne ikke startes ({e}). Du kan hente det fra udgivelsessiden i stedet.",
   "The one the game is on": "Den, spillet er på",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Den anden vej til Discord og spil: et gratis virtuelt kabel, som du vælger som mikrofon dér",
   "The saved report and the app's log": "Den gemte rapport og appens log",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Indstillingerne i Zoom, Microsoft Teams og opkald på en hjemmeside, der forhindrer dem i at behandle dine lyde som støj",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Opsætningsguidens Installér-knap henter VB-Cable (det virtuelle kabel) fra vb-audio.com. Ikke nødvendigt, hvis dine lyde går direkte ind i din mikrofon, til en anden enhed eller ingen steder. Fra: installér det selv derfra.",
@@ -1242,7 +1238,6 @@
   "Use it": "Brug den",
   "Use less data": "Brug mindre data",
   "Use the virtual cable after all": "Brug alligevel det virtuelle kabel",
-  "Use the virtual cable instead": "Brug det virtuelle kabel i stedet",
   "Used for": "Brugt til",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… de stemmechatindstillinger, der betyder noget",
   "Version {version}": "Version {version}",
@@ -2106,7 +2101,6 @@
   "That's a members-only video.": "Det er en video kun for medlemmer.",
   "That's a playlist: open one video and try again.": "Det er en afspilningsliste: åbn en video, og prøv igen.",
   "That's far too long to be a voice code.": "Det er alt for lang tid til at være en stemmekode.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord er stedet, hvor du kan chatte, bede om hjælp og høre om nye versioner. Har du fundet en fejl eller mangler noget? Alt åbner i din browser, og intet sendes, medmindre du indsender det der.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord er stedet, hvor du kan chatte, bede om hjælp og høre om nye versioner. Feedbackformularen behøver ingen konto. Har du fundet et sikkerhedsproblem? Rapportér det privat på GitHub, ikke i en offentlig udgave.",
   "The Onion Board Discord server, in your browser": "Onion Board Discord-serveren i din browser",
   "The address starts with http:// or https://": "Adressen starter med http:// eller https://",
@@ -3309,5 +3303,8 @@
   "Plain": "Ensfarvet",
   "Textured": "Med mønster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mønster får hvert tema sit eget mønster på panelerne: skærmlinjer, kulfiber, bølger og mere. Ensfarvet holder dem flade.",
-  "Theme style": "Temastil"
+  "Theme style": "Temastil",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Henter dine lyde fra dine andre soundboards: {done} af {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Henter dine lyde fra {name}: {done} af {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Det er installeret, men dine lyde går ind i din mikrofon nu. Brug det, hvis et spil springer din mikrofon over, eller fjern det, hvis intet andet har brug for det."
 }

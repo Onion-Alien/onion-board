@@ -393,13 +393,13 @@ def test_every_theme_builds_a_clean_stylesheet(qapp, name):
     css = theme.stylesheet(name)
     font = theme.THEMES[name].get("font", theme.FONT)
     assert f"font-family:'{font}'" in css
-    assert ("/tex-" in css) == bool(theme.THEMES[name].get("texture"))
+    assert "/tex-" not in css   # Plain (the default): no theme draws a texture
     assert "$" not in css
-    theme.textures_on = False   # Plain: no theme draws a texture
+    theme.textures_on = True   # Textured: each theme with a pattern draws it
     try:
-        assert "/tex-" not in theme.stylesheet(name)
+        assert ("/tex-" in theme.stylesheet(name)) == bool(theme.THEMES[name].get("texture"))
     finally:
-        theme.textures_on = True
+        theme.textures_on = False
 
 
 def test_setup_tab_uses_the_themes_status_colours(qapp, win):

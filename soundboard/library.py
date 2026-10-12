@@ -373,7 +373,7 @@ class Config:
     # display scaling; read before the app starts (app.ui_scale_startup)
     ui_scale: int = 100
     live_color: str = ""   # own colour for the "it's on" highlights ("" = the theme's)
-    theme_texture: bool = True   # each theme's own pattern on the panels; False = plain
+    theme_texture: bool = False  # True = each theme's own pattern on the panels; plain by default
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"

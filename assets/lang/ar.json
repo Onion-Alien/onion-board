@@ -449,7 +449,6 @@
   "The game you have open uses {engine} for voice chat": "اللعبة المفتوحة لديك تستخدم {engine} للدردشة الصوتية",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "التراكب داخل اللعبة يُظهر أزرارك فوق اللعبة، وتشغّلها بمفاتيح الأرقام. اضبطه من الإعدادات → التراكب.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "تعذّر تشغيل المثبّت ({e}). يمكنك تنزيله من صفحة الإصدار بدلًا من ذلك.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "الطريقة الأخرى للوصول إلى Discord والألعاب: كابل افتراضي مجاني تختاره كميكروفون هناك",
   "The saved report and the app's log": "التقرير المحفوظ وسجل التطبيق",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "الإعدادات في Zoom وMicrosoft Teams ومكالمات صفحات الويب التي تمنعها من اعتبار أصواتك ضجيجًا",
   "The update didn't finish": "لم يكتمل التحديث",
@@ -489,7 +488,6 @@
   "Update available": "تحديث متاح",
   "Update now": "حدّث الآن",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "حُدّث إلى Onion Board {version}. لا شيء يتغير حتى تريد ذلك: كل شيء يعمل كما كان.",
-  "Use the virtual cable instead": "استخدم الكابل الافتراضي بدلًا من ذلك",
   "Video": "فيديو",
   "Videos can't be shown in this copy of Onion Board": "لا يمكن عرض الفيديوهات في هذه النسخة من Onion Board",
   "Voice": "صوتك",
@@ -757,7 +755,6 @@
   "Add-on downloads": "التنزيلات الإضافية",
   "Add-on downloads are off (Privacy)": "تم إيقاف تنزيلات الوظائف الإضافية (الخصوصية)",
   "Add-ons": "الإضافات",
-  "Add-ons && help": "الإضافات والمساعدة",
   "Advanced: {label}": "متقدم: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "بعد أن يبدأ، يتم تجاهل المطابع لفترة طويلة، لذلك لا يمكن لأحد إرسال بريد عشوائي إليها",
   "All hotkeys off / on": "جميع مفاتيح التشغيل السريع إيقاف / تشغيل",
@@ -924,7 +921,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "يقوم التصدير بوضع كل صوت (مع صورته وتأثيراته ومفتاح التشغيل السريع والفئات) وإعداداتك في ملف .zip واحد: احتفظ به آمنًا، أو قم باستيراده على جهاز كمبيوتر آخر. يؤدي استيراد حزمة الصوت الخاصة بصديق إلى إضافة أصواتها؛ يتم تخطي تلك التي لديك بالفعل.",
   "Export sounds": "تصدير الأصوات",
   "Fades": "تلاشٍ",
-  "Feedback and problems": "ردود الفعل والمشاكل",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "يجلب yt-dlp أحدث من PyPI عندما تضغط على التحديث الآن أو إعادة تعيين أداة التنزيل (صفحة التحديثات)، أو بمفرده إذا قمت بتحديد التحديث تلقائيًا هناك.",
   "Fetching the parts (downloading)": "جلب الأجزاء (التنزيل)",
   "Finish  ✓": "إنهاء ✓",
@@ -960,7 +956,6 @@
     "تم العثور على أصوات <b>{n}</b> في {name} .",
     "تم العثور على أصوات <b>{n}</b> في {name} ."
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "على Discord يمكنك الدردشة وطلب المساعدة ومعرفة الإصدارات الجديدة. وجدت خطأ أو ينقصك شيء؟ كل شيء يفتح في متصفحك، ولا يُرسل أي شيء إلا إذا أرسلته أنت هناك.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "إضافات مجانية من جيثب. تؤدي إزالة أحدها أو إعادة تثبيته إلى الحفاظ على المشغلات والهواتف المقترنة.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "مجاني، بدون إعلانات ولا حساب. مصنوع بواسطة OnionAlien. ترخيص معهد ماساتشوستس للتكنولوجيا مع بند العموم: استخدمه في أي شيء، وشاركه مجانًا، ولا تبيعه أبدًا.",
   "Frequencies": "الترددات",
@@ -1248,7 +1243,6 @@
   "Removed “{name}”: Who's listening is Off now": "تمت إزالة \"{name}\": من يستمع متوقف الآن",
   "Replay {time}": "إعادة التشغيل {time}",
   "Report a problem": "الإبلاغ عن مشكلة",
-  "Report a problem on GitHub": "الإبلاغ عن مشكلة على جيثب",
   "Report a security issue": "الإبلاغ عن مشكلة أمنية",
   "Reset and restart": "إعادة تعيين وإعادة التشغيل",
   "Reset downloader": "إعادة تعيين أداة التنزيل",
@@ -3605,5 +3599,8 @@
   "Plain": "سادة",
   "Textured": "بنقشة",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "مع النقشة يحصل كل مظهر على نقشته الخاصة على اللوحات: خطوط شاشة قديمة، ألياف كربون، أمواج والمزيد. السادة يتركها مسطحة.",
-  "Theme style": "نمط المظهر"
+  "Theme style": "نمط المظهر",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "جارٍ نقل أصواتك من لوحات الأصوات الأخرى: {done} من {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "جارٍ نقل أصواتك من {name}: {done} من {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "إنه مثبّت، لكن أصواتك تذهب إلى الميكروفون الآن. استخدمه إذا تجاهلت لعبةٌ الميكروفون، أو أزِله إذا لم يعد شيء آخر يحتاجه."
 }

@@ -419,7 +419,6 @@
   "The game you have open uses {engine} for voice chat": "開いているゲームはボイスチャットに {engine} を使っています",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "ゲーム内オーバーレイは、ゲームの上にパッドを表示し、数字キーで再生できます。設定 → オーバーレイ で設定してください。",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "インストーラーを起動できませんでした（{e}）。代わりにリリースページからダウンロードできます。",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Discord やゲームに届けるもう1つの方法: そこでマイクとして選ぶ無料の仮想ケーブル",
   "The saved report and the app's log": "保存されたレポートとアプリのログ",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoom、Microsoft Teams、ブラウザでの通話がサウンドをノイズ扱いしないための設定",
   "The update didn't finish": "アップデートが完了しませんでした",
@@ -459,7 +458,6 @@
   "Update available": "アップデートがあります",
   "Update now": "今すぐ更新",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version} に更新しました。使いたくなるまで何も変わりません: すべて今までどおり動きます。",
-  "Use the virtual cable instead": "代わりに仮想ケーブルを使う",
   "Video": "動画",
   "Videos can't be shown in this copy of Onion Board": "この Onion Board では動画を表示できません",
   "Voice": "ボイス",
@@ -672,7 +670,6 @@
   "Add-on downloads": "アドオンのダウンロード",
   "Add-on downloads are off (Privacy)": "アドオンのダウンロードはオフです（プライバシー）",
   "Add-ons": "アドオン",
-  "Add-ons && help": "アドオンとヘルプ",
   "Advanced: {label}": "詳細: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "開始後、この時間は押しても無視されるので、連打できません",
   "All hotkeys off / on": "すべてのホットキー オフ / オン",
@@ -839,7 +836,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "エクスポートすると、すべてのサウンド（画像、エフェクト、ホットキー、カテゴリ付き）と設定を1つの .zip にまとめます: 大切に保管するか、別の PC でインポートしてください。友達のサウンドパックをインポートするとサウンドが追加されます。すでにあるものはスキップされます。",
   "Export sounds": "サウンドをエクスポート",
   "Fades": "フェード",
-  "Feedback and problems": "フィードバックと問題",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "「今すぐ更新」か「ダウンローダーをリセット」（アップデートページ）を押したとき、またはそこで「自動で更新」にチェックしていれば自動で、PyPI から新しい yt-dlp を取得します。",
   "Fetching the parts (downloading)": "部品を取得中（ダウンロード中）",
   "Finish  ✓": "完了  ✓",
@@ -860,7 +856,6 @@
   "Found <b>{n}</b> sound in {name}.": [
     "{name}で<b>{n}</b>個の音が見つかりました。"
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord では雑談したり、助けを求めたり、新しいバージョンの情報を受け取れます。バグを見つけた、または何か足りない？すべてブラウザーで開き、そこで送信しない限り何も送られません。",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub からの無料のアドオン。削除または再インストールしても、トリガーとペアリングされた電話は保持されます。",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "無料、広告なし、アカウントなし。オニオンエイリアン製。コモンズ条項付きの MIT ライセンス: 何にでも使用し、無料で共有し、決して販売しないでください。",
   "Frequencies": "周波数",
@@ -1133,7 +1128,6 @@
   "Removed “{name}”: Who's listening is Off now": "「{name}」を削除しました：誰が聞いているかは現在オフです",
   "Replay {time}": "リプレイ{time}",
   "Report a problem": "問題を報告する",
-  "Report a problem on GitHub": "GitHub で問題を報告する",
   "Report a security issue": "セキュリティ問題を報告する",
   "Reset and restart": "リセットして再起動する",
   "Reset downloader": "ダウンローダーをリセットする",
@@ -3235,5 +3229,8 @@
   "Plain": "無地",
   "Textured": "テクスチャあり",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "テクスチャありでは、テーマごとにパネルに模様が付きます：ブラウン管の走査線、カーボン、波など。無地はフラットのままです。",
-  "Theme style": "テーマのスタイル"
+  "Theme style": "テーマのスタイル",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "ほかのサウンドボードからサウンドを移行中: {total} 件中 {done} 件…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name} からサウンドを移行中: {total} 件中 {done} 件…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "インストール済みですが、今はサウンドがマイクに流れています。ゲームがマイクを通さないときに使うか、ほかに使うものがなければ削除してください。"
 }

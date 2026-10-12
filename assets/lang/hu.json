@@ -137,7 +137,6 @@
   "Add-on downloads": "Bővítmény-letöltések",
   "Add-on downloads are off (Privacy)": "A bővítmény-letöltések ki vannak kapcsolva (Adatvédelem)",
   "Add-ons": "Bővítmények",
-  "Add-ons && help": "Bővítmények && súgó",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Hozzáadva a Hangokhoz: „{name}” ({duration:.1f} mp), ott jobb klikkel átnevezheted vagy gyorsbillentyűt adhatsz neki.",
   "Adding {count} sound…": [
     "{count} hang hozzáadása…",
@@ -416,7 +415,6 @@
   "Fade in / out": "Fel- / leúsztatás",
   "Fade out": "Leúsztatás",
   "Fades": "Úsztatások",
-  "Feedback and problems": "Visszajelzés és problémák",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Újabb yt-dlp-t tölt le a PyPI-ról, amikor megnyomod a Frissítés most vagy a Letöltő alaphelyzetbe gombot (Frissítések oldal), vagy magától, ha ott bepipáltad az Automatikus frissítést.",
   "Fetching the parts (downloading)": "Részek beszerzése (letöltés)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "TikTok-hangok keresése (a TikTok saját kereséséhez fiók kell, így ez a YouTube-on keresi őket, ahová újra feltöltik)",
@@ -935,7 +933,6 @@
   "Repair needed": "Javítás kell",
   "Replay {time}": "Visszajátszás {time}",
   "Report a problem": "Probléma jelentése",
-  "Report a problem on GitHub": "Probléma jelentése a GitHubon",
   "Report a security issue": "Biztonsági hiba jelentése",
   "Report copied: paste it into your message (Ctrl+V).": "Jelentés kimásolva: illeszd be az üzenetedbe (Ctrl+V).",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Jelentés kimásolva, de a böngésző nem nyílt meg. Menj ide: {issue_url}, és illeszd be ott.",
@@ -1150,7 +1147,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "A játékon belüli overlay a játék fölött mutatja a gombjaidat, a számgombokkal játszod le őket. Állítsd be itt: Beállítások → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "A telepítőt nem sikerült elindítani ({e}). Letöltheted inkább a kiadási oldalról.",
   "The one the game is on": "Amelyiken a játék van",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "A másik út a Discordhoz és a játékokhoz: egy ingyenes virtuális kábel, amit ott mikrofonnak választasz",
   "The saved report and the app's log": "A mentett jelentés és az app naplója",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "A Zoom, a Microsoft Teams és a böngészős hívások beállításai, amikkel nem veszik zajnak a hangjaidat",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "A beüzemelési útmutató Telepítés gombja letölti a VB-Cable-t (a virtuális kábelt) a vb-audio.com oldalról. Nem kell, ha a hangjaid egyenesen a mikrofonodba, másik eszközre vagy sehová mennek. Ki: telepítsd magad onnan.",
@@ -1242,7 +1238,6 @@
   "Use it": "Használd",
   "Use less data": "Kevesebb adat",
   "Use the virtual cable after all": "Mégis a virtuális kábel",
-  "Use the virtual cable instead": "Inkább a virtuális kábel",
   "Used for": "Mire",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… a fontos beszédchat-beállítások",
   "Version {version}": "{version} verzió",
@@ -2106,7 +2101,6 @@
   "That's a members-only video.": "Ez egy csak tagok számára készült videó.",
   "That's a playlist: open one video and try again.": "Ez egy lejátszási lista: nyisson meg egy videót, és próbálja újra.",
   "That's far too long to be a voice code.": "Ez túl hosszú ahhoz, hogy hangkód legyen.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "A Discord az a hely, ahol cseveghet, segítséget kérhet és hallhat az új verziókról. Hibát talált vagy hiányzik valami? Minden megnyílik a böngészőjében, és semmi sem kerül elküldésre, hacsak nem küldi be oda.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "A Discord az a hely, ahol cseveghet, segítséget kérhet és hallhat az új verziókról. A visszajelzési űrlap nem igényel fiókot. Biztonsági problémát talált? Jelentse privátban a GitHubon, ne nyilvánosan.",
   "The Onion Board Discord server, in your browser": "Az Onion Board Discord szerver a böngészőjében",
   "The address starts with http:// or https://": "A cím http:// vagy https:// előtaggal kezdődik",
@@ -3309,5 +3303,8 @@
   "Plain": "Sima",
   "Textured": "Mintás",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Mintásan minden téma saját mintát kap a paneleken: régi képernyő csíkjai, karbon, hullámok és még több. A sima egyszínűen hagyja őket.",
-  "Theme style": "Téma stílusa"
+  "Theme style": "Téma stílusa",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Hangjaid áthozása a többi soundboardodból: {done}/{total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Hangjaid áthozása innen: {name}: {done}/{total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Telepítve van, de a hangjaid most már a mikrofonodba mennek. Használd, ha egy játék kihagyja a mikrofonodat, vagy távolítsd el, ha semmi más nem használja."
 }

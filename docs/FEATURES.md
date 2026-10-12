@@ -259,8 +259,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   one click*), tips, startup, backups and *Start over* (*Reset* just the parts you
   pick, with a restore point first; *Restore points* undoes it); **Tabs** switches
   off the Radio, Apps, Triggers or Voice tab so it doesn't load at all;
-  **Add-ons & help** holds Onion Watch, feedback and support; **About** holds the
-  version and links. The other categories are Appearance, Audio (devices, *Also
+  **Add-ons** holds Onion Watch and Onion Pocket; **About** holds the version,
+  links, the Discord, feedback, bug reports and support. The other categories are Appearance, Audio (devices, *Also
   send to*, the stream output and buffering: Low or Safer, with a count of drop-outs),
   Hotkeys, Overlay and Remote. Changes apply immediately.
 - **MIDI pads and macro keypads:** a pad controller (Akai LPD8 / MPD, Launchpad,

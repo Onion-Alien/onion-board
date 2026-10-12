@@ -114,7 +114,6 @@
   "Add-on downloads": "Изтегляне на добавки",
   "Add-on downloads are off (Privacy)": "Изтеглянето на добавки е изключено (Поверителност)",
   "Add-ons": "Добавки",
-  "Add-ons && help": "Добавки && помощ",
   "Adding {count} sound…": [
     "Добавям {count} звук…",
     "Добавям {count} звука…"
@@ -383,7 +382,6 @@
   "Fade in / out": "Плавно начало / край",
   "Fade out": "Плавен край",
   "Fades": "Плавни преходи",
-  "Feedback and problems": "Обратна връзка и проблеми",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Сваля по-нов yt-dlp от PyPI, когато натиснеш Обнови сега или Нулирай програмата за изтегляне (страница Обновления), или сам, ако си отметнал Обновявай автоматично там.",
   "Fetching the parts (downloading)": "Сваляне на частите (изтегляне)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "Търси TikTok звуци (търсенето на TikTok иска акаунт, затова това ги търси в YouTube, където се качват отново)",
@@ -872,7 +870,6 @@
   "Repair needed": "Трябва поправка",
   "Replay {time}": "Повтор {time}",
   "Report a problem": "Докладвай проблем",
-  "Report a problem on GitHub": "Докладвай проблем в GitHub",
   "Report a security issue": "Докладвай проблем със сигурността",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Докладът е копиран, но браузърът не се отвори. Отиди на {issue_url} и го постави там.",
   "Report copied. Paste it into the issue that just opened in your browser (Ctrl+V).": "Докладът е копиран. Постави го в issue-то, което току-що се отвори в браузъра ти (Ctrl+V).",
@@ -1076,7 +1073,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Овърлеят в играта показва бутоните ти върху играта и ги пускаш с цифровите клавиши. Настрой го в Настройки → Овърлей.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Инсталаторът не можа да се пусне ({e}). Можеш да го изтеглиш от страницата на версията вместо това.",
   "The one the game is on": "Този, на който е играта",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Другият начин да стигнеш до Discord и игрите: безплатен виртуален кабел, който избираш там за микрофон",
   "The saved report and the app's log": "Запазеният доклад и дневникът на приложението",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Настройките в Zoom, Microsoft Teams и разговори в уеб страница, които ги спират да смятат звуците ти за шум",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Бутонът Инсталирай в ръководството за настройка изтегля VB-Cable (виртуалния кабел) от vb-audio.com. Не трябва, ако звуците ти отиват направо в микрофона ти, към друго устройство или никъде. Изключено: инсталирай го сам оттам.",
@@ -1167,7 +1163,6 @@
   "Use it": "Ползвай го",
   "Use less data": "Ползвай по-малко данни",
   "Use the virtual cable after all": "Ползвай виртуалния кабел все пак",
-  "Use the virtual cable instead": "Ползвай виртуалния кабел вместо това",
   "Used for": "Ползва се за",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… настройките на гласовия чат, които имат значение",
   "Version {version}": "Версия {version}",
@@ -2017,7 +2012,6 @@
   "That's a folder, not a file.": "Това е папка, а не файл.",
   "That's a members-only video.": "Това е видео само за членове.",
   "That's far too long to be a voice code.": "Това е твърде дълго, за да бъде гласов код.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord е мястото, където да чатите, да поискате помощ и да чуете за нови версии. Открихте грешка или нещо липсва? Всичко се отваря в браузъра ви и нищо не се изпраща, освен ако не го изпратите там.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord е мястото, където да чатите, да поискате помощ и да чуете за нови версии. Формата за обратна връзка не се нуждае от акаунт. Открихте проблем със сигурността? Докладвайте го частно в GitHub, а не в публично издание.",
   "The Onion Board Discord server, in your browser": "Сървърът Onion Board Discord във вашия браузър",
   "The address starts with http:// or https://": "Адресът започва с http:// или https://",
@@ -3309,5 +3303,8 @@
   "Plain": "Обикновен",
   "Textured": "С текстура",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "С текстура всяка тема получава свой шарка по панелите: линии като на стар екран, карбон, вълни и още. Обикновеният ги оставя гладки.",
-  "Theme style": "Стил на темата"
+  "Theme style": "Стил на темата",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Пренасяне на звуците ти от другите ти саундбордове: {done} от {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Пренасяне на звуците ти от {name}: {done} от {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Инсталиран е, но звуците ти вече отиват в микрофона. Използвай го, ако игра пропуска микрофона ти, или го премахни, ако нищо друго не го ползва."
 }
