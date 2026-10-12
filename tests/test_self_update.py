@@ -240,16 +240,22 @@ def test_hiding_the_banner_lasts_until_the_next_start(window, boxes):
     assert not window.btn_update.isHidden()          # the pill stays
 
 
-def test_an_urgent_onion_watch_fix_gets_the_banner_too(window, monkeypatch):
+def test_an_urgent_onion_watch_fix_gets_the_banner_on_its_tab_only(window, monkeypatch):
     from soundboard import watchaddon
     calls = []
     monkeypatch.setattr(window.triggers, "offer_update", lambda o: calls.append(o))
+    window.tabs.setCurrentIndex(0)                   # the Sounds tab
     window._on_watch_update(watchaddon.Offer("9.9.9", notes="Fixes."))
     assert window.urgent_bar.isHidden() and len(calls) == 1   # a normal one: the tab only
     window._on_watch_update(watchaddon.Offer("9.9.9", urgent="triggers stop firing"))
-    assert not window.urgent_bar.isHidden() and len(calls) == 2
+    assert window.urgent_bar.isHidden() and len(calls) == 2   # not on the Sounds tab
+    window.tabs.setCurrentWidget(window.triggers)
+    assert not window.urgent_bar.isHidden()
     assert "Onion Watch 9.9.9" in window.urgent_lbl.text()
     assert window.urgent_btn.text() == "Update Onion Watch"
-    window.urgent_btn.click()                        # off to its tab, banner gone
+    window.tabs.setCurrentIndex(0)                   # and gone again off it
+    assert window.urgent_bar.isHidden()
+    window.tabs.setCurrentWidget(window.triggers)
+    window.urgent_btn.click()                        # updates there, banner gone
     assert window.tabs.currentWidget() is window.triggers
     assert window.urgent_bar.isHidden()

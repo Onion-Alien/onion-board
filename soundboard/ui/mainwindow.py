@@ -1216,6 +1216,9 @@ class MainWindow(QMainWindow):
         self._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
         self.tabs.currentChanged.connect(self._focus_sounds_page)
+        # an urgent Onion Watch fix's banner shows on the Triggers tab only
+        self.tabs.currentChanged.connect(
+            lambda _i: self.watch_offer is not None and self._show_urgent())
         # a badge on a tab's icon (or, by default, a wash) in the theme's live colour while
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
@@ -8754,7 +8757,7 @@ class MainWindow(QMainWindow):
 
     def _on_watch_update(self, offer):
         """A newer Onion Watch (check_updates): its Triggers tab offers it, and an
-        urgent one gets the banner too."""
+        urgent one gets the banner too, on that tab only (_urgent_now)."""
         self.triggers.offer_update(offer)
         if offer.urgent:
             self.watch_offer = offer
@@ -8776,8 +8779,9 @@ class MainWindow(QMainWindow):
             return (f"board {rel.version}",
                     _("Important fix in Onion Board {version}: {fix}",
                       version=rel.version, fix=rel.urgent), button)
-        o = self.watch_offer
-        if o is not None and f"watch {o.version}" not in self._urgent_hidden:
+        o = self.watch_offer   # only on its Triggers tab: there it's the one in use
+        if (o is not None and f"watch {o.version}" not in self._urgent_hidden
+                and self.tabs.currentWidget() is self.triggers):
             return (f"watch {o.version}",
                     _("Important fix in Onion Watch {version}: {fix}",
                       version=o.version, fix=o.urgent),
