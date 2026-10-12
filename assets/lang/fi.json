@@ -3306,5 +3306,6 @@
   "Theme style": "Teeman tyyli",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Tuodaan äänesi muista soundboardeistasi: {done}/{total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Tuodaan äänesi sovelluksesta {name}: {done}/{total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Se on asennettu, mutta äänesi menevät nyt mikrofoniisi. Käytä sitä, jos peli ohittaa mikrofonisi, tai poista se, jos mikään muu ei tarvitse sitä."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Se on asennettu, mutta äänesi menevät nyt mikrofoniisi. Käytä sitä, jos peli ohittaa mikrofonisi, tai poista se, jos mikään muu ei tarvitse sitä.",
+  "⚠ Another sound already has this name.": "⚠ Toisella äänellä on jo tämä nimi."
 }

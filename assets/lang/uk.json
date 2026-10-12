@@ -3380,5 +3380,6 @@
   "Theme style": "Стиль теми",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Переношу твої звуки з інших саундбордів: {done} з {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Переношу твої звуки з {name}: {done} з {total}…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Його встановлено, але тепер твої звуки йдуть у мікрофон. Використовуй його, якщо гра пропускає твій мікрофон, або видали, якщо він більше нічому не потрібен."
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Його встановлено, але тепер твої звуки йдуть у мікрофон. Використовуй його, якщо гра пропускає твій мікрофон, або видали, якщо він більше нічому не потрібен.",
+  "⚠ Another sound already has this name.": "⚠ Інший звук уже має цю назву."
 }

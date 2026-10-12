@@ -104,3 +104,17 @@ def test_delete_info_from_edit_hides_the_line_and_saves(window, monkeypatch):  #
     assert window.meta("s0").source == {} and saved and not d.source_row.isVisible()
     d.close()
     d.deleteLater()
+
+
+def test_renaming_to_another_sounds_name_warns(window):  # noqa: F811
+    d = window._new_editor(window.meta("s0"), "sound")
+    other = window.meta("s1").name
+    assert not d.name_hint.isVisibleTo(d)          # its own name: no warning
+    d.name.setText(f"  {other.upper()} ")          # any case, spaces round it
+    assert d.name_hint.isVisibleTo(d)
+    d.name.setText(other + " 2")
+    assert not d.name_hint.isVisibleTo(d)
+    d.name.setText(other)
+    d.load(window.meta("s1"))                      # reused for that sound: its own name
+    assert not d.name_hint.isVisibleTo(d)
+    d.deleteLater()

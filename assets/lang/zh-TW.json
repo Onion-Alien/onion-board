@@ -3232,5 +3232,6 @@
   "Theme style": "主題樣式",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "正在從你的其他音效板搬入音效：第 {done}/{total} 個…",
   "Bringing your sounds over from {name}: {done} of {total}…": "正在從 {name} 搬入你的音效：第 {done}/{total} 個…",
-  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安裝，但你的聲音現在會進入麥克風。如果某個遊戲略過了你的麥克風就用它，如果沒有其他東西需要它就移除它。"
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安裝，但你的聲音現在會進入麥克風。如果某個遊戲略過了你的麥克風就用它，如果沒有其他東西需要它就移除它。",
+  "⚠ Another sound already has this name.": "⚠ 已有其他音效使用這個名稱。"
 }
