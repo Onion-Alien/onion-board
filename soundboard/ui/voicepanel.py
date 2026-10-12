@@ -1822,6 +1822,7 @@ class SpeechPanel(QWidget):
         self._fill_langs()
         self.cb_lang.currentIndexChanged.connect(self._lang_picked)
         self.sw_lang.toggled.connect(self._lang_switched)
+        self.sw_lang.clicked.connect(lambda on: on and usage.used("translate-on"))
         self._refresh_module()
 
         app = QGuiApplication.instance()
@@ -3010,6 +3011,8 @@ class VoicePanel(QWidget):
             self.fx.picked.setVisible(key == "fx")
         self._tabs[key].setChecked(True)
         self._update_heads()
+        if asked and key in usage.VOICE_TABS:
+            usage.used(f"voice-tab-{key}")
         if asked and self.speech.s.get("tab") != key:
             self.speech.s["tab"] = key   # kept with the speech settings
             self.speech_changed.emit(dict(self.speech.s))

@@ -801,6 +801,8 @@ class MainWindow(QMainWindow):
         self.btn_air.setCheckable(True)
         self.btn_air.setChecked(True)
         self.btn_air.toggled.connect(self.set_sending)
+        self.btn_air.clicked.connect(
+            lambda on: usage.used("on-air-on" if on else "on-air-off"))
         icons.set_icon(self.btn_air, "live", "danger_text", "on_live", size=sidebar.ICON, gap=False)
         self.set_sending(True)
         # Keep the mode controller for shared commands; its full picker lives on Setup.
@@ -989,6 +991,7 @@ class MainWindow(QMainWindow):
         self._ff_percent = -1      # ...how far its download is (-1: not known)
         self._ff_stop_flag: threading.Event | None = None   # Stop sets it
         self._ff_auto_tried = False   # got by itself once this start (not again)
+        self._ff_auto_now = False     # the get running now is that one (for the count)
         self._ff_done = False         # the last fix worked (Settings says so)
         rv.addWidget(self.ff_bar)
 
@@ -1107,6 +1110,7 @@ class MainWindow(QMainWindow):
         # (_net_follow), each one click to its Settings page
         if self.rail.output is not None:
             self.rail.output.lineClicked.connect(self.open_settings)
+            self.rail.output.lineClicked.connect(lambda _p: usage.used("on-air-line"))
         self.remote_changed.connect(self._net_follow, Qt.ConnectionType.QueuedConnection)
         remote.on_change(self._remote_watch)
         self._net_follow()
@@ -1277,6 +1281,8 @@ class MainWindow(QMainWindow):
         self.mini_air.setChecked(self.btn_air.isChecked())
         self.mini_air.setToolTip(self.btn_air.toolTip())
         self.mini_air.toggled.connect(self.set_sending)
+        self.mini_air.clicked.connect(
+            lambda on: usage.used("on-air-on" if on else "on-air-off"))
         icons.set_icon(self.mini_air, "live", "danger_text", "on_live")
         # "All" in words: an icon-only ■ here looked just like the one-sound ■ on
         # the left, and stopped everything
@@ -2196,6 +2202,7 @@ class MainWindow(QMainWindow):
         cv.addWidget(self.btn_rescan, 0, Qt.AlignmentFlag.AlignLeft)
         helpcard = FoldCard("speech", _("Connect your chat"))
         helpcard.set_summary(_("Discord, games, Zoom and Teams"))
+        helpcard.head.clicked.connect(lambda on: on and usage.used("setup-opened-chat"))
         hv = helpcard.body
         hv.addWidget(hint_label(_("Choose your app for the recommended microphone settings.")))
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
@@ -2223,6 +2230,7 @@ class MainWindow(QMainWindow):
 
         # ---- devices
         devcard = self.dev_fold = FoldCard("headphones", _("Devices"))
+        devcard.head.clicked.connect(lambda on: on and usage.used("setup-opened-devices"))
         av = devcard.body
         av.addWidget(hint_label(_("Already set up for you, only change these if "
                                   "something's wrong.")))
@@ -2297,6 +2305,7 @@ class MainWindow(QMainWindow):
 
         # ---- sound shaping
         eqcard = self.sound_fold = FoldCard("sliders", _("Equalizer and volume"))
+        eqcard.head.clicked.connect(lambda on: on and usage.used("setup-opened-sound"))
         ev = eqcard.body
         self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains, fold=True)
         self.eq.changed.connect(self.on_eq)
@@ -3369,6 +3378,8 @@ class MainWindow(QMainWindow):
         said = self._done_toast
         if said and not mic_busy:
             self._done_toast = None
+            if route != "mic" or state != "ok":
+                usage.used("mic-effect-no-load")   # set up, not working when the wait ran out
             if route == "mic" and state == "ok":   # (the wait ran out: no "Done")
                 self.toast(_("Mic updated: games, calls and browsers hear your sounds.")
                            if said == "updated" else
@@ -3609,6 +3620,7 @@ class MainWindow(QMainWindow):
         if not directmic.needs_repair(directmic.status(self.cfg.mic_device)):
             return
         log.info("the mic effect was taken off the mic (%s): fixing it by itself", direct)
+        usage.used("mic-effect-taken-off")
         self._autofix_tried = True
         self.attach_mic(auto=True)
 
@@ -3705,6 +3717,9 @@ class MainWindow(QMainWindow):
             # an older mic part can still be working (the optional update failed): the
             # status then reads fine, but this attempt didn't work, so Bun mustn't cheer
             self.setup_show.finish(False)
+            usage.used("mic-effect-fix-failed" if auto else
+                       "mic-effect-said-no" if err == directmic.declined() else
+                       "mic-effect-failed")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
@@ -3722,6 +3737,8 @@ class MainWindow(QMainWindow):
                 self.tell(_("Couldn't put Onion Board on your mic"), err, "error")
         else:
             log.info("on the mic now: %s", mic)
+            usage.used("mic-effect-updated" if updating else
+                       "mic-effect-fixed" if auto else "mic-effect-on")
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             self._settle_until = time.monotonic() + self.SETTLE_S
@@ -4985,8 +5002,9 @@ class MainWindow(QMainWindow):
         worked; the bar and Settings show the new state."""
         if self._ff_getting:
             return
-        usage.used("get-ffmpeg")
+        usage.used("get-ffmpeg-auto" if auto else "get-ffmpeg")
         self._ff_getting, self._ff_percent, self._ff_error = True, -1, ""
+        self._ff_auto_now = auto
         self._ff_auto_tried = self._ff_auto_tried or auto
         stop = self._ff_stop_flag = threading.Event()
         if btn is not None:
@@ -5036,7 +5054,8 @@ class MainWindow(QMainWindow):
             self._ff_getting, self._ff_stop_flag = False, None
             stopped = isinstance(err, ffmpegget.Stopped)
             if err and not stopped:
-                usage.used("get-ffmpeg-failed")
+                usage.used("get-ffmpeg-auto-failed" if self._ff_auto_now
+                           else "get-ffmpeg-failed")
             for btn, release in self._ff_waiting:
                 if qt_valid(btn):
                     release(None if stopped else _("✗ Failed") if err else _("✓ Got FFmpeg"))
@@ -6777,6 +6796,7 @@ class MainWindow(QMainWindow):
         """The card's Stop: the file being read finishes, the rest are skipped; the
         sounds already in stay (the finished card's Undo takes them off too)."""
         if self._pending_imports > 0:
+            usage.used("import-stopped")
             self._import_stop.set()
             self._import_card_shut = True
 
@@ -6829,6 +6849,7 @@ class MainWindow(QMainWindow):
             return
         text, kind = importreport.summary(n, skipped)
         if skipped:
+            usage.used("import-skipped")
             action = (_("See why"), lambda: self._show_skipped(skipped))
         else:
             action = (_("Undo"), lambda: self.remove_sounds(ids))
@@ -8748,6 +8769,7 @@ class MainWindow(QMainWindow):
 
     def _copy_update_error(self):
         """Copy error: what went wrong, where, for the user to send to the developer."""
+        usage.used("update-copy-error")
         QApplication.clipboard().setText(self._update_detail or self._update_err)
         self.toast(_("Error details copied: paste them into a message to the developer."),
                    "ok")
@@ -8830,6 +8852,7 @@ class MainWindow(QMainWindow):
             return
         if path is None and self._update_cancel:   # Cancel: back to "Update to …"
             self._update_cancel = False
+            usage.used("update-cancelled")
             self._update_got = (0, 0)
             self._show_update_state()
             return
@@ -8838,6 +8861,7 @@ class MainWindow(QMainWindow):
                                                       getattr(self, "_update_detail_next", ""))
             self._update_fails += 1
             self._update_err = errors.plain(err) or _("the download failed")
+            usage.used("update-download-failed")
             self._show_update_state()
             url = rel.url
             self.tell(_("Couldn't update"),
@@ -8879,6 +8903,7 @@ class MainWindow(QMainWindow):
         clicked = box.clickedButton()
         free_dialog(box)
         if clicked is not now:
+            usage.used("update-later")
             return
         if not path.is_file():   # removed meanwhile: fetch it again
             self._update_file = None
@@ -8897,6 +8922,7 @@ class MainWindow(QMainWindow):
                                                       traceback.format_exc(limit=8), "install")
             self._update_fails += 1
             self._update_err = errors.plain(e)
+            usage.used("update-install-failed")
             self._show_update_state()   # "Couldn't update", click to try again
             self.tell(_("Couldn't update"),
                       _("The installer couldn't be started ({e}). You can download it "
@@ -8979,6 +9005,7 @@ class MainWindow(QMainWindow):
     def _update_failed(self, pending: str):
         from soundboard import __version__
         log.warning("the update to %s didn't finish (still %s)", pending, __version__)
+        usage.used("update-didnt-finish")
         box = QMessageBox(QMessageBox.Icon.Warning, _("The update didn't finish"),
                           _("Onion Board {pending} wasn't installed; this is still {version}. "
                             "You can download it from its page and run it yourself.",

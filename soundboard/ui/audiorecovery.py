@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabe
                                QVBoxLayout)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import directmic, errors, michelper, theme
+from soundboard import directmic, errors, michelper, theme, usage
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import Flow
@@ -159,6 +159,11 @@ class Recovery(QObject):
 
     def _finished(self, action, err, state):
         self.running = False
+        done = "cleanup" if action == "cleanup-none" else action
+        if done in usage.RECOVERY:
+            usage.used(f"recovery-{done}")
+        if err:
+            usage.used("recovery-failed")
         self.mw._attaching = False
         target, self.target = getattr(self, "target", None), None
         pa = target and target.get("pa")

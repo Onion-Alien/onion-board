@@ -32,7 +32,8 @@ fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`open/1-3h`), how many sounds were fetched from a link or a web search since then
 (`downloads/2-5`), how many times it was started since then (`launches/2-5`), the system
-(`os/win11`, `os/win10`), the app's language (`lang/de`), and which features
+(`os/win11`, `os/win10`), the app's language (`lang/de`), its theme (`theme/dark`: a
+built-in theme's name, else `other`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
 triggershost.BoardHost.count, as `used/triggers-mode-colour`). A use is only noted
@@ -115,6 +116,10 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
              ("instagram", ("instagram.com",)), ("x", ("x.com", "twitter.com")),
              ("reddit", ("reddit.com", "redd.it")), ("twitch", ("twitch.tv",)),
              ("myinstants", ("myinstants.com",)))
+# the Voice tab's tabs (ui/voicepanel.py VoicePanel._section keys)
+VOICE_TABS = ("fx", "ai", "speak", "custom", "addons")
+# Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
+RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -164,7 +169,35 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # failed. Never the link, title or search words
             *(f"dl-{k}" for k in DL_SITES),
             "dl-link", "dl-search", "dl-add", "dl-play", "dl-queue", "dl-already-have",
-            *(f"dl-failed-{k}" for k in DL_SITES))
+            *(f"dl-failed-{k}" for k in DL_SITES),
+            # FFmpeg got by the app itself while it loads (not a click), and that failing
+            "get-ffmpeg-auto", "get-ffmpeg-auto-failed",
+            # the mic effect: put on by a click, put back by itself after Windows took it
+            # off, updated; No to Windows' admin prompt; a click's set-up failed; the
+            # fix-by-itself failed; on, but not working when the wait ran out; Windows took
+            # it off (found by the app); and the mic helper set up (features_now)
+            "mic-effect-on", "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
+            "mic-effect-failed", "mic-effect-fix-failed", "mic-effect-no-load",
+            "mic-effect-taken-off", "mic-helper",
+            # Onion Board's own update: the download cancelled or failed, the installer
+            # wouldn't start, Copy error, Later at "Restart now", one that didn't finish
+            "update-cancelled", "update-download-failed", "update-install-failed",
+            "update-copy-error", "update-later", "update-didnt-finish",
+            # On Air switched off / on by a click, a line of the On Air card clicked; a
+            # proxy, Tor or Offline mode set (features_now)
+            "on-air-off", "on-air-on", "on-air-line", "net-proxy", "net-tor", "net-offline",
+            # the playing sound's picture behind the board (features_now)
+            "playing-bg",
+            # the Voice tab's own tabs clicked (VOICE_TABS); Speak in switched on
+            *(f"voice-tab-{k}" for k in VOICE_TABS), "translate-on",
+            # Radio: a station played, a station that wouldn't play, the list down
+            "radio-played", "radio-failed", "radio-list-down",
+            # the Setup tab's folded cards opened by a click
+            *(f"setup-opened-{k}" for k in ("chat", "devices", "sound")),
+            # Settings' Audio recovery: what was run on a mic, and it failing
+            *(f"recovery-{k}" for k in RECOVERY), "recovery-failed",
+            # a file import stopped from its card; an import that skipped some files
+            "import-stopped", "import-skipped")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -436,7 +469,25 @@ def features_now(cfg) -> list[str]:
         out.append("apps-own-categories")
     if not cfg.sidebar_open:
         out.append("rail-shut")
+    if cfg.net_mode in ("proxy", "tor"):
+        out.append(f"net-{cfg.net_mode}")
+    if cfg.net_offline:
+        out.append("net-offline")
+    if cfg.playing_background:
+        out.append("playing-bg")
+    from soundboard import michelper
+    if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
+        out.append("mic-helper")
     return out
+
+
+def theme_tag(name: str) -> str:
+    """A built-in theme's name as a count's word ("Midnight Blue" -> midnight-blue);
+    anything else (a newer version's) is "other"."""
+    from soundboard import theme
+    if name not in theme.THEMES:
+        return "other"
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "other"
 
 
 def about(cfg, now: float) -> list[str]:
@@ -451,6 +502,7 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"downloads/{download_bucket(cfg.stats_downloads or 0)}")
     lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
     out.append(f"lang/{lang}")
+    out.append(f"theme/{theme_tag(cfg.theme)}")
     out.append(f"os/{os_tag()}")
     out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
