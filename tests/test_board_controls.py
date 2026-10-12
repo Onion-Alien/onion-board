@@ -175,6 +175,53 @@ def test_skip_starts_the_next_queued_sound_now(window, monkeypatch, calls):
     assert stopped == ["s0"] and [c[0] for c in calls] == ["s1"] and w._queue == []
 
 
+def test_a_web_search_play_waits_for_your_sound_instead_of_playing_over_it(
+        window, monkeypatch, calls):
+    """Your sound plays, then a search result's Play: it goes in Up next (it used to
+    play on top of the song), and starts once yours ends. A looping background
+    sound doesn't hold it up. Skip starts it at once."""
+    from soundboard.ui import linkbar
+
+    w = window
+    monkeypatch.setattr(linkbar.busy, "toast", lambda *a, **kw: None)
+    stopped = []
+    monkeypatch.setattr(w.engine, "stop", stopped.append)
+    song = np.zeros((480, 2), np.int16)
+    playing(monkeypatch, w, ["s0"])
+    w.linkbar._play(song, 1.0, "Song", "https://example.com/a")
+    assert calls == [] and w.linkbar.up_next() == ["Song"]
+    w.tick()
+    assert calls == []                                 # still waits for s0
+    playing(monkeypatch, w, [])
+    w.tick()
+    assert [c[0] for c in calls] == ["__link__"] and w.linkbar.up_next() == []
+
+    calls.clear()                                      # a loop is only a background
+    w.meta("s1").loop = True
+    playing(monkeypatch, w, ["s1"])
+    w.linkbar._play(song, 1.0, "Two", "https://example.com/b")
+    assert [c[0] for c in calls] == ["__link__"]
+
+    calls.clear()                                      # Skip: the song starts now
+    playing(monkeypatch, w, ["s0"])
+    w.linkbar._play(song, 1.0, "Three", "https://example.com/c")
+    assert calls == []
+    w.btn_skip.click()
+    assert stopped == ["s0"] and [c[0] for c in calls] == ["__link__"]
+
+
+def test_play_next_waits_for_a_web_search_song(window, monkeypatch, calls):
+    w = window
+    playing(monkeypatch, w, ["__link__"])
+    w.queue_sound("s1")
+    assert calls == [] and w._queue == ["s1"]
+    w.tick()
+    assert calls == []
+    playing(monkeypatch, w, [])
+    w.tick()
+    assert [c[0] for c in calls] == ["s1"]
+
+
 def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypatch, calls):
     w = window
     stopped = []

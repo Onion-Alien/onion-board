@@ -1789,6 +1789,7 @@ class MainWindow(QMainWindow):
             lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
         self.linkbar.sound_ready.connect(self.on_downloaded)
         self.linkbar.played.connect(self.on_link_played)
+        self.linkbar.board_busy = self._board_song_playing
         self.linkbar.up_next_changed.connect(lambda *__: self._update_chips(self.engine.playing()))
         # a link in the search box shows as a result card (nothing downloads until Play / Add)
         self._link_wait = QTimer(self, singleShot=True, interval=LINK_WAIT_MS)
@@ -6164,10 +6165,18 @@ class MainWindow(QMainWindow):
         return any(sid in self._meta and not paused
                    for sid, (_p, paused) in self.engine.playing().items())
 
+    def _board_song_playing(self, playing=None) -> bool:
+        """Is one of the board's sounds playing or paused? A web search's Play waits
+        for it (Up next), as a pad's Play next does. A looping one (rain, a hum) is a
+        background: that would never end, so a song doesn't wait for it."""
+        playing = self.engine.playing() if playing is None else playing
+        return any(sid in self._meta and not self._meta[sid].loop for sid in playing)
+
     def queue_sound(self, sid: str) -> bool:
         """Play `sid` once the board's sounds playing now have finished (now, if none are:
         True then)."""
-        if not self._pads_playing() and not self._queue:
+        if (not self._pads_playing() and not self._queue
+                and not self.linkbar.up_next() and LINK_ID not in self.engine.playing()):
             self.play(sid, now=True)
             return True
         self._queue.append(sid)
@@ -6278,7 +6287,9 @@ class MainWindow(QMainWindow):
                     self.engine.stop(sid)
             self._next_in_queue()
         elif self.linkbar.up_next():
-            self.engine.stop(LINK_ID)
+            for sid in self.engine.playing():   # it waits for your sounds too
+                if sid == LINK_ID or (sid in self._meta and not self._meta[sid].loop):
+                    self.engine.stop(sid)
             self.linkbar.play_next()
         elif self.current:
             self._stop_sound(self.current)
@@ -9607,10 +9618,12 @@ class MainWindow(QMainWindow):
                 self._update_flow()
             self.voice.poll()
         playing = e.playing()
-        if self._queue and not any(sid in self._meta for sid in playing):
-            self._next_in_queue()
+        if self._queue and LINK_ID not in playing and not any(sid in self._meta
+                                                              for sid in playing):
+            self._next_in_queue()   # it waits for a web search's song too
             playing = e.playing()
-        if LINK_ID not in playing and self.linkbar.up_next() and self.linkbar.play_next():
+        if (LINK_ID not in playing and self.linkbar.up_next()
+                and not self._board_song_playing(playing) and self.linkbar.play_next()):
             playing = e.playing()   # the web search song ended: the next one waiting
         live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
                    for sid, (_p, paused) in playing.items())                # Play too
