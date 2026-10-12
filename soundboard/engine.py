@@ -63,6 +63,11 @@ RETRY_S = 5.0   # how often to retry a device that failed to open
 BUFFER = {"low": "low", "high": 0.04}
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 CACHE_BUDGET = 192 << 20               # bytes of resampled copies kept for non-48 kHz devices
+# a sound on disk longer than this is never copied at another device's rate: it plays
+# read at that rate (Voice.step). A 2-hour song's copy took 17 s, 1.2 GB of RAM and
+# held the GIL for seconds at a time (the app froze, the audio cut out)
+NO_COPY_S = 20 * 60
+READ_AHEAD_EVERY_S = 1.0               # how often the minutes ahead of a long sound are asked for
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune. With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
 FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__"})
@@ -992,6 +997,8 @@ class Engine:
         self._cache_bytes = 0
         self._cache_lock = threading.Lock()
         self._resampling: set[tuple[str, int]] = set()   # cache keys being made on a thread
+        self._ahead_lock = threading.Lock()
+        self._ahead_on = False   # the read-ahead thread is running (_read_ahead)
         # sid -> (source array, src rate, destination.cut_shares): worked out once per
         # sound (at load, by prepare), not on every press
         self._shares: dict[str, tuple[weakref.ref, int, dict]] = {}
@@ -1862,7 +1869,8 @@ class Engine:
         for o in outs:
             d = self._cached(sid, data, rates_used[o], src_rate)
             if d is None:
-                self._resample_soon(sid, data, rates_used[o], src_rate)
+                if not (mapped.is_mapped(data) and len(data) > NO_COPY_S * src_rate):
+                    self._resample_soon(sid, data, rates_used[o], src_rate)
                 d, step[o] = data, src_rate / rates_used[o]
             per_out[o] = d
         for d in {id(d): d for d in per_out.values()}.values():
@@ -1887,7 +1895,52 @@ class Engine:
             if v.finished:
                 return None
             self.voices = self.voices + (v,)
+        if any(mapped.is_mapped(d) for d in v.data.values()):
+            self._follow()
         return v
+
+    def _follow(self):
+        """Start the read-ahead thread if it isn't running."""
+        with self._ahead_lock:
+            if self._ahead_on:
+                return
+            self._ahead_on = True
+        threading.Thread(target=Engine._read_ahead, args=(weakref.ref(self),),
+                         daemon=True, name="read-ahead").start()
+
+    @staticmethod
+    def _read_ahead(ref: weakref.ref):
+        """While sounds on disk play, keep the next mapped.AHEAD_S of each asked for
+        (play and seek warm only that much, so a long song's later minutes would
+        otherwise be read by the audio thread itself: a cut-out on a slow drive).
+        Holds neither the engine nor any audio between rounds."""
+        asked: dict[tuple[int, int], tuple[int, int]] = {}   # (voice, data) -> frames asked for
+        span = int(mapped.AHEAD_S * SR)
+        while True:
+            eng = ref()
+            if eng is None:
+                return
+            with eng._ahead_lock:
+                live = [v for v in eng.voices if not v.finished and not eng._shut
+                        and any(mapped.is_mapped(d) for d in v.data.values())]
+                if not live:
+                    eng._ahead_on = False
+                    return
+            keys = set()
+            for v in live:
+                for o, d in list(v.data.items()):
+                    key = (id(v), id(d))
+                    if key in keys or not len(d) or not mapped.is_mapped(d):
+                        continue
+                    keys.add(key)
+                    p = int(v.pos.get(o, 0)) % len(d)
+                    lo, hi = asked.get(key, (-1, -1))
+                    if not (lo <= p and hi - p > span // 2):   # behind, past half, or a seek
+                        mapped.prefetch(d, p, wrap=v.loop)
+                        asked[key] = (p, p + span)
+            asked = {k: asked[k] for k in keys}
+            eng = live = v = d = None   # (let go of them while it sleeps)
+            time.sleep(READ_AHEAD_EVERY_S)
 
     def stop(self, sid: str):
         with self.lock:

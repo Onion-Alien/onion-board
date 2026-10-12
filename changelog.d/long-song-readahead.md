@@ -1,0 +1,1 @@
+- Very long sounds (an hour or more) start at once and no longer cut out: the app reads the next couple of minutes ahead while one plays instead of the whole file on every press or skip, and on a 44.1 kHz device it no longer makes a full copy of a song over 20 minutes long.
