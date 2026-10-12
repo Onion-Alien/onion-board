@@ -1336,6 +1336,7 @@ class MainWindow(QMainWindow):
                                    "play for them."))
         self.mini_mic.toggled.connect(self.on_mic_toggle)
         self.mini_mic.clicked.connect(lambda: usage.used("mini-mic-mute"))   # clicks only
+        self.mini_mic.clicked.connect(self._warn_mute_does_nothing)
         connection.addWidget(self.mini_mic)
         cv.addLayout(connection)
         v.addWidget(card)
@@ -1443,6 +1444,7 @@ class MainWindow(QMainWindow):
                                   "sounds only: they hear your sounds but not your mic."))
         self.chk_mic.setChecked(c.mic_enabled)
         self.chk_mic.toggled.connect(self.on_mic_toggle)
+        self.chk_mic.clicked.connect(self._warn_mute_does_nothing)   # clicks only
         row.addWidget(self.chk_mic)
         self.vol_mic = VolumeControl(c.mic_vol, meter=True,
                                      tip=_("How loud your voice is for others. The dot shows "
@@ -3156,6 +3158,35 @@ class MainWindow(QMainWindow):
         self.set_option("mic_enabled", b)
         self._sync_mini_mic()
         self._update_status()
+
+    def _mute_does_nothing(self) -> bool:
+        """Sending into the mic, but the mic effect isn't on it: voice apps take the real
+        mic as it is, so unticking "Others hear it" can't keep your voice from them."""
+        return (self.cfg.route == "mic"
+                and not directmic.works(directmic.status(self.cfg.mic_device)))
+
+    def _warn_mute_does_nothing(self, on: bool):
+        """Unticked by a click while that's so: say it, and offer the one-click set-up.
+        Not on the hotkey: no pop-up mid-game."""
+        if on or not self._mute_does_nothing():
+            return
+        box = QMessageBox(QMessageBox.Icon.Information, _("Your mic still goes out"),
+                          _("Discord and games still hear your voice: they take your mic "
+                            "straight from Windows, so this box can't mute it yet."),
+                          QMessageBox.StandardButton.NoButton, self)
+        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=self.devicePixelRatioF()))
+        box.setInformativeText(_("Put your sounds straight into your mic and it works. Or "
+                                 "mute your mic in Discord for now."))
+        setup = box.addButton(_("Set it up"), QMessageBox.ButtonRole.AcceptRole)
+        setup.setObjectName("primary")
+        ok = box.addButton(_("OK"), QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(setup)
+        box.setEscapeButton(ok)
+        box.exec()
+        chosen = box.clickedButton() is setup
+        free_dialog(box)
+        if chosen:
+            self.attach_mic()
 
     def _update_status(self):
         e = self.engine

@@ -3286,5 +3286,9 @@
   "Before update": "Før oppdatering",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Et lagres hver gang du tilbakestiller noe eller oppdaterer appen (de siste {max_points} beholdes). Gjenoppretting setter tilbake innstillingene, hurtigtastene og lydene dine slik de var. Lyder du har lagt til siden, beholdes.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stopper alle lyder, radioen og alle programmer og slår av stemmene",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Stopper alle lyder, radioen og alle programmer og slår av stemmene."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Stopper alle lyder, radioen og alle programmer og slår av stemmene.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord og spill hører fortsatt stemmen din: de tar mikrofonen rett fra Windows, så denne boksen kan ikke dempe den ennå.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Send lydene dine rett inn i mikrofonen, så virker det. Eller demp mikrofonen i Discord inntil videre.",
+  "Set it up": "Sett det opp",
+  "Your mic still goes out": "Mikrofonen din går fortsatt ut"
 }

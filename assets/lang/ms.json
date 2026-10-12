@@ -3213,5 +3213,9 @@
   "Before update": "Sebelum kemas kini",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali anda menetapkan semula sesuatu atau mengemas kini apl ({max_points} terakhir dikekalkan). Memulihkan mengembalikan tetapan, hotkey dan bunyi anda seperti dahulu. Bunyi yang anda tambah sejak itu dikekalkan.",
   "Stops every sound, the radio and every program, and turns the voices off": "Menghentikan setiap bunyi, radio dan setiap program, dan mematikan suara",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Menghentikan setiap bunyi, radio dan setiap program, dan mematikan suara."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Menghentikan setiap bunyi, radio dan setiap program, dan mematikan suara.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord dan permainan masih mendengar suara anda: ia mengambil mik anda terus dari Windows, jadi kotak ini belum boleh membisukannya.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Masukkan bunyi anda terus ke dalam mik dan ia akan berfungsi. Atau bisukan mik anda dalam Discord buat masa ini.",
+  "Set it up": "Sediakan",
+  "Your mic still goes out": "Mik anda masih keluar"
 }

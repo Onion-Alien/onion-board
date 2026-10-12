@@ -199,3 +199,24 @@ def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeyp
     window.cfg.route, e.main_direct = "cable", False
     window._tick_visuals({}, 0.0)
     assert window.out_meter.level == 0.0
+
+
+def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QMessageBox
+
+    from soundboard.ui import mainwindow as main
+    shown, attached = [], []
+    monkeypatch.setattr(QMessageBox, "exec", lambda box: shown.append(box.text()))
+    monkeypatch.setattr(window, "attach_mic", lambda *a, **k: attached.append(1))
+    works = [False]
+    monkeypatch.setattr(main.directmic, "works", lambda _s: works[0])
+    window.cfg.route = "mic"
+    window._warn_mute_does_nothing(True)             # ticked back on: nothing to say
+    assert shown == []
+    window._warn_mute_does_nothing(False)            # unticked, effect not on the mic
+    assert len(shown) == 1 and attached == []        # closed: nothing set up
+    works[0] = True                                  # on the mic: the box really mutes
+    window._warn_mute_does_nothing(False)
+    window.cfg.route, works[0] = "cable", False      # the cable: it mutes there too
+    window._warn_mute_does_nothing(False)
+    assert len(shown) == 1

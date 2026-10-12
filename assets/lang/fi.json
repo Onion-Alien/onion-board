@@ -3286,5 +3286,9 @@
   "Before update": "Ennen päivitystä",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
   "Stops every sound, the radio and every program, and turns the voices off": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord ja pelit kuulevat yhä äänesi: ne ottavat mikrofonin suoraan Windowsista, joten tämä ruutu ei vielä voi mykistää sitä.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Laita äänesi suoraan mikrofoniin, niin se toimii. Tai mykistä mikrofoni toistaiseksi Discordissa.",
+  "Set it up": "Ota käyttöön",
+  "Your mic still goes out": "Mikrofonisi kuuluu yhä"
 }

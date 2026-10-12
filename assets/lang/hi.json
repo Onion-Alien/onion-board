@@ -3286,5 +3286,9 @@
   "Before update": "अपडेट से पहले",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं या ऐप अपडेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।",
   "Stops every sound, the radio and every program, and turns the voices off": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है",
-  "Stops every sound, the radio and every program, and turns the voices off.": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है।"
+  "Stops every sound, the radio and every program, and turns the voices off.": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है।",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord और गेम अब भी तुम्हारी आवाज़ सुनते हैं: वे तुम्हारा माइक सीधे Windows से लेते हैं, इसलिए यह बॉक्स अभी उसे म्यूट नहीं कर सकता।",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "अपनी आवाज़ें सीधे अपने माइक में डालो, फिर यह काम करेगा। या अभी के लिए Discord में अपना माइक म्यूट कर दो।",
+  "Set it up": "सेट अप करें",
+  "Your mic still goes out": "तुम्हारा माइक अब भी जा रहा है"
 }

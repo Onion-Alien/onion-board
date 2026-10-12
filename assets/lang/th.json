@@ -3213,5 +3213,9 @@
   "Before update": "ก่อนอัปเดต",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งหรืออัปเดตแอป (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้",
   "Stops every sound, the radio and every program, and turns the voices off": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์",
-  "Stops every sound, the radio and every program, and turns the voices off.": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์"
+  "Stops every sound, the radio and every program, and turns the voices off.": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord และเกมยังได้ยินเสียงคุณอยู่: เพราะดึงไมค์ของคุณจาก Windows โดยตรง ช่องนี้จึงยังปิดเสียงไม่ได้",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "ส่งเสียงของคุณเข้าไมค์โดยตรงแล้วจะใช้ได้ หรือปิดไมค์ใน Discord ไปก่อน",
+  "Set it up": "ตั้งค่า",
+  "Your mic still goes out": "ไมค์ของคุณยังส่งออกไปอยู่"
 }

@@ -3213,5 +3213,9 @@
   "Before update": "Trước khi cập nhật",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó hoặc cập nhật ứng dụng ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại.",
   "Stops every sound, the radio and every program, and turns the voices off": "Dừng mọi âm thanh, radio và mọi chương trình, rồi tắt các giọng",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Dừng mọi âm thanh, radio và mọi chương trình, rồi tắt các giọng."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Dừng mọi âm thanh, radio và mọi chương trình, rồi tắt các giọng.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord và game vẫn nghe thấy giọng bạn: chúng lấy mic trực tiếp từ Windows, nên ô này chưa thể tắt tiếng được.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Đưa âm thanh thẳng vào mic là được. Hoặc tạm thời tắt mic trong Discord.",
+  "Set it up": "Thiết lập",
+  "Your mic still goes out": "Mic của bạn vẫn đang phát ra"
 }

@@ -3286,5 +3286,9 @@
   "Before update": "Bago mag-update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "May isang sine-save tuwing may nire-reset ka o ina-update mo ang app (itinatago ang huling {max_points}). Ibinabalik ng pag-restore ang settings, hotkeys at sounds mo gaya ng dati. Hindi gagalawin ang mga sound na idinagdag mo mula noon.",
   "Stops every sound, the radio and every program, and turns the voices off": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Itinitigil ang bawat sound, ang radio at bawat program, at pinapatay ang mga boses.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Naririnig pa rin ng Discord at mga laro ang boses mo: kinukuha nila ang mic mo diretso sa Windows, kaya hindi pa ito kayang i-mute ng box na ito.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Ilagay ang mga sound mo diretso sa mic mo at gagana ito. O i-mute muna ang mic mo sa Discord.",
+  "Set it up": "I-set up",
+  "Your mic still goes out": "Lumalabas pa rin ang mic mo"
 }

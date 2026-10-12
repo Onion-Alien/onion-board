@@ -3359,5 +3359,9 @@
   "Before update": "Înainte de actualizare",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se salvează unul de fiecare dată când resetezi ceva sau actualizezi aplicația (se păstrează ultimele {max_points}). Restaurarea îți pune la loc setările, tastele rapide și sunetele cum erau. Sunetele adăugate între timp sunt păstrate.",
   "Stops every sound, the radio and every program, and turns the voices off": "Oprește toate sunetele, radioul și toate programele și oprește vocile",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Oprește toate sunetele, radioul și toate programele și oprește vocile."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Oprește toate sunetele, radioul și toate programele și oprește vocile.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord și jocurile încă îți aud vocea: îți iau microfonul direct din Windows, așa că această casetă nu-l poate opri încă.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Pune-ți sunetele direct în microfon și va merge. Sau oprește-ți microfonul din Discord deocamdată.",
+  "Set it up": "Configurează",
+  "Your mic still goes out": "Microfonul tău încă se aude"
 }

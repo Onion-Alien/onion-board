@@ -3213,5 +3213,9 @@
   "Before update": "更新前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重置东西或更新应用时都会保存一个（保留最近 {max_points} 个）。还原会把你的设置、快捷键和音效恢复原样。之后添加的音效会保留。",
   "Stops every sound, the radio and every program, and turns the voices off": "停止所有音效、电台和所有程序，并关闭变声",
-  "Stops every sound, the radio and every program, and turns the voices off.": "停止所有音效、电台和所有程序，并关闭变声。"
+  "Stops every sound, the radio and every program, and turns the voices off.": "停止所有音效、电台和所有程序，并关闭变声。",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord 和游戏仍能听到你的声音：它们直接从 Windows 获取你的麦克风，所以这个勾选框暂时无法静音。",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "把你的声音直接送进麦克风就能用了。或者先在 Discord 里把麦克风静音。",
+  "Set it up": "去设置",
+  "Your mic still goes out": "你的麦克风仍在传出"
 }

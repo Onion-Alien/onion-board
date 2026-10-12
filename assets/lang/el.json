@@ -3286,5 +3286,9 @@
   "Before update": "Πριν την ενημέρωση",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Αποθηκεύεται ένα κάθε φορά που επαναφέρεις κάτι ή ενημερώνεις την εφαρμογή (κρατιούνται τα τελευταία {max_points}). Η ανάκτηση επαναφέρει τις ρυθμίσεις, τις συντομεύσεις και τους ήχους σου όπως ήταν. Οι ήχοι που πρόσθεσες από τότε μένουν.",
   "Stops every sound, the radio and every program, and turns the voices off": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα και κλείνει τις φωνές",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα και κλείνει τις φωνές."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα και κλείνει τις φωνές.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Το Discord και τα παιχνίδια ακούνε ακόμα τη φωνή σου: παίρνουν το μικρόφωνο κατευθείαν από τα Windows, οπότε αυτό το κουτί δεν μπορεί ακόμα να το σβήσει.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Βάλε τους ήχους σου κατευθείαν στο μικρόφωνο και θα δουλέψει. Ή κάνε σίγαση στο Discord προς το παρόν.",
+  "Set it up": "Ρύθμισέ το",
+  "Your mic still goes out": "Το μικρόφωνό σου ακούγεται ακόμα"
 }

@@ -3286,5 +3286,9 @@
   "Before update": "Vor dem Update",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bei jedem Zurücksetzen und jedem Update der App wird einer gespeichert (die letzten {max_points} bleiben erhalten). Wiederherstellen bringt deine Einstellungen, Hotkeys und Sounds zurück, wie sie waren. Sounds, die du seitdem hinzugefügt hast, bleiben.",
   "Stops every sound, the radio and every program, and turns the voices off": "Stoppt jeden Sound, das Radio und jedes Programm und schaltet die Stimmen aus",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Stoppt jeden Sound, das Radio und jedes Programm und schaltet die Stimmen aus."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Stoppt jeden Sound, das Radio und jedes Programm und schaltet die Stimmen aus.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord und Spiele hören deine Stimme weiterhin: Sie nehmen dein Mikro direkt von Windows, deshalb kann dieses Kästchen es noch nicht stummschalten.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Leite deine Sounds direkt in dein Mikro, dann klappt es. Oder schalte dein Mikro vorerst in Discord stumm.",
+  "Set it up": "Einrichten",
+  "Your mic still goes out": "Dein Mikro geht noch raus"
 }

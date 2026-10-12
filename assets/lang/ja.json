@@ -3213,5 +3213,9 @@
   "Before update": "更新前",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットしたりアプリを更新したりするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。",
   "Stops every sound, the radio and every program, and turns the voices off": "すべてのサウンド、ラジオ、プログラムを停止し、ボイスをオフにします",
-  "Stops every sound, the radio and every program, and turns the voices off.": "すべてのサウンド、ラジオ、プログラムを停止し、ボイスをオフにします。"
+  "Stops every sound, the radio and every program, and turns the voices off.": "すべてのサウンド、ラジオ、プログラムを停止し、ボイスをオフにします。",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord やゲームにはまだあなたの声が聞こえています。マイクを Windows から直接取っているので、このチェックではまだミュートできません。",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "サウンドをマイクに直接送るようにすれば使えます。今は Discord でマイクをミュートしてください。",
+  "Set it up": "設定する",
+  "Your mic still goes out": "マイクはまだ届いています"
 }

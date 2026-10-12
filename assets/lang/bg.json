@@ -3286,5 +3286,9 @@
   "Before update": "Преди обновяването",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят.",
   "Stops every sound, the radio and every program, and turns the voices off": "Спира всеки звук, радиото и всяка програма и изключва гласовете",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Спира всеки звук, радиото и всяка програма и изключва гласовете."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Спира всеки звук, радиото и всяка програма и изключва гласовете.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord и игрите още чуват гласа ти: те взимат микрофона направо от Windows, затова това поле още не може да го заглуши.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Пусни звуците си направо в микрофона и ще работи. Или засега заглуши микрофона в Discord.",
+  "Set it up": "Настрой",
+  "Your mic still goes out": "Микрофонът ти още се чува"
 }

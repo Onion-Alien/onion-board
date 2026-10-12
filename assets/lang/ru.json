@@ -3359,5 +3359,9 @@
   "Before update": "До обновления",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе и каждом обновлении приложения (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются.",
   "Stops every sound, the radio and every program, and turns the voices off": "Останавливает все звуки, радио и все программы и выключает голоса",
-  "Stops every sound, the radio and every program, and turns the voices off.": "Останавливает все звуки, радио и все программы и выключает голоса."
+  "Stops every sound, the radio and every program, and turns the voices off.": "Останавливает все звуки, радио и все программы и выключает голоса.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "Discord и игры всё ещё слышат твой голос: они берут микрофон прямо из Windows, поэтому эта галочка пока не может его заглушить.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "Пусти звуки прямо в микрофон, и всё заработает. Или пока выключи микрофон в Discord.",
+  "Set it up": "Настроить",
+  "Your mic still goes out": "Твой микрофон всё ещё слышно"
 }

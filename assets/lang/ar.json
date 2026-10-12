@@ -3578,5 +3578,9 @@
   "Before update": "قبل التحديث",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما أو تحديث التطبيق (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين.",
   "Stops every sound, the radio and every program, and turns the voices off": "يوقف كل صوت والراديو وكل برنامج، ويطفئ الأصوات",
-  "Stops every sound, the radio and every program, and turns the voices off.": "يوقف كل صوت والراديو وكل برنامج، ويطفئ الأصوات."
+  "Stops every sound, the radio and every program, and turns the voices off.": "يوقف كل صوت والراديو وكل برنامج، ويطفئ الأصوات.",
+  "Discord and games still hear your voice: they take your mic straight from Windows, so this box can't mute it yet.": "ديسكورد والألعاب لا تزال تسمع صوتك: فهي تأخذ الميكروفون مباشرة من ويندوز، لذا لا يمكن لهذا المربع كتمه بعد.",
+  "Put your sounds straight into your mic and it works. Or mute your mic in Discord for now.": "ضع أصواتك مباشرة في الميكروفون وسيعمل. أو اكتم الميكروفون في ديسكورد الآن.",
+  "Set it up": "إعداده",
+  "Your mic still goes out": "الميكروفون لا يزال يُرسَل"
 }
