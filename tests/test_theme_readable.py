@@ -46,6 +46,16 @@ def test_buttons_and_boxes_on_a_card_stand_out_from_it(name):
     assert fill != theme.THEMES[name]["panel"], fill
 
 
+@pytest.mark.parametrize("name", [n for n in theme.THEMES if theme.is_light(n)])
+def test_a_light_themes_buttons_and_boxes_show_on_every_surface(name):
+    """Light's buttons were 1.06:1 on the window (a pop-up's Done read as words) and its
+    boxes white on the white panels (Radio's filters, Remote's Port)."""
+    t = theme.THEMES[name]
+    for surface in ("bg", "panel"):
+        assert theme._contrast(t["btn"], t[surface]) >= 1.12, surface
+    assert theme._contrast(t["card_ctl"], t["panel"]) >= 1.10
+
+
 @pytest.mark.parametrize("name", list(theme.THEMES))
 def test_live_text_reads_on_every_surface_it_sits_on(name):
     """live_text was checked against the window only: 3.53:1 on Dark's hovered card."""
