@@ -1220,6 +1220,7 @@ class MainWindow(QMainWindow):
               "test that records what goes out and plays it back.")))
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
+        self._focus_open_tab()
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
         self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
@@ -1788,6 +1789,7 @@ class MainWindow(QMainWindow):
             lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
         self.linkbar.sound_ready.connect(self.on_downloaded)
         self.linkbar.played.connect(self.on_link_played)
+        self.linkbar.board_busy = self._board_song_playing
         self.linkbar.up_next_changed.connect(lambda *__: self._update_chips(self.engine.playing()))
         # a link in the search box shows as a result card (nothing downloads until Play / Add)
         self._link_wait = QTimer(self, singleShot=True, interval=LINK_WAIT_MS)
@@ -2221,6 +2223,17 @@ class MainWindow(QMainWindow):
         self.card_meter.setToolTip(_("Your mic"))
         top.addWidget(self.card_meter, 0, Qt.AlignmentFlag.AlignVCenter)   # by its name
         top.addStretch(1)
+        # working: a fresh copy or off, right here (Settings → Audio has every mic)
+        from soundboard.ui.audiorecovery import explanation
+        self.btn_micredo = QPushButton(_("Reinstall"))
+        self.btn_micredo.setProperty("quiet", True)
+        self.btn_micredo.setToolTip(explanation("reinstall"))
+        self.btn_micredo.clicked.connect(lambda: self._ask_mic_effect("reinstall"))
+        self.btn_micoff = QPushButton(_("Remove"))
+        self.btn_micoff.setObjectName("danger")
+        self.btn_micoff.setProperty("quiet", True)
+        self.btn_micoff.setToolTip(explanation("remove"))
+        self.btn_micoff.clicked.connect(lambda: self._ask_mic_effect("remove"))
         lines.addLayout(top)
         # line 2, when there's something to say or do: why, then the buttons
         self.mic_reason = QLabel()
@@ -2230,6 +2243,9 @@ class MainWindow(QMainWindow):
         lines.addWidget(self.mic_reason)
         self.mic_ways = Flow(gap=8)
         lines.addLayout(self.mic_ways)
+        for b in (self.btn_micredo, self.btn_micoff):   # (under the line: wraps when narrow)
+            b.hide()
+            self.mic_ways.addWidget(b)
         box.hide()
         self._mic_icon = None
         self._ways_in = None   # which row the set-up buttons are in (_place_ways)
@@ -3566,6 +3582,10 @@ class MainWindow(QMainWindow):
             self.setup_show.start()
         if not mic_busy:
             self._show_bun = False
+        effect_on = (mic_route and not mic_busy and not self.setup_show.on
+                     and directmic.works(direct))
+        self.btn_micredo.setVisible(effect_on)
+        self.btn_micoff.setVisible(effect_on)
         said = self._done_toast
         if said and not mic_busy:
             self._done_toast = None
@@ -3998,6 +4018,21 @@ class MainWindow(QMainWindow):
             self.toast(_("{value} still uses the virtual cable as its mic. It still hears you, "
                          "but you can set its input back to your normal mic: your sounds are in "
                          "it now.", value=heard[0][1]))
+
+    def _ask_mic_effect(self, action: str):
+        """The status box's Reinstall / Remove: Settings' audio recovery, on this mic,
+        after the same are-you-sure box."""
+        from soundboard.ui import audiorecovery
+        recovery = audiorecovery.recovery_of(self)
+        if recovery.running or self._attaching:
+            return
+
+        def go_on(dialog):
+            if recovery.start(action, None, say_done=True):
+                dialog.accept()
+                self._update_flow()
+        audiorecovery.ask(self, action, [audiorecovery.explanation(
+            action, self.cfg.mic_device or None)], go_on)
 
     def _pick_send_device(self):
         """Setup tab -> Another device: Devices' "Send my sounds to", opened."""
@@ -4524,6 +4559,16 @@ class MainWindow(QMainWindow):
     def _radio_live(self, on: bool):
         set_tab_live(self.tabs, self.tabs.indexOf(self.radio_page), on,
                      self.radio.live_tip(), "radio")
+
+    def _focus_open_tab(self):
+        """The window's first focus: the open tab's page (Ctrl+V on Sounds works at
+        once). Left to Qt, a window shown with nothing focused focuses its first
+        focusable widget as if Tab were pressed: the Sounds rail button, with its
+        keyboard ring, whatever tab was open, so it looked like a second picked tab."""
+        if (fw := self.focusWidget()) is not None and not self.rail.isAncestorOf(fw):
+            return   # something else has it already
+        if (page := self.tabs.currentWidget()) is not None:
+            page.setFocus(Qt.FocusReason.OtherFocusReason)
 
     def tab_on(self, key: str) -> bool:
         """Whether a tab (taboff.KEYS) is switched on in Settings > Tabs."""
@@ -6153,10 +6198,18 @@ class MainWindow(QMainWindow):
         return any(sid in self._meta and not paused
                    for sid, (_p, paused) in self.engine.playing().items())
 
+    def _board_song_playing(self, playing=None) -> bool:
+        """Is one of the board's sounds playing or paused? A web search's Play waits
+        for it (Up next), as a pad's Play next does. A looping one (rain, a hum) is a
+        background: that would never end, so a song doesn't wait for it."""
+        playing = self.engine.playing() if playing is None else playing
+        return any(sid in self._meta and not self._meta[sid].loop for sid in playing)
+
     def queue_sound(self, sid: str) -> bool:
         """Play `sid` once the board's sounds playing now have finished (now, if none are:
         True then)."""
-        if not self._pads_playing() and not self._queue:
+        if (not self._pads_playing() and not self._queue
+                and not self.linkbar.up_next() and LINK_ID not in self.engine.playing()):
             self.play(sid, now=True)
             return True
         self._queue.append(sid)
@@ -6267,7 +6320,9 @@ class MainWindow(QMainWindow):
                     self.engine.stop(sid)
             self._next_in_queue()
         elif self.linkbar.up_next():
-            self.engine.stop(LINK_ID)
+            for sid in self.engine.playing():   # it waits for your sounds too
+                if sid == LINK_ID or (sid in self._meta and not self._meta[sid].loop):
+                    self.engine.stop(sid)
             self.linkbar.play_next()
         elif self.current:
             self._stop_sound(self.current)
@@ -9507,6 +9562,10 @@ class MainWindow(QMainWindow):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         shellicon.paint_background(self, theme.T["bg"])
         super().showEvent(ev)
+        if not getattr(self, "_start_focus_set", False):
+            # (again here: start-up can still switch the tab after __init__, to Setup)
+            self._start_focus_set = True
+            self._focus_open_tab()
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)
@@ -9592,10 +9651,12 @@ class MainWindow(QMainWindow):
                 self._update_flow()
             self.voice.poll()
         playing = e.playing()
-        if self._queue and not any(sid in self._meta for sid in playing):
-            self._next_in_queue()
+        if self._queue and LINK_ID not in playing and not any(sid in self._meta
+                                                              for sid in playing):
+            self._next_in_queue()   # it waits for a web search's song too
             playing = e.playing()
-        if LINK_ID not in playing and self.linkbar.up_next() and self.linkbar.play_next():
+        if (LINK_ID not in playing and self.linkbar.up_next()
+                and not self._board_song_playing(playing) and self.linkbar.play_next()):
             playing = e.playing()   # the web search song ended: the next one waiting
         live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
                    for sid, (_p, paused) in playing.items())                # Play too

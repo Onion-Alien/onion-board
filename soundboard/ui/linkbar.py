@@ -17,6 +17,7 @@ import logging
 import shutil
 import tempfile
 import threading
+from collections.abc import Callable
 from typing import Any
 from pathlib import Path
 
@@ -86,6 +87,9 @@ class LinkBar(QFrame):
         # (title, int16 audio, gain, url) of Plays that finished downloading while
         # another link was playing: they wait their turn instead of cutting it off
         self._up_next: list[tuple] = []
+        # is one of the board's own songs playing? (MainWindow sets it): a Play waits
+        # for it too, it never plays over it
+        self.board_busy: Callable[[], bool] = lambda: False
         self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
         self._dups: set[str] = set()     # urls refused as already in the library
         self._msg.connect(self._on_msg)
@@ -342,8 +346,9 @@ class LinkBar(QFrame):
         title = self.title if title is None else title
         gain = gain if self.cfg.level_volumes else 1.0
         url = url or self.url
-        if self._in_player() or self._up_next:
-            # another link is playing (or paused): never cut it off, play this after it
+        if self._in_player() or self._up_next or self.board_busy():
+            # another link or one of your sounds is playing (or paused): never play over
+            # it, play this after it
             if all(u != url for *_r, u in self._up_next):
                 self._up_next.append((title or _("Link"), data, gain, url))
                 self.up_next_changed.emit(self.up_next())
