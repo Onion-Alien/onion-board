@@ -1,0 +1,1 @@
+- The first click on the Triggers tab is as quick as any other (~30 ms, was ~220 ms): it's shown once behind the loading screen, like Settings.

@@ -260,6 +260,52 @@ def test_an_installed_onion_watch_is_in_the_tab_before_the_window_shows(
         close_window(qapp, w)
 
 
+def test_the_tab_is_shown_once_behind_the_loading_screen(qapp, app_dir, monkeypatch, pkg):
+    """warm_triggers: its first show (layout, the editor) done before the first click,
+    quietly: the tab you were on stays, nothing saved or counted as opened."""
+    from soundboard.ui import mainwindow as main
+    w = watch_window(qapp, app_dir, monkeypatch, pkg, two_triggers(on=False))
+    shown = []
+    try:
+        w.resize(1200, 800)
+        w.show()
+        qapp.processEvents()
+        before, saved_tab = w.tabs.currentIndex(), w.cfg.tab
+        w.triggers.panel.showEvent = lambda e: shown.append(1)
+        w.warm_triggers()
+        assert shown                                       # it was shown once
+        assert w.tabs.currentIndex() == before and w.cfg.tab == saved_tab
+        assert w.updatesEnabled()
+        assert w.tabs.currentIndex() != main.TAB_INDEX["triggers"]
+    finally:
+        close_window(qapp, w)
+
+
+def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
+        qapp, app_dir, monkeypatch):
+    """No add-on installed (Hoot's page): warm_triggers leaves the tabs alone."""
+    from soundboard import engine, winkeys
+    from soundboard.library import Config
+    from soundboard.ui import mainwindow as main
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    Config(mic_first=True).save()
+    w = main.MainWindow()
+    try:
+        w._load_thread.join(15)
+        w.show()
+        qapp.processEvents()
+        assert w.triggers.panel is None                    # not installed
+        switched = []
+        w.tabs.currentChanged.connect(switched.append)
+        monkeypatch.setattr(w.tabs, "setCurrentWidget", lambda *a: switched.append(a))
+        w.warm_triggers()
+        assert not switched and w.updatesEnabled()
+    finally:
+        close_window(qapp, w)
+
+
 def test_the_bar_keeps_its_words_while_it_has_room(qapp, app_dir, monkeypatch, pkg):
     """The bar's buttons go icon only by the bar's own room, not the window's: another
     tab not fitting used to take their words, and they stayed off until the window
