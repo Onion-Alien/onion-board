@@ -607,6 +607,149 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     assert wiz.btn_attach.isHidden()
 
 
+def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
+    """While Bun puts the sounds into the mic, Back, Next, Esc and the X do nothing:
+    closed or moved on mid-way, they couldn't tell how it went. Afterwards they work
+    again, and a set-up that never answers lets them go after LOCK_MAX_S."""
+    w, wiz = mic_wizard
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    w._attaching = True   # the set-up is running
+    wiz._update_next()
+    assert busy.is_busy(wiz.btn_next) and busy.is_busy(wiz.btn_back)
+    for press in (wiz.next_clicked, wiz.back_clicked, wiz.reject, wiz.close):
+        press()
+        assert wiz.isVisible() and wiz.stack.currentIndex() == wiz.base + 2
+    w._attaching = False   # done
+    wiz._tick()
+    assert not busy.is_busy(wiz.btn_next) and not busy.is_busy(wiz.btn_back)
+    w._attaching = True    # never answers: let go after LOCK_MAX_S
+    assert wiz._locked()
+    monkeypatch.setattr(setupwizard.time, "monotonic",
+                        lambda t=setupwizard.time.monotonic(): t + setupwizard.LOCK_MAX_S)
+    assert not wiz._locked()
+    w._attaching = False
+
+
+@pytest.mark.parametrize("err", ["", "Windows said no"])
+def test_the_real_mic_set_up_holds_the_guide_until_it_ends(mic_wizard, qapp, monkeypatch,
+                                                          err):
+    """The real path: the set-up button, the install on its thread (held until we
+    let it go), then success or failure. All the while Back, Next, Esc and the X
+    do nothing; once it ends, either way, they all work again."""
+    import threading
+    from soundboard import directmic
+    w, wiz = mic_wizard
+    release = threading.Event()
+
+    def install(name, **k):
+        release.wait(20)
+        return err
+    monkeypatch.setattr(directmic, "install", install)
+    monkeypatch.setattr(directmic, "status",
+                        lambda name=None: "missing" if err or not release.is_set() else "ready")
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    page = wiz.stack.currentIndex()
+    wiz.btn_attach.click()
+    assert w._attaching and wiz.setup_show.on
+    for _round in range(3):   # spammed, with time passing in between
+        _settle(qapp, 0.3)
+        assert busy.is_busy(wiz.btn_next) and busy.is_busy(wiz.btn_back)
+        wiz.btn_next.click()
+        wiz.btn_back.click()
+        wiz.reject()   # Esc
+        wiz.close()    # the X
+        assert wiz.isVisible() and wiz.stack.currentIndex() == page
+    release.set()   # the set-up ends
+    deadline = __import__("time").monotonic() + 10
+    while w._attaching and __import__("time").monotonic() < deadline:
+        _settle(qapp, 0.05)
+    _settle(qapp, 0.4)
+    assert not w._attaching
+    assert not busy.is_busy(wiz.btn_next) and not busy.is_busy(wiz.btn_back)
+    wiz.btn_back.click()   # Back works again
+    assert wiz.stack.currentIndex() == page - 1
+    wiz.btn_next.click()   # and Next
+    assert wiz.stack.currentIndex() == page
+    wiz.close()            # and the X closes it
+    assert not wiz.isVisible()
+
+
+def _settle(qapp, s=0.25):
+    import time
+    t = time.monotonic()
+    while time.monotonic() - t < s:
+        qapp.processEvents()
+
+
+def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
+    """Switching steps: the old step goes before the new one shows. Both shown for
+    a moment made the window as tall as the screen (and moved it up) until it
+    shrank back, a flash on every Back / Next."""
+    from PySide6.QtCore import QEvent, QObject
+    from soundboard.ui import fit
+    _, wiz = mic_wizard
+    wiz.show()
+    wiz.go(wiz.base + 3)
+    _settle(qapp)
+    top = wiz.screen().availableGeometry().y() + 10   # room below for every step
+    wiz.move(100, top)
+    heights = []
+
+    class Spy(QObject):
+        def eventFilter(self, obj, ev):
+            if ev.type() == QEvent.Type.Resize:
+                heights.append(ev.size().height())
+            return False
+    spy = Spy(wiz)
+    wiz.installEventFilter(spy)
+    tall = {}
+    for i in (wiz.base + 2, wiz.base + 3) * 2:
+        wiz.go(i)
+        # its size already, before anything's drawn (not squeezed at the old one)
+        assert wiz.height() >= fit.needed_height(wiz, wiz.width())
+        _settle(qapp)
+        tall[i] = wiz.height()
+        assert wiz.y() == top   # never moved
+    assert heights and max(heights) <= max(tall.values()), (heights, tall)
+
+
+def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
+    """Near the screen's bottom, opening the Discord tip moves the guide up to fit;
+    shutting it puts it back where it was (it walked up the screen click by click)."""
+    from soundboard import directmic
+    from soundboard.ui import fit
+    monkeypatch.setattr(directmic, "works", lambda *a: True)
+    w, wiz = mic_wizard
+    w.cfg.route = "mic"
+    w.cfg.mic_device = w.cfg.mic_device or "Mic"
+    wiz.show()
+    wiz.go(wiz.base + 3)
+    _settle(qapp)
+    assert wiz.discord_fold.isVisible()
+    avail = wiz.screen().availableGeometry()
+    wiz.move(100, avail.bottom() - wiz.frameGeometry().height() - 5)
+    _settle(qapp)
+    home = wiz.y()
+    for _ in range(3):
+        wiz.discord_fold.click()
+        _settle(qapp)
+        assert wiz.y() < home   # open: up to fit
+        wiz.discord_fold.click()
+        # shut: its size at once, no empty band (opening can widen it a little, for
+        # a long button: then it's a bit shorter than before)
+        assert wiz.height() == fit.needed_height(wiz, wiz.width())
+        _settle(qapp)
+        assert wiz.y() == home   # and back where it was
+    wiz.discord_fold.click()   # dragged by them meanwhile: it stays where they put it
+    _settle(qapp)
+    wiz.move(100, 50)
+    wiz.discord_fold.click()
+    _settle(qapp)
+    assert wiz.y() == 50
+
+
 def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
     """On the mic: the cable and another device are optional, in their own card with
     what each is for; Pick a device opens the device list in its place."""
@@ -822,6 +965,24 @@ def test_only_a_brand_new_install_is_asked_what_its_for(wizard, app_dir):
     assert not wiz._ask_use and wiz.base == 0 and wiz.PAGES == 4
     assert Config.from_raw({"version": 2}).use_mode == "normal"
     assert FIRST_START.__func__(Config).use_mode == ""
+
+
+def test_picking_what_its_for_never_resizes_the_guide(mic_wizard, qapp):
+    """The words under the tiles are one line for some answers and two for others:
+    the guide keeps room for the longest, so clicking between them (spamming
+    included) never makes the window grow, shrink and jump around."""
+    _, wiz = mic_wizard
+    wiz.show()
+    qapp.processEvents()
+    wiz._settle_size()
+    sizes = set()
+    for _round in range(2):
+        for key in ("normal", "streamer", "games", "all"):
+            wiz.use_buttons[key].click()
+            qapp.processEvents()
+            wiz._settle_size()
+            sizes.add((wiz.height(), wiz.use_hint.y(), wiz.btn_next.y()))
+    assert len(sizes) == 1, sizes
 
 
 def test_the_first_launch_asks_what_its_for_first(mic_wizard):

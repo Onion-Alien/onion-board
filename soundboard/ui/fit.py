@@ -25,6 +25,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QWidget
 from shiboken6 import isValid as qt_valid
 
 WIDEN_STEP = 80
+LIFTED = "fit_lifted"   # (how far fit() moved a window up, the y it left it at)
 WATCHED = (QEvent.Type.Show, QEvent.Type.LayoutRequest, QEvent.Type.Resize)
 
 
@@ -69,7 +70,27 @@ def fit(w: QWidget) -> bool:
     y = min(g.y(), avail.bottom() - g.height() + 1)
     if (x, y) != (g.x(), g.y()):
         w.move(max(x, avail.x()), max(y, avail.y()))
+        # remember how far up it went (and where it landed), so shrinking can put it
+        # back: a fold opened and shut near the bottom walked the window up the screen
+        lifted = (w.property(LIFTED) or (0, 0))[0] + g.y() - w.frameGeometry().y()
+        w.setProperty(LIFTED, (lifted, w.frameGeometry().y()))
     return True
+
+
+def shrink(w: QWidget, height: int):
+    """Make `w` `height` tall, and move it back down by what fit() lifted it to keep
+    a taller step on screen (only while it's still where fit() left it: a window the
+    user dragged stays put)."""
+    w.resize(w.width(), height)
+    lifted, at = w.property(LIFTED) or (0, 0)
+    w.setProperty(LIFTED, None)
+    g = w.frameGeometry()
+    if lifted <= 0 or g.y() != at:
+        return
+    screen = w.screen() or QApplication.primaryScreen()
+    y = min(g.y() + lifted, screen.availableGeometry().bottom() - g.height() + 1)
+    if y > g.y():
+        w.move(g.x(), y)
 
 
 class _Fitter(QObject):
