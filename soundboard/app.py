@@ -431,6 +431,38 @@ def ui_scale_startup(app_dir: Path) -> int:
     return pct
 
 
+LOAD_WAIT_S = 3.0    # longest the loading screen waits for the sounds (a big first load)
+PAINT_WAIT_S = 0.5   # ...and for Windows to put the window on screen for its first paint
+
+
+def wait_for_sounds(app, w, cap_s: float = LOAD_WAIT_S):
+    """The sounds (MainWindow._load_all's thread) finish loading behind the loading
+    screen: ~0.4 s for 50 sounds that otherwise ran right after the window showed,
+    sharing Python with the first paint and the first clicks. Events are handled
+    meanwhile, so each pad gets its sound as it loads. A big library shows the window
+    after `cap_s` and loads the rest as before."""
+    import time
+    loader = getattr(w, "_load_thread", None)
+    end = time.monotonic() + cap_s
+    while loader is not None and loader.is_alive() and time.monotonic() < end:
+        app.processEvents()
+        loader.join(0.01)   # (not a busy loop: the loader gets Python meanwhile)
+    app.processEvents()   # the last sounds' results
+
+
+def first_paint(app, w, cap_s: float = PAINT_WAIT_S):
+    """The window's first layout and paint (~0.1 s), done while the loading screen is
+    still up rather than as the first thing after it goes."""
+    import time
+    end = time.monotonic() + cap_s
+    handle = w.windowHandle()
+    while handle is not None and not handle.isExposed() and time.monotonic() < end:
+        app.processEvents()
+        time.sleep(0.005)
+    app.processEvents()   # layouts asked for while it was built
+    w.repaint()
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):   # a path with emoji or Cyrillic in it, sent
         if stream is not None and hasattr(stream, "reconfigure"):   # to a file or pipe,
@@ -563,9 +595,14 @@ def main():
     import time
     exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
         getattr(app, "hangwatch", None), "beat", time.monotonic()))
-    if (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
-            or server.show_requested):    # ...unless launched again since
+    show = (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
+            or server.show_requested)    # ...unless launched again since
+    if TRAY_ARG not in sys.argv:   # Bun is up: the sounds load behind it (settle)
+        wait_for_sounds(app, w)
+    if show:
         w.show()
+        if TRAY_ARG not in sys.argv:
+            first_paint(app, w)
     splash.close()
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
