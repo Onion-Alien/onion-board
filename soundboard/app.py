@@ -599,10 +599,12 @@ def main():
             or server.show_requested)    # ...unless launched again since
     if TRAY_ARG not in sys.argv:   # Bun is up: the sounds load behind it (settle)
         wait_for_sounds(app, w)
+        w.preload_dialogs()   # Settings and Edit sound, built behind it too
     if show:
         w.show()
         if TRAY_ARG not in sys.argv:
             first_paint(app, w)
+            w.warm_settings()
     splash.close()
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for

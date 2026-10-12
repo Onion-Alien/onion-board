@@ -371,6 +371,19 @@ DISCORD_URGENT = {
 }
 
 
+def _polish(w: QWidget, size=None):
+    """Style a hidden widget and its children now, and lay it out at `size` (Qt waits
+    for the first show for both)."""
+    w.ensurePolished()
+    for c in w.findChildren(QWidget):
+        c.ensurePolished()
+    if size is not None:
+        w.resize(size)
+    for lay in [c.layout() for c in (w, *w.findChildren(QWidget))]:
+        if lay is not None:
+            lay.activate()
+
+
 class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     update_state = Signal()             # the update card changed (Settings > Updates follows)
@@ -5487,9 +5500,11 @@ class MainWindow(QMainWindow):
     # Settings pages showing state from outside the config (downloads, add-ons, Tor,
     # updates, the remote's add-ons): a kept Settings with one of them built is rebuilt
     SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about")
-    # config that changes without Settings showing it (counts, tips, the tab shown)
+    # config that changes without Settings showing it (counts, tips, the tab shown, the
+    # Voice tab's speech) or that it keeps up to date itself (app_setup_changed)
     SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
-                           "update_checked", "whats_new_seen", "load_note")
+                           "update_checked", "whats_new_seen", "load_note", "speech",
+                           "app_setup")
 
     def _settings_reusable(self, dlg) -> bool:
         if not qt_valid(dlg) or dlg.search_box.text():
@@ -7792,10 +7807,7 @@ class MainWindow(QMainWindow):
         if d is not None and qt_valid(d):
             d.load(m, tab)
         else:
-            d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
-            d.hotkeys_changed.connect(self.register_hotkeys)
-            d.source_forgotten.connect(self._save_now)
-            d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
+            d = self._new_editor(m, tab)
         self._editors[sid] = d
         d.show()
         return d
@@ -7831,6 +7843,60 @@ class MainWindow(QMainWindow):
             else:   # freed once its finished signal is over (deleting it inside crashed)
                 QTimer.singleShot(0, lambda: free_dialog(d))
         self.register_hotkeys()
+
+    def preload_dialogs(self):
+        """Behind the loading screen: Settings (its first page) and an Edit sound are
+        built now, so even the first click of the cog or Edit opens at once (each took
+        100-300 ms to build); Settings' other pages follow one at a time once it's up."""
+        if self._settings_dlg is None and self._settings_kept is None:
+            dlg = SettingsDialog(self, "privacy", lazy=True)
+            dlg.hide()
+            dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
+            _polish(dlg, self._content.size())
+            self._settings_kept, self._settings_kept_print = dlg, self._settings_print()
+            self._preload_pages = [i for i, k in enumerate(dlg._page_keys)
+                                   if i in dlg._unbuilt and k not in self.SETTINGS_LIVE_PAGES]
+            QTimer.singleShot(1500, self._preload_next_page)
+        if self._spare_editor is None and self.cfg.sounds:
+            d = self._new_editor(self.cfg.sounds[0], "sound")
+            d.hide()
+            _polish(d)
+            self._spare_editor = d
+
+    def warm_settings(self):
+        """Still behind the loading screen, the window up: the kept Settings goes in
+        the window's place once, with drawing off (nothing changes on screen), so Qt's
+        first-show work (~100 ms) isn't left for the first click of the cog."""
+        dlg = self._settings_kept
+        if dlg is None or not qt_valid(dlg) or not self.isVisible() or self.settings_open():
+            return
+        self.setUpdatesEnabled(False)
+        try:
+            self._content.addWidget(dlg)
+            self._content.setCurrentWidget(dlg)
+            QApplication.processEvents()
+            dlg.grab()
+        finally:
+            self._content.setCurrentWidget(self._tabs_area)
+            self._content.removeWidget(dlg)
+            dlg.hide()
+            self.setUpdatesEnabled(True)
+
+    def _preload_next_page(self):
+        """One more of the kept Settings' pages built (~20-60 ms each), while it's closed."""
+        dlg, pages = self._settings_kept, getattr(self, "_preload_pages", [])
+        if dlg is None or not qt_valid(dlg) or not pages:
+            return
+        dlg._build_page(pages.pop(0))
+        _polish(dlg, self._content.size())
+        QTimer.singleShot(60, self._preload_next_page)
+
+    def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
+        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
+        d.hotkeys_changed.connect(self.register_hotkeys)
+        d.source_forgotten.connect(self._save_now)
+        d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
+        return d
 
     def _drop_spare_dialogs(self):
         """The kept Edit sound and Settings go (a new theme: built again in it)."""
