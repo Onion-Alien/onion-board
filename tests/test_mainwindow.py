@@ -635,13 +635,14 @@ def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
 
 
 def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):
-    """Big pads in a narrow window get narrower instead of running off the edge, and
-    the mini player puts two a row while they're still a usable size."""
+    """Big pads in a narrow window get narrower instead of running off the edge, a row
+    of them stretches to the right edge, and the mini player puts two a row while
+    they're still a usable size."""
     window.show()
     window.set_pad_width(240)
     window.resize(1000, 700)
     window._refit()
-    assert window.pads["s0"].width() == 240
+    near_240_to_the_edge(window)
     window.resize(270, 600)
     window._refit()
     qapp.processEvents()
@@ -654,7 +655,18 @@ def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):
     assert a.y() == b.y() and a.width() < 240          # two a row
     window.resize(1000, 700)
     window._refit()
-    assert not window.is_mini() and window.pads["s0"].width() == 240
+    assert not window.is_mini()
+    near_240_to_the_edge(window)
+
+
+def near_240_to_the_edge(window):
+    """About the picked size, stretched so the row of pads ends at the right edge."""
+    grid = window.grid
+    cols, w = grid._shape
+    assert 240 * 0.8 <= w < 240 * 2 and window.pads["s0"].width() == w
+    m = grid.grid.contentsMargins()
+    right = m.left() + cols * w + (cols - 1) * grid.grid.spacing()
+    assert grid.width() - m.right() - right < cols   # no strip left over on the right
 
 
 @pytest.mark.windows   # Segoe UI's text widths: with another font the columns fit side by side

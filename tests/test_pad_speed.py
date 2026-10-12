@@ -145,10 +145,11 @@ def test_a_new_pad_size_with_the_same_columns_only_resizes(qapp):
     added = []
     real = grid.grid.addWidget
     grid.grid.addWidget = lambda *a: (added.append(a), real(*a))
-    grid.set_pad_width(95)
+    grid.resize(grid.width() - 8, 600)   # a little narrower: still four a row,
+    grid.relayout()                      # stretched to the edge
     assert added == [] and grid.grid.isEnabled()
     a, b, c = grid.pads[0], grid.pads[1], grid.pads[4]
-    assert a.width() == 95 and b.geometry().left() == a.geometry().right() + 1 + 10
+    assert a.width() == 100 and b.geometry().left() == a.geometry().right() + 1 + 10
     assert c.geometry().top() == a.geometry().bottom() + 1 + 10
     grid.pads[2].setProperty("filtered", True)   # another set shown: the ones after
     grid.relayout(force=True)                    # it move up, the first two stay put
