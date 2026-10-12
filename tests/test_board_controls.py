@@ -558,6 +558,9 @@ def test_duplicate_and_show_file(window, monkeypatch):
 def test_transport_time_is_blank_until_a_sound_is_picked(window):
     w = window
     assert w.np_time.text() == "" and w.mini_time.text() == ""
+    assert w.np_time.isHidden()   # blank: the seek line takes its room
     w.select("s0")
+    w._update_transport({})   # the player's timer tick
+    assert w.np_time.text() and not w.np_time.isHidden()
     w.remove_sound("s0")   # back to "Pick a sound"
-    assert w.np_time.text() == ""
+    assert w.np_time.text() == "" and w.np_time.isHidden()
