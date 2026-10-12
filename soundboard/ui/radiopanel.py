@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
                                QStyledItemDelegate, QStyleOptionComboBox, QVBoxLayout,
                                QWidget)
 
-from soundboard import library, radio, theme
+from soundboard import library, radio, theme, usage
 from soundboard.i18n import _, ngettext
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
@@ -1011,6 +1011,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             # sad Bun says them on the map, and they stay up (list and info line)
             # until a reload gets through
             self._globe_error = msg or radio.directory_unreachable()
+            usage.used("radio-list-down")
             self._map("show_message", self._globe_error)
             self._flash_until = 0.0
             self._show_list()
@@ -1278,6 +1279,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.recorder.clear_replay()   # "Last 15s" is only ever this station
         self._fed_by = s
         self.player.play(s)
+        usage.used("radio-played")
         if self.cfg.radio.get("count_plays", False):   # Settings > Privacy, off by default
             self.dir.count_click(s.uuid)
         self.cfg.radio["last"] = s.to_saved()
@@ -1340,6 +1342,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._report_active()      # the player gave the station up by itself
 
     def _on_error(self, msg: str):
+        usage.used("radio-failed")
         self._restate_rows()
         # the player's own plain words (radio.station_off_air, a switch's reason)
         self._say(msg or radio.station_off_air(), "error")

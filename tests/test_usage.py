@@ -52,7 +52,7 @@ class _Inline:
 
 
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
-         "launches/", "downloads/")
+         "launches/", "downloads/", "theme/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -843,3 +843,53 @@ def test_the_daily_count_goes_by_the_calendar_day():
     assert not usage.due(eight_pm, eight_pm + 60)            # the same evening
     assert usage.due(eight_pm, eight_pm + usage.EVERY_S)    # a whole day
     assert not usage.due(1e18, eight_pm)                     # the clock went back
+
+
+def test_every_name_in_a_used_call_is_in_features():
+    """usage.used("a" if x else "b"): every quoted name in the call, not only the first,
+    and the f-string families' keys."""
+    import re
+    from pathlib import Path
+    root = Path(usage.__file__).parent
+    names = set()
+    for f in root.rglob("*.py"):
+        for call in re.findall(r'usage\.used\(((?:[^()]|\([^()]*\))*)\)',
+                               f.read_text(encoding="utf-8")):
+            # the names: the first argument, and each `else "…"` of a choice
+            names |= set(re.findall(r'(?:^|\(|else)\s*"([a-z0-9-]+)"', call.strip()))
+    assert {"mic-effect-said-no", "on-air-off", "get-ffmpeg-auto-failed"} <= names
+    assert not names - set(usage.FEATURES)
+    for k in usage.VOICE_TABS:
+        assert f"voice-tab-{k}" in usage.FEATURES
+    for k in usage.RECOVERY:
+        assert f"recovery-{k}" in usage.FEATURES
+
+
+def test_voice_tabs_and_recovery_actions_match_the_ui():
+    import re
+    from pathlib import Path
+
+    from soundboard.ui import audiorecovery
+    assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
+    src = (Path(usage.__file__).parent / "ui" / "voicepanel.py").read_text(encoding="utf-8")
+    assert set(re.findall(r'self\._section\("([a-z]+)"', src)) == set(usage.VOICE_TABS)
+
+
+def test_network_background_and_helper_settings_count_every_day(monkeypatch):
+    from soundboard import michelper
+    monkeypatch.setattr(michelper, "known", lambda same_dll=True: True)
+    cfg = Config(net_mode="tor", net_offline=True, playing_background=True, route="mic")
+    got = set(usage.features_now(cfg))
+    assert {"net-tor", "net-offline", "playing-bg", "mic-helper"} <= got
+    assert got <= set(usage.FEATURES)
+    monkeypatch.setattr(michelper, "known", lambda same_dll=True: None)
+    cfg = Config(net_mode="direct", route="cable")
+    assert not {"net-proxy", "net-tor", "net-offline", "playing-bg", "mic-helper"} & set(
+        usage.features_now(cfg))
+
+
+def test_theme_is_a_built_in_name_or_other():
+    assert usage.theme_tag("Dark") == "dark"
+    assert usage.theme_tag("Cherry Blossom") == "cherry-blossom"
+    assert usage.theme_tag("My secret theme") == "other"
+    assert "theme/high-contrast" in usage.about(Config(theme="High Contrast"), 0.0)
