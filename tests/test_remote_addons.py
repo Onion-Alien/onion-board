@@ -331,7 +331,7 @@ def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # 
 
 def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
                                                     monkeypatch):
-    """Settings → Add-ons & help, Onion Pocket's row: Check for updates turns into
+    """Settings → Add-ons, Onion Pocket's row: Check for updates turns into
     Update to X when GitHub has a newer one, Reinstall swaps in a fresh copy, and
     Report a problem opens a bug report naming the add-on and its version."""
 

@@ -425,7 +425,6 @@
   "The game you have open uses {engine} for voice chat": "Açık olan oyunun sesli sohbet için {engine} kullanıyor",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Oyun içi katman pad'lerini oyunun üstünde gösterir, sayı tuşlarıyla çalınır. Ayarlar → Katman'dan kur.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Kurulum programı başlatılamadı ({e}). Onun yerine sürüm sayfasından indirebilirsin.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Discord'a ve oyunlara ulaşmanın diğer yolu: orada mikrofon olarak seçtiğin ücretsiz bir sanal kablo",
   "The saved report and the app's log": "Kaydedilen rapor ve uygulamanın günlüğü",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoom, Microsoft Teams ve web sayfasındaki aramalarda seslerini gürültü saymalarını önleyen ayarlar",
   "The update didn't finish": "Güncelleme bitmedi",
@@ -465,7 +464,6 @@
   "Update available": "Güncelleme var",
   "Update now": "Şimdi güncelle",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version} sürümüne güncellendi. Sen istemedikçe hiçbir şey değişmez: her şey eskisi gibi çalışır.",
-  "Use the virtual cable instead": "Onun yerine sanal kabloyu kullan",
   "Video": "Video",
   "Videos can't be shown in this copy of Onion Board": "Onion Board'un bu kopyasında videolar gösterilemiyor",
   "Voice": "Ses",
@@ -689,7 +687,6 @@
   "Add-on downloads": "Eklenti indirmeleri",
   "Add-on downloads are off (Privacy)": "Eklenti indirmeleri kapalı (Gizlilik)",
   "Add-ons": "Eklentiler",
-  "Add-ons && help": "Eklentiler && yardım",
   "Advanced: {label}": "Gelişmiş: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "Başladıktan sonra, basışlar bu kadar uzun süre göz ardı edilir, böylece kimse spam gönderemez",
   "All hotkeys off / on": "Tüm kısayol tuşları kapalı/açık",
@@ -856,7 +853,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "Dışa aktarma, her sesi (resim, efektler, kısayol tuşları ve kategorileriyle birlikte) ve ayarlarınızı tek bir .zip dosyasına koyar: onu güvende tutun veya başka bir bilgisayara aktarın. Bir arkadaşınızın ses paketini içe aktardığınızda sesleri eklenir; halihazırda sahip olduklarınız atlanır.",
   "Export sounds": "Sesleri dışa aktar",
   "Fades": "Soluyor",
-  "Feedback and problems": "Geri bildirim ve sorunlar",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Şimdi güncelle veya İndiriciyi sıfırla (Güncellemeler sayfası) tuşuna bastığınızda veya orada Otomatik olarak güncelle seçeneğini işaretlediyseniz PyPI'den daha yeni bir yt-dlp getirir.",
   "Fetching the parts (downloading)": "Parçaların getirilmesi (indirilmesi)",
   "Finish  ✓": "Bitir ✓",
@@ -880,7 +876,6 @@
     "{name} içinde <b>{n}</b> ses bulundu.",
     "{name} içinde <b>{n}</b> ses bulundu."
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord'da sohbet edebilir, yardım isteyebilir ve yeni sürümlerden haberdar olabilirsin. Bir hata mı buldun ya da bir şey mi eksik? Her şey tarayıcında açılır ve orada göndermedikçe hiçbir şey gönderilmez.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub'dan ücretsiz eklentiler. Birini kaldırmak veya yeniden yüklemek, tetikleyicilerinizi ve eşleştirilmiş telefonlarınızı korur.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Ücretsiz, reklamsız ve hesapsız. OnionAlien tarafından yapılmıştır. Commons Maddesi ile MIT lisansı: onu herhangi bir şey için kullanın, ücretsiz olarak paylaşın, asla satmayın.",
   "Frequencies": "Frekanslar",
@@ -1156,7 +1151,6 @@
   "Removed “{name}”: Who's listening is Off now": "“{name}” kaldırıldı: Dinleyenler şu anda Kapalı",
   "Replay {time}": "{time} tekrar oynat",
   "Report a problem": "Sorun bildir",
-  "Report a problem on GitHub": "GitHub'da bir sorun bildirin",
   "Report a security issue": "Bir güvenlik sorununu bildirin",
   "Reset and restart": "Sıfırla ve yeniden başlat",
   "Reset downloader": "İndiriciyi sıfırla",
@@ -3309,5 +3303,8 @@
   "Plain": "Düz",
   "Textured": "Desenli",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Desenli seçenekte her temanın panellerde kendi deseni olur: eski ekran çizgileri, karbon fiber, dalgalar ve daha fazlası. Düz onları sade bırakır.",
-  "Theme style": "Tema stili"
+  "Theme style": "Tema stili",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Seslerin diğer ses panolarından aktarılıyor: {total} sesten {done}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Seslerin {name} içinden aktarılıyor: {total} sesten {done}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Yüklü, ama seslerin artık mikrofonuna gidiyor. Bir oyun mikrofonunu atlarsa onu kullan, başka hiçbir şeyin ihtiyacı yoksa kaldır."
 }

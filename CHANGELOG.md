@@ -23,8 +23,8 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
   the back arrow and the cog sit on the same line as "Settings" again, instead of a
   couple of pixels higher.
 - Theme textures are back, and now every theme has one: scanlines, carbon fibre, waves,
-  ruled paper, onion rings and more. Settings > Appearance > Theme style switches
-  between Textured and Plain.
+  ruled paper, onion rings and more. Panels stay plain unless you pick Textured in
+  Settings > Appearance > Theme style.
 - A ⏭ Skip button next to ■ in the player (and the mini player), plus a "Skip to the next sound" hotkey in Settings → Hotkeys: the next sound in Up next starts at once. With nothing waiting it stops the sound.
 - A damaged settings file no longer loses pads: the ones still readable in it, and sound
   files in your library no pad uses, are put back on the board, and the message says how

@@ -137,7 +137,6 @@
   "Add-on downloads": "Mga download ng add-on",
   "Add-on downloads are off (Privacy)": "Naka-off ang mga download ng add-on (Privacy)",
   "Add-ons": "Mga add-on",
-  "Add-ons && help": "Add-ons && tulong",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Naidagdag ang “{name}” ({duration:.1f}s) sa Sounds, i-right-click ito doon para i-rename o mag-set ng hotkey.",
   "Adding {count} sound…": [
     "Idinadagdag ang {count} sound…",
@@ -416,7 +415,6 @@
   "Fade in / out": "Fade in / out",
   "Fade out": "Fade out",
   "Fades": "Fade",
-  "Feedback and problems": "Feedback at mga problema",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Kumukuha ng mas bagong yt-dlp mula sa PyPI kapag pinindot mo ang Update now o Reset downloader (Updates page), o kusa kung naka-tick ang Update automatically doon.",
   "Fetching the parts (downloading)": "Kinukuha ang mga piyesa (dina-download)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "Maghanap ng TikTok sounds (kailangan ng account ang sariling search ng TikTok, kaya sa YouTube ito naghahanap, kung saan sila nire-repost)",
@@ -935,7 +933,6 @@
   "Repair needed": "Kailangan ng repair",
   "Replay {time}": "Replay {time}",
   "Report a problem": "I-report ang problema",
-  "Report a problem on GitHub": "I-report ang problema sa GitHub",
   "Report a security issue": "I-report ang security issue",
   "Report copied: paste it into your message (Ctrl+V).": "Nakopya ang report: i-paste ito sa mensahe mo (Ctrl+V).",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Nakopya ang report, pero hindi bumukas ang browser. Pumunta sa {issue_url} at i-paste doon.",
@@ -1150,7 +1147,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Ipinapakita ng in-game overlay ang mga pad mo sa ibabaw ng game, pine-play gamit ang number keys. I-set up ito sa Settings → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Hindi masimulan ang installer ({e}). Pwede mo itong i-download sa release page.",
   "The one the game is on": "Kung saan ang game",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Ang ibang paraan para maabot ang Discord at games: libreng virtual cable na pipiliin mo bilang mic doon",
   "The saved report and the app's log": "Ang naka-save na report at ang log ng app",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Ang settings sa Zoom, Microsoft Teams at calls sa web page na pumipigil sa kanila na ituring na ingay ang mga sound mo",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Dina-download ng Install button ng setup guide ang VB-Cable (ang virtual cable) mula sa vb-audio.com. Hindi kailangan kung diretso sa mic mo, sa ibang device o sa wala pumupunta ang mga sound mo. Off: ikaw na ang mag-install mula doon.",
@@ -1242,7 +1238,6 @@
   "Use it": "Gamitin",
   "Use less data": "Gumamit ng mas kaunting data",
   "Use the virtual cable after all": "Gamitin na lang ang virtual cable",
-  "Use the virtual cable instead": "Gamitin na lang ang virtual cable",
   "Used for": "Gamit para sa",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… ang mga voice chat setting na mahalaga",
   "Version {version}": "Version {version}",
@@ -2106,7 +2101,6 @@
   "That's a members-only video.": "Iyan ay isang video na para sa mga miyembro lamang.",
   "That's a playlist: open one video and try again.": "Iyan ay isang playlist: magbukas ng isang video at subukang muli.",
   "That's far too long to be a voice code.": "Masyadong mahaba iyon para maging voice code.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Ang Discord ay kung saan makikipag-chat, humingi ng tulong at marinig ang tungkol sa mga bagong bersyon. Nakahanap ng bug o may nawawala? Lahat ay bubukas sa iyong browser, at walang ipapadala maliban kung isusumite mo ito doon.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Ang Discord ay kung saan makikipag-chat, humingi ng tulong at marinig ang tungkol sa mga bagong bersyon. Ang form ng feedback ay hindi nangangailangan ng account. Nakakita ng problema sa seguridad? Iulat ito nang pribado sa GitHub, hindi sa pampublikong isyu.",
   "The Onion Board Discord server, in your browser": "Ang server ng Onion Board Discord, sa iyong browser",
   "The address starts with http:// or https://": "Ang address ay nagsisimula sa http:// o https://",
@@ -3309,5 +3303,8 @@
   "Plain": "Plain",
   "Textured": "May texture",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Sa may texture, may sariling disenyo ang bawat tema sa mga panel: linya ng lumang screen, carbon fiber, alon at iba pa. Pinapanatili itong patag ng Plain.",
-  "Theme style": "Istilo ng tema"
+  "Theme style": "Istilo ng tema",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Inililipat ang mga tunog mo mula sa iba mong soundboard: {done} sa {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Inililipat ang mga tunog mo mula sa {name}: {done} sa {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Naka-install ito, pero papunta na sa mic mo ang mga tunog mo ngayon. Gamitin ito kung nilalaktawan ng isang laro ang mic mo, o tanggalin ito kung wala nang ibang gumagamit nito."
 }

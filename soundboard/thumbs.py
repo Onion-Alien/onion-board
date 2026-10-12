@@ -337,10 +337,24 @@ def fitted(path: str, w: int, h: int, dpr: float,
     pm = _fitted.get(key)
     if pm is not None:
         _fitted.move_to_end(key)
+        if path in _pixmaps:   # its file stays at hand while it's on screen
+            _pixmaps.move_to_end(path)
         return pm
     src = pixmap(path, waiter)
     if src is None:
-        return None
+        # still being read: the last size of it, stretched, until it's in (a resize
+        # needs every pad's file again, more than the cache holds: the cards went
+        # blank and back on each step, a flicker across the board); its other shade
+        # will do too (the mouse over a pad)
+        olds = [(k[4] == shade, v) for k, v in _fitted.items()
+                if k[0] == path and k[3] == key[3] and k[5] == radius]
+        old = max(olds, key=lambda o: o[0])[1] if olds else None
+        if old is None:
+            return None
+        pm = old.scaled(w, h, Qt.AspectRatioMode.IgnoreAspectRatio,
+                        Qt.TransformationMode.FastTransformation)
+        pm.setDevicePixelRatio(dpr)
+        return pm
     big = src.scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
                      Qt.TransformationMode.SmoothTransformation)
     pm = QPixmap(w, h)

@@ -666,7 +666,8 @@ class VoiceFxPanel(QWidget):
                                  "a game, OBS). Pick a voice to turn it on, then use Hear what "
                                  "they hear at the bottom to try it.")))
 
-        # ---- the Discord catch (shown with the changer on, until "Got it")
+        # ---- the Discord catch (always shown until "Got it": popping in when a voice was
+        # picked made the card jump)
         # Measured in a real call: with Discord's default Input Profile (Voice
         # Isolation) a deep voice arrived ~20% of the time; on Studio, 93% at -0.8 dB.
         self.tip = QFrame()
@@ -1454,7 +1455,7 @@ class VoiceFxPanel(QWidget):
         self.btn_power.setToolTip(POWER_TEXT[on])
         self.btn_power.setAccessibleName(POWER_TEXT[on])
         self._show_picked()
-        self.tip.setVisible(on and self._tip_enabled)
+        self.tip.setVisible(self._tip_enabled)
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)
         for name, b in self._tile.items():

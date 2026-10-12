@@ -10,10 +10,12 @@ measurable idle cost.
 """
 from __future__ import annotations
 
+import time
+
 from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
 from PySide6.QtGui import QHoverEvent, QMouseEvent
-from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QCheckBox, QComboBox, QFormLayout,
+from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
+                               QAbstractSpinBox, QApplication, QCheckBox, QComboBox, QFormLayout,
                                QGridLayout, QLayout, QMenu, QProxyStyle,
                                QScrollBar, QSizePolicy, QSlider, QTabBar, QWidget)
 
@@ -60,6 +62,8 @@ class AppStyle(QProxyStyle):
             arg.installEventFilter(_submenu_edge())   # once: Qt doesn't add it twice
         elif isinstance(arg, QWidget) and arg.windowType() == Qt.WindowType.Popup:
             arg.installEventFilter(_submenu_edge())
+        if isinstance(arg, (QAbstractButton, QComboBox)):
+            arg.installEventFilter(_popup_click_guard())
 
 
 
@@ -100,6 +104,27 @@ class _SubmenuEdge(QObject):
     GAP = 2
 
     def eventFilter(self, obj, ev):
+        if obj.windowType() == Qt.WindowType.Popup:
+            if ev.type() == QEvent.Type.Show:
+                opener = getattr(obj, "_opener", None)
+                parent = obj.parentWidget()
+                while opener is None and parent is not None:
+                    if isinstance(parent, QMenu):
+                        break
+                    if isinstance(parent, (QAbstractButton, QComboBox)):
+                        opener = parent
+                    elif isinstance(obj, QMenu):
+                        # setMenu() does not require the button to own the menu.
+                        opener = next((button for button in parent.findChildren(QAbstractButton)
+                                       if getattr(button, "menu", lambda: None)() is obj), None)
+                    parent = parent.parentWidget()
+                # Submenus and context menus have no dropdown opener.
+                # Qt's Python wrappers allow per-instance bookkeeping attributes.
+                obj._click_opener = opener  # pyright: ignore[reportAttributeAccessIssue]
+            elif ev.type() == QEvent.Type.Hide:
+                opener = getattr(obj, "_click_opener", None)
+                if opener is not None:
+                    opener.setProperty("popupClosedAt", time.monotonic())
         if ev.type() == QEvent.Type.Show and obj.windowType() == Qt.WindowType.Popup:
             # A popup grabs the mouse before the opener receives Leave. Moving away
             # while it is open can then leave both QSS and custom hover fills stuck.
@@ -136,6 +161,47 @@ def _submenu_edge() -> _SubmenuEdge:
     if _edge is None:
         _edge = _SubmenuEdge()
     return _edge
+
+
+class _PopupClickGuard(QObject):
+    """Require a short pause before reopening a dismissed dropdown with the mouse.
+
+    Qt can replay the outside click that dismissed a popup onto its opener. That
+    must not immediately reopen it. Repeated presses extend the pause, so a burst
+    of clicks settles closed rather than flashing a new popup every few clicks.
+    Keyboard input, menu choices and the first click remain immediate.
+    """
+    PAUSE = 0.25
+
+    def eventFilter(self, obj, ev):
+        kind = ev.type()
+        if kind in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonDblClick) \
+                and ev.button() == Qt.MouseButton.LeftButton:
+            closed = obj.property("popupClosedAt")
+            now = time.monotonic()
+            blocked = closed is not None and now - closed < self.PAUSE
+            obj.setProperty("popupClickBlocked", blocked)
+            if blocked:
+                obj.setProperty("popupClosedAt", now)
+                ev.accept()
+                return True
+        elif kind == QEvent.Type.MouseButtonRelease \
+                and ev.button() == Qt.MouseButton.LeftButton \
+                and obj.property("popupClickBlocked"):
+            obj.setProperty("popupClickBlocked", False)
+            ev.accept()
+            return True
+        return False
+
+
+_click_guard: _PopupClickGuard | None = None
+
+
+def _popup_click_guard() -> _PopupClickGuard:
+    global _click_guard
+    if _click_guard is None:
+        _click_guard = _PopupClickGuard()
+    return _click_guard
 
 
 def snug_combo(cb: QComboBox, cap: int = AppStyle.COMBO_CAP):

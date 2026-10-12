@@ -431,7 +431,6 @@
   "The game you have open uses {engine} for voice chat": "Otwarta gra używa {engine} do czatu głosowego",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Nakładka w grze pokazuje twoje pady na grze, grane klawiszami cyfr. Ustaw ją w Ustawienia → Nakładka.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Nie udało się uruchomić instalatora ({e}). Możesz zamiast tego pobrać go ze strony wydania.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Inny sposób, by dotrzeć do Discorda i gier: darmowy wirtualny kabel, który wybierasz tam jako mikrofon",
   "The saved report and the app's log": "Zapisany raport i dziennik aplikacji",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Ustawienia w Zoomie, Microsoft Teams i rozmowach w przeglądarce, dzięki którym nie traktują twoich dźwięków jak szumu",
   "The update didn't finish": "Aktualizacja się nie dokończyła",
@@ -471,7 +470,6 @@
   "Update available": "Dostępna aktualizacja",
   "Update now": "Aktualizuj teraz",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Zaktualizowano do Onion Board {version}. Nic się nie zmienia, dopóki tego nie zechcesz: wszystko działa jak wcześniej.",
-  "Use the virtual cable instead": "Użyj zamiast tego wirtualnego kabla",
   "Video": "Film",
   "Videos can't be shown in this copy of Onion Board": "Ta kopia Onion Board nie może pokazywać filmów",
   "Voice": "Głos",
@@ -706,7 +704,6 @@
   "Add-on downloads": "Dodatki do pobrania",
   "Add-on downloads are off (Privacy)": "Pobieranie dodatków jest wyłączone (prywatność)",
   "Add-ons": "Dodatki",
-  "Add-ons && help": "Dodatki i pomoc",
   "Advanced: {label}": "Zaawansowane: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "Po uruchomieniu, prasy są ignorowane przez tak długi czas, więc nikt nie może ich spamować",
   "All hotkeys off / on": "Wszystkie klawisze skrótu wyłączone/włączone",
@@ -873,7 +870,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "Eksport umieszcza każdy dźwięk (wraz z obrazem, efektami, klawiszami skrótu i ​​kategoriami) oraz ustawienia w jednym pliku .zip: przechowuj go w bezpiecznym miejscu lub zaimportuj na inny komputer. Importowanie pakietu dźwiękowego znajomego dodaje jego dźwięki; te, które już posiadasz, zostaną pominięte.",
   "Export sounds": "Eksportuj dźwięki",
   "Fades": "Zanikanie",
-  "Feedback and problems": "Informacje zwrotne i problemy",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Pobiera nowszy plik yt-dlp z PyPI po naciśnięciu Aktualizuj teraz lub Resetuj narzędzie do pobierania (strona Aktualizacje) lub samodzielnie, jeśli zaznaczyłeś tam opcję Aktualizuj automatycznie.",
   "Fetching the parts (downloading)": "Pobieranie części (pobieranie)",
   "Finish  ✓": "Zakończ ✓",
@@ -900,7 +896,6 @@
     "Znaleziono <b>{n}</b> dźwięków w: {name} .",
     "Znaleziono <b>{n}</b> dźwięków w: {name} ."
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Na Discordzie możesz pogadać, poprosić o pomoc i dowiedzieć się o nowych wersjach. Znalazłeś błąd albo czegoś brakuje? Wszystko otwiera się w przeglądarce i nic nie zostanie wysłane, dopóki sam tego tam nie wyślesz.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Darmowe dodatki z GitHuba. Usunięcie lub ponowna instalacja jednego z nich powoduje zachowanie wyzwalaczy i sparowanych telefonów.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Za darmo, bez reklam i bez konta. Wykonane przez OnionAlien. Licencja MIT z klauzulą ​​Commons: używaj jej do czegokolwiek, udostępniaj ją za darmo, nigdy nie sprzedawaj.",
   "Frequencies": "Częstotliwości",
@@ -1179,7 +1174,6 @@
   "Removed “{name}”: Who's listening is Off now": "Usunięto „{name}”: Kto słucha, jest teraz wyłączony",
   "Replay {time}": "Odtwórz ponownie {time}",
   "Report a problem": "Zgłoś problem",
-  "Report a problem on GitHub": "Zgłoś problem w GitHubie",
   "Report a security issue": "Zgłoś problem związany z bezpieczeństwem",
   "Reset and restart": "Zresetuj i uruchom ponownie",
   "Reset downloader": "Zresetuj moduł pobierania",
@@ -3383,5 +3377,8 @@
   "Plain": "Gładki",
   "Textured": "Z teksturą",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Z teksturą każdy motyw ma własny wzór na panelach: linie starego monitora, włókno węglowe, fale i więcej. Gładki zostawia je płaskie.",
-  "Theme style": "Styl motywu"
+  "Theme style": "Styl motywu",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Przenoszenie dźwięków z innych soundboardów: {done} z {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Przenoszenie dźwięków z {name}: {done} z {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Jest zainstalowany, ale twoje dźwięki idą teraz do mikrofonu. Użyj go, jeśli gra pomija twój mikrofon, albo usuń go, jeśli nic innego go nie potrzebuje."
 }
