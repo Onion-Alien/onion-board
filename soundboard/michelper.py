@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 11
+HELPER_VERSION = 12
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -560,14 +560,49 @@ class _Heartbeat:
         _forget(self.path)
 
 
-def _prune(now: float):
+SEEN = "prune.seen"   # in results: when this helper first saw each file there
+
+
+def _read_seen(path: Path) -> dict[str, float]:
+    seen = {}
     try:
-        for p in results_dir().iterdir():
-            try:
-                if now - p.stat().st_mtime > RESULT_KEEP_S:
-                    p.unlink()
-            except OSError:
-                pass
+        for line in path.read_text(encoding="ascii").splitlines():
+            name, _, when = line.partition(" ")
+            seen[name] = float(when)
+    except (OSError, ValueError, UnicodeDecodeError):
+        pass
+    return seen
+
+
+def _prune(now: float, mono: float | None = None):
+    """Remove results nobody read (the app gave up on them): ones older than
+    RESULT_KEEP_S by the wall clock AND seen by an earlier run that long ago by
+    time.monotonic() (the whole PC's, not moved by a clock change; lower after a
+    restart, when nobody waits on anything from before). A clock put forward an hour
+    never takes an answer the app is still about to read."""
+    mono = time.monotonic() if mono is None else mono
+    folder = results_dir()
+    ledger = folder / SEEN
+    seen, keep = _read_seen(ledger), {}
+    try:
+        files = [p for p in folder.iterdir() if p.name != SEEN]
+    except OSError:
+        return
+    for p in files:
+        first = seen.get(p.name, mono)
+        try:
+            if (now - p.stat().st_mtime > RESULT_KEEP_S
+                    and (mono - first > RESULT_KEEP_S or first > mono)):
+                p.unlink()
+                continue
+        except OSError:
+            continue
+        keep[p.name] = first
+    try:
+        tmp = folder / f"{SEEN}.tmp"
+        tmp.write_text("".join(f"{n} {t:.3f}\n" for n, t in keep.items()),
+                       encoding="ascii")
+        os.replace(tmp, ledger)
     except OSError:
         pass
 
