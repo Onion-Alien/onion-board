@@ -5708,12 +5708,12 @@ class MainWindow(QMainWindow):
             return self._link_meta
         return self._meta.get(sid)
 
-    def on_link_played(self, title: str, data, gain: float):
+    def on_link_played(self, title: str, data, gain: float, url: str = ""):
         """The link bar's Play once: show it in the transport bar like a pad, so it
         can be paused, stopped and seeked. It isn't a sound in the library."""
         self._link_meta = SoundMeta(id=LINK_ID, name=title, file="", level_gain=gain,
                                     duration=len(data) / SR)
-        self._link_url = self.linkbar.url
+        self._link_url = url or self.linkbar.url   # its own page (another card may show)
         self.audio[LINK_ID] = data
         if self.current == LINK_ID:
             self.current = None   # a new link: refresh the name

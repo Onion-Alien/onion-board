@@ -199,6 +199,29 @@ def test_a_new_play_replaces_the_one_still_loading(qapp, monkeypatch, tmp_path):
     assert len(eng.played) == 1
 
 
+def test_a_play_still_plays_after_another_card_is_queued_and_removed(qapp, monkeypatch,
+                                                                     tmp_path):
+    """Play on one card, Add on another while it loads (it waits), then ✕ on the
+    waiting one: the Play that was loading still plays when it lands, not dropped
+    without a word because a different card was the one showing."""
+    bar, eng = _bar()
+    _fake_start(bar, monkeypatch)
+    done, played = [], []
+    bar.done.connect(lambda *args: done.append(args))
+    bar.played.connect(lambda title, *_a: played.append(title))
+    bar.open(URL, "Shrek")
+    bar.play_once()
+    job = bar._job
+    bar.open(OTHER, "Random")
+    assert bar.add()                       # waits behind the Play
+    bar.cancel(OTHER)                      # its ✕ in the download bar
+    assert done == [(OTHER, "add", False)] and bar._busy == "play"
+    data = np.zeros((480, 2), np.int16)
+    bar._on_msg("play", URL, (tmp_path / "a.wav", data, 1.0), job)
+    assert eng.played == [("__link__", 480, 1.0)] and played == ["Shrek"]
+    assert done[-1] == (URL, "play", True) and not bar._busy
+
+
 def test_picks_queue_behind_an_add_and_a_full_queue_says_so(qapp, monkeypatch):
     from soundboard.ui import linkbar
 
