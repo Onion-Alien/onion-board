@@ -9165,6 +9165,9 @@ class MainWindow(QMainWindow):
             self._sounds_live = live
             set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
                          _("● ON: a sound is playing"), "sounds")
+        # the taskbar preview's Pause button turns into Play while all of it is paused
+        self.thumbbar.set_paused(not live and any(
+            paused for sid, (_p, paused) in playing.items() if sid in self._meta or sid == LINK_ID))
         self._tick_busy = self._busy(playing)
         pace = self._tick_pace()
         if self.timer.interval() != pace:

@@ -3282,7 +3282,6 @@
   "Volumes levelled": "Äänenvoimakkuudet tasattu",
   "Live: click to mute": "Live: mykistä napsauttamalla",
   "Muted: click to go live": "Mykistetty: palaa liveen napsauttamalla",
-  "Pause or resume": "Tauko tai jatka",
   "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ja pelit eivät kuule mikistäsi mitään. Jos se on mykistetty, poista mykistys. Jos ei, klikkaa <b>Korjaa</b> ja sitten <b>Kyllä</b>, kun Windows kysyy.",
   "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ja pelit eivät kuule mikistäsi mitään. Jos se on mykistetty, poista mykistys. Jos ei, klikkaa <b>Korjaa</b>: ääni katkeaa muutamaksi sekunniksi.",
   "No sound": "Ei ääntä",

@@ -3209,7 +3209,6 @@
   "Volumes levelled": "音量をそろえ済み",
   "Live: click to mute": "ライブ: クリックでミュート",
   "Muted: click to go live": "ミュート中: クリックでライブに戻る",
-  "Pause or resume": "一時停止 / 再開",
   "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord やゲームにマイクの音が何も届いていません。ミュートになっていれば解除してください。そうでなければ<b>修復</b>をクリックし、Windows の確認で<b>はい</b>をクリックしてください。",
   "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ミュートになっていれば解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
   "No sound": "音なし",

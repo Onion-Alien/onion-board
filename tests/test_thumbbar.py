@@ -52,3 +52,19 @@ def test_stop_and_pause_buttons(window, monkeypatch):  # noqa: F811
     window.thumbbar.click(thumbbar.PAUSE)
     window.thumbbar.click(thumbbar.STOP)
     assert calls == ["pause", "stop"]
+
+
+def test_pause_button_turns_into_play_while_paused(window, monkeypatch):  # noqa: F811
+    sid = next(iter(window._meta), None)
+    if sid is None:
+        pytest.skip("no sounds on the test board")
+    states = {sid: (0.5, False)}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(states))
+    window.tick()
+    assert not window.thumbbar.paused   # playing: Pause
+    states[sid] = (0.5, True)
+    window.tick()
+    assert window.thumbbar.paused       # all paused: Play
+    states.clear()
+    window.tick()
+    assert not window.thumbbar.paused   # nothing at all: back to Pause
