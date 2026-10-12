@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "Ugrás a következő hangra",
   "Skip to the next sound in Up next": "Ugrás a Következik lista következő hangjára",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Leállítja a szóló hangot, és elindítja a következőt a Következik listából. Ha nincs várakozó, csak leállítja a hangot."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Leállítja a szóló hangot, és elindítja a következőt a Következik listából. Ha nincs várakozó, csak leállítja a hangot.",
+  "Plain": "Sima",
+  "Textured": "Mintás",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Mintásan minden téma saját mintát kap a paneleken: régi képernyő csíkjai, karbon, hullámok és még több. A sima egyszínűen hagyja őket.",
+  "Theme style": "Téma stílusa"
 }

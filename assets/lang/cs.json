@@ -3379,5 +3379,9 @@
   ],
   "Skip to the next sound": "Přeskočit na další zvuk",
   "Skip to the next sound in Up next": "Přeskočit na další zvuk v „Další na řadě“",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Zastaví hrající zvuk a spustí další v „Další na řadě“. Když nic nečeká, zvuk jen zastaví."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Zastaví hrající zvuk a spustí další v „Další na řadě“. Když nic nečeká, zvuk jen zastaví.",
+  "Plain": "Hladký",
+  "Textured": "S texturou",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "S texturou má každý motiv na panelech vlastní vzor: řádky starého monitoru, karbon, vlny a další. Hladký je nechá jednobarevné.",
+  "Theme style": "Styl motivu"
 }

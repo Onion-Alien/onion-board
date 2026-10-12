@@ -3231,5 +3231,9 @@
   ],
   "Skip to the next sound": "다음 사운드로 건너뛰기",
   "Skip to the next sound in Up next": "다음 재생의 다음 사운드로 건너뛰기",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "재생 중인 사운드를 멈추고 다음 재생의 다음 사운드를 시작합니다. 기다리는 것이 없으면 사운드만 멈춥니다."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "재생 중인 사운드를 멈추고 다음 재생의 다음 사운드를 시작합니다. 기다리는 것이 없으면 사운드만 멈춥니다.",
+  "Plain": "단색",
+  "Textured": "텍스처",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "텍스처를 고르면 테마마다 패널에 고유한 무늬가 생겨요: 옛날 화면 줄무늬, 카본, 물결 등. 단색은 평평하게 둡니다.",
+  "Theme style": "테마 스타일"
 }

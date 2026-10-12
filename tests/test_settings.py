@@ -420,6 +420,34 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
     assert window.cfg.live_tab_green is True
 
 
+def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
+    """Textured puts the theme's pattern on the panels; Plain leaves them flat."""
+    from soundboard import theme
+    window.apply_theme("Amber Terminal")
+    d = SettingsDialog(window, "appearance")
+    assert d.texture_on.isChecked() and window.cfg.theme_texture
+    assert "/tex-" in qapp.styleSheet()
+    d.texture_off.click()
+    assert window.cfg.theme_texture is False and not theme.textures_on
+    assert "/tex-" not in qapp.styleSheet()
+    d.texture_on.click()
+    assert window.cfg.theme_texture is True
+    assert "/tex-" in qapp.styleSheet()
+    d.close()
+
+
+@pytest.mark.parametrize("kind", sorted(__import__("soundboard.theme").theme.TEXTURES))
+def test_every_texture_tile_is_see_through(qapp, kind):
+    """Each tile lies over the card's own colour, so hover shades still show."""
+    from soundboard import theme
+    for name in ("Dark", "Light"):
+        img = theme.texture_image(kind, theme.THEMES[name])
+        assert not img.isNull()
+        alphas = {img.pixelColor(x, y).alpha() for x in range(img.width())
+                  for y in range(img.height())}
+        assert min(alphas) < 255, (kind, name)
+
+
 def _ink_left(lbl) -> int | None:
     """The first column of a label's picture with text in it."""
     img = lbl.grab().toImage()

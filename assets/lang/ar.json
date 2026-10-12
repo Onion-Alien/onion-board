@@ -3601,5 +3601,9 @@
   ],
   "Skip to the next sound": "التخطي إلى الصوت التالي",
   "Skip to the next sound in Up next": "التخطي إلى الصوت التالي في «التالي»",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "يوقف الصوت الذي يعمل ويبدأ الصوت التالي في «التالي». إن لم يكن هناك ما ينتظر، يوقف الصوت فقط."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "يوقف الصوت الذي يعمل ويبدأ الصوت التالي في «التالي». إن لم يكن هناك ما ينتظر، يوقف الصوت فقط.",
+  "Plain": "سادة",
+  "Textured": "بنقشة",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "مع النقشة يحصل كل مظهر على نقشته الخاصة على اللوحات: خطوط شاشة قديمة، ألياف كربون، أمواج والمزيد. السادة يتركها مسطحة.",
+  "Theme style": "نمط المظهر"
 }

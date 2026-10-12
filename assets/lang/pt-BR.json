@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "Pular para o próximo som",
   "Skip to the next sound in Up next": "Pular para o próximo som em A seguir",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Para o som que está tocando e inicia o próximo em A seguir. Sem nenhum esperando, só para o som."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Para o som que está tocando e inicia o próximo em A seguir. Sem nenhum esperando, só para o som.",
+  "Plain": "Liso",
+  "Textured": "Com textura",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Com textura, cada tema ganha seu próprio padrão nos painéis: linhas de tela antiga, fibra de carbono, ondas e mais. Liso deixa tudo plano.",
+  "Theme style": "Estilo do tema"
 }

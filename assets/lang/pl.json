@@ -3379,5 +3379,9 @@
   ],
   "Skip to the next sound": "Przejdź do następnego dźwięku",
   "Skip to the next sound in Up next": "Przejdź do następnego dźwięku w Następne",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Zatrzymuje grający dźwięk i włącza następny z Następne. Gdy nic nie czeka, tylko zatrzymuje dźwięk."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Zatrzymuje grający dźwięk i włącza następny z Następne. Gdy nic nie czeka, tylko zatrzymuje dźwięk.",
+  "Plain": "Gładki",
+  "Textured": "Z teksturą",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Z teksturą każdy motyw ma własny wzór na panelach: linie starego monitora, włókno węglowe, fale i więcej. Gładki zostawia je płaskie.",
+  "Theme style": "Styl motywu"
 }

@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "Passa al suono successivo",
   "Skip to the next sound in Up next": "Passa al suono successivo in Prossimo",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Ferma il suono in riproduzione e avvia il successivo in Prossimo. Se non c'è nulla in attesa, ferma solo il suono."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Ferma il suono in riproduzione e avvia il successivo in Prossimo. Se non c'è nulla in attesa, ferma solo il suono.",
+  "Plain": "Semplice",
+  "Textured": "Con trama",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Con trama ogni tema ha il suo motivo sui pannelli: righe da vecchio schermo, fibra di carbonio, onde e altro. Semplice li lascia piatti.",
+  "Theme style": "Stile del tema"
 }

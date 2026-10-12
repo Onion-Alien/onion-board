@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "Passer au son suivant",
   "Skip to the next sound in Up next": "Passer au son suivant dans À suivre",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Arrête le son en cours et lance le suivant dans À suivre. S'il n'y en a aucun, arrête simplement le son."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Arrête le son en cours et lance le suivant dans À suivre. S'il n'y en a aucun, arrête simplement le son.",
+  "Plain": "Uni",
+  "Textured": "Texturé",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Texturé donne à chaque thème son propre motif sur les panneaux : lignes de vieil écran, fibre de carbone, vagues et plus. Uni les garde plats.",
+  "Theme style": "Style du thème"
 }

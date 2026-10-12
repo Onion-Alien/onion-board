@@ -3231,5 +3231,9 @@
   ],
   "Skip to the next sound": "ข้ามไปเสียงถัดไป",
   "Skip to the next sound in Up next": "ข้ามไปเสียงถัดไปใน ถัดไป",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "หยุดเสียงที่กำลังเล่นแล้วเริ่มเสียงถัดไปใน ถัดไป ถ้าไม่มีเสียงรออยู่ ก็แค่หยุดเสียง"
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "หยุดเสียงที่กำลังเล่นแล้วเริ่มเสียงถัดไปใน ถัดไป ถ้าไม่มีเสียงรออยู่ ก็แค่หยุดเสียง",
+  "Plain": "เรียบ",
+  "Textured": "มีลวดลาย",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "แบบมีลวดลายจะให้แต่ละธีมมีลายของตัวเองบนแผง: เส้นจอเก่า คาร์บอนไฟเบอร์ คลื่น และอีกมาก แบบเรียบจะคงไว้เป็นพื้นเรียบ",
+  "Theme style": "สไตล์ธีม"
 }

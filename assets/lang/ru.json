@@ -3379,5 +3379,9 @@
   ],
   "Skip to the next sound": "Перейти к следующему звуку",
   "Skip to the next sound in Up next": "Перейти к следующему звуку в «Дальше»",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Останавливает играющий звук и запускает следующий из «Дальше». Если ничего не ждёт, просто останавливает звук."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Останавливает играющий звук и запускает следующий из «Дальше». Если ничего не ждёт, просто останавливает звук.",
+  "Plain": "Простой",
+  "Textured": "С текстурой",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "С текстурой у каждой темы свой узор на панелях: строки старого экрана, карбон, волны и не только. Простой оставляет их ровными.",
+  "Theme style": "Стиль темы"
 }

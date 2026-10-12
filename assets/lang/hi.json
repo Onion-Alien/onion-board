@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "अगली साउंड पर जाएँ",
   "Skip to the next sound in Up next": "‘अगला’ में अगली साउंड पर जाएँ",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "चल रही साउंड रोककर ‘अगला’ में अगली साउंड शुरू करता है। कुछ इंतज़ार में न हो तो बस साउंड रोक देता है।"
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "चल रही साउंड रोककर ‘अगला’ में अगली साउंड शुरू करता है। कुछ इंतज़ार में न हो तो बस साउंड रोक देता है।",
+  "Plain": "सादा",
+  "Textured": "टेक्सचर वाला",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "टेक्सचर वाले में हर थीम के पैनलों पर उसका अपना पैटर्न होता है: पुरानी स्क्रीन की लाइनें, कार्बन फ़ाइबर, लहरें और बहुत कुछ। सादा उन्हें समतल रखता है।",
+  "Theme style": "थीम की शैली"
 }

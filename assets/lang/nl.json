@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "Naar het volgende geluid",
   "Skip to the next sound in Up next": "Naar het volgende geluid in Hierna",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stopt het geluid dat speelt en start het volgende in Hierna. Wacht er niets, dan stopt het alleen het geluid."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stopt het geluid dat speelt en start het volgende in Hierna. Wacht er niets, dan stopt het alleen het geluid.",
+  "Plain": "Effen",
+  "Textured": "Met patroon",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Met patroon krijgt elk thema een eigen patroon op de panelen: lijnen van een oud scherm, carbon, golven en meer. Effen houdt ze vlak.",
+  "Theme style": "Themastijl"
 }

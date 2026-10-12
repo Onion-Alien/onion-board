@@ -3305,5 +3305,9 @@
   ],
   "Skip to the next sound": "Sonraki sese geç",
   "Skip to the next sound in Up next": "Sıradaki listesindeki sonraki sese geç",
-  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Çalan sesi durdurur ve Sıradaki listesindeki sonrakini başlatır. Bekleyen yoksa yalnızca sesi durdurur."
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Çalan sesi durdurur ve Sıradaki listesindeki sonrakini başlatır. Bekleyen yoksa yalnızca sesi durdurur.",
+  "Plain": "Düz",
+  "Textured": "Desenli",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Desenli seçenekte her temanın panellerde kendi deseni olur: eski ekran çizgileri, karbon fiber, dalgalar ve daha fazlası. Düz onları sade bırakır.",
+  "Theme style": "Tema stili"
 }
