@@ -605,6 +605,7 @@ def main():
         if TRAY_ARG not in sys.argv:
             first_paint(app, w)
             w.warm_settings()
+            w.warm_triggers()
     splash.close()
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for

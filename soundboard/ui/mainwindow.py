@@ -7882,6 +7882,27 @@ class MainWindow(QMainWindow):
             dlg.hide()
             self.setUpdatesEnabled(True)
 
+    def warm_triggers(self):
+        """Like warm_settings, for the Triggers tab: Onion Watch is loaded while the
+        window is built, but its first show at full size still lays out the list and
+        builds the editor beside it (~100-300 ms). Shown once here, with drawing off and
+        the tab's signals quiet (nothing saved or counted), then the tab picked before."""
+        t = self.triggers
+        if (not isinstance(t, TriggersTab) or t.panel is None or not self.isVisible()
+                or self.settings_open() or self.tabs.currentWidget() is t):
+            return
+        before = self.tabs.currentIndex()
+        self.setUpdatesEnabled(False)
+        self.tabs.blockSignals(True)
+        try:
+            self.tabs.setCurrentWidget(t)
+            QApplication.processEvents()
+            t.grab()
+        finally:
+            self.tabs.setCurrentIndex(before)
+            self.tabs.blockSignals(False)
+            self.setUpdatesEnabled(True)
+
     def _preload_next_page(self):
         """One more of the kept Settings' pages built (~20-60 ms each), while it's closed."""
         dlg, pages = self._settings_kept, getattr(self, "_preload_pages", [])
