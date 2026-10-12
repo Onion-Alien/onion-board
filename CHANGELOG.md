@@ -4,6 +4,7 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.0.0 — 2026-10-12
 
+- Card heading icons stay level with the text when changing to a theme with its own font.
 - *Also send to*: a device's − button is a small button again, not a bar across the
   rest of the Devices card.
 - The side menu's *How it works* button moved from under the tabs down to the bottom,
