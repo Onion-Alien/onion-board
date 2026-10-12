@@ -11,7 +11,7 @@ from PySide6.QtGui import QWheelEvent
 from soundboard import library
 from soundboard.library import Config, SoundMeta, sorted_sounds
 from soundboard.speech import tts
-from soundboard.ui.widgets import SLIM_PAD_H, Pad, pad_height
+from soundboard.ui.widgets import PAD_SHRINK, SLIM_PAD_H, Pad, pad_height
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 from tests.conftest import process_events
 
@@ -132,7 +132,8 @@ def test_list_view_rows_in_columns(window):
     assert cols >= 3 and width >= 260
     w.set_pad_view("grid")
     assert not w.grid.listed
-    assert pad.height() == pad_height(pad.width())
+    # as tall as the picked size, however much the row stretches or squeezes it
+    assert pad.height() == pad_height(min(w.grid.pad_w, round(pad.width() / PAD_SHRINK)))
 
 
 def test_list_view_survives_the_mini_player(window):
