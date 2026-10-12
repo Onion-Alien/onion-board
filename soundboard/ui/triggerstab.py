@@ -179,7 +179,7 @@ class TriggersTab(QWidget):
         self.error.hide()
         text.addWidget(self.error)
         buttons = Flow(gap=8)
-        self.btn_get = QPushButton(_("Get Onion Watch"))   # words first: the icon's gap
+        self.btn_get = QPushButton()
         self.btn_get.setObjectName("primary")
         icons.set_icon(self.btn_get, "triggers", "on_accent")
         self.btn_get.clicked.connect(lambda: (usage.used("watch-prompt-get"), self.get()))
@@ -283,6 +283,7 @@ class TriggersTab(QWidget):
                            "Onion Watch")
         self.btn_get.setText(_("Get Onion Watch again") if broken and error
                              else _("Get Onion Watch"))
+        icons.text_gap(self.btn_get)   # (its icon was set before it had words)
         local = watchaddon.local_zip()
         self.btn_get.setToolTip(_("Install {file}", file=local) if local is not None else
                                 _("Download Onion Watch from GitHub and install it"))

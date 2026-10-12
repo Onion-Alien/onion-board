@@ -2143,7 +2143,7 @@ class MainWindow(QMainWindow):
         self.btn_install.clicked.connect(
             lambda: self.attach_mic() if self.cfg.route == "mic" else self.install_cable())
         self._install_icon = None   # what set_icon last put on it (only set when it changes)
-        self.btn_attach = QPushButton(_("Straight into my mic instead (no cable)"))
+        self.btn_attach = QPushButton(_("Straight into my mic instead"))   # (tip: no cable)
         self.btn_attach.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                      "Discord and games need no virtual cable and nothing picked"))
         self.btn_attach.clicked.connect(self.attach_mic)

@@ -77,6 +77,8 @@ Decisions in the right-hand column are standing: don't undo them without the own
 | U14 category names | #425 | Built-in Apps categories translated for display; config keeps the English key. |
 | U15 heading keyboard | #426 | Apps category headings take focus; Menu key / Shift+F10 opens their menu. |
 | U18 long import | #484 | The import's busy card stays up until the import is done (`ms=0`), for one file too, not 4 s. Checked on main with a 1-hour MP3, offscreen: "Adding 1 sound…" the whole 9.4 s (before: gone at 4 s), then "Added 1 sound". Test: `test_one_slow_file_keeps_its_busy_card_until_its_in`. |
+| U23-U28 Setup ways | #566, #PRNUM | One 38 px height for the Setup card's ways (the filled one's 1px rim counted) and *Who's listening* (already 38: U28 needs nothing). *Check again* is the last of the ways in their Flow, not a row of its own. The cable button's icon is white only while it's filled (#566). The main button reads *Straight into my mic instead*; "no cable" is in its tooltip. 1400 px: two rows; 1180: main button, then the rest. Test: `test_button_alignment.py`. |
+| U40, U43, U45, U52 | #PRNUM | Record is as tall as Send (Radio bar, Apps cards). An icon set before a button had words gets its gap when they come (`icons.text_gap`: both Sends, *Get Onion Watch*). Narrow Radio: Play/shuffle/Send keep their size. Apps card ✕ is 28 px. Test: `test_button_alignment.py`. |
 
 ## Features for later (not UI fixes; after 2.0)
 
@@ -115,30 +117,6 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Setup: start here
 
-- [ ] **U23 (defect): Virtual mic action heights differ.** The direct-mic primary is
-  40 px high; cable install, guide and rescan are 38 px. Side-by-side controls have
-  different top/bottom edges. Normalize the action row using the standard control
-  family. Target: `ui/mainwindow.py`, `_build_setup_page` and `_update_status`.
-- [ ] **U24 (defect): Cable-install icon disappears in Light.** The secondary cable
-  button keeps an `on_accent` icon when it loses primary styling. White icon on the
-  white card leaves a conspicuous blank slot before the text. Confirmed visually
-  and by the `look` / `_set_primary` sequence. Choose the icon role from the final
-  button state. Target: `ui/mainwindow.py`, `_update_status`.
-- [ ] **U25 (polish): Virtual mic actions wrap into a ragged staircase.** At 1400 the
-  direct-mic and cable buttons share row one, the guide occupies row two, and rescan
-  row three. At 1180 the primary occupies row one, cable + guide row two, and rescan
-  row three. Define a deliberate primary row and compact secondary row, preserving
-  sensible wrapping. Target: `_ways`, `mic_ways`, `Flow`.
-- [ ] **U26 (polish): Rescan has a separate spacing rhythm.** There is a larger gap
-  before rescan than between the other action rows. Bring its row into the same
-  action-group rhythm. Target: `_build_setup_page`, `btn_rescan`.
-- [ ] **U27 (polish, overlaps U22): Long primary label dominates the card.**
-  "Straight into my mic instead (no cable)" is 295 px wide, forcing the other
-  actions to wrap early. Shorten the visible action and retain the explanation
-  nearby or in help, with translations checked. Target: `btn_attach`.
-- [ ] **U28 (polish): Who's listening uses another control height.** Mode buttons
-  are 38 px versus the standard 36 px. Review them alongside the mic action group
-  so the two Setup cards share a control scale. Target: `ui/destpanel.py`.
 - [ ] **U29 (polish): Setup heading indents differ.** Your virtual mic has a leading
   icon and indented title; Who's listening starts directly with text; fold headers
   use a third icon/title treatment. Normalize heading icon slots and title offsets
@@ -182,18 +160,12 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Radio
 
-- [ ] **U38 (defect/debt, overlaps U16): Radio bar mixes 34, 33 and 21 px buttons.**
-  Play/Send/Last 15s are 34 px; Record is 33 px; Effects is 21 px. Vertical centers
-  are close, but edges and hit areas differ visibly. Normalize the intended bar
-  families together. Target: `ui/radiopanel.py` control bar.
+- [ ] **U38 (debt, overlaps U16): Radio's Effects pill is 21 px in a 34 px bar.** Record
+  now matches Play/Send/Last 15s (#PRNUM). Effects is the `#small` family; decide whether
+  bar controls get a bar-sized Effects. Target: `ui/radiopanel.py`, `SpeedPitchButton`.
 - [ ] **U39 (polish): Radio icon buttons are 44x34.** Shuffle/Favorite have wider
   rectangular hitboxes than neighboring transport icons. Review standard square
   bar controls and consistent icon centering. Target: radio control bar.
-- [ ] **U40 (polish): Compact Radio stretches icon actions very wide.** At 800 px,
-  Play, Shuffle and Send become roughly 176 px wide, while the shared footer below
-  has compact icon actions. Consider compact transport groups plus flexible
-  remaining space; preserve access to the controls intentionally hidden at narrow
-  sizes rather than treating that existing decision as a newly found bug.
 - [ ] **U41 (polish): Radio selector star uses a larger icon than its peers.**
   Favorites has a 22 px icon at wide width; Popular/Recent are text, with a 28 px
   selector height. Review optical centering and the icon-only compact Favorites
@@ -204,16 +176,9 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Apps
 
-- [ ] **U43 (defect/debt): Send and Record heights differ on every app card.** Send
-  measures 34 px and Record 33 px in the same row. Fix at the shared control level,
-  coordinating with U38, rather than padding individual cards.
 - [ ] **U44 (polish): App toolbar is smaller than other page toolbars.** Effects and
   Category are 21 px high; app-card actions are 33/34 px. Review whether this page
   intentionally needs dense controls; otherwise use the standard toolbar family.
-- [ ] **U45 (polish): App close action uses a 26 px square.** The top-right close
-  button is between the documented 24 and 28 px dense/normal families. Use one of
-  those families and check its center against the app heading. Existing app rows
-  otherwise align consistently between the two populated cards.
 - [ ] **U46 (verify): Expanded Clip editor needs its own pass.** Idle fold toggles
   line up; editor transport/trim/save actions were not opened in this pass.
 
@@ -240,9 +205,6 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Triggers and Settings
 
-- [ ] **U52 (polish): Triggers install CTA icon/text gap is tight.** The eye glyph
-  sits close to "Get Onion Watch" compared with Setup actions. Standardize the
-  action's icon slot/gap. The install-card bullet icons otherwise align consistently.
 - [ ] **U53 (verify): Installed Onion Watch toolbar and trigger cards.** Only the
   not-installed card was checked. The separately shipped add-on needs a matching
   pass on cut/capture/add/record/delete controls; do not infer its layout from the
@@ -255,7 +217,6 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
   pass covered Appearance at default scaling only. Check other categories, 80/150%
   interface sizes and Windows DPI scaling before applying global sizing changes.
 
-Suggested fix order: U24 (missing cable icon), U23/U25/U26 (virtual mic action
-layout), shared Send/Record and toolbar sizes (U38/U43/U47), then page-specific
+Suggested fix order for what's left: toolbar sizes (U38/U44/U47), then page-specific
 polish. Verify items remain coverage gaps, not confirmed defects. No runtime code,
 real audio/device settings or installed application changed during this audit.
