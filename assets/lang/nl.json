@@ -3309,5 +3309,7 @@
   "Plain": "Effen",
   "Textured": "Met patroon",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Met patroon krijgt elk thema een eigen patroon op de panelen: lijnen van een oud scherm, carbon, golven en meer. Effen houdt ze vlak.",
-  "Theme style": "Themastijl"
+  "Theme style": "Themastijl",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Je geluiden uit je andere soundboards overzetten: {done} van {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Je geluiden uit {name} overzetten: {done} van {total}…"
 }

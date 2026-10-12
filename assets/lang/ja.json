@@ -3235,5 +3235,7 @@
   "Plain": "無地",
   "Textured": "テクスチャあり",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "テクスチャありでは、テーマごとにパネルに模様が付きます：ブラウン管の走査線、カーボン、波など。無地はフラットのままです。",
-  "Theme style": "テーマのスタイル"
+  "Theme style": "テーマのスタイル",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "ほかのサウンドボードからサウンドを移行中: {total} 件中 {done} 件…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name} からサウンドを移行中: {total} 件中 {done} 件…"
 }

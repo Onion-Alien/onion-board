@@ -3235,5 +3235,7 @@
   "Plain": "단색",
   "Textured": "텍스처",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "텍스처를 고르면 테마마다 패널에 고유한 무늬가 생겨요: 옛날 화면 줄무늬, 카본, 물결 등. 단색은 평평하게 둡니다.",
-  "Theme style": "테마 스타일"
+  "Theme style": "테마 스타일",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "다른 사운드보드에서 사운드 가져오는 중: {total}개 중 {done}개…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name}에서 사운드 가져오는 중: {total}개 중 {done}개…"
 }

@@ -3309,5 +3309,7 @@
   "Plain": "Düz",
   "Textured": "Desenli",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Desenli seçenekte her temanın panellerde kendi deseni olur: eski ekran çizgileri, karbon fiber, dalgalar ve daha fazlası. Düz onları sade bırakır.",
-  "Theme style": "Tema stili"
+  "Theme style": "Tema stili",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Seslerin diğer ses panolarından aktarılıyor: {total} sesten {done}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Seslerin {name} içinden aktarılıyor: {total} sesten {done}…"
 }

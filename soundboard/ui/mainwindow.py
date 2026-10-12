@@ -4129,6 +4129,9 @@ class MainWindow(QMainWindow):
         wiz.exec()
         free_dialog(wiz)
         self._prepare_all()
+        # the installer's "from Soundpad" box waits for this, so its progress card
+        # isn't stuck over the guide (a no-op once it's done)
+        QTimer.singleShot(300, self.import_queued)
 
     def open_windows_mic(self):
         vm = self.virtual_mic or _("your virtual cable")
@@ -7065,6 +7068,12 @@ class MainWindow(QMainWindow):
             return
         if self._import_card_shut:
             return
+        if self._ask_keep:   # the installer's box: say where they're coming from
+            text = (_("Bringing your sounds over from {name}: {done} of {total}…",
+                      name=self._ask_keep[0], done=done, total=total)
+                    if len(self._ask_keep) == 1 else
+                    _("Bringing your sounds over from your other soundboards: {done} of "
+                      "{total}…", done=done, total=total))
         text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
                                                  "Closing this doesn't stop it."))
         t = self.toast(text, "busy", 0, key="import", progress=(done, total),

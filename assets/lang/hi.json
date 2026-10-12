@@ -3309,5 +3309,7 @@
   "Plain": "सादा",
   "Textured": "टेक्सचर वाला",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "टेक्सचर वाले में हर थीम के पैनलों पर उसका अपना पैटर्न होता है: पुरानी स्क्रीन की लाइनें, कार्बन फ़ाइबर, लहरें और बहुत कुछ। सादा उन्हें समतल रखता है।",
-  "Theme style": "थीम की शैली"
+  "Theme style": "थीम की शैली",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "तुम्हारे दूसरे साउंडबोर्ड से आवाज़ें लाई जा रही हैं: {total} में से {done}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name} से तुम्हारी आवाज़ें लाई जा रही हैं: {total} में से {done}…"
 }

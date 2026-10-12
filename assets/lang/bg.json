@@ -3309,5 +3309,7 @@
   "Plain": "Обикновен",
   "Textured": "С текстура",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "С текстура всяка тема получава свой шарка по панелите: линии като на стар екран, карбон, вълни и още. Обикновеният ги оставя гладки.",
-  "Theme style": "Стил на темата"
+  "Theme style": "Стил на темата",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Пренасяне на звуците ти от другите ти саундбордове: {done} от {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Пренасяне на звуците ти от {name}: {done} от {total}…"
 }

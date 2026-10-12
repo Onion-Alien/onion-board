@@ -3235,5 +3235,7 @@
   "Plain": "純色",
   "Textured": "紋理",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "紋理會為每個主題的面板加上專屬圖案：老式螢幕掃描線、碳纖維、波浪等。純色則保持平整。",
-  "Theme style": "主題樣式"
+  "Theme style": "主題樣式",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "正在從你的其他音效板搬入音效：第 {done}/{total} 個…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "正在從 {name} 搬入你的音效：第 {done}/{total} 個…"
 }

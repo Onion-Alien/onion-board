@@ -3605,5 +3605,7 @@
   "Plain": "سادة",
   "Textured": "بنقشة",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "مع النقشة يحصل كل مظهر على نقشته الخاصة على اللوحات: خطوط شاشة قديمة، ألياف كربون، أمواج والمزيد. السادة يتركها مسطحة.",
-  "Theme style": "نمط المظهر"
+  "Theme style": "نمط المظهر",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "جارٍ نقل أصواتك من لوحات الأصوات الأخرى: {done} من {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "جارٍ نقل أصواتك من {name}: {done} من {total}…"
 }

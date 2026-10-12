@@ -3309,5 +3309,7 @@
   "Plain": "Uni",
   "Textured": "Texturé",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Texturé donne à chaque thème son propre motif sur les panneaux : lignes de vieil écran, fibre de carbone, vagues et plus. Uni les garde plats.",
-  "Theme style": "Style du thème"
+  "Theme style": "Style du thème",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Récupération de tes sons depuis tes autres soundboards : {done} sur {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Récupération de tes sons depuis {name} : {done} sur {total}…"
 }

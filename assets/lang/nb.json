@@ -3309,5 +3309,7 @@
   "Plain": "Ensfarget",
   "Textured": "Med mønster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mønster får hvert tema sitt eget mønster på panelene: skjermlinjer, karbonfiber, bølger og mer. Ensfarget holder dem flate.",
-  "Theme style": "Temastil"
+  "Theme style": "Temastil",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Henter lydene dine fra de andre soundboardene dine: {done} av {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Henter lydene dine fra {name}: {done} av {total}…"
 }

@@ -3383,5 +3383,7 @@
   "Plain": "Simplu",
   "Textured": "Cu textură",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Cu textură, fiecare temă are propriul model pe panouri: linii de ecran vechi, fibră de carbon, valuri și altele. Simplu le lasă plate.",
-  "Theme style": "Stilul temei"
+  "Theme style": "Stilul temei",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Se aduc sunetele tale din celelalte soundboarduri: {done} din {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Se aduc sunetele tale din {name}: {done} din {total}…"
 }
