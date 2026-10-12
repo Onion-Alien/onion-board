@@ -493,7 +493,6 @@
   "Hotkey sounds": "Ήχοι συντομεύσεων",
   "Hotkey: {hotkey}": "Συντόμευση: {hotkey}",
   "Hotkeys": "Συντομεύσεις",
-  "Hotkeys && auto push-to-talk": "Συντομεύσεις && αυτόματο push-to-talk",
   "Hotkeys are on again.": "Οι συντομεύσεις είναι ξανά ανοιχτές.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Συντομεύσεις ανά κατηγορία: ένα πλήκτρο παίζει διαφορετικό ήχο σε κάθε κατηγορία. Άνοιξέ το στις Ρυθμίσεις → Συντομεύσεις.",
   "How loud the stream output is (only OBS hears it)": "Πόσο δυνατή είναι η έξοδος stream (μόνο το OBS την ακούει)",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Πληκτρολογήστε για να φιλτράρετε τους ήχους σας. Το Enter πραγματοποιεί αναζήτηση στον ιστό (YouTube, TikTok, Myinstants…). Ή επικολλήστε έναν σύνδεσμο (YouTube, SoundCloud, TikTok, οι περισσότεροι ιστότοποι πολυμέσων) για να τον δείτε και, στη συνέχεια, παίξτε ή προσθέστε τον",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Χρησιμοποιήστε ένα δωρεάν εικονικό καλώδιο: το επιλέγετε ως μικρόφωνο στο Discord και στα παιχνίδια",
   "Voice changer": "Αλλαγη φωνης",
-  "Volume & shortcuts": "Ενταση & συντομευσεις",
   "What others hear": "Αυτό που ακούνε οι άλλοι",
   "What the voice said": "Τι ειπε η φωνη",
   "Where your sounds go": "Που πανε οι ηχοι σου",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · κλειστό",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Το βήμα διαχειριστή των Windows δεν ολοκληρώθηκε. Αν το παράθυρό του είναι ακόμα ανοιχτό, απάντησέ το· μετά δοκίμασε ξανά.",
   "{title}  ·  quiet on {devices}": "{title} · σιωπηλό σε {devices}",
-  "Languages": "Γλώσσες"
+  "Languages": "Γλώσσες",
+  "Discord, games, Zoom and Teams": "Discord, παιχνίδια, Zoom και Teams",
+  "Equalizer and volume": "Ισοσταθμιστής και ένταση",
+  "Volumes as they are": "Εντάσεις όπως είναι",
+  "Volumes levelled": "Εντάσεις εξισωμένες"
 }

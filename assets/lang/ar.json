@@ -175,7 +175,6 @@
   "Hold to show, let go to hide": "اضغط مطوّلًا للإظهار، وأفلت للإخفاء",
   "Hotkey removed from “{name}”": "أُزيل الاختصار من “{name}”",
   "Hotkey: {hotkey}": "الاختصار: {hotkey}",
-  "Hotkeys && auto push-to-talk": "الاختصارات && الضغط للتحدث التلقائي",
   "Hotkeys are on again.": "الاختصارات تعمل مجددًا.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "اختصارات لكل فئة: مفتاح واحد يشغّل صوتًا مختلفًا في كل فئة. فعّلها من الإعدادات → الاختصارات.",
   "How loud your sounds are, type up to 1000% in the box": "مدى علوّ أصواتك, اكتب حتى 1000% في الخانة",
@@ -2977,7 +2976,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "اكتب لتصفية الأصوات الخاصة بك؛ أدخل عمليات البحث على الويب (YouTube وTikTok وMyinstants...). أو الصق رابطًا (YouTube، SoundCloud، TikTok، معظم مواقع الوسائط) لمشاهدته، ثم تشغيله أو إضافته",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "استخدم كبلًا افتراضيًا مجانيًا بدلاً من ذلك: يمكنك اختياره كميكروفون في Discord والألعاب",
   "Voice changer": "مغير الصوت",
-  "Volume & shortcuts": "الحجم والاختصارات",
   "What others hear": "ما يسمعه الآخرون",
   "What the voice said": "ماذا قال الصوت؟",
   "Where your sounds go": "إلى أين تذهب أصواتك",
@@ -3577,5 +3575,9 @@
   "{mic} · off": "{mic} · متوقف",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "لم تنتهِ خطوة مسؤول Windows. إذا كانت نافذتها لا تزال مفتوحة، أجب عليها؛ ثم حاول مرة أخرى.",
   "{title}  ·  quiet on {devices}": "{title} · صامت على {devices}",
-  "Languages": "اللغات"
+  "Languages": "اللغات",
+  "Discord, games, Zoom and Teams": "Discord والألعاب وZoom وTeams",
+  "Equalizer and volume": "المعادل ومستوى الصوت",
+  "Volumes as they are": "مستويات الصوت كما هي",
+  "Volumes levelled": "مستوى الصوت موحّد"
 }

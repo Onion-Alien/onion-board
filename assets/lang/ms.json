@@ -484,7 +484,6 @@
   "Hotkey sounds": "Bunyi hotkey",
   "Hotkey: {hotkey}": "Hotkey: {hotkey}",
   "Hotkeys": "Hotkey",
-  "Hotkeys && auto push-to-talk": "Hotkey && push-to-talk automatik",
   "Hotkeys are on again.": "Hotkey hidup semula.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Hotkey setiap kategori: satu kekunci memainkan bunyi berbeza dalam setiap kategori. Hidupkan di Tetapan → Hotkey.",
   "How loud the stream output is (only OBS hears it)": "Sekuat mana output strim (hanya OBS yang dengar)",
@@ -2682,7 +2681,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Taip untuk menapis bunyi anda; Masukkan carian di web (YouTube, TikTok, Myinstants…). Atau tampal pautan (YouTube, SoundCloud, TikTok, kebanyakan tapak media) untuk melihatnya, kemudian mainkan atau tambahkannya",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Sebaliknya, gunakan kabel maya percuma: anda memilihnya sebagai mikrofon dalam Discord dan permainan",
   "Voice changer": "Penukar suara",
-  "Volume & shortcuts": "Kelantangan & pintasan",
   "What others hear": "Apa yang orang lain dengar",
   "What the voice said": "Apa kata suara",
   "Where your sounds go": "Ke mana bunyi anda pergi",
@@ -3212,5 +3210,9 @@
   "{mic} · off": "{mic} · dimatikan",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Langkah pentadbir Windows tidak selesai. Jika gesaannya masih terbuka, jawab dahulu; kemudian cuba lagi.",
   "{title}  ·  quiet on {devices}": "{title} · senyap pada {devices}",
-  "Languages": "Bahasa"
+  "Languages": "Bahasa",
+  "Discord, games, Zoom and Teams": "Discord, permainan, Zoom dan Teams",
+  "Equalizer and volume": "Penyama dan kelantangan",
+  "Volumes as they are": "Kelantangan seperti asal",
+  "Volumes levelled": "Kelantangan diratakan"
 }

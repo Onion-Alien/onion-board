@@ -493,7 +493,6 @@
   "Hotkey sounds": "Sonidos de atajos",
   "Hotkey: {hotkey}": "Atajo: {hotkey}",
   "Hotkeys": "Atajos",
-  "Hotkeys && auto push-to-talk": "Atajos && presionar para hablar automático",
   "Hotkeys are on again.": "Los atajos vuelven a estar activados.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Atajos por categoría: una tecla reproduce un sonido distinto en cada categoría. Actívalo en Configuración → Atajos.",
   "How loud the stream output is (only OBS hears it)": "Qué tan fuerte es la salida para stream (solo OBS la oye)",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Escribe para filtrar tus sonidos; Introduce búsquedas en la web (YouTube, TikTok, Myinstants…). O pegue un enlace (YouTube, SoundCloud, TikTok, la mayoría de los sitios de medios) para verlo y luego reprodúzcalo o agréguelo.",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Utilice un cable virtual gratuito: lo elige como micrófono en Discord y juegos",
   "Voice changer": "Cambiador de voz",
-  "Volume & shortcuts": "Volumen y atajos",
   "What others hear": "lo que otros escuchan",
   "What the voice said": "Lo que dijo la voz",
   "Where your sounds go": "A dónde van tus sonidos",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · apagado",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "El paso de administrador de Windows no terminó. Si su aviso sigue abierto, respóndelo; luego intenta de nuevo.",
   "{title}  ·  quiet on {devices}": "{title} · en silencio en {devices}",
-  "Languages": "Idiomas"
+  "Languages": "Idiomas",
+  "Discord, games, Zoom and Teams": "Discord, juegos, Zoom y Teams",
+  "Equalizer and volume": "Ecualizador y volumen",
+  "Volumes as they are": "Volúmenes sin cambios",
+  "Volumes levelled": "Volúmenes igualados"
 }

@@ -148,7 +148,6 @@
   "Hold to show, let go to hide": "Держи — показывается, отпусти — скрывается",
   "Hotkey removed from “{name}”": "Горячая клавиша убрана у «{name}»",
   "Hotkey: {hotkey}": "Горячая клавиша: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Горячие клавиши && авто push-to-talk",
   "Hotkeys are on again.": "Горячие клавиши снова включены.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Горячие клавиши по категориям: одна клавиша играет разный звук в каждой категории. Включи в Настройки → Горячие клавиши.",
   "How loud your voice is for others. The dot shows activity when you talk": "Насколько громко твой голос звучит для других. Точка показывает активность, когда ты говоришь",
@@ -2695,7 +2694,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Введите текст, чтобы отфильтровать звуки; Введите поиск в Интернете (YouTube, TikTok, Myinstants…). Или вставьте ссылку (YouTube, SoundCloud, TikTok, большинство медиа-сайтов), чтобы увидеть ее, а затем воспроизведите или добавьте ее.",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Вместо этого используйте бесплатный виртуальный кабель: вы выбираете его в качестве микрофона в Discord и играх.",
   "Voice changer": "Смена голоса",
-  "Volume & shortcuts": "Громкость и клавиши",
   "What others hear": "Что слышат другие",
   "What the voice said": "Что сказал голос",
   "Where your sounds go": "Куда идут твои звуки",
@@ -3358,5 +3356,9 @@
   "{mic} · off": "{mic} · выключен",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Шаг администратора Windows не завершился. Если его запрос ещё открыт, ответьте на него; затем попробуйте снова.",
   "{title}  ·  quiet on {devices}": "{title} · тихо на {devices}",
-  "Languages": "Языки"
+  "Languages": "Языки",
+  "Discord, games, Zoom and Teams": "Discord, игры, Zoom и Teams",
+  "Equalizer and volume": "Эквалайзер и громкость",
+  "Volumes as they are": "Громкость как есть",
+  "Volumes levelled": "Громкость выровнена"
 }

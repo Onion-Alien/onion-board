@@ -502,7 +502,6 @@
   "Hotkey sounds": "Sunete pentru tastele rapide",
   "Hotkey: {hotkey}": "Tastă rapidă: {hotkey}",
   "Hotkeys": "Taste rapide",
-  "Hotkeys && auto push-to-talk": "Taste rapide && apasă-pentru-a-vorbi automat",
   "Hotkeys are on again.": "Tastele rapide sunt din nou pornite.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Taste rapide pe categorie: o tastă redă alt sunet în fiecare categorie. Pornește asta în Setări → Taste rapide.",
   "How loud the stream output is (only OBS hears it)": "Cât de tare e ieșirea pentru stream (doar OBS o aude)",
@@ -2800,7 +2799,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Tastați pentru a vă filtra sunetele; Introduceți căutări pe web (YouTube, TikTok, Myinstants...). Sau inserați un link (YouTube, SoundCloud, TikTok, majoritatea site-urilor media) pentru a-l vedea, apoi redați-l sau adăugați-l",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "În schimb, folosiți un cablu virtual gratuit: îl alegeți ca microfon în Discord și jocuri",
   "Voice changer": "Schimbator de voce",
-  "Volume & shortcuts": "Volum și scurtături",
   "What others hear": "Ce aud alții",
   "What the voice said": "Ce a spus vocea",
   "Where your sounds go": "Unde merg sunetele tale",
@@ -3358,5 +3356,9 @@
   "{mic} · off": "{mic} · oprit",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Pasul de administrator din Windows nu s-a terminat. Dacă fereastra lui e încă deschisă, răspunde-i; apoi încearcă din nou.",
   "{title}  ·  quiet on {devices}": "{title} · liniște pe {devices}",
-  "Languages": "Limbi"
+  "Languages": "Limbi",
+  "Discord, games, Zoom and Teams": "Discord, jocuri, Zoom și Teams",
+  "Equalizer and volume": "Egalizator și volum",
+  "Volumes as they are": "Volumele așa cum sunt",
+  "Volumes levelled": "Volume egalizate"
 }

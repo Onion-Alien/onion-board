@@ -163,7 +163,6 @@
   "Hold to show, let go to hide": "Przytrzymaj, by pokazać, puść, by ukryć",
   "Hotkey removed from “{name}”": "Usunięto skrót z „{name}”",
   "Hotkey: {hotkey}": "Skrót: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Skróty && automatyczne push-to-talk",
   "Hotkeys are on again.": "Skróty znów są włączone.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Skróty na kategorię: jeden klawisz gra inny dźwięk w każdej kategorii. Włącz to w Ustawienia → Skróty.",
   "How loud your sounds are, type up to 1000% in the box": "Jak głośne są twoje dźwięki, w polu wpisz do 1000%",
@@ -2800,7 +2799,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Wpisz, aby filtrować dźwięki; Enter przeszukuje internet (YouTube, TikTok, Myinstants…). Możesz też wkleić link (YouTube, SoundCloud, TikTok, większość witryn multimedialnych), aby go zobaczyć, a następnie odtworzyć lub dodać",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Zamiast tego użyj darmowego wirtualnego kabla: wybierasz go jako mikrofon w Discord i grach",
   "Voice changer": "Zmieniacz głosu",
-  "Volume & shortcuts": "Głośność i skróty",
   "What others hear": "Co słyszą inni",
   "What the voice said": "Co powiedział głos",
   "Where your sounds go": "Dokąd idą Twoje dźwięki",
@@ -3358,5 +3356,9 @@
   "{mic} · off": "{mic} · wyłączony",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Krok administratora Windows nie zakończył się. Jeśli jego okno nadal jest otwarte, odpowiedz na nie; potem spróbuj ponownie.",
   "{title}  ·  quiet on {devices}": "{title} · cisza na {devices}",
-  "Languages": "Języki"
+  "Languages": "Języki",
+  "Discord, games, Zoom and Teams": "Discord, gry, Zoom i Teams",
+  "Equalizer and volume": "Korektor i głośność",
+  "Volumes as they are": "Głośność bez zmian",
+  "Volumes levelled": "Głośność wyrównana"
 }

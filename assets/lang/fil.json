@@ -493,7 +493,6 @@
   "Hotkey sounds": "Mga tunog ng hotkey",
   "Hotkey: {hotkey}": "Hotkey: {hotkey}",
   "Hotkeys": "Mga hotkey",
-  "Hotkeys && auto push-to-talk": "Mga hotkey && auto push-to-talk",
   "Hotkeys are on again.": "Naka-on ulit ang mga hotkey.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Hotkey bawat kategorya: isang key ang nagpe-play ng ibang sound sa bawat kategorya. I-on ito sa Settings → Mga hotkey.",
   "How loud the stream output is (only OBS hears it)": "Gaano kalakas ang stream output (OBS lang ang nakakarinig)",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Mag-type upang i-filter ang iyong mga tunog; Ipasok ang mga paghahanap sa web (YouTube, TikTok, Myinstants…). O mag-paste ng link (YouTube, SoundCloud, TikTok, karamihan sa mga site ng media) para makita ito, pagkatapos ay i-play o idagdag ito",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Gumamit na lang ng libreng virtual cable: pipiliin mo ito bilang mikropono sa Discord at mga laro",
   "Voice changer": "Voice changer",
-  "Volume & shortcuts": "Volume & shortcuts",
   "What others hear": "Ang naririnig ng iba",
   "What the voice said": "Ang sabi ng boses",
   "Where your sounds go": "Kung saan pupunta ang mga sound mo",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · naka-off",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Hindi natapos ang admin step ng Windows. Kung bukas pa ang prompt nito, sagutin ito; pagkatapos subukan ulit.",
   "{title}  ·  quiet on {devices}": "{title} · tahimik sa {devices}",
-  "Languages": "Mga Wika"
+  "Languages": "Mga Wika",
+  "Discord, games, Zoom and Teams": "Discord, mga laro, Zoom at Teams",
+  "Equalizer and volume": "Equalizer at volume",
+  "Volumes as they are": "Volume gaya ng dati",
+  "Volumes levelled": "Pantay ang volume"
 }

@@ -155,7 +155,6 @@
   "Hold to show, let go to hide": "押すと表示、離すと非表示",
   "Hotkey removed from “{name}”": "「{name}」のホットキーを解除しました",
   "Hotkey: {hotkey}": "ホットキー: {hotkey}",
-  "Hotkeys && auto push-to-talk": "ホットキーと自動プッシュトゥトーク",
   "Hotkeys are on again.": "ホットキーがオンに戻りました。",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "カテゴリごとのホットキー: 1つのキーでカテゴリごとに別のサウンドを再生できます。設定 → ホットキー でオンにしてください。",
   "How loud your sounds are, type up to 1000% in the box": "サウンドの音量、欄には最大 1000% まで入力できます",
@@ -2682,7 +2681,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "サウンドをフィルタリングするには、次のように入力します。 Enter はウェブ (YouTube、TikTok、Myinstant…) を検索します。または、リンク (YouTube、SoundCloud、TikTok、ほとんどのメディア サイト) を貼り付けて表示し、再生または追加します",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "代わりに無料の仮想ケーブルを使用します。Discord やゲームのマイクとしてそれを選択します。",
   "Voice changer": "ボイスチェンジャー",
-  "Volume & shortcuts": "ボリュームとショートカット",
   "What others hear": "他の人が聞いたこと",
   "What the voice said": "声が言ったこと",
   "Where your sounds go": "サウンドの行き先",
@@ -3212,5 +3210,9 @@
   "{mic} · off": "{mic} · オフ",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows の管理者ステップが終了しませんでした。プロンプトがまだ開いていれば応答し、そのあともう一度お試しください。",
   "{title}  ·  quiet on {devices}": "{title} · {devices}で無音",
-  "Languages": "言語"
+  "Languages": "言語",
+  "Discord, games, Zoom and Teams": "Discord、ゲーム、Zoom、Teams",
+  "Equalizer and volume": "イコライザーと音量",
+  "Volumes as they are": "音量はそのまま",
+  "Volumes levelled": "音量をそろえ済み"
 }

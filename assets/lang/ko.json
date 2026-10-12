@@ -155,7 +155,6 @@
   "Hold to show, let go to hide": "누르면 표시, 떼면 숨김",
   "Hotkey removed from “{name}”": "“{name}”의 단축키를 지웠어요",
   "Hotkey: {hotkey}": "단축키: {hotkey}",
-  "Hotkeys && auto push-to-talk": "단축키 && 자동 푸시 투 토크",
   "Hotkeys are on again.": "단축키가 다시 켜졌어요.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "카테고리별 단축키: 키 하나가 카테고리마다 다른 사운드를 재생해요. 설정 → 단축키에서 켜세요.",
   "How loud your sounds are, type up to 1000% in the box": "사운드 볼륨, 상자에 최대 1000%까지 입력할 수 있어요",
@@ -2682,7 +2681,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "소리를 필터링하려면 입력하세요. Enter는 웹(YouTube, TikTok, Myinstants…)을 검색합니다. 또는 링크(YouTube, SoundCloud, TikTok, 대부분의 미디어 사이트)를 붙여넣어 확인한 다음 재생하거나 추가하세요.",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "대신 무료 가상 케이블을 사용하세요. Discord 및 게임에서 마이크로 선택하세요.",
   "Voice changer": "보이스 체인저",
-  "Volume & shortcuts": "볼륨 및 단축키",
   "What others hear": "다른 사람들이 듣는 것",
   "What the voice said": "음성이 말한 내용",
   "Where your sounds go": "사운드가 가는 곳",
@@ -3212,5 +3210,9 @@
   "{mic} · off": "{mic} · 꺼짐",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 관리자 단계가 끝나지 않았습니다. 프롬프트가 아직 열려 있으면 응답한 뒤 다시 시도하세요.",
   "{title}  ·  quiet on {devices}": "{title} · {devices} 에서 조용함",
-  "Languages": "언어"
+  "Languages": "언어",
+  "Discord, games, Zoom and Teams": "Discord, 게임, Zoom, Teams",
+  "Equalizer and volume": "평형 장치와 볼륨",
+  "Volumes as they are": "볼륨 그대로",
+  "Volumes levelled": "볼륨 맞춤"
 }

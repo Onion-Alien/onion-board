@@ -493,7 +493,6 @@
   "Hotkey sounds": "Pikanäppäinäänet",
   "Hotkey: {hotkey}": "Pikanäppäin: {hotkey}",
   "Hotkeys": "Pikanäppäimet",
-  "Hotkeys && auto push-to-talk": "Pikanäppäimet && automaattinen push-to-talk",
   "Hotkeys are on again.": "Pikanäppäimet ovat taas päällä.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Pikanäppäimet kategorioittain: yksi näppäin soittaa eri äänen jokaisessa kategoriassa. Laita se päälle kohdassa Asetukset → Pikanäppäimet.",
   "How loud the stream output is (only OBS hears it)": "Kuinka kovaa stream-ulostulo on (vain OBS kuulee sen)",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Suodata äänet kirjoittamalla; Syötä haut verkosta (YouTube, TikTok, Myinstants…). Tai liitä linkki (YouTube, SoundCloud, TikTok, useimmat mediasivustot) nähdäksesi sen ja toista tai lisää se sitten",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Käytä sen sijaan ilmaista virtuaalikaapelia: valitse se mikrofoniksi Discordissa ja peleissä",
   "Voice changer": "Äänenmuuttaja",
-  "Volume & shortcuts": "Äänenvoimakkuus & pikanäppäimet",
   "What others hear": "Mitä muut kuulevat",
   "What the voice said": "Mitä ääni sanoi",
   "Where your sounds go": "Minne äänesi menevät",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · pois päältä",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windowsin järjestelmänvalvojavaihe ei valmistunut. Jos sen kehote on vielä auki, vastaa siihen; yritä sitten uudelleen.",
   "{title}  ·  quiet on {devices}": "{title} · hiljaa laitteella {devices}",
-  "Languages": "Kielet"
+  "Languages": "Kielet",
+  "Discord, games, Zoom and Teams": "Discord, pelit, Zoom ja Teams",
+  "Equalizer and volume": "Taajuuskorjain ja äänenvoimakkuus",
+  "Volumes as they are": "Äänenvoimakkuudet ennallaan",
+  "Volumes levelled": "Äänenvoimakkuudet tasattu"
 }

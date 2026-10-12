@@ -493,7 +493,6 @@
   "Hotkey sounds": "Sons de atalho",
   "Hotkey: {hotkey}": "Atalho: {hotkey}",
   "Hotkeys": "Atalhos",
-  "Hotkeys && auto push-to-talk": "Atalhos && premir para falar automático",
   "Hotkeys are on again.": "Os atalhos estão ligados outra vez.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Atalhos por categoria: uma tecla toca um som diferente em cada categoria. Liga isto em Definições → Atalhos.",
   "How loud the stream output is (only OBS hears it)": "O volume da saída de stream (só o OBS a ouve)",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Digite para filtrar os seus sons; Digite pesquisas na web (YouTube, TikTok, Myinstants…). Ou cole um link (YouTube, SoundCloud, TikTok, a maioria dos sites de media) para o ver e reproduza-o ou adicione-o",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Em vez disso, utilize um cabo virtual gratuito: escolhe-o como microfone no Discord e nos jogos",
   "Voice changer": "Mudador de voz",
-  "Volume & shortcuts": "Volume e atalhos",
   "What others hear": "O que os outros ouvem",
   "What the voice said": "O que a voz disse",
   "Where your sounds go": "Para onde vão os teus sons",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · desligado",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "O passo de administrador do Windows não terminou. Se o pedido ainda estiver aberto, responde-lhe; depois tenta de novo.",
   "{title}  ·  quiet on {devices}": "{title} · em silêncio em {devices}",
-  "Languages": "Idiomas"
+  "Languages": "Idiomas",
+  "Discord, games, Zoom and Teams": "Discord, jogos, Zoom e Teams",
+  "Equalizer and volume": "Equalizador e volume",
+  "Volumes as they are": "Volumes como estão",
+  "Volumes levelled": "Volumes nivelados"
 }

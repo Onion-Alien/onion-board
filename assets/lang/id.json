@@ -155,7 +155,6 @@
   "Hold to show, let go to hide": "Tahan untuk tampil, lepas untuk sembunyi",
   "Hotkey removed from “{name}”": "Hotkey dihapus dari “{name}”",
   "Hotkey: {hotkey}": "Hotkey: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Hotkey && push-to-talk otomatis",
   "Hotkeys are on again.": "Hotkey nyala lagi.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Hotkey per kategori: satu tombol memutar suara yang berbeda di tiap kategori. Nyalakan di Pengaturan → Hotkey.",
   "How loud your sounds are, type up to 1000% in the box": "Seberapa keras suaramu, ketik sampai 1000% di kotaknya",
@@ -2682,7 +2681,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Ketik untuk memfilter suara Anda; Masuk ke pencarian web (YouTube, TikTok, Myinstants…). Atau tempel tautan (YouTube, SoundCloud, TikTok, sebagian besar situs media) untuk melihatnya, lalu putar atau tambahkan",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Gunakan kabel virtual gratis sebagai gantinya: Anda memilihnya sebagai mikrofon di Discord dan game",
   "Voice changer": "Pengubah suara",
-  "Volume & shortcuts": "Volume & pintasan",
   "What others hear": "Apa yang orang lain dengar",
   "What the voice said": "Apa yang dikatakan suara",
   "Where your sounds go": "Ke mana suaramu dikirim",
@@ -3212,5 +3210,9 @@
   "{mic} · off": "{mic} · mati",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Langkah admin Windows tidak selesai. Jika permintaannya masih terbuka, jawab dulu; lalu coba lagi.",
   "{title}  ·  quiet on {devices}": "{title} · senyap di {devices}",
-  "Languages": "Bahasa"
+  "Languages": "Bahasa",
+  "Discord, games, Zoom and Teams": "Discord, game, Zoom, dan Teams",
+  "Equalizer and volume": "Equaliser dan volume",
+  "Volumes as they are": "Volume apa adanya",
+  "Volumes levelled": "Volume disamakan"
 }

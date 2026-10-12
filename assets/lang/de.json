@@ -159,7 +159,6 @@
   "Hold to show, let go to hide": "Halten zum Zeigen, loslassen zum Ausblenden",
   "Hotkey removed from “{name}”": "Hotkey von „{name}“ entfernt",
   "Hotkey: {hotkey}": "Hotkey: {hotkey}",
-  "Hotkeys && auto push-to-talk": "Hotkeys && Auto-Push-to-Talk",
   "Hotkeys are on again.": "Hotkeys sind wieder an.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Hotkeys pro Kategorie: Eine Taste spielt in jeder Kategorie einen anderen Sound. Schalte es unter Einstellungen → Hotkeys ein.",
   "How loud your sounds are, type up to 1000% in the box": "Wie laut deine Sounds sind, tipp bis zu 1000% ins Feld",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Geben Sie ein, um Ihre Sounds zu filtern. Enter durchsucht das Web (YouTube, TikTok, Myinstants…). Oder fügen Sie einen Link ein (YouTube, SoundCloud, TikTok, die meisten Medienseiten), um ihn anzuzeigen, und spielen Sie ihn dann ab oder fügen Sie ihn hinzu",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Verwenden Sie stattdessen ein kostenloses virtuelles Kabel: Sie wählen es als Mikrofon in Discord und Spielen",
   "Voice changer": "Stimmverzerrer",
-  "Volume & shortcuts": "Lautstärke & Kürzel",
   "What others hear": "Was andere hören",
   "What the voice said": "Was die Stimme sagte",
   "Where your sounds go": "Wohin deine Sounds gehen",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · aus",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Der Windows-Administratorschritt wurde nicht beendet. Wenn seine Aufforderung noch offen ist, beantworte sie; dann versuch es noch einmal.",
   "{title}  ·  quiet on {devices}": "{title} · still auf {devices}",
-  "Languages": "Sprachen"
+  "Languages": "Sprachen",
+  "Discord, games, Zoom and Teams": "Discord, Spiele, Zoom und Teams",
+  "Equalizer and volume": "Equalizer und Lautstärke",
+  "Volumes as they are": "Lautstärken wie sie sind",
+  "Volumes levelled": "Lautstärken angeglichen"
 }

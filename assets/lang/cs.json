@@ -502,7 +502,6 @@
   "Hotkey sounds": "Zvuky zkratek",
   "Hotkey: {hotkey}": "Zkratka: {hotkey}",
   "Hotkeys": "Zkratky",
-  "Hotkeys && auto push-to-talk": "Zkratky && automatické push-to-talk",
   "Hotkeys are on again.": "Zkratky jsou zase zapnuté.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Zkratky podle kategorie: jedna klávesa přehraje v každé kategorii jiný zvuk. Zapneš to v Nastavení → Zkratky.",
   "How loud the stream output is (only OBS hears it)": "Jak hlasitý je výstup pro stream (slyší ho jen OBS)",
@@ -2800,7 +2799,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Zadejte pro filtrování zvuků; Enter vyhledává na webu (YouTube, TikTok, Myinstants…). Nebo vložte odkaz (YouTube, SoundCloud, TikTok, většina mediálních webů), abyste jej viděli, a poté jej přehrajte nebo přidejte",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Místo toho použijte bezplatný virtuální kabel: vyberete si jej jako mikrofon v Discordu a hrách",
   "Voice changer": "Měnič hlasu",
-  "Volume & shortcuts": "Hlasitost a zkratky",
   "What others hear": "Co ostatní slyší",
   "What the voice said": "Co říkal hlas",
   "Where your sounds go": "Kam jdou tvoje zvuky",
@@ -3358,5 +3356,9 @@
   "{mic} · off": "{mic} · vypnutý",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Krok správce Windows se nedokončil. Pokud je jeho výzva stále otevřená, odpovězte na ni; pak to zkuste znovu.",
   "{title}  ·  quiet on {devices}": "{title} · ticho na {devices}",
-  "Languages": "Jazyky"
+  "Languages": "Jazyky",
+  "Discord, games, Zoom and Teams": "Discord, hry, Zoom a Teams",
+  "Equalizer and volume": "Ekvalizér a hlasitost",
+  "Volumes as they are": "Hlasitost beze změn",
+  "Volumes levelled": "Hlasitost vyrovnaná"
 }

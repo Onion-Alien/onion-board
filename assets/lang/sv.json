@@ -493,7 +493,6 @@
   "Hotkey sounds": "Snabbtangentljud",
   "Hotkey: {hotkey}": "Snabbtangent: {hotkey}",
   "Hotkeys": "Snabbtangenter",
-  "Hotkeys && auto push-to-talk": "Snabbtangenter && automatisk push-to-talk",
   "Hotkeys are on again.": "Snabbtangenterna är på igen.",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "Snabbtangenter per kategori: en tangent spelar olika ljud i varje kategori. Slå på det under Inställningar → Snabbtangenter.",
   "How loud the stream output is (only OBS hears it)": "Hur högt streamutgången låter (bara OBS hör den)",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "Skriv för att filtrera dina ljud; Enter söker på webben (YouTube, TikTok, Myinstants...). Eller klistra in en länk (YouTube, SoundCloud, TikTok, de flesta mediesajter) för att se den och sedan spela upp eller lägg till den",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "Använd en gratis virtuell kabel istället: du väljer den som mikrofon i Discord och spel",
   "Voice changer": "Röstvändare",
-  "Volume & shortcuts": "Volym & genvägar",
   "What others hear": "Vad andra hör",
   "What the voice said": "Vad rösten sa",
   "Where your sounds go": "Vart dina ljud går",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · av",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows administratörssteg blev inte klart. Om dess fråga fortfarande är öppen, svara på den; försök sedan igen.",
   "{title}  ·  quiet on {devices}": "{title} · tyst på {devices}",
-  "Languages": "Språk"
+  "Languages": "Språk",
+  "Discord, games, Zoom and Teams": "Discord, spel, Zoom och Teams",
+  "Equalizer and volume": "Equalizer och volym",
+  "Volumes as they are": "Volymer som de är",
+  "Volumes levelled": "Volymer utjämnade"
 }

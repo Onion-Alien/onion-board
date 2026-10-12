@@ -11,7 +11,8 @@ import math
 from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QSlider, QSpinBox, QVBoxLayout, QWidget)
+                               QLayout, QPushButton, QSizePolicy, QSlider, QSpinBox, QVBoxLayout,
+                               QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -318,6 +319,83 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False,
     return f, v
 
 
+class _FoldHead(QPushButton):
+    """FoldCard's header line: a button sized by the row inside it, not by its text."""
+
+    def sizeHint(self):
+        lay = self.layout()
+        return lay.sizeHint() if lay is not None else super().sizeHint()
+
+    def minimumSizeHint(self):
+        lay = self.layout()
+        return lay.minimumSize() if lay is not None else super().minimumSizeHint()
+
+
+class FoldCard(QFrame):
+    """A card that shuts to one line: its icon, title, a short summary of what's in it
+    and a chevron. Click the line to open it. `body` is the layout its contents go
+    in (the Setup tab's rarely-touched parts: devices, chat help, sound)."""
+    toggled = Signal(bool)
+
+    def __init__(self, icon: str, title: str):
+        super().__init__()
+        self.setObjectName("card")
+        self.setProperty("roomy", True)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(6, 6, 6, 6)
+        v.setSpacing(0)
+        self.head = _FoldHead()
+        self.head.setObjectName("foldhead")
+        # (a button's width floor is its size hint: the summary's whole text)
+        self.head.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.head.setCheckable(True)
+        self.head.setAccessibleName(title)
+        self.head.setFocusPolicy(Qt.FocusPolicy.TabFocus)   # (a click mustn't ring it)
+        h = QHBoxLayout(self.head)
+        h.setContentsMargins(12, 8, 10, 8)
+        h.setSpacing(10)
+        h.addWidget(icon_label(icon, color="text"))
+        self.title = QLabel(title)
+        self.title.setObjectName("section")
+        self.title.setProperty("head", True)
+        h.addWidget(self.title)
+        from soundboard.ui.appspanel import ElidedLabel
+        self._summary = ""
+        self.summary = ElidedLabel()
+        self.summary.setObjectName("hint")
+        self.summary.setMinimumWidth(20)
+        self.summary.setAlignment(Qt.AlignmentFlag.AlignRight)
+        h.addWidget(self.summary, 1)
+        self.chevron = icon_label("fold_open", color="muted")
+        h.addWidget(self.chevron)
+        v.addWidget(self.head)
+        self.inner = QWidget()
+        self.body = QVBoxLayout(self.inner)
+        self.body.setContentsMargins(12, 6, 12, 12)
+        self.body.setSpacing(12)
+        self.inner.hide()
+        v.addWidget(self.inner)
+        self.head.toggled.connect(self._toggled)
+
+    def _toggled(self, on: bool):
+        self.inner.setVisible(on)
+        # open, the card itself shows it (blank, not hidden: it keeps the row's spacing)
+        self.summary.setText("" if on else self._summary)
+        icons.set_label_icon(self.chevron, "fold_up" if on else "fold_open", "muted")
+        self.toggled.emit(on)
+
+    def is_open(self) -> bool:
+        return self.head.isChecked()
+
+    def set_open(self, on: bool):
+        self.head.setChecked(on)
+
+    def set_summary(self, text: str):
+        self._summary = text
+        self.summary.setText("" if self.is_open() else text)
+        self.summary.update()
+
+
 def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     """A small painted icon used as a label in the bars."""
     lbl = QLabel()
@@ -500,7 +578,8 @@ class EqPanel(QWidget):
         pv = QVBoxLayout(self)
         pv.setContentsMargins(0, 0, 0, 0)
         pv.setSpacing(8)
-        pv.addWidget(section_label(_("Equalizer")))
+        if not fold:   # (Setup's: the card it's in has the title)
+            pv.addWidget(section_label(_("Equalizer")))
         row = QHBoxLayout()
         self.chk_on = QCheckBox(_("EQ on"))
         self.chk_on.setChecked(enabled)

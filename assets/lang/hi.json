@@ -159,7 +159,6 @@
   "Hold to show, let go to hide": "दिखाने के लिए दबाए रखें, छुपाने के लिए छोड़ दें",
   "Hotkey removed from “{name}”": "“{name}” से हॉटकी हटाई गई",
   "Hotkey: {hotkey}": "हॉटकी: {hotkey}",
-  "Hotkeys && auto push-to-talk": "हॉटकी && ऑटो पुश-टू-टॉक",
   "Hotkeys are on again.": "हॉटकी फिर से चालू हैं।",
   "Hotkeys per category: one key plays a different sound in each category. Switch it on in Settings → Hotkeys.": "हर कैटेगरी की हॉटकी: एक ही की हर कैटेगरी में अलग साउंड चलाती है। इसे सेटिंग्स → हॉटकी में चालू करें।",
   "How loud your sounds are, type up to 1000% in the box": "आपके साउंड कितने तेज़ हैं, बॉक्स में 1000% तक टाइप करें",
@@ -2741,7 +2740,6 @@
   "Type to filter your sounds; Enter searches the web (YouTube, TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, TikTok, most media sites) to see it, then play or add it": "अपनी आवाज़ फ़िल्टर करने के लिए टाइप करें; वेब पर खोजें दर्ज करें (यूट्यूब, टिकटॉक, मायइंस्टेंट्स…)। या इसे देखने के लिए एक लिंक पेस्ट करें (यूट्यूब, साउंडक्लाउड, टिकटॉक, अधिकांश मीडिया साइटें), फिर इसे चलाएं या जोड़ें",
   "Use a free virtual cable instead: you pick it as the mic in Discord and games": "इसके बजाय एक निःशुल्क वर्चुअल केबल का उपयोग करें: आप इसे डिस्कॉर्ड और गेम्स में माइक के रूप में चुनें",
   "Voice changer": "आवाज परिवर्तक",
-  "Volume & shortcuts": "वॉल्यूम और शॉर्टकट",
   "What others hear": "दूसरे क्या सुनते हैं",
   "What the voice said": "आवाज ने क्या कहा",
   "Where your sounds go": "आपके साउंड कहाँ जाते हैं",
@@ -3285,5 +3283,9 @@
   "{mic} · off": "{mic} · बंद",
   "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows का एडमिन चरण पूरा नहीं हुआ। अगर उसका प्रॉम्प्ट अभी भी खुला है, तो उसका जवाब दें; फिर दोबारा कोशिश करें।",
   "{title}  ·  quiet on {devices}": "{title} · {devices} पर शांत",
-  "Languages": "भाषाएँ"
+  "Languages": "भाषाएँ",
+  "Discord, games, Zoom and Teams": "Discord, गेम, Zoom और Teams",
+  "Equalizer and volume": "तुल्यकारक और वॉल्यूम",
+  "Volumes as they are": "वॉल्यूम जैसे हैं वैसे",
+  "Volumes levelled": "वॉल्यूम बराबर"
 }
