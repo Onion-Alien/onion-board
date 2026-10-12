@@ -1,0 +1,1 @@
+- The Triggers tab opens instantly: Onion Watch now loads behind the loading screen when the app starts, not the first time you click the tab.

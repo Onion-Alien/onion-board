@@ -192,7 +192,8 @@ def test_a_deferred_tab_loads_the_add_on_only_when_asked(qapp, tmp_path, pkg, mo
     tab.shutdown()
 
 
-def test_the_window_loads_onion_watch_after_it_is_built(qapp, app_dir, monkeypatch):
+def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypatch):
+    """Behind the loading screen, so the tab's first click is instant."""
     from PySide6.QtCore import QEvent
     from soundboard import engine, winkeys
     from soundboard.library import Config
@@ -206,8 +207,7 @@ def test_the_window_loads_onion_watch_after_it_is_built(qapp, app_dir, monkeypat
     Config().save()
     w = main.MainWindow()
     try:
-        assert not loads and w.triggers.pending          # not while the window is built
-        assert process_events(qapp, lambda: bool(loads), timeout=5)
+        assert loads == [w.triggers] and not w.triggers.pending
         w.load_triggers()
         assert loads == [w.triggers]                     # once
     finally:
@@ -240,34 +240,22 @@ def close_window(qapp, w):
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
-def test_not_watching_the_window_leaves_onion_watch_until_the_tab_is_shown(
-        qapp, app_dir, monkeypatch, pkg):
-    """Watching off: loading the add-on (~0.5 s, 40+ MB, a dozen threads) waits for
-    the Triggers tab; showing it switches at once, then loads it."""
+@pytest.mark.parametrize("screen", [two_triggers(on=False), two_triggers(on=True),
+                                    {"on": True, "triggers": []}])
+def test_an_installed_onion_watch_is_in_the_tab_before_the_window_shows(
+        qapp, app_dir, monkeypatch, pkg, screen):
+    """Watching on or off, triggers or none: the add-on loads while the window is built
+    (behind the loading screen), so the Triggers tab opens at once, already there."""
     from soundboard.ui import mainwindow as main
-    w = watch_window(qapp, app_dir, monkeypatch, pkg, two_triggers(on=False))
+    w = watch_window(qapp, app_dir, monkeypatch, pkg, screen)
     try:
-        w.show()
-        process_events(qapp, lambda: False, timeout=0.5)   # well past its start timer
-        assert w.triggers.pending and w.triggers.panel is None
-        assert w.triggers.info is not None                 # Settings > Add-ons knows it
-        assert w.triggers.stack.currentWidget() is w.triggers.wait_page
-        assert not is_tab_live(w.tabs, main.TAB_INDEX["triggers"])
-        w.tabs.setCurrentWidget(w.triggers)
-        assert w.tabs.currentWidget() is w.triggers and w.triggers.panel is None
-        assert process_events(qapp, lambda: w.triggers.panel is not None, timeout=5)
+        assert not w.triggers.pending and w.triggers.panel is not None
         assert w.triggers.stack.currentWidget() is w.triggers.board_page
         assert w.triggers.panel.host.screen is w.cfg.screen
-    finally:
-        close_window(qapp, w)
-
-
-def test_watching_on_loads_onion_watch_at_the_start(qapp, app_dir, monkeypatch, pkg):
-    w = watch_window(qapp, app_dir, monkeypatch, pkg, two_triggers(on=True))
-    try:
-        assert w.triggers.pending                          # not while it's built...
-        assert process_events(qapp, lambda: w.triggers.panel is not None, timeout=5)
-        assert w.tabs.currentWidget() is not w.triggers    # ...without the tab shown
+        assert not is_tab_live(w.tabs, main.TAB_INDEX["triggers"])
+        w.show()
+        w.tabs.setCurrentWidget(w.triggers)
+        assert w.tabs.currentWidget() is w.triggers and w.triggers.panel is not None
     finally:
         close_window(qapp, w)
 
@@ -296,18 +284,6 @@ def test_the_bar_keeps_its_words_while_it_has_room(qapp, app_dir, monkeypatch, p
         w.resize(900, 700)
         qapp.processEvents()
         assert watch.text() == "Start watching"
-    finally:
-        close_window(qapp, w)
-
-
-def test_watching_on_with_no_triggers_still_waits(qapp, app_dir, monkeypatch, pkg):
-    """Onion Watch only starts watching again when there's a trigger to watch."""
-    w = watch_window(qapp, app_dir, monkeypatch, pkg, {"on": True, "triggers": []})
-    try:
-        process_events(qapp, lambda: False, timeout=0.3)
-        assert w.triggers.pending and w.triggers.panel is None
-        w.load_triggers()                                  # asked for: loads now
-        assert w.triggers.panel is not None and not w.triggers.pending
     finally:
         close_window(qapp, w)
 
