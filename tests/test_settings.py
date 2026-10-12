@@ -799,3 +799,74 @@ def test_theme_cards_and_sliders_have_a_name_a_screen_reader_can_say(window):  #
         assert all(p.accessibleName() for p in parts), [type(p).__name__ for p in parts
                                                         if not p.accessibleName()]
         d.close()
+
+
+@pytest.mark.parametrize("error", ["", "offline"])
+def test_update_check_keeps_focus_and_blocks_repeat_clicks(window, qapp, monkeypatch, error):  # noqa: F811
+    monkeypatch.setattr(net, "allowed", lambda key: True)
+    calls = []
+    monkeypatch.setattr(window, "check_updates", lambda **kw: calls.append(kw))
+    d = _open_in_window(window, qapp, "updates")
+    btn = d.upd_btn
+    btn.setFocus()
+    QTest.mouseClick(btn, Qt.LeftButton)
+    assert busy.is_busy(btn) and btn.isEnabled() and d.focusWidget() is btn
+    QTest.mouseClick(btn, Qt.LeftButton)
+    QTest.keyClick(btn, Qt.Key_Space)
+    d._updates_check()  # programmatic calls also cannot overlap
+    assert len(calls) == 1
+    window.update_done.emit(None, error)
+    assert not busy.is_busy(btn) and d.focusWidget() is btn
+    assert ("Couldn't check" if error else "newest version") in d.upd_label.text()
+    QTest.keyClick(btn, Qt.Key_Tab)
+    assert d.focusWidget() is not btn  # keyboard navigation still works
+    btn.setFocus()
+    QTest.keyClick(btn, Qt.Key_Space)
+    assert len(calls) == 2 and busy.is_busy(btn)
+    window.update_done.emit(None, "")
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("error", [False, True])
+def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypatch, index, error):  # noqa: F811
+    from soundboard import settings
+    monkeypatch.setattr(net, "allowed", lambda key: True)
+    workers = []
+
+    class DeferredThread:
+        def __init__(self, target, **kw):
+            self.target = target
+
+        def start(self):
+            workers.append(self.target)
+
+    monkeypatch.setattr(settings, "threading", type("Threads", (), {"Thread": DeferredThread}))
+    jobs = []
+
+    def job(**kw):
+        jobs.append(1)
+        if error:
+            raise OSError("offline")
+        return "Done."
+
+    monkeypatch.setattr(settings.ytdl, "update", job)
+    monkeypatch.setattr(settings.ytdl, "reset", job)
+    d = _open_in_window(window, qapp, "updates")
+    btn = d.ytdlp_btns[index]
+    btn.setFocus()
+    QTest.mouseClick(btn, Qt.LeftButton)
+    assert d.focusWidget() is btn
+    assert all(b.isEnabled() and busy.is_busy(b) for b in d.ytdlp_btns)
+    for b in d.ytdlp_btns:
+        QTest.mouseClick(b, Qt.LeftButton)
+    d._ytdlp_run(job)
+    assert len(workers) == 1
+    btn.setFocus()
+    workers.pop()()
+    qapp.processEvents()
+    assert jobs == [1] and d.focusWidget() is btn
+    assert all(not busy.is_busy(b) for b in d.ytdlp_btns)
+    assert ("Couldn't update" if error else "Done.") in d.ytdlp_label.text()
+    QTest.keyClick(btn, Qt.Key_Space)
+    assert len(workers) == 1
+    workers.pop()()

@@ -1,0 +1,1 @@
+- Keep focus on update buttons while checking or updating, and ignore repeat clicks until the work finishes.
