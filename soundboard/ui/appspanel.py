@@ -46,9 +46,10 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import WAVE_H, ClipEditor
 from soundboard.ui.clipshelf import ClipShelf
 from soundboard.ui.panel import (CardGrid, HoverCard, UndoBar, VolumeControl, fold_button,
-                                 hint_label)
+                                 hint_label, icon_button)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.speedpitch import SpeedPitchButton
+from soundboard.ui.windowview import WindowView
 from soundboard.wheelguard import no_wheel
 from soundboard.ui.pixels import snap_to_pixels
 
@@ -630,6 +631,12 @@ class AppRow(HoverCard):
             # as wide as their words
             b.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
             buttons.addWidget(b)
+        # the eye: a small live picture of the program's window, under the volume
+        # (only programs with a window have one)
+        self.btn_view = icon_button("eye", _("Show this program's window"))
+        self.btn_view.setCheckable(True)
+        icons.set_icon(self.btn_view, "eye", checked_color="accent")
+        buttons.addWidget(self.btn_view)
         self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
             self.cb_to.addItem(label, key)
@@ -655,6 +662,9 @@ class AppRow(HoverCard):
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
         mix.addWidget(self.chk_hear)
         v.addLayout(mix)
+        self.view = WindowView(self)
+        self.btn_view.toggled.connect(self._on_view)
+        v.addWidget(self.view)
         self.btn_clip = fold_button(_("Clip editor"))
         self.btn_clip.setToolTip(_("Keep this program's last minute as a waveform you can cut "
                                    "bits out of, play, save as sounds or send straight back. "
@@ -825,10 +835,28 @@ class AppRow(HoverCard):
                               else _("Sending") if self.sending else _("Send"))
         icons.text_gap(self.btn_send)   # (its icon was set before it had words)
 
+    def _on_view(self, on: bool):
+        if on:
+            usage.used("apps-window-view")
+        self.btn_view.setToolTip(_("Hide this program's window") if on
+                                 else _("Show this program's window"))
+        self.view.set_open(on)
+
+    def close_view(self):
+        if self.btn_view.isChecked():
+            self.btn_view.setChecked(False)
+        self.view.set_open(False)
+
     def set_app(self, app: appaudio.App | None):
         """The program is running (app) or not (None)."""
         self.app = app
         running = app is not None
+        has_window = app is not None and bool(app.title)
+        if app is not None and has_window:
+            self.view.set_pids((app.pid, *sorted(app.session_pids)))
+        else:
+            self.close_view()
+        self.btn_view.setVisible(has_window)
         if running:
             self.known_name = app.name   # kept for when it closes
             self.name.setText(app.name + self.folder)
@@ -859,6 +887,7 @@ class AppRow(HoverCard):
         self.btn_rec.setAccessibleName(_("Record {name}", name=name))
         self.btn_forget.setAccessibleName(_("Forget {name}", name=name))
         self.btn_clip.setAccessibleName(_("Clip editor for {name}", name=name))
+        self.btn_view.setAccessibleName(_("Window of {name}", name=name))
 
     def set_status(self, text: str, error: bool = False):
         self.status_text = text
@@ -1259,6 +1288,7 @@ class AppsTab(QWidget):
         self.lister.stop()
         self.shelf.shutdown()
         for row in list(self.rows.values()):
+            row.close_view()
             self._stop_capture(row, save=False)
             if row.editor is not None:
                 row.editor.shutdown()
@@ -1333,6 +1363,7 @@ class AppsTab(QWidget):
             w.setVisible(bool(self.rows))
 
     def _drop_row(self, row: AppRow):
+        row.close_view()
         self._stop_capture(row)
         self._close_clip(row)
         if self.big is row:

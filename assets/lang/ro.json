@@ -3382,5 +3382,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Se aduc sunetele tale din {name}: {done} din {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Este instalat, dar sunetele tale merg acum în microfon. Folosește-l dacă un joc îți ocolește microfonul, sau elimină-l dacă nimic altceva nu are nevoie de el.",
   "⚠ Another sound already has this name.": "⚠ Alt sunet are deja acest nume.",
-  "Don't show this again": "Nu mai afișa"
+  "Don't show this again": "Nu mai afișa",
+  "Hide this program's window": "Ascunde fereastra acestui program",
+  "Looking for its window…": "Îi caut fereastra…",
+  "Minimised: nothing to show": "Minimizată: nimic de arătat",
+  "No window to show": "Nicio fereastră de arătat",
+  "Show this program's window": "Arată fereastra acestui program",
+  "This program doesn't share its picture": "Acest program nu își partajează imaginea",
+  "Window of {name}": "Fereastra {name}"
 }

@@ -3234,5 +3234,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "{name} からサウンドを移行中: {total} 件中 {done} 件…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "インストール済みですが、今はサウンドがマイクに流れています。ゲームがマイクを通さないときに使うか、ほかに使うものがなければ削除してください。",
   "⚠ Another sound already has this name.": "⚠ 同じ名前のサウンドがすでにあります。",
-  "Don't show this again": "今後表示しない"
+  "Don't show this again": "今後表示しない",
+  "Hide this program's window": "このプログラムのウィンドウを隠す",
+  "Looking for its window…": "ウィンドウを探しています…",
+  "Minimised: nothing to show": "最小化中: 表示するものがありません",
+  "No window to show": "表示するウィンドウがありません",
+  "Show this program's window": "このプログラムのウィンドウを表示",
+  "This program doesn't share its picture": "このプログラムは画面を共有しません",
+  "Window of {name}": "{name} のウィンドウ"
 }

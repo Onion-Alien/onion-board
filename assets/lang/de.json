@@ -3308,5 +3308,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Deine Sounds aus {name} werden übernommen: {done} von {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Es ist installiert, aber deine Sounds gehen jetzt in dein Mikro. Nutz es, wenn ein Spiel dein Mikro überspringt, oder entferne es, wenn nichts anderes es braucht.",
   "⚠ Another sound already has this name.": "⚠ Ein anderer Sound hat schon diesen Namen.",
-  "Don't show this again": "Nicht mehr anzeigen"
+  "Don't show this again": "Nicht mehr anzeigen",
+  "Hide this program's window": "Fenster dieses Programms ausblenden",
+  "Looking for its window…": "Suche sein Fenster…",
+  "Minimised: nothing to show": "Minimiert: nichts zu zeigen",
+  "No window to show": "Kein Fenster zum Anzeigen",
+  "Show this program's window": "Fenster dieses Programms zeigen",
+  "This program doesn't share its picture": "Dieses Programm teilt sein Bild nicht",
+  "Window of {name}": "Fenster von {name}"
 }

@@ -3308,5 +3308,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Μεταφορά των ήχων σου από {name}: {done} από {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Είναι εγκατεστημένο, αλλά οι ήχοι σου πάνε πλέον στο μικρόφωνό σου. Χρησιμοποίησέ το αν ένα παιχνίδι παρακάμπτει το μικρόφωνό σου, ή αφαίρεσέ το αν δεν το χρειάζεται τίποτα άλλο.",
   "⚠ Another sound already has this name.": "⚠ Άλλος ήχος έχει ήδη αυτό το όνομα.",
-  "Don't show this again": "Να μην εμφανιστεί ξανά"
+  "Don't show this again": "Να μην εμφανιστεί ξανά",
+  "Hide this program's window": "Απόκρυψη του παραθύρου αυτού του προγράμματος",
+  "Looking for its window…": "Αναζήτηση του παραθύρου του…",
+  "Minimised: nothing to show": "Ελαχιστοποιημένο: τίποτα για εμφάνιση",
+  "No window to show": "Κανένα παράθυρο για εμφάνιση",
+  "Show this program's window": "Εμφάνιση του παραθύρου αυτού του προγράμματος",
+  "This program doesn't share its picture": "Αυτό το πρόγραμμα δεν μοιράζεται την εικόνα του",
+  "Window of {name}": "Παράθυρο του {name}"
 }

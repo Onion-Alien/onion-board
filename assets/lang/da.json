@@ -3308,5 +3308,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Henter dine lyde fra {name}: {done} af {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Det er installeret, men dine lyde går ind i din mikrofon nu. Brug det, hvis et spil springer din mikrofon over, eller fjern det, hvis intet andet har brug for det.",
   "⚠ Another sound already has this name.": "⚠ En anden lyd har allerede dette navn.",
-  "Don't show this again": "Vis ikke dette igen"
+  "Don't show this again": "Vis ikke dette igen",
+  "Hide this program's window": "Skjul dette programs vindue",
+  "Looking for its window…": "Leder efter dets vindue…",
+  "Minimised: nothing to show": "Minimeret: intet at vise",
+  "No window to show": "Intet vindue at vise",
+  "Show this program's window": "Vis dette programs vindue",
+  "This program doesn't share its picture": "Dette program deler ikke sit billede",
+  "Window of {name}": "Vindue for {name}"
 }

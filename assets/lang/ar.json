@@ -3604,5 +3604,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "جارٍ نقل أصواتك من {name}: {done} من {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "إنه مثبّت، لكن أصواتك تذهب إلى الميكروفون الآن. استخدمه إذا تجاهلت لعبةٌ الميكروفون، أو أزِله إذا لم يعد شيء آخر يحتاجه.",
   "⚠ Another sound already has this name.": "⚠ يوجد صوت آخر بهذا الاسم.",
-  "Don't show this again": "لا تُظهر هذا مرة أخرى"
+  "Don't show this again": "لا تُظهر هذا مرة أخرى",
+  "Hide this program's window": "إخفاء نافذة هذا البرنامج",
+  "Looking for its window…": "جارٍ البحث عن نافذته…",
+  "Minimised: nothing to show": "مصغّرة: لا شيء لعرضه",
+  "No window to show": "لا توجد نافذة لعرضها",
+  "Show this program's window": "إظهار نافذة هذا البرنامج",
+  "This program doesn't share its picture": "هذا البرنامج لا يشارك صورته",
+  "Window of {name}": "نافذة {name}"
 }

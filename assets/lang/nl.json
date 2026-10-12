@@ -3308,5 +3308,12 @@
   "Bringing your sounds over from {name}: {done} of {total}…": "Je geluiden uit {name} overzetten: {done} van {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Hij is geïnstalleerd, maar je geluiden gaan nu in je microfoon. Gebruik hem als een game je microfoon overslaat, of verwijder hem als niets anders hem nodig heeft.",
   "⚠ Another sound already has this name.": "⚠ Een ander geluid heeft deze naam al.",
-  "Don't show this again": "Niet meer tonen"
+  "Don't show this again": "Niet meer tonen",
+  "Hide this program's window": "Venster van dit programma verbergen",
+  "Looking for its window…": "Zoeken naar het venster…",
+  "Minimised: nothing to show": "Geminimaliseerd: niets te tonen",
+  "No window to show": "Geen venster om te tonen",
+  "Show this program's window": "Venster van dit programma tonen",
+  "This program doesn't share its picture": "Dit programma deelt zijn beeld niet",
+  "Window of {name}": "Venster van {name}"
 }
