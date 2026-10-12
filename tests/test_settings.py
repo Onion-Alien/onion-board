@@ -678,19 +678,38 @@ def test_back_hover_has_room_before_settings_title(window, qapp, width, directio
     assert not d.isVisible()
 
 
-def test_pages_start_level_with_the_back_row(window, qapp):  # noqa: F811
-    """The first card on every page lines up with the top of the back arrow's row."""
+def test_pages_start_where_a_tabs_do(window, qapp):  # noqa: F811
+    """The first card on every page starts where a tab's page does (the body's 10 px
+    plus 8), whatever the heading beside it does."""
     d = _open_in_window(window, qapp, "privacy", 1020, 680)
-
-    def top(w):
-        return w.mapTo(d, QPoint(0, 0)).y()
+    content = window._content.mapTo(window, QPoint(0, 0)).y()
     for row in range(d.categories.count()):
         d.categories.setCurrentRow(row)
         qapp.processEvents()
         page = d.tabs.currentWidget().widget()
         first = min((c for c in page.children() if isinstance(c, QWidget) and c.isVisible()),
                     key=lambda c: c.y())
-        assert top(first) == top(d.back_btn), d.categories.item(row).text()
+        at = first.mapTo(window, QPoint(0, 0)).y()
+        assert at == content + d.PAGE_TOP, d.categories.item(row).text()
+    d.close()
+    qapp.processEvents()
+    assert window._body_lay.contentsMargins().top() == 10   # a tab's again
+
+
+def test_heading_level_with_the_rails_name(window, qapp):  # noqa: F811
+    """ "Settings" (the rail's "Onion Board" size, a cog after it) has its capitals
+    level with the rail's name, the arrow and cog centred on them."""
+    d = _open_in_window(window, qapp, "privacy", 1020, 680)
+    qapp.processEvents()
+    qapp.processEvents()
+    assert d.page_title.font().pointSizeF() == window.wordmark.font().pointSizeF()
+    title = d._caps_mid(d.page_title)
+    assert abs(title - d._caps_mid(window.wordmark)) <= 0.5
+    for icon in (d.back_btn, d.title_cog):
+        r = icon.contentsRect() if icon is d.title_cog else icon.rect()
+        at = icon.mapTo(window, QPoint(0, 0)).y()
+        mid = (at + r.top() + r.height() / 2) * icon.devicePixelRatioF()   # (screen px)
+        assert abs(mid - title) <= 2, icon.objectName()
     d.close()
 
 

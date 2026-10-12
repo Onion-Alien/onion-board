@@ -1,0 +1,1 @@
+- Settings: the "Settings" heading is the size of the "Onion Board" name beside it, level with it, with a cog after it; the back arrow sits level with its letters

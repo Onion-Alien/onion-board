@@ -4442,7 +4442,7 @@ class MainWindow(QMainWindow):
         side = (BODY_SIDE_TIGHT if tight else BODY_SIDE, BODY_SIDE)
         if self.isRightToLeft():   # mirrored (Arabic): the rail is on the right
             side = side[::-1]
-        self._body_lay.setContentsMargins(side[0], 10, side[1], 10)
+        self._body_lay.setContentsMargins(side[0], self._body_top(), side[1], 10)
         if getattr(self, "_mixer_tight", False):   # its room changed: measure it again
             self._fit_mixer(True)
 
@@ -5282,6 +5282,7 @@ class MainWindow(QMainWindow):
             self._route_at_open = (self.cfg.route, self.cfg.main_device)
             self._content.addWidget(dlg)
         self._content.setCurrentWidget(dlg)
+        self._fit_body_top()
         self._opening_settings = True   # (_refit: not closed again for being too small)
         try:
             self._board_counts(False)
@@ -5323,6 +5324,15 @@ class MainWindow(QMainWindow):
             self.resize(w, h)
             self._refit()
 
+    def _body_top(self) -> int:
+        """The body's top margin: none under Settings, whose heading rises level with
+        the rail's name and keeps its pages where a tab's start (SettingsDialog)."""
+        return 0 if self.settings_open() else 10
+
+    def _fit_body_top(self):
+        m = self._body_lay.contentsMargins()
+        self._body_lay.setContentsMargins(m.left(), self._body_top(), m.right(), m.bottom())
+
     def settings_open(self) -> bool:
         dlg = self._settings_dlg
         return dlg is not None and qt_valid(dlg) and self._content.currentWidget() is dlg
@@ -5338,6 +5348,7 @@ class MainWindow(QMainWindow):
         had_focus = _holds_focus(dlg)
         self._content.setCurrentWidget(self._tabs_area)
         self._content.removeWidget(dlg)
+        self._fit_body_top()
         self._board_counts(True)
         self.rail.select_foot(None)
         self._show_transport()
