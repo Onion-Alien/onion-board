@@ -24,7 +24,7 @@ from PySide6.QtGui import (QColor, QFontMetricsF, QLinearGradient, QPainter,
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
-from soundboard import theme, usage
+from soundboard import jobprogress, theme, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
 from soundboard.ui.scribebun import ScribeBunny
@@ -37,13 +37,14 @@ LINE_GAP = 6  # between line 1 (the title) and line 2 (the bar); the mini player
 
 
 class SmoothProgressBar(QWidget):
-    """A sleek 6px progress bar that supports both indeterminate gliding shimmer
-    (during video parsing / audio decoding) and determinate progress (during byte download)."""
+    """A sleek 6px progress bar that only fills forward (soundboard/jobprogress.py). While
+    a step has nothing to measure (the link looked up, the audio converted) a faint glint
+    runs along the empty part, so it's plainly busy, never a block that looks full."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedHeight(6)
-        self._mode = "indeterminate"  # "indeterminate" or "determinate"
+        self._busy = True
         self._progress = 0.0          # 0.0 .. 1.0
         self._t0 = time.monotonic()
         self._timer = QTimer(self)
@@ -51,26 +52,25 @@ class SmoothProgressBar(QWidget):
         self._timer.timeout.connect(self.update)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-    def set_indeterminate(self, on: bool):
-        if on:
-            self._mode = "indeterminate"
+    def set_busy(self, on: bool):
+        """The glint over the empty part: on while a step can't say how far it is."""
+        if on and not self._busy:
             self._t0 = time.monotonic()
-            if self.isVisible() and not self._timer.isActive():
+        self._busy = on
+        if on and self.isVisible():
+            if not self._timer.isActive():
                 self._timer.start()
         else:
-            self._mode = "determinate"
             self._timer.stop()
         self.update()
 
-    def set_progress(self, frac: float):
-        self._mode = "determinate"
+    def set_progress(self, frac: float, busy: bool = False):
         self._progress = max(0.0, min(1.0, float(frac)))
-        self._timer.stop()
-        self.update()
+        self.set_busy(busy)
 
     def showEvent(self, ev):
         super().showEvent(ev)
-        if self._mode == "indeterminate":
+        if self._busy:
             self._timer.start()
 
     def hideEvent(self, ev):
@@ -92,17 +92,33 @@ class SmoothProgressBar(QWidget):
         p.drawRoundedRect(r, rad, rad)
 
         accent = QColor(theme.T.get("accent", "#7c5cff"))
-        p.setBrush(accent)
-        if self._mode == "indeterminate":
-            k = 0.5 - 0.5 * math.cos((time.monotonic() - self._t0) * math.pi / 0.9)
-            pw = max(r.height() * 2, r.width() * 0.28)
-            px = r.left() + (r.width() - pw) * k
-            p.drawRoundedRect(QRectF(px, r.top(), pw, r.height()), rad, rad)
-        else:
-            w = r.width() * self._progress
-            if w > 0:
-                p.drawRoundedRect(QRectF(r.left(), r.top(), max(r.height(), w), r.height()),
-                                  rad, rad)
+        w = r.width() * self._progress
+        if w > 0:
+            p.setBrush(accent)
+            p.drawRoundedRect(QRectF(r.left(), r.top(), max(r.height(), w), r.height()),
+                              rad, rad)
+        if self._busy:
+            # a soft glint sweeping the empty part, faded at both ends: busy, not further
+            empty = QRectF(r.left() + w, r.top(), r.width() - w, r.height())
+            if empty.width() > r.height():
+                k = ((time.monotonic() - self._t0) / 1.6) % 1.0
+                gw = max(r.height() * 4, empty.width() * 0.3)
+                gx = empty.left() - gw + (empty.width() + gw) * k
+                g = QLinearGradient(gx, 0, gx + gw, 0)
+                clear, lit = QColor(accent), QColor(accent)
+                clear.setAlpha(0)
+                lit.setAlpha(110)
+                g.setColorAt(0.0, clear)
+                g.setColorAt(0.5, lit)
+                g.setColorAt(1.0, clear)
+                p.save()
+                clip = QPainterPath()
+                clip.addRoundedRect(r, rad, rad)
+                p.setClipPath(clip)
+                p.setClipRect(empty, Qt.ClipOperation.IntersectClip)
+                p.setBrush(g)
+                p.drawRect(QRectF(gx, r.top(), gw, r.height()))
+                p.restore()
         p.end()
 
 
@@ -426,7 +442,8 @@ class DownloadBar(QFrame):
         self.title = ""
         self.kind = ""  # "play" or "add"
         self.stage = ""  # "parsing", "downloading", "processing", "done"
-        self.progress_frac = 0.0
+        self.progress_frac = 0.0   # the running pick's one bar (jobprogress), 0..1
+        self._job = jobprogress.JobProgress()
         self._mini = False
         self._tight = False   # _fit_tight: a narrow banner (or the mini player's)
         self._collapsed = False
@@ -497,7 +514,7 @@ class DownloadBar(QFrame):
         self.h_failed.hide()
         hl.addWidget(self.h_failed, 0, Qt.AlignmentFlag.AlignVCenter)
         hl.addStretch(1)
-        # minimised: how far the running one has got, as a thin bar and a number
+        # how far the whole list has got, as a thin bar and a number
         self.s_bar = SmoothProgressBar()
         self.s_bar.setFixedHeight(4)
         self.s_bar.setMaximumWidth(160)
@@ -538,9 +555,17 @@ class DownloadBar(QFrame):
         self.thumb.setFixedSize(THUMB_W, THUMB_H)
         self.thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
         h.addWidget(self.thumb, 0, Qt.AlignmentFlag.AlignVCenter)
-        # no picture of its own (an MP3, a link without art): Bun writes the download down
+        # no picture of its own (an MP3, a link without art): Bun writes the download down,
+        # centred in the picture's column so he lines up with the rows' pictures under him
         self.scribe = ScribeBunny()
-        h.addWidget(self.scribe, 0, Qt.AlignmentFlag.AlignVCenter)
+        self._scribe_box = QWidget()
+        self._scribe_box.setObjectName("scribebox")
+        self._scribe_box.setStyleSheet("background: transparent;")
+        self._scribe_box.setFixedWidth(THUMB_W)
+        sb = QHBoxLayout(self._scribe_box)
+        sb.setContentsMargins(0, 0, 0, 0)
+        sb.addWidget(self.scribe, 0, Qt.AlignmentFlag.AlignCenter)
+        h.addWidget(self._scribe_box, 0, Qt.AlignmentFlag.AlignVCenter)
 
         col = self._col = QVBoxLayout()
         col.setSpacing(LINE_GAP)
@@ -846,7 +871,8 @@ class DownloadBar(QFrame):
 
     def _sync_head(self):
         """The summary line: what the list is up to, how many failed (a red pill), the
-        buttons that fit what's going on; minimised, how far the running one is too."""
+        buttons that fit what's going on, and while one runs how far the whole list has
+        got: one bar for all of it, so it doesn't start again with each pick."""
         words, name, colour = self._head_text()
         self.h_text.setText(words)
         icons.set_label_icon(self.h_icon, name, theme.T.get(colour) or theme.T["accent"],
@@ -860,14 +886,14 @@ class DownloadBar(QFrame):
         # folded for room, it can't open: no button that does nothing
         self.btn_min.setVisible(not over and not self._mini
                                 and (self._collapsed or self._room == "open"))
-        show_bar = self._folded() and self._running()
+        show_bar = self._running()
         self.s_bar.setVisible(show_bar)
         self.s_text.setVisible(show_bar)
-        self.s_text.setText(self.lbl_status.text() if show_bar else "")
-        if self.bar._mode == "indeterminate":
-            self.s_bar.set_indeterminate(True)
-        else:
-            self.s_bar.set_progress(self.bar._progress)
+        done = len(self._others_added()) + len(self._others_failed())
+        frac = jobprogress.batch(done, self.progress_frac if show_bar else None,
+                                 len(self._queue))
+        self.s_text.setText(f"{frac * 100:.0f}%" if show_bar else "")
+        self.s_bar.set_progress(frac, busy=show_bar and self.stage != "downloading")
 
     # ------------------------------------------------------------------ sizes
 
@@ -929,7 +955,7 @@ class DownloadBar(QFrame):
         self.btn_cancel.show()
         self.btn_retry.hide()
         self.lbl_status.setText(_("Parsing video…"))
-        self.bar.set_indeterminate(True)
+        self.bar.set_progress(0.0, busy=True)
         self._fill_rows()
         self._sync_head()
         self.show()
@@ -943,6 +969,7 @@ class DownloadBar(QFrame):
         self.kind = kind
         self.stage = "parsing"
         self._set_ended("")
+        self._job.reset()
         self.progress_frac = 0.0
         self._pm = thumb_pm
         self._source = source_of(url)
@@ -971,22 +998,20 @@ class DownloadBar(QFrame):
             # starts it again.
             return
         self._auto_hide.stop()
-        if payload == "parsing":
-            self.stage = "parsing"
+        # every step on one bar that only goes forward (jobprogress): it used to fill
+        # for the download, then again (a gliding block) while converting
+        self.progress_frac = self._job.update(payload)
+        self.stage = self._job.stage
+        if self.stage == "parsing":
             self.scribe.set_state("parsing")
             self.lbl_status.setText(_("Parsing video…"))
-            self.bar.set_indeterminate(True)
-        elif payload == "processing" or (isinstance(payload, (int, float)) and payload < 0):
-            self.stage = "processing"
+        elif self.stage == "processing":
             self.scribe.set_state("processing")
             self.lbl_status.setText(_("Processing audio…"))
-            self.bar.set_indeterminate(True)
-        elif isinstance(payload, (int, float)):
-            self.stage = "downloading"
-            self.progress_frac = max(0.0, min(1.0, float(payload)))
+        else:
             self.scribe.set_progress(self.progress_frac)
             self.lbl_status.setText(f"{self.progress_frac * 100:.0f}%")   # the title says what
-            self.bar.set_progress(self.progress_frac)
+        self.bar.set_progress(self.progress_frac, busy=self.stage != "downloading")
         self._sync_head()
         self.show()
 
@@ -1021,7 +1046,7 @@ class DownloadBar(QFrame):
         """The sound's own picture if it has one, else Bun at his scroll."""
         has = self._pm is not None and not self._pm.isNull()
         self.thumb.setVisible(has and not self._tight)
-        self.scribe.setVisible(not has and not self._tight)
+        self._scribe_box.setVisible(not has and not self._tight)
 
     # ------------------------------------------------------------------ the rest of the list
 
@@ -1079,9 +1104,10 @@ class DownloadBar(QFrame):
         rl = QHBoxLayout(row)
         rl.setContentsMargins(8, 6, 6, 6)
         rl.setSpacing(12)
-        if not self._tight:
+        if not self._tight:   # centred under the running row's picture, titles in line
             pic = QLabel()
-            pic.setFixedSize(*ROW_THUMB)
+            pic.setFixedSize(THUMB_W, ROW_THUMB[1])
+            pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
             pic.setPixmap(self._picture(self.thumb_lookup(q["url"]), *ROW_THUMB, 6))
             rl.addWidget(pic, 0, Qt.AlignmentFlag.AlignVCenter)
         col = QVBoxLayout()
@@ -1181,6 +1207,7 @@ class DownloadBar(QFrame):
         self.bar.hide()
         if ok:
             self.btn_retry.hide()
+            self.progress_frac = self._job.finish()
             self.bar.set_progress(1.0)
             theme.set_tone(self.lbl_status, "ok")
             if kind == "play":

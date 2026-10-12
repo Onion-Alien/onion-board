@@ -872,12 +872,15 @@ def test_a_download_shows_its_progress_and_leaves_the_other_cards_free(qapp, mon
     assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
     panel.queued(hits[1].url, "add")
     assert b.btn_add.text() == _("Queued") and busy.is_busy(b.btn_add)
-    panel.progress(hits[0].url, 0.42)
-    assert a.fill == 0.42 and "42%" in a.btn_add.text()
+    from soundboard import jobprogress
+    panel.progress(hits[0].url, 0.42)   # the download's stretch of the one bar
+    got = jobprogress.LOOKED_UP + (jobprogress.FETCHED - jobprogress.LOOKED_UP) * 0.42
+    assert a.fill == pytest.approx(got) and f"{got * 100:.0f}%" in a.btn_add.text()
     panel.mark(hits[0].url, "play")                  # ...and Play on it too
-    assert a.fill == 0.42                     # no reset for a shared download
-    panel.progress(hits[0].url, -1)                  # conversion is a separate phase
-    assert a.fill == 1.0   # converting: full
+    assert a.fill == pytest.approx(got)       # no reset for a shared download
+    panel.progress(hits[0].url, -1)   # converting: the bar goes on, it doesn't fill up
+    assert a.fill == jobprogress.FETCHED
+    assert a.thumb.progress_frac == jobprogress.FETCHED
     assert "Processing" in a.btn_play.text()
     panel.mark(hits[0].url, "add", True)
     assert a.btn_add.text() == "✓ Added" and a.fill >= 0   # still playing
