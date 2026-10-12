@@ -693,7 +693,8 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
     wiz.show()
     wiz.go(wiz.base + 3)
     _settle(qapp)
-    wiz.move(100, 200)
+    top = wiz.screen().availableGeometry().y() + 10   # room below for every step
+    wiz.move(100, top)
     heights = []
 
     class Spy(QObject):
@@ -710,7 +711,7 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
         assert wiz.height() >= fit.needed_height(wiz, wiz.width())
         _settle(qapp)
         tall[i] = wiz.height()
-        assert wiz.y() == 200   # never moved
+        assert wiz.y() == top   # never moved
     assert heights and max(heights) <= max(tall.values()), (heights, tall)
 
 
@@ -718,6 +719,7 @@ def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
     """Near the screen's bottom, opening the Discord tip moves the guide up to fit;
     shutting it puts it back where it was (it walked up the screen click by click)."""
     from soundboard import directmic
+    from soundboard.ui import fit
     monkeypatch.setattr(directmic, "works", lambda *a: True)
     w, wiz = mic_wizard
     w.cfg.route = "mic"
@@ -729,15 +731,17 @@ def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
     avail = wiz.screen().availableGeometry()
     wiz.move(100, avail.bottom() - wiz.frameGeometry().height() - 5)
     _settle(qapp)
-    home = (wiz.y(), wiz.height())
+    home = wiz.y()
     for _ in range(3):
         wiz.discord_fold.click()
         _settle(qapp)
-        assert wiz.height() > home[1] and wiz.y() < home[0]   # open: up to fit
+        assert wiz.y() < home   # open: up to fit
         wiz.discord_fold.click()
-        assert wiz.height() == home[1]   # shut: its size at once (no empty band)
+        # shut: its size at once, no empty band (opening can widen it a little, for
+        # a long button: then it's a bit shorter than before)
+        assert wiz.height() == fit.needed_height(wiz, wiz.width())
         _settle(qapp)
-        assert (wiz.y(), wiz.height()) == home   # and back where it was
+        assert wiz.y() == home   # and back where it was
     wiz.discord_fold.click()   # dragged by them meanwhile: it stays where they put it
     _settle(qapp)
     wiz.move(100, 50)
