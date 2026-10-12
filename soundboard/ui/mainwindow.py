@@ -8028,7 +8028,8 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(60, self._preload_next_page)
 
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
-        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
+        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab,
+                       others=lambda: list(self._meta.values()))
         d.hotkeys_changed.connect(self.register_hotkeys)
         d.source_forgotten.connect(self._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
