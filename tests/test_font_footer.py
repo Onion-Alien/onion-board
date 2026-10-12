@@ -1,9 +1,17 @@
 """The mixer's icon ink follows its words, including live font changes."""
+import os
+from pathlib import Path
+
 import pytest
 import numpy as np
 from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QApplication, QLabel
 from test_mainwindow import window  # noqa: F401
+
+# Set before the qapp fixture creates Qt's font database, including on CI.
+font_dir = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+if font_dir.is_dir():
+    os.environ.setdefault("QT_QPA_FONTDIR", str(font_dir))
 
 
 def pixels(widget):
