@@ -3360,5 +3360,8 @@
   "Discord, games, Zoom and Teams": "Discord, ігри, Zoom і Teams",
   "Equalizer and volume": "Еквалайзер і гучність",
   "Volumes as they are": "Гучність як є",
-  "Volumes levelled": "Гучність вирівняно"
+  "Volumes levelled": "Гучність вирівняно",
+  "Live: click to mute": "В ефірі: натисніть, щоб вимкнути звук",
+  "Muted: click to go live": "Без звуку: натисніть, щоб вийти в ефір",
+  "Pause or resume": "Пауза або продовжити"
 }

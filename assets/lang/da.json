@@ -3287,5 +3287,8 @@
   "Discord, games, Zoom and Teams": "Discord, spil, Zoom og Teams",
   "Equalizer and volume": "Equalizer og lydstyrke",
   "Volumes as they are": "Lydstyrker som de er",
-  "Volumes levelled": "Lydstyrker udjævnet"
+  "Volumes levelled": "Lydstyrker udjævnet",
+  "Live: click to mute": "Live: klik for at slå lyden fra",
+  "Muted: click to go live": "Lyd fra: klik for at gå live",
+  "Pause or resume": "Pause eller fortsæt"
 }

@@ -3360,5 +3360,8 @@
   "Discord, games, Zoom and Teams": "Discord, jocuri, Zoom și Teams",
   "Equalizer and volume": "Egalizator și volum",
   "Volumes as they are": "Volumele așa cum sunt",
-  "Volumes levelled": "Volume egalizate"
+  "Volumes levelled": "Volume egalizate",
+  "Live: click to mute": "Live: clic pentru a dezactiva sunetul",
+  "Muted: click to go live": "Fără sunet: clic pentru a reveni live",
+  "Pause or resume": "Pauză sau reluare"
 }

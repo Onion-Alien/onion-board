@@ -3214,5 +3214,8 @@
   "Discord, games, Zoom and Teams": "Discord、ゲーム、Zoom、Teams",
   "Equalizer and volume": "イコライザーと音量",
   "Volumes as they are": "音量はそのまま",
-  "Volumes levelled": "音量をそろえ済み"
+  "Volumes levelled": "音量をそろえ済み",
+  "Live: click to mute": "ライブ: クリックでミュート",
+  "Muted: click to go live": "ミュート中: クリックでライブに戻る",
+  "Pause or resume": "一時停止 / 再開"
 }

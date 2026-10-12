@@ -3579,5 +3579,8 @@
   "Discord, games, Zoom and Teams": "Discord والألعاب وZoom وTeams",
   "Equalizer and volume": "المعادل ومستوى الصوت",
   "Volumes as they are": "مستويات الصوت كما هي",
-  "Volumes levelled": "مستوى الصوت موحّد"
+  "Volumes levelled": "مستوى الصوت موحّد",
+  "Live: click to mute": "مباشر: انقر لكتم الصوت",
+  "Muted: click to go live": "مكتوم: انقر للعودة مباشرًا",
+  "Pause or resume": "إيقاف مؤقت أو استئناف"
 }

@@ -36,8 +36,8 @@ from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
 from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, net, netlog,
-                        profiles, quality, rawmic, shellicon, sourceinfo, tips, tor, usage,
-                        watchaddon)
+                        profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
+                        usage, watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -423,6 +423,14 @@ class MainWindow(QMainWindow):
         self.hotkeys.failed_changed.connect(self.on_hotkeys_failed)
         self.hotkeys.midi.busy_changed.connect(self.on_midi_busy)
         self.replay = InstantReplay(self.cfg.replay_seconds)
+        # buttons in the taskbar's hover preview, like Discord's mute / deafen
+        tb = thumbbar
+        self.thumbbar = tb.ThumbBar(self, {
+            tb.LAST: self.play_last,
+            tb.PAUSE: self._pause_clicked,
+            tb.STOP: self._stop_all_clicked,
+            tb.RANDOM: self.play_random,
+            tb.LIVE: lambda: self.set_sending(not self.engine.sending)})
         self.replay.state_changed.connect(self.on_replay_state)
         self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
@@ -5427,10 +5435,7 @@ class MainWindow(QMainWindow):
         if action == "__stop__":
             self.stop_all()
         elif action == "__last__":
-            if self._last_sid is None or self.meta(self._last_sid) is None:
-                self.cue("fail")
-            else:
-                self.play(self._last_sid)
+            self.play_last()
         elif action in ("__nextcat__", "__prevcat__"):
             self.step_category(1 if action == "__nextcat__" else -1)
         elif action in ("__volup__", "__voldown__"):
@@ -5451,8 +5456,7 @@ class MainWindow(QMainWindow):
         elif action == "__replay__":
             self.save_replay()
         elif action == "__pause__":
-            self.engine.pause_all()
-            self._wake()
+            self._pause_clicked()
         elif action == "__random__":
             self.play_random()
         elif action.startswith(RANDOM):
@@ -5587,6 +5591,8 @@ class MainWindow(QMainWindow):
         if self._pill_good and self._pill_long:   # the hidden pill's "In your mic…"
             tip = f"{self._pill_long}\n{tip}"
         sidebar.put(self.btn_air, text[1], text[0], tip)
+        if hasattr(self, "thumbbar"):
+            self.thumbbar.set_live(on)
         if hasattr(self, "mini_air"):
             self.mini_air.setChecked(on)
             self.mini_air.setToolTip(self.btn_air.toolTip())
@@ -5597,6 +5603,16 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.stop_btn, "check", "live_text", size=sidebar.ICON, gap=False)
         QTimer.singleShot(1200, lambda: icons.set_icon(self.stop_btn, "stop", "danger_text",
                                                        size=sidebar.ICON))
+
+    def play_last(self):
+        if self._last_sid is None or self.meta(self._last_sid) is None:
+            self.cue("fail")
+        else:
+            self.play(self._last_sid)
+
+    def _pause_clicked(self):
+        self.engine.pause_all()
+        self._wake()
 
     def stop_all(self):
         self._queue.clear()
@@ -9022,6 +9038,14 @@ class MainWindow(QMainWindow):
         # an older mic part: its update is offered a moment after the window opens
         QTimer.singleShot(MIC_OFFER_MS, self, self._offer_mic_update)
 
+    def nativeEvent(self, event_type, message):
+        # every Windows message passes here: keep it a few attribute reads. The handle
+        # can exist before __init__ has made the taskbar buttons
+        tb = getattr(self, "thumbbar", None)
+        if tb is not None and tb.native_event(message):
+            return True, 0
+        return super().nativeEvent(event_type, message)
+
     def hideEvent(self, ev):
         super().hideEvent(ev)
         self._set_tick_rate()
@@ -9588,6 +9612,7 @@ class MainWindow(QMainWindow):
                      self.triggers.shutdown,
                      self.linkbar.shutdown, ytworker.drop_all,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach,
+                     self.thumbbar.close,
                      netlog.flush,   # what's still open, once the rest closed
                      self._mark_stopped):   # last: this run ended cleanly (usage.py)
             try:

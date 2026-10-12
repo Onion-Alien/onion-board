@@ -3287,5 +3287,8 @@
   "Discord, games, Zoom and Teams": "Discord, oyunlar, Zoom ve Teams",
   "Equalizer and volume": "Ekolayzer ve ses seviyesi",
   "Volumes as they are": "Ses seviyeleri olduğu gibi",
-  "Volumes levelled": "Ses seviyeleri eşit"
+  "Volumes levelled": "Ses seviyeleri eşit",
+  "Live: click to mute": "Canlı: sessize almak için tıkla",
+  "Muted: click to go live": "Sessiz: canlıya geçmek için tıkla",
+  "Pause or resume": "Duraklat veya sürdür"
 }

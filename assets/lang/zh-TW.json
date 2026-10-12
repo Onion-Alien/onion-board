@@ -3214,5 +3214,8 @@
   "Discord, games, Zoom and Teams": "Discord、遊戲、Zoom 和 Teams",
   "Equalizer and volume": "等化器和音量",
   "Volumes as they are": "音量保持原樣",
-  "Volumes levelled": "音量已統一"
+  "Volumes levelled": "音量已統一",
+  "Live: click to mute": "直播中：點一下即可靜音",
+  "Muted: click to go live": "已靜音：點一下即可恢復直播",
+  "Pause or resume": "暫停或繼續"
 }

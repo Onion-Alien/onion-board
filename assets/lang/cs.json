@@ -3360,5 +3360,8 @@
   "Discord, games, Zoom and Teams": "Discord, hry, Zoom a Teams",
   "Equalizer and volume": "Ekvalizér a hlasitost",
   "Volumes as they are": "Hlasitost beze změn",
-  "Volumes levelled": "Hlasitost vyrovnaná"
+  "Volumes levelled": "Hlasitost vyrovnaná",
+  "Live: click to mute": "Živě: kliknutím ztlumíte",
+  "Muted: click to go live": "Ztlumeno: kliknutím přejdete živě",
+  "Pause or resume": "Pozastavit nebo pokračovat"
 }

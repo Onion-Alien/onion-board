@@ -3214,5 +3214,8 @@
   "Discord, games, Zoom and Teams": "Discord, 게임, Zoom, Teams",
   "Equalizer and volume": "평형 장치와 볼륨",
   "Volumes as they are": "볼륨 그대로",
-  "Volumes levelled": "볼륨 맞춤"
+  "Volumes levelled": "볼륨 맞춤",
+  "Live: click to mute": "라이브: 클릭하면 음소거",
+  "Muted: click to go live": "음소거됨: 클릭하면 라이브",
+  "Pause or resume": "일시정지 또는 재개"
 }
