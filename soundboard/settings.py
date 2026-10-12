@@ -526,14 +526,15 @@ class SettingsDialog(QDialog):
         self._title_cog()
         # Keep the arrow over the category icons, with room between its hover
         # background and the heading.
-        back.setFixedWidth(36)
+        back.setFixedWidth(26)   # (just round the arrow: the heading right after it)
         # its icon on the icons' centre line; the same 14 px of padding: the controls'
         # height (BACK_PAD: the arrow level with the middle of the heading's capitals)
         back.setStyleSheet(self.BACK_PAD)
         top = self._top = QHBoxLayout()
-        top.setSpacing(8)
+        top.setSpacing(2)   # (the heading close after the arrow)
         top.addWidget(back)
         top.addWidget(self.page_title)
+        top.addSpacing(4)   # (the cog as close as the arrow)
         top.addWidget(self.title_cog)
         top.addStretch(1)
         side.addLayout(top)

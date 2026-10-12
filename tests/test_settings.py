@@ -664,7 +664,7 @@ def test_search_of_only_spaces_before_the_pages_are_built(window, qapp, text):  
 
 @pytest.mark.parametrize("width", [800, 1180])
 @pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
-def test_back_hover_has_room_before_settings_title(window, qapp, width, direction):  # noqa: F811
+def test_settings_title_close_after_the_back_arrow(window, qapp, width, direction):  # noqa: F811
     d = _open_in_window(window, qapp, "privacy", width, 720)
     d.setLayoutDirection(direction)
     qapp.processEvents()
@@ -673,7 +673,7 @@ def test_back_hover_has_room_before_settings_title(window, qapp, width, directio
     arrow, title = d.back_btn.geometry(), d.page_title.geometry()
     gap = (title.left() - arrow.right() - 1 if direction == Qt.LeftToRight
            else arrow.left() - title.right() - 1)
-    assert gap >= 8
+    assert 0 <= gap <= 4   # a word after the arrow, not across the row
     d.back_btn.click()
     assert not d.isVisible()
 
