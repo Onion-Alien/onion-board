@@ -1788,15 +1788,20 @@ def test_new_users_go_straight_into_their_mic_old_settings_keep_the_cable(app_di
     (["{a}"], True, False, True, "wiped"),       # a driver update took it off
     (["{a}"], True, True, False, "outdated"),    # an older copy (still works)
     (["{a}"], True, True, True, "ready"),
+    (["{a}"], False, True, True, "wiped"),       # its DLL deleted: repaired, not "fine"
+    (["{a}"], None, True, True, "wiped"),        # its registration gone
 ])
 @pytest.mark.parametrize("slot", [None, 7])
 def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected, slot):
+    dll = tmp_path / "obmic-1.dll"
+    if here:
+        dll.write_bytes(b"dll")
     monkeypatch.setattr(dm, "installed_slot", lambda guid: slot)
     monkeypatch.setattr(dm, "installed_on", lambda: on)
     monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
     monkeypatch.setattr(dm, "effect_in_place", lambda guid: in_place)
     monkeypatch.setattr(dm, "same_dll", lambda a, b: same)
-    monkeypatch.setattr(dm, "registered_dll", lambda: None)
+    monkeypatch.setattr(dm, "registered_dll", lambda: None if here is None else dll)
     monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
     dm.forget_status()
     assert dm.status("My mic") == expected
@@ -1806,14 +1811,17 @@ def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected, slot)
 
 @pytest.mark.parametrize("slot, expected", [(5, "outdated"), (13, "outdated"), (1, "ready"),
                                             (7, "ready"), (15, "ready")])
-def test_status_offers_the_move_out_of_the_stream_effect(monkeypatch, slot, expected):
+def test_status_offers_the_move_out_of_the_stream_effect(monkeypatch, tmp_path, slot,
+                                                         expected):
     """On in the stream effect (before the endpoint one), raw streams (Chrome, Edge,
     Discord Studio) skip it: the update that moves it is offered."""
+    dll = tmp_path / "obmic-1.dll"
+    dll.write_bytes(b"dll")
     monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
     monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
     monkeypatch.setattr(dm, "effect_in_place", lambda guid: True)
     monkeypatch.setattr(dm, "same_dll", lambda a, b: True)
-    monkeypatch.setattr(dm, "registered_dll", lambda: None)
+    monkeypatch.setattr(dm, "registered_dll", lambda: dll)
     monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
     monkeypatch.setattr(dm, "installed_slot", lambda guid: slot)
     dm.forget_status()
