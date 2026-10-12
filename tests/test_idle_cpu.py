@@ -3,7 +3,6 @@ skipped or slowed down, and animations stop while nobody can see them."""
 import threading
 import time
 
-from PySide6.QtWidgets import QApplication
 
 from conftest import process_events
 from soundboard import appaudio
@@ -91,19 +90,6 @@ def test_whos_listening_poll_slows_down_while_hidden(window, monkeypatch):  # no
     assert len(polls) == 3                            # it switches by itself: keeps up
 
 
-def test_icon_glow_sets_only_the_windows_own_icon(window, monkeypatch):  # noqa: F811
-    app_wide = []
-    monkeypatch.setattr(QApplication, "setWindowIcon", lambda icon: app_wide.append(icon))
-    monkeypatch.setattr(window, "isVisible", lambda: True)
-    now = time.monotonic() + 100
-    window._glow_icons(1.0, now)
-    assert window._icon_step > 0 and not app_wide
-    window._glow_icons(0.0, now + 1)
-    assert window._icon_step == 0 and not app_wide
-    window._glow_icons(0.0, now + 2, force=True)      # a theme change: every window
-    assert len(app_wide) == 1
-
-
 def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qapp):  # noqa: F811
     """The banner's throb draws the whole banner again on each step: not in the tray,
     minimised or behind a game (there it stands still, fully bright)."""
@@ -139,27 +125,6 @@ def test_mic_check_pulse_steps_about_16_times_a_second_along_the_same_curve(wind
     assert abs(pulse.opacity_at(main.PULSE_MS / 2) - main.PULSE_LOW) < 1e-9
     assert abs(pulse.opacity_at(main.PULSE_MS / 4) - (1 + main.PULSE_LOW) / 2) < 1e-9
     assert pulse.opacity_at(main.PULSE_MS) == 1.0     # and round again
-
-
-def test_icon_glow_holds_a_step_while_the_level_hovers_on_a_boundary(window, monkeypatch):  # noqa: F811
-    """Each swap makes Explorer redraw the taskbar and tray icons: a level wobbling
-    across the line between two steps flipped the icon back and forth."""
-    from soundboard.ui import mainwindow as main
-    monkeypatch.setattr(window, "isVisible", lambda: True)
-    swaps = []
-    real = type(window).setWindowIcon
-    monkeypatch.setattr(window, "setWindowIcon", lambda ic: (swaps.append(1), real(window, ic)))
-    now = time.monotonic() + 100
-    edge = 1.5 / main.GLOW_STEPS / 1.4                # the level between step 1 and 2
-    window._glow_icons(edge * 0.98, now)
-    assert window._icon_step == 1
-    for i in range(1, 20):                            # wobbling on the line
-        window._glow_icons(edge * (1.03 if i % 2 else 0.97), now + i)
-    assert window._icon_step == 1 and len(swaps) == 1
-    window._glow_icons(1.0, now + 30)                 # clearly louder: follows at once
-    assert window._icon_step == main.GLOW_STEPS
-    window._glow_icons(0.0, now + 31)                 # quiet: the plain icon
-    assert window._icon_step == 0 and len(swaps) == 3
 
 
 def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  # noqa: F811

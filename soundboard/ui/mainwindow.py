@@ -127,12 +127,6 @@ TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk,
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
 TRIGGERS_LOAD_MS = 50   # Onion Watch loads this long after the window is built
-GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
-ICON_GLOW_MS = 250   # ...and how often at most it changes
-ICON_GLOW_BG_MS = 1000  # ...while another program (a game) is in front
-# ...and a step is kept until the level is this far (in steps) past the middle between
-# it and the next: a level hovering on a boundary flipped the icon back and forth
-ICON_GLOW_HOLD = 0.25
 PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright again
 PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
@@ -538,8 +532,6 @@ class MainWindow(QMainWindow):
         self._tick_busy = True            # something moves with the tick (see _busy)
         self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
         self._sounds_live = False         # the Sounds tab's live dot is shown
-        self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
-        self._tray_step = -1              # ...and the tray icon's
         self._xruns_shown = 0             # drop-out count last told (the "audio" toast)
         self._audio_said = ""             # what that toast says now
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
@@ -5449,44 +5441,16 @@ class MainWindow(QMainWindow):
         self.logo.update()   # it reads the theme colours itself
         # title bar + taskbar follow the theme too, and so do the taskbar's right-click
         # menu, a pin and the app's own Desktop / Start menu shortcuts (shellicon)
-        self._icon_step = -1
-        self._glow_icons(0.0, time.monotonic(), force=True)
+        # (they stay still while sound plays: only the header logo glows. Swapping
+        # them made Windows redraw the taskbar button, which flickered its layers)
+        icon = glow_icon(theme.T["accent"], theme.T["accent2"], 0.0)
+        QApplication.setWindowIcon(icon)   # every window, dialogs too
+        self.setWindowIcon(icon)
+        tray = getattr(self, "tray", None)
+        if tray is not None:
+            tray.setIcon(icon)
         shellicon.follow_theme(self, theme.T["accent"], theme.T["accent2"])
         shellicon.paint_background(self, theme.T["bg"])   # fast resizes: no white edge
-
-    def _glow_icons(self, level: float, now: float, force: bool = False):
-        """The title bar / taskbar and tray icons glow warm with whatever is playing,
-        like the header logo: a few steps of glow, swapped only when the step changes
-        (at most every ICON_GLOW_MS, or ICON_GLOW_BG_MS behind a game), back to the plain
-        icon when it goes quiet. Each swap makes Windows redraw the taskbar and tray
-        icons in Explorer, so a step is held until the level clearly leaves it
-        (ICON_GLOW_HOLD): on songs that's 3-10 times fewer swaps for the same glow."""
-        x = min(1.0, level * 1.4) * GLOW_STEPS
-        step = min(GLOW_STEPS, round(x))
-        if self._icon_step >= 0 and abs(x - self._icon_step) < 0.5 + ICON_GLOW_HOLD:
-            step = self._icon_step
-        if not self.isVisible() or self.isMinimized():
-            # nobody sees it, and each swap makes Windows rebuild the taskbar and tray
-            # icons in Explorer, several times a second while a game runs
-            step = 0
-        tray = getattr(self, "tray", None)
-        tray_due = tray is not None and tray.isVisible() and step != self._tray_step
-        if not force and ((step == self._icon_step and not tray_due) or now < self._icon_next):
-            return
-        wait = ICON_GLOW_MS if appstate.active() else ICON_GLOW_BG_MS
-        self._icon_next = now + wait / 1000
-        icon = glow_icon(theme.T["accent"], theme.T["accent2"], step / GLOW_STEPS)
-        if force:   # a theme change: every window (dialogs too) gets the plain icon
-            QApplication.setWindowIcon(glow_icon(theme.T["accent"], theme.T["accent2"], 0.0))
-        if force or step != self._icon_step:
-            # only this window's own icon: the app-wide one restyles every window,
-            # hidden dialogs included, on each swap
-            self.setWindowIcon(icon)
-            self._icon_step = step
-        # the tray icon follows the theme too; a hidden one is caught up once it shows
-        if tray is not None and (force or tray_due):
-            tray.setIcon(icon)
-            self._tray_step = step
 
     def on_hotkey(self, action):
         if action == "__hotkeys__":
@@ -9204,7 +9168,6 @@ class MainWindow(QMainWindow):
         if self._ui_live:
             self._tick_visuals(playing, now)
         self.overlay.tick(playing)
-        self._glow_icons(e.level_play, now)
         e.level_play *= 0.9
         e.level_main *= 0.9
         e.level_mic *= 0.9
