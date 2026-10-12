@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} blok is teruggevonden en weer op het bord gezet.",
     "{n} blokken zijn teruggevonden en weer op het bord gezet."
-  ]
+  ],
+  "Plain": "Effen",
+  "Textured": "Met patroon",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Met patroon krijgt elk thema een eigen patroon op de panelen: lijnen van een oud scherm, carbon, golven en meer. Effen houdt ze vlak.",
+  "Theme style": "Themastijl"
 }

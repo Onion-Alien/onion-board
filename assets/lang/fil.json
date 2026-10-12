@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} pad ang nahanap at ibinalik sa board.",
     "{n} pad ang nahanap at ibinalik sa board."
-  ]
+  ],
+  "Plain": "Plain",
+  "Textured": "May texture",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Sa may texture, may sariling disenyo ang bawat tema sa mga panel: linya ng lumang screen, carbon fiber, alon at iba pa. Pinapanatili itong patag ng Plain.",
+  "Theme style": "Istilo ng tema"
 }

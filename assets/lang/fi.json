@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} nappi löytyi ja palautettiin taululle.",
     "{n} nappia löytyi ja palautettiin taululle."
-  ]
+  ],
+  "Plain": "Tasainen",
+  "Textured": "Kuvioitu",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Kuvioitu antaa jokaiselle teemalle oman kuvion paneeleihin: vanhan näytön juovat, hiilikuitu, aallot ja muuta. Tasainen pitää ne yksivärisinä.",
+  "Theme style": "Teeman tyyli"
 }

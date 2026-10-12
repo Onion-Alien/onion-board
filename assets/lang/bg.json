@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} бутон беше намерен и върнат на таблото.",
     "{n} бутона бяха намерени и върнати на таблото."
-  ]
+  ],
+  "Plain": "Обикновен",
+  "Textured": "С текстура",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "С текстура всяка тема получава свой шарка по панелите: линии като на стар екран, карбон, вълни и още. Обикновеният ги оставя гладки.",
+  "Theme style": "Стил на темата"
 }

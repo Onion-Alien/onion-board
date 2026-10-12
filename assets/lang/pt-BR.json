@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} bloco foi encontrado e voltou para o painel.",
     "{n} blocos foram encontrados e voltaram para o painel."
-  ]
+  ],
+  "Plain": "Liso",
+  "Textured": "Com textura",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Com textura, cada tema ganha seu próprio padrão nos painéis: linhas de tela antiga, fibra de carbono, ondas e mais. Liso deixa tudo plano.",
+  "Theme style": "Estilo do tema"
 }

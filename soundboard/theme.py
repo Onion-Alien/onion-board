@@ -6,6 +6,7 @@ the hand-painted widgets (pads, meters, EQ curve, logo) read the same tokens thr
 """
 from __future__ import annotations
 
+import hashlib
 import re
 import tempfile
 from pathlib import Path
@@ -38,6 +39,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#363b4e", border_hi="#5a6080", groove="#343849", inset="#1b1d26",
         text="#e6e8f0", text_hi="#f1f3f9", muted="#8a90a6", faint="#6b7189", section="#8f96b3",
         accent="#7859f7", accent_hi="#8d71ff", accent2="#ff4d8d", on_accent="#ffffff",
+        texture="grain",
         off="#4a5068", badge="#343849", badge_text="#d6d9e6",
         danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
         warn_bg="#3a2e14", warn_text="#ffb020",
@@ -49,6 +51,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#cfd5e2", border_hi="#8f98b3", groove="#d5dae6", inset="#e3e7f0",
         text="#1d2130", text_hi="#11141f", muted="#5c637c", faint="#8a90a6", section="#6a7190",
         accent="#6a4cff", accent_hi="#7d62ff", accent2="#ff3d7f", on_accent="#ffffff",
+        texture="grain",
         off="#b3b9cc", badge="#e3e7f0", badge_text="#2a2f40",
         danger_bg="#ffe8ec", danger_border="#f3b3c0", danger_text="#c4213f", danger_hover="#ffd9e0",
         warn_bg="#fff1d6", warn_text="#855000",
@@ -60,6 +63,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#27402f", border_hi="#3f6a50", groove="#223829", inset="#0e1711",
         text="#e0f5e8", text_hi="#f0fff5", muted="#7fa08c", faint="#5b7b67", section="#86b597",
         accent="#1ee07f", accent_hi="#45ef98", accent2="#c6ff3d", on_accent="#04140b",
+        texture="diagonal",
         off="#3a5646", badge="#223829", badge_text="#cfeedd",
         danger_bg="#361d22", danger_border="#5a2a33", danger_text="#ff8f9e", danger_hover="#45242a",
         warn_bg="#33301a", warn_text="#ffc53d",
@@ -71,6 +75,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#263a54", border_hi="#3d5f86", groove="#22354d", inset="#0e1622",
         text="#e1ecf8", text_hi="#f2f8ff", muted="#7f96b2", faint="#5c738f", section="#87a4c6",
         accent="#1fb6ff", accent_hi="#4cc6ff", accent2="#7c5cff", on_accent="#031320",
+        texture="waves",
         off="#3a4f69", badge="#22354d", badge_text="#d3e3f5",
         danger_bg="#361f2b", danger_border="#5a2a40", danger_text="#ff8fb0", danger_hover="#45243a",
         warn_bg="#33301f", warn_text="#ffb020",
@@ -82,6 +87,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#efc9d5", border_hi="#d98aa5", groove="#f0cdd8", inset="#f6e3e9",
         text="#3a1f2b", text_hi="#2a1520", muted="#8a5d6e", faint="#b48898", section="#a9607c",
         accent="#d23f6a", accent_hi="#e0527e", accent2="#ffb7c5", on_accent="#ffffff",
+        texture="petals",
         off="#dcb0c0", badge="#f6dde5", badge_text="#5a2f40",
         danger_bg="#ffe3e3", danger_border="#f2a9a9", danger_text="#c0282d", danger_hover="#ffd3d3",
         warn_bg="#fff1d6", warn_text="#855000",
@@ -114,6 +120,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#3a4757", border_hi="#5b6e84", groove="#37434f", inset="#161c23",
         text="#e2e8ef", text_hi="#f3f6f9", muted="#8d9bab", faint="#687686", section="#9fb0c2",
         accent="#4fa3a5", accent_hi="#63b9bb", accent2="#e0a458", on_accent="#0e1a1b",
+        texture="brushed",
         off="#4a5868", badge="#354251", badge_text="#d6dee7",
         **_DARK_STATUS | dict(error_text="#ff7a7c"),
     ),
@@ -123,6 +130,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#4c566a", border_hi="#6b7891", groove="#4c566a", inset="#2a2f3a",
         text="#e5e9f0", text_hi="#eceff4", muted="#a3adc0", faint="#7b869c", section="#93b3d3",
         accent="#88c0d0", accent_hi="#9fd0de", accent2="#b48ead", on_accent="#1d232e",
+        texture="frost",
         off="#5a6479", badge="#434c5e", badge_text="#e5e9f0",
         **_DARK_STATUS | dict(ok_text="#a3e635", error_text="#ff8a8a", warn_text="#ffc857"),
     ),
@@ -132,6 +140,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#d8cbb4", border_hi="#a8977a", groove="#dccfb9", inset="#ebe2d1",
         text="#3b3226", text_hi="#2a2319", muted="#6e604a", faint="#a08f74", section="#8a6f47",
         accent="#b5562c", accent_hi="#c9663a", accent2="#2f6f73", on_accent="#ffffff",
+        texture="ruled",
         off="#c9b99c", badge="#ece3d2", badge_text="#4a3f30", **_LIGHT_STATUS,
     ),
     "High Contrast": dict(   # black, white and yellow: easiest to read
@@ -152,6 +161,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#44475a", border_hi="#6272a4", groove="#44475a", inset="#191a22",
         text="#f8f8f2", text_hi="#ffffff", muted="#a0a4c0", faint="#6f7494", section="#bd93f9",
         accent="#bd93f9", accent_hi="#caa8fb", accent2="#ff79c6", on_accent="#1e1f29",
+        texture="crosshatch",
         off="#565a70", badge="#3e4154", badge_text="#f0f0ea",
         **_DARK_STATUS | dict(ok_text="#50fa7b", error_text="#ff6e6e"),
     ),
@@ -161,6 +171,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#354433", border_hi="#587055", groove="#324030", inset="#101510",
         text="#e6eedf", text_hi="#f4f9ef", muted="#93a58a", faint="#6c7d64", section="#b5c98f",
         accent="#8bbf4d", accent_hi="#9fd060", accent2="#d9a441", on_accent="#122008",
+        texture="brushed",
         off="#4a5a45", badge="#2f3b2d", badge_text="#dbe6d1", **_DARK_STATUS,
     ),
     "Mocha": dict(   # coffee browns and caramel
@@ -169,6 +180,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#45382f", border_hi="#6e5a4b", groove="#413429", inset="#171210",
         text="#efe4da", text_hi="#fbf3ec", muted="#a8927f", faint="#7d6a5b", section="#b9b0a8",
         accent="#d4915a", accent_hi="#e0a36e", accent2="#a86a4a", on_accent="#1c120a",
+        texture="crosshatch",
         off="#5a4a3f", badge="#3b302a", badge_text="#e8dccf", **_DARK_STATUS,
     ),
     "Sunset": dict(   # orange and pink on plum
@@ -177,6 +189,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#4d2f4f", border_hi="#7a4d7a", groove="#4a2d4b", inset="#1a1019",
         text="#fbe9f0", text_hi="#fff5f8", muted="#c095a8", faint="#8e6a7c", section="#ff9e7a",
         accent="#ff7849", accent_hi="#ff8f66", accent2="#ff3d7f", on_accent="#1f0e0a",
+        texture="diagonal",
         off="#614160", badge="#442b46", badge_text="#f5dbe5",
         **_DARK_STATUS | dict(error_text="#ff6b6b"),
     ),
@@ -186,6 +199,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#3a2d5c", border_hi="#5f4c91", groove="#372a58", inset="#100b1d",
         text="#ece6ff", text_hi="#f7f3ff", muted="#a497c7", faint="#766a99", section="#e0bf5c",
         accent="#e6b93d", accent_hi="#f0c95a", accent2="#9d6bff", on_accent="#1c1405",
+        texture="diamond",
         off="#4c406e", badge="#31264f", badge_text="#e2daf7", **_DARK_STATUS,
     ),
     "Onion": dict(   # red-onion purple with a green sprout, like the logo
@@ -194,6 +208,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#4a2f57", border_hi="#7a4f8e", groove="#472c54", inset="#170e1d",
         text="#f3e6f7", text_hi="#fbf5fd", muted="#b596c2", faint="#846a90", section="#9ad36a",
         accent="#ae45d7", accent_hi="#c064e4", accent2="#8fd14f", on_accent="#ffffff",
+        texture="scales",
         off="#5e416b", badge="#40274d", badge_text="#ecdcf2",
         **_DARK_STATUS | dict(error_text="#ff6b6b"),
     ),
@@ -203,6 +218,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#3a3049", border_hi="#5e5079", groove="#352c44", inset="#19141f",
         text="#ebe5f4", text_hi="#f7f2ff", muted="#9b90b0", faint="#75698b", section="#a598c4",
         accent="#8f4cf5", accent_hi="#a066ff", accent2="#ff5fa2", on_accent="#ffffff",
+        texture="grain",
         off="#4d4262", badge="#352c44", badge_text="#e2d9f0", **_DARK_STATUS,
     ),
     "Mint": dict(   # fresh mint and white
@@ -211,6 +227,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#c3ddd1", border_hi="#7fb39b", groove="#c9e2d6", inset="#e0f0e8",
         text="#16322a", text_hi="#0c231c", muted="#4d6e62", faint="#85a498", section="#3f7f68",
         accent="#0e8669", accent_hi="#10a07c", accent2="#3f8cff", on_accent="#ffffff",
+        texture="diagonal",
         off="#a9cbbd", badge="#dcefe6", badge_text="#1e3d33", **_LIGHT_STATUS,
     ),
     # ---- wild
@@ -230,6 +247,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#e9bfdc", border_hi="#c47fb5", groove="#eac6e0", inset="#f6dcee",
         text="#3b1d4a", text_hi="#2a1236", muted="#74508a", faint="#a888b8", section="#1f8a83",
         accent="#9f3dff", accent_hi="#b060ff", accent2="#05e0a1", on_accent="#ffffff",
+        texture="grid",
         off="#d9b3d6", badge="#f5d5ec", badge_text="#4a2860", **_LIGHT_STATUS,
     ),
     "Blood Moon": dict(   # crimson on black
@@ -238,6 +256,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#3e2228", border_hi="#6b3440", groove="#3a1f25", inset="#0d0708",
         text="#f3e3e5", text_hi="#fff4f5", muted="#b08a90", faint="#7f5f65", section="#e0606f",
         accent="#d91f35", accent_hi="#ec3448", accent2="#ff8a3d", on_accent="#ffffff",
+        texture="embers",
         off="#56313a", badge="#341c21", badge_text="#f0d6da",
         **_DARK_STATUS | dict(error_text="#ff7a7c"),
     ),
@@ -247,6 +266,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#4d2010", border_hi="#8a3a14", groove="#45200e", inset="#100604",
         text="#ffe4d1", text_hi="#fff3ea", muted="#d08a63", faint="#9a6043", section="#ffae3d",
         accent="#ff5a1f", accent_hi="#ff7640", accent2="#ffd23d", on_accent="#1a0600",
+        texture="embers",
         off="#5f2b16", badge="#3b180c", badge_text="#ffd9c2",
         **_DARK_STATUS | dict(error_text="#ff7a7c"),
     ),
@@ -288,6 +308,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#ff5fb0", border_hi="#e0218a", groove="#ff8cc6", inset="#ffc0e0",
         text="#4a0027", text_hi="#330019", muted="#7a1650", faint="#a8407c", section="#a3005a",
         accent="#d6157f", accent_hi="#d91a84", accent2="#ff00a0", on_accent="#ffffff",
+        texture="dots",
         off="#e889bd", badge="#ff9ccf", badge_text="#4a0027",
         **_LIGHT_STATUS | dict(ok_text="#044a22", warn_text="#5e3700", error_text="#7a0017",
                                danger_bg="#ffe0e8", danger_text="#9a0f25"),
@@ -320,6 +341,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#808080", border_hi="#404040", groove="#a0a0a0", inset="#ffffff",
         text="#000000", text_hi="#000000", muted="#3a3a3a", faint="#6d6d6d", section="#000080",
         accent="#000080", accent_hi="#0e6fae", accent2="#008080", on_accent="#ffffff",
+        texture="dither",
         off="#a0a0a0", badge="#ffffff", badge_text="#000000",
         **_LIGHT_STATUS | dict(ok_text="#004a18", warn_text="#5c3600", error_text="#880000"),
         font="Tahoma",
@@ -330,6 +352,7 @@ THEMES: dict[str, dict[str, str]] = {
         border="#f2c200", border_hi="#d99a00", groove="#f5dc70", inset="#fff3a0",
         text="#2b1d00", text_hi="#1a1100", muted="#63500f", faint="#a08530", section="#c2006b",
         accent="#e01686", accent_hi="#f7349c", accent2="#1aa7ec", on_accent="#ffffff",
+        texture="halftone",
         off="#e0c860", badge="#ffe97a", badge_text="#3a2a00",
         **_LIGHT_STATUS | dict(ok_text="#085a2d", warn_text="#6b3f00", error_text="#a0142e"),
         font="Comic Sans MS",
@@ -552,6 +575,7 @@ def font_families() -> list[str]:
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
 live_override = ""   # the user's own highlight colour ("" = each theme's own)
+textures_on = True   # Settings > Appearance: Textured (each theme's pattern) or Plain
 
 
 def valid_colour(colour: str) -> str:
@@ -1388,14 +1412,16 @@ def _chevron_url(colour: str, size: int, up: bool, side: str = "") -> str:
     return base.as_posix()
 
 
-def _carbon_image(base: str, size: int) -> QImage:
-    """One tile of 2x2 twill weave: each cell is a tow of fibres shaded across its
-    width, the neighbouring cells turned 90 degrees, so it tiles into carbon fibre."""
-    img = QImage(size, size, QImage.Format.Format_ARGB32)
-    img.fill(QColor(base))
-    p = QPainter(img)
+def _ink(colour: str, alpha: float) -> QColor:
+    c = QColor(colour)
+    c.setAlphaF(max(0.0, min(1.0, alpha)))
+    return c
+
+
+def _carbon_tile(p: QPainter, size: int, light: QColor, dark: QColor) -> None:
+    """2x2 twill weave: each cell a tow of fibres shaded across its width, the
+    neighbouring cells turned 90 degrees, so it tiles into carbon fibre."""
     c = size / 2
-    dark, light = QColor(base).darker(150), QColor(base).lighter(135)
     for i in range(2):
         for j in range(2):
             x, y = i * c, j * c
@@ -1407,41 +1433,149 @@ def _carbon_image(base: str, size: int) -> QImage:
             g.setColorAt(0.5, light)
             g.setColorAt(1.0, dark)
             p.fillRect(QRectF(x, y, c, c), g)
-    p.end()
-    return img
 
 
-def _pattern_image(kind: str, base: str, size: int) -> QImage:
-    """The simpler tiling patterns: CRT scanlines, a neon grid, polka dots. Each is the
-    panel colour a shade lighter or darker, so text on it stays readable."""
+# Each texture: its tile size and which colour it draws with by default ("lift" = the
+# theme's brightest text colour, "shade" = black, or a theme token like "accent2").
+TEXTURES = {
+    "carbon": (14, "lift"), "scanlines": (3, "shade"), "grid": (24, "accent2"),
+    "dots": (12, "lift"), "grain": (96, "lift"), "diagonal": (12, "lift"),
+    "ruled": (24, "accent2"), "waves": (32, "accent"), "brushed": (96, "lift"),
+    "crosshatch": (8, "lift"), "diamond": (20, "accent"), "scales": (24, "accent"),
+    "embers": (96, "accent2"), "petals": (64, "accent2"), "dither": (2, "shade"),
+    "halftone": (10, "shade"), "frost": (64, "lift"),
+}
+TEXTURE_TILE = {k: v[0] for k, v in TEXTURES.items()}
+
+
+def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None = None) -> QImage:
+    """One see-through tile of theme texture `kind`, in theme `tk`'s colours. It lies
+    over a card's own colour, so hover and the theme's shades still show through, and
+    every mark stays faint enough for text on top to read."""
+    tk = tk or T
+    size = size or TEXTURES.get(kind, (14, ""))[0]
+    ink_key = tk.get("texture_ink") or TEXTURES.get(kind, (0, "lift"))[1]
+    light = is_light_colour(tk["panel"])
+    ink = ("#000000" if ink_key == "shade" or (ink_key == "lift" and light)
+           else tk["text_hi"] if ink_key == "lift" else tk.get(ink_key, tk["accent"]))
+    k = float(tk.get("texture_strength", 1.0))   # a theme can turn its texture up or down
+    a = (lambda x: _ink(ink, x * k))
     img = QImage(size, size, QImage.Format.Format_ARGB32)
-    img.fill(QColor(base))
+    img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    if kind == "scanlines":   # a darker row every third pixel
-        for y in range(0, size, 3):
-            p.fillRect(QRectF(0, y, size, 1), QColor(base).darker(135))
-    elif kind == "grid":      # one lit line along the top and left of each tile
-        line = QColor(base).lighter(150)
-        p.fillRect(QRectF(0, 0, size, 1), line)
-        p.fillRect(QRectF(0, 0, 1, size), line)
+    import random
+    rng = random.Random(7)   # the same specks every time, so tiles meet without a seam
+    if kind == "carbon":
+        _carbon_tile(p, size, _ink("#ffffff", 0.07 * k), _ink("#000000", 0.30 * k))
+    elif kind == "scanlines":   # a darker row every third pixel, like an old CRT
+        p.fillRect(QRectF(0, 0, size, 1), a(0.28))
+    elif kind == "grid":        # one lit line along the top and left of each tile
+        p.fillRect(QRectF(0, 0, size, 1), a(0.13))
+        p.fillRect(QRectF(0, 0, 1, size), a(0.13))
     elif kind == "dots":
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(base).lighter(125))
+        p.setBrush(a(0.10))
         r = size * 0.14
         for c in (0.25, 0.75):
             p.drawEllipse(QPointF(size * c, size * c), r, r)
+    elif kind == "halftone":    # comic-book print dots
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(a(0.09))
+        for cx, cy in ((0, 0), (size, 0), (0, size), (size, size), (size / 2, size / 2)):
+            p.drawEllipse(QPointF(cx, cy), size * 0.2, size * 0.2)
+    elif kind in ("grain", "frost", "embers"):   # fixed-seed specks
+        n, alpha = {"grain": (size * size // 3, 0.05), "frost": (220, 0.10),
+                    "embers": (40, 0.30)}[kind]
+        dark = _ink("#000000", (0.10 if not light else 0.04) * k)
+        for _ in range(n):
+            x, y = rng.randrange(size), rng.randrange(size)
+            if kind == "grain" and rng.random() < 0.5:
+                img.setPixelColor(x, y, dark)
+                continue
+            img.setPixelColor(x, y, a(alpha * rng.uniform(0.4, 1.0)))
+    elif kind == "diagonal":    # thin pinstripes, bottom-left to top-right
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(a(0.07), 1.5))
+        for off in (-size, 0, size):
+            p.drawLine(QPointF(off, size), QPointF(off + size, 0))
+    elif kind == "crosshatch":
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(a(0.045), 1))
+        for off in (-size, 0, size):
+            p.drawLine(QPointF(off, size), QPointF(off + size, 0))
+            p.drawLine(QPointF(off, 0), QPointF(off + size, size))
+    elif kind == "ruled":       # notebook paper: one faint line per text row
+        p.fillRect(QRectF(0, size - 1, size, 1), a(0.16))
+    elif kind == "waves":
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(a(0.08), 1.2))
+        import math
+        path = QPainterPath(QPointF(0, size / 2))
+        for x in range(1, size + 1):
+            path.lineTo(QPointF(x, size / 2 + math.sin(x / size * 2 * math.pi) * size / 6))
+        p.drawPath(path)
+    elif kind == "brushed":     # brushed metal: long, faint horizontal streaks
+        for y in range(size):
+            v = rng.uniform(-1, 1)
+            p.fillRect(QRectF(0, y, size, 1), (a(0.035 * v) if v > 0
+                                               else _ink("#000000", -0.10 * v * k)))
+    elif kind == "diamond":     # a thin lattice, like damask wallpaper
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(a(0.08), 1))
+        h = size / 2
+        diamond = QPainterPath(QPointF(h, 0))
+        for pt in ((size, h), (h, size), (0, h), (h, 0)):
+            diamond.lineTo(QPointF(*pt))
+        p.drawPath(diamond)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(a(0.12))
+        p.drawEllipse(QPointF(h, h), 1.2, 1.2)
+    elif kind == "scales":      # overlapping rings, like the layers of an onion
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(QPen(a(0.08), 1))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        h = size / 2
+        for cx, cy in ((0, h), (size, h), (h, size), (h, 0), (0, -h + size * 2), (size, h * 3)):
+            for r in (h * 0.95, h * 0.6):
+                p.drawEllipse(QPointF(cx, cy), r, r)
+    elif kind == "petals":      # a few soft blossoms scattered across the tile
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        for _ in range(5):
+            x, y, r = rng.uniform(4, size - 4), rng.uniform(4, size - 4), rng.uniform(1.5, 3)
+            p.setBrush(a(0.20))
+            p.drawEllipse(QPointF(x, y), r * 1.3, r)
+    elif kind == "dither":      # a 1-pixel checkerboard, like 256-colour dithering
+        img.setPixelColor(0, 0, a(0.10))
+        img.setPixelColor(1, 1, a(0.10))
     p.end()
     return img
 
 
-TEXTURE_TILE = {"carbon": 14, "scanlines": 3, "grid": 24, "dots": 12}
+_texture_urls: dict[tuple, str] = {}
 
 
-def texture_image(kind: str, base: str, size: int | None = None) -> QImage:
-    """One tile of theme texture `kind` ("carbon", "scanlines", "grid", "dots") on `base`."""
-    size = size or TEXTURE_TILE.get(kind, 14)
-    return _carbon_image(base, size) if kind == "carbon" else _pattern_image(kind, base, size)
+def _texture_url(tk: dict[str, str]) -> str:
+    """The theme's texture tile as a file for the stylesheet: made once, then remembered."""
+    kind = tk.get("texture", "")
+    if not textures_on or kind not in TEXTURES:
+        return ""
+    key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
+           tk.get("texture_ink", ""), tk.get("texture_strength", ""))
+    if url := _texture_urls.get(key):
+        return url
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
+    path = folder / f"tex-{kind}-{hashlib.md5(repr(key).encode()).hexdigest()[:10]}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        if not path.exists():
+            texture_image(kind, tk).save(str(path))
+    except OSError:
+        return ""
+    _texture_urls[key] = url = path.as_posix()
+    return url
 
 
 # Themes whose controls and cards keep an outline at rest: the others draw buttons,
@@ -1491,6 +1625,9 @@ def stylesheet(name: str | None = None) -> str:
         css += OUTLINE_STYLE.substitute(tk)
     else:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
+    if url := _texture_url(tk):
+        css += ("QFrame#card, QFrame#setcard, QFrame#fxcard, QFrame#transport, QDialog#transport, "
+                f'QFrame#deck {{ background-image:url("{url}"); }}\n')
     return css
 
 

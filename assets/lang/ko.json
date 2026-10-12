@@ -3228,5 +3228,9 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "저기요! 이건 아직 아무것도 안 해요. Onion Board가 마이크에 설정되지 않았거든요. 다른 사람들에게 아직 들려요.",
   "{n} pad was found and put back on the board.": [
     "패드 {n}개를 찾아 보드에 다시 넣었습니다."
-  ]
+  ],
+  "Plain": "단색",
+  "Textured": "텍스처",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "텍스처를 고르면 테마마다 패널에 고유한 무늬가 생겨요: 옛날 화면 줄무늬, 카본, 물결 등. 단색은 평평하게 둡니다.",
+  "Theme style": "테마 스타일"
 }

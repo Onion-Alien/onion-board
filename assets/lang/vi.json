@@ -3228,5 +3228,9 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Này! Cái này chưa có tác dụng, vì Onion Board chưa được thiết lập trong mic của bạn. Mọi người vẫn nghe thấy bạn.",
   "{n} pad was found and put back on the board.": [
     "Đã tìm thấy {n} pad và đặt lại lên bảng."
-  ]
+  ],
+  "Plain": "Trơn",
+  "Textured": "Có họa tiết",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Có họa tiết cho mỗi chủ đề một họa tiết riêng trên các bảng: vạch màn hình cũ, sợi carbon, sóng và hơn thế nữa. Trơn giữ chúng phẳng.",
+  "Theme style": "Kiểu chủ đề"
 }

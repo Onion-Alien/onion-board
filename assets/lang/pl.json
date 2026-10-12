@@ -3376,5 +3376,9 @@
     "Znaleziono {n} pad i przywrócono go na tablicę.",
     "Znaleziono {n} pady i przywrócono je na tablicę.",
     "Znaleziono {n} padów i przywrócono je na tablicę."
-  ]
+  ],
+  "Plain": "Gładki",
+  "Textured": "Z teksturą",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Z teksturą każdy motyw ma własny wzór na panelach: linie starego monitora, włókno węglowe, fale i więcej. Gładki zostawia je płaskie.",
+  "Theme style": "Styl motywu"
 }

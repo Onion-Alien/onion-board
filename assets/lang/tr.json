@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} tuş bulundu ve panoya geri kondu.",
     "{n} tuş bulundu ve panoya geri kondu."
-  ]
+  ],
+  "Plain": "Düz",
+  "Textured": "Desenli",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Desenli seçenekte her temanın panellerde kendi deseni olur: eski ekran çizgileri, karbon fiber, dalgalar ve daha fazlası. Düz onları sade bırakır.",
+  "Theme style": "Tema stili"
 }

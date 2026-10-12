@@ -826,6 +826,7 @@ class SettingsDialog(QDialog):
         v.addWidget(self._playing_background_card())
         v.addWidget(self._ui_scale_card())
         v.addWidget(self._highlight_card())
+        v.addWidget(self._texture_card())
         hints = {"Classic": _("Changes the whole app instantly."),
                  "Meme": _("For when you want your soundboard to be a bit.")}
         for group, names in theme.GROUPS:
@@ -841,6 +842,24 @@ class SettingsDialog(QDialog):
             v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _texture_card(self) -> QFrame:
+        """Textured or Plain: each theme's own pattern on its panels, or flat panels."""
+        card, cv = self._card(_("Theme style"),
+                              _("Textured gives each theme its own pattern on the panels: "
+                                "scanlines, carbon fibre, waves and more. Plain keeps them flat."))
+        row = _button_row()
+        textured = QRadioButton(_("Textured"))
+        plain = QRadioButton(_("Plain"))
+        group = QButtonGroup(card)
+        for b in (textured, plain):
+            group.addButton(b)
+            row.addWidget(b)
+        (textured if self.mw.cfg.theme_texture else plain).setChecked(True)
+        textured.toggled.connect(self.mw.set_theme_texture)
+        self.texture_on, self.texture_off = textured, plain
+        cv.addLayout(row)
+        return card
 
     def _ui_scale_card(self) -> QFrame:
         """Interface size: everything bigger or smaller, on top of Windows' display

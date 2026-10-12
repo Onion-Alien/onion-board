@@ -3228,5 +3228,9 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "嘿！這個現在還沒用，因為 Onion Board 還沒在你的麥克風裡設定好。別人還是聽得到你。",
   "{n} pad was found and put back on the board.": [
     "找到 {n} 個按鍵，已放回面板。"
-  ]
+  ],
+  "Plain": "純色",
+  "Textured": "紋理",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "紋理會為每個主題的面板加上專屬圖案：老式螢幕掃描線、碳纖維、波浪等。純色則保持平整。",
+  "Theme style": "主題樣式"
 }

@@ -3228,5 +3228,9 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "เฮ้! อันนี้ยังไม่มีผล เพราะยังไม่ได้ตั้งค่า Onion Board ในไมค์ของคุณ คนอื่นยังได้ยินคุณอยู่",
   "{n} pad was found and put back on the board.": [
     "พบแพด {n} อันและนำกลับมาไว้บนบอร์ดแล้ว"
-  ]
+  ],
+  "Plain": "เรียบ",
+  "Textured": "มีลวดลาย",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "แบบมีลวดลายจะให้แต่ละธีมมีลายของตัวเองบนแผง: เส้นจอเก่า คาร์บอนไฟเบอร์ คลื่น และอีกมาก แบบเรียบจะคงไว้เป็นพื้นเรียบ",
+  "Theme style": "สไตล์ธีม"
 }

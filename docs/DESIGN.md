@@ -63,7 +63,8 @@ coding agents alike: the rules are meant to be followed literally. When a rule h
 and an older screen disagree, this file wins for new work; don't restyle old screens
 in passing unless the task is about them.
 
-The style is **quiet and compact**: flat surfaces in the theme's colours, no resting
+The style is **quiet and compact**: surfaces in the theme's colours (with the theme's own
+faint texture unless the user picks Plain), no resting
 outlines, controls only as big as their words, one accent-coloured thing that says
 "do this" or "this is on". The app should look designed, not generated.
 
@@ -541,7 +542,7 @@ the tests check the tokens in all 31):
 | Accent close to grey or to the text colour | Carbon, Arctic, Hacker, Amber Terminal | anything filled with the accent under `text`-coloured words (grey on grey) |
 | Light backgrounds | Light, Paper, Mint, Cherry Blossom, Vaporwave, Flashbang, Barbie, Comic Sans, Retro 98 | bright dark-theme status colours, white text, shadows that assume dark |
 | Outlined, black on black | High Contrast | flat fills vanish: it keeps borders at rest (`OUTLINED`) |
-| Textures | Carbon, Synthwave, Brainrot, Amber Terminal, Hacker, Swamp, Deep Fried | flat colours painted over panels show as patches |
+| Textures | every theme but Midnight, High Contrast, Flashbang (`theme.TEXTURES`; Plain turns them off) | flat colours painted over panels show as patches |
 | Other fonts | Amber Terminal, Hacker (Consolas), Retro 98 (Tahoma), Comic Sans | wider words: fixed widths cut text off |
 | Loud colours | Deep Fried, Brainrot, Synthwave | `text` is yellow / lime, so a hard-coded white or grey stands out |
 

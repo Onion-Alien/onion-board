@@ -3376,5 +3376,9 @@
     "{n} pad a fost găsit și pus înapoi pe board.",
     "{n} pad-uri au fost găsite și puse înapoi pe board.",
     "{n} de pad-uri au fost găsite și puse înapoi pe board."
-  ]
+  ],
+  "Plain": "Simplu",
+  "Textured": "Cu textură",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Cu textură, fiecare temă are propriul model pe panouri: linii de ecran vechi, fibră de carbon, valuri și altele. Simplu le lasă plate.",
+  "Theme style": "Stilul temei"
 }

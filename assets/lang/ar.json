@@ -3598,5 +3598,9 @@
     "تم العثور على {n} زر وإعادته إلى اللوحة.",
     "تم العثور على {n} زر وإعادته إلى اللوحة.",
     "تم العثور على {n} زر وإعادته إلى اللوحة."
-  ]
+  ],
+  "Plain": "سادة",
+  "Textured": "بنقشة",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "مع النقشة يحصل كل مظهر على نقشته الخاصة على اللوحات: خطوط شاشة قديمة، ألياف كربون، أمواج والمزيد. السادة يتركها مسطحة.",
+  "Theme style": "نمط المظهر"
 }

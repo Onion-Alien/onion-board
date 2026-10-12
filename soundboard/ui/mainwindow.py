@@ -424,6 +424,7 @@ class MainWindow(QMainWindow):
         app = QApplication.instance()
         # before the UI is built, so everything polishes in-theme
         if isinstance(app, QApplication):
+            theme.textures_on = self.cfg.theme_texture
             self.cfg.theme = theme.apply(app, self.cfg.theme, self.cfg.live_color)
             self.cfg.live_color = theme.live_override
             app.commitDataRequest.connect(self._on_session_end)   # log-off / installer
@@ -4867,6 +4868,14 @@ class MainWindow(QMainWindow):
         self._pill_long = ""   # forces _update_flow to repaint its icon
         self._update_status()
         return True
+
+    def set_theme_texture(self, on: bool):
+        """Textured (each theme's own pattern on the panels) or Plain (flat panels)."""
+        if on == theme.textures_on:
+            return
+        self.set_option("theme_texture", on)
+        theme.textures_on = on
+        self.apply_theme(self.cfg.theme)
 
     def set_live_tab_tint(self, on: bool):
         self.set_option("live_tab_green", on)

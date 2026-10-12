@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "Βρέθηκε {n} κουμπί και μπήκε ξανά στο board.",
     "Βρέθηκαν {n} κουμπιά και μπήκαν ξανά στο board."
-  ]
+  ],
+  "Plain": "Απλό",
+  "Textured": "Με υφή",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Με υφή κάθε θέμα παίρνει το δικό του μοτίβο στα πάνελ: γραμμές παλιάς οθόνης, ανθρακονήματα, κύματα και άλλα. Το απλό τα αφήνει επίπεδα.",
+  "Theme style": "Στυλ θέματος"
 }

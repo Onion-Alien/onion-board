@@ -3376,5 +3376,9 @@
     "{n} pad byl nalezen a vrácen na desku.",
     "{n} pady byly nalezeny a vráceny na desku.",
     "{n} padů bylo nalezeno a vráceno na desku."
-  ]
+  ],
+  "Plain": "Hladký",
+  "Textured": "S texturou",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "S texturou má každý motiv na panelech vlastní vzor: řádky starého monitoru, karbon, vlny a další. Hladký je nechá jednobarevné.",
+  "Theme style": "Styl motivu"
 }

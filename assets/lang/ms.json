@@ -3228,5 +3228,9 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Ini belum berfungsi lagi, sebab Onion Board belum disediakan dalam mik anda. Orang masih boleh dengar anda.",
   "{n} pad was found and put back on the board.": [
     "{n} pad ditemui dan diletakkan semula pada papan."
-  ]
+  ],
+  "Plain": "Polos",
+  "Textured": "Bertekstur",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Bertekstur memberi setiap tema corak sendiri pada panel: garis skrin lama, gentian karbon, ombak dan banyak lagi. Polos mengekalkannya rata.",
+  "Theme style": "Gaya tema"
 }

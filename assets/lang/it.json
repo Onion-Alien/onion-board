@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} pad è stato ritrovato e rimesso sulla board.",
     "{n} pad sono stati ritrovati e rimessi sulla board."
-  ]
+  ],
+  "Plain": "Semplice",
+  "Textured": "Con trama",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Con trama ogni tema ha il suo motivo sui pannelli: righe da vecchio schermo, fibra di carbonio, onde e altro. Semplice li lascia piatti.",
+  "Theme style": "Stile del tema"
 }

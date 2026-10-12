@@ -3302,5 +3302,9 @@
   "{n} pad was found and put back on the board.": [
     "{n} ruta hittades och lades tillbaka på brädan.",
     "{n} rutor hittades och lades tillbaka på brädan."
-  ]
+  ],
+  "Plain": "Enfärgad",
+  "Textured": "Med mönster",
+  "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mönster får varje tema sitt eget mönster på panelerna: skärmlinjer, kolfiber, vågor och mer. Enfärgad håller dem platta.",
+  "Theme style": "Temastil"
 }
