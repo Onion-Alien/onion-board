@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 10
+HELPER_VERSION = 11
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -68,7 +68,12 @@ _SID = re.compile(r"S-1-5-21(-\d{1,10}){3,4}|S-1-12-1(-\d{1,10}){4}")
 _REQUEST = re.compile(r"[0-9a-f]{32}")
 MAX_REQUEST = 256
 RESULT_KEEP_S = 3600.0
-START_S = 20.0   # the task didn't pick a request up in this long: it isn't working
+START_S = 20.0   # the task didn't pick a request up in this long, and Task Scheduler
+#                says it isn't running or queued either: it isn't working
+STATUS_EVERY_S = 2.0   # ...asked this often past START_S, while the request waits
+# Task Scheduler's "Last Result" while a task runs / waits its turn: the same in every
+# language, where the status words aren't
+_RUNNING_CODES = ("267009", "267045")   # SCHED_S_TASK_RUNNING, SCHED_S_TASK_QUEUED
 BEAT_S = 2.0     # the helper touches a request's .ack this often while on it
 STALE_S = 30.0   # ...so an .ack this old means it died half-way (killed, crashed)
 HARD_S = 960.0   # the task's own time limit (PT15M) and a minute: gone by then
@@ -283,6 +288,7 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
         return None
     ack = results_dir() / f"{rid}.ack"
     clock, beats = _Clock(), _Beats()
+    running, next_status = False, START_S
     while True:
         waited = clock.now()
         code = _result(res)
@@ -304,7 +310,11 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
             # next, so wait, within the task's own time limit (others are watched from
             # the start: one only counts once it is seen to change)
             busy = beats.busy(ack, waited)
-            if waited > HARD_S or (waited > START_S and not busy):
+            if waited > START_S and not busy and waited >= next_status:
+                # slow to start (a busy PC, Task Scheduler queueing it): wait on while
+                # Task Scheduler says it is running or queued, not a fixed time
+                running, next_status = task_running(), waited + STATUS_EVERY_S
+            if waited > HARD_S or (waited > START_S and not busy and not running):
                 log.info("the mic helper didn't pick the request up")
                 _forget(req)
                 return None
@@ -312,6 +322,24 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
             log.info("the mic helper didn't answer in %.0f s", wait_s)
             return None
         time.sleep(0.1)
+
+
+def task_running() -> bool:
+    """Task Scheduler says the helper's task is running or queued (on a worker)."""
+    out: list[str] = []
+    return (_schtasks("/query", "/tn", TASK, "/v", "/fo", "LIST", out=out) == 0
+            and bool(out) and task_running_in(out[0]))
+
+
+def task_running_in(text: str) -> bool:
+    """`schtasks /query /v /fo LIST`'s output says running or queued: its last result
+    code (any language) or the English status. Anything else (a language whose status
+    words it can't read and no code) counts as not running: the wait is as before."""
+    for line in text.splitlines():
+        value = line.partition(":")[2].strip()
+        if value in _RUNNING_CODES or value in ("Running", "Queued"):
+            return True
+    return False
 
 
 GAP_S = 5.0   # ask() didn't look for this long (it looks 10 times a second): the PC slept

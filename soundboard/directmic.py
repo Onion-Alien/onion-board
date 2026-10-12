@@ -1926,7 +1926,8 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
         if code is not None or not ask_windows:
             return code
         return run_elevated(sys.executable,
-                            relaunch_params(args + michelper.for_user(args)), wait_s)
+                            relaunch_params(args + michelper.for_user(args)), wait_s,
+                            progress=data_dir().parent / "directmic-admin.log")
     finally:
         # what the UI shows follows the helper as it is now: the prompt's step may
         # have set it up, and another account may have removed it meanwhile
@@ -1960,11 +1961,42 @@ def _via_helper(args: list[str], wait_s: float) -> int | None:
 UNFINISHED = -1   # run_elevated: it ran (or couldn't start), but no answer came
 
 
-def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
+PROMPT_CAP_S = 900.0   # an admin step still writing its log is waited for up to this
+
+
+def wait_for(done, wait_s: float, progress: Path | None, cap_s: float = PROMPT_CAP_S,
+             poll_s: float = 1.0) -> bool:
+    """Wait for `done(seconds)` (blocks up to that long; True once finished) while
+    `progress` (an admin log) keeps changing, up to `cap_s`: a slow PC still at work
+    isn't cut off at a fixed time. False once it has been silent for `wait_s`."""
+    start = last = time.monotonic()
+    mark = _file_mark(progress)
+    while True:
+        if done(poll_s):
+            return True
+        now = time.monotonic()
+        seen = _file_mark(progress)
+        if seen != mark:
+            mark, last = seen, now
+        if now - start > cap_s or now - last > wait_s:
+            return False
+
+
+def _file_mark(path: Path | None) -> tuple[int, int] | None:
+    try:
+        st = path.stat() if path is not None else None
+    except OSError:
+        return None
+    return None if st is None else (st.st_size, st.st_mtime_ns)
+
+
+def run_elevated(exe: str, params: str, wait_s: float = 90.0,
+                 progress: Path | None = None) -> int | None:
     """Run `exe` as admin, hidden (Windows asks first). Its exit code; None if the
     prompt was turned down (ERROR_CANCELLED: a No, or a PC that denies admin rights to
-    this account); UNFINISHED if it couldn't start otherwise or didn't finish in
-    `wait_s` (the prompt may still be open: nobody clicked No)."""
+    this account); UNFINISHED if it couldn't start otherwise or didn't finish (silent
+    for `wait_s`: the log `progress` didn't change either; the prompt may still be
+    open: nobody clicked No)."""
     from ctypes import wintypes
 
     class SHELLEXECUTEINFOW(ctypes.Structure):
@@ -1990,8 +2022,11 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
         log.info("%s %s not run (error %s)", Path(exe).name, params[-40:], error)
         return None if error == 1223 else UNFINISHED   # ERROR_CANCELLED: turned down
     try:
-        if kernel32.WaitForSingleObject(info.hProcess, int(wait_s * 1000)) != 0:
-            log.info("%s %s didn't finish in %.0f s", Path(exe).name, params[-40:], wait_s)
+        handle = info.hProcess
+        if not wait_for(lambda t: kernel32.WaitForSingleObject(handle, int(t * 1000)) == 0,
+                        wait_s, progress, max(PROMPT_CAP_S, wait_s)):
+            log.info("%s %s didn't finish (silent for %.0f s)", Path(exe).name,
+                     params[-40:], wait_s)
             return UNFINISHED
         code = wintypes.DWORD()
         kernel32.GetExitCodeProcess(info.hProcess, ctypes.byref(code))
