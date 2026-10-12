@@ -846,18 +846,18 @@ class SettingsDialog(QDialog):
         return card
 
     def _language_card(self) -> QFrame:
-        """The app's language: a button showing the one picked, opening a window of
-        language tiles with a search (ui.langpick). The title is in Windows' language
-        too, so someone who can't read this page still finds it; what it says about
-        restarting is in the language picked."""
+        """The app's language: a button showing the one picked (its letter coin and
+        name), opening a drop-down of languages with a search (ui.langpick). The title
+        is in Windows' language too, so someone who can't read this page still finds
+        it; what it says about restarting is in the language picked."""
         title = _("Language")
         other = i18n.offer()
         if other:
             word = i18n.in_language(other, lambda: _("Language"))
             title = title if word == title else f"{title} · {word}"
         card, cv = self._card(title)
-        pick = QPushButton()
-        icons.set_icon(pick, "browser")
+        from soundboard.ui.langpick import LangButton
+        pick = LangButton()
         pick.setAccessibleName(_("Language"))
         pick.setToolTip(_("Pick the language Onion Board is shown in"))
         restart = QPushButton()
@@ -880,7 +880,7 @@ class SettingsDialog(QDialog):
 
         def show():
             code = chosen()
-            pick.setText(f"{langs.get(code, code)}  ▾")
+            pick.show_language(code, langs.get(code, code))
             later = code != i18n.current()
             if later:
                 text, button = i18n.in_language(code, lambda: (
@@ -896,13 +896,15 @@ class SettingsDialog(QDialog):
 
         def open_picker():
             from soundboard.ui.langpick import LanguageDialog
+            if self.lang_dialog is not None and self.lang_dialog.isVisible():
+                return
             dlg = LanguageDialog(self, chosen())
             self.lang_dialog = dlg   # (tests reach it while it's open)
+            dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
             dlg.chosen.connect(lambda code: (
                 self.mw.switch_language(code, restart=False), show()))
-            dlg.exec()
-            self.lang_dialog = None
-            dlg.deleteLater()
+            dlg.destroyed.connect(lambda *__: setattr(self, "lang_dialog", None))
+            dlg.open_under(pick)   # a drop-down, not a window: nothing waits on it
         pick.clicked.connect(open_picker)
         show()
         self.lang_button, self.lang_note, self.lang_restart = pick, note, restart
