@@ -3207,7 +3207,6 @@
   "Volumes levelled": "ปรับความดังเท่ากันแล้ว",
   "Live: click to mute": "สด: คลิกเพื่อปิดเสียง",
   "Muted: click to go live": "ปิดเสียงอยู่: คลิกเพื่อกลับมาสด",
-  "Pause or resume": "หยุดชั่วคราวหรือเล่นต่อ",
   "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย ถ้าปิดเสียงไมค์อยู่ ให้เปิดเสียง ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b> แล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
   "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย ถ้าปิดเสียงไมค์อยู่ ให้เปิดเสียง ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b>: เสียงจะหายไปสองสามวินาที",
   "No sound": "ไม่มีเสียง",

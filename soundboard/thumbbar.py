@@ -30,7 +30,7 @@ MSGFLT_ALLOW = 1
 # button id -> (icon, colour key); ids are what WM_COMMAND brings back
 LAST, PAUSE, STOP, RANDOM, LIVE = range(1, 6)
 ORDER = (LAST, PAUSE, STOP, RANDOM, LIVE)
-ICONS = {LAST: "reload", PAUSE: "pause", STOP: "stop_all", RANDOM: "shuffle", LIVE: "live"}
+ICONS = {LAST: "reload", PAUSE: "pause", STOP: "stop", RANDOM: "shuffle", LIVE: "live"}
 
 # on the flyout: (light Windows, dark Windows)
 COLOURS = {"plain": ("#1f1f1f", "#e8e8e8"), "stop": ("#c42b1c", "#ff6b6b"),
@@ -53,7 +53,7 @@ class THUMBBUTTON(Structure):
 def tips() -> dict:
     """Tooltips, translated when they're asked for (the language can change)."""
     from soundboard.i18n import _
-    return {LAST: _("Play the last sound again"), PAUSE: _("Pause or resume"),
+    return {LAST: _("Play the last sound again"), PAUSE: _("Pause"),
             STOP: _("Stops every sound, the radio and every program, and turns the voices off"),
             RANDOM: _("Play a random sound")}
 
@@ -88,6 +88,7 @@ class ThumbBar:
         self.window = window
         self.actions = actions
         self.live = True
+        self.paused = False    # everything playing is paused: the Pause button says Play
         self._tb = None        # the ITaskbarList3, once the taskbar button exists
         self._hwnd = 0
         self._added = False
@@ -147,6 +148,13 @@ class ThumbBar:
         self.live = on
         self.refresh()
 
+    def set_paused(self, on: bool):
+        """Pause while a sound plays, Play (resume) while everything is paused."""
+        if on == self.paused:
+            return
+        self.paused = on
+        self.refresh()
+
     def refresh(self):
         """Repaint the buttons (the state changed, Windows' light / dark mode)."""
         if not self._added:
@@ -172,12 +180,16 @@ class ThumbBar:
         light = light_windows()
         size = max(16, round(16 * self.window.devicePixelRatioF()))
         text = {**tips(), LIVE: live_tip(self.live)}
+        if self.paused:
+            from soundboard.i18n import _
+            text[PAUSE] = _("Resume")
         out = []
         for bid in ORDER:
             kind = ("live" if self.live else "muted") if bid == LIVE else (
                 "stop" if bid == STOP else "plain")
             colour = COLOURS[kind][0 if light else 1]
-            img = icons.pixmap(ICONS[bid], size, colour).toImage()
+            name = "play" if bid == PAUSE and self.paused else ICONS[bid]
+            img = icons.pixmap(name, size, colour).toImage()
             b = THUMBBUTTON()
             b.dwMask = THB_ICON | THB_TOOLTIP | THB_FLAGS
             b.iId = bid
