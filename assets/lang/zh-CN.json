@@ -1014,7 +1014,6 @@
   "On the left, click <b>Voice</b>.": "在左边点 <b>语音</b>。",
   "On, at {host}:{port}. Pick a link to copy.": "已开启，位于 {host}:{port}。选一个链接来复制。",
   "On: listening on {host}:{port}.": "已开启：正在监听 {host}:{port}。",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重置东西时都会保存一个（保留最近 {max_points} 个）。还原会把你的设置、快捷键和音效恢复原样。之后添加的音效会保留。",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "一个键可以在每个分类里播放不同的音效：切换分类（它的标签页，或上面的键），同样的键就会播放那个分类的音效。不属于任何分类的音效始终保留它们的键。",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "每个连接一行：是你的什么操作引起的、线路、结果、字节数，以及应用能读到的请求",
   "One row per server: what it was for, why, and how often": "每个服务器一行：用来做什么、为什么，以及多频繁",
@@ -3223,5 +3222,7 @@
   "No sound": "没有声音",
   "Your mic sends no sound": "你的麦克风没有声音",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "即使重启了 Windows 的音频，你的麦克风仍然没有声音。如果耳机麦克风静音了，请取消静音。如果没有，请重启电脑，然后再试一次。",
-  "Your mic sends no sound: see the Setup tab.": "你的麦克风没有声音：请查看设置标签页。"
+  "Your mic sends no sound: see the Setup tab.": "你的麦克风没有声音：请查看设置标签页。",
+  "Before update": "更新前",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重置东西或更新应用时都会保存一个（保留最近 {max_points} 个）。还原会把你的设置、快捷键和音效恢复原样。之后添加的音效会保留。"
 }

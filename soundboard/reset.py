@@ -16,6 +16,10 @@ A restore point is a folder in %APPDATA%\\OnionBoard\\restore-points\\:
 
 so restoring one puts back what the reset took away, files and all. The newest
 MAX_POINTS are kept; an older point's audio goes to the Windows Recycle Bin.
+
+A point is also saved when another version of the app ran here last (an update, or
+going back to an older one): before_update(). It holds only the settings, since an
+update leaves the sounds themselves where they are.
 """
 from __future__ import annotations
 
@@ -27,13 +31,15 @@ import uuid
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 
-from soundboard import library, trash
+from soundboard import __version__, library, trash
 from soundboard.i18n import _
 from soundboard.library import Config
 
 log = logging.getLogger(__name__)
 
 MAX_POINTS = 5
+UPDATE = "Before update"   # an update's point (label kept in English, like the others)
+UPDATE_POINTS = 2          # ...of which only the newest are kept
 SETTINGS, HOTKEYS, SOUND_KEYS, SOUNDS, BIN, PROGRAMS, DEVICES = (
     "settings", "hotkeys", "sound_keys", "sounds", "bin", "programs", "devices")
 # what each part is called, in English (shown through part_name(): this module can be
@@ -90,7 +96,8 @@ class Point:
     def title(self) -> str:
         """The label in the language showing."""
         return {"Before reset": _("Before reset"),
-                "Before restoring": _("Before restoring")}.get(self.label, self.label)
+                "Before restoring": _("Before restoring"),
+                UPDATE: _("Before update")}.get(self.label, self.label)
 
     def describe(self) -> str:
         """"Settings, Hotkeys" / "Everything as it was"."""
@@ -141,6 +148,26 @@ def run_pending() -> str:
         log.exception("the reset / restore failed")
         return _("Couldn't finish that: nothing was changed. The log has the details.")
     return ""
+
+
+def before_update(cfg: Config) -> Point | None:
+    """At start, before anything moves or changes (library.tidy_files): when another
+    version ran here last, save the settings as they were, so Restore points can put
+    them back. cfg.stats_version is the last version that ran (usage.started notes
+    this one later); versions before it kept none, so a profile with sounds or a
+    finished setup and no version is an update too. Never raises."""
+    last = cfg.stats_version
+    if last == __version__ or cfg.read_only or not (last or cfg.sounds or cfg.setup_done):
+        return None
+    try:
+        for old in [p for p in points() if p.label == UPDATE][UPDATE_POINTS - 1:]:
+            _remove(old.path)
+        point = _new_point(UPDATE, [], cfg)
+    except Exception:  # noqa: BLE001 - never in the way of starting
+        log.warning("couldn't save a restore point before the update", exc_info=True)
+        return None
+    log.info("saved restore point %s before the update from %s", point.id, last or "?")
+    return point
 
 
 # --------------------------------------------------------------------------- reset
@@ -271,9 +298,14 @@ def restore(point_id: str) -> str:
         # the pad list as it was, minus sounds whose audio has gone since (deleted after
         # the point was saved: they're in Recently deleted), plus sounds added since
         ids = {m.id for m in old.sounds}
+        files_now = {m.id: m.file for m in now.sounds}
+        for m in old.sounds:   # moved since (an update put it in its library folder)
+            if not Path(m.file).exists() and Path(files_now.get(m.id) or "").is_file():
+                m.file = files_now[m.id]
         old.sounds = [m for m in old.sounds if Path(m.file).exists()]
         old.sounds += [m for m in now.sounds if m.id not in ids]
         library.merge_tags(now.categories, old.categories)   # appends the new ones
+        old.stats_version = now.stats_version   # the version that's running, not a new update
         saved = old.save()
     except Exception:
         if not _put_back(moved):

@@ -710,7 +710,6 @@
   "One click": "Um clique",
   "One click needed: repair your mic": "Falta um clique: repara o teu microfone",
   "One click: put your sounds straight into your mic": "Um clique: pôr os teus sons diretamente no teu microfone",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "É guardado um sempre que repões alguma coisa (os últimos {max_points} são mantidos). Restaurar repõe as tuas definições, atalhos e sons como estavam. Os sons que adicionaste desde então são mantidos.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Uma tecla pode tocar um som diferente em cada categoria: muda de categoria (o separador dela, ou as teclas acima) e as mesmas teclas tocam os sons dessa categoria. Os sons sem categoria mantêm sempre as suas teclas.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Uma tecla pode desligar todos os outros atalhos enquanto escreves no chat. Define-a em Definições → Atalhos.",
   "One of them": "Um deles",
@@ -3296,5 +3295,7 @@
   "No sound": "Sem som",
   "Your mic sends no sound": "O teu microfone não está a enviar som",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "O teu microfone não está a enviar som, mesmo depois de reiniciar o áudio do Windows. Se o microfone dos teus auscultadores estiver silenciado, tira o silêncio. Se não, reinicia o PC e tenta outra vez.",
-  "Your mic sends no sound: see the Setup tab.": "O teu microfone não está a enviar som: vê o separador Configuração."
+  "Your mic sends no sound: see the Setup tab.": "O teu microfone não está a enviar som: vê o separador Configuração.",
+  "Before update": "Antes de atualizar",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "É guardado um sempre que repões alguma coisa ou atualizas a app (os últimos {max_points} são mantidos). Restaurar repõe as tuas definições, atalhos e sons como estavam. Os sons que adicionaste desde então são mantidos."
 }

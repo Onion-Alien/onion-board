@@ -1014,7 +1014,6 @@
   "On the left, click <b>Voice</b>.": "Di sebelah kiri, klik <b>Suara</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Aktif, di {host} : {port} . Pilih tautan untuk disalin.",
   "On: listening on {host}:{port}.": "Aktif: mendengarkan di {host} : {port} .",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Satu tombol dapat memainkan suara berbeda di setiap kategori: beralih kategori (tabnya, atau tombol di atas) dan tombol yang sama memutar suara kategori tersebut. Suara dalam kategori apa pun selalu menyimpan kuncinya.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Satu baris per koneksi: apa yang Anda lakukan, rute, hasil, byte, dan permintaan yang dapat dibaca aplikasi",
   "One row per server: what it was for, why, and how often": "Satu baris per server: untuk apa, mengapa, dan seberapa sering",
@@ -3223,5 +3222,7 @@
   "No sound": "Tidak ada suara",
   "Your mic sends no sound": "Mic-mu tidak mengirim suara",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mic-mu tidak mengirim suara, bahkan setelah audio Windows dimulai ulang. Kalau mic headset-mu di-mute, nyalakan lagi. Kalau tidak, restart PC-mu, lalu coba lagi.",
-  "Your mic sends no sound: see the Setup tab.": "Mic-mu tidak mengirim suara: lihat tab Setup."
+  "Your mic sends no sound: see the Setup tab.": "Mic-mu tidak mengirim suara: lihat tab Setup.",
+  "Before update": "Sebelum pembaruan",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu atau memperbarui aplikasi ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan."
 }

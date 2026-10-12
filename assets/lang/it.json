@@ -1037,7 +1037,6 @@
   "On the left, click <b>Voice</b>.": "A sinistra, fai clic su <b>Voce</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Su, su {host} : {port} . Scegli un collegamento da copiare.",
   "On: listening on {host}:{port}.": "Acceso: in ascolto su {host} : {port} .",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ne viene salvato uno ogni volta che reimposti qualcosa (vengono mantenuti gli ultimi {max_points}). Il ripristino ripristina le impostazioni, i tasti di scelta rapida e i suoni com'erano. I suoni che hai aggiunto da allora vengono mantenuti.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Un tasto può riprodurre un suono diverso in ciascuna categoria: cambia categoria (la sua scheda o i tasti sopra) e gli stessi tasti riproducono i suoni di quella categoria. I suoni di nessuna categoria mantengono sempre le loro chiavi.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Una riga per connessione: cosa hai fatto per realizzarla, percorso, risultato, byte e richieste che l'app può leggere",
   "One row per server: what it was for, why, and how often": "Una riga per server: a cosa serviva, perché e quanto spesso",
@@ -3296,5 +3295,7 @@
   "No sound": "Nessun suono",
   "Your mic sends no sound": "Il tuo microfono non invia nessun suono",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Il tuo microfono non invia nessun suono, anche dopo il riavvio dell'audio di Windows. Se il microfono delle cuffie è disattivato, riattivalo. Altrimenti riavvia il PC e riprova.",
-  "Your mic sends no sound: see the Setup tab.": "Il tuo microfono non invia nessun suono: guarda la scheda Configurazione."
+  "Your mic sends no sound: see the Setup tab.": "Il tuo microfono non invia nessun suono: guarda la scheda Configurazione.",
+  "Before update": "Prima dell'aggiornamento",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ne viene salvato uno ogni volta che reimposti qualcosa o aggiorni l'app (vengono mantenuti gli ultimi {max_points}). Il ripristino ripristina le impostazioni, i tasti di scelta rapida e i suoni com'erano. I suoni che hai aggiunto da allora vengono mantenuti."
 }

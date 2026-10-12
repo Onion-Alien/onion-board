@@ -710,7 +710,6 @@
   "One click": "Yksi klikkaus",
   "One click needed: repair your mic": "Yksi klikkaus tarvitaan: korjaa mikkisi",
   "One click: put your sounds straight into your mic": "Yksi klikkaus: laita äänesi suoraan mikkiisi",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Yksi näppäin voi soittaa eri äänen jokaisessa kategoriassa: vaihda kategoriaa (sen välilehdestä tai yllä olevilla näppäimillä), niin samat näppäimet soittavat sen kategorian ääniä. Kategoriattomat äänet pitävät aina näppäimensä.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Yksi näppäin voi laittaa kaikki muut pikanäppäimet pois, kun kirjoitat chattiin. Aseta se kohdassa Asetukset → Pikanäppäimet.",
   "One of them": "Yksi niistä",
@@ -3296,5 +3295,7 @@
   "No sound": "Ei ääntä",
   "Your mic sends no sound": "Mikkisi ei lähetä ääntä",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikkisi ei lähetä ääntä edes Windowsin äänen uudelleenkäynnistyksen jälkeen. Jos kuulokkeidesi mikki on mykistetty, poista mykistys. Jos ei, käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
-  "Your mic sends no sound: see the Setup tab.": "Mikkisi ei lähetä ääntä: katso Asetukset-välilehti."
+  "Your mic sends no sound: see the Setup tab.": "Mikkisi ei lähetä ääntä: katso Asetukset-välilehti.",
+  "Before update": "Ennen päivitystä",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät."
 }

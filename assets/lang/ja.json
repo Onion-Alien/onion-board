@@ -1016,7 +1016,6 @@
   "On the left, click <b>Voice</b>.": "左側にある<b>[音声]</b>をクリックします。",
   "On, at {host}:{port}. Pick a link to copy.": "オン、 {host} : {port} 。コピーするリンクを選択します。",
   "On: listening on {host}:{port}.": "オン: {host} : {port}をリッスンします。",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "1 つのキーで各カテゴリの異なるサウンドを再生できます。カテゴリ (そのタブまたは上のキー) を切り替えると、同じキーでそのカテゴリのサウンドが再生されます。どのカテゴリーのサウンドも常にキーを保持します。",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "接続ごとに 1 行: 接続を確立するために行った操作、ルート、結果、バイト数、アプリが読み取ることができたリクエスト",
   "One row per server: what it was for, why, and how often": "サーバーごとに 1 行: その目的、理由、頻度",
@@ -3223,5 +3222,7 @@
   "No sound": "音なし",
   "Your mic sends no sound": "マイクから音が出ていません",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows のオーディオを再起動しても、マイクから音が出ていません。ヘッドセットのマイクがミュートになっていれば解除してください。そうでなければ PC を再起動してから、もう一度お試しください。",
-  "Your mic sends no sound: see the Setup tab.": "マイクから音が出ていません: セットアップ タブを確認してください。"
+  "Your mic sends no sound: see the Setup tab.": "マイクから音が出ていません: セットアップ タブを確認してください。",
+  "Before update": "更新前",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットしたりアプリを更新したりするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。"
 }

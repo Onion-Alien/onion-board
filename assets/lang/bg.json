@@ -659,7 +659,6 @@
   "On: listening on {host}:{port}.": "Включено: слуша на {host}:{port}.",
   "One click": "Един клик",
   "One click: put your sounds straight into your mic": "Един клик: пусни звуците си направо в микрофона",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Един клавиш може да пуска различен звук във всяка категория: смени категорията (раздела ѝ или клавишите по-горе) и същите клавиши пускат звуците на тази категория. Звуците без категория винаги пазят клавишите си.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Един клавиш може да изключва всички други бързи клавиши, докато пишеш в чата. Задай го в Настройки → Бързи клавиши.",
   "One of them": "Един от тях",
@@ -3296,5 +3295,7 @@
   "No sound": "Няма звук",
   "Your mic sends no sound": "Микрофонът ти не праща звук",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Микрофонът ти не праща звук дори след рестарт на звука на Windows. Ако микрофонът на слушалките е заглушен, включи го. Ако не е, рестартирай компютъра и опитай пак.",
-  "Your mic sends no sound: see the Setup tab.": "Микрофонът ти не праща звук: виж раздела Настройка."
+  "Your mic sends no sound: see the Setup tab.": "Микрофонът ти не праща звук: виж раздела Настройка.",
+  "Before update": "Преди обновяването",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят."
 }

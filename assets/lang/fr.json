@@ -1035,7 +1035,6 @@
   "On the left, click <b>Voice</b>.": "À gauche, clique sur <b>Voix</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Actif, sur {host}:{port}. Choisis un lien à copier.",
   "On: listening on {host}:{port}.": "Actif : écoute sur {host}:{port}.",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Un est enregistré chaque fois que tu réinitialises quelque chose (les {max_points} derniers sont gardés). Restaurer remet tes paramètres, raccourcis et sons comme ils étaient. Les sons ajoutés depuis sont gardés.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Une touche peut jouer un son différent dans chaque catégorie : change de catégorie (son onglet, ou les touches ci-dessus) et les mêmes touches jouent les sons de cette catégorie. Les sons sans catégorie gardent toujours leurs touches.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Une ligne par connexion : ce que tu as fait qui l'a lancée, itinéraire, résultat, octets, et les requêtes que l'appli a pu lire",
   "One row per server: what it was for, why, and how often": "Une ligne par serveur : à quoi il servait, pourquoi, et combien de fois",
@@ -3296,5 +3295,7 @@
   "No sound": "Pas de son",
   "Your mic sends no sound": "Ton micro n'envoie aucun son",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Ton micro n'envoie aucun son, même après le redémarrage du son de Windows. Si le micro de ton casque est coupé, réactive-le. Sinon, redémarre ton PC, puis réessaie.",
-  "Your mic sends no sound: see the Setup tab.": "Ton micro n'envoie aucun son : regarde l'onglet Configuration."
+  "Your mic sends no sound: see the Setup tab.": "Ton micro n'envoie aucun son : regarde l'onglet Configuration.",
+  "Before update": "Avant la mise à jour",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Un est enregistré chaque fois que tu réinitialises quelque chose ou mets l'app à jour (les {max_points} derniers sont gardés). Restaurer remet tes paramètres, raccourcis et sons comme ils étaient. Les sons ajoutés depuis sont gardés."
 }

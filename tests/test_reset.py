@@ -3,6 +3,7 @@ restore point is saved first, and restoring it puts back settings and files."""
 import json
 from pathlib import Path
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
 
@@ -145,7 +146,9 @@ def test_guide_picks_parts_and_restarts(window, monkeypatch, qapp):  # noqa: F81
     reset.run_pending()
     r = RestorePoints(window)
     assert r.list.count() == 1 and r.btn_restore.isEnabled()
-    assert "Hotkeys, Sound hotkeys, Recently deleted" in r.list.item(0).text()
+    assert "Hotkeys, Sound hotkeys, Recently deleted" in r.list.item(0).data(
+        Qt.ItemDataRole.AccessibleTextRole)
+    assert r.list.height() < 140   # as tall as its one row, no empty box under it
 
 
 def test_restart_starts_a_copy_that_waits_for_this_one(window, monkeypatch):  # noqa: F811
@@ -159,3 +162,34 @@ def test_restart_starts_a_copy_that_waits_for_this_one(window, monkeypatch):  # 
     window.restart_app()
     assert calls == [[sys.executable, "main.py", "--restart-after", str(os.getpid())]]
     assert quits == [1]
+
+
+def test_an_update_saves_a_restore_point_first(app_dir):
+    cfg = _board(app_dir)
+    cfg.stats_version = reset.__version__
+    assert reset.before_update(cfg) is None   # the same version: not an update
+    assert reset.before_update(Config()) is None   # a new install: nothing to keep
+    cfg.stats_version = ""   # versions before 2.0 didn't note theirs
+    point = reset.before_update(cfg)
+    assert point is not None and point.label == reset.UPDATE
+    assert [p.id for p in reset.points()] == [point.id]
+    assert reset.points()[0].title == "Before update"
+    for _ in range(3):
+        reset.before_update(cfg)
+    assert [p.label for p in reset.points()].count(reset.UPDATE) == reset.UPDATE_POINTS
+
+
+def test_restoring_an_update_point_follows_files_the_update_moved(app_dir):
+    cfg = _board(app_dir)
+    cfg.theme, cfg.stats_version = "Neon", "1.9.27"
+    point = reset.before_update(cfg)
+    moved = library.SOUNDS_DIR / "My sounds" / "Sound a1.wav"   # what tidy_files does
+    moved.parent.mkdir(parents=True)
+    Path(cfg.sounds[0].file).replace(moved)
+    cfg.sounds[0].file, cfg.theme, cfg.stats_version = str(moved), "Light", reset.__version__
+    assert cfg.save()
+    reset.schedule_restore(point.id)
+    reset.run_pending()
+    back = Config.load()
+    assert back.theme == "Neon" and back.stats_version == reset.__version__
+    assert [m.file for m in back.sounds] == [str(moved), cfg.sounds[1].file]   # none lost

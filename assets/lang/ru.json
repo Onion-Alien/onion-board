@@ -986,7 +986,6 @@
   "On the left, click <b>Voice</b>.": "Слева нажми <b>Голос</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Включено, на {host}:{port}. Выбери ссылку, чтобы скопировать.",
   "On: listening on {host}:{port}.": "Вкл.: слушаю на {host}:{port}.",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Одна клавиша может играть разный звук в каждой категории: переключи категорию (её вкладкой или клавишами выше), и те же клавиши играют звуки этой категории. Звуки без категории всегда сохраняют свои клавиши.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "По строке на соединение: что ты сделал, чтобы оно появилось, маршрут, результат, байты и запросы, которые приложение смогло прочитать",
   "One row per server: what it was for, why, and how often": "По строке на сервер: для чего он, почему и как часто",
@@ -3369,5 +3368,7 @@
   "No sound": "Нет звука",
   "Your mic sends no sound": "Микрофон не передаёт звук",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Микрофон не передаёт звук даже после перезапуска звука Windows. Если микрофон на гарнитуре выключен, включи его. Если нет, перезагрузи ПК и попробуй ещё раз.",
-  "Your mic sends no sound: see the Setup tab.": "Микрофон не передаёт звук: загляни на вкладку «Настройка»."
+  "Your mic sends no sound: see the Setup tab.": "Микрофон не передаёт звук: загляни на вкладку «Настройка».",
+  "Before update": "До обновления",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе и каждом обновлении приложения (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются."
 }

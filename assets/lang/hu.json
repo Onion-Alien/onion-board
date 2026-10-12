@@ -710,7 +710,6 @@
   "One click": "Egy kattintás",
   "One click needed: repair your mic": "Egy kattintás kell: javítsd meg a mikrofonodat",
   "One click: put your sounds straight into your mic": "Egy kattintás: tedd a hangjaidat egyenesen a mikrofonodba",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Egy gomb minden kategóriában más hangot játszhat le: válts kategóriát (a fülével vagy a fenti gombokkal), és ugyanazok a gombok annak a kategóriának a hangjait játsszák le. A kategória nélküli hangok mindig megtartják a gombjaikat.",
   "One key can switch every other hotkey off while you type in chat. Set it in Settings → Hotkeys.": "Egy gomb kikapcsolhatja az összes többi gyorsbillentyűt, amíg chatben gépelsz. Állítsd be itt: Beállítások → Gyorsbillentyűk.",
   "One of them": "Az egyik",
@@ -3296,5 +3295,7 @@
   "No sound": "Nincs hang",
   "Your mic sends no sound": "A mikrofonod nem küld hangot",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "A mikrofonod a Windows hangjának újraindítása után sem küld hangot. Ha a headseted mikrofonja le van némítva, kapcsold vissza. Ha nem, indítsd újra a géped, aztán próbáld újra.",
-  "Your mic sends no sound: see the Setup tab.": "A mikrofonod nem küld hangot: nézd meg a Beállítás fület."
+  "Your mic sends no sound: see the Setup tab.": "A mikrofonod nem küld hangot: nézd meg a Beállítás fület.",
+  "Before update": "Frissítés előtt",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor és az app minden frissítésekor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak."
 }

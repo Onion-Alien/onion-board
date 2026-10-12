@@ -1014,7 +1014,6 @@
   "On the left, click <b>Voice</b>.": "在左邊按<b>語音</b>。",
   "On, at {host}:{port}. Pick a link to copy.": "已開啟，位於 {host}:{port}。選一個連結來複製。",
   "On: listening on {host}:{port}.": "已開啟：在 {host}:{port} 上收聽。",
-  "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "一個按鍵可以在每個分類播放不同的音效：切換分類（它的分頁，或上面的按鍵），同樣的按鍵就會播放那個分類的音效。不屬於任何分類的音效永遠保留它們的按鍵。",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "每個連線一列：是你做了什麼產生的、路線、結果、位元組，以及程式能讀到的請求",
   "One row per server: what it was for, why, and how often": "每個伺服器一列：用途、原因和頻率",
@@ -3223,5 +3222,7 @@
   "No sound": "沒有聲音",
   "Your mic sends no sound": "你的麥克風沒有聲音",
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "即使重新啟動了 Windows 的音訊，你的麥克風仍然沒有聲音。如果耳機麥克風靜音了，請取消靜音。如果沒有，請重新啟動電腦，然後再試一次。",
-  "Your mic sends no sound: see the Setup tab.": "你的麥克風沒有聲音：請查看設定分頁。"
+  "Your mic sends no sound: see the Setup tab.": "你的麥克風沒有聲音：請查看設定分頁。",
+  "Before update": "更新之前",
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西或更新應用程式時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。"
 }

@@ -3,7 +3,7 @@ back to how they started, and the Restore points list that undoes it
 (soundboard.reset does the work, at the next start-up)."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QDialog, QFrame, QHBoxLayout,
                                QLabel, QListWidget, QListWidgetItem, QMessageBox, QPushButton,
@@ -176,6 +176,28 @@ class ResetGuide(QDialog):
         QTimer.singleShot(0, self.mw.restart_app)   # once this window's loop is done
 
 
+def _point_row(title: str, meta: str) -> QWidget:
+    """One restore point in the list: a history icon, its title, and what it holds and
+    when in muted text under it."""
+    w = QWidget()
+    w.setObjectName("pointrow")
+    w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)   # the item selects
+    h = QHBoxLayout(w)
+    h.setContentsMargins(12, 8, 12, 8)
+    h.setSpacing(12)
+    h.addWidget(icon_label("history"), 0, Qt.AlignmentFlag.AlignVCenter)
+    v = QVBoxLayout()
+    v.setSpacing(2)
+    name = QLabel(title)
+    name.setObjectName("pointtitle")
+    v.addWidget(name)
+    sub = hint_label(meta)
+    sub.setWordWrap(False)
+    v.addWidget(sub)
+    h.addLayout(v, 1)
+    return w
+
+
 class RestorePoints(QDialog):
     """The saved restore points, newest first: Restore (restarts) or Delete."""
 
@@ -184,20 +206,28 @@ class RestorePoints(QDialog):
         fit.watch(self)
         self.mw = mw
         self.setWindowTitle(_("Restore points"))
+        self.setMaximumWidth(620)
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(20, 18, 20, 16)
-        lay.setSpacing(10)
-        lay.addWidget(_heading(_("Restore points")))
+        lay.setContentsMargins(18, 18, 18, 18)
+        lay.setSpacing(12)
+        title = QLabel(_("Restore points"))
+        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        lay.addWidget(title)
         lay.addWidget(hint_label(
-            _("One is saved every time you reset something (the last {max_points} are kept). "
+            _("One is saved every time you reset something or update the app (the last "
+              "{max_points} are kept). "
               "Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've "
               "added since are kept.", max_points=reset.MAX_POINTS)))
         self.list = QListWidget()
+        self.list.setObjectName("pointlist")
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.list.setMinimumSize(420, 200)
+        self.list.setMinimumWidth(420)
+        self.list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.list.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)   # all fit
         self.list.itemSelectionChanged.connect(self._update)
         self.list.itemDoubleClicked.connect(lambda _i: self.restore())
-        lay.addWidget(self.list, 1)
+        lay.addWidget(self.list)
         row = QHBoxLayout()
         self.btn_delete = QPushButton(_("Delete"))
         icons.set_icon(self.btn_delete, "trash", "danger_text")
@@ -218,16 +248,26 @@ class RestorePoints(QDialog):
     def fill(self):
         self.list.clear()
         for p in reset.points():
-            li = QListWidgetItem(f"{p.title}  ·  {trash.ago(p.when)}\n{p.describe()}")
+            meta = f"{p.describe()}  ·  {trash.ago(p.when)}"
+            li = QListWidgetItem()
             li.setData(Qt.ItemDataRole.UserRole, p.id)
+            li.setData(Qt.ItemDataRole.AccessibleTextRole, f"{p.title}, {meta}")
+            row = _point_row(p.title, meta)
+            li.setSizeHint(row.sizeHint())
             self.list.addItem(li)
+            self.list.setItemWidget(li, row)
         if self.list.count():
             self.list.setCurrentRow(0)
         else:
             li = QListWidgetItem(_("No restore points yet. One is saved every time you reset "
                                    "something."))
             li.setFlags(Qt.ItemFlag.NoItemFlags)
+            li.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            li.setSizeHint(QSize(0, 64))
             self.list.addItem(li)
+        # as tall as its rows (all MAX_POINTS fit), never an empty box under them
+        rows = sum(self.list.sizeHintForRow(i) for i in range(self.list.count()))
+        self.list.setFixedHeight(rows + 2 * self.list.frameWidth() + 2 * 6)   # + its padding
         self._update()
 
     def _picked(self) -> reset.Point | None:
