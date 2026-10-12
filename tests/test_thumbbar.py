@@ -49,6 +49,7 @@ def test_stop_and_pause_buttons(window, monkeypatch):  # noqa: F811
     calls = []
     monkeypatch.setattr(window.engine, "stop_all", lambda: calls.append("stop"))
     monkeypatch.setattr(window.engine, "pause_all", lambda: calls.append("pause"))
+    monkeypatch.setattr(window.engine, "playing", lambda: {"x": (0.5, False)})
     window.thumbbar.click(thumbbar.PAUSE)
     window.thumbbar.click(thumbbar.STOP)
     assert calls == ["pause", "stop"]
@@ -68,3 +69,70 @@ def test_pause_button_turns_into_play_while_paused(window, monkeypatch):  # noqa
     states.clear()
     window.tick()
     assert not window.thumbbar.paused   # nothing at all: back to Pause
+
+
+class _FakeRadio:
+    """Just enough of the Radio tab: a station on or off, and what was played."""
+
+    def __init__(self, station=None):
+        self.player = type("P", (), {"station": station})()
+        self.played = []
+
+    def is_active(self):
+        return self.player.station is not None
+
+    def stop(self):
+        self.player.station = None
+
+    def play(self, s):
+        self.played.append(s)
+        self.player.station = s
+
+    def __getattr__(self, name):   # the rest (the window's shutdown, ...): nothing
+        return lambda *a, **k: None
+
+
+def _fake_sounds(win, monkeypatch, states):
+    def pause_all():
+        resume = bool(states) and all(p for _x, p in states.values())
+        for sid in states:
+            states[sid] = (0.5, not resume)
+    monkeypatch.setattr(win.engine, "playing", lambda: dict(states))
+    monkeypatch.setattr(win.engine, "pause_all", pause_all)
+
+
+def test_pause_stops_the_radio_and_play_brings_it_back(window, monkeypatch):  # noqa: F811
+    _fake_sounds(window, monkeypatch, {})
+    monkeypatch.setattr(window, "radio", _FakeRadio("station-a"))
+    window.thumbbar.click(thumbbar.PAUSE)
+    assert not window.radio.is_active()
+    window.tick()
+    assert window.thumbbar.paused   # only the radio was on: Play
+    window.thumbbar.click(thumbbar.PAUSE)
+    assert window.radio.played == ["station-a"]
+    window.tick()
+    assert not window.thumbbar.paused
+
+
+def test_pause_pauses_a_sound_and_the_radio_together(window, monkeypatch):  # noqa: F811
+    sid = next(iter(window._meta), None)
+    if sid is None:
+        pytest.skip("no sounds on the test board")
+    states = {sid: (0.5, False)}
+    _fake_sounds(window, monkeypatch, states)
+    monkeypatch.setattr(window, "radio", _FakeRadio("station-a"))
+    window.thumbbar.click(thumbbar.PAUSE)
+    assert states[sid][1] and not window.radio.is_active()
+    window.tick()
+    assert window.thumbbar.paused
+    window.thumbbar.click(thumbbar.PAUSE)
+    assert not states[sid][1] and window.radio.played == ["station-a"]
+
+
+def test_stop_all_forgets_the_paused_station(window, monkeypatch):  # noqa: F811
+    _fake_sounds(window, monkeypatch, {})
+    monkeypatch.setattr(window, "radio", _FakeRadio("station-a"))
+    window.thumbbar.click(thumbbar.PAUSE)
+    window.stop_all()
+    window.thumbbar.click(thumbbar.PAUSE)   # nothing left to bring back
+    assert window.radio.played == []

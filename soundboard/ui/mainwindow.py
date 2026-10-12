@@ -426,6 +426,7 @@ class MainWindow(QMainWindow):
             tb.STOP: self._stop_all_clicked,
             tb.RANDOM: self.play_random,
             tb.LIVE: lambda: self.set_sending(not self.engine.sending)})
+        self._radio_paused = None   # the station Pause stopped, for Play to turn back on
         self.replay.state_changed.connect(self.on_replay_state)
         self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
@@ -5638,10 +5639,27 @@ class MainWindow(QMainWindow):
             self.play(self._last_sid)
 
     def _pause_clicked(self):
-        self.engine.pause_all()
+        """Pause everything playing (sounds and the radio), or bring it all back. A
+        station is live, so pausing it stops it and Play turns the same one back on."""
+        playing = self.engine.playing()
+        radio_on = self.radio.is_active()
+        if radio_on or any(not paused for _p, paused in playing.values()):
+            if any(not paused for _p, paused in playing.values()):
+                self.engine.pause_all()   # something still plays: pauses them all
+            if radio_on:
+                self._radio_paused = getattr(getattr(self.radio, "player", None), "station", None)
+                self.radio.stop()
+        else:
+            if playing:
+                self.engine.pause_all()   # all paused: resumes them
+            station, self._radio_paused = self._radio_paused, None
+            play = getattr(self.radio, "play", None)   # (the Radio tab switched off: none)
+            if station is not None and play is not None:
+                play(station)
         self._wake()
 
     def stop_all(self):
+        self._radio_paused = None
         self._queue.clear()
         self._say_queue()
         for sid in list(self._waiting):
@@ -9168,8 +9186,13 @@ class MainWindow(QMainWindow):
             set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
                          _("● ON: a sound is playing"), "sounds")
         # the taskbar preview's Pause button turns into Play while all of it is paused
-        self.thumbbar.set_paused(not live and any(
-            paused for sid, (_p, paused) in playing.items() if sid in self._meta or sid == LINK_ID))
+        # (a station Pause stopped counts as paused, until anything plays again)
+        if live or self.radio.is_active():
+            self._radio_paused = None
+        self.thumbbar.set_paused(not live and not self.radio.is_active() and (
+            self._radio_paused is not None or any(
+                paused for sid, (_p, paused) in playing.items()
+                if sid in self._meta or sid == LINK_ID)))
         self._tick_busy = self._busy(playing)
         pace = self._tick_pace()
         if self.timer.interval() != pace:
