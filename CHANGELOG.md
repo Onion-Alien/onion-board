@@ -4,6 +4,7 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.0.0 — 2026-10-12
 
+- An add-on folder Windows won't let Onion Board read (locked by an antivirus, no permission, or a link it refuses to follow) is now skipped as a broken add-on, instead of closing the app at start-up.
 - Settings: the Discord, feedback, bug report and Support buttons now live together on the
   About page (the duplicate *Feedback and problems* card is gone), and *Add-ons & help* is
   now just *Add-ons*.
