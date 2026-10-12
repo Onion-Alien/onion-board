@@ -3298,5 +3298,9 @@
   "Set it up": "I-set up",
   "One click sets it up.": "Isang click lang para i-set up.",
   "This won't mute you yet": "Hindi ka pa nito mamu-mute",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Uy! Wala pang ginagawa ito, kasi hindi pa naka-set up ang Onion Board sa mic mo. Naririnig ka pa rin nila."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Uy! Wala pang ginagawa ito, kasi hindi pa naka-set up ang Onion Board sa mic mo. Naririnig ka pa rin nila.",
+  "{n} pad was found and put back on the board.": [
+    "{n} pad ang nahanap at ibinalik sa board.",
+    "{n} pad ang nahanap at ibinalik sa board."
+  ]
 }

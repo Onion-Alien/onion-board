@@ -3298,5 +3298,9 @@
   "Set it up": "Настрой",
   "One click sets it up.": "Едно щракване го настройва.",
   "This won't mute you yet": "Това още няма да те заглуши",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Ей! Това още не прави нищо, защото Onion Board не е настроен в микрофона ти. Хората още те чуват."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Ей! Това още не прави нищо, защото Onion Board не е настроен в микрофона ти. Хората още те чуват.",
+  "{n} pad was found and put back on the board.": [
+    "{n} бутон беше намерен и върнат на таблото.",
+    "{n} бутона бяха намерени и върнати на таблото."
+  ]
 }

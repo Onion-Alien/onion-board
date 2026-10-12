@@ -17,7 +17,8 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
   card for something that runs a while (a big import).
   ``on_close`` runs when the card goes without its button clicked: timed out, closed,
   pushed out by newer cards or replaced (an Undo card's "too late now").
-- **Timing**: hovering pauses the countdown. Errors stay until closed.
+- **Timing**: hovering pauses the countdown. Errors stay until closed, as does a card
+  shown with ``ms=0``; a newer card pushes out the oldest of the others first.
 - **Too small to read**: the host's ``toast_mode()`` says "icons" (the mini player
   with pads) or "hidden" (its smallest); cards that don't all fit above the floor are
   icons too. Icons sit in the window's top corner: hovering shows the words, clicking
@@ -29,6 +30,7 @@ game. Animations are skipped when Windows' "Animation effects" setting is off.
 """
 from __future__ import annotations
 
+import re
 import sys
 from collections.abc import Callable
 
@@ -355,6 +357,10 @@ class _Toast(QWidget):
             f' font-weight:600">×{self._n}</span>')
         self.restart(ms)
 
+    def stays(self) -> bool:
+        """Shown until it's closed: an error, or a card shown with no time limit."""
+        return self.kind == "error" or (self._ms <= 0 and self.kind != "busy")
+
     def restart(self, ms: int):
         self._timer.stop()
         self._left = 0
@@ -491,7 +497,11 @@ class _Stack(QObject):
     def add(self, t: _Toast):
         self.toasts.append(t)
         while len(self.toasts) > MAX_SHOWN:
-            self.toasts[0].dismiss()   # the oldest makes room (it forgets itself)
+            # the oldest makes room (it forgets itself); one that stays until it's
+            # closed (an error, damaged settings) only when every card does
+            old = next((o for o in self.toasts if o is not t and not o.stays()),
+                       self.toasts[0])
+            old.dismiss()
 
     def _floor(self) -> int:
         """The y the cards stand on: above the player bar, or a dialog's buttons."""
@@ -624,7 +634,7 @@ def _in_toast(w: QWidget | None) -> bool:
 
 def _strip_tags(text: str) -> str:
     from PySide6.QtGui import QTextDocumentFragment
-    return QTextDocumentFragment.fromHtml(text).toPlainText()
+    return QTextDocumentFragment.fromHtml(text).toPlainText().replace(_BREAK, "")
 
 
 def _stack_for(host: QWidget) -> _Stack:
@@ -642,10 +652,20 @@ def _announce(t: _Toast, text: str):
         pass
 
 
+# a word too long for the card's line (a folder path, a file name) may wrap after these
+# (a zero-width space; Copy and screen readers leave it out)
+_BREAK = "​"
+_LONG_WORD = re.compile(r"\S{24,}")
+
+
+def _breakable(text: str) -> str:
+    return _LONG_WORD.sub(lambda m: re.sub(r"([\\/._-])", r"\1" + _BREAK, m.group()), text)
+
+
 def titled(title: str, text: str) -> str:
     """A message box's title and plain words (lines kept) as a toast's rich text."""
     import html
-    body = html.escape(text, quote=False).replace("\n", "<br>")
+    body = _breakable(html.escape(text, quote=False)).replace("\n", "<br>")
     return f"<b>{html.escape(title, quote=False)}</b><br>{body}" if title else body
 
 

@@ -3371,5 +3371,10 @@
   "Set it up": "Налаштувати",
   "One click sets it up.": "Налаштовується одним кліком.",
   "This won't mute you yet": "Це поки тебе не вимкне",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Гей! Це поки нічого не робить, бо Onion Board ще не налаштований у твоєму мікрофоні. Тебе досі чують."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Гей! Це поки нічого не робить, бо Onion Board ще не налаштований у твоєму мікрофоні. Тебе досі чують.",
+  "{n} pad was found and put back on the board.": [
+    "Знайдено {n} кнопку, вона знову на панелі.",
+    "Знайдено {n} кнопки, вони знову на панелі.",
+    "Знайдено {n} кнопок, вони знову на панелі."
+  ]
 }

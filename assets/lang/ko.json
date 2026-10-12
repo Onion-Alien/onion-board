@@ -3225,5 +3225,8 @@
   "Set it up": "설정하기",
   "One click sets it up.": "클릭 한 번이면 설정돼요.",
   "This won't mute you yet": "아직 음소거되지 않아요",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "저기요! 이건 아직 아무것도 안 해요. Onion Board가 마이크에 설정되지 않았거든요. 다른 사람들에게 아직 들려요."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "저기요! 이건 아직 아무것도 안 해요. Onion Board가 마이크에 설정되지 않았거든요. 다른 사람들에게 아직 들려요.",
+  "{n} pad was found and put back on the board.": [
+    "패드 {n}개를 찾아 보드에 다시 넣었습니다."
+  ]
 }

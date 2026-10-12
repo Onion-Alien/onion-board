@@ -3590,5 +3590,13 @@
   "Set it up": "إعداده",
   "One click sets it up.": "نقرة واحدة تُعدّه.",
   "This won't mute you yet": "هذا لن يكتم صوتك بعد",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "مرحبًا! هذا لا يفعل شيئًا بعد، لأن Onion Board غير مُعدّ في الميكروفون. الناس لا يزالون يسمعونك."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "مرحبًا! هذا لا يفعل شيئًا بعد، لأن Onion Board غير مُعدّ في الميكروفون. الناس لا يزالون يسمعونك.",
+  "{n} pad was found and put back on the board.": [
+    "تم العثور على {n} زر وإعادته إلى اللوحة.",
+    "تم العثور على {n} زر وإعادته إلى اللوحة.",
+    "تم العثور على {n} زر وإعادته إلى اللوحة.",
+    "تم العثور على {n} زر وإعادته إلى اللوحة.",
+    "تم العثور على {n} زر وإعادته إلى اللوحة.",
+    "تم العثور على {n} زر وإعادته إلى اللوحة."
+  ]
 }

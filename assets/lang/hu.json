@@ -3298,5 +3298,9 @@
   "Set it up": "Beállítás",
   "One click sets it up.": "Egy kattintással beállítható.",
   "This won't mute you yet": "Ez még nem némít le",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé! Ez még nem csinál semmit, mert az Onion Board nincs beállítva a mikrofonodban. Még mindig hallanak."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hé! Ez még nem csinál semmit, mert az Onion Board nincs beállítva a mikrofonodban. Még mindig hallanak.",
+  "{n} pad was found and put back on the board.": [
+    "{n} gomb előkerült, és visszakerült a táblára.",
+    "{n} gomb előkerült, és visszakerült a táblára."
+  ]
 }

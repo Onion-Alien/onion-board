@@ -3298,5 +3298,9 @@
   "Set it up": "Einrichten",
   "One click sets it up.": "Ein Klick richtet es ein.",
   "This won't mute you yet": "Das schaltet dich noch nicht stumm",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hey! Das bringt noch nichts, weil Onion Board noch nicht in deinem Mikro eingerichtet ist. Die anderen hören dich weiter."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hey! Das bringt noch nichts, weil Onion Board noch nicht in deinem Mikro eingerichtet ist. Die anderen hören dich weiter.",
+  "{n} pad was found and put back on the board.": [
+    "{n} Pad wurde gefunden und wieder aufs Board gelegt.",
+    "{n} Pads wurden gefunden und wieder aufs Board gelegt."
+  ]
 }

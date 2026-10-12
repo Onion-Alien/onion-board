@@ -3225,5 +3225,8 @@
   "Set it up": "Sediakan",
   "One click sets it up.": "Satu klik untuk menyediakannya.",
   "This won't mute you yet": "Ini belum membisukan anda",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Ini belum berfungsi lagi, sebab Onion Board belum disediakan dalam mik anda. Orang masih boleh dengar anda."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Hei! Ini belum berfungsi lagi, sebab Onion Board belum disediakan dalam mik anda. Orang masih boleh dengar anda.",
+  "{n} pad was found and put back on the board.": [
+    "{n} pad ditemui dan diletakkan semula pada papan."
+  ]
 }

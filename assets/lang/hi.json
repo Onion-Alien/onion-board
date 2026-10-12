@@ -3298,5 +3298,9 @@
   "Set it up": "सेट अप करें",
   "One click sets it up.": "एक क्लिक में सेट अप हो जाता है।",
   "This won't mute you yet": "यह अभी तुम्हें म्यूट नहीं करेगा",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "अरे! यह अभी कुछ नहीं करता, क्योंकि Onion Board तुम्हारे माइक में सेट अप नहीं है। लोग अब भी तुम्हें सुन रहे हैं।"
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "अरे! यह अभी कुछ नहीं करता, क्योंकि Onion Board तुम्हारे माइक में सेट अप नहीं है। लोग अब भी तुम्हें सुन रहे हैं।",
+  "{n} pad was found and put back on the board.": [
+    "{n} पैड मिला और बोर्ड पर वापस रख दिया गया।",
+    "{n} पैड मिले और बोर्ड पर वापस रख दिए गए।"
+  ]
 }

@@ -3298,5 +3298,9 @@
   "Set it up": "Ρύθμισέ το",
   "One click sets it up.": "Ένα κλικ το ρυθμίζει.",
   "This won't mute you yet": "Αυτό δεν σε κάνει σίγαση ακόμα",
-  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Γεια! Αυτό δεν κάνει τίποτα ακόμα, γιατί το Onion Board δεν έχει ρυθμιστεί στο μικρόφωνό σου. Σε ακούνε ακόμα."
+  "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "Γεια! Αυτό δεν κάνει τίποτα ακόμα, γιατί το Onion Board δεν έχει ρυθμιστεί στο μικρόφωνό σου. Σε ακούνε ακόμα.",
+  "{n} pad was found and put back on the board.": [
+    "Βρέθηκε {n} κουμπί και μπήκε ξανά στο board.",
+    "Βρέθηκαν {n} κουμπιά και μπήκαν ξανά στο board."
+  ]
 }
