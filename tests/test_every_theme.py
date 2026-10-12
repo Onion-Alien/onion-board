@@ -54,9 +54,10 @@ def test_the_picked_theme_card_keeps_the_panel_behind_its_name(qapp, name):
     theme.set_current(name)
     try:
         img = card.grab().toImage()
-        # beside the name, under the preview: the card's own background
+        # beside the name, under the preview: the card's own background (`tile`: the
+        # panel in every theme but Flashbang, where the panel is white like the window)
         got = QColor(img.pixel(img.width() - 14, img.height() - 8)).name()
-        assert got == theme.T["panel"], (got, theme.T["panel"], theme.T["accent"])
+        assert got == theme.T["tile"], (got, theme.T["tile"], theme.T["accent"])
     finally:
         theme.T.clear()
         theme.T.update(old)
