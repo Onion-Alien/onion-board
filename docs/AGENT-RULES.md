@@ -104,7 +104,9 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   touch Qt or do file I/O ([CODE.md](CODE.md) *Audio notes*). `4b4f9a7` `e5cc373`
 - Anything the native mic effect reads (the ring file) is fuzzed:
   `scripts/fuzz_directmic.py`, and `scripts/build_directmic.py --testhost` before the
-  `test_directmic.py` tests, which CI skips.
+  `test_directmic.py` tests. CI's `mic-effect` job does all of it on a PR that touches
+  the effect, plus `scripts/check_directmic.py` (warnings as errors, GCC's analyzer,
+  cppcheck): run that one locally before pushing C++ changes.
 - The mic effect's admin install / uninstall (`soundboard/directmic.py`: copying the DLL,
   registering it, putting it on a mic, taking it off) is fuzzed at every registry write:
   **run `python scripts/sim_directmic.py` after changing it, or the ring layout**, before
