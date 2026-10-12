@@ -2002,7 +2002,7 @@ class SpeechPanel(QWidget):
         self._loading_since = 0.0
         if not error:
             self._remember_voices()
-        self.b_voices_check.setEnabled(True)
+        busy.set_busy(self.b_voices_check, False)
         self.b_voices_check.setText(_("Reload voices"))
         if self._voices_again:   # asked for while that load ran (e.g. a server was added)
             self._voices_again = False
@@ -2201,7 +2201,18 @@ class SpeechPanel(QWidget):
         return self.ctl.tts.voice_for(m.language, self.s["voice"])
 
     def _refresh_translation(self):
+        # Computing this state temporarily hides its buttons. Restore focus only
+        # when the same action is still available in the resulting state.
+        focused = self.focusWidget()
+        self._refresh_translation_state()
+        if focused is not None and focused in (
+                self.b_dl, self.b_dl_cancel, self.b_voice_install, self.b_voices,
+                self.b_voices_check, self.b_dl_remove) and focused.isVisible():
+            focused.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _refresh_translation_state(self):
         """The box under "Speak in": download it, get its Windows voice, or all set."""
+        busy.set_busy(self.b_voice_install, self._voice_installing is not None)
         m = self._lang()
         on = self._lang_on()
         if on is not None:
@@ -2212,13 +2223,14 @@ class SpeechPanel(QWidget):
                 "with the AI voice, the voice changer and the computer voice; your real voice "
                 "is muted meanwhile.", language=name))
         self.lbl_delay.setVisible(on is not None)
-        busy = self._dl_busy is not None
-        self.tr_box.setVisible(m is not None or busy)
+        downloading = self._dl_busy is not None
+        self.tr_box.setVisible(m is not None or downloading)
         for b in (self.b_dl, self.b_dl_cancel, self.b_voice_install, self.b_voices,
                   self.b_voices_check, self.b_dl_remove):
             b.hide()
         self._watch_voices(False)
-        if busy:
+        if downloading:
+            self.b_dl.show()
             self.b_dl_cancel.show()
             return
         if m is None:
@@ -2263,7 +2275,7 @@ class SpeechPanel(QWidget):
                                       "or two). It's used by itself as soon as it's in.",
                                       language=name))
                 self.b_voice_install.setText(_("Installing\u2026"))
-                self.b_voice_install.setEnabled(False)
+                busy.set_busy(self.b_voice_install, True)
                 self.b_voices.hide()
                 return
             self.b_voice_install.setText(_("Install the {language} voice", language=name))
@@ -2362,7 +2374,7 @@ class SpeechPanel(QWidget):
             self._voices_again = True   # run once more when this load is done
             return
         self._loading_since = time.monotonic()
-        self.b_voices_check.setEnabled(False)
+        busy.set_busy(self.b_voices_check, True)
         self.b_voices_check.setText(_("Reloading\u2026"))
 
         def work():
@@ -2376,6 +2388,7 @@ class SpeechPanel(QWidget):
         if m is None or self._dl_busy is not None:
             return
         self._dl_busy, self._dl_cancel = m, False
+        busy.set_busy(self.b_dl, True)
         _enable(self.cb_lang, False, _("Waiting for the download to finish"))
         _enable(self.b_live, False, _("Waiting for the download to finish"))
         self._refresh_translation()
@@ -2401,7 +2414,7 @@ class SpeechPanel(QWidget):
 
     def _cancel_download(self):
         self._dl_cancel = True
-        self.b_dl_cancel.setEnabled(False)
+        busy.set_busy(self.b_dl_cancel, True)
         if self._dl_busy is not None:
             self.lbl_tr.setText(_("Cancelling…"))
 
@@ -2416,9 +2429,10 @@ class SpeechPanel(QWidget):
 
     def _on_dl_done(self, err: str):
         m, self._dl_busy = self._dl_busy, None
+        busy.set_busy(self.b_dl, False)
         _enable(self.cb_lang, not self.ctl.live, _("Stop the computer voice to change this"))
         _enable(self.b_live, not self._installing, _("Waiting for the install to finish"))
-        self.b_dl_cancel.setEnabled(True)
+        busy.set_busy(self.b_dl_cancel, False)
         self._fill_langs()
         if err == "cancelled" and m is not None:
             busy.toast(self, html.escape(_("Download cancelled.")))
@@ -2496,7 +2510,7 @@ class SpeechPanel(QWidget):
             return          # one pip at a time: two into the same environment break it
         self._installing = True
         for b in (self.b_install, self.b_update, self.b_live):
-            b.setEnabled(False)
+            busy.set_busy(b, True)
         self.b_install.setText(_("Installing… (a few minutes)"))
         self.b_update.setText(_("Updating… (a few minutes)"))
         self.lbl_install.show()
@@ -2515,6 +2529,8 @@ class SpeechPanel(QWidget):
 
     def _on_install_done(self, ok: bool, err: str = ""):
         self._installing = False
+        for b in (self.b_install, self.b_update, self.b_live):
+            busy.set_busy(b, False)
         self.b_install.setEnabled(True)
         self.b_install.setText(_("Install speech recognition"))
         _enable(self.b_update, not self.ctl.live, _("Stop the computer voice to change this"))
@@ -2624,7 +2640,7 @@ class SpeechPanel(QWidget):
         self.live_changed.emit(on)
         for w in (self.cb_model, self.ed_lang, self.cb_lang, self.sw_lang):
             _enable(w, not on, _("Stop the computer voice to change this"))
-        _enable(self.b_update, not on and not self._installing,
+        _enable(self.b_update, not on,
                 _("Stop the computer voice to change this") if on
                 else _("Waiting for the install to finish"))
         self.lbl_state.setText(state)

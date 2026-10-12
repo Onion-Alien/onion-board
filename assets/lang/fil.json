@@ -3307,5 +3307,6 @@
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Inililipat ang mga tunog mo mula sa iba mong soundboard: {done} sa {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Inililipat ang mga tunog mo mula sa {name}: {done} sa {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Naka-install ito, pero papunta na sa mic mo ang mga tunog mo ngayon. Gamitin ito kung nilalaktawan ng isang laro ang mic mo, o tanggalin ito kung wala nang ibang gumagamit nito.",
+  "⚠ Another sound already has this name.": "⚠ May ibang sound na may ganitong pangalan.",
   "Don't show this again": "Huwag nang ipakita ulit"
 }

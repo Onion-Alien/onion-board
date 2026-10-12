@@ -5991,6 +5991,7 @@ class MainWindow(QMainWindow):
         """A site picked in the search button's menu: it shows that site, and the
         search box's words are searched there now (open results re-run themselves)."""
         icons.set_icon(self.btn_yt, key, size=18)
+        self._drop_link()   # the last site's song, if it's over: its card goes too
         if self.ytresults.isHidden() and self.search.text().strip():
             self.search_youtube()
 
@@ -6293,12 +6294,28 @@ class MainWindow(QMainWindow):
         moves to the newest of them, so its ⏸ / ■ reach them (stopping the shown pad
         used to leave a web search's sound playing with no way back to it)."""
         self.engine.stop(sid)
-        if sid != self.current:
+        if sid == LINK_ID:   # a web song isn't on the board: stopped, it leaves the player
+            self._drop_link()
+        if sid != self.current and self.current:
             return
         others = [s for s in self.engine.playing()
                   if s != sid and (s in self._meta or s == LINK_ID)]
         if others:
             self.select(others[-1])
+
+    def _drop_link(self):
+        """Take a stopped web song out of the player. It stayed there as the player's
+        sound, and once its card was gone (another site searched) nothing took it out:
+        ■ only stopped it and its name sat in the bar for good."""
+        if LINK_ID in self.engine.playing():
+            return   # still playing or paused: the player keeps it
+        self._link_meta, self._link_url = None, ""
+        self.audio.pop(LINK_ID, None)
+        if self.current == LINK_ID:
+            self.current = None
+            self.start_frac = 0.0
+            self._set_np_name(_("Pick a sound"))
+            self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
 
     def _seek_preview(self, v):
         if self._seeking:
@@ -8019,7 +8036,8 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(60, self._preload_next_page)
 
     def _new_editor(self, m: SoundMeta, tab: str) -> EditDialog:
-        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
+        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab,
+                       others=lambda: list(self._meta.values()))
         d.hotkeys_changed.connect(self.register_hotkeys)
         d.source_forgotten.connect(self._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))

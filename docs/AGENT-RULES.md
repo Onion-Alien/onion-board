@@ -78,6 +78,11 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   keeps the widget's size changes, so the re-added card keeps a stale height and gets
   squeezed until the width changes.
 
+- Busy actions keep their button enabled with `busy.set_busy`; disabling it moves
+  focus to another control. A refresh that briefly hides controls must preserve
+  focus when the same action remains visible afterwards. Test actual mouse clicks
+  on the visible page, including completion, failure and repeat clicks.
+
 - Disk, network, device, process and capture calls never run on the Qt UI thread.
   Run them on a worker, and the UI thread only applies the result.
   `9fa49b9` `154b0f5` `307ff86`

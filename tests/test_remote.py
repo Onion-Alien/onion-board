@@ -139,6 +139,25 @@ def test_window_endpoints(qapp, window):
     assert d("status")[1]["version"]
 
 
+def test_pause_on_sets_instead_of_flipping(qapp, window):
+    w = window
+    state = {"paused": False}
+    w.engine.playing = lambda: {"s0": (0.3, state["paused"])}
+
+    def pause_all(on=None):
+        state["paused"] = (not state["paused"]) if on is None else on
+        return state["paused"]
+    w.engine.pause_all = pause_all
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    assert d("pause", on="1") == (200, {"paused": True})
+    assert d("pause", on="1") == (200, {"paused": True})     # already paused: stays
+    assert d("status")[1]["paused"]
+    assert d("pause", on="0") == (200, {"paused": False})
+    assert d("pause", on="0") == (200, {"paused": False})
+    assert d("pause") == (200, {"paused": True})              # no on=: flips
+    assert d("pause", on="toggle") == (200, {"paused": False})
+    assert d("pause", on="maybe") == (400, remote.BAD_ON)
+
 def test_a_ringing_watch_alarm_shows_as_its_pad_and_stops_with_it(qapp, window):
     from soundboard.ui import triggershost
     assert remote.RING == triggershost.RING
@@ -311,7 +330,7 @@ def test_the_real_window_answers_over_http(qapp, window):
 
 
 def test_live_speed_pitch_and_effects_go_through_the_popup(qapp, window):
-    """A phone moves the PC's own sliders: the engine and the ⏩ button follow."""
+    """A phone moves the PC's own sliders: the engine and the â© button follow."""
     w = window
     d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
     s = d("status")[1]

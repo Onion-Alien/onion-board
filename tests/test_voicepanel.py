@@ -257,7 +257,8 @@ def test_one_click_voice_install_then_its_picked_up(panel, qapp, monkeypatch):
                                                             "ok")[-1])
     _huihui_arrives(monkeypatch)
     s.b_voice_install.click()
-    assert not s.b_voice_install.isEnabled() and "Installing" in s.lbl_tr.text()
+    from soundboard.ui import busy
+    assert busy.is_busy(s.b_voice_install) and "Installing" in s.lbl_tr.text()
     s.b_voice_install.click()                      # a second click does nothing
     go.set()
     assert process_events(qapp, lambda: "Huihui says it in Chinese" in s.lbl_tr.text())
@@ -327,9 +328,10 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     reported = []
     monkeypatch.setattr(applog, "report", lambda **k: reported.append(k))
     s._install()
-    assert not s.b_update.isEnabled() and not s.b_install.isEnabled()
+    from soundboard.ui import busy
+    assert busy.is_busy(s.b_update) and busy.is_busy(s.b_install)
     s._install()                                   # a double-click: still one pip
-    assert process_events(qapp, lambda: s.b_update.isEnabled())
+    assert process_events(qapp, lambda: not busy.is_busy(s.b_update))
     from soundboard.ui import toast
     [t] = [t for t in toast.shown(s) if "disk full" in t.words()]
     assert len(started) == 1 and t.kind == "error" and "again" in t.words()
@@ -1394,3 +1396,100 @@ def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard.ui import busy, voicepanel
+    p, _ = panel
+    s = p.speech
+    _chinese_without_a_voice(s, qapp)
+    p.show_tab("speak")
+    p.show()
+    qapp.processEvents()
+    workers = []
+    class Thread:
+        def __init__(self, target, **kw): self.target = target
+        def start(self): workers.append(self.target)
+    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    for btn, finish in (
+            (s.b_voices_check, lambda: s._fill_voices(["Microsoft Zira Desktop"], "")),
+            (s.b_voice_install, lambda: s._on_voice_installed("", "offline"))):
+        btn.setFocus()
+        QTest.mouseClick(btn, Qt.LeftButton)
+        assert btn.isEnabled() and busy.is_busy(btn) and p.focusWidget() is btn
+        QTest.mouseClick(btn, Qt.LeftButton)
+        assert len(workers) == 1
+        workers.clear()
+        finish()
+        qapp.processEvents()
+        assert not busy.is_busy(btn) and p.focusWidget() is btn
+
+
+def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard.ui import busy, voicepanel
+    p, _ = panel
+    s = p.speech
+    assert process_events(qapp, lambda: not s._loading())
+    p.show_tab("speak")
+    p.show()
+    s.opts.show()
+    s.b_update.show()
+    qapp.processEvents()
+    workers = []
+    class Thread:
+        def __init__(self, target, **kw): self.target = target
+        def start(self): workers.append(self.target)
+    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    s.b_update.setFocus()
+    QTest.mouseClick(s.b_update, Qt.LeftButton)
+    assert busy.is_busy(s.b_update) and p.focusWidget() is s.b_update
+    QTest.mouseClick(s.b_update, Qt.LeftButton)
+    assert len(workers) == 1
+    s._on_install_done(False, "offline")
+    assert not busy.is_busy(s.b_update) and p.focusWidget() is s.b_update
+    _chinese_without_a_voice(s, qapp)
+    s._dl_busy = s._lang()
+    s._refresh_translation()
+    s.b_dl_cancel.setFocus()
+    QTest.mouseClick(s.b_dl_cancel, Qt.LeftButton)
+    assert busy.is_busy(s.b_dl_cancel) and p.focusWidget() is s.b_dl_cancel
+    s._on_dl_done("cancelled")
+    assert not busy.is_busy(s.b_dl_cancel)
+
+
+def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard import net
+    from soundboard.speech import translation
+    from soundboard.ui import busy, voicepanel
+    monkeypatch.setattr(net, "allowed", lambda key: True)
+    monkeypatch.setattr(net, "offline", lambda: False)
+    p, _ = panel
+    s = p.speech
+    assert process_events(qapp, lambda: not s._loading())
+    monkeypatch.setattr(translation, "is_downloaded", lambda info: False)
+    installed = voicepanel.mods.ModuleInfo.installed.fget
+    monkeypatch.setattr(voicepanel.mods.ModuleInfo, "installed", property(
+        lambda info: True if info.id == "live-voice" else installed(info)))
+    s._fill_langs()
+    s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
+    p.show_tab("speak")
+    p.show()
+    qapp.processEvents()
+    workers = []
+    class Thread:
+        def __init__(self, target, **kw): self.target = target
+        def start(self): workers.append(self.target)
+    monkeypatch.setattr(voicepanel, "threading", type("Threads", (), {"Thread": Thread}))
+    s.b_dl.setFocus()
+    QTest.mouseClick(s.b_dl, Qt.LeftButton)
+    assert s.b_dl.isVisible() and busy.is_busy(s.b_dl) and p.focusWidget() is s.b_dl
+    QTest.mouseClick(s.b_dl, Qt.LeftButton)
+    assert len(workers) == 1
+    s._on_dl_done("offline")
+    assert not busy.is_busy(s.b_dl) and p.focusWidget() is s.b_dl

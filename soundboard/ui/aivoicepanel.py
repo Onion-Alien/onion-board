@@ -330,9 +330,8 @@ class AiVoicePanel(QWidget):
         else:
             self.ready_box.setVisible(ok)
             self.missing.setVisible(not ok)
-        busy_now = self._installing   # Robo-Bun, the step and the bar stand in for them
-        self.b_install.setVisible(m is not None and not ok and not busy_now)
-        self.b_get.setVisible(m is None and not busy_now)
+        self.b_install.setVisible(m is not None and not ok)
+        self.b_get.setVisible(m is None)
         self.b_update.setVisible(m is not None)
         self.b_remove.setVisible(m is not None and aiaddon.removable(m))
         self.btn_opts.setVisible(m is not None and not self._installing)
@@ -508,7 +507,7 @@ class AiVoicePanel(QWidget):
         self.b_start.setChecked(on)
         self.b_start.blockSignals(False)
         self.b_start.setText(_("Stop AI voice") if on else _("Start AI voice"))
-        self.b_update.setEnabled(not on and not self._installing)
+        self.b_update.setEnabled(not on)
         self.lbl_state.setText(state)
         self.live_changed.emit(on)
 
@@ -557,7 +556,7 @@ class AiVoicePanel(QWidget):
         if self._installing:
             return
         self._installing = True
-        self.b_get.setEnabled(False)
+        busy.set_busy(self.b_get, True)
         self.b_get.setText(_("Getting AI voices…"))
         self._last_line = ""
         self._refresh()
@@ -613,7 +612,7 @@ class AiVoicePanel(QWidget):
         self._installing = True
         self._refresh()
         for b in (self.b_install, self.b_update, self.b_start):
-            b.setEnabled(False)
+            busy.set_busy(b, True)
         self.b_install.setText(_("Installing… (a few minutes)"))
         self._last_line = ""
         self.bun_robot.build()
@@ -645,7 +644,8 @@ class AiVoicePanel(QWidget):
     def _on_install_done(self, ok: bool, err: str = ""):
         self._installing = False
         for b in (self.b_install, self.b_update, self.b_start, self.b_get):
-            b.setEnabled(True)
+            busy.set_busy(b, False)
+        self.b_update.setEnabled(not self.ctl.running)
         self.b_install.setText(_("Install AI voices"))
         self.b_get.setText(_("Get AI voices"))
         self.loading_bar.stop()

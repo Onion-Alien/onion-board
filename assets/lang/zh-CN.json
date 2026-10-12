@@ -3233,5 +3233,6 @@
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "正在从你的其他音效板搬入声音：第 {done}/{total} 个…",
   "Bringing your sounds over from {name}: {done} of {total}…": "正在从 {name} 搬入你的声音：第 {done}/{total} 个…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安装，但你的声音现在会进入麦克风。如果某个游戏跳过了你的麦克风就用它，如果没有别的东西需要它就删除它。",
+  "⚠ Another sound already has this name.": "⚠ 已有其他音效使用这个名字。",
   "Don't show this again": "不再显示"
 }

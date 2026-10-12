@@ -3307,5 +3307,6 @@
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "तुम्हारे दूसरे साउंडबोर्ड से आवाज़ें लाई जा रही हैं: {total} में से {done}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "{name} से तुम्हारी आवाज़ें लाई जा रही हैं: {total} में से {done}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "यह इंस्टॉल है, पर अब आपकी आवाज़ें आपके माइक में जाती हैं। अगर कोई गेम आपका माइक छोड़ देता है तो इसे इस्तेमाल करें, या अगर किसी और चीज़ को इसकी ज़रूरत नहीं है तो इसे हटा दें।",
+  "⚠ Another sound already has this name.": "⚠ किसी दूसरी साउंड का पहले से यही नाम है।",
   "Don't show this again": "इसे दोबारा न दिखाएँ"
 }

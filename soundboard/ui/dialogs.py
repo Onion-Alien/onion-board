@@ -277,11 +277,12 @@ class EditDialog(QDialog):
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
-                 tab: str = "sound"):
+                 tab: str = "sound", others=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle(_("Edit sound"))
         self.meta = meta
+        self.others = others   # () -> every sound on the board, for the same-name warning
         self.hotkeys = hotkeys
         self.hotkey = meta.hotkey
         self.color = meta.color
@@ -331,6 +332,11 @@ class EditDialog(QDialog):
         f.setWeight(QFont.Weight.DemiBold)
         self.name.setFont(f)
         row(g, _("Name"), self.name)
+        # same name as another pad: allowed, but two "Airhorn"s are hard to tell apart
+        self.name_hint = hint_label(_("⚠ Another sound already has this name."))
+        self.name_hint.hide()
+        g.addWidget(self.name_hint, g.rowCount(), 1)
+        self.name.textChanged.connect(self._check_name)
 
         crow = QHBoxLayout()
         crow.setSpacing(8)
@@ -593,6 +599,7 @@ class EditDialog(QDialog):
         self.setResult(0)
         self.name.setText(meta.name)
         self.name.setCursorPosition(0)
+        self._check_name()   # same text as the last sound: textChanged doesn't fire
         self.picture = None
         self._set_picture(None)
         self.pic_view.setStyleSheet(f"background: {theme.T['inset']}; border-radius: 6px;")
@@ -757,6 +764,13 @@ class EditDialog(QDialog):
                 f"QPushButton:checked {{ border:3px solid {t['text']}; }}"
                 f"QPushButton:focus {{ border:2px solid {t['accent']}; }}"
                 f"QPushButton:checked:focus {{ border:3px solid {t['accent']}; }}")
+
+    def _check_name(self, *_a):
+        """The warning under Name: another sound already goes by it (any case)."""
+        name = self.name.text().strip().casefold()
+        taken = bool(name) and self.others is not None and any(
+            m.id != self.meta.id and m.name.strip().casefold() == name for m in self.others())
+        self.name_hint.setVisible(taken)
 
     def _set_hk(self, combo):
         self.hotkey = combo

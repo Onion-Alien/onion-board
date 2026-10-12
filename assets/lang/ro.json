@@ -3381,5 +3381,6 @@
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Se aduc sunetele tale din celelalte soundboarduri: {done} din {total}…",
   "Bringing your sounds over from {name}: {done} of {total}…": "Se aduc sunetele tale din {name}: {done} din {total}…",
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Este instalat, dar sunetele tale merg acum în microfon. Folosește-l dacă un joc îți ocolește microfonul, sau elimină-l dacă nimic altceva nu are nevoie de el.",
+  "⚠ Another sound already has this name.": "⚠ Alt sunet are deja acest nume.",
   "Don't show this again": "Nu mai afișa"
 }
