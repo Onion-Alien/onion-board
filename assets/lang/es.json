@@ -3263,11 +3263,8 @@
   "Equalizer and volume": "Ecualizador y volumen",
   "Live: click to mute": "En directo: haz clic para silenciar",
   "Muted: click to go live": "Silenciado: haz clic para salir en directo",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord y los juegos no oyen nada de tu micro. Si está silenciado, quita el silencio. Si no, haz clic en <b>Reparar</b> y luego en <b>Sí</b> cuando Windows pregunte.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord y los juegos no oyen nada de tu micro. Si está silenciado, quita el silencio. Si no, haz clic en <b>Reparar</b>: el sonido se corta unos segundos.",
   "No sound": "Sin sonido",
   "Your mic sends no sound": "Tu micro no envía sonido",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Tu micro no envía sonido, ni siquiera después de reiniciar el audio de Windows. Si el micro de tus cascos está silenciado, quita el silencio. Si no, reinicia el PC y vuelve a intentarlo.",
   "Your mic sends no sound: see the Setup tab.": "Tu micro no envía sonido: mira la pestaña Configuración.",
   "Before update": "Antes de actualizar",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo o actualizas la app (se conservan los últimos {max_points}). Restaurar devuelve tus ajustes, atajos y sonidos a como estaban. Los sonidos que hayas añadido desde entonces se conservan.",
@@ -3316,5 +3313,8 @@
   "No window to show": "No hay ventana que mostrar",
   "Show this program's window": "Mostrar la ventana de este programa",
   "This program doesn't share its picture": "Este programa no comparte su imagen",
-  "Window of {name}": "Ventana de {name}"
+  "Window of {name}": "Ventana de {name}",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord y los juegos no oyen nada de tu micro. ¿Tus cascos están apagados o su micro silenciado? Enciéndelos o quita el silencio. Si no, haz clic en <b>Reparar</b> y luego en <b>Sí</b> cuando Windows pregunte.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord y los juegos no oyen nada de tu micro. ¿Tus cascos están apagados o su micro silenciado? Enciéndelos o quita el silencio. Si no, haz clic en <b>Reparar</b>: el sonido se corta unos segundos.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tu micro no envía sonido. ¿Tus cascos están apagados o su micro silenciado? Enciéndelos o quita el silencio. ¿Sigue sin funcionar? Reinicia el PC y vuelve a intentarlo."
 }

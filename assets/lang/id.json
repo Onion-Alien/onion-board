@@ -3190,11 +3190,8 @@
   "Equalizer and volume": "Equaliser dan volume",
   "Live: click to mute": "Live: klik untuk membisukan",
   "Muted: click to go live": "Dibisukan: klik untuk live lagi",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord dan game tidak mendengar apa pun dari mic-mu. Kalau mic-nya di-mute, nyalakan lagi. Kalau tidak, klik <b>Perbaiki</b>, lalu <b>Ya</b> saat Windows bertanya.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan game tidak mendengar apa pun dari mic-mu. Kalau mic-nya di-mute, nyalakan lagi. Kalau tidak, klik <b>Perbaiki</b>: suaramu hilang beberapa detik.",
   "No sound": "Tidak ada suara",
   "Your mic sends no sound": "Mic-mu tidak mengirim suara",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mic-mu tidak mengirim suara, bahkan setelah audio Windows dimulai ulang. Kalau mic headset-mu di-mute, nyalakan lagi. Kalau tidak, restart PC-mu, lalu coba lagi.",
   "Your mic sends no sound: see the Setup tab.": "Mic-mu tidak mengirim suara: lihat tab Setup.",
   "Before update": "Sebelum pembaruan",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu atau memperbarui aplikasi ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan.",
@@ -3242,5 +3239,8 @@
   "No window to show": "Tidak ada jendela untuk ditampilkan",
   "Show this program's window": "Tampilkan jendela program ini",
   "This program doesn't share its picture": "Program ini tidak membagikan gambarnya",
-  "Window of {name}": "Jendela {name}"
+  "Window of {name}": "Jendela {name}",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>, lalu <b>Ya</b> saat Windows bertanya.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>: suaramu hilang beberapa detik.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic-mu tidak mengirim suara. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Restart PC-mu, lalu coba lagi."
 }

@@ -3336,11 +3336,8 @@
   "Equalizer and volume": "Ekvalizér a hlasitost",
   "Live: click to mute": "Živě: kliknutím ztlumíte",
   "Muted: click to go live": "Ztlumeno: kliknutím přejdete živě",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord a hry z tvého mikrofonu nic neslyší. Jestli je ztlumený, zapni ho. Jestli ne, klikni na <b>Opravit</b> a pak na <b>Ano</b>, až se Windows zeptají.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord a hry z tvého mikrofonu nic neslyší. Jestli je ztlumený, zapni ho. Jestli ne, klikni na <b>Opravit</b>: zvuk na pár sekund vypadne.",
   "No sound": "Bez zvuku",
   "Your mic sends no sound": "Tvůj mikrofon neposílá žádný zvuk",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk ani po restartu zvuku Windows. Jestli máš mikrofon na sluchátkách ztlumený, zapni ho. Jestli ne, restartuj počítač a zkus to znovu.",
   "Your mic sends no sound: see the Setup tab.": "Tvůj mikrofon neposílá žádný zvuk: podívej se na kartu Nastavení.",
   "Before update": "Před aktualizací",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ nebo aktualizuješ aplikaci (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou.",
@@ -3390,5 +3387,8 @@
   "No window to show": "Žádné okno k zobrazení",
   "Show this program's window": "Zobrazit okno tohoto programu",
   "This program doesn't share its picture": "Tento program nesdílí svůj obraz",
-  "Window of {name}": "Okno {name}"
+  "Window of {name}": "Okno {name}",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b> a pak na <b>Ano</b>, až se Windows zeptají.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b>: zvuk na pár sekund vypadne.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Pořád nic? Restartuj počítač a zkus to znovu."
 }

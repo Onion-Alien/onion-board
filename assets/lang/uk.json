@@ -3336,11 +3336,8 @@
   "Equalizer and volume": "Еквалайзер і гучність",
   "Live: click to mute": "В ефірі: натисніть, щоб вимкнути звук",
   "Muted: click to go live": "Без звуку: натисніть, щоб вийти в ефір",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord та ігри нічого не чують з твого мікрофона. Якщо його вимкнено, увімкни. Якщо ні, натисни <b>Полагодити</b>, потім <b>Так</b>, коли Windows запитає.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord та ігри нічого не чують з твого мікрофона. Якщо його вимкнено, увімкни. Якщо ні, натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
   "No sound": "Немає звуку",
   "Your mic sends no sound": "Мікрофон не передає звук",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Мікрофон не передає звук навіть після перезапуску звуку Windows. Якщо мікрофон на гарнітурі вимкнено, увімкни його. Якщо ні, перезавантаж ПК і спробуй ще раз.",
   "Your mic sends no sound: see the Setup tab.": "Мікрофон не передає звук: глянь вкладку «Налаштування».",
   "Before update": "Перед оновленням",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте або оновлюєте застосунок (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються.",
@@ -3390,5 +3387,8 @@
   "No window to show": "Немає вікна для показу",
   "Show this program's window": "Показати вікно цієї програми",
   "This program doesn't share its picture": "Ця програма не ділиться своїм зображенням",
-  "Window of {name}": "Вікно {name}"
+  "Window of {name}": "Вікно {name}",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>, потім <b>Так</b>, коли Windows запитає.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Мікрофон не передає звук. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Досі нічого? Перезавантаж ПК і спробуй ще раз."
 }

@@ -3555,11 +3555,8 @@
   "Equalizer and volume": "المعادل ومستوى الصوت",
   "Live: click to mute": "مباشر: انقر لكتم الصوت",
   "Muted: click to go live": "مكتوم: انقر للعودة مباشرًا",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. إذا كان كتم الصوت مفعّلًا، فأوقفه. وإلا، انقر <b>إصلاح</b>، ثم <b>نعم</b> عندما يطلب Windows الإذن.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. إذا كان كتم الصوت مفعّلًا، فأوقفه. وإلا، انقر <b>إصلاح</b>: سينقطع الصوت لبضع ثوانٍ.",
   "No sound": "لا صوت",
   "Your mic sends no sound": "الميكروفون لا يرسل أي صوت",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "الميكروفون لا يرسل أي صوت، حتى بعد إعادة تشغيل صوت Windows. إذا كان ميكروفون السماعة مكتومًا، فألغِ الكتم. وإلا، أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى.",
   "Your mic sends no sound: see the Setup tab.": "الميكروفون لا يرسل أي صوت: راجع علامة تبويب الإعداد.",
   "Before update": "قبل التحديث",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "يتم حفظ واحدة في كل مرة تقوم فيها بإعادة تعيين شيء ما أو تحديث التطبيق (يتم الاحتفاظ بآخر {max_points}). تؤدي عملية الاستعادة إلى إعادة الإعدادات ومفاتيح التشغيل السريع والأصوات كما كانت. يتم الاحتفاظ بالأصوات التي أضفتها منذ ذلك الحين.",
@@ -3612,5 +3609,8 @@
   "No window to show": "لا توجد نافذة لعرضها",
   "Show this program's window": "إظهار نافذة هذا البرنامج",
   "This program doesn't share its picture": "هذا البرنامج لا يشارك صورته",
-  "Window of {name}": "نافذة {name}"
+  "Window of {name}": "نافذة {name}",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. وإلا، انقر <b>إصلاح</b>، ثم <b>نعم</b> عندما يطلب Windows الإذن.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. وإلا، انقر <b>إصلاح</b>: سينقطع الصوت لبضع ثوانٍ.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "الميكروفون لا يرسل أي صوت. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. ما زال لا شيء؟ أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى."
 }

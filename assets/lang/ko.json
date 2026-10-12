@@ -3190,11 +3190,8 @@
   "Equalizer and volume": "평형 장치와 볼륨",
   "Live: click to mute": "라이브: 클릭하면 음소거",
   "Muted: click to go live": "음소거됨: 클릭하면 라이브",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 음소거되어 있으면 해제하세요. 아니라면 <b>복구</b>를 클릭한 다음 Windows가 물으면 <b>예</b>를 클릭하세요.",
-  "Discord and games hear nothing from your mic. If its mute is on, switch it off. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 음소거되어 있으면 해제하세요. 아니라면 <b>복구</b>를 클릭하세요: 몇 초 동안 소리가 끊깁니다.",
   "No sound": "소리 없음",
   "Your mic sends no sound": "마이크에서 소리가 나가지 않습니다",
-  "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows 오디오를 다시 시작한 뒤에도 마이크에서 소리가 나가지 않습니다. 헤드셋 마이크가 음소거되어 있으면 해제하세요. 아니라면 PC를 다시 시작한 다음 다시 시도하세요.",
   "Your mic sends no sound: see the Setup tab.": "마이크에서 소리가 나가지 않습니다: 설정 탭을 확인하세요.",
   "Before update": "업데이트 전",
   "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "무언가를 재설정하거나 앱을 업데이트할 때마다 하나가 저장됩니다(마지막 {max_points} 개는 유지됩니다). 복원하면 설정, 단축키 및 사운드가 원래대로 돌아갑니다. 이후 추가한 사운드는 유지됩니다.",
@@ -3242,5 +3239,8 @@
   "No window to show": "보여줄 창이 없어요",
   "Show this program's window": "이 프로그램의 창 보기",
   "This program doesn't share its picture": "이 프로그램은 화면을 공유하지 않아요",
-  "Window of {name}": "{name} 창"
+  "Window of {name}": "{name} 창",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭한 다음 Windows가 물으면 <b>예</b>를 클릭하세요.",
+  "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭하세요: 몇 초 동안 소리가 끊깁니다.",
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요."
 }

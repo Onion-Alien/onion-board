@@ -1141,6 +1141,7 @@ class SetupWizard(QDialog):
 
     _lock_since: float | None = None
     _was_locked = False
+    _route_was_ok: bool | None = None   # step 3's last answer (_tick)
 
     def _locked(self) -> bool:
         """Bun is putting the sounds into the mic: the guide stays open on its page
@@ -1754,6 +1755,15 @@ class SetupWizard(QDialog):
             else:
                 self.mic_heard.setText(_("Waiting to hear you… if the bar doesn't move, pick "
                                          "another mic."))
+        if (self.stack.currentIndex() == self.base + 2 and self._proc is None
+                and not self._was_locked):
+            # the step's card follows the mic effect when it changes from outside the
+            # guide (a Windows update takes it off, a repair or Remove elsewhere): it
+            # kept saying "Working" after the effect was gone
+            if (ok := self.route_ok()) != self._route_was_ok:
+                if self._route_was_ok is not None:
+                    self.recheck_cable(rescan=False)
+                self._route_was_ok = ok
         if self._proc is not None:
             self._read_cable_step()
             if (rc := self._proc.poll()) is not None:
