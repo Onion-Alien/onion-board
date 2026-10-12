@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "Je geluiden gaan in je mic",
   "{mic} · not sent, sounds only": "{mic} · niet verzonden, alleen geluiden",
   "{mic} · off": "{mic} · uit",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "De Windows-beheerdersstap is niet afgerond. Als de prompt nog open staat, beantwoord die; probeer het daarna opnieuw."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "De Windows-beheerdersstap is niet afgerond. Als de prompt nog open staat, beantwoord die; probeer het daarna opnieuw.",
+  "{title}  ·  quiet on {devices}": "{title} · stil op {devices}"
 }

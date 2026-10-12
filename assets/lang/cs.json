@@ -3360,5 +3360,6 @@
   "Your sounds go into your mic": "Tvoje zvuky jdou do mikrofonu",
   "{mic} · not sent, sounds only": "{mic} · neposílá se, jen zvuky",
   "{mic} · off": "{mic} · vypnutý",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Krok správce Windows se nedokončil. Pokud je jeho výzva stále otevřená, odpovězte na ni; pak to zkuste znovu."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Krok správce Windows se nedokončil. Pokud je jeho výzva stále otevřená, odpovězte na ni; pak to zkuste znovu.",
+  "{title}  ·  quiet on {devices}": "{title} · ticho na {devices}"
 }

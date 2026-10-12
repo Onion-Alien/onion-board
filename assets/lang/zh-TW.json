@@ -3214,5 +3214,6 @@
   "Your sounds go into your mic": "你的音效會進入麥克風",
   "{mic} · not sent, sounds only": "{mic} · 不傳送，只有音效",
   "{mic} · off": "{mic} · 已關閉",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 管理員步驟未完成。如果它的提示仍然開著，請先回應它，然後再試一次。"
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows 管理員步驟未完成。如果它的提示仍然開著，請先回應它，然後再試一次。",
+  "{title}  ·  quiet on {devices}": "{title} · 在{devices}上靜音"
 }

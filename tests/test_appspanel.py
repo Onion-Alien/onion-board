@@ -137,6 +137,16 @@ def test_quiet_program_still_running_keeps_its_card(tab):
     assert tab.rows == {}
 
 
+def test_quiet_program_with_open_session_stops_saying_playing_on(tab):
+    tab._on_apps([music()], {100: "music.exe"})
+    row = tab.rows["music.exe"]
+    assert "playing on Speakers" in row.sub.text()
+    tab._on_apps([music(active=False)], {100: "music.exe"})   # paused: session stays open
+    assert "quiet on Speakers" in row.sub.text() and "playing on" not in row.sub.text()
+    tab._on_apps([music()], {100: "music.exe"})               # playing again
+    assert "playing on Speakers" in row.sub.text()
+
+
 def test_quiet_sent_program_keeps_sending(tab):
     tab._on_apps([music()], {100: "music.exe"})
     row = tab.rows["music.exe"]

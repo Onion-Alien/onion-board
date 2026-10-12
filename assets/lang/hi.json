@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "आपके साउंड आपके माइक में जाते हैं",
   "{mic} · not sent, sounds only": "{mic} · नहीं भेजा जा रहा, सिर्फ़ साउंड",
   "{mic} · off": "{mic} · बंद",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows का एडमिन चरण पूरा नहीं हुआ। अगर उसका प्रॉम्प्ट अभी भी खुला है, तो उसका जवाब दें; फिर दोबारा कोशिश करें।"
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows का एडमिन चरण पूरा नहीं हुआ। अगर उसका प्रॉम्प्ट अभी भी खुला है, तो उसका जवाब दें; फिर दोबारा कोशिश करें।",
+  "{title}  ·  quiet on {devices}": "{title} · {devices} पर शांत"
 }

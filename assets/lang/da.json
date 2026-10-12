@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "Dine lyde går ind i din mikrofon",
   "{mic} · not sent, sounds only": "{mic} · sendes ikke, kun lyde",
   "{mic} · off": "{mic} · slukket",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows' administratortrin blev ikke færdigt. Hvis dets prompt stadig er åben, så svar på den; prøv derefter igen."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Windows' administratortrin blev ikke færdigt. Hvis dets prompt stadig er åben, så svar på den; prøv derefter igen.",
+  "{title}  ·  quiet on {devices}": "{title} · stille på {devices}"
 }

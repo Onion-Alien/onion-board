@@ -3214,5 +3214,6 @@
   "Your sounds go into your mic": "Âm thanh của bạn đi vào mic",
   "{mic} · not sent, sounds only": "{mic} · không gửi, chỉ âm thanh",
   "{mic} · off": "{mic} · tắt",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Bước quản trị của Windows chưa hoàn tất. Nếu lời nhắc của nó vẫn còn mở, hãy trả lời; rồi thử lại."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Bước quản trị của Windows chưa hoàn tất. Nếu lời nhắc của nó vẫn còn mở, hãy trả lời; rồi thử lại.",
+  "{title}  ·  quiet on {devices}": "{title} · đang im lặng trên {devices}"
 }

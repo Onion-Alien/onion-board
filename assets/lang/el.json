@@ -3287,5 +3287,6 @@
   "Your sounds go into your mic": "Οι ήχοι σου μπαίνουν στο μικρόφωνο",
   "{mic} · not sent, sounds only": "{mic} · δεν στέλνεται, μόνο ήχοι",
   "{mic} · off": "{mic} · κλειστό",
-  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Το βήμα διαχειριστή των Windows δεν ολοκληρώθηκε. Αν το παράθυρό του είναι ακόμα ανοιχτό, απάντησέ το· μετά δοκίμασε ξανά."
+  "Windows' admin step didn't finish. If its prompt is still open, answer it; then try again.": "Το βήμα διαχειριστή των Windows δεν ολοκληρώθηκε. Αν το παράθυρό του είναι ακόμα ανοιχτό, απάντησέ το· μετά δοκίμασε ξανά.",
+  "{title}  ·  quiet on {devices}": "{title} · σιωπηλό σε {devices}"
 }
