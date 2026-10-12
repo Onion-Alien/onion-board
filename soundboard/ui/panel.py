@@ -10,6 +10,7 @@ import math
 
 from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
+from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QPushButton, QSizePolicy, QSlider, QSpinBox, QVBoxLayout,
                                QWidget)
@@ -99,14 +100,24 @@ class Flow(QLayout):
     def addItem(self, item):
         self._items.append(item)
 
+    def _alive(self) -> list:
+        """Its items, minus any whose Qt side is already gone. One went once (after
+        removing Onion Watch): every layout pass then raised on it, the tab's parts
+        were left where they were mid-pass (on top of each other) and the app crashed."""
+        if not all(qt_valid(it) for it in self._items):
+            self._items = [it for it in self._items if qt_valid(it)]
+        return self._items
+
     def count(self):
-        return len(self._items)
+        return len(self._alive())
 
     def itemAt(self, i):
-        return self._items[i] if 0 <= i < len(self._items) else None
+        items = self._alive()
+        return items[i] if 0 <= i < len(items) else None
 
     def takeAt(self, i):
-        return self._items.pop(i) if 0 <= i < len(self._items) else None
+        items = self._alive()
+        return items.pop(i) if 0 <= i < len(items) else None
 
     def expandingDirections(self):
         return Qt.Orientation(0)
@@ -130,14 +141,14 @@ class Flow(QLayout):
         # a maximized window restored to an ordinary size became the mini player.
         w = self.geometry().width()
         if w <= 0:
-            w = sum(it.sizeHint().width() + self._gap for it in self._items
+            w = sum(it.sizeHint().width() + self._gap for it in self._alive()
                     if not it.isEmpty()) - self._gap
         w = max(w, self.minimumSize().width())
         return QSize(w, self.heightForWidth(w))
 
     def minimumSize(self):
         size = QSize()
-        for it in self._items:
+        for it in self._alive():
             size = size.expandedTo(it.minimumSize())
         return size
 
@@ -153,7 +164,7 @@ class Flow(QLayout):
                     it.setGeometry(QRect(QPoint(ix, y + (line - hint.height()) // 2), hint))
             row.clear()
 
-        for it in self._items:
+        for it in self._alive():
             if it.isEmpty():
                 continue
             hint = it.sizeHint()
