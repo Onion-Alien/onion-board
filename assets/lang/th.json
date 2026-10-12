@@ -419,7 +419,6 @@
   "The game you have open uses {engine} for voice chat": "เกมที่คุณเปิดอยู่ใช้ {engine} สำหรับแชทเสียง",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "โอเวอร์เลย์ในเกมแสดงแพดของคุณทับบนเกม เล่นด้วยปุ่มตัวเลข ตั้งค่าได้ใน การตั้งค่า → โอเวอร์เลย์",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "เริ่มตัวติดตั้งไม่ได้ ({e}) คุณดาวน์โหลดจากหน้ารุ่นที่ออกแทนได้",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "อีกทางที่จะถึง Discord และเกม: สายเสมือนฟรีที่คุณเลือกเป็นไมค์ที่นั่น",
   "The saved report and the app's log": "รายงานที่บันทึกไว้และล็อกของแอป",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "การตั้งค่าใน Zoom, Microsoft Teams และการโทรบนหน้าเว็บ ที่ทำให้มันไม่มองเสียงของคุณเป็นเสียงรบกวน",
   "The update didn't finish": "อัปเดตไม่เสร็จ",
@@ -459,7 +458,6 @@
   "Update available": "มีอัปเดต",
   "Update now": "อัปเดตเลย",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "อัปเดตเป็น Onion Board {version} แล้ว ไม่มีอะไรเปลี่ยนจนกว่าคุณจะต้องการ: ทุกอย่างใช้ได้เหมือนเดิม",
-  "Use the virtual cable instead": "ใช้สายเสมือนแทน",
   "Video": "วิดีโอ",
   "Videos can't be shown in this copy of Onion Board": "Onion Board ชุดนี้แสดงวิดีโอไม่ได้",
   "Voice": "เสียงพูด",
@@ -672,7 +670,6 @@
   "Add-on downloads": "ดาวน์โหลดส่วนเสริม",
   "Add-on downloads are off (Privacy)": "การดาวน์โหลดส่วนเสริมปิดอยู่ (ความเป็นส่วนตัว)",
   "Add-ons": "ส่วนเสริม",
-  "Add-ons && help": "ส่วนเสริม && ความช่วยเหลือ",
   "Advanced: {label}": "ขั้นสูง: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "หลังจากที่มันเริ่มต้นขึ้น การกดจะถูกละเว้นเป็นเวลานานขนาดนี้ ดังนั้นจึงไม่มีใครสามารถส่งสแปมได้",
   "All hotkeys off / on": "ปุ่มลัดทั้งหมดปิด / เปิด",
@@ -839,7 +836,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "การส่งออกจะรวมทุกเสียง (พร้อมรูปภาพ เอฟเฟกต์ ปุ่มลัด และหมวดหมู่) และการตั้งค่าของคุณไว้ในไฟล์ .zip เดียว: เก็บไว้อย่างปลอดภัย หรือนำเข้าบนพีซีเครื่องอื่น การนำเข้าชุดเสียงของเพื่อนจะเพิ่มเสียง สิ่งที่คุณมีอยู่แล้วจะถูกข้ามไป",
   "Export sounds": "ส่งออกเสียง",
   "Fades": "เฟด",
-  "Feedback and problems": "ข้อเสนอแนะและปัญหา",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "ดึงข้อมูล yt-dlp ที่ใหม่กว่าจาก PyPI เมื่อคุณกดอัปเดตทันทีหรือรีเซ็ตตัวดาวน์โหลด (หน้าอัปเดต) หรือด้วยตัวเองหากคุณทำเครื่องหมายที่อัปเดตอัตโนมัติที่นั่น",
   "Fetching the parts (downloading)": "กำลังดึงชิ้นส่วน (ดาวน์โหลด)",
   "Finish  ✓": "เสร็จสิ้น ✓",
@@ -860,7 +856,6 @@
   "Found <b>{n}</b> sound in {name}.": [
     "พบ <b>{n}</b> เสียงใน {name}"
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "ใน Discord คุณคุยเล่น ขอความช่วยเหลือ และรู้ข่าวเวอร์ชันใหม่ได้ เจอบั๊กหรือขาดอะไรไปเหรอ? ทุกอย่างเปิดในเบราว์เซอร์ของคุณ และจะไม่มีอะไรถูกส่งจนกว่าคุณจะกดส่งที่นั่นเอง",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "ส่วนเสริมฟรีจาก GitHub การถอดหรือติดตั้งใหม่จะทำให้ทริกเกอร์และโทรศัพท์ที่จับคู่ของคุณยังคงอยู่",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "ฟรี ไม่มีโฆษณาและไม่มีบัญชี สร้างโดย OnionAlien ใบอนุญาต MIT ที่มี Commons Clause: ใช้เพื่ออะไรก็ได้ แบ่งปันได้ฟรี ไม่ต้องขายเลย",
   "Frequencies": "ความถี่",
@@ -1133,7 +1128,6 @@
   "Removed “{name}”: Who's listening is Off now": "ลบ “{name}”: ใครกำลังฟังอยู่ปิดอยู่ตอนนี้",
   "Replay {time}": "เล่นซ้ำ {time}",
   "Report a problem": "รายงานปัญหา",
-  "Report a problem on GitHub": "รายงานปัญหาบน GitHub",
   "Report a security issue": "รายงานปัญหาด้านความปลอดภัย",
   "Reset and restart": "รีเซ็ตและรีสตาร์ท",
   "Reset downloader": "รีเซ็ตตัวดาวน์โหลด",
@@ -3235,5 +3229,8 @@
   "Plain": "เรียบ",
   "Textured": "มีลวดลาย",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "แบบมีลวดลายจะให้แต่ละธีมมีลายของตัวเองบนแผง: เส้นจอเก่า คาร์บอนไฟเบอร์ คลื่น และอีกมาก แบบเรียบจะคงไว้เป็นพื้นเรียบ",
-  "Theme style": "สไตล์ธีม"
+  "Theme style": "สไตล์ธีม",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "กำลังย้ายเสียงของคุณจากซาวด์บอร์ดอื่น: {done} จาก {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "กำลังย้ายเสียงของคุณจาก {name}: {done} จาก {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "ติดตั้งไว้แล้ว แต่ตอนนี้เสียงของคุณเข้าไมค์แล้ว ใช้มันถ้าเกมข้ามไมค์ของคุณ หรือลบออกถ้าไม่มีอะไรต้องใช้มันแล้ว"
 }

@@ -89,6 +89,8 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   goes in slices or tiles, never all at once. `307ff86`
 - A timer that repaints slows down while the app is in the background
   (`ui/appstate.py`: `slow_in_background`, `pause_in_background`).
+- Dismissing a dropdown must not replay its outside click into an immediate reopen.
+  Keep rapid mouse clicks calm without delaying keyboard input (`wheelguard.py`).
 
 ### Async results (about 26)
 - Background cache writers use unique temporary files and coordinate replacement

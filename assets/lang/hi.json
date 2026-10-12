@@ -425,7 +425,6 @@
   "The game you have open uses {engine} for voice chat": "आपका खुला गेम वॉइस चैट के लिए {engine} इस्तेमाल करता है",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "इन-गेम ओवरले आपके पैड गेम के ऊपर दिखाता है, जिन्हें नंबर की से चलाया जाता है। इसे सेटिंग्स → ओवरले में सेट करें।",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "इंस्टॉलर शुरू नहीं हो सका ({e})। आप इसे रिलीज़ पेज से डाउनलोड कर सकते हैं।",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Discord और गेम तक पहुँचने का दूसरा तरीक़ा: एक मुफ़्त वर्चुअल केबल, जिसे आप वहाँ माइक के रूप में चुनते हैं",
   "The saved report and the app's log": "सेव की गई रिपोर्ट और ऐप का लॉग",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Zoom, Microsoft Teams और वेब पेज वाली कॉल की वे सेटिंग्स जो आपके साउंड को शोर समझना बंद करती हैं",
   "The update didn't finish": "अपडेट पूरा नहीं हुआ",
@@ -465,7 +464,6 @@
   "Update available": "अपडेट उपलब्ध है",
   "Update now": "अभी अपडेट करें",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Onion Board {version} पर अपडेट हो गया। जब तक आप न चाहें कुछ नहीं बदलता: सब पहले जैसा चलता है।",
-  "Use the virtual cable instead": "इसके बजाय वर्चुअल केबल इस्तेमाल करें",
   "Video": "वीडियो",
   "Videos can't be shown in this copy of Onion Board": "Onion Board की इस कॉपी में वीडियो नहीं दिखाए जा सकते",
   "Voice": "वॉइस",
@@ -689,7 +687,6 @@
   "Add-on downloads": "ऐड-ऑन डाउनलोड",
   "Add-on downloads are off (Privacy)": "ऐड-ऑन डाउनलोड बंद हैं (प्राइवेसी)",
   "Add-ons": "ऐड-ऑन",
-  "Add-ons && help": "ऐड-ऑन && मदद",
   "Advanced: {label}": "एडवांस्ड: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "शुरू होने के बाद, इतनी देर तक दबाना अनदेखा होता है, ताकि कोई इसे स्पैम न कर सके",
   "All hotkeys off / on": "सभी हॉटकी बंद / चालू",
@@ -856,7 +853,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "निर्यात प्रत्येक ध्वनि (उसकी तस्वीर, प्रभाव, हॉटकी और श्रेणियों के साथ) और आपकी सेटिंग्स को एक .zip में रखता है: इसे सुरक्षित रखें, या इसे किसी अन्य पीसी पर आयात करें। किसी मित्र का साउंड पैक आयात करने से उसकी ध्वनियाँ जुड़ जाती हैं; जो आपके पास पहले से हैं उन्हें छोड़ दिया गया है।",
   "Export sounds": "ध्वनियाँ निर्यात करें",
   "Fades": "फ़ेड",
-  "Feedback and problems": "प्रतिक्रिया और समस्याएं",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "जब आप अपडेट नाउ या रीसेट डाउनलोडर (अपडेट पेज) दबाते हैं, या यदि आपने वहां स्वचालित रूप से अपडेट पर टिक लगाया है, तो पीईपीआई से एक नया yt-dlp प्राप्त होता है।",
   "Fetching the parts (downloading)": "पुर्जे लाना (डाउनलोड करना)",
   "Finish  ✓": "समाप्त ✓",
@@ -880,7 +876,6 @@
     "{name} में <b>{n}</b> ध्वनि मिली।",
     "{name} में <b>{n}</b> ध्वनियाँ मिलीं।"
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord पर आप बातें कर सकते हैं, मदद माँग सकते हैं और नए वर्ज़न की खबर पा सकते हैं। कोई बग मिला या कुछ कमी लगी? सब कुछ आपके ब्राउज़र में खुलता है, और जब तक आप वहाँ भेजें नहीं, कुछ नहीं भेजा जाता।",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub से निःशुल्क ऐड-ऑन। किसी को हटाने या पुनः इंस्टॉल करने से आपके ट्रिगर और युग्मित फ़ोन बने रहते हैं।",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "निःशुल्क, बिना किसी विज्ञापन और बिना किसी खाते के। ओनियनएलियन द्वारा निर्मित। कॉमन्स क्लॉज के साथ एमआईटी लाइसेंस: इसे किसी भी चीज़ के लिए उपयोग करें, इसे मुफ्त में साझा करें, इसे कभी न बेचें।",
   "Frequencies": "आवृत्तियों",
@@ -1156,7 +1151,6 @@
   "Removed “{name}”: Who's listening is Off now": "\"{name}\" हटा दिया गया - कौन सुन रहा है अब बंद है",
   "Replay {time}": "पुनः चलाएँ {time}",
   "Report a problem": "एक समस्या का आख्या",
-  "Report a problem on GitHub": "GitHub पर किसी समस्या की रिपोर्ट करें",
   "Report a security issue": "किसी सुरक्षा समस्या की रिपोर्ट करें",
   "Reset and restart": "रीसेट करें और पुनरारंभ करें",
   "Reset downloader": "डाउनलोडर रीसेट करें",
@@ -3309,5 +3303,8 @@
   "Plain": "सादा",
   "Textured": "टेक्सचर वाला",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "टेक्सचर वाले में हर थीम के पैनलों पर उसका अपना पैटर्न होता है: पुरानी स्क्रीन की लाइनें, कार्बन फ़ाइबर, लहरें और बहुत कुछ। सादा उन्हें समतल रखता है।",
-  "Theme style": "थीम की शैली"
+  "Theme style": "थीम की शैली",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "तुम्हारे दूसरे साउंडबोर्ड से आवाज़ें लाई जा रही हैं: {total} में से {done}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "{name} से तुम्हारी आवाज़ें लाई जा रही हैं: {total} में से {done}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "यह इंस्टॉल है, पर अब आपकी आवाज़ें आपके माइक में जाती हैं। अगर कोई गेम आपका माइक छोड़ देता है तो इसे इस्तेमाल करें, या अगर किसी और चीज़ को इसकी ज़रूरत नहीं है तो इसे हटा दें।"
 }

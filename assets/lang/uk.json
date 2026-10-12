@@ -431,7 +431,6 @@
   "The game you have open uses {engine} for voice chat": "Відкрита гра використовує {engine} для голосового чату",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Ігровий оверлей показує твої кнопки поверх гри, грати їх можна цифровими клавішами. Налаштуй у Налаштування → Оверлей.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Не вдалося запустити інсталятор ({e}). Можеш завантажити його зі сторінки випуску.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Інший спосіб дістатися до Discord та ігор: безкоштовний віртуальний кабель, який ти вибираєш там як мікрофон",
   "The saved report and the app's log": "Збережений звіт і журнал програми",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Налаштування в Zoom, Microsoft Teams і дзвінках у браузері, які не дають їм сприймати твої звуки як шум",
   "The update didn't finish": "Оновлення не завершилося",
@@ -471,7 +470,6 @@
   "Update available": "Доступне оновлення",
   "Update now": "Оновити зараз",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Оновлено до Onion Board {version}. Нічого не зміниться, доки ти сам не захочеш: усе працює як раніше.",
-  "Use the virtual cable instead": "Натомість використати віртуальний кабель",
   "Video": "Відео",
   "Videos can't be shown in this copy of Onion Board": "У цій копії Onion Board відео не показуються",
   "Voice": "Голос",
@@ -706,7 +704,6 @@
   "Add-on downloads": "Завантаження доповнень",
   "Add-on downloads are off (Privacy)": "Завантаження додаткових компонентів вимкнено (конфіденційність)",
   "Add-ons": "Додатки",
-  "Add-ons && help": "Додатки та допомога",
   "Advanced: {label}": "Додатково: {label}",
   "After it starts, presses are ignored for this long, so nobody can spam it": "Після його запуску натискання ігноруються протягом цього часу, тому ніхто не може спамити його",
   "All hotkeys off / on": "Всі гарячі клавіші вимкнено/ввімкнено",
@@ -873,7 +870,6 @@
   "Export puts every sound (with its picture, effects, hotkey and categories) and your settings into one .zip: keep it safe, or import it on another PC. Importing a friend's sound pack adds its sounds; ones you already have are skipped.": "Експорт поміщає кожен звук (із зображенням, ефектами, гарячими клавішами та категоріями) і ваші налаштування в один архів .zip: зберігайте його в безпеці або імпортуйте на інший ПК. Імпорт звукового пакета друга додає його звуки; ті, які у вас уже є, пропускаються.",
   "Export sounds": "Експортувати звуки",
   "Fades": "Зникає",
-  "Feedback and problems": "Відгуки та проблеми",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Отримує новіший yt-dlp із PyPI, коли ви натискаєте «Оновити зараз» або «Скинути завантажувач» (сторінка «Оновлення»), або самостійно, якщо ви встановили прапорець «Оновити автоматично».",
   "Fetching the parts (downloading)": "Отримання частин (завантаження)",
   "Finish  ✓": "Фініш ✓",
@@ -900,7 +896,6 @@
     "Знайдено <b>{n}</b> звуків у {name} .",
     "Знайдено <b>{n}</b> звуків у {name} ."
   ],
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "У Discord можна поспілкуватися, попросити допомоги й дізнатися про нові версії. Знайшов баг або чогось бракує? Усе відкривається у твоєму браузері, і нічого не надсилається, доки ти сам не надішлеш це там.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Безкоштовні доповнення від GitHub. Видалення або перевстановлення одного з них збереже тригери та спарені телефони.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Безкоштовно, без реклами та облікового запису. Зроблено OnionAlien. Ліцензія Массачусетського технологічного інституту із застереженням Commons: використовуйте її для чого завгодно, поділіться нею безкоштовно, ніколи не продавайте.",
   "Frequencies": "Частоти",
@@ -1179,7 +1174,6 @@
   "Removed “{name}”: Who's listening is Off now": "Видалено “{name}”: Хто слухає зараз вимкнено",
   "Replay {time}": "Повторити {time}",
   "Report a problem": "Повідомте про проблему",
-  "Report a problem on GitHub": "Повідомити про проблему на GitHub",
   "Report a security issue": "Повідомити про проблему безпеки",
   "Reset and restart": "Скинути та перезапустити",
   "Reset downloader": "Скинути завантажувач",
@@ -3383,5 +3377,8 @@
   "Plain": "Простий",
   "Textured": "З текстурою",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "З текстурою кожна тема має свій візерунок на панелях: рядки старого екрана, карбон, хвилі та інше. Простий залишає їх рівними.",
-  "Theme style": "Стиль теми"
+  "Theme style": "Стиль теми",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Переношу твої звуки з інших саундбордів: {done} з {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Переношу твої звуки з {name}: {done} з {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Його встановлено, але тепер твої звуки йдуть у мікрофон. Використовуй його, якщо гра пропускає твій мікрофон, або видали, якщо він більше нічому не потрібен."
 }

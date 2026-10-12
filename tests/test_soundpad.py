@@ -177,6 +177,33 @@ def test_an_import_from_the_menu_is_not_asked_again(
     assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
 
 
+@pytest.mark.windows   # Windows paths
+def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    """The first start opens the setup guide: the import only starts once it's closed
+    (its card was stuck over the guide), and the card names the other soundboard."""
+    from soundboard.ui import setupwizard
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    note = library.APP_DIR / otherboards.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    during = []
+    monkeypatch.setattr(setupwizard.SetupWizard, "exec",
+                        lambda self: during.append(note.exists() and not w._pending_imports))
+    monkeypatch.setattr(QMessageBox, "exec", lambda box: 0)
+    texts = []
+    real_toast = w.toast
+    monkeypatch.setattr(w, "toast", lambda text, *a, **k: (texts.append(text),
+                                                         real_toast(text, *a, **k))[1])
+    w.run_setup()
+    assert during == [True] and note.exists()     # nothing started while it was up
+    assert process_events(qapp, lambda: not note.exists() and not w._pending_imports
+                          and len(w.cfg.sounds) == 5)
+    assert any("Bringing your sounds over from Soundpad" in t for t in texts)
+
+
 def test_a_queued_import_with_soundpad_gone_does_nothing(
         main_window, tmp_path, monkeypatch):  # noqa: F811
     monkeypatch.setenv("APPDATA", str(tmp_path))

@@ -138,7 +138,6 @@
   "Add-on downloads": "Descărcări de suplimente",
   "Add-on downloads are off (Privacy)": "Descărcările de suplimente sunt oprite (Confidențialitate)",
   "Add-ons": "Suplimente",
-  "Add-ons && help": "Suplimente && ajutor",
   "Added “{name}” ({duration:.1f}s) to Sounds: right-click it there to rename or set a hotkey.": "Am adăugat „{name}” ({duration:.1f}s) la Sunete, clic dreapta pe el acolo ca să-l redenumești sau să-i setezi o tastă rapidă.",
   "Adding {count} sound…": [
     "Se adaugă {count} sunet…",
@@ -422,7 +421,6 @@
   "Fade in / out": "Fade in / out",
   "Fade out": "Fade out",
   "Fades": "Fade-uri",
-  "Feedback and problems": "Păreri și probleme",
   "Fetches a newer yt-dlp from PyPI when you press Update now or Reset downloader (Updates page), or by itself if you ticked Update automatically there.": "Aduce un yt-dlp mai nou de pe PyPI când apeși Actualizează acum sau Resetează programul de descărcare (pagina Actualizări), sau singur dacă ai bifat acolo Actualizează automat.",
   "Fetching the parts (downloading)": "Se aduc componentele (se descarcă)",
   "Find TikTok sounds (TikTok's own search needs an account, so this looks for them on YouTube, where they get reposted)": "Găsește sunete TikTok (căutarea TikTok cere cont, așa că asta le caută pe YouTube, unde sunt repostate)",
@@ -950,7 +948,6 @@
   "Repair needed": "E nevoie de reparație",
   "Replay {time}": "Reluare {time}",
   "Report a problem": "Raportează o problemă",
-  "Report a problem on GitHub": "Raportează o problemă pe GitHub",
   "Report a security issue": "Raportează o problemă de securitate",
   "Report copied: paste it into your message (Ctrl+V).": "Raport copiat: lipește-l în mesaj (Ctrl+V).",
   "Report copied, but the browser didn't open. Go to {issue_url} and paste it there.": "Raport copiat, dar browserul nu s-a deschis. Mergi la {issue_url} și lipește-l acolo.",
@@ -1166,7 +1163,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Overlay-ul din joc îți arată pad-urile peste joc, redate cu tastele numerice. Configurează-l în Setări → Overlay.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Programul de instalare n-a putut porni ({e}). Îl poți descărca în schimb de pe pagina versiunii.",
   "The one the game is on": "Cel pe care e jocul",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Cealaltă cale spre Discord și jocuri: un cablu virtual gratuit pe care îl alegi acolo ca microfon",
   "The saved report and the app's log": "Raportul salvat și jurnalul aplicației",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Setările din Zoom, Microsoft Teams și apelurile dintr-o pagină web care le opresc să-ți trateze sunetele drept zgomot",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Butonul Instalează din ghidul de configurare descarcă VB-Cable (cablul virtual) de pe vb-audio.com. Nu e necesar dacă sunetele tale merg direct în microfon, la alt dispozitiv sau nicăieri. Oprit: instalează-l singur de acolo.",
@@ -1258,7 +1254,6 @@
   "Use it": "Folosește-l",
   "Use less data": "Folosește mai puține date",
   "Use the virtual cable after all": "Folosește totuși cablul virtual",
-  "Use the virtual cable instead": "Folosește în schimb cablul virtual",
   "Used for": "Folosit pentru",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… setările de chat vocal care contează",
   "Version {version}": "Versiunea {version}",
@@ -2153,7 +2148,6 @@
   "That's a members-only video.": "Acesta este un videoclip exclusiv pentru membri.",
   "That's a playlist: open one video and try again.": "Acesta este o listă de redare: deschideți un videoclip și încercați din nou.",
   "That's far too long to be a voice code.": "Este mult prea lung pentru a fi un cod vocal.",
-  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord este locul unde să discutați, să cereți ajutor și să aflați despre noile versiuni. Ați găsit o eroare sau ați ratat ceva? Totul se deschide în browserul dvs. și nimic nu este trimis decât dacă îl trimiteți acolo.",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord este locul unde să discutați, să cereți ajutor și să aflați despre noile versiuni. Formularul de feedback nu are nevoie de cont. Ați găsit o problemă de securitate? Raportați-l în mod privat pe GitHub, nu într-o problemă publică.",
   "The Onion Board Discord server, in your browser": "Serverul Onion Board Discord, în browserul dvs",
   "The address starts with http:// or https://": "Adresa începe cu http:// sau https://",
@@ -3383,5 +3377,8 @@
   "Plain": "Simplu",
   "Textured": "Cu textură",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Cu textură, fiecare temă are propriul model pe panouri: linii de ecran vechi, fibră de carbon, valuri și altele. Simplu le lasă plate.",
-  "Theme style": "Stilul temei"
+  "Theme style": "Stilul temei",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Se aduc sunetele tale din celelalte soundboarduri: {done} din {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Se aduc sunetele tale din {name}: {done} din {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Este instalat, dar sunetele tale merg acum în microfon. Folosește-l dacă un joc îți ocolește microfonul, sau elimină-l dacă nimic altceva nu are nevoie de el."
 }

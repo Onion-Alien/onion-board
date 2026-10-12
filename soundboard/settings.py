@@ -390,10 +390,13 @@ class ThemeGrid(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        columns = max(1, min(len(self.cards), (self.width() + 12) // 162))
+        # as many columns as fit, even past this group's cards: every group then gets
+        # the same columns and gaps and they line up (a short group spread its few
+        # cards over the whole width, out of line with the groups above and below)
+        columns = max(1, (self.width() + 12) // 162)
         self._reflow(columns)
         # the width left over is shared out as equal gaps, first card on the left edge
-        # and last on the right (all of it sat on the right, a big empty strip)
+        # and a full row's last on the right (all of it sat on the right, an empty strip)
         gap = 12
         if columns > 1:
             gap = max(12, (self.width() - columns * 150) // (columns - 1))
@@ -455,7 +458,7 @@ class SettingsDialog(QDialog):
                  ("hotkeys", _("Hotkeys"), "keyboard", self._hotkeys),
                  ("overlay", _("Overlay"), "gamepad", self._overlay),
                  ("updates", _("Updates"), "reload", self._updates),
-                 ("help", _("Add-ons && help"), "plus", self._help),
+                 ("help", _("Add-ons"), "plus", self._help),
                  ("remote", _("Remote"), "cable", self._remote),
                  ("about", _("About"), "star", self._about))
         self.categories = QListWidget()
@@ -1774,8 +1777,6 @@ class SettingsDialog(QDialog):
         cl.setContentsMargins(0, 0, 0, 0)
         cl.setSpacing(12)
         cl.addWidget(self._addons_card())
-        cl.addWidget(self._feedback_card())
-        cl.addWidget(self._support_card())
         row = QHBoxLayout()
         row.addWidget(col, 1)
         row.addStretch(0)
@@ -1804,6 +1805,7 @@ class SettingsDialog(QDialog):
         w, v = self._page()
         v.addWidget(self._about_card())
         v.addWidget(self._contact_card())
+        v.addWidget(self._support_card())
         v.addWidget(self._note_card())
         v.addWidget(self._disclaimer_card())
         v.addStretch(1)
@@ -1863,8 +1865,10 @@ class SettingsDialog(QDialog):
         icons.set_icon(send, "edit")
         send.clicked.connect(self._ask_feedback)
         row.addWidget(send)
-        row.addWidget(self._link_button(_("Report a problem"),
-                                        feedback.problem_url(__version__)))
+        bug = self._link_button(_("Report a problem"), feedback.problem_url(__version__))
+        bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
+        row.addWidget(bug)
+        self.discord_btn, self.feedback_btn, self.problem_btn = discord, send, bug
         row.addWidget(self._link_button(
             _("Report a security issue"), f"https://github.com/{REPO}/security/advisories/new",
             "shield"))
@@ -1888,7 +1892,7 @@ class SettingsDialog(QDialog):
         return card
 
     # ------------------------------------------------------------------ add-ons
-    ADDONS_W = 760   # the Add-ons & help page's cards stop growing here (a wide window
+    ADDONS_W = 760   # the Add-ons page's cards stop growing here (a wide window
     #                  stretched them into long thin bars with the buttons far apart)
 
     class _AddonRelay(QObject):
@@ -2224,36 +2228,6 @@ class SettingsDialog(QDialog):
                          daemon=True, name="onion-pocket-addons").start()
 
     # ------------------------------------------------------------------ support
-    def _feedback_card(self):
-        """The Discord, feedback and bug reports: all open a page in the browser,
-        nothing is sent from the app (feedback.py)."""
-        from soundboard import __version__, feedback
-        card, cv = self._card(_("Feedback and problems"),
-                              _("The Discord is where to chat, ask for help and hear about new "
-                                "versions. Found a bug or missing something? Everything opens in "
-                                "your browser, and nothing is sent unless you submit it there."))
-        row = _button_row()
-        discord = QPushButton(_("Join the Discord"))
-        discord.setObjectName("primary")
-        discord.clicked.connect(lambda: busy.open_url(
-            feedback.DISCORD_URL, discord, opened=_("✓ Opened in your browser"),
-            failed=_("Couldn't open your browser. The page is")))
-        icons.set_icon(discord, "speech")
-        send = QPushButton(_("Send feedback"))
-        send.clicked.connect(self._ask_feedback)
-        icons.set_icon(send, "edit")
-        bug = QPushButton(_("Report a problem on GitHub"))
-        bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
-        bug.clicked.connect(lambda: busy.open_url(
-            feedback.problem_url(__version__), bug, opened=_("✓ Opened in your browser"),
-            failed=_("Couldn't open your browser. The page is")))
-        row.addWidget(discord)
-        row.addWidget(send)
-        row.addWidget(bug)
-        cv.addLayout(row)
-        self.discord_btn, self.feedback_btn, self.problem_btn = discord, send, bug
-        return card
-
     def _support_card(self):
         """A link to the GitHub page's Support section: the ways to donate live there,
         not in the app, so they can change without a release and a copy of the app

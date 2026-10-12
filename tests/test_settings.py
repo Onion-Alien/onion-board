@@ -57,7 +57,7 @@ def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  #
 def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "help")
+    d = SettingsDialog(window, "about")
     btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
     btn.click()
     assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
@@ -71,8 +71,8 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
              "audio": ("Devices", "Your mic", "Who's listening", "Audio buffering"),
              "hotkeys": ("Hotkey sounds",),
              "general": ("Window", "Running in the background", "Backup"),
-             "help": ("Add-ons", "Feedback and problems",
-                         "Support Onion Board"),
+             "help": ("Add-ons",),
+             "about": ("Onion Board", "Get in touch", "Support Onion Board"),
              "updates": ("App updates", "Downloader (yt-dlp)"),
              "remote": ("Remote control (Stream Deck, scripts)", "Set it up the easy way")}
     for page, titles in where.items():
@@ -157,7 +157,7 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     from soundboard import __version__, feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "help")
+    d = SettingsDialog(window, "about")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
     d.feedback_btn.click()      # asks "What would you improve?" first (test_feedbackdialog)
     assert d.feedback_box.isVisible() and not opened
@@ -177,7 +177,7 @@ def test_join_the_discord_comes_first_and_only_opens_the_browser(window, monkeyp
     from soundboard import feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "help")
+    d = SettingsDialog(window, "about")
     assert d.discord_btn.objectName() == "primary"
 
     def rows(lay):   # every layout under the card's, depth first
@@ -314,6 +314,11 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
             last = grid.cards[expected - 1].geometry()
             assert grid.width() - 1 - last.right() < expected
             assert grid.cards[0].geometry().left() == 0
+            # every group shares those columns: its cards line up with the first group's
+            xs = [c.geometry().left() for c in grid.cards]
+            for other in d.findChildren(ThemeGrid):
+                for i, c in enumerate(other.cards[:expected]):
+                    assert c.geometry().left() == xs[i]
     finally:
         d.close()
 
@@ -422,18 +427,18 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
 
 
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
-    """Textured puts the theme's pattern on the panels; Plain leaves them flat."""
+    """Plain (the default) leaves the panels flat; Textured puts the theme's pattern on."""
     from soundboard import theme
     window.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
-    assert d.texture_on.isChecked() and window.cfg.theme_texture
+    assert d.texture_off.isChecked() and window.cfg.theme_texture is False
+    assert "/tex-" not in qapp.styleSheet()
+    d.texture_on.click()
+    assert window.cfg.theme_texture is True and theme.textures_on
     assert "/tex-" in qapp.styleSheet()
     d.texture_off.click()
     assert window.cfg.theme_texture is False and not theme.textures_on
     assert "/tex-" not in qapp.styleSheet()
-    d.texture_on.click()
-    assert window.cfg.theme_texture is True
-    assert "/tex-" in qapp.styleSheet()
     d.close()
 
 

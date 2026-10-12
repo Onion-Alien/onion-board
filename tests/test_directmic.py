@@ -2578,6 +2578,7 @@ def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa:
     _flow_settled(w)
     assert "virtual cable" not in w.mic_line.text()
     assert not w.btn_rmcable.isHidden() and w.btn_rmcable.toolTip()
+    assert "remove it" in w.alt_cable_words.text()   # why there's a Use and a Remove
     for cables, vbcable in (((), True), ((CABLE_IN,), False)):   # none, or not VB-Cable's
         _working_on_the_mic(w, monkeypatch, cables, vbcable)
         _flow_settled(w)
@@ -3183,7 +3184,7 @@ def test_the_working_card_is_one_line(window, monkeypatch):  # noqa: F811
     assert w.mic_pill.text() == "Connected" and w.mic_pill.property("tone") == "ok"
     for b in (w.btn_install, w.step_lbl, w.mic_flow, w.mic_update_note):
         assert b.isHidden()
-    assert not w.btn_usecable.isHidden() and w.btn_usecable.property("quiet")
+    assert not w.btn_usecable.isHidden() and not w.mic_alt.isHidden()   # the tiles
     assert w.btn_guide.isHidden() and not w.helpcard.isHidden()   # (it has the guide)
 
 

@@ -1,0 +1,2 @@
+- Quick setup no longer jumps around: clicking between the first step's choices keeps the window the same size, Back / Next no longer flash it to the full screen height for a moment, and opening and shutting the Discord tip near the bottom of the screen puts the window back where it was instead of walking it up.
+- Quick setup stays open while Bun puts your sounds into your mic: Back, Next, Esc and the X wait until it's done, so it can't be closed half-way.
