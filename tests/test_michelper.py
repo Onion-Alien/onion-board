@@ -720,11 +720,15 @@ def test_schtasks_on_the_ui_thread_is_flagged(qapp, monkeypatch, caplog):
 
 def test_the_admin_part_runs_without_numpy():
     """The helper build leaves numpy out: the admin part (and the ring file it makes)
-    must not need it."""
+    must not need it, nor the listen-to-the-mic check after the audio restart (in the
+    helper that failed with "No module named 'numpy'", so a mic left silent was never
+    restarted again)."""
     code = ("import sys; sys.modules['numpy'] = None\n"
             "from soundboard import directmic as dm, michelper as mh\n"
             "assert dm.np is None and len(dm.new_ring_bytes()) == dm.FILE_BYTES\n"
-            "assert mh.allowed(['uninstall'])\n")
+            "assert mh.allowed(['uninstall'])\n"
+            "from soundboard import appaudio\n"
+            "assert appaudio.np is None and callable(appaudio.mic_is_silent)\n")
     r = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
                        text=True, timeout=60)
     assert r.returncode == 0, r.stderr

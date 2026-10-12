@@ -371,7 +371,9 @@ def test_unplugged_mic_is_listed_but_never_repaired(window, qapp, monkeypatch): 
     d.close()
 
 
-def test_mic_list_by_endpoint(monkeypatch):
+def test_mic_list_by_endpoint(monkeypatch, tmp_path):
+    dll = tmp_path / 'obmic.dll'
+    dll.write_bytes(b'dll')
     monkeypatch.setattr(dm, 'capture_endpoints', lambda: [
         {'guid': GUID_A, 'name': 'Mic (USB)', 'active': True},
         {'guid': GUID_B, 'name': 'Mic (USB)', 'active': True},
@@ -381,7 +383,7 @@ def test_mic_list_by_endpoint(monkeypatch):
     monkeypatch.setattr(dm, 'effect_in_place', lambda guid: True)
     monkeypatch.setattr(dm, 'make_ring', lambda: True)
     monkeypatch.setattr(dm, 'same_dll', lambda *a: True)
-    monkeypatch.setattr(dm, 'registered_dll', lambda: None)
+    monkeypatch.setattr(dm, 'registered_dll', lambda: dll)
     monkeypatch.setattr(dm, 'installed_slot', lambda guid: None)
     found = dm.mics(['Mic (USB)'])
     # unplugged without the effect: left out; unplugged with it: kept, last

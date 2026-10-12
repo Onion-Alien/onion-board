@@ -321,9 +321,10 @@ goes online.
   `remove-all`), never used as a path or shown, and anything else is refused. The
   helper installs only the DLL inside its own Program Files folder, so it can't be
   used to put any other code into Windows' audio: a new version of the effect still
-  needs Windows' prompt, which also updates the helper. It logs to
-  `%ProgramData%\OnionBoard\michelper.log` (kept to about 1 MB, with one older copy,
-  as is `directmic-admin.log`). `obmichelper.exe` isn't code-signed; each release's
+  needs Windows' prompt, which also updates the helper. It logs what it does to
+  `%ProgramData%\OnionBoard\michelper.log` (made at its first request; kept to about
+  1 MB, with one older copy, as is `directmic-admin.log`, where the steps run after
+  Windows' prompt go). `obmichelper.exe` isn't code-signed; each release's
   VirusTotal scan covers it.
 - **The data folders**: anyone signed in can make folders in `%ProgramData%`, so before
   writing anything there the admin step makes `%ProgramData%\OnionBoard` a real folder
