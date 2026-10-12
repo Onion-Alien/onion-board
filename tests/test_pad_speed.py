@@ -388,6 +388,33 @@ def test_pad_picture_is_read_off_the_ui_thread(qapp, tmp_path, monkeypatch):
     thumbs.forget(m.image)
 
 
+def test_a_resized_pad_keeps_its_picture_while_its_file_is_read(qapp, tmp_path,
+                                                                monkeypatch):
+    """A resize needs every pad's file again for the new size, more than the cache
+    holds: the pads read again painted their plain card until it was in, so the
+    cards flickered across the board on each step of a resize. The last size of the
+    picture shows, stretched, until then."""
+    monkeypatch.setattr(thumbs, "LOAD_ASYNC", True, raising=False)
+    m = SoundMeta(id="p", name="Boom", file="f", duration=1.0,
+                  image=make_image(tmp_path / "a.png"))
+    pad = Pad(m, 150)
+    pad.state = "ready"
+    pad.grab()
+    assert process_events(qapp, lambda: not thumbs.loading(m.image), 3)
+    pad.grab()   # its picture at this size
+    thumbs._bytes -= thumbs._size(thumbs._pixmaps.pop(m.image))   # the file let go
+    gate, real = threading.Event(), thumbs.QImage
+    monkeypatch.setattr(thumbs, "QImage", lambda *a: (gate.wait(3), real(*a))[1])
+    pad.setFixedSize(180, widgets.pad_height(180))
+    img = pad.grab().toImage()
+    assert thumbs.loading(m.image)
+    mid = img.pixelColor(img.width() // 2, img.height() // 3)
+    assert mid.blue() > mid.red() + 40                  # the picture, not the plain card
+    gate.set()
+    assert process_events(qapp, lambda: not thumbs.loading(m.image), 3)
+    thumbs.forget(m.image)
+
+
 def test_a_picture_forgotten_while_read_is_not_cached(qapp, tmp_path, monkeypatch):
     monkeypatch.setattr(thumbs, "LOAD_ASYNC", True, raising=False)
     path = make_image(tmp_path / "a.png")
