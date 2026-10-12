@@ -3115,8 +3115,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "Mykistä tai avaa mikrofonisi muille. Äänesi kuuluvat heille edelleen.",
   "That page has no sound Onion Board can add.": "Sivulla ei ole ääntä, jonka Onion Board voi lisätä.",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Poistetut äänet saa takaisin Kumoa-painikkeella tai myöhemmin kohdasta Varmuuskopio → Äskettäin poistetut äänet.",
-  "Off Air": "Ei lähetyksessä",
-  "On Air": "Lähetyksessä",
   "Not configured": "Ei määritetty",
   "Not configured: click to fix": "Ei määritetty: korjaa klikkaamalla",
   "Can't send to {device}, click to fix": "Ei voi lähettää laitteeseen {device}, korjaa klikkaamalla",

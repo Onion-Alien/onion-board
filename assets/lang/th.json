@@ -3043,8 +3043,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "ปิดหรือเปิดเสียงไมโครโฟนของคุณสำหรับผู้อื่น เสียงของคุณยังเล่นให้พวกเขาได้ยิน",
   "That page has no sound Onion Board can add.": "หน้านั้นไม่มีเสียงที่ Onion Board เพิ่มได้",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "เสียงที่ลบจะกลับมาได้ด้วย เลิกทำ หรือภายหลังจาก สำรอง → เสียงที่ลบล่าสุด",
-  "Off Air": "ไม่ออกอากาศ",
-  "On Air": "ออกอากาศ",
   "Not configured": "ยังไม่ได้ตั้งค่า",
   "Not configured: click to fix": "ยังไม่ได้ตั้งค่า: คลิกเพื่อแก้",
   "Can't send to {device}, click to fix": "ส่งไปที่ {device} ไม่ได้ คลิกเพื่อแก้",

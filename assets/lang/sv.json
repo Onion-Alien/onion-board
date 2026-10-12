@@ -3115,8 +3115,6 @@
   "Mute or unmute your mic for others. Your sounds still play for them.": "Stäng av eller slå på din mikrofon för andra. Dina ljud spelas fortfarande för dem.",
   "That page has no sound Onion Board can add.": "Den sidan har inget ljud som Onion Board kan lägga till.",
   "Removed sounds come back with Undo, or later from Backup → Recently deleted sounds.": "Borttagna ljud kommer tillbaka med Ångra, eller senare från Säkerhetskopia → Nyligen raderade ljud.",
-  "Off Air": "Ej i sändning",
-  "On Air": "I sändning",
   "Not configured": "Inte inställt",
   "Not configured: click to fix": "Inte inställt: klicka för att fixa",
   "Can't send to {device}, click to fix": "Kan inte skicka till {device}, klicka för att fixa",

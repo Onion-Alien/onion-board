@@ -3,7 +3,7 @@ import pytest
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QLabel, QPushButton, QWidget
-from soundboard.ui.sidebar import FULL_W, OPEN_W, SHUT_W, SideRail, SideTabs, _Arrow
+from soundboard.ui.sidebar import FULL_W, OPEN_W, SHUT_W, SNAP_W, SideRail, SideTabs, _Arrow
 
 
 def _event(qapp, handle, kind, x):
@@ -61,7 +61,7 @@ def test_short_drag_snaps_back_without_changing_saved_preference(qapp):
     rail.close()
 
 
-def test_shut_then_mid_then_full_while_dragging(qapp):
+def test_shut_until_snap_then_full_while_dragging(qapp):
     tabs = SideTabs()
     tabs.addTab(QWidget(), "Sounds")
     settings = QPushButton()
@@ -77,17 +77,12 @@ def test_shut_then_mid_then_full_while_dragging(qapp):
             rail.drag_width(width)
             qapp.processEvents()
             named = bool(rail.buttons[0].text().strip())
-            assert named == (width >= FULL_W) == rail.brand.isVisible()
-            # the version shows once the name fits on one line; Settings: its icon only
-            assert rail.byline.isVisible() == (named and (width >= full or rail._brand_fits()))
+            # the shut column until SNAP_W, then open all the way: no half-open layout
+            assert named == (width >= SNAP_W) == rail.brand.isVisible()
+            assert not named or rail._target_width() == OPEN_W
+            assert rail.byline.isVisible() == named
             assert settings.text() == ""
             assert not named or rail.rect().contains(rail.brand.geometry())
-            # mid: Settings and the arrow side by side, centred as a pair
-            if FULL_W <= width < full:
-                qapp.processEvents()
-                left = settings.mapTo(rail, settings.rect().topLeft()).x()
-                right = rail.toggle.mapTo(rail, rail.toggle.rect().topRight()).x()
-                assert abs((left + right) / 2 - (rail.width() - 1) / 2) <= 2
         rail.finish_resize()
     finally:
         rail.close()
