@@ -12,6 +12,13 @@ PR and what was checked (themes, sizes, test file) only after reviewing the affe
 
 ## Open
 
+- [ ] **U57 (defect): Bottom-strip icons sit above Comic Sans and Tahoma capitals.**
+  Pixel subtraction confirms a 1.5 px offset for My mic, What others hear and My
+  headphones at 1700 px in Comic Sans and Retro 98. Draw each icon from its label's
+  current baseline and cap height, rather than centering it in the line box.
+  Regression: `tests/test_font_footer.py`, Dark, Amber Terminal and Comic Sans.
+  Awaiting picture approval before merging.
+
 - [ ] **U56 (defect): Card headings retain the default font's offsets.** Verified on
   `3db47c52`, offscreen at 1700, 1020 and 440 px in Dark, Amber Terminal, Hacker,
   Comic Sans and Retro 98. Setup's heading icons are 3 px above the capitals in
