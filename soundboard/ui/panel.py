@@ -12,7 +12,7 @@ from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QSizePolicy, QSlider, QSpinBox, QVBoxLayout,
+                               QLayout, QPushButton, QSlider, QSpinBox, QVBoxLayout,
                                QWidget)
 
 from soundboard import theme
@@ -315,116 +315,81 @@ def capped(body: QWidget, outer: QWidget | None = None, *,
     return outer
 
 
-def card(title: str = "", hint: str = "", *, roomy: bool = False,
-         beside: QWidget | None = None) -> tuple[QFrame, QVBoxLayout]:
-    """A titled card, the building block of the Voice and Setup pages. `beside` goes
-    right after the title (an ⓘ that explains the card: DESIGN section 4)."""
-    f = QFrame()
+def heading_row(title: str, icon: str = "", *, beside=(), end=()
+                ) -> tuple[QHBoxLayout, QLabel, list[QWidget]]:
+    """A card's heading line (DESIGN section 4, *Card headings*): the icon, the title,
+    `beside` right after it (an ⓘ), then `end` at the far end (a status pill). Every
+    part is centred on the title's cap height, worked out from its font, never by eye
+    or a hand-tuned margin; a part taller than the line pushes the title down instead
+    of sticking up. Returns the row, the title and the parts centred on it (the icon,
+    `beside` and `end`), which tests/test_card_headings.py measures on the ink."""
+    row = QHBoxLayout()
+    row.setContentsMargins(0, 0, 0, 0)
+    row.setSpacing(8)
+    lbl = section_label(title)
+    lbl.setProperty("head", True)   # (no padding above: the row places it)
+    lbl.ensurePolished()
+    fm = lbl.fontMetrics()
+    # the cap's ink runs from row ascent - capHeight to ascent - 1
+    centre = fm.ascent() - (fm.capHeight() + 1) / 2
+    marks: list[QWidget] = []
+    if icon:
+        marks.append(icon_label(icon, color="text"))
+    marks += [*beside, *end]
+    tops = {}
+    for w in marks:
+        w.ensurePolished()
+        h = max(w.minimumHeight(), w.sizeHint().height())
+        tops[w] = round(centre - (h - 1) / 2)   # its middle row on the cap's middle row
+    lead = max([0, *(-t for t in tops.values())])   # a taller part: the title comes down
+
+    def pin(w: QWidget, top: int):
+        box = QVBoxLayout()
+        box.setContentsMargins(0, top, 0, 0)
+        box.setSpacing(0)
+        box.addWidget(w)
+        box.addStretch(1)
+        row.addLayout(box)
+
+    if icon:
+        pin(marks[0], tops[marks[0]] + lead)
+    pin(lbl, lead)
+    for w in beside:
+        pin(w, tops[w] + lead)
+    row.addStretch(1)
+    for w in end:
+        pin(w, tops[w] + lead)
+    return row, lbl, marks
+
+
+class Card(QFrame):
+    """A `QFrame#card` that remembers its heading_row() parts."""
+    heading_row: QHBoxLayout | None = None
+    heading_title: QLabel | None = None
+    heading_marks: list[QWidget] = []
+
+
+def card(title: str = "", hint: str = "", *, roomy: bool = False, icon: str = "",
+         beside=(), end=()) -> tuple[Card, QVBoxLayout]:
+    """A titled card, the building block of the Voice and Setup pages. Its heading is
+    heading_row(): `icon` in front of the title, `beside` right after it (an ⓘ that
+    explains the card: DESIGN section 4), `end` at the far end (a status pill). The
+    card keeps them as `heading_title`, `heading_marks` and `heading_row`."""
+    f = Card()
     f.setObjectName("card")
     v = QVBoxLayout(f)
     f.setProperty("roomy", roomy)
-    # the title label adds 8 px of its own above, so the top margin is 8 less
-    v.setContentsMargins(*((18, 10, 18, 18) if roomy else (14, 8, 14, 14)))
+    # every titled card's heading starts at the same height: its top margin plus 8
+    v.setContentsMargins(*((18, 18, 18, 18) if roomy else (14, 16, 14, 14)))
     v.setSpacing(12 if roomy else 6)
-    if title and beside is not None:
-        row = QHBoxLayout()
-        row.setSpacing(4)
-        lbl = section_label(title)
-        row.addWidget(lbl, 0, Qt.AlignmentFlag.AlignTop)
-        # centred on the title's cap height (DESIGN section 4), measured from its font:
-        # its padding-top (8 px) + ascent - half the cap height
-        lbl.ensurePolished()
-        fm = lbl.fontMetrics()
-        centre = 8 + fm.ascent() - fm.capHeight() / 2
-        pin = QVBoxLayout()
-        pin.setContentsMargins(0, max(0, round(centre - beside.minimumHeight() / 2)), 0, 0)
-        pin.addWidget(beside)
-        pin.addStretch(1)
-        row.addLayout(pin)
-        row.addStretch(1)
+    beside = (beside,) if isinstance(beside, QWidget) else tuple(beside or ())
+    if title:
+        row, f.heading_title, f.heading_marks = heading_row(title, icon, beside=beside, end=end)
+        f.heading_row = row
         v.addLayout(row)
-    elif title:
-        v.addWidget(section_label(title))
     if hint:
         v.addWidget(hint_label(hint))
     return f, v
-
-
-class _FoldHead(QPushButton):
-    """FoldCard's header line: a button sized by the row inside it, not by its text."""
-
-    def sizeHint(self):
-        lay = self.layout()
-        return lay.sizeHint() if lay is not None else super().sizeHint()
-
-    def minimumSizeHint(self):
-        lay = self.layout()
-        return lay.minimumSize() if lay is not None else super().minimumSizeHint()
-
-
-class FoldCard(QFrame):
-    """A card that shuts to one line: its icon, title, a short summary of what's in it
-    and a chevron. Click the line to open it. `body` is the layout its contents go
-    in (the Setup tab's rarely-touched parts: devices, chat help, sound)."""
-    toggled = Signal(bool)
-
-    def __init__(self, icon: str, title: str):
-        super().__init__()
-        self.setObjectName("card")
-        self.setProperty("roomy", True)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(6, 6, 6, 6)
-        v.setSpacing(0)
-        self.head = _FoldHead()
-        self.head.setObjectName("foldhead")
-        # (a button's width floor is its size hint: the summary's whole text)
-        self.head.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.head.setCheckable(True)
-        self.head.setAccessibleName(title)
-        self.head.setFocusPolicy(Qt.FocusPolicy.TabFocus)   # (a click mustn't ring it)
-        h = QHBoxLayout(self.head)
-        h.setContentsMargins(12, 8, 10, 8)
-        h.setSpacing(10)
-        h.addWidget(icon_label(icon, color="text"))
-        self.title = QLabel(title)
-        self.title.setObjectName("section")
-        self.title.setProperty("head", True)
-        h.addWidget(self.title)
-        from soundboard.ui.appspanel import ElidedLabel
-        self._summary = ""
-        self.summary = ElidedLabel()
-        self.summary.setObjectName("hint")
-        self.summary.setMinimumWidth(20)
-        self.summary.setAlignment(Qt.AlignmentFlag.AlignRight)
-        h.addWidget(self.summary, 1)
-        self.chevron = icon_label("fold_open", color="muted")
-        h.addWidget(self.chevron)
-        v.addWidget(self.head)
-        self.inner = QWidget()
-        self.body = QVBoxLayout(self.inner)
-        self.body.setContentsMargins(12, 6, 12, 12)
-        self.body.setSpacing(12)
-        self.inner.hide()
-        v.addWidget(self.inner)
-        self.head.toggled.connect(self._toggled)
-
-    def _toggled(self, on: bool):
-        self.inner.setVisible(on)
-        # open, the card itself shows it (blank, not hidden: it keeps the row's spacing)
-        self.summary.setText("" if on else self._summary)
-        icons.set_label_icon(self.chevron, "fold_up" if on else "fold_open", "muted")
-        self.toggled.emit(on)
-
-    def is_open(self) -> bool:
-        return self.head.isChecked()
-
-    def set_open(self, on: bool):
-        self.head.setChecked(on)
-
-    def set_summary(self, text: str):
-        self._summary = text
-        self.summary.setText("" if self.is_open() else text)
-        self.summary.update()
 
 
 def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:

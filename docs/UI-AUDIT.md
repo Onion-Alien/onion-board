@@ -117,10 +117,8 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Setup: start here
 
-- [ ] **U29 (polish): Setup heading indents differ.** Your virtual mic has a leading
-  icon and indented title; Who's listening starts directly with text; fold headers
-  use a third icon/title treatment. Normalize heading icon slots and title offsets
-  without changing what the cards contain. Target: Setup card headings / FoldCard.
+- [x] **U29 (polish): Setup heading indents differ.** Done: every Setup card heading
+  comes from `heading_row()` with an icon, measured by `tests/test_card_headings.py`.
 
 ### Shared rail and bottom controls
 

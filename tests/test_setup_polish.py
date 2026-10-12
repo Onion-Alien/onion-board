@@ -78,7 +78,6 @@ def test_device_boxes_line_up(window, monkeypatch):  # noqa: F811
     _mic_works(w, monkeypatch)
     w.show()
     w.tabs.setCurrentWidget(w.setup_page)
-    w.dev_fold.set_open(True)   # (shut, the Devices row hides the boxes)
     for size in ((1180, 720), (800, 600)):
         w.resize(*size)
         pump()

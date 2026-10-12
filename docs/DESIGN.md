@@ -325,7 +325,7 @@ These are the current reference points. Copy their structure before inventing a 
 | --- | --- |
 | Sounds tab board (`ui/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
 | Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
-| Setup tab cards | `setcard`: heading, one-line hint, controls, buttons at their own width in a wrapping row. What you check every day (your mic, Who's listening) stays open; the rarely-touched parts (Devices, Connect your chat, Equalizer and volume) are `FoldCard`s: shut to one line with an icon, title, short summary and chevron, opened in place. |
+| Setup tab cards | A grid: your mic and Who's listening side by side in one row (always the same height, titles on one line), Devices and Connect your chat under your mic, Equalizer and volume under Who's listening. Every card open, built with `card()` (heading from `heading_row()`): they fit the screen, so nothing folds away. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
 | Send feedback box (`ui/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |
@@ -400,6 +400,28 @@ These are the current reference points. Copy their structure before inventing a 
     (`OutputBlock._pin`: `ascent - capHeight / 2`), never a hand-tuned margin.
   - **Trailing controls** (a switch) centre on the title's first line; the title is
     pushed down so the two share a centre.
+  - **Card headings: build them with `card()` / `heading_row()`** (`ui/panel.py`),
+    never a hand-made `QHBoxLayout`. This is the rule that broke most often: the ⓘ
+    sat 1.5 px low and "Your mic" sat 6 px below "Who's listening" beside it,
+    because each card built its own heading row (one centred its parts on the row's
+    box with `AlignVCenter`, another on a padded title), and every fix moved one
+    card by hand. How the good ones do it (the sidebar's Sound output card,
+    `OutputBlock._pin`, and the headings since `heading_row()`):
+    1. **One centre line from the font**: the title's cap-height middle row,
+       `ascent - (capHeight + 1) / 2`. Not the label's box, not `AlignVCenter`, not
+       a margin found by eye.
+    2. **Every part on it**: the heading icon, the ⓘ right after the title, the status
+       pill at the end: each one's top is `centre - (height - 1) / 2`, set as a top
+       margin in its own top-aligned box.
+    3. **Taller parts push the title down**, never stick up out of the row.
+    4. **Every titled card starts its title at the same height** (the card's top
+       margin is the same for all; `card()` sets it), so two cards side by side have
+       their titles on one line without anyone lining them up.
+    5. **Measured on the ink, by a test**: `tests/test_card_headings.py` grabs each
+       Setup card and checks every part's ink centre is within 1 px of the title's
+       first capital, and that side-by-side titles share a line. A new card heading
+       gets added to it (or to a test like it); a heading made any other way fails
+       review.
   - **A chevron sits right after its words** (one small gap), never at the row's far
     edge; a link-style action's hover fill reaches 8 px past its words on each side.
   - **Wrapping grows, never clips.** A button holding a wrapped label gets a
@@ -576,6 +598,11 @@ Never draw a fixed colour except a sound's own colour, the user's own highlight 
 - A plain card: heading + stacked rows of text and buttons with no icon, tile,
   pill or inner area.
 - Disabling the button that was just clicked.
+- A card heading built by hand (its own `QHBoxLayout` of icon + `QLabel#section` +
+  ⓘ), or any part of it placed with `AlignVCenter` or a hand-tuned margin: use
+  `card(title, icon=..., beside=..., end=...)` (section 4, *Card headings*).
+- A card that folds shut when the page fits the screen open. Folding is for a page
+  that really doesn't fit, never a way to tidy up.
 - A one-click delete of something a person made.
 
 ## 10. Checklist for every UI change
@@ -595,7 +622,8 @@ Never draw a fixed colour except a sound's own colour, the user's own highlight 
    changed. Look at them before anyone else does: empty space, cut-off words, things
    the same colour as what's behind them, the old theme's colours left after a switch.
 7. Icons and words aligned (section 4, *Icon and text alignment*): one icon column,
-   one text keyline for every line, icons on the first line's cap height? Check a
+   one text keyline for every line, icons on the first line's cap height? Card
+   headings from `card()` only, covered by `tests/test_card_headings.py`. Check a
    zoomed grab with guide lines.
 8. Tests: the new widget's flow, and that tooltips/accessible names exist on icon
    buttons.
