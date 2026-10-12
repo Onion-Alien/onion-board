@@ -364,7 +364,7 @@ class FlatMap(QWidget):
         t = theme.T
         self.setStyleSheet(
             f"QPushButton#mapbtn {{ border-radius:8px; border:1px solid {t['border']};"
-            f" background:{t['card']}; color:{t['text']}; font-weight:600; padding:0; }}"
+            f" background:{t['map_btn']}; color:{t['text']}; font-weight:600; padding:0; }}"
             f" QPushButton#mapbtn:hover {{ border-color:{t['accent']}; }}"
             f" QFrame#maploader {{ border-radius:14px; border:1px solid {t['border']};"
             f" background:{t['card']}; }}"

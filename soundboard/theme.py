@@ -270,6 +270,9 @@ THEMES: dict[str, dict[str, str]] = {
         text="#222222", text_hi="#000000", muted="#666666", faint="#9e9e9e", section="#8a6500",
         accent="#ffd600", accent_hi="#a38600", accent2="#ff9100", on_accent="#000000",
         off="#bdbdbd", badge="#fffde7", badge_text="#333333", **_LIGHT_STATUS,
+        # the window, panels and cards are all white: the language / theme tiles, the
+        # Radio Favorites / Recent strip and the map's + / - get a grey of their own
+        tile="#eeeeee", segbox="#eeeeee", map_btn="#eeeeee",
     ),
     "Barbie": dict(   # everything is pink. Everything.
         bg="#ffb3d9", panel="#ffc9e4", card="#ffdcee", card_hi="#ffd0e8",
@@ -500,6 +503,11 @@ for _t in THEMES.values():
     # sounds search): the card one where the window is the panel's (Flashbang, Comic Sans)
     _t.setdefault("field", _t["bg"] if _contrast(_t["bg"], _t["panel"]) >= need
                   else _t["card_ctl"])
+    # language / theme tiles, the Radio list's segment strip, the map's zoom buttons
+    # (their own colours only where they'd vanish: Flashbang)
+    _t.setdefault("tile", _t["panel"])
+    _t.setdefault("segbox", _t["inset"])
+    _t.setdefault("map_btn", _t["card"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
     _add_item_hover_token(_t)
@@ -1059,11 +1067,11 @@ QPushButton#hkbtn { min-width:150px; font-weight:600; }
 /* also inside a card: there `QFrame#setcard QPushButton:checked` (an accent fill) would
    win, and the card paints its name in $text: grey on grey in Carbon */
 QPushButton#themecard, QFrame#setcard QPushButton#themecard, QFrame#card QPushButton#themecard {
-    background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
+    background:$tile; border:2px solid $border; border-radius:12px; padding:0; }
 QPushButton#themecard:hover, QFrame#setcard QPushButton#themecard:hover,
-QFrame#card QPushButton#themecard:hover { background:$panel; border-color:$border_hi; }
+QFrame#card QPushButton#themecard:hover { background:$tile; border-color:$border_hi; }
 QPushButton#themecard:checked, QFrame#setcard QPushButton#themecard:checked,
-QFrame#card QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
+QFrame#card QPushButton#themecard:checked { background:$tile; border:2px solid $accent; }
 QFrame#card QFrame#chip { background:$btn; border:1px solid transparent; border-radius:11px; }
 QFrame#card QFrame#chip:hover { background:$btn_hover; }
 QFrame#card QFrame#chip[sel="true"] { border-color:$accent; }
