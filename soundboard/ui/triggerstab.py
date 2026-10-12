@@ -128,7 +128,9 @@ class TriggersTab(QWidget):
         # it does as a few points, the button, Hoot beside it all.
         box = HoverCard()   # lights up under the mouse, as the Apps cards do
         bv = QVBoxLayout(box)
-        bv.setContentsMargins(18, 16, 18, 16)
+        # (16 at the sides: the Get button's icon gap needed 4 px, and this card sets the
+        # narrowest window that isn't the mini player)
+        bv.setContentsMargins(16, 16, 16, 16)
         box.setMaximumWidth(620)
         row = QHBoxLayout()
         row.setSpacing(18)
