@@ -1,0 +1,1 @@
+- Dropdown menus settle closed during rapid repeated clicks and reopen after a short pause.
