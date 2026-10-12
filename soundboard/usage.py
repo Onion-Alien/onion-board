@@ -146,9 +146,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "source-open", "source-copy-link", "source-details", "source-deleted",
             "source-off",
             # the Apps tab: a card or section dragged, a category added / renamed /
-            # deleted, and own categories set up (features_now)
+            # deleted, and own categories set up (features_now); a program's window shown
             "apps-reorder", "apps-category-added", "apps-category-renamed",
-            "apps-category-deleted", "apps-own-categories",
+            "apps-category-deleted", "apps-own-categories", "apps-window-view",
             # Settings' search box used, and a search that found nothing
             "settings-search", "settings-search-nothing",
             # the mini player's mic mute switch; the setup guide opened from Setup

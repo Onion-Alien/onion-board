@@ -3309,5 +3309,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Telepítve van, de a hangjaid most már a mikrofonodba mennek. Használd, ha egy játék kihagyja a mikrofonodat, vagy távolítsd el, ha semmi más nem használja.",
   "⚠ Another sound already has this name.": "⚠ Egy másik hangnak már ez a neve.",
   "Don't show this again": "Ne mutasd újra",
-  "Stop voice effects": "Hangeffektek leállítása"
+  "Stop voice effects": "Hangeffektek leállítása",
+  "Hide this program's window": "A program ablakának elrejtése",
+  "Looking for its window…": "Az ablakát keresem…",
+  "Minimised: nothing to show": "Kis méretre állítva: nincs mit mutatni",
+  "No window to show": "Nincs megjeleníthető ablak",
+  "Show this program's window": "A program ablakának megjelenítése",
+  "This program doesn't share its picture": "Ez a program nem osztja meg a képét",
+  "Window of {name}": "{name} ablaka"
 }

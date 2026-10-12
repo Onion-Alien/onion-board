@@ -3309,5 +3309,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Den är installerad, men dina ljud går in i din mikrofon nu. Använd den om ett spel hoppar över din mikrofon, eller ta bort den om inget annat behöver den.",
   "⚠ Another sound already has this name.": "⚠ Ett annat ljud har redan det här namnet.",
   "Don't show this again": "Visa inte igen",
-  "Stop voice effects": "Stoppa rösteffekter"
+  "Stop voice effects": "Stoppa rösteffekter",
+  "Hide this program's window": "Dölj programmets fönster",
+  "Looking for its window…": "Letar efter fönstret…",
+  "Minimised: nothing to show": "Minimerat: inget att visa",
+  "No window to show": "Inget fönster att visa",
+  "Show this program's window": "Visa programmets fönster",
+  "This program doesn't share its picture": "Programmet delar inte sin bild",
+  "Window of {name}": "Fönstret för {name}"
 }

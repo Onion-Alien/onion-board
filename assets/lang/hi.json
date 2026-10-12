@@ -3309,5 +3309,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "यह इंस्टॉल है, पर अब आपकी आवाज़ें आपके माइक में जाती हैं। अगर कोई गेम आपका माइक छोड़ देता है तो इसे इस्तेमाल करें, या अगर किसी और चीज़ को इसकी ज़रूरत नहीं है तो इसे हटा दें।",
   "⚠ Another sound already has this name.": "⚠ किसी दूसरी साउंड का पहले से यही नाम है।",
   "Don't show this again": "इसे दोबारा न दिखाएँ",
-  "Stop voice effects": "आवाज़ के प्रभाव रोकें"
+  "Stop voice effects": "आवाज़ के प्रभाव रोकें",
+  "Hide this program's window": "इस प्रोग्राम की विंडो छिपाएं",
+  "Looking for its window…": "इसकी विंडो ढूंढ रहे हैं…",
+  "Minimised: nothing to show": "छोटा किया गया: दिखाने को कुछ नहीं",
+  "No window to show": "दिखाने के लिए कोई विंडो नहीं",
+  "Show this program's window": "इस प्रोग्राम की विंडो दिखाएं",
+  "This program doesn't share its picture": "यह प्रोग्राम अपनी तस्वीर साझा नहीं करता",
+  "Window of {name}": "{name} की विंडो"
 }

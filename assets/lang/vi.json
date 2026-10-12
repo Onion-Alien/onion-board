@@ -3235,5 +3235,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Nó đã được cài, nhưng giờ âm thanh của bạn đi vào mic rồi. Dùng nó nếu một game bỏ qua mic của bạn, hoặc gỡ nó nếu không còn gì cần đến nó.",
   "⚠ Another sound already has this name.": "⚠ Đã có âm thanh khác mang tên này.",
   "Don't show this again": "Không hiện lại",
-  "Stop voice effects": "Dừng hiệu ứng giọng nói"
+  "Stop voice effects": "Dừng hiệu ứng giọng nói",
+  "Hide this program's window": "Ẩn cửa sổ của chương trình này",
+  "Looking for its window…": "Đang tìm cửa sổ…",
+  "Minimised: nothing to show": "Đã thu nhỏ: không có gì để hiện",
+  "No window to show": "Không có cửa sổ để hiện",
+  "Show this program's window": "Hiện cửa sổ của chương trình này",
+  "This program doesn't share its picture": "Chương trình này không chia sẻ hình ảnh",
+  "Window of {name}": "Cửa sổ của {name}"
 }

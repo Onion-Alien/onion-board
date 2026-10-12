@@ -3235,5 +3235,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Sudah terpasang, tapi suaramu sekarang masuk ke mikmu. Pakai kalau ada game yang melewati mikmu, atau hapus kalau tidak ada lagi yang membutuhkannya.",
   "⚠ Another sound already has this name.": "⚠ Suara lain sudah memakai nama ini.",
   "Don't show this again": "Jangan tampilkan lagi",
-  "Stop voice effects": "Hentikan efek suara"
+  "Stop voice effects": "Hentikan efek suara",
+  "Hide this program's window": "Sembunyikan jendela program ini",
+  "Looking for its window…": "Mencari jendelanya…",
+  "Minimised: nothing to show": "Diminimalkan: tidak ada yang ditampilkan",
+  "No window to show": "Tidak ada jendela untuk ditampilkan",
+  "Show this program's window": "Tampilkan jendela program ini",
+  "This program doesn't share its picture": "Program ini tidak membagikan gambarnya",
+  "Window of {name}": "Jendela {name}"
 }

@@ -3235,5 +3235,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安裝，但你的聲音現在會進入麥克風。如果某個遊戲略過了你的麥克風就用它，如果沒有其他東西需要它就移除它。",
   "⚠ Another sound already has this name.": "⚠ 已有其他音效使用這個名稱。",
   "Don't show this again": "不再顯示",
-  "Stop voice effects": "停止語音效果"
+  "Stop voice effects": "停止語音效果",
+  "Hide this program's window": "隱藏這個程式的視窗",
+  "Looking for its window…": "正在尋找它的視窗…",
+  "Minimised: nothing to show": "已最小化：沒有可顯示的",
+  "No window to show": "沒有可顯示的視窗",
+  "Show this program's window": "顯示這個程式的視窗",
+  "This program doesn't share its picture": "這個程式不分享它的畫面",
+  "Window of {name}": "{name} 的視窗"
 }

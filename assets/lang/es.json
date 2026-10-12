@@ -3309,5 +3309,12 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Está instalado, pero ahora tus sonidos van a tu micro. Úsalo si un juego se salta tu micro, o quítalo si nada más lo necesita.",
   "⚠ Another sound already has this name.": "⚠ Otro sonido ya tiene este nombre.",
   "Don't show this again": "No volver a mostrar",
-  "Stop voice effects": "Detener efectos de voz"
+  "Stop voice effects": "Detener efectos de voz",
+  "Hide this program's window": "Ocultar la ventana de este programa",
+  "Looking for its window…": "Buscando su ventana…",
+  "Minimised: nothing to show": "Minimizada: nada que mostrar",
+  "No window to show": "No hay ventana que mostrar",
+  "Show this program's window": "Mostrar la ventana de este programa",
+  "This program doesn't share its picture": "Este programa no comparte su imagen",
+  "Window of {name}": "Ventana de {name}"
 }

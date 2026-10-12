@@ -1,0 +1,1 @@
+- Apps tab: an eye button on each program card with a window shows a small live picture of that window under the card.
