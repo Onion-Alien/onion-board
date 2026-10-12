@@ -209,6 +209,27 @@ def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkey
     assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
 
 
+def test_a_stopped_web_song_leaves_the_player(window, monkeypatch):
+    """A web search's song played, then another site picked: its card went, ■ only
+    stopped it and its name stayed in the player bar for good."""
+    import numpy as np
+    from soundboard.ui.linkbar import PLAY_ID
+    live = {}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
+    monkeypatch.setattr(window.engine, "stop", lambda sid: live.pop(sid, None))
+    window.on_link_played("Trap Queen", np.zeros(4800, np.int16), 1.0)
+    live[PLAY_ID] = (0.1, False)
+    window._on_site_picked("soundcloud")   # still playing: the player keeps it
+    assert window.current == PLAY_ID
+    window.stop_current()
+    assert window.current is None and window.meta(PLAY_ID) is None
+    assert window.np_name.text() == "Pick a sound"
+    # over by itself, then another site picked: it goes too
+    window.on_link_played("Trap Queen", np.zeros(4800, np.int16), 1.0)
+    window._on_site_picked("youtube")
+    assert window.current is None and window.meta(PLAY_ID) is None
+
+
 def test_now_playing_label_lines_up_with_its_chips(window, qapp):
     """The row's "Now playing" label sat at the chips' top edge, higher than them."""
     window.show()
