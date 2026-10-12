@@ -32,6 +32,8 @@ def test_buttons_have_icons_and_tips(window):  # noqa: F811
         assert [b.iId for b in btns] == list(thumbbar.ORDER)
         assert all(b.hIcon and b.szTip for b in btns)
         assert btns[-1].szTip == thumbbar.live_tip(True)
+        # a few words on the small hover flyout: the long forms live in the rail's tooltips
+        assert all(len(b.szTip) <= 32 for b in btns), [b.szTip for b in btns]
     finally:
         for b in btns:
             ctypes.windll.user32.DestroyIcon(ctypes.c_void_p(b.hIcon))

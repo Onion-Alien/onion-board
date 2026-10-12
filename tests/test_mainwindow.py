@@ -1424,6 +1424,28 @@ def test_narrow_levels_strip_shows_one_group_and_icons_for_the_others(window, qa
     assert window.chk_mic.text() and window.vol_mon.spin.isVisibleTo(window)
 
 
+def test_others_hear_it_keeps_its_words_in_the_tightest_levels_strip(window, qapp):
+    """The mic group open in a tight strip (side rail open): the % boxes go, never the
+    "Others hear it" words. An empty box beside the mic icon said nothing, and it's the
+    switch the mute warning sends you to."""
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.show()
+    window.rail.set_open(True)
+    squeezed = False
+    for width in (1100, 900, 700, 600):
+        window.resize(width, 720)
+        qapp.processEvents()
+        window._focus_deck(0)
+        qapp.processEvents()
+        if window.is_mini() or not window.chk_mic.isVisibleTo(window):
+            continue
+        assert window.chk_mic.text() == "Others hear it"
+        br = window.chk_mic.mapTo(window.mixer, window.chk_mic.rect().bottomRight())
+        assert window.mixer.rect().contains(br)
+        squeezed = squeezed or not window.vol_mic.spin.isVisibleTo(window)
+    assert squeezed   # the % boxes went at the tightest width: the case is reached
+
+
 @pytest.mark.parametrize("page", [0, -1])   # Sounds, and the last tab (Setup)
 def test_the_tab_key_goes_from_the_side_rail_into_the_page(window, qapp, page):
     """Tab walked the rail and its buttons, then stuck on the rail's last button (the
