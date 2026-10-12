@@ -30,3 +30,12 @@ def test_stock_reinstalled_over_marker_is_stock(tmp_path):
     (folder / bm.MARKER).write_text(bm.bootloader_hashes(folder), encoding="utf-8")
     (folder / "run.exe").write_bytes(b"stock run")
     assert bm.stock_bootloader(folder)
+
+
+def test_the_shipped_helper_is_listed_after_the_runtime_clean_up():
+    """vc_runtime.py overwrites older C++ runtime DLLs anywhere under _internal, the
+    bundled helper's too: build.ps1 must list the helper's files again after it, or the
+    shipped build never matches its manifest and the helper is never set up."""
+    text = (ROOT / "build.ps1").read_text(encoding="utf-8")
+    assert "write_manifest" in text
+    assert text.index("write_manifest") > text.index(r"scripts\vc_runtime.py dist\OnionBoard")
