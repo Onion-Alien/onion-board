@@ -304,8 +304,11 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 - Themed app icons: `%APPDATA%\OnionBoard\icons\` (the shortcuts point at one;
   deleting it leaves them blank until the next start writes it again).
 - Straight into my mic: the admin step logs to
-  `%ProgramData%\OnionBoard\directmic-admin.log` (`michelper.log` when the mic helper
-  ran it: `%ProgramFiles%\Onion Board Mic Helper\`, task `\Onion Board\Mic helper`,
+  `%ProgramData%\OnionBoard\directmic-admin.log` when Windows' prompt (or the
+  uninstaller, or a `--direct-mic` command by hand) ran it, setting up the helper
+  included; to `michelper.log` beside it when the mic helper ran it (a fix by itself, a
+  click with no prompt), so that file only appears once the helper has done something
+  (helper: `%ProgramFiles%\Onion Board Mic Helper\`, task `\Onion Board\Mic helper`,
   `schtasks /query /tn "\Onion Board\Mic helper"`; from source it's built by
   `scripts\build_michelper.py` after `build_directmic.py`); the ring shared with the effect is
   `%ProgramData%\OnionBoard\MicPlugin\ring2.bin`, and what the set-up changed is noted

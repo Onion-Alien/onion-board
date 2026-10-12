@@ -1160,47 +1160,106 @@ begin
       mbInformation, MB_OK, IDOK);
 end;
 
+// The Onion Board processes running from {app} (the app, its workers, an add-on's
+// Python): how many, and with Kill, closed first. Only what CloseApplications couldn't
+// close gets here: an Onion Board in another Windows session (a second account signed
+// in, a remote session), or one that's stuck. Its black box is told it was closed on
+// purpose, like Windows closing it, so its next start doesn't count it as a crash.
+function BoardProcesses(Kill: Boolean): Integer;
+var
+  Script, CountFile, Lines: String;
+  S: AnsiString;
+  Code: Integer;
+begin
+  Result := 0;
+  Script := ExpandConstant('{tmp}\board-procs.ps1');
+  CountFile := Script + '.count';
+  DeleteFile(CountFile);
+  Lines :=
+    '$app = ' + PsQuote(ExpandConstant('{app}') + '\') + #13#10 +
+    '$p = @(Get-Process | Where-Object { $_.Path -and ' +
+    '$_.Path.StartsWith($app, [StringComparison]::OrdinalIgnoreCase) })' + #13#10;
+  if Kill then
+    Lines := Lines +
+      'if ($p.Count) {' + #13#10 +
+      '  $f = Join-Path $env:APPDATA ''OnionBoard\last-run.json''' + #13#10 +
+      '  try { $j = [IO.File]::ReadAllText($f) | ConvertFrom-Json;' +
+      ' $j | Add-Member -Force closed_by_windows $true;' +
+      ' [IO.File]::WriteAllText($f, ($j | ConvertTo-Json -Depth 8 -Compress)) } catch {}' + #13#10 +
+      '  $p | Stop-Process -Force -ErrorAction SilentlyContinue' + #13#10 +
+      '  $p | Wait-Process -Timeout 10 -ErrorAction SilentlyContinue' + #13#10 +
+      '}' + #13#10;
+  Lines := Lines + 'Set-Content -LiteralPath ' + PsQuote(CountFile) + ' -Value $p.Count' + #13#10;
+  SaveStringToFile(Script, Lines, False);
+  if Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + Script + '"',
+          '', SW_HIDE, ewWaitUntilTerminated, Code) and LoadStringFromFile(CountFile, S) then
+    Result := StrToIntDef(Trim(String(S)), 0);
+end;
+
+// {app}\_internal can be renamed (nothing inside is open), tried for about Tries / 2 s.
+// It's renamed straight back.
+function InternalFree(Tries: Integer): Boolean;
+var
+  Dir, Probe: String;
+  Attempt: Integer;
+begin
+  Dir := ExpandConstant('{app}\_internal');
+  Probe := ExpandConstant('{app}\_internal.chk');
+  Result := False;
+  for Attempt := 1 to Tries do
+  begin
+    if RenameFile(Dir, Probe) then
+    begin
+      Result := True;
+      break;
+    end;
+    Sleep(500);
+  end;
+  if Result and not RenameFile(Probe, Dir) then
+  begin
+    // never leave the folder under the wrong name
+    Sleep(1000);
+    if not RenameFile(Probe, Dir) then
+      Log('Could not rename ' + Probe + ' back to ' + Dir);
+  end;
+end;
+
 // An update clears {app}\_internal first ([InstallDelete]). If a program (antivirus, a
 // leftover Onion Board or python process) holds a file in there open, that delete stops
 // halfway and leaves a broken install ("Failed to load Python DLL"). So before anything
 // is deleted, check the folder can be renamed: Windows refuses that while a file inside
 // is open. Not in PrepareToInstall: that runs before CloseApplications has closed a
 // running Onion Board, which would wrongly fail a normal update.
+// An Onion Board still open after that is closed here (asked first, unless silent):
+// reinstalling is what people try when it's broken, and a silent install over a running
+// one used to just stop (exit code 3) with nothing changed.
 procedure CheckInternalNotInUse;
 var
-  Dir, Probe: String;
-  Attempt: Integer;
   Moved: Boolean;
 begin
-  Dir := ExpandConstant('{app}\_internal');
-  Probe := ExpandConstant('{app}\_internal.chk');
-  if not DirExists(Dir) then
+  if not DirExists(ExpandConstant('{app}\_internal')) then
     exit;
-  Moved := False;
   // a scanner often lets go within a second or two, so try for ~10 s
-  for Attempt := 1 to 20 do
+  Moved := InternalFree(20);
+  if not Moved and (BoardProcesses(False) > 0) then
   begin
-    if RenameFile(Dir, Probe) then
+    Log('Onion Board is still running from ' + ExpandConstant('{app}'));
+    if SuppressibleMsgBox('Onion Board is still open, so it can''t be updated. Close it ' +
+         'now and carry on?' + #13#10#13#10 + 'Your sounds and settings are kept.',
+         mbConfirmation, MB_YESNO, IDYES) = IDYES then
     begin
-      Moved := True;
-      break;
+      Log('Closing it: ' + IntToStr(BoardProcesses(True)) + ' process(es)');
+      Moved := InternalFree(20);
     end;
-    Sleep(500);
   end;
   if not Moved then
   begin
-    Log('A file in ' + Dir + ' is in use; stopping before anything is deleted');
+    Log('A file in ' + ExpandConstant('{app}\_internal') + ' is in use; stopping before ' +
+        'anything is deleted');
     RaiseException('Onion Board can''t be updated right now: a file in its folder is in ' +
       'use by another program (antivirus, or Onion Board still running). Nothing was ' +
       'changed and your current Onion Board still works. Close it (and pause your ' +
       'antivirus for a moment), then run this installer again.');
-  end;
-  if not RenameFile(Probe, Dir) then
-  begin
-    // never leave the folder under the wrong name
-    Sleep(1000);
-    if not RenameFile(Probe, Dir) then
-      Log('Could not rename ' + Probe + ' back to ' + Dir);
   end;
 end;
 

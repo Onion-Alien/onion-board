@@ -28,7 +28,13 @@ from ctypes import (POINTER, Structure, Union, addressof, byref, c_float, c_int,
                     c_long, c_ubyte, c_uint, c_ulong, c_ushort, c_void_p, c_wchar_p, cast, sizeof)
 from dataclasses import dataclass, field
 
-import numpy as np
+if typing.TYPE_CHECKING:
+    import numpy as np
+else:
+    try:
+        import numpy as np
+    except ImportError:   # the mic helper (soundboard/michelper.py) ships without numpy:
+        np = None         # it only uses mic_is_silent(), which never needs it
 
 from soundboard import errors
 from soundboard.i18n import _
