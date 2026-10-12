@@ -117,7 +117,7 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
              ("reddit", ("reddit.com", "redd.it")), ("twitch", ("twitch.tv",)),
              ("myinstants", ("myinstants.com",)))
 # the Voice tab's tabs (ui/voicepanel.py VoicePanel._section keys)
-VOICE_TABS = ("fx", "ai", "speak", "custom", "addons")
+VOICE_TABS = ("fx", "ai", "speak", "addons")
 # Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # what else is counted, only ever these names (see the docstring)

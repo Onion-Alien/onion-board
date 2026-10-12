@@ -1463,7 +1463,7 @@ class SpeechPanel(QWidget):
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
     lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
-    custom_wanted = Signal()        # Add voices: VoicePanel unfolds the Custom voices card
+    custom_wanted = Signal()        # Add voices: VoicePanel shows the Add-ons tab
     clip_ready = Signal(object, str)   # Save as sound: the line's audio, its name
     _line_saved = Signal(object, str, str)   # its worker: audio (or None), name, error
 
@@ -1762,8 +1762,8 @@ class SpeechPanel(QWidget):
         v.addLayout(lrow)
         v.addWidget(self.said_log)
         # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs.
-        # Their own card under this one (VoicePanel puts it there), so they're easy to
-        # find; "Add voices" opens it and scrolls to it
+        # In the Add-ons tab, under the add-ons list (VoicePanel puts them there);
+        # "Add voices" opens it and scrolls to them
         self.custom_box = QWidget()
         ov = QVBoxLayout(self.custom_box)
         ov.setContentsMargins(0, 0, 0, 0)
@@ -1964,14 +1964,14 @@ class SpeechPanel(QWidget):
                               error=errors.plain(error)))
 
     def show_custom_voices(self):
-        """Open the Custom voices tab (VoicePanel shows it) and bring it into view."""
+        """Open the Add-ons tab (VoicePanel shows it) and bring custom voices into view."""
         self.custom_wanted.emit()
         w = self.custom_box.parentWidget()
         while w is not None and not isinstance(w, QScrollArea):
             w = w.parentWidget()
         if w is not None:
             QTimer.singleShot(0, self, lambda a=w: a.ensureWidgetVisible(
-                self.custom_box.parentWidget() or self.custom_box, 0, 40))
+                self.custom_title, 0, 40))   # from its heading
 
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""
@@ -2617,7 +2617,8 @@ class ModulesList(QWidget):
     refresh = Signal()
     shown = Signal()
 
-    def __init__(self):
+    def __init__(self, voices_title: QLabel | None = None, voices: QWidget | None = None):
+        """`voices_title` and `voices`: the custom voices part, under the list."""
         super().__init__()
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -2636,6 +2637,10 @@ class ModulesList(QWidget):
         row.addWidget(o)
         row.addStretch(1)
         v.addLayout(row)
+        if voices is not None:
+            if voices_title is not None:
+                v.addWidget(voices_title)
+            v.addWidget(voices)
 
     def _refresh(self):
         if busy.is_busy(self.b_refresh):
@@ -2720,12 +2725,10 @@ class CardBadge(QWidget):
         p.end()
 
 
-CARD_ICONS = {"fx": "voice", "ai": "wave", "speak": "browser",
-              "custom": "speech", "addons": "puzzle"}
+CARD_ICONS = {"fx": "voice", "ai": "wave", "speak": "browser", "addons": "puzzle"}
 TAB_KEYS = tuple(CARD_ICONS)   # the Voice tab's own tabs, in order
 TAB_NAMES = {"fx": lambda: _("Voice changer"), "ai": lambda: _("AI voices"),
-             "speak": lambda: _("Languages"), "custom": lambda: _("Custom"),
-             "addons": lambda: _("Add-ons")}
+             "speak": lambda: _("Languages"), "addons": lambda: _("Add-ons")}
 
 
 class VoicePanel(QWidget):
@@ -2791,6 +2794,8 @@ class VoicePanel(QWidget):
         self._folded = ({k for k in saved_folds if isinstance(k, str)}
                         if isinstance(saved_folds, list) else set())
         tab = speech.get("tab") if isinstance(speech, dict) else None
+        if tab == "custom":
+            tab = "addons"                # Custom voices joined Add-ons
         self._tab = tab if tab in TAB_KEYS else "fx"
         scroll.setWidget(page)
         outer.addWidget(tab_row)
@@ -2828,9 +2833,8 @@ class VoicePanel(QWidget):
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._section("speak", self.speech, self.speech.title)
-        self._section("custom", self.speech.custom_box, self.speech.custom_title)
-        self.speech.custom_wanted.connect(lambda: self.show_tab("custom"))
-        self.addons = ModulesList()
+        self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
+        self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
         self.addons.refresh.connect(self._rescan_in_background)
         self._scanned.connect(self._apply_scan)
         self._scanning = False
