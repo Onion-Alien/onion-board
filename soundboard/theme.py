@@ -457,6 +457,8 @@ def _add_hover_token(t: dict[str, str]) -> None:
     t["accent_hover"] = next(
         (c for c in (_mix(t["accent_hi"], _away(on), i / 20) for i in range(13))
          if _contrast(c, t["on_accent"]) >= 4.5), t["accent_hi"])
+    t["accent_hover"] = _distinct_hover(t["accent"], t["accent_hover"], on,
+                                         "#000000" if is_light_colour(t["bg"]) else "#ffffff")
 
 
 def _add_item_hover_token(t: dict[str, str]) -> None:
@@ -510,8 +512,26 @@ def _lift_buttons(t: dict[str, str]) -> None:
             t[key] = _mix(t[key], t["text"], i / 40)
 
 
+def _distinct_hover(base: str, hover: str, on: str, direction: str) -> str:
+    """Keep a visible hover step (1.3:1) without losing readable button text.
+
+    Continue the theme's lightening or darkening direction first; when that would
+    wash out the words, move the fill away from them instead. This is a visual
+    feedback floor, not a WCAG contrast requirement between interaction states.
+    """
+    for to in (direction, "#ffffff" if direction == "#000000" else "#000000"):
+        for i in range(101):
+            colour = _mix(hover, to, i / 100)
+            if _contrast(colour, base) >= 1.3 and _contrast(on, colour) >= 4.5:
+                return colour
+    return hover
+
+
 for _t in THEMES.values():
     _lift_buttons(_t)   # first: the secondary text below has to read on the lifted buttons
+    _t["btn_hover"] = _distinct_hover(_t["btn"], _t["btn_hover"], _t["text"],
+                                      "#000000" if is_light_colour(_t["bg"]) else "#ffffff")
+    _t["section"] = _readable_text(_t["section"], _t, 4.5)
     # Secondary text must read (4.5:1) on every surface it sits on: a quiet button's
     # hover and the inset boxes too (they were 3.6-4.5:1 in most themes).
     for key in ("muted", "faint"):
