@@ -153,3 +153,19 @@ def test_space_on_the_radio_tab_plays_and_stops_the_radio(window, monkeypatch):
     window.tabs.setCurrentIndex(window.tabs.count() - 1)   # Setup: its own Space
     space(target)
     assert calls == [1]
+
+
+def test_a_new_sound_stops_the_one_playing_unless_set_to_overlap(window, player, monkeypatch):
+    """One sound at a time by default: a pad press stops the others (engine "solo");
+    a sound set to Overlap still layers over them."""
+    modes = {}
+    play = window.engine.play
+    monkeypatch.setattr(window.engine, "play", lambda sid, *a, **k: (
+        modes.__setitem__(sid, k.get("mode")), play(sid, *a, **k))[1])
+    m = window.meta("s0")
+    window.play("s0")
+    assert modes["s0"] == "solo"
+    m.mode = "overlap"
+    window._cool.clear()
+    window.play("s0")
+    assert modes["s0"] == "overlap"

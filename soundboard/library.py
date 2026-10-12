@@ -307,7 +307,7 @@ class SoundMeta:
     file: str                 # absolute path (usually inside SOUNDS_DIR)
     volume: float = 1.0       # 0..2 user gain
     hotkey: str = ""
-    mode: str = "restart"     # restart | overlap | toggle | solo (stops the other sounds)
+    mode: str = "restart"     # restart | overlap | toggle | solo | queue (PRESS_MODE)
     #                           | queue (waits for the sounds playing to finish)
     loop: bool = False
     color: str = PAD_COLORS[0]
@@ -961,6 +961,10 @@ MAX_FADE_S = 10.0
 MAX_DELAY_S = 10.0      # a sound's "wait before playing"
 MAX_COOLDOWN_S = 60.0   # a sound's "ignore presses for"
 MODES = ("restart", "overlap", "toggle", "solo", "queue")   # SoundMeta.mode
+# how a pad press plays each mode: the default ("restart") is one sound at a time, a new
+# one stops the others (it only restarted itself before); "solo" is the same now, and
+# Overlap is the way to layer sounds. A Queue sound starts once the others are done.
+PRESS_MODE = {"restart": "solo", "queue": "restart"}
 
 
 def sorted_sounds(sounds: list[SoundMeta], how: str) -> list[SoundMeta]:

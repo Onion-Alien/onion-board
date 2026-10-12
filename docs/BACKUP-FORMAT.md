@@ -83,7 +83,7 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 | `picture` | file name of the pad picture in the same folder (png, jpg, jpeg, jfif, webp, gif, bmp), or `""` |
 | `volume` | 0–2 (1 = 100 %) |
 | `hotkey` | e.g. `ctrl+alt+1`, `f5`, `num 7`, or a MIDI pad: `midi:note 36:LPD8` (`note`, `cc` or `pc`, its number, the device name); dropped on import if something already uses it |
-| `mode` | `restart`, `overlap`, `toggle`, `solo` (stops the other sounds first) or `queue` (waits for the sounds playing to finish) |
+| `mode` | `restart` (stops the other sounds first; older versions restarted only itself), `overlap`, `toggle`, `solo` (same as `restart` now) or `queue` (waits for the sounds playing to finish) |
 | `loop` | `true` / `false` |
 | `hold` | `true`: plays only while its hotkey / MIDI pad is held down |
 | `fade_in`, `fade_out` | seconds (0–10) |

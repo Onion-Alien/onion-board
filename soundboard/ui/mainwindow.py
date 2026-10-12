@@ -40,8 +40,8 @@ from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, n
                         profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
 from soundboard.replay import InstantReplay
-from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
-                                cache_keep, clean_tags, duplicate, fingerprint,
+from soundboard.library import (AUDIO_EXTS, PAD_COLORS, PRESS_MODE, RESOURCE_DIR, Config,
+                                SoundMeta, cache_keep, clean_tags, duplicate, fingerprint,
                                 import_file, load_original, load_sound, loose_sounds,
                                 prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
@@ -5836,7 +5836,8 @@ class MainWindow(QMainWindow):
         return v * (m.level_gain if self.cfg.level_volumes else 1.0)
 
     def play(self, sid, now: bool = False):
-        """Play a pad's sound as its settings say: its cooldown, a Queue sound waiting
+        """Play a pad's sound as its settings say (by default one at a time: a new
+        sound stops the others, PRESS_MODE): its cooldown, a Queue sound waiting
         for the ones playing, its wait before playing. now=True skips all of that (the
         queue and a delayed start, whose press was already checked)."""
         m = self.meta(sid)
@@ -5879,7 +5880,7 @@ class MainWindow(QMainWindow):
             if not self._count_save.isActive():
                 self._count_save.start()
         v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop,
-                             mode="restart" if m.mode == "queue" else m.mode,
+                             mode=PRESS_MODE.get(m.mode, m.mode),
                              fade_in=m.fade_in, fade_out=m.fade_out,
                              only=("main", "obs") if m.only_them else None)
         self._wake()
