@@ -2118,6 +2118,9 @@ def test_nobody_goes_silent_before_the_mic_is_set_up(window, monkeypatch, state)
     assert w._main_name() == CABLE_IN
     _routes(w, monkeypatch, state, cables=())
     assert w._main_name() is None   # no cable either: nothing to send into
+    w.cfg.main_device = CABLE_IN   # one picked once, not installed now: still nothing
+    assert w._main_name() is None
+    assert w._cable_out() is None
 
 
 def test_sounds_follow_the_mic_effect_once_it_works(window, monkeypatch):  # noqa: F811
