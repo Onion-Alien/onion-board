@@ -18,7 +18,9 @@
 ;       * FFmpeg for m4a / aac / video files (via winget; hidden when ffmpeg is
 ;         already there or winget isn't)
 ;       * live voice-to-speech's set-up (its module itself always ships, like the
-;         other add-on modules in ..\modules but ai-voices)
+;         other add-on modules in ..\modules but ai-voices): OnionBoard.exe
+;         --install-addon live-voice, which gets the add-on a Python of its own
+;         (soundboard/pyget.py) when the PC has no good one
 ;       * Tor, unticked: the installer doesn't carry it. A ticked box runs
 ;         OnionBoard.exe --get-tor, which downloads the Tor Project's Expert Bundle
 ;         (soundboard/torget.py: SHA-256 pinned, the saved proxy used) into
@@ -110,7 +112,7 @@ FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual 
 
 [Tasks]
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; Check: CanOfferFfmpeg
-Name: "livevoice"; Description: "Live voice-to-speech (needs Python, about 300 MB)"; Flags: unchecked
+Name: "livevoice"; Description: "Live voice-to-speech (about 300 MB)"; Flags: unchecked
 Name: "tor"; Description: "Hide my internet address (Tor), about 22 MB"; Flags: unchecked
 Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"
@@ -120,7 +122,7 @@ Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you kn
 ; The Python runtime and libraries from the last version: cleared first so files a
 ; release no longer ships don't linger (and get loaded) after an update. Nothing of the
 ; user's lives there: settings, sounds and downloaded add-ons are in %APPDATA%\OnionBoard,
-; and {app}\modules (live-voice's own .venv) is left alone.
+; and {app}\modules (live-voice's own .venv, and its .python when it got one) is left alone.
 Type: filesandordirs; Name: "{app}\_internal"
 
 [Files]
@@ -803,15 +805,6 @@ begin
   Result := (not HasFfmpeg) and FileExists(WingetPath(''));
 end;
 
-// The python.org install puts the "py" launcher in one of these.
-function HasPython: Boolean;
-begin
-  Result := FileExists(ExpandConstant('{win}\py.exe')) or
-            FileExists(ExpandConstant('{localappdata}\Programs\Python\Launcher\py.exe')) or
-            RegKeyExists(HKCU, 'Software\Python\PythonCore') or
-            RegKeyExists(HKLM, 'Software\Python\PythonCore');
-end;
-
 // install-vbcable.ps1 skips a working cable, installs one otherwise, then checks it:
 // exit 3010 = installed but Windows needs a restart. VB-Audio recommends one, but it
 // often isn't needed, so the Finished page only offers "Restart now / later" when the
@@ -1134,15 +1127,17 @@ begin
     ExpandConstant('{tmp}'), 'Onion Board offers it when a file needs it', Code);
 end;
 
-// The live voice box: the add-on's own install.bat (needs Python).
+// The live voice box: the app sets the add-on up itself (OnionBoard.exe --install-addon,
+// the same as the Voice tab's Install button), getting a Python of its own into the
+// add-on's folder first when the PC has no good one (soundboard/pyget.py).
 procedure GetLiveVoice;
 var
   Code: Integer;
 begin
   RunExtra('Live voice-to-speech',
     'Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)...',
-    ExpandConstant('{cmd}'), '/c "' + ExpandConstant('{app}\modules\live-voice\install.bat') +
-    '" --quiet', ExpandConstant('{app}\modules\live-voice'), 'Voice tab > Install', Code);
+    ExpandConstant('{app}\{#AppExeName}.exe'), '--install-addon live-voice',
+    ExpandConstant('{app}'), 'Voice tab > Install', Code);
 end;
 
 // The "tor" box: the app downloads Tor itself (OnionBoard.exe --get-tor, the same
@@ -1223,7 +1218,7 @@ begin
     FinishCable;
   if (CurStep = ssPostInstall) and MayDownload('ffmpeg') then
     GetFfmpeg;
-  if (CurStep = ssPostInstall) and MayDownload('livevoice') and HasPython then
+  if (CurStep = ssPostInstall) and MayDownload('livevoice') then
     GetLiveVoice;
   if (CurStep = ssPostInstall) and MayDownload('tor') then
     GetTor;
@@ -1232,9 +1227,4 @@ begin
   if (CurStep = ssPostInstall) and (ExtrasSkipped <> '') then
     SuppressibleMsgBox('Stopped. Onion Board is installed; these weren''t added:' +
       ExtrasSkipped, mbInformation, MB_OK, IDOK);
-  if (CurStep = ssPostInstall) and MayDownload('livevoice') and not HasPython then
-    SuppressibleMsgBox('Live voice-to-speech needs Python, which isn''t on this PC yet.' + #13#10#13#10 +
-      'Get it free from python.org (tick "Add python.exe to PATH" while installing it). ' +
-      'Then in Onion Board open the Voice tab and press Install.',
-      mbInformation, MB_OK, IDOK);
 end;
