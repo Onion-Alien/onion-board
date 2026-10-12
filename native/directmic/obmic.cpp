@@ -261,6 +261,7 @@ struct RingHeader {                // offset
 static HMODULE g_module;
 static volatile LONG g_objects;
 static volatile LONG g_locks;
+static volatile LONG g_factoryRefs;
 static volatile LONG g_ids;
 static wchar_t g_dataDir[MAX_PATH];
 
@@ -590,6 +591,7 @@ public:
         m_played = false;
         m_locked = true;
         m_w = 0.0f;
+        m_addW = 0.0f;
         m_mg = 1.0f;
         m_b = 1.0f;
         m_owe = 0;
@@ -944,7 +946,7 @@ private:
     void releaseSlot() {
         if (!m_slot) return;
         InterlockedCompareExchange(&m_ring->publisher, 0, m_id);
-        m_slot->flags = 0;
+        // An expired slot may now belong to another instance; its flags are its own.
         InterlockedCompareExchange(&m_slot->owner, 0, m_id);
         m_slot = NULL;
     }
@@ -969,6 +971,7 @@ private:
         m_played = false;
         m_late = false;
         m_w = 0.0f;
+        m_addW = 0.0f;
         m_mg = 1.0f;
         m_b = 1.0f;
         m_owe = 0;
@@ -1043,6 +1046,7 @@ private:
         }
 #endif
         uint64_t now = GetTickCount64();
+        if (m_slot && m_slot->owner != m_id) m_slot = NULL;
         if (!m_slot && m_locked) claimSlot(true);
         bool publishing = publish(o, now);
         UINT32 frames = o->u32ValidFrameCount;
@@ -1147,6 +1151,8 @@ private:
         if (!(g >= 0.0f && g < 16.0f)) g = 1.0f;
         float ramp = 1.0f / (float)(FADE_S * m_rate);
         float w = m_w, mg = m_mg, b = useMic ? m_b : 1.0f;
+        float addW = m_addW;
+        float addTarget = board && have ? 1.0f : 0.0f;
         float sLast = 1.0f;
         bool any = false;
         if (have || useMic || w > 0.0f || mg != 1.0f || mgTarget != 1.0f) {
@@ -1170,6 +1176,10 @@ private:
                 if (w < 0.0f) w = 0.0f;
                 if (w > 1.0f) w = 1.0f;
                 float keep = (1.0f - w) * mg;
+                addW += addW < addTarget ? ramp : addW > addTarget ? -ramp : 0.0f;
+                if (addW < 0.0f) addW = 0.0f;
+                if (addW > 1.0f) addW = 1.0f;
+                if (!replaceMode) s *= addW;
                 if (replaceMode) s *= w;   // crossfade: the board's voice in, the mic out
                 float *p = buf + (size_t)i * ch;
                 for (UINT32 c = 0; c < ch; c++) {
@@ -1210,6 +1220,7 @@ private:
             }
         }
         m_w = w;
+        m_addW = addW;
         m_mg = mg;
         m_b = useMic ? b : 1.0f;
         bool filling = useMic && !have;
@@ -1218,7 +1229,7 @@ private:
             m_owe = 0;
         }
         if (any) o->u32BufferFlags = BUFFER_VALID;
-        if (m_slot) {
+        if (m_slot && m_slot->owner == m_id) {
             m_slot->rate = m_rate;
             m_slot->channels = ch;
             m_slot->flags = (w > 0.5f ? SLOT_REPLACING : 0) | (publishing ? SLOT_PUBLISHING : 0);
@@ -1263,6 +1274,7 @@ private:
     uint32_t m_okBlocks = 0;   // blocks the board was on time for, in a row
     float *m_kernel = NULL;    // the resampler's table (makeKernel); NULL = same rate
     int m_half = 0;            // its half width, in ring frames
+    float m_addW = 0.0f; // add-mode board contribution fades out when disabled or stale
     float m_w = 0.0f;    // 0 = the mic, 1 = the board's voice (MODE_REPLACE), crossfaded
     float m_mg = 1.0f;   // the mic's level (MODE_ADD; MODE_REPLACE: while it stands in)
     float m_b = 1.0f;    // filling in: 1 = the board's audio, 0 = the mic from then
@@ -1281,13 +1293,14 @@ public:
         if (!ppv) return E_POINTER;
         if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory)) {
             *ppv = static_cast<IClassFactory *>(this);
+            AddRef();
             return S_OK;
         }
         *ppv = NULL;
         return E_NOINTERFACE;
     }
-    ULONG STDMETHODCALLTYPE AddRef() override { return 2; }
-    ULONG STDMETHODCALLTYPE Release() override { return 1; }
+    ULONG STDMETHODCALLTYPE AddRef() override { return InterlockedIncrement(&g_factoryRefs); }
+    ULONG STDMETHODCALLTYPE Release() override { return InterlockedDecrement(&g_factoryRefs); }
     HRESULT STDMETHODCALLTYPE CreateInstance(IUnknown *outer, REFIID riid, void **ppv) override {
         if (!ppv) return E_POINTER;
         *ppv = NULL;
@@ -1317,7 +1330,7 @@ extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllGetClassObject(REFCLS
 }
 
 extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllCanUnloadNow() {
-    return (g_objects == 0 && g_locks == 0) ? S_OK : S_FALSE;
+    return (g_objects == 0 && g_locks == 0 && g_factoryRefs == 0) ? S_OK : S_FALSE;
 }
 
 BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {

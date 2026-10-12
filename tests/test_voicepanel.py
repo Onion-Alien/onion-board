@@ -63,9 +63,11 @@ def test_power_switch(panel):
     p, _ = panel
     seen = []
     p.fx_changed.connect(seen.append)
-    assert not p.fx.btn_power.isChecked() and "OFF" in p.fx.btn_power.text()
+    assert not p.fx.btn_power.isChecked() and p.fx.power_label.text() == "Off"
+    assert "OFF" in p.fx.btn_power.accessibleName()
     p.fx.pick("Deep voice")                  # picking a voice turns it on
-    assert p.fx.btn_power.isChecked() and "ON" in p.fx.btn_power.text()
+    assert p.fx.btn_power.isChecked() and p.fx.power_label.text() == "On"
+    assert "ON" in p.fx.btn_power.accessibleName()
     assert p.fx._tile["Deep voice"].isChecked()
     p.fx.btn_power.setChecked(False)         # the switch turns it off, voice kept
     assert not seen[-1]["enabled"] and seen[-1]["preset"] == "Deep voice"
@@ -119,7 +121,7 @@ def test_changer_starts_off_even_if_it_was_left_on(qapp, monkeypatch):
     p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Old telephone", "effects": {}}, {})
     try:
         assert not p.fx.btn_power.isChecked() and not p.chain.enabled
-        assert p.fx.btn_power.text() == POWER_TEXT[False]
+        assert p.fx.btn_power.accessibleName() == POWER_TEXT[False]
         assert not any(t.isChecked() for t in p.fx._tile.values())   # nothing looks active
         assert p.fx.preset == "Old telephone"                          # the choice is kept
     finally:
@@ -502,25 +504,27 @@ def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
 
 
 def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
-    """Three voices a row ran off the side of a narrow window: the switch's text
-    gets shorter, then two a row, then one."""
+    """Voice cards: as many a row as the width holds, down to one; never off the side."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.voicepanel import POWER_SHORT, POWER_TEXT, VoiceFxPanel
+    from soundboard.ui.voicepanel import MAX_COLS, VoiceFxPanel
     holder = QWidget()                 # inside the tab, it gets the width there is
     fx = VoiceFxPanel({})
     fx.setParent(holder)
     holder.show()
-    fx.setGeometry(0, 0, 1600, 600)   # (test fonts run wide)
-    assert fx._tile_cols == 3 and fx.btn_power.text() == POWER_TEXT[False]
-    for width in (420, 260):
-        fx.setGeometry(0, 0, width, 1200)
-        assert fx._tile_cols < 3 and fx.btn_power.text() == POWER_SHORT[False]
-        qapp.processEvents()
-        assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
     fx.setGeometry(0, 0, 1600, 600)
-    assert fx._tile_cols == 3 and fx.btn_power.text() == POWER_TEXT[False]
+    wide = fx._tile_cols
+    assert 3 < wide <= MAX_COLS
+    for width in (420, 260, 100):
+        fx.setGeometry(0, 0, width, 1200)
+        qapp.processEvents()
+        assert fx._tile_cols < wide and fx._tile_cols >= 1
+        if width >= 260:
+            assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
+    assert fx._tile_cols == 1
+    fx.setGeometry(0, 0, 1600, 600)
+    assert fx._tile_cols == wide
     holder.hide()
 
 
@@ -586,7 +590,7 @@ def _ask(monkeypatch, *answers):
 
 def _grid_order(fx):
     g = fx._tile_grid
-    return [w.text() for w in sorted((g.itemAt(i).widget() for i in range(g.count())),
+    return [w.accessibleName() for w in sorted((g.itemAt(i).widget() for i in range(g.count())),
                                      key=lambda w: g.getItemPosition(g.indexOf(w))[:2])]
 
 
@@ -848,27 +852,25 @@ def test_add_ons_refresh_lets_go_of_the_button_when_the_scan_fails(panel, monkey
     assert not busy.is_busy(b)
 
 
-def test_resizing_within_one_shape_does_no_layout_passes(panel, monkeypatch):
+def test_resizing_within_one_column_count_does_no_layout_passes(panel, monkeypatch):
+    """A drag-resize sends one resize per pixel: the voices are only placed again when
+    the number a row changes."""
     p, _ = panel
     fx = p.fx
-    fx._set_shape(True, 1)              # the narrowest shape's own width, in this font
-    narrow = fx.minimumSizeHint().width() - 1
     fx._fit_width(1100)
-    shapes = []
-    real = type(fx)._set_shape
-    monkeypatch.setattr(type(fx), "_set_shape",
-                        lambda self, *a: (shapes.append(a), real(self, *a))[1])
-    for w in range(1100, 1000, -4):     # roomy all the way: nothing to try
-        fx._fit_width(w)                # what each resize step does
-    assert shapes == []
-    fx._fit_width(narrow)               # narrower than anything: tried, then left alone
-    tried = len(shapes)
-    assert tried and (fx._short, fx._tile_cols) == (True, 1)
-    for w in range(narrow, narrow - 50, -4):
+    placed = []
+    real = type(fx)._place_tiles
+    monkeypatch.setattr(type(fx), "_place_tiles",
+                        lambda self: (placed.append(self._tile_cols), real(self))[1])
+    cols = fx._tile_cols
+    w = 1100
+    while fx._tile_cols == cols:          # down to the next column count, pixel by pixel
+        w -= 1
         fx._fit_width(w)
-    assert len(shapes) == tried
-    fx._fit_width(1100)
-    assert (fx._short, fx._tile_cols) == (False, fx.COLS)
+    assert placed == [cols - 1]
+    for w2 in range(w, w - 20, -1):       # within that count: nothing placed again
+        fx._fit_width(w2)
+    assert placed == [cols - 1]
 
 
 def test_a_slider_step_lays_nothing_out_and_its_value_always_fits(panel, qapp):
@@ -924,26 +926,15 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
 
 
-def test_cards_restore_saved_folds_and_unfold(qapp, monkeypatch):
-    """Saved folds are restored, including unknown keys from newer versions."""
-    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
-    from soundboard.ui.voicepanel import VoicePanel
-    p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", 7, "later"]})   # 7: junk
-    try:
-        assert not p._heads["ai"].is_open() and p._heads["fx"].is_open()
-        assert p.ai.isHidden() and not p.fx.isHidden()
-        saved = []
-        p.speech_changed.connect(saved.append)
-        p._heads["fx"].arrow.click()                 # fold the restored voice changer
-        assert p.fx.isHidden() and saved[-1]["folded"] == ["ai", "fx", "later"]
-        p._heads["ai"].arrow.click()                 # and open the AI voices again
-        # "later": a newer version's card, kept for it
-        assert not p.ai.isHidden() and saved[-1]["folded"] == ["fx", "later"]
-        p.fx.pick("Robot")                           # folded, it still says it's on
-        assert p._heads["fx"].pill.text() == "On"
-    finally:
-        p.shutdown()
-        p.deleteLater()
+def test_a_tab_thats_on_says_so_from_another_tab(panel):
+    """The voice changer on, another tab showing: its tab still says it's on."""
+    p, _ = panel
+    p.show_tab("ai")
+    assert not p._tabs["fx"].property("live")
+    p.fx.pick("Robot")
+    assert p._tabs["fx"].property("live") and not p._tabs["ai"].property("live")
+    p.fx.btn_power.setChecked(False)
+    assert not p._tabs["fx"].property("live")
 
 
 def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
@@ -962,7 +953,7 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
     assert asked[-1] == "" and "Turn on the AI voice" in sp.lbl_bg.text()
     p.fx.pick("Robot")
     assert asked[-1] == "fx" and sp.ctl.fx_always and sp.ctl.dub is None
-    assert "German, a few seconds late" in p._heads["fx"].pill.text()
+    assert "German, a few seconds late" in p._states["fx"].text()
     monkeypatch.setattr(p.ai, "is_on", lambda: True)
     p._sync_translate()
     assert asked[-1] == "ai" and sp.ctl.dub is p.ai_controller and p.ai_controller.dub_on
@@ -1003,7 +994,7 @@ def test_speak_in_has_its_own_switch_a_voice_never_turns_it_back_on(panel, monke
     assert not saved[-1]["translate_on"] and sp.lbl_bg.isHidden()
     p.fx.pick("Robot")                                # a voice from another card
     assert asked[-1] == "" and not sp.ctl.fx_always
-    assert "Chinese" not in p._heads["fx"].pill.text()
+    assert "Chinese" not in p._states["fx"].text()
     assert "lang" not in p.bar.chips                  # the status bar says English too
     sp.sw_lang.setChecked(True)                       # only its own switch turns it on
     assert asked[-1] == "fx" and sp.ctl.fx_always
@@ -1304,14 +1295,13 @@ def test_status_bar_off_label_cannot_open_a_card(panel):
     assert isinstance(label, QLabel)
     assert label.focusPolicy() == Qt.NoFocus
     assert label.cursor().shape() == Qt.ArrowCursor
-    before = [head.is_open() for head in p._heads.values()]
+    p.show_tab("addons")
     QTest.mouseClick(label, Qt.LeftButton)
     p._open_card("none")
-    assert not opened
-    assert [head.is_open() for head in p._heads.values()] == before
+    assert not opened and p.current_tab() == "addons"
     p.fx.pick("Robot")
     p.bar.chips["fx"].click()
-    assert opened == ["fx"] and p._heads["fx"].is_open()
+    assert opened == ["fx"] and p.current_tab() == "fx"
 
 
 def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
@@ -1323,12 +1313,12 @@ def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
     assert p.bar.chips["fx"].property("state") == "on"
     p.fx.btn_power.setChecked(False)
     assert p.bar.texts() == ["Voice effects off: mic unchanged"]
-    # a chip opens its folded card
-    assert not p._heads["speak"].is_open()
+    # a chip opens its tab
+    assert p.current_tab() != "speak"
     p.speech.b_live.setChecked(True)
     assert "Computer voice" in p.bar.texts()
     p.bar.chips["speak"].click()
-    assert p._heads["speak"].is_open() and p.speech.isVisibleTo(p)
+    assert p.current_tab() == "speak" and p.speech.isVisibleTo(p)
     p.speech.b_live.setChecked(False)
     # the mic: its level, or that none is open
     p.bar.set_level(None)
@@ -1353,17 +1343,19 @@ def test_status_bar_shows_the_ai_voice_starting_on_and_failed(panel, monkeypatch
 
 def test_first_visit_exposes_voice_presets(panel):
     p, _ = panel
-    assert p._heads["fx"].is_open() and not p.fx.isHidden()
-    assert not p._heads["ai"].is_open()
+    assert p.current_tab() == "fx" and p.fx.isVisibleTo(p)
+    assert not p.ai.isVisibleTo(p)
 
 
 def test_config_entries_sit_with_their_cards_main_controls(panel):
-    """U3: Make it yours (the big editor) is beside the on/off switch, not under 24
-    voices; Speak another language's More options comes before the past-lines box;
-    both More options use the one fold look and show/hide their fields."""
+    """U3: Make it yours (the big editor) is in the picked voice's bar, pinned in
+    sight under the voices (not under 24 of them, off the bottom); Speak another
+    language's More options comes before the past-lines box; both More options use
+    the one fold look and show/hide their fields."""
     p, _eng = panel
     fx = p.fx
-    assert fx.btn_tweak.parentWidget() is fx.btn_power.parentWidget()
+    assert fx.btn_tweak.parentWidget() is fx.picked
+    assert fx.picked.parentWidget() is p             # pinned outside the scrolling card
     sp = p.speech
     lay = sp.layout()
     at = {lay.itemAt(i).widget(): i for i in range(lay.count()) if lay.itemAt(i).widget()}

@@ -720,6 +720,79 @@ static int leadtest() {
     return fails ? 1 : 0;
 }
 
+
+// Deterministic lifecycle cases the random ring mutator cannot arrange.
+static int auditcase(const char *name, HMODULE dll) {
+    int fails = 0;
+    auto check = [&](bool ok, const char *why) {
+        if (!ok) { printf("FINDING: %s\n", why); fails++; }
+    };
+    if (!strcmp(name, "factory")) {
+        typedef HRESULT(STDAPICALLTYPE *CanUnloadFn)();
+        CanUnloadFn unload = (CanUnloadFn)(void (*)())GetProcAddress(dll, "DllCanUnloadNow");
+        check(unload && unload() == S_FALSE, "DLL unloadable with a live factory");
+        IUnknown *extra = NULL;
+        g_cf->QueryInterface(IID_IUnknown, (void **)&extra);
+        g_cf->Release();
+        check(unload && unload() == S_FALSE, "factory QueryInterface reference not counted");
+        if (extra) extra->Release();
+        check(unload && unload() == S_OK, "factory references never released");
+        return fails;
+    }
+    Layout L = {1u << 16, 1u << 15, 48000, true, 0};
+    L.size = HEADER + (uint64_t)L.cap * 4 + (uint64_t)L.mcap * 8;
+    Mapped m;
+    if (!writeRing(L, m)) return 1;
+    Instance x;
+    const UINT32 frames = 481; // deliberately not a 10 ms multiple
+    if (!create(x, 48000, 2, frames)) return 1;
+    auto block = [&]() {
+        for (UINT32 i = 0; i < frames * x.ch; i++) x.in[i] = 0.2f;
+        APO_CONNECTION_PROPERTY input = {(UINT_PTR)x.in, frames, BUFFER_VALID, 0};
+        APO_CONNECTION_PROPERTY output = {(UINT_PTR)x.out, 0, BUFFER_INVALID, 0};
+        APO_CONNECTION_PROPERTY *pi = &input, *po = &output;
+        x.rt->APOProcess(1, &pi, 1, &po);
+    };
+    if (!strcmp(name, "slot")) {
+        // All slots busy, then x's slot becomes stale and a new instance reclaims it.
+        for (uint32_t i = 1; i < 16; i++) {
+            wr<LONG>(m.p, SLOT_OFFSET + i * 64, (LONG)(100 + i));
+            wr<uint64_t>(m.p, SLOT_OFFSET + i * 64 + 16, GetTickCount64());
+        }
+        wr<uint64_t>(m.p, SLOT_OFFSET + 16, GetTickCount64() - 4000);
+        Instance y;
+        if (!create(y, 16000, 1, 160)) return 1;
+        LONG owner = rd<LONG>(m.p, SLOT_OFFSET);
+        block();
+        check(rd<LONG>(m.p, SLOT_OFFSET) == owner && rd<uint32_t>(m.p, SLOT_OFFSET + 4) == 16000,
+              "resumed instance overwrote the new slot owner's format");
+        wr<uint32_t>(m.p, SLOT_OFFSET + 12, 2);
+        destroy(x);
+        check(rd<uint32_t>(m.p, SLOT_OFFSET + 12) == 2,
+              "old instance cleared the new slot owner's flags on Release");
+        destroy(y);
+    } else if (!strcmp(name, "add-stop")) {
+        float *samples = (float *)(m.p + HEADER);
+        for (uint32_t i = 0; i < L.cap; i++) samples[i] = 0.4f;
+        wr<uint32_t>(m.p, 36, 0);
+        wr<uint32_t>(m.p, 32, 1);
+        wr<uint64_t>(m.p, 24, GetTickCount64());
+        wr<uint64_t>(m.p, 16, 10000);
+        block();
+        check(x.out[frames * 2 - 1] > 0.5f, "add mode did not start");
+        wr<uint32_t>(m.p, 32, 0);
+        // Enough queued audio to outlast the 10 ms fade, but less than half a ring.
+        wr<uint64_t>(m.p, 16, 20000);
+        for (int i = 0; i < 3; i++) block();
+        check(fabsf(x.out[frames * 2 - 1] - 0.2f) < 1e-6f,
+              "disabled board still audible in add mode after the fade");
+        destroy(x);
+    } else { destroy(x); check(false, "unknown audit case"); }
+    m.close();
+    printf("AUDIT %s: %d failures\n", name, fails);
+    return fails ? 1 : 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 4) {
         fprintf(stderr, "usage: fuzzhost dll workdir seconds seed | --selftest | --lead | --replay seed\n");
@@ -749,6 +822,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     if (!g_faultsFn) printf("(not the fuzz build: faults the guard catches go uncounted)\n");
+    if (!strcmp(argv[3], "--audit") && argc > 4) return auditcase(argv[4], dll);
     if (!strcmp(argv[3], "--selftest")) return selftest();
     if (!strcmp(argv[3], "--lead")) return leadtest();
     if (!strcmp(argv[3], "--replay")) {

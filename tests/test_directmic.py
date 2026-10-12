@@ -2983,3 +2983,53 @@ def test_every_time_windows_takes_it_off_it_is_fixed_again(window, monkeypatch):
     w._update_flow()
     _qt_run()
     assert len(threads.setups()) == 2 and "Fixing your mic" in w.mic_line.text()
+
+
+@pytest.mark.windows
+@pytest.mark.parametrize("state", ["starting", "stalled"])
+def test_board_claim_is_exclusive_before_enable_and_after_stall(ring_file, state):
+    first = dm.RingWriter(ring_file)
+    second = dm.RingWriter(ring_file)
+    try:
+        first.claim()
+        if state == "stalled":
+            first.set_enabled(True)
+            first._btick[0] = 0
+        with pytest.raises(RuntimeError, match="Another Onion Board"):
+            second.claim()
+    finally:
+        second.close(owner=False)
+        first.close()
+
+
+@pytest.mark.parametrize("seq", [0, 1, 0xFFFFFFFE, 0xFFFFFFFF])
+@pytest.mark.parametrize("clear", [False, True])
+def test_sync_recovers_an_interrupted_writer(ring_file, monkeypatch, seq, clear):
+    w = dm.RingWriter(ring_file)
+    try:
+        w._set("sync_seq", seq)
+        original = w._set
+        observed = []
+
+        def observe(name, value):
+            if name in ("sync_wp", "sync_mic"):
+                observed.append(int(w._get("sync_seq")))
+            original(name, value)
+
+        monkeypatch.setattr(w, "_set", observe)
+        if clear:
+            w.clear_sync()
+        else:
+            w.set_sync(100, 200)
+        assert all(value & 1 for value in observed), observed
+        assert int(w._get("sync_seq")) % 2 == 0
+    finally:
+        w.close()
+
+
+@needs_fuzz
+@pytest.mark.parametrize("case", ["factory", "slot", "add-stop"])
+def test_effect_lifecycle_audit(tmp_path, case):
+    r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "--audit", case],
+                       capture_output=True, text=True, timeout=30)
+    assert r.returncode == 0, r.stdout + r.stderr
