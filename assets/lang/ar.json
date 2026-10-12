@@ -3598,5 +3598,8 @@
     "تم العثور على {n} زر وإعادته إلى اللوحة.",
     "تم العثور على {n} زر وإعادته إلى اللوحة.",
     "تم العثور على {n} زر وإعادته إلى اللوحة."
-  ]
+  ],
+  "Skip to the next sound": "التخطي إلى الصوت التالي",
+  "Skip to the next sound in Up next": "التخطي إلى الصوت التالي في «التالي»",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "يوقف الصوت الذي يعمل ويبدأ الصوت التالي في «التالي». إن لم يكن هناك ما ينتظر، يوقف الصوت فقط."
 }

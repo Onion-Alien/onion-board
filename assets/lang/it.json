@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} pad è stato ritrovato e rimesso sulla board.",
     "{n} pad sono stati ritrovati e rimessi sulla board."
-  ]
+  ],
+  "Skip to the next sound": "Passa al suono successivo",
+  "Skip to the next sound in Up next": "Passa al suono successivo in Prossimo",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Ferma il suono in riproduzione e avvia il successivo in Prossimo. Se non c'è nulla in attesa, ferma solo il suono."
 }

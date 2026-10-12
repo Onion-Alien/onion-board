@@ -1381,8 +1381,8 @@ def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
     assert window.mixer.width() - right <= 20
     window.np_name.hide()
     qapp.processEvents()
-    seek_left = window.seek.mapTo(window.btn_st.parentWidget(), QPoint()).x()
-    assert seek_left - window.btn_st.geometry().right() <= 24
+    seek_left = window.seek.mapTo(window.btn_skip.parentWidget(), QPoint()).x()
+    assert seek_left - window.btn_skip.geometry().right() <= 24
     buttons = window.rail.buttons
     assert all(b.height() >= 34 for b in buttons)
     assert all(b.y() - a.geometry().bottom() >= 4

@@ -3376,5 +3376,8 @@
     "Znaleziono {n} pad i przywrócono go na tablicę.",
     "Znaleziono {n} pady i przywrócono je na tablicę.",
     "Znaleziono {n} padów i przywrócono je na tablicę."
-  ]
+  ],
+  "Skip to the next sound": "Przejdź do następnego dźwięku",
+  "Skip to the next sound in Up next": "Przejdź do następnego dźwięku w Następne",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Zatrzymuje grający dźwięk i włącza następny z Następne. Gdy nic nie czeka, tylko zatrzymuje dźwięk."
 }

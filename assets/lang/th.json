@@ -3228,5 +3228,8 @@
   "Hey! This does nothing yet, because Onion Board isn't set up in your mic. People still hear you.": "เฮ้! อันนี้ยังไม่มีผล เพราะยังไม่ได้ตั้งค่า Onion Board ในไมค์ของคุณ คนอื่นยังได้ยินคุณอยู่",
   "{n} pad was found and put back on the board.": [
     "พบแพด {n} อันและนำกลับมาไว้บนบอร์ดแล้ว"
-  ]
+  ],
+  "Skip to the next sound": "ข้ามไปเสียงถัดไป",
+  "Skip to the next sound in Up next": "ข้ามไปเสียงถัดไปใน ถัดไป",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "หยุดเสียงที่กำลังเล่นแล้วเริ่มเสียงถัดไปใน ถัดไป ถ้าไม่มีเสียงรออยู่ ก็แค่หยุดเสียง"
 }

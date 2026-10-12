@@ -3376,5 +3376,8 @@
     "{n} pad byl nalezen a vrácen na desku.",
     "{n} pady byly nalezeny a vráceny na desku.",
     "{n} padů bylo nalezeno a vráceno na desku."
-  ]
+  ],
+  "Skip to the next sound": "Přeskočit na další zvuk",
+  "Skip to the next sound in Up next": "Přeskočit na další zvuk v „Další na řadě“",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Zastaví hrající zvuk a spustí další v „Další na řadě“. Když nic nečeká, zvuk jen zastaví."
 }

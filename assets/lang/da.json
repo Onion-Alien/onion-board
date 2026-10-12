@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} pad blev fundet og sat tilbage på boardet.",
     "{n} pads blev fundet og sat tilbage på boardet."
-  ]
+  ],
+  "Skip to the next sound": "Spring til næste lyd",
+  "Skip to the next sound in Up next": "Spring til næste lyd i Næste i køen",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Stopper lyden, der spiller, og starter den næste i Næste i køen. Venter der ingen, stopper den bare lyden."
 }

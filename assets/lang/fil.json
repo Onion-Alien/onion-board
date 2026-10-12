@@ -3302,5 +3302,8 @@
   "{n} pad was found and put back on the board.": [
     "{n} pad ang nahanap at ibinalik sa board.",
     "{n} pad ang nahanap at ibinalik sa board."
-  ]
+  ],
+  "Skip to the next sound": "Lumaktaw sa susunod na tunog",
+  "Skip to the next sound in Up next": "Lumaktaw sa susunod na tunog sa Susunod",
+  "Stops the sound playing and starts the next one in Up next. With nothing waiting, it just stops the sound.": "Ihihinto ang tumutugtog na tunog at sisimulan ang susunod sa Susunod. Kung walang naghihintay, ihihinto lang ang tunog."
 }
