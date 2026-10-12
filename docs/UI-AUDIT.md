@@ -77,8 +77,8 @@ Decisions in the right-hand column are standing: don't undo them without the own
 | U14 category names | #425 | Built-in Apps categories translated for display; config keeps the English key. |
 | U15 heading keyboard | #426 | Apps category headings take focus; Menu key / Shift+F10 opens their menu. |
 | U18 long import | #484 | The import's busy card stays up until the import is done (`ms=0`), for one file too, not 4 s. Checked on main with a 1-hour MP3, offscreen: "Adding 1 sound…" the whole 9.4 s (before: gone at 4 s), then "Added 1 sound". Test: `test_one_slow_file_keeps_its_busy_card_until_its_in`. |
-| U23-U28 Setup ways | #566, #PRNUM | One 38 px height for the Setup card's ways (the filled one's 1px rim counted) and *Who's listening* (already 38: U28 needs nothing). *Check again* is the last of the ways in their Flow, not a row of its own. The cable button's icon is white only while it's filled (#566). The main button reads *Straight into my mic instead*; "no cable" is in its tooltip. 1400 px: two rows; 1180: main button, then the rest. Test: `test_button_alignment.py`. |
-| U40, U43, U45, U52 | #PRNUM | Record is as tall as Send (Radio bar, Apps cards). An icon set before a button had words gets its gap when they come (`icons.text_gap`: both Sends, *Get Onion Watch*). Narrow Radio: Play/shuffle/Send keep their size. Apps card ✕ is 28 px. Test: `test_button_alignment.py`. |
+| U23-U28 Setup ways | #566, #567 | One 38 px height for the Setup card's ways (the filled one's 1px rim counted) and *Who's listening* (already 38: U28 needs nothing). *Check again* is the last of the ways in their Flow, not a row of its own. The cable button's icon is white only while it's filled (#566). The main button reads *Straight into my mic instead*; "no cable" is in its tooltip. 1400 px: two rows; 1180: main button, then the rest. Test: `test_button_alignment.py`. |
+| U40, U43, U45, U52 | #567 | Record is as tall as Send (Radio bar, Apps cards). An icon set before a button had words gets its gap when they come (`icons.text_gap`: both Sends, *Get Onion Watch*). Narrow Radio: Play/shuffle/Send keep their size. Apps card ✕ is 28 px. Test: `test_button_alignment.py`. |
 
 ## Features for later (not UI fixes; after 2.0)
 
@@ -161,7 +161,7 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 ### Radio
 
 - [ ] **U38 (debt, overlaps U16): Radio's Effects pill is 21 px in a 34 px bar.** Record
-  now matches Play/Send/Last 15s (#PRNUM). Effects is the `#small` family; decide whether
+  now matches Play/Send/Last 15s (#567). Effects is the `#small` family; decide whether
   bar controls get a bar-sized Effects. Target: `ui/radiopanel.py`, `SpeedPitchButton`.
 - [ ] **U39 (polish): Radio icon buttons are 44x34.** Shuffle/Favorite have wider
   rectangular hitboxes than neighboring transport icons. Review standard square
