@@ -1,0 +1,1 @@
+- Voice's picked-voice icon follows the theme font, and the Computer voice label keeps enough room in narrow windows.

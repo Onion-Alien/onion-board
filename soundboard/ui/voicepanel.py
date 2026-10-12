@@ -28,6 +28,7 @@ from soundboard import modules as mods
 from soundboard import voicefx
 from soundboard import langnames, library, net, netlog, savedvoices, theme, usage
 from soundboard.speech import customvoices, translation, tts, winvoices
+from soundboard.ui.iconrow import CapIcon
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, fit, icons
@@ -720,12 +721,11 @@ class VoiceFxPanel(QWidget):
         ph = QHBoxLayout(self.picked)
         ph.setContentsMargins(12, 8, 12, 8)
         ph.setSpacing(10)
-        self.picked_pic = QLabel()
-        self.picked_pic.setFixedSize(PICKED_ART, PICKED_ART)
-        ph.addWidget(self.picked_pic)
         self.picked_name = QLabel()
         self.picked_name.setObjectName("pickedname")
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
+        self.picked_pic = CapIcon(self.picked_name, "sliders", size=PICKED_ART)
+        ph.addWidget(self.picked_pic)
         ph.addWidget(self.picked_name)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
@@ -1520,6 +1520,24 @@ class _SameWidth(QObject):
         return False
 
 
+class _FirstControlLabel(QObject):
+    """Keep a field label beside the first control when its action wraps below."""
+
+    def __init__(self, label: QLabel, control: QWidget):
+        super().__init__(label)
+        self.label, self.control = label, control
+        label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        for widget in (label, control):
+            widget.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if event.type() in (QEvent.Type.Resize, QEvent.Type.FontChange, QEvent.Type.StyleChange):
+            top = max(0, (self.control.height() - self.label.fontMetrics().height()) // 2)
+            if self.label.contentsMargins().top() != top:
+                self.label.setContentsMargins(0, top, 0, 0)
+        return False
+
+
 class SpeechPanel(QWidget):
     """Text-to-speech box and live voice-to-speech. `changed(settings)` for the config."""
     changed = Signal(dict)
@@ -1700,6 +1718,7 @@ class SpeechPanel(QWidget):
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(14)
         lbl_voice = QLabel(_("Computer voice"))
+        lbl_voice.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         grid.addWidget(lbl_voice, 0, 0)
         # Speak in's box starts where the voice list does
         self.lbl_lang.setMinimumWidth(max(self.lbl_lang.sizeHint().width(),
@@ -1712,14 +1731,18 @@ class SpeechPanel(QWidget):
         # the list shows a stand-in, not the saved voice (still loading, speech failed,
         # or that voice isn't installed now): other settings changes keep the saved one
         self._voice_standin = True
-        grid.addWidget(self.cb_voice, 0, 1)
+        voices = QWidget()
+        voice_flow = Flow(voices, gap=12)
+        voice_flow.addWidget(self.cb_voice)
+        grid.addWidget(voices, 0, 1, 1, 3)
         # custom voices have their own box, opened from next to the list itself
         self.b_add_voices = QPushButton(_("Add voices"))
         icons.set_icon(self.b_add_voices, "plus")
         self.b_add_voices.setToolTip(_("Your own voices: a TTS server on your PC (Kokoro, "
                                        "AllTalk…) or Piper voice packs"))
         self.b_add_voices.clicked.connect(self.show_custom_voices)
-        grid.addWidget(self.b_add_voices, 0, 2)
+        voice_flow.addWidget(self.b_add_voices)
+        _FirstControlLabel(lbl_voice, self.cb_voice)
         grid.addWidget(QLabel(_("Speed")), 1, 0)
         self.sl_rate = QSlider(Qt.Orientation.Horizontal)
         self.sl_rate.setMinimumHeight(28)
