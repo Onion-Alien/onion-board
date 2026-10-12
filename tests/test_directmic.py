@@ -438,6 +438,79 @@ def test_admin_step_brings_the_audio_back_whatever_happens(fake_reg, monkeypatch
     assert calls[-1] == (True, ["midisrv"])
 
 
+def _restart_kit(fake_reg, monkeypatch, tmp_path, heard):
+    """admin_install with the audio restart faked: `heard` is what each listen to the
+    mic says, in turn (True: exact zeros, False: real sound, None: can't tell)."""
+    calls = []
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
+    for name in ("_enable_privileges", "_register_com", "_make_ring"):
+        monkeypatch.setattr(dm, name, lambda *a: None)
+    monkeypatch.setattr(dm, "_running_dependents", lambda: ["midisrv"])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
+    monkeypatch.setattr(dm, "_audio_service",
+                        lambda start, deps=(): calls.append((start, deps)) or True)
+    monkeypatch.setattr(dm, "_mic_is_silent",
+                        lambda guid: calls.append(("listen", guid)) or heard.pop(0))
+    _mic(fake_reg, MICS["a stream effect"])
+    return calls
+
+
+def test_a_mic_left_silent_by_the_restart_gets_one_more(fake_reg, monkeypatch, tmp_path):
+    """A mic can come back from the audio restart sending only exact zeros (an app
+    grabbed it the moment it was back), until the audio restarts again. So it's listened
+    to after the restart: digital silence gets one more restart, then a second listen."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, False])
+    assert dm.admin_install(GUID) == 0
+    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID),
+                     (False, ()), (True, ["midisrv"]), ("listen", GUID)]
+
+
+def test_a_mic_that_stays_silent_gets_only_one_more_restart(fake_reg, monkeypatch, tmp_path,
+                                                            caplog):
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, True])
+    assert dm.admin_install(GUID) == 0
+    assert [c for c in calls if c[0] is False] == [(False, ()), (False, ())]
+    assert "still sends only silence" in caplog.text
+
+
+@pytest.mark.parametrize("heard", [False, None])
+def test_a_working_or_unknown_mic_is_left_alone(fake_reg, monkeypatch, tmp_path, heard):
+    """Real sound, or can't tell (muted, at 0%, not back yet): no extra restart."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [heard])
+    assert dm.admin_install(GUID) == 0
+    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID)]
+
+
+def test_the_uninstall_listens_to_the_mic_it_took_the_effect_off(fake_reg, monkeypatch,
+                                                                 tmp_path):
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False, True, False])
+    assert dm.admin_install(GUID) == 0
+    calls.clear()
+    assert dm.admin_uninstall() == 0
+    assert not fake_reg.installed_on()
+    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID),
+                     (False, ()), (True, ["midisrv"]), ("listen", GUID)]
+
+
+def test_no_listen_when_the_audio_never_stopped(fake_reg, monkeypatch, tmp_path):
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [])
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): start)   # stop fails
+    assert dm.admin_install(GUID) == 6
+    assert calls == []
+
+
+def test_a_failing_listen_never_fails_the_install(fake_reg, monkeypatch, tmp_path):
+    _restart_kit(fake_reg, monkeypatch, tmp_path, [])
+
+    def broken(guid):
+        raise OSError("no audio")
+    monkeypatch.setattr(dm, "_mic_is_silent", broken)
+    assert dm.admin_install(GUID) == 0
+
+
 def test_a_failed_set_up_puts_the_mic_back(fake_reg, monkeypatch, tmp_path):
     """An error half-way through putting it on the mic (not the process dying): the
     mic goes back as it was before the admin step says it failed."""
