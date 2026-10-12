@@ -3309,6 +3309,7 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Yüklü, ama seslerin artık mikrofonuna gidiyor. Bir oyun mikrofonunu atlarsa onu kullan, başka hiçbir şeyin ihtiyacı yoksa kaldır.",
   "⚠ Another sound already has this name.": "⚠ Başka bir ses zaten bu adı kullanıyor.",
   "Don't show this again": "Bir daha gösterme",
+  "Stop voice effects": "Ses efektlerini durdur",
   "Hide this program's window": "Bu programın penceresini gizle",
   "Looking for its window…": "Penceresi aranıyor…",
   "Minimised: nothing to show": "Simge durumunda: gösterilecek bir şey yok",

@@ -3235,6 +3235,7 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "它已安装，但你的声音现在会进入麦克风。如果某个游戏跳过了你的麦克风就用它，如果没有别的东西需要它就删除它。",
   "⚠ Another sound already has this name.": "⚠ 已有其他音效使用这个名字。",
   "Don't show this again": "不再显示",
+  "Stop voice effects": "停止语音效果",
   "Hide this program's window": "隐藏这个程序的窗口",
   "Looking for its window…": "正在查找它的窗口…",
   "Minimised: nothing to show": "已最小化：没有可显示的",

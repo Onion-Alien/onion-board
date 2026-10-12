@@ -3235,6 +3235,7 @@
   "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "ติดตั้งไว้แล้ว แต่ตอนนี้เสียงของคุณเข้าไมค์แล้ว ใช้มันถ้าเกมข้ามไมค์ของคุณ หรือลบออกถ้าไม่มีอะไรต้องใช้มันแล้ว",
   "⚠ Another sound already has this name.": "⚠ มีเสียงอื่นใช้ชื่อนี้อยู่แล้ว",
   "Don't show this again": "ไม่ต้องแสดงอีก",
+  "Stop voice effects": "หยุดเอฟเฟกต์เสียง",
   "Hide this program's window": "ซ่อนหน้าต่างของโปรแกรมนี้",
   "Looking for its window…": "กำลังหาหน้าต่าง…",
   "Minimised: nothing to show": "ย่ออยู่: ไม่มีอะไรให้แสดง",
