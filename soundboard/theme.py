@@ -310,7 +310,7 @@ THEMES: dict[str, dict[str, str]] = {
         text="#000000", text_hi="#000000", muted="#3a3a3a", faint="#6d6d6d", section="#000080",
         accent="#000080", accent_hi="#0e6fae", accent2="#008080", on_accent="#ffffff",
         off="#a0a0a0", badge="#ffffff", badge_text="#000000",
-        **_LIGHT_STATUS | dict(ok_text="#005a1e", warn_text="#6b3f00", error_text="#9a0000"),
+        **_LIGHT_STATUS | dict(ok_text="#004a18", warn_text="#5c3600", error_text="#880000"),
         font="Tahoma",
     ),
     "Comic Sans": dict(   # the most serious theme
@@ -477,6 +477,7 @@ def _lift_buttons(t: dict[str, str]) -> None:
 
 
 for _t in THEMES.values():
+    _lift_buttons(_t)   # first: the secondary text below has to read on the lifted buttons
     # Secondary text must read (4.5:1) on every surface it sits on: a quiet button's
     # hover and the inset boxes too (they were 3.6-4.5:1 in most themes).
     for key in ("muted", "faint"):
@@ -484,7 +485,6 @@ for _t in THEMES.values():
                                   for i in range(21))
                        if min(_contrast(c, _t[bg]) for bg in SECONDARY_ON if bg in _t) >= 4.5
                        or c == _t["text_hi"])
-    _lift_buttons(_t)
     # boxes and buttons on a panel or card: the card's colour, or where cards are (near
     # enough) the panel's (Light: white on white, the buttons read as plain text; Paper
     # and Cherry Blossom a hair off it) the button colour, or its hover one when that's
