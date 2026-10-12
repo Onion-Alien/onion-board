@@ -1,0 +1,1 @@
+- Setup: when your sounds go into your mic, the card shows the other ways (the virtual cable, another device) as two tiles that say what each one is for, like the setup guide, instead of a "use the cable" and a "remove the cable" button side by side with no reason and an empty card under them.

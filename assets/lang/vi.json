@@ -419,7 +419,6 @@
   "The game you have open uses {engine} for voice chat": "Game bạn đang mở dùng {engine} cho voice chat",
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Lớp phủ trong game hiện các nút của bạn trên game, phát bằng phím số. Thiết lập trong Cài đặt → Lớp phủ.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Không khởi động được trình cài đặt ({e}). Bạn có thể tải nó từ trang phát hành.",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Cách khác để tới Discord và game: một cáp ảo miễn phí mà bạn chọn làm mic ở đó",
   "The saved report and the app's log": "Báo cáo đã lưu và nhật ký của ứng dụng",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Các cài đặt trong Zoom, Microsoft Teams và cuộc gọi trên web giúp chúng không coi âm thanh của bạn là tiếng ồn",
   "The update didn't finish": "Cập nhật chưa xong",
@@ -459,7 +458,6 @@
   "Update available": "Có bản cập nhật",
   "Update now": "Cập nhật ngay",
   "Updated to Onion Board {version}. Nothing changes until you want it to: everything works as before.": "Đã cập nhật lên Onion Board {version}. Không gì thay đổi cho đến khi bạn muốn: mọi thứ vẫn như trước.",
-  "Use the virtual cable instead": "Dùng cáp ảo thay thế",
   "Video": "Video",
   "Videos can't be shown in this copy of Onion Board": "Bản Onion Board này không hiện được video",
   "Voice": "Giọng nói",
@@ -3237,5 +3235,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Có họa tiết cho mỗi chủ đề một họa tiết riêng trên các bảng: vạch màn hình cũ, sợi carbon, sóng và hơn thế nữa. Trơn giữ chúng phẳng.",
   "Theme style": "Kiểu chủ đề",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Đang chuyển âm thanh của bạn từ các soundboard khác: {done}/{total}…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "Đang chuyển âm thanh của bạn từ {name}: {done}/{total}…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "Đang chuyển âm thanh của bạn từ {name}: {done}/{total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Nó đã được cài, nhưng giờ âm thanh của bạn đi vào mic rồi. Dùng nó nếu một game bỏ qua mic của bạn, hoặc gỡ nó nếu không còn gì cần đến nó."
 }

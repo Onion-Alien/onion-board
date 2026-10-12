@@ -27,8 +27,7 @@ from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-                               QPushButton, QScrollArea, QSizePolicy,
-                               QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard import directmic, michelper
 from soundboard import engine as eng
@@ -888,23 +887,7 @@ class SetupWizard(QDialog):
         tiles.setSpacing(12)    # takes the whole row, not half of it beside a hole
 
         def tile(icon: str, title: str, words: str, button: QPushButton) -> QFrame:
-            box = QFrame()
-            box.setObjectName("alttile")   # an inner area (DESIGN.md: cards)
-            box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-            v = QVBoxLayout(box)
-            v.setContentsMargins(14, 12, 14, 14)
-            v.setSpacing(8)
-            top = QHBoxLayout()
-            top.setSpacing(8)
-            pic = QLabel()
-            icons.set_label_icon(pic, icon, "accent", size=18)
-            top.addWidget(pic)
-            top.addWidget(QLabel(f"<b>{html.escape(title)}</b>"))
-            top.addStretch(1)
-            v.addLayout(top)
-            v.addWidget(panel.hint_label(words))
-            v.addStretch(1)
-            v.addWidget(button, 0, Qt.AlignmentFlag.AlignLeft)
+            box = panel.alt_tile(icon, title, words, button)[0]
             tiles.addWidget(box, 1)
             return box
 

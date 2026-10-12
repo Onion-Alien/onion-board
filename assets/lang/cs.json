@@ -1166,7 +1166,6 @@
   "The in-game overlay shows your pads over the game, played with the number keys. Set it up in Settings → Overlay.": "Překryv ve hře ukazuje tvoje pady nad hrou a hrají se číselnými klávesami. Nastavíš ho v Nastavení → Překryv.",
   "The installer couldn't be started ({e}). You can download it from the release page instead.": "Instalátor se nepovedlo spustit ({e}). Místo toho si ho můžeš stáhnout ze stránky verze.",
   "The one the game is on": "Ten, na kterém je hra",
-  "The other way to reach Discord and games: a free virtual cable you pick as the mic there": "Druhá cesta do Discordu a her: virtuální kabel zdarma, který tam vybereš jako mikrofon",
   "The saved report and the app's log": "Uložené hlášení a záznam aplikace",
   "The settings in Zoom, Microsoft Teams and calls in a web page that stop them treating your sounds as noise": "Nastavení v Zoomu, Microsoft Teams a hovorech na webu, která zabrání, aby tvoje zvuky brali jako šum",
   "The setup guide's Install button downloads VB-Cable (the virtual cable) from vb-audio.com. Not needed if your sounds go straight into your mic, to another device or nowhere. Off: install it yourself from there.": "Tlačítko Instalovat v průvodci nastavením stáhne VB-Cable (virtuální kabel) z vb-audio.com. Není potřeba, pokud tvoje zvuky jdou rovnou do mikrofonu, do jiného zařízení nebo nikam. Vypnuto: nainstaluj si ho odtamtud ručně.",
@@ -1258,7 +1257,6 @@
   "Use it": "Použít",
   "Use less data": "Šetřit data",
   "Use the virtual cable after all": "Přece jen použít virtuální kabel",
-  "Use the virtual cable instead": "Místo toho použít virtuální kabel",
   "Used for": "Použito pro",
   "Valorant, Fortnite, Apex, Rust… the voice chat settings that matter": "Valorant, Fortnite, Apex, Rust… nastavení voice chatu, na kterých záleží",
   "Version {version}": "Verze {version}",
@@ -3385,5 +3383,6 @@
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "S texturou má každý motiv na panelech vlastní vzor: řádky starého monitoru, karbon, vlny a další. Hladký je nechá jednobarevné.",
   "Theme style": "Styl motivu",
   "Bringing your sounds over from your other soundboards: {done} of {total}…": "Přenáším tvoje zvuky z tvých jiných soundboardů: {done} z {total}…",
-  "Bringing your sounds over from {name}: {done} of {total}…": "Přenáším tvoje zvuky z {name}: {done} z {total}…"
+  "Bringing your sounds over from {name}: {done} of {total}…": "Přenáším tvoje zvuky z {name}: {done} z {total}…",
+  "It's installed, but your sounds go into your mic now. Use it if a game skips your mic, or remove it if nothing else needs it.": "Je nainstalovaný, ale tvoje zvuky teď jdou do mikrofonu. Použij ho, když hra tvůj mikrofon přeskočí, nebo ho odeber, pokud ho nic jiného nepotřebuje."
 }
