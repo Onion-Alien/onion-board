@@ -647,6 +647,117 @@ def default_output_name() -> str | None:
             _ole32.CoUninitialize()
 
 
+IID_IAudioEndpointVolume = GUID.of("5CDF2C82-841E-4546-9722-0CF74078229A")
+CAPTURE_ID = "{0.0.1.00000000}."   # a recording endpoint's id: this + its GUID
+
+
+def mic_is_silent(guid: str, seconds: float = 1.0, wait: float = 8.0) -> bool | None:
+    """Open the recording endpoint `guid` (as in MMDevices\\Audio\\Capture) for up to
+    `seconds` and say whether it delivers nothing but exact zeros: True for digital
+    silence (a quiet room still has noise, so a working mic never does), False at the
+    first real sample. None when it can't tell: the mic isn't back within `wait`
+    seconds, it's muted or at 0%, Windows refused, or too little audio came."""
+    if not _win:
+        return None
+    own = _co_init()
+    try:
+        return _mic_is_silent(guid if guid.startswith("{") else "{" + guid + "}",
+                              seconds, wait)
+    except ComError:
+        log.info("couldn't listen to mic %s", guid, exc_info=True)
+        return None
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
+def _mic_is_silent(guid: str, seconds: float, wait: float) -> bool | None:
+    dev = None
+    give_up = time.monotonic() + wait
+    with _enumerator() as en:
+        while dev is None:   # right after an audio restart it takes a moment to be back
+            d, state, got = c_void_p(), c_ulong(), None
+            try:
+                en.call(5, (c_wchar_p, POINTER(c_void_p)), CAPTURE_ID + guid.lower(),
+                        byref(d), what="GetDevice")
+                got = Com(d.value)
+                got.call(6, (POINTER(c_ulong),), byref(state), what="GetState")
+                if state.value == DEVICE_STATE_ACTIVE:
+                    dev, got = got, None
+                    break
+            except ComError:
+                pass
+            finally:
+                if got is not None:
+                    got.release()
+            if time.monotonic() > give_up:
+                return None
+            time.sleep(0.25)
+    with dev:
+        out = c_void_p()
+        dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
+                 byref(IID_IAudioEndpointVolume), CLSCTX_ALL, None, byref(out),
+                 what="Activate(IAudioEndpointVolume)")
+        with Com(out.value) as vol:
+            muted, level = c_int(), c_float()
+            vol.call(15, (POINTER(c_int),), byref(muted), what="GetMute")
+            vol.call(9, (POINTER(c_float),), byref(level), what="GetMasterVolumeLevelScalar")
+            if muted.value or level.value <= 0:
+                return None   # silent on purpose
+        out = c_void_p()
+        dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
+                 byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
+                 what="Activate(IAudioClient)")
+        with Com(out.value) as client:
+            pfmt = c_void_p()
+            client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
+            try:
+                # its own format: exact zeros are zero bytes in every sample format
+                align = cast(pfmt, POINTER(WAVEFORMATEX))[0].nBlockAlign
+                rate = cast(pfmt, POINTER(WAVEFORMATEX))[0].nSamplesPerSec
+                client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
+                            AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
+                            what="Initialize")
+            finally:
+                _ole32.CoTaskMemFree(pfmt)
+            out = c_void_p()
+            client.call(14, (POINTER(GUID), POINTER(c_void_p)), byref(IID_IAudioCaptureClient),
+                        byref(out), what="GetService(IAudioCaptureClient)")
+            with Com(out.value) as cap:
+                client.call(10, (), what="Start")
+                try:
+                    zeros = _all_zero(cap, align, seconds)
+                finally:
+                    client.call(11, (), what="Stop")
+    if zeros is None:
+        return False
+    return True if zeros >= rate * seconds / 2 else None
+
+
+def _all_zero(cap: Com, align: int, seconds: float) -> int | None:
+    """How many frames came, all exact zeros; None at the first one that isn't."""
+    n, frames, flags, data = c_uint(), c_uint(), c_ulong(), c_void_p()
+    count = 0
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        time.sleep(0.01)
+        while True:
+            cap.call(5, (POINTER(c_uint),), byref(n), what="GetNextPacketSize")
+            if not n.value:
+                break
+            cap.call(3, (POINTER(c_void_p), POINTER(c_uint), POINTER(c_ulong), c_void_p,
+                         c_void_p), byref(data), byref(frames), byref(flags), None, None,
+                     what="GetBuffer")
+            try:
+                if not flags.value & AUDCLNT_BUFFERFLAGS_SILENT and data.value \
+                        and any(ctypes.string_at(data.value, frames.value * align)):
+                    return None
+                count += frames.value
+            finally:
+                cap.call(4, (c_uint,), frames.value, what="ReleaseBuffer")
+    return count
+
+
 def endpoint_names(kind: str) -> set[str] | None:
     """Names of Windows' active playback ('output') or recording ('input') devices,
     asked now (PortAudio's list is from when it started or was last re-scanned).

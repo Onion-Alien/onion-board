@@ -345,6 +345,7 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     monkeypatch.setattr(directmic, "_elevated", no_admin)
     monkeypatch.setattr(directmic, "installed_on", lambda: [])
     monkeypatch.setattr(directmic, "capture_endpoints", lambda: [])   # nor this PC's mics
+    monkeypatch.setattr(directmic, "_mic_is_silent", lambda guid: None)   # nor listens to one
     # nor its mic helper (soundboard.michelper): no real Program Files, task or queue
     from soundboard import michelper
 

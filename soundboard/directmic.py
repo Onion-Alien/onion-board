@@ -1581,12 +1581,57 @@ def _audio_off(work) -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
+    mics: list[str] | None = None
     try:
         if not _audio_service(False):
             return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
+        mics = installed_on()   # the one it comes off is listened to as well
         return work()
     finally:
         _audio_service(True, dependents)
+        if mics is not None:
+            _mics_come_back_live(mics, dependents)
+
+
+def _mic_is_silent(guid: str) -> bool | None:
+    """appaudio.mic_is_silent: True when the mic sends only exact zeros."""
+    from soundboard import appaudio
+    return appaudio.mic_is_silent(guid)
+
+
+def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str]):
+    """After the audio restart a mic can come back sending only exact zeros (an app
+    such as a voice chat grabbed it the moment it was back), to every app and to Windows'
+    own mic test, until the audio restarts again. So the mics the effect was on (`before`)
+    and is on now are listened to for a second: digital silence gets one more restart,
+    never two."""
+    try:
+        silent = []
+        for g in dict.fromkeys([*before, *installed_on()]):
+            heard = _mic_is_silent(g)
+            if heard:   # a mic still waking up can be silent a moment: only twice counts
+                log.info("mic %s silent just after the audio restart: listening again", g)
+                time.sleep(2)
+                heard = _mic_is_silent(g)
+            log.info("mic %s after the audio restart: %s", g,
+                     {True: "only silence", False: "sound", None: "can't tell"}[heard])
+            if heard:
+                silent.append(g)
+        if not silent:
+            return
+        log.warning("%s sends only silence after the audio restart: "
+                    "restarting the audio once more", ", ".join(silent))
+        try:
+            _audio_service(False)
+        finally:
+            _audio_service(True, dependents)
+        still = [g for g in silent if _mic_is_silent(g)]
+        if still:
+            log.warning("%s still sends only silence after a second restart", ", ".join(still))
+        else:
+            log.info("the mic is back after a second restart")
+    except Exception:  # noqa: BLE001 - a check: never fails the install or uninstall
+        log.warning("couldn't check the mic after the audio restart", exc_info=True)
 
 
 def admin_install(guid: str, slot: str | None = None, source: Path | None = None) -> int:
