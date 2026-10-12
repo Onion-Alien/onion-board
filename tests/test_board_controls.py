@@ -222,6 +222,18 @@ def test_play_next_waits_for_a_web_search_song(window, monkeypatch, calls):
     assert [c[0] for c in calls] == ["s1"]
 
 
+def test_skip_stops_the_web_search_song_your_sound_waits_for(window, monkeypatch, calls):
+    """Your sound waits for a web search's song: Skip starts it now and the song makes
+    way (it kept playing under it)."""
+    w = window
+    stopped = []
+    monkeypatch.setattr(w.engine, "stop", stopped.append)
+    playing(monkeypatch, w, ["__link__"])
+    w.queue_sound("s1")
+    w.btn_skip.click()
+    assert stopped == ["__link__"] and [c[0] for c in calls] == ["s1"]
+
+
 def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypatch, calls):
     w = window
     stopped = []

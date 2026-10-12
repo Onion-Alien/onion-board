@@ -6315,9 +6315,10 @@ class MainWindow(QMainWindow):
         does); a web search's Up next waits for its song. Nothing waiting: it stops
         the player's sound, like ■."""
         if self._queue:
-            for sid in self.engine.playing():
-                if sid in self._meta:
+            for sid in self.engine.playing():   # (it waits for a web search's song too)
+                if sid in self._meta or sid == LINK_ID:
                     self.engine.stop(sid)
+            self._drop_link()
             self._next_in_queue()
         elif self.linkbar.up_next():
             for sid in self.engine.playing():   # it waits for your sounds too
