@@ -4,6 +4,24 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.0.0 — 2026-10-12
 
+- Settings: the Discord, feedback, bug report and Support buttons now live together on the
+  About page (the duplicate *Feedback and problems* card is gone), and *Add-ons & help* is
+  now just *Add-ons*.
+- Dropdown menus settle closed during rapid repeated clicks and reopen after a short pause.
+- Cards with pictures no longer flicker blank and back while the window is resized:
+  each keeps its picture, stretched, until the new size is ready.
+- A song played from a web search no longer stays stuck in the player bar: ■ now takes it
+  out, and so does picking another site once it's over.
+- Make plain and primary button hover shades easier to see in every theme, while keeping their words readable. Keep section colour tokens readable on every card surface.
+- Wrap the selected voice name in narrow windows so longer translations stay visible.
+- Keep focus on buttons while checking updates, reloading voices, downloading or installing add-ons, and cancelling a translation download. Ignore repeat clicks until the work finishes.
+- Quick setup no longer jumps around: clicking between the first step's choices keeps the window the same size, Back / Next no longer flash it to the full screen height for a moment, and opening and shutting the Discord tip near the bottom of the screen puts the window back where it was instead of walking it up.
+- Quick setup stays open while Bun puts your sounds into your mic: Back, Next, Esc and the X wait until it's done, so it can't be closed half-way.
+- Bottom-strip icons follow the capital height of each theme's font.
+- Setup: when your sounds go into your mic, the card shows the other ways (the virtual cable, another device) as two tiles that say what each one is for, like the setup guide, instead of a "use the cable" and a "remove the cable" button side by side with no reason and an empty card under them.
+- The mini player's mic button shows a mic icon, struck through when muted, so "Mic on" reads as the state it's in.
+- "This won't mute you yet" has a *Don't show this again* box, for people who play on the cable on purpose.
+- The Discord warning on the Voice changer card now always shows (until Got it), instead of popping in when you pick a voice and pushing the voices down.
 - Card heading icons stay level with the text when changing to a theme with its own font.
 - *Also send to*: a device's − button is a small button again, not a bar across the
   rest of the Devices card.

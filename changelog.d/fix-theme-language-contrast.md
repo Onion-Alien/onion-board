@@ -1,2 +1,0 @@
-- Make plain and primary button hover shades easier to see in every theme, while keeping their words readable. Keep section colour tokens readable on every card surface.
-- Wrap the selected voice name in narrow windows so longer translations stay visible.

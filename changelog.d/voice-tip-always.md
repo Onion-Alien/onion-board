@@ -1,1 +1,0 @@
-- The Discord warning on the Voice changer card now always shows (until Got it), instead of popping in when you pick a voice and pushing the voices down.
