@@ -149,6 +149,21 @@ def test_make_ring_replaces_an_old_layout(tmp_path):
     assert not dm.make_ring(tmp_path / "no" / "such" / "dir" / "ring2.bin")
 
 
+def test_make_ring_ok_while_a_board_writes(tmp_path):
+    """A writing board locks a few bytes of the ring (claim). Checking the file must not
+    read over them: a buffered read did, so the board's own ring looked bad (status
+    "wiped", then a repair) and make_ring tried to replace a file in use."""
+    p = tmp_path / "ring2.bin"
+    assert dm.make_ring(p)
+    w = dm.RingWriter(p)
+    try:
+        w.claim()
+        assert dm.make_ring_ok(p)
+        assert dm.make_ring(p)
+    finally:
+        w.close()
+
+
 def test_make_ring_replaces_one_with_the_wrong_rate(tmp_path):
     """The effect plays the board's audio at the rate the file says: a damaged (or
     tampered) one with another rate the effect accepts, 44.1 kHz, played every sound

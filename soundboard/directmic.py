@@ -200,7 +200,10 @@ def make_ring_ok(path: Path) -> bool:
     try:
         if not (path.is_file() and path.stat().st_size == FILE_BYTES):
             return False
-        with open(path, "rb") as f:
+        # unbuffered: a buffered read asks Windows for 8 KB, over the bytes a running
+        # board keeps locked (RingWriter.claim), and failed: a board that was writing
+        # made its own ring look "wiped", and an install tried to replace it
+        with open(path, "rb", buffering=0) as f:
             raw = f.read(52)
         magic, version, rate, capacity = struct.unpack_from("<4I", raw, 0)
         mic_capacity, = struct.unpack_from("<I", raw, 48)
