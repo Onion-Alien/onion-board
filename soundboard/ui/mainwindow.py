@@ -1729,7 +1729,13 @@ class MainWindow(QMainWindow):
         for b in (add, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
             b.setFixedHeight(CONTROL_H)
-        left.addWidget(self.sounds_toolbar)
+        # held in a row whose margins make the toolbar span exactly the pads below it
+        # (_fit_toolbar): its edges line up with the first and last card
+        hold = self._toolbar_hold = QWidget()
+        hl = QHBoxLayout(hold)
+        hl.setContentsMargins(0, 0, 0, 0)
+        hl.addWidget(self.sounds_toolbar)
+        left.addWidget(hold)
         self.cat_bar = self._build_categories()
         left.addWidget(self.cat_bar)
         self.linkbar = LinkBar(
@@ -1768,6 +1774,9 @@ class MainWindow(QMainWindow):
         # the pads fit the width
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         left.addWidget(scroll, 1)
+        scroll.verticalScrollBar().rangeChanged.connect(lambda *_r: self._fit_toolbar())
+        self.grid.laid_out.connect(self._fit_toolbar)
+        self._fit_toolbar()
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self._cat_row.show)   # ...and the categories' row
@@ -6252,6 +6261,21 @@ class MainWindow(QMainWindow):
             self.grid.relayout(force=True)
             self.selection.sync()
 
+    def _fit_toolbar(self):
+        """The toolbar spans the pads: in by the grid's margin on both sides, and by the
+        scroll bar too while it shows (and the odd pixels a row can't split). The
+        category tabs start on the same line as the toolbar and the first card."""
+        m = self.grid.grid.contentsMargins()
+        sb = self._pad_scroll.verticalScrollBar()
+        right = (m.right() + self.grid.slack()
+                 + (sb.sizeHint().width() if sb.maximum() > 0 else 0))
+        hold = self._toolbar_hold.layout()
+        row = self._cat_row.layout()
+        if hold is None or row is None:
+            return
+        hold.setContentsMargins(m.left(), 0, right, 0)
+        row.setContentsMargins(m.left(), 0, 0, 0)
+
     # ------------------------------------------------------------------ categories
     # A sound can be in any number of categories (SoundMeta.tags); the bar above the
     # pads shows one at a time. The overlay shows the same category's sounds.
@@ -6264,7 +6288,7 @@ class MainWindow(QMainWindow):
         w = self._cat_row = QWidget()
         ov.addWidget(w)
         h = QHBoxLayout(w)
-        h.setContentsMargins(0, 0, 0, 0)
+        h.setContentsMargins(0, 0, 0, 0)   # the left one: _fit_toolbar
         h.setSpacing(4)
         self.cat_tabs = SnugTabBar()
         self.cat_tabs.setDrawBase(False)

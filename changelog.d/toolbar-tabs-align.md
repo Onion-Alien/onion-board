@@ -1,0 +1,1 @@
+- The Sounds toolbar, the category tabs and the sound cards now line up on both sides.
