@@ -95,17 +95,33 @@ class Flow(QLayout):
     def __init__(self, parent=None, gap: int = 6):
         super().__init__(parent)
         self._items, self._gap = [], gap
+        self._widgets: list = []   # each item's widget (None for a spacer), in step
         self.setContentsMargins(0, 0, 0, 0)
 
     def addItem(self, item):
         self._items.append(item)
+        self._widgets.append(item.widget())
 
     def _alive(self) -> list:
-        """Its items, minus any whose Qt side is already gone. One went once (after
-        removing Onion Watch): every layout pass then raised on it, the tab's parts
-        were left where they were mid-pass (on top of each other) and the app crashed."""
-        if not all(qt_valid(it) for it in self._items):
-            self._items = [it for it in self._items if qt_valid(it)]
+        """Its items, with any whose Qt side is already gone made again for their widget
+        (or dropped, the widget gone too). One went once, around loading and removing
+        Onion Watch: every layout pass raised on it and the app crashed; dropping it
+        then left its button where it was while the row thought itself empty, 0 px
+        tall, so the line under Who's listening's modes sat on top of them."""
+        if all(qt_valid(it) for it in self._items):
+            return self._items
+        items, widgets, again = [], [], []
+        for it, w in zip(self._items, self._widgets):
+            if qt_valid(it):
+                items.append(it)
+                widgets.append(w)
+            elif w is not None and qt_valid(w):
+                again.append((len(items) + len(again), w))
+        self._items, self._widgets = items, widgets
+        for i, w in again:   # Qt makes (and owns) its new item, appended by addItem
+            self.addWidget(w)
+            self._items.insert(i, self._items.pop())
+            self._widgets.insert(i, self._widgets.pop())
         return self._items
 
     def count(self):
@@ -117,7 +133,10 @@ class Flow(QLayout):
 
     def takeAt(self, i):
         items = self._alive()
-        return items.pop(i) if 0 <= i < len(items) else None
+        if not 0 <= i < len(items):
+            return None
+        self._widgets.pop(i)
+        return items.pop(i)
 
     def expandingDirections(self):
         return Qt.Orientation(0)
