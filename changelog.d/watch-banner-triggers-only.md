@@ -1,0 +1,1 @@
+- An urgent Onion Watch fix now shows its banner on the Triggers tab only, not across the whole board.
