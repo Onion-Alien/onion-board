@@ -2,6 +2,11 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.0.2 — 2026-10-12
+
+- A mic that sends only silence because the headset is switched off or its mic muted no longer makes a mic set-up or repair restart Windows' audio over and over, and the messages ask about the headset first instead of telling you to restart your PC.
+- The quick setup guide's mic step follows changes made outside it (a repair, Remove, or a Windows update taking the mic effect off) instead of still saying it works.
+
 ## 2.0.1 — 2026-10-12
 
 - Skip with a sound waiting for a web search's song now stops the song, instead of playing your sound on top of it.
