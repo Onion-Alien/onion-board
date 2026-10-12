@@ -107,7 +107,7 @@ TRIGGERS_FEATURES = (
     "history", "restore-deleted",
     "mode-appear", "mode-vanish", "mode-change", "mode-still", "mode-colour", "ring",
     "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
-    "categories", "profiles")
+    "categories", "profiles", "view-pads", "view-cards")
 # the sites a downloaded sound is counted under (download_site); anything else is "other"
 DL_SITES = ("youtube", "tiktok", "soundcloud", "instagram", "x", "reddit", "twitch",
             "myinstants", "other")
@@ -120,6 +120,10 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
 VOICE_TABS = ("fx", "ai", "speak", "addons")
 # Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
+# a pad's "On press" modes other than the default (library.MODES, without "restart")
+PRESS_MODES = ("overlap", "toggle", "solo", "queue")
+# the add-ons with install steps (their module.json id); any other is "other"
+ADDONS = ("ai-voices", "live-voice", "other")
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -195,7 +199,21 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # Settings' Audio recovery: what was run on a mic, and it failing
             *(f"recovery-{k}" for k in RECOVERY), "recovery-failed",
             # a file import stopped from its card; an import that skipped some files
-            "import-stopped", "import-skipped")
+            "import-stopped", "import-skipped",
+            # Pause and Stop all (the side menu, a hotkey), and the taskbar preview's
+            # buttons; a sound set to a press mode other than the default one at a time
+            # (features_now, SoundMeta.mode)
+            "pause", "stop-all", "taskbar-buttons",
+            *(f"press-{k}" for k in PRESS_MODES),
+            # an add-on with install steps (ADDONS) set up or failing to, Repair, and a
+            # Python got for it (soundboard.pyget) or that failing
+            *(f"addon-installed-{k}" for k in ADDONS), *(f"addon-failed-{k}" for k in ADDONS),
+            "addon-repaired", "addon-got-python", "addon-python-failed",
+            # a restore point saved before an update; a restore point put back
+            "restore-point-update", "restore-point-used",
+            # unticking Others hear it while the mic effect isn't on: the pop-up saying it
+            # can't mute yet, and its Set it up
+            "mute-warning-shown", "mute-warning-setup")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -431,6 +449,11 @@ def settle(cfg, now: float) -> None:
 _used: set[str] = set()   # features used this run, kept in cfg by remember()
 
 
+def addon_tag(module_id: str) -> str:
+    """An add-on's id as a count's word: one of ADDONS, else "other"."""
+    return module_id if module_id in ADDONS else "other"
+
+
 def used(key: str) -> None:
     """Feature `key` (one of FEATURES) was used, for the next daily count."""
     if key in FEATURES:
@@ -473,6 +496,8 @@ def features_now(cfg) -> list[str]:
         out.append("net-offline")
     if cfg.playing_background:
         out.append("playing-bg")
+    modes = {getattr(m, "mode", "") for m in cfg.sounds}
+    out += [f"press-{k}" for k in PRESS_MODES if k in modes]
     from soundboard import michelper
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")

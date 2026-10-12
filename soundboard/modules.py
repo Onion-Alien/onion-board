@@ -598,6 +598,19 @@ def _kill_tree(p: subprocess.Popen, job) -> None:
 
 def install(info: ModuleInfo, on_line: Callable[[str], object],
             on_note: Callable[[str], object] | None = None) -> bool:
+    """Run the module's "install" steps (see _install), counting how it went for the
+    daily usage count (usage.py: the add-on's name from a fixed list, nothing else)."""
+    from soundboard import usage
+    repair = info.broken
+    ok = _install(info, on_line, on_note)
+    usage.used(f"addon-{'installed' if ok else 'failed'}-{usage.addon_tag(info.id)}")
+    if ok and repair:
+        usage.used("addon-repaired")
+    return ok
+
+
+def _install(info: ModuleInfo, on_line: Callable[[str], object],
+             on_note: Callable[[str], object] | None = None) -> bool:
     """Run the module's "install" steps (module.json), streaming their output to
     `on_line`; getting a Python for it first when the PC has no good one (pyget), whose
     progress goes to `on_note` (our own words, not a step's output) or else `on_line`.

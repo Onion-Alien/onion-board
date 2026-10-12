@@ -893,3 +893,50 @@ def test_theme_is_a_built_in_name_or_other():
     assert usage.theme_tag("Cherry Blossom") == "cherry-blossom"
     assert usage.theme_tag("My secret theme") == "other"
     assert "theme/high-contrast" in usage.about(Config(theme="High Contrast"), 0.0)
+
+
+def test_press_modes_count_every_day_and_match_the_library():
+    """A pad set to Overlap (one at a time is the default since 2.0): counted every day."""
+    assert set(usage.PRESS_MODES) == set(library.MODES) - {"restart"}
+    snd = library.SoundMeta(id="a", name="A", file="a.wav", mode="overlap")
+    got = set(usage.features_now(Config(sounds=[snd])))
+    assert "press-overlap" in got and got <= set(usage.FEATURES)
+    plain = library.SoundMeta(id="b", name="B", file="b.wav")
+    assert not any(k.startswith("press-") for k in usage.features_now(Config(sounds=[plain])))
+
+
+def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
+    """An add-on's install, failure and Repair: its id from ADDONS, anything else "other"."""
+    from pathlib import Path
+
+    from soundboard import modules
+    shipped = Path(usage.__file__).parent.parent / "modules"
+    with_steps = {m.id for m in modules.discover([shipped]) if m.install_steps}
+    assert with_steps and with_steps <= set(usage.ADDONS)
+    seen = []
+    monkeypatch.setattr(usage, "used", seen.append)
+    for ok, mid, broken in ((True, "ai-voices", False), (False, "secret-addon", False),
+                            (True, "live-voice", True)):
+        monkeypatch.setattr(modules, "_install", lambda *a, ok=ok, **k: ok)
+        info = SimpleNamespace(id=mid, broken=broken)
+        assert modules.install(info, print) is ok
+    assert seen == ["addon-installed-ai-voices", "addon-failed-other",
+                    "addon-installed-live-voice", "addon-repaired"]
+    assert set(seen) <= set(usage.FEATURES)
+
+
+def test_getting_python_for_an_addon_is_counted(monkeypatch, tmp_path):
+    from soundboard import pyget
+    seen = []
+    monkeypatch.setattr(usage, "used", seen.append)
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.setattr(pyget, "pc_python", lambda: None)
+    monkeypatch.setattr(pyget, "get", lambda d, on_line: "py.exe")
+    assert pyget.for_module(tmp_path, print) == "py.exe"
+
+    def fails(d, on_line):
+        raise pyget.GetError("no")
+    monkeypatch.setattr(pyget, "get", fails)
+    with pytest.raises(pyget.GetError):
+        pyget.for_module(tmp_path, print)
+    assert seen == ["addon-got-python", "addon-python-failed"]
