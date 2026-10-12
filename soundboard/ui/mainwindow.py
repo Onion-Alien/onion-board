@@ -2019,7 +2019,7 @@ class MainWindow(QMainWindow):
         lcol, rcol = self._setup_lr = QVBoxLayout(), QVBoxLayout()
         for i, col in enumerate((lcol, rcol)):
             col.setSpacing(16)
-            cols.addLayout(col, 1, i)   # (row 0: the two top cards, when side by side)
+            cols.addLayout(col, 2, i)   # (rows 0 and 1: the card pairs, when side by side)
         page.setWidget(inner)
 
         # ---- how it works + the one thing to set in Discord
@@ -2315,12 +2315,14 @@ class MainWindow(QMainWindow):
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
         ev.addWidget(self.chk_level)
-        cv.addStretch(1)   # (as tall as who's listening beside it)
-        # side by side: your mic and who's listening on top, the same height; under
-        # them the devices and chat below your mic, the EQ below who's listening. All
-        # open: they fit the screen, so nothing folds away. One column when narrow:
-        # what you check every day first
+        for lay in (cv, av, ev):   # as tall as the card beside it: the room goes at the bottom
+            lay.addStretch(1)
+        # side by side, in pairs that share a grid row (the same height, so their tops
+        # and bottoms line up): your mic and who's listening, then devices and the EQ;
+        # connect your chat under the devices. All open: they fit the screen, so
+        # nothing folds away. One column when narrow: what you check every day first
         self._setup_top = (howcard, destcard)
+        self._setup_pairs = (self._setup_top, (devcard, eqcard))
         self._setup_wide = ((howcard, devcard, helpcard), (destcard, eqcard))
         self._setup_narrow = (howcard, destcard, devcard, helpcard, eqcard)
         self._setup_stacked = None
@@ -2344,21 +2346,28 @@ class MainWindow(QMainWindow):
         if compact == self._setup_stacked:
             return
         self._setup_stacked = compact
-        grid, top = self._setup_cols, self._setup_top
+        grid = self._setup_cols
         for col in self._setup_lr:
             while col.count():
                 take_out(col)   # the cards stay on the page, only their places change
-        for w in top:
+        paired = [w for pair in self._setup_pairs for w in pair]
+        for w in paired:
             grid.removeWidget(w)
         if not compact:
-            grid.addWidget(top[0], 0, 0)
-            grid.addWidget(top[1], 0, 1)
+            for r, pair in enumerate(self._setup_pairs):
+                for c, w in enumerate(pair):
+                    grid.addWidget(w, r, c)
         grid.setColumnStretch(1, 0 if compact else 1)   # (stacked: column 1 is empty)
         grid.setColumnStretch(0, 1)
-        for col, cards in zip(self._setup_lr, (self._setup_narrow, ()) if compact
-                              else [c[1:] for c in self._setup_wide]):   # (c[0]: on top)
-            for w in cards:
-                col.addWidget(w)
+        lcol, rcol = self._setup_lr
+        for w in self._setup_narrow if compact else ():
+            lcol.addWidget(w)
+        if not compact:   # the rest under the pairs, in their own column
+            for col, cards in zip(self._setup_lr, self._setup_wide):
+                for w in cards:
+                    if w not in paired:
+                        col.addWidget(w)
+        for col in self._setup_lr:
             col.addStretch(1)
 
     def _setup_one_col(self) -> int:

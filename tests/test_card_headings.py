@@ -81,3 +81,18 @@ def test_setup_card_headings_line_up(window):  # noqa: F811
         # side by side: your mic and who's listening's titles on one line
         mic, dest = window._setup_top
         assert abs(titles[mic] - titles[dest]) <= 1, route
+
+
+def test_setup_card_pairs_share_top_and_bottom_with_the_eq_on_or_off(window):  # noqa: F811
+    """Devices and Equalizer and volume line up top and bottom whether the EQ's sliders
+    show or not (and so do your mic and who's listening)."""
+    _shown_setup(window, "mic")
+    for on in (False, True, False):
+        window.eq.chk_on.setChecked(on)
+        for _ in range(6):
+            QApplication.processEvents()
+            window._refit()
+        assert window.eq.body.isVisible() == on
+        for a, b in window._setup_pairs:
+            ga, gb = a.geometry(), b.geometry()
+            assert ga.top() == gb.top() and ga.bottom() == gb.bottom(), on

@@ -1189,6 +1189,8 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
         if not window._setup_stacked:
             assert mic.y() == dest.y() and mic.geometry().right() < dest.x()
             assert mic.height() == dest.height()   # the top cards line up
+            for a, b in window._setup_pairs:   # each pair: same top, same bottom
+                assert a.y() == b.y() and a.height() == b.height()
             for w, over in ((window.dev_card, mic), (window.helpcard, mic),
                             (window.eq_card, dest)):   # each as wide as the card above
                 if not w.isHidden():
