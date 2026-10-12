@@ -2223,6 +2223,17 @@ class MainWindow(QMainWindow):
         self.card_meter.setToolTip(_("Your mic"))
         top.addWidget(self.card_meter, 0, Qt.AlignmentFlag.AlignVCenter)   # by its name
         top.addStretch(1)
+        # working: a fresh copy or off, right here (Settings → Audio has every mic)
+        from soundboard.ui.audiorecovery import explanation
+        self.btn_micredo = QPushButton(_("Reinstall"))
+        self.btn_micredo.setProperty("quiet", True)
+        self.btn_micredo.setToolTip(explanation("reinstall"))
+        self.btn_micredo.clicked.connect(lambda: self._ask_mic_effect("reinstall"))
+        self.btn_micoff = QPushButton(_("Remove"))
+        self.btn_micoff.setObjectName("danger")
+        self.btn_micoff.setProperty("quiet", True)
+        self.btn_micoff.setToolTip(explanation("remove"))
+        self.btn_micoff.clicked.connect(lambda: self._ask_mic_effect("remove"))
         lines.addLayout(top)
         # line 2, when there's something to say or do: why, then the buttons
         self.mic_reason = QLabel()
@@ -2232,6 +2243,9 @@ class MainWindow(QMainWindow):
         lines.addWidget(self.mic_reason)
         self.mic_ways = Flow(gap=8)
         lines.addLayout(self.mic_ways)
+        for b in (self.btn_micredo, self.btn_micoff):   # (under the line: wraps when narrow)
+            b.hide()
+            self.mic_ways.addWidget(b)
         box.hide()
         self._mic_icon = None
         self._ways_in = None   # which row the set-up buttons are in (_place_ways)
@@ -3568,6 +3582,10 @@ class MainWindow(QMainWindow):
             self.setup_show.start()
         if not mic_busy:
             self._show_bun = False
+        effect_on = (mic_route and not mic_busy and not self.setup_show.on
+                     and directmic.works(direct))
+        self.btn_micredo.setVisible(effect_on)
+        self.btn_micoff.setVisible(effect_on)
         said = self._done_toast
         if said and not mic_busy:
             self._done_toast = None
@@ -4000,6 +4018,21 @@ class MainWindow(QMainWindow):
             self.toast(_("{value} still uses the virtual cable as its mic. It still hears you, "
                          "but you can set its input back to your normal mic: your sounds are in "
                          "it now.", value=heard[0][1]))
+
+    def _ask_mic_effect(self, action: str):
+        """The status box's Reinstall / Remove: Settings' audio recovery, on this mic,
+        after the same are-you-sure box."""
+        from soundboard.ui import audiorecovery
+        recovery = audiorecovery.recovery_of(self)
+        if recovery.running or self._attaching:
+            return
+
+        def go_on(dialog):
+            if recovery.start(action, None, say_done=True):
+                dialog.accept()
+                self._update_flow()
+        audiorecovery.ask(self, action, [audiorecovery.explanation(
+            action, self.cfg.mic_device or None)], go_on)
 
     def _pick_send_device(self):
         """Setup tab -> Another device: Devices' "Send my sounds to", opened."""

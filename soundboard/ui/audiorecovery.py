@@ -106,9 +106,10 @@ class Recovery(QObject):
         self.running = False
         self.finished.connect(self._finished)
 
-    def start(self, action, target=None):
+    def start(self, action, target=None, say_done=False):
         """Run `action` on the mic `target` (a directmic.mics() entry), or, without
-        one, on the app's mic (remove: off every mic)."""
+        one, on the app's mic (remove: off every mic). `say_done`: a toast when it
+        worked too (the Setup tab has no line of its own for it)."""
         if self.running or self.mw._attaching:
             return False
         mic = self.mw.cfg.mic_device
@@ -120,6 +121,7 @@ class Recovery(QObject):
             return False
         self.running = True
         self.target = target
+        self.say_done = say_done
         self.mw._attaching = True
         threading.Thread(target=self._work, args=(action, mic, target), daemon=True,
                          name="audio-recovery").start()
@@ -177,6 +179,65 @@ class Recovery(QObject):
             self.mw._when_devices_free(lambda: self.mw._refresh_off_ui())
         if err:
             self.mw.toast(_("{error}", error=err), "warn")
+        elif getattr(self, "say_done", False):
+            self.mw.toast(_("Mic effect removed") if action == "remove" else
+                          _("Mic effect reinstalled. Test it in your voice chat."), "ok")
+
+
+def recovery_of(mw):
+    """The main window's one Recovery (Settings' card and the Setup tab share it)."""
+    if not hasattr(mw, "audio_recovery"):
+        mw.audio_recovery = Recovery(mw)
+    return mw.audio_recovery
+
+
+def ask(parent, action, lines, go_on):
+    """The are-you-sure box for `action`: `lines` say what it does, then what Windows
+    and the audio will do. `go_on(dialog)` runs on its button. Returns the box (open)."""
+    d = QDialog(parent)
+    d.setWindowTitle(action_text(action))
+    d.setMaximumWidth(620)
+    v = QVBoxLayout(d)
+    v.setContentsMargins(18, 18, 18, 18)
+    v.setSpacing(12)
+    title = QLabel(action_text(action))
+    title.setObjectName("helptitle")
+    v.addWidget(title)
+    lines = list(lines)
+    # the mic helper does it without Windows' prompt (setting up: only with this
+    # app's own mic effect in it)
+    prompts = michelper.will_ask(action in INSTALLS)
+    lines.append(
+        (_("If anything is found, Windows will ask for permission and audio will "
+           "briefly stop.") if prompts else
+         _("If anything is found, audio will briefly stop.")) if action == "cleanup" else
+        _("Windows will ask for permission. Audio will briefly stop, "
+          "including calls and games.") if prompts else
+        _("Audio will briefly stop, including calls and games."))
+    for text in lines:
+        label = QLabel(text)
+        label.setWordWrap(True)
+        v.addWidget(label)
+    kept = QLabel(_("Your sounds and settings are kept."))
+    kept.setObjectName("hint")
+    kept.setWordWrap(True)
+    v.addWidget(kept)
+    row = QHBoxLayout()
+    row.setSpacing(8)
+    row.addStretch(1)
+    go = QPushButton(action_text(action))
+    go.setObjectName("danger" if action == "remove" else "primary")
+    go.setDefault(True)
+    go.clicked.connect(lambda: go_on(d))
+    cancel = QPushButton(_("Cancel"))
+    cancel.clicked.connect(d.reject)
+    row.addWidget(go)
+    row.addWidget(cancel)
+    v.addLayout(row)
+    fit.watch(d)
+    d.finished.connect(d.deleteLater)
+    d.open()
+    return d
 
 
 class MicRow(QFrame):
@@ -253,9 +314,7 @@ class RecoveryCard(QFrame):
     def __init__(self, mw, parent=None):
         super().__init__(parent)
         self.mw = mw
-        if not hasattr(mw, "audio_recovery"):
-            mw.audio_recovery = Recovery(mw)
-        self.recovery = mw.audio_recovery
+        self.recovery = recovery_of(mw)
         self.mics = []      # directmic.mics(): one row each
         self._state = ""    # the app's mic, for when Windows lists no mics
         self._shown = None  # what the rows show, so a check that changed nothing keeps them
@@ -403,16 +462,6 @@ class RecoveryCard(QFrame):
             return
         name = self.name_of(mic)
         target = mic if mic["guid"] else None   # unlisted: the app's mic, by name
-        d = QDialog(self.window())
-        self.dialog = d
-        d.setWindowTitle(action_text(action))
-        d.setMaximumWidth(620)
-        v = QVBoxLayout(d)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title = QLabel(action_text(action))
-        title.setObjectName("helptitle")
-        v.addWidget(title)
         lines = [explanation(action, name)]
         if target is not None and action in INSTALLS:
             moved = [self.name_of(m) for m in self.mics
@@ -427,39 +476,8 @@ class RecoveryCard(QFrame):
                 # its name is shared or unknown: the app can't switch to it by itself
                 lines.append(_("Your sounds go into {mic}. To use this mic instead, pick "
                                "it under Devices too.", mic=self.mw.cfg.mic_device))
-        # the mic helper does it without Windows' prompt (setting up: only with this
-        # app's own mic effect in it)
-        ask = michelper.will_ask(action in INSTALLS)
-        lines.append(
-            (_("If anything is found, Windows will ask for permission and audio will "
-               "briefly stop.") if ask else
-             _("If anything is found, audio will briefly stop.")) if action == "cleanup" else
-            _("Windows will ask for permission. Audio will briefly stop, "
-              "including calls and games.") if ask else
-            _("Audio will briefly stop, including calls and games."))
-        for text in lines:
-            label = QLabel(text)
-            label.setWordWrap(True)
-            v.addWidget(label)
-        kept = QLabel(_("Your sounds and settings are kept."))
-        kept.setObjectName("hint")
-        kept.setWordWrap(True)
-        v.addWidget(kept)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        row.addStretch(1)
-        go = QPushButton(action_text(action))
-        go.setObjectName("danger" if action == "remove" else "primary")
-        go.setDefault(True)
-        go.clicked.connect(lambda: self._start(action, d, target, name))
-        cancel = QPushButton(_("Cancel"))
-        cancel.clicked.connect(d.reject)
-        row.addWidget(go)
-        row.addWidget(cancel)
-        v.addLayout(row)
-        fit.watch(d)
-        d.finished.connect(d.deleteLater)
-        d.open()
+        self.dialog = ask(self.window(), action, lines,
+                          lambda d: self._start(action, d, target, name))
 
     def _start(self, action, dialog, target, name):
         self._target_name = name
