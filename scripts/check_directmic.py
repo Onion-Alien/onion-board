@@ -18,6 +18,7 @@ What's switched off, and why:
 """
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import subprocess
@@ -53,13 +54,16 @@ def run(cmd: list[str], label: str) -> bool:
 
 
 def find_cppcheck(gxx: str | None) -> str | None:
+    """A full install first: the copy some MinGW builds put next to g++ (GitHub's
+    runner image) can't find its own std.cfg."""
+    for p in (os.environ.get("CPPCHECK"), r"C:\Program Files\Cppcheck\cppcheck.exe",
+              shutil.which("cppcheck")):
+        if p and Path(p).is_file():
+            return p
     if gxx:
         beside = Path(gxx).with_name("cppcheck.exe")
         if beside.is_file():
             return str(beside)
-    for p in (shutil.which("cppcheck"), r"C:\Program Files\Cppcheck\cppcheck.exe"):
-        if p and Path(p).is_file():
-            return p
     return None
 
 
