@@ -117,10 +117,11 @@ improvement, not broken behavior; verify = coverage still needed before a fix.
 
 ### Setup: start here
 
-- [ ] **U29 (polish): Setup heading indents differ.** Your virtual mic has a leading
-  icon and indented title; Who's listening starts directly with text; fold headers
-  use a third icon/title treatment. Normalize heading icon slots and title offsets
-  without changing what the cards contain. Target: Setup card headings / FoldCard.
+- [ ] **U29 (polish): Setup heading indents differ.** Every Setup card heading now
+  comes from `heading_row()` (same height, icon/ⓘ/pill on the cap height, measured
+  by `tests/test_card_headings.py`) and nothing folds any more. Left: Who's listening
+  has no heading icon, so its title starts further left than the others. Target:
+  Who's listening's `card(..., icon=...)`.
 
 ### Shared rail and bottom controls
 

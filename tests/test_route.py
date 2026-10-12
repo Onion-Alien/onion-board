@@ -239,7 +239,6 @@ def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  #
     win.show()
     win.resize(1900, 1000)
     win.tabs.setCurrentWidget(win.setup_page)
-    win.dev_fold.set_open(True)   # (shut, the Devices row hides its grid)
     win.also_rows.add.click()
     qapp.processEvents()
     minus = win.also_rows.widgets[-1]

@@ -68,6 +68,9 @@ Before the first edit, every task: latest `origin/main` and the open PRs
 - Sidebar edge drag has three states, no steps between: shut below halfway (one icon
   column, centred), mid from halfway (names; what doesn't fit is hidden or kept
   small), full once everything fits (`_full_fit`). Attention dots sit on their icon.
+- Card headings come from `card()` / `heading_row()` only, every part centred on the
+  title's cap height from the font, never `AlignVCenter` or a margin found by eye
+  (DESIGN section 4, *Card headings*). `tests/test_card_headings.py` measures the ink.
 - Add regression checks for a reported layout defect, and run them before committing.
   Do not treat a partial spacing adjustment as completion of the screen's review.
 - Moving a widget between layouts (re-stacking columns, reflowing a grid): take it out

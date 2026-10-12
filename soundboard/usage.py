@@ -192,8 +192,6 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"voice-tab-{k}" for k in VOICE_TABS), "translate-on",
             # Radio: a station played, a station that wouldn't play, the list down
             "radio-played", "radio-failed", "radio-list-down",
-            # the Setup tab's folded cards opened by a click
-            *(f"setup-opened-{k}" for k in ("chat", "devices", "sound")),
             # Settings' Audio recovery: what was run on a mic, and it failing
             *(f"recovery-{k}" for k in RECOVERY), "recovery-failed",
             # a file import stopped from its card; an import that skipped some files

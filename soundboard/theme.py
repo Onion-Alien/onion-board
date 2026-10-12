@@ -644,9 +644,6 @@ QPushButton { background:$btn; border:1px solid transparent; border-radius:8px; 
 QPushButton[quiet="true"] { background:transparent; }
 QPushButton[quiet="true"]:hover { background:$btn_hover; }
 QPushButton[quiet="true"]:pressed { background:$btn_press; }
-QFrame#card QPushButton#foldhead { background:transparent; border:1px solid transparent; border-radius:8px; padding:0; text-align:left; }
-QFrame#card QPushButton#foldhead:hover { background:$btn_hover; }
-QFrame#card QPushButton#foldhead:focus { border-color:$accent; }
 QPushButton:hover { background:$btn_hover; }
 QPushButton:focus { border-color:$accent; }
 QPushButton#iconbutton { padding:7px 10px; min-width:18px; }
