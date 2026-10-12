@@ -405,7 +405,6 @@
   "Stop hearing it": "停止监听",
   "Stop showing this for {exe}": "{exe} 不再显示这个",
   "Stop this sound": "停止这个音效",
-  "Stops every sound, the radio and every program": "停止所有音效、电台和所有程序",
   "Switched to “{shown}” ({exe} is in front)": "已切换到“{shown}”（{exe} 在前台）",
   "Tap to open, tap again to close": "点击打开，再点击关闭",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "磁带模式：变速也会变调（Nightcore / 慢速）",
@@ -1235,7 +1234,6 @@
   "Stop switching to “{category}” when {program} is in front": "{program} 在前台时不再切换到“{category}”",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "停止时在这段时间内淡出，而不是直接切断；不循环的音效在最后几秒也会淡出。“全部停止”仍然会立刻切断。",
   "Stops every sound": "停止所有音效",
-  "Stops every sound, the radio and every program.": "停止所有音效、电台和所有程序。",
   "Streamer guide": "主播指南",
   "Streamer guide: play sounds from your Stream Deck and chat": "主播指南：用 Stream Deck 和聊天播放音效",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "在直播，或者用多个应用？这里的每个设备也会收到一份别人听到的内容：Voicemeeter、OBS 采集的设备、第二根音频线、扬声器...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "即使重启了 Windows 的音频，你的麦克风仍然没有声音。如果耳机麦克风静音了，请取消静音。如果没有，请重启电脑，然后再试一次。",
   "Your mic sends no sound: see the Setup tab.": "你的麦克风没有声音：请查看设置标签页。",
   "Before update": "更新前",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重置东西或更新应用时都会保存一个（保留最近 {max_points} 个）。还原会把你的设置、快捷键和音效恢复原样。之后添加的音效会保留。"
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重置东西或更新应用时都会保存一个（保留最近 {max_points} 个）。还原会把你的设置、快捷键和音效恢复原样。之后添加的音效会保留。",
+  "Stops every sound, the radio and every program, and turns the voices off": "停止所有音效、电台和所有程序，并关闭变声",
+  "Stops every sound, the radio and every program, and turns the voices off.": "停止所有音效、电台和所有程序，并关闭变声。"
 }

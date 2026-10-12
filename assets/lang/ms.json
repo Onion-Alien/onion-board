@@ -1090,8 +1090,6 @@
   "Stop this sound": "Hentikan bunyi ini",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Menghentikannya akan memudarkannya dalam tempoh ini dan bukan memotongnya; bunyi yang tidak berulang juga pudar dalam saat-saat terakhirnya. Hentikan semua tetap memotong serta-merta.",
   "Stops every sound": "Menghentikan setiap bunyi",
-  "Stops every sound, the radio and every program": "Menghentikan setiap bunyi, radio dan setiap program",
-  "Stops every sound, the radio and every program.": "Menghentikan setiap bunyi, radio dan setiap program.",
   "Streamer guide": "Panduan penstrim",
   "Streamer guide: play sounds from your Stream Deck and chat": "Panduan penstrim: mainkan bunyi dari Stream Deck dan sembang anda",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Strim, atau guna lebih daripada satu aplikasi? Setiap peranti di sini juga mendapat salinan apa yang orang lain dengar: Voicemeeter, peranti yang dirakam OBS, kabel kedua, pembesar suara...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikrofon anda tidak menghantar bunyi, walaupun selepas audio Windows dimulakan semula. Jika mikrofon set kepala anda diredamkan, nyahredamkannya. Jika tidak, mulakan semula PC anda, kemudian cuba lagi.",
   "Your mic sends no sound: see the Setup tab.": "Mikrofon anda tidak menghantar bunyi: lihat tab Persediaan.",
   "Before update": "Sebelum kemas kini",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali anda menetapkan semula sesuatu atau mengemas kini apl ({max_points} terakhir dikekalkan). Memulihkan mengembalikan tetapan, hotkey dan bunyi anda seperti dahulu. Bunyi yang anda tambah sejak itu dikekalkan."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali anda menetapkan semula sesuatu atau mengemas kini apl ({max_points} terakhir dikekalkan). Memulihkan mengembalikan tetapan, hotkey dan bunyi anda seperti dahulu. Bunyi yang anda tambah sejak itu dikekalkan.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Menghentikan setiap bunyi, radio dan setiap program, dan mematikan suara",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Menghentikan setiap bunyi, radio dan setiap program, dan mematikan suara."
 }

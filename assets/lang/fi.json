@@ -1106,8 +1106,6 @@
   "Stop this sound": "Pysäytä tämä ääni",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Pysäytys häivyttää sen pois näin pitkän ajan kuluessa katkaisemisen sijaan; ääni, joka ei toistu silmukkana, häivytetään myös viimeisinä sekunteinaan. Pysäytä kaikki katkaisee silti heti.",
   "Stops every sound": "Pysäyttää kaikki äänet",
-  "Stops every sound, the radio and every program": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat",
-  "Stops every sound, the radio and every program.": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat.",
   "Streamer guide": "Streamaajan opas",
   "Streamer guide: play sounds from your Stream Deck and chat": "Streamaajan opas: soita ääniä Stream Deckistä ja chatista",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streamaatko tai käytätkö useampaa sovellusta? Jokainen laite tässä saa myös kopion siitä, mitä muut kuulevat: Voicemeeter, laite, jonka OBS kaappaa, toinen kaapeli, kaiuttimet...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikkisi ei lähetä ääntä edes Windowsin äänen uudelleenkäynnistyksen jälkeen. Jos kuulokkeidesi mikki on mykistetty, poista mykistys. Jos ei, käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
   "Your mic sends no sound: see the Setup tab.": "Mikkisi ei lähetä ääntä: katso Asetukset-välilehti.",
   "Before update": "Ennen päivitystä",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Sellainen tallennetaan aina, kun nollaat jotain tai päivität sovelluksen (viimeiset {max_points} säilytetään). Palautus laittaa asetuksesi, pikanäppäimesi ja äänesi takaisin ennalleen. Sen jälkeen lisäämäsi äänet säilyvät.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Pysäyttää kaikki äänet, radion ja kaikki ohjelmat ja sammuttaa äänimuuntimet."
 }

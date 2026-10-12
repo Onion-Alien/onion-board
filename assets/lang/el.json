@@ -1106,8 +1106,6 @@
   "Stop this sound": "Σταμάτα αυτόν τον ήχο",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Το σταμάτημα τον σβήνει σταδιακά σε τόσο χρόνο αντί να τον κόβει· ένας ήχος που δεν είναι σε επανάληψη σβήνει κι αυτός στα τελευταία του δευτερόλεπτα. Το Σταμάτα τα πάντα κόβει πάντα αμέσως.",
   "Stops every sound": "Σταματάει κάθε ήχο",
-  "Stops every sound, the radio and every program": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα",
-  "Stops every sound, the radio and every program.": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα.",
   "Streamer guide": "Οδηγός για streamers",
   "Streamer guide: play sounds from your Stream Deck and chat": "Οδηγός για streamers: παίξε ήχους από το Stream Deck και το chat σου",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Κάνεις stream ή χρησιμοποιείς πάνω από μία εφαρμογή; Κάθε συσκευή εδώ παίρνει κι αυτή αντίγραφο αυτού που ακούν οι άλλοι: Voicemeeter, μια συσκευή που καταγράφει το OBS, δεύτερο καλώδιο, ηχεία...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο, ακόμα και μετά από επανεκκίνηση του ήχου των Windows. Αν το μικρόφωνο των ακουστικών σου είναι σε σίγαση, βγάλ' το από τη σίγαση. Αν όχι, κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
   "Your mic sends no sound: see the Setup tab.": "Το μικρόφωνό σου δεν στέλνει ήχο: δες την καρτέλα Ρύθμιση.",
   "Before update": "Πριν την ενημέρωση",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Αποθηκεύεται ένα κάθε φορά που επαναφέρεις κάτι ή ενημερώνεις την εφαρμογή (κρατιούνται τα τελευταία {max_points}). Η ανάκτηση επαναφέρει τις ρυθμίσεις, τις συντομεύσεις και τους ήχους σου όπως ήταν. Οι ήχοι που πρόσθεσες από τότε μένουν."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Αποθηκεύεται ένα κάθε φορά που επαναφέρεις κάτι ή ενημερώνεις την εφαρμογή (κρατιούνται τα τελευταία {max_points}). Η ανάκτηση επαναφέρει τις ρυθμίσεις, τις συντομεύσεις και τους ήχους σου όπως ήταν. Οι ήχοι που πρόσθεσες από τότε μένουν.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα και κλείνει τις φωνές",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Σταματάει κάθε ήχο, το ραδιόφωνο και κάθε πρόγραμμα και κλείνει τις φωνές."
 }

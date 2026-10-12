@@ -411,7 +411,6 @@
   "Stop hearing it": "Dejar de oírlo",
   "Stop showing this for {exe}": "Dejar de mostrar esto con {exe}",
   "Stop this sound": "Parar este sonido",
-  "Stops every sound, the radio and every program": "Para todos los sonidos, la radio y todos los programas",
   "Switched to “{shown}” ({exe} is in front)": "Se cambió a “{shown}” ({exe} está delante)",
   "Tap to open, tap again to close": "Toca para abrir, toca otra vez para cerrar",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Modo cinta: la velocidad también cambia el tono (nightcore / slowed)",
@@ -1258,7 +1257,6 @@
   "Stop switching to “{category}” when {program} is in front": "Dejar de cambiar a “{category}” cuando {program} esté delante",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Al pararlo se desvanece durante este tiempo en vez de cortarse; un sonido que no se repite también se desvanece en sus últimos segundos. Parar todo sigue cortando al momento.",
   "Stops every sound": "Para todos los sonidos",
-  "Stops every sound, the radio and every program.": "Para todos los sonidos, la radio y todos los programas.",
   "Streamer guide": "Guía para streamers",
   "Streamer guide: play sounds from your Stream Deck and chat": "Guía para streamers: reproduce sonidos desde tu Stream Deck y el chat",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "¿Haces stream o usas más de una app? Cada dispositivo de aquí también recibe una copia de lo que oyen los demás: Voicemeeter, un dispositivo que capture OBS, un segundo cable, altavoces...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Tu micro no envía sonido, ni siquiera después de reiniciar el audio de Windows. Si el micro de tus cascos está silenciado, quita el silencio. Si no, reinicia el PC y vuelve a intentarlo.",
   "Your mic sends no sound: see the Setup tab.": "Tu micro no envía sonido: mira la pestaña Configuración.",
   "Before update": "Antes de actualizar",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo o actualizas la app (se conservan los últimos {max_points}). Restaurar devuelve tus ajustes, atajos y sonidos a como estaban. Los sonidos que hayas añadido desde entonces se conservan."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Se guarda uno cada vez que restableces algo o actualizas la app (se conservan los últimos {max_points}). Restaurar devuelve tus ajustes, atajos y sonidos a como estaban. Los sonidos que hayas añadido desde entonces se conservan.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Para todos los sonidos, la radio y todos los programas, y apaga las voces",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Para todos los sonidos, la radio y todos los programas, y apaga las voces."
 }

@@ -1033,8 +1033,6 @@
   "Stop this sound": "Спри този звук",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Спирането го заглушава плавно за толкова време, вместо да го реже; звук, който не се повтаря, също заглъхва в последните си секунди. Спри всичко пак реже веднага.",
   "Stops every sound": "Спира всеки звук",
-  "Stops every sound, the radio and every program": "Спира всеки звук, радиото и всяка програма",
-  "Stops every sound, the radio and every program.": "Спира всеки звук, радиото и всяка програма.",
   "Streamer guide": "Ръководство за стриймъри",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Стриймваш или ползваш повече от едно приложение? Всяко устройство тук също получава копие на това, което чуват другите: Voicemeeter, устройство, което OBS хваща, втори кабел, колони...",
   "Stuck, or want something fancier (a key per category, a random sound for every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it into ChatGPT or Claude: it knows how Onion Board's links work and which sounds you have, and walks you through it.": "Заби ли или искаш нещо по-сложно (клавиш за всяка категория, случаен звук за всеки нов последовател, AutoHotkey)? Кликни <b>Копирай AI подкана</b> и я постави в ChatGPT или Claude: тя знае как работят линковете на Onion Board и какви звуци имаш, и те води през всичко.",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Микрофонът ти не праща звук дори след рестарт на звука на Windows. Ако микрофонът на слушалките е заглушен, включи го. Ако не е, рестартирай компютъра и опитай пак.",
   "Your mic sends no sound: see the Setup tab.": "Микрофонът ти не праща звук: виж раздела Настройка.",
   "Before update": "Преди обновяването",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Запазва се по една всеки път, когато нулираш нещо или обновиш приложението (пазят се последните {max_points}). Възстановяването връща настройките, бързите клавиши и звуците ти, както са били. Звуците, които си добавил оттогава, се пазят.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Спира всеки звук, радиото и всяка програма и изключва гласовете",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Спира всеки звук, радиото и всяка програма и изключва гласовете."
 }

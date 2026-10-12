@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 HOTKEY_GROUPS = [
     (_("Sounds"), [
         ("stop_hotkey", "__stop__", _("Stop everything"),
-         _("Stops every sound, the radio and every program.")),
+         _("Stops every sound, the radio and every program, and turns the voices off.")),
         ("pause_hotkey", "__pause__", _("Pause / resume sounds"),
          _("Pauses everything playing; press again to carry on.")),
         ("random_hotkey", "__random__", _("Play a random sound"),

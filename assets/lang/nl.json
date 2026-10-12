@@ -411,7 +411,6 @@
   "Stop hearing it": "Niet meer horen",
   "Stop showing this for {exe}": "Dit niet meer tonen voor {exe}",
   "Stop this sound": "Dit geluid stoppen",
-  "Stops every sound, the radio and every program": "Stopt alle geluiden, de radio en alle programma's",
   "Switched to “{shown}” ({exe} is in front)": "Overgeschakeld naar “{shown}” ({exe} staat vooraan)",
   "Tap to open, tap again to close": "Tik om te openen, tik nog eens om te sluiten",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Cassettemodus: snelheid verandert ook de toonhoogte (nightcore / slowed)",
@@ -1260,7 +1259,6 @@
   "Stop switching to “{category}” when {program} is in front": "Stop met het overschakelen naar “{category}” wanneer {program} vooraan staat",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Als je het stopt, vervaagt het zo lang in plaats van het af te snijden; een geluid dat niet in een lus zit, vervaagt ook gedurende de laatste seconden. Stop met alles wat nog steeds meteen snijdt.",
   "Stops every sound": "Stopt elk geluid",
-  "Stops every sound, the radio and every program.": "Stopt elk geluid, de radio en elk programma.",
   "Streamer guide": "Streamer-gids",
   "Streamer guide: play sounds from your Stream Deck and chat": "Streamergids: speel geluiden af ​​vanaf uw Stream Deck en chat",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streamen of meer dan één app gebruiken? Elk apparaat hier krijgt ook een kopie van wat anderen horen: Voicemeeter, een apparaat dat OBS vastlegt, een tweede kabel, luidsprekers...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Je mic stuurt geen geluid, zelfs niet na een herstart van het Windows-geluid. Is de mic van je headset gedempt, zet dat dan uit. Zo niet, start je pc opnieuw op en probeer het nog eens.",
   "Your mic sends no sound: see the Setup tab.": "Je mic stuurt geen geluid: kijk op het tabblad Instellen.",
   "Before update": "Vóór de update",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Elke keer dat u iets reset of de app bijwerkt, wordt er één opgeslagen (de laatste {max_points} blijven behouden). Bij het herstellen worden uw instellingen, sneltoetsen en geluiden teruggezet zoals ze waren. Geluiden die u sindsdien heeft toegevoegd, blijven behouden."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Elke keer dat u iets reset of de app bijwerkt, wordt er één opgeslagen (de laatste {max_points} blijven behouden). Bij het herstellen worden uw instellingen, sneltoetsen en geluiden teruggezet zoals ze waren. Geluiden die u sindsdien heeft toegevoegd, blijven behouden.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Stopt alle geluiden, de radio en alle programma's en zet de stemmen uit",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Stopt alle geluiden, de radio en alle programma's en zet de stemmen uit."
 }

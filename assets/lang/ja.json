@@ -405,7 +405,6 @@
   "Stop hearing it": "聞くのをやめる",
   "Stop showing this for {exe}": "{exe} でこれを表示しない",
   "Stop this sound": "このサウンドを停止",
-  "Stops every sound, the radio and every program": "すべてのサウンド、ラジオ、プログラムを停止します",
   "Switched to “{shown}” ({exe} is in front)": "「{shown}」に切り替えました（{exe} が前面）",
   "Tap to open, tap again to close": "タップで開く、もう一度タップで閉じる",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "テープモード: 速度を変えるとピッチも変わる（ナイトコア / スロー）",
@@ -1237,7 +1236,6 @@
   "Stop switching to “{category}” when {program} is in front": "{program}が前にあるときに「{category}」への切り替えを停止する",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "停止すると、カットされるのではなく、この期間にわたってフェードアウトします。ループしていないサウンドも、最後の数秒で消えてしまいます。すべてがまだすぐに切れるのをやめてください。",
   "Stops every sound": "あらゆる音を止める",
-  "Stops every sound, the radio and every program.": "すべての音、ラジオ、すべてのプログラムを停止します。",
   "Streamer guide": "ストリーマーガイド",
   "Streamer guide: play sounds from your Stream Deck and chat": "ストリーマー ガイド：ストリーム デッキからサウンドを再生してチャットします",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "ストリーミング、または複数のアプリを使用していますか?ここの各デバイスは、他のデバイスでも聞こえる音のコピーを取得します。Voicemeeter、OBS がキャプチャするデバイス、2 番目のケーブル、スピーカー...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows のオーディオを再起動しても、マイクから音が出ていません。ヘッドセットのマイクがミュートになっていれば解除してください。そうでなければ PC を再起動してから、もう一度お試しください。",
   "Your mic sends no sound: see the Setup tab.": "マイクから音が出ていません: セットアップ タブを確認してください。",
   "Before update": "更新前",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットしたりアプリを更新したりするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。"
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットしたりアプリを更新したりするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。",
+  "Stops every sound, the radio and every program, and turns the voices off": "すべてのサウンド、ラジオ、プログラムを停止し、ボイスをオフにします",
+  "Stops every sound, the radio and every program, and turns the voices off.": "すべてのサウンド、ラジオ、プログラムを停止し、ボイスをオフにします。"
 }

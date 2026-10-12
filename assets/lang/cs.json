@@ -1122,8 +1122,6 @@
   "Stop this sound": "Zastavit tento zvuk",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Zastavení ho během této doby ztlumí místo useknutí; zvuk, který se neopakuje, se taky ztlumí během posledních sekund. Zastavit všechno pořád utne hned.",
   "Stops every sound": "Zastaví všechny zvuky",
-  "Stops every sound, the radio and every program": "Zastaví všechny zvuky, rádio a všechny programy",
-  "Stops every sound, the radio and every program.": "Zastaví všechny zvuky, rádio a všechny programy.",
   "Streamer guide": "Průvodce pro streamery",
   "Streamer guide: play sounds from your Stream Deck and chat": "Průvodce pro streamery: přehrávej zvuky ze Stream Decku a z chatu",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streamuješ, nebo používáš víc aplikací? Každé zařízení tady dostane taky kopii toho, co slyší ostatní: Voicemeeter, zařízení, které zachytává OBS, druhý kabel, reproduktory...",
@@ -3363,5 +3361,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk ani po restartu zvuku Windows. Jestli máš mikrofon na sluchátkách ztlumený, zapni ho. Jestli ne, restartuj počítač a zkus to znovu.",
   "Your mic sends no sound: see the Setup tab.": "Tvůj mikrofon neposílá žádný zvuk: podívej se na kartu Nastavení.",
   "Before update": "Před aktualizací",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ nebo aktualizuješ aplikaci (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Ukládá se pokaždé, když něco resetuješ nebo aktualizuješ aplikaci (posledních {max_points} se uchovává). Obnovení vrátí tvoje nastavení, zkratky a zvuky, jak byly. Zvuky přidané od té doby zůstanou.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Zastaví všechny zvuky, rádio a všechny programy a vypne hlasy",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Zastaví všechny zvuky, rádio a všechny programy a vypne hlasy."
 }

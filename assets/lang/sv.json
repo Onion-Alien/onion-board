@@ -1106,8 +1106,6 @@
   "Stop this sound": "Stoppa det här ljudet",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Att stoppa det tonar ut det under så här lång tid i stället för att klippa det; ett ljud som inte loopar tonar också ut under sina sista sekunder. Stoppa allt klipper fortfarande direkt.",
   "Stops every sound": "Stoppar alla ljud",
-  "Stops every sound, the radio and every program": "Stoppar alla ljud, radion och alla program",
-  "Stops every sound, the radio and every program.": "Stoppar alla ljud, radion och alla program.",
   "Streamer guide": "Streamerguide",
   "Streamer guide: play sounds from your Stream Deck and chat": "Streamerguide: spela ljud från din Stream Deck och chatten",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streamar du, eller använder mer än en app? Varje enhet här får också en kopia av det andra hör: Voicemeeter, en enhet som OBS fångar, en andra kabel, högtalare...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Mikrofonen skickar inget ljud, inte ens efter en omstart av ljudet i Windows. Om mikrofonen på ditt headset är avstängd, slå på den. Om inte, starta om datorn och försök igen.",
   "Your mic sends no sound: see the Setup tab.": "Mikrofonen skickar inget ljud: titta på fliken Inställning.",
   "Before update": "Före uppdatering",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "En sparas varje gång du återställer något eller uppdaterar appen (de senaste {max_points} behålls). Att återställa lägger tillbaka dina inställningar, snabbtangenter och ljud som de var. Ljud du lagt till sedan dess behålls."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "En sparas varje gång du återställer något eller uppdaterar appen (de senaste {max_points} behålls). Att återställa lägger tillbaka dina inställningar, snabbtangenter och ljud som de var. Ljud du lagt till sedan dess behålls.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Stoppar alla ljud, radion och alla program och stänger av rösterna",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Stoppar alla ljud, radion och alla program och stänger av rösterna."
 }

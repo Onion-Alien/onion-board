@@ -1106,8 +1106,6 @@
   "Stop this sound": "A hang leállítása",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Leállításkor ennyi idő alatt úsztatja le levágás helyett; a nem ismétlődő hang az utolsó másodperceiben is leúszik. A Minden leállítása továbbra is azonnal vág.",
   "Stops every sound": "Minden hangot leállít",
-  "Stops every sound, the radio and every program": "Minden hangot, a rádiót és minden programot leállít",
-  "Stops every sound, the radio and every program.": "Minden hangot, a rádiót és minden programot leállít.",
   "Streamer guide": "Streamer-útmutató",
   "Streamer guide: play sounds from your Stream Deck and chat": "Streamer-útmutató: hangok lejátszása a Stream Deckről és a chatből",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streamelsz, vagy több appot használsz? Minden itteni eszköz is kap egy másolatot abból, amit mások hallanak: Voicemeeter, egy eszköz, amit az OBS rögzít, egy második kábel, hangszórók...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "A mikrofonod a Windows hangjának újraindítása után sem küld hangot. Ha a headseted mikrofonja le van némítva, kapcsold vissza. Ha nem, indítsd újra a géped, aztán próbáld újra.",
   "Your mic sends no sound: see the Setup tab.": "A mikrofonod nem küld hangot: nézd meg a Beállítás fület.",
   "Before update": "Frissítés előtt",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor és az app minden frissítésekor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Minden alaphelyzetbe állításkor és az app minden frissítésekor készül egy (az utolsó {max_points} marad meg). A helyreállítás visszateszi a beállításaidat, gyorsbillentyűidet és hangjaidat, ahogy voltak. Az azóta hozzáadott hangok megmaradnak.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Minden hangot, a rádiót és minden programot leállít, és kikapcsolja a hangokat",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Minden hangot, a rádiót és minden programot leállít, és kikapcsolja a hangokat."
 }

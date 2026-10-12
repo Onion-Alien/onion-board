@@ -405,7 +405,6 @@
   "Stop hearing it": "หยุดฟัง",
   "Stop showing this for {exe}": "เลิกแสดงสิ่งนี้สำหรับ {exe}",
   "Stop this sound": "หยุดเสียงนี้",
-  "Stops every sound, the radio and every program": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม",
   "Switched to “{shown}” ({exe} is in front)": "สลับไปที่ “{shown}” ({exe} อยู่ด้านหน้า)",
   "Tap to open, tap again to close": "แตะเพื่อเปิด แตะอีกครั้งเพื่อปิด",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "โหมดเทป: ความเร็วเปลี่ยนพิตช์ด้วย (nightcore / slowed)",
@@ -1237,7 +1236,6 @@
   "Stop switching to “{category}” when {program} is in front": "หยุดเปลี่ยนเป็น “{category}” เมื่อ {program} อยู่ข้างหน้า",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "การหยุดมันจะทำให้มันจางหายไปในระยะยาวแทนที่จะตัดมัน เสียงที่ไม่วนซ้ำจะจางหายไปในวินาทีสุดท้ายด้วย หยุดทุกอย่างที่ยังคงตัดทันที",
   "Stops every sound": "หยุดทุกเสียง",
-  "Stops every sound, the radio and every program.": "หยุดทุกเสียง วิทยุ และทุกรายการ",
   "Streamer guide": "คู่มือสตรีมเมอร์",
   "Streamer guide: play sounds from your Stream Deck and chat": "คู่มือสตรีมเมอร์: เล่นเสียงจาก Stream Deck ของคุณและแชท",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "สตรีมมิ่งหรือใช้มากกว่าหนึ่งแอป? อุปกรณ์แต่ละชิ้นที่นี่จะได้รับสำเนาของสิ่งที่คนอื่นได้ยินเช่นกัน: Voicemeeter, อุปกรณ์ที่จับภาพ OBS, สายเคเบิลเส้นที่สอง, ลำโพง...",
@@ -3217,5 +3215,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา แม้จะรีสตาร์ทเสียงของ Windows แล้ว ถ้าไมค์ของหูฟังปิดเสียงอยู่ ให้เปิดเสียง ถ้าไม่ได้ปิด ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
   "Your mic sends no sound: see the Setup tab.": "ไมค์ของคุณไม่ส่งเสียงออกมา: ดูที่แท็บตั้งค่า",
   "Before update": "ก่อนอัปเดต",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งหรืออัปเดตแอป (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้"
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งหรืออัปเดตแอป (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้",
+  "Stops every sound, the radio and every program, and turns the voices off": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์",
+  "Stops every sound, the radio and every program, and turns the voices off.": "หยุดทุกเสียง วิทยุ และทุกโปรแกรม แล้วปิดเสียงพากย์"
 }

@@ -411,7 +411,6 @@
   "Stop hearing it": "सुनना बंद करें",
   "Stop showing this for {exe}": "{exe} के लिए यह दिखाना बंद करें",
   "Stop this sound": "यह साउंड रोकें",
-  "Stops every sound, the radio and every program": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है",
   "Switched to “{shown}” ({exe} is in front)": "“{shown}” पर बदला ({exe} सामने है)",
   "Tap to open, tap again to close": "खोलने के लिए टैप करें, बंद करने के लिए फिर टैप करें",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "टेप मोड: स्पीड से पिच भी बदलती है (नाइटकोर / स्लोड)",
@@ -1260,7 +1259,6 @@
   "Stop switching to “{category}” when {program} is in front": "जब {program} सामने हो तो “{category}” पर स्विच करना बंद करें",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "इसे रोकने से यह कटने के बजाय इतनी देर में फीका पड़ जाता है; जो ध्वनि लूपिंग नहीं कर रही है वह भी अपने अंतिम सेकंड में फीकी पड़ जाती है। सब कुछ बंद करो फिर भी तुरंत कट जाता है।",
   "Stops every sound": "हर आवाज को रोक देता है",
-  "Stops every sound, the radio and every program.": "हर ध्वनि, रेडियो और हर कार्यक्रम को रोक देता है।",
   "Streamer guide": "स्ट्रीमर गाइड",
   "Streamer guide: play sounds from your Stream Deck and chat": "स्ट्रीमर गाइड - अपने स्ट्रीम डेक से ध्वनियाँ चलाएँ और चैट करें",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "स्ट्रीमिंग, या एक से अधिक ऐप का उपयोग? यहां प्रत्येक डिवाइस को दूसरे जो सुनते हैं उसकी एक प्रति मिलती है: वॉयसमीटर, एक डिवाइस ओबीएस कैप्चर, एक दूसरा केबल, स्पीकर...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Windows का ऑडियो फिर से शुरू करने के बाद भी आपका माइक कोई आवाज़ नहीं भेज रहा। अगर आपके हेडसेट का माइक म्यूट है, तो उसे अनम्यूट करें। अगर नहीं, तो अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
   "Your mic sends no sound: see the Setup tab.": "आपका माइक कोई आवाज़ नहीं भेज रहा: सेटअप टैब देखें।",
   "Before update": "अपडेट से पहले",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं या ऐप अपडेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।"
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं या ऐप अपडेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।",
+  "Stops every sound, the radio and every program, and turns the voices off": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है",
+  "Stops every sound, the radio and every program, and turns the voices off.": "हर साउंड, रेडियो और हर प्रोग्राम रोक देता है, और आवाज़ें बंद कर देता है।"
 }

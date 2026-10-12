@@ -2925,6 +2925,14 @@ class VoicePanel(QWidget):
         if on:
             self.ai.stop()
 
+    def stop_all(self):
+        """The window's Stop all: the typed line stops and every voice goes off (the
+        voice changer, the AI voice and the computer voice)."""
+        self.controller.stop_speaking()
+        self.ai.stop()
+        self.speech.b_live.setChecked(False)
+        self.fx.btn_power.setChecked(False)   # its toggled handler applies it
+
     def is_active(self) -> bool:
         """Something here is changing what others hear from your mic."""
         return (self.fx.btn_power.isChecked() or self.speech.b_live.isChecked()

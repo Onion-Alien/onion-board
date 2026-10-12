@@ -417,7 +417,6 @@
   "Stop hearing it": "Більше не слухати",
   "Stop showing this for {exe}": "Більше не показувати це для {exe}",
   "Stop this sound": "Зупинити цей звук",
-  "Stops every sound, the radio and every program": "Зупиняє всі звуки, радіо й усі програми",
   "Switched to “{shown}” ({exe} is in front)": "Перемкнуто на «{shown}» ({exe} на передньому плані)",
   "Tap to open, tap again to close": "Торкнись: відкрити, ще раз: закрити",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Режим касети: швидкість змінює й висоту (nightcore / slowed)",
@@ -1283,7 +1282,6 @@
   "Stop switching to “{category}” when {program} is in front": "Припиніть перемикання на “{category}”, коли {program} попереду",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Зупинка зникає протягом цього часу, а не скорочується; звук, який не повторюється, також слабшає протягом останніх секунд. Негайно зупиніть усе, що ще скорочується.",
   "Stops every sound": "Зупиняє кожен звук",
-  "Stops every sound, the radio and every program.": "Зупиняє кожен звук, радіо та кожну програму.",
   "Streamer guide": "Керівництво по стримеру",
   "Streamer guide: play sounds from your Stream Deck and chat": "Керівництво Streamer: відтворюйте звуки зі своєї Stream Deck і спілкуйтеся",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Потокове передавання чи використання кількох програм? Кожен пристрій тут отримує копію того, що чують інші: Voicemeeter, пристрій, який записує OBS, другий кабель, динаміки...",
@@ -3363,5 +3361,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Мікрофон не передає звук навіть після перезапуску звуку Windows. Якщо мікрофон на гарнітурі вимкнено, увімкни його. Якщо ні, перезавантаж ПК і спробуй ще раз.",
   "Your mic sends no sound: see the Setup tab.": "Мікрофон не передає звук: глянь вкладку «Налаштування».",
   "Before update": "Перед оновленням",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте або оновлюєте застосунок (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Один зберігається щоразу, коли ви щось скидаєте або оновлюєте застосунок (останні {max_points} зберігаються). Відновлення повертає ваші налаштування, гарячі клавіші та звуки, як вони були. Звуки, які ви додали після того, зберігаються.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Зупиняє всі звуки, радіо й усі програми та вимикає голоси",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Зупиняє всі звуки, радіо й усі програми та вимикає голоси."
 }

@@ -1106,8 +1106,6 @@
   "Stop this sound": "Parar este som",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Parar faz-lhe um fade out durante este tempo em vez de o cortar; um som que não está em repetição também faz fade nos últimos segundos. Parar tudo continua a cortar de imediato.",
   "Stops every sound": "Para todos os sons",
-  "Stops every sound, the radio and every program": "Para todos os sons, o rádio e todos os programas",
-  "Stops every sound, the radio and every program.": "Para todos os sons, o rádio e todos os programas.",
   "Streamer guide": "Guia para streamers",
   "Streamer guide: play sounds from your Stream Deck and chat": "Guia para streamers: toca sons a partir do teu Stream Deck e do chat",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "A fazer stream, ou a usar mais do que uma app? Cada dispositivo aqui também recebe uma cópia do que os outros ouvem: Voicemeeter, um dispositivo que o OBS capte, um segundo cabo, colunas...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "O teu microfone não está a enviar som, mesmo depois de reiniciar o áudio do Windows. Se o microfone dos teus auscultadores estiver silenciado, tira o silêncio. Se não, reinicia o PC e tenta outra vez.",
   "Your mic sends no sound: see the Setup tab.": "O teu microfone não está a enviar som: vê o separador Configuração.",
   "Before update": "Antes de atualizar",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "É guardado um sempre que repões alguma coisa ou atualizas a app (os últimos {max_points} são mantidos). Restaurar repõe as tuas definições, atalhos e sons como estavam. Os sons que adicionaste desde então são mantidos."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "É guardado um sempre que repões alguma coisa ou atualizas a app (os últimos {max_points} são mantidos). Restaurar repõe as tuas definições, atalhos e sons como estavam. Os sons que adicionaste desde então são mantidos.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Para todos os sons, o rádio e todos os programas, e desliga as vozes",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Para todos os sons, o rádio e todos os programas, e desliga as vozes."
 }

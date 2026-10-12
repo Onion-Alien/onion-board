@@ -1106,8 +1106,6 @@
   "Stop this sound": "Stop denne lyd",
   "Stopping it fades it out over this long instead of cutting it; a sound that isn't looping also fades over its last seconds. Stop everything still cuts straight away.": "Når du stopper den, fader den ud over så lang tid i stedet for at blive skåret af; en lyd, der ikke gentages, fader også ud over sine sidste sekunder. Stop alt skærer stadig af med det samme.",
   "Stops every sound": "Stopper alle lyde",
-  "Stops every sound, the radio and every program": "Stopper alle lyde, radioen og alle programmer",
-  "Stops every sound, the radio and every program.": "Stopper alle lyde, radioen og alle programmer.",
   "Streamer guide": "Streamerguide",
   "Streamer guide: play sounds from your Stream Deck and chat": "Streamerguide: afspil lyde fra dit Stream Deck og din chat",
   "Streaming, or using more than one app? Each device here gets a copy of what others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...": "Streamer du, eller bruger du mere end én app? Hver enhed her får også en kopi af det, andre hører: Voicemeeter, en enhed, OBS optager, et ekstra kabel, højttalere...",
@@ -3290,5 +3288,7 @@
   "Your mic sends no sound, even after restarting Windows' audio. If your headset's mic is muted, unmute it. If not, restart your PC, then try again.": "Din mikrofon sender ingen lyd, selv efter at Windows' lyd er genstartet. Hvis mikrofonen på dit headset er slået fra, så slå den til. Hvis ikke, genstart din pc, og prøv igen.",
   "Your mic sends no sound: see the Setup tab.": "Din mikrofon sender ingen lyd: se fanen Opsætning.",
   "Before update": "Før opdatering",
-  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Der gemmes et, hver gang du nulstiller noget eller opdaterer appen (de sidste {max_points} beholdes). Gendannelse sætter dine indstillinger, genvejstaster og lyde tilbage, som de var. Lyde, du har tilføjet siden, beholdes."
+  "One is saved every time you reset something or update the app (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Der gemmes et, hver gang du nulstiller noget eller opdaterer appen (de sidste {max_points} beholdes). Gendannelse sætter dine indstillinger, genvejstaster og lyde tilbage, som de var. Lyde, du har tilføjet siden, beholdes.",
+  "Stops every sound, the radio and every program, and turns the voices off": "Stopper alle lyde, radioen og alle programmer og slår stemmerne fra",
+  "Stops every sound, the radio and every program, and turns the voices off.": "Stopper alle lyde, radioen og alle programmer og slår stemmerne fra."
 }
