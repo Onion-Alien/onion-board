@@ -1609,8 +1609,12 @@ def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str]):
         silent = []
         for g in dict.fromkeys([*before, *installed_on()]):
             heard = _mic_is_silent(g)
+            if heard:   # a mic still waking up can be silent a moment: only twice counts
+                log.info("mic %s silent just after the audio restart: listening again", g)
+                time.sleep(2)
+                heard = _mic_is_silent(g)
             log.info("mic %s after the audio restart: %s", g,
-                     {True: "only silence", False: "sound"}.get(heard, "can't tell"))
+                     {True: "only silence", False: "sound", None: "can't tell"}[heard])
             if heard:
                 silent.append(g)
         if not silent:

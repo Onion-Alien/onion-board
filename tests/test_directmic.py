@@ -454,6 +454,7 @@ def _restart_kit(fake_reg, monkeypatch, tmp_path, heard):
                         lambda start, deps=(): calls.append((start, deps)) or True)
     monkeypatch.setattr(dm, "_mic_is_silent",
                         lambda guid: calls.append(("listen", guid)) or heard.pop(0))
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
     _mic(fake_reg, MICS["a stream effect"])
     return calls
 
@@ -462,15 +463,22 @@ def test_a_mic_left_silent_by_the_restart_gets_one_more(fake_reg, monkeypatch, t
     """A mic can come back from the audio restart sending only exact zeros (an app
     grabbed it the moment it was back), until the audio restarts again. So it's listened
     to after the restart: digital silence gets one more restart, then a second listen."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, True, False])
+    assert dm.admin_install(GUID) == 0
+    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID), ("listen", GUID),
+                     (False, ()), (True, ["midisrv"]), ("listen", GUID)]
+
+
+def test_a_mic_still_waking_up_is_listened_to_again(fake_reg, monkeypatch, tmp_path):
+    """Silent at first, then sound a moment later: just slow to start, no restart."""
     calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, False])
     assert dm.admin_install(GUID) == 0
-    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID),
-                     (False, ()), (True, ["midisrv"]), ("listen", GUID)]
+    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID), ("listen", GUID)]
 
 
 def test_a_mic_that_stays_silent_gets_only_one_more_restart(fake_reg, monkeypatch, tmp_path,
                                                             caplog):
-    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, True])
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True, True, True])
     assert dm.admin_install(GUID) == 0
     assert [c for c in calls if c[0] is False] == [(False, ()), (False, ())]
     assert "still sends only silence" in caplog.text
@@ -486,12 +494,12 @@ def test_a_working_or_unknown_mic_is_left_alone(fake_reg, monkeypatch, tmp_path,
 
 def test_the_uninstall_listens_to_the_mic_it_took_the_effect_off(fake_reg, monkeypatch,
                                                                  tmp_path):
-    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False, True, False])
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False, True, True, False])
     assert dm.admin_install(GUID) == 0
     calls.clear()
     assert dm.admin_uninstall() == 0
     assert not fake_reg.installed_on()
-    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID),
+    assert calls == [(False, ()), (True, ["midisrv"]), ("listen", GUID), ("listen", GUID),
                      (False, ()), (True, ["midisrv"]), ("listen", GUID)]
 
 
