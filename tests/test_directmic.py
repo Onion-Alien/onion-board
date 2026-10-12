@@ -1788,41 +1788,25 @@ def test_new_users_go_straight_into_their_mic_old_settings_keep_the_cable(app_di
     (["{a}"], True, False, True, "wiped"),       # a driver update took it off
     (["{a}"], True, True, False, "outdated"),    # an older copy (still works)
     (["{a}"], True, True, True, "ready"),
+    (["{a}"], False, True, True, "wiped"),       # its DLL deleted: repaired, not "fine"
+    (["{a}"], None, True, True, "wiped"),        # its registration gone
 ])
 @pytest.mark.parametrize("slot", [None, 7])
 def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected, slot):
+    dll = tmp_path / "obmic-1.dll"
+    if here:
+        dll.write_bytes(b"dll")
     monkeypatch.setattr(dm, "installed_slot", lambda guid: slot)
     monkeypatch.setattr(dm, "installed_on", lambda: on)
     monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
     monkeypatch.setattr(dm, "effect_in_place", lambda guid: in_place)
     monkeypatch.setattr(dm, "same_dll", lambda a, b: same)
-    dll = tmp_path / "obmic-x.dll"
-    dll.write_bytes(b"dll")
-    monkeypatch.setattr(dm, "registered_dll", lambda: dll)
+    monkeypatch.setattr(dm, "registered_dll", lambda: None if here is None else dll)
     monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
     dm.forget_status()
     assert dm.status("My mic") == expected
     assert dm.needs_repair(expected) == (expected == "wiped")
     assert dm.works(expected) == (expected in ("ready", "outdated"))
-
-
-@pytest.mark.parametrize("same", [True, False])
-@pytest.mark.parametrize("gone", ["file", "registration"])
-def test_status_effect_dll_gone_is_fixed_by_itself(monkeypatch, tmp_path, same, gone):
-    """The effect still on the mic but its DLL deleted (a virus scanner ate it): it
-    can't run, so it's "wiped" (put back by itself), never "outdated" (counts as
-    working, so nothing happened and a reinstall didn't fix it either)."""
-    dll = tmp_path / "obmic-x.dll"
-    monkeypatch.setattr(dm, "installed_slot", lambda guid: 7)
-    monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
-    monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
-    monkeypatch.setattr(dm, "effect_in_place", lambda guid: True)
-    monkeypatch.setattr(dm, "same_dll", lambda a, b: same)
-    monkeypatch.setattr(dm, "registered_dll", lambda: dll if gone == "file" else None)
-    monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
-    dm.forget_status()
-    assert dm.status("My mic") == "wiped"
-    assert dm.needs_repair(dm.status_on("{a}"))
 
 
 @pytest.mark.parametrize("slot, expected", [(5, "outdated"), (13, "outdated"), (1, "ready"),
@@ -1831,12 +1815,12 @@ def test_status_offers_the_move_out_of_the_stream_effect(monkeypatch, tmp_path, 
                                                          expected):
     """On in the stream effect (before the endpoint one), raw streams (Chrome, Edge,
     Discord Studio) skip it: the update that moves it is offered."""
+    dll = tmp_path / "obmic-1.dll"
+    dll.write_bytes(b"dll")
     monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
     monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
     monkeypatch.setattr(dm, "effect_in_place", lambda guid: True)
     monkeypatch.setattr(dm, "same_dll", lambda a, b: True)
-    dll = tmp_path / "obmic-x.dll"
-    dll.write_bytes(b"dll")
     monkeypatch.setattr(dm, "registered_dll", lambda: dll)
     monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
     monkeypatch.setattr(dm, "installed_slot", lambda guid: slot)

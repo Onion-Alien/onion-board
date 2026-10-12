@@ -1,4 +1,5 @@
 """The Settings window's layout: pages scroll instead of squashing their rows."""
+import re
 import time
 from contextlib import contextmanager
 
@@ -724,20 +725,26 @@ def test_pages_start_where_a_tabs_do(window, qapp):  # noqa: F811
     assert window._body_lay.contentsMargins().top() == 10   # a tab's again
 
 
-def test_heading_level_with_the_rails_name(window, qapp):  # noqa: F811
+@pytest.mark.parametrize("theme", ["Dark", "Amber Terminal", "Comic Sans"])
+def test_heading_level_with_the_rails_name(window, qapp, theme):  # noqa: F811
     """ "Settings" (the rail's "Onion Board" size, a cog after it) has its capitals
-    level with the rail's name, the arrow and cog centred on them."""
+    level with the rail's name, the arrow and cog centred on them, in every theme's
+    font (Consolas' capitals sit lower in the line: a fixed nudge left both 2 px high)."""
+    window.apply_theme(theme)
     d = _open_in_window(window, qapp, "privacy", 1020, 680)
-    qapp.processEvents()
-    qapp.processEvents()
+    process_events(qapp, lambda: abs(d._caps_mid(d.page_title)
+                                     - d._caps_mid(window.wordmark)) <= 0.5, timeout=3)
     assert d.page_title.font().pointSizeF() == window.wordmark.font().pointSizeF()
     title = d._caps_mid(d.page_title)
     assert abs(title - d._caps_mid(window.wordmark)) <= 0.5
     for icon in (d.back_btn, d.title_cog):
-        r = icon.contentsRect() if icon is d.title_cog else icon.rect()
+        r = icon.contentsRect()
+        if icon is d.back_btn:   # (its padding moves the arrow)
+            top, bottom = map(int, re.findall(r"(\d+)px", icon.styleSheet())[0:3:2])
+            r = icon.rect().adjusted(0, top, 0, -bottom)
         at = icon.mapTo(window, QPoint(0, 0)).y()
         mid = (at + r.top() + r.height() / 2) * icon.devicePixelRatioF()   # (screen px)
-        assert abs(mid - title) <= 2, icon.objectName()
+        assert abs(mid - title) <= 1, (theme, icon.objectName())
     d.close()
 
 
