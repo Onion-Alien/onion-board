@@ -133,6 +133,44 @@ def test_plain_preview_drops_a_render_in_flight(window, monkeypatch):
     assert played == ["s0:preview"]
 
 
+def test_a_long_sounds_effects_preview_renders_only_what_plays_first(window, qapp,
+                                                                    monkeypatch):
+    """A 2-hour song's pitch shift took minutes before its preview played."""
+    from tests.conftest import process_events
+    monkeypatch.setattr(main, "PREVIEW_WHOLE_S", 2)
+    monkeypatch.setattr(main, "PREVIEW_S", 1)
+    long_ = np.zeros((5 * main.SR, 2), np.int16)
+    window.audio["s0"] = long_
+    monkeypatch.setattr(main, "load_original", lambda m: long_)
+    monkeypatch.setattr(library, "render_cached", lambda *a, **k: pytest.fail("whole render"))
+    played = []
+    monkeypatch.setattr(window.engine, "play", lambda sid, data, *a, **k: played.append(
+        (sid, len(data))))
+    assert window.preview("s0", fx={"pitch": 5}) == "rendering"
+    assert process_events(qapp, lambda: played, timeout=10)
+    assert played == [("s0~fx:preview", main.SR)]
+
+
+def test_a_newer_preview_stops_the_render_still_going(window, monkeypatch):
+    seen = []
+
+    def render(sid, data, fx, cancel=None):
+        seen.append(cancel())
+        window._preview_gen += 1          # a newer preview starts meanwhile
+        seen.append(cancel())
+        raise library.Cancelled
+    monkeypatch.setattr(library, "render_cached", render)
+    monkeypatch.setattr(main, "load_original", lambda m: np.zeros((10, 2), np.int16))
+    window.audio["s0"] = np.zeros((10, 2), np.int16)
+    threads = []
+    monkeypatch.setattr(main.threading, "Thread",
+                        lambda target, **k: threads.append(target) or type(
+                            "T", (), {"start": lambda self: None})())
+    window.preview("s0", fx={"pitch": 5})
+    threads[-1]()                         # runs the render here: no error, nothing played
+    assert seen == [False, True]
+
+
 def test_closing_the_edit_dialog_mid_render_clears_the_status(window, qapp):
     d = window.edit("s0")
     window._preview_done = lambda ok: None   # a render was going

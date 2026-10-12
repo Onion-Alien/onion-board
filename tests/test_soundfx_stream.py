@@ -85,6 +85,29 @@ def test_render_cached_falls_back_to_memory_when_the_file_cant_be_written(app_di
     assert not list(library.CACHE_DIR.glob("*.npy"))
 
 
+def test_a_render_given_up_on_stops_and_keeps_nothing(app_dir):
+    x = noisy(3.0)
+    calls = []
+    with pytest.raises(library.Cancelled):
+        library.render_cached("s1", x, {"pitch": 4}, cancel=lambda: calls.append(1) or
+                              len(calls) > 1)
+    assert len(calls) == 2                       # stopped at the second piece
+    assert not list(library.CACHE_DIR.glob("*.npy"))
+    got = library.render_cached("s1", x, {"pitch": 4}, cancel=lambda: False)
+    assert np.array_equal(got, library.to_int16(soundfx.render(x, {"pitch": 4})))
+
+
+def test_preview_part_is_what_plays_first():
+    x = np.arange(10 * SR, dtype=np.int16).reshape(-1, 1).repeat(2, 1)
+    part, fx = soundfx.preview_part(x, {"start": 2.0, "end": 8.0, "pitch": 3}, 1.0)
+    assert part[0, 0] == x[2 * SR, 0] and len(part) == SR
+    assert fx["start"] == fx["end"] == 0.0 and fx["pitch"] == 3   # trimmed already
+    part, _ = soundfx.preview_part(x, {"reverse": True}, 1.0)
+    assert part[-1, 0] == x[-1, 0] and len(part) == SR           # backwards: the end
+    part, _ = soundfx.preview_part(x, {"speed": 2.0}, 1.0)
+    assert len(part) == 2 * SR                                    # a second as heard
+
+
 def test_a_long_sound_renders_in_bounded_memory(app_dir):
     """A two-hour sound used to need ~10 GB: float32 copies of all of it, one per step.
     Now the peak is a few pieces, the same for 20 s as for 40 s."""

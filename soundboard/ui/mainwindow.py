@@ -113,6 +113,10 @@ TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 SHORT_SOUND_S = 0.3   # an added sound shorter than this gets a "very short" note
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+# an effects preview of a sound longer than this renders only its first PREVIEW_S
+# (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
+PREVIEW_WHOLE_S = 5 * 60
+PREVIEW_S = 30
 UNDO_KEY = "undo-sounds"   # its card (toast key)
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
@@ -6166,9 +6170,17 @@ class MainWindow(QMainWindow):
 
         def run():
             try:
-                # into the cache file for these effects: a long sound is never all in
-                # memory, and saving them afterwards finds it rendered
-                out = library.render_cached(m.id, load_original(m), fx)
+                src = load_original(m)
+                if len(src) > PREVIEW_WHOLE_S * SR:   # long: only what plays first
+                    part, pfx = soundfx.preview_part(src, fx, PREVIEW_S)
+                    out = soundfx.render(part, pfx)
+                else:
+                    # into the cache file for these effects: saving them afterwards
+                    # finds it rendered
+                    out = library.render_cached(m.id, src, fx,
+                                                cancel=lambda: gen != self._preview_gen)
+            except library.Cancelled:
+                return   # a newer preview (or the dialog closed): nothing to play
             except Exception:  # noqa: BLE001
                 log.exception("effects preview failed")
                 out = None
@@ -7838,11 +7850,13 @@ class MainWindow(QMainWindow):
 
         def run():
             try:
-                data = load_sound(m)
+                data = load_sound(m, cancel=lambda: self._render_gen.get(m.id) != gen)
                 if self._render_gen.get(m.id) != gen:
                     return   # edited again meanwhile: a newer render is on its way
                 self.engine.prepare(m.id, data)
                 self.bridge.loaded.emit(m.id, data, "")
+            except library.Cancelled:
+                return       # (it stopped partway for that newer one)
             except Exception as e:  # noqa: BLE001
                 log.warning("can't apply effects to %s: %s", m.name, e)
                 self.bridge.loaded.emit(m.id, None, errors.plain(e))
