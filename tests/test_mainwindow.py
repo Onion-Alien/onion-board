@@ -1272,6 +1272,37 @@ def test_toolbar_tabs_and_pads_share_their_edges(window, qapp):
         assert 0 <= g.slack() < cols, w
 
 
+def test_pads_keep_their_height_when_a_row_loses_one(window, qapp):
+    """A row losing a pad as the window narrows keeps the pads' height: it followed
+    the width, so each re-wrap jolted every row below."""
+    from PySide6.QtTest import QTest
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    g = window.grid
+    window.resize(1700, 760)
+    QTest.qWait(80)
+    h, seen = g.pads[0].height(), set()
+    for w in range(1700, 1000, -7):
+        window.resize(w, 760)
+        qapp.processEvents()
+        seen.add(g._shape[0])
+        assert g.pads[0].height() == h, w
+    assert len(seen) > 2   # it did re-wrap, more than once
+
+
+def test_a_long_name_stays_on_one_line(window, qapp):
+    """A name too long for the pad is cut with "…" on one line (hover shows it all):
+    wrapped, it jumped between one line and two as a resize changed the width."""
+    from PySide6.QtCore import QRectF
+    pad = window.grid.pads[0]
+    pad.meta.name = "Goldeneye 007 (N64) Rap Beat - Straight Outta Hyrule"
+    _f, flags, text = pad._fit_name(QRectF(0, 0, 120, 60))
+    assert text.endswith("…") and "\n" not in text and pad.name_cut
+    assert flags & Qt.AlignmentFlag.AlignTop
+    pad.meta.name = "Boom"
+    assert pad._fit_name(QRectF(0, 0, 120, 60))[2] == "Boom" and not pad.name_cut
+
+
 def test_full_screen_caps_only_the_search_box(window, qapp):
     """At 1920x1080 the search box stops at SEARCH_MAX_W (the library tools stay at
     the right); the seek bar and the drop box still follow the window (U11)."""

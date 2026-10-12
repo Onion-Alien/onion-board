@@ -455,6 +455,7 @@ def pad_height(width: int) -> int:
 PAD_RADIUS = 12      # a pad card's rounded corners
 HOVER_LIFT = 2.0     # how far a card rises under the mouse (it has 2 px spare above)
 HOVER_MS = 120       # ...and how quickly: short, so moving across the board feels light
+PAD_SHRINK = 0.8     # a row takes one more pad when that shrinks them by a fifth at most
 PIC_SHADE = ((0.0, 100), (0.55, 150), (1.0, 205))
 PIC_SHADE_HOVER = ((0.0, 70), (0.55, 120), (1.0, 205))
 
@@ -526,6 +527,7 @@ class Pad(QAbstractButton):
         self._hover_anim.setEasingCurve(QEasingCurve.Type.OutCubic)   # quick up, soft landing
         self._hover_anim.valueChanged.connect(self._on_hover_k)
         self._down = False       # pressed: the card sinks a little
+        self.name_cut = False    # the name is cut short with "…" (_fit_name)
         self._play_t: float | None = None   # when it started playing (the flash on start)
         self._press = None
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
@@ -596,7 +598,8 @@ class Pad(QAbstractButton):
         return self._linked[1]
 
     def event(self, e):
-        """The linked-file mark's tooltip shows over the mark only, not the whole pad."""
+        """The linked-file mark's tooltip shows over the mark only; elsewhere on the pad,
+        the whole name when it's cut short."""
         if e.type() == QEvent.Type.ToolTip:
             box = self._link_rect
             hit = box.adjusted(-4, -4, 4, 4) if box is not None else None
@@ -604,6 +607,8 @@ class Pad(QAbstractButton):
                 QToolTip.showText(e.globalPos(), _("Plays from: {path}",
                                                    path=self.linked_file()),
                                   self, hit.toAlignedRect())
+            elif self.name_cut:
+                QToolTip.showText(e.globalPos(), self.meta.name, self)
             else:
                 QToolTip.hideText()
                 e.ignore()
@@ -651,29 +656,21 @@ class Pad(QAbstractButton):
         super().changeEvent(e)
 
     def _fit_name(self, room: QRectF) -> tuple[QFont, Qt.AlignmentFlag, str]:
-        """The name's font, flags and text so it fits the pad: wrapped over two lines,
-        then a size smaller, then on one line cut short with "…" (small pads cut
-        words in half and lost the line below)."""
-        key = (self.meta.name, room.width(), room.height(), self._font_key)
+        """The name's font, flags and text: one line from the top, cut short with "…"
+        when it doesn't fit (hovering the pad shows all of it). Wrapping it, or a size
+        smaller, changed with the pad's width: a resize made names jump between one
+        line and two."""
+        key = (self.meta.name, room.width(), self._font_key)
         if self._name_fit is None or self._name_fit[0] != key:
             name = self.meta.name
-            wrap = (Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-                    | Qt.TextFlag.TextWordWrap)
-            box = room.toRect()
             f = QFont(self.font())
             f.setBold(True)
-            for pt in (10.5, 9.0):
-                f.setPointSizeF(pt)
-                fm = QFontMetrics(f)
-                longest = max(name.split(), key=len, default="")   # no word cut in half
-                if (fm.boundingRect(box, wrap, name).height() <= box.height()
-                        and fm.horizontalAdvance(longest) <= box.width()):
-                    self._name_fit = (key, (f, wrap, name))
-                    break
-            else:
-                one = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-                self._name_fit = (key, (f, one, fm.elidedText(name, Qt.TextElideMode.ElideRight,
-                                                              box.width())))
+            f.setPointSizeF(10.5)
+            text = QFontMetrics(f).elidedText(name, Qt.TextElideMode.ElideRight,
+                                              room.toRect().width())
+            self._name_fit = (key, (f, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop,
+                                    text))
+            self.name_cut = text != name
         return self._name_fit[1]
 
     def _accent_colour(self) -> QColor:
@@ -1258,7 +1255,13 @@ class PadGrid(QWidget):
         return self.background_pad_height or self.natural_pad_h(w)
 
     def natural_pad_h(self, w: int) -> int:
-        return SLIM_PAD_H if self.rows() else pad_height(w)
+        # as tall as the picked size while a row only stretches or squeezes them (the
+        # height followed the width: each row losing a pad as the window narrowed
+        # jolted every row below); only pads squeezed past that (a narrow window, the
+        # mini player) get shorter
+        if self.rows():
+            return SLIM_PAD_H
+        return pad_height(min(self.pad_w, round(w / PAD_SHRINK)))
 
     def fit_width(self, room: int, slim: bool | None = None) -> tuple[int, int]:
         """(columns, pad width) for `room` pixels: the picked size, but never wider than
@@ -1280,7 +1283,7 @@ class PadGrid(QWidget):
         # the edge (a fixed size left a strip as wide as most of a pad on the right),
         # or take one more a row when that shrinks them by a fifth at most
         cols = max(1, (room + sp) // (w + sp))
-        if (room - sp * cols) // (cols + 1) >= w * 0.8:
+        if (room - sp * cols) // (cols + 1) >= w * PAD_SHRINK:
             cols += 1
         return cols, max(1, (room - sp * (cols - 1)) // cols)
 

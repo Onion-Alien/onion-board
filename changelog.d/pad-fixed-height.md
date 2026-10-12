@@ -1,0 +1,1 @@
+- Resizing the window no longer makes the sound cards jump: they keep their height as a row gains or loses one, and names stay on one line (cut with "…", the whole name shows on hover).
