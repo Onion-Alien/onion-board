@@ -3309,5 +3309,7 @@
   "Plain": "Plain",
   "Textured": "May texture",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Sa may texture, may sariling disenyo ang bawat tema sa mga panel: linya ng lumang screen, carbon fiber, alon at iba pa. Pinapanatili itong patag ng Plain.",
-  "Theme style": "Istilo ng tema"
+  "Theme style": "Istilo ng tema",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Inililipat ang mga tunog mo mula sa iba mong soundboard: {done} sa {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Inililipat ang mga tunog mo mula sa {name}: {done} sa {total}…"
 }

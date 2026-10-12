@@ -3309,5 +3309,7 @@
   "Plain": "Enfärgad",
   "Textured": "Med mönster",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Med mönster får varje tema sitt eget mönster på panelerna: skärmlinjer, kolfiber, vågor och mer. Enfärgad håller dem platta.",
-  "Theme style": "Temastil"
+  "Theme style": "Temastil",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Hämtar dina ljud från dina andra soundboards: {done} av {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Hämtar dina ljud från {name}: {done} av {total}…"
 }

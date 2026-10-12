@@ -3309,5 +3309,7 @@
   "Plain": "Tasainen",
   "Textured": "Kuvioitu",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Kuvioitu antaa jokaiselle teemalle oman kuvion paneeleihin: vanhan näytön juovat, hiilikuitu, aallot ja muuta. Tasainen pitää ne yksivärisinä.",
-  "Theme style": "Teeman tyyli"
+  "Theme style": "Teeman tyyli",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Tuodaan äänesi muista soundboardeistasi: {done}/{total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Tuodaan äänesi sovelluksesta {name}: {done}/{total}…"
 }

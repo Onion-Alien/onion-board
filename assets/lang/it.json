@@ -3309,5 +3309,7 @@
   "Plain": "Semplice",
   "Textured": "Con trama",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Con trama ogni tema ha il suo motivo sui pannelli: righe da vecchio schermo, fibra di carbonio, onde e altro. Semplice li lascia piatti.",
-  "Theme style": "Stile del tema"
+  "Theme style": "Stile del tema",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Sto portando qui i tuoi suoni dalle tue altre soundboard: {done} su {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Sto portando qui i tuoi suoni da {name}: {done} su {total}…"
 }

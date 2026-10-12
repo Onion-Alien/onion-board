@@ -3235,5 +3235,7 @@
   "Plain": "Trơn",
   "Textured": "Có họa tiết",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Có họa tiết cho mỗi chủ đề một họa tiết riêng trên các bảng: vạch màn hình cũ, sợi carbon, sóng và hơn thế nữa. Trơn giữ chúng phẳng.",
-  "Theme style": "Kiểu chủ đề"
+  "Theme style": "Kiểu chủ đề",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Đang chuyển âm thanh của bạn từ các soundboard khác: {done}/{total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Đang chuyển âm thanh của bạn từ {name}: {done}/{total}…"
 }

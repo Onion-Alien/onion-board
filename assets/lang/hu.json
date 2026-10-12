@@ -3309,5 +3309,7 @@
   "Plain": "Sima",
   "Textured": "Mintás",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Mintásan minden téma saját mintát kap a paneleken: régi képernyő csíkjai, karbon, hullámok és még több. A sima egyszínűen hagyja őket.",
-  "Theme style": "Téma stílusa"
+  "Theme style": "Téma stílusa",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Hangjaid áthozása a többi soundboardodból: {done}/{total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Hangjaid áthozása innen: {name}: {done}/{total}…"
 }

@@ -3309,5 +3309,7 @@
   "Plain": "Απλό",
   "Textured": "Με υφή",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Με υφή κάθε θέμα παίρνει το δικό του μοτίβο στα πάνελ: γραμμές παλιάς οθόνης, ανθρακονήματα, κύματα και άλλα. Το απλό τα αφήνει επίπεδα.",
-  "Theme style": "Στυλ θέματος"
+  "Theme style": "Στυλ θέματος",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Μεταφορά των ήχων σου από τα άλλα soundboard σου: {done} από {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Μεταφορά των ήχων σου από {name}: {done} από {total}…"
 }

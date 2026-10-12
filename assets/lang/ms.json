@@ -3235,5 +3235,7 @@
   "Plain": "Polos",
   "Textured": "Bertekstur",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Bertekstur memberi setiap tema corak sendiri pada panel: garis skrin lama, gentian karbon, ombak dan banyak lagi. Polos mengekalkannya rata.",
-  "Theme style": "Gaya tema"
+  "Theme style": "Gaya tema",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Membawa bunyi anda dari soundboard lain anda: {done} daripada {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Membawa bunyi anda dari {name}: {done} daripada {total}…"
 }

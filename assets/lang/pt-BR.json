@@ -3309,5 +3309,7 @@
   "Plain": "Liso",
   "Textured": "Com textura",
   "Textured gives each theme its own pattern on the panels: scanlines, carbon fibre, waves and more. Plain keeps them flat.": "Com textura, cada tema ganha seu próprio padrão nos painéis: linhas de tela antiga, fibra de carbono, ondas e mais. Liso deixa tudo plano.",
-  "Theme style": "Estilo do tema"
+  "Theme style": "Estilo do tema",
+  "Bringing your sounds over from your other soundboards: {done} of {total}…": "Trazendo seus sons dos seus outros soundboards: {done} de {total}…",
+  "Bringing your sounds over from {name}: {done} of {total}…": "Trazendo seus sons do {name}: {done} de {total}…"
 }
