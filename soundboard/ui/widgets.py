@@ -561,9 +561,9 @@ class Pad(QAbstractButton):
             bits.append(_("hotkey {key}", key=pretty_key(m.hotkey)))
         if m.loop:
             bits.append(_("loops"))
-        if m.mode in ("overlap", "toggle", "solo"):
-            bits.append({"overlap": _("presses overlap"), "toggle": _("press again stops"),
-                         "solo": _("stops the other sounds")}[m.mode])
+        if m.mode in ("overlap", "toggle"):
+            bits.append({"overlap": _("presses overlap"),
+                         "toggle": _("press again stops")}[m.mode])
         if m.hold:
             bits.append(_("plays while its hotkey is held"))
         if m.fx:
@@ -684,7 +684,7 @@ class Pad(QAbstractButton):
             f.setBold(False)
             f.setPointSizeF(8.5)
             flags = ("FX " if m.fx else "") + ("⟳ " if m.loop else "") + \
-                {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(m.mode, "") + \
+                {"overlap": "⧉ ", "toggle": "⏯ "}.get(m.mode, "") + \
                 (_("hold") + " " if m.hold else "")
             right = _("❚❚ paused") if self.paused else f"{flags}{m.duration:.1f}s"
             hk = m.hotkey and (midi.short(m.hotkey) if midi.is_midi(m.hotkey)
@@ -1032,7 +1032,7 @@ class Pad(QAbstractButton):
         else:
             m = self.meta
             flags = ("⟳ " if m.loop else "") + \
-                {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(m.mode, "")
+                {"overlap": "⧉ ", "toggle": "⏯ "}.get(m.mode, "")
             right = "❚❚" if self.paused else f"{flags}{m.duration:.1f}s"
             rc = T["muted"]
         rw = fm.horizontalAdvance(right) + 4

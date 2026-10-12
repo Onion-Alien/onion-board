@@ -430,10 +430,10 @@ class EditDialog(QDialog):
         self._set_hk(self.hotkey)
 
         self.mode = QComboBox()
-        self.mode.addItem(_("Restart: press again restarts it"), "restart")
+        # the default stops the other sounds (an old "solo" sound shows as it too)
+        self.mode.addItem(_("Solo: stops every other sound first"), "restart")
         self.mode.addItem(_("Overlap: every press plays a new copy"), "overlap")
         self.mode.addItem(_("Toggle: press again stops it"), "toggle")
-        self.mode.addItem(_("Solo: stops every other sound first"), "solo")
         self.mode.addItem(_("Queue: waits for the sounds playing to finish"), "queue")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)

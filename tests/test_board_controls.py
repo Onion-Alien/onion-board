@@ -314,6 +314,7 @@ def two_playing(w):
     w.engine.rates["mon"] = 48000
     for sid in ("s0", "s1"):
         w.audio[sid] = np.full((48000 * 20, 2), 0.01, np.float32)
+        w.meta(sid).mode = "overlap"   # layered (the default stops the other one)
     w.play("s0")
     w.play("s1")
     w._update_chips(w.engine.playing())

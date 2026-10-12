@@ -56,8 +56,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   zip of JSON and the original audio files — see
   [BACKUP-FORMAT.md](BACKUP-FORMAT.md).
 - **Per sound:** global hotkey (works in-game) or MIDI pad, volume, loop, what
-  pressing again does (restart / overlap / toggle), **Solo** (stops every other
-  sound first), **Queue** (waits for the sounds playing to finish; right-click any
+  pressing does: **Solo**, the default (one sound at a time: it stops every other
+  sound first), **Overlap** (layers over the others), **Toggle**, **Queue** (waits for the sounds playing to finish; right-click any
   pad → *Play next* does it once), **Only others hear it** (not in your
   headphones), a **wait** before it plays, a **cooldown** against spamming, **fade in /
   fade out**, and **Hold to play** (plays only while you hold its key or pad down, like
