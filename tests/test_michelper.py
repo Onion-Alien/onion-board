@@ -35,7 +35,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                 8: "2e6e7bce58fff25b999c3779c61576bc676a39765c974e83b62ad437f5a15a2d",
                 9: "f60c119dabaad07489532ae0fbb58b600cc3ac6f864f4b52622a5a95476a8894",
                10: "e9d84913fb40a44975302aed80f4875feeb7ae9626065a410678e62a3f3b4383",
-               11: "eeedff2b4f38cd99b8f919dd3f60f120d0977ab0be28055f52330e587103119b"}
+               11: "eeedff2b4f38cd99b8f919dd3f60f120d0977ab0be28055f52330e587103119b",
+               12: "3b389974f12790f2d46748bd7ce4b2574784de39c3e5e8b326d4df433a948f67"}
 
 
 def _queue():
@@ -636,8 +637,41 @@ def test_the_next_request_works_after_a_killed_one(monkeypatch):
     assert (mh.results_dir() / f"{'7' * 32}.res").read_text() == "0"
     old = time.time() - mh.RESULT_KEEP_S - 10
     os.utime(mh.results_dir() / f"{'6' * 32}.ack", (old, old))
-    mh._prune(time.time())
+    mh._prune(time.time(), mono=time.monotonic() + mh.RESULT_KEEP_S + 10)
     assert not (mh.results_dir() / f"{'6' * 32}.ack").exists()
+
+
+def test_a_clock_put_forward_never_prunes_a_fresh_answer(monkeypatch):
+    """The wall clock jumps an hour and more forward between the helper's answer and
+    the app reading it, and another run starts meanwhile: the answer is still there."""
+    _queue()
+    _request("8" * 32, b"uninstall")
+    mh.serve(run=lambda args: 0)
+    res = mh.results_dir() / f"{'8' * 32}.res"
+    real = time.time
+    monkeypatch.setattr(time, "time", lambda: real() + 2 * mh.RESULT_KEEP_S)
+    mh.serve(run=lambda args: 0)   # (a run with nothing to do: it only prunes)
+    mh._prune(time.time())
+    assert mh._result(res) == 0
+
+
+def test_old_results_from_an_earlier_run_are_pruned():
+    _queue()
+    old = mh.results_dir() / f"{'9' * 32}.res"
+    old.write_text("0")
+    t = time.time() - mh.RESULT_KEEP_S - 10
+    os.utime(old, (t, t))
+    mono = time.monotonic()
+    mh._prune(time.time(), mono=mono)   # first seen now: kept, however old it looks
+    assert old.exists()
+    mh._prune(time.time(), mono=mono + mh.RESULT_KEEP_S + 10)
+    assert not old.exists()
+    gone = mh.results_dir() / f"{'a' * 32}.ack"   # seen before a restart
+    gone.write_bytes(b"")
+    os.utime(gone, (t, t))
+    mh._prune(time.time(), mono=mono)
+    mh._prune(time.time(), mono=1.0)
+    assert not gone.exists()
 
 
 # ---------------------------------------------------------------- logs, UI thread
