@@ -9,6 +9,7 @@ icon (live badge, voice picture, warning tint), name, tip and whether it's shown
 from __future__ import annotations
 
 import html
+import math
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -432,7 +433,8 @@ class OutputBlock(QFrame):
         if not self._good():   # "Connected" is only words
             self.connection.click()
 
-    def _pin(self, glyph: QLabel, label: QLabel, lead: int = 0, mid: str = "cap"):
+    def _pin(self, glyph: QLabel, label: QLabel, lead: int = 0, mid: str = "cap",
+             move: bool = True):
         """Centre `glyph` on `label`'s first line (not on the label's box: a wrapped
         label's box centre falls between its lines): on its cap height, or (`mid`
         "x") its x-height, for the chevron after lowercase words. `lead`: how far
@@ -441,9 +443,42 @@ class OutputBlock(QFrame):
         fm = label.fontMetrics()
         centre = lead + fm.ascent() - (fm.xHeight() if mid == "x" else fm.capHeight()) / 2
         size = glyph.width()
-        top = max(0, int(centre - size / 2))   # (a half pixel up: the overshoot)
+        top = math.floor(centre - size / 2)   # (a half pixel up: the overshoot)
+        if move:
+            # an icon taller than the line can't go up to it: the words come down to it
+            down = max(0, -top)
+            label.setContentsMargins(0, lead + down, 0, 0)
+            top += down
+        top = max(0, top)
         glyph.setContentsMargins(0, top, 0, 0)
-        glyph.setFixedHeight(max(fm.height(), top + size))
+        glyph.setFixedHeight(max(fm.height() + label.contentsMargins().top(), top + size))
+
+    @staticmethod
+    def _air(glyph: QLabel) -> tuple[int, int]:
+        """The empty columns left and right of an icon's ink in its box."""
+        pm = glyph.pixmap()
+        if pm.isNull():
+            return 0, 0
+        img = pm.toImage()
+        cols = [x for x in range(img.width())
+                if any(img.pixelColor(x, y).alpha() > 40 for y in range(img.height()))]
+        if not cols:
+            return 0, 0
+        ratio = pm.devicePixelRatio() or 1
+        return round(cols[0] / ratio), round((img.width() - 1 - cols[-1]) / ratio)
+
+    def _balance(self, row: QHBoxLayout, glyph: QLabel, label: QLabel, tail: QLabel | None,
+                 top: int, bottom: int):
+        """Centre a line (icon, words, maybe a chevron) on its ink, not its boxes: a
+        narrow icon (the phone, the shield) or chevron left it a few px off."""
+        left = glyph.contentsMargins().left() + self._air(glyph)[0]
+        if tail is not None and tail.isVisible():
+            right = self._air(tail)[1]
+        else:
+            ink = label.fontMetrics().tightBoundingRect(label.text())
+            right = max(0, label.sizeHint().width() - (ink.right() + 1))
+        d, pad = left - right, self._px(self.PAD)
+        row.setContentsMargins(pad + max(0, -d), top, pad + max(0, d), bottom)
 
     def _pin_all(self):
         # the title's first line is centred on the row's controls (the switch, Stop all),
@@ -460,11 +495,14 @@ class OutputBlock(QFrame):
         pad = max(self._px(4), (row_h - self.status_text.fontMetrics().height()) // 2)
         self.row.setContentsMargins(self._px(self.PAD), pad, self._px(self.PAD), pad)
         self._pin(self.status_icon, self.status_text)
-        self._pin(self.arrow, self.status_text)   # (on the icon's line, not the x-height)
+        # (on the icon's line, not the x-height; the words stay where the icon put them)
+        self._pin(self.arrow, self.status_text, self.status_text.contentsMargins().top(),
+                  move=False)
+        self._balance(self.row, self.status_icon, self.status_text, self.arrow, pad, pad)
         for n in self.net:
             if self.property("expanded"):
-                n.row.setContentsMargins(self._px(self.ROW_PAD), pad, self._px(self.PAD), pad)
                 self._pin(n.glyph, n.label)
+                self._balance(n.row, n.glyph, n.label, None, pad, pad)
             else:   # the icon alone, centred under the switch
                 n.row.setContentsMargins(0, 8, 0, 0)
                 n.glyph.setContentsMargins(0, 0, 0, 0)
@@ -536,9 +574,8 @@ class OutputBlock(QFrame):
         self.setProperty("expanded", expanded)
         px = self._px
         glyph = px(self.GLYPH) if expanded else self.GLYPH
-        icon_x = round(self.ICON_X - glyph / 2)   # the icon column's centre stays put
         # open: Mute and Stop all, the same padding all round them; the network lines
-        # under them keep the icon column's keyline
+        # under them centred in the card
         pad = px(self.PAD)
         self.pair_lay.setContentsMargins(pad, pad, pad, pad)
         halves = [b for b in (self.mute, self.stop) if b is not None]
@@ -552,7 +589,7 @@ class OutputBlock(QFrame):
         if self.stop is not None:
             icons.set_icon(self.stop, "stop", "danger_text", gap=False, size=px(18))
         self.pair.setVisible(expanded)
-        self.box.setContentsMargins(*(icon_x, 0, pad, 0) if expanded else (0, 4, 0, 0))
+        self.box.setContentsMargins(*(pad, 0, pad, 0) if expanded else (0, 4, 0, 0))
         self.top.setContentsMargins(0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.Direction.TopToBottom)
         self.title.hide()   # open, Mute says it (its tip: Live or Muted, in full)
@@ -694,6 +731,10 @@ class OutputBlock(QFrame):
             n.setVisible(i < len(self._lines))
             if i < len(self._lines):
                 n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
+        # a network line under Mute and Stop all brings its own padding: the same room
+        # over its words as under them
+        pad = self._px(self.PAD)
+        self.pair_lay.setContentsMargins(pad, pad, pad, 0 if self._lines else pad)
         self._pin_all()
 
 
@@ -722,6 +763,7 @@ class _NetLine(QPushButton):
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         self.row = QHBoxLayout(self)
         self.row.setSpacing(0)
+        self.row.addStretch(1)   # centred in the card, as the status strip's line
         self.glyph = card._glyph()
         self.label = _HugLabel("")
         self.label.setWordWrap(True)

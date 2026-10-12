@@ -119,11 +119,12 @@ def _assert_keylines(output, setup=True):
     img = output.grab().toImage()
     pairs = []
     if setup:
-        # the strip's line: centred in the card, its icon and chevron on its cap height
-        line = [output.status_icon, output.status_text, output.arrow]
-        left = line[0].mapTo(output, QPoint()).x()
-        right = line[-1].mapTo(output, QPoint()).x() + line[-1].width()
-        assert abs(left + right - output.width()) <= 2
+        # the strip's line: its ink centred in the card (to the odd pixel), its icon and
+        # chevron on its cap height
+        icon = output.status_icon
+        y = icon.mapTo(output, QPoint()).y()
+        ink = _ink_box(img, QRect(0, y, output.width(), icon.height()), (2, y + 2))
+        assert abs(ink.left() - (output.width() - 1 - ink.right())) <= 1
         pairs += [(output.status_icon, output.status_text), (output.arrow, output.status_text)]
     for icon, label in pairs:
         glyph = _ink_box(img, QRect(icon.mapTo(output, QPoint()), icon.size()))

@@ -1,1 +1,1 @@
-﻿- Side bar: the Live switch and the stop square are now two matching buttons, Mute and Stop all, centred in the card.
+- Side bar: the Live switch and the stop square are now two matching buttons, Mute and Stop all, centred in the card; the Tor, proxy and Offline lines are centred too, their icons level with their words.
