@@ -1486,17 +1486,21 @@ def decode_int16(path: str) -> tuple[np.ndarray, float]:
     return to_int16(got[0]), level_gain(got[0])
 
 
-def load_sound(meta: SoundMeta) -> np.ndarray:
+class Cancelled(Exception):
+    """A render given up on partway (render_cached's `cancel`): a newer one replaced it."""
+
+
+def load_sound(meta: SoundMeta, cancel: Callable[[], bool] | None = None) -> np.ndarray:
     """int16 audio for a library sound as it plays, effects included. The first
     load after its effects change renders them (slow for long sounds); after that
-    it is one file read."""
+    it is one file read. cancel: see render_cached."""
     from soundboard import soundfx
     key = soundfx.key(meta.fx)
     if not key:
         return load_original(meta)
     data = load_cached(meta.id, key)
     if data is None:
-        data = render_cached(meta.id, load_original(meta), meta.fx)
+        data = render_cached(meta.id, load_original(meta), meta.fx, cancel)
     return data
 
 
@@ -1519,11 +1523,15 @@ def _reverse_frames(path: Path, frames: int) -> None:
     del mm   # unmapped now: Windows can't rename a file that's still mapped
 
 
-def render_cached(sid: str, data: np.ndarray, fx: dict | None) -> np.ndarray:
+def render_cached(sid: str, data: np.ndarray, fx: dict | None,
+                  cancel: Callable[[], bool] | None = None) -> np.ndarray:
     """Render a sound's effects (soundfx.render_into) straight into its cache file for
     these effects and return it as int16 (a long one mapped, soundboard.mapped). Only
     a few seconds of it are in memory at a time, however long it is. If the file
-    can't be written it's rendered in memory instead, like store_cached does."""
+    can't be written it's rendered in memory instead, like store_cached does.
+    cancel: asked between pieces; True stops the render (raises Cancelled, nothing
+    kept). A 2-hour song's pitch shift takes minutes, and each edit saved meanwhile
+    started another one alongside it."""
     from soundboard import soundfx
     key = soundfx.key(fx)
     if not key:
@@ -1544,6 +1552,8 @@ def render_cached(sid: str, data: np.ndarray, fx: dict | None) -> np.ndarray:
 
             def put(x):
                 nonlocal n
+                if cancel is not None and cancel():
+                    raise Cancelled
                 f.write(_i16(x).tobytes())        # x is in [-1, 1]: no limiter
                 n += len(x)
 

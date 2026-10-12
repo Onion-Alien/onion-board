@@ -1,6 +1,8 @@
 """Builds the real MainWindow on Qt's offscreen platform (no window appears, no
 audio device is opened, no global hotkey is registered) and exercises the UI
 plumbing: pad syncing, the metadata index, the mic-check pulse, the wheel guard."""
+import time
+
 import numpy as np
 from conftest import said, unsay
 import pytest
@@ -410,6 +412,31 @@ def test_mainwindow_effects_rerender(qapp, window):
     assert abs(len(window.audio["s0"]) - before / 2) < 10
     assert window.pads["s0"].state == "ready"
     assert abs(m.duration - before / 2 / SR) < 0.01
+
+
+def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeypatch):
+    from conftest import process_events
+    assert process_events(qapp, lambda: "s0" in window.audio, 10)
+    m = window.meta("s0")
+    before = len(window.audio["s0"])
+    stopped = []
+    real = main.load_sound
+
+    def slow(meta, cancel=None):
+        if meta.fx.get("speed") == 2.0:   # the first save: still going when the next comes
+            deadline = time.monotonic() + 10
+            while not cancel() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            stopped.append(cancel())
+            raise main.library.Cancelled
+        return real(meta, cancel)
+    monkeypatch.setattr(main, "load_sound", slow)
+    m.fx = {"speed": 2.0}
+    window._rerender(m)
+    m.fx = {"speed": 0.5}
+    window._rerender(m)
+    assert process_events(qapp, lambda: "s0" in window.audio and stopped, 15)
+    assert stopped == [True] and abs(len(window.audio["s0"]) - before * 2) < 10
 
 
 def test_mainwindow_live_speed_button_drives_the_engine(window):

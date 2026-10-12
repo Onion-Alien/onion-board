@@ -158,6 +158,18 @@ def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
     return x[a:b]
 
 
+def preview_part(x: np.ndarray, fx: dict | None, seconds: float) -> tuple[np.ndarray, dict]:
+    """(the part of `x` that plays first with these effects, about `seconds` of it as
+    heard, the effects to render that part with): a long sound's preview renders just
+    this, not the whole sound (a 2-hour song's pitch shift took minutes before the
+    preview played). Reversed, the end plays first."""
+    f = clean(fx)
+    part = trim(x, f)
+    n = max(1, int(seconds * f["speed"] * SR))
+    part = part[-n:] if f["reverse"] else part[:n]
+    return part, dict(f, start=0.0, end=0.0)
+
+
 # --------------------------------------------------------------------------- streaming
 #
 # A sound is rendered a piece at a time (CHUNK frames, ~2.7 s), every step carrying its
