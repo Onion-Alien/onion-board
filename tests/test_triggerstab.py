@@ -327,6 +327,31 @@ def test_a_waiting_tab_loads_when_first_shown(qapp, tmp_path, pkg):
     tab.shutdown()
 
 
+def test_an_add_on_that_can_is_made_on_the_tab_not_moved_in(qapp, tmp_path, pkg):
+    """create(host, parent) (newer Onion Watch): its tab is made on the board's page,
+    not moved there finished (that restyled every widget of it again, slowing the tab's
+    opening); an add-on with create(host) loads as before (the tests above)."""
+    made_on = []
+    board = PANEL.replace("    def __init__(self, host):\n        super().__init__()",
+                          "    def __init__(self, host, parent=None):\n"
+                          "        super().__init__(parent)") + (
+        "\n\ndef create(host, parent=None):\n"
+        "    MADE_ON.append(parent)\n"
+        "    return Panel(host, parent)\n")
+    make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=board)
+    from soundboard import modules
+    (info,) = modules.discover([tmp_path / "modules"])
+    modules.load_package(info)
+    import sys
+    sys.modules[f"{pkg}.board"].MADE_ON = made_on
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
+    try:
+        assert made_on == [tab.board_page] and tab.panel.parent() is tab.board_page
+        assert tab.stack.currentWidget() is tab.board_page
+    finally:
+        tab.shutdown()
+
+
 def test_a_waiting_tab_hidden_again_before_it_loads_waits_on(qapp, tmp_path, pkg):
     make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=PANEL)
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
