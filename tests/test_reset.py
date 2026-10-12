@@ -3,6 +3,7 @@ restore point is saved first, and restoring it puts back settings and files."""
 import json
 from pathlib import Path
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
 
@@ -145,7 +146,9 @@ def test_guide_picks_parts_and_restarts(window, monkeypatch, qapp):  # noqa: F81
     reset.run_pending()
     r = RestorePoints(window)
     assert r.list.count() == 1 and r.btn_restore.isEnabled()
-    assert "Hotkeys, Sound hotkeys, Recently deleted" in r.list.item(0).text()
+    assert "Hotkeys, Sound hotkeys, Recently deleted" in r.list.item(0).data(
+        Qt.ItemDataRole.AccessibleTextRole)
+    assert r.list.height() < 140   # as tall as its one row, no empty box under it
 
 
 def test_restart_starts_a_copy_that_waits_for_this_one(window, monkeypatch):  # noqa: F811

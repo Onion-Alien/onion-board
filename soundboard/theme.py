@@ -839,6 +839,12 @@ QListWidget#settingscategories { background:transparent; border:none; outline:0;
 QListWidget#settingscategories::item { padding:4px; border-radius:8px; }
 QListWidget#settingscategories::item:selected { background:$card_hi; color:$text_hi; }
 QListWidget#settingscategories::item:hover:!selected { background:$inset; }
+QListWidget#pointlist { background:$inset; border:1px solid $border; border-radius:12px; padding:6px; outline:0; }
+QListWidget#pointlist::item { background:transparent; border:none; border-radius:8px; margin:2px 0; color:$muted; }
+QListWidget#pointlist::item:selected { background:$btn_press; }
+QListWidget#pointlist::item:hover:!selected { background:$btn_hover; }
+QWidget#pointrow, QWidget#pointrow QLabel { background:transparent; }
+QLabel#pointtitle { color:$text_hi; font-weight:600; background:transparent; }
 QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
 QScrollBar:vertical { background:transparent; width:10px; }
 QScrollBar::handle:vertical { background:$groove; border-radius:5px; min-height:30px; }
