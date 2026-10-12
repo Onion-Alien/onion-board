@@ -121,6 +121,7 @@ REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
+HELPER_RETRY_S = 60.0   # a mic helper check that failed is tried again after this long
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
@@ -672,6 +673,8 @@ class MainWindow(QMainWindow):
     _declined = False       # the last set-up's Windows prompt got a No
     _show_bun = False       # the set-up running is the first one: Bun's show explains it
     _helper_checking = False
+    _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
+    _helper_check_at = 0.0  # when the last check started (time.monotonic())
     _mic_offered = False    # shown this start (it comes back next start until updated)
 
     def _mic_update_due(self) -> bool:
@@ -3582,10 +3585,15 @@ class MainWindow(QMainWindow):
         card redraws with the answer."""
         if self._helper_checking:
             return
-        self._helper_checking = True
+        # (a check that failed leaves known() None, which every card redraw asks about:
+        # one schtasks call a minute at most, not one per redraw)
+        if (self._helper_failed
+                and time.monotonic() - self._helper_check_at < HELPER_RETRY_S):
+            return
+        self._helper_checking, self._helper_check_at = True, time.monotonic()
 
         def work():
-            directmic._helper_check(via)
+            self._helper_failed = not directmic._helper_check(via)
             if qt_valid(self):
                 try:
                     self.helper_checked.emit()

@@ -2834,6 +2834,48 @@ def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window
     assert w.btn_install.text() == "Repair (one click)" and not w.btn_install.isHidden()
 
 
+def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
+    """michelper.ready() keeps raising: the card's redraws don't each run another
+    check (a schtasks call each), one a minute at most, and back to normal once a
+    check works."""
+    from PySide6.QtWidgets import QApplication
+
+    from conftest import process_events
+    from soundboard import michelper
+    from soundboard.ui import mainwindow as mw
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _helper(monkeypatch, None)
+    asked, fail = [], [True]
+
+    def ready(same_dll=True, via="ready"):
+        asked.append(via)
+        if fail[0]:
+            raise OSError("schtasks broke")
+        michelper.state.set({True: True, False: True}, via)
+        return True
+    monkeypatch.setattr(michelper, "ready", ready)
+    now = [1000.0]
+    own_module(monkeypatch, mw, "time", monotonic=lambda: now[0])
+    _no_threads(monkeypatch, run=True)
+    app = QApplication.instance()
+    for _ in range(20):
+        w._update_flow()
+        process_events(app, lambda: not w._helper_checking, timeout=1.0)
+    assert len(asked) == 1
+    now[0] += mw.HELPER_RETRY_S + 1
+    for _ in range(5):
+        w._update_flow()
+        process_events(app, lambda: not w._helper_checking, timeout=1.0)
+    assert len(asked) == 2
+    fail[0] = False
+    now[0] += mw.HELPER_RETRY_S + 1
+    w._update_flow()
+    process_events(app, lambda: michelper.known() is True)
+    assert len(asked) == 3 and not w._helper_failed
+
+
 def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F811
     """The fix by itself failed: a warning toast (no error box over the game), the card
     turns into Try again with the reason, and it isn't tried again by itself. Fixed but
