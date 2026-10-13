@@ -94,6 +94,8 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   goes in slices or tiles, never all at once. `307ff86`
 - A timer that repaints slows down while the app is in the background
   (`ui/appstate.py`: `slow_in_background`, `pause_in_background`).
+- Shell icon updates must recognise source launcher shortcuts as well as `main.py`.
+  Wrappers can replace `sys.argv`; use `sys.orig_argv` and match the Python installation.
 - An explicitly opened Apps window view keeps capturing across focus changes.
   Minimized source windows retain a labeled last frame; restore them only after
   the user clicks Restore, without activating them. Stop capture when the view
