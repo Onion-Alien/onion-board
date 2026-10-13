@@ -14,8 +14,8 @@ Getting it tries, in turn, until one works (fix):
    broken copy as installed), then uninstalled and installed fresh. winget downloads
    from Microsoft's package source itself and can't go through the app's proxy or Tor,
    so it's skipped when Connection is set to either.
-2. The app's own copy: the same build winget installs (PINNED below, from the
-   GyanD/codexffmpeg release winget's manifest points to), downloaded through net.urlopen
+2. The app's own copy: a pinned essentials build (PINNED below, from the
+   GyanD/codexffmpeg releases), downloaded through net.urlopen
    (so it follows Connection), checked against its SHA-256 before anything is unpacked,
    tried a few times on each of two sources, and unpacked into
    %APPDATA%\\OnionBoard\\ffmpeg\\bin, which library._ffmpeg looks in first.
@@ -23,9 +23,9 @@ Getting it tries, in turn, until one works (fix):
 net's "ffmpeg_download" switch and Offline mode decide whether the app goes online for
 it at all.
 
-To move to a newer FFmpeg: take VERSION and the zip's InstallerSha256 from the newest
-manifests/g/Gyan/FFmpeg/Essentials/<version> in github.com/microsoft/winget-pkgs, and
-check that GitHub's digest for the release asset says the same.
+To move to a newer FFmpeg: choose an essentials zip available from both URLS, and
+check that the builder's published SHA-256 and GitHub's release asset digest match.
+Older releases may remain on GitHub after the builder removes its own copy.
 """
 from __future__ import annotations
 
@@ -55,13 +55,13 @@ TIMEOUT_S = 900.0                    # winget fetches about 100 MB; a stuck one 
 CHECK_TIMEOUT_S = 8.0                # `ffmpeg -version` answers in well under a second;
                                      # a cold disk and a virus scan get a few more
 
-# the app's own copy (step 2): exactly the zip winget's 9.0.1 manifest installs
-VERSION = "9.0.1"
+# the app's own copy (step 2): a release available on both GitHub and the builder's site
+VERSION = "9.0.2"
 ZIP = f"ffmpeg-{VERSION}-essentials_build.zip"
-SHA256 = "fec81ae03971d9dd4be3ebe02e263bd2ec1d789483f931bdba5f5715e65da2e9"
+SHA256 = "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba"
 URLS = (f"https://github.com/GyanD/codexffmpeg/releases/download/{VERSION}/{ZIP}",
         f"https://www.gyan.dev/ffmpeg/builds/packages/{ZIP}")   # the builder's own site
-MAX_BYTES = 200_000_000             # the zip is 111 MB; anything far bigger isn't it
+MAX_BYTES = 200_000_000             # the zip is 115 MB; anything far bigger isn't it
 CHUNK = 256 * 1024
 DOWNLOAD_TIMEOUT_S = 60.0           # with no bytes arriving for this long
 TRIES = 3                           # per source
