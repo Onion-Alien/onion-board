@@ -100,3 +100,37 @@ def test_click_on_a_slider_jumps_there_and_drags(qapp):
         assert not s.isSliderDown()
         s.close()
         s.deleteLater()
+
+
+def test_a_menu_opening_skips_buttons_whose_menu_is_something_else(qapp):
+    """Finding which button opened a menu called every button's `menu`: a sound pad's
+    `menu` is a signal, so a menu shown over the board raised TypeError (2.0.2's
+    wheelguard.py:119). Only a real QPushButton / QToolButton menu() is asked."""
+    from PySide6.QtCore import QPoint, Signal
+    from PySide6.QtWidgets import QAbstractButton, QMenu, QPushButton
+
+    from soundboard import wheelguard
+
+    class PadLike(QAbstractButton):
+        menu = Signal(str, QPoint)   # like widgets.Pad
+
+        def paintEvent(self, e):
+            pass
+
+    class Picky(QAbstractButton):
+        def menu(self, pos):   # needs an argument, like padbatch.PadSelection.menu
+            raise AssertionError("called")
+
+        def paintEvent(self, e):
+            pass
+
+    host = QWidget()
+    PadLike(host), Picky(host)
+    owner = QPushButton("More", host)
+    menu = QMenu(host)
+    owner.setMenu(menu)
+    try:
+        wheelguard._submenu_edge().eventFilter(menu, QEvent(QEvent.Type.Show))
+        assert getattr(menu, "_click_opener", None) is owner
+    finally:
+        host.deleteLater()

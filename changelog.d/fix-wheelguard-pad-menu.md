@@ -1,0 +1,1 @@
+- Fix an error report that could pop up when a menu opened over the board (right-clicking a sound, for one).
