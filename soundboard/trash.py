@@ -138,8 +138,30 @@ def _move(src: Path, dest_dir: Path) -> Path:
 
 
 def put_sound(meta: SoundMeta, index: int) -> None:
-    """A sound came off the board: keep its files and its pad in the bin. Its decoded
-    cache is just deleted (it's made again from the audio)."""
+    """A sound came off the board: keep its files and its pad in the bin."""
+    put_sounds([(meta, index)])
+
+
+def put_sounds(removed: list[tuple[SoundMeta, int]]) -> int | None:
+    """Sounds came off the board (meta, where it was): keep their files and pads in
+    the bin. All the files move first, then the bin's list is read and written once,
+    so a whole pack is one save, not one per sound. Their decoded caches are just
+    deleted (made again from the audio). Disk work: never on the UI thread. Returns
+    how many sounds the bin now holds, or None if its list was locked."""
+    new = [it for it in (_bin_files(m, i) for m, i in removed) if it is not None]
+    if not new:
+        return None
+    saved = _add(*new)
+    if saved is None:   # unlisted, they could never come back: removed instead, the
+        for it in new:  # audio to the Recycle Bin, as a removal used to
+            _destroy(it)
+        return None
+    return sum(i.kind == SOUND for i in saved)
+
+
+def _bin_files(meta: SoundMeta, index: int) -> Item | None:
+    """Move one sound's audio and picture into the bin: its entry, not listed yet.
+    None if its audio couldn't be moved (it's removed instead)."""
     d = library._with_raw(asdict(meta), meta)   # a newer version's fields too
     try:
         p = Path(meta.file)
@@ -151,7 +173,7 @@ def put_sound(meta: SoundMeta, index: int) -> None:
         log.warning("couldn't move %s to the bin; removing it instead", meta.file,
                     exc_info=True)
         library.delete_file(meta)
-        return
+        return None
     try:
         if meta.image and Path(meta.image).parent == library.THUMBS_DIR \
                 and Path(meta.image).exists():
@@ -159,9 +181,7 @@ def put_sound(meta: SoundMeta, index: int) -> None:
     except OSError:   # the audio is in the bin already: the picture stays where it is
         log.warning("couldn't move %s to the bin", meta.image, exc_info=True)
     library.unlink_cache(meta.id)
-    item = Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index)
-    if not _add(item):   # unlisted, it could never come back: removed instead, the
-        _destroy(item)   # audio to the Recycle Bin, as a removal used to
+    return Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index)
 
 
 def put_app(exe: str, spec: dict, name: str, hidden: bool = False, path: str = "") -> Item:
@@ -176,16 +196,19 @@ def put_app(exe: str, spec: dict, name: str, hidden: bool = False, path: str = "
     return item
 
 
-def _add(item: Item) -> bool:
-    """False if the bin's list is locked: the rest of the bin is kept, unchanged."""
+def _add(*new: Item) -> list[Item] | None:
+    """List `new` in the bin (one read, one save): the bin as saved, or None if its
+    list is locked: the rest of the bin is kept, unchanged."""
     with _lock:
         all_, ok = _read(tries=10)
         if not ok:
-            log.warning("the bin's list is locked: %s isn't listed in it", item.name)
-            return False
-        all_.append(item)
-        _save(_prune(all_))
-        return True
+            log.warning("the bin's list is locked: %s isn't listed in it",
+                        ", ".join(i.name for i in new))
+            return None
+        all_.extend(new)
+        kept = _prune(all_)
+        _save(kept)
+        return kept
 
 
 def _in_bin(name: str) -> Path | None:
