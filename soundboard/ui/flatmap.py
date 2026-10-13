@@ -689,9 +689,15 @@ class FlatMap(QWidget):
         f = s / level[0] / level[1]                # its device pixels to screen pixels
         w, h, _nx, _ny = self._grid(level)
         o = self._origin(k, s)
-        return QRectF(round((o.x() + i * TILE * f) * dpr) / dpr,
-                      round((o.y() + j * TILE * f) * dpr) / dpr,
-                      min(TILE, w - i * TILE) * f, min(TILE, h - j * TILE) * f)
+        left = round((o.x() + i * TILE * f) * dpr) / dpr
+        top = round((o.y() + j * TILE * f) * dpr) / dpr
+        # The rounded cache width can differ from the next world's origin by a
+        # device pixel. End the last tile at that origin, and snap both edges.
+        end = min((i + 1) * TILE, w)
+        right = self._origin(k + 360, s).x() if end == w else o.x() + end * f
+        right = round(right * dpr) / dpr
+        bottom = round((o.y() + min((j + 1) * TILE, h) * f) * dpr) / dpr
+        return QRectF(left, top, right - left, bottom - top)
 
     def _tile_steps(self, level: tuple, i: int, j: int) -> tuple[QPixmap, Iterator[object]]:
         """A blank tile (i, j) of `level`, and the steps that draw it."""
@@ -700,7 +706,9 @@ class FlatMap(QWidget):
         w, h = min(TILE, w - i * TILE), min(TILE, h - j * TILE)
         pm = QPixmap(w, h)
         pm.setDevicePixelRatio(dpr)
-        pm.fill(QColor(theme.T["bg"]))
+        # The geographic world can end inside the last device pixel. Keep that
+        # pixel sea-coloured too, instead of baking a dark edge into the cache.
+        pm.fill(_mix(theme.T["bg"], theme.T["accent"], 0.06))
 
         def steps():
             p = QPainter(pm)
@@ -953,14 +961,14 @@ class FlatMap(QWidget):
         p.fillRect(self.rect(), QColor(t["bg"]))
         cur = self._level()
         slots = self._slots(cur)
-        shown = [(self._tile_rect(cur, k, i, j).topLeft(), self._tiles.get((cur, i, j)))
+        shown = [(self._tile_rect(cur, k, i, j), self._tiles.get((cur, i, j)))
                  for k, i, j in slots]
         complete = all(pm is not None for _at, pm in shown)
         revealing = self.revealing()
         if complete and not revealing:
             for at, pm in shown:
                 if pm is not None:   # (all of them: complete)
-                    p.drawPixmap(at, pm)
+                    p.drawPixmap(at, pm, QRectF(pm.rect()))
         else:
             # a new zoom (or new dots) shows all at once when it's all drawn, never a
             # patchwork of sharp and stretched squares; till then the last view
@@ -968,7 +976,7 @@ class FlatMap(QWidget):
             if not revealing and self._stable is not None and self._stable[0] == cur:
                 for at, pm in shown:   # the same zoom, dragged: the tiles there are
                     if pm is not None:
-                        p.drawPixmap(at, pm)
+                        p.drawPixmap(at, pm, QRectF(pm.rect()))
         self._plan(cur, slots, complete and not revealing)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         if revealing:
