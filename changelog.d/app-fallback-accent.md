@@ -1,0 +1,1 @@
+- Use the active theme accent for application tiles without an executable icon.
