@@ -4,8 +4,9 @@ now" button.
 
 A release whose notes have a line starting "Urgent:" ("Urgent: fixes sounds cutting
 out") is an urgent fix: the app shows it as a banner across the window instead of only
-the small Update pill, and "Skip this version" doesn't hide it. Only the newest release
-is looked at, so keep that line in the next release's notes while the fix still matters.
+the small Update pill, and "Skip this version" doesn't hide it. A copy that missed an
+urgent fix gets the banner for whatever newer release it's offered (skipped_urgent),
+and that installs the newer one.
 
 Any other release settles for SETTLE_S before the app offers it: a fix that follows it
 the same day replaces it, so people get one prompt instead of several. While the
@@ -237,6 +238,23 @@ def _release(data: dict) -> Release | None:
                    urgent=urgent(body), published=_published(data))
 
 
+def skipped_urgent(rel: Release) -> str:
+    """The "Urgent: …" reason of a release between this copy and `rel` (from the last
+    few), so an urgent fix still gets its banner when a normal release came out after
+    it; "" when none of them is urgent or GitHub can't be asked."""
+    try:
+        data = _get(RECENT)
+    except Exception as e:  # noqa: BLE001 - offline, rate-limited, GitHub down…
+        log.info("looking for a skipped urgent fix failed: %s", e)
+        return ""
+    for d in data if isinstance(data, list) else []:
+        if (isinstance(d, dict) and not d.get("draft") and not d.get("prerelease")
+                and (r := _release(d)) is not None and r.urgent and newer(r.version, __version__)
+                and not newer(r.version, rel.version)):
+            return r.urgent
+    return ""
+
+
 def check(cfg, force: bool = False) -> Release | None:
     """A newer release than this one, or None. Without `force` it only asks if the
     box is ticked, at most every EVERY_S, and stays quiet about a version they
@@ -260,6 +278,8 @@ def check(cfg, force: bool = False) -> Release | None:
     cfg.update_checked = time.time()
     if rel is None or not newer(rel.version):
         return None
+    if not rel.urgent:
+        rel.urgent = skipped_urgent(rel)
     if not force and rel.version == cfg.update_skip and not rel.urgent:
         return None
     log.info("a newer version is out: %s", rel.version)
