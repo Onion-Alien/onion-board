@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub のダウンロード チェックが一時的に利用できなくなりました (ゲートウェイ エラー)。しばらくしてからもう一度「Get Onion Watch」を試してください。",
   "Got it": "わかった",
   "Growl": "唸る",
-  "Hear": "聞く",
   "Hear it": "聞いてください",
   "Helmet": "ヘルメット",
   "Helmet size": "ヘルメットのサイズ",
@@ -3241,5 +3240,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "マイクから音が出ていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。それでも出ない場合は、PC を再起動してから、もう一度お試しください。",
   "Minimised: last picture": "最小化中：最後の画像",
   "Minimised: restore for live updates": "最小化中：元に戻すと映像が更新されます",
-  "Drag to resize saved clips. Double-click to fit the clips.": "ドラッグして保存済みクリップの表示サイズを変更。ダブルクリックでクリップに合わせます。"
+  "Drag to resize saved clips. Double-click to fit the clips.": "ドラッグして保存済みクリップの表示サイズを変更。ダブルクリックでクリップに合わせます。",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "このプログラムの直近1分間を波形で表示：一部を選んでクリップとして保存できます。開いている間だけ聞き取ります。"
 }

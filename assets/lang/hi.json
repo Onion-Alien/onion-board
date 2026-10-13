@@ -1823,7 +1823,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub की डाउनलोड जांच अस्थायी रूप से अनुपलब्ध है (गेटवे त्रुटि)। एक पल में फिर से ओनियन वॉच प्राप्त करने का प्रयास करें।",
   "Got it": "समझ गया",
   "Growl": "बादल की गरज",
-  "Hear": "सुनो",
   "Hear it": "यह सुनकर",
   "Helmet": "हेलमेट",
   "Helmet size": "हेलमेट का आकार",
@@ -3315,5 +3314,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
   "Minimised: last picture": "छोटी की गई: आखिरी तस्वीर",
   "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें",
-  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।"
+  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "इस प्रोग्राम का आख़िरी मिनट वेवफ़ॉर्म के रूप में: उसमें से एक हिस्सा चुनें और उसे क्लिप के रूप में रखें। यह सिर्फ़ खुला रहने पर ही सुनता है।"
 }

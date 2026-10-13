@@ -1823,7 +1823,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer Get Onion Watch over een ogenblik opnieuw.",
   "Got it": "Ik heb het",
   "Growl": "Grommen",
-  "Hear": "Horen",
   "Hear it": "Hoor het",
   "Helmet": "Helm",
   "Helmet size": "Helm maat",
@@ -3315,5 +3314,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Je mic stuurt geen geluid. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Nog steeds niets? Start je pc opnieuw op en probeer het nog eens.",
   "Minimised: last picture": "Geminimaliseerd: laatste beeld",
   "Minimised: restore for live updates": "Geminimaliseerd: herstel voor livebeelden",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Sleep om het vak met opgeslagen clips te vergroten of verkleinen. Dubbelklik om het aan de clips aan te passen."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Sleep om het vak met opgeslagen clips te vergroten of verkleinen. Dubbelklik om het aan de clips aan te passen.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "De laatste minuut van dit programma als golfvorm: kies er een stukje uit en bewaar het als clip. Het luistert alleen zolang het open is."
 }

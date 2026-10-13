@@ -1820,7 +1820,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκιμάστε το Get Onion Watch ξανά σε λίγο.",
   "Got it": "Κατάλαβα",
   "Growl": "Γκρινιάζω",
-  "Hear": "Ακούω",
   "Hear it": "Ακούστε το",
   "Helmet": "Κράνος",
   "Helmet size": "Μέγεθος κράνους",
@@ -3315,5 +3314,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
   "Minimised: last picture": "Ελαχιστοποιημένο: τελευταία εικόνα",
   "Minimised: restore for live updates": "Ελαχιστοποιημένο: επαναφέρετε για ζωντανή εικόνα",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Σύρετε για αλλαγή μεγέθους των αποθηκευμένων κλιπ. Διπλό κλικ για προσαρμογή στα κλιπ."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Σύρετε για αλλαγή μεγέθους των αποθηκευμένων κλιπ. Διπλό κλικ για προσαρμογή στα κλιπ.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Το τελευταίο λεπτό αυτού του προγράμματος ως κυματομορφή: διάλεξε ένα κομμάτι και κράτησέ το ως κλιπ. Ακούει μόνο όσο είναι ανοιχτό."
 }

@@ -1823,7 +1823,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "La vérification de téléchargement de GitHub est temporairement indisponible (erreur de passerelle). Essayez à nouveau Get Onion Watch dans un instant.",
   "Got it": "J'ai compris",
   "Growl": "Grognement",
-  "Hear": "Entendre",
   "Hear it": "Écoutez-le",
   "Helmet": "Casque",
   "Helmet size": "Taille du casque",
@@ -3315,5 +3314,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Ton micro n'envoie aucun son. Ton casque est-il éteint, ou son micro coupé ? Allume-le ou réactive le micro. Toujours rien ? Redémarre ton PC, puis réessaie.",
   "Minimised: last picture": "Réduite : dernière image",
   "Minimised: restore for live updates": "Réduite : restaurez pour voir les mises à jour en direct",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Faites glisser pour redimensionner les clips enregistrés. Double-cliquez pour ajuster aux clips."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Faites glisser pour redimensionner les clips enregistrés. Double-cliquez pour ajuster aux clips.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "La dernière minute de ce programme en forme d'onde : choisissez-en un morceau et gardez-le comme clip. Il n'écoute que lorsqu'il est ouvert."
 }

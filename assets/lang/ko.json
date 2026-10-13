@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub의 다운로드 확인을 일시적으로 사용할 수 없습니다(게이트웨이 오류). 잠시 후 Get Onion Watch를 다시 시도해 보세요.",
   "Got it": "알았어요",
   "Growl": "으르렁",
-  "Hear": "듣다",
   "Hear it": "들어보세요",
   "Helmet": "헬멧",
   "Helmet size": "헬멧 사이즈",
@@ -3241,5 +3240,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요.",
   "Minimised: last picture": "최소화됨: 마지막 화면",
   "Minimised: restore for live updates": "최소화됨: 실시간으로 보려면 창을 복원하세요",
-  "Drag to resize saved clips. Double-click to fit the clips.": "드래그하여 저장된 클립 영역의 크기를 조절하세요. 두 번 클릭하면 클립에 맞춰집니다."
+  "Drag to resize saved clips. Double-click to fit the clips.": "드래그하여 저장된 클립 영역의 크기를 조절하세요. 두 번 클릭하면 클립에 맞춰집니다.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "이 프로그램의 마지막 1분을 파형으로 보여줍니다: 일부를 골라 클립으로 저장하세요. 열려 있는 동안에만 듣습니다."
 }

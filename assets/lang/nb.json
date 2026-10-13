@@ -1820,7 +1820,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHubs nedlastingssjekk er midlertidig utilgjengelig (gatewayfeil). Prøv Get Onion Watch igjen om et øyeblikk.",
   "Got it": "Skjønner det",
   "Growl": "Knurre",
-  "Hear": "Høre",
   "Hear it": "Hør det",
   "Helmet": "Hjelm",
   "Helmet size": "Hjelmstørrelse",
@@ -3315,5 +3314,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen din sender ingen lyd. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Fortsatt ingenting? Start PC-en på nytt, og prøv igjen.",
   "Minimised: last picture": "Minimert: siste bilde",
   "Minimised: restore for live updates": "Minimert: gjenopprett for løpende oppdateringer",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Dra for å endre størrelsen på lagrede klipp. Dobbeltklikk for å tilpasse til klippene."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Dra for å endre størrelsen på lagrede klipp. Dobbeltklikk for å tilpasse til klippene.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Programmets siste minutt som en lydbølge: velg en bit og ta vare på den som et klipp. Den lytter bare mens den er åpen."
 }

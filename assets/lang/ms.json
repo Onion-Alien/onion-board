@@ -1776,7 +1776,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara waktu (ralat pintu masuk). Cuba Dapatkan Onion Watch sekali lagi.",
   "Got it": "faham",
   "Growl": "Geram",
-  "Hear": "dengar",
   "Hear it": "Dengarlah",
   "Helmet": "topi keledar",
   "Helmet size": "Saiz topi keledar",
@@ -3241,5 +3240,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofon anda tidak menghantar bunyi. Adakah set kepala anda dimatikan, atau mikrofonnya diredamkan? Hidupkannya atau nyahredamkannya. Masih tiada? Mulakan semula PC anda, kemudian cuba lagi.",
   "Minimised: last picture": "Diminimumkan: gambar terakhir",
   "Minimised: restore for live updates": "Diminimumkan: pulihkan untuk kemas kini langsung",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah saiz klip tersimpan. Klik dua kali untuk memuatkan klip."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah saiz klip tersimpan. Klik dua kali untuk memuatkan klip.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Minit terakhir program ini sebagai bentuk gelombang: pilih sebahagian dan simpan sebagai klip. Ia hanya mendengar semasa dibuka."
 }

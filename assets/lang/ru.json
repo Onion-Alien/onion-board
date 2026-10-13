@@ -1782,7 +1782,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте Get Onion Watch еще раз через минуту.",
   "Got it": "Понятно",
   "Growl": "Рычать",
-  "Hear": "Слышать",
   "Hear it": "Слушай это",
   "Helmet": "Шлем",
   "Helmet size": "Размер шлема",
@@ -3389,5 +3388,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофон не передаёт звук. Гарнитура выключена или её микрофон отключён? Включи её или микрофон. Всё ещё ничего? Перезагрузи ПК и попробуй ещё раз.",
   "Minimised: last picture": "Свёрнуто: последний кадр",
   "Minimised: restore for live updates": "Свёрнуто: восстановите окно для обновления в реальном времени",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Потяните, чтобы изменить размер области сохранённых клипов. Двойной щелчок подгоняет её под клипы."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Потяните, чтобы изменить размер области сохранённых клипов. Двойной щелчок подгоняет её под клипы.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Последняя минута этой программы в виде волны: выберите кусочек и сохраните его как клип. Слушает, только пока открыт."
 }

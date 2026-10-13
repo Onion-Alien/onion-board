@@ -942,3 +942,16 @@ def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypat
     QTest.keyClick(btn, Qt.Key_Space)
     assert len(workers) == 1
     workers.pop()()
+
+
+def test_search_words_skip_widgets_kept_as_a_name(qapp):
+    from PySide6.QtWidgets import QLabel, QWidget
+    from soundboard.settings import SettingsDialog
+    card = QWidget()
+    holder = QWidget(card)
+    holder.name = QLabel("Speaker", holder)   # a widget's own label kept as `name`
+    named = QWidget(card)
+    named.name = "Midnight"                    # a painted name
+    words = SettingsDialog._words_of(card)
+    assert "midnight" in words and "speaker" in words
+    assert "pyside" not in words and "object at" not in words

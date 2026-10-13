@@ -1999,7 +1999,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "فحص تنزيل GitHub غير متاح مؤقتًا (خطأ في البوابة). حاول الحصول على Onion Watch مرة أخرى بعد قليل.",
   "Got it": "فهمتها",
   "Growl": "تذمر",
-  "Hear": "يسمع",
   "Hear it": "اسمعها",
   "Helmet": "خوذة",
   "Helmet size": "حجم الخوذة",
@@ -3611,5 +3610,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "الميكروفون لا يرسل أي صوت. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. ما زال لا شيء؟ أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى.",
   "Minimised: last picture": "مصغّرة: آخر صورة",
   "Minimised: restore for live updates": "مصغّرة: استعد النافذة للتحديث المباشر",
-  "Drag to resize saved clips. Double-click to fit the clips.": "اسحب لتغيير حجم المقاطع المحفوظة. انقر مرتين لملاءمة المقاطع."
+  "Drag to resize saved clips. Double-click to fit the clips.": "اسحب لتغيير حجم المقاطع المحفوظة. انقر مرتين لملاءمة المقاطع.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "آخر دقيقة من هذا البرنامج كشكل موجي: اختر جزءًا منها واحتفظ به كمقطع. لا يستمع إلا وهو مفتوح."
 }

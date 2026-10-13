@@ -1820,7 +1820,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "A GitHub letöltési ellenőrzése átmenetileg nem érhető el (átjáróhiba). Próbálja újra a Hagyma óráját egy pillanat múlva.",
   "Got it": "Értem",
   "Growl": "Morgás",
-  "Hear": "Hall",
   "Hear it": "Halld",
   "Helmet": "Sisak",
   "Helmet size": "Sisak mérete",
@@ -3315,5 +3314,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "A mikrofonod nem küld hangot. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Indítsd újra a géped, aztán próbáld újra.",
   "Minimised: last picture": "Kis méretű: utolsó kép",
   "Minimised: restore for live updates": "Kis méretű: állítsd vissza az élő képhez",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Húzással méretezheted át a mentett klipek területét. Dupla kattintással a klipekhez igazíthatod."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Húzással méretezheted át a mentett klipek területét. Dupla kattintással a klipekhez igazíthatod.",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "A program utolsó perce hullámformaként: válassz ki belőle egy részt, és tartsd meg klipként. Csak akkor figyel, amikor nyitva van."
 }

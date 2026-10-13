@@ -817,7 +817,8 @@ def test_cards_tighten_when_narrow_and_keep_the_meter(qapp):
     assert row.vol.spin.isVisibleTo(row) and row.btn_rec.text() == "Record"
     row.setGeometry(0, 0, 150, 140)
     assert row.meter.isVisibleTo(row) and row.btn_rec.text() == ""
-    assert not row.vol.spin.isVisibleTo(row) and row.chk_hear.text() == "Hear"
+    assert not row.vol.spin.isVisibleTo(row)
+    assert "hear" not in row._TIGHTEN   # Hear it myself is in the card's menu now
     row.set_sending(True)                         # the words stay away when it changes
     assert row.btn_send.text() == ""
     row.setGeometry(0, 0, 800, 140)

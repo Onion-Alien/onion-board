@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub 的下載檢查暫時無法使用（網關錯誤）。稍後再次嘗試獲取 Onion Watch。",
   "Got it": "知道了",
   "Growl": "咆哮",
-  "Hear": "聽到",
   "Hear it": "聽到它",
   "Helmet": "頭盔",
   "Helmet size": "頭盔尺寸",
@@ -3241,5 +3240,6 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麥克風沒有聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。還是沒有聲音？請重新啟動電腦，然後再試一次。",
   "Minimised: last picture": "已最小化：最後一幀",
   "Minimised: restore for live updates": "已最小化：還原視窗以即時更新",
-  "Drag to resize saved clips. Double-click to fit the clips.": "拖曳可調整已儲存片段區域的大小。按兩下可自動符合片段。"
+  "Drag to resize saved clips. Double-click to fit the clips.": "拖曳可調整已儲存片段區域的大小。按兩下可自動符合片段。",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "這個程式最近一分鐘的波形：從中選一段，保存為剪輯。只在打開時才會收聽。"
 }
