@@ -1506,15 +1506,28 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
         p.setBrush(a(0.09))
         for cx, cy in ((0, 0), (size, 0), (0, size), (size, size), (size / 2, size / 2)):
             p.drawEllipse(QPointF(cx, cy), size * 0.2, size * 0.2)
-    elif kind in ("grain", "frost", "embers"):   # fixed-seed specks
-        n, alpha = {"grain": (size * size // 3, 0.05), "frost": (220, 0.10),
-                    "embers": (40, 0.30)}[kind]
-        dark = _ink("#000000", (0.10 if not light else 0.04) * k)
+    elif kind == "grain":   # a soft matte finish, without isolated bright pixels
+        cells = max(2, size // 24)
+        field = QImage(cells, cells, QImage.Format.Format_ARGB32_Premultiplied)
+        for y in range(cells):
+            for x in range(cells):
+                v = rng.uniform(-1, 1)
+                field.setPixelColor(x, y, a(0.012 * v) if v > 0
+                                   else _ink("#000000", -0.012 * v * k))
+        # Repeat before smoothing so the filter also sees the neighbouring tile.
+        # Cropping its centre keeps the finish continuous across tiled surfaces.
+        repeated = QImage(cells * 3, cells * 3, field.format())
+        repeated.fill(Qt.GlobalColor.transparent)
+        fp = QPainter(repeated)
+        fp.fillRect(repeated.rect(), QBrush(QPixmap.fromImage(field)))
+        fp.end()
+        smooth = repeated.scaled(size * 3, size * 3, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                 Qt.TransformationMode.SmoothTransformation)
+        p.drawImage(0, 0, smooth.copy(size, size, size, size))
+    elif kind in ("frost", "embers"):   # fixed-seed specks
+        n, alpha = {"frost": (220, 0.10), "embers": (40, 0.30)}[kind]
         for _ in range(n):
             x, y = rng.randrange(size), rng.randrange(size)
-            if kind == "grain" and rng.random() < 0.5:
-                img.setPixelColor(x, y, dark)
-                continue
             img.setPixelColor(x, y, a(alpha * rng.uniform(0.4, 1.0)))
     elif kind == "diagonal":    # thin pinstripes, bottom-left to top-right
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -1592,6 +1605,8 @@ def _texture_url(tk: dict[str, str]) -> str:
         return ""
     key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
            tk.get("texture_ink", ""), tk.get("texture_strength", ""))
+    if kind == "grain":
+        key += ("matte-v1",)   # don't reuse the old speckled tile from disk
     if url := _texture_urls.get(key):
         return url
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"

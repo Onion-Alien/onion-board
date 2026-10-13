@@ -1,0 +1,1 @@
+- Give textured Dark, Light and Onion themes a softer matte finish instead of speckled grain.

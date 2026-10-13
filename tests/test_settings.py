@@ -454,6 +454,29 @@ def test_every_texture_tile_is_see_through(qapp, kind):
         assert min(alphas) < 255, (kind, name)
 
 
+def test_matte_grain_replaces_a_cached_speckled_tile(qapp, tmp_path, monkeypatch):
+    """An existing installation must not keep its old texture after upgrading."""
+    import hashlib
+    from PySide6.QtGui import QImage, QColor
+    from soundboard import theme
+
+    tk = theme.tokens("Dark")
+    key = ("grain", tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
+           tk.get("texture_ink", ""), tk.get("texture_strength", ""))
+    folder = tmp_path / "onionboard-ui"
+    folder.mkdir()
+    stale = folder / f"tex-grain-{hashlib.md5(repr(key).encode()).hexdigest()[:10]}.png"
+    old = QImage(96, 96, QImage.Format.Format_ARGB32)
+    old.fill(QColor("magenta"))
+    assert old.save(str(stale))
+    monkeypatch.setattr(theme.tempfile, "gettempdir", lambda: str(tmp_path))
+    monkeypatch.setattr(theme, "_texture_urls", {})
+    monkeypatch.setattr(theme, "textures_on", True)
+    url = theme._texture_url(tk)
+    assert url != stale.as_posix()
+    assert QImage(url) == theme.texture_image("grain", tk)
+
+
 def _ink_left(lbl) -> int | None:
     """The first column of a label's picture with text in it."""
     img = lbl.grab().toImage()
