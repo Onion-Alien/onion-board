@@ -8,7 +8,7 @@ Or send it to your stream, or keep it to your own headphones.
 
 <!-- release -->
 Version **2.0.4** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/aca8f53cfcdb26623b9a4165d1ccd5aa034f3b9bdeffb806ae44510811aeca94) ·
+[VirusTotal: 67 of 67 clean](https://www.virustotal.com/gui/file/c454e266f202d254e48b13cd714ef9b17dbd20a74dfdbe76df1d73b92a2f5e36) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
