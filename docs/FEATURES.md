@@ -149,11 +149,13 @@ The full list. The [README](../README.md) has the short version and how to get s
   controls change the pitch and effects of every program you send. A closed editor
   doesn't listen or keep anything. A program you removed comes back, settings and
   all, from *Forgotten programs*.
-- **Voice tab:** voice changer (21 ready voices, from Female / Male voice and Demon to
-  Autotune, Talkbox, Masked caller and Dark lord; pitch with a natural-sound mode and a
+- **Voice tab:** voice changer (22 ready voices, from Female / Male voice and Demon to
+  Autotune, Talkbox, Masked caller, Dark lord and a chanting monk; pitch with a natural-sound mode and a
   voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,
   robot / talkbox, helmet, shout blowout, radio with walkie-talkie clicks, echo, reverb,
-  distortion, 8-bit bitcrusher, plus add-on effects; *Save as a voice* keeps your own
+  distortion (oversampled, so it crunches without fizz), a studio polish (de-esser,
+  warmth and a lookahead limiter), plus add-on effects such as an 8-bit bitcrusher;
+  *Save as a voice* keeps your own
   mix as a voice button (*Make it yours* tweaks it, a share code copies it to a
   friend and *Import a code* adds theirs; removed ones wait in *Recently deleted*),
   and the dice picks a random one; it shows how much delay the

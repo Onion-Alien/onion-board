@@ -3641,5 +3641,19 @@
   "New subcategory in {cat}": "فئة فرعية جديدة في {cat}",
   "Put its categories in one tab": "ضع فئاتها في تبويب واحد",
   "Rename subcategory": "إعادة تسمية الفئة الفرعية",
-  "✓ “{name}” is one tab now": "✓ أصبح «{name}» تبويبًا واحدًا"
+  "✓ “{name}” is one tab now": "✓ أصبح «{name}» تبويبًا واحدًا",
+  "Attack": "الهجوم",
+  "Ceiling": "السقف",
+  "Chanting monk": "راهب منشد",
+  "De-ess": "كبح السين",
+  "Release": "الإفلات",
+  "Studio polish": "لمسة الاستوديو",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "يخفف أصوات السين الحادة، يضيف دفئًا ويبقي كل ذروة تحت السقف. يعمل أخيرًا.",
+  "Warmth": "الدفء",
+  "quick": "سريع",
+  "slow": "بطيء",
+  "snappy": "خاطف",
+  "soft": "ناعم",
+  "warm": "دافئ",
+  "clean": "نظيف"
 }
