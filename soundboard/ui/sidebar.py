@@ -626,7 +626,7 @@ class OutputBlock(QFrame):
                 gap.changeSize(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         else:
             self._title_gap.changeSize(0, 4, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-            # Match the visible switch-to-stop gap below the small output block.
+            # Keep the caption with its switch; Stop all is a separate action below.
             self._switch_gap.changeSize(0, 4, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setup.setMinimumHeight(px(self.ROW_H))
         self._status_gap.changeSize(0, 0,

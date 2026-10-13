@@ -278,7 +278,7 @@ def test_output_block_stays_inside_rail_at_normal_and_narrow_sizes(window, qapp,
         output = window.rail.output
         if output.isVisible():
             assert window.rail.rect().contains(output.geometry())
-            for widget in (output.mark, output.title, output.switch, output.mute, output.stop,
+            for widget in (output.mark, output.caption, output.switch, output.mute, output.stop,
                            output.status_text, output.setup):
                 if not widget.isVisible():
                     continue
