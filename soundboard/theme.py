@@ -1460,7 +1460,7 @@ def _carbon_tile(p: QPainter, size: int, light: QColor, dark: QColor) -> None:
 # theme's brightest text colour, "shade" = black, or a theme token like "accent2").
 TEXTURES = {
     "carbon": (14, "lift"), "scanlines": (3, "shade"), "grid": (24, "accent2"),
-    "dots": (12, "lift"), "grain": (96, "lift"), "diagonal": (12, "lift"),
+    "dots": (12, "lift"), "grain": (192, "lift"), "diagonal": (12, "lift"),
     "ruled": (24, "accent2"), "waves": (32, "accent"), "brushed": (96, "lift"),
     "crosshatch": (8, "lift"), "diamond": (20, "accent"), "scales": (24, "accent"),
     "embers": (96, "accent2"), "petals": (64, "accent2"), "dither": (2, "shade"),
@@ -1506,17 +1506,17 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
         p.setBrush(a(0.09))
         for cx, cy in ((0, 0), (size, 0), (0, size), (size, size), (size / 2, size / 2)):
             p.drawEllipse(QPointF(cx, cy), size * 0.2, size * 0.2)
-    elif kind == "grain":   # a soft matte finish, without isolated bright pixels
-        cells = max(2, size // 24)
-        field = QImage(cells, cells, QImage.Format.Format_ARGB32_Premultiplied)
-        for y in range(cells):
-            for x in range(cells):
+    elif kind == "grain":   # soft brushed satin, without isolated bright pixels
+        columns, rows = 3, max(2, size // 3)
+        field = QImage(columns, rows, QImage.Format.Format_ARGB32_Premultiplied)
+        for y in range(rows):
+            for x in range(columns):
                 v = rng.uniform(-1, 1)
-                field.setPixelColor(x, y, a(0.012 * v) if v > 0
-                                   else _ink("#000000", -0.012 * v * k))
+                field.setPixelColor(x, y, a(0.05 * v) if v > 0
+                                   else _ink("#000000", -0.05 * v * k))
         # Repeat before smoothing so the filter also sees the neighbouring tile.
         # Cropping its centre keeps the finish continuous across tiled surfaces.
-        repeated = QImage(cells * 3, cells * 3, field.format())
+        repeated = QImage(columns * 3, rows * 3, field.format())
         repeated.fill(Qt.GlobalColor.transparent)
         fp = QPainter(repeated)
         fp.fillRect(repeated.rect(), QBrush(QPixmap.fromImage(field)))
@@ -1606,7 +1606,7 @@ def _texture_url(tk: dict[str, str]) -> str:
     key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
            tk.get("texture_ink", ""), tk.get("texture_strength", ""))
     if kind == "grain":
-        key += ("matte-v1",)   # don't reuse the old speckled tile from disk
+        key += ("satin-v1",)   # don't reuse the old speckled tile from disk
     if url := _texture_urls.get(key):
         return url
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"

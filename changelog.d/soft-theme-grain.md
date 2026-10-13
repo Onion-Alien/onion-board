@@ -1,1 +1,1 @@
-- Give textured Dark, Light and Onion themes a softer matte finish instead of speckled grain.
+- Give textured Dark, Light and Lilac themes a soft brushed satin finish instead of speckled grain.
