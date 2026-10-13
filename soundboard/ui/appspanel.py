@@ -779,7 +779,7 @@ class AppRow(HoverCard):
 
     NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
     # narrow card, in this order: the typed volume goes, the buttons keep only their
-    # icons (their tooltips say what they are), "Hear it myself" becomes "Hear"
+    # icons (their tooltips say what they are)
     _TIGHTEN = ("spin", "send", "rec")
 
     def resizeEvent(self, e):
