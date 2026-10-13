@@ -128,7 +128,6 @@ REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard
 CHIPS_GAP = 6         # between the now-playing row's chips
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
-TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
 HELPER_RETRY_S = 60.0   # a mic helper check that failed is tried again after this long
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
@@ -9569,8 +9568,7 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------ tick
     # The window's visibility sets the UI timer's pace: 30/s for the meters and
-    # visualisers while it's on screen, TICK_BG_MS while it's on screen behind another
-    # program (a game: the meters still move, a third as often), TICK_IDLE_MS while it's
+    # visualisers while it's on screen, even behind another program, TICK_IDLE_MS while it's
     # hidden in the tray or minimised (nothing to paint, but push-to-talk, the stream
     # watchdog must go on). Qt tells us through these three
     # events and applicationStateChanged.
@@ -9614,9 +9612,8 @@ class MainWindow(QMainWindow):
             return TICK_IDLE_MS
         if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
             return TICK_QUIET_MS
-        if self.overlay.is_open:   # the in-game overlay shows what's playing, over the game
-            return TICK_MS
-        return TICK_MS if appstate.active() else TICK_BG_MS
+        # Visible and busy: meters stay smooth even when a game has focus.
+        return TICK_MS
 
     def _wake(self):
         """A sound started or resumed: full pace now, not after a quiet tick (auto
