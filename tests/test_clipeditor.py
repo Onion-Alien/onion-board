@@ -510,6 +510,53 @@ def test_saved_clips_resize_with_mouse_and_keyboard_and_reset(tab, qapp):
     assert sh.list.height() == 72
 
 
+def test_empty_saved_clips_cannot_resize_and_undo_restores_height(tab, qapp):
+    sh = tab.shelf
+    assert not sh.isVisible() and not sh.resize_handle.isVisible()
+    sh.resize_clips(400)
+    assert tab.cfg.app_clip_height == 0
+    saved(tab, qapp)
+    sh.resize_clips(400)
+    handle = sh.resize_handle
+    QTest.mousePress(handle, Qt.LeftButton, Qt.NoModifier, handle.rect().center())
+    assert handle._drag is not None
+    sh.delete_picked()
+    qapp.processEvents()
+    assert sh.undo_bar.active()
+    assert not sh.isVisible() and not handle.isVisible() and handle._drag is None
+    assert sh.list.height() == sh._fit_height
+    QTest.keyClick(handle, Qt.Key_Down)
+    QTest.mouseDClick(handle, Qt.LeftButton)
+    sh.resize_clips(500)
+    assert tab.cfg.app_clip_height == 400
+    sh.undo_bar.undo()
+    qapp.processEvents()
+    assert sh.isVisible() and handle.isVisible() and sh.list.height() == 400
+    sh.delete_picked()
+    sh.undo_bar.finish()
+    assert not sh.isVisible()
+    sh.add(tone(1), "New clip")
+    qapp.processEvents()
+    assert sh.isVisible() and handle.isVisible() and sh.list.height() == 400
+
+
+def test_edit_menu_only_opens_when_an_action_is_available(tab, qapp, monkeypatch):
+    row = opened(tab, qapp)
+    ed = row.editor
+    assert not any(a.isEnabled() for a in ed.actions_by_name.values())
+    assert not ed.btn_edit.isEnabled()
+    clipeditor.set_clipboard(tone(1))
+    qapp.processEvents()
+    assert ed.actions_by_name["paste"].isEnabled() and ed.btn_edit.isEnabled()
+    monkeypatch.setattr(clipeditor, "clipboard", None)
+    ed._enable_actions()
+    assert not ed.btn_edit.isEnabled()
+    row.capture.sink(tone(1))
+    ed._tick()
+    assert ed.btn_edit.isEnabled() and ed.actions_by_name["copy"].isEnabled()
+    assert not ed.actions_by_name["cut"].isEnabled()
+
+
 def test_keyboard_paste_updates_when_another_editor_copies(tab, qapp):
     run(tab, music(), App(200, "game.exe", r"C:\Games\game.exe", "Game", True, 0.3,
                           ["Speakers"]))
