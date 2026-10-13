@@ -1,0 +1,1 @@
+- Fix the FFmpeg backup download by pinning version 9.0.2, available from both download sources with the same verified checksum.
