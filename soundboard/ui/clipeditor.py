@@ -452,6 +452,7 @@ class ClipEditor(QWidget):
               "redo": t is not None and t.can_redo, "fit": t is not None}
         for name, a in self.actions_by_name.items():
             a.setEnabled(on.get(name, self.length() > 0))
+        self.btn_edit.setEnabled(any(a.isEnabled() for a in self.actions_by_name.values()))
 
     # ---------------------------------------------------------- buffer / take
     def set_buffer(self, buf: LiveBuffer | None):

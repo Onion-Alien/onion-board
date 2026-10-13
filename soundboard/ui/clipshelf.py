@@ -179,15 +179,19 @@ class ClipShelf(QWidget):
         self._fit_height = (self.list.header().sizeHint().height() + rows * max(row_h, 36)
                             + 2 * self.list.frameWidth() + 2)
         self._apply_height()
-        self.setVisible(bool(self.shelf.clips) or self.undo_bar.active())
+        self.resize_handle._drag = None
+        self.resize_handle.setVisible(bool(self.shelf.clips))
+        self.setVisible(bool(self.shelf.clips))
         self._sync()
         self.layout_changed.emit()
 
     def _apply_height(self):
-        height = self.cfg.app_clip_height
+        height = self.cfg.app_clip_height if self.shelf.clips else 0
         self.list.setFixedHeight(min(max(int(height), 72), 600) if height else self._fit_height)
 
     def resize_clips(self, height):
+        if not self.shelf.clips:
+            return
         self.cfg.app_clip_height = min(max(int(height), 72), 600) if height else 0
         self._apply_height()
         self.layout_changed.emit()
@@ -323,7 +327,6 @@ class ClipShelf(QWidget):
                 else ngettext("Deleted {n} clip", "Deleted {n} clips", len(gone)))
         self.undo_bar.show_for(what, undo)
         self.reload()
-        self.show()
 
     def _menu(self, pos):
         it = self.list.itemAt(pos)
