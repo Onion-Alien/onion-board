@@ -108,3 +108,28 @@ def test_touch_still_reaches_nested_rows(qapp):
     responsive.touch(pill)
     assert rows and all(r in hit for r in rows)
     root.deleteLater()
+
+
+def test_fit_preserves_an_outer_paint_transaction(qapp):
+    root, pill = header(LONG)
+    fitter = responsive.Fitter(root)
+    fitter.add(10, "w", responsive.icon_only(pill))
+    root.setUpdatesEnabled(False)
+    fitter.fit(QSize(100, 400))
+    assert not root.updatesEnabled()
+    root.setUpdatesEnabled(True)
+    root.deleteLater()
+
+
+def test_nested_update_hold_commits_geometry_before_resuming(qapp):
+    root, pill = header(LONG)
+    root.show()
+    qapp.processEvents()
+    with responsive.hold_updates(root):
+        root.resize(800, 300)
+        with responsive.hold_updates(root):
+            pill.hide()
+        assert not root.updatesEnabled()
+    assert root.updatesEnabled()
+    assert pill.isHidden()
+    root.deleteLater()

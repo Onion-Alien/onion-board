@@ -96,3 +96,15 @@ def test_dot_stays_beside_the_arrow_at_every_width(qapp, rtl):
         arrow.resize(width, 38)
         assert arrow.dot_rect().center().x() - width / 2 == (-8 if rtl else 8)
     arrow.close()
+
+
+@pytest.mark.parametrize("kind", [QEvent.Move, QEvent.Resize, QEvent.Show, QEvent.Hide])
+def test_tab_geometry_invalidates_the_rail_live_stripe(qapp, monkeypatch, kind):
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "Sounds")
+    rail = SideRail(tabs, QWidget(), QLabel(), QLabel(), [], False)
+    updates = []
+    monkeypatch.setattr(rail, "update", lambda: updates.append(True))
+    rail.eventFilter(rail.buttons[0], QEvent(kind))
+    assert updates, "The playing stripe outside the button must also be erased"
+    rail.close()

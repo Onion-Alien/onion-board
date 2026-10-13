@@ -13,6 +13,7 @@ them again.
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import contextmanager
 
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QBoxLayout, QLayout, QPushButton, QWidget
@@ -22,6 +23,24 @@ from soundboard.ui import icons
 Step = tuple[int, str, Callable[[bool], object]]   # (priority, "w" / "h", apply(compact))
 
 MIN_SIZE = QSize(260, 120)   # the mini player (see MainWindow._refit)
+
+
+@contextmanager
+def hold_updates(widget: QWidget):
+    """Keep nested layout changes inside the caller's paint transaction."""
+    enabled = widget.updatesEnabled()
+    if enabled:
+        widget.setUpdatesEnabled(False)
+    try:
+        yield
+    finally:
+        if enabled:
+            # Commit the visible layout before painting resumes. Hidden pages
+            # must keep their deferred layout until they are shown.
+            layout = widget.layout()
+            if layout is not None:
+                layout.activate()
+            widget.setUpdatesEnabled(True)
 
 
 def touch(*widgets: QWidget):
@@ -181,8 +200,7 @@ class Fitter:
         # search through every widget took longer than the measuring (a step only
         # shows, hides or retitles things, so the layouts stay the same meanwhile)
         self._layouts, self._known = self.root.findChildren(QLayout), None
-        self.root.setUpdatesEnabled(False)
-        try:
+        with hold_updates(self.root):
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
                 for i, (_, ax, _fn) in enumerate(self.steps):
                     if ax != axis or i in self._at:
@@ -214,8 +232,6 @@ class Fitter:
                         self._at[i] = (dim["w"], dim["h"], cross)
                         break
                     del self._at[i]
-        finally:
-            self.root.setUpdatesEnabled(True)
         try:
             return self.need()
         finally:
