@@ -275,10 +275,12 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
         win.apply_theme("Dark")
 
 
-def test_the_rail_mirrors_right_to_left(qapp, win):
+@pytest.mark.parametrize("green", [False, True])
+def test_the_rail_mirrors_right_to_left(qapp, win, green):
     """Arabic: the rail on the right, its live bar and border on its outer / inner edge,
     and the narrow window's tight gap beside it."""
     from PySide6.QtGui import QColor
+    win.set_live_tab_tint(green)
     vi = win.tabs.indexOf(win.voice)
     win.tabs.setTabVisible(vi, True)
     set_tab_live(win.tabs, vi, True, "● ON", "voice")
@@ -292,12 +294,12 @@ def test_the_rail_mirrors_right_to_left(qapp, win):
         return [x for x in (0, rail.width() - 1) if QColor(img.pixel(x, y)).name() == live]
 
     try:
-        assert bar_at() == [0]
+        assert bar_at() == ([0] if green else [])
         qapp.setLayoutDirection(Qt.RightToLeft)
         qapp.processEvents()
         assert rail.property("rtl") is True
         assert rail.mapTo(win, QPoint(0, 0)).x() + rail.width() == win.width()
-        assert bar_at() == [rail.width() - 1]
+        assert bar_at() == ([rail.width() - 1] if green else [])
         win._squeeze_rail(True)
         m = win._body_lay.contentsMargins()
         assert (m.left(), m.right()) == (main.BODY_SIDE, main.BODY_SIDE_TIGHT)

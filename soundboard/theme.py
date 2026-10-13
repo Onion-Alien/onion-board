@@ -1051,6 +1051,7 @@ QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QFrame#voicebar { background:$panel; border-radius:12px; }
 QWidget#voicebarpart, QFrame#voicebar QLabel { background:transparent; }
 QLabel#voicebarlabel { color:$muted; font-size:9pt; font-weight:600; }
+QFrame#voicebar QPushButton#iconbutton { padding:0; min-width:0; }
 QPushButton#vchip { background:$inset; border:1px solid transparent; border-radius:13px; padding:4px 11px; color:$muted; font-size:9pt; font-weight:600; min-height:0; }
 QPushButton#vchip:hover { color:$text; }
 QPushButton#vchip[state="on"] { color:$live_text; border-color:$live_border; }
