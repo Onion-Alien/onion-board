@@ -1937,7 +1937,6 @@
   "Ran out of memory. Close some programs and try again.": "Kehabisan memori. Tutup beberapa program dan coba lagi.",
   "Randomize": "Acak",
   "Recognition": "Pengakuan",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Rekam program ini: menunggu program mengeluarkan suara, lalu merekam hingga Anda mengklik lagi, dan klip ditambahkan ke Suara Anda. Tidak ada yang mendengarnya kecuali Kirim aktif.",
   "Record {name}": "Rekam {name}",
   "Redo": "Mengulangi",
   "Refresh": "Menyegarkan",
@@ -1967,7 +1966,6 @@
   "Room": "Ruang",
   "Room, hall or cave.": "Kamar, aula atau gua.",
   "Save as a voice": "Simpan sebagai suara",
-  "Save clip": "Simpan klip",
   "Saved clips": "Klip yang disimpan",
   "Saved clips ({n})": "Klip tersimpan ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2406,7 +2404,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Jam Tangan Bawang dihilangkan. Pemicu Anda disimpan.",
   "✓ Opened Windows settings": "✓ Membuka pengaturan Windows",
   "✓ Saved": "✓ Disimpan",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Menyimpan klip {seconds} ke Suara Anda.",
   "✓ Saved “{name}”: loading its voices…": "✓ Menyimpan “{name}”: memuat suaranya…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Suara {language} ditemukan: {voice} berbicara dari baris berikutnya.",
   "✓ {n} voice": [
@@ -3241,5 +3238,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic-mu tidak mengirim suara. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Restart PC-mu, lalu coba lagi.",
   "Minimised: last picture": "Diminimalkan: gambar terakhir",
   "Minimised: restore for live updates": "Diminimalkan: pulihkan untuk pembaruan langsung",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah ukuran klip tersimpan. Klik dua kali untuk menyesuaikan dengan klip."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah ukuran klip tersimpan. Klik dua kali untuk menyesuaikan dengan klip.",
+  "By app": "Menurut aplikasi",
+  "By day": "Menurut hari",
+  "Created": "Dibuat",
+  "Find clips": "Cari klip",
+  "Group clips": "Kelompokkan klip",
+  "Keep forever": "Simpan selamanya",
+  "Newest first": "Terbaru dahulu",
+  "No matching clips": "Tidak ada klip yang cocok",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Jika tidak, klip dihapus setelah 7 hari tanpa dipratinjau, dikirim, disalin, diganti namanya, atau ditambahkan ke Suara.",
+  "Removed inactive clips: {n}": "Klip tidak aktif yang dihapus: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Rekam aplikasi ini ke Klip tersimpan. Klik lagi untuk selesai. Tidak ada yang mendengarnya kecuali Kirim aktif.",
+  "Save to clips": "Simpan ke klip",
+  "Show clips": "Tampilkan klip"
 }

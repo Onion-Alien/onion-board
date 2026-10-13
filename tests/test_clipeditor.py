@@ -46,7 +46,7 @@ def tab(qapp, monkeypatch):
     monkeypatch.setattr(clipeditor, "clipboard", None)
     FakeCapture.made = []
     FakeCapture.fail = FakeCapture.slow = False
-    t = AppsTab(FakeEngine(), Config(), lambda: None, Meter)
+    t = AppsTab(FakeEngine(), Config(app_clip_group="newest"), lambda: None, Meter)
     t.clips = []
     t.running = running
     t.clip_ready.connect(lambda data, name: t.clips.append((data, name)))
@@ -555,6 +555,138 @@ def test_edit_menu_only_opens_when_an_action_is_available(tab, qapp, monkeypatch
     ed._tick()
     assert ed.btn_edit.isEnabled() and ed.actions_by_name["copy"].isEnabled()
     assert not ed.actions_by_name["cut"].isEnabled()
+
+
+def test_large_shelf_groups_searches_and_cancels_stale_batches(tab, qapp):
+    import time
+    from dataclasses import replace
+    sh = tab.shelf
+    seed = sh.add(tone(0.1), "Example", "Music")
+    now = time.time()
+    sh.shelf.clips = [replace(seed, id=f"clip{i}", name=f"Clip {i}",
+                              src="Music" if i % 2 == 0 else "Browser",
+                              made=now - (i % 4) * 86400)
+                      for i in range(2000)]
+    sh.group_by.setCurrentIndex(sh.group_by.findData("app"))
+    assert len(sh._items) <= 100 and sh._fill_timer.isActive()
+    for _turn in range(100):
+        qapp.processEvents()
+        if not sh._fill_timer.isActive():
+            break
+    assert len(sh._items) == 2000 and sh.list.topLevelItemCount() == 2
+    assert len(sh._groups) == 6  # two apps, two days within each app
+    assert all(not sh.list.topLevelItem(i).isExpanded() for i in range(2))
+    sh.list.setCurrentItem(sh._item("clip0"))
+    sh.toggle_play()
+    playing = sh._playing
+    assert playing is not None
+    sh.list.itemDoubleClicked.emit(sh.list.topLevelItem(0), 0)
+    assert sh._playing == playing  # group expansion does not interrupt a preview
+    sh.stop()
+    sh.search.setText("Clip 1999")
+    for _turn in range(100):
+        qapp.processEvents()
+        if not sh._fill_timer.isActive():
+            break
+    assert list(sh._items) == ["clip1999"]
+    it = sh._item("clip1999")
+    assert it is not None and it.text(3) == sh._created(sh.shelf.get("clip1999"))
+    sh.search.setText("no match")
+    for _turn in range(100):
+        qapp.processEvents()
+        if not sh._fill_timer.isActive():
+            break
+    assert sh.empty.isVisible() and not sh.resize_handle.isVisible()
+    assert sh.list.height() == sh._fit_height
+    before = tab.cfg.app_clip_height
+    sh.resize_clips(500)
+    assert tab.cfg.app_clip_height == before
+    sh.search.clear()
+    sh.group_by.setCurrentIndex(sh.group_by.findData("day"))
+    sh.search.setText("Browser")  # cancels unfinished app/day filling
+    for _turn in range(100):
+        qapp.processEvents()
+        if not sh._fill_timer.isActive():
+            break
+    assert len(sh._items) == 1000 and sh.list.topLevelItemCount() == 2
+    assert all(sh.shelf.get(cid).src == "Browser" for cid in sh._items)
+
+
+def test_background_cleanup_hides_last_clip_and_undo_restores_it(tab, qapp):
+    from soundboard.clipshelf import DAY
+    saved(tab, qapp)
+    sh = tab.shelf
+    c = sh.shelf.clips[0]
+    sh.toggle_play()
+    tab.engine.stop(sh._playing[0])  # preview finished naturally; the tuple may still exist
+    c.last_used = DAY
+    sh._maintain()
+    sh._worker.join(5)
+    qapp.processEvents()
+    assert not sh.shelf.clips and sh.undo_bar.active() and not sh.isVisible()
+    sh.undo_bar.undo()
+    sh._worker.join(5)
+    qapp.processEvents()
+    assert sh.shelf.get(c.id) is not None and sh.isVisible()
+
+
+def test_preview_and_copy_refresh_activity(tab, qapp):
+    saved(tab, qapp)
+    sh = tab.shelf
+    c = sh.shelf.clips[0]
+    c.last_used = 1
+    sh.toggle_play()
+    assert c.last_used > 1
+    sh.stop()
+    c.last_used = 1
+    sh.copy_picked()
+    assert c.last_used > 1
+    c.last_used = 1
+    sh.add_picked()
+    assert c.last_used > 1
+
+
+def test_saved_clips_fold_to_header_and_restore_search_and_height(tab, qapp):
+    from soundboard.ui.clipshelf import ClipShelf
+    saved(tab, qapp)
+    sh = tab.shelf
+    sh.resize_clips(200)
+    sh.search.setText("music")
+    qapp.processEvents()
+    expanded = sh.sizeHint().height()
+    sh.title.click()
+    qapp.processEvents()
+    assert sh.isVisible() and not sh.body.isVisible() and not sh.hint.isVisible()
+    assert not sh.resize_handle.isVisible() and not tab.cfg.app_clips_expanded
+    tab.cfg.save()
+    assert not Config.load().app_clips_expanded
+    assert sh.sizeHint().height() < expanded and sh.sizeHint().height() <= 40
+    sh.resize_clips(500)
+    assert tab.cfg.app_clip_height == 200
+    rebuilt = ClipShelf(tab.engine, tab.cfg)
+    assert not rebuilt.title.isChecked()
+    rebuilt.shutdown()
+    rebuilt.deleteLater()
+    sh.title.click()
+    qapp.processEvents()
+    assert sh.body.isVisible() and sh.hint.isVisible() and sh.resize_handle.isVisible()
+    assert sh.search.text() == "music" and sh.list.height() == 200
+
+
+def test_save_destination_is_explicit_and_show_clips_reveals_a_folded_shelf(tab, qapp):
+    row = opened(tab, qapp)
+    assert row.editor.btn_save.text() == "Save to clips"
+    assert "Saved clips" in row.btn_rec.toolTip()
+    tab.shelf.title.setChecked(False)
+    row.capture.sink(tone(1))
+    row.editor.save()
+    assert not tab.shelf.body.isVisible() and len(tab.shelf.shelf.clips) == 1
+    from soundboard.ui import toast
+    cards = [t for t in toast.shown(tab) if "Kept" in t.words()]
+    assert cards and cards[-1].card.action.text() == "Show clips"
+    cards[-1].card.action.click()
+    qapp.processEvents()
+    assert tab.shelf.body.isVisible() and tab.shelf.list.hasFocus()
 
 
 def test_keyboard_paste_updates_when_another_editor_copies(tab, qapp):

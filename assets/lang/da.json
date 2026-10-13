@@ -1980,7 +1980,6 @@
   "Ran out of memory. Close some programs and try again.": "Løb tør for hukommelse. Luk nogle programmer, og prøv igen.",
   "Randomize": "Randomiser",
   "Recognition": "Anerkendelse",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Optag dette program: det venter på, at programmet laver en lyd, optager derefter, indtil du klikker igen, og klippet føjes til dine lyde. Ingen hører det, medmindre Send er slået til.",
   "Record {name}": "Optag {name}",
   "Redo": "Gentag",
   "Refresh": "Opfriske",
@@ -2011,7 +2010,6 @@
   "Room": "Værelse",
   "Room, hall or cave.": "Værelse, hall eller hule.",
   "Save as a voice": "Gem som en stemme",
-  "Save clip": "Gem klip",
   "Saved clips": "Gemte klip",
   "Saved clips ({n})": "Gemte klip ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2458,7 +2456,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch fjernet. Dine triggere bevares.",
   "✓ Opened Windows settings": "✓ Åbnede Windows-indstillinger",
   "✓ Saved": "✓ Gemt",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Gemte et {seconds} s klip til dine lyde.",
   "✓ Saved “{name}”: loading its voices…": "✓ Gemt \"{name}\": indlæser dens stemmer...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} stemme fundet: {voice} taler fra næste linje.",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Din mikrofon sender ingen lyd. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Stadig intet? Genstart din pc, og prøv igen.",
   "Minimised: last picture": "Minimeret: sidste billede",
   "Minimised: restore for live updates": "Minimeret: gendan for løbende opdateringer",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Træk for at ændre størrelsen på gemte klip. Dobbeltklik for at tilpasse til klippene."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Træk for at ændre størrelsen på gemte klip. Dobbeltklik for at tilpasse til klippene.",
+  "By app": "Efter app",
+  "By day": "Efter dag",
+  "Created": "Oprettet",
+  "Find clips": "Find klip",
+  "Group clips": "Gruppér klip",
+  "Keep forever": "Behold for altid",
+  "Newest first": "Nyeste først",
+  "No matching clips": "Ingen matchende klip",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Ellers fjernes klip efter 7 dage uden forhåndslytning, afsendelse, kopiering, omdøbning eller tilføjelse til Lyde.",
+  "Removed inactive clips: {n}": "Fjernede inaktive klip: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Optag denne app i Gemte klip. Klik igen for at afslutte. Ingen hører den, medmindre Send er slået til.",
+  "Save to clips": "Gem i klip",
+  "Show clips": "Vis klip"
 }

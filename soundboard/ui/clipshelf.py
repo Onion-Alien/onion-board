@@ -7,11 +7,14 @@ from __future__ import annotations
 
 import html
 import logging
+import threading
+from datetime import datetime
 
 import numpy as np
-from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtCore import QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QAction, QColor, QKeySequence, QPainter, QPen
-from PySide6.QtWidgets import (QAbstractItemView, QHBoxLayout, QHeaderView, QLabel, QMenu,
+from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QHeaderView,
+                               QLabel, QLineEdit, QMenu,
                                QPushButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard import errors, theme
@@ -19,9 +22,10 @@ from soundboard.clipshelf import Clip, Shelf
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
-from soundboard.ui.panel import CONTROL_H, Flow, UndoBar
+from soundboard.ui.panel import CONTROL_H, Flow, UndoBar, fold_button
 from soundboard.engine import SR
 from soundboard.library import level_gain
+from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
@@ -87,26 +91,46 @@ class ClipShelf(QWidget):
     add_to_sounds = Signal(object, str)
     layout_changed = Signal()
     size_changed = Signal()
+    cleanup_finished = Signal(object)
+    restore_finished = Signal(str, object)
     error = ""   # set by whoever adds it to Sounds, when it can't
 
     def __init__(self, engine, cfg, parent=None):
         super().__init__(parent)
         self.engine, self.cfg = engine, cfg
         self.shelf = Shelf()
+        self._closed = False
+        self._worker = None
+        self._items: dict[str, QTreeWidgetItem] = {}
+        self._groups: dict[tuple[str, ...], QTreeWidgetItem] = {}
+        self._group_counts: dict[tuple[str, ...], int] = {}
+        self._purge_workers: list[threading.Thread] = []
+        self._pending: list[Clip] = []
+        self._pick = ""
+        self._visible_count = 0
         self._playing: tuple[str, str] | None = None   # (engine sid, clip id)
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(4)
         head = QHBoxLayout()
         head.setSpacing(12)
-        self.title = QLabel()
-        self.title.setObjectName("section")
+        self.body = QWidget(self)
+        self.title = fold_button(_("Saved clips"), self.body)
+        self.title.setMinimumHeight(CONTROL_H)
+        self.title.setAccessibleName(_("Saved clips"))
+        self.title.setChecked(cfg.app_clips_expanded)
         head.addWidget(self.title)
-        hint = QLabel(_("Double-click plays · F2 renames · right-click for more"))
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        head.addWidget(hint, 1)
+        self.hint = QLabel(_("Double-click plays · F2 renames · right-click for more"))
+        self.hint.setObjectName("hint")
+        self.hint.setWordWrap(True)
+        self.hint.setVisible(cfg.app_clips_expanded)
+        head.addWidget(self.hint, 1)
+        head.addStretch(1)
         v.addLayout(head)
+        v.addWidget(self.body)
+        v = QVBoxLayout(self.body)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(4)
         actions = Flow(gap=8)
         self.btn_add = QPushButton(_("Add to Sounds"))
         self.btn_add.setObjectName("primary")
@@ -126,9 +150,28 @@ class ClipShelf(QWidget):
             actions.addWidget(b)
             self.clip_buttons.append(b)
         v.addLayout(actions)
+        filters = Flow(gap=8)
+        self.search = QLineEdit()
+        self.search.setPlaceholderText(_("Find clips"))
+        self.search.setAccessibleName(_("Find clips"))
+        self.search.setClearButtonEnabled(True)
+        self.search.setMinimumHeight(CONTROL_H)
+        self.search.setMinimumWidth(180)
+        self.search.setMaximumWidth(360)
+        filters.addWidget(self.search)
+        self.group_by = QComboBox()
+        self.group_by.setAccessibleName(_("Group clips"))
+        self.group_by.setMinimumHeight(CONTROL_H)
+        for text, key in ((_("By app"), "app"), (_("By day"), "day"),
+                          (_("Newest first"), "newest")):
+            self.group_by.addItem(text, key)
+        self.group_by.setCurrentIndex(max(0, self.group_by.findData(cfg.app_clip_group)))
+        no_wheel(self.group_by)
+        filters.addWidget(self.group_by)
+        v.addLayout(filters)
         self.list = QTreeWidget()
         self.list.setAccessibleName(_("Saved clips"))
-        self.list.setHeaderLabels([_("Name"), _("Length"), _("From")])
+        self.list.setHeaderLabels([_("Name"), _("Length"), _("From"), _("Created")])
         self.list.setRootIsDecorated(False)
         self.list.setUniformRowHeights(True)
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -136,7 +179,8 @@ class ClipShelf(QWidget):
                                   | QAbstractItemView.EditTrigger.SelectedClicked)
         self.list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.list.customContextMenuRequested.connect(self._menu)
-        self.list.itemDoubleClicked.connect(lambda it, _col: self.toggle_play(it))
+        self.list.itemDoubleClicked.connect(
+            lambda it, _col: self.toggle_play(it) if it.data(0, Qt.ItemDataRole.UserRole) else None)
         self.list.itemChanged.connect(self._renamed)
         self.list.itemSelectionChanged.connect(self._sync)
         h = self.list.header()
@@ -144,7 +188,12 @@ class ClipShelf(QWidget):
         h.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         h.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         h.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        h.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        h.setResizeContentsPrecision(100)
         v.addWidget(self.list)
+        self.empty = QLabel(_("No matching clips"))
+        self.empty.setObjectName("hint")
+        v.addWidget(self.empty)
         self.resize_handle = ClipResizeHandle(self)
         v.addWidget(self.resize_handle)
         self.undo_bar = UndoBar(_("Put the clip back in the list"))
@@ -156,41 +205,142 @@ class ClipShelf(QWidget):
             a.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
             a.triggered.connect(slot)
             self.list.addAction(a)
+        self._fill_timer = QTimer(self)
+        self._fill_timer.timeout.connect(self._fill_rows)
+        self.search.textChanged.connect(lambda: self.reload())
+        self.group_by.currentIndexChanged.connect(self._group_changed)
+        self.cleanup_finished.connect(self._cleanup_done)
+        self.restore_finished.connect(self._restored)
+        self._cleanup_timer = QTimer(self)
+        self._cleanup_timer.setInterval(60_000)
+        self._cleanup_timer.timeout.connect(self._maintain)
+        self._cleanup_timer.start()
+        self.title.toggled.connect(self._fold)
         self.reload()
+        QTimer.singleShot(0, self._maintain)
 
     # ------------------------------------------------------------------ list
     def reload(self, pick: str = ""):
+        self._fill_timer.stop()
+        current = self.list.currentItem()
+        pick = pick or (current.data(0, Qt.ItemDataRole.UserRole) if current is not None else "")
+        self.resize_handle._drag = None
         self.list.blockSignals(True)
         self.list.clear()
-        for c in self.shelf.clips:
-            it = QTreeWidgetItem([c.name, fmt(c.seconds * SR), c.src])
+        self._items.clear()
+        self._groups.clear()
+        self._group_counts.clear()
+        self._pick = pick
+        self._pending = self.shelf.snapshot()
+        self._pending.sort(key=lambda c: c.made, reverse=True)
+        self._visible_count = 0
+        self.list.setRootIsDecorated(self.group_by.currentData() != "newest")
+        self._columns()
+        self.list.blockSignals(False)
+        self._fill_rows()
+        if self._pending:
+            self._fill_timer.start(0)
+
+    @staticmethod
+    def _created(c: Clip) -> str:
+        try:
+            return datetime.fromtimestamp(c.made).strftime("%Y-%m-%d")
+        except (ValueError, OverflowError, OSError):
+            return ""
+
+    def _group_changed(self):
+        self.cfg.app_clip_group = self.group_by.currentData()
+        self.size_changed.emit()
+        self.reload()
+
+    def _fill_rows(self):
+        self.list.blockSignals(True)
+        batch, self._pending = self._pending[:100], self._pending[100:]
+        query = self.search.text().strip().casefold()
+        mode = self.group_by.currentData()
+        for c in batch:
+            created = self._created(c)
+            if query and query not in f"{c.name} {c.src} {created}".casefold():
+                continue
+            self._visible_count += 1
+            it = QTreeWidgetItem([c.name, fmt(c.seconds * SR), c.src, created])
             it.setData(0, Qt.ItemDataRole.UserRole, c.id)
             it.setSizeHint(0, QSize(0, CONTROL_H))
             it.setFlags(it.flags() | Qt.ItemFlag.ItemIsEditable)
             it.setToolTip(0, _("{name}\nDouble-click plays it, F2 renames it, right-click "
                                "adds it to your Sounds.", name=c.name))
             it.setTextAlignment(1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            self.list.addTopLevelItem(it)
-            if c.id == pick:
+            self._items[c.id] = it
+            labels = ((c.src or _("Other"), created) if mode == "app"
+                      else (created, c.src or _("Other")) if mode == "day" else ())
+            parent = None
+            for depth, label in enumerate(labels):
+                key = labels[:depth + 1]
+                group = self._groups.get(key)
+                if group is None:
+                    group = QTreeWidgetItem([label])
+                    group.setFlags(Qt.ItemFlag.ItemIsEnabled)
+                    group.setSizeHint(0, QSize(0, CONTROL_H))
+                    if parent is None:
+                        self.list.addTopLevelItem(group)
+                    else:
+                        parent.addChild(group)
+                    group.setExpanded(bool(query) or len(self.shelf.clips) <= 100 or depth > 0)
+                    self._groups[key] = group
+                count = self._group_counts.get(key, 0) + 1
+                self._group_counts[key] = count
+                group.setText(0, f"{label} ({count})")
+                parent = group
+            if parent is None:
+                self.list.addTopLevelItem(it)
+            else:
+                parent.addChild(it)
+            if c.id == self._pick:
+                ancestor = it.parent()
+                while ancestor is not None:
+                    ancestor.setExpanded(True)
+                    ancestor = ancestor.parent()
                 self.list.setCurrentItem(it)
         self.list.blockSignals(False)
-        rows = min(max(len(self.shelf.clips), 1), ROWS_SHOWN)
+        if not self._pending:
+            self._fill_timer.stop()
+        rows = min(max(self._visible_count + len(self._groups), 1), ROWS_SHOWN)
         row_h = self.list.sizeHintForRow(0) if self.shelf.clips else 22
         self._fit_height = (self.list.header().sizeHint().height() + rows * max(row_h, 36)
                             + 2 * self.list.frameWidth() + 2)
         self._apply_height()
-        self.resize_handle._drag = None
-        self.resize_handle.setVisible(bool(self.shelf.clips))
+        self.resize_handle.setVisible(self._visible_count > 0)
+        self.empty.setVisible(not self._pending and self._visible_count == 0)
         self.setVisible(bool(self.shelf.clips))
         self._sync()
         self.layout_changed.emit()
 
+    def _columns(self):
+        grouped = self.group_by.currentData() != "newest"
+        self.list.setColumnHidden(2, grouped or self.width() < 600)
+        self.list.setColumnHidden(3, grouped and self.width() < 420)
+
+    def _fold(self, expanded):
+        self.cfg.app_clips_expanded = expanded
+        self.hint.setVisible(expanded)
+        self.resize_handle._drag = None
+        layout = self.layout()
+        assert layout is not None
+        layout.activate()
+        self.updateGeometry()
+        self.size_changed.emit()
+        self.layout_changed.emit()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._columns()
+
     def _apply_height(self):
-        height = self.cfg.app_clip_height if self.shelf.clips else 0
+        height = self.cfg.app_clip_height if self._visible_count else 0
         self.list.setFixedHeight(min(max(int(height), 72), 600) if height else self._fit_height)
 
     def resize_clips(self, height):
-        if not self.shelf.clips:
+        if not self._visible_count or not self.title.isChecked():
             return
         self.cfg.app_clip_height = min(max(int(height), 72), 600) if height else 0
         self._apply_height()
@@ -207,22 +357,20 @@ class ClipShelf(QWidget):
 
     def _picked(self) -> list[Clip]:
         out = []
+        clips = {c.id: c for c in self.shelf.snapshot()}
         cur = self.list.currentItem()
         for it in self.list.selectedItems() or ([cur] if cur else []):
-            c = self.shelf.get(it.data(0, Qt.ItemDataRole.UserRole))
+            c = clips.get(it.data(0, Qt.ItemDataRole.UserRole))
             if c is not None:
                 out.append(c)
         return out
 
     def _item(self, cid: str) -> QTreeWidgetItem | None:
-        for i in range(self.list.topLevelItemCount()):
-            it = self.list.topLevelItem(i)
-            if it is not None and it.data(0, Qt.ItemDataRole.UserRole) == cid:
-                return it
-        return None
+        return self._items.get(cid)
 
     def add(self, data: np.ndarray, name: str, src: str = "") -> Clip:
         c = self.shelf.add(data, name, src)
+        self.search.clear()
         self.reload(pick=c.id)
         self.show()
         return c
@@ -258,6 +406,7 @@ class ClipShelf(QWidget):
                 else _("No headphones to play it in: pick them on the Setup tab.")), "error")
             return
         self._playing = (sid, cid)
+        self.shelf.touch(cid)
 
     def stop(self):
         if self._playing is not None:
@@ -293,6 +442,7 @@ class ClipShelf(QWidget):
                 errors.warn(self, _("Couldn't add it to your Sounds"), self.error)
                 return
             added += 1
+            self.shelf.touch(c.id)
         if added:
             self.undo_bar.finish()
             busy.toast(self, ngettext("Added {n} clip to your Sounds",
@@ -305,23 +455,21 @@ class ClipShelf(QWidget):
         data = self._audio(picked[0])
         if data is not None:
             clipeditor.set_clipboard(data)
+            self.shelf.touch(picked[0].id)
             busy.toast(self, _("Copied “{name}”: Ctrl+V pastes it in an editor or on the "
                                "Sounds tab", name=html.escape(picked[0].name)), "ok")
 
     def delete_picked(self):
-        gone = []
-        for c in self._picked():
+        picked = self._picked()
+        for c in picked:
             if self._playing is not None and self._playing[1] == c.id:
                 self.stop()
-            r = self.shelf.remove(c.id)
-            if r is not None:
-                gone.append(r)
+        gone = self.shelf.remove_many({c.id for c in picked})
         if not gone:
             return
 
         def undo():
-            for at, c in reversed(gone):
-                self.shelf.restore(at, c)
+            self.shelf.restore_many(gone)
             self.reload(pick=gone[0][1].id)
         what = (_("Deleted “{name}”", name=gone[0][1].name) if len(gone) == 1
                 else ngettext("Deleted {n} clip", "Deleted {n} clips", len(gone)))
@@ -330,7 +478,7 @@ class ClipShelf(QWidget):
 
     def _menu(self, pos):
         it = self.list.itemAt(pos)
-        if it is None:
+        if it is None or not it.data(0, Qt.ItemDataRole.UserRole):
             return
         if not it.isSelected():
             self.list.setCurrentItem(it)
@@ -359,6 +507,74 @@ class ClipShelf(QWidget):
 
         m.exec(self.list.viewport().mapToGlobal(pos))
 
+    def _maintain(self):
+        if self._closed or (self._worker is not None and self._worker.is_alive()):
+            return
+        keep = self.cfg.app_clips_keep_forever or self.undo_bar.active()
+        playing = self._playing
+        active = (playing[1] if playing is not None
+                  and self.engine.state(playing[0]) is not None else None)
+        def work():
+            try:
+                gone = self.shelf.maintain(keep, active)
+            except OSError:
+                log.exception("saved clips maintenance failed")
+                return
+            busy.emit(self.cleanup_finished, gone)
+        self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-cleanup")
+        self._worker.start()
+
+    def _cleanup_done(self, gone):
+        if self._closed or not gone:
+            return
+        def undo():
+            self._restore_background(gone)
+        if self.cfg.app_clips_keep_forever or self.undo_bar.active():
+            undo()
+            return
+        self.reload()
+        self.undo_bar.show_for(_("Removed inactive clips: {n}", n=len(gone)), undo,
+                              done=lambda: self._discard(gone))
+
+    def _restore_background(self, gone):
+        def work():
+            error = None
+            try:
+                self.shelf.restore_many(gone)
+            except OSError as e:
+                error = e
+            busy.emit(self.restore_finished, gone[0][1].id, error)
+        self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-restore")
+        self._worker.start()
+
+    def _restored(self, pick, error):
+        if self._closed:
+            return
+        self.reload(pick=pick)
+        if error is not None:
+            busy.toast(self, html.escape(_("Couldn't save it: {error}",
+                                          error=errors.plain(error))), "error")
+
+    def _discard(self, gone):
+        worker = threading.Thread(target=lambda: self.shelf.discard_files(gone),
+                                  daemon=True, name="saved-clips-delete")
+        self._purge_workers = [t for t in self._purge_workers if t.is_alive()]
+        self._purge_workers.append(worker)
+        worker.start()
+
     def shutdown(self):
+        self._closed = True
+        self._fill_timer.stop()
+        self._cleanup_timer.stop()
+        self.undo_bar.finish()
+        if self._worker is not None:
+            self._worker.join(5)
+        for worker in self._purge_workers:
+            worker.join(5)
+        # Persist the final activity timestamp off the UI thread as well.
+        self._worker = threading.Thread(target=lambda: self.shelf.maintain(True),
+                                        daemon=True, name="saved-clips-flush")
+        self._worker.start()
+        self._worker.join(5)
         self.stop()
         self.engine.forget(SEND)

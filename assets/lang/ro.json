@@ -2025,7 +2025,6 @@
   "Ran out of memory. Close some programs and try again.": "A rămas fără memorie. Închideți unele programe și încercați din nou.",
   "Randomize": "Randomizați",
   "Recognition": "Recunoaştere",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Înregistrați acest program: așteaptă ca programul să emită un sunet, apoi înregistrează până când dați clic din nou, iar clipul este adăugat la Sunete. Nimeni nu o aude decât dacă Trimitere este activată.",
   "Record {name}": "Înregistrează {name}",
   "Redo": "Reface",
   "Refresh": "Reîmprospăta",
@@ -2057,7 +2056,6 @@
   "Room": "Cameră",
   "Room, hall or cave.": "Cameră, sală sau peșteră.",
   "Save as a voice": "Salvați ca voce",
-  "Save clip": "Salvați clipul",
   "Saved clips": "Clipuri salvate",
   "Saved clips ({n})": "Clipuri salvate ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2510,7 +2508,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Ceapa ceapă eliminată. Declanșatoarele dvs. sunt păstrate.",
   "✓ Opened Windows settings": "✓ Setări Windows deschise",
   "✓ Saved": "✓ Salvat",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Salvat un clip de {seconds} în Sunete.",
   "✓ Saved “{name}”: loading its voices…": "✓ Salvat „{name}”: se încarcă vocile sale...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Voce {language} găsită: {voice} vorbește de la rândul următor.",
   "✓ {n} voice": [
@@ -3389,5 +3386,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Tot nimic? Repornește PC-ul, apoi încearcă din nou.",
   "Minimised: last picture": "Minimizată: ultima imagine",
   "Minimised: restore for live updates": "Minimizată: restaurează pentru actualizări în timp real",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Trage pentru a redimensiona clipurile salvate. Dublu clic pentru a ajusta la clipuri."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Trage pentru a redimensiona clipurile salvate. Dublu clic pentru a ajusta la clipuri.",
+  "By app": "După aplicație",
+  "By day": "După zi",
+  "Created": "Creat",
+  "Find clips": "Caută clipuri",
+  "Group clips": "Grupează clipuri",
+  "Keep forever": "Păstrează permanent",
+  "Newest first": "Cele mai noi întâi",
+  "No matching clips": "Niciun clip potrivit",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Altfel, clipurile sunt eliminate după 7 zile fără previzualizare, trimitere, copiere, redenumire sau adăugare la Sunete.",
+  "Removed inactive clips: {n}": "Clipuri inactive eliminate: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Înregistrează această aplicație în Clipuri salvate. Apasă din nou pentru a termina. Nimeni nu o aude dacă Trimitere nu este activă.",
+  "Save to clips": "Salvează în clipuri",
+  "Show clips": "Arată clipurile"
 }

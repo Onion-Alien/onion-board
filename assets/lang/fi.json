@@ -1980,7 +1980,6 @@
   "Ran out of memory. Close some programs and try again.": "Muisti loppui. Sulje joitain ohjelmia ja yritä uudelleen.",
   "Randomize": "Satunnaista",
   "Recognition": "Tunnustus",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Nauhoita tämä ohjelma: se odottaa, että ohjelma antaa äänen, sitten nauhoitetaan, kunnes napsautat uudelleen, ja leike lisätään Ääneihin. Kukaan ei kuule sitä, ellei lähetys ole päällä.",
   "Record {name}": "Tallenna {name}",
   "Redo": "Toista",
   "Refresh": "Päivitä",
@@ -2011,7 +2010,6 @@
   "Room": "Huone",
   "Room, hall or cave.": "Huone, sali tai luola.",
   "Save as a voice": "Tallenna äänenä",
-  "Save clip": "Tallenna klippi",
   "Saved clips": "Tallennetut leikkeet",
   "Saved clips ({n})": "Tallennetut leikkeet ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2458,7 +2456,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Sipulikello poistettu. Liipaisimet säilytetään.",
   "✓ Opened Windows settings": "✓ Windows-asetukset avattiin",
   "✓ Saved": "✓ Tallennettu",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Tallentui {seconds} s:n leikkeen Sounds-palveluun.",
   "✓ Saved “{name}”: loading its voices…": "✓ \"{name}\" tallennettu: ladataan sen ääniä…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Ääni {language} löydetty: {voice} puhuu seuraavalta riviltä eteenpäin.",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikkisi ei lähetä ääntä. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
   "Minimised: last picture": "Pienennetty: viimeisin kuva",
   "Minimised: restore for live updates": "Pienennetty: palauta ikkuna live-kuvaa varten",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Muuta tallennettujen leikkeiden alueen kokoa vetämällä. Sovita leikkeisiin kaksoisnapsauttamalla."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Muuta tallennettujen leikkeiden alueen kokoa vetämällä. Sovita leikkeisiin kaksoisnapsauttamalla.",
+  "By app": "Sovelluksen mukaan",
+  "By day": "Päivän mukaan",
+  "Created": "Luotu",
+  "Find clips": "Etsi leikkeitä",
+  "Group clips": "Ryhmittele leikkeet",
+  "Keep forever": "Säilytä aina",
+  "Newest first": "Uusimmat ensin",
+  "No matching clips": "Ei vastaavia leikkeitä",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Muuten leikkeet poistetaan, kun niitä ei ole esikuunneltu, lähetetty, kopioitu, nimetty uudelleen tai lisätty ääniin 7 päivään.",
+  "Removed inactive clips: {n}": "Poistettuja käyttämättömiä leikkeitä: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Tallenna tämän sovelluksen ääni tallennettuihin leikkeisiin. Lopeta napsauttamalla uudelleen. Kukaan ei kuule sitä, ellei Lähetä ole päällä.",
+  "Save to clips": "Tallenna leikkeisiin",
+  "Show clips": "Näytä leikkeet"
 }

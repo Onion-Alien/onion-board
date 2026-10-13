@@ -2162,7 +2162,6 @@
   "Ran out of memory. Close some programs and try again.": "نفدت الذاكرة. أغلق بعض البرامج وحاول مرة أخرى.",
   "Randomize": "عشوائية",
   "Recognition": "تعرُّف",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "سجل هذا البرنامج: ينتظر حتى يصدر البرنامج صوتًا، ثم يسجل حتى تنقر مرة أخرى، ويتم إضافة المقطع إلى الأصوات الخاصة بك. لا أحد يسمعها إلا إذا كان الإرسال قيد التشغيل.",
   "Record {name}": "سجل {name}",
   "Redo": "إعادة",
   "Refresh": "ينعش",
@@ -2197,7 +2196,6 @@
   "Room": "غرفة",
   "Room, hall or cave.": "غرفة أو صالة أو كهف.",
   "Save as a voice": "حفظ كصوت",
-  "Save clip": "حفظ المقطع",
   "Saved clips": "المقاطع المحفوظة",
   "Saved clips ({n})": "المقاطع المحفوظة ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2666,7 +2664,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ تمت إزالة ساعة البصل. يتم الاحتفاظ المشغلات الخاصة بك.",
   "✓ Opened Windows settings": "✓ فتح إعدادات ويندوز",
   "✓ Saved": "✓ المحفوظة",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ تم حفظ مقطع مدته {seconds} في الأصوات الخاصة بك.",
   "✓ Saved “{name}”: loading its voices…": "✓ تم حفظ \"{name}\": جارٍ تحميل أصواته...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ تم العثور على صوت {language} : {voice} يتحدث من السطر التالي فصاعدًا.",
   "✓ {n} voice": [
@@ -3611,5 +3608,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "الميكروفون لا يرسل أي صوت. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. ما زال لا شيء؟ أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى.",
   "Minimised: last picture": "مصغّرة: آخر صورة",
   "Minimised: restore for live updates": "مصغّرة: استعد النافذة للتحديث المباشر",
-  "Drag to resize saved clips. Double-click to fit the clips.": "اسحب لتغيير حجم المقاطع المحفوظة. انقر مرتين لملاءمة المقاطع."
+  "Drag to resize saved clips. Double-click to fit the clips.": "اسحب لتغيير حجم المقاطع المحفوظة. انقر مرتين لملاءمة المقاطع.",
+  "By app": "حسب التطبيق",
+  "By day": "حسب اليوم",
+  "Created": "تاريخ الإنشاء",
+  "Find clips": "البحث عن المقاطع",
+  "Group clips": "تجميع المقاطع",
+  "Keep forever": "الاحتفاظ دائمًا",
+  "Newest first": "الأحدث أولًا",
+  "No matching clips": "لا توجد مقاطع مطابقة",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "وإلا تُحذف المقاطع بعد 7 أيام دون معاينتها أو إرسالها أو نسخها أو إعادة تسميتها أو إضافتها إلى الأصوات.",
+  "Removed inactive clips: {n}": "المقاطع غير النشطة المحذوفة: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "سجّل هذا التطبيق في المقاطع المحفوظة. انقر مجددًا للإنهاء. لا يسمعه أحد إلا إذا كان الإرسال مفعّلًا.",
+  "Save to clips": "حفظ في المقاطع",
+  "Show clips": "عرض المقاطع"
 }

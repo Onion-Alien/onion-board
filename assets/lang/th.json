@@ -1937,7 +1937,6 @@
   "Ran out of memory. Close some programs and try again.": "หน่วยความจำไม่เพียงพอ ปิดบางโปรแกรมแล้วลองอีกครั้ง",
   "Randomize": "สุ่ม",
   "Recognition": "การยอมรับ",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "บันทึกโปรแกรมนี้: รอให้โปรแกรมส่งเสียง จากนั้นจึงบันทึกจนกว่าคุณจะคลิกอีกครั้ง จากนั้นคลิปจะถูกเพิ่มลงในเสียงของคุณ ไม่มีใครได้ยินเว้นแต่ว่าเปิดการส่งอยู่",
   "Record {name}": "บันทึก {name}",
   "Redo": "ทำซ้ำ",
   "Refresh": "รีเฟรช",
@@ -1967,7 +1966,6 @@
   "Room": "ห้อง",
   "Room, hall or cave.": "ห้อง ห้องโถง หรือถ้ำ",
   "Save as a voice": "บันทึกเป็นเสียง",
-  "Save clip": "บันทึกคลิป",
   "Saved clips": "คลิปที่บันทึกไว้",
   "Saved clips ({n})": "คลิปที่บันทึกไว้ ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2406,7 +2404,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ นำนาฬิกาหัวหอมออก ทริกเกอร์ของคุณจะถูกเก็บไว้",
   "✓ Opened Windows settings": "✓ เปิดการตั้งค่า Windows",
   "✓ Saved": "✓ บันทึกแล้ว",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ บันทึกคลิป {seconds} ลงในเสียงของคุณ",
   "✓ Saved “{name}”: loading its voices…": "✓ บันทึก “{name}”: กำลังโหลดเสียงของมัน...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ พบเสียง {language} : {voice} พูดจากบรรทัดถัดไป",
   "✓ {n} voice": [
@@ -3241,5 +3238,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีก? ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
   "Minimised: last picture": "ย่อหน้าต่างอยู่: ภาพล่าสุด",
   "Minimised: restore for live updates": "ย่อหน้าต่างอยู่: คืนค่าหน้าต่างเพื่อดูภาพสด",
-  "Drag to resize saved clips. Double-click to fit the clips.": "ลากเพื่อปรับขนาดพื้นที่คลิปที่บันทึกไว้ ดับเบิลคลิกเพื่อปรับให้พอดีกับคลิป"
+  "Drag to resize saved clips. Double-click to fit the clips.": "ลากเพื่อปรับขนาดพื้นที่คลิปที่บันทึกไว้ ดับเบิลคลิกเพื่อปรับให้พอดีกับคลิป",
+  "By app": "ตามแอป",
+  "By day": "ตามวัน",
+  "Created": "วันที่สร้าง",
+  "Find clips": "ค้นหาคลิป",
+  "Group clips": "จัดกลุ่มคลิป",
+  "Keep forever": "เก็บไว้ตลอด",
+  "Newest first": "ใหม่ที่สุดก่อน",
+  "No matching clips": "ไม่มีคลิปที่ตรงกัน",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "ไม่เช่นนั้น คลิปจะถูกลบหลังจาก 7 วันที่ไม่มีการฟังตัวอย่าง ส่ง คัดลอก เปลี่ยนชื่อ หรือเพิ่มลงในเสียง",
+  "Removed inactive clips: {n}": "คลิปที่ไม่ได้ใช้งานที่ถูกลบ: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "บันทึกเสียงจากแอปนี้ลงในคลิปที่บันทึกไว้ คลิกอีกครั้งเพื่อจบ ไม่มีใครได้ยินเว้นแต่จะเปิดส่ง",
+  "Save to clips": "บันทึกลงในคลิป",
+  "Show clips": "แสดงคลิป"
 }
