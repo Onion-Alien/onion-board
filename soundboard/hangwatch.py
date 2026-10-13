@@ -5,7 +5,12 @@ freeze and save it, with every other thread's stack, beside the crash reports
 nobody can reproduce can still be fixed. With it, how busy each thread was (CPU, over
 half a second: the window working itself, waiting on a busy thread, or everyone
 waiting), and once the window answers again, how long it was stuck in all. Nothing is
-shown or sent (usage.py counts it, with only where in our code it was)."""
+shown or sent (usage.py counts it, with only where in our code it was).
+
+Time is counted only while the PC is awake (awake_clock): with the app open over a
+sleep, every thread stops, and on waking it looked like the window had frozen for the
+whole sleep, stuck wherever it happened to be (2.0.4's "freezes" in the event loop, idle,
+lasting minutes)."""
 from __future__ import annotations
 
 import logging
@@ -14,6 +19,7 @@ import sys
 import threading
 import time
 import traceback
+from collections.abc import Callable
 
 from PySide6.QtCore import QObject, QTimer
 
@@ -29,13 +35,18 @@ THREAD_QUERY_LIMITED_INFORMATION = 0x0800
 IN_EXEC = re.compile(r"\.exec_?\(")
 IN_DIALOG_NOTE = ("(it was inside a window's own event loop; the stall was in Qt "
                   "or another thread)")
+# The watch's own thread was held up as long: not the window alone but the whole app
+# (one thread kept Python's lock while it waited, or Windows paused the app).
+ALL_HELD_NOTE = "(every thread was held up, this watch too)"
 
 
 class HangWatch(QObject):
-    def __init__(self, hang_s: float = HANG_S, parent=None):
+    def __init__(self, hang_s: float = HANG_S, parent=None,
+                 clock: Callable[[], float] | None = None):
         super().__init__(parent)
         self.hang_s = hang_s
-        self.beat = time.monotonic()
+        self._clock = clock or awake_clock()
+        self.beat = self._clock()
         self.reports = 0
         self.saved = None               # the last freeze report's file
         self._ui = threading.get_ident()
@@ -46,7 +57,7 @@ class HangWatch(QObject):
         threading.Thread(target=self._watch, name="hangwatch", daemon=True).start()
 
     def _tick(self):
-        self.beat = time.monotonic()
+        self.beat = self._clock()
 
     def stop(self):
         self._stop.set()
@@ -54,8 +65,11 @@ class HangWatch(QObject):
 
     def _watch(self):
         reported = False
+        woke = self._clock()
         while not self._stop.wait(min(1.0, self.hang_s / 4)):
-            stuck = time.monotonic() - self.beat
+            now = self._clock()
+            held, woke = now - woke >= self.hang_s, now   # this thread was stuck as long
+            stuck = now - self.beat
             if stuck < self.hang_s:
                 reported = False
                 continue
@@ -69,6 +83,8 @@ class HangWatch(QObject):
             stack = "".join(ui.format()) if ui else "(no stack)"
             if ui and IN_EXEC.search(ui[-1].line or ""):
                 stack += f"\n{IN_DIALOG_NOTE}\n"
+            if held:
+                stack += f"\n{ALL_HELD_NOTE}\n"
             log.warning("the window hasn't responded for %.0f s; it's doing:\n%s",
                         stuck, stack)
             cpu = self._cpu_use()
@@ -78,6 +94,7 @@ class HangWatch(QObject):
             self.saved = applog.save_freeze(stuck, stack + self._others(frames, cpu))
             self.reports += 1           # last: a report counts once it's logged and saved
             self._wait_end(since)
+            woke = self._clock()
 
     def _wait_end(self, since: float):
         """Once the window beats again, note in the report how long it was stuck."""
@@ -112,6 +129,32 @@ class HangWatch(QObject):
             parts.append(f'Thread "{names.get(ident, "?")}" ({ident}){use}:')
             parts.append("".join(traceback.format_stack(frame, limit=MAX_FRAMES)))
         return "\n".join(parts)
+
+
+def awake_clock() -> Callable[[], float]:
+    """Seconds the PC has been awake (Windows' unbiased interrupt time: sleep and
+    hibernation left out), else time.monotonic."""
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            from ctypes import POINTER, c_ulonglong
+            for dll, name in (("kernelbase", "QueryUnbiasedInterruptTimePrecise"),
+                              ("kernel32", "QueryUnbiasedInterruptTime")):
+                try:
+                    f = getattr(ctypes.WinDLL(dll), name)
+                except (OSError, AttributeError):
+                    continue
+                f.argtypes = (POINTER(c_ulonglong),)
+
+                def awake(f=f) -> float:   # (both threads call it: a value each)
+                    t = c_ulonglong()
+                    f(ctypes.byref(t))
+                    return t.value / 1e7   # 100 ns units
+                awake()
+                return awake
+        except (OSError, AttributeError, ImportError):
+            pass
+    return time.monotonic
 
 
 _api = None   # (OpenThread, GetThreadTimes, CloseHandle), False if missing
