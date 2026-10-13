@@ -2181,6 +2181,27 @@ def no_helper() -> str:
     return _("Onion Board's mic helper didn't answer.")
 
 
+def no_mic() -> str:
+    """What install returns when the mic isn't plugged in (or Windows doesn't list it)."""
+    return _("That mic isn't plugged in (or Windows doesn't list it).")
+
+
+def no_effect() -> str:
+    """What install returns when this copy has no mic effect DLL bundled."""
+    return _("This copy of Onion Board has no mic effect in it.")
+
+
+# why a set-up failed, as counted (usage MIC_FAILS); "code" is the installer's own error
+FAIL_KINDS = ("unfinished", "silent", "no-helper", "no-mic", "no-effect", "code")
+
+
+def fail_kind(err: str) -> str:
+    """Which of FAIL_KINDS the install() result `err` is (never the message itself)."""
+    known = {unfinished(): "unfinished", mic_silent(): "silent", no_helper(): "no-helper",
+             no_mic(): "no-mic", no_effect(): "no-effect"}
+    return known.get(err, "code")
+
+
 def install(mic_name: str | None, *, clean: bool = False,
             ask_windows: bool = True) -> str | None:
     """Put the effect on the mic called `mic_name` (Windows asks for admin, unless the
@@ -2193,9 +2214,9 @@ def install_on(guid: str | None, *, clean: bool = False,
                ask_windows: bool = True) -> str | None:
     """install() for the mic with endpoint GUID `guid` (it comes off any other mic)."""
     if guid is None:
-        return _("That mic isn't plugged in (or Windows doesn't list it).")
+        return no_mic()
     if not bundled_dll().is_file():
-        return _("This copy of Onion Board has no mic effect in it.")
+        return no_effect()
     code = _elevated(["reinstall" if clean else "install", guid], ask_windows=ask_windows)
     if code is None:
         return declined() if ask_windows else no_helper()
