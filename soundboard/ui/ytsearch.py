@@ -790,7 +790,8 @@ class SearchResults(RoundedFrame):
         group = QActionGroup(self)
         group.setExclusive(True)
         for key, (name, _prefix) in ytdl.SOURCES.items():
-            a = QAction(icons.icon(key, checked_color="accent"), name, self)
+            a = QAction(name, self)
+            icons.set_icon(a, key, "accent", "accent")
             a.setCheckable(True)
             a.setChecked(key == self.source)
             a.triggered.connect(lambda _c=False, k=key: self.set_source(k))

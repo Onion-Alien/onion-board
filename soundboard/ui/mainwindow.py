@@ -1672,7 +1672,7 @@ class MainWindow(QMainWindow):
         self.btn_yt.setAccessibleName(_("Search"))
         self.btn_yt.setToolTip(_("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
                                  "what's typed (or press Enter), play or add the audio"))
-        icons.set_icon(self.btn_yt, "youtube", size=18)
+        icons.set_icon(self.btn_yt, "youtube", "accent", "accent", size=18)
         # which site Enter searches: the button shows it, its menu picks another
         self._site_menu = DropdownMenu(self.btn_yt)
         self.btn_yt.setMenu(self._site_menu)
@@ -6049,7 +6049,7 @@ class MainWindow(QMainWindow):
     def _on_site_picked(self, key: str):
         """A site picked in the search button's menu: it shows that site, and the
         search box's words are searched there now (open results re-run themselves)."""
-        icons.set_icon(self.btn_yt, key, size=18)
+        icons.set_icon(self.btn_yt, key, "accent", "accent", size=18)
         self._drop_link()   # the last site's song, if it's over: its card goes too
         if self.ytresults.isHidden() and self.search.text().strip():
             self.search_youtube()

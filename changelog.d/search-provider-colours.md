@@ -1,0 +1,1 @@
+- Search provider icons now follow the current theme accent, including after changing themes.
