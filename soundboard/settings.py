@@ -696,6 +696,8 @@ class SettingsDialog(QDialog):
         for w in card.findChildren(QWidget):
             if name := getattr(w, "name", None):
                 bits.append(str(name))
+            if isinstance(w, ThemeCard):
+                bits.extend(("themes colors colours", _("Theme style"), _("Highlight colour")))
             if isinstance(w, (QLabel, QAbstractButton)):
                 bits.append(w.text())
             elif isinstance(w, QComboBox):

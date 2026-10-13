@@ -599,6 +599,25 @@ def test_search_finds_painted_theme_names(window, qapp, name):  # noqa: F811
         d.close()
 
 
+@pytest.mark.parametrize("query", ["theme", "themes", "color", "colors", "colour", "colours"])
+def test_search_theme_and_colour_terms_shows_every_theme(window, qapp, query):  # noqa: F811
+    from soundboard.settings import ThemeGrid
+
+    d = _open_in_window(window, qapp, "general", width=1020)
+    try:
+        d._apply_search(query)
+        for _ in range(10):
+            qapp.processEvents()
+        assert d._page_keys[d.tabs.currentIndex()] == "appearance"
+        grids = d.tabs.currentWidget().widget().findChildren(ThemeGrid)
+        assert grids
+        assert all(grid.isVisible() for grid in grids)
+        assert all(tile.isVisible() for grid in grids for tile in grid.cards)
+        assert all(grid.columns == max(1, (grid.width() + 12) // 162) for grid in grids)
+    finally:
+        window.close_settings()
+
+
 def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
     """Count me in on -> off: the anonymous opt-out goes while the count is still
     allowed, and the switch takes hold right after; other switches never send it."""
