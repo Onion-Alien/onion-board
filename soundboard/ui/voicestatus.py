@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushBut
 
 from soundboard.i18n import _
 from soundboard.ui import icons
-from soundboard.ui.panel import Flow, icon_label
+from soundboard.ui.panel import Flow, icon_button, icon_label
 from soundboard.ui.widgets import Meter
 
 GAP = 16            # between the mic half and the chips, side by side
@@ -77,12 +77,9 @@ class VoiceStatusBar(QFrame):
         mh = QHBoxLayout(mic)
         mh.setContentsMargins(0, 0, 0, 0)
         mh.setSpacing(8)
-        self.stop_button = QPushButton(_("Stop voice effects"))
-        self.stop_button.setObjectName("small")
-        self.stop_button.setFixedHeight(ROW_H)
-        self.stop_button.setAccessibleName(self.stop_button.text())
-        self.stop_button.setToolTip(self.stop_button.text())
-        icons.set_icon(self.stop_button, "stop", "muted", "text", size=16)
+        # Keep the stop action compact so translated mic text and the meter fit.
+        self.stop_button = icon_button("stop", _("Stop voice effects"))
+        self.stop_button.setFixedSize(ROW_H, ROW_H)
         mh.addWidget(self.stop_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
         mh.addWidget(self.mic_icon)

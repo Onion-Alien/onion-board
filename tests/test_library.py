@@ -238,11 +238,11 @@ def test_non_finite_numbers_in_a_config_fall_back_to_defaults():
     assert library.fits_type(1.0, 2)
 
 
-def test_live_tabs_are_tinted_green_by_default_even_after_1_6_6():
-    # 1.6.5-1.6.6 saved live_tab_tint=False, their default: it doesn't keep it off
-    assert Config.from_raw({"live_tab_tint": False}).live_tab_green
-    assert Config().live_tab_green
+def test_live_tabs_default_to_a_dot_and_preserve_saved_preferences():
+    assert Config.from_raw({"live_tab_tint": False}).live_tab_green is False
+    assert Config().live_tab_green is False
     assert Config.from_raw({"live_tab_green": False}).live_tab_green is False
+    assert Config.from_raw({"live_tab_green": True}).live_tab_green is True
 
 
 def test_ffmpeg_finding_no_sound_says_so_in_words(tmp_path, monkeypatch):

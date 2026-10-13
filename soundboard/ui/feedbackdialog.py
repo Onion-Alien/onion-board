@@ -9,7 +9,7 @@ session, never this PC's ID, and the box says so. The form only opens in the bro
 like before (feedback.py)."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QCheckBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 import shiboken6
@@ -166,15 +166,24 @@ class FeedbackDialog(QDialog):
                 if on and key in ("other", "bugs"):   # a text box: ready to type
                     (self.other if key == "other" else self.bugs_text).setFocus()
         if moved:
-            # grow and shrink with the follow-ups, no gap left behind; once the layout
-            # has caught up with what was just shown or hidden
-            # (two turns: the hidden rows' sizes settle one turn after they're hidden)
-            QTimer.singleShot(0, lambda: QTimer.singleShot(0, self._fit_height))
+            # Settle the follow-ups and resize during the checkbox change.
+            self._fit_height()
         self.send_btn.setEnabled(any(b.isChecked() for b in self.boxes.values()))
 
     def _fit_height(self):
         if not shiboken6.isValid(self):
             return
+        page = self.pages.currentWidget()
+        if page is not None:
+            page_layout = page.layout()
+            assert page_layout is not None   # both pages have a vertical layout
+            page_layout.invalidate()
+            page.updateGeometry()
+        stack_layout = self.pages.layout()
+        assert stack_layout is not None   # QStackedWidget owns its layout
+        stack_layout.invalidate()
+        self.pages.updateGeometry()
+        self.updateGeometry()
         lay = self.layout()
         assert lay is not None   # made in __init__
         lay.activate()
