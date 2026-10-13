@@ -37,6 +37,9 @@ def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch
     window._default_at -= 10
     tick()
     assert len(asked) == 3
+    # one thread kept for it: a new one each tick kept the window waiting in
+    # Thread.start (2.0.4's freezes at mainwindow.py:2848)
+    assert len(set(asked)) == 1
 
 
 def test_a_slow_default_output_answer_isnt_asked_twice(window, monkeypatch, qapp):  # noqa: F811

@@ -39,6 +39,7 @@ from soundboard import (appaudio, autostart, backup, catswitch, destination, lib
 from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, net, netlog,
                         profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
+from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, PRESS_MODE, RESOURCE_DIR, Config,
                                 SoundMeta, cache_keep, clean_tags, duplicate, fingerprint,
@@ -518,6 +519,7 @@ class MainWindow(QMainWindow):
         self.discord_found: list = []
         self._discord_sig = None
         self._discord_reading = False
+        self._discord_poll = PollThread("discord-settings")
         self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
         self._discord_timer.timeout.connect(self._discord_tick)
         if sys.platform == "win32":
@@ -655,6 +657,7 @@ class MainWindow(QMainWindow):
         self._default_timer.timeout.connect(self._recover_devices)
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
+        self._default_poll = PollThread("default-output")
         self.default_found.connect(self._on_default_found)
         self.device_step.connect(lambda step: step())
         self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
@@ -2844,7 +2847,7 @@ class MainWindow(QMainWindow):
             return
         self._default_at = now
         self._default_asking = True
-        threading.Thread(target=self._ask_default, daemon=True, name="default-output").start()
+        self._default_poll.run(self._ask_default)
 
     def _ask_default(self):
         try:
@@ -9329,7 +9332,7 @@ class MainWindow(QMainWindow):
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
                 log.debug("reading Discord's settings failed", exc_info=True)
             self.bridge.discord.emit((found, sig))
-        threading.Thread(target=run, daemon=True, name="discord-settings").start()
+        self._discord_poll.run(run)
 
     def _on_discord(self, res):
         found, sig = res
@@ -10439,6 +10442,7 @@ class MainWindow(QMainWindow):
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
         for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
+                     self._default_poll.stop, self._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,

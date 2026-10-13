@@ -17,7 +17,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QPushButton, QSizePolicy, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import aiaddon, applog, errors, net
+from soundboard import aiaddon, applog, errors, net, updates
 from soundboard import modules as mods
 from soundboard.i18n import _
 from soundboard.speech import aivoice
@@ -584,7 +584,9 @@ class AiVoicePanel(QWidget):
                                   on_note=lambda t: busy.emit(self._install_note, t))
                 busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the button must come back
-                if not isinstance(e, (mods.ModuleError, OSError)):   # a bug: report it
+                # a bug: report it. A download that failed (offline, the connection
+                # dropped: UpdateError) is said on the tab, not reported as a crash
+                if not isinstance(e, (mods.ModuleError, OSError, updates.UpdateError)):
                     applog.report(where="AI voices download")
                 busy.emit(self._install_done, False, aiaddon.friendly(e))
 

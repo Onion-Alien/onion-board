@@ -225,6 +225,26 @@ def test_a_long_voice_job_finishing_after_the_tab_is_off(window, qapp, monkeypat
     qapp.processEvents()
 
 
+def test_an_ai_voices_download_that_fails_is_said_not_reported(window, qapp, monkeypatch):
+    """The connection dropping mid-download (UpdateError) is said on the tab, never
+    saved as a crash report (2.0.2's error at updates.py:376)."""
+    import threading
+
+    from soundboard import aiaddon, applog, updates
+    reported, ran = [], []
+
+    def offline(*_a, **_k):
+        ran.append(threading.current_thread())
+        raise updates.UpdateError("the download failed (the connection dropped)")
+    monkeypatch.setattr(aiaddon, "latest", offline)
+    monkeypatch.setattr(applog, "report", lambda *a, **k: reported.append(a))
+    window.voice.ai._get()
+    assert process_events(qapp, lambda: bool(ran), timeout=5)
+    ran[0].join(10)
+    qapp.processEvents()
+    assert not reported
+
+
 def test_onion_watch_download_finishing_after_the_tab_is_off(window, qapp, monkeypatch):
     import threading
 
