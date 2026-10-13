@@ -23,6 +23,7 @@ import hashlib
 import logging
 import os
 import struct
+import subprocess
 import sys
 import threading
 from pathlib import Path
@@ -231,6 +232,11 @@ if sys.platform == "win32":
 # --------------------------------------------------------------------------- window
 
 def relaunch_command() -> str:
+    launcher = _source_launcher()
+    if launcher is not None:
+        exe = Path(sys.executable)
+        gui = exe.with_name("pythonw.exe")
+        return subprocess.list2cmdline([str(gui if gui.exists() else exe), str(launcher)])
     from soundboard import autostart
     return autostart.command(hidden=False)
 
@@ -276,10 +282,25 @@ def _first_arg(args: str) -> str:
     return args.split(" ", 1)[0]
 
 
+def _source_launcher() -> Path | None:
+    """Keep a source wrapper's identity even when it replaces sys.argv to run main.
+
+    orig_argv records Python's actual entry point; -m/-c and interpreter options
+    aren't script paths and must not be mistaken for an app launcher.
+    """
+    if getattr(sys, "frozen", False):
+        return None
+    args = getattr(sys, "orig_argv", ())
+    if len(args) < 2 or args[1].startswith("-"):
+        return None
+    entry = Path(args[1])
+    return entry if entry.is_absolute() and entry.suffix.lower() in (".py", ".pyw") else None
+
+
 def is_ours(target: str, args: str, *, frozen: bool | None = None,
             exe: str | None = None, main: str | None = None) -> bool:
     """Does a shortcut start this copy of the app: the installed .exe, or (from
-    source) python / pythonw with this checkout's main.py?"""
+    source) python / pythonw with this checkout's main.py or its startup wrapper?"""
     if not target:
         return False
     if frozen is None:
@@ -290,7 +311,15 @@ def is_ours(target: str, args: str, *, frozen: bool | None = None,
         return False
     main = main or str(Path(__file__).resolve().parent.parent / "main.py")
     first = _first_arg(args)
-    return bool(first) and _norm(first) == _norm(main)
+    if not first:
+        return False
+    if _norm(first) == _norm(main):
+        return True
+    launcher = _source_launcher()
+    # A wrapper only belongs to this app when it uses this Python installation.
+    # Matching a name alone would also change shortcuts for separate test copies.
+    return (launcher is not None and _norm(first) == _norm(launcher)
+            and _norm(Path(target).parent) == _norm(Path(exe or sys.executable).parent))
 
 
 def shortcut_folders() -> list[Path]:

@@ -55,6 +55,54 @@ def test_is_ours_matches_only_this_copy(tmp_path):
     assert not shellicon.is_ours("", "", frozen=False, main=main_py)
 
 
+def test_source_wrapper_shortcuts_follow_theme(tmp_path, monkeypatch):
+    py = tmp_path / "runtime" / "pythonw.exe"
+    launcher = tmp_path / "launch" / "Board.pyw"
+    main_py = tmp_path / "live" / "main.py"
+    monkeypatch.setattr(shellicon.sys, "executable", str(py))
+    monkeypatch.setattr(shellicon.sys, "orig_argv", [str(py), str(launcher)])
+    monkeypatch.setattr(shellicon.sys, "argv", [str(main_py)])
+    monkeypatch.setattr(shellicon.sys, "frozen", False, raising=False)
+    folder = tmp_path / "shortcuts"
+    folder.mkdir()
+    link = folder / shellicon.LINK_NAME
+    link.write_bytes(b"lnk")
+    monkeypatch.setattr(FakeLink, "store", {
+        link: dict(target=str(py), args=f'"{launcher}"', icon=("old.ico", 0)),
+    })
+    icon = tmp_path / "mint.ico"
+    told = []
+    assert shellicon.update_shortcuts(icon, [folder], open_link=FakeLink,
+                                     notify=told.extend) == [link]
+    assert FakeLink.store[link]["icon"] == (str(icon), 0)
+    assert told == [link]
+    assert shellicon._first_arg(shellicon.relaunch_command()) == str(py)
+    assert str(launcher) in shellicon.relaunch_command()
+    assert str(main_py) not in shellicon.relaunch_command()
+    assert not shellicon.is_ours(str(tmp_path / "other" / "pythonw.exe"),
+                                f'"{launcher}"', main=str(main_py))
+    assert not shellicon.is_ours(str(py), f'"{tmp_path / "other.pyw"}"',
+                                main=str(main_py))
+
+
+@pytest.mark.parametrize("args", [[], ["python"], ["python", "-m", "soundboard"],
+                                 ["python", "-c", "pass"], ["python", "relative.py"],
+                                 ["python", "C:/example/readme.txt"]])
+def test_only_absolute_source_script_is_a_wrapper(args, monkeypatch):
+    monkeypatch.setattr(shellicon.sys, "orig_argv", args)
+    monkeypatch.setattr(shellicon.sys, "frozen", False, raising=False)
+    assert shellicon._source_launcher() is None
+
+
+def test_frozen_relaunch_ignores_source_wrapper(tmp_path, monkeypatch):
+    exe = tmp_path / "OnionBoard.exe"
+    monkeypatch.setattr(shellicon.sys, "executable", str(exe))
+    monkeypatch.setattr(shellicon.sys, "orig_argv", [str(exe), str(tmp_path / "Board.pyw")])
+    monkeypatch.setattr(shellicon.sys, "frozen", True, raising=False)
+    assert shellicon._source_launcher() is None
+    assert shellicon.relaunch_command() == f'"{exe}"'
+
+
 class FakeLink:
     """Stands in for shellicon.ShellLink: a dict per .lnk path."""
     store: dict = {}

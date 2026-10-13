@@ -1,0 +1,1 @@
+- Keep the taskbar right-click menu icon in the theme colours when starting through a source launcher.
