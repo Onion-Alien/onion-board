@@ -9632,8 +9632,7 @@ class MainWindow(QMainWindow):
         radio, a meter or the mic level still showing."""
         e = self.engine
         return (any(not paused for _p, paused in playing.values())
-                or self.radio.is_active() or bool(self._queue) or bool(e.aux)
-                or bool(self.linkbar.up_next())
+                or self.radio.is_active() or bool(e.aux)
                 or max(e.level_play, e.level_main,
                        e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
 

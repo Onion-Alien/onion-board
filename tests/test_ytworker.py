@@ -1,4 +1,6 @@
 """soundboard.ytworker: yt-dlp in a helper process, off the audio callbacks' GIL."""
+from contextlib import nullcontext
+
 import pytest
 
 from soundboard import ytdl, ytworker
@@ -192,6 +194,26 @@ def test_alive_messages_keep_the_wait_going():
     seen = []
     assert h.call(("download",), timeout=5, progress=seen.append) == ("ok", 7)
     assert seen == [0.5]
+
+
+def test_helper_waits_for_work_and_exits_when_idle(monkeypatch):
+    waits = []
+
+    class Conn:
+        def poll(self, timeout):
+            waits.append(timeout)
+            return False
+
+        def recv(self):
+            pytest.fail("read without a request")
+
+    monkeypatch.setenv(ytworker.ADDR_ENV, "test-helper")
+    monkeypatch.setenv(ytworker.KEY_ENV, "00")
+    monkeypatch.setattr(ytworker, "Client", lambda *a, **kw: Conn())
+    monkeypatch.setattr(ytdl, "_ydl", lambda: nullcontext(None))
+    assert ytworker.child_main() == 0
+    assert waits == [ytworker.IDLE_S]
+    assert ytworker.IDLE_S > 0
 
 
 def test_a_soundcloud_search_asks_the_picture_server_nothing():
