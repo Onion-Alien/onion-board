@@ -763,6 +763,11 @@ def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: 
     flows = [f for f in card.layout().findChildren(Flow)
              if f.indexOf(d.live_green) >= 0 and f.indexOf(d.live_dot) >= 0]
     assert flows
+    assert flows[0].indexOf(d.live_dot) < flows[0].indexOf(d.live_green)
+    buttons = next(f for f in d.hue_reset.parentWidget().layout().findChildren(Flow)
+                   if f.indexOf(d.hue_reset) >= 0)
+    assert buttons.itemAt(0).widget() is d.hue_reset
+    assert buttons.itemAt(1).widget().text() == "More colours"
     d.close()
 
 

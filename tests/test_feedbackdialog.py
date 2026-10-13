@@ -2,6 +2,8 @@
 sends (usage.improve / other_tag)."""
 from types import SimpleNamespace
 
+import pytest
+
 from soundboard import __version__, feedback, usage
 from soundboard.ui import busy, feedbackdialog
 
@@ -125,4 +127,26 @@ def test_ticking_a_pick_opens_its_follow_ups(qapp, monkeypatch):
     dlg.bugs_text.setText("crashes on alt-tab")
     dlg.send()
     assert calls == [(["bugs"], "", "crashes on alt-tab")]
+    dlg.deleteLater()
+
+
+@pytest.mark.parametrize("key", list(feedbackdialog.follow_ups()) + ["bugs", "other"])
+def test_follow_up_height_settles_during_the_checkbox_change(qapp, key):
+    dlg = feedbackdialog.FeedbackDialog(SimpleNamespace())
+    dlg.show()
+    for _ in range(4):
+        qapp.processEvents()
+    closed = dlg.height()
+    for _ in range(3):
+        dlg.boxes[key].click()
+        opened = dlg.height()
+        assert opened > closed
+        for _ in range(4):
+            qapp.processEvents()
+            assert dlg.height() == opened
+        dlg.boxes[key].click()
+        assert dlg.height() == closed
+        for _ in range(4):
+            qapp.processEvents()
+            assert dlg.height() == closed
     dlg.deleteLater()

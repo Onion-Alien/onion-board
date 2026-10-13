@@ -851,7 +851,7 @@ class SettingsDialog(QDialog):
         dot = QRadioButton(_("A small dot on its icon"))
         dot.setToolTip(_("Quieter: only a dot on the tab's icon"))
         modes = QButtonGroup(card)
-        for b in (green, dot):
+        for b in (dot, green):
             modes.addButton(b)
             row.addWidget(b)
         (green if self.mw.cfg.live_tab_green else dot).setChecked(True)
@@ -1064,8 +1064,8 @@ class SettingsDialog(QDialog):
         more.setToolTip(_("Pick any colour, including how strong and how bright it is"))
         reset = QPushButton(_("Theme's colour"))
         reset.setToolTip(_("Go back to each theme's own highlight colour"))
-        btns.addWidget(more)
         btns.addWidget(reset)
+        btns.addWidget(more)
         cv.addLayout(btns)
         now = QLabel()
         now.setObjectName("hint")

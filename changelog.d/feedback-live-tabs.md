@@ -1,0 +1,2 @@
+- Feedback follow-ups resize immediately when their checkbox changes, without a delayed snap.
+- Live tabs default to a small icon dot, listed first in Settings. Theme's colour comes before More colours.
