@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 import subprocess
 import threading
+import json
 import time
 from pathlib import Path
 
@@ -539,6 +540,28 @@ def test_a_mic_already_silent_before_gets_no_extra_restarts(fake_reg, monkeypatc
     assert step(GUID) == 0
     assert len([c for c in calls if c[0] is False]) == 1   # the step's own restart only
     assert "switched off or muted?" in caplog.text
+
+
+def test_a_retry_after_a_silent_mic_still_restarts_for_it(fake_reg, monkeypatch, tmp_path):
+    """The step left the mic silent (MIC_SILENT): on the retry it's silent before the
+    step too, but that's the stuck mic the retry is for, so it still gets the restarts."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False] + [True] * 40)
+    dm.data_dir().mkdir(parents=True, exist_ok=True)   # (the admin step secures it first)
+    assert dm.admin_install(GUID) == dm.MIC_SILENT
+    assert dm._left_silent() == {GUID.lower()}
+    calls.clear()
+    _restart_kit(fake_reg, monkeypatch, tmp_path, [True] * 5 + [False])
+    assert dm.admin_reinstall(GUID) == 0   # silent before, back after the extra restarts
+    assert dm._left_silent() == set()      # it's working: forgotten
+
+
+def test_an_old_silent_note_is_no_retry(fake_reg, monkeypatch, tmp_path):
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True] * 40)
+    (dm.data_dir()).mkdir(parents=True, exist_ok=True)
+    (dm.data_dir() / dm.LEFT_SILENT).write_text(json.dumps(
+        {"at": time.time() - dm.RETRY_S - 5, "mics": [GUID]}), encoding="utf-8")
+    assert dm.admin_install(GUID) == 0
+    assert len([c for c in calls if c[0] is False]) == 1   # silent before: left alone
 
 
 def test_the_uninstall_listens_to_the_mic_it_took_the_effect_off(fake_reg, monkeypatch,
@@ -2297,6 +2320,32 @@ def test_an_unfinished_prompt_isnt_called_a_no(window, monkeypatch):  # noqa: F8
     assert w.btn_install.text() == "Put my sounds straight into my mic"
 
 
+@pytest.mark.parametrize("auto,code,counted", [
+    (False, dm.NO_ANSWER, "mic-effect-failed-unanswered"),
+    (False, 6, "mic-effect-failed-code-6"),
+    (True, None, "mic-effect-fix-failed-no-helper"),
+    (True, dm.MIC_SILENT, "mic-effect-fix-failed-silent"),
+    (False, None, None)])   # a No: counted as said-no only
+def test_why_a_set_up_failed_is_counted_as_its_word(window, monkeypatch, auto, code,  # noqa: F811
+                                                    counted):
+    """The worker's install() result carries the word; the window counts it for a click
+    and for the fix-by-itself (the signal in between hands over a plain str)."""
+    from soundboard import usage
+    w = window
+    _routes(w, monkeypatch, "missing")
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage, "_used", set())
+    monkeypatch.setattr(w, "tell", lambda *a, **k: None)
+    monkeypatch.setattr(dm, "endpoint_for", lambda name: GUID)
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
+    w._autofixing = auto
+    w._attach_mic_work("My mic", auto=auto)   # the worker, here: its signal arrives at once
+    words = {k for k in usage._used if k.startswith("mic-effect-") and "failed-" in k}
+    assert words == ({counted} if counted else set())
+    assert not w._mic_fail_kind   # used once
+
+
 def _fake_shell(monkeypatch, started: bool, error: int = 0, wait: int = 0, code: int = 0):
     """run_elevated's Windows calls: ShellExecuteExW `started` (else failing with
     `error`), WaitForSingleObject giving `wait`, the exit code `code`."""
@@ -2331,24 +2380,57 @@ def test_run_elevated_tells_a_no_from_no_answer(monkeypatch):
     _fake_shell(monkeypatch, started=False, error=1223)   # ERROR_CANCELLED: a No
     assert dm.run_elevated("x.exe", "") is None
     _fake_shell(monkeypatch, started=False, error=5)      # admin rights denied outright
-    assert dm.run_elevated("x.exe", "") == dm.UNFINISHED
-    _fake_shell(monkeypatch, started=True, wait=0x102)    # WAIT_TIMEOUT: still going
-    assert dm.run_elevated("x.exe", "", wait_s=0.01) == dm.UNFINISHED
+    assert dm.run_elevated("x.exe", "") == dm.NOT_STARTED
+    _fake_shell(monkeypatch, started=True, wait=0x102)    # WAIT_TIMEOUT, no log at all
+    assert dm.run_elevated("x.exe", "", wait_s=0.01) == dm.NO_ANSWER
     _fake_shell(monkeypatch, started=True, wait=0, code=7)
     assert dm.run_elevated("x.exe", "", wait_s=0.01) == 7
 
 
-def test_install_says_what_happened_to_the_prompt(monkeypatch):
+def test_run_elevated_tells_a_stuck_step_from_an_unanswered_prompt(monkeypatch, tmp_path):
+    log_file = tmp_path / "directmic-admin.log"
+    _fake_shell(monkeypatch, started=True, wait=0x102)
+    assert dm.run_elevated("x.exe", "", wait_s=0.01, progress=log_file) == dm.NO_ANSWER
+    marks = iter([None])   # nothing before it ran; its log written once it started
+    monkeypatch.setattr(dm, "_file_mark", lambda p: next(marks, (5, 1)))
+    assert dm.run_elevated("x.exe", "", wait_s=0.01, progress=log_file) == dm.UNFINISHED
+
+
+@pytest.mark.parametrize("code", dm.UNFINISHED_CODES)
+def test_install_says_what_happened_to_the_prompt(monkeypatch, code):
     monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: None)
     assert dm.install_on(GUID) == dm.declined()
-    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: dm.UNFINISHED)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
     assert dm.install_on(GUID) == dm.unfinished()
     assert dm.uninstall() == dm.unfinished() and dm.cleanup(GUID) == dm.unfinished()
     from soundboard import cableremove
     monkeypatch.setattr(cableremove, "setup_exe", lambda: Path("x.exe"))
-    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: dm.UNFINISHED)
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: code)
     assert cableremove.remove() == dm.unfinished()
+
+
+@pytest.mark.parametrize("code,ask,kind", [
+    (dm.NO_ANSWER, True, "unanswered"), (dm.NOT_STARTED, True, "no-start"),
+    (dm.UNFINISHED, True, "stuck"), (dm.MIC_SILENT, True, "silent"),
+    (None, False, "no-helper"), (3, True, "code-3"), (6, True, "code-6"),
+    (99, True, "code-other")])
+def test_install_says_why_as_a_fixed_word(monkeypatch, code, ask, kind):
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
+    err = dm.install_on(GUID, ask_windows=ask)
+    assert dm.fail_kind(err) == kind and kind in dm.FAIL_KINDS
+    assert kind not in err   # the word is counted, never shown
+
+
+def test_install_failures_before_any_step_have_their_word(monkeypatch):
+    assert dm.fail_kind(dm.install_on(None)) == "no-mic"
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path("nowhere/x.dll"))
+    assert dm.fail_kind(dm.install_on(GUID)) == "no-effect"
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: None)
+    assert dm.install_on(GUID).kind == "said-no"   # counted as said-no, not a failure
+    assert dm.fail_kind("any other text") == "code-other"
 
 
 def test_a_silent_mic_is_never_called_done(monkeypatch):

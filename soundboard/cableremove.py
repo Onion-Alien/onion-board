@@ -36,7 +36,7 @@ def remove() -> str | None:
     code = directmic.run_elevated(str(exe), "-u -h", wait_s=120.0)
     if code is None:
         return directmic.declined()
-    if code == directmic.UNFINISHED:
+    if code in directmic.UNFINISHED_CODES:
         return directmic.unfinished()
     log.info("VB-Cable removed (setup exit code %s)", code)   # (its codes aren't documented)
     return None

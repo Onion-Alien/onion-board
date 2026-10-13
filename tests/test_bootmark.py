@@ -42,16 +42,17 @@ def test_every_one_off_command_leaves_no_breadcrumb():
     """Each command app.main() handles and exits before the breadcrumb is cleared (the
     installer's --install-addon, say) is in main.py's _ONE_OFF, or the next normal start
     counts a startup-failed for a run that only did its job."""
-    import ast
     import re
     from pathlib import Path
+
+    from soundboard import app
+    assert list(app.ONE_OFF_COMMANDS) == list(bootmark.ONE_OFF)
     root = Path(__file__).resolve().parent.parent
-    tree = ast.parse((root / "main.py").read_text(encoding="utf-8"))
-    one_off = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
-                   and getattr(n.targets[0], "id", "") == "_ONE_OFF")
-    app = (root / "soundboard" / "app.py").read_text(encoding="utf-8")
-    body = app[app.index("\ndef main():"):]
-    early = body[:body.index("from soundboard import bootmark")]   # before it's cleared
-    handled = set(re.findall(r'if "(--[a-z-]+)" in sys\.argv:', early))
-    assert handled, "app.main()'s one-off branches not found"
-    assert handled <= set(one_off), sorted(handled - set(one_off))
+    assert "bootmark.ONE_OFF" in (root / "main.py").read_text(encoding="utf-8")
+    # nothing else in main() looks at a "--flag" before the breadcrumb is cleared, however
+    # it's written (a one-off command there would leave a breadcrumb behind)
+    src = (root / "soundboard" / "app.py").read_text(encoding="utf-8")
+    body = src[src.index("\ndef main():"):]
+    early = body[:body.index("from soundboard import bootmark")]
+    assert "ONE_OFF_COMMANDS" in early
+    assert not re.findall(r'"--[a-z-]+"', early), re.findall(r'"--[a-z-]+"', early)

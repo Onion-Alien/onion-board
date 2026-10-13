@@ -55,6 +55,7 @@ from __future__ import annotations
 
 import ctypes
 import hashlib
+import json
 import logging
 import mmap
 import os
@@ -1609,7 +1610,9 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     dependents = _running_dependents()
     _audio_comes_back(dependents)
-    quiet = _silent_before([*installed_on(), *also])
+    # a mic the last step left silent (MIC_SILENT, just now) is silent before this retry
+    # too, but that's the stuck mic the retry is for: it still gets the extra restarts
+    quiet = _silent_before([*installed_on(), *also]) - _left_silent()
     mics: list[str] | None = None
     code = None
     try:
@@ -1640,6 +1643,37 @@ def _silent_before(guids: Sequence[str]) -> set[str]:
 
 MIC_SILENT = 7        # the step was done, but a mic still sends only silence
 EXTRA_RESTARTS = 3    # ...after this many more restarts of Windows' audio
+LEFT_SILENT = "left-silent.json"   # in data_dir(): the mics a step's MIC_SILENT named
+RETRY_S = 30 * 60     # a step this soon after one counts as its retry
+
+
+def _left_silent() -> set[str]:
+    """The mics the last step left sending only silence, if it was under RETRY_S ago
+    (a check: never fails)."""
+    try:
+        got = json.loads((data_dir() / LEFT_SILENT).read_text(encoding="utf-8"))
+        if 0 <= time.time() - float(got["at"]) < RETRY_S:
+            mics = {str(g).lower() for g in got["mics"]}
+            if mics:
+                log.info("%s left silent by the last step: still restarting for it",
+                         ", ".join(sorted(mics)))
+            return mics
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return set()
+
+
+def _remember_silent(mics: Sequence[str]) -> None:
+    """Note the mics this step left silent for the next one (none: forget them)."""
+    path = data_dir() / LEFT_SILENT
+    try:
+        if mics:
+            path.write_text(json.dumps({"at": time.time(), "mics": sorted(mics)}),
+                            encoding="utf-8")
+        else:
+            path.unlink(missing_ok=True)
+    except OSError:
+        log.info("couldn't note the silent mics", exc_info=True)
 
 
 def _mic_is_silent(guid: str) -> bool | None:
@@ -1684,6 +1718,7 @@ def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str],
             silent = [g for g in silent if _silent(g)]
             if not silent:
                 log.info("the mic is back after %d more restart(s)", n)
+        _remember_silent(silent)
         if silent:
             log.warning("%s still sends only silence after %d more restarts",
                         ", ".join(silent), EXTRA_RESTARTS)
@@ -2080,7 +2115,11 @@ def _via_helper(args: list[str], wait_s: float) -> int | None:
         return None
 
 
-UNFINISHED = -1   # run_elevated: it ran (or couldn't start), but no answer came
+# run_elevated's "no answer came" codes (each reads as unfinished(); counted apart):
+UNFINISHED = -1    # it started (its log changed), then went silent for wait_s
+NOT_STARTED = -2   # Windows couldn't start it (an error other than a No)
+NO_ANSWER = -3     # silent from the start: the prompt still open, or it never got going
+UNFINISHED_CODES = (UNFINISHED, NOT_STARTED, NO_ANSWER)
 
 
 PROMPT_CAP_S = 900.0   # an admin step still writing its log is waited for up to this
@@ -2116,9 +2155,9 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0,
                  progress: Path | None = None) -> int | None:
     """Run `exe` as admin, hidden (Windows asks first). Its exit code; None if the
     prompt was turned down (ERROR_CANCELLED: a No, or a PC that denies admin rights to
-    this account); UNFINISHED if it couldn't start otherwise or didn't finish (silent
-    for `wait_s`: the log `progress` didn't change either; the prompt may still be
-    open: nobody clicked No)."""
+    this account); one of UNFINISHED_CODES if it couldn't start otherwise (NOT_STARTED)
+    or didn't finish (silent for `wait_s`: the log `progress` didn't change either;
+    NO_ANSWER if it never changed, the prompt may still be open: nobody clicked No)."""
     from ctypes import wintypes
 
     class SHELLEXECUTEINFOW(ctypes.Structure):
@@ -2139,17 +2178,18 @@ def run_elevated(exe: str, params: str, wait_s: float = 90.0,
     kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
     kernel32.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
     kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+    before = _file_mark(progress)
     if not shell32.ShellExecuteExW(ctypes.byref(info)) or not info.hProcess:
         error = ctypes.get_last_error()
         log.info("%s %s not run (error %s)", Path(exe).name, params[-40:], error)
-        return None if error == 1223 else UNFINISHED   # ERROR_CANCELLED: turned down
+        return None if error == 1223 else NOT_STARTED   # ERROR_CANCELLED: turned down
     try:
         handle = info.hProcess
         if not wait_for(lambda t: kernel32.WaitForSingleObject(handle, int(t * 1000)) == 0,
                         wait_s, progress, max(PROMPT_CAP_S, wait_s)):
             log.info("%s %s didn't finish (silent for %.0f s)", Path(exe).name,
                      params[-40:], wait_s)
-            return UNFINISHED
+            return UNFINISHED if _file_mark(progress) != before else NO_ANSWER
         code = wintypes.DWORD()
         kernel32.GetExitCodeProcess(info.hProcess, ctypes.byref(code))
         return code.value
@@ -2191,15 +2231,34 @@ def no_effect() -> str:
     return _("This copy of Onion Board has no mic effect in it.")
 
 
-# why a set-up failed, as counted (usage MIC_FAILS); "code" is the installer's own error
-FAIL_KINDS = ("unfinished", "silent", "no-helper", "no-mic", "no-effect", "code")
+# why a set-up failed, as counted (usage MIC_FAILS): the admin step's prompt left
+# unanswered (NO_ANSWER), it couldn't start (NOT_STARTED) or it stopped half-way
+# (UNFINISHED); the mic silent after it; the mic helper not answering (only the app's
+# own repair, which never asks Windows); no such mic; no effect in this copy; or the
+# admin step's own exit code: 1 it raised, 2 the mic isn't listed to admins, 3 the effect
+# file missing or empty, 4 another copy at it, 5 its data folder couldn't be secured,
+# 6 Windows' audio wouldn't stop. Never the message, the mic or a path.
+FAIL_CODES = (1, 2, 3, 4, 5, 6)
+FAIL_KINDS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
+              "no-effect", *(f"code-{c}" for c in FAIL_CODES), "code-other")
+_UNFINISHED_KIND = {NO_ANSWER: "unanswered", NOT_STARTED: "no-start", UNFINISHED: "stuck"}
+
+
+class Failure(str):
+    """install()'s reason in plain words, with `kind`: a fixed word from FAIL_KINDS
+    (or "said-no") to count, so nothing matches the translated message."""
+    kind: str
+
+    def __new__(cls, text: str, kind: str):
+        self = super().__new__(cls, text)
+        self.kind = kind
+        return self
 
 
 def fail_kind(err: str) -> str:
-    """Which of FAIL_KINDS the install() result `err` is (never the message itself)."""
-    known = {unfinished(): "unfinished", mic_silent(): "silent", no_helper(): "no-helper",
-             no_mic(): "no-mic", no_effect(): "no-effect"}
-    return known.get(err, "code")
+    """Which of FAIL_KINDS install()'s result `err` is ("code-other" for any other text)."""
+    kind = getattr(err, "kind", "")
+    return kind if kind in FAIL_KINDS else "code-other"
 
 
 def install(mic_name: str | None, *, clean: bool = False,
@@ -2214,19 +2273,21 @@ def install_on(guid: str | None, *, clean: bool = False,
                ask_windows: bool = True) -> str | None:
     """install() for the mic with endpoint GUID `guid` (it comes off any other mic)."""
     if guid is None:
-        return no_mic()
+        return Failure(no_mic(), "no-mic")
     if not bundled_dll().is_file():
-        return no_effect()
+        return Failure(no_effect(), "no-effect")
     code = _elevated(["reinstall" if clean else "install", guid], ask_windows=ask_windows)
     if code is None:
-        return declined() if ask_windows else no_helper()
-    if code == UNFINISHED:
-        return unfinished()
+        return Failure(declined(), "said-no") if ask_windows else \
+            Failure(no_helper(), "no-helper")
+    if code in UNFINISHED_CODES:
+        return Failure(unfinished(), _UNFINISHED_KIND[code])
     if code == MIC_SILENT:
-        return mic_silent()
+        return Failure(mic_silent(), "silent")
     if code:
-        return _("Installing failed (code {code}). The log is in {folder}.",
-                 code=code, folder=data_dir().parent)
+        return Failure(_("Installing failed (code {code}). The log is in {folder}.",
+                         code=code, folder=data_dir().parent),
+                       f"code-{code}" if code in FAIL_CODES else "code-other")
     return None
 
 
@@ -2235,7 +2296,7 @@ def cleanup(guid: str) -> str | None:
     code = _elevated(["cleanup", guid])
     if code is None:
         return declined()
-    if code == UNFINISHED:
+    if code in UNFINISHED_CODES:
         return unfinished()
     return _("Cleaning up failed (code {code}).", code=code) if code else None
 
@@ -2245,7 +2306,7 @@ def uninstall(guid: str | None = None) -> str | None:
     code = _elevated(["uninstall", guid] if guid else ["uninstall"])
     if code is None:
         return declined()
-    if code == UNFINISHED:
+    if code in UNFINISHED_CODES:
         return unfinished()
     if code == MIC_SILENT:
         return mic_silent()

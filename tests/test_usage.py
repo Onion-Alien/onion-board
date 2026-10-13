@@ -865,17 +865,14 @@ def test_every_name_in_a_used_call_is_in_features():
         assert f"recovery-{k}" in usage.FEATURES
     for k in usage.MIC_FAILS:
         assert f"mic-effect-failed-{k}" in usage.FEATURES
+        assert f"mic-effect-fix-failed-{k}" in usage.FEATURES
 
 
-def test_mic_effect_failure_is_counted_as_a_fixed_word():
+def test_mic_effect_failure_words_match_directmic():
     from soundboard import directmic
     assert usage.MIC_FAILS == directmic.FAIL_KINDS
-    assert directmic.fail_kind(directmic.unfinished()) == "unfinished"
-    assert directmic.fail_kind(directmic.mic_silent()) == "silent"
-    assert directmic.fail_kind(directmic.no_helper()) == "no-helper"
-    assert directmic.fail_kind(directmic.no_mic()) == "no-mic"
-    assert directmic.fail_kind(directmic.no_effect()) == "no-effect"
-    assert directmic.fail_kind("Installing failed (code 5). The log is in C:/x") == "code"
+    # a translated message is never matched: plain text is "code-other"
+    assert directmic.fail_kind(directmic.unfinished()) == "code-other"
 
 
 def test_voice_tabs_and_recovery_actions_match_the_ui():

@@ -463,34 +463,43 @@ def first_paint(app, w, cap_s: float = PAINT_WAIT_S):
     w.repaint()
 
 
+def _usage_count_cmd(rest: list[str]) -> int:
+    j = rest.index("--heard-from") if "--heard-from" in rest else -1
+    heard = rest[j + 1] if 0 <= j < len(rest) - 1 else ""
+    return set_usage_count(rest[:1] == ["on"], heard)
+
+
+def _selftest_addon_cmd(rest: list[str]) -> int:
+    try:
+        return selftest_addon(rest[0])
+    except Exception as e:  # noqa: BLE001 - a FAILED line, not the frozen exe's error box
+        print(f"FAILED: {type(e).__name__}: {e}", file=sys.stderr)
+        return 1
+
+
+# The one-off commands main() runs and exits; each gets the arguments after its flag.
+# Its keys must be bootmark.ONE_OFF (main.py skips the breadcrumb for those):
+# tests/test_bootmark.py checks both, so add a new one-off command here, never as its
+# own `if` in main().
+ONE_OFF_COMMANDS = {
+    "--selftest": lambda rest: selftest(),
+    "--get-tor": lambda rest: get_tor(),
+    "--install-addon": lambda rest: install_addon(rest[0] if rest else ""),
+    "--set-offline": lambda rest: set_offline(),
+    "--keep-netlog": lambda rest: keep_netlog(),
+    "--usage-count": _usage_count_cmd,
+    "--uninstall-count": lambda rest: uninstall_count(),
+    "--selftest-addon": _selftest_addon_cmd,
+}
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):   # a path with emoji or Cyrillic in it, sent
         if stream is not None and hasattr(stream, "reconfigure"):   # to a file or pipe,
             stream.reconfigure(errors="replace")   # pyright: ignore[reportAttributeAccessIssue]  # hasattr
-    if "--selftest" in sys.argv:
-        sys.exit(selftest())
-    if "--get-tor" in sys.argv:
-        sys.exit(get_tor())
-    if "--install-addon" in sys.argv:
-        i = sys.argv.index("--install-addon")
-        sys.exit(install_addon(sys.argv[i + 1] if i + 1 < len(sys.argv) else ""))
-    if "--set-offline" in sys.argv:
-        sys.exit(set_offline())
-    if "--keep-netlog" in sys.argv:
-        sys.exit(keep_netlog())
-    if "--usage-count" in sys.argv:
-        i = sys.argv.index("--usage-count")
-        j = sys.argv.index("--heard-from") if "--heard-from" in sys.argv else -1
-        heard = sys.argv[j + 1] if 0 <= j < len(sys.argv) - 1 else ""
-        sys.exit(set_usage_count(sys.argv[i + 1:i + 2] == ["on"], heard))
-    if "--uninstall-count" in sys.argv:
-        sys.exit(uninstall_count())
-    if "--selftest-addon" in sys.argv:
-        try:
-            sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
-        except Exception as e:  # noqa: BLE001 - a FAILED line, not the frozen exe's error box
-            print(f"FAILED: {type(e).__name__}: {e}", file=sys.stderr)
-            sys.exit(1)
+    for flag, run in ONE_OFF_COMMANDS.items():   # first match wins, in this order
+        if flag in sys.argv:
+            sys.exit(run(sys.argv[sys.argv.index(flag) + 1:]))
     from soundboard import bootmark, exitwatch, threadnames
     threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()

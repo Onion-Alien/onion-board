@@ -298,6 +298,31 @@ def test_download_retries_then_tries_the_other_source(monkeypatch, tmp_path):
     assert tried == [ffmpegget.URLS[0]] * ffmpegget.TRIES + [ffmpegget.URLS[1]]
 
 
+def test_download_says_why_each_source_failed(monkeypatch, tmp_path):
+    monkeypatch.setattr(ffmpegget, "RETRY_WAIT_S", (0.0, 0.0))
+
+    def once(url, to, progress, stop):
+        if "github.com" in url:
+            raise ffmpegget.GetError("Couldn't reach github.com (reset)")
+        raise ffmpegget.GetError("www.gyan.dev said 404 Not Found.")
+    monkeypatch.setattr(ffmpegget, "_download_once", once)
+    with pytest.raises(ffmpegget.GetError) as e:
+        ffmpegget.download(tmp_path / "z.zip")
+    assert str(e.value) == ("Couldn't reach github.com (reset). "
+                            "www.gyan.dev said 404 Not Found.")
+
+
+def test_download_says_a_shared_reason_once(monkeypatch, tmp_path):
+    monkeypatch.setattr(ffmpegget, "RETRY_WAIT_S", (0.0, 0.0))
+
+    def once(url, to, progress, stop):
+        raise ffmpegget.GetError("Offline mode is on.")
+    monkeypatch.setattr(ffmpegget, "_download_once", once)
+    with pytest.raises(ffmpegget.GetError) as e:
+        ffmpegget.download(tmp_path / "z.zip")
+    assert str(e.value) == "Offline mode is on."
+
+
 def test_download_stops_at_once(monkeypatch, tmp_path):
     tried = []
 

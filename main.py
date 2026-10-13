@@ -21,14 +21,13 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--ytdl-worker"]:
     from soundboard.ytworker import child_main
     sys.exit(child_main())
 
-# the one-off commands app.main() handles and exits (a breadcrumb would look like a
-# start that failed: see soundboard/bootmark.py). Keep in step with app.main()'s branches.
-_ONE_OFF = ("--selftest", "--get-tor", "--install-addon", "--set-offline", "--keep-netlog",
-            "--usage-count", "--uninstall-count", "--selftest-addon")
+from soundboard import bootmark  # noqa: E402  (small: no Qt, no sound library)
 
-if __name__ == "__main__" and not (set(sys.argv[1:]) & set(_ONE_OFF)):
+# no breadcrumb for the one-off commands app.main() runs and exits (one would look like
+# a start that failed: see soundboard/bootmark.py)
+if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
     # a breadcrumb before the heavy import below, so a crash while it loads is counted
-    from soundboard import __version__, bootmark  # noqa: E402
+    from soundboard import __version__  # noqa: E402
     bootmark.start(__version__)
 
 from soundboard.app import main  # noqa: E402

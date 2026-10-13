@@ -120,8 +120,12 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
 VOICE_TABS = ("fx", "ai", "speak", "addons")
 # Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
-# why a click's mic effect set-up failed (directmic.FAIL_KINDS)
-MIC_FAILS = ("unfinished", "silent", "no-helper", "no-mic", "no-effect", "code")
+# why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
+# the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
+# the helper not answering, no mic, no effect, the admin step's exit code 1-6 or another)
+MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
+             "no-effect", "code-1", "code-2", "code-3", "code-4", "code-5", "code-6",
+             "code-other")
 # a pad's "On press" modes other than the default (library.MODES, without "restart")
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
@@ -183,10 +187,12 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # off, updated; No to Windows' admin prompt; a click's set-up failed; the
             # fix-by-itself failed; on, but not working when the wait ran out; Windows took
             # it off (found by the app); and the mic helper set up (features_now); and
-            # why a click's set-up failed (MIC_FAILS: a fixed word, never the message)
+            # why a set-up or the fix-by-itself failed (MIC_FAILS: a fixed word, never
+            # the message)
             "mic-effect-on", "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
             "mic-effect-failed", *(f"mic-effect-failed-{k}" for k in MIC_FAILS),
-            "mic-effect-fix-failed", "mic-effect-no-load",
+            "mic-effect-fix-failed", *(f"mic-effect-fix-failed-{k}" for k in MIC_FAILS),
+            "mic-effect-no-load",
             "mic-effect-taken-off", "mic-helper",
             # Onion Board's own update: the download cancelled or failed, the installer
             # wouldn't start, Copy error, Later at "Restart now", one that didn't finish
@@ -470,6 +476,10 @@ def ffmpeg_state(cfg, state: str) -> None:
     The marker survives daily sends and restarts; missing on a new install is normal,
     and an unknown check or a cancelled get cannot prove recovery. Only fixed feature
     names are counted, never a path or error message.
+    On purpose, only this count's own switch (and Offline / Tor) stop it, not FFmpeg's
+    download switch: the check that finds a broken copy is local, so with that switch off
+    a broken copy still counts, no get runs (so no get-failed), and a copy the user fixes
+    themselves still counts as recovered on the next check.
     """
     if not enabled() or not net.allowed(FEATURE) or net.mode() == net.TOR:
         cfg.stats_ffmpeg_failed = False
