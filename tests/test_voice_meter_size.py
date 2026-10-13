@@ -1,8 +1,9 @@
 """The status chips leave room for a readable mic meter after resizing."""
 import pytest
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QBoxLayout
 
-from soundboard import theme
+from soundboard import i18n, theme
 from soundboard.ui.voicestatus import VoiceStatusBar
 
 
@@ -78,3 +79,34 @@ def test_many_chips_wrap_and_meter_recovers(qapp):
     finally:
         bar.close()
         bar.deleteLater()
+
+
+@pytest.mark.parametrize("language", ["en", "de", "ar", "zh-CN"])
+def test_translated_mic_status_fits_with_stop_and_meter(qapp, language):
+    direction = qapp.layoutDirection()
+    i18n.set_language(language)
+    qapp.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(language) else Qt.LeftToRight)
+    bar = VoiceStatusBar()
+    bar.set_items([("none", i18n._("Voice effects off"), "off", "mic", None, "")])
+    bar.set_level(None)
+    bar.show()
+    try:
+        for width in (800, 320, 440, 800):
+            bar.resize(width, bar.sizeHint().height())
+            for _ in range(4):
+                qapp.processEvents()
+            label = bar.lbl_mic
+            text_width = label.fontMetrics().horizontalAdvance(label.text())
+            assert text_width <= label.contentsRect().width()
+            assert bar.meter.width() >= bar.meter.minimumWidth()
+            for widget in (bar.stop_button, label, bar.meter):
+                rect = widget.rect().translated(widget.mapTo(bar._mic, QPoint()))
+                assert bar._mic.rect().contains(rect)
+            assert not bar.stop_button.icon().isNull()
+            assert bar.stop_button.toolTip() == i18n._("Stop voice effects")
+            assert bar.stop_button.accessibleName() == bar.stop_button.toolTip()
+    finally:
+        bar.close()
+        bar.deleteLater()
+        i18n.set_language("en")
+        qapp.setLayoutDirection(direction)
