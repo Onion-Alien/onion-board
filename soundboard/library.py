@@ -840,7 +840,10 @@ class Config:
             cfg._raw_extra = extra   # pyright: ignore[reportAttributeAccessIssue]
         if kept:
             cfg._raw_kept = kept   # pyright: ignore[reportAttributeAccessIssue]
-        cfg.categories = clean_tags(cfg.categories)
+        # a "Cat / Sub" tab (an older version saved one for a subcategory, or a name
+        # typed with " / " before there were any) is the subcategory again
+        cats, cfg.categories = clean_tags(cfg.categories), []
+        merge_tags(cats, cfg.categories, cfg.subcategories)
         for m in sounds:   # a category a sound is in always has a tab
             m.tags = merge_tags(m.tags, cfg.categories, cfg.subcategories)
         if cfg.category not in cfg.categories:

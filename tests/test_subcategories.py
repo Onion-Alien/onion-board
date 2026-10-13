@@ -48,6 +48,15 @@ def test_a_saved_board_finds_its_subcategories_again():
     assert gone.subcategory == "" and gone.subcategories == {}
 
 
+def test_a_sub_tab_an_older_version_saved_is_a_subcategory_again():
+    cfg = Config.from_raw({"categories": ["Memes", "Memes / Vine", "Music"],
+                           "subcategories": {"Memes": ["Vine"]},
+                           "sounds": [{"id": "a", "name": "a", "path": "a.wav",
+                                       "tags": ["Memes", "Memes / Vine"]}]})
+    assert cfg.categories == ["Memes", "Music"]
+    assert cfg.subcategories == {"Memes": ["Vine"]}
+
+
 def test_a_pack_becomes_one_tab_with_its_categories_inside():
     sounds = [SimpleNamespace(tags=["Tavern"]), SimpleNamespace(tags=["Combat", "Mine"])]
     assert library.group_pack_tags(sounds, "GM starter pack")
