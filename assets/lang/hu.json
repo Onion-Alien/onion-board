@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Hangeffektek leállítása",
   "Hide this program's window": "A program ablakának elrejtése",
   "Looking for its window…": "Az ablakát keresem…",
-  "Minimised: nothing to show": "Kis méretre állítva: nincs mit mutatni",
   "No window to show": "Nincs megjeleníthető ablak",
   "Show this program's window": "A program ablakának megjelenítése",
   "This program doesn't share its picture": "Ez a program nem osztja meg a képét",
   "Window of {name}": "{name} ablaka",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Ha nem, kattints a <b>Javítás</b> gombra, majd az <b>Igen</b> gombra, amikor a Windows kérdez.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Ha nem, kattints a <b>Javítás</b> gombra: a hang pár másodpercre kimarad.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "A mikrofonod nem küld hangot. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Indítsd újra a géped, aztán próbáld újra."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "A mikrofonod nem küld hangot. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Indítsd újra a géped, aztán próbáld újra.",
+  "Minimised: last picture": "Kis méretű: utolsó kép",
+  "Minimised: restore for live updates": "Kis méretű: állítsd vissza az élő képhez"
 }

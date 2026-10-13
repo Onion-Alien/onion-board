@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Parar efeitos de voz",
   "Hide this program's window": "Ocultar a janela deste programa",
   "Looking for its window…": "Procurando a janela…",
-  "Minimised: nothing to show": "Minimizada: nada para mostrar",
   "No window to show": "Nenhuma janela para mostrar",
   "Show this program's window": "Mostrar a janela deste programa",
   "This program doesn't share its picture": "Este programa não compartilha a imagem dele",
   "Window of {name}": "Janela de {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "O Discord e os jogos não ouvem nada do seu microfone. Seu headset está desligado ou com o microfone no mudo? Ligue-o ou tire do mudo. Se não, clique em <b>Consertar</b> e depois em <b>Sim</b> quando o Windows perguntar.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "O Discord e os jogos não ouvem nada do seu microfone. Seu headset está desligado ou com o microfone no mudo? Ligue-o ou tire do mudo. Se não, clique em <b>Consertar</b>: seu som some por alguns segundos.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Seu microfone não está enviando som. Seu headset está desligado ou com o microfone no mudo? Ligue-o ou tire do mudo. Ainda nada? Reinicie o PC e tente de novo."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Seu microfone não está enviando som. Seu headset está desligado ou com o microfone no mudo? Ligue-o ou tire do mudo. Ainda nada? Reinicie o PC e tente de novo.",
+  "Minimised: last picture": "Minimizada: última imagem",
+  "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações ao vivo"
 }

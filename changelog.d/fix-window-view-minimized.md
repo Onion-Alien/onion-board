@@ -1,0 +1,1 @@
+- Apps window views keep their last picture when the source is minimised, label it clearly, and offer Restore for live updates without switching focus. Open views also refresh while another app has focus.

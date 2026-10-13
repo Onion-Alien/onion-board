@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Διακοπή εφέ φωνής",
   "Hide this program's window": "Απόκρυψη του παραθύρου αυτού του προγράμματος",
   "Looking for its window…": "Αναζήτηση του παραθύρου του…",
-  "Minimised: nothing to show": "Ελαχιστοποιημένο: τίποτα για εμφάνιση",
   "No window to show": "Κανένα παράθυρο για εμφάνιση",
   "Show this program's window": "Εμφάνιση του παραθύρου αυτού του προγράμματος",
   "This program doesn't share its picture": "Αυτό το πρόγραμμα δεν μοιράζεται την εικόνα του",
   "Window of {name}": "Παράθυρο του {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b> και μετά στο <b>Ναι</b> όταν ρωτήσουν τα Windows.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b>: ο ήχος σου κόβεται για λίγα δευτερόλεπτα.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
+  "Minimised: last picture": "Ελαχιστοποιημένο: τελευταία εικόνα",
+  "Minimised: restore for live updates": "Ελαχιστοποιημένο: επαναφέρετε για ζωντανή εικόνα"
 }

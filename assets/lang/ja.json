@@ -3235,12 +3235,13 @@
   "Stop voice effects": "音声エフェクトを停止",
   "Hide this program's window": "このプログラムのウィンドウを隠す",
   "Looking for its window…": "ウィンドウを探しています…",
-  "Minimised: nothing to show": "最小化中: 表示するものがありません",
   "No window to show": "表示するウィンドウがありません",
   "Show this program's window": "このプログラムのウィンドウを表示",
   "This program doesn't share its picture": "このプログラムは画面を共有しません",
   "Window of {name}": "{name} のウィンドウ",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックし、Windows の確認で<b>はい</b>をクリックしてください。",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "マイクから音が出ていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。それでも出ない場合は、PC を再起動してから、もう一度お試しください。"
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "マイクから音が出ていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。それでも出ない場合は、PC を再起動してから、もう一度お試しください。",
+  "Minimised: last picture": "最小化中：最後の画像",
+  "Minimised: restore for live updates": "最小化中：元に戻すと映像が更新されます"
 }

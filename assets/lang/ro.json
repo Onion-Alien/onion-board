@@ -3383,12 +3383,13 @@
   "Stop voice effects": "Oprește efectele vocale",
   "Hide this program's window": "Ascunde fereastra acestui program",
   "Looking for its window…": "Îi caut fereastra…",
-  "Minimised: nothing to show": "Minimizată: nimic de arătat",
   "No window to show": "Nicio fereastră de arătat",
   "Show this program's window": "Arată fereastra acestui program",
   "This program doesn't share its picture": "Acest program nu își partajează imaginea",
   "Window of {name}": "Fereastra {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord și jocurile nu aud nimic de la microfonul tău. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>, apoi pe <b>Da</b> când întreabă Windows.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord și jocurile nu aud nimic de la microfonul tău. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>: sunetul se oprește câteva secunde.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Tot nimic? Repornește PC-ul, apoi încearcă din nou."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Tot nimic? Repornește PC-ul, apoi încearcă din nou.",
+  "Minimised: last picture": "Minimizată: ultima imagine",
+  "Minimised: restore for live updates": "Minimizată: restaurează pentru actualizări în timp real"
 }

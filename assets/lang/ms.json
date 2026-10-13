@@ -3235,12 +3235,13 @@
   "Stop voice effects": "Hentikan kesan suara",
   "Hide this program's window": "Sembunyikan tetingkap program ini",
   "Looking for its window…": "Mencari tetingkapnya…",
-  "Minimised: nothing to show": "Diminimumkan: tiada apa untuk ditunjukkan",
   "No window to show": "Tiada tetingkap untuk ditunjukkan",
   "Show this program's window": "Tunjukkan tetingkap program ini",
   "This program doesn't share its picture": "Program ini tidak berkongsi gambarnya",
   "Window of {name}": "Tetingkap {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord dan permainan tidak mendengar apa-apa daripada mikrofon anda. Adakah set kepala anda dimatikan, atau mikrofonnya diredamkan? Hidupkannya atau nyahredamkannya. Jika tidak, klik <b>Baiki</b>, kemudian <b>Yes</b> apabila Windows bertanya.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan permainan tidak mendengar apa-apa daripada mikrofon anda. Adakah set kepala anda dimatikan, atau mikrofonnya diredamkan? Hidupkannya atau nyahredamkannya. Jika tidak, klik <b>Baiki</b>: bunyi anda hilang selama beberapa saat.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofon anda tidak menghantar bunyi. Adakah set kepala anda dimatikan, atau mikrofonnya diredamkan? Hidupkannya atau nyahredamkannya. Masih tiada? Mulakan semula PC anda, kemudian cuba lagi."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofon anda tidak menghantar bunyi. Adakah set kepala anda dimatikan, atau mikrofonnya diredamkan? Hidupkannya atau nyahredamkannya. Masih tiada? Mulakan semula PC anda, kemudian cuba lagi.",
+  "Minimised: last picture": "Diminimumkan: gambar terakhir",
+  "Minimised: restore for live updates": "Diminimumkan: pulihkan untuk kemas kini langsung"
 }

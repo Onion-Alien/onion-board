@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Stoppa rösteffekter",
   "Hide this program's window": "Dölj programmets fönster",
   "Looking for its window…": "Letar efter fönstret…",
-  "Minimised: nothing to show": "Minimerat: inget att visa",
   "No window to show": "Inget fönster att visa",
   "Show this program's window": "Visa programmets fönster",
   "This program doesn't share its picture": "Programmet delar inte sin bild",
   "Window of {name}": "Fönstret för {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord och spel hör ingenting från din mikrofon. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Om inte, klicka <b>Reparera</b> och sedan <b>Ja</b> när Windows frågar.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord och spel hör ingenting från din mikrofon. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Om inte, klicka <b>Reparera</b>: ljudet försvinner i några sekunder.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen skickar inget ljud. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Fortfarande inget? Starta om datorn och försök igen."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen skickar inget ljud. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Fortfarande inget? Starta om datorn och försök igen.",
+  "Minimised: last picture": "Minimerat: senaste bilden",
+  "Minimised: restore for live updates": "Minimerat: återställ för löpande uppdateringar"
 }

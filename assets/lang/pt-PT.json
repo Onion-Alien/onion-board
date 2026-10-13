@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Parar efeitos de voz",
   "Hide this program's window": "Ocultar a janela deste programa",
   "Looking for its window…": "A procurar a janela…",
-  "Minimised: nothing to show": "Minimizada: nada para mostrar",
   "No window to show": "Nenhuma janela para mostrar",
   "Show this program's window": "Mostrar a janela deste programa",
   "This program doesn't share its picture": "Este programa não partilha a sua imagem",
   "Window of {name}": "Janela de {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "O Discord e os jogos não ouvem nada do teu microfone. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Se não, clica em <b>Reparar</b> e depois em <b>Sim</b> quando o Windows perguntar.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "O Discord e os jogos não ouvem nada do teu microfone. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Se não, clica em <b>Reparar</b>: o som falha durante alguns segundos.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "O teu microfone não está a enviar som. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Continua sem som? Reinicia o PC e tenta outra vez."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "O teu microfone não está a enviar som. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Continua sem som? Reinicia o PC e tenta outra vez.",
+  "Minimised: last picture": "Minimizada: última imagem",
+  "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações em direto"
 }

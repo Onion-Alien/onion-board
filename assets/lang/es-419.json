@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Detener efectos de voz",
   "Hide this program's window": "Ocultar la ventana de este programa",
   "Looking for its window…": "Buscando su ventana…",
-  "Minimised: nothing to show": "Minimizada: nada que mostrar",
   "No window to show": "No hay ventana que mostrar",
   "Show this program's window": "Mostrar la ventana de este programa",
   "This program doesn't share its picture": "Este programa no comparte su imagen",
   "Window of {name}": "Ventana de {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord y los juegos no oyen nada de tu micrófono. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. Si no, haz clic en <b>Reparar</b> y luego en <b>Sí</b> cuando Windows pregunte.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord y los juegos no oyen nada de tu micrófono. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. Si no, haz clic en <b>Reparar</b>: el sonido se corta unos segundos.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tu micrófono no envía sonido. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. ¿Sigue sin funcionar? Reinicia tu PC y vuelve a intentarlo."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tu micrófono no envía sonido. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. ¿Sigue sin funcionar? Reinicia tu PC y vuelve a intentarlo.",
+  "Minimised: last picture": "Minimizada: última imagen",
+  "Minimised: restore for live updates": "Minimizada: restaura para ver cambios en vivo"
 }

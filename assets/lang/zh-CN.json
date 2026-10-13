@@ -3235,12 +3235,13 @@
   "Stop voice effects": "停止语音效果",
   "Hide this program's window": "隐藏这个程序的窗口",
   "Looking for its window…": "正在查找它的窗口…",
-  "Minimised: nothing to show": "已最小化：没有可显示的",
   "No window to show": "没有可显示的窗口",
   "Show this program's window": "显示这个程序的窗口",
   "This program doesn't share its picture": "这个程序不共享它的画面",
   "Window of {name}": "{name} 的窗口",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord 和游戏听不到你麦克风的任何声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。如果没有，点 <b>修复</b>，然后在 Windows 询问时点 <b>是</b>。",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord 和游戏听不到你麦克风的任何声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。如果没有，点 <b>修复</b>：声音会中断几秒。",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麦克风没有声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。还是没有声音？请重启电脑，然后再试一次。"
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麦克风没有声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。还是没有声音？请重启电脑，然后再试一次。",
+  "Minimised: last picture": "已最小化：最后一帧",
+  "Minimised: restore for live updates": "已最小化：还原窗口以实时更新"
 }

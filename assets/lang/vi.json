@@ -3235,12 +3235,13 @@
   "Stop voice effects": "Dừng hiệu ứng giọng nói",
   "Hide this program's window": "Ẩn cửa sổ của chương trình này",
   "Looking for its window…": "Đang tìm cửa sổ…",
-  "Minimised: nothing to show": "Đã thu nhỏ: không có gì để hiện",
   "No window to show": "Không có cửa sổ để hiện",
   "Show this program's window": "Hiện cửa sổ của chương trình này",
   "This program doesn't share its picture": "Chương trình này không chia sẻ hình ảnh",
   "Window of {name}": "Cửa sổ của {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord và game không nghe thấy gì từ mic của bạn. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Nếu không, bấm <b>Sửa</b>, rồi bấm <b>Có</b> khi Windows hỏi.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord và game không nghe thấy gì từ mic của bạn. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Nếu không, bấm <b>Sửa</b>: âm thanh sẽ mất vài giây.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic của bạn không gửi âm thanh. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Khởi động lại PC rồi thử lại."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic của bạn không gửi âm thanh. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Khởi động lại PC rồi thử lại.",
+  "Minimised: last picture": "Đã thu nhỏ: hình ảnh cuối",
+  "Minimised: restore for live updates": "Đã thu nhỏ: khôi phục để xem cập nhật trực tiếp"
 }

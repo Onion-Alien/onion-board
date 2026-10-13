@@ -3235,12 +3235,13 @@
   "Stop voice effects": "음성 효과 중지",
   "Hide this program's window": "이 프로그램의 창 숨기기",
   "Looking for its window…": "창을 찾는 중…",
-  "Minimised: nothing to show": "최소화됨: 보여줄 것이 없어요",
   "No window to show": "보여줄 창이 없어요",
   "Show this program's window": "이 프로그램의 창 보기",
   "This program doesn't share its picture": "이 프로그램은 화면을 공유하지 않아요",
   "Window of {name}": "{name} 창",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭한 다음 Windows가 물으면 <b>예</b>를 클릭하세요.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭하세요: 몇 초 동안 소리가 끊깁니다.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요.",
+  "Minimised: last picture": "최소화됨: 마지막 화면",
+  "Minimised: restore for live updates": "최소화됨: 실시간으로 보려면 창을 복원하세요"
 }

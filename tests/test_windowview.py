@@ -29,7 +29,6 @@ def fake_win(monkeypatch):
 
     monkeypatch.setattr(winshot, "find_window", find)
     monkeypatch.setattr(winshot, "grab", grab)
-    monkeypatch.setattr(windowview.appstate, "active", lambda: True)
     monkeypatch.setattr(windowview, "FRAME_S", 0.02)
     return state
 
@@ -118,3 +117,91 @@ def test_fit_keeps_the_shape_and_never_grows():
 def test_black_check():
     assert winshot.is_black(b"\x00\x00\x00\xff" * 1000)
     assert not winshot.is_black(b"\x00\x00\x00\xff" * 500 + b"\xff\xff\xff\xff" * 500)
+
+
+def test_minimised_keeps_last_picture_until_restored(qapp, fake_win, monkeypatch):
+    restored = []
+
+    def restore(pids):
+        restored.append(tuple(pids))
+        fake_win["status"] = winshot.OK
+
+    monkeypatch.setattr(winshot, "restore_window", restore)
+    row = shown_row(qapp, App(5, "music.exe", title="Music Thing"))
+    row.btn_view.click()
+    assert wait_for(qapp, lambda: row.view.status == winshot.OK)
+    before = row.view.picture.pixmap().toImage()
+    fake_win["status"] = winshot.MINIMISED
+    assert wait_for(qapp, lambda: row.view.status == winshot.MINIMISED)
+    assert row.view.picture.isVisible()
+    assert row.view.picture.pixmap().toImage() == before
+    assert row.view.message.text() == "Minimised: last picture"
+    assert row.view.restore.isVisible()
+    row.view.restore.click()
+    assert wait_for(qapp, lambda: row.view.status == winshot.OK)
+    assert restored == [(5,)]
+    assert not row.view.restore.isVisible()
+    row.close_view()
+    row.close()
+
+
+def test_lost_window_discards_cached_picture(qapp, fake_win):
+    row = shown_row(qapp, App(5, "music.exe", title="Music Thing"))
+    row.btn_view.click()
+    assert wait_for(qapp, lambda: row.view.status == winshot.OK)
+    fake_win["status"] = winshot.GONE
+    assert wait_for(qapp, lambda: row.view.status == winshot.GONE)
+    assert row.view.picture.pixmap().isNull()
+    fake_win["status"] = winshot.MINIMISED
+    assert wait_for(qapp, lambda: row.view.status == winshot.MINIMISED)
+    assert not row.view.picture.isVisible()
+    assert row.view.restore.isVisible()
+    row.close_view()
+    row.close()
+
+
+def test_restore_only_minimised_source_without_activation(monkeypatch):
+    from types import SimpleNamespace
+
+    calls = []
+    u = SimpleNamespace(IsIconic=lambda hwnd: True,
+                        ShowWindowAsync=lambda *args: calls.append(args) or True)
+    monkeypatch.setattr(winshot, "find_window", lambda pids: 77 if pids else 0)
+    monkeypatch.setattr(winshot, "_win", lambda: (u, None, None))
+    assert winshot.restore_window((5,))
+    assert calls == [(77, 4)]
+    u.IsIconic = lambda hwnd: False
+    assert not winshot.restore_window((5,))
+    assert not winshot.restore_window(())
+    assert len(calls) == 1
+
+
+def test_view_runs_without_focus_but_pauses_when_board_minimised(qapp, fake_win, monkeypatch):
+    from soundboard.ui import appstate
+
+    monkeypatch.setattr(appstate, "active", lambda: False)
+    row = shown_row(qapp, App(5, "music.exe", title="Music Thing"))
+    row.btn_view.click()
+    assert wait_for(qapp, lambda: fake_win["grabs"] >= 3)
+    row.showMinimized()
+    qapp.processEvents()
+    assert not row.view._grabber._run
+    row.showNormal()
+    qapp.processEvents()
+    assert row.view._grabber._run
+    row.close_view()
+    row.close()
+
+
+def test_changed_program_and_late_results_cannot_reuse_old_picture(qapp, fake_win):
+    view = windowview.WindowView()
+    view.set_pids((5,))
+    view._open = True
+    view._show(winshot.Shot(winshot.OK, 2, 2, b"\x40\x80\xc0\xff" * 4))
+    view.set_pids((9,))
+    assert view.picture.pixmap().isNull()
+    view._received(((5,), winshot.Shot(winshot.OK, 2, 2, b"\xff" * 16)))
+    assert view.picture.pixmap().isNull()
+    view._show(winshot.Shot(winshot.MINIMISED))
+    assert view.message.text() == windowview.MESSAGES[winshot.MINIMISED]
+    view.close()

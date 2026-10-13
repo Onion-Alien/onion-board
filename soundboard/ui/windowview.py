@@ -3,8 +3,8 @@ its card's buttons, opened with the card's eye button (soundboard.ui.appspanel).
 
 A worker thread finds the program's window and copies it (soundboard.winshot)
 about four times a second; the UI thread only turns the pixels into a picture.
-It runs only while the view is open, on screen and the app is in front: hidden
-tab, closed view or a game in front, and the worker sleeps.
+It runs while the view is open and on screen, including while another app has
+focus. Minimized sources keep their last picture with a paused message.
 """
 from __future__ import annotations
 
@@ -12,13 +12,12 @@ import logging
 import threading
 import time
 
-from PySide6.QtCore import QObject, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QSize, Qt, Signal
 from PySide6.QtGui import QImage, QPixmap
-from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 from soundboard import winshot
 from soundboard.i18n import _
-from soundboard.ui import appstate
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ FIND_S = 2.0          # the window is looked up again this often (it may have ch
 VIEW_H = 180          # the picture's tallest, in pixels
 
 MESSAGES = {
-    winshot.MINIMISED: _("Minimised: nothing to show"),
+    winshot.MINIMISED: _("Minimised: restore for live updates"),
     winshot.GONE: _("No window to show"),
     winshot.BLACK: _("This program doesn't share its picture"),
 }
@@ -46,6 +45,13 @@ class _Grabber(QObject):
         self._wake = threading.Event()
         self._hand_over = threading.Lock()  # held while emitting; stop() takes it
         self._thread: threading.Thread | None = None
+        self._restore = threading.Event()
+        self._restore_pids: tuple[int, ...] = ()
+
+    def restore(self):
+        self._restore_pids = self.pids
+        self._restore.set()
+        self._wake.set()
 
     def resume(self):
         self._run = True
@@ -64,6 +70,7 @@ class _Grabber(QObject):
 
     def _loop(self):
         hwnd, found_at = 0, -FIND_S
+        found_pids = ()
         while not self._stopped:
             if not self._run:
                 self._wake.wait()
@@ -71,9 +78,16 @@ class _Grabber(QObject):
                 hwnd, found_at = 0, -FIND_S   # back from a pause: look it up again
                 continue
             started = time.monotonic()
+            pids = self.pids
             try:
-                if not hwnd or started - found_at >= FIND_S:
-                    hwnd, found_at = winshot.find_window(self.pids), started
+                if self._restore.is_set():
+                    self._restore.clear()
+                    if pids == self._restore_pids:
+                        winshot.restore_window(pids)
+                    hwnd = 0
+                if not hwnd or pids != found_pids or started - found_at >= FIND_S:
+                    hwnd, found_at = winshot.find_window(pids), started
+                    found_pids = pids
                 w, h = self.limit
                 shot = winshot.grab(hwnd, w, h)
                 if shot.status == winshot.GONE:
@@ -84,7 +98,7 @@ class _Grabber(QObject):
             with self._hand_over:
                 if self._stopped:
                     return
-                self.shot.emit(shot)
+                self.shot.emit((pids, shot))
             self._wake.wait(max(0.0, FRAME_S - (time.monotonic() - started)))
             self._wake.clear()
 
@@ -107,6 +121,11 @@ class WindowView(QWidget):
         self.message.setWordWrap(True)
         v.addWidget(self.picture)
         v.addWidget(self.message)
+        self.restore = QPushButton(_("Restore"))
+        self.restore.setObjectName("small")
+        self.restore.clicked.connect(self._restore_window)
+        v.addWidget(self.restore, 0, Qt.AlignmentFlag.AlignLeft)
+        self.restore.hide()
         self.max_h = VIEW_H
         self.status = ""
         self._open = False
@@ -115,14 +134,17 @@ class WindowView(QWidget):
         self.picture.hide()
         self.message.setText(_("Looking for its window…"))
         self.hide()
-        appstate.pause_in_background(self, self._wake, self._sleep)
 
     @property
     def is_open(self) -> bool:
         return self._open
 
     def set_pids(self, pids):
-        self._pids = tuple(pids)
+        pids = tuple(pids)
+        if pids != self._pids:
+            self.picture.clear()
+            self.picture.hide()
+        self._pids = pids
         if self._grabber is not None:
             self._grabber.pids = self._pids
 
@@ -134,7 +156,7 @@ class WindowView(QWidget):
         if on:
             self._grabber = _Grabber(self)
             self._grabber.pids = self._pids
-            self._grabber.shot.connect(self._show)
+            self._grabber.shot.connect(self._received)
             self._resize_grab()
             self._wake()
         else:
@@ -142,19 +164,25 @@ class WindowView(QWidget):
             self.status = ""
             self.picture.clear()
             self.picture.hide()
+            self.restore.hide()
             self.message.setText(_("Looking for its window…"))
             self.message.show()
 
     def _end(self):
         if self._grabber is not None:
             self._grabber.stop()
-            self._grabber.shot.disconnect(self._show)
+            self._grabber.shot.disconnect(self._received)
             self._grabber.deleteLater()
             self._grabber = None
 
     def _wake(self):
-        if self._grabber is not None and self.isVisible() and appstate.active():
+        if (self._grabber is not None and self.isVisible()
+                and not self.window().isMinimized()):
             self._grabber.resume()
+
+    def _restore_window(self):
+        if self._grabber is not None and self.status == winshot.MINIMISED:
+            self._grabber.restore()
 
     def _sleep(self):
         if self._grabber is not None:
@@ -162,7 +190,16 @@ class WindowView(QWidget):
 
     def showEvent(self, e):
         super().showEvent(e)
+        self.window().installEventFilter(self)
         self._wake()
+
+    def eventFilter(self, obj, e):
+        if obj is self.window() and e.type() == QEvent.Type.WindowStateChange:
+            if obj.isMinimized():
+                self._sleep()
+            else:
+                self._wake()
+        return super().eventFilter(obj, e)
 
     def hideEvent(self, e):
         super().hideEvent(e)
@@ -178,13 +215,23 @@ class WindowView(QWidget):
             self._grabber.limit = (max(32, round(self.width() * dpr)),
                                   max(32, round(self.max_h * dpr)))
 
+    def _received(self, result):
+        pids, shot = result
+        if self.sender() is self._grabber and pids == self._pids:
+            self._show(shot)
+
     def _show(self, shot: winshot.Shot):
         if not self._open:
             return
         self.status = shot.status
+        self.restore.setVisible(shot.status == winshot.MINIMISED)
         if shot.status != winshot.OK:
-            self.picture.hide()
-            self.message.setText(MESSAGES.get(shot.status, MESSAGES[winshot.GONE]))
+            cached = shot.status == winshot.MINIMISED and not self.picture.pixmap().isNull()
+            self.picture.setVisible(cached)
+            if not cached:
+                self.picture.clear()
+            self.message.setText(_("Minimised: last picture") if cached else
+                                 MESSAGES.get(shot.status, MESSAGES[winshot.GONE]))
             self.message.show()
             return
         img = QImage(shot.data, shot.width, shot.height, shot.width * 4,
