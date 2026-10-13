@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Behåll bara urvalet",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Behåll markeringen i Sparade klipp, under korten (Enter). Därifrån: spela upp det, namnge det eller lägg till det i dina ljud.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Behåll dessa inställningar som en röst med ett namn: den får en egen knapp under \"Välj en röst\".",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Behåll det här programmets sista minut som en vågform som du kan klippa bitar ur, spela upp, spara som ljud eller skicka direkt tillbaka. Den lyssnar bara när den är öppen.",
   "Kicks in at": "Sparkar in kl",
   "Language": "Språk",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Språk du talar (tvåbokstavskod). \"auto\" gissningar; behöver en igenkänningsmodell för alla språk för allt annat än engelska.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, varje effekt och dina sparade röster: bygg din egen röst i ett fönster bredvid appen",
   "Play (headphones)": "Spela (hörlurar)",
   "Play the selection in your headphones only (Space)": "Spela upp markeringen endast i dina hörlurar (utrymme)",
-  "Play the selection to whoever's listening, right now, without saving it": "Spela upp markeringen för den som lyssnar, just nu, utan att spara den",
   "Podcast voice": "Podcast röst",
   "Presence": "Närvaro",
   "Press Start, then just talk.": "Tryck på Start och prata sedan.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "Skicka {name}",
   "Sending": "Sändning",
   "Sending this program's sound failed. Switch Send on to try again.": "Det gick inte att skicka programmets ljud. Slå på Skicka för att försöka igen.",
-  "Sending {length}…": "Skickar {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Formar dina ljud för en röstchatt-app: Discord, eller ett samtal i en webbläsare, Zoom eller Teams, väljs av vilken som lyssnar på dig. Mono, den djupa basen förvandlas till övertoner som kommer igenom, varje ljuds nivå ges tillbaka. Om den inte kan säga det, behåller den den senast den använde (Discord först).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Formar dina ljud för röstchatt i spel: mono, den djupa basen som chatten kastar bort förvandlas till övertoner som kommer igenom, och varje ljuds nivå ges tillbaka. När den känner igen spelets röstchatt (Vivox eller Unity's Photon and Dissonance) växlar den till det av sig själv; annars behåller den den senast den använde (Vivox till en början, den vanligaste). Steam voice, Epic och äldre 8 kHz-spel: välj dem i Avancerat.",
   "Shared voice": "Delad röst",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord och spel hör ingenting från din mikrofon. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Om inte, klicka <b>Reparera</b>: ljudet försvinner i några sekunder.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen skickar inget ljud. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Fortfarande inget? Starta om datorn och försök igen.",
   "Minimised: last picture": "Minimerat: senaste bilden",
-  "Minimised: restore for live updates": "Minimerat: återställ för löpande uppdateringar"
+  "Minimised: restore for live updates": "Minimerat: återställ för löpande uppdateringar",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Dra för att ändra storleken på sparade klipp. Dubbelklicka för att anpassa till klippen."
 }

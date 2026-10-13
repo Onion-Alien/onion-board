@@ -1,0 +1,3 @@
+- Give the Apps clip editor a larger waveform and full-size controls, preview and trim actions, and a roomier edit menu. Saving returns to live audio automatically, while Undo can restore the previous selection.
+- Keep saved clips directly below the app cards, with larger rows and visible preview, rename, delete and Add to Sounds actions. Move optional duplicate headphone monitoring into the program menu.
+- Resize the saved clips list by dragging its grip, keep the chosen height for next time, or double-click the grip to fit the clips again.

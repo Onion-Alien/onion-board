@@ -1866,7 +1866,6 @@
   "Keep only the selection": "Alleen de selectie behouden",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Behoud de selectie in Opgeslagen clips, onder de kaarten (Enter). Vanaf daar: speel het af, geef het een naam of voeg het toe aan je geluiden.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Bewaar deze instellingen als een stem met een naam: deze krijgt een eigen knop onder ‘Kies een stem’.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Bewaar de laatste minuut van dit programma als een golfvorm waaruit u stukjes kunt knippen, afspelen, opslaan als geluid of direct terug kunt sturen. Hij luistert alleen als hij open is.",
   "Kicks in at": "Schiet op",
   "Language": "Taal",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Taal die u spreekt (tweeletterige code). 'automatische' gissingen; heeft een 'Elke taal'-herkenningsmodel nodig voor alles behalve Engels.",
@@ -1970,7 +1969,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, elk effect en je opgeslagen stemmen: bouw je eigen stem in een venster naast de app",
   "Play (headphones)": "Spelen (hoofdtelefoon)",
   "Play the selection in your headphones only (Space)": "Speel de selectie alleen af ​​via uw hoofdtelefoon (spatiebalk)",
-  "Play the selection to whoever's listening, right now, without saving it": "Speel de selectie nu af voor iedereen die luistert, zonder deze op te slaan",
   "Podcast voice": "Podcast-stem",
   "Presence": "Aanwezigheid",
   "Press Start, then just talk.": "Druk op Start en praat dan gewoon.",
@@ -2038,7 +2036,6 @@
   "Send {name}": "Stuur {name}",
   "Sending": "Verzenden",
   "Sending this program's sound failed. Switch Send on to try again.": "Het verzenden van het geluid van dit programma is mislukt. Schakel Verzenden in om het opnieuw te proberen.",
-  "Sending {length}…": "{length} verzenden…",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Vormt uw geluiden voor een voicechat-app: Discord, of een oproep in een browser, Zoom of Teams, gekozen door welke naar u luistert. Mono, de diepe bas omgezet in harmonischen die doordringen, waarbij het niveau van elk geluid wordt teruggegeven. Als het het niet weet, behoudt het de laatste die het heeft gebruikt (in eerste instantie Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Vormt je geluiden voor voicechat in games: mono, de diepe bas die de chat weggooit, omgezet in harmonischen die doorkomen, en het niveau van elk geluid wordt teruggegeven. Wanneer het de voicechat van het spel herkent (Vivox of Unity's Photon and Dissonance), schakelt het daar zelf naar over; anders behoudt het de laatste die het gebruikte (in eerste instantie Vivox, de meest voorkomende). Steam Voice, Epic en oudere 8 kHz-games: kies ze in Advanced.",
   "Shared voice": "Gedeelde stem",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord en games horen niets van je mic. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Zo niet, klik op <b>Repareren</b>: je geluid valt een paar seconden weg.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Je mic stuurt geen geluid. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Nog steeds niets? Start je pc opnieuw op en probeer het nog eens.",
   "Minimised: last picture": "Geminimaliseerd: laatste beeld",
-  "Minimised: restore for live updates": "Geminimaliseerd: herstel voor livebeelden"
+  "Minimised: restore for live updates": "Geminimaliseerd: herstel voor livebeelden",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Sleep om het vak met opgeslagen clips te vergroten of verkleinen. Dubbelklik om het aan de clips aan te passen."
 }

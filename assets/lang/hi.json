@@ -1866,7 +1866,6 @@
   "Keep only the selection": "केवल चयन रखें",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "चयन को कार्ड के नीचे, सहेजे गए क्लिप में रखें (दर्ज करें)। वहां से: इसे बजाएं, इसे नाम दें, या इसे अपनी ध्वनि में जोड़ें।",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "इन सेटिंग्स को एक नाम के साथ एक आवाज के रूप में रखें: इसे \"आवाज चुनें\" के अंतर्गत अपना स्वयं का बटन मिलता है।",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "इस प्रोग्राम के अंतिम मिनट को एक तरंग के रूप में रखें, जिसमें से आप बिट्स को काट सकते हैं, चला सकते हैं, ध्वनि के रूप में सहेज सकते हैं या सीधे वापस भेज सकते हैं। यह केवल तभी सुनता है जब यह खुला हो।",
   "Kicks in at": "पर लात मारता है",
   "Language": "भाषा",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "आप जो भाषा बोलते हैं (दो अक्षर का कोड)। 'ऑटो' अनुमान; अंग्रेजी के अलावा किसी भी चीज़ के लिए 'कोई भी भाषा' मान्यता मॉडल की आवश्यकता है।",
@@ -1970,7 +1969,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "पिच, रैंडमाइज़, हर प्रभाव और आपकी सहेजी गई आवाज़ें: ऐप के बगल में एक विंडो में अपनी आवाज़ बनाएं",
   "Play (headphones)": "चलायें (हेडफ़ोन)",
   "Play the selection in your headphones only (Space)": "चयन को केवल अपने हेडफ़ोन में चलाएं (स्पेस)",
-  "Play the selection to whoever's listening, right now, without saving it": "जो कोई भी सुन रहा है, उसके लिए चयन को अभी, बिना सहेजे चलाएँ",
   "Podcast voice": "पॉडकास्ट आवाज",
   "Presence": "उपस्थिति",
   "Press Start, then just talk.": "स्टार्ट दबाएँ, फिर बात करें।",
@@ -2038,7 +2036,6 @@
   "Send {name}": "{name} भेजें",
   "Sending": "भेजा जा रहा है",
   "Sending this program's sound failed. Switch Send on to try again.": "इस प्रोग्राम की ध्वनि भेजना विफल रहा. पुनः प्रयास करने के लिए भेजें पर स्विच करें।",
-  "Sending {length}…": "{length} भेजा जा रहा है...",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "वॉइस चैट ऐप के लिए आपकी आवाज़ को आकार देता है: डिस्कॉर्ड, या ब्राउज़र, ज़ूम या टीम्स में एक कॉल, जिसे चुना जाता है कि कौन आपकी बात सुन रहा है। मोनो, गहरा बास हार्मोनिक्स में बदल गया जो प्रत्येक ध्वनि के स्तर को वापस देता है। यदि यह नहीं बता सकता है, तो यह अपने द्वारा उपयोग किए गए अंतिम को रखता है (पहले डिस्कॉर्ड)।",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "गेम्स के अंदर वॉइस चैट के लिए आपकी ध्वनियों को आकार देता है: मोनो, चैट द्वारा छोड़ा गया गहरा बास हार्मोनिक्स में बदल जाता है, और प्रत्येक ध्वनि का स्तर वापस दे दिया जाता है। जब यह गेम की वॉयस चैट (विवॉक्स, या यूनिटी के फोटॉन और डिसोनेंस) को पहचानता है तो यह स्वयं ही उस पर स्विच हो जाता है; अन्यथा यह अपने द्वारा उपयोग किए गए अंतिम को बरकरार रखता है (विवोक्स सबसे पहले, सबसे आम)। स्टीम वॉयस, एपिक और पुराने 8 किलोहर्ट्ज़ गेम: उन्हें एडवांस्ड में चुनें।",
   "Shared voice": "साझा आवाज",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord और गेम आपके माइक से कुछ नहीं सुन रहे। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अगर नहीं, तो <b>ठीक करें</b> पर क्लिक करें: आपकी आवाज़ कुछ सेकंड के लिए बंद हो जाएगी।",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
   "Minimised: last picture": "छोटी की गई: आखिरी तस्वीर",
-  "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें"
+  "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें",
+  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।"
 }

@@ -42,7 +42,7 @@ class FakeEngine(Engine):
 def tab(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
     running = []   # what the tab's own refreshes see running
-    monkeypatch.setattr(appaudio, "list_apps", lambda: list(running))
+    monkeypatch.setattr(appaudio, "list_apps", lambda **kw: list(running))
     monkeypatch.setattr(clipeditor, "clipboard", None)
     FakeCapture.made = []
     FakeCapture.fail = FakeCapture.slow = False
@@ -164,7 +164,7 @@ def test_saving_the_whole_take_trims_dead_air(tab, qapp):
     assert len(data) / SR == pytest.approx(1.05, abs=0.02)
 
 
-def test_play_and_send_go_to_the_right_place(tab, qapp):
+def test_preview_only_goes_to_headphones(tab, qapp):
     row = opened(tab, qapp)
     ed = row.editor
     row.capture.sink(tone(3.0))
@@ -176,10 +176,7 @@ def test_play_and_send_go_to_the_right_place(tab, qapp):
     assert ed.playhead() == pytest.approx(1.5 * SR)
     ed.toggle_play()   # again: stops
     assert ed._play is None and sid not in tab.engine.live
-    ed.toggle_send()
-    sid, n, kw = tab.engine.played[-1]
-    assert not sid.endswith(":preview") and not kw.get("preview") and n == SR
-    assert ed.btn_send.property("full_text") == "Stop"
+    assert not hasattr(ed, "btn_send")
 
 
 def test_cut_and_paste_into_another_programs_editor(tab, qapp):
@@ -286,8 +283,8 @@ def test_paints_in_every_state(tab, qapp):
     ed.take.select(SR // 2, SR)
     ed.toggle_play()
     ed.wave.grab()                      # selection and playhead
-    ed.resize(200, 200)                 # narrow: icons only
-    assert ed.btn_play.text() == ""
+    ed.resize(200, 200)                 # narrow: words remain, controls wrap
+    assert ed.btn_play.text() == "Stop"
 
 
 def test_live_view_shows_only_what_was_heard(tab, qapp):
@@ -310,7 +307,7 @@ def test_buttons_wake_up_when_the_first_sound_arrives(tab, qapp):
     assert not ed.btn_play.isEnabled() and not ed.btn_save.isEnabled()
     row.capture.sink(tone(1.0))
     ed._tick()
-    assert ed.btn_play.isEnabled() and ed.btn_save.isEnabled() and ed.btn_send.isEnabled()
+    assert ed.btn_play.isEnabled() and ed.btn_save.isEnabled()
 
 
 # ---------------------------------------------------------------------- saved clips
@@ -350,6 +347,7 @@ def test_saved_clips_play_rename_add_and_delete_with_undo(tab, qapp):
 def test_saved_clips_are_kept_for_next_time(tab, qapp):
     from soundboard.clipshelf import Shelf
     ed = saved(tab, qapp).editor
+    ed.freeze()
     ed.take.select(0, SR // 2)
     ed.save()                                        # a second clip: half of it
     gone = tab.shelf.shelf.clips[0]
@@ -380,6 +378,9 @@ def test_big_view_gives_one_card_the_tab(tab, qapp):
     run(tab, music(), other)
     row, rest = tab.rows["music.exe"], tab.rows["other.exe"]
     row.btn_clip.click()
+    qapp.processEvents()
+    assert tab.big is row and not rest.isVisible()
+    row.editor.btn_big.click()
     qapp.processEvents()
     h_rest = rest.height()
     assert h_rest < row.height()      # an open editor doesn't stretch the card next to it
@@ -441,3 +442,104 @@ def test_a_paused_program_doesnt_fill_the_editor_with_silence(tab, qapp):
     assert ed.length() == 0
     row.capture.sink(np.concatenate([tone(2.0), quiet, tone(1.0), quiet]))
     assert ed.length() / SR == pytest.approx(2.0 + 0.5 + 1.0 + 0.5, abs=0.02)
+
+
+def test_save_returns_to_live_and_new_audio_appears_without_reopening(tab, qapp):
+    row = opened(tab, qapp)
+    ed = row.editor
+    row.capture.sink(tone(2.0))
+    ed.freeze()
+    ed.take.select(0, SR)
+    row.capture.sink(tone(3.0))
+    ed.save()
+    assert ed.take is None and ed.timer.isActive()
+    assert row.btn_clip.isChecked() and row.capture is not None
+    row.capture.sink(tone(1.0))
+    ed._tick()
+    assert ed.length() == 6 * SR
+    assert len(tab.shelf.shelf.clips[0].audio()) == SR
+    ed.undo()
+    assert ed.take is not None and ed.take.has_selection
+
+
+def test_failed_save_preserves_the_edit(tab, qapp, monkeypatch):
+    row = opened(tab, qapp)
+    row.capture.sink(tone(2.0))
+    ed = row.editor
+    take = ed.freeze()
+    def fail(*args):
+        raise OSError("disk full")
+    monkeypatch.setattr(tab.shelf, "add", fail)
+    ed.save()
+    assert ed.take is take
+
+
+def test_editor_and_shelf_have_usable_targets_and_stay_together(tab, qapp):
+    row = saved(tab, qapp)
+    ed = row.editor
+    assert not row.chk_hear.isVisible()
+    for b in (ed.btn_live, ed.btn_play, ed.btn_save, ed.btn_edit, ed.btn_trim, ed.btn_undo):
+        assert b.minimumHeight() >= 36 and b.accessibleName()
+    assert ed.wave.minimumHeight() >= 180
+    assert ed.btn_edit.menu().minimumWidth() >= 280
+    assert tab.shelf.parentWidget() is tab.list
+    assert tab.shelf.list.sizeHintForRow(0) >= 36
+    assert tab.shelf.y() < row.geometry().bottom() + 80
+
+
+def test_saved_clips_resize_with_mouse_and_keyboard_and_reset(tab, qapp):
+    saved(tab, qapp)
+    sh = tab.shelf
+    handle = sh.resize_handle
+    before = sh.list.height()
+    pos = handle.rect().center()
+    QTest.mousePress(handle, Qt.LeftButton, Qt.NoModifier, pos)
+    QTest.mouseMove(handle, pos + QPoint(0, 100))
+    QTest.mouseRelease(handle, Qt.LeftButton, Qt.NoModifier, pos + QPoint(0, 100))
+    assert sh.list.height() == before + 100
+    assert tab.cfg.app_clip_height == before + 100
+    QTest.keyClick(handle, Qt.Key_Down)
+    assert sh.list.height() == before + 136
+    sh.reload()
+    assert sh.list.height() == before + 136
+    QTest.mouseDClick(handle, Qt.LeftButton)
+    assert sh.list.height() == before and tab.cfg.app_clip_height == 0
+    sh.resize_clips(10000)
+    assert sh.list.height() == 600
+    sh.resize_clips(-100)
+    assert sh.list.height() == 72
+
+
+def test_keyboard_paste_updates_when_another_editor_copies(tab, qapp):
+    run(tab, music(), App(200, "game.exe", r"C:\Games\game.exe", "Game", True, 0.3,
+                          ["Speakers"]))
+    a, b = tab.rows["music.exe"], tab.rows["game.exe"]
+    a.btn_clip.click()
+    a.capture.sink(tone(1))
+    b.btn_clip.click()
+    b.capture.sink(tone(1))
+    b.editor.freeze()
+    assert not b.editor.actions_by_name["paste"].isEnabled()
+    a.editor.copy()
+    assert b.editor.actions_by_name["paste"].isEnabled()
+    qapp.processEvents()
+    b.editor.wave.setFocus()
+    qapp.processEvents()
+    QTest.keyClick(b.editor.wave, Qt.Key_V, Qt.ControlModifier)
+    assert len(b.editor.take) == 2 * SR
+
+
+@pytest.mark.parametrize("width", [240, 360, 480])
+def test_card_sizes_wrap_readable_controls_without_overlap(tab, qapp, width):
+    row = opened(tab, qapp)
+    tab._set_big(row, False)
+    tab.resize(1700, 900)
+    tab.card_size.setValue(width)
+    qapp.processEvents()
+    ed = row.editor
+    buttons = [ed.btn_save, ed.btn_live, ed.btn_play, ed.btn_edit, ed.btn_trim, ed.btn_undo]
+    for b in buttons:
+        assert b.text() and b.width() >= b.minimumSizeHint().width()
+        assert ed.rect().contains(b.geometry())
+    for i, a in enumerate(buttons):
+        assert all(not a.geometry().intersects(b.geometry()) for b in buttons[i + 1:])

@@ -1822,7 +1822,6 @@
   "Keep only the selection": "선택 항목만 유지",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "카드 아래의 저장된 클립에서 선택 항목을 유지합니다(Enter). 거기서부터 재생하고, 이름을 지정하고, 사운드에 추가하세요.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "이 설정을 이름이 있는 음성으로 유지하세요. '음성 선택' 아래에 자체 버튼이 있습니다.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "이 프로그램의 마지막 순간을 파형으로 유지하여 비트를 잘라내고, 재생하고, 사운드로 저장하거나 바로 보낼 수 있습니다. 열려 있는 동안에만 청취합니다.",
   "Kicks in at": "시작 시간:",
   "Language": "언어",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "사용하는 언어(2자리 코드) '자동' 추측; 영어를 제외한 모든 언어에 대해 '모든 언어' 인식 모델이 필요합니다.",
@@ -1925,7 +1924,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "피치, 무작위화, 모든 효과 및 저장된 음성: 앱 옆 창에서 나만의 음성 만들기",
   "Play (headphones)": "플레이(헤드폰)",
   "Play the selection in your headphones only (Space)": "헤드폰에서만 선택 항목 재생(Space)",
-  "Play the selection to whoever's listening, right now, without saving it": "저장하지 않고 지금 듣고 있는 사람에게 선택 항목을 재생합니다.",
   "Podcast voice": "팟캐스트 음성",
   "Presence": "있음",
   "Press Start, then just talk.": "시작을 누르고 말만 하면 됩니다.",
@@ -1991,7 +1989,6 @@
   "Send {name}": "{name} 보내기",
   "Sending": "배상",
   "Sending this program's sound failed. Switch Send on to try again.": "이 프로그램의 사운드 전송에 실패했습니다. 보내기를 켜서 다시 시도하세요.",
-  "Sending {length}…": "{length} 번 보내는 중…",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "음성 채팅 앱의 사운드를 형성합니다. Discord 또는 브라우저, Zoom 또는 Teams의 통화 중 어느 것이 사용자의 말을 듣고 있는지 선택합니다. 모노, 깊은 저음이 고조파로 바뀌어 각 사운드의 레벨이 반환됩니다. 알 수 없으면 마지막으로 사용한 것을 유지합니다(처음에는 Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "게임 내 음성 채팅을 위한 사운드를 형성합니다. 모노, 채팅에서 전달되는 깊은 저음이 고조파로 바뀌고 각 사운드의 레벨이 반환됩니다. 게임의 음성 채팅(Vivox 또는 Unity의 Photon and Dissonance)을 인식하면 자동으로 해당 음성 채팅으로 전환됩니다. 그렇지 않으면 마지막으로 사용한 것(처음에는 Vivox가 가장 일반적임)을 유지합니다. Steam Voice, Epic 및 이전 8kHz 게임: 고급에서 선택하세요.",
   "Shared voice": "공유된 음성",
@@ -3243,5 +3240,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord와 게임에 마이크 소리가 전혀 들리지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 아니라면 <b>복구</b>를 클릭하세요: 몇 초 동안 소리가 끊깁니다.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요.",
   "Minimised: last picture": "최소화됨: 마지막 화면",
-  "Minimised: restore for live updates": "최소화됨: 실시간으로 보려면 창을 복원하세요"
+  "Minimised: restore for live updates": "최소화됨: 실시간으로 보려면 창을 복원하세요",
+  "Drag to resize saved clips. Double-click to fit the clips.": "드래그하여 저장된 클립 영역의 크기를 조절하세요. 두 번 클릭하면 클립에 맞춰집니다."
 }

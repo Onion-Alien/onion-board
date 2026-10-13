@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Κρατήστε μόνο την επιλογή",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Διατηρήστε την επιλογή στα Αποθηκευμένα κλιπ, κάτω από τις κάρτες (Enter). Από εκεί: παίξτε το, ονομάστε το ή προσθέστε το στους ήχους σας.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Διατηρήστε αυτές τις ρυθμίσεις ως φωνή με όνομα: λαμβάνει το δικό της κουμπί στην ενότητα \"Επιλογή φωνής\".",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Διατηρήστε την τελευταία στιγμή αυτού του προγράμματος ως κυματομορφή από την οποία μπορείτε να αποκόψετε κομμάτια, να παίξετε, να αποθηκεύσετε ως ήχους ή να στείλετε κατευθείαν πίσω. Ακούει μόνο όταν είναι ανοιχτό.",
   "Kicks in at": "Κλωτσιές στο",
   "Language": "Γλώσσα",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Γλώσσα που μιλάτε (κωδικός δύο γραμμάτων). «αυτόματα» εικασίες. χρειάζεται ένα μοντέλο αναγνώρισης «Any language» για οτιδήποτε άλλο εκτός από τα αγγλικά.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Προώθηση, τυχαιοποίηση, κάθε εφέ και οι αποθηκευμένες φωνές σας: δημιουργήστε τη δική σας φωνή σε ένα παράθυρο δίπλα στην εφαρμογή",
   "Play (headphones)": "Παίξτε (ακουστικά)",
   "Play the selection in your headphones only (Space)": "Παίξτε την επιλογή μόνο στα ακουστικά σας (Space)",
-  "Play the selection to whoever's listening, right now, without saving it": "Παίξτε την επιλογή σε όποιον την ακούει, αυτήν τη στιγμή, χωρίς να την αποθηκεύσετε",
   "Podcast voice": "Φωνή podcast",
   "Presence": "Παρουσία",
   "Press Start, then just talk.": "Πατήστε Έναρξη και μετά απλώς μιλήστε.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "Αποστολή {name}",
   "Sending": "Αποστολή",
   "Sending this program's sound failed. Switch Send on to try again.": "Η αποστολή του ήχου αυτού του προγράμματος απέτυχε. Ενεργοποιήστε την Αποστολή για να προσπαθήσετε ξανά.",
-  "Sending {length}…": "Αποστολή {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Διαμορφώνει τους ήχους σας για μια εφαρμογή φωνητικής συνομιλίας: Discord ή κλήση σε πρόγραμμα περιήγησης, Zoom ή Teams, που επιλέγονται από το ποιος σας ακούει. Mono, το βαθύ μπάσο μετατράπηκε σε αρμονικές που περνούν, με το επίπεδο κάθε ήχου να δίνεται πίσω. Αν δεν μπορεί να ξεχωρίσει, κρατάει το τελευταίο που χρησιμοποίησε (Discord στην αρχή).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Διαμορφώνει τους ήχους σας για φωνητική συνομιλία μέσα στα παιχνίδια: μονοφωνικό, το βαθύ μπάσο που πετάει η συνομιλία μετατρέπεται σε αρμονικές που περνούν και το επίπεδο κάθε ήχου δίνεται πίσω. Όταν αναγνωρίζει τη φωνητική συνομιλία του παιχνιδιού (Vivox, ή Unity's Photon and Dissonance), αλλάζει σε αυτήν από μόνη της. αλλιώς κρατάει το τελευταίο που χρησιμοποίησε (το Vivox στην αρχή, το πιο συνηθισμένο). Steam Voice, Epic και παλαιότερα παιχνίδια 8 kHz: επιλέξτε τα στο Advanced.",
   "Shared voice": "Κοινή φωνή",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Το Discord και τα παιχνίδια δεν ακούν τίποτα από το μικρόφωνό σου. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Αν όχι, κάνε κλικ στο <b>Επισκευή</b>: ο ήχος σου κόβεται για λίγα δευτερόλεπτα.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
   "Minimised: last picture": "Ελαχιστοποιημένο: τελευταία εικόνα",
-  "Minimised: restore for live updates": "Ελαχιστοποιημένο: επαναφέρετε για ζωντανή εικόνα"
+  "Minimised: restore for live updates": "Ελαχιστοποιημένο: επαναφέρετε για ζωντανή εικόνα",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Σύρετε για αλλαγή μεγέθους των αποθηκευμένων κλιπ. Διπλό κλικ για προσαρμογή στα κλιπ."
 }

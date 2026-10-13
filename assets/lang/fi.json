@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Säilytä vain valinta",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Säilytä valinta Tallennetut leikkeet -kohdassa korttien alla (Enter). Sieltä: toista se, nimeä se tai lisää se Soundeihin.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Säilytä nämä asetukset äänenä, jolla on nimi: se saa oman painikkeensa kohdassa \"Valitse ääni\".",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Pidä tämän ohjelman viime hetken aaltomuotona, josta voit leikata bittejä, toistaa, tallentaa ääninä tai lähettää suoraan takaisin. Se kuuntelee vain, kun se on auki.",
   "Kicks in at": "Alkaa klo",
   "Language": "Kieli",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Kieli, jota puhut (kaksikirjaiminen koodi). \"automaattiset\" arvaukset; tarvitsee \"Mikä tahansa kieli\" -tunnistusmallin kaikelle muulle kuin englannin kielelle.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, satunnaisuus, kaikki tehosteet ja tallennetut äänesi: rakenna oma äänesi sovelluksen vieressä olevaan ikkunaan",
   "Play (headphones)": "Pelaa (kuulokkeet)",
   "Play the selection in your headphones only (Space)": "Toista valinta vain kuulokkeilla (välilyönti)",
-  "Play the selection to whoever's listening, right now, without saving it": "Toista valinta kenelle tahansa, joka kuuntelee, juuri nyt tallentamatta sitä",
   "Podcast voice": "Podcastin ääni",
   "Presence": "Läsnäolo",
   "Press Start, then just talk.": "Paina Aloita ja puhu sitten.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "Lähetä {name}",
   "Sending": "Lähetetään",
   "Sending this program's sound failed. Switch Send on to try again.": "Tämän ohjelman äänen lähettäminen epäonnistui. Yritä uudelleen kytkemällä Lähetä päälle.",
-  "Sending {length}…": "Lähetetään {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Muokkaa äänesi äänichat-sovellukseen: Discord tai puhelu selaimessa, Zoom tai Teams, sen mukaan, kumpi kuuntelee sinua. Mono, syvä basso muuttui harmonisiksi, jotka pääsevät läpi, jokaisen äänen taso palautetaan. Jos se ei osaa sanoa, se säilyttää viimeksi käyttämänsä (Discord aluksi).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Muokkaa äänesi äänikeskusteluun pelien sisällä: mono, chatin heittämä syvä basso muuttui harmonisiksi, jotka pääsevät läpi, ja jokaisen äänen taso palautetaan. Kun se tunnistaa pelin äänichatin (Vivox tai Unity's Photon and Dissonance), se vaihtaa siihen itsestään; muuten se säilyttää viimeisimmän käyttämänsä (Vivox aluksi, yleisin). Steam voice, Epic ja vanhemmat 8 kHz:n pelit: valitse ne Advancedista.",
   "Shared voice": "Jaettu ääni",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ja pelit eivät kuule mikistäsi mitään. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Jos ei, klikkaa <b>Korjaa</b>: ääni katkeaa muutamaksi sekunniksi.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikkisi ei lähetä ääntä. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
   "Minimised: last picture": "Pienennetty: viimeisin kuva",
-  "Minimised: restore for live updates": "Pienennetty: palauta ikkuna live-kuvaa varten"
+  "Minimised: restore for live updates": "Pienennetty: palauta ikkuna live-kuvaa varten",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Muuta tallennettujen leikkeiden alueen kokoa vetämällä. Sovita leikkeisiin kaksoisnapsauttamalla."
 }

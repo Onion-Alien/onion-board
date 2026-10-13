@@ -1822,7 +1822,6 @@
   "Keep only the selection": "เก็บเฉพาะส่วนที่เลือกไว้",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "เก็บส่วนที่เลือกไว้ในคลิปที่บันทึกไว้ ใต้การ์ด (Enter) จากนั้น: เล่น ตั้งชื่อ หรือเพิ่มลงในเสียงของคุณ",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "เก็บการตั้งค่าเหล่านี้เป็นเสียงพร้อมชื่อ โดยจะมีปุ่มของตัวเองอยู่ใต้ \"เลือกเสียง\"",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "เก็บนาทีสุดท้ายของโปรแกรมนี้ไว้เป็นรูปแบบคลื่นที่คุณสามารถตัดออก เล่น บันทึกเป็นเสียง หรือส่งกลับโดยตรง มันจะฟังตอนเปิดเท่านั้น",
   "Kicks in at": "เตะเข้าที่",
   "Language": "ภาษา",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "ภาษาที่คุณพูด (รหัสตัวอักษรสองตัว) 'อัตโนมัติ' เดา; ต้องการโมเดลการจดจำ 'ภาษาใดก็ได้' สำหรับทุกสิ่งยกเว้นภาษาอังกฤษ",
@@ -1925,7 +1924,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "ระดับเสียง สุ่ม เอฟเฟ็กต์ทั้งหมด และเสียงที่บันทึกไว้: สร้างเสียงของคุณเองในหน้าต่างข้างแอป",
   "Play (headphones)": "เล่น (หูฟัง)",
   "Play the selection in your headphones only (Space)": "เล่นส่วนที่เลือกในหูฟังของคุณเท่านั้น (เว้นวรรค)",
-  "Play the selection to whoever's listening, right now, without saving it": "เล่นเพลงที่เลือกให้กับใครก็ตามที่กำลังฟังอยู่ตอนนี้โดยไม่ต้องบันทึก",
   "Podcast voice": "เสียงพอดแคสต์",
   "Presence": "การมีอยู่",
   "Press Start, then just talk.": "กด Start จากนั้นเพียงพูด",
@@ -1991,7 +1989,6 @@
   "Send {name}": "ส่ง {name}",
   "Sending": "กำลังส่ง",
   "Sending this program's sound failed. Switch Send on to try again.": "การส่งเสียงของโปรแกรมนี้ล้มเหลว เปิดสวิตช์ส่งเพื่อลองอีกครั้ง",
-  "Sending {length}…": "กำลังส่ง {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "ปรับแต่งเสียงของคุณสำหรับแอปแชทด้วยเสียง: Discord หรือการโทรในเบราว์เซอร์, Zoom หรือ Teams ซึ่งเลือกจากแอปที่กำลังฟังคุณอยู่ โมโน เสียงเบสที่ลึกกลายเป็นฮาร์โมนิคที่ผ่านไป โดยแต่ละระดับของเสียงจะย้อนกลับไป ถ้าบอกไม่ได้ก็จะเก็บอันสุดท้ายที่ใช้ไว้ (Discord ในตอนแรก)",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "ปรับแต่งเสียงของคุณสำหรับการแชทด้วยเสียงภายในเกม: โมโน เสียงเบสทุ้มลึกที่แชทโยนทิ้งไป กลายเป็นฮาร์โมนิคที่ส่งผ่าน และระดับเสียงของแต่ละเสียงจะถูกส่งกลับ เมื่อจดจำเสียงแชทของเกมได้ (Vivox หรือ Photon and Dissonance ของ Unity) ระบบจะสลับไปใช้เสียงนั้นด้วยตัวเอง ไม่อย่างนั้นจะเก็บอันสุดท้ายที่ใช้ไว้ (ตอนแรก Vivox เป็นเรื่องธรรมดาที่สุด) เกม Steam Voice, Epic และเกม 8 kHz ที่เก่ากว่า: เลือกได้ในขั้นสูง",
   "Shared voice": "เสียงที่แบ่งปัน",
@@ -3243,5 +3240,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b>: เสียงจะหายไปสองสามวินาที",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีก? ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
   "Minimised: last picture": "ย่อหน้าต่างอยู่: ภาพล่าสุด",
-  "Minimised: restore for live updates": "ย่อหน้าต่างอยู่: คืนค่าหน้าต่างเพื่อดูภาพสด"
+  "Minimised: restore for live updates": "ย่อหน้าต่างอยู่: คืนค่าหน้าต่างเพื่อดูภาพสด",
+  "Drag to resize saved clips. Double-click to fit the clips.": "ลากเพื่อปรับขนาดพื้นที่คลิปที่บันทึกไว้ ดับเบิลคลิกเพื่อปรับให้พอดีกับคลิป"
 }
