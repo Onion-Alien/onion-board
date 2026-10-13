@@ -796,7 +796,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         return panel
 
     def _style_panel(self):
-        self.station_panel.setStyleSheet(self._PANEL_STYLE.substitute(theme.T))
+        self.station_panel.setStyleSheet(self._PANEL_STYLE.substitute(theme.T)
+                                        + theme.texture_style("QFrame#stations"))
 
     # -- filters
     def set_genre(self, genre: str):
