@@ -101,6 +101,8 @@ Before the first edit, every task: latest `origin/main` and the open PRs
 - Dismissing a dropdown must not replay its outside click into an immediate reopen.
   Keep rapid mouse clicks calm without delaying keyboard input (`wheelguard.py`).
 
+- Nested layout updates must preserve an outer paint hold. Parent-painted markers outside a child must be invalidated when that child moves or hides.
+
 ### Async results (about 26)
 - Background cache writers use unique temporary files and coordinate replacement
   with readers across owner instances; Windows refuses replacement of open files.

@@ -1526,3 +1526,29 @@ def test_a_link_pasted_in_offline_mode_says_why_nothing_happens(window, monkeypa
         net.configure_features()
     assert len(said) == 1 and "Offline mode" in said[0]
     assert window.ytresults.isHidden()
+
+
+@pytest.mark.parametrize("page", ["sounds_page", "radio_page"])
+def test_resize_transactions_finish_before_painting(window, qapp, monkeypatch, page):
+    window.show()
+    window.tabs.setCurrentWidget(getattr(window, page))
+    qapp.processEvents()
+    original = window._fit.fit
+    calls = []
+
+    def fit(size):
+        assert not window.updatesEnabled()
+        result = original(size)
+        assert not window.updatesEnabled()
+        calls.append(size)
+        return result
+
+    monkeypatch.setattr(window._fit, "fit", fit)
+    for width, height in ((440, 600), (360, 220), (800, 600), (450, 390),
+                          (1180, 720), (800, 320), (1700, 1000)):
+        window.resize(width, height)
+        qapp.processEvents()
+        assert window.updatesEnabled()
+    assert calls
+    assert not window.is_mini()
+    assert window.tabs.currentWidget() is getattr(window, page)

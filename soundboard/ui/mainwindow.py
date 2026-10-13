@@ -10015,6 +10015,16 @@ class MainWindow(QMainWindow):
             self.rail.refresh_output()
 
     def _refit(self):
+        if getattr(self, "_refitting", False):
+            return
+        self._refitting = True
+        try:
+            with responsive.hold_updates(self):
+                self._refit_layout()
+        finally:
+            self._refitting = False
+
+    def _refit_layout(self):
         size = self._pages.size()
         mini = size.width() < MINI_SIZE.width() or size.height() < MINI_SIZE.height()
         if not mini:
@@ -10101,8 +10111,7 @@ class MainWindow(QMainWindow):
         if on == self.is_mini():
             return
         scroll = self._pads_scroll
-        self.setUpdatesEnabled(False)
-        try:
+        with responsive.hold_updates(self):
             self.grid.set_two_up(on)
             if not on:
                 self.grid.set_slim(False)
@@ -10115,8 +10124,6 @@ class MainWindow(QMainWindow):
                 scroll.setVisible(self.ytresults.isHidden())   # results take the pads' place
             self._pages.setCurrentIndex(1 if on else 0)
             self.apply_filter(self.search.text())
-        finally:
-            self.setUpdatesEnabled(True)
         toastmod.relayout(self)   # cards in the window, icons in the mini player
 
     def resizeEvent(self, ev):

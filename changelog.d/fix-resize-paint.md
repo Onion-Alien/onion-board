@@ -1,0 +1,1 @@
+- Keep compact-window layout changes together while resizing, and move the playing-tab marker with its tab.

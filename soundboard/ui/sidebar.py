@@ -1255,6 +1255,7 @@ class SideRail(QFrame):
         self.buttons: list[RailTab] = []
         for i in range(tabs.count()):
             b = RailTab(self, i)
+            b.installEventFilter(self)
             b.clicked.connect(lambda _c=False, i=i: (tabs.setCurrentIndex(i), self.sync()))
             lay.addWidget(b)
             self.buttons.append(b)
@@ -1385,6 +1386,12 @@ class SideRail(QFrame):
         return line
 
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
+        if (isinstance(obj, RailTab)
+                and e.type() in (QEvent.Type.Move, QEvent.Type.Resize,
+                                 QEvent.Type.Show, QEvent.Type.Hide)):
+            # The live stripe is painted outside the button. Qt only invalidates
+            # the button's rectangles when it moves, leaving the old stripe behind.
+            self.update()
         if e.type() in (QEvent.Type.Show, QEvent.Type.Hide) and obj in self.alerts:
             QTimer.singleShot(0, self, self._sync_divider)   # (not after the rail's gone)
         elif (e.type() in (QEvent.Type.Show, QEvent.Type.Hide)
