@@ -185,15 +185,8 @@ class EqCurve(QWidget):
             p.drawText(plate, Qt.AlignmentFlag.AlignCenter, off)
 
 
-class SeekSlider(QSlider):
-    """Slider that jumps straight to where you click (then drags from there)."""
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.setAccessibleName(_("Playback position"))   # a screen reader said nothing on it
-        # at 0:00 Qt still paints a sliver of fill beside the handle (it looked a few
-        # seconds in): the theme hides the fill while "atstart" is set
-        self.setProperty("atstart", True)
+class CrispSlider(QSlider):
+    """Themed horizontal slider with a circle aligned to physical pixels."""
 
     def paintEvent(self, e):
         if self.orientation() != Qt.Orientation.Horizontal:
@@ -217,7 +210,7 @@ class SeekSlider(QSlider):
                 fill.setLeft(handle.center().x())
             else:
                 fill.setRight(handle.center().x())
-            p.setBrush(QColor(theme.T["accent"]))
+            p.setBrush(QColor(theme.T["accent" if self.objectName() == "seek" else "muted"]))
             p.drawRoundedRect(fill, radius, radius)
         # A stylesheet's rounded box with a transparent border leaves a soft rim.
         # Paint one circle instead, with its bounds on physical pixel boundaries.
@@ -231,7 +224,8 @@ class SeekSlider(QSlider):
                         diameter / scale, diameter / scale)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(theme.T["text_hi" if self.isEnabled() else "off"]))
+        p.setBrush(QColor(theme.T["text_hi" if self.isEnabled() else
+                                 ("off" if self.objectName() == "seek" else "inset")]))
         p.drawEllipse(circle)
         hovered = opt.activeSubControls == QStyle.SubControl.SC_SliderHandle
         if self.isEnabled() and (self.hasFocus() or hovered or self.isSliderDown()):
@@ -239,6 +233,17 @@ class SeekSlider(QSlider):
             p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QPen(QColor(theme.T["accent" if self.hasFocus() else "border_hi"]), width))
             p.drawEllipse(circle.adjusted(width / 2, width / 2, -width / 2, -width / 2))
+
+
+class SeekSlider(CrispSlider):
+    """Slider that jumps straight to where you click (then drags from there)."""
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setAccessibleName(_("Playback position"))   # a screen reader said nothing on it
+        # at 0:00 Qt still paints a sliver of fill beside the handle (it looked a few
+        # seconds in): the theme hides the fill while "atstart" is set
+        self.setProperty("atstart", True)
 
     def sliderChange(self, change):
         super().sliderChange(change)

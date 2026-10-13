@@ -1,1 +1,1 @@
-- Sharpen the playback slider knob by drawing a pixel-aligned circle without a soft transparent border.
+- Sharpen playback and volume slider knobs by drawing pixel-aligned circles without soft transparent borders.
