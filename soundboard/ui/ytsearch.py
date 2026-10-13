@@ -1131,9 +1131,10 @@ class SearchResults(RoundedFrame):
             else:
                 self.rows.addWidget(row)
             self._rows.append(row)
-            if not quality.current.web_extras or not r.thumb:   # Settings > Data & quality
+            thumb = net.web_url(r.thumb)   # web links only
+            if not quality.current.web_extras or not thumb:   # Settings > Data & quality
                 continue
-            reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))
+            reply = self.net.get(QNetworkRequest(QUrl(thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
 
