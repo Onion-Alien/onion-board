@@ -3325,5 +3325,21 @@
   "Removed inactive clips: {n}": "Clip inattive rimosse: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Registra questa app nelle Clip salvate. Clicca di nuovo per finire. Nessuno la sente se Invia non è attivo.",
   "Save to clips": "Salva nelle clip",
-  "Show clips": "Mostra clip"
+  "Show clips": "Mostra clip",
+  "+ Subcategory": "+ Sottocategoria",
+  "Add subcategory…": "Aggiungi sottocategoria…",
+  "All {n}": "Tutti {n}",
+  "Delete subcategory": "Elimina sottocategoria",
+  "Delete subcategory (keeps the sounds)": "Elimina sottocategoria (tiene i suoni)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Eliminare la sottocategoria «{name}»? I suoni ({n}) restano in {cat}.",
+    "Eliminare la sottocategoria «{name}»? I suoni ({n}) restano in {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Creare una sola scheda «{name}», con {n} delle sue categorie dentro come sottocategorie invece di schede separate?\n\nNessun suono viene rimosso o modificato.",
+  "Name (a group inside {cat}):": "Nome (un gruppo dentro {cat}):",
+  "New subcategory": "Nuova sottocategoria",
+  "New subcategory in {cat}": "Nuova sottocategoria in {cat}",
+  "Put its categories in one tab": "Metti le sue categorie in una scheda",
+  "Rename subcategory": "Rinomina sottocategoria",
+  "✓ “{name}” is one tab now": "✓ «{name}» ora è una sola scheda"
 }

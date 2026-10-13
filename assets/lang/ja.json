@@ -3251,5 +3251,20 @@
   "Removed inactive clips: {n}": "削除された未使用クリップ: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "このアプリの音声を保存済みクリップに録音します。もう一度クリックすると終了します。送信がオンでない限り、誰にも聞こえません。",
   "Save to clips": "クリップに保存",
-  "Show clips": "クリップを表示"
+  "Show clips": "クリップを表示",
+  "+ Subcategory": "+ サブカテゴリ",
+  "Add subcategory…": "サブカテゴリを追加…",
+  "All {n}": "すべて {n}",
+  "Delete subcategory": "サブカテゴリを削除",
+  "Delete subcategory (keeps the sounds)": "サブカテゴリを削除（サウンドは残ります）",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "サブカテゴリ「{name}」を削除しますか？中のサウンド（{n}）は {cat} に残ります。"
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "「{name}」を1つのタブにして、そのカテゴリ {n} 個を別々のタブではなくサブカテゴリとして中に入れますか？\n\nサウンドが削除・変更されることはありません。",
+  "Name (a group inside {cat}):": "名前（{cat} の中のグループ）:",
+  "New subcategory": "新しいサブカテゴリ",
+  "New subcategory in {cat}": "{cat} に新しいサブカテゴリ",
+  "Put its categories in one tab": "カテゴリを1つのタブにまとめる",
+  "Rename subcategory": "サブカテゴリの名前の変更",
+  "✓ “{name}” is one tab now": "✓「{name}」が1つのタブになりました"
 }

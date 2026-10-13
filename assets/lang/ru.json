@@ -3399,5 +3399,22 @@
   "Removed inactive clips: {n}": "Удалено неиспользуемых клипов: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Запиши звук этого приложения в Сохранённые клипы. Нажми ещё раз, чтобы закончить. Никто его не слышит, если Отправка выключена.",
   "Save to clips": "Сохранить в клипы",
-  "Show clips": "Показать клипы"
+  "Show clips": "Показать клипы",
+  "+ Subcategory": "+ Подкатегория",
+  "Add subcategory…": "Добавить подкатегорию…",
+  "All {n}": "Все {n}",
+  "Delete subcategory": "Удалить подкатегорию",
+  "Delete subcategory (keeps the sounds)": "Удалить подкатегорию (звуки останутся)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Удалить подкатегорию «{name}»? Её звуки ({n}) останутся в {cat}.",
+    "Удалить подкатегорию «{name}»? Её звуки ({n}) останутся в {cat}.",
+    "Удалить подкатегорию «{name}»? Её звуки ({n}) останутся в {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Сделать одну вкладку «{name}», а {n} её категорий положить внутрь как подкатегории вместо отдельных вкладок?\n\nНи один звук не удалится и не изменится.",
+  "Name (a group inside {cat}):": "Название (группа внутри {cat}):",
+  "New subcategory": "Новая подкатегория",
+  "New subcategory in {cat}": "Новая подкатегория в {cat}",
+  "Put its categories in one tab": "Собрать её категории в одну вкладку",
+  "Rename subcategory": "Переименовать подкатегорию",
+  "✓ “{name}” is one tab now": "✓ «{name}» теперь одна вкладка"
 }

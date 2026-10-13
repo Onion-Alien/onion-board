@@ -3325,5 +3325,21 @@
   "Removed inactive clips: {n}": "Fjernede inaktive klipp: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Ta opp denne appen i Lagrede klipp. Klikk igjen for å avslutte. Ingen hører den med mindre Send er slått på.",
   "Save to clips": "Lagre i klipp",
-  "Show clips": "Vis klipp"
+  "Show clips": "Vis klipp",
+  "+ Subcategory": "+ Underkategori",
+  "Add subcategory…": "Legg til underkategori…",
+  "All {n}": "Alle {n}",
+  "Delete subcategory": "Slett underkategori",
+  "Delete subcategory (keeps the sounds)": "Slett underkategori (beholder lydene)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Slette underkategorien «{name}»? Lydene i den ({n}) blir værende i {cat}.",
+    "Slette underkategorien «{name}»? Lydene i den ({n}) blir værende i {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Lage én fane «{name}», med {n} av kategoriene dens som underkategorier i stedet for egne faner?\n\nIngen lyder fjernes eller endres.",
+  "Name (a group inside {cat}):": "Navn (en gruppe i {cat}):",
+  "New subcategory": "Ny underkategori",
+  "New subcategory in {cat}": "Ny underkategori i {cat}",
+  "Put its categories in one tab": "Legg kategoriene dens i én fane",
+  "Rename subcategory": "Gi underkategorien nytt navn",
+  "✓ “{name}” is one tab now": "✓ «{name}» er nå én fane"
 }

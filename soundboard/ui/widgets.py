@@ -644,7 +644,9 @@ class Pad(QAbstractButton):
         if m.fx:
             bits.append(_("effects"))
         if m.tags:
-            bits.append(_("in {categories}", categories=", ".join(m.tags)))
+            bits.append(_("in {categories}", categories=", ".join(
+                t if "/" not in t else t.replace(" / ", " › ") for t in m.tags
+                if not any(o.startswith(t + " / ") for o in m.tags))))
         if self.linked_file():
             bits.append(_("Plays from: {path}", path=self.linked_file()))
         desc = ", ".join(bits)

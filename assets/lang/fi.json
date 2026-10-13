@@ -3325,5 +3325,21 @@
   "Removed inactive clips: {n}": "Poistettuja käyttämättömiä leikkeitä: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Tallenna tämän sovelluksen ääni tallennettuihin leikkeisiin. Lopeta napsauttamalla uudelleen. Kukaan ei kuule sitä, ellei Lähetä ole päällä.",
   "Save to clips": "Tallenna leikkeisiin",
-  "Show clips": "Näytä leikkeet"
+  "Show clips": "Näytä leikkeet",
+  "+ Subcategory": "+ Alakategoria",
+  "Add subcategory…": "Lisää alakategoria…",
+  "All {n}": "Kaikki {n}",
+  "Delete subcategory": "Poista alakategoria",
+  "Delete subcategory (keeps the sounds)": "Poista alakategoria (äänet säilyvät)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Poistetaanko alakategoria “{name}”? Sen äänet ({n}) jäävät kategoriaan {cat}.",
+    "Poistetaanko alakategoria “{name}”? Sen äänet ({n}) jäävät kategoriaan {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Tehdäänkö yksi välilehti “{name}”, jossa {n} sen kategoriaa ovat alakategorioina erillisten välilehtien sijaan?\n\nÄänistä ei poisteta tai muuteta mitään.",
+  "Name (a group inside {cat}):": "Nimi (ryhmä kategoriassa {cat}):",
+  "New subcategory": "Uusi alakategoria",
+  "New subcategory in {cat}": "Uusi alakategoria kategoriaan {cat}",
+  "Put its categories in one tab": "Laita sen kategoriat yhteen välilehteen",
+  "Rename subcategory": "Nimeä alakategoria uudelleen",
+  "✓ “{name}” is one tab now": "✓ “{name}” on nyt yksi välilehti"
 }

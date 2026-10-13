@@ -3399,5 +3399,22 @@
   "Removed inactive clips: {n}": "Odstraněné neaktivní klipy: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Nahraj tuto aplikaci do Uložených klipů. Dalším kliknutím nahrávání ukončíš. Nikdo ji neslyší, pokud není zapnuté Odesílání.",
   "Save to clips": "Uložit do klipů",
-  "Show clips": "Zobrazit klipy"
+  "Show clips": "Zobrazit klipy",
+  "+ Subcategory": "+ Podkategorie",
+  "Add subcategory…": "Přidat podkategorii…",
+  "All {n}": "Vše {n}",
+  "Delete subcategory": "Smazat podkategorii",
+  "Delete subcategory (keeps the sounds)": "Smazat podkategorii (zvuky zůstanou)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Smazat podkategorii „{name}“? Zvuky v ní ({n}) zůstanou v {cat}.",
+    "Smazat podkategorii „{name}“? Zvuky v ní ({n}) zůstanou v {cat}.",
+    "Smazat podkategorii „{name}“? Zvuky v ní ({n}) zůstanou v {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Vytvořit jednu kartu „{name}“, v níž bude {n} jejích kategorií jako podkategorie místo samostatných karet?\n\nŽádný zvuk se neodstraní ani nezmění.",
+  "Name (a group inside {cat}):": "Název (skupina v {cat}):",
+  "New subcategory": "Nová podkategorie",
+  "New subcategory in {cat}": "Nová podkategorie v {cat}",
+  "Put its categories in one tab": "Dát jeho kategorie do jedné karty",
+  "Rename subcategory": "Přejmenovat podkategorii",
+  "✓ “{name}” is one tab now": "✓ „{name}“ je teď jedna karta"
 }
