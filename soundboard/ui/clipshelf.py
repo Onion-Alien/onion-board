@@ -509,7 +509,9 @@ class ClipShelf(QWidget):
         if self._closed or (self._worker is not None and self._worker.is_alive()):
             return
         keep = self.cfg.app_clips_keep_forever or self.undo_bar.active()
-        active = self._playing[1] if self._playing is not None else None
+        playing = self._playing
+        active = (playing[1] if playing is not None
+                  and self.engine.state(playing[0]) is not None else None)
         def work():
             try:
                 gone = self.shelf.maintain(keep, active)
