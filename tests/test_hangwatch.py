@@ -143,3 +143,72 @@ def test_a_responsive_window_logs_nothing(qapp, caplog):
         assert hw.reports == 0 and not caplog.text
     finally:
         hw.stop()
+
+
+class SleepingPC:
+    """An awake-time clock: it stands still while `asleep` (the PC sleeping with the
+    app open: every thread stopped, the window too)."""
+
+    def __init__(self):
+        self.asleep, self._held, self._at = False, 0.0, None
+
+    def __call__(self) -> float:
+        now = time.monotonic()
+        if self.asleep:
+            if self._at is None:
+                self._at = now
+            return self._at - self._held
+        if self._at is not None:
+            self._held += now - self._at
+            self._at = None
+        return now - self._held
+
+
+def test_time_the_pc_slept_is_no_freeze(qapp, tmp_path, monkeypatch):
+    """2.0.4 counted every sleep with the app open as a freeze of the whole sleep,
+    stuck wherever the window happened to be."""
+    from soundboard import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    pc = SleepingPC()
+    hw = HangWatch(hang_s=HANG_S, clock=pc)
+    try:
+        pc.asleep = True
+        time.sleep(HANG_S * 3)          # asleep: no beats, but no awake time either
+        pc.asleep = False
+        beat_for(qapp, HANG_S)
+        assert hw.reports == 0
+        frozen_in_a_long_wait(hw, HANG_S * 2)      # a real freeze still counts
+        assert hw.reports == 1
+    finally:
+        hw.stop()
+
+
+def test_the_awake_clock_moves_with_time():
+    from soundboard.hangwatch import awake_clock
+    clock = awake_clock()
+    a = clock()
+    time.sleep(0.2)
+    assert 0.1 < clock() - a < 5
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Sleep without letting go of the GIL")
+def test_a_freeze_that_held_every_thread_says_so(qapp, tmp_path, monkeypatch):
+    """One thread keeping Python's lock while it waits stops the watch too: the report
+    tells that apart from the window alone being stuck."""
+    import ctypes
+
+    from soundboard import applog, hangwatch
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        ctypes.PyDLL("kernel32").Sleep(int(HANG_S * 2500))   # holds the GIL throughout
+        frozen_in_a_long_wait(hw, 0)
+        assert hangwatch.ALL_HELD_NOTE in hw.saved.read_text(encoding="utf-8")
+        beat_for(qapp, HANG_S)
+        frozen_in_a_long_wait(hw, HANG_S * 2)      # the window alone: no such note
+        assert hw.reports == 2
+        assert hangwatch.ALL_HELD_NOTE not in hw.saved.read_text(encoding="utf-8")
+    finally:
+        hw.stop()

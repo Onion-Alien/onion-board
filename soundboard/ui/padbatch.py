@@ -15,6 +15,7 @@ from PySide6.QtGui import (QActionGroup, QColor, QIcon, QKeySequence, QPainter, 
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QWidget)
 
+from soundboard import library
 from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta
 from soundboard.ui import icons
 from soundboard.ui.widgets import DropdownMenu
@@ -220,15 +221,18 @@ class PadSelection(QObject):
 
     def _fill_cats(self, menu: QMenu):
         sounds = self.sounds()
-        for c in self.mw.cfg.categories:
-            have = sum(1 for m in sounds if c in m.tags)
-            a = menu.addAction(icons.icon("tag", checked_color="text"),
-                               c.replace("&", "&&"))   # a lone & is a shortcut marker
-            a.setCheckable(True)
-            a.setChecked(have == len(sounds) and have > 0)
-            # all of them in it: takes them out; otherwise puts them all in
-            a.triggered.connect(lambda __=False, c=c, out=have == len(sounds):
-                                self.set_category(c, not out))
+        cfg = self.mw.cfg
+        for c in cfg.categories:
+            for name, label in [(c, c)] + [(library.sub_tag(c, s), "      " + s)
+                                           for s in cfg.subcategories.get(c, [])]:
+                have = sum(1 for m in sounds if name in m.tags)
+                a = menu.addAction(icons.icon("tag", checked_color="text"),
+                                   label.replace("&", "&&"))   # a lone & is a shortcut marker
+                a.setCheckable(True)
+                a.setChecked(have == len(sounds) and have > 0)
+                # all of them in it: takes them out; otherwise puts them all in
+                a.triggered.connect(lambda __=False, name=name, out=have == len(sounds):
+                                    self.set_category(name, not out))
         if self.mw.cfg.categories:
             menu.addSeparator()
         menu.addAction(icons.icon("plus"), _("New category"), self.new_category)
@@ -295,13 +299,20 @@ class PadSelection(QObject):
         self.set_fades(*got)
 
     def set_category(self, name: str, on: bool):
-        if name not in self.mw.cfg.categories:
+        cat, sub = library.split_tag(name)
+        if cat not in self.mw.cfg.categories or (
+                sub and sub not in self.mw.cfg.subcategories.get(cat, [])):
             return
         for m in self.sounds():
-            if on and name not in m.tags:
-                m.tags.append(name)
-            elif not on and name in m.tags:
-                m.tags.remove(name)
+            if on:
+                for t in (cat, name):   # a subcategory's sound is in its category too
+                    if t not in m.tags:
+                        m.tags.append(t)
+            elif sub:
+                if name in m.tags:
+                    m.tags.remove(name)
+            else:   # out of a category is out of its subcategories too
+                m.tags = [t for t in m.tags if library.split_tag(t)[0] != cat]
         n = len(self.sounds())
         self.mw._save_now()
         self.mw._fill_categories()
