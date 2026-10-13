@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "Ny underkategori i {cat}",
   "Put its categories in one tab": "Lägg dess kategorier i en flik",
   "Rename subcategory": "Byt namn på underkategori",
-  "✓ “{name}” is one tab now": "✓ “{name}” är nu en flik"
+  "✓ “{name}” is one tab now": "✓ “{name}” är nu en flik",
+  "Attack": "Anslag",
+  "Ceiling": "Tak",
+  "Chanting monk": "Sjungande munk",
+  "De-ess": "De-esser",
+  "Release": "Släpp",
+  "Studio polish": "Studiofinish",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Tämjer vassa S-ljud, ger värme och håller varje topp under taket. Körs sist.",
+  "Warmth": "Värme",
+  "quick": "snabb",
+  "slow": "långsam",
+  "snappy": "kvick",
+  "soft": "mjuk",
+  "warm": "varm",
+  "clean": "ren"
 }

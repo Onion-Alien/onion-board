@@ -3416,5 +3416,19 @@
   "New subcategory in {cat}": "Новая подкатегория в {cat}",
   "Put its categories in one tab": "Собрать её категории в одну вкладку",
   "Rename subcategory": "Переименовать подкатегорию",
-  "✓ “{name}” is one tab now": "✓ «{name}» теперь одна вкладка"
+  "✓ “{name}” is one tab now": "✓ «{name}» теперь одна вкладка",
+  "Attack": "Атака",
+  "Ceiling": "Потолок",
+  "Chanting monk": "Поющий монах",
+  "De-ess": "Де-эссер",
+  "Release": "Спад",
+  "Studio polish": "Студийная шлифовка",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Смягчает резкие «С», добавляет теплоты и держит каждый пик ниже потолка. Работает последним.",
+  "Warmth": "Теплота",
+  "quick": "быстро",
+  "slow": "медленно",
+  "snappy": "резко",
+  "soft": "мягко",
+  "warm": "тепло",
+  "clean": "чисто"
 }

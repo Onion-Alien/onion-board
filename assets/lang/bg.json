@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "Нова подкатегория в {cat}",
   "Put its categories in one tab": "Сложи категориите му в един раздел",
   "Rename subcategory": "Преименувай подкатегорията",
-  "✓ “{name}” is one tab now": "✓ „{name}“ вече е един раздел"
+  "✓ “{name}” is one tab now": "✓ „{name}“ вече е един раздел",
+  "Attack": "Атака",
+  "Ceiling": "Таван",
+  "Chanting monk": "Пеещ монах",
+  "De-ess": "Де-есер",
+  "Release": "Отпускане",
+  "Studio polish": "Студиен финиш",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Укротява острите С звуци, добавя топлина и държи всеки пик под тавана. Работи последен.",
+  "Warmth": "Топлина",
+  "quick": "бързо",
+  "slow": "бавно",
+  "snappy": "рязко",
+  "soft": "меко",
+  "warm": "топло",
+  "clean": "чисто"
 }

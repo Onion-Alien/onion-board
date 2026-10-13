@@ -3341,5 +3341,19 @@
   "New subcategory in {cat}": "Nova subcategoria em {cat}",
   "Put its categories in one tab": "Colocar as categorias dela em uma aba",
   "Rename subcategory": "Renomear subcategoria",
-  "✓ “{name}” is one tab now": "✓ “{name}” agora é uma aba só"
+  "✓ “{name}” is one tab now": "✓ “{name}” agora é uma aba só",
+  "Attack": "Ataque",
+  "Ceiling": "Teto",
+  "Chanting monk": "Monge cantando",
+  "De-ess": "De-esser",
+  "Release": "Liberação",
+  "Studio polish": "Acabamento de estúdio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Suaviza os S agudos, adiciona calor e mantém cada pico abaixo do teto. Roda por último.",
+  "Warmth": "Calor",
+  "quick": "rápido",
+  "slow": "lento",
+  "snappy": "seco",
+  "soft": "suave",
+  "warm": "quente",
+  "clean": "limpo"
 }
