@@ -16,8 +16,9 @@ from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer
 from PySide6.QtGui import QHoverEvent, QMouseEvent
 from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
                                QAbstractSpinBox, QApplication, QCheckBox, QComboBox, QFormLayout,
-                               QGridLayout, QLayout, QMenu, QProxyStyle,
-                               QScrollBar, QSizePolicy, QSlider, QTabBar, QWidget)
+                               QGridLayout, QLayout, QMenu, QProxyStyle, QPushButton,
+                               QScrollBar, QSizePolicy, QSlider, QTabBar, QToolButton,
+                               QWidget)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
 
@@ -114,9 +115,12 @@ class _SubmenuEdge(QObject):
                     if isinstance(parent, (QAbstractButton, QComboBox)):
                         opener = parent
                     elif isinstance(obj, QMenu):
-                        # setMenu() does not require the button to own the menu.
+                        # setMenu() does not require the button to own the menu. Only
+                        # Qt's own setMenu() buttons: other buttons' `menu` is theirs
+                        # (a sound pad's is a signal, and calling it raised TypeError).
                         opener = next((button for button in parent.findChildren(QAbstractButton)
-                                       if getattr(button, "menu", lambda: None)() is obj), None)
+                                       if isinstance(button, (QPushButton, QToolButton))
+                                       and button.menu() is obj), None)
                     parent = parent.parentWidget()
                 # Submenus and context menus have no dropdown opener.
                 # Qt's Python wrappers allow per-instance bookkeeping attributes.
