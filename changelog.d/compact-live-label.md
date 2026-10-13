@@ -1,0 +1,1 @@
+- Show Live or Muted above the compact sidebar's output switch, with a crossed-out broadcast icon while muted.

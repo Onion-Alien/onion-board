@@ -7,6 +7,25 @@ from PySide6.QtTest import QTest
 from test_mainwindow import window  # noqa: F401
 
 
+def test_collapsed_output_names_live_and_muted_without_hover(window, qapp, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(window, "_main_name", lambda: "Selected output")
+    window.resize(1180, 720)
+    window.show()
+    window.rail.set_open(False)
+    output = window.rail.output
+    for on, name in ((True, "Live"), (False, "Muted"), (True, "Live")):
+        window.set_sending(on)
+        qapp.processEvents()
+        assert output.caption.isVisible()
+        assert output.caption.text() == name
+        assert output.switch.isChecked() == on
+        assert output.rect().contains(output.caption.geometry())
+        assert output.caption.geometry().bottom() < output.switch.geometry().top()
+    window.rail.set_open(True)
+    qapp.processEvents()
+    assert output.caption.isHidden() and output.switch.isHidden()
+
+
 def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window, qapp,  # noqa: F811
                                                                          monkeypatch):
     # a send device, so muting means something even on a PC (CI) with no cable
@@ -86,12 +105,13 @@ def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_na
         rail.set_open(False)
         qapp.processEvents()
         img = rail.grab().toImage()
-        mark, switch, stop = [_ink_box(img, QRect(w.mapTo(rail, QPoint()), w.size()))
-                              for w in (rail.output.mark, rail.output.switch, window.stop_btn)]
-        above = switch.top() - mark.bottom() - 1
+        widgets = (rail.output.caption, rail.output.switch, window.stop_btn)
+        caption, switch, stop = [_ink_box(img, QRect(w.mapTo(rail, QPoint()), w.size()))
+                                 for w in widgets]
+        above = switch.top() - caption.bottom() - 1
         below = stop.top() - switch.bottom() - 1
-        assert abs(above - below) <= 1
-        assert above >= 16
+        assert 4 <= above <= below
+        assert below >= 16
         rail.set_open(True)
         qapp.processEvents()
         _assert_pair(rail.output)
@@ -258,7 +278,7 @@ def test_output_block_stays_inside_rail_at_normal_and_narrow_sizes(window, qapp,
         output = window.rail.output
         if output.isVisible():
             assert window.rail.rect().contains(output.geometry())
-            for widget in (output.mark, output.title, output.switch, output.mute, output.stop,
+            for widget in (output.mark, output.caption, output.switch, output.mute, output.stop,
                            output.status_text, output.setup):
                 if not widget.isVisible():
                     continue

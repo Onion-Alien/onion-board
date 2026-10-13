@@ -342,6 +342,13 @@ class OutputBlock(QFrame):
                                       QSizePolicy.Policy.Minimum)
         top.addSpacerItem(self._title_gap)
         top.addWidget(self.title, 0, Qt.AlignmentFlag.AlignTop)
+        self.caption = QLabel(self.title.text())
+        self.caption.setObjectName("hint")
+        self.caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.caption.setWordWrap(True)
+        self.caption.setFixedWidth(BUTTON_W)
+        self.caption.setBuddy(self.switch)
+        top.addWidget(self.caption)
         self._switch_gap = QSpacerItem(self.SWITCH_GAP, 0, QSizePolicy.Policy.Fixed,
                                        QSizePolicy.Policy.Minimum)
         top.addSpacerItem(self._switch_gap)
@@ -598,6 +605,7 @@ class OutputBlock(QFrame):
         self.top.setContentsMargins(0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.Direction.TopToBottom)
         self.title.hide()   # open, Mute says it (its tip: Live or Muted, in full)
+        self.caption.setVisible(not expanded)
         for w in (self.mark, self.switch):
             w.setVisible(not expanded)
         for g in (self.mark, self.status_icon):
@@ -605,7 +613,7 @@ class OutputBlock(QFrame):
         for n in self.net:
             n.lay_out(expanded, glyph, px)
         self.arrow.setFixedWidth(px(self.CHEVRON))
-        icons.set_label_icon(self.mark, "live", "accent", size=glyph)
+        self._name(self.power.isChecked())
         self.switch.setFixedSize(*((px(self.SWITCH[0]), px(self.SWITCH[1])) if expanded
                                    else (34, 22)))
         self._tail.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
@@ -617,8 +625,9 @@ class OutputBlock(QFrame):
             for gap in (self._title_gap, self._switch_gap):
                 gap.changeSize(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         else:
-            # Match the visible switch-to-stop gap below the small output block.
-            self._switch_gap.changeSize(0, 14, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+            self._title_gap.changeSize(0, 4, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+            # Keep the caption with its switch; Stop all is a separate action below.
+            self._switch_gap.changeSize(0, 4, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setup.setMinimumHeight(px(self.ROW_H))
         self._status_gap.changeSize(0, 0,
                                     QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
@@ -629,6 +638,7 @@ class OutputBlock(QFrame):
             layout.invalidate()
         self.updateGeometry()
         self.top.setAlignment(self.mark, Qt.AlignmentFlag.AlignHCenter)
+        self.top.setAlignment(self.caption, Qt.AlignmentFlag.AlignHCenter)
         self.top.setAlignment(self.switch, Qt.AlignmentFlag.AlignHCenter)
         self.setFixedWidth(OPEN_W - 2 * SIDE_OPEN - 1 if expanded else BUTTON_W)
         self.style().unpolish(self)
@@ -695,7 +705,11 @@ class OutputBlock(QFrame):
         """"Live" while others hear you, "Muted" while they don't."""
         text = self.names()[0 if on else 1]
         self.title.setText(text)
+        if hasattr(self, "caption"):
+            self.caption.setText(text)
         self.switch.setAccessibleName(text)
+        icons.set_label_icon(self.mark, "live" if on else "live_off",
+                             "accent" if on else "danger_text", size=self.mark.width())
 
     def refresh(self):
         self.switch.setToolTip(self.power.toolTip())
