@@ -3309,12 +3309,13 @@
   "Stop voice effects": "आवाज़ के प्रभाव रोकें",
   "Hide this program's window": "इस प्रोग्राम की विंडो छिपाएं",
   "Looking for its window…": "इसकी विंडो ढूंढ रहे हैं…",
-  "Minimised: nothing to show": "छोटा किया गया: दिखाने को कुछ नहीं",
   "No window to show": "दिखाने के लिए कोई विंडो नहीं",
   "Show this program's window": "इस प्रोग्राम की विंडो दिखाएं",
   "This program doesn't share its picture": "यह प्रोग्राम अपनी तस्वीर साझा नहीं करता",
   "Window of {name}": "{name} की विंडो",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord और गेम आपके माइक से कुछ नहीं सुन रहे। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अगर नहीं, तो <b>ठीक करें</b> पर क्लिक करें, फिर Windows पूछे तो <b>हाँ</b> पर।",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord और गेम आपके माइक से कुछ नहीं सुन रहे। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अगर नहीं, तो <b>ठीक करें</b> पर क्लिक करें: आपकी आवाज़ कुछ सेकंड के लिए बंद हो जाएगी।",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।"
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
+  "Minimised: last picture": "छोटी की गई: आखिरी तस्वीर",
+  "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें"
 }

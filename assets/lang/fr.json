@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Arrêter les effets vocaux",
   "Hide this program's window": "Masquer la fenêtre de ce programme",
   "Looking for its window…": "Recherche de sa fenêtre…",
-  "Minimised: nothing to show": "Réduite : rien à afficher",
   "No window to show": "Aucune fenêtre à afficher",
   "Show this program's window": "Afficher la fenêtre de ce programme",
   "This program doesn't share its picture": "Ce programme ne partage pas son image",
   "Window of {name}": "Fenêtre de {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord et les jeux n'entendent rien de ton micro. Ton casque est-il éteint, ou son micro coupé ? Allume-le ou réactive le micro. Sinon, clique sur <b>Réparer</b>, puis sur <b>Oui</b> quand Windows demande.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord et les jeux n'entendent rien de ton micro. Ton casque est-il éteint, ou son micro coupé ? Allume-le ou réactive le micro. Sinon, clique sur <b>Réparer</b> : ton son se coupe quelques secondes.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Ton micro n'envoie aucun son. Ton casque est-il éteint, ou son micro coupé ? Allume-le ou réactive le micro. Toujours rien ? Redémarre ton PC, puis réessaie."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Ton micro n'envoie aucun son. Ton casque est-il éteint, ou son micro coupé ? Allume-le ou réactive le micro. Toujours rien ? Redémarre ton PC, puis réessaie.",
+  "Minimised: last picture": "Réduite : dernière image",
+  "Minimised: restore for live updates": "Réduite : restaurez pour voir les mises à jour en direct"
 }

@@ -3235,12 +3235,13 @@
   "Stop voice effects": "停止語音效果",
   "Hide this program's window": "隱藏這個程式的視窗",
   "Looking for its window…": "正在尋找它的視窗…",
-  "Minimised: nothing to show": "已最小化：沒有可顯示的",
   "No window to show": "沒有可顯示的視窗",
   "Show this program's window": "顯示這個程式的視窗",
   "This program doesn't share its picture": "這個程式不分享它的畫面",
   "Window of {name}": "{name} 的視窗",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord 和遊戲聽不到你麥克風的任何聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。如果沒有，按 <b>修復</b>，然後在 Windows 詢問時按 <b>是</b>。",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord 和遊戲聽不到你麥克風的任何聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。如果沒有，按 <b>修復</b>：聲音會中斷幾秒。",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麥克風沒有聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。還是沒有聲音？請重新啟動電腦，然後再試一次。"
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麥克風沒有聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。還是沒有聲音？請重新啟動電腦，然後再試一次。",
+  "Minimised: last picture": "已最小化：最後一幀",
+  "Minimised: restore for live updates": "已最小化：還原視窗以即時更新"
 }

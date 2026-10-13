@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Спри гласовите ефекти",
   "Hide this program's window": "Скрий прозореца на тази програма",
   "Looking for its window…": "Търсене на прозореца му…",
-  "Minimised: nothing to show": "Минимизиран: няма какво да се покаже",
   "No window to show": "Няма прозорец за показване",
   "Show this program's window": "Покажи прозореца на тази програма",
   "This program doesn't share its picture": "Тази програма не споделя картината си",
   "Window of {name}": "Прозорец на {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord и игрите не чуват нищо от микрофона ти. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Ако не е, кликни <b>Поправи</b>, после <b>Да</b>, когато Windows попита.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord и игрите не чуват нищо от микрофона ти. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Ако не е, кликни <b>Поправи</b>: звукът ще изчезне за няколко секунди.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофонът ти не праща звук. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Пак нищо? Рестартирай компютъра и опитай пак."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофонът ти не праща звук. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Пак нищо? Рестартирай компютъра и опитай пак.",
+  "Minimised: last picture": "Минимизиран: последна снимка",
+  "Minimised: restore for live updates": "Минимизиран: възстановете за обновяване на живо"
 }

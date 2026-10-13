@@ -3235,12 +3235,13 @@
   "Stop voice effects": "Hentikan efek suara",
   "Hide this program's window": "Sembunyikan jendela program ini",
   "Looking for its window…": "Mencari jendelanya…",
-  "Minimised: nothing to show": "Diminimalkan: tidak ada yang ditampilkan",
   "No window to show": "Tidak ada jendela untuk ditampilkan",
   "Show this program's window": "Tampilkan jendela program ini",
   "This program doesn't share its picture": "Program ini tidak membagikan gambarnya",
   "Window of {name}": "Jendela {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>, lalu <b>Ya</b> saat Windows bertanya.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>: suaramu hilang beberapa detik.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic-mu tidak mengirim suara. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Restart PC-mu, lalu coba lagi."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic-mu tidak mengirim suara. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Restart PC-mu, lalu coba lagi.",
+  "Minimised: last picture": "Diminimalkan: gambar terakhir",
+  "Minimised: restore for live updates": "Diminimalkan: pulihkan untuk pembaruan langsung"
 }

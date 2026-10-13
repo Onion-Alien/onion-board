@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Ihinto ang mga voice effect",
   "Hide this program's window": "Itago ang window ng program na ito",
   "Looking for its window…": "Hinahanap ang window nito…",
-  "Minimised: nothing to show": "Naka-minimize: walang maipakita",
   "No window to show": "Walang window na maipakita",
   "Show this program's window": "Ipakita ang window ng program na ito",
   "This program doesn't share its picture": "Hindi ibinabahagi ng program na ito ang larawan nito",
   "Window of {name}": "Window ng {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Kung hindi, i-click ang <b>I-repair</b>, tapos <b>Yes</b> kapag nagtanong ang Windows.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Kung hindi, i-click ang <b>I-repair</b>: mawawala ang tunog mo nang ilang segundo.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Walang tunog na pinapadala ang mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Wala pa rin? I-restart ang PC mo, tapos subukan ulit."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Walang tunog na pinapadala ang mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Wala pa rin? I-restart ang PC mo, tapos subukan ulit.",
+  "Minimised: last picture": "Naka-minimize: huling larawan",
+  "Minimised: restore for live updates": "Naka-minimize: i-restore para sa live na larawan"
 }

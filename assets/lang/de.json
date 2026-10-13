@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Stimmeffekte stoppen",
   "Hide this program's window": "Fenster dieses Programms ausblenden",
   "Looking for its window…": "Suche sein Fenster…",
-  "Minimised: nothing to show": "Minimiert: nichts zu zeigen",
   "No window to show": "Kein Fenster zum Anzeigen",
   "Show this program's window": "Fenster dieses Programms zeigen",
   "This program doesn't share its picture": "Dieses Programm teilt sein Bild nicht",
   "Window of {name}": "Fenster von {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord und Spiele hören nichts von deinem Mikro. Ist dein Headset ausgeschaltet oder sein Mikro stummgeschaltet? Schalte es ein oder heb die Stummschaltung auf. Wenn nicht, klick <b>Reparieren</b>, dann <b>Ja</b>, wenn Windows fragt.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord und Spiele hören nichts von deinem Mikro. Ist dein Headset ausgeschaltet oder sein Mikro stummgeschaltet? Schalte es ein oder heb die Stummschaltung auf. Wenn nicht, klick <b>Reparieren</b>: dein Ton fällt ein paar Sekunden aus.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Dein Mikro sendet keinen Ton. Ist dein Headset ausgeschaltet oder sein Mikro stummgeschaltet? Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Starte deinen PC neu und versuch es noch mal."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Dein Mikro sendet keinen Ton. Ist dein Headset ausgeschaltet oder sein Mikro stummgeschaltet? Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Starte deinen PC neu und versuch es noch mal.",
+  "Minimised: last picture": "Minimiert: letztes Bild",
+  "Minimised: restore for live updates": "Minimiert: für Live-Bilder wiederherstellen"
 }

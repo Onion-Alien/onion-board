@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Ferma effetti vocali",
   "Hide this program's window": "Nascondi la finestra di questo programma",
   "Looking for its window…": "Cerco la sua finestra…",
-  "Minimised: nothing to show": "Ridotta a icona: niente da mostrare",
   "No window to show": "Nessuna finestra da mostrare",
   "Show this program's window": "Mostra la finestra di questo programma",
   "This program doesn't share its picture": "Questo programma non condivide la sua immagine",
   "Window of {name}": "Finestra di {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord e i giochi non sentono niente dal tuo microfono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Altrimenti fai clic su <b>Ripara</b>, poi su <b>Sì</b> quando Windows lo chiede.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord e i giochi non sentono niente dal tuo microfono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Altrimenti fai clic su <b>Ripara</b>: l'audio si interrompe per qualche secondo.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Il tuo microfono non invia nessun suono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Ancora niente? Riavvia il PC e riprova."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Il tuo microfono non invia nessun suono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Ancora niente? Riavvia il PC e riprova.",
+  "Minimised: last picture": "Ridotta a icona: ultima immagine",
+  "Minimised: restore for live updates": "Ridotta a icona: ripristina per gli aggiornamenti in tempo reale"
 }

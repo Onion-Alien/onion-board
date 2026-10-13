@@ -3235,12 +3235,13 @@
   "Stop voice effects": "หยุดเอฟเฟกต์เสียง",
   "Hide this program's window": "ซ่อนหน้าต่างของโปรแกรมนี้",
   "Looking for its window…": "กำลังหาหน้าต่าง…",
-  "Minimised: nothing to show": "ย่ออยู่: ไม่มีอะไรให้แสดง",
   "No window to show": "ไม่มีหน้าต่างให้แสดง",
   "Show this program's window": "แสดงหน้าต่างของโปรแกรมนี้",
   "This program doesn't share its picture": "โปรแกรมนี้ไม่แชร์ภาพของมัน",
   "Window of {name}": "หน้าต่างของ {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b> แล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord และเกมไม่ได้ยินอะไรจากไมค์ของคุณเลย หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ถ้าไม่ได้ปิด ให้คลิก <b>ซ่อม</b>: เสียงจะหายไปสองสามวินาที",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีก? ให้รีสตาร์ท PC แล้วลองอีกครั้ง"
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีก? ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
+  "Minimised: last picture": "ย่อหน้าต่างอยู่: ภาพล่าสุด",
+  "Minimised: restore for live updates": "ย่อหน้าต่างอยู่: คืนค่าหน้าต่างเพื่อดูภาพสด"
 }

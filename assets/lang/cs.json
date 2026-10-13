@@ -3383,12 +3383,13 @@
   "Stop voice effects": "Zastavit hlasové efekty",
   "Hide this program's window": "Skrýt okno tohoto programu",
   "Looking for its window…": "Hledám jeho okno…",
-  "Minimised: nothing to show": "Minimalizováno: není co ukázat",
   "No window to show": "Žádné okno k zobrazení",
   "Show this program's window": "Zobrazit okno tohoto programu",
   "This program doesn't share its picture": "Tento program nesdílí svůj obraz",
   "Window of {name}": "Okno {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b> a pak na <b>Ano</b>, až se Windows zeptají.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b>: zvuk na pár sekund vypadne.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Pořád nic? Restartuj počítač a zkus to znovu."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Pořád nic? Restartuj počítač a zkus to znovu.",
+  "Minimised: last picture": "Minimalizováno: poslední snímek",
+  "Minimised: restore for live updates": "Minimalizováno: obnovte okno pro živý náhled"
 }

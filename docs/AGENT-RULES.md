@@ -94,6 +94,10 @@ Before the first edit, every task: latest `origin/main` and the open PRs
   goes in slices or tiles, never all at once. `307ff86`
 - A timer that repaints slows down while the app is in the background
   (`ui/appstate.py`: `slow_in_background`, `pause_in_background`).
+- An explicitly opened Apps window view keeps capturing across focus changes.
+  Minimized source windows retain a labeled last frame; restore them only after
+  the user clicks Restore, without activating them. Stop capture when the view
+  is hidden or Onion Board itself is minimized.
 - Dismissing a dropdown must not replay its outside click into an immediate reopen.
   Keep rapid mouse clicks calm without delaying keyboard input (`wheelguard.py`).
 

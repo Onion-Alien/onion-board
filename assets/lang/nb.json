@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Stopp stemmeeffekter",
   "Hide this program's window": "Skjul vinduet til dette programmet",
   "Looking for its window…": "Leter etter vinduet…",
-  "Minimised: nothing to show": "Minimert: ingenting å vise",
   "No window to show": "Ingen vindu å vise",
   "Show this program's window": "Vis vinduet til dette programmet",
   "This program doesn't share its picture": "Dette programmet deler ikke bildet sitt",
   "Window of {name}": "Vinduet til {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord og spill hører ingenting fra mikrofonen din. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Hvis ikke, klikk <b>Reparer</b>, og deretter <b>Ja</b> når Windows spør.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord og spill hører ingenting fra mikrofonen din. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Hvis ikke, klikk <b>Reparer</b>: lyden forsvinner i noen sekunder.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen din sender ingen lyd. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Fortsatt ingenting? Start PC-en på nytt, og prøv igjen."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen din sender ingen lyd. Er headsettet slått av, eller er mikrofonen dempet? Slå det på, eller slå på lyden. Fortsatt ingenting? Start PC-en på nytt, og prøv igjen.",
+  "Minimised: last picture": "Minimert: siste bilde",
+  "Minimised: restore for live updates": "Minimert: gjenopprett for løpende oppdateringer"
 }

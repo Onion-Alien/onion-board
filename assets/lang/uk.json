@@ -3383,12 +3383,13 @@
   "Stop voice effects": "Зупинити голосові ефекти",
   "Hide this program's window": "Сховати вікно цієї програми",
   "Looking for its window…": "Шукаю її вікно…",
-  "Minimised: nothing to show": "Згорнуто: нічого показати",
   "No window to show": "Немає вікна для показу",
   "Show this program's window": "Показати вікно цієї програми",
   "This program doesn't share its picture": "Ця програма не ділиться своїм зображенням",
   "Window of {name}": "Вікно {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>, потім <b>Так</b>, коли Windows запитає.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Мікрофон не передає звук. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Досі нічого? Перезавантаж ПК і спробуй ще раз."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Мікрофон не передає звук. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Досі нічого? Перезавантаж ПК і спробуй ще раз.",
+  "Minimised: last picture": "Згорнуто: останній кадр",
+  "Minimised: restore for live updates": "Згорнуто: відновіть вікно для оновлень наживо"
 }

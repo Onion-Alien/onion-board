@@ -80,6 +80,7 @@ def _win():
     u.GetWindowThreadProcessId.argtypes = [H, ctypes.POINTER(wintypes.DWORD)]
     u.GetClientRect.argtypes = [H, ctypes.POINTER(wintypes.RECT)]
     u.PrintWindow.argtypes = [H, wintypes.HDC, wintypes.UINT]
+    u.ShowWindowAsync.argtypes = [H, ctypes.c_int]
     u.GetDC.argtypes = [H]
     u.GetDC.restype = wintypes.HDC
     u.ReleaseDC.argtypes = [H, wintypes.HDC]
@@ -236,3 +237,13 @@ def grab(hwnd: int, max_w: int, max_h: int) -> Shot:
     if is_black(data):
         return Shot(BLACK)
     return Shot(OK, tw, th, data)
+
+
+def restore_window(pids) -> bool:
+    """Restore only a minimised source window, without activating it or waiting
+    for its thread. Called by the viewer worker after an explicit Restore click."""
+    hwnd = find_window(pids)
+    if not hwnd:
+        return False
+    u, _g, _d = _win()
+    return bool(u.IsIconic(hwnd) and u.ShowWindowAsync(hwnd, 4))  # SW_SHOWNOACTIVATE

@@ -3309,12 +3309,13 @@
   "Stop voice effects": "Ses efektlerini durdur",
   "Hide this program's window": "Bu programın penceresini gizle",
   "Looking for its window…": "Penceresi aranıyor…",
-  "Minimised: nothing to show": "Simge durumunda: gösterilecek bir şey yok",
   "No window to show": "Gösterilecek pencere yok",
   "Show this program's window": "Bu programın penceresini göster",
   "This program doesn't share its picture": "Bu program görüntüsünü paylaşmıyor",
   "Window of {name}": "{name} penceresi",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Değilse <b>Onar</b>'a, sonra Windows sorunca <b>Evet</b>'e tıkla.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Değilse <b>Onar</b>'a tıkla: sesin birkaç saniye kesilir.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonun ses göndermiyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? Bilgisayarını yeniden başlat, sonra tekrar dene."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonun ses göndermiyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? Bilgisayarını yeniden başlat, sonra tekrar dene.",
+  "Minimised: last picture": "Simge durumunda: son görüntü",
+  "Minimised: restore for live updates": "Simge durumunda: canlı güncellemeler için geri yükle"
 }

@@ -3383,12 +3383,13 @@
   "Stop voice effects": "Zatrzymaj efekty głosu",
   "Hide this program's window": "Ukryj okno tego programu",
   "Looking for its window…": "Szukam jego okna…",
-  "Minimised: nothing to show": "Zminimalizowane: nic do pokazania",
   "No window to show": "Brak okna do pokazania",
   "Show this program's window": "Pokaż okno tego programu",
   "This program doesn't share its picture": "Ten program nie udostępnia swojego obrazu",
   "Window of {name}": "Okno {name}",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>, then <b>Yes</b> when Windows asks.": "Discord i gry nic nie słyszą z twojego mikrofonu. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Jeśli nie, kliknij <b>Napraw</b>, a potem <b>Tak</b>, gdy Windows zapyta.",
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord i gry nic nie słyszą z twojego mikrofonu. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Jeśli nie, kliknij <b>Napraw</b>: dźwięk zniknie na kilka sekund.",
-  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Twój mikrofon nie wysyła dźwięku. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Nadal nic? Uruchom ponownie komputer i spróbuj jeszcze raz."
+  "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Twój mikrofon nie wysyła dźwięku. Czy słuchawki są wyłączone albo ich mikrofon wyciszony? Włącz je albo wyłącz wyciszenie. Nadal nic? Uruchom ponownie komputer i spróbuj jeszcze raz.",
+  "Minimised: last picture": "Zminimalizowane: ostatni obraz",
+  "Minimised: restore for live updates": "Zminimalizowane: przywróć, aby oglądać na żywo"
 }
