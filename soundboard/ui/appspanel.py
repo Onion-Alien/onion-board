@@ -934,7 +934,7 @@ class AppRow(HoverCard):
         self._icon_path = path
         img = exeicon.get(path) if path else None
         if img is None:
-            pm = icons.icon("apps", "muted").pixmap(QSize(22, 22))
+            pm = icons.icon("apps", "accent").pixmap(QSize(22, 22))
         else:
             dpr = self.icon.devicePixelRatioF()
             side = round(24 * dpr)
