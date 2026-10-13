@@ -20,6 +20,40 @@ def outlines():
 
 
 @pytest.mark.parametrize("dpr", [1.0, 1.25, 1.5, 1.75, 2.0])
+@pytest.mark.parametrize("solid", [False, True])
+def test_settled_world_tiles_cover_the_antimeridian(qapp, monkeypatch, dpr, solid):
+    from PySide6.QtGui import QColor, QImage, QPainter
+
+    m = FlatMap()
+    m.resize(240, 80)
+    monkeypatch.setattr(m, "_scale", lambda: 100.49 / 360)
+    monkeypatch.setattr(m, "devicePixelRatioF", lambda: dpr)
+    m.cy = flatmap.LAT_TOP
+    level = m._level()
+    colour = (QColor("white") if solid else
+              flatmap._mix(flatmap.theme.T["bg"], flatmap.theme.T["accent"], 0.06))
+    for i, j in m._all_tiles(level):
+        m._tile_now((level, i, j))
+        if solid:
+            m._tiles[level, i, j].fill(colour)
+    try:
+        for cx in (179.0, 180.0, 181.0, 182.0):
+            m.cx = cx
+            image = QImage(round(240 * dpr), round(80 * dpr), QImage.Format_RGB32)
+            image.setDevicePixelRatio(dpr)
+            painter = QPainter(image)
+            try:
+                m._paint(painter, dpr)
+            finally:
+                painter.end()
+            assert all(image.pixelColor(x, round(60 * dpr)).rgba() == colour.rgba()
+                       for x in range(round(25 * dpr), round(215 * dpr))), (dpr, cx)
+    finally:
+        m._stop_build()
+        m.close()
+
+
+@pytest.mark.parametrize("dpr", [1.0, 1.25, 1.5, 1.75, 2.0])
 def test_world_copy_seams_do_not_expose_the_background(qapp, monkeypatch, dpr):
     from PySide6.QtGui import QColor, QImage, QPainter, QPixmap
 

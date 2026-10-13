@@ -1,0 +1,1 @@
+- Fixed the anti-meridian hairline in the settled flat map by aligning adjacent world tiles to a shared pixel boundary.
