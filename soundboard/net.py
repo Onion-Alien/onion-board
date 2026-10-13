@@ -368,6 +368,19 @@ def allowed(feature) -> bool:
     return feature.partition(".")[0] not in _off and feature not in _off
 
 
+def web_url(url: str) -> str:
+    """`url` when it's an http(s) link with a host, else "". For any address a web page
+    or a site's answer names (a thumbnail, a preview picture): only web links go through
+    the relay, Tor and the switches."""
+    try:
+        parts = urllib.parse.urlsplit(url.strip())
+    except ValueError:
+        return ""
+    if parts.scheme.lower() not in ("http", "https") or not parts.hostname:
+        return ""
+    return url.strip()
+
+
 def offline() -> bool:
     return _offline
 
