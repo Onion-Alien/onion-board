@@ -1,0 +1,1 @@
+- Settings search now finds themes by name, including Paper and Synthwave.
