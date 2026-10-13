@@ -23,8 +23,8 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--ytdl-worker"]:
 
 # the one-off commands app.main() handles and exits (a breadcrumb would look like a
 # start that failed: see soundboard/bootmark.py). Keep in step with app.main()'s branches.
-_ONE_OFF = ("--selftest", "--get-tor", "--set-offline", "--keep-netlog", "--usage-count",
-            "--uninstall-count", "--selftest-addon")
+_ONE_OFF = ("--selftest", "--get-tor", "--install-addon", "--set-offline", "--keep-netlog",
+            "--usage-count", "--uninstall-count", "--selftest-addon")
 
 if __name__ == "__main__" and not (set(sys.argv[1:]) & set(_ONE_OFF)):
     # a breadcrumb before the heavy import below, so a crash while it loads is counted
