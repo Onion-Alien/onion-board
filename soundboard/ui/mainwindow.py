@@ -3953,6 +3953,8 @@ class MainWindow(QMainWindow):
             usage.used("mic-effect-fix-failed" if auto else
                        "mic-effect-said-no" if err == directmic.declined() else
                        "mic-effect-failed")
+            if not auto and err != directmic.declined():
+                usage.used(f"mic-effect-failed-{directmic.fail_kind(err)}")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err

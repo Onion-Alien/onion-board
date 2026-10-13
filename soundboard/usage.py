@@ -120,6 +120,8 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
 VOICE_TABS = ("fx", "ai", "speak", "addons")
 # Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
+# why a click's mic effect set-up failed (directmic.FAIL_KINDS)
+MIC_FAILS = ("unfinished", "silent", "no-helper", "no-mic", "no-effect", "code")
 # a pad's "On press" modes other than the default (library.MODES, without "restart")
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
@@ -180,9 +182,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the mic effect: put on by a click, put back by itself after Windows took it
             # off, updated; No to Windows' admin prompt; a click's set-up failed; the
             # fix-by-itself failed; on, but not working when the wait ran out; Windows took
-            # it off (found by the app); and the mic helper set up (features_now)
+            # it off (found by the app); and the mic helper set up (features_now); and
+            # why a click's set-up failed (MIC_FAILS: a fixed word, never the message)
             "mic-effect-on", "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
-            "mic-effect-failed", "mic-effect-fix-failed", "mic-effect-no-load",
+            "mic-effect-failed", *(f"mic-effect-failed-{k}" for k in MIC_FAILS),
+            "mic-effect-fix-failed", "mic-effect-no-load",
             "mic-effect-taken-off", "mic-helper",
             # Onion Board's own update: the download cancelled or failed, the installer
             # wouldn't start, Copy error, Later at "Restart now", one that didn't finish
