@@ -69,6 +69,7 @@ class Meter(QWidget):
         self.level = 0.0
         self._hot = False
         self._drawn = None        # (bar width in px, colour) as last painted
+        self._col = "#13ce66"
         self.setFixedHeight(8)
         self.setAccessibleName(_("Level meter"))
 
@@ -84,8 +85,21 @@ class Meter(QWidget):
     def _bar(self) -> tuple[float, str]:
         db = 20 * np.log10(max(self.level, 1e-5))
         frac = float(np.clip((db + 50) / 50, 0, 1))
-        col = "#13ce66" if db < -9 else "#ffb020" if db < -2 else "#ff4d4f"
-        return frac, "#ff4d4f" if self._hot else col
+        # Hysteresis keeps levels near the thresholds from flashing between colours.
+        if self._col == "#ff4d4f":
+            if db < -3.5:
+                self._col = "#ffb020" if db >= -11.0 else "#13ce66"
+        elif self._col == "#ffb020":
+            if db >= -2.0:
+                self._col = "#ff4d4f"
+            elif db < -11.0:
+                self._col = "#13ce66"
+        else:
+            if db >= -2.0:
+                self._col = "#ff4d4f"
+            elif db >= -9.0:
+                self._col = "#ffb020"
+        return frac, "#ff4d4f" if self._hot else self._col
 
     def set_level(self, v):
         self.level = v
