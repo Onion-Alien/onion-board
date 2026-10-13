@@ -2,6 +2,21 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.0.3 — 2026-10-13
+
+- When the FFmpeg backup download fails on both sites, the message now says what went
+  wrong on each, not just the last one.
+- Trying the mic set-up again right after "Your mic sends no sound" now restarts
+  Windows' audio for that mic again, instead of taking its silence as a switched-off
+  headset and leaving it stuck.
+- *Count me in* now says why a mic effect set-up failed, and why fixing it by itself
+  failed, as one fixed word (the admin prompt left open, the admin step not starting
+  or stopping half-way, a silent mic, the mic helper, a missing mic, or the admin
+  step's exit code), so failed set-ups can be fixed. Never the message or the mic's
+  name.
+- Count FFmpeg startup failures and verified recovery in the anonymous usage flags, remembering an unresolved failure across app restarts.
+- Fix the FFmpeg backup download by pinning version 9.0.2, available from both download sources with the same verified checksum.
+
 ## 2.0.2 — 2026-10-12
 
 - A mic that sends only silence because the headset is switched off or its mic muted no longer makes a mic set-up or repair restart Windows' audio over and over, and the messages ask about the headset first instead of telling you to restart your PC.
