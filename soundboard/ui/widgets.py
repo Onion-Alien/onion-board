@@ -13,7 +13,8 @@ from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, 
                            QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMainWindow, QMenu,
                                QScrollArea,
-                               QSlider, QStackedWidget, QStyle, QTabWidget, QToolTip,
+                               QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
+                               QTabWidget, QToolTip,
                                QVBoxLayout, QWidget)
 from shiboken6 import delete as qt_delete
 from shiboken6 import isValid as qt_valid
@@ -184,7 +185,57 @@ class EqCurve(QWidget):
             p.drawText(plate, Qt.AlignmentFlag.AlignCenter, off)
 
 
-class SeekSlider(QSlider):
+class CrispSlider(QSlider):
+    """Themed horizontal slider with a circle aligned to physical pixels."""
+
+    def paintEvent(self, e):
+        if self.orientation() != Qt.Orientation.Horizontal:
+            return super().paintEvent(e)
+        opt = QStyleOptionSlider()
+        self.initStyleOption(opt)
+        style = self.style()
+        handle = style.subControlRect(QStyle.ComplexControl.CC_Slider, opt,
+                                      QStyle.SubControl.SC_SliderHandle, self)
+        groove = QRectF(style.subControlRect(QStyle.ComplexControl.CC_Slider, opt,
+                                            QStyle.SubControl.SC_SliderGroove, self))
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(theme.T["groove"]))
+        radius = groove.height() / 2
+        p.drawRoundedRect(groove, radius, radius)
+        if self.isEnabled() and self.sliderPosition() > self.minimum():
+            fill = QRectF(groove)
+            if opt.upsideDown:
+                fill.setLeft(handle.center().x())
+            else:
+                fill.setRight(handle.center().x())
+            p.setBrush(QColor(theme.T["accent" if self.objectName() == "seek" else "muted"]))
+            p.drawRoundedRect(fill, radius, radius)
+        # A stylesheet's rounded box with a transparent border leaves a soft rim.
+        # Paint one circle instead, with its bounds on physical pixel boundaries.
+        transform = p.deviceTransform()
+        scale = transform.m11()
+        bounds = transform.mapRect(QRectF(handle))
+        diameter = math.floor(min(bounds.width(), bounds.height()) + 0.5)
+        x = math.floor(bounds.center().x() - diameter / 2 + 0.5)
+        y = math.floor(bounds.center().y() - diameter / 2 + 0.5)
+        circle = QRectF((x - transform.dx()) / scale, (y - transform.dy()) / scale,
+                        diameter / scale, diameter / scale)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(theme.T["text_hi" if self.isEnabled() else
+                                 ("off" if self.objectName() == "seek" else "inset")]))
+        p.drawEllipse(circle)
+        hovered = opt.activeSubControls == QStyle.SubControl.SC_SliderHandle
+        if self.isEnabled() and (self.hasFocus() or hovered or self.isSliderDown()):
+            width = 2 if self.hasFocus() else 1
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QPen(QColor(theme.T["accent" if self.hasFocus() else "border_hi"]), width))
+            p.drawEllipse(circle.adjusted(width / 2, width / 2, -width / 2, -width / 2))
+
+
+class SeekSlider(CrispSlider):
     """Slider that jumps straight to where you click (then drags from there)."""
 
     def __init__(self, *args):

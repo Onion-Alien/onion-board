@@ -20,7 +20,7 @@ from soundboard.eq import BAND_LABELS as EQ_LABELS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.ui import icons
-from soundboard.ui.widgets import EqCurve, Meter
+from soundboard.ui.widgets import CrispSlider, EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
@@ -571,7 +571,7 @@ class VolumeControl(QWidget):
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(4)
-        self.slider = QSlider(Qt.Orientation.Horizontal)
+        self.slider = CrispSlider(Qt.Orientation.Horizontal)
         self.meter = _LevelDot() if meter else None
         if self.meter is not None:
             h.addWidget(self.meter)
