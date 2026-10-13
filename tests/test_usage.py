@@ -384,6 +384,9 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
     _freeze(f, "12 s", 0, "", inner="")
     assert usage._report_event(f) == ("freeze/1.9.28@soundboard/voicesdk.py:80"
                                       "<soundboard/ui/mainwindow.py:50/lasted-10-30s/idle")
+    # the whole app was held up, not the window alone (hangwatch.ALL_HELD_NOTE)
+    _freeze(f, "12 s", 0, "", inner="\n(every thread was held up, this watch too)\n")
+    assert usage._report_event(f).endswith("/all-held/lasted-10-30s/idle")
     # an older report (no Lasted / CPU lines): only what it has
     _freeze(f, "", None, hog)
     assert usage._report_event(f) == ("freeze/1.9.28@soundboard/voicesdk.py:80"
