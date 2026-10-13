@@ -1937,7 +1937,6 @@
   "Ran out of memory. Close some programs and try again.": "메모리가 부족합니다. 일부 프로그램을 닫고 다시 시도해 보세요.",
   "Randomize": "무작위화",
   "Recognition": "인식",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "이 프로그램을 녹음하세요. 프로그램이 소리를 낼 때까지 기다린 다음 다시 클릭할 때까지 녹음하고 클립이 사운드에 추가됩니다. 보내기가 켜져 있지 않으면 아무도 듣지 못합니다.",
   "Record {name}": "{name} 기록",
   "Redo": "다시 하다",
   "Refresh": "새로 고치다",
@@ -1967,7 +1966,6 @@
   "Room": "방",
   "Room, hall or cave.": "방, 홀 또는 동굴.",
   "Save as a voice": "음성으로 저장",
-  "Save clip": "클립 저장",
   "Saved clips": "저장된 클립",
   "Saved clips ({n})": "저장된 클립({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2406,7 +2404,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ 양파 감시가 제거되었습니다. 트리거가 유지됩니다.",
   "✓ Opened Windows settings": "✓ Windows 설정을 열었습니다.",
   "✓ Saved": "✓ 저장됨",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ 사운드에 {seconds} 초의 클립을 저장했습니다.",
   "✓ Saved “{name}”: loading its voices…": "✓ “{name}” 저장됨: 음성 로드 중…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} 음성 발견: {voice} 은 다음 줄에서 말합니다.",
   "✓ {n} voice": [
@@ -3241,5 +3238,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "마이크에서 소리가 나가지 않습니다. 헤드셋이 꺼져 있거나 마이크가 음소거되어 있나요? 켜거나 음소거를 해제하세요. 그래도 안 되면 PC를 다시 시작한 다음 다시 시도하세요.",
   "Minimised: last picture": "최소화됨: 마지막 화면",
   "Minimised: restore for live updates": "최소화됨: 실시간으로 보려면 창을 복원하세요",
-  "Drag to resize saved clips. Double-click to fit the clips.": "드래그하여 저장된 클립 영역의 크기를 조절하세요. 두 번 클릭하면 클립에 맞춰집니다."
+  "Drag to resize saved clips. Double-click to fit the clips.": "드래그하여 저장된 클립 영역의 크기를 조절하세요. 두 번 클릭하면 클립에 맞춰집니다.",
+  "By app": "앱별",
+  "By day": "날짜별",
+  "Created": "만든 날짜",
+  "Find clips": "클립 찾기",
+  "Group clips": "클립 그룹화",
+  "Keep forever": "계속 보관",
+  "Newest first": "최신순",
+  "No matching clips": "일치하는 클립 없음",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "그렇지 않으면 미리 듣기, 전송, 복사, 이름 변경 또는 사운드에 추가하는 활동이 7일 동안 없는 클립은 삭제됩니다.",
+  "Removed inactive clips: {n}": "삭제된 미사용 클립: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "이 앱의 소리를 저장된 클립에 녹음합니다. 다시 클릭하면 종료됩니다. 전송을 켜지 않으면 다른 사람에게 들리지 않습니다.",
+  "Save to clips": "클립에 저장",
+  "Show clips": "클립 보기"
 }

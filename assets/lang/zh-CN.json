@@ -1937,7 +1937,6 @@
   "Ran out of memory. Close some programs and try again.": "内存不足。关闭一些程序并重试。",
   "Randomize": "随机化",
   "Recognition": "认出",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "录制该节目：它等待节目发出声音，然后录制，直到您再次单击，剪辑就会添加到您的声音中。除非打开“发送”，否则没有人会听到它。",
   "Record {name}": "记录{name}",
   "Redo": "重做",
   "Refresh": "刷新",
@@ -1967,7 +1966,6 @@
   "Room": "房间",
   "Room, hall or cave.": "房间、大厅或洞穴。",
   "Save as a voice": "另存为声音",
-  "Save clip": "保存剪辑",
   "Saved clips": "已保存的剪辑",
   "Saved clips ({n})": "已保存的剪辑 ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2406,7 +2404,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ 洋葱手表已移除。您的触发器将被保留。",
   "✓ Opened Windows settings": "✓ 打开 Windows 设置",
   "✓ Saved": "✓ 已保存",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ 将{seconds}秒的剪辑保存到您的声音中。",
   "✓ Saved “{name}”: loading its voices…": "✓ 已保存“{name}”：正在加载其声音...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ 找到{language}语音： {voice}从下一行开始讲话。",
   "✓ {n} voice": [
@@ -3241,5 +3238,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麦克风没有声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。还是没有声音？请重启电脑，然后再试一次。",
   "Minimised: last picture": "已最小化：最后一帧",
   "Minimised: restore for live updates": "已最小化：还原窗口以实时更新",
-  "Drag to resize saved clips. Double-click to fit the clips.": "拖动可调整已保存片段区域的大小。双击可自动适应片段。"
+  "Drag to resize saved clips. Double-click to fit the clips.": "拖动可调整已保存片段区域的大小。双击可自动适应片段。",
+  "By app": "按应用",
+  "By day": "按日期",
+  "Created": "创建日期",
+  "Find clips": "查找片段",
+  "Group clips": "片段分组",
+  "Keep forever": "永久保留",
+  "Newest first": "最新优先",
+  "No matching clips": "没有匹配的片段",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "否则，片段在7天内未试听、发送、复制、重命名或添加到声音后会被移除。",
+  "Removed inactive clips: {n}": "已移除未使用的片段：{n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "将此应用的声音录制到已保存片段。再次点击即可结束。除非开启发送，否则其他人听不到。",
+  "Save to clips": "保存到片段",
+  "Show clips": "显示片段"
 }

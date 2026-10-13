@@ -1939,7 +1939,6 @@
   "Ran out of memory. Close some programs and try again.": "Кончилась память. Закройте некоторые программы и повторите попытку.",
   "Randomize": "Рандомизировать",
   "Recognition": "Признание",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Запишите эту программу: она ждет, пока программа издаст звук, затем записывает до тех пор, пока вы не нажмете еще раз, и клип будет добавлен в ваши Звуки. Никто его не слышит, если не включена функция «Отправить».",
   "Record {name}": "Запись {name}",
   "Redo": "Повторить",
   "Refresh": "Обновить",
@@ -1971,7 +1970,6 @@
   "Room": "Комната",
   "Room, hall or cave.": "Комната, зал или пещера.",
   "Save as a voice": "Сохранить как голос",
-  "Save clip": "Сохранить клип",
   "Saved clips": "Сохраненные клипы",
   "Saved clips ({n})": "Сохраненные клипы ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2419,7 +2417,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Луковый дозор удален. Ваши триггеры сохраняются.",
   "✓ Opened Windows settings": "✓ Открытые настройки Windows",
   "✓ Saved": "✓ Сохранено",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Сохранен клип {seconds} в ваши Звуки.",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Найден голос {language} : {voice} говорит со следующей строки.",
   "✓ {n} voice": [
     "✓ {n} голос",
@@ -3389,5 +3386,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофон не передаёт звук. Гарнитура выключена или её микрофон отключён? Включи её или микрофон. Всё ещё ничего? Перезагрузи ПК и попробуй ещё раз.",
   "Minimised: last picture": "Свёрнуто: последний кадр",
   "Minimised: restore for live updates": "Свёрнуто: восстановите окно для обновления в реальном времени",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Потяните, чтобы изменить размер области сохранённых клипов. Двойной щелчок подгоняет её под клипы."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Потяните, чтобы изменить размер области сохранённых клипов. Двойной щелчок подгоняет её под клипы.",
+  "By app": "По приложению",
+  "By day": "По дню",
+  "Created": "Создан",
+  "Find clips": "Найти клипы",
+  "Group clips": "Группировать клипы",
+  "Keep forever": "Хранить всегда",
+  "Newest first": "Сначала новые",
+  "No matching clips": "Подходящих клипов нет",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Иначе клипы удаляются после 7 дней без прослушивания, отправки, копирования, переименования или добавления в Звуки.",
+  "Removed inactive clips: {n}": "Удалено неиспользуемых клипов: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Запиши звук этого приложения в Сохранённые клипы. Нажми ещё раз, чтобы закончить. Никто его не слышит, если Отправка выключена.",
+  "Save to clips": "Сохранить в клипы",
+  "Show clips": "Показать клипы"
 }

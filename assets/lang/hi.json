@@ -1982,7 +1982,6 @@
   "Ran out of memory. Close some programs and try again.": "स्मृति ख़त्म हो गई. कुछ प्रोग्राम बंद करें और पुनः प्रयास करें।",
   "Randomize": "यादृच्छिक करें",
   "Recognition": "मान्यता",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "इस प्रोग्राम को रिकॉर्ड करें: यह प्रोग्राम के ध्वनि उत्पन्न करने की प्रतीक्षा करता है, फिर तब तक रिकॉर्ड करता है जब तक आप दोबारा क्लिक नहीं करते, और क्लिप आपकी ध्वनि में जुड़ नहीं जाती। जब तक सेंड चालू न हो कोई भी इसे नहीं सुनता।",
   "Record {name}": "रिकॉर्ड {name}",
   "Redo": "फिर से करना",
   "Refresh": "ताज़ा करना",
@@ -2013,7 +2012,6 @@
   "Room": "कमरा",
   "Room, hall or cave.": "कमरा, हॉल या गुफा.",
   "Save as a voice": "एक आवाज के रूप में सहेजें",
-  "Save clip": "क्लिप सहेजें",
   "Saved clips": "सहेजे गए क्लिप",
   "Saved clips ({n})": "सहेजे गए क्लिप ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2458,7 +2456,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ प्याज घड़ी हटा दी गई। आपके ट्रिगर रखे गए हैं.",
   "✓ Opened Windows settings": "✓ विंडोज़ सेटिंग्स खोली गईं",
   "✓ Saved": "✓ सहेजा गया",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ आपकी ध्वनि में एक {seconds} क्लिप सहेजा गया।",
   "✓ Saved “{name}”: loading its voices…": "✓ सहेजा गया \"{name}\" - इसकी आवाजें लोड हो रही हैं...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} आवाज मिली: {voice} अगली पंक्ति से बोलती है।",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
   "Minimised: last picture": "छोटी की गई: आखिरी तस्वीर",
   "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें",
-  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।"
+  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।",
+  "By app": "ऐप के अनुसार",
+  "By day": "दिन के अनुसार",
+  "Created": "बनाया गया",
+  "Find clips": "क्लिप खोजें",
+  "Group clips": "क्लिप का समूह बनाएं",
+  "Keep forever": "हमेशा रखें",
+  "Newest first": "सबसे नए पहले",
+  "No matching clips": "कोई मेल खाती क्लिप नहीं",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "वरना क्लिप 7 दिनों तक प्रीव्यू, भेजने, कॉपी करने, नाम बदलने या ध्वनियों में जोड़ने जैसी गतिविधि न होने पर हटा दी जाती हैं।",
+  "Removed inactive clips: {n}": "हटाई गई निष्क्रिय क्लिप: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "इस ऐप की रिकॉर्डिंग सहेजी गई क्लिप में रखें। खत्म करने के लिए फिर क्लिक करें। भेजना चालू न हो तो कोई इसे नहीं सुनता।",
+  "Save to clips": "क्लिप में सेव करें",
+  "Show clips": "क्लिप दिखाएं"
 }

@@ -1982,7 +1982,6 @@
   "Ran out of memory. Close some programs and try again.": "Hafızamız tükendi. Bazı programları kapatıp tekrar deneyin.",
   "Randomize": "Rastgeleleştir",
   "Recognition": "Tanıma",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Bu programı kaydedin: programın ses çıkarmasını bekler, ardından siz tekrar tıklayana kadar kaydeder ve klip Seslerinize eklenir. Gönder açık olmadığı sürece kimse duymaz.",
   "Record {name}": "{name} 'i kaydet",
   "Redo": "Yinele",
   "Refresh": "Yenile",
@@ -2013,7 +2012,6 @@
   "Room": "Oda",
   "Room, hall or cave.": "Oda, salon veya mağara.",
   "Save as a voice": "Ses olarak kaydet",
-  "Save clip": "Klibi kaydet",
   "Saved clips": "Kaydedilen klipler",
   "Saved clips ({n})": "Kaydedilen klipler ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2458,7 +2456,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Soğan Gözlemi kaldırıldı. Tetikleyicileriniz tutulur.",
   "✓ Opened Windows settings": "✓ Açılan Windows ayarları",
   "✓ Saved": "✓ Kaydedildi",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Seslerinize {seconds} saniyelik bir klip kaydedildi.",
   "✓ Saved “{name}”: loading its voices…": "✓ “{name}” kaydedildi: sesleri yükleniyor…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} ses bulundu: {voice} sonraki satırdan itibaren konuşuyor.",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonun ses göndermiyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? Bilgisayarını yeniden başlat, sonra tekrar dene.",
   "Minimised: last picture": "Simge durumunda: son görüntü",
   "Minimised: restore for live updates": "Simge durumunda: canlı güncellemeler için geri yükle",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Kayıtlı kliplerin alanını boyutlandırmak için sürükle. Kliplere sığdırmak için çift tıkla."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Kayıtlı kliplerin alanını boyutlandırmak için sürükle. Kliplere sığdırmak için çift tıkla.",
+  "By app": "Uygulamaya göre",
+  "By day": "Güne göre",
+  "Created": "Oluşturulma",
+  "Find clips": "Klip bul",
+  "Group clips": "Klipleri grupla",
+  "Keep forever": "Sonsuza kadar sakla",
+  "Newest first": "En yeniler önce",
+  "No matching clips": "Eşleşen klip yok",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Aksi halde klipler 7 gün boyunca önizlenmez, gönderilmez, kopyalanmaz, yeniden adlandırılmaz veya Seslere eklenmezse kaldırılır.",
+  "Removed inactive clips: {n}": "Kaldırılan kullanılmayan klipler: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Bu uygulamayı Kaydedilen kliplere kaydet. Bitirmek için tekrar tıkla. Gönder açık değilse kimse duymaz.",
+  "Save to clips": "Kliplere kaydet",
+  "Show clips": "Klipleri göster"
 }

@@ -1892,7 +1892,6 @@
   "Ran out of memory. Close some programs and try again.": "Свърши паметта. Затворете някои програми и опитайте отново.",
   "Randomize": "Рандомизиране",
   "Recognition": "Признание",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Запишете тази програма: изчаква програмата да издаде звук, след което записва, докато щракнете отново и клипът се добавя към вашите звуци. Никой не го чува, освен ако изпращането не е включено.",
   "Record {name}": "Запис {name}",
   "Redo": "Повторете",
   "Refresh": "Опресняване",
@@ -1923,7 +1922,6 @@
   "Room": "стая",
   "Room, hall or cave.": "Стая, зала или пещера.",
   "Save as a voice": "Запазване като глас",
-  "Save clip": "Запазване на клипа",
   "Saved clips": "Запазени клипове",
   "Saved clips ({n})": "Запазени клипове ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2367,7 +2365,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch е премахнат. Вашите тригери се запазват.",
   "✓ Opened Windows settings": "✓ Отворени настройки на Windows",
   "✓ Saved": "✓ Запазено",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Запазихте {seconds} клип във вашите звуци.",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Намерен е {language} глас: {voice} говори от следващия ред нататък.",
   "✓ {n} voice": [
     "✓ {n} глас",
@@ -3315,5 +3312,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофонът ти не праща звук. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Пак нищо? Рестартирай компютъра и опитай пак.",
   "Minimised: last picture": "Минимизиран: последна снимка",
   "Minimised: restore for live updates": "Минимизиран: възстановете за обновяване на живо",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Плъзнете, за да преоразмерите запазените клипове. Щракнете два пъти, за да ги поберете."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Плъзнете, за да преоразмерите запазените клипове. Щракнете два пъти, за да ги поберете.",
+  "By app": "По приложение",
+  "By day": "По ден",
+  "Created": "Създаден",
+  "Find clips": "Търси клипове",
+  "Group clips": "Групирай клипове",
+  "Keep forever": "Запази завинаги",
+  "Newest first": "Първо най-новите",
+  "No matching clips": "Няма съвпадащи клипове",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Иначе клиповете се премахват след 7 дни без прослушване, изпращане, копиране, преименуване или добавяне към Звуци.",
+  "Removed inactive clips: {n}": "Премахнати неактивни клипове: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Запиши това приложение в Запазени клипове. Натисни отново, за да завършиш. Никой не го чува, освен ако Изпращане е включено.",
+  "Save to clips": "Запази в клипове",
+  "Show clips": "Покажи клипове"
 }

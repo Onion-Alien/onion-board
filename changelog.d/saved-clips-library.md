@@ -1,0 +1,5 @@
+- Find saved clips by name, app or creation date, and group them automatically by app and day.
+- Replace the 200-clip limit with cleanup after seven days without use. Settings > Tabs offers Keep forever; automatic cleanup supports Undo.
+- Fill large clip lists in small batches so the interface remains responsive.
+- Fold saved clips down to one header and reopen them with their search and list height preserved.
+- Apps recordings go to Saved clips first. The editor says Save to clips, and the result offers Show clips; Add to Sounds creates a sound when wanted.

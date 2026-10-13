@@ -1982,7 +1982,6 @@
   "Ran out of memory. Close some programs and try again.": "Ficou sem memória. Feche alguns programas e tente novamente.",
   "Randomize": "Randomizar",
   "Recognition": "Reconhecimento",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Grave este programa: ele espera que o programa emita um som, depois grava até você clicar novamente e o clipe é adicionado aos seus Sons. Ninguém ouve a menos que Enviar esteja ativado.",
   "Record {name}": "Registro {name}",
   "Redo": "Refazer",
   "Refresh": "Atualizar",
@@ -2013,7 +2012,6 @@
   "Room": "Sala",
   "Room, hall or cave.": "Sala, hall ou caverna.",
   "Save as a voice": "Salvar como voz",
-  "Save clip": "Salvar clipe",
   "Saved clips": "Clipes salvos",
   "Saved clips ({n})": "Clipes salvos ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2458,7 +2456,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch removido. Seus gatilhos são mantidos.",
   "✓ Opened Windows settings": "✓ Configurações do Windows abertas",
   "✓ Saved": "✓ Salvo",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Salvou um clipe de {seconds} em seus sons.",
   "✓ Saved “{name}”: loading its voices…": "✓ “{name}” salvo: carregando suas vozes…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Voz {language} encontrada: {voice} fala a partir da próxima linha.",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Seu microfone não está enviando som. Seu headset está desligado ou com o microfone no mudo? Ligue-o ou tire do mudo. Ainda nada? Reinicie o PC e tente de novo.",
   "Minimised: last picture": "Minimizada: última imagem",
   "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações ao vivo",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Arraste para redimensionar os clipes salvos. Clique duas vezes para ajustar aos clipes."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Arraste para redimensionar os clipes salvos. Clique duas vezes para ajustar aos clipes.",
+  "By app": "Por app",
+  "By day": "Por dia",
+  "Created": "Criado em",
+  "Find clips": "Buscar clipes",
+  "Group clips": "Agrupar clipes",
+  "Keep forever": "Guardar para sempre",
+  "Newest first": "Mais recentes primeiro",
+  "No matching clips": "Nenhum clipe encontrado",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Caso contrário, os clipes são removidos após 7 dias sem ouvir a prévia, enviar, copiar, renomear ou adicionar aos Sons.",
+  "Removed inactive clips: {n}": "Clipes inativos removidos: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Grave este app em Clipes salvos. Clique de novo para terminar. Ninguém ouve a menos que Enviar esteja ativado.",
+  "Save to clips": "Salvar nos clipes",
+  "Show clips": "Mostrar clipes"
 }
