@@ -15,8 +15,8 @@ from __future__ import annotations
 import collections
 
 import numpy as np
-from soundboard.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad, sosfilt,
-                             sosfilt_bank)
+from soundboard.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad,
+                             running_min, sosfilt, sosfilt_bank)
 from soundboard.i18n import _
 from soundboard.voicefx import Effect, Param, register
 
@@ -56,6 +56,43 @@ class _Filter:
         if key != self.key:
             self.key, self.sos = key, design()
         return self.f.run(x, self.sos).astype(F32, copy=False)
+
+
+class _Oversampled:
+    """Runs a waveshaper (tanh and friends) at `factor` times the rate. A curve bent
+    at the mic's own rate makes harmonics past Nyquist that fold back down as a fizz
+    that isn't in tune with the voice (aliasing; measured -25 dB on a 1 kHz tone at
+    36 dB drive). Up here the harmonics have room, and the way back down cuts them
+    off. Both ways are one windowed-sinc lowpass with memory, so blocks join without
+    a seam whatever their size. Delay: (TAPS - 1) / factor samples (about 0.25 ms)."""
+
+    TAPS = 48
+
+    def __init__(self, rate: int, factor: int = 4):
+        self.factor = factor
+        n = np.arange(self.TAPS) - (self.TAPS - 1) / 2
+        cut = 0.45 / factor            # of the oversampled rate: the voice's own band
+        h = 2 * cut * np.sinc(2 * cut * n) * np.kaiser(self.TAPS, 8.0)
+        self.h = (h / h.sum()).astype(F32)
+        self._up = np.zeros(self.TAPS - 1, F32)       # the lowpasses' memory
+        self._down = np.zeros(self.TAPS - 1, F32)
+
+    def run(self, x: np.ndarray, shape) -> np.ndarray:
+        """`shape(z)` bends the upsampled block z (len(x) * factor samples)."""
+        n, L, keep = len(x), self.factor, self.TAPS - 1
+        if n == 0:
+            return x
+        z = np.zeros(n * L, F32)
+        z[::L] = x * F32(L)
+        up = np.convolve(np.concatenate([self._up, z]), self.h, "valid")
+        self._up = np.concatenate([self._up, z])[-keep:]
+        y = shape(up.astype(F32, copy=False))
+        down = np.convolve(np.concatenate([self._down, y]), self.h, "valid")
+        self._down = np.concatenate([self._down, y])[-keep:]
+        return down[::L].astype(F32, copy=False)
+
+    def latency(self, rate: int) -> float:
+        return (self.TAPS - 1) / self.factor / rate
 
 
 
@@ -855,35 +892,82 @@ class Robot(Effect):
 
 # --------------------------------------------------------------------------- dynamics
 
+def _chunks(n: int, size: int) -> np.ndarray:
+    """Where each `size`-sample chunk of an n-sample block starts (the last may be
+    short)."""
+    return np.arange(0, n, size)
+
+
+def _per_chunk(x: np.ndarray, starts: np.ndarray, how) -> np.ndarray:
+    """`how` (np.maximum / np.add ...) reduced over each chunk of x."""
+    return how.reduceat(x, starts)
+
+
+def _envelope(target: np.ndarray, g: float, lengths: np.ndarray, rate: int,
+              attack_s: float, release_s: float) -> np.ndarray:
+    """A gain chasing `target` chunk by chunk from `g`: down at the attack speed,
+    up at the release speed. A few chunks per block: a short loop."""
+    out = np.empty(len(target), np.float64)
+    for k, (t, m) in enumerate(zip(target, lengths)):
+        tau = attack_s if t < g else release_s
+        g = t + (g - t) * np.exp(-m / (rate * tau))
+        out[k] = g
+    return out
+
+
+def _spread(g0: float, g: np.ndarray, ends: np.ndarray, n: int) -> np.ndarray:
+    """A per-sample gain: `g0` at the block's start, `g[k]` at the end of chunk k
+    (`ends`), straight lines between."""
+    return np.interp(np.arange(1, n + 1), np.concatenate([[0], ends]),
+                     np.concatenate([[g0], g])).astype(F32)
+
+
 @register
 class Compressor(Effect):
-    """Block-wise peak compressor: gain is decided once per block and ramped across
-    it (fast attack, slow release), so there is no per-sample loop."""
+    """Peak compressor: the level is read every millisecond (not once per block, which
+    reacted late at big blocks and pumped at their edges), a 6 dB soft knee eases it
+    in, and the gain chases the target at the attack and release speeds, then runs
+    as straight lines between those points: no per-sample loop."""
 
     type = "compressor"
     name = "Compressor"
     description = "Evens out your volume: quiet words louder, shouting tamed."
     params = (Param("threshold", "Kicks in at", -40, 0, -20, " dB", 1),
               Param("ratio", "Squash", 1, 20, 4, ":1", 0.5),
-              Param("boost", "Boost", 0, 24, 6, " dB", 1))
+              Param("boost", "Boost", 0, 24, 6, " dB", 1),
+              Param("attack", "Attack", 0.5, 50, 4, " ms", 0.5, ("snappy", "soft")),
+              Param("release", "Release", 20, 1000, 150, " ms", 10, ("quick", "slow")))
 
-    ATTACK_S, RELEASE_S = 0.004, 0.15
+    KNEE_DB = 6.0
+    CHUNK_S = 0.001
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
         self.g = 1.0
         self.boost = 10 ** (self.p["boost"] / 20)
 
+    def _target(self, peak: np.ndarray) -> np.ndarray:
+        level = 20 * np.log10(peak + 1e-9)
+        over = level - self.p["threshold"]
+        slope = 1 - 1 / self.p["ratio"]
+        w = self.KNEE_DB
+        cut = np.where(over >= w / 2, over * slope,
+                       np.where(over > -w / 2, slope * (over + w / 2) ** 2 / (2 * w), 0.0))
+        return 10 ** (-cut / 20)
+
     def run(self, x, rate):
         n = len(x)
-        level = 20 * np.log10(float(np.max(np.abs(x))) + 1e-9)
-        over = level - self.p["threshold"]
-        target = 10 ** (-over * (1 - 1 / self.p["ratio"]) / 20) if over > 0 else 1.0
-        tau = self.ATTACK_S if target < self.g else self.RELEASE_S
-        g = target + (self.g - target) * np.exp(-n / (rate * tau))
-        ramp = np.linspace(self.g, g, n + 1, dtype=F32)[1:]
-        self.g = float(g)
         boost = 10 ** (self.p["boost"] / 20)
+        if n == 0:
+            self.boost = boost
+            return x
+        starts = _chunks(n, max(1, int(rate * self.CHUNK_S)))
+        ends = np.append(starts[1:], n)
+        peak = _per_chunk(np.abs(x), starts, np.maximum)
+        g = _envelope(self._target(peak), self.g, ends - starts, rate,
+                      self.p["attack"] / 1000, self.p["release"] / 1000)
+        ramp = _spread(self.g, g, ends, n)
+        self.g = float(g[-1])
         ramp *= _glide(self.boost, boost, n)
         self.boost = boost
         return x * ramp
@@ -996,6 +1080,9 @@ class Radio(Effect):
 
 @register
 class Distortion(Effect):
+    """tanh overdrive, bent at 4x the rate (_Oversampled) so the crunch is harmonics
+    of the voice and not aliasing fizz, then a tone lowpass."""
+
     type = "distortion"
     name = "Distortion"
     description = "Overdriven, crunchy voice."
@@ -1006,13 +1093,20 @@ class Distortion(Effect):
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
         self.lp = _Filter()
+        self.os = _Oversampled(rate)
         self.gains = (10 ** (self.p["drive"] / 20), self.p["level"])
+
+    def latency(self) -> float:
+        return self.os.latency(self.rate)
 
     def run(self, x, rate):
         g, level = 10 ** (self.p["drive"] / 20), self.p["level"]
         (g0, level0), n = self.gains, len(x)
         self.gains = (g, level)
-        y = np.tanh(x * _glide(g0, g, n)) * _glide(level0, level, n)
+        if n == 0:
+            return x
+        m = n * self.os.factor
+        y = self.os.run(x, lambda z: np.tanh(z * _glide(g0, g, m)) * _glide(level0, level, m))
         tone = self.p["tone"]
         return self.lp.run(y, tone, lambda: _one_pole_lowpass(tone, rate))
 
@@ -1279,6 +1373,133 @@ def _allpass(x, xh, yh, g):
     return out, xh, yh
 
 
+# --------------------------------------------------------------------------- polish
+
+@register
+class Polish(Effect):
+    """The last stage of a broadcast chain, after every other effect: a de-esser, a
+    touch of warmth and a lookahead limiter.
+
+    De-ess: the voice is split at 5 kHz (a Linkwitz-Riley pair: two matching
+    second-order filters each way, so the two halves add back up flat; a plain
+    highpass and "the rest" left most of an S in the rest), and whenever the top
+    (the hiss of an S, T or SH) gets louder than the voice's recent level allows,
+    only the top is turned down; the rest (the vowels) passes untouched, so it never
+    dulls the voice. Read every 2 ms, instant on, 30 ms back off. "Recent level" is
+    the rest's level with a slow fall (an S has no low end of its own to compare
+    against).
+
+    Warmth: a gentle tanh bend at 4x the rate (_Oversampled): soft odd harmonics on
+    the loud parts, the way a tube stage adds body, with no aliasing fizz. Made up
+    so a normal talking level stays where it was.
+
+    Limiter: nothing passes the ceiling. The gain is worked out LOOK_S ahead on a
+    copy of the signal while the signal itself waits that long, so the gain is
+    already down when a peak arrives (no overshoot, no clip). Per sample: a running
+    minimum over twice the lookahead, then a moving average over the lookahead,
+    which is at or under the gain the peak needs at every sample (the window the
+    average takes always contains the peak's minimum) and has no corners. A slow
+    50 ms release rides under that, so a held loud note doesn't flutter."""
+
+    type = "polish"
+    name = "Studio polish"
+    description = ("Tames harsh S sounds, adds warmth and keeps every peak under a "
+                   "ceiling. Runs last.")
+    params = (Param("deess", "De-ess", 0, 1, 0.5, "", 0, ("off", "strong")),
+              Param("warmth", "Warmth", 0, 1, 0.3, "", 0, ("clean", "warm")),
+              Param("ceiling", "Ceiling", -12, 0, -1, " dB", 0.5))
+
+    SPLIT_HZ = 5000.0
+    DEESS_CHUNK_S, DEESS_RELEASE_S = 0.002, 0.03
+    DEESS_FLOOR, DEESS_GATE = 0.25, 10 ** (-45 / 20)   # most it cuts; quietest top it reads
+    LEVEL_RISE_S, LEVEL_FALL_S = 0.005, 0.3            # the recent-level tracker
+    WARM_REF = 0.3                                     # a normal talking peak, kept level
+    LOOK_S, RELEASE_S = 0.0015, 0.05
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        hz = min(self.SPLIT_HZ, 0.45 * rate)
+        self.top_f, self.rest_f = _Filter(), _Filter()
+        self.top_sos = np.vstack([butter(2, hz, btype="high", fs=rate)] * 2).astype(F32)
+        self.rest_sos = np.vstack([butter(2, hz, btype="low", fs=rate)] * 2).astype(F32)
+        self.dg = 1.0                      # the de-esser's gain on the top
+        self.lvl = 0.0                     # the voice's recent level (its rest band)
+        self.os = _Oversampled(rate)
+        self.drive = 3 * self.p["warmth"]
+        self.look = max(1, int(rate * self.LOOK_S))
+        self._held = np.zeros(self.look, F32)            # the signal waiting its turn
+        self._need = np.ones(2 * self.look - 1, F32)     # gains needed, for the running min
+        self._mins = np.ones(self.look - 1, F32)         # those minima, for the average
+        self.lg = 1.0                                    # the limiter's slow release
+
+    def latency(self) -> float:
+        return self.look / self.rate + self.os.latency(self.rate)
+
+    def _deess(self, x: np.ndarray, rate: int) -> np.ndarray:
+        amount = self.p["deess"]
+        n = len(x)
+        top = self.top_f.run(x, "top", lambda: self.top_sos)
+        rest = self.rest_f.run(x, "rest", lambda: self.rest_sos)
+        if not amount and self.dg == 1.0:
+            return rest + top
+        starts = _chunks(n, max(1, int(rate * self.DEESS_CHUNK_S)))
+        ends = np.append(starts[1:], n)
+        m = ends - starts
+        hi = np.sqrt(_per_chunk(top * top, starts, np.add) / m)
+        lo = np.sqrt(_per_chunk(rest * rest, starts, np.add) / m)
+        lvl = _envelope(lo, self.lvl, m, rate, self.LEVEL_RISE_S, self.LEVEL_FALL_S)
+        self.lvl = float(lvl[-1])
+        # the top may be this much of the voice's level before it's an S
+        allow = 10 ** ((-3 - 12 * amount) / 20) if amount else 1e9
+        need = np.minimum(1.0, allow * lvl / (hi + 1e-9))
+        need = np.where(hi < self.DEESS_GATE, 1.0, np.maximum(need, self.DEESS_FLOOR))
+        g = _envelope(need, self.dg, m, rate, 1e-4, self.DEESS_RELEASE_S)
+        ramp = _spread(self.dg, g, ends, n)
+        self.dg = float(g[-1])
+        return rest + top * ramp
+
+    @classmethod
+    def _bend(cls, z: np.ndarray, d) -> np.ndarray:
+        """tanh(d z) / d, made up so WARM_REF stays at WARM_REF; at d -> 0 it's z."""
+        d = np.maximum(d, 1e-3)
+        r = cls.WARM_REF
+        return np.tanh(z * d) * (r / np.tanh(r * d))
+
+    def _warm(self, x: np.ndarray) -> np.ndarray:
+        d = 3 * self.p["warmth"]
+        d0, self.drive = self.drive, d
+        m = len(x) * self.os.factor
+        dd = _glide(d0, d, m)
+        return self.os.run(x, lambda z: self._bend(z, dd))
+
+    def _limit(self, x: np.ndarray, rate: int) -> np.ndarray:
+        n, look = len(x), self.look
+        c = 10 ** (self.p["ceiling"] / 20)
+        need = np.minimum(1.0, c / (np.abs(x) + 1e-9)).astype(F32)
+        seq = np.concatenate([self._need, need])
+        mins = running_min(seq, 2 * look) if look > 1 else need
+        self._need = seq[-(2 * look - 1):] if look > 1 else self._need
+        seq = np.concatenate([self._mins, mins])
+        gain = np.convolve(seq, np.full(look, 1 / look, F32), "valid") if look > 1 else mins
+        if look > 1:
+            self._mins = seq[-(look - 1):]
+        # the slow release: per lookahead-chunk minima, chased, never above `gain`
+        starts = _chunks(n, look)
+        ends = np.append(starts[1:], n)
+        slow = _envelope(_per_chunk(gain, starts, np.minimum), self.lg, ends - starts, rate,
+                         1e-5, self.RELEASE_S)
+        gain = np.minimum(gain, _spread(self.lg, slow, ends, n))
+        self.lg = float(slow[-1])
+        held = np.concatenate([self._held, x])
+        self._held = held[-look:]
+        return np.clip(held[:n] * gain, -c, c).astype(F32, copy=False)
+
+    def run(self, x, rate):
+        if len(x) == 0:
+            return x
+        return self._limit(self._warm(self._deess(x, rate)), rate)
+
+
 # --------------------------------------------------------------------------- presets
 
 # name -> the effects that are on, with their settings (everything else is off).
@@ -1364,8 +1585,18 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Cave":              {"tone": {"bass": 2, "presence": 0, "treble": -3},
                           "echo": {"delay": 350, "feedback": 0.4, "mix": 0.3, "tone": 2500},
                           "reverb": {"size": 0.95, "tone": 3000, "mix": 0.4}},
-    "Podcast voice":     {"compressor": {"threshold": -22, "ratio": 3, "boost": 5},
-                          "tone": {"bass": 3, "presence": 3, "treble": 1}},
+    # a chanting monk: every word held on a note (hard autotune), a big slow throat,
+    # a slow wobble like a held chant, the top rolled off, in a temple hall
+    "Chanting monk":     {"pitch": {"semitones": -2, "natural": 1, "size": 4, "tune": 1},
+                          "compressor": {"threshold": -26, "ratio": 5, "boost": 8,
+                                         "attack": 10, "release": 300},
+                          "tone": {"bass": 2, "mid": 4, "presence": -2, "treble": -6},
+                          "chorus": {"rate": 5.5, "depth": 2, "mix": 0.35},
+                          "reverb": {"size": 0.9, "tone": 3500, "mix": 0.35}},
+    "Podcast voice":     {"compressor": {"threshold": -22, "ratio": 3, "boost": 5,
+                                         "attack": 8, "release": 120},
+                          "tone": {"bass": 3, "presence": 3, "treble": 1},
+                          "polish": {"deess": 0.5, "warmth": 0.3, "ceiling": -1}},
 }
 
 PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵", "Male voice": "👨",
@@ -1374,7 +1605,7 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Dark lord": "⛑️",
                 "Hothead": "😡", "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻",
                 "Old telephone": "☎️", "Megaphone": "📢", "Stadium announcer": "🏟️",
-                "Cave": "🦇", "Podcast voice": "🎙️"}
+                "Cave": "🦇", "Chanting monk": "🧘", "Podcast voice": "🎙️"}
 
 
 # --------------------------------------------------------------------------- shown text
@@ -1424,6 +1655,10 @@ def shown_texts() -> dict[str, str]:
             _("Repeating echo, from slapback to canyon."),
         "Reverb": _("Reverb"),
         "Room, hall or cave.": _("Room, hall or cave."),
+        "Studio polish": _("Studio polish"),
+        "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.":
+            _("Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. "
+              "Runs last."),
         # settings
         "Noise gate": _("Noise gate"),
         "Hiss removal": _("Hiss removal"),
@@ -1441,6 +1676,11 @@ def shown_texts() -> dict[str, str]:
         "Kicks in at": _("Kicks in at"),
         "Squash": _("Squash"),
         "Boost": _("Boost"),
+        "Attack": _("Attack"),
+        "Release": _("Release"),
+        "De-ess": _("De-ess"),
+        "Warmth": _("Warmth"),
+        "Ceiling": _("Ceiling"),
         "Bass": _("Bass"),
         "Mid": _("Mid"),
         "Presence": _("Presence"),
@@ -1473,6 +1713,7 @@ def shown_texts() -> dict[str, str]:
         "together": _("together"),
         "echo": _("echo"),
         "clear": _("clear"),
+        "clean": _("clean"),
         "blurry": _("blurry"),
         "new voice only": _("new voice only"),
         "mine too": _("mine too"),
@@ -1484,6 +1725,11 @@ def shown_texts() -> dict[str, str]:
         "yell": _("yell"),
         "tin can": _("tin can"),
         "big helmet": _("big helmet"),
+        "snappy": _("snappy"),
+        "soft": _("soft"),
+        "quick": _("quick"),
+        "slow": _("slow"),
+        "warm": _("warm"),
         # voices (PRESETS: their English names are what settings and share codes keep)
         "Chipmunk": _("Chipmunk"),
         "Deep voice": _("Deep voice"),
@@ -1498,6 +1744,7 @@ def shown_texts() -> dict[str, str]:
         "Hothead": _("Hothead"),
         "Alien": _("Alien"),
         "Ghost": _("Ghost"),
+        "Chanting monk": _("Chanting monk"),
         "Walkie-talkie": _("Walkie-talkie"),
         "Old telephone": _("Old telephone"),
         "Megaphone": _("Megaphone"),

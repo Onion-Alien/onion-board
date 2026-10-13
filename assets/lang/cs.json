@@ -3416,5 +3416,19 @@
   "New subcategory in {cat}": "Nová podkategorie v {cat}",
   "Put its categories in one tab": "Dát jeho kategorie do jedné karty",
   "Rename subcategory": "Přejmenovat podkategorii",
-  "✓ “{name}” is one tab now": "✓ „{name}“ je teď jedna karta"
+  "✓ “{name}” is one tab now": "✓ „{name}“ je teď jedna karta",
+  "Attack": "Náběh",
+  "Ceiling": "Strop",
+  "Chanting monk": "Zpívající mnich",
+  "De-ess": "De-esser",
+  "Release": "Doznívání",
+  "Studio polish": "Studiový finiš",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Zkrotí ostré sykavky, přidá teplo a drží každou špičku pod stropem. Běží jako poslední.",
+  "Warmth": "Teplo",
+  "quick": "rychle",
+  "slow": "pomalu",
+  "snappy": "ostře",
+  "soft": "měkce",
+  "warm": "teple",
+  "clean": "čistě"
 }
