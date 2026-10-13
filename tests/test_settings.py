@@ -17,6 +17,20 @@ from soundboard.ui import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
+def test_saved_clip_retention_setting_persists(window, qapp):  # noqa: F811
+    window.open_settings("tabs")
+    qapp.processEvents()
+    d = window._settings_dlg
+    assert not d.keep_clips.isChecked()
+    d.keep_clips.click()
+    assert window.cfg.app_clips_keep_forever
+    window.cfg.save()
+    from soundboard.library import Config
+    assert Config.load().app_clips_keep_forever
+    d.keep_clips.click()
+    assert not window.cfg.app_clips_keep_forever
+
+
 @contextmanager
 def windows_shown():
     """The class names of the windows shown meanwhile (a widget shown before it has a

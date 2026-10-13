@@ -1736,6 +1736,14 @@ class SettingsDialog(QDialog):
         cv.addWidget(self.tabs_offline_note)
         v.addWidget(card)
         self._offline_sync()
+        card, cv = self._card(_("Saved clips"))
+        self.keep_clips = self._option(
+            cv, _("Keep forever"),
+            _("Otherwise, clips are removed after 7 days without previewing, sending, copying, "
+              "renaming or adding them to Sounds."),
+            self.mw.cfg.app_clips_keep_forever,
+            lambda on: self.mw.set_option("app_clips_keep_forever", on))
+        v.addWidget(card)
         v.addStretch(1)
         return w
 

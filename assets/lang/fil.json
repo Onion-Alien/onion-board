@@ -1979,7 +1979,6 @@
   "Ran out of memory. Close some programs and try again.": "Naubusan ng memorya. Isara ang ilang program at subukang muli.",
   "Randomize": "I-randomize",
   "Recognition": "Pagkilala",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "I-record ang program na ito: hinihintay nitong gumawa ng tunog ang program, pagkatapos ay i-record hanggang sa mag-click ka muli, at idinagdag ang clip sa iyong Mga Tunog. Walang makakarinig nito maliban kung naka-on ang Send.",
   "Record {name}": "Itala si {name}",
   "Redo": "Gawin muli",
   "Refresh": "I-refresh",
@@ -2010,7 +2009,6 @@
   "Room": "Kwarto",
   "Room, hall or cave.": "Kwarto, bulwagan o kuweba.",
   "Save as a voice": "I-save bilang isang boses",
-  "Save clip": "I-save ang clip",
   "Saved clips": "Naka-save na mga clip",
   "Saved clips ({n})": "Mga naka-save na clip ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2457,7 +2455,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Inalis ang Onion Watch. Ang iyong mga trigger ay pinananatili.",
   "✓ Opened Windows settings": "✓ Binuksan ang mga setting ng Windows",
   "✓ Saved": "✓ Nai-save",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Nag-save ng {seconds} s clip sa iyong Sounds.",
   "✓ Saved “{name}”: loading its voices…": "✓ Naka-save na “{name}”: nilo-load ang mga boses nito...",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} voice found: {voice} speaks from the next line on.",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Minimised: last picture": "Naka-minimize: huling larawan",
   "Minimised: restore for live updates": "Naka-minimize: i-restore para sa live na larawan",
   "Drag to resize saved clips. Double-click to fit the clips.": "I-drag para baguhin ang laki ng mga naka-save na clip. I-double-click para magkasya ang mga clip.",
+  "By app": "Ayon sa app",
+  "By day": "Ayon sa araw",
+  "Created": "Ginawa",
+  "Find clips": "Maghanap ng clip",
+  "Group clips": "Igrupo ang mga clip",
+  "Keep forever": "Itago habambuhay",
+  "Newest first": "Pinakabago muna",
+  "No matching clips": "Walang katugmang clip",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Kung hindi, aalisin ang mga clip matapos ang 7 araw na walang preview, pagpapadala, pagkopya, pagpapalit ng pangalan o pagdagdag sa Mga tunog.",
+  "Removed inactive clips: {n}": "Inalis na mga hindi ginagamit na clip: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "I-record ang app na ito sa Mga naka-save na clip. I-click muli para matapos. Walang makakarinig nito maliban kung naka-on ang Ipadala.",
+  "Save to clips": "I-save sa mga clip",
+  "Show clips": "Ipakita ang mga clip",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ang huling minuto ng programang ito bilang waveform: pumili ng bahagi nito at itago ito bilang clip. Nakikinig lang ito habang bukas."
 }

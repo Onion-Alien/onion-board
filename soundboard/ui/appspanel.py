@@ -622,9 +622,8 @@ class AppRow(HoverCard):
         self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
-        self.btn_rec.setToolTip(_("Record this program: it waits for the program to make a "
-                                  "sound, then records until you click again, and the clip is "
-                                  "added to your Sounds. Nobody hears it unless Send is on."))
+        self.btn_rec.setToolTip(_("Record this program to Saved clips. Click again to finish. "
+                                  "Nobody hears it unless Send is on."))
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(lambda on: self.rec_toggled.emit(self, on))
         for b in (self.btn_send, self.btn_rec):
@@ -1738,15 +1737,17 @@ class AppsTab(QWidget):
             busy.toast(self, html.escape(_("Couldn't save the clip: {error}", error=error)),
                        "error")
             return
-        busy.toast(self, _("✓ Saved a {seconds}s clip to your Sounds.",
-                           seconds=f"{len(data) / SR:.1f}"), "ok")
+        self._kept_clip(data)
 
     def _add_clip(self, row: AppRow, data) -> str:
-        """Hand a clip to the window to become a sound; why it couldn't, or ""."""
+        """Keep a recording in Saved clips; why it couldn't, or ""."""
         name = (row.app.name if row.app else row.name.text())[:30] or _("App")
-        self.clip_error = ""
-        self.clip_ready.emit(data, f"{name} {time.strftime('%H.%M.%S')}")
-        return self.clip_error
+        try:
+            self.shelf.add(data, f"{name} {time.strftime('%H.%M.%S')}", name)
+        except Exception as e:  # noqa: BLE001 - failed audio encoding or disk writes
+            log.exception("can't keep recording")
+            return errors.plain(e)
+        return ""
 
     # ------------------------------------------------------------------ clip editor
     # Opt-in per card: nothing is built, kept or drawn until its Clip editor is
@@ -1810,9 +1811,19 @@ class AppsTab(QWidget):
             return
         if row.editor is not None:
             row.editor.go_live()
+        self._kept_clip(data)
+
+    def _kept_clip(self, data):
         busy.toast(self, _("✓ Kept {seconds}s in Saved clips below: double-click plays it, "
                            "right-click adds it to your Sounds.",
-                           seconds=f"{len(data) / SR:.2f}"), "ok")
+                           seconds=f"{len(data) / SR:.2f}"), "ok",
+                   action=(_("Show clips"), self._show_clips))
+
+    def _show_clips(self):
+        self.shelf.title.setChecked(True)
+        self.list_layout.activate()
+        self.scroll_area.ensureWidgetVisible(self.shelf)
+        self.shelf.list.setFocus()
 
     def _shelf_to_sounds(self, data, name: str):
         self.clip_error = ""

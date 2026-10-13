@@ -730,7 +730,7 @@ def test_hidden_tab_picks_up_a_remembered_program_on_the_next_check(tab, qapp, m
     assert check() == 0                            # picked up: back to the walk only
 
 
-def test_record_waits_for_sound_then_adds_a_clip_without_sending(tab, monkeypatch, tmp_path):
+def test_record_waits_for_sound_then_keeps_a_clip_without_sending(tab, monkeypatch, tmp_path):
     monkeypatch.setattr(appspanel.library, "APP_DIR", tmp_path)
     clips = []
     tab.clip_ready.connect(lambda data, name: clips.append((data, name)))
@@ -750,14 +750,19 @@ def test_record_waits_for_sound_then_adds_a_clip_without_sending(tab, monkeypatc
     assert row.rec.triggered and row.btn_rec.text().startswith("Stop")
 
     row.btn_rec.setChecked(False)                # click again: the clip is handed over
-    assert len(clips) == 1
-    data, name = clips[0]
+    assert not clips
+    assert len(tab.shelf.shelf.clips) == 1
+    c = tab.shelf.shelf.clips[0]
+    data, name = c.audio(), c.name
     assert name.startswith("Music ")
     assert 0.9 * appspanel.SR < len(data) < 1.4 * appspanel.SR   # the silence isn't in it
     from soundboard.ui import toast
     assert cap.stopped and row.capture is None
     assert any("Saved" in t.words() and t.kind == "ok" for t in toast.shown(tab))
-    assert not list(tmp_path.iterdir())          # the spool file is gone
+    assert not list(tmp_path.glob("app-recording-*.tmp.wav"))  # the spool file is gone
+    assert c.src == row.app.name
+    tab.shelf.btn_add.click()
+    assert len(clips) == 1 and clips[0][1] == c.name
 
 
 def test_record_that_never_hears_anything_saves_nothing(tab, monkeypatch, tmp_path):
@@ -772,6 +777,20 @@ def test_record_that_never_hears_anything_saves_nothing(tab, monkeypatch, tmp_pa
     from soundboard.ui import toast
     assert clips == []
     assert any("didn't make a sound" in t.words() for t in toast.shown(tab))
+
+
+def test_failed_record_save_does_not_claim_success(tab, monkeypatch):
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    def fail(*args):
+        raise OSError("disk full")
+    monkeypatch.setattr(tab.shelf, "add", fail)
+    row.btn_rec.setChecked(True)
+    row.capture.sink(np.full((48000, 2), 0.3, np.float32))
+    row.btn_rec.setChecked(False)
+    from soundboard.ui import toast
+    assert not tab.shelf.shelf.clips
+    assert any("Couldn't save the clip" in t.words() for t in toast.shown(tab))
 
 
 def test_record_and_send_share_one_capture(tab, monkeypatch, tmp_path):

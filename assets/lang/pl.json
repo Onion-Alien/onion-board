@@ -2026,7 +2026,6 @@
   "Ran out of memory. Close some programs and try again.": "Zabrakło pamięci. Zamknij niektóre programy i spróbuj ponownie.",
   "Randomize": "Losuj",
   "Recognition": "Uznanie",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Nagraj ten program: czeka, aż program wyda dźwięk, następnie nagrywa, aż ponownie klikniesz, a klip zostanie dodany do Twoich dźwięków. Nikt tego nie słyszy, chyba że funkcja Wyślij jest włączona.",
   "Record {name}": "Rekord {name}",
   "Redo": "Przerobić",
   "Refresh": "Odświeżać",
@@ -2058,7 +2057,6 @@
   "Room": "Pokój",
   "Room, hall or cave.": "Pokój, korytarz lub jaskinia.",
   "Save as a voice": "Zapisz jako głos",
-  "Save clip": "Zapisz klip",
   "Saved clips": "Zapisane klipy",
   "Saved clips ({n})": "Zapisane klipy ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2509,7 +2507,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Usunięto zegarek cebulowy. Twoje wyzwalacze zostaną zachowane.",
   "✓ Opened Windows settings": "✓ Otwarte ustawienia systemu Windows",
   "✓ Saved": "✓ Zapisano",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Zapisano klip trwający {seconds} w Twoich dźwiękach.",
   "✓ Saved “{name}”: loading its voices…": "✓ Zapisano „{name}”: ładowanie jego głosów…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Znaleziono głos w języku {language} : {voice} mówi od następnego wiersza.",
   "✓ {n} voice": [
@@ -3389,5 +3386,18 @@
   "Minimised: last picture": "Zminimalizowane: ostatni obraz",
   "Minimised: restore for live updates": "Zminimalizowane: przywróć, aby oglądać na żywo",
   "Drag to resize saved clips. Double-click to fit the clips.": "Przeciągnij, aby zmienić rozmiar zapisanych klipów. Kliknij dwukrotnie, aby dopasować do klipów.",
+  "By app": "Według aplikacji",
+  "By day": "Według dnia",
+  "Created": "Utworzono",
+  "Find clips": "Znajdź klipy",
+  "Group clips": "Grupuj klipy",
+  "Keep forever": "Zachowaj na zawsze",
+  "Newest first": "Najnowsze najpierw",
+  "No matching clips": "Brak pasujących klipów",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "W przeciwnym razie klipy są usuwane po 7 dniach bez odsłuchiwania, wysyłania, kopiowania, zmiany nazwy lub dodawania do Dźwięków.",
+  "Removed inactive clips: {n}": "Usunięte nieaktywne klipy: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Nagraj tę aplikację do Zapisanych klipów. Kliknij ponownie, aby zakończyć. Nikt jej nie słyszy, jeśli Wysyłanie jest wyłączone.",
+  "Save to clips": "Zapisz w klipach",
+  "Show clips": "Pokaż klipy",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ostatnia minuta tego programu jako fala dźwiękowa: wybierz z niej fragment i zachowaj go jako klip. Słucha tylko, gdy jest otwarty."
 }

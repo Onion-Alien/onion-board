@@ -1979,7 +1979,6 @@
   "Ran out of memory. Close some programs and try again.": "Se quedó sin memoria. Cierra algunos programas y vuelve a intentarlo.",
   "Randomize": "Aleatorizar",
   "Recognition": "Reconocimiento",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "Graba este programa: espera a que el programa emita un sonido, luego graba hasta que vuelves a hacer clic y el clip se agrega a tus Sonidos. Nadie lo escucha a menos que Enviar esté activado.",
   "Record {name}": "Grabar {name}",
   "Redo": "Rehacer",
   "Refresh": "Refrescar",
@@ -2010,7 +2009,6 @@
   "Room": "Habitación",
   "Room, hall or cave.": "Habitación, salón o cueva.",
   "Save as a voice": "Guardar como voz",
-  "Save clip": "Guardar clip",
   "Saved clips": "Vídeos guardados",
   "Saved clips ({n})": "Clips guardados ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2457,7 +2455,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Se eliminó Onion Watch. Tus factores desencadenantes se conservan.",
   "✓ Opened Windows settings": "✓ Configuración de Windows abierta",
   "✓ Saved": "✓ Guardado",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ Guardó un clip de {seconds} en sus sonidos.",
   "✓ Saved “{name}”: loading its voices…": "✓ Guardado “{name}”: cargando sus voces…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Voz {language} encontrada: {voice} habla desde la siguiente línea en adelante.",
   "✓ {n} voice": [
@@ -3315,5 +3312,18 @@
   "Minimised: last picture": "Minimizada: última imagen",
   "Minimised: restore for live updates": "Minimizada: restaura para ver cambios en vivo",
   "Drag to resize saved clips. Double-click to fit the clips.": "Arrastra para cambiar el tamaño de los clips guardados. Haz doble clic para ajustarlo a los clips.",
+  "By app": "Por app",
+  "By day": "Por día",
+  "Created": "Creado",
+  "Find clips": "Buscar clips",
+  "Group clips": "Agrupar clips",
+  "Keep forever": "Guardar para siempre",
+  "Newest first": "Más recientes primero",
+  "No matching clips": "No hay clips coincidentes",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "Si no, los clips se eliminan tras 7 días sin previsualizarlos, enviarlos, copiarlos, renombrarlos o agregarlos a Sonidos.",
+  "Removed inactive clips: {n}": "Clips inactivos eliminados: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Graba esta app en Clips guardados. Haz clic de nuevo para terminar. Nadie la oye a menos que Enviar esté activado.",
+  "Save to clips": "Guardar en clips",
+  "Show clips": "Ver clips",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "El último minuto de este programa como forma de onda: elige un trozo y guárdalo como clip. Solo escucha mientras está abierto."
 }

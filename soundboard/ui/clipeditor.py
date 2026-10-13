@@ -363,7 +363,7 @@ class ClipEditor(QWidget):
             bar.addWidget(b)
             return b
 
-        self.btn_save = button(_("Save clip"), "plus",
+        self.btn_save = button(_("Save to clips"), "plus",
                                _("Keep the selection in Saved clips, under the cards "
                                  "(Enter). From there: play it, name it, or add it to "
                                  "your Sounds."), self.save, "primary")

@@ -1936,7 +1936,6 @@
   "Ran out of memory. Close some programs and try again.": "メモリが不足しました。いくつかのプログラムを閉じて、もう一度試してください。",
   "Randomize": "ランダム化",
   "Recognition": "認識",
-  "Record this program: it waits for the program to make a sound, then records until you click again, and the clip is added to your Sounds. Nobody hears it unless Send is on.": "このプログラムを録音します。プログラムがサウンドを発するのを待ち、再度クリックするまで録音し、クリップがサウンドに追加されます。 Send がオンになっていない限り、誰もそれを聞きません。",
   "Record {name}": "レコード{name}",
   "Redo": "やり直し",
   "Refresh": "リフレッシュ",
@@ -1966,7 +1965,6 @@
   "Room": "部屋",
   "Room, hall or cave.": "部屋、ホール、洞窟。",
   "Save as a voice": "音声として保存",
-  "Save clip": "クリップの保存",
   "Saved clips": "保存されたクリップ",
   "Saved clips ({n})": "保存されたクリップ ({n})",
   "Saved voices you deleted, kept for {n} day so you can bring them back": [
@@ -2405,7 +2403,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ オニオンウォッチが削除されました。トリガーは保持されます。",
   "✓ Opened Windows settings": "✓ Windows 設定を開いた",
   "✓ Saved": "✓ 保存済み",
-  "✓ Saved a {seconds}s clip to your Sounds.": "✓ {seconds}秒のクリップをサウンドに保存しました。",
   "✓ Saved “{name}”: loading its voices…": "✓ 保存された「{name}」：音声をロード中…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language}音声が見つかりました: {voice}は次の行から話します。",
   "✓ {n} voice": [
@@ -3241,5 +3238,18 @@
   "Minimised: last picture": "最小化中：最後の画像",
   "Minimised: restore for live updates": "最小化中：元に戻すと映像が更新されます",
   "Drag to resize saved clips. Double-click to fit the clips.": "ドラッグして保存済みクリップの表示サイズを変更。ダブルクリックでクリップに合わせます。",
+  "By app": "アプリ別",
+  "By day": "日付別",
+  "Created": "作成日",
+  "Find clips": "クリップを検索",
+  "Group clips": "クリップをグループ化",
+  "Keep forever": "無期限に保存",
+  "Newest first": "新しい順",
+  "No matching clips": "一致するクリップはありません",
+  "Otherwise, clips are removed after 7 days without previewing, sending, copying, renaming or adding them to Sounds.": "それ以外の場合、プレビュー、送信、コピー、名前の変更、サウンドへの追加が7日間なかったクリップは削除されます。",
+  "Removed inactive clips: {n}": "削除された未使用クリップ: {n}",
+  "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "このアプリの音声を保存済みクリップに録音します。もう一度クリックすると終了します。送信がオンでない限り、誰にも聞こえません。",
+  "Save to clips": "クリップに保存",
+  "Show clips": "クリップを表示",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "このプログラムの直近1分間を波形で表示：一部を選んでクリップとして保存できます。開いている間だけ聞き取ります。"
 }

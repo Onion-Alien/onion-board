@@ -174,7 +174,7 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
-NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view")
+NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view", "app_clip_group")
 # the Sounds tab's orders: as dragged, A-Z, the newest first, the most played first
 PAD_SORTS = ("custom", "name", "newest", "plays")
 PAD_VIEWS = ("grid", "list")
@@ -220,6 +220,8 @@ def clean_setting(k: str, v):
         return v if v in PAD_SORTS else "custom"
     if k == "pad_view":
         return v if v in PAD_VIEWS else "grid"
+    if k == "app_clip_group":
+        return v if v in ("newest", "app", "day") else "app"
     if k == "category_colors":   # {category: "#rrggbb"}; anything else is dropped
         return {c: col for c, col in v.items() if isinstance(c, str) and isinstance(col, str)
                 and re.fullmatch(r"#[0-9a-fA-F]{6}", col)}
@@ -395,6 +397,9 @@ class Config:
     pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
     app_card_width: int = 300
     app_clip_height: int = 0   # saved clips: 0 fits the rows, otherwise the dragged height
+    app_clip_group: str = "app"   # saved clips grouped by app, day, or newest first
+    app_clips_expanded: bool = True   # fold the saved clips down to their header
+    app_clips_keep_forever: bool = False   # otherwise expire after seven inactive days
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
