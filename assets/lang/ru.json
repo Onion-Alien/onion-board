@@ -3399,5 +3399,19 @@
   "Removed inactive clips: {n}": "Удалено неиспользуемых клипов: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Запиши звук этого приложения в Сохранённые клипы. Нажми ещё раз, чтобы закончить. Никто его не слышит, если Отправка выключена.",
   "Save to clips": "Сохранить в клипы",
-  "Show clips": "Показать клипы"
+  "Show clips": "Показать клипы",
+  "Attack": "Атака",
+  "Ceiling": "Потолок",
+  "Chanting monk": "Поющий монах",
+  "De-ess": "Де-эссер",
+  "Release": "Спад",
+  "Studio polish": "Студийная шлифовка",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Смягчает резкие «С», добавляет теплоты и держит каждый пик ниже потолка. Работает последним.",
+  "Warmth": "Теплота",
+  "quick": "быстро",
+  "slow": "медленно",
+  "snappy": "резко",
+  "soft": "мягко",
+  "warm": "тепло",
+  "clean": "чисто"
 }

@@ -3251,5 +3251,19 @@
   "Removed inactive clips: {n}": "Klip tidak aktif yang dihapus: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Rekam aplikasi ini ke Klip tersimpan. Klik lagi untuk selesai. Tidak ada yang mendengarnya kecuali Kirim aktif.",
   "Save to clips": "Simpan ke klip",
-  "Show clips": "Tampilkan klip"
+  "Show clips": "Tampilkan klip",
+  "Attack": "Attack",
+  "Ceiling": "Batas atas",
+  "Chanting monk": "Biksu bersenandung",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Sentuhan studio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Menjinakkan bunyi S yang tajam, menambah kehangatan dan menjaga setiap puncak di bawah batas. Berjalan terakhir.",
+  "Warmth": "Kehangatan",
+  "quick": "cepat",
+  "slow": "lambat",
+  "snappy": "tangkas",
+  "soft": "lembut",
+  "warm": "hangat",
+  "clean": "bersih"
 }

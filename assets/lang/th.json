@@ -3251,5 +3251,19 @@
   "Removed inactive clips: {n}": "คลิปที่ไม่ได้ใช้งานที่ถูกลบ: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "บันทึกเสียงจากแอปนี้ลงในคลิปที่บันทึกไว้ คลิกอีกครั้งเพื่อจบ ไม่มีใครได้ยินเว้นแต่จะเปิดส่ง",
   "Save to clips": "บันทึกลงในคลิป",
-  "Show clips": "แสดงคลิป"
+  "Show clips": "แสดงคลิป",
+  "Attack": "อะแทค",
+  "Ceiling": "เพดาน",
+  "Chanting monk": "พระสวดมนต์",
+  "De-ess": "ลดเสียง S",
+  "Release": "รีลีส",
+  "Studio polish": "ขัดเงาแบบสตูดิโอ",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "ลดเสียง S ที่แหลมคม เพิ่มความอบอุ่น และกดทุกพีคให้อยู่ใต้เพดาน ทำงานเป็นตัวสุดท้าย",
+  "Warmth": "ความอบอุ่น",
+  "quick": "เร็ว",
+  "slow": "ช้า",
+  "snappy": "ฉับไว",
+  "soft": "นุ่ม",
+  "warm": "อบอุ่น",
+  "clean": "สะอาด"
 }

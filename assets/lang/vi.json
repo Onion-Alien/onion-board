@@ -3251,5 +3251,19 @@
   "Removed inactive clips: {n}": "Đoạn không hoạt động đã xóa: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Ghi âm ứng dụng này vào Các đoạn đã lưu. Nhấp lại để kết thúc. Không ai nghe thấy nếu chưa bật Gửi.",
   "Save to clips": "Lưu vào đoạn âm thanh",
-  "Show clips": "Xem đoạn âm thanh"
+  "Show clips": "Xem đoạn âm thanh",
+  "Attack": "Attack",
+  "Ceiling": "Trần",
+  "Chanting monk": "Nhà sư tụng kinh",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Hoàn thiện phòng thu",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Làm dịu âm S chói, thêm độ ấm và giữ mọi đỉnh dưới mức trần. Chạy sau cùng.",
+  "Warmth": "Độ ấm",
+  "quick": "nhanh",
+  "slow": "chậm",
+  "snappy": "gọn",
+  "soft": "mềm",
+  "warm": "ấm",
+  "clean": "sạch"
 }

@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Eltávolított inaktív klipek: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Rögzítsd ezt az alkalmazást a Mentett klipek közé. A befejezéshez kattints újra. Senki sem hallja, ha a Küldés nincs bekapcsolva.",
   "Save to clips": "Mentés a klipekhez",
-  "Show clips": "Klipek megjelenítése"
+  "Show clips": "Klipek megjelenítése",
+  "Attack": "Felfutás",
+  "Ceiling": "Plafon",
+  "Chanting monk": "Éneklő szerzetes",
+  "De-ess": "De-esser",
+  "Release": "Lecsengés",
+  "Studio polish": "Stúdió csiszolás",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Megszelídíti az éles S hangokat, meleget ad és minden csúcsot a plafon alatt tart. Utolsóként fut.",
+  "Warmth": "Melegség",
+  "quick": "gyors",
+  "slow": "lassú",
+  "snappy": "pattogós",
+  "soft": "lágy",
+  "warm": "meleg",
+  "clean": "tiszta"
 }

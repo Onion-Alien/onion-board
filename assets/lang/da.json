@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Fjernede inaktive klip: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Optag denne app i Gemte klip. Klik igen for at afslutte. Ingen hører den, medmindre Send er slået til.",
   "Save to clips": "Gem i klip",
-  "Show clips": "Vis klip"
+  "Show clips": "Vis klip",
+  "Attack": "Anslag",
+  "Ceiling": "Loft",
+  "Chanting monk": "Syngende munk",
+  "De-ess": "De-esser",
+  "Release": "Slip",
+  "Studio polish": "Studiefinish",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Tæmmer skarpe S-lyde, tilføjer varme og holder hver top under loftet. Kører sidst.",
+  "Warmth": "Varme",
+  "quick": "hurtig",
+  "slow": "langsom",
+  "snappy": "kvik",
+  "soft": "blød",
+  "warm": "varm",
+  "clean": "ren"
 }

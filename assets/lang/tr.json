@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Kaldırılan kullanılmayan klipler: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Bu uygulamayı Kaydedilen kliplere kaydet. Bitirmek için tekrar tıkla. Gönder açık değilse kimse duymaz.",
   "Save to clips": "Kliplere kaydet",
-  "Show clips": "Klipleri göster"
+  "Show clips": "Klipleri göster",
+  "Attack": "Atak",
+  "Ceiling": "Tavan",
+  "Chanting monk": "İlahi söyleyen keşiş",
+  "De-ess": "De-esser",
+  "Release": "Bırakma",
+  "Studio polish": "Stüdyo cilası",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Keskin S seslerini yumuşatır, sıcaklık katar ve her tepeyi tavanın altında tutar. En son çalışır.",
+  "Warmth": "Sıcaklık",
+  "quick": "hızlı",
+  "slow": "yavaş",
+  "snappy": "sert",
+  "soft": "yumuşak",
+  "warm": "sıcak",
+  "clean": "temiz"
 }

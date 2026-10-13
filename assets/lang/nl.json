@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Inactieve clips verwijderd: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Neem deze app op in Opgeslagen clips. Klik opnieuw om te stoppen. Niemand hoort de app tenzij Versturen aanstaat.",
   "Save to clips": "Opslaan in clips",
-  "Show clips": "Clips tonen"
+  "Show clips": "Clips tonen",
+  "Attack": "Attack",
+  "Ceiling": "Plafond",
+  "Chanting monk": "Zingende monnik",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Studio-afwerking",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Temt scherpe S-klanken, voegt warmte toe en houdt elke piek onder het plafond. Draait als laatste.",
+  "Warmth": "Warmte",
+  "quick": "snel",
+  "slow": "traag",
+  "snappy": "strak",
+  "soft": "zacht",
+  "warm": "warm",
+  "clean": "schoon"
 }

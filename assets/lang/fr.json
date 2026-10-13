@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Clips inactifs supprimés : {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Enregistre cette appli dans Clips enregistrés. Clique à nouveau pour terminer. Personne ne l’entend sauf si Envoyer est activé.",
   "Save to clips": "Enregistrer dans Clips",
-  "Show clips": "Voir les clips"
+  "Show clips": "Voir les clips",
+  "Attack": "Attaque",
+  "Ceiling": "Plafond",
+  "Chanting monk": "Moine chantant",
+  "De-ess": "Dé-esseur",
+  "Release": "Relâchement",
+  "Studio polish": "Finition studio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Adoucit les S sifflants, ajoute de la chaleur et garde chaque pic sous le plafond. Passe en dernier.",
+  "Warmth": "Chaleur",
+  "quick": "rapide",
+  "slow": "lent",
+  "snappy": "sec",
+  "soft": "doux",
+  "warm": "chaud",
+  "clean": "propre"
 }

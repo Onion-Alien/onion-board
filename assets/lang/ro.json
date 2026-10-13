@@ -3399,5 +3399,19 @@
   "Removed inactive clips: {n}": "Clipuri inactive eliminate: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Înregistrează această aplicație în Clipuri salvate. Apasă din nou pentru a termina. Nimeni nu o aude dacă Trimitere nu este activă.",
   "Save to clips": "Salvează în clipuri",
-  "Show clips": "Arată clipurile"
+  "Show clips": "Arată clipurile",
+  "Attack": "Atac",
+  "Ceiling": "Plafon",
+  "Chanting monk": "Călugăr cântând",
+  "De-ess": "De-esser",
+  "Release": "Eliberare",
+  "Studio polish": "Finisaj de studio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Îmblânzește sunetele S ascuțite, adaugă căldură și ține fiecare vârf sub plafon. Rulează ultimul.",
+  "Warmth": "Căldură",
+  "quick": "rapid",
+  "slow": "lent",
+  "snappy": "sec",
+  "soft": "moale",
+  "warm": "cald",
+  "clean": "curat"
 }

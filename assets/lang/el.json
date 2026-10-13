@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Αφαιρέθηκαν ανενεργά κλιπ: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Γράψε αυτή την εφαρμογή στα Αποθηκευμένα κλιπ. Πάτησε ξανά για να τελειώσεις. Κανείς δεν την ακούει αν η Αποστολή είναι κλειστή.",
   "Save to clips": "Αποθήκευση στα κλιπ",
-  "Show clips": "Εμφάνιση κλιπ"
+  "Show clips": "Εμφάνιση κλιπ",
+  "Attack": "Attack",
+  "Ceiling": "Οροφή",
+  "Chanting monk": "Ψάλλων μοναχός",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Στούντιο φινίρισμα",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Μαλακώνει τα σκληρά Σ, προσθέτει ζεστασιά και κρατά κάθε κορυφή κάτω από την οροφή. Τρέχει τελευταίο.",
+  "Warmth": "Ζεστασιά",
+  "quick": "γρήγορα",
+  "slow": "αργά",
+  "snappy": "απότομα",
+  "soft": "απαλά",
+  "warm": "ζεστά",
+  "clean": "καθαρά"
 }

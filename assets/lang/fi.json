@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Poistettuja käyttämättömiä leikkeitä: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Tallenna tämän sovelluksen ääni tallennettuihin leikkeisiin. Lopeta napsauttamalla uudelleen. Kukaan ei kuule sitä, ellei Lähetä ole päällä.",
   "Save to clips": "Tallenna leikkeisiin",
-  "Show clips": "Näytä leikkeet"
+  "Show clips": "Näytä leikkeet",
+  "Attack": "Attack",
+  "Ceiling": "Katto",
+  "Chanting monk": "Laulava munkki",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Studioviimeistely",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Kesyttää terävät S-äänteet, lisää lämpöä ja pitää jokaisen huipun katon alla. Ajetaan viimeisenä.",
+  "Warmth": "Lämpö",
+  "quick": "nopea",
+  "slow": "hidas",
+  "snappy": "napakka",
+  "soft": "pehmeä",
+  "warm": "lämmin",
+  "clean": "puhdas"
 }

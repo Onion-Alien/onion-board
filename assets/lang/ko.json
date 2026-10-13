@@ -3251,5 +3251,19 @@
   "Removed inactive clips: {n}": "삭제된 미사용 클립: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "이 앱의 소리를 저장된 클립에 녹음합니다. 다시 클릭하면 종료됩니다. 전송을 켜지 않으면 다른 사람에게 들리지 않습니다.",
   "Save to clips": "클립에 저장",
-  "Show clips": "클립 보기"
+  "Show clips": "클립 보기",
+  "Attack": "어택",
+  "Ceiling": "최대 한계",
+  "Chanting monk": "염불하는 승려",
+  "De-ess": "디에서",
+  "Release": "릴리즈",
+  "Studio polish": "스튜디오 마무리",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "날카로운 S 소리를 누르고, 따뜻함을 더하고, 모든 피크를 한계 아래로 유지합니다. 맨 마지막에 동작합니다.",
+  "Warmth": "따뜻함",
+  "quick": "빠르게",
+  "slow": "느리게",
+  "snappy": "날렵하게",
+  "soft": "부드럽게",
+  "warm": "따뜻하게",
+  "clean": "깨끗하게"
 }

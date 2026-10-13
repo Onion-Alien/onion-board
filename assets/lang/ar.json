@@ -3621,5 +3621,19 @@
   "Removed inactive clips: {n}": "المقاطع غير النشطة المحذوفة: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "سجّل هذا التطبيق في المقاطع المحفوظة. انقر مجددًا للإنهاء. لا يسمعه أحد إلا إذا كان الإرسال مفعّلًا.",
   "Save to clips": "حفظ في المقاطع",
-  "Show clips": "عرض المقاطع"
+  "Show clips": "عرض المقاطع",
+  "Attack": "الهجوم",
+  "Ceiling": "السقف",
+  "Chanting monk": "راهب منشد",
+  "De-ess": "كبح السين",
+  "Release": "الإفلات",
+  "Studio polish": "لمسة الاستوديو",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "يخفف أصوات السين الحادة، يضيف دفئًا ويبقي كل ذروة تحت السقف. يعمل أخيرًا.",
+  "Warmth": "الدفء",
+  "quick": "سريع",
+  "slow": "بطيء",
+  "snappy": "خاطف",
+  "soft": "ناعم",
+  "warm": "دافئ",
+  "clean": "نظيف"
 }

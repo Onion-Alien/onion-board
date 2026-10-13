@@ -3251,5 +3251,19 @@
   "Removed inactive clips: {n}": "削除された未使用クリップ: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "このアプリの音声を保存済みクリップに録音します。もう一度クリックすると終了します。送信がオンでない限り、誰にも聞こえません。",
   "Save to clips": "クリップに保存",
-  "Show clips": "クリップを表示"
+  "Show clips": "クリップを表示",
+  "Attack": "アタック",
+  "Ceiling": "シーリング",
+  "Chanting monk": "詠唱する僧侶",
+  "De-ess": "ディエッサー",
+  "Release": "リリース",
+  "Studio polish": "スタジオ仕上げ",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "きつい「サ行」を抑え、温かみを足し、すべてのピークをシーリング以下に保ちます。最後に動きます。",
+  "Warmth": "温かみ",
+  "quick": "速い",
+  "slow": "遅い",
+  "snappy": "キレよく",
+  "soft": "やわらか",
+  "warm": "温かい",
+  "clean": "クリーン"
 }

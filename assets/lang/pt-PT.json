@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Clipes inativos removidos: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Grava esta aplicação em Clipes guardados. Clica novamente para terminar. Ninguém ouve a menos que Enviar esteja ativado.",
   "Save to clips": "Guardar nos clipes",
-  "Show clips": "Mostrar clipes"
+  "Show clips": "Mostrar clipes",
+  "Attack": "Ataque",
+  "Ceiling": "Teto",
+  "Chanting monk": "Monge a cantar",
+  "De-ess": "De-esser",
+  "Release": "Libertação",
+  "Studio polish": "Acabamento de estúdio",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Suaviza os S agudos, acrescenta calor e mantém cada pico abaixo do teto. Corre em último.",
+  "Warmth": "Calor",
+  "quick": "rápido",
+  "slow": "lento",
+  "snappy": "seco",
+  "soft": "suave",
+  "warm": "quente",
+  "clean": "limpo"
 }

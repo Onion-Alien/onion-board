@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "हटाई गई निष्क्रिय क्लिप: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "इस ऐप की रिकॉर्डिंग सहेजी गई क्लिप में रखें। खत्म करने के लिए फिर क्लिक करें। भेजना चालू न हो तो कोई इसे नहीं सुनता।",
   "Save to clips": "क्लिप में सेव करें",
-  "Show clips": "क्लिप दिखाएं"
+  "Show clips": "क्लिप दिखाएं",
+  "Attack": "अटैक",
+  "Ceiling": "सीलिंग",
+  "Chanting monk": "मंत्र गाता भिक्षु",
+  "De-ess": "डी-एस",
+  "Release": "रिलीज़",
+  "Studio polish": "स्टूडियो पॉलिश",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "तीखी S आवाज़ें नरम करता है, गर्माहट जोड़ता है और हर चोटी को सीलिंग के नीचे रखता है। सबसे आखिर में चलता है।",
+  "Warmth": "गर्माहट",
+  "quick": "तेज़",
+  "slow": "धीमा",
+  "snappy": "झटपट",
+  "soft": "नरम",
+  "warm": "गर्म",
+  "clean": "साफ़"
 }

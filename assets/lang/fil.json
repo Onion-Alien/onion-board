@@ -3325,5 +3325,19 @@
   "Removed inactive clips: {n}": "Inalis na mga hindi ginagamit na clip: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "I-record ang app na ito sa Mga naka-save na clip. I-click muli para matapos. Walang makakarinig nito maliban kung naka-on ang Ipadala.",
   "Save to clips": "I-save sa mga clip",
-  "Show clips": "Ipakita ang mga clip"
+  "Show clips": "Ipakita ang mga clip",
+  "Attack": "Attack",
+  "Ceiling": "Ceiling",
+  "Chanting monk": "Umaawit na monghe",
+  "De-ess": "De-esser",
+  "Release": "Release",
+  "Studio polish": "Studio polish",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Pinapaamo ang matatalim na S, nagdadagdag ng init at pinapanatili ang bawat peak sa ilalim ng ceiling. Huli itong tumatakbo.",
+  "Warmth": "Init",
+  "quick": "mabilis",
+  "slow": "mabagal",
+  "snappy": "mabilis",
+  "soft": "malambot",
+  "warm": "mainit",
+  "clean": "malinis"
 }

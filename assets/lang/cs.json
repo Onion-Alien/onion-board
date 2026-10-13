@@ -3399,5 +3399,19 @@
   "Removed inactive clips: {n}": "Odstraněné neaktivní klipy: {n}",
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Nahraj tuto aplikaci do Uložených klipů. Dalším kliknutím nahrávání ukončíš. Nikdo ji neslyší, pokud není zapnuté Odesílání.",
   "Save to clips": "Uložit do klipů",
-  "Show clips": "Zobrazit klipy"
+  "Show clips": "Zobrazit klipy",
+  "Attack": "Náběh",
+  "Ceiling": "Strop",
+  "Chanting monk": "Zpívající mnich",
+  "De-ess": "De-esser",
+  "Release": "Doznívání",
+  "Studio polish": "Studiový finiš",
+  "Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. Runs last.": "Zkrotí ostré sykavky, přidá teplo a drží každou špičku pod stropem. Běží jako poslední.",
+  "Warmth": "Teplo",
+  "quick": "rychle",
+  "slow": "pomalu",
+  "snappy": "ostře",
+  "soft": "měkce",
+  "warm": "teple",
+  "clean": "čistě"
 }
