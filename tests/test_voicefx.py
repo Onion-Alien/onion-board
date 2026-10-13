@@ -432,6 +432,80 @@ def test_autotune_snaps_to_a_note():
     assert _f0(y) == pytest.approx(123.47, rel=0.01)  # B2
 
 
+@pytest.mark.parametrize("mic_db", [-60, -48, -30, -12])
+def test_autotune_corrects_quiet_headset_speech(mic_db):
+    x = _vowel(f0=120.0)
+    x *= 10 ** (mic_db / 20) / np.max(np.abs(x))
+    y = _run("pitch", {"tune": 1}, x)
+    # Measure at a fixed level so this checks the correction, independently of
+    # the output pitch detector's own silence threshold.
+    assert _f0(y / np.max(np.abs(y))) == pytest.approx(123.47, rel=0.01)
+
+
+@pytest.mark.parametrize("mic_db", [-48, -30, -12])
+@pytest.mark.parametrize("block", [173, 480, 1024])
+def test_autotune_preset_has_character_even_on_an_in_tune_voice(mic_db, block):
+    # A3 needs no correction: hard tuning alone sounded like the unchanged mic.
+    x = sine(220, amp=10 ** (mic_db / 20))
+    chain = VoiceChain()
+    chain.configure(spec_for(**voicefx.PRESETS["Autotune"]))
+    y = chain.render(x, RATE, block)[RATE // 4:3 * RATE // 4]
+    sp = np.abs(np.fft.rfft(y * np.hanning(len(y)))) ** 2
+    freq = np.fft.rfftfreq(len(y), 1 / RATE)
+    assert sp[freq > 400].sum() > 0.001 * sp.sum()
+    assert dominant_hz(y) == pytest.approx(220, abs=3)
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1
+
+
+@pytest.mark.parametrize("mic_db", [-48, -30, -12])
+@pytest.mark.parametrize("block", [173, 480, 1024])
+def test_hothead_preset_changes_normal_speech_without_waiting_for_a_shout(mic_db, block):
+    # Equal bass and midrange: the megaphone must audibly narrow the voice from
+    # the first words, even on a mic that never reaches the blowout threshold.
+    x = sine(150, 0.4, amp=0.5) + sine(1500, 0.4, amp=0.5)
+    x *= 10 ** (mic_db / 20)
+    chain = VoiceChain()
+    chain.configure(spec_for(**voicefx.PRESETS["Hothead"]))
+    y = chain.render(x, RATE, block)[RATE // 10:]
+    sp = np.abs(np.fft.rfft(y * np.hanning(len(y)))) ** 2
+    freq = np.fft.rfftfreq(len(y), 1 / RATE)
+    assert sp[freq < 250].sum() < 0.05 * sp[(freq > 1400) & (freq < 1600)].sum()
+    assert np.max(np.abs(y)) > 0.1 * np.max(np.abs(x))
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1
+
+
+def test_quiet_pitch_tracker_still_rejects_silence_and_unvoiced_noise():
+    from soundboard.voicefx.builtin import _PitchTracker
+    tracker = _PitchTracker(RATE)
+    rng = np.random.default_rng(7)
+    for x in (np.zeros(tracker.window, np.float32),
+              rng.normal(0, 0.01, tracker.window).astype(np.float32)):
+        assert tracker.measure(x) == 0
+
+
+@pytest.mark.parametrize("name", ["Hothead", "Autotune"])
+@pytest.mark.parametrize("block", [64, 173, 1024])
+def test_hothead_and_autotune_stream_through_mic_rate_changes(name, block):
+    chain = VoiceChain()
+    chain.configure(spec_for(**voicefx.PRESETS[name]))
+    for rate in (48000, 8000, 16000, 44100, 48000):
+        x = sine(120, 0.3, rate=rate, amp=0.01)
+        # Pauses and empty callbacks must not disable an effect or leave noise.
+        x = np.r_[x, np.zeros(rate // 4, np.float32)]
+        out = []
+        for i in range(0, len(x), block):
+            m = np.repeat(x[i:i + block, None], 2, axis=1)
+            y = chain.process(m, rate)
+            assert y.shape == m.shape and np.all(np.isfinite(y))
+            out.append(y)
+            assert chain.process(m[:0], rate).shape == (0, 2)
+        y = np.concatenate(out)
+        assert np.max(np.abs(y)) < 1
+        assert np.max(np.abs(y[:int(rate * 0.3)])) > 0.001
+        assert np.max(np.abs(y[-rate // 20:])) < 0.001
+        assert not chain.errors
+
+
 def test_cleanup_quietens_the_pauses_not_the_voice():
     rng = np.random.default_rng(0)
     voice = _vowel(secs=1.0)
