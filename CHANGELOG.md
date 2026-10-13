@@ -2,6 +2,10 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.0.4 — 2026-10-13
+
+- Fix an error report that could pop up when a menu opened over the board (right-clicking a sound, for one).
+
 ## 2.0.3 — 2026-10-13
 
 - When the FFmpeg backup download fails on both sites, the message now says what went
