@@ -1,0 +1,1 @@
+- Let the UI timer slow down while playback is paused with sounds waiting in Up next.

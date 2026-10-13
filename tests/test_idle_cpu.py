@@ -185,6 +185,41 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
     assert window.timer.interval() == main.TICK_QUIET_MS
 
 
+def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  # noqa: F811
+    from soundboard.ui import mainwindow as main
+
+    playing = {"s0": (0.5, True)}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
+    monkeypatch.setattr(window.radio, "is_active", lambda: False)
+    monkeypatch.setattr(window.linkbar, "up_next", lambda: ["https://example.com/song"])
+    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    window._queue[:] = ["s1"]
+    window.engine.level_play = window.engine.level_main = window.engine.level_mic = 0.0
+    monkeypatch.setattr(window.engine, "aux", ())
+    window._ui_live = True
+    window.tick()
+    assert not window._tick_busy
+    assert window.timer.interval() == main.TICK_QUIET_MS
+    assert window._queue == ["s1"]
+
+    window._ui_live = False
+    window.tick()
+    assert window.timer.interval() == main.TICK_IDLE_MS
+    playing["s0"] = (0.5, False)
+    window._ui_live = True
+    window.tick()
+    assert window._tick_busy
+    assert window.timer.interval() == main.TICK_MS
+
+    advanced = []
+    monkeypatch.setattr(window, "_next_in_queue", lambda: advanced.append(True))
+    monkeypatch.setattr(window.linkbar, "play_next", lambda: False)
+    playing.clear()
+    window.tick()
+    assert advanced == [True]
+    assert not window._tick_busy
+
+
 def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeypatch):  # noqa: F811
     e = window.engine
     monkeypatch.setattr(window, "isVisible", lambda: True)
