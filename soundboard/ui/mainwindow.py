@@ -318,6 +318,7 @@ class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
     exported = Signal(str, int, str)           # file, sounds written, error
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
+    worked = Signal(object, object, object)    # _on_worker: then, result|None, error|None
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
     update_progress = Signal(object, object)   # bytes of the new version downloaded, of
                                                # how many (0: not known)
@@ -461,6 +462,7 @@ class MainWindow(QMainWindow):
         self.bridge.preview.connect(self._on_fx_preview)
         self.bridge.exported.connect(self._on_exported)
         self.bridge.unpacked.connect(self._on_unpacked)
+        self.bridge.worked.connect(self._on_worked)
         self.bridge.update.connect(self._on_update)
         self.bridge.update_progress.connect(self._on_update_progress)
         self.bridge.update_ready.connect(self._on_update_ready)
@@ -7294,15 +7296,31 @@ class MainWindow(QMainWindow):
             if (src := otherboards.for_file(f)) is not None:
                 files.remove(f)   # another soundboard's saved board dropped on the window
                 self.import_other(src, f)
-        zips = {}   # a plain zip of sound files: unpacked, then imported like the rest
-        # a backup / sound pack (a .zip, or a folder with its JSON) is unpacked instead
-        for f in [f for f in files if self._is_package(f)]:
-            files.remove(f)
-            names = backup.loose_audio(f)
-            if names:
-                zips[f] = names
-            else:
-                self.import_package(f)
+        packages = [f for f in files if self._is_package(f)]
+        if not packages:
+            self._import_now(files, extras, {})
+            return
+        files = [f for f in files if f not in packages]
+
+        def look():   # opening each zip: on the worker (a big one, or on OneDrive)
+            return {f: backup.loose_audio(f) for f in packages}
+
+        def then(found, err):
+            if err is not None:
+                log.warning("couldn't look into %s: %r", packages, err)
+            found = found or {}
+            # a plain zip of sound files: unpacked, then imported like the rest; a
+            # backup / sound pack (a .zip, or a folder with its JSON) is read instead
+            zips = {f: found[f] for f in packages if found.get(f)}
+            for f in packages:
+                if f not in zips:
+                    self.import_package(f)
+            self._import_now(files, extras, zips)
+        self._on_worker(look, then, "import-look")
+
+    def _import_now(self, files: list[str], extras: dict[str, otherboards.Entry],
+                    zips: dict[str, list[str]]):
+        """import_files once the zips are sorted: `zips` maps a plain zip to its sounds."""
         count = len(files) + sum(len(n) for n in zips.values())
         if not count:
             return
@@ -8599,23 +8617,21 @@ class MainWindow(QMainWindow):
 
     def import_package(self, path: str):
         """Add the sounds from a backup / sound pack (ones already here are skipped).
-        A full backup's settings are only applied if the user says so."""
-        # reading a big zip takes a moment
-        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-        try:
-            pkg = backup.read(path)
-        except backup.BackupError as e:
-            QApplication.restoreOverrideCursor()
-            errors.warn(self, _("Can't import"), e)
+        A full backup's settings are only applied if the user says so.
+        Reading it (a big zip takes a moment) runs on a worker; this returns at once."""
+        self._on_worker(lambda: backup.read(path),
+                        lambda pkg, err: self._package_read(path, pkg, err), "import-read")
+
+    def _package_read(self, path: str, pkg, err):
+        if isinstance(err, backup.BackupError):
+            errors.warn(self, _("Can't import"), err)
             return
-        except Exception as e:  # noqa: BLE001 - a damaged or odd file, never a crash
-            QApplication.restoreOverrideCursor()
-            log.warning("couldn't read %s", path, exc_info=True)
+        if err is not None:   # a damaged or odd file, never a crash
+            log.warning("couldn't read %s: %r", path, err)
             self.tell(_("Can't import"),
                       _("{name} is damaged or in a format Onion Board can't read ({e}).",
-                        name=Path(path).name, e=errors.plain(e)), "error")
+                        name=Path(path).name, e=errors.plain(err)), "error")
             return
-        QApplication.restoreOverrideCursor()
         use_settings = False
         if pkg.settings:
             box = QMessageBox(QMessageBox.Icon.Question, _("Import backup"),
@@ -8864,13 +8880,21 @@ class MainWindow(QMainWindow):
 
     def reset_pack(self, pid: str, ask: bool = True):
         """Put a sound pack back how it came: its sounds' names, hotkeys, volume,
-        effects, categories and pictures, and its removed sounds come back."""
-        try:
+        effects, categories and pictures, and its removed sounds come back.
+        The pack is read, and its pictures put back, on a worker; this returns at once."""
+        def read():
             pkg = backup.read_pack(pid)
-        except backup.BackupError as e:
-            errors.warn(self, _("Can't reset the sound pack"), e)
+            return pkg, self._pack_name(pkg)
+        self._on_worker(read, lambda got, err: self._pack_read(pid, got, err, ask),
+                        "reset-read")
+
+    def _pack_read(self, pid: str, got, err, ask: bool):
+        if err is not None:
+            if not isinstance(err, backup.BackupError):
+                log.warning("couldn't read the sound pack %s: %r", pid, err)
+            errors.warn(self, _("Can't reset the sound pack"), err)
             return
-        name = self._pack_name(pkg)
+        pkg, name = got
         if ask and QMessageBox.question(
                 self, _("Reset sound pack"),
                 _("Put the sounds from “{name}” back how they came?\n\nChanges you made to "
@@ -8883,26 +8907,17 @@ class MainWindow(QMainWindow):
         for m in self.cfg.sounds:
             if m.pack == pid:
                 on_board.setdefault(m.pack_item, m)
-        fx_before = {m.id: soundfx.key(m.fx) for m in on_board.values()}
-        try:
-            pkg.restored = backup.reset_sounds(pkg, on_board)
-        except (OSError, backup.BackupError) as e:
-            errors.warn(self, _("Can't reset the sound pack"), e)
-            return
-        for m in pkg.restored:
-            if soundfx.key(m.fx) != fx_before[m.id]:
-                self._rerender(m)
-            if p := self.pads.get(m.id):
-                p.update()
+        # put back on copies (the pictures are re-encoded: disk), copied over here
+        copies = {k: copy.copy(m) for k, m in on_board.items()}
         missing = [ps for ps in pkg.sounds if ps.folder not in on_board]
-        if not missing:
-            self._on_unpacked(backup.Imported(), pkg, "")
-            return
-        full = list(pkg.sounds)
-        pkg.sounds = missing
         start = len(self.cfg.sounds)
 
         def run():
+            restored = backup.reset_sounds(pkg, copies)
+            if not missing:
+                return restored, backup.Imported(), ""
+            full = list(pkg.sounds)
+            pkg.sounds = missing
             try:
                 res = backup.install(
                     pkg, set(), lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)])
@@ -8911,9 +8926,55 @@ class MainWindow(QMainWindow):
                 res, err = None, errors.plain(e)
             else:
                 err = ""
-            pkg.sounds = full   # for _pack_spot's order
-            self.bridge.unpacked.emit(res, pkg, err)
-        threading.Thread(target=run, daemon=True, name="reset-pack").start()
+            finally:
+                pkg.sounds = full   # for _pack_spot's order
+            return restored, res, err
+
+        def then(got, err):
+            if err is not None:
+                if not isinstance(err, (OSError, backup.BackupError)):
+                    log.warning("reset of the sound pack %s failed: %r", pid, err)
+                errors.warn(self, _("Can't reset the sound pack"), err)
+                return
+            restored, res, failed = got
+            pkg.restored = []
+            for c in restored:
+                m = on_board[c.pack_item]
+                if m not in self.cfg.sounds:   # removed while it ran
+                    continue
+                fx_before = soundfx.key(m.fx)
+                for k in (*backup.SOUND_FIELDS, "image"):
+                    setattr(m, k, getattr(c, k))
+                pkg.restored.append(m)
+                if soundfx.key(m.fx) != fx_before:
+                    self._rerender(m)
+                if p := self.pads.get(m.id):
+                    p.update()
+            self._on_unpacked(res, pkg, failed)
+        self._on_worker(run, then, "reset-pack")
+
+    def _on_worker(self, work, then, name: str):
+        """work() (reading a backup or pack: disk) on a worker thread with the busy
+        cursor up, then then(its result, None) or then(None, what it raised) back on
+        the UI thread."""
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+
+        def run():
+            try:
+                res, err = work(), None
+            except Exception as e:  # noqa: BLE001 - said by then()
+                res, err = None, e
+            try:
+                self.bridge.worked.emit(then, res, err)
+            except RuntimeError:   # the window is gone (quitting)
+                pass
+        threading.Thread(target=run, daemon=True, name=name).start()
+
+    def _on_worked(self, then, res, err):
+        QApplication.restoreOverrideCursor()
+        if self._quitting:   # closed while it ran
+            return
+        then(res, err)
 
     def remove_pack(self, pid: str, ask: bool = True):
         """Take every sound of a sound pack off the board (one Undo brings them back);
