@@ -10078,6 +10078,9 @@ class MainWindow(QMainWindow):
         if mini and self.settings_open() and not getattr(self, "_opening_settings", False):
             # made too small for Settings: they close (as Done does), the mini player shows
             self.close_settings()
+            # close_settings requests a refit, which the outer transaction guards.
+            # Finish it here with Settings removed, before painting resumes.
+            self._refit_layout()
             return
         self._set_mini(mini)
         if mini:   # the pads too: cards with room for a couple of rows of them, else
