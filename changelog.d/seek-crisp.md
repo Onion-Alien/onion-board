@@ -1,0 +1,1 @@
+- Sharpen the playback slider knob by drawing a pixel-aligned circle without a soft transparent border.
