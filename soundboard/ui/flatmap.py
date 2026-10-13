@@ -760,7 +760,8 @@ class FlatMap(QWidget):
         view = QRectF(self.rect())
         for k in copies:
             o = self._origin(k, s)
-            target = QRectF(o.x() + x0 * f, o.y() + y0 * f, pic.width() * f,
+            # Overlap adjacent world copies to cover subpixel rasterization gaps.
+            target = QRectF(o.x() + x0 * f, o.y() + y0 * f, pic.width() * f + 0.5,
                             pic.height() * f)
             if target.intersects(view):
                 p.drawPixmap(target, pic, QRectF(pic.rect()))
