@@ -1908,7 +1908,6 @@
   "Keep only the selection": "Ponechte pouze výběr",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Ponechte výběr v Uložené klipy pod kartami (Enter). Odtud: hrajte, pojmenujte nebo přidejte do svých zvuků.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Ponechte tato nastavení jako hlas s názvem: má vlastní tlačítko pod „Vybrat hlas“.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Uchovejte si poslední chvíli tohoto programu jako křivku, ze které můžete vystřihnout kousky, přehrát, uložit jako zvuky nebo poslat rovnou zpět. Poslouchá pouze, když je otevřená.",
   "Kicks in at": "Kope v",
   "Language": "Jazyk",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Jazyk, kterým mluvíte (dvoupísmenný kód). „automatické“ odhady; potřebuje model rozpoznávání „jakýkoli jazyk“ pro cokoli kromě angličtiny.",
@@ -2013,7 +2012,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, každý efekt a vaše uložené hlasy: vytvořte si svůj vlastní hlas v okně vedle aplikace",
   "Play (headphones)": "Hrát (sluchátka)",
   "Play the selection in your headphones only (Space)": "Přehrajte výběr pouze ve sluchátkách (Space)",
-  "Play the selection to whoever's listening, right now, without saving it": "Přehrajte výběr komukoli, kdo právě poslouchá, bez uložení",
   "Podcast voice": "Hlas podcastu",
   "Presence": "Přítomnost",
   "Press Start, then just talk.": "Stiskněte Start a pak už jen mluvte.",
@@ -2083,7 +2081,6 @@
   "Send {name}": "Odeslat {name}",
   "Sending": "Odesílání",
   "Sending this program's sound failed. Switch Send on to try again.": "Odeslání zvuku tohoto programu se nezdařilo. Chcete-li to zkusit znovu, zapněte možnost Odeslat.",
-  "Sending {length}…": "Odesílání {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Tvaruje vaše zvuky pro aplikaci pro hlasový chat: Discord nebo hovor v prohlížeči, Zoom nebo Teams, podle toho, která z nich vás poslouchá. Mono, hluboké basy se změnily v harmonické, které procházejí, úroveň každého zvuku je vrácena zpět. Pokud to nedokáže zjistit, ponechá si poslední, kterou použil (nejprve Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Tvaruje vaše zvuky pro hlasový chat ve hrách: mono, hluboké basy, které chat vyhazuje, se proměnily v harmonické, které procházejí, a úroveň každého zvuku se vrací zpět. Když rozpozná hlasový chat hry (Vivox nebo Unity's Photon and Dissonance), přepne se na něj sám; jinak si ponechává ten poslední, který použil (nejprve Vivox, nejběžnější). Steam voice, Epic a starší 8kHz hry: vyberte si je v Advanced.",
   "Shared voice": "Sdílený hlas",
@@ -3391,5 +3388,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord a hry z tvého mikrofonu nic neslyší. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Jestli ne, klikni na <b>Opravit</b>: zvuk na pár sekund vypadne.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Pořád nic? Restartuj počítač a zkus to znovu.",
   "Minimised: last picture": "Minimalizováno: poslední snímek",
-  "Minimised: restore for live updates": "Minimalizováno: obnovte okno pro živý náhled"
+  "Minimised: restore for live updates": "Minimalizováno: obnovte okno pro živý náhled",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Tažením změňte velikost uložených klipů. Dvojklikem ji přizpůsobte klipům."
 }

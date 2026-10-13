@@ -1822,7 +1822,6 @@
   "Keep only the selection": "選択範囲のみを保持",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "カードの下の「保存されたクリップ」に選択内容を保持します (Enter)。そこから、再生したり、名前を付けたり、サウンドに追加したりできます。",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "これらの設定を名前付きの音声として保持します。「音声を選択」の下に独自のボタンが表示されます。",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "このプログラムの最後の瞬間を波形として保存し、一部を切り取って再生したり、サウンドとして保存したり、直接送信したりできます。開いている間だけ聞きます。",
   "Kicks in at": "でキックイン",
   "Language": "言語",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "あなたが話す言語 (2 文字コード)。 「自動」推測。英語以外には「任意の言語」認識モデルが必要です。",
@@ -1925,7 +1924,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "ピッチ、ランダマイズ、あらゆるエフェクト、保存した音声: アプリの横のウィンドウで独自の音声を作成します",
   "Play (headphones)": "再生（ヘッドフォン）",
   "Play the selection in your headphones only (Space)": "ヘッドフォンのみで選択範囲を再生します (スペース)",
-  "Play the selection to whoever's listening, right now, without saving it": "選択した内容を保存せずに、聞いている人に向けて今すぐ再生します",
   "Podcast voice": "ポッドキャストの音声",
   "Presence": "面前",
   "Press Start, then just talk.": "スタートを押して、あとは話すだけです。",
@@ -1991,7 +1989,6 @@
   "Send {name}": "{name}を送信",
   "Sending": "送信中",
   "Sending this program's sound failed. Switch Send on to try again.": "このプログラムの音声の送信に失敗しました。送信をオンにして再試行してください。",
-  "Sending {length}…": "{length}を送信中 …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "ボイスチャット アプリ用のサウンドを形成します: Discord、ブラウザーでの通話、Zoom、Teams のどれがあなたの話を聞いているかによって選択されます。モノラル、深みのある低音が倍音に変わり、各サウンドのレベルが返されます。判断できない場合は、最後に使用したもの (最初は Discord) を保持します。",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "ゲーム内でのボイス チャット用のサウンドを形成します。モノラル、チャットによって捨てられる重低音が、通過する倍音に変わり、各サウンドのレベルが返されます。ゲームのボイス チャット (Vivox、または Unity の Photon and Dissonance) を認識すると、自動的にボイス チャットに切り替わります。それ以外の場合は、最後に使用したもの (最初は Vivox が最も一般的でした) が保持されます。 Steam 音声、Epic および古い 8 kHz ゲーム: 詳細設定で選択してください。",
   "Shared voice": "共有された声",
@@ -3243,5 +3240,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord やゲームにマイクの音が何も届いていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。そうでなければ<b>修復</b>をクリックしてください: 数秒間音が途切れます。",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "マイクから音が出ていません。ヘッドセットの電源が切れているか、マイクがミュートになっていませんか？電源を入れるか、ミュートを解除してください。それでも出ない場合は、PC を再起動してから、もう一度お試しください。",
   "Minimised: last picture": "最小化中：最後の画像",
-  "Minimised: restore for live updates": "最小化中：元に戻すと映像が更新されます"
+  "Minimised: restore for live updates": "最小化中：元に戻すと映像が更新されます",
+  "Drag to resize saved clips. Double-click to fit the clips.": "ドラッグして保存済みクリップの表示サイズを変更。ダブルクリックでクリップに合わせます。"
 }

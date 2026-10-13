@@ -1822,7 +1822,6 @@
   "Keep only the selection": "仅保留选择",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "将选择保留在卡片下方的“已保存剪辑”中（Enter）。从那里：播放它、命名它或将它添加到您的声音中。",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "将这些设置保留为带有名称的语音：它在“选择语音”下有自己的按钮。",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "将此程序的最后一刻保留为波形，您可以从中剪切、播放、另存为声音或直接发送回来。它仅在打开时监听。",
   "Kicks in at": "开始于",
   "Language": "语言",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "您所说的语言（两个字母的代码）。 “自动”猜测；需要一个“任何语言”识别模型，用于除英语之外的任何语言。",
@@ -1925,7 +1924,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "音调、随机化、每种效果以及您保存的声音：在应用程序旁边的窗口中构建您自己的声音",
   "Play (headphones)": "播放（耳机）",
   "Play the selection in your headphones only (Space)": "仅在耳机中播放所选内容（空格键）",
-  "Play the selection to whoever's listening, right now, without saving it": "立即向正在收听的人播放所选内容，无需保存",
   "Podcast voice": "播客之声",
   "Presence": "在场",
   "Press Start, then just talk.": "按开始，然后就可以说话了。",
@@ -1991,7 +1989,6 @@
   "Send {name}": "发送{name}",
   "Sending": "发送",
   "Sending this program's sound failed. Switch Send on to try again.": "发送该程序的声音失败。打开“发送”以重试。",
-  "Sending {length}…": "正在发送{length} ...",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "为语音聊天应用程序塑造声音：Discord，或浏览器、Zoom 或 Teams 中的通话，由正在听您说话的人选择。单声道，深沉的低音变成了穿透的和声，每个声音的电平都得到反馈。如果它不能分辨，它会保留最后使用的一个（一开始是 Discord）。",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "塑造游戏内语音聊天的声音：单声道，聊天时发出的深沉低音转化为可穿透的和声，并返回每个声音的电平。当它识别出游戏的语音聊天（Vivox，或 Unity 的 Photon 和 Dissonance）时，它会自行切换到该语音聊天；否则它会保留最后使用的一个（Vivox 最初是最常见的）。 Steam 语音、Epic 和较早的 8 kHz 游戏：在“高级”中选择它们。",
   "Shared voice": "共享语音",
@@ -3243,5 +3240,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord 和游戏听不到你麦克风的任何声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。如果没有，点 <b>修复</b>：声音会中断几秒。",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麦克风没有声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。还是没有声音？请重启电脑，然后再试一次。",
   "Minimised: last picture": "已最小化：最后一帧",
-  "Minimised: restore for live updates": "已最小化：还原窗口以实时更新"
+  "Minimised: restore for live updates": "已最小化：还原窗口以实时更新",
+  "Drag to resize saved clips. Double-click to fit the clips.": "拖动可调整已保存片段区域的大小。双击可自动适应片段。"
 }

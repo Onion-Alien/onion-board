@@ -1,5 +1,5 @@
 """The Apps tab's clip editor: a program's last minute as a live waveform, to
-drag across, play, cut up and save as a sound or send straight back out.
+drag across, preview, trim and save.
 
 It's opt-in and folded away: a card builds one only when its *Clip editor* is
 opened, and nothing listens, keeps audio or draws while it's closed. Live, the
@@ -7,8 +7,8 @@ waveform scrolls (newest on the right). The first press on it freezes what's
 there into a take to edit (soundboard.clipedit.Take); the program keeps being
 kept behind it, and **Live** goes back. Drag selects; Space plays the selection
 in your headphones; Ctrl+X / C / V, Delete, Ctrl+Z work as in any editor; Enter
-keeps it in the tab's Saved clips (soundboard.ui.clipshelf) and **Send** plays it
-to whoever's listening. A copied bit also marks the system clipboard (MIME), so
+keeps it in the tab's Saved clips (soundboard.ui.clipshelf) and returns to live
+capture. A copied bit also marks the system clipboard (MIME), so
 Ctrl+V on the Sounds tab adds it as a sound."""
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ import html
 import itertools
 
 import numpy as np
-from PySide6.QtCore import QLineF, QMimeData, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QLineF, QMimeData, QRectF, QSize, Qt, QTimer, Signal, Slot
 from PySide6.QtGui import QAction, QColor, QKeySequence, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QSizePolicy, QVBoxLayout, QWidget)
@@ -27,6 +27,7 @@ from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import level_gain
 from soundboard.ui import appstate, busy, icons
+from soundboard.ui.panel import CONTROL_H, Flow
 from soundboard.ui.pixels import snap_to_pixels
 
 PAD = 4                 # the waveform's inner margin, px
@@ -35,9 +36,8 @@ DRAG_PX = 4             # a press that moves less than this is a click: it place
 TICK_MS = 50            # redraw pace while live or playing (20 a second)
 MIN_VIEW = 256          # frames: the furthest it zooms in
 STEP_DB = 3.0           # Louder / Quieter
-NARROW_PX = 380         # below this the buttons keep only their icons
 LIVE_MIN_S = 10         # live, the view shows what's been heard, at least this wide
-WAVE_H = 84             # the waveform's height; in the big view it takes what there is
+WAVE_H = 180            # the waveform's height; in the big view it takes what there is
 _ids = itertools.count(1)
 clipboard: np.ndarray | None = None   # Ctrl+C in one card, Ctrl+V in any other
 MIME = "application/x-onionboard-clip"   # on the system clipboard while `clipboard` is the copy
@@ -250,7 +250,8 @@ class ClipWave(QWidget):
             p.fillRect(QRectF(max(x0, r.left()), r.top() + 1,
                               max(min(x1, r.right()) - max(x0, r.left()), 1), r.height() - 2), fill)
         if len(peaks):
-            h = columns(peaks, *ed.view, n) * half
+            h = columns(peaks, *ed.view, n)
+            h *= half / max(float(h.max(initial=0)), 0.05)
             xs = PAD + np.arange(n) + 0.5
             if sel is not None:
                 lit = (xs >= x0) & (xs <= x1)
@@ -317,7 +318,6 @@ class ClipEditor(QWidget):
         self.engine, self.cfg = engine, cfg
         n = next(_ids)
         self._preview_sid = f"clipedit{n}:preview"   # ":preview": headphones only
-        self._send_sid = f"clipedit{n}-send"
         self.buf: LiveBuffer | None = None
         self.take: Take | None = None
         self._stash: Take | None = None   # the take "Live" left behind (Ctrl+Z brings it back)
@@ -332,49 +332,56 @@ class ClipEditor(QWidget):
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(6)
+        v.setSpacing(8)
+        heading = QHBoxLayout()
+        self.state_label = QLabel()
+        self.state_label.setObjectName("section")
+        heading.addWidget(self.state_label)
+        heading.addStretch(1)
+        v.addLayout(heading)
         self._copied_from: tuple[int, int, int] | None = None   # (take data id, a, b)
         self.wave = ClipWave(self)
         v.addWidget(self.wave)
-        bar = QHBoxLayout()
-        bar.setSpacing(6)
+        bar = Flow(gap=8)
 
-        def button(text, icon, tip, slot, name="small"):
+        def button(text, icon, tip, slot, name=""):
             b = QPushButton(text)
             b.setObjectName(name)
             b.setToolTip(tip)
+            b.setAccessibleName(text)
+            b.setMinimumSize(CONTROL_H, CONTROL_H)
             b.setProperty("full_text", text)
-            icons.set_icon(b, icon, size=13)
+            icons.set_icon(b, icon, size=18)
             b.clicked.connect(slot)
             b.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
             bar.addWidget(b)
             return b
 
+        self.btn_save = button(_("Save clip"), "plus",
+                               _("Keep the selection in Saved clips, under the cards "
+                                 "(Enter). From there: play it, name it, or add it to "
+                                 "your Sounds."), self.save, "primary")
         self.btn_live = button(_("Pause"), "pause",
                                _("Freeze the waveform to pick a bit out of it "
                                  "(it keeps listening behind). L goes back to live."),
                                self._live_clicked)
-        self.btn_play = button(_("Play"), "play",
+        self.btn_play = button(_("Preview"), "play",
                                _("Play the selection in your headphones only (Space)"),
                                self.toggle_play)
-        self.btn_save = button(_("Save clip"), "plus",
-                               _("Keep the selection in Saved clips, under the cards "
-                                 "(Enter). From there: play it, name it, or add it to "
-                                 "your Sounds."), self.save)
-        self.btn_send = button(_("Send"), "live",
-                               _("Play the selection to whoever's listening, right now, "
-                                 "without saving it"), self.toggle_send)
         self.btn_edit = button(_("Edit"), "edit",
                                _("Cut, copy, paste, fades, louder / quieter, reverse, undo"),
                                lambda: None)
         self.btn_edit.setMenu(self._make_menu())
-        bar.addStretch(1)
+        QApplication.clipboard().dataChanged.connect(self._enable_actions)
+        self.btn_trim = button(_("Trim"), "edit", _("Keep only the selection"),
+                               lambda: self._edit(Take.crop))
+        self.btn_undo = button(_("Undo"), "back", _("Undo"), self.undo)
         self.btn_big = QPushButton()
-        self.btn_big.setObjectName("small")
+        self.btn_big.setFixedSize(CONTROL_H, CONTROL_H)
         self.btn_big.setCheckable(True)
         self.btn_big.setToolTip(_("Big view: this program's editor takes the whole tab"))
         self.btn_big.setAccessibleName(_("Big view"))
-        icons.set_icon(self.btn_big, "expand", size=13)
+        icons.set_icon(self.btn_big, "expand", size=18)
         self.btn_big.toggled.connect(self.big_toggled)
         bar.addWidget(self.btn_big)
         v.addLayout(bar)
@@ -393,6 +400,8 @@ class ClipEditor(QWidget):
     # ---------------------------------------------------------- menu
     def _make_menu(self) -> QMenu:
         m = QMenu(self)
+        m.setMinimumWidth(280)
+        m.setStyleSheet("QMenu::item { padding: 10px 24px; }")
         self.actions_by_name: dict[str, QAction] = {}
 
         def act(name, text, slot, keys=None, icon=None):
@@ -433,6 +442,7 @@ class ClipEditor(QWidget):
         m.aboutToShow.connect(self._enable_actions)
         return m
 
+    @Slot()
     def _enable_actions(self):
         t = self.take
         sel = t is not None and t.has_selection
@@ -578,6 +588,7 @@ class ClipEditor(QWidget):
             return False
         copied = take.selected()
         set_clipboard(copied)
+        self._enable_actions()
         self._copied_from = (id(take.data), take.a, take.b) if take.has_selection else None
         if take.has_selection:
             self.say(_("Copied {length}. Ctrl+V pastes it at the cursor, in another "
@@ -657,22 +668,6 @@ class ClipEditor(QWidget):
         self._play = (self._preview_sid, start, start + len(data))
         self._sync()
 
-    def toggle_send(self):
-        if self._play is not None and self._play[0] == self._send_sid:
-            self.stop_playing()
-            return
-        self.stop_playing()
-        data, start, __ = self._audio()
-        if not len(data):
-            return
-        if self.engine.play(self._send_sid, data, self._gain(data), mode="restart") is None:
-            self.say(_("Nowhere to send it: pick where your sounds go on the Setup tab."),
-                     "error")
-            return
-        self._play = (self._send_sid, start, start + len(data))
-        self.flash(_("Sending {length}…", length=fmt(len(data))))
-        self._sync()
-
     def stop_playing(self):
         if self._play is not None:
             self.engine.stop(self._play[0])
@@ -725,21 +720,25 @@ class ClipEditor(QWidget):
     def _sync(self):
         """Buttons, the line under the waveform, the timer."""
         live = self.take is None
+        self.state_label.setText(_("Live") if live else _("Edit"))
         self.btn_live.setProperty("full_text", _("Pause") if live else _("Live"))
-        icons.set_icon(self.btn_live, "pause" if live else "wave", size=13)
+        icons.set_icon(self.btn_live, "pause" if live else "wave", size=18)
         self.btn_live.setToolTip(_("Freeze the waveform to pick a bit out of it (it keeps "
                                    "listening behind)") if live else
                                  _("Back to the live waveform (L)"))
         self.btn_live.setEnabled(self.buf is not None)
         playing = self._play[0] if self._play is not None else None
         self.btn_play.setProperty("full_text",
-                                  _("Stop") if playing == self._preview_sid else _("Play"))
-        icons.set_icon(self.btn_play, "stop" if playing == self._preview_sid else "play", size=13)
-        self.btn_send.setProperty("full_text",
-                                  _("Stop") if playing == self._send_sid else _("Send"))
+                                  _("Stop") if playing == self._preview_sid else _("Preview"))
+        icons.set_icon(self.btn_play, "stop" if playing == self._preview_sid else "play", size=18)
         has = self.length() > 0
-        for b in (self.btn_play, self.btn_save, self.btn_send):
+        for b in (self.btn_play, self.btn_save):
             b.setEnabled(has)
+        self._enable_actions()
+        self.btn_trim.setEnabled(self.actions_by_name["crop"].isEnabled())
+        self.btn_undo.setEnabled(self.actions_by_name["undo"].isEnabled())
+        self.btn_live.setAccessibleName(self.btn_live.toolTip())
+        self.btn_play.setAccessibleName(self.btn_play.property("full_text"))
         self._label_buttons()
         if not self._msg:
             self.info.setText(self._describe())
@@ -763,9 +762,9 @@ class ClipEditor(QWidget):
 
 
     def _label_buttons(self):
-        narrow = self.width() < NARROW_PX
-        for b in (self.btn_live, self.btn_play, self.btn_save, self.btn_send, self.btn_edit):
-            b.setText("" if narrow else b.property("full_text"))
+        for b in (self.btn_live, self.btn_play, self.btn_save, self.btn_edit,
+                  self.btn_trim, self.btn_undo):
+            b.setText(b.property("full_text"))
             icons.text_gap(b)
 
     def resizeEvent(self, e):
@@ -774,8 +773,7 @@ class ClipEditor(QWidget):
             self._label_buttons()
 
     def minimumSizeHint(self):
-        # the buttons' icons alone: with their words it would ask the card to be wider
-        # and squeeze the rest of it (AppRow._fit_width), when they'd just drop the words
+        # The toolbar wraps rather than making the card wider.
         hint = super().minimumSizeHint()
         return QSize(min(hint.width(), 230), hint.height())
 
@@ -818,4 +816,3 @@ class ClipEditor(QWidget):
     def shutdown(self):
         self.stop_playing()
         self.timer.stop()
-        self.engine.forget(self._send_sid)

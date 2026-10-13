@@ -1779,7 +1779,6 @@
   "Keep only the selection": "Запазете само селекцията",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Запазете селекцията в Запазени клипове, под картите (Enter). Оттам: пуснете го, наименувайте го или го добавете към вашите звуци.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Запазете тези настройки като глас с име: той получава свой собствен бутон под „Избор на глас“.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Запазете последната минута на тази програма като вълнова форма, от която можете да изрязвате битове, да възпроизвеждате, да запазвате като звуци или да изпращате направо обратно. Слуша само докато е отворен.",
   "Kicks in at": "Удари в",
   "Language": "език",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Език, който говорите (двубуквен код). „автоматични“ предположения; се нуждае от модел за разпознаване „Всеки език“ за всичко, освен за английски.",
@@ -1880,7 +1879,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, всеки ефект и вашите запазени гласове: изградете свой собствен глас в прозорец до приложението",
   "Play (headphones)": "Възпроизвеждане (слушалки)",
   "Play the selection in your headphones only (Space)": "Пуснете селекцията само в слушалките си (Интервал)",
-  "Play the selection to whoever's listening, right now, without saving it": "Пуснете селекцията на всеки, който слуша, точно сега, без да я запазвате",
   "Podcast voice": "Подкаст глас",
   "Presence": "присъствие",
   "Press Start, then just talk.": "Натиснете Старт, след това просто говорете.",
@@ -1948,7 +1946,6 @@
   "Send {name}": "Изпратете {name}",
   "Sending": "Изпращане",
   "Sending this program's sound failed. Switch Send on to try again.": "Изпращането на звука на тази програма не бе успешно. Включете Изпращане, за да опитате отново.",
-  "Sending {length}…": "Изпраща се {length} ...",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Оформя вашите звуци за приложение за гласов чат: Discord или обаждане в браузър, Zoom или Teams, избрано от това кой ви слуша. Моно, дълбокият бас, превърнат в хармоници, които преминават, връщайки нивото на всеки звук. Ако не може да разбере, запазва последното, което е използвало (в началото Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Оформя вашите звуци за гласов чат в игри: моно, дълбокият бас, който чатът изхвърля, се превръща в хармоници, които преминават, и нивото на всеки звук се връща обратно. Когато разпознае гласовия чат на играта (Vivox или Photon and Dissonance на Unity), той сам превключва към него; в противен случай запазва последния използван (първоначално Vivox, най-често срещаният). Steam voice, Epic и по-стари 8 kHz игри: изберете ги в Advanced.",
   "Shared voice": "Споделен глас",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord и игрите не чуват нищо от микрофона ти. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Ако не е, кликни <b>Поправи</b>: звукът ще изчезне за няколко секунди.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофонът ти не праща звук. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Пак нищо? Рестартирай компютъра и опитай пак.",
   "Minimised: last picture": "Минимизиран: последна снимка",
-  "Minimised: restore for live updates": "Минимизиран: възстановете за обновяване на живо"
+  "Minimised: restore for live updates": "Минимизиран: възстановете за обновяване на живо",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Плъзнете, за да преоразмерите запазените клипове. Щракнете два пъти, за да ги поберете."
 }

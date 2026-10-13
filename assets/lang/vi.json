@@ -1822,7 +1822,6 @@
   "Keep only the selection": "Chỉ giữ lại phần lựa chọn",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Giữ lựa chọn trong Các clip đã lưu, bên dưới các thẻ (Enter). Từ đó: phát, đặt tên hoặc thêm nó vào Âm thanh của bạn.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Giữ các cài đặt này dưới dạng giọng nói kèm theo tên: nó có nút riêng bên dưới “Chọn giọng nói”.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Giữ phút cuối cùng của chương trình này dưới dạng dạng sóng mà bạn có thể cắt từng đoạn, phát, lưu dưới dạng âm thanh hoặc gửi thẳng trở lại. Nó chỉ nghe khi nó mở.",
   "Kicks in at": "Đá vào lúc",
   "Language": "Ngôn ngữ",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Ngôn ngữ bạn nói (mã hai chữ cái). đoán 'tự động'; cần một mô hình nhận dạng 'Bất kỳ ngôn ngữ nào' cho mọi ngôn ngữ ngoại trừ tiếng Anh.",
@@ -1925,7 +1924,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Cao độ, Ngẫu nhiên hóa, mọi hiệu ứng và giọng nói đã lưu của bạn: tạo giọng nói của riêng bạn trong cửa sổ bên cạnh ứng dụng",
   "Play (headphones)": "Chơi (tai nghe)",
   "Play the selection in your headphones only (Space)": "Chỉ phát phần lựa chọn trong tai nghe của bạn (Dấu cách)",
-  "Play the selection to whoever's listening, right now, without saving it": "Phát phần lựa chọn cho bất cứ ai đang nghe ngay bây giờ mà không lưu nó",
   "Podcast voice": "Giọng nói podcast",
   "Presence": "Sự hiện diện",
   "Press Start, then just talk.": "Nhấn Bắt đầu, sau đó chỉ cần nói chuyện.",
@@ -1991,7 +1989,6 @@
   "Send {name}": "Gửi {name}",
   "Sending": "Đang gửi",
   "Sending this program's sound failed. Switch Send on to try again.": "Gửi âm thanh của chương trình này không thành công. Hãy bật Gửi để thử lại.",
-  "Sending {length}…": "Đang gửi {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Định hình âm thanh của bạn cho ứng dụng trò chuyện thoại: Discord hoặc cuộc gọi trong trình duyệt, Zoom hoặc Teams, được chọn theo ứng dụng nào đang lắng nghe bạn. Mono, âm trầm sâu chuyển thành hài hòa xuyên suốt, trả lại đẳng cấp của từng âm thanh. Nếu không thể biết, nó sẽ giữ lại cái cuối cùng được sử dụng (Lúc đầu là Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Định hình âm thanh của bạn để trò chuyện bằng giọng nói trong trò chơi: đơn âm, âm trầm sâu mà cuộc trò chuyện loại bỏ sẽ biến thành âm thanh xuyên suốt và mức độ của từng âm thanh được trả lại. Khi nó nhận ra trò chuyện thoại của trò chơi (Vivox, hoặc Photon và Dissonance của Unity), nó sẽ tự chuyển sang trò chuyện đó; nếu không thì nó sẽ giữ lại cái cuối cùng mà nó đã sử dụng (Vivox lúc đầu là phổ biến nhất). Giọng nói Steam, trò chơi Epic và 8 kHz cũ hơn: chọn chúng trong phần Nâng cao.",
   "Shared voice": "Giọng nói chung",
@@ -3243,5 +3240,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord và game không nghe thấy gì từ mic của bạn. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Nếu không, bấm <b>Sửa</b>: âm thanh sẽ mất vài giây.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic của bạn không gửi âm thanh. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Khởi động lại PC rồi thử lại.",
   "Minimised: last picture": "Đã thu nhỏ: hình ảnh cuối",
-  "Minimised: restore for live updates": "Đã thu nhỏ: khôi phục để xem cập nhật trực tiếp"
+  "Minimised: restore for live updates": "Đã thu nhỏ: khôi phục để xem cập nhật trực tiếp",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Kéo để đổi kích thước vùng clip đã lưu. Nhấp đúp để vừa với các clip."
 }

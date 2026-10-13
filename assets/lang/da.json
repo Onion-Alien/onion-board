@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Behold kun udvalget",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Behold markeringen i Gemte klip, under kortene (Enter). Derfra: afspil det, navngiv det, eller føj det til dine lyde.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Behold disse indstillinger som en stemme med et navn: den får sin egen knap under \"Vælg en stemme\".",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Hold dette programs sidste minut som en bølgeform, du kan skære bits ud af, afspille, gemme som lyde eller sende direkte tilbage. Den lytter kun, mens den er åben.",
   "Kicks in at": "Sparker ind kl",
   "Language": "Sprog",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Sprog du taler (kode på to bogstaver). 'auto' gæt; har brug for en 'Alle sprog'-genkendelsesmodel til alt andet end engelsk.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, hver effekt og dine gemte stemmer: Byg din egen stemme i et vindue ved siden af ​​appen",
   "Play (headphones)": "Afspil (hovedtelefoner)",
   "Play the selection in your headphones only (Space)": "Afspil valget kun i dine hovedtelefoner (Space)",
-  "Play the selection to whoever's listening, right now, without saving it": "Afspil valget for den, der lytter, lige nu, uden at gemme det",
   "Podcast voice": "Podcast stemme",
   "Presence": "Tilstedeværelse",
   "Press Start, then just talk.": "Tryk på Start, og tal derefter.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "Send {name}",
   "Sending": "Sender",
   "Sending this program's sound failed. Switch Send on to try again.": "Sendingen af ​​dette programs lyd mislykkedes. Slå Send til for at prøve igen.",
-  "Sending {length}…": "Sender {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Former dine lyde til en stemmechat-app: Discord eller et opkald i en browser, Zoom eller Teams, valgt af, hvilken der lytter til dig. Mono, den dybe bas bliver til harmoniske, der slipper igennem, hver lyds niveau givet tilbage. Hvis den ikke kan fortælle, beholder den den sidst brugte (Discord i starten).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Former dine lyde til stemmechat i spil: mono, den dybe bas, chatten smider væk, forvandlet til harmoniske, der trænger igennem, og hver lyds niveau givet tilbage. Når det genkender spillets stemmechat (Vivox eller Unity's Photon and Dissonance), skifter det til det af sig selv; ellers beholder den den sidste, den brugte (Vivox først, den mest almindelige). Steam-stemme, episke og ældre 8 kHz-spil: vælg dem i Avanceret.",
   "Shared voice": "Delt stemme",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord og spil hører intet fra din mikrofon. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Hvis ikke, klik <b>Reparér</b>: lyden forsvinder i et par sekunder.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Din mikrofon sender ingen lyd. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Stadig intet? Genstart din pc, og prøv igen.",
   "Minimised: last picture": "Minimeret: sidste billede",
-  "Minimised: restore for live updates": "Minimeret: gendan for løbende opdateringer"
+  "Minimised: restore for live updates": "Minimeret: gendan for løbende opdateringer",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Træk for at ændre størrelsen på gemte klip. Dobbeltklik for at tilpasse til klippene."
 }

@@ -655,20 +655,19 @@ class AppRow(HoverCard):
         self.vol.slider.setMaximumWidth(16777215)   # the card's width, not a row's sliver
         self.vol.changed.connect(lambda v: self.vol_changed.emit(self, v))
         mix.addWidget(self.vol, 1)
-        self.chk_hear = QCheckBox(_("Hear it myself"))
+        self.chk_hear = QCheckBox(_("Hear it myself"), self)
         self.chk_hear.setToolTip(_("Also play it into your headphones (off: the program "
                                    "already plays there on its own)"))
         self.chk_hear.setChecked(hear)
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
-        mix.addWidget(self.chk_hear)
+        self.chk_hear.hide()   # optional duplicate monitoring lives in the card menu
         v.addLayout(mix)
         self.view = WindowView(self)
         self.btn_view.toggled.connect(self._on_view)
         v.addWidget(self.view)
         self.btn_clip = fold_button(_("Clip editor"))
-        self.btn_clip.setToolTip(_("Keep this program's last minute as a waveform you can cut "
-                                   "bits out of, play, save as sounds or send straight back. "
-                                   "It only listens while it's open."))
+        self.btn_clip.setToolTip(_("Freeze the waveform to pick a bit out of it "
+                                  "(it keeps listening behind). L goes back to live."))
         self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
         v.addWidget(self.btn_clip, 0, Qt.AlignmentFlag.AlignLeft)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
@@ -767,6 +766,11 @@ class AppRow(HoverCard):
                     act.triggered.connect(lambda _x=False, _c=cat:
                                           self.move_to_category.emit(self, _c))
             menu.addSeparator()
+        monitor = menu.addAction(_("Hear it myself"))
+        monitor.setCheckable(True)
+        monitor.setChecked(self.chk_hear.isChecked())
+        monitor.setToolTip(self.chk_hear.toolTip())
+        monitor.toggled.connect(self.chk_hear.setChecked)
         menu.setToolTipsVisible(True)
         gone = menu.addAction(icons.icon("trash", "danger_text"), _("Remove"),
                               lambda: self.forget.emit(self))
@@ -1045,7 +1049,9 @@ class AppsTab(QWidget):
         # what the clip editors' Save keeps, under the cards
         self.shelf = ClipShelf(engine, cfg, self)
         self.shelf.add_to_sounds.connect(self._shelf_to_sounds)
-        v.addWidget(self.shelf)
+        self.shelf.layout_changed.connect(self._fit_big)
+        self.shelf.size_changed.connect(self._save)
+        self.list_layout.insertWidget(self.list_layout.count() - 1, self.shelf)
 
         ok, why = appaudio.supported()
         if not ok:
@@ -1774,6 +1780,7 @@ class AppsTab(QWidget):
         row.editor.set_buffer(row.listen)
         row.btn_forget.setVisible(False)
         self._poll_capture(row)
+        self._set_big(row, True)
 
     def _close_clip(self, row: AppRow):
         if self.big is row:
@@ -1801,6 +1808,8 @@ class AppsTab(QWidget):
             busy.toast(self, html.escape(_("Couldn't save it: {error}", error=errors.plain(e))),
                        "error")
             return
+        if row.editor is not None:
+            row.editor.go_live()
         busy.toast(self, _("✓ Kept {seconds}s in Saved clips below: double-click plays it, "
                            "right-click adds it to your Sounds.",
                            seconds=f"{len(data) / SR:.2f}"), "ok")
@@ -1816,6 +1825,8 @@ class AppsTab(QWidget):
     def _set_big(self, row: AppRow, on: bool):
         if on and row.editor is None:
             return
+        if on and self.big is not None and self.big is not row and self.big.editor is not None:
+            self.big.editor.set_big(False)
         self.big = row if on else None
         self._layout_apps()
         if row.editor is not None:
@@ -1833,8 +1844,10 @@ class AppsTab(QWidget):
             return
         wave = row.editor.wave
         rest = row.sizeHint().height() - max(wave.minimumHeight(), wave.sizeHint().height())
-        room = self.scroll_area.viewport().height() - rest - 12
+        shelf_h = self.shelf.sizeHint().height() + 12 if self.shelf.isVisible() else 0
+        room = self.scroll_area.viewport().height() - rest - shelf_h - 12
         wave.setMinimumHeight(max(WAVE_H, room))
+        self.grid.invalidate()
         self.list_layout.activate()
 
     def resizeEvent(self, e):

@@ -1866,7 +1866,6 @@
   "Keep only the selection": "Yalnızca seçimi koru",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Seçimi kartların (Enter) altındaki Kaydedilen klipler bölümünde tutun. Buradan: çalın, adlandırın veya Seslerinize ekleyin.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Bu ayarları adı olan bir ses olarak saklayın: \"Ses seç\" altında kendi düğmesi bulunur.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Bu programın son dakikasını, bazı kısımlarını kesebileceğiniz, çalabileceğiniz, ses olarak kaydedebileceğiniz veya doğrudan geri gönderebileceğiniz bir dalga biçimi olarak saklayın. Sadece açıkken dinler.",
   "Kicks in at": "Şu saatte devreye giriyor:",
   "Language": "Dil",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Konuştuğunuz dil (iki harfli kod). 'otomatik' tahminler; İngilizce dışındaki her şey için 'Herhangi bir dil' tanıma modeline ihtiyacı var.",
@@ -1970,7 +1969,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, her efekt ve kayıtlı sesleriniz: uygulamanın yanındaki bir pencerede kendi sesinizi oluşturun",
   "Play (headphones)": "Çal (kulaklık)",
   "Play the selection in your headphones only (Space)": "Seçimi yalnızca kulaklığınızda çalın (Boşluk)",
-  "Play the selection to whoever's listening, right now, without saving it": "Seçimi kaydetmeden, şu anda dinleyen kişiye oynatın",
   "Podcast voice": "Podcast sesi",
   "Presence": "Mevcudiyet",
   "Press Start, then just talk.": "Başlat'a basın, ardından konuşun.",
@@ -2038,7 +2036,6 @@
   "Send {name}": "{name} gönder",
   "Sending": "Gönderiliyor",
   "Sending this program's sound failed. Switch Send on to try again.": "Bu programın sesi gönderilemedi. Tekrar denemek için Gönder seçeneğini açın.",
-  "Sending {length}…": "{length} gönderiliyor…",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Seslerinizi sesli sohbet uygulaması için şekillendirir: Discord veya tarayıcı, Zoom veya Teams'deki bir çağrı, hangisinin sizi dinlediğine göre seçilir. Mono, derin bas, her sesin seviyesini geri veren harmoniklere dönüştü. Bilemezse son kullandığını (ilk başta Discord) saklar.",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Oyun içinde sesli sohbet için seslerinizi şekillendirir: mono, sohbetin attığı derin bas, içeri giren armoniklere dönüşür ve her sesin seviyesi geri verilir. Oyunun sesli sohbetini tanıdığında (Vivox veya Unity'nin Photon and Dissonance'ı) kendiliğinden buna geçer; aksi takdirde son kullandığını korur (ilk başta Vivox en yaygın olanı). Steam Voice, Epic ve daha eski 8 kHz oyunlar: Bunları Gelişmiş'te seçin.",
   "Shared voice": "Paylaşılan ses",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord ve oyunlar mikrofonundan hiçbir şey duymuyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Değilse <b>Onar</b>'a tıkla: sesin birkaç saniye kesilir.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonun ses göndermiyor. Kulaklığın kapalı mı, ya da mikrofonu sessizde mi? Kulaklığı aç ya da mikrofonun sesini aç. Hâlâ bir şey yok mu? Bilgisayarını yeniden başlat, sonra tekrar dene.",
   "Minimised: last picture": "Simge durumunda: son görüntü",
-  "Minimised: restore for live updates": "Simge durumunda: canlı güncellemeler için geri yükle"
+  "Minimised: restore for live updates": "Simge durumunda: canlı güncellemeler için geri yükle",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Kayıtlı kliplerin alanını boyutlandırmak için sürükle. Kliplere sığdırmak için çift tıkla."
 }

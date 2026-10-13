@@ -1825,7 +1825,6 @@
   "Keep only the selection": "Оставить только выбор",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Сохраните выделение в Сохраненные клипы под карточками (Ввод). Отсюда: воспроизведите его, назовите его или добавьте в свои звуки.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Сохраните эти настройки как голос с именем: у него появится собственная кнопка в разделе «Выбрать голос».",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Сохраните последнюю минуту этой программы в виде сигнала, из которого вы можете вырезать фрагменты, воспроизвести, сохранить как звуки или отправить обратно. Он слушает только пока открыт.",
   "Kicks in at": "Начинается в",
   "Language": "Язык",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Язык, на котором вы говорите (двухбуквенный код). «авто» угадывает; нужна модель распознавания «Любой язык» для чего угодно, кроме английского.",
@@ -1927,7 +1926,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Высота тона, рандомизация, каждый эффект и ваши сохраненные голоса: создайте свой собственный голос в окне рядом с приложением.",
   "Play (headphones)": "Играть (наушники)",
   "Play the selection in your headphones only (Space)": "Воспроизвести выбранный фрагмент только в наушниках (Пробел)",
-  "Play the selection to whoever's listening, right now, without saving it": "Проиграйте подборку тому, кто ее слушает, прямо сейчас, не сохраняя ее.",
   "Podcast voice": "Голос подкаста",
   "Presence": "Присутствие",
   "Press Start, then just talk.": "Нажмите «Старт», а затем просто говорите.",
@@ -1997,7 +1995,6 @@
   "Send {name}": "Отправить {name}",
   "Sending": "Отправка",
   "Sending this program's sound failed. Switch Send on to try again.": "Не удалось отправить звук этой программы. Включите «Отправить», чтобы повторить попытку.",
-  "Sending {length}…": "Отправка {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Формирует ваши звуки для приложения голосового чата: Discord или звонка в браузере, Zoom или Teams, в зависимости от того, какое из них вас слушает. Моно, глубокий бас превратился в гармоники, которые проникают сквозь него, возвращая уровень каждому звуку. Если он не может этого определить, он сохраняет последний использованный файл (сначала Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Формирует ваши звуки для голосового чата в играх: моно, глубокий бас, который выбрасывает чат, превращается в доходящие гармоники, и уровень каждого звука возвращается. Когда он распознает голосовой чат игры (Vivox или Unity’s Photon and Dissonance), он автоматически переключается на него; в противном случае он сохраняет последний использованный (сначала Vivox, самый распространенный). Голос Steam, Epic и более ранние игры с частотой 8 кГц: выберите их в разделе «Дополнительно».",
   "Shared voice": "Общий голос",
@@ -3391,5 +3388,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord и игры ничего не слышат с твоего микрофона. Гарнитура выключена или её микрофон отключён? Включи её или микрофон. Если нет, нажми <b>Починить</b>: звук пропадёт на несколько секунд.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофон не передаёт звук. Гарнитура выключена или её микрофон отключён? Включи её или микрофон. Всё ещё ничего? Перезагрузи ПК и попробуй ещё раз.",
   "Minimised: last picture": "Свёрнуто: последний кадр",
-  "Minimised: restore for live updates": "Свёрнуто: восстановите окно для обновления в реальном времени"
+  "Minimised: restore for live updates": "Свёрнуто: восстановите окно для обновления в реальном времени",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Потяните, чтобы изменить размер области сохранённых клипов. Двойной щелчок подгоняет её под клипы."
 }

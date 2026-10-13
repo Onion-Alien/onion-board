@@ -9,17 +9,17 @@ import html
 import logging
 
 import numpy as np
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QAction, QColor, QKeySequence, QPainter, QPen
 from PySide6.QtWidgets import (QAbstractItemView, QHBoxLayout, QHeaderView, QLabel, QMenu,
                                QPushButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
-from soundboard import errors
+from soundboard import errors, theme
 from soundboard.clipshelf import Clip, Shelf
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
-from soundboard.ui.panel import UndoBar
+from soundboard.ui.panel import CONTROL_H, Flow, UndoBar
 from soundboard.engine import SR
 from soundboard.library import level_gain
 
@@ -30,10 +30,63 @@ PREVIEW = "clipshelf:preview"   # ":preview": headphones only
 SEND = "clipshelf-send"
 
 
+class ClipResizeHandle(QWidget):
+    """A mouse and keyboard grip for the saved clips, inside the scrolling page."""
+
+    def __init__(self, shelf):
+        super().__init__(shelf)
+        self.shelf = shelf
+        self.setFixedHeight(28)
+        self.setCursor(Qt.CursorShape.SplitVCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        tip = _("Drag to resize saved clips. Double-click to fit the clips.")
+        self.setToolTip(tip)
+        self.setAccessibleName(tip)
+        self._drag = None
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setPen(QPen(QColor(theme.T["accent"] if self.hasFocus() else theme.T["muted"]), 2))
+        mid = self.width() // 2
+        for y in (12, 16):
+            p.drawLine(mid - 20, y, mid + 20, y)
+        p.end()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.setFocus(Qt.FocusReason.MouseFocusReason)
+            self._drag = (event.globalPosition().y(), self.shelf.list.height())
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if self._drag is not None:
+            y, height = self._drag
+            self.shelf.resize_clips(height + event.globalPosition().y() - y)
+            event.accept()
+
+    def mouseReleaseEvent(self, event):
+        self._drag = None
+
+    def mouseDoubleClickEvent(self, event):
+        self._drag = None
+        self.shelf.resize_clips(0)
+
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down):
+            self.shelf.resize_clips(self.shelf.list.height()
+                                    + (36 if event.key() == Qt.Key.Key_Down else -36))
+        elif event.key() == Qt.Key.Key_Home:
+            self.shelf.resize_clips(0)
+        else:
+            super().keyPressEvent(event)
+
+
 class ClipShelf(QWidget):
     """The saved clips list. `add_to_sounds(audio, name)` asks the window to make
     one a sound (AppsTab passes it on as clip_ready)."""
     add_to_sounds = Signal(object, str)
+    layout_changed = Signal()
+    size_changed = Signal()
     error = ""   # set by whoever adds it to Sounds, when it can't
 
     def __init__(self, engine, cfg, parent=None):
@@ -51,13 +104,28 @@ class ClipShelf(QWidget):
         head.addWidget(self.title)
         hint = QLabel(_("Double-click plays · F2 renames · right-click for more"))
         hint.setObjectName("hint")
+        hint.setWordWrap(True)
         head.addWidget(hint, 1)
-        self.btn_add = QPushButton(_("Add to Sounds"))
-        self.btn_add.setObjectName("small")
-        icons.set_icon(self.btn_add, "sounds", size=13)
-        self.btn_add.clicked.connect(self.add_picked)
-        head.addWidget(self.btn_add)
         v.addLayout(head)
+        actions = Flow(gap=8)
+        self.btn_add = QPushButton(_("Add to Sounds"))
+        self.btn_add.setObjectName("primary")
+        self.btn_add.setMinimumHeight(CONTROL_H)
+        icons.set_icon(self.btn_add, "sounds", size=18)
+        self.btn_add.clicked.connect(self.add_picked)
+        actions.addWidget(self.btn_add)
+        self.clip_buttons = []
+        for text, icon, slot in ((_("Preview"), "play", self.toggle_play),
+                                 (_("Rename"), "edit", self.rename),
+                                 (_("Delete"), "trash", self.delete_picked)):
+            b = QPushButton(text)
+            b.setMinimumHeight(CONTROL_H)
+            b.setAccessibleName(text)
+            icons.set_icon(b, icon, size=18)
+            b.clicked.connect(lambda _checked=False, fn=slot: fn())
+            actions.addWidget(b)
+            self.clip_buttons.append(b)
+        v.addLayout(actions)
         self.list = QTreeWidget()
         self.list.setAccessibleName(_("Saved clips"))
         self.list.setHeaderLabels([_("Name"), _("Length"), _("From")])
@@ -77,6 +145,8 @@ class ClipShelf(QWidget):
         h.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         h.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         v.addWidget(self.list)
+        self.resize_handle = ClipResizeHandle(self)
+        v.addWidget(self.resize_handle)
         self.undo_bar = UndoBar(_("Put the clip back in the list"))
         v.addWidget(self.undo_bar)
         for keys, slot in ((Qt.Key.Key_Delete, self.delete_picked),
@@ -95,6 +165,7 @@ class ClipShelf(QWidget):
         for c in self.shelf.clips:
             it = QTreeWidgetItem([c.name, fmt(c.seconds * SR), c.src])
             it.setData(0, Qt.ItemDataRole.UserRole, c.id)
+            it.setSizeHint(0, QSize(0, CONTROL_H))
             it.setFlags(it.flags() | Qt.ItemFlag.ItemIsEditable)
             it.setToolTip(0, _("{name}\nDouble-click plays it, F2 renames it, right-click "
                                "adds it to your Sounds.", name=c.name))
@@ -105,15 +176,30 @@ class ClipShelf(QWidget):
         self.list.blockSignals(False)
         rows = min(max(len(self.shelf.clips), 1), ROWS_SHOWN)
         row_h = self.list.sizeHintForRow(0) if self.shelf.clips else 22
-        self.list.setFixedHeight(self.list.header().sizeHint().height() + rows * max(row_h, 18)
-                                 + 2 * self.list.frameWidth() + 2)
+        self._fit_height = (self.list.header().sizeHint().height() + rows * max(row_h, 36)
+                            + 2 * self.list.frameWidth() + 2)
+        self._apply_height()
         self.setVisible(bool(self.shelf.clips) or self.undo_bar.active())
         self._sync()
+        self.layout_changed.emit()
+
+    def _apply_height(self):
+        height = self.cfg.app_clip_height
+        self.list.setFixedHeight(min(max(int(height), 72), 600) if height else self._fit_height)
+
+    def resize_clips(self, height):
+        self.cfg.app_clip_height = min(max(int(height), 72), 600) if height else 0
+        self._apply_height()
+        self.layout_changed.emit()
+        self.size_changed.emit()
 
     def _sync(self):
         n = len(self.shelf.clips)
         self.title.setText(_("Saved clips ({n})", n=n))
-        self.btn_add.setEnabled(bool(self._picked()))
+        picked = bool(self._picked())
+        self.btn_add.setEnabled(picked)
+        for b in self.clip_buttons:
+            b.setEnabled(picked)
 
     def _picked(self) -> list[Clip]:
         out = []

@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Mantenha apenas a seleção",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Mantenha a seleção em Clipes guardados, abaixo dos cartões (Enter). A partir daí: toque, dê um nome ou adicione aos seus sons.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Mantenha estas definições como uma voz com nome: ganha um botão próprio em “Escolha uma voz”.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Mantenha o último minuto deste programa como uma forma de onda a partir da qual pode cortar pedaços, reproduzir, guardar como sons ou enviar de volta. Só escuta enquanto está aberto.",
   "Kicks in at": "Entra em ação em",
   "Language": "Idioma",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Língua que fala (código de duas letras). suposições 'automáticas'; precisa de um modelo de reconhecimento 'Qualquer língua' para qualquer coisa, excepto o inglês.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, todos os efeitos e as suas vozes guardadas: crie a sua própria voz numa janela ao lado da aplicação",
   "Play (headphones)": "Jogar (auscultadores)",
   "Play the selection in your headphones only (Space)": "Reproduza a seleção apenas nos seus auscultadores (Espaço)",
-  "Play the selection to whoever's listening, right now, without saving it": "Reproduza a seleção para quem estiver a ouvir, neste momento, sem a guardar",
   "Podcast voice": "Voz de podcast",
   "Presence": "Presença",
   "Press Start, then just talk.": "Prima Iniciar e depois é só falar.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "Enviar {name}",
   "Sending": "Enviando",
   "Sending this program's sound failed. Switch Send on to try again.": "O envio do som deste programa falhou. Ative Enviar para tentar novamente.",
-  "Sending {length}…": "Enviando {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Molda os seus sons para uma aplicação de chat por voz: Discord, ou uma chamada num browser, Zoom ou Teams, escolhido por qual deles o está a ouvir. Mono, os graves profundos transformam-se em harmónicos que passam, o nível de cada som é devolvido. Se não souber, mantém o último que usou (Discord no início).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Molda os seus sons para o chat de voz dentro dos jogos: mono, os graves profundos que o chat deita fora transformam-se em harmónicos que passam e o nível de cada som é devolvido. Quando reconhece o chat de voz do jogo (Vivox, ou Unity's Photon and Dissonance), muda para ele sozinho; caso contrário, mantém o último que utilizou (Vivox a princípio, o mais comum). Voz Steam, jogos épicos e mais antigos de 8 kHz: escolha-os em Avançado.",
   "Shared voice": "Voz partilhada",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "O Discord e os jogos não ouvem nada do teu microfone. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Se não, clica em <b>Reparar</b>: o som falha durante alguns segundos.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "O teu microfone não está a enviar som. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Continua sem som? Reinicia o PC e tenta outra vez.",
   "Minimised: last picture": "Minimizada: última imagem",
-  "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações em direto"
+  "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações em direto",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Arrasta para redimensionar os clips guardados. Clica duas vezes para ajustar aos clips."
 }

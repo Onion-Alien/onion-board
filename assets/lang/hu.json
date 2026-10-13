@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Csak a kijelölést tartsa meg",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Tartsa meg a kijelölést a Mentett klipekben, a kártyák alatt (Enter). Innentől kezdve: játssza le, nevezze el, vagy adja hozzá a hangjaihoz.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Tartsa meg ezeket a beállításokat névvel ellátott hangként: saját gombot kap a „Hang kiválasztása” alatt.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Tartsa meg a program utolsó pillanatát hullámformaként, amelyet kivághat, lejátszhat, hangként menthet vagy egyenesen visszaküldheti. Csak akkor hallgat, amíg nyitva van.",
   "Kicks in at": "Beindul a",
   "Language": "Nyelv",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Beszélt nyelv (kétbetűs kód). „automatikus” találgatások; „Bármilyen nyelvű” felismerési modellre van szüksége mindenhez, kivéve az angolhoz.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, minden effektus és az elmentett hangok: építse fel saját hangját az alkalmazás melletti ablakban",
   "Play (headphones)": "Lejátszás (fejhallgató)",
   "Play the selection in your headphones only (Space)": "A kiválasztott elemek lejátszása csak a fejhallgatón (szóköz)",
-  "Play the selection to whoever's listening, right now, without saving it": "Játssza le a kiválasztottat annak, aki éppen hallgatja, mentés nélkül",
   "Podcast voice": "Podcast hangja",
   "Presence": "Jelenlét",
   "Press Start, then just talk.": "Nyomja meg a Start gombot, majd csak beszéljen.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "{name} küldése",
   "Sending": "Küldés",
   "Sending this program's sound failed. Switch Send on to try again.": "A program hangjának elküldése nem sikerült. Kapcsolja be a Küldés lehetőséget, és próbálja újra.",
-  "Sending {length}…": "{length} küldése…",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Hangos csevegőalkalmazáshoz alakítja hangjait: Discord, vagy hívás böngészőben, Zoomban vagy Teamsben, az alapján választva, hogy melyik hallgat rád. Mono, a mély basszus harmonikussá változott, amelyek átjutnak, minden hangszint visszaadódik. Ha nem tudja megállapítani, megtartja az utoljára használtat (eleinte Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Formázza hangjait a játékokon belüli hangcsevegéshez: monó, a mély basszus, amelyet a csevegés eldob, harmonikussá változott, amely átjut, és minden hangszintet visszaadnak. Amikor felismeri a játék hangos csevegését (Vivox, vagy Unity's Photon and Dissonance), magától átvált erre; egyébként megtartja az utoljára használtat (eleinte Vivox, a leggyakoribb). Steam voice, Epic és régebbi, 8 kHz-es játékok: válaszd ki őket az Advanced menüben.",
   "Shared voice": "Megosztott hang",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "A Discord és a játékok semmit sem hallanak a mikrofonodból. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Ha nem, kattints a <b>Javítás</b> gombra: a hang pár másodpercre kimarad.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "A mikrofonod nem küld hangot. Ki van kapcsolva a headseted, vagy le van némítva a mikrofonja? Kapcsold be, vagy oldd fel a némítást. Még mindig semmi? Indítsd újra a géped, aztán próbáld újra.",
   "Minimised: last picture": "Kis méretű: utolsó kép",
-  "Minimised: restore for live updates": "Kis méretű: állítsd vissza az élő képhez"
+  "Minimised: restore for live updates": "Kis méretű: állítsd vissza az élő képhez",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Húzással méretezheted át a mentett klipek területét. Dupla kattintással a klipekhez igazíthatod."
 }

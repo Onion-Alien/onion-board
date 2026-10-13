@@ -1910,7 +1910,6 @@
   "Keep only the selection": "Зберігайте лише виділення",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Збережіть вибір у Збережених кліпах під картками (Enter). Звідти: відтворіть його, назвіть його або додайте до своїх звуків.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Збережіть ці налаштування як голос із назвою: він отримає власну кнопку під «Вибрати голос».",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Зберігайте останню хвилину цієї програми як хвилю, з якої можна вирізати біти, відтворювати, зберігати як звуки або відправляти прямо назад. Він слухає, лише коли відкритий.",
   "Kicks in at": "Удари в",
   "Language": "Мова",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Мова, якою ви володієте (двобуквений код). «авто» відгадки; потрібна модель розпізнавання «Будь-яка мова» для всього, крім англійської.",
@@ -2015,7 +2014,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, кожен ефект і ваші збережені голоси: створіть свій власний голос у вікні біля програми",
   "Play (headphones)": "Грати (навушники)",
   "Play the selection in your headphones only (Space)": "Відтворити вибраний фрагмент лише в навушниках (Пробіл)",
-  "Play the selection to whoever's listening, right now, without saving it": "Відтворіть добірку всім, хто її слухає, прямо зараз, не зберігаючи її",
   "Podcast voice": "Голос подкасту",
   "Presence": "Присутність",
   "Press Start, then just talk.": "Натисніть «Пуск», а потім просто говоріть.",
@@ -2085,7 +2083,6 @@
   "Send {name}": "Надіслати {name}",
   "Sending": "Відправка",
   "Sending this program's sound failed. Switch Send on to try again.": "Не вдалося надіслати звук цієї програми. Увімкніть Надіслати, щоб повторити спробу.",
-  "Sending {length}…": "Надсилання {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Формує ваші звуки для програми голосового чату: Discord або дзвінок у браузері, Zoom або Teams, вибираючи, хто вас слухає. Моно, глибокі баси перетворюються на гармоніки, які проникають, повертаючи рівень кожного звуку. Якщо він не може визначити, він зберігає останній використаний (спочатку Discord).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Формує ваші звуки для голосового чату в іграх: моно, глибокі баси, які викидає чат, перетворюються на гармоніки, які проникають, і рівень кожного звуку повертається. Коли він розпізнає голосовий чат гри (Vivox або Unity's Photon and Dissonance), він перемикається на нього самостійно; інакше він зберігає останній використаний (спочатку Vivox, найпоширеніший). Голос Steam, Epic і старіші ігри 8 кГц: виберіть їх у розділі «Додатково».",
   "Shared voice": "Спільний голос",
@@ -3391,5 +3388,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord та ігри нічого не чують з твого мікрофона. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Якщо ні, натисни <b>Полагодити</b>: звук зникне на кілька секунд.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Мікрофон не передає звук. Гарнітуру вимкнено, або її мікрофон вимкнено? Увімкни її або мікрофон. Досі нічого? Перезавантаж ПК і спробуй ще раз.",
   "Minimised: last picture": "Згорнуто: останній кадр",
-  "Minimised: restore for live updates": "Згорнуто: відновіть вікно для оновлень наживо"
+  "Minimised: restore for live updates": "Згорнуто: відновіть вікно для оновлень наживо",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Потягніть, щоб змінити розмір області збережених кліпів. Подвійне клацання підганяє її під кліпи."
 }

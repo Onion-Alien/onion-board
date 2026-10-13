@@ -1822,7 +1822,6 @@
   "Keep only the selection": "Simpan saja pilihannya",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Simpan pilihan di Klip tersimpan, di bawah kartu (Enter). Dari sana: mainkan, beri nama, atau tambahkan ke Suara Anda.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Pertahankan pengaturan ini sebagai suara dengan nama: ia memiliki tombolnya sendiri di bawah “Pilih suara”.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Simpan menit terakhir program ini sebagai bentuk gelombang yang dapat Anda potong, putar, simpan sebagai suara, atau kirim langsung kembali. Ia hanya mendengarkan saat terbuka.",
   "Kicks in at": "Dimulai pada",
   "Language": "Bahasa",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Bahasa yang Anda gunakan (kode dua huruf). tebakan 'otomatis'; membutuhkan model pengenalan 'Bahasa apa pun' untuk apa pun selain bahasa Inggris.",
@@ -1925,7 +1924,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Acak, setiap efek, dan suara Anda yang disimpan: buat suara Anda sendiri di jendela di samping aplikasi",
   "Play (headphones)": "Putar (headphone)",
   "Play the selection in your headphones only (Space)": "Putar pilihan di headphone Anda saja (Spasi)",
-  "Play the selection to whoever's listening, right now, without saving it": "Putar pilihan tersebut kepada siapa pun yang mendengarkannya, sekarang juga, tanpa menyimpannya",
   "Podcast voice": "Suara podcast",
   "Presence": "Kehadiran",
   "Press Start, then just talk.": "Tekan Mulai, lalu bicara saja.",
@@ -1991,7 +1989,6 @@
   "Send {name}": "Kirim {name}",
   "Sending": "Mengirim",
   "Sending this program's sound failed. Switch Send on to try again.": "Gagal mengirimkan suara program ini. Aktifkan Kirim untuk mencoba lagi.",
-  "Sending {length}…": "Mengirim {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Membentuk suara Anda untuk aplikasi obrolan suara: Discord, atau panggilan di browser, Zoom, atau Teams, dipilih berdasarkan aplikasi mana yang mendengarkan Anda. Mono, bass yang dalam berubah menjadi harmonik yang mengalir, setiap level suara dikembalikan. Jika tidak dapat membedakannya, ia akan menyimpan yang terakhir digunakan (Discord pada awalnya).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Membentuk suara Anda untuk obrolan suara di dalam game: mono, bass dalam yang dihasilkan obrolan berubah menjadi harmonis, dan setiap level suara dikembalikan. Saat ia mengenali obrolan suara game (Vivox, atau Unity's Photon and Dissonance), ia akan beralih ke obrolan suara itu sendiri; jika tidak, ia akan tetap menggunakan yang terakhir digunakan (Vivox pada awalnya, yang paling umum). Steam voice, Epic, dan game 8 kHz lama: pilih di Advanced.",
   "Shared voice": "Suara bersama",
@@ -3243,5 +3240,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord dan game tidak mendengar apa pun dari mic-mu. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Kalau tidak, klik <b>Perbaiki</b>: suaramu hilang beberapa detik.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic-mu tidak mengirim suara. Apakah headset-mu mati, atau mic-nya di-mute? Nyalakan atau aktifkan lagi mic-nya. Masih tidak ada? Restart PC-mu, lalu coba lagi.",
   "Minimised: last picture": "Diminimalkan: gambar terakhir",
-  "Minimised: restore for live updates": "Diminimalkan: pulihkan untuk pembaruan langsung"
+  "Minimised: restore for live updates": "Diminimalkan: pulihkan untuk pembaruan langsung",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah ukuran klip tersimpan. Klik dua kali untuk menyesuaikan dengan klip."
 }

@@ -2042,7 +2042,6 @@
   "Keep only the selection": "احتفظ بالاختيار فقط",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "احتفظ بالاختيار في المقاطع المحفوظة، أسفل البطاقات (أدخل). من هناك: قم بتشغيلها أو تسميتها أو إضافتها إلى الأصوات الخاصة بك.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "احتفظ بهذه الإعدادات كصوت باسم: فهو يحصل على زر خاص به ضمن \"اختيار صوت\".",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "احتفظ باللحظة الأخيرة لهذا البرنامج كشكل موج يمكنك قطع أجزاء منه أو تشغيلها أو حفظها كأصوات أو إرسالها مباشرة. إنه يستمع فقط عندما يكون مفتوحًا.",
   "Kicks in at": "ركلات في",
   "Language": "لغة",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "اللغة التي تتحدثها (رمز مكون من حرفين). التخمينات \"التلقائية\"؛ يحتاج إلى نموذج التعرف على \"أي لغة\" لأي شيء باستثناء اللغة الإنجليزية.",
@@ -2150,7 +2149,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "طبقة الصوت، والعشوائية، وكل تأثير، والأصوات المحفوظة: أنشئ صوتك الخاص في نافذة بجانب التطبيق",
   "Play (headphones)": "تشغيل (سماعات الرأس)",
   "Play the selection in your headphones only (Space)": "تشغيل التحديد في سماعات الرأس الخاصة بك فقط (مسافة)",
-  "Play the selection to whoever's listening, right now, without saving it": "قم بتشغيل التحديد لمن يستمع الآن دون حفظه",
   "Podcast voice": "بودكاست صوت",
   "Presence": "حضور",
   "Press Start, then just talk.": "اضغط على ابدأ، ثم تحدث فقط.",
@@ -2226,7 +2224,6 @@
   "Send {name}": "أرسل {name}",
   "Sending": "إرسال",
   "Sending this program's sound failed. Switch Send on to try again.": "فشل إرسال صوت هذا البرنامج. قم بتشغيل \"إرسال\" للمحاولة مرة أخرى.",
-  "Sending {length}…": "إرسال {length} ...",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "يشكل أصواتك لتطبيق الدردشة الصوتية: Discord، أو مكالمة في المتصفح، أو Zoom أو Teams، ويتم اختيار الشخص الذي يستمع إليك. Mono، الجهير العميق يتحول إلى توافقيات يتم إرجاع مستوى كل صوت إليها. إذا لم يتمكن من معرفة ذلك، فإنه يحتفظ بآخر ما استخدمه (Discord في البداية).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "يشكل أصواتك للدردشة الصوتية داخل الألعاب: أحادي، الجهير العميق الذي تطرحه الدردشة يتحول إلى توافقيات يمكن الوصول إليها، ويتم استعادة مستوى كل صوت. عندما يتعرف على الدردشة الصوتية للعبة (Vivox، أو Unity's Photon and Dissonance)، فإنه يتحول إلى ذلك من تلقاء نفسه؛ وإلا فإنه يحتفظ بآخر ما استخدمه (Vivox في البداية، وهو الأكثر شيوعًا). ألعاب Steam voice وEpic والألعاب الأقدم بتردد 8 كيلو هرتز: اخترها في الوضع المتقدم.",
   "Shared voice": "صوت مشترك",
@@ -3613,5 +3610,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord والألعاب لا تسمع شيئًا من الميكروفون. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. وإلا، انقر <b>إصلاح</b>: سينقطع الصوت لبضع ثوانٍ.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "الميكروفون لا يرسل أي صوت. هل السماعة مطفأة، أو ميكروفونها مكتوم؟ شغّلها أو ألغِ الكتم. ما زال لا شيء؟ أعد تشغيل الكمبيوتر، ثم حاول مرة أخرى.",
   "Minimised: last picture": "مصغّرة: آخر صورة",
-  "Minimised: restore for live updates": "مصغّرة: استعد النافذة للتحديث المباشر"
+  "Minimised: restore for live updates": "مصغّرة: استعد النافذة للتحديث المباشر",
+  "Drag to resize saved clips. Double-click to fit the clips.": "اسحب لتغيير حجم المقاطع المحفوظة. انقر مرتين لملاءمة المقاطع."
 }

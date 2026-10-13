@@ -1908,7 +1908,6 @@
   "Keep only the selection": "Păstrați doar selecția",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Păstrați selecția în Clipuri salvate, sub carduri (Enter). De acolo: redați-l, denumiți-l sau adăugați-l la Sunete.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Păstrați aceste setări ca o voce cu un nume: primește propriul buton sub „Alege o voce”.",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Păstrați ultimul minut al acestui program ca formă de undă din care puteți tăia, reda, salva ca sunete sau trimite direct înapoi. Ascultă doar când este deschis.",
   "Kicks in at": "Dă cu piciorul la",
   "Language": "Limbă",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Limba pe care o vorbiți (cod din două litere). presupuneri „auto”; are nevoie de un model de recunoaștere „Orice limbă” pentru orice, în afară de engleză.",
@@ -2013,7 +2012,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, fiecare efect și vocile tale salvate: construiește-ți propria voce într-o fereastră de lângă aplicație",
   "Play (headphones)": "Redare (căști)",
   "Play the selection in your headphones only (Space)": "Redați selecția numai în căști (Spațiu)",
-  "Play the selection to whoever's listening, right now, without saving it": "Redați selecția oricui ascultă, chiar acum, fără a o salva",
   "Podcast voice": "Vocea podcastului",
   "Presence": "Prezenţă",
   "Press Start, then just talk.": "Apăsați Start, apoi vorbiți.",
@@ -2083,7 +2081,6 @@
   "Send {name}": "Trimite {name}",
   "Sending": "Trimiterea",
   "Sending this program's sound failed. Switch Send on to try again.": "Trimiterea sunetului acestui program a eșuat. Activați Trimiteți pentru a încerca din nou.",
-  "Sending {length}…": "Se trimite {length} ...",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Modelează sunetele dvs. pentru o aplicație de chat vocal: Discord sau un apel într-un browser, Zoom sau Teams, ales de care vă ascultă. Mono, basul profund transformat în armonici care trec, nivelul fiecărui sunet fiind restituit. Dacă nu poate spune, îl păstrează pe ultimul pe care l-a folosit (Discord la început).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Modelează sunetele dvs. pentru chatul vocal în cadrul jocurilor: mono, basul profund pe care chatul îl aruncă transformat în armonici care trec și nivelul fiecărui sunet este returnat. Când recunoaște chat-ul vocal al jocului (Vivox, sau Fotonul și Dissonanța Unității), trece singur la acesta; altfel îl păstrează pe ultimul pe care l-a folosit (Vivox la început, cel mai comun). Voce Steam, jocuri epice și jocuri mai vechi de 8 kHz: alegeți-le în Avansat.",
   "Shared voice": "Voce comună",
@@ -3391,5 +3388,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Discord și jocurile nu aud nimic de la microfonul tău. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Dacă nu, dă clic pe <b>Repară</b>: sunetul se oprește câteva secunde.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Microfonul tău nu trimite niciun sunet. Căștile sunt oprite sau au microfonul pe mut? Pornește-le sau scoate-l de pe mut. Tot nimic? Repornește PC-ul, apoi încearcă din nou.",
   "Minimised: last picture": "Minimizată: ultima imagine",
-  "Minimised: restore for live updates": "Minimizată: restaurează pentru actualizări în timp real"
+  "Minimised: restore for live updates": "Minimizată: restaurează pentru actualizări în timp real",
+  "Drag to resize saved clips. Double-click to fit the clips.": "Trage pentru a redimensiona clipurile salvate. Dublu clic pentru a ajusta la clipuri."
 }

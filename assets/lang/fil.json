@@ -1864,7 +1864,6 @@
   "Keep only the selection": "Panatilihin lamang ang pagpili",
   "Keep the selection in Saved clips, under the cards (Enter). From there: play it, name it, or add it to your Sounds.": "Panatilihin ang pagpili sa Mga Nai-save na clip, sa ilalim ng mga card (Enter). Mula doon: i-play ito, pangalanan ito, o idagdag ito sa iyong Mga Tunog.",
   "Keep these settings as a voice with a name: it gets its own button under “Pick a voice”.": "Panatilihin ang mga setting na ito bilang isang boses na may pangalan: nakakakuha ito ng sarili nitong button sa ilalim ng \"Pumili ng boses\".",
-  "Keep this program's last minute as a waveform you can cut bits out of, play, save as sounds or send straight back. It only listens while it's open.": "Panatilihin ang huling minuto ng program na ito bilang isang waveform na maaari mong putulin ang mga piraso, i-play, i-save bilang mga tunog o ipadala pabalik. Nakikinig lang ito habang nakabukas.",
   "Kicks in at": "Kicks in sa",
   "Language": "Wika",
   "Language you speak (two-letter code). 'auto' guesses; needs an 'Any language' recognition model for anything but English.": "Wikang ginagamit mo (two-letter code). 'auto' hula; kailangan ng 'Anumang wika' na modelo ng pagkilala para sa anumang bagay maliban sa Ingles.",
@@ -1968,7 +1967,6 @@
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, bawat epekto, at ang iyong mga naka-save na boses: bumuo ng sarili mong boses sa isang window sa tabi ng app",
   "Play (headphones)": "Maglaro (headphones)",
   "Play the selection in your headphones only (Space)": "I-play ang pagpili sa iyong mga headphone lamang (Space)",
-  "Play the selection to whoever's listening, right now, without saving it": "I-play ang seleksyon sa sinumang nakikinig, ngayon, nang hindi ito sine-save",
   "Podcast voice": "Boses ng podcast",
   "Presence": "presensya",
   "Press Start, then just talk.": "Pindutin ang Start, pagkatapos ay makipag-usap lang.",
@@ -2036,7 +2034,6 @@
   "Send {name}": "Ipadala si {name}",
   "Sending": "Nagpapadala",
   "Sending this program's sound failed. Switch Send on to try again.": "Nabigo ang pagpapadala ng tunog ng program na ito. I-on ang Send para subukang muli.",
-  "Sending {length}…": "Ipinapadala ang {length} …",
   "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom or Teams, picked by which one is listening to you. Mono, the deep bass turned into harmonics that get through, each sound's level given back. If it can't tell, it keeps the last one it used (Discord at first).": "Hinuhubog ang iyong mga tunog para sa isang voice chat app: Discord, o isang tawag sa isang browser, Zoom o Mga Koponan, na pinili kung sino ang nakikinig sa iyo. Mono, ang malalim na bass ay naging harmonic na nakakalusot, ang bawat antas ng tunog ay naibalik. Kung hindi nito masabi, pinapanatili nito ang huling ginamit nito (Discord sa una).",
   "Shapes your sounds for voice chat inside games: mono, the deep bass the chat throws away turned into harmonics that get through, and each sound's level given back. When it recognises the game's voice chat (Vivox, or Unity's Photon and Dissonance) it switches to that by itself; otherwise it keeps the last one it used (Vivox at first, the most common). Steam voice, Epic and older 8 kHz games: pick them in Advanced.": "Humuhubog sa iyong mga tunog para sa voice chat sa loob ng mga laro: mono, ang malalim na bass na itinapon ng chat ay naging mga harmonika na dumaan, at ang bawat antas ng tunog ay naibalik. Kapag nakilala nito ang voice chat ng laro (Vivox, o Unity's Photon and Dissonance) lilipat ito sa mismong iyon; kung hindi, pinapanatili nito ang huling ginamit nito (Vivox sa una, ang pinakakaraniwan). Steam voice, Epic at mas lumang 8 kHz na laro: piliin ang mga ito sa Advanced.",
   "Shared voice": "Nakabahaging boses",
@@ -3317,5 +3314,6 @@
   "Discord and games hear nothing from your mic. Is your headset switched off, or its mic muted? Turn it on or unmute it. If not, click <b>Repair</b>: your sound drops out for a few seconds.": "Walang naririnig ang Discord at mga laro mula sa mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Kung hindi, i-click ang <b>I-repair</b>: mawawala ang tunog mo nang ilang segundo.",
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Walang tunog na pinapadala ang mic mo. Naka-off ba ang headset mo, o naka-mute ang mic nito? I-on ito o i-unmute. Wala pa rin? I-restart ang PC mo, tapos subukan ulit.",
   "Minimised: last picture": "Naka-minimize: huling larawan",
-  "Minimised: restore for live updates": "Naka-minimize: i-restore para sa live na larawan"
+  "Minimised: restore for live updates": "Naka-minimize: i-restore para sa live na larawan",
+  "Drag to resize saved clips. Double-click to fit the clips.": "I-drag para baguhin ang laki ng mga naka-save na clip. I-double-click para magkasya ang mga clip."
 }
