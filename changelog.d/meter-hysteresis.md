@@ -1,0 +1,1 @@
+- Stop level meters flashing between colours when audio hovers around a warning threshold.
