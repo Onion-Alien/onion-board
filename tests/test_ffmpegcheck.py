@@ -8,7 +8,7 @@ import time
 import pytest
 from conftest import process_events, said
 
-from soundboard import ffmpegget, net, quality
+from soundboard import ffmpegget, net, quality, usage
 from soundboard.ui import mainwindow
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -167,3 +167,43 @@ def test_hide_is_until_the_next_start_only(window):  # noqa: F811
 
 def test_icon_button_has_words(window):  # noqa: F811
     assert window.ff_hide.toolTip() and window.ff_hide.accessibleName()
+
+
+
+def test_failed_get_then_retry_counts_recovery(window, qapp, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage, "_used", set())
+    _fix(monkeypatch, err="network unavailable")
+    _found(window, ffmpegget.MISSING)
+    process_events(qapp, lambda: not window._ff_getting)
+    assert window.cfg.stats_ffmpeg_failed
+    assert "get-ffmpeg-auto-failed" in window.cfg.stats_used
+    assert "ffmpeg-recovered" not in window.cfg.stats_used
+    _fix(monkeypatch)
+    window.ff_fix.click()
+    process_events(qapp, lambda: not window._ff_getting)
+    assert not window.cfg.stats_ffmpeg_failed
+    assert "ffmpeg-recovered" in window.cfg.stats_used
+
+
+def test_startup_broken_then_working_check_counts_recovery(window, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage, "_used", set())
+    window._ff_auto_tried = True   # test checks, without starting a download
+    _found(window, ffmpegget.BROKEN)
+    assert window.cfg.stats_ffmpeg_failed and "ffmpeg-broken" in window.cfg.stats_used
+    _found(window, ffmpegget.OK)
+    assert not window.cfg.stats_ffmpeg_failed
+    assert "ffmpeg-recovered" in window.cfg.stats_used
+
+
+@pytest.mark.parametrize("err", [ffmpegget.Stopped("Stopped."), ffmpegget.GetError("failed")])
+def test_failed_or_stopped_fix_cannot_recover_from_stale_health(window, monkeypatch, err):  # noqa: F811
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage, "_used", set())
+    window.cfg.stats_ffmpeg_failed = True
+    window._on_ffmpeg(OK, err)
+    assert window.cfg.stats_ffmpeg_failed
+    assert "ffmpeg-recovered" not in window.cfg.stats_used
+    failed = not isinstance(err, ffmpegget.Stopped)
+    assert ("get-ffmpeg-failed" in window.cfg.stats_used) == failed

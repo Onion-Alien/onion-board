@@ -940,3 +940,60 @@ def test_getting_python_for_an_addon_is_counted(monkeypatch, tmp_path):
     with pytest.raises(pyget.GetError):
         pyget.for_module(tmp_path, print)
     assert seen == ["addon-got-python", "addon-python-failed"]
+
+
+@pytest.mark.parametrize("failure", ["broken", "get-failed"])
+def test_ffmpeg_failure_survives_a_send_and_restart_until_verified_recovery(sent, app_dir, failure):
+    cfg = Config()
+    usage.ffmpeg_state(cfg, failure)
+    if failure == "get-failed":
+        usage.used("get-ffmpeg-auto-failed")
+    usage.maybe_send(cfg)
+    failed_hits = _hits(sent[0][0], about=True)
+    expected = "used/ffmpeg-broken" if failure == "broken" else "used/get-ffmpeg-auto-failed"
+    assert expected in {h["path"] for h in failed_hits}
+    assert cfg.stats_ffmpeg_failed and cfg.save()
+
+    # The daily send cleared its flags, but not the unresolved-failure marker.
+    cfg = Config.load()
+    assert cfg.stats_ffmpeg_failed and not cfg.stats_used
+    usage.ffmpeg_state(cfg, "missing")
+    usage.ffmpeg_state(cfg, "unknown")
+    assert cfg.stats_ffmpeg_failed
+    cfg.stats_sent -= usage.EVERY_S
+    usage.ffmpeg_state(cfg, "ok")
+    usage.maybe_send(cfg)
+    recovered_hits = _hits(sent[1][0], about=True)
+    assert "used/ffmpeg-recovered" in {h["path"] for h in recovered_hits}
+    assert {h["ref"] for h in failed_hits} == {h["ref"] for h in recovered_hits}
+    assert not cfg.stats_ffmpeg_failed
+
+    # A later healthy start isn't another recovery.
+    usage.ffmpeg_state(cfg, "ok")
+    usage.remember(cfg)
+    assert not cfg.stats_used
+
+
+def test_ffmpeg_first_install_and_healthy_reinstall_arent_recoveries(sent):
+    cfg = Config()
+    usage.ffmpeg_state(cfg, "missing")
+    usage.ffmpeg_state(cfg, "ok")
+    usage.remember(cfg)
+    assert not cfg.stats_ffmpeg_failed and not cfg.stats_used
+
+
+@pytest.mark.parametrize("off", ["switch", "offline", "tor", "source"])
+def test_ffmpeg_recovery_doesnt_track_while_the_count_is_off(sent, monkeypatch, off):
+    cfg = Config(stats_ffmpeg_failed=True)
+    if off == "switch":
+        net.configure_features(off=[usage.FEATURE])
+    elif off == "offline":
+        net.configure_features(offline=True)
+    elif off == "tor":
+        monkeypatch.setattr(net, "_mode", net.TOR)
+    else:
+        monkeypatch.setattr(sys, "frozen", False)
+    usage.ffmpeg_state(cfg, "broken")
+    usage.ffmpeg_state(cfg, "ok")
+    usage.remember(cfg)
+    assert not cfg.stats_ffmpeg_failed and not cfg.stats_used

@@ -176,6 +176,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"dl-failed-{k}" for k in DL_SITES),
             # FFmpeg got by the app itself while it loads (not a click), and that failing
             "get-ffmpeg-auto", "get-ffmpeg-auto-failed",
+            "ffmpeg-broken", "ffmpeg-recovered",
             # the mic effect: put on by a click, put back by itself after Windows took it
             # off, updated; No to Windows' admin prompt; a click's set-up failed; the
             # fix-by-itself failed; on, but not working when the wait ran out; Windows took
@@ -458,6 +459,24 @@ def used(key: str) -> None:
     """Feature `key` (one of FEATURES) was used, for the next daily count."""
     if key in FEATURES:
         _used.add(key)
+
+
+def ffmpeg_state(cfg, state: str) -> None:
+    """Remember a broken copy or failed get until a later check verifies it works.
+    The marker survives daily sends and restarts; missing on a new install is normal,
+    and an unknown check or a cancelled get cannot prove recovery. Only fixed feature
+    names are counted, never a path or error message.
+    """
+    if not enabled() or not net.allowed(FEATURE) or net.mode() == net.TOR:
+        cfg.stats_ffmpeg_failed = False
+        return
+    if state in ("broken", "get-failed"):
+        cfg.stats_ffmpeg_failed = True
+        if state == "broken":
+            used("ffmpeg-broken")
+    elif state == "ok" and cfg.stats_ffmpeg_failed:
+        used("ffmpeg-recovered")
+        cfg.stats_ffmpeg_failed = False
 
 
 def remember(cfg) -> None:

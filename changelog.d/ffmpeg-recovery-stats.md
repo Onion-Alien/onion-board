@@ -1,0 +1,1 @@
+- Count FFmpeg startup failures and verified recovery in the anonymous usage flags, remembering an unresolved failure across app restarts.

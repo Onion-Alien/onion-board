@@ -5320,6 +5320,10 @@ class MainWindow(QMainWindow):
         the GetError)."""
         if h is not None:
             self.ffmpeg = h
+            if not err:   # a check or successful fix, never a failed/cancelled fix's stale health
+                usage.ffmpeg_state(self.cfg, h.state)
+                usage.remember(self.cfg)
+                self._save_later()
         if err is None:
             self._ff_checking = False
             if h is not None and h.state != ffmpegget.OK and self._may_get_ffmpeg():
@@ -5331,6 +5335,9 @@ class MainWindow(QMainWindow):
             if err and not stopped:
                 usage.used("get-ffmpeg-auto-failed" if self._ff_auto_now
                            else "get-ffmpeg-failed")
+                usage.ffmpeg_state(self.cfg, "get-failed")
+                usage.remember(self.cfg)
+                self._save_later()
             for btn, release in self._ff_waiting:
                 if qt_valid(btn):
                     release(None if stopped else _("✗ Failed") if err else _("✓ Got FFmpeg"))
