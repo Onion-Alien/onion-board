@@ -522,6 +522,8 @@ class Config:
     stats_launches: int = 0
     stats_version: str = ""
     stats_pending: list[str] = field(default_factory=list)
+    # an observed FFmpeg startup/get failure awaiting a verified working copy
+    stats_ffmpeg_failed: bool = False
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
