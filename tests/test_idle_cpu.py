@@ -185,6 +185,34 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
     assert window.timer.interval() == main.TICK_QUIET_MS
 
 
+def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatch, qapp):  # noqa: F811
+    from PySide6.QtCore import Qt
+    from soundboard.ui import mainwindow as main
+
+    monkeypatch.setattr(window, "isVisible", lambda: True)
+    monkeypatch.setattr(window, "isMinimized", lambda: False)
+    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    window._ui_live = True
+    window._tick_busy = True
+    window._set_tick_rate()
+    assert window.timer.interval() == main.TICK_MS
+
+    monkeypatch.setattr(main.appstate, "active", lambda: False)
+    qapp.applicationStateChanged.emit(Qt.ApplicationInactive)
+    assert window.timer.interval() == main.TICK_MS
+    window._tick_busy = False
+    window._wake()  # playback starts while the game already has focus
+    assert window.timer.interval() == main.TICK_MS
+
+    window._tick_busy = False
+    window._set_tick_rate()
+    assert window.timer.interval() == main.TICK_QUIET_MS
+    monkeypatch.setattr(window, "isMinimized", lambda: True)
+    window._tick_busy = True
+    window._set_tick_rate()
+    assert window.timer.interval() == main.TICK_IDLE_MS
+
+
 def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  # noqa: F811
     from soundboard.ui import mainwindow as main
 
