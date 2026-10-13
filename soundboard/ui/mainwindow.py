@@ -708,6 +708,7 @@ class MainWindow(QMainWindow):
     _mic_updating = False   # attach_mic was started from it (its own result messages)
     _autofixing = False     # attach_mic(auto=True): the app's own repair, nobody clicked
     _autofix_err = ""       # that repair failed: the card asks for a click until it works
+    _mic_fail_kind = ""     # the last set-up's directmic.FAIL_KINDS word, for the count
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
     _show_bun = False       # the set-up running is the first one: Bun's show explains it
@@ -3928,6 +3929,8 @@ class MainWindow(QMainWindow):
 
     def _attach_mic_work(self, mic: str, clean: bool = False, auto: bool = False):
         err = directmic.install(mic, clean=clean, ask_windows=not auto) or ""
+        # its reason word, kept here: the signal hands _mic_attached a plain str
+        self._mic_fail_kind = directmic.fail_kind(err) if err else ""
         # the admin prompt can outlast the window (closed and freed meanwhile): then
         # there's nobody to tell, and emitting on the freed window raises TypeError
         if qt_valid(self):
@@ -3953,8 +3956,9 @@ class MainWindow(QMainWindow):
             usage.used("mic-effect-fix-failed" if auto else
                        "mic-effect-said-no" if err == directmic.declined() else
                        "mic-effect-failed")
-            if not auto and err != directmic.declined():
-                usage.used(f"mic-effect-failed-{directmic.fail_kind(err)}")
+            kind, self._mic_fail_kind = self._mic_fail_kind or "code-other", ""
+            if auto or err != directmic.declined():   # why, as a fixed word (never err)
+                usage.used(f"mic-effect-{'fix-' if auto else ''}failed-{kind}")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err

@@ -328,8 +328,9 @@ def _download_once(url: str, to: Path, progress, stop) -> None:
 
 def download(to: Path, progress=None, stop: threading.Event | None = None) -> None:
     """The zip into ``to``: each source in turn, a few tries each (a dropped connection,
-    a busy server). Raises GetError with the last reason; Stopped at once."""
-    why: GetError | None = None
+    a busy server). Raises GetError with each source's last reason (GitHub down and the
+    builder's site missing the file are two problems, not one); Stopped at once."""
+    why: dict[str, str] = {}
     for url in URLS:
         for n in range(TRIES):
             if n:
@@ -345,9 +346,10 @@ def download(to: Path, progress=None, stop: threading.Event | None = None) -> No
                 raise
             except GetError as e:
                 log.info("ffmpeg download from %s, try %d: %s", url, n + 1, e)
-                why = e
-    assert why is not None
-    raise why
+                why[url] = str(e)
+    reasons = list(dict.fromkeys(why.values()))   # the same words from both: say it once
+    raise GetError(" ".join(r if r.endswith((".", "!", "?")) else r + "."
+                            for r in reasons))
 
 
 def unpack(zip_path: Path, dest: Path | None = None) -> Path:
