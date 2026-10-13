@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Γράψε αυτή την εφαρμογή στα Αποθηκευμένα κλιπ. Πάτησε ξανά για να τελειώσεις. Κανείς δεν την ακούει αν η Αποστολή είναι κλειστή.",
   "Save to clips": "Αποθήκευση στα κλιπ",
   "Show clips": "Εμφάνιση κλιπ",
+  "+ Subcategory": "+ Υποκατηγορία",
+  "Add subcategory…": "Προσθήκη υποκατηγορίας…",
+  "All {n}": "Όλα {n}",
+  "Delete subcategory": "Διαγραφή υποκατηγορίας",
+  "Delete subcategory (keeps the sounds)": "Διαγραφή υποκατηγορίας (κρατάει τους ήχους)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Διαγραφή της υποκατηγορίας «{name}»; Οι ήχοι της ({n}) μένουν στο {cat}.",
+    "Διαγραφή της υποκατηγορίας «{name}»; Οι ήχοι της ({n}) μένουν στο {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Να γίνει μία καρτέλα «{name}», με {n} από τις κατηγορίες της ως υποκατηγορίες αντί για ξεχωριστές καρτέλες;\n\nΚανένας ήχος δεν αφαιρείται ή αλλάζει.",
+  "Name (a group inside {cat}):": "Όνομα (μια ομάδα μέσα στο {cat}):",
+  "New subcategory": "Νέα υποκατηγορία",
+  "New subcategory in {cat}": "Νέα υποκατηγορία στο {cat}",
+  "Put its categories in one tab": "Βάλε τις κατηγορίες της σε μία καρτέλα",
+  "Rename subcategory": "Μετονομασία υποκατηγορίας",
+  "✓ “{name}” is one tab now": "✓ Το «{name}» είναι τώρα μία καρτέλα",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Το τελευταίο λεπτό αυτού του προγράμματος ως κυματομορφή: διάλεξε ένα κομμάτι και κράτησέ το ως κλιπ. Ακούει μόνο όσο είναι ανοιχτό."
 }

@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Nimm diese App in Gespeicherte Clips auf. Klick erneut zum Beenden. Niemand hört sie, solange Senden aus ist.",
   "Save to clips": "In Clips speichern",
   "Show clips": "Clips anzeigen",
+  "+ Subcategory": "+ Unterkategorie",
+  "Add subcategory…": "Unterkategorie hinzufügen…",
+  "All {n}": "Alle {n}",
+  "Delete subcategory": "Unterkategorie löschen",
+  "Delete subcategory (keeps the sounds)": "Unterkategorie löschen (Sounds bleiben)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Unterkategorie „{name}“ löschen? Ihre Sounds ({n}) bleiben in {cat}.",
+    "Unterkategorie „{name}“ löschen? Ihre Sounds ({n}) bleiben in {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Einen Tab „{name}“ anlegen, in dem {n} seiner Kategorien als Unterkategorien liegen statt als eigene Tabs?\n\nKein Sound wird entfernt oder geändert.",
+  "Name (a group inside {cat}):": "Name (eine Gruppe in {cat}):",
+  "New subcategory": "Neue Unterkategorie",
+  "New subcategory in {cat}": "Neue Unterkategorie in {cat}",
+  "Put its categories in one tab": "Seine Kategorien in einen Tab legen",
+  "Rename subcategory": "Unterkategorie umbenennen",
+  "✓ “{name}” is one tab now": "✓ „{name}“ ist jetzt ein Tab",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Die letzte Minute dieses Programms als Wellenform: Wählen Sie ein Stück daraus aus und behalten Sie es als Clip. Es lauscht nur, solange es geöffnet ist."
 }

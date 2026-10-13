@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Neem deze app op in Opgeslagen clips. Klik opnieuw om te stoppen. Niemand hoort de app tenzij Versturen aanstaat.",
   "Save to clips": "Opslaan in clips",
   "Show clips": "Clips tonen",
+  "+ Subcategory": "+ Subcategorie",
+  "Add subcategory…": "Subcategorie toevoegen…",
+  "All {n}": "Alle {n}",
+  "Delete subcategory": "Subcategorie verwijderen",
+  "Delete subcategory (keeps the sounds)": "Subcategorie verwijderen (geluiden blijven)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Subcategorie “{name}” verwijderen? De geluiden erin ({n}) blijven in {cat}.",
+    "Subcategorie “{name}” verwijderen? De geluiden erin ({n}) blijven in {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Eén tabblad “{name}” maken, met {n} van de categorieën erin als subcategorieën in plaats van eigen tabbladen?\n\nEr wordt geen geluid verwijderd of gewijzigd.",
+  "Name (a group inside {cat}):": "Naam (een groep in {cat}):",
+  "New subcategory": "Nieuwe subcategorie",
+  "New subcategory in {cat}": "Nieuwe subcategorie in {cat}",
+  "Put its categories in one tab": "Zet de categorieën in één tabblad",
+  "Rename subcategory": "Subcategorie hernoemen",
+  "✓ “{name}” is one tab now": "✓ “{name}” is nu één tabblad",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "De laatste minuut van dit programma als golfvorm: kies er een stukje uit en bewaar het als clip. Het luistert alleen zolang het open is."
 }

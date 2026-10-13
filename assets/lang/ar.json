@@ -3621,5 +3621,25 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "سجّل هذا التطبيق في المقاطع المحفوظة. انقر مجددًا للإنهاء. لا يسمعه أحد إلا إذا كان الإرسال مفعّلًا.",
   "Save to clips": "حفظ في المقاطع",
   "Show clips": "عرض المقاطع",
+  "+ Subcategory": "+ فئة فرعية",
+  "Add subcategory…": "إضافة فئة فرعية…",
+  "All {n}": "الكل {n}",
+  "Delete subcategory": "حذف الفئة الفرعية",
+  "Delete subcategory (keeps the sounds)": "حذف الفئة الفرعية (تبقى الأصوات)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "حذف الفئة الفرعية «{name}»؟ ستبقى أصواتها ({n}) في {cat}.",
+    "حذف الفئة الفرعية «{name}»؟ ستبقى أصواتها ({n}) في {cat}.",
+    "حذف الفئة الفرعية «{name}»؟ ستبقى أصواتها ({n}) في {cat}.",
+    "حذف الفئة الفرعية «{name}»؟ ستبقى أصواتها ({n}) في {cat}.",
+    "حذف الفئة الفرعية «{name}»؟ ستبقى أصواتها ({n}) في {cat}.",
+    "حذف الفئة الفرعية «{name}»؟ ستبقى أصواتها ({n}) في {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "إنشاء تبويب واحد باسم «{name}» تكون فيه {n} من فئاته فئاتٍ فرعية بدل تبويبات منفصلة؟\n\nلن يُحذف أو يتغير أي صوت.",
+  "Name (a group inside {cat}):": "الاسم (مجموعة داخل {cat}):",
+  "New subcategory": "فئة فرعية جديدة",
+  "New subcategory in {cat}": "فئة فرعية جديدة في {cat}",
+  "Put its categories in one tab": "ضع فئاتها في تبويب واحد",
+  "Rename subcategory": "إعادة تسمية الفئة الفرعية",
+  "✓ “{name}” is one tab now": "✓ أصبح «{name}» تبويبًا واحدًا",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "آخر دقيقة من هذا البرنامج كشكل موجي: اختر جزءًا منها واحتفظ به كمقطع. لا يستمع إلا وهو مفتوح."
 }

@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Grave este app em Clipes salvos. Clique de novo para terminar. Ninguém ouve a menos que Enviar esteja ativado.",
   "Save to clips": "Salvar nos clipes",
   "Show clips": "Mostrar clipes",
+  "+ Subcategory": "+ Subcategoria",
+  "Add subcategory…": "Adicionar subcategoria…",
+  "All {n}": "Todos {n}",
+  "Delete subcategory": "Excluir subcategoria",
+  "Delete subcategory (keeps the sounds)": "Excluir subcategoria (mantém os sons)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Excluir a subcategoria “{name}”? Os sons dela ({n}) ficam em {cat}.",
+    "Excluir a subcategoria “{name}”? Os sons dela ({n}) ficam em {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Criar uma única aba “{name}”, com {n} das categorias dela dentro como subcategorias em vez de abas separadas?\n\nNenhum som é removido ou alterado.",
+  "Name (a group inside {cat}):": "Nome (um grupo dentro de {cat}):",
+  "New subcategory": "Nova subcategoria",
+  "New subcategory in {cat}": "Nova subcategoria em {cat}",
+  "Put its categories in one tab": "Colocar as categorias dela em uma aba",
+  "Rename subcategory": "Renomear subcategoria",
+  "✓ “{name}” is one tab now": "✓ “{name}” agora é uma aba só",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "O último minuto deste programa como forma de onda: escolha um trecho e guarde-o como clipe. Ele só escuta enquanto está aberto."
 }

@@ -39,6 +39,7 @@ from soundboard import (appaudio, autostart, backup, catswitch, destination, lib
 from soundboard import (appsetup, directmic, discordcfg, ffmpegget, michelper, net, netlog,
                         profiles, quality, rawmic, shellicon, sourceinfo, thumbbar, tips, tor,
                         usage, watchaddon)
+from soundboard.pollthread import PollThread
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, PRESS_MODE, RESOURCE_DIR, Config,
                                 SoundMeta, cache_keep, clean_tags, duplicate, fingerprint,
@@ -518,6 +519,7 @@ class MainWindow(QMainWindow):
         self.discord_found: list = []
         self._discord_sig = None
         self._discord_reading = False
+        self._discord_poll = PollThread("discord-settings")
         self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
         self._discord_timer.timeout.connect(self._discord_tick)
         if sys.platform == "win32":
@@ -655,6 +657,7 @@ class MainWindow(QMainWindow):
         self._default_timer.timeout.connect(self._recover_devices)
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
+        self._default_poll = PollThread("default-output")
         self.default_found.connect(self._on_default_found)
         self.device_step.connect(lambda step: step())
         self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
@@ -2844,7 +2847,7 @@ class MainWindow(QMainWindow):
             return
         self._default_at = now
         self._default_asking = True
-        threading.Thread(target=self._ask_default, daemon=True, name="default-output").start()
+        self._default_poll.run(self._ask_default)
 
     def _ask_default(self):
         try:
@@ -6541,13 +6544,13 @@ class MainWindow(QMainWindow):
         # a link filters nothing, and nor does the box in the mini player, which hides
         # it: a web search's words left there showed a blank mini player
         t = "" if self.linkbar.url or self.is_mini() else text.strip().lower()
-        cat = self.cfg.category
+        cat, sub = self.cfg.category, self.cfg.subcategory
         changed = False
         for m in self.cfg.sounds:
             p = self.pads.get(m.id)
             if p:
                 hit = not t or t in m.name.lower() or any(t in g.lower() for g in m.tags)
-                hide = not hit or bool(cat and cat not in m.tags)
+                hide = not hit or not library.in_view(m.tags, cat, sub)
                 changed = changed or bool(p.property("filtered")) != hide
                 p.setProperty("filtered", hide)
         if changed or not lazy:
@@ -6568,6 +6571,8 @@ class MainWindow(QMainWindow):
             return
         hold.setContentsMargins(m.left(), 0, right, 0)
         row.setContentsMargins(m.left(), 0, 0, 0)
+        if sub := self._sub_row.layout():
+            sub.setContentsMargins(m.left(), 6, right, 0)
 
     # ------------------------------------------------------------------ categories
     # A sound can be in any number of categories (SoundMeta.tags); the bar above the
@@ -6580,6 +6585,15 @@ class MainWindow(QMainWindow):
         ov.setContentsMargins(0, 0, 0, 0)
         w = self._cat_row = QWidget()
         ov.addWidget(w)
+        # the chips under the tabs: the subcategories of the category showing
+        self._sub_row = QWidget()
+        sv = QVBoxLayout(self._sub_row)   # Flow ignores margins: this one holds them
+        sv.setContentsMargins(0, 6, 0, 0)   # the left one: _fit_toolbar
+        chips = QWidget()
+        self._sub_flow = Flow(chips, 6)
+        sv.addWidget(chips)
+        self._sub_row.hide()
+        ov.addWidget(self._sub_row)
         h = QHBoxLayout(w)
         h.setContentsMargins(0, 0, 0, 0)   # the left one: _fit_toolbar
         h.setSpacing(4)
@@ -6607,6 +6621,154 @@ class MainWindow(QMainWindow):
         self._fill_categories()
         return outer
 
+    def _fill_subcategories(self):
+        """The chips under the tabs: All, then each subcategory of the category showing,
+        then a dashed "+ Subcategory". Only a category that has some shows the row."""
+        cfg = self.cfg
+        subs = cfg.subcategories.get(cfg.category, []) if cfg.category else []
+        if cfg.subcategory not in subs:
+            cfg.subcategory = ""
+        flow = self._sub_flow
+        while flow.count():
+            it = flow.takeAt(0)
+            if it is not None and it.widget() is not None:
+                old = it.widget()   # hidden and let go of now: deleteLater alone leaves it
+                old.hide()          # drawn (full size) until the event loop frees it
+                old.setParent(None)
+                old.deleteLater()
+        self._sub_row.setVisible(bool(subs) and not self._cat_row.isHidden())
+        if not subs:
+            return
+        cat = cfg.category
+        if getattr(self, "_toolbar_hold", None) is not None:
+            self._fit_toolbar()   # its margins, before the first resize does
+
+        def chip(text: str, tip: str):
+            b = QPushButton(text.replace("&", "&&"))
+            b.setObjectName("subchip")
+            b.setCheckable(True)
+            b.setToolTip(tip)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            flow.addWidget(b)
+            return b
+
+        total = sum(1 for m in cfg.sounds if cat in m.tags)
+        b = chip(_("All {n}", n=total), "")
+        b.setChecked(not cfg.subcategory)
+        b.clicked.connect(lambda: self.set_subcategory(""))
+        for sub in subs:
+            n = sum(1 for m in cfg.sounds if library.sub_tag(cat, sub) in m.tags)
+            b = chip(f"{sub} {n}", ngettext("{n} sound", "{n} sounds", n))
+            b.setChecked(sub == cfg.subcategory)
+            b.clicked.connect(lambda __=False, sub=sub: self.set_subcategory(sub))
+            b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            b.customContextMenuRequested.connect(
+                lambda pos, sub=sub, b=b: self._subcategory_menu(sub, b.mapToGlobal(pos)))
+        add = chip(_("+ Subcategory"), "")
+        add.setCheckable(False)
+        add.setProperty("add", True)
+        add.clicked.connect(lambda: self.new_subcategory(cat))
+
+    def set_subcategory(self, sub: str):
+        """Show only one subcategory of the category showing ("" = all of it)."""
+        cfg = self.cfg
+        sub = sub if sub in cfg.subcategories.get(cfg.category, []) else ""
+        if sub != cfg.subcategory:
+            cfg.subcategory = sub
+            self.overlay.page = 0
+            self._save_later()
+        self._fill_subcategories()
+        self.apply_filter(self.search.text())
+
+    def new_subcategory(self, cat: str, sid: str | None = None, name: str | None = None) -> str:
+        """Add a subcategory to `cat` (asking for its name unless given), with `sid`'s
+        sound in it when made from a pad's menu. Returns the name, or "" if cancelled."""
+        if cat not in self.cfg.categories:
+            return ""
+        if name is None:
+            name, ok = QInputDialog.getText(self, _("New subcategory"),
+                                            _("Name (a group inside {cat}):", cat=cat))
+            name = name if ok else ""
+        name = str(library.plain_name(name or ""))
+        if not name:
+            return ""
+        subs: list[str] = self.cfg.subcategories.setdefault(cat, [])
+        name = {x.lower(): x for x in subs}.get(name.lower(), name)
+        if name not in subs:
+            subs.append(name)
+        if sid and self.meta(sid):
+            self.toggle_tag(sid, library.sub_tag(cat, name), on=True)
+        self._save_now()
+        self._fill_subcategories()
+        if not sid:
+            if self.cfg.category != cat:
+                self.set_category(cat)
+            self.set_subcategory(name)
+        return name
+
+    def rename_subcategory(self, sub: str, new: str | None = None):
+        cat = self.cfg.category
+        subs = self.cfg.subcategories.get(cat, [])
+        if sub not in subs:
+            return
+        if new is None:
+            new, ok = QInputDialog.getText(self, _("Rename subcategory"), _("New name:"),
+                                           text=sub)
+            new = new if ok else ""
+        new = library.plain_name(new)
+        if not new or new == sub:
+            return
+        if new.lower() in {x.lower() for x in subs if x != sub}:
+            self.toast(_("There's already a “{new}”.", new=html.escape(new)), "warn")
+            return
+        old_tag, new_tag = library.sub_tag(cat, sub), library.sub_tag(cat, new)
+        subs[subs.index(sub)] = new
+        for m in self._live_metas():   # removed ones too, or Undo brings `old` back
+            m.tags = [new_tag if t == old_tag else t for t in m.tags]
+        if self.cfg.subcategory == sub:
+            self.cfg.subcategory = new
+        self._save_now()
+        self._fill_subcategories()
+        self.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
+
+    def delete_subcategory(self, sub: str):
+        """Delete a subcategory. Its sounds stay in the category."""
+        cat = self.cfg.category
+        subs = self.cfg.subcategories.get(cat, [])
+        if sub not in subs:
+            return
+        tag = library.sub_tag(cat, sub)
+        n = sum(tag in m.tags for m in self.cfg.sounds)
+        if n and QMessageBox.question(
+                self, _("Delete subcategory"),
+                ngettext("Delete the “{name}” subcategory? Its {n} sound stay in {cat}.",
+                         "Delete the “{name}” subcategory? Its {n} sounds stay in {cat}.",
+                         n, name=sub, cat=cat)) != QMessageBox.StandardButton.Yes:
+            return
+        subs.remove(sub)
+        if not subs:
+            self.cfg.subcategories.pop(cat, None)
+        for m in self._live_metas():
+            if tag in m.tags:
+                m.tags.remove(tag)
+        if self.cfg.subcategory == sub:
+            self.cfg.subcategory = ""
+        self._save_now()
+        self._fill_subcategories()
+        self.apply_filter(self.search.text())
+
+    def _subcategory_menu(self, sub: str, pos):
+        menu = QMenu(self)
+        a_ren = menu.addAction(icons.icon("edit"), _("Rename"))
+        a_del = menu.addAction(icons.icon("trash", "danger_text"),
+                               _("Delete subcategory (keeps the sounds)"))
+        act = menu.exec(pos)
+        menu.deleteLater()
+        if act == a_ren:
+            self.rename_subcategory(sub)
+        elif act == a_del:
+            self.delete_subcategory(sub)
+
     def _fill_categories(self):
         tb = self.cat_tabs
         tb.blockSignals(True)
@@ -6632,6 +6794,7 @@ class MainWindow(QMainWindow):
         tb.setCurrentIndex(self.cfg.categories.index(cat) + 1 if cat in self.cfg.categories
                            else 0)
         tb.blockSignals(False)
+        self._fill_subcategories()
 
     @staticmethod
     def _dot_icon(color: str) -> QIcon:
@@ -6678,6 +6841,9 @@ class MainWindow(QMainWindow):
         name = name if name in self.cfg.categories else ""
         changed = name != self.cfg.category
         self.cfg.category = name
+        if changed:
+            self.cfg.subcategory = ""
+            self._fill_subcategories()
         want = self.cfg.categories.index(name) + 1 if name else 0
         if self.cat_tabs.currentIndex() != want:
             self.cat_tabs.blockSignals(True)
@@ -6691,8 +6857,8 @@ class MainWindow(QMainWindow):
                 self.register_hotkeys()
 
     def category_sounds(self) -> list[SoundMeta]:
-        cat = self.cfg.category
-        return [m for m in self.cfg.sounds if not cat or cat in m.tags]
+        return [m for m in self.cfg.sounds
+                if library.in_view(m.tags, self.cfg.category, self.cfg.subcategory)]
 
     def new_category(self, sid: str | None = None, name: str | None = None) -> str:
         """Add a category (asking for its name unless given), with `sid`'s sound in it
@@ -6701,7 +6867,7 @@ class MainWindow(QMainWindow):
             name, ok = QInputDialog.getText(self, _("New category"),
                                             _("Name (e.g. Memes, Music, Game 1):"))
             name = name if ok else ""
-        name = (clean_tags([name]) or [""])[0]
+        name = library.plain_name(name)
         if name.lower() == ALL.lower():   # would look like the built-in tab
             self.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
             return ""
@@ -6722,18 +6888,38 @@ class MainWindow(QMainWindow):
         self.apply_filter(self.search.text())
         return name
 
-    def toggle_tag(self, sid: str, name: str):
+    @staticmethod
+    def _retag(tag: str, old: str, new: str) -> str:
+        """`tag` with category `old` renamed to `new` ("Old / Sub" follows)."""
+        cat, sub = library.split_tag(tag)
+        if cat != old:
+            return tag
+        return library.sub_tag(new, sub) if sub else new
+
+    def toggle_tag(self, sid: str, name: str, on: bool | None = None):
+        """Put the sound in a category, or in a "Cat / Sub" subcategory (which puts it
+        in Cat too), or take it out; `on` says which way, None flips it."""
         m = self.meta(sid)
-        if not m or name not in self.cfg.categories:
+        cat, sub = library.split_tag(name)
+        if not m or cat not in self.cfg.categories or (
+                sub and sub not in self.cfg.subcategories.get(cat, [])):
             return
-        if name in m.tags:
-            m.tags.remove(name)
-            msg = _("Took “{name}” out of {category}",
-                    name=html.escape(m.name), category=html.escape(name))
-        else:
-            m.tags.append(name)
+        if on is None:
+            on = name not in m.tags
+        shown = f"{cat} › {sub}" if sub else cat
+        if on:
+            for t in (cat, name):
+                if t not in m.tags:
+                    m.tags.append(t)
             msg = _("✓ Added “{name}” to {category}",
-                    name=html.escape(m.name), category=html.escape(name))
+                    name=html.escape(m.name), category=html.escape(shown))
+        else:
+            # out of a category is out of its subcategories too; out of a subcategory
+            # leaves it in the category
+            m.tags = [t for t in m.tags
+                      if t != name and (sub or library.split_tag(t)[0] != cat)]
+            msg = _("Took “{name}” out of {category}",
+                    name=html.escape(m.name), category=html.escape(shown))
         if self.cfg.scoped_hotkeys:   # where its key works changed with its categories
             self.register_hotkeys()
         self._save_now()
@@ -6770,7 +6956,7 @@ class MainWindow(QMainWindow):
         if new is None:
             new, ok = QInputDialog.getText(self, _("Rename category"), _("New name:"), text=old)
             new = new if ok else ""
-        new = (clean_tags([new]) or [""])[0]
+        new = library.plain_name(new)
         if new.lower() == ALL.lower():
             self.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
             return
@@ -6792,8 +6978,10 @@ class MainWindow(QMainWindow):
         if self.cat_switch.before == old:
             self.cat_switch.before = new
         self.shuffle.forget(old)
+        if old in self.cfg.subcategories:
+            self.cfg.subcategories[new] = self.cfg.subcategories.pop(old)
         for m in self._live_metas():   # removed ones too, or Undo brings `old` back
-            m.tags = [new if t == old else t for t in m.tags]
+            m.tags = [self._retag(t, old, new) for t in m.tags]
         if self.cfg.category == old:
             self.cfg.category = new
         self._save_now()
@@ -6821,11 +7009,12 @@ class MainWindow(QMainWindow):
                                       in self.cfg.category_programs.items() if cat != name}
         self._update_cat_timer()
         self.shuffle.forget(name)
+        self.cfg.subcategories.pop(name, None)
         for m in self._live_metas():   # removed ones too, or Undo brings it back
-            if name in m.tags:
-                m.tags.remove(name)
+            m.tags = [t for t in m.tags if library.split_tag(t)[0] != name]
         if self.cfg.category == name:
             self.cfg.category = ""
+            self.cfg.subcategory = ""
         self._save_now()
         self._fill_categories()
         self.apply_filter(self.search.text())
@@ -6844,6 +7033,7 @@ class MainWindow(QMainWindow):
                               else _("Set a random-sound hotkey"))
         a_nohk = menu.addAction(icons.icon("trash"),
                                _("Clear the random-sound hotkey")) if hk else None
+        a_sub = menu.addAction(icons.icon("plus"), _("Add subcategory…"))
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
         a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
         a_shuf = menu.addAction(icons.icon("shuffle"), _("Play them all, shuffled"))
@@ -6866,6 +7056,8 @@ class MainWindow(QMainWindow):
             return
         if act == a_ren:
             self.rename_category(name)
+        elif act == a_sub:
+            self.new_subcategory(name)
         elif act == a_hk:
             self.set_category_hotkey(name)
         elif act is not None and act == a_nohk:
@@ -7231,9 +7423,8 @@ class MainWindow(QMainWindow):
         self._pending_imports -= 1
         if meta is not None:
             self._tag_new(meta)
-            for t in meta.tags:
-                if t not in self.cfg.categories:
-                    self.cfg.categories.append(t)
+            meta.tags = library.merge_tags(meta.tags, self.cfg.categories,
+                                           self.cfg.subcategories)
             key = self._import_keys.pop(meta.id, "")
             if key and not self._hotkey_taken(key):
                 meta.hotkey = key
@@ -7610,9 +7801,18 @@ class MainWindow(QMainWindow):
             a.setCheckable(True)
             a.setChecked(c in m.tags)
             cat_acts[a] = c
+            for sub in self.cfg.subcategories.get(c, []):   # indented under it
+                tag = library.sub_tag(c, sub)
+                a = cats.addAction(icons.icon("tag", checked_color="accent"),
+                                   "      " + sub.replace("&", "&&"))
+                a.setCheckable(True)
+                a.setChecked(tag in m.tags)
+                cat_acts[a] = tag
         if cat_acts:
             cats.addSeparator()
         a_newcat = cats.addAction(icons.icon("plus"), _("New category"))
+        cat_subs = {cats.addAction(icons.icon("plus"), _("New subcategory in {cat}", cat=c)): c
+                    for c in self.cfg.categories if c in m.tags}
         menu.addSeparator()
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
@@ -7636,6 +7836,8 @@ class MainWindow(QMainWindow):
             return
         if act in cat_acts:
             self.toggle_tag(sid, cat_acts[act])
+        elif act in cat_subs:
+            self.new_subcategory(cat_subs[act], sid)
         elif act == a_newcat:
             self.new_category(sid)
         elif act == a_export:
@@ -7808,9 +8010,7 @@ class MainWindow(QMainWindow):
             if m.hotkey and self._hotkey_taken(m.hotkey):
                 m.hotkey = ""   # given to something else in the meantime
             self.cfg.sounds.insert(min(index, len(self.cfg.sounds)), m)
-            for t in m.tags:
-                if t not in self.cfg.categories:
-                    self.cfg.categories.append(t)
+            m.tags = library.merge_tags(m.tags, self.cfg.categories, self.cfg.subcategories)
             if data is not None:
                 self.audio[m.id] = data
                 threading.Thread(target=self.engine.prepare, args=(m.id, data),
@@ -8518,13 +8718,18 @@ class MainWindow(QMainWindow):
             return
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.library import merge_tags
+        if pkg.is_pack and len({library.split_tag(t)[0].lower() for ps in pkg.sounds
+                                for t in clean_tags(ps.entry.get("tags"))}) > 1:
+            # one tab for the pack, its categories inside it as subcategories
+            library.group_pack_tags(res.sounds + pkg.restored, self._pack_name(pkg))
         order = [ps.folder for ps in pkg.sounds]
         for m in pkg.restored + res.sounds:
             # "memes" goes into the "Memes" already here (and a new one gets a tab)
-            m.tags = merge_tags(m.tags, self.cfg.categories)
+            m.tags = merge_tags(m.tags, self.cfg.categories, self.cfg.subcategories)
         for m in res.sounds:
             self.cfg.sounds.insert(self._pack_spot(m, order), m)
-        merge_tags(pkg.categories, self.cfg.categories)   # a full backup's empty ones too
+        merge_tags(pkg.categories, self.cfg.categories,   # a full backup's empty ones too
+                   self.cfg.subcategories)
         for m in pkg.restored:
             self.engine.set_gain(m.id, self.gain_for(m))
         self._save_now()
@@ -8601,8 +8806,61 @@ class MainWindow(QMainWindow):
             sub = menu.addMenu(ngettext("{name} ({n} sound)", "{name} ({n} sounds)", n,
                                         name=name.replace("&", "&&")))   # not a shortcut
             sub.addAction(_("Reset to how it came"), lambda pid=pid: self.reset_pack(pid))
+            if self._ungrouped_pack_sounds(pid):
+                sub.addAction(_("Put its categories in one tab"),
+                              lambda pid=pid: self.tidy_pack(pid))
             act = sub.addAction(_("Remove from the board"), lambda pid=pid: self.remove_pack(pid))
             act.setEnabled(bool(n))
+
+    @staticmethod
+    def _pack_own_categories(pid: str) -> set[str]:
+        """The categories a free pack comes with (lower case); {} for any other pack."""
+        from soundboard import packs
+        return {c.lower() for p in packs.built_in() if p.id == pid for c in p.categories}
+
+    def _ungrouped_pack_sounds(self, pid: str) -> list[SoundMeta]:
+        """Sounds of pack `pid` still in its categories as tabs of their own."""
+        own = self._pack_own_categories(pid)
+        return [m for m in self.cfg.sounds if m.pack == pid and any(
+            library.split_tag(t)[0].lower() in own and not library.split_tag(t)[1]
+            for t in m.tags)] if own else []
+
+    def tidy_pack(self, pid: str):
+        """Backup → My sound packs → Put its categories in one tab: the pack's categories
+        (Tavern, Combat…) stop being tabs and become subcategories of one named after
+        the pack. Sounds you added to your own categories stay in them."""
+        moved = self._ungrouped_pack_sounds(pid)
+        name = backup.packs().get(pid, pid)
+        own = self._pack_own_categories(pid)
+        if not moved:
+            return
+        if QMessageBox.question(
+                self, _("Put its categories in one tab"),
+                _("Make one “{name}” tab, with {n} of its categories inside it as "
+                  "subcategories instead of tabs of their own?\n\nNo sound is removed or "
+                  "changed.", name=name, n=len(own)),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
+                ) != QMessageBox.StandardButton.Yes:
+            return
+        mine = [m for m in self._live_metas() if m.pack == pid]
+        library.group_pack_tags(mine, name, own)
+        merge = library.merge_tags
+        for m in mine:
+            m.tags = merge(m.tags, self.cfg.categories, self.cfg.subcategories)
+        for c in list(self.cfg.categories):   # the old tabs, once nothing is in them
+            if c.lower() in own and not any(c in m.tags for m in self._live_metas()) and not (
+                    self.cfg.category_hotkeys.get(c)
+                    or catswitch.programs_for(self.cfg.category_programs, c)):
+                self.cfg.categories.remove(c)
+                self.cfg.category_colors.pop(c, None)
+                self.cfg.subcategories.pop(c, None)
+        if self.cfg.category not in self.cfg.categories:
+            self.cfg.category = self.cfg.subcategory = ""
+        self._save_now()
+        self._fill_categories()
+        self.apply_filter(self.search.text())
+        self.register_hotkeys()
+        self.toast(_("✓ “{name}” is one tab now", name=html.escape(name)), "ok")
 
     def reset_pack(self, pid: str, ask: bool = True):
         """Put a sound pack back how it came: its sounds' names, hotkeys, volume,
@@ -9076,7 +9334,7 @@ class MainWindow(QMainWindow):
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
                 log.debug("reading Discord's settings failed", exc_info=True)
             self.bridge.discord.emit((found, sig))
-        threading.Thread(target=run, daemon=True, name="discord-settings").start()
+        self._discord_poll.run(run)
 
     def _on_discord(self, res):
         found, sig = res
@@ -10186,6 +10444,7 @@ class MainWindow(QMainWindow):
         self._shut_down = True
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
         for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
+                     self._default_poll.stop, self._discord_poll.stop,
                      self._release_ptt,
                      self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,

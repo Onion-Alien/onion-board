@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Rögzítsd ezt az alkalmazást a Mentett klipek közé. A befejezéshez kattints újra. Senki sem hallja, ha a Küldés nincs bekapcsolva.",
   "Save to clips": "Mentés a klipekhez",
   "Show clips": "Klipek megjelenítése",
+  "+ Subcategory": "+ Alkategória",
+  "Add subcategory…": "Alkategória hozzáadása…",
+  "All {n}": "Mind {n}",
+  "Delete subcategory": "Alkategória törlése",
+  "Delete subcategory (keeps the sounds)": "Alkategória törlése (a hangok megmaradnak)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Törlöd a(z) „{name}” alkategóriát? A hangjai ({n}) a(z) {cat} kategóriában maradnak.",
+    "Törlöd a(z) „{name}” alkategóriát? A hangjai ({n}) a(z) {cat} kategóriában maradnak."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Legyen egyetlen „{name}” lap, benne a(z) {n} kategóriájával alkategóriaként, külön lapok helyett?\n\nEgyetlen hang sem törlődik vagy változik.",
+  "Name (a group inside {cat}):": "Név (egy csoport a(z) {cat} kategórián belül):",
+  "New subcategory": "Új alkategória",
+  "New subcategory in {cat}": "Új alkategória itt: {cat}",
+  "Put its categories in one tab": "Kategóriái egy lapra",
+  "Rename subcategory": "Alkategória átnevezése",
+  "✓ “{name}” is one tab now": "✓ A(z) „{name}” most egyetlen lap",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "A program utolsó perce hullámformaként: válassz ki belőle egy részt, és tartsd meg klipként. Csak akkor figyel, amikor nyitva van."
 }

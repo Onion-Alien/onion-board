@@ -3251,5 +3251,20 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Rekam aplikasi ini ke Klip tersimpan. Klik lagi untuk selesai. Tidak ada yang mendengarnya kecuali Kirim aktif.",
   "Save to clips": "Simpan ke klip",
   "Show clips": "Tampilkan klip",
+  "+ Subcategory": "+ Subkategori",
+  "Add subcategory…": "Tambah subkategori…",
+  "All {n}": "Semua {n}",
+  "Delete subcategory": "Hapus subkategori",
+  "Delete subcategory (keeps the sounds)": "Hapus subkategori (suaranya tetap ada)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Hapus subkategori “{name}”? Suaranya ({n}) tetap ada di {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Jadikan satu tab “{name}”, dengan {n} kategorinya di dalamnya sebagai subkategori, bukan tab terpisah?\n\nTidak ada suara yang dihapus atau diubah.",
+  "Name (a group inside {cat}):": "Nama (grup di dalam {cat}):",
+  "New subcategory": "Subkategori baru",
+  "New subcategory in {cat}": "Subkategori baru di {cat}",
+  "Put its categories in one tab": "Taruh kategorinya dalam satu tab",
+  "Rename subcategory": "Ganti nama subkategori",
+  "✓ “{name}” is one tab now": "✓ “{name}” sekarang satu tab",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Satu menit terakhir program ini sebagai gelombang suara: pilih sebagian dan simpan sebagai klip. Hanya mendengarkan selama terbuka."
 }

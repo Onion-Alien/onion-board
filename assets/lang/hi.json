@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "इस ऐप की रिकॉर्डिंग सहेजी गई क्लिप में रखें। खत्म करने के लिए फिर क्लिक करें। भेजना चालू न हो तो कोई इसे नहीं सुनता।",
   "Save to clips": "क्लिप में सेव करें",
   "Show clips": "क्लिप दिखाएं",
+  "+ Subcategory": "+ सब-कैटेगरी",
+  "Add subcategory…": "सब-कैटेगरी जोड़ें…",
+  "All {n}": "सभी {n}",
+  "Delete subcategory": "सब-कैटेगरी डिलीट करें",
+  "Delete subcategory (keeps the sounds)": "सब-कैटेगरी डिलीट करें (साउंड बने रहेंगे)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "सब-कैटेगरी “{name}” डिलीट करें? इसके साउंड ({n}) {cat} में बने रहेंगे।",
+    "सब-कैटेगरी “{name}” डिलीट करें? इसके साउंड ({n}) {cat} में बने रहेंगे।"
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "एक ही टैब “{name}” बनाएँ, जिसमें इसकी {n} कैटेगरी अलग टैब की जगह सब-कैटेगरी बनकर रहें?\n\nकोई साउंड हटेगा या बदलेगा नहीं।",
+  "Name (a group inside {cat}):": "नाम ({cat} के अंदर एक ग्रुप):",
+  "New subcategory": "नई सब-कैटेगरी",
+  "New subcategory in {cat}": "{cat} में नई सब-कैटेगरी",
+  "Put its categories in one tab": "इसकी कैटेगरी एक टैब में रखें",
+  "Rename subcategory": "सब-कैटेगरी का नाम बदलें",
+  "✓ “{name}” is one tab now": "✓ “{name}” अब एक ही टैब है",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "इस प्रोग्राम का आख़िरी मिनट वेवफ़ॉर्म के रूप में: उसमें से एक हिस्सा चुनें और उसे क्लिप के रूप में रखें। यह सिर्फ़ खुला रहने पर ही सुनता है।"
 }

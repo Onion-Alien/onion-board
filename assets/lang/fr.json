@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Enregistre cette appli dans Clips enregistrés. Clique à nouveau pour terminer. Personne ne l’entend sauf si Envoyer est activé.",
   "Save to clips": "Enregistrer dans Clips",
   "Show clips": "Voir les clips",
+  "+ Subcategory": "+ Sous-catégorie",
+  "Add subcategory…": "Ajouter une sous-catégorie…",
+  "All {n}": "Tous {n}",
+  "Delete subcategory": "Supprimer la sous-catégorie",
+  "Delete subcategory (keeps the sounds)": "Supprimer la sous-catégorie (garde les sons)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}.",
+    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Faire un seul onglet « {name} », avec {n} de ses catégories dedans comme sous-catégories au lieu d'onglets séparés ?\n\nAucun son n'est retiré ni modifié.",
+  "Name (a group inside {cat}):": "Nom (un groupe dans {cat}) :",
+  "New subcategory": "Nouvelle sous-catégorie",
+  "New subcategory in {cat}": "Nouvelle sous-catégorie dans {cat}",
+  "Put its categories in one tab": "Mettre ses catégories dans un seul onglet",
+  "Rename subcategory": "Renommer la sous-catégorie",
+  "✓ “{name}” is one tab now": "✓ « {name} » est maintenant un seul onglet",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "La dernière minute de ce programme en forme d'onde : choisissez-en un morceau et gardez-le comme clip. Il n'écoute que lorsqu'il est ouvert."
 }

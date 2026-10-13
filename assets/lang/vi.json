@@ -3251,5 +3251,20 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Ghi âm ứng dụng này vào Các đoạn đã lưu. Nhấp lại để kết thúc. Không ai nghe thấy nếu chưa bật Gửi.",
   "Save to clips": "Lưu vào đoạn âm thanh",
   "Show clips": "Xem đoạn âm thanh",
+  "+ Subcategory": "+ Danh mục con",
+  "Add subcategory…": "Thêm danh mục con…",
+  "All {n}": "Tất cả {n}",
+  "Delete subcategory": "Xóa danh mục con",
+  "Delete subcategory (keeps the sounds)": "Xóa danh mục con (giữ âm thanh)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Xóa danh mục con “{name}”? Các âm thanh trong đó ({n}) vẫn ở lại {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Gộp thành một tab “{name}”, với {n} danh mục của nó nằm bên trong làm danh mục con thay vì các tab riêng?\n\nKhông có âm thanh nào bị xóa hay thay đổi.",
+  "Name (a group inside {cat}):": "Tên (một nhóm trong {cat}):",
+  "New subcategory": "Danh mục con mới",
+  "New subcategory in {cat}": "Danh mục con mới trong {cat}",
+  "Put its categories in one tab": "Gộp các danh mục của nó vào một tab",
+  "Rename subcategory": "Đổi tên danh mục con",
+  "✓ “{name}” is one tab now": "✓ “{name}” giờ là một tab",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Phút cuối của chương trình này dưới dạng sóng âm: chọn một đoạn và giữ lại thành clip. Chỉ nghe khi đang mở."
 }

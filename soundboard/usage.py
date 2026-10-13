@@ -11,8 +11,9 @@ last one (their names only). Soon after a start: how many problems there were si
 last send, as counts, never the report itself: a crash report or a freeze saved
 (`crash/<version>`, `error/<version>`, `freeze/<version>`, with the error's type and
 the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
-soundboard/engine.py:1090`; a freeze also its caller's line, the library function it
-was stuck in, how long it lasted and whether the window or another thread was busy:
+soundboard/engine.py:1090`; also the line that called it and the library function it
+was raised or stuck in, and for a freeze how long it lasted and whether the window or
+another thread was busy:
 never its message or anything else from the report), an error the app caught itself and
 showed as a warning instead of crashing (`warned/<version>/<type>@<soundboard/…py:line>`
 from `warned()`, the type and the deepest line of our own code it came from, never the
@@ -717,11 +718,23 @@ def _report_event(path: Path) -> str:
     stack, *others = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)
     if "froze for" in head.split("\n", 1)[0]:
         return f"freeze/{ver}" + _freeze_tag(head, stack, "".join(others))
-    where = _where(stack)
     kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
-    etype = _error_type(stack)
-    tag = "@".join(p for p in (etype, where) if p)
-    return f"{kind}/{ver}" + (f"/{tag}" if tag else "")
+    return f"{kind}/{ver}" + _error_tag(stack)
+
+
+def _error_tag(stack: str) -> str:
+    """`/<type>@<deepest line><<its caller>~<raised in>`, e.g. `/TypeError@soundboard/
+    ui/appspanel.py:352<soundboard/ui/appspanel.py:380~enum.__or__`: like a freeze's,
+    the caller and the library function it was raised in tell apart errors that end on
+    the same line. Each part only when the stack has it."""
+    ours = _ours(stack)
+    tag = "@".join(p for p in (_error_type(stack), ours[-1] if ours else "") if p)
+    if len(ours) > 1:
+        tag += f"<{ours[-2]}"
+    inner = _blocked_in(stack)
+    if inner:
+        tag += f"~{inner}"
+    return f"/{tag}" if tag else ""
 
 
 def problems(app_dir: Path, since: float,

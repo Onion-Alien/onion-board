@@ -32,7 +32,7 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainte
                            QPen, QPixmap, QPolygonF)
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import theme, winkeys
+from soundboard import library, theme, winkeys
 from soundboard.i18n import _, ngettext
 from soundboard.ui.pixels import snap_to_pixels
 
@@ -238,10 +238,10 @@ class Overlay:
         until sounds_changed() or the category / sound list changes: a paint asks
         several times, and a big library made each ask a full pass."""
         cfg = self.host.cfg
-        key = (cfg.category, id(cfg.sounds), len(cfg.sounds))
+        key = (cfg.category, cfg.subcategory, id(cfg.sounds), len(cfg.sounds))
         if self._sounds is None or self._sounds[0] != key:
-            cat = cfg.category
-            self._sounds = (key, [m for m in cfg.sounds if not cat or cat in m.tags])
+            self._sounds = (key, [m for m in cfg.sounds
+                                  if library.in_view(m.tags, cfg.category, cfg.subcategory)])
         return self._sounds[1]
 
     def sounds_changed(self):

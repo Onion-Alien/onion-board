@@ -3325,5 +3325,21 @@
   "Record this program to Saved clips. Click again to finish. Nobody hears it unless Send is on.": "Bu uygulamayı Kaydedilen kliplere kaydet. Bitirmek için tekrar tıkla. Gönder açık değilse kimse duymaz.",
   "Save to clips": "Kliplere kaydet",
   "Show clips": "Klipleri göster",
+  "+ Subcategory": "+ Alt kategori",
+  "Add subcategory…": "Alt kategori ekle…",
+  "All {n}": "Tümü {n}",
+  "Delete subcategory": "Alt kategoriyi sil",
+  "Delete subcategory (keeps the sounds)": "Alt kategoriyi sil (sesler kalır)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "“{name}” alt kategorisi silinsin mi? İçindeki sesler ({n}) {cat} içinde kalır.",
+    "“{name}” alt kategorisi silinsin mi? İçindeki sesler ({n}) {cat} içinde kalır."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Tek bir “{name}” sekmesi yapılsın mı? Kategorilerinden {n} tanesi ayrı sekmeler yerine içinde alt kategori olarak durur.\n\nHiçbir ses kaldırılmaz ya da değiştirilmez.",
+  "Name (a group inside {cat}):": "Ad ({cat} içinde bir grup):",
+  "New subcategory": "Yeni alt kategori",
+  "New subcategory in {cat}": "{cat} içinde yeni alt kategori",
+  "Put its categories in one tab": "Kategorilerini tek sekmede topla",
+  "Rename subcategory": "Alt kategoriyi yeniden adlandır",
+  "✓ “{name}” is one tab now": "✓ “{name}” artık tek sekme",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Bu programın son dakikası dalga formu olarak: içinden bir parça seç ve klip olarak sakla. Yalnızca açıkken dinler."
 }
