@@ -19,6 +19,35 @@ def outlines():
     return radio.outline_rings(raw), radio.outline_labels(raw)
 
 
+@pytest.mark.parametrize("dpr", [1.0, 1.25, 1.5, 1.75, 2.0])
+def test_world_copy_seams_do_not_expose_the_background(qapp, monkeypatch, dpr):
+    from PySide6.QtGui import QColor, QImage, QPainter, QPixmap
+
+    m = FlatMap()
+    m.resize(240, 80)
+    m.cx = 180.0
+    m.cy = flatmap.LAT_TOP
+    # The cached world's rounded device width is slightly smaller than its
+    # fractional screen spacing, putting both anti-meridians inside the view.
+    scale = 100.49 / 360
+    monkeypatch.setattr(m, "_scale", lambda: scale)
+    pic = QPixmap(100, 80)
+    pic.fill(QColor("white"))
+    image = QImage(round(240 * dpr), round(80 * dpr), QImage.Format_RGB32)
+    image.setDevicePixelRatio(dpr)
+    image.fill(QColor("black"))
+    painter = QPainter(image)
+    painter.setRenderHint(QPainter.SmoothPixmapTransform)
+    try:
+        m._draw_picture(painter, (scale, 1.0), (pic, 0, 0), (-360, 0, 360))
+    finally:
+        painter.end()
+        m.close()
+    row = round(60 * dpr)
+    assert all(image.pixelColor(x, row) == QColor("white")
+               for x in range(round(25 * dpr), round(215 * dpr)))
+
+
 def quietest(measure, limit, tries=5):
     """The best of a few tries of measure(), stopping at the first under limit. Holding
     Python's lock stalls the audio on every try; a busy shared machine (CI, the other
