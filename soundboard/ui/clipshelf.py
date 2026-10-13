@@ -25,6 +25,7 @@ from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import CONTROL_H, Flow, UndoBar, fold_button
 from soundboard.engine import SR
 from soundboard.library import level_gain
+from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
@@ -165,6 +166,7 @@ class ClipShelf(QWidget):
                           (_("Newest first"), "newest")):
             self.group_by.addItem(text, key)
         self.group_by.setCurrentIndex(max(0, self.group_by.findData(cfg.app_clip_group)))
+        no_wheel(self.group_by)
         filters.addWidget(self.group_by)
         v.addLayout(filters)
         self.list = QTreeWidget()
