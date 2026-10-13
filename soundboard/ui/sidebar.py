@@ -58,8 +58,9 @@ class SideTabs(QTabWidget):
 
     def __init__(self):
         super().__init__()
-        self.tabBar().hide()
-        self.tabBar().installEventFilter(self)
+        self._bar = self.tabBar()
+        self._bar.hide()
+        self._bar.installEventFilter(self)
         # the hidden bar was the Tab key's stop after the rail: it can't take focus, so
         # Tab stuck on the rail's last button and never reached the page
         self.setFocusProxy(None)   # pyright: ignore[reportArgumentType]  # None clears it
@@ -67,9 +68,11 @@ class SideTabs(QTabWidget):
         self.tabBar().setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def eventFilter(self, obj: QObject, e: QEvent) -> bool:
-        bar = self.tabBar()
-        if obj is bar and e.type() == QEvent.Type.Show:
-            bar.hide()   # QTabWidget shows it again when it lays itself out
+        # never self.tabBar() here: the filter also sees the bar's last events while it
+        # is being torn down, and asking for the bar then wrapped a freed object and
+        # crashed the app (an access violation, 2.0.2)
+        if obj is self._bar and e.type() == QEvent.Type.Show:
+            self._bar.hide()   # QTabWidget shows it again when it lays itself out
         return False
 
     def setCurrentIndex(self, i):

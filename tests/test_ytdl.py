@@ -605,6 +605,38 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     assert not window._pads_scroll.isHidden() and window.ytresults.isHidden()
 
 
+@pytest.mark.parametrize("url, ok", [
+    ("https://i.ytimg.com/vi/x/mqdefault.jpg", True),
+    ("HTTP://cdn.example.com/a.jpg", True),
+    ("file://host/share/x.jpg", False),
+    ("file:///C:/Windows/win.ini", False),
+    (r"\\host\share\x.jpg", False),   # UNC
+    ("//host/share/x.jpg", False),
+    ("ftp://host/x.jpg", False),
+    ("https://", False),
+    ("", False),
+])
+def test_web_url_lets_only_http_links_through(url, ok):
+    from soundboard import net
+    assert bool(net.web_url(url)) is ok
+
+
+def test_a_file_share_thumbnail_is_never_fetched(qapp, window):  # noqa: F811
+    """A page's own og:image becomes the result's picture: one that isn't a web link
+    is dropped, with no request at all."""
+    asked = []
+    window.ytresults.net.get = lambda req: (asked.append(req.url().toString()),
+                                            types.SimpleNamespace(finished=types.SimpleNamespace(
+                                                connect=lambda f: None)))[1]
+    bad = ytdl.Result("x", "Evil", "page", 3, source="generic",
+                      link="https://evil.example/page", art="file://host/share/x.jpg")
+    good = ytdl.Result("y", "Fine", "page", 3, source="generic",
+                       link="https://ok.example/page", art="https://ok.example/pic.jpg")
+    assert bad.thumb == ""
+    window.ytresults._add_rows([bad, good], window.ytresults._gen)
+    assert asked == ["https://ok.example/pic.jpg"]
+
+
 def test_web_results_hide_the_empty_category_bar(qapp, window,  # noqa: F811
                                                  monkeypatch):
     """The category bar's empty row stayed in the layout while web results showed,

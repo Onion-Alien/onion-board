@@ -180,7 +180,7 @@ def fetch(url: str) -> QImage:
             pic = link_picture(body.decode("utf-8", "replace"), url)
             # the page names it, not the user: a file:// one would open a file on this
             # PC (or a share on another), past the switches and Tor
-            if urllib.parse.urlsplit(pic).scheme.lower() in ("http", "https"):
+            if net.web_url(pic):
                 body, kind = _get(pic)
                 img = QImage.fromData(body)
     except (LinkError, net.FeatureOff):

@@ -595,9 +595,10 @@ class Result:
 
     @property
     def thumb(self) -> str:
-        """"" when there's none (Myinstants' buttons have no picture)."""
+        """"" when there's none (Myinstants' buttons have no picture) or it isn't a
+        web link (the site's page names it: net.web_url)."""
         if self.art or self.source != "youtube":
-            return self.art
+            return net.web_url(self.art)
         return f"https://i.ytimg.com/vi/{self.id}/mqdefault.jpg"
 
 
