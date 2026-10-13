@@ -38,6 +38,26 @@ def test_panel_installs_the_chain_on_the_engine(panel):
     assert set(voicefx.REGISTRY) <= set(p.fx.rows)       # built-ins and add-ons get rows
 
 
+@pytest.mark.parametrize("name", ["Hothead", "Autotune"])
+def test_hothead_and_autotune_tiles_change_the_engine_mic_and_stop_cleanly(panel, name):
+    p, eng = panel
+    p.fx._tile[name].click()
+    assert p.fx.preset == name and eng.voice_chain.enabled
+    t = np.arange(48000 // 2) / 48000
+    x = (0.02 * (np.sin(2 * np.pi * 120 * t) + np.sin(2 * np.pi * 1500 * t)))
+    x = np.repeat(x.astype(np.float32)[:, None], 2, axis=1)
+    y = np.concatenate([eng.voice_chain.process(x[i:i + 480], 48000)
+                        for i in range(0, len(x), 480)])
+    assert not eng.voice_chain.errors
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) > 0.001
+    assert not np.allclose(y[4800:], x[4800:], atol=0.001)
+    p.bar.stop_button.click()
+    assert np.array_equal(eng.voice_chain.process(x[:480], 48000), x[:480])
+    p.fx._tile[name].click()
+    assert eng.voice_chain.enabled
+    assert np.all(np.isfinite(eng.voice_chain.process(x[:480], 48000)))
+
+
 @pytest.mark.parametrize("tab", ["fx", "ai", "speak", "addons"])
 def test_global_voice_stop_is_visible_and_keeps_the_preset(panel, qapp, tab):
     p, eng = panel

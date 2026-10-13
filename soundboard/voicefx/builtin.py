@@ -218,7 +218,7 @@ class _PitchTracker:
         """Pitch of exactly `window` samples."""
         w = h.reshape(-1, self.dec).mean(axis=1).astype(np.float64)
         w -= w.mean()
-        if float(np.sqrt(np.mean(w * w))) < 3e-3:      # about -50 dBFS: nothing to track
+        if float(np.sqrt(np.mean(w * w))) < 3e-4:      # quiet headset speech still has pitch
             self.f0 = 0.0
             return 0.0
         tmax, size = self.tmax, len(w) - self.tmax
@@ -1310,6 +1310,9 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "compressor": {"threshold": -24, "ratio": 3, "boost": 10},
                           "chorus": {"rate": 0.6, "depth": 3, "mix": 0.3}},
     "Autotune":          {"pitch": {"semitones": 0, "tune": 1},
+                          # A little tuned carrier makes hard tuning audible in speech,
+                          # even when the speaker is already close to a musical note.
+                          "robot": {"follow": 1, "noise": 0.05, "mix": 0.35},
                           "compressor": {"threshold": -22, "ratio": 3, "boost": 5},
                           "reverb": {"size": 0.35, "tone": 6000, "mix": 0.18}},
     "Masked caller":     {"pitch": {"semitones": -6, "natural": 0.6, "size": 2},
@@ -1334,7 +1337,8 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "tone": {"bass": 4, "presence": 1, "treble": -3},
                           "helmet": {"size": 3, "ring": 0.6, "mix": 0.45},
                           "reverb": {"size": 0.2, "tone": 4000, "mix": 0.1}},
-    "Hothead":           {"shout": {"threshold": -14, "drive": 16}},
+    "Hothead":           {"radio": {"low": 350, "high": 4000, "drive": 12, "noise": 0},
+                          "shout": {"threshold": -14, "drive": 16}},
     "Alien":             {"pitch": {"semitones": 5, "mix": 0.6},
                           "compressor": {"threshold": -24, "ratio": 3, "boost": 13},
                           "chorus": {"rate": 4.0, "depth": 3, "mix": 0.6},
