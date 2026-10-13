@@ -8972,7 +8972,7 @@ class MainWindow(QMainWindow):
 
     def _on_worked(self, then, res, err):
         QApplication.restoreOverrideCursor()
-        if self._quitting:   # closed while it ran
+        if self._shut_down:   # closed while it ran
             return
         then(res, err)
 
