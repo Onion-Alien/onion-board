@@ -1,6 +1,6 @@
 """The map's cutout must reveal the window, including its gradient."""
 import pytest
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
@@ -8,6 +8,41 @@ from soundboard.library import Config
 from soundboard.radio import RadioDirectory
 from soundboard.ui.radiopanel import RadioTab
 from test_radio import FakeEngine, FakeMeter
+
+
+@pytest.mark.parametrize("name", ["Hacker", "Synthwave", "Carbon", "Dark", "Light"])
+def test_station_panel_texture_follows_appearance(qapp, app_dir, monkeypatch, name):
+    previous = theme.current_name
+    monkeypatch.setattr(RadioDirectory, "load_outlines", lambda self: None)
+    tab = RadioTab(FakeEngine(), Config(), lambda: None, FakeMeter,
+                   directory=RadioDirectory(app_dir / "radio"))
+    tab.resize(1180, 720)
+    tab.show()
+    for child in tab.station_panel.findChildren(QWidget, options=Qt.FindDirectChildrenOnly):
+        child.hide()
+    try:
+        for textured in (True, False, True):
+            monkeypatch.setattr(theme, "textures_on", textured)
+            theme.apply(qapp, name)
+            tab._style_panel()
+            qapp.processEvents()
+            panel = tab.station_panel
+            img = panel.grab().toImage()
+            # Sample the surface without child controls covering its pattern.
+            dpr = img.devicePixelRatio()
+            colours = {img.pixelColor(int(x * dpr), int(y * dpr)).name()
+                       for x in range(30, 90) for y in range(30, 90)}
+            if textured:
+                assert "background-image" in panel.styleSheet()
+                assert len(colours) > 1
+            else:
+                assert "background-image" not in panel.styleSheet()
+                assert colours == {theme.T["panel"]}
+    finally:
+        tab.shutdown()
+        tab.close()
+        monkeypatch.setattr(theme, "textures_on", False)
+        theme.apply(qapp, previous)
 
 
 @pytest.mark.parametrize("name", ["Dark", "Light", "Mocha"])
