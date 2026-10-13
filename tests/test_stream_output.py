@@ -3,6 +3,7 @@ import numpy as np
 
 from soundboard.library import Config
 from soundboard.sendfx import SafetyLimiter
+from conftest import devices_done
 from test_engine import engine_with, tone
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
@@ -90,6 +91,7 @@ def test_window_never_streams_to_the_cable_or_headphones(window, monkeypatch):  
     w.set_obs_device("Headphones")
     w.set_obs_device("CABLE-A Input")
     w.set_obs_device(None)
+    devices_done(w)   # (opened on the device thread, in turn)
     assert opened == [None, None, "CABLE-A Input", None]
     assert w.cfg.obs_device is None
 
@@ -117,4 +119,5 @@ def test_another_end_of_the_cable_in_use_is_never_the_stream_output(window, monk
     w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
     w.set_obs_device("CABLE In 16ch (VB-Audio Virtual Cable)")
     w.set_obs_device("CABLE-A Input (VB-Audio Cable A)")
+    devices_done(w)   # (opened on the device thread, in turn)
     assert opened == [None, "CABLE-A Input (VB-Audio Cable A)"]
