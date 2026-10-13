@@ -8,10 +8,10 @@ the small Update pill, and "Skip this version" doesn't hide it. A copy that miss
 urgent fix gets the banner for whatever newer release it's offered (skipped_urgent),
 and that installs the newer one.
 
-Any other release settles for SETTLE_S before the app offers it: a fix that follows it
-the same day replaces it, so people get one prompt instead of several. While the
-newest one settles, the newest settled release newer than this copy is offered
-instead. "Check now" always offers the newest.
+Any other release settles for SETTLE_S (30 minutes) before the app offers it: a quick
+fix that follows it replaces it, so people get one prompt instead of two. While the
+newest one settles, nothing is offered (not an older one either: the newest comes a
+few minutes later). "Check now" always offers the newest.
 
 A newer version is only announced. Nothing is downloaded until the user presses
 *Update now*: then the release's OnionBoardSetup.exe is fetched from the project's own
@@ -59,7 +59,7 @@ OLD_DOWNLOADS = "https://github.com/Onion-Alien/onionboard/releases/download/"
 UPDATES_DIR = APP_DIR / "updates"
 INSTALL_LOG = UPDATES_DIR / "install.log"
 EVERY_S = 6 * 3600       # so an urgent fix reaches people the same day
-SETTLE_S = 24 * 3600     # how long any other release is out before it's offered
+SETTLE_S = 30 * 60       # how long any other release is out before it's offered
 LIMIT = 1 << 20          # the API's answer is a few KB
 MAX_SIZE = 400 << 20     # the installer is ~180 MB
 CHUNK = 1 << 20
@@ -215,16 +215,6 @@ def latest() -> Release | None:
     return _release(_get(API))
 
 
-def latest_settled() -> Release | None:
-    """The newest release that has settled (see SETTLE_S), from the last few."""
-    data = _get(RECENT)
-    found = [r for d in (data if isinstance(data, list) else [])
-             if isinstance(d, dict) and not d.get("draft") and not d.get("prerelease")
-             and (r := _release(d)) is not None and settled(r)]
-    # (a Release's version is made from a parsed one, so never None here)
-    return max(found, key=lambda r: parse_version(r.version) or (), default=None)
-
-
 def _release(data: dict) -> Release | None:
     tag = str(data.get("tag_name") or data.get("name") or "")
     ver = parse_version(tag)
@@ -268,8 +258,8 @@ def check(cfg, force: bool = False) -> Release | None:
     try:
         rel = latest()
         if not force and rel is not None and newer(rel.version) and not settled(rel):
-            log.info("%s is still settling: looking for an older one", rel.version)
-            rel = latest_settled()
+            log.info("%s is still settling: offering it later", rel.version)
+            return None
     except Exception as e:  # noqa: BLE001 - offline, rate-limited, GitHub down…
         log.info("update check failed: %s", e)
         if force:

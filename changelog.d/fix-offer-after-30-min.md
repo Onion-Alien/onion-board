@@ -1,0 +1,1 @@
+- New versions are offered 30 minutes after they come out instead of a day, and while the newest is that fresh no older version is offered.

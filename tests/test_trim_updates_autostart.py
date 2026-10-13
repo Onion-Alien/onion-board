@@ -108,16 +108,15 @@ def _gh(tag, age_h, **extra):
                                           time.gmtime(time.time() - age_h * 3600)), **extra}
 
 
-def test_a_fresh_release_settles_a_day_before_it_is_offered(monkeypatch):
-    answers = {updates.API: _gh("v99.0.2", 3),
-               updates.RECENT: [_gh("v99.0.2", 3), _gh("v99.1.0-beta", 30, prerelease=True),
-                                _gh("v99.0.1", 30), _gh("v99.0.0", 50)]}
+def test_a_fresh_release_waits_30_minutes(monkeypatch):
+    answers = {updates.API: _gh("v99.0.2", 0.25),
+               updates.RECENT: [_gh("v99.0.2", 0.25), _gh("v99.0.1", 30)]}
     monkeypatch.setattr(updates, "_get", lambda url, *_f: answers[url])
-    rel = updates.check(Config())
-    assert rel.version == "99.0.1"                           # the newest settled one
+    assert updates.check(Config()) is None                   # not an older one either
     assert updates.check(Config(), force=True).version == "99.0.2"   # "Check now": newest
-    answers[updates.RECENT] = [_gh("v99.0.2", 3), _gh("v1.0.0", 30)]
-    assert updates.check(Config()) is None                   # nothing settled is newer
+    answers[updates.API] = _gh("v99.0.2", 0.6)
+    assert updates.check(Config()).version == "99.0.2"       # out 30 minutes: offered
+    assert updates.SETTLE_S == 30 * 60
 
 
 def test_an_urgent_fix_does_not_wait_to_settle(monkeypatch):
