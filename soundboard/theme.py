@@ -1577,6 +1577,13 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
 _texture_urls: dict[tuple, str] = {}
 
 
+def texture_style(selector: str, tk: dict[str, str] | None = None) -> str:
+    """Apply the active tiling texture to a surface, including locally styled panels."""
+    if url := _texture_url(T if tk is None else tk):
+        return f'{selector} {{ background-image:url("{url}"); background-repeat:repeat-xy; }}\n'
+    return ""
+
+
 def _texture_url(tk: dict[str, str]) -> str:
     """The theme's texture tile as a file for the stylesheet: made once, then remembered."""
     kind = tk.get("texture", "")
@@ -1645,9 +1652,8 @@ def stylesheet(name: str | None = None) -> str:
         css += OUTLINE_STYLE.substitute(tk)
     else:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
-    if url := _texture_url(tk):
-        css += ("QFrame#card, QFrame#setcard, QFrame#fxcard, QFrame#transport, QDialog#transport, "
-                f'QFrame#deck {{ background-image:url("{url}"); }}\n')
+    css += texture_style("QFrame#card, QFrame#setcard, QFrame#fxcard, QFrame#transport, "
+                         "QDialog#transport, QFrame#deck", tk)
     return css
 
 
