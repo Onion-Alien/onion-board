@@ -126,6 +126,19 @@ def test_an_urgent_fix_does_not_wait_to_settle(monkeypatch):
     assert updates.check(Config()).version == "99.0.2"
 
 
+def test_a_skipped_urgent_fix_still_gets_the_banner(monkeypatch):
+    monkeypatch.setattr(updates, "__version__", "99.0.0")
+    recent = [_gh("v99.3.0", 30), _gh("v99.2.0", 40),
+              _gh("v99.1.0", 50, body="Urgent: sounds cut out"), _gh("v98.0.0", 90,
+                                                                     body="Urgent: old")]
+    answers = {updates.API: _gh("v99.3.0", 30), updates.RECENT: recent}
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: answers[url])
+    rel = updates.check(Config(update_skip="99.3.0"))
+    assert rel.version == "99.3.0" and rel.urgent == "sounds cut out"   # installs 2.3
+    monkeypatch.setattr(updates, "__version__", "99.1.0")    # already has the fix
+    assert updates.check(Config()).urgent == ""
+
+
 def test_settled():
     rel = updates.Release("1.0.0", "https://x", published=1000.0)
     assert not updates.settled(rel, now=1000.0 + updates.SETTLE_S - 1)
