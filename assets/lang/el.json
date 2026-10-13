@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Το μικρόφωνό σου δεν στέλνει ήχο. Είναι τα ακουστικά σου κλειστά ή το μικρόφωνό τους σε σίγαση; Άνοιξέ τα ή βγάλε τη σίγαση. Ακόμα τίποτα; Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά.",
   "Minimised: last picture": "Ελαχιστοποιημένο: τελευταία εικόνα",
   "Minimised: restore for live updates": "Ελαχιστοποιημένο: επαναφέρετε για ζωντανή εικόνα",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Σύρετε για αλλαγή μεγέθους των αποθηκευμένων κλιπ. Διπλό κλικ για προσαρμογή στα κλιπ."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Σύρετε για αλλαγή μεγέθους των αποθηκευμένων κλιπ. Διπλό κλικ για προσαρμογή στα κλιπ.",
+  "+ Subcategory": "+ Υποκατηγορία",
+  "Add subcategory…": "Προσθήκη υποκατηγορίας…",
+  "All {n}": "Όλα {n}",
+  "Delete subcategory": "Διαγραφή υποκατηγορίας",
+  "Delete subcategory (keeps the sounds)": "Διαγραφή υποκατηγορίας (κρατάει τους ήχους)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Διαγραφή της υποκατηγορίας «{name}»; Οι ήχοι της ({n}) μένουν στο {cat}.",
+    "Διαγραφή της υποκατηγορίας «{name}»; Οι ήχοι της ({n}) μένουν στο {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Να γίνει μία καρτέλα «{name}», με {n} από τις κατηγορίες της ως υποκατηγορίες αντί για ξεχωριστές καρτέλες;\n\nΚανένας ήχος δεν αφαιρείται ή αλλάζει.",
+  "Name (a group inside {cat}):": "Όνομα (μια ομάδα μέσα στο {cat}):",
+  "New subcategory": "Νέα υποκατηγορία",
+  "New subcategory in {cat}": "Νέα υποκατηγορία στο {cat}",
+  "Put its categories in one tab": "Βάλε τις κατηγορίες της σε μία καρτέλα",
+  "Rename subcategory": "Μετονομασία υποκατηγορίας",
+  "✓ “{name}” is one tab now": "✓ Το «{name}» είναι τώρα μία καρτέλα"
 }

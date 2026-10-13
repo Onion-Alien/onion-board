@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tu micrófono no envía sonido. ¿Tus audífonos están apagados o su micrófono silenciado? Enciéndelos o quita el silencio. ¿Sigue sin funcionar? Reinicia tu PC y vuelve a intentarlo.",
   "Minimised: last picture": "Minimizada: última imagen",
   "Minimised: restore for live updates": "Minimizada: restaura para ver cambios en vivo",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Arrastra para cambiar el tamaño de los clips guardados. Haz doble clic para ajustarlo a los clips."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Arrastra para cambiar el tamaño de los clips guardados. Haz doble clic para ajustarlo a los clips.",
+  "+ Subcategory": "+ Subcategoría",
+  "Add subcategory…": "Agregar subcategoría…",
+  "All {n}": "Todo {n}",
+  "Delete subcategory": "Eliminar subcategoría",
+  "Delete subcategory (keeps the sounds)": "Eliminar subcategoría (conserva los sonidos)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "¿Eliminar la subcategoría «{name}»? Sus sonidos ({n}) se quedan en {cat}.",
+    "¿Eliminar la subcategoría «{name}»? Sus sonidos ({n}) se quedan en {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "¿Crear una sola pestaña «{name}» con {n} de sus categorías adentro como subcategorías, en vez de pestañas aparte?\n\nNo se quita ni se cambia ningún sonido.",
+  "Name (a group inside {cat}):": "Nombre (un grupo dentro de {cat}):",
+  "New subcategory": "Subcategoría nueva",
+  "New subcategory in {cat}": "Subcategoría nueva en {cat}",
+  "Put its categories in one tab": "Poner sus categorías en una pestaña",
+  "Rename subcategory": "Cambiar nombre de la subcategoría",
+  "✓ “{name}” is one tab now": "✓ «{name}» ahora es una sola pestaña"
 }

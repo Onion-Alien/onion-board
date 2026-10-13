@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Dein Mikro sendet keinen Ton. Ist dein Headset ausgeschaltet oder sein Mikro stummgeschaltet? Schalte es ein oder heb die Stummschaltung auf. Immer noch nichts? Starte deinen PC neu und versuch es noch mal.",
   "Minimised: last picture": "Minimiert: letztes Bild",
   "Minimised: restore for live updates": "Minimiert: für Live-Bilder wiederherstellen",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Ziehen, um den Bereich für gespeicherte Clips zu vergrößern. Doppelklicken, um ihn an die Clips anzupassen."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Ziehen, um den Bereich für gespeicherte Clips zu vergrößern. Doppelklicken, um ihn an die Clips anzupassen.",
+  "+ Subcategory": "+ Unterkategorie",
+  "Add subcategory…": "Unterkategorie hinzufügen…",
+  "All {n}": "Alle {n}",
+  "Delete subcategory": "Unterkategorie löschen",
+  "Delete subcategory (keeps the sounds)": "Unterkategorie löschen (Sounds bleiben)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Unterkategorie „{name}“ löschen? Ihre Sounds ({n}) bleiben in {cat}.",
+    "Unterkategorie „{name}“ löschen? Ihre Sounds ({n}) bleiben in {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Einen Tab „{name}“ anlegen, in dem {n} seiner Kategorien als Unterkategorien liegen statt als eigene Tabs?\n\nKein Sound wird entfernt oder geändert.",
+  "Name (a group inside {cat}):": "Name (eine Gruppe in {cat}):",
+  "New subcategory": "Neue Unterkategorie",
+  "New subcategory in {cat}": "Neue Unterkategorie in {cat}",
+  "Put its categories in one tab": "Seine Kategorien in einen Tab legen",
+  "Rename subcategory": "Unterkategorie umbenennen",
+  "✓ “{name}” is one tab now": "✓ „{name}“ ist jetzt ein Tab"
 }

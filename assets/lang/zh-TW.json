@@ -3241,5 +3241,20 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麥克風沒有聲音。耳機是不是關著，或者麥克風靜音了？請打開耳機或取消靜音。還是沒有聲音？請重新啟動電腦，然後再試一次。",
   "Minimised: last picture": "已最小化：最後一幀",
   "Minimised: restore for live updates": "已最小化：還原視窗以即時更新",
-  "Drag to resize saved clips. Double-click to fit the clips.": "拖曳可調整已儲存片段區域的大小。按兩下可自動符合片段。"
+  "Drag to resize saved clips. Double-click to fit the clips.": "拖曳可調整已儲存片段區域的大小。按兩下可自動符合片段。",
+  "+ Subcategory": "+ 子分類",
+  "Add subcategory…": "新增子分類…",
+  "All {n}": "全部 {n}",
+  "Delete subcategory": "刪除子分類",
+  "Delete subcategory (keeps the sounds)": "刪除子分類（保留音效）",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "刪除子分類「{name}」？其中的音效（{n}）會留在 {cat} 裡。"
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "把它做成一個「{name}」分頁，讓它的 {n} 個分類作為子分類放在裡面，而不是各占一個分頁？\n\n不會刪除或更改任何音效。",
+  "Name (a group inside {cat}):": "名稱（{cat} 裡的一個群組）：",
+  "New subcategory": "新子分類",
+  "New subcategory in {cat}": "在 {cat} 中新增子分類",
+  "Put its categories in one tab": "把它的分類放進一個分頁",
+  "Rename subcategory": "重新命名子分類",
+  "✓ “{name}” is one tab now": "✓「{name}」現在是一個分頁"
 }

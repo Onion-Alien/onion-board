@@ -3241,5 +3241,20 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "ไมค์ของคุณไม่ส่งเสียงออกมา หูฟังปิดอยู่ หรือไมค์ของหูฟังปิดเสียงอยู่หรือเปล่า เปิดหูฟังหรือเปิดเสียงไมค์ ยังไม่มีเสียงอีก? ให้รีสตาร์ท PC แล้วลองอีกครั้ง",
   "Minimised: last picture": "ย่อหน้าต่างอยู่: ภาพล่าสุด",
   "Minimised: restore for live updates": "ย่อหน้าต่างอยู่: คืนค่าหน้าต่างเพื่อดูภาพสด",
-  "Drag to resize saved clips. Double-click to fit the clips.": "ลากเพื่อปรับขนาดพื้นที่คลิปที่บันทึกไว้ ดับเบิลคลิกเพื่อปรับให้พอดีกับคลิป"
+  "Drag to resize saved clips. Double-click to fit the clips.": "ลากเพื่อปรับขนาดพื้นที่คลิปที่บันทึกไว้ ดับเบิลคลิกเพื่อปรับให้พอดีกับคลิป",
+  "+ Subcategory": "+ หมวดหมู่ย่อย",
+  "Add subcategory…": "เพิ่มหมวดหมู่ย่อย…",
+  "All {n}": "ทั้งหมด {n}",
+  "Delete subcategory": "ลบหมวดหมู่ย่อย",
+  "Delete subcategory (keeps the sounds)": "ลบหมวดหมู่ย่อย (เก็บเสียงไว้)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "ลบหมวดหมู่ย่อย “{name}” ไหม? เสียงในนั้น ({n}) จะยังอยู่ใน {cat}"
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "รวมเป็นแท็บ “{name}” แท็บเดียว โดยให้ {n} หมวดหมู่ของมันอยู่ข้างในเป็นหมวดหมู่ย่อยแทนที่จะแยกเป็นแท็บละอัน ไหม?\n\nจะไม่มีเสียงใดถูกลบหรือเปลี่ยน",
+  "Name (a group inside {cat}):": "ชื่อ (กลุ่มใน {cat}):",
+  "New subcategory": "หมวดหมู่ย่อยใหม่",
+  "New subcategory in {cat}": "หมวดหมู่ย่อยใหม่ใน {cat}",
+  "Put its categories in one tab": "รวมหมวดหมู่ของมันไว้ในแท็บเดียว",
+  "Rename subcategory": "เปลี่ยนชื่อหมวดหมู่ย่อย",
+  "✓ “{name}” is one tab now": "✓ “{name}” เป็นแท็บเดียวแล้ว"
 }

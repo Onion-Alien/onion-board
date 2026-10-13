@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Seu microfone não está enviando som. Seu headset está desligado ou com o microfone no mudo? Ligue-o ou tire do mudo. Ainda nada? Reinicie o PC e tente de novo.",
   "Minimised: last picture": "Minimizada: última imagem",
   "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações ao vivo",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Arraste para redimensionar os clipes salvos. Clique duas vezes para ajustar aos clipes."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Arraste para redimensionar os clipes salvos. Clique duas vezes para ajustar aos clipes.",
+  "+ Subcategory": "+ Subcategoria",
+  "Add subcategory…": "Adicionar subcategoria…",
+  "All {n}": "Todos {n}",
+  "Delete subcategory": "Excluir subcategoria",
+  "Delete subcategory (keeps the sounds)": "Excluir subcategoria (mantém os sons)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Excluir a subcategoria “{name}”? Os sons dela ({n}) ficam em {cat}.",
+    "Excluir a subcategoria “{name}”? Os sons dela ({n}) ficam em {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Criar uma única aba “{name}”, com {n} das categorias dela dentro como subcategorias em vez de abas separadas?\n\nNenhum som é removido ou alterado.",
+  "Name (a group inside {cat}):": "Nome (um grupo dentro de {cat}):",
+  "New subcategory": "Nova subcategoria",
+  "New subcategory in {cat}": "Nova subcategoria em {cat}",
+  "Put its categories in one tab": "Colocar as categorias dela em uma aba",
+  "Rename subcategory": "Renomear subcategoria",
+  "✓ “{name}” is one tab now": "✓ “{name}” agora é uma aba só"
 }

@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikkisi ei lähetä ääntä. Ovatko kuulokkeesi pois päältä tai niiden mikki mykistetty? Laita ne päälle tai poista mykistys. Vieläkään ei mitään? Käynnistä tietokone uudelleen ja yritä sitten uudestaan.",
   "Minimised: last picture": "Pienennetty: viimeisin kuva",
   "Minimised: restore for live updates": "Pienennetty: palauta ikkuna live-kuvaa varten",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Muuta tallennettujen leikkeiden alueen kokoa vetämällä. Sovita leikkeisiin kaksoisnapsauttamalla."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Muuta tallennettujen leikkeiden alueen kokoa vetämällä. Sovita leikkeisiin kaksoisnapsauttamalla.",
+  "+ Subcategory": "+ Alakategoria",
+  "Add subcategory…": "Lisää alakategoria…",
+  "All {n}": "Kaikki {n}",
+  "Delete subcategory": "Poista alakategoria",
+  "Delete subcategory (keeps the sounds)": "Poista alakategoria (äänet säilyvät)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Poistetaanko alakategoria “{name}”? Sen äänet ({n}) jäävät kategoriaan {cat}.",
+    "Poistetaanko alakategoria “{name}”? Sen äänet ({n}) jäävät kategoriaan {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Tehdäänkö yksi välilehti “{name}”, jossa {n} sen kategoriaa ovat alakategorioina erillisten välilehtien sijaan?\n\nÄänistä ei poisteta tai muuteta mitään.",
+  "Name (a group inside {cat}):": "Nimi (ryhmä kategoriassa {cat}):",
+  "New subcategory": "Uusi alakategoria",
+  "New subcategory in {cat}": "Uusi alakategoria kategoriaan {cat}",
+  "Put its categories in one tab": "Laita sen kategoriat yhteen välilehteen",
+  "Rename subcategory": "Nimeä alakategoria uudelleen",
+  "✓ “{name}” is one tab now": "✓ “{name}” on nyt yksi välilehti"
 }

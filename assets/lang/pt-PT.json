@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "O teu microfone não está a enviar som. Os teus auscultadores estão desligados ou com o microfone silenciado? Liga-os ou tira o silêncio. Continua sem som? Reinicia o PC e tenta outra vez.",
   "Minimised: last picture": "Minimizada: última imagem",
   "Minimised: restore for live updates": "Minimizada: restaure para ver atualizações em direto",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Arrasta para redimensionar os clips guardados. Clica duas vezes para ajustar aos clips."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Arrasta para redimensionar os clips guardados. Clica duas vezes para ajustar aos clips.",
+  "+ Subcategory": "+ Subcategoria",
+  "Add subcategory…": "Adicionar subcategoria…",
+  "All {n}": "Todos {n}",
+  "Delete subcategory": "Eliminar subcategoria",
+  "Delete subcategory (keeps the sounds)": "Eliminar subcategoria (mantém os sons)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Eliminar a subcategoria “{name}”? Os sons dela ({n}) ficam em {cat}.",
+    "Eliminar a subcategoria “{name}”? Os sons dela ({n}) ficam em {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Criar um único separador “{name}”, com {n} das categorias dele lá dentro como subcategorias em vez de separadores à parte?\n\nNenhum som é removido ou alterado.",
+  "Name (a group inside {cat}):": "Nome (um grupo dentro de {cat}):",
+  "New subcategory": "Nova subcategoria",
+  "New subcategory in {cat}": "Nova subcategoria em {cat}",
+  "Put its categories in one tab": "Pôr as categorias dele num separador",
+  "Rename subcategory": "Mudar o nome da subcategoria",
+  "✓ “{name}” is one tab now": "✓ “{name}” agora é um único separador"
 }

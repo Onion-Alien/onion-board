@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Ton micro n'envoie aucun son. Ton casque est-il éteint, ou son micro coupé ? Allume-le ou réactive le micro. Toujours rien ? Redémarre ton PC, puis réessaie.",
   "Minimised: last picture": "Réduite : dernière image",
   "Minimised: restore for live updates": "Réduite : restaurez pour voir les mises à jour en direct",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Faites glisser pour redimensionner les clips enregistrés. Double-cliquez pour ajuster aux clips."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Faites glisser pour redimensionner les clips enregistrés. Double-cliquez pour ajuster aux clips.",
+  "+ Subcategory": "+ Sous-catégorie",
+  "Add subcategory…": "Ajouter une sous-catégorie…",
+  "All {n}": "Tous {n}",
+  "Delete subcategory": "Supprimer la sous-catégorie",
+  "Delete subcategory (keeps the sounds)": "Supprimer la sous-catégorie (garde les sons)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}.",
+    "Supprimer la sous-catégorie « {name} » ? Ses sons ({n}) restent dans {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Faire un seul onglet « {name} », avec {n} de ses catégories dedans comme sous-catégories au lieu d'onglets séparés ?\n\nAucun son n'est retiré ni modifié.",
+  "Name (a group inside {cat}):": "Nom (un groupe dans {cat}) :",
+  "New subcategory": "Nouvelle sous-catégorie",
+  "New subcategory in {cat}": "Nouvelle sous-catégorie dans {cat}",
+  "Put its categories in one tab": "Mettre ses catégories dans un seul onglet",
+  "Rename subcategory": "Renommer la sous-catégorie",
+  "✓ “{name}” is one tab now": "✓ « {name} » est maintenant un seul onglet"
 }

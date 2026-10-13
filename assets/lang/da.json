@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Din mikrofon sender ingen lyd. Er dit headset slukket, eller er dets mikrofon slået fra? Tænd det, eller slå mikrofonen til. Stadig intet? Genstart din pc, og prøv igen.",
   "Minimised: last picture": "Minimeret: sidste billede",
   "Minimised: restore for live updates": "Minimeret: gendan for løbende opdateringer",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Træk for at ændre størrelsen på gemte klip. Dobbeltklik for at tilpasse til klippene."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Træk for at ændre størrelsen på gemte klip. Dobbeltklik for at tilpasse til klippene.",
+  "+ Subcategory": "+ Underkategori",
+  "Add subcategory…": "Tilføj underkategori…",
+  "All {n}": "Alle {n}",
+  "Delete subcategory": "Slet underkategori",
+  "Delete subcategory (keeps the sounds)": "Slet underkategori (beholder lydene)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Slet underkategorien “{name}”? Lydene i den ({n}) bliver i {cat}.",
+    "Slet underkategorien “{name}”? Lydene i den ({n}) bliver i {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Lav én fane “{name}”, hvor {n} af dens kategorier ligger som underkategorier i stedet for faner hver for sig?\n\nIngen lyde fjernes eller ændres.",
+  "Name (a group inside {cat}):": "Navn (en gruppe i {cat}):",
+  "New subcategory": "Ny underkategori",
+  "New subcategory in {cat}": "Ny underkategori i {cat}",
+  "Put its categories in one tab": "Læg dens kategorier i én fane",
+  "Rename subcategory": "Omdøb underkategori",
+  "✓ “{name}” is one tab now": "✓ “{name}” er nu én fane"
 }

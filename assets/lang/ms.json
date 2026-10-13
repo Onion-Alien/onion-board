@@ -3241,5 +3241,20 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofon anda tidak menghantar bunyi. Adakah set kepala anda dimatikan, atau mikrofonnya diredamkan? Hidupkannya atau nyahredamkannya. Masih tiada? Mulakan semula PC anda, kemudian cuba lagi.",
   "Minimised: last picture": "Diminimumkan: gambar terakhir",
   "Minimised: restore for live updates": "Diminimumkan: pulihkan untuk kemas kini langsung",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah saiz klip tersimpan. Klik dua kali untuk memuatkan klip."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Seret untuk mengubah saiz klip tersimpan. Klik dua kali untuk memuatkan klip.",
+  "+ Subcategory": "+ Subkategori",
+  "Add subcategory…": "Tambah subkategori…",
+  "All {n}": "Semua {n}",
+  "Delete subcategory": "Padam subkategori",
+  "Delete subcategory (keeps the sounds)": "Padam subkategori (bunyi dikekalkan)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Padam subkategori “{name}”? Bunyinya ({n}) kekal dalam {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Jadikan satu tab “{name}”, dengan {n} kategorinya di dalam sebagai subkategori dan bukan tab berasingan?\n\nTiada bunyi yang dibuang atau diubah.",
+  "Name (a group inside {cat}):": "Nama (kumpulan dalam {cat}):",
+  "New subcategory": "Subkategori baharu",
+  "New subcategory in {cat}": "Subkategori baharu dalam {cat}",
+  "Put its categories in one tab": "Letakkan kategorinya dalam satu tab",
+  "Rename subcategory": "Namakan semula subkategori",
+  "✓ “{name}” is one tab now": "✓ “{name}” kini satu tab"
 }

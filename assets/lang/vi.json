@@ -3241,5 +3241,20 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mic của bạn không gửi âm thanh. Tai nghe của bạn đang tắt, hay mic của nó đang tắt tiếng? Hãy bật tai nghe hoặc bật lại tiếng mic. Vẫn không có gì? Khởi động lại PC rồi thử lại.",
   "Minimised: last picture": "Đã thu nhỏ: hình ảnh cuối",
   "Minimised: restore for live updates": "Đã thu nhỏ: khôi phục để xem cập nhật trực tiếp",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Kéo để đổi kích thước vùng clip đã lưu. Nhấp đúp để vừa với các clip."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Kéo để đổi kích thước vùng clip đã lưu. Nhấp đúp để vừa với các clip.",
+  "+ Subcategory": "+ Danh mục con",
+  "Add subcategory…": "Thêm danh mục con…",
+  "All {n}": "Tất cả {n}",
+  "Delete subcategory": "Xóa danh mục con",
+  "Delete subcategory (keeps the sounds)": "Xóa danh mục con (giữ âm thanh)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Xóa danh mục con “{name}”? Các âm thanh trong đó ({n}) vẫn ở lại {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Gộp thành một tab “{name}”, với {n} danh mục của nó nằm bên trong làm danh mục con thay vì các tab riêng?\n\nKhông có âm thanh nào bị xóa hay thay đổi.",
+  "Name (a group inside {cat}):": "Tên (một nhóm trong {cat}):",
+  "New subcategory": "Danh mục con mới",
+  "New subcategory in {cat}": "Danh mục con mới trong {cat}",
+  "Put its categories in one tab": "Gộp các danh mục của nó vào một tab",
+  "Rename subcategory": "Đổi tên danh mục con",
+  "✓ “{name}” is one tab now": "✓ “{name}” giờ là một tab"
 }

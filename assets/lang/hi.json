@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "आपका माइक कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद है, या उसका माइक म्यूट है? उसे चालू करें या अनम्यूट करें। अब भी कुछ नहीं? अपना PC रीस्टार्ट करें, फिर दोबारा कोशिश करें।",
   "Minimised: last picture": "छोटी की गई: आखिरी तस्वीर",
   "Minimised: restore for live updates": "छोटी की गई: लाइव अपडेट के लिए विंडो बहाल करें",
-  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।"
+  "Drag to resize saved clips. Double-click to fit the clips.": "सहेजे गए क्लिप का आकार बदलने के लिए खींचें। क्लिप के अनुसार आकार करने के लिए डबल-क्लिक करें।",
+  "+ Subcategory": "+ सब-कैटेगरी",
+  "Add subcategory…": "सब-कैटेगरी जोड़ें…",
+  "All {n}": "सभी {n}",
+  "Delete subcategory": "सब-कैटेगरी डिलीट करें",
+  "Delete subcategory (keeps the sounds)": "सब-कैटेगरी डिलीट करें (साउंड बने रहेंगे)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "सब-कैटेगरी “{name}” डिलीट करें? इसके साउंड ({n}) {cat} में बने रहेंगे।",
+    "सब-कैटेगरी “{name}” डिलीट करें? इसके साउंड ({n}) {cat} में बने रहेंगे।"
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "एक ही टैब “{name}” बनाएँ, जिसमें इसकी {n} कैटेगरी अलग टैब की जगह सब-कैटेगरी बनकर रहें?\n\nकोई साउंड हटेगा या बदलेगा नहीं।",
+  "Name (a group inside {cat}):": "नाम ({cat} के अंदर एक ग्रुप):",
+  "New subcategory": "नई सब-कैटेगरी",
+  "New subcategory in {cat}": "{cat} में नई सब-कैटेगरी",
+  "Put its categories in one tab": "इसकी कैटेगरी एक टैब में रखें",
+  "Rename subcategory": "सब-कैटेगरी का नाम बदलें",
+  "✓ “{name}” is one tab now": "✓ “{name}” अब एक ही टैब है"
 }

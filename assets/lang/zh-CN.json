@@ -3241,5 +3241,20 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "你的麦克风没有声音。耳机是不是关着，或者麦克风静音了？请打开耳机或取消静音。还是没有声音？请重启电脑，然后再试一次。",
   "Minimised: last picture": "已最小化：最后一帧",
   "Minimised: restore for live updates": "已最小化：还原窗口以实时更新",
-  "Drag to resize saved clips. Double-click to fit the clips.": "拖动可调整已保存片段区域的大小。双击可自动适应片段。"
+  "Drag to resize saved clips. Double-click to fit the clips.": "拖动可调整已保存片段区域的大小。双击可自动适应片段。",
+  "+ Subcategory": "+ 子分类",
+  "Add subcategory…": "添加子分类…",
+  "All {n}": "全部 {n}",
+  "Delete subcategory": "删除子分类",
+  "Delete subcategory (keeps the sounds)": "删除子分类（保留音效）",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "删除子分类“{name}”？其中的音效（{n}）会留在 {cat} 里。"
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "把它做成一个“{name}”标签页，让它的 {n} 个分类作为子分类放在里面，而不是各占一个标签页？\n\n不会删除或更改任何音效。",
+  "Name (a group inside {cat}):": "名称（{cat} 里的一个组）：",
+  "New subcategory": "新建子分类",
+  "New subcategory in {cat}": "在 {cat} 中新建子分类",
+  "Put its categories in one tab": "把它的分类放进一个标签页",
+  "Rename subcategory": "重命名子分类",
+  "✓ “{name}” is one tab now": "✓ “{name}”现在是一个标签页"
 }

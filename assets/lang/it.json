@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Il tuo microfono non invia nessun suono. Le cuffie sono spente o il loro microfono è disattivato? Accendile o riattiva il microfono. Ancora niente? Riavvia il PC e riprova.",
   "Minimised: last picture": "Ridotta a icona: ultima immagine",
   "Minimised: restore for live updates": "Ridotta a icona: ripristina per gli aggiornamenti in tempo reale",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Trascina per ridimensionare i clip salvati. Fai doppio clic per adattare lo spazio ai clip."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Trascina per ridimensionare i clip salvati. Fai doppio clic per adattare lo spazio ai clip.",
+  "+ Subcategory": "+ Sottocategoria",
+  "Add subcategory…": "Aggiungi sottocategoria…",
+  "All {n}": "Tutti {n}",
+  "Delete subcategory": "Elimina sottocategoria",
+  "Delete subcategory (keeps the sounds)": "Elimina sottocategoria (tiene i suoni)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Eliminare la sottocategoria «{name}»? I suoni ({n}) restano in {cat}.",
+    "Eliminare la sottocategoria «{name}»? I suoni ({n}) restano in {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Creare una sola scheda «{name}», con {n} delle sue categorie dentro come sottocategorie invece di schede separate?\n\nNessun suono viene rimosso o modificato.",
+  "Name (a group inside {cat}):": "Nome (un gruppo dentro {cat}):",
+  "New subcategory": "Nuova sottocategoria",
+  "New subcategory in {cat}": "Nuova sottocategoria in {cat}",
+  "Put its categories in one tab": "Metti le sue categorie in una scheda",
+  "Rename subcategory": "Rinomina sottocategoria",
+  "✓ “{name}” is one tab now": "✓ «{name}» ora è una sola scheda"
 }

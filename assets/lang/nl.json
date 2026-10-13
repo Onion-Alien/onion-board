@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Je mic stuurt geen geluid. Staat je headset uit, of is de mic gedempt? Zet hem aan of zet dempen uit. Nog steeds niets? Start je pc opnieuw op en probeer het nog eens.",
   "Minimised: last picture": "Geminimaliseerd: laatste beeld",
   "Minimised: restore for live updates": "Geminimaliseerd: herstel voor livebeelden",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Sleep om het vak met opgeslagen clips te vergroten of verkleinen. Dubbelklik om het aan de clips aan te passen."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Sleep om het vak met opgeslagen clips te vergroten of verkleinen. Dubbelklik om het aan de clips aan te passen.",
+  "+ Subcategory": "+ Subcategorie",
+  "Add subcategory…": "Subcategorie toevoegen…",
+  "All {n}": "Alle {n}",
+  "Delete subcategory": "Subcategorie verwijderen",
+  "Delete subcategory (keeps the sounds)": "Subcategorie verwijderen (geluiden blijven)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Subcategorie “{name}” verwijderen? De geluiden erin ({n}) blijven in {cat}.",
+    "Subcategorie “{name}” verwijderen? De geluiden erin ({n}) blijven in {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Eén tabblad “{name}” maken, met {n} van de categorieën erin als subcategorieën in plaats van eigen tabbladen?\n\nEr wordt geen geluid verwijderd of gewijzigd.",
+  "Name (a group inside {cat}):": "Naam (een groep in {cat}):",
+  "New subcategory": "Nieuwe subcategorie",
+  "New subcategory in {cat}": "Nieuwe subcategorie in {cat}",
+  "Put its categories in one tab": "Zet de categorieën in één tabblad",
+  "Rename subcategory": "Subcategorie hernoemen",
+  "✓ “{name}” is one tab now": "✓ “{name}” is nu één tabblad"
 }

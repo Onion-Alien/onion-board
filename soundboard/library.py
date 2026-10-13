@@ -220,6 +220,13 @@ def clean_setting(k: str, v):
         return v if v in PAD_SORTS else "custom"
     if k == "pad_view":
         return v if v in PAD_VIEWS else "grid"
+    if k == "subcategories":   # {category: [names]}; anything else is dropped
+        out = {}
+        for c, subs in v.items():
+            c = clean_tags([c])[0] if isinstance(c, str) and clean_tags([c]) else ""
+            if c and SUB_SEP not in c:
+                out[c] = [s for s in clean_tags(subs) if SUB_SEP not in s]
+        return {c: subs for c, subs in out.items() if subs}
     if k == "category_colors":   # {category: "#rrggbb"}; anything else is dropped
         return {c: col for c, col in v.items() if isinstance(c, str) and isinstance(col, str)
                 and re.fullmatch(r"#[0-9a-fA-F]{6}", col)}
@@ -435,6 +442,10 @@ class Config:
     screen: dict = field(default_factory=dict)
     categories: list[str] = field(default_factory=list)   # pad categories, in tab order
     category: str = ""                # the category the Sounds tab shows; "" = all
+    # subcategories: {category: [names]}. A sound in one carries the tags "Cat" and
+    # "Cat / Sub" (SUB_SEP), so an older version just shows an extra tab
+    subcategories: dict = field(default_factory=dict)
+    subcategory: str = ""             # the one showing inside `category`; "" = all of it
     category_colors: dict = field(default_factory=dict)   # category -> "#rrggbb" on its tab
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
@@ -826,9 +837,11 @@ class Config:
             cfg._raw_kept = kept   # pyright: ignore[reportAttributeAccessIssue]
         cfg.categories = clean_tags(cfg.categories)
         for m in sounds:   # a category a sound is in always has a tab
-            m.tags = merge_tags(m.tags, cfg.categories)
+            m.tags = merge_tags(m.tags, cfg.categories, cfg.subcategories)
         if cfg.category not in cfg.categories:
             cfg.category = ""
+        if cfg.subcategory not in cfg.subcategories.get(cfg.category, []):
+            cfg.subcategory = ""
         return cfg
 
     def to_raw(self) -> dict:
@@ -1050,31 +1063,109 @@ def clean_wait(v, kind: str = "delay") -> float:
     return min(max(v, 0.0), hi) if v == v else 0.0
 
 
+SUB_SEP = " / "   # "Cat / Sub": the tag a sound in a subcategory carries (besides "Cat")
+
+
+def split_tag(tag: str) -> tuple[str, str]:
+    """("Cat", "Sub") for "Cat / Sub", ("Cat", "") for a plain category."""
+    cat, sep, sub = tag.partition(SUB_SEP)
+    return (cat, sub) if sep else (tag, "")
+
+
+def sub_tag(cat: str, sub: str) -> str:
+    return f"{cat}{SUB_SEP}{sub}"
+
+
+def plain_name(name: str) -> str:
+    """A name typed for a category or subcategory: one that can't be mistaken for a
+    "Cat / Sub" tag."""
+    return (clean_tags([name.replace(SUB_SEP, " - ")]) or [""])[0]
+
+
 def clean_tags(tags) -> list[str]:
     """Category names: strings, trimmed, at most 30 characters, no duplicates
-    (ignoring case), in order."""
+    (ignoring case), in order. A "Cat / Sub" tag keeps 30 characters of each part."""
     out, seen = [], set()
     for t in tags if isinstance(tags, list) else []:
-        t = str(t).strip()[:30] if isinstance(t, str) else ""
+        if not isinstance(t, str):
+            continue
+        cat, sub = split_tag(t.strip())
+        cat, sub = cat.strip()[:30].strip(), sub.strip()[:30].strip()
+        t = sub_tag(cat, sub) if cat and sub else cat
         if t and t.lower() not in seen:
             seen.add(t.lower())
             out.append(t)
     return out
 
 
-def merge_tags(tags: list[str], categories: list[str]) -> list[str]:
+def in_view(tags: list[str], cat: str, sub: str = "") -> bool:
+    """Is a sound with `tags` on the Sounds tab showing `cat` (and its subcategory
+    `sub`)? "" for `cat` is every sound."""
+    if not cat:
+        return True
+    return (sub_tag(cat, sub) if sub else cat) in tags
+
+
+def sub_names(tags: list[str], cat: str) -> list[str]:
+    """The subcategories of `cat` that `tags` are in."""
+    return [s for c, s in map(split_tag, tags) if s and c == cat]
+
+
+def merge_tags(tags: list[str], categories: list[str],
+               subs: dict | None = None) -> list[str]:
     """`tags` spelled the way `categories` already spells them (ignoring case), so an
     imported "memes" lands in the existing "Memes". Tags that aren't a category yet
-    are appended to `categories`, which is changed in place."""
+    are appended to `categories`, which is changed in place. A "Cat / Sub" tag is no
+    tab of its own: "Cat" is added (to the tags and `categories`) and, when `subs`
+    is given, "Sub" is listed in it under "Cat"."""
     by_lower = {c.lower(): c for c in categories}
+
+    def top(name: str) -> str:
+        c = by_lower.get(name.lower())
+        if c is None:
+            categories.append(name)
+            c = by_lower[name.lower()] = name
+        return c
+
     out = []
     for t in clean_tags(tags):
-        c = by_lower.get(t.lower())
-        if c is None:
-            categories.append(t)
-            c = by_lower[t.lower()] = t
-        out.append(c)
-    return out
+        cat, sub = split_tag(t)
+        cat = top(cat)
+        if sub:
+            known = subs.setdefault(cat, []) if subs is not None else []
+            sub = {k.lower(): k for k in known}.get(sub.lower(), sub)
+            if subs is not None and sub not in known:
+                known.append(sub)
+            out.append(cat)
+            out.append(sub_tag(cat, sub))
+        else:
+            out.append(cat)
+    return list(dict.fromkeys(out))
+
+
+def group_pack_tags(sounds: list, pack_name: str, own: set[str] | None = None) -> bool:
+    """A pack with several categories goes into one tab named after it, each of its
+    categories a subcategory ("GM starter pack" with Tavern, Combat…) rather than a tab
+    apiece: a sound's tags become [pack, "pack / category"]. `own` limits it to those
+    categories (lower case), so a category the user added to a pack's sound stays as it
+    is; None is every tag. Returns whether anything moved."""
+    group = plain_name(pack_name)
+    if not group:
+        return False
+    moved = False
+    for m in sounds:
+        tags, hit = [], False
+        for t in m.tags:
+            c, sub = split_tag(t)
+            if sub or c.lower() == group.lower() or (own is not None and c.lower() not in own):
+                tags.append(t)
+            else:
+                tags += [group, sub_tag(group, c)]
+                hit = True
+        if hit:
+            m.tags = clean_tags(tags)
+            moved = True
+    return moved
 
 
 def _privacy_path() -> Path:

@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Микрофонът ти не праща звук. Слушалките изключени ли са, или микрофонът им е заглушен? Включи ги или махни заглушаването. Пак нищо? Рестартирай компютъра и опитай пак.",
   "Minimised: last picture": "Минимизиран: последна снимка",
   "Minimised: restore for live updates": "Минимизиран: възстановете за обновяване на живо",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Плъзнете, за да преоразмерите запазените клипове. Щракнете два пъти, за да ги поберете."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Плъзнете, за да преоразмерите запазените клипове. Щракнете два пъти, за да ги поберете.",
+  "+ Subcategory": "+ Подкатегория",
+  "Add subcategory…": "Добави подкатегория…",
+  "All {n}": "Всички {n}",
+  "Delete subcategory": "Изтрий подкатегорията",
+  "Delete subcategory (keeps the sounds)": "Изтрий подкатегорията (звуците остават)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Да се изтрие ли подкатегорията „{name}“? Звуците в нея ({n}) остават в {cat}.",
+    "Да се изтрие ли подкатегорията „{name}“? Звуците в нея ({n}) остават в {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Да се направи един раздел „{name}“, в който {n} от категориите му са подкатегории вместо отделни раздели?\n\nНяма да се премахне или промени нито един звук.",
+  "Name (a group inside {cat}):": "Име (група в {cat}):",
+  "New subcategory": "Нова подкатегория",
+  "New subcategory in {cat}": "Нова подкатегория в {cat}",
+  "Put its categories in one tab": "Сложи категориите му в един раздел",
+  "Rename subcategory": "Преименувай подкатегорията",
+  "✓ “{name}” is one tab now": "✓ „{name}“ вече е един раздел"
 }

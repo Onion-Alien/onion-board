@@ -3315,5 +3315,21 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Mikrofonen skickar inget ljud. Är ditt headset avstängt, eller är dess mikrofon avstängd? Slå på det eller mikrofonen. Fortfarande inget? Starta om datorn och försök igen.",
   "Minimised: last picture": "Minimerat: senaste bilden",
   "Minimised: restore for live updates": "Minimerat: återställ för löpande uppdateringar",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Dra för att ändra storleken på sparade klipp. Dubbelklicka för att anpassa till klippen."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Dra för att ändra storleken på sparade klipp. Dubbelklicka för att anpassa till klippen.",
+  "+ Subcategory": "+ Underkategori",
+  "Add subcategory…": "Lägg till underkategori…",
+  "All {n}": "Alla {n}",
+  "Delete subcategory": "Ta bort underkategori",
+  "Delete subcategory (keeps the sounds)": "Ta bort underkategori (behåller ljuden)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Ta bort underkategorin “{name}”? Ljuden i den ({n}) blir kvar i {cat}.",
+    "Ta bort underkategorin “{name}”? Ljuden i den ({n}) blir kvar i {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Göra en enda flik “{name}”, med {n} av dess kategorier inuti som underkategorier i stället för egna flikar?\n\nInga ljud tas bort eller ändras.",
+  "Name (a group inside {cat}):": "Namn (en grupp i {cat}):",
+  "New subcategory": "Ny underkategori",
+  "New subcategory in {cat}": "Ny underkategori i {cat}",
+  "Put its categories in one tab": "Lägg dess kategorier i en flik",
+  "Rename subcategory": "Byt namn på underkategori",
+  "✓ “{name}” is one tab now": "✓ “{name}” är nu en flik"
 }

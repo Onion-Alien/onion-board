@@ -3389,5 +3389,22 @@
   "Your mic sends no sound. Is your headset switched off, or its mic muted? Turn it on or unmute it. Still nothing? Restart your PC, then try again.": "Tvůj mikrofon neposílá žádný zvuk. Nejsou sluchátka vypnutá, nebo jejich mikrofon ztlumený? Zapni je nebo zruš ztlumení. Pořád nic? Restartuj počítač a zkus to znovu.",
   "Minimised: last picture": "Minimalizováno: poslední snímek",
   "Minimised: restore for live updates": "Minimalizováno: obnovte okno pro živý náhled",
-  "Drag to resize saved clips. Double-click to fit the clips.": "Tažením změňte velikost uložených klipů. Dvojklikem ji přizpůsobte klipům."
+  "Drag to resize saved clips. Double-click to fit the clips.": "Tažením změňte velikost uložených klipů. Dvojklikem ji přizpůsobte klipům.",
+  "+ Subcategory": "+ Podkategorie",
+  "Add subcategory…": "Přidat podkategorii…",
+  "All {n}": "Vše {n}",
+  "Delete subcategory": "Smazat podkategorii",
+  "Delete subcategory (keeps the sounds)": "Smazat podkategorii (zvuky zůstanou)",
+  "Delete the “{name}” subcategory? Its {n} sound stay in {cat}.": [
+    "Smazat podkategorii „{name}“? Zvuky v ní ({n}) zůstanou v {cat}.",
+    "Smazat podkategorii „{name}“? Zvuky v ní ({n}) zůstanou v {cat}.",
+    "Smazat podkategorii „{name}“? Zvuky v ní ({n}) zůstanou v {cat}."
+  ],
+  "Make one “{name}” tab, with {n} of its categories inside it as subcategories instead of tabs of their own?\n\nNo sound is removed or changed.": "Vytvořit jednu kartu „{name}“, v níž bude {n} jejích kategorií jako podkategorie místo samostatných karet?\n\nŽádný zvuk se neodstraní ani nezmění.",
+  "Name (a group inside {cat}):": "Název (skupina v {cat}):",
+  "New subcategory": "Nová podkategorie",
+  "New subcategory in {cat}": "Nová podkategorie v {cat}",
+  "Put its categories in one tab": "Dát jeho kategorie do jedné karty",
+  "Rename subcategory": "Přejmenovat podkategorii",
+  "✓ “{name}” is one tab now": "✓ „{name}“ je teď jedna karta"
 }
