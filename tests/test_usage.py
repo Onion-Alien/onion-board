@@ -316,7 +316,8 @@ def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
     f.write_text(_real_report(src) + "\n\nLast 60 log lines\n------\n"
                  '  File "C:\\soundboard\\ui\\other.py", line 7, in g\nOSError: x\n',
                  encoding="utf-8")
-    assert usage._report_event(f) == "error/1.9.8/KeyError@soundboard/engine.py:2"
+    assert usage._report_event(f) == ("error/1.9.8/KeyError@soundboard/engine.py:2"
+                                      "<soundboard/engine.py:3")   # and its caller
     # the freeze from a real 1.9.7 report: its deepest line of our own code
     f.write_text("Onion Board froze for 6 s\nVersion:  1.9.7\nTime:  x\n\n"
                  "What it was doing\n-----------------\n"
@@ -409,12 +410,31 @@ def test_a_freeze_end_is_noted_without_counting_the_report_again(tmp_path, monke
     assert "Lasted:   23 s" in path.read_text(encoding="utf-8")
 
 
+def test_an_error_says_its_caller_and_the_library_call_it_came_from(tmp_path):
+    """Two errors that end on the same line of ours (2.0.4's TypeError at
+    appspanel.py:352) are told apart by who called it and what raised it, like a
+    freeze; still never the message."""
+    f = tmp_path / "crash-x.txt"
+    f.write_text("Onion Board crash report\nVersion:  2.0.4\n\nError\n-----\n"
+                 "Traceback (most recent call last):\n"
+                 '  File "C:\\x\\soundboard\\ui\\appspanel.py", line 380, in setGeometry\n'
+                 "    self._place(rect, True)\n"
+                 '  File "C:\\x\\soundboard\\ui\\appspanel.py", line 352, in _place\n'
+                 "    item.setGeometry(QRect(x, y, w, h))\n"
+                 '  File "C:\\Python\\Lib\\enum.py", line 1600, in __or__\n'
+                 "    raise TypeError(private)\n"
+                 "TypeError: D:/private/secret.wav\n", encoding="utf-8")
+    assert usage._report_event(f) == ("error/2.0.4/TypeError@soundboard/ui/appspanel.py:352"
+                                      "<soundboard/ui/appspanel.py:380~enum.__or__")
+    assert "private" not in usage._report_event(f)
+
+
 def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
     f = tmp_path / "crash-x.txt"
     # an odd install folder named soundboard: deeper than our package, so not sent
     f.write_text(_real_report("D:\\soundboard\\Python\\Lib\\json\\decoder.py"),
                  encoding="utf-8")
-    assert usage._report_event(f) == "error/1.9.8/KeyError"
+    assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # its name only
     f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
                  encoding="utf-8")
     assert usage._report_event(f) == "error/1.9.8"
