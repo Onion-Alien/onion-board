@@ -568,6 +568,7 @@ class MainWindow(QMainWindow):
         self._talk_shown: bool | None = None
         self.virtual_mic: str | None = None
         self._load_thread: threading.Thread | None = None
+        self._loading: set[str] = set()   # sids a load thread is decoding right now
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
@@ -7144,7 +7145,11 @@ class MainWindow(QMainWindow):
             meta.tags.append(self.cfg.category)
 
     def _load_all(self):
-        todo = [m for m in self.cfg.sounds if m.id not in self.audio]
+        # one still being loaded by an earlier call (a pack import or Undo during a slow
+        # first load) isn't decoded again: two writers of one cache file garble it
+        todo = [m for m in self.cfg.sounds if m.id not in self.audio and m.id not in self._loading]
+        self._loading.update(m.id for m in todo)
+        prev = self._load_thread
 
         def run():
             t0 = time.monotonic()
@@ -7156,6 +7161,10 @@ class MainWindow(QMainWindow):
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't load %s: %s", m.file, e)
                     self.bridge.loaded.emit(m.id, None, errors.plain(e))
+                finally:
+                    self._loading.discard(m.id)
+            if prev is not None:   # done only once the sounds it skipped are, too
+                prev.join()
             live = self._live_metas()   # as of now, not of the start
             prune_cache(cache_keep(live))
             thumbs.prune({m.image for m in live if m.image})
