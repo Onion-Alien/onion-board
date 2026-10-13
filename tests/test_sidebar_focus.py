@@ -78,3 +78,22 @@ def test_sidebar_status_buttons_centered_when_extended(qapp):
     finally:
         host.close()
 
+
+
+def test_the_hidden_bar_filter_never_asks_for_the_bar(qapp, monkeypatch):
+    """The filter sees the bar's last events while it's being torn down: asking for
+    the bar there wrapped a freed object (an access violation in 2.0.2)."""
+    from PySide6.QtCore import QEvent
+
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "Sounds")
+    bar = tabs.tabBar()
+
+    def gone():
+        raise AssertionError("tabBar() asked for inside the filter")
+    monkeypatch.setattr(tabs, "tabBar", gone)
+    assert tabs.eventFilter(bar, QEvent(QEvent.Type.Hide)) is False
+    assert tabs.eventFilter(bar, QEvent(QEvent.Type.ChildRemoved)) is False
+    bar.show()                     # still kept hidden
+    qapp.processEvents()
+    assert not bar.isVisible()
