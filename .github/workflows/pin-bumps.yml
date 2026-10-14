@@ -4,6 +4,8 @@ name: pin-bumps
 # those) are bumped here: one script per pin in scripts/pinbump/. Each finds the newest
 # release, verifies it, rewrites the pin and opens its own PR on pin-bump/<name>-<version>,
 # skipping one that's already waiting. One failing checker doesn't stop the others.
+# FFmpeg's builder drops old builds, so when its pin is already the newest the ffmpeg job
+# checks both its sites still serve the pinned zip: a red one there means bump by hand.
 on:
   schedule:
     - cron: "37 6 * * 1"   # Mondays 06:37 UTC
@@ -12,6 +14,9 @@ on:
     paths:
       - scripts/pinbump/**
       - .github/workflows/pin-bumps.yml
+      - soundboard/ffmpegget.py   # a hand-edited pin gets checked too
+      - soundboard/pyget.py
+      - scripts/fetch_qjs.py
 
 permissions:
   contents: read
@@ -27,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        checker: [tor]
+        checker: [tor, ffmpeg, qjs, python]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7

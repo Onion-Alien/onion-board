@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
+import os
 import re
 import subprocess
 import sys
@@ -108,3 +110,30 @@ def open_pr(name: str, version: str, files: list[Path], title: str, body: str) -
                  f"{repo}/compare/{branch}?expand=1")
     print(url)
     gh("workflow", "run", "checks.yml", "--ref", branch)
+
+
+def fetch_json(url: str, headers: dict[str, str] | None = None):
+    req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard pin bump",
+                                               **(headers or {})})
+    with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:
+        return json.loads(r.read(10_000_000))
+
+
+def github_release(repo: str, tag: str = "latest") -> dict:
+    """A release's JSON from the GitHub API ("latest" skips drafts and pre-releases).
+    Uses GH_TOKEN when it's set, for the higher rate limit."""
+    path = "latest" if tag == "latest" else f"tags/{tag}"
+    token = os.environ.get("GH_TOKEN")
+    return fetch_json(f"https://api.github.com/repos/{repo}/releases/{path}",
+                      {"Authorization": f"Bearer {token}"} if token else None)
+
+
+def asset_sha256(release: dict, name: str) -> str:
+    """The SHA-256 GitHub computed for one of a release's files ("sha256:<hex>")."""
+    for a in release.get("assets", []):
+        if a["name"] == name:
+            digest = a.get("digest") or ""
+            if not digest.startswith("sha256:"):
+                sys.exit(f"{name} in {release['tag_name']} has no SHA-256 digest")
+            return digest.removeprefix("sha256:")
+    sys.exit(f"no {name} in release {release['tag_name']}")
