@@ -8,14 +8,10 @@ rule exists): one foreground-window lookup and, while a program it switched for 
 running, one "is it still running?" check. Nothing is scanned."""
 from __future__ import annotations
 
-import logging
 import os
-import sys
 from dataclasses import dataclass
 
 from soundboard import voicesdk
-
-log = logging.getLogger(__name__)
 
 POLL_MS = 1000
 
@@ -87,87 +83,3 @@ class Switcher:
                 return Switch(before, exe, back=True)
         return None
 
-
-def windowed_programs() -> list[tuple[str, str, str]]:
-    """The programs with a window open now, as (exe name, exe path, window title),
-    one per exe, this app and Windows' own left out. For picking a program."""
-    if sys.platform != "win32":
-        return []
-    try:
-        return _windowed()
-    except Exception:  # noqa: BLE001
-        log.debug("listing windows failed", exc_info=True)
-        return []
-
-
-def _windowed() -> list[tuple[str, str, str]]:
-    import ctypes
-    from ctypes import POINTER, WINFUNCTYPE, byref, c_bool, c_int, c_ulong, c_void_p, wintypes
-    u = ctypes.WinDLL("user32", use_last_error=True)
-    k = ctypes.WinDLL("kernel32", use_last_error=True)
-    proc = WINFUNCTYPE(c_bool, c_void_p, c_void_p)
-    u.EnumWindows.argtypes = (proc, c_void_p)
-    u.EnumWindows.restype = c_bool
-    u.IsWindowVisible.argtypes = (c_void_p,)
-    u.IsWindowVisible.restype = c_bool
-    u.GetWindowTextLengthW.argtypes = (c_void_p,)
-    u.GetWindowTextLengthW.restype = c_int
-    u.GetWindowTextW.argtypes = (c_void_p, wintypes.LPWSTR, c_int)
-    u.GetWindowTextW.restype = c_int
-    u.GetWindow.argtypes = (c_void_p, wintypes.UINT)
-    u.GetWindow.restype = c_void_p
-    u.GetWindowLongW.argtypes = (c_void_p, c_int)
-    u.GetWindowLongW.restype = wintypes.LONG
-    u.GetWindowThreadProcessId.argtypes = (c_void_p, POINTER(c_ulong))
-    u.GetWindowThreadProcessId.restype = c_ulong
-    k.OpenProcess.argtypes = (c_ulong, c_int, c_ulong)
-    k.OpenProcess.restype = c_void_p
-    k.QueryFullProcessImageNameW.argtypes = (c_void_p, c_ulong, wintypes.LPWSTR,
-                                             POINTER(c_ulong))
-    k.QueryFullProcessImageNameW.restype = c_int
-    k.CloseHandle.argtypes = (c_void_p,)
-    k.CloseHandle.restype = c_int
-    GW_OWNER, GWL_EXSTYLE, WS_EX_TOOLWINDOW = 4, -20, 0x80
-    me = os.getpid()
-    found: dict[str, tuple[str, str, str]] = {}
-    paths: dict[int, str] = {}
-
-    def path_of(pid: int) -> str:
-        if pid not in paths:
-            paths[pid] = ""
-            h = k.OpenProcess(0x1000, False, pid)   # PROCESS_QUERY_LIMITED_INFORMATION
-            if h:
-                try:
-                    buf = ctypes.create_unicode_buffer(1024)
-                    size = c_ulong(len(buf))
-                    if k.QueryFullProcessImageNameW(h, 0, buf, byref(size)):
-                        paths[pid] = buf.value
-                finally:
-                    k.CloseHandle(h)
-        return paths[pid]
-
-    def each(hwnd, _lp):
-        try:
-            if not u.IsWindowVisible(hwnd) or u.GetWindow(hwnd, GW_OWNER):
-                return True
-            if u.GetWindowLongW(hwnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW:
-                return True
-            n = u.GetWindowTextLengthW(hwnd)
-            if n <= 0:
-                return True
-            buf = ctypes.create_unicode_buffer(n + 1)
-            u.GetWindowTextW(hwnd, buf, n + 1)
-            pid = c_ulong()
-            u.GetWindowThreadProcessId(hwnd, byref(pid))
-            if not pid.value or pid.value == me:
-                return True
-            path = path_of(pid.value)
-            exe = exe_name(path)
-            if exe and not voicesdk._is_system(path) and exe not in found:
-                found[exe] = (exe, path, buf.value)
-        except Exception:  # noqa: BLE001 - one odd window mustn't end the listing
-            pass
-        return True
-
-    u.EnumWindows(proc(each), None)
-    return sorted(found.values(), key=lambda t: t[0])

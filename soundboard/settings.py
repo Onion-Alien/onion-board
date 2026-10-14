@@ -1584,7 +1584,8 @@ class SettingsDialog(QDialog):
                   "game is up."), self.mw.cfg.tips_on, self.mw.set_tips_on)
         v.addWidget(card)
         v.addWidget(self._app_setup_card())
-        v.addWidget(self._programs_card())
+        if self.mw.cfg.category_programs:   # rules made before the category menu lost it
+            v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
@@ -1676,10 +1677,7 @@ class SettingsDialog(QDialog):
 
     def _programs_card(self):
         """Switch category when a program is in front: every rule in one place."""
-        card, cv = self._card(
-            _("Switch category by program"),
-            _("Right-click a category tab → Show this when a program is in front and the board "
-              "shows that category by itself whenever the program is in front."))
+        card, cv = self._card(_("Switch category by program"))
         self.box_programs = self._option(
             cv, _("Switch by itself"),
             _("When the program closes, the board goes back to what it showed before."),

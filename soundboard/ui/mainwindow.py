@@ -6920,18 +6920,11 @@ class MainWindow(QMainWindow):
                                _("Clear the random-sound hotkey")) if hk else None
         a_sub = menu.addAction(icons.icon("plus"), _("Add subcategory…"))
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
-        a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
-        a_shuf = menu.addAction(icons.icon("shuffle"), _("Play them all, shuffled"))
         a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
         # the same colour list as the bulk Colour menu: names, the current one ticked
         fill_colour_menu(cm, self.cfg.category_colors.get(name, ""),
                          lambda col: self.set_category_color(name, col), none=True)
-        menu.addSeparator()
-        a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front"))
-        a_unprog = {menu.addAction(icons.icon("offline"),
-                                  _("Stop showing this for {exe}", exe=exe)): exe
-                    for exe in catswitch.programs_for(self.cfg.category_programs, name)}
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
                                _("Delete category (keeps the sounds)"))
@@ -6949,16 +6942,10 @@ class MainWindow(QMainWindow):
             self.set_category_hotkey(name, "")
         elif act == a_rand:
             self.play_random(name)
-        elif act in (a_all, a_shuf):
-            self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
         elif act == a_del:
             self.delete_category(name)
-        elif act == a_prog:
-            self.pick_category_programs(name)
-        elif act in a_unprog:
-            self.remove_category_program(a_unprog[act])
 
     # ------------------------------------------------------------ program -> category
     def _update_cat_timer(self):
@@ -6983,18 +6970,6 @@ class MainWindow(QMainWindow):
                      shown=shown, exe=html.escape(sw.exe)) if sw.back
                    else _("Switched to “{shown}” ({exe} is in front)",
                           shown=shown, exe=html.escape(sw.exe)))
-
-    def pick_category_programs(self, name: str):
-        """A category's menu → Show this when a program is in front"""
-        from soundboard.ui.programpick import ProgramPicker
-        d = ProgramPicker(name, dict(self.cfg.category_programs), self)
-        picked = d.picked if d.exec() else []
-        free_dialog(d)
-        for exe in picked:
-            self.add_category_program(name, exe, quiet=True)
-        if picked:
-            self.toast(_("✓ “{name}” shows by itself when {picked} is in front",
-                         name=html.escape(name), picked=html.escape(', '.join(picked))), "ok")
 
     def add_category_program(self, name: str, exe: str, quiet: bool = False):
         exe = catswitch.exe_name(exe)
