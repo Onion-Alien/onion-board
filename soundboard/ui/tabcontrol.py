@@ -110,7 +110,7 @@ class TabControl:
         signal comes after the menu hides, so this looks once that's through)."""
         mw = self.mw
         def check():
-            if not getattr(mw, "_more_added", True):
+            if not getattr(self, "_more_added", True):
                 usage.used("more-tabs-closed")
             self._more_added = True
         QTimer.singleShot(0, check)
