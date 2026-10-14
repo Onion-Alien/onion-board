@@ -649,6 +649,7 @@ class FakeWindow:
         self.played, self.imports, self.saves = [], [], 0
         self.tray = FakeTray()
         self.active = False
+        self.impctl = self   # the board's import controller: import_files below
 
     def meta(self, sid):
         return next((m for m in self.cfg.sounds if m.id == sid), None)
