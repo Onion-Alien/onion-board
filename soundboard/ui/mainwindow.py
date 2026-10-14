@@ -81,8 +81,8 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
-                                   spectrum, take_out, SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped, fmt_pos, loudness,
+                                   pad_height, spectrum, take_out, SLIM_PAD_H)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -798,8 +798,8 @@ class MainWindow(QMainWindow):
         # made too small to use (see _refit)
         self._pages = QStackedWidget()
         self.setCentralWidget(self._pages)
-        root = self._full = QWidget()
-        root.setObjectName("root")   # the theme's window gradient
+        root = self._full = WindowRoot()
+        root.setObjectName("root")   # the theme's window background (flat or the glow)
         self._pages.addWidget(root)
         self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
         self._full_row.setContentsMargins(0, 0, 0, 0)
