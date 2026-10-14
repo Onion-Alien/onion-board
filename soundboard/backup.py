@@ -638,38 +638,71 @@ def _put_picture(src: _Source, ps: PackedSound, meta: SoundMeta,
 # naming it), and its sounds remember it (SoundMeta.pack / pack_item), so the whole
 # pack can be removed, or put back how it came after its pads were changed or removed.
 
+PACK_ID_RE = re.compile(r"[0-9a-f]{12}")   # a kept pack's id: _pack_id()
+
+
 def packs_dir() -> Path:
     return library.APP_DIR / "packs"
 
 
-def keep_pack(pkg: Package) -> str:
-    """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
-    twice gets the same id and is kept once). "" if it couldn't be kept."""
+def _pack_id(src: Path) -> str:
+    """A kept pack's id: from what's in it, not when it was zipped (the same pack
+    re-zipped, or as a folder, is one pack)."""
     import hashlib
     import zlib
-    src = Path(pkg.path)
     h = hashlib.sha1()
+    if src.is_dir():
+        for p in sorted((p for p in src.rglob("*") if p.is_file()),
+                        key=lambda p: p.relative_to(src).as_posix()):
+            crc, size = 0, 0
+            with p.open("rb") as stream:
+                while chunk := stream.read(1024 * 1024):
+                    crc = zlib.crc32(chunk, crc)
+                    size += len(chunk)
+            # Same identity as a ZIP containing these paths and contents;
+            # existing ZIP pack memberships remain valid.
+            h.update(f"{p.relative_to(src).as_posix()}\0{crc}\0{size}\0".encode())
+    else:
+        with zipfile.ZipFile(src) as z:
+            for i in sorted(z.infolist(), key=lambda i: i.filename):
+                if not i.is_dir():
+                    h.update(f"{i.filename}\0{i.CRC}\0{i.file_size}\0".encode())
+    return h.hexdigest()[:12]
+
+
+def _is_free_download(src: Path) -> bool:
+    """A free pack's download (soundboard.packs saves it as packs/<its id>.zip), not a
+    pack kept under its content id."""
+    d = packs_dir()
+    return (src.is_file() and src.suffix.lower() == ".zip" and src.parent.resolve() ==
+            d.resolve() and not PACK_ID_RE.fullmatch(src.stem))
+
+
+def keep_pack(pkg: Package) -> str:
+    """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
+    twice gets the same id and is kept once). "" if it couldn't be kept. A free pack's
+    download is moved in, not copied (and pkg.path follows it): kept once, not twice."""
+    src = Path(pkg.path)
     try:
-        if src.is_dir():
-            for p in sorted((p for p in src.rglob("*") if p.is_file()),
-                            key=lambda p: p.relative_to(src).as_posix()):
-                crc, size = 0, 0
-                with p.open("rb") as stream:
-                    while chunk := stream.read(1024 * 1024):
-                        crc = zlib.crc32(chunk, crc)
-                        size += len(chunk)
-                # Same identity as a ZIP containing these paths and contents;
-                # existing ZIP pack memberships remain valid.
-                h.update(f"{p.relative_to(src).as_posix()}\0{crc}\0{size}\0".encode())
-        else:   # what's in it, not when it was zipped: the same pack re-zipped is one pack
-            with zipfile.ZipFile(src) as z:
-                for i in sorted(z.infolist(), key=lambda i: i.filename):
-                    if not i.is_dir():
-                        h.update(f"{i.filename}\0{i.CRC}\0{i.file_size}\0".encode())
-        pid = h.hexdigest()[:12]
+        pid = _pack_id(src)
         d = packs_dir()
         d.mkdir(parents=True, exist_ok=True)
         dest = d / f"{pid}.zip"
+        info = d / f"{pid}.json"
+        if src.resolve() == dest.resolve():   # a kept pack imported again (Add again)
+            if not info.is_file():
+                info.write_text(json.dumps({"name": pid}), "utf-8")
+            pkg.pack_id = pid
+            return pid
+        if _is_free_download(src):
+            if dest.is_file():
+                src.unlink()   # kept already: this download is the same pack again
+            else:
+                src.replace(dest)
+            pkg.path = dest
+            info.write_text(json.dumps({"name": src.stem[:60], "free": src.stem}), "utf-8")
+            pkg.pack_id = pid
+            return pid
         if not dest.is_file():
             tmp = dest.with_name(dest.name + ".part")
             try:
@@ -684,12 +717,56 @@ def keep_pack(pkg: Package) -> str:
                 tmp.unlink(missing_ok=True)
                 raise
         name = src.stem if not src.is_dir() else src.name
-        (d / f"{pid}.json").write_text(json.dumps({"name": name[:60]}), "utf-8")
+        info.write_text(json.dumps({"name": name[:60]}), "utf-8")
     except _ZIP_ERRORS:   # OSError, or a zip that changed since it was read
         log.warning("couldn't keep a copy of the sound pack %s", src.name, exc_info=True)
         return ""
     pkg.pack_id = pid
     return pid
+
+
+def kept_free_pack(free_id: str) -> Path | None:
+    """The kept copy of the free pack `free_id` (soundboard.packs), if it's kept."""
+    for j in packs_dir().glob("*.json") if packs_dir().is_dir() else []:
+        try:
+            free = json.loads(j.read_text("utf-8")).get("free")
+        except (OSError, ValueError, AttributeError):
+            continue
+        if free == free_id and j.with_suffix(".zip").is_file():
+            return j.with_suffix(".zip")
+    return None
+
+
+def drop_duplicate_packs() -> int:
+    """Free packs used to be stored twice: the download (packs/<id>.zip) and the copy
+    keep_pack made of it (packs/<content id>.zip). Delete a download whose pack is kept,
+    and remember which free pack the kept copy is. Returns how many went. Run off the UI
+    thread."""
+    d, gone = packs_dir(), 0
+    for z in sorted(d.glob("*.zip")) if d.is_dir() else []:
+        if not _is_free_download(z):
+            continue
+        try:
+            pid = _pack_id(z)
+            if not (d / f"{pid}.zip").is_file():
+                continue   # downloaded, never imported: Add again reuses it
+            info = d / f"{pid}.json"
+            try:
+                meta = json.loads(info.read_text("utf-8"))
+            except (OSError, ValueError):
+                meta = {}
+            meta = meta if isinstance(meta, dict) else {}
+            meta.setdefault("name", z.stem[:60])
+            meta["free"] = z.stem
+            info.write_text(json.dumps(meta), "utf-8")
+            z.unlink()
+            gone += 1
+        except _ZIP_ERRORS:
+            log.warning("couldn't check the sound pack %s for a duplicate", z.name,
+                        exc_info=True)
+    if gone:
+        log.info("removed %d duplicate free pack download(s)", gone)
+    return gone
 
 
 def packs() -> dict[str, str]:

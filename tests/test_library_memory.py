@@ -75,7 +75,7 @@ def test_original_peaks_of_a_long_sound_read_only_a_little(app_dir, monkeypatch)
 def test_prune_cache_leaves_an_import_in_flight(app_dir):
     store_cached("live", np.zeros((10, 2), np.float32))
     store_cached("new", np.zeros((10, 2), np.float32))    # imported, not in the list yet
-    tmp = cache_path("new2").with_suffix(".tmp.npy")
+    tmp = library.CACHE_DIR / "new2.0123abcd.tmp.npy"
     np.save(tmp, np.zeros((10, 2), np.int16))              # still being written
     stale = cache_path("gone")
     np.save(stale, np.zeros((10, 2), np.int16))

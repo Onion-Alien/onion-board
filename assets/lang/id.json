@@ -3281,6 +3281,7 @@
   "warm": "hangat",
   "clean": "bersih",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Satu menit terakhir program ini sebagai gelombang suara: pilih sebagian dan simpan sebagai klip. Hanya mendengarkan selama terbuka.",
+  "Pre-delay": "Pra-tunda",
   "{n} sound couldn't be read and was left out.": [
     "{n} suara tidak bisa dibaca dan dilewati."
   ]

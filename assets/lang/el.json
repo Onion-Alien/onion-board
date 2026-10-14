@@ -3356,6 +3356,7 @@
   "warm": "ζεστά",
   "clean": "καθαρά",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Το τελευταίο λεπτό αυτού του προγράμματος ως κυματομορφή: διάλεξε ένα κομμάτι και κράτησέ το ως κλιπ. Ακούει μόνο όσο είναι ανοιχτό.",
+  "Pre-delay": "Προ-καθυστέρηση",
   "{n} sound couldn't be read and was left out.": [
     "{n} ήχος δεν διαβάστηκε και παραλείφθηκε.",
     "{n} ήχοι δεν διαβάστηκαν και παραλείφθηκαν."

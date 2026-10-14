@@ -3431,6 +3431,7 @@
   "warm": "cald",
   "clean": "curat",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ultimul minut al acestui program ca formă de undă: alegeți o bucată din el și păstrați-o ca clip. Ascultă doar cât timp este deschis.",
+  "Pre-delay": "Pre-întârziere",
   "{n} sound couldn't be read and was left out.": [
     "{n} sunet nu a putut fi citit și a fost lăsat deoparte.",
     "{n} sunete nu au putut fi citite și au fost lăsate deoparte.",

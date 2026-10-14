@@ -149,9 +149,15 @@ def _cstr(b: bytes, i: int) -> tuple[str, int]:
     return b[i:j].decode("utf-8"), j + 1
 
 
-def _bson(b: bytes, i: int) -> tuple[dict, int]:
+MAX_DEPTH = 32   # documents inside documents: a real board row nests 2 or 3 deep
+
+
+def _bson(b: bytes, i: int, depth: int = 0) -> tuple[dict, int]:
     """One BSON document at b[i:] -> (dict, the index after it). Only the types a
-    LiteDB row holds; anything else stops the document there."""
+    LiteDB row holds; anything else stops the document there. Nesting deeper than
+    MAX_DEPTH is a damaged or crafted file (a ValueError, never a RecursionError)."""
+    if depth > MAX_DEPTH:
+        raise ValueError("BSON nested too deep")
     size = struct.unpack_from("<i", b, i)[0]
     end = i + size
     if size < 5:   # a damaged length mustn't send the reader backwards (forever)
@@ -171,7 +177,7 @@ def _bson(b: bytes, i: int) -> tuple[dict, int]:
             out[name] = b[i + 4:i + 3 + n].decode("utf-8")
             i += 4 + n
         elif t in (0x03, 0x04):
-            out[name], i = _bson(b, i)
+            out[name], i = _bson(b, i, depth + 1)
         elif t == 0x05:
             n = struct.unpack_from("<i", b, i)[0]
             if n < 0 or i + 5 + n > end:

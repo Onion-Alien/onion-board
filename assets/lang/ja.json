@@ -3281,6 +3281,7 @@
   "warm": "温かい",
   "clean": "クリーン",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "このプログラムの直近1分間を波形で表示：一部を選んでクリップとして保存できます。開いている間だけ聞き取ります。",
+  "Pre-delay": "プリディレイ",
   "{n} sound couldn't be read and was left out.": [
     "{n} 個のサウンドを読み込めなかったため、含めませんでした。"
   ]

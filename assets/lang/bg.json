@@ -3356,6 +3356,7 @@
   "warm": "топло",
   "clean": "чисто",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Последната минута на тази програма като звукова вълна: изберете част от нея и я запазете като клип. Слуша само докато е отворен.",
+  "Pre-delay": "Предзакъснение",
   "{n} sound couldn't be read and was left out.": [
     "{n} звук не можа да се прочете и беше пропуснат.",
     "{n} звука не можаха да се прочетат и бяха пропуснати."

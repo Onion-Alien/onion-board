@@ -3281,6 +3281,7 @@
   "warm": "温暖",
   "clean": "干净",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "这个程序最近一分钟的波形：从中选一段，保存为剪辑。只在打开时才会收听。",
+  "Pre-delay": "预延迟",
   "{n} sound couldn't be read and was left out.": [
     "有 {n} 个音效无法读取，已跳过。"
   ]

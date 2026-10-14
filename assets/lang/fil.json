@@ -3356,6 +3356,7 @@
   "warm": "mainit",
   "clean": "malinis",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ang huling minuto ng programang ito bilang waveform: pumili ng bahagi nito at itago ito bilang clip. Nakikinig lang ito habang bukas.",
+  "Pre-delay": "Pre-delay",
   "{n} sound couldn't be read and was left out.": [
     "Hindi nabasa ang {n} sound kaya hindi ito isinama.",
     "Hindi nabasa ang {n} sound kaya hindi sila isinama."

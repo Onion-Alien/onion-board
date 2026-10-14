@@ -3356,6 +3356,7 @@
   "warm": "varm",
   "clean": "ren",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Programmets seneste minut som en lydbølge: vælg et stykke og gem det som et klip. Den lytter kun, mens den er åben.",
+  "Pre-delay": "Forsinkelse før",
   "{n} sound couldn't be read and was left out.": [
     "{n} lyd kunne ikke læses og blev udeladt.",
     "{n} lyde kunne ikke læses og blev udeladt."

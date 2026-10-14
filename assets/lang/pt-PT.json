@@ -3356,6 +3356,7 @@
   "warm": "quente",
   "clean": "limpo",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "O último minuto deste programa como forma de onda: escolha um excerto e guarde-o como clipe. Só escuta enquanto está aberto.",
+  "Pre-delay": "Pré-atraso",
   "{n} sound couldn't be read and was left out.": [
     "{n} som não pôde ser lido e ficou de fora.",
     "{n} sons não puderam ser lidos e ficaram de fora."

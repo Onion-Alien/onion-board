@@ -3281,6 +3281,7 @@
   "warm": "따뜻하게",
   "clean": "깨끗하게",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "이 프로그램의 마지막 1분을 파형으로 보여줍니다: 일부를 골라 클립으로 저장하세요. 열려 있는 동안에만 듣습니다.",
+  "Pre-delay": "프리 딜레이",
   "{n} sound couldn't be read and was left out.": [
     "사운드 {n}개를 읽을 수 없어서 빼고 내보냈어요."
   ]

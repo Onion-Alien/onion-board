@@ -3431,6 +3431,7 @@
   "warm": "teple",
   "clean": "čistě",
   "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Poslední minuta tohoto programu jako zvuková vlna: vyberte z ní kousek a uložte si ho jako klip. Poslouchá jen, když je otevřený.",
+  "Pre-delay": "Předzpoždění",
   "{n} sound couldn't be read and was left out.": [
     "{n} zvuk nešel přečíst a byl vynechán.",
     "{n} zvuky nešly přečíst a byly vynechány.",
