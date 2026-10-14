@@ -77,62 +77,62 @@ def test_add_filter_rename_and_delete_a_subcategory(window, monkeypatch):
     w = window
     monkeypatch.setattr("soundboard.ui.mainwindow.QMessageBox.question",
                         lambda *a, **k: QMessageBox.StandardButton.Yes)
-    w.new_category(name="Memes")
+    w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
     w.meta("s1").tags = ["Memes"]
-    w.set_category("Memes")
-    assert w.new_subcategory("Memes", "s0", "Vine") == "Vine"
+    w.catctl.set_category("Memes")
+    assert w.catctl.new_subcategory("Memes", "s0", "Vine") == "Vine"
     assert w.meta("s0").tags == ["Memes", "Memes / Vine"]
     assert "Vine" not in w.cfg.categories               # no tab of its own
-    assert not w._sub_row.isHidden() or not w.isVisible()
-    w.set_subcategory("Vine")
-    assert [m.id for m in w.category_sounds()] == ["s0"]
+    assert not w.catctl._sub_row.isHidden() or not w.isVisible()
+    w.catctl.set_subcategory("Vine")
+    assert [m.id for m in w.catctl.category_sounds()] == ["s0"]
     assert w.pads["s1"].property("filtered") and not w.pads["s0"].property("filtered")
-    w.rename_subcategory("Vine", "Clips")
+    w.catctl.rename_subcategory("Vine", "Clips")
     assert w.cfg.subcategories == {"Memes": ["Clips"]} and w.cfg.subcategory == "Clips"
     assert w.meta("s0").tags == ["Memes", "Memes / Clips"]
-    w.rename_category("Memes", "Funny")
+    w.catctl.rename_category("Memes", "Funny")
     assert w.cfg.subcategories == {"Funny": ["Clips"]}
     assert w.meta("s0").tags == ["Funny", "Funny / Clips"]
-    w.set_category("Funny")
-    w.delete_subcategory("Clips")                         # asks only when it has sounds
+    w.catctl.set_category("Funny")
+    w.catctl.delete_subcategory("Clips")                         # asks only when it has sounds
     assert w.cfg.subcategories == {} and w.meta("s0").tags == ["Funny"]
 
 
 def test_switching_tab_leaves_the_subcategory_and_all_shows_everything(window):
     w = window
-    w.new_category(name="Memes")
-    w.new_category(name="Music")
+    w.catctl.new_category(name="Memes")
+    w.catctl.new_category(name="Music")
     w.meta("s0").tags = ["Memes"]
-    w.new_subcategory("Memes", "s0", "Vine")
-    w.set_category("Memes")
-    w.set_subcategory("Vine")
-    w.set_category("Music")
+    w.catctl.new_subcategory("Memes", "s0", "Vine")
+    w.catctl.set_category("Memes")
+    w.catctl.set_subcategory("Vine")
+    w.catctl.set_category("Music")
     assert w.cfg.subcategory == ""
-    w.set_category("Memes")
+    w.catctl.set_category("Memes")
     assert w.cfg.subcategory == ""
     assert not w.pads["s0"].property("filtered")
 
 
 def test_taking_a_sound_out_of_a_category_takes_it_out_of_its_subcategories(window):
     w = window
-    w.new_category(name="Memes")
+    w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
-    w.new_subcategory("Memes", "s0", "Vine")
-    w.toggle_tag("s0", "Memes / Vine")                   # out of the subcategory only
+    w.catctl.new_subcategory("Memes", "s0", "Vine")
+    w.catctl.toggle_tag("s0", "Memes / Vine")                   # out of the subcategory only
     assert w.meta("s0").tags == ["Memes"]
-    w.toggle_tag("s0", "Memes / Vine")
-    w.toggle_tag("s0", "Memes")
+    w.catctl.toggle_tag("s0", "Memes / Vine")
+    w.catctl.toggle_tag("s0", "Memes")
     assert w.meta("s0").tags == []
 
 
 def test_deleting_a_category_takes_its_subcategories_with_it(window, monkeypatch):
     w = window
-    w.new_category(name="Memes")
+    w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
-    w.new_subcategory("Memes", "s0", "Vine")
+    w.catctl.new_subcategory("Memes", "s0", "Vine")
     monkeypatch.setattr("soundboard.ui.mainwindow.QMessageBox.question",
                         lambda *a, **k: QMessageBox.StandardButton.Yes)
-    w.delete_category("Memes")
+    w.catctl.delete_category("Memes")
     assert w.cfg.subcategories == {} and w.meta("s0").tags == []
     assert isinstance(w.meta("s0"), SoundMeta)

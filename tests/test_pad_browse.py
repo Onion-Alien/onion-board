@@ -223,17 +223,17 @@ def test_pad_menu_volume_slider(window):
 def test_category_colour_on_tab_rename_and_delete(window):
     w = window
     w.cfg.categories.append("Memes")
-    w._fill_categories()
-    assert w.cat_tabs.tabIcon(1).isNull()
-    w.set_category_color("Memes", "#ff5c8a")
+    w.catctl._fill_categories()
+    assert w.catctl.cat_tabs.tabIcon(1).isNull()
+    w.catctl.set_category_color("Memes", "#ff5c8a")
     assert w.cfg.category_colors == {"Memes": "#ff5c8a"}
-    assert not w.cat_tabs.tabIcon(1).isNull()
-    w.rename_category("Memes", "Funny")
+    assert not w.catctl.cat_tabs.tabIcon(1).isNull()
+    w.catctl.rename_category("Memes", "Funny")
     assert w.cfg.category_colors == {"Funny": "#ff5c8a"}
-    w.set_category_color("Funny", "")
+    w.catctl.set_category_color("Funny", "")
     assert w.cfg.category_colors == {}
-    w.set_category_color("Funny", "#13ce66")
-    w.delete_category("Funny")
+    w.catctl.set_category_color("Funny", "#13ce66")
+    w.catctl.delete_category("Funny")
     assert w.cfg.category_colors == {}
 
 

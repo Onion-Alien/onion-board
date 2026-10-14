@@ -19,40 +19,41 @@ def _visible(w):
 
 
 def test_categories_filter_the_pads_and_the_overlay(window):
-    assert window.new_category(name="Memes") == "Memes"
+    assert window.catctl.new_category(name="Memes") == "Memes"
     assert window.cfg.category == "Memes" and _visible(window) == []   # new, empty page
-    window.toggle_tag("s1", "Memes")
+    window.catctl.toggle_tag("s1", "Memes")
     assert _visible(window) == ["s1"] and window.overlay.sounds()[0].id == "s1"
-    window.set_category("")
+    window.catctl.set_category("")
     assert _visible(window) == ["s0", "s1"] and len(window.overlay.sounds()) == 2
     window.search.setText("mem")                   # the search box finds categories too
     assert _visible(window) == ["s1"]
     window.search.setText("")
     # the overlay's category key walks All -> Memes -> All, and the tab follows
     window.overlay.next_category()
-    assert window.cfg.category == "Memes" and window.cat_tabs.currentIndex() == 1
+    assert window.cfg.category == "Memes" and window.catctl.cat_tabs.currentIndex() == 1
     window.overlay.next_category()
-    assert window.cfg.category == "" and window.cat_tabs.currentIndex() == 0
+    assert window.cfg.category == "" and window.catctl.cat_tabs.currentIndex() == 0
 
 
 def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, monkeypatch):
     """The category tabs pick pads, so they step aside while web results take the
     pads' place; the results' own back button brings both back. The new-category
     button is a "+" right after the last tab, not across the window."""
-    window.new_category(name="Memes")
+    window.catctl.new_category(name="Memes")
     window.tabs.setCurrentWidget(window.sounds_page)
     window.show()
-    assert window.btn_cat_add.text() == "" and window.btn_cat_add.toolTip()
-    assert window.btn_cat_add.x() < window.cat_tabs.geometry().right() + 40
-    last = window.cat_tabs.tabRect(window.cat_tabs.count() - 1)
-    assert window.btn_cat_add.x() - (window.cat_tabs.x() + last.right()) < 16   # no gap
+    cat = window.catctl
+    assert cat.btn_cat_add.text() == "" and cat.btn_cat_add.toolTip()
+    assert cat.btn_cat_add.x() < cat.cat_tabs.geometry().right() + 40
+    last = cat.cat_tabs.tabRect(cat.cat_tabs.count() - 1)
+    assert cat.btn_cat_add.x() - (cat.cat_tabs.x() + last.right()) < 16   # no gap
     monkeypatch.setattr(window.ytresults, "available", lambda: True)
     monkeypatch.setattr(window.ytresults, "search", lambda q: window.ytresults.show() or True)
     window.search.setText("test tone")
     window.search_youtube()
-    assert not window._cat_row.isVisibleTo(window) and window.ytresults.isVisibleTo(window)
+    assert not window.catctl._cat_row.isVisibleTo(window) and window.ytresults.isVisibleTo(window)
     window.ytresults.btn_back.click()
-    assert window._cat_row.isVisibleTo(window) and window._pads_scroll.isVisibleTo(window)
+    assert window.catctl._cat_row.isVisibleTo(window) and window._pads_scroll.isVisibleTo(window)
     assert window.ytresults.isHidden()
 
 
@@ -86,20 +87,20 @@ def test_my_sounds_shows_all_the_pads_not_the_ones_matching_the_web_search(
 def test_rename_and_delete_category_keep_the_sounds(window, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
-    window.new_category("s0", name="Game")
+    window.catctl.new_category("s0", name="Game")
     assert window.meta("s0").tags == ["Game"] and window.cfg.category == ""
-    window.set_category("Game")
-    window.rename_category("Game", "Game 1")
+    window.catctl.set_category("Game")
+    window.catctl.rename_category("Game", "Game 1")
     assert window.meta("s0").tags == ["Game 1"] and window.cfg.category == "Game 1"
-    assert window.cat_tabs.tabText(1) == "Game 1"
-    window.delete_category("Game 1")
+    assert window.catctl.cat_tabs.tabText(1) == "Game 1"
+    window.catctl.delete_category("Game 1")
     assert window.cfg.categories == [] and window.meta("s0").tags == []
     assert window.cfg.category == "" and len(window.cfg.sounds) == 2
 
 
 def test_new_sounds_land_in_the_category_on_show(window):
     from soundboard.library import SoundMeta
-    window.new_category(name="Clips")
+    window.catctl.new_category(name="Clips")
     m = SoundMeta(id="n1", name="new", file="x.wav")
     window.impctl._pending_imports = 1
     window.impctl.on_imported(m, None, "")

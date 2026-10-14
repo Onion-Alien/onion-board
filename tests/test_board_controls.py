@@ -49,9 +49,9 @@ def test_last_sound_hotkey_plays_it_again(window, calls):
 
 def test_category_keys_cycle_through_all_and_the_categories(window):
     w = window
-    w.new_category(name="Memes")
-    w.new_category(name="Music")
-    w.set_category("")
+    w.catctl.new_category(name="Memes")
+    w.catctl.new_category(name="Music")
+    w.catctl.set_category("")
     w.on_hotkey("__nextcat__")
     assert w.cfg.category == "Memes"
     w.on_hotkey("__nextcat__")
@@ -126,8 +126,8 @@ def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
     w = window
     registered = []
     monkeypatch.setattr(w.hotkeys, "register", lambda m: registered.append(dict(m)))
-    w.new_category(name="Memes")
-    w.new_category(name="Music")
+    w.catctl.new_category(name="Memes")
+    w.catctl.new_category(name="Music")
     a, b = w.meta("s0"), w.meta("s1")
     a.tags, b.tags = ["Memes"], ["Music"]
     w.set_scoped_hotkeys(True)
@@ -136,9 +136,9 @@ def test_a_set_of_hotkeys_per_category(window, monkeypatch, calls):
     b.hotkey = "f1"
     w._clear_dupe_hotkey(b)           # no category in common: both keep it
     assert a.hotkey == b.hotkey == "f1"
-    w.set_category("Memes")
+    w.catctl.set_category("Memes")
     assert registered[-1]["f1"] == "s0"
-    w.set_category("Music")
+    w.catctl.set_category("Music")
     assert registered[-1]["f1"] == "s1"
     w.set_scoped_hotkeys(False)       # one key, one sound again: the first keeps it
     assert (a.hotkey, b.hotkey) == ("f1", "")
@@ -246,7 +246,7 @@ def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypa
 
 def test_play_a_whole_category_one_after_another(window, monkeypatch, calls):
     w = window
-    w.new_category(name="Memes")
+    w.catctl.new_category(name="Memes")
     for sid in ("s0", "s1"):
         w.meta(sid).tags = ["Memes"]
     monkeypatch.setattr(w.engine, "stop", lambda sid: None)

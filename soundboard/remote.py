@@ -714,7 +714,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
             if name and name.lower() != "all" and match is None:
                 return 404, {"error": f"no category called {name!r}",
                              "categories": list(cfg.categories)}
-            mw.set_category(match or "")
+            mw.catctl.set_category(match or "")
         else:
             return 400, {"error": "say which: ?name=… or ?step=next / prev"}
         return 200, {"category": cfg.category}

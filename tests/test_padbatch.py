@@ -34,12 +34,12 @@ def click(pad, mods=Qt.NoModifier):
 def menu_shows(monkeypatch, look):
     """Menus open as a QMenu subclass that hands itself to `look` instead of blocking
     (Qt's own exec can't be patched on the class)."""
-    from soundboard.ui import mainwindow, padbatch
+    from soundboard.ui import categorycontrol, mainwindow, padbatch
 
     class Shown(QMenu):
         def exec(self, *a):
             look(self)
-    for mod in (mainwindow, padbatch):
+    for mod in (mainwindow, padbatch, categorycontrol):
         monkeypatch.setattr(mod, "QMenu", Shown)
 
 
@@ -77,13 +77,13 @@ def test_bulk_menu_starts_with_its_actions_not_a_blank_section(window, monkeypat
 
 def test_category_colour_menu_is_the_bulk_one_with_no_colour(window, monkeypatch):
     """A category tab's Colour menu: names and a real tick, like the bulk one (it had
-    a "  ✓" typed after the name and bold text)."""
+    a "  âœ“" typed after the name and bold text)."""
     from soundboard.ui.dialogs import COLOUR_NAMES
     w = window
     w.cfg.categories = ["Memes"]
     w.cfg.category_colors["Memes"] = PAD_COLORS[2]
-    w._fill_categories()
-    i = next(i for i in range(w.cat_tabs.count()) if w.cat_tabs.tabData(i) == "Memes")
+    w.catctl._fill_categories()
+    i = next(i for i in range(w.catctl.cat_tabs.count()) if w.catctl.cat_tabs.tabData(i) == "Memes")
     subs = []
 
     def grab(m):
@@ -91,7 +91,7 @@ def test_category_colour_menu_is_the_bulk_one_with_no_colour(window, monkeypatch
             if act.menu() is not None and act.text() == _("Colour"):
                 subs.append(act.menu().actions())
     menu_shows(monkeypatch, grab)
-    w._category_menu(w.cat_tabs.tabRect(i).center())
+    w.catctl._category_menu(w.catctl.cat_tabs.tabRect(i).center())
     acts = [a for a in subs[0] if not a.isSeparator()]
     assert [a.text() for a in acts[:-1]] == [COLOUR_NAMES[c] for c in PAD_COLORS]
     assert [a.text() for a in acts if a.isChecked()] == [COLOUR_NAMES[PAD_COLORS[2]]]
@@ -141,8 +141,8 @@ def test_batch_colour_volume_fades_and_category(window):
     w.selection.set_fades(0.5, None)
     assert all(m.color == "#123456" and m.volume == 1.5 for m in w.cfg.sounds)
     assert all(m.fade_in == 0.5 and m.fade_out == 0.0 for m in w.cfg.sounds)
-    w.new_category(name="Memes")
-    w.set_category("")
+    w.catctl.new_category(name="Memes")
+    w.catctl.set_category("")
     w.selection.select_all()
     w.selection.set_category("Memes", True)
     assert all("Memes" in m.tags for m in w.cfg.sounds)

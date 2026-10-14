@@ -101,13 +101,13 @@ def test_an_old_status_text_loses_its_colour_wrapper(window):
 
 def test_category_changes_reregister_scoped_hotkeys(window, monkeypatch):
     window.cfg.scoped_hotkeys = True
-    window.new_category(name="Memes")
+    window.catctl.new_category(name="Memes")
     calls = []
     monkeypatch.setattr(window, "register_hotkeys", lambda: calls.append(1))
-    window.toggle_tag("s0", "Memes")
+    window.catctl.toggle_tag("s0", "Memes")
     assert calls and "Memes" in window.meta("s0").tags
     calls.clear()
-    window.new_category("s1", name="Music")
+    window.catctl.new_category("s1", name="Music")
     assert calls and "Music" in window.meta("s1").tags
 
 
