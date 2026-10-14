@@ -61,12 +61,10 @@ def _mix(a: float, b: float, k: float) -> float:
 HEAD = (0, -12, 1.0)
 EYES_AT = (50 - 50 * 1.3, 53 - 62 * 1.3, 1.3)
 NECK_AT = (0, -14, 1.0)
-# pieces that need their own place: tall hats would poke out of the top of his picture
-# (shrunk onto the top of his head), and the frog's eyes and the mint would too (moved
-# a little lower)
-OWN_PLACE = {"wizard": (50 - 50 * 0.76, 36 - 42 * 0.76, 0.76),
-             "party": (50 - 50 * 0.76, 36 - 42 * 0.76, 0.76),
-             "frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0)}
+# pieces that need their own place: the frog's eyes and the mint would poke out of the
+# top of his picture (moved a little lower). Tall hats stay full size on purpose: an
+# oversized hat on him is the look.
+OWN_PLACE = {"frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0)}
 # pieces that don't fit an owl: a hoodie's drawstrings read as a second face on his
 # belly, and a turtleneck's ribbed roll as teeth under his beak
 NOT_ON_OWL = {"strings", "sweater", "turtleneck"}

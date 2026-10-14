@@ -5,4 +5,4 @@
   and dizzy spiral eyes (Flashbang). Hacker's hood no longer vanishes on its dark
   background.
 - Bun takes his glasses off when he naps, and his smug brows and tears no longer show
-  through sunglasses. Hoot the owl's hats, bands and hood strings fit him properly.
+  through sunglasses. Hoot the owl's bands and hood strings fit him properly.

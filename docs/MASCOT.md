@@ -75,8 +75,8 @@ it sits on his head), list it under the theme in `OUTFITS`, then check the sheet
 Hoot the owl (`soundboard/ui/owl.py`, the Triggers tab before Onion Watch is installed)
 wears the same theme outfit. He has no pieces of his own: `owl._fit` moves Bun's pieces
 onto his shape (head 12 higher, eyes 28 apart and scaled 1.3, neck pieces just under his
-beak; `OWN_PLACE` for the ones that need their own spot, such as tall hats shrunk to fit
-his picture; `NOT_ON_OWL` for the ones that don't suit him) and `draw_owl` calls it at
+beak; `OWN_PLACE` for the ones that need their own spot (tall hats stay full size: an
+oversized hat is the look); `NOT_ON_OWL` for the ones that don't suit him) and `draw_owl` calls it at
 the same five layers. `owl_image` (dialog artwork, his own
 teal) stays plain. A new piece drawn for Bun shows up on Hoot too: check it with
 `bun_sheet.py owls` and `bun_sheet.py owl`. Onion Watch's own copy of the owl
