@@ -2942,6 +2942,31 @@ def test_cable_tap_plays_the_send_mix_on_the_cables_clock(monkeypatch):
         tap.close()
 
 
+def test_cable_tap_closes_its_stream_when_start_fails(monkeypatch):
+    # a busy cable used to leak one PortAudio stream on every retry
+    from soundboard import engine as eng
+    made = []
+
+    class BusyStream:
+        def __init__(self, **kw):
+            self.closed = False
+            made.append(self)
+
+        def start(self):
+            raise RuntimeError("device busy")
+
+        def close(self):
+            self.closed = True
+
+    monkeypatch.setattr(eng, "find_device", lambda kind, name: 7)
+    monkeypatch.setattr(eng.sd, "query_devices", lambda idx: {"default_samplerate": 48000})
+    monkeypatch.setattr(eng.sd, "OutputStream", BusyStream)
+    for _ in range(3):
+        with pytest.raises(RuntimeError, match="busy"):
+            eng.CableTap(CABLE_IN)
+    assert len(made) == 3 and all(s.closed for s in made)
+
+
 def test_engine_feeds_the_cable_only_while_straight_into_the_mic(ring_file, monkeypatch):
     from soundboard.engine import Engine
     monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
