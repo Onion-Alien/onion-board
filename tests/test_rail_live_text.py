@@ -2,7 +2,6 @@
 read on its own box when it's switched on, as Stop all's beside it do (the general
 `:checked` rule's on-accent colour was near-black on its grey box in many themes)."""
 import pytest
-from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QFrame, QPushButton, QVBoxLayout
 
 from soundboard import theme
