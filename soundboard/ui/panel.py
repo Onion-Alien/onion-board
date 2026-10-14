@@ -743,6 +743,7 @@ class EqPanel(QWidget):
         self.lbl_for = QLabel(_("for"))
         row.addWidget(self.lbl_for)
         self.cb_target = QComboBox()
+        self.cb_target.setAccessibleName(_("Equalizer"))   # (the "for" before it is no name)
         for label, key in ((_("My voice"), "voice"), (_("My sounds"), "sounds"),
                            (_("Both"), "all")):
             self.cb_target.addItem(label, key)

@@ -20,9 +20,10 @@ import html
 import re
 import time
 
-from PySide6.QtWidgets import (QAbstractButton, QAbstractSlider, QAbstractSpinBox, QApplication,
-                               QComboBox, QLineEdit, QProgressBar, QStackedWidget, QTabWidget,
-                               QWidget)
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
+                               QAbstractSpinBox, QApplication, QComboBox, QLineEdit,
+                               QProgressBar, QStackedWidget, QTabWidget, QWidget)
 
 AUTO = "_a11y_auto"      # dynamic property: this name was made here
 KINDS = (QAbstractButton, QAbstractSlider, QComboBox, QAbstractSpinBox, QLineEdit,
@@ -97,6 +98,14 @@ def label_tree(root: QWidget, force: bool = False):
     for w in (top, *top.findChildren(QWidget)):
         if isinstance(w, KINDS):
             label(w)
+
+
+def scroll_stop(area: QAbstractScrollArea, name: str):
+    """A scroll area whose controls are Tab stops of their own: not one itself (an
+    extra stop a screen reader could only call "scroll area"), but it still takes the
+    focus on a click, so Page Up / Down scroll it, and has a name for then."""
+    area.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+    area.setAccessibleName(name)
 
 
 def install(app: QApplication):

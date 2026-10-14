@@ -36,7 +36,7 @@ from PySide6.QtWidgets import (
 from soundboard import backup, bunny, destination, net, otherboards, remote, usage
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS
-from soundboard.ui import alsosend, busy, icons, sidebar, taboff
+from soundboard.ui import a11y, alsosend, busy, icons, sidebar, taboff
 from soundboard.ui.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
@@ -1135,6 +1135,7 @@ class WindowBuilder(Controller):
         scroll.setWidget(mw.grid)
         scroll.verticalScrollBar().valueChanged.connect(mw.transctl._scroll_background_board)
         mw._pad_scroll = scroll
+        a11y.scroll_stop(scroll, _("Your sounds"))   # the pads are the Tab stops
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         # the pads fit the width
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -1277,6 +1278,7 @@ class WindowBuilder(Controller):
                            lambda: mw.fitctl._setup_one_col())
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.Shape.NoFrame)
+        a11y.scroll_stop(page, _("Setup"))
         body = QWidget()
         page.dl_column = body   # the download bar lines up with these cards
         _Moved(body, mw.fitctl._fit_dl_bar)

@@ -78,3 +78,30 @@ def test_a_focus_change_in_a_tab_goes_over_only_that_tab(qapp):
     assert btns[1].accessibleName() == "" and outside.accessibleName() == ""
     a11y.label_tree(outside)
     assert btns[1].accessibleName() == "Tab 1 button" and outside.accessibleName() == "Outside"
+
+
+def test_every_tab_stop_on_the_main_pages_has_a_name(window):
+    """A screen reader says each Tab stop's name; a bare one is only "scroll area" or
+    "tab bar". Scroll areas whose controls are stops of their own aren't stops."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QAbstractButton, QAbstractScrollArea, QLabel
+    buddied = {id(lab.buddy()) for lab in window.findChildren(QLabel) if lab.buddy()}
+
+    def said(w):
+        text = w.text() if isinstance(w, (QAbstractButton, QLineEdit)) else ""
+        return bool(w.accessibleName() or a11y.has_words(text) or id(w) in buddied)
+
+    for page in (window.sounds_page, window.apps, window.voice, window.setup_page):
+        window.tabs.setCurrentWidget(page)
+        a11y.label_tree(window, force=True)
+        stops, w = [], window.nextInFocusChain()
+        while w is not window:
+            if ((w.focusPolicy() & Qt.FocusPolicy.TabFocus) == Qt.FocusPolicy.TabFocus
+                    and w.isEnabled() and w.isVisibleTo(window)):
+                stops.append(w)
+            w = w.nextInFocusChain()
+        assert stops
+        assert [w for w in stops if not said(w)] == [], type(page).__name__
+        assert not [w for w in stops if isinstance(w, QAbstractScrollArea)]
+    assert window.catctl.cat_tabs.accessibleName() == "Categories"
+    assert window._pad_scroll.accessibleName() == "Your sounds"

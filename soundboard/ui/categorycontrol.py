@@ -81,6 +81,7 @@ class CategoryControl(Controller):
         h.setContentsMargins(0, 0, 0, 0)   # the left one: _fit_toolbar
         h.setSpacing(4)
         self.cat_tabs = SnugTabBar()
+        self.cat_tabs.setAccessibleName(_("Categories"))   # a Tab stop: arrows pick one
         self.cat_tabs.setDrawBase(False)
         self.cat_tabs.setExpanding(False)
         self.cat_tabs.setUsesScrollButtons(True)
