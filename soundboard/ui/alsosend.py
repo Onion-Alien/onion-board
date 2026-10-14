@@ -4,7 +4,7 @@ either the same as the call (Config.also_send: a copy of what others hear) or a 
 mix for streaming (Config.obs_device, the stream output: no voice chat shaping, its
 own volume, your voice or not), which brings those two settings in under it; one
 device at most gets the clean mix. Built into a device grid (the Setup tab's, and
-Settings -> Audio's copy of it); MainWindow.set_also_send_at / set_send_kind apply a
+Settings -> Audio's copy of it); RouteControl.set_also_send_at / set_send_kind apply a
 change and rebuild them all."""
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ class AlsoSendRows:
         devices) leaves them as they are."""
         c = self.mw.cfg
         return (tuple(self.rows()), tuple(d["name"] for d in eng.list_devices("output")),
-                tuple(self.mw.sending_to()), c.route, c.mon_device, c.obs_vol, c.obs_voice)
+                tuple(self.mw.routectl.sending_to()), c.route, c.mon_device, c.obs_vol, c.obs_voice)
 
     def rows(self) -> list[tuple[str, str]]:
         """(device, CALL / STREAM) per row: the call copies (none while sending to
@@ -72,16 +72,16 @@ class AlsoSendRows:
         if not free:
             return
         if self.mw.cfg.route == "off":
-            self.mw.set_obs_device(free[0])
+            self.mw.routectl.set_obs_device(free[0])
         else:
-            self.mw.set_also_send_at(len(self.mw.cfg.also_send), free[0])
+            self.mw.routectl.set_also_send_at(len(self.mw.cfg.also_send), free[0])
 
     def free(self, keep: str | None = None) -> list[str]:
         """Outputs a row can pick: not the headphones, not what already gets it (the
         picked device, the cable alongside the mic) and not another row's (`keep`: this
         row's own stays)."""
         mw, c = self.mw, self.mw.cfg
-        taken = [t for t in mw.sending_to() if t != keep]
+        taken = [t for t in mw.routectl.sending_to() if t != keep]
         used = [n for n in (*c.also_send, c.obs_device) if n and n != keep]
         return [n for n in (d["name"] for d in eng.list_devices("output"))
                 if n != c.mon_device and n not in used
@@ -89,15 +89,15 @@ class AlsoSendRows:
 
     def _set_device(self, i: int, kind: str, name: str):
         if kind == STREAM:
-            self.mw.set_obs_device(name)
+            self.mw.routectl.set_obs_device(name)
         else:
-            self.mw.set_also_send_at(i, name)
+            self.mw.routectl.set_also_send_at(i, name)
 
     def _remove(self, i: int, kind: str):
         if kind == STREAM:
-            self.mw.set_obs_device(None)
+            self.mw.routectl.set_obs_device(None)
         else:
-            self.mw.set_also_send_at(i, None)
+            self.mw.routectl.set_also_send_at(i, None)
 
     def _place(self, r: int, label: QWidget, icon: bool, field: QWidget,
                minus: QWidget | None = None):
@@ -163,7 +163,7 @@ class AlsoSendRows:
             what.setMinimumWidth(max(fm.horizontalAdvance(t) for __, t, __t in KINDS) + 90)
             what.setToolTip(dict((k, tip) for k, __, tip in KINDS)[kind])
             what.setAccessibleName(_("What {name} gets", name=name))
-            what.activated.connect(lambda _i, name=name, what=what: self.mw.set_send_kind(
+            what.activated.connect(lambda _i, name=name, what=what: self.mw.routectl.set_send_kind(
                 name, what.currentData() == STREAM))
             field = QWidget()
             h = QHBoxLayout(field)

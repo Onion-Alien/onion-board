@@ -2295,12 +2295,12 @@ def test_nobody_goes_silent_before_the_mic_is_set_up(window, monkeypatch, state)
     cable meanwhile, so a voice app set to it still hears you."""
     w = window
     _routes(w, monkeypatch, state)
-    assert w._main_name() == CABLE_IN
+    assert w.routectl._main_name() == CABLE_IN
     _routes(w, monkeypatch, state, cables=())
-    assert w._main_name() is None   # no cable either: nothing to send into
+    assert w.routectl._main_name() is None   # no cable either: nothing to send into
     w.cfg.main_device = CABLE_IN   # one picked once, not installed now: still nothing
-    assert w._main_name() is None
-    assert w._cable_out() is None
+    assert w.routectl._main_name() is None
+    assert w.routectl._cable_out() is None
 
 
 def test_sounds_follow_the_mic_effect_once_it_works(window, monkeypatch):  # noqa: F811
@@ -2312,7 +2312,7 @@ def test_sounds_follow_the_mic_effect_once_it_works(window, monkeypatch):  # noq
     opened = []
     monkeypatch.setattr(w.engine, "set_main_device",
                         lambda name: (opened.append(name), w.engine.names.update(main=name)))
-    monkeypatch.setattr(w, "_device_job", lambda plan, then=None: then(plan()()))
+    monkeypatch.setattr(w.devctl, "_device_job", lambda plan, then=None: then(plan()()))
     monkeypatch.setattr(w, "_cable_ends", lambda *_a: None)
     w.engine.names["main"] = CABLE_IN
     w._follow_mic_effect()
@@ -2347,7 +2347,7 @@ def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatc
         close = stop
     w.engine.main_stream, w.engine.tap = S(), S()   # the cable still fed alongside
     try:
-        w._show_route()
+        w.routectl._show_route()
         w._update_status()
         for lbl in (w.flow_out, w.step_lbl, w.setup_hint, w.how_title, w.pill):
             assert "cable" not in lbl.text().lower(), lbl.text()
@@ -2388,7 +2388,7 @@ def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F8
         close = stop
     w.engine.main_stream = S()
     try:
-        w._show_route()
+        w.routectl._show_route()
         w._update_status()
         assert w.setup_state == "ok"
         assert w.step_lbl.isHidden()
@@ -2413,11 +2413,11 @@ def test_on_the_mic_the_cable_gets_the_same(window, monkeypatch, state):  # noqa
     opened = []
     monkeypatch.setattr(type(w.engine), "set_tap_device",
                         lambda self, name: (opened.append(name), setattr(self, "tap_name", name)))
-    assert w._main_name() == dm.DEVICE   # (an older copy of the effect still works)
-    w._apply_send_outputs()
+    assert w.routectl._main_name() == dm.DEVICE   # (an older copy of the effect still works)
+    w.routectl._apply_send_outputs()
     assert opened == [CABLE_IN]
     _routes(w, monkeypatch, state, cables=())
-    w._apply_send_outputs()
+    w.routectl._apply_send_outputs()
     assert opened[-1] is None
 
 
@@ -2429,7 +2429,7 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     w = window
     _routes(w, monkeypatch, "missing", cables)
     w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
-    assert w.cfg.route == "mic" and w._main_name() == (cables[0] if cables else None)
+    assert w.cfg.route == "mic" and w.routectl._main_name() == (cables[0] if cables else None)
     assert not [t for t in toast.shown(w) if t.kind == "error"]
     assert "You clicked <b>No</b>" in w.mic_reason.text()
     assert "cable" not in w.mic_reason.text().lower()   # the mic is the way
@@ -2842,9 +2842,9 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
         w._update_flow()
     assert len(asked) == 1                   # asked once, not on every redraw
     monkeypatch.setattr(w.engine, "shutdown", lambda: None)
-    monkeypatch.setattr(w, "_init_devices", lambda: None)
-    monkeypatch.setattr(w, "_prepare_all", lambda: None)
-    w.refresh_devices()                      # devices re-scanned: looked up again
+    monkeypatch.setattr(w.devctl, "_init_devices", lambda: None)
+    monkeypatch.setattr(w.routectl, "_prepare_all", lambda: None)
+    w.devctl.refresh_devices()                      # devices re-scanned: looked up again
     w._update_flow()
     assert process_events(app, lambda: len(asked) == 2 and not w._vb_setup_asking, 3)
 
@@ -2863,7 +2863,7 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     assert said[-1][1] == "warn"
     monkeypatch.setattr(cableremove, "remove", lambda: None)
     w.remove_cable()
-    assert w._cable_gone and w._tap_name() is None and not busy.is_busy(w.btn_rmcable)
+    assert w._cable_gone and w.routectl._tap_name() is None and not busy.is_busy(w.btn_rmcable)
     assert "Restart" in said[-1][0]
     w._update_flow()
     assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
@@ -3095,10 +3095,10 @@ def test_the_cable_copy_opens_at_start(window, monkeypatch):  # noqa: F811
     opened = []
     monkeypatch.setattr(type(w.engine), "set_tap_device",
                         lambda self, name: (opened.append(name), setattr(self, "tap_name", name)))
-    w._init_devices()
+    w.devctl._init_devices()
     assert opened[-1] == CABLE_IN
     # the stream output never goes to that same cable (everyone would get it twice)
-    assert w._obs_name("CABLE Input (VB-Audio Virtual Cable)") is None
+    assert w.routectl._obs_name("CABLE Input (VB-Audio Virtual Cable)") is None
 
 
 def test_reopening_every_stream_reopens_the_cable_copy(monkeypatch):
@@ -3165,15 +3165,15 @@ def test_picking_the_mic_asks_for_admin_only_when_it_doesnt_work(window, monkeyp
     for state in ("outdated", "ready"):
         w.cfg.route = "cable"
         monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
-        w.set_route("mic")
+        w.routectl.set_route("mic")
         assert w.cfg.route == "mic" and not tried
     for state in ("wiped", "missing", "other"):
         w.cfg.route = "cable"
         monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
-        w.set_route("mic")
+        w.routectl.set_route("mic")
         assert w.cfg.route == "cable" and tried == [1]
         tried.clear()
-        w.set_route("mic", attached=True)
+        w.routectl.set_route("mic", attached=True)
         assert w.cfg.route == "mic" and not tried
 
 

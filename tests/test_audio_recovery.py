@@ -39,7 +39,7 @@ def test_recovery_finishes_after_settings_is_deleted(window, qapp, monkeypatch, 
     gate, entered = threading.Event(), threading.Event()
     calls, refreshed = [], []
     window.cfg.mic_device = 'Test mic'
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: refreshed.append(fn))
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: refreshed.append(fn))
     monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
 
     def install(mic, *, clean=False):
@@ -66,7 +66,7 @@ def test_recovery_finishes_after_settings_is_deleted(window, qapp, monkeypatch, 
 @pytest.mark.parametrize('state,error', [('outdated', None), ('ready', 'Permission refused')])
 def test_failed_repair_never_reports_success(window, qapp, monkeypatch, state, error):  # noqa: F811
     window.cfg.mic_device = 'Test mic'
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
     monkeypatch.setattr(window, 'toast', lambda *a: None)
     monkeypatch.setattr(dm, 'install', lambda *a, **kw: error)
     monkeypatch.setattr(dm, 'status', lambda mic=None: state)
@@ -80,7 +80,7 @@ def test_failed_repair_never_reports_success(window, qapp, monkeypatch, state, e
 
 
 def test_remove_verifies_effect_is_gone(window, qapp, monkeypatch):  # noqa: F811
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
     monkeypatch.setattr(dm, 'uninstall', lambda: None)
     monkeypatch.setattr(dm, 'status', lambda mic=None: 'missing')
     monkeypatch.setattr(dm, 'anything_installed', lambda: False)
@@ -238,7 +238,7 @@ def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # n
 def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch, error):  # noqa: F811
     gate = threading.Event()
     window.cfg.mic_device = 'Test mic'
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
     monkeypatch.setattr(window, 'toast', lambda *a: None)
     monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
     monkeypatch.setattr(dm, 'install', lambda *a, **kw: gate.wait(5) and error)
@@ -325,8 +325,8 @@ def test_install_acts_only_on_that_mic(window, qapp, monkeypatch):  # noqa: F811
     monkeypatch.setattr(dm, 'install_on', lambda guid, clean=False: calls.append(guid))
     monkeypatch.setattr(dm, 'install', lambda *a, **k: pytest.fail('went by name'))
     monkeypatch.setattr(dm, 'status_on', lambda guid: 'ready')
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
-    monkeypatch.setattr(window, 'on_device', lambda cb, attr: switched.append(attr))
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window.routectl, 'on_device', lambda cb, attr: switched.append(attr))
     window.cb_mic.addItem('Headset Mic (USB) #2', 'Headset Mic (USB) #2')
     card.rows[GUID_B].buttons['install'].click()
     assert card.dialog.windowTitle() == 'Install mic effect'
@@ -351,7 +351,7 @@ def test_remove_leaves_the_other_mic_alone(window, qapp, monkeypatch):  # noqa: 
     d, card = card_with(window, qapp, monkeypatch, two_mics('ready', 'ready'))
     monkeypatch.setattr(dm, 'uninstall', lambda guid=None: calls.append(guid))
     monkeypatch.setattr(dm, 'status_on', lambda guid: 'other')
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
     card.rows[GUID_B].buttons['remove'].click()
     next(b for b in card.dialog.findChildren(QPushButton)
          if b.text() == 'Remove mic effect').click()
@@ -531,8 +531,8 @@ def test_cleanup_asks_for_admin_only_when_something_is_there(window, qapp, monke
     monkeypatch.setattr(dm, 'cleanup',
                         lambda guid: asked.append(guid) or left.__setitem__(0, False))
     monkeypatch.setattr(dm, 'status_on', lambda guid: 'other')
-    monkeypatch.setattr(window, '_when_devices_free', lambda fn: None)
-    monkeypatch.setattr(window, 'on_device', lambda cb, attr: switched.append(attr))
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window.routectl, 'on_device', lambda cb, attr: switched.append(attr))
     card.rows[GUID_B].buttons['cleanup'].click()
     words = ' '.join(lbl.text() for lbl in card.dialog.findChildren(QLabel))
     assert "Only Onion Board's own parts go" in words and 'comes off' not in words

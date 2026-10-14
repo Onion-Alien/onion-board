@@ -87,10 +87,10 @@ def test_window_never_streams_to_the_cable_or_headphones(window, monkeypatch):  
     opened = []
     monkeypatch.setattr(w.engine, "set_obs_device", opened.append)
     w.cfg.main_device, w.cfg.mon_device = "CABLE Input", "Headphones"
-    w.set_obs_device("CABLE Input")
-    w.set_obs_device("Headphones")
-    w.set_obs_device("CABLE-A Input")
-    w.set_obs_device(None)
+    w.routectl.set_obs_device("CABLE Input")
+    w.routectl.set_obs_device("Headphones")
+    w.routectl.set_obs_device("CABLE-A Input")
+    w.routectl.set_obs_device(None)
     devices_done(w)   # (opened on the device thread, in turn)
     assert opened == [None, None, "CABLE-A Input", None]
     assert w.cfg.obs_device is None
@@ -117,7 +117,7 @@ def test_another_end_of_the_cable_in_use_is_never_the_stream_output(window, monk
     opened = []
     monkeypatch.setattr(w.engine, "set_obs_device", opened.append)
     w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
-    w.set_obs_device("CABLE In 16ch (VB-Audio Virtual Cable)")
-    w.set_obs_device("CABLE-A Input (VB-Audio Cable A)")
+    w.routectl.set_obs_device("CABLE In 16ch (VB-Audio Virtual Cable)")
+    w.routectl.set_obs_device("CABLE-A Input (VB-Audio Cable A)")
     devices_done(w)   # (opened on the device thread, in turn)
     assert opened == [None, "CABLE-A Input (VB-Audio Cable A)"]

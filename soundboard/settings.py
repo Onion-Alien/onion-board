@@ -1458,7 +1458,7 @@ class SettingsDialog(QDialog):
         lat.addItem(_("Low (default)"), "low")
         lat.addItem(_("Safer: bigger buffers"), "high")
         lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
-        lat.currentIndexChanged.connect(lambda i: self.mw.set_latency(lat.itemData(i)))
+        lat.currentIndexChanged.connect(lambda i: self.mw.devctl.set_latency(lat.itemData(i)))
         no_wheel(lat)
         cv.addWidget(lat)
         e = self.mw.engine
@@ -1546,7 +1546,7 @@ class SettingsDialog(QDialog):
         alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
         ref = QPushButton(_("Re-scan devices"))
         icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.rescan_with_feedback(ref, self._sync_devices))
+        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
         cv.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
         self._sync_devices()
         return card
@@ -1561,7 +1561,7 @@ class SettingsDialog(QDialog):
 
     def _pick_device(self, src, attr, i):
         src.setCurrentIndex(i)
-        self.mw.on_device(src, attr)
+        self.mw.routectl.on_device(src, attr)
         self._sync_devices()   # "Send my sounds to" never offers the headphones
 
     def _general(self):

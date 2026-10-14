@@ -44,7 +44,7 @@ def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F8
     hidden and the guide is in the mic card. Once sounds reach a mic it's back."""
     w = window
     _cable_missing(w, monkeypatch)
-    w._show_route()
+    w.routectl._show_route()
     w._update_status()
     assert w.helpcard.isHidden()
     assert not w.btn_guide.isHidden()
@@ -56,7 +56,7 @@ def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F8
     monkeypatch.setattr(w, "_direct_not_running", lambda: False)
     monkeypatch.setattr(w.engine, "main_stream", _Stream())
     w.cfg.route = "mic"
-    w._show_route()
+    w.routectl._show_route()
     w._update_status()
     assert not w.helpcard.isHidden()
     assert w.btn_guide.isHidden()

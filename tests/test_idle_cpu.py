@@ -15,11 +15,11 @@ def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch
                         lambda: asked.append(threading.current_thread())
                         or "Speakers (Realtek Audio)")
     followed = []
-    monkeypatch.setattr(window, "_follow_default_output", lambda *a: followed.append(a))
+    monkeypatch.setattr(window.devctl, "_follow_default_output", lambda *a: followed.append(a))
 
     def tick():
-        window._default_tick()
-        process_events(qapp, lambda: not window._default_asking, timeout=5)
+        window.devctl._default_tick()
+        process_events(qapp, lambda: not window.devctl._default_asking, timeout=5)
     window._default_timer.stop()
     window.cfg.mon_follows_default = False
     tick()
@@ -34,7 +34,7 @@ def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch
     window._ui_live = False
     tick()
     assert len(asked) == 2                            # in the tray: every few seconds
-    window._default_at -= 10
+    window.devctl._default_at -= 10
     tick()
     assert len(asked) == 3
     # one thread kept for it: a new one each tick kept the window waiting in
@@ -49,16 +49,16 @@ def test_a_slow_default_output_answer_isnt_asked_twice(window, monkeypatch, qapp
     window._default_timer.stop()
     window.cfg.mon_follows_default = True
     window._ui_live = True
-    window._default_tick()
-    window._default_tick()                            # the first is still asking
+    window.devctl._default_tick()
+    window.devctl._default_tick()                            # the first is still asking
     go.set()
-    process_events(qapp, lambda: not window._default_asking, timeout=5)
+    process_events(qapp, lambda: not window.devctl._default_asking, timeout=5)
     assert len(asked) == 1
 
 
 def recover(w, qapp):
     """One device check, and its answer (it asks Windows on the device thread)."""
-    w._recover_devices()
+    w.devctl._recover_devices()
     process_events(qapp, lambda: not w.engine.devices.busy, timeout=5)
 
 
@@ -72,7 +72,7 @@ def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch, qapp)
     for _ in range(10):
         recover(window, qapp)
     assert len(looks) == 4                            # a few quick looks, then it waits
-    window._recover_at = 0.0
+    window.devctl._recover_at = 0.0
     recover(window, qapp)
     assert len(looks) == 5
 
@@ -277,14 +277,14 @@ def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monk
     works = [False]
     monkeypatch.setattr(main.directmic, "works", lambda _s: works[0])
     window.cfg.route = "mic"
-    window._warn_mute_does_nothing(True)             # ticked back on: nothing to say
+    window.routectl._warn_mute_does_nothing(True)             # ticked back on: nothing to say
     assert shown == []
-    window._warn_mute_does_nothing(False)            # unticked, effect not on the mic
+    window.routectl._warn_mute_does_nothing(False)            # unticked, effect not on the mic
     assert len(shown) == 1 and attached == []        # closed: nothing set up
     works[0] = True                                  # on the mic: the box really mutes
-    window._warn_mute_does_nothing(False)
+    window.routectl._warn_mute_does_nothing(False)
     window.cfg.route, works[0] = "cable", False      # the cable: it mutes there too
-    window._warn_mute_does_nothing(False)
+    window.routectl._warn_mute_does_nothing(False)
     assert len(shown) == 1
 
 
@@ -300,9 +300,9 @@ def test_mute_warning_can_be_turned_off_for_good(window, monkeypatch):  # noqa: 
     monkeypatch.setattr(QMessageBox, "exec", answer)
     monkeypatch.setattr(main.directmic, "works", lambda _s: False)
     window.cfg.route = "mic"
-    window._warn_mute_does_nothing(False)
+    window.routectl._warn_mute_does_nothing(False)
     assert len(shown) == 1 and window.cfg.mute_warning_off
-    window._warn_mute_does_nothing(False)            # the next untick says nothing
+    window.routectl._warn_mute_does_nothing(False)            # the next untick says nothing
     assert len(shown) == 1
 
 

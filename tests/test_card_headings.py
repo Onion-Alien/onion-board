@@ -56,7 +56,7 @@ def heading_parts(card: QWidget):
 def _shown_setup(window, route):  # noqa: F811
     window.apply_theme("Dark")
     window.cfg.route = route
-    window._show_route()
+    window.routectl._show_route()
     window._update_status()
     window.tabs.setCurrentWidget(window.setup_page)
     window.show()

@@ -68,7 +68,7 @@ def test_the_cable_route_still_picks_the_cable(win, opened):
 
 
 def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, opened, devices):  # noqa: F811
-    win.set_route("device", "Speakers")
+    win.routectl.set_route("device", "Speakers")
     assert opened["main"][-1] == "Speakers"
     assert win.setup_state == "ok"
     assert "Speakers" in win.pill.accessibleName()
@@ -77,22 +77,22 @@ def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, open
     assert win.cb_route.currentText() == "Speakers"   # picked by name
     # the cable missing changes nothing, and the cable showing up doesn't take over
     devices["cable"] = False
-    win.refresh_devices()
+    win.devctl.refresh_devices()
     assert win.cfg.main_device == "Speakers" and win.setup_state == "ok"
     devices["cable"] = True
-    win.refresh_devices()
+    win.devctl.refresh_devices()
     assert win.cfg.main_device == "Speakers" and opened["main"][-1] == "Speakers"
 
 
 def test_without_any_cable_the_device_route_never_asks_to_install_one(win, devices):  # noqa: F811
     devices["cable"] = False
-    win.set_route("device", "Speakers")
+    win.routectl.set_route("device", "Speakers")
     assert win.setup_state == "ok"
     assert win.btn_install.isHidden() and win.btn_rescan.isHidden()
 
 
 def test_the_headphones_are_never_what_others_hear(win, opened):
-    win.set_route("device", PHONES)
+    win.routectl.set_route("device", PHONES)
     assert opened["main"][-1] is None    # you'd hear everything twice, your voice too
     assert win.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
@@ -101,15 +101,15 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
 
 
 def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, opened):
-    win.set_obs_device(CABLE)            # the cable is what others hear: not for OBS too
+    win.routectl.set_obs_device(CABLE)            # the cable is what others hear: not for OBS too
     assert opened["obs"][-1] is None
-    win.set_route("off")
+    win.routectl.set_route("off")
     assert opened["main"][-1] is None and opened["obs"][-1] == CABLE
     assert win.setup_state == "ok"       # picked on purpose: the Setup tab doesn't nag
     assert "Not sending" in win.pill.accessibleName()
     assert win.cb_route.currentData() == "off"
     assert win.cfg.main_device == CABLE  # kept for switching back
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     assert opened["main"][-1] == CABLE and opened["obs"][-1] is None
     assert win.cb_route.currentText() == CABLE
 
@@ -121,17 +121,17 @@ def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
         return win.btn_air.property("railtext"), win.btn_air.accessibleName()
     win.set_sending(True)
     assert said() == ("Live", "Live: others hear you")
-    win.set_route("device", PHONES)      # the headphones: nothing is sent
+    win.routectl.set_route("device", PHONES)      # the headphones: nothing is sent
     assert said() == ("Only you", "Only you hear sounds")
-    win.set_route("off")
+    win.routectl.set_route("off")
     assert said() == ("Only you", "Only you hear sounds")
-    win.set_obs_device("Speakers")       # muting still silences the stream output
+    win.routectl.set_obs_device("Speakers")       # muting still silences the stream output
     devices_done(win)
     assert said() == ("Live", "Live: stream output only")
     win.btn_air.setChecked(False)
     assert said() == ("Muted", "Muted: others hear nothing")
     win.btn_air.setChecked(True)
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     assert said() == ("Live", "Live: others hear you")
 
 
@@ -143,7 +143,7 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     assert CABLE in texts and "Speakers" in texts and PHONES not in texts
     assert not any("cable" in t.lower() and t != CABLE for t in texts)
     cb.setCurrentIndex(cb.findData(main.ROUTE_DEVICE + "Speakers"))
-    win.on_device(cb, "route")
+    win.routectl.on_device(cb, "route")
     devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
     d = SettingsDialog(win, "audio")
@@ -162,7 +162,7 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
 def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     w, wiz = wizard
     devices["cable"] = False
-    w.refresh_devices()
+    w.devctl.refresh_devices()
     wiz.go(2)
     assert wiz.btn_next.text().startswith("Skip")
     wiz.btn_other.click()
@@ -203,7 +203,7 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     monkeypatch.setattr(engine.Engine, "set_copy_devices",
                         lambda self, names: (copies.append(list(names)),
                                              setattr(self, "copy_names", tuple(names))))
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     rows = win.also_rows
     assert rows.boxes == [] and not rows.add.isHidden()
     assert rows.free() == ["Speakers"]   # not the headphones, not the cable it's on
@@ -214,20 +214,20 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     d = SettingsDialog(win, "audio")
     mirror = [v for v in win.also_views if v is not rows]
     assert len(mirror) == 1 and [b.currentData() for b in mirror[0].boxes] == ["Speakers"]
-    win.set_route("off")                 # nobody: no copies (+ adds a clean one)
+    win.routectl.set_route("off")                 # nobody: no copies (+ adds a clean one)
     assert copies[-1] == [] and rows.boxes == [] and not rows.add.isHidden()
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     assert copies[-1] == ["Speakers"] and len(rows.boxes) == 1
-    win.set_route("device", "Speakers")  # picked as the main one: not twice
+    win.routectl.set_route("device", "Speakers")  # picked as the main one: not twice
     assert copies[-1] == []
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     minus = rows.widgets[-1]
     assert minus.text() == "−"
     minus.click()                        # −
     assert win.cfg.also_send == [] and copies[-1] == [] and rows.boxes == []
     assert [b for b in mirror[0].boxes] == [] and not rows.add.isHidden()
     d.close()
-    win.set_also_send_at(0, PHONES)      # the headphones: you'd hear it twice
+    win.routectl.set_also_send_at(0, PHONES)      # the headphones: you'd hear it twice
     assert copies[-1] == []
 
 
@@ -236,7 +236,7 @@ def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  #
     bar across the card's whole right half."""
     monkeypatch.setattr(engine.Engine, "set_copy_devices",
                         lambda self, names: setattr(self, "copy_names", tuple(names)))
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     win.show()
     win.resize(1900, 1000)
     win.tabs.setCurrentWidget(win.setup_page)
@@ -260,7 +260,7 @@ def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  
     monkeypatch.setattr(engine.Engine, "set_obs_device",
                         lambda self, name: (opened.append(name),
                                             self.names.__setitem__("obs", name)))
-    win.set_route("cable")
+    win.routectl.set_route("cable")
     rows = win.also_rows
     rows.add.click()
     assert win.cfg.also_send == ["Speakers"] and rows.stream_vol is None
@@ -275,12 +275,12 @@ def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  
     rows.stream_voice.setChecked(False)
     assert win.cfg.obs_voice is False
     assert rows.add.isHidden()           # nothing left to add
-    win.set_send_kind("Speakers", False)  # back to a copy of the call
+    win.routectl.set_send_kind("Speakers", False)  # back to a copy of the call
     devices_done(win)
     assert win.cfg.obs_device is None and win.cfg.also_send == ["Speakers"]
     assert opened[-1] is None and rows.stream_vol is None
-    win.set_also_send_at(0, None)
-    win.set_route("off")                 # nobody: only the clean one makes sense
+    win.routectl.set_also_send_at(0, None)
+    win.routectl.set_route("off")                 # nobody: only the clean one makes sense
     assert rows.boxes == [] and not rows.add.isHidden()
     rows.add.click()
     assert win.cfg.obs_device and win.cfg.also_send == []
@@ -399,13 +399,13 @@ def test_leaving_settings_on_a_new_non_cable_device_asks_once(win, monkeypatch):
     assert not routewarn.needs_warning("device", PHONES, PHONES)   # has its own hint
     assert not routewarn.needs_warning("mic", "Speakers", PHONES)
     picked, installs = [], []
-    monkeypatch.setattr(win, "set_route", lambda r, d=None, **k: picked.append((r, d)))
+    monkeypatch.setattr(win.routectl, "set_route", lambda r, d=None, **k: picked.append((r, d)))
     monkeypatch.setattr(win, "install_cable", lambda: installs.append(1))
 
     def leave_on(device):
         win.open_settings("audio")
         win.cfg.route, win.cfg.main_device = "device", device
-        win._show_route()
+        win.routectl._show_route()
         win.close_settings()
         return win._route_warning
     # the cable picked in Settings: nothing asked
@@ -433,13 +433,13 @@ def test_leaving_settings_on_a_new_non_cable_device_asks_once(win, monkeypatch):
 
 def test_without_a_cable_the_warning_offers_to_install_one(win, devices, monkeypatch):  # noqa: F811
     devices["cable"] = False
-    win.refresh_devices()
+    win.devctl.refresh_devices()
     picked, installs = [], []
-    monkeypatch.setattr(win, "set_route", lambda r, d=None, **k: picked.append((r, d)))
+    monkeypatch.setattr(win.routectl, "set_route", lambda r, d=None, **k: picked.append((r, d)))
     monkeypatch.setattr(win, "install_cable", lambda: installs.append(1))
     win.open_settings("audio")
     win.cfg.route, win.cfg.main_device = "device", "Speakers"
-    win._show_route()
+    win.routectl._show_route()
     win.close_settings()
     box = win._route_warning
     assert box.to_cable.text() == "Install a virtual cable"

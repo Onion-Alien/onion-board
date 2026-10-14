@@ -174,9 +174,9 @@ class Recovery(QObject):
                 and cb is not None and cb.findData(pa) >= 0:
             # the effect is on that mic now: the app sends into it (as picking it would)
             cb.setCurrentIndex(cb.findData(pa))
-            self.mw.on_device(cb, "mic_device")
+            self.mw.routectl.on_device(cb, "mic_device")
         else:
-            self.mw._when_devices_free(lambda: self.mw._refresh_off_ui())
+            self.mw.devctl._when_devices_free(lambda: self.mw.devctl._refresh_off_ui())
         if err:
             self.mw.toast(_("{error}", error=err), "warn")
         elif getattr(self, "say_done", False):

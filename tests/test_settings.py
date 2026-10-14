@@ -151,10 +151,10 @@ def test_closing_settings_before_the_updates_page_is_built_warns_nothing(window)
 
 
 def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatch):  # noqa: F811
-    window._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
-    window._fill_combo(window.cb_mon, ["Speakers", "Headset"], "Speakers")
+    window.routectl._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
+    window.routectl._fill_combo(window.cb_mon, ["Speakers", "Headset"], "Speakers")
     picked = []
-    monkeypatch.setattr(window, "on_device",
+    monkeypatch.setattr(window.routectl, "on_device",
                         lambda cb, attr: picked.append((attr, cb.currentData())))
     d = SettingsDialog(window, "audio")
     mic, mon = d.dev_combos[0][0], d.dev_combos[1][0]

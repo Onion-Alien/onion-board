@@ -619,13 +619,13 @@ def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
 
 def test_mute_switch_silences_what_others_hear(window, monkeypatch):
     # a send device, so Live is Live even on a PC (CI) with no cable
-    monkeypatch.setattr(window, "_main_name", lambda: "CABLE Input")
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: "CABLE Input")
     e = window.engine
     assert window.btn_air.isChecked() and e.sending
     window.btn_air.click()
     # your plain mic still goes out (tests/test_mic_only.py) unless it isn't sent
     assert not e.sending and "only your mic" in window.btn_air.accessibleName()
-    window.on_mic_toggle(False)
+    window.routectl.on_mic_toggle(False)
     assert "Muted" in window.btn_air.accessibleName()
     out = np.ones((64, 2), np.float32)
     e._main(out, 64)
