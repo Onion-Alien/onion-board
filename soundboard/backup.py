@@ -56,7 +56,7 @@ MAX_JSON = 4 << 20          # 4 MiB for a JSON file
 MAX_PICTURE = 64 << 20      # 64 MiB for a pad picture
 MAX_TOTAL = 8 << 30         # 8 GiB for everything one import writes
 DISK_SPARE = 256 << 20      # free space an import must leave behind
-# speech-to-text models the live voice may be told to load (ui.voicepanel.MODELS): any
+# speech-to-text models the live voice may be told to load (ui.speechpanel.MODELS): any
 # other name would make faster-whisper download that repo from Hugging Face
 SPEECH_MODELS = ("base.en", "tiny.en", "small.en", "base", "small")
 LANGUAGE_RE = re.compile(r"[a-z]{2,3}")
