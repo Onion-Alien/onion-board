@@ -276,7 +276,6 @@
   "Opened your sounds folder": "已開啟你的音效資料夾",
   "Others hear it": "別人聽得到",
   "Overlap: every press plays a new copy": "重疊：每按一次就播放一份新的",
-  "Pad size": "按鈕大小",
   "Page {value} of {n}": "第 {value} 頁，共 {n} 頁",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "把 YouTube 或 TikTok 連結貼到搜尋框，就能把它的聲音加成按鈕。",
   "Pause": "暫停",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "提供新應用程式設定",
   "One line each: many more sounds on the screen": "每行一行：螢幕上出現更多聲音",
   "Order and view": "訂購及查看",
-  "Pads": "護墊",
   "Save as sound": "另存為聲音",
   "Set up": "設定",
   "Set up for the app you're using": "針對您正在使用的應用程式進行設定",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "拖曳：移動他。滾輪：變大或變小。滑鼠移上去會出現按鈕。",
   "Open the full board": "開啟完整音效板",
   "Turn into Bun": "變成 Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "變成 Bun：一隻小小的 Bun 浮在最上層，取代這個視窗。他下面的按鈕能把視窗叫回來。"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "變成 Bun：一隻小小的 Bun 浮在最上層，取代這個視窗。他下面的按鈕能把視窗叫回來。",
+  "Row size": "列大小",
+  "How tall the rows in the list are": "清單中每列的高度",
+  "Small": "小",
+  "Medium": "中",
+  "Large": "大",
+  "Cards": "卡片"
 }

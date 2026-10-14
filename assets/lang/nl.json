@@ -282,7 +282,6 @@
   "Opened your sounds folder": "Je geluidenmap is geopend",
   "Others hear it": "Anderen horen het",
   "Overlap: every press plays a new copy": "Overlappen: elke druk speelt een nieuwe kopie",
-  "Pad size": "Padgrootte",
   "Page {value} of {n}": "Pagina {value} van {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Plak een YouTube- of TikTok-link in het zoekvak om het geluid als pad toe te voegen.",
   "Pause": "Pauze",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Bied aan om nieuwe apps in te stellen",
   "One line each: many more sounds on the screen": "Eén regel per stuk: veel meer geluiden op het scherm",
   "Order and view": "Bestel en bekijk",
-  "Pads": "Pads",
   "Save as sound": "Opslaan als geluid",
   "Set up": "Instellen",
   "Set up for the app you're using": "Instellen voor de app die u gebruikt",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Slepen: verplaats hem. Scrollen: groter of kleiner. Ga erover met je muis voor de knoppen.",
   "Open the full board": "Hele board openen",
   "Turn into Bun": "Verander in Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Verander in Bun: een kleine Bun die bovenop zweeft in plaats van dit venster. De knop onder hem haalt het terug."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Verander in Bun: een kleine Bun die bovenop zweeft in plaats van dit venster. De knop onder hem haalt het terug.",
+  "Row size": "Rijgrootte",
+  "How tall the rows in the list are": "Hoe hoog de rijen in de lijst zijn",
+  "Small": "Klein",
+  "Medium": "Middel",
+  "Large": "Groot",
+  "Cards": "Kaarten"
 }

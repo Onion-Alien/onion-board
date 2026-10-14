@@ -778,7 +778,6 @@
   "Overlap: every press plays a new copy": "Överlappa: varje tryck spelar en ny kopia",
   "Overlay": "Overlay",
   "Overlay hotkey": "Snabbtangent för overlay",
-  "Pad size": "Rutstorlek",
   "Page {value} of {n}": "Sida {value} av {n}",
   "Panic mute": "Paniktysta",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Klistra in en YouTube- eller TikTok-länk i sökrutan för att lägga till dess ljud som en ruta.",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Erbjud dig att konfigurera för nya appar",
   "One line each: many more sounds on the screen": "En rad vardera: många fler ljud på skärmen",
   "Order and view": "Beställ och se",
-  "Pads": "Kuddar",
   "Save as sound": "Spara som ljud",
   "Set up": "Inrätta",
   "Set up for the app you're using": "Konfigurera för appen du använder",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Dra: flytta honom. Scrolla: större eller mindre. Håll musen över honom för knapparna.",
   "Open the full board": "Öppna hela boardet",
   "Turn into Bun": "Bli Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli Bun: en liten Bun som svävar överst i stället för det här fönstret. Knappen under honom tar tillbaka det."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli Bun: en liten Bun som svävar överst i stället för det här fönstret. Knappen under honom tar tillbaka det.",
+  "Row size": "Radstorlek",
+  "How tall the rows in the list are": "Hur höga raderna i listan är",
+  "Small": "Liten",
+  "Medium": "Mellan",
+  "Large": "Stor",
+  "Cards": "Kort"
 }

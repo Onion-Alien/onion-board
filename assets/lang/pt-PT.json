@@ -778,7 +778,6 @@
   "Overlap: every press plays a new copy": "Sobrepor: cada toque toca uma cópia nova",
   "Overlay": "Sobreposição",
   "Overlay hotkey": "Atalho da sobreposição",
-  "Pad size": "Tamanho dos botões",
   "Page {value} of {n}": "Página {value} de {n}",
   "Panic mute": "Silenciar tudo",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Cola uma ligação do YouTube ou do TikTok na caixa de pesquisa para adicionar o som como botão.",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Ofereça-se para configurar novas aplicações",
   "One line each: many more sounds on the screen": "Uma linha cada: muito mais sons no ecrã",
   "Order and view": "Encomende e visualize",
-  "Pads": "Almofadas",
   "Save as sound": "Guardar como som",
   "Set up": "Configurar",
   "Set up for the app you're using": "Configure a aplicação que está a usar",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arrastar: movê-lo. Roda: maior ou mais pequeno. Passa o rato por cima para os botões.",
   "Open the full board": "Abrir o board completo",
   "Turn into Bun": "Tornar-se Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Tornar-se Bun: um Bun pequeno a flutuar por cima em vez desta janela. O botão por baixo dele trá-la de volta."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Tornar-se Bun: um Bun pequeno a flutuar por cima em vez desta janela. O botão por baixo dele trá-la de volta.",
+  "Row size": "Tamanho das linhas",
+  "How tall the rows in the list are": "Altura das linhas da lista",
+  "Small": "Pequeno",
+  "Medium": "Médio",
+  "Large": "Grande",
+  "Cards": "Cartões"
 }

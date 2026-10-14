@@ -276,7 +276,6 @@
   "Opened your sounds folder": "已打开你的音效文件夹",
   "Others hear it": "别人能听到",
   "Overlap: every press plays a new copy": "叠加：每按一次播放一份新的",
-  "Pad size": "按钮大小",
   "Page {value} of {n}": "第 {value} 页，共 {n} 页",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "把 YouTube 或 TikTok 链接粘贴到搜索框，就能把它的声音添加为按钮。",
   "Pause": "暂停",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "提供新应用设置",
   "One line each: many more sounds on the screen": "每行一行：屏幕上出现更多声音",
   "Order and view": "订购及查看",
-  "Pads": "护垫",
   "Save as sound": "另存为声音",
   "Set up": "设置",
   "Set up for the app you're using": "针对您正在使用的应用程序进行设置",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "拖动：移动他。滚轮：变大或变小。鼠标移上去会出现按钮。",
   "Open the full board": "打开完整音效板",
   "Turn into Bun": "变成 Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "变成 Bun：一个小小的 Bun 浮在最上层，代替这个窗口。他下面的按钮能把窗口找回来。"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "变成 Bun：一个小小的 Bun 浮在最上层，代替这个窗口。他下面的按钮能把窗口找回来。",
+  "Row size": "行大小",
+  "How tall the rows in the list are": "列表中每行的高度",
+  "Small": "小",
+  "Medium": "中",
+  "Large": "大",
+  "Cards": "卡片"
 }

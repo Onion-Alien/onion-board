@@ -790,7 +790,6 @@
   "Overlap: every press plays a new copy": "Překrývat: každý stisk přehraje novou kopii",
   "Overlay": "Překryv",
   "Overlay hotkey": "Zkratka překryvu",
-  "Pad size": "Velikost padů",
   "Page {value} of {n}": "Stránka {value} z {n}",
   "Panic mute": "Panické ztlumení",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Vlož odkaz z YouTube nebo TikToku do vyhledávání a jeho zvuk se přidá jako pad.",
@@ -2681,7 +2680,6 @@
   "Offer to set up for new apps": "Nabídněte nastavení pro nové aplikace",
   "One line each: many more sounds on the screen": "Každý jeden řádek: mnohem více zvuků na obrazovce",
   "Order and view": "Objednejte a prohlédněte si",
-  "Pads": "Vycpávky",
   "Save as sound": "Uložit jako zvuk",
   "Set up": "Nastavit",
   "Set up for the app you're using": "Nastavte pro aplikaci, kterou používáte",
@@ -3477,5 +3475,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Táhni: přesune ho. Kolečko: větší nebo menší. Najeď na něj pro tlačítka.",
   "Open the full board": "Otevřít celý board",
   "Turn into Bun": "Proměnit v Buna",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Proměnit v Buna: malý Bun plovoucí navrchu místo tohohle okna. Tlačítko pod ním ho vrátí."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Proměnit v Buna: malý Bun plovoucí navrchu místo tohohle okna. Tlačítko pod ním ho vrátí.",
+  "Row size": "Velikost řádků",
+  "How tall the rows in the list are": "Jak vysoké jsou řádky v seznamu",
+  "Small": "Malé",
+  "Medium": "Střední",
+  "Large": "Velké",
+  "Cards": "Karty"
 }

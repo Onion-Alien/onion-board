@@ -288,7 +288,6 @@
   "Opened your sounds folder": "Відкрито папку звуків",
   "Others hear it": "Інші чують",
   "Overlap: every press plays a new copy": "Накладання: кожне натискання грає нову копію",
-  "Pad size": "Розмір кнопок",
   "Page {value} of {n}": "Сторінка {value} з {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Встав посилання YouTube або TikTok у пошук, щоб додати його звук як кнопку.",
   "Pause": "Пауза",
@@ -2681,7 +2680,6 @@
   "Offer to set up for new apps": "Пропонувати налаштувати нові програми",
   "One line each: many more sounds on the screen": "По одному рядку: багато звуків на екрані",
   "Order and view": "Замовлення та перегляд",
-  "Pads": "колодки",
   "Save as sound": "Зберегти як звук",
   "Set up": "Налаштувати",
   "Set up for the app you're using": "Налаштуйте програму, якою ви користуєтеся",
@@ -3477,5 +3475,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Перетягни: посунути. Коліщатко: більший чи менший. Наведи мишу, щоб побачити кнопки.",
   "Open the full board": "Відкрити весь борд",
   "Turn into Bun": "Перетворитися на Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Перетворитися на Bun: маленький Bun літає поверх усього замість цього вікна. Кнопка під ним повертає вікно."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Перетворитися на Bun: маленький Bun літає поверх усього замість цього вікна. Кнопка під ним повертає вікно.",
+  "Row size": "Розмір рядків",
+  "How tall the rows in the list are": "Висота рядків у списку",
+  "Small": "Малий",
+  "Medium": "Середній",
+  "Large": "Великий",
+  "Cards": "Картки"
 }

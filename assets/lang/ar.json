@@ -306,7 +306,6 @@
   "Opened your sounds folder": "فُتح مجلد أصواتك",
   "Others hear it": "الآخرون يسمعونه",
   "Overlap: every press plays a new copy": "تداخل: كل ضغطة تشغّل نسخة جديدة",
-  "Pad size": "حجم الزر",
   "Page {value} of {n}": "الصفحة {value} من {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "الصق رابط YouTube أو TikTok في خانة البحث لإضافة صوته كزر.",
   "Pause": "إيقاف مؤقت",
@@ -2858,7 +2857,6 @@
   "Offer to set up for new apps": "عرض لإعداد تطبيقات جديدة",
   "One line each: many more sounds on the screen": "سطر واحد لكل منهما: العديد من الأصوات التي تظهر على الشاشة",
   "Order and view": "النظام والعرض",
-  "Pads": "منصات",
   "Save as sound": "حفظ كصوت",
   "Set up": "يثبت",
   "Set up for the app you're using": "قم بالإعداد للتطبيق الذي تستخدمه",
@@ -3705,5 +3703,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "اسحب: لتحريكه. مرّر العجلة: أكبر أو أصغر. مرّر الماوس فوقه لتظهر الأزرار.",
   "Open the full board": "فتح اللوحة كاملة",
   "Turn into Bun": "تحوّل إلى Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها.",
+  "Row size": "حجم الصف",
+  "How tall the rows in the list are": "ارتفاع الصفوف في القائمة",
+  "Small": "صغير",
+  "Medium": "متوسط",
+  "Large": "كبير",
+  "Cards": "بطاقات"
 }

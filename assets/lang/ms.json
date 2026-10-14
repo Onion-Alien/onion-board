@@ -766,7 +766,6 @@
   "Overlap: every press plays a new copy": "Bertindih: setiap tekanan memainkan salinan baharu",
   "Overlay": "Overlay",
   "Overlay hotkey": "Hotkey overlay",
-  "Pad size": "Saiz pad",
   "Page {value} of {n}": "Halaman {value} daripada {n}",
   "Panic mute": "Senyap panik",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Tampal pautan YouTube atau TikTok ke dalam kotak carian untuk menambah bunyinya sebagai pad.",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "Tawarkan untuk menyediakan apl baharu",
   "One line each: many more sounds on the screen": "Satu baris setiap satu: banyak lagi bunyi pada skrin",
   "Order and view": "Pesanan dan lihat",
-  "Pads": "Pad",
   "Save as sound": "Simpan sebagai bunyi",
   "Set up": "Sediakan",
   "Set up for the app you're using": "Sediakan untuk apl yang anda gunakan",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: alihkan dia. Skrol: lebih besar atau lebih kecil. Halakan tetikus untuk butangnya.",
   "Open the full board": "Buka board penuh",
   "Turn into Bun": "Jadi Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil terapung di atas menggantikan tetingkap ini. Butang di bawahnya membawanya kembali."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil terapung di atas menggantikan tetingkap ini. Butang di bawahnya membawanya kembali.",
+  "Row size": "Saiz baris",
+  "How tall the rows in the list are": "Ketinggian baris dalam senarai",
+  "Small": "Kecil",
+  "Medium": "Sederhana",
+  "Large": "Besar",
+  "Cards": "Kad"
 }

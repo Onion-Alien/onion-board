@@ -719,7 +719,6 @@
   "Otherwise, double-click to play. Ctrl+click selects without playing.": "Иначе двоен клик, за да пуснеш. Ctrl+клик избира, без да пуска.",
   "Overlay": "Овърлей",
   "Overlay hotkey": "Бърз клавиш за овърлея",
-  "Pad size": "Размер на бутоните",
   "Page {value} of {n}": "Страница {value} от {n}",
   "Panic mute": "Паник заглушаване",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Постави линк от YouTube или TikTok в полето за търсене, за да добавиш звука му като бутон.",
@@ -2521,7 +2520,6 @@
   "Offer to set up for new apps": "Оферта за настройка за нови приложения",
   "One line each: many more sounds on the screen": "По един ред всеки: много повече звуци на екрана",
   "Order and view": "Поръчайте и разгледайте",
-  "Pads": "Подложки",
   "Save as sound": "Запазване като звук",
   "Set up": "Настройка",
   "Set up for the app you're using": "Настройте за приложението, което използвате",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Влачене: мести го. Колелце: по-голям или по-малък. Посочи го за бутоните.",
   "Open the full board": "Отвори целия борд",
   "Turn into Bun": "Превърни се в Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Превърни се в Bun: малък Bun, който плава отгоре вместо този прозорец. Бутонът под него го връща."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Превърни се в Bun: малък Bun, който плава отгоре вместо този прозорец. Бутонът под него го връща.",
+  "Row size": "Размер на редовете",
+  "How tall the rows in the list are": "Колко високи са редовете в списъка",
+  "Small": "Малък",
+  "Medium": "Среден",
+  "Large": "Голям",
+  "Cards": "Карти"
 }

@@ -276,7 +276,6 @@
   "Opened your sounds folder": "사운드 폴더를 열었어요",
   "Others hear it": "다른 사람이 들어요",
   "Overlap: every press plays a new copy": "겹치기: 누를 때마다 새로 재생",
-  "Pad size": "패드 크기",
   "Page {value} of {n}": "{value} / {n} 페이지",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "검색창에 YouTube나 TikTok 링크를 붙여넣으면 그 소리를 패드로 추가할 수 있어요.",
   "Pause": "일시정지",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "새 앱 설정 제안",
   "One line each: many more sounds on the screen": "한 줄씩: 화면에 더 많은 소리가 표시됩니다.",
   "Order and view": "주문 및 보기",
-  "Pads": "패드",
   "Save as sound": "소리로 저장",
   "Set up": "설정",
   "Set up for the app you're using": "사용 중인 앱에 맞게 설정",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "드래그: 옮기기. 스크롤: 크게 또는 작게. 마우스를 올리면 버튼이 나와요.",
   "Open the full board": "전체 보드 열기",
   "Turn into Bun": "Bun으로 변신",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun으로 변신: 이 창 대신 작은 Bun이 맨 위에 떠 있어요. 아래 버튼을 누르면 돌아와요."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun으로 변신: 이 창 대신 작은 Bun이 맨 위에 떠 있어요. 아래 버튼을 누르면 돌아와요.",
+  "Row size": "행 크기",
+  "How tall the rows in the list are": "목록의 행 높이",
+  "Small": "작게",
+  "Medium": "보통",
+  "Large": "크게",
+  "Cards": "카드"
 }

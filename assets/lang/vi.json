@@ -276,7 +276,6 @@
   "Opened your sounds folder": "Đã mở thư mục âm thanh của bạn",
   "Others hear it": "Người khác nghe",
   "Overlap: every press plays a new copy": "Chồng lên: mỗi lần bấm phát một bản mới",
-  "Pad size": "Cỡ nút",
   "Page {value} of {n}": "Trang {value}/{n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Dán link YouTube hoặc TikTok vào ô tìm kiếm để thêm âm thanh của nó thành nút.",
   "Pause": "Tạm dừng",
@@ -2563,7 +2562,6 @@
   "Offer to set up for new apps": "Đề nghị thiết lập cho các ứng dụng mới",
   "One line each: many more sounds on the screen": "Mỗi dòng một: nhiều âm thanh khác trên màn hình",
   "Order and view": "Đặt hàng và xem",
-  "Pads": "Miếng đệm",
   "Save as sound": "Lưu dưới dạng âm thanh",
   "Set up": "Cài đặt",
   "Set up for the app you're using": "Thiết lập cho ứng dụng bạn đang sử dụng",
@@ -3325,5 +3323,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Kéo: di chuyển cậu ấy. Cuộn: to hơn hoặc nhỏ hơn. Di chuột lên để thấy các nút.",
   "Open the full board": "Mở toàn bộ board",
   "Turn into Bun": "Biến thành Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại.",
+  "Row size": "Cỡ hàng",
+  "How tall the rows in the list are": "Độ cao của các hàng trong danh sách",
+  "Small": "Nhỏ",
+  "Medium": "Vừa",
+  "Large": "Lớn",
+  "Cards": "Thẻ"
 }

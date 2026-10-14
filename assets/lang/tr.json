@@ -282,7 +282,6 @@
   "Opened your sounds folder": "Ses klasörün açıldı",
   "Others hear it": "Diğerleri duyar",
   "Overlap: every press plays a new copy": "Üst üste: her basış yeni bir kopya çalar",
-  "Pad size": "Pad boyutu",
   "Page {value} of {n}": "Sayfa {value} / {n}",
   "Paste a YouTube or TikTok link into the search box to add its sound as a pad.": "Bir YouTube ya da TikTok bağlantısını arama kutusuna yapıştır, sesini pad olarak ekle.",
   "Pause": "Duraklat",
@@ -2622,7 +2621,6 @@
   "Offer to set up for new apps": "Yeni uygulamalar için kurulum teklifinde bulunun",
   "One line each: many more sounds on the screen": "Her biri bir satır: ekranda çok daha fazla ses",
   "Order and view": "Sipariş verin ve görüntüleyin",
-  "Pads": "Pedler",
   "Save as sound": "Ses olarak kaydet",
   "Set up": "Kurmak",
   "Set up for the app you're using": "Kullandığınız uygulama için kurulum",
@@ -3401,5 +3399,11 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Sürükle: onu taşı. Kaydır: büyüt veya küçült. Düğmeler için üzerine gel.",
   "Open the full board": "Tüm board'u aç",
   "Turn into Bun": "Bun'a dönüş",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun'a dönüş: bu pencere yerine en üstte süzülen küçük bir Bun. Altındaki düğme pencereyi geri getirir."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun'a dönüş: bu pencere yerine en üstte süzülen küçük bir Bun. Altındaki düğme pencereyi geri getirir.",
+  "Row size": "Satır boyutu",
+  "How tall the rows in the list are": "Listedeki satırların yüksekliği",
+  "Small": "Küçük",
+  "Medium": "Orta",
+  "Large": "Büyük",
+  "Cards": "Kartlar"
 }
