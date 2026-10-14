@@ -1358,13 +1358,18 @@ class Engine:
         return s if self.main_direct and isinstance(s, directmic.DirectMicStream) else None
 
     def _mic_direct(self, x: np.ndarray, rate: int):
-        """A block of the clean mic, from the mic effect (its stream's thread)."""
-        if rate != self.rates["mic"]:
-            log.info("mic rate %d -> %d (the mic effect's)", self.rates["mic"], rate)
-            self.rates["mic"] = rate
-            self._reconfigure_mic_resamplers()
-        self._last_cb["mic"] = time.monotonic()
-        self._mic(x, direct=True)
+        """A block of the clean mic, from the mic effect (its stream's thread). Guarded
+        like the device mic's callback (_cb_mic): a failing block is counted and logged
+        once, and the feed goes on."""
+        try:
+            if rate != self.rates["mic"]:
+                log.info("mic rate %d -> %d (the mic effect's)", self.rates["mic"], rate)
+                self.rates["mic"] = rate
+                self._reconfigure_mic_resamplers()
+            self._last_cb["mic"] = time.monotonic()
+            self._mic(x, direct=True)
+        except Exception as e:  # noqa: BLE001
+            self._guard("mic", e)
 
     def _mic_direct_stopped(self):
         """The mic effect's clean mic stopped (its stream's thread, under its lock):
@@ -2440,38 +2445,7 @@ class Engine:
             self._guard("mic", e)
 
     def _main(self, outdata, frames):
-        idle = self._bus_idle("main", frames)   # nothing to mix: the sounds bus is silence
-        if idle:
-            mix = np.zeros((frames, CH), np.float32)
-            self._glides[("main", "sounds")] = float(self.sound_vol)
-            play = 0.0
-        else:
-            self._wake_bus("main")
-            mix = self._vol("main", "sounds", self._sounds("main", frames), self.sound_vol)
-            play = peak(mix)
-        take = self._play_take   # read once: the UI may end it meanwhile
-        took = mix.copy() if take is not None and self.play_take_out == "main" else None
-        r = self.ring_rmain.read(frames)
-        if r is not None:
-            r = self._live("main", "radio", r)
-            idle = False
-            play = max(play, peak(r) * self.radio_vol)
-            mix += self._vol("main", "radio", r, self.radio_vol if self.radio_live else 0.0)
-            if took is not None:   # the radio as you hear it, sent out or not
-                took += r * np.float32(self.radio_vol)
-        if took is not None and take is not None:
-            take.append(took)
-        lowcut = self._lowcut()
-        apps = None
-        for a in self.aux:
-            x = a.ring_main.read(frames)
-            if x is not None:
-                idle = False
-                play = max(play, peak(x) * a.vol)
-                g = a.gain("main", lowcut) if a.live else 0.0
-                apps = _add(apps, self._vol("main", ("aux", a.key), x, g))
-        if apps is not None:
-            mix += self._live("main", "apps", apps)
+        mix, idle, play = self._bus("main", frames, self.sound_vol)
         self.level_play = max(play, self.level_play * 0.85)
         # off with only your voice going out (mic_only): the sounds, radio and programs
         # fade out here, before the mic goes in; the send stage below stays open
@@ -2555,46 +2529,12 @@ class Engine:
             return
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
-        idle = not check and self._bus_idle("mon", frames)
-        if idle:
-            mix = np.zeros((frames, CH), np.float32)
-            self._glides[("mon", "sounds")] = 1.0
-            play = 0.0
-        else:
-            self._wake_bus("mon")
-            mix = self._sounds("mon", frames,
-                               previews_only=not (check and not voice or self.monitor_sounds))
+        hear = check and not voice
+        mix, idle, play = self._bus("mon", frames, self.sound_vol if hear else 1.0, hear=hear,
+                                    can_idle=not check,
+                                    previews_only=not (hear or self.monitor_sounds))
         m = self.ring_mon.read(frames)
-        if not idle:
-            mix = self._vol("mon", "sounds", mix,
-                            self.sound_vol if check and not voice else 1.0)
-            # the main output sees the rest; this one counts with no send device too
-            play = peak(mix)
-        take = self._play_take   # no send device: what's playing is recorded from here
-        took = mix.copy() if take is not None and self.play_take_out == "mon" else None
-        r = self.ring_rmon.read(frames)
-        if r is not None:
-            r = self._live("mon", "radio", r)
-            idle = False
-            play = max(play, peak(r) * self.radio_vol)
-            on = self.radio_monitor or (check and not voice and self.radio_live)
-            mix += self._vol("mon", "radio", r, self.radio_vol if on else 0.0)
-            if took is not None:
-                took += r * np.float32(self.radio_vol)
-        if took is not None and take is not None:
-            take.append(took)
-        lowcut = self._lowcut()   # the headphones get the mode's shaping too (_dest)
-        apps = None
-        for a in self.aux:
-            x = a.ring_mon.read(frames)
-            if x is not None:
-                idle = False
-                play = max(play, peak(x) * a.vol)
-                on = a.monitor or (check and not voice and a.live)
-                apps = _add(apps, self._vol("mon", ("aux", a.key), x,
-                                            a.gain("mon", lowcut) if on else 0.0))
-        if apps is not None:
-            mix += self._live("mon", "apps", apps)
+        # the main output sees the rest; this one counts with no send device too
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
         if idle:   # silence all the way: only the volume's glide and the limiter to keep
             self._bus_quiet("mon", mix, silent=True)
@@ -2652,21 +2592,12 @@ class Engine:
     def _obs(self, outdata, frames):
         """The stream output: what others get (sounds, the live radio and programs,
         your mic if obs_voice), clean: no voice chat shaping, no mono, its own volume."""
-        mix = self._sounds("obs", frames, makeup=False)   # clean: no _dest, so no makeup
-        mix = self._vol("obs", "sounds", mix, self.sound_vol)
-        r = self.ring_robs.read(frames)
-        if r is not None:
-            r = self._live("obs", "radio", r)
-            mix += self._vol("obs", "radio", r, self.radio_vol if self.radio_live else 0.0)
-        apps = None
-        for a in self.aux:
-            x = a.ring_obs.read(frames)
-            if x is not None:
-                apps = _add(apps, self._vol("obs", ("aux", a.key), x,
-                                            a.vol if a.stream else 0.0))
-        if apps is not None:
-            mix += self._live("obs", "apps", apps)
-        mix = self._eq("obs", "sounds", finite(mix))
+        # clean: no _dest, so no makeup
+        mix, idle, _ = self._bus("obs", frames, self.sound_vol, makeup=False)
+        if not idle:
+            finite(mix)
+        if not self._bus_quiet("obs", mix, silent=idle):   # else its EQ has rung out
+            mix = self._eq("obs", "sounds", mix)
         m = self.ring_obs.read(frames)
         if m is None:
             self._glides[("obs", "mic")] = 0.0   # nothing coming: it fades in when it does
@@ -2675,13 +2606,92 @@ class Engine:
             if on or self._glides.get(("obs", "mic"), 0.0):   # on, or still fading out
                 m = self._vol("obs", "mic", self._gated("obs", m), self.mic_vol if on else 0.0)
                 mix += self._eq("obs", "voice", m)
+                idle = False
         # muted: the stream gets silence too (faded, not cut)
-        mix = self._vol("obs", "out", mix, self.obs_vol if self.sending else 0.0)
-        if self.limiter_on:
-            mix = self._stage("obs", Limiter).process(mix)
-        mix = self._stage("obs", SafetyLimiter).process(mix)
+        out_vol = self.obs_vol if self.sending else 0.0
+        if idle:   # silence all the way: only the volume's glide and the limiters to keep
+            self._glides[("obs", "out")] = float(out_vol)
+            y = self._stage("obs", Limiter).silence(frames) if self.limiter_on else None
+            safety = self._stage("obs", SafetyLimiter)
+            y = safety.silence(frames) if y is None else safety.process(y)
+            if y is None:
+                outdata.fill(0)
+                self.level_obs *= 0.85
+                return
+            mix = y
+        else:
+            mix = self._vol("obs", "out", mix, out_vol)
+            if self.limiter_on:
+                mix = self._stage("obs", Limiter).process(mix)
+            mix = self._stage("obs", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_obs = max(peak(mix), self.level_obs * 0.85)
+
+    def _bus(self, out: str, frames: int, sounds_vol: float, hear: bool = False,
+             can_idle: bool = True, previews_only: bool = False,
+             makeup: bool = True) -> tuple[np.ndarray, bool, float]:
+        """How _main, _mon and _obs all start: the block of `out`'s sounds bus, with
+        the sounds at `sounds_vol` and the live radio and captured programs at the
+        volumes `out` gives them (_radio_on, _aux_gain). With nothing to mix
+        (_bus_idle, when `can_idle`) the mixer is skipped and the bus is zeros.
+        Returns the bus, whether it is that silence, and the loudest of what's playing
+        (level_play). `hear`: the headphones hear what others get (mic check). The
+        play take is recorded here too, on the output it's taken from."""
+        idle = can_idle and self._bus_idle(out, frames)
+        if idle:
+            mix = np.zeros((frames, CH), np.float32)
+            self._glides[(out, "sounds")] = float(sounds_vol)
+            play = 0.0
+        else:
+            self._wake_bus(out)
+            mix = self._vol(out, "sounds",
+                            self._sounds(out, frames, previews_only, makeup=makeup), sounds_vol)
+            play = peak(mix)
+        take = self._play_take   # read once: the UI may end it meanwhile
+        took = mix.copy() if take is not None and self.play_take_out == out else None
+        ring = (self.ring_rmain if out == "main" else
+                self.ring_rmon if out == "mon" else self.ring_robs)
+        r = ring.read(frames)
+        if r is not None:
+            r = self._live(out, "radio", r)
+            idle = False
+            play = max(play, peak(r) * self.radio_vol)
+            on = self._radio_on(out, hear)
+            mix += self._vol(out, "radio", r, self.radio_vol if on else 0.0)
+            if took is not None:   # the radio as you hear it, sent out or not
+                took += r * np.float32(self.radio_vol)
+        if took is not None and take is not None:
+            take.append(took)
+        lowcut = self._lowcut() if out != "obs" else 0   # the stream output is clean
+        apps = None
+        for a in self.aux:
+            ring = a.ring_main if out == "main" else a.ring_mon if out == "mon" else a.ring_obs
+            x = ring.read(frames)
+            if x is not None:
+                idle = False
+                play = max(play, peak(x) * a.vol)
+                apps = _add(apps, self._vol(out, ("aux", a.key), x,
+                                            self._aux_gain(out, a, lowcut, hear)))
+        if apps is not None:
+            mix += self._live(out, "apps", apps)
+        return mix, idle, play
+
+    def _radio_on(self, out: str, hear: bool) -> bool:
+        """The radio is heard on `out`: others and the stream output get it while it's
+        live; the headphones when you listen to it, or hear what's sent while it's live."""
+        if out == "mon":
+            return self.radio_monitor or (hear and self.radio_live)
+        return self.radio_live
+
+    @staticmethod
+    def _aux_gain(out: str, a: AuxSource, lowcut: int, hear: bool) -> float:
+        """A captured program's volume on `out` (0: not on it). Others and the
+        headphones get the make-up for the mode's low cut (AuxSource.gain, the
+        headphones get the mode's shaping too); the stream output gets it clean."""
+        if out == "obs":
+            return a.vol if a.stream else 0.0
+        on = a.live if out == "main" else (a.monitor or (hear and a.live))
+        return a.gain(out, lowcut) if on else 0.0
 
     def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None,
                   add_mic: bool = True, silent: bool = False) -> np.ndarray:
