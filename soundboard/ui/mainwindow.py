@@ -2710,10 +2710,13 @@ class MainWindow(QMainWindow):
             return
         self.cfg.latency = mode
         self.engine.latency = mode
-        self.engine.reopen_all()
         self._save_now()
-        self._update_status()
-        self._say_back_on_mic()
+        e = self.engine
+
+        def reopened(_):
+            self._update_status()
+            self._say_back_on_mic()
+        self._device_job(lambda: e.reopen_all, reopened)   # (on the device thread)
 
     def _say_back_on_mic(self):
         """After a restart or an audio buffering change: tell them the board is on the
@@ -3217,14 +3220,24 @@ class MainWindow(QMainWindow):
         """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
         for streaming. None switches it off."""
         self.cfg.obs_device = name
-        self.engine.set_obs_device(self._obs_name(name))
-        copies = self._copy_names()   # (a copy row on it may be free to open again)
-        if list(self.engine.copy_names) != copies:
-            self.engine.set_copy_devices(copies)
         self._show_route()            # the rows
         self._save_now()
-        self._update_status()
-        self._prepare_all()
+        e = self.engine
+
+        def plan():   # the streams are opened on the device thread (_device_job)
+            obs = self._obs_name(name)
+            copies = self._copy_names()   # (a copy row on it may be free to open again)
+
+            def work():
+                e.set_obs_device(obs)
+                if list(e.copy_names) != copies:
+                    e.set_copy_devices(copies)
+            return work
+
+        def opened(_):
+            self._update_status()
+            self._prepare_all()
+        self._device_job(plan, opened)
 
     def set_send_kind(self, name: str, stream: bool):
         """Also send to: the row on `name` gets the clean stream mix (`stream`; the
