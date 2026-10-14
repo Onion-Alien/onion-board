@@ -213,6 +213,24 @@ def test_headphones_over_100_percent_get_louder_not_just_limited():
     assert loud_boost(x, 1.0) is x and np.array_equal(x, song[:BLOCK])
 
 
+def test_sounds_at_1000_percent_go_out_louder_than_at_300():
+    # what others get ended in the send limiter: 300 % and 1000 % came out the same
+    from soundboard.engine import LOUD_SEND, loud_boost
+    from soundboard.sendfx import Limiter
+    rng = np.random.default_rng(2)
+    song = np.clip(rng.normal(0, 0.15, (SR * 2, 2)), -1, 1).astype(np.float32)
+
+    def rms_db(vol):
+        lim = Limiter(SR)
+        y = np.concatenate([lim.process(loud_boost(song[i:i + BLOCK] * np.float32(vol),
+                                                   vol, LOUD_SEND))
+                            for i in range(0, len(song), BLOCK)])[SR // 2:]
+        assert np.max(np.abs(y)) <= LOUD_SEND + 1e-6
+        return 20 * np.log10(np.sqrt(np.mean(y.astype(np.float64) ** 2)))
+
+    assert rms_db(10.0) > rms_db(3.0) + 3.0 > rms_db(1.0) + 3.0
+
+
 def test_loud_masters_are_stored_without_flat_tops():
     # a loud master decodes ~1 dB over full scale: clipped into the 16-bit cache, every
     # peak had a flat top (crackle). It's turned down around the peaks instead.

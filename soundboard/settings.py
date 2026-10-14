@@ -9,88 +9,32 @@ import re
 import threading
 import time
 from collections.abc import Callable
+from typing import Any
 
-from PySide6.QtCore import (QObject, QPoint, QPointF, QRectF, QSignalBlocker, QSize, Qt, QTimer,
-                            Signal)
-from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QImage, QKeySequence, QPainter,
-                           QPainterPath, QPixmap, QShortcut)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QCheckBox,
-                               QColorDialog, QComboBox,
-                               QDialog, QFrame,
-                               QGridLayout,
-                               QHBoxLayout, QLabel, QLayout, QLineEdit, QListWidget,
-                               QListWidgetItem,
-                               QPushButton, QRadioButton, QScrollArea, QSlider, QStyle,
+from PySide6.QtCore import QObject, QPoint, QPointF, QSignalBlocker, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QIcon, QImage, QKeySequence, QPainter, QPixmap, QShortcut
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
+                               QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget,
+                               QListWidgetItem, QPushButton, QScrollArea, QStyle,
                                QStyleOptionButton, QTabWidget, QVBoxLayout, QWidget)
 
 from shiboken6 import isValid as qt_valid
 
-from soundboard import appsetup, autostart, midi, profiles, theme, winkeys, ytdl
-from soundboard.ui import busy, fit, icons
-from soundboard.ui import overlay as ovl
+from soundboard import appsetup, autostart, profiles, theme, ytdl
+from soundboard.ui import busy, icons
 from soundboard.wheelguard import no_wheel
-from soundboard.winkeys import Hotkeys
-from soundboard import errors, i18n, usage
-from soundboard.i18n import _, ngettext
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard import errors, usage
+from soundboard.i18n import _
+from soundboard.ui.settingspages import _button_row
+from soundboard.ui.settingspages.help import HelpPage
+from soundboard.ui.settingspages.audio import AudioPage
+from soundboard.ui.settingspages.appearance import AppearancePage, ThemeCard, ThemeGrid as ThemeGrid
+from soundboard.ui.settingspages.keys import (KeysPage, HOTKEY_ACTIONS as HOTKEY_ACTIONS,
+                                              HotkeyDialog as HotkeyDialog,
+                                              pretty_key as pretty_key)
 
 log = logging.getLogger(__name__)
 
-# Global hotkey actions: (config attribute, action id, label, what it does).
-# Grouped for the Settings window; the action ids go to HotkeyControl.on_hotkey.
-HOTKEY_GROUPS = [
-    (_("Sounds"), [
-        ("stop_hotkey", "__stop__", _("Stop everything"),
-         _("Stops every sound, the radio and every program, and turns the voices off.")),
-        ("pause_hotkey", "__pause__", _("Pause / resume sounds"),
-         _("Pauses everything playing; press again to carry on.")),
-        ("skip_hotkey", "__skip__", _("Skip to the next sound"),
-         _("Stops the sound playing and starts the next one in Up next. With nothing "
-           "waiting, it just stops the sound.")),
-        ("random_hotkey", "__random__", _("Play a random sound"),
-         _("From the category showing (All = any sound), never the same one twice in a row. "
-           "A category can have its own: right-click its tab.")),
-        ("last_hotkey", "__last__", _("Play the last sound again"),
-         _("Whatever played last, from a pad, a hotkey or the random key.")),
-        ("vol_up_hotkey", "__volup__", _("Sounds louder"),
-         _("Turns your sounds up by 10% (what others hear and what you hear).")),
-        ("vol_down_hotkey", "__voldown__", _("Sounds quieter"),
-         _("Turns your sounds down by 10%.")),
-    ]),
-    (_("Categories"), [
-        ("next_cat_hotkey", "__nextcat__", _("Next category"),
-         _("Shows the next category's pads. The random-sound key and the overlay follow it, "
-           "so one key plays a random sound from whichever category you switched to.")),
-        ("prev_cat_hotkey", "__prevcat__", _("Previous category"),
-         _("Shows the category before it.")),
-    ]),
-    (_("Mic and voice"), [
-        ("mic_hotkey", "__mic__", _("Send my mic on / off"),
-         _("Others hear your voice with the sounds, or only the sounds.")),
-        ("voice_hotkey", "__voice__", _("Voice changer on / off"),
-         _("Turns the voice changer on with the voice picked on the Voice tab, or off.")),
-        ("voice_hold_hotkey", "__voicehold__", _("Change my voice while held"),
-         _("The voice changer is on only while you hold this key down.")),
-    ]),
-    (_("Turn hotkeys off"), [
-        ("hotkeys_off_hotkey", "__hotkeys__", _("All hotkeys off / on"),
-         _("Turns every other hotkey off, so they type normally (in chat, say), and back "
-           "on. Hotkeys are always on when Onion Board opens.")),
-    ]),
-    (_("Instant replay"), [
-        ("replay_hotkey", "__replay__", _("Save what you just heard"),
-         _("Turns instant replay on: the last 30 seconds of everything your PC plays (a "
-           "friend in Discord, the game, a video; not Onion Board's own sounds) are kept "
-           "in memory, and this key adds them to your Sounds as a pad. Nothing is saved "
-           "until you press it. Clear the key to switch it off. Only keep clips of people "
-           "who are fine with it: in some places, recording a call needs everyone's OK.")),
-    ]),
-    (_("Overlay"), [
-        ("overlay_hotkey", "__overlay__", _("Open the in-game overlay"),
-         _("Sound tiles over your game; pick one with the number keys. See the Overlay tab.")),
-    ]),
-]
-HOTKEY_ACTIONS = [a for __, group in HOTKEY_GROUPS for a in group]
 
 # Settings > About. The note is the author's own words, kept casual on purpose.
 NOTE = _("Hey, thanks for actually using this. Onion Board started because every soundboard "
@@ -100,158 +44,6 @@ NOTE = _("Hey, thanks for actually using this. Onion Board started because every
           "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
           "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
           "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
-# Plain words, not a contract: the LICENSE file is the real terms.
-DISCLAIMER = _(
-    "Onion Board is provided as is, with no warranty: use it at your own risk (the "
-    "LICENSE file has the full terms). In plain words:"
-    "<ul style='margin-left:-24px'>"
-    "<li><b>Your sounds are on you.</b> It comes with none of its own. Only download, "
-    "play or stream things you have the right to use, and follow the rules of the sites "
-    "you get them from.</li>"
-    "<li><b>Recording people.</b> Instant replay and radio clips record what your PC "
-    "plays. Some places need everyone's OK to record a call, so ask first.</li>"
-    "<li><b>Voices.</b> Don't use the voice changer or text-to-speech to pretend to be "
-    "a real person, to scam or to harass anyone.</li>"
-    "<li><b>Games and servers.</b> Some servers and games don't allow soundboards or "
-    "voice changers. Onion Board never changes a game's files or reads its memory, but whether a "
-    "server is OK with it is their call, and your account.</li>"
-    "<li><b>Your ears.</b> Keep an eye on the volume, yours and your friends'.</li>"
-    "<li><b>Names.</b> Discord, YouTube, VB-Audio and every other product named here "
-    "belong to their owners. Onion Board isn't affiliated with or endorsed by any of "
-    "them.</li>"
-    "<li><b>Other people's code.</b> Parts of Onion Board (Qt, yt-dlp and more) "
-    "come under their own licenses; THIRD-PARTY-NOTICES.txt next to the app lists "
-    "them.</li></ul>")
-
-
-def pretty_key(combo: str) -> str:
-    if not combo:
-        return ""
-    if midi.is_midi(combo):
-        return midi.pretty(combo)
-
-    def part(p: str) -> str:
-        if len(p) > 1:
-            return p.title()
-        if not p.isalnum() and p in winkeys.VK:   # punctuation: as printed on this keyboard
-            return (winkeys.key_char(winkeys.VK[p]) or p).upper()
-        return p.upper()
-    return "+".join(part(p.strip()) for p in combo.split("+"))
-
-
-def _button_row():
-    """Buttons side by side at their own width, wrapping onto a second line only when
-    Settings is too narrow (stacked full-width buttons looked like a form)."""
-    from soundboard.ui.panel import Flow   # panel imports this module
-    return Flow(gap=8)
-
-
-class HotkeyDialog(QDialog):
-    """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller."""
-
-    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
-        self.setWindowTitle(_("Set hotkey"))
-        self.result_combo = None
-        self._midi = hotkeys.midi if pads else None
-        lay = QVBoxLayout(self)
-        t = QLabel(_("Press the key or combo you want…"))
-        t.setStyleSheet("font-size:16px; font-weight:600;")
-        lay.addWidget(t)
-        self.hint = QLabel(_("Works globally, even while in-game.  Esc = cancel."))
-        self.hint.setWordWrap(True)
-        lay.addWidget(self.hint)
-        self.pads_note = QLabel()
-        self.pads_note.setObjectName("hint")
-        self.pads_note.setWordWrap(True)
-        lay.addWidget(self.pads_note)
-        # a way out on screen too (Esc and the title bar's ✕ were the only ones); it
-        # takes no focus, so the keys pressed here all go to the capture
-        cancel = QPushButton(_("Cancel"))
-        cancel.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        cancel.setAutoDefault(False)
-        cancel.clicked.connect(self.reject)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        row.addWidget(cancel)
-        lay.addLayout(row)
-        self._warned_vk = None
-        self.setMinimumWidth(340)
-        hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
-        if self._midi is not None:
-            self._midi.pressed.connect(self._on_pad)
-            self._midi.busy_changed.connect(self._show_pads)
-            self._midi.capture(True)
-            self.finished.connect(self._stop_pads)
-        self._show_pads()
-
-    def _show_pads(self, *__):
-        if self._midi is None:
-            self.pads_note.hide()
-            return
-        found = self._midi.devices()
-        busy = set(self._midi.busy)
-        free = [d for d in found if d not in busy]
-        lines = []
-        if free:
-            lines.append(_("…or hit a pad on {devices}.", devices=", ".join(free)))
-        if busy:
-            warn = theme.status("warn")
-            lines.append(_("<span style='color:{warn}'>{devices} is open in another program "
-                           "(a music app?), so its pads can't be used here. Close that "
-                           "program and it's picked up in a few seconds.</span>",
-                           warn=warn, devices=", ".join(sorted(busy))))
-        self.pads_note.setText("<br>".join(lines))
-        self.pads_note.setVisible(bool(lines))
-
-    def _on_pad(self, combo: str):
-        if self.result_combo is None and self.isVisible():
-            self.result_combo = combo
-            self.accept()
-
-    def _stop_pads(self):
-        midi = self._midi
-        assert midi is not None   # only connected with one
-        try:
-            midi.pressed.disconnect(self._on_pad)
-            midi.busy_changed.disconnect(self._show_pads)
-        except (RuntimeError, TypeError):
-            pass
-        midi.capture(False)
-
-    def keyPressEvent(self, e):
-        vk = e.nativeVirtualKey()
-        if vk == 0x1B:            # Esc
-            self.reject()
-            return
-        if vk in winkeys.MODIFIER_VKS or not vk:
-            return                # wait for the real key
-        m = e.modifiers()
-        mods = ((winkeys.MOD_CONTROL if m & Qt.KeyboardModifier.ControlModifier else 0)
-                | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
-                | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
-                | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
-        if not mods and is_typing_key(vk) and self._warned_vk != vk:
-            # a global hotkey takes the key away from every other program: warn once
-            self._warned_vk = vk
-            key = pretty_key(winkeys.combo_name(0, vk))
-            warn = theme.status("warn")
-            self.hint.setText(_("<span style='color:{warn}'><b>{key}</b> on its own would stop "
-                                "working for typing everywhere (chat, games, browser). Add Ctrl, "
-                                "Alt or Shift, or press it again to use it anyway.</span>",
-                                warn=warn, key=key))
-            return
-        self.result_combo = winkeys.combo_name(mods, vk)
-        self.accept()
-
-
-def is_typing_key(vk: int) -> bool:
-    """Letters, digits, punctuation, Space, Enter, Tab, Backspace, arrows: keys people
-    type with. F-keys, the numpad, Insert/Home/…, media keys are fine bare."""
-    return (0x30 <= vk <= 0x39 or 0x41 <= vk <= 0x5A or 0xBA <= vk <= 0xC0
-            or 0xDB <= vk <= 0xDF or 0x25 <= vk <= 0x28
-            or vk in (0x08, 0x09, 0x0D, 0x20, 0xE2))   # 0xE2: the extra key of ISO keyboards
 
 
 class _Relay(QObject):
@@ -321,124 +113,6 @@ class _AddonGrid(QWidget):
             self.cols = cols
             self._place()
         super().resizeEvent(e)
-
-
-_tiles: dict[str, QBrush | None] = {}
-
-
-def _tile(name: str) -> QBrush | None:
-    """A theme's texture as a brush for its preview card (None: the theme has none)."""
-    if name not in _tiles:
-        kind = theme.THEMES[name].get("texture", "")
-        _tiles[name] = (QBrush(QPixmap.fromImage(theme.texture_image(kind, theme.THEMES[name])))
-                        if kind in theme.TEXTURES else None)
-    return _tiles[name]
-
-
-class ThemeCard(QPushButton):
-    """A clickable mini-preview of a theme: its colours, and with Textured on, its
-    pattern on the panels and its glow behind them, so the switch shows what it does."""
-
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
-        self.setObjectName("themecard")
-        self.setAccessibleName(name)   # it draws its name: a screen reader had nothing to say
-        self.setCheckable(True)
-        self.setFixedSize(QSize(150, 112))
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-    def paintEvent(self, e):
-        super().paintEvent(e)   # frame + checked border from the stylesheet
-        t = theme.THEMES[self.name]
-        p = QPainter(self)
-        snap_to_pixels(p)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        r = QRectF(self.rect()).adjusted(8, 8, -8, -30)
-        win = QPainterPath()
-        win.addRoundedRect(r, 8, 8)
-        p.fillPath(win, QColor(t["bg"]))
-        tile = _tile(self.name) if theme.textures_on else None
-        if theme.textures_on:
-            p.save()
-            p.setClipPath(win)
-            theme.paint_window_bg(p, r, r.topLeft(), r.width(), r.height(), tk=t)
-            p.restore()
-        # side panel, pads and a slider, in the theme's own colours
-        p.setPen(Qt.PenStyle.NoPen)
-        for brush in (QColor(t["panel"]), tile):
-            if brush is not None:
-                p.setBrush(brush)
-                p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
-        for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
-            x = r.left() + 7 + (i % 2) * 44
-            y = r.top() + 7 + (i // 2) * 34
-            for brush in (QColor(t["card"]), tile):
-                if brush is not None:
-                    p.setBrush(brush)
-                    p.drawRoundedRect(QRectF(x, y, 40, 28), 5, 5)
-            p.setBrush(QColor(col))
-            p.drawRoundedRect(QRectF(x + 5, y + 5, 10, 3), 1.5, 1.5)
-        p.setBrush(QColor(t["groove"]))
-        p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 28, 3), 1.5, 1.5)
-        p.setBrush(QColor(t["accent"]))
-        p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 17, 3), 1.5, 1.5)
-        theme.paint_logo(p, QRectF(r.right() - 36, r.bottom() - 30, 22, 22),
-                         t["accent"], t["accent2"])
-        # name, in the theme's own font
-        p.setPen(QColor(theme.T["text"]))
-        f = QFont(self.font())
-        f.setFamily(t.get("font", theme.FONT))
-        f.setBold(True)
-        p.setFont(f)
-        p.drawText(QRectF(10, self.height() - 28, self.width() - 20, 22),
-                   Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, self.name)
-        p.end()
-
-
-class ThemeGrid(QWidget):
-    """Keep previews their readable size, using as many columns as fit."""
-
-    def __init__(self, cards):
-        super().__init__()
-        self.cards = cards
-        self.columns = 0
-        self.grid = QGridLayout(self)
-        self.grid.setContentsMargins(0, 0, 0, 0)
-        self.grid.setSpacing(12)
-        self.grid.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
-        self._reflow(1)
-
-    def minimumSizeHint(self):
-        return QSize(150, 112)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        # as many columns as fit, even past this group's cards: every group then gets
-        # the same columns and gaps and they line up (a short group spread its few
-        # cards over the whole width, out of line with the groups above and below)
-        columns = max(1, (self.width() + 12) // 162)
-        self._reflow(columns)
-        # the width left over is shared out as equal gaps, first card on the left edge
-        # and a full row's last on the right (all of it sat on the right, an empty strip)
-        gap = 12
-        if columns > 1:
-            gap = max(12, (self.width() - columns * 150) // (columns - 1))
-        self.grid.setHorizontalSpacing(gap)
-
-    def _reflow(self, columns):
-        if columns == self.columns:
-            return
-        for col in range(self.columns + 1):
-            self.grid.setColumnStretch(col, 0)
-        from soundboard.ui.widgets import take_out   # (it imports this module)
-        while self.grid.count():
-            take_out(self.grid)
-        for i, card in enumerate(self.cards):
-            self.grid.addWidget(card, i // columns, i % columns, Qt.AlignmentFlag.AlignLeft)
-        self.grid.setColumnStretch(columns, 1)
-        self.columns = columns
-        self.updateGeometry()
 
 
 def _ink_rows(img: QImage) -> float:
@@ -534,12 +208,55 @@ class SettingsDialog(QDialog):
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
     BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
 
+    # ---- set by its pages (ui/settingspages), read by the dialog, the window and tests
+    about_version: Any
+    dev_combos: Any
+    discord_btn: Any
+    feedback_box: Any
+    feedback_btn: Any
+    hue_now: Any
+    hue_reset: Any
+    hue_settle: Any
+    hue_slider: Any
+    hue_swatch: Any
+    lang_button: Any
+    lang_dialog: Any
+    lang_note: Any
+    lang_restart: Any
+    live_dot: Any
+    look_box: Any
+    look_pages: Any
+    look_shown: Any
+    look_tabs: Any
+    _look_pick: Any
+    live_green: Any
+    ov_monitor: Any
+    ov_position: Any
+    ov_toggle_only: Any
+    playing_background_check: Any
+    playing_background_opacity: Any
+    problem_btn: Any
+    _sync_highlight: Any
+    texture_off: Any
+    texture_on: Any
+    theme_cards: Any
+    ui_scale_combo: Any
+    ui_scale_note: Any
+    ui_scale_restart: Any
+    voices_card: Any
+    voices_show: Any
+
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
         """A page in the main window, in place of the tabs (SettingsControl.open_settings),
         never a window of its own. `lazy`: build only `page` now and each other page
         the first time it's shown. Building all twelve under the app's style sheet took
         a second or two on every click of the cog; the tests build them all at once."""
         super().__init__(mw)
+        # The pages (soundboard/ui/settingspages), before anything builds one.
+        self.help = HelpPage(self)
+        self.audio = AudioPage(self)
+        self.appearance = AppearancePage(self)
+        self.keys = KeysPage(self)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.setObjectName("settingspage")   # the window's own background
         self.mw = mw
@@ -561,14 +278,14 @@ class SettingsDialog(QDialog):
                  ("data", _("Data && quality"), "wave", self._data),
                  ("general", _("General"), "settings", self._general),
                  ("tabs", _("Tabs"), "sounds", self._tabs),
-                 ("appearance", _("Appearance"), "palette", self._appearance),
-                 ("audio", _("Audio"), "volume", self._audio),
-                 ("hotkeys", _("Hotkeys"), "keyboard", self._hotkeys),
-                 ("overlay", _("Overlay"), "gamepad", self._overlay),
+                 ("appearance", _("Appearance"), "palette", self.appearance._appearance),
+                 ("audio", _("Audio"), "volume", self.audio._audio),
+                 ("hotkeys", _("Hotkeys"), "keyboard", self.keys._hotkeys),
+                 ("overlay", _("Overlay"), "gamepad", self.keys._overlay),
                  ("updates", _("Updates"), "reload", self._updates),
-                 ("help", _("Add-ons"), "plus", self._help),
+                 ("help", _("Add-ons"), "plus", self.help._help),
                  ("remote", _("Remote"), "cable", self._remote),
-                 ("about", _("About"), "star", self._about))
+                 ("about", _("About"), "star", self.help._about))
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))
@@ -954,771 +671,6 @@ class SettingsDialog(QDialog):
         v.setSpacing(12)
         return w, v
 
-    def _appearance(self):
-        """Language on its own, then one box for the look with a row of tabs (the
-        themes, highlight colour, style, size, live tabs, background): one after another
-        the page ran so long that some people never scrolled down to the themes."""
-        w, v = self._page()
-        self.theme_cards = []
-        v.addWidget(self._language_card())
-        hints = {"Classic": _("Changes the whole app instantly."),
-                 "Meme": _("For when you want your soundboard to be a bit.")}
-        themes, tv = self._card(_("Themes"))
-        tv.setSpacing(6)
-        for group, names in theme.GROUPS:
-            head = QLabel(theme.group_name(group))
-            head.setObjectName("section")
-            tv.addWidget(head)
-            if group in hints:
-                h = QLabel(hints[group])
-                h.setObjectName("hint")
-                h.setWordWrap(True)
-                tv.addWidget(h)
-            cards = []
-            for name in names:
-                c = ThemeCard(name)
-                c.setChecked(name == theme.current_name)
-                c.clicked.connect(lambda __=False, n=name: self._pick_theme(n))
-                cards.append(c)
-                self.theme_cards.append(c)
-            tv.addWidget(ThemeGrid(cards))
-            tv.addSpacing(8)
-        pages = [(_("Themes"), themes)]
-        pages += [(_("Colour"), self._highlight_card()),
-                  (_("Theme style"), self._texture_card()),
-                  (_("Size"), self._ui_scale_card()),
-                  (_("Live tabs"), self._live_tabs_card()),
-                  (_("Background"), self._playing_background_card())]
-        v.addWidget(self._look_box(pages))
-        v.addStretch(1)
-        return w
-
-    def _look_box(self, pages) -> QFrame:
-        """One card holding `pages` [(tab name, card)], a tab row on top showing one at a
-        time (the others hidden, so the box is only as tall as the one showing). To
-        search it is one card; a search lands on the tab with the words."""
-        box = QFrame()
-        box.setObjectName("setcard")
-        bv = QVBoxLayout(box)
-        bv.setContentsMargins(14, 12, 14, 14)
-        bv.setSpacing(10)
-        row = _button_row()
-        bv.addLayout(row)
-        group = QButtonGroup(box)
-        tabs = []
-        for i, (name, card) in enumerate(pages):
-            card.setObjectName("lookpage")   # not a card of its own: flat inside the box
-            lay = card.layout()
-            lay.setContentsMargins(0, 0, 0, 0)
-            lay.itemAt(0).widget().hide()   # its title: the tab says it (search still reads it)
-            b = QPushButton(name)
-            b.setObjectName("voicetab")    # the same tabs as the voice changer's
-            b.setCheckable(True)
-            group.addButton(b, i)
-            row.addWidget(b)
-            bv.addWidget(card)
-            tabs.append(b)
-        self.look_shown = 0   # the tab showing
-
-        def show(i):
-            tabs[i].setChecked(True)
-            for j, (__, card) in enumerate(pages):
-                card.setVisible(j == i)
-            self.look_shown = i
-        group.idClicked.connect(show)
-        show(0)
-
-        def pick(words):
-            for i, (name, card) in enumerate(pages):
-                if all(wd in name.lower() or wd in self._words_of(card) for wd in words):
-                    show(i)
-                    return
-        self._look_pick = pick
-        self.look_tabs, self.look_pages, self.look_box = tabs, [c for __, c in pages], box
-        return box
-
-    def _live_tabs_card(self) -> QFrame:
-        card, cv = self._card(_("Live tabs"),
-                              _("A tab whose feature is on right now (a sound playing, the voice "
-                                "changer, the radio…) is marked, so nothing is left on without "
-                                "you noticing."))
-        # side by side like Connection's and Network activity's choices (DESIGN section 0:
-        # comparable short choices look alike); they wrap when Settings is narrow
-        row = _button_row()
-        green = QRadioButton(_("A bar beside the tab"))
-        green.setToolTip(_("A bar at the edge of the tabs and a coloured icon, in the highlight "
-                           "colour: easy to spot from across the room"))
-        dot = QRadioButton(_("A small dot on its icon"))
-        dot.setToolTip(_("Quieter: only a dot on the tab's icon"))
-        modes = QButtonGroup(card)
-        for b in (dot, green):
-            modes.addButton(b)
-            row.addWidget(b)
-        (green if self.mw.cfg.live_tab_green else dot).setChecked(True)
-        green.toggled.connect(self.mw.themectl.set_live_tab_tint)
-        self.live_green, self.live_dot = green, dot
-        cv.addLayout(row)
-        return card
-
-    def _texture_card(self) -> QFrame:
-        """Textured or Plain: each theme's own pattern on its panels, or flat panels."""
-        card, cv = self._card(_("Theme style"),
-                              _("Textured gives each theme its own pattern on the panels: "
-                                "scanlines, carbon fibre, waves and more. Plain keeps them flat."))
-        row = _button_row()
-        textured = QRadioButton(_("Textured"))
-        plain = QRadioButton(_("Plain"))
-        group = QButtonGroup(card)
-        for b in (textured, plain):
-            group.addButton(b)
-            row.addWidget(b)
-        (textured if self.mw.cfg.theme_texture else plain).setChecked(True)
-        textured.toggled.connect(self.mw.themectl.set_theme_texture)
-        self.texture_on, self.texture_off = textured, plain
-        cv.addLayout(row)
-        return card
-
-    def _ui_scale_card(self) -> QFrame:
-        """Interface size: everything bigger or smaller, on top of Windows' display
-        scaling. Qt sizes the app only as it starts (app.ui_scale_startup), so a new
-        size offers a restart, like the language."""
-        import os
-        from soundboard.library import UI_SCALES
-        card, cv = self._card(_("Interface size"),
-                              _("Makes everything in Onion Board bigger or smaller: text, "
-                                "buttons and pads."))
-        now = round(float(os.environ.get("QT_SCALE_FACTOR") or 1) * 100)
-        combo = QComboBox()
-        combo.setAccessibleName(_("Interface size"))
-        for pct in UI_SCALES:
-            combo.addItem(_("{percent}%", percent=pct), pct)
-        combo.setCurrentIndex(max(0, combo.findData(self.mw.cfg.ui_scale)))
-        no_wheel(combo)
-        restart = QPushButton(_("Restart now"))
-        restart.clicked.connect(self.mw.restart_app)
-        row = QHBoxLayout()
-        row.setSpacing(10)
-        row.addWidget(combo)
-        row.addWidget(restart)
-        row.addStretch(1)   # as wide as their text, not the card
-        cv.addLayout(row)
-        note = QLabel(_("Onion Board changes size after a restart."))
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        cv.addWidget(note)
-
-        def show():
-            later = self.mw.cfg.ui_scale != now
-            note.setVisible(later)
-            restart.setVisible(later)
-
-        def picked(i):
-            self.mw.cfg.ui_scale = combo.itemData(i)
-            self.mw._save_later()
-            show()
-        combo.currentIndexChanged.connect(picked)
-        show()
-        self.ui_scale_combo, self.ui_scale_note, self.ui_scale_restart = combo, note, restart
-        return card
-
-    def _playing_background_card(self) -> QFrame:
-        card, cv = self._card(_("Playing sound background"),
-                              _("Show the playing sound's thumbnail behind the cards"))
-        enabled = QCheckBox(_("On"))
-        enabled.setAccessibleName(_("Playing sound background"))
-        enabled.setChecked(self.mw.cfg.playing_background)
-        enabled.toggled.connect(lambda on: self.mw.set_option("playing_background", on))
-        cv.addWidget(enabled)
-        row = QHBoxLayout()
-        row.addWidget(QLabel(_("Opacity")))
-        opacity = QSlider(Qt.Orientation.Horizontal)
-        opacity.setRange(0, 100)
-        opacity.setValue(self.mw.cfg.playing_background_opacity)
-        opacity.setAccessibleName(_("Opacity"))
-        no_wheel(opacity)
-        value = QLabel(f"{opacity.value()}%")
-        value.setMinimumWidth(value.fontMetrics().horizontalAdvance("100%"))
-        opacity.valueChanged.connect(lambda n: (
-            value.setText(f"{n}%"), self.mw.set_option("playing_background_opacity", n)))
-        opacity.setEnabled(enabled.isChecked())
-        enabled.toggled.connect(opacity.setEnabled)
-        row.addWidget(opacity, 1)
-        row.addWidget(value)
-        cv.addLayout(row)
-        self.playing_background_check, self.playing_background_opacity = enabled, opacity
-        return card
-
-    def _language_card(self) -> QFrame:
-        """The app's language: a button showing the one picked (its letter coin and
-        name), opening a drop-down of languages with a search (ui.langpick). The title
-        is in Windows' language too, so someone who can't read this page still finds
-        it; what it says about restarting is in the language picked."""
-        title = _("Language")
-        other = i18n.offer()
-        if other:
-            word = i18n.in_language(other, lambda: _("Language"))
-            title = title if word == title else f"{title} · {word}"
-        card, cv = self._card(title)
-        from soundboard.ui.langpick import LangButton
-        pick = LangButton()
-        pick.setAccessibleName(_("Language"))
-        pick.setToolTip(_("Pick the language Onion Board is shown in"))
-        restart = QPushButton()
-        restart.clicked.connect(self.mw.restart_app)
-        row = QHBoxLayout()
-        row.setSpacing(10)
-        row.addWidget(pick)
-        row.addWidget(restart)
-        row.addStretch(1)   # buttons as wide as their text, not the card
-        cv.addLayout(row)
-        note = QLabel()
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        cv.addWidget(note)
-        langs = dict(i18n.available())
-
-        def chosen() -> str:
-            c = self.mw.cfg.language
-            return c if c in langs else i18n.current()
-
-        def show():
-            code = chosen()
-            pick.show_language(code, langs.get(code, code))
-            later = code != i18n.current()
-            if later:
-                text, button = i18n.in_language(code, lambda: (
-                    _("Onion Board shows {name} after a restart.", name=i18n.name_of(code)),
-                    _("Restart now")))
-                note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: see
-                # LanguageControl._offer_language)
-                restart.setText(button)
-                note.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
-                                        else Qt.LayoutDirection.LeftToRight)
-            note.setVisible(later)
-            restart.setVisible(later)
-
-        def open_picker():
-            from soundboard.ui.langpick import LanguageDialog
-            if self.lang_dialog is not None and self.lang_dialog.isVisible():
-                return
-            dlg = LanguageDialog(self, chosen())
-            self.lang_dialog = dlg   # (tests reach it while it's open)
-            dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-            dlg.chosen.connect(lambda code: (
-                self.mw.langctl.switch_language(code, restart=False), show()))
-            dlg.destroyed.connect(lambda *__: setattr(self, "lang_dialog", None))
-            dlg.open_under(pick)   # a drop-down, not a window: nothing waits on it
-        pick.clicked.connect(open_picker)
-        show()
-        self.lang_button, self.lang_note, self.lang_restart = pick, note, restart
-        self.lang_dialog = None
-        return card
-
-    def _highlight_card(self) -> QFrame:
-        """Your own colour for what's on right now (the voice changer, Live, a live tab),
-        kept whatever the theme: for when you like a theme but not its colour."""
-        card, cv = self._card(_("Highlight colour"),
-                              _("What's switched on (the voice changer, Live, a live tab) is "
-                                "shown in the theme's colour. Slide to pick your own; it stays "
-                                "when you change theme."))
-        row = QHBoxLayout()
-        row.setSpacing(10)
-        swatch = QPushButton(_("On"))   # a switched-on button, as it will look
-        swatch.setObjectName("power")
-        swatch.setCheckable(True)
-        swatch.setChecked(True)
-        swatch.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        swatch.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        swatch.setFixedWidth(64)
-        swatch.setAccessibleName(_("Highlight colour preview"))
-        hue = QSlider(Qt.Orientation.Horizontal)
-        hue.setObjectName("hue")
-        hue.setRange(0, 359)
-        hue.setAccessibleName(_("Highlight colour hue"))
-        hue.setToolTip(_("Drag along the rainbow to pick the highlight colour"))
-        no_wheel(hue)
-        row.addWidget(swatch)
-        row.addWidget(hue, 1)
-        cv.addLayout(row)
-        btns = _button_row()   # (one under the other in a narrow window: no clipping)
-        more = QPushButton(_("More colours"))
-        more.setToolTip(_("Pick any colour, including how strong and how bright it is"))
-        reset = QPushButton(_("Theme's colour"))
-        reset.setToolTip(_("Go back to each theme's own highlight colour"))
-        btns.addWidget(reset)
-        btns.addWidget(more)
-        cv.addLayout(btns)
-        now = QLabel()
-        now.setObjectName("hint")
-        now.setWordWrap(True)
-        cv.addWidget(now)
-        self.hue_slider, self.hue_swatch, self.hue_reset, self.hue_now = hue, swatch, reset, now
-        # arrow keys / clicks on the strip come in bursts: apply once they stop
-        settle = QTimer(card, singleShot=True, interval=250)
-        self.hue_settle = settle
-
-        def own(h: int) -> str:
-            """Hue `h` at the strength / brightness of the current colour (a vivid one
-            when it's too grey for a hue to show)."""
-            c = QColor(theme.T["live"])
-            sat, val = c.hsvSaturationF(), c.valueF()
-            if sat < 0.35 or val < 0.45:
-                sat, val = 0.75, 0.95
-            return QColor.fromHsvF(h / 360, sat, val).name()
-
-        def preview(colour: str = ""):
-            """Show `colour` on the swatch only (while dragging); "" = what's applied."""
-            if colour:
-                on = max(("#ffffff", "#111111"), key=lambda c: theme._contrast(c, colour))
-                swatch.setStyleSheet(f"QPushButton#power:checked {{ background:{colour}; "
-                                     f"border:1px solid {colour}; color:{on}; }}")
-            else:
-                swatch.setStyleSheet(theme.live_sheet())
-
-        def sync():
-            hue.blockSignals(True)
-            h = QColor(theme.T["live"]).hsvHue()
-            hue.setValue(h if h >= 0 else 0)
-            hue.blockSignals(False)
-            now.setText(_("Now: your own colour, in every theme.")
-                        if theme.live_override else
-                        _("Now: {theme}'s own colour.", theme=theme.current_name))
-            preview()
-
-        def use(colour: str, btn=None, done: str = "") -> bool:
-            settle.stop()
-            changed = self.mw.themectl.set_live_color(colour)
-            sync()
-            if btn is not None and done:
-                busy.flash(btn, done)
-            return changed
-
-        def moved(h: int):
-            preview(own(h))
-            if not hue.isSliderDown():
-                settle.start()
-        hue.valueChanged.connect(moved)
-        hue.sliderReleased.connect(lambda: use(own(hue.value())))
-        settle.timeout.connect(lambda: use(own(hue.value())))
-
-        def pick():
-            c = QColorDialog.getColor(QColor(theme.T["live"]), self, _("Highlight colour"))
-            if c.isValid():
-                use(c.name(), more, _("✓ Changed"))
-
-        def back():
-            if not theme.live_override:
-                busy.flash(reset, _("✓ Already the theme's"))
-            else:
-                use("", reset, _("✓ Back to the theme's"))
-        more.clicked.connect(pick)
-        reset.clicked.connect(back)
-        self._sync_highlight = sync
-        sync()
-        return card
-
-    def _pick_theme(self, name: str):
-        if name == theme.current_name:   # already on: restyling every widget again froze
-            for c in self.theme_cards:   # the app for nothing (a click unticks the card)
-                c.setChecked(c.name == name)
-            return
-        self.mw.themectl.apply_theme(name)
-        self._category_icons()
-        if getattr(self, "net_activity", None) is not None:
-            self.net_activity.refresh(force=True)   # its status colours are per theme
-        self._sync_highlight()   # the theme's own colour, unless you picked one
-        for c in self.theme_cards:
-            c.setChecked(c.name == name)
-            c.update()
-
-    def _hotkeys(self):
-        w, v = self._page()
-        for group, actions in HOTKEY_GROUPS:
-            card, cv = self._card(group)
-            for attr, _action, label, desc in actions:
-                self._hk_row(cv, attr, label, desc)
-            # the Categories group: its keys and the per-category sets go together
-            if any(a[0] == "next_cat_hotkey" for a in actions):
-                scoped = QCheckBox(_("Use hotkeys per category"))
-                scoped.setToolTip(_("One key can play a different sound in each category: switch "
-                                    "category (its tab, or the keys above) and the same keys "
-                                    "play that category's sounds. Sounds in no category always "
-                                    "keep their keys."))
-                scoped.setChecked(self.mw.cfg.scoped_hotkeys)
-                scoped.toggled.connect(self.mw.hkctl.set_scoped_hotkeys)
-                cv.addWidget(scoped)
-                hint = QLabel(_("Sound hotkeys only work in the category showing. Switch "
-                                "categories to use the same keys for different sounds."))
-                hint.setObjectName("hint")
-                hint.setWordWrap(True)
-                cv.addWidget(hint)
-            v.addWidget(card)
-        card, cv = self._card(_("Auto push-to-talk (optional)"),
-                              _("Only if you use push-to-talk in a game or Discord: set your "
-                                "push-to-talk key and the app holds it for you while a sound, "
-                                "live radio or a program plays. Leave it Off for open mic."))
-        self._hk_row(cv, "ptt_key", _("Hold this key"), "")
-        v.addWidget(card)
-        card, cv = self._card(_("Hotkey sounds"),
-                              _("Short beeps in your headphones (only you hear them) when a "
-                                "hotkey does something you can't see in a game: switches "
-                                "category (one beep per place along, a low one for All), turns "
-                                "your mic, the voice changer or the hotkeys on (rising) or off "
-                                "(falling), changes the volume, or records or saves a clip."))
-        cue = QCheckBox(_("Play hotkey beeps"))
-        cue.setChecked(self.mw.cfg.cue_sounds)
-        cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
-        cv.addWidget(cue)
-        v.addWidget(card)
-        note = QLabel(_("Per-sound hotkeys: right-click a pad → Set hotkey. All hotkeys work "
-                        "while you're in a game."))
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        note.setContentsMargins(14, 0, 14, 0)   # in line with the cards' text
-        v.addWidget(note)
-        v.addStretch(1)
-        self._refresh_hk()
-        return w
-
-    def _hk_row(self, lay, attr, label, desc):
-        row = QHBoxLayout()
-        text = QVBoxLayout()
-        text.setSpacing(0)
-        t = QLabel(label)
-        t.setStyleSheet("font-weight:600;")
-        text.addWidget(t)
-        if desc:
-            d = QLabel(desc)
-            d.setObjectName("hint")
-            d.setWordWrap(True)
-            text.addWidget(d)
-        row.addLayout(text, 1)
-        b = QPushButton()
-        b.setObjectName("hkbtn")
-        b.clicked.connect(lambda __=False, a=attr: self._capture(a))
-        # each row's buttons say which hotkey they're for (a screen reader read every
-        # row as "Click to set" and "Clear")
-        b.setAccessibleName(_("{label} hotkey", label=label))
-        row.addWidget(b)
-        x = QPushButton()
-        x.setObjectName("small")
-        icons.close_button(x, 24)
-        x.setAccessibleName(_("Clear the {label} hotkey", label=label))
-        x.clicked.connect(lambda __=False, a=attr: self._set_hk(a, ""))
-        row.addWidget(x)
-        lay.addLayout(row)
-        self.hk_buttons.setdefault(attr, []).append(b)
-
-    def _refresh_hk(self):
-        for attr, buttons in self.hk_buttons.items():
-            combo = getattr(self.mw.cfg, attr)
-            for b in buttons:
-                b.setText(pretty_key(combo)
-                          or (_("Off") if attr == "ptt_key" else _("Click to set")))
-
-    def _capture(self, attr):
-        # auto push-to-talk presses the key itself: that can't be a MIDI pad
-        d = HotkeyDialog(self.mw.hotkeys, self, pads=attr != "ptt_key")
-        if d.exec() and d.result_combo:
-            self._set_hk(attr, d.result_combo)
-        else:
-            self.mw.hkctl.register_hotkeys()   # capture paused them
-
-    def _set_hk(self, attr, combo):
-        self.mw.hkctl.set_global_hotkey(attr, combo)
-        self._refresh_hk()
-
-    def _overlay(self):
-        """The in-game overlay: how it opens, which keys pick, how it looks."""
-        w, v = self._page()
-        s = self.mw.overlay.s
-        card, cv = self._card(_("Open it"),
-                              _("Press the hotkey in a game and your sounds appear on top of it. "
-                                "The game keeps your keyboard and mouse, and the overlay's keys "
-                                "go back to the game the moment it closes."))
-        self._hk_row(cv, "overlay_hotkey", _("Overlay hotkey"), "")
-        test = QPushButton(_("Open overlay"))
-        test.setToolTip(_("Opens it now, the same as the hotkey: pick a sound with its keys or a "
-                          "click. Esc, this button or the hotkey closes it"))
-        test.clicked.connect(lambda: self.mw.overlay.open_by_click())
-        row = QHBoxLayout()   # beside how the key works: two lines, not three
-        row.setSpacing(8)
-        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
-        row.addWidget(test)   # as wide as its words (it ran to the card's edge)
-        row.addStretch(1)
-        cv.addLayout(row)
-        v.addWidget(card)
-
-        card, cv = self._card(_("Pick sounds"),
-                              _("Nine tiles a page, in the same order as your pads. Drag pads "
-                                "in the Sounds tab to rearrange them."))
-        cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys))
-        after = QCheckBox(_("Hide after picking a sound"))
-        after.setChecked(s.close_after_play)
-        after.toggled.connect(lambda b: self._ov_set("close_after_play", b))
-        cv.addWidget(after)
-        row = QHBoxLayout()
-        row.setSpacing(12)
-        row.addWidget(QLabel(_("Auto-hide after")))
-        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide))
-        row.addStretch(1)   # the choice right after its label, not at the card's far edge
-        cv.addLayout(row)
-        item = row.itemAt(1)
-        assert item is not None
-        self.ov_toggle_only = (after, item.widget())
-        v.addWidget(card)
-
-        card, cv = self._card(_("Where and how it looks"),
-                              _("Or just drag it: grab any empty part of the overlay (its title, "
-                                "its edges) and drop it anywhere, on any monitor. It opens there "
-                                "from then on. Show preview only shows how it looks: open the "
-                                "overlay with its hotkey to try it or move it."))
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(12)
-        grid.addWidget(QLabel(_("Monitor")), 0, 0)
-        self.ov_monitor = self._ov_combo("monitor", self._monitor_choices(s.monitor), s.monitor)
-        self.ov_monitor.setToolTip(_("With more than one monitor: put the overlay on the one "
-                                     "you're gaming on, or keep it on a second one"))
-        grid.addWidget(self.ov_monitor, 0, 1)
-        grid.addWidget(QLabel(_("Position")), 1, 0)
-        self.ov_position = self._ov_combo("position", ovl.POSITIONS, s.position)
-        grid.addWidget(self.ov_position, 1, 1)
-        grid.addWidget(QLabel(_("Size")), 2, 0)
-        grid.addLayout(self._ov_slider("scale", 60, 160, s.scale, _("Size")), 2, 1)
-        grid.addWidget(QLabel(_("Background")), 3, 0)
-        grid.addLayout(self._ov_slider("opacity", 30, 100, s.opacity, _("Background")), 3, 1)
-        grid.setColumnStretch(1, 1)
-        cv.addLayout(grid)
-        # a drag on the overlay changes monitor / position: show it here
-        self.mw.overlay.listeners.append(self._ov_dragged)
-        self.destroyed.connect(lambda *__: self._ov_forget())
-        self.finished.connect(lambda *__: self._ov_forget())
-        prev = QPushButton(_("Show preview"))
-        prev.setToolTip(_("Shows the overlay for a few seconds, to see how it looks; any click "
-                          "or key closes it"))
-        prev.clicked.connect(lambda: self.mw.overlay.preview(6))
-        row = _button_row()
-        row.addWidget(prev)
-        cv.addLayout(row)
-        v.addWidget(card)
-
-        note = QLabel(_("Games in true exclusive fullscreen can't have anything drawn over them: "
-                        "there the keys still work and you hear beeps instead (turn on hotkey "
-                        "beeps above). Borderless / windowed fullscreen shows the overlay. Some "
-                        "games also see the number keys you press. If picking a sound switches "
-                        "your weapon, use the numpad."))
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        note.setContentsMargins(14, 0, 14, 0)   # in line with the cards' text
-        v.addWidget(note)
-        v.addStretch(1)
-        self._ov_sync()
-        return w
-
-    def _ov_combo(self, key, choices, current):
-        cb = QComboBox()
-        for value, label in choices:
-            cb.addItem(label, value)
-        cb.setCurrentIndex(max(0, cb.findData(current)))
-        cb.currentIndexChanged.connect(lambda i: self._ov_set(key, cb.itemData(i)))
-        no_wheel(cb)
-        return cb
-
-    def _ov_slider(self, key, lo, hi, value, name):
-        row = QHBoxLayout()
-        sl = QSlider(Qt.Orientation.Horizontal)
-        sl.setAccessibleName(name)
-        sl.setRange(lo, hi)
-        sl.setValue(value)
-        val = QLabel(_("{percent}%", percent=value))
-        val.setFixedWidth(48)
-        val.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        sl.valueChanged.connect(lambda x: (val.setText(_("{percent}%", percent=x)),
-                                           self._ov_set(key, x)))
-        no_wheel(sl)
-        row.addWidget(sl, 1)
-        row.addWidget(val)
-        return row
-
-    def _ov_set(self, key, value):
-        d = self.mw.overlay.s.to_dict()
-        d[key] = value
-        self.mw.overlay.apply(d)
-        self.mw.set_option("overlay", self.mw.overlay.s.to_dict())
-        self._ov_sync()
-
-    def _monitor_choices(self, current: str) -> list[tuple[str, str]]:
-        choices = ovl.monitor_choices(QApplication.screens(), QApplication.primaryScreen())
-        if current not in dict(choices):   # a monitor that isn't plugged in right now
-            choices.append((current, _("{monitor}  (not connected)",
-                                       monitor=current.rpartition('@')[0] or current)))
-        return choices
-
-    def _ov_dragged(self):
-        """The overlay was dragged somewhere: show its new monitor and position."""
-        if not qt_valid(self):
-            return
-        s = self.mw.overlay.s
-        for cb, value, choices in ((self.ov_monitor, s.monitor, self._monitor_choices(s.monitor)),
-                                   (self.ov_position, s.position, ovl.POSITIONS)):
-            cb.blockSignals(True)
-            cb.clear()
-            for v, label in choices:
-                cb.addItem(label, v)
-            cb.setCurrentIndex(max(0, cb.findData(value)))
-            cb.blockSignals(False)
-
-    def _ov_forget(self):
-        try:
-            self.mw.overlay.listeners.remove(self._ov_dragged)
-        except ValueError:
-            pass
-
-    def _ov_sync(self):
-        for wdg in getattr(self, "ov_toggle_only", ()):
-            wdg.setEnabled(self.mw.overlay.s.mode == "toggle")   # hold mode: letting go hides
-
-    def _audio(self):
-        w, v = self._page()
-        v.addWidget(self._devices_card())
-        from soundboard.ui.audiorecovery import RecoveryCard
-        v.addWidget(RecoveryCard(self.mw))
-        card, cv = self._card(_("Your mic"),
-                              _("Normally others hear your voice and your sounds together. "
-                                "Untick this for sounds only: they hear the sounds but not your "
-                                "mic. (Same as the “Others hear it” box under My mic.)"))
-        send = QCheckBox(_("Send my mic to others"))
-        send.setChecked(self.mw.cfg.mic_enabled)
-        send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
-        cv.addWidget(send)
-        v.addWidget(card)
-        v.addWidget(self._voices_card())
-        card, cv = self._card(_("Who's listening"),
-                              _("Voice chat squashes your sounds: mono, no deep bass, and in "
-                                "some games nothing above 8-12 kHz. Pick where people hear you "
-                                "and they're shaped to get through it. Game and Voice chat work "
-                                "out the exact voice chat by themselves; Clean sends them "
-                                "exactly as mixed; Advanced lets you pick it yourself."))
-        from soundboard.ui.destpanel import DestPanel
-        dest = DestPanel(self.mw)
-        dest.chk_gate.setText(_("Mute mic during sounds"))
-        cv.addWidget(dest)
-        v.addWidget(card)
-        card, cv = self._card(_("Audio buffering"),
-                              _("Low keeps your voice and sounds as immediate as possible. If "
-                                "the status line reports drop-outs (crackles, stutters), Safer "
-                                "uses bigger buffers: a little more delay, far fewer drop-outs."))
-        lat = QComboBox()
-        lat.addItem(_("Low (default)"), "low")
-        lat.addItem(_("Safer: bigger buffers"), "high")
-        lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
-        lat.currentIndexChanged.connect(lambda i: self.mw.devctl.set_latency(lat.itemData(i)))
-        no_wheel(lat)
-        cv.addWidget(lat)
-        e = self.mw.engine
-        xr = sum(e.xruns.values())
-        stat = QLabel(_("Since start: {dropouts}, {reconnects}.",
-                        dropouts=ngettext("{n} drop-out", "{n} drop-outs", xr),
-                        reconnects=ngettext("{n} device reconnect", "{n} device reconnects",
-                                            e.stalls)))
-        stat.setObjectName("hint")
-        cv.addWidget(stat)
-        v.addWidget(card)
-        v.addStretch(1)
-        return w
-
-    def _voices_card(self):
-        """Custom text-to-speech voices live on the Voice tab (behind Add voices); this
-        card is where people look for them first. Hidden while the tab is switched off
-        (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
-        and on again while Settings is open, that's a new one."""
-        from soundboard.speech import customvoices
-        mw = self.mw
-        card, cv = self._card(
-            _("Custom voices (text-to-speech)"),
-            _("Your own voices for typed lines and the text-to-speech voice: a TTS server "
-              "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
-              "Piper voice packs dropped into the voices folder. They join the Voice list on the "
-              "Voice tab."))
-        row = _button_row()   # one line, wrapping only when the window is narrow
-        add = QPushButton(_("Add a voice server"))
-        icons.set_icon(add, "plus")
-        add.clicked.connect(
-            lambda: mw.tabctl.tab_on("voice") and mw.voice.speech._add_voice_server())
-        row.addWidget(add)
-        folder = QPushButton(_("Open voices folder"))
-        folder.setToolTip(_("Voice packs and voice settings go here; README.txt in it says how"))
-        folder.clicked.connect(lambda: busy.open_folder(customvoices.ensure_folder, folder))
-        row.addWidget(folder)
-        show = QPushButton(_("Show on the Voice tab"))
-
-        def go():
-            if not mw.tabctl.tab_on("voice"):
-                return
-            self.accept()
-            mw.tabs.setCurrentWidget(mw.voice)
-            mw.voice.speech.show_custom_voices()
-        show.clicked.connect(go)
-        row.addWidget(show)
-        cv.addLayout(row)
-        self.voices_card, self.voices_show = card, show
-        if not mw.tabctl.tab_on("voice"):   # (never show() it here: not in its page yet, it'd
-            card.hide()              # flash up as a little window of its own)
-        return card
-
-    def _devices_card(self):
-        """Input / output pickers: the Setup tab's Devices combos, mirrored here so
-        people find them where they look first. Picking goes through the window."""
-        mw = self.mw
-        card, cv = self._card(_("Devices"),
-                              _("Your mic (input) and where you listen (output). Your sounds go "
-                                "into your mic unless you pick somewhere else to send them. "
-                                "Plugged something in? Press Re-scan."))
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(10)
-        grid.setVerticalSpacing(6)
-        self.dev_combos = []
-        for r, (text, src, attr) in enumerate((
-                (_("Input: my mic"), mw.cb_mic, "mic_device"),
-                (_("Output: my headphones"), mw.cb_mon, "mon_device"),
-                (_("Send my sounds to"), mw.cb_route, "route"))):
-            cb = QComboBox()
-            cb.setMinimumWidth(120)
-            # sized for a short name, the list opens wide enough for whole ones (device
-            # names in "Send my sounds to" made the page scroll sideways)
-            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-            cb.setMinimumContentsLength(16)
-            no_wheel(cb)
-            cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
-            label = QLabel(text)
-            grid.addWidget(label, r, 0)
-            grid.addWidget(cb, r, 1)
-            self.dev_combos.append((cb, src))
-        grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
-        cv.addLayout(grid)
-        from soundboard.ui import alsosend   # (its panel import imports this module)
-        # once the grid is in the card: a row added before would be its own window
-        alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
-        ref = QPushButton(_("Re-scan devices"))
-        icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        cv.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
-        self._sync_devices()
-        return card
-
-    def _sync_devices(self):
-        for cb, src in self.dev_combos:
-            cb.clear()
-            for i in range(src.count()):
-                cb.addItem(src.itemText(i), src.itemData(i))
-            cb.setCurrentIndex(src.currentIndex())
-            cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
-
-    def _pick_device(self, src, attr, i):
-        src.setCurrentIndex(i)
-        self.mw.routectl.on_device(src, attr)
-        self._sync_devices()   # "Send my sounds to" never offers the headphones
-
     def _general(self):
         w, v = self._page()
         card, cv = self._card(_("Window"))
@@ -1956,21 +908,6 @@ class SettingsDialog(QDialog):
         from soundboard.ui.resetguide import ResetGuide, RestorePoints
         (RestorePoints if points else ResetGuide)(self.mw, self).exec()
 
-    def _help(self):
-        w, v = self._page()
-        col = QWidget()
-        col.setMaximumWidth(self.ADDONS_W)
-        cl = QVBoxLayout(col)
-        cl.setContentsMargins(0, 0, 0, 0)
-        cl.setSpacing(12)
-        cl.addWidget(self._addons_card())
-        row = QHBoxLayout()
-        row.addWidget(col, 1)
-        row.addStretch(0)
-        v.addLayout(row)
-        v.addStretch(1)
-        return w
-
     def _updates(self):
         w, v = self._page()
         v.addWidget(self._updates_card())
@@ -1987,17 +924,6 @@ class SettingsDialog(QDialog):
         v.addStretch(1)
         return w
 
-    # ------------------------------------------------------------------ about
-    def _about(self):
-        w, v = self._page()
-        v.addWidget(self._about_card())
-        v.addWidget(self._contact_card())
-        v.addWidget(self._support_card())
-        v.addWidget(self._note_card())
-        v.addWidget(self._disclaimer_card())
-        v.addStretch(1)
-        return w
-
     def _link_button(self, text: str, url: str, icon: str = "") -> QPushButton:
         btn = QPushButton(text)
         if icon:
@@ -2007,75 +933,11 @@ class SettingsDialog(QDialog):
             failed=_("Couldn't open your browser. The page is")))
         return btn
 
-    def _ask_feedback(self):
-        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
-        from soundboard.ui import feedbackdialog
-        self.feedback_box = feedbackdialog.ask(self.mw.cfg, self)
-
-    def _about_card(self):
-        """The version (as the title bar shows it), and where the app and its licences
-        live."""
-        from soundboard.ui.mainwindow import version_text
-        from soundboard.updates import REPO
-        card, cv = self._card("Onion Board")
-        ver = self.about_version = QLabel(_("Version {version}", version=version_text()))
-        ver.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        cv.addWidget(ver)
-        hint = QLabel(_("Free, with no ads and no account. Made by OnionAlien. MIT license with "
-                        "the Commons Clause: use it for anything, share it for free, never sell "
-                        "it."))
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        cv.addWidget(hint)
-        row = _button_row()
-        row.addWidget(self._link_button(_("Website"), "https://onion-alien.github.io/onion-board/",
-                                        "browser"))
-        row.addWidget(self._link_button(_("Source code"), f"https://github.com/{REPO}"))
-        row.addWidget(self._link_button(_("Licenses"), f"https://github.com/{REPO}#license"))
-        cv.addLayout(row)
-        return card
-
-    def _contact_card(self):
-        """Ways to reach the author. All of them only open a page in the browser:
-        nothing is sent from the app (feedback.py)."""
-        from soundboard import __version__, feedback
-        from soundboard.updates import REPO
-        card, cv = self._card(_("Get in touch"),
-                              _("The Discord is where to chat, ask for help and hear about new "
-                                "versions. The feedback form needs no account. Found a security "
-                                "problem? Report it privately on GitHub, not in a public issue."))
-        row = _button_row()
-        discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
-        discord.setObjectName("primary")
-        row.addWidget(discord)
-        send = QPushButton(_("Send feedback"))
-        icons.set_icon(send, "edit")
-        send.clicked.connect(self._ask_feedback)
-        row.addWidget(send)
-        bug = self._link_button(_("Report a problem"), feedback.problem_url(__version__))
-        bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
-        row.addWidget(bug)
-        self.discord_btn, self.feedback_btn, self.problem_btn = discord, send, bug
-        row.addWidget(self._link_button(
-            _("Report a security issue"), f"https://github.com/{REPO}/security/advisories/new",
-            "shield"))
-        cv.addLayout(row)
-        return card
-
     def _note_card(self):
         card, cv = self._card(_("A note from me"))
         note = QLabel(NOTE)
         note.setWordWrap(True)
         cv.addWidget(note)
-        return card
-
-    def _disclaimer_card(self):
-        card, cv = self._card(_("The boring bit"))
-        text = QLabel(DISCLAIMER)
-        text.setObjectName("hint")
-        text.setWordWrap(True)
-        text.setTextFormat(Qt.TextFormat.RichText)
-        cv.addWidget(text)
         return card
 
     # ------------------------------------------------------------------ add-ons
@@ -2413,27 +1275,6 @@ class SettingsDialog(QDialog):
         relay.done.connect(finish)
         threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
                          daemon=True, name="onion-pocket-addons").start()
-
-    # ------------------------------------------------------------------ support
-    def _support_card(self):
-        """A link to the GitHub page's Support section: the ways to donate live there,
-        not in the app, so they can change without a release and a copy of the app
-        with someone else's details swapped in is easy to spot."""
-        from soundboard.updates import REPO
-        card, cv = self._card(_("Support Onion Board"),
-                              _("Onion Board is free, with no ads and no account. If it made "
-                                "your games or calls more fun, you can chip in. Entirely "
-                                "optional. The button opens the project's GitHub page."))
-        btn = QPushButton(_("♥  Support Onion Board"))
-        btn.clicked.connect(lambda: busy.open_url(
-            f"https://github.com/{REPO}#support-onion-board", btn,
-            opened=_("✓ Opened in your browser, thank you!"),
-            failed=_("Couldn't open your browser. The page is")))
-        row = QHBoxLayout()
-        row.addWidget(btn)
-        row.addStretch(1)
-        cv.addLayout(row)
-        return card
 
     # ------------------------------------------------------------------ background
     def _background_card(self):

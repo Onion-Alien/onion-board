@@ -77,7 +77,7 @@ class SettingsControl(Controller):
                     and self._settings_print() == self._settings_kept_print:
                 dlg.show_page(page or "privacy")
                 if getattr(dlg, "dev_combos", None):
-                    dlg._sync_devices()
+                    dlg.audio._sync_devices()
             else:
                 if dlg is not None and qt_valid(dlg):
                     free_dialog(dlg)

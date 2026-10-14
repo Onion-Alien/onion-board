@@ -25,8 +25,8 @@ In scope, for example:
   (module link) without the per-launch secret.
 - Anything reaching the local control API (Settings → Remote → *Remote
   control*, off by default) without its key, from another machine, or through a
-  web page (e.g. DNS rebinding), or making it do more than play / stop / pause
-  sounds and list them.
+  web page (e.g. DNS rebinding), or making it do more than the actions `/api/help`
+  lists (`ENDPOINTS` in `soundboard/remote.py`).
 - The phone remote's server (Onion Pocket, off by default) answering without its key,
   from outside the local network, or doing more than the actions it lists.
 - The installer or `installer/install-vbcable.ps1` running something that isn't what it
@@ -81,7 +81,7 @@ So you know what normal looks like when auditing it:
 | When you click *Update now* / *Reset downloader* (Settings → Updates) or *Update downloader* (on a link that failed to download), or — only if you tick *Update automatically*, off by default — once a day and after an *Add as sound* that failed | `pypi.org`, `files.pythonhosted.org` | checks for a newer `yt-dlp` (the newest release that runs on the app's Python version; if PyPI's latest needs a newer one, that release's page is asked for too); if there is one, downloads the `yt-dlp` and `yt-dlp-ejs` wheels, checks each against PyPI's SHA-256, and unpacks them into `%APPDATA%\OnionBoard\yt-dlp\`. That code then runs inside the app, like the bundled copy it replaces | `ytdlp_update` |
 | Unless you untick *Check for updates* (Settings → Updates): 45 s after start, then at most every 6 hours; or when you click *Check now* | `api.github.com` | asks for this project's latest release (version number, release page, the first lines of its notes, and its installer's download link and SHA-256). If it isn't an urgent fix, it also asks for the last 10 releases, to see whether one you skipped was urgent. The automatic check offers a release once it's been out 30 minutes (an urgent fix right away). A newer version is only announced; nothing is downloaded until you click *Update now* | `app_update` |
 | You click *Update now* on a newer version (installed app only; a copy running from source only opens the release page) | `github.com` → GitHub's release download server (`release-assets.githubusercontent.com`) | downloads that release's `OnionBoardSetup.exe` (only from this project's own `github.com/…/releases/download/` link, HTTPS only) into `%APPDATA%\OnionBoard\updates\` and checks it against the SHA-256 GitHub lists for it; a file that doesn't match is deleted. When you click *Restart now* the app closes and runs it silently over the installed copy (never the virtual cable, FFmpeg or live-voice extras), then the installer opens the app again. Downloaded installers are removed on the next start | `app_update` |
-| Unless you untick *Count me in* (the installer, or Settings → Privacy & security; on for new installs, off for copies installed before it existed): once a day (the first start on a new day on your PC's clock, or a whole day since the last one), 60 s after start (and checked every 6 hours, for an app left running); also once when you click *Update now* (installed app only; a copy running from source never sends it) | `onionalien.goatcounter.com` (GoatCounter, a privacy-friendly counter; the website counts its visits there too) | one HTTPS POST to its `/api/v0/count`: the path `/app/<version>`, a random ID made on this PC (`stats_id` in `config.json`) and a short tag made from it (`u-` and 12 letters of its hash, as the count's referrer), sent with every one of these so one person counts once and we can follow how each person uses the app over time (which tabs, which versions, whether they come back, where they stop), only to fix errors and see which features need work. The ID isn't tied to your name, account or anything else about you, and on the very first send a `first-start` event (`first-start/heard-<where>` if you picked where you heard about the app on the installer's last page: YouTube, Reddit, Google, a friend, or a short name you typed under Other; a typed answer that looks like an email address, a link or a number is dropped, not sent); *Update now* sends an `update-now/<from>-to-<to>` event instead, and the first start of a new version (however it was installed) one `updated/<from>-to-<to>`, so an update that didn't finish can be told apart. More than 10 problems in one send are cut to 10 plus one `problems-dropped/<bucket>` (`1-10`, `11-50`, `51-plus`). One-off events that couldn't be sent yet wait in `config.json` (`stats_pending`) for the next send. The daily one also says which tabs you opened since the last one (`tab/sounds`, `tab/radio`… names only, nothing about what you did there). It also gives a rough picture of how the app is used, each as a bucket or a name from a fixed list: how long ago it was installed (`age/day-1`, `age/days-2-7`, `age/days-8-30`, `age/days-31-plus`), where your sounds go (`route/mic`, `route/cable`, `route/device`, `route/off`), how many sounds your board has and how many you played since the last one (`sounds/…` and `played/…`: `0`, `1-10`, `11-50` or `51-plus`), how long the app was open since the last one (`open/under-15m`, `15m-1h`, `1-3h`, `3-8h` or `8h-plus`; added up every 5 minutes while it runs, never the times of day, and a sleeping PC doesn't count), how many sounds you fetched from a link or a web search since the last one (`downloads/0`, `1`, `2-5`, `6-20` or `21-plus`), how many times you started it since then (`launches/0`, `1`, `2-5` or `6-plus`), which system it runs on (`os/win11`, `os/win10`, `os/win-older`, `os/linux` or `os/other`: never the exact version), the app's language (`lang/de`), its theme (`theme/dark`: a built-in theme's name, else `other`), and which features you used or have set up since then (`used/voice-changer`, `used/youtube`, whether you opened *+ More tabs* and then added a tab from it or closed it (`used/more-tabs-opened`, `used/more-tabs-added-radio`, `used/more-tabs-closed`), a tab hidden from its right-click menu (`used/tab-hidden-voice`), the first start's answer to "What's it for?" (`used/use-normal`, `use-streamer`, `use-games`, `use-all`, or `use-skipped` when the guide was closed there), the Triggers tab's *Get Onion Watch* window shown, its Get clicked or the window closed (`used/watch-prompt-shown`, `watch-prompt-get`, `watch-prompt-closed`), *Get FFmpeg* clicked or failed, FFmpeg got by the app itself while it loads or that failing, and a file that needed FFmpeg to play (`used/get-ffmpeg`, `get-ffmpeg-failed`, `get-ffmpeg-auto`, `get-ffmpeg-auto-failed`, `needs-ffmpeg`, `ffmpeg-broken` (a copy found but unable to start), `ffmpeg-recovered` (a verified working copy after a startup or get failure, including on a later launch; a yes/no marker stays locally until it works)), the link download bar's Cancel, Retry and one-line view (`used/dl-cancel`, `dl-retry`, `dl-bar-small`), a downloaded sound's *Open on…*, *Copy link*, *Details* and its info deleted (`used/source-open`, `source-copy-link`, `source-details`, `source-deleted`), the Apps tab's cards or sections dragged and categories added, renamed or deleted (`used/apps-reorder`, `apps-category-added`…), Settings' search used and a search that found nothing (`used/settings-search`, `settings-search-nothing`: never what was typed), the mini player's mic switch (`used/mini-mic-mute`), the Setup tab's *Step-by-step guide* (`used/setup-guide-opened`), Ctrl+1 to 9 or Ctrl+Tab (`used/tab-keys`), the version clicked for What's new (`used/whats-new`), *Show more* under web search results (`used/search-show-more`), a pad's Edit: its Effects tab and a picture from a file or a link (`used/pad-effects`, `pad-picture-file`, `pad-picture-link`), the mic effect put on by a click, put back by itself or updated, No at Windows' admin prompt, a set-up or a fix-by-itself that failed, one not working when its wait ran out, and Windows having taken it off (`used/mic-effect-on`, `mic-effect-fixed`, `mic-effect-updated`, `mic-effect-said-no`, `mic-effect-failed`, `mic-effect-fix-failed`, and why a set-up or a fix-by-itself failed as one word (`mic-effect-failed-<why>` and `mic-effect-fix-failed-<why>`: `unanswered` (the admin prompt left open), `no-start`, `stuck`, `silent`, `no-helper`, `no-mic`, `no-effect`, the admin step's exit code as `code-1` to `code-6`, or `code-other`: never the message), `mic-effect-no-load`, `mic-effect-taken-off`: never the mic's name), Onion Board's own update cancelled, failing to download or to start, its *Copy error*, *Later* and one that didn't finish (`used/update-cancelled`, `update-download-failed`, `update-install-failed`, `update-copy-error`, `update-later`, `update-didnt-finish`), *On Air* switched off or on and a line of its card clicked (`used/on-air-off`, `on-air-on`, `on-air-line`), the Voice tab's tabs clicked and *Speak in* switched on (`used/voice-tab-fx`, `voice-tab-ai`, `voice-tab-speak`, `voice-tab-addons`, `translate-on`), a radio station played or one that wouldn't play and the station list not loading (`used/radio-played`, `radio-failed`, `radio-list-down`: never which station), Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and `recovery-failed`), a file import stopped from its card or one that skipped files (`used/import-stopped`, `import-skipped`), *Pause*, *Stop all* and the taskbar preview's buttons (`used/pause`, `stop-all`, `taskbar-buttons`), an add-on set up, failing to, repaired, and a Python got for it or that failing (`used/addon-installed-ai-voices`, `addon-installed-live-voice`, `addon-failed-…`, `addon-repaired`, `addon-got-python`, `addon-python-failed`: another add-on is `other`), a restore point saved before an update and one put back (`used/restore-point-update`, `restore-point-used`), the pop-up saying unticking *Others hear it* can't mute your mic yet and its *Set it up* (`used/mute-warning-shown`, `mute-warning-setup`), and, every day they're set: *Remember where it came from* switched off, own Apps categories and the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture behind the board and the mic helper set up, and any sound set to play other than one at a time (`used/source-off`, `apps-own-categories`, `rail-shut`, `net-proxy`, `net-tor`, `net-offline`, `playing-bg`, `mic-helper`, `press-overlap`, `press-toggle`, `press-solo`, `press-queue`: never the proxy's address or which sounds); each of these is a yes or no for the day, never how many times, for sounds fetched from a link or a web search: the site's name (`used/dl-youtube`, `used/dl-tiktok`, `dl-soundcloud`, `dl-instagram`, `dl-x`, `dl-reddit`, `dl-twitch`, `dl-myinstants` or `dl-other`), whether it was a pasted link or a search pick (`used/dl-link`, `used/dl-search`), *Add as sound* or *Play once* (`used/dl-add`, `used/dl-play`), one waiting in the download queue (`used/dl-queue`), a pick that was already in your Sounds (`used/dl-already-have`) and the sites a download failed on (`used/dl-failed-youtube`…): never the link, its title or what you searched for, the Triggers tab's features (`used/triggers-mode-colour`, `used/triggers-pack-import`: which kinds of trigger and options are set up, and which of its buttons were used, never the triggers, pictures or windows themselves)… only the names in `FEATURES` in `soundboard/usage.py`, never what you did with them). A new install also sends its first steps once each, when they happen: `step/added-sound`, `step/played-sound` and `step/sent-to-others` (a copy counted before these existed never sends them); and once each, when you switch on a tab a new install starts without: `step/added-radio-tab`, `step/added-apps-tab` or `step/added-triggers-tab`. Soon after a start, how many problems there were since the last send, as counts only: `crash/<version>`, `error/<version>` or `freeze/<version>` for each crash or freeze report saved in `crash-reports\` (with where it happened in Onion Board's own code: the error's type, such as `KeyError`, and the file and line, such as `soundboard/engine.py:1090`, which anyone can look up in the public source; also the line that called it and the name of the Python library function it was raised or stuck in (such as `threading.wait`); for a freeze also how long it lasted (`lasted-under-10s`, `lasted-10-30s`, `lasted-30s-2m`, `lasted-2m-plus` or `never-ended`) and whether the window itself was busy, another part of the app was (with its line of Onion Board's code) or nothing was (`busy-window`, `busy-thread@…`, `idle`). That, the kind and the version are all that's read from it: never the error message, paths, devices or log lines. The report itself never leaves your PC unless you post it), an error the app caught and showed you as a warning instead of crashing is counted as `warned/<version>/<type>@<soundboard/…py:line>` (the error's type and the line of Onion Board's own code it came from, never the message), and `unclean-exit/<version>/<why>` when the last run ended without the app closing itself, with which kind it was (`native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`, `pc-restarted` or `ended`; for a crash also the error's name, such as `access-violation`, and the Windows file or the line of Onion Board's code it happened in, such as `Qt6Core.dll`. The app works this out on your PC, from its own notes and Windows' Application log). A run that died before it got that far (a crash while a module or Qt loaded, before the app writes those notes) is counted once as `startup-failed/<version>` on the next start, with the same kind of detail when it's there (the native stacks faulthandler caught, or Windows' own error for that run's process). Answering *Send feedback*'s "What would you improve?" sends your picks right away, with a one-off random session instead of this PC's ID so they can't be linked to you or to the daily count (`improve/sounds`, `improve/looks`… only the names in `IMPROVE` in `soundboard/usage.py`) the follow-up ticks that open under a pick (`improve/sounds/memes`, only the names in `IMPROVE_MORE`), and what you typed under *Something else* or *Fewer bugs* as dashed words (`improve/other/more-anime-sounds`, `improve/bugs/said/crashes-when-i-alt-tab`, at most 100 and 200 characters; anything that looks like an email address, a link or a long number is taken out first). Switching *Count me in* off (the installer's box, or Settings) sends one last `opt-out/installer` or `opt-out/settings`, with no ID, tag or session, so it can't be tied to anything sent before (only when it was on until then, never in Offline or Tor mode, and the installer waits at most 5 s); after that nothing is sent. Uninstalling sends one `uninstall/<version>` (the uninstaller runs `OnionBoard.exe --uninstall-count`; not in Tor mode, and it gives up after 15 s). Nothing else: no user name, PC name, sounds, settings, devices, games or crash messages, and the app doesn't send its IP address in the message (GoatCounter sees the connection's address like any site, and isn't asked to look it up or keep it). The key in `soundboard/usage.py` can only add counts, not read them | `usage_stats` |
+| Unless you untick *Count me in* (the installer, or Settings → Privacy & security): once a day, and once on *Update now* (installed app only) | `onionalien.goatcounter.com` (GoatCounter) | the anonymous usage count: the version, a random ID made on this PC, which tabs and features were used and problem counts, as fixed names and buckets. Exactly what, when and what never: [The anonymous usage count](#the-anonymous-usage-count-count-me-in) below | `usage_stats` |
 | You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it), or a phone remote / the control API asks for the popular stations or searches them | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Share play counts* (Settings → Privacy & security, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The map's country outlines ship with the app and load from its own folder: no CDN is contacted | `radio` |
 | You play a radio station | that station's stream server (the address listed for it in the directory; its `https` address when the directory lists one, so the network in between can't see which station) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine | `radio` |
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one | `voice_servers` |
@@ -101,7 +101,7 @@ So you know what normal looks like when auditing it:
 | You press *Report on GitHub* in the crash window | `github.com`, in your own web browser | opens a new-issue page; the report is only put on your clipboard, and nothing is posted unless you paste it and submit | — (your browser) |
 | You press *Join the Discord* (Settings → About, the tray icon's menu, the *What's new* window, or the installer's last page), *Send feedback*, *Report a problem* or *Report a security issue* (Settings → About), a *Report it* link beside an error message, *Yes* to "Would you tell us why?" after uninstalling, or *Website* / *Source code* / *Licenses* (Settings → About) | `discord.gg` (the Onion Board Discord server), `tally.so` (the no-account feedback form), `github.com` or `onion-alien.github.io`, in your own web browser | opens that page with the app's version (and, for *Report it*, the error's text) filled in; the app sends nothing itself, and nothing is posted unless you submit it there | — (your browser) |
 | While a module runs (e.g. live voice) | `127.0.0.1` only | module link, guarded by a random per-launch secret | — (this PC) |
-| You turn on *Remote control* (Settings → Remote; off by default) | listens on `127.0.0.1` only (port 7474 unless you change it) | lets a Stream Deck, AutoHotkey or a script on this PC play / stop / pause sounds and list them. Every request needs the key shown in Settings. Unlike the sockets above the key survives restarts (a Stream Deck button has to keep working), so it's stored in `config.json`; it's never exported with a backup or logged, and *New key* replaces it. Requests for any other `Host` are refused and no CORS headers are sent, so web pages can't use it | — (this PC) |
+| You turn on *Remote control* (Settings → Remote; off by default) | listens on `127.0.0.1` only (port 7474 unless you change it) | lets a Stream Deck, AutoHotkey or a script on this PC use the actions `/api/help` lists: list, play, queue, stop and pause sounds, switch category, the volume, mute you (Live / Muted) or your mic, the voice changer and a typed line in the computer voice, *Hear what they hear*, the instant replay, live speed / pitch / effects, who's listening, and the radio. Never files, other settings or anything outside the app. Every request needs the key shown in Settings. Unlike the sockets above the key survives restarts (a Stream Deck button has to keep working), so it's stored in `config.json`; it's never exported with a backup or logged, and *New key* replaces it. Requests for any other `Host` are refused and no CORS headers are sent, so web pages can't use it | — (this PC) |
 | You click *Get AI voices* (Voice tab) | `api.github.com`, then `github.com` → GitHub's release download server | asks for this project's `ai-voices` release (its title's version, its notes, and its add-on zip's download link and SHA-256), then downloads `AiVoices-module.zip` (about 40 MB: the add-on's code and its voice model; only from `github.com/Onion-Alien/onion-board/releases/download/`, HTTPS only) into `%APPDATA%\OnionBoard\updates\`, checks it against the SHA-256 GitHub lists for it and unpacks it into `%APPDATA%\OnionBoard\modules\ai-voices\` only if every file stays inside that folder. Its install then fetches `onnxruntime` and `numpy` from PyPI (the module row above). The zip is deleted afterwards. While an AI voice runs nothing goes online: your mic goes to its helper over `127.0.0.1` and back | `addons` |
 | The AI voices add-on finds its voice model missing (its install step, `helper.py --download`) | the address in its `voices.json` (`model.url`, HTTPS only) | downloads the model zip and keeps it only if it matches the SHA-256 written there. Unused when the add-on came with its model (the normal case) | `addons` |
 | You click *Get Onion Pocket* (Settings → Remote) | `api.github.com`, then `github.com` → GitHub's release download server | the same as *Get Onion Watch* above, for the Onion Pocket project: its latest release, then `OnionPocket-module.zip` (only from `github.com/Onion-Alien/onion-pocket/releases/download/`, HTTPS only), checked against the SHA-256 GitHub lists for it and unpacked into `%APPDATA%\OnionBoard\modules\onion-pocket\` only if every file stays inside that folder. The zip is deleted afterwards | `addons` |
@@ -125,6 +125,190 @@ log or sent anywhere, and it never holds proxy passwords, the relay's secret, re
 headers or bodies; query values whose names look like keys or tokens are masked.
 `tor.exe`'s own connections to the Tor network and everything under *Not covered*
 below aren't in it.
+
+### The anonymous usage count (*Count me in*)
+
+On for new installs, off for copies installed before it existed; untick it in the
+installer or Settings → Privacy & security (feature switch `usage_stats`). It only
+runs in the installed app: a copy running from source never sends it.
+
+**When:** once a day (the first start on a new day on your PC's clock, or a whole day
+since the last one), 60 s after start, and checked every 6 hours for an app left
+running; also once when you click *Update now*.
+
+**Where and how:** one HTTPS POST to `onionalien.goatcounter.com/api/v0/count`
+(GoatCounter, a privacy-friendly counter; the website counts its visits there too). The
+key in `soundboard/usage.py` can only add counts, not read them.
+
+**Always in it:** the path `/app/<version>`, a random ID made on this PC (`stats_id` in
+`config.json`) and a short tag made from it (`u-` and 12 letters of its hash, as the
+count's referrer). They let one person count once and show how each person uses the
+app over time (which tabs, which versions, whether they come back, where they stop),
+only to fix errors and see which features need work. The ID isn't tied to your name,
+account or anything else about you.
+
+**Once-only events:**
+
+- The very first send: `first-start` (`first-start/heard-<where>` if you picked where you
+  heard about the app on the installer's last page: YouTube, Reddit, Google, a friend,
+  or a short name you typed under Other; a typed answer that looks like an email
+  address, a link or a number is dropped, not sent).
+- *Update now* sends `update-now/<from>-to-<to>`, and the first start of a new version
+  (however it was installed) `updated/<from>-to-<to>`, so an update that didn't finish
+  can be told apart.
+- A new install's first steps, once each, when they happen: `step/added-sound`,
+  `step/played-sound`, `step/sent-to-others` (a copy counted before these existed never
+  sends them), and switching on a tab a new install starts without:
+  `step/added-radio-tab`, `step/added-apps-tab`, `step/added-triggers-tab`.
+- Events that couldn't be sent yet wait in `config.json` (`stats_pending`) for the next
+  send.
+
+**The daily count also says, each as a bucket or a name from a fixed list:**
+
+- the tabs you opened since the last one (`tab/sounds`, `tab/radio`…: names only,
+  nothing about what you did there);
+- how long ago it was installed (`age/day-1`, `age/days-2-7`, `age/days-8-30`,
+  `age/days-31-plus`);
+- where your sounds go (`route/mic`, `route/cable`, `route/device`, `route/off`);
+- how many sounds your board has and how many you played since the last one
+  (`sounds/…` and `played/…`: `0`, `1-10`, `11-50` or `51-plus`);
+- how long the app was open since the last one (`open/under-15m`, `15m-1h`, `1-3h`,
+  `3-8h` or `8h-plus`; added up every 5 minutes while it runs, never the times of day,
+  and a sleeping PC doesn't count);
+- how many sounds you fetched from a link or a web search (`downloads/0`, `1`, `2-5`,
+  `6-20` or `21-plus`) and how many times you started it (`launches/0`, `1`, `2-5` or
+  `6-plus`) since then;
+- the system (`os/win11`, `os/win10`, `os/win-older`, `os/linux` or `os/other`: never
+  the exact version), the app's language (`lang/de`) and theme (`theme/dark`: a
+  built-in theme's name, else `other`);
+- **which features you used or have set up since then**, as `used/<name>`: only the
+  names in `FEATURES` in `soundboard/usage.py`, each a yes or no for the day, never how
+  many times or what you did with them. Some examples by area:
+  - tabs: `used/more-tabs-opened`, `used/more-tabs-added-radio`, `used/more-tabs-closed`,
+    a tab hidden from its right-click menu (`used/tab-hidden-voice`), Ctrl+1 to 9 or
+    Ctrl+Tab (`used/tab-keys`);
+  - the first start's answer to "What's it for?" (`used/use-normal`, `use-streamer`,
+    `use-games`, `use-all`, or `use-skipped` when the guide was closed there), the
+    setup guide closed on a later step, its send step skipped, or finished with or
+    without your sounds going out (`used/setup-closed-mic`, `setup-closed-headphones`,
+    `setup-closed-send`, `setup-closed-last`, `setup-skipped-send`, `setup-finished`,
+    `setup-finished-not-sending`), the Setup tab's *Step-by-step guide*
+    (`used/setup-guide-opened`);
+  - Bun's first-run tour of the empty board shown, searched from, its Add clicked (the
+    version for Offline mode), skipped or left alone until it went (`used/tour-shown`,
+    `tour-searched`, `tour-files`, `tour-skipped`, `tour-ignored`; never what was
+    searched);
+  - sounds from the web: the site (`used/dl-youtube`, `dl-tiktok`, `dl-soundcloud`,
+    `dl-instagram`, `dl-x`, `dl-reddit`, `dl-twitch`, `dl-myinstants` or `dl-other`), a
+    pasted link or a search pick (`used/dl-link`, `dl-search`), *Add as sound* or *Play
+    once* (`used/dl-add`, `dl-play`), the download queue (`used/dl-queue`), a pick
+    already in your Sounds (`used/dl-already-have`), the sites a download failed on
+    (`used/dl-failed-youtube`…), the download bar's Cancel, Retry and one-line view
+    (`used/dl-cancel`, `dl-retry`, `dl-bar-small`), *Show more* under search results
+    (`used/search-show-more`), and a downloaded sound's *Open on…*, *Copy link*,
+    *Details* and its info deleted (`used/source-open`, `source-copy-link`,
+    `source-details`, `source-deleted`): never the link, its title or what you searched;
+  - FFmpeg: *Get FFmpeg* clicked or failed, got by itself or that failing, a file that
+    needed it, a copy that won't start and one working again after a failure
+    (`used/get-ffmpeg`, `get-ffmpeg-failed`, `get-ffmpeg-auto`, `get-ffmpeg-auto-failed`,
+    `needs-ffmpeg`, `ffmpeg-broken`, `ffmpeg-recovered`; a yes/no marker stays locally
+    until it works);
+  - the mic effect: put on by a click, put back by itself or updated, No at Windows'
+    admin prompt, a set-up or fix-by-itself that failed, not working when its wait ran
+    out, Windows having taken it off (`used/mic-effect-on`, `mic-effect-fixed`,
+    `mic-effect-updated`, `mic-effect-said-no`, `mic-effect-failed`,
+    `mic-effect-fix-failed`, `mic-effect-no-load`, `mic-effect-taken-off`), and why a
+    set-up or fix failed as one word (`mic-effect-failed-<why>` /
+    `mic-effect-fix-failed-<why>`: `unanswered` (the admin prompt left open),
+    `no-start`, `stuck`, `silent`, `no-helper`, `no-mic`, `no-effect`, the admin step's
+    exit code as `code-1` to `code-6`, or `code-other`): never the message or the mic's
+    name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
+    `recovery-failed`);
+  - Onion Board's own update cancelled, failing to download or to start, its *Copy
+    error*, *Later*, one that didn't finish (`used/update-cancelled`,
+    `update-download-failed`, `update-install-failed`, `update-copy-error`,
+    `update-later`, `update-didnt-finish`), the version clicked for What's new
+    (`used/whats-new`), a restore point saved before an update and one put back
+    (`used/restore-point-update`, `restore-point-used`);
+  - add-ons: one set up, failing to, repaired, a Python got for it or that failing
+    (`used/addon-installed-ai-voices`, `addon-installed-live-voice`, `addon-failed-…`,
+    `addon-repaired`, `addon-got-python`, `addon-python-failed`; another add-on is
+    `other`); the Triggers tab's *Get Onion Watch* window shown, Get clicked or closed
+    (`used/watch-prompt-shown`, `watch-prompt-get`, `watch-prompt-closed`) and which
+    kinds of trigger and options are set up and which of its buttons were used
+    (`used/triggers-mode-colour`, `used/triggers-pack-import`…: never the triggers,
+    pictures or windows themselves);
+  - the rest of the app: the Voice tab's tabs and *Speak in* (`used/voice-tab-fx`,
+    `voice-tab-ai`, `voice-tab-speak`, `voice-tab-addons`, `translate-on`),
+    `used/voice-changer`, `used/youtube`, a radio station played or one that wouldn't
+    play and the station list not loading (`used/radio-played`, `radio-failed`,
+    `radio-list-down`: never which station), the Apps tab's cards or sections dragged
+    and categories added, renamed or deleted (`used/apps-reorder`,
+    `apps-category-added`…), Settings' search used and one that found nothing
+    (`used/settings-search`, `settings-search-nothing`: never what was typed), the mini
+    player's mic switch (`used/mini-mic-mute`), a pad's Effects tab and a picture from a
+    file or a link (`used/pad-effects`, `pad-picture-file`, `pad-picture-link`), *On
+    Air* switched off or on and a line of its card clicked (`used/on-air-off`,
+    `on-air-on`, `on-air-line`), a file import stopped or one that skipped files
+    (`used/import-stopped`, `import-skipped`), *Pause*, *Stop all* and the taskbar
+    preview's buttons (`used/pause`, `stop-all`, `taskbar-buttons`), the pop-up saying
+    unticking *Others hear it* can't mute your mic yet and its *Set it up*
+    (`used/mute-warning-shown`, `mute-warning-setup`);
+  - and every day they're set: *Remember where it came from* off, own Apps categories,
+    the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
+    behind the board, the mic helper set up, and any sound set to play other than one at
+    a time (`used/source-off`, `apps-own-categories`, `rail-shut`, `net-proxy`,
+    `net-tor`, `net-offline`, `playing-bg`, `mic-helper`, `press-overlap`,
+    `press-toggle`, `press-solo`, `press-queue`: never the proxy's address or which
+    sounds).
+
+**Problems, as counts only, soon after a start:**
+
+- `crash/<version>`, `error/<version>` or `freeze/<version>` for each crash or freeze
+  report saved in `crash-reports\` since the last send, with where it happened in
+  Onion Board's own code: the error's type (such as `KeyError`) and the file and line
+  (such as `soundboard/engine.py:1090`, which anyone can look up in the public source),
+  the line that called it and the Python library function it was raised or stuck in
+  (such as `threading.wait`). A freeze also says how long it lasted
+  (`lasted-under-10s`, `lasted-10-30s`, `lasted-30s-2m`, `lasted-2m-plus` or
+  `never-ended`) and whether the window itself was busy, another part of the app was
+  (with its line of Onion Board's code) or nothing was (`busy-window`,
+  `busy-thread@…`, `idle`). That, the kind and the version are all that's read from a
+  report: never the error message, paths, devices or log lines. The report itself
+  never leaves your PC unless you post it.
+- `warned/<version>/<type>@<soundboard/…py:line>`: an error the app caught and showed
+  you as a warning instead of crashing (the type and the line, never the message).
+- `unclean-exit/<version>/<why>` when the last run ended without the app closing
+  itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
+  `pc-restarted` or `ended`; for a crash also the error's name (such as
+  `access-violation`) and the Windows file or the line of Onion Board's code it
+  happened in (such as `Qt6Core.dll`). The app works this out on your PC, from its own
+  notes and Windows' Application log.
+- `startup-failed/<version>`, once, for a run that died before it got that far (a
+  crash while a module or Qt loaded), with the same kind of detail when it's there (the
+  native stacks faulthandler caught, or Windows' own error for that run's process).
+- More than 10 problems in one send are cut to 10 plus one `problems-dropped/<bucket>`
+  (`1-10`, `11-50`, `51-plus`).
+
+**Send feedback** ("What would you improve?") sends your picks right away, with a
+one-off random session instead of this PC's ID, so they can't be linked to you or to the
+daily count: `improve/sounds`, `improve/looks`… (only the names in `IMPROVE` in
+`soundboard/usage.py`), the follow-up ticks that open under a pick
+(`improve/sounds/memes`, only the names in `IMPROVE_MORE`), and what you typed under
+*Something else* or *Fewer bugs* as dashed words (`improve/other/more-anime-sounds`,
+`improve/bugs/said/crashes-when-i-alt-tab`, at most 100 and 200 characters; anything
+that looks like an email address, a link or a long number is taken out first).
+
+**Switching it off** (the installer's box, or Settings) sends one last
+`opt-out/installer` or `opt-out/settings` with no ID, tag or session, so it can't be
+tied to anything sent before (only when it was on until then, never in Offline or Tor
+mode, and the installer waits at most 5 s); after that nothing is sent.
+**Uninstalling** sends one `uninstall/<version>` (the uninstaller runs
+`OnionBoard.exe --uninstall-count`; not in Tor mode, and it gives up after 15 s).
+
+**Nothing else:** no user name, PC name, sounds, settings, devices, games or crash
+messages, and the app doesn't send its IP address in the message (GoatCounter sees the
+connection's address like any site, and isn't asked to look it up or keep it).
 
 ### Switches and Offline mode
 
@@ -385,8 +569,10 @@ use is plain Windows APIs that any desktop app can call:
 None of the anti-cheats checked (Riot Vanguard, Easy Anti-Cheat, BattlEye, FACEIT)
 publish a rule against any of this: their published rules target vulnerable or blocked
 kernel drivers, code loaded into the game, and cheats or macros that play the game
-for you. The app hasn't been tested in-game against them, and no one can promise what
-an anti-cheat will do next, so if one ever complains, please
+for you. The app has been used in real Valorant (Vanguard) and Fortnite (Easy
+Anti-Cheat) parties without a complaint (Vanguard ignores the injected push-to-talk key,
+so hold it yourself there), but no one can promise what an anti-cheat will do next, so
+if one ever complains, please
 [open an issue](https://github.com/Onion-Alien/onion-board/issues).
 Two sensible habits: set your push-to-talk key to the game's push-to-talk only (never
 a key that moves or shoots), and don't build Onion Watch triggers that react to

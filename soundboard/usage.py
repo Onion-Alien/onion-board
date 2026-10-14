@@ -142,6 +142,12 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the first start's "What's it for?" answer (setupwizard.uses keys), or
             # the guide closed on that page
             *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),
+            # the setup guide closed on one of its device steps (where people give up),
+            # its send step skipped, finished sending or not; Bun's first-run tour of the
+            # empty board shown, searched from, or skipped (ui/firsttour.py)
+            *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "last")),
+            "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
+            "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
             # the Triggers tab's Get Onion Watch window: shown, Get clicked, closed
             "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",
             # Get FFmpeg clicked / failed; a file that couldn't play without it

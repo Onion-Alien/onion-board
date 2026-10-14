@@ -18,8 +18,10 @@ from __future__ import annotations
 
 import ctypes
 import html
+import logging
 import re
 import subprocess
+import threading
 import time
 
 import numpy as np
@@ -29,7 +31,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import directmic, michelper
+from soundboard import directmic, discordcfg, michelper
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
@@ -43,6 +45,8 @@ from soundboard import errors
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
 
+log = logging.getLogger(__name__)
+
 # step 3's "I don't use the cable" list: this choice sends nowhere (Config.route "off")
 NOWHERE = _("Nobody: only I hear them")
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
@@ -50,6 +54,9 @@ TICK_MS = 40            # the mic page's meter
 SETTLE_MS = 60          # after a step change, the window settles to what the steps need
 SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
 LOCK_MAX_S = 180        # the mic set-up holds the guide shut at most this long
+DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this often
+# the device steps by name, for the count of where the guide was closed (usage.py)
+PAGE_NAMES = ("mic", "headphones", "send", "last")
 
 # install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
 # guide shows them, in order ("wake" only happens if the cable needs a nudge)
@@ -529,6 +536,7 @@ class CableConfirm(QDialog):
 
 class SetupWizard(QDialog):
     PAGES = 4
+    _discord_read = Signal(object, object)   # worker -> UI: (files' signature, settings)
 
     def __init__(self, win, resumed: bool = False):
         """`resumed`: opened by itself after the restart the cable asked for, so it
@@ -560,6 +568,11 @@ class SetupWizard(QDialog):
         self._use = "normal"
         self.base = 1 if self._ask_use else 0
         self.PAGES = SetupWizard.PAGES + self.base
+        # Discord's own settings, read live on the last step (discordcfg)
+        self._discord_sig: tuple | None = None
+        self._discord_found: list | None = None   # None: not read (or no Discord)
+        self._discord_reading = False
+        self._discord_read.connect(self._discord_in)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(MARGIN, 18, MARGIN, 18)
@@ -595,6 +608,14 @@ class SetupWizard(QDialog):
         self.btn_back.clicked.connect(self.back_clicked)
         nav.addWidget(self.btn_back)
         nav.addStretch(1)
+        # the send step, not set up: Next does the setting up, so leaving it without is
+        # this quiet button, saying what that means (a bright "Skip for now" in Next's
+        # place was the button people pressed, and their sounds then went nowhere)
+        self.btn_skip = QPushButton(_("Skip: only I'll hear my sounds"))
+        self.btn_skip.setProperty("quiet", True)
+        self.btn_skip.clicked.connect(self.skip_clicked)
+        self.btn_skip.hide()
+        nav.addWidget(self.btn_skip)
         self.btn_next = QPushButton(_nav_words(_("Next  →")))
         self.btn_next.setObjectName("primary")
         # the arrow after the words, on the reading side's end
@@ -611,6 +632,8 @@ class SetupWizard(QDialog):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
         self.timer.start(TICK_MS)
+        self.discord_timer = QTimer(self)   # the last step only (go)
+        self.discord_timer.timeout.connect(self._read_discord)
         if self._proc is not None:   # still installing from a guide closed mid-way
             self.bun_cable.build()
         if win._attaching:
@@ -887,20 +910,36 @@ class SetupWizard(QDialog):
         self.btn_use_cable.clicked.connect(lambda: self._pick_route("cable"))
         self.btn_use_cable.hide()
         v.addWidget(self.btn_use_cable, 0, Qt.AlignmentFlag.AlignLeft)
+        # the other ways are for a few people (streamers, mixers, a game that skips the
+        # mic): a pill that opens their card, not a card that's always there. Open, it
+        # read like a second thing to do, with words new users don't need yet
+        self.alt_fold = FoldPill(_("Other ways: virtual cable, OBS, a mixer"), "sliders")
+        self.alt_fold.toggled.connect(self._fold_alt)
+        self.alt_fold_row = QWidget()   # (takes no room while hidden)
+        fold_row = QHBoxLayout(self.alt_fold_row)
+        fold_row.setContentsMargins(0, 0, 0, 0)
+        fold_row.addWidget(self.alt_fold)
+        fold_row.addStretch(1)
+        self.alt_fold_row.hide()
+        v.addWidget(self.alt_fold_row)
         v.addWidget(self._alt_card())
         v.addStretch(1)
         return p
+
+    def _fold_alt(self, open_: bool):
+        """Open or shut the other ways' card under its pill."""
+        self.alt_fold.setToolTip(_("Hide") if open_ else _("Show"))
+        self.alt_fold.setAccessibleDescription(self.alt_fold.toolTip())
+        self.alt_card.setVisible(open_ and not self.alt_fold_row.isHidden())
+        QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # shut: no band left
 
     def _alt_card(self) -> QFrame:
         """Sending into the mic: the other ways, in their own card under it, side by
         side as small tiles (icon, name, why you'd want it, then its button on the
         same edge). Before, their buttons sat right under the green "On your mic" and
-        read like a step still to do."""
+        read like a step still to do. It opens under its pill (alt_fold), which is
+        its heading."""
         self.alt_card, cl = _card(14, 12, roomy=False)
-        head = QLabel(_("Optional: other ways to send your sounds"))
-        head.setObjectName("section")
-        head.setProperty("head", True)
-        cl.addWidget(head)
         tiles = QHBoxLayout()   # two halves; one left alone (the other's list is open)
         tiles.setSpacing(12)    # takes the whole row, not half of it beside a hole
 
@@ -1000,16 +1039,22 @@ class SetupWizard(QDialog):
         row.addStretch(1)
         v.addSpacing(HEADER_GAP - 8)
         v.addWidget(self.helper_row)
-        # straight into the mic, Discord needs nothing to work: its one tip is a small
-        # pill (shut until clicked) that opens a card under it, not a paragraph
+        # straight into the mic, Discord needs nothing picked, but its own noise filter
+        # (on by default) wipes sounds out: the tip's card starts open under its pill,
+        # with Discord's settings read live (a tip shut by default was missed, and
+        # people from Discord thought the app was broken)
         self.discord_fold = FoldPill(_("Discord: one setting worth changing"), "speech")
         self.discord_fold.toggled.connect(self._fold_discord)
         fold_row = QHBoxLayout()
         fold_row.addWidget(self.discord_fold)
         fold_row.addStretch(1)
         v.addLayout(fold_row)
-        self._discord_open = False
+        self._discord_open = True
         self.discord_body, body = _card(14, 8, roomy=False)
+        # what Discord's own files say (chatguide.settings_html): ✓, or what to switch
+        self.discord_live = _label("", "font-size:10pt;")
+        self.discord_live.hide()
+        body.addWidget(self.discord_live)
         self.discord_tip = _label("", "font-size:10pt;")
         body.addWidget(self.discord_tip)
         self.btn_discord = QPushButton(_("Discord: make my sounds come through clean"))
@@ -1023,7 +1068,7 @@ class SetupWizard(QDialog):
         v.addWidget(self.discord_body)
         # games and calls: their guides, in a card of their own
         self.help_card, cl = _card(14, 8, roomy=False)
-        self._fold_discord(False)
+        self._fold_discord(True)
         self.games_label = _label(_("Playing a game or on a call?"), "font-size:10pt;")
         self.games_label.setObjectName("muted")
         cl.addWidget(self.games_label)
@@ -1060,10 +1105,8 @@ class SetupWizard(QDialog):
         v.addWidget(self.help_card)
         v.addStretch(1)
         v.addSpacing(SECTION_GAP - 8)   # the closing words: apart from the cards above
-        v.addWidget(_label(_("That's it. Add sounds by dragging files onto the window, then "
-                             "click one to play it. You can open this guide again any time "
-                             "from the <b>Setup</b> tab (<b>Step-by-step guide</b>)."),
-                           "font-size:10pt;"))
+        self.closing = _label("", "font-size:10pt;")   # (_fill_discord)
+        v.addWidget(self.closing)
         return p
 
     # ------------------------------------------------------------------ navigation
@@ -1085,6 +1128,11 @@ class SetupWizard(QDialog):
             self.recheck_cable(rescan=False)
         elif page == 3:
             self._fill_discord()
+        if page == 3:   # Discord's own settings: read now, then while the step is up
+            self._read_discord()
+            self.discord_timer.start(DISCORD_READ_MS)
+        else:
+            self.discord_timer.stop()
         self._update_next()
         # to the new step's size now, before it's drawn: drawn first at the old size,
         # a taller step showed squeezed for a moment
@@ -1128,8 +1176,16 @@ class SetupWizard(QDialog):
         installing = self._proc is not None or self._was_locked
         busy.set_busy(self.btn_next, installing)
         busy.set_busy(self.btn_back, installing)
+        mic_action = self._mic_action()
+        self.btn_skip.setVisible(mic_action)
         if i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
+        elif i == self.base + 2 and self._was_locked:
+            text, icon = _("Setting up…"), "mic"
+        elif mic_action:   # the step's one thing to do: Next does it (next_clicked)
+            text = (_("Repair my mic  →") if directmic.needs_repair(
+                directmic.status(self.win.cfg.mic_device)) else _("Put my sounds in my mic  →"))
+            icon = "nav_next"
         elif i == self.base + 2 and not self.route_ok():
             text, icon = _("Skip for now  →"), "nav_next"
         else:
@@ -1158,6 +1214,14 @@ class SetupWizard(QDialog):
         """Back / Next wait: the cable is installing or the mic is being set up."""
         return self._proc is not None or self._locked()
 
+    def _mic_action(self) -> bool:
+        """The send step, straight into the mic and not set up (or needing a repair):
+        Next puts the sounds into the mic, the step's one thing to do, and Skip is
+        the quiet way past it."""
+        return (self.stack.currentIndex() == self.base + 2 and self.win.cfg.route == "mic"
+                and self._proc is None and not self.win._attaching
+                and not self.setup_show.on and not self.route_ok())
+
     def back_clicked(self):
         if not self._busy():
             self.go(self.stack.currentIndex() - 1)
@@ -1166,14 +1230,24 @@ class SetupWizard(QDialog):
         if self._busy():
             return   # the cable is installing / the mic is set up: stay on its page
         i = self.stack.currentIndex()
-        if i == self.PAGES - 1:
+        if self._mic_action():
+            self.attach_mic()   # Next is "Put my sounds in my mic" here (_update_next)
+        elif i == self.PAGES - 1:
             self.finish()
         else:
             self.go(i + 1)
 
+    def skip_clicked(self):
+        """Past the send step without setting it up: only they hear their sounds."""
+        if self._busy():
+            return
+        usage.used("setup-skipped-send")
+        self.go(self.stack.currentIndex() + 1)
+
     def finish(self):
         cfg = self.win.cfg
         cfg.setup_done = self.route_ok()   # without the cable, offer the guide again next time
+        usage.used("setup-finished" if cfg.setup_done else "setup-finished-not-sending")
         cfg.mic_enabled = self.chk_send.isChecked()
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
@@ -1197,8 +1271,13 @@ class SetupWizard(QDialog):
 
     def done(self, r):
         self.timer.stop()
+        self.discord_timer.stop()
         if self.setup_show.on:
             self.setup_show._stop()
+        page = self.stack.currentIndex() - self.base
+        if r != QDialog.DialogCode.Accepted and 0 <= page < len(PAGE_NAMES):
+            usage.used(f"setup-closed-{PAGE_NAMES[page]}")   # where people give up
+        tour = self._ask_use   # the very first launch: Bun's tour of the empty board next
         if not self.win.cfg.use_mode:   # closed on "What's it for?": asked once is enough
             usage.used("use-skipped")
             self.win.cfg.use_mode = "normal"
@@ -1213,6 +1292,13 @@ class SetupWizard(QDialog):
             self.win.cfg.save()
             self.win.devctl._reopen_devices()
         super().done(r)
+        if tour:   # once the guide is gone (and the window has its devices back)
+            from soundboard.ui import firsttour
+            if firsttour.will_run(self.win):
+                # a first start opens on the Setup tab (nothing set up yet): the
+                # guide's done, so on to the board it's about
+                self.win.tabs.setCurrentWidget(self.win.sounds_page)
+            QTimer.singleShot(firsttour.START_MS, self.win, lambda w=self.win: firsttour.start(w))
 
     # ------------------------------------------------------------------ actions
     def _pick_mic(self, name: str, by_user: bool = False):
@@ -1312,6 +1398,7 @@ class SetupWizard(QDialog):
                                     "in Discord and games") if route == "mic" else "")
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
         self.alt_card.hide()   # the mic's other ways: shown below once it's the mic's page
+        self.alt_fold_row.hide()
         attaching = self.win._attaching
         self.btn_attach.setVisible(not busy and not (route == "mic" and self.route_ok())
                                    and not self.setup_show.on)
@@ -1345,27 +1432,32 @@ class SetupWizard(QDialog):
                 self.btn_other.hide()
                 self._update_next()
                 return
+            # the step's one action is the corner button (Next: _mic_action), not a
+            # second button in the card saying the same
+            self.btn_attach.hide()
             if self.route_ok():
                 self._show_working()
             elif directmic.needs_repair(state):
-                self.status_card.set_state("warn", _("Needs a repair"),
-                                           _("Your mic needs a quick repair"))
+                self.status_card.set_state("warn", "", _("Your mic needs a quick repair"))
                 self.cable_status.setText(_("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>, and Windows asks for "
                                             "permission once.") if ask else
                                           _("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>."))
             else:
-                self.status_card.set_state("", _("Not set up"), _("Not set up yet"))
-                self.cable_status.setText(_("Windows asks for permission once, and your PC's "
-                                            "sound drops out for a second.") if ask else
-                                          _("Your PC's sound drops out for a second while "
-                                            "Windows reloads it."))
+                self.status_card.set_state("", "", _("Not set up yet"))
+                self.cable_status.setText(_("Press <b>Put my sounds in my mic</b> below. Windows "
+                                            "asks once: click <b>Yes</b>. Your sound drops out "
+                                            "for a second while it sets up.") if ask else
+                                          _("Press <b>Put my sounds in my mic</b> below. Your "
+                                            "sound drops out for a second while Windows "
+                                            "reloads it."))
             # the other ways sit in their own card, not as buttons under the status
             self.btn_cable.hide()
             self.btn_other.hide()
             self.btn_recheck.hide()
-            self.alt_card.show()
+            self.alt_fold_row.show()
+            self.alt_card.setVisible(self.alt_fold.isChecked())
             self.alt_other_row.setVisible(self.other_box.isHidden())
             self._update_next()
             return
@@ -1629,9 +1721,17 @@ class SetupWizard(QDialog):
 
     def _fill_discord(self):
         self.discord_tip.setText("")
+        self._live_kept: bool | None = None   # (_fill_discord_text: Discord's settings count)
         self._fill_discord_text()
-        self.discord_tip.setVisible(bool(self.discord_tip.text()))
-        self._show_discord_body()
+        self._show_live()
+        from soundboard.ui import firsttour
+        self.closing.setText(
+            _("That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You "
+              "can open this guide again any time from the <b>Setup</b> tab "
+              "(<b>Step-by-step guide</b>).") if self._ask_use and firsttour.will_run(self.win)
+            else _("That's it. Add sounds by dragging files onto the window, then click one "
+                   "to play it. You can open this guide again any time from the <b>Setup</b> "
+                   "tab (<b>Step-by-step guide</b>)."))
         games = not self.btn_steam.isHidden()
         self.games_label.setVisible(games)
         streamer = self.win.cfg.use_mode == "streamer"
@@ -1685,6 +1785,7 @@ class SetupWizard(QDialog):
             return
         self.btn_copy.show()
         self.btn_discord.show()
+        self._live_kept = False   # on the cable: Studio is the clean choice there
         esc = html.escape(name)
         self.discord_text.setText(
             _("Onion Board now sends your voice and sounds into a new microphone called:<p "
@@ -1704,13 +1805,16 @@ class SetupWizard(QDialog):
             self.discord_title.setText(_("Last step: tell Discord or your game"))
             self.discord_text.setText(
                 _("<span style='color:{colour}'>Onion Board isn't on your mic yet, so only "
-                  "you will hear your sounds.</span> Go <b>Back</b> and click <b>Put my sounds "
-                  "straight into my mic</b> (or use the virtual cable), or finish now and this "
-                  "guide will open again next time.", colour=_bad()))
+                  "you will hear your sounds.</span> Go <b>Back</b> and press <b>Put my sounds "
+                  "in my mic</b> (or use the virtual cable), or finish now and this guide will "
+                  "open again next time.", colour=_bad()))
             self.btn_discord.hide()
             return
-        self.discord_title.setText(_("Last step: nothing to pick"))
+        # nothing to pick, but Discord's own noise filter (on by default) wipes sounds
+        # out: the step says so, with Discord's settings checked live under it
+        self.discord_title.setText(_("Last step: check Discord"))
         self.btn_discord.show()
+        self._live_kept = True
         mic = html.escape(cfg.mic_device or _("your mic"))
         text = (
             _("Discord and your games keep using the mic they already have:<p "
@@ -1725,10 +1829,51 @@ class SetupWizard(QDialog):
         # the Discord part sits in the card under its pill (split after translating, and
         # before it's shown: the whole text for a moment grew the window for good)
         intro, sep, tip = text.partition("<br><br>")
-        self.discord_text.setText(intro if sep else text)
+        self.discord_text.setText(
+            _("Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing "
+              "to pick in Discord or your games. One thing can still stop them: Discord's own "
+              "noise filter, which is on by default.", colour=_ok(), mic=mic))
         if sep:
             # its bold lead-in ("One thing worth doing in Discord:") is the pill's words
             self.discord_tip.setText(re.sub(r"^\s*<b>[^<]*</b>\s*", "", tip) or tip)
+
+    # Discord's own settings, read from its files (discordcfg) while the last step is
+    # up: a ✓, or what to switch, ticking itself off as they change it in Discord
+    def _read_discord(self):
+        if self._discord_reading:
+            return
+        self._discord_reading = True
+        threading.Thread(target=self._discord_worker, args=(self._discord_sig,), daemon=True,
+                         name="setup-discord-read").start()
+
+    def _discord_worker(self, last):
+        try:
+            sig = discordcfg.signature()
+            found = None if sig == last else discordcfg.read()
+        except Exception:  # noqa: BLE001 - never leave _discord_reading stuck
+            log.debug("reading Discord's settings failed", exc_info=True)
+            sig, found = last, None
+        busy.emit(self._discord_read, sig, found)
+
+    def _discord_in(self, sig, found):
+        self._discord_reading = False
+        if found is None:   # unchanged since the last read (or it failed): as it is
+            return
+        self._discord_sig, self._discord_found = sig, found
+        self._show_live()
+
+    def _show_live(self):
+        """Discord's settings as read, in the tip's card: when there's an answer, it
+        takes the place of the general tip (it says what to switch, or ✓)."""
+        from soundboard.ui import chatguide
+        found = self._discord_found
+        text = (chatguide.settings_html(found, self._live_kept)
+                if found and self._live_kept is not None else "")
+        if text != self.discord_live.text():
+            self.discord_live.setText(text)
+        self.discord_live.setVisible(bool(text))
+        self.discord_tip.setVisible(bool(self.discord_tip.text()) and not text)
+        self._show_discord_body()
 
     def show_steam_guide(self):
         self.show_guide("steam")

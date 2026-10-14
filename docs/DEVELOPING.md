@@ -170,9 +170,9 @@ py -3.13 -m venv .venv-bench
 The real-world checks play test signals into the virtual cable (they need it
 installed, even if you normally send your sounds elsewhere), so they aren't
 headless: mute your mic in the app and stay out of calls that use the cable.
-`game_capture.py` (which device Windows gives a game, its resampling, ducking;
-with no flags it only reports), `steam_voice_roundtrip.py` (Steam's own voice
-codec, one PC, one account), `discord_roundtrip.py` and `game_roundtrip.py` (a
+`scripts\voicetests\game_capture.py` (which device Windows gives a game, its resampling, ducking;
+with no flags it only reports), `scripts\voicetests\steam_voice_roundtrip.py` (Steam's own voice
+codec, one PC, one account), `scripts\voicetests\discord_roundtrip.py` and `scripts\voicetests\game_roundtrip.py` (a
 friend records the game on their end). The stacks, their sources and what the
 bench found: [GAME-VOICE.md](GAME-VOICE.md).
 
