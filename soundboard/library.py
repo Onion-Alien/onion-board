@@ -1523,7 +1523,9 @@ def _stream(pieces, rate: int, sid: str, store: Path | None, via_ffmpeg: bool) -
     rs = soxr.ResampleStream(rate, SR, 2, dtype="float32", quality="VHQ") if rate != SR else None
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     dest = cache_path(sid)
-    tmp = {False: dest.with_suffix(".tmp.npy"), True: dest.with_name(f"{sid}.lim.tmp.npy")}
+    tag = uuid.uuid4().hex[:8]   # unique: another thread may be writing this sound's cache
+    tmp = {False: dest.with_name(f"{sid}.{tag}.tmp.npy"),
+           True: dest.with_name(f"{sid}.{tag}.lim.tmp.npy")}
     lim = Limiter(SR, ceiling_db=-0.05)
     st = {"n": 0, "lim_n": 0, "skip": lim.la, "peak": 0.0}
     rms: list[np.ndarray] = []
@@ -1664,9 +1666,12 @@ def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         dest = cache_path(sid, fx_key)
-        tmp = dest.with_suffix(".tmp.npy")
-        np.save(tmp, i16)
-        tmp.replace(dest)
+        tmp = dest.with_name(f"{dest.stem}.{uuid.uuid4().hex[:8]}.tmp.npy")   # unique per writer
+        try:
+            np.save(tmp, i16)
+            _replace(tmp, dest)   # another writer's replace can hold dest a moment
+        finally:
+            tmp.unlink(missing_ok=True)
         _refused.discard(dest)   # a new file there: in use again, not a leftover
     except OSError:   # e.g. dest is mapped by audio still in use: prune_cache tidies up
         log.warning("couldn't write cache for %s", sid, exc_info=True)

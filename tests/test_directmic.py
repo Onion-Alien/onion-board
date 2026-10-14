@@ -885,6 +885,66 @@ def test_direct_fifo_keeps_a_late_wake_up_whole():
     assert np.array_equal(got, x) and f.count == 0
 
 
+def test_mic_rate_goes_back_to_the_devices_when_the_clean_mic_stops(ring_file):
+    """The clean mic from the mic effect switched the board's mic to the effect's rate,
+    and nothing switched it back: once it stopped, the mic device's 44.1 kHz blocks were
+    taken as 48 kHz (mic check, voice effects and recordings at the wrong pitch)."""
+    from soundboard.engine import Engine
+    e = Engine()
+    e.rates["main"] = e.rates["mon"] = e.rates["obs"] = 48000
+    e._mic_dev_rate = e.rates["mic"] = 44100   # the mic device's rate
+    e._reconfigure_mic_resamplers()
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file,
+                           mic_callback=e._mic_direct, mic_stopped=e._mic_direct_stopped)
+    w = dm.RingWriter(ring_file)
+    try:
+        s.active = True
+        block = np.zeros((480, 2), np.float32)
+        _publish(w, block)
+        s.pump()          # (finds where the mic is)
+        _publish(w, block)
+        s.pump()
+        assert s.mic_live and e.rates["mic"] == 48000 and e._rs_main.src == 48000
+        w.h[0]["mic_tick"] = dm._tick() - 10 * dm.MIC_LIVE_MS   # the clean mic stops
+        s.pump()
+        assert not s.mic_live
+        assert e.rates["mic"] == 44100
+        assert all((r.src, r.dst) == (44100, 48000) for r in (e._rs_main, e._rs_mon, e._rs_obs))
+        _publish(w, block)   # live again, then the stream closes while it is
+        s.pump()
+        _publish(w, block)
+        s.pump()
+        assert e.rates["mic"] == 48000
+    finally:
+        w.close()
+        s.close()
+    assert e.rates["mic"] == 44100 and e._rs_main.src == 44100
+
+
+def test_the_device_mic_is_taken_under_the_feeds_lock(ring_file):
+    """While straight-into-the-mic is on, the mic device's block runs under the feed's
+    lock: its thread can go live on the clean mic (and switch the mic's rate) meanwhile,
+    and _mic ran on both threads at once at that flip."""
+    from soundboard.engine import Engine
+    e = Engine()
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
+    e.main_direct, e.main_stream = True, s
+    held = []
+    e._mic = lambda x, direct=False: held.append(s.lock.locked())
+    try:
+        e._cb_mic(np.zeros((480, 1), np.float32), 480, None, None)
+        assert held == [True]
+        s.lock.acquire()   # the feed's thread is at it and goes live meanwhile
+        s.mic_live = True
+        threading.Timer(0.005, s.lock.release).start()
+        e._cb_mic(np.zeros((480, 1), np.float32), 480, None, None)
+        assert held == [True]   # the clean mic carries that block now
+    finally:
+        e.main_stream = None
+        s.mic_live = False
+        s.close()
+
+
 def test_late_pump_sends_all_the_voice(ring_file):
     """A late pump in the real engine: the voice sent is the mic it got, with no holes."""
     from soundboard.engine import Engine
