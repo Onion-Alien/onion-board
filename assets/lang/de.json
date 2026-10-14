@@ -1693,7 +1693,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Gelöscht, aber es konnte keine neue Kopie heruntergeladen werden ({error}). Versuchen Sie es erneut, wenn Sie online sind.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Gelöscht, aber es konnte keine neue Kopie heruntergeladen werden ({error}). Verwendung des integrierten yt-dlp {version} .",
   "Click when I talk": "Klicken Sie, wenn ich spreche",
-  "Clip editor": "Clip-Editor",
   "Clip editor for {name}": "Clip-Editor für {name}",
   "Clip waveform": "Clip-Wellenform",
   "Colourful": "Bunt",

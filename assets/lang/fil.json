@@ -1690,7 +1690,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Na-clear, ngunit hindi makapag-download ng bagong kopya ({error}). Subukang muli kapag online ka.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Na-clear, ngunit hindi makapag-download ng bagong kopya ({error}). Gamit ang built-in na yt-dlp {version} .",
   "Click when I talk": "I-click kapag nagsasalita ako",
-  "Clip editor": "Clip editor",
   "Clip editor for {name}": "Clip editor para kay {name}",
   "Clip waveform": "Clip waveform",
   "Colourful": "makulay",

@@ -1736,7 +1736,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Wyczyszczono, ale nie można pobrać nowej kopii ({error}). Spróbuj ponownie, gdy będziesz online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Wyczyszczono, ale nie można pobrać nowej kopii ({error}). Korzystanie z wbudowanego yt-dlp {version} .",
   "Click when I talk": "Kliknij, kiedy mówię",
-  "Clip editor": "Edytor klipów",
   "Clip editor for {name}": "Edytor klipów dla {name}",
   "Clip waveform": "Przebieg klipu",
   "Colourful": "Kolorowy",

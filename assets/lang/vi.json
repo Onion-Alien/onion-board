@@ -1650,7 +1650,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Đã xóa nhưng không thể tải xuống bản sao mới ({error}). Hãy thử lại khi bạn trực tuyến.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Đã xóa nhưng không thể tải xuống bản sao mới ({error}). Sử dụng yt-dlp {version} tích hợp sẵn.",
   "Click when I talk": "Bấm vào khi tôi nói chuyện",
-  "Clip editor": "Trình chỉnh sửa clip",
   "Clip editor for {name}": "Trình chỉnh sửa clip cho {name}",
   "Clip waveform": "Dạng sóng clip",
   "Colourful": "đầy màu sắc",

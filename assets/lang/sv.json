@@ -1690,7 +1690,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Raderade, men det gick inte att ladda ned en ny kopia ({error}). Försök igen när du är online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Raderade, men det gick inte att ladda ned en ny kopia ({error}). Använder den inbyggda yt-dlp {version} .",
   "Click when I talk": "Klicka när jag pratar",
-  "Clip editor": "Klippredigerare",
   "Clip editor for {name}": "Klippredigerare för {name}",
   "Clip waveform": "Klipp vågform",
   "Colourful": "Färgrik",

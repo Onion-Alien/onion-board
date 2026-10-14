@@ -1650,7 +1650,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Dihapus, namun tidak dapat mengunduh salinan baru ({error}). Coba lagi saat Anda online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Dihapus, namun tidak dapat mengunduh salinan baru ({error}). Menggunakan yt-dlp {version} bawaan.",
   "Click when I talk": "Klik ketika saya berbicara",
-  "Clip editor": "Penyunting klip",
   "Clip editor for {name}": "Editor klip untuk {name}",
   "Clip waveform": "Bentuk gelombang klip",
   "Colourful": "Berwarna-warni",

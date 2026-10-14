@@ -1690,7 +1690,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Tyhjennetty, mutta uutta kopiota ei voitu ladata ({error}). Yritä uudelleen, kun olet online-tilassa.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Tyhjennetty, mutta uutta kopiota ei voitu ladata ({error}). Sisäänrakennetun yt-dlp {version} käyttö.",
   "Click when I talk": "Napsauta, kun puhun",
-  "Clip editor": "Leikkeen editori",
   "Clip editor for {name}": "Leikeeditori kohteelle {name}",
   "Clip waveform": "Leikkaa aaltomuoto",
   "Colourful": "Värikäs",

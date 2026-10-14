@@ -1605,7 +1605,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Изчистено, но не можа да се изтегли ново копие ({error}). Опитайте отново, когато сте онлайн.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Изчистено, но не можа да се изтегли ново копие ({error}). Използване на вградения yt-dlp {version} .",
   "Click when I talk": "Щракни, когато говоря",
-  "Clip editor": "Редактор на клипове",
   "Clip editor for {name}": "Редактор на клипове за {name}",
   "Clip waveform": "Клип форма на вълната",
   "Colourful": "Цветен",

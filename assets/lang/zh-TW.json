@@ -1650,7 +1650,6 @@
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "已清除，但無法下載新副本 ({error})。當您在線時重試。",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "已清除，但無法下載新副本 ({error})。使用內建 yt-dlp {version} 。",
   "Click when I talk": "當我說話時點擊",
-  "Clip editor": "剪輯編輯器",
   "Clip editor for {name}": "{name}的剪輯編輯器",
   "Clip waveform": "削波波形",
   "Colourful": "豐富多彩的",
