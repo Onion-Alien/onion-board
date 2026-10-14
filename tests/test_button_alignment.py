@@ -8,7 +8,7 @@ from test_mainwindow import window  # noqa: F401
 from soundboard import appaudio
 from soundboard import engine as eng
 from soundboard.appaudio import App
-from soundboard.ui.mainwindow import TAB_INDEX
+from soundboard.ui.tabcontrol import TAB_INDEX
 
 
 def pump():

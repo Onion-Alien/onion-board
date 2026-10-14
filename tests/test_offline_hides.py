@@ -2,11 +2,11 @@
 Watch, the web search, downloads, updates…) instead of leaving it greyed out, says
 it's offline in the header, and brings it all back when it's switched off."""
 from PySide6.QtWidgets import QApplication
+from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard import net
 from soundboard.settings import SettingsDialog
-from soundboard.ui.mainwindow import TAB_INDEX
-from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
+from soundboard.ui.tabcontrol import TAB_INDEX
 
 
 def offline(mw, on: bool):
