@@ -15,16 +15,17 @@ from soundboard import directmic, michelper, net, theme, usage
 from soundboard import engine as eng
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons, sidebar
+from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
 
-class StatusControl:
+class StatusControl(Controller):
     """The audio status and the Setup tab's flow of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
-        self.mw = mw
+        super().__init__(mw)
         self._xruns_shown = 0             # drop-out count last told (the "audio" toast)
         self._audio_said = ""             # what that toast says now
         self.virtual_mic: str | None = None

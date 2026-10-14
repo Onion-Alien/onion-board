@@ -140,7 +140,7 @@ def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811
     w.show()
     w.tabs.setCurrentWidget(w.setup_page)
     w.routectl._show_route()
-    w._update_status()
+    w.statusctl._update_status()
     row = w.mic_alt_tiles
     tiles = (w.alt_cable, w.alt_device)
 
