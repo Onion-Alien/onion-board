@@ -48,6 +48,7 @@ DIM = {"bun": 165, "search": 135, "results": 105, "add": 135}   # how dark the r
 BUBBLE_W = 340           # a bubble's width at most (less in a small window)
 EDGE = 12                # bubbles keep this far in from the window's edges
 GAP = 18                 # between a bubble and what it points at (its tail spans it)
+PANEL_PAD = 12           # the results' panel round Bun and his bubble
 
 _current: Tour | None = None
 
@@ -359,17 +360,15 @@ class Tour(QWidget):
                     self._ring(p, first)
                 self._ring(p, add, QColor(theme.T["accent"]), 2)
                 target = first if first is not None else add
+                backing = QRectF()
                 if not self.result_bun.isHidden():   # beside Bun, who's beside the result
-                    g = self.result_bun.geometry()
-                    # his own card, as on the board: not sat on a result's picture
-                    p.setPen(QPen(QColor(theme.T["border"]), 1))
-                    p.setBrush(QColor(theme.T["panel"]))
-                    p.drawRoundedRect(QRectF(g).adjusted(-6, -6, 6, 6), 14, 14)
-                    target = QRectF(g.x(), g.y(), g.width(), 60)
+                    backing = QRectF(self.result_bun.geometry())
+                    target = QRectF(backing.x(), backing.y(), backing.width(), 60)
+                # Bun and his bubble on one panel: not sat on the results' pictures
                 self._bubble(p, target, _("Pick one, you'll love it!"),
                              _("Play to hear it, Add to keep it on your board."),
                              _("Got your own songs? The Add button, ringed up top, brings "
-                               "them in."))
+                               "them in."), backing=backing)
             p.end()
         except Exception:  # noqa: BLE001 - see eventFilter
             log.exception("first-run tour: paint")
@@ -394,9 +393,11 @@ class Tour(QWidget):
         p.drawRoundedRect(r, 12, 12)
 
     def _bubble(self, p: QPainter, target: QRectF, title: str, body: str, hint: str,
-                prefer: str = "right"):
+                prefer: str = "right", backing: QRectF | None = None):
         """A speech bubble in Bun's style (BUBBLE, INK) pointing at `target`: beside it
-        when there's room, else under it, else over it; always inside the window."""
+        when there's room, else under it, else over it; always inside the window.
+        `backing` (on the results): one panel behind the bubble and that rect (Bun),
+        so neither sits on what's under them."""
         bw = min(BUBBLE_W, self.width() - 2 * EDGE)
         inner = bw - 32
         parts = ((title, _font(13, True), INK), (body, _font(10), INK),
@@ -426,6 +427,12 @@ class Tour(QWidget):
         x = max(EDGE, min(x, self.width() - EDGE - bw))
         y = max(EDGE, min(y, self.height() - EDGE - bh))
         box = QRectF(x, y, bw, bh)
+        if backing is not None:
+            panel = (box.united(backing) if not backing.isEmpty() else box).adjusted(
+                -PANEL_PAD, -PANEL_PAD, PANEL_PAD, PANEL_PAD)
+            p.setPen(QPen(QColor(theme.T["border"]), 1))
+            p.setBrush(QColor(theme.T["panel"]))
+            p.drawRoundedRect(panel, 18, 18)
         shape = QPainterPath()
         shape.addRoundedRect(box, 16, 16)
         # the tail: from the bubble's near edge towards the target
