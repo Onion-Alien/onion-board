@@ -1,21 +1,18 @@
-"""Settings window: themes, every global hotkey in one place, the in-game overlay,
-general options."""
+"""Settings window (a page inside the main window): the dialog, its categories and search,
+and the card helpers its pages share. The pages themselves are in ui/settingspages/."""
 from __future__ import annotations
 
 import html
 import logging
-import math
 import re
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, QPoint, QPointF, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QIcon, QImage, QKeySequence, QPainter, QPixmap, QShortcut
+from PySide6.QtCore import QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QPushButton, QScrollArea, QStyle, QStyleOptionButton, QTabWidget,
-                               QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QTabWidget, QVBoxLayout, QWidget)
 
-from shiboken6 import isValid as qt_valid
 
 from soundboard.ui import busy, icons
 from soundboard import usage
@@ -31,6 +28,7 @@ from soundboard.ui.settingspages.general import GeneralPage
 from soundboard.ui.settingspages.connection import ConnectionPage
 from soundboard.ui.settingspages.privacy import PrivacyPage
 from soundboard.ui.settingspages.addons import AddonsPage
+from soundboard.ui.settingspages.heading import Heading, _BackArrow, _Mark
 
 log = logging.getLogger(__name__)
 
@@ -43,89 +41,6 @@ NOTE = _("Hey, thanks for actually using this. Onion Board started because every
           "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
           "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
           "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
-
-
-def _ink_rows(img: QImage) -> float:
-    """The middle of an image's ink between its top and bottom edge, in device px from
-    its top: a blurred end row counts by how much of a typical inked row it covers."""
-    img = img.convertToFormat(QImage.Format.Format_ARGB32_Premultiplied)
-    line, data = img.bytesPerLine(), bytes(img.constBits())
-    ink = [sum(data[y * line + 3:y * line + img.width() * 4:4]) for y in range(img.height())]
-    rows = [y for y, a in enumerate(ink) if a]
-    if not rows:
-        return img.height() / 2
-    typical = sorted(ink[y] for y in rows)[len(rows) // 2]
-    first, last = rows[0], rows[-1]
-    return (first + 1 - min(1.0, ink[first] / typical) + last + min(1.0, ink[last] / typical)) / 2
-
-
-_DRAWN: dict[tuple, tuple[QPixmap, float]] = {}   # (_draw_icon)
-
-
-def _draw_icon(p: QPainter, w: QWidget, name: str, color: str, side: int, x: float,
-               mid: float):
-    """Icon `name` drawn `side` px at `x` with its ink's middle (not its box's: an
-    icon's drawing isn't always in the middle of its picture) on `mid`, in `w`, to a
-    fraction of a screen pixel: a picture lands on whole ones, 0.4 px off at 125%."""
-    k = w.devicePixelRatioF()
-    px = max(1, round(side * k))
-    wy = w.mapTo(w.window(), QPoint(0, 0)).y()
-    plain = _DRAWN.get((name, px))
-    if plain is None:
-        pm = icons.pixmap(name, px, "#000000")
-        plain = _DRAWN[(name, px)] = (pm, _ink_rows(pm.toImage()))
-    at = (wy + mid) * k - plain[1]   # the picture's top, in screen px
-    whole = math.floor(at)
-    frac = round((at - whole) * 8) / 8
-    key = (name, px, icons.resolve(color), frac)
-    drawn = _DRAWN.get(key)
-    if drawn is None:
-        if len(_DRAWN) > 64:
-            _DRAWN.clear()
-        pm = icons.pixmap(name, px, key[2], frac)
-        pm.setDevicePixelRatio(k)
-        drawn = _DRAWN[key] = (pm, 0.0)
-    p.drawPixmap(QPointF(x, whole / k - wy), drawn[0])
-
-
-class _Mark(QWidget):
-    """The heading's cog, drawn `dy` px below its box's middle (_draw_icon): a label's
-    picture moves in whole px, 1.25 screen px at 125%."""
-
-    dy = 0.0
-
-    def __init__(self, name: str, color: str, side: int):
-        super().__init__()
-        self.name, self.color, self.side = name, color, side
-        self.setFixedWidth(side)
-
-    def sizeHint(self):
-        return QSize(self.side, self.side)
-
-    def paintEvent(self, e):
-        p = QPainter(self)
-        _draw_icon(p, self, self.name, self.color, self.side, 0,
-                   self.height() / 2 + self.dy)
-        p.end()
-
-
-class _BackArrow(QPushButton):
-    """The heading's back arrow, drawn `dy` px below the button's middle to the screen
-    pixel (as _Mark): its button, hover and focus look as any quiet one's."""
-
-    dy = 0.0
-    BACK_LEFT = 3   # (the padding's left: SettingsDialog.BACK_PAD)
-
-    def paintEvent(self, e):
-        opt = QStyleOptionButton()
-        self.initStyleOption(opt)
-        opt.icon = QIcon()
-        p = QPainter(self)
-        self.style().drawControl(QStyle.ControlElement.CE_PushButton, opt, p, self)
-        side, left = self.iconSize().height(), self.BACK_LEFT
-        _draw_icon(p, self, "back", "text" if self.isEnabled() else "muted", side,
-                   left + (self.width() - left - side) / 2, self.height() / 2 + self.dy)
-        p.end()
 
 
 class SettingsDialog(QDialog, Built):
@@ -153,6 +68,7 @@ class SettingsDialog(QDialog, Built):
         self.connection = ConnectionPage(self)
         self.privacy = PrivacyPage(self)
         self.addons = AddonsPage(self)
+        self.heading = Heading(self)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.setObjectName("settingspage")   # the window's own background
         self.mw = mw
@@ -284,120 +200,12 @@ class SettingsDialog(QDialog, Built):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self._fit_width(self.width())
-        QTimer.singleShot(0, self._level_with_rail)   # once the rows have their places
+        self.heading._fit_width(self.width())
+        QTimer.singleShot(0, self.heading._level_with_rail)   # once the rows have their places
 
     def showEvent(self, e):
         super().showEvent(e)
-        QTimer.singleShot(0, self._level_with_rail)
-
-    def _caps_mid(self, label: QLabel, dy: int = 0) -> float:
-        """The middle of a one-line label's capitals in the window, in screen pixels
-        (what the eye lines up: not the box, not the descenders), were it `dy` px lower.
-        Measured on an "H" drawn the way the label draws its text, on the same part of a
-        pixel: where Qt and the font's hinting put a line can't be worked out from the
-        font's numbers (Consolas and Tahoma at 125% drew theirs up to 2 px off them)."""
-        k = label.devicePixelRatioF()
-        at = (label.mapTo(self.window(), QPoint(0, 0)).y() + dy) * k
-        whole = math.floor(at)
-        rect = label.contentsRect()
-        key = (label.font().key(), rect.getRect(), int(label.alignment()), k, at - whole)
-        mid = self._caps_cache.get(key)
-        if mid is None:   # (not an alpha-only image: Windows drew its text 4 px off)
-            img = QImage(max(1, math.ceil(label.width() * k)),
-                         math.ceil(label.height() * k) + 2,
-                         QImage.Format.Format_ARGB32_Premultiplied)
-            img.setDevicePixelRatio(k)
-            img.fill(0)
-            p = QPainter(img)
-            p.translate(0, (at - whole) / k)
-            p.setFont(label.font())
-            p.setPen(Qt.GlobalColor.black)
-            p.drawText(rect, int(label.alignment()), "H")
-            p.end()
-            mid = _ink_rows(img)   # (the H's top and bottom edge)
-            self._caps_cache[key] = mid
-        return whole + mid
-
-    def _level_with_rail(self):
-        """The heading row moves down until the middle of "Settings"' capitals is level
-        with the rail's "Onion Board" (the arrow and cog are centred on it); with the
-        name hidden (the rail shut) or a bar above the pages, it sits where the pages
-        start."""
-        if not qt_valid(self) or self.back_btn is None:
-            return
-        lay = self.layout()
-        if lay is not None:
-            lay.activate()   # (a lift just set: measured where it put the row)
-        side = self._side.contentsMargins()
-        lift = self.PAGE_TOP
-        wm = getattr(self.mw, "wordmark", None)
-        if wm is not None and qt_valid(wm) and wm.isVisible():
-            want = self._caps_mid(wm)
-            titled = self.page_title.isVisible()
-            k = self.back_btn.devicePixelRatioF()
-            at = self.back_btn.mapTo(self.window(), QPoint(0, 0)).y()
-
-            def off(dy):   # how far off the name, in screen pixels, dy px lower
-                if titled:
-                    return abs(self._caps_mid(self.page_title, dy) - want)
-                return abs((at + dy + self.back_btn.height() / 2) * k - want)   # (narrow)
-            # the whole-pixel lifts either side of the exact one: the nearer on screen
-            near = (want - self._caps_mid(self.page_title)) / self.devicePixelRatioF()
-            dy = min(range(math.floor(near) - 1, math.ceil(near) + 2), key=off)
-            lift = max(0, min(self.PAGE_TOP, side.top() + dy))
-        if lift != side.top():
-            self._side.setContentsMargins(side.left(), lift, side.right(), side.bottom())
-            if lay is not None:
-                lay.activate()
-        self._level_icons()
-
-    def _level_icons(self):
-        """The arrow and cog centred on the middle of "Settings"' capitals as drawn,
-        wherever the theme's font puts them (_caps_mid): Consolas and Tahoma draw theirs
-        lower in the line than Bahnschrift, Comic Sans higher."""
-        title = self.page_title
-        if not title.isVisible():   # (narrow: the arrow on its own, in its middle)
-            if self.back_btn.dy:
-                self.back_btn.dy = 0.0
-                self.back_btn.update()
-            return
-        caps = (self._caps_mid(title) / title.devicePixelRatioF()
-                - self.mapTo(self.window(), QPoint(0, 0)).y())
-        # both to the screen pixel (_BackArrow, _Mark)
-        for w in (self.back_btn, self.title_cog):
-            dy = caps - w.mapTo(self, QPoint(0, 0)).y() - w.height() / 2
-            if abs(dy - w.dy) > 0.01:
-                w.dy = dy
-                w.update()
-
-    def _fit_width(self, width: int):
-        """Narrow: the categories as an icon column (the name is the tip) and the
-        search box over the page, so a 440 px window has room for the page itself."""
-        narrow = width < self.NARROW_W
-        if narrow == self._narrow:
-            return
-        self._narrow = narrow
-        box = self.search_box
-        (self._side if narrow else self._right).removeWidget(box)
-        if narrow:
-            self._right.insertWidget(0, box)
-            box.setMinimumWidth(0)
-            box.setMaximumWidth(16777215)
-        else:
-            self._side.insertWidget(1 if self.back_btn is not None else 0, box)
-            box.setFixedWidth(196)
-        if self.back_btn is not None:
-            self.page_title.setVisible(not narrow)
-            self.title_cog.setVisible(not narrow)
-        self._content.setSpacing(8 if narrow else 16)
-        for i in range(self.categories.count()):
-            item = self.categories.item(i)
-            title = item.data(Qt.ItemDataRole.UserRole + 1)
-            item.setText("" if narrow else title)
-            item.setToolTip(title if narrow else "")
-            item.setSizeHint(QSize(40 if narrow else 180, 38))
-        self.categories.setFixedWidth(48 if narrow else 196)
+        QTimer.singleShot(0, self.heading._level_with_rail)
 
     def show_page(self, page: str):
         """Go to `page` (also when the window is open already and asked for another).
@@ -493,7 +301,7 @@ class SettingsDialog(QDialog, Built):
             item.setIcon(icons.icon(name, selected="text_hi"))
         if getattr(self, "title_cog", None) is not None:
             self._title_cog()
-            QTimer.singleShot(0, self._level_with_rail)   # (a new theme: maybe a new font)
+            QTimer.singleShot(0, self.heading._level_with_rail)   # (a new theme: maybe a new font)
 
     def _title_cog(self):
         """The heading's cog in this theme's accent (redrawn when the theme changes)."""

@@ -852,11 +852,11 @@ def test_heading_level_with_the_rails_name(window, qapp, theme):  # noqa: F811
     d = _open_in_window(window, qapp, "privacy", 1020, 680)
     # (text lands on whole screen pixels: at 125% a 1 px lower row can move it 2, so
     # the nearest place can be a pixel off the name)
-    process_events(qapp, lambda: abs(d._caps_mid(d.page_title)
-                                     - d._caps_mid(window.wordmark)) <= 1, timeout=3)
+    process_events(qapp, lambda: abs(d.heading._caps_mid(d.page_title)
+                                     - d.heading._caps_mid(window.wordmark)) <= 1, timeout=3)
     assert d.page_title.font().pointSizeF() == window.wordmark.font().pointSizeF()
-    title = d._caps_mid(d.page_title)
-    assert abs(title - d._caps_mid(window.wordmark)) <= 1
+    title = d.heading._caps_mid(d.page_title)
+    assert abs(title - d.heading._caps_mid(window.wordmark)) <= 1
     for icon in (d.back_btn, d.title_cog):
         at = icon.mapTo(window, QPoint(0, 0)).y()
         # (both drawn to the screen pixel, `dy` below their box's middle)
