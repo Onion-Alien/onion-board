@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+import shiboken6
 from PySide6.QtCore import QPoint, QSize, QTimer
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
@@ -338,11 +339,13 @@ class FitControl(Controller):
         if (m.left(), m.right()) != (left, right):
             mw._dl_lay.setContentsMargins(left, 0, right, 0)
 
-    def _refit_dl_bar(self):
+    def _refit_dl_bar(self, *_shown):
         """The download bar came, went or needs another height (rows added, opened):
-        fit the window again for it, once the change is laid out."""
+        fit the window again for it, once the change is laid out. The bar also hides
+        while the window is being deleted (its C++ side already gone): nothing to fit."""
         mw = self.mw
-        if getattr(self, "_dl_refit_due", False) or not hasattr(self, "_dl_steps"):
+        if (getattr(self, "_dl_refit_due", False) or not hasattr(self, "_dl_steps")
+                or not shiboken6.isValid(mw)):
             return
         self._dl_refit_due = True
 
@@ -356,6 +359,8 @@ class FitControl(Controller):
         """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
         and none from the Sounds page, whose first row then sits 8 px down like the rest."""
         mw = self.mw
+        if not shiboken6.isValid(mw):   # hidden as the window is deleted
+            return
         mw._tabs_lay.setSpacing(8 if shown else 0)
         mw._sounds_lay.setContentsMargins(0, 0 if shown else 8, 0, 0)
 

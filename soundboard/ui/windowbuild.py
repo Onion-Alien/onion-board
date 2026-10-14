@@ -489,7 +489,8 @@ class WindowBuilder(Controller):
         mw._dl_lay.addWidget(mw.download_bar)
         tv.addWidget(dl_box)
         mw.download_bar.shown_changed.connect(mw.fitctl._dl_bar_gap)
-        mw.download_bar.shown_changed.connect(lambda _on: mw.fitctl._refit_dl_bar())
+        # (the controller's own slot, not a lambda: Qt drops it with the window)
+        mw.download_bar.shown_changed.connect(mw.fitctl._refit_dl_bar)
         mw.download_bar.room_changed.connect(mw.fitctl._refit_dl_bar)
 
         # ---- tabs
