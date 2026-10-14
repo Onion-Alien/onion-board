@@ -35,7 +35,7 @@ def window(qapp, app_dir, monkeypatch, counted):
     # a new install's first start: nothing on the board, "What's it for?" not answered
     Config(use_mode="", stats_version=__version__).save()
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.resize(1100, 700)
     w.show()
     w.tabs.setCurrentWidget(w.sounds_page)
@@ -43,7 +43,7 @@ def window(qapp, app_dir, monkeypatch, counted):
     if firsttour._current is not None:
         firsttour._current.end()
     w.close()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 

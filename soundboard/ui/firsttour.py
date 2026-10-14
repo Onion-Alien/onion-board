@@ -66,7 +66,7 @@ def can_search() -> bool:
 
 def _elsewhere(win) -> bool:
     """The window isn't the empty Sounds tab in front of them any more."""
-    return (not win.isVisible() or win.isMinimized() or win.is_mini()
+    return (not win.isVisible() or win.isMinimized() or win.fitctl.is_mini()
             or win.tabs.currentWidget() is not win.sounds_page
             or win.setctl.settings_open()
             or QApplication.activeModalWidget() is not None)
