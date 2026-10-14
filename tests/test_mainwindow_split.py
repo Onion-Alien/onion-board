@@ -3,7 +3,7 @@ module that the window owns, not more methods on one 10,000-line class. A method
 out must not come back, and the window must still make each controller."""
 import pytest
 
-from soundboard.ui import (categorycontrol, ffmpegcontrol, importcontrol, mainwindow,
+from soundboard.ui import (alertcontrol, categorycontrol, ffmpegcontrol, importcontrol, mainwindow,
                            updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -21,6 +21,9 @@ SPLIT = [
      ["_build_categories", "_fill_categories", "set_category", "new_category", "toggle_tag",
       "rename_category", "delete_category", "new_subcategory", "_cat_tick",
       "add_category_program"]),
+    ("alertctl", alertcontrol.AlertControl,
+     ["_urgent_now", "_show_urgent", "_hide_urgent", "_urgent_clicked", "discord_problems",
+      "_discord_tick", "_on_discord", "_raw_tick", "_on_mic_users"]),
 ]
 
 

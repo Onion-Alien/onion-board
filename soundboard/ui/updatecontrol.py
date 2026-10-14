@@ -91,7 +91,7 @@ class UpdateControl:
                     QSystemTrayIcon.MessageIcon.Warning if rel.urgent
                     else QSystemTrayIcon.MessageIcon.Information,
                     8000)
-            mw._show_urgent()
+            mw.alertctl._show_urgent()
         mw.update_done.emit(rel, err)   # for the Settings window's "Check now"
         if asked and rel is not None:
             self.show_update()
@@ -103,7 +103,7 @@ class UpdateControl:
         mw.triggers.offer_update(offer)
         if offer.urgent:
             mw.watch_offer = offer
-            mw._show_urgent()
+            mw.alertctl._show_urgent()
 
     def show_update(self):
         """The update pill was clicked: what's new, and what can be done about it."""
@@ -205,7 +205,7 @@ class UpdateControl:
         box = self._update_box
         if box is not None and qt_valid(box):
             box.setText(self._update_box_text())
-        mw._show_urgent()
+        mw.alertctl._show_urgent()
         mw.update_state.emit()
 
     def _update_clicked(self):

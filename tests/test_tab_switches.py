@@ -273,8 +273,8 @@ def test_the_onion_watch_fix_banner_with_the_tab_off(window):
     w = window
     w.set_tab_on("triggers", False)
     w.watch_offer = SimpleNamespace(version="9.9.9", urgent="a fix")
-    assert w._urgent_now() is None
-    w._show_urgent()
+    assert w.alertctl._urgent_now() is None
+    w.alertctl._show_urgent()
     assert w.urgent_bar.isHidden()
 
 

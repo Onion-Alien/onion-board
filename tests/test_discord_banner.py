@@ -30,7 +30,7 @@ def found(**over):
 
 def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
-    window._on_discord((found(activeInputProfile="STUDIO"), ("sig",)))
+    window.alertctl._on_discord((found(activeInputProfile="STUDIO"), ("sig",)))
     assert not window.urgent_bar.isHidden()
     assert "Studio" in window.urgent_lbl.text() and "Custom" in window.urgent_lbl.text()
     assert window.urgent_btn.text() == "Fix Discord"
@@ -38,34 +38,34 @@ def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):
     monkeypatch.setattr(window, "show_chat_guide", guides.append)
     window.urgent_btn.click()
     assert guides == ["discord"]
-    window._on_discord((found(), ("sig2",)))          # fixed in Discord
+    window.alertctl._on_discord((found(), ("sig2",)))          # fixed in Discord
     assert window.urgent_bar.isHidden()
 
 
 def test_studio_on_the_cable_is_fine_but_krisp_is_not(window, monkeypatch):
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: False)
-    window._on_discord((found(activeInputProfile="STUDIO"), ("a",)))
+    window.alertctl._on_discord((found(activeInputProfile="STUDIO"), ("a",)))
     assert window.urgent_bar.isHidden()
-    window._on_discord((found(noiseCancellation=True), ("b",)))
+    window.alertctl._on_discord((found(noiseCancellation=True), ("b",)))
     assert not window.urgent_bar.isHidden() and "Krisp" in window.urgent_lbl.text()
 
 
 def test_unchanged_files_and_no_discord(window, monkeypatch):
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
-    window._on_discord((found(noiseCancellation=True), ("a",)))
+    window.alertctl._on_discord((found(noiseCancellation=True), ("a",)))
     assert not window.urgent_bar.isHidden()
-    window._on_discord((None, ("a",)))               # files unchanged: nothing re-read
+    window.alertctl._on_discord((None, ("a",)))               # files unchanged: nothing re-read
     assert not window.urgent_bar.isHidden()
-    window._on_discord(([], None))                   # Discord closed
+    window.alertctl._on_discord(([], None))                   # Discord closed
     assert window.urgent_bar.isHidden()
 
 
 def test_hiding_it_lasts_until_the_settings_change(window, monkeypatch):
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
-    window._on_discord((found(echoCancellation=True), ("a",)))
+    window.alertctl._on_discord((found(echoCancellation=True), ("a",)))
     window.urgent_bar.findChild(type(window.urgent_btn), "urgenthide").click()
     assert window.urgent_bar.isHidden()
-    window._on_discord((found(echoCancellation=True, automaticGainControl=True), ("b",)))
+    window.alertctl._on_discord((found(echoCancellation=True, automaticGainControl=True), ("b",)))
     assert not window.urgent_bar.isHidden()          # something new is wrong
 
 
@@ -75,10 +75,10 @@ def test_the_tick_reads_on_a_worker(window, monkeypatch, qapp):
     (folder() / "000005.log").write_bytes(store(activeInputProfile="STUDIO"))
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
     monkeypatch.setattr(appaudio, "_process_table", lambda: {7: (1, "discord.exe")})
-    window._discord_tick()
-    assert process_events(qapp, lambda: window.discord_found)
-    assert window.discord_problems() == [dc.STUDIO]
-    assert not window._discord_reading
+    window.alertctl._discord_tick()
+    assert process_events(qapp, lambda: window.alertctl.discord_found)
+    assert window.alertctl.discord_problems() == [dc.STUDIO]
+    assert not window.alertctl._discord_reading
 
 
 def test_guide_on_the_mic_says_custom_not_studio(window, monkeypatch):
@@ -127,7 +127,7 @@ def test_guide_reads_discords_files_off_the_ui_thread(window, monkeypatch):
 def test_every_problem_has_words():
     for p in dc.ORDER:
         assert p in chatguide.SETTING_FIXES
-        from soundboard.ui.mainwindow import DISCORD_URGENT
+        from soundboard.ui.alertcontrol import DISCORD_URGENT
         assert "{name}" in DISCORD_URGENT[p]
 
 
