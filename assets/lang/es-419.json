@@ -1104,7 +1104,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "La pestaña Apps envía el sonido de otro programa (un reproductor de música, un video) a tus amigos, y puede grabarlo.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "La configuración de Discord que evita que corte tus sonidos, y una prueba que escucha lo que hace Discord",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "La configuración de Discord que evita que corte tus sonidos, y una prueba que escucha lo que Discord les hace",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "La pestaña Radio reproduce emisoras de todo el mundo y puede guardar los últimos 15 segundos como pad.",
   "The Triggers tab is switched off (Settings > Tabs).": "La pestaña Disparadores está desactivada (Configuración > Pestañas).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "La pestaña Voz cambia tu voz en vivo, o habla por ti con una voz de computadora.",
   "The Voice tab is switched off (Settings > Tabs).": "La pestaña Voz está desactivada (Configuración > Pestañas).",
@@ -2481,7 +2480,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Está desactivado en Configuración > Privacidad y seguridad, por lo que la radio no contacta a nadie: ni directorio de estaciones, ni estaciones.",
   "Jazz & Soul": "Jazz y soul",
-  "Last {n}s": "Últimos {n} s",
   "Latin": "Musica latina",
   "Most listened": "mas escuchado",
   "Most voted": "Más votados",
@@ -2490,7 +2488,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Aún no hay favoritos. Coloca el cursor sobre una estación y haz clic en su ☆ para mantenerla aquí.",
   "No stations found.": "No se encontraron estaciones.",
   "No stations match these filters.\nTry another genre or country.": "Ninguna estación coincide con estos filtros. Prueba con otro género o país.",
-  "Nothing on the radio has played in the last {n} seconds.": "No se ha reproducido nada en la radio en los últimos {n} segundos.",
   "Nothing played yet.\nStations you listen to show up here.": "Aún no se ha reproducido nada. Las estaciones que escuchas aparecen aquí.",
   "Nothing playing": "Nada jugando",
   "Nothing playing: click a station": "No se reproduce nada: haz clic en una estación",
@@ -2513,7 +2510,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Eliminar de favoritos",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Guarda los últimos {n} segundos de la radio como sonido",
   "Saved a {secs}s clip to your Sounds.": "Guarda un clip de {secs} en tus sonidos.",
   "Search failed: press Enter to try again.": "La búsqueda falló: presione Entrar para intentarlo nuevamente.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Busca estaciones de radio, géneros, países o ciudades… (o haz clic en un punto en el mapa)",
@@ -3392,5 +3388,6 @@
   "Put your sounds into another mic instead": "Poner tus sonidos en otro micrófono",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Graba tu voz, un fragmento de un sonido, una canción o la radio mientras suena, o ambos a la vez, y guárdalo como sonido.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Grabando tu voz y lo que está sonando… habla, reproduce un sonido y luego haz clic en Detener.",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Tu voz y lo que está sonando juntos, como un solo sonido. Lo que suena baja mientras hablas, así tu voz queda por encima"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Tu voz y lo que está sonando juntos, como un solo sonido. Lo que suena baja mientras hablas, así tu voz queda por encima",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "La pestaña Radio reproduce emisoras de todo el mundo y puede grabarlas como pads."
 }

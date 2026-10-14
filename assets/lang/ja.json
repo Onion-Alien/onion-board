@@ -396,7 +396,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "それは Bluetooth ヘッドセットの通話用マイクです: Windows のサウンド効果を通らないものがあります。誰にもサウンドが聞こえない場合は、ヘッドセットの USB ドングルか仮想ケーブルを使ってください。",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "アプリタブでは、ほかのプログラムの音（音楽プレーヤーや動画）をフレンドに送ったり、録音したりできます。",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Discord がサウンドを途切れさせないための設定と、Discord がサウンドをどう処理しているかを聞いて確かめるチェック",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "ラジオタブでは世界中の局を再生でき、直前15秒をパッドとして保存できます。",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "ボイスタブでは、声をリアルタイムで変えたり、合成音声で代わりにしゃべらせたりできます。",
   "The Voice tab is switched off (Settings > Tabs).": "ボイスタブはオフになっています（設定 > タブ）。",
   "The device changed mid-way, so the recording stopped there.": "途中でデバイスが変わったため、録音はそこで止まりました。",
@@ -2428,7 +2427,6 @@
   "Hip-hop": "ヒップホップ",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "[設定] > [プライバシーとセキュリティ] でオフになっているため、ラジオは誰にも連絡しません。ステーション ディレクトリもステーションもありません。",
   "Jazz & Soul": "ジャズ＆ソウル",
-  "Last {n}s": "最後の{n}秒",
   "Latin": "ラテン音楽",
   "Most listened": "最もよく聞かれた",
   "Most voted": "最も投票された",
@@ -2437,7 +2435,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "まだお気に入りはありません。ステーションにカーソルを合わせ、☆をクリックしてここに保持します。",
   "No stations found.": "ステーションが見つかりませんでした。",
   "No stations match these filters.\nTry another genre or country.": "これらのフィルターに一致する放送局はありません。別のジャンルまたは国を試してください。",
-  "Nothing on the radio has played in the last {n} seconds.": "過去{n}秒間、ラジオでは何も再生されていません。",
   "Nothing played yet.\nStations you listen to show up here.": "まだ何も再生されていません。あなたが聞いている放送局がここに表示されます。",
   "Nothing playing": "何も遊んでいない",
   "Nothing playing: click a station": "何も再生されていません：ステーションをクリックしてください",
@@ -2460,7 +2457,6 @@
   "Reggae": "レゲエ",
   "Remove from Favorites": "お気に入りから削除",
   "Rock": "ロック",
-  "Save the last {n} seconds of the radio as a sound": "ラジオの最後の{n}秒をサウンドとして保存します",
   "Saved a {secs}s clip to your Sounds.": "{secs}個のクリップをサウンドに保存しました。",
   "Search failed: press Enter to try again.": "検索に失敗しました：Enter を押して再試行してください。",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ラジオ局、ジャンル、国、都市を検索... (または地図上の点をクリック)",
@@ -3316,5 +3312,6 @@
   "Put your sounds into another mic instead": "サウンドを別のマイクに入れる",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "自分の声、再生中のサウンド・曲・ラジオの一部、またはその両方を同時に録音して、サウンドとして保存します。",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "あなたの声と再生中の音を録音中… 話して、サウンドを再生してから「停止」をクリックしてください。",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "あなたの声と再生中の音を一緒に、1つのサウンドにします。話している間は再生中の音が下がるので、声がしっかり聞こえます"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "あなたの声と再生中の音を一緒に、1つのサウンドにします。話している間は再生中の音が下がるので、声がしっかり聞こえます",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "ラジオタブでは世界中の局を再生でき、パッドとして録音できます。"
 }

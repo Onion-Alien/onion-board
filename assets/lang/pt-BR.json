@@ -402,7 +402,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Esse é o microfone de chamada de um headset Bluetooth: alguns deles pulam os efeitos de som do Windows. Se ninguém ouve seus sons, use o adaptador USB do headset ou o cabo virtual.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "A aba Apps envia o som de outro programa (um player de música, um vídeo) para seus amigos, e pode gravá-lo.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "As configurações do Discord que impedem ele de picotar seus sons, e um teste que ouve o que o Discord faz com eles",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "A aba Rádio toca estações do mundo todo, e pode salvar os últimos 15 segundos como um botão.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "A aba Voz muda sua voz ao vivo, ou fala por você com uma voz de computador.",
   "The Voice tab is switched off (Settings > Tabs).": "A aba Voz está desligada (Configurações > Abas).",
   "The device changed mid-way, so the recording stopped there.": "O dispositivo mudou no meio, então a gravação parou ali.",
@@ -2481,7 +2480,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Está desligado em Configurações > Privacidade e segurança, então o rádio não entra em contato com ninguém: nenhum diretório de estações, nenhuma estação.",
   "Jazz & Soul": "Jazz e Soul",
-  "Last {n}s": "Últimos {n} segundos",
   "Latin": "Música latina",
   "Most listened": "Mais ouvidos",
   "Most voted": "Mais votados",
@@ -2490,7 +2488,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Ainda não há favoritos. Passe o mouse sobre uma estação e clique em ☆ para mantê-la aqui.",
   "No stations found.": "Nenhuma estação encontrada.",
   "No stations match these filters.\nTry another genre or country.": "Nenhuma estação corresponde a esses filtros. Experimente outro gênero ou país.",
-  "Nothing on the radio has played in the last {n} seconds.": "Nada no rádio tocou nos últimos {n} segundos.",
   "Nothing played yet.\nStations you listen to show up here.": "Nada foi jogado ainda. As estações que você ouve aparecem aqui.",
   "Nothing playing": "Nada jogando",
   "Nothing playing: click a station": "Nada tocando: clique em uma estação",
@@ -2513,7 +2510,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Remover dos Favoritos",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Salve os últimos {n} segundos do rádio como som",
   "Saved a {secs}s clip to your Sounds.": "Salvei um clipe de {secs} em seus sons.",
   "Search failed: press Enter to try again.": "Falha na pesquisa: pressione Enter para tentar novamente.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Pesquise estações de rádio, gêneros, países ou cidades… (ou clique em um ponto no mapa)",
@@ -3392,5 +3388,6 @@
   "Put your sounds into another mic instead": "Colocar seus sons em outro microfone",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Grave sua voz, um trecho de um som, música ou do rádio enquanto toca, ou os dois ao mesmo tempo, e guarde como um som.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Gravando sua voz e o que está tocando… fale, toque um som e clique em Parar.",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sua voz e o que está tocando juntos, como um só som. O que está tocando abaixa enquanto você fala, para sua voz ficar por cima"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sua voz e o que está tocando juntos, como um só som. O que está tocando abaixa enquanto você fala, para sua voz ficar por cima",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "A aba Rádio toca estações do mundo todo, e pode gravá-las como botões."
 }

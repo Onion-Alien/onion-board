@@ -1104,7 +1104,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Η καρτέλα Εφαρμογές στέλνει τον ήχο άλλου προγράμματος (music player, βίντεο) στους φίλους σου, και μπορεί να τον ηχογραφήσει.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Οι ρυθμίσεις του Discord που το σταματούν από το να κομματιάζει τους ήχους σου, και ένας έλεγχος που ακούει τι κάνει το Discord",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Οι ρυθμίσεις του Discord που το σταματούν από το να κομματιάζει τους ήχους σου, και ένας έλεγχος που ακούει τι τους κάνει το Discord",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Η καρτέλα Ραδιόφωνο παίζει σταθμούς από όλο τον κόσμο, και μπορεί να σώσει τα τελευταία 15 δευτερόλεπτα ως κουμπί.",
   "The Triggers tab is switched off (Settings > Tabs).": "Η καρτέλα Εναύσματα είναι κλειστή (Ρυθμίσεις > Καρτέλες).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Η καρτέλα Φωνή αλλάζει τη φωνή σου ζωντανά, ή μιλάει για σένα με φωνή υπολογιστή.",
   "The Voice tab is switched off (Settings > Tabs).": "Η καρτέλα Φωνή είναι κλειστή (Ρυθμίσεις > Καρτέλες).",
@@ -2481,7 +2480,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Είναι απενεργοποιημένο στις Ρυθμίσεις > Απόρρητο και ασφάλεια, ώστε το ραδιόφωνο να μην έρχεται σε επαφή με κανέναν: χωρίς κατάλογο σταθμών, χωρίς σταθμούς.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Τελευταία {n} δευτ",
   "Latin": "Latin μουσική",
   "Most listened": "Οι περισσότεροι άκουσαν",
   "Most voted": "Οι περισσότεροι ψήφισαν",
@@ -2490,7 +2488,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Δεν υπάρχουν ακόμα αγαπημένα. Τοποθετήστε το δείκτη του ποντικιού σε έναν σταθμό και κάντε κλικ στο ☆ του για να τον διατηρήσετε εδώ.",
   "No stations found.": "Δεν βρέθηκαν σταθμοί.",
   "No stations match these filters.\nTry another genre or country.": "Κανένας σταθμός δεν ταιριάζει με αυτά τα φίλτρα. Δοκιμάστε άλλο είδος ή χώρα.",
-  "Nothing on the radio has played in the last {n} seconds.": "Δεν έχει παίξει τίποτα στο ραδιόφωνο τα τελευταία {n} δευτερόλεπτα.",
   "Nothing played yet.\nStations you listen to show up here.": "Δεν έπαιξε τίποτα ακόμα. Οι σταθμοί που ακούτε εμφανίζονται εδώ.",
   "Nothing playing": "Δεν παίζει τίποτα",
   "Nothing playing: click a station": "Δεν παίζει τίποτα: κάντε κλικ σε έναν σταθμό",
@@ -2513,7 +2510,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Αφαίρεση από τα Αγαπημένα",
   "Rock": "Ροκ",
-  "Save the last {n} seconds of the radio as a sound": "Αποθηκεύστε τα τελευταία {n} δευτερόλεπτα του ραδιοφώνου ως ήχο",
   "Saved a {secs}s clip to your Sounds.": "Αποθηκεύτηκε ένα κλιπ {secs} στους ήχους σας.",
   "Search failed: press Enter to try again.": "Η αναζήτηση απέτυχε: πατήστε Enter για να προσπαθήσετε ξανά.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Αναζητήστε ραδιοφωνικούς σταθμούς, είδη, χώρες ή πόλεις… (ή κάντε κλικ σε μια κουκκίδα στον χάρτη)",
@@ -3392,5 +3388,6 @@
   "Put your sounds into another mic instead": "Βάλε τους ήχους σου σε άλλο μικρόφωνο",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ηχογραφήστε τη φωνή σας, ένα κομμάτι ήχου, τραγουδιού ή του ραδιοφώνου όσο παίζει, ή και τα δύο μαζί, και κρατήστε το ως ήχο.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Ηχογραφείται η φωνή σας και ό,τι παίζει… μιλήστε, παίξτε έναν ήχο και πατήστε Διακοπή.",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Η φωνή σας και ό,τι παίζει μαζί, ως ένας ήχος. Ό,τι παίζει χαμηλώνει όταν μιλάτε, ώστε η φωνή σας να ακούγεται από πάνω"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Η φωνή σας και ό,τι παίζει μαζί, ως ένας ήχος. Ό,τι παίζει χαμηλώνει όταν μιλάτε, ώστε η φωνή σας να ακούγεται από πάνω",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Η καρτέλα Ραδιόφωνο παίζει σταθμούς από όλο τον κόσμο, και μπορεί να τους ηχογραφήσει ως κουμπιά."
 }

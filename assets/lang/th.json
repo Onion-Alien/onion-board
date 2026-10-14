@@ -396,7 +396,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "นั่นคือไมค์โทรของหูฟัง Bluetooth: บางรุ่นข้ามเอฟเฟกต์เสียงของ Windows ถ้าไม่มีใครได้ยินเสียงของคุณ ให้ใช้ดองเกิล USB ของหูฟังหรือสายเสมือน",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "แท็บ แอป ส่งเสียงของโปรแกรมอื่น (เครื่องเล่นเพลง, วิดีโอ) ไปหาเพื่อน และอัดเก็บได้",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "การตั้งค่า Discord ที่ทำให้มันไม่ตัดเสียงของคุณเป็นท่อนๆ และตัวตรวจที่ฟังว่า Discord ทำอะไรกับเสียง",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "แท็บ วิทยุ เล่นสถานีจากทั่วโลก และบันทึก 15 วินาทีล่าสุดเป็นแพดได้",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "แท็บ เสียงพูด เปลี่ยนเสียงคุณแบบสด หรือพูดแทนคุณด้วยเสียงคอมพิวเตอร์",
   "The Voice tab is switched off (Settings > Tabs).": "แท็บ เสียงพูด ปิดอยู่ (การตั้งค่า > แท็บ)",
   "The device changed mid-way, so the recording stopped there.": "อุปกรณ์เปลี่ยนกลางทาง การอัดจึงหยุดตรงนั้น",
@@ -2428,7 +2427,6 @@
   "Hip-hop": "ฮิปฮอป",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "ปิดอยู่ในการตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย ดังนั้นวิทยุจึงไม่มีใครติดต่อ: ไม่มีไดเรกทอรีสถานี ไม่มีสถานี",
   "Jazz & Soul": "แจ๊สแอนด์โซล",
-  "Last {n}s": "ล่าสุด {n} วินาที",
   "Latin": "เพลงลาติน",
   "Most listened": "ฟังมากที่สุด",
   "Most voted": "โหวตมากที่สุด",
@@ -2437,7 +2435,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "ยังไม่มีรายการโปรด เลื่อนสถานีแล้วคลิก ☆ เพื่อเก็บไว้ที่นี่",
   "No stations found.": "ไม่พบสถานี",
   "No stations match these filters.\nTry another genre or country.": "ไม่มีสถานีที่ตรงกับตัวกรองเหล่านี้ ลองประเภทหรือประเทศอื่น",
-  "Nothing on the radio has played in the last {n} seconds.": "ไม่มีรายการวิทยุใดเล่นในช่วง {n} วินาทีที่ผ่านมา",
   "Nothing played yet.\nStations you listen to show up here.": "ยังไม่ได้เล่นอะไรเลย สถานีที่คุณฟังจะแสดงที่นี่",
   "Nothing playing": "ไม่มีอะไรเล่น",
   "Nothing playing: click a station": "ไม่มีอะไรเล่น: คลิกสถานี",
@@ -2460,7 +2457,6 @@
   "Reggae": "เร้กเก้",
   "Remove from Favorites": "ลบออกจากรายการโปรด",
   "Rock": "ร็อค",
-  "Save the last {n} seconds of the radio as a sound": "บันทึก {n} วินาทีสุดท้ายของวิทยุเป็นเสียง",
   "Saved a {secs}s clip to your Sounds.": "บันทึกคลิป {secs} วินาทีลงในเสียงของคุณ",
   "Search failed: press Enter to try again.": "การค้นหาล้มเหลว: กด Enter เพื่อลองอีกครั้ง",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ค้นหาสถานีวิทยุ ประเภท ประเทศ หรือเมือง... (หรือคลิกจุดบนแผนที่)",
@@ -3316,5 +3312,6 @@
   "Put your sounds into another mic instead": "ใส่เสียงของคุณเข้าไมค์อื่นแทน",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "อัดเสียงของคุณ หรือบางส่วนของเสียง เพลง หรือวิทยุขณะเล่น หรือทั้งสองอย่างพร้อมกัน แล้วเก็บไว้เป็นเสียง",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "กำลังอัดเสียงของคุณและสิ่งที่กำลังเล่น… พูด เล่นเสียง แล้วคลิกหยุด",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "เสียงของคุณและสิ่งที่กำลังเล่นรวมกันเป็นเสียงเดียว สิ่งที่กำลังเล่นจะเบาลงขณะคุณพูด เสียงของคุณจึงอยู่ด้านบน"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "เสียงของคุณและสิ่งที่กำลังเล่นรวมกันเป็นเสียงเดียว สิ่งที่กำลังเล่นจะเบาลงขณะคุณพูด เสียงของคุณจึงอยู่ด้านบน",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "แท็บ วิทยุ เล่นสถานีจากทั่วโลก และอัดเป็นแพดได้"
 }

@@ -127,7 +127,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   it is; drag to move, scroll to zoom: zoomed in, the cities and towns with stations
   are named), or search by name, genre, country or city. Star stations for
   *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. One click plays a station; it plays in your headphones, goes out through
-  your mic when you press **Send**, and can *Record* or save the *Last 15s* as a pad.
+  your mic when you press **Send**, and can *Record* it as a pad.
   The bar's live controls change the pitch (up to ±36 semitones with *Redline*) and
   add bass, treble, muffle, reverb, echo, distortion or a preset.
 - **Apps tab:** send one program's sound (a music player, a browser, a video, a

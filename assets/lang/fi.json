@@ -1104,7 +1104,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Sovellukset-välilehti lähettää toisen ohjelman äänen (musiikkisoitin, video) kavereillesi ja voi nauhoittaa sen.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Discordin asetukset, jotka estävät sitä pilkkomasta ääniäsi, ja tarkistus, joka kuuntelee mitä Discord tekee",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Discordin asetukset, jotka estävät sitä pilkkomasta ääniäsi, ja tarkistus, joka kuuntelee mitä Discord tekee niille",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Radio-välilehti soittaa asemia ympäri maailmaa ja voi tallentaa viimeiset 15 sekuntia napiksi.",
   "The Triggers tab is switched off (Settings > Tabs).": "Laukaisimet-välilehti on pois (Asetukset > Välilehdet).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Puhe-välilehti muuttaa ääntäsi livenä, tai puhuu puolestasi tietokoneäänellä.",
   "The Voice tab is switched off (Settings > Tabs).": "Puhe-välilehti on pois (Asetukset > Välilehdet).",
@@ -2481,7 +2480,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Se on kytketty pois päältä kohdassa Asetukset > Tietosuoja ja turvallisuus, joten radio ei ota yhteyttä keneenkään: ei asemahakemistoa, ei asemia.",
   "Jazz & Soul": "Jazz & soul",
-  "Last {n}s": "Viimeiset {n} s",
   "Latin": "Latinalaista musiikkia",
   "Most listened": "Suurin osa kuunteli",
   "Most voted": "Suurin osa äänesti",
@@ -2490,7 +2488,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Ei vielä suosikkeja. Vie hiiri aseman kohdalle ja napsauta sen ☆ säilyttääksesi sen tässä.",
   "No stations found.": "Asemia ei löytynyt.",
   "No stations match these filters.\nTry another genre or country.": "Mikään asema ei vastaa näitä suodattimia. Kokeile toista genreä tai maata.",
-  "Nothing on the radio has played in the last {n} seconds.": "Mitään radiosta ei ole toistettu viimeisen {n} sekunnin aikana.",
   "Nothing played yet.\nStations you listen to show up here.": "Mitään ei ole vielä pelattu. Kuuntelemasi asemat näkyvät täällä.",
   "Nothing playing": "Ei pelaa mitään",
   "Nothing playing: click a station": "Mitään ei toisteta: napsauta asemaa",
@@ -2513,7 +2510,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Poista suosikeista",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Tallenna radion viimeiset {n} sekuntia äänenä",
   "Saved a {secs}s clip to your Sounds.": "Tallentui {secs} s:n leikkeen Sounds-palveluun.",
   "Search failed: press Enter to try again.": "Haku epäonnistui: yritä uudelleen painamalla Enter.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Hae radioasemia, genrejä, maita tai kaupunkeja… (tai napsauta pistettä kartalla)",
@@ -3392,5 +3388,6 @@
   "Put your sounds into another mic instead": "Laita äänesi toiseen mikkiin",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Äänitä äänesi, pätkä äänestä, kappaleesta tai radiosta sen soidessa, tai molemmat kerralla, ja tallenna se ääneksi.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Äänitetään ääntäsi ja sitä, mikä soi… puhu, soita ääni ja napsauta sitten Pysäytä.",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Äänesi ja se, mikä soi, yhdessä yhtenä äänenä. Se, mikä soi, hiljenee puhuessasi, joten äänesi kuuluu päällimmäisenä"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Äänesi ja se, mikä soi, yhdessä yhtenä äänenä. Se, mikä soi, hiljenee puhuessasi, joten äänesi kuuluu päällimmäisenä",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Radio-välilehti soittaa asemia ympäri maailmaa ja voi nauhoittaa niitä napeiksi."
 }

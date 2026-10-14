@@ -54,8 +54,8 @@ TIPS: tuple[Tip, ...] = (
         "computer voice."), "tab:voice", "voice"),
     Tip("apps", _("The Apps tab sends another program's sound (a music player, a video) "
         "to your friends, and can record it."), "tab:apps", "apps"),
-    Tip("radio", _("The Radio tab plays stations from around the world, and can save the "
-        "last 15 seconds as a pad."), "tab:radio", "radio"),
+    Tip("radio", _("The Radio tab plays stations from around the world, and can record "
+        "them as pads."), "tab:radio", "radio"),
     Tip("queue", _("Right-click a pad → Play next to queue it after the sound that's "
         "playing."), "tab:sounds"),
     Tip("deleted", _("Removed a sound by mistake? It waits in Recently deleted for 30 "

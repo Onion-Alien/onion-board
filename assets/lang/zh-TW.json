@@ -396,7 +396,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "這是藍牙耳機的通話用麥克風：有些會略過 Windows 的音效處理。如果沒有人聽到你的音效，請改用耳機的 USB 接收器或虛擬音源線。",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "「應用程式」分頁可以把其他程式的聲音（音樂播放器、影片）傳給你的朋友，也能錄下來。",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "防止 Discord 把你的音效切得斷斷續續的設定，以及一個檢查 Discord 怎麼處理它們的檢測",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "「電台」分頁可以播放世界各地的電台，還能把最後 15 秒存成按鈕。",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "「語音」分頁可以即時改變你的聲音，或用電腦語音替你說話。",
   "The Voice tab is switched off (Settings > Tabs).": "「語音」分頁已關閉（設定 > 分頁）。",
   "The device changed mid-way, so the recording stopped there.": "裝置在中途變更了，所以錄音停在那裡。",
@@ -2428,7 +2427,6 @@
   "Hip-hop": "嘻哈",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "它在“設定”>“隱私和安全”中關閉，因此收音機無法與任何人聯繫：沒有電台目錄，沒有電台。",
   "Jazz & Soul": "爵士樂與靈魂樂",
-  "Last {n}s": "最後{n}秒",
   "Latin": "拉丁音樂",
   "Most listened": "聽得最多的",
   "Most voted": "投票最多",
@@ -2437,7 +2435,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "還沒有收藏。將滑鼠懸停在某個電台上並點擊其 ☆ 將其保留在此處。",
   "No stations found.": "沒有找到電台。",
   "No stations match these filters.\nTry another genre or country.": "沒有電台與這些過濾器相符。嘗試其他類型或國家。",
-  "Nothing on the radio has played in the last {n} seconds.": "過去{n}秒內收音機未播放任何內容。",
   "Nothing played yet.\nStations you listen to show up here.": "還沒有播放任何內容。您收聽的電台會顯示在此。",
   "Nothing playing": "沒什麼玩的",
   "Nothing playing: click a station": "沒有播放任何內容：點擊一個電台",
@@ -2460,7 +2457,6 @@
   "Reggae": "雷鬼",
   "Remove from Favorites": "從收藏夾中刪除",
   "Rock": "搖滾",
-  "Save the last {n} seconds of the radio as a sound": "將收音機的最後{n}秒儲存為聲音",
   "Saved a {secs}s clip to your Sounds.": "已將{secs}秒剪輯儲存到您的聲音中。",
   "Search failed: press Enter to try again.": "搜尋失敗：按 Enter 鍵重試。",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "搜尋廣播電台、流派、國家或城市…（或點擊地圖上的點）",
@@ -3316,5 +3312,6 @@
   "Put your sounds into another mic instead": "把音效放進另一個麥克風",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "錄下你的聲音，或正在播放的音效、歌曲或電台的一段，或兩者同時錄，並儲存為音效。",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "正在錄製你的聲音和正在播放的內容… 說話、播放一個音效，然後按一下停止。",
-  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的聲音和正在播放的內容合成一個音效。你說話時正在播放的內容會變小，讓你的聲音保持在上面"
+  "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的聲音和正在播放的內容合成一個音效。你說話時正在播放的內容會變小，讓你的聲音保持在上面",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "「電台」分頁可以播放世界各地的電台，還能把它們錄成按鈕。"
 }
