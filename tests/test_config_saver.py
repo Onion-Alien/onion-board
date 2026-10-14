@@ -82,7 +82,7 @@ def test_an_older_snapshot_never_overwrites_a_newer_save(app_dir):
 def test_a_failed_write_is_reported(app_dir, monkeypatch):
     def broken(*_a, **_k):
         raise OSError("disk full")
-    monkeypatch.setattr(library.Path, "write_text", broken)
+    monkeypatch.setattr(library.os, "fsync", broken)
     results = []
     s = library.Saver(Config(), done=results.append)
     s.save()
