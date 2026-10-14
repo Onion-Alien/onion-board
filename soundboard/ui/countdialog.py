@@ -1,7 +1,7 @@
 """*What Count me in sends*: the eye button beside Settings' Count me in opens this
 small table (what, an example, why), so the setting itself stays one line and the
-whole list is one click away. Keep it in step with soundboard/usage.py and the
-SECURITY.md row: anything new the count sends gets a row here too."""
+whole list is one click away. Keep it in step with soundboard/usage.py and SECURITY.md's
+*The anonymous usage count*: anything new the count sends gets a row here too."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
