@@ -731,7 +731,6 @@
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "Onion Board posílá tvoje zvuky (a tvůj hlas, pokud ho posíláš) do:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>V OBS:</b> Zdroje → + → <b>Záznam zvukového výstupu</b> → vyber ho. <b>Ve Voicemeeteru nebo mixpultu:</b> pošli ten vstup dál, kam má jít (Discord, stream, nahrávka).",
   "Onion Board was on your mic but needs a quick repair: <b>one click</b>, and Windows asks for permission once.": "Onion Board byl na tvém mikrofonu, ale potřebuje rychlou opravu: <b>jedno kliknutí</b> a Windows se jednou zeptají na povolení.",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} se nenainstaloval; tohle je pořád {version}. Můžeš si ho stáhnout z jeho stránky a spustit ručně.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} se nepovedlo stáhnout: {rstrip}.",
   "Onion Board {version} is downloaded, click to install it": "Onion Board {version} je stažený, klikni a nainstaluj ho",
   "Onion Board {version} is out (you have {current}).": "Vyšel Onion Board {version} (máš {current}).",

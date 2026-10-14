@@ -259,7 +259,6 @@
   "Onion Board overlay": "Overlay di Onion Board",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board mette i tuoi suoni nel tuo vero microfono, così Discord e i giochi non hanno bisogno di cavi virtuali né di scegliere niente",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} non è stato installato; questa è ancora la {version}. Puoi scaricarlo dalla sua pagina e avviarlo tu.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Impossibile scaricare Onion Board {version}: {rstrip}.",
   "Onion Board {version} is out (you have {current}).": "È uscito Onion Board {version} (tu hai la {current}).",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} è pronto. Riavviare ora per installarlo?",

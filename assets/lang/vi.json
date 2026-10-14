@@ -253,7 +253,6 @@
   "Onion Board overlay": "Lớp phủ Onion Board",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board đưa âm thanh vào mic thật của bạn, nên Discord và game không cần cáp ảo và không cần chọn gì",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} chưa được cài; đây vẫn là {version}. Bạn có thể tải nó từ trang của nó và tự chạy.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Không tải được Onion Board {version}: {rstrip}.",
   "Onion Board {version} is out (you have {current}).": "Đã có Onion Board {version} (bạn đang dùng {current}).",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} đã sẵn sàng. Khởi động lại ngay để cài?",

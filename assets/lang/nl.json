@@ -259,7 +259,6 @@
   "Onion Board overlay": "Onion Board-overlay",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board zet je geluiden in je echte microfoon, dus Discord en games hebben geen virtuele kabel nodig en je hoeft niets te kiezen",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} is niet geïnstalleerd; dit is nog {version}. Je kunt het downloaden van de pagina en zelf uitvoeren.",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} kon niet worden gedownload: {rstrip}.",
   "Onion Board {version} is out (you have {current}).": "Onion Board {version} is uit (jij hebt {current}).",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} staat klaar. Nu herstarten om het te installeren?",

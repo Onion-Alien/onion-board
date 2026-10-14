@@ -253,7 +253,6 @@
   "Onion Board overlay": "Onion Board 悬浮窗",
   "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked": "Onion Board 把你的音效送进你真实的麦克风，所以 Discord 和游戏不需要虚拟音频线，也不用另外选择",
   "Onion Board {pending} wasn't installed; this is still {version}. You can download it from its page and run it yourself.": "Onion Board {pending} 没有安装成功；当前仍是 {version}。你可以从它的页面下载并自己运行。",
-  "Onion Board {version_text}": "Onion Board {version_text}",
   "Onion Board {version} couldn't be downloaded: {rstrip}.": "Onion Board {version} 无法下载：{rstrip}。",
   "Onion Board {version} is out (you have {current}).": "Onion Board {version} 已发布（你的版本是 {current}）。",
   "Onion Board {version} is ready. Restart now to install it?": "Onion Board {version} 已准备好。现在重启安装吗？",
