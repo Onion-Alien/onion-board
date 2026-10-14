@@ -66,7 +66,7 @@ def test_save_as_new_sound_puts_the_picture_on_the_copy(window, tmp_path,  # noq
     w = window
     before = len(w.cfg.sounds)
 
-    d = w.edit("s0")
+    d = w.editctl.edit("s0")
     d.btn_pic_file.click()
     d.as_copy = True
     d.done(QDialog.Accepted)
@@ -107,7 +107,7 @@ def test_delete_info_from_edit_hides_the_line_and_saves(window, monkeypatch):  #
 
 
 def test_renaming_to_another_sounds_name_warns(window):  # noqa: F811
-    d = window._new_editor(window.meta("s0"), "sound")
+    d = window.editctl._new_editor(window.meta("s0"), "sound")
     other = window.meta("s1").name
     assert not d.name_hint.isVisibleTo(d)          # its own name: no warning
     d.name.setText(f"  {other.upper()} ")          # any case, spaces round it

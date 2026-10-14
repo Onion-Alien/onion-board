@@ -513,7 +513,7 @@ def menu_pick(monkeypatch, path):
     """Make the pad menu pick the action at `path` (texts, through submenus); returns
     the top-level menu's texts as it was shown."""
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui import mainwindow
+    from soundboard.ui import mainwindow, padcontrol
     shown = []
 
     class Menu(QMenu):
@@ -525,6 +525,7 @@ def menu_pick(monkeypatch, path):
                 acts = a.menu().actions() if a.menu() else acts
             return a
     monkeypatch.setattr(mainwindow, "QMenu", Menu)
+    monkeypatch.setattr(padcontrol, "QMenu", Menu)
     return shown
 
 
@@ -534,13 +535,13 @@ def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     from soundboard.ui import mainwindow
     monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     assert shown == ["Play next", "Volume", "---", "Edit", "Rename",
                      "Set hotkey", "Categories", "---", "Duplicate",
                      "Export", "Open file location", "Remove"]
     assert w.meta("s0").hotkey == "ctrl+alt+7"
     shown = menu_pick(monkeypatch, ["Hotkey: Ctrl+Alt+7", "Remove hotkey"])
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     assert "Hotkey: Ctrl+Alt+7" in shown and "Set hotkey" not in shown
     assert w.meta("s0").hotkey == ""
 
@@ -552,17 +553,17 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     from soundboard.ui import busy, sourcedialog
     w = window
     shown = menu_pick(monkeypatch, ["Duplicate"])
-    monkeypatch.setattr(w, "duplicate_sound", lambda sid: None)
-    w.pad_menu("s0", None)
+    monkeypatch.setattr(w.editctl, "duplicate_sound", lambda sid: None)
+    w.padctl.pad_menu("s0", None)
     assert "YouTube" not in shown
     w.meta("s0").source = {"site": "youtube", "link": LINK}
     opened = []
     monkeypatch.setattr(busy, "open_url", lambda url, **kw: opened.append(url) or True)
     shown = menu_pick(monkeypatch, ["YouTube", "Open on YouTube"])
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     assert shown.index("YouTube") == shown.index("Export") + 1 and opened == [LINK]
     menu_pick(monkeypatch, ["YouTube", "Copy link"])
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     from PySide6.QtWidgets import QApplication
     assert QApplication.clipboard().text() == LINK
     dialogs = []
@@ -571,11 +572,11 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     from soundboard import quality
     monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
     shown = menu_pick(monkeypatch, ["Duplicate"])
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     assert "YouTube" not in shown and w.meta("s0").source   # hidden, still kept
     monkeypatch.setattr(quality, "current", quality.Prefs())
     menu_pick(monkeypatch, ["YouTube", "Details"])
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     [d] = dialogs
     assert d.btn_open.text() == "Open on YouTube" and d.btn_open.toolTip() == LINK
     d.close()
@@ -631,11 +632,12 @@ def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp):
     QTest.keyClick(pad, Qt.Key_F2)
     assert w.meta("s0").name == "Big boom" and pad.meta.name == "Big boom"
     edited = []
-    monkeypatch.setattr(w, "edit", lambda sid, tab="sound": edited.append(sid))
+    pad.edit.disconnect()   # (wired to the real Edit sound when the pad was made)
+    pad.edit.connect(edited.append)
     QTest.keyClick(pad, Qt.Key_Return, Qt.AltModifier)
     assert edited == ["s0"]
     asked = []
-    monkeypatch.setattr(w, "ask_remove", lambda sids: asked.append(list(sids)) or False)
+    monkeypatch.setattr(w.rmctl, "ask_remove", lambda sids: asked.append(list(sids)) or False)
     QTest.keyClick(pad, Qt.Key_Delete)
     assert asked == [["s0"]]
     QTest.keyClick(pad, Qt.Key_F, Qt.ControlModifier)
@@ -649,7 +651,7 @@ def test_duplicate_and_show_file(window, monkeypatch):
     from pathlib import Path
     w = window
     w.meta("s0").hotkey = "f1"
-    new = w.duplicate_sound("s0")
+    new = w.editctl.duplicate_sound("s0")
     assert new is not None and new.id in w.pads
     assert [m.id for m in w.cfg.sounds][:2] == ["s0", new.id]
     assert new.name == "Boom (copy)" and new.hotkey == "" and new.file != w.meta("s0").file
@@ -658,13 +660,13 @@ def test_duplicate_and_show_file(window, monkeypatch):
     monkeypatch.setattr(subprocess, "Popen", lambda args, **k: runs.append(args))
     from soundboard.ui import mainwindow as mwmod
     monkeypatch.setattr(mwmod.sys, "platform", "win32")
-    w.show_sound_file("s0")
+    w.editctl.show_sound_file("s0")
     assert runs and runs[-1][0] == "explorer" and runs[-1][-1] == w.meta("s0").file
     toasts = []
     from soundboard.ui import busy
     monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append(kind))
     w.meta("s0").file = str(Path(w.meta("s0").file).with_name("gone.wav"))
-    w.show_sound_file("s0")
+    w.editctl.show_sound_file("s0")
     assert toasts[-1] == "warn" and len(runs) == 1
 
 
@@ -675,5 +677,5 @@ def test_transport_time_is_blank_until_a_sound_is_picked(window):
     w.select("s0")
     w._update_transport({})   # the player's timer tick
     assert w.np_time.text() and not w.np_time.isHidden()
-    w.remove_sound("s0")   # back to "Pick a sound"
+    w.rmctl.remove_sound("s0")   # back to "Pick a sound"
     assert w.np_time.text() == "" and w.np_time.isHidden()

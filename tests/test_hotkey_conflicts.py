@@ -94,15 +94,15 @@ def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qa
     from conftest import process_events
     from soundboard import trash
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
-    for sid, done in (("s0", window.undo_remove), ("s1", None)):
+    for sid, done in (("s0", window.rmctl.undo_remove), ("s1", None)):
         window.meta(sid).hotkey = "f9"
-        window.remove_sound(sid)
+        window.rmctl.remove_sound(sid)
         window.set_global_hotkey("stop_hotkey", "f9")
         if done is None:   # from Recently deleted
-            window._finish_removals()
-            window._wait_bin()
+            window.rmctl._finish_removals()
+            window.rmctl._wait_bin()
             [it] = trash.items(trash.SOUND)
-            assert window._restore_deleted(trash.take(it.id))
+            assert window.rmctl._restore_deleted(trash.take(it.id))
         else:
             done()
         assert window.meta(sid).hotkey == "" and window.cfg.stop_hotkey == "f9"

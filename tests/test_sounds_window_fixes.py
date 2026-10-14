@@ -86,15 +86,15 @@ def test_undo_after_a_rename_or_delete_does_not_bring_the_old_category_back(wind
                                                                            monkeypatch):
     window.catctl.new_category("s0", name="Memes")
     window.catctl.new_category("s1", name="Loud")
-    window.remove_sound("s0")
+    window.rmctl.remove_sound("s0")
     window.catctl.rename_category("Memes", "Jokes")
-    window.undo_remove()
+    window.rmctl.undo_remove()
     assert window.cfg.categories == ["Jokes", "Loud"]
     assert window.meta("s0").tags == ["Jokes"]
-    window.remove_sound("s1")
+    window.rmctl.remove_sound("s1")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
     window.catctl.delete_category("Loud")
-    window.undo_remove()
+    window.rmctl.undo_remove()
     assert window.cfg.categories == ["Jokes"] and window.meta("s1").tags == []
 
 
@@ -103,7 +103,7 @@ def test_save_as_new_sound_stays_in_the_category(window, monkeypatch, qapp):
     window.catctl.set_category("Memes")
     window.meta("s0").fade_in = 1.5
 
-    d = window.edit("s0")
+    d = window.editctl.edit("s0")
     d.as_copy = True
     d.done(1)
     new = window.cfg.sounds[1]
@@ -138,7 +138,7 @@ def test_a_backup_restores_sounds_removed_a_moment_ago(window, tmp_path, qapp, m
     assert window.cfg.sounds == []
     window.impctl.import_package(str(out))   # still inside the Undo window
     process_events(qapp, lambda: said(window).startswith("Imported"), 10)
-    window._finish_removals()
+    window.rmctl._finish_removals()
     assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn", "Crash"]
 
 
@@ -237,8 +237,8 @@ def test_a_sound_pack_resets_to_how_it_came(window, tmp_path, qapp):
     door, dragon, coins = _import_three(window, tmp_path, qapp)
     pid = door.pack
     door.name, door.hotkey, door.volume, door.tags = "My door", "f9", 1.5, ["Mine"]
-    window.remove_sounds([dragon.id])
-    window._finish_removals()
+    window.rmctl.remove_sounds([dragon.id])
+    window.rmctl._finish_removals()
     assert [m.name for m in window.cfg.sounds[3:]] == ["My door", "Coins"]
     window.impctl.reset_pack(pid, ask=False)
     process_events(qapp, lambda: len(window.cfg.sounds) == 6, 10)
@@ -325,14 +325,14 @@ def test_a_sound_pack_is_removed_in_one_go_and_undone(window, tmp_path, qapp):
     pid = door.pack
     window.impctl.remove_pack(pid, ask=False)
     assert [m.name for m in window.cfg.sounds] == ["Boom", "Airhorn", "Crash"]
-    window.undo_remove()
+    window.rmctl.undo_remove()
     assert len(window.cfg.sounds) == 6
-    window._finish_removals()
-    window._wait_bin()
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
     assert pid in backup.packs()   # undone: still kept
     window.impctl.remove_pack(pid, ask=False)
-    window._finish_removals()
-    window._wait_bin()
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
     assert backup.packs() == {}
 
 
