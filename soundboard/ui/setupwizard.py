@@ -1294,6 +1294,10 @@ class SetupWizard(QDialog):
         super().done(r)
         if tour:   # once the guide is gone (and the window has its devices back)
             from soundboard.ui import firsttour
+            if firsttour.will_run(self.win):
+                # a first start opens on the Setup tab (nothing set up yet): the
+                # guide's done, so on to the board it's about
+                self.win.tabs.setCurrentWidget(self.win.sounds_page)
             QTimer.singleShot(firsttour.START_MS, self.win, lambda w=self.win: firsttour.start(w))
 
     # ------------------------------------------------------------------ actions

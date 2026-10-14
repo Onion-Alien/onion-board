@@ -1,20 +1,23 @@
 """Bun's first-run tour of the empty board: ten seconds on where sounds come from.
 
-Right after the very first setup guide (setupwizard.SetupWizard.done), on a board with
-no sounds yet, the window dims and Bun, in a spotlight, says there are none:
+Right after the very first setup guide (setupwizard.SetupWizard.done: a new install's
+first start, never an update, a reset or a restored backup), on a board with no sounds
+yet, the window dims and Bun, in a spotlight, says there are none:
 
   "bun"      Bun and his bubble. Any click or key moves on; Esc ends it.
-  "search"   The search box in a yellow ring: type a song, press Enter. Optional: a
-             click anywhere else (or Esc) ends it.
+  "search"   The search box in a yellow ring: type a song, press Enter. A click
+             anywhere else (or Esc) ends it.
   "wait"     They searched: nothing drawn while the results load.
   "results"  The results are up: Bun comes back beside the first one ("pick one"), the
-             Add button ringed for their own files. Any click, key or scroll ends it
-             and goes on to whatever was clicked.
+             Add button ringed for their own files. Any click, key or scroll ends it.
+  "add"      Offline mode (or every search site switched off): instead of the search
+             box, the Add button in the ring, for a song from their own files. Any click
+             ends it.
 
-Never in Offline mode or with every search site switched off (there'd be nothing to
-find), never in the mini player, and once only (Config.tips_seen). It ends by itself
-when sounds arrive (an import), the Sounds tab is left, a dialog opens, or the window
-goes away.
+It never forces anything: it takes no clicks (each one goes on to what was under it:
+the Radio tab, the cog…), and it ends for good when they leave the Sounds tab, open a
+menu, a dialog or Settings, sounds arrive, the window goes away, or they leave it alone
+for a minute (IDLE_S). Once only (Config.tips_seen).
 """
 from __future__ import annotations
 
@@ -36,10 +39,12 @@ KEY = "first-run-tour"   # in Config.tips_seen once shown
 START_MS = 700           # after the setup guide closes: the window settles first
 TICK_MS = 150            # follows the window (sizes, results, tab) this often
 WAIT_MAX_S = 30.0        # a search that never answers ends the tour
+IDLE_S = 60.0            # a step left alone this long: the tour goes away by itself
+CLICK_MS = 60            # after a click on the first step: did it open something?
 # the ring round what to use next: a fixed yellow, drawn on the dimmed window (so the
 # same in every theme), as asked for: "a yellow border around the search bar"
 RING = QColor("#ffd23f")
-DIM = {"bun": 165, "search": 135, "results": 105}   # how dark the rest of the window gets
+DIM = {"bun": 165, "search": 135, "results": 105, "add": 135}   # how dark the rest gets
 BUBBLE_W = 340           # a bubble's width at most (less in a small window)
 EDGE = 12                # bubbles keep this far in from the window's edges
 GAP = 18                 # between a bubble and what it points at (its tail spans it)
@@ -48,21 +53,31 @@ _current: Tour | None = None
 
 
 def will_run(win) -> bool:
-    """Would the tour run once the setup guide closes: not seen yet, no sounds yet,
-    and searching possible (not Offline mode, not every site switched off)."""
+    """Would the tour run once the setup guide closes: not seen yet, no sounds yet."""
     cfg = win.cfg
-    return (KEY not in cfg.tips_seen and not cfg.sounds and not net.offline()
-            and SearchResults.available())
+    return KEY not in cfg.tips_seen and not cfg.sounds
+
+
+def can_search() -> bool:
+    """Searching online works (not Offline mode, not every site switched off): the
+    tour shows the search box, else the Add button."""
+    return not net.offline() and SearchResults.available()
+
+
+def _elsewhere(win) -> bool:
+    """The window isn't the empty Sounds tab in front of them any more."""
+    return (not win.isVisible() or win.isMinimized() or win.is_mini()
+            or win.tabs.currentWidget() is not win.sounds_page
+            or win.setctl.settings_open()
+            or QApplication.activeModalWidget() is not None)
 
 
 def start(win) -> Tour | None:
     """Start the tour over `win` (the main window), if it should run now."""
     global _current
     try:
-        if (_current is not None or not will_run(win) or not win.isVisible()
-                or win.isMinimized() or win.is_mini()
-                or win.tabs.currentWidget() is not win.sounds_page
-                or QApplication.activeModalWidget() is not None):
+        if (_current is not None or not will_run(win) or _elsewhere(win)
+                or QApplication.activePopupWidget() is not None):
             return None
     except RuntimeError:   # the window went meanwhile
         return None
@@ -84,16 +99,19 @@ def _font(size_pt: float, bold: bool = False) -> QFont:
 
 class Tour(QWidget):
     """The dimmed layer over the window, its bubbles and rings. A child of the
-    window that covers it; it takes clicks only on its first step, and watches the
-    app's input (eventFilter) for the rest."""
+    window that covers it; it never takes a click (WA_TransparentForMouseEvents): it
+    watches the app's input instead (eventFilter)."""
 
     def __init__(self, win):
         super().__init__(win)
         self.win = win
         self.step = ""
+        self.online = can_search()   # the search box, or (offline) the Add button
         self._wait_since = 0.0
+        self._last_input = time.monotonic()
         self._ended = False
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setGeometry(win.rect())
         # Bun on the board: his own small bubble waits while the tour's speaks for him
         self.bun = win.grid.bun
@@ -115,17 +133,13 @@ class Tour(QWidget):
     # ------------------------------------------------------------------ steps
     def _go(self, step: str):
         self.step = step
+        self._last_input = time.monotonic()   # each step gets its own minute
         if step == "bun":
             self.bun.lines, self.bun.hope_lines = (), ()
             self.bun.say = ""
             self.bun.hope(True)   # happy to see them
-            self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
-            self.setFocus()
         else:
             self._bun_back()
-            # the window works as usual underneath from here: the search box takes the
-            # typing, a result's Play / Add take their clicks
-            self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         if step == "search":
             self.win.search.setFocus(Qt.FocusReason.OtherFocusReason)
         elif step == "wait":
@@ -136,20 +150,27 @@ class Tour(QWidget):
         self._place_result_bun()
         self.update()
 
+    def _next(self):
+        """On from Bun: to the search box, or offline to the Add button."""
+        self._go("search" if self.online else "add")
+
     def _bun_back(self):
         """The board's Bun back to his own lines and mood."""
         if self.bun.lines == () and self._bun_lines is not None:
             self.bun.lines, self.bun.hope_lines = self._bun_lines
             self.bun.hope(False)
 
-    def end(self, skipped: bool = False):
-        """Gone for good (it never comes back: Config.tips_seen)."""
+    def end(self, skipped: bool = False, count: str = ""):
+        """Gone for good (it never comes back: Config.tips_seen). `count`: what to
+        count instead of tour-skipped when it wasn't skipped."""
         global _current
         if self._ended:
             return
         self._ended = True
         if skipped:
             usage.used("tour-skipped")
+        elif count:
+            usage.used(count)
         self.timer.stop()
         app = QApplication.instance()
         if app is not None:
@@ -163,16 +184,27 @@ class Tour(QWidget):
         if _current is self:
             _current = None
 
+    def _gone(self) -> bool:
+        """They're somewhere else now: another tab, Settings, a dialog, a menu (but
+        the search box's own site menu on the search step), or sounds arrived."""
+        w = self.win
+        if _elsewhere(w) or (self.step in ("bun", "search", "add") and w.cfg.sounds):
+            return True
+        popup = QApplication.activePopupWidget()
+        return popup is not None and not (self.step == "search" and self._in_search(popup))
+
     def _tick(self):
         """Follow the window: its size, its search results; stop when it's no
-        longer the empty Sounds tab in front of them."""
+        longer the empty Sounds tab in front of them, or left alone a minute."""
         try:
+            if self._ended:
+                return
             w = self.win
-            if (not w.isVisible() or w.isMinimized() or w.is_mini()
-                    or w.tabs.currentWidget() is not w.sounds_page
-                    or QApplication.activeModalWidget() is not None
-                    or (self.step in ("bun", "search") and w.cfg.sounds)):
+            if self._gone():
                 self.end()
+                return
+            if self.step != "wait" and time.monotonic() - self._last_input > IDLE_S:
+                self.end(count="tour-ignored")
                 return
             if self.geometry() != w.rect():
                 self.setGeometry(w.rect())
@@ -212,35 +244,56 @@ class Tour(QWidget):
             return False
         if not isinstance(obj, QWidget) or obj.window() is not self.win:
             return False   # another window (a menu, a dialog): not the tour's
+        self._last_input = time.monotonic()
         if t == QEvent.Type.KeyPress and ev.key() == Qt.Key.Key_Escape:
-            self.end(skipped=self.step in ("bun", "search"))
+            self.end(skipped=self.step in ("bun", "search", "add"))
             return self.step == "bun"   # (in the search box, Esc does its own thing too)
         if self.step == "bun":
-            if t == QEvent.Type.Wheel:
-                return True   # the board stays put under the spotlight
-            self._go("search")
-            if t == QEvent.Type.KeyPress and ev.text().strip():
-                self.win.search.insert(ev.text())   # typing at once: it goes in the box
-            return True   # the click or key that moved on does nothing else
+            if t == QEvent.Type.MouseButtonPress:
+                # the click goes on to what was under it; if that opened something
+                # (a tab, a menu, Settings) the tour ends, else it moves on
+                QTimer.singleShot(CLICK_MS, self, self._after_click)
+            elif t == QEvent.Type.KeyPress:
+                self._next()
+                if self.online and ev.text().strip() and not ev.modifiers() & (
+                        Qt.KeyboardModifier.ControlModifier
+                        | Qt.KeyboardModifier.AltModifier):
+                    self.win.search.insert(ev.text())   # typing at once: it goes in the box
+                    return True
+            return False   # (a scroll: the board scrolls as usual)
         if self.step == "search":
             if t == QEvent.Type.MouseButtonPress and not self._in_search(obj):
                 self.end(skipped=True)   # not now: the click goes on to what was under it
+            return False
+        if self.step == "add":
+            if t == QEvent.Type.MouseButtonPress:
+                add = self.win.btn_add
+                on_add = obj is add or add.isAncestorOf(obj)
+                self.end(skipped=not on_add, count="tour-files")
             return False
         if self.step == "results":
             self.end()   # they got it: the click goes on (Play, Add, …)
         return False
 
+    def _after_click(self):
+        if self._ended or self.step != "bun":
+            return
+        try:
+            if self._gone():
+                self.end()
+            else:
+                self._next()
+        except RuntimeError:
+            self.end()
+
     def _in_search(self, obj) -> bool:
-        """The search box, its clear button, or the site button next to it."""
+        """The search box, its clear button, or the site button next to it (and its
+        menu)."""
         w = self.win
+        if isinstance(obj, QWidget) and obj.isWindow() and obj is not w:
+            obj = obj.parentWidget()   # a popup: whose is it
         return any(obj is b or (isinstance(obj, QWidget) and b.isAncestorOf(obj))
                    for b in (w.search, w.btn_yt))
-
-    def mousePressEvent(self, ev):   # noqa: N802 - Qt (the first step only)
-        ev.accept()
-
-    def keyPressEvent(self, ev):   # noqa: N802 - Qt (eventFilter moves it on)
-        ev.accept()
 
     # ------------------------------------------------------------------ drawing
     def _rect(self, widget: QWidget, pad: float) -> QRectF:
@@ -278,7 +331,10 @@ class Tour(QWidget):
                 hole = self._bun_hole()
                 self._dim(p, [hole])
                 self._bubble(p, hole, _("No sounds here yet!"),
-                             _("How about your favourite song? I'll show you where to look."),
+                             _("How about your favourite song? I'll show you where to look.")
+                             if self.online else
+                             _("Got a song or a sound on your PC? I'll show you where it "
+                               "goes."),
                              _("Click anywhere to keep going · Esc to skip"))
             elif self.step == "search":
                 box = self._rect(self.win.search, 6)
@@ -286,6 +342,14 @@ class Tour(QWidget):
                 self._ring(p, box)
                 self._bubble(p, box, _("Type a song you love, then press Enter"),
                              _("Try anything: a song, a meme, a game sound."),
+                             _("Not now? Click anywhere else."), prefer="below")
+            elif self.step == "add":
+                add = self._rect(self.win.btn_add, 6)
+                self._dim(p, [add])
+                self._ring(p, add)
+                self._bubble(p, add, _("Add a song from your PC"),
+                             _("Click Add, then Sound files, and pick a song or a sound "
+                               "you have."),
                              _("Not now? Click anywhere else."), prefer="below")
             elif self.step == "results":
                 first = self._first_result()
@@ -297,6 +361,10 @@ class Tour(QWidget):
                 target = first if first is not None else add
                 if not self.result_bun.isHidden():   # beside Bun, who's beside the result
                     g = self.result_bun.geometry()
+                    # his own card, as on the board: not sat on a result's picture
+                    p.setPen(QPen(QColor(theme.T["border"]), 1))
+                    p.setBrush(QColor(theme.T["panel"]))
+                    p.drawRoundedRect(QRectF(g).adjusted(-6, -6, 6, 6), 14, 14)
                     target = QRectF(g.x(), g.y(), g.width(), 60)
                 self._bubble(p, target, _("Pick one, you'll love it!"),
                              _("Play to hear it, Add to keep it on your board."),
