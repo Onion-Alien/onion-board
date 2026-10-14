@@ -205,7 +205,7 @@ class FfmpegControl:
     def news(self):
         """The bar, and Settings' FFmpeg row if it's built, show the current state."""
         self.show_bar()
-        dlg = self.mw._settings_dlg
+        dlg = self.mw.setctl._settings_dlg
         if dlg is not None and qt_valid(dlg):
             dlg._ffmpeg_sync()
 

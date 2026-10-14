@@ -12,6 +12,7 @@ from conftest import own_module, said
 from soundboard import appaudio, applog, autostart, library, net
 from soundboard.ui import chatguide, crashdialog, responsive
 from soundboard.ui import importcontrol
+from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import worker
 from test_trim_updates_autostart import FakeReg
@@ -219,7 +220,7 @@ def test_edit_sound_sits_beside_the_board_one_per_sound(window, qapp):
     qapp.processEvents()
     assert window.editctl._editors == {}
     # each one freed but one, kept for the next sound edited
-    assert len(window.findChildren(main.EditDialog)) == 1
+    assert len(window.findChildren(EditDialog)) == 1
 
 
 def test_a_kept_edit_window_shows_the_next_sound_as_a_new_one_would(window, qapp):
@@ -372,15 +373,15 @@ def test_discord_check_cleans_up_when_play_fails(qapp, monkeypatch):
 def test_settings_and_edit_built_behind_the_loading_screen(window, qapp):
     """Built behind the loading screen (app.main): the first click of the cog or Edit
     opens the ones already made, and the window stays as it was meanwhile."""
-    window.preload_dialogs()
+    window.setctl.preload_dialogs()
     window.show()
     qapp.processEvents()
     size = window.size()
-    window.warm_settings()
-    assert window.size() == size and not window.settings_open()
-    kept, spare = window._settings_kept, window._spare_editor
+    window.setctl.warm_settings()
+    assert window.size() == size and not window.setctl.settings_open()
+    kept, spare = window.setctl._settings_kept, window.setctl._spare_editor
     assert kept is not None and spare is not None
-    assert window.open_settings("audio") is kept and window.settings_open()
+    assert window.setctl.open_settings("audio") is kept and window.setctl.settings_open()
     kept.accept()
     qapp.processEvents()
     sid = window.cfg.sounds[-1].id

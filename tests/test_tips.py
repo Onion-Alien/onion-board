@@ -59,7 +59,7 @@ def test_window_shows_a_tip_and_show_me_goes_there(window, monkeypatch):  # noqa
     w.cfg.tip_day = ""
     monkeypatch.setattr(w, "isVisible", lambda: True)
     opened = []
-    monkeypatch.setattr(w, "open_settings", lambda page="privacy": opened.append(page))
+    monkeypatch.setattr(w.setctl, "open_settings", lambda page="privacy": opened.append(page))
     assert w._maybe_tip()
     assert not w.tip_bar.isHidden() and "Tabs" in w.tip_lbl.text()
     assert "tabs" in w.cfg.tips_seen and w.cfg.tip_day == tips.today()

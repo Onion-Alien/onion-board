@@ -28,14 +28,14 @@ def test_translated_labels_fit_across_themes(translated_window):
     w = translated_window
     w.show()
     for name in theme.THEMES:
-        w.apply_theme(name)
+        w.themectl.apply_theme(name)
         for width, height in ((800, 600), (440, 600)):
             w.resize(width, height)
             for page in (w.sounds_page, w.setup_page, w.voice, None):
                 if page is None:
-                    w.open_settings("appearance")
+                    w.setctl.open_settings("appearance")
                 else:
-                    w.close_settings()
+                    w.setctl.close_settings()
                     w.tabs.setCurrentWidget(page)
                 QApplication.processEvents()
                 for label in w.findChildren(QLabel, "pickedname"):

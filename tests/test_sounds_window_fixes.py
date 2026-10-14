@@ -15,6 +15,7 @@ from conftest import process_events, said
 from soundboard import backup, engine, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui import mainwindow as main
+from soundboard.ui.dialogs import EditDialog
 
 
 def _tone(path, seconds=0.1):
@@ -119,7 +120,7 @@ def test_the_edit_dialog_does_not_nudge_the_volume(window):
     assert drifting
     for pct in drifting[:6]:
         m.volume = pct / 100
-        d = main.EditDialog(m, window.hotkeys, window.preview, window)
+        d = EditDialog(m, window.hotkeys, window.preview, window)
         d.apply()
         d.deleteLater()
         assert round(m.volume * 100) == pct

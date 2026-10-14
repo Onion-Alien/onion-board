@@ -54,7 +54,7 @@ def heading_parts(card: QWidget):
 
 
 def _shown_setup(window, route):  # noqa: F811
-    window.apply_theme("Dark")
+    window.themectl.apply_theme("Dark")
     window.cfg.route = route
     window.routectl._show_route()
     window.statusctl._update_status()
@@ -90,7 +90,7 @@ def test_setup_heading_ink_follows_live_font_changes(window, theme_name):  # noq
     _shown_setup(window, "mic")
     # The cards were built in the default font; a live theme switch must realign them.
     for name in (theme_name, "Dark", theme_name):
-        window.apply_theme(name)
+        window.themectl.apply_theme(name)
         for _ in range(8):
             QApplication.processEvents()
             window._refit()

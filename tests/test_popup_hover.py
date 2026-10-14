@@ -64,7 +64,7 @@ def test_onion_menu_dismissed_away_clears_rail_fill(qapp, window):  # noqa: F811
         qapp.processEvents()
         assert button.underMouse()
         assert button.grab().toImage() != resting
-        window._show_about_menu()
+        window.aboutctl._show_about_menu()
         QTest.mouseMove(window.about_menu, window.about_menu.rect().center())
         window.about_menu.close()
         button.clearFocus()

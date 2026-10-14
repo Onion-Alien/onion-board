@@ -54,7 +54,7 @@ def ink_middle(widget, parent, capital=False):
 def test_footer_icon_capitals_stay_level(window, name):  # noqa: F811
     window.show()
     window.resize(1700, 900)
-    window.apply_theme(name)
+    window.themectl.apply_theme(name)
     for _ in range(8):
         QApplication.processEvents()
         window._refit()

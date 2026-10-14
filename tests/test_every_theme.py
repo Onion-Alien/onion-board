@@ -96,7 +96,7 @@ def test_a_live_switch_leaves_no_old_theme_colours_in_icons(main_window):  # noq
     seen = []
     for name in ("Dark", "Blood Moon", "Carbon"):
         if name != "Dark":
-            main_window.apply_theme(name)
+            main_window.themectl.apply_theme(name)
             QApplication.processEvents()
         new = theme.tokens(name)
         now = {new[k] for k in ("accent", "accent_text", "live_text", "muted", "text",

@@ -763,7 +763,7 @@ class ImportControl:
         if mw.voice.fx.merge_saved(raw.get(backup.SAVED_VOICES)):   # their own file
             changed.append("saved voices")
         if "theme" in changed:
-            mw.apply_theme(mw.cfg.theme)
+            mw.themectl.apply_theme(mw.cfg.theme)
         mw._save_now()
         mw.register_hotkeys()
         if changed:

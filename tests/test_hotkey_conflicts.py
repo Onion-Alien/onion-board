@@ -130,7 +130,7 @@ def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
     next(a for a in menu.actions() if a.text().startswith("Stop")).trigger()
     assert window.cfg.stop_hotkey == "f10"
     pages = []
-    monkeypatch.setattr(window, "open_settings", pages.append)
+    monkeypatch.setattr(window.setctl, "open_settings", pages.append)
     menu.actions()[-1].trigger()
     assert pages == ["hotkeys"]
 

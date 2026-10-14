@@ -164,7 +164,7 @@ def test_on_air_card_says_proxy_and_tor(window, monkeypatch):  # noqa: F811
             window._on_tor()
             assert line() == ("tor", words, tone)
         clicked = []
-        monkeypatch.setattr(window, "open_settings", clicked.append)
+        monkeypatch.setattr(window.setctl, "open_settings", clicked.append)
         window.rail.output.net[0].click()
         assert clicked == ["privacy"]
     finally:

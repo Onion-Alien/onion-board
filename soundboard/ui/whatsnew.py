@@ -248,7 +248,7 @@ def _heading(text: str) -> QLabel:
 
 
 class WhatsNewDialog(QDialog):
-    """The notes in `notes`; its button opens Settings on that page (mw.open_settings)
+    """The notes in `notes`; its button opens Settings on that page (mw.setctl.open_settings)
     after this closes. `updated`: it follows an update the app installed itself."""
 
     def __init__(self, mw, notes: list[Note], updated: bool = False):
