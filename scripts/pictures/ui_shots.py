@@ -1,7 +1,7 @@
 """Pictures of the app's UI in one call, offscreen (no window opens, nothing plays).
 
-    .venv\\Scripts\\python scripts\\ui_shots.py window settings:tabs --theme dark --lang de
-    .venv\\Scripts\\python scripts\\ui_shots.py "w.voice" "w.tabs.tabBar()" --out shots
+    .venv\\Scripts\\python scripts\\pictures\\ui_shots.py window settings:tabs --lang de
+    .venv\\Scripts\\python scripts\\pictures\\ui_shots.py "w.voice" "w.tabs.tabBar()" --out shots
 
 Each target becomes one PNG in --out (default: a ui_shots folder in the temp folder):
   window            the whole main window
@@ -21,7 +21,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 
 TEST = '''\
 import pytest

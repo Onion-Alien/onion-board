@@ -1,6 +1,6 @@
 """Render the README screenshots into site/screenshots/.
 
-    .venv\\Scripts\\python scripts/screenshots.py [--theme "Dark"] [--plain]
+    .venv\\Scripts\\python scripts/pictures/screenshots.py [--theme "Dark"] [--plain]
 
 scripts/docs.py runs this along with the README / site version line.
 
@@ -28,7 +28,7 @@ os.environ.setdefault("QT_QPA_FONTDIR", str(Path(os.environ.get("WINDIR", r"C:\W
                                             / "Fonts"))   # offscreen has no fonts otherwise
 os.environ.setdefault("QT_SCALE_FACTOR", "1.5")           # crisper pictures
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 os.chdir(ROOT)

@@ -3,9 +3,9 @@
 A game doesn't open the mic the way Discord does. Three things go wrong before any
 codec is involved, and this checks each on the real audio engine:
 
-    python scripts/game_capture.py                 # report only: nothing plays
-    python scripts/game_capture.py --resample      # the formats games open the mic in
-    python scripts/game_capture.py --ducking       # does a voice stream turn us down?
+    python scripts/voicetests/game_capture.py                 # report only: nothing plays
+    python scripts/voicetests/game_capture.py --resample      # the formats games open the mic in
+    python scripts/voicetests/game_capture.py --ducking       # does a voice stream turn us down?
 
 report     Which recording device Windows gives a game that asks for "the default
            mic" (many do, and never show a picker) and which it gives one asking
@@ -41,7 +41,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from soundboard import appaudio, cableformat, codecsim  # noqa: E402
 from soundboard.appaudio import GUID, Com, ComError, _co_init, _device_name, _enumerator  # noqa: E402

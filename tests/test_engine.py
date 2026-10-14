@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from soundboard import engine as eng
+from soundboard import soundcache
 from soundboard.engine import SR, Engine, is_xrun
 
 
@@ -158,7 +159,7 @@ def test_int16_data_is_resampled_and_cached_as_int16():
 
 
 def test_resample_cache_evicts_least_recently_used(monkeypatch):
-    monkeypatch.setattr(eng, "CACHE_BUDGET", 3 * 4410 * 2 * 4 + 10)   # room for 3 copies
+    monkeypatch.setattr(soundcache, "CACHE_BUDGET", 3 * 4410 * 2 * 4 + 10)   # room for 3 copies
     e = engine_with("main")
     e.rates["main"] = 44100
     arrays = {k: tone(0.1) * (i + 1) / 10 for i, k in enumerate("abcd")}
@@ -803,16 +804,16 @@ def test_a_prepare_still_running_when_the_sound_is_removed_keeps_nothing(monkeyp
     (so it couldn't be deleted) until the app closed."""
     e = engine_with("main")
     e.rates["main"] = 44100
-    real_shares, real_resample = eng.destination.cut_shares, eng.resample
+    real_shares, real_resample = eng.destination.cut_shares, soundcache.resample
     monkeypatch.setattr(eng.destination, "cut_shares",
                         lambda d, r: e.forget("a") or real_shares(d, r))
-    monkeypatch.setattr(eng, "resample",
+    monkeypatch.setattr(soundcache, "resample",
                         lambda d, a, b: e.forget("a") or real_resample(d, a, b))
     x = tone(1.0)
     e.prepare("a", x)                  # removed mid-way, twice
     assert "a" not in e._shares and ("a", 44100) not in e._cache
     monkeypatch.setattr(eng.destination, "cut_shares", real_shares)
-    monkeypatch.setattr(eng, "resample", real_resample)
+    monkeypatch.setattr(soundcache, "resample", real_resample)
     e.prepare("a", x)                  # back again (undo): kept as usual
     assert "a" in e._shares and ("a", 44100) in e._cache
 

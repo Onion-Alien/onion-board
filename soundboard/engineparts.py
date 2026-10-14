@@ -26,6 +26,7 @@ log = logging.getLogger("soundboard.engine")
 
 SR = 48000  # library storage rate
 CH = 2
+I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
 # Pong game's sounds (ui/bunpong.py). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
