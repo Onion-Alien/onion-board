@@ -11,7 +11,8 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
-from soundboard import library, otherboards, soundpad
+from soundboard import library, otherboards
+from soundboard.otherboards import soundpad
 from soundboard.library import SR
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
