@@ -62,7 +62,7 @@ def test_config_round_trip(app_dir):
                sounds=[SoundMeta(id="abc", name="Boom", file=inside, hotkey="f5"),
                        SoundMeta(id="def", name="Out", file=r"D:\elsewhere\y.wav")])
     assert c.save()
-    assert not (app_dir / "config.tmp").exists()          # atomic replace cleaned up
+    assert not list(app_dir.glob("*.tmp"))                # atomic replace cleaned up
     d = Config.load()
     assert d.sound_vol == 1.5 and d.stop_hotkey == "ctrl+alt+x" and d.latency == "high"
     assert d.sounds == c.sounds                           # absolute again in memory
@@ -282,6 +282,40 @@ def test_settings_named_like_the_windows_own_state_are_ignored():
     # in config.json they made Config(**known) fail, and a good config was set aside
     c = Config.from_raw({"read_only": True, "load_note": "hi", "mon_vol": 0.5})
     assert c.mon_vol == 0.5 and c.read_only is False and c.load_note == ""
+
+
+def test_settings_reach_the_disk_before_they_replace_the_old_file(app_dir, monkeypatch):
+    """Renamed over config.json without a flush, a power cut could leave it empty or
+    full of NULs."""
+    steps, real_fsync, real_replace = [], library.os.fsync, Path.replace
+
+    def fsync(fd):
+        steps.append("fsync")
+        real_fsync(fd)
+
+    def replace(self, target):
+        steps.append(("replace", Path(target).name))
+        return real_replace(self, target)
+
+    monkeypatch.setattr(library.os, "fsync", fsync)
+    monkeypatch.setattr(Path, "replace", replace)
+    library.atomic_write_text(app_dir / "x.json", "{}")
+    assert steps == ["fsync", ("replace", "x.json")]
+    steps.clear()
+    assert Config(sound_vol=0.3).save()
+    assert steps[-2:] == ["fsync", ("replace", "config.json")]
+    assert not list(app_dir.glob("*.tmp"))
+
+
+def test_a_write_that_cant_reach_the_disk_leaves_the_old_file(app_dir, monkeypatch):
+    assert Config(sound_vol=0.3).save()
+
+    def full(fd):
+        raise OSError(28, "No space left on device")
+    monkeypatch.setattr(library.os, "fsync", full)
+    assert not Config(sound_vol=0.9).save()
+    assert json.loads(library.CONFIG_PATH.read_text())["sound_vol"] == 0.3
+    assert not list(app_dir.glob("*.tmp"))
 
 
 def test_a_config_locked_for_a_moment_still_saves(app_dir, monkeypatch):

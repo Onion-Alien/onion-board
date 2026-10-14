@@ -259,10 +259,8 @@ def sync(folder: Path, mine: list[dict], write: bool = True) -> list[dict]:
     if want != have:
         data["voices"] = want
         try:
-            tmp = path.with_suffix(".tmp")
-            tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n",
-                           encoding="utf-8")
-            tmp.replace(path)
+            library.atomic_write_text(
+                path, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
         except OSError:
             log.warning("couldn't update %s", path, exc_info=True)
             return have
@@ -335,9 +333,7 @@ class Store:
                              "voice": i.data.get("voice", {})} for i in self.deleted]}
         try:
             path().parent.mkdir(parents=True, exist_ok=True)
-            tmp = path().with_suffix(".tmp")
-            tmp.write_text(json.dumps(data, indent=1, ensure_ascii=False), encoding="utf-8")
-            tmp.replace(path())
+            library.atomic_write_text(path(), json.dumps(data, indent=1, ensure_ascii=False))
             return True
         except OSError:
             log.exception("couldn't save %s", path())
