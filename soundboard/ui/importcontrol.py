@@ -127,7 +127,7 @@ class ImportControl:
         seen, ready, empty = {}, [], {}
         # a sound on the Undo bar is off the board but its file is still here: not a
         # new one (it came back as a copy, without its hotkey, and its bin entry broke)
-        undoable = {os.path.normcase(m.file) for m, *_rest in mw._removed}
+        undoable = {os.path.normcase(m.file) for m, *_rest in mw.rmctl._removed}
         for p in loose_sounds(mw.cfg):
             if p in self._loose_taken or os.path.normcase(str(p)) in undoable:
                 continue
@@ -399,7 +399,7 @@ class ImportControl:
             usage.used("import-skipped")
             action = (_("See why"), lambda: self._show_skipped(skipped))
         else:
-            action = (_("Undo"), lambda: mw.remove_sounds(ids))
+            action = (_("Undo"), lambda: mw.rmctl.remove_sounds(ids))
         mw.toast(text, kind, 8000 if skipped else 6000, key="import", action=action)
         self._flash_new(ids)
         if short:
@@ -432,7 +432,7 @@ class ImportControl:
         kept = box.clickedButton() is not remove   # closed some other way: kept
         free_dialog(box)
         if not kept:
-            mw.remove_sounds(ids)
+            mw.rmctl.remove_sounds(ids)
         return kept
 
     def _show_skipped(self, skipped):
@@ -1024,7 +1024,7 @@ class ImportControl:
                     setattr(m, k, getattr(c, k))
                 pkg.restored.append(m)
                 if soundfx.key(m.fx) != fx_before:
-                    mw._rerender(m)
+                    mw.editctl._rerender(m)
                 if p := mw.pads.get(m.id):
                     p.update()
             self._on_unpacked(res, pkg, failed)
@@ -1064,5 +1064,5 @@ class ImportControl:
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 ) != QMessageBox.StandardButton.Yes:
             return
-        mw.remove_sounds(gone)
+        mw.rmctl.remove_sounds(gone)
         self._packs_removed.add(pid)

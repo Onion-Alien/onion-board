@@ -165,7 +165,7 @@ def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
     assert [m.id for m in w.cfg.sounds] == ["s0", "x0"]
     from soundboard.ui import toast
     assert any("2 sounds" in t.text() for t in toast.shown(w)) and not w.selection.picked
-    w.undo_remove()
+    w.rmctl.undo_remove()
     assert [m.id for m in w.cfg.sounds] == before
     assert set(w.pads) == set(before)
 
@@ -175,7 +175,7 @@ def test_right_click_on_a_picked_pad_opens_the_batch_menu(window, monkeypatch):
     opened = []
     monkeypatch.setattr(w.selection, "menu", lambda pos: opened.append(pos))
     w.selection.picked = {"s0", "s1"}
-    w.pad_menu("s0", None)
+    w.padctl.pad_menu("s0", None)
     assert len(opened) == 1
 
 

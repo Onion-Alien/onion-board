@@ -3,8 +3,9 @@ module that the window owns, not more methods on one 10,000-line class. A method
 out must not come back, and the window must still make each controller."""
 import pytest
 
-from soundboard.ui import (alertcontrol, buncontrol, categorycontrol, ffmpegcontrol,
-                           importcontrol, mainwindow, remoteaccess, updatecontrol)
+from soundboard.ui import (alertcontrol, buncontrol, categorycontrol, editcontrol,
+                           ffmpegcontrol, importcontrol, mainwindow, padcontrol, remoteaccess,
+                           removecontrol, updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -29,6 +30,15 @@ SPLIT = [
     ("remctl", remoteaccess.RemoteAccess,
      ["apply_remote", "_load_remote_addons", "load_remote_addon", "remove_remote_addon",
       "_stop_remote_addons"]),
+    ("padctl", padcontrol.PadControl,
+     ["pad_menu", "_volume_action", "nudge_volume", "set_picture", "paste_picture",
+      "set_pad_sort", "set_pad_view", "set_list_rows", "_fill_view_menu"]),
+    ("rmctl", removecontrol.RemoveControl,
+     ["ask_remove", "remove_sound", "remove_sounds", "undo_remove", "_put_back",
+      "_finish_removals", "show_deleted", "_restore_deleted"]),
+    ("editctl", editcontrol.EditControl,
+     ["edit", "_edit_done", "_new_editor", "_close_editors", "duplicate_sound",
+      "show_sound_file", "_rerender"]),
 ]
 
 

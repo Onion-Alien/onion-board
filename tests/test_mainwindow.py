@@ -428,7 +428,7 @@ def test_mainwindow_effects_rerender(qapp, window):
     m = window.meta("s0")
     before = len(window.audio["s0"])
     m.fx = {"speed": 2.0}
-    window._rerender(m)
+    window.editctl._rerender(m)
     assert window.pads["s0"].state == "rendering" and "s0" not in window.audio
     assert process_events(qapp, lambda: "s0" in window.audio, 15)
     assert abs(len(window.audio["s0"]) - before / 2) < 10
@@ -454,9 +454,9 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
         return real(meta, cancel)
     monkeypatch.setattr(main, "load_sound", slow)
     m.fx = {"speed": 2.0}
-    window._rerender(m)
+    window.editctl._rerender(m)
     m.fx = {"speed": 0.5}
-    window._rerender(m)
+    window.editctl._rerender(m)
     assert process_events(qapp, lambda: "s0" in window.audio and stopped, 15)
     assert stopped == [True] and abs(len(window.audio["s0"]) - before * 2) < 10
 
@@ -947,18 +947,18 @@ def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
     from PySide6.QtGui import QColor, QImage
     window.select("s1")
     QApplication.clipboard().setText("just words")
-    window.paste_picture()
+    window.padctl.paste_picture()
     assert not window.meta("s1").image and "copy a picture first" in said(window)
     img = QImage(200, 120, QImage.Format_RGB32)
     img.fill(QColor("#ff00ff"))
     QApplication.clipboard().setImage(img)
-    window.paste_picture()
+    window.padctl.paste_picture()
     pic = window.meta("s1").image
     assert pic and library.Path(pic).is_file() and not window.meta("s0").image
     assert "Airhorn" in said(window)
     window.selection.on_pick("s0", False)   # picked pads win over the selected one
     window.selection.on_pick("s1", False)
-    window.paste_picture()
+    window.padctl.paste_picture()
     assert window.meta("s0").image and window.meta("s1").image != pic
     assert not library.Path(pic).exists()   # the old picture's file is gone
 
@@ -970,11 +970,11 @@ def test_ctrl_v_adds_a_clip_copied_in_the_clip_editor_as_a_sound(window):
     n = len(window.cfg.sounds)
     clipeditor.set_clipboard(np.zeros((int(0.23 * 48000), 2), np.float32))   # even silence
     try:
-        window.paste_picture()
+        window.padctl.paste_picture()
         assert len(window.cfg.sounds) == n + 1
         assert window.cfg.sounds[-1].name.startswith("Clip ")
         QApplication.clipboard().setText("words")      # copied something since: not again
-        window.paste_picture()
+        window.padctl.paste_picture()
         assert len(window.cfg.sounds) == n + 1
         # the real key, after switching to the Sounds tab from another one
         from PySide6.QtTest import QTest
