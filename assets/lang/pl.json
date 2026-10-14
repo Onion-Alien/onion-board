@@ -421,7 +421,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "To mikrofon rozmów zestawu Bluetooth: niektóre z nich pomijają efekty dźwiękowe Windows. Jeśli nikt nie słyszy twoich dźwięków, użyj dongla USB zestawu albo wirtualnego kabla.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Karta Aplikacje wysyła dźwięk innego programu (odtwarzacza muzyki, filmu) do znajomych i może go nagrywać.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Ustawienia Discorda, dzięki którym nie szatkuje twoich dźwięków, i test, który sprawdza, co Discord z nimi robi",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Karta Radio gra stacje z całego świata i może zapisać ostatnie 15 sekund jako pad.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Karta Głos zmienia twój głos na żywo albo mówi za ciebie komputerowym głosem.",
   "The Voice tab is switched off (Settings > Tabs).": "Karta Głos jest wyłączona (Ustawienia > Karty).",
   "The device changed mid-way, so the recording stopped there.": "Urządzenie zmieniło się w trakcie, więc nagranie zatrzymało się w tym miejscu.",
@@ -2561,7 +2560,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Jest ona wyłączona w Ustawieniach > Prywatność i bezpieczeństwo, więc radio nie kontaktuje się z nikim: nie ma katalogu stacji, nie ma stacji.",
   "Jazz & Soul": "Jazz i Soul",
-  "Last {n}s": "Ostatnie {n} s",
   "Latin": "Muzyka latynoska",
   "Most listened": "Większość słuchała",
   "Most voted": "Większość głosowała",
@@ -2570,7 +2568,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Nie ma jeszcze ulubionych. Najedź kursorem na stację i kliknij jej ☆, aby ją tu zatrzymać.",
   "No stations found.": "Nie znaleziono żadnych stacji.",
   "No stations match these filters.\nTry another genre or country.": "Żadna stacja nie pasuje do tych filtrów. Wypróbuj inny gatunek lub kraj.",
-  "Nothing on the radio has played in the last {n} seconds.": "W ciągu ostatnich {n} sekund nie było nic w radiu.",
   "Nothing played yet.\nStations you listen to show up here.": "Nic jeszcze nie grane. Tutaj pojawią się stacje, których słuchasz.",
   "Nothing playing": "Nic nie gra",
   "Nothing playing: click a station": "Nic nie jest odtwarzane: kliknij stację",
@@ -2593,7 +2590,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Usuń z ulubionych",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Zapisz ostatnie {n} sekundy radia jako dźwięk",
   "Saved a {secs}s clip to your Sounds.": "Zapisano klip o długości {secs} w Twoich dźwiękach.",
   "Search failed: press Enter to try again.": "Wyszukiwanie nie powiodło się: naciśnij klawisz Enter, aby spróbować ponownie.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Wyszukaj stacje radiowe, gatunki, kraje lub miasta… (lub kliknij kropkę na mapie)",
@@ -3477,5 +3473,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Przeciągnij: przesuń go. Kółko: większy lub mniejszy. Najedź na niego, żeby zobaczyć przyciski.",
   "Open the full board": "Otwórz cały board",
   "Turn into Bun": "Zamień się w Buna",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Karta Radio gra stacje z całego świata i może je nagrywać jako pady."
 }

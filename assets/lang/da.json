@@ -1121,7 +1121,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Fanen Apps sender et andet programs lyd (en musikafspiller, en video) til dine venner og kan optage den.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Discord-indstillingerne, der forhindrer den i at hakke dine lyde i stykker, og et tjek, der lytter til, hvad Discord gør",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Discord-indstillingerne, der forhindrer den i at hakke dine lyde i stykker, og et tjek, der lytter til, hvad Discord gør ved dem",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Fanen Radio spiller stationer fra hele verden og kan gemme de sidste 15 sekunder som en pad.",
   "The Triggers tab is switched off (Settings > Tabs).": "Fanen Triggere er slået fra (Indstillinger > Faner).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Fanen Stemme ændrer din stemme live eller taler for dig med en computerstemme.",
   "The Voice tab is switched off (Settings > Tabs).": "Fanen Stemme er slået fra (Indstillinger > Faner).",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Den er slået fra i Indstillinger > Privatliv og sikkerhed, så radioen kontakter ingen: ingen stationsoversigt, ingen stationer.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Sidste {n} s",
   "Latin": "Latin musik",
   "Most listened": "De fleste lyttede",
   "Most voted": "De fleste stemte",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Ingen favoritter endnu. Hold musen over en station, og klik på dens ☆ for at beholde den her.",
   "No stations found.": "Ingen stationer fundet.",
   "No stations match these filters.\nTry another genre or country.": "Ingen stationer matcher disse filtre. Prøv en anden genre eller et andet land.",
-  "Nothing on the radio has played in the last {n} seconds.": "Der er ikke afspillet noget i radioen i de sidste {n} sekunder.",
   "Nothing played yet.\nStations you listen to show up here.": "Intet spillet endnu. Stationer, du lytter til, vises her.",
   "Nothing playing": "Intet spiller",
   "Nothing playing: click a station": "Der afspilles ikke noget: klik på en station",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Fjern fra favoritter",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Gem de sidste {n} sekunder af radioen som en lyd",
   "Saved a {secs}s clip to your Sounds.": "Gemte et {secs} s klip til dine lyde.",
   "Search failed: press Enter to try again.": "Søgning mislykkedes: tryk på Enter for at prøve igen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Søg efter radiostationer, genrer, lande eller byer... (eller klik på en prik på kortet)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Træk: flyt ham. Scroll: større eller mindre. Hold musen over ham for knapperne.",
   "Open the full board": "Åbn hele boardet",
   "Turn into Bun": "Bliv til Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bliv til Bun: en lille Bun, der svæver øverst i stedet for dette vindue. Knappen under ham bringer det tilbage."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bliv til Bun: en lille Bun, der svæver øverst i stedet for dette vindue. Knappen under ham bringer det tilbage.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Fanen Radio spiller stationer fra hele verden og kan optage dem som pads."
 }

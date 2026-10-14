@@ -409,7 +409,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "นั่นคือไมค์โทรของหูฟัง Bluetooth: บางรุ่นข้ามเอฟเฟกต์เสียงของ Windows ถ้าไม่มีใครได้ยินเสียงของคุณ ให้ใช้ดองเกิล USB ของหูฟังหรือสายเสมือน",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "แท็บ แอป ส่งเสียงของโปรแกรมอื่น (เครื่องเล่นเพลง, วิดีโอ) ไปหาเพื่อน และอัดเก็บได้",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "การตั้งค่า Discord ที่ทำให้มันไม่ตัดเสียงของคุณเป็นท่อนๆ และตัวตรวจที่ฟังว่า Discord ทำอะไรกับเสียง",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "แท็บ วิทยุ เล่นสถานีจากทั่วโลก และบันทึก 15 วินาทีล่าสุดเป็นแพดได้",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "แท็บ เสียงพูด เปลี่ยนเสียงคุณแบบสด หรือพูดแทนคุณด้วยเสียงคอมพิวเตอร์",
   "The Voice tab is switched off (Settings > Tabs).": "แท็บ เสียงพูด ปิดอยู่ (การตั้งค่า > แท็บ)",
   "The device changed mid-way, so the recording stopped there.": "อุปกรณ์เปลี่ยนกลางทาง การอัดจึงหยุดตรงนั้น",
@@ -2455,7 +2454,6 @@
   "Hip-hop": "ฮิปฮอป",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "ปิดอยู่ในการตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย ดังนั้นวิทยุจึงไม่มีใครติดต่อ: ไม่มีไดเรกทอรีสถานี ไม่มีสถานี",
   "Jazz & Soul": "แจ๊สแอนด์โซล",
-  "Last {n}s": "ล่าสุด {n} วินาที",
   "Latin": "เพลงลาติน",
   "Most listened": "ฟังมากที่สุด",
   "Most voted": "โหวตมากที่สุด",
@@ -2464,7 +2462,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "ยังไม่มีรายการโปรด เลื่อนสถานีแล้วคลิก ☆ เพื่อเก็บไว้ที่นี่",
   "No stations found.": "ไม่พบสถานี",
   "No stations match these filters.\nTry another genre or country.": "ไม่มีสถานีที่ตรงกับตัวกรองเหล่านี้ ลองประเภทหรือประเทศอื่น",
-  "Nothing on the radio has played in the last {n} seconds.": "ไม่มีรายการวิทยุใดเล่นในช่วง {n} วินาทีที่ผ่านมา",
   "Nothing played yet.\nStations you listen to show up here.": "ยังไม่ได้เล่นอะไรเลย สถานีที่คุณฟังจะแสดงที่นี่",
   "Nothing playing": "ไม่มีอะไรเล่น",
   "Nothing playing: click a station": "ไม่มีอะไรเล่น: คลิกสถานี",
@@ -2487,7 +2484,6 @@
   "Reggae": "เร้กเก้",
   "Remove from Favorites": "ลบออกจากรายการโปรด",
   "Rock": "ร็อค",
-  "Save the last {n} seconds of the radio as a sound": "บันทึก {n} วินาทีสุดท้ายของวิทยุเป็นเสียง",
   "Saved a {secs}s clip to your Sounds.": "บันทึกคลิป {secs} วินาทีลงในเสียงของคุณ",
   "Search failed: press Enter to try again.": "การค้นหาล้มเหลว: กด Enter เพื่อลองอีกครั้ง",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ค้นหาสถานีวิทยุ ประเภท ประเทศ หรือเมือง... (หรือคลิกจุดบนแผนที่)",
@@ -3325,5 +3321,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "ลาก: ย้ายเขา เลื่อนล้อ: ใหญ่ขึ้นหรือเล็กลง ชี้เมาส์ที่เขาเพื่อดูปุ่ม",
   "Open the full board": "เปิดบอร์ดเต็ม",
   "Turn into Bun": "แปลงร่างเป็น Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "แปลงร่างเป็น Bun: Bun ตัวเล็กลอยอยู่ด้านบนแทนหน้าต่างนี้ ปุ่มใต้ตัวเขาจะพาหน้าต่างกลับมา"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "แปลงร่างเป็น Bun: Bun ตัวเล็กลอยอยู่ด้านบนแทนหน้าต่างนี้ ปุ่มใต้ตัวเขาจะพาหน้าต่างกลับมา",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "แท็บ วิทยุ เล่นสถานีจากทั่วโลก และอัดเป็นแพดได้"
 }

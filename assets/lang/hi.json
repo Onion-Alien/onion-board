@@ -415,7 +415,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "यह Bluetooth हेडसेट का कॉल माइक है: इनमें से कुछ Windows के साउंड इफ़ेक्ट छोड़ देते हैं। अगर कोई आपके साउंड नहीं सुनता, तो हेडसेट का USB डोंगल या वर्चुअल केबल इस्तेमाल करें।",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "ऐप्स टैब किसी दूसरे प्रोग्राम का साउंड (म्यूज़िक प्लेयर, वीडियो) आपके दोस्तों को भेजता है, और उसे रिकॉर्ड भी कर सकता है।",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Discord की वे सेटिंग्स जो आपके साउंड को कटने से रोकती हैं, और एक जाँच जो सुनती है कि Discord उनके साथ क्या करता है",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "रेडियो टैब दुनिया भर के स्टेशन चलाता है, और आख़िरी 15 सेकंड को पैड के रूप में सेव कर सकता है।",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "वॉइस टैब आपकी आवाज़ लाइव बदलता है, या कंप्यूटर की आवाज़ में आपकी जगह बोलता है।",
   "The Voice tab is switched off (Settings > Tabs).": "वॉइस टैब बंद है (सेटिंग्स > टैब)।",
   "The device changed mid-way, so the recording stopped there.": "बीच में डिवाइस बदल गया, इसलिए रिकॉर्डिंग वहीं रुक गई।",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "हिप-हॉप",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "यह सेटिंग्स > गोपनीयता और सुरक्षा में बंद है, इसलिए रेडियो किसी से संपर्क नहीं करता: कोई स्टेशन निर्देशिका नहीं, कोई स्टेशन नहीं।",
   "Jazz & Soul": "जैज़ एंड सोल",
-  "Last {n}s": "अंतिम {n} एस",
   "Latin": "लैटिन संगीत",
   "Most listened": "सबसे ज्यादा सुनी गई",
   "Most voted": "सबसे ज्यादा मतदान हुआ",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "अभी तक कोई पसंदीदा नहीं. किसी स्टेशन पर होवर करें और उसे यहां रखने के लिए ☆ पर क्लिक करें।",
   "No stations found.": "कोई स्टेशन नहीं मिला.",
   "No stations match these filters.\nTry another genre or country.": "कोई भी स्टेशन इन फ़िल्टर से मेल नहीं खाता. किसी अन्य शैली या देश का प्रयास करें.",
-  "Nothing on the radio has played in the last {n} seconds.": "अंतिम {n} सेकंड में रेडियो पर कुछ भी नहीं बजा है।",
   "Nothing played yet.\nStations you listen to show up here.": "अभी तक कुछ भी नहीं खेला गया. जिन स्टेशनों को आप सुनते हैं वे यहां दिखाई देते हैं।",
   "Nothing playing": "कुछ भी नहीं चल रहा है",
   "Nothing playing: click a station": "कुछ भी नहीं चल रहा है - एक स्टेशन पर क्लिक करें",
@@ -2540,7 +2537,6 @@
   "Reggae": "रेगे",
   "Remove from Favorites": "पसंदीदा से हटाएँ",
   "Rock": "रॉक",
-  "Save the last {n} seconds of the radio as a sound": "रेडियो के अंतिम {n} सेकंड को ध्वनि के रूप में सहेजें",
   "Saved a {secs}s clip to your Sounds.": "आपकी ध्वनि में एक {secs} क्लिप सहेजी गई।",
   "Search failed: press Enter to try again.": "खोज विफल - पुनः प्रयास करने के लिए Enter दबाएँ।",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "रेडियो स्टेशन, शैलियाँ, देश या शहर खोजें... (या मानचित्र पर एक बिंदु पर क्लिक करें)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "खींचें: उसे हिलाएँ। स्क्रॉल: बड़ा या छोटा। बटन के लिए उस पर माउस ले जाएँ।",
   "Open the full board": "पूरा बोर्ड खोलें",
   "Turn into Bun": "Bun बन जाएँ",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।"
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "रेडियो टैब दुनिया भर के स्टेशन चलाता है, और उन्हें पैड के रूप में रिकॉर्ड कर सकता है।"
 }

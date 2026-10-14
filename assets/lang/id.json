@@ -409,7 +409,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Itu mic panggilan dari headset Bluetooth: sebagian melewati efek suara Windows. Kalau tidak ada yang mendengar suaramu, pakai dongle USB headset atau kabel virtual.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Tab Aplikasi mengirim suara program lain (pemutar musik, video) ke teman-temanmu, dan bisa merekamnya.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Pengaturan Discord yang mencegahnya memotong-motong suaramu, dan tes yang mendengar apa yang Discord lakukan pada suaranya",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Tab Radio memutar stasiun dari seluruh dunia, dan bisa menyimpan 15 detik terakhir sebagai pad.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Tab Vokal mengubah suaramu secara langsung, atau bicara untukmu dengan suara komputer.",
   "The Voice tab is switched off (Settings > Tabs).": "Tab Vokal dimatikan (Pengaturan > Tab).",
   "The device changed mid-way, so the recording stopped there.": "Perangkat berganti di tengah jalan, jadi rekamannya berhenti di situ.",
@@ -2455,7 +2454,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Ini dimatikan di Pengaturan> Privasi & keamanan, sehingga radio tidak menghubungi siapa pun: tidak ada direktori stasiun, tidak ada stasiun.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "{n} detik terakhir",
   "Latin": "Musik Latin",
   "Most listened": "Kebanyakan mendengarkan",
   "Most voted": "Suara terbanyak",
@@ -2464,7 +2462,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Belum ada favorit. Arahkan kursor ke stasiun dan klik ☆ untuk menyimpannya di sini.",
   "No stations found.": "Tidak ada stasiun yang ditemukan.",
   "No stations match these filters.\nTry another genre or country.": "Tidak ada stasiun yang cocok dengan filter ini. Coba genre atau negara lain.",
-  "Nothing on the radio has played in the last {n} seconds.": "Tidak ada siaran radio yang diputar dalam {n} detik terakhir.",
   "Nothing played yet.\nStations you listen to show up here.": "Belum ada yang dimainkan. Stasiun yang Anda dengarkan muncul di sini.",
   "Nothing playing": "Tidak ada yang dimainkan",
   "Nothing playing: click a station": "Tidak ada yang diputar: klik stasiun",
@@ -2487,7 +2484,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Hapus dari Favorit",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Simpan {n} detik terakhir radio sebagai suara",
   "Saved a {secs}s clip to your Sounds.": "Menyimpan klip {secs} ke Suara Anda.",
   "Search failed: press Enter to try again.": "Pencarian gagal: tekan Enter untuk mencoba lagi.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Cari stasiun radio, genre, negara atau kota… (atau klik satu titik di peta)",
@@ -3325,5 +3321,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: pindahkan dia. Gulir: lebih besar atau lebih kecil. Arahkan kursor untuk tombolnya.",
   "Open the full board": "Buka board penuh",
   "Turn into Bun": "Jadi Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil melayang di atas menggantikan jendela ini. Tombol di bawahnya mengembalikannya.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Tab Radio memutar stasiun dari seluruh dunia, dan bisa merekamnya sebagai pad."
 }

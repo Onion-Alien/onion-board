@@ -1137,7 +1137,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Fila Aplicații trimite sunetul altui program (un player de muzică, un video) la prietenii tăi, și îl poate înregistra.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Setările Discord care îl opresc să-ți taie sunetele, și o verificare care ascultă ce face Discord",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Setările Discord care îl opresc să-ți taie sunetele, și o verificare care ascultă ce face Discord cu ele",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Fila Radio redă posturi din toată lumea și poate salva ultimele 15 secunde ca pad.",
   "The Triggers tab is switched off (Settings > Tabs).": "Fila Declanșatoare e oprită (Setări > File).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Fila Voce îți schimbă vocea live, sau vorbește în locul tău cu o voce de computer.",
   "The Voice tab is switched off (Settings > Tabs).": "Fila Voce e oprită (Setări > File).",
@@ -2561,7 +2560,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Este dezactivat în Setări > Confidențialitate și securitate, astfel încât radioul nu contactează pe nimeni: nici un director de posturi, nici un post.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Ultimul {n} s",
   "Latin": "Muzica latina",
   "Most listened": "Cei mai mulți au ascultat",
   "Most voted": "Cele mai votate",
@@ -2570,7 +2568,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Încă nu sunt favorite. Treceți cu mouse-ul pe o stație și faceți clic pe ☆ pentru a-l păstra aici.",
   "No stations found.": "Nu s-au găsit stații.",
   "No stations match these filters.\nTry another genre or country.": "Nicio stație nu corespunde acestor filtre. Încercați alt gen sau țară.",
-  "Nothing on the radio has played in the last {n} seconds.": "Nu s-a redat nimic la radio în ultimele {n} secunde.",
   "Nothing played yet.\nStations you listen to show up here.": "Nu s-a jucat încă nimic. Posturile pe care le ascultați apar aici.",
   "Nothing playing": "Nu se joacă nimic",
   "Nothing playing: click a station": "Nu se redă nimic: faceți clic pe o stație",
@@ -2593,7 +2590,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Eliminați din Favorite",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Salvați ultimele {n} secunde ale radioului ca sunet",
   "Saved a {secs}s clip to your Sounds.": "A salvat un clip de {secs} în Sunete.",
   "Search failed: press Enter to try again.": "Căutarea eșuată: apăsați pe Enter pentru a încerca din nou.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Căutați posturi de radio, genuri, țări sau orașe... (sau faceți clic pe un punct de pe hartă)",
@@ -3477,5 +3473,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Trage: mută-l. Rotiță: mai mare sau mai mic. Ține mouse-ul pe el pentru butoane.",
   "Open the full board": "Deschide tot board-ul",
   "Turn into Bun": "Transformă-te în Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Transformă-te în Bun: un Bun mic care plutește deasupra în locul acestei ferestre. Butonul de sub el o aduce înapoi."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Transformă-te în Bun: un Bun mic care plutește deasupra în locul acestei ferestre. Butonul de sub el o aduce înapoi.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Fila Radio redă posturi din toată lumea și le poate înregistra ca pad-uri."
 }

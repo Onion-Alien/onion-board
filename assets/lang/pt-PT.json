@@ -1121,7 +1121,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "O separador Apps envia o som de outro programa (um leitor de música, um vídeo) para os teus amigos, e pode gravá-lo.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "As definições do Discord que o impedem de cortar os teus sons aos bocados, e uma verificação que ouve o que o Discord faz",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "As definições do Discord que o impedem de cortar os teus sons aos bocados, e uma verificação que ouve o que o Discord lhes faz",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "O separador Rádio toca estações de todo o mundo, e pode guardar os últimos 15 segundos como botão.",
   "The Triggers tab is switched off (Settings > Tabs).": "O separador Gatilhos está desligado (Definições > Separadores).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "O separador Voz muda a tua voz em direto, ou fala por ti com uma voz de computador.",
   "The Voice tab is switched off (Settings > Tabs).": "O separador Voz está desligado (Definições > Separadores).",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Está desligado em Definições > Privacidade e segurança, pelo que o rádio não contacta ninguém: nenhum diretório de estações, nenhuma estação.",
   "Jazz & Soul": "Jazz e Soul",
-  "Last {n}s": "Últimos {n} segundos",
   "Latin": "Música latina",
   "Most listened": "Mais ouvidos",
   "Most voted": "Mais votados",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Ainda não há favoritos. Passe o rato sobre uma estação e clique em ☆ para a manter aqui.",
   "No stations found.": "Nenhuma estação encontrada.",
   "No stations match these filters.\nTry another genre or country.": "Nenhuma estação corresponde a estes filtros. Experimente outro género ou país.",
-  "Nothing on the radio has played in the last {n} seconds.": "Nada no rádio tocou nos últimos {n} segundos.",
   "Nothing played yet.\nStations you listen to show up here.": "Ainda não foi jogado nada. As estações que ouve aparecem aqui.",
   "Nothing playing": "Nada jogando",
   "Nothing playing: click a station": "Nada a tocar: clique numa estação",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Remover dos Favoritos",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Guarde os últimos {n} segundos do rádio como som",
   "Saved a {secs}s clip to your Sounds.": "Guardei um clip de {secs} nos seus sons.",
   "Search failed: press Enter to try again.": "Falha na pesquisa: prima Enter para tentar novamente.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Pesquise estações de rádio, géneros, países ou cidades… (ou clique num ponto no mapa)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arrastar: movê-lo. Roda: maior ou mais pequeno. Passa o rato por cima para os botões.",
   "Open the full board": "Abrir o board completo",
   "Turn into Bun": "Tornar-se Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Tornar-se Bun: um Bun pequeno a flutuar por cima em vez desta janela. O botão por baixo dele trá-la de volta."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Tornar-se Bun: um Bun pequeno a flutuar por cima em vez desta janela. O botão por baixo dele trá-la de volta.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "O separador Rádio toca estações de todo o mundo, e pode gravá-las como botões."
 }

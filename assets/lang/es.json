@@ -415,7 +415,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Ese es el micro de llamadas de unos auriculares Bluetooth: algunos se saltan los efectos de sonido de Windows. Si nadie oye tus sonidos, usa el adaptador USB de los auriculares o el cable virtual.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "La pestaña Apps envía el sonido de otro programa (un reproductor de música, un vídeo) a tus amigos, y puede grabarlo.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Los ajustes de Discord que evitan que corte tus sonidos, y una prueba que escucha lo que Discord les hace",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "La pestaña Radio reproduce emisoras de todo el mundo y puede guardar los últimos 15 segundos como pad.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "La pestaña Voz cambia tu voz en directo, o habla por ti con una voz de ordenador.",
   "The Voice tab is switched off (Settings > Tabs).": "La pestaña Voz está desactivada (Ajustes > Pestañas).",
   "The device changed mid-way, so the recording stopped there.": "El dispositivo cambió a mitad, así que la grabación se paró ahí.",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Está desactivado en Configuración > Privacidad y seguridad, por lo que la radio no contacta a nadie: ni directorio de estaciones, ni estaciones.",
   "Jazz & Soul": "Jazz y soul",
-  "Last {n}s": "Últimos {n} s",
   "Latin": "Musica latina",
   "Most listened": "mas escuchado",
   "Most voted": "Más votados",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Aún no hay favoritos. Coloca el cursor sobre una estación y haz clic en su ☆ para mantenerla aquí.",
   "No stations found.": "No se encontraron estaciones.",
   "No stations match these filters.\nTry another genre or country.": "Ninguna estación coincide con estos filtros. Prueba con otro género o país.",
-  "Nothing on the radio has played in the last {n} seconds.": "No se ha reproducido nada en la radio en los últimos {n} segundos.",
   "Nothing played yet.\nStations you listen to show up here.": "Aún no se ha reproducido nada. Las estaciones que escuchas aparecen aquí.",
   "Nothing playing": "Nada jugando",
   "Nothing playing: click a station": "No se reproduce nada: haz clic en una estación",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Eliminar de favoritos",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Guarda los últimos {n} segundos de la radio como sonido",
   "Saved a {secs}s clip to your Sounds.": "Guarda un clip de {secs} en tus sonidos.",
   "Search failed: press Enter to try again.": "La búsqueda falló: presione Entrar para intentarlo nuevamente.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Busca estaciones de radio, géneros, países o ciudades… (o haz clic en un punto en el mapa)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Arrastra: muévelo. Rueda: más grande o más pequeño. Pasa el ratón por encima para ver los botones.",
   "Open the full board": "Abrir el tablero completo",
   "Turn into Bun": "Convertir en Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Convertir en Bun: un Bun pequeño flotando encima en lugar de esta ventana. El botón de debajo la recupera."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Convertir en Bun: un Bun pequeño flotando encima en lugar de esta ventana. El botón de debajo la recupera.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "La pestaña Radio reproduce emisoras de todo el mundo y puede grabarlas como pads."
 }

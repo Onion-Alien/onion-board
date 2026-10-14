@@ -409,7 +409,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Đó là mic gọi điện của tai nghe Bluetooth: một số loại bỏ qua hiệu ứng âm thanh của Windows. Nếu không ai nghe âm thanh của bạn, hãy dùng USB dongle của tai nghe hoặc cáp ảo.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Thẻ Ứng dụng gửi âm thanh của chương trình khác (trình phát nhạc, video) tới bạn bè, và có thể ghi lại.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Các cài đặt Discord giúp nó không cắt vụn âm thanh của bạn, và một bài kiểm tra nghe xem Discord làm gì với chúng",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Thẻ Radio phát các đài khắp thế giới, và có thể lưu 15 giây cuối thành nút.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Thẻ Giọng nói đổi giọng bạn trực tiếp, hoặc nói thay bạn bằng giọng máy.",
   "The Voice tab is switched off (Settings > Tabs).": "Thẻ Giọng nói đang tắt (Cài đặt > Thẻ).",
   "The device changed mid-way, so the recording stopped there.": "Thiết bị đã đổi giữa chừng, nên bản ghi dừng ở đó.",
@@ -2455,7 +2454,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Nó bị tắt trong Cài đặt > Quyền riêng tư & bảo mật, do đó radio không liên lạc được với ai: không danh mục đài, không đài.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "{n} giây cuối cùng",
   "Latin": "Nhạc latinh",
   "Most listened": "Nghe nhiều nhất",
   "Most voted": "Được bình chọn nhiều nhất",
@@ -2464,7 +2462,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Chưa có mục yêu thích nào. Di chuột qua một đài và nhấp vào ☆ của đài đó để giữ đài đó ở đây.",
   "No stations found.": "Không tìm thấy trạm nào.",
   "No stations match these filters.\nTry another genre or country.": "Không có đài nào phù hợp với các bộ lọc này. Hãy thử thể loại hoặc quốc gia khác.",
-  "Nothing on the radio has played in the last {n} seconds.": "Không có gì trên radio được phát trong {n} giây vừa qua.",
   "Nothing played yet.\nStations you listen to show up here.": "Chưa có gì chơi. Các đài bạn nghe sẽ hiển thị ở đây.",
   "Nothing playing": "Không có gì đang phát",
   "Nothing playing: click a station": "Không có gì đang phát - nhấp vào một đài",
@@ -2487,7 +2484,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Xóa khỏi Mục yêu thích",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Lưu {n} giây cuối cùng của đài dưới dạng âm thanh",
   "Saved a {secs}s clip to your Sounds.": "Đã lưu clip {secs} giây vào Âm thanh của bạn.",
   "Search failed: press Enter to try again.": "Tìm kiếm không thành công: nhấn Enter để thử lại.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Tìm kiếm đài phát thanh, thể loại, quốc gia hoặc thành phố… (hoặc nhấp vào dấu chấm trên bản đồ)",
@@ -3325,5 +3321,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Kéo: di chuyển cậu ấy. Cuộn: to hơn hoặc nhỏ hơn. Di chuột lên để thấy các nút.",
   "Open the full board": "Mở toàn bộ board",
   "Turn into Bun": "Biến thành Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Biến thành Bun: một Bun nhỏ bay lơ lửng trên cùng thay cho cửa sổ này. Nút bên dưới cậu ấy sẽ đưa cửa sổ trở lại.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Thẻ Radio phát các đài khắp thế giới, và có thể ghi âm chúng thành nút."
 }

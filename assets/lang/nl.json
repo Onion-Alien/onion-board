@@ -415,7 +415,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Dat is de belmic van een Bluetooth-headset: sommige slaan de geluidseffecten van Windows over. Hoort niemand je geluiden? Gebruik de USB-dongle van de headset of de virtuele kabel.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Het tabblad Apps stuurt het geluid van een ander programma (een muziekspeler, een video) naar je vrienden, en kan het opnemen.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "De Discord-instellingen die voorkomen dat je geluiden worden afgekapt, en een check die luistert wat Discord ermee doet",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Het tabblad Radio speelt zenders van over de hele wereld en kan de laatste 15 seconden als pad bewaren.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Het tabblad Stem verandert je stem live, of praat voor je met een computerstem.",
   "The Voice tab is switched off (Settings > Tabs).": "Het tabblad Stem staat uit (Instellingen > Tabbladen).",
   "The device changed mid-way, so the recording stopped there.": "Het apparaat veranderde halverwege, dus de opname stopte daar.",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hiphop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Het is uitgeschakeld in Instellingen > Privacy en beveiliging, dus de radio maakt met niemand contact: geen zenderlijst, geen zenders.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Laatste {n} s",
   "Latin": "Latijnse muziek",
   "Most listened": "De meesten luisterden",
   "Most voted": "De meesten hebben gestemd",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Nog geen favorieten. Beweeg de muis over een station en klik op de ☆ om het hier te houden.",
   "No stations found.": "Geen zenders gevonden.",
   "No stations match these filters.\nTry another genre or country.": "Er zijn geen stations die overeenkomen met deze filters. Probeer een ander genre of land.",
-  "Nothing on the radio has played in the last {n} seconds.": "Er is de afgelopen {n} seconden niets op de radio afgespeeld.",
   "Nothing played yet.\nStations you listen to show up here.": "Er is nog niets gespeeld. Stations waarnaar u luistert, worden hier weergegeven.",
   "Nothing playing": "Er speelt niets",
   "Nothing playing: click a station": "Er wordt niets afgespeeld. Klik op een station",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Verwijderen uit Favorieten",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Bewaar de laatste {n} seconden van de radio als geluid",
   "Saved a {secs}s clip to your Sounds.": "Er is een fragment van {secs} sec. opgeslagen in je geluiden.",
   "Search failed: press Enter to try again.": "Zoeken mislukt. Druk op Enter om het opnieuw te proberen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Zoek radiostations, genres, landen of steden… (of klik op een stip op de kaart)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Slepen: verplaats hem. Scrollen: groter of kleiner. Ga erover met je muis voor de knoppen.",
   "Open the full board": "Hele board openen",
   "Turn into Bun": "Verander in Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Verander in Bun: een kleine Bun die bovenop zweeft in plaats van dit venster. De knop onder hem haalt het terug."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Verander in Bun: een kleine Bun die bovenop zweeft in plaats van dit venster. De knop onder hem haalt het terug.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Het tabblad Radio speelt zenders van over de hele wereld en kan ze als pads opnemen."
 }

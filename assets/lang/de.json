@@ -415,7 +415,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Das ist das Anruf-Mikro eines Bluetooth-Headsets: Manche davon überspringen die Soundeffekte von Windows. Wenn niemand deine Sounds hört, nutz den USB-Dongle des Headsets oder das virtuelle Kabel.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Der Apps-Tab sendet den Sound eines anderen Programms (einen Musikplayer, ein Video) an deine Freunde und kann ihn aufnehmen.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Die Discord-Einstellungen, die verhindern, dass es deine Sounds zerhackt, und ein Check, der hört, was Discord mit ihnen macht",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Der Radio-Tab spielt Sender aus aller Welt und kann die letzten 15 Sekunden als Pad speichern.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Der Stimme-Tab verändert deine Stimme live oder spricht mit einer Computerstimme für dich.",
   "The Voice tab is switched off (Settings > Tabs).": "Der Stimme-Tab ist ausgeschaltet (Einstellungen > Tabs).",
   "The device changed mid-way, so the recording stopped there.": "Das Gerät hat sich mittendrin geändert, also hat die Aufnahme dort aufgehört.",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hip-Hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Unter „Einstellungen“ > „Datenschutz und Sicherheit“ ist es ausgeschaltet, sodass das Radio niemanden kontaktiert: kein Senderverzeichnis, keine Sender.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Letzte {n} s",
   "Latin": "Lateinamerikanische Musik",
   "Most listened": "Die meisten hörten zu",
   "Most voted": "Die meisten haben abgestimmt",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Noch keine Favoriten. Bewegen Sie den Mauszeiger über eine Station und klicken Sie auf ihr ☆, um sie hier zu behalten.",
   "No stations found.": "Keine Sender gefunden.",
   "No stations match these filters.\nTry another genre or country.": "Keine Sender entsprechen diesen Filtern. Versuchen Sie es mit einem anderen Genre oder Land.",
-  "Nothing on the radio has played in the last {n} seconds.": "Im Radio wurde in den letzten {n} Sekunden nichts abgespielt.",
   "Nothing played yet.\nStations you listen to show up here.": "Es wurde noch nichts gespielt. Die Sender, die Sie hören, werden hier angezeigt.",
   "Nothing playing": "Nichts spielt",
   "Nothing playing: click a station": "Nichts läuft: klicken Sie auf einen Sender",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Aus Favoriten entfernen",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Speichern Sie die letzten {n} Sekunden des Radios als Ton",
   "Saved a {secs}s clip to your Sounds.": "Ein Clip {secs} s wurde in Ihren Sounds gespeichert.",
   "Search failed: press Enter to try again.": "Suche fehlgeschlagen: drücken Sie die Eingabetaste, um es erneut zu versuchen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Suchen Sie nach Radiosendern, Genres, Ländern oder Städten ... (oder klicken Sie auf einen Punkt auf der Karte)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Ziehen: verschieben. Mausrad: größer oder kleiner. Maus drauf für die Knöpfe.",
   "Open the full board": "Ganzes Board öffnen",
   "Turn into Bun": "In Bun verwandeln",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "In Bun verwandeln: ein kleiner Bun schwebt ganz oben statt dieses Fensters. Der Knopf unter ihm holt es zurück."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "In Bun verwandeln: ein kleiner Bun schwebt ganz oben statt dieses Fensters. Der Knopf unter ihm holt es zurück.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Der Radio-Tab spielt Sender aus aller Welt und kann sie als Pads aufnehmen."
 }

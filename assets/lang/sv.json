@@ -1121,7 +1121,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Fliken Appar skickar ett annat programs ljud (en musikspelare, en video) till dina vänner, och kan spela in det.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Discord-inställningarna som stoppar den från att hacka sönder dina ljud, och en kontroll som lyssnar på vad Discord gör",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Discord-inställningarna som stoppar den från att hacka sönder dina ljud, och en kontroll som lyssnar på vad Discord gör med dem",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Fliken Radio spelar stationer från hela världen, och kan spara de senaste 15 sekunderna som en ruta.",
   "The Triggers tab is switched off (Settings > Tabs).": "Fliken Triggers är avstängd (Inställningar > Flikar).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Fliken Röst ändrar din röst live, eller pratar åt dig med en datorröst.",
   "The Voice tab is switched off (Settings > Tabs).": "Fliken Röst är avstängd (Inställningar > Flikar).",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hiphop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Den är avstängd i Inställningar > Sekretess och säkerhet, så radion kontaktar ingen: ingen stationskatalog, inga stationer.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Senaste {n} s",
   "Latin": "Latin musik",
   "Most listened": "De flesta lyssnade",
   "Most voted": "De flesta röstade",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Inga favoriter än. Håll muspekaren över en station och klicka på dess ☆ för att behålla den här.",
   "No stations found.": "Inga stationer hittades.",
   "No stations match these filters.\nTry another genre or country.": "Inga stationer matchar dessa filter. Prova en annan genre eller ett annat land.",
-  "Nothing on the radio has played in the last {n} seconds.": "Ingenting på radion har spelat upp de senaste {n} sekunderna.",
   "Nothing played yet.\nStations you listen to show up here.": "Inget spelat ännu. Stationer du lyssnar på visas här.",
   "Nothing playing": "Ingenting spelar",
   "Nothing playing: click a station": "Ingenting spelas upp: klicka på en station",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Ta bort från favoriter",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Spara de sista {n} sekunderna av radion som ett ljud",
   "Saved a {secs}s clip to your Sounds.": "Sparade ett {secs} s klipp till dina ljud.",
   "Search failed: press Enter to try again.": "Sökningen misslyckades: tryck på Enter för att försöka igen.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Sök efter radiostationer, genrer, länder eller städer... (eller klicka på en prick på kartan)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Dra: flytta honom. Scrolla: större eller mindre. Håll musen över honom för knapparna.",
   "Open the full board": "Öppna hela boardet",
   "Turn into Bun": "Bli Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli Bun: en liten Bun som svävar överst i stället för det här fönstret. Knappen under honom tar tillbaka det."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bli Bun: en liten Bun som svävar överst i stället för det här fönstret. Knappen under honom tar tillbaka det.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Fliken Radio spelar stationer från hela världen, och kan spela in dem som rutor."
 }

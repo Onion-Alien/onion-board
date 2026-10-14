@@ -1,6 +1,6 @@
-"""A clip recorder for a live stream (the Radio tab): a rolling replay buffer
-of the last CLIP_S seconds, plus a manual recording spooled to disk. Clips are
-added to the Sounds tab as ordinary pads."""
+"""A clip recorder for a live stream: a rolling replay buffer of the last few
+seconds (instant replay), plus a manual recording spooled to disk (the Radio
+tab's Record). Clips are added to the Sounds tab as ordinary pads."""
 from __future__ import annotations
 
 import logging
@@ -30,7 +30,7 @@ class Recorder:
     gives it back: instant replay's 120 s one is ~46 MB."""
 
     def __init__(self, spool_path=None, seconds: int = CLIP_S):
-        self._frames = max(1, int(seconds * SR))
+        self._frames = max(0, int(seconds * SR))   # 0: no replay buffer, only recording
         self.replay: np.ndarray | None = None
         self.w = 0
         self.filled = 0
@@ -49,19 +49,19 @@ class Recorder:
     def _push(self, x: np.ndarray):
         n = len(x)
         cap = self._frames
-        if self.replay is None:
-            self.replay = np.zeros((cap, 2), np.float32)
-        if n >= cap:
-            x, n = x[-cap:], cap
-        end = self.w + n
-        if end <= cap:
-            self.replay[self.w:end] = x
-        else:
-            k = cap - self.w
-            self.replay[self.w:] = x[:k]
-            self.replay[:n - k] = x[k:]
-        self.w = end % cap
-        self.filled = min(self.filled + n, cap)
+        if cap:
+            if self.replay is None:
+                self.replay = np.zeros((cap, 2), np.float32)
+            r, m = (x[-cap:], cap) if n >= cap else (x, n)
+            end = self.w + m
+            if end <= cap:
+                self.replay[self.w:end] = r
+            else:
+                k = cap - self.w
+                self.replay[self.w:] = r[:k]
+                self.replay[:m - k] = r[k:]
+            self.w = end % cap
+            self.filled = min(self.filled + m, cap)
         if self._recording and self.rec_frames < MAX_SECONDS * SR:
             if self._spool is not None:
                 try:

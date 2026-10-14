@@ -439,7 +439,6 @@
   "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "هذا ميكروفون المكالمات في سماعة Bluetooth: بعضها يتخطى مؤثرات الصوت في Windows. إذا لم يسمع أحد أصواتك، فاستخدم قطعة USB الخاصة بالسماعة أو الكابل الافتراضي.",
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "تبويب التطبيقات يرسل صوت برنامج آخر (مشغّل موسيقى، فيديو) إلى أصدقائك، ويمكنه تسجيله.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "إعدادات Discord التي تمنعه من تقطيع أصواتك، وفحص يستمع إلى ما يفعله Discord بها",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "تبويب الراديو يشغّل محطات من حول العالم، ويمكنه حفظ آخر 15 ثانية كزر.",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "تبويب صوتك يغيّر صوتك مباشرة، أو يتكلم عنك بصوت حاسوبي.",
   "The Voice tab is switched off (Settings > Tabs).": "تبويب صوتك متوقف (الإعدادات > التبويبات).",
   "The device changed mid-way, so the recording stopped there.": "تغيّر الجهاز في المنتصف، فتوقف التسجيل عند تلك النقطة.",
@@ -2720,7 +2719,6 @@
   "Hip-hop": "الهيب هوب",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "يتم إيقاف تشغيله في الإعدادات > الخصوصية والأمان، لذا لا يتصل الراديو بأي شخص: لا يوجد دليل محطات، ولا محطات.",
   "Jazz & Soul": "موسيقى الجاز والسول",
-  "Last {n}s": "آخر {n} ث",
   "Latin": "الموسيقى اللاتينية",
   "Most listened": "الأكثر استمعا",
   "Most voted": "معظم الأصوات",
@@ -2729,7 +2727,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "لا يوجد مفضلة بعد. مرر مؤشر الماوس على المحطة وانقر فوق ☆ للاحتفاظ بها هنا.",
   "No stations found.": "لم يتم العثور على محطات.",
   "No stations match these filters.\nTry another genre or country.": "لا توجد محطات تطابق هذه المرشحات. جرب نوعًا أو بلدًا آخر.",
-  "Nothing on the radio has played in the last {n} seconds.": "لم يتم تشغيل أي شيء على الراديو خلال آخر {n} ثانية.",
   "Nothing played yet.\nStations you listen to show up here.": "لم يتم لعب أي شيء حتى الآن. المحطات التي تستمع إليها ستظهر هنا.",
   "Nothing playing": "لا شيء يلعب",
   "Nothing playing: click a station": "لا يوجد شيء قيد التشغيل - انقر فوق المحطة",
@@ -2752,7 +2749,6 @@
   "Reggae": "الريغي",
   "Remove from Favorites": "إزالة من المفضلة",
   "Rock": "روك",
-  "Save the last {n} seconds of the radio as a sound": "احفظ آخر {n} ثانية من الراديو كصوت",
   "Saved a {secs}s clip to your Sounds.": "تم حفظ مقطع {secs} s في الأصوات الخاصة بك.",
   "Search failed: press Enter to try again.": "فشل البحث: اضغط على Enter للمحاولة مرة أخرى.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "ابحث عن محطات الراديو أو الأنواع أو البلدان أو المدن... (أو انقر على نقطة على الخريطة)",
@@ -3705,5 +3701,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "اسحب: لتحريكه. مرّر العجلة: أكبر أو أصغر. مرّر الماوس فوقه لتظهر الأزرار.",
   "Open the full board": "فتح اللوحة كاملة",
   "Turn into Bun": "تحوّل إلى Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "تبويب الراديو يشغّل محطات من حول العالم، ويمكنه تسجيلها كأزرار."
 }

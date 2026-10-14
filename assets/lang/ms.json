@@ -1105,7 +1105,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Tab Aplikasi menghantar bunyi program lain (pemain muzik, video) kepada kawan anda, dan boleh merakamnya.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Tetapan Discord yang menghalangnya memotong bunyi anda, dan semakan yang mendengar apa yang Discord lakukan",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "Tetapan Discord yang menghalangnya memotong bunyi anda, dan semakan yang mendengar apa yang Discord lakukan padanya",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "Tab Radio memainkan stesen dari seluruh dunia, dan boleh menyimpan 15 saat terakhir sebagai pad.",
   "The Triggers tab is switched off (Settings > Tabs).": "Tab Pencetus dimatikan (Tetapan > Tab).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "Tab Suara mengubah suara anda secara langsung, atau bercakap untuk anda dengan suara komputer.",
   "The Voice tab is switched off (Settings > Tabs).": "Tab Suara dimatikan (Tetapan > Tab).",
@@ -2455,7 +2454,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Ia dimatikan dalam Tetapan > Privasi & keselamatan, jadi radio tidak menghubungi sesiapa: tiada direktori stesen, tiada stesen.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "{n} s terakhir",
   "Latin": "Muzik Latin",
   "Most listened": "Kebanyakan mendengar",
   "Most voted": "Terbanyak mengundi",
@@ -2464,7 +2462,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Tiada kegemaran lagi. Tuding stesen dan klik ☆ untuk menyimpannya di sini.",
   "No stations found.": "Tiada stesen ditemui.",
   "No stations match these filters.\nTry another genre or country.": "Tiada stesen yang sepadan dengan penapis ini. Cuba genre atau negara lain.",
-  "Nothing on the radio has played in the last {n} seconds.": "Tiada apa-apa di radio telah dimainkan dalam {n} saat terakhir.",
   "Nothing played yet.\nStations you listen to show up here.": "Belum ada yang dimainkan. Stesen yang anda dengar akan dipaparkan di sini.",
   "Nothing playing": "Tiada apa yang bermain",
   "Nothing playing: click a station": "Tiada apa-apa yang dimainkan: klik stesen",
@@ -2487,7 +2484,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Alih keluar daripada Kegemaran",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Simpan {n} saat terakhir radio sebagai bunyi",
   "Saved a {secs}s clip to your Sounds.": "Menyimpan klip {secs} s ke Bunyi anda.",
   "Search failed: press Enter to try again.": "Carian gagal: tekan Enter untuk mencuba lagi.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Cari stesen radio, genre, negara atau bandar… (atau klik titik pada peta)",
@@ -3325,5 +3321,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Seret: alihkan dia. Skrol: lebih besar atau lebih kecil. Halakan tetikus untuk butangnya.",
   "Open the full board": "Buka board penuh",
   "Turn into Bun": "Jadi Bun",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil terapung di atas menggantikan tetingkap ini. Butang di bawahnya membawanya kembali."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Jadi Bun: Bun kecil terapung di atas menggantikan tetingkap ini. Butang di bawahnya membawanya kembali.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "Tab Radio memainkan stesen dari seluruh dunia, dan boleh merakamnya sebagai pad."
 }

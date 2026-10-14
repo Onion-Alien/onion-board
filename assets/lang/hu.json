@@ -1121,7 +1121,6 @@
   "The Apps tab sends another program's sound (a music player, a video) to your friends, and can record it.": "Az Appok lap egy másik program hangját (zenelejátszó, videó) küldi a barátaidnak, és fel is tudja venni.",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "A Discord-beállítások, amikkel nem szaggatja szét a hangjaidat, és egy ellenőrzés, ami figyeli, mit csinál a Discord",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does to them": "A Discord-beállítások, amikkel nem szaggatja szét a hangjaidat, és egy ellenőrzés, ami figyeli, mit csinál velük a Discord",
-  "The Radio tab plays stations from around the world, and can save the last 15 seconds as a pad.": "A Rádió lap a világ minden tájáról játszik állomásokat, és az utolsó 15 másodpercet gombként is mentheti.",
   "The Triggers tab is switched off (Settings > Tabs).": "A Triggerek lap ki van kapcsolva (Beállítások > Lapok).",
   "The Voice tab changes your voice live, or talks for you with a computer voice.": "A Beszéd lap élőben módosítja a beszédhangodat, vagy gépi hanggal beszél helyetted.",
   "The Voice tab is switched off (Settings > Tabs).": "A Beszéd lap ki van kapcsolva (Beállítások > Lapok).",
@@ -2508,7 +2507,6 @@
   "Hip-hop": "Hip-hop",
   "It's switched off in Settings > Privacy & security, so the radio contacts nobody: no station directory, no stations.": "Ki van kapcsolva a Beállítások > Adatvédelem és biztonság menüpontban, így a rádió senkivel sem érintkezik: nincs állomáskönyvtár, nincsenek állomások.",
   "Jazz & Soul": "Jazz & Soul",
-  "Last {n}s": "Utolsó {n} s",
   "Latin": "Latin zene",
   "Most listened": "A legtöbben hallgattak",
   "Most voted": "A legtöbben szavaztak",
@@ -2517,7 +2515,6 @@
   "No favorites yet.\nHover a station and click its ☆ to keep it here.": "Még nincs kedvenc. Mutasson egy állomásra, és kattintson a ☆ ikonra, hogy itt maradjon.",
   "No stations found.": "Nem található állomás.",
   "No stations match these filters.\nTry another genre or country.": "Egyetlen állomás sem felel meg ezeknek a szűrőknek. Próbáljon ki egy másik műfajt vagy országot.",
-  "Nothing on the radio has played in the last {n} seconds.": "Az elmúlt {n} másodpercben nem szólt semmi a rádióban.",
   "Nothing played yet.\nStations you listen to show up here.": "Még nem játszott semmi. Az Ön által hallgatott állomások itt jelennek meg.",
   "Nothing playing": "Semmi sem játszik",
   "Nothing playing: click a station": "Nincs lejátszás: kattintson egy állomásra",
@@ -2540,7 +2537,6 @@
   "Reggae": "Reggae",
   "Remove from Favorites": "Eltávolítás a Kedvencek közül",
   "Rock": "Rock",
-  "Save the last {n} seconds of the radio as a sound": "Mentse el a rádió utolsó {n} másodpercét hangként",
   "Saved a {secs}s clip to your Sounds.": "Mentettünk egy {secs} klipet a Hangok közé.",
   "Search failed: press Enter to try again.": "A keresés sikertelen: nyomja meg az Enter billentyűt az újbóli próbálkozáshoz.",
   "Search radio stations, genres, countries or cities…  (or click a dot on the map)": "Rádióállomások, műfajok, országok vagy városok keresése… (vagy kattintson egy pontra a térképen)",
@@ -3401,5 +3397,6 @@
   "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Húzás: mozgatás. Görgő: nagyobb vagy kisebb. Vidd fölé az egeret a gombokért.",
   "Open the full board": "A teljes board megnyitása",
   "Turn into Bun": "Változz Bunná",
-  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Változz Bunná: egy kis Bun lebeg mindenek felett ez az ablak helyett. Az alatta lévő gomb visszahozza."
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Változz Bunná: egy kis Bun lebeg mindenek felett ez az ablak helyett. Az alatta lévő gomb visszahozza.",
+  "The Radio tab plays stations from around the world, and can record them as pads.": "A Rádió lap a világ minden tájáról játszik állomásokat, és gombként fel is veheti őket."
 }
