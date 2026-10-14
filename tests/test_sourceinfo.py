@@ -221,3 +221,14 @@ def test_delete_info_asks_then_drops_the_info_and_its_text_file(qapp, monkeypatc
     else:
         assert m.source == SRC and audio.with_suffix(".txt").exists() and not saved
     d.deleteLater()
+
+
+def test_link_key_matches_one_video_written_different_ways():
+    k = sourceinfo.link_key
+    same = ["https://www.youtube.com/watch?v=abc", "https://youtu.be/abc",
+            "https://m.youtube.com/watch?v=abc&list=PL1&t=30",
+            "https://music.youtube.com/watch?v=abc", "https://youtube.com/shorts/abc/"]
+    assert {k(u) for u in same} == {"youtube.com/watch?v=abc"}
+    assert k("https://www.youtube.com/watch?v=xyz") != k(same[0])
+    assert k("https://www.tiktok.com/@a/video/1?lang=en") == k("https://tiktok.com/@a/video/1")
+    assert k("C:/songs/a.mp3") == "" and k("") == ""

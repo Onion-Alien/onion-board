@@ -16,7 +16,7 @@ import json
 import logging
 import time
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from soundboard.i18n import _
 
@@ -55,6 +55,33 @@ def site_of(url: str) -> tuple[str, str] | None:
         if host == site or host.endswith("." + site):
             return found
     return "web", host.removeprefix("www.")
+
+
+def link_key(url: str) -> str:
+    """One video's link written one way, to tell two links apart: no "www." / "m.",
+    youtu.be and YouTube Music as the youtube.com watch link, and no query but a
+    YouTube video's v= (a search hit's link and the saved sound's are often written
+    differently). "" when it isn't a web link."""
+    try:
+        parts = urlsplit(str(url).strip())
+        host = (parts.hostname or "").lower()
+    except ValueError:
+        return ""
+    if parts.scheme not in ("http", "https") or not host:
+        return ""
+    for pre in ("www.", "m."):
+        host = host.removeprefix(pre)
+    path = parts.path.rstrip("/")
+    if host == "youtu.be" and path:
+        return "youtube.com/watch?v=" + path.lstrip("/")
+    if host in ("youtube.com", "music.youtube.com"):
+        v = parse_qs(parts.query).get("v")
+        if path == "/watch" and v:
+            return "youtube.com/watch?v=" + v[0]
+        if path.startswith("/shorts/"):
+            return "youtube.com/watch?v=" + path.removeprefix("/shorts/")
+        host = "youtube.com"
+    return host + path
 
 
 def _text(v, limit: int = 300) -> str:
