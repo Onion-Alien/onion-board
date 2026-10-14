@@ -40,7 +40,7 @@ import sounddevice as sd
 from soundboard import destination, directmic, livefx, mapped
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
-from soundboard.sendfx import Ducker, Limiter, SafetyLimiter, SmartMono
+from soundboard.sendfx import CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter, SmartMono
 from soundboard import errors
 from soundboard.i18n import _
 from soundboard.enginedevices import EngineDevices
@@ -63,6 +63,9 @@ from soundboard.engineparts import (  # noqa: F401
 log = logging.getLogger(__name__)
 
 FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
+# where Sounds over 100 % round their peaks to: the limiter that follows them
+LOUD_SEND = 10 ** (CEILING_DB / 20)
+LOUD_SAFE = 10 ** (SAFETY_DB / 20)
 # a sound on disk longer than this is never copied at another device's rate: it plays
 # read at that rate (Voice.step). A 2-hour song's copy took 17 s, 1.2 GB of RAM and
 # held the GIL for seconds at a time (the app froze, the audio cut out)
@@ -1202,6 +1205,10 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             self._wake_bus(out)
             mix = self._vol(out, "sounds",
                             self._sounds(out, frames, previews_only, makeup=makeup), sounds_vol)
+            if sounds_vol > 1.0:
+                # over 100 %: louder by rounding the peaks to where the limiter after
+                # it holds them (Limiter at CEILING_DB, or the SafetyLimiter / end clip)
+                mix = loud_boost(mix, sounds_vol, LOUD_SEND if self.limiter_on else LOUD_SAFE)
             play = peak(mix)
         take = self._play_take   # read once: the UI may end it meanwhile
         took = mix.copy() if take is not None and self.play_take_out == out else None
