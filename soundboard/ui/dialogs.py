@@ -7,10 +7,10 @@ import threading
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QImage, QPixmap
+from PySide6.QtGui import QColor, QFont, QImage, QPixmap
 from shiboken6 import isValid as qt_valid
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox, QDialog,
-                               QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
+                               QDialog, QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
@@ -353,6 +353,15 @@ class EditDialog(QDialog):
             self.swatch_group.addButton(b)
             self.swatches.append((b, c))
             crow.addWidget(b)
+        # any other colour: a colour wheel; the button wears the custom colour once picked
+        self.custom_swatch = QPushButton()
+        self.custom_swatch.setFixedSize(22, 22)
+        self.custom_swatch.setCheckable(True)
+        self.custom_swatch.setToolTip(_("Custom colour…"))
+        self.custom_swatch.setAccessibleName(_("Custom colour"))
+        self.custom_swatch.clicked.connect(self._pick_custom)
+        self.swatch_group.addButton(self.custom_swatch)
+        crow.addWidget(self.custom_swatch)
         crow.addStretch()
         row(g, _("Colour"), crow)
 
@@ -751,9 +760,27 @@ class EditDialog(QDialog):
             return
         self._set_picture(img)
 
+    def _pick_custom(self):
+        c = QColorDialog.getColor(QColor(self.color or PAD_COLORS[0]), self,
+                                  _("Pick a colour"))
+        self._set_color(c.name() if c.isValid() else self.color)
+
     def _set_color(self, c):
         self.color = c
         t = theme.T
+        custom = bool(c) and c.lower() not in {col.lower() for col in PAD_COLORS}
+        b = self.custom_swatch
+        b.setChecked(custom)
+        ink = (("#000000" if QColor(c).lightnessF() > 0.6 else "#ffffff") if custom
+               else "muted")
+        icons.set_icon(b, "palette", ink, ink, size=12)
+        bg = c if custom else t["inset"]
+        b.setStyleSheet(
+            f"QPushButton {{ background:{bg}; border:1px solid {t['border']};"
+            f" border-radius:11px; }}"
+            f"QPushButton:checked {{ border:3px solid {t['text']}; }}"
+            f"QPushButton:focus {{ border:2px solid {t['accent']}; }}"
+            f"QPushButton:checked:focus {{ border:3px solid {t['accent']}; }}")
         for b, col in self.swatches:
             b.setChecked(col == c)
             # its own sheet outranks the theme's :focus rule, so focus is drawn here:

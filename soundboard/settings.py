@@ -2434,7 +2434,7 @@ class SettingsDialog(QDialog):
             mw.impctl.export_board()
             if mw.impctl._exporting:   # it started (not cancelled in the save dialog)
                 busy.hold_until(exp, _("Exporting…"), mw.bridge.exported,
-                                lambda _p, _n, err: _("Didn't export") if err
+                                lambda _p, _n, err, *_rest: _("Didn't export") if err
                                 else _("✓ Exported"))
         exp.clicked.connect(export)
         imp = QPushButton(_("Import"))

@@ -1024,11 +1024,12 @@ class AppsTab(QWidget):
                             min_w=self.card_size.value(), gap=10, even=False)
         self._wire_headings()
         self.card_size.valueChanged.connect(self._set_card_size)
-        # nothing playing: Bun waits, a bit glum, above the how-to
+        # nothing playing: Bun waits, a bit glum, above the how-to, halfway down the page
         self.empty = QWidget()
         ev = QVBoxLayout(self.empty)
         ev.setContentsMargins(0, 12, 0, 0)
         ev.setSpacing(4)
+        ev.addStretch(1)
         self.bun = BunnyWidget(height=72, pad=18, sad=0.6,
                                lines=(_("play something?"), _("so quiet…"),
                                       _("music, please?")),
@@ -1038,7 +1039,8 @@ class AppsTab(QWidget):
                                        "a video or a call and it'll show up here."))
         self.empty_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         ev.addWidget(self.empty_text)
-        self.list_layout.addWidget(self.empty)
+        ev.addStretch(1)
+        self.list_layout.addWidget(self.empty, 1)
         self._tools_for_rows()
         self.list_layout.addLayout(self.grid)
         self.list_layout.addStretch(1)
@@ -1105,6 +1107,8 @@ class AppsTab(QWidget):
             row.setVisible(bool(visible))
             shown += bool(visible)
         self.empty.setVisible(not shown)
+        # the room under the cards goes to the empty page instead, so it sits centred
+        self.list_layout.setStretch(self.list_layout.count() - 1, 1 if shown else 0)
         self.grid.invalidate()
         self.list.updateGeometry()
 
