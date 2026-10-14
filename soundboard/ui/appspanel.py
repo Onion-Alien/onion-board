@@ -368,15 +368,13 @@ class AppGrid(CardGrid):
             if isinstance(w, AppCategoryHeading):
                 chain.append(w)
                 continue
-            inner = getattr(w, "_tab_chain", None)
-            if inner is None:   # a card's own order, read while it's still in one piece
-                inner, n = [], w.nextInFocusChain()
-                while n is not None and n is not w and w.isAncestorOf(n):
-                    if n.focusPolicy() & Qt.FocusPolicy.TabFocus:
-                        inner.append(n)
-                    n = n.nextInFocusChain()
-                w._tab_chain = inner   # pyright: ignore[reportAttributeAccessIssue]  # kept on the card
-            chain += inner
+            # a card's controls in the order they were made, read fresh: a list kept
+            # on the card held widgets Qt had since deleted (a spin box's line edit),
+            # and setTabOrder raising inside this layout pass broke PySide
+            # (overridepin.py). Not a drop-down's list: that's a window of its own.
+            chain += [c for c in w.findChildren(QWidget)
+                      if c.focusPolicy() & Qt.FocusPolicy.TabFocus
+                      and c.window() is w.window()]
         for a, b in zip(chain, chain[1:]):
             QWidget.setTabOrder(a, b)
 
