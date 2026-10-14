@@ -84,7 +84,7 @@ def test_settings_hides_online_pages_and_cards(window, monkeypatch):  # noqa: F8
         conn_card = next(c for c in d._offline_cards if c.parentWidget() is conn)
         assert not conn_card.isHidden()
         offline(window, True)
-        d._net_sync()
+        d.connection._net_sync()
         assert conn_card.isHidden()   # proxy / Tor: no use offline
         for page in ("data", "updates"):
             assert d.categories.item(keys.index(page)).isHidden()
@@ -102,7 +102,7 @@ def test_settings_hides_online_pages_and_cards(window, monkeypatch):  # noqa: F8
         d._apply_search("")
         assert conn_card.isHidden()
         offline(window, False)
-        d._net_sync()
+        d.connection._net_sync()
         assert not conn_card.isHidden()
         assert not d.categories.item(keys.index("updates")).isHidden()
         assert d.tab_boxes["radio"].isEnabled()
@@ -129,10 +129,10 @@ def test_addons_without_one_installed_goes_offline(window):  # noqa: F811
         card = d._addons_card_w
         assert not card.isHidden() and not d.watch_buttons["get"].isHidden()
         offline(window, True)
-        d._net_sync()
+        d.connection._net_sync()
         assert card.isHidden()   # neither add-on is installed in the test profile
         offline(window, False)
-        d._net_sync()
+        d.connection._net_sync()
         assert not card.isHidden() and not d.watch_buttons["get"].isHidden()
         assert not d.watch_buttons["report"].isHidden()
     finally:
