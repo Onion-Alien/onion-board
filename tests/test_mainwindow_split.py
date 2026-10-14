@@ -55,3 +55,9 @@ def test_each_feature_is_its_own_controller(window, attr, cls, gone):  # noqa: F
     assert isinstance(ctl, cls) and ctl.mw is window and ctl.parent() is window
     for name in gone:
         assert not hasattr(mainwindow.MainWindow, name), name
+
+
+def test_a_link_with_no_pad_finds_none(window):  # noqa: F811
+    """_pad_for_link uses sourceinfo, whose import an earlier split dropped while the
+    method was being added: every web song looked up crashed."""
+    assert window._pad_for_link("https://www.youtube.com/watch?v=nothing") is None
