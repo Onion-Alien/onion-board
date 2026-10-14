@@ -1864,7 +1864,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Verificarea de descărcare a GitHub este temporar indisponibilă (eroare de gateway). Încercați din nou Obțineți ceapa ceapă peste un moment.",
   "Got it": "Am înţeles",
   "Growl": "Mârâi",
-  "Hear": "Auzi",
   "Hear it": "Auzi",
   "Helmet": "Cască",
   "Helmet size": "Dimensiunea casca",
@@ -3430,5 +3429,7 @@
   "snappy": "sec",
   "soft": "moale",
   "warm": "cald",
-  "clean": "curat"
+  "clean": "curat",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ultimul minut al acestui program ca formă de undă: alegeți o bucată din el și păstrați-o ca clip. Ascultă doar cât timp este deschis.",
+  "Pre-delay": "Pre-întârziere"
 }

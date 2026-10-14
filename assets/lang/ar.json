@@ -1999,7 +1999,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "فحص تنزيل GitHub غير متاح مؤقتًا (خطأ في البوابة). حاول الحصول على Onion Watch مرة أخرى بعد قليل.",
   "Got it": "فهمتها",
   "Growl": "تذمر",
-  "Hear": "يسمع",
   "Hear it": "اسمعها",
   "Helmet": "خوذة",
   "Helmet size": "حجم الخوذة",
@@ -3655,5 +3654,7 @@
   "snappy": "خاطف",
   "soft": "ناعم",
   "warm": "دافئ",
-  "clean": "نظيف"
+  "clean": "نظيف",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "آخر دقيقة من هذا البرنامج كشكل موجي: اختر جزءًا منها واحتفظ به كمقطع. لا يستمع إلا وهو مفتوح.",
+  "Pre-delay": "تأخير مسبق"
 }

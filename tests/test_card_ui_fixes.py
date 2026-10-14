@@ -100,7 +100,7 @@ def test_help_card_dismisses_without_a_button(qapp, dismiss):
 
 
 def test_help_card_uses_shared_styles_and_returns_focus(qapp):
-    """U7: the help card's look comes from the style sheet (no local pixel sizes or
+    """The help card's look comes from the style sheet (no local pixel sizes or
     colours), its close is a painted icon with a name, and the focus goes back."""
     from PySide6.QtWidgets import QPushButton, QWidget
     opener_host = QWidget()

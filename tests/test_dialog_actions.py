@@ -1,5 +1,5 @@
 """Dialog footers sit bottom-right: a stretch, then the actions with the main (filled)
-one first, then the others and Cancel/Done/Close (DESIGN section 0, backlog U1)."""
+one first, then the others and Cancel/Done/Close (DESIGN section 0)."""
 from types import SimpleNamespace
 
 from PySide6.QtCore import QPoint

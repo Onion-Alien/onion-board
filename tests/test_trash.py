@@ -72,6 +72,7 @@ def test_a_removed_sound_is_in_recently_deleted_after_the_undo_bar(window, qapp)
     m = window.meta("s1")
     window.remove_sound("s1")
     window._finish_removals()                   # the Undo bar went
+    window._wait_bin()
     assert window.meta("s1") is None   # (a file outside the library stays put)
     [it] = trash.items(trash.SOUND)
     dlg = DeletedDialog(trash.SOUND, "sounds", window._restore_deleted, window)
@@ -151,6 +152,7 @@ def test_removing_from_the_menu_asks_first_and_deleted_sounds_stay_in_library(wi
     monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
     assert window.ask_remove(["s0"]) and window.meta("s0") is None
     window._finish_removals()
+    window._wait_bin()
     assert window.btn_bin.isHidden()
     assert len(trash.items()) == 1
     deleted = next(a for a in window.btn_more.menu().actions()
@@ -211,3 +213,39 @@ def test_a_picture_that_cant_go_in_the_bin_doesnt_lose_the_sound(app_dir, monkey
     [it] = trash.items(trash.SOUND)   # listed, so it can come back
     back = trash.meta_of(trash.take(it.id))
     assert Path(back.file).exists() and Path(back.image) == Path(m.image)
+
+
+def test_removing_50_sounds_writes_the_bin_list_once(app_dir, monkeypatch):
+    """A whole pack going into the bin: one read and one save of deleted.json, not
+    one of each per sound (that froze the window for a 100-sound pack)."""
+    sounds = [(_sound(app_dir, f"p{n}"), n) for n in range(50)]
+    saves, reads = [], []
+    real_save, real_read = trash._save, trash._read
+    monkeypatch.setattr(trash, "_save", lambda items: saves.append(1) or real_save(items))
+    monkeypatch.setattr(trash, "_read", lambda *a, **k: reads.append(1) or real_read(*a, **k))
+    assert trash.put_sounds(sounds) == 50
+    assert len(saves) == 1 and len(reads) == 1
+    assert len(trash.items(trash.SOUND)) == 50
+    assert not any(Path(m.file).exists() for m, _i in sounds)
+
+
+def test_finishing_a_removal_leaves_the_disk_work_to_a_worker(window, qapp, monkeypatch):  # noqa: F811
+    import threading
+    ui = threading.current_thread()
+    seen = []
+    real = trash.put_sounds
+
+    def put_sounds(removed):
+        seen.append(threading.current_thread())
+        return real(removed)
+
+    def on_ui(*_a, **_k):
+        raise AssertionError("bin disk work on the UI thread")
+    monkeypatch.setattr(trash, "put_sounds", put_sounds)
+    monkeypatch.setattr(trash, "put_sound", on_ui)
+    monkeypatch.setattr(trash, "items", on_ui)   # the bin's count comes from the worker
+    window.remove_sounds(["s0", "s1"])
+    window._finish_removals()
+    window._wait_bin()
+    assert seen and all(t is not ui for t in seen)
+    assert process_events(qapp, lambda: window.btn_bin.text() == "Recently deleted (2)")

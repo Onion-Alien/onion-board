@@ -235,6 +235,23 @@ def list_name(index: int) -> str:
         DEVICES.release()
 
 
+def close_quietly(s, what):
+    try:
+        s.close()
+    except Exception:  # noqa: BLE001
+        log.debug("closing %s raised", what, exc_info=True)
+
+
+def start_or_close(s, what):
+    """Start a freshly made stream; if that fails, close it before re-raising, or
+    every RETRY_S retry of a busy device leaks one PortAudio stream."""
+    try:
+        s.start()
+    except Exception:
+        close_quietly(s, what)
+        raise
+
+
 def find_device(kind: str, name: str | None) -> int | None:
     if not name:
         return None
@@ -682,7 +699,7 @@ class CableTap:
         self.last_cb = time.monotonic()
         self.stream = sd.OutputStream(device=idx, samplerate=self.rate, channels=CH,
                                       dtype="float32", latency=latency, callback=self._cb)
-        self.stream.start()
+        start_or_close(self.stream, f"cable tap {name}")
 
     def write(self, mix: np.ndarray):
         self.ring.write(self._rs(mix))
@@ -972,8 +989,10 @@ class Voice:
 # --------------------------------------------------------------------------- engine
 
 def _holding_devices(fn):
-    """Engine methods that open or close streams hold DEVICES: the device thread and
-    the UI thread (a device picked by hand) never do it at the same time."""
+    """Engine methods that open or close streams hold DEVICES, so two threads never
+    do it at the same time. Call them on the device thread (DeviceWorker; a device
+    picked in the window goes through MainWindow._device_job), not the UI thread: a
+    recovery stuck holding DEVICES there would freeze the window."""
     @functools.wraps(fn)
     def run(*a, **k):
         with DEVICES:
@@ -1086,6 +1105,9 @@ class Engine:
         # thread, for hours while a cable is missing)
         self._open_warned: set[str] = set()
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
+        # the mic device's own rate: rates["mic"] is the mic effect's while its clean
+        # mic feeds the board, and goes back to this when that stops
+        self._mic_dev_rate = SR
         self.errors: dict[str, str] = {}
         # the watchdog's reopens run here (check_streams), and so do the window's
         # re-scans: one at a time, never on the UI thread
@@ -1169,11 +1191,7 @@ class Engine:
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
                             latency=BUFFER.get(self.latency, "low"), callback=callback)
         self._last_cb[key] = time.monotonic()
-        try:
-            s.start()
-        except Exception:
-            self._close_quietly(s, key)   # else every RETRY_S retry leaks a stream
-            raise
+        start_or_close(s, key)
         # committed only now, so a failed open leaves the rate and the rings alone.
         # Nothing plays on or writes to this output until its *_stream attribute is
         # set, so callbacks that run before this line render silence and do no harm.
@@ -1191,6 +1209,7 @@ class Engine:
         """What others hear -> straight into the real mic (soundboard.directmic)."""
         try:
             s = directmic.DirectMicStream(callback, mic_callback=self._mic_direct,
+                                          mic_stopped=self._mic_direct_stopped,
                                           mode=self.direct_mode, lead_s=self.direct_lead_s,
                                           voice_delay=self._direct_voice_delay)
         except FileNotFoundError:
@@ -1347,6 +1366,16 @@ class Engine:
         self._last_cb["mic"] = time.monotonic()
         self._mic(x, direct=True)
 
+    def _mic_direct_stopped(self):
+        """The mic effect's clean mic stopped (its stream's thread, under its lock):
+        the mic device's blocks come at the device's rate again. Left at the effect's,
+        mic check, voice effects and recordings played them at the wrong pitch."""
+        rate = self._mic_dev_rate
+        if rate != self.rates["mic"]:
+            log.info("mic rate %d -> %d (the mic's own)", self.rates["mic"], rate)
+            self.rates["mic"] = rate
+            self._reconfigure_mic_resamplers()
+
     def _resume_voices(self, key: str, rate: int):
         """Output `key` was reopened: sounds still playing on another output pick
         up here again, at the same spot (with a short fade in); sounds this output
@@ -1374,12 +1403,7 @@ class Engine:
                 v.fading.discard(key)
                 v.done.discard(key)   # last: the callback may render it from here on
 
-    @staticmethod
-    def _close_quietly(s, what):
-        try:
-            s.close()
-        except Exception:  # noqa: BLE001
-            log.debug("closing %s raised", what, exc_info=True)
+    _close_quietly = staticmethod(close_quietly)
 
     def _stream_opened(self, key):
         # callback errors are counted per stream from here: the first failure on the
@@ -1460,6 +1484,7 @@ class Engine:
                 s.start()
                 self._stream_opened("mic")
                 self.mic_stream = s
+                self._mic_dev_rate = rate
                 self._open_warned.discard(f"mic:{name}")
                 log.info("opened mic: %s @ %d Hz, %d ch", name, rate, chans)
             except Exception as e:  # noqa: BLE001
@@ -2384,18 +2409,33 @@ class Engine:
             outdata.fill(0)
             self._guard("obs", e)
 
+    DIRECT_LOCK_S = 0.02   # longest the mic callback waits on the mic effect's feed
+
     def _cb_mic(self, indata, frames, t, status):
         self._last_cb["mic"] = time.monotonic()
         if is_xrun(status):
             self.xruns["mic"] += 1
         try:
             d = self.direct_stream()
-            if d is not None and d.mic_live:
-                # this block went through the mic effect, sounds and all: the clean one
-                # came from the effect already; take it now rather than at the next poll
-                d.pump()
+            if d is None:
+                self._mic(indata)
                 return
-            self._mic(indata)
+            if not d.mic_live:
+                # under the stream's lock: its thread can go live on the clean mic (and
+                # switch the mic's rate) mid-block, and _mic must not run on both
+                if not d.lock.acquire(timeout=self.DIRECT_LOCK_S):
+                    return   # its thread is stuck: the watchdog sees to that
+                try:
+                    live = d.mic_live
+                    if not live:
+                        self._mic(indata)
+                finally:
+                    d.lock.release()
+                if not live:
+                    return
+            # this block went through the mic effect, sounds and all: the clean one
+            # came from the effect already; take it now rather than at the next poll
+            d.pump()
         except Exception as e:  # noqa: BLE001
             self._guard("mic", e)
 

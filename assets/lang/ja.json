@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub のダウンロード チェックが一時的に利用できなくなりました (ゲートウェイ エラー)。しばらくしてからもう一度「Get Onion Watch」を試してください。",
   "Got it": "わかった",
   "Growl": "唸る",
-  "Hear": "聞く",
   "Hear it": "聞いてください",
   "Helmet": "ヘルメット",
   "Helmet size": "ヘルメットのサイズ",
@@ -3280,5 +3279,7 @@
   "snappy": "キレよく",
   "soft": "やわらか",
   "warm": "温かい",
-  "clean": "クリーン"
+  "clean": "クリーン",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "このプログラムの直近1分間を波形で表示：一部を選んでクリップとして保存できます。開いている間だけ聞き取ります。",
+  "Pre-delay": "プリディレイ"
 }

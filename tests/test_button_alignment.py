@@ -1,5 +1,5 @@
 """Buttons side by side line up: one height in a row, the icon's gap before the words,
-and no row of its own for one button (UI-AUDIT U23, U26, U27, U38, U40, U43, U45, U52)."""
+and no row of its own for one button."""
 from types import SimpleNamespace
 
 from PySide6.QtWidgets import QApplication
