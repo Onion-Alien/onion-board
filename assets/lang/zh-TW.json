@@ -975,7 +975,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "每頁九格，順序和你的按鈕一樣，在「音效」分頁拖曳按鈕來重新排列。",
   "No audio device is open, pick one in Setup.": "沒有開啟任何音訊裝置，請在「設置」裡選一個。",
   "No cable found yet": "還沒找到音源線",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "還沒有自訂模式。填寫表單來建立一個，或按「新增」／「複製內建」。",
   "No cut (full band)": "不切（全頻段）",
   "No mic is picked. Pick one in Setup → Devices.": "沒有選擇麥克風。請在 設置 → 裝置 選一個。",
   "No programs set yet.": "還沒有設定任何程式。",
@@ -3280,5 +3279,11 @@
   "snappy": "乾脆",
   "soft": "柔和",
   "warm": "溫暖",
-  "clean": "乾淨"
+  "clean": "乾淨",
+  "Hide the report": "隱藏報告",
+  "Network activity log": "網路活動記錄",
+  "No custom modes yet. Fill in the form to make one.": "還沒有自訂模式。填寫表單來新增一個。",
+  "Show the report": "顯示報告",
+  "This run only. It isn't saved.": "僅限這次執行。不會儲存。",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "你自己的聲音模式，用於內建模式不適合的語音聊天。"
 }

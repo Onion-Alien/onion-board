@@ -997,7 +997,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Negen tegels per pagina, in dezelfde volgorde als uw pads: sleep de pads op het tabblad Geluiden om ze opnieuw te rangschikken.",
   "No audio device is open, pick one in Setup.": "Er is geen audioapparaat geopend. Kies er een in Configuratie.",
   "No cable found yet": "Nog geen kabel gevonden",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Nog geen aangepaste modi. Vul het formulier in om er een te maken, of klik op Toevoegen / Kopiëren ingebouwd.",
   "No cut (full band)": "Geen snit (volledige band)",
   "No mic is picked. Pick one in Setup → Devices.": "Er is geen microfoon gekozen. Kies er een in Instellingen → Apparaten.",
   "No programs set yet.": "Er zijn nog geen programma's ingesteld.",
@@ -3355,5 +3354,11 @@
   "snappy": "strak",
   "soft": "zacht",
   "warm": "warm",
-  "clean": "schoon"
+  "clean": "schoon",
+  "Hide the report": "Rapport verbergen",
+  "Network activity log": "Netwerkactiviteitlogboek",
+  "No custom modes yet. Fill in the form to make one.": "Nog geen aangepaste modi. Vul het formulier in om er een te maken.",
+  "Show the report": "Rapport tonen",
+  "This run only. It isn't saved.": "Alleen deze sessie. Wordt niet opgeslagen.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Je eigen geluidsmodi, voor een voicechat die de ingebouwde niet dekken."
 }

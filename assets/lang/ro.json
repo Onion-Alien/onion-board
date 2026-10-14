@@ -654,7 +654,6 @@
   "No audio device is open, pick one in Setup.": "Niciun dispozitiv audio nu e deschis, alege unul în Configurare.",
   "No audio device is open. Pick one in Setup → Devices.": "Niciun dispozitiv audio nu e deschis. Alege unul în Configurare → Dispozitive.",
   "No cable found yet": "Încă nu s-a găsit niciun cablu",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Încă nu ai moduri personalizate. Completează formularul ca să faci unul, sau dă clic pe Adaugă / Copiază inclus.",
   "No cut (full band)": "Fără tăiere (bandă completă)",
   "No mic is picked. Pick one in Setup → Devices.": "Niciun microfon ales. Alege unul în Configurare → Dispozitive.",
   "No open programs found. Use Browse for a program.": "Nu s-a găsit niciun program deschis. Folosește Caută un program.",
@@ -3430,5 +3429,11 @@
   "snappy": "sec",
   "soft": "moale",
   "warm": "cald",
-  "clean": "curat"
+  "clean": "curat",
+  "Hide the report": "Ascunde raportul",
+  "Network activity log": "Jurnalul activității în rețea",
+  "No custom modes yet. Fill in the form to make one.": "Încă nu ai moduri personalizate. Completează formularul ca să faci unul.",
+  "Show the report": "Arată raportul",
+  "This run only. It isn't saved.": "Doar rularea asta. Nu se salvează.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Modurile tale de sunet, pentru un chat vocal pe care cele incluse nu-l acoperă."
 }

@@ -642,7 +642,6 @@
   "No audio device is open, pick one in Setup.": "Walang bukas na audio device, pumili sa Setup.",
   "No audio device is open. Pick one in Setup → Devices.": "Walang bukas na audio device. Pumili sa Setup → Mga device.",
   "No cable found yet": "Wala pang nakitang cable",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Wala pang custom mode. Punan ang form para gumawa, o i-click ang Magdagdag / Kopyahin ang built-in.",
   "No cut (full band)": "Walang cut (full band)",
   "No mic is picked. Pick one in Setup → Devices.": "Walang napiling mic. Pumili sa Setup → Mga device.",
   "No open programs found. Use Browse for a program.": "Walang nakitang bukas na program. Gamitin ang Maghanap ng program.",
@@ -3355,5 +3354,11 @@
   "snappy": "mabilis",
   "soft": "malambot",
   "warm": "mainit",
-  "clean": "malinis"
+  "clean": "malinis",
+  "Hide the report": "Itago ang report",
+  "Network activity log": "Network activity log",
+  "No custom modes yet. Fill in the form to make one.": "Wala pang custom modes. Punan ang form para gumawa ng isa.",
+  "Show the report": "Ipakita ang report",
+  "This run only. It isn't saved.": "Ngayong run lang. Hindi ito nase-save.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Sarili mong sound modes, para sa voice chat na hindi sakop ng mga built-in."
 }

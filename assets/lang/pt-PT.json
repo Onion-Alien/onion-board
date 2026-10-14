@@ -642,7 +642,6 @@
   "No audio device is open, pick one in Setup.": "Nenhum dispositivo de áudio aberto, escolhe um em Configurar.",
   "No audio device is open. Pick one in Setup → Devices.": "Nenhum dispositivo de áudio aberto. Escolhe um em Configurar → Dispositivos.",
   "No cable found yet": "Ainda não foi encontrado nenhum cabo",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Ainda não há modos personalizados. Preenche o formulário para criar um, ou clica em Adicionar / Copiar incluído.",
   "No cut (full band)": "Sem corte (banda completa)",
   "No mic is picked. Pick one in Setup → Devices.": "Nenhum microfone escolhido. Escolhe um em Configurar → Dispositivos.",
   "No open programs found. Use Browse for a program.": "Não foram encontrados programas abertos. Usa Procurar um programa.",
@@ -3355,5 +3354,11 @@
   "snappy": "seco",
   "soft": "suave",
   "warm": "quente",
-  "clean": "limpo"
+  "clean": "limpo",
+  "Hide the report": "Ocultar o relatório",
+  "Network activity log": "Registo da atividade de rede",
+  "No custom modes yet. Fill in the form to make one.": "Ainda não há modos personalizados. Preenche o formulário para criar um.",
+  "Show the report": "Mostrar o relatório",
+  "This run only. It isn't saved.": "Só esta sessão. Não é guardado.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Os teus próprios modos de som, para um chat de voz que os incluídos não cobrem."
 }

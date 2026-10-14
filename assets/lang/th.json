@@ -976,7 +976,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "เก้าแผ่นต่อหน้า ในลำดับเดียวกับแผ่นของคุณ ให้ลากแผ่นในแถบเสียงเพื่อจัดเรียงแผ่นใหม่",
   "No audio device is open, pick one in Setup.": "ไม่มีอุปกรณ์เสียงเปิดอยู่, เลือกหนึ่งอุปกรณ์ในการตั้งค่า",
   "No cable found yet": "ยังไม่พบสายเคเบิล",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "ยังไม่มีโหมดที่กำหนดเอง กรอกแบบฟอร์มเพื่อสร้างหรือคลิกเพิ่ม / คัดลอกในตัว.",
   "No cut (full band)": "ไม่ตัด (เต็มวง)",
   "No mic is picked. Pick one in Setup → Devices.": "ไม่มีการเลือกไมค์ เลือกหนึ่งรายการในการตั้งค่า → อุปกรณ์",
   "No programs set yet.": "ยังไม่มีการตั้งค่าโปรแกรม",
@@ -3280,5 +3279,11 @@
   "snappy": "ฉับไว",
   "soft": "นุ่ม",
   "warm": "อบอุ่น",
-  "clean": "สะอาด"
+  "clean": "สะอาด",
+  "Hide the report": "ซ่อนรายงาน",
+  "Network activity log": "บันทึกกิจกรรมเครือข่าย",
+  "No custom modes yet. Fill in the form to make one.": "ยังไม่มีโหมดที่กำหนดเอง กรอกแบบฟอร์มเพื่อสร้างหนึ่งโหมด",
+  "Show the report": "แสดงรายงาน",
+  "This run only. It isn't saved.": "เฉพาะการเปิดครั้งนี้ ไม่ได้บันทึกไว้",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "โหมดเสียงของคุณเอง สำหรับแชทเสียงที่โหมดในตัวไม่ครอบคลุม"
 }

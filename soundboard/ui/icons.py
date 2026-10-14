@@ -366,6 +366,18 @@ def _info(p, fill):
     p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
 
 
+def _question(p, fill):
+    """A question (yes / no boxes): a circle with a question mark, like _info's."""
+    p.drawEllipse(QRectF(3, 3, 18, 18))
+    hook = QPainterPath(QPointF(9.4, 9.6))
+    hook.cubicTo(9.4, 6.4, 14.8, 6.4, 14.8, 9.6)
+    hook.cubicTo(14.8, 11.6, 12, 11.8, 12, 14)
+    p.drawPath(hook)
+    dot = QPainterPath()
+    dot.addEllipse(QPointF(12, 16.8), 1.1, 1.1)
+    fill(dot)
+
+
 def _more(p, fill):
     """More actions (a card's rare ones): three dots in a row."""
     dots = QPainterPath()
@@ -770,7 +782,8 @@ SHAPES = {
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn,
     "folder": _folder,
     "link": _link,
-    "shield": _shield, "info": _info, "alert": _alert, "more": _more, "onion": _onion,
+    "shield": _shield, "info": _info, "question": _question, "alert": _alert, "more": _more,
+    "onion": _onion,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "eye": _eye,

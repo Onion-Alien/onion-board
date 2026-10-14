@@ -975,7 +975,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Sembilan kotak per halaman, urutannya sama dengan pad-mu, seret pad di tab Suara untuk mengatur ulang.",
   "No audio device is open, pick one in Setup.": "Tidak ada perangkat audio yang terbuka, pilih salah satu di Pengaturan.",
   "No cable found yet": "Belum ada kabel yang ditemukan",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Belum ada mode khusus. Isi formulir untuk membuatnya, atau klik Tambah / Salin bawaan.",
   "No cut (full band)": "Tanpa potongan (band penuh)",
   "No mic is picked. Pick one in Setup → Devices.": "Tidak ada mikrofon yang dipilih. Pilih satu di Pengaturan → Perangkat.",
   "No programs set yet.": "Belum ada program yang ditetapkan.",
@@ -3280,5 +3279,11 @@
   "snappy": "tangkas",
   "soft": "lembut",
   "warm": "hangat",
-  "clean": "bersih"
+  "clean": "bersih",
+  "Hide the report": "Sembunyikan laporan",
+  "Network activity log": "Log aktivitas jaringan",
+  "No custom modes yet. Fill in the form to make one.": "Belum ada mode khusus. Isi formulir untuk membuatnya.",
+  "Show the report": "Tampilkan laporan",
+  "This run only. It isn't saved.": "Hanya sesi ini. Tidak disimpan.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Mode suara milikmu sendiri, untuk obrolan suara yang tidak dicakup mode bawaan."
 }

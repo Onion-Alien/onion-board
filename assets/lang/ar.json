@@ -1081,7 +1081,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "تسعة مربعات في كل صفحة، بنفس ترتيب الوسادات الخاصة بك - اسحب الوسادات في علامة التبويب \"الأصوات\" لإعادة ترتيبها.",
   "No audio device is open, pick one in Setup.": "لا يوجد جهاز صوت مفتوح, اختر واحدًا في الإعداد.",
   "No cable found yet": "لم يتم العثور على كابل حتى الآن",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "لا توجد أوضاع مخصصة حتى الآن. املأ النموذج لإنشاء واحد، أو انقر فوق إضافة / نسخ مدمج.",
   "No cut (full band)": "بدون قطع (شريط كامل)",
   "No mic is picked. Pick one in Setup → Devices.": "لم يتم اختيار أي ميكروفون. اختر واحدًا في الإعداد → الأجهزة.",
   "No programs set yet.": "لم يتم تعيين أي برامج حتى الآن.",
@@ -3655,5 +3654,11 @@
   "snappy": "خاطف",
   "soft": "ناعم",
   "warm": "دافئ",
-  "clean": "نظيف"
+  "clean": "نظيف",
+  "Hide the report": "إخفاء التقرير",
+  "Network activity log": "سجل نشاط الشبكة",
+  "No custom modes yet. Fill in the form to make one.": "لا توجد أوضاع مخصصة بعد. املأ النموذج لإنشاء واحد.",
+  "Show the report": "إظهار التقرير",
+  "This run only. It isn't saved.": "هذا التشغيل فقط. لا يتم حفظه.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "أوضاع صوت خاصة بك، لمحادثة صوتية لا تغطيها الأوضاع المدمجة."
 }

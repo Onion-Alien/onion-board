@@ -997,7 +997,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "आपके पैड के समान क्रम में, एक पृष्ठ पर नौ टाइलें - उन्हें पुनर्व्यवस्थित करने के लिए ध्वनि टैब में पैड खींचें।",
   "No audio device is open, pick one in Setup.": "कोई ऑडियो डिवाइस खुला नहीं है - सेटअप में कोई एक चुनें।",
   "No cable found yet": "अभी तक कोई केबल नहीं मिला",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "अभी तक कोई कस्टम मोड नहीं. एक बनाने के लिए फॉर्म भरें, या ऐड/कॉपी बिल्ट-इन पर क्लिक करें।",
   "No cut (full band)": "कोई कट नहीं (पूर्ण बैंड)",
   "No mic is picked. Pick one in Setup → Devices.": "कोई माइक नहीं उठाया गया. सेटअप → डिवाइसेस में से एक चुनें।",
   "No programs set yet.": "अभी तक कोई कार्यक्रम निर्धारित नहीं है.",
@@ -3355,5 +3354,11 @@
   "snappy": "झटपट",
   "soft": "नरम",
   "warm": "गर्म",
-  "clean": "साफ़"
+  "clean": "साफ़",
+  "Hide the report": "रिपोर्ट छिपाएँ",
+  "Network activity log": "नेटवर्क गतिविधि लॉग",
+  "No custom modes yet. Fill in the form to make one.": "अभी कोई कस्टम मोड नहीं। एक बनाने के लिए फ़ॉर्म भरें।",
+  "Show the report": "रिपोर्ट दिखाएँ",
+  "This run only. It isn't saved.": "सिर्फ़ यह रन। सहेजा नहीं जाता।",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "आपके अपने ध्वनि मोड, ऐसी वॉइस चैट के लिए जिसे बिल्ट-इन मोड कवर नहीं करते।"
 }

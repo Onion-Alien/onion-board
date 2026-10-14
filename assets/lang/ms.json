@@ -630,7 +630,6 @@
   "No audio device is open, pick one in Setup.": "Tiada peranti audio dibuka, pilih satu dalam Persediaan.",
   "No audio device is open. Pick one in Setup → Devices.": "Tiada peranti audio dibuka. Pilih satu dalam Persediaan → Peranti.",
   "No cable found yet": "Belum ada kabel ditemui",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Belum ada mod tersuai. Isi borang untuk membuat satu, atau klik Tambah / Salin terbina dalam.",
   "No cut (full band)": "Tiada potongan (jalur penuh)",
   "No mic is picked. Pick one in Setup → Devices.": "Tiada mikrofon dipilih. Pilih satu dalam Persediaan → Peranti.",
   "No open programs found. Use Browse for a program.": "Tiada program dibuka ditemui. Guna Cari program.",
@@ -3280,5 +3279,11 @@
   "snappy": "tangkas",
   "soft": "lembut",
   "warm": "hangat",
-  "clean": "bersih"
+  "clean": "bersih",
+  "Hide the report": "Sembunyikan laporan",
+  "Network activity log": "Log aktiviti rangkaian",
+  "No custom modes yet. Fill in the form to make one.": "Belum ada mod tersuai. Isi borang untuk membuat satu.",
+  "Show the report": "Tunjukkan laporan",
+  "This run only. It isn't saved.": "Sesi ini sahaja. Tidak disimpan.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Mod bunyi anda sendiri, untuk sembang suara yang tidak diliputi mod terbina dalam."
 }

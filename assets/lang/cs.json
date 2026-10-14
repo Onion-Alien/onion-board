@@ -654,7 +654,6 @@
   "No audio device is open, pick one in Setup.": "Není otevřené žádné zvukové zařízení, vyber ho v Zapojení.",
   "No audio device is open. Pick one in Setup → Devices.": "Není otevřené žádné zvukové zařízení. Vyber ho v Zapojení → Zařízení.",
   "No cable found yet": "Zatím žádný kabel",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Zatím žádné vlastní režimy. Vyplň formulář a vytvoř jeden, nebo klikni na Přidat / Kopírovat vestavěný.",
   "No cut (full band)": "Bez ořezu (celé pásmo)",
   "No mic is picked. Pick one in Setup → Devices.": "Není vybraný žádný mikrofon. Vyber ho v Zapojení → Zařízení.",
   "No open programs found. Use Browse for a program.": "Žádné otevřené programy. Použij Vyhledat program.",
@@ -3430,5 +3429,11 @@
   "snappy": "ostře",
   "soft": "měkce",
   "warm": "teple",
-  "clean": "čistě"
+  "clean": "čistě",
+  "Hide the report": "Skrýt hlášení",
+  "Network activity log": "Záznam síťové aktivity",
+  "No custom modes yet. Fill in the form to make one.": "Zatím žádné vlastní režimy. Vyplň formulář a jeden vytvoř.",
+  "Show the report": "Zobrazit hlášení",
+  "This run only. It isn't saved.": "Jen tento běh. Neukládá se.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Vlastní režimy zvuku pro hlasový chat, na který vestavěné nestačí."
 }

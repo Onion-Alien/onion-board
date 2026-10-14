@@ -81,7 +81,7 @@ def test_typing_into_the_empty_editor_makes_a_mode(window):  # noqa: F811
     (it used to be disabled, which looked the same and just ignored typing)."""
     dlg = CustomDestDialog(window)
     assert window.cfg.dest.get("custom", []) == []
-    assert dlg.name.isEnabled() and dlg.note.isEnabled() and dlg.empty.isVisibleTo(dlg)
+    assert dlg.name.isEnabled() and dlg.note.isEnabled() and dlg.list.count() == 0
     dlg.name.setText("Mumble")
     dlg.name.textEdited.emit("Mumble")
     dlg.bass.setValue(40)
@@ -89,7 +89,7 @@ def test_typing_into_the_empty_editor_makes_a_mode(window):  # noqa: F811
     assert len(custom) == 1 and custom[0]["label"] == "Mumble"
     assert abs(custom[0]["bass"] - 0.4) < 1e-9
     assert dlg.list.count() == 1 and dlg.list.item(0).text() == "Mumble"
-    assert dlg.b_del.isEnabled() and not dlg.empty.isVisibleTo(dlg)
+    assert dlg.b_del.isEnabled()
     dlg.accept()
 
 

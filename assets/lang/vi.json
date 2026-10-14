@@ -976,7 +976,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Chín ô trên một trang, theo thứ tự giống như các miếng đệm của bạn, kéo các miếng đệm trong tab Âm thanh để sắp xếp lại chúng.",
   "No audio device is open, pick one in Setup.": "Không có thiết bị âm thanh nào đang mở, hãy chọn một thiết bị trong Cài đặt.",
   "No cable found yet": "Chưa tìm thấy cáp",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Chưa có chế độ tùy chỉnh nào. Điền vào biểu mẫu để tạo một hoặc nhấp vào Thêm / Sao chép tích hợp.",
   "No cut (full band)": "Không cắt (toàn dải)",
   "No mic is picked. Pick one in Setup → Devices.": "Không có mic nào được chọn. Chọn một trong Cài đặt → Thiết bị.",
   "No programs set yet.": "Chưa có chương trình nào được thiết lập.",
@@ -3280,5 +3279,11 @@
   "snappy": "gọn",
   "soft": "mềm",
   "warm": "ấm",
-  "clean": "sạch"
+  "clean": "sạch",
+  "Hide the report": "Ẩn báo cáo",
+  "Network activity log": "Nhật ký hoạt động mạng",
+  "No custom modes yet. Fill in the form to make one.": "Chưa có chế độ tùy chỉnh. Điền biểu mẫu để tạo một chế độ.",
+  "Show the report": "Hiện báo cáo",
+  "This run only. It isn't saved.": "Chỉ lần chạy này. Không được lưu.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Chế độ âm thanh của riêng bạn, cho trò chuyện thoại mà các chế độ có sẵn không phù hợp."
 }

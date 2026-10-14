@@ -949,7 +949,6 @@
   "Next  →": "Далее  →",
   "Next category": "Следующая категория",
   "No cable found yet": "Кабель пока не найден",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Своих режимов пока нет. Заполни форму, чтобы создать, или нажми «Добавить» / «Копировать встроенный».",
   "No cut (full band)": "Без среза (вся полоса)",
   "No mic is picked. Pick one in Setup → Devices.": "Микрофон не выбран. Выбери его в Подключение → Устройства.",
   "No programs set yet.": "Программы пока не заданы.",
@@ -3430,5 +3429,11 @@
   "snappy": "резко",
   "soft": "мягко",
   "warm": "тепло",
-  "clean": "чисто"
+  "clean": "чисто",
+  "Hide the report": "Скрыть отчёт",
+  "Network activity log": "Журнал сетевой активности",
+  "No custom modes yet. Fill in the form to make one.": "Своих режимов пока нет. Заполни форму, чтобы создать режим.",
+  "Show the report": "Показать отчёт",
+  "This run only. It isn't saved.": "Только этот запуск. Не сохраняется.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Свои режимы звука для голосового чата, который встроенные не покрывают."
 }

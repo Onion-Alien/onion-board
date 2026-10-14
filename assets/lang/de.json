@@ -996,7 +996,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Neun Kacheln pro Seite, in derselben Reihenfolge wie deine Pads, zieh Pads im Sounds-Tab, um sie umzusortieren.",
   "No audio device is open, pick one in Setup.": "Kein Audiogerät ist offen, wähl eins unter Setup.",
   "No cable found yet": "Noch kein Kabel gefunden",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Noch keine eigenen Modi. Füll das Formular aus, um einen zu machen, oder klick auf Hinzufügen / Eingebauten kopieren.",
   "No cut (full band)": "Kein Schnitt (volles Band)",
   "No mic is picked. Pick one in Setup → Devices.": "Kein Mikro gewählt. Wähl eins unter Setup → Geräte.",
   "No programs set yet.": "Noch keine Programme festgelegt.",
@@ -3355,5 +3354,11 @@
   "snappy": "zackig",
   "soft": "weich",
   "warm": "warm",
-  "clean": "sauber"
+  "clean": "sauber",
+  "Hide the report": "Bericht ausblenden",
+  "Network activity log": "Netzwerkaktivitäts-Protokoll",
+  "No custom modes yet. Fill in the form to make one.": "Noch keine eigenen Modi. Füll das Formular aus, um einen zu erstellen.",
+  "Show the report": "Bericht zeigen",
+  "This run only. It isn't saved.": "Nur diese Sitzung. Wird nicht gespeichert.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Eigene Sound-Modi für einen Voice-Chat, den die eingebauten nicht abdecken."
 }

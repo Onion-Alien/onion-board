@@ -976,7 +976,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "パッドと同じ順序で 1 ページに 9 つのタイルが表示されます。[サウンド] タブでパッドをドラッグして並べ替えます。",
   "No audio device is open, pick one in Setup.": "開いているオーディオ デバイスがありません。[セットアップ] で 1 つ選択してください。",
   "No cable found yet": "まだケーブルが見つかりません",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "カスタムモードはまだありません。フォームに記入して作成するか、「組み込みの追加/コピー」をクリックします。",
   "No cut (full band)": "ノーカット（フルバンド）",
   "No mic is picked. Pick one in Setup → Devices.": "マイクは選ばれていません。 [セットアップ] → [デバイス] でいずれかを選択します。",
   "No programs set yet.": "まだプログラムが設定されていません。",
@@ -3280,5 +3279,11 @@
   "snappy": "キレよく",
   "soft": "やわらか",
   "warm": "温かい",
-  "clean": "クリーン"
+  "clean": "クリーン",
+  "Hide the report": "レポートを隠す",
+  "Network activity log": "ネットワーク アクティビティ ログ",
+  "No custom modes yet. Fill in the form to make one.": "カスタムモードはまだありません。フォームに入力して作成してください。",
+  "Show the report": "レポートを表示",
+  "This run only. It isn't saved.": "今回の実行のみ。保存されません。",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "内蔵モードでは合わないボイスチャット用の、自分だけのサウンドモード。"
 }

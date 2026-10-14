@@ -996,7 +996,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Neuf tuiles par page, dans le même ordre que tes pads, fais glisser les pads dans l'onglet Sons pour les réordonner.",
   "No audio device is open, pick one in Setup.": "Aucun périphérique audio n'est ouvert, choisis-en un dans Config.",
   "No cable found yet": "Aucun câble trouvé pour l'instant",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Pas encore de modes perso. Remplis le formulaire pour en créer un, ou clique sur Ajouter / Copier un intégré.",
   "No cut (full band)": "Sans coupure (bande complète)",
   "No mic is picked. Pick one in Setup → Devices.": "Aucun micro choisi. Choisis-en un dans Config → Périphériques.",
   "No programs set yet.": "Aucun programme réglé pour l'instant.",
@@ -3355,5 +3354,11 @@
   "snappy": "sec",
   "soft": "doux",
   "warm": "chaud",
-  "clean": "propre"
+  "clean": "propre",
+  "Hide the report": "Masquer le rapport",
+  "Network activity log": "Journal d'activité réseau",
+  "No custom modes yet. Fill in the form to make one.": "Pas encore de mode perso. Remplis le formulaire pour en créer un.",
+  "Show the report": "Afficher le rapport",
+  "This run only. It isn't saved.": "Cette session seulement. Pas enregistré.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Tes propres modes son, pour un chat vocal que ceux intégrés ne couvrent pas."
 }

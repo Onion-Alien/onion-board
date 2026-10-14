@@ -642,7 +642,6 @@
   "No audio device is open, pick one in Setup.": "Mikään äänilaite ei ole auki, valitse sellainen Käyttöönotossa.",
   "No audio device is open. Pick one in Setup → Devices.": "Mikään äänilaite ei ole auki. Valitse sellainen kohdassa Käyttöönotto → Laitteet.",
   "No cable found yet": "Kaapelia ei vielä löytynyt",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Ei vielä omia tiloja. Täytä lomake tehdäksesi sellaisen, tai klikkaa Lisää / Kopioi valmis.",
   "No cut (full band)": "Ei leikkausta (koko kaista)",
   "No mic is picked. Pick one in Setup → Devices.": "Mikkiä ei ole valittu. Valitse se kohdassa Käyttöönotto → Laitteet.",
   "No open programs found. Use Browse for a program.": "Avoimia ohjelmia ei löytynyt. Käytä Selaa ohjelmaa.",
@@ -3355,5 +3354,11 @@
   "snappy": "napakka",
   "soft": "pehmeä",
   "warm": "lämmin",
-  "clean": "puhdas"
+  "clean": "puhdas",
+  "Hide the report": "Piilota raportti",
+  "Network activity log": "Verkkotoiminnan loki",
+  "No custom modes yet. Fill in the form to make one.": "Ei vielä omia tiloja. Täytä lomake tehdäksesi sellaisen.",
+  "Show the report": "Näytä raportti",
+  "This run only. It isn't saved.": "Vain tämä käyttökerta. Ei tallenneta.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Omat äänitilat puhechattiin, jota sisäänrakennetut eivät kata."
 }

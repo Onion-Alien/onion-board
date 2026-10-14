@@ -976,7 +976,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "패드와 동일한 순서로 한 페이지에 9개의 타일이 있습니다. 사운드 탭에서 패드를 드래그하여 재정렬하세요.",
   "No audio device is open, pick one in Setup.": "열려 있는 오디오 장치가 없습니다. 설정에서 하나를 선택하세요.",
   "No cable found yet": "아직 케이블을 찾을 수 없습니다.",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "아직 맞춤 모드가 없습니다. 양식을 작성하여 만들거나 내장된 추가/복사를 클릭하세요.",
   "No cut (full band)": "노컷(풀밴드)",
   "No mic is picked. Pick one in Setup → Devices.": "마이크가 선택되지 않았습니다. 설정 → 장치에서 하나를 선택하세요.",
   "No programs set yet.": "아직 설정된 프로그램이 없습니다.",
@@ -3280,5 +3279,11 @@
   "snappy": "날렵하게",
   "soft": "부드럽게",
   "warm": "따뜻하게",
-  "clean": "깨끗하게"
+  "clean": "깨끗하게",
+  "Hide the report": "보고서 숨기기",
+  "Network activity log": "네트워크 활동 로그",
+  "No custom modes yet. Fill in the form to make one.": "아직 사용자 정의 모드가 없습니다. 양식을 채워 하나 만드세요.",
+  "Show the report": "보고서 보기",
+  "This run only. It isn't saved.": "이번 실행만. 저장되지 않습니다.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "기본 모드로 안 맞는 음성 채팅을 위한 나만의 사운드 모드."
 }
