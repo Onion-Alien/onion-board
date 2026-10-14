@@ -38,6 +38,7 @@ cache/
 browser/
 # personal sound files dropped in for testing
 *.mp3
+!docs/sounds/*.mp3
 *.wav
 *.flac
 *.ogg
