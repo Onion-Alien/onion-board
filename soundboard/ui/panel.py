@@ -453,6 +453,10 @@ class EmptyList(QListWidget):
             self._empty_icon = icon
         self.viewport().update()
 
+    def empty_text(self) -> str:
+        """What it says now: "" while it has rows."""
+        return "" if self.count() else self._empty_text
+
     def paintEvent(self, e):
         super().paintEvent(e)
         if self.count() or not self._empty_text:
