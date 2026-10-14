@@ -76,9 +76,9 @@ def served(monkeypatch, app_dir):
 
 def test_the_built_in_list_has_our_packs_from_our_own_releases():
     built = packs.built_in()
-    assert [(p.id, p.sounds) for p in built] == [("gm-starter", 67), ("esports", 51),
+    assert [(p.id, p.sounds) for p in built] == [("streamer", 57), ("esports", 51),
                                                  ("podcast", 51), ("halloween", 49),
-                                                 ("streamer", 57)]
+                                                 ("gm-starter", 67)]
     for p in built:
         assert p.url.startswith(updates.DOWNLOADS) and len(p.sha256) == 64
 
@@ -159,8 +159,8 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        assert [c.pack.id for c in dlg.cards] == ["gm-starter", "esports", "podcast",
-                                                "halloween", "streamer"]
+        assert [c.pack.id for c in dlg.cards] == ["streamer", "esports", "podcast",
+                                                "halloween", "gm-starter"]
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
         assert served.calls == []
     finally:

@@ -2,17 +2,17 @@
   "version": 1,
   "packs": [
     {
-      "id": "gm-starter",
-      "name": "GM starter pack",
-      "emoji": "🎲",
-      "description": "For tabletop games (D&D and friends): tavern, travel, weather, dungeon, combat, magic, boss and ending sounds. Music loops, and Ctrl+Alt+1/2/3 switch tavern, battle and boss music.",
-      "url": "https://github.com/Onion-Alien/onion-board/releases/download/gm-pack-1/onion-board-gm-starter-pack.zip",
-      "sha256": "bfb53856bb8f225f336e5391b9ceb0773da2bca61923de0102abf888d499f09d",
-      "size": 28480681,
-      "sounds": 67,
-      "license": "CC0 + CC BY (credits inside)",
+      "id": "streamer",
+      "name": "Streamer pack",
+      "emoji": "📺",
+      "description": "For live streams: starting soon, just chatting, BRB and ending music; follower, sub, donation and raid alerts; air horn, cheers, fails (bonk, buzzer, sad trombone), chat reactions, a 3-2-1 Go announcer and transitions. Ctrl+Alt+3 air horn, Ctrl+Alt+4 bonk.",
+      "url": "https://github.com/Onion-Alien/onion-board/releases/download/streamer-pack-1/onion-board-streamer-pack.zip",
+      "sha256": "bb6b6895c3ef30f14e5a45a1b0cfc384de4691d960e1fdf1b0eae8967e1b638c",
+      "size": 18299334,
+      "sounds": 57,
+      "license": "CC0",
       "author": "Onion Board",
-      "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss", "Endings"]
+      "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer", "Transitions"]
     },
     {
       "id": "esports",
@@ -54,17 +54,17 @@
       "categories": ["Spooky music", "Screams", "Monsters", "Jump scares", "Haunted house", "Night"]
     },
     {
-      "id": "streamer",
-      "name": "Streamer pack",
-      "emoji": "📺",
-      "description": "For live streams: starting soon, just chatting, BRB and ending music; follower, sub, donation and raid alerts; air horn, cheers, fails (bonk, buzzer, sad trombone), chat reactions, a 3-2-1 Go announcer and transitions. Ctrl+Alt+3 air horn, Ctrl+Alt+4 bonk.",
-      "url": "https://github.com/Onion-Alien/onion-board/releases/download/streamer-pack-1/onion-board-streamer-pack.zip",
-      "sha256": "bb6b6895c3ef30f14e5a45a1b0cfc384de4691d960e1fdf1b0eae8967e1b638c",
-      "size": 18299334,
-      "sounds": 57,
-      "license": "CC0",
+      "id": "gm-starter",
+      "name": "GM starter pack",
+      "emoji": "🎲",
+      "description": "For tabletop games (D&D and friends): tavern, travel, weather, dungeon, combat, magic, boss and ending sounds. Music loops, and Ctrl+Alt+1/2/3 switch tavern, battle and boss music.",
+      "url": "https://github.com/Onion-Alien/onion-board/releases/download/gm-pack-1/onion-board-gm-starter-pack.zip",
+      "sha256": "bfb53856bb8f225f336e5391b9ceb0773da2bca61923de0102abf888d499f09d",
+      "size": 28480681,
+      "sounds": 67,
+      "license": "CC0 + CC BY (credits inside)",
       "author": "Onion Board",
-      "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer", "Transitions"]
+      "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss", "Endings"]
     }
   ]
 }
