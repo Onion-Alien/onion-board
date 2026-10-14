@@ -24,7 +24,7 @@
     })(0);
   }
   // What visitors do on the page: site-<what>, each counted once a visit, so a few clicks
-  // never turn into a flood of hits (Onion Stats' Website tab shows them).
+  // never turn into a flood of hits.
   var counted = {};
   function countOnce(path) { if (!counted[path]) { counted[path] = 1; count(path); } }
   function did(what) { countOnce("site-" + what); }

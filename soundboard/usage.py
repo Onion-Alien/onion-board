@@ -268,8 +268,8 @@ def install_id(cfg) -> str:
 def user_tag(sid: str) -> str:
     """A short tag made from the random ID, sent as each count's "ref". GoatCounter
     swaps "session" for its own number that starts over after 8 hours, so the daily
-    counts of one person only link up across days through this (Onion Stats' User
-    paths). A hash, so the ID itself isn't what's kept there."""
+    counts of one person only link up across days through this. A hash, so the ID
+    itself isn't what's kept there."""
     return "u-" + hashlib.sha256(sid.encode()).hexdigest()[:12]
 
 

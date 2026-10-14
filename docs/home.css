@@ -111,7 +111,9 @@ html.js[data-product="watch"] .panel[data-panel="board"] { display: none; }
 html:not(.js) .panel + .panel { border-top: 1px solid var(--edge); margin-top: 60px; }
 
 /* ---------- hero ---------- */
-.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 40px; align-items: center;
+/* Both columns start at the top (not centred), and the intro keeps three lines' room, so
+   the Download button sits at the same height on both tabs. */
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 40px; align-items: start;
         padding: 56px 0 40px; min-height: min(760px, calc(100vh - 70px)); }
 .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 13px 6px 9px; border-radius: 999px;
         border: 1px solid var(--edge2); background: rgba(255,255,255,.04); color: var(--muted); font-size: 14px; }
@@ -126,6 +128,7 @@ h1 em, h2 em { font-style: normal; background: linear-gradient(100deg, var(--a1)
                animation: shimmer 9s linear infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 .lede { margin: 0 0 30px; max-width: 560px; color: var(--muted); font-size: clamp(17px, 1.5vw, 19.5px); }
+@media (min-width: 981px) { .lede { min-height: 3lh; } }
 .ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .meta { margin: 18px 0 0; color: var(--dim); font-size: 14px; line-height: 1.7; }
 .meta a { color: var(--muted); }
