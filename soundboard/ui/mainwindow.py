@@ -1471,7 +1471,7 @@ class MainWindow(QMainWindow):
                              "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                              "TikTok, most media sites) to see it, then play or add it")
         self.search.setToolTip(self._search_tip)
-        self.search.setClearButtonEnabled(True)
+        icons.clear_button(self.search)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
@@ -3462,7 +3462,7 @@ class MainWindow(QMainWindow):
     def _settings_closed(self, dlg):
         if self._settings_dlg is dlg:
             self._settings_dlg = None
-        had_focus = _holds_focus(dlg)
+        had_focus = getattr(dlg, "had_focus", False) or _holds_focus(dlg)
         self._content.setCurrentWidget(self._tabs_area)
         self._content.removeWidget(dlg)
         self._fit_body_top()

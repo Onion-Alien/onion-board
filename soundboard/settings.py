@@ -607,7 +607,7 @@ class SettingsDialog(QDialog):
         self.search_box = QLineEdit()
         # (a page: "Settings" is the heading right over it)
         self.search_box.setPlaceholderText(_("Search"))
-        self.search_box.setClearButtonEnabled(True)
+        icons.clear_button(self.search_box)
         self.search_box.setAccessibleName(_("Search settings"))
         self.search_box.setFixedWidth(196)
         self._search_wait = QTimer(self, singleShot=True, interval=150)
@@ -3504,6 +3504,10 @@ class SettingsDialog(QDialog):
                     sig.disconnect(slot)
                 except (RuntimeError, TypeError):
                     pass
+        # hiding it hands the focus on as if Tab were pressed (a keyboard ring on the
+        # Sounds rail tab): the window takes it back, but only knows to if told here
+        fw = QApplication.focusWidget()
+        self.had_focus = fw is not None and self.isAncestorOf(fw)
         super().done(r)
 
     # ------------------------------------------------------------------ remote control

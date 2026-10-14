@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
 from soundboard import theme
 from soundboard.ui.sidebar import SideRail, SideTabs
+from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 
 def test_sidebar_focus_ring_follows_keyboard_navigation(qapp):
@@ -97,3 +98,21 @@ def test_the_hidden_bar_filter_never_asks_for_the_bar(qapp, monkeypatch):
     bar.show()                     # still kept hidden
     qapp.processEvents()
     assert not bar.isVisible()
+
+
+def test_back_from_settings_by_rail_click_has_no_ring(window):  # noqa: F811
+    """Settings, then a click on the Sounds rail tab: hiding Settings handed the focus
+    on as if Tab were pressed, and Sounds wore the keyboard ring."""
+    from PySide6.QtWidgets import QApplication
+    w = window
+    w.show()
+    w.activateWindow()
+    w.tabs.setCurrentWidget(w.sounds_page)
+    QApplication.processEvents()
+    QTest.mouseClick(w.rail.foot[0], Qt.LeftButton)   # the gear
+    QApplication.processEvents()
+    assert w.settings_open()
+    QTest.mouseClick(w.rail.buttons[0], Qt.LeftButton)   # Sounds
+    QApplication.processEvents()
+    assert not w.settings_open()
+    assert [b.index for b in w.rail.buttons if b._kbd_focus] == []

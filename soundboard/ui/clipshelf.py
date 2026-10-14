@@ -154,7 +154,7 @@ class ClipShelf(QWidget):
         self.search = QLineEdit()
         self.search.setPlaceholderText(_("Find clips"))
         self.search.setAccessibleName(_("Find clips"))
-        self.search.setClearButtonEnabled(True)
+        icons.clear_button(self.search)
         self.search.setMinimumHeight(CONTROL_H)
         self.search.setMinimumWidth(180)
         self.search.setMaximumWidth(360)
