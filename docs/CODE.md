@@ -173,8 +173,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/langnames.py`, `langnames_data.py` | language names in the app's language for the *Speak in* list; the data file is generated from Unicode CLDR by `scripts/make_langnames.py` (don't edit it) |
 | `soundboard/tips.py` | *Did you know?* tips: the list (each with where *Show me* goes), which one is due (after setup, once a day, never during a game), and the fullscreen-in-front check; the main window shows the bar |
 | `soundboard/ui/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`) or what's playing (`Engine.start_play_take`: sounds + radio, no mic), spooled by `recorder.MicTake`, raw or through the voice changer, trimmed and added as a pad; not modal |
-| `soundboard/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) and the open programs for picking one (`windowed_programs`) |
-| `soundboard/ui/programpick.py` | the program picker for a category's *Show this when a program is in front…* |
+| `soundboard/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) |
 | `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |

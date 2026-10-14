@@ -44,8 +44,6 @@ TIPS: tuple[Tip, ...] = (
         "one to give it a random-sound hotkey."), "tab:sounds"),
     Tip("scoped", _("Hotkeys per category: one key plays a different sound in each "
         "category. Switch it on in Settings → Hotkeys."), "settings:hotkeys"),
-    Tip("programs", _("Right-click a category → Show this when a program is in front, and "
-        "the board switches to it by itself when you open your game."), "tab:sounds"),
     Tip("tabs", _("Don't use the Radio or Triggers tabs? Switch them off in Settings → "
         "Tabs and they don't load at all."), "settings:tabs"),
     Tip("phone", _("Play your pads from your phone with Onion Pocket: Settings → Remote."),

@@ -1727,18 +1727,36 @@ class MainWindow(QMainWindow):
         c.pad_width = min(max(c.pad_width, 110), 240)   # the pads are built with it next
         size.setValue(c.pad_width)
         size.setFixedWidth(90)
-        size.setToolTip(_("Pad size"))
+        size.setToolTip(_("Card size"))
         # a drag re-lays every pad at most every PAD_SIZE_WAIT_MS, not on each step
         self._pad_size_wait = QTimer(self, singleShot=True, interval=PAD_SIZE_WAIT_MS)
         self._pad_size_wait.timeout.connect(lambda: self.set_pad_width(size.value()))
         size.valueChanged.connect(lambda _v: self._pad_size_wait.isActive()
                                   or self._pad_size_wait.start())
         no_wheel(size)
-        size_lbl = QLabel(_("Pad size"))
+        size_lbl = QLabel(_("Card size"))
         size_lbl.setObjectName("muted")
         tb.addWidget(size_lbl)
         tb.addWidget(size)
         self._pad_size = (size_lbl, size)
+        # the list view has rows, not cards: a row size takes the slider's place there
+        rows_lbl = QLabel(_("Row size"))
+        rows_lbl.setObjectName("muted")
+        self.btn_rows = QPushButton()
+        self.btn_rows.setAccessibleName(_("Row size"))
+        self.btn_rows.setToolTip(_("How tall the rows in the list are"))
+        rm = DropdownMenu(self.btn_rows)
+        rm.aboutToShow.connect(lambda: self._fill_rows_menu(rm))
+        self.btn_rows.setMenu(rm)
+        self.btn_rows.setProperty("toolbarMenu", True)
+        self.btn_rows.setProperty("quiet", True)
+        self.btn_rows.setFixedHeight(CONTROL_H)
+        tb.addWidget(rows_lbl)
+        tb.addWidget(self.btn_rows)
+        self._row_size = (rows_lbl, self.btn_rows)
+        self._size_tight = False   # the window too narrow for either (_init_fit)
+        self._label_rows()
+        self._show_size_picker()
         for b in (add, self.btn_yt, self.btn_folder, more, self.btn_keys,
                   self.btn_bin, self.btn_view, self.search):
             b.setFixedHeight(CONTROL_H)
@@ -1773,6 +1791,7 @@ class MainWindow(QMainWindow):
         self.grid = PadGrid()
         self.grid.pad_w = c.pad_width
         self.grid.listed = c.pad_view == "list"
+        self.grid.row_size = c.list_rows
         self.grid._spacing()
         self.grid.reorder.connect(self.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
@@ -6873,18 +6892,11 @@ class MainWindow(QMainWindow):
                                _("Clear the random-sound hotkey")) if hk else None
         a_sub = menu.addAction(icons.icon("plus"), _("Add subcategory…"))
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
-        a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
-        a_shuf = menu.addAction(icons.icon("shuffle"), _("Play them all, shuffled"))
         a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack"))
         cm = menu.addMenu(icons.icon("palette"), _("Colour"))
         # the same colour list as the bulk Colour menu: names, the current one ticked
         fill_colour_menu(cm, self.cfg.category_colors.get(name, ""),
                          lambda col: self.set_category_color(name, col), none=True)
-        menu.addSeparator()
-        a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front"))
-        a_unprog = {menu.addAction(icons.icon("offline"),
-                                  _("Stop showing this for {exe}", exe=exe)): exe
-                    for exe in catswitch.programs_for(self.cfg.category_programs, name)}
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
                                _("Delete category (keeps the sounds)"))
@@ -6902,16 +6914,10 @@ class MainWindow(QMainWindow):
             self.set_category_hotkey(name, "")
         elif act == a_rand:
             self.play_random(name)
-        elif act in (a_all, a_shuf):
-            self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.impctl.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
         elif act == a_del:
             self.delete_category(name)
-        elif act == a_prog:
-            self.pick_category_programs(name)
-        elif act in a_unprog:
-            self.remove_category_program(a_unprog[act])
 
     # ------------------------------------------------------------ program -> category
     def _update_cat_timer(self):
@@ -6936,18 +6942,6 @@ class MainWindow(QMainWindow):
                      shown=shown, exe=html.escape(sw.exe)) if sw.back
                    else _("Switched to “{shown}” ({exe} is in front)",
                           shown=shown, exe=html.escape(sw.exe)))
-
-    def pick_category_programs(self, name: str):
-        """A category's menu → Show this when a program is in front"""
-        from soundboard.ui.programpick import ProgramPicker
-        d = ProgramPicker(name, dict(self.cfg.category_programs), self)
-        picked = d.picked if d.exec() else []
-        free_dialog(d)
-        for exe in picked:
-            self.add_category_program(name, exe, quiet=True)
-        if picked:
-            self.toast(_("✓ “{name}” shows by itself when {picked} is in front",
-                         name=html.escape(name), picked=html.escape(', '.join(picked))), "ok")
 
     def add_category_program(self, name: str, exe: str, quiet: bool = False):
         exe = catswitch.exe_name(exe)
@@ -7203,7 +7197,7 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         views = QActionGroup(menu)
         for key, name, icon, tip in (
-                ("grid", _("Pads"), "sounds", _("Cards, with pictures")),
+                ("grid", _("Cards"), "sounds", _("Cards, with pictures")),
                 ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
             a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
             icons.set_icon(a, icon, checked_color="accent")
@@ -7225,8 +7219,46 @@ class MainWindow(QMainWindow):
             return
         self.cfg.pad_view = view
         self._label_view()
+        self._show_size_picker()
         self._save_now()
         self.grid.set_listed(view == "list")
+
+    @staticmethod
+    def _row_names() -> dict[str, str]:
+        return {"small": _("Small"), "medium": _("Medium"), "large": _("Large")}
+
+    def _label_rows(self):
+        self.btn_rows.setText(self._row_names().get(self.cfg.list_rows, ""))
+
+    def _fill_rows_menu(self, menu: QMenu):
+        menu.clear()
+        group = QActionGroup(menu)
+        for key, name in self._row_names().items():
+            a = menu.addAction(name, lambda k=key: self.set_list_rows(k))
+            a.setCheckable(True)
+            a.setChecked(self.cfg.list_rows == key)
+            group.addAction(a)
+
+    def set_list_rows(self, size: str):
+        if size not in library.LIST_ROWS or size == self.cfg.list_rows:
+            return
+        self.cfg.list_rows = size
+        self._label_rows()
+        self._save_now()
+        self.grid.set_row_size(size)
+
+    def _show_size_picker(self):
+        """Card size for the cards, Row size for the list; neither in a narrow window."""
+        listed = self.cfg.pad_view == "list"
+        for w in self._pad_size:
+            w.setVisible(not listed and not self._size_tight)
+        for w in self._row_size:
+            w.setVisible(listed and not self._size_tight)
+        responsive.touch(*self._pad_size, *self._row_size)
+
+    def _fit_size_picker(self, tight: bool):
+        self._size_tight = tight
+        self._show_size_picker()
         self.selection.sync()
 
     def _volume_action(self, menu: QMenu, m: SoundMeta) -> QWidgetAction:
@@ -8899,7 +8931,7 @@ class MainWindow(QMainWindow):
         # last: opened out, the rail stays open until nothing else can give (it shut
         # again at once when opened in a mid-sized window)
         f.add(90, "w", self._squeeze_rail)
-        f.add(10, "w", r.hide(*self._pad_size))
+        f.add(10, "w", self._fit_size_picker)
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
