@@ -3461,5 +3461,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Скачать самый новый yt-dlp, часть, которая загружает с YouTube и других сайтов, и попробовать эту ссылку снова",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Загрузчик уже самый новый. Возможно, сайт изменился так, что он пока с этим не справляется: попробуйте снова через несколько дней.",
   "Update downloader": "Обновить загрузчик",
-  "Updating the downloader…": "Загрузчик обновляется…"
+  "Updating the downloader…": "Загрузчик обновляется…",
+  "Hear {name}": "Послушать {name}",
+  "Hear {name} (only you hear it)": "Послушать {name} (слышите только вы)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Выберите наушники в Настройки → Аудио, чтобы послушать примеры.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Готовые доски, которые можно бесплатно использовать где угодно: в играх, стримах и видеороликах. Нажмите на звук, чтобы сначала послушать его (слышите только вы). Добавьте один, и его звуки появятся на вашей доске, каждая категория будет выделена на отдельной вкладке."
 }

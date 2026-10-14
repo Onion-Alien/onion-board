@@ -3461,5 +3461,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Pobiera najnowszy yt-dlp, część, która pobiera z YouTube i innych stron, i ponawia ten link",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Downloader jest już najnowszy. Strona mogła się zmienić w sposób, z którym jeszcze sobie nie radzi: spróbuj ponownie za kilka dni.",
   "Update downloader": "Zaktualizuj downloader",
-  "Updating the downloader…": "Aktualizowanie downloadera…"
+  "Updating the downloader…": "Aktualizowanie downloadera…",
+  "Hear {name}": "Posłuchaj: {name}",
+  "Hear {name} (only you hear it)": "Posłuchaj: {name} (słyszysz to tylko ty)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Wybierz słuchawki w Ustawienia → Audio, żeby usłyszeć próbki.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Gotowe tablice, z których możesz korzystać bezpłatnie w dowolnym miejscu: w grach, transmisjach strumieniowych i filmach. Kliknij dźwięk, żeby najpierw go posłuchać (słyszysz go tylko ty). Dodaj jeden, a jego dźwięki wylądują na Twojej tablicy, każda kategoria jako osobna zakładka."
 }

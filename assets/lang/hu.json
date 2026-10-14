@@ -3385,5 +3385,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Letölti a legújabb yt-dlp-t, azt a részt, ami a YouTube-ról és más oldalakról tölt le, majd újra megpróbálja ezt a linket",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "A letöltő már a legújabb. Lehet, hogy az oldal úgy változott meg, amit még nem tud kezelni: próbáld újra pár nap múlva.",
   "Update downloader": "Letöltő frissítése",
-  "Updating the downloader…": "A letöltő frissítése…"
+  "Updating the downloader…": "A letöltő frissítése…",
+  "Hear {name}": "{name} meghallgatása",
+  "Hear {name} (only you hear it)": "{name} meghallgatása (csak te hallod)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Válaszd ki a fejhallgatódat a Beállítások → Hang részben, hogy halld a mintákat.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Kész táblák, bárhol ingyenesen használhatók: játékokban, streamekben és videókban. Nyomjon egy hangra, hogy előbb meghallgassa (csak Ön hallja). Adjon hozzá egyet, és annak hangjai a táblán landolnak, minden kategória külön lapként."
 }
