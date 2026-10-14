@@ -131,7 +131,7 @@ def test_voice_panel_reports_when_it_is_changing_your_voice(panel):
 def test_random_voice_is_a_silly_own_mix(panel):
     import random
 
-    from soundboard.ui.voicepanel import CUSTOM
+    from soundboard.ui.voicefxpanel import CUSTOM
     for seed in range(20):
         panel.fx.randomize(random.Random(seed))
         on = {t: r.state() for t, r in panel.fx.rows.items()

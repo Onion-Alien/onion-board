@@ -83,7 +83,7 @@ CODE_PREFIX = "OB"
 CODE_VERSION = 1
 MAX_CODE = 4096        # characters of code (a full 13-effect voice is ~300)
 MAX_JSON = 16384       # bytes it may unpack to (a zip bomb stops here)
-# your mic clean-up is yours, not the voice's (ui.voicepanel.KEEP): never shared
+# your mic clean-up is yours, not the voice's (ui.voicefxpanel.KEEP): never shared
 NOT_SHARED = frozenset({"cleanup"})
 
 
