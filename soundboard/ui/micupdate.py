@@ -88,7 +88,7 @@ class MicUpdateOffer(QFrame):
                            _("Audio pauses briefly during the update."))
         self.body.setWordWrap(True)
         body.addWidget(self.body)
-        self.note = QLabel(prompt_note(frozen))
+        self.note = QLabel(prompt_note(frozen), self)   # parent: see test_no_flash_windows
         self.note.setObjectName("hint")
         self.note.setWordWrap(True)
         self.note.setVisible(ask)

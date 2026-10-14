@@ -423,7 +423,7 @@ class DiscordGuide(QDialog):
         self.result_box.hide()
         v.addWidget(self.result_box)
         row = QHBoxLayout()
-        copy = QPushButton(_("Copy the mic name"))
+        copy = QPushButton(_("Copy the mic name"), self)   # parent: see test_no_flash_windows
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, _("✓  Copied"))))
@@ -552,7 +552,7 @@ class GameGuide(QDialog):
               "(Fortnite) or <b>Low bandwidth</b> (older and console titles), choose "
               "<b>Advanced</b> and pick it."))))
         row = QHBoxLayout()
-        copy = QPushButton(_("Copy the mic name"))
+        copy = QPushButton(_("Copy the mic name"), self)   # parent: see test_no_flash_windows
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, _("✓  Copied"))))
@@ -604,7 +604,7 @@ class MeetingGuide(QDialog):
             _("On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It picks "
               "the browser shaping by itself once the call is listening."))))
         row = QHBoxLayout()
-        copy = QPushButton(_("Copy the mic name"))
+        copy = QPushButton(_("Copy the mic name"), self)   # parent: see test_no_flash_windows
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, _("✓  Copied"))))

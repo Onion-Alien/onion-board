@@ -9,7 +9,6 @@ import re
 import threading
 import time
 from collections.abc import Callable
-from typing import Any
 
 from PySide6.QtCore import QObject, QPoint, QPointF, QSignalBlocker, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QIcon, QImage, QKeySequence, QPainter, QPixmap, QShortcut
@@ -20,18 +19,20 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboB
 
 from shiboken6 import isValid as qt_valid
 
-from soundboard import appsetup, autostart, profiles, theme, ytdl
 from soundboard.ui import busy, icons
 from soundboard.wheelguard import no_wheel
 from soundboard import errors, usage
 from soundboard.i18n import _
-from soundboard.ui.settingspages import _button_row
+from soundboard.ui.settingspages import Built, _button_row
 from soundboard.ui.settingspages.help import HelpPage
 from soundboard.ui.settingspages.audio import AudioPage
 from soundboard.ui.settingspages.appearance import AppearancePage, ThemeCard, ThemeGrid as ThemeGrid
 from soundboard.ui.settingspages.keys import (KeysPage, HOTKEY_ACTIONS as HOTKEY_ACTIONS,
                                               HotkeyDialog as HotkeyDialog,
                                               pretty_key as pretty_key)
+from soundboard.ui.settingspages.general import GeneralPage
+from soundboard.ui.settingspages.connection import ConnectionPage
+from soundboard.ui.settingspages.privacy import PrivacyPage
 
 log = logging.getLogger(__name__)
 
@@ -44,16 +45,6 @@ NOTE = _("Hey, thanks for actually using this. Onion Board started because every
           "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
           "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
           "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
-
-
-class _Relay(QObject):
-    """Carries a background job's result back to the UI thread."""
-    done = Signal(str)
-
-
-class _ProgressRelay(_Relay):
-    """A _Relay that also carries progress (bytes done, bytes in all; 0 = unknown)."""
-    progress = Signal(int, int)
 
 
 class _AddonGrid(QWidget):
@@ -198,7 +189,7 @@ class _BackArrow(QPushButton):
         p.end()
 
 
-class SettingsDialog(QDialog):
+class SettingsDialog(QDialog, Built):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
     # narrower than this, the categories are icons only and the search box goes over
@@ -207,44 +198,6 @@ class SettingsDialog(QDialog):
     TITLE_COG = 18   # the heading's cog, px
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
     BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
-
-    # ---- set by its pages (ui/settingspages), read by the dialog, the window and tests
-    about_version: Any
-    dev_combos: Any
-    discord_btn: Any
-    feedback_box: Any
-    feedback_btn: Any
-    hue_now: Any
-    hue_reset: Any
-    hue_settle: Any
-    hue_slider: Any
-    hue_swatch: Any
-    lang_button: Any
-    lang_dialog: Any
-    lang_note: Any
-    lang_restart: Any
-    live_dot: Any
-    look_box: Any
-    look_pages: Any
-    look_shown: Any
-    look_tabs: Any
-    _look_pick: Any
-    live_green: Any
-    ov_monitor: Any
-    ov_position: Any
-    ov_toggle_only: Any
-    playing_background_check: Any
-    playing_background_opacity: Any
-    problem_btn: Any
-    _sync_highlight: Any
-    texture_off: Any
-    texture_on: Any
-    theme_cards: Any
-    ui_scale_combo: Any
-    ui_scale_note: Any
-    ui_scale_restart: Any
-    voices_card: Any
-    voices_show: Any
 
     def __init__(self, mw, page: str = "privacy", lazy: bool = False):
         """A page in the main window, in place of the tabs (SettingsControl.open_settings),
@@ -257,6 +210,9 @@ class SettingsDialog(QDialog):
         self.audio = AudioPage(self)
         self.appearance = AppearancePage(self)
         self.keys = KeysPage(self)
+        self.general = GeneralPage(self)
+        self.connection = ConnectionPage(self)
+        self.privacy = PrivacyPage(self)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.setObjectName("settingspage")   # the window's own background
         self.mw = mw
@@ -273,16 +229,16 @@ class SettingsDialog(QDialog):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        pages = (("privacy", _("Privacy && security"), "shield", self._privacy),
-                 ("connection", _("Connection"), "radio", self._connection),
-                 ("data", _("Data && quality"), "wave", self._data),
-                 ("general", _("General"), "settings", self._general),
+        pages = (("privacy", _("Privacy && security"), "shield", self.privacy._privacy),
+                 ("connection", _("Connection"), "radio", self.connection._connection),
+                 ("data", _("Data && quality"), "wave", self.privacy._data),
+                 ("general", _("General"), "settings", self.general._general),
                  ("tabs", _("Tabs"), "sounds", self._tabs),
                  ("appearance", _("Appearance"), "palette", self.appearance._appearance),
                  ("audio", _("Audio"), "volume", self.audio._audio),
                  ("hotkeys", _("Hotkeys"), "keyboard", self.keys._hotkeys),
                  ("overlay", _("Overlay"), "gamepad", self.keys._overlay),
-                 ("updates", _("Updates"), "reload", self._updates),
+                 ("updates", _("Updates"), "reload", self.connection._updates),
                  ("help", _("Add-ons"), "plus", self.help._help),
                  ("remote", _("Remote"), "cable", self._remote),
                  ("about", _("About"), "star", self.help._about))
@@ -318,7 +274,7 @@ class SettingsDialog(QDialog):
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
         self._page_keys = [p[0] for p in pages]
         self.show_page(page)
-        self._offline_sync()
+        self.privacy._offline_sync()
         # a search box over the categories: 13 pages are a lot to look through for one
         # switch. Typing hides every card without the word and every page without a card.
         self.search_box = QLineEdit()
@@ -671,163 +627,6 @@ class SettingsDialog(QDialog):
         v.setSpacing(12)
         return w, v
 
-    def _general(self):
-        w, v = self._page()
-        card, cv = self._card(_("Window"))
-        top = QCheckBox(_("Keep window on top"))
-        top.setChecked(self.mw.cfg.always_on_top)
-        top.toggled.connect(self.mw.on_top_toggle)
-        cv.addWidget(top)
-        # its explanation under the box's text like every other option's (it sat at
-        # the card's edge)
-        one = self._option(cv, _("Play pads with one click"),
-                           _("Otherwise, double-click to play. Ctrl+click selects without "
-                             "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
-        one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        if hasattr(getattr(self.mw, "tipctl", None), "set_tips_on"):
-            self.box_tips = self._option(
-                cv, _("Show tips"),
-                _("A short “Did you know?” about a feature, at most once a day, never while a "
-                  "game is up."), self.mw.cfg.tips_on, self.mw.tipctl.set_tips_on)
-        v.addWidget(card)
-        v.addWidget(self._app_setup_card())
-        if self.mw.cfg.category_programs:   # rules made before the category menu lost it
-            v.addWidget(self._programs_card())
-        v.addWidget(self._background_card())
-        v.addWidget(self._backup_card())
-        v.addWidget(self._reset_card())
-        v.addStretch(1)
-        return w
-
-    def _app_setup_card(self):
-        """Set up for the app you're using (soundboard.appsetup): ask or not, and the
-        apps remembered or never asked about."""
-        card, cv = self._card(
-            _("Set up for the app you're using"),
-            _("When a voice chat app or a game starts listening to you, a small bar offers "
-              "to set the board up for it. Apps you set up switch the mode by themselves "
-              "next time."))
-        self.box_app_setup = self._option(
-            cv, _("Offer to set up for new apps"),
-            _("Off: nothing asks. Apps already set up still switch."),
-            appsetup.settings(self.mw.cfg)["ask"], self._app_setup_ask)
-        self.app_setup_list = QVBoxLayout()
-        self.app_setup_list.setSpacing(4)
-        cv.addLayout(self.app_setup_list)
-        self._fill_app_setup()
-        if hasattr(self.mw, "app_setup_changed"):
-            self.mw.app_setup_changed.connect(self._fill_app_setup)
-        return card
-
-    def _app_setup_ask(self, on: bool):
-        appsetup.settings(self.mw.cfg)["ask"] = bool(on)
-        self.mw._save_later()
-
-    def _fill_app_setup(self):
-        lay = self.app_setup_list
-        while lay.count():
-            item = lay.takeAt(0)
-            w = item.widget() if item is not None else None
-            if w is not None:
-                w.deleteLater()
-        s = appsetup.settings(self.mw.cfg)
-        if not s["apps"] and not s["never"]:
-            none = QLabel(_("No apps set up yet."))
-            none.setObjectName("muted")
-            lay.addWidget(none)
-        names = {k: profiles.BY_KEY[k].name for k in appsetup.MODES}
-        for exe, mode in sorted(s["apps"].items()):
-            row = QWidget()
-            h = QHBoxLayout(row)
-            h.setContentsMargins(0, 0, 0, 0)
-            h.addWidget(QLabel(exe), 1)
-            if mode in names:
-                cb = QComboBox()
-                for k, n in names.items():
-                    cb.addItem(n, k)
-                cb.setCurrentIndex(cb.findData(mode))
-                cb.setAccessibleName(_("Mode for {program}", program=exe))
-                no_wheel(cb)
-                cb.currentIndexChanged.connect(
-                    lambda _i, e=exe, c=cb: self._app_setup_mode(e, c.currentData()))
-                h.addWidget(cb)
-            rm = QPushButton(_("Remove"))
-            rm.setObjectName("small")
-            rm.setToolTip(_("Forget {program}: it asks again next time", program=exe))
-            icons.set_icon(rm, "trash", "danger_text", size=12)
-            rm.clicked.connect(lambda _c=False, e=exe: self._app_setup_forget(e))
-            h.addWidget(rm)
-            lay.addWidget(row)
-        for exe in sorted(s["never"]):
-            if exe in s["apps"]:
-                continue
-            row = QWidget()
-            h = QHBoxLayout(row)
-            h.setContentsMargins(0, 0, 0, 0)
-            lbl = QLabel(_("{program}  (never asks)", program=exe))
-            lbl.setObjectName("muted")
-            h.addWidget(lbl, 1)
-            again = QPushButton(_("Ask again"))
-            again.setObjectName("small")
-            again.clicked.connect(lambda _c=False, e=exe: self._app_setup_forget(e))
-            h.addWidget(again)
-            lay.addWidget(row)
-
-    def _app_setup_mode(self, exe: str, mode: str):
-        appsetup.remember(self.mw.cfg, exe, mode)
-        self.mw._save_later()
-
-    def _app_setup_forget(self, exe: str):
-        appsetup.forget(self.mw.cfg, exe)
-        self.mw._save_later()
-        self._fill_app_setup()
-
-    def _programs_card(self):
-        """Switch category when a program is in front: every rule in one place."""
-        card, cv = self._card(_("Switch category by program"))
-        self.box_programs = self._option(
-            cv, _("Switch by itself"),
-            _("When the program closes, the board goes back to what it showed before."),
-            self.mw.cfg.category_programs_on, self.mw.catctl.set_category_programs_on)
-        self.programs_list = QVBoxLayout()
-        self.programs_list.setSpacing(4)
-        cv.addLayout(self.programs_list)
-        self._fill_programs()
-        if hasattr(self.mw, "category_programs_changed"):
-            self.mw.category_programs_changed.connect(self._fill_programs)
-        return card
-
-    def _fill_programs(self):
-        lay = self.programs_list
-        while lay.count():
-            item = lay.takeAt(0)
-            w = item.widget() if item is not None else None
-            if w is not None:
-                w.deleteLater()
-        rules = self.mw.cfg.category_programs
-        if not rules:
-            none = QLabel(_("No programs set yet."))
-            none.setObjectName("muted")
-            lay.addWidget(none)
-        for exe, cat in sorted(rules.items()):
-            row = QWidget()
-            h = QHBoxLayout(row)
-            h.setContentsMargins(0, 0, 0, 0)
-            missing = cat not in self.mw.cfg.categories
-            lbl = QLabel(_("{program}  →  “{category}”  (no such category now)",
-                           program=exe, category=cat) if missing else
-                         _("{program}  →  “{category}”", program=exe, category=cat))
-            lbl.setObjectName("muted" if missing else "")
-            h.addWidget(lbl, 1)
-            rm = QPushButton(_("Remove"))
-            rm.setObjectName("small")
-            rm.setToolTip(_("Stop switching to “{category}” when {program} is in front",
-                            category=cat, program=exe))
-            icons.set_icon(rm, "trash", "danger_text", size=12)
-            rm.clicked.connect(lambda _c=False, e=exe: self.mw.catctl.remove_category_program(e))
-            h.addWidget(rm)
-            lay.addWidget(row)
-
     # Settings > Tabs: what each tab that can be switched off is for (taboff.KEYS)
     TAB_HINTS = {
         "radio": _("Internet radio stations from around the world."),
@@ -861,7 +660,7 @@ class SettingsDialog(QDialog):
         self.tabs_offline_note.setWordWrap(True)
         cv.addWidget(self.tabs_offline_note)
         v.addWidget(card)
-        self._offline_sync()
+        self.privacy._offline_sync()
         card, cv = self._card(_("Saved clips"))
         self.keep_clips = self._option(
             cv, _("Keep forever"),
@@ -885,35 +684,6 @@ class SettingsDialog(QDialog):
             self._watch_refresh()
         if key == "voice" and hasattr(self, "voices_card"):
             self.voices_card.setVisible(on)
-
-    def _reset_card(self):
-        card, cv = self._card(_("Start over"),
-                              _("Something's not right? Reset just the parts you pick: settings, "
-                                "hotkeys, sounds, Recently deleted, Apps tab programs or audio "
-                                "devices. A restore point is saved first, so it can always be "
-                                "undone."))
-        row = QHBoxLayout()
-        rst = QPushButton(_("Reset"))
-        icons.set_icon(rst, "reload")
-        rst.clicked.connect(lambda: self._open_reset(points=False))
-        pts = QPushButton(_("Restore points"))
-        pts.clicked.connect(lambda: self._open_reset(points=True))
-        row.addWidget(rst)
-        row.addWidget(pts)
-        row.addStretch(1)
-        cv.addLayout(row)
-        return card
-
-    def _open_reset(self, points: bool):
-        from soundboard.ui.resetguide import ResetGuide, RestorePoints
-        (RestorePoints if points else ResetGuide)(self.mw, self).exec()
-
-    def _updates(self):
-        w, v = self._page()
-        v.addWidget(self._updates_card())
-        v.addWidget(self._downloader_card())
-        v.addStretch(1)
-        return w
 
     def _remote(self):
         w, v = self._page()
@@ -1020,7 +790,7 @@ class SettingsDialog(QDialog):
                 w.setVisible(row)
         card = getattr(self, "_addons_card_w", None)
         if card is not None and qt_valid(card):
-            self._offline_card(card, lambda: not any(
+            self.privacy._offline_card(card, lambda: not any(
                 s.isVisibleTo(card) for s in self._addon_titles if qt_valid(s)))
 
     def _addon_report(self, btn, what: str):
@@ -1276,435 +1046,8 @@ class SettingsDialog(QDialog):
         threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
                          daemon=True, name="onion-pocket-addons").start()
 
-    # ------------------------------------------------------------------ background
-    def _background_card(self):
-        mw = self.mw
-        card, cv = self._card(_("Running in the background"),
-                              _("A soundboard is most useful left running: your hotkeys and the "
-                                "overlay work while the window is closed. The tray icon (by the "
-                                "clock) opens it again; right-click it to quit."))
-        tray = QCheckBox(_("Close to tray"))
-        tray.setChecked(mw.cfg.tray)
-        tray.toggled.connect(lambda b: mw.set_option("tray", b))
-        if mw.tray is None:
-            tray.setEnabled(False)
-            tray.setToolTip(_("This desktop has no system tray, so closing the window quits."))
-        cv.addWidget(tray)
-        auto = QCheckBox(_("Start when I sign in"))
-        hidden = QCheckBox(_("Start in the tray"))
-        auto.setChecked(autostart.is_enabled())
-        hidden.setContentsMargins(22, 0, 0, 0)
-
-        def sync_hidden():
-            """Ticked only when it would do something: with sign-in start off it read
-            as on by default. The saved choice is kept for when that's turned on."""
-            on = auto.isChecked()
-            hidden.blockSignals(True)
-            hidden.setChecked(on and mw.cfg.autostart_hidden)
-            hidden.blockSignals(False)
-            hidden.setEnabled(on)
-        sync_hidden()
-
-        def set_auto(on: bool):
-            if not mw.set_autostart(on):
-                auto.blockSignals(True)
-                auto.setChecked(autostart.is_enabled())
-                auto.blockSignals(False)
-                busy.toast(self, _("Couldn't change Windows startup, see the log in "
-                                   "{folder}.", folder=r"%APPDATA%\OnionBoard"), "warn")
-            sync_hidden()
-        auto.toggled.connect(set_auto)
-        hidden.toggled.connect(mw.set_autostart_hidden)
-        if not autostart.available():
-            auto.setEnabled(False)
-            hidden.setEnabled(False)
-        cv.addWidget(auto)
-        cv.addWidget(hidden)
-        return card
-
-    # ------------------------------------------------------------------ backup
-    def _backup_card(self):
-        card, cv = self._card(_("Backup"),
-                              _("Export puts every sound (with its picture, effects, hotkey and "
-                                "categories) and your settings into one .zip: keep it safe, or "
-                                "import it on another PC. Importing a friend's sound pack adds "
-                                "its sounds; ones you already have are skipped."))
-        row = QHBoxLayout()
-        exp = QPushButton(_("Export everything"))
-        icons.set_icon(exp, "folder")
-        def export():
-            mw = self.mw
-            mw.impctl.export_board()
-            if mw.impctl._exporting:   # it started (not cancelled in the save dialog)
-                busy.hold_until(exp, _("Exporting…"), mw.bridge.exported,
-                                lambda _p, _n, err, *_rest: _("Didn't export") if err
-                                else _("✓ Exported"))
-        exp.clicked.connect(export)
-        imp = QPushButton(_("Import"))
-        imp.clicked.connect(self.mw.impctl.import_dialog)
-        row.addWidget(exp)
-        row.addWidget(imp)
-        row.addStretch(1)
-        cv.addLayout(row)
-        return card
-
-    # ------------------------------------------------------------------ data & quality
-    def _data(self):
-        """Settings > Data & quality (soundboard.quality): download size, keeping the
-        video, radio bitrate and patience, search extras. Each applies at once."""
-        from PySide6.QtCore import QUrl
-        from PySide6.QtGui import QDesktopServices
-        from PySide6.QtWidgets import QFileDialog, QSizePolicy
-
-        from soundboard import library, quality
-        from soundboard.ui.panel import icon_button, section_label
-        q = quality.current
-        w, v = self._page()
-        self._data_widgets = {}
-
-        card, cv = self._card(_("Local sounds"))
-        self.copy_local_sounds = self._option(
-            cv, _("Copy into library"),
-            _("Off: link to the original file. Turn on to keep sounds if the original is "
-              "moved, deleted or on a disconnected drive. Uses extra disk space. "
-              "Applies to new local imports only."),
-            self.mw.cfg.copy_local_sounds,
-            lambda b: self.mw.set_option("copy_local_sounds", b))
-        v.addWidget(card)
-
-        card, cv = self._card(_("Low data mode"),
-                              _("For a phone hotspot, capped plan or slow internet: smaller "
-                                "downloads, lower-bitrate radio, more patience with stations "
-                                "that cut out, and no pictures in web search results. Or pick "
-                                "each one below."))
-        self.data_low = QCheckBox(_("Use less data"))
-        self.data_low.toggled.connect(
-            lambda b: self._data_set(**(quality.LOW if b else quality.NORMAL)))
-        cv.addWidget(self.data_low)
-        v.addWidget(card)
-
-        card, cv = self._card(_("Downloads"),
-                              _("Sounds added from YouTube, SoundCloud and other links. Smaller "
-                                "files are about a third of the size (around 0.5 MB a minute "
-                                "instead of 1.5 MB) and still sound fine on a pad."))
-        save_hint = _("Downloads and recordings are saved as this in your Sounds folder. "
-                      "MP3 opens anywhere; FLAC is about 7 times bigger and loses nothing. "
-                      "Files you add from your PC stay as they are.")
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(12)
-        grid.addWidget(QLabel(_("Quality")), 0, 0)
-        dl = QComboBox()
-        for key, (label, _fmt) in quality.DOWNLOADS.items():
-            dl.addItem(label, key)
-        dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
-        dl.setMinimumWidth(dl.sizeHint().width())
-        grid.addWidget(dl, 0, 1)
-        no_wheel(dl)
-        grid.addWidget(QLabel(_("Save sounds as")), 1, 0)
-        fmt = QComboBox()
-        for key, label in quality.SAVE_FORMATS.items():
-            fmt.addItem(label, key)
-        fmt.setToolTip(save_hint)
-        fmt.currentIndexChanged.connect(lambda _i: self._data_set(save_format=fmt.currentData()))
-        fmt.setMinimumWidth(fmt.sizeHint().width())
-        grid.addWidget(fmt, 1, 1)
-        no_wheel(fmt)
-        grid.setColumnStretch(2, 1)
-        cv.addLayout(grid)
-        hint = QLabel(save_hint)
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        cv.addWidget(hint)
-        self._data_widgets["download"] = dl
-        self._data_widgets["save_format"] = fmt
-        has_ff = library._ffmpeg() is not None
-        self._data_widgets["save_video"] = self._option(
-            cv, _("Also save the video"),
-            _("Add as sound keeps a copy of the video too (the pad is still just its sound). "
-              "Videos use a lot more data: about 5 to 25 MB a minute.") if has_ff else
-            _("Add as sound keeps a copy of the video too (the pad is still just its sound). "
-              "Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg "
-              "installed only lower-quality videos can be saved (usually 360p)."),
-            q.save_video, lambda b: self._data_set(save_video=b))
-        item = cv.itemAt(cv.count() - 1)   # _option's hint: its words follow FFmpeg
-        hint_lbl = item.widget() if item is not None else None
-        assert isinstance(hint_lbl, QLabel)
-        self._save_video_hint = hint_lbl
-        self._has_ff = has_ff
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(12)
-        grid.setContentsMargins(26, 0, 0, 0)
-        grid.addWidget(QLabel(_("Video quality")), 0, 0)
-        vh = QComboBox()
-        for h in quality.VIDEO_HEIGHTS:
-            vh.addItem(_("Up to {height}p", height=h), h)
-        vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
-        vh.setMinimumWidth(vh.sizeHint().width())
-        grid.addWidget(vh, 0, 1)
-        no_wheel(vh)
-        self._data_widgets["video_height"] = vh
-        grid.addWidget(QLabel(_("Save videos in")), 1, 0)
-        self.data_folder = QLabel()
-        self.data_folder.setObjectName("hint")
-        self.data_folder.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        # a path has no spaces to wrap at: it gets cut short instead of widening the page
-        self.data_folder.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-        grid.addWidget(self.data_folder, 1, 1, 1, 2)
-        row = _button_row()
-        change = QPushButton(_("Change"))
-
-        def pick():
-            folder = QFileDialog.getExistingDirectory(self, _("Save videos in"),
-                                                      str(quality.current.videos()))
-            if folder:
-                self._data_set(video_dir=folder)
-        change.clicked.connect(pick)
-        row.addWidget(change)
-        show = icon_button("folder", _("Open folder"), hover=False)
-
-        def open_folder():
-            folder = quality.current.videos()
-            folder.mkdir(parents=True, exist_ok=True)
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
-        show.clicked.connect(open_folder)
-        row.addWidget(show)
-        grid.addLayout(row, 2, 1, 1, 2)
-        grid.setColumnStretch(2, 1)
-        cv.addLayout(grid)
-        self._data_video_rows = (vh, change, show, self.data_folder)
-        self._data_widgets["keep_source"] = self._option(
-            cv, _("Remember where it came from"),
-            _("Keeps each download's link, channel, upload date, length and views (from the "
-              "download itself, nothing extra is fetched), in a text file next to the sound "
-              "too. Right-click the sound to open or copy the link. Off: new downloads keep "
-              "none of it and the menu hides it; what's already saved stays."),
-            q.keep_source, lambda b: self._data_set(keep_source=b))
-
-        # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
-        # who skipped it had no way to add it later, so the app can get it itself now.
-        # Always shown: whether it works (MainWindow.check_ffmpeg), and a way to fix it.
-        ff_box = QWidget()
-        ff_col = QVBoxLayout(ff_box)
-        ff_col.setContentsMargins(0, 0, 0, 0)
-        ff_col.setSpacing(6)
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        name = section_label("FFmpeg")   # a name: the same in every language
-        name.setProperty("head", True)   # no gap above: it shares its line with the pill
-        head.addWidget(name)
-        self.ff_state = QLabel()
-        self.ff_state.setObjectName("pill")       # works / missing / won't start
-        head.addWidget(self.ff_state)
-        head.addStretch(1)
-        ff_col.addLayout(head)
-        self.ff_note = QLabel()
-        self.ff_note.setObjectName("hint")
-        self.ff_note.setWordWrap(True)
-        ff_col.addWidget(self.ff_note)
-        self.btn_ffmpeg = QPushButton(_("Get FFmpeg"))
-        icons.set_icon(self.btn_ffmpeg, "download")
-        self.ff_box = ff_box
-        ff_col.addWidget(self.btn_ffmpeg, 0, Qt.AlignmentFlag.AlignLeft)   # buttons sit left
-        cv.addWidget(ff_box)
-        self.btn_ffmpeg.clicked.connect(self._get_ffmpeg)
-        v.addWidget(card)
-
-        card, cv = self._card(_("Radio"),
-                              _("Lower bitrates use less data: 128 kbps is about 58 MB an hour, "
-                                "64 kbps about 29 MB and 32 kbps about 14 MB. With a limit, the "
-                                "map and search only show stations at or under it (and ones that "
-                                "don't say)."))
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(12)
-        grid.addWidget(QLabel(_("Stations")), 0, 0)
-        kb = QComboBox()
-        for kbps, label in quality.RADIO_KBPS.items():
-            kb.addItem(label, kbps)
-        kb.currentIndexChanged.connect(lambda _i: self._data_radio(kb.currentData()))
-        kb.setMinimumWidth(kb.sizeHint().width())
-        grid.addWidget(kb, 0, 1)
-        no_wheel(kb)
-        grid.setColumnStretch(2, 1)
-        cv.addLayout(grid)
-        self._data_widgets["radio_kbps"] = kb
-        self._data_widgets["patient"] = self._option(
-            cv, _("Slow or patchy connection"),
-            _("Gives a station longer to start and to come back after it cuts out (on mobile "
-              "data or weak Wi-Fi) before the Radio tab gives up on it."),
-            q.patient, lambda b: self._data_set(patient=b))
-        v.addWidget(card)
-
-        card, cv = self._card(_("Sounds from the web"))
-        self._data_widgets["web_extras"] = self._option(
-            cv, _("Show pictures"),
-            _("Search results load each video's thumbnail. Off: just the titles, a lot less data "
-              "per search."),
-            q.web_extras, lambda b: self._data_set(web_extras=b))
-        v.addWidget(card)
-        v.addStretch(1)
-        self._data_sync()
-        return w
 
     _data_syncing = False
-
-    def _data_set(self, **kw):
-        from soundboard import quality
-        if self._data_syncing:
-            return
-        self.mw.set_option("data", quality.change(**kw))
-        self._data_sync()
-
-    def _data_radio(self, kbps):
-        """A new bitrate cap: the map's list follows (a lower cap trims the saved list,
-        a higher one fetches it again)."""
-        from soundboard import quality
-        if self._data_syncing:
-            return
-        old = quality.current.radio_kbps
-        self._data_set(radio_kbps=kbps)
-        tab = getattr(self.mw, "radio", None)
-        directory = getattr(tab, "dir", None)
-        if directory is not None and getattr(tab, "_started", False) and kbps != old:
-            directory.load_globe(force=not kbps or bool(old and kbps > old))
-
-    def _data_sync(self):
-        """Every control on the page shows quality.current."""
-        from soundboard import quality
-        q = quality.current
-        self._data_syncing = True
-        try:
-            self.data_low.setChecked(q.low_data)
-            for key, wdg in self._data_widgets.items():
-                val = getattr(q, key)
-                if isinstance(wdg, QComboBox):
-                    wdg.setCurrentIndex(max(0, wdg.findData(val)))
-                else:
-                    wdg.setChecked(val)
-            for wdg in self._data_video_rows:
-                wdg.setEnabled(q.save_video)
-            self.data_folder.setText(str(q.videos()))
-            self.data_folder.setToolTip(str(q.videos()))
-            self._ffmpeg_sync()
-        finally:
-            self._data_syncing = False
-
-    def _ffmpeg_sync(self):
-        """The FFmpeg row: whether it works, how far its download is, and Reinstall /
-        Get FFmpeg / Fix it. It shows the main window's state (FfmpegControl.news
-        calls this), so it and the bar always agree."""
-        from soundboard import ffmpegget
-        button = getattr(self, "btn_ffmpeg", None)
-        if button is None or not qt_valid(button):
-            return
-        mw = self.mw
-        ff = getattr(mw, "ffctl", None)   # ui/ffmpegcontrol.py
-        h = ffmpegget.last()
-        working = h is not None and h.state == ffmpegget.OK
-        getting = getattr(ff, "getting", False)
-        if h is None:
-            mw.check_ffmpeg()   # its answer comes back through FfmpegControl.news
-            state, tone, label = _("Checking…"), "", _("Get FFmpeg")
-            note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
-                     "about 100 MB.")
-        elif working:
-            state = (_("Working: version {version}", version=h.version) if h.version
-                     else _("Working"))
-            tone, label = "on", _("Reinstall")
-            note = _("M4A, AAC and video files play, and videos can be saved. If "
-                     "they stop working, reinstall it.")
-        elif h.state == ffmpegget.MISSING:
-            state, tone, label = _("Missing"), "slow", _("Get FFmpeg")
-            note = _("M4A, AAC and video files need FFmpeg. It's a free download of "
-                     "about 100 MB.")
-        else:
-            state, tone, label = _("Won't start"), "slow", _("Fix it")
-            note = _("It's installed but won't start ({error}), so M4A, AAC and "
-                     "video files won't play. Fix it installs it again.",
-                     error=h.why or _("no reason given"))
-        pct = getattr(ff, "percent", -1)
-        if getting:
-            note = (_("Getting FFmpeg… {percent}%", percent=pct) if pct >= 0
-                    else _("Getting FFmpeg…"))
-        elif ff is not None and ff.error:
-            note = ff.error
-        elif getattr(ff, "done", False) and working:
-            note = _("FFmpeg is ready: M4A, AAC and video files play now.")
-        elif not working and ffmpegget.why_not():
-            note = "\n".join((note, ffmpegget.why_not()))
-        self.ff_state.setText(state)
-        for prop in ("on", "slow"):   # the pill's own colours: on = works, slow = a problem
-            self.ff_state.setProperty(prop, "true" if tone == prop else "false")
-        self.ff_state.style().unpolish(self.ff_state)
-        self.ff_state.style().polish(self.ff_state)
-        self.ff_note.setText(note)
-        if not busy.is_busy(button):
-            button.setText(_("Getting FFmpeg…") if getting else label)
-            button.setToolTip(_("Download FFmpeg (about 110 MB) so M4A, AAC and video "
-                                "files play and videos can be saved"))
-        if h is not None and working != self._has_ff:   # the video hint's words follow
-            self._has_ff = working
-            self._save_video_hint.setText(
-                _("Add as sound keeps a copy of the video too (the pad is still just its "
-                  "sound). Videos use a lot more data: about 5 to 25 MB a minute.") if working
-                else _("Add as sound keeps a copy of the video too (the pad is still just its "
-                       "sound). Videos use a lot more data: about 5 to 25 MB a minute. "
-                       "Without ffmpeg installed only lower-quality videos can be saved "
-                       "(usually 360p)."))
-
-    def _get_ffmpeg(self):
-        """Get FFmpeg, fix it or reinstall it (MainWindow.fix_ffmpeg_clicked: on a worker,
-        winget then the app's own download)."""
-        from soundboard import ffmpegget
-        h = ffmpegget.last()
-        self.mw.fix_ffmpeg_clicked(self.btn_ffmpeg,
-                                   force=h is not None and h.state == ffmpegget.OK)
-
-    # ------------------------------------------------------------------ privacy & security
-    def _privacy(self):
-        w, v = self._page()
-        self._switches_card(v)
-        v.addWidget(self._online_card())
-        v.addStretch(1)
-        return w
-
-    def _connection(self):
-        w, v = self._page()
-        v.addWidget(self._offline_card(self._connection_card()))   # Offline: no use
-        v.addWidget(self._activity_card())
-        v.addStretch(1)
-        return w
-
-    def _activity_card(self):
-        """Network activity: every connection the app has made (soundboard.netlog)."""
-        from soundboard.ui.netactivity import NetActivity
-        card, cv = self._card(_("Network activity"))
-        self.net_activity = NetActivity(card)
-        cv.addWidget(self.net_activity)
-        self.netlog_keep_box = self._option(
-            cv, _("Keep a history between starts"),
-            _("Saves this list on this PC (network-activity.jsonl in the app's folder) and shows "
-              "it again next time (the last 1000; Totals adds up all of it). Nothing is sent "
-              "anywhere. Unticking it deletes the saved file; Clear empties it."),
-            self.mw.cfg.netlog_keep, self._set_netlog_keep)
-        self.app_log_box = self._option(
-            cv, _("Keep an app log"),
-            _("The app writes what it does to onionboard.log in its folder (3 MB at most), "
-              "so a problem can be looked into. It can name a site a download or radio "
-              "station failed on. Nothing is sent anywhere. Unticking it stops the log and "
-              "deletes it."),
-            self.mw.cfg.app_log, self._set_app_log)
-        return card
-
-    def _set_app_log(self, on: bool):
-        from soundboard import applog
-        self.mw.set_option("app_log", on)
-        applog.keep(on)
-
-    def _set_netlog_keep(self, on: bool):
-        from soundboard import library, netlog
-        self.mw.set_option("netlog_keep", on)
-        netlog.keep(library.APP_DIR / netlog.FILE_NAME if on else None)
-        self.net_activity.refresh(force=True)
 
     def _option(self, cv, text: str, hint: str, on: bool, changed, extra=None):
         """A checkbox with a short label and its explanation underneath (a long label
@@ -1765,192 +1108,6 @@ class SettingsDialog(QDialog):
                          "Never your name, IP address or device info."),
     }
 
-    def _count_eye(self) -> QPushButton:
-        """Count me in's eye: opens the table of what it sends (ui/countdialog.py)."""
-        eye = QPushButton()
-        eye.setObjectName("iconbutton")
-        eye.setProperty("quiet", True)
-        icons.set_icon(eye, "eye")
-        eye.setToolTip(_("See what's sent"))
-        eye.setAccessibleName(_("See what's sent"))
-
-        def show():
-            from soundboard.ui import countdialog
-            self.count_dialog = countdialog.show(self)
-        eye.clicked.connect(show)
-        self.count_eye = eye
-        self.count_dialog = None   # the dialog show() opens
-        return eye
-
-    def _switches_card(self, v=None):
-        """Every feature that goes online, each with its own switch (soundboard.net
-        enforces them: off means no connection at all, in any Connection mode), and
-        Offline mode over all of them."""
-        from soundboard import net
-        cfg = self.mw.cfg
-        card, cv = self._card(
-            _("What goes online"),
-            _("Onion Board has no account or ads. The only thing it sends us is the anonymous "
-              "usage count below, if it's on. These are the only things that go online. Switch "
-              "off what you don't want: off means it makes no connection at all, whatever the "
-              "Connection setting."))
-        self.offline_box = self._option(
-            cv, _("Offline mode"),
-            _("Nothing goes online at all, and everything that needs the internet is hidden "
-              "(the Radio tab, web search, downloads, updates…). Untick it to pick what may go "
-              "online."),
-            cfg.net_offline, self._set_offline)
-        note = QLabel(_("Not covered by these: links you open in your own browser (Support, "
-                        "Report a problem, release pages) and the installer's own downloads."))
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        cv.addWidget(note)
-
-        body = QWidget()
-        bl = QVBoxLayout(body)
-        bl.setContentsMargins(0, 0, 0, 0)
-        bl.setSpacing(12)
-        self._net_body = body
-        self.net_boxes: dict[str, QCheckBox] = {}
-        self._net_subs: dict[str, QWidget] = {}
-        groups = (
-            (_("Sounds and radio"), ("sounds_web", "sound_packs", "radio")),
-            (_("Voices"), ("voices", "voice_servers")),
-            (_("Updates and add-ons"), ("app_update", "ytdlp_update", "addons")),
-            (_("Setup downloads"), ("setup_downloads", "tor_download", "ffmpeg_download")),
-            (_("Usage count"), ("usage_stats",)),
-        )
-        labels = {"sounds_web": _("Online sounds"), "sound_packs": _("Free sound packs"),
-                  "app_update": _("App updates"),
-                  "ytdlp_update": _("Downloader updates"), "addons": _("Add-on downloads"),
-                  "voices": _("Voice and model downloads"),
-                  "voice_servers": _("Online voice servers"),
-                  "setup_downloads": _("Virtual cable download"),
-                  "tor_download": _("Tor download"),
-                  "ffmpeg_download": _("FFmpeg download"),
-                  "usage_stats": _("Count me in")}
-        for title, keys in groups:
-            section, sv = self._card(title)
-            for key in keys:
-                self.net_boxes[key] = self._option(
-                    sv, labels.get(key) or net.feature_name(key), self.NET_HINTS[key],
-                    key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on),
-                    extra=self._count_eye() if key == "usage_stats" else None)
-                sub = QWidget()
-                sl = QVBoxLayout(sub)
-                sl.setContentsMargins(26, 0, 0, 0)
-                sl.setSpacing(6)
-                self._net_sub_options(key, sl)
-                if sl.count():
-                    sv.addWidget(sub)
-                    self._net_subs[key] = sub
-            bl.addWidget(section)
-        if v is not None:
-            v.addWidget(card)
-            v.addWidget(body)
-        else:
-            cv.addWidget(body)
-        self._net_sync()
-        return card
-
-    def _net_sub_options(self, key: str, sl):
-        """The options that belong to one switch, indented under it."""
-        from soundboard import net
-        cfg = self.mw.cfg
-        if key == "sounds_web":
-            row = QGridLayout()
-            row.setHorizontalSpacing(14)
-            for i, (site, name) in enumerate(net.SITES.items()):
-                k = f"sounds_web.{site}"
-                b = QCheckBox(_("Other links") if site == "other" else name)
-                b.setChecked(k not in cfg.net_off)
-                b.toggled.connect(lambda on, k=k: self._set_feature(k, on))
-                self.net_boxes[k] = b
-                row.addWidget(b, i // 2, i % 2)
-            sl.addLayout(row)
-            h = QLabel(_("YouTube also covers YouTube Music and the TikTok search button "
-                         "(TikTok's own search needs an account, so it finds TikTok sounds on "
-                         "YouTube). Other: any other site's link, including pasted TikTok links, "
-                         "which still download from TikTok."))
-            h.setObjectName("hint")
-            h.setWordWrap(True)
-            sl.addWidget(h)
-        elif key == "radio":
-            def count_plays(on: bool):
-                cfg.radio["count_plays"] = on
-                self.mw.set_option("radio", cfg.radio)   # saves
-            self.plays_box = self._option(
-                sl, _("Share play counts"),
-                _("Radio Browser ranks stations by how often they're played. Off: starting a "
-                  "station only contacts the station itself."),
-                bool(cfg.radio.get("count_plays", False)), count_plays)
-        elif key in ("app_update", "ytdlp_update"):
-            go = QPushButton(_("Update settings"))
-            go.clicked.connect(lambda: self.tabs.setCurrentIndex(self._page_keys.index("updates")))
-            sl.addWidget(go, 0, Qt.AlignmentFlag.AlignLeft)
-
-    def _set_feature(self, key: str, on: bool):
-        from soundboard import net, usage
-        cfg = self.mw.cfg
-        was_on = key not in cfg.net_off
-        off = [k for k in cfg.net_off if k != key] + ([] if on else [key])
-        self.mw.set_option("net_off", off)   # saves
-        if key == usage.FEATURE and was_on and not on and net.allowed(key):
-            # Count me in switched off: one anonymous "opt-out/settings" goes first
-            # (usage.opt_out), and the switch takes hold the moment it's done
-            t = threading.Thread(target=usage.opt_out, args=("settings",), daemon=True,
-                                 name="usage-opt-out")
-            t.start()
-            self._opt_out_wait(t)
-            return
-        net.configure_features(cfg.net_off, cfg.net_offline)   # applies at once
-        self._net_sync()
-
-    def _opt_out_wait(self, t):
-        from soundboard import net
-        if t.is_alive():
-            QTimer.singleShot(100, lambda: self._opt_out_wait(t))
-            return
-        cfg = self.mw.cfg
-        net.configure_features(cfg.net_off, cfg.net_offline)
-        self._net_sync()
-
-    def _set_offline(self, on: bool):
-        from soundboard import net
-        cfg = self.mw.cfg
-        self.mw.set_option("net_offline", on)
-        net.configure_features(cfg.net_off, cfg.net_offline)
-        self._net_sync()
-
-    def _net_sync(self):
-        """Grey out what's under a switch that's off (everything, in Offline mode), and
-        the buttons on other pages that would go online for it."""
-        from soundboard import net, torget
-        body = getattr(self, "_net_body", None)   # None until its page is first shown
-        if body is not None:
-            if not qt_valid(body):
-                return
-            body.setVisible(not net.offline())   # Offline mode: only its own box
-            for key, sub in self._net_subs.items():
-                sub.setEnabled(key not in self.mw.cfg.net_off)
-        for keys, attr in ((("app_update",), "upd_btn"), (("app_update",), "upd_chk"),
-                           (("ytdlp_update",), "ytdlp_auto_box")):
-            w = getattr(self, attr, None)
-            if w is not None and qt_valid(w):
-                w.setEnabled(all(net.allowed(k) for k in keys))
-                w.setToolTip("" if w.isEnabled() else net.off_message(keys[0]))
-        for b in getattr(self, "ytdlp_btns", ()):
-            if qt_valid(b):
-                b.setEnabled(net.allowed("ytdlp_update"))
-                b.setToolTip(b.property("tip") if b.isEnabled()
-                             else net.off_message("ytdlp_update"))
-        b = getattr(self, "net_get", None)
-        if b is not None and qt_valid(b) and not busy.is_busy(b):
-            b.setEnabled(net.allowed(torget.FEATURE))
-            b.setToolTip(b.property("tip") if b.isEnabled()
-                         else net.off_message(torget.FEATURE))
-        self._offline_sync()
-
     # ---- Offline mode: what only works online is hidden, not left greyed out
     OFFLINE_PAGES = ("data", "updates")   # whole pages about downloads and updates
 
@@ -1959,450 +1116,13 @@ class SettingsDialog(QDialog):
         from soundboard import net
         return cls.OFFLINE_PAGES if net.offline() else ()
 
-    def _offline_card(self, card: QFrame, online_only=None) -> QFrame:
-        """Hide `card` in Offline mode (and show it again after), or, with
-        `online_only()`, only while that says it's no use offline."""
-        if not hasattr(self, "_offline_cards"):
-            self._offline_cards = {}
-        cards = self._offline_cards
-        cards[card] = online_only or (lambda: True)
-        self._offline_hide(card, self._offline_says(cards[card]))
-        return card
-
-    @staticmethod
-    def _offline_says(online_only) -> bool:
-        from soundboard import net
-        return net.offline() and online_only()
-
-    @staticmethod
-    def _offline_hide(card: QFrame, hide: bool):
-        """A card hidden for Offline mode: the search leaves it be (_apply_search)."""
-        if bool(card.property("offline_hid")) == hide:
-            return
-        card.setProperty("offline_hid", hide)
-        card.setProperty("search_hid", False)
-        card.setVisible(not hide)
-
-    def _offline_sync(self):
-        """Offline mode on or off: its pages, cards and tab boxes follow."""
-        from soundboard import net
-        offline = net.offline()
-        for card, online_only in list(getattr(self, "_offline_cards", {}).items()):
-            if qt_valid(card):
-                self._offline_hide(card, self._offline_says(online_only))
-        needs = getattr(getattr(self.mw, "tabctl", None), "needs_online", None)
-        for key, box in getattr(self, "tab_boxes", {}).items():
-            if qt_valid(box) and needs is not None:
-                box.setEnabled(not needs(key))
-                box.setToolTip(_("Needs the internet: Offline mode is on (Privacy & security)")
-                               if needs(key) else "")
-        note = getattr(self, "tabs_offline_note", None)
-        if note is not None and qt_valid(note):
-            note.setVisible(needs is not None and any(needs(k) for k in getattr(
-                self, "tab_boxes", {})))
-        for refresh in ("_watch_refresh", "_pocket_refresh"):
-            if hasattr(self, refresh):
-                getattr(self, refresh)()
-        keys = getattr(self, "_page_keys", None)   # None while the dialog is being made
-        cats = getattr(self, "categories", None)
-        if keys is None or cats is None or not qt_valid(cats):
-            return
-        for i, key in enumerate(keys):
-            cats.item(i).setHidden(offline and key in self.OFFLINE_PAGES)
-        if cats.item(self.tabs.currentIndex()).isHidden():
-            self.tabs.setCurrentIndex(keys.index("privacy"))
-        search = getattr(self, "search_box", None)
-        if (search is not None and search.text().strip()   # it hides what doesn't match
-                and not getattr(self, "_searching", False)):   # (a page built by it)
-            self._apply_search(search.text())
-
-    def _online_card(self):
-        """What goes online only when you do something, and the app's local doors."""
-        card, cv = self._card(
-            _("Network information"),
-            _("Everything else goes online only when you do it: a search or a pasted link goes "
-              "to that site (YouTube, SoundCloud, TikTok, Myinstants), a radio station plays "
-              "straight from that station, and a download you press fetches that one file. Those "
-              "sites see your IP address like they would in a browser, unless you use a proxy or "
-              "Tor (Connection page). The radio maps ship with the app: opening them contacts "
-              "nobody."))
-        remote = QLabel()
-        remote.setWordWrap(True)
-        on = self.mw.cfg.api_enabled
-        remote.setText(_("Remote control is <b>on</b>: scripts and a Stream Deck on this PC can "
-                         "play sounds with its key.") if on else
-                        _("Remote control is <b>off</b>: nothing else on this PC can control the "
-                          "app."))
-        go = QPushButton(_("Remote settings"))
-        go.clicked.connect(lambda: self.tabs.setCurrentIndex(self._page_keys.index("remote")))
-        cv.addWidget(remote)
-        full = QPushButton(_("Network details"))
-        full.setToolTip(_("Opens the full list (SECURITY.md) on GitHub, in your browser"))
-        from soundboard.updates import REPO
-        full.clicked.connect(lambda: busy.open_url(
-            f"https://github.com/{REPO}/blob/main/SECURITY.md#what-the-app-does-on-the-network",
-            full, self))
-        row = _button_row()   # both under the text, on the left
-        row.addWidget(go)
-        row.addWidget(full)
-        cv.addLayout(row)
-        return card
-
-    def _connection_card(self):
-        """Connection: Direct, through a proxy, or through the app's own Tor
-        (soundboard.net, soundboard.tor). Applies at once; a proxy or Tor that can't be
-        reached makes requests fail, never go direct."""
-        from PySide6.QtWidgets import QButtonGroup, QLineEdit, QRadioButton
-
-        import logging
-
-        from soundboard import net, tor, torget
-        cfg = self.mw.cfg
-        card, cv = self._card(
-            _("Connection"),
-            _("Through a proxy or Tor, everything the app fetches (searches, downloads, radio, "
-              "updates) goes through it, and site names are looked up there, not on this PC. If "
-              "it can't be reached, nothing is fetched: the app never quietly goes direct. This "
-              "PC's own addresses (127.0.0.1) stay direct."))
-        direct = QRadioButton(_("Direct"))
-        direct.setToolTip(_("Connect straight to each site"))
-        via = QRadioButton(_("Through a proxy"))
-        via.setToolTip(_("A proxy of your own (or one your VPN app offers)"))
-        use_tor = QRadioButton("Tor")
-        use_tor.setToolTip(_("The app's own Tor: sites and radio stations don't see your address"))
-        group = QButtonGroup(card)
-        row = QHBoxLayout()
-        for b in (direct, via, use_tor):
-            group.addButton(b)
-            row.addWidget(b)
-        row.addStretch(1)
-        cv.addLayout(row)
-
-        # ---- Get Tor: the app doesn't ship it (soundboard.torget)
-        get_box = QWidget()
-        row = QHBoxLayout(get_box)
-        row.setContentsMargins(0, 0, 0, 0)
-        get_note = QLabel()
-        get_note.setObjectName("hint")
-        get_note.setWordWrap(True)
-        row.addWidget(get_note, 1)
-        get = QPushButton(_("Get Tor"))
-        get.setProperty("tip", _("Download Tor {version} from the Tor Project "
-                                 "(dist.torproject.org), the way the Connection setting says",
-                                 version=torget.VERSION))
-        get.setToolTip(get.property("tip"))
-        row.addWidget(get)
-        cv.addWidget(get_box)
-
-        def show_get(msg: str = ""):
-            have = tor.available()
-            outdated = (have and tor.bundle_dir() == torget.bin_dir()
-                        and not torget.installed())
-            use_tor.setEnabled(have)
-            use_tor.setToolTip(
-                _("The app's own Tor: sites and radio stations don't see your address")
-                if have else tor.not_installed())
-            if not busy.is_busy(get):
-                get.setText(_("Update Tor") if outdated else _("Get Tor"))
-            get_box.setVisible(bool(msg) or busy.is_busy(get) or not have or outdated)
-            get_note.setText(msg or (
-                _("A newer Tor ({version}) is ready to download.", version=torget.VERSION)
-                if outdated else
-                _("To use Tor, get it first: about 22 MB from the Tor Project, checked "
-                  "before it's used. {blocked_hint}", blocked_hint=torget.blocked_hint())))
-
-        # ---- proxy
-        proxy_box = QWidget()
-        row = QHBoxLayout(proxy_box)
-        row.setContentsMargins(0, 0, 0, 0)
-        addr = QLineEdit(cfg.net_proxy)
-        addr.setPlaceholderText(_("socks5h://127.0.0.1:9050  or  http://host:8080"))
-        addr.setToolTip(_("A SOCKS5 proxy (host names are looked up by the proxy) or an HTTP "
-                          "proxy. Add user:password@ before the host if it needs a login."))
-        row.addWidget(addr, 1)
-        test = QPushButton(_("Test"))
-        test.setToolTip(_("Connect to GitHub through this proxy (only to see that it works)"))
-        row.addWidget(test)
-        cv.addWidget(proxy_box)
-
-        # ---- Tor
-        tor_box = QWidget()
-        tv = QVBoxLayout(tor_box)
-        tv.setContentsMargins(0, 0, 0, 0)
-        about = QLabel(_("Tor sends everything through three volunteer computers around the "
-                         "world, so the sites you search and download from and the radio "
-                         "stations you play see a Tor address, not yours. It's slower, and "
-                         "YouTube often turns Tor away: the app then tries other Tor routes, and "
-                         "only goes without Tor if you click to."))
-        about.setObjectName("hint")
-        about.setWordWrap(True)
-        tv.addWidget(about)
-        row = QHBoxLayout()
-        tor_state = QLabel()
-        tor_state.setWordWrap(True)
-        row.addWidget(tor_state, 1)
-        newnym = QPushButton(_("New identity"))
-        newnym.setToolTip(_("New connections go out through a different Tor route, so sites see "
-                            "a different address"))
-        row.addWidget(newnym)
-        tv.addLayout(row)
-        row = QHBoxLayout()
-        hide = QCheckBox(_("Hide that I'm using Tor"))
-        hide.setChecked(bool(cfg.tor_bridges))
-        row.addWidget(hide)
-        kind = QComboBox()
-        kind.addItem(_("Snowflake"), "snowflake")
-        kind.addItem("obfs4", "obfs4")
-        kind.setItemData(0, _("Looks like a video call"), Qt.ItemDataRole.ToolTipRole)
-        kind.setItemData(1, _("Looks like random noise"), Qt.ItemDataRole.ToolTipRole)
-        kind.setCurrentIndex(max(0, kind.findData(cfg.tor_bridges or tor.DEFAULT_BRIDGE)))
-        kind.setToolTip(_("If one doesn't connect, try the other"))
-        no_wheel(kind)
-        row.addWidget(kind)
-        row.addStretch(1)
-        tv.addLayout(row)
-        hide_hint = QLabel(_("Disguises the connection so your internet provider can't easily "
-                             "tell it's Tor. Helps where Tor is blocked or frowned on. It's "
-                             "slower, and connecting can take a few minutes."))
-        hide_hint.setObjectName("hint")
-        hide_hint.setWordWrap(True)
-        hide_hint.setContentsMargins(26, 0, 0, 0)   # under the box's text, not its tick
-        tv.addWidget(hide_hint)
-        cv.addWidget(tor_box)
-
-        note = QLabel()
-        note.setObjectName("hint")
-        note.setWordWrap(True)
-        cv.addWidget(note)
-        {net.TOR: use_tor, net.PROXY: via}.get(cfg.net_mode, direct).setChecked(True)
-
-        def show():
-            if not qt_valid(note):
-                return
-            proxy_box.setVisible(via.isChecked())
-            addr.setEnabled(via.isChecked())
-            test.setEnabled(via.isChecked())
-            tor_box.setVisible(use_tor.isChecked())
-            note.setVisible(not use_tor.isChecked())
-            kind.setEnabled(hide.isChecked())
-            t = tor.manager()
-            tor_state.setText(t.status_text())
-            color = {tor.READY: "ok", tor.FAILED: "error"}.get(t.state)
-            tor_state.setStyleSheet(f"color: {theme.status(color)}" if color else "")
-            if not busy.is_busy(newnym):
-                newnym.setEnabled(t.state == tor.READY)
-            if via.isChecked():
-                try:
-                    net.parse(addr.text())
-                except ValueError as e:
-                    note.setText(_("{error}. Until it's fixed, nothing goes online.",
-                                   error=e))
-                    return
-            note.setText(_("Now: {connection}.", connection=net.describe()))
-
-        def apply():
-            mode = (net.TOR if use_tor.isChecked() else
-                    net.PROXY if via.isChecked() else net.DIRECT)
-            text = addr.text().strip()
-            bridges = kind.currentData() if hide.isChecked() else ""
-            if (mode, text, bridges) != (cfg.net_mode, cfg.net_proxy, cfg.tor_bridges):
-                self.mw.set_option("net_mode", mode)     # saves
-                self.mw.set_option("net_proxy", text)
-                self.mw.set_option("tor_bridges", bridges)
-                tor.configure_from(cfg)                  # before net: its gate needs it
-                net.configure(mode, text)
-                if mode == net.TOR:
-                    tor.manager().start()   # picked here: connect now and show how far
-            show()
-
-        for b in (direct, via, use_tor):
-            b.toggled.connect(lambda on: on and apply())
-        addr.editingFinished.connect(apply)
-        hide.toggled.connect(lambda _on: apply())
-        kind.currentIndexChanged.connect(lambda _i: apply())
-        status = tor.qt_status()
-        status.changed.connect(show)
-
-        def unhook(*__):
-            try:
-                status.changed.disconnect(show)
-            except (RuntimeError, TypeError):
-                pass
-        card.destroyed.connect(unhook)
-
-        def run_newnym():
-            release = busy.hold(newnym, _("Changing…"))
-            relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
-
-            def finish(msg):
-                relay.deleteLater()
-                ok = msg == tor.newnym_ok()
-                release(_("✓ Changed") if ok else _("✗ Failed"))
-                if qt_valid(tor_state):
-                    tor_state.setText(msg)
-
-            relay.done.connect(finish)
-            threading.Thread(target=lambda: relay.done.emit(tor.new_identity()),
-                             daemon=True, name="tor-newnym").start()
-        newnym.clicked.connect(run_newnym)
-
-        def run_get():
-            release = busy.hold(get, _("Downloading…"))
-            relay = _ProgressRelay(self.mw)   # outlives this window if it's closed meanwhile
-
-            def progress(done, total):
-                if qt_valid(get_note):
-                    get_note.setText(
-                        _("Downloading Tor… {done:.1f} of {total:.1f} MB",
-                          done=done / 1e6, total=total / 1e6) if total else
-                        _("Downloading Tor… {done:.1f} MB", done=done / 1e6))
-
-            def finish(err):
-                relay.deleteLater()
-                release(_("✗ Failed") if err else _("✓ Got Tor"))
-                if qt_valid(get_note):
-                    show_get(err or _("Tor {version} is ready: pick Tor above to use it.",
-                                      version=torget.VERSION))
-                    show()
-                    self._net_sync()
-
-            def work():
-                from soundboard import netlog
-                netlog.cause(torget.FEATURE, "You clicked to download Tor (Settings > "
-                                             "Connection)")
-                try:
-                    # a running Tor may have carried the download: stopped before its
-                    # files are swapped, the next connection starts the new one
-                    torget.get(relay.progress.emit, before_unpack=tor.shutdown)
-                    relay.done.emit("")
-                except torget.GetError as e:
-                    relay.done.emit(errors.plain(e))
-                except Exception as e:  # noqa: BLE001 - shown, never a stuck button
-                    logging.getLogger(__name__).exception("Get Tor failed")
-                    relay.done.emit(_("Couldn't get Tor ({error}).", error=errors.plain(e)))
-
-            relay.progress.connect(progress)
-            relay.done.connect(finish)
-            threading.Thread(target=work, daemon=True, name="tor-get").start()
-        get.clicked.connect(run_get)
-
-        def run_test():
-            text = addr.text()
-            release = busy.hold(test, _("Testing…"))
-            relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
-            worked = []   # set by the thread before it emits: not read from the message
-
-            def finish(msg):
-                relay.deleteLater()
-                release(_("✓ Works") if worked else _("✗ Failed"))
-                if qt_valid(note):
-                    note.setText(msg)
-
-            relay.done.connect(finish)
-
-            def run():
-                from soundboard import netlog
-                netlog.cause(net.TEST, "You clicked Test (Settings > Connection)")
-                try:
-                    msg = net.test(text)
-                    worked.append(True)
-                except (ValueError, OSError) as e:
-                    msg = _("It didn't work: {error}", error=errors.plain(e))
-                relay.done.emit(msg)
-            threading.Thread(target=run, daemon=True, name="proxy-test").start()
-        test.clicked.connect(run_test)
-        self.net_direct, self.net_via, self.net_addr, self.net_test = direct, via, addr, test
-        self.net_tor, self.net_hide, self.net_bridge = use_tor, hide, kind
-        self.net_tor_state, self.net_newnym = tor_state, newnym
-        self.net_get, self.net_get_note = get, get_note
-        self.net_note = note
-        show_get()
-        show()
-        self._net_sync()   # Get Tor switched off: greyed, with the reason
-        return card
-
-    # ------------------------------------------------------------------ app updates
-    def _updates_card(self):
-        from soundboard import __version__, updates
-        hint = (_("This is Onion Board {version}. With the box ticked it asks GitHub every "
-                  "few hours whether a newer version is out and tells you (with a banner if "
-                  "it's an important fix). Update now downloads it and checks it's the file "
-                  "GitHub lists; you pick when the app restarts to install it. Your sounds "
-                  "and settings are kept.", version=__version__)
-                if updates.can_install() else
-                _("This is Onion Board {version}. With the box ticked it asks GitHub every "
-                  "few hours whether a newer version is out and tells you (with a banner if "
-                  "it's an important fix). This copy runs from source, so it only tells you: "
-                  "update it with git pull.", version=__version__))
-        card, cv = self._card(_("App updates"), hint)
-        chk = self._option(cv, _("Check for updates"),
-                           _("Tell me when a new version is out. Nothing is downloaded until I "
-                             "press Update now."), self.mw.cfg.update_check,
-                           self._updates_optin)
-        self.upd_chk = chk
-        row = QHBoxLayout()
-        self.upd_label = QLabel()
-        self.upd_label.setObjectName("hint")
-        self.upd_label.setWordWrap(True)
-        # the button first, its result beside it: on the right with nothing yet to
-        # say, it sat on a line of its own far from everything else
-        self.upd_btn = QPushButton(_("Check now"))
-        self.upd_btn.clicked.connect(self._updates_check)
-        row.addWidget(self.upd_btn)
-        row.addWidget(self.upd_label, 1)
-        cv.addLayout(row)
-        self.mw.update_done.connect(self._updates_done)
-        # downloading, ready or failed: the same words as the side bar's update card
-        self.mw.update_state.connect(self._updates_state)
-        self._upd_wired = True   # done() unhooks only what was hooked
-        self._updates_state()
-        self._net_sync()   # off in Settings > Privacy: greyed, with the reason
-        return card
-
-    def _updates_optin(self, on: bool):
-        self.mw.set_option("update_check", on)
-        if on:
-            self.mw.updctl.check_updates(why="You turned on update checks")
-
-    def _updates_check(self):
-        if busy.is_busy(self.upd_btn) or not self.upd_btn.isEnabled():
-            return
-        self._upd_asked = True
-        busy.set_busy(self.upd_btn, True)
-        self.upd_label.setText(_("Checking…"))
-        self.mw.updctl.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
-
-    def _updates_done(self, rel, err: str):
-        if not qt_valid(self.upd_label):
-            return
-        busy.set_busy(self.upd_btn, False)
-        self._net_sync()
-        asked, self._upd_asked = getattr(self, "_upd_asked", False), False
-        if err:
-            self.upd_label.setText(_("Couldn't check: {error}", error=errors.plain(err)))
-        elif rel is None:
-            # a check the user didn't ask for may not have asked GitHub at all (done
-            # today already, or the newer version was skipped): don't claim anything
-            if asked:
-                self.upd_label.setText(_("You have the newest version."))
-        else:
-            self.upd_label.setText(_("Version {version} is out.", version=rel.version))
-
-    def _updates_state(self):
-        if not qt_valid(self.upd_label):
-            return
-        status = self.mw.updctl.update_status() if self.mw.updctl.release is not None else ""
-        if status and (self.mw.updctl._downloading or self.mw.updctl._update_err
-                       or self.mw.updctl._update_file is not None):
-            self.upd_label.setText(status)
-
     def done(self, r):
         # unhooking a slot that was never hooked (Updates card not built, or done()
         # twice) only prints PySide's "Failed to disconnect" RuntimeWarning
         if getattr(self, "_upd_wired", False):
             self._upd_wired = False
-            for sig, slot in ((self.mw.update_done, self._updates_done),
-                              (self.mw.update_state, self._updates_state)):
+            for sig, slot in ((self.mw.update_done, self.connection._updates_done),
+                              (self.mw.update_state, self.connection._updates_state)):
                 try:
                     sig.disconnect(slot)
                 except (RuntimeError, TypeError):
@@ -2777,7 +1497,7 @@ class SettingsDialog(QDialog):
         get.clicked.connect(run)
         self.get_pocket = get
         # Offline mode: gone, unless there's a zip on this PC to install it from
-        return self._offline_card(card, lambda: pocketaddon.local_zip() is None)
+        return self.privacy._offline_card(card, lambda: pocketaddon.local_zip() is None)
 
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""
@@ -2826,78 +1546,4 @@ class SettingsDialog(QDialog):
         ai.clicked.connect(copy_ai)
         return card
 
-    # ------------------------------------------------------------------ yt-dlp
-    def _downloader_card(self):
-        card, cv = self._card(_("Downloader (yt-dlp)"),
-                              _("Searching YouTube / SoundCloud and adding a pasted link use "
-                                "yt-dlp. YouTube changes often, so it needs updating now and "
-                                "then. Nothing is downloaded unless you click Update now / "
-                                "Reset, or tick the box below. If downloads keep failing even "
-                                "after updating, Reset deletes it and its cache and installs a "
-                                "fresh copy."))
-        auto = self._option(cv, _("Update automatically"),
-                            _("Check PyPI once a day and after a failed download. Off by "
-                              "default: an update is code the app runs."),
-                            self.mw.cfg.ytdlp_auto_optin,
-                            lambda b: self.mw.set_option("ytdlp_auto_optin", b))
-        auto.setToolTip(_("Off by default: an update is code the app runs. It's checked against "
-                          "PyPI's SHA-256 before it's used."))
-        self.ytdlp_auto_box = auto
-        row = _button_row()
-        self.ytdlp_label = QLabel()
-        self.ytdlp_label.setObjectName("hint")
-        self.ytdlp_label.setWordWrap(True)
-        cv.addWidget(self.ytdlp_label)
-        self.ytdlp_btns = []
-        # (label, the English one for the network log, job, tooltip)
-        for text, logged, job, tip in (
-                (_("Update now"), "Update now", ytdl.update,
-                 _("Check for a newer yt-dlp and install it")),
-                (_("Reset downloader"), "Reset downloader", ytdl.reset,
-                 _("Delete the downloaded yt-dlp and its cache, then install a fresh copy"))):
-            b = QPushButton(text)
-            b.setToolTip(tip)
-            b.setProperty("tip", tip)
-            b.clicked.connect(lambda __=False, j=job, t=logged: self._ytdlp_run(j, t))
-            row.addWidget(b)
-            self.ytdlp_btns.append(b)
-        cv.addLayout(row)
-        self._ytdlp_show()
-        self._net_sync()
-        return card
 
-    def _ytdlp_show(self, msg: str = ""):
-        v, downloaded = ytdl.active_version()
-        now = (_("yt-dlp isn't installed.") if not v else
-               _("In use: yt-dlp {version} (updated copy).", version=v) if downloaded else
-               _("In use: yt-dlp {version} (built in).", version=v))
-        self.ytdlp_label.setText(f"{msg} {now}".strip())
-
-    def _ytdlp_run(self, job, button: str = ""):
-        if any(busy.is_busy(b) or not b.isEnabled() for b in self.ytdlp_btns):
-            return
-        from soundboard import netlog
-        netlog.cause(ytdl.UPDATE_FEATURE, f"You clicked {button} (Settings > Updates)"
-                     if button else "You asked to update the downloader")
-        for b in self.ytdlp_btns:
-            busy.set_busy(b, True)
-        self.ytdlp_label.setText(_("Working…"))
-        relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
-
-        def finish(msg):
-            relay.deleteLater()
-            if qt_valid(self.ytdlp_label):
-                for b in self.ytdlp_btns:
-                    busy.set_busy(b, False)
-                self._net_sync()
-                self._ytdlp_show(msg)
-
-        relay.done.connect(finish)
-
-        def run():
-            try:
-                msg = job()
-            except Exception as e:  # noqa: BLE001 - offline, PyPI down…
-                msg = _("Couldn't update: {error}.", error=errors.plain(e))
-            relay.done.emit(msg)
-        threading.Thread(target=run, daemon=True, name="ytdlp-settings").start()

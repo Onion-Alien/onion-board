@@ -349,7 +349,7 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
             assert box.isChecked() and net.allowed(key)
             box.setChecked(False)
             # Count me in waits for its last anonymous opt-out count first
-            # (SettingsDialog._opt_out_wait checks every 100 ms)
+            # (PrivacyPage._opt_out_wait checks every 100 ms)
             end = time.monotonic() + 5
             while net.allowed(key) and time.monotonic() < end:
                 QApplication.processEvents()
@@ -952,7 +952,7 @@ def test_update_check_keeps_focus_and_blocks_repeat_clicks(window, qapp, monkeyp
     assert busy.is_busy(btn) and btn.isEnabled() and d.focusWidget() is btn
     QTest.mouseClick(btn, Qt.LeftButton)
     QTest.keyClick(btn, Qt.Key_Space)
-    d._updates_check()  # programmatic calls also cannot overlap
+    d.connection._updates_check()  # programmatic calls also cannot overlap
     assert len(calls) == 1
     window.update_done.emit(None, error)
     assert not busy.is_busy(btn) and d.focusWidget() is btn
@@ -968,7 +968,7 @@ def test_update_check_keeps_focus_and_blocks_repeat_clicks(window, qapp, monkeyp
 @pytest.mark.parametrize("index", [0, 1])
 @pytest.mark.parametrize("error", [False, True])
 def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypatch, index, error):  # noqa: F811
-    from soundboard import settings
+    from soundboard.ui.settingspages import connection
     monkeypatch.setattr(net, "allowed", lambda key: True)
     workers = []
 
@@ -979,7 +979,7 @@ def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypat
         def start(self):
             workers.append(self.target)
 
-    monkeypatch.setattr(settings, "threading", type("Threads", (), {"Thread": DeferredThread}))
+    monkeypatch.setattr(connection, "threading", type("Threads", (), {"Thread": DeferredThread}))
     jobs = []
 
     def job(**kw):
@@ -988,8 +988,8 @@ def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypat
             raise OSError("offline")
         return "Done."
 
-    monkeypatch.setattr(settings.ytdl, "update", job)
-    monkeypatch.setattr(settings.ytdl, "reset", job)
+    monkeypatch.setattr(connection.ytdl, "update", job)
+    monkeypatch.setattr(connection.ytdl, "reset", job)
     d = _open_in_window(window, qapp, "updates")
     btn = d.ytdlp_btns[index]
     btn.setFocus()
@@ -998,7 +998,7 @@ def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypat
     assert all(b.isEnabled() and busy.is_busy(b) for b in d.ytdlp_btns)
     for b in d.ytdlp_btns:
         QTest.mouseClick(b, Qt.LeftButton)
-    d._ytdlp_run(job)
+    d.connection._ytdlp_run(job)
     assert len(workers) == 1
     btn.setFocus()
     workers.pop()()

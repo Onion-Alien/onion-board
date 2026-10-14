@@ -212,7 +212,7 @@ class SpeechPanel(QWidget):
                        Qt.AlignmentFlag.AlignBottom)
         # beside the title, and only once there's something to clear (alone at the far
         # end of an empty list it read as part of some other row)
-        self.b_clear = b_clear = QPushButton(_("Clear"))
+        self.b_clear = b_clear = QPushButton(_("Clear"), self)
         b_clear.setObjectName("reset")
         b_clear.setCursor(Qt.CursorShape.PointingHandCursor)
         b_clear.hide()

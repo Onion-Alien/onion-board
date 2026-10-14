@@ -232,9 +232,8 @@ QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
 QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
 QFrame#railoutput QFrame#railoutputstrip { background:$warn_bg; border:none;
-    border-bottom-left-radius:12px; border-bottom-right-radius:12px; }
-QFrame#railoutputstrip QPushButton#railoutputsetup { border-radius:0;
-    border-bottom-left-radius:12px; border-bottom-right-radius:12px; }
+    border-radius:8px; }
+QFrame#railoutputstrip QPushButton#railoutputsetup { border-radius:8px; }
 QPushButton#railupdate { background:transparent; border:none; padding:0; }   /* painted: sidebar.UpdateCard */
 QPushButton#railupdatecopy { background:transparent; border:1px solid transparent;
     border-radius:6px; padding:2px 6px; color:$accent_link; font-size:8.5pt; font-weight:600; }
@@ -1092,7 +1091,7 @@ def apply_live(app, colour: str) -> str:
 
 # --------------------------------------------------------------------------- logo
 
-def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
+def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04):
     """The Onion Board mark: a gradient squircle holding an onion whose layers
     are drawn as sound-wave arcs — onion + soundboard in one shape."""
     s = rect.width()
@@ -1104,7 +1103,8 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
     g.setColorAt(0.0, QColor(c1))
     g.setColorAt(1.0, QColor(c2))
     body = QPainterPath()
-    body.addRoundedRect(QRectF(x0 + s * 0.04, y0 + s * 0.04, s * 0.92, s * 0.92), s * 0.26, s * 0.26)
+    body.addRoundedRect(QRectF(x0 + s * inset, y0 + s * inset, s * (1 - 2 * inset), s * (1 - 2 * inset)),
+                        s * 0.26, s * 0.26)
     p.fillPath(body, g)
     # soft top highlight
     hi = QLinearGradient(QPointF(x0, y0), QPointF(x0, y0 + s * 0.6))
@@ -1161,11 +1161,17 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
 BRAND = ("#7c5cff", "#ff4d8d")   # the app icon keeps its own colours in every theme
 
 
-def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None) -> QPixmap:
+# Icons Windows draws (taskbar, exe, shortcuts) fill their square edge to edge, like other apps'
+# do; with the in-app 4% margin the tile looked smaller and a touch low beside them.
+ICON_INSET = 0.01
+
+
+def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None,
+                inset: float = 0.04) -> QPixmap:
     pm = QPixmap(size, size)
     pm.fill(Qt.GlobalColor.transparent)
     p = QPainter(pm)
-    paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1])
+    paint_logo(p, QRectF(0, 0, size, size), c1 or BRAND[0], c2 or BRAND[1], inset)
     p.end()
     return pm
 
@@ -1173,7 +1179,7 @@ def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None) -> QPix
 def app_icon(c1: str | None = None, c2: str | None = None) -> QIcon:
     icon = QIcon()
     for sz in (16, 24, 32, 48, 64, 128, 256):
-        icon.addPixmap(logo_pixmap(sz, c1, c2))
+        icon.addPixmap(logo_pixmap(sz, c1, c2, ICON_INSET))
     return icon
 
 
@@ -1181,6 +1187,6 @@ def logo_image(size: int) -> QImage:
     img = QImage(size, size, QImage.Format.Format_ARGB32)
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
-    paint_logo(p, QRectF(0, 0, size, size), *BRAND)
+    paint_logo(p, QRectF(0, 0, size, size), *BRAND, inset=ICON_INSET)
     p.end()
     return img

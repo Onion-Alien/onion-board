@@ -120,7 +120,9 @@ class ClipShelf(QWidget):
         self.title.setAccessibleName(_("Saved clips"))
         self.title.setChecked(cfg.app_clips_expanded)
         head.addWidget(self.title)
-        self.hint = QLabel(_("Double-click plays · F2 renames · right-click for more"))
+        # a parent from the start: shown with none (its row isn't in the shelf yet), it
+        # flashed up as a little window of its own at start-up
+        self.hint = QLabel(_("Double-click plays · F2 renames · right-click for more"), self)
         self.hint.setObjectName("hint")
         self.hint.setWordWrap(True)
         self.hint.setVisible(cfg.app_clips_expanded)

@@ -1,0 +1,1 @@
+- The open sidebar's Live and Stop all buttons now say what they do ("Live" / "Muted", "Stop all") beside their icons, and "Not configured" is its own rounded button inside the card instead of a strip along its bottom edge.
