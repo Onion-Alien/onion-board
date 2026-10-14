@@ -422,6 +422,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        # sounds left on the Undo bar by a crash: into Recently deleted (before the
+        # sounds folder is scanned, or their audio joins the board again bare)
+        trash.finish_held({m.id for m in self.cfg.sounds})
         if self.cfg.netlog_keep:   # the kept network history: listed, and saved from now
             netlog.keep(library.APP_DIR / netlog.FILE_NAME)
         net.configure_from(self.cfg)   # before anything goes online
@@ -8046,6 +8049,8 @@ class MainWindow(QMainWindow):
                 self.current = None
                 self._set_np_name(_("Pick a sound"))
                 self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
+        # written down first: a crash before the Undo bar goes still bins them next start
+        trash.hold([(m, i) for m, i, _d in self._removed])
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
@@ -8068,6 +8073,7 @@ class MainWindow(QMainWindow):
             return
         done, self._removed = self._removed, []
         self._put_back(done)
+        trash.release([m.id for m, *_rest in done])   # after the save: back on the board
         # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
         # on_close finds their pack still in use)
         toastmod.close(self, UNDO_KEY)
@@ -8122,6 +8128,7 @@ class MainWindow(QMainWindow):
             if prev is not None:
                 prev.join()   # an earlier removal's sounds go in first
             n = trash.put_sounds(done) if done else None
+            trash.release([m.id for m, _i in done])   # in the bin: crash-safe now
             for pid in packs:
                 backup.forget_pack(pid)
             return worker.SKIP if n is None else n

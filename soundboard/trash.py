@@ -182,6 +182,86 @@ def _bin_files(meta: SoundMeta, index: int) -> Item | None:
     return Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index)
 
 
+def _held() -> Path:
+    return folder() / "removing.json"
+
+
+def _read_held() -> list[dict]:
+    try:
+        raw = json.loads(_held().read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return []
+    except (OSError, ValueError):
+        log.warning("couldn't read %s", _held(), exc_info=True)
+        return []
+    held = raw.get("sounds") if isinstance(raw, dict) else None
+    return [e for e in held if isinstance(e, dict)] if isinstance(held, list) else []
+
+
+def _write_held(held: list[dict]) -> None:
+    try:
+        if not held:
+            _held().unlink(missing_ok=True)
+            return
+        folder().mkdir(parents=True, exist_ok=True)
+        library.atomic_write_text(_held(), json.dumps({"sounds": held}, indent=1))
+    except OSError:
+        log.warning("couldn't write %s", _held(), exc_info=True)
+
+
+def hold(entries: list[tuple[SoundMeta, int]]) -> None:
+    """Sounds on the Undo bar: off the board but not in the bin yet. Written down
+    before the settings are saved without them, so a crash or power cut before they
+    reach the bin doesn't lose their pads (finish_held() bins them on the next start).
+    Added to any still on their way to the bin from an earlier removal."""
+    new = [{"index": i, "data": library._with_raw(asdict(m), m)} for m, i in entries]
+    ids = {m.id for m, _i in entries}
+    with _lock:
+        _write_held([e for e in _read_held() if _held_id(e) not in ids] + new)
+
+
+def release(ids: list[str]) -> None:
+    """These held sounds were put back (Undo) or are in the bin now."""
+    gone = set(ids)
+    with _lock:
+        held = _read_held()
+        kept = [e for e in held if _held_id(e) not in gone]
+        if len(kept) != len(held):
+            _write_held(kept)
+
+
+def _held_id(e: dict):
+    d = e.get("data")
+    return d.get("id") if isinstance(d, dict) else None
+
+
+def finish_held(on_board: set[str]) -> int:
+    """At startup: sounds that were on their way to the bin when the app last stopped
+    without closing go in now, with their pads (one save). Ones still on the board (it
+    stopped before the settings were saved) or already in the bin are skipped. How
+    many went in."""
+    with _lock:
+        held = _read_held()
+        if not held:
+            return 0
+        binned = {i.data.get("id") for i in load() if i.kind == SOUND}
+        todo = []
+        for e in held:
+            try:
+                m = meta_of(Item("", SOUND, "", 0, dict(e["data"])))
+                index = int(e.get("index", 0))
+            except (KeyError, TypeError, ValueError, AttributeError):
+                continue
+            if m is not None and m.id not in on_board and m.id not in binned:
+                todo.append((m, index))
+        if todo:
+            put_sounds(todo)
+            log.info("put %d sound(s) left on the Undo bar into Recently deleted",
+                     len(todo))
+        _write_held([])
+        return len(todo)
+
+
 def put_app(exe: str, spec: dict, name: str, hidden: bool = False, path: str = "") -> Item:
     """A program was forgotten: keep what was remembered about it (`spec`, maybe
     empty), and whether it was also taken off the Apps tab's list (`hidden`). `path`:
