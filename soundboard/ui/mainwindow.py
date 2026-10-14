@@ -82,8 +82,8 @@ from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.playbutton import PlayButton
 from soundboard.ui.widgets import (DropdownMenu, Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
-                                   SteadyTabs, expand_dropped, fmt_pos, loudness, pad_height,
-                                   spectrum, take_out, SLIM_PAD_H)
+                                   SteadyTabs, WindowRoot, expand_dropped, fmt_pos, loudness,
+                                   pad_height, spectrum, take_out, SLIM_PAD_H)
 from soundboard.wheelguard import AppStyle, no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -121,6 +121,7 @@ UNDO_S = 10          # how long "Removed … · Undo" stays up
 # (soundfx.preview_part): a 2-hour song's pitch shift took minutes to start playing
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
+PACK_SAMPLE = "__pack_sample"   # Free packs' "hear it first" voice (headphones only)
 UNDO_KEY = "undo-sounds"   # its card (toast key)
 TOAST_EXPAND = QSize(900, 640)   # a shrunk card clicked: the window grows to this
 # shown when instant replay goes on: it records whoever is talking in a call
@@ -806,8 +807,8 @@ class MainWindow(QMainWindow):
         # made too small to use (see _refit)
         self._pages = QStackedWidget()
         self.setCentralWidget(self._pages)
-        root = self._full = QWidget()
-        root.setObjectName("root")   # the theme's window gradient
+        root = self._full = WindowRoot()
+        root.setObjectName("root")   # the theme's window background (flat or the glow)
         self._pages.addWidget(root)
         self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
         self._full_row.setContentsMargins(0, 0, 0, 0)
@@ -5748,7 +5749,7 @@ class MainWindow(QMainWindow):
     def apply_theme(self, name: str):
         # a still of the window with Bun over it while every widget restyles: no frame
         # of a half-styled window, and it fades to the new theme (ui/themecover.py)
-        with themecover.covered(self):
+        with themecover.covered(self, name):
             self._apply_theme(name)
 
     def _apply_theme(self, name: str):
@@ -8608,9 +8609,19 @@ class MainWindow(QMainWindow):
         """The Free packs window (soundboard.packs): a pack it downloads is imported the
         way dropping its zip on the window is."""
         from soundboard.ui.packsdialog import PacksDialog
-        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self)
+        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self,
+                          play=self._pack_sample)
         dlg.exec()
         free_dialog(dlg)
+
+    def _pack_sample(self, data, gain: float) -> bool:
+        """Free packs' samples: to your headphones only (None stops it). False: no
+        headphones to play them on."""
+        if data is None:
+            self.engine.stop(PACK_SAMPLE)
+            return True
+        return self.engine.play(PACK_SAMPLE, data, gain, mode="restart",
+                                preview=True) is not None
 
     def import_dialog(self):
         files, __ = QFileDialog.getOpenFileNames(

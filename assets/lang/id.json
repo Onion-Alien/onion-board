@@ -2699,14 +2699,14 @@
   "Pong with Bun": "Pong dengan Bun",
   "First to {n} wins. Move your paddle with the mouse or the arrow keys.": "Yang pertama sampai {n} menang. Gerakkan dayung Anda dengan mouse atau tombol panah.",
   "Play again": "Mainkan lagi",
-  "Bun": "Sanggul",
+  "Bun": "Bun",
   "You": "Anda",
   "Click to serve": "Klik untuk melayani",
   "Closing it ends the game. Nothing is kept.": "Menutupnya mengakhiri permainan. Tidak ada yang disimpan.",
   "You win!": "Kamu menang!",
-  "{you} to {bun}. Bun's not happy.": "{you} ke {bun} . Bun tidak senang.",
+  "{you} to {bun}. Bun's not happy.": "{you}–{bun}. Bun tidak senang.",
   "Bun wins!": "Bun menang!",
-  "{bun} to {you}. Try again?": "{bun} ke {you} . Coba lagi?",
+  "{bun} to {you}. Try again?": "{bun}–{you}. Coba lagi?",
   "aww…": "aduh…",
   "who's the champ!": "siapa juaranya!",
   "no way!": "mustahil!",
@@ -3309,5 +3309,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ambil yt-dlp terbaru, bagian yang mengunduh dari YouTube dan situs lain, lalu coba tautan ini lagi",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Pengunduh sudah yang terbaru. Situsnya mungkin berubah dengan cara yang belum bisa ditangani: coba lagi dalam beberapa hari.",
   "Update downloader": "Perbarui pengunduh",
-  "Updating the downloader…": "Memperbarui pengunduh…"
+  "Updating the downloader…": "Memperbarui pengunduh…",
+  "Hear {name}": "Dengarkan {name}",
+  "Hear {name} (only you hear it)": "Dengarkan {name} (hanya kamu yang dengar)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Pilih headphone kamu di Pengaturan → Audio untuk mendengar contohnya.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Papan siap pakai, bebas digunakan di mana saja: dalam game, streaming, dan video. Tekan suara untuk mendengarnya dulu (hanya Anda yang mendengar). Tambahkan satu dan suaranya akan mendarat di papan Anda, setiap kategori sebagai tabnya sendiri."
 }

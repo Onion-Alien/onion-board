@@ -2817,14 +2817,14 @@
   "Pong with Bun": "Pong cu Bun",
   "First to {n} wins. Move your paddle with the mouse or the arrow keys.": "Primul care este {n} câștigă. Mișcați paleta cu mouse-ul sau cu tastele săgeți.",
   "Play again": "Joacă din nou",
-  "Bun": "chifla",
+  "Bun": "Bun",
   "You": "Tu",
   "Click to serve": "Faceți clic pentru a servi",
   "Closing it ends the game. Nothing is kept.": "Închiderea acestuia se încheie jocul. Nu se păstrează nimic.",
   "You win!": "Tu câștigi!",
-  "{you} to {bun}. Bun's not happy.": "{you} la {bun} . Bun nu e fericit.",
+  "{you} to {bun}. Bun's not happy.": "{you}–{bun}. Bun nu e fericit.",
   "Bun wins!": "Bun câștigă!",
-  "{bun} to {you}. Try again?": "{bun} către {you} . Încearcă din nou?",
+  "{bun} to {you}. Try again?": "{bun}–{you}. Mai încerci?",
   "aww…": "aww…",
   "who's the champ!": "cine este campionul!",
   "no way!": "în nici un caz!",
@@ -3461,5 +3461,9 @@
   "Get the newest yt-dlp, the part that downloads from YouTube and other sites, then try this link again": "Ia cel mai nou yt-dlp, partea care descarcă de pe YouTube și alte site-uri, apoi încearcă din nou acest link",
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Programul de descărcare e deja cel mai nou. Site-ul s-ar putea să se fi schimbat într-un fel pe care încă nu-l poate gestiona: încearcă din nou peste câteva zile.",
   "Update downloader": "Actualizează programul de descărcare",
-  "Updating the downloader…": "Se actualizează programul de descărcare…"
+  "Updating the downloader…": "Se actualizează programul de descărcare…",
+  "Hear {name}": "Ascultă {name}",
+  "Hear {name} (only you hear it)": "Ascultă {name} (doar tu auzi)",
+  "Pick your headphones in Settings → Audio to hear the samples.": "Alege-ți căștile în Setări → Audio ca să asculți mostrele.",
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Plăci gata făcute, care pot fi folosite gratuit oriunde: în jocuri, streamuri și videoclipuri. Apasă pe un sunet ca să-l asculți întâi (doar tu îl auzi). Adaugă unul și sunetele sale ajung pe tabla ta, fiecare categorie ca filă proprie."
 }

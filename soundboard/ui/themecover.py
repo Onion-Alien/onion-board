@@ -5,7 +5,9 @@ frame painted part way through showed the app half styled: Qt's plain look, or t
 old theme's colours on some parts and the new one's on others. Like other polished
 desktop apps (a Qt chat client fades its old frame out the same way), the window
 shows a picture of itself, dimmed, with Bun in the middle until the new theme is in,
-then fades to it. The cover is a child of the window: no window of its own appears.
+then fades to it. The dimming and Bun are already in the new theme's colours (his
+headphones and outfit too): the old theme's showed the theme being left, not the one
+coming. The cover is a child of the window: no window of its own appears.
 """
 from __future__ import annotations
 
@@ -21,18 +23,20 @@ BUNNY_H = 96
 
 
 class ThemeCover(QWidget):
-    def __init__(self, window: QWidget):
+    def __init__(self, window: QWidget, name: str | None = None):
         super().__init__(window)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
         self.setGeometry(window.rect())
         dpr = window.devicePixelRatioF() or 1.0
         self.still: QPixmap = window.grab()
-        # the old theme's colours: what's under the cover until it fades
-        self.scrim = QColor(theme.T["bg"])
-        self.scrim.setAlpha(150)
+        # the theme being switched to (`name`; None: the current one), so the cover
+        # already shows where it's going
         from soundboard.bunny import bunny_pixmap
-        self.bunny = bunny_pixmap(BUNNY_H, dpr=dpr)
+        with theme.previewing(name or theme.current_name):
+            self.scrim = QColor(theme.T["bg"])
+            self.bunny = bunny_pixmap(BUNNY_H, dpr=dpr)
+        self.scrim.setAlpha(150)
         self._fade: QPropertyAnimation | None = None
 
     def paintEvent(self, _e):
@@ -68,20 +72,21 @@ class ThemeCover(QWidget):
         fade.start()
 
 
-def covered(window: QWidget):
-    """The cover over `window` for a `with` block (None when it isn't on screen)."""
-    return _Covered(window)
+def covered(window: QWidget, name: str | None = None):
+    """The cover over `window` for a `with` block (None when it isn't on screen), in
+    theme `name`'s colours (the one being switched to)."""
+    return _Covered(window, name)
 
 
 class _Covered:
-    def __init__(self, window: QWidget):
+    def __init__(self, window: QWidget, name: str | None = None):
         # a quick second click: the last cover may still be fading, and a still taken
         # through it would show the theme before that one
         direct = Qt.FindChildOption.FindDirectChildrenOnly
         for old in window.findChildren(ThemeCover, options=direct):
             old.hide()
             old.deleteLater()
-        self.cover = (ThemeCover(window) if window.isVisible() and not window.isMinimized()
+        self.cover = (ThemeCover(window, name) if window.isVisible() and not window.isMinimized()
                       else None)
 
     def __enter__(self):

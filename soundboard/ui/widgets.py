@@ -64,6 +64,16 @@ class DropdownMenu(QMenu):
             self.move(self.x(), new_y)
 
 
+class WindowRoot(QWidget):
+    """The main window's page: it paints the theme's window background itself (flat, or
+    the Textured accent glow), the same picture opaque widgets copy (PadGrid)."""
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        theme.paint_window_bg(p, e.rect(), QPointF(0, 0), self.width(), self.height())
+        p.end()
+
+
 class Meter(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)

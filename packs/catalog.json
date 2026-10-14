@@ -12,6 +12,9 @@
       "sounds": 67,
       "license": "CC0 + CC BY (credits inside)",
       "author": "Onion Board",
+      "preview": {"url": "https://github.com/Onion-Alien/onion-board/releases/download/gm-pack-1/gm-starter-preview.zip",
+                  "sha256": "287c97df2e05a8b0aefb76381ab8bc91f28546caa0b2a1dbd8e5228b71d611db",
+                  "size": 523245},
       "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss", "Endings"]
     },
     {
@@ -25,6 +28,9 @@
       "sounds": 51,
       "license": "CC0",
       "author": "Onion Board",
+      "preview": {"url": "https://github.com/Onion-Alien/onion-board/releases/download/esports-pack-1/esports-preview.zip",
+                  "sha256": "81553c247a987ef7dabe7da2b8b4a4555e5fe7e09a9c73f7dd063c491cd8ea4b",
+                  "size": 407620},
       "categories": ["Hype music", "Crowd", "Announcer", "Callouts", "Plays", "Memes"]
     },
     {
@@ -38,6 +44,9 @@
       "sounds": 51,
       "license": "CC0 (applause public domain)",
       "author": "Onion Board",
+      "preview": {"url": "https://github.com/Onion-Alien/onion-board/releases/download/podcast-pack-1/podcast-preview.zip",
+                  "sha256": "1a427fc256d0152b7e5d2250337971e2660595dad21b7afd5b2f8184f7af4db1",
+                  "size": 392570},
       "categories": ["Show music", "Stingers", "Reactions", "Comedy", "Game show", "Studio"]
     },
     {
@@ -51,6 +60,9 @@
       "sounds": 49,
       "license": "CC0 + CC BY (credits inside)",
       "author": "Onion Board",
+      "preview": {"url": "https://github.com/Onion-Alien/onion-board/releases/download/halloween-pack-1/halloween-preview.zip",
+                  "sha256": "8014fbf24322b467e09e4a4eaff179aa974f424750d0191393655fe27ae5a090",
+                  "size": 480541},
       "categories": ["Spooky music", "Screams", "Monsters", "Jump scares", "Haunted house", "Night"]
     },
     {
@@ -64,6 +76,9 @@
       "sounds": 57,
       "license": "CC0",
       "author": "Onion Board",
+      "preview": {"url": "https://github.com/Onion-Alien/onion-board/releases/download/streamer-pack-1/streamer-preview.zip",
+                  "sha256": "4baeb7fe3d9bdbd2a07db071ba89666d9b3a910118cb510325c1adef1478191c",
+                  "size": 376595},
       "categories": ["Stream music", "Alerts", "Hype", "Fails", "Chat reactions", "Announcer", "Transitions"]
     }
   ]
