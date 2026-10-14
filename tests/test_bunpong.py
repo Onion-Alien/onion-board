@@ -1,6 +1,7 @@
 """The Pong Easter egg: poke Bun enough and he fetches a bat and opens Pong in a
 dialog; points and the end work; Esc or Close ends it and calms him."""
 
+import math
 import random
 import time
 
@@ -180,8 +181,11 @@ def test_long_play_never_sticks_and_paints(qapp):
     stack, game = _game(seed=4)
     c = game.court
     c.serve("bun")
-    for i in range(60 * 60):        # a minute, your paddle chasing the ball
-        c.aim_y = c.by
+    # two minutes, your paddle chasing the ball a little off its middle, as a person
+    # does: dead-centre hits send it flat forever, and Bun reaches every flat ball
+    # near the top or bottom, so a perfect robot never scores
+    for i in range(60 * 120):
+        c.aim_y = c.by + 0.06 * math.sin(i / 23)
         game.step(1 / 60)
         if i % 300 == 0:
             game.grab()
