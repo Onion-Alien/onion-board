@@ -608,6 +608,7 @@ def _apply_entry(meta: SoundMeta, entry: dict, color: str | None):
             v = defaults[k]
         setattr(meta, k, v.copy() if isinstance(v, (dict, list)) else v)
     meta.tags = clean_tags(meta.tags)
+    meta.hotkey = library.clean_hotkey(meta.hotkey, meta.name)
     meta.volume = min(max(meta.volume, 0.0), 2.0)
     meta.level_gain = min(max(meta.level_gain, 0.1), 6.0)
     meta.fade_in, meta.fade_out = clean_fade(meta.fade_in), clean_fade(meta.fade_out)

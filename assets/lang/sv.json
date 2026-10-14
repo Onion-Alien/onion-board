@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Testa vad som helst: en låt, en meme, ett spelljud.",
   "Type a song you love, then press Enter": "Skriv en låt du älskar och tryck på Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Dina ljud är i <b style='color:{colour}'>{mic}</b> nu, så det finns inget att välja i Discord eller dina spel. En sak kan fortfarande stoppa dem: Discords eget brusfilter, som är på som standard.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Tystad / live: när det är tystat hör ingen dina ljud (din mikrofon går fortfarande ut, om inte röstvändaren är på eller Skicka min mikrofon är av)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Tystad / live: när det är tystat hör ingen dina ljud (din mikrofon går fortfarande ut, om inte röstvändaren är på eller Skicka min mikrofon är av)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Den MIDI-paden går inte att läsa: slå på paden igen för att ställa in den.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "En snabbtangent behöver en tangent, till exempel F1 eller Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Det är för långt för en snabbtangent: en tangent, plus Ctrl, Alt, Shift eller Windows om du vill.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} finns två gånger i den snabbtangenten: använd den en gång, till exempel {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "”{key}” är ingen tangent på ett tangentbord, så den snabbtangenten kan aldrig tryckas.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} ensam kan inte vara en snabbtangent: lägg till en tangent, till exempel {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "En snabbtangent har en tangent, plus Ctrl, Alt, Shift eller Windows om du vill: den här har {keys}.",
+  "Hotkey not saved: {why}": "Snabbtangenten sparades inte: {why}"
 }

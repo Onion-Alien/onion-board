@@ -47,6 +47,17 @@ def test_a_key_updates_its_own_card(qapp):
     w.close()
 
 
+def test_a_card_updated_with_longer_words_grows_to_show_them_all(qapp):
+    w = _host(qapp)
+    a = busy.toast(w, "Short", "warn", key="hotkey")
+    qapp.processEvents()
+    short = a.height()
+    busy.toast(w, "Much longer words this time, " * 4, "warn", key="hotkey")
+    qapp.processEvents()
+    assert a.height() > short   # it kept the short text's height: the rest was cut off
+    w.close()
+
+
 def test_the_same_notice_counts_up_right_after_its_words(qapp):
     w = _host(qapp)
     busy.toast(w, "✓ Link copied")

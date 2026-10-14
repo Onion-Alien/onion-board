@@ -205,9 +205,27 @@ def clean_programs(v) -> dict[str, str]:
     return out
 
 
+def clean_hotkey(combo: str, what: str) -> str:
+    """A saved hotkey, or "" (with a log line) if no keyboard could ever send it: older
+    versions saved any text. It stays as written otherwise, for older versions."""
+    if not combo:
+        return ""
+    from soundboard import winkeys   # Win32; only needed once there's a key
+    if winkeys.check(combo)[1]:
+        log.warning("dropped the hotkey %r of %s: no key can send it", combo[:80], what)
+        return ""
+    return combo
+
+
 def clean_setting(k: str, v):
     """Setting `k` (already of the right type) as the app can use it: brought into the
     range of its control. None if it's unusable, so the default applies instead."""
+    if k.endswith("_hotkey") or k == "ptt_key":
+        return clean_hotkey(v, k)
+    if k == "category_hotkeys":   # {category: its random-sound key}
+        return {c: key for c, key in v.items()
+                if isinstance(c, str) and isinstance(key, str)
+                and clean_hotkey(key, f"category {c!r}")}
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
@@ -807,6 +825,7 @@ class Config:
             if s.get("image") and not Path(s["image"]).is_absolute():
                 s["image"] = str(THUMBS_DIR / s["image"])
             s["tags"] = clean_tags(s.get("tags"))
+            s["hotkey"] = clean_hotkey(s.get("hotkey", ""), f"sound {s['name']!r}")
             s["source"] = sourceinfo.clean(s.get("source"))
             for k in ("fade_in", "fade_out"):
                 s[k] = clean_fade(s.get(k))

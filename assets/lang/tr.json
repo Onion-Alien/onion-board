@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Ne istersen dene: bir şarkı, bir meme, bir oyun sesi.",
   "Type a song you love, then press Enter": "Sevdiğin bir şarkıyı yaz, sonra Enter'a bas",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Seslerin artık <b style='color:{colour}'>{mic}</b> içinde, yani Discord'da ya da oyunlarında seçecek bir şey yok. Onları hâlâ durdurabilecek tek şey: Discord'un varsayılan olarak açık olan kendi gürültü filtresi.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Sessize alındı / canlı: sessize alındığında kimse seslerinizi duymaz (ses değiştirici açık ya da mikrofon gönderme kapalı değilse mikrofonunuz yine gider)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Sessize alındı / canlı: sessize alındığında kimse seslerinizi duymaz (ses değiştirici açık ya da mikrofon gönderme kapalı değilse mikrofonunuz yine gider)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Bu MIDI pedi okunamıyor: ayarlamak için pede yeniden vur.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Kısayol tuşunun bir tuşa ihtiyacı var, örneğin F1 veya Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Bu bir kısayol tuşu için çok uzun: bir tuş, istersen artı Ctrl, Alt, Shift veya Windows.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} bu kısayol tuşunda iki kez var: bir kez kullan, örneğin {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” klavyede bir tuş değil, yani bu kısayol tuşuna asla basılamaz.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "Tek başına {mod} kısayol tuşu olamaz: bir tuş ekle, örneğin {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Bir kısayol tuşunda bir tuş olur, istersen artı Ctrl, Alt, Shift veya Windows: bunda {keys} var.",
+  "Hotkey not saved: {why}": "Kısayol tuşu kaydedilmedi: {why}"
 }

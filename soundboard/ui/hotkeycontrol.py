@@ -177,12 +177,29 @@ class HotkeyControl(Controller):
                    status=theme.status('warn'),
                    keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn")
 
+    def _valid_hotkey(self, combo: str) -> str | None:
+        """`combo` as it's saved, or None (and a toast saying why) if no keyboard could
+        ever send it: such a key used to be saved and shown as working."""
+        if not combo:
+            return combo
+        good, why = winkeys.check(combo)
+        if why:
+            log.info("refused hotkey %r: %s", combo[:80], why)
+            self.mw.toast(_("Hotkey not saved: {why}", why=why), "warn", key="hotkey")
+            return None
+        return good
+
     def set_global_hotkey(self, attr: str, combo: str):
         """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
         so it's taken off any other action or sound that had it, and a toast says what
         lost it: a key quietly going off a pad was a surprise the next time it was
         pressed in a game."""
         mw = self.mw
+        good = self._valid_hotkey(combo)
+        if good is None:
+            self.register_hotkeys()   # the capture paused them
+            return
+        combo = good
         lost = []
         if combo:
             for other, _action, label, _desc in HOTKEY_ACTIONS:
@@ -397,6 +414,8 @@ class HotkeyControl(Controller):
             d = HotkeyDialog(mw.hotkeys, mw)
             combo = d.result_combo if d.exec() and d.result_combo else None
             free_dialog(d)
+        if combo is not None:
+            combo = self._valid_hotkey(combo)
         if combo is not None and combo != m.hotkey:
             m.hotkey = combo
             lost = self._clear_dupe_hotkey(m)
@@ -405,7 +424,8 @@ class HotkeyControl(Controller):
                 mw.pads[sid].update()
             if not lost:   # else its warning already says what the key plays now
                 mw.toast(_("✓ {combo} plays “{name}”",
-                             combo=html.escape(combo), name=html.escape(m.name)) if combo
+                             combo=html.escape(pretty_key(combo)),
+                             name=html.escape(m.name)) if combo
                            else _("Hotkey removed from “{name}”", name=html.escape(m.name)),
                            key="hotkey")
         self.register_hotkeys()   # the capture paused them
@@ -431,6 +451,10 @@ class HotkeyControl(Controller):
             if combo is None:
                 self.register_hotkeys()   # the capture paused them
                 return
+        combo = self._valid_hotkey(combo)
+        if combo is None:
+            self.register_hotkeys()
+            return
         taken_from = []
         if combo:
             for attr, *__ in HOTKEY_ACTIONS:
@@ -449,11 +473,11 @@ class HotkeyControl(Controller):
             mw.cfg.category_hotkeys[name] = combo
             if taken_from:
                 msg = _("✓ {combo} plays a random “{name}” sound, it was the key for {lost}",
-                        combo=html.escape(combo), name=html.escape(name),
+                        combo=html.escape(pretty_key(combo)), name=html.escape(name),
                         lost=html.escape(", ".join(taken_from)))
             else:
                 msg = _("✓ {combo} plays a random “{name}” sound",
-                        combo=html.escape(combo), name=html.escape(name))
+                        combo=html.escape(pretty_key(combo)), name=html.escape(name))
             mw.toast(msg, "ok")
         else:
             mw.cfg.category_hotkeys.pop(name, None)

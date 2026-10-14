@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Prøv hva som helst: en sang, et meme, en spillyd.",
   "Type a song you love, then press Enter": "Skriv inn en sang du elsker, og trykk på Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Lydene dine er i <b style='color:{colour}'>{mic}</b> nå, så det er ingenting å velge i Discord eller spillene dine. Én ting kan fortsatt stoppe dem: Discords eget støyfilter, som er på som standard.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Dempet / live: når den er dempet, hører ingen lydene dine (mikrofonen din går fortsatt ut, med mindre stemmeskifteren er på eller Send mikrofonen er av)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Dempet / live: når den er dempet, hører ingen lydene dine (mikrofonen din går fortsatt ut, med mindre stemmeskifteren er på eller Send mikrofonen er av)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Den MIDI-paden kan ikke leses: slå på paden igjen for å velge den.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "En hurtigtast trenger en tast, for eksempel F1 eller Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Det er for langt for en hurtigtast: én tast, pluss Ctrl, Alt, Shift eller Windows om du vil.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} er med to ganger i den hurtigtasten: bruk den én gang, for eksempel {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "«{key}» er ikke en tast på et tastatur, så den hurtigtasten kan aldri trykkes.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "{mod} alene kan ikke være en hurtigtast: legg til en tast, for eksempel {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "En hurtigtast har én tast, pluss Ctrl, Alt, Shift eller Windows om du vil: denne har {keys}.",
+  "Hotkey not saved: {why}": "Hurtigtasten ble ikke lagret: {why}"
 }

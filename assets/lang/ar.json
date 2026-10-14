@@ -3719,5 +3719,13 @@
   "Try anything: a song, a meme, a game sound.": "جرّب أي شيء: أغنية، ميم، صوت من لعبة.",
   "Type a song you love, then press Enter": "اكتب أغنية تحبها، ثم اضغط Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "أصواتك الآن في <b style='color:{colour}'>{mic}</b>، لذا لا شيء تختاره في Discord أو ألعابك. شيء واحد فقط ما زال قد يوقفها: فلتر الضوضاء الخاص بـ Discord، وهو مفعّل افتراضيًا.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "مكتوم/مباشر: أثناء كتم الصوت لا أحد يسمع أصواتك (ميكروفونك يبقى مسموعًا إلا إذا كان مغير الصوت يعمل أو كان إرسال الميكروفون متوقفًا)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "مكتوم/مباشر: أثناء كتم الصوت لا أحد يسمع أصواتك (ميكروفونك يبقى مسموعًا إلا إذا كان مغير الصوت يعمل أو كان إرسال الميكروفون متوقفًا)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "تعذّرت قراءة لوحة MIDI هذه: اضغطها مرة أخرى لتعيينها.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "يحتاج الاختصار إلى مفتاح، مثل F1 أو Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "هذا طويل جدًا لاختصار: مفتاح واحد، مع Ctrl أو Alt أو Shift أو Windows إن شئت.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "{mod} موجود مرتين في هذا الاختصار: استخدمه مرة واحدة، مثل {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "“{key}” ليس مفتاحًا على لوحة المفاتيح، لذا لا يمكن الضغط على هذا الاختصار أبدًا.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "لا يمكن أن يكون {mod} وحده اختصارًا: أضف مفتاحًا، مثل {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "للاختصار مفتاح واحد، مع Ctrl أو Alt أو Shift أو Windows إن شئت: هذا فيه {keys}.",
+  "Hotkey not saved: {why}": "لم يُحفظ الاختصار: {why}"
 }

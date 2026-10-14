@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Próbálj bármit: egy dalt, egy mémet, egy játékhangot.",
   "Type a song you love, then press Enter": "Írj be egy dalt, amit imádsz, és nyomj Entert",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "A hangjaid most már a(z) <b style='color:{colour}'>{mic}</b> mikrofonban vannak, így a Discordban és a játékaidban nincs mit kiválasztani. Egy dolog még megállíthatja őket: a Discord saját zajszűrője, ami alapból be van kapcsolva.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Némítva / élő: némítva senki nem hallja a hangjaidat (a mikrofonod továbbra is megy, hacsak nincs bekapcsolva a hangváltó vagy kikapcsolva a mikrofon küldése)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Némítva / élő: némítva senki nem hallja a hangjaidat (a mikrofonod továbbra is megy, hacsak nincs bekapcsolva a hangváltó vagy kikapcsolva a mikrofon küldése)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Ez a MIDI-pad nem olvasható: üsd meg újra a padet a beállításhoz.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "A gyorsbillentyűhöz kell egy billentyű, például F1 vagy Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Ez túl hosszú egy gyorsbillentyűnek: egy billentyű, plusz ha akarod Ctrl, Alt, Shift vagy Windows.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "A(z) {mod} kétszer szerepel ebben a gyorsbillentyűben: egyszer használd, például {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "A(z) „{key}” nem billentyű a billentyűzeten, így ezt a gyorsbillentyűt sosem lehetne lenyomni.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "A(z) {mod} egyedül nem lehet gyorsbillentyű: adj hozzá egy billentyűt, például {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Egy gyorsbillentyűben egy billentyű van, plusz ha akarod Ctrl, Alt, Shift vagy Windows: ebben {keys} van.",
+  "Hotkey not saved: {why}": "A gyorsbillentyű nincs mentve: {why}"
 }

@@ -711,6 +711,12 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
             t.glide_to(t.pos(), from_below=True)
             stack.place()   # the older cards make room
     else:
+        # its layouts still hold the old text's height: a longer one was cut off
+        for w in (*t.findChildren(QWidget), t):
+            w.updateGeometry()
+            lay = w.layout()
+            if lay is not None:
+                lay.invalidate()
         stack.place()
     _announce(t, text)
     return t

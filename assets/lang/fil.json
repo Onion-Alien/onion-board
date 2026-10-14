@@ -3415,5 +3415,13 @@
   "Try anything: a song, a meme, a game sound.": "Subukan kahit ano: kanta, meme, sound ng game.",
   "Type a song you love, then press Enter": "I-type ang kantang gusto mo, tapos pindutin ang Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Nasa <b style='color:{colour}'>{mic}</b> na ang mga sound mo, kaya wala nang pipiliin sa Discord o sa mga game mo. Isang bagay na lang ang puwedeng pumigil sa kanila: ang sariling noise filter ng Discord, na naka-on bilang default.",
-  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Muted / live: habang naka-mute, walang nakakarinig ng mga sound mo (lumalabas pa rin ang mic mo, maliban kung naka-on ang voice changer o naka-off ang pagpapadala ng mic)"
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Muted / live: habang naka-mute, walang nakakarinig ng mga sound mo (lumalabas pa rin ang mic mo, maliban kung naka-on ang voice changer o naka-off ang pagpapadala ng mic)",
+  "That MIDI pad can't be read: hit the pad again to set it.": "Hindi mabasa ang MIDI pad na iyan: pindutin ulit ang pad para i-set ito.",
+  "A hotkey needs a key, like F1 or Ctrl+1.": "Kailangan ng hotkey ng isang key, gaya ng F1 o Ctrl+1.",
+  "That's too long for a hotkey: one key, plus Ctrl, Alt, Shift or Windows if you like.": "Masyadong mahaba iyan para sa hotkey: isang key, at Ctrl, Alt, Shift o Windows kung gusto mo.",
+  "{mod} is in that hotkey twice: use it once, like {mod}+1.": "Dalawang beses ang {mod} sa hotkey na iyan: gamitin ito nang isang beses, gaya ng {mod}+1.",
+  "“{key}” isn't a key on a keyboard, so that hotkey could never be pressed.": "Hindi key sa keyboard ang “{key}”, kaya hindi kailanman mapipindot ang hotkey na iyan.",
+  "{mod} alone can't be a hotkey: add a key, like {mod}+1.": "Hindi puwedeng hotkey ang {mod} lang: magdagdag ng key, gaya ng {mod}+1.",
+  "A hotkey has one key, plus Ctrl, Alt, Shift or Windows if you like: this one has {keys}.": "Isang key ang hotkey, at Ctrl, Alt, Shift o Windows kung gusto mo: ito ay may {keys}.",
+  "Hotkey not saved: {why}": "Hindi na-save ang hotkey: {why}"
 }
