@@ -110,8 +110,8 @@ class ResetGuide(QDialog):
         self.btn_next.setObjectName("primary")
         self.btn_next.setDefault(True)
         self.btn_next.clicked.connect(self._to_check)
+        row.addWidget(self.btn_next)   # the main button first
         row.addWidget(cancel)
-        row.addWidget(self.btn_next)
         v.addLayout(row)
         return w
 
@@ -234,14 +234,14 @@ class RestorePoints(QDialog):
         self.btn_delete.clicked.connect(self.delete)
         row.addWidget(self.btn_delete)
         row.addStretch(1)
-        close = QPushButton(_("Close"))
-        close.clicked.connect(self.reject)
-        row.addWidget(close)
         self.btn_restore = QPushButton(_("Restore"))
         self.btn_restore.setObjectName("primary")
         self.btn_restore.clicked.connect(self.restore)
         self.btn_restore.setDefault(True)   # Enter restores (it was Delete, the first button)
-        row.addWidget(self.btn_restore)
+        row.addWidget(self.btn_restore)     # the main button first
+        close = QPushButton(_("Close"))
+        close.clicked.connect(self.reject)
+        row.addWidget(close)
         lay.addLayout(row)
         self.fill()
 

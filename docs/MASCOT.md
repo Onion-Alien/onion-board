@@ -50,16 +50,22 @@ animation at once.
 
 | Layer | Painted | Pieces |
 | --- | --- | --- |
-| `back` | after his body, before his head | hood, cape collar |
-| `under` | on his head, under the headphones | beanie, headband, bandana, eye shade |
-| `over` | after the headphones (and nightcap) | crown, hats, horns, flowers, onion |
-| `face` | after his face, before the prop in his paw | glasses, laser eyes, fangs, clown nose, bow tie, scarf, lei, hood strings |
+| `behind` | first, behind even his ears | moon |
+| `back` | after his body, before his head | hood, hazmat hood, cape collar |
+| `under` | on his head, under the headphones | beanie, frog hat, snapback, bandana, eye shade |
+| `over` | after the headphones (and nightcap) | crown, hats, horns, flowers, mint sprig, pencil, dizzy stars |
+| `face` | after his face, before the prop in his paw | glasses, spiral eyes, laser eyes, fangs, clown nose, sweater, turtleneck, badge, bow tie, scarf, lei, hood strings |
 
 Rules the drawing keeps:
 
 - Robo-Bun wears no outfit.
-- The nightcap replaces anything in `bunnyfit.HATS`; glasses and neck pieces stay on.
+- The nightcap replaces anything in `bunnyfit.HATS` and takes off his glasses
+  (`bunnyfit.EYEWEAR`); neck pieces stay on.
+- Glasses you can't see through (`bunnyfit.HIDE_EYES`) hide his smug lids and tears, and
+  his smug brows lift clear of the lenses.
 - Laser eyes switch off while his eyes are shut (`blink > 0.6`).
+- A piece clipped to his head redraws only the part of his outline it covered, never the
+  whole ellipse (on Hoot that line would cross his face).
 - His headphones are the theme's `accent`; hats and neck pieces that follow the theme use
   `accent2`, so the two don't blend.
 - Dark (the default, and the installer art) and High Contrast stay plain.
@@ -75,7 +81,9 @@ it sits on his head), list it under the theme in `OUTFITS`, then check the sheet
 Hoot the owl (`soundboard/ui/owl.py`, the Triggers tab before Onion Watch is installed)
 wears the same theme outfit. He has no pieces of his own: `owl._fit` moves Bun's pieces
 onto his shape (head 12 higher, eyes 28 apart and scaled 1.3, neck pieces just under his
-beak) and `draw_owl` calls it at the same four layers. `owl_image` (dialog artwork, his own
+beak; `OWN_PLACE` for the ones that need their own spot (tall hats stay full size: an
+oversized hat is the look); `NOT_ON_OWL` for the ones that don't suit him) and `draw_owl` calls it at
+the same five layers. `owl_image` (dialog artwork, his own
 teal) stays plain. A new piece drawn for Bun shows up on Hoot too: check it with
 `bun_sheet.py owls` and `bun_sheet.py owl`. Onion Watch's own copy of the owl
 (`onionwatch/owl.py` in that project) has no outfits.

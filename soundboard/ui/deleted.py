@@ -8,12 +8,12 @@ from typing import Protocol
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHBoxLayout,
-                               QListWidget, QListWidgetItem, QMessageBox, QPushButton,
+                               QLabel, QListWidgetItem, QMessageBox, QPushButton,
                                QVBoxLayout)
 
 from soundboard import trash
 from soundboard.ui import busy, fit, icons, toast
-from soundboard.ui.panel import hint_label
+from soundboard.ui.panel import EmptyList, hint_label
 from soundboard.i18n import _, ngettext
 
 
@@ -60,9 +60,14 @@ class DeletedDialog(QDialog):
         title, hint, self.empty_text = _texts(what, source.KEEP_DAYS)
         self.setWindowTitle(title)
         lay = QVBoxLayout(self)
+        lay.setContentsMargins(18, 18, 18, 18)
+        lay.setSpacing(12)
+        heading = QLabel(title)
+        heading.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        lay.addWidget(heading)
         self.hint = hint_label(hint)
         lay.addWidget(self.hint)
-        self.list = QListWidget()
+        self.list = EmptyList(self.empty_text, "trash")
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.list.setMinimumSize(360, 240)
         self.list.itemSelectionChanged.connect(self._update)
@@ -94,10 +99,6 @@ class DeletedDialog(QDialog):
             self.list.addItem(li)
         if self.list.count():
             self.list.setCurrentRow(0)
-        else:
-            li = QListWidgetItem(self.empty_text)
-            li.setFlags(Qt.ItemFlag.NoItemFlags)
-            self.list.addItem(li)
         self._update()
 
     def _picked(self) -> list[str]:

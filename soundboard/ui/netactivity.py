@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
 
 from soundboard import netlog, theme
 from soundboard.ui import busy, fit
-from soundboard.ui.panel import Flow
+from soundboard.ui.panel import Flow, hint_label
 from soundboard.i18n import _, ngettext
 
 REFRESH_MS = 1000
@@ -450,6 +450,12 @@ class LogDialog(QDialog):
         self.setWindowTitle(_("Network activity log (this run, not saved)"))
         self.resize(820, 520)
         v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        title = QLabel(_("Network activity log"))
+        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        v.addWidget(title)
+        v.addWidget(hint_label(_("This run only. It isn't saved.")))
         self.text = QPlainTextEdit(text)
         self.text.setReadOnly(True)
         self.text.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
@@ -478,6 +484,11 @@ class TotalsDialog(QDialog):
         self.setWindowTitle(_("Network activity totals"))
         self.resize(820, 520)
         v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        title = QLabel(_("Network activity totals"))
+        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        v.addWidget(title)
         self.summary = QLabel()
         self.summary.setObjectName("hint")
         self.summary.setWordWrap(True)

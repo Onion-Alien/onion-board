@@ -15,8 +15,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame, QHBoxLa
 
 from soundboard import remote, theme
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.chatguide import _header, _label
+from soundboard.ui.chatguide import _bun, _header, _label
 from soundboard.i18n import _
 
 
@@ -56,7 +55,7 @@ class StreamerGuide(QDialog):
             "Remote control lets your other stream tools press Onion Board's buttons for "
             "you: a <b>Stream Deck</b> key, a <b>channel point</b> reward, a <b>!command</b> "
             "in chat. Each one is just a link. Everything stays on this PC.")),
-            BunnyWidget("star")))
+            _bun("star")))
 
         ok = theme.status("ok")
         li = "<li style='margin-bottom:8px'>{}</li>"

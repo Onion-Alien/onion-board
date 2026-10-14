@@ -12,8 +12,8 @@ from PySide6.QtCore import QEvent, QObject, QPoint, QRect, QRectF, QSize, Qt, QT
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QSizePolicy, QSlider, QSpinBox, QStyle,
-                               QVBoxLayout, QWidget)
+                               QLayout, QListWidget, QPushButton, QSizePolicy, QSlider, QSpinBox,
+                               QStyle, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -436,6 +436,44 @@ def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     lbl.setToolTip(tip)
     lbl.setObjectName("iconlabel")
     return lbl
+
+
+class EmptyList(QListWidget):
+    """A list that says so when it's empty: a faint icon over a muted line, centred in
+    the list, instead of a first row of grey text in its corner. `set_empty(text,
+    icon)` changes what it says (a "Looking…" while a list is being filled)."""
+
+    def __init__(self, text: str = "", icon: str = "info", parent=None):
+        super().__init__(parent)
+        self._empty_text, self._empty_icon = text, icon
+
+    def set_empty(self, text: str, icon: str | None = None):
+        self._empty_text = text
+        if icon is not None:
+            self._empty_icon = icon
+        self.viewport().update()
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        if self.count() or not self._empty_text:
+            return
+        vp = self.viewport()
+        p = QPainter(vp)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        side = 32
+        box = vp.rect().adjusted(24, 0, -24, 0)
+        p.setFont(self.font())
+        flags = int(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+                    | Qt.TextFlag.TextWordWrap)
+        text_h = p.fontMetrics().boundingRect(box, flags, self._empty_text).height()
+        top = max(8, (vp.height() - side - 12 - text_h) // 2)
+        if self._empty_icon:
+            pm = icons.pixmap(self._empty_icon, side, theme.T.get("faint", "#888"))
+            p.drawPixmap(vp.width() // 2 - side // 2, top, pm)
+        p.setPen(QColor(theme.T.get("muted", "#888")))
+        p.drawText(QRect(box.left(), top + side + 12, box.width(), text_h), flags,
+                   self._empty_text)
+        p.end()
 
 
 def alt_tile(icon: str, title: str, words: str, *buttons: QPushButton

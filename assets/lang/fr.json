@@ -992,7 +992,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "Neuf tuiles par page, dans le même ordre que tes pads, fais glisser les pads dans l'onglet Sons pour les réordonner.",
   "No audio device is open, pick one in Setup.": "Aucun périphérique audio n'est ouvert, choisis-en un dans Config.",
   "No cable found yet": "Aucun câble trouvé pour l'instant",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Pas encore de modes perso. Remplis le formulaire pour en créer un, ou clique sur Ajouter / Copier un intégré.",
   "No cut (full band)": "Sans coupure (bande complète)",
   "No mic is picked. Pick one in Setup → Devices.": "Aucun micro choisi. Choisis-en un dans Config → Périphériques.",
   "No programs set yet.": "Aucun programme réglé pour l'instant.",
@@ -3386,8 +3385,16 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Le téléchargeur est déjà le plus récent. Le site a peut-être changé d'une façon qu'il ne sait pas encore gérer : réessaie dans quelques jours.",
   "Update downloader": "Mettre à jour le téléchargeur",
   "Updating the downloader…": "Mise à jour du téléchargeur…",
+  "Mute the game's sounds": "Couper les sons du jeu",
+  "Turn the game's sounds on": "Activer les sons du jeu",
   "Hear {name}": "Écouter {name}",
   "Hear {name} (only you hear it)": "Écouter {name} (toi seul l'entends)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Choisis ton casque dans Paramètres → Audio pour écouter les extraits.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Des tableaux prêts à l'emploi, gratuits à utiliser partout : dans les jeux, les flux et les vidéos. Cliquez sur un son pour l'écouter d'abord (vous seul l'entendez). Ajoutez-en un et ses sons atterrissent sur votre tableau, chaque catégorie constituant son propre onglet."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Des tableaux prêts à l'emploi, gratuits à utiliser partout : dans les jeux, les flux et les vidéos. Cliquez sur un son pour l'écouter d'abord (vous seul l'entendez). Ajoutez-en un et ses sons atterrissent sur votre tableau, chaque catégorie constituant son propre onglet.",
+  "Hide the report": "Masquer le rapport",
+  "Network activity log": "Journal d'activité réseau",
+  "No custom modes yet. Fill in the form to make one.": "Pas encore de mode perso. Remplis le formulaire pour en créer un.",
+  "Show the report": "Afficher le rapport",
+  "This run only. It isn't saved.": "Cette session seulement. Pas enregistré.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Tes propres modes son, pour un chat vocal que ceux intégrés ne couvrent pas."
 }

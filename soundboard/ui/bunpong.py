@@ -5,7 +5,8 @@ He holds his bat up as his paddle on the left; yours is on the right and follows
 mouse (or the arrow keys). First to WIN_AT. Every hit speeds the ball up a little, and
 Bun only moves so fast, so a long rally is how you beat him.
 
-Nothing is kept: Esc or Close ends the game and Bun calms down again.
+Nothing is kept: Esc or Close ends the game and Bun calms down again. The game's
+sounds (pongsounds.py) play in your headphones only; the speaker button mutes them.
 """
 from __future__ import annotations
 
@@ -20,11 +21,11 @@ from PySide6.QtGui import (QBrush, QColor, QFont, QImage, QLinearGradient, QPain
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import theme, usage
+from soundboard import pongsounds, theme, usage
 from soundboard.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
-from soundboard.ui import appstate, fit
-from soundboard.ui.panel import hint_label
+from soundboard.ui import appstate, fit, icons
+from soundboard.ui.panel import hint_label, icon_button
 from soundboard.ui.pixels import snap_to_pixels
 
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # as the guides' titles (setupwizard.py)
@@ -41,7 +42,10 @@ BALL = QColor("#d8f25e")
 BUN_PINK = QColor("#ff8fae")   # his end of the court
 CONFETTI = ("#ffcf40", "#ff8fae", "#1fb6ff", "#13ce66", "#a48bff")
 RALLY_SHOWN = 3   # from this many hits in a row the rally counter shows
+MILESTONE = 5     # every this many hits in a row a chime plays
+EDGE = 0.8        # a hit this far out on your paddle (0 middle, 1 tip) is a close call
 BUBBLE = QColor("#fffaf0")
+SOUND_SID = "__pong__"   # the game's sounds in the engine (engine.FIXED_SIDS)
 
 
 def _mix(a: QColor, b: QColor, t: float, alpha: float = 1.0) -> QColor:
@@ -121,6 +125,8 @@ class Court(QWidget):
         self.setMinimumSize(320, 220)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.on_over: Callable[[], None] | None = None   # called when someone reaches WIN_AT
+        # plays one of pongsounds.NAMES: sound(name, **pongsounds.render's options)
+        self.sound: Callable[..., None] | None = None
         self.end_bun_left = 0.0   # where Bun stands at the end (the dialog centres him)
         self.reset()
 
@@ -158,12 +164,25 @@ class Court(QWidget):
         self.err = self._guess_error()
         self.trail.clear()
         self._go("play")
+        self._play("serve")
 
     def _go(self, state: str):
         self.state, self.st = state, 0.0
         # the pointer hides while you play (your paddle is the pointer)
         self.setCursor(Qt.CursorShape.BlankCursor if state in ("play", "point")
                        else Qt.CursorShape.ArrowCursor)
+
+    def _play(self, name: str, **kw):
+        if self.sound is not None:
+            self.sound(name, **kw)
+
+    def _pan(self) -> float:
+        """Where the ball is, as a stereo position: a little left of Bun to a little
+        right of you, never all the way to one ear."""
+        return (self.bx - 0.5) * 1.4
+
+    def _heat(self) -> float:
+        return max(0.0, min(1.0, (self._speed() - SPEED0) / (SPEED_MAX - SPEED0)))
 
     def _say(self, text: str, secs: float = 1.2):
         self.say, self.say_until = text, time.monotonic() + secs
@@ -260,6 +279,7 @@ class Court(QWidget):
         if self.by < ry and self.vy < 0 or self.by > 1 - ry and self.vy > 0:
             self.vy = -self.vy
             self.by = min(1 - ry, max(ry, self.by))
+            self._play("wall", pan=self._pan())
         x = self.bx * w
         # Bun's bat
         bx = g["bun_x"] + 3
@@ -298,6 +318,14 @@ class Court(QWidget):
         self.bx = x
         self.flash.append([self.bx, self.by, 0.0])
         self.rally += 1
+        heat = self._heat()
+        if sign < 0:   # yours: one step up the ladder each hit of the rally
+            self._play("you", rally=self.rally - 1, pan=self._pan(), heat=heat,
+                       edge=abs(off) >= EDGE)
+        else:
+            self._play("bun", pan=self._pan(), heat=heat)
+        if self.rally % MILESTONE == 0:
+            self._play("milestone", level=self.rally // MILESTONE)
         # sparks off the hit, in the hitter's colour, flying back into the court
         col = BUN_PINK if sign > 0 else QColor(theme.T["accent"])
         px, py = self.bx * self.width(), self.by * self.height()
@@ -321,11 +349,14 @@ class Court(QWidget):
             usage.used("egg-pong-won" if who == "you" else "egg-pong-lost")
             if who == "you":
                 self._confetti()
+            self._play("win" if who == "you" else "lose")
             self._go("over")
             self._say(_("aww…") if who == "you" else _("who's the champ!"), 1e9)
             if self.on_over:
                 self.on_over()
             return
+        self._play("score_you" if who == "you" else "score_bun")
+        QTimer.singleShot(180, self, lambda: self._play("score_pop"))
         if who == "you":
             self._say(self.fx.choice((_("no way!"), _("lucky!"), _("hey!"))))
         else:
@@ -475,7 +506,7 @@ class Court(QWidget):
             else:
                 p.drawEllipse(QPointF(sp.x, sp.y), sp.size * (1 - 0.5 * k), sp.size * (1 - 0.5 * k))
         if self.state in ("play", "ready"):
-            heat = max(0.0, min(1.0, (self._speed() - SPEED0) / (SPEED_MAX - SPEED0)))
+            heat = self._heat()
             hot = _mix(BALL, QColor(theme.T["accent"]), heat)
             p.setPen(Qt.PenStyle.NoPen)
             for i, (tx, ty) in enumerate(self.trail[:-1]):
@@ -619,6 +650,7 @@ class BunPong(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.bun = bun
+        self.win = parent   # the main window: its engine and settings, for the sounds
         self._done = False
         self.setWindowTitle(_("Pong with Bun"))
         self.setMinimumWidth(640)
@@ -641,6 +673,7 @@ class BunPong(QDialog):
         self.court = Court(rng)
         self.court.setMinimumHeight(320)
         self.court.on_over = self._show_end
+        self.court.sound = self._sound
         cl.addWidget(self.court)
         v.addWidget(self.card, 1)
 
@@ -666,6 +699,12 @@ class BunPong(QDialog):
 
         row = QHBoxLayout()
         row.addWidget(hint_label(_("Closing it ends the game. Nothing is kept.")), 1)
+        self.mute = icon_button("volume", "")
+        self.mute.setAutoDefault(False)
+        self.mute.setFocusPolicy(Qt.FocusPolicy.NoFocus)   # the arrow keys stay the game's
+        self.mute.clicked.connect(self.toggle_sounds)
+        self._mute_look()
+        row.addWidget(self.mute)
         close = QPushButton(_("Close"))
         close.setAutoDefault(False)
         close.clicked.connect(self.reject)
@@ -705,6 +744,34 @@ class BunPong(QDialog):
         c.end_bun_left = left
         self.end.setGeometry(round(left + bun_w + gap), round((c.height() - sz.height()) / 2),
                              sz.width(), sz.height())
+
+    # ------------------------------------------------------------------ sound
+    def sounds_on(self) -> bool:
+        return bool(getattr(getattr(self.win, "cfg", None), "pong_sounds", True))
+
+    def toggle_sounds(self):
+        """The speaker button: the game's sounds off or on again (kept in the settings)."""
+        on = not self.sounds_on()
+        set_option = getattr(self.win, "set_option", None)   # the main window's
+        if set_option is not None:
+            set_option("pong_sounds", on)
+        self._mute_look()
+
+    def _mute_look(self):
+        on = self.sounds_on()
+        tip = _("Mute the game's sounds") if on else _("Turn the game's sounds on")
+        icons.set_icon(self.mute, "volume" if on else "volume_off", size=18)
+        self.mute.setToolTip(tip)
+        self.mute.setAccessibleName(tip)
+
+    def _sound(self, name: str, **kw):
+        """Play one of the game's sounds, in the theme's style, in your headphones only
+        (a preview: never to your mic or the call)."""
+        eng = getattr(self.win, "engine", None)
+        if eng is None or eng.mon_stream is None or not self.sounds_on():
+            return
+        data = pongsounds.render(name, pongsounds.style_for(theme.current_name), **kw)
+        eng.play(SOUND_SID, data, 1.0, mode="overlap", preview=True)
 
     def play_again(self):
         self.end.hide()

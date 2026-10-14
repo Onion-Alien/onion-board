@@ -9,13 +9,14 @@ import html
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
-                               QFormLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget,
-                               QMenu, QPushButton, QSlider, QVBoxLayout, QWidget)
+                               QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit, QMenu,
+                               QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import destination, profiles, voicesdk
 from soundboard.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit, icons
-from soundboard.ui.panel import Flow, UndoBar, hint_label, info_button
+from soundboard.ui.panel import (EmptyList, Flow, UndoBar, hint_label, icon_button,
+                                 info_button)
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
@@ -471,38 +472,56 @@ class CustomDestDialog(QDialog):
         self._loading = False
 
         lay = QVBoxLayout(self)
-        lay.addWidget(hint_label(
+        lay.setContentsMargins(18, 18, 18, 18)
+        lay.setSpacing(12)
+        about = info_button(
             _("A mode describes what the listener's voice codec does to your sounds, so the app "
               "can pre-shape them: which frequencies it cuts, how much sub-bass to turn into "
               "harmonics that survive, how much to even out the level, and whether it's mono. "
               "The built-in modes were measured; to measure another service, run "
-              "scripts/codec_bench.py from the source tree.")))
+              "scripts/codec_bench.py from the source tree."))
+        head = QHBoxLayout()
+        head.setSpacing(8)
+        title = QLabel(_("Custom destination modes"))
+        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
+        head.addWidget(title)
+        head.addWidget(about, 0, Qt.AlignmentFlag.AlignVCenter)
+        head.addStretch(1)
+        lay.addLayout(head)
+        lay.addWidget(hint_label(_("Your own sound modes, for a voice chat the built-in ones "
+                                   "don't cover.")))
         body = QHBoxLayout()
+        body.setSpacing(14)
         left = QVBoxLayout()
-        self.list = QListWidget()
+        left.setSpacing(8)
+        self.list = EmptyList(_("No custom modes yet. Fill in the form to make one."), "sliders")
+        self.list.setMinimumWidth(200)
         self.list.currentRowChanged.connect(self._select)
         left.addWidget(self.list, 1)
-        self.empty = hint_label(_("No custom modes yet. Fill in the form to make one, or click "
-                                  "Add / Copy built-in."))
-        left.addWidget(self.empty)
         btns = QHBoxLayout()
+        btns.setSpacing(8)
         self.b_add = QPushButton(_("Add"))
+        icons.set_icon(self.b_add, "plus")
         self.b_add.clicked.connect(self.add)
         self.b_copy = QPushButton(_("Copy built-in"))
+        icons.set_icon(self.b_copy, "copy")
         self.b_copy.setToolTip(_("Start from one of the measured modes"))
         self.b_copy.clicked.connect(self.copy_builtin)
-        self.b_del = QPushButton(_("Remove"))
+        self.b_del = icon_button("trash", _("Remove"))
         self.b_del.clicked.connect(self.remove)
         for b in (self.b_add, self.b_copy, self.b_del):
-            b.setObjectName("small")
             btns.addWidget(b)
+        btns.addStretch(1)
         left.addLayout(btns)
         self.undo_bar = UndoBar(_("Put the mode back, as it was"))
         left.addWidget(self.undo_bar)
         body.addLayout(left, 1)
 
-        self.form_box = QWidget()
+        self.form_box = QFrame()
+        self.form_box.setObjectName("card")
         form = QFormLayout(self.form_box)
+        form.setContentsMargins(14, 12, 14, 14)
+        form.setVerticalSpacing(10)
         form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         self.name = QLineEdit()
         self.name.setMaxLength(40)
@@ -577,7 +596,6 @@ class CustomDestDialog(QDialog):
         # (a disabled form looked the same and just ignored clicks and typing).
         ok = 0 <= row < len(self.items)
         self.b_del.setEnabled(ok)
-        self.empty.setVisible(not self.items)
         d = Dest.from_dict(self.items[row]) if ok else Dest("", "", 0, 0.5, 0.4, True)
         self._loading = True
         self.name.setText(d.label)
@@ -662,7 +680,6 @@ class CustomDestDialog(QDialog):
             self.list.setCurrentRow(row)
             self.list.blockSignals(False)
             self.b_del.setEnabled(True)
-            self.empty.setVisible(False)
         raw = self.items[row]
         raw.update(label=self.name.text().strip() or _("My mode {n}", n=row + 1),
                    ceiling=int(self.ceiling.currentData() or 0),

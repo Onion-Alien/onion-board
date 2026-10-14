@@ -591,7 +591,6 @@
   "No": "Не",
   "No audio device is open. Pick one in Setup → Devices.": "Няма отворено аудио устройство. Избери едно в Свързване → Устройства.",
   "No cable found yet": "Още не е намерен кабел",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "Още няма собствени режими. Попълни формата, за да направиш един, или кликни Добави / Копирай вграден.",
   "No cut (full band)": "Без рязане (пълна лента)",
   "No mic is picked. Pick one in Setup → Devices.": "Не е избран микрофон. Избери един в Свързване → Устройства.",
   "No open programs found. Use Browse for a program.": "Не са намерени отворени програми. Ползвай Избери програма.",
@@ -3386,8 +3385,16 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "Програмата за изтегляне вече е най-новата. Сайтът може да се е променил по начин, с който тя още не се справя: опитай пак след няколко дни.",
   "Update downloader": "Обнови програмата за изтегляне",
   "Updating the downloader…": "Програмата за изтегляне се обновява…",
+  "Mute the game's sounds": "Заглуши звуците на играта",
+  "Turn the game's sounds on": "Включи звуците на играта",
   "Hear {name}": "Чуй {name}",
   "Hear {name} (only you hear it)": "Чуй {name} (само ти го чуваш)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Избери слушалките си в Настройки → Аудио, за да чуеш пробите.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Готови дъски, безплатни за използване навсякъде: в игри, потоци и видеоклипове. Натиснете звук, за да го чуете първо (само вие го чувате). Добавете един и неговите звуци ще се появят на вашата дъска, всяка категория като отделен раздел."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Готови дъски, безплатни за използване навсякъде: в игри, потоци и видеоклипове. Натиснете звук, за да го чуете първо (само вие го чувате). Добавете един и неговите звуци ще се появят на вашата дъска, всяка категория като отделен раздел.",
+  "Hide the report": "Скрий доклада",
+  "Network activity log": "Дневник на мрежовата активност",
+  "No custom modes yet. Fill in the form to make one.": "Още няма собствени режими. Попълни формуляра, за да направиш един.",
+  "Show the report": "Покажи доклада",
+  "This run only. It isn't saved.": "Само това пускане. Не се запазва.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Твои звукови режими, за гласов чат, който вградените не покриват."
 }

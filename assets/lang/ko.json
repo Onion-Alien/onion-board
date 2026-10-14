@@ -972,7 +972,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "패드와 동일한 순서로 한 페이지에 9개의 타일이 있습니다. 사운드 탭에서 패드를 드래그하여 재정렬하세요.",
   "No audio device is open, pick one in Setup.": "열려 있는 오디오 장치가 없습니다. 설정에서 하나를 선택하세요.",
   "No cable found yet": "아직 케이블을 찾을 수 없습니다.",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "아직 맞춤 모드가 없습니다. 양식을 작성하여 만들거나 내장된 추가/복사를 클릭하세요.",
   "No cut (full band)": "노컷(풀밴드)",
   "No mic is picked. Pick one in Setup → Devices.": "마이크가 선택되지 않았습니다. 설정 → 장치에서 하나를 선택하세요.",
   "No programs set yet.": "아직 설정된 프로그램이 없습니다.",
@@ -3310,8 +3309,16 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "다운로더가 이미 최신이에요. 사이트가 아직 처리할 수 없는 방식으로 바뀌었을 수 있어요. 며칠 뒤에 다시 시도해 보세요.",
   "Update downloader": "다운로더 업데이트",
   "Updating the downloader…": "다운로더 업데이트 중…",
+  "Mute the game's sounds": "게임 소리 끄기",
+  "Turn the game's sounds on": "게임 소리 켜기",
   "Hear {name}": "{name} 듣기",
   "Hear {name} (only you hear it)": "{name} 듣기 (나만 들려요)",
   "Pick your headphones in Settings → Audio to hear the samples.": "샘플을 들으려면 설정 → 오디오에서 헤드폰을 고르세요.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "게임, 스트리밍, 비디오 등 어디에서나 무료로 사용할 수 있는 기성 보드입니다. 사운드를 눌러 먼저 들어 보세요 (나만 들려요). 하나를 추가하면 해당 사운드가 보드에 표시되고 각 카테고리는 자체 탭으로 표시됩니다."
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "게임, 스트리밍, 비디오 등 어디에서나 무료로 사용할 수 있는 기성 보드입니다. 사운드를 눌러 먼저 들어 보세요 (나만 들려요). 하나를 추가하면 해당 사운드가 보드에 표시되고 각 카테고리는 자체 탭으로 표시됩니다.",
+  "Hide the report": "보고서 숨기기",
+  "Network activity log": "네트워크 활동 로그",
+  "No custom modes yet. Fill in the form to make one.": "아직 사용자 정의 모드가 없습니다. 양식을 채워 하나 만드세요.",
+  "Show the report": "보고서 보기",
+  "This run only. It isn't saved.": "이번 실행만. 저장되지 않습니다.",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "기본 모드로 안 맞는 음성 채팅을 위한 나만의 사운드 모드."
 }

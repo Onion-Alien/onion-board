@@ -196,7 +196,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord) and the Steam help |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
-| `soundboard/ui/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to Pong |
+| `soundboard/ui/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to Pong (its sounds: `pongsounds.py`) |
 | `soundboard/ui/choicetile.py` | ChoiceTile (a choice as a fixed-size tile: icon, name, tick, optional level bar; the setup guide's devices) and FoldPill (a small pill that opens something under it) |
 | `soundboard/ui/micupdate.py` | the offer to update the mic part: a card over the window a second after it opens; Windows is asked only after *Install update* |
 | `soundboard/ui/setupshow.py` | Bun building your mic on the Setup tab while Onion Board goes onto it (Windows asking, then loading) |
@@ -234,6 +234,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/reset.py` | Settings → General → Reset: puts the parts picked (settings, hotkeys, sounds, the bin, programs, devices) back to the start at the next launch, after saving a restore point in `%APPDATA%\OnionBoard\restore-points` that undoes it |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
 | `soundboard/bunnyfit.py` | Bun's outfit for each theme (crown, cape, laser eyes...), drawn in layers by `bunny.py`; how it all fits: [MASCOT.md](MASCOT.md) |
+| `soundboard/pongsounds.py` | the Pong game's sounds, made in code: hits that climb a scale through a rally, chimes, cheers; a style of sound per theme |
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`, and when each is let go, for hold-to-play) and key presses (`SendInput`), no hooks |
 | `soundboard/midi.py` | MIDI pad controllers as hotkeys (`midi:note 36:LPD8`): Windows' winmm over ctypes, a device opened only while a hotkey uses it, busy / unplugged devices retried |
 | `soundboard/replay.py` | instant replay: process loopback of everything but Onion Board into a ring buffer, saved as a pad on its hotkey |

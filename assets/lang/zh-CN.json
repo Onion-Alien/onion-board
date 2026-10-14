@@ -971,7 +971,6 @@
   "Nine tiles a page, in the same order as your pads. Drag pads in the Sounds tab to rearrange them.": "每页九个格子，顺序和你的按钮一样，在“音效”标签页里拖动按钮来重新排列。",
   "No audio device is open, pick one in Setup.": "没有打开任何音频设备，去“向导”里选一个。",
   "No cable found yet": "还没找到音频线",
-  "No custom modes yet. Fill in the form to make one, or click Add / Copy built-in.": "还没有自定义模式。填写表单来创建一个，或点“添加 / 复制内置”。",
   "No cut (full band)": "不切（全频段）",
   "No mic is picked. Pick one in Setup → Devices.": "没有选择麦克风。去 向导 → 设备 里选一个。",
   "No programs set yet.": "还没设置程序。",
@@ -3310,8 +3309,16 @@
   "The downloader is already the newest. The site may have changed in a way it can't handle yet: try again in a few days.": "下载器已经是最新的。网站可能改成了它暂时处理不了的样子：过几天再试试。",
   "Update downloader": "更新下载器",
   "Updating the downloader…": "正在更新下载器…",
+  "Mute the game's sounds": "静音游戏音效",
+  "Turn the game's sounds on": "打开游戏音效",
   "Hear {name}": "试听 {name}",
   "Hear {name} (only you hear it)": "试听 {name}（只有你能听到）",
   "Pick your headphones in Settings → Audio to hear the samples.": "在 设置 → 音频 里选好耳机，就能试听了。",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "现成的图板，可在任何地方免费使用：在游戏、直播和视频中。点一个声音先试听（只有你能听到）。添加一个，它的声音就会出现在你的板上，每个类别都有自己的选项卡。"
+  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "现成的图板，可在任何地方免费使用：在游戏、直播和视频中。点一个声音先试听（只有你能听到）。添加一个，它的声音就会出现在你的板上，每个类别都有自己的选项卡。",
+  "Hide the report": "隐藏报告",
+  "Network activity log": "网络活动记录",
+  "No custom modes yet. Fill in the form to make one.": "还没有自定义模式。填写表单来新建一个。",
+  "Show the report": "显示报告",
+  "This run only. It isn't saved.": "仅本次运行。不会保存。",
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "你自己的音效模式，用于内置模式不适合的语音聊天。"
 }
