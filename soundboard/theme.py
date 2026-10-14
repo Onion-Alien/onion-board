@@ -224,7 +224,7 @@ QFrame#railoutput[expanded="false"] { background:transparent; }
 QFrame#railoutput QLabel#railoutputtitle { font-weight:700; color:$text_hi; }
 QFrame#railoutput QWidget#railpairrow { background:transparent; }
 QFrame#railoutput QPushButton#railpair { background:$btn; border:1px solid transparent;
-    border-radius:8px; padding:0; }
+    border-radius:8px; padding:0; color:$text; }   /* checked (Live) too: no accent fill under it */
 QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railpair[muted="true"] { background:$danger_bg; }
 QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
