@@ -90,22 +90,22 @@ def test_playing_counts_and_most_played_sorts(window, monkeypatch):
     assert (w.meta("s0").plays, w.meta("s1").plays) == (0, 2)
     assert w._count_save.isActive()   # saved soon, not on each press
     assert [p.meta.id for p in w.grid.pads] == ["s0", "s1"]   # not re-sorted under the mouse
-    w.set_pad_sort("plays")
+    w.padctl.set_pad_sort("plays")
     assert [p.meta.id for p in w.grid.pads] == ["s1", "s0"]
     assert w.btn_view.text() == "Most played"
-    w.set_pad_sort("name")
+    w.padctl.set_pad_sort("name")
     assert [p.meta.id for p in w.grid.pads] == ["s1", "s0"]   # Airhorn, Boom
     assert [m.id for m in w.cfg.sounds] == ["s0", "s1"]          # own order kept
-    w.set_pad_sort("custom")
+    w.padctl.set_pad_sort("custom")
     assert [p.meta.id for p in w.grid.pads] == ["s0", "s1"]
 
 
 def test_dragging_while_sorted_keeps_the_own_order(window):
     w = window
-    w.set_pad_sort("name")
+    w.padctl.set_pad_sort("name")
     w.on_reorder("s0", 0)
     assert [m.id for m in w.cfg.sounds] == ["s0", "s1"]
-    w.set_pad_sort("custom")
+    w.padctl.set_pad_sort("custom")
     w.on_reorder("s1", 0)
     assert [m.id for m in w.cfg.sounds] == ["s1", "s0"]
 
@@ -113,7 +113,7 @@ def test_dragging_while_sorted_keeps_the_own_order(window):
 def test_view_menu_lists_orders_and_views(window):
     w = window
     menu = w.btn_view.menu()
-    w._fill_view_menu(menu)
+    w.padctl._fill_view_menu(menu)
     names = [a.text() for a in menu.actions() if a.text()]
     assert names == ["My order", "A–Z", "Newest", "Most played", "Cards", "List"]
     checked = [a.text() for a in menu.actions() if a.isChecked()]
@@ -124,13 +124,13 @@ def test_list_view_rows_in_columns(window):
     w = window
     w.resize(1200, 800)
     w.grid.resize(900, 600)
-    w.set_pad_view("list")
+    w.padctl.set_pad_view("list")
     assert w.grid.listed and w.cfg.pad_view == "list"
     pad = w.pads["s0"]
     assert pad.height() == SLIM_PAD_H
     cols, width = w.grid.fit_width(900 - 8)
     assert cols >= 3 and width >= 260
-    w.set_pad_view("grid")
+    w.padctl.set_pad_view("grid")
     assert not w.grid.listed
     # as tall as the picked size, however much the row stretches or squeezes it
     assert pad.height() == pad_height(min(w.grid.pad_w, round(pad.width() / PAD_SHRINK)))
@@ -142,24 +142,24 @@ def test_list_view_swaps_card_size_for_row_size(window):
     w = window
     w.resize(1500, 800)
     w.grid.resize(900, 600)
-    w.set_pad_view("list")
+    w.padctl.set_pad_view("list")
     assert all(x.isHidden() for x in w._pad_size)
     assert not any(x.isHidden() for x in w._row_size)
     assert w.btn_rows.text() == "Medium"
     pad = w.pads["s0"]
     for size in ("small", "large", "medium"):
-        w.set_list_rows(size)
+        w.padctl.set_list_rows(size)
         assert w.cfg.list_rows == size and pad.height() == LIST_ROW_H[size]
-    w.set_list_rows("huge")   # not a size: nothing changes
+    w.padctl.set_list_rows("huge")   # not a size: nothing changes
     assert w.cfg.list_rows == "medium"
-    w._fill_rows_menu(w.btn_rows.menu())
+    w.padctl._fill_rows_menu(w.btn_rows.menu())
     assert [a.text() for a in w.btn_rows.menu().actions() if a.isChecked()] == ["Medium"]
-    w.set_pad_view("grid")
+    w.padctl.set_pad_view("grid")
     assert not any(x.isHidden() for x in w._pad_size)
     assert all(x.isHidden() for x in w._row_size)
-    w._fit_size_picker(True)   # a narrow window: neither
+    w.padctl._fit_size_picker(True)   # a narrow window: neither
     assert all(x.isHidden() for x in (*w._pad_size, *w._row_size))
-    w._fit_size_picker(False)
+    w.padctl._fit_size_picker(False)
 
 
 def test_a_newer_row_size_loads_as_medium():
@@ -169,7 +169,7 @@ def test_a_newer_row_size_loads_as_medium():
 
 def test_list_view_survives_the_mini_player(window):
     w = window
-    w.set_pad_view("list")
+    w.padctl.set_pad_view("list")
     w._set_mini(True)
     assert w.grid.fit_width(300) == (1, 300)   # one row a line in the mini player
     w._set_mini(False)
@@ -213,7 +213,7 @@ def test_plain_wheel_still_scrolls(window):
 def test_pad_menu_volume_slider(window):
     w = window
     from PySide6.QtWidgets import QMenu, QSlider
-    act = w._volume_action(QMenu(w), w.meta("s1"))
+    act = w.padctl._volume_action(QMenu(w), w.meta("s1"))
     sl = act.defaultWidget().findChild(QSlider)
     assert sl.value() == 100
     sl.setValue(140)

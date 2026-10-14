@@ -143,6 +143,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
 | `soundboard/ui/panel.py` | volume boxes, the equalizer panel (emit values; the window applies them) a wrapping row layout (`Flow`) and a grid of equal-width cards (`CardGrid`) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
+| `soundboard/ui/padcontrol.py` | a pad's own controls in the main window (`MainWindow.padctl`): its right-click menu, volume slider and nudges, its picture, and the View menu (sort, grid or list, row size, pad size) |
+| `soundboard/ui/removecontrol.py` | taking sounds off the board (`MainWindow.rmctl`): asking first, removing one or several, the Undo bar, the Recently deleted bin and restoring from it |
 | `soundboard/ui/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
 | `soundboard/ui/busy.py` | click feedback for buttons: a greyed-out *Scanning…* while the work runs, then a short *✓ done* on the button (`run_busy`, `hold`, `flash`) |
 | `soundboard/ui/worker.py` | `run(fn, signal, name, error=…)`: work on a thread whose answer always comes back to the UI, the error value when it raises (so no busy flag or button stays stuck), nothing when its owner is gone |
@@ -152,6 +154,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/buncontrol.py` | Bun mode in the main window (`MainWindow.bunctl`): the window goes and the floating Bun takes its place, Back / Open the full board, Bun saying the toasts, starting as Bun |
 | `soundboard/ui/categorycontrol.py` | categories in the main window (`MainWindow.catctl`): the category tabs and sub-category row, picking, adding, renaming, deleting and colouring them, a sound's categories, switching category while a chosen program is in front |
 | `soundboard/ui/controller.py` | the base of the main window's feature controllers: a QObject the window owns, so timers and signals aimed at a controller stop with the window |
+| `soundboard/ui/editcontrol.py` | the Edit sound windows of the main window (`MainWindow.editctl`): one per sound plus a spare kept built, saving or saving a copy when one closes, closing them when their sound goes, Duplicate, Open file location, rendering a sound again |
 | `soundboard/ui/ffmpegcontrol.py` | FFmpeg in the main window (`MainWindow.ffctl`): the check at start-up, getting it by itself when it's missing or won't start, Fix it / Get FFmpeg / Reinstall, and the top bar with how far it is and Stop |
 | `soundboard/ui/importcontrol.py` | getting sounds in and out, in the main window (`MainWindow.impctl`): Add sounds / folder / link, dropped files, the sounds folder's loose files, backups and sound packs (import, export, tidy, reset, remove), other soundboards, Free packs |
 | `soundboard/ui/updatecontrol.py` | Onion Board's own updates in the main window (`MainWindow.updctl`): the check (and Onion Watch's), the update card's states, the download with Cancel, installing it, What's new |

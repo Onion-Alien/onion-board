@@ -3,13 +3,13 @@ sound files dragged into that folder in Explorer join the board by themselves.""
 import numpy as np
 import pytest
 import soundfile as sf
-
 from conftest import process_events
+from PySide6.QtGui import QDesktopServices
+from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
+
 from soundboard import library
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui import importcontrol
-from soundboard.ui import mainwindow as main
-from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 
 @pytest.fixture
@@ -64,6 +64,6 @@ def test_a_file_still_copying_in_waits(window, qapp):
 
 def test_the_button_opens_the_sounds_folder(window, monkeypatch):
     opened = []
-    monkeypatch.setattr(main.QDesktopServices, "openUrl", lambda u: opened.append(u))
+    monkeypatch.setattr(QDesktopServices, "openUrl", lambda u: opened.append(u))
     window.btn_folder.click()
     assert opened and library.Path(opened[0].toLocalFile()) == library.SOUNDS_DIR
