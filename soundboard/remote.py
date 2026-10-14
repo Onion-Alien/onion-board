@@ -836,7 +836,7 @@ def voice_names(mw: MainWindow) -> list[str]:
 
 
 def _voice_tab(mw: MainWindow):
-    """The Voice tab, for a caller that checked mw.tab_on("voice")."""
+    """The Voice tab, for a caller that checked mw.tabctl.tab_on("voice")."""
     from soundboard.ui.taboff import VoiceOff
     voice = mw.voice
     assert not isinstance(voice, VoiceOff)   # switched on: the real tab
@@ -850,7 +850,7 @@ def voice_state(mw: MainWindow) -> dict:
 
 def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     from soundboard import voicefx
-    if not mw.tab_on("voice"):
+    if not mw.tabctl.tab_on("voice"):
         return 409, VOICE_OFF
     fx = _voice_tab(mw).fx
     if action == "voices":

@@ -994,10 +994,10 @@ def test_the_first_launch_asks_what_its_for_first(mic_wizard):
     assert "Step 1 of 5" in wiz.progress.text()
     wiz.use_buttons["games"].click()
     assert "Triggers" in wiz.use_hint.text()
-    assert not w.tab_on("triggers")   # nothing changes until Next
+    assert not w.tabctl.tab_on("triggers")   # nothing changes until Next
     wiz.next_clicked()
-    assert w.cfg.use_mode == "games" and w.tab_on("triggers")
-    assert not w.tab_on("apps") and not w.tab_on("radio")
+    assert w.cfg.use_mode == "games" and w.tabctl.tab_on("triggers")
+    assert not w.tabctl.tab_on("apps") and not w.tabctl.tab_on("radio")
     assert wiz.stack.currentIndex() == wiz.base   # on to the mic
 
 
@@ -1005,7 +1005,7 @@ def test_streaming_adds_the_apps_tab_and_the_streamer_guide(mic_wizard):
     w, wiz = mic_wizard
     wiz.use_buttons["streamer"].click()
     wiz.next_clicked()
-    assert w.tab_on("apps") and not w.tab_on("triggers")
+    assert w.tabctl.tab_on("apps") and not w.tabctl.tab_on("triggers")
     wiz.go(wiz.PAGES - 1)
     assert not wiz.btn_streamer.isHidden() and wiz.btn_streamer.toolTip()
 

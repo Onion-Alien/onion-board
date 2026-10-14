@@ -13,9 +13,13 @@ from PySide6.QtCore import QRect, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication
 
 from soundboard import usage, winkeys
+from soundboard.i18n import _
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
+
+BUN_TIP = _("Turn into Bun: a small Bun floating on top instead of this window. The "
+            "button under him brings it back.")
 
 FULL_FROM_BUN = QSize(1180, 720)   # Bun grown past his biggest opens the board this big
 

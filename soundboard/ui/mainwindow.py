@@ -50,6 +50,7 @@ from soundboard.ui import routewarn
 from soundboard.ui import worker
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.ffmpegcontrol import FfmpegControl
+from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, TabControl
 from soundboard.ui.statuscontrol import StatusControl
 from soundboard.ui.miccontrol import MIC_OFFER_MS, MicControl
 from soundboard.ui.routecontrol import ROUTE_DEVICE, RouteControl
@@ -58,7 +59,7 @@ from soundboard.ui.editcontrol import EditControl
 from soundboard.ui.removecontrol import RemoveControl
 from soundboard.ui.padcontrol import PadControl
 from soundboard.ui.remoteaccess import RemoteAccess
-from soundboard.ui.buncontrol import BunControl
+from soundboard.ui.buncontrol import BUN_TIP, BunControl
 from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
@@ -111,17 +112,6 @@ def version_text() -> str:
     return _("{version} from source", version=__version__)
 
 
-# The tabs, in order: each one is a thing you can play (or, last, the setup). The
-# tooltip says what it's for in a few words.
-# the tabs' keys (never translated: settings, Tabs on/off, the usage count) and labels
-TAB_KEYS = ("sounds", "radio", "apps", "triggers", "voice", "setup")
-TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
-        (_("Radio"), _("Internet radio stations from around the world")),
-        (_("Apps"), _("Send another program's sound (music player, game…)")),
-        (_("Triggers"), _("Play a sound when something shows up on your screen (“YOU DIED”…)")),
-        (_("Voice"), _("Change your voice, speak another language, or use text-to-speech")),
-        (_("Setup"), _("Pick where your sounds go (Discord, games, OBS…), test it")))
-TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
 
 
 # an effects preview of a sound longer than this renders only its first PREVIEW_S
@@ -150,8 +140,6 @@ RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (raw
 BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
-BUN_TIP = _("Turn into Bun: a small Bun floating on top instead of this window. The "
-            "button under him brings it back.")
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -362,6 +350,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.tabctl = TabControl(self)
         self.statusctl = StatusControl(self)
         self.micctl = MicControl(self)
         self.routectl = RouteControl(self)
@@ -933,7 +922,7 @@ class MainWindow(QMainWindow):
             self.tabs.setTabText(i, text)
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
-            self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
+            self.tabs.setTabVisible(TAB_INDEX[key], self.tabctl.tab_shown(key))
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
@@ -947,10 +936,10 @@ class MainWindow(QMainWindow):
                                         "triggers"))
         from soundboard.ui import moretabs
         mt = self.more_menu = moretabs.Menu(self.btn_more_tabs)
-        mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
-        mt.aboutToHide.connect(self._more_tabs_hidden)
+        mt.aboutToShow.connect(lambda: self.tabctl._fill_more_tabs(mt))
+        mt.aboutToHide.connect(self.tabctl._more_tabs_hidden)
         self.btn_more_tabs.clicked.connect(mt.pop)
-        self._update_more_tabs()
+        self.tabctl._update_more_tabs()
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs], self.cfg.sidebar_open, [self.gear, self.btn_about],
@@ -972,9 +961,9 @@ class MainWindow(QMainWindow):
         # through them (the tab widget does that only while it has the focus)
         for n in range(1, 10):
             QShortcut(QKeySequence(f"Ctrl+{n}"), self,   # pyright: ignore[reportCallIssue]  # signal keyword
-                      activated=lambda n=n: self._go_tab(n - 1, absolute=True))
-        QShortcut(QKeySequence("Ctrl+Tab"), self, activated=lambda: self._go_tab(1))   # pyright: ignore[reportCallIssue]
-        QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self._go_tab(-1))   # pyright: ignore[reportCallIssue]
+                      activated=lambda n=n: self.tabctl._go_tab(n - 1, absolute=True))
+        QShortcut(QKeySequence("Ctrl+Tab"), self, activated=lambda: self.tabctl._go_tab(1))   # pyright: ignore[reportCallIssue]
+        QShortcut(QKeySequence("Ctrl+Shift+Tab"), self, activated=lambda: self.tabctl._go_tab(-1))   # pyright: ignore[reportCallIssue]
         self.rail.orderChanged.connect(
             lambda order: self.set_option("sidebar_order", [TAB_KEYS[i] for i in order]))
         # a tab asked for (the rail, Ctrl+1..., a link) while Settings is up: back to the
@@ -1001,7 +990,7 @@ class MainWindow(QMainWindow):
         # bring it back)
         for b in self.rail.buttons:
             b.customContextMenuRequested.connect(
-                lambda pos, b=b: self.tab_menu(b.index).exec(b.mapToGlobal(pos)))
+                lambda pos, b=b: self.tabctl.tab_menu(b.index).exec(b.mapToGlobal(pos)))
         # every tab has a line for its right-click "About this tab" (the Apps tab brings
         # its own)
         self.tab_info.setdefault("sounds_page", (
@@ -1033,11 +1022,11 @@ class MainWindow(QMainWindow):
               "test that records what goes out and plays it back.")))
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
-        self._focus_open_tab()
+        self.tabctl._focus_open_tab()
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._fit_dl_bar())
-        self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
-        self._count_tab(self.tabs.currentIndex())
+        self.tabs.currentChanged.connect(self.tabctl._count_tab)   # names only (usage.py)
+        self.tabctl._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self.statusctl._update_status())
         self.tabs.currentChanged.connect(self._focus_sounds_page)
         # an urgent Onion Watch fix's banner shows on the Triggers tab only
@@ -1048,8 +1037,8 @@ class MainWindow(QMainWindow):
         # sent, the screen watched — so it's never left on without you noticing
         set_live_tint(self.tabs, self.cfg.live_tab_green)
         for key in ("voice", "triggers", "apps"):
-            self._tab_live(key, getattr(self, key).is_active())
-        self._radio_live(self.radio.is_active())
+            self.tabctl._tab_live(key, getattr(self, key).is_active())
+        self.tabctl._radio_live(self.radio.is_active())
         self._search_follow_switch()
         net.on_change(self._follow_switches)
 
@@ -2746,54 +2735,16 @@ class MainWindow(QMainWindow):
         """The Radio tab, or with Radio switched off in Settings > Privacy & security a
         panel saying so: then no directory, player or web view is made at all. (The
         same panel stands in, hidden, while the tab is switched off in Settings > Tabs.)"""
-        if net.allowed("radio") and self.tab_on("radio"):
+        if net.allowed("radio") and self.tabctl.tab_on("radio"):
             r = RadioTab(self.engine, self.cfg, self._save_later, Meter)
             r.clip_ready.connect(self.on_clip)
         else:
             r = RadioOff()
             r.open_settings.connect(lambda: self.open_settings("privacy"))
-        r.active_changed.connect(self._radio_live)
+        r.active_changed.connect(self.tabctl._radio_live)
         self.radio_page.addWidget(r)
         self.radio_page.setCurrentWidget(r)
         return r
-
-    def _radio_live(self, on: bool):
-        set_tab_live(self.tabs, self.tabs.indexOf(self.radio_page), on,
-                     self.radio.live_tip(), "radio")
-
-    def _focus_open_tab(self):
-        """The window's first focus: the open tab's page (Ctrl+V on Sounds works at
-        once). Left to Qt, a window shown with nothing focused focuses its first
-        focusable widget as if Tab were pressed: the Sounds rail button, with its
-        keyboard ring, whatever tab was open, so it looked like a second picked tab."""
-        if (fw := self.focusWidget()) is not None and not self.rail.isAncestorOf(fw):
-            return   # something else has it already
-        if (page := self.tabs.currentWidget()) is not None:
-            page.setFocus(Qt.FocusReason.OtherFocusReason)
-
-    def tab_on(self, key: str) -> bool:
-        """Whether a tab (taboff.KEYS) is switched on in Settings > Tabs."""
-        return key not in self.cfg.tabs_off
-
-    def needs_online(self, key: str) -> bool:
-        """In Offline mode, whether a tab is of no use at all: Radio, and Triggers
-        until Onion Watch is installed (its page is only the Get button). Those are
-        hidden, and + More tabs doesn't offer them."""
-        if not net.offline():
-            return False
-        if key == "radio":
-            return True
-        if key == "triggers":
-            has = getattr(self.triggers, "has_addon", None)   # (switched off: a stand-in)
-            if has is not None:
-                return not has()
-            from soundboard import watchaddon
-            return watchaddon.installed() is None and watchaddon.local_zip() is None
-        return False
-
-    def tab_shown(self, key: str) -> bool:
-        """Whether a tab is in the tab bar: switched on, and of use (needs_online)."""
-        return self.tab_on(key) and not self.needs_online(key)
 
     @overload
     def _make_tab(self, key: Literal["voice"]) -> VoicePanel | taboff.VoiceOff: ...
@@ -2808,7 +2759,7 @@ class MainWindow(QMainWindow):
     def _make_tab(self, key: str):
         """The Apps, Triggers or Voice tab, wired to the window; or, switched off in
         Settings > Tabs, its stand-in (nothing of the tab is made or loaded)."""
-        if not self.tab_on(key):
+        if not self.tabctl.tab_on(key):
             self.tab_info.pop(key, None)
             if key != "voice":
                 return taboff.TabOff()
@@ -2833,42 +2784,8 @@ class MainWindow(QMainWindow):
             # the Onion Watch add-on, or Hoot and its download button until it's
             # installed; loaded by load_triggers
             v = TriggersTab(BoardHost(self), defer=True)
-        v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
+        v.active_changed.connect(lambda on, k=key: self.tabctl._tab_live(k, on))
         return v
-
-    def _more_tab_keys(self) -> list[str]:
-        """The tabs + More tabs offers: switched off, and of use (not Radio offline)."""
-        return [k for k in taboff.KEYS if not self.tab_on(k) and not self.needs_online(k)]
-
-    def _update_more_tabs(self):
-        self.btn_more_tabs.setVisible(bool(self._more_tab_keys()))
-
-    def _fill_more_tabs(self, menu: QMenu):
-        """+ More tabs: a card for each tab that's switched off, with what it's good
-        for (click: it's added and opened), then Settings > Tabs to pick them all."""
-        from soundboard.ui import moretabs
-        off = [(k, *TABS[TAB_INDEX[k]]) for k in self._more_tab_keys()]
-        self._more_added = False
-        usage.used("more-tabs-opened")
-        moretabs.fill(menu, off, self._add_from_more, lambda: self.open_settings("tabs"))
-
-    def _more_tabs_hidden(self):
-        """+ More tabs closed: counted when nothing was added (a pick's triggered
-        signal comes after the menu hides, so this looks once that's through)."""
-        def check():
-            if not getattr(self, "_more_added", True):
-                usage.used("more-tabs-closed")
-            self._more_added = True
-        QTimer.singleShot(0, check)
-
-    def _add_from_more(self, key: str):
-        self._more_added = True
-        usage.used(f"more-tabs-added-{key}")
-        self._add_tab(key)
-
-    def _add_tab(self, key: str):
-        self.set_tab_on(key, True)
-        self.tabs.setCurrentIndex(TAB_INDEX[key])
 
     def _squeeze_rail(self, tight: bool):
         """A narrow window: the rail shut (opened out, it shuts again) and the gap
@@ -2897,107 +2814,6 @@ class MainWindow(QMainWindow):
             self._fit.reset()
             self._refit()
 
-    def tab_menu(self, i: int) -> QMenu:
-        key = TAB_KEYS[i]
-        menu = QMenu(self)
-        menu.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        if self._tab_info_at(i) is not None:
-            menu.addAction(icons.icon("info"), _("About this tab"),
-                           lambda: self._show_tab_info(i))
-            menu.addSeparator()
-        if key in taboff.KEYS:
-            act = menu.addAction(icons.icon("offline"), _("Hide this tab"))
-            act.triggered.connect(lambda: self.hide_tab(key))
-        else:
-            act = menu.addAction(icons.icon("check"), _("This tab is always shown"))
-            act.setEnabled(False)
-        menu.addSeparator()
-        menu.addAction(icons.icon("settings"), _("Choose tabs in Settings"),
-                       lambda: self.open_settings("tabs"))
-        # Bun mode from the full window too (the mini player has its own Bun button)
-        menu.addSeparator()
-        act = menu.addAction(self._bun_icon(), _("Turn into Bun"), self.bunctl.enter_bun_mode)
-        act.setToolTip(BUN_TIP)
-        menu.setToolTipsVisible(True)
-        return menu
-
-    def hide_tab(self, key: str):
-        """Hide a tab from its right-click menu, saying where to get it back."""
-        self.set_tab_on(key, False)
-        usage.used(f"tab-hidden-{key}")
-        self.toast(_("{tab} hidden. Bring it back with + More tabs or Settings > Tabs.",
-                     tab=TABS[TAB_INDEX[key]][0]))
-
-    def _tab_live(self, key: str, on: bool):
-        """The live badge on the Voice, Triggers or Apps tab."""
-        page = getattr(self, key)
-        if key == "voice":   # the active voice's picture, when there is one
-            set_tab_live(self.tabs, TAB_INDEX[key], on,
-                         _("● ON: others hear your changed / computer voice"), page.tab_icon())
-        elif key == "triggers":
-            set_tab_live(self.tabs, TAB_INDEX[key], on, _("● ON: watching your screen"),
-                         "triggers")
-        else:
-            set_tab_live(self.tabs, TAB_INDEX[key], on, page.live_tip(), "apps")
-
-    def set_tab_on(self, key: str, on: bool):
-        """Settings > Tabs: switch a tab off (what it was doing stops, it's shut down
-        and hidden, and it isn't made again, even at the next start) or back on (made
-        afresh and shown)."""
-        if key not in taboff.KEYS or self.tab_on(key) == on:
-            return
-        off = [k for k in self.cfg.tabs_off if k != key]
-        self.set_option("tabs_off", off if on else [*off, key])
-        i = TAB_INDEX[key]
-        if not on and self.tabs.currentIndex() == i:
-            self.tabs.move_to(0)   # (Settings, where this is done, stays up)
-        if key == "radio":
-            self._radio_follow_switch()
-        else:
-            self._swap_tab(key)
-        self.tabs.setTabVisible(i, self.tab_shown(key))
-        self._update_more_tabs()
-        log.info("tab %s switched %s", key, "on" if on else "off")
-        if on:   # once per install, sent now (usage.py: a daily count could be a day off)
-            usage.step(self.cfg, f"added-{key}-tab")
-        self.tab_switched.emit(key, on)
-
-    def _swap_tab(self, key: str):
-        """Put a freshly made `key` tab (or its stand-in) in place of the one there."""
-        i, old = TAB_INDEX[key], getattr(self, key)
-        if key == "triggers":
-            old.cancel_pending()   # sounds still waiting out a trigger's wait
-        old.shutdown()   # first: a new Voice tab sets the engine's voice chain
-        steps = self._tab_steps.pop(key, []) if hasattr(self, "_fit") else []
-        if steps:
-            self._fit.remove(steps)
-        new = self._make_tab(key)
-        setattr(self, key, new)
-        bar = self.tabs.tabBar()
-        text, tip, name = self.tabs.tabText(i), self.tabs.tabToolTip(i), bar.accessibleTabName(i)
-        cur = self.tabs.currentIndex()
-        with QSignalBlocker(self.tabs):   # no tab change saved, no status rewritten
-            self.tabs.removeTab(i)
-            self.tabs.insertTab(i, new, text)
-            self.tabs.setTabToolTip(i, tip)
-            bar.setAccessibleTabName(i, name)
-            self.tabs.setCurrentIndex(cur)
-        self.rail.sync()
-        icons.set_tab_icon(self.tabs, i, key)
-        old.deleteLater()
-        self._tab_live(key, False)
-        if key == "triggers":
-            self.load_triggers()
-        if hasattr(self, "_fit"):
-            if key in ("voice", "triggers"):
-                assert not isinstance(new, AppsTab)
-                self._tab_steps[key] = new.fit_steps()
-                self._fit.extend(self._tab_steps[key])
-            if key == "voice":
-                assert isinstance(new, (VoicePanel, taboff.TabOff))
-                self._stack_cols = (*self._stack_cols[:1], *new.stack_steps())
-            self._refit()
-
     def _follow_switches(self):
         """Settings > Privacy & security changed: the parts of the window that go
         online follow their switches."""
@@ -3014,11 +2830,11 @@ class MainWindow(QMainWindow):
         self._net_follow()
         for key in ("radio", "triggers"):
             i = TAB_INDEX[key]
-            shown = self.tab_shown(key)
+            shown = self.tabctl.tab_shown(key)
             if not shown and self.tabs.currentIndex() == i:
                 self.tabs.move_to(0)   # (Settings, where this is done, stays up)
             self.tabs.setTabVisible(i, shown)
-        self._update_more_tabs()
+        self.tabctl._update_more_tabs()
 
     def _search_follow_switch(self):
         """Finding sounds online switched off: no Search button, and the search box
@@ -3045,7 +2861,8 @@ class MainWindow(QMainWindow):
     def _radio_follow_switch(self):
         """Radio switched off: the tab becomes the "off" panel (a playing station
         stops); switched back on, the tab is built again."""
-        if (net.allowed("radio") and self.tab_on("radio")) == isinstance(self.radio, RadioTab):
+        on = net.allowed("radio") and self.tabctl.tab_on("radio")
+        if on == isinstance(self.radio, RadioTab):
             return
         old, playing = self.radio, self.radio.is_active()
         old.shutdown()
@@ -3058,7 +2875,7 @@ class MainWindow(QMainWindow):
             self._radio_steps = self.radio.fit_steps()
             self._fit.extend(self._radio_steps)
             self._refit()
-        self._radio_live(False)
+        self.tabctl._radio_live(False)
         if playing:
             self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
 
@@ -3504,7 +3321,7 @@ class MainWindow(QMainWindow):
     def _maybe_tip(self) -> bool:
         """Show today's tip if it's time. True when there's nothing more to try this
         start (one shown, or none due)."""
-        tip = tips.due(self.cfg, self.tab_on)
+        tip = tips.due(self.cfg, self.tabctl.tab_on)
         if tip is None:
             self._tip_timer.stop()
             return True
@@ -3815,9 +3632,9 @@ class MainWindow(QMainWindow):
             self._voice_was = None
             self._set_voice(on)
             # the Voice tab switched off: nothing went on, so no "on" beep either
-            self.cue("fail" if not self.tab_on("voice") else "start" if on else "stop")
+            self.cue("fail" if not self.tabctl.tab_on("voice") else "start" if on else "stop")
         elif action == "__voicehold__":
-            if self._voice_was is None and self.tab_on("voice"):
+            if self._voice_was is None and self.tabctl.tab_on("voice"):
                 self._voice_was = self.voice.fx.btn_power.isChecked()
             self._set_voice(True)
         elif action == "__replay__":
@@ -3835,7 +3652,7 @@ class MainWindow(QMainWindow):
 
     def _set_voice(self, on: bool):
         """The voice changer's big ON / OFF switch, from a hotkey."""
-        if not self.tab_on("voice"):
+        if not self.tabctl.tab_on("voice"):
             if on:
                 self.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
             return
@@ -5155,23 +4972,6 @@ class MainWindow(QMainWindow):
         usage.mark_stopped(library.APP_DIR)
         exitwatch.stopped()
 
-    def _count_tab(self, i: int):
-        if 0 <= i < len(TABS):
-            usage.tab_opened(self.cfg, TAB_KEYS[i])
-
-    def _go_tab(self, n: int, absolute: bool = False):
-        """The n-th tab on the rail (`absolute`), or the one n steps from this one."""
-        shown = [b for b in self.rail.buttons if b.isVisible()]
-        if not shown:
-            return
-        usage.used("tab-keys")
-        if absolute:
-            if n < len(shown):
-                shown[n].click()
-            return
-        cur = next((k for k, b in enumerate(shown) if b.index == self.tabs.currentIndex()), 0)
-        shown[(cur + n) % len(shown)].click()
-
     # ------------------------------------------------------------------ test mode
     def on_mic_check(self, on):
         self.engine.ring_mon.clear()
@@ -5205,7 +5005,7 @@ class MainWindow(QMainWindow):
         if not getattr(self, "_start_focus_set", False):
             # (again here: start-up can still switch the tab after __init__, to Setup)
             self._start_focus_set = True
-            self._focus_open_tab()
+            self.tabctl._focus_open_tab()
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
         if note:   # held back while the window was in the tray (see __init__)

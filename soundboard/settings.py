@@ -1489,7 +1489,8 @@ class SettingsDialog(QDialog):
         row = _button_row()   # one line, wrapping only when the window is narrow
         add = QPushButton(_("Add a voice server"))
         icons.set_icon(add, "plus")
-        add.clicked.connect(lambda: mw.tab_on("voice") and mw.voice.speech._add_voice_server())
+        add.clicked.connect(
+            lambda: mw.tabctl.tab_on("voice") and mw.voice.speech._add_voice_server())
         row.addWidget(add)
         folder = QPushButton(_("Open voices folder"))
         folder.setToolTip(_("Voice packs and voice settings go here; README.txt in it says how"))
@@ -1498,7 +1499,7 @@ class SettingsDialog(QDialog):
         show = QPushButton(_("Show on the Voice tab"))
 
         def go():
-            if not mw.tab_on("voice"):
+            if not mw.tabctl.tab_on("voice"):
                 return
             self.accept()
             mw.tabs.setCurrentWidget(mw.voice)
@@ -1507,7 +1508,7 @@ class SettingsDialog(QDialog):
         row.addWidget(show)
         cv.addLayout(row)
         self.voices_card, self.voices_show = card, show
-        if not mw.tab_on("voice"):   # (never show() it here: not in its page yet, it'd
+        if not mw.tabctl.tab_on("voice"):   # (never show() it here: not in its page yet, it'd
             card.hide()              # flash up as a little window of its own)
         return card
 
@@ -1737,13 +1738,13 @@ class SettingsDialog(QDialog):
             _("Switch off the tabs you don't use. A switched-off tab is gone from the window and "
               "doesn't load at all, so nothing of it runs in the background. Switch it back on "
               "any time, here or with + More tabs after the tabs. Right-click a tab to hide it."))
-        from soundboard.ui.mainwindow import TAB_KEYS, TABS
+        from soundboard.ui.tabcontrol import TAB_KEYS, TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
         for key, (text, _tip) in zip(TAB_KEYS, TABS):
             if key in self.TAB_HINTS:
                 self.tab_boxes[key] = self._option(
-                    cv, text, self.TAB_HINTS[key], self.mw.tab_on(key),
-                    lambda on, k=key: self.mw.set_tab_on(k, on))
+                    cv, text, self.TAB_HINTS[key], self.mw.tabctl.tab_on(key),
+                    lambda on, k=key: self.mw.tabctl.set_tab_on(k, on))
             else:   # Sounds and Setup: the board itself, and where it sends
                 box = self._option(cv, text, _("Always on."), True, lambda _on: None)
                 box.setEnabled(False)
@@ -2061,7 +2062,7 @@ class SettingsDialog(QDialog):
             """The Triggers tab there now: switched off and on again (Settings > Tabs)
             while this is open, it's a new one; switched off, None (nothing of it is
             loaded)."""
-            return self.mw.triggers if self.mw.tab_on("triggers") else None
+            return self.mw.triggers if self.mw.tabctl.tab_on("triggers") else None
 
         def refresh(note: str = ""):
             if not qt_valid(status):
@@ -2994,7 +2995,7 @@ class SettingsDialog(QDialog):
         for card, online_only in list(getattr(self, "_offline_cards", {}).items()):
             if qt_valid(card):
                 self._offline_hide(card, self._offline_says(online_only))
-        needs = getattr(self.mw, "needs_online", None)
+        needs = getattr(getattr(self.mw, "tabctl", None), "needs_online", None)
         for key, box in getattr(self, "tab_boxes", {}).items():
             if qt_valid(box) and needs is not None:
                 box.setEnabled(not needs(key))
