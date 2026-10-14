@@ -1817,7 +1817,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub की डाउनलोड जांच अस्थायी रूप से अनुपलब्ध है (गेटवे त्रुटि)। एक पल में फिर से ओनियन वॉच प्राप्त करने का प्रयास करें।",
   "Got it": "समझ गया",
   "Growl": "बादल की गरज",
-  "Hear": "सुनो",
   "Hear it": "यह सुनकर",
   "Helmet": "हेलमेट",
   "Helmet size": "हेलमेट का आकार",
@@ -3346,5 +3345,7 @@
   "snappy": "झटपट",
   "soft": "नरम",
   "warm": "गर्म",
-  "clean": "साफ़"
+  "clean": "साफ़",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "इस प्रोग्राम का आख़िरी मिनट वेवफ़ॉर्म के रूप में: उसमें से एक हिस्सा चुनें और उसे क्लिप के रूप में रखें। यह सिर्फ़ खुला रहने पर ही सुनता है।",
+  "Pre-delay": "प्री-डिले"
 }

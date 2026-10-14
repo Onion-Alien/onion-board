@@ -1814,7 +1814,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHubin lataustarkistus ei ole tilapäisesti käytettävissä (yhdyskäytävävirhe). Kokeile Get Onion Watchia hetken kuluttua uudelleen.",
   "Got it": "Selvä",
   "Growl": "Murista",
-  "Hear": "Kuulla",
   "Hear it": "Kuule se",
   "Helmet": "Kypärä",
   "Helmet size": "Kypärän koko",
@@ -3346,5 +3345,7 @@
   "snappy": "napakka",
   "soft": "pehmeä",
   "warm": "lämmin",
-  "clean": "puhdas"
+  "clean": "puhdas",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ohjelman viimeinen minuutti aaltomuotona: valitse siitä pätkä ja tallenna se leikkeeksi. Se kuuntelee vain, kun se on auki.",
+  "Pre-delay": "Esiviive"
 }

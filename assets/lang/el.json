@@ -1814,7 +1814,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκιμάστε το Get Onion Watch ξανά σε λίγο.",
   "Got it": "Κατάλαβα",
   "Growl": "Γκρινιάζω",
-  "Hear": "Ακούω",
   "Hear it": "Ακούστε το",
   "Helmet": "Κράνος",
   "Helmet size": "Μέγεθος κράνους",
@@ -3346,5 +3345,7 @@
   "snappy": "απότομα",
   "soft": "απαλά",
   "warm": "ζεστά",
-  "clean": "καθαρά"
+  "clean": "καθαρά",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Το τελευταίο λεπτό αυτού του προγράμματος ως κυματομορφή: διάλεξε ένα κομμάτι και κράτησέ το ως κλιπ. Ακούει μόνο όσο είναι ανοιχτό.",
+  "Pre-delay": "Προ-καθυστέρηση"
 }

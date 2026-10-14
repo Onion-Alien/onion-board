@@ -1861,7 +1861,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Kontrola pobierania w GitHub jest tymczasowo niedostępna (błąd bramy). Spróbuj ponownie uzyskać dostęp do Onion Watch za chwilę.",
   "Got it": "Rozumiem",
   "Growl": "Warczeć",
-  "Hear": "Słyszeć",
   "Hear it": "Usłysz to",
   "Helmet": "Kask",
   "Helmet size": "Rozmiar kasku",
@@ -3421,5 +3420,7 @@
   "snappy": "ostro",
   "soft": "miękko",
   "warm": "ciepło",
-  "clean": "czysto"
+  "clean": "czysto",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Ostatnia minuta tego programu jako fala dźwiękowa: wybierz z niej fragment i zachowaj go jako klip. Słucha tylko, gdy jest otwarty.",
+  "Pre-delay": "Pre-delay"
 }
