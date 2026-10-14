@@ -40,7 +40,7 @@ THEMES: dict[str, dict[str, str]] = {
         text="#ececee", text_hi="#fafafa", muted="#8d8d95", faint="#6c6c74", section="#9c9ca5",
         accent="#7859f7", accent_hi="#8d71ff", accent2="#ff4d8d", on_accent="#ffffff",
         off="#4a4a54", badge="#2c2c33", badge_text="#d8d8de",
-        danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
+        danger_bg="#3f1d27", danger_border="#5f2a3a", danger_text="#ff8fa3", danger_hover="#4f2531",
         warn_bg="#3a2e14", warn_text="#ffb020",
         ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
     ),
