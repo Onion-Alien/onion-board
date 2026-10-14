@@ -694,7 +694,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         m = mw.meta(sid)
         return 200, {"playing": sid, "name": m.name if m is not None else ""}
     if action == "last":
-        sid = getattr(mw, "_last_sid", None)
+        sid = getattr(mw.playctl, "_last_sid", None)
         m = mw.meta(sid) if sid is not None else None
         if sid is None or m is None:
             return 404, {"error": "nothing has played yet"}
