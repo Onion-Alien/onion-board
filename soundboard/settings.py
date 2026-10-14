@@ -3503,6 +3503,10 @@ class SettingsDialog(QDialog):
                     sig.disconnect(slot)
                 except (RuntimeError, TypeError):
                     pass
+        # hiding it hands the focus on as if Tab were pressed (a keyboard ring on the
+        # Sounds rail tab): the window takes it back, but only knows to if told here
+        fw = QApplication.focusWidget()
+        self.had_focus = fw is not None and self.isAncestorOf(fw)
         super().done(r)
 
     # ------------------------------------------------------------------ remote control
