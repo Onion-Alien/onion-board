@@ -143,6 +143,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
 | `soundboard/ui/panel.py` | volume boxes, the equalizer panel (emit values; the window applies them) a wrapping row layout (`Flow`) and a grid of equal-width cards (`CardGrid`) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
+| `soundboard/ui/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
 | `soundboard/ui/miccontrol.py` | straight into the mic and the virtual cable in the main window (`MainWindow.micctl`): the mic effect's status, putting it on the mic (and back by itself), the mic helper, its update offer, falling back to the cable; installing, removing and fixing the cable; Windows' mic settings |
 | `soundboard/ui/padcontrol.py` | a pad's own controls in the main window (`MainWindow.padctl`): its right-click menu, volume slider and nudges, its picture, and the View menu (sort, grid or list, row size, pad size) |
 | `soundboard/ui/routecontrol.py` | where the main window's sounds go (`MainWindow.routectl`): the device pickers, the route (the mic, a cable, or only you), the extra send outputs and OBS's device, what the mic button and mute do |
@@ -154,6 +155,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
 | `soundboard/ui/aboutcontrol.py` | the main window's About menu (`MainWindow.aboutctl`): the version, Join the Discord, Send feedback, the website |
 | `soundboard/ui/alertcontrol.py` | the urgent bar in the main window (`MainWindow.alertctl`): an important fix for Onion Board or Onion Watch, Discord's own settings hurting your sounds, apps recording your mic around the mic effect; one at a time, each can be hidden |
+| `soundboard/ui/appsetupcontrol.py` | set up for the app you're using, in the main window (`MainWindow.appsetctl`): noticing the voice app or game in front, the bar offering to set up for it (Yes / Not now / x, Undo), its checks once done, picking where sounds go by itself |
 | `soundboard/ui/buncontrol.py` | Bun mode in the main window (`MainWindow.bunctl`): the window goes and the floating Bun takes its place, Back / Open the full board, Bun saying the toasts, starting as Bun |
 | `soundboard/ui/categorycontrol.py` | categories in the main window (`MainWindow.catctl`): the category tabs and sub-category row, picking, adding, renaming, deleting and colouring them, a sound's categories, switching category while a chosen program is in front |
 | `soundboard/ui/controller.py` | the base of the main window's feature controllers: a QObject the window owns, so timers and signals aimed at a controller stop with the window |
@@ -166,6 +168,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/statuscontrol.py` | what the main window says about its audio (`MainWindow.statusctl`): the devices' status line and card, and the Setup tab's flow (what you hear, what others hear, the set-up buttons and which one is the main one) |
 | `soundboard/ui/tabcontrol.py` | the main window's tabs (`MainWindow.tabctl`): which are on and shown, switching them on and off, the More tabs menu, a tab's right-click menu, moving a tab's place, the tab keys, counting which tab was opened |
 | `soundboard/ui/themecontrol.py` | the main window's look (`MainWindow.themectl`): applying a theme, the Live colour, the background texture, the live tab's tint, the onion logo |
+| `soundboard/ui/tipcontrol.py` | tips and help in the main window (`MainWindow.tipctl`): a tip once things settle, Show me, tips off, a tab's About this tab, the mic tips, the Help menu |
 | `soundboard/ui/updatecontrol.py` | Onion Board's own updates in the main window (`MainWindow.updctl`): the check (and Onion Watch's), the update card's states, the download with Cancel, installing it, What's new |
 | `soundboard/ui/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
 | `soundboard/ui/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded out after: never a half-styled frame |

@@ -4,6 +4,7 @@ MainWindow on Qt's offscreen platform, no hotkeys registered)."""
 from soundboard import winkeys
 from soundboard.library import Config
 from soundboard.ui import hotkeycontrol
+from soundboard.ui.dialogs import TabHelpPopup
 from soundboard.ui import mainwindow as main
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -138,7 +139,7 @@ def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
 
 def test_tab_explanations_are_in_each_tabs_right_click_menu(window, monkeypatch):  # noqa: F811
     shown = []
-    monkeypatch.setattr(main.TabHelpPopup, "exec", lambda box: shown.append(box.windowTitle()))
+    monkeypatch.setattr(TabHelpPopup, "exec", lambda box: shown.append(box.windowTitle()))
     for page, title in ((window.apps, "Send a program's sound"),
                         (window.sounds_page, "Your sounds")):
         menu = window.tabctl.tab_menu(window.tabs.indexOf(page))

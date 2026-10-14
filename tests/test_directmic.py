@@ -2248,18 +2248,18 @@ def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa:
     monkeypatch.setattr(w.engine, "direct_stream", lambda: object())
     from soundboard import engine as eng
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
-    assert w._heard_device() == ("Microphone (Test Headset)",)
+    assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",)
     monkeypatch.setattr(eng, "virtual_outputs", lambda: ["CABLE Input (VB-Audio Virtual Cable)"])
     monkeypatch.setattr(eng, "virtual_mic_for",   # (no real cable needed: CI has none)
                         lambda name: name and name.replace("Input", "Output"))
     # a voice app still set to the cable counts too
-    assert w._heard_device() == ("Microphone (Test Headset)",
+    assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",
                                  "CABLE Output (VB-Audio Virtual Cable)")
     monkeypatch.setattr(w.engine, "direct_stream", lambda: None)
-    assert w._heard_device() is None   # not sending into it: nobody hears the board there
+    assert w.appsetctl._heard_device() is None   # not sending into it: nobody hears the board there
     w.cfg.route = "cable"
     monkeypatch.setattr(dm, "status", lambda name=None: "missing")
-    assert w._heard_device() != "Microphone (Test Headset)"
+    assert w.appsetctl._heard_device() != "Microphone (Test Headset)"
 
 
 def test_listeners_look_at_every_device_given():

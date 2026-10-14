@@ -79,17 +79,17 @@ def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch, qapp)
 
 def test_whos_listening_poll_slows_down_while_hidden(window, monkeypatch):  # noqa: F811
     polls = []
-    monkeypatch.setattr(window, "_poll_voice", lambda: polls.append(1))
+    monkeypatch.setattr(window.appsetctl, "_poll_voice", lambda: polls.append(1))
     window.cfg.dest = {"mode": "off", "auto": False}
     window._ui_live = True
-    window._voice_tick()
-    window._voice_tick()
+    window.appsetctl._voice_tick()
+    window.appsetctl._voice_tick()
     assert len(polls) == 2
     window._ui_live = False
-    window._voice_tick()
+    window.appsetctl._voice_tick()
     assert len(polls) == 2                            # nobody sees the hint
     window.cfg.dest = {"mode": "off", "auto": True}
-    window._voice_tick()
+    window.appsetctl._voice_tick()
     assert len(polls) == 3                            # it switches by itself: keeps up
 
 

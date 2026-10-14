@@ -60,12 +60,12 @@ def test_window_shows_a_tip_and_show_me_goes_there(window, monkeypatch):  # noqa
     monkeypatch.setattr(w, "isVisible", lambda: True)
     opened = []
     monkeypatch.setattr(w.setctl, "open_settings", lambda page="privacy": opened.append(page))
-    assert w._maybe_tip()
+    assert w.tipctl._maybe_tip()
     assert not w.tip_bar.isHidden() and "Tabs" in w.tip_lbl.text()
     assert "tabs" in w.cfg.tips_seen and w.cfg.tip_day == tips.today()
     w.tip_btn.click()
     assert opened == ["tabs"] and w.tip_bar.isHidden()
-    assert w._maybe_tip() and w.tip_bar.isHidden()   # not again today
+    assert w.tipctl._maybe_tip() and w.tip_bar.isHidden()   # not again today
 
 
 def test_window_waits_while_a_game_is_up(window, monkeypatch):  # noqa: F811
@@ -73,13 +73,13 @@ def test_window_waits_while_a_game_is_up(window, monkeypatch):  # noqa: F811
     w.cfg.setup_done, w.cfg.tips_seen, w.cfg.tip_day = True, [], ""
     monkeypatch.setattr(w, "isVisible", lambda: True)
     monkeypatch.setattr(tips, "fullscreen_in_front", lambda: True)
-    assert not w._maybe_tip() and w.tip_bar.isHidden()
+    assert not w.tipctl._maybe_tip() and w.tip_bar.isHidden()
     monkeypatch.setattr(tips, "fullscreen_in_front", lambda: False)
     w.overlay.is_open = True
     try:
-        assert not w._maybe_tip()
+        assert not w.tipctl._maybe_tip()
     finally:
         w.overlay.is_open = False
-    assert w._maybe_tip() and not w.tip_bar.isHidden()
-    w.set_tips_on(False)
+    assert w.tipctl._maybe_tip() and not w.tip_bar.isHidden()
+    w.tipctl.set_tips_on(False)
     assert w.tip_bar.isHidden() and not w.cfg.tips_on

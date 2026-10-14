@@ -35,7 +35,7 @@ def test_help_cards_open_right_of_the_rail_inside_the_window(window, qapp, monke
         return 0
 
     monkeypatch.setattr(TabHelpPopup, "exec", inspect)
-    window._show_tab_info(window.tabs.indexOf(window.sounds_page))
+    window.tipctl._show_tab_info(window.tabs.indexOf(window.sounds_page))
     title, rect = placed[-1]
     assert title == "Your sounds"
     rail_right = window.rail.mapToGlobal(window.rail.rect().topRight()).x()
@@ -67,7 +67,7 @@ def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page)
         return 0
 
     monkeypatch.setattr(TabHelpPopup, "exec", inspect)
-    window._show_tab_info(window.tabs.indexOf(target))
+    window.tipctl._show_tab_info(window.tabs.indexOf(target))
     assert checked == [True]
 
 

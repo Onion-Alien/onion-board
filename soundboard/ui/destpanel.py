@@ -398,7 +398,7 @@ class DestPanel(QWidget):
         self._cfg()["simple"] = profiles.ADVANCED.key   # it's Advanced's switch
         self.mw._save_later()
         if on:
-            self.mw._auto_dest()
+            self.mw.appsetctl._auto_dest()
             self.refresh()
 
     def _show_suggestion(self):

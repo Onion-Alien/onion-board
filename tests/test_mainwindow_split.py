@@ -4,10 +4,11 @@ out must not come back, and the window must still make each controller: a QObjec
 owns, so timers and signals aimed at the controller stop with the window."""
 import pytest
 
-from soundboard.ui import (aboutcontrol, alertcontrol, buncontrol, categorycontrol, devicecontrol,
-                           editcontrol, ffmpegcontrol, hotkeycontrol, importcontrol, mainwindow,
-                           miccontrol, padcontrol, remoteaccess, removecontrol, routecontrol,
-                           settingscontrol, statuscontrol, tabcontrol, themecontrol, updatecontrol)
+from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontrol, categorycontrol,
+                           devicecontrol, editcontrol, ffmpegcontrol, hotkeycontrol, importcontrol,
+                           languagecontrol, mainwindow, miccontrol, padcontrol, remoteaccess,
+                           removecontrol, routecontrol, settingscontrol, statuscontrol, tabcontrol,
+                           themecontrol, tipcontrol, updatecontrol)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)
@@ -69,6 +70,14 @@ SPLIT = [
      ["register_hotkeys", "on_hotkey", "on_hotkey_released", "set_global_hotkey",
       "set_sound_hotkey", "set_category_hotkey", "toggle_hotkeys", "step_category",
       "save_replay", "_release_ptt", "_clear_dupe_hotkey"]),
+    ("tipctl", tipcontrol.TipControl,
+     ["_start_tips", "_maybe_tip", "show_tip", "_tip_show_me", "set_tips_on", "_show_tab_info",
+      "_show_help"]),
+    ("langctl", languagecontrol.LanguageControl,
+     ["_offer_language", "_no_language", "switch_language"]),
+    ("appsetctl", appsetupcontrol.AppSetupControl,
+     ["_voice_tick", "_poll_voice", "_app_setup", "_undo_app_switch", "_show_setup",
+      "_hide_setup", "_setup_checks", "_auto_dest"]),
 ]
 
 
