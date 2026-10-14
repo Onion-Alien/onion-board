@@ -3472,5 +3472,10 @@
   "No custom modes yet. Fill in the form to make one.": "Brak jeszcze własnych trybów. Wypełnij formularz, aby utworzyć jeden.",
   "Show the report": "Pokaż raport",
   "This run only. It isn't saved.": "Tylko ten przebieg. Nie jest zapisywany.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Twoje własne tryby dźwięku, do czatu głosowego, którego nie obejmują wbudowane."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "Twoje własne tryby dźwięku, do czatu głosowego, którego nie obejmują wbudowane.",
+  "Back to the board": "Wróć do boardu",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "Przeciągnij: przesuń go. Kółko: większy lub mniejszy. Najedź na niego, żeby zobaczyć przyciski.",
+  "Open the full board": "Otwórz cały board",
+  "Turn into Bun": "Zamień się w Buna",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Zamień się w Buna: mały Bun unoszący się na wierzchu zamiast tego okna. Przycisk pod nim przywraca okno."
 }

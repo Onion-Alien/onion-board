@@ -217,8 +217,9 @@ class BunnyWidget(QWidget):
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
                  lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
-                 naps: bool = False, robot: bool = False):
+                 naps: bool = False, robot: bool = False, in_background: bool = False):
         super().__init__(parent)
+        self.in_background = in_background   # keeps moving with a game in front (Bun mode)
         self.robot = robot              # Robo-Bun: metal, LEDs, a wrench instead of a hammer
         self.pong = pong
         self.naps = naps
@@ -275,7 +276,8 @@ class BunnyWidget(QWidget):
         self._timer.timeout.connect(self._step)
         if pong:
             self.challenge.connect(self._open_game)
-        appstate.pause_in_background(self, self._resume, self._timer.stop)
+        if not in_background:
+            appstate.pause_in_background(self, self._resume, self._timer.stop)
         self.junk: list[_Junk] = []     # tossed out of the dust cloud, the hammer's head
         self.sparks: list[_Spark] = []
         self._junk_debt = 0.0
@@ -326,8 +328,9 @@ class BunnyWidget(QWidget):
 
     @property
     def asleep(self) -> bool:
-        """Napping right now: naps on, the small hours, not just woken, not mid-act."""
-        if not self.naps or self.building:
+        """Napping right now: naps on, the small hours, not just woken, not mid-act (nor
+        while its ending plays out)."""
+        if not self.naps or self.building or self._fail_t >= 0 or self._fin_t >= 0:
             return False
         now = time.monotonic()
         if now < self._woken_until:
@@ -476,7 +479,8 @@ class BunnyWidget(QWidget):
 
     # ------------------------------------------------------------------ animation
     def showEvent(self, ev):
-        if appstate.active():   # behind a game it waits until the app is back in front
+        # behind a game it waits until the app is back in front
+        if self.in_background or appstate.active():
             self._resume()
         super().showEvent(ev)
 

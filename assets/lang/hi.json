@@ -3396,5 +3396,10 @@
   "No custom modes yet. Fill in the form to make one.": "अभी कोई कस्टम मोड नहीं। एक बनाने के लिए फ़ॉर्म भरें।",
   "Show the report": "रिपोर्ट दिखाएँ",
   "This run only. It isn't saved.": "सिर्फ़ यह रन। सहेजा नहीं जाता।",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "आपके अपने ध्वनि मोड, ऐसी वॉइस चैट के लिए जिसे बिल्ट-इन मोड कवर नहीं करते।"
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "आपके अपने ध्वनि मोड, ऐसी वॉइस चैट के लिए जिसे बिल्ट-इन मोड कवर नहीं करते।",
+  "Back to the board": "बोर्ड पर वापस",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "खींचें: उसे हिलाएँ। स्क्रॉल: बड़ा या छोटा। बटन के लिए उस पर माउस ले जाएँ।",
+  "Open the full board": "पूरा बोर्ड खोलें",
+  "Turn into Bun": "Bun बन जाएँ",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "Bun बन जाएँ: इस विंडो की जगह सबसे ऊपर तैरता एक छोटा Bun। उसके नीचे वाला बटन इसे वापस लाता है।"
 }

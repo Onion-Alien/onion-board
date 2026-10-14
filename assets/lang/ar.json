@@ -3700,5 +3700,10 @@
   "No custom modes yet. Fill in the form to make one.": "لا توجد أوضاع مخصصة بعد. املأ النموذج لإنشاء واحد.",
   "Show the report": "إظهار التقرير",
   "This run only. It isn't saved.": "هذا التشغيل فقط. لا يتم حفظه.",
-  "Your own sound modes, for a voice chat the built-in ones don't cover.": "أوضاع صوت خاصة بك، لمحادثة صوتية لا تغطيها الأوضاع المدمجة."
+  "Your own sound modes, for a voice chat the built-in ones don't cover.": "أوضاع صوت خاصة بك، لمحادثة صوتية لا تغطيها الأوضاع المدمجة.",
+  "Back to the board": "العودة إلى اللوحة",
+  "Drag: move him. Scroll: bigger or smaller. Hover for the buttons.": "اسحب: لتحريكه. مرّر العجلة: أكبر أو أصغر. مرّر الماوس فوقه لتظهر الأزرار.",
+  "Open the full board": "فتح اللوحة كاملة",
+  "Turn into Bun": "تحوّل إلى Bun",
+  "Turn into Bun: a small Bun floating on top instead of this window. The button under him brings it back.": "تحوّل إلى Bun: أرنب Bun صغير يطفو فوق كل شيء بدل هذه النافذة. الزر تحته يعيدها."
 }

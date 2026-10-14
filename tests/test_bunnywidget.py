@@ -321,3 +321,17 @@ def test_idle_fidgets_now_and_then(qapp):
     b._fidget = ""
     _run(qapp, b, 1)
     assert not b._fidget
+
+
+def test_a_napping_bun_stays_up_for_the_end_of_his_act(qapp, monkeypatch):
+    from soundboard.ui import bunnywidget as bw
+    monkeypatch.setattr(bw, "local_hour", lambda: bw.NAP_HOURS[0])
+    b = BunnyWidget(naps=True)
+    b.resize(b.sizeHint())
+    b.build()
+    _frames(qapp, b, bw.BACK_END + 2 * bw.SWING)
+    b.stop_building(False)
+    _frames(qapp, b, bw.FAIL_SNAP + 0.1)
+    assert not b.asleep and b.pose()["prop"] == "hammer_broken"   # sees it fail, awake
+    _frames(qapp, b, bw.FAIL_END)
+    assert b.asleep                                               # then back to his nap
