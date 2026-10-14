@@ -282,3 +282,20 @@ def test_a_soundcloud_search_asks_the_picture_server_nothing():
         hit = ytdl._soundcloud_hit({"id": 1, "title": "t", "thumbnails": [{"url": art}],
                                     "webpage_url": "https://soundcloud.com/a/b"})
         assert hit.art == "https://i1.sndcdn.com/artworks-abc-t300x300.jpg"
+
+
+def test_a_soundcloud_result_keeps_its_cover_through_the_helper():
+    """The helper slims what it sends back, but a search card's picture stays."""
+    small = "https://i1.sndcdn.com/artworks-abc-small.jpg"
+    art = "https://i1.sndcdn.com/artworks-abc-large.jpg"
+    entry = {"id": 1, "title": "t", "webpage_url": "https://soundcloud.com/a/b",
+             "thumbnails": [{"url": small}, {"url": art, "width": 100}],
+             "formats": [{"url": "x"}]}
+    slim = ytworker._slim({"_type": "playlist", "entries": [entry, {"id": 2}]})
+    one, bare = slim["entries"]
+    assert one["thumbnails"] == [{"url": art}] and "formats" not in one
+    assert "thumbnails" not in bare
+    assert ytdl._soundcloud_hit(one).art == "https://i1.sndcdn.com/artworks-abc-t300x300.jpg"
+    del entry["thumbnails"]
+    entry["thumbnail"] = art
+    assert ytdl._soundcloud_hit(ytworker._slim(entry)).art.endswith("-t300x300.jpg")

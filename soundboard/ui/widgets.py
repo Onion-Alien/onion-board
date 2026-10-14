@@ -11,7 +11,8 @@ from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QP
                             QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QMainWindow, QMenu,
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QGridLayout, QLabel, QMainWindow,
+                               QMenu,
                                QScrollArea,
                                QSlider, QStackedWidget, QStyle, QStyleOptionSlider,
                                QTabWidget, QToolTip,
@@ -609,6 +610,7 @@ class Pad(QAbstractButton):
         self.name_cut = False    # the name is cut short with "…" (_fit_name)
         self._play_t: float | None = None   # when it started playing (the flash on start)
         self._press = None
+        self._last_click = -1e9   # when a plain left click was let go (ms): see _second_click
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
         self._described = None
         self._name_fit = None    # (what it was fitted to, how) - see _fit_name
@@ -830,8 +832,24 @@ class Pad(QAbstractButton):
         self._down = False
         self._fade_hover(False)
 
+    def _second_click(self, e) -> bool:
+        """A second plain left click soon after the first, anywhere on the pad. Qt only
+        counts a double-click when both land a few pixels apart, so top-left then
+        bottom-right was two single clicks (and a drag if the mouse was still moving)."""
+        return (not Pad.single_click and e.button() == Qt.MouseButton.LeftButton
+                and not e.modifiers() & (Qt.KeyboardModifier.ShiftModifier
+                                         | Qt.KeyboardModifier.ControlModifier)
+                and time.monotonic() * 1000 - self._last_click
+                <= QApplication.doubleClickInterval())
+
     def mousePressEvent(self, e):
-        if e.button() == Qt.MouseButton.LeftButton:
+        if self._second_click(e):
+            self._last_click = -1e9   # a third click starts over
+            self._press = None        # no drag, no select on release
+            self._down = True
+            self.update()
+            self.activated.emit(self.meta.id)
+        elif e.button() == Qt.MouseButton.LeftButton:
             self._press = e.position().toPoint()
             self._down = True
             self.update()
@@ -867,6 +885,9 @@ class Pad(QAbstractButton):
         if e.button() == Qt.MouseButton.LeftButton and self._press is not None:
             self._press = None
             mods = e.modifiers()
+            if not mods & (Qt.KeyboardModifier.ShiftModifier
+                           | Qt.KeyboardModifier.ControlModifier):
+                self._last_click = time.monotonic() * 1000
             if mods & Qt.KeyboardModifier.ShiftModifier:
                 self.pick.emit(self.meta.id, True)
             elif mods & Qt.KeyboardModifier.ControlModifier:
@@ -889,13 +910,10 @@ class Pad(QAbstractButton):
         e.accept()
 
     def mouseDoubleClickEvent(self, e):
-        if Pad.single_click:   # a quick second click is just another click
-            self.mousePressEvent(e)
-            return
-        if e.button() == Qt.MouseButton.LeftButton and not e.modifiers() & (
-                Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.ControlModifier):
-            self._press = None
-            self.activated.emit(self.meta.id)
+        # Qt sends this in place of the second press: the same as a press (it plays when
+        # it's a second click: _second_click; a quick second click is just another click
+        # when one click plays)
+        self.mousePressEvent(e)
 
     def paintEvent(self, e):
         self.describe()
@@ -972,9 +990,10 @@ class Pad(QAbstractButton):
             glow.setAlpha(60 if self.paused else int(105 + 35 * math.sin(now * 5)))
             p.setPen(QPen(glow, 6))
             p.drawPath(path)
-            pen = QPen(accent, 2.2)
-            if self.paused:
-                pen.setStyle(Qt.PenStyle.DashLine)
+            ink = QColor(accent)
+            if self.paused:   # paused: the same line, faded
+                ink.setAlpha(110)
+            pen = QPen(ink, 2.2)
             p.setPen(pen)
         elif self.picked:
             p.setPen(QPen(C["accent"], 2.4))
@@ -996,7 +1015,7 @@ class Pad(QAbstractButton):
                             QPointF(c.right() - 4, c.top() + 5)])
             p.setBrush(Qt.BrushStyle.NoBrush)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(C["text_hi"], 1.4, Qt.PenStyle.DashLine))
+            p.setPen(QPen(C["text_hi"], 1.4))
             p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
         on_pic = pic is not None
         # name
@@ -1083,9 +1102,10 @@ class Pad(QAbstractButton):
                        accent)
             p.restore()
         if playing:
-            pen = QPen(accent, 1.8)
-            if self.paused:
-                pen.setStyle(Qt.PenStyle.DashLine)
+            ink = QColor(accent)
+            if self.paused:   # paused: the same line, faded
+                ink.setAlpha(110)
+            pen = QPen(ink, 1.8)
         elif self.picked:
             pen = QPen(QColor(T["accent"]), 2)
         elif self.selected:
@@ -1095,7 +1115,7 @@ class Pad(QAbstractButton):
         p.setPen(pen)
         p.drawPath(path)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(QColor(T["text_hi"]), 1.2, Qt.PenStyle.DashLine))
+            p.setPen(QPen(QColor(T["text_hi"]), 1.2))
             p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
         p.setPen(Qt.PenStyle.NoPen)
         dot = QRectF(r.left() + 9, r.center().y() - 4, 8, 8)
@@ -1443,8 +1463,9 @@ class PadGrid(QWidget):
                 p.hide()
             self.empty_text.setText(self.NO_MATCH if self.pads else self.HOW_TO)
             # across the whole width, however wide that is now (a fixed width here kept
-            # the grid as wide as the window once was: a shrunk window showed nothing)
-            grid.setAlignment(Qt.AlignmentFlag.AlignTop)
+            # the grid as wide as the window once was: a shrunk window showed nothing),
+            # halfway down the page rather than stuck to its top
+            grid.setAlignment(Qt.AlignmentFlag.AlignVCenter)
             grid.addWidget(self.empty, 0, 0)
             self.empty.show()
             return
@@ -1512,7 +1533,7 @@ class PadGrid(QWidget):
         if drop is not None and drop.intersects(QRectF(e.rect())):
             # the empty room under the pads says what it's for, faintly
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
-            pen = QPen(QColor(theme.T["border"]), 1.4, Qt.PenStyle.DashLine)
+            pen = QPen(QColor(theme.T["border"]), 1.4)
             p.setPen(pen)
             p.drawRoundedRect(drop, PAD_RADIUS, PAD_RADIUS)
             if self._n_shown:
@@ -1596,7 +1617,9 @@ class PadGrid(QWidget):
         if md.hasFormat(PAD_MIME):
             sid = bytes(md.data(PAD_MIME)).decode()
             pos = e.position().toPoint()
-            self.reorder.emit(sid, self._drop_target(pos))
+            over = self.pad_at(pos)
+            if over is None or over.meta.id != sid:   # back on itself: nothing moved
+                self.reorder.emit(sid, self._drop_target(pos))
             e.acceptProposedAction()
         elif md.hasUrls():
             files = [u.toLocalFile() for u in md.urls() if u.isLocalFile()]

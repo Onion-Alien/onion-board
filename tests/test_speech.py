@@ -764,7 +764,7 @@ def test_helper_refuses_to_run_without_the_app():
 
 LANGS = {"zh", "es", "fr", "de", "ru", "it", "pt-PT", "pt-BR", "nl", "pl", "cs", "sk", "sl",
          "hu", "ro", "bg", "el", "da", "sv", "nb", "fi", "ca", "ja", "ko", "zh-TW", "th",
-         "vi", "id", "ms", "hi", "ar", "he", "tr"}
+         "vi", "id", "ms", "hi", "ar", "he", "tr", "uk", "fil"}
 
 
 def test_repo_ships_the_translation_addons_not_downloaded():

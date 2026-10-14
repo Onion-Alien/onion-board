@@ -9,7 +9,6 @@ from __future__ import annotations
 import functools
 import html
 import random
-import re
 import threading
 import time
 
@@ -18,7 +17,8 @@ from PySide6.QtGui import QColor, QGuiApplication, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
-                               QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy,
+                               QPlainTextEdit, QProgressBar, QPushButton, QScrollArea,
+                               QSizePolicy,
                                QSlider, QStyle, QStyleOptionSlider, QToolButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
@@ -27,7 +27,7 @@ from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
 from soundboard import langnames, library, net, netlog, savedvoices, theme, usage
-from soundboard.speech import customvoices, translation, tts, winvoices
+from soundboard.speech import customvoices, spoken, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, fit, icons
@@ -384,6 +384,18 @@ class ParamSlider(QWidget):
     def _moved(self, _v):
         self._label()
         self.changed.emit()
+
+
+def _download_bar() -> QProgressBar:
+    """A thin download bar (the theme's `downloadprogress`), hidden until there's one."""
+    bar = QProgressBar()
+    bar.setObjectName("downloadprogress")
+    bar.setRange(0, 1000)
+    bar.setTextVisible(False)
+    bar.setFixedSize(320, 6)
+    bar.setAccessibleName(_("Speech model download"))
+    bar.hide()
+    return bar
 
 
 def _enable(w, on: bool, why: str = ""):
@@ -1602,8 +1614,11 @@ class SpeechPanel(QWidget):
         self.title = section_label(_("Speak another language"))
         v.addWidget(self.title)
         self.start_box = QWidget()   # Start and its state: shown with live_box
-        action = QHBoxLayout(self.start_box)
-        action.setContentsMargins(0, 0, 0, 0)
+        sv = QVBoxLayout(self.start_box)
+        sv.setContentsMargins(0, 0, 0, 0)
+        sv.setSpacing(8)
+        action = QHBoxLayout()
+        sv.addLayout(action)
         action.setSpacing(14)
         self.b_live = QPushButton(_("Start the computer voice"))
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
@@ -1618,14 +1633,17 @@ class SpeechPanel(QWidget):
         self.lbl_state.setWordWrap(True)
         self.lbl_state.setMinimumWidth(0)
         action.addWidget(self.lbl_state, 1)
+        # the speech model's first download (the helper's "download" events)
+        self.dl_bar = _download_bar()
+        sv.addWidget(self.dl_bar, 0, Qt.AlignmentFlag.AlignLeft)
         v.addWidget(self.start_box)
         self.lbl_intro = hint_label(_(
-            "Talk in English and others hear another language. Turn on the switch below: the AI "
+            "Talk in your language and others hear another one. Turn on the switch below: the AI "
             "voice or the voice changer says it when one of them is on; otherwise press "
             "Start and a computer voice does."))
         v.addWidget(self.lbl_intro)
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
-        # English in, the chosen language out.
+        # your language in, the chosen one out (through English: spoken.py).
         self.bg_for = ""             # translating for the "ai" voice or the "fx" changer
         self._bg_key: tuple = ()     # (who, language) the running helper was started for
         self._bg_failed: tuple = ()  # the key it last stopped with an error for
@@ -1637,14 +1655,14 @@ class SpeechPanel(QWidget):
         trow = QHBoxLayout()
         # its own on/off: turning on a voice elsewhere never starts translating
         self.sw_lang = Switch(_("Translate what you say into this language. Off: every "
-                                "voice speaks English, and the language stays picked."))
+                                "voice says it as you do, and the language stays picked."))
         self.sw_lang.setAccessibleName(_("Speak in"))
         self.sw_lang.setChecked(bool(self.s["translate_on"]))
         trow.addWidget(self.sw_lang)
         self.lbl_lang = QLabel(_("Speak in"))
         trow.addWidget(self.lbl_lang)
         self.cb_lang = QComboBox()
-        self.cb_lang.setToolTip(_("Say it in English; whichever voice is on says it in this "
+        self.cb_lang.setToolTip(_("Say it in your language; whichever voice is on says it in this "
                                   "language. Each language is a one-time download."))
         # as wide as the voice list below (_SameWidth), not a bar across the card:
         # its list opens as wide as the box
@@ -1660,6 +1678,8 @@ class SpeechPanel(QWidget):
         self.lbl_bg.setTextFormat(Qt.TextFormat.PlainText)     # shows the helper's error text
         self.lbl_bg.hide()
         lv.addWidget(self.lbl_bg)
+        self.bg_bar = _download_bar()   # the same, while translating for another voice
+        lv.addWidget(self.bg_bar, 0, Qt.AlignmentFlag.AlignLeft)
         self.tr_box = QWidget()
         tv = QVBoxLayout(self.tr_box)
         tv.setContentsMargins(0, 0, 0, 0)
@@ -1820,11 +1840,10 @@ class SpeechPanel(QWidget):
         self.cb_model.setCurrentIndex(max(0, self.cb_model.findData(self.s["model"])))
         grid.addWidget(self.cb_model, 2, 1)
         grid.addWidget(QLabel(_("Language")), 3, 0)
-        self.ed_lang = QLineEdit(self.s["language"])
+        self.ed_lang = QLineEdit(spoken.typed(self.s))
         self.ed_lang.setPlaceholderText(_("en, es, de… or auto"))
-        self.ed_lang.setToolTip(_("Language you speak (two-letter code). 'auto' guesses; needs "
-                                  "an 'Any language' recognition model for anything but "
-                                  "English."))
+        self.ed_lang.setToolTip(_("Language you speak (two-letter code). Empty: the app's "
+                                  "language. 'auto' guesses."))
         grid.addWidget(self.ed_lang, 3, 1)
         grid.setColumnStretch(1, 1)
         ov.addLayout(grid)
@@ -2139,7 +2158,7 @@ class SpeechPanel(QWidget):
             self.ctl.speaker.voice = self.s["voice"]
         self.s.update(rate=self.sl_rate.value(),
                       model=self.cb_model.currentData(),
-                      language=self.ed_lang.text().strip() or "en",
+                      spoken=self.ed_lang.text().strip().lower(),
                       mute_real_voice=self.chk_mute.isChecked(),
                       voice_fx=self.chk_fx.isChecked(),
                       translate=self.cb_lang.currentData() or "",
@@ -2169,7 +2188,7 @@ class SpeechPanel(QWidget):
     def _fill_langs(self):
         self.cb_lang.blockSignals(True)
         self.cb_lang.clear()
-        self.cb_lang.addItem(_("English (as you say it)"), "")
+        self.cb_lang.addItem(_("As you say it"), "")
         for m in self.langs:
             name = langnames.of(m)
             self.cb_lang.addItem(name if m.installed
@@ -2187,7 +2206,7 @@ class SpeechPanel(QWidget):
         self._refresh_translation()
 
     def _lang_picked(self, *_):
-        # picking a language means speaking it; English (as you say it) is off
+        # picking a language means speaking it; As you say it is off
         self.sw_lang.blockSignals(True)
         self.sw_lang.setChecked(bool(self.cb_lang.currentData()))
         self.sw_lang.blockSignals(False)
@@ -2273,13 +2292,13 @@ class SpeechPanel(QWidget):
             return
         self.b_dl_remove.setVisible(not live)
         if not self.ctl.tts.voices:        # still loading, or no speech at all
-            self.lbl_tr.setText(_("Say it in English; the voice says it in {language}.",
+            self.lbl_tr.setText(_("Say it in your language; the voice says it in {language}.",
                                   language=name))
             return
         voice = self._voice_for(m)
         if voice:
             short = customvoices.label(voice)
-            self.lbl_tr.setText(_("Say it in English; {voice} says it in {language}. "
+            self.lbl_tr.setText(_("Say it in your language; {voice} says it in {language}. "
                                   "Translation is quick but not perfect with slang.",
                                   voice=short, language=name))
         else:
@@ -2568,13 +2587,16 @@ class SpeechPanel(QWidget):
         """The live-voice helper's arguments; sets the voice translated lines use."""
         # only our own models: any other name makes the helper download that repo
         model = self.s["model"] if self.s["model"] in {d for _n, d in MODELS} else MODELS[0][1]
-        lang = str(self.s["language"]).strip().lower()
-        lang = lang if re.fullmatch(r"auto|[a-z]{2,3}", lang) else "en"
-        args = ["--model", model, "--language", lang]
+        lang = spoken.spoken(self.s)
+        # an English-only model can't hear another language: its "Any language" one
+        args = ["--model", spoken.model_for(model, lang), "--language", lang]
         m = self._lang_on()
         self.ctl.live_voice = None
         if m is not None and m.installed:
-            args += ["--translate", str(translation.model_dir(m))]
+            if not spoken.same(m.language, lang):   # said in it already: just spoken
+                if lang != "en":   # the translations go from English: Whisper's first
+                    args += ["--task", "translate"]
+                args += ["--translate", str(translation.model_dir(m))]
             self.ctl.live_voice = self._voice_for(m) or None
         return args
 
@@ -2641,6 +2663,7 @@ class SpeechPanel(QWidget):
         self.bg_for, self._bg_key, self._bg_failed = "", (), ()
         self.ctl.stop_live()
         self._bg_note("")
+        self.bg_bar.hide()
 
     def _bg_note(self, text: str, warning: bool = False):
         self.lbl_bg.setText(text)
@@ -2659,15 +2682,30 @@ class SpeechPanel(QWidget):
                 _("Stop the computer voice to change this") if on
                 else _("Waiting for the install to finish"))
         self.lbl_state.setText(state)
+        if not on:
+            self.dl_bar.hide()
         self._refresh_translation()
+
+    def _download_note(self, ev: dict) -> str:
+        """A "download" event: its bar filled, the words that go with it."""
+        done, total = int(ev.get("done") or 0), int(ev.get("total") or 0)
+        bar = self.bg_bar if self.bg_for else self.dl_bar
+        bar.setValue(min(1000, done * 1000 // total) if total > 0 else 0)
+        bar.show()
+        return _("Downloading the speech model (one time only)… {done} of {total} MB",
+                 done=done // 1_000_000, total=total // 1_000_000)
 
     def _on_event(self, ev: dict):
         t = ev.get("type")
         text = str(ev.get("text", ""))
+        if t != "download":
+            (self.bg_bar if self.bg_for else self.dl_bar).hide()
         if self.bg_for and t != "tts_error":
             self._on_bg_event(t, text, ev)
             return
-        if t == "tts_error":
+        if t == "download":
+            self.lbl_state.setText(self._download_note(ev))
+        elif t == "tts_error":
             self._tts_error(_("Couldn't speak that line: {error}", error=text))
         elif t == "status":
             self.lbl_state.setText(text)
@@ -2690,8 +2728,10 @@ class SpeechPanel(QWidget):
         name = self._bg_key[1] if self._bg_key else ""
         m = self._lang()
         name = langnames.of(m) if m is not None else name
-        if t == "ready" or (t == "vad" and not ev.get("speaking")):
-            self._bg_note(_("● Listening: say it in English, it comes out in {language}.",
+        if t == "download":
+            self._bg_note(self._download_note(ev))
+        elif t == "ready" or (t == "vad" and not ev.get("speaking")):
+            self._bg_note(_("● Listening: say it in your language, it comes out in {language}.",
                             language=name))
         elif t == "vad":
             self._bg_note(_("● Hearing you…"))
@@ -2948,6 +2988,8 @@ class VoicePanel(QWidget):
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._section("speak", self.speech, self.speech.title)
+        # speech recognition has to hear the app's language for any of it to work
+        self._tabs["speak"].setVisible(spoken.heard())
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
         self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
         self.addons.refresh.connect(self._rescan_in_background)
@@ -3190,7 +3232,7 @@ class VoicePanel(QWidget):
             items.append(("speak", who, "on", "speech", None,
                           _("The computer voice ({voice}) speaks for you. Click to open it.",
                             voice=who)))
-        m = self.speech.translating()
+        m = self.speech.translating() if spoken.heard() else None   # else no Languages tab
         if m is not None:
             lang = langnames.of(m)
             items.append(("lang", lang, "on", "browser", None,

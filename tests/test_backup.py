@@ -327,6 +327,10 @@ def test_apply_settings_drops_unknown_speech_models_and_languages():
     assert cfg.speech == {"model": "tiny.en", "language": "de"}
     backup.apply_settings(cfg, {"speech": {"model": 5, "language": "EN"}})
     assert cfg.speech == {}
+    backup.apply_settings(cfg, {"speech": {"spoken": ""}})       # the app's language
+    assert cfg.speech == {"spoken": ""}
+    backup.apply_settings(cfg, {"speech": {"spoken": "../x"}})
+    assert cfg.speech == {}
 
 
 def test_speech_model_allowlist_matches_the_voice_panel():
