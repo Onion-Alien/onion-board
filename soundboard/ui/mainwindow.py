@@ -334,7 +334,7 @@ class MainWindow(QMainWindow):
         # pumps events while the window is built, so its timers can run
         # before the end of __init__
         self._shut_down = False
-        self.title = _("Onion Board {version_text}", version_text=version_text())
+        self.title = "Onion Board"   # the version is on the rail, under the name
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
@@ -578,9 +578,10 @@ class MainWindow(QMainWindow):
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
         from soundboard import __version__
-        # on the rail: the name over a quiet "v1.9.28" (the title bar says "from source");
-        # who made it is a tip on all three
-        self.tagline = sidebar.ClickLabel(f"v{__version__}")
+        # on the rail: the name over a quiet "by Onion Alien · v1.9.28" (the title bar
+        # is just the name; "from source" is in the tips)
+        self.tagline = sidebar.ClickLabel(
+            f"{_('by {name}', name='Onion Alien')} · v{__version__}")
         self.tagline.setObjectName("tagline")
         about = _("an app by Onion Alien · v{version_text}", version_text=version_text())
         for w in (self.logo, self.wordmark):
