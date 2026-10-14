@@ -27,19 +27,15 @@ The full list. The [README](../README.md) has the short version and how to get s
   pad → *Categories* to put it in any number of them; right-click a category to
   rename, export or delete it. The in-game overlay shows the same category, and
   its **R** key (numpad **\***) switches to the next one. Right-click a category to
-  give it a random-sound hotkey, or to *Play them all* (in order or shuffled). With
+  give it a random-sound hotkey. With
   *Use hotkeys per category* (Settings → Hotkeys) each category is its own set of
   keys: one key, a different sound per category.
-- **Switch category when a program is in front:** right-click a category →
-  *Show this when a program is in front* lists the programs open now (with their
-  icons) and *Browse for a program*. When one of them comes to the front, the board
-  and the overlay switch to that category (with the category beep, if beeps are on);
-  when it closes, the board goes back to the category it showed before. Alt-tabbing
-  away changes nothing; a category you pick by hand while it's in front stays. Rules
-  match the program's file name (`game.exe`), so they survive a reinstall and go
-  into backups. The tab's tooltip lists its programs; *Stop showing this for…* in the
-  same menu, or *Settings → General → Switch category by program* (every rule, a
-  *Remove* each, and *Switch by itself* to turn it all off).
+- **Switch category when a program is in front:** rules made in older versions
+  (a program's file name, `game.exe`, tied to a category) still work: when that
+  program comes to the front, the board and the overlay switch to its category, and
+  back when it closes. *Settings → General → Switch category by program* lists them,
+  with a *Remove* each and *Switch by itself* to turn it all off. New rules can't be
+  made any more.
 - **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds. After that
   the sound waits in **Recently deleted** (the *Backup* menu, or the bin button that
   shows while it holds sounds) for 30 days, and *Bring back* returns it exactly as it
@@ -89,7 +85,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   sounds, and the stream output if you set one). With another device the app never puts
   the cable back, never asks you to install it, and the header pill gets a tick once
   it's sending. With nowhere nothing nags. The choice is per PC and isn't in backups.
-- **Stream output for OBS** (Setup → Devices → *Also send to* → a device set to *Clean,
+- **Stream output for OBS** (Setup → Devices → *Also play on* → a device set to *Clean,
   for streaming*; one at a time, with its volume and *Include my voice* under it): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
   as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
@@ -214,7 +210,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   settings that stop it chopping up your sounds, with a check that listens to what
   Discord does to them), *Set up game voice chat*, *Zoom, Teams or a browser call*,
   *Game has no microphone setting?*, and the *Step-by-step guide* with Bun (mic,
-  headphones, where your sounds go, then Discord). **Also send to** (Setup → Devices)
+  headphones, where your sounds go, then Discord). **Also play on** (Setup → Devices)
   gives extra outputs a copy of what others hear, each with a − to remove it.
 - **Search the web for sounds** from the Sounds tab: Enter in *Search sounds* lists
   results (thumbnail, title, length) in place of the pads, from YouTube, YouTube

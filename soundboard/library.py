@@ -175,10 +175,13 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
-NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view", "app_clip_group")
+NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view", "list_rows",
+                 "app_clip_group")
 # the Sounds tab's orders: as dragged, A-Z, the newest first, the most played first
 PAD_SORTS = ("custom", "name", "newest", "plays")
 PAD_VIEWS = ("grid", "list")
+# the list view's row heights (ui.widgets.LIST_ROW_H)
+LIST_ROWS = ("small", "medium", "large")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
@@ -221,6 +224,8 @@ def clean_setting(k: str, v):
         return v if v in PAD_SORTS else "custom"
     if k == "pad_view":
         return v if v in PAD_VIEWS else "grid"
+    if k == "list_rows":
+        return v if v in LIST_ROWS else "medium"
     if k == "subcategories":   # {category: [names]}; anything else is dropped
         out = {}
         for c, subs in v.items():
@@ -362,7 +367,7 @@ class Config:
     obs_device: str | None = None
     obs_vol: float = 1.0
     obs_voice: bool = True            # your mic goes to the stream output too
-    # Setup -> Devices -> Also send to: more devices that get a copy of what others hear,
+    # Setup -> Devices -> Also play on: more devices that get a copy of what others hear,
     # on top of "Send my sounds to" (streamers: Voicemeeter, OBS, a second cable...;
     # engine.Engine.set_copy_devices)
     also_send: list[str] = field(default_factory=list)
@@ -393,7 +398,8 @@ class Config:
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
     dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
     send_mono: bool = True    # phase-aware mono for the send device (sendfx.SmartMono)
-    duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
+    duck_db: float = -12.0    # lower the sounds this much while you talk; 0 = off
+    duck_on: bool = False     # ducking was switched on once for older settings (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
@@ -404,6 +410,7 @@ class Config:
     pad_width: int = 150
     pad_sort: str = "custom"   # the Sounds tab's order: PAD_SORTS
     pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
+    list_rows: str = "medium"  # the list view's row height: LIST_ROWS
     app_card_width: int = 300
     app_clip_height: int = 0   # saved clips: 0 fits the rows, otherwise the dragged height
     app_clip_group: str = "app"   # saved clips grouped by app, day, or newest first
@@ -688,6 +695,7 @@ class Config:
         cfg = cls()
         cfg.route = "mic"
         cfg.mic_first = True
+        cfg.duck_on = True
         cfg.tabs_off = list(BASIC_TABS_OFF)   # a plain soundboard first; + More tabs adds them
         cfg.use_mode = ""   # the guide asks what it's for (and adds the tabs that fit)
         return cfg
@@ -772,6 +780,13 @@ class Config:
             if raw.get("route", "cable") == "cable":
                 raw["route"] = "mic"
             raw["mic_first"] = True
+        if not raw.get("duck_on"):
+            # once: lowering the sounds while you talk is on by default now (your voice
+            # was buried under a song). Off was the old default, so it moves to -12 dB;
+            # a depth someone picked stays, and Off picked after this stays off.
+            if not raw.get("duck_db"):
+                raw["duck_db"] = -12.0
+            raw["duck_on"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
         raw_sounds = raw.pop("sounds", [])
