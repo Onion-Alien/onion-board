@@ -599,7 +599,6 @@
   "Mute mic during sounds": "Demp mikrofonen under lyder",
   "Mute my mic while a sound plays": "Demp mikrofonen min mens en lyd spilles",
   "Muted": "Dempet",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Dempet / live: når den er dempet, hører ingen lydene eller mikrofonen din",
   "Muted: others hear nothing": "Dempet: andre hører ingenting",
   "My changed voice": "Min endrede stemme",
   "My headphones": "Hodetelefonene mine",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Det var det! Trykk på <b>Fullfør</b>, så viser Bun deg hvor du finner lyder. Du kan åpne veiledningen igjen når som helst fra fanen <b>Oppsett</b> (<b>Steg-for-steg-veiledning</b>).",
   "Try anything: a song, a meme, a game sound.": "Prøv hva som helst: en sang, et meme, en spillyd.",
   "Type a song you love, then press Enter": "Skriv inn en sang du elsker, og trykk på Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Lydene dine er i <b style='color:{colour}'>{mic}</b> nå, så det er ingenting å velge i Discord eller spillene dine. Én ting kan fortsatt stoppe dem: Discords eget støyfilter, som er på som standard."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Lydene dine er i <b style='color:{colour}'>{mic}</b> nå, så det er ingenting å velge i Discord eller spillene dine. Én ting kan fortsatt stoppe dem: Discords eget støyfilter, som er på som standard.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Dempet / live: når den er dempet, hører ingen lydene dine (mikrofonen din går fortsatt ut, med mindre stemmeskifteren er på eller Send mikrofonen er av)"
 }

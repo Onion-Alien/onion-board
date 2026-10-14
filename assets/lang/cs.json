@@ -611,7 +611,6 @@
   "Mute mic during sounds": "Ztlumit mikrofon během zvuků",
   "Mute my mic while a sound plays": "Ztlumit můj mikrofon, zatímco hraje zvuk",
   "Muted": "Ztlumeno",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Ztlumeno / živě: při ztlumení nikdo neslyší tvoje zvuky ani mikrofon",
   "Muted: others hear nothing": "Ztlumeno: ostatní neslyší nic",
   "My changed voice": "Můj změněný hlas",
   "My headphones": "Moje sluchátka",
@@ -3491,5 +3490,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Hotovo! Stiskni <b>Dokončit</b> a Bun ti ukáže, kde najdeš zvuky. Průvodce můžeš kdykoli znovu otevřít na kartě <b>Zapojení</b> (<b>Průvodce krok za krokem</b>).",
   "Try anything: a song, a meme, a game sound.": "Zkus cokoli: písničku, meme, zvuk ze hry.",
   "Type a song you love, then press Enter": "Napiš písničku, kterou miluješ, a stiskni Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Tvoje zvuky jsou teď v <b style='color:{colour}'>{mic}</b>, takže v Discordu ani ve hrách není co vybírat. Jedna věc je ještě může zastavit: vlastní filtr šumu v Discordu, který je ve výchozím stavu zapnutý."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Tvoje zvuky jsou teď v <b style='color:{colour}'>{mic}</b>, takže v Discordu ani ve hrách není co vybírat. Jedna věc je ještě může zastavit: vlastní filtr šumu v Discordu, který je ve výchozím stavu zapnutý.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Ztlumeno / živě: při ztlumení nikdo neslyší tvoje zvuky (mikrofon jde ven dál, pokud není zapnutý měnič hlasu nebo vypnuté posílání mikrofonu)"
 }

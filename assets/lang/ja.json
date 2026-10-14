@@ -932,7 +932,6 @@
   "More colours": "さらに多くの色",
   "Mute mic during sounds": "音が鳴っている間はマイクをミュートします",
   "Mute my mic while a sound plays": "サウンドの再生中はマイクをミュートします",
-  "Muted / live: while muted nobody hears your sounds or your mic": "ミュート/ライブ: ミュート中は、あなたの音やマイクが誰にも聞こえません。",
   "My headphones": "私のヘッドフォン",
   "My mic": "私のマイク",
   "My mode {n}": "私のモード{n}",
@@ -3339,5 +3338,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "完了！ <b>完了</b>を押すと、Bun がサウンドの見つけ方を教えてくれます。このガイドはいつでも<b>セットアップ</b>タブ（<b>手順ガイド</b>）からもう一度開けます。",
   "Try anything: a song, a meme, a game sound.": "なんでも試して：曲、ミーム、ゲームの音。",
   "Type a song you love, then press Enter": "好きな曲を入力して Enter を押してね",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "サウンドはもう <b style='color:{colour}'>{mic}</b> に入っているので、Discord やゲームで選ぶものはありません。止める可能性があるのは一つだけ：最初からオンになっている Discord のノイズ除去です。"
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "サウンドはもう <b style='color:{colour}'>{mic}</b> に入っているので、Discord やゲームで選ぶものはありません。止める可能性があるのは一つだけ：最初からオンになっている Discord のノイズ除去です。",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "ミュート/ライブ: ミュート中は、あなたの音は誰にも聞こえません(ボイスチェンジャーがオンか、マイクの送信がオフでない限り、マイクは届きます)。"
 }

@@ -953,7 +953,6 @@
   "More colours": "Meer kleuren",
   "Mute mic during sounds": "Demp de microfoon tijdens geluiden",
   "Mute my mic while a sound plays": "Demp mijn microfoon terwijl er een geluid wordt afgespeeld",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Gedempt / live: terwijl het gedempt is, hoort niemand je geluiden of je microfoon",
   "My headphones": "Mijn koptelefoon",
   "My mic": "Mijn microfoon",
   "My mode {n}": "Mijn modus {n}",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Klaar! Druk op <b>Voltooi</b> en Bun laat zien waar je geluiden vindt. Je kunt deze uitleg altijd weer openen via het tabblad <b>Setup</b> (<b>Stap-voor-stap-uitleg</b>).",
   "Try anything: a song, a meme, a game sound.": "Probeer van alles: een nummer, een meme, een gamegeluid.",
   "Type a song you love, then press Enter": "Typ een nummer waar je van houdt en druk op Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Je geluiden zitten nu in <b style='color:{colour}'>{mic}</b>, dus je hoeft niets te kiezen in Discord of je games. Eén ding kan ze nog tegenhouden: de eigen ruisfilter van Discord, die standaard aan staat."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Je geluiden zitten nu in <b style='color:{colour}'>{mic}</b>, dus je hoeft niets te kiezen in Discord of je games. Eén ding kan ze nog tegenhouden: de eigen ruisfilter van Discord, die standaard aan staat.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Gedempt / live: terwijl het gedempt is, hoort niemand je geluiden (je microfoon gaat nog steeds door, tenzij de stemverander aan staat of Stuur mijn microfoon uit)"
 }

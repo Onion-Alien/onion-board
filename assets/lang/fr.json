@@ -952,7 +952,6 @@
   "More colours": "Plus de couleurs",
   "Mute mic during sounds": "Couper le micro pendant les sons",
   "Mute my mic while a sound plays": "Couper mon micro pendant qu'un son joue",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Muet / en direct : en muet, personne n'entend tes sons ni ton micro",
   "My headphones": "Mon casque",
   "My mic": "Mon micro",
   "My mode {n}": "Mon mode {n}",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "C'est tout ! Clique sur <b>Terminer</b>, et Bun te montre où trouver des sons. Tu peux rouvrir ce guide à tout moment depuis l'onglet <b>Config</b> (<b>Guide pas à pas</b>).",
   "Try anything: a song, a meme, a game sound.": "Essaie n'importe quoi : une chanson, un mème, un son de jeu.",
   "Type a song you love, then press Enter": "Tape une chanson que tu adores, puis appuie sur Entrée",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Tes sons sont dans <b style='color:{colour}'>{mic}</b> maintenant, donc rien à choisir dans Discord ou tes jeux. Une seule chose peut encore les bloquer : le filtre anti-bruit de Discord, activé par défaut."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Tes sons sont dans <b style='color:{colour}'>{mic}</b> maintenant, donc rien à choisir dans Discord ou tes jeux. Une seule chose peut encore les bloquer : le filtre anti-bruit de Discord, activé par défaut.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Muet / en direct : en muet, personne n'entend tes sons (ton micro passe toujours, sauf si le changeur de voix est activé ou l'envoi du micro coupé)"
 }

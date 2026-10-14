@@ -599,7 +599,6 @@
   "Mute mic during sounds": "Σίγαση μικροφώνου στους ήχους",
   "Mute my mic while a sound plays": "Σίγαση του μικροφώνου μου όσο παίζει ήχος",
   "Muted": "Σε σίγαση",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Σίγαση / ζωντανά: σε σίγαση κανείς δεν ακούει τους ήχους ή το μικρόφωνό σου",
   "Muted: others hear nothing": "Σε σίγαση: οι άλλοι δεν ακούν τίποτα",
   "My changed voice": "Η αλλαγμένη φωνή μου",
   "My headphones": "Τα ακουστικά μου",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Αυτό ήταν! Πάτα <b>Τέλος</b> και ο Bun θα σου δείξει πού θα βρεις ήχους. Μπορείς να ανοίξεις ξανά αυτόν τον οδηγό όποτε θες από την καρτέλα <b>Διαμόρφωση</b> (<b>Οδηγός βήμα-βήμα</b>).",
   "Try anything: a song, a meme, a game sound.": "Δοκίμασε οτιδήποτε: ένα τραγούδι, ένα meme, έναν ήχο από παιχνίδι.",
   "Type a song you love, then press Enter": "Γράψε ένα τραγούδι που αγαπάς και πάτα Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Οι ήχοι σου είναι τώρα στο <b style='color:{colour}'>{mic}</b>, οπότε δεν έχεις τίποτα να διαλέξεις στο Discord ή στα παιχνίδια σου. Ένα πράγμα μπορεί ακόμα να τους σταματήσει: το φίλτρο θορύβου του ίδιου του Discord, που είναι ανοιχτό από προεπιλογή."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Οι ήχοι σου είναι τώρα στο <b style='color:{colour}'>{mic}</b>, οπότε δεν έχεις τίποτα να διαλέξεις στο Discord ή στα παιχνίδια σου. Ένα πράγμα μπορεί ακόμα να τους σταματήσει: το φίλτρο θορύβου του ίδιου του Discord, που είναι ανοιχτό από προεπιλογή.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Σίγαση / ζωντανά: σε σίγαση κανείς δεν ακούει τους ήχους σου (το μικρόφωνό σου ακούγεται ακόμα, εκτός αν η αλλαγή φωνής είναι ανοιχτή ή η αποστολή μικροφώνου κλειστή)"
 }

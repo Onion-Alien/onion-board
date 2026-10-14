@@ -599,7 +599,6 @@
   "Mute mic during sounds": "Silenciar o microfone durante os sons",
   "Mute my mic while a sound plays": "Silenciar o meu microfone enquanto um som toca",
   "Muted": "Silenciado",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Silenciado / em direto: enquanto silenciado ninguém ouve os teus sons nem o teu microfone",
   "Muted: others hear nothing": "Silenciado: os outros não ouvem nada",
   "My changed voice": "A minha voz alterada",
   "My headphones": "Os meus auscultadores",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Já está! Carrega em <b>Terminar</b> e o Bun mostra-te onde encontrar sons. Podes voltar a abrir este guia quando quiseres no separador <b>Configurar</b> (<b>Guia passo a passo</b>).",
   "Try anything: a song, a meme, a game sound.": "Experimenta qualquer coisa: uma música, um meme, um som de jogo.",
   "Type a song you love, then press Enter": "Escreve uma música de que gostes muito e carrega em Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Os teus sons estão em <b style='color:{colour}'>{mic}</b> agora, por isso não há nada a escolher no Discord nem nos teus jogos. Só uma coisa ainda os pode travar: o filtro de ruído do próprio Discord, ligado por predefinição."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Os teus sons estão em <b style='color:{colour}'>{mic}</b> agora, por isso não há nada a escolher no Discord nem nos teus jogos. Só uma coisa ainda os pode travar: o filtro de ruído do próprio Discord, ligado por predefinição.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Silenciado / em direto: enquanto silenciado ninguém ouve os teus sons (o teu microfone continua a passar, a não ser que o mudador de voz esteja ligado ou o envio do microfone desligado)"
 }

@@ -12,6 +12,7 @@ def test_collapsed_output_names_live_and_muted_without_hover(window, qapp, monke
     window.resize(1180, 720)
     window.show()
     window.rail.set_open(False)
+    window.routectl.on_mic_toggle(False)   # (mic sent: off says "Only your mic")
     output = window.rail.output
     for on, name in ((True, "Live"), (False, "Muted"), (True, "Live")):
         window.set_sending(on)
@@ -44,7 +45,7 @@ def test_labelled_output_switch_controls_engine_and_tracks_other_controls(window
     QTest.keyClick(output.mute, Qt.Key_Space)
     assert not window.engine.sending and not window.btn_air.isChecked()
     # checked = live, like the switch: muted is unchecked, and named so
-    assert not output.mute.isChecked() and output.mute.accessibleName() == "Muted"
+    assert not output.mute.isChecked() and output.mute.accessibleName() == "Only your mic"
     # off: your plain mic still goes (no voice changer), only the sounds are cut
     assert "only your mic" in output.mute.accessibleDescription()
     QTest.keyClick(output.mute, Qt.Key_Tab)
@@ -335,3 +336,34 @@ def test_full_card_only_when_every_line_fits(window, qapp):  # noqa: F811
                 assert out.mute.geometry().right() < out.stop.x(), width
     finally:
         rail.finish_resize()
+
+
+def test_muted_rail_says_only_your_mic_while_the_plain_voice_still_goes(window, qapp,  # noqa: F811
+                                                                       monkeypatch):
+    """Off with your mic sent and no voice changer, others still hear your plain voice
+    (engine.mic_only): the rail says so instead of "Muted", and follows the mic switch."""
+    monkeypatch.setattr(window.routectl, "_main_name", lambda: "CABLE Input")
+    window.resize(1180, 720)
+    window.show()
+    output = window.rail.output
+    window.routectl.on_mic_toggle(True)
+    window.set_sending(False)
+    qapp.processEvents()
+    assert window.engine.mic_only()
+    for opened in (False, True):
+        window.rail.set_open(opened)
+        qapp.processEvents()
+        assert output.caption.text() == "Only your mic"
+        assert output.switch.accessibleName() == "Only your mic"
+        assert output.mute.accessibleName() == "Only your mic"
+    # mic not sent: nothing goes out, so "Muted", without touching the switch
+    window.routectl.on_mic_toggle(False)
+    qapp.processEvents()
+    assert not window.engine.mic_only()
+    assert output.mute.accessibleName() == "Muted" and output.caption.text() == "Muted"
+    window.routectl.on_mic_toggle(True)
+    qapp.processEvents()
+    assert output.mute.accessibleName() == "Only your mic"
+    window.set_sending(True)
+    qapp.processEvents()
+    assert output.mute.accessibleName() == "Live" and output.caption.text() == "Live"

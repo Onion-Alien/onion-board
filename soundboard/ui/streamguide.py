@@ -148,7 +148,8 @@ class StreamerGuide(QDialog):
                 (_("Random sound"), "random", "category=", _("Plays any of your sounds")),
                 (_("Stop all"), "stop", "", _("Stops every sound")),
                 (_("Panic mute"), "live", "on=toggle",
-                 _("Muted / live: while muted nobody hears your sounds or your mic"))):
+                 _("Muted / live: while muted nobody hears your sounds (your mic still goes out "
+                   "unless a voice changer is on or Send my mic is off)"))):
             b = QPushButton(text)
             b.setToolTip(_("Copy the link: {tip}", tip=tip))
             b.clicked.connect(lambda __=False, b=b, a=action, q=query: self._copy(b, a, q))

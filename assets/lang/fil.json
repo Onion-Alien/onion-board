@@ -599,7 +599,6 @@
   "Mute mic during sounds": "I-mute ang mic habang may sound",
   "Mute my mic while a sound plays": "I-mute ang mic ko habang may sound na nagpe-play",
   "Muted": "Naka-mute",
-  "Muted / live: while muted nobody hears your sounds or your mic": "Muted / live: habang naka-mute, walang nakakarinig ng mga sound o mic mo",
   "Muted: others hear nothing": "Naka-mute: walang naririnig ang iba",
   "My changed voice": "Binago kong boses",
   "My headphones": "Headphones ko",
@@ -3415,5 +3414,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Ayan na! Pindutin ang <b>Tapusin</b>, at ipapakita ni Bun kung saan makakahanap ng mga sound. Puwede mong buksan ulit ang guide na ito anumang oras mula sa tab na <b>Setup</b> (<b>Step-by-step guide</b>).",
   "Try anything: a song, a meme, a game sound.": "Subukan kahit ano: kanta, meme, sound ng game.",
   "Type a song you love, then press Enter": "I-type ang kantang gusto mo, tapos pindutin ang Enter",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Nasa <b style='color:{colour}'>{mic}</b> na ang mga sound mo, kaya wala nang pipiliin sa Discord o sa mga game mo. Isang bagay na lang ang puwedeng pumigil sa kanila: ang sariling noise filter ng Discord, na naka-on bilang default."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Nasa <b style='color:{colour}'>{mic}</b> na ang mga sound mo, kaya wala nang pipiliin sa Discord o sa mga game mo. Isang bagay na lang ang puwedeng pumigil sa kanila: ang sariling noise filter ng Discord, na naka-on bilang default.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "Muted / live: habang naka-mute, walang nakakarinig ng mga sound mo (lumalabas pa rin ang mic mo, maliban kung naka-on ang voice changer o naka-off ang pagpapadala ng mic)"
 }

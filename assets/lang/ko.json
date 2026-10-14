@@ -932,7 +932,6 @@
   "More colours": "더 많은 색상",
   "Mute mic during sounds": "소리가 나는 동안 마이크 음소거",
   "Mute my mic while a sound plays": "소리가 재생되는 동안 마이크 음소거",
-  "Muted / live: while muted nobody hears your sounds or your mic": "음소거/라이브: 음소거된 동안에는 누구도 귀하의 소리나 마이크를 듣지 못합니다.",
   "My headphones": "내 헤드폰",
   "My mic": "내 마이크",
   "My mode {n}": "내 모드 {n}",
@@ -3339,5 +3338,6 @@
   "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "끝! <b>마침</b>을 누르면 Bun이 사운드 찾는 곳을 보여 줘요. 이 가이드는 언제든 <b>셋업</b> 탭(<b>단계별 가이드</b>)에서 다시 열 수 있어요.",
   "Try anything: a song, a meme, a game sound.": "뭐든 해 보세요: 노래, 밈, 게임 사운드.",
   "Type a song you love, then press Enter": "좋아하는 노래를 입력하고 Enter를 누르세요",
-  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "이제 사운드가 <b style='color:{colour}'>{mic}</b>에 들어가 있어서 Discord나 게임에서 고를 게 없어요. 막을 수 있는 건 하나뿐: 기본으로 켜져 있는 Discord 자체 소음 필터예요."
+  "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "이제 사운드가 <b style='color:{colour}'>{mic}</b>에 들어가 있어서 Discord나 게임에서 고를 게 없어요. 막을 수 있는 건 하나뿐: 기본으로 켜져 있는 Discord 자체 소음 필터예요.",
+  "Muted / live: while muted nobody hears your sounds (your mic still goes out unless a voice changer is on or Send my mic is off)": "음소거/라이브: 음소거된 동안에는 누구도 귀하의 소리를 듣지 못합니다(보이스 체인저가 켜져 있거나 마이크 보내기가 꺼져 있지 않으면 마이크는 계속 전달됩니다)."
 }
