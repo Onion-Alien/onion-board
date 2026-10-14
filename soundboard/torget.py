@@ -20,7 +20,6 @@ SHA256. A copy with an older stamp is offered as "Update Tor" in Settings.
 """
 from __future__ import annotations
 
-import hashlib
 import io
 import logging
 import shutil
@@ -116,22 +115,16 @@ class _Gone(Exception):
 def _download(url: str, progress) -> bytes:
     host = urllib.parse.urlsplit(url).hostname
     req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
-    h = hashlib.sha256()
     buf = io.BytesIO()
     try:
         with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
-            total = _length(r.headers.get("Content-Length"))
-            if total > MAX_BYTES:
-                raise GetError(_("The download is {mb} MB, far bigger than Tor: not "
-                                 "taking it.", mb=f"{total / 1e6:.0f}"))
-            while chunk := r.read(CHUNK):
-                h.update(chunk)
-                buf.write(chunk)
-                if buf.tell() > MAX_BYTES:
-                    raise GetError(_("The download kept going far past Tor's size: "
-                                     "not taking it."))
-                if progress:
-                    progress(buf.tell(), total)
+            got = net.read_capped(r, buf, MAX_BYTES, chunk=CHUNK, progress=progress)
+    except net.TooBig as e:
+        if e.listed:
+            raise GetError(_("The download is {mb} MB, far bigger than Tor: not "
+                             "taking it.", mb=f"{e.listed / 1e6:.0f}")) from None
+        raise GetError(_("The download kept going far past Tor's size: "
+                         "not taking it.")) from None
     except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
         raise GetError(errors.plain(e)) from None
     except urllib.error.HTTPError as e:
@@ -143,21 +136,12 @@ def _download(url: str, progress) -> bytes:
         why = getattr(e, "reason", None) or e
         raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why)
                        + " " + blocked_hint()) from None
-    got = h.hexdigest()
     if got != SHA256:
         log.warning("tor download: SHA-256 %s, expected %s", got, SHA256)
         raise GetError(_("The download isn't the Tor it should be (its checksum doesn't "
                          "match), so it wasn't used. Something between you and the Tor "
                          "Project changed it, or it was cut short: try again later."))
     return buf.getvalue()
-
-
-def _length(header) -> int:
-    """Content-Length as a number; 0 (unknown) when it's missing or isn't one."""
-    try:
-        return max(int(str(header or 0).strip()), 0)
-    except ValueError:
-        return 0
 
 
 def unpack(data: bytes, dest: Path | None = None) -> Path:

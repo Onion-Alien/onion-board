@@ -28,7 +28,6 @@ add-ons install with it (``scripts`` has no helper: install them from the Voice 
 """
 from __future__ import annotations
 
-import hashlib
 import logging
 import shutil
 import subprocess
@@ -102,27 +101,13 @@ def _download(to: Path, progress: Callable[[int, int], None] | None) -> None:
     """The package into the file ``to``, checked against SHA256. Raises GetError."""
     host = urllib.parse.urlsplit(URL).hostname
     req = urllib.request.Request(URL, headers={"User-Agent": "OnionBoard"})
-    h = hashlib.sha256()
-    got = 0
     try:
         with net.urlopen(req, timeout=DOWNLOAD_TIMEOUT_S, feature=FEATURE) as r, \
                 open(to, "wb") as f:
-            try:
-                total = max(int(str(r.headers.get("Content-Length") or 0).strip()), 0)
-            except ValueError:
-                total = 0
-            if total > MAX_BYTES:
-                raise GetError(_("The download isn't the Python it should be, so it "
-                                 "wasn't used."))
-            while chunk := r.read(CHUNK):
-                h.update(chunk)
-                f.write(chunk)
-                got += len(chunk)
-                if got > MAX_BYTES:
-                    raise GetError(_("The download isn't the Python it should be, so it "
-                                     "wasn't used."))
-                if progress:
-                    progress(got, total)
+            got = net.read_capped(r, f, MAX_BYTES, chunk=CHUNK, progress=progress)
+    except net.TooBig:
+        raise GetError(_("The download isn't the Python it should be, so it "
+                         "wasn't used.")) from None
     except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
         raise GetError(errors.plain(e)) from None
     except urllib.error.HTTPError as e:
@@ -131,8 +116,8 @@ def _download(to: Path, progress: Callable[[int, int], None] | None) -> None:
     except (urllib.error.URLError, OSError) as e:
         why = getattr(e, "reason", None) or e
         raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why)) from None
-    if h.hexdigest() != SHA256:
-        log.warning("python download: SHA-256 %s, expected %s", h.hexdigest(), SHA256)
+    if got != SHA256:
+        log.warning("python download: SHA-256 %s, expected %s", got, SHA256)
         raise GetError(_("The download isn't the Python it should be, so it wasn't used."))
 
 
