@@ -79,6 +79,11 @@ DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the pro
 # features with nothing on this PC: the relay refuses them 127.x / localhost in every
 # mode (every station comes from Radio Browser, so one leading here is a redirect)
 NEVER_THIS_PC = frozenset({"radio"})
+# features whose urlopen() may reach this PC / the home network: a custom voice server
+# is one the user typed in, often on their own PC or LAN. For every other feature only
+# a URL the caller names on this PC is (the "explicit loopback" API); a redirect or a
+# LAN address is refused.
+HOME_OK = frozenset({"voice_servers"})
 
 # Everything that goes online, by the key its requests carry: its switch in Settings >
 # Privacy & security (cfg.net_off lists the ones switched off). The names as written
@@ -379,6 +384,15 @@ def web_url(url: str) -> str:
     if parts.scheme.lower() not in ("http", "https") or not parts.hostname:
         return ""
     return url.strip()
+
+
+def home_url(url: str) -> bool:
+    """Does `url` point at this PC or the home network (loopback, a private, link-local
+    or .lan / .local address)? Without a lookup: for addresses a web page names."""
+    try:
+        return _local_target(urllib.parse.urlsplit(url.strip()).hostname or "")
+    except ValueError:
+        return False
 
 
 def offline() -> bool:
@@ -926,14 +940,46 @@ def _tls_context() -> ssl.SSLContext:
     return ctx
 
 
+def _refuse_home(feature: str, u: urllib.parse.SplitResult) -> ProxyError:
+    """The error (logged, and kept for explain()) for a request to this PC or the
+    home network that `feature` may not make."""
+    host = (u.hostname or "").strip("[]")
+    why = _("Not connecting to {host}: it's on this PC or your home network", host=host)
+    try:
+        port = u.port or (443 if u.scheme.lower() == "https" else 80)
+    except ValueError:
+        port = 0
+    netlog.blocked(feature, host, port, why)
+    return _failed(why)
+
+
+class _RedirectHandler(urllib.request.HTTPRedirectHandler):
+    """A site's redirect never leads into this PC or the home network (except for
+    HOME_OK features), and one to this PC is still checked against the switches:
+    connect() lets loopback through unchecked only because the caller named it."""
+
+    def __init__(self, feature: str):
+        super().__init__()
+        self.feature = feature
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        u = urllib.parse.urlsplit(newurl)
+        host = u.hostname or ""
+        if _local_target(host):
+            if self.feature not in HOME_OK:
+                raise _refuse_home(self.feature, u)
+            check(self.feature)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
 def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector:
     """http / https only, connections made by connect() for `feature`: no ftp:// or
     file:// handler, and environment proxies are ignored (they point at the relay, and
-    a redirect can't step around the setting)."""
+    a redirect can't step around the setting, or into this PC / the home network)."""
     o = urllib.request.OpenerDirector()
     for h in (urllib.request.UnknownHandler(), _HTTPHandler(feature, direct),
               _HTTPSHandler(feature, _tls_context(), direct),
-              urllib.request.HTTPDefaultErrorHandler(), urllib.request.HTTPRedirectHandler(),
+              urllib.request.HTTPDefaultErrorHandler(), _RedirectHandler(feature),
               urllib.request.HTTPErrorProcessor()):
         o.add_handler(h)
     return o
@@ -942,7 +988,9 @@ def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector
 def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool = False):
     """urllib.request.urlopen for `feature` (a key of FEATURES), the way the Connection
     setting says. Raises FeatureOff, before anything is looked up, when that's switched
-    off or no feature is named (a URL on this PC is always allowed). `direct` connects
+    off or no feature is named (a URL on this PC is always allowed). Any other address
+    on the home network (192.168.x, .lan…) is refused, except for HOME_OK features,
+    and so is a redirect into this PC or the home network. `direct` connects
     straight to the site whatever the Connection setting (the switches still hold):
     only for a click on "Try this one without Tor" (the user's own choice for that one
     request)."""
@@ -963,6 +1011,9 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
             netlog.blocked(feature, u.hostname or "", port, str(e))
             raise
     assert feature is not None   # check() raised for None
+    if (feature not in HOME_OK and not is_loopback(u.hostname or "")
+            and _local_target(u.hostname or "")):
+        raise _refuse_home(feature, u)
     try:
         return _opener(feature, direct).open(req, timeout=timeout)
     except urllib.error.URLError as e:

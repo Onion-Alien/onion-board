@@ -1820,7 +1820,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHubs nedlastingssjekk er midlertidig utilgjengelig (gatewayfeil). Prøv Get Onion Watch igjen om et øyeblikk.",
   "Got it": "Skjønner det",
   "Growl": "Knurre",
-  "Hear": "Høre",
   "Hear it": "Hør det",
   "Helmet": "Hjelm",
   "Helmet size": "Hjelmstørrelse",
@@ -3356,6 +3355,7 @@
   "soft": "myk",
   "warm": "varm",
   "clean": "ren",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Programmets siste minutt som en lydbølge: velg en bit og ta vare på den som et klipp. Den lytter bare mens den er åpen.",
   "{n} sound couldn't be read and was left out.": [
     "{n} lyd kunne ikke leses og ble utelatt.",
     "{n} lyder kunne ikke leses og ble utelatt."

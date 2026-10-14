@@ -1823,7 +1823,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Die Download-Prüfung von GitHub ist vorübergehend nicht verfügbar (Gateway-Fehler). Versuchen Sie es gleich noch einmal mit „Get Onion Watch“.",
   "Got it": "Habe es",
   "Growl": "Knurren",
-  "Hear": "Hören",
   "Hear it": "Hören Sie es",
   "Helmet": "Helm",
   "Helmet size": "Helmgröße",
@@ -3356,6 +3355,7 @@
   "soft": "weich",
   "warm": "warm",
   "clean": "sauber",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Die letzte Minute dieses Programms als Wellenform: Wählen Sie ein Stück daraus aus und behalten Sie es als Clip. Es lauscht nur, solange es geöffnet ist.",
   "{n} sound couldn't be read and was left out.": [
     "{n} Sound konnte nicht gelesen werden und wurde weggelassen.",
     "{n} Sounds konnten nicht gelesen werden und wurden weggelassen."

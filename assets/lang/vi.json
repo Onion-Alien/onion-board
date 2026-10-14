@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Kiểm tra tải xuống của GitHub tạm thời không khả dụng (lỗi cổng). Hãy thử tải lại Onion Watch sau giây lát.",
   "Got it": "Hiểu rồi",
   "Growl": "gầm gừ",
-  "Hear": "Nghe",
   "Hear it": "Hãy nghe nó",
   "Helmet": "Mũ bảo hiểm",
   "Helmet size": "Kích thước mũ bảo hiểm",
@@ -3281,6 +3280,7 @@
   "soft": "mềm",
   "warm": "ấm",
   "clean": "sạch",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "Phút cuối của chương trình này dưới dạng sóng âm: chọn một đoạn và giữ lại thành clip. Chỉ nghe khi đang mở.",
   "{n} sound couldn't be read and was left out.": [
     "Không đọc được {n} âm thanh nên đã bỏ qua."
   ]
