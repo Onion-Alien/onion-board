@@ -611,7 +611,8 @@ def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp):
     QTest.keyClick(pad, Qt.Key_F2)
     assert w.meta("s0").name == "Big boom" and pad.meta.name == "Big boom"
     edited = []
-    monkeypatch.setattr(w.editctl, "edit", lambda sid, tab="sound": edited.append(sid))
+    pad.edit.disconnect()   # (wired to the real Edit sound when the pad was made)
+    pad.edit.connect(edited.append)
     QTest.keyClick(pad, Qt.Key_Return, Qt.AltModifier)
     assert edited == ["s0"]
     asked = []

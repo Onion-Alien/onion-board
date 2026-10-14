@@ -442,7 +442,8 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
     m = window.meta("s0")
     before = len(window.audio["s0"])
     stopped = []
-    real = main.load_sound
+    from soundboard.ui import editcontrol
+    real = editcontrol.load_sound
 
     def slow(meta, cancel=None):
         if meta.fx.get("speed") == 2.0:   # the first save: still going when the next comes
@@ -452,7 +453,7 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
             stopped.append(cancel())
             raise main.library.Cancelled
         return real(meta, cancel)
-    monkeypatch.setattr(main, "load_sound", slow)
+    monkeypatch.setattr(editcontrol, "load_sound", slow)
     m.fx = {"speed": 2.0}
     window.editctl._rerender(m)
     m.fx = {"speed": 0.5}
