@@ -1,8 +1,8 @@
 """Render the installer's artwork (Bun the mascot, from soundboard/bunny.py) into
 installer/. build.ps1 runs this before compiling the installer.
 
-    .venv\\Scripts\\python scripts\\make_bunny.py            # installer images
-    .venv\\Scripts\\python scripts\\make_bunny.py --preview  # also a sheet of every pose
+    .venv\\Scripts\\python scripts\\pictures\\make_bunny.py            # installer images
+    .venv\\Scripts\\python scripts\\pictures\\make_bunny.py --preview  # also a sheet of every pose
 """
 import os
 import sys
@@ -16,7 +16,7 @@ os.environ.setdefault("QT_QPA_FONTDIR",
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QColor, QGuiApplication, QImage, QLinearGradient, QPainter
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))   # run from scripts\: make `soundboard` importable
 OUT = ROOT / "installer"
 

@@ -123,14 +123,14 @@ def main():
         start = time.time()
         # judged by the pictures it wrote: it sometimes crashes on its way out (os._exit
         # with Qt's threads still running), after everything is saved
-        subprocess.run([sys.executable, "-u", str(ROOT / "scripts" / "screenshots.py"),
+        subprocess.run([sys.executable, "-u", str(ROOT / "scripts" / "pictures" / "screenshots.py"),
                         "--out", str(SHOTS)], cwd=ROOT)
         stale = [p.name for p in SHOTS.glob("*.png") if p.stat().st_mtime < start
                  and (p.name != "triggers.png" or os.environ.get("ONIONBOARD_ONION_WATCH_ZIP"))]
         if stale:
             raise SystemExit(f"screenshots.py didn't redo: {', '.join(stale)}")
     if args.tour:
-        subprocess.run([sys.executable, str(ROOT / "scripts" / "tour.py"),
+        subprocess.run([sys.executable, str(ROOT / "scripts" / "pictures" / "tour.py"),
                         "--out", str(SHOTS / "tour.webp")], cwd=ROOT, check=True)
     bust_caches()
 
