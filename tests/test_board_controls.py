@@ -656,3 +656,14 @@ def test_transport_time_is_blank_until_a_sound_is_picked(window):
     assert w.np_time.text() and not w.np_time.isHidden()
     w.remove_sound("s0")   # back to "Pick a sound"
     assert w.np_time.text() == "" and w.np_time.isHidden()
+
+
+def test_player_bar_sound_has_no_outline_on_its_card(window):
+    """The sound named in the player bar isn't outlined on the board: cards at rest
+    show no border (it looked like a stray focus box after leaving Settings)."""
+    w = window
+    w.select("s1")
+    pad = w.pads["s0"]
+    plain = pad.grab().toImage()
+    w.select("s0")
+    assert pad.selected and pad.grab().toImage() == plain
