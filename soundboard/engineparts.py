@@ -8,6 +8,7 @@ reads the device list (those stay in engine.py, where tests swap them).
 """
 from __future__ import annotations
 
+import functools
 import logging
 import queue
 import threading
@@ -27,6 +28,12 @@ log = logging.getLogger("soundboard.engine")
 SR = 48000  # library storage rate
 CH = 2
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
+STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reopen it
+RETRY_S = 5.0   # how often to retry a device that failed to open
+# What each Audio buffering choice asks PortAudio for. Windows' shared mode never goes
+# below its own 10 ms period, so 'low' and PortAudio's 'high' (10 ms) both came out as
+# 22 ms with ~10 ms to spare per block; asking for a number buys real room.
+BUFFER = {"low": "low", "high": 0.04}
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
 # Pong game's sounds (ui/bunpong.py). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
@@ -111,6 +118,41 @@ class DeviceWorker:
                     log.exception("device work's hand-back failed")
                     self.release()
 
+
+# Held while streams are opened or closed and while PortAudio is re-scanned (torn down
+# and started again), which happen on the device thread (DeviceWorker). The device
+# lists (engine.list_devices...) never wait for it: during a re-scan PortAudio's list
+# is being freed, so they answer from the last list they read instead.
+DEVICES = threading.RLock()
+
+
+def _holding_devices(fn):
+    """Engine methods that open or close streams hold DEVICES, so two threads never
+    do it at the same time. Call them on the device thread (DeviceWorker; a device
+    picked in the window goes through DeviceControl._device_job), not the UI thread: a
+    recovery stuck holding DEVICES there would freeze the window."""
+    @functools.wraps(fn)
+    def run(*a, **k):
+        with DEVICES:
+            return fn(*a, **k)
+    return run
+
+
+def close_quietly(s, what):
+    try:
+        s.close()
+    except Exception:  # noqa: BLE001
+        log.debug("closing %s raised", what, exc_info=True)
+
+
+def start_or_close(s, what):
+    """Start a freshly made stream; if that fails, close it before re-raising, or
+    every RETRY_S retry of a busy device leaks one PortAudio stream."""
+    try:
+        s.start()
+    except Exception:
+        close_quietly(s, what)
+        raise
 
 # --------------------------------------------------------------------------- helpers
 
