@@ -4,19 +4,19 @@ plumbing: pad syncing, the metadata index, the mic-check pulse, the wheel guard.
 import time
 
 import numpy as np
-from conftest import said, unsay
 import pytest
 import soundfile as sf
+from conftest import said, unsay
 from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QApplication, QScrollArea, QSlider, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QLabel, QScrollArea, QSlider, QVBoxLayout, QWidget
 
-from soundboard import engine
-from soundboard import library
-from soundboard.ui import mainwindow as main
-from soundboard import __version__, winkeys
+from soundboard import __version__, engine, library, winkeys
 from soundboard.library import SR, Config, SoundMeta
+from soundboard.ui import mainwindow as main
+from soundboard.ui import windowbuild
 from soundboard.ui.livedot import is_tab_live
+from soundboard.ui.tabcontrol import TABS
 from soundboard.wheelguard import no_wheel
 
 
@@ -37,13 +37,13 @@ def window(qapp, app_dir, monkeypatch):
     w = main.MainWindow()
     # the loader thread writes the cache and prunes orphans: it must finish while the
     # temp paths are still patched in, never after the fixture is torn down
-    w._load_thread.join(15)
-    assert not w._load_thread.is_alive()
+    w.soundctl._load_thread.join(15)
+    assert not w.soundctl._load_thread.is_alive()
     w.load_triggers()   # now, not on its timer in the middle of a test
     yield w
     w.close()
-    w._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now
-    assert not w._load_thread.is_alive()
+    w.soundctl._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now
+    assert not w.soundctl._load_thread.is_alive()
     # a closed top-level window isn't freed by Qt; left alive, every later test's
     # theme / stylesheet change restyles all of them and the suite crawls
     from PySide6.QtCore import QEvent
@@ -69,9 +69,10 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
                         lambda self: (calls.append(self), real(self)))
 
     building = []
-    real_build = main.MainWindow._build_ui
-    monkeypatch.setattr(main.MainWindow, "_build_ui",
-                        lambda self: (building.append(self), real_build(self))[1])
+    from soundboard.ui.windowbuild import WindowBuilder
+    real_build = WindowBuilder._build_ui
+    monkeypatch.setattr(WindowBuilder, "_build_ui",
+                        lambda self: (building.append(self.mw), real_build(self))[1])
 
     def slow_pump():   # a slow start with the splash up
         time.sleep(0.08)
@@ -85,7 +86,7 @@ def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
         assert calls and not errors
         assert not w.triggers.pending   # loaded while the window was built
     finally:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
         from PySide6.QtCore import QEvent
         w.deleteLater()
@@ -112,7 +113,7 @@ def test_rebuild_keeps_existing_pad_widgets(window):
 
 def test_reorder_moves_without_recreating(window):
     old = dict(window.pads)
-    window.on_reorder("s1", 0)
+    window.soundctl.on_reorder("s1", 0)
     assert [m.id for m in window.cfg.sounds] == ["s1", "s0"]
     assert window.pads["s1"] is old["s1"]
     assert [p.meta.id for p in window.grid.pads] == ["s1", "s0"]
@@ -188,6 +189,7 @@ def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkey
     the search's sound was in no chip and the player stayed on the stopped pad, so
     only Stop all could reach it."""
     import numpy as np
+
     from soundboard.ui.linkbar import PLAY_ID
     live = {"s0": (0.2, False)}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
@@ -213,6 +215,7 @@ def test_a_stopped_web_song_leaves_the_player(window, monkeypatch):
     """A web search's song played, then another site picked: its card went, ■ only
     stopped it and its name stayed in the player bar for good."""
     import numpy as np
+
     from soundboard.ui.linkbar import PLAY_ID
     live = {}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
@@ -237,7 +240,7 @@ def test_now_playing_label_lines_up_with_its_chips(window, qapp):
     window.playctl.select("s1")
     window.playctl._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
     qapp.processEvents()
-    lbl = next(w for w in window.playing_row.findChildren(main.QLabel)
+    lbl = next(w for w in window.playing_row.findChildren(QLabel)
                if w.text() == "Now playing")
     for chip in window._chips.values():
         assert abs(lbl.geometry().center().y() - chip.geometry().center().y()) <= 1
@@ -387,7 +390,7 @@ def test_maximizing_doesnt_grow_what_the_window_needs(window, qapp):
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(1180, 720)
     window.fitctl._refit()
-    page = window.tabs.widget([t for t, _ in main.TABS].index("Radio"))
+    page = window.tabs.widget([t for t, _ in TABS].index("Radio"))
     assert page.isAncestorOf(window.radio)
     small = page.minimumSizeHint().height()
     for _ in range(2):
@@ -520,7 +523,7 @@ def test_speed_popup_shrinks_back_when_redline_locks(window, qapp):
 
 def test_every_tab_has_its_own_label(window):
     texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
-    assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
+    assert texts == [t for t, _ in TABS] and len(set(texts)) == len(texts)
     assert window.tabs.tabToolTip(2) == ""   # the name says it: no hover tip
 
 
@@ -575,7 +578,7 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
     window.tickctl.tick()
     assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
-    from soundboard.ui.linkbar import PLAY_ID   # a web search's Play lights it too
+    from soundboard.ui.linkbar import PLAY_ID  # a web search's Play lights it too
     playing.clear()
     playing[PLAY_ID] = (0.1, False)
     window.tickctl.tick()
@@ -1121,11 +1124,12 @@ def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window, monkeypat
 def test_mic_card_status_uses_painted_marks_on_one_line(window, monkeypatch):
     """The mic card's status lines show the app's own tick and cross (not the font's
     ✓ / ✗), and "not running" fits beside "Into your mic" at 1180x720."""
+    from PySide6.QtWidgets import QApplication
+
     from soundboard import directmic as dm
     from soundboard import engine as eng
     from soundboard import theme
     from soundboard.ui import icons
-    from PySide6.QtWidgets import QApplication
     w = window
     dead = {"on": True}
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
@@ -1363,7 +1367,7 @@ def test_full_screen_caps_only_the_search_box(window, qapp):
     window.tabs.setCurrentIndex(0)
     window.resize(1920, 1080)
     QTest.qWait(150)   # the window's re-fit runs on a timer
-    assert window.search.width() == main.SEARCH_MAX_W
+    assert window.search.width() == windowbuild.SEARCH_MAX_W
     last = window._pad_size[1]   # Pad size: the toolbar's last control
     right = last.mapTo(window.sounds_toolbar, last.rect().topRight()).x()
     assert window.sounds_toolbar.width() - right < 40

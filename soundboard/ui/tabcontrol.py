@@ -145,7 +145,7 @@ class TabControl(Controller):
                        lambda: mw.setctl.open_settings("tabs"))
         # Bun mode from the full window too (the mini player has its own Bun button)
         menu.addSeparator()
-        act = menu.addAction(mw._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
+        act = menu.addAction(mw.builder._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
         act.setToolTip(BUN_TIP)
         menu.setToolTipsVisible(True)
         return menu
@@ -184,7 +184,7 @@ class TabControl(Controller):
         if not on and mw.tabs.currentIndex() == i:
             mw.tabs.move_to(0)   # (Settings, where this is done, stays up)
         if key == "radio":
-            mw._radio_follow_switch()
+            mw.netctl._radio_follow_switch()
         else:
             self._swap_tab(key)
         mw.tabs.setTabVisible(i, self.tab_shown(key))

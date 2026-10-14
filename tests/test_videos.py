@@ -134,8 +134,8 @@ def test_the_video_follows_the_sound(qapp):
 
 def _close(qapp, w):
     w.close()
-    if w._load_thread:
-        w._load_thread.join(15)
+    if w.soundctl._load_thread:
+        w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
@@ -155,7 +155,7 @@ def window(qapp, app_dir, monkeypatch):
     Config(sounds=sounds).save()
     videos.link("vid", _video(app_dir / "clips" / "vid.mp4"))
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     process_events(qapp, lambda: all(p.state == "ready" for p in w.pads.values()), 5)
     yield w
     _close(qapp, w)

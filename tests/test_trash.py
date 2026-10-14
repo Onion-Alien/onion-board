@@ -221,10 +221,10 @@ def _restart(qapp):
 
     from soundboard.ui import mainwindow as main
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     ids = [m.id for m in w.cfg.sounds]
     w.close()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
     return ids

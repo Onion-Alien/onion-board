@@ -164,7 +164,7 @@ class HotkeyControl(Controller):
             mw.say(_("<span style='color:{status}'>Nothing to save: {why}.</span>",
                        status=theme.status('warn'), why=html.escape(why)), "warn")
             return
-        mw.on_clip(data, _("Replay {time}", time=time.strftime("%H.%M.%S")))
+        mw.soundctl.on_clip(data, _("Replay {time}", time=time.strftime("%H.%M.%S")))
         mw.playctl.cue("saved")
 
     def on_hotkeys_failed(self, failed: list[str]):

@@ -50,7 +50,7 @@ def wizard(qapp, app_dir, devices):
     wiz = setupwizard.SetupWizard(w)
     yield w, wiz
     wiz.done(0)
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.close()
     from PySide6.QtCore import QEvent   # free it (see test_mainwindow's window fixture)
     wiz.deleteLater()
@@ -307,7 +307,7 @@ def test_resumed_guide_starts_on_the_cable_and_welcomes_them_back(qapp, app_dir,
         assert wiz.bun_cable.celebrate
     finally:
         wiz.done(0)
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
 
 
@@ -381,7 +381,7 @@ def test_resumed_guide_with_the_cable_still_missing_offers_to_install_again(
         assert not wiz.btn_cable.isHidden() and "again" in wiz.btn_cable.text()
     finally:
         wiz.done(0)
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
 
 
@@ -414,7 +414,7 @@ def test_no_microphone_at_all_says_so(qapp, app_dir, devices, monkeypatch):
         assert "No microphone was found" in wiz.mic_heard.text()
     finally:
         wiz.done(0)
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.close()
 
 
@@ -469,7 +469,7 @@ def test_steam_guide_text_has_its_spaces(wizard):
 def _close(qapp, w, wiz):
     from PySide6.QtCore import QEvent
     wiz.done(0)
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.close()
     wiz.deleteLater()
     w.deleteLater()
@@ -507,7 +507,7 @@ def mic_wizard(qapp, app_dir, devices, monkeypatch):
     wiz = setupwizard.SetupWizard(w)
     yield w, wiz
     wiz.done(0)
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.close()
     from PySide6.QtCore import QEvent
     wiz.deleteLater()
@@ -566,7 +566,7 @@ def test_a_mic_set_up_finishing_after_the_guide_closed_is_ignored(qapp, app_dir,
                         lambda self, rescan=True: calls.append(rescan))
     w.mic_attached.emit("My mic", "")
     assert calls == []
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     w.close()
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)

@@ -1,8 +1,8 @@
 """*Did you know?* tips: when one is due, which one, and the bar's Show me."""
+from test_mainwindow import window  # noqa: F401  (the real MainWindow)
+
 from soundboard import tips
 from soundboard.library import Config
-
-from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 
 def cfg(**kw):
@@ -10,7 +10,7 @@ def cfg(**kw):
 
 
 def test_about_twenty_tips_each_with_a_known_place():
-    from soundboard.ui.mainwindow import TAB_INDEX
+    from soundboard.ui.tabcontrol import TAB_INDEX
     pages = {"privacy", "connection", "data", "general", "tabs", "appearance", "audio",
              "hotkeys", "overlay", "updates", "help", "remote", "about"}
     assert 18 <= len(tips.TIPS) <= 26 and len(tips.BY_KEY) == len(tips.TIPS)

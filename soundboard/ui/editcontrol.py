@@ -201,7 +201,7 @@ class EditControl(Controller):
             return m.id, data, ""
 
         def prune():
-            worker.run(lambda: prune_cache(cache_keep(mw._live_metas())), name="prune")
+            worker.run(lambda: prune_cache(cache_keep(mw.soundctl._live_metas())), name="prune")
 
         def failed(e):
             prune()

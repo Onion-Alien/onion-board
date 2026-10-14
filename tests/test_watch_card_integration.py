@@ -102,7 +102,7 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
                         "triggers", app_dir / "modules")
     Config(screen={"on": False, "triggers": []}, mic_first=True).save()
     w = main.MainWindow()
-    w._load_thread.join(15)
+    w.soundctl._load_thread.join(15)
     try:
         w.load_triggers()
         w.resize(1100, 800)
@@ -134,6 +134,6 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
         assert shown()
     finally:
         w.close()
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)

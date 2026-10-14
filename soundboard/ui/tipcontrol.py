@@ -77,9 +77,9 @@ class TipControl(Controller):
         elif kind == "search":
             mw.tabs.setCurrentWidget(mw.sounds_page)
             mw.search.setFocus()
-        elif kind == "record" and hasattr(mw, "record_dialog"):
+        elif kind == "record" and hasattr(mw.soundctl, "record_dialog"):
             mw.tabs.setCurrentWidget(mw.sounds_page)
-            mw.record_dialog()
+            mw.soundctl.record_dialog()
         elif kind == "deleted":
             mw.rmctl.show_deleted()
         else:

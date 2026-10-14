@@ -106,7 +106,7 @@ def test_two_writers_of_one_cache_leave_a_whole_file_and_no_temp(app_dir, monkey
 def test_load_all_skips_sounds_an_earlier_load_is_still_decoding(app_dir, monkeypatch):
     """_load_all again while the first is still on a slow sound (a pack import, Undo)
     doesn't decode that sound a second time; its thread ends after the first one's."""
-    from soundboard.ui import mainwindow as mw
+    from soundboard.ui import soundscontrol as mw
     slow, other = (SoundMeta(id="slow", name="slow", file="slow.wav"),
                     SoundMeta(id="other", name="other", file="o.wav"))
     started, go = threading.Event(), threading.Event()
@@ -124,22 +124,23 @@ def test_load_all_skips_sounds_an_earlier_load_is_still_decoding(app_dir, monkey
     monkeypatch.setattr(mw.thumbs, "prune", lambda *a: None)
     monkeypatch.setattr(mw.trash, "prune", lambda *a: None)
     sounds = [slow]
-    w = SimpleNamespace(cfg=SimpleNamespace(sounds=sounds), audio={}, _loading=set(),
-                        _load_thread=None, _live_metas=lambda: list(sounds),
-                        engine=SimpleNamespace(prepare=lambda *a: None),
-                        bridge=SimpleNamespace(loaded=SimpleNamespace(emit=lambda *a: None)))
-    mw.MainWindow._load_all(w)
-    first = w._load_thread
+    win = SimpleNamespace(cfg=SimpleNamespace(sounds=sounds), audio={},
+                          engine=SimpleNamespace(prepare=lambda *a: None),
+                          bridge=SimpleNamespace(loaded=SimpleNamespace(emit=lambda *a: None)))
+    w = SimpleNamespace(soundctl=SimpleNamespace(mw=win, _loading=set(), _load_thread=None,
+                                                 _live_metas=lambda: list(sounds)))
+    mw.SoundsControl._load_all(w.soundctl)
+    first = w.soundctl._load_thread
     assert started.wait(10)
     sounds.append(other)   # added while "slow" is still loading
-    mw.MainWindow._load_all(w)
-    second = w._load_thread
+    mw.SoundsControl._load_all(w.soundctl)
+    second = w.soundctl._load_thread
     second.join(0.5)
     assert second.is_alive()   # waits for the sound it left to the first
     go.set()
     first.join(10)
     second.join(10)
-    assert sorted(decoded) == ["other", "slow"] and not w._loading
+    assert sorted(decoded) == ["other", "slow"] and not w.soundctl._loading
 
 
 def test_load_sound_decodes_once_then_uses_the_cache(app_dir, monkeypatch):

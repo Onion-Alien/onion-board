@@ -7,18 +7,19 @@ from PySide6.QtCore import QEvent
 from soundboard import __version__, engine, winkeys
 from soundboard.library import Config
 from soundboard.ui import mainwindow as main
+from soundboard.ui.tabcontrol import TAB_INDEX
 
 
 def test_start_focus_is_the_open_tab_without_the_ring(qapp, app_dir, monkeypatch):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
-    voice = main.TAB_INDEX["voice"]
+    voice = TAB_INDEX["voice"]
     Config(mic_first=True, stats_version=__version__, tab=voice, tabs_off=[],
            setup_done=True).save()
     w = main.MainWindow()
     try:
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.show()
         w.activateWindow()
         for _ in range(20):
@@ -30,6 +31,6 @@ def test_start_focus_is_the_open_tab_without_the_ring(qapp, app_dir, monkeypatch
         assert [b.index for b in w.rail.buttons if b.hasFocus()] == []
     finally:
         w.close()
-        w._load_thread.join(15)
+        w.soundctl._load_thread.join(15)
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
