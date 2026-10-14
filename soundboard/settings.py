@@ -1584,7 +1584,8 @@ class SettingsDialog(QDialog):
                   "game is up."), self.mw.cfg.tips_on, self.mw.set_tips_on)
         v.addWidget(card)
         v.addWidget(self._app_setup_card())
-        v.addWidget(self._programs_card())
+        if self.mw.cfg.category_programs:   # rules made before the category menu lost it
+            v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
@@ -1676,10 +1677,7 @@ class SettingsDialog(QDialog):
 
     def _programs_card(self):
         """Switch category when a program is in front: every rule in one place."""
-        card, cv = self._card(
-            _("Switch category by program"),
-            _("Right-click a category tab → Show this when a program is in front and the board "
-              "shows that category by itself whenever the program is in front."))
+        card, cv = self._card(_("Switch category by program"))
         self.box_programs = self._option(
             cv, _("Switch by itself"),
             _("When the program closes, the board goes back to what it showed before."),
@@ -3368,7 +3366,7 @@ class SettingsDialog(QDialog):
     def _updates_optin(self, on: bool):
         self.mw.set_option("update_check", on)
         if on:
-            self.mw.check_updates(why="You turned on update checks")
+            self.mw.updctl.check_updates(why="You turned on update checks")
 
     def _updates_check(self):
         if busy.is_busy(self.upd_btn) or not self.upd_btn.isEnabled():
@@ -3376,7 +3374,7 @@ class SettingsDialog(QDialog):
         self._upd_asked = True
         busy.set_busy(self.upd_btn, True)
         self.upd_label.setText(_("Checking…"))
-        self.mw.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
+        self.mw.updctl.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
 
     def _updates_done(self, rel, err: str):
         if not qt_valid(self.upd_label):
@@ -3397,9 +3395,9 @@ class SettingsDialog(QDialog):
     def _updates_state(self):
         if not qt_valid(self.upd_label):
             return
-        status = self.mw.update_status() if self.mw.release is not None else ""
-        if status and (self.mw._downloading or self.mw._update_err
-                       or self.mw._update_file is not None):
+        status = self.mw.updctl.update_status() if self.mw.updctl.release is not None else ""
+        if status and (self.mw.updctl._downloading or self.mw.updctl._update_err
+                       or self.mw.updctl._update_file is not None):
             self.upd_label.setText(status)
 
     def done(self, r):

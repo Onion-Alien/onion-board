@@ -85,7 +85,7 @@ def test_a_missing_device_is_retried_off_the_ui_thread(monkeypatch, gate):
     e = Engine()
     e.names["mic"] = "Microphone (USB Mic)"
     e.tap_name = "CABLE Input"                      # straight into the mic, and the cable
-    e.copy_names = ("Speakers",)                    # Also send to
+    e.copy_names = ("Speakers",)                    # Also play on
     e.errors["mic"] = "device not found"
     assert quick(e.check_streams) == []
     gate.set()
@@ -188,7 +188,7 @@ def recording(calls, key):
 
 def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
         main_window, monkeypatch, qapp):  # noqa: F811
-    """Audio buffering (reopens every stream) and Also send to's stream output were
+    """Audio buffering (reopens every stream) and Also play on's stream output were
     opened on the UI thread: a recovery holding the devices froze the window."""
     from conftest import devices_done
     w = main_window
