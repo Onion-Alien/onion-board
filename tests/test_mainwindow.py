@@ -778,7 +778,7 @@ def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
 def test_every_tab_stays_the_whole_window_down_to_the_mini_size(window, qapp):
     """The icon-only tabs' padding alone needed ~480 px, so a window the rest fits
     (480 px is a 600 px window at 125 %) turned into the mini player."""
-    from soundboard.ui.mainwindow import MINI_SIZE
+    from soundboard.ui.fitcontrol import MINI_SIZE
 
     window.show()
     window.resize(1000, 700)
