@@ -1,5 +1,5 @@
-// The home page's moving parts: the Board / Watch tabs, the try-it pads (every sound
-// is made here with the Web Audio API: no sound files), Bun and Hoot, the Watch demo,
+// The home page's moving parts: the Board / Watch tabs, the try-it pads (made here with
+// the Web Audio API; Hoot's hoot is a real owl, sounds/hoot.mp3), Bun and Hoot, the Watch demo,
 // and the small stuff (reveal on scroll, counters, the copy button).
 (function () {
   "use strict";
@@ -145,6 +145,7 @@
       noise = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
       var d = noise.getChannelData(0);
       for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      loadClip("hoot", "sounds/hoot.mp3");
     }
     if (ac.state === "suspended") ac.resume();
     return ac;
@@ -164,6 +165,43 @@
     did(muted ? "mute-on" : "mute-off");
     if (!muted) { audio(); play("coin"); }
   });
+
+  // Recorded clips, fetched once the page may play sound.
+  var clips = {};
+  function loadClip(name, url) {
+    fetch(url).then(function (r) { return r.arrayBuffer(); })
+      .then(function (b) { return new Promise(function (ok, no) { ac.decodeAudioData(b, ok, no); }); })
+      .then(function (buf) { clips[name] = buf; })
+      .catch(function () { /* offline or blocked: the made-up one plays instead */ });
+  }
+  function clip(name, t, vol) {
+    var buf = clips[name];
+    if (!buf) return 0;
+    var s = ac.createBufferSource(), g = ac.createGain();
+    s.buffer = buf; g.gain.value = vol;
+    s.connect(g); g.connect(bus);
+    s.start(t);
+    return buf.duration;
+  }
+  // A dark, booming room for the vine boom: decaying noise, made once.
+  var roomIR = null;
+  function room(to) {
+    if (!roomIR) {
+      var n = Math.floor(ac.sampleRate * 1.8), ch = [0, 1];
+      roomIR = ac.createBuffer(2, n, ac.sampleRate);
+      ch.forEach(function (c) {
+        var d = roomIR.getChannelData(c), lp = 0;
+        for (var i = 0; i < n; i++) {
+          lp += 0.08 * ((Math.random() * 2 - 1) - lp);       // dark: low-passed noise
+          d[i] = lp * Math.exp(-i / (ac.sampleRate * 0.38));
+        }
+      });
+    }
+    var cv = ac.createConvolver();
+    cv.buffer = roomIR;
+    cv.connect(to);
+    return cv;
+  }
 
   function env(g, t, a, peak, d) {
     g.gain.setValueAtTime(0.0001, t);
@@ -215,17 +253,38 @@
       });
       return 1.15;
     },
-    boom: function (t) {
-      var ws = crunch(2.5);
-      tone("sine", 110, 38, t, 1.7, 0.28, 0.004, ws);
-      tone("triangle", 70, 32, t, 1.4, 0.16, 0.004, ws);
-      hiss(t, 0.08, 0.3, "lowpass", 900);
-      return 1.7;
+    boom: function (t) {               // a deep, round "bwomm" that hangs in a big room
+      var ws = crunch(3.5), wet = ac.createGain();
+      wet.gain.value = 0.55; wet.connect(room(bus));
+      ws.connect(wet);
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(190, t);
+      o.frequency.exponentialRampToValueAtTime(60, t + 0.06);
+      o.frequency.exponentialRampToValueAtTime(47, t + 1.3);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.3, t + 0.004);
+      g.gain.setValueAtTime(0.3, t + 0.12);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+      o.connect(g); g.connect(ws);
+      o.start(t); o.stop(t + 1.45);
+      tone("triangle", 120, 94, t, 0.5, 0.1, 0.004, ws);        // the "wom" in it
+      hiss(t, 0.03, 0.22, "lowpass", 2400);                      // the hit
+      return 2.1;
     },
-    boing: function (t) {
-      var o = tone("triangle", 120, 520, t, 0.75, 0.55, 0.004);
-      vibrato(o, t, 16, 40, 0.75);
-      return 0.75;
+    buzzer: function (t) {             // the game-show "wrong answer"
+      var lp = ac.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1700; lp.connect(bus);
+      [[146, "sawtooth", 0.11], [151, "sawtooth", 0.11], [73, "square", 0.055]].forEach(function (v) {
+        var o = ac.createOscillator(), g = ac.createGain();
+        o.type = v[1]; o.frequency.value = v[0];
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(v[2], t + 0.01);
+        g.gain.setValueAtTime(v[2], t + 0.78);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.86);
+        o.connect(g); g.connect(lp);
+        o.start(t); o.stop(t + 0.9);
+      });
+      return 0.86;
     },
     rimshot: function (t) {
       tone("sine", 210, 110, t, 0.2, 0.5);
@@ -285,9 +344,12 @@
       vibrato(o, t, 14, 12, 0.45);
       return 0.45;
     },
-    hoot: function (t) {               // one soft, low "hoo"
-      tone("sine", 410, 370, t, 0.42, 0.09, 0.09);
-      return 0.42;
+    hoot: function (t) {               // a real owl's "hoo… hoo" (CC0), softly
+      var d = clip("hoot", t, 0.5);
+      if (d) return d;
+      var o = tone("sine", 330, 300, t, 0.5, 0.07, 0.08);      // not loaded yet: a low hum
+      vibrato(o, t, 5, 3, 0.5);
+      return 0.5;
     },
     ring: function (t) {               // a gentle two-note chime
       [[0, 1046.5], [0.18, 784]].forEach(function (n) {

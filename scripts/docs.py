@@ -13,7 +13,9 @@ so nobody is shown an old cached copy after the pictures change.
 
 Screenshots are screenshots.py (offscreen, made-up data, the Dark theme, Textured). The
 Onion Watch pictures in docs/screenshots/watch/ come from Onion Watch's own screenshots.py
-(its Hoot theme) and are copied in by hand. Set
+(`python scripts/screenshots.py <dir>` there, Dark like these; its game is the same scene as
+this site's Watch demo): copy main, window-picker, cut-picture, health-bar and categories
+in, then run this with --no-shots to re-link them. Set
 ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip to include the Triggers tab.
 --tour runs tour.py, which drives a real window parked off-screen for about a minute.
 """

@@ -1,0 +1,3 @@
+hoot.mp3: "owl.wav" by Anthousai, CC0 (public domain).
+https://freesound.org/people/Anthousai/sounds/398734/
+Trimmed to two hoots and cleaned of background hiss.
