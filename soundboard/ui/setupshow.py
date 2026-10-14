@@ -6,7 +6,7 @@ his back, takes a hammer out of it and hammers a speaker together, one part a bl
 He keeps at it until `finish(ok)`:
 
 - ok: the last part pops on, the speaker thumps out music notes, he cheers, then
-  scoots off to the right with his toolbox.
+  scoots off to the right with his toolbox, fading out in a puff before the edge.
 - not ok: the speaker shakes, goes BOOM into bits and smoke, and he droops, sighs
   and shuffles off sadly.
 
@@ -24,8 +24,8 @@ from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QSizePolicy
 
 from soundboard import theme
-from soundboard.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, music_note, sparkle
-from soundboard.ui.bunnywidget import NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note
+from soundboard.bunny import H, INK, STEEL, W, WOOD, WOOD_DARK, draw_bunny, sparkle
+from soundboard.ui.bunnywidget import NOTE_COLORS, SPARKLE_COLORS, BunnyWidget, _Note, paint_note
 from soundboard.ui.pixels import snap_to_pixels
 
 # when each part of the show ends, in seconds from start()
@@ -76,6 +76,7 @@ class SetupShow(BunnyWidget):
         self._part_at = [-1.0] * PARTS   # show time each part popped on
         self._bits: list[_Bit] = []
         self._booms = 0
+        self._poofed = False     # the puff he vanishes in while scooting off
         self.hide()
 
     def sizeHint(self) -> QSize:
@@ -99,7 +100,7 @@ class SetupShow(BunnyWidget):
         self._t, self._act_t = 0.0, 0.0   # (_act_t: the base class sees us as mid-act)
         self._result, self._end_at, self._ok = None, -1.0, False
         self._parts, self._part_at = 0, [-1.0] * PARTS
-        self._bits, self._booms = [], 0
+        self._bits, self._booms, self._poofed = [], 0, False
         self.notes, self.puffs = [], []
         self.prop, self.sad, self._sad, self.celebrate = None, 0.0, 0.0, False
         self.show()
@@ -173,6 +174,12 @@ class SetupShow(BunnyWidget):
             b.a += b.va * dt
             if b.y > r.bottom() - 3:          # bounce on the floor, losing most of it
                 b.y, b.vy, b.vx, b.va = r.bottom() - 3, -b.vy * 0.35, b.vx * 0.6, b.va * 0.5
+        if phase == "scoot" and not self._poofed and self._scoot_k() >= 0.6:
+            self._poofed = True   # gone in a puff (well before the edge)
+            r = self._bun_rect()
+            x = r.center().x() + self._scoot_dx()
+            for _ in range(8):
+                self._puff(x, r.center().y() + r.height() * 0.2, 40, r.height() * 0.08, 0.6)
         end = YAY_END if self._ok else BOOM_END
         if self._end_at >= 0 and self._t - self._end_at >= end:
             self._stop()
@@ -263,12 +270,23 @@ class SetupShow(BunnyWidget):
         ease = 1 - (1 - k) ** 3
         return -(r.right() + 4) * (1 - ease), 720 * ease
 
-    def _scoot_dx(self) -> float:
+    def _scoot_k(self) -> float:
+        """How far through scooting off, 0..1."""
         if self.phase() != "scoot":
             return 0.0
         start = YAY_SCOOT if self._ok else BOOM_SCOOT
-        k = min(1.0, (self._t - self._end_at - start) / (SCOOT_S * (1 if self._ok else 1.6)))
-        return (self.width() - self._bun_rect().left() + 10) * k * k
+        return min(1.0, (self._t - self._end_at - start) / (SCOOT_S * (1 if self._ok else 1.6)))
+
+    def _scoot_dx(self) -> float:
+        """He scoots right, but only as far as there's room: he fades out in a puff of
+        dust before the edge, so it never cuts him in half."""
+        k = self._scoot_k()
+        room = max(0.0, self.width() - self._bun_rect().right() - 4)
+        return room * (1 - (1 - k) ** 2)
+
+    def _scoot_alpha(self) -> float:
+        k = self._scoot_k()
+        return 1.0 if k < 0.45 else max(0.0, 1 - (k - 0.45) / 0.5)
 
     def pose(self, now=None) -> dict:
         pose = super().pose(now)
@@ -312,7 +330,7 @@ class SetupShow(BunnyWidget):
         r = self._bun_rect()
         phase = self.phase()
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(0, 0, 0, 45))
+        p.setBrush(QColor(0, 0, 0, round(45 * self._scoot_alpha())))
         sw = r.width() * 0.62
         p.drawEllipse(QRectF(r.center().x() + pose["dx"] - sw / 2, r.bottom() - 4, sw, 8))
         self._paint_progress(p)
@@ -330,23 +348,15 @@ class SetupShow(BunnyWidget):
                         3 + 4 * tw, QColor(col))
         body = r.translated(pose["dx"], pose["dy"])
         p.save()
+        p.setOpacity(self._scoot_alpha())
         p.translate(body.center())
         p.rotate(pose["angle"])
         p.translate(-body.center())
         draw_bunny(p, body, self.prop, blink=pose["blink"], mouth=pose["mouth"],
                    ears=pose["ears"], swing=pose["swing"], sad=pose["sad"])
         p.restore()
-        for n in self.notes:
-            k = n.age / n.life
-            p.save()
-            p.setOpacity(min(1.0, n.age * 6) * (1 - k) ** 1.4)
-            p.translate(n.x, n.y)
-            p.rotate(n.spin * math.sin(n.age * 4))
-            if n.size < 0.6:   # (a sparkle, not a note)
-                sparkle(p, 0, 0, 5, n.col)
-            else:
-                music_note(p, -5, -8, n.size, n.col)
-            p.restore()
+        for n in self.notes:   # (size < 0.6: a sparkle, not a note)
+            paint_note(p, n)
         p.end()
 
     def progress(self) -> float:
@@ -404,6 +414,8 @@ class SetupShow(BunnyWidget):
             lid = 1.0
         if phase == "scoot":   # he takes it with him
             box.translate(self._scoot_dx(), 0)
+            p.save()
+            p.setOpacity(self._scoot_alpha())
         ink = QPen(INK, 1.6)
         ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         # the handle, then the box, then the lid hinged at the back
@@ -434,6 +446,8 @@ class SetupShow(BunnyWidget):
         p.drawRoundedRect(QRectF(0, -box.height() * 0.28, box.width(), box.height() * 0.28),
                           2, 2)
         p.restore()
+        if phase == "scoot":
+            p.restore()
 
     def _paint_speaker(self, p: QPainter, phase):
         if self._parts == 0:

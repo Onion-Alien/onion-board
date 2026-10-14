@@ -4,7 +4,7 @@ it again, and the plain drawing still works with every pose."""
 import time
 
 from PySide6.QtCore import QRectF
-from PySide6.QtGui import QImage, QPainter
+from PySide6.QtGui import QColor, QImage, QPainter
 
 from soundboard.bunny import PROPS, draw_bunny
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -83,7 +83,9 @@ def test_sad_bun_droops_and_cheers_up_while_hoping(qapp):
     b.resize(b.sizeHint())
     _run(qapp, b, 5)
     glum = b.pose()
-    assert glum["sad"] > 0.8 and glum["ears"] > 20   # ears drooping
+    # ears drooping: folded down from the middle, not tilted out sideways (that read
+    # as cross "airplane ears")
+    assert glum["sad"] > 0.8 and glum["ears"] < 20
     b.hope(True)                                     # files dragged over him
     assert b.notes
     _run(qapp, b, 30)
@@ -156,3 +158,166 @@ def test_robot_bunny_widget_build_and_props(qapp):
     b.build()
     b.stop_building(False)
     assert not b.building and not b.celebrate and b.sad > 0.5
+
+
+def _top_ink_row(img: QImage) -> int:
+    for y in range(img.height()):
+        for x in range(img.width()):
+            if img.pixelColor(x, y).alpha() > 40:
+                return y
+    return img.height()
+
+
+def test_sad_ears_fold_down_from_the_middle(qapp):
+    from soundboard.bunny import bunny_image
+    tops = []
+    for sad in (0.0, 1.0):
+        img = QImage(100, 120, QImage.Format_ARGB32_Premultiplied)
+        img.fill(0)
+        p = QPainter(img)
+        draw_bunny(p, QRectF(0, 0, 100, 120), sad=sad, outfit=())
+        p.end()
+        tops.append(_top_ink_row(img))
+    assert tops[1] > tops[0] + 12        # the tips came down a long way
+    assert not bunny_image(60, robot=True).isNull()
+
+
+def _frames(qapp, b, secs):
+    for _ in range(round(secs / 0.035)):
+        _run(qapp, b, 1)
+        b.grab()
+
+
+def test_run_off_stays_in_his_box_with_no_empty_frames(qapp):
+    b = BunnyWidget("plug", pong=True)
+    b.resize(b.sizeHint())
+    for act in (b.build, b.fetch_bat):
+        b.calm_down()
+        act()
+        while b.act_phase() in ("dash", "cloud", "back"):
+            _run(qapp, b, 1)
+            if b.act_phase() not in ("dash", "cloud", "back"):
+                break
+            pose = b.pose()
+            assert pose["dx"] == 0            # he dives into the cloud right where he is
+            if b.act_phase() == "dash":
+                assert pose["sx"] <= 1.1      # squashed, stretched, never moved off
+            # every frame shows him or the cloud (never an empty box)
+            assert pose["shown"] or b.act_phase() in ("cloud", "back")
+        assert b.act_phase() in ("hammer", "bat")
+
+
+def test_rummaging_tosses_junk_out_of_the_cloud(qapp):
+    b = BunnyWidget("plug")
+    b.resize(b.sizeHint())
+    b.build()
+    seen = set()
+    while b.act_phase() != "hammer":
+        _run(qapp, b, 1)
+        seen |= {j.kind for j in b.junk}
+        for j in b.junk:                      # all of it lands inside the widget
+            assert -4 <= j.x <= b.width() + 4
+    assert seen
+
+
+def test_hammering_builds_a_speaker_and_success_finishes_it(qapp):
+    from soundboard.ui import bunnywidget as bw
+    b = BunnyWidget("plug")
+    b.resize(b.sizeHint())
+    b.build()
+    _frames(qapp, b, bw.BACK_END + 4 * bw.SWING)
+    assert b._parts == bw.PARTS - 1           # the last part waits for the result
+    b.stop_building(True)
+    assert b._parts == bw.PARTS and b._fin_t >= 0 and b.prop == "star"
+    _frames(qapp, b, bw.FINALE + 0.2)
+    assert b._fin_t < 0
+
+
+def test_a_failed_build_snaps_then_he_droops_and_sighs(qapp):
+    from soundboard.ui import bunnywidget as bw
+    b = BunnyWidget("plug")
+    b.resize(b.sizeHint())
+    b.build()
+    _frames(qapp, b, bw.BACK_END + 2 * bw.SWING)
+    b.stop_building(False)
+    assert not b.building and b.prop == "plug"
+    assert b.pose()["prop"] == "hammer"       # the blow still comes down
+    _frames(qapp, b, bw.FAIL_SNAP + 0.1)
+    shocked = b.pose()
+    assert shocked["prop"] == "hammer_broken" and shocked["sad"] < 0.3   # not sad yet: "oh!"
+    assert any(j.kind == "head" for j in b.junk)                       # the head flew off
+    assert any(f.col == bw.SMOKE for f in b.puffs)
+    _frames(qapp, b, bw.FAIL_DROP - bw.FAIL_SNAP + 0.6)
+    assert b._sad > 0.6 and b._sigh_at > 0    # ears dropped with a sigh
+    _frames(qapp, b, bw.FAIL_END)
+    assert b._fail_t < 0 and b.pose()["prop"] == "plug" and b._sad > 0.6
+
+
+def test_robo_bun_sparks_pulses_and_shorts_out(qapp):
+    from soundboard.ui import bunnywidget as bw
+    b = BunnyWidget(robot=True)
+    b.resize(b.sizeHint())
+    b.build()
+    leds, sparked = set(), False
+    for _ in range(round((bw.BACK_END + 3 * bw.SWING) / 0.035)):
+        _run(qapp, b, 1)
+        leds.add(round(b.pose()["led"], 1))
+        sparked |= bool(b.sparks)
+        b.grab()
+    assert sparked and len(leds) > 3          # sparks per blow, LEDs pulsing
+    assert b._parts >= 2                      # the screen's bar filling
+    b.stop_building(False)
+    _frames(qapp, b, bw.FAIL_SNAP + 0.1)
+    assert len(b.sparks) > 6                  # shorted out
+    _frames(qapp, b, bw.FAIL_END)
+    assert b.pose()["led"] == 0
+
+
+def test_robo_gadget_and_notes_read_on_dark_themes(qapp):
+    from soundboard import theme
+    from soundboard.bunny import GADGET
+    from soundboard.ui.bunnywidget import NOTE_COLORS, _luma, note_colors
+
+    def contrast(a, b):
+        la, lb = _luma(a), _luma(b)
+        return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+
+    for name in theme.THEMES:
+        with theme.previewing(name):
+            bg = QColor(theme.T["bg"])
+            if _luma(bg) < 0.35:
+                assert contrast(GADGET, bg) >= 3, name
+            for col in NOTE_COLORS:
+                assert contrast(note_colors(QColor(col))[0], bg) >= 3, (name, col)
+
+
+def test_a_click_cheer_hops_high_with_a_happy_face_and_squashes(qapp):
+    b = BunnyWidget("star", height=150, joy_lines=("yay",))
+    b.cheer()
+    t0 = b._joy_at
+    top = min(b.pose(t0 + i / 60)["dy"] for i in range(30))
+    assert top < -20                          # a real hop, not 12 px
+    mid = b.pose(t0 + 0.2)
+    assert mid["blink"] >= 1 and mid["mouth"] > 0.4   # eyes shut happy, a grin
+    landing = b.pose(t0 + 0.4)
+    assert landing["sy"] < 0.95 < landing["sx"]       # squashed on landing
+
+
+def test_idle_fidgets_now_and_then(qapp):
+    from soundboard.ui import bunnywidget as bw
+    b = BunnyWidget("headphones")
+    b.resize(b.sizeHint())
+    b._next_blink = b._next_flick = time.monotonic() + 600
+    b._next_fidget = 0
+    _run(qapp, b, 1)
+    assert b._fidget in bw.FIDGETS
+    for kind in bw.FIDGETS:
+        b.fidget(kind)
+        poses = [b.pose(b._fidget_at + i * 0.1) for i in range(int(bw.FIDGETS[kind] * 10))]
+        assert any(p["mouth"] > 0.5 or abs(p["angle"]) > 2 or p["dy"] < -1.5 for p in poses)
+        b.grab()
+    b._next_fidget = 0
+    b.build()                                 # never in the middle of anything
+    b._fidget = ""
+    _run(qapp, b, 1)
+    assert not b._fidget
