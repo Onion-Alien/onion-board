@@ -204,9 +204,7 @@ def _write_held(held: list[dict]) -> None:
             _held().unlink(missing_ok=True)
             return
         folder().mkdir(parents=True, exist_ok=True)
-        tmp = _held().with_suffix(".tmp")
-        tmp.write_text(json.dumps({"sounds": held}, indent=1), encoding="utf-8")
-        tmp.replace(_held())
+        library.atomic_write_text(_held(), json.dumps({"sounds": held}, indent=1))
     except OSError:
         log.warning("couldn't write %s", _held(), exc_info=True)
 
