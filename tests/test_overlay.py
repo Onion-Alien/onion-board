@@ -19,6 +19,7 @@ class Host:
         self.audio = {m.id: object() for m in sounds}
         self.played, self.actions, self.cues = [], [], []
         self.registered = 0
+        self.hkctl = self   # the window's hotkey controller: on_hotkey, register_hotkeys
 
     def play(self, sid):
         self.played.append(sid)
