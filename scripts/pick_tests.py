@@ -2,9 +2,10 @@
 
 A test file runs when:
 - it changed, or a test file it imports (the `window` fixture in test_mainwindow…)
-- it imports a changed module (soundboard/, perf/, scripts/, main.py), straight or
-  through a test file it imports. A module no test imports picks the tests of the
-  nearest modules that import it.
+- it imports a changed module (soundboard/, perf/, scripts/, main.py), straight,
+  through a test file it imports, or through a package that imports its own modules
+  (`from soundboard import voicefx` gets `voicefx.builtin`'s presets). A module no
+  test imports picks the tests of the nearest modules that import it.
 - it names a changed file that isn't one of those (`build.ps1`, `DESIGN.md`,
   `module.json`, "lang" for assets/lang/…)
 
@@ -114,6 +115,19 @@ def pick(changed: list[str]) -> list[str]:
     imports = {m: imported_names(p) for m, p in files.items()}
     tests = {m: p for m, p in files.items()
              if p.parent == TESTS and p.name.startswith("test_")}
+    # a package that imports its own modules hands them on: a test of the package
+    # tests them too (voicefx/__init__.py re-exports voicefx.builtin's PRESETS)
+    hands_on = {m: {n for n in imports[m] if n.startswith(m + ".") and n in files}
+                for m, p in files.items() if p.name == "__init__.py"}
+
+    def with_parts(names: set[str]) -> set[str]:
+        todo = [n for n in names if n in hands_on]
+        while todo:
+            for n in hands_on[todo.pop()] - names:
+                names.add(n)
+                todo += [n] if n in hands_on else []
+        return names
+
     # a test file "uses" what it imports and what the test files it imports do; not
     # conftest's: a test taking process_events from it doesn't use the dozens of
     # modules its fixtures patch (a conftest change runs everything anyway)
@@ -123,7 +137,7 @@ def pick(changed: list[str]) -> list[str]:
         for m in imports[t]:
             if m in files and files[m].parent == TESTS and m != "conftest":
                 u |= imports[m]
-        uses[t] = u
+        uses[t] = with_parts(u)
     # test_pick_tests names files of every kind as examples: it's about this script
     texts = {t: p.read_text(encoding="utf-8") for t, p in tests.items()
              if t != "test_pick_tests"}

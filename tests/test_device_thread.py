@@ -156,3 +156,51 @@ def test_a_new_default_output_is_found_by_a_rescan_off_the_ui_thread(
                    timeout=5)
     assert w.cfg.mon_device == OUTS[1] and w.opened[-1] == OUTS[1]
     assert w.cb_mon.currentData() == OUTS[1]
+
+
+class held_elsewhere:
+    """DEVICES held by another thread (a recovery stuck on a hung driver) until the
+    block ends."""
+    def __enter__(self):
+        self.go, self.held = threading.Event(), threading.Event()
+
+        def hold():
+            with eng.DEVICES:
+                self.held.set()
+                self.go.wait(10)
+        self.t = threading.Thread(target=hold, daemon=True)
+        self.t.start()
+        assert self.held.wait(5)
+        return self
+
+    def __exit__(self, *exc):
+        self.go.set()
+        self.t.join(5)
+
+
+def recording(calls, key):
+    """An engine device method that, like the real ones, opens under DEVICES."""
+    def opener(self, *a):
+        with eng.DEVICES:
+            calls.append((key, *a))
+    return opener
+
+
+def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
+        main_window, monkeypatch, qapp):  # noqa: F811
+    """Audio buffering (reopens every stream) and Also send to's stream output were
+    opened on the UI thread: a recovery holding the devices froze the window."""
+    from conftest import devices_done
+    w = main_window
+    devices_done(w)
+    calls = []
+    for name in ("set_mic_device", "set_main_device", "set_tap_device", "set_mon_device",
+                 "set_obs_device", "set_copy_devices"):
+        monkeypatch.setattr(eng.Engine, name, recording(calls, name))
+    with held_elsewhere():
+        quick(w.set_latency, "high" if w.cfg.latency != "high" else "low")
+        quick(w.set_obs_device, "Speakers")
+        assert calls == []                       # waiting their turn, off the UI thread
+    devices_done(w)
+    assert [c[0] for c in calls].count("set_obs_device") == 2   # reopened, then picked
+    assert ("set_obs_device", w._obs_name("Speakers")) in calls
