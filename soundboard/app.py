@@ -151,6 +151,16 @@ def clean_temp_leftovers(now: float | None = None) -> int:
     return gone
 
 
+def packs_dedupe():
+    """Free packs an older version stored twice (backup.drop_duplicate_packs), off the
+    UI thread."""
+    from soundboard import backup
+    try:
+        backup.drop_duplicate_packs()
+    except Exception:  # noqa: BLE001 - tidying up must never hurt the running app
+        log.debug("couldn't tidy duplicate sound packs", exc_info=True)
+
+
 def modules_prune():
     """Leftover add-on copies (modules.prune_leftovers), off the UI thread."""
     from soundboard import modules
@@ -627,6 +637,8 @@ def main():
     # old add-on copies: once the add-ons are loaded (so the ones in use are known)
     QTimer.singleShot(20_000, lambda: threading.Thread(
         target=modules_prune, daemon=True, name="addon-leftovers").start())
+    QTimer.singleShot(25_000, lambda: threading.Thread(
+        target=packs_dedupe, daemon=True, name="pack-dupes").start())
     if "--resume-setup" not in sys.argv and w.cfg.setup_done:
         # the installer's "from Soundpad" box; with the setup guide up, run_setup
         # starts it once the guide is closed

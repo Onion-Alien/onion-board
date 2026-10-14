@@ -24,6 +24,14 @@ def test_a_module_runs_the_tests_that_import_it():
     assert "tests/test_dsp.py" not in picked
 
 
+def test_a_module_a_package_hands_on_runs_the_tests_of_the_package():
+    # test_remote imports soundboard.voicefx, whose __init__ re-exports
+    # voicefx.builtin's PRESETS: a new preset changed its "did you mean" answer (#702)
+    picked = pick_tests.pick(["soundboard/voicefx/builtin.py"])
+    assert {"tests/test_voicefx.py", "tests/test_remote.py"} <= set(picked)
+    assert "tests/test_dsp.py" not in picked
+
+
 def test_a_test_file_runs_itself_and_the_tests_that_import_it():
     picked = pick_tests.pick(["tests/test_mainwindow.py"])
     assert {"tests/test_mainwindow.py", "tests/test_audit_main.py"} <= set(picked)

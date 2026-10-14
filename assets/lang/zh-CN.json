@@ -1779,7 +1779,6 @@
   "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。稍后再次尝试获取 Onion Watch。",
   "Got it": "知道了",
   "Growl": "咆哮",
-  "Hear": "听到",
   "Hear it": "听到它",
   "Helmet": "头盔",
   "Helmet size": "头盔尺寸",
@@ -3280,5 +3279,6 @@
   "snappy": "干脆",
   "soft": "柔和",
   "warm": "温暖",
-  "clean": "干净"
+  "clean": "干净",
+  "This program's last minute as a waveform: pick a bit out of it and keep it as a clip. It only listens while it's open.": "这个程序最近一分钟的波形：从中选一段，保存为剪辑。只在打开时才会收听。"
 }
