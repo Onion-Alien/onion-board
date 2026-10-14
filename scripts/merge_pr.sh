@@ -53,7 +53,8 @@ tmp=$(mktemp -d "${TMPDIR:-/tmp}/merge_pr_$n.XXXXXX")
 git worktree add -q --detach "$tmp" origin/main
 now="$(date +%s) +0000"
 if ! (cd "$tmp" && GIT_AUTHOR_DATE="$now" GIT_COMMITTER_DATE="$now" \
-      git merge -q --no-ff -m "Merge pull request #$n from $owner/$branch" -m "$title" "$head"); then
+      git -c merge.langjson.driver="python scripts/merge_json.py %O %A %B" \
+          merge -q --no-ff -m "Merge pull request #$n from $owner/$branch" -m "$title" "$head"); then
     (cd "$tmp" && git merge --abort) 2>/dev/null || true
     echo "PR #$n doesn't merge cleanly with main: merge main into $branch first." >&2
     exit 1
