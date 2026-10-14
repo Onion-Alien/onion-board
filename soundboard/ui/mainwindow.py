@@ -5956,11 +5956,26 @@ class MainWindow(QMainWindow):
             self.select(LINK_ID)   # already in the player: Play / Space pause and resume it
             self.toggle_play_pause()
             return
+        pad = self._pad_for_link(r.url) if play else None
+        if pad is not None:   # it's on the board already: the pad plays, from the start
+            self.play(pad)
+            return
         kind = "play" if play else "add"
         self.linkbar.open(r.url, r.title, r.seconds)
         self.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
         if not (self.linkbar.play_once() if play else self.linkbar.add()):
             self.ytresults.mark(r.url, kind, False)
+
+    def _pad_for_link(self, url: str) -> str | None:
+        """The board's sound downloaded from this link (its audio loaded), or None."""
+        key = sourceinfo.link_key(url)
+        if not key:
+            return None
+        for m in self.cfg.sounds:
+            if (self.audio.get(m.id) is not None and isinstance(m.source, dict)
+                    and sourceinfo.link_key(m.source.get("link", "")) == key):
+                return m.id
+        return None
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
@@ -6004,6 +6019,11 @@ class MainWindow(QMainWindow):
             else:
                 self.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
+        if (sid != LINK_ID and LINK_ID in self.engine.playing()
+                and self._pad_for_link(self._link_url) == sid):
+            # the web song played from a search, now saved as this pad: one song, so
+            # it starts again from the top instead of a second copy playing over it
+            self._stop_sound(LINK_ID)
         self.select(sid)
         self._last_sid = sid
         if sid != LINK_ID:
