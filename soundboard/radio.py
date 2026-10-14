@@ -168,7 +168,13 @@ def _local_ip(ip) -> bool:
 
 def _name_is_local(host: str) -> bool:
     """Does the station's host name lead into this PC / the home network? A name that
-    doesn't resolve isn't refused here: the stream just fails to connect, as it would."""
+    doesn't resolve isn't refused here: the stream just fails to connect, as it would.
+
+    Only an early, readable refusal: FFmpeg looks the name up again when it opens the
+    stream, and a name can answer differently the second time (DNS rebinding). That
+    lookup isn't FFmpeg's own: the stream goes through the relay (http_proxy), which
+    looks the name up once, checks it and connects to the address it checked
+    (net._connect_away)."""
     try:
         infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
     except (OSError, UnicodeError):
