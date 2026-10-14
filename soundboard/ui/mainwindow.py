@@ -63,7 +63,7 @@ from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (BAR_H, CONTROL_H, EqPanel, Flow, VolumeControl, bar,
                                  alt_tile, capped, card, hint_label, icon_label,
                                  info_button,
-                                 steady_number, vsep)
+                                 steady_number, TileRow, vsep)
 from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
@@ -2363,19 +2363,19 @@ class MainWindow(QMainWindow):
         head.setObjectName("section")
         head.setProperty("head", True)
         al.addWidget(head)
-        tiles = QHBoxLayout()
-        tiles.setSpacing(12)
+        tiles = self.mic_alt_tiles = TileRow()   # stacked when narrow, never clipped
         self.alt_cable, self.alt_cable_words = alt_tile(
             "cable", _("Virtual cable"), "", self.btn_usecable, self.btn_rmcable)
-        tiles.addWidget(self.alt_cable, 1)
+        tiles.addTile(self.alt_cable)
         self.btn_pickdev = QPushButton(_("Pick a device"))
         icons.set_icon(self.btn_pickdev, "sliders")
         self.btn_pickdev.clicked.connect(self._pick_send_device)
-        tiles.addWidget(alt_tile(
+        self.alt_device = alt_tile(
             "sliders", _("Another device"),
             _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
-              "capture card, or to nobody."), self.btn_pickdev)[0], 1)
-        al.addLayout(tiles)
+              "capture card, or to nobody."), self.btn_pickdev)[0]
+        tiles.addTile(self.alt_device)
+        al.addWidget(tiles)
         alt.hide()
         cv.addWidget(alt)
         helpcard, hv = card(_("Connect your chat"), roomy=True, icon="speech")
