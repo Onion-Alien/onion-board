@@ -108,6 +108,11 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     w._show_route()
     w._update_status()
     assert not w.btn_micredo.isHidden() and not w.btn_micoff.isHidden()
+    assert not w.btn_michange.isHidden()
+    opened = []
+    monkeypatch.setattr(w.cb_mic, "showPopup", lambda: opened.append(True))
+    w.btn_michange.click()   # Change mic: Devices' My mic, opened (the effect follows it)
+    assert opened
     ran = []
     rec = audiorecovery.recovery_of(w)
     monkeypatch.setattr(rec, "start", lambda a, t=None, say_done=False:
@@ -122,6 +127,7 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     monkeypatch.setattr(dm, "status", lambda name=None: "missing")
     w._update_status()
     assert w.btn_micredo.isHidden() and w.btn_micoff.isHidden()
+    assert w.btn_michange.isHidden()
 
 
 def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811

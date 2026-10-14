@@ -71,7 +71,7 @@ NEW_CARDS = 1           # program cards made per go (see AppsTab._apply_listing)
 CARDS_GAP_MS = 6        # ...and the break between goes, for the audio thread
 CONNECTING = _("Connecting…")   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
-# choice shows once a stream output is set (Also send to → Clean, for streaming), or
+# choice shows once a stream output is set (Also play on → Clean, for streaming), or
 # while it's set to anything but both
 TO = (("both", _("Call + stream"), _("Others in the call and your stream output both get it")),
       ("call", _("Call only"), _("Only others in the call get it, not your stream output")),
@@ -368,15 +368,13 @@ class AppGrid(CardGrid):
             if isinstance(w, AppCategoryHeading):
                 chain.append(w)
                 continue
-            inner = getattr(w, "_tab_chain", None)
-            if inner is None:   # a card's own order, read while it's still in one piece
-                inner, n = [], w.nextInFocusChain()
-                while n is not None and n is not w and w.isAncestorOf(n):
-                    if n.focusPolicy() & Qt.FocusPolicy.TabFocus:
-                        inner.append(n)
-                    n = n.nextInFocusChain()
-                w._tab_chain = inner   # pyright: ignore[reportAttributeAccessIssue]  # kept on the card
-            chain += inner
+            # a card's controls in the order they were made, read fresh: a list kept
+            # on the card held widgets Qt had since deleted (a spin box's line edit),
+            # and setTabOrder raising inside this layout pass broke PySide
+            # (overridepin.py). Not a drop-down's list: that's a window of its own.
+            chain += [c for c in w.findChildren(QWidget)
+                      if c.focusPolicy() & Qt.FocusPolicy.TabFocus
+                      and c.window() is w.window()]
         for a, b in zip(chain, chain[1:]):
             QWidget.setTabOrder(a, b)
 
@@ -1918,7 +1916,7 @@ class AppsTab(QWidget):
         self._report_active()
 
     def _stream_output(self) -> bool:
-        """A stream output is set (Also send to → Clean, for streaming)."""
+        """A stream output is set (Also play on → Clean, for streaming)."""
         return bool(self.engine.names.get("obs"))
 
     def _on_hear(self, row: AppRow, on: bool):
