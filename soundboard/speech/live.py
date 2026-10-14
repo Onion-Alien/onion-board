@@ -45,7 +45,7 @@ def clean_settings(raw) -> dict:
     of the wrong type dropped, so the panel falls back to its default for it instead
     of failing to open. Numbers are brought into range; unknown keys are kept."""
     out = dict(raw) if isinstance(raw, dict) else {}
-    for k in ("voice", "model", "language", "translate"):
+    for k in ("voice", "model", "language", "spoken", "translate"):
         if k in out and not isinstance(out[k], str):
             del out[k]
     for k in ("mute_real_voice", "voice_fx", "translate_on"):

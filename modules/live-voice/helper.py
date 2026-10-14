@@ -9,6 +9,8 @@ others hear that voice instead of yours.
 
 With --translate <folder> (a translation add-on's downloaded model), each line is
 translated from English before it's sent; "original" then carries what was said.
+The models go from English only: --task translate has Whisper hear any other
+language straight into English first.
 
 Runs in its own Python environment (install.bat makes it) so the ~100 MB of
 speech-recognition libraries never touch the app itself.
@@ -117,14 +119,17 @@ class WhisperTranscriber:
     JUNK = {"", "you", "thank you.", "thanks for watching!", "thank you for watching.",
             "bye.", "."}
 
-    def __init__(self, model: str, language: str | None, device: str):
+    def __init__(self, model: str, language: str | None, device: str,
+                 task: str = "transcribe"):
         from faster_whisper import WhisperModel
         self.language = language or None
+        self.task = task
         self.model = WhisperModel(model, device=device,
                                   compute_type="int8" if device == "cpu" else "float16")
 
     def __call__(self, audio: np.ndarray) -> str:
-        segs, _ = self.model.transcribe(audio, language=self.language, beam_size=1,
+        segs, _ = self.model.transcribe(audio, language=self.language, task=self.task,
+                                        beam_size=1,
                                         condition_on_previous_text=False,
                                         without_timestamps=True, vad_filter=False)
         parts = [s.text.strip() for s in segs
@@ -189,6 +194,8 @@ def main(argv=None) -> int:
     ap.add_argument("--model", default="base.en",
                     help="tiny.en, base.en, small.en, … (multilingual: base, small, …)")
     ap.add_argument("--language", default="en", help="spoken language code, or 'auto'")
+    ap.add_argument("--task", default="transcribe", choices=("transcribe", "translate"),
+                    help="translate: write what was said in English (multilingual models)")
     ap.add_argument("--device", default="cpu", help="cpu or cuda")
     ap.add_argument("--translate", metavar="FOLDER",
                     help="a downloaded translation model: speak each line in its language")
@@ -234,7 +241,8 @@ def main(argv=None) -> int:
         link.send(type="status", text=f"loading speech model ({args.model})…")
         try:
             t = FakeTranscriber() if args.fake else WhisperTranscriber(
-                args.model, None if args.language == "auto" else args.language, args.device)
+                args.model, None if args.language == "auto" else args.language, args.device,
+                args.task)
         except ImportError:
             fail("speech recognition isn't fully installed: press Update speech recognition "
                  "under More options, then Start again")

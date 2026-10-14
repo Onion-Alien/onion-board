@@ -1,0 +1,2 @@
+- Languages: speak in your own language, not just English. The live voice listens in the app's language (or the one you type under More options), turns it into English with its speech recognition, then into the language you picked; speaking the picked language itself just says it. Anyone not speaking English gets the accurate recognition model by default.
+- New translation add-ons: Ukrainian and Filipino.
