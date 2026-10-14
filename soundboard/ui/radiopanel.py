@@ -533,7 +533,7 @@ class RadioTab(QWidget):
         self.search = QLineEdit()
         self.search.setPlaceholderText(_("Search radio stations, genres, countries or "
                                          "cities…  (or click a dot on the map)"))
-        self.search.setClearButtonEnabled(True)
+        icons.clear_button(self.search)
         self.search.textChanged.connect(self._on_text)
         self.search.returnPressed.connect(self._search_now)
         top.addWidget(self.search, 1)

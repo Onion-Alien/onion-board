@@ -1447,7 +1447,7 @@ class MainWindow(QMainWindow):
                              "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                              "TikTok, most media sites) to see it, then play or add it")
         self.search.setToolTip(self._search_tip)
-        self.search.setClearButtonEnabled(True)
+        icons.clear_button(self.search)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         self.search.setMaximumWidth(SEARCH_MAX_W)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),

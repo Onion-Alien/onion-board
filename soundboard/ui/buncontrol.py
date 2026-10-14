@@ -77,7 +77,7 @@ class BunControl(Controller):
             # it was the mini player: shown at once, its first frames were a blank white
             # window while it laid the board out again; it fades in once that's done
             mw.setWindowOpacity(0.0)
-            QTimer.singleShot(150, lambda: mw.setWindowOpacity(1.0))
+            QTimer.singleShot(150, mw, lambda: mw.setWindowOpacity(1.0))   # (not once it's gone)
         else:
             self._back_as_it_was()
         mw.show_from_tray()

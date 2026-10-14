@@ -1,7 +1,7 @@
 """Every theme in theme.THEMES, not just Dark and Light: the bugs a full
 render of each one found, kept from coming back."""
 import pytest
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QPoint, QSize
 from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import QAbstractButton, QApplication, QFrame, QTabBar, QVBoxLayout
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
@@ -113,3 +113,39 @@ def test_a_live_switch_leaves_no_old_theme_colours_in_icons(main_window):  # noq
                     bad.append((bar.tabText(i), hit))
         assert not bad, (name, bad)
         seen.append(name)
+
+
+@pytest.mark.parametrize("name", ["Hacker", "Dark", "Light"])
+def test_scroll_area_corner_is_not_drawn(qapp, name):
+    """With both scroll bars up (a narrow Setup page), the square where they meet was
+    drawn as a dark box with a black outline: it's see-through now."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QScrollArea, QWidget
+
+    from soundboard.wheelguard import AppStyle
+    old_sheet = qapp.styleSheet()
+    qapp.setStyle(AppStyle("Fusion"))   # the app's own style (app.py)
+    qapp.setStyleSheet(theme.stylesheet(name) + "QWidget#cornerholder { background:#ff00ff; }")
+    try:
+        holder = QWidget()
+        holder.setObjectName("cornerholder")
+        holder.resize(200, 200)
+        area = QScrollArea(holder)
+        area.setFrameShape(QFrame.Shape.NoFrame)
+        area.resize(200, 200)
+        inner = QWidget()
+        inner.setFixedSize(600, 600)
+        area.setWidget(inner)
+        area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        holder.show()
+        QApplication.processEvents()
+        img = holder.grab().toImage()
+        v, h = area.verticalScrollBar(), area.horizontalScrollBar()
+        left, top = v.mapTo(holder, QPoint()).x(), h.mapTo(holder, QPoint()).y()
+        corner = {img.pixelColor(x, y).name() for x in range(left, left + v.width())
+                  for y in range(top, top + h.height())}
+        assert corner == {"#ff00ff"}
+        holder.close()
+    finally:
+        qapp.setStyleSheet(old_sheet)
