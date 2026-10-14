@@ -13,9 +13,9 @@ from soundboard import backup, eq, library, mapped, soundfx, trash
 
 
 def test_setting_defaults_and_roundtrips(app_dir):
-    assert not library.Config.from_raw({}).copy_local_sounds
-    cfg = library.Config(copy_local_sounds=True)
-    assert library.Config.from_raw(cfg.to_raw()).copy_local_sounds
+    assert library.Config.from_raw({}).copy_local_sounds
+    cfg = library.Config(copy_local_sounds=False)
+    assert not library.Config.from_raw(cfg.to_raw()).copy_local_sounds
 
 
 @pytest.mark.parametrize("speed", [0.75, 1.0, 1.5])
@@ -117,10 +117,10 @@ def test_local_import_obeys_setting_and_zip_keeps_file(window, qapp, tmp_path, c
 def test_settings_toggle_applies_and_survives_reload(window):  # noqa: F811
     d = window.setctl.open_settings("data")
     assert d.back_btn is not None
-    assert not d.copy_local_sounds.isChecked()
-    d.copy_local_sounds.setChecked(True)
-    assert window.cfg.copy_local_sounds
-    assert library.Config.from_raw(window.cfg.to_raw()).copy_local_sounds
+    assert d.copy_local_sounds.isChecked()   # on by default
     d.copy_local_sounds.setChecked(False)
     assert not window.cfg.copy_local_sounds
+    assert not library.Config.from_raw(window.cfg.to_raw()).copy_local_sounds
+    d.copy_local_sounds.setChecked(True)
+    assert window.cfg.copy_local_sounds
     window.setctl.close_settings()

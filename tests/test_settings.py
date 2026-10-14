@@ -456,13 +456,16 @@ def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # n
     d.close()
 
 
-def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa: F811
+def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: F811
     d = SettingsDialog(window, "appearance")
     assert d.live_green.isChecked() == window.cfg.live_tab_green
     card = d.live_green.parentWidget()
     assert card.findChild(QLabel).text() == "Live tabs"
-    # right under the language, above the themes
-    assert card.parentWidget().layout().itemAt(1).widget() is card
+    # one of the look box's tabs, the box right under the language
+    names = [b.text() for b in d.look_tabs]
+    assert names[0] == "Themes" and "Live tabs" in names
+    assert d.look_pages.index(card) == names.index("Live tabs")
+    assert d.look_box.parentWidget().layout().itemAt(1).widget() is d.look_box
     d.live_dot.click()
     assert window.cfg.live_tab_green is False
     d.live_green.click()
@@ -689,6 +692,20 @@ def test_search_theme_and_colour_terms_shows_every_theme(window, qapp, query):  
         assert all(grid.columns == max(1, (grid.width() + 12) // 162) for grid in grids)
     finally:
         window.setctl.close_settings()
+
+
+@pytest.mark.parametrize("query, tab", [("opacity", "Background"), ("interface size", "Size"),
+                                        ("textured", "Theme style"), ("synthwave", "Themes")])
+def test_search_shows_the_look_tab_with_the_words(window, qapp, query, tab):  # noqa: F811
+    d = SettingsDialog(window, "general", lazy=True)
+    try:
+        d._apply_search(query)
+        assert d._page_keys[d.tabs.currentIndex()] == "appearance"
+        shown = d.look_shown
+        assert d.look_tabs[shown].text() == tab and d.look_tabs[shown].isChecked()
+        assert all(p.isHidden() == (i != shown) for i, p in enumerate(d.look_pages))
+    finally:
+        d.close()
 
 
 def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811

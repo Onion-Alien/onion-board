@@ -854,6 +854,8 @@ class SettingsDialog(QDialog):
                 elif match and card.property("search_hid"):
                     card.show()
                     card.setProperty("search_hid", False)
+                if match and words and card is getattr(self, "look_box", None):
+                    self._look_pick(words)   # (the look box: show the tab with the words)
                 hits += match
             self.categories.item(i).setHidden(bool(words) and not hits)
             if hits and first is None:
@@ -953,10 +955,89 @@ class SettingsDialog(QDialog):
         return w, v
 
     def _appearance(self):
+        """Language on its own, then one box for the look with a row of tabs (the
+        themes, highlight colour, style, size, live tabs, background): one after another
+        the page ran so long that some people never scrolled down to the themes."""
         w, v = self._page()
         self.theme_cards = []
         v.addWidget(self._language_card())
-        # above the themes (it sat under every theme card, out of sight)
+        hints = {"Classic": _("Changes the whole app instantly."),
+                 "Meme": _("For when you want your soundboard to be a bit.")}
+        themes, tv = self._card(_("Themes"))
+        tv.setSpacing(6)
+        for group, names in theme.GROUPS:
+            head = QLabel(theme.group_name(group))
+            head.setObjectName("section")
+            tv.addWidget(head)
+            if group in hints:
+                h = QLabel(hints[group])
+                h.setObjectName("hint")
+                h.setWordWrap(True)
+                tv.addWidget(h)
+            cards = []
+            for name in names:
+                c = ThemeCard(name)
+                c.setChecked(name == theme.current_name)
+                c.clicked.connect(lambda __=False, n=name: self._pick_theme(n))
+                cards.append(c)
+                self.theme_cards.append(c)
+            tv.addWidget(ThemeGrid(cards))
+            tv.addSpacing(8)
+        pages = [(_("Themes"), themes)]
+        pages += [(_("Colour"), self._highlight_card()),
+                  (_("Theme style"), self._texture_card()),
+                  (_("Size"), self._ui_scale_card()),
+                  (_("Live tabs"), self._live_tabs_card()),
+                  (_("Background"), self._playing_background_card())]
+        v.addWidget(self._look_box(pages))
+        v.addStretch(1)
+        return w
+
+    def _look_box(self, pages) -> QFrame:
+        """One card holding `pages` [(tab name, card)], a tab row on top showing one at a
+        time (the others hidden, so the box is only as tall as the one showing). To
+        search it is one card; a search lands on the tab with the words."""
+        box = QFrame()
+        box.setObjectName("setcard")
+        bv = QVBoxLayout(box)
+        bv.setContentsMargins(14, 12, 14, 14)
+        bv.setSpacing(10)
+        row = _button_row()
+        bv.addLayout(row)
+        group = QButtonGroup(box)
+        tabs = []
+        for i, (name, card) in enumerate(pages):
+            card.setObjectName("lookpage")   # not a card of its own: flat inside the box
+            lay = card.layout()
+            lay.setContentsMargins(0, 0, 0, 0)
+            lay.itemAt(0).widget().hide()   # its title: the tab says it (search still reads it)
+            b = QPushButton(name)
+            b.setObjectName("voicetab")    # the same tabs as the voice changer's
+            b.setCheckable(True)
+            group.addButton(b, i)
+            row.addWidget(b)
+            bv.addWidget(card)
+            tabs.append(b)
+        self.look_shown = 0   # the tab showing
+
+        def show(i):
+            tabs[i].setChecked(True)
+            for j, (__, card) in enumerate(pages):
+                card.setVisible(j == i)
+            self.look_shown = i
+        group.idClicked.connect(show)
+        show(0)
+
+        def pick(words):
+            for i, (name, card) in enumerate(pages):
+                if all(wd in name.lower() or wd in self._words_of(card) for wd in words):
+                    show(i)
+                    return
+        self._look_pick = pick
+        self.look_tabs, self.look_pages, self.look_box = tabs, [c for __, c in pages], box
+        return box
+
+    def _live_tabs_card(self) -> QFrame:
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
                                 "changer, the radio…) is marked, so nothing is left on without "
@@ -977,26 +1058,7 @@ class SettingsDialog(QDialog):
         green.toggled.connect(self.mw.themectl.set_live_tab_tint)
         self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
-        v.addWidget(card)
-        v.addWidget(self._playing_background_card())
-        v.addWidget(self._ui_scale_card())
-        v.addWidget(self._highlight_card())
-        v.addWidget(self._texture_card())
-        hints = {"Classic": _("Changes the whole app instantly."),
-                 "Meme": _("For when you want your soundboard to be a bit.")}
-        for group, names in theme.GROUPS:
-            card, cv = self._card(theme.group_name(group), hints.get(group, ""))
-            cards = []
-            for name in names:
-                c = ThemeCard(name)
-                c.setChecked(name == theme.current_name)
-                c.clicked.connect(lambda __=False, n=name: self._pick_theme(n))
-                cards.append(c)
-                self.theme_cards.append(c)
-            cv.addWidget(ThemeGrid(cards))
-            v.addWidget(card)
-        v.addStretch(1)
-        return w
+        return card
 
     def _texture_card(self) -> QFrame:
         """Textured or Plain: each theme's own pattern on its panels, or flat panels."""

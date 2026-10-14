@@ -348,7 +348,7 @@ class SoundMeta:
 
 @dataclass
 class Config:
-    copy_local_sounds: bool = False   # new local imports link to their source by default
+    copy_local_sounds: bool = True   # new local imports get their own copy (False: a link)
     version: int = CONFIG_VERSION
     route: str = "cable"      # where what others hear goes: ROUTES ("mic": see mic_first)
     # straight into my mic became the main way in 1.9.1: settings on the cable were
